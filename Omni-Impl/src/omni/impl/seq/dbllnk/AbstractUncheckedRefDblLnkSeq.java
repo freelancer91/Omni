@@ -1,13 +1,11 @@
 package omni.impl.seq.dbllnk;
 import java.util.Comparator;
 import java.util.function.Consumer;
-import java.util.function.IntFunction;
 import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
 import omni.api.OmniIterator;
 import omni.api.OmniList;
 import omni.api.OmniListIterator;
-import omni.util.OmniArray;
 import omni.util.OmniPred;
 abstract class AbstractUncheckedRefDblLnkSeq<E>extends AbstractRefDblLnkSeq<E>{
   static void decrementSize(AbstractUncheckedRefDblLnkSeq<?> curr){
@@ -264,32 +262,6 @@ abstract class AbstractUncheckedRefDblLnkSeq<E>extends AbstractRefDblLnkSeq<E>{
     default:
       return getDefaultSublist(fromIndex,size,tailDist);
     }
-  }
-  @Override public Object[] toArray(){
-    int size;
-    if((size=this.size)!=0){
-      Object[] dst;
-      uncheckedCopyIntoArray(head,size,dst=new Object[size],0);
-      return dst;
-    }
-    return OmniArray.OfRef.DEFAULT_ARR;
-  }
-  @Override public <T> T[] toArray(IntFunction<T[]> arrConstructor){
-    int size;
-    final T[] dst=arrConstructor.apply(size=this.size);
-    if(size!=0){
-      uncheckedCopyIntoArray(head,size,dst,0);
-    }
-    return dst;
-  }
-  @Override public <T> T[] toArray(T[] dst){
-    int size;
-    if((size=this.size)!=0){
-      uncheckedCopyIntoArray(head,size,dst=OmniArray.uncheckedArrResize(size,dst),0);
-    }else if(dst.length!=0){
-      dst[0]=null;
-    }
-    return dst;
   }
   @Override public String toString(){
     Node<E> head;

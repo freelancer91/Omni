@@ -3,14 +3,42 @@ import java.util.Comparator;
 import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.IntFunction;
 import java.util.function.Predicate;
 import omni.api.OmniList;
 import omni.impl.seq.AbstractRefList;
+import omni.util.OmniArray;
 import omni.util.OmniPred;
 abstract class AbstractRefDblLnkSeq<E>extends AbstractRefList<E> implements OmniList.OfRef<E>{
   static <E> void joinNodes(Node<E> before,Node<E> after){
     after.prev=before;
     before.next=after;
+  }
+  @Override public Object[] toArray(){
+    int size;
+    if((size=this.size)!=0){
+      Object[] dst;
+      uncheckedCopyIntoArray(head,size,dst=new Object[size],0);
+      return dst;
+    }
+    return OmniArray.OfRef.DEFAULT_ARR;
+  }
+  @Override public <T> T[] toArray(T[] dst){
+    int size;
+    if((size=this.size)!=0){
+      uncheckedCopyIntoArray(head,size,dst=OmniArray.uncheckedArrResize(size,dst),0);
+    }else if(dst.length!=0){
+      dst[0]=null;
+    }
+    return dst;
+  }
+  @Override public <T> T[] toArray(IntFunction<T[]> arrConstructor){
+    int size;
+    final T[] dst=arrConstructor.apply(size=this.size);
+    if(size!=0){
+      uncheckedCopyIntoArray(head,size,dst,0);
+    }
+    return dst;
   }
   @Override public boolean contains(boolean val){
     Node<E> head;
@@ -202,6 +230,15 @@ abstract class AbstractRefDblLnkSeq<E>extends AbstractRefList<E> implements Omni
     }else{
       uncheckedInit(val);
     }
+  }
+  @Override public boolean add(E val){
+    Node<E> tail;
+    if((tail=this.tail)!=null){
+      uncheckedAppend(tail,val);
+    }else{
+      uncheckedInit(val);
+    }
+    return true;
   }
   public void addLast(E val){
     Node<E> tail;

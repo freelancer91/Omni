@@ -237,21 +237,30 @@ public class CheckedRefDblLnkList<E>extends AbstractCheckedRefDblLnkSeq<E> imple
     Node<E> head;
     return (head=this.head)!=null&&uncheckedRemoveFirstMatch(head,OmniPred.OfRef.getEqualsPred(val));
   }
-  @Override public Object[] toArray(){
-    // TODO Auto-generated method stub
-    return null;
-  }
   @Override public <T> T[] toArray(IntFunction<T[]> arrConstructor){
-    // TODO Auto-generated method stub
-    return null;
-  }
-  @Override public <T> T[] toArray(T[] dst){
-    // TODO Auto-generated method stub
-    return null;
+    return super.toArray(size->{
+      final int expectedModCount=modCount;
+      try{
+        return arrConstructor.apply(size);
+      }finally{
+        CheckedCollection.checkModCount(expectedModCount,modCount);
+      }
+    });
   }
   @Override public int search(Object val){
-    // TODO Auto-generated method stub
-    return 0;
+    Node<E> head;
+    if((head=this.head)!=null){
+      if(val!=null){
+        final int modCount=this.modCount;
+        try{
+          return super.uncheckedSearch(head,val::equals);
+        }finally{
+          CheckedCollection.checkModCount(modCount,modCount);
+        }
+      }
+      return super.uncheckedSearch(head,Objects::isNull);
+    }
+    return -1;
   }
   @Override public E element(){
     Node<E> head;
@@ -268,10 +277,6 @@ public class CheckedRefDblLnkList<E>extends AbstractCheckedRefDblLnkSeq<E> imple
       return ret;
     }
     throw new NoSuchElementException();
-  }
-  @Override public boolean add(E val){
-    // TODO Auto-generated method stub
-    return false;
   }
   @Override public void forEach(Consumer<? super E> action){
     Node<E> head;
@@ -306,10 +311,6 @@ public class CheckedRefDblLnkList<E>extends AbstractCheckedRefDblLnkSeq<E> imple
   @Override public void add(int index,E val){
     // TODO Auto-generated method stub
   }
-  @Override public E get(int index){
-    // TODO Auto-generated method stub
-    return null;
-  }
   @Override public OmniListIterator.OfRef<E> listIterator(){
     // TODO Auto-generated method stub
     return null;
@@ -318,19 +319,12 @@ public class CheckedRefDblLnkList<E>extends AbstractCheckedRefDblLnkSeq<E> imple
     // TODO Auto-generated method stub
     return null;
   }
-  @Override public void put(int index,E val){
-    // TODO Auto-generated method stub
-  }
   @Override public E remove(int index){
     // TODO Auto-generated method stub
     return null;
   }
   @Override public void replaceAll(UnaryOperator<E> operator){
     // TODO Auto-generated method stub
-  }
-  @Override public E set(int index,E val){
-    // TODO Auto-generated method stub
-    return null;
   }
   @Override public void sort(Comparator<? super E> sorter){
     // TODO Auto-generated method stub
