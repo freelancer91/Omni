@@ -1,4 +1,4 @@
 package omni.function;
 public interface ShortConsumer{
-  void accept(short val);
+    void accept(short val);
 }

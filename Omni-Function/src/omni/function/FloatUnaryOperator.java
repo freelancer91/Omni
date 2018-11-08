@@ -1,4 +1,4 @@
 package omni.function;
 public interface FloatUnaryOperator{
-  float applyAsFloat(float val);
+    float applyAsFloat(float val);
 }

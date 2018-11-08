@@ -6,156 +6,181 @@ import omni.api.OmniStack;
 import omni.impl.CheckedCollection;
 import omni.util.ArrCopy;
 public class CheckedLongArrStack extends AbstractLongArrSeq.Checked implements OmniStack.OfLong{
-  CheckedLongArrStack(){
-    super();
-  }
-  CheckedLongArrStack(int capacity){
-    super(capacity);
-  }
-  private CheckedLongArrStack(int size,long[] arr){
-    super(size,arr);
-  }
-  @Override public Object clone(){
-    final long[] arr;
-    final int size;
-    if((size=this.size)!=0){
-      ArrCopy.uncheckedCopy(this.arr,0,arr=new long[size],0,size);
-    }else{
-      arr=null;
+    CheckedLongArrStack(){
+        super();
     }
-    return new CheckedLongArrStack(size,arr);
-  }
-  @Override public boolean equals(Object val){
-    // TODO Auto-generated method stub
-    return false;
-  }
-  @Override public OmniIterator.OfLong iterator(){
-    return new DescendingItr(this);
-  }
-  @Override public Long poll(){
-    final int size;
-    if((size=this.size)!=0){
-      ++modCount;
-      return super.uncheckedPopLong(size-1);
+    CheckedLongArrStack(int capacity){
+        super(capacity);
     }
-    return null;
-  }
-  @Override public double pollDouble(){
-    final int size;
-    if((size=this.size)!=0){
-      ++modCount;
-      return super.uncheckedPopLong(size-1);
+    private CheckedLongArrStack(int size,long[] arr){
+        super(size,arr);
     }
-    return Double.NaN;
-  }
-  @Override public float pollFloat(){
-    final int size;
-    if((size=this.size)!=0){
-      ++modCount;
-      return super.uncheckedPopLong(size-1);
+    @Override
+    public Object clone(){
+        final long[] arr;
+        final int size;
+        if((size=this.size)!=0){
+            ArrCopy.uncheckedCopy(this.arr,0,arr=new long[size],0,size);
+        }else{
+            arr=null;
+        }
+        return new CheckedLongArrStack(size,arr);
     }
-    return Float.NaN;
-  }
-  @Override public long pollLong(){
-    final int size;
-    if((size=this.size)!=0){
-      ++modCount;
-      return super.uncheckedPopLong(size-1);
+    @Override
+    public boolean equals(Object val){
+        // TODO Auto-generated method stub
+        return false;
     }
-    return Long.MIN_VALUE;
-  }
-  @Override public Long pop(){
-    return super.popLong();
-  }
-  @Override public void push(Long val){
-    super.push(val);
-  }
-  @Override void uncheckedCopyInto(double[] dst,int length){
-    ArrCopy.uncheckedReverseCopy(arr,0,dst,0,length);
-  }
-  @Override void uncheckedCopyInto(float[] dst,int length){
-    ArrCopy.uncheckedReverseCopy(arr,0,dst,0,length);
-  }
-  @Override void uncheckedCopyInto(long[] dst,int length){
-    ArrCopy.uncheckedReverseCopy(arr,0,dst,0,length);
-  }
-  @Override void uncheckedCopyInto(Long[] dst,int length){
-    ArrCopy.uncheckedReverseCopy(arr,0,dst,0,length);
-  }
-  @Override void uncheckedCopyInto(Object[] dst,int length){
-    ArrCopy.uncheckedReverseCopy(arr,0,dst,0,length);
-  }
-  @Override void uncheckedForEach(int size,LongConsumer action){
-    final int modCount=this.modCount;
-    try{
-      uncheckedReverseForEachInRange(arr,0,size,action);
-    }finally{
-      CheckedCollection.checkModCount(modCount,this.modCount);
+    @Override
+    public OmniIterator.OfLong iterator(){
+        return new DescendingItr(this);
     }
-  }
-  @Override int uncheckedHashCode(int size){
-    return reverseHashCode(arr,0,size);
-  }
-  @Override boolean uncheckedRemoveFirstMatch(int size,long val){
-    final var arr=this.arr;
-    int index;
-    for(index=--size;arr[index]!=val;--index){
-      if(index==0){ return false; }
+    @Override
+    public Long poll(){
+        final int size;
+        if((size=this.size)!=0){
+            ++modCount;
+            return super.uncheckedPopLong(size-1);
+        }
+        return null;
     }
-    ++modCount;
-    eraseIndexHelper(arr,index,size);
-    this.size=size;
-    return true;
-  }
-  @Override void uncheckedToString(int size,StringBuilder builder){
-    reverseToString(arr,0,size,builder);
-  }
-  private static class DescendingItr extends AbstractDescendingItr implements OmniIterator.OfLong{
-    private DescendingItr(Checked root){
-      super(root);
+    @Override
+    public double pollDouble(){
+        final int size;
+        if((size=this.size)!=0){
+            ++modCount;
+            return super.uncheckedPopLong(size-1);
+        }
+        return Double.NaN;
     }
-    @Override public void forEachRemaining(Consumer<? super Long> action){
-      final int cursor;
-      if((cursor=this.cursor)!=0){
-        uncheckedForEachRemaining(cursor,action::accept);
-      }
+    @Override
+    public float pollFloat(){
+        final int size;
+        if((size=this.size)!=0){
+            ++modCount;
+            return super.uncheckedPopLong(size-1);
+        }
+        return Float.NaN;
     }
-    @Override public void forEachRemaining(LongConsumer action){
-      final int cursor;
-      if((cursor=this.cursor)!=0){
-        uncheckedForEachRemaining(cursor,action);
-      }
+    @Override
+    public long pollLong(){
+        final int size;
+        if((size=this.size)!=0){
+            ++modCount;
+            return super.uncheckedPopLong(size-1);
+        }
+        return Long.MIN_VALUE;
     }
-    @Override public boolean hasNext(){
-      return cursor!=0;
+    @Override
+    public Long pop(){
+        return super.popLong();
     }
-    @Override public Long next(){
-      return super.nextLong();
+    @Override
+    public void push(Long val){
+        super.push(val);
     }
-    private void uncheckedForEachRemaining(int cursor,LongConsumer action){
-      final var root=this.root;
-      final int expectedModCount=modCount;
-      try{
-        uncheckedReverseForEachInRange(root.arr,0,cursor,action);
-      }finally{
-        CheckedCollection.checkModCount(expectedModCount,root.modCount);
-      }
-      this.cursor=0;
-      lastRet=0;
+    @Override
+    void uncheckedCopyInto(double[] dst,int length){
+        ArrCopy.uncheckedReverseCopy(arr,0,dst,0,length);
     }
-    @Override public void remove(){
-      final int lastRet;
-      if((lastRet=this.lastRet)!=-1){
-        final Checked root;
-        int modCount;
-        CheckedCollection.checkModCount(modCount=this.modCount,(root=this.root).modCount);
-        eraseIndexHelper(root.arr,lastRet,--root.size);
-        root.modCount=++modCount;
-        this.modCount=modCount;
-        this.lastRet=-1;
-        return;
-      }
-      throw new IllegalStateException();
+    @Override
+    void uncheckedCopyInto(float[] dst,int length){
+        ArrCopy.uncheckedReverseCopy(arr,0,dst,0,length);
     }
-  }
+    @Override
+    void uncheckedCopyInto(long[] dst,int length){
+        ArrCopy.uncheckedReverseCopy(arr,0,dst,0,length);
+    }
+    @Override
+    void uncheckedCopyInto(Long[] dst,int length){
+        ArrCopy.uncheckedReverseCopy(arr,0,dst,0,length);
+    }
+    @Override
+    void uncheckedCopyInto(Object[] dst,int length){
+        ArrCopy.uncheckedReverseCopy(arr,0,dst,0,length);
+    }
+    @Override
+    void uncheckedForEach(int size,LongConsumer action){
+        final int modCount=this.modCount;
+        try{
+            uncheckedReverseForEachInRange(arr,0,size,action);
+        }finally{
+            CheckedCollection.checkModCount(modCount,this.modCount);
+        }
+    }
+    @Override
+    int uncheckedHashCode(int size){
+        return reverseHashCode(arr,0,size);
+    }
+    @Override
+    boolean uncheckedRemoveFirstMatch(int size,long val){
+        final var arr=this.arr;
+        int index;
+        for(index=--size;arr[index]!=val;--index){
+            if(index==0){
+                return false;
+            }
+        }
+        ++modCount;
+        eraseIndexHelper(arr,index,size);
+        this.size=size;
+        return true;
+    }
+    @Override
+    void uncheckedToString(int size,StringBuilder builder){
+        reverseToString(arr,0,size,builder);
+    }
+    private static class DescendingItr extends AbstractDescendingItr implements OmniIterator.OfLong{
+        private DescendingItr(Checked root){
+            super(root);
+        }
+        @Override
+        public void forEachRemaining(Consumer<? super Long> action){
+            final int cursor;
+            if((cursor=this.cursor)!=0){
+                uncheckedForEachRemaining(cursor,action::accept);
+            }
+        }
+        @Override
+        public void forEachRemaining(LongConsumer action){
+            final int cursor;
+            if((cursor=this.cursor)!=0){
+                uncheckedForEachRemaining(cursor,action);
+            }
+        }
+        @Override
+        public boolean hasNext(){
+            return cursor!=0;
+        }
+        @Override
+        public Long next(){
+            return super.nextLong();
+        }
+        @Override
+        public void remove(){
+            final int lastRet;
+            if((lastRet=this.lastRet)!=-1){
+                final Checked root;
+                int modCount;
+                CheckedCollection.checkModCount(modCount=this.modCount,(root=this.root).modCount);
+                eraseIndexHelper(root.arr,lastRet,--root.size);
+                root.modCount=++modCount;
+                this.modCount=modCount;
+                this.lastRet=-1;
+                return;
+            }
+            throw new IllegalStateException();
+        }
+        private void uncheckedForEachRemaining(int cursor,LongConsumer action){
+            final var root=this.root;
+            final int expectedModCount=modCount;
+            try{
+                uncheckedReverseForEachInRange(root.arr,0,cursor,action);
+            }finally{
+                CheckedCollection.checkModCount(expectedModCount,root.modCount);
+            }
+            this.cursor=0;
+            lastRet=0;
+        }
+    }
 }

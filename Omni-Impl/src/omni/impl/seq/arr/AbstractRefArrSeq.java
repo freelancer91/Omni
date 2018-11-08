@@ -12,7 +12,6 @@ import omni.util.BitSetUtils;
 import omni.util.OmniArray;
 import omni.util.OmniPred;
 abstract class AbstractRefArrSeq<E>extends AbstractRefList<E>{
-    transient Object[] arr;
     // TODO redo toString implementation
     static void eraseIndexHelper(Object[] arr,int index,int newSize){
         ArrCopy.semicheckedCopy(arr,index+1,arr,index,newSize-index);
@@ -40,12 +39,14 @@ abstract class AbstractRefArrSeq<E>extends AbstractRefList<E>{
     }
     static boolean uncheckedAnyMatches(Object[] arr,int offset,int bound,Predicate<Object> pred){
         while(!pred.test(arr[offset])){
-            if(++offset==bound){ return false; }
+            if(++offset==bound){
+                return false;
+            }
         }
         return true;
     }
-    @SuppressWarnings("unchecked") static <E> void uncheckedForwardForEachInRange(Object[] arr,int offset,int bound,
-            Consumer<? super E> action){
+    @SuppressWarnings("unchecked")
+    static <E> void uncheckedForwardForEachInRange(Object[] arr,int offset,int bound,Consumer<? super E> action){
         do{
             action.accept((E)arr[offset]);
         }while(++offset!=bound);
@@ -53,51 +54,60 @@ abstract class AbstractRefArrSeq<E>extends AbstractRefList<E>{
     static int uncheckedIndexOf(Object[] arr,int offset,int bound,Predicate<Object> pred){
         int index=offset;
         do{
-            if(pred.test(arr[index])){ return index-offset; }
+            if(pred.test(arr[index])){
+                return index-offset;
+            }
         }while(++index!=bound);
         return -1;
     }
     static int uncheckedIndexOf(Object[] arr,int size,Predicate<Object> pred){
         int index=0;
         do{
-            if(pred.test(arr[index])){ return index; }
+            if(pred.test(arr[index])){
+                return index;
+            }
         }while(++index!=size);
         return -1;
     }
     static int uncheckedLastIndexOf(Object[] arr,int offset,int bound,Predicate<Object> pred){
         do{
-            if(pred.test(arr[--bound])){ return bound-offset; }
+            if(pred.test(arr[--bound])){
+                return bound-offset;
+            }
         }while(bound!=offset);
         return -1;
     }
-    @SuppressWarnings("unchecked") static <E> void uncheckedReplaceAll(Object[] arr,int offset,int bound,
-            Function<? super E,? extends E> operator){
+    @SuppressWarnings("unchecked")
+    static <E> void uncheckedReplaceAll(Object[] arr,int offset,int bound,Function<? super E,? extends E> operator){
         do{
             arr[offset]=operator.apply((E)arr[offset]);
         }while(++offset!=bound);
     }
-    @SuppressWarnings("unchecked") static <E> void uncheckedReverseForEachInRange(Object[] arr,int offset,int bound,
-            Consumer<? super E> action){
+    @SuppressWarnings("unchecked")
+    static <E> void uncheckedReverseForEachInRange(Object[] arr,int offset,int bound,Consumer<? super E> action){
         do{
             action.accept((E)arr[--bound]);
         }while(bound!=offset);
     }
-    static void uncheckedReverseSort(Object[] arr,int begin,int end){
-        // TODO
-    }
+    // static void uncheckedReverseSort(Object[] arr,int begin,int end){
+    // // TODO
+    // }
     static int uncheckedSearch(Object[] arr,int size,Predicate<Object> pred){
         int index;
         for(index=size-1;!pred.test(arr[index]);--index){
-            if(index==0){ return -1; }
+            if(index==0){
+                return -1;
+            }
         }
         return size-index;
     }
-    static void uncheckedSort(Object[] arr,int begin,int end){
-        // TODO
-    }
+    // static void uncheckedSort(Object[] arr,int begin,int end){
+    // // TODO
+    // }
     static <E> void uncheckedSort(Object[] arr,int begin,int end,Comparator<? super E> sorter){
         // TODO
     }
+    transient Object[] arr;
     private AbstractRefArrSeq(){
         super();
         this.arr=OmniArray.OfRef.DEFAULT_ARR;
@@ -187,97 +197,136 @@ abstract class AbstractRefArrSeq<E>extends AbstractRefList<E>{
             uncheckedForEach(size,action);
         }
     }
-    @SuppressWarnings("unchecked") public E get(int index){
+    @SuppressWarnings("unchecked")
+    public E get(int index){
         return (E)arr[index];
     }
-    @Override public int hashCode(){
+    @Override
+    public int hashCode(){
         final int size;
-        if((size=this.size)!=0){ return uncheckedHashCode(size); }
+        if((size=this.size)!=0){
+            return uncheckedHashCode(size);
+        }
         return 1;
     }
     public int indexOf(boolean val){
         final int size;
-        if((size=this.size)!=0){ return uncheckedIndexOf(arr,size,OmniPred.OfRef.getEqualsPred(val)); }
+        if((size=this.size)!=0){
+            return uncheckedIndexOf(arr,size,OmniPred.OfRef.getEqualsPred(val));
+        }
         return -1;
     }
     public int indexOf(Boolean val){
         final int size;
-        if((size=this.size)!=0){ return uncheckedIndexOf(arr,size,OmniPred.OfRef.getEqualsPred(val)); }
+        if((size=this.size)!=0){
+            return uncheckedIndexOf(arr,size,OmniPred.OfRef.getEqualsPred(val));
+        }
         return -1;
     }
     public int indexOf(byte val){
         final int size;
-        if((size=this.size)!=0){ return uncheckedIndexOf(arr,size,OmniPred.OfRef.getEqualsPred(val)); }
+        if((size=this.size)!=0){
+            return uncheckedIndexOf(arr,size,OmniPred.OfRef.getEqualsPred(val));
+        }
         return -1;
     }
     public int indexOf(Byte val){
         final int size;
-        if((size=this.size)!=0){ return uncheckedIndexOf(arr,size,OmniPred.OfRef.getEqualsPred(val)); }
+        if((size=this.size)!=0){
+            return uncheckedIndexOf(arr,size,OmniPred.OfRef.getEqualsPred(val));
+        }
         return -1;
     }
     public int indexOf(char val){
         final int size;
-        if((size=this.size)!=0){ return uncheckedIndexOf(arr,size,OmniPred.OfRef.getEqualsPred(val)); }
+        if((size=this.size)!=0){
+            return uncheckedIndexOf(arr,size,OmniPred.OfRef.getEqualsPred(val));
+        }
         return -1;
     }
     public int indexOf(Character val){
         final int size;
-        if((size=this.size)!=0){ return uncheckedIndexOf(arr,size,OmniPred.OfRef.getEqualsPred(val)); }
+        if((size=this.size)!=0){
+            return uncheckedIndexOf(arr,size,OmniPred.OfRef.getEqualsPred(val));
+        }
         return -1;
     }
     public int indexOf(double val){
         final int size;
-        if((size=this.size)!=0){ return uncheckedIndexOf(arr,size,OmniPred.OfRef.getEqualsPred(val)); }
+        if((size=this.size)!=0){
+            return uncheckedIndexOf(arr,size,OmniPred.OfRef.getEqualsPred(val));
+        }
         return -1;
     }
     public int indexOf(Double val){
         final int size;
-        if((size=this.size)!=0){ return uncheckedIndexOf(arr,size,OmniPred.OfRef.getEqualsPred(val)); }
+        if((size=this.size)!=0){
+            return uncheckedIndexOf(arr,size,OmniPred.OfRef.getEqualsPred(val));
+        }
         return -1;
     }
     public int indexOf(float val){
         final int size;
-        if((size=this.size)!=0){ return uncheckedIndexOf(arr,size,OmniPred.OfRef.getEqualsPred(val)); }
+        if((size=this.size)!=0){
+            return uncheckedIndexOf(arr,size,OmniPred.OfRef.getEqualsPred(val));
+        }
         return -1;
     }
     public int indexOf(Float val){
         final int size;
-        if((size=this.size)!=0){ return uncheckedIndexOf(arr,size,OmniPred.OfRef.getEqualsPred(val)); }
+        if((size=this.size)!=0){
+            return uncheckedIndexOf(arr,size,OmniPred.OfRef.getEqualsPred(val));
+        }
         return -1;
     }
     public int indexOf(int val){
         final int size;
-        if((size=this.size)!=0){ return uncheckedIndexOf(arr,size,OmniPred.OfRef.getEqualsPred(val)); }
+        if((size=this.size)!=0){
+            return uncheckedIndexOf(arr,size,OmniPred.OfRef.getEqualsPred(val));
+        }
         return -1;
     }
     public int indexOf(Integer val){
         final int size;
-        if((size=this.size)!=0){ return uncheckedIndexOf(arr,size,OmniPred.OfRef.getEqualsPred(val)); }
+        if((size=this.size)!=0){
+            return uncheckedIndexOf(arr,size,OmniPred.OfRef.getEqualsPred(val));
+        }
         return -1;
     }
     public int indexOf(long val){
         final int size;
-        if((size=this.size)!=0){ return uncheckedIndexOf(arr,size,OmniPred.OfRef.getEqualsPred(val)); }
+        if((size=this.size)!=0){
+            return uncheckedIndexOf(arr,size,OmniPred.OfRef.getEqualsPred(val));
+        }
         return -1;
     }
     public int indexOf(Long val){
         final int size;
-        if((size=this.size)!=0){ return uncheckedIndexOf(arr,size,OmniPred.OfRef.getEqualsPred(val)); }
+        if((size=this.size)!=0){
+            return uncheckedIndexOf(arr,size,OmniPred.OfRef.getEqualsPred(val));
+        }
         return -1;
     }
     public int indexOf(short val){
         final int size;
-        if((size=this.size)!=0){ return uncheckedIndexOf(arr,size,OmniPred.OfRef.getEqualsPred(val)); }
+        if((size=this.size)!=0){
+            return uncheckedIndexOf(arr,size,OmniPred.OfRef.getEqualsPred(val));
+        }
         return -1;
     }
     public int indexOf(Short val){
         final int size;
-        if((size=this.size)!=0){ return uncheckedIndexOf(arr,size,OmniPred.OfRef.getEqualsPred(val)); }
+        if((size=this.size)!=0){
+            return uncheckedIndexOf(arr,size,OmniPred.OfRef.getEqualsPred(val));
+        }
         return -1;
     }
-    @SuppressWarnings("unchecked") public E peek(){
+    @SuppressWarnings("unchecked")
+    public E peek(){
         final int size;
-        if((size=this.size)!=0){ return (E)arr[size-1]; }
+        if((size=this.size)!=0){
+            return (E)arr[size-1];
+        }
         return null;
     }
     public void push(E val){
@@ -294,7 +343,9 @@ abstract class AbstractRefArrSeq<E>extends AbstractRefList<E>{
     public boolean remove(Object val){
         final int size;
         if((size=this.size)!=0){
-            if(val!=null){ return uncheckedRemoveFirstNonNull(size,val); }
+            if(val!=null){
+                return uncheckedRemoveFirstNonNull(size,val);
+            }
             return uncheckedRemoveFirstMatch(size,Objects::isNull);
         }
         return false;
@@ -369,87 +420,120 @@ abstract class AbstractRefArrSeq<E>extends AbstractRefList<E>{
     }
     public int search(boolean val){
         final int size;
-        if((size=this.size)!=0){ return uncheckedSearch(arr,size,OmniPred.OfRef.getEqualsPred(val)); }
+        if((size=this.size)!=0){
+            return uncheckedSearch(arr,size,OmniPred.OfRef.getEqualsPred(val));
+        }
         return -1;
     }
     public int search(Boolean val){
         final int size;
-        if((size=this.size)!=0){ return uncheckedSearch(arr,size,OmniPred.OfRef.getEqualsPred(val)); }
+        if((size=this.size)!=0){
+            return uncheckedSearch(arr,size,OmniPred.OfRef.getEqualsPred(val));
+        }
         return -1;
     }
     public int search(byte val){
         final int size;
-        if((size=this.size)!=0){ return uncheckedSearch(arr,size,OmniPred.OfRef.getEqualsPred(val)); }
+        if((size=this.size)!=0){
+            return uncheckedSearch(arr,size,OmniPred.OfRef.getEqualsPred(val));
+        }
         return -1;
     }
     public int search(Byte val){
         final int size;
-        if((size=this.size)!=0){ return uncheckedSearch(arr,size,OmniPred.OfRef.getEqualsPred(val)); }
+        if((size=this.size)!=0){
+            return uncheckedSearch(arr,size,OmniPred.OfRef.getEqualsPred(val));
+        }
         return -1;
     }
     public int search(char val){
         final int size;
-        if((size=this.size)!=0){ return uncheckedSearch(arr,size,OmniPred.OfRef.getEqualsPred(val)); }
+        if((size=this.size)!=0){
+            return uncheckedSearch(arr,size,OmniPred.OfRef.getEqualsPred(val));
+        }
         return -1;
     }
     public int search(Character val){
         final int size;
-        if((size=this.size)!=0){ return uncheckedSearch(arr,size,OmniPred.OfRef.getEqualsPred(val)); }
+        if((size=this.size)!=0){
+            return uncheckedSearch(arr,size,OmniPred.OfRef.getEqualsPred(val));
+        }
         return -1;
     }
     public int search(double val){
         final int size;
-        if((size=this.size)!=0){ return uncheckedSearch(arr,size,OmniPred.OfRef.getEqualsPred(val)); }
+        if((size=this.size)!=0){
+            return uncheckedSearch(arr,size,OmniPred.OfRef.getEqualsPred(val));
+        }
         return -1;
     }
     public int search(Double val){
         final int size;
-        if((size=this.size)!=0){ return uncheckedSearch(arr,size,OmniPred.OfRef.getEqualsPred(val)); }
+        if((size=this.size)!=0){
+            return uncheckedSearch(arr,size,OmniPred.OfRef.getEqualsPred(val));
+        }
         return -1;
     }
     public int search(float val){
         final int size;
-        if((size=this.size)!=0){ return uncheckedSearch(arr,size,OmniPred.OfRef.getEqualsPred(val)); }
+        if((size=this.size)!=0){
+            return uncheckedSearch(arr,size,OmniPred.OfRef.getEqualsPred(val));
+        }
         return -1;
     }
     public int search(Float val){
         final int size;
-        if((size=this.size)!=0){ return uncheckedSearch(arr,size,OmniPred.OfRef.getEqualsPred(val)); }
+        if((size=this.size)!=0){
+            return uncheckedSearch(arr,size,OmniPred.OfRef.getEqualsPred(val));
+        }
         return -1;
     }
     public int search(int val){
         final int size;
-        if((size=this.size)!=0){ return uncheckedSearch(arr,size,OmniPred.OfRef.getEqualsPred(val)); }
+        if((size=this.size)!=0){
+            return uncheckedSearch(arr,size,OmniPred.OfRef.getEqualsPred(val));
+        }
         return -1;
     }
     public int search(Integer val){
         final int size;
-        if((size=this.size)!=0){ return uncheckedSearch(arr,size,OmniPred.OfRef.getEqualsPred(val)); }
+        if((size=this.size)!=0){
+            return uncheckedSearch(arr,size,OmniPred.OfRef.getEqualsPred(val));
+        }
         return -1;
     }
     public int search(long val){
         final int size;
-        if((size=this.size)!=0){ return uncheckedSearch(arr,size,OmniPred.OfRef.getEqualsPred(val)); }
+        if((size=this.size)!=0){
+            return uncheckedSearch(arr,size,OmniPred.OfRef.getEqualsPred(val));
+        }
         return -1;
     }
     public int search(Long val){
         final int size;
-        if((size=this.size)!=0){ return uncheckedSearch(arr,size,OmniPred.OfRef.getEqualsPred(val)); }
+        if((size=this.size)!=0){
+            return uncheckedSearch(arr,size,OmniPred.OfRef.getEqualsPred(val));
+        }
         return -1;
     }
     public int search(short val){
         final int size;
-        if((size=this.size)!=0){ return uncheckedSearch(arr,size,OmniPred.OfRef.getEqualsPred(val)); }
+        if((size=this.size)!=0){
+            return uncheckedSearch(arr,size,OmniPred.OfRef.getEqualsPred(val));
+        }
         return -1;
     }
     public int search(Short val){
         final int size;
-        if((size=this.size)!=0){ return uncheckedSearch(arr,size,OmniPred.OfRef.getEqualsPred(val)); }
+        if((size=this.size)!=0){
+            return uncheckedSearch(arr,size,OmniPred.OfRef.getEqualsPred(val));
+        }
         return -1;
     }
     public E set(int index,E val){
         final Object[] arr;
-        @SuppressWarnings("unchecked") final var oldVal=(E)(arr=this.arr)[index];
+        @SuppressWarnings("unchecked")
+        final var oldVal=(E)(arr=this.arr)[index];
         arr[index]=val;
         return oldVal;
     }
@@ -479,7 +563,8 @@ abstract class AbstractRefArrSeq<E>extends AbstractRefList<E>{
         }
         return dst;
     }
-    @Override public String toString(){
+    @Override
+    public String toString(){
         final int size;
         if((size=this.size)!=0){
             final StringBuilder builder;
@@ -488,10 +573,23 @@ abstract class AbstractRefArrSeq<E>extends AbstractRefList<E>{
         }
         return "[]";
     }
-    @Override protected int uncheckedLastIndexOfMatch(int size,Predicate<Object> pred){
+    @Override
+    protected int uncheckedLastIndexOfMatch(int size,Predicate<Object> pred){
         final var arr=this.arr;
         do{
-            if(pred.test(arr[--size])){ return size; }
+            if(pred.test(arr[--size])){
+                return size;
+            }
+        }while(size!=0);
+        return -1;
+    }
+    @Override
+    protected int uncheckedLastIndexOfNonNull(int size,Object nonNull){
+        final var arr=this.arr;
+        do{
+            if(nonNull.equals(arr[--size])){
+                return size;
+            }
         }while(size!=0);
         return -1;
     }
@@ -501,7 +599,8 @@ abstract class AbstractRefArrSeq<E>extends AbstractRefList<E>{
     E uncheckedPop(int newSize){
         size=newSize;
         final Object[] arr;
-        @SuppressWarnings("unchecked") final var popped=(E)(arr=this.arr)[newSize];
+        @SuppressWarnings("unchecked")
+        final var popped=(E)(arr=this.arr)[newSize];
         arr[newSize]=null;
         return popped;
     }
@@ -553,7 +652,6 @@ abstract class AbstractRefArrSeq<E>extends AbstractRefList<E>{
         }
     }
     static abstract class Checked<E>extends AbstractRefArrSeq<E>{
-        transient int modCount;
         @SuppressWarnings("unchecked")
         static <E> int markSurvivors(Object[] arr,long[] survivorSet,int offset,int bound,Predicate<? super E> filter){
             for(int numSurvivors=0,wordOffset=0;;){
@@ -589,6 +687,7 @@ abstract class AbstractRefArrSeq<E>extends AbstractRefList<E>{
                 }
             }
         }
+        transient int modCount;
         Checked(){
             super();
         }
@@ -614,7 +713,8 @@ abstract class AbstractRefArrSeq<E>extends AbstractRefList<E>{
                 super.uncheckedInit(val);
             }
         }
-        @Override public void clear(){
+        @Override
+        public void clear(){
             final int size;
             if((size=this.size)!=0){
                 ++modCount;
@@ -638,34 +738,31 @@ abstract class AbstractRefArrSeq<E>extends AbstractRefList<E>{
             }
             return false;
         }
-        @Override public E get(int index){
+        @Override
+        public E get(int index){
             CheckedCollection.checkLo(index);
             CheckedCollection.checkWriteHi(index,size);
             return super.get(index);
         }
-        @Override protected int uncheckedLastIndexOfNonNull(int size,Object nonNull){
-            final int modCount=this.modCount;
-            try{
-                return super.uncheckedLastIndexOfNonNull(size,nonNull);
-            }finally{
-                CheckedCollection.checkModCount(modCount,this.modCount);
-            }
-        }
-        @Override public void push(E val){
+        @Override
+        public void push(E val){
             ++modCount;
             super.push(val);
         }
-        @Override public void put(int index,E val){
+        @Override
+        public void put(int index,E val){
             CheckedCollection.checkLo(index);
             CheckedCollection.checkReadHi(index,size);
             super.put(index,val);
         }
-        @Override public E set(int index,E val){
+        @Override
+        public E set(int index,E val){
             CheckedCollection.checkLo(index);
             CheckedCollection.checkReadHi(index,size);
             return super.set(index,val);
         }
-        @Override public <T> T[] toArray(IntFunction<T[]> arrConstructor){
+        @Override
+        public <T> T[] toArray(IntFunction<T[]> arrConstructor){
             return super.toArray(size->{
                 final int expectedModCount=modCount;
                 try{
@@ -675,7 +772,18 @@ abstract class AbstractRefArrSeq<E>extends AbstractRefList<E>{
                 }
             });
         }
-        @Override @SuppressWarnings("unchecked") boolean uncheckedRemoveIf(int size,Predicate<? super E> filter){
+        @Override
+        protected int uncheckedLastIndexOfNonNull(int size,Object nonNull){
+            final int modCount=this.modCount;
+            try{
+                return super.uncheckedLastIndexOfNonNull(size,nonNull);
+            }finally{
+                CheckedCollection.checkModCount(modCount,this.modCount);
+            }
+        }
+        @Override
+        @SuppressWarnings("unchecked")
+        boolean uncheckedRemoveIf(int size,Predicate<? super E> filter){
             final int expectedModCount=modCount;
             final var arr=this.arr;
             int srcOffset=0;
@@ -689,7 +797,8 @@ abstract class AbstractRefArrSeq<E>extends AbstractRefList<E>{
                                 final long[] survivors;
                                 int numSurvivors;
                                 if((numSurvivors=size-++srcOffset)!=0){
-                                    numSurvivors=markSurvivors(arr,survivors=BitSetUtils.getBitSet(numSurvivors),srcOffset,size,filter);
+                                    numSurvivors=markSurvivors(arr,survivors=BitSetUtils.getBitSet(numSurvivors),
+                                            srcOffset,size,filter);
                                     CheckedCollection.checkModCount(expectedModCount,modCount);
                                     arr[dstOffset++]=v;
                                     if(numSurvivors!=0){
@@ -747,9 +856,6 @@ abstract class AbstractRefArrSeq<E>extends AbstractRefList<E>{
             }
         }
         static abstract class AbstractSubList<E>extends AbstractSubArrSeq{
-            transient final Checked<E> root;
-            transient final AbstractSubList<E> parent;
-            transient int modCount;
             private static void bubbleUpDecrementSize(AbstractSubList<?> parent,int numToRemove){
                 while(parent!=null){
                     parent.size-=numToRemove;
@@ -764,6 +870,9 @@ abstract class AbstractRefArrSeq<E>extends AbstractRefList<E>{
                     parent=parent.parent;
                 }
             }
+            transient final Checked<E> root;
+            transient final AbstractSubList<E> parent;
+            transient int modCount;
             AbstractSubList(Checked<E> root,AbstractSubList<E> parent,int rootOffset,int size,int modCount){
                 super(rootOffset,size);
                 this.root=root;
@@ -811,11 +920,8 @@ abstract class AbstractRefArrSeq<E>extends AbstractRefList<E>{
                 bubbleUpIncrementSize(parent);
                 this.size=size+1;
             }
-            @Override public boolean isEmpty(){
-                CheckedCollection.checkModCount(this.modCount,root.modCount);
-                return size==0;
-            }
-            @Override public void clear(){
+            @Override
+            public void clear(){
                 final var root=this.root;
                 final int modCount=this.modCount;
                 final int size;
@@ -828,13 +934,20 @@ abstract class AbstractRefArrSeq<E>extends AbstractRefList<E>{
                     root.size=newRootSize=(oldRootSize=root.size)-size;
                     final Object[] arr;
                     final int rootOffset;
-                    ArrCopy.semicheckedCopy(arr=root.arr,(rootOffset=this.rootOffset)+size,arr,rootOffset,newRootSize-rootOffset);
+                    ArrCopy.semicheckedCopy(arr=root.arr,(rootOffset=this.rootOffset)+size,arr,rootOffset,
+                            newRootSize-rootOffset);
                     OmniArray.OfRef.nullifyRange(arr,newRootSize,oldRootSize-1);
                 }else{
                     CheckedCollection.checkModCount(modCount,root.modCount);
                 }
             }
-            @SuppressWarnings("unchecked") public boolean removeIf(Predicate<? super E> filter){
+            @Override
+            public boolean isEmpty(){
+                CheckedCollection.checkModCount(this.modCount,root.modCount);
+                return size==0;
+            }
+            @SuppressWarnings("unchecked")
+            public boolean removeIf(Predicate<? super E> filter){
                 final var root=this.root;
                 int expectedModCount=modCount;
                 int size;
@@ -852,12 +965,14 @@ abstract class AbstractRefArrSeq<E>extends AbstractRefList<E>{
                                         final long[] survivors;
                                         int numSurvivors;
                                         if((numSurvivors=size-++srcOffset)!=0){
-                                            numSurvivors
-                                            =markSurvivors(arr,survivors=BitSetUtils.getBitSet(numSurvivors),srcOffset,srcBound,filter);
+                                            numSurvivors=markSurvivors(arr,
+                                                    survivors=BitSetUtils.getBitSet(numSurvivors),srcOffset,srcBound,
+                                                    filter);
                                             CheckedCollection.checkModCount(expectedModCount,root.modCount);
                                             arr[dstOffset++]=v;
                                             if(numSurvivors!=0){
-                                                dstOffset=pullSurvivorsDown(arr,survivors,dstOffset,srcOffset,numSurvivors);
+                                                dstOffset=pullSurvivorsDown(arr,survivors,dstOffset,srcOffset,
+                                                        numSurvivors);
                                             }
                                         }else{
                                             CheckedCollection.checkModCount(expectedModCount,root.modCount);
@@ -865,8 +980,8 @@ abstract class AbstractRefArrSeq<E>extends AbstractRefList<E>{
                                         }
                                         root.modCount=++expectedModCount;
                                         modCount=expectedModCount;
-                                        this.size
-                                        =size-(size=((AbstractRefArrSeq<E>)root).finalizeSubListBatchRemove(arr,dstOffset,srcBound));
+                                        this.size=size-(size=((AbstractRefArrSeq<E>)root)
+                                                .finalizeSubListBatchRemove(arr,dstOffset,srcBound));
                                         bubbleUpDecrementSize(parent,size);
                                         return true;
                                     }
@@ -874,7 +989,8 @@ abstract class AbstractRefArrSeq<E>extends AbstractRefList<E>{
                                 CheckedCollection.checkModCount(expectedModCount,root.modCount);
                                 root.modCount=++expectedModCount;
                                 modCount=expectedModCount;
-                                this.size=size-(size=((AbstractRefArrSeq<E>)root).finalizeSubListBatchRemove(arr,dstOffset,srcBound));
+                                this.size=size-(size=((AbstractRefArrSeq<E>)root).finalizeSubListBatchRemove(arr,
+                                        dstOffset,srcBound));
                                 bubbleUpDecrementSize(parent,size);
                                 return true;
                             }
@@ -886,7 +1002,8 @@ abstract class AbstractRefArrSeq<E>extends AbstractRefList<E>{
                 CheckedCollection.checkModCount(expectedModCount,root.modCount);
                 return false;
             }
-            @Override public int size(){
+            @Override
+            public int size(){
                 CheckedCollection.checkModCount(this.modCount,root.modCount);
                 return size;
             }
@@ -927,16 +1044,9 @@ abstract class AbstractRefArrSeq<E>extends AbstractRefList<E>{
             }
         }
     }
-    @Override protected int uncheckedLastIndexOfNonNull(int size,Object nonNull){
-        final var arr=this.arr;
-        do{
-            if(nonNull.equals(arr[--size])){ return size; }
-        }while(size!=0);
-        return -1;
-    }
     static abstract class Unchecked<E>extends AbstractRefArrSeq<E>{
-        @SuppressWarnings("unchecked") private static <E> int pullSurvivorsDown(Object[] arr,int srcBegin,int srcEnd,
-                Predicate<? super E> filter){
+        @SuppressWarnings("unchecked")
+        private static <E> int pullSurvivorsDown(Object[] arr,int srcBegin,int srcEnd,Predicate<? super E> filter){
             int dstOffset=srcBegin;
             while(srcBegin!=srcEnd){
                 final Object v;
@@ -967,7 +1077,8 @@ abstract class AbstractRefArrSeq<E>extends AbstractRefList<E>{
                 super.uncheckedInit(val);
             }
         }
-        @Override public void clear(){
+        @Override
+        public void clear(){
             final int size;
             if((size=this.size)!=0){
                 OmniArray.OfRef.nullifyRange(arr,0,size-1);
@@ -978,7 +1089,9 @@ abstract class AbstractRefArrSeq<E>extends AbstractRefList<E>{
             final int size;
             return (size=this.size)!=0&&uncheckedAnyMatches(arr,0,size,OmniPred.OfRef.getEqualsPred(val));
         }
-        @Override @SuppressWarnings("unchecked") boolean uncheckedRemoveIf(int size,Predicate<? super E> filter){
+        @Override
+        @SuppressWarnings("unchecked")
+        boolean uncheckedRemoveIf(int size,Predicate<? super E> filter){
             final var arr=this.arr;
             int srcOffset=0;
             do{
@@ -1013,8 +1126,6 @@ abstract class AbstractRefArrSeq<E>extends AbstractRefList<E>{
             }
         }
         static abstract class AbstractSubList<E>extends AbstractSubArrSeq{
-            transient final Unchecked<E> root;
-            transient final AbstractSubList<E> parent;
             private static void bubbleUpDecrementSize(AbstractSubList<?> parent,int numToRemove){
                 while(parent!=null){
                     parent.size-=numToRemove;
@@ -1027,6 +1138,8 @@ abstract class AbstractRefArrSeq<E>extends AbstractRefList<E>{
                     parent=parent.parent;
                 }
             }
+            transient final Unchecked<E> root;
+            transient final AbstractSubList<E> parent;
             AbstractSubList(Unchecked<E> root,AbstractSubList<E> parent,int rootOffset,int size){
                 super(rootOffset,size);
                 this.root=root;
@@ -1061,7 +1174,8 @@ abstract class AbstractRefArrSeq<E>extends AbstractRefList<E>{
                 ++size;
                 bubbleUpIncrementSize(parent);
             }
-            @Override public void clear(){
+            @Override
+            public void clear(){
                 int size;
                 if((size=this.size)!=0){
                     this.size=0;
@@ -1074,7 +1188,8 @@ abstract class AbstractRefArrSeq<E>extends AbstractRefList<E>{
                     OmniArray.OfRef.nullifyRange(arr,newRootSize,oldRootSize-1);
                 }
             }
-            @SuppressWarnings("unchecked") public boolean removeIf(Predicate<? super E> filter){
+            @SuppressWarnings("unchecked")
+            public boolean removeIf(Predicate<? super E> filter){
                 int size;
                 if((size=this.size)!=0){
                     final AbstractRefArrSeq<E> root;
@@ -1083,8 +1198,8 @@ abstract class AbstractRefArrSeq<E>extends AbstractRefList<E>{
                     final int srcBound=(srcOffset=rootOffset)+size;
                     do{
                         if(filter.test((E)arr[srcOffset])){
-                            this.size=size-(size
-                                    =root.finalizeSubListBatchRemove(arr,pullSurvivorsDown(arr,srcOffset,srcBound-1,filter),srcBound));
+                            this.size=size-(size=root.finalizeSubListBatchRemove(arr,
+                                    pullSurvivorsDown(arr,srcOffset,srcBound-1,filter),srcBound));
                             bubbleUpDecrementSize(parent,size);
                             return true;
                         }
