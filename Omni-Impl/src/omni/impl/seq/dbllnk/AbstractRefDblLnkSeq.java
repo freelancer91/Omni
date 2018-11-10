@@ -90,16 +90,6 @@ abstract class AbstractRefDblLnkSeq<E>extends AbstractRefList<E> implements Omni
         joinNodes(before,newNode);
         joinNodes(newNode,after);
     }
-    private static <SRC extends DST,DST> void uncheckedCopyForward(Node<SRC> src,DST[] dst,int dstOffset,int length){
-        for(;;){
-            dst[dstOffset]=src.val;
-            if(--length==0){
-                return;
-            }
-            ++dstOffset;
-            src=src.next;
-        }
-    }
     static <E> void uncheckedForEachForward(Node<E> begin,Node<E> end,Consumer<? super E> action){
         for(;;){
             action.accept(begin.val);
@@ -147,6 +137,16 @@ abstract class AbstractRefDblLnkSeq<E>extends AbstractRefList<E> implements Omni
     }
     static <E> void uncheckedSort(Node<?> begin,int size,Node<?> end,Comparator<? super E> sorter){
         // TODO
+    }
+    private static <SRC extends DST,DST> void uncheckedCopyForward(Node<SRC> src,DST[] dst,int dstOffset,int length){
+        for(;;){
+            dst[dstOffset]=src.val;
+            if(--length==0){
+                return;
+            }
+            ++dstOffset;
+            src=src.next;
+        }
     }
     transient Node<E> head;
     transient Node<E> tail;
@@ -1010,7 +1010,6 @@ abstract class AbstractRefDblLnkSeq<E>extends AbstractRefList<E> implements Omni
             }
             return false;
         }
-
         @Override
         public E getFirst(){
             Node<E> head;
@@ -1046,7 +1045,6 @@ abstract class AbstractRefDblLnkSeq<E>extends AbstractRefList<E> implements Omni
             }
             return null;
         }
-
         @Override
         public E removeFirst(){
             Node<E> head;
@@ -1074,7 +1072,6 @@ abstract class AbstractRefDblLnkSeq<E>extends AbstractRefList<E> implements Omni
             }
             return -1;
         }
-
         protected class ModCountChecker extends CheckedCollection.AbstractModCountChecker{
             public ModCountChecker(int expectedModCount){
                 super(expectedModCount);
@@ -1084,7 +1081,6 @@ abstract class AbstractRefDblLnkSeq<E>extends AbstractRefList<E> implements Omni
                 return Checked.this.modCount;
             }
         }
-
     }
     static class Node<E>{
         transient Node<E> prev;

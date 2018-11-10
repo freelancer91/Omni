@@ -106,90 +106,6 @@ public class CheckedRefDblLnkList<E>extends AbstractRefDblLnkSeq.Checked<E>{
         return true;
     }
     @Override
-    boolean uncheckedRemoveFirstMatch(Node<E> curr,Predicate<Object> pred){
-        final var tail=this.tail;
-        if(pred.test(curr.val)){
-            if(curr==tail){
-                staticInit(this,null);
-            }else{
-                staticEraseHead(this,curr);
-            }
-        }else{
-            Node<E> prev;
-            do{
-                if(curr==tail){
-                    return false;
-                }
-            }while(!pred.test((curr=(prev=curr).next).val));
-            if(curr==tail){
-                staticSetTail(this,prev);
-            }else{
-                joinNodes(prev,curr.next);
-            }
-        }
-        ++this.modCount;
-        --size;
-        return true;
-    }
-    @Override
-    boolean uncheckedRemoveFirstNonNull(Node<E> curr,Object nonNull){
-        final int modCount=this.modCount;
-        try{
-            final var tail=this.tail;
-            if(nonNull.equals(curr.val)){
-                CheckedCollection.checkModCount(modCount,this.modCount);
-                if(curr==tail){
-                    staticInit(this,null);
-                }else{
-                    staticEraseHead(this,curr);
-                }
-            }else{
-                Node<E> prev;
-                do{
-                    if(curr==tail){
-                        CheckedCollection.checkModCount(modCount,this.modCount);
-                        return false;
-                    }
-                }while(!nonNull.equals((curr=(prev=curr).next).val));
-                CheckedCollection.checkModCount(modCount,this.modCount);
-                if(curr==tail){
-                    staticSetTail(this,prev);
-                }else{
-                    joinNodes(prev,curr.next);
-                }
-            }
-        }catch(final RuntimeException e){
-            throw CheckedCollection.checkModCount(modCount,this.modCount,e);
-        }
-        this.modCount=modCount+1;
-        --size;
-        return true;
-    }
-    @Override
-    public E set(int index,E val){
-        CheckedCollection.checkLo(index);
-        int size;
-        CheckedCollection.checkReadHi(index,size=this.size);
-        Node<E> node;
-        final var oldVal=(node=staticGetNode(this,index,size-index)).val;
-        node.val=val;
-        return oldVal;
-    }
-    @Override
-    public void put(int index,E val){
-        CheckedCollection.checkLo(index);
-        int size;
-        CheckedCollection.checkReadHi(index,size=this.size);
-        staticGetNode(this,index,size-index).val=val;
-    }
-    @Override
-    public E get(int index){
-        CheckedCollection.checkLo(index);
-        int size;
-        CheckedCollection.checkReadHi(index,size=this.size);
-        return staticGetNode(this,index,size-index).val;
-    }
-    @Override
     public void add(int index,E val){
         CheckedCollection.checkLo(index);
         int size;
@@ -256,6 +172,13 @@ public class CheckedRefDblLnkList<E>extends AbstractRefDblLnkSeq.Checked<E>{
                 CheckedCollection.checkModCount(modCount,this.modCount);
             }
         }
+    }
+    @Override
+    public E get(int index){
+        CheckedCollection.checkLo(index);
+        int size;
+        CheckedCollection.checkReadHi(index,size=this.size);
+        return staticGetNode(this,index,size-index).val;
     }
     @Override
     public E getLast(){
@@ -330,6 +253,13 @@ public class CheckedRefDblLnkList<E>extends AbstractRefDblLnkSeq.Checked<E>{
     @Override
     public void push(E val){
         super.addFirst(val);
+    }
+    @Override
+    public void put(int index,E val){
+        CheckedCollection.checkLo(index);
+        int size;
+        CheckedCollection.checkReadHi(index,size=this.size);
+        staticGetNode(this,index,size-index).val=val;
     }
     @Override
     public E remove(){
@@ -522,6 +452,16 @@ public class CheckedRefDblLnkList<E>extends AbstractRefDblLnkSeq.Checked<E>{
         }
     }
     @Override
+    public E set(int index,E val){
+        CheckedCollection.checkLo(index);
+        int size;
+        CheckedCollection.checkReadHi(index,size=this.size);
+        Node<E> node;
+        final var oldVal=(node=staticGetNode(this,index,size-index)).val;
+        node.val=val;
+        return oldVal;
+    }
+    @Override
     public void sort(){
         int size;
         if((size=this.size)>1){
@@ -596,6 +536,66 @@ public class CheckedRefDblLnkList<E>extends AbstractRefDblLnkSeq.Checked<E>{
         }finally{
             CheckedCollection.checkModCount(modCount,this.modCount);
         }
+    }
+    @Override
+    boolean uncheckedRemoveFirstMatch(Node<E> curr,Predicate<Object> pred){
+        final var tail=this.tail;
+        if(pred.test(curr.val)){
+            if(curr==tail){
+                staticInit(this,null);
+            }else{
+                staticEraseHead(this,curr);
+            }
+        }else{
+            Node<E> prev;
+            do{
+                if(curr==tail){
+                    return false;
+                }
+            }while(!pred.test((curr=(prev=curr).next).val));
+            if(curr==tail){
+                staticSetTail(this,prev);
+            }else{
+                joinNodes(prev,curr.next);
+            }
+        }
+        ++modCount;
+        --size;
+        return true;
+    }
+    @Override
+    boolean uncheckedRemoveFirstNonNull(Node<E> curr,Object nonNull){
+        final int modCount=this.modCount;
+        try{
+            final var tail=this.tail;
+            if(nonNull.equals(curr.val)){
+                CheckedCollection.checkModCount(modCount,this.modCount);
+                if(curr==tail){
+                    staticInit(this,null);
+                }else{
+                    staticEraseHead(this,curr);
+                }
+            }else{
+                Node<E> prev;
+                do{
+                    if(curr==tail){
+                        CheckedCollection.checkModCount(modCount,this.modCount);
+                        return false;
+                    }
+                }while(!nonNull.equals((curr=(prev=curr).next).val));
+                CheckedCollection.checkModCount(modCount,this.modCount);
+                if(curr==tail){
+                    staticSetTail(this,prev);
+                }else{
+                    joinNodes(prev,curr.next);
+                }
+            }
+        }catch(final RuntimeException e){
+            throw CheckedCollection.checkModCount(modCount,this.modCount,e);
+        }
+        this.modCount=modCount+1;
+        --size;
+        return true;
     }
     private boolean collapseBody(int modCount,Node<E> prev,Node<E> next,Predicate<? super E> filter){
         int numLeft=size;
@@ -1639,7 +1639,7 @@ public class CheckedRefDblLnkList<E>extends AbstractRefDblLnkSeq.Checked<E>{
             }
         }
     }
-    private static class RootSubList<E>extends  AbstractRefDblLnkSeq<E>{
+    private static class RootSubList<E>extends AbstractRefDblLnkSeq<E>{
         transient final RootSubList<E> parent;
         transient final Checked<E> root;
         transient int modCount;
@@ -1671,33 +1671,6 @@ public class CheckedRefDblLnkList<E>extends AbstractRefDblLnkSeq.Checked<E>{
             }
             ++root.size;
             return true;
-        }
-        @Override
-        public E get(int index){
-            CheckedCollection.checkModCount(modCount,root.modCount);
-            CheckedCollection.checkLo(index);
-            int size;
-            CheckedCollection.checkReadHi(index,size=this.size);
-            return staticGetNode(this,index,size-index).val;
-        }
-        @Override
-        public void put(int index,E val){
-            CheckedCollection.checkModCount(modCount,root.modCount);
-            CheckedCollection.checkLo(index);
-            int size;
-            CheckedCollection.checkReadHi(index,size=this.size);
-            staticGetNode(this,index,size-index).val=val;
-        }
-        @Override
-        public E set(int index,E val){
-            CheckedCollection.checkModCount(modCount,root.modCount);
-            CheckedCollection.checkLo(index);
-            int size;
-            CheckedCollection.checkReadHi(index,size=this.size);
-            Node<E> node;
-            final var oldVal=(node=staticGetNode(this,index,size-index)).val;
-            node.val=val;
-            return oldVal;
         }
         @Override
         public final void add(int index,E val){
@@ -1860,6 +1833,14 @@ public class CheckedRefDblLnkList<E>extends AbstractRefDblLnkSeq.Checked<E>{
             }finally{
                 CheckedCollection.checkModCount(modCount,root.modCount);
             }
+        }
+        @Override
+        public E get(int index){
+            CheckedCollection.checkModCount(modCount,root.modCount);
+            CheckedCollection.checkLo(index);
+            int size;
+            CheckedCollection.checkReadHi(index,size=this.size);
+            return staticGetNode(this,index,size-index).val;
         }
         @Override
         public final int hashCode(){
@@ -2143,6 +2124,14 @@ public class CheckedRefDblLnkList<E>extends AbstractRefDblLnkSeq.Checked<E>{
             return new BidirectionalItr<>(this,super.getItrNode(index,size-index),index);
         }
         @Override
+        public void put(int index,E val){
+            CheckedCollection.checkModCount(modCount,root.modCount);
+            CheckedCollection.checkLo(index);
+            int size;
+            CheckedCollection.checkReadHi(index,size=this.size);
+            staticGetNode(this,index,size-index).val=val;
+        }
+        @Override
         public final E remove(int index){
             CheckedCollection.checkLo(index);
             int size;
@@ -2380,6 +2369,17 @@ public class CheckedRefDblLnkList<E>extends AbstractRefDblLnkSeq.Checked<E>{
             }
             root.modCount=++modCount;
             bubbleUpSetModCount(modCount);
+        }
+        @Override
+        public E set(int index,E val){
+            CheckedCollection.checkModCount(modCount,root.modCount);
+            CheckedCollection.checkLo(index);
+            int size;
+            CheckedCollection.checkReadHi(index,size=this.size);
+            Node<E> node;
+            final var oldVal=(node=staticGetNode(this,index,size-index)).val;
+            node.val=val;
+            return oldVal;
         }
         @Override
         public final int size(){
