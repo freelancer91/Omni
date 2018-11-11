@@ -13,7 +13,6 @@ import omni.function.BytePredicate;
 import omni.function.ByteUnaryOperator;
 import omni.impl.CheckedCollection;
 import omni.impl.seq.AbstractByteList;
-import omni.impl.seq.dbllnk.ofref.UncheckedList;
 import omni.util.OmniArray;
 import omni.util.TypeUtil;
 abstract class AbstractSeq extends AbstractByteList implements OmniList.OfByte{

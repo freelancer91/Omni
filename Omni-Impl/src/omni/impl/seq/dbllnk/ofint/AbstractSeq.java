@@ -13,7 +13,6 @@ import omni.api.OmniDeque;
 import omni.api.OmniList;
 import omni.impl.CheckedCollection;
 import omni.impl.seq.AbstractIntList;
-import omni.impl.seq.dbllnk.ofref.UncheckedList;
 import omni.util.OmniArray;
 import omni.util.TypeUtil;
 abstract class AbstractSeq extends AbstractIntList implements OmniList.OfInt{
@@ -399,14 +398,6 @@ abstract class AbstractSeq extends AbstractIntList implements OmniList.OfInt{
     Node head;
     return (head=this.head)!=null&&uncheckedRemoveFirstMatch(head,TypeUtil.castToByte(val));
   }
-  public boolean removeFirstOccurrence(byte val){
-    Node head;
-    return (head=this.head)!=null&&uncheckedRemoveFirstMatch(head,val);
-  }
-  public boolean removeFirstOccurrence(char val){
-    Node head;
-    return (head=this.head)!=null&&uncheckedRemoveFirstMatch(head,val);
-  }
   public boolean removeFirstOccurrence(double val){
     Node head;
     int v;
@@ -433,14 +424,6 @@ abstract class AbstractSeq extends AbstractIntList implements OmniList.OfInt{
   @Override public boolean removeVal(boolean val){
     Node head;
     return (head=this.head)!=null&&uncheckedRemoveFirstMatch(head,TypeUtil.castToByte(val));
-  }
-  @Override public boolean removeVal(byte val){
-    Node head;
-    return (head=this.head)!=null&&uncheckedRemoveFirstMatch(head,val);
-  }
-  @Override public boolean removeVal(char val){
-    Node head;
-    return (head=this.head)!=null&&uncheckedRemoveFirstMatch(head,val);
   }
   @Override public boolean removeVal(double val){
     Node head;

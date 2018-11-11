@@ -13,7 +13,6 @@ import omni.function.ShortPredicate;
 import omni.function.ShortUnaryOperator;
 import omni.impl.CheckedCollection;
 import omni.impl.seq.AbstractShortList;
-import omni.impl.seq.dbllnk.ofref.UncheckedList;
 import omni.util.OmniArray;
 import omni.util.TypeUtil;
 abstract class AbstractSeq extends AbstractShortList implements OmniList.OfShort{
@@ -440,10 +439,6 @@ abstract class AbstractSeq extends AbstractShortList implements OmniList.OfShort
     Node head;
     return (head=this.head)!=null&&uncheckedRemoveFirstMatch(head,TypeUtil.castToByte(val));
   }
-  public boolean removeFirstOccurrence(byte val){
-    Node head;
-    return (head=this.head)!=null&&uncheckedRemoveFirstMatch(head,val);
-  }
   public boolean removeFirstOccurrence(char val){
     Node head;
     return val<=Short.MAX_VALUE&&(head=this.head)!=null&&uncheckedRemoveFirstMatch(head,val);
@@ -478,10 +473,6 @@ abstract class AbstractSeq extends AbstractShortList implements OmniList.OfShort
   @Override public boolean removeVal(boolean val){
     Node head;
     return (head=this.head)!=null&&uncheckedRemoveFirstMatch(head,TypeUtil.castToByte(val));
-  }
-  @Override public boolean removeVal(byte val){
-    Node head;
-    return (head=this.head)!=null&&uncheckedRemoveFirstMatch(head,val);
   }
   @Override public boolean removeVal(char val){
     Node head;

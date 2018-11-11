@@ -1,6 +1,6 @@
 package omni.impl.seq;
 import omni.util.TypeUtil;
-public abstract class AbstractDoubleList extends AbstractSeq{
+public abstract class AbstractDoubleList extends AbstractSeq.OfDouble{
   protected AbstractDoubleList(){
     super();
   }

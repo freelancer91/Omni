@@ -175,14 +175,6 @@ abstract class AbstractSeq extends AbstractDoubleList{
     }
     return false;
   }
-  public boolean contains(byte val){
-    final int size;
-    return (size=this.size)!=0&&uncheckedAnyMatches(arr,0,size,val);
-  }
-  public boolean contains(char val){
-    final int size;
-    return (size=this.size)!=0&&uncheckedAnyMatches(arr,0,size,val);
-  }
   public boolean contains(double val){
     final int size;
     return (size=this.size)!=0&&uncheckedAnyMatches(arr,0,size,val);
@@ -196,7 +188,7 @@ abstract class AbstractSeq extends AbstractDoubleList{
     }
     return false;
   }
-  public boolean contains(int val){
+  @Override public boolean contains(int val){
     final int size;
     return (size=this.size)!=0&&uncheckedAnyMatches(arr,0,size,val);
   }
@@ -212,10 +204,6 @@ abstract class AbstractSeq extends AbstractDoubleList{
   public boolean contains(Object val){
     final int size;
     return (size=this.size)!=0&&val instanceof Double&&uncheckedAnyMatches(arr,0,size,(double)val);
-  }
-  public boolean contains(short val){
-    final int size;
-    return (size=this.size)!=0&&uncheckedAnyMatches(arr,0,size,val);
   }
   public void forEach(Consumer<? super Double> action){
     final int size;
@@ -323,14 +311,6 @@ abstract class AbstractSeq extends AbstractDoubleList{
     }
     return false;
   }
-  public boolean removeVal(byte val){
-    final int size;
-    return (size=this.size)!=0&&uncheckedRemoveFirstMatch(size,val);
-  }
-  public boolean removeVal(char val){
-    final int size;
-    return (size=this.size)!=0&&uncheckedRemoveFirstMatch(size,val);
-  }
   public boolean removeVal(double val){
     final int size;
     return (size=this.size)!=0&&uncheckedRemoveFirstMatch(size,val);
@@ -343,7 +323,7 @@ abstract class AbstractSeq extends AbstractDoubleList{
     }
     return false;
   }
-  public boolean removeVal(int val){
+  @Override public boolean removeVal(int val){
     final int size;
     return (size=this.size)!=0&&uncheckedRemoveFirstMatch(size,val);
   }
@@ -355,10 +335,6 @@ abstract class AbstractSeq extends AbstractDoubleList{
       return uncheckedRemoveFirstDbl0(size);
     }
     return false;
-  }
-  public boolean removeVal(short val){
-    final int size;
-    return (size=this.size)!=0&&uncheckedRemoveFirstMatch(size,val);
   }
   public void replaceAll(DoubleUnaryOperator operator){
     final int size;
@@ -859,7 +835,7 @@ abstract class AbstractSeq extends AbstractDoubleList{
         lastRet=-1;
       }
     }
-    static abstract class AbstractSubList extends AbstractSubArrSeq{
+    static abstract class AbstractSubList extends AbstractSubArrSeq.OfDouble{
       transient final Checked root;
       transient final AbstractSubList parent;
       transient int modCount;
@@ -1214,7 +1190,7 @@ abstract class AbstractSeq extends AbstractDoubleList{
         this.cursor=cursor+1;
       }
     }
-    static abstract class AbstractSubList extends AbstractSubArrSeq{
+    static abstract class AbstractSubList extends AbstractSubArrSeq.OfDouble{
       transient final Unchecked root;
       transient final AbstractSubList parent;
       static void bubbleUpDecrementSize(AbstractSubList parent){

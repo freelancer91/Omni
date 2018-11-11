@@ -118,7 +118,7 @@ public interface OmniCollection{
     boolean removeIf(BytePredicate filter);
     boolean removeIf(Predicate<? super Byte> filter);
     @Override default boolean removeVal(short val){
-      return removeVal(val);
+      return removeVal((int)val);
     }
     @Override Byte[] toArray();
     byte[] toByteArray();

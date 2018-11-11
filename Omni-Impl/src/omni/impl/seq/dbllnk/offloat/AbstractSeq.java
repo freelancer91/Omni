@@ -13,7 +13,6 @@ import omni.function.FloatPredicate;
 import omni.function.FloatUnaryOperator;
 import omni.impl.CheckedCollection;
 import omni.impl.seq.AbstractFloatList;
-import omni.impl.seq.dbllnk.ofref.UncheckedList;
 import omni.util.HashUtils;
 import omni.util.OmniArray;
 import omni.util.TypeUtil;
@@ -226,13 +225,13 @@ abstract class AbstractSeq extends AbstractFloatList implements OmniList.OfFloat
     }
     return false;
   }
-  @Override public boolean contains(byte val){
+  @Override protected boolean containsRawInt(int val){
     Node head;
     return (head=this.head)!=null&&uncheckedAnyMatchesRawInt(head,val);
   }
-  @Override public boolean contains(char val){
+  @Override protected boolean removeRawInt(int val){
     Node head;
-    return (head=this.head)!=null&&uncheckedAnyMatchesRawInt(head,val);
+    return (head=this.head)!=null&&uncheckedRemoveFirstRawInt(head,val);
   }
   @Override public boolean contains(double val){
     Node head;
@@ -268,10 +267,6 @@ abstract class AbstractSeq extends AbstractFloatList implements OmniList.OfFloat
   @Override public boolean contains(Object val){
     Node head;
     return (head=this.head)!=null&&val instanceof Float&&uncheckedAnyMatches(head,(float)val);
-  }
-  @Override public boolean contains(short val){
-    Node head;
-    return (head=this.head)!=null&&uncheckedAnyMatchesRawInt(head,val);
   }
   @Override public void forEach(Consumer<? super Float> action){
     Node head;
@@ -413,10 +408,6 @@ abstract class AbstractSeq extends AbstractFloatList implements OmniList.OfFloat
     }
     return false;
   }
-  public boolean removeFirstOccurrence(byte val){
-    Node head;
-    return (head=this.head)!=null&&uncheckedRemoveFirstRawInt(head,val);
-  }
   public boolean removeFirstOccurrence(char val){
     Node head;
     return (head=this.head)!=null&&uncheckedRemoveFirstRawInt(head,val);
@@ -468,14 +459,6 @@ abstract class AbstractSeq extends AbstractFloatList implements OmniList.OfFloat
     }
     return false;
   }
-  @Override public boolean removeVal(byte val){
-    Node head;
-    return (head=this.head)!=null&&uncheckedRemoveFirstRawInt(head,val);
-  }
-  @Override public boolean removeVal(char val){
-    Node head;
-    return (head=this.head)!=null&&uncheckedRemoveFirstRawInt(head,val);
-  }
   @Override public boolean removeVal(double val){
     Node head;
     if((head=this.head)!=null){
@@ -506,10 +489,6 @@ abstract class AbstractSeq extends AbstractFloatList implements OmniList.OfFloat
       return uncheckedRemoveFirstFlt0(head);
     }
     return false;
-  }
-  @Override public boolean removeVal(short val){
-    Node head;
-    return (head=this.head)!=null&&uncheckedRemoveFirstRawInt(head,val);
   }
   @Override public void replaceAll(FloatUnaryOperator operator){
     Node head;

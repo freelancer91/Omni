@@ -287,10 +287,6 @@ abstract class AbstractSeq extends AbstractShortList{
     final int size;
     return (size=this.size)!=0&&uncheckedRemoveFirstMatch(size,TypeUtil.castToByte(val));
   }
-  public boolean removeVal(byte val){
-    final int size;
-    return (size=this.size)!=0&&uncheckedRemoveFirstMatch(size,val);
-  }
   public boolean removeVal(char val){
     final int size;
     return val<=Short.MAX_VALUE&&(size=this.size)!=0&&uncheckedRemoveFirstMatch(size,val);
@@ -311,7 +307,7 @@ abstract class AbstractSeq extends AbstractShortList{
     final int size,v;
     return (size=this.size)!=0&&(v=(short)val)==val&&uncheckedRemoveFirstMatch(size,v);
   }
-  public boolean removeVal(short val){
+  @Override public boolean removeVal(short val){
     final int size;
     return (size=this.size)!=0&&uncheckedRemoveFirstMatch(size,val);
   }
@@ -760,7 +756,7 @@ abstract class AbstractSeq extends AbstractShortList{
         lastRet=-1;
       }
     }
-    static abstract class AbstractSubList extends AbstractSubArrSeq{
+    static abstract class AbstractSubList extends AbstractSubArrSeq.Of16BitPrimitive{
       transient final Checked root;
       transient final AbstractSubList parent;
       transient int modCount;
@@ -1073,7 +1069,7 @@ abstract class AbstractSeq extends AbstractShortList{
         this.cursor=cursor+1;
       }
     }
-    static abstract class AbstractSubList extends AbstractSubArrSeq{
+    static abstract class AbstractSubList extends AbstractSubArrSeq.Of16BitPrimitive{
       transient final Unchecked root;
       transient final AbstractSubList parent;
       static void bubbleUpDecrementSize(AbstractSubList parent){

@@ -67,16 +67,6 @@ class CheckedSubList extends AbstractSeq.Checked.AbstractSubList implements Omni
     }
     return false;
   }
-  @Override public boolean contains(byte val){
-    final var root=checkModCountAndGetRoot();
-    final int size;
-    return (size=this.size)!=0&&uncheckedContainsRawInt(root,size,val);
-  }
-  @Override public boolean contains(char val){
-    final var root=checkModCountAndGetRoot();
-    final int size;
-    return (size=this.size)!=0&&uncheckedContainsRawInt(root,size,val);
-  }
   @Override public boolean contains(double val){
     final var root=checkModCountAndGetRoot();
     final int size;
@@ -117,7 +107,7 @@ class CheckedSubList extends AbstractSeq.Checked.AbstractSubList implements Omni
     final int size;
     return (size=this.size)!=0&&val instanceof Float&&uncheckedContains(root,size,(float)val);
   }
-  @Override public boolean contains(short val){
+  @Override protected boolean containsRawInt(int val){
     final var root=checkModCountAndGetRoot();
     final int size;
     return (size=this.size)!=0&&uncheckedContainsRawInt(root,size,val);
@@ -323,18 +313,6 @@ class CheckedSubList extends AbstractSeq.Checked.AbstractSubList implements Omni
     CheckedCollection.checkModCount(modCount,root.modCount);
     return false;
   }
-  @Override public boolean removeVal(byte val){
-    final int size;
-    if((size=this.size)!=0){ return uncheckedRemoveRawInt(size,val); }
-    CheckedCollection.checkModCount(modCount,root.modCount);
-    return false;
-  }
-  @Override public boolean removeVal(char val){
-    final int size;
-    if((size=this.size)!=0){ return uncheckedRemoveRawInt(size,val); }
-    CheckedCollection.checkModCount(modCount,root.modCount);
-    return false;
-  }
   @Override public boolean removeVal(double val){
     final int size;
     if((size=this.size)!=0){
@@ -376,7 +354,7 @@ class CheckedSubList extends AbstractSeq.Checked.AbstractSubList implements Omni
     CheckedCollection.checkModCount(modCount,root.modCount);
     return false;
   }
-  @Override public boolean removeVal(short val){
+  @Override protected boolean removeRawInt(int val){
     final int size;
     if((size=this.size)!=0){ return uncheckedRemoveRawInt(size,val); }
     CheckedCollection.checkModCount(modCount,root.modCount);

@@ -210,14 +210,6 @@ abstract class AbstractSeq extends AbstractFloatList{
     }
     return false;
   }
-  public boolean contains(byte val){
-    final int size;
-    return (size=this.size)!=0&&uncheckedAnyMatchesRawInt(arr,0,size,val);
-  }
-  public boolean contains(char val){
-    final int size;
-    return (size=this.size)!=0&&uncheckedAnyMatchesRawInt(arr,0,size,val);
-  }
   public boolean contains(double val){
     final int size;
     if((size=this.size)!=0){
@@ -253,7 +245,7 @@ abstract class AbstractSeq extends AbstractFloatList{
     final int size;
     return (size=this.size)!=0&&val instanceof Float&&uncheckedAnyMatches(arr,0,size,(float)val);
   }
-  public boolean contains(short val){
+  @Override protected boolean containsRawInt(int val){
     final int size;
     return (size=this.size)!=0&&uncheckedAnyMatchesRawInt(arr,0,size,val);
   }
@@ -383,14 +375,6 @@ abstract class AbstractSeq extends AbstractFloatList{
     }
     return false;
   }
-  public boolean removeVal(byte val){
-    final int size;
-    return (size=this.size)!=0&&uncheckedRemoveFirstMatch(size,val);
-  }
-  public boolean removeVal(char val){
-    final int size;
-    return (size=this.size)!=0&&uncheckedRemoveFirstMatch(size,val);
-  }
   public boolean removeVal(double val){
     final int size;
     if((size=this.size)!=0){
@@ -422,7 +406,7 @@ abstract class AbstractSeq extends AbstractFloatList{
     }
     return false;
   }
-  public boolean removeVal(short val){
+  @Override protected boolean removeRawInt(int val){
     final int size;
     return (size=this.size)!=0&&uncheckedRemoveFirstMatch(size,val);
   }
@@ -953,7 +937,7 @@ abstract class AbstractSeq extends AbstractFloatList{
         lastRet=-1;
       }
     }
-    static abstract class AbstractSubList extends AbstractSubArrSeq{
+    static abstract class AbstractSubList extends AbstractSubArrSeq.OfFloat{
       transient final Checked root;
       transient final AbstractSubList parent;
       transient int modCount;
@@ -1304,7 +1288,7 @@ abstract class AbstractSeq extends AbstractFloatList{
         this.cursor=cursor+1;
       }
     }
-    static abstract class AbstractSubList extends AbstractSubArrSeq{
+    static abstract class AbstractSubList extends AbstractSubArrSeq.OfFloat{
       transient final Unchecked root;
       transient final AbstractSubList parent;
       static void bubbleUpDecrementSize(AbstractSubList parent){

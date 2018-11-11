@@ -52,18 +52,6 @@ class CheckedSubList extends AbstractSeq.Checked.AbstractSubList implements Omni
     return (size=this.size)!=0
         &&AbstractSeq.uncheckedAnyMatches(root.arr,rootOffset=this.rootOffset,rootOffset+size,TypeUtil.castToByte(val));
   }
-  @Override public boolean contains(byte val){
-    final var root=checkModCountAndGetRoot();
-    final int size,rootOffset;
-    return (size=this.size)!=0
-        &&AbstractSeq.uncheckedAnyMatches(root.arr,rootOffset=this.rootOffset,rootOffset+size,val);
-  }
-  @Override public boolean contains(char val){
-    final var root=checkModCountAndGetRoot();
-    final int size,rootOffset;
-    return (size=this.size)!=0
-        &&AbstractSeq.uncheckedAnyMatches(root.arr,rootOffset=this.rootOffset,rootOffset+size,val);
-  }
   @Override public boolean contains(double val){
     final var root=checkModCountAndGetRoot();
     final int size,rootOffset,v;
@@ -263,18 +251,6 @@ class CheckedSubList extends AbstractSeq.Checked.AbstractSubList implements Omni
   @Override public boolean removeVal(boolean val){
     final int size;
     if((size=this.size)!=0){ return uncheckedRemoveFirstMatch(size,TypeUtil.castToByte(val)); }
-    CheckedCollection.checkModCount(modCount,root.modCount);
-    return false;
-  }
-  @Override public boolean removeVal(byte val){
-    final int size;
-    if((size=this.size)!=0){ return uncheckedRemoveFirstMatch(size,val); }
-    CheckedCollection.checkModCount(modCount,root.modCount);
-    return false;
-  }
-  @Override public boolean removeVal(char val){
-    final int size;
-    if((size=this.size)!=0){ return uncheckedRemoveFirstMatch(size,val); }
     CheckedCollection.checkModCount(modCount,root.modCount);
     return false;
   }

@@ -264,14 +264,6 @@ abstract class AbstractSeq extends AbstractIntList{
     final int size;
     return (size=this.size)!=0&&uncheckedRemoveFirstMatch(size,TypeUtil.castToByte(val));
   }
-  public boolean removeVal(byte val){
-    final int size;
-    return (size=this.size)!=0&&uncheckedRemoveFirstMatch(size,val);
-  }
-  public boolean removeVal(char val){
-    final int size;
-    return (size=this.size)!=0&&uncheckedRemoveFirstMatch(size,val);
-  }
   public boolean removeVal(double val){
     final int size,v;
     return (size=this.size)!=0&&(v=(int)val)==val&&uncheckedRemoveFirstMatch(size,v);
@@ -280,7 +272,7 @@ abstract class AbstractSeq extends AbstractIntList{
     final int size,v;
     return (size=this.size)!=0&&(double)(v=(int)val)==(double)val&&uncheckedRemoveFirstMatch(size,v);
   }
-  public boolean removeVal(int val){
+  @Override public boolean removeVal(int val){
     final int size;
     return (size=this.size)!=0&&uncheckedRemoveFirstMatch(size,val);
   }
@@ -713,7 +705,7 @@ abstract class AbstractSeq extends AbstractIntList{
         lastRet=-1;
       }
     }
-    static abstract class AbstractSubList extends AbstractSubArrSeq{
+    static abstract class AbstractSubList extends AbstractSubArrSeq.OfSignedIntegralPrimitive{
       transient final Checked root;
       transient final AbstractSubList parent;
       transient int modCount;
@@ -1048,7 +1040,7 @@ abstract class AbstractSeq extends AbstractIntList{
         this.cursor=cursor+1;
       }
     }
-    static abstract class AbstractSubList extends AbstractSubArrSeq{
+    static abstract class AbstractSubList extends AbstractSubArrSeq.OfSignedIntegralPrimitive{
       transient final Unchecked root;
       transient final AbstractSubList parent;
       static void bubbleUpDecrementSize(AbstractSubList parent){

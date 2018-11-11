@@ -12,7 +12,6 @@ import omni.function.BooleanConsumer;
 import omni.function.BooleanPredicate;
 import omni.impl.CheckedCollection;
 import omni.impl.seq.AbstractBooleanList;
-import omni.impl.seq.dbllnk.ofref.UncheckedList;
 import omni.util.OmniArray;
 import omni.util.TypeUtil;
 abstract class AbstractSeq extends AbstractBooleanList implements OmniList.OfBoolean{

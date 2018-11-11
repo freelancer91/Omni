@@ -1,6 +1,6 @@
 package omni.impl.seq;
 import omni.util.TypeUtil;
-public abstract class AbstractFloatList extends AbstractSeq{
+public abstract class AbstractFloatList extends AbstractSeq.OfFloat{
   protected AbstractFloatList(){
     super();
   }

@@ -43,16 +43,6 @@ class UncheckedSubList extends AbstractSeq.Unchecked.AbstractSubList implements 
     return (size=this.size)!=0
         &&AbstractSeq.uncheckedAnyMatches(root.arr,rootOffset=this.rootOffset,rootOffset+size,TypeUtil.castToByte(val));
   }
-  @Override public boolean contains(byte val){
-    final int size,rootOffset;
-    return (size=this.size)!=0
-        &&AbstractSeq.uncheckedAnyMatches(root.arr,rootOffset=this.rootOffset,rootOffset+size,val);
-  }
-  @Override public boolean contains(char val){
-    final int size,rootOffset;
-    return (size=this.size)!=0
-        &&AbstractSeq.uncheckedAnyMatches(root.arr,rootOffset=this.rootOffset,rootOffset+size,val);
-  }
   @Override public boolean contains(double val){
     final int size,rootOffset,v;
     return (size=this.size)!=0&&val==(v=(int)val)
@@ -224,14 +214,6 @@ class UncheckedSubList extends AbstractSeq.Unchecked.AbstractSubList implements 
   @Override public boolean removeVal(boolean val){
     final int size;
     return (size=this.size)!=0&&uncheckedRemoveFirstMatch(size,TypeUtil.castToByte(val));
-  }
-  @Override public boolean removeVal(byte val){
-    final int size;
-    return (size=this.size)!=0&&uncheckedRemoveFirstMatch(size,val);
-  }
-  @Override public boolean removeVal(char val){
-    final int size;
-    return (size=this.size)!=0&&uncheckedRemoveFirstMatch(size,val);
   }
   @Override public boolean removeVal(double val){
     final int size,v;

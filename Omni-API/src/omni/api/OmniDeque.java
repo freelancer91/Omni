@@ -173,8 +173,32 @@ public interface OmniDeque extends OmniQueue,OmniStack{
     default short removeLastShort(){
       return TypeUtil.castToByte(removeLastBoolean());
     }
+    @Override default boolean removeFirstOccurrence(byte val){
+      return removeFirstOccurrence((int)val);
+    }
+    @Override default boolean removeFirstOccurrence(char val){
+      return removeFirstOccurrence((int)val);
+    }
+    @Override default boolean removeFirstOccurrence(short val){
+      return removeFirstOccurrence((int)val);
+    }
+    @Override default boolean removeLastOccurrence(byte val){
+      return removeLastOccurrence((int)val);
+    }
+    @Override default boolean removeLastOccurrence(char val){
+      return removeLastOccurrence((int)val);
+    }
+    @Override default boolean removeLastOccurrence(short val){
+      return removeLastOccurrence((int)val);
+    }
   }
   interface OfByte extends OfPrimitive,OmniQueue.OfByte,OmniStack.OfByte{
+    @Override default boolean removeFirstOccurrence(short val){
+      return removeFirstOccurrence((int)val);
+    }
+    @Override default boolean removeLastOccurrence(short val){
+      return removeLastOccurrence((int)val);
+    }
     default void addFirst(boolean val){
       addFirst(TypeUtil.castToByte(val));
     }
@@ -306,6 +330,12 @@ public interface OmniDeque extends OmniQueue,OmniStack{
     }
   }
   interface OfChar extends OfPrimitive,OmniQueue.OfChar,OmniStack.OfChar{
+    @Override default boolean removeFirstOccurrence(byte val){
+      return removeFirstOccurrence((short)val);
+    }
+    @Override default boolean removeLastOccurrence(byte val){
+      return removeLastOccurrence((short)val);
+    }
     default void addFirst(boolean val){
       addFirst(TypeUtil.castToChar(val));
     }
@@ -421,6 +451,24 @@ public interface OmniDeque extends OmniQueue,OmniStack{
     }
   }
   interface OfDouble extends OfPrimitive,OmniQueue.OfDouble,OmniStack.OfDouble{
+    @Override default boolean removeFirstOccurrence(byte val){
+      return removeFirstOccurrence((int)val);
+    }
+    @Override default boolean removeLastOccurrence(byte val){
+      return removeLastOccurrence((int)val);
+    }
+    @Override default boolean removeFirstOccurrence(char val){
+      return removeFirstOccurrence((int)val);
+    }
+    @Override default boolean removeLastOccurrence(char val){
+      return removeLastOccurrence((int)val);
+    }
+    @Override default boolean removeFirstOccurrence(short val){
+      return removeFirstOccurrence((int)val);
+    }
+    @Override default boolean removeLastOccurrence(short val){
+      return removeLastOccurrence((int)val);
+    }
     default void addFirst(boolean val){
       addFirst(TypeUtil.castToDouble(val));
     }
@@ -616,6 +664,12 @@ public interface OmniDeque extends OmniQueue,OmniStack{
     double removeLastDouble();
   }
   interface OfFloat extends OfPrimitive,OmniQueue.OfFloat,OmniStack.OfFloat{
+    @Override default boolean removeFirstOccurrence(byte val){
+      return removeFirstOccurrence((short)val);
+    }
+    @Override default boolean removeLastOccurrence(byte val){
+      return removeLastOccurrence((short)val);
+    }
     default void addFirst(boolean val){
       addFirst(TypeUtil.castToFloat(val));
     }
@@ -803,6 +857,24 @@ public interface OmniDeque extends OmniQueue,OmniStack{
     float removeLastFloat();
   }
   interface OfInt extends OfPrimitive,OmniQueue.OfInt,OmniStack.OfInt{
+    @Override default boolean removeFirstOccurrence(byte val){
+      return removeFirstOccurrence((int)val);
+    }
+    @Override default boolean removeLastOccurrence(byte val){
+      return removeLastOccurrence((int)val);
+    }
+    @Override default boolean removeFirstOccurrence(char val){
+      return removeFirstOccurrence((int)val);
+    }
+    @Override default boolean removeLastOccurrence(char val){
+      return removeLastOccurrence((int)val);
+    }
+    @Override default boolean removeFirstOccurrence(short val){
+      return removeFirstOccurrence((int)val);
+    }
+    @Override default boolean removeLastOccurrence(short val){
+      return removeLastOccurrence((int)val);
+    }
     default void addFirst(boolean val){
       addFirst((int)TypeUtil.castToByte(val));
     }
@@ -974,6 +1046,24 @@ public interface OmniDeque extends OmniQueue,OmniStack{
     }
   }
   interface OfLong extends OfPrimitive,OmniQueue.OfLong,OmniStack.OfLong{
+    @Override default boolean removeFirstOccurrence(byte val){
+      return removeFirstOccurrence((int)val);
+    }
+    @Override default boolean removeLastOccurrence(byte val){
+      return removeLastOccurrence((int)val);
+    }
+    @Override default boolean removeFirstOccurrence(char val){
+      return removeFirstOccurrence((int)val);
+    }
+    @Override default boolean removeLastOccurrence(char val){
+      return removeLastOccurrence((int)val);
+    }
+    @Override default boolean removeFirstOccurrence(short val){
+      return removeFirstOccurrence((int)val);
+    }
+    @Override default boolean removeLastOccurrence(short val){
+      return removeLastOccurrence((int)val);
+    }
     default void addFirst(boolean val){
       addFirst(TypeUtil.castToLong(val));
     }
@@ -1218,6 +1308,12 @@ public interface OmniDeque extends OmniQueue,OmniStack{
     E removeLast();
   }
   interface OfShort extends OfPrimitive,OmniQueue.OfShort,OmniStack.OfShort{
+    @Override default boolean removeFirstOccurrence(byte val){
+      return removeFirstOccurrence((short)val);
+    }
+    @Override default boolean removeLastOccurrence(byte val){
+      return removeLastOccurrence((short)val);
+    }
     default void addFirst(boolean val){
       addFirst((short)TypeUtil.castToByte(val));
     }

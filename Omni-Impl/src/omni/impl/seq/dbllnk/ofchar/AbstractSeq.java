@@ -13,7 +13,6 @@ import omni.function.CharPredicate;
 import omni.function.CharUnaryOperator;
 import omni.impl.CheckedCollection;
 import omni.impl.seq.AbstractCharList;
-import omni.impl.seq.dbllnk.ofref.UncheckedList;
 import omni.util.OmniArray;
 import omni.util.TypeUtil;
 abstract class AbstractSeq extends AbstractCharList implements OmniList.OfChar{
@@ -440,10 +439,6 @@ abstract class AbstractSeq extends AbstractCharList implements OmniList.OfChar{
     Node head;
     return (head=this.head)!=null&&uncheckedRemoveFirstMatch(head,TypeUtil.castToByte(val));
   }
-  public boolean removeFirstOccurrence(byte val){
-    Node head;
-    return val>=0&&(head=this.head)!=null&&uncheckedRemoveFirstMatch(head,val);
-  }
   public boolean removeFirstOccurrence(char val){
     Node head;
     return (head=this.head)!=null&&uncheckedRemoveFirstMatch(head,val);
@@ -478,10 +473,6 @@ abstract class AbstractSeq extends AbstractCharList implements OmniList.OfChar{
   @Override public boolean removeVal(boolean val){
     Node head;
     return (head=this.head)!=null&&uncheckedRemoveFirstMatch(head,TypeUtil.castToByte(val));
-  }
-  @Override public boolean removeVal(byte val){
-    Node head;
-    return val>=0&&(head=this.head)!=null&&uncheckedRemoveFirstMatch(head,val);
   }
   @Override public boolean removeVal(char val){
     Node head;

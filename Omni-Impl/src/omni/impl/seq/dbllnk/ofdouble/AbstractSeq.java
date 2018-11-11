@@ -217,14 +217,6 @@ abstract class AbstractSeq extends AbstractDoubleList implements OmniList.OfDoub
     }
     return false;
   }
-  @Override public boolean contains(byte val){
-    Node head;
-    return (head=this.head)!=null&&uncheckedAnyMatches(head,val);
-  }
-  @Override public boolean contains(char val){
-    Node head;
-    return (head=this.head)!=null&&uncheckedAnyMatches(head,val);
-  }
   @Override public boolean contains(double val){
     Node head;
     return (head=this.head)!=null&&uncheckedAnyMatches(head,val);
@@ -253,10 +245,6 @@ abstract class AbstractSeq extends AbstractDoubleList implements OmniList.OfDoub
   @Override public boolean contains(Object val){
     Node head;
     return (head=this.head)!=null&&val instanceof Double&&uncheckedAnyMatches(head,(double)val);
-  }
-  @Override public boolean contains(short val){
-    Node head;
-    return (head=this.head)!=null&&uncheckedAnyMatches(head,val);
   }
   @Override public void forEach(Consumer<? super Double> action){
     Node head;
@@ -368,14 +356,6 @@ abstract class AbstractSeq extends AbstractDoubleList implements OmniList.OfDoub
     }
     return false;
   }
-  public boolean removeFirstOccurrence(byte val){
-    Node head;
-    return (head=this.head)!=null&&uncheckedRemoveFirstMatch(head,val);
-  }
-  public boolean removeFirstOccurrence(char val){
-    Node head;
-    return (head=this.head)!=null&&uncheckedRemoveFirstMatch(head,val);
-  }
   public boolean removeFirstOccurrence(double val){
     Node head;
     return (head=this.head)!=null&&uncheckedRemoveFirstMatch(head,val);
@@ -405,10 +385,6 @@ abstract class AbstractSeq extends AbstractDoubleList implements OmniList.OfDoub
     Node head;
     return (head=this.head)!=null&&val instanceof Double&&uncheckedRemoveFirstMatch(head,(double)val);
   }
-  public boolean removeFirstOccurrence(short val){
-    Node head;
-    return (head=this.head)!=null&&uncheckedRemoveFirstMatch(head,val);
-  }
   @Override public boolean removeVal(boolean val){
     Node head;
     if((head=this.head)!=null){
@@ -416,14 +392,6 @@ abstract class AbstractSeq extends AbstractDoubleList implements OmniList.OfDoub
       return uncheckedRemoveFirstDbl0(head);
     }
     return false;
-  }
-  @Override public boolean removeVal(byte val){
-    Node head;
-    return (head=this.head)!=null&&uncheckedRemoveFirstMatch(head,val);
-  }
-  @Override public boolean removeVal(char val){
-    Node head;
-    return (head=this.head)!=null&&uncheckedRemoveFirstMatch(head,val);
   }
   @Override public boolean removeVal(double val){
     Node head;
@@ -449,10 +417,6 @@ abstract class AbstractSeq extends AbstractDoubleList implements OmniList.OfDoub
       return uncheckedRemoveFirstDbl0(head);
     }
     return false;
-  }
-  @Override public boolean removeVal(short val){
-    Node head;
-    return (head=this.head)!=null&&uncheckedRemoveFirstMatch(head,val);
   }
   @Override public void replaceAll(DoubleUnaryOperator operator){
     Node head;

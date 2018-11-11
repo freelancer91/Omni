@@ -373,14 +373,6 @@ abstract class AbstractSeq extends AbstractLongList implements OmniList.OfLong{
     Node head;
     return (head=this.head)!=null&&uncheckedRemoveFirstMatch(head,TypeUtil.castToLong(val));
   }
-  public boolean removeFirstOccurrence(byte val){
-    Node head;
-    return (head=this.head)!=null&&uncheckedRemoveFirstMatch(head,val);
-  }
-  public boolean removeFirstOccurrence(char val){
-    Node head;
-    return (head=this.head)!=null&&uncheckedRemoveFirstMatch(head,val);
-  }
   public boolean removeFirstOccurrence(double val){
     Node head;
     long v;
@@ -406,14 +398,6 @@ abstract class AbstractSeq extends AbstractLongList implements OmniList.OfLong{
   @Override public boolean removeVal(boolean val){
     Node head;
     return (head=this.head)!=null&&uncheckedRemoveFirstMatch(head,TypeUtil.castToLong(val));
-  }
-  @Override public boolean removeVal(byte val){
-    Node head;
-    return (head=this.head)!=null&&uncheckedRemoveFirstMatch(head,val);
-  }
-  @Override public boolean removeVal(char val){
-    Node head;
-    return (head=this.head)!=null&&uncheckedRemoveFirstMatch(head,val);
   }
   @Override public boolean removeVal(double val){
     Node head;

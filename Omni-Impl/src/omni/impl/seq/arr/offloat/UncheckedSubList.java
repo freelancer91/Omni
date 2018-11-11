@@ -58,16 +58,6 @@ class UncheckedSubList extends AbstractSeq.Unchecked.AbstractSubList implements 
     }
     return false;
   }
-  @Override public boolean contains(byte val){
-    final int size,rootOffset;
-    return (size=this.size)!=0
-        &&AbstractSeq.uncheckedAnyMatchesRawInt(root.arr,rootOffset=this.rootOffset,rootOffset+size,val);
-  }
-  @Override public boolean contains(char val){
-    final int size,rootOffset;
-    return (size=this.size)!=0
-        &&AbstractSeq.uncheckedAnyMatchesRawInt(root.arr,rootOffset=this.rootOffset,rootOffset+size,val);
-  }
   @Override public boolean contains(double val){
     int size;
     if((size=this.size)!=0){
@@ -103,7 +93,7 @@ class UncheckedSubList extends AbstractSeq.Unchecked.AbstractSubList implements 
     return (size=this.size)!=0&&val instanceof Float
         &&AbstractSeq.uncheckedAnyMatches(root.arr,rootOffset=this.rootOffset,rootOffset+size,(float)val);
   }
-  @Override public boolean contains(short val){
+  @Override protected boolean containsRawInt(int val){
     final int size,rootOffset;
     return (size=this.size)!=0
         &&AbstractSeq.uncheckedAnyMatches(root.arr,rootOffset=this.rootOffset,rootOffset+size,val);
@@ -305,14 +295,6 @@ class UncheckedSubList extends AbstractSeq.Unchecked.AbstractSubList implements 
     }
     return false;
   }
-  @Override public boolean removeVal(byte val){
-    final int size;
-    return (size=this.size)!=0&&uncheckedRemoveRawInt(size,val);
-  }
-  @Override public boolean removeVal(char val){
-    final int size;
-    return (size=this.size)!=0&&uncheckedRemoveRawInt(size,val);
-  }
   @Override public boolean removeVal(double val){
     final int size;
     if((size=this.size)!=0){
@@ -342,7 +324,7 @@ class UncheckedSubList extends AbstractSeq.Unchecked.AbstractSubList implements 
     }
     return false;
   }
-  @Override public boolean removeVal(short val){
+  @Override protected boolean removeRawInt(int val){
     final int size;
     return (size=this.size)!=0&&uncheckedRemoveRawInt(size,val);
   }

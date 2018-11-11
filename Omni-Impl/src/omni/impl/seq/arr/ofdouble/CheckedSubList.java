@@ -70,16 +70,6 @@ class CheckedSubList extends AbstractSeq.Checked.AbstractSubList implements Omni
     }
     return false;
   }
-  @Override public boolean contains(byte val){
-    final var root=checkModCountAndGetRoot();
-    final int size;
-    return (size=this.size)!=0&&uncheckedContains(root,size,val);
-  }
-  @Override public boolean contains(char val){
-    final var root=checkModCountAndGetRoot();
-    final int size;
-    return (size=this.size)!=0&&uncheckedContains(root,size,val);
-  }
   @Override public boolean contains(double val){
     final var root=checkModCountAndGetRoot();
     final int size;
@@ -113,11 +103,6 @@ class CheckedSubList extends AbstractSeq.Checked.AbstractSubList implements Omni
     final var root=checkModCountAndGetRoot();
     final int size;
     return (size=this.size)!=0&&val instanceof Double&&uncheckedContains(root,size,(double)val);
-  }
-  @Override public boolean contains(short val){
-    final var root=checkModCountAndGetRoot();
-    final int size;
-    return (size=this.size)!=0&&uncheckedContains(root,size,val);
   }
   @Override public boolean equals(Object val){
     // TODO Auto-generated method stub
@@ -286,18 +271,6 @@ class CheckedSubList extends AbstractSeq.Checked.AbstractSubList implements Omni
     CheckedCollection.checkModCount(modCount,root.modCount);
     return false;
   }
-  @Override public boolean removeVal(byte val){
-    final int size;
-    if((size=this.size)!=0){ return uncheckedRemove(size,val); }
-    CheckedCollection.checkModCount(modCount,root.modCount);
-    return false;
-  }
-  @Override public boolean removeVal(char val){
-    final int size;
-    if((size=this.size)!=0){ return uncheckedRemove(size,val); }
-    CheckedCollection.checkModCount(modCount,root.modCount);
-    return false;
-  }
   @Override public boolean removeVal(double val){
     final int size;
     if((size=this.size)!=0){ return uncheckedRemove(size,val); }
@@ -328,12 +301,6 @@ class CheckedSubList extends AbstractSeq.Checked.AbstractSubList implements Omni
         return uncheckedRemoveDbl0(size);
       }
     }
-    CheckedCollection.checkModCount(modCount,root.modCount);
-    return false;
-  }
-  @Override public boolean removeVal(short val){
-    final int size;
-    if((size=this.size)!=0){ return uncheckedRemove(size,val); }
     CheckedCollection.checkModCount(modCount,root.modCount);
     return false;
   }
