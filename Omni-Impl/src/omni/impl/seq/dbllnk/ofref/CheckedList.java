@@ -12,7 +12,7 @@ import omni.api.OmniListIterator;
 import omni.impl.CheckedCollection;
 import omni.util.BitSetUtils;
 import omni.util.OmniPred;
-public class CheckedRefDblLnkList<E>extends AbstractRefDblLnkSeq.Checked<E>{
+public class CheckedList<E>extends AbstractSeq.Checked<E>{
   static <E> int collapseBodyHelper(CheckedCollection.AbstractModCountChecker modCountChecker,Node<E> prev,int numLeft,
       Node<E> next,Predicate<? super E> filter){
     int numRemoved=0;
@@ -90,13 +90,13 @@ public class CheckedRefDblLnkList<E>extends AbstractRefDblLnkSeq.Checked<E>{
       }
     }
   }
-  CheckedRefDblLnkList(){
+  CheckedList(){
     super();
   }
-  CheckedRefDblLnkList(Node<E> onlyNode){
+  CheckedList(Node<E> onlyNode){
     super(onlyNode);
   }
-  CheckedRefDblLnkList(Node<E> head,int size,Node<E> tail){
+  CheckedList(Node<E> head,int size,Node<E> tail){
     super(head,size,tail);
   }
   @Override public boolean add(E val){
@@ -141,7 +141,7 @@ public class CheckedRefDblLnkList<E>extends AbstractRefDblLnkSeq.Checked<E>{
       newHead=null;
       newTail=null;
     }
-    return new CheckedRefDblLnkList<>(newHead,size,newTail);
+    return new CheckedList<>(newHead,size,newTail);
   }
   @Override public OmniIterator.OfRef<E> descendingIterator(){
     return new CheckedDescendingItr<>(this);
@@ -640,9 +640,8 @@ public class CheckedRefDblLnkList<E>extends AbstractRefDblLnkSeq.Checked<E>{
     Node<E> subListTail=tail;
     if(tailDist==0){
       if(headDist==0){ return new CheckedSubList<>(this,null,subListHead,subListSize,subListTail); }
-      return new CheckedSubList.Suffix<>(this,null,headDist<=subListSize
-          ?uncheckedIterateForward(subListHead,headDist):uncheckedIterateReverse(subListTail,subListSize),subListSize,
-          subListTail);
+      return new CheckedSubList.Suffix<>(this,null,headDist<=subListSize?uncheckedIterateForward(subListHead,headDist)
+          :uncheckedIterateReverse(subListTail,subListSize),subListSize,subListTail);
     }
     subListTail=tailDist<=subListSize?uncheckedIterateReverse(subListTail,tailDist)
         :uncheckedIterateForward(subListHead,subListSize);

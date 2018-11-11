@@ -9,18 +9,18 @@ class Node<E>{
   Node(E val,Node<E> next){
     this.val=val;
     this.next=next;
-    AbstractRefDblLnkSeq.joinNodes(this,next);
+    AbstractSeq.joinNodes(this,next);
   }
   Node(Node<E> prev,E val){
     this.prev=prev;
     this.val=val;
-    AbstractRefDblLnkSeq.joinNodes(prev,this);
+    AbstractSeq.joinNodes(prev,this);
   }
   Node(Node<E> prev,E val,Node<E> next){
     this.prev=prev;
     this.val=val;
     this.next=next;
-    AbstractRefDblLnkSeq.joinNodes(prev,this);
-    AbstractRefDblLnkSeq.joinNodes(this,next);
+    AbstractSeq.joinNodes(prev,this);
+    AbstractSeq.joinNodes(this,next);
   }
 }

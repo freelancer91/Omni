@@ -1,4 +1,4 @@
 package omni.function;
 public interface ByteConsumer{
-    void accept(byte val);
+  void accept(byte val);
 }

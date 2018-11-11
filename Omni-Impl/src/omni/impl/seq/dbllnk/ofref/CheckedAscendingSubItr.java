@@ -1,10 +1,8 @@
 package omni.impl.seq.dbllnk.ofref;
-
 import java.util.NoSuchElementException;
 import java.util.function.Consumer;
 import omni.api.OmniIterator;
 import omni.impl.CheckedCollection;
-
 class CheckedAscendingSubItr<E> implements OmniIterator.OfRef<E>{
   transient final CheckedSubList<E> parent;
   transient Node<E> cursor;

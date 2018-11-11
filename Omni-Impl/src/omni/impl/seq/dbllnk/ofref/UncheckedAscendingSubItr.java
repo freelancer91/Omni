@@ -1,8 +1,6 @@
 package omni.impl.seq.dbllnk.ofref;
-
 import java.util.function.Consumer;
 import omni.api.OmniIterator;
-
 class UncheckedAscendingSubItr<E> implements OmniIterator.OfRef<E>{
   transient final UncheckedSubList<E> parent;
   transient Node<E> cursor;
@@ -17,7 +15,7 @@ class UncheckedAscendingSubItr<E> implements OmniIterator.OfRef<E>{
   @Override public void forEachRemaining(Consumer<? super E> action){
     Node<E> cursor;
     if((cursor=this.cursor)!=null){
-      UncheckedSubList.uncheckedForEachForward(cursor,parent.tail,action);
+      AbstractSeq.uncheckedForEachForward(cursor,parent.tail,action);
       this.cursor=null;
     }
   }

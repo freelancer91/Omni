@@ -1,4 +1,4 @@
 package omni.function;
 public interface BooleanConsumer{
-    void accept(boolean val);
+  void accept(boolean val);
 }

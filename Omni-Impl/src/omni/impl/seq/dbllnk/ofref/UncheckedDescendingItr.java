@@ -1,8 +1,6 @@
 package omni.impl.seq.dbllnk.ofref;
-
 import java.util.function.Consumer;
-import omni.impl.seq.dbllnk.ofref.AbstractRefDblLnkSeq.Unchecked;
-
+import omni.impl.seq.dbllnk.ofref.AbstractSeq.Unchecked;
 class UncheckedDescendingItr<E>extends UncheckedAscendingItr<E>{
   UncheckedDescendingItr(Unchecked<E> root){
     super(root,root.tail);
@@ -10,7 +8,7 @@ class UncheckedDescendingItr<E>extends UncheckedAscendingItr<E>{
   @Override public void forEachRemaining(Consumer<? super E> action){
     Node<E> cursor;
     if((cursor=this.cursor)!=null){
-      UncheckedRefDblLnkList.uncheckedForEachReverse(cursor,action);
+      UncheckedList.uncheckedForEachReverse(cursor,action);
       this.cursor=null;
     }
   }
@@ -26,15 +24,15 @@ class UncheckedDescendingItr<E>extends UncheckedAscendingItr<E>{
       if((cursor=this.cursor)!=null){
         Node<E> lastRet;
         if((lastRet=cursor.next)==root.tail){
-          UncheckedRefDblLnkList.staticSetTail(root,cursor);
+          UncheckedList.staticSetTail(root,cursor);
         }else{
-          UncheckedRefDblLnkList.joinNodes(cursor,lastRet.next);
+          UncheckedList.joinNodes(cursor,lastRet.next);
         }
       }else{
-        UncheckedRefDblLnkList.staticEraseHead(root,root.head);
+        UncheckedList.staticEraseHead(root,root.head);
       }
     }else{
-      UncheckedRefDblLnkList.staticInit(root,null);
+      UncheckedList.staticInit(root,null);
     }
   }
 }

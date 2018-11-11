@@ -13,7 +13,9 @@ import omni.impl.CheckedCollection;
 import omni.impl.seq.AbstractRefList;
 import omni.util.OmniArray;
 import omni.util.OmniPred;
-abstract class AbstractRefDblLnkSeq<E>extends AbstractRefList<E> implements OmniList.OfRef<E>{
+abstract class AbstractSeq<E>extends AbstractRefList<E> implements OmniList.OfRef<E>{
+  transient Node<E> head;
+  transient Node<E> tail;
   static <E> Node<E> iterateForward(Node<E> curr,int dist){
     if(dist!=0){ return uncheckedIterateForward(curr,dist); }
     return curr;
@@ -26,19 +28,19 @@ abstract class AbstractRefDblLnkSeq<E>extends AbstractRefList<E> implements Omni
     prev.next=next;
     next.prev=prev;
   }
-  static void staticClear(AbstractRefDblLnkSeq<?> seq){
+  static void staticClear(AbstractSeq<?> seq){
     seq.size=0;
     staticInit(seq,null);
   }
-  static <E> void staticEraseHead(AbstractRefDblLnkSeq<E> seq,Node<E> oldHead){
+  static <E> void staticEraseHead(AbstractSeq<E> seq,Node<E> oldHead){
     seq.head=oldHead=oldHead.next;
     oldHead.prev=null;
   }
-  static <E> void staticEraseTail(AbstractRefDblLnkSeq<E> seq,Node<E> oldTail){
+  static <E> void staticEraseTail(AbstractSeq<E> seq,Node<E> oldTail){
     seq.tail=oldTail=oldTail.prev;
     oldTail.next=null;
   }
-  static <E> Node<E> staticExtractNode(AbstractRefDblLnkSeq<E> seq,int headDist,int tailDist){
+  static <E> Node<E> staticExtractNode(AbstractSeq<E> seq,int headDist,int tailDist){
     Node<E> node;
     if(headDist<=tailDist){
       joinNodes(node=iterateForward(seq.head,headDist-1),(node=node.next).next);
@@ -48,15 +50,15 @@ abstract class AbstractRefDblLnkSeq<E>extends AbstractRefList<E> implements Omni
     }
     return node;
   }
-  static <E> Node<E> staticGetNode(AbstractRefDblLnkSeq<E> seq,int headDist,int tailDist){
+  static <E> Node<E> staticGetNode(AbstractSeq<E> seq,int headDist,int tailDist){
     if(headDist<=tailDist){ return iterateForward(seq.head,headDist); }
     return iterateReverse(seq.tail,tailDist-1);
   }
-  static <E> void staticInit(AbstractRefDblLnkSeq<E> seq,Node<E> node){
+  static <E> void staticInit(AbstractSeq<E> seq,Node<E> node){
     seq.head=node;
     seq.tail=node;
   }
-  static <E> void staticInsertNode(AbstractRefDblLnkSeq<E> seq,int headDist,E val,int tailDist){
+  static <E> void staticInsertNode(AbstractSeq<E> seq,int headDist,E val,int tailDist){
     Node<E> before,after;
     if(headDist<=tailDist){
       after=(before=iterateForward(seq.head,headDist-1)).next;
@@ -65,15 +67,15 @@ abstract class AbstractRefDblLnkSeq<E>extends AbstractRefList<E> implements Omni
     }
     new Node<>(before,val,after);
   }
-  static <E> void staticSetHead(AbstractRefDblLnkSeq<E> seq,Node<E> newHead){
+  static <E> void staticSetHead(AbstractSeq<E> seq,Node<E> newHead){
     seq.head=newHead;
     newHead.prev=null;
   }
-  static <E> void staticSetTail(AbstractRefDblLnkSeq<E> seq,Node<E> newTail){
+  static <E> void staticSetTail(AbstractSeq<E> seq,Node<E> newTail){
     seq.tail=newTail;
     newTail.next=null;
   }
-  static <E> void subSeqInsertHelper(AbstractRefDblLnkSeq<E> root,Node<E> newNode,int index){
+  static <E> void subSeqInsertHelper(AbstractSeq<E> root,Node<E> newNode,int index){
     int tailDist;
     Node<E> before,after;
     if(index<=(tailDist=root.size-index)){
@@ -136,16 +138,14 @@ abstract class AbstractRefDblLnkSeq<E>extends AbstractRefList<E> implements Omni
       src=src.next;
     }
   }
-  transient Node<E> head;
-  transient Node<E> tail;
-  AbstractRefDblLnkSeq(){
+  AbstractSeq(){
     super();
   }
-  AbstractRefDblLnkSeq(Node<E> onlyNode){
+  AbstractSeq(Node<E> onlyNode){
     super(1);
     staticInit(this,onlyNode);
   }
-  AbstractRefDblLnkSeq(Node<E> head,int size,Node<E> tail){
+  AbstractSeq(Node<E> head,int size,Node<E> tail){
     super(size);
     this.head=head;
     this.tail=tail;
@@ -182,7 +182,7 @@ abstract class AbstractRefDblLnkSeq<E>extends AbstractRefList<E> implements Omni
       newHead=null;
       newTail=null;
     }
-    return new UncheckedRefDblLnkList<>(newHead,size,newTail);
+    return new UncheckedList<>(newHead,size,newTail);
   }
   @Override public boolean contains(boolean val){
     Node<E> head;
@@ -740,7 +740,7 @@ abstract class AbstractRefDblLnkSeq<E>extends AbstractRefList<E> implements Omni
     }
     return index;
   }
-  static abstract class Checked<E>extends AbstractRefDblLnkSeq<E> implements OmniDeque.OfRef<E>{
+  static abstract class Checked<E>extends AbstractSeq<E> implements OmniDeque.OfRef<E>{
     transient int modCount;
     Checked(){
       super();
@@ -838,8 +838,7 @@ abstract class AbstractRefDblLnkSeq<E>extends AbstractRefList<E> implements Omni
       }
     }
   }
-  static abstract class Unchecked<E>extends AbstractRefDblLnkSeq<E>{
-    // TODO maybe do something with this, or delete it
+  static abstract class Unchecked<E>extends AbstractSeq<E>{
     Unchecked(){
       super();
     }

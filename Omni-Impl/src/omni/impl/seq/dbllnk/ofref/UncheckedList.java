@@ -5,7 +5,7 @@ import omni.api.OmniIterator;
 import omni.api.OmniList;
 import omni.api.OmniListIterator;
 import omni.util.OmniPred;
-public class UncheckedRefDblLnkList<E>extends AbstractRefDblLnkSeq.Unchecked<E> implements OmniDeque.OfRef<E>{
+public class UncheckedList<E>extends AbstractSeq.Unchecked<E> implements OmniDeque.OfRef<E>{
   static <E> int collapseBodyHelper(Node<E> prev,Node<E> next,Predicate<? super E> filter){
     int numRemoved=0;
     for(Node<E> curr;(curr=prev.next)!=next;prev=curr){
@@ -22,13 +22,13 @@ public class UncheckedRefDblLnkList<E>extends AbstractRefDblLnkSeq.Unchecked<E> 
     }
     return numRemoved;
   }
-  UncheckedRefDblLnkList(){
+  UncheckedList(){
     super();
   }
-  UncheckedRefDblLnkList(Node<E> onlyNode){
+  UncheckedList(Node<E> onlyNode){
     super(onlyNode);
   }
-  UncheckedRefDblLnkList(Node<E> head,int size,Node<E> tail){
+  UncheckedList(Node<E> head,int size,Node<E> tail){
     super(head,size,tail);
   }
   @Override public boolean add(E val){

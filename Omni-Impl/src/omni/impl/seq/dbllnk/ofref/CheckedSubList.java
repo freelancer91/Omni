@@ -12,830 +12,7 @@ import omni.api.OmniListIterator;
 import omni.impl.CheckedCollection;
 import omni.util.BitSetUtils;
 import omni.util.OmniPred;
-class CheckedSubList<E>extends AbstractRefDblLnkSeq<E>{
-  static class Suffix<E>extends CheckedSubList<E>{
-    Suffix(Checked<E> root,CheckedSubList<E> parent){
-      super(root,parent);
-    }
-    Suffix(Checked<E> root,CheckedSubList<E> parent,Node<E> onlyNode){
-      super(root,parent,onlyNode);
-    }
-    Suffix(Checked<E> root,CheckedSubList<E> parent,Node<E> head,int size,Node<E> tail){
-      super(root,parent,head,size,tail);
-    }
-    @Override public void clear(){
-      int modCount;
-      Checked<E> root;
-      CheckedCollection.checkModCount(modCount=this.modCount,(root=this.root).modCount);
-      int size;
-      if((size=this.size)!=0){
-        root.modCount=++modCount;
-        Node<E> tmp;
-        bubbleUpClear(modCount,size,tmp=head,tmp=tmp.prev);
-        staticSetTail(root,tmp);
-        root.size-=size;
-      }
-    }
-    @Override public OmniList.OfRef<E> subList(int fromIndex,int toIndex){
-      Checked<E> root;
-      CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
-      int size;
-      CheckedCollection.CheckSubListRange(fromIndex,toIndex,size=this.size);
-      final int tailDist=size-toIndex;
-      int subListSize;
-      switch(subListSize=toIndex-fromIndex){
-      default:
-        return getDefaultSubList(root,fromIndex,subListSize,tailDist);
-      case 1:
-        return getSubList1(root,fromIndex,tailDist);
-      case 0:
-        return getEmptySubList(root,fromIndex,tailDist);
-      }
-    }
-    @Override void ascItrRemove(CheckedAscendingSubItr<E> itr){
-      Node<E> lastRet;
-      if((lastRet=itr.lastRet)!=null){
-        int modCount;
-        Checked<E> root;
-        CheckedCollection.checkModCount(modCount=itr.modCount,(root=this.root).modCount);
-        root.modCount=++modCount;
-        uncheckedItrRemove(lastRet,modCount,root);
-        itr.modCount=modCount;
-        --root.size;
-        return;
-      }
-      throw new IllegalStateException();
-    }
-    @Override void bidirectItrRemove(CheckedSubList.BidirectionalItr<E> itr){
-      Node<E> lastRet;
-      if((lastRet=itr.lastRet)!=null){
-        int modCount;
-        Checked<E> root;
-        CheckedCollection.checkModCount(modCount=itr.modCount,(root=this.root).modCount);
-        root.modCount=++modCount;
-        uncheckedItrRemove(lastRet,modCount,root);
-        if(lastRet!=itr.cursor){
-          --itr.nextIndex;
-        }
-        itr.modCount=modCount;
-        --root.size;
-        return;
-      }
-      throw new IllegalStateException();
-    }
-    @Override void findNewHead(int modCount,Node<E> curr,Predicate<? super E> filter){
-      final Node<E> tail;
-      if(curr==(tail=this.tail)){
-        Checked<E> root;
-        CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
-        root.modCount=++modCount;
-        bubbleUpClear(modCount,1,curr,curr=curr.prev);
-        staticSetTail(root,curr);
-        --root.size;
-      }else if(filter.test(tail.val)){
-        collapseHeadAndTail(modCount,curr,tail,filter);
-      }else{
-        super.suffixCollapseHead(modCount,curr,tail,filter);
-      }
-    }
-    @Override void initHelper(Checked<E> root,E val,int modCount){
-      final Node<E> before,newNode=new Node<>(val);
-      for(CheckedSubList<E> curr=this;;curr.size=1){
-        curr.privateInit(newNode,modCount);
-        if((curr=curr.parent)==null){
-          before=root.tail;
-          break;
-        }else if(curr.size!=0){
-          before=curr.tail;
-          curr.bubbleUpRootPushTail(modCount,newNode);
-          break;
-        }
-      }
-      joinNodes(before,newNode);
-    }
-    @Override void prependHelper(E val,int modCount){
-      this.modCount=modCount;
-      Node<E> newNode,oldHead;
-      head=newNode=new Node<>((oldHead=head).prev,val,oldHead);
-      CheckedSubList<E> parent;
-      if((parent=this.parent)!=null){
-        parent.bubbleUpSuffixPushHead(modCount,newNode,oldHead);
-      }
-    }
-    @Override void removeFirstHelper(int modCount,Node<E> curr){
-      Checked<E> root;
-      CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
-      root.modCount=++modCount;
-      if(curr==tail){
-        bubbleUpClear(modCount,1,curr,curr=curr.prev);
-        staticSetTail(root,curr);
-      }else{
-        super.bubbleUpSuffixEraseHead(modCount,curr,curr.next);
-      }
-      --root.size;
-    }
-    @Override Node<E> uncheckedExtractHead(int newSize){
-      Checked<E> root;
-      int modCount;
-      CheckedCollection.checkModCount(modCount=this.modCount,(root=this.root).modCount);
-      root.modCount=++modCount;
-      Node<E> oldHead;
-      super.bubbleUpSuffixEraseHead(modCount,oldHead=head,oldHead.next);
-      --root.size;
-      return oldHead;
-    }
-    @Override Node<E> uncheckedExtractLastNode(){
-      int modCount;
-      Checked<E> root;
-      CheckedCollection.checkModCount(modCount=this.modCount,(root=this.root).modCount);
-      root.modCount=++modCount;
-      final Node<E> prev,lastNode;
-      staticSetTail(root,prev=(lastNode=head).prev);
-      bubbleUpClear(modCount,1,lastNode,prev);
-      --root.size;
-      return lastNode;
-    }
-    private void bubbleUpClear(int modCount,int size,Node<E> head,final Node<E> prev){
-      for(CheckedSubList<E> curr=this;;){
-        curr.modCount=modCount;
-        staticClear(curr);
-        if((curr=curr.parent)==null){
-          break;
-        }else if(curr.head!=head){
-          curr.bubbleUpRootCollapseTail(modCount,size,prev);
-          break;
-        }
-      }
-    }
-    private void bubbleUpCollapseHeadAndTail(int newModCount,Node<E> oldHead,Node<E> newHead,Node<E> newTail,
-        int numRemoved){
-      final int newSize=size-numRemoved;
-      for(CheckedSubList<E> curr=this;;){
-        curr.privateCollapseHeadAndTail(newModCount,newSize,newHead,newTail);
-        if((curr=curr.parent)==null){
-          break;
-        }
-        if(curr.head!=oldHead){
-          curr.bubbleUpRootCollapseTail(newModCount,numRemoved,newTail);
-          break;
-        }
-      }
-      joinNodes(oldHead.prev,newHead);
-    }
-    private void collapseHeadAndTail(int modCount,Node<E> head,Node<E> tailCandidate,Predicate<? super E> filter){
-      final int oldSize=size;
-      int numConsumed=2;
-      final var root=this.root;
-      for(;;){
-        if(numConsumed==oldSize){
-          CheckedCollection.checkModCount(modCount,root.modCount);
-          bubbleUpClear(++modCount,oldSize,head,tailCandidate=head.prev);
-          break;
-        }
-        ++numConsumed;
-        if(!filter.test((tailCandidate=tailCandidate.prev).val)){
-          var headCandidate=head;
-          for(;;){
-            if(numConsumed==oldSize){
-              CheckedCollection.checkModCount(modCount,root.modCount);
-              --numConsumed;
-              break;
-            }
-            ++numConsumed;
-            if(!filter.test((headCandidate=headCandidate.next).val)){
-              numConsumed-=2-+CheckedRefDblLnkList.collapseBodyHelper(root.new ModCountChecker(modCount),headCandidate,
-                  oldSize-numConsumed,tailCandidate,filter);
-              break;
-            }
-          }
-          bubbleUpCollapseHeadAndTail(++modCount,head,headCandidate,tailCandidate,numConsumed);
-          break;
-        }
-      }
-      root.modCount=modCount;
-      staticSetTail(root,tailCandidate);
-      root.size-=numConsumed;
-    }
-    private OmniList.OfRef<E> getDefaultSubList(Checked<E> root,int headDist,int subListSize,int tailDist){
-      Node<E> subListHead=head,subListTail=tail;
-      if(tailDist==0){ return new CheckedSubList.Suffix<>(root,this,headDist<=subListSize
-          ?iterateForward(subListHead,headDist):uncheckedIterateReverse(subListTail,subListSize)); }
-      if(tailDist<=headDist){
-        subListTail=uncheckedIterateReverse(subListTail,tailDist);
-        subListHead=headDist<=subListSize?iterateForward(subListHead,headDist)
-            :uncheckedIterateReverse(subListTail,subListSize);
-      }else{
-        subListHead=iterateForward(subListHead,headDist);
-        subListTail=tailDist<=subListSize?uncheckedIterateReverse(subListTail,tailDist)
-            :uncheckedIterateForward(subListHead,subListSize);
-      }
-      return new CheckedSubList.Body<>(root,this,subListHead,subListSize,subListTail,headDist);
-    }
-    private OmniList.OfRef<E> getEmptySubList(Checked<E> root,int headDist,int tailDist){
-      if(tailDist==0){ return new CheckedSubList.Prefix<>(root,this); }
-      return new CheckedSubList.Body<>(root,this,headDist);
-    }
-    private OmniList.OfRef<E> getSubList1(Checked<E> root,int headDist,int tailDist){
-      if(tailDist==0){ return new CheckedSubList.Suffix<>(root,this,tail); }
-      return new CheckedSubList.Body<>(root,this,staticGetNode(this,headDist,tailDist),headDist);
-    }
-    private void uncheckedItrRemove(Node<E> lastRet,int modCount,Checked<E> root){
-      if(lastRet==tail){
-        if(lastRet==head){
-          bubbleUpClear(modCount,1,lastRet,lastRet=lastRet.prev);
-        }else{
-          super.bubbleUpRootEraseTail(modCount,lastRet=lastRet.prev);
-        }
-        staticSetTail(root,lastRet);
-      }else{
-        if(lastRet==head){
-          super.bubbleUpSuffixEraseHead(modCount,lastRet,lastRet.next);
-        }else{
-          super.bubbleUpDecrementSize(modCount);
-          joinNodes(lastRet.prev,lastRet.next);
-        }
-      }
-    }
-  }
-  static class Body<E>extends CheckedSubList.Prefix<E>{
-    private transient final int parentOffset;
-    Body(Checked<E> root,CheckedSubList<E> parent,int parentOffset){
-      super(root,parent);
-      this.parentOffset=parentOffset;
-    }
-    Body(Checked<E> root,CheckedSubList<E> parent,Node<E> onlyNode,int parentOffset){
-      super(root,parent,onlyNode);
-      this.parentOffset=parentOffset;
-    }
-    Body(Checked<E> root,CheckedSubList<E> parent,Node<E> head,int size,Node<E> tail,int parentOffset){
-      super(root,parent,head,size,tail);
-      this.parentOffset=parentOffset;
-    }
-    @Override public void clear(){
-      Checked<E> root;
-      int modCount;
-      CheckedCollection.checkModCount(modCount=this.modCount,(root=this.root).modCount);
-      int size;
-      if((size=this.size)!=0){
-        root.modCount=++modCount;
-        bubbleUpClear(modCount,size,head,tail);
-        root.size-=size;
-      }
-    }
-    @Override public OmniList.OfRef<E> subList(int fromIndex,int toIndex){
-      Checked<E> root;
-      CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
-      int size;
-      CheckedCollection.CheckSubListRange(fromIndex,toIndex,size=this.size);
-      int subListSize;
-      switch(subListSize=toIndex-fromIndex){
-      default:
-        return getDefaultSubList(root,fromIndex,subListSize,size-toIndex);
-      case 1:
-        return getSubList1(root,fromIndex,size-toIndex);
-      case 0:
-        return getEmptySubList(root,fromIndex);
-      }
-    }
-    @Override void ascItrRemove(CheckedAscendingSubItr<E> itr){
-      Node<E> lastRet;
-      if((lastRet=itr.lastRet)!=null){
-        int modCount;
-        Checked<E> root;
-        CheckedCollection.checkModCount(modCount=itr.modCount,(root=this.root).modCount);
-        root.modCount=++modCount;
-        uncheckedItrRemove(lastRet,modCount);
-        itr.modCount=modCount;
-        --root.size;
-        return;
-      }
-      throw new IllegalStateException();
-    }
-    @Override void bidirectItrRemove(CheckedSubList.BidirectionalItr<E> itr){
-      Node<E> lastRet;
-      if((lastRet=itr.lastRet)!=null){
-        int modCount;
-        Checked<E> root;
-        CheckedCollection.checkModCount(modCount=itr.modCount,(root=this.root).modCount);
-        root.modCount=++modCount;
-        uncheckedItrRemove(lastRet,modCount);
-        if(lastRet!=itr.cursor){
-          --itr.nextIndex;
-        }
-        itr.modCount=modCount;
-        --root.size;
-        return;
-      }
-      throw new IllegalStateException();
-    }
-    @Override void findNewHead(int modCount,Node<E> curr,Predicate<? super E> filter){
-      final Node<E> tail;
-      if(curr==(tail=this.tail)){
-        Checked<E> root;
-        CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
-        bubbleUpClear(++modCount,1,head,tail);
-        root.modCount=modCount;
-        --root.size;
-      }else if(filter.test(tail.val)){
-        collapseHeadAndTail(modCount,curr,tail,filter);
-      }else{
-        ((CheckedSubList<E>)this).suffixCollapseHead(modCount,curr,tail,filter);
-      }
-    }
-    @Override int getParentOffset(){
-      return this.parentOffset;
-    }
-    @Override void initHelper(Checked<E> root,E val,int modCount){
-      final Node<E> newNode;
-      ((CheckedSubList<E>)this).privateInit(newNode=new Node<>(val),modCount);
-      CheckedSubList<E> parent,curr;
-      if((parent=(curr=this).parent)!=null){
-        do{
-          int parentSize;
-          if((parentSize=parent.size)!=0){
-            Node<E> before,after;
-            int headDist,tailDist;
-            if((headDist=curr.getParentOffset())==0){
-              parent.bubbleUpSuffixPushHead(modCount,newNode,after=parent.head);
-              before=after.prev;
-            }else if((tailDist=parentSize-headDist)==0){
-              parent.bubbleUpPrefixPushTail(modCount,newNode,before=parent.tail);
-              after=before.next;
-            }else{
-              if(headDist<=tailDist){
-                after=(before=iterateForward(root.head,headDist-1)).next;
-              }else{
-                before=(after=iterateReverse(root.tail,tailDist-1)).prev;
-              }
-              parent.bubbleUpIncrementSize(modCount);
-            }
-            joinNodes(before,newNode);
-            joinNodes(newNode,after);
-            return;
-          }
-          parent=(curr=parent).parent;
-          curr.privateInit(newNode,modCount);
-          curr.size=1;
-        }while(parent!=null);
-      }
-      subSeqInsertHelper(root,newNode,curr.getParentOffset());
-    }
-    @Override void prependHelper(E val,int modCount){
-      this.modCount=modCount;
-      Node<E> newNode,oldHead;
-      head=newNode=new Node<>((oldHead=head).prev,val,oldHead);
-      CheckedSubList<E> parent;
-      if((parent=this.parent)!=null){
-        parent.bubbleUpSuffixPushHead(modCount,newNode,oldHead);
-      }
-    }
-    @Override void removeFirstHelper(int modCount,Node<E> curr){
-      Checked<E> root;
-      CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
-      root.modCount=++modCount;
-      if(curr==tail){
-        bubbleUpClear(modCount,1,head,curr);
-      }else{
-        ((CheckedSubList<E>)this).bubbleUpSuffixEraseHead(modCount,curr,curr.next);
-      }
-      --root.size;
-    }
-    @Override Node<E> uncheckedExtractHead(int newSize){
-      Checked<E> root;
-      int modCount;
-      CheckedCollection.checkModCount(modCount=this.modCount,(root=this.root).modCount);
-      root.modCount=++modCount;
-      Node<E> oldHead;
-      ((CheckedSubList<E>)this).bubbleUpSuffixEraseHead(modCount,oldHead=head,oldHead.next);
-      --root.size;
-      return oldHead;
-    }
-    @Override Node<E> uncheckedExtractLastNode(){
-      final Node<E> lastNode;
-      final Checked<E> root;
-      int modCount;
-      CheckedCollection.checkModCount(modCount=this.modCount,(root=this.root).modCount);
-      root.modCount=++modCount;
-      bubbleUpClear(modCount,1,lastNode=head,lastNode);
-      --root.size;
-      return lastNode;
-    }
-    private void bubbleUpClear(int modCount,int size,Node<E> head,Node<E> tail){
-      final Node<E> prev=head.prev,next=tail.next;
-      for(CheckedSubList<E> curr=this;;){
-        curr.modCount=modCount;
-        staticClear(curr);
-        if((curr=curr.parent)!=null){
-          if(curr.head!=head){
-            curr.bubbleUpPrefixCollapseTail(modCount,size,tail,prev);
-            break;
-          }else if(curr.tail!=tail){
-            curr.modCount=modCount;
-            curr.size-=size;
-            curr.head=next;
-            if((curr=curr.parent)!=null){
-              curr.bubbleUpSuffixCollapseHead(modCount,size,head,next);
-            }
-            break;
-          }
-          continue;
-        }
-        break;
-      }
-      joinNodes(prev,next);
-    }
-    private void bubbleUpCollapseHeadAndTail(int newModCount,Node<E> oldHead,Node<E> oldTail,Node<E> newHead,
-        Node<E> newTail,int numRemoved){
-      final int newSize=size-numRemoved;
-      for(CheckedSubList<E> curr=this;;){
-        curr.privateCollapseHeadAndTail(newModCount,newSize,newHead,newTail);
-        if((curr=curr.parent)==null){
-          break;
-        }
-        if(curr.head!=oldHead){
-          curr.bubbleUpPrefixCollapseTail(newModCount,numRemoved,oldTail,newTail);
-          break;
-        }else if(curr.tail!=oldTail){
-          curr.modCount=newModCount;
-          curr.size-=numRemoved;
-          curr.head=newHead;
-          if((curr=curr.parent)!=null){
-            curr.bubbleUpSuffixCollapseHead(newModCount,numRemoved,oldHead,newHead);
-          }
-          break;
-        }
-      }
-      joinNodes(oldHead.prev,newHead);
-      joinNodes(newTail,oldTail.next);
-    }
-    private void collapseHeadAndTail(int modCount,final Node<E> head,final Node<E> tail,
-        final Predicate<? super E> filter){
-      final int oldSize=size;
-      int numConsumed=2;
-      var headCandidate=head;
-      final var root=this.root;
-      for(;;){
-        if(numConsumed==oldSize){
-          CheckedCollection.checkModCount(modCount,root.modCount);
-          bubbleUpClear(++modCount,oldSize,head,tail);
-          break;
-        }
-        ++numConsumed;
-        if(!filter.test((headCandidate=headCandidate.next).val)){
-          var tailCandidate=tail;
-          for(;;){
-            if(numConsumed==oldSize){
-              CheckedCollection.checkModCount(modCount,root.modCount);
-              --numConsumed;
-              break;
-            }
-            ++numConsumed;
-            if(!filter.test((tailCandidate=tailCandidate.prev).val)){
-              numConsumed-=2-CheckedRefDblLnkList.collapseBodyHelper(root.new ModCountChecker(modCount),headCandidate,
-                  oldSize-numConsumed,tailCandidate,filter);
-              break;
-            }
-          }
-          bubbleUpCollapseHeadAndTail(++modCount,head,tail,headCandidate,tailCandidate,numConsumed);
-          break;
-        }
-      }
-      root.modCount=modCount;
-      root.size-=numConsumed;
-    }
-    private OmniList.OfRef<E> getDefaultSubList(Checked<E> root,int headDist,int subListSize,int tailDist){
-      Node<E> subListHead,subListTail;
-      if(headDist<=tailDist){
-        subListHead=iterateForward(head,headDist);
-        subListTail=tailDist<subListSize?iterateReverse(tail,tailDist):uncheckedIterateForward(subListHead,subListSize);
-      }else{
-        subListTail=iterateReverse(tail,tailDist);
-        subListHead=headDist<subListSize?iterateForward(head,headDist):uncheckedIterateReverse(subListTail,subListSize);
-      }
-      return new CheckedSubList.Body<>(root,this,subListHead,subListSize,subListTail,headDist);
-    }
-    private OmniList.OfRef<E> getEmptySubList(Checked<E> root,int headDist){
-      return new CheckedSubList.Body<>(root,this,headDist);
-    }
-    private OmniList.OfRef<E> getSubList1(Checked<E> root,int headDist,int tailDist){
-      return new CheckedSubList.Body<>(root,this,staticGetNode(this,headDist,tailDist),headDist);
-    }
-    private void uncheckedItrRemove(Node<E> lastRet,int modCount){
-      if(lastRet==head){
-        if(lastRet==tail){
-          bubbleUpClear(modCount,1,lastRet,lastRet);
-        }else{
-          ((CheckedSubList<E>)this).bubbleUpSuffixEraseHead(modCount,lastRet,lastRet.next);
-        }
-      }else{
-        if(lastRet==tail){
-          super.bubbleUpPrefixEraseTail(modCount,lastRet,lastRet.prev);
-        }else{
-          ((CheckedSubList<E>)this).bubbleUpDecrementSize(modCount);
-          joinNodes(lastRet.prev,lastRet.next);
-        }
-      }
-    }
-  }
-  static class Prefix<E>extends CheckedSubList<E>{
-    Prefix(Checked<E> root,CheckedSubList<E> parent){
-      super(root,parent);
-    }
-    Prefix(Checked<E> root,CheckedSubList<E> parent,Node<E> onlyNode){
-      super(root,parent,onlyNode);
-    }
-    Prefix(Checked<E> root,CheckedSubList<E> parent,Node<E> head,int size,Node<E> tail){
-      super(root,parent,head,size,tail);
-    }
-    @Override public void clear(){
-      int modCount;
-      Checked<E> root;
-      CheckedCollection.checkModCount(modCount=this.modCount,(root=this.root).modCount);
-      int size;
-      if((size=this.size)!=0){
-        root.modCount=++modCount;
-        Node<E> tmp;
-        bubbleUpClear(modCount,size,tmp=tail,tmp=tmp.next);
-        staticSetHead(root,tmp);
-        root.size-=size;
-      }
-    }
-    @Override public OmniList.OfRef<E> subList(int fromIndex,int toIndex){
-      Checked<E> root;
-      CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
-      int size;
-      CheckedCollection.CheckSubListRange(fromIndex,toIndex,size=this.size);
-      int subListSize;
-      switch(subListSize=toIndex-fromIndex){
-      default:
-        return getDefaultSubList(root,fromIndex,subListSize,size-toIndex);
-      case 1:
-        return getSubList1(root,fromIndex,size-toIndex);
-      case 0:
-        return getEmptySubList(root,fromIndex);
-      }
-    }
-    @Override void appendHelper(E val,int modCount){
-      this.modCount=modCount;
-      Node<E> newNode,oldTail;
-      tail=newNode=new Node<>(oldTail=tail,val,oldTail.next);
-      CheckedSubList<E> parent;
-      if((parent=this.parent)!=null){
-        parent.bubbleUpPrefixPushTail(modCount,newNode,oldTail);
-      }
-    }
-    @Override void ascItrRemove(CheckedAscendingSubItr<E> itr){
-      Node<E> lastRet;
-      if((lastRet=itr.lastRet)!=null){
-        int modCount;
-        Checked<E> root;
-        CheckedCollection.checkModCount(modCount=itr.modCount,(root=this.root).modCount);
-        root.modCount=++modCount;
-        uncheckedItrRemove(lastRet,modCount,root);
-        itr.modCount=modCount;
-        --root.size;
-        return;
-      }
-      throw new IllegalStateException();
-    }
-    @Override void bidirectItrRemove(CheckedSubList.BidirectionalItr<E> itr){
-      Node<E> lastRet;
-      if((lastRet=itr.lastRet)!=null){
-        int modCount;
-        Checked<E> root;
-        CheckedCollection.checkModCount(modCount=itr.modCount,(root=this.root).modCount);
-        root.modCount=++modCount;
-        uncheckedItrRemove(lastRet,modCount,root);
-        if(lastRet!=itr.cursor){
-          --itr.nextIndex;
-        }
-        itr.modCount=modCount;
-        --root.size;
-        return;
-      }
-      throw new IllegalStateException();
-    }
-    @Override void findNewHead(int modCount,Node<E> curr,Predicate<? super E> filter){
-      final Node<E> tail;
-      if(curr==(tail=this.tail)){
-        Checked<E> root;
-        CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
-        root.modCount=++modCount;
-        bubbleUpClear(modCount,1,curr,curr=tail.next);
-        staticSetHead(root,curr);
-        --root.size;
-      }else if(filter.test(tail.val)){
-        collapseHeadAndTail(modCount,curr,tail,filter);
-      }else{
-        super.rootCollapseHead(modCount,curr.next,tail,filter);
-      }
-    }
-    @Override void initHelper(Checked<E> root,E val,int modCount){
-      final Node<E> after,newNode=new Node<>(val);
-      for(CheckedSubList<E> curr=this;;curr.size=1){
-        curr.privateInit(newNode,modCount);
-        if((curr=curr.parent)==null){
-          after=root.head;
-          break;
-        }else if(curr.size!=0){
-          after=curr.head;
-          curr.bubbleUpRootPushHead(modCount,newNode);
-          break;
-        }
-      }
-      joinNodes(newNode,after);
-    }
-    @Override boolean removeIfHelper(int modCount,Node<E> curr,Predicate<? super E> filter){
-      final Node<E> tail;
-      if(curr!=(tail=this.tail)){
-        if(filter.test(tail.val)){
-          prefixCollapseTail(modCount,curr,tail,filter);
-          return true;
-        }
-        return super.collapseBody(modCount,curr,tail,filter);
-      }
-      CheckedCollection.checkModCount(modCount,root.modCount);
-      return false;
-    }
-    @Override Node<E> uncheckedExtractLastNode(){
-      Checked<E> root;
-      int modCount;
-      CheckedCollection.checkModCount(modCount=this.modCount,(root=this.root).modCount);
-      root.modCount=++modCount;
-      final Node<E> next,lastNode;
-      staticSetHead(root,next=(lastNode=tail).next);
-      bubbleUpClear(modCount,1,lastNode,next);
-      --root.size;
-      return lastNode;
-    }
-    @Override Node<E> uncheckedExtractTail(int newSize){
-      Checked<E> root;
-      int modCount;
-      CheckedCollection.checkModCount(modCount=this.modCount,(root=this.root).modCount);
-      root.modCount=++modCount;
-      Node<E> oldTail;
-      bubbleUpPrefixEraseTail(modCount,oldTail=tail,oldTail.prev);
-      --root.size;
-      return oldTail;
-    }
-    @Override boolean uncheckedRemoveFirstMatchHelper(int modCount,Node<E> curr,Predicate<Object> pred){
-      final var root=this.root;
-      final var tail=this.tail;
-      Node<E> prev;
-      do{
-        if(curr==tail){
-          CheckedCollection.checkModCount(modCount,root.modCount);
-          return false;
-        }
-      }while(!pred.test((curr=(prev=curr).next).val));
-      CheckedCollection.checkModCount(modCount,root.modCount);
-      root.modCount=++modCount;
-      --root.size;
-      if(curr==tail){
-        bubbleUpPrefixEraseTail(modCount,curr,prev);
-      }else{
-        super.bubbleUpDecrementSize(modCount);
-        joinNodes(prev,curr.next);
-      }
-      return true;
-    }
-    private void bubbleUpClear(int modCount,int size,Node<E> tail,final Node<E> next){
-      for(CheckedSubList<E> curr=this;;){
-        curr.modCount=modCount;
-        staticClear(curr);
-        if((curr=curr.parent)==null){
-          break;
-        }else if(curr.tail!=tail){
-          curr.bubbleUpRootCollapseHead(modCount,size,next);
-          break;
-        }
-      }
-    }
-    private void bubbleUpCollapseHeadAndTail(int newModCount,Node<E> oldTail,Node<E> newHead,Node<E> newTail,
-        int numRemoved){
-      final int newSize=size-numRemoved;
-      for(CheckedSubList<E> curr=this;;){
-        curr.privateCollapseHeadAndTail(newModCount,newSize,newHead,newTail);
-        if((curr=curr.parent)==null){
-          break;
-        }
-        if(curr.tail!=oldTail){
-          curr.bubbleUpRootCollapseHead(newModCount,numRemoved,newHead);
-          break;
-        }
-      }
-      joinNodes(newTail,oldTail.next);
-    }
-    private void bubbleUpPrefixEraseTail(int newModCount,Node<E> oldTail,Node<E> newTail){
-      CheckedSubList<E> curr=this;
-      do{
-        curr.modCount=newModCount;
-        --curr.size;
-        curr.tail=newTail;
-        if((curr=curr.parent)==null){ return; }
-      }while(curr.tail==oldTail);
-      curr.bubbleUpDecrementSize(newModCount);
-      joinNodes(newTail,oldTail.next);
-    }
-    private void collapseHeadAndTail(int modCount,Node<E> headCandidate,Node<E> tail,Predicate<? super E> filter){
-      final int oldSize=size;
-      int numConsumed=2;
-      final var root=this.root;
-      for(;;){
-        if(numConsumed==oldSize){
-          CheckedCollection.checkModCount(modCount,root.modCount);
-          bubbleUpClear(++modCount,oldSize,tail,headCandidate=tail.next);
-          break;
-        }
-        ++numConsumed;
-        if(!filter.test((headCandidate=headCandidate.next).val)){
-          var tailCandidate=tail;
-          for(;;){
-            if(numConsumed==oldSize){
-              CheckedCollection.checkModCount(modCount,root.modCount);
-              --numConsumed;
-              break;
-            }
-            ++numConsumed;
-            if(!filter.test((tailCandidate=tailCandidate.prev).val)){
-              numConsumed-=2-CheckedRefDblLnkList.collapseBodyHelper(root.new ModCountChecker(modCount),headCandidate,
-                  oldSize-numConsumed,tailCandidate,filter);
-              break;
-            }
-          }
-          bubbleUpCollapseHeadAndTail(++modCount,tail,headCandidate,tailCandidate,numConsumed);
-          break;
-        }
-      }
-      root.modCount=modCount;
-      staticSetHead(root,headCandidate);
-      root.size-=numConsumed;
-    }
-    private OmniList.OfRef<E> getDefaultSubList(Checked<E> root,int headDist,int subListSize,int tailDist){
-      Node<E> subListHead=head,subListTail=tail;
-      if(headDist==0){ return new CheckedSubList.Prefix<>(root,this,subListHead,subListSize,tailDist<=subListSize
-          ?iterateReverse(subListTail,tailDist):uncheckedIterateForward(subListHead,subListSize)); }
-      if(headDist<=tailDist){
-        subListHead=uncheckedIterateForward(subListHead,headDist);
-        subListTail=tailDist<=subListSize?iterateReverse(subListTail,tailDist)
-            :uncheckedIterateForward(subListHead,subListSize);
-      }else{
-        subListTail=iterateReverse(subListTail,tailDist);
-        subListHead=headDist<=subListSize?uncheckedIterateForward(subListHead,headDist)
-            :uncheckedIterateReverse(subListTail,subListSize);
-      }
-      return new CheckedSubList.Body<>(root,this,subListHead,subListSize,subListTail,headDist);
-    }
-    private OmniList.OfRef<E> getEmptySubList(Checked<E> root,int headDist){
-      if(headDist==0){ return new CheckedSubList.Prefix<>(root,this); }
-      return new CheckedSubList.Body<>(root,this,headDist);
-    }
-    private OmniList.OfRef<E> getSubList1(Checked<E> root,int headDist,int tailDist){
-      if(headDist==0){ return new CheckedSubList.Prefix<>(root,this,head); }
-      return new CheckedSubList.Body<>(root,this,
-          tailDist<headDist?iterateReverse(tail,tailDist):uncheckedIterateForward(head,headDist),headDist);
-    }
-    private void prefixCollapseTail(int modCount,Node<E> oldHead,Node<E> oldTail,Predicate<? super E> filter){
-      final int oldSize=size;
-      int numConsumed=2;
-      final var root=this.root;
-      var tailCandidate=oldTail.prev;
-      for(;;tailCandidate=tailCandidate.prev){
-        if(numConsumed==oldSize){
-          CheckedCollection.checkModCount(modCount,root.modCount);
-          --numConsumed;
-          break;
-        }
-        ++numConsumed;
-        if(!filter.test(tailCandidate.val)){
-          numConsumed-=2-CheckedRefDblLnkList.collapseBodyHelper(root.new ModCountChecker(modCount),oldHead,
-              oldSize-numConsumed,tailCandidate,filter);
-          break;
-        }
-      }
-      root.modCount=++modCount;
-      super.bubbleUpPrefixCollapseTail(modCount,numConsumed,oldTail,tailCandidate);
-      joinNodes(tailCandidate,oldTail.next);
-      root.size-=numConsumed;
-    }
-    private void uncheckedItrRemove(Node<E> lastRet,int modCount,Checked<E> root){
-      if(lastRet==head){
-        if(lastRet==tail){
-          bubbleUpClear(modCount,1,lastRet,lastRet=lastRet.next);
-        }else{
-          super.bubbleUpRootEraseHead(modCount,lastRet=lastRet.next);
-        }
-        staticSetHead(root,lastRet);
-      }else{
-        if(lastRet==tail){
-          bubbleUpPrefixEraseTail(modCount,lastRet,lastRet.prev);
-        }else{
-          super.bubbleUpDecrementSize(modCount);
-          joinNodes(lastRet.prev,lastRet.next);
-        }
-      }
-    }
-  }
+class CheckedSubList<E>extends AbstractSeq<E>{
   transient final CheckedSubList<E> parent;
   transient final Checked<E> root;
   transient int modCount;
@@ -920,7 +97,7 @@ class CheckedSubList<E>extends AbstractRefDblLnkSeq<E>{
       newHead=null;
       newTail=null;
     }
-    return new CheckedRefDblLnkList<>(newHead,size,newTail);
+    return new CheckedList<>(newHead,size,newTail);
   }
   @Override public boolean contains(boolean val){
     CheckedCollection.checkModCount(modCount,root.modCount);
@@ -1830,11 +1007,11 @@ class CheckedSubList<E>extends AbstractRefDblLnkSeq<E>{
             ++numRemoved;
             long[] survivorSet;
             int numLeft,numSurvivors;
-            if((numLeft=oldSize-numConsumed)!=0&&(numSurvivors=CheckedRefDblLnkList.markSurvivors(before=before.next,
-                numLeft,survivorSet=BitSetUtils.getBitSet(numLeft),filter))!=0){
+            if((numLeft=oldSize-numConsumed)!=0&&(numSurvivors=CheckedList.markSurvivors(before=before.next,numLeft,
+                survivorSet=BitSetUtils.getBitSet(numLeft),filter))!=0){
               CheckedCollection.checkModCount(modCount,root.modCount);
               numRemoved+=numLeft-numSurvivors;
-              prev=CheckedRefDblLnkList.retainSurvivors(prev,before,numSurvivors,survivorSet);
+              prev=CheckedList.retainSurvivors(prev,before,numSurvivors,survivorSet);
             }else{
               CheckedCollection.checkModCount(modCount,root.modCount);
               numRemoved+=oldSize;
@@ -1874,8 +1051,8 @@ class CheckedSubList<E>extends AbstractRefDblLnkSeq<E>{
           }
           ++numConsumed;
           if(!filter.test((tailCandidate=tailCandidate.prev).val)){
-            size-=numConsumed-2-CheckedRefDblLnkList.collapseBodyHelper(root.new ModCountChecker(modCount),
-                headCandidate,size-numConsumed,tailCandidate,filter);
+            size-=numConsumed-2-CheckedList.collapseBodyHelper(root.new ModCountChecker(modCount),headCandidate,
+                size-numConsumed,tailCandidate,filter);
             break;
           }
         }
@@ -1946,7 +1123,7 @@ class CheckedSubList<E>extends AbstractRefDblLnkSeq<E>{
       }
       ++numConsumed;
       if(!filter.test(headCandidate.val)){
-        numConsumed-=2-CheckedRefDblLnkList.collapseBodyHelper(root.new ModCountChecker(modCount),headCandidate,
+        numConsumed-=2-CheckedList.collapseBodyHelper(root.new ModCountChecker(modCount),headCandidate,
             oldSize-numConsumed,oldTail,filter);
         break;
       }
@@ -1968,8 +1145,8 @@ class CheckedSubList<E>extends AbstractRefDblLnkSeq<E>{
       }
       ++numConsumed;
       if(!filter.test(tailCandidate.val)){
-        numConsumed-=2-CheckedRefDblLnkList.collapseBodyHelper(root.new ModCountChecker(modCount),oldHead,
-            oldSize-numConsumed,tailCandidate,filter);
+        numConsumed-=2-CheckedList.collapseBodyHelper(root.new ModCountChecker(modCount),oldHead,oldSize-numConsumed,
+            tailCandidate,filter);
         break;
       }
     }
@@ -1991,7 +1168,7 @@ class CheckedSubList<E>extends AbstractRefDblLnkSeq<E>{
       }
       ++numConsumed;
       if(!filter.test(headCandidate.val)){
-        numConsumed-=2-CheckedRefDblLnkList.collapseBodyHelper(root.new ModCountChecker(modCount),headCandidate,
+        numConsumed-=2-CheckedList.collapseBodyHelper(root.new ModCountChecker(modCount),headCandidate,
             oldSize-numConsumed,oldTail,filter);
         break;
       }
@@ -2017,6 +1194,829 @@ class CheckedSubList<E>extends AbstractRefDblLnkSeq<E>{
       }else{
         bubbleUpDecrementSize(modCount);
         joinNodes(lastRet.prev,lastRet.next);
+      }
+    }
+  }
+  static class Body<E>extends CheckedSubList.Prefix<E>{
+    private transient final int parentOffset;
+    Body(Checked<E> root,CheckedSubList<E> parent,int parentOffset){
+      super(root,parent);
+      this.parentOffset=parentOffset;
+    }
+    Body(Checked<E> root,CheckedSubList<E> parent,Node<E> onlyNode,int parentOffset){
+      super(root,parent,onlyNode);
+      this.parentOffset=parentOffset;
+    }
+    Body(Checked<E> root,CheckedSubList<E> parent,Node<E> head,int size,Node<E> tail,int parentOffset){
+      super(root,parent,head,size,tail);
+      this.parentOffset=parentOffset;
+    }
+    @Override public void clear(){
+      Checked<E> root;
+      int modCount;
+      CheckedCollection.checkModCount(modCount=this.modCount,(root=this.root).modCount);
+      int size;
+      if((size=this.size)!=0){
+        root.modCount=++modCount;
+        bubbleUpClear(modCount,size,head,tail);
+        root.size-=size;
+      }
+    }
+    @Override public OmniList.OfRef<E> subList(int fromIndex,int toIndex){
+      Checked<E> root;
+      CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+      int size;
+      CheckedCollection.CheckSubListRange(fromIndex,toIndex,size=this.size);
+      int subListSize;
+      switch(subListSize=toIndex-fromIndex){
+      default:
+        return getDefaultSubList(root,fromIndex,subListSize,size-toIndex);
+      case 1:
+        return getSubList1(root,fromIndex,size-toIndex);
+      case 0:
+        return getEmptySubList(root,fromIndex);
+      }
+    }
+    @Override void ascItrRemove(CheckedAscendingSubItr<E> itr){
+      Node<E> lastRet;
+      if((lastRet=itr.lastRet)!=null){
+        int modCount;
+        Checked<E> root;
+        CheckedCollection.checkModCount(modCount=itr.modCount,(root=this.root).modCount);
+        root.modCount=++modCount;
+        uncheckedItrRemove(lastRet,modCount);
+        itr.modCount=modCount;
+        --root.size;
+        return;
+      }
+      throw new IllegalStateException();
+    }
+    @Override void bidirectItrRemove(CheckedSubList.BidirectionalItr<E> itr){
+      Node<E> lastRet;
+      if((lastRet=itr.lastRet)!=null){
+        int modCount;
+        Checked<E> root;
+        CheckedCollection.checkModCount(modCount=itr.modCount,(root=this.root).modCount);
+        root.modCount=++modCount;
+        uncheckedItrRemove(lastRet,modCount);
+        if(lastRet!=itr.cursor){
+          --itr.nextIndex;
+        }
+        itr.modCount=modCount;
+        --root.size;
+        return;
+      }
+      throw new IllegalStateException();
+    }
+    @Override void findNewHead(int modCount,Node<E> curr,Predicate<? super E> filter){
+      final Node<E> tail;
+      if(curr==(tail=this.tail)){
+        Checked<E> root;
+        CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+        bubbleUpClear(++modCount,1,head,tail);
+        root.modCount=modCount;
+        --root.size;
+      }else if(filter.test(tail.val)){
+        collapseHeadAndTail(modCount,curr,tail,filter);
+      }else{
+        ((CheckedSubList<E>)this).suffixCollapseHead(modCount,curr,tail,filter);
+      }
+    }
+    @Override int getParentOffset(){
+      return this.parentOffset;
+    }
+    @Override void initHelper(Checked<E> root,E val,int modCount){
+      final Node<E> newNode;
+      ((CheckedSubList<E>)this).privateInit(newNode=new Node<>(val),modCount);
+      CheckedSubList<E> parent,curr;
+      if((parent=(curr=this).parent)!=null){
+        do{
+          int parentSize;
+          if((parentSize=parent.size)!=0){
+            Node<E> before,after;
+            int headDist,tailDist;
+            if((headDist=curr.getParentOffset())==0){
+              parent.bubbleUpSuffixPushHead(modCount,newNode,after=parent.head);
+              before=after.prev;
+            }else if((tailDist=parentSize-headDist)==0){
+              parent.bubbleUpPrefixPushTail(modCount,newNode,before=parent.tail);
+              after=before.next;
+            }else{
+              if(headDist<=tailDist){
+                after=(before=iterateForward(root.head,headDist-1)).next;
+              }else{
+                before=(after=iterateReverse(root.tail,tailDist-1)).prev;
+              }
+              parent.bubbleUpIncrementSize(modCount);
+            }
+            joinNodes(before,newNode);
+            joinNodes(newNode,after);
+            return;
+          }
+          parent=(curr=parent).parent;
+          curr.privateInit(newNode,modCount);
+          curr.size=1;
+        }while(parent!=null);
+      }
+      subSeqInsertHelper(root,newNode,curr.getParentOffset());
+    }
+    @Override void prependHelper(E val,int modCount){
+      this.modCount=modCount;
+      Node<E> newNode,oldHead;
+      head=newNode=new Node<>((oldHead=head).prev,val,oldHead);
+      CheckedSubList<E> parent;
+      if((parent=this.parent)!=null){
+        parent.bubbleUpSuffixPushHead(modCount,newNode,oldHead);
+      }
+    }
+    @Override void removeFirstHelper(int modCount,Node<E> curr){
+      Checked<E> root;
+      CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+      root.modCount=++modCount;
+      if(curr==tail){
+        bubbleUpClear(modCount,1,head,curr);
+      }else{
+        ((CheckedSubList<E>)this).bubbleUpSuffixEraseHead(modCount,curr,curr.next);
+      }
+      --root.size;
+    }
+    @Override Node<E> uncheckedExtractHead(int newSize){
+      Checked<E> root;
+      int modCount;
+      CheckedCollection.checkModCount(modCount=this.modCount,(root=this.root).modCount);
+      root.modCount=++modCount;
+      Node<E> oldHead;
+      ((CheckedSubList<E>)this).bubbleUpSuffixEraseHead(modCount,oldHead=head,oldHead.next);
+      --root.size;
+      return oldHead;
+    }
+    @Override Node<E> uncheckedExtractLastNode(){
+      final Node<E> lastNode;
+      final Checked<E> root;
+      int modCount;
+      CheckedCollection.checkModCount(modCount=this.modCount,(root=this.root).modCount);
+      root.modCount=++modCount;
+      bubbleUpClear(modCount,1,lastNode=head,lastNode);
+      --root.size;
+      return lastNode;
+    }
+    private void bubbleUpClear(int modCount,int size,Node<E> head,Node<E> tail){
+      final Node<E> prev=head.prev,next=tail.next;
+      for(CheckedSubList<E> curr=this;;){
+        curr.modCount=modCount;
+        staticClear(curr);
+        if((curr=curr.parent)!=null){
+          if(curr.head!=head){
+            curr.bubbleUpPrefixCollapseTail(modCount,size,tail,prev);
+            break;
+          }else if(curr.tail!=tail){
+            curr.modCount=modCount;
+            curr.size-=size;
+            curr.head=next;
+            if((curr=curr.parent)!=null){
+              curr.bubbleUpSuffixCollapseHead(modCount,size,head,next);
+            }
+            break;
+          }
+          continue;
+        }
+        break;
+      }
+      joinNodes(prev,next);
+    }
+    private void bubbleUpCollapseHeadAndTail(int newModCount,Node<E> oldHead,Node<E> oldTail,Node<E> newHead,
+        Node<E> newTail,int numRemoved){
+      final int newSize=size-numRemoved;
+      for(CheckedSubList<E> curr=this;;){
+        curr.privateCollapseHeadAndTail(newModCount,newSize,newHead,newTail);
+        if((curr=curr.parent)==null){
+          break;
+        }
+        if(curr.head!=oldHead){
+          curr.bubbleUpPrefixCollapseTail(newModCount,numRemoved,oldTail,newTail);
+          break;
+        }else if(curr.tail!=oldTail){
+          curr.modCount=newModCount;
+          curr.size-=numRemoved;
+          curr.head=newHead;
+          if((curr=curr.parent)!=null){
+            curr.bubbleUpSuffixCollapseHead(newModCount,numRemoved,oldHead,newHead);
+          }
+          break;
+        }
+      }
+      joinNodes(oldHead.prev,newHead);
+      joinNodes(newTail,oldTail.next);
+    }
+    private void collapseHeadAndTail(int modCount,final Node<E> head,final Node<E> tail,
+        final Predicate<? super E> filter){
+      final int oldSize=size;
+      int numConsumed=2;
+      var headCandidate=head;
+      final var root=this.root;
+      for(;;){
+        if(numConsumed==oldSize){
+          CheckedCollection.checkModCount(modCount,root.modCount);
+          bubbleUpClear(++modCount,oldSize,head,tail);
+          break;
+        }
+        ++numConsumed;
+        if(!filter.test((headCandidate=headCandidate.next).val)){
+          var tailCandidate=tail;
+          for(;;){
+            if(numConsumed==oldSize){
+              CheckedCollection.checkModCount(modCount,root.modCount);
+              --numConsumed;
+              break;
+            }
+            ++numConsumed;
+            if(!filter.test((tailCandidate=tailCandidate.prev).val)){
+              numConsumed-=2-CheckedList.collapseBodyHelper(root.new ModCountChecker(modCount),headCandidate,
+                  oldSize-numConsumed,tailCandidate,filter);
+              break;
+            }
+          }
+          bubbleUpCollapseHeadAndTail(++modCount,head,tail,headCandidate,tailCandidate,numConsumed);
+          break;
+        }
+      }
+      root.modCount=modCount;
+      root.size-=numConsumed;
+    }
+    private OmniList.OfRef<E> getDefaultSubList(Checked<E> root,int headDist,int subListSize,int tailDist){
+      Node<E> subListHead,subListTail;
+      if(headDist<=tailDist){
+        subListHead=iterateForward(head,headDist);
+        subListTail=tailDist<subListSize?iterateReverse(tail,tailDist):uncheckedIterateForward(subListHead,subListSize);
+      }else{
+        subListTail=iterateReverse(tail,tailDist);
+        subListHead=headDist<subListSize?iterateForward(head,headDist):uncheckedIterateReverse(subListTail,subListSize);
+      }
+      return new CheckedSubList.Body<>(root,this,subListHead,subListSize,subListTail,headDist);
+    }
+    private OmniList.OfRef<E> getEmptySubList(Checked<E> root,int headDist){
+      return new CheckedSubList.Body<>(root,this,headDist);
+    }
+    private OmniList.OfRef<E> getSubList1(Checked<E> root,int headDist,int tailDist){
+      return new CheckedSubList.Body<>(root,this,staticGetNode(this,headDist,tailDist),headDist);
+    }
+    private void uncheckedItrRemove(Node<E> lastRet,int modCount){
+      if(lastRet==head){
+        if(lastRet==tail){
+          bubbleUpClear(modCount,1,lastRet,lastRet);
+        }else{
+          ((CheckedSubList<E>)this).bubbleUpSuffixEraseHead(modCount,lastRet,lastRet.next);
+        }
+      }else{
+        if(lastRet==tail){
+          super.bubbleUpPrefixEraseTail(modCount,lastRet,lastRet.prev);
+        }else{
+          ((CheckedSubList<E>)this).bubbleUpDecrementSize(modCount);
+          joinNodes(lastRet.prev,lastRet.next);
+        }
+      }
+    }
+  }
+  static class Prefix<E>extends CheckedSubList<E>{
+    Prefix(Checked<E> root,CheckedSubList<E> parent){
+      super(root,parent);
+    }
+    Prefix(Checked<E> root,CheckedSubList<E> parent,Node<E> onlyNode){
+      super(root,parent,onlyNode);
+    }
+    Prefix(Checked<E> root,CheckedSubList<E> parent,Node<E> head,int size,Node<E> tail){
+      super(root,parent,head,size,tail);
+    }
+    @Override public void clear(){
+      int modCount;
+      Checked<E> root;
+      CheckedCollection.checkModCount(modCount=this.modCount,(root=this.root).modCount);
+      int size;
+      if((size=this.size)!=0){
+        root.modCount=++modCount;
+        Node<E> tmp;
+        bubbleUpClear(modCount,size,tmp=tail,tmp=tmp.next);
+        staticSetHead(root,tmp);
+        root.size-=size;
+      }
+    }
+    @Override public OmniList.OfRef<E> subList(int fromIndex,int toIndex){
+      Checked<E> root;
+      CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+      int size;
+      CheckedCollection.CheckSubListRange(fromIndex,toIndex,size=this.size);
+      int subListSize;
+      switch(subListSize=toIndex-fromIndex){
+      default:
+        return getDefaultSubList(root,fromIndex,subListSize,size-toIndex);
+      case 1:
+        return getSubList1(root,fromIndex,size-toIndex);
+      case 0:
+        return getEmptySubList(root,fromIndex);
+      }
+    }
+    @Override void appendHelper(E val,int modCount){
+      this.modCount=modCount;
+      Node<E> newNode,oldTail;
+      tail=newNode=new Node<>(oldTail=tail,val,oldTail.next);
+      CheckedSubList<E> parent;
+      if((parent=this.parent)!=null){
+        parent.bubbleUpPrefixPushTail(modCount,newNode,oldTail);
+      }
+    }
+    @Override void ascItrRemove(CheckedAscendingSubItr<E> itr){
+      Node<E> lastRet;
+      if((lastRet=itr.lastRet)!=null){
+        int modCount;
+        Checked<E> root;
+        CheckedCollection.checkModCount(modCount=itr.modCount,(root=this.root).modCount);
+        root.modCount=++modCount;
+        uncheckedItrRemove(lastRet,modCount,root);
+        itr.modCount=modCount;
+        --root.size;
+        return;
+      }
+      throw new IllegalStateException();
+    }
+    @Override void bidirectItrRemove(CheckedSubList.BidirectionalItr<E> itr){
+      Node<E> lastRet;
+      if((lastRet=itr.lastRet)!=null){
+        int modCount;
+        Checked<E> root;
+        CheckedCollection.checkModCount(modCount=itr.modCount,(root=this.root).modCount);
+        root.modCount=++modCount;
+        uncheckedItrRemove(lastRet,modCount,root);
+        if(lastRet!=itr.cursor){
+          --itr.nextIndex;
+        }
+        itr.modCount=modCount;
+        --root.size;
+        return;
+      }
+      throw new IllegalStateException();
+    }
+    @Override void findNewHead(int modCount,Node<E> curr,Predicate<? super E> filter){
+      final Node<E> tail;
+      if(curr==(tail=this.tail)){
+        Checked<E> root;
+        CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+        root.modCount=++modCount;
+        bubbleUpClear(modCount,1,curr,curr=tail.next);
+        staticSetHead(root,curr);
+        --root.size;
+      }else if(filter.test(tail.val)){
+        collapseHeadAndTail(modCount,curr,tail,filter);
+      }else{
+        super.rootCollapseHead(modCount,curr.next,tail,filter);
+      }
+    }
+    @Override void initHelper(Checked<E> root,E val,int modCount){
+      final Node<E> after,newNode=new Node<>(val);
+      for(CheckedSubList<E> curr=this;;curr.size=1){
+        curr.privateInit(newNode,modCount);
+        if((curr=curr.parent)==null){
+          after=root.head;
+          break;
+        }else if(curr.size!=0){
+          after=curr.head;
+          curr.bubbleUpRootPushHead(modCount,newNode);
+          break;
+        }
+      }
+      joinNodes(newNode,after);
+    }
+    @Override boolean removeIfHelper(int modCount,Node<E> curr,Predicate<? super E> filter){
+      final Node<E> tail;
+      if(curr!=(tail=this.tail)){
+        if(filter.test(tail.val)){
+          prefixCollapseTail(modCount,curr,tail,filter);
+          return true;
+        }
+        return super.collapseBody(modCount,curr,tail,filter);
+      }
+      CheckedCollection.checkModCount(modCount,root.modCount);
+      return false;
+    }
+    @Override Node<E> uncheckedExtractLastNode(){
+      Checked<E> root;
+      int modCount;
+      CheckedCollection.checkModCount(modCount=this.modCount,(root=this.root).modCount);
+      root.modCount=++modCount;
+      final Node<E> next,lastNode;
+      staticSetHead(root,next=(lastNode=tail).next);
+      bubbleUpClear(modCount,1,lastNode,next);
+      --root.size;
+      return lastNode;
+    }
+    @Override Node<E> uncheckedExtractTail(int newSize){
+      Checked<E> root;
+      int modCount;
+      CheckedCollection.checkModCount(modCount=this.modCount,(root=this.root).modCount);
+      root.modCount=++modCount;
+      Node<E> oldTail;
+      bubbleUpPrefixEraseTail(modCount,oldTail=tail,oldTail.prev);
+      --root.size;
+      return oldTail;
+    }
+    @Override boolean uncheckedRemoveFirstMatchHelper(int modCount,Node<E> curr,Predicate<Object> pred){
+      final var root=this.root;
+      final var tail=this.tail;
+      Node<E> prev;
+      do{
+        if(curr==tail){
+          CheckedCollection.checkModCount(modCount,root.modCount);
+          return false;
+        }
+      }while(!pred.test((curr=(prev=curr).next).val));
+      CheckedCollection.checkModCount(modCount,root.modCount);
+      root.modCount=++modCount;
+      --root.size;
+      if(curr==tail){
+        bubbleUpPrefixEraseTail(modCount,curr,prev);
+      }else{
+        super.bubbleUpDecrementSize(modCount);
+        joinNodes(prev,curr.next);
+      }
+      return true;
+    }
+    private void bubbleUpClear(int modCount,int size,Node<E> tail,final Node<E> next){
+      for(CheckedSubList<E> curr=this;;){
+        curr.modCount=modCount;
+        staticClear(curr);
+        if((curr=curr.parent)==null){
+          break;
+        }else if(curr.tail!=tail){
+          curr.bubbleUpRootCollapseHead(modCount,size,next);
+          break;
+        }
+      }
+    }
+    private void bubbleUpCollapseHeadAndTail(int newModCount,Node<E> oldTail,Node<E> newHead,Node<E> newTail,
+        int numRemoved){
+      final int newSize=size-numRemoved;
+      for(CheckedSubList<E> curr=this;;){
+        curr.privateCollapseHeadAndTail(newModCount,newSize,newHead,newTail);
+        if((curr=curr.parent)==null){
+          break;
+        }
+        if(curr.tail!=oldTail){
+          curr.bubbleUpRootCollapseHead(newModCount,numRemoved,newHead);
+          break;
+        }
+      }
+      joinNodes(newTail,oldTail.next);
+    }
+    private void bubbleUpPrefixEraseTail(int newModCount,Node<E> oldTail,Node<E> newTail){
+      CheckedSubList<E> curr=this;
+      do{
+        curr.modCount=newModCount;
+        --curr.size;
+        curr.tail=newTail;
+        if((curr=curr.parent)==null){ return; }
+      }while(curr.tail==oldTail);
+      curr.bubbleUpDecrementSize(newModCount);
+      joinNodes(newTail,oldTail.next);
+    }
+    private void collapseHeadAndTail(int modCount,Node<E> headCandidate,Node<E> tail,Predicate<? super E> filter){
+      final int oldSize=size;
+      int numConsumed=2;
+      final var root=this.root;
+      for(;;){
+        if(numConsumed==oldSize){
+          CheckedCollection.checkModCount(modCount,root.modCount);
+          bubbleUpClear(++modCount,oldSize,tail,headCandidate=tail.next);
+          break;
+        }
+        ++numConsumed;
+        if(!filter.test((headCandidate=headCandidate.next).val)){
+          var tailCandidate=tail;
+          for(;;){
+            if(numConsumed==oldSize){
+              CheckedCollection.checkModCount(modCount,root.modCount);
+              --numConsumed;
+              break;
+            }
+            ++numConsumed;
+            if(!filter.test((tailCandidate=tailCandidate.prev).val)){
+              numConsumed-=2-CheckedList.collapseBodyHelper(root.new ModCountChecker(modCount),headCandidate,
+                  oldSize-numConsumed,tailCandidate,filter);
+              break;
+            }
+          }
+          bubbleUpCollapseHeadAndTail(++modCount,tail,headCandidate,tailCandidate,numConsumed);
+          break;
+        }
+      }
+      root.modCount=modCount;
+      staticSetHead(root,headCandidate);
+      root.size-=numConsumed;
+    }
+    private OmniList.OfRef<E> getDefaultSubList(Checked<E> root,int headDist,int subListSize,int tailDist){
+      Node<E> subListHead=head,subListTail=tail;
+      if(headDist==0){ return new CheckedSubList.Prefix<>(root,this,subListHead,subListSize,tailDist<=subListSize
+          ?iterateReverse(subListTail,tailDist):uncheckedIterateForward(subListHead,subListSize)); }
+      if(headDist<=tailDist){
+        subListHead=uncheckedIterateForward(subListHead,headDist);
+        subListTail=tailDist<=subListSize?iterateReverse(subListTail,tailDist)
+            :uncheckedIterateForward(subListHead,subListSize);
+      }else{
+        subListTail=iterateReverse(subListTail,tailDist);
+        subListHead=headDist<=subListSize?uncheckedIterateForward(subListHead,headDist)
+            :uncheckedIterateReverse(subListTail,subListSize);
+      }
+      return new CheckedSubList.Body<>(root,this,subListHead,subListSize,subListTail,headDist);
+    }
+    private OmniList.OfRef<E> getEmptySubList(Checked<E> root,int headDist){
+      if(headDist==0){ return new CheckedSubList.Prefix<>(root,this); }
+      return new CheckedSubList.Body<>(root,this,headDist);
+    }
+    private OmniList.OfRef<E> getSubList1(Checked<E> root,int headDist,int tailDist){
+      if(headDist==0){ return new CheckedSubList.Prefix<>(root,this,head); }
+      return new CheckedSubList.Body<>(root,this,
+          tailDist<headDist?iterateReverse(tail,tailDist):uncheckedIterateForward(head,headDist),headDist);
+    }
+    private void prefixCollapseTail(int modCount,Node<E> oldHead,Node<E> oldTail,Predicate<? super E> filter){
+      final int oldSize=size;
+      int numConsumed=2;
+      final var root=this.root;
+      var tailCandidate=oldTail.prev;
+      for(;;tailCandidate=tailCandidate.prev){
+        if(numConsumed==oldSize){
+          CheckedCollection.checkModCount(modCount,root.modCount);
+          --numConsumed;
+          break;
+        }
+        ++numConsumed;
+        if(!filter.test(tailCandidate.val)){
+          numConsumed-=2-CheckedList.collapseBodyHelper(root.new ModCountChecker(modCount),oldHead,oldSize-numConsumed,
+              tailCandidate,filter);
+          break;
+        }
+      }
+      root.modCount=++modCount;
+      super.bubbleUpPrefixCollapseTail(modCount,numConsumed,oldTail,tailCandidate);
+      joinNodes(tailCandidate,oldTail.next);
+      root.size-=numConsumed;
+    }
+    private void uncheckedItrRemove(Node<E> lastRet,int modCount,Checked<E> root){
+      if(lastRet==head){
+        if(lastRet==tail){
+          bubbleUpClear(modCount,1,lastRet,lastRet=lastRet.next);
+        }else{
+          super.bubbleUpRootEraseHead(modCount,lastRet=lastRet.next);
+        }
+        staticSetHead(root,lastRet);
+      }else{
+        if(lastRet==tail){
+          bubbleUpPrefixEraseTail(modCount,lastRet,lastRet.prev);
+        }else{
+          super.bubbleUpDecrementSize(modCount);
+          joinNodes(lastRet.prev,lastRet.next);
+        }
+      }
+    }
+  }
+  static class Suffix<E>extends CheckedSubList<E>{
+    Suffix(Checked<E> root,CheckedSubList<E> parent){
+      super(root,parent);
+    }
+    Suffix(Checked<E> root,CheckedSubList<E> parent,Node<E> onlyNode){
+      super(root,parent,onlyNode);
+    }
+    Suffix(Checked<E> root,CheckedSubList<E> parent,Node<E> head,int size,Node<E> tail){
+      super(root,parent,head,size,tail);
+    }
+    @Override public void clear(){
+      int modCount;
+      Checked<E> root;
+      CheckedCollection.checkModCount(modCount=this.modCount,(root=this.root).modCount);
+      int size;
+      if((size=this.size)!=0){
+        root.modCount=++modCount;
+        Node<E> tmp;
+        bubbleUpClear(modCount,size,tmp=head,tmp=tmp.prev);
+        staticSetTail(root,tmp);
+        root.size-=size;
+      }
+    }
+    @Override public OmniList.OfRef<E> subList(int fromIndex,int toIndex){
+      Checked<E> root;
+      CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+      int size;
+      CheckedCollection.CheckSubListRange(fromIndex,toIndex,size=this.size);
+      final int tailDist=size-toIndex;
+      int subListSize;
+      switch(subListSize=toIndex-fromIndex){
+      default:
+        return getDefaultSubList(root,fromIndex,subListSize,tailDist);
+      case 1:
+        return getSubList1(root,fromIndex,tailDist);
+      case 0:
+        return getEmptySubList(root,fromIndex,tailDist);
+      }
+    }
+    @Override void ascItrRemove(CheckedAscendingSubItr<E> itr){
+      Node<E> lastRet;
+      if((lastRet=itr.lastRet)!=null){
+        int modCount;
+        Checked<E> root;
+        CheckedCollection.checkModCount(modCount=itr.modCount,(root=this.root).modCount);
+        root.modCount=++modCount;
+        uncheckedItrRemove(lastRet,modCount,root);
+        itr.modCount=modCount;
+        --root.size;
+        return;
+      }
+      throw new IllegalStateException();
+    }
+    @Override void bidirectItrRemove(CheckedSubList.BidirectionalItr<E> itr){
+      Node<E> lastRet;
+      if((lastRet=itr.lastRet)!=null){
+        int modCount;
+        Checked<E> root;
+        CheckedCollection.checkModCount(modCount=itr.modCount,(root=this.root).modCount);
+        root.modCount=++modCount;
+        uncheckedItrRemove(lastRet,modCount,root);
+        if(lastRet!=itr.cursor){
+          --itr.nextIndex;
+        }
+        itr.modCount=modCount;
+        --root.size;
+        return;
+      }
+      throw new IllegalStateException();
+    }
+    @Override void findNewHead(int modCount,Node<E> curr,Predicate<? super E> filter){
+      final Node<E> tail;
+      if(curr==(tail=this.tail)){
+        Checked<E> root;
+        CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+        root.modCount=++modCount;
+        bubbleUpClear(modCount,1,curr,curr=curr.prev);
+        staticSetTail(root,curr);
+        --root.size;
+      }else if(filter.test(tail.val)){
+        collapseHeadAndTail(modCount,curr,tail,filter);
+      }else{
+        super.suffixCollapseHead(modCount,curr,tail,filter);
+      }
+    }
+    @Override void initHelper(Checked<E> root,E val,int modCount){
+      final Node<E> before,newNode=new Node<>(val);
+      for(CheckedSubList<E> curr=this;;curr.size=1){
+        curr.privateInit(newNode,modCount);
+        if((curr=curr.parent)==null){
+          before=root.tail;
+          break;
+        }else if(curr.size!=0){
+          before=curr.tail;
+          curr.bubbleUpRootPushTail(modCount,newNode);
+          break;
+        }
+      }
+      joinNodes(before,newNode);
+    }
+    @Override void prependHelper(E val,int modCount){
+      this.modCount=modCount;
+      Node<E> newNode,oldHead;
+      head=newNode=new Node<>((oldHead=head).prev,val,oldHead);
+      CheckedSubList<E> parent;
+      if((parent=this.parent)!=null){
+        parent.bubbleUpSuffixPushHead(modCount,newNode,oldHead);
+      }
+    }
+    @Override void removeFirstHelper(int modCount,Node<E> curr){
+      Checked<E> root;
+      CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+      root.modCount=++modCount;
+      if(curr==tail){
+        bubbleUpClear(modCount,1,curr,curr=curr.prev);
+        staticSetTail(root,curr);
+      }else{
+        super.bubbleUpSuffixEraseHead(modCount,curr,curr.next);
+      }
+      --root.size;
+    }
+    @Override Node<E> uncheckedExtractHead(int newSize){
+      Checked<E> root;
+      int modCount;
+      CheckedCollection.checkModCount(modCount=this.modCount,(root=this.root).modCount);
+      root.modCount=++modCount;
+      Node<E> oldHead;
+      super.bubbleUpSuffixEraseHead(modCount,oldHead=head,oldHead.next);
+      --root.size;
+      return oldHead;
+    }
+    @Override Node<E> uncheckedExtractLastNode(){
+      int modCount;
+      Checked<E> root;
+      CheckedCollection.checkModCount(modCount=this.modCount,(root=this.root).modCount);
+      root.modCount=++modCount;
+      final Node<E> prev,lastNode;
+      staticSetTail(root,prev=(lastNode=head).prev);
+      bubbleUpClear(modCount,1,lastNode,prev);
+      --root.size;
+      return lastNode;
+    }
+    private void bubbleUpClear(int modCount,int size,Node<E> head,final Node<E> prev){
+      for(CheckedSubList<E> curr=this;;){
+        curr.modCount=modCount;
+        staticClear(curr);
+        if((curr=curr.parent)==null){
+          break;
+        }else if(curr.head!=head){
+          curr.bubbleUpRootCollapseTail(modCount,size,prev);
+          break;
+        }
+      }
+    }
+    private void bubbleUpCollapseHeadAndTail(int newModCount,Node<E> oldHead,Node<E> newHead,Node<E> newTail,
+        int numRemoved){
+      final int newSize=size-numRemoved;
+      for(CheckedSubList<E> curr=this;;){
+        curr.privateCollapseHeadAndTail(newModCount,newSize,newHead,newTail);
+        if((curr=curr.parent)==null){
+          break;
+        }
+        if(curr.head!=oldHead){
+          curr.bubbleUpRootCollapseTail(newModCount,numRemoved,newTail);
+          break;
+        }
+      }
+      joinNodes(oldHead.prev,newHead);
+    }
+    private void collapseHeadAndTail(int modCount,Node<E> head,Node<E> tailCandidate,Predicate<? super E> filter){
+      final int oldSize=size;
+      int numConsumed=2;
+      final var root=this.root;
+      for(;;){
+        if(numConsumed==oldSize){
+          CheckedCollection.checkModCount(modCount,root.modCount);
+          bubbleUpClear(++modCount,oldSize,head,tailCandidate=head.prev);
+          break;
+        }
+        ++numConsumed;
+        if(!filter.test((tailCandidate=tailCandidate.prev).val)){
+          var headCandidate=head;
+          for(;;){
+            if(numConsumed==oldSize){
+              CheckedCollection.checkModCount(modCount,root.modCount);
+              --numConsumed;
+              break;
+            }
+            ++numConsumed;
+            if(!filter.test((headCandidate=headCandidate.next).val)){
+              numConsumed-=2-+CheckedList.collapseBodyHelper(root.new ModCountChecker(modCount),headCandidate,
+                  oldSize-numConsumed,tailCandidate,filter);
+              break;
+            }
+          }
+          bubbleUpCollapseHeadAndTail(++modCount,head,headCandidate,tailCandidate,numConsumed);
+          break;
+        }
+      }
+      root.modCount=modCount;
+      staticSetTail(root,tailCandidate);
+      root.size-=numConsumed;
+    }
+    private OmniList.OfRef<E> getDefaultSubList(Checked<E> root,int headDist,int subListSize,int tailDist){
+      Node<E> subListHead=head,subListTail=tail;
+      if(tailDist==0){ return new CheckedSubList.Suffix<>(root,this,headDist<=subListSize
+          ?iterateForward(subListHead,headDist):uncheckedIterateReverse(subListTail,subListSize)); }
+      if(tailDist<=headDist){
+        subListTail=uncheckedIterateReverse(subListTail,tailDist);
+        subListHead=headDist<=subListSize?iterateForward(subListHead,headDist)
+            :uncheckedIterateReverse(subListTail,subListSize);
+      }else{
+        subListHead=iterateForward(subListHead,headDist);
+        subListTail=tailDist<=subListSize?uncheckedIterateReverse(subListTail,tailDist)
+            :uncheckedIterateForward(subListHead,subListSize);
+      }
+      return new CheckedSubList.Body<>(root,this,subListHead,subListSize,subListTail,headDist);
+    }
+    private OmniList.OfRef<E> getEmptySubList(Checked<E> root,int headDist,int tailDist){
+      if(tailDist==0){ return new CheckedSubList.Prefix<>(root,this); }
+      return new CheckedSubList.Body<>(root,this,headDist);
+    }
+    private OmniList.OfRef<E> getSubList1(Checked<E> root,int headDist,int tailDist){
+      if(tailDist==0){ return new CheckedSubList.Suffix<>(root,this,tail); }
+      return new CheckedSubList.Body<>(root,this,staticGetNode(this,headDist,tailDist),headDist);
+    }
+    private void uncheckedItrRemove(Node<E> lastRet,int modCount,Checked<E> root){
+      if(lastRet==tail){
+        if(lastRet==head){
+          bubbleUpClear(modCount,1,lastRet,lastRet=lastRet.prev);
+        }else{
+          super.bubbleUpRootEraseTail(modCount,lastRet=lastRet.prev);
+        }
+        staticSetTail(root,lastRet);
+      }else{
+        if(lastRet==head){
+          super.bubbleUpSuffixEraseHead(modCount,lastRet,lastRet.next);
+        }else{
+          super.bubbleUpDecrementSize(modCount);
+          joinNodes(lastRet.prev,lastRet.next);
+        }
       }
     }
   }

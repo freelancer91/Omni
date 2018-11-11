@@ -1,9 +1,7 @@
 package omni.impl.seq.dbllnk.ofref;
-
 import java.util.function.Consumer;
 import omni.api.OmniListIterator;
-import omni.impl.seq.dbllnk.ofref.AbstractRefDblLnkSeq.Unchecked;
-
+import omni.impl.seq.dbllnk.ofref.AbstractSeq.Unchecked;
 class UncheckedBidirectionalItr<E>extends UncheckedAscendingItr<E> implements OmniListIterator.OfRef<E>{
   private transient Node<E> lastRet;
   private transient int nextIndex;
@@ -26,7 +24,7 @@ class UncheckedBidirectionalItr<E>extends UncheckedAscendingItr<E> implements Om
         new Node<>(cursor.prev,val,cursor);
       }
     }else{
-      UncheckedRefDblLnkList.staticInit(root,new Node<>(val));
+      UncheckedList.staticInit(root,new Node<>(val));
     }
     ++nextIndex;
     this.lastRet=null;
@@ -36,7 +34,7 @@ class UncheckedBidirectionalItr<E>extends UncheckedAscendingItr<E> implements Om
     if((cursor=this.cursor)!=null){
       Node<E> bound;
       Unchecked<E> root;
-      UncheckedRefDblLnkList.uncheckedForEachForward(cursor,bound=(root=this.root).tail,action);
+      UncheckedList.uncheckedForEachForward(cursor,bound=(root=this.root).tail,action);
       this.cursor=null;
       this.lastRet=bound;
       this.nextIndex=root.size;
@@ -73,23 +71,23 @@ class UncheckedBidirectionalItr<E>extends UncheckedAscendingItr<E> implements Om
       if(lastRet!=(cursor=this.cursor)){
         --nextIndex;
         if(lastRet==root.head){
-          UncheckedRefDblLnkList.staticSetHead(root,cursor);
+          UncheckedList.staticSetHead(root,cursor);
         }else if(lastRet==root.tail){
-          UncheckedRefDblLnkList.staticEraseTail(root,lastRet);
+          UncheckedList.staticEraseTail(root,lastRet);
         }else{
-          UncheckedRefDblLnkList.joinNodes(lastRet.prev,cursor);
+          UncheckedList.joinNodes(lastRet.prev,cursor);
         }
       }else{
         if(lastRet==root.head){
-          UncheckedRefDblLnkList.staticEraseHead(root,lastRet);
+          UncheckedList.staticEraseHead(root,lastRet);
         }else if(lastRet==root.tail){
-          UncheckedRefDblLnkList.staticEraseTail(root,lastRet);
+          UncheckedList.staticEraseTail(root,lastRet);
         }else{
-          UncheckedRefDblLnkList.joinNodes(lastRet.prev,lastRet.next);
+          UncheckedList.joinNodes(lastRet.prev,lastRet.next);
         }
       }
     }else{
-      UncheckedRefDblLnkList.staticInit(root,null);
+      UncheckedList.staticInit(root,null);
       if(lastRet!=cursor){
         --nextIndex;
       }
