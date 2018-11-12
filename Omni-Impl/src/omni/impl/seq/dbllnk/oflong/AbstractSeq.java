@@ -692,6 +692,54 @@ abstract class AbstractSeq extends AbstractLongList implements OmniList.OfLong{
     }
   }
   static abstract class Unchecked extends AbstractSeq{
+    public long removeFirstLong(){
+      Node head;
+      --size;
+      staticEraseHead(this,head=this.head);
+      return head.val;
+    }
+    public long removeLastLong(){
+      Node tail;
+      --size;
+      staticEraseTail(this,tail=this.tail);
+      return tail.val;
+    }
+    public Long pollFirst(){
+      Node head;
+      if((head=this.head)!=null){
+        --size;
+        staticEraseHead(this,head);
+        return head.val;
+      }
+      return null;
+    }
+    public double pollFirstDouble(){
+      Node head;
+      if((head=this.head)!=null){
+        --size;
+        staticEraseHead(this,head);
+        return head.val;
+      }
+      return Double.NaN;
+    }
+    public float pollFirstFloat(){
+      Node head;
+      if((head=this.head)!=null){
+        --size;
+        staticEraseHead(this,head);
+        return head.val;
+      }
+      return Float.NaN;
+    }
+    public long pollFirstLong(){
+      Node head;
+      if((head=this.head)!=null){
+        --size;
+        staticEraseHead(this,head);
+        return head.val;
+      }
+      return Long.MIN_VALUE;
+    }
     Unchecked(){
       super();
     }

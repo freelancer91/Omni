@@ -7,6 +7,22 @@ public abstract class AbstractFloatList extends AbstractSeq.OfFloat{
   protected AbstractFloatList(int size){
     super(size);
   }
+  protected abstract float getFloat(int index);
+  public Float get(int index){
+    return getFloat(index);
+  }
+  protected abstract float removeFloatAt(int index);
+  public Float remove(int index){
+    return removeFloatAt(index);
+  }
+  protected abstract float set(int index,float val);
+  public Float set(int index,Float val){
+    return set(index,(float)val);
+  }
+  protected abstract void add(int index,float val);
+  public void add(int index,Float val){
+    add(index,(float)val);
+  }
   public int lastIndexOf(boolean val){
     final int size;
     if((size=this.size)!=0){

@@ -10,7 +10,6 @@ import omni.function.BooleanConsumer;
 import omni.function.BooleanPredicate;
 import omni.impl.CheckedCollection;
 import omni.impl.seq.AbstractBooleanList;
-import omni.impl.seq.arr.AbstractSubArrSeq;
 import omni.util.ArrCopy;
 import omni.util.OmniArray;
 import omni.util.ToStringUtil;
@@ -141,12 +140,12 @@ abstract class AbstractSeq extends AbstractBooleanList{
   private AbstractSeq(int capacity){
     super();
     switch(capacity){
-    default:
-      arr=new boolean[capacity];
-      return;
-    case OmniArray.DEFAULT_ARR_SEQ_CAP:
-      arr=OmniArray.OfBoolean.DEFAULT_ARR;
-    case 0:
+      default:
+        arr=new boolean[capacity];
+        return;
+      case OmniArray.DEFAULT_ARR_SEQ_CAP:
+        arr=OmniArray.OfBoolean.DEFAULT_ARR;
+      case 0:
     }
   }
   private AbstractSeq(int size,boolean[] arr){
@@ -178,14 +177,14 @@ abstract class AbstractSeq extends AbstractBooleanList{
     if((size=this.size)!=0){
       final boolean v;
       switch(Float.floatToRawIntBits(val)){
-      default:
-        return false;
-      case 0:
-      case Integer.MIN_VALUE:
-        v=false;
-        break;
-      case TypeUtil.FLT_TRUE_BITS:
-        v=true;
+        default:
+          return false;
+        case 0:
+        case Integer.MIN_VALUE:
+          v=false;
+          break;
+        case TypeUtil.FLT_TRUE_BITS:
+          v=true;
       }
       return uncheckedAnyMatches(arr,0,size,v);
     }
@@ -196,13 +195,13 @@ abstract class AbstractSeq extends AbstractBooleanList{
     if((size=this.size)!=0){
       final boolean v;
       switch(val){
-      default:
-        return false;
-      case 0:
-        v=false;
-        break;
-      case 1:
-        v=true;
+        default:
+          return false;
+        case 0:
+          v=false;
+          break;
+        case 1:
+          v=true;
       }
       return uncheckedAnyMatches(arr,0,size,v);
     }
@@ -239,7 +238,7 @@ abstract class AbstractSeq extends AbstractBooleanList{
       uncheckedForEach(size,action::accept);
     }
   }
-  public boolean getBoolean(int index){
+  @Override public boolean getBoolean(int index){
     return arr[index];
   }
   @Override public int hashCode(){
@@ -273,14 +272,14 @@ abstract class AbstractSeq extends AbstractBooleanList{
     if((size=this.size)!=0){
       final boolean v;
       switch(Float.floatToRawIntBits(val)){
-      default:
-        return -1;
-      case 0:
-      case Integer.MIN_VALUE:
-        v=false;
-        break;
-      case TypeUtil.FLT_TRUE_BITS:
-        v=true;
+        default:
+          return -1;
+        case 0:
+        case Integer.MIN_VALUE:
+          v=false;
+          break;
+        case TypeUtil.FLT_TRUE_BITS:
+          v=true;
       }
       return uncheckedIndexOfMatch(size,v);
     }
@@ -291,13 +290,13 @@ abstract class AbstractSeq extends AbstractBooleanList{
     if((size=this.size)!=0){
       final boolean v;
       switch(val){
-      default:
-        return -1;
-      case 0:
-        v=false;
-        break;
-      case 1:
-        v=true;
+        default:
+          return -1;
+        case 0:
+          v=false;
+          break;
+        case 1:
+          v=true;
       }
       return uncheckedIndexOfMatch(size,v);
     }
@@ -415,14 +414,14 @@ abstract class AbstractSeq extends AbstractBooleanList{
     if((size=this.size)!=0){
       final boolean v;
       switch(Float.floatToRawIntBits(val)){
-      default:
-        return false;
-      case 0:
-      case Integer.MIN_VALUE:
-        v=false;
-        break;
-      case TypeUtil.FLT_TRUE_BITS:
-        v=true;
+        default:
+          return false;
+        case 0:
+        case Integer.MIN_VALUE:
+          v=false;
+          break;
+        case TypeUtil.FLT_TRUE_BITS:
+          v=true;
       }
       return uncheckedRemoveFirstMatch(size,v);
     }
@@ -433,13 +432,13 @@ abstract class AbstractSeq extends AbstractBooleanList{
     if((size=this.size)!=0){
       final boolean v;
       switch(val){
-      default:
-        return false;
-      case 0:
-        v=false;
-        break;
-      case 1:
-        v=true;
+        default:
+          return false;
+        case 0:
+          v=false;
+          break;
+        case 1:
+          v=true;
       }
       return uncheckedRemoveFirstMatch(size,v);
     }
@@ -498,14 +497,14 @@ abstract class AbstractSeq extends AbstractBooleanList{
     if((size=this.size)!=0){
       final boolean v;
       switch(Float.floatToRawIntBits(val)){
-      default:
-        return -1;
-      case 0:
-      case Integer.MIN_VALUE:
-        v=false;
-        break;
-      case TypeUtil.FLT_TRUE_BITS:
-        v=true;
+        default:
+          return -1;
+        case 0:
+        case Integer.MIN_VALUE:
+          v=false;
+          break;
+        case TypeUtil.FLT_TRUE_BITS:
+          v=true;
       }
       return uncheckedSearch(size,v);
     }
@@ -516,13 +515,13 @@ abstract class AbstractSeq extends AbstractBooleanList{
     if((size=this.size)!=0){
       final boolean v;
       switch(val){
-      default:
-        return -1;
-      case 0:
-        v=false;
-        break;
-      case 1:
-        v=true;
+        default:
+          return -1;
+        case 0:
+          v=false;
+          break;
+        case 1:
+          v=true;
       }
       return uncheckedSearch(size,v);
     }
@@ -548,7 +547,7 @@ abstract class AbstractSeq extends AbstractBooleanList{
     if((size=this.size)!=0&&val instanceof Boolean){ return uncheckedSearch(size,(boolean)val); }
     return -1;
   }
-  public boolean set(int index,boolean val){
+  @Override public boolean set(int index,boolean val){
     final boolean[] arr;
     final var oldVal=(arr=this.arr)[index];
     arr[index]=val;
@@ -783,7 +782,7 @@ abstract class AbstractSeq extends AbstractBooleanList{
       super.push(val);
       return true;
     }
-    public void add(int index,boolean val){
+    @Override public void add(int index,boolean val){
       CheckedCollection.checkLo(index);
       final int size;
       CheckedCollection.checkWriteHi(index,size=this.size);
@@ -822,7 +821,7 @@ abstract class AbstractSeq extends AbstractBooleanList{
       CheckedCollection.checkReadHi(index,size);
       super.put(index,val);
     }
-    public boolean removeBooleanAt(int index){
+    @Override public boolean removeBooleanAt(int index){
       CheckedCollection.checkLo(index);
       int size;
       CheckedCollection.checkReadHi(index,size=this.size);
@@ -936,10 +935,34 @@ abstract class AbstractSeq extends AbstractBooleanList{
         lastRet=-1;
       }
     }
-    static abstract class AbstractSubList extends AbstractSubArrSeq{
+    static abstract class AbstractSubList extends AbstractBooleanList{
       transient final Checked root;
       transient final AbstractSubList parent;
       transient int modCount;
+      transient final int rootOffset;
+      int getBound(){
+        return size+rootOffset;
+      }
+      @Override protected int uncheckedLastIndexOfMatch(int size,boolean val){
+        Checked root;
+        CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+        int rootOffset;
+        return AbstractSeq.uncheckedLastIndexOfMatch(root.arr,rootOffset=this.rootOffset,rootOffset+size,val);
+      }
+      AbstractSubList(Checked root,AbstractSubList parent,int rootOffset,int size,int modCount){
+        super(size);
+        this.rootOffset=rootOffset;
+        this.root=root;
+        this.parent=parent;
+        this.modCount=modCount;
+      }
+      AbstractSubList(Checked root,int rootOffset,int size){
+        super(size);
+        this.rootOffset=rootOffset;
+        this.root=root;
+        parent=null;
+        modCount=root.modCount;
+      }
       static void bubbleUpDecrementSize(AbstractSubList parent){
         while(parent!=null){
           --parent.size;
@@ -961,18 +984,6 @@ abstract class AbstractSeq extends AbstractBooleanList{
           parent=parent.parent;
         }
       }
-      AbstractSubList(Checked root,AbstractSubList parent,int rootOffset,int size,int modCount){
-        super(rootOffset,size);
-        this.root=root;
-        this.parent=parent;
-        this.modCount=modCount;
-      }
-      AbstractSubList(Checked root,int rootOffset,int size){
-        super(rootOffset,size);
-        this.root=root;
-        parent=null;
-        modCount=root.modCount;
-      }
       public boolean add(boolean val){
         final Checked root;
         int modCount;
@@ -990,7 +1001,7 @@ abstract class AbstractSeq extends AbstractBooleanList{
         this.size=size+1;
         return true;
       }
-      public void add(int index,boolean val){
+      @Override public void add(int index,boolean val){
         final Checked root;
         int modCount;
         CheckedCollection.checkModCount(modCount=this.modCount,(root=this.root).modCount);
@@ -1026,7 +1037,7 @@ abstract class AbstractSeq extends AbstractBooleanList{
           CheckedCollection.checkModCount(modCount,root.modCount);
         }
       }
-      public boolean getBoolean(int index){
+      @Override public boolean getBoolean(int index){
         final Checked root;
         CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
         CheckedCollection.checkLo(index);
@@ -1047,7 +1058,7 @@ abstract class AbstractSeq extends AbstractBooleanList{
         CheckedCollection.checkModCount(modCount,root.modCount);
         return size==0;
       }
-      public boolean removeBooleanAt(int index){
+      @Override public boolean removeBooleanAt(int index){
         int modCount;
         final Checked root;
         CheckedCollection.checkModCount(modCount=this.modCount,(root=this.root).modCount);
@@ -1075,7 +1086,7 @@ abstract class AbstractSeq extends AbstractBooleanList{
         CheckedCollection.checkModCount(modCount,root.modCount);
         return false;
       }
-      public boolean set(int index,boolean val){
+      @Override public boolean set(int index,boolean val){
         final Checked root;
         CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
         CheckedCollection.checkLo(index);
@@ -1220,7 +1231,7 @@ abstract class AbstractSeq extends AbstractBooleanList{
       super.push(val);
       return true;
     }
-    public void add(int index,boolean val){
+    @Override public void add(int index,boolean val){
       final int size;
       if((size=this.size)!=0){
         super.uncheckedInsert(index,val,size);
@@ -1228,7 +1239,7 @@ abstract class AbstractSeq extends AbstractBooleanList{
         super.uncheckedInit(val);
       }
     }
-    public boolean removeBooleanAt(int index){
+    @Override public boolean removeBooleanAt(int index){
       final boolean[] arr;
       final var removed=(arr=this.arr)[index];
       eraseIndexHelper(arr,index,--size);
@@ -1273,7 +1284,11 @@ abstract class AbstractSeq extends AbstractBooleanList{
         this.cursor=cursor+1;
       }
     }
-    static abstract class AbstractSubList extends AbstractSubArrSeq{
+    static abstract class AbstractSubList extends AbstractBooleanList{
+      @Override protected int uncheckedLastIndexOfMatch(int size,boolean val){
+        int rootOffset;
+        return AbstractSeq.uncheckedLastIndexOfMatch(root.arr,rootOffset=this.rootOffset,rootOffset+size,val);
+      }
       transient final Unchecked root;
       transient final AbstractSubList parent;
       static void bubbleUpDecrementSize(AbstractSubList parent){
@@ -1294,13 +1309,19 @@ abstract class AbstractSeq extends AbstractBooleanList{
           parent=parent.parent;
         }
       }
+      transient final int rootOffset;
+      int getBound(){
+        return rootOffset+size;
+      }
       AbstractSubList(Unchecked root,AbstractSubList parent,int rootOffset,int size){
-        super(rootOffset,size);
+        super(size);
+        this.rootOffset=rootOffset;
         this.root=root;
         this.parent=parent;
       }
       AbstractSubList(Unchecked root,int rootOffset,int size){
-        super(rootOffset,size);
+        super(size);
+        this.rootOffset=rootOffset;
         this.root=root;
         parent=null;
       }
@@ -1317,7 +1338,7 @@ abstract class AbstractSeq extends AbstractBooleanList{
         bubbleUpIncrementSize(parent);
         return true;
       }
-      public void add(int index,boolean val){
+      @Override public void add(int index,boolean val){
         final AbstractSeq root;
         final int rootSize;
         if((rootSize=(root=this.root).size)!=0){
@@ -1340,13 +1361,13 @@ abstract class AbstractSeq extends AbstractBooleanList{
           ArrCopy.semicheckedCopy(arr=root.arr,size+(size=rootOffset),arr,size,newRootSize-size);
         }
       }
-      public boolean getBoolean(int index){
+      @Override public boolean getBoolean(int index){
         return root.arr[index+rootOffset];
       }
       public void put(int index,boolean val){
         root.arr[index+rootOffset]=val;
       }
-      public boolean removeBooleanAt(int index){
+      @Override public boolean removeBooleanAt(int index){
         final Unchecked root;
         final boolean[] arr;
         final var removed=(arr=(root=this.root).arr)[index+=rootOffset];
@@ -1363,7 +1384,7 @@ abstract class AbstractSeq extends AbstractBooleanList{
         final int size;
         return (size=this.size)!=0&&uncheckedRemoveIf(size,filter::test);
       }
-      public boolean set(int index,boolean val){
+      @Override public boolean set(int index,boolean val){
         final boolean[] arr;
         final var oldVal=(arr=root.arr)[index+=rootOffset];
         arr[index]=val;
@@ -1376,8 +1397,8 @@ abstract class AbstractSeq extends AbstractBooleanList{
         final int srcBound=(srcOffset=rootOffset)+size;
         do{
           if(filter.test(arr[srcOffset])){
-            this.size=size-(size
-                =root.finalizeSubListBatchRemove(arr,pullSurvivorsDown(arr,srcOffset,srcBound-1,filter),srcBound));
+            this.size=size-(size=root.finalizeSubListBatchRemove(arr,pullSurvivorsDown(arr,srcOffset,srcBound-1,filter),
+                srcBound));
             bubbleUpDecrementSize(parent,size);
             return true;
           }

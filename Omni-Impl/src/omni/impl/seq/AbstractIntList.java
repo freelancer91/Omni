@@ -7,6 +7,22 @@ public abstract class AbstractIntList extends AbstractSeq.OfSignedIntegralPrimit
   protected AbstractIntList(int size){
     super(size);
   }
+  protected abstract int getInt(int index);
+  public Integer get(int index){
+    return getInt(index);
+  }
+  protected abstract int removeIntAt(int index);
+  public Integer remove(int index){
+    return removeIntAt(index);
+  }
+  protected abstract int set(int index,int val);
+  public Integer set(int index,Integer val){
+    return set(index,(int)val);
+  }
+  protected abstract void add(int index,int val);
+  public void add(int index,Integer val){
+    add(index,(int)val);
+  }
   public int lastIndexOf(boolean val){
     final int size;
     if((size=this.size)!=0){ return uncheckedLastIndexOfMatch(size,TypeUtil.castToByte(val)); }

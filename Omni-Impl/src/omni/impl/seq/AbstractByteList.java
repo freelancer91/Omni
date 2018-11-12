@@ -7,6 +7,22 @@ public abstract class AbstractByteList extends AbstractSeq{
   protected AbstractByteList(int size){
     super(size);
   }
+  protected abstract byte getByte(int index);
+  public Byte get(int index){
+    return getByte(index);
+  }
+  protected abstract byte removeByteAt(int index);
+  public Byte remove(int index){
+    return removeByteAt(index);
+  }
+  protected abstract byte set(int index,byte val);
+  public Byte set(int index,Byte val){
+    return set(index,(byte)val);
+  }
+  protected abstract void add(int index,byte val);
+  public void add(int index,Byte val){
+    add(index,(byte)val);
+  }
   public int lastIndexOf(boolean val){
     final int size;
     if((size=this.size)!=0){ return uncheckedLastIndexOfMatch(size,TypeUtil.castToByte(val)); }

@@ -22,9 +22,6 @@ class UncheckedSubList extends AbstractSeq.Unchecked.AbstractSubList implements 
   @Override public boolean add(Boolean val){
     return super.add(val);
   }
-  @Override public void add(int index,Boolean val){
-    super.add(index,val);
-  }
   @Override public Object clone(){
     final boolean[] arr;
     final int size;
@@ -133,9 +130,6 @@ class UncheckedSubList extends AbstractSeq.Unchecked.AbstractSubList implements 
       AbstractSeq.uncheckedForwardForEachInRange(root.arr,rootOffset=this.rootOffset,rootOffset+size,action::accept);
     }
   }
-  @Override public Boolean get(int index){
-    return super.getBoolean(index);
-  }
   @Override public int hashCode(){
     final int size;
     if((size=this.size)!=0){
@@ -233,100 +227,11 @@ class UncheckedSubList extends AbstractSeq.Unchecked.AbstractSubList implements 
   @Override public OmniIterator.OfBoolean iterator(){
     return new UncheckedAscendingSubItr(this);
   }
-  @Override public int lastIndexOf(boolean val){
-    final int size;
-    if((size=this.size)!=0){
-      final int rootOffset;
-      return AbstractSeq.uncheckedLastIndexOfMatch(root.arr,rootOffset=this.rootOffset,rootOffset+size,val);
-    }
-    return -1;
-  }
-  @Override public int lastIndexOf(double val){
-    final int size;
-    if((size=this.size)!=0){
-      final boolean v;
-      final long bits;
-      if((bits=Double.doubleToRawLongBits(val))==0||bits==Long.MIN_VALUE){
-        v=false;
-      }else if(bits==TypeUtil.DBL_TRUE_BITS){
-        v=true;
-      }else{
-        return -1;
-      }
-      final int rootOffset;
-      return AbstractSeq.uncheckedLastIndexOfMatch(root.arr,rootOffset=this.rootOffset,rootOffset+size,v);
-    }
-    return -1;
-  }
-  @Override public int lastIndexOf(float val){
-    final int size;
-    if((size=this.size)!=0){
-      final boolean v;
-      switch(Float.floatToRawIntBits(val)){
-      default:
-        return -1;
-      case 0:
-      case Integer.MIN_VALUE:
-        v=false;
-        break;
-      case TypeUtil.FLT_TRUE_BITS:
-        v=true;
-      }
-      final int rootOffset;
-      return AbstractSeq.uncheckedLastIndexOfMatch(root.arr,rootOffset=this.rootOffset,rootOffset+size,v);
-    }
-    return -1;
-  }
-  @Override public int lastIndexOf(int val){
-    final int size;
-    if((size=this.size)!=0){
-      final boolean v;
-      switch(val){
-      default:
-        return -1;
-      case 0:
-        v=false;
-        break;
-      case 1:
-        v=true;
-      }
-      final int rootOffset;
-      return AbstractSeq.uncheckedLastIndexOfMatch(root.arr,rootOffset=this.rootOffset,rootOffset+size,v);
-    }
-    return -1;
-  }
-  @Override public int lastIndexOf(long val){
-    final int size;
-    if((size=this.size)!=0){
-      final boolean v;
-      if(val==0){
-        v=false;
-      }else if(val==1){
-        v=true;
-      }else{
-        return -1;
-      }
-      final int rootOffset;
-      return AbstractSeq.uncheckedLastIndexOfMatch(root.arr,rootOffset=this.rootOffset,rootOffset+size,v);
-    }
-    return -1;
-  }
-  @Override public int lastIndexOf(Object val){
-    final int size;
-    if((size=this.size)!=0&&val instanceof Boolean){
-      final int rootOffset;
-      return AbstractSeq.uncheckedLastIndexOfMatch(root.arr,rootOffset=this.rootOffset,rootOffset+size,(boolean)val);
-    }
-    return -1;
-  }
   @Override public OmniListIterator.OfBoolean listIterator(){
     return new UncheckedBidirectionalSubItr(this);
   }
   @Override public OmniListIterator.OfBoolean listIterator(int index){
     return new UncheckedBidirectionalSubItr(this,index+rootOffset);
-  }
-  @Override public Boolean remove(int index){
-    return super.removeBooleanAt(index);
   }
   @Override public boolean remove(Object val){
     final int size;
@@ -422,9 +327,6 @@ class UncheckedSubList extends AbstractSeq.Unchecked.AbstractSubList implements 
       final int rootOffset;
       AbstractSeq.uncheckedReverseSort(root.arr,rootOffset=this.rootOffset,size+rootOffset-1);
     }
-  }
-  @Override public Boolean set(int index,Boolean val){
-    return super.set(index,val);
   }
   @Override public void sort(){
     int size;

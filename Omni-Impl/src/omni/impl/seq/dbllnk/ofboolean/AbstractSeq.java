@@ -1130,6 +1130,99 @@ abstract class AbstractSeq extends AbstractBooleanList implements OmniList.OfBoo
     }
   }
   static abstract class Unchecked extends AbstractSeq{
+    public boolean removeFirstBoolean(){
+      Node head;
+      --size;
+      staticEraseHead(this,head=this.head);
+      return head.val;
+    }
+    public boolean removeLastBoolean(){
+      Node tail;
+      --size;
+      staticEraseTail(this,tail=this.tail);
+      return tail.val;
+    }
+    public Boolean pollFirst(){
+      Node head;
+      if((head=this.head)!=null){
+        --size;
+        staticEraseHead(this,head);
+        return head.val;
+      }
+      return null;
+    }
+    public double pollFirstDouble(){
+      Node head;
+      if((head=this.head)!=null){
+        --size;
+        staticEraseHead(this,head);
+        return TypeUtil.castToDouble(head.val);
+      }
+      return Double.NaN;
+    }
+    public float pollFirstFloat(){
+      Node head;
+      if((head=this.head)!=null){
+        --size;
+        staticEraseHead(this,head);
+        return TypeUtil.castToFloat(head.val);
+      }
+      return Float.NaN;
+    }
+    public long pollFirstLong(){
+      Node head;
+      if((head=this.head)!=null){
+        --size;
+        staticEraseHead(this,head);
+        return TypeUtil.castToLong(head.val);
+      }
+      return Long.MIN_VALUE;
+    }
+    public int pollFirstInt(){
+      Node head;
+      if((head=this.head)!=null){
+        --size;
+        staticEraseHead(this,head);
+        return TypeUtil.castToByte(head.val);
+      }
+      return Integer.MIN_VALUE;
+    }
+    public short pollFirstShort(){
+      Node head;
+      if((head=this.head)!=null){
+        --size;
+        staticEraseHead(this,head);
+        return TypeUtil.castToByte(head.val);
+      }
+      return Short.MIN_VALUE;
+    }
+    public char pollFirstChar(){
+      Node head;
+      if((head=this.head)!=null){
+        --size;
+        staticEraseHead(this,head);
+        return TypeUtil.castToChar(head.val);
+      }
+      return Character.MIN_VALUE;
+    }
+    public byte pollFirstByte(){
+      Node head;
+      if((head=this.head)!=null){
+        --size;
+        staticEraseHead(this,head);
+        return TypeUtil.castToByte(head.val);
+      }
+      return Byte.MIN_VALUE;
+    }
+    public boolean pollFirstBoolean(){
+      Node head;
+      if((head=this.head)!=null){
+        --size;
+        staticEraseHead(this,head);
+        return head.val;
+      }
+      return false;
+    }
     Unchecked(){
       super();
     }

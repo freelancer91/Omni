@@ -11,7 +11,6 @@ import java.util.function.UnaryOperator;
 import omni.function.LongComparator;
 import omni.impl.CheckedCollection;
 import omni.impl.seq.AbstractLongList;
-import omni.impl.seq.arr.AbstractSubArrSeq;
 import omni.util.ArrCopy;
 import omni.util.BitSetUtils;
 import omni.util.OmniArray;
@@ -176,7 +175,7 @@ abstract class AbstractSeq extends AbstractLongList{
       uncheckedForEach(size,action);
     }
   }
-  public long getLong(int index){
+  @Override public long getLong(int index){
     return arr[index];
   }
   @Override public int hashCode(){
@@ -320,12 +319,19 @@ abstract class AbstractSeq extends AbstractLongList{
     if((size=this.size)!=0){ return uncheckedSearch(size,val); }
     return -1;
   }
+  @Override protected int uncheckedLastIndexOfMatch(int size,long val){
+    final var arr=this.arr;
+    do{
+      if(arr[--size]==val){ return size; }
+    }while(size!=0);
+    return -1;
+  }
   public int search(Object val){
     final int size;
     if((size=this.size)!=0&&val instanceof Long){ return uncheckedSearch(size,(long)val); }
     return -1;
   }
-  public long set(int index,long val){
+  @Override public long set(int index,long val){
     final long[] arr;
     final var oldVal=(arr=this.arr)[index];
     arr[index]=val;
@@ -404,13 +410,6 @@ abstract class AbstractSeq extends AbstractLongList{
       return builder.append(']').toString();
     }
     return "[]";
-  }
-  @Override protected int uncheckedLastIndexOfMatch(int size,long val){
-    final var arr=this.arr;
-    do{
-      if(arr[--size]==val){ return size; }
-    }while(size!=0);
-    return -1;
   }
   abstract void uncheckedCopyInto(double[] dst,int length);
   abstract void uncheckedCopyInto(float[] dst,int length);
@@ -539,7 +538,7 @@ abstract class AbstractSeq extends AbstractLongList{
       super.push(val);
       return true;
     }
-    public void add(int index,long val){
+    @Override public void add(int index,long val){
       CheckedCollection.checkLo(index);
       final int size;
       CheckedCollection.checkWriteHi(index,size=this.size);
@@ -588,7 +587,7 @@ abstract class AbstractSeq extends AbstractLongList{
       CheckedCollection.checkReadHi(index,size);
       super.put(index,val);
     }
-    public long removeLongAt(int index){
+    @Override public long removeLongAt(int index){
       CheckedCollection.checkLo(index);
       int size;
       CheckedCollection.checkReadHi(index,size=this.size);
@@ -703,7 +702,13 @@ abstract class AbstractSeq extends AbstractLongList{
         lastRet=-1;
       }
     }
-    static abstract class AbstractSubList extends AbstractSubArrSeq.OfSignedIntegralPrimitive{
+    static abstract class AbstractSubList extends AbstractLongList{
+      @Override protected int uncheckedLastIndexOfMatch(int size,long val){
+        Checked root;
+        CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+        int rootOffset;
+        return AbstractSeq.uncheckedLastIndexOfMatch(root.arr,rootOffset=this.rootOffset,rootOffset+size,val);
+      }
       transient final Checked root;
       transient final AbstractSubList parent;
       transient int modCount;
@@ -728,19 +733,25 @@ abstract class AbstractSeq extends AbstractLongList{
           parent=parent.parent;
         }
       }
+      transient final int rootOffset;
+      int getBound(){
+        return rootOffset+size;
+      }
       AbstractSubList(Checked root,AbstractSubList parent,int rootOffset,int size,int modCount){
-        super(rootOffset,size);
+        super(size);
+        this.rootOffset=rootOffset;
         this.root=root;
         this.parent=parent;
         this.modCount=modCount;
       }
       AbstractSubList(Checked root,int rootOffset,int size){
-        super(rootOffset,size);
+        super(size);
+        this.rootOffset=rootOffset;
         this.root=root;
         parent=null;
         modCount=root.modCount;
       }
-      public void add(int index,long val){
+      @Override public void add(int index,long val){
         final Checked root;
         int modCount;
         CheckedCollection.checkModCount(modCount=this.modCount,(root=this.root).modCount);
@@ -793,7 +804,7 @@ abstract class AbstractSeq extends AbstractLongList{
           CheckedCollection.checkModCount(modCount,root.modCount);
         }
       }
-      public long getLong(int index){
+      @Override public long getLong(int index){
         final Checked root;
         CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
         CheckedCollection.checkLo(index);
@@ -826,7 +837,7 @@ abstract class AbstractSeq extends AbstractLongList{
         CheckedCollection.checkModCount(modCount,root.modCount);
         return false;
       }
-      public long removeLongAt(int index){
+      @Override public long removeLongAt(int index){
         int modCount;
         final Checked root;
         CheckedCollection.checkModCount(modCount=this.modCount,(root=this.root).modCount);
@@ -842,7 +853,7 @@ abstract class AbstractSeq extends AbstractLongList{
         this.size=size-1;
         return removed;
       }
-      public long set(int index,long val){
+      @Override public long set(int index,long val){
         final Checked root;
         CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
         CheckedCollection.checkLo(index);
@@ -981,7 +992,7 @@ abstract class AbstractSeq extends AbstractLongList{
       super.push(val);
       return true;
     }
-    public void add(int index,long val){
+    @Override public void add(int index,long val){
       final int size;
       if((size=this.size)!=0){
         super.uncheckedInsert(index,val,size);
@@ -997,7 +1008,7 @@ abstract class AbstractSeq extends AbstractLongList{
       super.push(val);
       return true;
     }
-    public long removeLongAt(int index){
+    @Override public long removeLongAt(int index){
       final long[] arr;
       final var removed=(arr=this.arr)[index];
       eraseIndexHelper(arr,index,--size);
@@ -1042,7 +1053,11 @@ abstract class AbstractSeq extends AbstractLongList{
         this.cursor=cursor+1;
       }
     }
-    static abstract class AbstractSubList extends AbstractSubArrSeq.OfSignedIntegralPrimitive{
+    static abstract class AbstractSubList extends AbstractLongList{
+      @Override protected int uncheckedLastIndexOfMatch(int size,long val){
+        int rootOffset;
+        return AbstractSeq.uncheckedLastIndexOfMatch(root.arr,rootOffset=this.rootOffset,rootOffset+size,val);
+      }
       transient final Unchecked root;
       transient final AbstractSubList parent;
       static void bubbleUpDecrementSize(AbstractSubList parent){
@@ -1063,17 +1078,23 @@ abstract class AbstractSeq extends AbstractLongList{
           parent=parent.parent;
         }
       }
+      transient final int rootOffset;
+      int getBound(){
+        return rootOffset+size;
+      }
       AbstractSubList(Unchecked root,AbstractSubList parent,int rootOffset,int size){
-        super(rootOffset,size);
+        super(size);
+        this.rootOffset=rootOffset;
         this.root=root;
         this.parent=parent;
       }
       AbstractSubList(Unchecked root,int rootOffset,int size){
-        super(rootOffset,size);
+        super(size);
+        this.rootOffset=rootOffset;
         this.root=root;
         parent=null;
       }
-      public void add(int index,long val){
+      @Override public void add(int index,long val){
         final AbstractSeq root;
         final int rootSize;
         if((rootSize=(root=this.root).size)!=0){
@@ -1109,7 +1130,7 @@ abstract class AbstractSeq extends AbstractLongList{
           ArrCopy.semicheckedCopy(arr=root.arr,size+(size=rootOffset),arr,size,newRootSize-size);
         }
       }
-      public long getLong(int index){
+      @Override public long getLong(int index){
         return root.arr[index+rootOffset];
       }
       public void put(int index,long val){
@@ -1123,7 +1144,7 @@ abstract class AbstractSeq extends AbstractLongList{
         final int size;
         return (size=this.size)!=0&&uncheckedRemoveIf(size,filter::test);
       }
-      public long removeLongAt(int index){
+      @Override public long removeLongAt(int index){
         final Unchecked root;
         final long[] arr;
         final var removed=(arr=(root=this.root).arr)[index+=rootOffset];
@@ -1132,7 +1153,7 @@ abstract class AbstractSeq extends AbstractLongList{
         --size;
         return removed;
       }
-      public long set(int index,long val){
+      @Override public long set(int index,long val){
         final long[] arr;
         final var oldVal=(arr=root.arr)[index+=rootOffset];
         arr[index]=val;

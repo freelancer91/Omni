@@ -31,9 +31,6 @@ class UncheckedSubList extends AbstractSeq.Unchecked.AbstractSubList implements 
   @Override public boolean add(int val){
     return super.add(val);
   }
-  @Override public void add(int index,Float val){
-    super.add(index,val);
-  }
   @Override public boolean add(long val){
     return super.add(val);
   }
@@ -115,9 +112,6 @@ class UncheckedSubList extends AbstractSeq.Unchecked.AbstractSubList implements 
       final int rootOffset;
       AbstractSeq.uncheckedForwardForEachInRange(root.arr,rootOffset=this.rootOffset,rootOffset+size,action);
     }
-  }
-  @Override public Float get(int index){
-    return super.getFloat(index);
   }
   @Override public int hashCode(){
     final int size;
@@ -202,86 +196,11 @@ class UncheckedSubList extends AbstractSeq.Unchecked.AbstractSubList implements 
   @Override public OmniIterator.OfFloat iterator(){
     return new UncheckedAscendingSubItr(this);
   }
-  @Override public int lastIndexOf(boolean val){
-    int size;
-    if((size=this.size)!=0){
-      if(val){ return uncheckedLastIndexOfFltBits(size,TypeUtil.FLT_TRUE_BITS); }
-      return uncheckedLastIndexOfFlt0(size);
-    }
-    return -1;
-  }
-  @Override public int lastIndexOf(char val){
-    final int size;
-    if((size=this.size)!=0){
-      final int rootOffset;
-      return AbstractSeq.uncheckedLastIndexOfRawInt(root.arr,rootOffset=this.rootOffset,rootOffset+size,val);
-    }
-    return -1;
-  }
-  @Override public int lastIndexOf(double val){
-    final int size;
-    if((size=this.size)!=0){
-      final float v;
-      if((v=(float)val)==val){
-        return uncheckedLastIndexOfFltBits(size,Float.floatToRawIntBits(v));
-      }else if(v!=v){ return uncheckedLastIndexOfFltNaN(size); }
-    }
-    return -1;
-  }
-  @Override public int lastIndexOf(float val){
-    final int size;
-    if((size=this.size)!=0){
-      final int rootOffset;
-      return AbstractSeq.uncheckedLastIndexOfMatch(root.arr,rootOffset=this.rootOffset,rootOffset+size,val);
-    }
-    return -1;
-  }
-  @Override public int lastIndexOf(int val){
-    int size;
-    if((size=this.size)!=0){
-      if(val!=0){
-        if(!TypeUtil.checkCastToFloat(val)){ return -1; }
-        return uncheckedLastIndexOfFltBits(size,Float.floatToRawIntBits(val));
-      }
-      return uncheckedLastIndexOfFlt0(size);
-    }
-    return -1;
-  }
-  @Override public int lastIndexOf(long val){
-    int size;
-    if((size=this.size)!=0){
-      if(val!=0){
-        if(!TypeUtil.checkCastToFloat(val)){ return -1; }
-        return uncheckedLastIndexOfFltBits(size,Float.floatToRawIntBits(val));
-      }
-      return uncheckedLastIndexOfFlt0(size);
-    }
-    return -1;
-  }
-  @Override public int lastIndexOf(Object val){
-    final int size;
-    if((size=this.size)!=0&&val instanceof Float){
-      final int rootOffset;
-      return AbstractSeq.uncheckedLastIndexOfMatch(root.arr,rootOffset=this.rootOffset,rootOffset+size,(float)val);
-    }
-    return -1;
-  }
-  @Override public int lastIndexOf(short val){
-    final int size;
-    if((size=this.size)!=0){
-      final int rootOffset;
-      return AbstractSeq.uncheckedLastIndexOfRawInt(root.arr,rootOffset=this.rootOffset,rootOffset+size,val);
-    }
-    return -1;
-  }
   @Override public OmniListIterator.OfFloat listIterator(){
     return new UncheckedBidirectionalSubItr(this);
   }
   @Override public OmniListIterator.OfFloat listIterator(int index){
     return new UncheckedBidirectionalSubItr(this,index+rootOffset);
-  }
-  @Override public Float remove(int index){
-    return super.removeFloatAt(index);
   }
   @Override public boolean remove(Object val){
     final int size;
@@ -348,9 +267,6 @@ class UncheckedSubList extends AbstractSeq.Unchecked.AbstractSubList implements 
       final int rootOffset;
       AbstractSeq.uncheckedReverseSort(root.arr,rootOffset=this.rootOffset,size+rootOffset-1);
     }
-  }
-  @Override public Float set(int index,Float val){
-    return super.set(index,val);
   }
   @Override public void sort(){
     int size;
@@ -453,18 +369,6 @@ class UncheckedSubList extends AbstractSeq.Unchecked.AbstractSubList implements 
   private int uncheckedIndexOfFltNaN(int size){
     final int rootOffset;
     return AbstractSeq.uncheckedIndexOfFltNaN(root.arr,rootOffset=this.rootOffset,rootOffset+size);
-  }
-  private int uncheckedLastIndexOfFlt0(int size){
-    final int rootOffset;
-    return AbstractSeq.uncheckedLastIndexOfFlt0(root.arr,rootOffset=this.rootOffset,rootOffset+size);
-  }
-  private int uncheckedLastIndexOfFltBits(int size,int fltBits){
-    final int rootOffset;
-    return AbstractSeq.uncheckedLastIndexOfFltBits(root.arr,rootOffset=this.rootOffset,rootOffset+size,fltBits);
-  }
-  private int uncheckedLastIndexOfFltNaN(int size){
-    final int rootOffset;
-    return AbstractSeq.uncheckedLastIndexOfFltNaN(root.arr,rootOffset=this.rootOffset,rootOffset+size);
   }
   private boolean uncheckedRemove(int size,float val){
     if(val==val){ return uncheckedRemoveFltBits(size,Float.floatToRawIntBits(val)); }

@@ -11,7 +11,6 @@ import omni.function.CharPredicate;
 import omni.function.CharUnaryOperator;
 import omni.impl.CheckedCollection;
 import omni.impl.seq.AbstractCharList;
-import omni.impl.seq.arr.AbstractSubArrSeq;
 import omni.util.ArrCopy;
 import omni.util.BitSetUtils;
 import omni.util.OmniArray;
@@ -126,12 +125,12 @@ abstract class AbstractSeq extends AbstractCharList{
   private AbstractSeq(int capacity){
     super();
     switch(capacity){
-    default:
-      arr=new char[capacity];
-      return;
-    case OmniArray.DEFAULT_ARR_SEQ_CAP:
-      arr=OmniArray.OfChar.DEFAULT_ARR;
-    case 0:
+      default:
+        arr=new char[capacity];
+        return;
+      case OmniArray.DEFAULT_ARR_SEQ_CAP:
+        arr=OmniArray.OfChar.DEFAULT_ARR;
+      case 0:
     }
   }
   private AbstractSeq(int size,char[] arr){
@@ -182,7 +181,7 @@ abstract class AbstractSeq extends AbstractCharList{
       uncheckedForEach(size,action::accept);
     }
   }
-  public char getChar(int index){
+  @Override public char getChar(int index){
     return arr[index];
   }
   @Override public int hashCode(){
@@ -363,7 +362,7 @@ abstract class AbstractSeq extends AbstractCharList{
     if(val>=0&&(size=this.size)!=0){ return uncheckedSearch(size,val); }
     return -1;
   }
-  public char set(int index,char val){
+  @Override public char set(int index,char val){
     final char[] arr;
     final var oldVal=(arr=this.arr)[index];
     arr[index]=val;
@@ -602,7 +601,7 @@ abstract class AbstractSeq extends AbstractCharList{
       super.push(val);
       return true;
     }
-    public void add(int index,char val){
+    @Override public void add(int index,char val){
       CheckedCollection.checkLo(index);
       final int size;
       CheckedCollection.checkWriteHi(index,size=this.size);
@@ -641,7 +640,7 @@ abstract class AbstractSeq extends AbstractCharList{
       CheckedCollection.checkReadHi(index,size);
       super.put(index,val);
     }
-    public char removeCharAt(int index){
+    @Override public char removeCharAt(int index){
       CheckedCollection.checkLo(index);
       int size;
       CheckedCollection.checkReadHi(index,size=this.size);
@@ -756,7 +755,13 @@ abstract class AbstractSeq extends AbstractCharList{
         lastRet=-1;
       }
     }
-    static abstract class AbstractSubList extends AbstractSubArrSeq.Of16BitPrimitive{
+    static abstract class AbstractSubList extends AbstractCharList{
+      @Override protected int uncheckedLastIndexOfMatch(int size,int val){
+        Checked root;
+        CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+        int rootOffset;
+        return AbstractSeq.uncheckedLastIndexOfMatch(root.arr,rootOffset=this.rootOffset,rootOffset+size,val);
+      }
       transient final Checked root;
       transient final AbstractSubList parent;
       transient int modCount;
@@ -781,14 +786,20 @@ abstract class AbstractSeq extends AbstractCharList{
           parent=parent.parent;
         }
       }
+      transient final int rootOffset;
+      int getBound(){
+        return size+rootOffset;
+      }
       AbstractSubList(Checked root,AbstractSubList parent,int rootOffset,int size,int modCount){
-        super(rootOffset,size);
+        super(size);
+        this.rootOffset=rootOffset;
         this.root=root;
         this.parent=parent;
         this.modCount=modCount;
       }
       AbstractSubList(Checked root,int rootOffset,int size){
-        super(rootOffset,size);
+        super(size);
+        this.rootOffset=rootOffset;
         this.root=root;
         parent=null;
         modCount=root.modCount;
@@ -810,7 +821,7 @@ abstract class AbstractSeq extends AbstractCharList{
         this.size=size+1;
         return true;
       }
-      public void add(int index,char val){
+      @Override public void add(int index,char val){
         final Checked root;
         int modCount;
         CheckedCollection.checkModCount(modCount=this.modCount,(root=this.root).modCount);
@@ -846,7 +857,7 @@ abstract class AbstractSeq extends AbstractCharList{
           CheckedCollection.checkModCount(modCount,root.modCount);
         }
       }
-      public char getChar(int index){
+      @Override public char getChar(int index){
         final Checked root;
         CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
         CheckedCollection.checkLo(index);
@@ -867,7 +878,7 @@ abstract class AbstractSeq extends AbstractCharList{
         CheckedCollection.checkModCount(modCount,root.modCount);
         return size==0;
       }
-      public char removeCharAt(int index){
+      @Override public char removeCharAt(int index){
         int modCount;
         final Checked root;
         CheckedCollection.checkModCount(modCount=this.modCount,(root=this.root).modCount);
@@ -895,7 +906,7 @@ abstract class AbstractSeq extends AbstractCharList{
         CheckedCollection.checkModCount(modCount,root.modCount);
         return false;
       }
-      public char set(int index,char val){
+      @Override public char set(int index,char val){
         final Checked root;
         CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
         CheckedCollection.checkLo(index);
@@ -937,8 +948,8 @@ abstract class AbstractSeq extends AbstractCharList{
                   final long[] survivors;
                   int numSurvivors;
                   if((numSurvivors=size-++srcOffset)!=0){
-                    numSurvivors
-                        =markSurvivors(arr,survivors=BitSetUtils.getBitSet(numSurvivors),srcOffset,srcBound,filter);
+                    numSurvivors=markSurvivors(arr,survivors=BitSetUtils.getBitSet(numSurvivors),srcOffset,srcBound,
+                        filter);
                     CheckedCollection.checkModCount(expectedModCount,root.modCount);
                     arr[dstOffset++]=v;
                     if(numSurvivors!=0){
@@ -1038,7 +1049,7 @@ abstract class AbstractSeq extends AbstractCharList{
       super.push(val);
       return true;
     }
-    public void add(int index,char val){
+    @Override public void add(int index,char val){
       final int size;
       if((size=this.size)!=0){
         super.uncheckedInsert(index,val,size);
@@ -1046,7 +1057,7 @@ abstract class AbstractSeq extends AbstractCharList{
         super.uncheckedInit(val);
       }
     }
-    public char removeCharAt(int index){
+    @Override public char removeCharAt(int index){
       final char[] arr;
       final var removed=(arr=this.arr)[index];
       eraseIndexHelper(arr,index,--size);
@@ -1091,7 +1102,11 @@ abstract class AbstractSeq extends AbstractCharList{
         this.cursor=cursor+1;
       }
     }
-    static abstract class AbstractSubList extends AbstractSubArrSeq.Of16BitPrimitive{
+    static abstract class AbstractSubList extends AbstractCharList{
+      @Override protected int uncheckedLastIndexOfMatch(int size,int val){
+        int rootOffset;
+        return AbstractSeq.uncheckedLastIndexOfMatch(root.arr,rootOffset=this.rootOffset,rootOffset+size,val);
+      }
       transient final Unchecked root;
       transient final AbstractSubList parent;
       static void bubbleUpDecrementSize(AbstractSubList parent){
@@ -1112,13 +1127,19 @@ abstract class AbstractSeq extends AbstractCharList{
           parent=parent.parent;
         }
       }
+      transient final int rootOffset;
+      int getBound(){
+        return rootOffset+size;
+      }
       AbstractSubList(Unchecked root,AbstractSubList parent,int rootOffset,int size){
-        super(rootOffset,size);
+        super(size);
+        this.rootOffset=rootOffset;
         this.root=root;
         this.parent=parent;
       }
       AbstractSubList(Unchecked root,int rootOffset,int size){
-        super(rootOffset,size);
+        super(size);
+        this.rootOffset=rootOffset;
         this.root=root;
         parent=null;
       }
@@ -1135,7 +1156,7 @@ abstract class AbstractSeq extends AbstractCharList{
         bubbleUpIncrementSize(parent);
         return true;
       }
-      public void add(int index,char val){
+      @Override public void add(int index,char val){
         final AbstractSeq root;
         final int rootSize;
         if((rootSize=(root=this.root).size)!=0){
@@ -1158,13 +1179,13 @@ abstract class AbstractSeq extends AbstractCharList{
           ArrCopy.semicheckedCopy(arr=root.arr,size+(size=rootOffset),arr,size,newRootSize-size);
         }
       }
-      public char getChar(int index){
+      @Override public char getChar(int index){
         return root.arr[index+rootOffset];
       }
       public void put(int index,char val){
         root.arr[index+rootOffset]=val;
       }
-      public char removeCharAt(int index){
+      @Override public char removeCharAt(int index){
         final Unchecked root;
         final char[] arr;
         final var removed=(arr=(root=this.root).arr)[index+=rootOffset];
@@ -1181,7 +1202,7 @@ abstract class AbstractSeq extends AbstractCharList{
         final int size;
         return (size=this.size)!=0&&uncheckedRemoveIf(size,filter::test);
       }
-      public char set(int index,char val){
+      @Override public char set(int index,char val){
         final char[] arr;
         final var oldVal=(arr=root.arr)[index+=rootOffset];
         arr[index]=val;
@@ -1194,8 +1215,8 @@ abstract class AbstractSeq extends AbstractCharList{
         final int srcBound=(srcOffset=rootOffset)+size;
         do{
           if(filter.test(arr[srcOffset])){
-            this.size=size-(size
-                =root.finalizeSubListBatchRemove(arr,pullSurvivorsDown(arr,srcOffset,srcBound-1,filter),srcBound));
+            this.size=size-(size=root.finalizeSubListBatchRemove(arr,pullSurvivorsDown(arr,srcOffset,srcBound-1,filter),
+                srcBound));
             bubbleUpDecrementSize(parent,size);
             return true;
           }

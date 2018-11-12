@@ -368,83 +368,51 @@ class CheckedSubList<E>extends AbstractSeq.Checked.AbstractSubList<E> implements
     return new CheckedBidirectionalSubItr<>(this,modCount);
   }
   @Override public int lastIndexOf(boolean val){
-    final var root=checkModCountAndGetRoot();
     final int size;
-    if((size=this.size)!=0){
-      final int rootOffset;
-      return AbstractSeq.uncheckedLastIndexOfMatch(root.arr,rootOffset=this.rootOffset,rootOffset+size,
-          OmniPred.OfRef.getEqualsPred(val));
-    }
+    if((size=this.size)!=0){ return super.uncheckedLastIndexOfMatch(size,OmniPred.OfRef.getEqualsPred(val)); }
+    CheckedCollection.checkModCount(modCount,root.modCount);
     return -1;
   }
   @Override public int lastIndexOf(Boolean val){
-    final var root=checkModCountAndGetRoot();
     final int size;
-    if((size=this.size)!=0){
-      final int rootOffset;
-      return AbstractSeq.uncheckedLastIndexOfMatch(root.arr,rootOffset=this.rootOffset,rootOffset+size,
-          OmniPred.OfRef.getEqualsPred(val));
-    }
+    if((size=this.size)!=0){ return super.uncheckedLastIndexOfMatch(size,OmniPred.OfRef.getEqualsPred(val)); }
+    CheckedCollection.checkModCount(modCount,root.modCount);
     return -1;
   }
   @Override public int lastIndexOf(byte val){
-    final var root=checkModCountAndGetRoot();
     final int size;
-    if((size=this.size)!=0){
-      final int rootOffset;
-      return AbstractSeq.uncheckedLastIndexOfMatch(root.arr,rootOffset=this.rootOffset,rootOffset+size,
-          OmniPred.OfRef.getEqualsPred(val));
-    }
+    if((size=this.size)!=0){ return super.uncheckedLastIndexOfMatch(size,OmniPred.OfRef.getEqualsPred(val)); }
+    CheckedCollection.checkModCount(modCount,root.modCount);
     return -1;
   }
   @Override public int lastIndexOf(Byte val){
-    final var root=checkModCountAndGetRoot();
     final int size;
-    if((size=this.size)!=0){
-      final int rootOffset;
-      return AbstractSeq.uncheckedLastIndexOfMatch(root.arr,rootOffset=this.rootOffset,rootOffset+size,
-          OmniPred.OfRef.getEqualsPred(val));
-    }
+    if((size=this.size)!=0){ return super.uncheckedLastIndexOfMatch(size,OmniPred.OfRef.getEqualsPred(val)); }
+    CheckedCollection.checkModCount(modCount,root.modCount);
     return -1;
   }
   @Override public int lastIndexOf(char val){
-    final var root=checkModCountAndGetRoot();
     final int size;
-    if((size=this.size)!=0){
-      final int rootOffset;
-      return AbstractSeq.uncheckedLastIndexOfMatch(root.arr,rootOffset=this.rootOffset,rootOffset+size,
-          OmniPred.OfRef.getEqualsPred(val));
-    }
+    if((size=this.size)!=0){ return super.uncheckedLastIndexOfMatch(size,OmniPred.OfRef.getEqualsPred(val)); }
+    CheckedCollection.checkModCount(modCount,root.modCount);
     return -1;
   }
   @Override public int lastIndexOf(Character val){
-    final var root=checkModCountAndGetRoot();
     final int size;
-    if((size=this.size)!=0){
-      final int rootOffset;
-      return AbstractSeq.uncheckedLastIndexOfMatch(root.arr,rootOffset=this.rootOffset,rootOffset+size,
-          OmniPred.OfRef.getEqualsPred(val));
-    }
+    if((size=this.size)!=0){ return super.uncheckedLastIndexOfMatch(size,OmniPred.OfRef.getEqualsPred(val)); }
+    CheckedCollection.checkModCount(modCount,root.modCount);
     return -1;
   }
   @Override public int lastIndexOf(double val){
-    final var root=checkModCountAndGetRoot();
     final int size;
-    if((size=this.size)!=0){
-      final int rootOffset;
-      return AbstractSeq.uncheckedLastIndexOfMatch(root.arr,rootOffset=this.rootOffset,rootOffset+size,
-          OmniPred.OfRef.getEqualsPred(val));
-    }
+    if((size=this.size)!=0){ return super.uncheckedLastIndexOfMatch(size,OmniPred.OfRef.getEqualsPred(val)); }
+    CheckedCollection.checkModCount(modCount,root.modCount);
     return -1;
   }
   @Override public int lastIndexOf(Double val){
-    final var root=checkModCountAndGetRoot();
     final int size;
-    if((size=this.size)!=0){
-      final int rootOffset;
-      return AbstractSeq.uncheckedLastIndexOfMatch(root.arr,rootOffset=this.rootOffset,rootOffset+size,
-          OmniPred.OfRef.getEqualsPred(val));
-    }
+    if((size=this.size)!=0){ return super.uncheckedLastIndexOfMatch(size,OmniPred.OfRef.getEqualsPred(val)); }
+    CheckedCollection.checkModCount(modCount,root.modCount);
     return -1;
   }
   @Override public int lastIndexOf(float val){
@@ -508,19 +476,13 @@ class CheckedSubList<E>extends AbstractSeq.Checked.AbstractSubList<E> implements
     return -1;
   }
   @Override public int lastIndexOf(Object val){
-    final var root=this.root;
-    final int modCount=this.modCount;
-    try{
-      final int size;
-      if((size=this.size)!=0){
-        final int rootOffset;
-        return AbstractSeq.uncheckedLastIndexOfMatch(root.arr,rootOffset=this.rootOffset,rootOffset+size,
-            OmniPred.OfRef.getEqualsPred(val));
-      }
-      return -1;
-    }finally{
-      CheckedCollection.checkModCount(modCount,root.modCount);
+    final int size;
+    if((size=this.size)!=0){
+      if(val!=null){ return super.uncheckedLastIndexOfNonNull(size,val); }
+      return super.uncheckedLastIndexOfMatch(size,Objects::isNull);
     }
+    CheckedCollection.checkModCount(modCount,root.modCount);
+    return -1;
   }
   @Override public int lastIndexOf(short val){
     final var root=checkModCountAndGetRoot();

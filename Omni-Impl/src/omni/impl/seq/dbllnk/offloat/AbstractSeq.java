@@ -878,6 +878,45 @@ abstract class AbstractSeq extends AbstractFloatList implements OmniList.OfFloat
     }
   }
   static abstract class Unchecked extends AbstractSeq{
+    public float removeFirstFloat(){
+      Node head;
+      --size;
+      staticEraseHead(this,head=this.head);
+      return head.val;
+    }
+    public float removeLastFloat(){
+      Node tail;
+      --size;
+      staticEraseTail(this,tail=this.tail);
+      return tail.val;
+    }
+    public Float pollFirst(){
+      Node head;
+      if((head=this.head)!=null){
+        --size;
+        staticEraseHead(this,head);
+        return head.val;
+      }
+      return null;
+    }
+    public double pollFirstDouble(){
+      Node head;
+      if((head=this.head)!=null){
+        --size;
+        staticEraseHead(this,head);
+        return head.val;
+      }
+      return Double.NaN;
+    }
+    public float pollFirstFloat(){
+      Node head;
+      if((head=this.head)!=null){
+        --size;
+        staticEraseHead(this,head);
+        return head.val;
+      }
+      return Float.NaN;
+    }
     Unchecked(){
       super();
     }

@@ -38,9 +38,6 @@ class CheckedSubList extends AbstractSeq.Checked.AbstractSubList implements Omni
   @Override public boolean add(int val){
     return super.add(val);
   }
-  @Override public void add(int index,Float val){
-    super.add(index,val);
-  }
   @Override public boolean add(long val){
     return super.add(val);
   }
@@ -132,9 +129,6 @@ class CheckedSubList extends AbstractSeq.Checked.AbstractSubList implements Omni
       CheckedCollection.checkModCount(modCount,root.modCount);
     }
   }
-  @Override public Float get(int index){
-    return super.getFloat(index);
-  }
   @Override public int indexOf(boolean val){
     final var root=checkModCountAndGetRoot();
     int size;
@@ -209,71 +203,77 @@ class CheckedSubList extends AbstractSeq.Checked.AbstractSubList implements Omni
     return new CheckedBidirectionalSubItr(this,modCount);
   }
   @Override public int lastIndexOf(boolean val){
-    final var root=checkModCountAndGetRoot();
     int size;
     if((size=this.size)!=0){
-      if(val){ return uncheckedLastIndexOfFltBits(root,size,TypeUtil.FLT_TRUE_BITS); }
-      return uncheckedLastIndexOfFlt0(root,size);
+      if(val){ return super.uncheckedLastIndexOfFltBits(size,TypeUtil.FLT_TRUE_BITS); }
+      return super.uncheckedLastIndexOfFlt0(size);
     }
+    CheckedCollection.checkModCount(modCount,root.modCount);
     return -1;
   }
   @Override public int lastIndexOf(char val){
-    final var root=checkModCountAndGetRoot();
     int size;
-    if((size=this.size)!=0){ return uncheckedLastIndexOfRawInt(root,size,val); }
+    if((size=this.size)!=0){ return uncheckedLastIndexOfRawInt(size,val); }
+    CheckedCollection.checkModCount(modCount,root.modCount);
     return -1;
   }
   @Override public int lastIndexOf(double val){
-    final var root=checkModCountAndGetRoot();
     final int size;
     if((size=this.size)!=0){
       final float v;
       if((v=(float)val)==val){
-        return uncheckedLastIndexOfFltBits(root,size,Float.floatToRawIntBits(v));
-      }else if(v!=v){ return uncheckedLastIndexOfFltNaN(root,size); }
+        return super.uncheckedLastIndexOfFltBits(size,Float.floatToRawIntBits(v));
+      }else if(v!=v){ return super.uncheckedLastIndexOfFltNaN(size); }
     }
+    CheckedCollection.checkModCount(modCount,root.modCount);
     return -1;
   }
   @Override public int lastIndexOf(float val){
-    final var root=checkModCountAndGetRoot();
     int size;
-    if((size=this.size)!=0){ return uncheckedLastIndexOf(root,size,val); }
+    if((size=this.size)!=0){ return uncheckedLastIndexOf(size,val); }
+    CheckedCollection.checkModCount(modCount,root.modCount);
     return -1;
   }
   @Override public int lastIndexOf(int val){
-    final var root=checkModCountAndGetRoot();
     final int size;
     if((size=this.size)!=0){
       if(val!=0){
-        if(!TypeUtil.checkCastToFloat(val)){ return -1; }
-        return uncheckedLastIndexOfFltBits(root,size,Float.floatToRawIntBits(val));
+        if(!TypeUtil.checkCastToFloat(val)){
+          CheckedCollection.checkModCount(modCount,root.modCount);
+          return -1;
+        }
+        return super.uncheckedLastIndexOfFltBits(size,Float.floatToRawIntBits(val));
       }
-      return uncheckedLastIndexOfFlt0(root,size);
+      return super.uncheckedLastIndexOfFlt0(size);
     }
+    CheckedCollection.checkModCount(modCount,root.modCount);
     return -1;
   }
   @Override public int lastIndexOf(long val){
-    final var root=checkModCountAndGetRoot();
     int size;
     if((size=this.size)!=0){
       if(val!=0){
-        if(!TypeUtil.checkCastToFloat(val)){ return -1; }
-        return uncheckedLastIndexOfFltBits(root,size,Float.floatToRawIntBits(val));
+        if(!TypeUtil.checkCastToFloat(val)){
+          CheckedCollection.checkModCount(modCount,root.modCount);
+          return -1;
+        }
+        return super.uncheckedLastIndexOfFltBits(size,Float.floatToRawIntBits(val));
       }
-      return uncheckedLastIndexOfFlt0(root,size);
+      return super.uncheckedLastIndexOfFlt0(size);
     }
+    CheckedCollection.checkModCount(modCount,root.modCount);
     return -1;
   }
   @Override public int lastIndexOf(Object val){
-    final var root=checkModCountAndGetRoot();
     int size;
-    if((size=this.size)!=0&&val instanceof Float){ return uncheckedLastIndexOf(root,size,(float)val); }
+    if((size=this.size)!=0&&val instanceof Float){ return uncheckedLastIndexOf(size,(float)val); }
+    CheckedCollection.checkModCount(modCount,root.modCount);
     return -1;
   }
   @Override public int lastIndexOf(short val){
-    final var root=checkModCountAndGetRoot();
     int size;
-    if((size=this.size)!=0){ return uncheckedLastIndexOfRawInt(root,size,val); }
+    if((size=this.size)!=0){ return uncheckedLastIndexOfRawInt(size,val); }
+    CheckedCollection.checkModCount(modCount,root.modCount);
     return -1;
   }
   @Override public OmniListIterator.OfFloat listIterator(){
@@ -294,9 +294,6 @@ class CheckedSubList extends AbstractSeq.Checked.AbstractSubList implements Omni
     CheckedCollection.checkLo(index);
     CheckedCollection.checkReadHi(index,size);
     root.arr[index+rootOffset]=val;
-  }
-  @Override public Float remove(int index){
-    return super.removeFloatAt(index);
   }
   @Override public boolean remove(Object val){
     final int size;
@@ -388,9 +385,6 @@ class CheckedSubList extends AbstractSeq.Checked.AbstractSubList implements Omni
       this.modCount=modCount;
       bubbleUpIncrementModCount(parent);
     }
-  }
-  @Override public Float set(int index,Float val){
-    return super.set(index,val);
   }
   @Override public void sort(){
     int modCount;
@@ -537,25 +531,13 @@ class CheckedSubList extends AbstractSeq.Checked.AbstractSubList implements Omni
     if(val!=0){ return uncheckedIndexOfFltBits(root,size,Float.floatToRawIntBits(val)); }
     return uncheckedIndexOfFlt0(root,size);
   }
-  private int uncheckedLastIndexOf(AbstractSeq.Checked root,int size,float val){
-    if(val==val){ return uncheckedLastIndexOfFltBits(root,size,Float.floatToRawIntBits(val)); }
-    return uncheckedLastIndexOfFltNaN(root,size);
+  private int uncheckedLastIndexOf(int size,float val){
+    if(val==val){ return super.uncheckedLastIndexOfFltBits(size,Float.floatToRawIntBits(val)); }
+    return super.uncheckedLastIndexOfFltNaN(size);
   }
-  private int uncheckedLastIndexOfFlt0(AbstractSeq.Checked root,int size){
-    final int rootOffset;
-    return AbstractSeq.uncheckedLastIndexOfFlt0(root.arr,rootOffset=this.rootOffset,rootOffset+size);
-  }
-  private int uncheckedLastIndexOfFltBits(AbstractSeq.Checked root,int size,int fltBits){
-    final int rootOffset;
-    return AbstractSeq.uncheckedLastIndexOfFltBits(root.arr,rootOffset=this.rootOffset,rootOffset+size,fltBits);
-  }
-  private int uncheckedLastIndexOfFltNaN(AbstractSeq.Checked root,int size){
-    final int rootOffset;
-    return AbstractSeq.uncheckedLastIndexOfFltNaN(root.arr,rootOffset=this.rootOffset,rootOffset+size);
-  }
-  private int uncheckedLastIndexOfRawInt(AbstractSeq.Checked root,int size,int val){
-    if(val!=0){ return uncheckedLastIndexOfFltBits(root,size,Float.floatToRawIntBits(val)); }
-    return uncheckedLastIndexOfFlt0(root,size);
+  private int uncheckedLastIndexOfRawInt(int size,int val){
+    if(val!=0){ return super.uncheckedLastIndexOfFltBits(size,Float.floatToRawIntBits(val)); }
+    return super.uncheckedLastIndexOfFlt0(size);
   }
   private boolean uncheckedRemove(int size,float val){
     if(val==val){ return uncheckedRemoveFltBits(size,Float.floatToRawIntBits(val)); }

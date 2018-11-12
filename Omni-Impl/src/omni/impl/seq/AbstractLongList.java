@@ -7,6 +7,22 @@ public abstract class AbstractLongList extends AbstractSeq.OfSignedIntegralPrimi
   protected AbstractLongList(int size){
     super(size);
   }
+  protected abstract long getLong(int index);
+  public Long get(int index){
+    return getLong(index);
+  }
+  protected abstract long removeLongAt(int index);
+  public Long remove(int index){
+    return removeLongAt(index);
+  }
+  protected abstract long set(int index,long val);
+  public Long set(int index,Long val){
+    return set(index,(long)val);
+  }
+  protected abstract void add(int index,long val);
+  public void add(int index,Long val){
+    add(index,(long)val);
+  }
   public int lastIndexOf(boolean val){
     final int size;
     if((size=this.size)!=0){ return uncheckedLastIndexOfMatch(size,TypeUtil.castToLong(val)); }

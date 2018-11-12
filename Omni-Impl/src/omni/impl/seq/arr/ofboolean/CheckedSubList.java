@@ -29,9 +29,6 @@ class CheckedSubList extends AbstractSeq.Checked.AbstractSubList implements Omni
   @Override public boolean add(Boolean val){
     return super.add(val);
   }
-  @Override public void add(int index,Boolean val){
-    super.add(index,val);
-  }
   @Override public Object clone(){
     final var root=checkModCountAndGetRoot();
     final boolean[] arr;
@@ -149,9 +146,6 @@ class CheckedSubList extends AbstractSeq.Checked.AbstractSubList implements Omni
       CheckedCollection.checkModCount(modCount,root.modCount);
     }
   }
-  @Override public Boolean get(int index){
-    return super.getBoolean(index);
-  }
   @Override public int indexOf(boolean val){
     final var root=checkModCountAndGetRoot();
     final int size;
@@ -250,17 +244,13 @@ class CheckedSubList extends AbstractSeq.Checked.AbstractSubList implements Omni
     return new CheckedBidirectionalSubItr(this,modCount);
   }
   @Override public int lastIndexOf(boolean val){
-    final var root=checkModCountAndGetRoot();
-    final int size;
-    if((size=this.size)!=0){
-      final int rootOffset;
-      return AbstractSeq.uncheckedLastIndexOfMatch(root.arr,rootOffset=this.rootOffset,rootOffset+size,val);
-    }
+    int size;
+    if((size=this.size)!=0){ return super.uncheckedLastIndexOfMatch(size,val); }
+    CheckedCollection.checkModCount(modCount,root.modCount);
     return -1;
   }
   @Override public int lastIndexOf(double val){
-    final var root=checkModCountAndGetRoot();
-    final int size;
+    int size;
     if((size=this.size)!=0){
       final boolean v;
       final long bits;
@@ -271,13 +261,12 @@ class CheckedSubList extends AbstractSeq.Checked.AbstractSubList implements Omni
       }else{
         return -1;
       }
-      final int rootOffset;
-      return AbstractSeq.uncheckedLastIndexOfMatch(root.arr,rootOffset=this.rootOffset,rootOffset+size,v);
+      return super.uncheckedLastIndexOfMatch(size,v);
     }
+    CheckedCollection.checkModCount(modCount,root.modCount);
     return -1;
   }
   @Override public int lastIndexOf(float val){
-    final var root=checkModCountAndGetRoot();
     final int size;
     if((size=this.size)!=0){
       final boolean v;
@@ -291,13 +280,12 @@ class CheckedSubList extends AbstractSeq.Checked.AbstractSubList implements Omni
       case TypeUtil.FLT_TRUE_BITS:
         v=true;
       }
-      final int rootOffset;
-      return AbstractSeq.uncheckedLastIndexOfMatch(root.arr,rootOffset=this.rootOffset,rootOffset+size,v);
+      return super.uncheckedLastIndexOfMatch(size,v);
     }
+    CheckedCollection.checkModCount(modCount,root.modCount);
     return -1;
   }
   @Override public int lastIndexOf(int val){
-    final var root=checkModCountAndGetRoot();
     final int size;
     if((size=this.size)!=0){
       final boolean v;
@@ -310,13 +298,12 @@ class CheckedSubList extends AbstractSeq.Checked.AbstractSubList implements Omni
       case 1:
         v=true;
       }
-      final int rootOffset;
-      return AbstractSeq.uncheckedLastIndexOfMatch(root.arr,rootOffset=this.rootOffset,rootOffset+size,v);
+      return super.uncheckedLastIndexOfMatch(size,v);
     }
+    CheckedCollection.checkModCount(modCount,root.modCount);
     return -1;
   }
   @Override public int lastIndexOf(long val){
-    final var root=checkModCountAndGetRoot();
     final int size;
     if((size=this.size)!=0){
       final boolean v;
@@ -327,18 +314,15 @@ class CheckedSubList extends AbstractSeq.Checked.AbstractSubList implements Omni
       }else{
         return -1;
       }
-      final int rootOffset;
-      return AbstractSeq.uncheckedLastIndexOfMatch(root.arr,rootOffset=this.rootOffset,rootOffset+size,v);
+      return super.uncheckedLastIndexOfMatch(size,v);
     }
+    CheckedCollection.checkModCount(modCount,root.modCount);
     return -1;
   }
   @Override public int lastIndexOf(Object val){
-    final var root=checkModCountAndGetRoot();
     final int size;
-    if((size=this.size)!=0&&val instanceof Boolean){
-      final int rootOffset;
-      return AbstractSeq.uncheckedLastIndexOfMatch(root.arr,rootOffset=this.rootOffset,rootOffset+size,(boolean)val);
-    }
+    if((size=this.size)!=0&&val instanceof Boolean){ return super.uncheckedLastIndexOfMatch(size,(boolean)val); }
+    CheckedCollection.checkModCount(modCount,root.modCount);
     return -1;
   }
   @Override public OmniListIterator.OfBoolean listIterator(){
@@ -359,9 +343,6 @@ class CheckedSubList extends AbstractSeq.Checked.AbstractSubList implements Omni
     CheckedCollection.checkLo(index);
     CheckedCollection.checkReadHi(index,size);
     root.arr[index+rootOffset]=val;
-  }
-  @Override public Boolean remove(int index){
-    return super.removeBooleanAt(index);
   }
   @Override public boolean remove(Object val){
     final int size;
@@ -477,9 +458,6 @@ class CheckedSubList extends AbstractSeq.Checked.AbstractSubList implements Omni
       this.modCount=modCount;
       bubbleUpIncrementModCount(parent);
     }
-  }
-  @Override public Boolean set(int index,Boolean val){
-    return super.set(index,val);
   }
   @Override public void sort(){
     int modCount;

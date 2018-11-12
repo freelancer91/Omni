@@ -7,6 +7,22 @@ public abstract class AbstractDoubleList extends AbstractSeq.OfDouble{
   protected AbstractDoubleList(int size){
     super(size);
   }
+  protected abstract double getDouble(int index);
+  public Double get(int index){
+    return getDouble(index);
+  }
+  protected abstract double removeDoubleAt(int index);
+  public Double remove(int index){
+    return removeDoubleAt(index);
+  }
+  protected abstract double set(int index,double val);
+  public Double set(int index,Double val){
+    return set(index,(double)val);
+  }
+  protected abstract void add(int index,double val);
+  public void add(int index,Double val){
+    add(index,(double)val);
+  }
   public int lastIndexOf(boolean val){
     final int size;
     if((size=this.size)!=0){

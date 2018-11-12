@@ -7,6 +7,22 @@ public abstract class AbstractCharList extends AbstractSeq.Of16BitPrimitive{
   protected AbstractCharList(int size){
     super(size);
   }
+  protected abstract char getChar(int index);
+  public Character get(int index){
+    return getChar(index);
+  }
+  protected abstract char removeCharAt(int index);
+  public Character remove(int index){
+    return removeCharAt(index);
+  }
+  protected abstract char set(int index,char val);
+  public Character set(int index,Character val){
+    return set(index,(char)val);
+  }
+  protected abstract void add(int index,char val);
+  public void add(int index,Character val){
+    add(index,(char)val);
+  }
   public int lastIndexOf(boolean val){
     final int size;
     if((size=this.size)!=0){ return uncheckedLastIndexOfMatch(size,TypeUtil.castToChar(val)); }

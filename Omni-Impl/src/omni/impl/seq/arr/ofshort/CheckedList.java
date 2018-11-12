@@ -15,9 +15,6 @@ public class CheckedList extends AbstractSeq.Checked implements OmniList.OfShort
   CheckedList(int size,short[] arr){
     super(size,arr);
   }
-  @Override public void add(int index,Short val){
-    super.add(index,val);
-  }
   @Override public Object clone(){
     final short[] arr;
     final int size;
@@ -32,9 +29,6 @@ public class CheckedList extends AbstractSeq.Checked implements OmniList.OfShort
     // TODO Auto-generated method stub
     return false;
   }
-  @Override public Short get(int index){
-    return super.getShort(index);
-  }
   @Override public OmniIterator.OfShort iterator(){
     return new CheckedBidirectionalItr(this);
   }
@@ -46,18 +40,12 @@ public class CheckedList extends AbstractSeq.Checked implements OmniList.OfShort
     CheckedCollection.checkWriteHi(index,size);
     return new CheckedBidirectionalItr(this,index);
   }
-  @Override public Short remove(int index){
-    return super.removeShortAt(index);
-  }
   @Override public void reverseSort(){
     final int size;
     if((size=this.size)>1){
       uncheckedReverseSort(arr,0,size-1);
       ++modCount;
     }
-  }
-  @Override public Short set(int index,Short val){
-    return super.set(index,val);
   }
   @Override public void sort(){
     final int size;

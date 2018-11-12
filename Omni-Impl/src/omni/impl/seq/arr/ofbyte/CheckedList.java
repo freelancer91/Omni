@@ -15,9 +15,6 @@ public class CheckedList extends AbstractSeq.Checked implements OmniList.OfByte{
   CheckedList(int size,byte[] arr){
     super(size,arr);
   }
-  @Override public void add(int index,Byte val){
-    super.add(index,val);
-  }
   @Override public Object clone(){
     final byte[] arr;
     final int size;
@@ -32,9 +29,6 @@ public class CheckedList extends AbstractSeq.Checked implements OmniList.OfByte{
     // TODO Auto-generated method stub
     return false;
   }
-  @Override public Byte get(int index){
-    return super.getByte(index);
-  }
   @Override public OmniIterator.OfByte iterator(){
     return new CheckedBidirectionalItr(this);
   }
@@ -46,18 +40,12 @@ public class CheckedList extends AbstractSeq.Checked implements OmniList.OfByte{
     CheckedCollection.checkWriteHi(index,size);
     return new CheckedBidirectionalItr(this,index);
   }
-  @Override public Byte remove(int index){
-    return super.removeByteAt(index);
-  }
   @Override public void reverseSort(){
     final int size;
     if((size=this.size)>1){
       uncheckedReverseSort(arr,0,size-1);
       ++modCount;
     }
-  }
-  @Override public Byte set(int index,Byte val){
-    return super.set(index,val);
   }
   @Override public void sort(){
     final int size;

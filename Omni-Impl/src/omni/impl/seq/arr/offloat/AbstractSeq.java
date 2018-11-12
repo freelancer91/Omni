@@ -11,7 +11,6 @@ import omni.function.FloatPredicate;
 import omni.function.FloatUnaryOperator;
 import omni.impl.CheckedCollection;
 import omni.impl.seq.AbstractFloatList;
-import omni.impl.seq.arr.AbstractSubArrSeq;
 import omni.util.ArrCopy;
 import omni.util.BitSetUtils;
 import omni.util.HashUtils;
@@ -261,7 +260,7 @@ abstract class AbstractSeq extends AbstractFloatList{
       uncheckedForEach(size,action);
     }
   }
-  public float getFloat(int index){
+  @Override public float getFloat(int index){
     return arr[index];
   }
   @Override public int hashCode(){
@@ -482,7 +481,7 @@ abstract class AbstractSeq extends AbstractFloatList{
     if((size=this.size)!=0){ return uncheckedSearchRawInt(size,val); }
     return -1;
   }
-  public float set(int index,float val){
+  @Override public float set(int index,float val){
     final float[] arr;
     final var oldVal=(arr=this.arr)[index];
     arr[index]=val;
@@ -773,7 +772,7 @@ abstract class AbstractSeq extends AbstractFloatList{
       super.push(val);
       return true;
     }
-    public void add(int index,float val){
+    @Override public void add(int index,float val){
       CheckedCollection.checkLo(index);
       final int size;
       CheckedCollection.checkWriteHi(index,size=this.size);
@@ -822,7 +821,7 @@ abstract class AbstractSeq extends AbstractFloatList{
       CheckedCollection.checkReadHi(index,size);
       super.put(index,val);
     }
-    public float removeFloatAt(int index){
+    @Override public float removeFloatAt(int index){
       CheckedCollection.checkLo(index);
       int size;
       CheckedCollection.checkReadHi(index,size=this.size);
@@ -937,7 +936,7 @@ abstract class AbstractSeq extends AbstractFloatList{
         lastRet=-1;
       }
     }
-    static abstract class AbstractSubList extends AbstractSubArrSeq.OfFloat{
+    static abstract class AbstractSubList extends AbstractFloatList{
       transient final Checked root;
       transient final AbstractSubList parent;
       transient int modCount;
@@ -962,14 +961,38 @@ abstract class AbstractSeq extends AbstractFloatList{
           parent=parent.parent;
         }
       }
+      transient final int rootOffset;
+      int getBound(){
+        return size+rootOffset;
+      }
+      @Override protected int uncheckedLastIndexOfFlt0(int size){
+        Checked root;
+        CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+        final int rootOffset;
+        return AbstractSeq.uncheckedLastIndexOfFlt0(root.arr,rootOffset=this.rootOffset,rootOffset+size);
+      }
+      @Override protected int uncheckedLastIndexOfFltBits(int size,int fltBits){
+        Checked root;
+        CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+        final int rootOffset;
+        return AbstractSeq.uncheckedLastIndexOfFltBits(root.arr,rootOffset=this.rootOffset,rootOffset+size,fltBits);
+      }
+      @Override protected int uncheckedLastIndexOfFltNaN(int size){
+        Checked root;
+        CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+        final int rootOffset;
+        return AbstractSeq.uncheckedLastIndexOfFltNaN(root.arr,rootOffset=this.rootOffset,rootOffset+size);
+      }
       AbstractSubList(Checked root,AbstractSubList parent,int rootOffset,int size,int modCount){
-        super(rootOffset,size);
+        super(size);
+        this.rootOffset=rootOffset;
         this.root=root;
         this.parent=parent;
         this.modCount=modCount;
       }
       AbstractSubList(Checked root,int rootOffset,int size){
-        super(rootOffset,size);
+        super(size);
+        this.rootOffset=rootOffset;
         this.root=root;
         parent=null;
         modCount=root.modCount;
@@ -991,7 +1014,7 @@ abstract class AbstractSeq extends AbstractFloatList{
         this.size=size+1;
         return true;
       }
-      public void add(int index,float val){
+      @Override public void add(int index,float val){
         final Checked root;
         int modCount;
         CheckedCollection.checkModCount(modCount=this.modCount,(root=this.root).modCount);
@@ -1027,7 +1050,7 @@ abstract class AbstractSeq extends AbstractFloatList{
           CheckedCollection.checkModCount(modCount,root.modCount);
         }
       }
-      public float getFloat(int index){
+      @Override public float getFloat(int index){
         final Checked root;
         CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
         CheckedCollection.checkLo(index);
@@ -1048,7 +1071,7 @@ abstract class AbstractSeq extends AbstractFloatList{
         CheckedCollection.checkModCount(modCount,root.modCount);
         return size==0;
       }
-      public float removeFloatAt(int index){
+      @Override public float removeFloatAt(int index){
         int modCount;
         final Checked root;
         CheckedCollection.checkModCount(modCount=this.modCount,(root=this.root).modCount);
@@ -1076,7 +1099,7 @@ abstract class AbstractSeq extends AbstractFloatList{
         CheckedCollection.checkModCount(modCount,root.modCount);
         return false;
       }
-      public float set(int index,float val){
+      @Override public float set(int index,float val){
         final Checked root;
         CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
         CheckedCollection.checkLo(index);
@@ -1227,7 +1250,7 @@ abstract class AbstractSeq extends AbstractFloatList{
       super.push(val);
       return true;
     }
-    public void add(int index,float val){
+    @Override public void add(int index,float val){
       final int size;
       if((size=this.size)!=0){
         super.uncheckedInsert(index,val,size);
@@ -1243,7 +1266,7 @@ abstract class AbstractSeq extends AbstractFloatList{
       super.push(val);
       return true;
     }
-    public float removeFloatAt(int index){
+    @Override public float removeFloatAt(int index){
       final float[] arr;
       final var removed=(arr=this.arr)[index];
       eraseIndexHelper(arr,index,--size);
@@ -1288,7 +1311,19 @@ abstract class AbstractSeq extends AbstractFloatList{
         this.cursor=cursor+1;
       }
     }
-    static abstract class AbstractSubList extends AbstractSubArrSeq.OfFloat{
+    static abstract class AbstractSubList extends AbstractFloatList{
+      @Override protected int uncheckedLastIndexOfFltBits(int size,int fltBits){
+        int rootOffset;
+        return AbstractSeq.uncheckedLastIndexOfFltBits(root.arr,rootOffset=this.rootOffset,rootOffset+size,fltBits);
+      }
+      @Override protected int uncheckedLastIndexOfFlt0(int size){
+        int rootOffset;
+        return AbstractSeq.uncheckedLastIndexOfFlt0(root.arr,rootOffset=this.rootOffset,rootOffset+size);
+      }
+      @Override protected int uncheckedLastIndexOfFltNaN(int size){
+        int rootOffset;
+        return AbstractSeq.uncheckedLastIndexOfFltNaN(root.arr,rootOffset=this.rootOffset,rootOffset+size);
+      }
       transient final Unchecked root;
       transient final AbstractSubList parent;
       static void bubbleUpDecrementSize(AbstractSubList parent){
@@ -1309,13 +1344,19 @@ abstract class AbstractSeq extends AbstractFloatList{
           parent=parent.parent;
         }
       }
+      transient final int rootOffset;
+      int getBound(){
+        return rootOffset+size;
+      }
       AbstractSubList(Unchecked root,AbstractSubList parent,int rootOffset,int size){
-        super(rootOffset,size);
+        super(size);
+        this.rootOffset=rootOffset;
         this.root=root;
         this.parent=parent;
       }
       AbstractSubList(Unchecked root,int rootOffset,int size){
-        super(rootOffset,size);
+        super(size);
+        this.rootOffset=rootOffset;
         this.root=root;
         parent=null;
       }
@@ -1332,7 +1373,7 @@ abstract class AbstractSeq extends AbstractFloatList{
         bubbleUpIncrementSize(parent);
         return true;
       }
-      public void add(int index,float val){
+      @Override public void add(int index,float val){
         final AbstractSeq root;
         final int rootSize;
         if((rootSize=(root=this.root).size)!=0){
@@ -1355,13 +1396,13 @@ abstract class AbstractSeq extends AbstractFloatList{
           ArrCopy.semicheckedCopy(arr=root.arr,size+(size=rootOffset),arr,size,newRootSize-size);
         }
       }
-      public float getFloat(int index){
+      @Override public float getFloat(int index){
         return root.arr[index+rootOffset];
       }
       public void put(int index,float val){
         root.arr[index+rootOffset]=val;
       }
-      public float removeFloatAt(int index){
+      @Override public float removeFloatAt(int index){
         final Unchecked root;
         final float[] arr;
         final var removed=(arr=(root=this.root).arr)[index+=rootOffset];
@@ -1378,7 +1419,7 @@ abstract class AbstractSeq extends AbstractFloatList{
         final int size;
         return (size=this.size)!=0&&uncheckedRemoveIf(size,filter::test);
       }
-      public float set(int index,float val){
+      @Override public float set(int index,float val){
         final float[] arr;
         final var oldVal=(arr=root.arr)[index+=rootOffset];
         arr[index]=val;

@@ -25,9 +25,6 @@ class UncheckedSubList extends AbstractSeq.Unchecked.AbstractSubList implements 
   @Override public boolean add(Byte val){
     return super.add(val);
   }
-  @Override public void add(int index,Byte val){
-    super.add(index,val);
-  }
   @Override public Object clone(){
     final byte[] arr;
     final int size;
@@ -95,9 +92,6 @@ class UncheckedSubList extends AbstractSeq.Unchecked.AbstractSubList implements 
       final int rootOffset;
       AbstractSeq.uncheckedForwardForEachInRange(root.arr,rootOffset=this.rootOffset,rootOffset+size,action::accept);
     }
-  }
-  @Override public Byte get(int index){
-    return super.getByte(index);
   }
   @Override public int hashCode(){
     final int size;
@@ -175,79 +169,11 @@ class UncheckedSubList extends AbstractSeq.Unchecked.AbstractSubList implements 
   @Override public OmniIterator.OfByte iterator(){
     return new UncheckedAscendingSubItr(this);
   }
-  @Override public int lastIndexOf(boolean val){
-    final int size;
-    if((size=this.size)!=0){
-      final int rootOffset;
-      return AbstractSeq.uncheckedLastIndexOfMatch(root.arr,rootOffset=this.rootOffset,rootOffset+size,
-          TypeUtil.castToByte(val));
-    }
-    return -1;
-  }
-  @Override public int lastIndexOf(byte val){
-    final int size;
-    if((size=this.size)!=0){
-      final int rootOffset;
-      return AbstractSeq.uncheckedLastIndexOfMatch(root.arr,rootOffset=this.rootOffset,rootOffset+size,val);
-    }
-    return -1;
-  }
-  @Override public int lastIndexOf(char val){
-    final int size;
-    if(val<=Byte.MAX_VALUE&&(size=this.size)!=0){
-      final int rootOffset;
-      return AbstractSeq.uncheckedLastIndexOfMatch(root.arr,rootOffset=this.rootOffset,rootOffset+size,val);
-    }
-    return -1;
-  }
-  @Override public int lastIndexOf(double val){
-    final int size,v;
-    if((size=this.size)!=0&&val==(v=(byte)val)){
-      final int rootOffset;
-      return AbstractSeq.uncheckedLastIndexOfMatch(root.arr,rootOffset=this.rootOffset,rootOffset+size,v);
-    }
-    return -1;
-  }
-  @Override public int lastIndexOf(float val){
-    final int size,v;
-    if((size=this.size)!=0&&val==(v=(byte)val)){
-      final int rootOffset;
-      return AbstractSeq.uncheckedLastIndexOfMatch(root.arr,rootOffset=this.rootOffset,rootOffset+size,v);
-    }
-    return -1;
-  }
-  @Override public int lastIndexOf(int val){
-    final int size;
-    if((size=this.size)!=0&&val==(byte)val){
-      final int rootOffset;
-      return AbstractSeq.uncheckedLastIndexOfMatch(root.arr,rootOffset=this.rootOffset,rootOffset+size,val);
-    }
-    return -1;
-  }
-  @Override public int lastIndexOf(long val){
-    final int size,v;
-    if((size=this.size)!=0&&val==(v=(byte)val)){
-      final int rootOffset;
-      return AbstractSeq.uncheckedLastIndexOfMatch(root.arr,rootOffset=this.rootOffset,rootOffset+size,v);
-    }
-    return -1;
-  }
-  @Override public int lastIndexOf(Object val){
-    final int size;
-    if((size=this.size)!=0&&val instanceof Byte){
-      final int rootOffset;
-      return AbstractSeq.uncheckedLastIndexOfMatch(root.arr,rootOffset=this.rootOffset,rootOffset+size,(byte)val);
-    }
-    return -1;
-  }
   @Override public OmniListIterator.OfByte listIterator(){
     return new UncheckedBidirectionalSubItr(this);
   }
   @Override public OmniListIterator.OfByte listIterator(int index){
     return new UncheckedBidirectionalSubItr(this,index+rootOffset);
-  }
-  @Override public Byte remove(int index){
-    return super.removeByteAt(index);
   }
   @Override public boolean remove(Object val){
     final int size;
@@ -301,9 +227,6 @@ class UncheckedSubList extends AbstractSeq.Unchecked.AbstractSubList implements 
       final int rootOffset;
       AbstractSeq.uncheckedReverseSort(root.arr,rootOffset=this.rootOffset,size+rootOffset-1);
     }
-  }
-  @Override public Byte set(int index,Byte val){
-    return super.set(index,val);
   }
   @Override public void sort(){
     int size;

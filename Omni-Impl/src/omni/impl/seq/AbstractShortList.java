@@ -7,6 +7,22 @@ public abstract class AbstractShortList extends AbstractSeq.Of16BitPrimitive{
   protected AbstractShortList(int size){
     super(size);
   }
+  protected abstract short getShort(int index);
+  public Short get(int index){
+    return getShort(index);
+  }
+  protected abstract short removeShortAt(int index);
+  public Short remove(int index){
+    return removeShortAt(index);
+  }
+  protected abstract short set(int index,short val);
+  public Short set(int index,Short val){
+    return set(index,(short)val);
+  }
+  protected abstract void add(int index,short val);
+  public void add(int index,Short val){
+    add(index,(short)val);
+  }
   public int lastIndexOf(boolean val){
     final int size;
     if((size=this.size)!=0){ return uncheckedLastIndexOfMatch(size,TypeUtil.castToByte(val)); }

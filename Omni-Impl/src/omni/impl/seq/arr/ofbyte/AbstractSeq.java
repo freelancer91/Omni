@@ -11,7 +11,6 @@ import omni.function.BytePredicate;
 import omni.function.ByteUnaryOperator;
 import omni.impl.CheckedCollection;
 import omni.impl.seq.AbstractByteList;
-import omni.impl.seq.arr.AbstractSubArrSeq;
 import omni.util.ArrCopy;
 import omni.util.BitSetUtils;
 import omni.util.OmniArray;
@@ -126,12 +125,12 @@ abstract class AbstractSeq extends AbstractByteList{
   private AbstractSeq(int capacity){
     super();
     switch(capacity){
-    default:
-      arr=new byte[capacity];
-      return;
-    case OmniArray.DEFAULT_ARR_SEQ_CAP:
-      arr=OmniArray.OfByte.DEFAULT_ARR;
-    case 0:
+      default:
+        arr=new byte[capacity];
+        return;
+      case OmniArray.DEFAULT_ARR_SEQ_CAP:
+        arr=OmniArray.OfByte.DEFAULT_ARR;
+      case 0:
     }
   }
   private AbstractSeq(int size,byte[] arr){
@@ -182,7 +181,7 @@ abstract class AbstractSeq extends AbstractByteList{
       uncheckedForEach(size,action::accept);
     }
   }
-  public byte getByte(int index){
+  @Override public byte getByte(int index){
     return arr[index];
   }
   @Override public int hashCode(){
@@ -368,7 +367,7 @@ abstract class AbstractSeq extends AbstractByteList{
     if((size=this.size)!=0&&val instanceof Byte){ return uncheckedSearch(size,(byte)val); }
     return -1;
   }
-  public byte set(int index,byte val){
+  @Override public byte set(int index,byte val){
     final byte[] arr;
     final var oldVal=(arr=this.arr)[index];
     arr[index]=val;
@@ -617,7 +616,7 @@ abstract class AbstractSeq extends AbstractByteList{
       super.push(val);
       return true;
     }
-    public void add(int index,byte val){
+    @Override public void add(int index,byte val){
       CheckedCollection.checkLo(index);
       final int size;
       CheckedCollection.checkWriteHi(index,size=this.size);
@@ -656,7 +655,7 @@ abstract class AbstractSeq extends AbstractByteList{
       CheckedCollection.checkReadHi(index,size);
       super.put(index,val);
     }
-    public byte removeByteAt(int index){
+    @Override public byte removeByteAt(int index){
       CheckedCollection.checkLo(index);
       int size;
       CheckedCollection.checkReadHi(index,size=this.size);
@@ -771,7 +770,13 @@ abstract class AbstractSeq extends AbstractByteList{
         lastRet=-1;
       }
     }
-    static abstract class AbstractSubList extends AbstractSubArrSeq{
+    static abstract class AbstractSubList extends AbstractByteList{
+      @Override protected int uncheckedLastIndexOfMatch(int size,int val){
+        Checked root;
+        CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+        int rootOffset;
+        return AbstractSeq.uncheckedLastIndexOfMatch(root.arr,rootOffset=this.rootOffset,rootOffset+size,val);
+      }
       transient final Checked root;
       transient final AbstractSubList parent;
       transient int modCount;
@@ -796,14 +801,20 @@ abstract class AbstractSeq extends AbstractByteList{
           parent=parent.parent;
         }
       }
+      transient final int rootOffset;
+      int getBound(){
+        return size+rootOffset;
+      }
       AbstractSubList(Checked root,AbstractSubList parent,int rootOffset,int size,int modCount){
-        super(rootOffset,size);
+        super(size);
+        this.rootOffset=rootOffset;
         this.root=root;
         this.parent=parent;
         this.modCount=modCount;
       }
       AbstractSubList(Checked root,int rootOffset,int size){
-        super(rootOffset,size);
+        super(size);
+        this.rootOffset=rootOffset;
         this.root=root;
         parent=null;
         modCount=root.modCount;
@@ -825,7 +836,7 @@ abstract class AbstractSeq extends AbstractByteList{
         this.size=size+1;
         return true;
       }
-      public void add(int index,byte val){
+      @Override public void add(int index,byte val){
         final Checked root;
         int modCount;
         CheckedCollection.checkModCount(modCount=this.modCount,(root=this.root).modCount);
@@ -861,7 +872,7 @@ abstract class AbstractSeq extends AbstractByteList{
           CheckedCollection.checkModCount(modCount,root.modCount);
         }
       }
-      public byte getByte(int index){
+      @Override public byte getByte(int index){
         final Checked root;
         CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
         CheckedCollection.checkLo(index);
@@ -882,7 +893,7 @@ abstract class AbstractSeq extends AbstractByteList{
         CheckedCollection.checkModCount(modCount,root.modCount);
         return size==0;
       }
-      public byte removeByteAt(int index){
+      @Override public byte removeByteAt(int index){
         int modCount;
         final Checked root;
         CheckedCollection.checkModCount(modCount=this.modCount,(root=this.root).modCount);
@@ -910,7 +921,7 @@ abstract class AbstractSeq extends AbstractByteList{
         CheckedCollection.checkModCount(modCount,root.modCount);
         return false;
       }
-      public byte set(int index,byte val){
+      @Override public byte set(int index,byte val){
         final Checked root;
         CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
         CheckedCollection.checkLo(index);
@@ -952,8 +963,8 @@ abstract class AbstractSeq extends AbstractByteList{
                   final long[] survivors;
                   int numSurvivors;
                   if((numSurvivors=size-++srcOffset)!=0){
-                    numSurvivors
-                        =markSurvivors(arr,survivors=BitSetUtils.getBitSet(numSurvivors),srcOffset,srcBound,filter);
+                    numSurvivors=markSurvivors(arr,survivors=BitSetUtils.getBitSet(numSurvivors),srcOffset,srcBound,
+                        filter);
                     CheckedCollection.checkModCount(expectedModCount,root.modCount);
                     arr[dstOffset++]=v;
                     if(numSurvivors!=0){
@@ -1053,7 +1064,7 @@ abstract class AbstractSeq extends AbstractByteList{
       super.push(val);
       return true;
     }
-    public void add(int index,byte val){
+    @Override public void add(int index,byte val){
       final int size;
       if((size=this.size)!=0){
         super.uncheckedInsert(index,val,size);
@@ -1061,7 +1072,7 @@ abstract class AbstractSeq extends AbstractByteList{
         super.uncheckedInit(val);
       }
     }
-    public byte removeByteAt(int index){
+    @Override public byte removeByteAt(int index){
       final byte[] arr;
       final var removed=(arr=this.arr)[index];
       eraseIndexHelper(arr,index,--size);
@@ -1106,7 +1117,11 @@ abstract class AbstractSeq extends AbstractByteList{
         this.cursor=cursor+1;
       }
     }
-    static abstract class AbstractSubList extends AbstractSubArrSeq{
+    static abstract class AbstractSubList extends AbstractByteList{
+      @Override protected int uncheckedLastIndexOfMatch(int size,int val){
+        int rootOffset;
+        return AbstractSeq.uncheckedLastIndexOfMatch(root.arr,rootOffset=this.rootOffset,rootOffset+size,val);
+      }
       transient final Unchecked root;
       transient final AbstractSubList parent;
       static void bubbleUpDecrementSize(AbstractSubList parent){
@@ -1127,13 +1142,19 @@ abstract class AbstractSeq extends AbstractByteList{
           parent=parent.parent;
         }
       }
+      transient final int rootOffset;
+      int getBound(){
+        return rootOffset+size;
+      }
       AbstractSubList(Unchecked root,AbstractSubList parent,int rootOffset,int size){
-        super(rootOffset,size);
+        super(size);
+        this.rootOffset=rootOffset;
         this.root=root;
         this.parent=parent;
       }
       AbstractSubList(Unchecked root,int rootOffset,int size){
-        super(rootOffset,size);
+        super(size);
+        this.rootOffset=rootOffset;
         this.root=root;
         parent=null;
       }
@@ -1150,7 +1171,7 @@ abstract class AbstractSeq extends AbstractByteList{
         bubbleUpIncrementSize(parent);
         return true;
       }
-      public void add(int index,byte val){
+      @Override public void add(int index,byte val){
         final AbstractSeq root;
         final int rootSize;
         if((rootSize=(root=this.root).size)!=0){
@@ -1173,13 +1194,13 @@ abstract class AbstractSeq extends AbstractByteList{
           ArrCopy.semicheckedCopy(arr=root.arr,size+(size=rootOffset),arr,size,newRootSize-size);
         }
       }
-      public byte getByte(int index){
+      @Override public byte getByte(int index){
         return root.arr[index+rootOffset];
       }
       public void put(int index,byte val){
         root.arr[index+rootOffset]=val;
       }
-      public byte removeByteAt(int index){
+      @Override public byte removeByteAt(int index){
         final Unchecked root;
         final byte[] arr;
         final var removed=(arr=(root=this.root).arr)[index+=rootOffset];
@@ -1196,7 +1217,7 @@ abstract class AbstractSeq extends AbstractByteList{
         final int size;
         return (size=this.size)!=0&&uncheckedRemoveIf(size,filter::test);
       }
-      public byte set(int index,byte val){
+      @Override public byte set(int index,byte val){
         final byte[] arr;
         final var oldVal=(arr=root.arr)[index+=rootOffset];
         arr[index]=val;
@@ -1209,8 +1230,8 @@ abstract class AbstractSeq extends AbstractByteList{
         final int srcBound=(srcOffset=rootOffset)+size;
         do{
           if(filter.test(arr[srcOffset])){
-            this.size=size-(size
-                =root.finalizeSubListBatchRemove(arr,pullSurvivorsDown(arr,srcOffset,srcBound-1,filter),srcBound));
+            this.size=size-(size=root.finalizeSubListBatchRemove(arr,pullSurvivorsDown(arr,srcOffset,srcBound-1,filter),
+                srcBound));
             bubbleUpDecrementSize(parent,size);
             return true;
           }

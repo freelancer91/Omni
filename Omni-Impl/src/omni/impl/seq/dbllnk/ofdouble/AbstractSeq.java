@@ -764,6 +764,36 @@ abstract class AbstractSeq extends AbstractDoubleList implements OmniList.OfDoub
     }
   }
   static abstract class Unchecked extends AbstractSeq{
+    public double removeFirstDouble(){
+      Node head;
+      --size;
+      staticEraseHead(this,head=this.head);
+      return head.val;
+    }
+    public double removeLastDouble(){
+      Node tail;
+      --size;
+      staticEraseTail(this,tail=this.tail);
+      return tail.val;
+    }
+    public Double pollFirst(){
+      Node head;
+      if((head=this.head)!=null){
+        --size;
+        staticEraseHead(this,head);
+        return head.val;
+      }
+      return null;
+    }
+    public double pollFirstDouble(){
+      Node head;
+      if((head=this.head)!=null){
+        --size;
+        staticEraseHead(this,head);
+        return head.val;
+      }
+      return Double.NaN;
+    }
     Unchecked(){
       super();
     }

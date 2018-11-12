@@ -2,7 +2,24 @@ package omni.impl.seq.dbllnk.oflong;
 import java.util.function.LongPredicate;
 import omni.api.OmniDeque;
 import omni.api.OmniList;
+import omni.util.TypeUtil;
 public class UncheckedList extends AbstractSeq.Unchecked implements OmniDeque.OfLong{
+  static int collapseBodyHelper(Node prev,Node next,LongPredicate filter){
+    int numRemoved=0;
+    for(Node curr;(curr=prev.next)!=next;prev=curr){
+      if(filter.test(curr.val)){
+        do{
+          ++numRemoved;
+          if((curr=curr.next)==next){
+            joinNodes(prev,next);
+            return numRemoved;
+          }
+        }while(filter.test(curr.val));
+        joinNodes(prev,curr);
+      }
+    }
+    return numRemoved;
+  }
   UncheckedList(){
     super();
   }
@@ -12,111 +29,70 @@ public class UncheckedList extends AbstractSeq.Unchecked implements OmniDeque.Of
   UncheckedList(Node head,int size,Node tail){
     super(head,size,tail);
   }
-  @Override public boolean removeLastOccurrence(boolean val){
-    // TODO Auto-generated method stub
-    return false;
-  }
-  @Override public boolean removeLastOccurrence(double val){
-    // TODO Auto-generated method stub
-    return false;
-  }
-  @Override public boolean removeLastOccurrence(float val){
-    // TODO Auto-generated method stub
-    return false;
-  }
-  @Override public boolean removeLastOccurrence(int val){
-    // TODO Auto-generated method stub
-    return false;
-  }
-  @Override public boolean removeLastOccurrence(long val){
-    // TODO Auto-generated method stub
-    return false;
-  }
-  @Override public boolean removeLastOccurrence(Object val){
-    // TODO Auto-generated method stub
-    return false;
-  }
-  @Override public Long element(){
-    // TODO Auto-generated method stub
-    return null;
-  }
-  @Override public long longElement(){
-    // TODO Auto-generated method stub
-    return 0;
-  }
-  @Override public boolean offer(long val){
-    // TODO Auto-generated method stub
-    return false;
-  }
-  @Override public boolean offer(Long val){
-    // TODO Auto-generated method stub
-    return false;
-  }
-  @Override public Long remove(){
-    // TODO Auto-generated method stub
-    return null;
-  }
-  @Override public long removeLong(){
-    // TODO Auto-generated method stub
-    return 0;
-  }
   @Override public boolean add(boolean val){
-    // TODO Auto-generated method stub
-    return false;
+    super.addLast(TypeUtil.castToLong(val));
+    return true;
   }
   @Override public boolean add(int val){
-    // TODO Auto-generated method stub
-    return false;
-  }
-  @Override public boolean add(long val){
-    // TODO Auto-generated method stub
-    return false;
-  }
-  @Override public boolean add(Long val){
-    // TODO Auto-generated method stub
-    return false;
-  }
-  @Override public omni.api.OmniIterator.OfLong iterator(){
-    // TODO Auto-generated method stub
-    return null;
-  }
-  @Override public Long poll(){
-    // TODO Auto-generated method stub
-    return null;
-  }
-  @Override public double pollDouble(){
-    // TODO Auto-generated method stub
-    return 0;
-  }
-  @Override public float pollFloat(){
-    // TODO Auto-generated method stub
-    return 0;
-  }
-  @Override public long pollLong(){
-    // TODO Auto-generated method stub
-    return 0;
-  }
-  @Override public Long pop(){
-    // TODO Auto-generated method stub
-    return null;
-  }
-  @Override public long popLong(){
-    // TODO Auto-generated method stub
-    return 0;
-  }
-  @Override public void push(long val){
-    // TODO Auto-generated method stub
-  }
-  @Override public void push(Long val){
-    // TODO Auto-generated method stub
+    super.addLast(val);
+    return true;
   }
   @Override public void add(int index,long val){
-    // TODO Auto-generated method stub
+    int size;
+    if((size=this.size)!=0){
+      if(index==0){
+        head=new Node(val,head);
+      }else{
+        int tailDist;
+        if((tailDist=size-index)==0){
+          tail=new Node(tail,val);
+        }else{
+          staticInsertNode(this,index,val,tailDist);
+        }
+      }
+    }else{
+      staticInit(this,new Node(val));
+    }
+    this.size=size+1;
   }
-  @Override public void add(int index,Long val){
-    // TODO Auto-generated method stub
+  @Override public boolean add(long val){
+    super.addLast(val);
+    return true;
   }
-  @Override public Long get(int index){
+  @Override public boolean add(Long val){
+    super.addLast(val);
+    return true;
+  }
+  @Override public void addFirst(Long val){
+    super.addFirst(val);
+  }
+  @Override public void addLast(Long val){
+    super.addLast(val);
+  }
+  @Override public omni.api.OmniIterator.OfLong descendingIterator(){
+    // TODO Auto-generated method stub
+    return null;
+  }
+  @Override public Long element(){
+    return head.val;
+  }
+  @Override public boolean equals(Object val){
+    // TODO Auto-generated method stub
+    return false;
+  }
+  @Override public Long getFirst(){
+    return head.val;
+  }
+  @Override public long getFirstLong(){
+    return head.val;
+  }
+  @Override public Long getLast(){
+    return tail.val;
+  }
+  @Override public long getLastLong(){
+    return tail.val;
+  }
+  @Override public omni.api.OmniIterator.OfLong iterator(){
     // TODO Auto-generated method stub
     return null;
   }
@@ -128,128 +104,267 @@ public class UncheckedList extends AbstractSeq.Unchecked implements OmniDeque.Of
     // TODO Auto-generated method stub
     return null;
   }
-  @Override public Long remove(int index){
-    // TODO Auto-generated method stub
+  @Override public long longElement(){
+    return head.val;
+  }
+  @Override public boolean offer(long val){
+    super.addLast(val);
+    return true;
+  }
+  @Override public boolean offer(Long val){
+    super.addLast(val);
+    return true;
+  }
+  @Override public boolean offerFirst(long val){
+    super.addFirst(val);
+    return true;
+  }
+  @Override public boolean offerFirst(Long val){
+    super.addFirst(val);
+    return true;
+  }
+  @Override public boolean offerLast(long val){
+    super.addLast(val);
+    return true;
+  }
+  @Override public boolean offerLast(Long val){
+    super.addLast(val);
+    return true;
+  }
+  @Override public Long poll(){
+    return super.pollFirst();
+  }
+  @Override public double pollDouble(){
+    return super.pollFirstDouble();
+  }
+  @Override public float pollFloat(){
+    return super.pollFirstFloat();
+  }
+  @Override public Long pollLast(){
+    Node tail;
+    if((tail=this.tail)!=null){
+      --size;
+      staticEraseTail(this,tail);
+      return tail.val;
+    }
     return null;
+  }
+  @Override public double pollLastDouble(){
+    Node tail;
+    if((tail=this.tail)!=null){
+      --size;
+      staticEraseTail(this,tail);
+      return tail.val;
+    }
+    return Double.NaN;
+  }
+  @Override public float pollLastFloat(){
+    Node tail;
+    if((tail=this.tail)!=null){
+      --size;
+      staticEraseTail(this,tail);
+      return tail.val;
+    }
+    return Float.NaN;
+  }
+  @Override public long pollLastLong(){
+    Node tail;
+    if((tail=this.tail)!=null){
+      --size;
+      staticEraseTail(this,tail);
+      return tail.val;
+    }
+    return Long.MIN_VALUE;
+  }
+  @Override public long pollLong(){
+    return super.pollFirstLong();
+  }
+  @Override public Long pop(){
+    return super.removeFirstLong();
+  }
+  @Override public long popLong(){
+    return super.removeFirstLong();
+  }
+  @Override public void push(long val){
+    super.addFirst(val);
+  }
+  @Override public void push(Long val){
+    super.addFirst(val);
+  }
+  @Override public Long remove(){
+    return super.removeFirstLong();
+  }
+  @Override public Long removeFirst(){
+    return super.removeFirstLong();
+  }
+  @Override public Long removeLast(){
+    return super.removeLastLong();
+  }
+  @Override public boolean removeLastOccurrence(boolean val){
+    final Node tail;
+    return (tail=this.tail)!=null&&uncheckedRemoveLastMatch(tail,TypeUtil.castToLong(val));
+  }
+  @Override public boolean removeLastOccurrence(double val){
+    final Node tail;
+    long v;
+    return (tail=this.tail)!=null&&TypeUtil.doubleEquals(val,v=(long)val)&&uncheckedRemoveLastMatch(tail,v);
+  }
+  @Override public boolean removeLastOccurrence(float val){
+    final Node tail;
+    long v;
+    return (tail=this.tail)!=null&&TypeUtil.floatEquals(val,v=(long)val)&&uncheckedRemoveLastMatch(tail,v);
+  }
+  @Override public boolean removeLastOccurrence(int val){
+    final Node tail;
+    return (tail=this.tail)!=null&&uncheckedRemoveLastMatch(tail,val);
+  }
+  @Override public boolean removeLastOccurrence(long val){
+    final Node tail;
+    return (tail=this.tail)!=null&&uncheckedRemoveLastMatch(tail,val);
+  }
+  @Override public boolean removeLastOccurrence(Object val){
+    final Node tail;
+    return (tail=this.tail)!=null&&val instanceof Long&&uncheckedRemoveLastMatch(tail,(long)val);
+  }
+  @Override public long removeLong(){
+    return super.removeFirstLong();
   }
   @Override public long removeLongAt(int index){
-    // TODO Auto-generated method stub
-    return 0;
-  }
-  @Override public Long set(int index,Long val){
-    // TODO Auto-generated method stub
-    return null;
+    Node node;
+    int size;
+    if((size=--this.size)!=0){
+      if(index==0){
+        staticEraseHead(this,node=head);
+      }else{
+        int tailDist;
+        if((tailDist=size-index)==0){
+          staticEraseTail(this,node=tail);
+        }else{
+          node=staticExtractNode(this,index,tailDist);
+        }
+      }
+    }else{
+      node=head;
+      staticInit(this,null);
+    }
+    return node.val;
   }
   @Override public OmniList.OfLong subList(int fromIndex,int toIndex){
     // TODO Auto-generated method stub
     return null;
   }
-  @Override public void addFirst(Long val){
-    // TODO Auto-generated method stub
-  }
-  @Override public void addLast(Long val){
-    // TODO Auto-generated method stub
-  }
-  @Override public omni.api.OmniIterator.OfLong descendingIterator(){
-    // TODO Auto-generated method stub
-    return null;
-  }
-  @Override public Long getFirst(){
-    // TODO Auto-generated method stub
-    return null;
-  }
-  @Override public long getFirstLong(){
-    // TODO Auto-generated method stub
-    return 0;
-  }
-  @Override public Long getLast(){
-    // TODO Auto-generated method stub
-    return null;
-  }
-  @Override public long getLastLong(){
-    // TODO Auto-generated method stub
-    return 0;
-  }
-  @Override public boolean offerFirst(long val){
-    // TODO Auto-generated method stub
-    return false;
-  }
-  @Override public boolean offerFirst(Long val){
-    // TODO Auto-generated method stub
-    return false;
-  }
-  @Override public boolean offerLast(long val){
-    // TODO Auto-generated method stub
-    return false;
-  }
-  @Override public boolean offerLast(Long val){
-    // TODO Auto-generated method stub
-    return false;
-  }
-  @Override public Long pollFirst(){
-    // TODO Auto-generated method stub
-    return null;
-  }
-  @Override public double pollFirstDouble(){
-    // TODO Auto-generated method stub
-    return 0;
-  }
-  @Override public float pollFirstFloat(){
-    // TODO Auto-generated method stub
-    return 0;
-  }
-  @Override public long pollFirstLong(){
-    // TODO Auto-generated method stub
-    return 0;
-  }
-  @Override public Long pollLast(){
-    // TODO Auto-generated method stub
-    return null;
-  }
-  @Override public double pollLastDouble(){
-    // TODO Auto-generated method stub
-    return 0;
-  }
-  @Override public float pollLastFloat(){
-    // TODO Auto-generated method stub
-    return 0;
-  }
-  @Override public long pollLastLong(){
-    // TODO Auto-generated method stub
-    return 0;
-  }
-  @Override public Long removeFirst(){
-    // TODO Auto-generated method stub
-    return null;
-  }
-  @Override public long removeFirstLong(){
-    // TODO Auto-generated method stub
-    return 0;
-  }
-  @Override public Long removeLast(){
-    // TODO Auto-generated method stub
-    return null;
-  }
-  @Override public long removeLastLong(){
-    // TODO Auto-generated method stub
-    return 0;
-  }
   @Override boolean collapseBody(Node head,Node tail,LongPredicate filter){
-    // TODO Auto-generated method stub
+    Node prev;
+    while((head=(prev=head).next)!=tail){
+      if(filter.test(head.val)){
+        int numRemoved;
+        for(numRemoved=1;(head=head.next)!=tail;++numRemoved){
+          if(!filter.test(head.val)){
+            numRemoved+=collapseBodyHelper(head,tail,filter);
+            break;
+          }
+        }
+        joinNodes(prev,head);
+        size-=numRemoved;
+        return true;
+      }
+    }
     return false;
   }
   @Override void collapseTail(Node head,Node tail,LongPredicate filter){
-    // TODO Auto-generated method stub
+    int numRemoved;
+    for(numRemoved=1;(tail=tail.prev)!=head;++numRemoved){
+      if(!filter.test(tail.val)){
+        numRemoved+=collapseBodyHelper(head,tail,filter);
+        break;
+      }
+    }
+    staticSetTail(this,tail);
+    size-=numRemoved;
   }
   @Override void findNewHead(Node head,LongPredicate filter){
-    // TODO Auto-generated method stub
+    final Node tail;
+    if((tail=this.tail)!=head){
+      if(filter.test(tail.val)){
+        collapseHeadAndTail(head,tail,filter);
+      }else{
+        collapseHead(head.next,tail,filter);
+      }
+    }else{
+      super.clear();
+    }
   }
-  @Override boolean uncheckedRemoveFirstMatch(Node head,long val){
-    // TODO Auto-generated method stub
-    return false;
+  @Override boolean uncheckedRemoveFirstMatch(Node curr,long val){
+    final var tail=this.tail;
+    if(curr.val==val){
+      if(curr==tail){
+        staticInit(this,null);
+      }else{
+        staticEraseHead(this,curr);
+      }
+    }else{
+      Node prev;
+      do{
+        if(curr==tail){ return false; }
+      }while((curr=(prev=curr).next).val!=val);
+      if(curr==tail){
+        staticSetTail(this,prev);
+      }else{
+        joinNodes(prev,curr.next);
+      }
+    }
+    --size;
+    return true;
   }
-  @Override public boolean equals(Object val){
-    // TODO Auto-generated method stub
-    return false;
+  private void collapseHead(Node headCandidate,Node tail,LongPredicate filter){
+    int numRemoved;
+    for(numRemoved=1;headCandidate!=tail;++numRemoved,headCandidate=headCandidate.next){
+      if(!filter.test(headCandidate.val)){
+        numRemoved+=collapseBodyHelper(headCandidate,tail,filter);
+        break;
+      }
+    }
+    staticSetHead(this,headCandidate);
+    size-=numRemoved;
+  }
+  private void collapseHeadAndTail(Node head,Node tail,LongPredicate filter){
+    for(int numRemoved=2;(head=head.next)!=tail;++numRemoved){
+      if(!filter.test(head.val)){
+        while((tail=tail.prev)!=head){
+          if(!filter.test(tail.val)){
+            numRemoved+=collapseBodyHelper(head,tail,filter);
+            break;
+          }
+          ++numRemoved;
+        }
+        staticSetHead(this,head);
+        staticSetTail(this,tail);
+        size-=numRemoved;
+        return;
+      }
+    }
+    super.clear();
+  }
+  private boolean uncheckedRemoveLastMatch(Node curr,long val){
+    final var head=this.head;
+    if(curr.val==val){
+      if(curr==head){
+        staticInit(this,null);
+      }else{
+        staticEraseTail(this,curr);
+      }
+    }else{
+      Node next;
+      do{
+        if(curr==head){ return false; }
+      }while((curr=(next=curr).prev).val!=val);
+      if(curr==head){
+        staticSetHead(this,next);
+      }else{
+        joinNodes(curr.prev,next);
+      }
+    }
+    --size;
+    return true;
   }
 }

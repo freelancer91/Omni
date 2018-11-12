@@ -14,9 +14,6 @@ public class UncheckedList extends AbstractSeq.Unchecked implements OmniList.OfB
   UncheckedList(int size,boolean[] arr){
     super(size,arr);
   }
-  @Override public void add(int index,Boolean val){
-    super.add(index,val);
-  }
   @Override public Object clone(){
     final boolean[] arr;
     final int size;
@@ -31,9 +28,6 @@ public class UncheckedList extends AbstractSeq.Unchecked implements OmniList.OfB
     // TODO Auto-generated method stub
     return false;
   }
-  @Override public Boolean get(int index){
-    return super.getBoolean(index);
-  }
   @Override public OmniIterator.OfBoolean iterator(){
     return new UncheckedAscendingItr(this);
   }
@@ -43,17 +37,11 @@ public class UncheckedList extends AbstractSeq.Unchecked implements OmniList.OfB
   @Override public OmniListIterator.OfBoolean listIterator(int index){
     return new UncheckedBidirectionalItr(this,index);
   }
-  @Override public Boolean remove(int index){
-    return super.removeBooleanAt(index);
-  }
   @Override public void reverseSort(){
     int size;
     if((size=this.size)>1){
       uncheckedReverseSort(arr,0,size-1);
     }
-  }
-  @Override public Boolean set(int index,Boolean val){
-    return super.set(index,val);
   }
   @Override public void sort(){
     int size;

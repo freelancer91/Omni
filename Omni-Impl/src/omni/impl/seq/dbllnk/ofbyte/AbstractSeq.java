@@ -867,6 +867,81 @@ abstract class AbstractSeq extends AbstractByteList implements OmniList.OfByte{
     }
   }
   static abstract class Unchecked extends AbstractSeq{
+    public byte removeFirstByte(){
+      Node head;
+      --size;
+      staticEraseHead(this,head=this.head);
+      return head.val;
+    }
+    public byte removeLastByte(){
+      Node tail;
+      --size;
+      staticEraseTail(this,tail=this.tail);
+      return tail.val;
+    }
+    public Byte pollFirst(){
+      Node head;
+      if((head=this.head)!=null){
+        --size;
+        staticEraseHead(this,head);
+        return head.val;
+      }
+      return null;
+    }
+    public double pollFirstDouble(){
+      Node head;
+      if((head=this.head)!=null){
+        --size;
+        staticEraseHead(this,head);
+        return head.val;
+      }
+      return Double.NaN;
+    }
+    public float pollFirstFloat(){
+      Node head;
+      if((head=this.head)!=null){
+        --size;
+        staticEraseHead(this,head);
+        return head.val;
+      }
+      return Float.NaN;
+    }
+    public long pollFirstLong(){
+      Node head;
+      if((head=this.head)!=null){
+        --size;
+        staticEraseHead(this,head);
+        return head.val;
+      }
+      return Long.MIN_VALUE;
+    }
+    public int pollFirstInt(){
+      Node head;
+      if((head=this.head)!=null){
+        --size;
+        staticEraseHead(this,head);
+        return head.val;
+      }
+      return Integer.MIN_VALUE;
+    }
+    public short pollFirstShort(){
+      Node head;
+      if((head=this.head)!=null){
+        --size;
+        staticEraseHead(this,head);
+        return head.val;
+      }
+      return Short.MIN_VALUE;
+    }
+    public byte pollFirstByte(){
+      Node head;
+      if((head=this.head)!=null){
+        --size;
+        staticEraseHead(this,head);
+        return head.val;
+      }
+      return Byte.MIN_VALUE;
+    }
     Unchecked(){
       super();
     }

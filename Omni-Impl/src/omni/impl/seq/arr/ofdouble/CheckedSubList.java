@@ -41,9 +41,6 @@ class CheckedSubList extends AbstractSeq.Checked.AbstractSubList implements Omni
   @Override public boolean add(int val){
     return super.add(val);
   }
-  @Override public void add(int index,Double val){
-    super.add(index,val);
-  }
   @Override public boolean add(long val){
     return super.add(val);
   }
@@ -86,8 +83,12 @@ class CheckedSubList extends AbstractSeq.Checked.AbstractSubList implements Omni
   }
   @Override public boolean contains(int val){
     final var root=checkModCountAndGetRoot();
-    final int size;
-    return (size=this.size)!=0&&uncheckedContains(root,size,val);
+    int size;
+    if((size=this.size)!=0){
+      if(val!=0){ return uncheckedContainsDblBits(root,size,Double.doubleToRawLongBits(val)); }
+      return uncheckedContainsDbl0(root,size);
+    }
+    return false;
   }
   @Override public boolean contains(long val){
     final var root=checkModCountAndGetRoot();
@@ -123,9 +124,6 @@ class CheckedSubList extends AbstractSeq.Checked.AbstractSubList implements Omni
     }else{
       CheckedCollection.checkModCount(modCount,root.modCount);
     }
-  }
-  @Override public Double get(int index){
-    return super.getDouble(index);
   }
   @Override public int indexOf(boolean val){
     final var root=checkModCountAndGetRoot();
@@ -184,54 +182,61 @@ class CheckedSubList extends AbstractSeq.Checked.AbstractSubList implements Omni
     return new CheckedBidirectionalSubItr(this,modCount);
   }
   @Override public int lastIndexOf(boolean val){
-    final var root=checkModCountAndGetRoot();
     int size;
     if((size=this.size)!=0){
-      if(val){ return uncheckedLastIndexOfDblBits(root,size,TypeUtil.DBL_TRUE_BITS); }
-      return uncheckedLastIndexOfDbl0(root,size);
+      if(val){ return super.uncheckedLastIndexOfDblBits(size,TypeUtil.DBL_TRUE_BITS); }
+      return super.uncheckedLastIndexOfDbl0(size);
     }
+    CheckedCollection.checkModCount(modCount,root.modCount);
     return -1;
   }
+  private int uncheckedLastIndexOf(int size,double val){
+    if(val==val){ return super.uncheckedLastIndexOfDblBits(size,Double.doubleToRawLongBits(val)); }
+    return super.uncheckedLastIndexOfDblNaN(size);
+  }
   @Override public int lastIndexOf(double val){
-    final var root=checkModCountAndGetRoot();
     int size;
-    if((size=this.size)!=0){ return uncheckedLastIndexOf(root,size,val); }
+    if((size=this.size)!=0){ return uncheckedLastIndexOf(size,val); }
+    CheckedCollection.checkModCount(modCount,root.modCount);
     return -1;
   }
   @Override public int lastIndexOf(float val){
-    final var root=checkModCountAndGetRoot();
     int size;
     if((size=this.size)!=0){
-      if(val==val){ return uncheckedLastIndexOfDblBits(root,size,Double.doubleToRawLongBits(val)); }
-      return uncheckedLastIndexOfDblNaN(root,size);
+      if(val==val){ return super.uncheckedLastIndexOfDblBits(size,Double.doubleToRawLongBits(val)); }
+      return super.uncheckedLastIndexOfDblNaN(size);
     }
+    CheckedCollection.checkModCount(modCount,root.modCount);
     return -1;
   }
   @Override public int lastIndexOf(int val){
-    final var root=checkModCountAndGetRoot();
     int size;
     if((size=this.size)!=0){
-      if(val!=0){ return uncheckedLastIndexOfDblBits(root,size,Double.doubleToRawLongBits(val)); }
-      return uncheckedLastIndexOfDbl0(root,size);
+      if(val!=0){ return super.uncheckedLastIndexOfDblBits(size,Double.doubleToRawLongBits(val)); }
+      return super.uncheckedLastIndexOfDbl0(size);
     }
+    CheckedCollection.checkModCount(modCount,root.modCount);
     return -1;
   }
   @Override public int lastIndexOf(long val){
-    final var root=checkModCountAndGetRoot();
     int size;
     if((size=this.size)!=0){
       if(val!=0){
-        if(!TypeUtil.checkCastToDouble(val)){ return -1; }
-        return uncheckedLastIndexOfDblBits(root,size,Double.doubleToRawLongBits(val));
+        if(!TypeUtil.checkCastToDouble(val)){
+          CheckedCollection.checkModCount(modCount,root.modCount);
+          return -1;
+        }
+        return super.uncheckedLastIndexOfDblBits(size,Double.doubleToRawLongBits(val));
       }
-      return uncheckedLastIndexOfDbl0(root,size);
+      return super.uncheckedLastIndexOfDbl0(size);
     }
+    CheckedCollection.checkModCount(modCount,root.modCount);
     return -1;
   }
   @Override public int lastIndexOf(Object val){
-    final var root=checkModCountAndGetRoot();
     int size;
-    if((size=this.size)!=0&&val instanceof Double){ return uncheckedLastIndexOf(root,size,(double)val); }
+    if((size=this.size)!=0&&val instanceof Double){ return uncheckedLastIndexOf(size,(double)val); }
+    CheckedCollection.checkModCount(modCount,root.modCount);
     return -1;
   }
   @Override public OmniListIterator.OfDouble listIterator(){
@@ -252,9 +257,6 @@ class CheckedSubList extends AbstractSeq.Checked.AbstractSubList implements Omni
     CheckedCollection.checkLo(index);
     CheckedCollection.checkReadHi(index,size);
     root.arr[index+rootOffset]=val;
-  }
-  @Override public Double remove(int index){
-    return super.removeDoubleAt(index);
   }
   @Override public boolean remove(Object val){
     final int size;
@@ -288,7 +290,10 @@ class CheckedSubList extends AbstractSeq.Checked.AbstractSubList implements Omni
   }
   @Override public boolean removeVal(int val){
     final int size;
-    if((size=this.size)!=0){ return uncheckedRemove(size,val); }
+    if((size=this.size)!=0){
+      if(val!=0){ return uncheckedRemoveDblBits(size,Double.doubleToRawLongBits(val)); }
+      return uncheckedRemoveDbl0(size);
+    }
     CheckedCollection.checkModCount(modCount,root.modCount);
     return false;
   }
@@ -332,9 +337,6 @@ class CheckedSubList extends AbstractSeq.Checked.AbstractSubList implements Omni
       this.modCount=modCount;
       bubbleUpIncrementModCount(parent);
     }
-  }
-  @Override public Double set(int index,Double val){
-    return super.set(index,val);
   }
   @Override public void sort(){
     int modCount;
@@ -425,10 +427,6 @@ class CheckedSubList extends AbstractSeq.Checked.AbstractSubList implements Omni
     if(val==val){ return uncheckedContainsDblBits(root,size,Double.doubleToRawLongBits(val)); }
     return uncheckedContainsDblNaN(root,size);
   }
-  private boolean uncheckedContains(AbstractSeq.Checked root,int size,int val){
-    if(val!=0){ return uncheckedContainsDblBits(root,size,Double.doubleToRawLongBits(val)); }
-    return uncheckedContainsDbl0(root,size);
-  }
   private boolean uncheckedContainsDbl0(AbstractSeq.Checked root,int size){
     final int rootOffset;
     return AbstractSeq.uncheckedAnyMatchesDbl0(root.arr,rootOffset=this.rootOffset,rootOffset+size);
@@ -467,29 +465,9 @@ class CheckedSubList extends AbstractSeq.Checked.AbstractSubList implements Omni
     final int rootOffset;
     return AbstractSeq.uncheckedIndexOfDblNaN(root.arr,rootOffset=this.rootOffset,rootOffset+size);
   }
-  private int uncheckedLastIndexOf(AbstractSeq.Checked root,int size,double val){
-    if(val==val){ return uncheckedLastIndexOfDblBits(root,size,Double.doubleToRawLongBits(val)); }
-    return uncheckedLastIndexOfDblNaN(root,size);
-  }
-  private int uncheckedLastIndexOfDbl0(AbstractSeq.Checked root,int size){
-    final int rootOffset;
-    return AbstractSeq.uncheckedLastIndexOfDbl0(root.arr,rootOffset=this.rootOffset,rootOffset+size);
-  }
-  private int uncheckedLastIndexOfDblBits(AbstractSeq.Checked root,int size,long dblBits){
-    final int rootOffset;
-    return AbstractSeq.uncheckedLastIndexOfDblBits(root.arr,rootOffset=this.rootOffset,rootOffset+size,dblBits);
-  }
-  private int uncheckedLastIndexOfDblNaN(AbstractSeq.Checked root,int size){
-    final int rootOffset;
-    return AbstractSeq.uncheckedLastIndexOfDblNaN(root.arr,rootOffset=this.rootOffset,rootOffset+size);
-  }
   private boolean uncheckedRemove(int size,double val){
     if(val==val){ return uncheckedRemoveDblBits(size,Double.doubleToRawLongBits(val)); }
     return uncheckedRemoveDblNaN(size);
-  }
-  private boolean uncheckedRemove(int size,int val){
-    if(val!=0){ return uncheckedRemoveDblBits(size,Double.doubleToRawLongBits(val)); }
-    return uncheckedRemoveDbl0(size);
   }
   private boolean uncheckedRemoveDbl0(int size){
     int modCount;

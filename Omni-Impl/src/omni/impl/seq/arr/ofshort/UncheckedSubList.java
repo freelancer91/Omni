@@ -22,9 +22,6 @@ class UncheckedSubList extends AbstractSeq.Unchecked.AbstractSubList implements 
   @Override public boolean add(boolean val){
     return super.add(TypeUtil.castToByte(val));
   }
-  @Override public void add(int index,Short val){
-    super.add(index,val);
-  }
   @Override public boolean add(Short val){
     return super.add(val);
   }
@@ -95,9 +92,6 @@ class UncheckedSubList extends AbstractSeq.Unchecked.AbstractSubList implements 
       final int rootOffset;
       AbstractSeq.uncheckedForwardForEachInRange(root.arr,rootOffset=this.rootOffset,rootOffset+size,action);
     }
-  }
-  @Override public Short get(int index){
-    return super.getShort(index);
   }
   @Override public int hashCode(){
     final int size;
@@ -175,79 +169,11 @@ class UncheckedSubList extends AbstractSeq.Unchecked.AbstractSubList implements 
   @Override public OmniIterator.OfShort iterator(){
     return new UncheckedAscendingSubItr(this);
   }
-  @Override public int lastIndexOf(boolean val){
-    final int size;
-    if((size=this.size)!=0){
-      final int rootOffset;
-      return AbstractSeq.uncheckedLastIndexOfMatch(root.arr,rootOffset=this.rootOffset,rootOffset+size,
-          TypeUtil.castToByte(val));
-    }
-    return -1;
-  }
-  @Override public int lastIndexOf(char val){
-    final int size;
-    if(val<=Short.MAX_VALUE&&(size=this.size)!=0){
-      final int rootOffset;
-      return AbstractSeq.uncheckedLastIndexOfMatch(root.arr,rootOffset=this.rootOffset,rootOffset+size,val);
-    }
-    return -1;
-  }
-  @Override public int lastIndexOf(double val){
-    final int size,v;
-    if((size=this.size)!=0&&val==(v=(short)val)){
-      final int rootOffset;
-      return AbstractSeq.uncheckedLastIndexOfMatch(root.arr,rootOffset=this.rootOffset,rootOffset+size,v);
-    }
-    return -1;
-  }
-  @Override public int lastIndexOf(float val){
-    final int size,v;
-    if((size=this.size)!=0&&val==(v=(short)val)){
-      final int rootOffset;
-      return AbstractSeq.uncheckedLastIndexOfMatch(root.arr,rootOffset=this.rootOffset,rootOffset+size,v);
-    }
-    return -1;
-  }
-  @Override public int lastIndexOf(int val){
-    final int size;
-    if((size=this.size)!=0&&val==(short)val){
-      final int rootOffset;
-      return AbstractSeq.uncheckedLastIndexOfMatch(root.arr,rootOffset=this.rootOffset,rootOffset+size,val);
-    }
-    return -1;
-  }
-  @Override public int lastIndexOf(long val){
-    final int size,v;
-    if((size=this.size)!=0&&val==(v=(short)val)){
-      final int rootOffset;
-      return AbstractSeq.uncheckedLastIndexOfMatch(root.arr,rootOffset=this.rootOffset,rootOffset+size,v);
-    }
-    return -1;
-  }
-  @Override public int lastIndexOf(Object val){
-    final int size;
-    if((size=this.size)!=0&&val instanceof Short){
-      final int rootOffset;
-      return AbstractSeq.uncheckedLastIndexOfMatch(root.arr,rootOffset=this.rootOffset,rootOffset+size,(short)val);
-    }
-    return -1;
-  }
-  @Override public int lastIndexOf(short val){
-    final int size;
-    if((size=this.size)!=0){
-      final int rootOffset;
-      return AbstractSeq.uncheckedLastIndexOfMatch(root.arr,rootOffset=this.rootOffset,rootOffset+size,val);
-    }
-    return -1;
-  }
   @Override public OmniListIterator.OfShort listIterator(){
     return new UncheckedBidirectionalSubItr(this);
   }
   @Override public OmniListIterator.OfShort listIterator(int index){
     return new UncheckedBidirectionalSubItr(this,index+rootOffset);
-  }
-  @Override public Short remove(int index){
-    return super.removeShortAt(index);
   }
   @Override public boolean remove(Object val){
     final int size;
@@ -301,9 +227,6 @@ class UncheckedSubList extends AbstractSeq.Unchecked.AbstractSubList implements 
       final int rootOffset;
       AbstractSeq.uncheckedReverseSort(root.arr,rootOffset=this.rootOffset,size+rootOffset-1);
     }
-  }
-  @Override public Short set(int index,Short val){
-    return super.set(index,val);
   }
   @Override public void sort(){
     int size;

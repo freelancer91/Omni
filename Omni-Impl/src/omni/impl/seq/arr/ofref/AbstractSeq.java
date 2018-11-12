@@ -7,7 +7,6 @@ import java.util.function.IntFunction;
 import java.util.function.Predicate;
 import omni.impl.CheckedCollection;
 import omni.impl.seq.AbstractRefList;
-import omni.impl.seq.arr.AbstractSubArrSeq;
 import omni.util.ArrCopy;
 import omni.util.BitSetUtils;
 import omni.util.OmniArray;
@@ -746,7 +745,7 @@ abstract class AbstractSeq<E>extends AbstractRefList<E>{
         this.lastRet=-1;
       }
     }
-    static abstract class AbstractSubList<E>extends AbstractSubArrSeq{
+    static abstract class AbstractSubList<E>extends AbstractRefList<E>{
       transient final Checked<E> root;
       transient final Checked.AbstractSubList<E> parent;
       transient int modCount;
@@ -764,17 +763,40 @@ abstract class AbstractSeq<E>extends AbstractRefList<E>{
           parent=parent.parent;
         }
       }
-      AbstractSubList(Checked<E> root,Checked.AbstractSubList<E> parent,int rootOffset,int size,int modCount){
-        super(rootOffset,size);
+      @Override protected int uncheckedLastIndexOfMatch(int size,Predicate<Object> pred){
+        Checked<E> root;
+        CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+        int rootOffset;
+        return AbstractSeq.uncheckedLastIndexOfMatch(root.arr,rootOffset=this.rootOffset,rootOffset+size,pred);
+      }
+      @Override protected int uncheckedLastIndexOfNonNull(int size,Object nonNull){
+        final int modCount=this.modCount;
+        final var root=this.root;
+        try{
+          int rootOffset;
+          return AbstractSeq.uncheckedLastIndexOfMatch(root.arr,rootOffset=this.rootOffset,rootOffset+size,
+              nonNull::equals);
+        }finally{
+          CheckedCollection.checkModCount(modCount,root.modCount);
+        }
+      }
+      transient final int rootOffset;
+      int getBound(){
+        return size+rootOffset;
+      }
+      AbstractSubList(Checked<E> root,AbstractSubList<E> parent,int rootOffset,int size,int modCount){
+        super(size);
+        this.rootOffset=rootOffset;
         this.root=root;
         this.parent=parent;
         this.modCount=modCount;
       }
       AbstractSubList(Checked<E> root,int rootOffset,int size){
-        super(rootOffset,size);
+        super(size);
+        this.rootOffset=rootOffset;
         this.root=root;
-        this.parent=null;
-        this.modCount=root.modCount;
+        parent=null;
+        modCount=root.modCount;
       }
       public boolean add(E val){
         final Checked<E> root;
@@ -1004,7 +1026,16 @@ abstract class AbstractSeq<E>extends AbstractRefList<E>{
         this.cursor=cursor+1;
       }
     }
-    static abstract class AbstractSubList<E>extends AbstractSubArrSeq{
+    static abstract class AbstractSubList<E>extends AbstractRefList<E>{
+      @Override protected int uncheckedLastIndexOfNonNull(int size,Object nonNull){
+        int rootOffset;
+        return AbstractSeq.uncheckedLastIndexOfMatch(root.arr,rootOffset=this.rootOffset,rootOffset+size,
+            nonNull::equals);
+      }
+      @Override protected int uncheckedLastIndexOfMatch(int size,Predicate<Object> pred){
+        int rootOffset;
+        return AbstractSeq.uncheckedLastIndexOfMatch(root.arr,rootOffset=this.rootOffset,rootOffset+size,pred);
+      }
       transient final Unchecked<E> root;
       transient final AbstractSubList<E> parent;
       private static void bubbleUpDecrementSize(AbstractSubList<?> parent,int numToRemove){
@@ -1019,15 +1050,21 @@ abstract class AbstractSeq<E>extends AbstractRefList<E>{
           parent=parent.parent;
         }
       }
+      transient final int rootOffset;
+      int getBound(){
+        return this.rootOffset+size;
+      }
       AbstractSubList(Unchecked<E> root,AbstractSubList<E> parent,int rootOffset,int size){
-        super(rootOffset,size);
+        super(size);
+        this.rootOffset=rootOffset;
         this.root=root;
         this.parent=parent;
       }
       AbstractSubList(Unchecked<E> root,int rootOffset,int size){
-        super(rootOffset,size);
+        super(size);
+        this.rootOffset=rootOffset;
         this.root=root;
-        this.parent=null;
+        parent=null;
       }
       public boolean add(E val){
         final AbstractSeq<E> root;

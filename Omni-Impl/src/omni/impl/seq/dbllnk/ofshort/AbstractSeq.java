@@ -825,6 +825,72 @@ abstract class AbstractSeq extends AbstractShortList implements OmniList.OfShort
     }
   }
   static abstract class Unchecked extends AbstractSeq{
+    public short removeFirstShort(){
+      Node head;
+      --size;
+      staticEraseHead(this,head=this.head);
+      return head.val;
+    }
+    public short removeLastShort(){
+      Node tail;
+      --size;
+      staticEraseTail(this,tail=this.tail);
+      return tail.val;
+    }
+    public Short pollFirst(){
+      Node head;
+      if((head=this.head)!=null){
+        --size;
+        staticEraseHead(this,head);
+        return head.val;
+      }
+      return null;
+    }
+    public double pollFirstDouble(){
+      Node head;
+      if((head=this.head)!=null){
+        --size;
+        staticEraseHead(this,head);
+        return head.val;
+      }
+      return Double.NaN;
+    }
+    public float pollFirstFloat(){
+      Node head;
+      if((head=this.head)!=null){
+        --size;
+        staticEraseHead(this,head);
+        return head.val;
+      }
+      return Float.NaN;
+    }
+    public long pollFirstLong(){
+      Node head;
+      if((head=this.head)!=null){
+        --size;
+        staticEraseHead(this,head);
+        return head.val;
+      }
+      return Long.MIN_VALUE;
+    }
+    public int pollFirstInt(){
+      Node head;
+      if((head=this.head)!=null){
+        --size;
+        staticEraseHead(this,head);
+        return head.val;
+      }
+      return Integer.MIN_VALUE;
+    }
+    public short pollFirstShort(){
+      Node head;
+      if((head=this.head)!=null){
+        --size;
+        staticEraseHead(this,head);
+        return head.val;
+      }
+      return Short.MIN_VALUE;
+    }
     Unchecked(){
       super();
     }

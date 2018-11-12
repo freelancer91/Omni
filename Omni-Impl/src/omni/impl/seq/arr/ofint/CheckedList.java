@@ -15,9 +15,6 @@ public class CheckedList extends AbstractSeq.Checked implements OmniList.OfInt{
   CheckedList(int size,int[] arr){
     super(size,arr);
   }
-  @Override public void add(int index,Integer val){
-    super.add(index,val);
-  }
   @Override public Object clone(){
     final int[] arr;
     final int size;
@@ -32,9 +29,6 @@ public class CheckedList extends AbstractSeq.Checked implements OmniList.OfInt{
     // TODO Auto-generated method stub
     return false;
   }
-  @Override public Integer get(int index){
-    return super.getInt(index);
-  }
   @Override public OmniIterator.OfInt iterator(){
     return new CheckedBidirectionalItr(this);
   }
@@ -46,18 +40,12 @@ public class CheckedList extends AbstractSeq.Checked implements OmniList.OfInt{
     CheckedCollection.checkWriteHi(index,size);
     return new CheckedBidirectionalItr(this,index);
   }
-  @Override public Integer remove(int index){
-    return super.removeIntAt(index);
-  }
   @Override public void reverseSort(){
     final int size;
     if((size=this.size)>1){
       uncheckedReverseSort(arr,0,size-1);
       ++modCount;
     }
-  }
-  @Override public Integer set(int index,Integer val){
-    return super.set(index,val);
   }
   @Override public void sort(){
     final int size;

@@ -14,9 +14,6 @@ public class UncheckedList extends AbstractSeq.Unchecked implements OmniList.OfS
   UncheckedList(int size,short[] arr){
     super(size,arr);
   }
-  @Override public void add(int index,Short val){
-    super.add(index,val);
-  }
   @Override public Object clone(){
     final short[] arr;
     final int size;
@@ -31,9 +28,6 @@ public class UncheckedList extends AbstractSeq.Unchecked implements OmniList.OfS
     // TODO Auto-generated method stub
     return false;
   }
-  @Override public Short get(int index){
-    return super.getShort(index);
-  }
   @Override public OmniIterator.OfShort iterator(){
     return new UncheckedAscendingItr(this);
   }
@@ -43,17 +37,11 @@ public class UncheckedList extends AbstractSeq.Unchecked implements OmniList.OfS
   @Override public OmniListIterator.OfShort listIterator(int index){
     return new UncheckedBidirectionalItr(this,index);
   }
-  @Override public Short remove(int index){
-    return super.removeShortAt(index);
-  }
   @Override public void reverseSort(){
     int size;
     if((size=this.size)>1){
       uncheckedReverseSort(arr,0,size-1);
     }
-  }
-  @Override public Short set(int index,Short val){
-    return super.set(index,val);
   }
   @Override public void sort(){
     int size;

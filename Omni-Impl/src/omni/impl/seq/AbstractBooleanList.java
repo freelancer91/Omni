@@ -7,6 +7,22 @@ public abstract class AbstractBooleanList extends AbstractSeq{
   protected AbstractBooleanList(int size){
     super(size);
   }
+  protected abstract boolean getBoolean(int index);
+  public Boolean get(int index){
+    return getBoolean(index);
+  }
+  protected abstract boolean removeBooleanAt(int index);
+  public Boolean remove(int index){
+    return removeBooleanAt(index);
+  }
+  protected abstract boolean set(int index,boolean val);
+  public Boolean set(int index,Boolean val){
+    return set(index,(boolean)val);
+  }
+  protected abstract void add(int index,boolean val);
+  public void add(int index,Boolean val){
+    add(index,(boolean)val);
+  }
   public int lastIndexOf(boolean val){
     final int size;
     if((size=this.size)!=0){ return uncheckedLastIndexOfMatch(size,val); }
@@ -33,14 +49,14 @@ public abstract class AbstractBooleanList extends AbstractSeq{
     if((size=this.size)!=0){
       final boolean v;
       switch(Float.floatToRawIntBits(val)){
-      default:
-        return -1;
-      case 0:
-      case Integer.MIN_VALUE:
-        v=false;
-        break;
-      case TypeUtil.FLT_TRUE_BITS:
-        v=true;
+        default:
+          return -1;
+        case 0:
+        case Integer.MIN_VALUE:
+          v=false;
+          break;
+        case TypeUtil.FLT_TRUE_BITS:
+          v=true;
       }
       return uncheckedLastIndexOfMatch(size,v);
     }
@@ -51,13 +67,13 @@ public abstract class AbstractBooleanList extends AbstractSeq{
     if((size=this.size)!=0){
       final boolean v;
       switch(val){
-      default:
-        return -1;
-      case 0:
-        v=false;
-        break;
-      case 1:
-        v=true;
+        default:
+          return -1;
+        case 0:
+          v=false;
+          break;
+        case 1:
+          v=true;
       }
       return uncheckedLastIndexOfMatch(size,v);
     }

@@ -34,9 +34,6 @@ class UncheckedSubList extends AbstractSeq.Unchecked.AbstractSubList implements 
   @Override public boolean add(int val){
     return super.add(val);
   }
-  @Override public void add(int index,Double val){
-    super.add(index,val);
-  }
   @Override public boolean add(long val){
     return super.add(val);
   }
@@ -75,9 +72,12 @@ class UncheckedSubList extends AbstractSeq.Unchecked.AbstractSubList implements 
     return false;
   }
   @Override public boolean contains(int val){
-    final int size,rootOffset;
-    return (size=this.size)!=0
-        &&AbstractSeq.uncheckedAnyMatches(root.arr,rootOffset=this.rootOffset,rootOffset+size,val);
+    int size;
+    if((size=this.size)!=0){
+      if(val!=0){ return uncheckedContainsDblBits(size,Double.doubleToRawLongBits(val)); }
+      return uncheckedContainsDbl0(size);
+    }
+    return false;
   }
   @Override public boolean contains(long val){
     int size;
@@ -110,9 +110,6 @@ class UncheckedSubList extends AbstractSeq.Unchecked.AbstractSubList implements 
       final int rootOffset;
       AbstractSeq.uncheckedForwardForEachInRange(root.arr,rootOffset=this.rootOffset,rootOffset+size,action);
     }
-  }
-  @Override public Double get(int index){
-    return super.getDouble(index);
   }
   @Override public int hashCode(){
     final int size;
@@ -176,65 +173,11 @@ class UncheckedSubList extends AbstractSeq.Unchecked.AbstractSubList implements 
   @Override public OmniIterator.OfDouble iterator(){
     return new UncheckedAscendingSubItr(this);
   }
-  @Override public int lastIndexOf(boolean val){
-    int size;
-    if((size=this.size)!=0){
-      if(val){ return uncheckedLastIndexOfDblBits(size,TypeUtil.DBL_TRUE_BITS); }
-      return uncheckedLastIndexOfDbl0(size);
-    }
-    return -1;
-  }
-  @Override public int lastIndexOf(double val){
-    final int size;
-    if((size=this.size)!=0){
-      final int rootOffset;
-      return AbstractSeq.uncheckedLastIndexOfMatch(root.arr,rootOffset=this.rootOffset,rootOffset+size,val);
-    }
-    return -1;
-  }
-  @Override public int lastIndexOf(float val){
-    int size;
-    if((size=this.size)!=0){
-      if(val==val){ return uncheckedLastIndexOfDblBits(size,Double.doubleToRawLongBits(val)); }
-      return uncheckedLastIndexOfDblNaN(size);
-    }
-    return -1;
-  }
-  @Override public int lastIndexOf(int val){
-    int size;
-    if((size=this.size)!=0){
-      if(val!=0){ return uncheckedLastIndexOfDblBits(size,Double.doubleToRawLongBits(val)); }
-      return uncheckedLastIndexOfDbl0(size);
-    }
-    return -1;
-  }
-  @Override public int lastIndexOf(long val){
-    int size;
-    if((size=this.size)!=0){
-      if(val!=0){
-        if(!TypeUtil.checkCastToDouble(val)){ return -1; }
-        return uncheckedLastIndexOfDblBits(size,Double.doubleToRawLongBits(val));
-      }
-      return uncheckedLastIndexOfDbl0(size);
-    }
-    return -1;
-  }
-  @Override public int lastIndexOf(Object val){
-    final int size;
-    if((size=this.size)!=0&&val instanceof Double){
-      final int rootOffset;
-      return AbstractSeq.uncheckedLastIndexOfMatch(root.arr,rootOffset=this.rootOffset,rootOffset+size,(double)val);
-    }
-    return -1;
-  }
   @Override public OmniListIterator.OfDouble listIterator(){
     return new UncheckedBidirectionalSubItr(this);
   }
   @Override public OmniListIterator.OfDouble listIterator(int index){
     return new UncheckedBidirectionalSubItr(this,index+rootOffset);
-  }
-  @Override public Double remove(int index){
-    return super.removeDoubleAt(index);
   }
   @Override public boolean remove(Object val){
     final int size;
@@ -262,7 +205,11 @@ class UncheckedSubList extends AbstractSeq.Unchecked.AbstractSubList implements 
   }
   @Override public boolean removeVal(int val){
     final int size;
-    return (size=this.size)!=0&&uncheckedRemove(size,val);
+    if((size=this.size)!=0){
+      if(val!=0){ return uncheckedRemoveDblBits(size,Double.doubleToRawLongBits(val)); }
+      return uncheckedRemoveDbl0(size);
+    }
+    return false;
   }
   @Override public boolean removeVal(long val){
     final int size;
@@ -293,9 +240,6 @@ class UncheckedSubList extends AbstractSeq.Unchecked.AbstractSubList implements 
       final int rootOffset;
       AbstractSeq.uncheckedReverseSort(root.arr,rootOffset=this.rootOffset,size+rootOffset-1);
     }
-  }
-  @Override public Double set(int index,Double val){
-    return super.set(index,val);
   }
   @Override public void sort(){
     int size;
@@ -390,25 +334,9 @@ class UncheckedSubList extends AbstractSeq.Unchecked.AbstractSubList implements 
     final int rootOffset;
     return AbstractSeq.uncheckedIndexOfDblNaN(root.arr,rootOffset=this.rootOffset,rootOffset+size);
   }
-  private int uncheckedLastIndexOfDbl0(int size){
-    final int rootOffset;
-    return AbstractSeq.uncheckedLastIndexOfDbl0(root.arr,rootOffset=this.rootOffset,rootOffset+size);
-  }
-  private int uncheckedLastIndexOfDblBits(int size,long dblBits){
-    final int rootOffset;
-    return AbstractSeq.uncheckedLastIndexOfDblBits(root.arr,rootOffset=this.rootOffset,rootOffset+size,dblBits);
-  }
-  private int uncheckedLastIndexOfDblNaN(int size){
-    final int rootOffset;
-    return AbstractSeq.uncheckedLastIndexOfDblNaN(root.arr,rootOffset=this.rootOffset,rootOffset+size);
-  }
   private boolean uncheckedRemove(int size,double val){
     if(val==val){ return uncheckedRemoveDblBits(size,Double.doubleToRawLongBits(val)); }
     return uncheckedRemoveDblNaN(size);
-  }
-  private boolean uncheckedRemove(int size,int val){
-    if(val!=0){ return uncheckedRemoveDblBits(size,Double.doubleToRawLongBits(val)); }
-    return uncheckedRemoveDbl0(size);
   }
   private boolean uncheckedRemoveDbl0(int size){
     int offset;

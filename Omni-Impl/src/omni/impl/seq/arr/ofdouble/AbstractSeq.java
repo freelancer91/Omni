@@ -11,7 +11,6 @@ import java.util.function.UnaryOperator;
 import omni.function.DoubleComparator;
 import omni.impl.CheckedCollection;
 import omni.impl.seq.AbstractDoubleList;
-import omni.impl.seq.arr.AbstractSubArrSeq;
 import omni.util.ArrCopy;
 import omni.util.BitSetUtils;
 import omni.util.HashUtils;
@@ -46,10 +45,6 @@ abstract class AbstractSeq extends AbstractDoubleList{
   static boolean uncheckedAnyMatches(double[] arr,int offset,int bound,double val){
     if(val==val){ return uncheckedAnyMatchesDblBits(arr,offset,bound,Double.doubleToRawLongBits(val)); }
     return uncheckedAnyMatchesDblNaN(arr,offset,bound);
-  }
-  static boolean uncheckedAnyMatches(double[] arr,int offset,int bound,int val){
-    if(val!=0){ return uncheckedAnyMatchesDblBits(arr,offset,bound,Double.doubleToRawLongBits(val)); }
-    return uncheckedAnyMatchesDbl0(arr,offset,bound);
   }
   static boolean uncheckedAnyMatchesDbl0(double[] arr,int offset,int bound){
     while(arr[offset]!=0){
@@ -190,7 +185,12 @@ abstract class AbstractSeq extends AbstractDoubleList{
   }
   @Override public boolean contains(int val){
     final int size;
-    return (size=this.size)!=0&&uncheckedAnyMatches(arr,0,size,val);
+    if((size=this.size)!=0){
+      final var arr=this.arr;
+      if(val!=0){ return uncheckedAnyMatchesDblBits(arr,0,size,Double.doubleToRawLongBits(val)); }
+      return uncheckedAnyMatchesDbl0(arr,0,size);
+    }
+    return false;
   }
   public boolean contains(long val){
     final int size;
@@ -217,7 +217,7 @@ abstract class AbstractSeq extends AbstractDoubleList{
       uncheckedForEach(size,action);
     }
   }
-  public double getDouble(int index){
+  @Override public double getDouble(int index){
     return arr[index];
   }
   @Override public int hashCode(){
@@ -325,7 +325,11 @@ abstract class AbstractSeq extends AbstractDoubleList{
   }
   @Override public boolean removeVal(int val){
     final int size;
-    return (size=this.size)!=0&&uncheckedRemoveFirstMatch(size,val);
+    if((size=this.size)!=0){
+      if(val!=0){ return uncheckedRemoveFirstDblBits(size,Double.doubleToRawLongBits(val)); }
+      return uncheckedRemoveFirstDbl0(size);
+    }
+    return false;
   }
   public boolean removeVal(long val){
     final int size;
@@ -393,7 +397,7 @@ abstract class AbstractSeq extends AbstractDoubleList{
     if((size=this.size)!=0&&val instanceof Double){ return uncheckedSearch(size,(double)val); }
     return -1;
   }
-  public double set(int index,double val){
+  @Override public double set(int index,double val){
     final double[] arr;
     final var oldVal=(arr=this.arr)[index];
     arr[index]=val;
@@ -566,10 +570,6 @@ abstract class AbstractSeq extends AbstractDoubleList{
     if(val==val){ return uncheckedRemoveFirstDblBits(size,Double.doubleToRawLongBits(val)); }
     return uncheckedRemoveFirstDblNaN(size);
   }
-  private boolean uncheckedRemoveFirstMatch(int size,int val){
-    if(val!=0){ return uncheckedRemoveFirstDblBits(size,Double.doubleToRawLongBits(val)); }
-    return uncheckedRemoveFirstDbl0(size);
-  }
   private int uncheckedSearch(int size,double val){
     if(val==val){ return uncheckedSearchDblBits(size,Double.doubleToRawLongBits(val)); }
     return uncheckedSearchDblNaN(size);
@@ -671,7 +671,7 @@ abstract class AbstractSeq extends AbstractDoubleList{
       super.push(val);
       return true;
     }
-    public void add(int index,double val){
+    @Override public void add(int index,double val){
       CheckedCollection.checkLo(index);
       final int size;
       CheckedCollection.checkWriteHi(index,size=this.size);
@@ -720,7 +720,7 @@ abstract class AbstractSeq extends AbstractDoubleList{
       CheckedCollection.checkReadHi(index,size);
       super.put(index,val);
     }
-    public double removeDoubleAt(int index){
+    @Override public double removeDoubleAt(int index){
       CheckedCollection.checkLo(index);
       int size;
       CheckedCollection.checkReadHi(index,size=this.size);
@@ -835,7 +835,25 @@ abstract class AbstractSeq extends AbstractDoubleList{
         lastRet=-1;
       }
     }
-    static abstract class AbstractSubList extends AbstractSubArrSeq.OfDouble{
+    static abstract class AbstractSubList extends AbstractDoubleList{
+      @Override protected int uncheckedLastIndexOfDbl0(int size){
+        Checked root;
+        CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+        final int rootOffset;
+        return AbstractSeq.uncheckedLastIndexOfDbl0(root.arr,rootOffset=this.rootOffset,rootOffset+size);
+      }
+      @Override protected int uncheckedLastIndexOfDblBits(int size,long dblBits){
+        Checked root;
+        CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+        final int rootOffset;
+        return AbstractSeq.uncheckedLastIndexOfDblBits(root.arr,rootOffset=this.rootOffset,rootOffset+size,dblBits);
+      }
+      @Override protected int uncheckedLastIndexOfDblNaN(int size){
+        Checked root;
+        CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+        final int rootOffset;
+        return AbstractSeq.uncheckedLastIndexOfDblNaN(root.arr,rootOffset=this.rootOffset,rootOffset+size);
+      }
       transient final Checked root;
       transient final AbstractSubList parent;
       transient int modCount;
@@ -860,14 +878,20 @@ abstract class AbstractSeq extends AbstractDoubleList{
           parent=parent.parent;
         }
       }
+      transient final int rootOffset;
+      int getBound(){
+        return size+rootOffset;
+      }
       AbstractSubList(Checked root,AbstractSubList parent,int rootOffset,int size,int modCount){
-        super(rootOffset,size);
+        super(size);
+        this.rootOffset=rootOffset;
         this.root=root;
         this.parent=parent;
         this.modCount=modCount;
       }
       AbstractSubList(Checked root,int rootOffset,int size){
-        super(rootOffset,size);
+        super(size);
+        this.rootOffset=rootOffset;
         this.root=root;
         parent=null;
         modCount=root.modCount;
@@ -889,7 +913,7 @@ abstract class AbstractSeq extends AbstractDoubleList{
         this.size=size+1;
         return true;
       }
-      public void add(int index,double val){
+      @Override public void add(int index,double val){
         final Checked root;
         int modCount;
         CheckedCollection.checkModCount(modCount=this.modCount,(root=this.root).modCount);
@@ -925,7 +949,7 @@ abstract class AbstractSeq extends AbstractDoubleList{
           CheckedCollection.checkModCount(modCount,root.modCount);
         }
       }
-      public double getDouble(int index){
+      @Override public double getDouble(int index){
         final Checked root;
         CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
         CheckedCollection.checkLo(index);
@@ -946,7 +970,7 @@ abstract class AbstractSeq extends AbstractDoubleList{
         CheckedCollection.checkModCount(modCount,root.modCount);
         return size==0;
       }
-      public double removeDoubleAt(int index){
+      @Override public double removeDoubleAt(int index){
         int modCount;
         final Checked root;
         CheckedCollection.checkModCount(modCount=this.modCount,(root=this.root).modCount);
@@ -974,7 +998,7 @@ abstract class AbstractSeq extends AbstractDoubleList{
         CheckedCollection.checkModCount(modCount,root.modCount);
         return false;
       }
-      public double set(int index,double val){
+      @Override public double set(int index,double val){
         final Checked root;
         CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
         CheckedCollection.checkLo(index);
@@ -1129,7 +1153,7 @@ abstract class AbstractSeq extends AbstractDoubleList{
       super.push(val);
       return true;
     }
-    public void add(int index,double val){
+    @Override public void add(int index,double val){
       final int size;
       if((size=this.size)!=0){
         super.uncheckedInsert(index,val,size);
@@ -1145,7 +1169,7 @@ abstract class AbstractSeq extends AbstractDoubleList{
       super.push(val);
       return true;
     }
-    public double removeDoubleAt(int index){
+    @Override public double removeDoubleAt(int index){
       final double[] arr;
       final var removed=(arr=this.arr)[index];
       eraseIndexHelper(arr,index,--size);
@@ -1190,7 +1214,19 @@ abstract class AbstractSeq extends AbstractDoubleList{
         this.cursor=cursor+1;
       }
     }
-    static abstract class AbstractSubList extends AbstractSubArrSeq.OfDouble{
+    static abstract class AbstractSubList extends AbstractDoubleList{
+      @Override protected int uncheckedLastIndexOfDblBits(int size,long dblBits){
+        int rootOffset;
+        return AbstractSeq.uncheckedLastIndexOfDblBits(root.arr,rootOffset=this.rootOffset,rootOffset+size,dblBits);
+      }
+      @Override protected int uncheckedLastIndexOfDbl0(int size){
+        int rootOffset;
+        return AbstractSeq.uncheckedLastIndexOfDbl0(root.arr,rootOffset=this.rootOffset,rootOffset+size);
+      }
+      @Override protected int uncheckedLastIndexOfDblNaN(int size){
+        int rootOffset;
+        return AbstractSeq.uncheckedLastIndexOfDblNaN(root.arr,rootOffset=this.rootOffset,rootOffset+size);
+      }
       transient final Unchecked root;
       transient final AbstractSubList parent;
       static void bubbleUpDecrementSize(AbstractSubList parent){
@@ -1211,13 +1247,19 @@ abstract class AbstractSeq extends AbstractDoubleList{
           parent=parent.parent;
         }
       }
+      transient final int rootOffset;
+      int getBound(){
+        return rootOffset+size;
+      }
       AbstractSubList(Unchecked root,AbstractSubList parent,int rootOffset,int size){
-        super(rootOffset,size);
+        super(size);
+        this.rootOffset=rootOffset;
         this.root=root;
         this.parent=parent;
       }
       AbstractSubList(Unchecked root,int rootOffset,int size){
-        super(rootOffset,size);
+        super(size);
+        this.rootOffset=rootOffset;
         this.root=root;
         parent=null;
       }
@@ -1234,7 +1276,7 @@ abstract class AbstractSeq extends AbstractDoubleList{
         bubbleUpIncrementSize(parent);
         return true;
       }
-      public void add(int index,double val){
+      @Override public void add(int index,double val){
         final AbstractSeq root;
         final int rootSize;
         if((rootSize=(root=this.root).size)!=0){
@@ -1257,13 +1299,13 @@ abstract class AbstractSeq extends AbstractDoubleList{
           ArrCopy.semicheckedCopy(arr=root.arr,size+(size=rootOffset),arr,size,newRootSize-size);
         }
       }
-      public double getDouble(int index){
+      @Override public double getDouble(int index){
         return root.arr[index+rootOffset];
       }
       public void put(int index,double val){
         root.arr[index+rootOffset]=val;
       }
-      public double removeDoubleAt(int index){
+      @Override public double removeDoubleAt(int index){
         final Unchecked root;
         final double[] arr;
         final var removed=(arr=(root=this.root).arr)[index+=rootOffset];
@@ -1280,7 +1322,7 @@ abstract class AbstractSeq extends AbstractDoubleList{
         final int size;
         return (size=this.size)!=0&&uncheckedRemoveIf(size,filter::test);
       }
-      public double set(int index,double val){
+      @Override public double set(int index,double val){
         final double[] arr;
         final var oldVal=(arr=root.arr)[index+=rootOffset];
         arr[index]=val;
