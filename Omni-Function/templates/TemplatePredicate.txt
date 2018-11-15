@@ -1,0 +1,28 @@
+#define OfBoolean
+ShortType = Boolean
+valueType = boolean
+#END
+#define OfByte
+ShortType = Byte
+valueType = byte
+#END
+#define OfChar
+ShortType = Char
+valueType = char
+#END
+#define OfShort
+ShortType = Short
+valueType = short
+#END
+#define OfFloat
+ShortType = Float
+valueType = float
+#END
+#FQT omni.function.$ShortType$Predicate
+#SOURCE 
+package omni.function;
+public interface $ShortType$Predicate
+{
+	public abstract boolean test(final $valueType$ val);
+}
+#END

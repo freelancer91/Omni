@@ -781,9 +781,6 @@ abstract class AbstractSeq<E>extends AbstractRefList<E>{
         }
       }
       transient final int rootOffset;
-      int getBound(){
-        return size+rootOffset;
-      }
       AbstractSubList(Checked<E> root,AbstractSubList<E> parent,int rootOffset,int size,int modCount){
         super(size);
         this.rootOffset=rootOffset;
@@ -1051,9 +1048,6 @@ abstract class AbstractSeq<E>extends AbstractRefList<E>{
         }
       }
       transient final int rootOffset;
-      int getBound(){
-        return this.rootOffset+size;
-      }
       AbstractSubList(Unchecked<E> root,AbstractSubList<E> parent,int rootOffset,int size){
         super(size);
         this.rootOffset=rootOffset;

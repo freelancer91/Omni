@@ -1,0 +1,24 @@
+#define OfByte
+ShortType = Byte
+valueType = byte
+#END
+#define OfChar
+ShortType = Char
+valueType = char
+#END
+#define OfShort
+ShortType = Short
+valueType = short
+#END
+#define OfFloat
+ShortType = Float
+valueType = float
+#END
+#FQT omni.function.$ShortType$UnaryOperator
+#SOURCE 
+package omni.function;
+public interface $ShortType$UnaryOperator
+{
+	public abstract $valueType$ applyAs$ShortType$(final $valueType$ val);
+}
+#END

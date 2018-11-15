@@ -656,12 +656,8 @@ class CheckedSubList<E>extends AbstractSeq<E>{
     });
   }
   @Override public <T> T[] toArray(T[] dst){
-    final int modCount=this.modCount;
-    try{
-      return super.toArray(dst);
-    }finally{
-      CheckedCollection.checkModCount(modCount,root.modCount);
-    }
+    CheckedCollection.checkModCount(modCount,root.modCount);
+    return super.toArray(dst);
   }
   @Override public String toString(){
     final int modCount=this.modCount;
@@ -1273,7 +1269,7 @@ class CheckedSubList<E>extends AbstractSeq<E>{
       if(curr==(tail=this.tail)){
         Checked<E> root;
         CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
-        bubbleUpClear(++modCount,1,head,tail);
+        bubbleUpClear(++modCount,1,curr,tail);
         root.modCount=modCount;
         --root.size;
       }else if(filter.test(tail.val)){
@@ -2110,7 +2106,12 @@ class CheckedSubList<E>extends AbstractSeq<E>{
       lastRet=null;
     }
     @Override public void set(E val){
-      lastRet.val=val;
+      Node<E> lastRet;
+      if((lastRet=this.lastRet)!=null){
+        CheckedCollection.checkModCount(modCount,parent.root.modCount);
+        lastRet.val=val;
+      }
+      throw new IllegalStateException();
     }
   }
 }

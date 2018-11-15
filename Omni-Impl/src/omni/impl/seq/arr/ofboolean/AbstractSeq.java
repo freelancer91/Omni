@@ -940,9 +940,6 @@ abstract class AbstractSeq extends AbstractBooleanList{
       transient final AbstractSubList parent;
       transient int modCount;
       transient final int rootOffset;
-      int getBound(){
-        return size+rootOffset;
-      }
       @Override protected int uncheckedLastIndexOfMatch(int size,boolean val){
         Checked root;
         CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
@@ -1310,9 +1307,6 @@ abstract class AbstractSeq extends AbstractBooleanList{
         }
       }
       transient final int rootOffset;
-      int getBound(){
-        return rootOffset+size;
-      }
       AbstractSubList(Unchecked root,AbstractSubList parent,int rootOffset,int size){
         super(size);
         this.rootOffset=rootOffset;

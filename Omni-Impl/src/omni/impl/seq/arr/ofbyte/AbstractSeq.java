@@ -802,9 +802,6 @@ abstract class AbstractSeq extends AbstractByteList{
         }
       }
       transient final int rootOffset;
-      int getBound(){
-        return size+rootOffset;
-      }
       AbstractSubList(Checked root,AbstractSubList parent,int rootOffset,int size,int modCount){
         super(size);
         this.rootOffset=rootOffset;
@@ -1143,9 +1140,6 @@ abstract class AbstractSeq extends AbstractByteList{
         }
       }
       transient final int rootOffset;
-      int getBound(){
-        return rootOffset+size;
-      }
       AbstractSubList(Unchecked root,AbstractSubList parent,int rootOffset,int size){
         super(size);
         this.rootOffset=rootOffset;

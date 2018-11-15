@@ -962,9 +962,6 @@ abstract class AbstractSeq extends AbstractFloatList{
         }
       }
       transient final int rootOffset;
-      int getBound(){
-        return size+rootOffset;
-      }
       @Override protected int uncheckedLastIndexOfFlt0(int size){
         Checked root;
         CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
@@ -1345,9 +1342,6 @@ abstract class AbstractSeq extends AbstractFloatList{
         }
       }
       transient final int rootOffset;
-      int getBound(){
-        return rootOffset+size;
-      }
       AbstractSubList(Unchecked root,AbstractSubList parent,int rootOffset,int size){
         super(size);
         this.rootOffset=rootOffset;
