@@ -1,0 +1,27 @@
+#DEFINE OfBoolean
+ShortName = Boolean
+valueName = boolean
+#END_DEFINE
+#DEFINE OfByte
+ShortName = Byte
+valueName = byte
+#END_DEFINE
+#DEFINE OfChar
+ShortName = Char
+valueName = char
+#END_DEFINE
+#DEFINE OfShort
+ShortName = Short
+valueName = short
+#END_DEFINE
+#DEFINE OfFloat
+ShortName = Float
+valueName = float
+#END_DEFINE
+#SOURCE 
+package omni.function;
+public interface $ShortName$Consumer
+{
+	public abstract void accept(final $valueName$ val);
+}
+#END_SOURCE

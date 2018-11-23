@@ -1,9 +1,5 @@
 /**
- * 
- */
-/**
- * @author lyonste
  *
  */
-module omni.codegen{
-}
+/** @author lyonste */
+module omni.codegen{}

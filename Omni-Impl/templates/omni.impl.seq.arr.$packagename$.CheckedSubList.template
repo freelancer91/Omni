@@ -1,0 +1,261 @@
+#TYPEDEF OfBoolean
+  packagename = ofboolean
+  PackageName = OfBoolean
+  <E> = 
+  ArrayType = boolean
+  Consumer = BooleanConsumer
+  BoxedType = Boolean
+  exposedType = boolean
+  queryParameterType = boolean
+  Comparator = BooleanComparator
+  UnaryOperator = BooleanPredicate
+  DEFAULT_BOXED_ARR = OmniArray.OfBoolean.DEFAULT_BOXED_ARR
+  removeAtIndexMethod = removeBooleanAt
+  getMethod = getBoolean
+  queryCastBoolean = 
+  queryCastRef = (boolean)
+#ENDDEF
+#TYPEDEF OfByte
+  packagename = ofbyte
+  PackageName = OfByte
+  <E> = 
+  ArrayType = byte
+  Consumer = ByteConsumer
+  BoxedType = Byte
+  exposedType = byte
+  queryParameterType = int
+  Comparator = ByteComparator
+  UnaryOperator = ByteUnaryOperator
+  DEFAULT_BOXED_ARR = OmniArray.OfByte.DEFAULT_BOXED_ARR
+  removeAtIndexMethod = removeByteAt
+  getMethod = getByte
+  queryCastBoolean = TypeUtil.castToByte
+  queryCastPrimitive = 
+  queryCastRef = (byte)
+#ENDDEF
+#TYPEDEF OfChar
+  packagename = ofchar
+  PackageName = OfChar
+  <E> = 
+  ArrayType = char
+  Consumer = CharConsumer
+  BoxedType = Character
+  exposedType = char
+  queryParameterType = int
+  Comparator = CharComparator
+  UnaryOperator = CharUnaryOperator
+  DEFAULT_BOXED_ARR = OmniArray.OfChar.DEFAULT_BOXED_ARR
+  removeAtIndexMethod = removeCharAt
+  getMethod = getChar
+  queryCastBoolean = TypeUtil.castToChar
+  queryCastPrimitive = 
+  queryCastRef = (char)
+#ENDDEF
+#TYPEDEF OfShort
+  packagename = ofshort
+  PackageName = OfShort
+  <E> = 
+  ArrayType = short
+  Consumer = ShortConsumer
+  BoxedType = Short
+  exposedType = short
+  queryParameterType = int
+  Comparator = ShortComparator
+  UnaryOperator = ShortUnaryOperator
+  DEFAULT_BOXED_ARR = OmniArray.OfShort.DEFAULT_BOXED_ARR
+  removeAtIndexMethod = removeShortAt
+  getMethod = getShort
+  queryCastBoolean = (short)TypeUtil.castToByte
+  queryCastPrimitive = 
+  queryCastRef = (short)
+#ENDDEF
+#TYPEDEF OfInt
+  packagename = ofint
+  PackageName = OfInt
+  <E> = 
+  ArrayType = int
+  Consumer = IntConsumer
+  BoxedType = Integer
+  exposedType = int
+  queryParameterType = int
+  Comparator = IntBinaryOperator
+  UnaryOperator = IntUnaryOperator
+  DEFAULT_BOXED_ARR = OmniArray.OfInt.DEFAULT_BOXED_ARR
+  removeAtIndexMethod = removeIntAt
+  getMethod = getInt
+  queryCastBoolean = (int)TypeUtil.castToByte
+  queryCastPrimitive = 
+  queryCastRef = (int)
+#ENDDEF
+#TYPEDEF OfLong
+  packagename = oflong
+  PackageName = OfLong
+  <E> = 
+  ArrayType = long
+  Consumer = LongConsumer
+  BoxedType = Long
+  exposedType = long
+  queryParameterType = long
+  Comparator = LongComparator
+  UnaryOperator = LongUnaryOperator
+  DEFAULT_BOXED_ARR = OmniArray.OfLong.DEFAULT_BOXED_ARR
+  removeAtIndexMethod = removeLongAt
+  getMethod = getLong
+  queryCastBoolean = TypeUtil.castToLong
+  queryCastPrimitive = 
+  queryCastRef = (long)
+#ENDDEF
+#TYPEDEF OfFloat
+  packagename = offloat
+  PackageName = OfFloat
+  <E> = 
+  ArrayType = float
+  Consumer = FloatConsumer
+  BoxedType = Float
+  exposedType = float
+  queryParameterType = int
+  convertToBits = Float.floatToRawIntBits
+  Comparator = FloatComparator
+  UnaryOperator = FloatUnaryOperator
+  DEFAULT_BOXED_ARR = OmniArray.OfFloat.DEFAULT_BOXED_ARR
+  removeAtIndexMethod = removeFloatAt
+  getMethod = getFloat
+  TRUE_BITS = TypeUtil.FLT_TRUE_BITS
+  queryCastPrimitive = 
+  queryCastRef = (float)
+#ENDDEF
+#TYPEDEF OfDouble
+  packagename = ofdouble
+  PackageName = OfDouble
+  <E> = 
+  ArrayType = double
+  Consumer = DoubleConsumer
+  BoxedType = Double
+  exposedType = double
+  queryParameterType = long
+  convertToBits = Double.doubleToRawLongBits
+  Comparator = DoubleComparator
+  UnaryOperator = DoubleUnaryOperator
+  DEFAULT_BOXED_ARR = OmniArray.OfDouble.DEFAULT_BOXED_ARR
+  removeAtIndexMethod = removeDoubleAt
+  getMethod = getDouble
+  TRUE_BITS = TypeUtil.DBL_TRUE_BITS
+  queryCastPrimitive = 
+  queryCastRef = (double)
+#ENDDEF
+#TYPEDEF OfRef
+  packagename = ofref
+  PackageName = OfRef
+  <E> = <E>
+  ArrayType = Object
+  Consumer = Consumer<? super E>
+  BoxedType = Object
+  exposedType = E
+  Comparator = Comparator<? super E>
+  UnaryOperator = UnaryOperator<E>
+  DEFAULT_BOXED_ARR = OmniArray.OfRef.DEFAULT_ARR
+  queryCastBoolean = OmniPred.OfRef.getEqualsPred
+  removeAtIndexMethod = remove
+  getMethod = get
+  queryCastPrimitive = OmniPred.OfRef.getEqualsPred
+  queryCastRef = OmniPred.OfRef.getEqualsPred
+#ENDDEF
+package omni.impl.seq.arr.$packagename$;
+import omni.api.OmniList;
+import omni.api.OmniIterator;
+import omni.api.OmniListIterator;
+import omni.util.ArrCopy;
+import omni.util.SortUtil;
+import omni.util.OmniArray;
+import omni.impl.seq.arr.ArrSeqUtil;
+#IF OfDouble,OfLong,OfInt
+import java.util.function.$Consumer$;
+import java.util.function.$UnaryOperator$;
+#ELSEIF OfRef
+import java.util.function.Predicate;
+#ELSE
+import omni.function.$Consumer$;
+import omni.function.$UnaryOperator$;
+#ENDIF
+import java.util.function.Consumer;
+import java.util.Comparator;
+import java.util.function.UnaryOperator;
+import java.util.function.IntFunction;
+#IF OfInt
+import java.util.function.IntBinaryOperator;
+#ELSEIFNOT OfRef
+import omni.function.$Comparator$;
+#ENDIF
+#IF OfRef
+import omni.util.OmniPred;
+#ELSE
+import omni.util.TypeUtil;
+#ENDIF
+import omni.impl.CheckedCollection;
+class CheckedSubList$<E>$ extends AbstractSeq.Checked.AbstractSubList$<E>$ implements OmniList.$PackageName$$<E>$
+{
+  CheckedSubList(AbstractSeq.Checked$<E>$ root,AbstractSeq.Checked.AbstractSubList$<E>$ parent,int rootOffset,int size)
+  {
+    super(root,parent,rootOffset,size);
+  }
+  CheckedSubList(AbstractSeq.Checked$<E>$ root,int rootOffset,int size)
+  {
+    super(root,rootOffset,size);
+  }
+#MACRODEF CheckModCount()
+    final AbstractSeq.Checked$<E>$ root;
+    CheckedCollection.checkModCount(this.modCount,(root=this.root).modCount);
+#ENDDEF
+  private AbstractSeq.Checked$<E>$ checkModCountAndGetRoot()
+  {
+#MACRO CheckModCount()
+    return root;
+  }
+  @Override
+  public Object clone()
+  {
+    final var root=checkModCountAndGetRoot();
+    final $ArrayType$[] arr;
+    final int size;
+    if((size=this.size)!=0)
+    {
+      ArrCopy.uncheckedCopy(root.arr,rootOffset,arr=new $ArrayType$[size],0,size);
+    }
+    else
+    {
+      arr=null;
+    }
+    return new UncheckedList$<E>$(size,arr);
+  }
+  @Override
+  public boolean equals(Object val)
+  {
+    //TODO
+    return false;
+  }
+  @Override
+  public OmniIterator.$PackageName$$<E>$ iterator()
+  {
+    //TODO
+    return null;
+  }
+  @Override
+  public OmniListIterator.$PackageName$$<E>$ listIterator()
+  {
+    //TODO
+    return null;
+  }
+  @Override
+  public OmniListIterator.$PackageName$$<E>$ listIterator(int index)
+  {
+    //TODO
+    return null;
+  }
+  @Override
+  public OmniList.$PackageName$$<E>$ subList(int fromIndex,int toIndex)
+  {
+    //TODO
+    return null;
+  }
+  //TODO add the rest of the methods
+}

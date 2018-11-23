@@ -1,0 +1,26 @@
+#TYPEDEF OfBoolean
+  Consumer = BooleanConsumer
+  exposedType = boolean
+#ENDDEF
+#TYPEDEF OfByte
+  Consumer = ByteConsumer
+  exposedType = byte
+#ENDDEF
+#TYPEDEF OfChar
+  Consumer = CharConsumer
+  exposedType = char
+#ENDDEF
+#TYPEDEF OfShort
+  Consumer = ShortConsumer
+  exposedType = short
+#ENDDEF
+#TYPEDEF OfFloat
+  Consumer = FloatConsumer
+  exposedType = float
+#ENDDEF
+
+package omni.function;
+public interface $Consumer$
+{
+  public abstract void accept(final $exposedType$ val);
+}

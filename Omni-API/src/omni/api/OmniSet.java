@@ -1,12 +1,21 @@
 package omni.api;
 public interface OmniSet extends OmniCollection{
-  interface OfBoolean extends OmniSet,OmniCollection.OfBoolean{}
-  interface OfByte extends OmniSet,OmniCollection.OfByte{}
-  interface OfChar extends OmniSet,OmniCollection.OfChar{}
-  interface OfDouble extends OmniSet,OmniCollection.OfDouble{}
-  interface OfFloat extends OmniSet,OmniCollection.OfFloat{}
-  interface OfInt extends OmniSet,OmniCollection.OfInt{}
-  interface OfLong extends OmniSet,OmniCollection.OfLong{}
-  interface OfRef<E>extends OmniSet,OmniCollection.OfRef<E>{}
-  interface OfShort extends OmniSet,OmniCollection.OfShort{}
+    interface OfBoolean extends OmniCollection,OmniCollection.OfPrimitive,OmniCollection.OfBoolean,OmniSet{
+    }
+    interface OfByte extends OmniCollection,OmniCollection.OfPrimitive,OmniCollection.OfByte,OmniSet{
+    }
+    interface OfChar extends OmniCollection,OmniCollection.OfPrimitive,OmniCollection.OfChar,OmniSet{
+    }
+    interface OfDouble extends OmniCollection,OmniCollection.OfPrimitive,OmniCollection.OfDouble,OmniSet{
+    }
+    interface OfFloat extends OmniCollection,OmniCollection.OfPrimitive,OmniCollection.OfFloat,OmniSet{
+    }
+    interface OfInt extends OmniCollection,OmniCollection.OfPrimitive,OmniCollection.OfInt,OmniSet{
+    }
+    interface OfLong extends OmniCollection,OmniCollection.OfPrimitive,OmniCollection.OfLong,OmniSet{
+    }
+    interface OfRef<E>extends OmniCollection,OmniCollection.OfRef<E>,OmniSet{
+    }
+    interface OfShort extends OmniCollection,OmniCollection.OfPrimitive,OmniCollection.OfShort,OmniSet{
+    }
 }

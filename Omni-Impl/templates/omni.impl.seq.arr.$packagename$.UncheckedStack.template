@@ -1,0 +1,308 @@
+#TYPEDEF OfBoolean
+  packagename = ofboolean
+  PackageName = OfBoolean
+  <E> = 
+  ArrayType = boolean
+  Consumer = BooleanConsumer
+  BoxedType = Boolean
+  exposedType = boolean
+  castToDouble = TypeUtil.castToDouble
+  castToFloat = TypeUtil.castToFloat
+  castToLong = TypeUtil.castToLong
+  castToInt = (int)TypeUtil.castToByte
+  castToShort = (short)TypeUtil.castToByte
+  castToChar = TypeUtil.castToChar
+  castToByte = TypeUtil.castToByte
+  BoxedArrayType = Boolean
+  queryParameterType = boolean
+  popMethod = popBoolean
+#ENDDEF
+#TYPEDEF OfByte
+  packagename = ofbyte
+  PackageName = OfByte
+  <E> = 
+  ArrayType = byte
+  Consumer = ByteConsumer
+  BoxedType = Byte
+  exposedType = byte
+  castToDouble = (double)
+  castToFloat = (float)
+  castToLong =(long)
+  castToInt = (int)
+  castToShort = (short)
+  castToByte = (byte)
+  BoxedArrayType = Byte
+  queryParameterType = int
+  popMethod = popByte
+#ENDDEF
+#TYPEDEF OfChar
+  packagename = ofchar
+  PackageName = OfChar
+  <E> = 
+  ArrayType = char
+  Consumer = CharConsumer
+  BoxedType = Character
+  exposedType = char
+  castToDouble = (double)
+  castToFloat = (float)
+  castToLong =(long)
+  castToInt = (int)
+  castToChar = (char)
+  BoxedArrayType = Character
+  queryParameterType = int
+  popMethod = popChar
+#ENDDEF
+#TYPEDEF OfShort
+  packagename = ofshort
+  PackageName = OfShort
+  <E> = 
+  ArrayType = short
+  Consumer = ShortConsumer
+  BoxedType = Short
+  exposedType = short
+  castToDouble = (double)
+  castToFloat = (float)
+  castToLong =(long)
+  castToInt = (int)
+  castToShort = (short)
+  BoxedArrayType = Short
+  queryParameterType = int
+  popMethod = popShort
+#ENDDEF
+#TYPEDEF OfInt
+  packagename = ofint
+  PackageName = OfInt
+  <E> = 
+  ArrayType = int
+  Consumer = IntConsumer
+  BoxedType = Integer
+  exposedType = int
+  castToDouble = (double)
+  castToFloat = (float)
+  castToLong =(long)
+  castToInt = (int)
+  BoxedArrayType = Integer
+  queryParameterType = int
+  popMethod = popInt
+#ENDDEF
+#TYPEDEF OfLong
+  packagename = oflong
+  PackageName = OfLong
+  <E> = 
+  ArrayType = long
+  Consumer = LongConsumer
+  BoxedType = Long
+  exposedType = long
+  castToDouble = (double)
+  castToFloat = (float)
+  castToLong =(long)
+  BoxedArrayType = Long
+  queryParameterType = long
+  popMethod = popLong
+#ENDDEF
+#TYPEDEF OfFloat
+  packagename = offloat
+  PackageName = OfFloat
+  <E> = 
+  ArrayType = float
+  Consumer = FloatConsumer
+  BoxedType = Float
+  exposedType = float
+  castToDouble = (double)
+  castToFloat = (float)
+  BoxedArrayType = Float
+  queryParameterType = int
+  convertToBits = Float.floatToRawIntBits
+  popMethod = popFloat
+#ENDDEF
+#TYPEDEF OfDouble
+  packagename = ofdouble
+  PackageName = OfDouble
+  <E> = 
+  ArrayType = double
+  Consumer = DoubleConsumer
+  BoxedType = Double
+  exposedType = double
+  castToDouble = (double)
+  BoxedArrayType = Double
+  queryParameterType = long
+  convertToBits = Double.doubleToRawLongBits
+  popMethod = popDouble
+#ENDDEF
+#TYPEDEF OfRef
+  packagename = ofref
+  PackageName = OfRef
+  <E> = <E>
+  ArrayType = Object
+  Consumer = Consumer<? super E>
+  BoxedType = E
+  BoxedArrayType = Object
+#ENDDEF
+package omni.impl.seq.arr.$packagename$;
+import omni.api.OmniStack;
+import omni.api.OmniIterator;
+import omni.util.ArrCopy;
+import omni.impl.seq.arr.ArrSeqUtil;
+#IF OfDouble,OfLong,OfInt
+import java.util.function.$Consumer$;
+#ELSEIF OfRef
+import java.util.function.Predicate;
+import java.util.function.Consumer;
+#ELSE
+import omni.function.$Consumer$;
+#ENDIF
+#IF OfBoolean
+import omni.util.TypeUtil;
+#ENDIF
+public class UncheckedStack$<E>$ extends AbstractSeq.Unchecked$<E>$ implements OmniStack.$PackageName$$<E>$
+{
+  UncheckedStack()
+  {
+    super();
+  }
+  UncheckedStack(int capacity)
+  {
+    super(capacity);
+  }
+  private UncheckedStack(int size,$ArrayType$[] arr)
+  {
+    super(size,arr);
+  }
+  @Override
+  public Object clone()
+  {
+    final $ArrayType$[] arr;
+    final int size;
+    if((size=this.size)!=0)
+    {
+      ArrCopy.uncheckedCopy(this.arr,0,arr=new $ArrayType$[size],0,size);
+    }
+    else
+    {
+      arr=null;
+    }
+    return new UncheckedStack$<E>$(size,arr);
+  }
+  @Override
+  public boolean equals(Object val)
+  {
+    //TODO
+    return false;
+  }
+  @Override
+  public OmniIterator.$PackageName$$<E>$ iterator()
+  {
+    //TODO
+    return null;
+  }
+#MACRODEF Poll(retType,Suffix,emptyVal,cast)
+  @Override
+  public retType pollSuffix()
+  {
+    final int size;
+    if((size=this.size)!=0)
+    {
+      return cast(super.uncheckedPop(size-1));
+    }
+    return emptyVal;
+  }
+#ENDDEF
+#MACRO Poll(\$BoxedType\$,,null,(\$BoxedType\$))
+  @Override
+  public $BoxedType$ pop()
+  {
+    return super.uncheckedPop(size-1);
+  }
+#MACRODEF arrcopyMethod(arrType)
+  @Override
+  void uncheckedCopyInto(arrType[] arr,int size)
+  {
+    ArrCopy.uncheckedReverseCopy(this.arr,0,arr,0,size);
+  }
+#ENDDEF
+#MACRO arrcopyMethod(\$BoxedArrayType\$)
+  @Override
+  void uncheckedForEach(int size,$Consumer$ action)
+  {
+    ArrSeqUtil.uncheckedReverseForEach(arr,0,size,action);
+  }
+  @Override
+  int uncheckedHashCode(int size)
+  {
+    return ArrSeqUtil.reverseHashCode(arr,0,size);
+  }
+  @Override
+  void uncheckedToString(int size,StringBuilder builder)
+  {
+    ArrSeqUtil.reverseToString(arr,0,size,builder);
+  }
+#IF OfRef
+#MACRODEF UncheckedRemoveVal(indexTest,Suffix,methodParams)
+  @Override
+  boolean uncheckedremoveValSuffix(methodParams)
+  {
+    final var arr=this.arr;
+    int index;
+    for(index=--size;indexTest(arr[index]);--index)
+    {
+      if(index==0)
+      {
+        return false;
+      }
+    }
+    ArrSeqUtil.eraseIndexHelper(arr,index,size);
+    this.size=size;
+    return true;
+  }
+#ENDDEF
+  #MACRO UncheckedRemoveVal(!pred.test,,int size\,Predicate<Object> pred)
+  #MACRO UncheckedRemoveVal(!nonNull.equals,NonNull,int size\,Object nonNull)
+#ELSE
+  #MACRO arrcopyMethod(Object)
+  @Override
+  public void push($BoxedType$ val)
+  {
+    super.push(($exposedType$)val);
+  }
+  @Override
+  public $exposedType$ $popMethod$()
+  {
+    return super.uncheckedPop(size-1);
+  }
+  #IF OfDouble,OfFloat
+    #MACRO UncheckedRemoveVal(0!=,0,int size)
+    #MACRO UncheckedRemoveVal(bits!=\$convertToBits\$,Bits,int size\,\$queryParameterType\$ bits)
+    #MACRO UncheckedRemoveVal(!\$BoxedType\$.isNaN,NaN,int size)
+  #ELSE
+    #MACRO Poll(long,Long,Long.MIN_VALUE,\$castToLong\$)
+    #MACRO arrcopyMethod(long)
+    #MACRO UncheckedRemoveVal(val!=,,int size\,\$queryParameterType\$ val)
+    #IF OfInt,OfShort,OfChar,OfByte,OfBoolean
+      #MACRO Poll(int,Int,Integer.MIN_VALUE,\$castToInt\$)
+      #MACRO arrcopyMethod(int)
+      #IF OfShort,OfByte,OfBoolean
+        #MACRO Poll(short,Short,Short.MIN_VALUE,\$castToShort\$)
+        #MACRO arrcopyMethod(short)
+        #IF OfByte,OfBoolean
+          #MACRO Poll(byte,Byte,Byte.MIN_VALUE,\$castToByte\$)
+          #MACRO arrcopyMethod(byte)
+          #IF OfBoolean
+            #MACRO Poll(boolean,Boolean,false,(boolean))
+            #MACRO arrcopyMethod(boolean)
+          #ENDIF
+        #ENDIF
+      #ENDIF
+      #IF OfChar,OfBoolean
+        #MACRO Poll(char,Char,Character.MIN_VALUE,\$castToChar\$)
+        #MACRO arrcopyMethod(char)
+      #ENDIF
+    #ENDIF
+  #ENDIF
+  #MACRO Poll(double,Double,Double.NaN,\$castToDouble\$)
+  #MACRO arrcopyMethod(double)
+  #IF OfFloat,OfLong,OfInt,OfShort,OfChar,OfByte,OfBoolean
+    #MACRO Poll(float,Float,Float.NaN,\$castToFloat\$)
+    #MACRO arrcopyMethod(float)
+  #ENDIF
+#ENDIF
+}

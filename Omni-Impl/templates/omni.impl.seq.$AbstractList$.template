@@ -1,0 +1,502 @@
+#TYPEDEF OfBoolean
+  AbstractList = AbstractBooleanList
+  <E> = 
+  exposedType = boolean
+  BoxedType = Boolean
+  castBooleanMethod = 
+  getMethod = getBoolean
+  removeAtIndexMethod = removeBooleanAt
+  queryParameterType = boolean
+  extends = 
+#ENDDEF
+#TYPEDEF OfByte
+  AbstractList = AbstractByteList
+  <E> = 
+  exposedType = byte
+  BoxedType = Byte
+  castBooleanMethod = TypeUtil.castToByte
+  castByteMethod = 
+  castCharMethod = 
+  getMethod = getByte
+  removeAtIndexMethod = removeByteAt
+  queryParameterType = int
+  extends = 
+#ENDDEF
+#TYPEDEF OfChar
+  AbstractList = AbstractCharList
+  <E> = 
+  exposedType = char
+  BoxedType = Character
+  castBooleanMethod = TypeUtil.castToChar
+  castCharMethod = 
+  castShortMethod = 
+  getMethod = getChar
+  removeAtIndexMethod = removeCharAt
+  queryParameterType = int
+  extends = .Of16BitPrimitive
+#ENDDEF
+#TYPEDEF OfShort
+  AbstractList = AbstractShortList
+  <E> = 
+  exposedType = short
+  BoxedType = Short
+  castBooleanMethod = (short)TypeUtil.castToByte
+  castCharMethod = 
+  castShortMethod = 
+  castIntMethod = 
+  getMethod = getShort
+  removeAtIndexMethod = removeShortAt
+  queryParameterType = int
+  extends = .Of16BitPrimitive
+#ENDDEF
+#TYPEDEF OfInt
+  AbstractList = AbstractIntList
+  <E> = 
+  exposedType = int
+  BoxedType = Integer
+  castBooleanMethod = (int)TypeUtil.castToByte
+  castIntMethod = 
+  getMethod = getInt
+  removeAtIndexMethod = removeIntAt
+  queryParameterType = int
+  extends = .OfSignedIntegralPrimitive
+#ENDDEF
+#TYPEDEF OfLong
+  AbstractList = AbstractLongList
+  <E> = 
+  exposedType = long
+  BoxedType = Long
+  castBooleanMethod = TypeUtil.castToLong
+  castIntMethod = 
+  castLongMethod = 
+  getMethod = getLong
+  removeAtIndexMethod = removeLongAt
+  queryParameterType = long
+  extends = .OfSignedIntegralPrimitive
+#ENDDEF
+#TYPEDEF OfFloat
+  AbstractList = AbstractFloatList
+  <E> = 
+  exposedType = float
+  BoxedType = Float
+  castBooleanMethod = TypeUtil.castToFloat
+  convertToBitsMethod = floatToRawIntBits
+  TRUE_BITS = TypeUtil.FLT_TRUE_BITS
+  castFloatMethod = 
+  getMethod = getFloat
+  removeAtIndexMethod = removeFloatAt
+  queryParameterType = int
+  extends = .OfFloat
+#ENDDEF
+#TYPEDEF OfDouble
+  AbstractList = AbstractDoubleList
+  <E> = 
+  exposedType = double
+  BoxedType = Double
+  castBooleanMethod = TypeUtil.castToDouble
+  convertToBitsMethod = doubleToRawLongBits
+  TRUE_BITS = TypeUtil.DBL_TRUE_BITS
+  castDoubleMethod = 
+  getMethod = getDouble
+  removeAtIndexMethod = removeDoubleAt
+  queryParameterType = long
+  extends = .OfDouble
+#ENDDEF
+#TYPEDEF OfRef
+  AbstractList = AbstractRefList
+  <E> = <E>
+  castBooleanMethod = OmniPred.OfRef.getEqualsPred
+  castByteMethod = OmniPred.OfRef.getEqualsPred
+  castCharMethod = OmniPred.OfRef.getEqualsPred
+  castShortMethod = OmniPred.OfRef.getEqualsPred
+  castIntMethod = OmniPred.OfRef.getEqualsPred
+  castLongMethod = OmniPred.OfRef.getEqualsPred
+  castFloatMethod = OmniPred.OfRef.getEqualsPred
+  castDoubleMethod = OmniPred.OfRef.getEqualsPred
+  extends = 
+#ENDDEF
+package omni.impl.seq;
+#IF OfRef
+import java.util.Objects;
+import java.util.function.Predicate;
+import omni.util.OmniPred;
+#ELSE
+import omni.util.TypeUtil;
+#ENDIF
+public abstract class $AbstractList$$<E>$ extends AbstractSeq$extends$
+{
+  protected $AbstractList$()
+  {
+    super();
+  }
+  protected $AbstractList$(int size)
+  {
+    super(size);
+  }
+#IF OfDouble,OfFloat,OfLong,OfInt,OfShort,OfChar,OfByte,OfBoolean
+  protected abstract boolean add($exposedType$ val);
+  #IF OfDouble,OfFloat,OfLong,OfInt,OfShort,OfChar,OfByte
+    #IF OfDouble,OfFloat,OfLong
+  public final boolean add(int val)
+  {
+    return add(($exposedType$)val);
+  }
+      #IF OfDouble,OfFloat
+        #IF OfDouble
+  public final boolean add(float val)
+  {
+    return add(($exposedType$)val);
+  }
+        #ENDIF
+  public final boolean add(char val)
+  {
+    return add(($exposedType$)val);
+  }
+  public final boolean add(short val)
+  {
+    return add(($exposedType$)val);
+  }
+  public final boolean add(long val)
+  {
+   return add(($exposedType$)val);
+  }
+      #ENDIF
+    #ENDIF
+  public final boolean add(boolean val)
+  {
+    return add($castBooleanMethod$(val));
+  } 
+  #ENDIF
+  public final boolean add($BoxedType$ val)
+  {
+    return add(($exposedType$)val);
+  }
+#ENDIF
+#MACRODEF BasicLastIndexOf(paramType,castParam)
+  public int lastIndexOf(paramType val)
+  {
+    final int size;
+    if((size=this.size)!=0)
+    {
+      return uncheckedlastIndexOf(size,castParam(val));
+    }
+    return -1;
+  }
+#ENDDEF
+#IF OfRef,OfByte
+  #MACRO BasicLastIndexOf(byte,\$castByteMethod\$)
+#ENDIF
+#IF OfRef
+  #MACRO BasicLastIndexOf(Boolean,OmniPred.OfRef.getEqualsPred)
+  #MACRO BasicLastIndexOf(Byte,OmniPred.OfRef.getEqualsPred)
+  #MACRO BasicLastIndexOf(Character,OmniPred.OfRef.getEqualsPred)
+  #MACRO BasicLastIndexOf(Short,OmniPred.OfRef.getEqualsPred)
+  #MACRO BasicLastIndexOf(Integer,OmniPred.OfRef.getEqualsPred)
+  #MACRO BasicLastIndexOf(Long,OmniPred.OfRef.getEqualsPred)
+  #MACRO BasicLastIndexOf(Float,OmniPred.OfRef.getEqualsPred)
+  #MACRO BasicLastIndexOf(Double,OmniPred.OfRef.getEqualsPred)
+  protected abstract int uncheckedlastIndexOf(int size,Predicate<Object> pred);
+  protected abstract int uncheckedlastIndexOfNonNull(int size,Object nonNull);
+#ELSE
+  public final $BoxedType$ remove(int index)
+  {
+    return $removeAtIndexMethod$(index);
+  }
+  public final $BoxedType$ set(int index,$BoxedType$ val)
+  {
+    return set(index,($exposedType$)val);
+  }
+  protected abstract void add(int index,$exposedType$ val);
+  protected abstract $exposedType$ $getMethod$(int index);
+  protected abstract $exposedType$ $removeAtIndexMethod$(int index);
+  protected abstract $exposedType$ set(int index,$exposedType$ val);
+  public final void add(int index,$BoxedType$ val)
+  {
+    add(index,($exposedType$)val);
+  }
+  public final $BoxedType$ get(int index)
+  {
+    return $getMethod$(index);
+  }
+  #IF OfDouble,OfFloat
+  protected abstract int uncheckedlastIndexOf0(int size);
+  protected abstract int uncheckedlastIndexOfBits(int size,$queryParameterType$ bits);
+  protected abstract int uncheckedlastIndexOfNaN(int size);
+  private int uncheckedlastIndexOf(int size,$exposedType$ val)
+  {
+    if(val==val)
+    {
+      return uncheckedlastIndexOfBits(size,$BoxedType$.$convertToBitsMethod$(val));
+    }
+    return uncheckedlastIndexOfNaN(size);
+  }
+    #IF OfFloat
+  private int uncheckedlastIndexOfRawInt(int size,int val)
+  {
+    if(val!=0)
+    {
+      return uncheckedlastIndexOfBits(size,$BoxedType$.$convertToBitsMethod$(val));
+    }
+    return uncheckedlastIndexOf0(size);
+  }
+    #ENDIF
+  #ELSE
+  protected abstract int uncheckedlastIndexOf(int size,$queryParameterType$ val);
+  #ENDIF
+#ENDIF
+  public int lastIndexOf(Object val)
+  {
+    final int size;
+    if((size=this.size)!=0)
+    {
+#IF OfRef
+      if(val!=null)
+      {
+        return uncheckedlastIndexOfNonNull(size,val);
+      }
+      return uncheckedlastIndexOf(size,Objects::isNull);
+#ELSE
+      if(val instanceof $BoxedType$)
+      {
+         return uncheckedlastIndexOf(size,($exposedType$)val);
+      }
+#ENDIF
+    }
+    return -1;
+  }
+  public int lastIndexOf(double val)
+  {
+    final int size;
+    if((size=this.size)!=0)
+    {
+#IF OfRef,OfDouble
+     return uncheckedlastIndexOf(size,$castDoubleMethod$(val));
+#ELSE
+      final $exposedType$ v;
+  #IF OfFloat
+      if((v=(float)val)==val)
+      {
+        return uncheckedlastIndexOfBits(size,Float.floatToRawIntBits(v));
+      }
+      else if(v!=v)
+      {
+        return uncheckedlastIndexOfNaN(size);
+      }
+  #ELSE
+    #IF OfBoolean
+      final long bits;
+      if((bits=Double.doubleToRawLongBits(val))==0||bits==Long.MIN_VALUE)
+      {
+        v=false;
+      }
+      else if(bits==TypeUtil.DBL_TRUE_BITS)
+      {
+        v=true;
+      }
+      else
+      {
+        return -1;
+      }
+    #ELSEIF OfLong
+      if(TypeUtil.doubleEquals(val,v=(long)val))
+    #ELSE
+      if(val==(v=($exposedType$)val))
+    #ENDIF
+      {
+        return uncheckedlastIndexOf(size,v);
+      }
+  #ENDIF
+#ENDIF
+    }
+    return -1;
+  }
+  public int lastIndexOf(float val)
+  {
+    final int size;
+    if((size=this.size)!=0)
+    {
+#IF OfRef,OfFloat
+      return uncheckedlastIndexOf(size,$castFloatMethod$(val));
+#ELSEIF OfDouble
+      if(val==val)
+      {
+        return uncheckedlastIndexOfBits(size,Double.doubleToRawLongBits(val));
+      }
+      return uncheckedlastIndexOfNaN(size);
+#ELSE
+      final $exposedType$ v;
+  #IF OfBoolean
+      switch(Float.floatToRawIntBits(val))
+      {
+      default:
+        return -1;
+      case 0:
+      case Integer.MIN_VALUE:
+        v=false;
+        break;
+      case TypeUtil.FLT_TRUE_BITS:
+        v=true;
+      }
+  #ELSEIF OfInt
+      if((double)val==(double)(v=(int)val))
+  #ELSEIF OfLong
+      if(TypeUtil.floatEquals(val,v=(long)val))
+  #ELSE
+      if(val==(v=($exposedType$)val))
+  #ENDIF    
+      {
+        return uncheckedlastIndexOf(size,v);
+      }
+#ENDIF
+    }
+    return -1;
+  }
+  public int lastIndexOf(long val)
+  {
+    final int size;
+    if((size=this.size)!=0)
+    {
+#IF OfRef,OfLong
+      return uncheckedlastIndexOf(size,$castLongMethod$(val));
+#ELSE
+  #IF OfDouble,OfFloat
+      if(val!=0)
+      {
+        if(!TypeUtil.checkCastTo$BoxedType$(val))
+        {
+          return -1;
+        }
+        return uncheckedlastIndexOfBits(size,$BoxedType$.$convertToBitsMethod$(val));
+      }
+      return uncheckedlastIndexOf0(size);
+  #ELSE
+      final $exposedType$ v;
+    #IF OfBoolean
+      if(val==0)
+      {
+        v=false;
+      }
+      else if(val==1)
+      {
+        v=true;
+      }
+      else
+      {
+        return -1;
+      }
+    #ELSE
+      if(val==(v=($exposedType$)val))
+    #ENDIF
+      {
+        return uncheckedlastIndexOf(size,v);
+      }
+  #ENDIF
+#ENDIF
+    }
+    return -1;
+  }
+  public int lastIndexOf(int val)
+  {
+    final int size;
+    if((size=this.size)!=0)
+    {
+#IF OfShort
+      if(val==(short)val)
+#ENDIF
+#IF OfFloat,OfDouble
+      if(val!=0)
+      {
+  #IF OfFloat
+        if(!TypeUtil.checkCastToFloat(val))
+        {
+          return -1;
+        }
+  #ENDIF
+        return uncheckedlastIndexOfBits(size,$BoxedType$.$convertToBitsMethod$(val));
+      }
+      return uncheckedlastIndexOf0(size);
+#ELSEIF OfChar,OfByte,OfBoolean
+      final $exposedType$ v;
+  #IF OfChar,OfByte
+      if(val==(v=($exposedType$)val))
+  #ELSE
+      switch(val)
+      {
+      default:
+        return -1;
+      case 0:
+        v=false;
+        break;
+      case 1:
+        v=true;
+      }
+  #ENDIF
+      {
+        return uncheckedlastIndexOf(size,v);
+      }
+#ELSE
+      {
+	    return uncheckedlastIndexOf(size,$castIntMethod$(val));
+	  }
+#ENDIF
+    }
+    return -1;
+  }
+#IF OfRef,OfFloat,OfShort,OfChar
+  public int lastIndexOf(short val)
+  {
+  #IF OfChar
+    if(val>=0)
+  #ENDIF
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+  #IF OfFloat
+        return uncheckedlastIndexOfRawInt(size,val);
+  #ELSE
+        return uncheckedlastIndexOf(size,$castShortMethod$(val));
+  #ENDIF
+      }
+    }
+    return -1;
+  }
+#ENDIF
+#IF OfRef,OfFloat,OfShort,OfChar,OfByte
+  public int lastIndexOf(char val)
+  {
+  #IF OfShort,OfByte
+    if(val<=$BoxedType$.MAX_VALUE)
+  #ENDIF
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+  #IF OfFloat
+        return uncheckedlastIndexOfRawInt(size,val);
+  #ELSE
+        return uncheckedlastIndexOf(size,$castCharMethod$(val));
+  #ENDIF
+      }
+    }
+    return -1;
+  }
+#ENDIF
+  public int lastIndexOf(boolean val)
+  {
+    final int size;
+    if((size=this.size)!=0)
+    {
+#IF OfFloat,OfDouble
+      if(val)
+      {
+        return uncheckedlastIndexOfBits(size,$TRUE_BITS$);
+      }
+      return uncheckedlastIndexOf0(size);
+#ELSE
+      return uncheckedlastIndexOf(size,$castBooleanMethod$(val));
+#ENDIF
+    }
+    return -1;
+  }
+}

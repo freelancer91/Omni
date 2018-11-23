@@ -1,0 +1,58 @@
+#TYPEDEF OfBoolean
+  AbstractItr = AbstractBooleanItr
+  BoxedType = Boolean
+  nextMethod = nextBoolean
+  exposedType = boolean
+#ENDDEF
+#TYPEDEF OfByte
+  AbstractItr = AbstractByteItr
+  BoxedType = Byte
+  nextMethod = nextByte
+  exposedType = byte
+#ENDDEF
+#TYPEDEF OfChar
+  AbstractItr = AbstractCharItr
+  BoxedType = Character
+  nextMethod = nextChar
+  exposedType = char
+#ENDDEF
+#TYPEDEF OfShort
+  AbstractItr = AbstractShortItr
+  BoxedType = Short
+  nextMethod = nextShort
+  exposedType = short
+#ENDDEF
+#TYPEDEF OfInt
+  AbstractItr = AbstractIntItr
+  BoxedType = Integer
+  nextMethod = nextInt
+  exposedType = int
+#ENDDEF
+#TYPEDEF OfLong
+  AbstractItr = AbstractLongItr
+  BoxedType = Long
+  nextMethod = nextLong
+  exposedType = long
+#ENDDEF
+#TYPEDEF OfFloat
+  AbstractItr = AbstractFloatItr
+  BoxedType = Float
+  nextMethod = nextFloat
+  exposedType = float
+#ENDDEF
+#TYPEDEF OfDouble
+  AbstractItr = AbstractDoubleItr
+  BoxedType = Double
+  nextMethod = nextDouble
+  exposedType = double
+#ENDDEF
+
+package omni.impl;
+public abstract class $AbstractItr$
+{
+  public $BoxedType$ next()
+  {
+    return $nextMethod$();
+  }
+  protected abstract $exposedType$ $nextMethod$();
+}

@@ -6,6 +6,7 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="src" path="src-generated"/>
 	<classpathentry kind="src" path="/Omni-API">
 		<attributes>
 			<attribute name="module" value="true"/>
