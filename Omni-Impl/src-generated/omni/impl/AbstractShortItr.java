@@ -1,9 +1,7 @@
 package omni.impl;
-public abstract class AbstractShortItr
-{
-  public Short next()
-  {
+import omni.api.OmniIterator;
+public abstract class AbstractShortItr implements OmniIterator.OfShort{
+  @Override public Short next(){
     return nextShort();
   }
-  protected abstract short nextShort();
 }

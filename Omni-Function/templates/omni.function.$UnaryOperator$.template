@@ -1,26 +1,9 @@
 #TYPEDEF OfByte
-  UnaryOperator = ByteUnaryOperator
-  unaryOperatorMethod = applyAsByte
-  exposedType = byte
-#ENDDEF
 #TYPEDEF OfChar
-  UnaryOperator = CharUnaryOperator
-  unaryOperatorMethod = applyAsChar
-  exposedType = char
-#ENDDEF
 #TYPEDEF OfShort
-  UnaryOperator = ShortUnaryOperator
-  unaryOperatorMethod = applyAsShort
-  exposedType = short
-#ENDDEF
 #TYPEDEF OfFloat
-  UnaryOperator = FloatUnaryOperator
-  unaryOperatorMethod = applyAsFloat
-  exposedType = float
-#ENDDEF
-
 package omni.function;
 public interface $UnaryOperator$
 {
-  public abstract $exposedType$ $unaryOperatorMethod$(final $exposedType$ val);
+  public abstract $exposedType$ $applyMethod$(final $exposedType$ val);
 }

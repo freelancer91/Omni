@@ -1,9 +1,7 @@
 package omni.impl;
-public abstract class AbstractByteItr
-{
-  public Byte next()
-  {
+import omni.api.OmniIterator;
+public abstract class AbstractByteItr implements OmniIterator.OfByte{
+  @Override public Byte next(){
     return nextByte();
   }
-  protected abstract byte nextByte();
 }

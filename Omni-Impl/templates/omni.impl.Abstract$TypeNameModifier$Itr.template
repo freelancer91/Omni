@@ -1,0 +1,18 @@
+#TYPEDEF OfBoolean
+#TYPEDEF OfByte
+#TYPEDEF OfChar
+#TYPEDEF OfShort
+#TYPEDEF OfInt
+#TYPEDEF OfLong
+#TYPEDEF OfFloat
+#TYPEDEF OfDouble
+package omni.impl;
+import omni.api.OmniIterator;
+public abstract class Abstract$TypeNameModifier$Itr implements OmniIterator.Of$TypeNameModifier$$<E>$
+{
+  @Override
+  public $BoxedType$ next()
+  {
+    return next$TypeNameModifier$();
+  }
+}

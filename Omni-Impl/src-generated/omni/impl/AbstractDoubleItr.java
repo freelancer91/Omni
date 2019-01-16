@@ -1,9 +1,7 @@
 package omni.impl;
-public abstract class AbstractDoubleItr
-{
-  public Double next()
-  {
+import omni.api.OmniIterator;
+public abstract class AbstractDoubleItr implements OmniIterator.OfDouble{
+  @Override public Double next(){
     return nextDouble();
   }
-  protected abstract double nextDouble();
 }

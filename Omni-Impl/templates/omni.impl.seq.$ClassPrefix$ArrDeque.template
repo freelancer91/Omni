@@ -1,0 +1,3942 @@
+#TYPEDEF OfBoolean
+#TYPEDEF OfByte
+#TYPEDEF OfChar
+#TYPEDEF OfShort
+#TYPEDEF OfInt
+#TYPEDEF OfLong
+#TYPEDEF OfFloat
+#TYPEDEF OfDouble
+#TYPEDEF OfRef
+package omni.impl.seq;
+import omni.api.OmniDeque;
+import omni.util.OmniArray;
+import omni.util.ArrCopy;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
+import omni.api.OmniIterator;
+import java.util.function.IntFunction;
+import java.util.NoSuchElementException;
+import omni.impl.CheckedCollection;
+#IFNOT OfBoolean
+import omni.util.BitSetUtils;
+#ENDIF
+#IF OfDouble,OfFloat
+import omni.util.HashUtils;
+#ENDIF
+#IF OfDouble,OfLong,OfInt
+import java.util.function.$TypeNameModifier$Predicate;
+import java.util.function.$TypeNameModifier$Consumer;
+#ELSEIFNOT OfRef
+import omni.function.$TypeNameModifier$Predicate;
+import omni.function.$TypeNameModifier$Consumer;
+#ENDIF
+#IF OfRef
+import java.util.Objects;
+import omni.util.OmniPred;
+#ELSE
+import omni.impl.Abstract$ClassPrefix$Itr;
+import omni.util.TypeUtil;
+#ENDIF
+public class $ClassPrefix$ArrDeque$<E>$ implements OmniDeque.Of$ClassPrefix$$<E>$
+{
+  transient $ArrayType$[] arr;
+  transient int head;
+  transient int tail;
+  public $ClassPrefix$ArrDeque()
+  {
+    this.tail=-1;
+    this.arr=OmniArray.Of$ClassPrefix$.DEFAULT_ARR;
+  }
+  public $ClassPrefix$ArrDeque(int capacity)
+  {
+    this.tail=-1;
+    switch(capacity)
+    {
+    default:
+      this.arr=new $ArrayType$[capacity];
+      return;
+    case OmniArray.DEFAULT_ARR_SEQ_CAP:
+      this.arr=OmniArray.Of$ClassPrefix$.DEFAULT_ARR;
+    case 0:
+    }
+  }
+  public $ClassPrefix$ArrDeque(int head,int tail,$ArrayType$[] arr)
+  {
+    this.head=head;
+    this.tail=tail;
+    this.arr=arr;
+  }
+  @Override
+  public Object clone()
+  {
+    int tail;
+    if((tail=this.tail+1)!=0)
+    {
+      final var arr=this.arr;
+      final $ArrayType$[] newArr;
+      int head,size;
+      if((size=tail-(head=this.head))<=0)
+      {
+        ArrCopy.uncheckedCopy(arr,head,newArr=new $ArrayType$[size+=arr.length],0,head);
+        ArrCopy.uncheckedCopy(arr,0,newArr,head,tail);
+      }
+      else
+      {
+        ArrCopy.uncheckedCopy(arr,head,newArr=new $ArrayType$[size],0,size);
+      }
+      return new $ClassPrefix$ArrDeque$<E>$(0,size-1,newArr);
+    }
+    return new $ClassPrefix$ArrDeque$<E>$();
+  }
+  #MACRO TailCheckAndCall<false>(String,toString,"[]")
+  #MACRO TailCheckAndCall<false>(int,hashCode,1)
+  @Override
+  public boolean equals(Object val)
+  {
+    //TODO implements equals method
+    return false;
+  }
+  private String toStringHelper(int tail)
+  {
+    final $ArrayType$[] arr;
+    int head;
+    StringBuilder builder=new StringBuilder("[").append((arr=this.arr)[head=this.head]);
+    if(tail<=head)
+    {
+      for(int bound=arr.length;++head!=bound;builder.append(',').append(' ').append(arr[head])){}
+      builder.append(',').append(' ').append(arr[head=0]);
+    }
+    for(;++head!=tail;builder.append(',').append(' ').append(arr[head])){}
+    return builder.append(']').toString();
+  }
+  private int hashCodeHelper(int tail)
+  {
+    final $ArrayType$[] arr;
+    int head;
+    int hash=31+$hashCodeMethod$((arr=this.arr)[head=this.head]);
+    if(tail<=head)
+    {
+      for(int bound=arr.length;++head!=bound;hash=(hash*31)+$hashCodeMethod$(arr[head])){}
+      hash=(hash*31)+$hashCodeMethod$(arr[head=0]);
+    }
+    for(;++head!=tail;hash=(hash*31)+$hashCodeMethod$(arr[head])){}
+    return hash;
+  }
+  #MACRO SuppressUnchecked()
+  @Override
+  public $exposedType$ $elementMethod$()
+  {
+    return ($exposedType$)arr[head];
+  }
+  #MACRO SuppressUnchecked()
+  @Override
+  public $exposedType$ getLast$TypeNameModifier$()
+  {
+    return ($exposedType$)arr[tail];
+  }
+  @Override
+  public void addLast($exposedType$ val)
+  {
+    int tail;
+    if((tail=this.tail)!=-1)
+    {
+      var arr=this.arr;
+      final int head;
+      switch(Integer.signum((++tail)-(head=this.head)))
+      {
+        case 0:
+          int oldArrSize,newArrSize;
+          final $ArrayType$[] newArr;
+          ArrCopy.uncheckedCopy(arr,0,newArr=new $ArrayType$[newArrSize=OmniArray.growBy50Pct(oldArrSize=arr.length)],0,tail);
+          ArrCopy.uncheckedCopy(arr,head,newArr,newArrSize-=(oldArrSize-=tail),oldArrSize);
+          this.head=newArrSize;
+          this.arr=arr=newArr;
+        case -1:
+          break;
+        default:
+          if(tail==arr.length)
+          {
+            if(head==0)
+            {
+              ArrCopy.uncheckedCopy(arr,0,arr=new $ArrayType$[OmniArray.growBy50Pct(tail)],0,tail);
+              this.arr=arr;
+            }
+            else
+            {
+              tail=0;
+            }
+          }
+      }
+      arr[tail]=val;
+      this.tail=tail;
+    }
+    else
+    {
+      initialize(val);
+    }
+  }
+  @Override
+  public void push($exposedType$ val)
+  {
+    int tail;
+    if((tail=this.tail)!=-1)
+    {
+      var arr=this.arr;
+      int head;
+      switch(Integer.signum((++tail)-(head=this.head)))
+      {
+        case 0:
+          int oldArrSize,newArrSize;
+          final $ArrayType$[] newArr;
+          ArrCopy.uncheckedCopy(arr,0,newArr=new $ArrayType$[newArrSize=OmniArray.growBy50Pct(oldArrSize=arr.length)],0,tail);
+          ArrCopy.uncheckedCopy(arr,head,newArr,head=(newArrSize-=(oldArrSize-=tail)),oldArrSize);
+          this.arr=arr=newArr;
+        case -1:
+          --head;
+          break;
+        default:
+          if(--head==-1)
+          {
+            int arrLength;
+            if(tail==(arrLength=arr.length))
+            {
+              ArrCopy.uncheckedCopy(arr,0,arr=new $ArrayType$[arrLength=OmniArray.growBy50Pct(tail)],arrLength-=tail,tail);
+              this.arr=arr;
+            }
+            head=arrLength-1;
+          }
+      }
+      arr[head]=val;
+      this.head=head;
+    }
+    else
+    {
+      initialize(val);
+    }
+  }
+  @Override
+  public $exposedType$ pop$TypeNameModifier$()
+  {
+    return uncheckedExtractFirst(tail);
+  }
+  @Override
+  public $exposedType$ removeLast$TypeNameModifier$()
+  {
+    return uncheckedExtractLast(tail);
+  }
+  @Override
+  public <T> T[] toArray(IntFunction<T[]> arrConstructor)
+  {
+    T[] dst;
+    int tail;
+    if((tail=this.tail+1)!=0)
+    {
+      var arr=this.arr;
+      int head;
+      if(tail<=(head=this.head))
+      {
+        int size;
+        ArrCopy.uncheckedCopy(arr,head,dst=arrConstructor.apply(size=tail+arr.length),0,size-=head);
+        ArrCopy.uncheckedCopy(arr,0,dst,size,tail);
+      }
+      else
+      {
+        ArrCopy.uncheckedCopy(arr,head,dst=arrConstructor.apply(tail-=head),0,tail);
+      }
+    }
+    else
+    {
+      dst=arrConstructor.apply(0);
+    }
+    return dst;
+  }
+  @Override
+  public void clear()
+  {
+#IF OfRef
+    int tail;
+    if((tail=this.tail)!=-1)
+    {
+      int head;
+      if(tail<(head=this.head))
+      {
+        Object[] arr;
+        OmniArray.OfRef.nullifyRange(arr=this.arr,0,tail);
+        OmniArray.OfRef.nullifyRange(arr,head,arr.length-1);
+      }
+      else
+      {
+        OmniArray.OfRef.nullifyRange(arr,head,tail);
+      }
+      this.tail=-1;
+    }
+#ELSE
+    this.tail=-1;
+#ENDIF
+  }
+  #MACRO SuppressUnchecked()
+  void uncheckedForEach(int tail,$TypeNameModifier$Consumer$<? super E>$ action)
+  {
+    var arr=this.arr;
+    int head;
+    if(tail<(head=this.head))
+    {
+      for(int bound=arr.length;;)
+      {
+        action.accept(($exposedType$)arr[head]);
+        if(++head==bound)
+        {
+          break;
+        }
+      }
+      head=0;
+    }
+    for(;;++head)
+    {
+      action.accept(($exposedType$)arr[head]);
+      if(head==tail)
+      {
+        return;
+      }
+    }
+  }
+  #MACRO PollMethods(PollLast,)
+  #MACRO PollMethods(PollFirst,)
+  @Override
+  public OmniIterator.Of$ClassPrefix$$<E>$ iterator()
+  {
+    return new AscendingItr$<E>$(this);
+  }
+  @Override
+  public OmniIterator.Of$ClassPrefix$$<E>$ descendingIterator()
+  {
+    return new DescendingItr$<E>$(this);
+  }
+  @Override
+  public boolean isEmpty()
+  {
+    return this.tail==-1;
+  }
+  @Override
+  public int size()
+  {
+    int tail;
+    if((tail=this.tail+1)!=0 && (tail-=head)<1)
+    {
+      tail+=arr.length;
+    }
+    return tail;
+  }
+  #MACRO DoubleFloatQuery(boolean,removeLastOccurrence)
+  #MACRO DoubleFloatQuery(boolean,removeVal)
+  #MACRO PeekMethods(PeekLast)
+  #MACRO PeekMethods(PeekFirst)
+  #MACRO ForEachMethods(UncheckedForEach)
+  #MACRO ProxyAdd(boolean,add,addLast,$exposedType$,,return true;)
+  #MACRO ProxyAdd(boolean,offerLast,addLast,$exposedType$,,return true;)
+  #MACRO ProxyAdd(boolean,offerFirst,push,$exposedType$,,return true;)
+  #MACRO ProxyAdd(boolean,offer,addLast,$exposedType$,,return true;)
+  #MACRO ProxyAdd(void,addFirst,push,$BoxedType$,($exposedType$),)
+#IFNOT OfRef
+  #MACRO ProxyAdd(void,push,push,$BoxedType$,($exposedType$),)
+  #MACRO ProxyAdd(boolean,offer,addLast,$BoxedType$,($exposedType$),return true;)
+  #MACRO ProxyAdd(boolean,offerLast,addLast,$BoxedType$,($exposedType$),return true;)
+  #MACRO ProxyAdd(boolean,offerFirst,push,$BoxedType$,($exposedType$),return true;)
+  #MACRO ProxyAdd(void,addLast,addLast,$BoxedType$,($exposedType$),)
+  #MACRO ProxyAdd(boolean,add,addLast,$BoxedType$,($exposedType$),return true;)
+  #IFNOT OfBoolean
+  #MACRO ProxyAdd(boolean,add,addLast,boolean,$queryCastBoolean$,return true;)
+    #IF OfDouble,OfFloat,OfLong
+  #MACRO ProxyAdd(boolean,add,addLast,int,($exposedType$),return true;)
+      #IFNOT OfLong
+  #MACRO ProxyAdd(boolean,add,addLast,char,($exposedType$),return true;)
+  #MACRO ProxyAdd(boolean,add,addLast,short,($exposedType$),return true;)
+  #MACRO ProxyAdd(boolean,add,addLast,long,($exposedType$),return true;)
+        #IFNOT OfFloat
+  #MACRO ProxyAdd(boolean,add,addLast,float,($exposedType$),return true;)
+        #ENDIF
+      #ENDIF
+    #ENDIF
+  #ENDIF
+#ENDIF
+  private void initialize($exposedType$ val)
+  {
+    $ArrayType$[] arr;
+    if((arr=this.arr)==OmniArray.Of$ClassPrefix$.DEFAULT_ARR)
+    {
+      this.arr=arr=new $ArrayType$[OmniArray.DEFAULT_ARR_SEQ_CAP];
+    }
+    else if(arr==null)
+    {
+      this.arr=new $ArrayType$[1];
+    }
+    arr[0]=val;
+    this.tail=0;
+    this.head=0;
+  }
+  private $exposedType$ uncheckedExtractFirst(int tail)
+  {
+    $ArrayType$[] arr;
+    int head;
+    #MACRO SuppressUnchecked()
+    var ret=($exposedType$)(arr=this.arr)[head=this.head];
+#IF OfRef
+    arr[head]=null;
+#ENDIF
+    switch(Integer.signum(tail-head))
+    {
+      case -1:
+        if(++head==arr.length)
+        {
+          head=0;
+        }
+        break;
+    case 0:
+        tail=-1;
+        break;
+    default:
+        ++head;
+    }
+    this.head=head;
+    return ret;
+  }
+  private $exposedType$ uncheckedExtractLast(int tail)
+  {
+    $ArrayType$[] arr;
+    #MACRO SuppressUnchecked()
+    var ret=($exposedType$)(arr=this.arr)[tail];
+#IF OfRef
+    arr[tail]=null;
+#ENDIF
+    switch(Integer.signum(tail-head))
+    {
+      case -1:
+        if(--tail==-1)
+        {
+          tail=arr.length-1;
+        }
+        break;
+      case 0:
+        tail=-1;
+        break;
+      default:
+        --tail;
+    }
+    this.tail=tail;
+    return ret;
+  }
+  #MACRO ProxyGet($BoxedType$,peekFirst,peek)
+  #MACRO ProxyGet($BoxedType$,pollFirst,poll)
+  #MACRO ProxyGet($BoxedType$,getFirst,$elementMethod$)
+  #MACRO ProxyGet($BoxedType$,removeFirst,pop$TypeNameModifier$)
+  #MACRO ProxyGet($BoxedType$,remove,pop$TypeNameModifier$)
+#IFNOT OfRef
+  #MACRO ProxyGet($BoxedType$,element,$elementMethod$)
+  #MACRO ProxyGet($BoxedType$,getLast,getLast$TypeNameModifier$)
+  #MACRO ProxyGet($BoxedType$,removeLast,removeLast$TypeNameModifier$)
+  #MACRO ProxyGet($BoxedType$,pop,pop$TypeNameModifier$)
+#ENDIF
+  @Override
+  public boolean removeFirstOccurrence(Object val)
+  {
+    return remove(val);
+  }
+  #MACRO ToArray($ArrayType$,$TypeNameModifier$,Of$ClassPrefix$.DEFAULT_ARR)
+  #MACRO RemoveIf($TypeNameModifier$Predicate$<? super E>$,filter)
+#IFNOT OfRef
+  #MACRO RemoveIf(Predicate<? super $BoxedType$>,filter::test)
+#ENDIF
+  @Override
+  public <T> T[] toArray(T[] dst)
+  {
+    int tail;
+    if((tail=this.tail+1)!=0)
+    {
+      var arr=this.arr;
+      int head;
+      if(tail<=(head=this.head))
+      {
+        int size;
+        ArrCopy.uncheckedCopy(arr,head,dst=OmniArray.uncheckedArrResize(size=tail+arr.length,dst),0,size-=head);
+        ArrCopy.uncheckedCopy(arr,0,dst,size,tail);
+      }
+      else
+      {
+        ArrCopy.uncheckedCopy(arr,head,dst=OmniArray.uncheckedArrResize(tail-=head,dst),0,tail);
+      }
+    }
+    else if(dst.length!=0)
+    {
+      dst[0]=null;
+    }
+    return dst;
+  }
+#IFNOT OfRef
+  #MACRO ToArray($BoxedType$,,Of$ClassPrefix$.DEFAULT_BOXED_ARR)
+  #IFNOT OfDouble
+  #MACRO ToArray(double,Double,OfDouble.DEFAULT_ARR)
+    #IFNOT OfFloat
+  #MACRO ToArray(float,Float,OfFloat.DEFAULT_ARR)
+      #IFNOT OfLong
+  #MACRO ToArray(long,Long,OfLong.DEFAULT_ARR)
+        #IFNOT OfInt
+  #MACRO ToArray(int,Int,OfInt.DEFAULT_ARR)
+          #IFNOT OfShort,OfChar
+  #MACRO ToArray(short,Short,OfShort.DEFAULT_ARR)
+            #IFNOT OfByte
+  #MACRO ToArray(byte,Byte,OfByte.DEFAULT_ARR)
+  #MACRO ToArray(char,Char,OfChar.DEFAULT_ARR)
+            #ENDIF
+          #ENDIF
+        #ENDIF
+      #ENDIF
+    #ENDIF
+  #ENDIF
+#ENDIF
+  #MACRO QueryMethods(boolean,contains,false,#IFNOT OfBoolean,#IFNOT OfLong\,OfInt\,OfByte\,OfBoolean,#IFNOT OfBoolean)
+  #MACRO QueryMethods(int,search,-1,#IF OfRef\,OfByte,#IF OfRef\,OfFloat\,OfShort\,OfChar,#IFNOT OfDouble\,OfLong\,OfInt\,OfBoolean)
+  #MACRO DoubleFloatQuery(boolean,contains)
+  #MACRO DoubleFloatQuery(int,search)
+  private static class DescendingItr$<E>$
+#IFNOT OfRef
+    extends Abstract$ClassPrefix$Itr$<E>$
+#ENDIF
+    implements OmniIterator.Of$ClassPrefix$$<E>$
+  {
+    transient final $ClassPrefix$ArrDeque$<E>$ root;
+    transient int nextIndex;
+    DescendingItr($ClassPrefix$ArrDeque$<E>$ root)
+    {
+      this.root=root;
+      this.nextIndex=root.tail;
+    }
+    @Override
+    public boolean hasNext()
+    {
+      final int tail,head,index;
+      final $ClassPrefix$ArrDeque$<E>$ root;
+      return (index=this.nextIndex)>=(head=(root=this.root).head) || (index<=(tail=root.tail)&&tail<head);
+    }
+    #MACRO SuppressUnchecked()
+    @Override
+    public $exposedType$ next$TypeNameModifier$()
+    {
+      final $ArrayType$[] arr;
+      int index;
+      final $exposedType$ ret=($exposedType$)(arr=root.arr)[index=this.nextIndex];
+      if(--index==-1)
+      {
+        index=arr.length-1;
+      }
+      this.nextIndex=index;
+      return ret;
+    }
+    #MACRO ForEachMethods(UncheckedDescItrForEachRemaining)
+    @Override
+    public void remove()
+    {
+      final $ClassPrefix$ArrDeque$<E>$ root;
+      int head,tail,removeIndex;
+      if((tail=(root=this.root).tail)<(head=root.head))
+      {
+        //fragmented
+        final $ArrayType$[] arr;
+        int arrLength=(arr=root.arr).length-1;
+        if((removeIndex=this.nextIndex+1)>arrLength)
+        {
+          //0 == removeIndex <=tail < head <= arr.length-1
+          int before;
+          if((before=arrLength-head)<tail)
+          {
+            arr[0]=arr[arrLength];
+            #MACRO UncheckedRemoveIndex1(root)
+            //also move the index to the beginning of the array
+            this.nextIndex=0;
+          }
+          else
+          {
+            #MACRO UncheckedRemoveIndex2(root,uncheckedCopy,tail)
+          }
+        }
+        else
+        {
+          int headDist,after;
+          if((headDist=removeIndex-head)<0)
+          {
+            //0 < removeIndex <= tail < head < arr.length
+            if((headDist=arrLength-head)+removeIndex<(after=tail-removeIndex))
+            {
+              #MACRO UncheckedRemoveIndex3(root,uncheckedCopy)
+              //also move the nextIndex up
+              this.nextIndex=removeIndex;
+            }
+            else
+            {
+              #MACRO UncheckedRemoveIndex4(root)
+            }
+          }
+          else
+          {
+            //0 <= tail < head <= removeIndex <= arr.length-1
+            if(headDist<=(after=arrLength-removeIndex)+tail)
+            {
+              //cheaper to shift elements forward
+              //also move the index up
+              if(head==arrLength)
+              {
+                root.head=0;
+              }
+              else
+              {
+#IF OfRef
+                ArrCopy.semicheckedCopy(arr,head,arr,head+1,headDist);
+                root.head=head+1;
+#ELSE
+                ArrCopy.semicheckedCopy(arr,head,arr,++head,headDist);
+                root.head=head;
+#ENDIF
+              }
+#IF OfRef
+              arr[head]=null;
+#ENDIF
+              this.nextIndex=removeIndex;
+            }
+            else
+            {
+              #MACRO UncheckedRemoveIndex5(root,semicheckedCopy)
+            }
+          }
+        }
+      }
+      else
+      {
+        //non-fragmented
+        //0 <= head <= removeIndex <= tail < arr.length
+        final var arr=root.arr;
+        int headDist,tailDist;
+        if((headDist=(removeIndex=this.nextIndex+1)-head)<(tailDist=tail-removeIndex))
+        {
+          //cheaper to move elements forward
+          this.nextIndex=removeIndex;
+          ArrCopy.semicheckedCopy(arr,head,arr,head+1,headDist);
+#IF OfRef
+          arr[head]=null;
+#ENDIF
+        }
+        else
+        {
+          //cheaper to move elements backward
+          ArrCopy.semicheckedCopy(arr,removeIndex+1,arr,removeIndex,tailDist);
+#IF OfRef
+          arr[tail]=null;
+#ENDIF
+        }
+      }
+    }
+  }
+  private static class AscendingItr$<E>$
+#IFNOT OfRef
+    extends Abstract$ClassPrefix$Itr$<E>$
+#ENDIF
+    implements OmniIterator.Of$ClassPrefix$$<E>$
+  {
+    transient final $ClassPrefix$ArrDeque$<E>$ root;
+    transient int nextIndex;
+    AscendingItr($ClassPrefix$ArrDeque$<E>$ root)
+    {
+      this.root=root;
+      this.nextIndex=root.head;
+    }
+    @Override
+    public boolean hasNext()
+    {
+      final int tail,head,index;
+      final $ClassPrefix$ArrDeque$<E>$ root;
+      return (index=this.nextIndex)<=(tail=(root=this.root).tail) ||
+        (index>=(head=root.head) && tail<head);
+    }
+    #MACRO SuppressUnchecked()
+    @Override
+    public $exposedType$ next$TypeNameModifier$()
+    {
+      final $ArrayType$[] arr;
+      int index;
+      final $exposedType$ ret=($exposedType$)(arr=root.arr)[index=this.nextIndex];
+      if(++index==arr.length)
+      {
+        index=0;
+      }
+      this.nextIndex=index;
+      return ret;
+    }
+    #MACRO ForEachMethods(UncheckedAscItrForEachRemaining)
+    @Override
+    public void remove()
+    {
+      final $ClassPrefix$ArrDeque$<E>$ root;
+      int head,tail,removeIndex;
+      if((tail=(root=this.root).tail)<(head=root.head))
+      {
+        //fragmented
+        final $ArrayType$[] arr;
+        int arrLength=(arr=root.arr).length-1;
+        if((removeIndex=this.nextIndex-1)==-1)
+        {
+          //0 <= tail < head <= removeIndex == arr.length-1
+          int before;
+          if((before=arrLength-head)<=tail)
+          {
+            #MACRO UncheckedRemoveIndex1(root)
+          }
+          else
+          {
+            arr[arrLength]=arr[0];
+            #MACRO UncheckedRemoveIndex2(root,uncheckedCopy,tail)
+            //also move the nextIndex to the end of the array
+            this.nextIndex=arrLength;
+          }
+        }
+        else
+        {
+          int headDist,after;
+          if((headDist=removeIndex-head)<0)
+          {
+            //0 <= removeIndex <= tail < head < arr.length
+            if((headDist=arrLength-head)+removeIndex<(after=tail-removeIndex))
+            {
+              #MACRO UncheckedRemoveIndex3(root,semicheckedCopy)
+            }
+            else
+            {
+              #MACRO UncheckedRemoveIndex4(root)
+              //also move the nextIndex down
+              this.nextIndex=removeIndex;
+            }
+          }
+          else
+          {
+            //0 <= tail < head <= removeIndex < arr.length-1
+            if(headDist<=(after=arrLength-removeIndex)+tail)
+            {
+              //cheaper to shift elements forward
+#IF OfRef
+              ArrCopy.semicheckedCopy(arr,head,arr,head+1,headDist);
+              arr[head]=null;
+              root.head=head+1;
+#ELSE
+              ArrCopy.semicheckedCopy(arr,head,arr,++head,headDist);
+              root.head=head;
+#ENDIF
+            }
+            else
+            {
+              #MACRO UncheckedRemoveIndex5(root,uncheckedCopy)
+              //also move the nextIndex down
+              this.nextIndex=removeIndex;
+            }
+          }
+        }
+      }
+      else
+      {
+        //non-fragmented
+        //0 <= head <= removeIndex <= tail < arr.length
+        final var arr=root.arr;
+        int headDist,tailDist;
+        if((headDist=(removeIndex=this.nextIndex-1)-head)<(tailDist=tail-removeIndex))
+        {
+          //cheaper to move elements forward
+          ArrCopy.semicheckedCopy(arr,head,arr,head+1,headDist);
+#IF OfRef
+          arr[head]=null;
+#ENDIF
+        }
+        else
+        {
+          //cheaper to move elements backward
+          this.nextIndex=removeIndex;
+          ArrCopy.semicheckedCopy(arr,removeIndex+1,arr,removeIndex,tailDist);
+#IF OfRef
+          arr[tail]=null;
+#ENDIF
+        }
+      }
+    }
+  }
+  #MACRO QueryObject<false>(boolean,contains,contains,false)
+  #MACRO QueryObject<false>(int,search,search,-1)
+  #MACRO QueryObject<false>(boolean,remove,removeVal,false)
+  #MACRO QueryObject<false>(boolean,removeLastOccurrence,removeLastOccurrence,false)
+  #MACRO QueryMethods(boolean,removeVal,false,#IFNOT OfBoolean,#IFNOT OfLong\,OfInt\,OfByte\,OfBoolean,#IFNOT OfBoolean)
+  #MACRO QueryMethods(boolean,removeLastOccurrence,false,#IF OfRef\,OfByte,#IF OfRef\,OfFloat\,OfShort\,OfChar,#IFNOT OfDouble\,OfLong\,OfInt\,OfBoolean)
+  public static class Checked$<E>$ extends $ClassPrefix$ArrDeque$<E>$
+  {
+    transient int modCount;
+    public Checked()
+    {
+      super();
+    }
+    public Checked(int capacity)
+    {
+      super(capacity);
+    }
+    public Checked(int head,int tail,$ArrayType$[] arr)
+    {
+      super(head,tail,arr);
+    }
+    @Override
+    public Object clone()
+    {
+      int tail;
+      if((tail=this.tail+1)!=0)
+      {
+        final var arr=this.arr;
+        final $ArrayType$[] newArr;
+        int head,size;
+        if((size=tail-(head=this.head))<=0)
+        {
+          ArrCopy.uncheckedCopy(arr,head,newArr=new $ArrayType$[size+=arr.length],0,head);
+          ArrCopy.uncheckedCopy(arr,0,newArr,head,tail);
+        }
+        else
+        {
+          ArrCopy.uncheckedCopy(arr,head,newArr=new $ArrayType$[size],0,size);
+        }
+        return new Checked$<E>$(0,size-1,newArr);
+      }
+      return new Checked$<E>$();
+    }
+    @Override
+    public boolean equals(Object val)
+    {
+      //TODO implements equals method
+      return false;
+    }
+#IF OfRef
+    #MACRO TailCheckAndCall<true>(String,toString,"[]")
+    #MACRO TailCheckAndCall<true>(int,hashCode,1)
+#ENDIF
+    #MACRO SuppressUnchecked()
+    @Override
+    public $exposedType$ $elementMethod$()
+    {
+      if(tail!=-1)
+      {
+        return ($exposedType$)arr[head];
+      }
+      throw new NoSuchElementException();
+    }
+    #MACRO SuppressUnchecked()
+    @Override
+    public $exposedType$ getLast$TypeNameModifier$()
+    {
+      int tail;
+      if((tail=this.tail)!=-1)
+      {
+        return ($exposedType$)arr[tail];
+      }
+      throw new NoSuchElementException();
+    }
+    @Override
+    public void addLast($exposedType$ val)
+    {
+      ++this.modCount;
+      super.addLast(val);
+    }
+    @Override
+    public void push($exposedType$ val)
+    {
+      ++this.modCount;
+      super.push(val);
+    }
+    @Override
+    public $exposedType$ pop$TypeNameModifier$()
+    {
+      int tail;
+      if((tail=this.tail)!=-1)
+      {
+        ++this.modCount;
+        return super.uncheckedExtractFirst(tail);
+      }
+      throw new NoSuchElementException();
+    }
+    @Override
+    public $exposedType$ removeLast$TypeNameModifier$()
+    {
+      int tail;
+      if((tail=this.tail)!=-1)
+      {
+        ++this.modCount;
+        return super.uncheckedExtractLast(tail);
+      }
+      throw new NoSuchElementException();
+    }
+    @Override
+    public <T> T[] toArray(IntFunction<T[]> arrConstructor)
+    {
+      return super.toArray(arrSize->
+      {
+        int modCount=this.modCount;
+        try
+        {
+          return arrConstructor.apply(arrSize);
+        }
+        finally
+        {
+          CheckedCollection.checkModCount(modCount,this.modCount);
+        }
+      });
+    }
+    @Override
+    public void clear()
+    {
+#IF OfRef
+      int tail;
+      if((tail=this.tail)!=-1)
+      {
+        ++this.modCount;
+        int head;
+        if(tail<(head=this.head))
+        {
+          Object[] arr;
+          OmniArray.OfRef.nullifyRange(arr=this.arr,0,tail);
+          OmniArray.OfRef.nullifyRange(arr,head,arr.length-1);
+        }
+        else
+        {
+          OmniArray.OfRef.nullifyRange(arr,head,tail);
+        }
+      }
+#ELSE
+      if(tail!=-1)
+      {
+        ++this.modCount;
+        this.tail=-1;
+      }
+#ENDIF
+    }
+    @Override
+    void uncheckedForEach(int tail,$TypeNameModifier$Consumer$<? super E>$ action)
+    {
+      int modCount=this.modCount;
+      try
+      {
+        super.uncheckedForEach(tail,action);
+      }
+      finally
+      {
+        CheckedCollection.checkModCount(modCount,this.modCount);
+      }
+    }
+    #MACRO PollMethods(PollLast,++this.modCount;)
+    #MACRO PollMethods(PollFirst,++this.modCount;)
+    private static class CheckedAscendingItr$<E>$
+#IFNOT OfRef
+      extends Abstract$ClassPrefix$Itr$<E>$
+#ENDIF
+      implements OmniIterator.Of$ClassPrefix$$<E>$
+    {
+      transient final Checked$<E>$ root;
+      transient int modCount;
+      transient int nextIndex;
+      transient int lastRet;
+      CheckedAscendingItr(Checked$<E>$ root)
+      {
+        this.root=root;
+        this.modCount=root.modCount;
+        this.lastRet=-1;
+        this.nextIndex=root.head;
+      }
+      @Override
+      public boolean hasNext()
+      {
+        final int tail,head,index;
+        final $ClassPrefix$ArrDeque$<E>$ root;
+        return (index=this.nextIndex)<=(tail=(root=this.root).tail) ||
+          (index>=(head=root.head) && tail<head);
+      }
+      #MACRO SuppressUnchecked()
+      @Override
+      public $exposedType$ next$TypeNameModifier$()
+      {
+        final Checked$<E>$ root;
+        CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+        final int tail,index;
+        final var arr=root.arr;
+        if((index=this.nextIndex)>(tail=root.tail))
+        {
+          int head;
+          if(index<(head=root.head) || tail>head)
+          {
+            throw new NoSuchElementException();
+          }
+          else if(index==arr.length-1)
+          {
+            this.nextIndex=0;
+          }
+          else
+          {
+            this.nextIndex=index+1;
+          }
+        }
+        else
+        {
+          this.nextIndex=index+1;
+        }
+        this.lastRet=index;
+        return ($exposedType$)arr[index];
+      }
+      #MACRO ForEachMethods(CheckedAscItrForEachRemaining)
+      @Override
+      public void remove()
+      {
+        int removeIndex;
+        if((removeIndex=this.lastRet)==-1)
+        {
+          throw new IllegalStateException();
+        }
+        int modCount;
+        final Checked$<E>$ root;
+        CheckedCollection.checkModCount(modCount=this.modCount,(root=this.root).modCount);
+        root.modCount=++modCount;
+        this.modCount=modCount;
+        int head,tail;
+        if((tail=root.tail)<(head=root.head))
+        {
+          //fragmented
+          final $ArrayType$[] arr;
+          int arrLength=(arr=root.arr).length-1;
+          {
+            int headDist,after;
+            if((headDist=removeIndex-head)<0)
+            {
+              //0 <= removeIndex <= tail < head < arr.length
+              if((headDist=arrLength-head)+removeIndex<(after=tail-removeIndex))
+              {
+                #MACRO UncheckedRemoveIndex3(root,semicheckedCopy)
+              }
+              else
+              {
+                #MACRO UncheckedRemoveIndex4(root)
+                //also move the nextIndex down
+                this.nextIndex=removeIndex;
+              }
+            }
+            else
+            {
+              //0 <= tail < head <= removeIndex <= arr.length-1
+              if(headDist<=(after=arrLength-removeIndex)+tail)
+              {
+                //cheaper to shift elements forward
+#IF OfRef
+                ArrCopy.semicheckedCopy(arr,head,arr,head+1,headDist);
+                arr[head]=null;
+                root.head=head+1;
+#ELSE
+                ArrCopy.semicheckedCopy(arr,head,arr,++head,headDist);
+                root.head=head;
+#ENDIF
+              }
+              else
+              {
+                #MACRO UncheckedRemoveIndex5(root,semicheckedCopy)
+                //also move the nextIndex down
+                this.nextIndex=removeIndex;
+              }
+            }
+          }
+        }
+        else
+        {
+          //non-fragmented
+          //0 <= head <= removeIndex <= tail < arr.length
+          final var arr=root.arr;
+          int headDist,tailDist;
+          if((headDist=removeIndex-head)<(tailDist=tail-removeIndex))
+          {
+            //cheaper to move elements forward
+            ArrCopy.semicheckedCopy(arr,head,arr,head+1,headDist);
+#IF OfRef
+            arr[head]=null;
+#ENDIF
+          }
+          else
+          {
+            //cheaper to move elements backward
+            this.nextIndex=removeIndex;
+            ArrCopy.semicheckedCopy(arr,removeIndex+1,arr,removeIndex,tailDist);
+#IF OfRef
+            arr[tail]=null;
+#ENDIF
+          }
+        }
+      }
+    }
+    private static class CheckedDescendingItr$<E>$
+#IFNOT OfRef
+      extends Abstract$ClassPrefix$Itr$<E>$
+#ENDIF
+      implements OmniIterator.Of$ClassPrefix$$<E>$
+    {
+      transient final Checked$<E>$ root;
+      transient int modCount;
+      transient int nextIndex;
+      transient int lastRet;
+      CheckedDescendingItr(Checked$<E>$ root)
+      {
+        this.root=root;
+        this.modCount=root.modCount;
+        this.lastRet=-1;
+        this.nextIndex=root.tail;
+      }
+       @Override
+      public boolean hasNext()
+      {
+        final int tail,head,index;
+        final $ClassPrefix$ArrDeque$<E>$ root;
+        return (index=this.nextIndex)>=(head=(root=this.root).head) || (index<=(tail=root.tail)&&tail<head);
+      }
+      #MACRO SuppressUnchecked()
+      @Override
+      public $exposedType$ next$TypeNameModifier$()
+      {
+        final Checked$<E>$ root;
+        CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+        int head,index;
+        final var arr=root.arr;
+        if((index=this.nextIndex)<(head=root.head))
+        {
+          int tail;
+          if(index>(tail=root.tail) || tail>=head)
+          {
+            throw new NoSuchElementException();
+          }
+          else if(index==0)
+          {
+            this.nextIndex=arr.length-1;
+          }
+          else
+          {
+            this.nextIndex=index-1;
+          }
+        }
+        else
+        {
+          this.nextIndex=index-1;
+        }
+        this.lastRet=index;
+        return ($exposedType$)arr[index];
+      }
+      #MACRO ForEachMethods(CheckedDescItrForEachRemaining)
+      @Override
+      public void remove()
+      {
+        int removeIndex;
+        if((removeIndex=this.lastRet)==-1)
+        {
+          throw new IllegalStateException();
+        }
+        int modCount;
+        final Checked$<E>$ root;
+        CheckedCollection.checkModCount(modCount=this.modCount,(root=this.root).modCount);
+        root.modCount=++modCount;
+        this.modCount=modCount;
+        int head,tail;
+        if((tail=root.tail)<(head=root.head))
+        {
+          //fragmented
+          final $ArrayType$[] arr;
+          int arrLength=(arr=root.arr).length-1;
+          {
+            int headDist,after;
+            if((headDist=removeIndex-head)<0)
+            {
+              //0 <= removeIndex <= tail < head < arr.length
+              if((headDist=arrLength-head)+removeIndex<(after=tail-removeIndex))
+              {
+                #MACRO UncheckedRemoveIndex3(root,semicheckedCopy)
+                //also move the nextIndex up
+                this.nextIndex=removeIndex;
+              }
+              else
+              {
+                #MACRO UncheckedRemoveIndex4(root)
+              }
+            }
+            else
+            {
+              //0 <= tail < head <= removeIndex <= arr.length-1
+              if(headDist<=(after=arrLength-removeIndex)+tail)
+              {
+                //cheaper to shift elements forward
+                //also move the index up
+                if(head==arrLength)
+                {
+                  root.head=0;
+                }
+                else
+                {
+#IF OfRef
+                  ArrCopy.semicheckedCopy(arr,head,arr,head+1,headDist);
+                  root.head=head+1;
+#ELSE
+                  ArrCopy.semicheckedCopy(arr,head,arr,++head,headDist);
+                  root.head=head;
+#ENDIF
+                }
+#IF OfRef
+                arr[head]=null;
+#ENDIF
+                this.nextIndex=removeIndex;
+              }
+              else
+              {
+                #MACRO UncheckedRemoveIndex5(root,semicheckedCopy)
+              }
+            }
+          }
+        }
+        else
+        {
+          //non-fragmented
+          //0 <= head <= removeIndex <= tail < arr.length
+          final var arr=root.arr;
+          int headDist,tailDist;
+          if((headDist=removeIndex-head)<(tailDist=tail-removeIndex))
+          {
+            //cheaper to move elements forward
+            this.nextIndex=removeIndex;
+            ArrCopy.semicheckedCopy(arr,head,arr,head+1,headDist);
+#IF OfRef
+            arr[head]=null;
+#ENDIF
+          }
+          else
+          {
+            //cheaper to move elements backward
+            ArrCopy.semicheckedCopy(arr,removeIndex+1,arr,removeIndex,tailDist);
+#IF OfRef
+            arr[tail]=null;
+#ENDIF
+          }
+        }
+      }
+    }
+    @Override
+    public OmniIterator.Of$ClassPrefix$$<E>$ iterator()
+    {
+      return new CheckedAscendingItr$<E>$(this);
+    }
+    @Override
+    public OmniIterator.Of$ClassPrefix$$<E>$ descendingIterator()
+    {
+      return new CheckedDescendingItr$<E>$(this);
+    }
+    
+#IF OfRef
+    #MACRO QueryObject<true>(boolean,contains,contains,false)
+    #MACRO QueryObject<true>(int,search,search,-1)
+    #MACRO CheckedRemoveObject(remove,removeVal)
+    #MACRO CheckedRemoveObject(removeLastOccurrence,removeLastOccurrence)
+    private boolean fragmentedremoveLastOccurrenceNonNull(int head,int tail,Object val)
+    {
+      int modCount=this.modCount;
+      try
+      {
+        final $ArrayType$[] arr=this.arr;
+        int removeIndex=tail,arrLength;
+        for(;;--removeIndex)
+        {
+          if(val.equals(arr[removeIndex]))
+          {
+            CheckedCollection.checkModCount(modCount,this.modCount);
+            this.modCount=modCount+1;
+            #MACRO FragmentedRemoveTail(head,removeIndex,tail,arrLength=arr.length-1)
+            return true;
+          }
+          if(removeIndex==0)
+          {
+            removeIndex=arrLength=arr.length-1;
+            break;
+          }
+        }
+        for(;;--removeIndex)
+        {
+          if(val.equals(arr[removeIndex]))
+          {
+            CheckedCollection.checkModCount(modCount,this.modCount);
+            this.modCount=modCount+1;
+            #MACRO FragmentedRemoveHead(head,removeIndex,tail)
+            return true;
+          }
+          if(removeIndex==head)
+          {
+            CheckedCollection.checkModCount(modCount,this.modCount);
+            return false;
+          }
+        }
+      }
+      catch(final RuntimeException e)
+      {
+        throw CheckedCollection.checkModCount(modCount,this.modCount,e);
+      }
+    }
+    private boolean fragmentedremoveValNonNull(int head,int tail,Object val)
+    {
+      int modCount=this.modCount;
+      try
+      {
+        final $ArrayType$[] arr;
+        int removeIndex=head;
+        int arrLength;
+        for(arrLength=(arr=this.arr).length-1;;++removeIndex)
+        {
+          if(val.equals(arr[removeIndex]))
+          {
+            CheckedCollection.checkModCount(modCount,this.modCount);
+            this.modCount=modCount+1;
+            #MACRO FragmentedRemoveHead(head,removeIndex,tail)
+            return true;
+          }
+          if(removeIndex==arrLength)
+          {
+            removeIndex=0;
+            break;
+          }
+        }
+        for(;;++removeIndex)
+        {
+          if(val.equals(arr[removeIndex]))
+          {
+            CheckedCollection.checkModCount(modCount,this.modCount);
+            this.modCount=modCount+1;
+            #MACRO FragmentedRemoveTail(head,removeIndex,tail,arrLength)
+            return true;
+          }
+          if(removeIndex==tail)
+          {
+            CheckedCollection.checkModCount(modCount,this.modCount);
+            return false;
+          }
+        }
+      }
+      catch(final RuntimeException e)
+      {
+        throw CheckedCollection.checkModCount(modCount,this.modCount,e);
+      }
+    }
+    #MACRO CheckedNonFragmentedRemoveValNonNull(removeLastOccurrence,tail,head,--)
+    #MACRO CheckedNonFragmentedRemoveValNonNull(removeVal,head,tail,++)
+    #MACRO UncheckedRemoveVal<removeVal,true>(,\,Predicate<Object> pred,\,pred,pred.test)
+    #MACRO UncheckedRemoveVal<removeLastOccurrence,true>(,\,Predicate<Object> pred,\,pred,pred.test)
+#ELSEIF OfDouble,OfFloat
+    #MACRO UncheckedRemoveVal<removeVal,true>(Bits,\,$queryParameterType$ bits,\,bits,bits==$convertToBits$)
+    #MACRO UncheckedRemoveVal<removeVal,true>(0,,,0==)
+    #MACRO UncheckedRemoveVal<removeVal,true>(NaN,,,$BoxedType$.isNaN)
+    #MACRO UncheckedRemoveVal<removeLastOccurrence,true>(Bits,\,$queryParameterType$ bits,\,bits,bits==$convertToBits$)
+    #MACRO UncheckedRemoveVal<removeLastOccurrence,true>(0,,,0==)
+    #MACRO UncheckedRemoveVal<removeLastOccurrence,true>(NaN,,,$BoxedType$.isNaN)
+#ELSE
+    #MACRO UncheckedRemoveVal<removeVal,true>(,\,$queryParameterType$ val,\,val,val==)
+    #MACRO UncheckedRemoveVal<removeLastOccurrence,true>(,\,$queryParameterType$ val,\,val,val==)
+#ENDIF
+#IF OfBoolean
+    private void collapseheadandtailFragmented(int modCount,$ArrayType$[] arr,int head,int tail,$TypeNameModifier$Predicate$<? super E>$ filter,$ArrayType$ removeThis)
+    {
+      while(tail!=0)
+      {
+        if(arr[--tail]^removeThis)
+        {
+          if(filter.test(removeThis=!removeThis))
+          {
+            CheckedCollection.checkModCount(modCount,this.modCount);
+            this.modCount=modCount+1;
+            this.tail=-1;
+            return;
+          }
+          CheckedCollection.checkModCount(modCount,this.modCount);
+          this.modCount=modCount+1;
+          this.tail=tail;
+          int bound;
+          if((bound=arr.length)-1==(head=pullUp(arr,bound,head,removeThis)))
+          {
+            head=pullUp(arr,tail,-1,removeThis);
+          }
+          this.head=head+1;
+          return;
+        }
+      }
+      for(tail=arr.length-1;tail!=head;--tail)
+      {
+        if(arr[tail]^removeThis)
+        {
+          if(filter.test(removeThis=!removeThis))
+          {
+            break;
+          }
+          CheckedCollection.checkModCount(modCount,this.modCount);
+          this.modCount=modCount+1;
+          this.tail=tail;
+          this.head=pullUp(arr,tail,head,removeThis)+1;
+          return;
+        }
+      }
+      CheckedCollection.checkModCount(modCount,this.modCount);
+      this.modCount=modCount+1;
+      this.tail=-1;
+    }
+    private boolean collapsebodyFragmented(int modCount,$ArrayType$[] arr,int head,int tail,$TypeNameModifier$Predicate$<? super E>$ filter,$ArrayType$ retainThis)
+    {
+      for(int srcOffset=0;srcOffset!=tail;++srcOffset)
+      {
+        if(arr[srcOffset]^retainThis)
+        {
+          if(!filter.test(!retainThis))
+          {
+            CheckedCollection.checkModCount(modCount,this.modCount);
+            return false;
+          }
+          CheckedCollection.checkModCount(modCount,this.modCount);
+          this.modCount=modCount+1;
+          arr[tail=$ClassPrefix$ArrSeq.pullSurvivorsDown(arr,srcOffset,tail,retainThis)]=retainThis;
+          this.tail=tail;
+          if(head!=(head=pullUp(arr,arr.length,head,retainThis)))
+          {
+            arr[head]=retainThis;
+            this.head=head;
+          }
+          return true;
+        }
+      }
+      for(int srcOffset=arr.length-1;srcOffset!=head;--srcOffset)
+      {
+        if(arr[srcOffset]^retainThis)
+        {
+          if(!filter.test(!retainThis))
+          {
+            break;
+          }
+          CheckedCollection.checkModCount(modCount,this.modCount);
+          this.modCount=modCount+1;
+          arr[head=$ClassPrefix$ArrSeq.pullSurvivorsUp(arr,srcOffset,head,retainThis)]=retainThis;
+          this.head=head;
+          return true;
+        }
+      }
+      CheckedCollection.checkModCount(modCount,this.modCount);
+      return false;
+    }
+    private void collapseheadandtailNonFragmented(int modCount,$ArrayType$[] arr,int head,int tail,$TypeNameModifier$Predicate$<? super E>$ filter,$ArrayType$ removeThis)
+    {
+      while(++head!=tail)
+      {
+        if(arr[head]^removeThis)
+        {
+          if(filter.test(removeThis=!removeThis))
+          {
+            break;
+          }
+          CheckedCollection.checkModCount(modCount,this.modCount);
+          this.modCount=modCount+1;
+          this.head=head;
+          while(--tail!=head)
+          {
+            if(arr[tail]==removeThis)
+            {
+              if(tail!=(tail=pullDown(arr,head,tail,removeThis)))
+              {
+                arr[tail]=removeThis;
+              }
+              break;
+            }
+          }
+          this.tail=tail;
+          return;
+        }
+      }
+      CheckedCollection.checkModCount(modCount,this.modCount);
+      this.modCount=modCount+1;
+      this.tail=-1;
+      return;
+    }
+    private boolean collapsebodyNonFragmented(int modCount,$ArrayType$[] arr,int head,int tail,$TypeNameModifier$Predicate$<? super E>$ filter, $ArrayType$ retainThis)
+    {
+      while(++head!=tail)
+      {
+        if(arr[head]^retainThis)
+        {
+          if(!filter.test(!retainThis))
+          {
+            break;
+          }
+          CheckedCollection.checkModCount(modCount,this.modCount);
+          this.modCount=modCount+1;
+          arr[tail=$ClassPrefix$ArrSeq.pullSurvivorsDown(arr,head,tail,retainThis)]=retainThis;
+          this.tail=tail;
+          return true;
+        }
+      }
+      CheckedCollection.checkModCount(modCount,this.modCount);
+      return false;
+    }
+#ELSE
+#MACRODEF CheckedCollapseEndNonFragmented(ITERATENEXT,FIRSTINDEX,LASTINDEX,NULLIFYFIRST,NULLIFYLAST,PULLDIRECTION,PULLCOMPENSATE)
+#MACRO SuppressUnchecked()
+private void collapseLASTINDEXNonFragmented(int modCount,$ArrayType$[] arr,int head,int tail,$TypeNameModifier$Predicate$<? super E>$ filter)
+{
+  int dstOffset;
+  for(;;)
+  {
+    if(ITERATENEXTFIRSTINDEX==LASTINDEX)
+    {
+      CheckedCollection.checkModCount(modCount,this.modCount);
+      dstOffset=LASTINDEX;
+    }
+    if(filter.test(($exposedType$)arr[FIRSTINDEX]))
+    {
+      dstOffset=$ClassPrefix$ArrSeq.markSurvivorsAndPullPULLDIRECTION(new ModCountChecker(modCount),arr,FIRSTINDEX,LASTINDEX,filter);
+      break;
+    }
+  }
+  this.LASTINDEX=dstOffsetPULLCOMPENSATE1;
+  this.modCount=modCount+1;
+#IF OfRef
+  OmniArray.OfRef.nullifyRange(arr,NULLIFYFIRST,NULLIFYLAST);
+#ENDIF
+}
+#ENDDEF
+    #MACRO CheckedCollapseEndNonFragmented(--,tail,head,head,dstOffset,Up,+)
+    #MACRO CheckedCollapseEndNonFragmented(++,head,tail,dstOffset,tail,Down,-)
+    #MACRO SuppressUnchecked()
+    private void collapseheadFragmentedHelper(int modCount,$ArrayType$[] arr,int tail,$TypeNameModifier$Predicate$<? super E>$ filter)
+    {
+      for(;;)
+      {
+        if(tail==0)
+        {
+          CheckedCollection.checkModCount(modCount,this.modCount);
+          this.modCount=modCount+1;
+          this.head=0;
+          return;
+        }
+        if(filter.test(($exposedType$)arr[--tail]))
+        {
+          break;
+        }
+      }
+      this.head=(tail=$ClassPrefix$ArrSeq.markSurvivorsAndPullUp(new ModCountChecker(modCount),arr,tail,-1,filter))+1;
+  #IF OfRef
+      OmniArray.OfRef.nullifyRange(arr,0,tail);
+  #ENDIF
+    }
+    #MACRO SuppressUnchecked()
+    private void collapsetailFragmentedHelper(int modCount,$ArrayType$[] arr,int head,$TypeNameModifier$Predicate$<? super E>$ filter)
+    {
+      int bound=arr.length;
+      for(;;)
+      {
+        if(++head==bound)
+        {
+          CheckedCollection.checkModCount(modCount,this.modCount);
+          this.modCount=modCount+1;
+          this.tail=bound-1;
+          return;
+        }
+        if(filter.test(($exposedType$)arr[head]))
+        {
+          break;
+        }
+      }
+      this.tail=(head=$ClassPrefix$ArrSeq.markSurvivorsAndPullDown(new ModCountChecker(modCount),arr,head,bound,filter))-1;
+  #IF OfRef
+      OmniArray.OfRef.nullifyRange(arr,head,bound-1);
+  #ENDIF
+    }
+    #MACRO SuppressUnchecked()
+    private void collapseheadFragmented(int modCount,$ArrayType$[] arr,int head,int tail,$TypeNameModifier$Predicate$<? super E>$ filter)
+    {
+  #IF OfRef
+      int oldHead=head;
+  #ENDIF
+      for(int bound=arr.length-1;;)
+      {
+        if(head==bound)
+        {
+          collapseheadFragmentedHelper(modCount,arr,tail,filter);
+  #IF OfRef
+          OmniArray.OfRef.nullifyRange(arr,oldHead,bound);
+  #ENDIF
+          break;
+        }
+        if(!filter.test(($exposedType$)arr[++head]))
+        {
+          collapseheadFragmentedHelper(modCount,arr,head,tail,filter);
+  #IF OfRef
+          OmniArray.OfRef.nullifyRange(arr,oldHead,head-1);
+  #ENDIF
+          break;
+        }
+      }
+      this.modCount=modCount+1;
+    }
+    #MACRO SuppressUnchecked()
+    private void collapsetailFragmented(int modCount,$ArrayType$[] arr,int head,int tail,$TypeNameModifier$Predicate$<? super E>$ filter)
+    {
+  #IF OfRef
+      int oldTail=tail;
+  #ENDIF
+      for(;;)
+      {
+        if(tail==0)
+        {
+          collapsetailFragmentedHelper(modCount,arr,head,filter);
+  #IF OfRef
+          OmniArray.OfRef.nullifyRange(arr,0,oldTail);
+  #ENDIF
+          break;
+        }
+        if(!filter.test(($exposedType$)arr[--tail]))
+        {
+          collapsetailFragmentedHelper(modCount,arr,head,tail,filter);
+  #IF OfRef
+          OmniArray.OfRef.nullifyRange(arr,tail+1,oldTail);
+  #ENDIF
+          break;
+        }
+      }
+      this.modCount=modCount+1;
+    }
+    #MACRO SuppressUnchecked()
+    private void collapseheadFragmentedHelper(int modCount,$ArrayType$[] arr,int head,int tail,$TypeNameModifier$Predicate$<? super E>$ filter)
+    {
+      for(int headOffset=arr.length-1;headOffset!=head;--headOffset)
+      {
+        if(filter.test(($exposedType$)arr[headOffset]))
+        {
+          for(int tailOffset=0;tailOffset!=tail;++tailOffset)
+          {
+            if(filter.test(($exposedType$)arr[tailOffset]))
+            {
+              collapseheadandtailFragmentedHelper(modCount,arr,head,tail,headOffset,tailOffset,filter);
+              return;
+            }
+          }
+          this.head=headOffset=$ClassPrefix$ArrSeq.markSurvivorsAndPullUp(new ModCountChecker(modCount),arr,headOffset,head,filter);
+          arr[headOffset]=arr[head];
+  #IF OfRef
+          OmniArray.OfRef.nullifyRange(arr,head,headOffset-1);
+  #ENDIF
+          return;
+        }
+      }
+      for(int tailOffset=0;tailOffset!=tail;++tailOffset)
+      {
+        if(filter.test(($exposedType$)arr[tailOffset]))
+        {
+          this.tail=tailOffset=$ClassPrefix$ArrSeq.markSurvivorsAndPullDown(new ModCountChecker(modCount),arr,tailOffset,tail,filter);
+          arr[tailOffset]=arr[tail];
+  #IF OfRef
+          OmniArray.OfRef.nullifyRange(arr,tailOffset+1,tail);
+  #ENDIF
+          return;
+        }
+      }
+    }
+    #MACRO SuppressUnchecked()
+    private void collapsetailFragmentedHelper(int modCount,$ArrayType$[] arr,int head,int tail,$TypeNameModifier$Predicate$<? super E>$ filter)
+    {
+      for(int tailOffset=0;tailOffset!=tail;++tailOffset)
+      {
+        if(filter.test(($exposedType$)arr[tailOffset]))
+        {
+          for(int headOffset=arr.length-1;headOffset!=head;--headOffset)
+          {
+            if(filter.test(($exposedType$)arr[headOffset]))
+            {
+              collapseheadandtailFragmentedHelper(modCount,arr,head,tail,headOffset,tailOffset,filter);
+              return;
+            }
+          }
+          this.tail=tailOffset=$ClassPrefix$ArrSeq.markSurvivorsAndPullDown(new ModCountChecker(modCount),arr,tailOffset,tail,filter);
+          arr[tailOffset]=arr[tail];
+  #IF OfRef
+          OmniArray.OfRef.nullifyRange(arr,tailOffset+1,tail);
+  #ENDIF
+          return;
+        }
+      }
+      for(int headOffset=arr.length-1;headOffset!=head;--headOffset)
+      {
+        if(filter.test(($exposedType$)arr[headOffset]))
+        {
+          this.head=headOffset=$ClassPrefix$ArrSeq.markSurvivorsAndPullUp(new ModCountChecker(modCount),arr,headOffset,head,filter);
+          arr[headOffset]=arr[head];
+  #IF OfRef
+          OmniArray.OfRef.nullifyRange(arr,head,headOffset-1);
+  #ENDIF
+          return;
+        }
+      }
+    }
+    #MACRO SuppressUnchecked()
+    private void collapseheadandtailFragmentedHelper(int modCount,$ArrayType$[] arr,int head,int tail,int headOffset,int tailOffset,$TypeNameModifier$Predicate$<? super E>$ filter)
+    {
+      int tailDstOffset=tailOffset;
+      int headDstOffset;
+      outer:for(;;)
+      {
+        if(++tailOffset==tail)
+        {
+          headDstOffset=$ClassPrefix$ArrSeq.markSurvivorsAndPullUp(new ModCountChecker(modCount),arr,headOffset,head,filter);
+          break;
+        }
+        final $ArrayType$ tailVal;
+        if(!filter.test(($exposedType$)(tailVal=arr[tailOffset])))
+        {
+          headDstOffset=headOffset;
+          for(;;)
+          {
+            if(--headOffset==head)
+            {
+              int numTailSurvivors;
+              if((numTailSurvivors=tail-++tailOffset)!=0)
+              {
+                final long[] survivors;
+                numTailSurvivors=$ClassPrefix$ArrSeq.markSurvivors(arr,survivors=BitSetUtils.getBitSet(numTailSurvivors),tailOffset,tail,filter);
+                CheckedCollection.checkModCount(modCount,this.modCount);
+                arr[tailDstOffset++]=tailVal;
+                if(numTailSurvivors!=0)
+                {
+                  tailDstOffset=$ClassPrefix$ArrSeq.pullSurvivorsDown(arr,survivors,tailDstOffset,tailOffset,numTailSurvivors);
+                }
+              }
+              else
+              {
+                CheckedCollection.checkModCount(modCount,this.modCount);
+                arr[tailDstOffset++]=tailVal;
+              }
+              break outer;
+            }
+            final $ArrayType$ headVal;
+            if(!filter.test(($exposedType$)(headVal=arr[headOffset])))
+            {
+              int numHeadSurvivors,numTailSurvivors;
+              if((numHeadSurvivors=(--headOffset)-head)+(numTailSurvivors=tail-++tailOffset)!=0)
+              {
+                final long[] survivors;
+                numTailSurvivors=$ClassPrefix$ArrSeq.markSurvivors(arr,survivors=new long[((numTailSurvivors-1)>>>6)+((numHeadSurvivors-1)>>>6)+2],tailOffset,tail,filter);
+                numHeadSurvivors=$ClassPrefix$ArrSeq.markSurvivorsReverse(arr,survivors,headOffset,head,filter);
+                CheckedCollection.checkModCount(modCount,this.modCount);
+                arr[headDstOffset--]=headVal;
+                if(numHeadSurvivors!=0)
+                {
+                  headDstOffset=$ClassPrefix$ArrSeq.pullSurvivorsUp(arr,survivors,headDstOffset,headOffset,numHeadSurvivors);
+                }
+                arr[tailDstOffset++]=tailVal;
+                if(numTailSurvivors!=0)
+                {
+                  tailDstOffset=$ClassPrefix$ArrSeq.pullSurvivorsDown(arr,survivors,tailDstOffset,tailOffset,numTailSurvivors);
+                }
+              }
+              else
+              {
+                CheckedCollection.checkModCount(modCount,this.modCount);
+                arr[headDstOffset--]=headVal;
+                arr[tailDstOffset++]=tailVal;
+              }
+              break outer;
+            }
+          }
+        }
+      }
+      this.tail=tailDstOffset;
+      this.head=headDstOffset;
+      arr[headDstOffset]=arr[head];
+      arr[tailDstOffset]=arr[tail];
+  #IF OfRef
+      OmniArray.OfRef.nullifyRange(arr,head,headDstOffset-1);
+      OmniArray.OfRef.nullifyRange(arr,tailDstOffset+1,tail);
+  #ENDIF
+    }
+    #MACRO SuppressUnchecked()
+    private boolean collapsebodyFragmented(int modCount,$ArrayType$[] arr,int head,int tail,$TypeNameModifier$Predicate$<? super E>$ filter)
+    {
+      for(int tailOffset=0;tailOffset!=tail;++tailOffset)
+      {
+        if(filter.test(($exposedType$)arr[tailOffset]))
+        {
+          for(int headOffset=arr.length-1;headOffset!=head;--headOffset)
+          {
+            if(filter.test(($exposedType$)arr[headOffset]))
+            {
+              collapseheadandtailFragmentedHelper(modCount,arr,head,tail,headOffset,tailOffset,filter);
+              this.modCount=modCount+1;
+              return true;
+            }
+          }
+          arr[tailOffset=$ClassPrefix$ArrSeq.markSurvivorsAndPullDown(new ModCountChecker(modCount),arr,head,tail,filter)]=arr[tail];
+          this.modCount=modCount+1;
+  #IF OfRef
+          OmniArray.OfRef.nullifyRange(arr,tailOffset+1,tail);
+  #ENDIF
+          this.tail=tailOffset;
+          return true;
+        }
+      }
+      CheckedCollection.checkModCount(modCount,this.modCount);
+      return false;
+    }
+    #MACRO SuppressUnchecked()
+    private void collapseheadandtailFragmented(int modCount,$ArrayType$[] arr,int head,int tail,$TypeNameModifier$Predicate$<? super E>$ filter)
+    {
+  #IF OfRef
+      int oldTail=tail;
+  #ENDIF
+      outer:for(;;)
+      {
+        if(tail==0)
+        {
+          if((tail=arr.length-1)==head)
+          {
+            CheckedCollection.checkModCount(modCount,this.modCount);
+            this.modCount=modCount+1;
+  #IF OfRef
+            arr[head]=null;
+  #ENDIF
+            this.tail=-1;
+          }
+          else if(filter.test(($exposedType$)arr[tail=arr.length-1]))
+          {
+            collapseheadandtailNonFragmented(modCount,arr,head,tail,filter);
+          }
+          else
+          {
+            collapseheadNonFragmented(modCount,arr,head,tail,filter);
+            this.tail=tail;
+          }
+  #IF OfRef
+          OmniArray.OfRef.nullifyRange(arr,0,oldTail);
+  #ENDIF
+          return;
+        }
+        final $ArrayType$ tailVal;
+        if(!filter.test(($exposedType$)(tailVal=arr[--tail])))
+        {
+  #IF OfRef
+          int oldHead=head;
+  #ENDIF
+          inner: for(int bound=arr.length-1;;)
+          {
+            if(head==bound)
+            {
+              if(tail==0)
+              {
+                CheckedCollection.checkModCount(modCount,this.modCount);
+              }
+              else
+              {
+                if(filter.test(($exposedType$)arr[head=0]))
+                {
+                  collapseheadNonFragmented(modCount,arr,head,tail,filter);
+  #IF OfRef
+                  OmniArray.OfRef.nullifyRange(arr,tail+1,oldTail);
+  #ENDIF
+                  this.tail=tail;
+                  return;
+                }
+                else
+                {
+                  for(;;)
+                  {
+                    if(++head==tail)
+                    {
+                      CheckedCollection.checkModCount(modCount,this.modCount);
+                      break;
+                    }
+                    if(filter.test(($exposedType$)arr[head]))
+                    {
+                      arr[tail=$ClassPrefix$ArrSeq.markSurvivorsAndPullDown(new ModCountChecker(modCount),arr,head,tail,filter)]=tailVal;
+                      break;
+                    }
+                  }
+                }
+              }
+              this.head=0;
+              this.tail=tail;
+  #IF OfRef
+              OmniArray.OfRef.nullifyRange(arr,oldHead,bound);
+              OmniArray.OfRef.nullifyRange(arr,tail+1,oldTail);
+  #ENDIF
+              break outer;
+            }
+            final $ArrayType$ headVal;
+            if(!filter.test(($exposedType$)(headVal=arr[++head])))
+            {
+              for(int tailOffset=0;tailOffset!=tail;++tailOffset)
+              {
+                if(filter.test(($exposedType$)arr[tailOffset]))
+                {
+                  for(int headOffset=bound;headOffset!=head;--headOffset)
+                  {
+                    if(filter.test(($exposedType$)arr[headOffset]))
+                    {
+                      collapseheadandtailFragmentedHelper(modCount,arr,head,tail,headOffset,tailOffset,filter);
+                      break outer;
+                    }
+                  }
+                  arr[tail=$ClassPrefix$ArrSeq.markSurvivorsAndPullDown(new ModCountChecker(modCount),arr,tailOffset,tail,filter)]=tailVal;
+                  break inner;
+                }
+              }
+              for(int headOffset=bound;headOffset!=head;--headOffset)
+              {
+                if(filter.test(($exposedType$)arr[headOffset]))
+                {
+                  arr[head=$ClassPrefix$ArrSeq.markSurvivorsAndPullUp(new ModCountChecker(modCount),arr,headOffset,head,filter)]=headVal;
+                  break inner;
+                }
+              }
+              CheckedCollection.checkModCount(modCount,this.modCount);
+              break;
+            }
+          }
+          this.head=head;
+          this.tail=tail;
+  #IF OfRef
+          OmniArray.OfRef.nullifyRange(arr,oldHead,head-1);
+          OmniArray.OfRef.nullifyRange(arr,tail+1,oldTail);
+  #ENDIF
+          break;
+        }
+      }
+      this.modCount=modCount+1;
+    }
+    #MACRO SuppressUnchecked()
+    private void collapseheadandtailNonFragmented(int modCount,$ArrayType$[] arr,int head,int tail,$TypeNameModifier$Predicate$<? super E>$ filter)
+    {
+  #IF OfRef
+      int oldHead=head;
+  #ENDIF
+      for(;;)
+      {
+        if(++head==tail)
+        {
+          CheckedCollection.checkModCount(modCount,this.modCount);
+          this.modCount=modCount+1;
+          this.tail=-1;
+          break;
+        }
+        if(!filter.test(($exposedType$)arr[head]))
+        {
+          collapsetailNonFragmented(modCount,arr,head,tail,filter);
+          this.head=head;
+          break;
+        }
+      }
+  #IF OfRef
+      OmniArray.OfRef.nullifyRange(arr,oldHead,head);
+  #ENDIF
+    }
+    #MACRO SuppressUnchecked()
+    private boolean collapsebodyNonFragmented(int modCount,$ArrayType$[] arr,int head,int tail,$TypeNameModifier$Predicate$<? super E>$ filter)
+    {
+      while(++head!=tail)
+      {
+        if(filter.test(($exposedType$)arr[head]))
+        {
+          int dstOffset;
+          this.tail=dstOffset=$ClassPrefix$ArrSeq.markSurvivorsAndPullDown(new ModCountChecker(modCount),arr,head,tail,filter);
+          arr[dstOffset]=arr[tail];
+          this.modCount=modCount+1;
+  #IF OfRef
+          OmniArray.OfRef.nullifyRange(arr,dstOffset+1,tail);
+  #ENDIF
+          return true;
+        }
+      }
+      CheckedCollection.checkModCount(modCount,this.modCount);
+      return false;
+    }
+    private class ModCountChecker extends CheckedCollection.AbstractModCountChecker
+    {
+      public ModCountChecker(int expectedModCount)
+      {
+        super(expectedModCount);
+      }
+      @Override protected int getActualModCount()
+      {
+        return modCount;
+      }
+    }
+#ENDIF
+    #MACRO SuppressUnchecked()
+    private boolean uncheckedRemoveIf1(int tail,$TypeNameModifier$Predicate$<? super E>$ filter)
+    {
+      int modCount=this.modCount;
+      try
+      {
+#IF OfRef
+        $ArrayType$[] arr;
+        if(filter.test(($exposedType$)(arr=this.arr)[tail]))
+        {
+          CheckedCollection.checkModCount(modCount,this.modCount);
+          arr[tail]=null;
+#ELSE
+        if(filter.test(arr[tail]))
+        {
+          CheckedCollection.checkModCount(modCount,this.modCount);
+#ENDIF
+          this.modCount=modCount+1;
+          this.tail=-1;
+          return true;
+        }
+        CheckedCollection.checkModCount(modCount,this.modCount);
+        return false;
+      }
+      catch(final RuntimeException e)
+      {
+        throw CheckedCollection.checkModCount(modCount,this.modCount,e);
+      }
+    }
+    #MACRO SuppressUnchecked()
+    private boolean uncheckedRemoveIfFragmented(int head,int tail,$TypeNameModifier$Predicate$<? super E>$ filter)
+    {
+      int modCount=this.modCount;
+      try
+      {
+        $ArrayType$[] arr;
+#IF OfBoolean
+        $ArrayType$ v;
+        if(filter.test(v=(arr=this.arr)[head]))
+        {
+          if(arr[tail]==v)
+          {
+            collapseheadandtailFragmented(modCount,arr,head,tail,filter,v);
+          }
+          else if(filter.test(v=!v))
+          {
+            CheckedCollection.checkModCount(modCount,this.modCount);
+            this.modCount=modCount+1;
+            this.tail=-1;
+          }
+          else
+          {
+            CheckedCollection.checkModCount(modCount,this.modCount);
+            this.modCount=modCount+1;
+            super.collapseheadFragmented(arr,head,tail,v);
+          }
+          return true;
+        }
+        else if(arr[tail]==v)
+        {
+          return collapsebodyFragmented(modCount,arr,head,tail,filter,v);
+        }
+        else if(filter.test(!v))
+        {
+          CheckedCollection.checkModCount(modCount,this.modCount);
+          this.modCount=modCount+1;
+          super.collapsetailFragmented(arr,head,tail,v);
+          return true;
+        }
+        return false;
+#ELSE
+        if(filter.test(($exposedType$)(arr=this.arr)[head]))
+        {
+          if(filter.test(($exposedType$)arr[tail]))
+          {
+            collapseheadandtailFragmented(modCount,arr,head,tail,filter);
+          }
+          else
+          {
+            collapseheadFragmented(modCount,arr,head,tail,filter);
+          }
+          return true;
+        }
+        else if(filter.test(($exposedType$)arr[tail]))
+        {
+          collapsetailFragmented(modCount,arr,head,tail,filter);
+          return true;
+        }
+        return collapsebodyFragmented(modCount,arr,head,tail,filter);
+#ENDIF
+      }
+      catch(final RuntimeException e)
+      {
+        throw CheckedCollection.checkModCount(modCount,this.modCount,e);
+      }
+    }
+    #MACRO SuppressUnchecked()
+    boolean uncheckedRemoveIf(int tail,$TypeNameModifier$Predicate$<? super E>$ filter)
+    {
+      int head;
+      switch(Integer.signum(tail-(head=this.head))) 
+      {
+        case 0:
+          return uncheckedRemoveIf1(tail,filter);
+        case -1:
+          return uncheckedRemoveIfFragmented(head,tail,filter);
+        default:
+          int modCount=this.modCount;
+          try
+          {
+            $ArrayType$[] arr;
+#IF OfBoolean
+            $ArrayType$ v;
+            if(filter.test(v=(arr=this.arr)[head]))
+            {
+              if(arr[tail]==v)
+              {
+                collapseheadandtailNonFragmented(modCount,arr,head,tail,filter,v);
+              }
+              else if(filter.test(v=!v))
+              {
+                CheckedCollection.checkModCount(modCount,this.modCount);
+                this.modCount=modCount+1;
+                this.tail=-1;
+              }
+              else
+              {
+                CheckedCollection.checkModCount(modCount,this.modCount);
+                this.modCount=modCount+1;
+                super.collapseheadNonFragmented(arr,head,tail,v);
+              }
+              return true;
+            }
+            else if(arr[tail]==v)
+            {
+              return collapsebodyNonFragmented(modCount,arr,head,tail,filter,v);
+            }
+            else if(filter.test(!v))
+            {
+              CheckedCollection.checkModCount(modCount,this.modCount);
+              this.modCount=modCount+1;
+              super.collapsetailNonFragmented(arr,head,tail,v);
+              return true;
+            }
+            CheckedCollection.checkModCount(modCount,this.modCount);
+            return false;
+#ELSE
+            if(filter.test(($exposedType$)(arr=this.arr)[head]))
+            {
+              if(filter.test(($exposedType$)arr[tail]))
+              {
+                collapseheadandtailNonFragmented(modCount,arr,head,tail,filter);
+              }
+              else
+              {
+                collapseheadNonFragmented(modCount,arr,head,tail,filter);
+              }
+              return true;
+            }
+            else if(filter.test(($exposedType$)arr[tail]))
+            {
+              collapsetailNonFragmented(modCount,arr,head,tail,filter);
+              return true;
+            }
+            return collapsebodyNonFragmented(modCount,arr,head,tail,filter);
+#ENDIF
+          }
+          catch(final RuntimeException e)
+          {
+            throw CheckedCollection.checkModCount(modCount,this.modCount,e);
+          }
+      }
+    }
+  }
+#MACRODEF UncheckedCollapseEndNonFragmented(FIRSTINDEX,LASTINDEX,ITERATE,NULLIFYFIRST,NULLIFYLAST,PULLDIRECTION)
+#MACRO SuppressUnchecked()
+private void collapseFIRSTINDEXNonFragmented($ArrayType$[] arr,int head,int tail,
+#IF OfBoolean
+$ArrayType$ retainThis)
+#ELSE
+$TypeNameModifier$Predicate$<? super E>$ filter)
+#ENDIF
+{
+#IF OfRef
+  int oldFIRSTINDEX=FIRSTINDEX;
+#ENDIF
+  while(ITERATEFIRSTINDEX!=LASTINDEX)
+  {
+#IF OfBoolean
+    if(arr[FIRSTINDEX]==retainThis)
+#ELSE
+    final $ArrayType$ v;
+    if(!filter.test(($exposedType$)(v=arr[FIRSTINDEX])))
+#ENDIF
+    {
+      if(FIRSTINDEX!=(FIRSTINDEX=pullPULLDIRECTION(arr,LASTINDEX,FIRSTINDEX,
+#IF OfBoolean
+      retainThis))){arr[FIRSTINDEX]=retainThis;}
+#ELSE
+      filter))){arr[FIRSTINDEX]=v;}
+#ENDIF
+      break;
+    }
+  }
+  this.FIRSTINDEX=FIRSTINDEX;
+#IF OfRef
+  OmniArray.OfRef.nullifyRange(arr,NULLIFYFIRST,NULLIFYLAST);
+#ENDIF
+}
+#ENDDEF
+  #MACRO UncheckedCollapseEndNonFragmented(head,tail,++,oldhead,head-1,Up)
+  #MACRO UncheckedCollapseEndNonFragmented(tail,head,--,tail+1,oldtail,Down)
+#IF OfBoolean
+  private boolean collapsebodyNonFragmented($ArrayType$[] arr,int head,int tail,$TypeNameModifier$Predicate$<? super E>$ filter,$ArrayType$ retainThis)
+  {
+    while(++head!=tail)
+    {
+      if(arr[head]^retainThis)
+      {
+        if(!filter.test(!retainThis))
+        {
+          break;
+        }
+        arr[head=$ClassPrefix$ArrSeq.pullSurvivorsDown(arr,head,tail,retainThis)]=retainThis;
+        this.tail=head;
+        return true;
+      }
+    }
+    return false;
+  }
+  private static int pullDown($ArrayType$[] arr,int srcOffset,int srcBound,$ArrayType$ retainThis)
+  {
+    while(++srcOffset!=srcBound)
+    {
+      if(arr[srcOffset]^retainThis)
+      {
+        return $ClassPrefix$ArrSeq.pullSurvivorsDown(arr,srcOffset,srcBound,retainThis);
+      }
+    }
+    return srcOffset;
+  }
+  private static int pullUp($ArrayType$[] arr,int srcOffset,int srcBound,$ArrayType$ retainThis)
+  {
+    while(--srcOffset!=srcBound)
+    {
+      if(arr[srcOffset]^retainThis)
+      {
+        return $ClassPrefix$ArrSeq.pullSurvivorsUp(arr,srcOffset,srcBound,retainThis);
+      }
+    }
+    return srcOffset;
+  }
+  private void collapseheadandtailNonFragmented($ArrayType$[] arr,int head,int tail,$TypeNameModifier$Predicate$<? super E>$ filter,$ArrayType$ removeThis)
+  {
+    while(++head!=tail)
+    {
+      if(arr[head]^removeThis)
+      {
+        if(filter.test(removeThis=!removeThis))
+        {
+          this.tail=-1;
+        }
+        else
+        {
+          this.head=head;
+          this.tail=pullDown(arr,head,tail,removeThis)-1;
+        }
+        return;
+      }
+    }
+    this.tail=-1;
+  }
+  private boolean collapsebodyFragmented($ArrayType$[] arr,int head,int tail,$TypeNameModifier$Predicate$<? super E>$ filter,$ArrayType$ retainThis)
+  {
+    for(int srcOffset=0;srcOffset!=tail;++srcOffset)
+    {
+      if(arr[srcOffset]^retainThis)
+      {
+        if(!filter.test(!retainThis))
+        {
+          return false;
+        }
+        arr[tail=$ClassPrefix$ArrSeq.pullSurvivorsDown(arr,srcOffset,tail,retainThis)]=retainThis;
+        this.tail=tail;
+        if(head!=(head=pullUp(arr,arr.length,head,retainThis)))
+        {
+          arr[head]=retainThis;
+          this.head=head;
+        }
+        return true;
+      }
+    }
+    for(int srcOffset=arr.length-1;srcOffset!=head;--srcOffset)
+    {
+      if(arr[srcOffset]^retainThis)
+      {
+        if(!filter.test(!retainThis))
+        {
+          break;
+        }
+        arr[head=$ClassPrefix$ArrSeq.pullSurvivorsUp(arr,srcOffset,head,retainThis)]=retainThis;
+        this.head=head;
+        return true;
+      }
+    }
+    return false;
+  }
+  private void collapseheadandtailFragmented($ArrayType$[] arr,int head,int tail,$TypeNameModifier$Predicate$<? super E>$ filter,$ArrayType$ removeThis)
+  {
+    while(tail!=0)
+    {
+      if(arr[--tail]^removeThis)
+      {
+        if(filter.test(removeThis=!removeThis))
+        {
+          this.tail=-1;
+          return;
+        }
+        int bound=arr.length;
+        while(++head!=bound)
+        {
+          if(arr[head]==removeThis)
+          {
+            if(head!=(head=pullUp(arr,bound,head,removeThis)))
+            {
+              arr[head]=removeThis;
+            }
+            this.head=head;
+            if(tail!=(tail=pullDown(arr,-1,tail,removeThis)))
+            {
+              arr[tail]=removeThis;
+            }
+            this.tail=tail;
+            return;
+          }
+        }
+        this.tail=tail;
+        this.head=pullUp(arr,tail,-1,removeThis)+1;
+        return;
+      }
+    }
+    for(tail=arr.length-1;tail!=head;--tail)
+    {
+      if(arr[tail]^removeThis)
+      {
+        if(filter.test(removeThis=!removeThis))
+        {
+          break;
+        }
+        while(++head!=tail)
+        {
+          if(arr[head]==removeThis)
+          {
+            if(tail!=(tail=pullDown(arr,head,tail,removeThis)))
+            {
+              arr[tail]=removeThis;
+            }
+            break;
+          }
+        }
+        this.head=head;
+        this.tail=tail;
+        return;
+      }
+    }
+    this.tail=-1;
+  }
+  private void collapsetailFragmented($ArrayType$[] arr,int head,int tail,$ArrayType$ retainThis)
+  {
+    while(tail!=0)
+    {
+      if(arr[--tail]==retainThis)
+      {
+        for(int srcOffset=0;srcOffset!=tail;++srcOffset)
+        {
+          if(arr[srcOffset]^retainThis)
+          {
+            arr[tail=$ClassPrefix$ArrSeq.pullSurvivorsDown(arr,srcOffset,tail,retainThis)]=retainThis;
+            break;
+          }
+        }
+        if(head!=(head=pullUp(arr,arr.length,head,retainThis)))
+        {
+          arr[head]=retainThis;
+          this.head=head;
+        }
+        this.tail=tail;
+        return;
+      }
+    }
+    this.tail=pullDown(arr,head,arr.length,retainThis)-1;
+  }
+  private void collapseheadFragmented($ArrayType$[] arr,int head,int tail,$ArrayType$ retainThis)
+  {
+    int bound=arr.length-1;
+    while(head!=bound)
+    {
+      if(arr[++head]==retainThis)
+      {
+        for(int srcOffset=bound;srcOffset!=head;--srcOffset)
+        {
+          if(arr[srcOffset]^retainThis)
+          {
+            arr[head=$ClassPrefix$ArrSeq.pullSurvivorsUp(arr,srcOffset,head,retainThis)]=retainThis;
+            break;
+          }
+        }
+        if(tail!=(tail=pullDown(arr,-1,tail,retainThis)))
+        {
+          arr[tail]=retainThis;
+          this.tail=tail;
+        }
+        this.head=head;
+        return;
+      }
+    }
+    this.head=pullUp(arr,tail,-1,retainThis)+1;
+  }
+#ELSE
+  #MACRO SuppressUnchecked()
+  private void collapseheadFragmented($ArrayType$[] arr,int head,int tail,$TypeNameModifier$Predicate$<? super E>$ filter)
+  {
+  #IF OfRef
+    int oldTmp=head;
+  #ENDIF
+    int bound=arr.length-1;
+    while(head!=bound)
+    {
+      if(!filter.test(($exposedType$)arr[++head]))
+      {
+        for(int srcOffset=bound;srcOffset!=head;--srcOffset)
+        {
+          if(filter.test(($exposedType$)arr[srcOffset]))
+          {
+            arr[srcOffset=$ClassPrefix$ArrSeq.pullSurvivorsUp(arr,srcOffset,head+1,filter)]=arr[head];
+            this.head=srcOffset;
+  #IF OfRef
+            OmniArray.OfRef.nullifyRange(arr,oldTmp,srcOffset-1);
+  #ENDIF
+            break;
+          }
+        }
+  #IF OfRef
+        if((oldTmp=tail)!=(bound=pullDown(arr,-1,tail,filter)))
+  #ELSE
+        if(tail!=(bound=pullDown(arr,-1,tail,filter)))
+  #ENDIF
+        {
+          arr[bound]=arr[tail];
+          this.tail=bound;
+  #IF OfRef
+          OmniArray.OfRef.nullifyRange(arr,bound+1,oldTmp);
+  #ENDIF
+        }
+        return;
+      }
+    }
+  #IF OfRef
+    OmniArray.OfRef.nullifyRange(arr,oldTmp,head-1);
+    if(-1!=(head=pullUp(arr,tail,-1,filter)))
+    {
+      OmniArray.OfRef.nullifyRange(arr,0,head);
+    }
+    this.head=head+1;
+  #ELSE
+    this.head=pullUp(arr,tail,-1,filter)+1;
+  #ENDIF
+  }
+  #MACRO SuppressUnchecked()
+  private void collapsetailFragmented($ArrayType$[] arr,int head,int tail,$TypeNameModifier$Predicate$<? super E>$ filter)
+  {
+  #IF OfRef
+    int oldTmp=tail;
+  #ENDIF
+    while(tail!=0)
+    {
+      if(!filter.test(($exposedType$)arr[--tail]))
+      {
+        for(int srcOffset=0;srcOffset!=tail;++srcOffset)
+        {
+          if(filter.test(($exposedType$)arr[srcOffset]))
+          {
+            arr[srcOffset=$ClassPrefix$ArrSeq.pullSurvivorsDown(arr,srcOffset,tail-1,filter)]=arr[tail];
+            this.tail=srcOffset;
+  #IF OfRef
+            OmniArray.OfRef.nullifyRange(arr,srcOffset+1,oldTmp);
+  #ENDIF
+            break;
+          }
+        }
+        int tmp;
+        if(head!=(tmp=pullUp(arr,arr.length,head,filter)))
+        {
+          arr[tmp]=arr[head];
+          this.head=tmp;
+  #IF OfRef
+          OmniArray.OfRef.nullifyRange(arr,head,tmp-1);
+  #ENDIF
+        }
+        return;
+      }
+    }
+  #IF OfRef
+    OmniArray.OfRef.nullifyRange(arr,tail+1,oldTmp);
+    if(-1!=(tail=pullDown(arr,head,oldTmp=arr.length,filter)))
+    {
+      OmniArray.OfRef.nullifyRange(arr,tail,oldTmp-1);
+    }
+    this.tail=tail-1;
+  #ELSE
+    this.tail=pullDown(arr,head,arr.length,filter)-1;
+  #ENDIF
+  }
+  #MACRO SuppressUnchecked()
+  private static $<E>$ int pullDown($ArrayType$[] arr,int srcOffset,int srcBound,$TypeNameModifier$Predicate$<? super E>$ filter)
+  {
+    while(++srcOffset!=srcBound)
+    {
+      if(filter.test(($exposedType$)arr[srcOffset]))
+      {
+        return $ClassPrefix$ArrSeq.pullSurvivorsDown(arr,srcOffset,srcBound-1,filter);
+      }
+    }
+    return srcOffset;
+  }
+  #MACRO SuppressUnchecked()
+  private static $<E>$ int pullUp($ArrayType$[] arr,int srcOffset,int srcBound,$TypeNameModifier$Predicate$<? super E>$ filter)
+  {
+    while(--srcOffset!=srcBound)
+    {
+      if(filter.test(($exposedType$)arr[srcOffset]))
+      {
+        return $ClassPrefix$ArrSeq.pullSurvivorsUp(arr,srcOffset,srcBound+1,filter);
+      }
+    }
+    return srcOffset;
+  }
+  #MACRO SuppressUnchecked()
+  private void collapseheadandtailFragmented($ArrayType$[] arr,int head,int tail,$TypeNameModifier$Predicate$<? super E>$ filter)
+  {
+  #IF OfRef
+    int oldTail=tail;
+  #ENDIF
+    while(tail!=0)
+    {
+      if(!filter.test(($exposedType$)arr[--tail]))
+      {
+        int bound=arr.length;
+  #IF OfRef
+        int oldHead=head;
+  #ENDIF
+        while(++head!=bound)
+        {
+          if(!filter.test(($exposedType$)arr[head]))
+          {
+            int tmp;
+            if(head!=(tmp=pullUp(arr,bound,head,filter)))
+            {
+              arr[tmp]=arr[head];
+            }
+            this.head=tmp;
+  #IF OfRef
+            OmniArray.OfRef.nullifyRange(arr,oldHead,tmp-1);
+  #ENDIF
+            if(tail!=(tmp=pullDown(arr,-1,tail,filter)))
+            {
+              arr[tmp]=arr[tail];
+            }
+            this.tail=tmp;
+  #IF OfRef
+            OmniArray.OfRef.nullifyRange(arr,tmp+1,oldTail);
+  #ENDIF
+            return;
+          }
+        }
+        this.tail=tail;
+  #IF OfRef
+        OmniArray.OfRef.nullifyRange(arr,oldHead,bound-1);
+        OmniArray.OfRef.nullifyRange(arr,tail+1,oldTail);
+        if(-1!=(head=pullUp(arr,tail,-1,filter)))
+        {
+          OmniArray.OfRef.nullifyRange(arr,0,head);
+        }
+        this.head=head+1;
+  #ELSE
+        this.head=pullUp(arr,tail,-1,filter)+1;
+  #ENDIF 
+        return;
+      }
+    }
+    tail=arr.length-1;
+  #IF OfRef
+    OmniArray.OfRef.nullifyRange(arr,0,oldTail);
+    oldTail=tail;
+  #ENDIF
+    for(;tail!=head;--tail)
+    {
+      if(!filter.test(($exposedType$)arr[tail]))
+      {
+  #IF OfRef
+        int oldHead=head;
+  #ENDIF
+        while(++head!=tail)
+        {
+          if(!filter.test(($exposedType$)arr[head]))
+          {
+            int tmp;
+            if(tail!=(tmp=pullDown(arr,head,tail,filter)))
+            {
+              arr[tmp]=arr[tail];
+  #IF OfRef
+              OmniArray.OfRef.nullifyRange(arr,tmp+1,oldTail);
+  #ENDIF
+            }
+            break;
+          }
+        }
+  #IF OfRef
+        OmniArray.OfRef.nullifyRange(arr,oldHead,head-1);
+  #ENDIF
+        this.head=head;
+        this.tail=tail;
+        return;
+      }
+    }
+#IF OfRef
+    OmniArray.OfRef.nullifyRange(arr,tail,oldTail);
+#ENDIF
+    this.tail=-1;
+  }
+  #MACRO SuppressUnchecked()
+  private boolean collapsebodyFragmented($ArrayType$[] arr,int head,int tail,$TypeNameModifier$Predicate$<? super E>$ filter)
+  {
+    for(int srcOffset=0;srcOffset!=tail;++srcOffset)
+    {
+      if(filter.test(($exposedType$)arr[srcOffset]))
+      {
+        arr[srcOffset=$ClassPrefix$ArrSeq.pullSurvivorsDown(arr,srcOffset,tail-1,filter)]=arr[tail];
+        this.tail=srcOffset;
+  #IF OfRef
+        OmniArray.OfRef.nullifyRange(arr,srcOffset+1,tail);
+  #ENDIF
+        if(head!=(srcOffset=pullUp(arr,arr.length,head,filter)))
+        {
+          arr[srcOffset]=arr[head];
+          this.head=srcOffset;
+  #IF OfRef
+          OmniArray.OfRef.nullifyRange(arr,head,srcOffset-1);
+  #ENDIF
+        }
+        return true;
+      }
+    }
+    for(int srcOffset=arr.length-1;srcOffset!=head;--srcOffset)
+    {
+      if(filter.test(($exposedType$)arr[srcOffset]))
+      {
+        arr[srcOffset=$ClassPrefix$ArrSeq.pullSurvivorsUp(arr,srcOffset,head+1,filter)]=arr[head];
+        this.head=srcOffset;
+  #IF OfRef
+        OmniArray.OfRef.nullifyRange(arr,head,srcOffset-1);
+  #ENDIF
+        return true;
+      }
+    }
+    return false;
+  }
+  #MACRO SuppressUnchecked()
+  private void collapseheadandtailNonFragmented($ArrayType$[] arr,int head,int tail,$TypeNameModifier$Predicate$<? super E>$ filter)
+  {
+  #IF OfRef
+    int oldHead=head;
+  #ENDIF
+    while(++head!=tail)
+    {
+      if(!filter.test(($exposedType$)arr[head]))
+      {
+        this.head=head;
+  #IF OfRef
+        OmniArray.OfRef.nullifyRange(arr,oldHead,head-1);
+  #ENDIF
+        this.tail=head=pullDown(arr,head,tail,filter)-1;
+  #IF OfRef
+        OmniArray.OfRef.nullifyRange(arr,head+1,tail);
+  #ENDIF
+        return;
+      }
+    }
+  #IF OfRef
+    OmniArray.OfRef.nullifyRange(arr,oldHead,tail);
+  #ENDIF
+    this.tail=-1;
+  }
+  #MACRO SuppressUnchecked()
+  private boolean collapsebodyNonFragmented($ArrayType$[] arr,int head,int tail,$TypeNameModifier$Predicate$<? super E>$ filter)
+  {
+  #IF OfRef
+    int oldHead=head;
+  #ENDIF
+    while(++head!=tail)
+    {
+      $ArrayType$ v;
+      if(filter.test(($exposedType$)(v=arr[head])))
+      {
+        arr[head=$ClassPrefix$ArrSeq.pullSurvivorsDown(arr,head,tail-1,filter)]=v;
+        this.tail=head;
+  #IF OfRef
+        OmniArray.OfRef.nullifyRange(arr,head+1,oldHead);
+  #ENDIF
+        return true;
+      }
+    }
+    return false;
+  }
+#ENDIF
+  #MACRO SuppressUnchecked()
+  private boolean uncheckedRemoveIf1(int tail,$TypeNameModifier$Predicate$<? super E>$ filter)
+  {
+#IF OfRef
+    $ArrayType$[] arr;
+    if(filter.test(($exposedType$)(arr=this.arr)[tail]))
+    {
+      arr[tail]=null;
+#ELSE
+    if(filter.test(arr[tail]))
+    {
+#ENDIF
+        this.tail=-1;
+        return true;
+    }
+    return false;
+  }
+  #MACRO SuppressUnchecked()
+  private boolean uncheckedRemoveIfFragmented(int head,int tail,$TypeNameModifier$Predicate$<? super E>$ filter)
+  {
+    $ArrayType$[] arr;
+#IF OfBoolean
+    $ArrayType$ v;
+    if(filter.test(v=(arr=this.arr)[head]))
+    {
+      if(arr[tail]==v)
+      {
+        collapseheadandtailFragmented(arr,head,tail,filter,v);
+      }
+      else if(filter.test(v=!v))
+      {
+        this.tail=-1;
+      }
+      else
+      {
+        collapseheadFragmented(arr,head,tail,v);
+      }
+      return true;
+    }
+    else if(arr[tail]==v)
+    {
+      return collapsebodyFragmented(arr,head,tail,filter,v);
+    }
+    else if(filter.test(!v))
+    {
+      collapsetailFragmented(arr,head,tail,v);
+      return true;
+    }
+    return false;
+#ELSE
+    if(filter.test(($exposedType$)(arr=this.arr)[head]))
+    {
+      if(filter.test(($exposedType$)arr[tail]))
+      {
+        collapseheadandtailFragmented(arr,head,tail,filter);
+      }
+      else
+      {
+        collapseheadFragmented(arr,head,tail,filter);
+      }
+      return true;
+    }
+    else if(filter.test(($exposedType$)arr[tail]))
+    {
+      collapsetailFragmented(arr,head,tail,filter);
+      return true;
+    }
+    return collapsebodyFragmented(arr,head,tail,filter);
+#ENDIF
+  }
+  #MACRO SuppressUnchecked()
+  boolean uncheckedRemoveIf(int tail,$TypeNameModifier$Predicate$<? super E>$ filter)
+  {
+    int head;
+    switch(Integer.signum(tail-(head=this.head)))
+    {
+      case 0:
+        return uncheckedRemoveIf1(tail,filter);
+      case -1:
+        return uncheckedRemoveIfFragmented(head,tail,filter);
+      default:
+        $ArrayType$[] arr;
+#IF OfBoolean
+        $ArrayType$ v;
+        if(filter.test(v=(arr=this.arr)[head]))
+        {
+          if(arr[tail]==v)
+          {
+            collapseheadandtailNonFragmented(arr,head,tail,filter,v);
+          }
+          else if(filter.test(v=!v))
+          {
+            this.tail=-1;
+          }
+          else
+          {
+            collapseheadNonFragmented(arr,head,tail,v);
+          }
+          return true;
+        }
+        else if(arr[tail]==v)
+        {
+          return collapsebodyNonFragmented(arr,head,tail,filter,v);
+        }
+        else if(filter.test(!v))
+        {
+          collapsetailNonFragmented(arr,head,tail,v);
+          return true;
+        }
+        return false;
+#ELSE
+        if(filter.test(($exposedType$)(arr=this.arr)[head]))
+        {
+          if(filter.test(($exposedType$)arr[tail]))
+          {
+            collapseheadandtailNonFragmented(arr,head,tail,filter);
+          }
+          else
+          {
+            collapseheadNonFragmented(arr,head,tail,filter);
+          }
+          return true;
+        }
+        else if(filter.test(($exposedType$)arr[tail]))
+        {
+          collapsetailNonFragmented(arr,head,tail,filter);
+          return true;
+        }
+        return collapsebodyNonFragmented(arr,head,tail,filter);
+#ENDIF
+    }
+  }
+#IF OfRef
+  #MACRO UncheckedContains(,\,Predicate<Object> pred,\,pred)
+  #MACRO UncheckedSearch(,\,Predicate<Object> pred,pred.test)
+  #MACRO UncheckedRemoveVal<removeVal,false>(,\,Predicate<Object> pred,\,pred,pred.test)
+  #MACRO UncheckedRemoveVal<removeLastOccurrence,false>(,\,Predicate<Object> pred,\,pred,pred.test)
+#ELSEIF OfDouble,OfFloat
+  #MACRO UncheckedContains(Bits,\,$queryParameterType$ bits,\,bits)
+  #MACRO UncheckedSearch(Bits,\,$queryParameterType$ bits,bits==$convertToBits$)
+  #MACRO UncheckedRemoveVal<removeVal,false>(Bits,\,$queryParameterType$ bits,\,bits,bits==$convertToBits$)
+  #MACRO UncheckedRemoveVal<removeLastOccurrence,false>(Bits,\,$queryParameterType$ bits,\,bits,bits==$convertToBits$)
+  #MACRO UncheckedContains(0,,)
+  #MACRO UncheckedSearch(0,,0==)
+  #MACRO UncheckedRemoveVal<removeVal,false>(0,,,0==)
+  #MACRO UncheckedRemoveVal<removeLastOccurrence,false>(0,,,0==)
+  #MACRO UncheckedContains(NaN,,)
+  #MACRO UncheckedSearch(NaN,,$BoxedType$.isNaN)
+  #MACRO UncheckedRemoveVal<removeVal,false>(NaN,,,$BoxedType$.isNaN)
+  #MACRO UncheckedRemoveVal<removeLastOccurrence,false>(NaN,,,$BoxedType$.isNaN)
+#ELSE
+  #MACRO UncheckedContains(,\,$queryParameterType$ val,\,val)
+  #MACRO UncheckedSearch(,\,$queryParameterType$ val,val==)
+  #MACRO UncheckedRemoveVal<removeVal,false>(,\,$queryParameterType$ val,\,val,val==)
+  #MACRO UncheckedRemoveVal<removeLastOccurrence,false>(,\,$queryParameterType$ val,\,val,val==)
+#ENDIF
+}
+#MACRODEF CheckedNonFragmentedRemoveValNonNull(METHODNAME,FIRSTINDEX,LASTINDEX,ITERATE)
+private boolean uncheckedMETHODNAMENonNull(int tail,Object val)
+{
+  final int head;
+  if(tail<(head=this.head))
+  {
+    return fragmentedMETHODNAMENonNull(head,tail,val);
+  }
+  return nonfragmentedMETHODNAMENonNull(head,tail,val);
+}
+private boolean nonfragmentedMETHODNAMENonNull(int head,int tail,Object val)
+{
+  int modCount=this.modCount;
+  try
+  {
+    final var arr=this.arr;
+    int index=FIRSTINDEX;
+    for(;;)
+    {
+      if(val.equals(arr[index]))
+      {
+        CheckedCollection.checkModCount(modCount,this.modCount);
+        this.modCount=modCount+1;
+        #MACRO NonFragmentedRemoveIndex(head,index,tail)
+        return true;
+      }
+      if(index==LASTINDEX)
+      {
+        CheckedCollection.checkModCount(modCount,this.modCount);
+        return false;
+      }
+      ITERATEindex;
+    }
+  }
+  catch(final RuntimeException e)
+  {
+    throw CheckedCollection.checkModCount(modCount,this.modCount,e);
+  }
+}
+#ENDDEF
+#MACRODEF TailCheckAndCall<IsChecked>(retType,methodName,emptyRet)
+@Override
+public retType methodName()
+{
+  final int tail;
+  if((tail=this.tail+1)!=0)
+  {
+#IFSWITCH IsChecked==true
+    int modCount=this.modCount;
+    try
+    {
+      return super.methodNameHelper(tail);
+    }
+    finally
+    {
+      CheckedCollection.checkModCount(modCount,this.modCount);
+    }
+#ELSE
+    return methodNameHelper(tail);
+#ENDIF
+  }
+  return emptyRet;
+}
+#ENDDEF
+#MACRODEF CheckedRemoveObject(methodName,uncheckedMethodName)
+@Override
+public boolean methodName(Object val)
+{
+  final int tail;
+  if((tail=this.tail)!=-1)
+  {
+    if(val!=null)
+    {
+      return uncheckeduncheckedMethodNameNonNull(tail,val);
+    }
+    return super.uncheckeduncheckedMethodName(tail,Objects::isNull);
+  }
+  return false;
+}
+#ENDDEF
+#MACRODEF FragmentedRemoveHead(head,index,tail)
+//0 <= tail < head <= removeIndex <= arr.length-1
+int headDist,after;
+if((headDist=removeIndex-head)<=(after=arrLength-removeIndex)+tail)
+{
+  //cheaper to shift elements forward
+  //also move the index up
+  if(head==arrLength)
+  {
+    this.head=0;
+  }
+  else
+  {
+#IF OfRef
+    ArrCopy.semicheckedCopy(arr,head,arr,head+1,headDist);
+    this.head=head+1;
+#ELSE
+    ArrCopy.semicheckedCopy(arr,head,arr,++head,headDist);
+    this.head=head;
+#ENDIF
+  }
+#IF OfRef
+  arr[head]=null;
+#ENDIF
+}
+else
+{
+  #MACRO UncheckedRemoveIndex5(this,semicheckedCopy)
+}
+#ENDDEF
+#MACRODEF FragmentedRemoveTail(head,index,tail,arrLengthAssignment)
+//0 <= removeIndex <= tail < head <= arr.length-1
+int before,after;
+if((before=(arrLengthAssignment)-head)+removeIndex<(after=tail-removeIndex))
+{
+  ArrCopy.semicheckedCopy(arr,0,arr,1,removeIndex);
+  arr[0]=arr[arrLength];
+  #MACRO UncheckedRemoveIndex1(this)
+}
+else
+{
+  #MACRO UncheckedRemoveIndex2(this,semicheckedCopy,after)
+}
+#ENDDEF
+#MACRODEF UncheckedRemoveIndex1(target)
+//cheaper to move elements forward
+if(before==0)
+{
+  target.head=0;
+#IF OfRef
+  arr[head]=null;
+#ENDIF
+}
+else
+{
+#IF OfRef
+  ArrCopy.uncheckedCopy(arr,head,arr,head+1,before);
+  arr[head]=null;
+  target.head=head+1;
+#ELSE
+  ArrCopy.uncheckedCopy(arr,head,arr,++head,before);
+  target.head=head;
+#ENDIF
+}
+#ENDDEF
+#MACRODEF UncheckedRemoveIndex2(target,copyMethod,copyDist)
+//cheaper to move elements backward
+if(tail==0)
+{
+  target.tail=arrLength;
+}
+else
+{
+  target.tail=tail-1;
+  ArrCopy.copyMethod(arr,1,arr,0,copyDist);
+}
+#IF OfRef
+arr[tail]=null;
+#ENDIF
+#ENDDEF
+#MACRODEF UncheckedRemoveIndex3(target,copyMethod)
+//cheaper to shift elements forward
+ArrCopy.copyMethod(arr,0,arr,1,removeIndex);
+arr[0]=arr[arrLength];
+if(headDist==0)
+{
+#IF OfRef
+  arr[head]=null;
+#ENDIF
+  target.head=0;
+}
+else
+{
+#IF OfRef
+  ArrCopy.uncheckedCopy(arr,head,arr,head+1,headDist);
+  arr[head]=null;
+  target.head=head+1;
+#ELSE
+  ArrCopy.uncheckedCopy(arr,head,arr,++head,headDist);
+  target.head=head;
+#ENDIF
+}
+#ENDDEF
+#MACRODEF UncheckedRemoveIndex4(target)
+//cheaper to shift elements backwards
+if(after==0)
+{
+  target.tail=arrLength;
+}
+else
+{
+  ArrCopy.uncheckedCopy(arr,removeIndex+1,arr,removeIndex,after);
+  target.tail=tail-1;
+}
+#IF OfRef
+arr[tail]=null;
+#ENDIF
+#ENDDEF
+#MACRODEF UncheckedRemoveIndex5(target,copyMethod)
+//cheaper to shift elements down
+ArrCopy.copyMethod(arr,removeIndex+1,arr,removeIndex,after);
+arr[arrLength]=arr[0];
+if(tail==0)
+{
+  target.tail=arrLength;
+}
+else
+{
+  ArrCopy.uncheckedCopy(arr,1,arr,0,tail);
+  target.tail=tail-1;
+}
+#IF OfRef
+arr[tail]=null;
+#ENDIF
+#ENDDEF
+#MACRODEF CheckedDescItrForEachRemaining(Consumer,actionParam)
+@Override
+public void forEachRemaining(Consumer action)
+{
+  final int tail,index,head;
+  final Checked$<E>$ root;
+  if((index=this.nextIndex+1)>(head=(root=this.root).head))
+  {
+    int modCount=this.modCount;
+    try
+    {
+      $ClassPrefix$ArrSeq.uncheckedReverseForEach(root.arr,head,index,actionParam);
+    }
+    finally
+    {
+      CheckedCollection.checkModCount(modCount,root.modCount);
+    }
+    this.lastRet=head;
+    this.nextIndex=head-1;
+  }
+  else if(index<=(tail=root.tail) && tail<head)
+  {
+    int modCount=this.modCount;
+    try
+    {
+      $ArrayType$[] arr;
+      $ClassPrefix$ArrSeq.uncheckedReverseForEach(arr=root.arr,0,index,actionParam);
+      $ClassPrefix$ArrSeq.uncheckedReverseForEach(arr,head,arr.length,actionParam);
+    }
+    finally
+    {
+      CheckedCollection.checkModCount(modCount,root.modCount);
+    }
+    this.lastRet=head;
+    this.nextIndex=head-1;
+  }
+}
+#ENDDEF
+#MACRODEF UncheckedDescItrForEachRemaining(Consumer,actionParam)
+@Override
+public void forEachRemaining(Consumer action)
+{
+  final int tail,index,head;
+  final $ClassPrefix$ArrDeque$<E>$ root;
+  if((index=this.nextIndex+1)>(head=(root=this.root).head))
+  {
+    $ClassPrefix$ArrSeq.uncheckedReverseForEach(root.arr,head,index,actionParam);
+    this.nextIndex=head-1;
+  }
+  else if(index<=(tail=root.tail) && tail<head)
+  {
+    $ArrayType$[] arr;
+    $ClassPrefix$ArrSeq.uncheckedReverseForEach(arr=root.arr,0,index,actionParam);
+    $ClassPrefix$ArrSeq.uncheckedReverseForEach(arr,head,arr.length,actionParam);
+    this.nextIndex=head-1;
+  }
+}
+#ENDDEF
+#MACRODEF CheckedAscItrForEachRemaining(Consumer,actionParam)
+@Override
+public void forEachRemaining(Consumer action)
+{
+  final int tail,index,head;
+  final Checked$<E>$ root;
+  if((index=this.nextIndex)<(tail=(root=this.root).tail+1))
+  {
+    int modCount=this.modCount;
+    try
+    {
+      $ClassPrefix$ArrSeq.uncheckedForwardForEach(root.arr,index,tail,actionParam);
+    }
+    finally
+    {
+      CheckedCollection.checkModCount(modCount,root.modCount);
+    }
+    this.lastRet=tail-1;
+    this.nextIndex=tail;
+  }
+  else if(index>=(head=root.head) && tail<=head)
+  {
+    int modCount=this.modCount;
+    try
+    {
+      final $ArrayType$[] arr;
+      $ClassPrefix$ArrSeq.uncheckedForwardForEach(arr=root.arr,index,arr.length,actionParam);
+      $ClassPrefix$ArrSeq.uncheckedForwardForEach(arr,0,tail,actionParam);
+    }
+    finally
+    {
+      CheckedCollection.checkModCount(modCount,root.modCount);
+    }
+    this.lastRet=tail-1;
+    this.nextIndex=tail; 
+  }
+}
+#ENDDEF
+#MACRODEF UncheckedAscItrForEachRemaining(Consumer,actionParam)
+@Override
+public void forEachRemaining(Consumer action)
+{
+  final int tail,index,head;
+  final $ClassPrefix$ArrDeque$<E>$ root;
+  if((index=this.nextIndex)<(tail=(root=this.root).tail+1))
+  {
+    $ClassPrefix$ArrSeq.uncheckedForwardForEach(root.arr,index,tail,actionParam);
+    this.nextIndex=tail;
+  }
+  else if(index>=(head=root.head) && tail<=head)
+  {
+    final $ArrayType$[] arr;
+    $ClassPrefix$ArrSeq.uncheckedForwardForEach(arr=root.arr,index,arr.length,actionParam);
+    $ClassPrefix$ArrSeq.uncheckedForwardForEach(arr,0,tail,actionParam);
+    this.nextIndex=tail; 
+  }
+}
+#ENDDEF
+#MACRODEF DoubleFloatQuery(retType,methodName)
+#IF OfDouble,OfFloat
+private retType uncheckedmethodName(int tail,$exposedType$ val)
+{
+  if(val==val)
+  {
+    return uncheckedmethodNameBits(tail,$convertToBits$(val));
+  }
+  return uncheckedmethodNameNaN(tail);
+}
+#ENDIF
+#ENDDEF
+#MACRODEF ProxyAdd(retType,methodName,proxyCall,paramType,cast,retLine)
+@Override
+public retType methodName(final paramType val)
+{
+  proxyCall(cast(val));
+  retLine
+}
+#ENDDEF
+#MACRODEF QueryObject<IsChecked>(retType,methodName,uncheckedMethodName,negRet)
+@Override
+public retType methodName(final Object val)
+{
+  final int tail;
+  if((tail=this.tail)!=-1)
+  {
+#IFSWITCH IsChecked==true
+    if(val!=null)
+    {
+      final int modCount=this.modCount;
+      try
+      {
+        return super.uncheckeduncheckedMethodName(tail,val::equals);
+      }
+      finally
+      {
+        CheckedCollection.checkModCount(modCount,this.modCount);
+      }
+    }
+    return super.uncheckeduncheckedMethodName(tail,Objects::isNull);
+#ELSE
+  #IFNOT OfRef
+    if(val instanceof $BoxedType$)
+  #ENDIF
+    {
+      return uncheckeduncheckedMethodName(tail,$queryCastRef$(val));
+    }
+#ENDIF
+  }
+  return negRet;
+}
+#ENDDEF
+#MACRODEF RemoveIf(Predicate,filterParam)
+@Override
+public boolean removeIf(Predicate filter)
+{
+  final int tail;
+  return (tail=this.tail)!=-1 && uncheckedRemoveIf(tail,filterParam);
+}
+#ENDDEF
+#MACRODEF UncheckedForEach(Consumer,actionParam)
+@Override
+public void forEach(Consumer action)
+{
+  final int tail;
+  if((tail=this.tail)!=-1)
+  {
+    uncheckedForEach(tail,actionParam);
+  }
+}
+#ENDDEF
+#MACRODEF ForEachMethods(MacroName)
+#MACRO MacroName($TypeNameModifier$Consumer$<? super E>$,action)
+#IFNOT OfRef
+#MACRO MacroName(Consumer<? super $BoxedType$>,action::accept)
+#ENDIF
+#ENDDEF
+#MACRODEF BasicQuery(retType,methodName,paramType,negRet,methodParam)
+@Override
+public retType methodName(final paramType val)
+{
+  final int tail;
+  if((tail=this.tail)!=-1)
+  {
+    return uncheckedmethodName(tail,methodParam);
+  }
+  return negRet;
+}
+#ENDDEF
+#MACRODEF QueryBoolean(retType,methodName,negRet)
+@Override
+public retType methodName(final boolean val)
+{
+  final int tail;
+  if((tail=this.tail)!=-1)
+  {
+#IF OfDouble,OfFloat
+    if(val)
+    {
+      return uncheckedmethodNameBits(tail,$TRUE_BITS$);
+    }
+    return uncheckedmethodName0(tail);
+#ELSE
+    return uncheckedmethodName(tail,$queryCastBoolean$(val));
+#ENDIF
+  }
+  return negRet;
+}
+#ENDDEF
+#MACRODEF QueryByte(retType,methodName,negRet)
+@Override
+public retType methodName(final byte val)
+{
+#IF OfChar
+  if(val>=0)
+#ENDIF
+  {
+    final int tail;
+    if((tail=this.tail)!=-1)
+    {
+#IF OfDouble,OfFloat
+      if(val!=0)
+      {
+        return uncheckedmethodNameBits(tail,$convertToBits$(val));
+      }
+      return uncheckedmethodName0(tail);
+#ELSE
+      return uncheckedmethodName(tail,$queryCastPrimitive$(val));
+#ENDIF
+      
+    }
+  }
+  return negRet;
+}
+#ENDDEF
+#MACRODEF QueryChar(retType,methodName,negRet)
+@Override
+public retType methodName(final char val)
+{
+#IF OfByte,OfShort
+  if(val<=$BoxedType$.MAX_VALUE)
+#ENDIF
+  {
+    final int tail;
+    if((tail=this.tail)!=-1)
+    {
+#IF OfDouble,OfFloat
+      if(val!=0)
+      {
+        return uncheckedmethodNameBits(tail,$convertToBits$(val));
+      }
+      return uncheckedmethodName0(tail);
+#ELSE
+      return uncheckedmethodName(tail,$queryCastPrimitive$(val));
+#ENDIF
+    }
+  }
+  return negRet;
+}
+#ENDDEF
+#MACRODEF QueryShort(retType,methodName,negRet)
+@Override
+public retType methodName(final short val)
+{
+#IF OfChar
+  if(val>=0)
+#ENDIF
+  {
+    final int tail;
+    if((tail=this.tail)!=-1)
+    {
+#IF OfDouble,OfFloat
+      if(val!=0)
+      {
+        return uncheckedmethodNameBits(tail,$convertToBits$(val));
+      }
+      return uncheckedmethodName0(tail);
+#ELSE
+      return uncheckedmethodName(tail,$queryCastPrimitive$(val));
+#ENDIF
+    }
+  }
+  return negRet;
+}
+#ENDDEF
+#MACRODEF QueryInt(retType,methodName,negRet)
+@Override
+public retType methodName(final int val)
+{
+  final int tail;
+  if((tail=this.tail)!=-1)
+  {
+#IF OfDouble,OfFloat
+    if(val!=0)
+    {
+  #IF OfFloat
+      if(TypeUtil.checkCastToFloat(val))
+  #ENDIF
+      {
+        return uncheckedmethodNameBits(tail,$convertToBits$(val));
+      }
+    }
+    else
+    {
+      return uncheckedmethodName0(tail);
+    }
+#ELSEIF OfBoolean
+    final boolean v;
+    switch(val)
+    {
+      default:
+        return negRet;
+      case 0:
+        v=false;
+        break;
+      case 1:
+        v=true;
+    }
+    return uncheckedmethodName(tail,v);
+#ELSE
+  #IF OfShort,OfChar,OfByte
+    if(val==($exposedType$)val)
+  #ENDIF
+    {
+      return uncheckedmethodName(tail,$queryCastPrimitive$(val));
+    }
+#ENDIF
+  }
+  return negRet;
+}
+#ENDDEF
+#MACRODEF QueryLong(retType,methodName,negRet)
+@Override
+public retType methodName(final long val)
+{
+  final int tail;
+  if((tail=this.tail)!=-1)
+  {
+#IF OfRef,OfLong
+    return uncheckedmethodName(tail,$queryCastPrimitive$(val));
+#ELSEIF OfDouble,OfFloat
+    if(val!=0)
+    {
+      if(TypeUtil.checkCastTo$BoxedType$(val))
+      {
+        return uncheckedmethodNameBits(tail,$convertToBits$(val));
+      }
+    }
+    else
+    {
+      return uncheckedmethodName0(tail);
+    }
+#ELSE
+    final $exposedType$ v;
+  #IF OfBoolean
+    if(val==0)
+    {
+      v=false;
+    }
+    else if(val==1)
+    {
+      v=true;
+    }
+    else
+    {
+      return negRet;
+    }
+  #ELSE
+    if(val==(v=($exposedType$)val))
+  #ENDIF
+    {
+      return uncheckedmethodName(tail,v);
+    }
+#ENDIF
+  }
+  return negRet;
+}
+#ENDDEF
+#MACRODEF QueryFloat(retType,methodName,negRet)
+@Override
+public retType methodName(final float val)
+{
+  final int tail;
+  if((tail=this.tail)!=-1)
+  {
+#IF OfRef,OfFloat
+    return uncheckedmethodName(tail,$queryCastPrimitive$(val));
+#ELSEIF OfDouble
+    if(val==val)
+    {
+      return uncheckedmethodNameBits(tail,$convertToBits$(val));
+    }
+    return uncheckedmethodNameNaN(tail);
+#ELSE
+    final $exposedType$ v;
+  #IF OfLong
+    if(TypeUtil.floatEquals(val,v=(long)val))
+  #ELSEIF OfInt
+    if((double)val==(double)(v=(int)val))
+  #ELSEIF OfBoolean
+    switch(Float.floatToRawIntBits(val))
+    {
+      default:
+        return negRet;
+      case 0:
+      case Integer.MIN_VALUE:
+        v=false;
+        break;
+      case TypeUtil.FLT_TRUE_BITS:
+        v=true;
+    }
+  #ELSE
+    if(val==(v=($exposedType$)val))
+  #ENDIF
+    {
+      return uncheckedmethodName(tail,v);
+    }
+#ENDIF
+  }
+  return negRet;
+}
+#ENDDEF
+#MACRODEF QueryDouble(retType,methodName,negRet)
+@Override
+public retType methodName(final double val)
+{
+  final int tail;
+  if((tail=this.tail)!=0)
+  {
+#IF OfRef,OfDouble
+    return uncheckedmethodName(tail,$queryCastPrimitive$(val));
+#ELSE
+    final $exposedType$ v;
+  #IF OfFloat
+    if(val==(v=($exposedType$)val))
+    {
+      return uncheckedmethodNameBits(tail,$convertToBits$(v));
+    }
+    else if(v!=v)
+    {
+      return uncheckedmethodNameNaN(tail);
+    }
+  #ELSE
+    #IF OfBoolean
+    final long bits;
+    if((bits=Double.doubleToRawLongBits(val))==0||bits==Long.MIN_VALUE)
+    {
+      v=false;
+    }
+    else if(bits==TypeUtil.DBL_TRUE_BITS)
+    {
+      v=true;
+    }
+    else
+    {
+      return negRet;
+    }
+    #ELSE
+    if(val==(v=($exposedType$)val))
+    #ENDIF
+    {
+      return uncheckedmethodName(tail,v);
+    }
+  #ENDIF
+#ENDIF
+  }
+  return negRet;
+}
+#ENDDEF
+#MACRODEF QueryMethods(retType,methodName,negRet,BYTEIFSTATEMENT,SHORTIFSTATEMENT,CHARIFSTATEMENT)
+#MACRO QueryBoolean(retType,methodName,negRet)
+#MACRO QueryInt(retType,methodName,negRet)
+#MACRO QueryLong(retType,methodName,negRet)
+#MACRO QueryFloat(retType,methodName,negRet)
+#MACRO QueryDouble(retType,methodName,negRet)
+BYTEIFSTATEMENT
+#MACRO QueryByte(retType,methodName,negRet)
+#ENDIF
+CHARIFSTATEMENT
+#MACRO QueryChar(retType,methodName,negRet)
+#ENDIF
+SHORTIFSTATEMENT
+#MACRO QueryShort(retType,methodName,negRet)
+#ENDIF
+#IF OfRef
+#MACRO BasicQuery(retType,methodName,Boolean,negRet,OmniPred.OfRef.getEqualsPred(val))
+#MACRO BasicQuery(retType,methodName,Byte,negRet,OmniPred.OfRef.getEqualsPred(val))
+#MACRO BasicQuery(retType,methodName,Character,negRet,OmniPred.OfRef.getEqualsPred(val))
+#MACRO BasicQuery(retType,methodName,Short,negRet,OmniPred.OfRef.getEqualsPred(val))
+#MACRO BasicQuery(retType,methodName,Integer,negRet,OmniPred.OfRef.getEqualsPred(val))
+#MACRO BasicQuery(retType,methodName,Long,negRet,OmniPred.OfRef.getEqualsPred(val))
+#MACRO BasicQuery(retType,methodName,Float,negRet,OmniPred.OfRef.getEqualsPred(val))
+#MACRO BasicQuery(retType,methodName,Double,negRet,OmniPred.OfRef.getEqualsPred(val))
+#ENDIF
+#ENDDEF
+#MACRODEF UncheckedRemoveVal<MethodName,IsChecked>(Suffix,SigParam,MethodParam,IndexTest)
+#IFSWITCH IsChecked==true
+@Override
+#ENDIF
+boolean fragmentedMethodNameSuffix(int head,int tailSigParam)
+{
+  final $ArrayType$[] arr;
+  int arrLength=(arr=this.arr).length-1;
+#IFSWITCH MethodName==removeVal
+  int removeIndex=head;
+  for(;;++removeIndex)
+#ELSE
+  int removeIndex=tail;
+  for(;;--removeIndex)
+#ENDIF
+  {
+    if(IndexTest(arr[removeIndex]))
+    {
+#IFSWITCH IsChecked==true
+      ++this.modCount;
+#ENDIF
+#IFSWITCH MethodName==removeVal
+      #MACRO FragmentedRemoveHead(head,removeIndex,tail)
+      return true;
+    }
+    if(removeIndex==arrLength)
+    {
+      removeIndex=0;
+      break;
+    }
+  }
+  for(;;++removeIndex)
+#ELSE
+      #MACRO FragmentedRemoveTail(head,removeIndex,tail,arrLength)
+      return true;
+    }
+    if(removeIndex==0)
+    {
+      removeIndex=arrLength;
+      break;
+    }
+  }
+  for(;;++removeIndex)
+#ENDIF
+  {
+    if(IndexTest(arr[removeIndex]))
+    {
+#IFSWITCH IsChecked==true
+      ++this.modCount;
+#ENDIF
+#IFSWITCH MethodName==removeVal
+      #MACRO FragmentedRemoveTail(head,removeIndex,tail,arrLength)
+      return true;
+    }
+    if(removeIndex==tail)
+#ELSE
+      #MACRO FragmentedRemoveHead(head,removeIndex,tail)
+      return true;
+    }
+    if(removeIndex==head)
+#ENDIF
+    {
+      return false;
+    }
+  }
+}
+#IFSWITCH IsChecked==true
+@Override
+#ENDIF
+boolean nonfragmentedMethodNameSuffix(int head,int tailSigParam)
+{
+  final var arr=this.arr;
+#IFSWITCH MethodName==removeVal
+  for(int removeIndex=head;;++removeIndex)
+#ELSE
+  for(int removeIndex=tail;;--removeIndex)
+#ENDIF
+  {
+    if(IndexTest(arr[removeIndex]))
+    {
+#IFSWITCH IsChecked==true
+      ++this.modCount;
+#ENDIF
+      #MACRO NonFragmentedRemoveIndex(head,removeIndex,tail)
+      return true;
+    }
+#IFSWITCH MethodName==removeVal
+    if(removeIndex==tail)
+#ELSE
+    if(removeIndex==head)
+#ENDIF
+    {
+      return false;
+    }
+  }
+}
+#IFNOTSWITCH IsChecked==true
+private boolean uncheckedMethodNameSuffix(int tailSigParam)
+{
+  final int head;
+  if(tail<(head=this.head))
+  {
+    return fragmentedMethodNameSuffix(head,tailMethodParam);
+  }
+  return nonfragmentedMethodNameSuffix(head,tailMethodParam);
+}
+#ENDIF
+#ENDDEF
+#MACRODEF NonFragmentedRemoveIndex(head,index,tail)
+int hDist,tDist;
+if((hDist=index-head)<=(tDist=tail-index))
+{
+  if(hDist==0)
+  {
+    if(tDist==0)
+    {
+#IF OfRef
+      arr[index]=null;
+#ENDIF
+      this.tail=-1;
+      return true;
+    }
+#IF OfRef
+    tDist=head+1;
+  }
+  else
+  {
+    ArrCopy.uncheckedCopy(arr,head,arr,tDist=head+1,hDist);
+  }
+  arr[head]=null;
+  this.head=tDist;
+#ELSE
+  }
+  else
+  {
+    ArrCopy.uncheckedCopy(arr,head,arr,++head,hDist);
+  }
+  this.head=head;
+#ENDIF
+}
+else
+{
+  ArrCopy.semicheckedCopy(arr,index+1,arr,index,tDist);
+#IF OfRef
+  arr[tail]=null;
+#ENDIF
+  this.tail=tail-1;
+}
+#ENDDEF
+#MACRODEF UncheckedSearch(Suffix,SigParam,IndexTest)
+private int uncheckedsearchSuffix(int tailSigParam)
+{
+  final var arr=this.arr;
+  int index=1;
+  if(tail<head)
+  {
+    for(final int bound=arr.length;;++index)
+    {
+      if(IndexTest(arr[head]))
+      {
+        return index;
+      }
+      if(++head==bound)
+      {
+        break;
+      }
+    }
+    head=0;
+  }
+  for(;;++index,++head)
+  {
+    if(IndexTest(arr[head]))
+    {
+      return index;
+    }
+    if(head==tail)
+    {
+      return -1;
+    }
+  }
+}
+#ENDDEF
+#MACRODEF UncheckedContains(Suffix,SigParam,MethodParam)
+private boolean uncheckedcontainsSuffix(int tailSigParam)
+{
+  if(tail<head)
+  {
+    final $ArrayType$[] arr;
+    return $ClassPrefix$ArrSeq.uncheckedcontainsSuffix(arr=this.arr,0,tail+1MethodParam)
+    || $ClassPrefix$ArrSeq.uncheckedcontainsSuffix(arr,head,arr.lengthMethodParam);
+  }
+  return $ClassPrefix$ArrSeq.uncheckedcontainsSuffix(arr,head,tail+1MethodParam);
+}
+#ENDDEF
+#MACRODEF ToArray(retType,MethodName,DefaultArr)
+@Override
+public retType[] toMethodNameArray()
+{
+  int tail;
+  if((tail=this.tail+1)!=0)
+  {
+    final var srcArr=this.arr;
+    final retType[] ret;
+    int size;
+    if((size=tail-head)<1)
+    {
+      ArrCopy.uncheckedCopy(srcArr,0,ret=new retType[size+=srcArr.length],size-=tail,tail);
+      ArrCopy.uncheckedCopy(srcArr,head,ret,0,size);
+    }
+    else
+    {
+      ArrCopy.uncheckedCopy(srcArr,head,ret=new retType[size],0,size);
+    }
+    return ret;
+  }
+  return OmniArray.DefaultArr;
+}
+#ENDDEF
+#MACRODEF ProxyGet(retType,methodName,proxyCall)
+@Override
+public retType methodName()
+{
+  return (retType)proxyCall();
+}
+#ENDDEF
+#MACRODEF PeekMethods(MacroName)
+#MACRO MacroName($exposedType$,$TypeNameModifier$,,$defaultVal$)
+#IFNOT OfRef
+#MACRO MacroName($BoxedType$,,,null)
+  #IFNOT OfDouble
+#MACRO MacroName(double,Double,$castToDouble$,Double.NaN)
+    #IFNOT OfFloat
+#MACRO MacroName(float,Float,$castToFloat$,Float.NaN)
+      #IFNOT OfLong
+#MACRO MacroName(long,Long,$castToLong$,Long.MIN_VALUE)
+        #IFNOT OfInt
+#MACRO MacroName(int,Int,$castToInt$,Integer.MIN_VALUE)
+          #IFNOT OfShort,OfChar
+#MACRO MacroName(short,Short,$castToShort$,Short.MIN_VALUE)
+            #IFNOT OfByte
+#MACRO MacroName(byte,Byte,$castToByte$,Byte.MIN_VALUE)
+#MACRO MacroName(char,Char,$castToChar$,Character.MIN_VALUE)
+            #ENDIF
+          #ENDIF
+        #ENDIF
+      #ENDIF
+    #ENDIF
+  #ENDIF
+#ENDIF
+#ENDDEF
+#MACRODEF PeekFirst(retType,Suffix,cast,defaultRet)
+#MACRO SuppressUnchecked()
+@Override
+public retType peekSuffix()
+{
+  if(this.tail!=-1)
+  {
+    return (retType)cast(arr[head]);
+  }
+  return defaultRet;
+}
+#ENDDEF
+#MACRODEF PeekLast(retType,Suffix,cast,defaultRet)
+#MACRO SuppressUnchecked()
+@Override
+public retType peekLastSuffix()
+{
+  int tail;
+  if((tail=this.tail)!=-1)
+  {
+    return (retType)cast(arr[tail]);
+  }
+  return defaultRet;
+}
+#ENDDEF
+#MACRODEF PollMethods(MacroName,IncrementModCount)
+#MACRO MacroName($exposedType$,$TypeNameModifier$,IncrementModCount,,$defaultVal$)
+#IFNOT OfRef
+#MACRO MacroName($BoxedType$,,IncrementModCount,,null)
+  #IFNOT OfDouble
+#MACRO MacroName(double,Double,IncrementModCount,$castToDouble$,Double.NaN)
+    #IFNOT OfFloat
+#MACRO MacroName(float,Float,IncrementModCount,$castToFloat$,Float.NaN)
+      #IFNOT OfLong
+#MACRO MacroName(long,Long,IncrementModCount,$castToLong$,Long.MIN_VALUE)
+        #IFNOT OfInt
+#MACRO MacroName(int,Int,IncrementModCount,$castToInt$,Integer.MIN_VALUE)
+          #IFNOT OfShort,OfChar
+#MACRO MacroName(short,Short,IncrementModCount,$castToShort$,Short.MIN_VALUE)
+            #IFNOT OfByte
+#MACRO MacroName(byte,Byte,IncrementModCount,$castToByte$,Byte.MIN_VALUE)
+#MACRO MacroName(char,Char,IncrementModCount,$castToChar$,Character.MIN_VALUE)
+            #ENDIF
+          #ENDIF
+        #ENDIF
+      #ENDIF
+    #ENDIF
+  #ENDIF
+#ENDIF
+#ENDDEF
+#MACRODEF PollLast(retType,Suffix,IncrementModCount,cast,defaultRet)
+@Override
+public retType pollLastSuffix()
+{
+  int tail;
+  if((tail=this.tail)!=-1)
+  {
+    IncrementModCount
+    $ArrayType$[] arr;
+    #MACRO SuppressUnchecked()
+    final var ret=(retType)cast((arr=this.arr)[tail]);
+    switch(Integer.signum(this.head-tail))
+    {
+    default:
+      if(tail==0)
+      {
+        this.tail=arr.length-1;
+        break;
+      }
+    case -1:
+      this.tail=tail-1;
+      break;
+    case 0:
+      this.tail=-1;
+    }
+#IF OfRef
+    arr[tail]=null;
+#ENDIF
+    return ret;
+  }
+  return defaultRet;
+}
+#ENDDEF
+#MACRODEF PollFirst(retType,Suffix,IncrementModCount,cast,defaultRet)
+@Override
+public retType pollSuffix()
+{
+  int tail;
+  if((tail=this.tail)!=-1)
+  {
+    IncrementModCount
+    int head;
+    $ArrayType$[] arr;
+    #MACRO SuppressUnchecked()
+    final var ret=(retType)cast((arr=this.arr)[head=this.head]);
+    switch(Integer.signum(head-tail))
+    {
+    default:
+      if(head==arr.length-1)
+      {
+        this.head=0;
+        break;
+      }
+    case -1:
+      this.head=head+1;
+      break;
+    case 0:
+      this.tail=-1;
+    }
+#IF OfRef
+    arr[head]=null;
+#ENDIF
+    return ret;
+  }
+  return defaultRet;
+}
+#ENDDEF
+#MACRODEF SuppressUnchecked()
+#IF OfRef
+@SuppressWarnings("unchecked")
+#ENDIF
+#ENDDEF

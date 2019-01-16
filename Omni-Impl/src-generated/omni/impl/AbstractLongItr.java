@@ -1,9 +1,7 @@
 package omni.impl;
-public abstract class AbstractLongItr
-{
-  public Long next()
-  {
+import omni.api.OmniIterator;
+public abstract class AbstractLongItr implements OmniIterator.OfLong{
+  @Override public Long next(){
     return nextLong();
   }
-  protected abstract long nextLong();
 }

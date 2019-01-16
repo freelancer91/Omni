@@ -1,0 +1,10 @@
+#TYPEDEF OfBoolean
+#TYPEDEF OfByte
+#TYPEDEF OfChar
+#TYPEDEF OfShort
+#TYPEDEF OfFloat
+package omni.function;
+public interface $TypeNameModifier$Predicate
+{
+  public abstract boolean test(final $exposedType$ val);
+}

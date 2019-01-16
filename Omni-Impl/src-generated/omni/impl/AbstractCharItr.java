@@ -1,9 +1,7 @@
 package omni.impl;
-public abstract class AbstractCharItr
-{
-  public Character next()
-  {
+import omni.api.OmniIterator;
+public abstract class AbstractCharItr implements OmniIterator.OfChar{
+  @Override public Character next(){
     return nextChar();
   }
-  protected abstract char nextChar();
 }

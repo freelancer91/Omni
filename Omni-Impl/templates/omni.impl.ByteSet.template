@@ -1,0 +1,875 @@
+#TYPEDEF OfByte
+package omni.impl;
+import omni.api.OmniSet;
+import omni.api.OmniIterator;
+import omni.function.ByteConsumer;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
+import omni.function.BytePredicate;
+import java.util.function.IntFunction;
+import omni.util.OmniArray;
+import java.util.ConcurrentModificationException;
+import java.util.NoSuchElementException;
+public class ByteSet implements OmniSet.OfByte
+{
+  #MACRO WordOps<false,word0>((Byte.MIN_VALUE))
+  #MACRO WordOps<false,word1>((Byte.MIN_VALUE+64))
+  #MACRO WordOps<false,word2>((Byte.MIN_VALUE+128))
+  #MACRO WordOps<false,word3>((Byte.MIN_VALUE+192))
+  
+  ByteSet(long word0,long word1,long word2, long word3)
+  {
+    this.word0=word0;
+    this.word1=word1;
+    this.word2=word2;
+    this.word3=word3;
+  }
+  ByteSet()
+  {
+  }
+  
+  #MACRO AddRemoveBoolean<add>()
+  #MACRO QueryByte(add,add)
+  #MACRO DelegateQuery(add,Byte,byte)
+  @Override
+  public void clear()
+  {
+    this.word0=0;
+    this.word1=0;
+    this.word2=0;
+    this.word3=0;
+  }
+  @Override
+  public Object clone()
+  {
+    return new ByteSet(word0,word1,word2,word3);
+  }
+  @Override
+  public boolean contains(boolean val)
+  {
+    return (this.word2&(val?0b10L:0b01L))!=0;
+  }
+  #MACRO CheckNullAndDelegate(boolean,contains,Boolean,contains,(boolean))
+  #MACRO QueryByte(contains,contains)
+  #MACRO CheckNullAndDelegate(boolean,contains,Byte,contains,(byte))
+  #MACRO QueryChar(contains,contains)
+  #MACRO CheckNullAndDelegate(boolean,contains,Character,contains,(char))
+  #MACRO CheckRangeAndDelegate(boolean,contains,double,contains,byte)
+  #MACRO CheckNullAndDelegate(boolean,contains,Double,contains,(double))
+  #MACRO CheckRangeAndDelegate(boolean,contains,float,contains,byte)
+  #MACRO CheckNullAndDelegate(boolean,contains,Float,contains,(float))
+  #MACRO QueryInt(contains,contains)
+  #MACRO CheckNullAndDelegate(boolean,contains,Integer,contains,(int))
+  #MACRO CheckRangeAndDelegate(boolean,contains,long,contains,byte)
+  #MACRO CheckNullAndDelegate(boolean,contains,Long,contains,(long))
+  #MACRO QueryObject(contains,contains)
+  #MACRO DelegateQuery(contains,short,int)
+  #MACRO CheckNullAndDelegate(boolean,contains,Short,contains,(int))
+  @Override
+  public boolean equals(Object val)
+  {
+    //TODO implement equals method
+    return false;
+  }
+  #MACRO ForEachMethods(ForEach)
+  @Override
+  public int hashCode()
+  {
+    return word0hash()+word1hash()+word2hash()+word3hash();
+  }
+  @Override
+  public boolean isEmpty()
+  {
+    return word0==0&&word1==0&&word2==0&&word3==0;
+  }
+  @Override
+  public OmniIterator.OfByte iterator()
+  {
+    return new Itr(this);
+  }
+  #MACRO RemoveIf(BytePredicate,filter)
+  #MACRO RemoveIf(Predicate<? super Byte>,filter::test)
+  private static class Itr extends AbstractByteItr
+  {
+    private transient final ByteSet root;
+    private transient int srcOffset;
+    private transient byte lastRet;
+    private Itr(ByteSet root)
+    {
+      this.root=root;
+      int srcOffset=Byte.MIN_VALUE;
+      long currWord=root.word0,marker=1L;
+      outer: for(;;)
+      {
+        #MACRO InitializeItr()
+        currWord=root.word1;
+        marker=1L;
+        #MACRO InitializeItr()
+        currWord=root.word2;
+        marker=1L;
+        #MACRO InitializeItr()
+        currWord=root.word3;
+        marker=1L;
+        #MACRO InitializeItr()
+      }
+      this.srcOffset=srcOffset;
+    }
+    @Override
+    public boolean hasNext()
+    {
+      return this.srcOffset<=Byte.MAX_VALUE;
+    }
+    @Override
+    public void remove()
+    {
+      byte lastRet;
+      switch((lastRet=this.lastRet)>>6)
+      {
+        case -2:
+          root.word0&=(~(1L<<lastRet));
+          return;
+        case -1:
+          root.word1&=(~(1L<<lastRet));
+          return;
+        case 0:
+          root.word2&=(~(1L<<lastRet));
+          return;
+        default:
+          root.word3&=(~(1L<<lastRet));
+      }
+    }
+    @Override
+    public byte nextByte()
+    {
+      int srcOffset;
+      final byte lastRet;
+      this.lastRet=lastRet=(byte)(srcOffset=this.srcOffset);
+      final ByteSet root=this.root;
+      long currWord,marker;
+      outerfinal: switch(srcOffset>>6)
+      {
+      case -2:
+        currWord=root.word0;
+        marker=1L<<srcOffset;
+        #MACRO IterateToNext()
+      case -1:
+        currWord=root.word1;
+        marker=1L<<srcOffset;
+        #MACRO IterateToNext()
+      case 0:
+        currWord=root.word2;
+        marker=1L<<srcOffset;
+        #MACRO IterateToNext()
+      default:
+        currWord=root.word3;
+        marker=1L<<srcOffset;
+        #MACRO IterateToNext()
+      }
+      this.srcOffset=srcOffset;
+      return lastRet;
+    }
+    #MACRO ForEachMethods(ForEachItr<false>)
+  }
+  #MACRO QueryObject(remove,removeVal)
+  #MACRO AddRemoveBoolean<removeVal>()
+  #MACRO CheckNullAndDelegate(boolean,removeVal,Boolean,removeVal,(boolean))
+  #MACRO QueryByte(removeVal,remove)
+  #MACRO CheckNullAndDelegate(boolean,removeVal,Byte,removeVal,(byte))
+  #MACRO QueryChar(removeVal,remove)
+  #MACRO CheckNullAndDelegate(boolean,removeVal,Character,removeVal,(char))
+  #MACRO CheckRangeAndDelegate(boolean,removeVal,double,removeVal,byte)
+  #MACRO CheckNullAndDelegate(boolean,removeVal,Double,removeVal,(double))
+  #MACRO CheckRangeAndDelegate(boolean,removeVal,float,removeVal,byte)
+  #MACRO CheckNullAndDelegate(boolean,removeVal,Float,removeVal,(float))
+  #MACRO QueryInt(removeVal,remove)
+  #MACRO CheckNullAndDelegate(boolean,removeVal,Integer,removeVal,(int))
+  #MACRO CheckRangeAndDelegate(boolean,removeVal,long,removeVal,byte)
+  #MACRO CheckNullAndDelegate(boolean,removeVal,Long,removeVal,(long))
+  #MACRO DelegateQuery(removeVal,short,int)
+  #MACRO CheckNullAndDelegate(boolean,removeVal,Short,removeVal,(int))
+  @Override
+  public int size()
+  {
+    return Long.bitCount(word0)
+      +Long.bitCount(word1)
+      +Long.bitCount(word2)
+      +Long.bitCount(word3);
+  }
+  
+  #MACRO ToArrayIntFunc<false>()
+  @Override
+  public <T> T[] toArray(T[] dst)
+  {
+    final int size;
+    if((size=Long.bitCount(word0)+Long.bitCount(word1)+Long.bitCount(word2)+Long.bitCount(word3))!=0)
+    {
+      word3copy(dst=OmniArray.uncheckedArrResize(size,dst),word2copy(dst,word1copy(dst,word0copy(dst,0))));
+    }
+    else if(dst.length!=0)
+    {
+      dst[0]=null;
+    }
+    return dst;
+  }
+  #MACRO ToArray(Byte,,OfByte.DEFAULT_BOXED_ARR)
+  #MACRO ToArray(byte,Byte,OfByte.DEFAULT_ARR)
+  #MACRO ToArray(short,Short,OfShort.DEFAULT_ARR)
+  #MACRO ToArray(int,Int,OfInt.DEFAULT_ARR)
+  #MACRO ToArray(long,Long,OfLong.DEFAULT_ARR)
+  #MACRO ToArray(float,Float,OfFloat.DEFAULT_ARR)
+  #MACRO ToArray(double,Double,OfDouble.DEFAULT_ARR)
+  @Override
+  public String toString()
+  {
+    long word,marker;
+    final StringBuilder builder;
+    int srcOffset=Byte.MIN_VALUE;
+    outerword3: for(;;)
+    {
+      outerword2: for(;;)
+      {
+        outerword1: for(;;)
+        {
+          outerword0: for(;;)
+          {
+            #MACRO InnerWordToString(word0)
+            #MACRO InnerWordToString(word1)
+            #MACRO InnerWordToString(word2)
+            #MACRO InnerWordToString(word3)
+            return "[]";
+          }
+          #MACRO OuterWordToString(word1)
+        }
+        #MACRO OuterWordToString(word2)
+      }
+      #MACRO OuterWordToString(word3)
+    }
+    while((marker<<=1)!=0)
+    {
+      ++srcOffset;
+      if((word&marker)!=0)
+      {
+        builder.append(',').append(' ').append(srcOffset);
+      }
+    }
+    return builder.append(']').toString();
+  }
+  static class Checked extends ByteSet
+  {
+    private static void checkMod(long expectedWord,long actualWord)
+    {
+      if(expectedWord!=actualWord)
+      {
+        throw new ConcurrentModificationException();
+      }
+    }
+    Checked(long word0,long word1,long word2,long word3)
+    {
+      super(word0,word1,word2,word3);
+    }
+    Checked()
+    {
+      super();
+    }
+    @Override
+    public Object clone()
+    {
+      return new Checked(word0,word1,word2,word3);
+    }
+    @Override
+    public boolean equals(Object val)
+    {
+      //TODO implement equals method
+      return false;
+    }
+    @Override
+    public OmniIterator.OfByte iterator()
+    {
+      return new CheckedItr(this);
+    }
+    #MACRO ToArrayIntFunc<true>()
+    private static class CheckedItr extends AbstractByteItr
+    {
+      private transient final Checked root;
+      private transient int srcOffset;
+      private transient byte lastRet;
+      private CheckedItr(Checked root)
+      {
+        this.root=root;
+        int srcOffset=Byte.MIN_VALUE;
+        long currWord=root.word0,marker=1L;
+        outer: for(;;)
+        {
+          #MACRO InitializeItr()
+          currWord=root.word1;
+          marker=1L;
+          #MACRO InitializeItr()
+          currWord=root.word2;
+          marker=1L;
+          #MACRO InitializeItr()
+          currWord=root.word3;
+          marker=1L;
+          #MACRO InitializeItr()
+        }
+        this.srcOffset=srcOffset;
+      }
+      @Override
+      public boolean hasNext()
+      {
+        return this.srcOffset<=Byte.MAX_VALUE;
+      }
+      @Override
+      public void remove()
+      {
+        byte lastRet;
+        switch((lastRet=this.lastRet)>>6)
+        {
+          case -2:
+            root.word0&=(~(1L<<lastRet));
+            return;
+          case -1:
+            root.word1&=(~(1L<<lastRet));
+            return;
+          case 0:
+            root.word2&=(~(1L<<lastRet));
+            return;
+          default:
+            root.word3&=(~(1L<<lastRet));
+        }
+      }
+      @Override
+      public byte nextByte()
+      {
+        int srcOffset;
+        final byte lastRet=(byte)(srcOffset=this.srcOffset);
+        final ByteSet root=this.root;
+        long currWord,marker=1L<<srcOffset;
+        outerfinal: for(;;)
+        {
+          outerword3: for(;;)
+          {
+            outerword2: for(;;)
+            {
+              outerword1: for(;;)
+              {
+                outerword0: switch(srcOffset>>6)
+                {
+                  case -2:
+                    checkMod((currWord=root.word0)&marker,marker);
+                    break outerword0;
+                  case -1:
+                    checkMod((currWord=root.word1)&marker,marker);
+                    break outerword1;
+                  case 0:
+                    checkMod((currWord=root.word2)&marker,marker);
+                    break outerword2;
+                  case 1:
+                    checkMod((currWord=root.word3)&marker,marker);
+                    break outerword3;
+                  default:
+                    throw new NoSuchElementException();
+                }
+                #MACRO IterateToNext()
+                currWord=root.word1;
+                marker=1L;
+                break;
+              }
+              #MACRO IterateToNext()
+              currWord=root.word2;
+              marker=1L;
+              break;
+            }
+            #MACRO IterateToNext()
+            currWord=root.word3;
+            marker=1L;
+            break;
+          }
+          #MACRO IterateToNext()
+          break;
+        }
+        this.srcOffset=srcOffset;
+        this.lastRet=lastRet;
+        return lastRet;
+      }
+      #MACRO ForEachMethods(ForEachItr<true>)
+    }
+  }
+  private static void consumeWord(long word,ByteConsumer action,int srcOffset)
+  {
+    for(long marker=1L<<srcOffset;;++srcOffset)
+    {
+      if((word&marker)!=0)
+      {
+        action.accept((byte)srcOffset);
+      }
+      if((marker<<=1)==0)
+      {
+        return;
+      }
+    }
+  }
+}
+#MACRODEF IterateToNext()
+for(;;)
+{
+  ++srcOffset;
+  if((marker<<=1)==0)
+  {
+    break;
+  }
+  if((marker&currWord)!=0)
+  {
+    break outerfinal;
+  }
+}
+#ENDDEF
+#MACRODEF InitializeItr()
+for(;;)
+{
+  if((marker&currWord)!=0)
+  {
+    break outer;
+  }
+  ++srcOffset;
+  if((marker<<=1)==0)
+  {
+    break;
+  }
+}
+#ENDDEF
+#MACRODEF OuterWordToString(WORD)
+for(;;)
+{
+  if((marker<<=1)==0)
+  {
+    word=this.WORD;
+    break outerWORD;
+  }
+  ++srcOffset;
+  if((word&marker)!=0)
+  {
+    builder.append(',').append(' ').append(srcOffset);
+  }
+}
+#ENDDEF
+#MACRODEF InnerWordToString(WORD)
+for(word=this.WORD,marker=1L;;++srcOffset)
+{
+  if((word&marker)!=0)
+  {
+    builder=new StringBuilder("[").append(srcOffset);
+    break outerWORD;
+  }
+  if((marker<<=1)==0)
+  {
+    break;
+  }
+}
+#ENDDEF
+#MACRODEF ToArrayIntFunc<IsChecked>()
+@Override
+public <T> T[] toArray(IntFunction<T[]> arrConstructor)
+{
+  final int size;
+  #IFSWITCH IsChecked==true
+  final long word0,word1,word2,word3;
+  if((size=Long.bitCount(word0=this.word0)
+    +Long.bitCount(word1=this.word1)
+    +Long.bitCount(word2=this.word2)
+    +Long.bitCount(word3=this.word3))!=0)
+  {
+    T[] arr=arrConstructor.apply(size);
+    checkMod(this.word0,word0);
+    checkMod(this.word1,word1);
+    checkMod(this.word2,word2);
+    checkMod(this.word3,word3);
+    super.word3copy(arr,super.word2copy(arr,super.word1copy(arr,super.word0copy(arr,0))));
+  #ELSE
+  if((size=Long.bitCount(word0)
+    +Long.bitCount(word1)
+    +Long.bitCount(word2)
+    +Long.bitCount(word3))!=0)
+  {
+    T[] arr;
+    word3copy(arr=arrConstructor.apply(size),word2copy(arr,word1copy(arr,word0copy(arr,0))));
+  #ENDIF
+    return arr;
+  }
+  else
+  {
+  #IFSWITCH IsChecked==true
+  T[] arr=arrConstructor.apply(0);
+  checkMod(this.word0,word0);
+  checkMod(this.word1,word1);
+  checkMod(this.word2,word2);
+  checkMod(this.word3,word3);
+  return arr;
+  #ELSE
+  return arrConstructor.apply(0);
+  #ENDIF
+  }
+}
+#ENDDEF
+#MACRODEF ToArray(ArrType,MethodName,DefaultArr)
+@Override
+public ArrType[] toMethodNameArray()
+{
+  final int size;
+  if((size=Long.bitCount(word0)
+    +Long.bitCount(word1)
+    +Long.bitCount(word2)
+    +Long.bitCount(word3))!=0)
+  {
+    final ArrType[] arr;
+    word3copy(arr=new ArrType[size],word2copy(arr,word1copy(arr,word0copy(arr,0))));
+    return arr;
+  }
+  return OmniArray.DefaultArr;
+}
+#ENDDEF
+#MACRODEF RemoveIf(Predicate,predicateParam)
+@Override
+public boolean removeIf(Predicate filter)
+{
+  return word0removeIf(predicateParam)
+        |word1removeIf(predicateParam)
+        |word2removeIf(predicateParam)
+        |word3removeIf(predicateParam);
+}
+#ENDDEF
+#MACRODEF AddRemoveBoolean<MethodName>()
+@Override
+public boolean MethodName(boolean val)
+{
+  long word;
+  if((word=this.word2)!=
+#IFSWITCH MethodName==add
+    (word|=(val?0b10:0b01))
+#ELSE
+    (word&=(val?~(0b10):~(0b01)))
+#ENDIF
+  )
+  {
+    this.word2=word;
+    return true;
+  }
+  return false;
+}
+#ENDDEF
+#MACRODEF QueryByte(MethodName,WordMethod)
+@Override
+public boolean MethodName(byte val)
+{
+  switch(val>>6)
+  {
+    case -2:
+      return word0WordMethod(val);
+    case -1:
+      return word1WordMethod(val);
+    case 0:
+      return word2WordMethod(val);
+    default:
+      return word3WordMethod(val);
+  }
+}
+#ENDDEF
+#MACRODEF QueryChar(MethodName,WordMethod)
+@Override
+public boolean MethodName(char val)
+{
+  switch(val>>6)
+  {
+    case 0:
+      return word2WordMethod(val);
+    case 1:
+      return word3WordMethod(val);
+    default:
+      return false;
+  }
+}
+#ENDDEF
+#MACRODEF QueryInt(MethodName,WordMethod)
+@Override
+public boolean MethodName(int val)
+{
+  switch(val>>6)
+  {
+    case -2:
+      return word0WordMethod(val);
+    case -1:
+      return word1WordMethod(val);
+    case 0:
+      return word2WordMethod(val);
+    case 1:
+      return word3WordMethod(val);
+    default:
+      return false;
+  }
+}
+#ENDDEF
+#MACRODEF QueryObject(MethodName,Delegate)
+@Override
+public boolean MethodName(Object val)
+{
+  return val instanceof Byte && Delegate((byte)val);
+}
+#ENDDEF
+
+#MACRODEF DelegateQuery(MethodName,ParamType,CastType)
+@Override
+public boolean MethodName(ParamType val)
+{
+  return MethodName((CastType)val);
+}
+#ENDDEF
+#MACRODEF ForEachMethods(MACRONAME)
+#MACRO MACRONAME(ByteConsumer,action)
+#MACRO MACRONAME(Consumer<? super Byte>,action::accept)
+#ENDDEF
+#MACRODEF ForEachItr<IsChecked>(Consumer,consumerParam)
+@Override
+public void forEachRemaining(Consumer action)
+{
+#IFSWITCH IsChecked==true
+  var root=this.root;
+  int srcOffset;
+  long word,marker=1L<<(srcOffset=this.srcOffset);
+  byte lastRet;
+  outerword3: for(;;)
+  {
+    outerword2: for(;;)
+    {
+      outerword1: for(;;)
+      {
+        outerword0: switch(srcOffset>>6)
+        {
+        case -2:
+          checkMod((word=root.word0)&marker,marker);
+          action.accept(lastRet=(byte)srcOffset);
+          break outerword0;
+        case -1:
+          checkMod((word=root.word1)&marker,marker);
+          action.accept(lastRet=(byte)srcOffset);
+          break outerword1;
+        case 0:
+          checkMod((word=root.word2)&marker,marker);
+          action.accept(lastRet=(byte)srcOffset);
+          break outerword2;
+        case 1:
+          checkMod((word=root.word3)&marker,marker);
+          action.accept(lastRet=(byte)srcOffset);
+          break outerword3;
+        default:
+          return;
+        }
+        #MACRO ConsumeWord()
+        checkMod(root.word0,word);
+        marker=1L;
+        word=root.word1;
+        break outerword1;
+      }
+      #MACRO ConsumeWord()
+      checkMod(root.word1,word);
+      marker=1L;
+      word=root.word2;
+      break outerword2;
+    }
+    #MACRO ConsumeWord()
+    checkMod(root.word2,word);
+    marker=1L;
+    word=root.word3;
+    break outerword3;
+  }
+  #MACRO ConsumeWord()
+  checkMod(root.word3,word);
+#ELSE
+  var root=this.root;
+  int srcOffset;
+  byte lastRet;
+  action.accept(lastRet=(byte)(srcOffset=this.srcOffset));
+  switch(srcOffset>>6)
+  {
+    case -2:
+      long word=root.word0;
+      long marker=1L<<srcOffset;
+      #MACRO ConsumeWord()
+    case -1:
+      word=root.word1;
+      marker=1L<<srcOffset;
+      #MACRO ConsumeWord()
+    case 0:
+      word=root.word2;
+      marker=1L<<srcOffset;
+      #MACRO ConsumeWord()
+    case 1:
+      word=root.word3;
+      marker=1L<<srcOffset;
+      #MACRO ConsumeWord()
+      break;
+    default:
+      return;
+  }
+#ENDIF
+  this.lastRet=lastRet;
+  this.srcOffset=srcOffset;
+}
+#ENDDEF
+#MACRODEF ConsumeWord()
+for(;;)
+{
+  ++srcOffset;
+  if((marker<<=1)==0)
+  {
+    break;
+  }
+  if((word&marker)!=0)
+  {
+    action.accept(lastRet=(byte)srcOffset);
+  }
+}
+#ENDDEF
+#MACRODEF ForEach(Consumer,consumerParam)
+@Override
+public void forEach(Consumer action)
+{
+  word0consume(consumerParam);
+  word1consume(consumerParam);
+  word2consume(consumerParam);
+  word3consume(consumerParam);
+}
+#ENDDEF
+#MACRODEF CheckRangeAndDelegate(RetType,MethodName,ParamType,CastName,ParamCast)
+@Override
+public RetType MethodName(ParamType val)
+{
+  final ParamCast v;
+  return val==(v=(ParamCast)val)&&CastName(v);
+}
+#ENDDEF
+#MACRODEF CheckNullAndDelegate(RetType,MethodName,ParamType,CastName,ParamCast)
+@Override
+public RetType MethodName(ParamType val)
+{
+  return val!=null && CastName(ParamCast(val));
+}
+#ENDDEF
+#MACRODEF WordOps<IsChecked,WORD>(SRCOFFSET)
+#IFSWITCH IsChecked==false
+transient long WORD;
+#MACRO CopyWord(Object,int,SRCOFFSET,)
+#MACRO CopyWord(Byte,int,SRCOFFSET,(byte))
+#MACRO CopyWord(double,int,SRCOFFSET,)
+#MACRO CopyWord(float,int,SRCOFFSET,)
+#MACRO CopyWord(long,long,SRCOFFSET,)
+#MACRO CopyWord(int,int,SRCOFFSET,)
+#MACRO CopyWord(short,int,SRCOFFSET,(short))
+#MACRO CopyWord(byte,int,SRCOFFSET,(byte))
+private boolean WORDcontains(int val)
+{
+  return (this.WORD&(1L<<val))!=0;
+}
+private boolean WORDadd(int val)
+{
+  long word;
+  if((word=this.WORD)!=(word|=1L<<val))
+  {
+    this.WORD=word;
+    return true;
+  }
+  return false;
+}
+private boolean WORDremove(int val)
+{
+  long word;
+  if((word=this.WORD)!=(word&=(~(1L<<val))))
+  {
+    this.WORD=word;
+    return true;
+  }
+  return false;
+}
+private int WORDhash()
+{
+  long marker,word;
+  int srcOffset=SRCOFFSET;
+  int hash=((marker=1L<<SRCOFFSET)&(word=this.WORD))!=0?srcOffset:0;
+  while((marker<<=1)!=0)
+  {
+    ++srcOffset;
+    if((marker&word)!=0)
+    {
+      hash+=srcOffset;
+    }
+  }
+  return hash;
+}
+#ELSE
+@Override
+#ENDIF
+void WORDconsume(ByteConsumer action)
+{
+#IFSWITCH IsChecked==true
+  long word;
+  consumeWord(word=WORD,action,SRCOFFSET);
+  checkMod(word,WORD);
+#ELSE
+  consumeWord(WORD,action,SRCOFFSET);
+#ENDIF
+}
+#IFSWITCH IsChecked==true
+@Override
+#ENDIF
+boolean WORDremoveIf(BytePredicate filter)
+{
+  long originalWord,marker=1L,word=originalWord=this.WORD;
+  int srcOffset=SRCOFFSET;
+  for(;;)
+  {
+    if((word&marker)!=0 && filter.test((byte)srcOffset))
+    {
+      word&=(~(marker));
+    }
+    ++srcOffset;
+    if((marker<<=1)==0)
+    {
+#IFSWITCH IsChecked==true
+      checkMod(originalWord,this.WORD);
+#ENDIF
+      if(originalWord!=word)
+      {
+        this.WORD=word;
+        return true;
+      }
+      return false;
+    }
+  }
+}
+#ENDDEF
+#MACRODEF CopyWord(ArrType,SrcOffsetType,SRCOFFSET,CAST)
+private
+#IFSWITCH WORD==word3
+void
+#ELSE
+int
+#ENDIF
+WORDcopy(ArrType[] dst,int dstOffset)
+{
+  long marker=1L<<SRCOFFSET;
+  SrcOffsetType srcOffset=SRCOFFSET;
+  for(long word=this.WORD;;++srcOffset)
+  {
+    if((word&marker)!=0)
+    {
+      dst[dstOffset++]=CAST(srcOffset);
+    }
+    if((marker<<=1)==0)
+    {
+#IFSWITCH WORD==word3
+      return;
+#ELSE
+      return dstOffset;
+#ENDIF
+    }
+  }
+}
+#ENDDEF

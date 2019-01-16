@@ -930,7 +930,8 @@ public class CheckedSubList extends AbstractSeq{
             parent.bubbleUpIncrementSize(modCount);
         }
     }
-    private void privateCollapseHeadAndTail(int modCount,int size,Node head,Node tail){
+    private void privateCollapseHeadAndTail(int modCount,int size,Node head,Node tail)
+    {
         this.modCount=modCount;
         this.size=size;
         this.head=head;
@@ -982,7 +983,8 @@ public class CheckedSubList extends AbstractSeq{
         staticSetTail(root,tailCandidate);
         root.size-=numConsumed;
     }
-    private void suffixCollapseHead(int modCount,Node oldHead,Node oldTail,boolean removeThis){
+    private void suffixCollapseHead(int modCount,Node oldHead,Node oldTail,boolean removeThis)
+    {
         final Checked root;
         CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
         root.modCount=++modCount;

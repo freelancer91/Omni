@@ -2,4 +2,6 @@
  *
  */
 /** @author lyonste */
-module omni.codegen{}
+module omni.codegen{
+  requires java.xml;
+}

@@ -1,32 +1,10 @@
 #TYPEDEF OfBoolean
-  Comparator = BooleanComparator
-  exposedType = boolean
-#ENDDEF
 #TYPEDEF OfByte
-  Comparator = ByteComparator
-  exposedType = byte
-#ENDDEF
 #TYPEDEF OfChar
-  Comparator = CharComparator
-  exposedType = char
-#ENDDEF
 #TYPEDEF OfShort
-  Comparator = ShortComparator
-  exposedType = short
-#ENDDEF
 #TYPEDEF OfLong
-  Comparator = LongComparator
-  exposedType = long
-#ENDDEF
 #TYPEDEF OfFloat
-  Comparator = FloatComparator
-  exposedType = float
-#ENDDEF
 #TYPEDEF OfDouble
-  Comparator = DoubleComparator
-  exposedType = double
-#ENDDEF
-
 package omni.function;
 public interface $Comparator$
 {

@@ -1,0 +1,10 @@
+#TYPEDEF OfBoolean
+#TYPEDEF OfByte
+#TYPEDEF OfChar
+#TYPEDEF OfShort
+#TYPEDEF OfFloat
+package omni.function;
+public interface $TypeNameModifier$Consumer
+{
+  public abstract void accept(final $exposedType$ val);
+}
