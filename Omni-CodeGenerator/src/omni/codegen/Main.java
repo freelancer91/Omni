@@ -17,18 +17,10 @@ public class Main{
     private static final Pattern FQT_PATTERN
     =Pattern.compile("([\\p{L}_$][\\p{L}\\p{N}_$]*\\.)*[\\p{L}_$][\\p{L}\\p{N}_$]*");
     private static final Map<Path,Path> TEMPLATE_AND_SOURCE_FOLDERS=new HashMap<>();
+    private static final String WORKING_SET_ROOT_KEY="OMNI_WORKING_SET_ROOT";
     static{
-        String workingSetRoot;
-        switch(1){
-        case 1:
-            workingSetRoot="C:\\Users\\lyonste\\git\\Omni";
-            break;
-        case 2:
-            workingSetRoot="C:\\eclipse\\workspace";
-        default:
-            workingSetRoot="C:\\Users\\Thomas\\git\\repository";
-            break;
-        }
+        String workingSetRoot=System.getenv(WORKING_SET_ROOT_KEY);
+        System.out.println(WORKING_SET_ROOT_KEY+" = "+workingSetRoot);
         final String[] projectNames=new String[]{"Omni-Function","Omni-Impl","Omni-Util"};
         for(final String projectName:projectNames){
             TEMPLATE_AND_SOURCE_FOLDERS.put(Paths.get(workingSetRoot,projectName,"templates"),
