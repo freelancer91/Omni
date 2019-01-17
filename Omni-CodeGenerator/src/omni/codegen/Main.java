@@ -14,120 +14,120 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 public class Main{
-  private static final Pattern FQT_PATTERN
-      =Pattern.compile("([\\p{L}_$][\\p{L}\\p{N}_$]*\\.)*[\\p{L}_$][\\p{L}\\p{N}_$]*");
-  private static final Map<Path,Path> TEMPLATE_AND_SOURCE_FOLDERS=new HashMap<>();
-  static{
-    String workingSetRoot;
-    switch(0){
-    case 1:
-      workingSetRoot="D:\\eclipse\\workspace\\photonR";
-      break;
-    case 2:
-      workingSetRoot="C:\\eclipse\\workspace";
-    default:
-      workingSetRoot="C:\\Users\\Thomas\\git\\repository";
-      break;
-    }
-    final String[] projectNames=new String[]{"Omni-Function","Omni-Impl","Omni-Util"};
-    for(final String projectName:projectNames){
-      TEMPLATE_AND_SOURCE_FOLDERS.put(Paths.get(workingSetRoot,projectName,"templates"),
-          Paths.get(workingSetRoot,projectName,"src-generated"));
-    }
-  }
-  public static void main(String[] args) throws Exception{
-    TEMPLATE_AND_SOURCE_FOLDERS.forEach(Main::processTemplates);
-  }
-  private static void processTemplates(Path templateFolder,Path outputFolder){
-    try{
-      Files.walkFileTree(templateFolder,new SimpleFileVisitor<>(){
-        @SuppressWarnings("unused") public FileVisitResult visitFile(Path file,BasicFileAttributes attributes)
-            throws IOException{
-          final String fileName=file.getFileName().toString();
-          if(fileName.endsWith(".template")){
-            final Path semaphoreFile=file.resolveSibling(fileName+".semaphore");
-            if(Files.exists(semaphoreFile)){
-              final FileTime lastModified=Files.getLastModifiedTime(file);
-              final List<String> semaphoreLines=Files.readAllLines(semaphoreFile);
-              if(semaphoreLines.size()>0){
-                final String dateInFile=semaphoreLines.get(0);
-                long lDateInFile;
-                try{
-                  lDateInFile=Long.valueOf(dateInFile.trim());
-                  final long lLastModified=lastModified.toMillis();
-                  if(lDateInFile>=lLastModified){
-                    System.out.println("Template file "+fileName+" was not modified.");
-                    return FileVisitResult.CONTINUE;
-                  }
-                }catch(final Exception e){
-                  e.printStackTrace();
-                }
-              }
-            }
-            System.out.println("Template file "+fileName+" was modified.");
-            try{
-              final String fqt=fileName.substring(0,fileName.lastIndexOf(".template"));
-              final var fqtMatcher=FQT_PATTERN.matcher(fqt);
-              if(!fqtMatcher.matches()){
-                System.err.println("The fully-qualified-type \""+fqt+"\" is not valid");
-              }else{
-                final TemplateProcessor2 processor=new TemplateProcessor2(file);
-                final Map<TypeDefinition,List<String>> sources=processor.sources;
-                final Map<TypeDefinition,Integer> typeDefs=processor.typeDefs;
-                typeDefs.forEach((typeDef,lineNumber)->{
-                  final List<String> sourceCode=sources.get(typeDef);
-                  final var sourceFilePath=outputFolder.resolve(
-                      typeDef.parseLine(fqt).replaceAll("\\.",Matcher.quoteReplacement(File.separator))+".java");
-                  if(true){
-                    try{
-                      Files.createDirectories(sourceFilePath.getParent());
-                      if(Files.exists(sourceFilePath)){
-                        final List<String> existingCode=Files.readAllLines(sourceFilePath);
-                        int sourceCodeSize;
-                        if((sourceCodeSize=existingCode.size())==sourceCode.size()){
-                          int index=0;
-                          for(;;){
-                            if(index==sourceCodeSize){
-                              System.out.println("Source code file "+sourceFilePath+" was not modified.");
-                              return;
-                            }
-                            final String existingLine=existingCode.get(index);
-                            final String newLine=sourceCode.get(index);
-                            if(!existingLine.equals(newLine)){
-                              break;
-                            }
-                            ++index;
-                          }
-                        }
-                      }
-                      System.out.println("Source code file "+sourceFilePath+" was modified");
-                      Files.write(sourceFilePath,sourceCode);
-                    }catch(final IOException e){
-                      e.printStackTrace();
-                    }
-                  }else{
-                    System.out.println("writing type "+typeDef.name()+" to "+sourceFilePath);
-                  }
-                });
-                if(!processor.trouble){
-                  writeSemaphoreFile(Files.getLastModifiedTime(file).toMillis(),file);
-                  System.out.println("Template file "+file+" was modified");
-                }
-              }
-            }catch(final Exception e){
-              e.printStackTrace();
-            }
-          }
-          return FileVisitResult.CONTINUE;
+    private static final Pattern FQT_PATTERN
+    =Pattern.compile("([\\p{L}_$][\\p{L}\\p{N}_$]*\\.)*[\\p{L}_$][\\p{L}\\p{N}_$]*");
+    private static final Map<Path,Path> TEMPLATE_AND_SOURCE_FOLDERS=new HashMap<>();
+    static{
+        String workingSetRoot;
+        switch(1){
+        case 1:
+            workingSetRoot="C:\\Users\\lyonste\\git\\Omni";
+            break;
+        case 2:
+            workingSetRoot="C:\\eclipse\\workspace";
+        default:
+            workingSetRoot="C:\\Users\\Thomas\\git\\repository";
+            break;
         }
-      });
-    }catch(final IOException e){
-      e.printStackTrace();
+        final String[] projectNames=new String[]{"Omni-Function","Omni-Impl","Omni-Util"};
+        for(final String projectName:projectNames){
+            TEMPLATE_AND_SOURCE_FOLDERS.put(Paths.get(workingSetRoot,projectName,"templates"),
+                    Paths.get(workingSetRoot,projectName,"src-generated"));
+        }
     }
-  }
-  private static void writeSemaphoreFile(long currentTime,Path templateFile) throws IOException{
-    final String currentTimeStr=Long.toString(currentTime);
-    final Path semaphoreFile=templateFile.resolveSibling(templateFile.getFileName().toString()+".semaphore");
-    Files.write(semaphoreFile,List.of(currentTimeStr));
-  }
+    public static void main(String[] args) throws Exception{
+        TEMPLATE_AND_SOURCE_FOLDERS.forEach(Main::processTemplates);
+    }
+    private static void processTemplates(Path templateFolder,Path outputFolder){
+        try{
+            Files.walkFileTree(templateFolder,new SimpleFileVisitor<>(){
+                @SuppressWarnings("unused") public FileVisitResult visitFile(Path file,BasicFileAttributes attributes)
+                        throws IOException{
+                    final String fileName=file.getFileName().toString();
+                    if(fileName.endsWith(".template")){
+                        final Path semaphoreFile=file.resolveSibling(fileName+".semaphore");
+                        if(Files.exists(semaphoreFile)){
+                            final FileTime lastModified=Files.getLastModifiedTime(file);
+                            final List<String> semaphoreLines=Files.readAllLines(semaphoreFile);
+                            if(semaphoreLines.size()>0){
+                                final String dateInFile=semaphoreLines.get(0);
+                                long lDateInFile;
+                                try{
+                                    lDateInFile=Long.valueOf(dateInFile.trim());
+                                    final long lLastModified=lastModified.toMillis();
+                                    if(lDateInFile>=lLastModified){
+                                        System.out.println("Template file "+fileName+" was not modified.");
+                                        return FileVisitResult.CONTINUE;
+                                    }
+                                }catch(final Exception e){
+                                    e.printStackTrace();
+                                }
+                            }
+                        }
+                        System.out.println("Template file "+fileName+" was modified.");
+                        try{
+                            final String fqt=fileName.substring(0,fileName.lastIndexOf(".template"));
+                            final var fqtMatcher=FQT_PATTERN.matcher(fqt);
+                            if(!fqtMatcher.matches()){
+                                System.err.println("The fully-qualified-type \""+fqt+"\" is not valid");
+                            }else{
+                                final TemplateProcessor2 processor=new TemplateProcessor2(file);
+                                final Map<TypeDefinition,List<String>> sources=processor.sources;
+                                final Map<TypeDefinition,Integer> typeDefs=processor.typeDefs;
+                                typeDefs.forEach((typeDef,lineNumber)->{
+                                    final List<String> sourceCode=sources.get(typeDef);
+                                    final var sourceFilePath=outputFolder.resolve(
+                                            typeDef.parseLine(fqt).replaceAll("\\.",Matcher.quoteReplacement(File.separator))+".java");
+                                    if(true){
+                                        try{
+                                            Files.createDirectories(sourceFilePath.getParent());
+                                            if(Files.exists(sourceFilePath)){
+                                                final List<String> existingCode=Files.readAllLines(sourceFilePath);
+                                                int sourceCodeSize;
+                                                if((sourceCodeSize=existingCode.size())==sourceCode.size()){
+                                                    int index=0;
+                                                    for(;;){
+                                                        if(index==sourceCodeSize){
+                                                            System.out.println("Source code file "+sourceFilePath+" was not modified.");
+                                                            return;
+                                                        }
+                                                        final String existingLine=existingCode.get(index);
+                                                        final String newLine=sourceCode.get(index);
+                                                        if(!existingLine.equals(newLine)){
+                                                            break;
+                                                        }
+                                                        ++index;
+                                                    }
+                                                }
+                                            }
+                                            System.out.println("Source code file "+sourceFilePath+" was modified");
+                                            Files.write(sourceFilePath,sourceCode);
+                                        }catch(final IOException e){
+                                            e.printStackTrace();
+                                        }
+                                    }else{
+                                        System.out.println("writing type "+typeDef.name()+" to "+sourceFilePath);
+                                    }
+                                });
+                                if(!processor.trouble){
+                                    writeSemaphoreFile(Files.getLastModifiedTime(file).toMillis(),file);
+                                    System.out.println("Template file "+file+" was modified");
+                                }
+                            }
+                        }catch(final Exception e){
+                            e.printStackTrace();
+                        }
+                    }
+                    return FileVisitResult.CONTINUE;
+                }
+            });
+        }catch(final IOException e){
+            e.printStackTrace();
+        }
+    }
+    private static void writeSemaphoreFile(long currentTime,Path templateFile) throws IOException{
+        final String currentTimeStr=Long.toString(currentTime);
+        final Path semaphoreFile=templateFile.resolveSibling(templateFile.getFileName().toString()+".semaphore");
+        Files.write(semaphoreFile,List.of(currentTimeStr));
+    }
 }
