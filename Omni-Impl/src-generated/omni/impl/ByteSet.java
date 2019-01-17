@@ -12,154 +12,6 @@ import java.util.NoSuchElementException;
 public class ByteSet implements OmniSet.OfByte
 {
   transient long word0;
-  private
-  int
-  word0copy(Object[] dst,int dstOffset)
-  {
-    long marker=1L<<(Byte.MIN_VALUE);
-    int srcOffset=(Byte.MIN_VALUE);
-    for(long word=this.word0;;++srcOffset)
-    {
-      if((word&marker)!=0)
-      {
-        dst[dstOffset++]=(srcOffset);
-      }
-      if((marker<<=1)==0)
-      {
-        return dstOffset;
-      }
-    }
-  }
-  private
-  int
-  word0copy(Byte[] dst,int dstOffset)
-  {
-    long marker=1L<<(Byte.MIN_VALUE);
-    int srcOffset=(Byte.MIN_VALUE);
-    for(long word=this.word0;;++srcOffset)
-    {
-      if((word&marker)!=0)
-      {
-        dst[dstOffset++]=(byte)(srcOffset);
-      }
-      if((marker<<=1)==0)
-      {
-        return dstOffset;
-      }
-    }
-  }
-  private
-  int
-  word0copy(double[] dst,int dstOffset)
-  {
-    long marker=1L<<(Byte.MIN_VALUE);
-    int srcOffset=(Byte.MIN_VALUE);
-    for(long word=this.word0;;++srcOffset)
-    {
-      if((word&marker)!=0)
-      {
-        dst[dstOffset++]=(srcOffset);
-      }
-      if((marker<<=1)==0)
-      {
-        return dstOffset;
-      }
-    }
-  }
-  private
-  int
-  word0copy(float[] dst,int dstOffset)
-  {
-    long marker=1L<<(Byte.MIN_VALUE);
-    int srcOffset=(Byte.MIN_VALUE);
-    for(long word=this.word0;;++srcOffset)
-    {
-      if((word&marker)!=0)
-      {
-        dst[dstOffset++]=(srcOffset);
-      }
-      if((marker<<=1)==0)
-      {
-        return dstOffset;
-      }
-    }
-  }
-  private
-  int
-  word0copy(long[] dst,int dstOffset)
-  {
-    long marker=1L<<(Byte.MIN_VALUE);
-    long srcOffset=(Byte.MIN_VALUE);
-    for(long word=this.word0;;++srcOffset)
-    {
-      if((word&marker)!=0)
-      {
-        dst[dstOffset++]=(srcOffset);
-      }
-      if((marker<<=1)==0)
-      {
-        return dstOffset;
-      }
-    }
-  }
-  private
-  int
-  word0copy(int[] dst,int dstOffset)
-  {
-    long marker=1L<<(Byte.MIN_VALUE);
-    int srcOffset=(Byte.MIN_VALUE);
-    for(long word=this.word0;;++srcOffset)
-    {
-      if((word&marker)!=0)
-      {
-        dst[dstOffset++]=(srcOffset);
-      }
-      if((marker<<=1)==0)
-      {
-        return dstOffset;
-      }
-    }
-  }
-  private
-  int
-  word0copy(short[] dst,int dstOffset)
-  {
-    long marker=1L<<(Byte.MIN_VALUE);
-    int srcOffset=(Byte.MIN_VALUE);
-    for(long word=this.word0;;++srcOffset)
-    {
-      if((word&marker)!=0)
-      {
-        dst[dstOffset++]=(short)(srcOffset);
-      }
-      if((marker<<=1)==0)
-      {
-        return dstOffset;
-      }
-    }
-  }
-  private
-  int
-  word0copy(byte[] dst,int dstOffset)
-  {
-    long marker=1L<<(Byte.MIN_VALUE);
-    int srcOffset=(Byte.MIN_VALUE);
-    for(long word=this.word0;;++srcOffset)
-    {
-      if((word&marker)!=0)
-      {
-        dst[dstOffset++]=(byte)(srcOffset);
-      }
-      if((marker<<=1)==0)
-      {
-        return dstOffset;
-      }
-    }
-  }
-  private boolean word0contains(int val)
-  {
-    return (this.word0&(1L<<val))!=0;
-  }
   private boolean word0add(int val)
   {
     long word;
@@ -179,25 +31,6 @@ public class ByteSet implements OmniSet.OfByte
       return true;
     }
     return false;
-  }
-  private int word0hash()
-  {
-    long marker,word;
-    int srcOffset=(Byte.MIN_VALUE);
-    int hash=((marker=1L<<(Byte.MIN_VALUE))&(word=this.word0))!=0?srcOffset:0;
-    while((marker<<=1)!=0)
-    {
-      ++srcOffset;
-      if((marker&word)!=0)
-      {
-        hash+=srcOffset;
-      }
-    }
-    return hash;
-  }
-  void word0consume(ByteConsumer action)
-  {
-    consumeWord(word0,action,(Byte.MIN_VALUE));
   }
   boolean word0removeIf(BytePredicate filter)
   {
@@ -222,154 +55,6 @@ public class ByteSet implements OmniSet.OfByte
     }
   }
   transient long word1;
-  private
-  int
-  word1copy(Object[] dst,int dstOffset)
-  {
-    long marker=1L<<(Byte.MIN_VALUE+64);
-    int srcOffset=(Byte.MIN_VALUE+64);
-    for(long word=this.word1;;++srcOffset)
-    {
-      if((word&marker)!=0)
-      {
-        dst[dstOffset++]=(srcOffset);
-      }
-      if((marker<<=1)==0)
-      {
-        return dstOffset;
-      }
-    }
-  }
-  private
-  int
-  word1copy(Byte[] dst,int dstOffset)
-  {
-    long marker=1L<<(Byte.MIN_VALUE+64);
-    int srcOffset=(Byte.MIN_VALUE+64);
-    for(long word=this.word1;;++srcOffset)
-    {
-      if((word&marker)!=0)
-      {
-        dst[dstOffset++]=(byte)(srcOffset);
-      }
-      if((marker<<=1)==0)
-      {
-        return dstOffset;
-      }
-    }
-  }
-  private
-  int
-  word1copy(double[] dst,int dstOffset)
-  {
-    long marker=1L<<(Byte.MIN_VALUE+64);
-    int srcOffset=(Byte.MIN_VALUE+64);
-    for(long word=this.word1;;++srcOffset)
-    {
-      if((word&marker)!=0)
-      {
-        dst[dstOffset++]=(srcOffset);
-      }
-      if((marker<<=1)==0)
-      {
-        return dstOffset;
-      }
-    }
-  }
-  private
-  int
-  word1copy(float[] dst,int dstOffset)
-  {
-    long marker=1L<<(Byte.MIN_VALUE+64);
-    int srcOffset=(Byte.MIN_VALUE+64);
-    for(long word=this.word1;;++srcOffset)
-    {
-      if((word&marker)!=0)
-      {
-        dst[dstOffset++]=(srcOffset);
-      }
-      if((marker<<=1)==0)
-      {
-        return dstOffset;
-      }
-    }
-  }
-  private
-  int
-  word1copy(long[] dst,int dstOffset)
-  {
-    long marker=1L<<(Byte.MIN_VALUE+64);
-    long srcOffset=(Byte.MIN_VALUE+64);
-    for(long word=this.word1;;++srcOffset)
-    {
-      if((word&marker)!=0)
-      {
-        dst[dstOffset++]=(srcOffset);
-      }
-      if((marker<<=1)==0)
-      {
-        return dstOffset;
-      }
-    }
-  }
-  private
-  int
-  word1copy(int[] dst,int dstOffset)
-  {
-    long marker=1L<<(Byte.MIN_VALUE+64);
-    int srcOffset=(Byte.MIN_VALUE+64);
-    for(long word=this.word1;;++srcOffset)
-    {
-      if((word&marker)!=0)
-      {
-        dst[dstOffset++]=(srcOffset);
-      }
-      if((marker<<=1)==0)
-      {
-        return dstOffset;
-      }
-    }
-  }
-  private
-  int
-  word1copy(short[] dst,int dstOffset)
-  {
-    long marker=1L<<(Byte.MIN_VALUE+64);
-    int srcOffset=(Byte.MIN_VALUE+64);
-    for(long word=this.word1;;++srcOffset)
-    {
-      if((word&marker)!=0)
-      {
-        dst[dstOffset++]=(short)(srcOffset);
-      }
-      if((marker<<=1)==0)
-      {
-        return dstOffset;
-      }
-    }
-  }
-  private
-  int
-  word1copy(byte[] dst,int dstOffset)
-  {
-    long marker=1L<<(Byte.MIN_VALUE+64);
-    int srcOffset=(Byte.MIN_VALUE+64);
-    for(long word=this.word1;;++srcOffset)
-    {
-      if((word&marker)!=0)
-      {
-        dst[dstOffset++]=(byte)(srcOffset);
-      }
-      if((marker<<=1)==0)
-      {
-        return dstOffset;
-      }
-    }
-  }
-  private boolean word1contains(int val)
-  {
-    return (this.word1&(1L<<val))!=0;
-  }
   private boolean word1add(int val)
   {
     long word;
@@ -389,25 +74,6 @@ public class ByteSet implements OmniSet.OfByte
       return true;
     }
     return false;
-  }
-  private int word1hash()
-  {
-    long marker,word;
-    int srcOffset=(Byte.MIN_VALUE+64);
-    int hash=((marker=1L<<(Byte.MIN_VALUE+64))&(word=this.word1))!=0?srcOffset:0;
-    while((marker<<=1)!=0)
-    {
-      ++srcOffset;
-      if((marker&word)!=0)
-      {
-        hash+=srcOffset;
-      }
-    }
-    return hash;
-  }
-  void word1consume(ByteConsumer action)
-  {
-    consumeWord(word1,action,(Byte.MIN_VALUE+64));
   }
   boolean word1removeIf(BytePredicate filter)
   {
@@ -432,154 +98,6 @@ public class ByteSet implements OmniSet.OfByte
     }
   }
   transient long word2;
-  private
-  int
-  word2copy(Object[] dst,int dstOffset)
-  {
-    long marker=1L<<(Byte.MIN_VALUE+128);
-    int srcOffset=(Byte.MIN_VALUE+128);
-    for(long word=this.word2;;++srcOffset)
-    {
-      if((word&marker)!=0)
-      {
-        dst[dstOffset++]=(srcOffset);
-      }
-      if((marker<<=1)==0)
-      {
-        return dstOffset;
-      }
-    }
-  }
-  private
-  int
-  word2copy(Byte[] dst,int dstOffset)
-  {
-    long marker=1L<<(Byte.MIN_VALUE+128);
-    int srcOffset=(Byte.MIN_VALUE+128);
-    for(long word=this.word2;;++srcOffset)
-    {
-      if((word&marker)!=0)
-      {
-        dst[dstOffset++]=(byte)(srcOffset);
-      }
-      if((marker<<=1)==0)
-      {
-        return dstOffset;
-      }
-    }
-  }
-  private
-  int
-  word2copy(double[] dst,int dstOffset)
-  {
-    long marker=1L<<(Byte.MIN_VALUE+128);
-    int srcOffset=(Byte.MIN_VALUE+128);
-    for(long word=this.word2;;++srcOffset)
-    {
-      if((word&marker)!=0)
-      {
-        dst[dstOffset++]=(srcOffset);
-      }
-      if((marker<<=1)==0)
-      {
-        return dstOffset;
-      }
-    }
-  }
-  private
-  int
-  word2copy(float[] dst,int dstOffset)
-  {
-    long marker=1L<<(Byte.MIN_VALUE+128);
-    int srcOffset=(Byte.MIN_VALUE+128);
-    for(long word=this.word2;;++srcOffset)
-    {
-      if((word&marker)!=0)
-      {
-        dst[dstOffset++]=(srcOffset);
-      }
-      if((marker<<=1)==0)
-      {
-        return dstOffset;
-      }
-    }
-  }
-  private
-  int
-  word2copy(long[] dst,int dstOffset)
-  {
-    long marker=1L<<(Byte.MIN_VALUE+128);
-    long srcOffset=(Byte.MIN_VALUE+128);
-    for(long word=this.word2;;++srcOffset)
-    {
-      if((word&marker)!=0)
-      {
-        dst[dstOffset++]=(srcOffset);
-      }
-      if((marker<<=1)==0)
-      {
-        return dstOffset;
-      }
-    }
-  }
-  private
-  int
-  word2copy(int[] dst,int dstOffset)
-  {
-    long marker=1L<<(Byte.MIN_VALUE+128);
-    int srcOffset=(Byte.MIN_VALUE+128);
-    for(long word=this.word2;;++srcOffset)
-    {
-      if((word&marker)!=0)
-      {
-        dst[dstOffset++]=(srcOffset);
-      }
-      if((marker<<=1)==0)
-      {
-        return dstOffset;
-      }
-    }
-  }
-  private
-  int
-  word2copy(short[] dst,int dstOffset)
-  {
-    long marker=1L<<(Byte.MIN_VALUE+128);
-    int srcOffset=(Byte.MIN_VALUE+128);
-    for(long word=this.word2;;++srcOffset)
-    {
-      if((word&marker)!=0)
-      {
-        dst[dstOffset++]=(short)(srcOffset);
-      }
-      if((marker<<=1)==0)
-      {
-        return dstOffset;
-      }
-    }
-  }
-  private
-  int
-  word2copy(byte[] dst,int dstOffset)
-  {
-    long marker=1L<<(Byte.MIN_VALUE+128);
-    int srcOffset=(Byte.MIN_VALUE+128);
-    for(long word=this.word2;;++srcOffset)
-    {
-      if((word&marker)!=0)
-      {
-        dst[dstOffset++]=(byte)(srcOffset);
-      }
-      if((marker<<=1)==0)
-      {
-        return dstOffset;
-      }
-    }
-  }
-  private boolean word2contains(int val)
-  {
-    return (this.word2&(1L<<val))!=0;
-  }
   private boolean word2add(int val)
   {
     long word;
@@ -599,25 +117,6 @@ public class ByteSet implements OmniSet.OfByte
       return true;
     }
     return false;
-  }
-  private int word2hash()
-  {
-    long marker,word;
-    int srcOffset=(Byte.MIN_VALUE+128);
-    int hash=((marker=1L<<(Byte.MIN_VALUE+128))&(word=this.word2))!=0?srcOffset:0;
-    while((marker<<=1)!=0)
-    {
-      ++srcOffset;
-      if((marker&word)!=0)
-      {
-        hash+=srcOffset;
-      }
-    }
-    return hash;
-  }
-  void word2consume(ByteConsumer action)
-  {
-    consumeWord(word2,action,(Byte.MIN_VALUE+128));
   }
   boolean word2removeIf(BytePredicate filter)
   {
@@ -642,154 +141,6 @@ public class ByteSet implements OmniSet.OfByte
     }
   }
   transient long word3;
-  private
-  void
-  word3copy(Object[] dst,int dstOffset)
-  {
-    long marker=1L<<(Byte.MIN_VALUE+192);
-    int srcOffset=(Byte.MIN_VALUE+192);
-    for(long word=this.word3;;++srcOffset)
-    {
-      if((word&marker)!=0)
-      {
-        dst[dstOffset++]=(srcOffset);
-      }
-      if((marker<<=1)==0)
-      {
-        return;
-      }
-    }
-  }
-  private
-  void
-  word3copy(Byte[] dst,int dstOffset)
-  {
-    long marker=1L<<(Byte.MIN_VALUE+192);
-    int srcOffset=(Byte.MIN_VALUE+192);
-    for(long word=this.word3;;++srcOffset)
-    {
-      if((word&marker)!=0)
-      {
-        dst[dstOffset++]=(byte)(srcOffset);
-      }
-      if((marker<<=1)==0)
-      {
-        return;
-      }
-    }
-  }
-  private
-  void
-  word3copy(double[] dst,int dstOffset)
-  {
-    long marker=1L<<(Byte.MIN_VALUE+192);
-    int srcOffset=(Byte.MIN_VALUE+192);
-    for(long word=this.word3;;++srcOffset)
-    {
-      if((word&marker)!=0)
-      {
-        dst[dstOffset++]=(srcOffset);
-      }
-      if((marker<<=1)==0)
-      {
-        return;
-      }
-    }
-  }
-  private
-  void
-  word3copy(float[] dst,int dstOffset)
-  {
-    long marker=1L<<(Byte.MIN_VALUE+192);
-    int srcOffset=(Byte.MIN_VALUE+192);
-    for(long word=this.word3;;++srcOffset)
-    {
-      if((word&marker)!=0)
-      {
-        dst[dstOffset++]=(srcOffset);
-      }
-      if((marker<<=1)==0)
-      {
-        return;
-      }
-    }
-  }
-  private
-  void
-  word3copy(long[] dst,int dstOffset)
-  {
-    long marker=1L<<(Byte.MIN_VALUE+192);
-    long srcOffset=(Byte.MIN_VALUE+192);
-    for(long word=this.word3;;++srcOffset)
-    {
-      if((word&marker)!=0)
-      {
-        dst[dstOffset++]=(srcOffset);
-      }
-      if((marker<<=1)==0)
-      {
-        return;
-      }
-    }
-  }
-  private
-  void
-  word3copy(int[] dst,int dstOffset)
-  {
-    long marker=1L<<(Byte.MIN_VALUE+192);
-    int srcOffset=(Byte.MIN_VALUE+192);
-    for(long word=this.word3;;++srcOffset)
-    {
-      if((word&marker)!=0)
-      {
-        dst[dstOffset++]=(srcOffset);
-      }
-      if((marker<<=1)==0)
-      {
-        return;
-      }
-    }
-  }
-  private
-  void
-  word3copy(short[] dst,int dstOffset)
-  {
-    long marker=1L<<(Byte.MIN_VALUE+192);
-    int srcOffset=(Byte.MIN_VALUE+192);
-    for(long word=this.word3;;++srcOffset)
-    {
-      if((word&marker)!=0)
-      {
-        dst[dstOffset++]=(short)(srcOffset);
-      }
-      if((marker<<=1)==0)
-      {
-        return;
-      }
-    }
-  }
-  private
-  void
-  word3copy(byte[] dst,int dstOffset)
-  {
-    long marker=1L<<(Byte.MIN_VALUE+192);
-    int srcOffset=(Byte.MIN_VALUE+192);
-    for(long word=this.word3;;++srcOffset)
-    {
-      if((word&marker)!=0)
-      {
-        dst[dstOffset++]=(byte)(srcOffset);
-      }
-      if((marker<<=1)==0)
-      {
-        return;
-      }
-    }
-  }
-  private boolean word3contains(int val)
-  {
-    return (this.word3&(1L<<val))!=0;
-  }
   private boolean word3add(int val)
   {
     long word;
@@ -809,25 +160,6 @@ public class ByteSet implements OmniSet.OfByte
       return true;
     }
     return false;
-  }
-  private int word3hash()
-  {
-    long marker,word;
-    int srcOffset=(Byte.MIN_VALUE+192);
-    int hash=((marker=1L<<(Byte.MIN_VALUE+192))&(word=this.word3))!=0?srcOffset:0;
-    while((marker<<=1)!=0)
-    {
-      ++srcOffset;
-      if((marker&word)!=0)
-      {
-        hash+=srcOffset;
-      }
-    }
-    return hash;
-  }
-  void word3consume(ByteConsumer action)
-  {
-    consumeWord(word3,action,(Byte.MIN_VALUE+192));
   }
   boolean word3removeIf(BytePredicate filter)
   {
@@ -850,6 +182,256 @@ public class ByteSet implements OmniSet.OfByte
         return false;
       }
     }
+  }
+  private static int wordcopy(int dstOffset,Object[] dst,long word,int srcOffset)
+  {
+    for(long marker=1L<<srcOffset;;++srcOffset)
+    {
+      if((word&marker)!=0)
+      {
+        dst[dstOffset++]=(srcOffset);
+      }
+      if((marker<<=1)==0)
+      {
+        return dstOffset;
+      }
+    }
+  }
+  private void word3copy(int dstOffset,Object[] dst)
+  {
+    int srcOffset=Byte.MIN_VALUE+192;
+    for(long marker=1L<<(Byte.MIN_VALUE+192),word=this.word3;;++srcOffset)
+    {
+      if((word&marker)!=0)
+      {
+        dst[dstOffset++]=(srcOffset);
+      }
+      if((marker<<=1)==0)
+      {
+        return;
+      }
+    }
+  }
+  private static int wordcopy(int dstOffset,Byte[] dst,long word,int srcOffset)
+  {
+    for(long marker=1L<<srcOffset;;++srcOffset)
+    {
+      if((word&marker)!=0)
+      {
+        dst[dstOffset++]=(byte)(srcOffset);
+      }
+      if((marker<<=1)==0)
+      {
+        return dstOffset;
+      }
+    }
+  }
+  private void word3copy(int dstOffset,Byte[] dst)
+  {
+    int srcOffset=Byte.MIN_VALUE+192;
+    for(long marker=1L<<(Byte.MIN_VALUE+192),word=this.word3;;++srcOffset)
+    {
+      if((word&marker)!=0)
+      {
+        dst[dstOffset++]=(byte)(srcOffset);
+      }
+      if((marker<<=1)==0)
+      {
+        return;
+      }
+    }
+  }
+  private static int wordcopy(int dstOffset,double[] dst,long word,int srcOffset)
+  {
+    for(long marker=1L<<srcOffset;;++srcOffset)
+    {
+      if((word&marker)!=0)
+      {
+        dst[dstOffset++]=(srcOffset);
+      }
+      if((marker<<=1)==0)
+      {
+        return dstOffset;
+      }
+    }
+  }
+  private void word3copy(int dstOffset,double[] dst)
+  {
+    int srcOffset=Byte.MIN_VALUE+192;
+    for(long marker=1L<<(Byte.MIN_VALUE+192),word=this.word3;;++srcOffset)
+    {
+      if((word&marker)!=0)
+      {
+        dst[dstOffset++]=(srcOffset);
+      }
+      if((marker<<=1)==0)
+      {
+        return;
+      }
+    }
+  }
+  private static int wordcopy(int dstOffset,float[] dst,long word,int srcOffset)
+  {
+    for(long marker=1L<<srcOffset;;++srcOffset)
+    {
+      if((word&marker)!=0)
+      {
+        dst[dstOffset++]=(srcOffset);
+      }
+      if((marker<<=1)==0)
+      {
+        return dstOffset;
+      }
+    }
+  }
+  private void word3copy(int dstOffset,float[] dst)
+  {
+    int srcOffset=Byte.MIN_VALUE+192;
+    for(long marker=1L<<(Byte.MIN_VALUE+192),word=this.word3;;++srcOffset)
+    {
+      if((word&marker)!=0)
+      {
+        dst[dstOffset++]=(srcOffset);
+      }
+      if((marker<<=1)==0)
+      {
+        return;
+      }
+    }
+  }
+  private static int wordcopy(int dstOffset,long[] dst,long word,long srcOffset)
+  {
+    for(long marker=1L<<srcOffset;;++srcOffset)
+    {
+      if((word&marker)!=0)
+      {
+        dst[dstOffset++]=(srcOffset);
+      }
+      if((marker<<=1)==0)
+      {
+        return dstOffset;
+      }
+    }
+  }
+  private void word3copy(int dstOffset,long[] dst)
+  {
+    int srcOffset=Byte.MIN_VALUE+192;
+    for(long marker=1L<<(Byte.MIN_VALUE+192),word=this.word3;;++srcOffset)
+    {
+      if((word&marker)!=0)
+      {
+        dst[dstOffset++]=(srcOffset);
+      }
+      if((marker<<=1)==0)
+      {
+        return;
+      }
+    }
+  }
+  private static int wordcopy(int dstOffset,int[] dst,long word,int srcOffset)
+  {
+    for(long marker=1L<<srcOffset;;++srcOffset)
+    {
+      if((word&marker)!=0)
+      {
+        dst[dstOffset++]=(srcOffset);
+      }
+      if((marker<<=1)==0)
+      {
+        return dstOffset;
+      }
+    }
+  }
+  private void word3copy(int dstOffset,int[] dst)
+  {
+    int srcOffset=Byte.MIN_VALUE+192;
+    for(long marker=1L<<(Byte.MIN_VALUE+192),word=this.word3;;++srcOffset)
+    {
+      if((word&marker)!=0)
+      {
+        dst[dstOffset++]=(srcOffset);
+      }
+      if((marker<<=1)==0)
+      {
+        return;
+      }
+    }
+  }
+  private static int wordcopy(int dstOffset,short[] dst,long word,int srcOffset)
+  {
+    for(long marker=1L<<srcOffset;;++srcOffset)
+    {
+      if((word&marker)!=0)
+      {
+        dst[dstOffset++]=(short)(srcOffset);
+      }
+      if((marker<<=1)==0)
+      {
+        return dstOffset;
+      }
+    }
+  }
+  private void word3copy(int dstOffset,short[] dst)
+  {
+    int srcOffset=Byte.MIN_VALUE+192;
+    for(long marker=1L<<(Byte.MIN_VALUE+192),word=this.word3;;++srcOffset)
+    {
+      if((word&marker)!=0)
+      {
+        dst[dstOffset++]=(short)(srcOffset);
+      }
+      if((marker<<=1)==0)
+      {
+        return;
+      }
+    }
+  }
+  private static int wordcopy(int dstOffset,byte[] dst,long word,int srcOffset)
+  {
+    for(long marker=1L<<srcOffset;;++srcOffset)
+    {
+      if((word&marker)!=0)
+      {
+        dst[dstOffset++]=(byte)(srcOffset);
+      }
+      if((marker<<=1)==0)
+      {
+        return dstOffset;
+      }
+    }
+  }
+  private void word3copy(int dstOffset,byte[] dst)
+  {
+    int srcOffset=Byte.MIN_VALUE+192;
+    for(long marker=1L<<(Byte.MIN_VALUE+192),word=this.word3;;++srcOffset)
+    {
+      if((word&marker)!=0)
+      {
+        dst[dstOffset++]=(byte)(srcOffset);
+      }
+      if((marker<<=1)==0)
+      {
+        return;
+      }
+    }
+  }
+  private static boolean wordcontains(long word,int val)
+  {
+    return (word&(1L<<val))!=0;
+  }
+  private static int wordhash(long word,int srcOffset)
+  {
+    long marker;
+    int hash=((marker=1L<<srcOffset)&word)!=0?srcOffset:0;
+    while((marker<<=1)!=0)
+    {
+      ++srcOffset;
+      if((marker&word)!=0)
+      {
+        hash+=srcOffset;
+      }
+    }
+    return hash;
   }
   ByteSet(long word0,long word1,long word2, long word3)
   {
@@ -920,17 +502,22 @@ public class ByteSet implements OmniSet.OfByte
   @Override
   public boolean contains(byte val)
   {
+    long word;
     switch(val>>6)
     {
       case -2:
-        return word0contains(val);
+        word=this.word0;
+        break;
       case -1:
-        return word1contains(val);
+        word=this.word1;
+        break;
       case 0:
-        return word2contains(val);
+        word=this.word2;
+        break;
       default:
-        return word3contains(val);
+        word=this.word3;
     }
+    return wordcontains(word,val);
   }
   @Override
   public boolean contains(Byte val)
@@ -940,15 +527,18 @@ public class ByteSet implements OmniSet.OfByte
   @Override
   public boolean contains(char val)
   {
+    long word;
     switch(val>>6)
     {
-      case 0:
-        return word2contains(val);
-      case 1:
-        return word3contains(val);
       default:
         return false;
+      case 0:
+        word=this.word2;
+        break;
+      case 1:
+        word=this.word3;
     }
+    return wordcontains(word,val);
   }
   @Override
   public boolean contains(Character val)
@@ -980,19 +570,24 @@ public class ByteSet implements OmniSet.OfByte
   @Override
   public boolean contains(int val)
   {
+    long word;
     switch(val>>6)
     {
-      case -2:
-        return word0contains(val);
-      case -1:
-        return word1contains(val);
-      case 0:
-        return word2contains(val);
-      case 1:
-        return word3contains(val);
       default:
         return false;
+      case -2:
+        word=this.word0;
+        break;
+      case -1:
+        word=this.word1;
+        break;
+      case 0:
+        word=this.word2;
+        break;
+      case 1:
+        word=this.word3;
     }
+    return wordcontains(word,val);
   }
   @Override
   public boolean contains(Integer val)
@@ -1034,18 +629,20 @@ public class ByteSet implements OmniSet.OfByte
   @Override
   public void forEach(ByteConsumer action)
   {
-    word0consume(action);
-    word1consume(action);
-    word2consume(action);
-    word3consume(action);
+    long word;
+    wordconsume(word=this.word0,Byte.MIN_VALUE,action);
+    wordconsume(word=this.word1,Byte.MIN_VALUE+64,action);
+    wordconsume(word=this.word2,Byte.MIN_VALUE+128,action);
+    wordconsume(word=this.word3,Byte.MIN_VALUE+192,action);
   }
   @Override
   public void forEach(Consumer<? super Byte> action)
   {
-    word0consume(action::accept);
-    word1consume(action::accept);
-    word2consume(action::accept);
-    word3consume(action::accept);
+    long word;
+    wordconsume(word=this.word0,Byte.MIN_VALUE,action::accept);
+    wordconsume(word=this.word1,Byte.MIN_VALUE+64,action::accept);
+    wordconsume(word=this.word2,Byte.MIN_VALUE+128,action::accept);
+    wordconsume(word=this.word3,Byte.MIN_VALUE+192,action::accept);
   }
   @Override
   public int hashCode()
@@ -1819,6 +1416,32 @@ public class ByteSet implements OmniSet.OfByte
       return new CheckedItr(this);
     }
     @Override
+    public void forEach(ByteConsumer action)
+    {
+      long word;
+      wordconsume(word=this.word0,Byte.MIN_VALUE,action);
+      checkMod(word,this.word0);
+      wordconsume(word=this.word1,Byte.MIN_VALUE+64,action);
+      checkMod(word,this.word1);
+      wordconsume(word=this.word2,Byte.MIN_VALUE+128,action);
+      checkMod(word,this.word2);
+      wordconsume(word=this.word3,Byte.MIN_VALUE+192,action);
+      checkMod(word,this.word3);
+    }
+    @Override
+    public void forEach(Consumer<? super Byte> action)
+    {
+      long word;
+      wordconsume(word=this.word0,Byte.MIN_VALUE,action::accept);
+      checkMod(word,this.word0);
+      wordconsume(word=this.word1,Byte.MIN_VALUE+64,action::accept);
+      checkMod(word,this.word1);
+      wordconsume(word=this.word2,Byte.MIN_VALUE+128,action::accept);
+      checkMod(word,this.word2);
+      wordconsume(word=this.word3,Byte.MIN_VALUE+192,action::accept);
+      checkMod(word,this.word3);
+    }
+    @Override
     public <T> T[] toArray(IntFunction<T[]> arrConstructor)
     {
       final int size;
@@ -2241,7 +1864,7 @@ public class ByteSet implements OmniSet.OfByte
       }
     }
   }
-  private static void consumeWord(long word,ByteConsumer action,int srcOffset)
+  private static void wordconsume(long word,int srcOffset,ByteConsumer action)
   {
     for(long marker=1L<<srcOffset;;++srcOffset)
     {

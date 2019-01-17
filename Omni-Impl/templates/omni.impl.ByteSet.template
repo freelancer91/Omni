@@ -16,7 +16,32 @@ public class ByteSet implements OmniSet.OfByte
   #MACRO WordOps<false,word1>((Byte.MIN_VALUE+64))
   #MACRO WordOps<false,word2>((Byte.MIN_VALUE+128))
   #MACRO WordOps<false,word3>((Byte.MIN_VALUE+192))
-  
+  #MACRO CopyWord(Object,int,)
+  #MACRO CopyWord(Byte,int,(byte))
+  #MACRO CopyWord(double,int,)
+  #MACRO CopyWord(float,int,)
+  #MACRO CopyWord(long,long,)
+  #MACRO CopyWord(int,int,)
+  #MACRO CopyWord(short,int,(short))
+  #MACRO CopyWord(byte,int,(byte))
+  private static boolean wordcontains(long word,int val)
+  {
+    return (word&(1L<<val))!=0;
+  }
+  private static int wordhash(long word,int srcOffset)
+  {
+    long marker;
+    int hash=((marker=1L<<srcOffset)&word)!=0?srcOffset:0;
+    while((marker<<=1)!=0)
+    {
+      ++srcOffset;
+      if((marker&word)!=0)
+      {
+        hash+=srcOffset;
+      }
+    }
+    return hash;
+  }
   ByteSet(long word0,long word1,long word2, long word3)
   {
     this.word0=word0;
@@ -50,15 +75,70 @@ public class ByteSet implements OmniSet.OfByte
     return (this.word2&(val?0b10L:0b01L))!=0;
   }
   #MACRO CheckNullAndDelegate(boolean,contains,Boolean,contains,(boolean))
-  #MACRO QueryByte(contains,contains)
+  @Override
+  public boolean contains(byte val)
+  {
+    long word;
+    switch(val>>6)
+    {
+      case -2:
+        word=this.word0;
+        break;
+      case -1:
+        word=this.word1;
+        break;
+      case 0:
+        word=this.word2;
+        break;
+      default:
+        word=this.word3;
+    }
+    return wordcontains(word,val);
+  }
   #MACRO CheckNullAndDelegate(boolean,contains,Byte,contains,(byte))
-  #MACRO QueryChar(contains,contains)
+  @Override
+  public boolean contains(char val)
+  {
+    long word;
+    switch(val>>6)
+    {
+      default:
+        return false;
+      case 0:
+        word=this.word2;
+        break;
+      case 1:
+        word=this.word3;
+    }
+    return wordcontains(word,val);
+  }
   #MACRO CheckNullAndDelegate(boolean,contains,Character,contains,(char))
   #MACRO CheckRangeAndDelegate(boolean,contains,double,contains,byte)
   #MACRO CheckNullAndDelegate(boolean,contains,Double,contains,(double))
   #MACRO CheckRangeAndDelegate(boolean,contains,float,contains,byte)
   #MACRO CheckNullAndDelegate(boolean,contains,Float,contains,(float))
-  #MACRO QueryInt(contains,contains)
+  @Override
+  public boolean contains(int val)
+  {
+    long word;
+    switch(val>>6)
+    {
+      default:
+        return false;
+      case -2:
+        word=this.word0;
+        break;
+      case -1:
+        word=this.word1;
+        break;
+      case 0:
+        word=this.word2;
+        break;
+      case 1:
+        word=this.word3;
+    }
+    return wordcontains(word,val);
+  }
   #MACRO CheckNullAndDelegate(boolean,contains,Integer,contains,(int))
   #MACRO CheckRangeAndDelegate(boolean,contains,long,contains,byte)
   #MACRO CheckNullAndDelegate(boolean,contains,Long,contains,(long))
@@ -71,7 +151,7 @@ public class ByteSet implements OmniSet.OfByte
     //TODO implement equals method
     return false;
   }
-  #MACRO ForEachMethods(ForEach)
+  #MACRO ForEachMethods(ForEach<false>)
   @Override
   public int hashCode()
   {
@@ -287,6 +367,7 @@ public class ByteSet implements OmniSet.OfByte
     {
       return new CheckedItr(this);
     }
+    #MACRO ForEachMethods(ForEach<true>)
     #MACRO ToArrayIntFunc<true>()
     private static class CheckedItr extends AbstractByteItr
     {
@@ -394,7 +475,7 @@ public class ByteSet implements OmniSet.OfByte
       #MACRO ForEachMethods(ForEachItr<true>)
     }
   }
-  private static void consumeWord(long word,ByteConsumer action,int srcOffset)
+  private static void wordconsume(long word,int srcOffset,ByteConsumer action)
   {
     for(long marker=1L<<srcOffset;;++srcOffset)
     {
@@ -409,6 +490,20 @@ public class ByteSet implements OmniSet.OfByte
     }
   }
 }
+#MACRODEF ConsumeWord()
+for(;;)
+{
+  ++srcOffset;
+  if((marker<<=1)==0)
+  {
+    break;
+  }
+  if((word&marker)!=0)
+  {
+    action.accept(lastRet=(byte)srcOffset);
+  }
+}
+#ENDDEF
 #MACRODEF IterateToNext()
 for(;;)
 {
@@ -714,28 +809,28 @@ public void forEachRemaining(Consumer action)
   this.srcOffset=srcOffset;
 }
 #ENDDEF
-#MACRODEF ConsumeWord()
-for(;;)
-{
-  ++srcOffset;
-  if((marker<<=1)==0)
-  {
-    break;
-  }
-  if((word&marker)!=0)
-  {
-    action.accept(lastRet=(byte)srcOffset);
-  }
-}
-#ENDDEF
-#MACRODEF ForEach(Consumer,consumerParam)
+
+#MACRODEF ForEach<IsChecked>(Consumer,consumerParam)
 @Override
 public void forEach(Consumer action)
 {
-  word0consume(consumerParam);
-  word1consume(consumerParam);
-  word2consume(consumerParam);
-  word3consume(consumerParam);
+  long word;
+  wordconsume(word=this.word0,Byte.MIN_VALUE,consumerParam);
+#IFSWITCH IsChecked==true
+  checkMod(word,this.word0);
+#ENDIF
+  wordconsume(word=this.word1,Byte.MIN_VALUE+64,consumerParam);
+#IFSWITCH IsChecked==true
+  checkMod(word,this.word1);
+#ENDIF
+  wordconsume(word=this.word2,Byte.MIN_VALUE+128,consumerParam);
+#IFSWITCH IsChecked==true
+  checkMod(word,this.word2);
+#ENDIF
+  wordconsume(word=this.word3,Byte.MIN_VALUE+192,consumerParam);
+#IFSWITCH IsChecked==true
+  checkMod(word,this.word3);
+#ENDIF
 }
 #ENDDEF
 #MACRODEF CheckRangeAndDelegate(RetType,MethodName,ParamType,CastName,ParamCast)
@@ -756,18 +851,6 @@ public RetType MethodName(ParamType val)
 #MACRODEF WordOps<IsChecked,WORD>(SRCOFFSET)
 #IFSWITCH IsChecked==false
 transient long WORD;
-#MACRO CopyWord(Object,int,SRCOFFSET,)
-#MACRO CopyWord(Byte,int,SRCOFFSET,(byte))
-#MACRO CopyWord(double,int,SRCOFFSET,)
-#MACRO CopyWord(float,int,SRCOFFSET,)
-#MACRO CopyWord(long,long,SRCOFFSET,)
-#MACRO CopyWord(int,int,SRCOFFSET,)
-#MACRO CopyWord(short,int,SRCOFFSET,(short))
-#MACRO CopyWord(byte,int,SRCOFFSET,(byte))
-private boolean WORDcontains(int val)
-{
-  return (this.WORD&(1L<<val))!=0;
-}
 private boolean WORDadd(int val)
 {
   long word;
@@ -788,34 +871,7 @@ private boolean WORDremove(int val)
   }
   return false;
 }
-private int WORDhash()
-{
-  long marker,word;
-  int srcOffset=SRCOFFSET;
-  int hash=((marker=1L<<SRCOFFSET)&(word=this.WORD))!=0?srcOffset:0;
-  while((marker<<=1)!=0)
-  {
-    ++srcOffset;
-    if((marker&word)!=0)
-    {
-      hash+=srcOffset;
-    }
-  }
-  return hash;
-}
-#ELSE
-@Override
 #ENDIF
-void WORDconsume(ByteConsumer action)
-{
-#IFSWITCH IsChecked==true
-  long word;
-  consumeWord(word=WORD,action,SRCOFFSET);
-  checkMod(word,WORD);
-#ELSE
-  consumeWord(WORD,action,SRCOFFSET);
-#ENDIF
-}
 #IFSWITCH IsChecked==true
 @Override
 #ENDIF
@@ -845,18 +901,10 @@ boolean WORDremoveIf(BytePredicate filter)
   }
 }
 #ENDDEF
-#MACRODEF CopyWord(ArrType,SrcOffsetType,SRCOFFSET,CAST)
-private
-#IFSWITCH WORD==word3
-void
-#ELSE
-int
-#ENDIF
-WORDcopy(ArrType[] dst,int dstOffset)
+#MACRODEF CopyWord(ArrType,SrcOffsetType,CAST)
+private static int wordcopy(int dstOffset,ArrType[] dst,long word,SrcOffsetType srcOffset)
 {
-  long marker=1L<<SRCOFFSET;
-  SrcOffsetType srcOffset=SRCOFFSET;
-  for(long word=this.WORD;;++srcOffset)
+  for(long marker=1L<<srcOffset;;++srcOffset)
   {
     if((word&marker)!=0)
     {
@@ -864,11 +912,22 @@ WORDcopy(ArrType[] dst,int dstOffset)
     }
     if((marker<<=1)==0)
     {
-#IFSWITCH WORD==word3
-      return;
-#ELSE
       return dstOffset;
-#ENDIF
+    }
+  }
+}
+private void word3copy(int dstOffset,ArrType[] dst)
+{
+  int srcOffset=Byte.MIN_VALUE+192;
+  for(long marker=1L<<(Byte.MIN_VALUE+192),word=this.word3;;++srcOffset)
+  {
+    if((word&marker)!=0)
+    {
+      dst[dstOffset++]=CAST(srcOffset);
+    }
+    if((marker<<=1)==0)
+    {
+      return;
     }
   }
 }
