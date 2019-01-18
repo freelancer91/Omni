@@ -48,7 +48,7 @@ public class Main{
                                     lDateInFile=Long.valueOf(dateInFile.trim());
                                     final long lLastModified=lastModified.toMillis();
                                     if(lDateInFile>=lLastModified){
-                                        System.out.println("Template file "+fileName+" was not modified.");
+                                        System.out.println("UNCHANGED: Template file "+fileName);
                                         return FileVisitResult.CONTINUE;
                                     }
                                 }catch(final Exception e){
@@ -56,7 +56,7 @@ public class Main{
                                 }
                             }
                         }
-                        System.out.println("Template file "+fileName+" was modified.");
+                        System.out.println("MODIFIED : Template file "+fileName);
                         try{
                             final String fqt=fileName.substring(0,fileName.lastIndexOf(".template"));
                             final var fqtMatcher=FQT_PATTERN.matcher(fqt);
@@ -80,7 +80,8 @@ public class Main{
                                                     int index=0;
                                                     for(;;){
                                                         if(index==sourceCodeSize){
-                                                            System.out.println("Source code file "+sourceFilePath+" was not modified.");
+                                                            System.out.println(
+                                                                    "UNCHANGED: Source code file "+sourceFilePath);
                                                             return;
                                                         }
                                                         final String existingLine=existingCode.get(index);
@@ -92,7 +93,7 @@ public class Main{
                                                     }
                                                 }
                                             }
-                                            System.out.println("Source code file "+sourceFilePath+" was modified");
+                                            System.out.println("MODIFIED : Source code file "+sourceFilePath);
                                             Files.write(sourceFilePath,sourceCode);
                                         }catch(final IOException e){
                                             e.printStackTrace();
@@ -103,7 +104,6 @@ public class Main{
                                 });
                                 if(!processor.trouble){
                                     writeSemaphoreFile(Files.getLastModifiedTime(file).toMillis(),file);
-                                    System.out.println("Template file "+file+" was modified");
                                 }
                             }
                         }catch(final Exception e){

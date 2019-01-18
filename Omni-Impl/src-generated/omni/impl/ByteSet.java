@@ -197,10 +197,10 @@ public class ByteSet implements OmniSet.OfByte
       }
     }
   }
-  private void word3copy(int dstOffset,Object[] dst)
+  private static void word3copy(int dstOffset,Object[] dst,long word)
   {
     int srcOffset=Byte.MIN_VALUE+192;
-    for(long marker=1L<<(Byte.MIN_VALUE+192),word=this.word3;;++srcOffset)
+    for(long marker=1L<<(Byte.MIN_VALUE+192);;++srcOffset)
     {
       if((word&marker)!=0)
       {
@@ -226,10 +226,10 @@ public class ByteSet implements OmniSet.OfByte
       }
     }
   }
-  private void word3copy(int dstOffset,Byte[] dst)
+  private static void word3copy(int dstOffset,Byte[] dst,long word)
   {
     int srcOffset=Byte.MIN_VALUE+192;
-    for(long marker=1L<<(Byte.MIN_VALUE+192),word=this.word3;;++srcOffset)
+    for(long marker=1L<<(Byte.MIN_VALUE+192);;++srcOffset)
     {
       if((word&marker)!=0)
       {
@@ -255,10 +255,10 @@ public class ByteSet implements OmniSet.OfByte
       }
     }
   }
-  private void word3copy(int dstOffset,double[] dst)
+  private static void word3copy(int dstOffset,double[] dst,long word)
   {
     int srcOffset=Byte.MIN_VALUE+192;
-    for(long marker=1L<<(Byte.MIN_VALUE+192),word=this.word3;;++srcOffset)
+    for(long marker=1L<<(Byte.MIN_VALUE+192);;++srcOffset)
     {
       if((word&marker)!=0)
       {
@@ -284,10 +284,10 @@ public class ByteSet implements OmniSet.OfByte
       }
     }
   }
-  private void word3copy(int dstOffset,float[] dst)
+  private static void word3copy(int dstOffset,float[] dst,long word)
   {
     int srcOffset=Byte.MIN_VALUE+192;
-    for(long marker=1L<<(Byte.MIN_VALUE+192),word=this.word3;;++srcOffset)
+    for(long marker=1L<<(Byte.MIN_VALUE+192);;++srcOffset)
     {
       if((word&marker)!=0)
       {
@@ -313,10 +313,10 @@ public class ByteSet implements OmniSet.OfByte
       }
     }
   }
-  private void word3copy(int dstOffset,long[] dst)
+  private static void word3copy(int dstOffset,long[] dst,long word)
   {
     int srcOffset=Byte.MIN_VALUE+192;
-    for(long marker=1L<<(Byte.MIN_VALUE+192),word=this.word3;;++srcOffset)
+    for(long marker=1L<<(Byte.MIN_VALUE+192);;++srcOffset)
     {
       if((word&marker)!=0)
       {
@@ -342,10 +342,10 @@ public class ByteSet implements OmniSet.OfByte
       }
     }
   }
-  private void word3copy(int dstOffset,int[] dst)
+  private static void word3copy(int dstOffset,int[] dst,long word)
   {
     int srcOffset=Byte.MIN_VALUE+192;
-    for(long marker=1L<<(Byte.MIN_VALUE+192),word=this.word3;;++srcOffset)
+    for(long marker=1L<<(Byte.MIN_VALUE+192);;++srcOffset)
     {
       if((word&marker)!=0)
       {
@@ -371,10 +371,10 @@ public class ByteSet implements OmniSet.OfByte
       }
     }
   }
-  private void word3copy(int dstOffset,short[] dst)
+  private static void word3copy(int dstOffset,short[] dst,long word)
   {
     int srcOffset=Byte.MIN_VALUE+192;
-    for(long marker=1L<<(Byte.MIN_VALUE+192),word=this.word3;;++srcOffset)
+    for(long marker=1L<<(Byte.MIN_VALUE+192);;++srcOffset)
     {
       if((word&marker)!=0)
       {
@@ -400,10 +400,10 @@ public class ByteSet implements OmniSet.OfByte
       }
     }
   }
-  private void word3copy(int dstOffset,byte[] dst)
+  private static void word3copy(int dstOffset,byte[] dst,long word)
   {
     int srcOffset=Byte.MIN_VALUE+192;
-    for(long marker=1L<<(Byte.MIN_VALUE+192),word=this.word3;;++srcOffset)
+    for(long marker=1L<<(Byte.MIN_VALUE+192);;++srcOffset)
     {
       if((word&marker)!=0)
       {
@@ -629,25 +629,26 @@ public class ByteSet implements OmniSet.OfByte
   @Override
   public void forEach(ByteConsumer action)
   {
-    long word;
-    wordconsume(word=this.word0,Byte.MIN_VALUE,action);
-    wordconsume(word=this.word1,Byte.MIN_VALUE+64,action);
-    wordconsume(word=this.word2,Byte.MIN_VALUE+128,action);
-    wordconsume(word=this.word3,Byte.MIN_VALUE+192,action);
+    wordconsume(this.word0,Byte.MIN_VALUE,action);
+    wordconsume(this.word1,Byte.MIN_VALUE+64,action);
+    wordconsume(this.word2,Byte.MIN_VALUE+128,action);
+    wordconsume(this.word3,Byte.MIN_VALUE+192,action);
   }
   @Override
   public void forEach(Consumer<? super Byte> action)
   {
-    long word;
-    wordconsume(word=this.word0,Byte.MIN_VALUE,action::accept);
-    wordconsume(word=this.word1,Byte.MIN_VALUE+64,action::accept);
-    wordconsume(word=this.word2,Byte.MIN_VALUE+128,action::accept);
-    wordconsume(word=this.word3,Byte.MIN_VALUE+192,action::accept);
+    wordconsume(this.word0,Byte.MIN_VALUE,action::accept);
+    wordconsume(this.word1,Byte.MIN_VALUE+64,action::accept);
+    wordconsume(this.word2,Byte.MIN_VALUE+128,action::accept);
+    wordconsume(this.word3,Byte.MIN_VALUE+192,action::accept);
   }
   @Override
   public int hashCode()
   {
-    return word0hash()+word1hash()+word2hash()+word3hash();
+    return wordhash(this.word0,Byte.MIN_VALUE)
+     +wordhash(this.word1,Byte.MIN_VALUE+64)
+     +wordhash(this.word2,Byte.MIN_VALUE+128)
+     +wordhash(this.word3,Byte.MIN_VALUE+192);
   }
   @Override
   public boolean isEmpty()
@@ -1132,46 +1133,48 @@ public class ByteSet implements OmniSet.OfByte
   @Override
   public <T> T[] toArray(IntFunction<T[]> arrConstructor)
   {
+    final long word0,word1,word2,word3;
     final int size;
-    if((size=Long.bitCount(word0)
-      +Long.bitCount(word1)
-      +Long.bitCount(word2)
-      +Long.bitCount(word3))!=0)
+    final T[] arr=arrConstructor.apply(size=Long.bitCount(word0=this.word0)
+      +Long.bitCount(word1=this.word1)
+      +Long.bitCount(word2=this.word2)
+      +Long.bitCount(word3=this.word3));
+    if(size!=0)
     {
-      T[] arr;
-      word3copy(arr=arrConstructor.apply(size),word2copy(arr,word1copy(arr,word0copy(arr,0))));
-      return arr;
+      word3copy(wordcopy(wordcopy(wordcopy(0,arr,word0,Byte.MIN_VALUE),arr,word1,Byte.MIN_VALUE+64),arr,word2,Byte.MIN_VALUE+128),arr,word3);
     }
-    else
-    {
-    return arrConstructor.apply(0);
-    }
+    return arr;
   }
   @Override
-  public <T> T[] toArray(T[] dst)
+  public <T> T[] toArray(T[] arr)
   {
+    final long word0,word1,word2,word3;
     final int size;
-    if((size=Long.bitCount(word0)+Long.bitCount(word1)+Long.bitCount(word2)+Long.bitCount(word3))!=0)
+    if((size=Long.bitCount(word0=this.word0)
+      +Long.bitCount(word1=this.word1)
+      +Long.bitCount(word2=this.word2)
+      +Long.bitCount(word3=this.word3))!=0)
     {
-      word3copy(dst=OmniArray.uncheckedArrResize(size,dst),word2copy(dst,word1copy(dst,word0copy(dst,0))));
+      word3copy(wordcopy(wordcopy(wordcopy(0,arr=OmniArray.uncheckedArrResize(size,arr),word0,Byte.MIN_VALUE),arr,word1,Byte.MIN_VALUE+64),arr,word2,Byte.MIN_VALUE+128),arr,word3);
     }
-    else if(dst.length!=0)
+    else if(arr.length!=0)
     {
-      dst[0]=null;
+      arr[0]=null;
     }
-    return dst;
+    return arr;
   }
   @Override
   public Byte[] toArray()
   {
+    final long word0,word1,word2,word3;
     final int size;
-    if((size=Long.bitCount(word0)
-      +Long.bitCount(word1)
-      +Long.bitCount(word2)
-      +Long.bitCount(word3))!=0)
+    if((size=Long.bitCount(word0=this.word0)
+      +Long.bitCount(word1=this.word1)
+      +Long.bitCount(word2=this.word2)
+      +Long.bitCount(word3=this.word3))!=0)
     {
       final Byte[] arr;
-      word3copy(arr=new Byte[size],word2copy(arr,word1copy(arr,word0copy(arr,0))));
+      word3copy(wordcopy(wordcopy(wordcopy(0,arr=new Byte[size],word0,Byte.MIN_VALUE),arr,word1,Byte.MIN_VALUE+64),arr,word2,Byte.MIN_VALUE+128),arr,word3);
       return arr;
     }
     return OmniArray.OfByte.DEFAULT_BOXED_ARR;
@@ -1179,14 +1182,15 @@ public class ByteSet implements OmniSet.OfByte
   @Override
   public byte[] toByteArray()
   {
+    final long word0,word1,word2,word3;
     final int size;
-    if((size=Long.bitCount(word0)
-      +Long.bitCount(word1)
-      +Long.bitCount(word2)
-      +Long.bitCount(word3))!=0)
+    if((size=Long.bitCount(word0=this.word0)
+      +Long.bitCount(word1=this.word1)
+      +Long.bitCount(word2=this.word2)
+      +Long.bitCount(word3=this.word3))!=0)
     {
       final byte[] arr;
-      word3copy(arr=new byte[size],word2copy(arr,word1copy(arr,word0copy(arr,0))));
+      word3copy(wordcopy(wordcopy(wordcopy(0,arr=new byte[size],word0,Byte.MIN_VALUE),arr,word1,Byte.MIN_VALUE+64),arr,word2,Byte.MIN_VALUE+128),arr,word3);
       return arr;
     }
     return OmniArray.OfByte.DEFAULT_ARR;
@@ -1194,14 +1198,15 @@ public class ByteSet implements OmniSet.OfByte
   @Override
   public short[] toShortArray()
   {
+    final long word0,word1,word2,word3;
     final int size;
-    if((size=Long.bitCount(word0)
-      +Long.bitCount(word1)
-      +Long.bitCount(word2)
-      +Long.bitCount(word3))!=0)
+    if((size=Long.bitCount(word0=this.word0)
+      +Long.bitCount(word1=this.word1)
+      +Long.bitCount(word2=this.word2)
+      +Long.bitCount(word3=this.word3))!=0)
     {
       final short[] arr;
-      word3copy(arr=new short[size],word2copy(arr,word1copy(arr,word0copy(arr,0))));
+      word3copy(wordcopy(wordcopy(wordcopy(0,arr=new short[size],word0,Byte.MIN_VALUE),arr,word1,Byte.MIN_VALUE+64),arr,word2,Byte.MIN_VALUE+128),arr,word3);
       return arr;
     }
     return OmniArray.OfShort.DEFAULT_ARR;
@@ -1209,14 +1214,15 @@ public class ByteSet implements OmniSet.OfByte
   @Override
   public int[] toIntArray()
   {
+    final long word0,word1,word2,word3;
     final int size;
-    if((size=Long.bitCount(word0)
-      +Long.bitCount(word1)
-      +Long.bitCount(word2)
-      +Long.bitCount(word3))!=0)
+    if((size=Long.bitCount(word0=this.word0)
+      +Long.bitCount(word1=this.word1)
+      +Long.bitCount(word2=this.word2)
+      +Long.bitCount(word3=this.word3))!=0)
     {
       final int[] arr;
-      word3copy(arr=new int[size],word2copy(arr,word1copy(arr,word0copy(arr,0))));
+      word3copy(wordcopy(wordcopy(wordcopy(0,arr=new int[size],word0,Byte.MIN_VALUE),arr,word1,Byte.MIN_VALUE+64),arr,word2,Byte.MIN_VALUE+128),arr,word3);
       return arr;
     }
     return OmniArray.OfInt.DEFAULT_ARR;
@@ -1224,14 +1230,15 @@ public class ByteSet implements OmniSet.OfByte
   @Override
   public long[] toLongArray()
   {
+    final long word0,word1,word2,word3;
     final int size;
-    if((size=Long.bitCount(word0)
-      +Long.bitCount(word1)
-      +Long.bitCount(word2)
-      +Long.bitCount(word3))!=0)
+    if((size=Long.bitCount(word0=this.word0)
+      +Long.bitCount(word1=this.word1)
+      +Long.bitCount(word2=this.word2)
+      +Long.bitCount(word3=this.word3))!=0)
     {
       final long[] arr;
-      word3copy(arr=new long[size],word2copy(arr,word1copy(arr,word0copy(arr,0))));
+      word3copy(wordcopy(wordcopy(wordcopy(0,arr=new long[size],word0,Byte.MIN_VALUE),arr,word1,Byte.MIN_VALUE+64),arr,word2,Byte.MIN_VALUE+128),arr,word3);
       return arr;
     }
     return OmniArray.OfLong.DEFAULT_ARR;
@@ -1239,14 +1246,15 @@ public class ByteSet implements OmniSet.OfByte
   @Override
   public float[] toFloatArray()
   {
+    final long word0,word1,word2,word3;
     final int size;
-    if((size=Long.bitCount(word0)
-      +Long.bitCount(word1)
-      +Long.bitCount(word2)
-      +Long.bitCount(word3))!=0)
+    if((size=Long.bitCount(word0=this.word0)
+      +Long.bitCount(word1=this.word1)
+      +Long.bitCount(word2=this.word2)
+      +Long.bitCount(word3=this.word3))!=0)
     {
       final float[] arr;
-      word3copy(arr=new float[size],word2copy(arr,word1copy(arr,word0copy(arr,0))));
+      word3copy(wordcopy(wordcopy(wordcopy(0,arr=new float[size],word0,Byte.MIN_VALUE),arr,word1,Byte.MIN_VALUE+64),arr,word2,Byte.MIN_VALUE+128),arr,word3);
       return arr;
     }
     return OmniArray.OfFloat.DEFAULT_ARR;
@@ -1254,14 +1262,15 @@ public class ByteSet implements OmniSet.OfByte
   @Override
   public double[] toDoubleArray()
   {
+    final long word0,word1,word2,word3;
     final int size;
-    if((size=Long.bitCount(word0)
-      +Long.bitCount(word1)
-      +Long.bitCount(word2)
-      +Long.bitCount(word3))!=0)
+    if((size=Long.bitCount(word0=this.word0)
+      +Long.bitCount(word1=this.word1)
+      +Long.bitCount(word2=this.word2)
+      +Long.bitCount(word3=this.word3))!=0)
     {
       final double[] arr;
-      word3copy(arr=new double[size],word2copy(arr,word1copy(arr,word0copy(arr,0))));
+      word3copy(wordcopy(wordcopy(wordcopy(0,arr=new double[size],word0,Byte.MIN_VALUE),arr,word1,Byte.MIN_VALUE+64),arr,word2,Byte.MIN_VALUE+128),arr,word3);
       return arr;
     }
     return OmniArray.OfDouble.DEFAULT_ARR;
@@ -1400,6 +1409,102 @@ public class ByteSet implements OmniSet.OfByte
       super();
     }
     @Override
+    boolean word0removeIf(BytePredicate filter)
+    {
+      long originalWord,marker=1L,word=originalWord=this.word0;
+      int srcOffset=(Byte.MIN_VALUE);
+      for(;;)
+      {
+        if((word&marker)!=0 && filter.test((byte)srcOffset))
+        {
+          word&=(~(marker));
+        }
+        ++srcOffset;
+        if((marker<<=1)==0)
+        {
+          checkMod(originalWord,this.word0);
+          if(originalWord!=word)
+          {
+            this.word0=word;
+            return true;
+          }
+          return false;
+        }
+      }
+    }
+    @Override
+    boolean word1removeIf(BytePredicate filter)
+    {
+      long originalWord,marker=1L,word=originalWord=this.word1;
+      int srcOffset=(Byte.MIN_VALUE+64);
+      for(;;)
+      {
+        if((word&marker)!=0 && filter.test((byte)srcOffset))
+        {
+          word&=(~(marker));
+        }
+        ++srcOffset;
+        if((marker<<=1)==0)
+        {
+          checkMod(originalWord,this.word1);
+          if(originalWord!=word)
+          {
+            this.word1=word;
+            return true;
+          }
+          return false;
+        }
+      }
+    }
+    @Override
+    boolean word2removeIf(BytePredicate filter)
+    {
+      long originalWord,marker=1L,word=originalWord=this.word2;
+      int srcOffset=(Byte.MIN_VALUE+128);
+      for(;;)
+      {
+        if((word&marker)!=0 && filter.test((byte)srcOffset))
+        {
+          word&=(~(marker));
+        }
+        ++srcOffset;
+        if((marker<<=1)==0)
+        {
+          checkMod(originalWord,this.word2);
+          if(originalWord!=word)
+          {
+            this.word2=word;
+            return true;
+          }
+          return false;
+        }
+      }
+    }
+    @Override
+    boolean word3removeIf(BytePredicate filter)
+    {
+      long originalWord,marker=1L,word=originalWord=this.word3;
+      int srcOffset=(Byte.MIN_VALUE+192);
+      for(;;)
+      {
+        if((word&marker)!=0 && filter.test((byte)srcOffset))
+        {
+          word&=(~(marker));
+        }
+        ++srcOffset;
+        if((marker<<=1)==0)
+        {
+          checkMod(originalWord,this.word3);
+          if(originalWord!=word)
+          {
+            this.word3=word;
+            return true;
+          }
+          return false;
+        }
+      }
+    }
+    @Override
     public Object clone()
     {
       return new Checked(word0,word1,word2,word3);
@@ -1444,30 +1549,21 @@ public class ByteSet implements OmniSet.OfByte
     @Override
     public <T> T[] toArray(IntFunction<T[]> arrConstructor)
     {
-      final int size;
       final long word0,word1,word2,word3;
-      if((size=Long.bitCount(word0=this.word0)
+      final int size;
+      final T[] arr=arrConstructor.apply(size=Long.bitCount(word0=this.word0)
         +Long.bitCount(word1=this.word1)
         +Long.bitCount(word2=this.word2)
-        +Long.bitCount(word3=this.word3))!=0)
-      {
-        T[] arr=arrConstructor.apply(size);
-        checkMod(this.word0,word0);
-        checkMod(this.word1,word1);
-        checkMod(this.word2,word2);
-        checkMod(this.word3,word3);
-        super.word3copy(arr,super.word2copy(arr,super.word1copy(arr,super.word0copy(arr,0))));
-        return arr;
-      }
-      else
-      {
-      T[] arr=arrConstructor.apply(0);
+        +Long.bitCount(word3=this.word3));
       checkMod(this.word0,word0);
       checkMod(this.word1,word1);
       checkMod(this.word2,word2);
       checkMod(this.word3,word3);
-      return arr;
+      if(size!=0)
+      {
+        word3copy(wordcopy(wordcopy(wordcopy(0,arr,word0,Byte.MIN_VALUE),arr,word1,Byte.MIN_VALUE+64),arr,word2,Byte.MIN_VALUE+128),arr,word3);
       }
+      return arr;
     }
     private static class CheckedItr extends AbstractByteItr
     {

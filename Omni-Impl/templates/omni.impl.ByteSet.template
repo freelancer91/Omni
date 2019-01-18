@@ -52,7 +52,6 @@ public class ByteSet implements OmniSet.OfByte
   ByteSet()
   {
   }
-  
   #MACRO AddRemoveBoolean<add>()
   #MACRO QueryByte(add,add)
   #MACRO DelegateQuery(add,Byte,byte)
@@ -155,7 +154,10 @@ public class ByteSet implements OmniSet.OfByte
   @Override
   public int hashCode()
   {
-    return word0hash()+word1hash()+word2hash()+word3hash();
+    return wordhash(this.word0,Byte.MIN_VALUE)
+     +wordhash(this.word1,Byte.MIN_VALUE+64)
+     +wordhash(this.word2,Byte.MIN_VALUE+128)
+     +wordhash(this.word3,Byte.MIN_VALUE+192);
   }
   @Override
   public boolean isEmpty()
@@ -255,13 +257,41 @@ public class ByteSet implements OmniSet.OfByte
   #MACRO CheckNullAndDelegate(boolean,removeVal,Boolean,removeVal,(boolean))
   #MACRO QueryByte(removeVal,remove)
   #MACRO CheckNullAndDelegate(boolean,removeVal,Byte,removeVal,(byte))
-  #MACRO QueryChar(removeVal,remove)
+  @Override
+  public boolean removeVal(char val)
+  {
+    switch(val>>6)
+    {
+      case 0:
+        return word2remove(val);
+      case 1:
+        return word3remove(val);
+      default:
+        return false;
+    }
+  }
   #MACRO CheckNullAndDelegate(boolean,removeVal,Character,removeVal,(char))
   #MACRO CheckRangeAndDelegate(boolean,removeVal,double,removeVal,byte)
   #MACRO CheckNullAndDelegate(boolean,removeVal,Double,removeVal,(double))
   #MACRO CheckRangeAndDelegate(boolean,removeVal,float,removeVal,byte)
   #MACRO CheckNullAndDelegate(boolean,removeVal,Float,removeVal,(float))
-  #MACRO QueryInt(removeVal,remove)
+  @Override
+  public boolean removeVal(int val)
+  {
+    switch(val>>6)
+    {
+      case -2:
+        return word0remove(val);
+      case -1:
+        return word1remove(val);
+      case 0:
+        return word2remove(val);
+      case 1:
+        return word3remove(val);
+      default:
+        return false;
+    }
+  }
   #MACRO CheckNullAndDelegate(boolean,removeVal,Integer,removeVal,(int))
   #MACRO CheckRangeAndDelegate(boolean,removeVal,long,removeVal,byte)
   #MACRO CheckNullAndDelegate(boolean,removeVal,Long,removeVal,(long))
@@ -278,18 +308,22 @@ public class ByteSet implements OmniSet.OfByte
   
   #MACRO ToArrayIntFunc<false>()
   @Override
-  public <T> T[] toArray(T[] dst)
+  public <T> T[] toArray(T[] arr)
   {
+    final long word0,word1,word2,word3;
     final int size;
-    if((size=Long.bitCount(word0)+Long.bitCount(word1)+Long.bitCount(word2)+Long.bitCount(word3))!=0)
+    if((size=Long.bitCount(word0=this.word0)
+      +Long.bitCount(word1=this.word1)
+      +Long.bitCount(word2=this.word2)
+      +Long.bitCount(word3=this.word3))!=0)
     {
-      word3copy(dst=OmniArray.uncheckedArrResize(size,dst),word2copy(dst,word1copy(dst,word0copy(dst,0))));
+      word3copy(wordcopy(wordcopy(wordcopy(0,arr=OmniArray.uncheckedArrResize(size,arr),word0,Byte.MIN_VALUE),arr,word1,Byte.MIN_VALUE+64),arr,word2,Byte.MIN_VALUE+128),arr,word3);
     }
-    else if(dst.length!=0)
+    else if(arr.length!=0)
     {
-      dst[0]=null;
+      arr[0]=null;
     }
-    return dst;
+    return arr;
   }
   #MACRO ToArray(Byte,,OfByte.DEFAULT_BOXED_ARR)
   #MACRO ToArray(byte,Byte,OfByte.DEFAULT_ARR)
@@ -351,6 +385,10 @@ public class ByteSet implements OmniSet.OfByte
     {
       super();
     }
+    #MACRO WordOps<true,word0>((Byte.MIN_VALUE))
+    #MACRO WordOps<true,word1>((Byte.MIN_VALUE+64))
+    #MACRO WordOps<true,word2>((Byte.MIN_VALUE+128))
+    #MACRO WordOps<true,word3>((Byte.MIN_VALUE+192))
     @Override
     public Object clone()
     {
@@ -565,58 +603,38 @@ for(word=this.WORD,marker=1L;;++srcOffset)
 @Override
 public <T> T[] toArray(IntFunction<T[]> arrConstructor)
 {
-  final int size;
-  #IFSWITCH IsChecked==true
   final long word0,word1,word2,word3;
-  if((size=Long.bitCount(word0=this.word0)
+  final int size;
+  final T[] arr=arrConstructor.apply(size=Long.bitCount(word0=this.word0)
     +Long.bitCount(word1=this.word1)
     +Long.bitCount(word2=this.word2)
-    +Long.bitCount(word3=this.word3))!=0)
-  {
-    T[] arr=arrConstructor.apply(size);
-    checkMod(this.word0,word0);
-    checkMod(this.word1,word1);
-    checkMod(this.word2,word2);
-    checkMod(this.word3,word3);
-    super.word3copy(arr,super.word2copy(arr,super.word1copy(arr,super.word0copy(arr,0))));
-  #ELSE
-  if((size=Long.bitCount(word0)
-    +Long.bitCount(word1)
-    +Long.bitCount(word2)
-    +Long.bitCount(word3))!=0)
-  {
-    T[] arr;
-    word3copy(arr=arrConstructor.apply(size),word2copy(arr,word1copy(arr,word0copy(arr,0))));
-  #ENDIF
-    return arr;
-  }
-  else
-  {
-  #IFSWITCH IsChecked==true
-  T[] arr=arrConstructor.apply(0);
+    +Long.bitCount(word3=this.word3));
+#IFSWITCH IsChecked==true
   checkMod(this.word0,word0);
   checkMod(this.word1,word1);
   checkMod(this.word2,word2);
   checkMod(this.word3,word3);
-  return arr;
-  #ELSE
-  return arrConstructor.apply(0);
-  #ENDIF
+#ENDIF
+  if(size!=0)
+  {
+    word3copy(wordcopy(wordcopy(wordcopy(0,arr,word0,Byte.MIN_VALUE),arr,word1,Byte.MIN_VALUE+64),arr,word2,Byte.MIN_VALUE+128),arr,word3);
   }
+  return arr;
 }
 #ENDDEF
 #MACRODEF ToArray(ArrType,MethodName,DefaultArr)
 @Override
 public ArrType[] toMethodNameArray()
 {
+  final long word0,word1,word2,word3;
   final int size;
-  if((size=Long.bitCount(word0)
-    +Long.bitCount(word1)
-    +Long.bitCount(word2)
-    +Long.bitCount(word3))!=0)
+  if((size=Long.bitCount(word0=this.word0)
+    +Long.bitCount(word1=this.word1)
+    +Long.bitCount(word2=this.word2)
+    +Long.bitCount(word3=this.word3))!=0)
   {
     final ArrType[] arr;
-    word3copy(arr=new ArrType[size],word2copy(arr,word1copy(arr,word0copy(arr,0))));
+    word3copy(wordcopy(wordcopy(wordcopy(0,arr=new ArrType[size],word0,Byte.MIN_VALUE),arr,word1,Byte.MIN_VALUE+64),arr,word2,Byte.MIN_VALUE+128),arr,word3);
     return arr;
   }
   return OmniArray.DefaultArr;
@@ -665,40 +683,6 @@ public boolean MethodName(byte val)
       return word2WordMethod(val);
     default:
       return word3WordMethod(val);
-  }
-}
-#ENDDEF
-#MACRODEF QueryChar(MethodName,WordMethod)
-@Override
-public boolean MethodName(char val)
-{
-  switch(val>>6)
-  {
-    case 0:
-      return word2WordMethod(val);
-    case 1:
-      return word3WordMethod(val);
-    default:
-      return false;
-  }
-}
-#ENDDEF
-#MACRODEF QueryInt(MethodName,WordMethod)
-@Override
-public boolean MethodName(int val)
-{
-  switch(val>>6)
-  {
-    case -2:
-      return word0WordMethod(val);
-    case -1:
-      return word1WordMethod(val);
-    case 0:
-      return word2WordMethod(val);
-    case 1:
-      return word3WordMethod(val);
-    default:
-      return false;
   }
 }
 #ENDDEF
@@ -809,27 +793,25 @@ public void forEachRemaining(Consumer action)
   this.srcOffset=srcOffset;
 }
 #ENDDEF
-
 #MACRODEF ForEach<IsChecked>(Consumer,consumerParam)
 @Override
 public void forEach(Consumer action)
 {
+#IFSWITCH IsChecked==true
   long word;
   wordconsume(word=this.word0,Byte.MIN_VALUE,consumerParam);
-#IFSWITCH IsChecked==true
   checkMod(word,this.word0);
-#ENDIF
   wordconsume(word=this.word1,Byte.MIN_VALUE+64,consumerParam);
-#IFSWITCH IsChecked==true
   checkMod(word,this.word1);
-#ENDIF
   wordconsume(word=this.word2,Byte.MIN_VALUE+128,consumerParam);
-#IFSWITCH IsChecked==true
   checkMod(word,this.word2);
-#ENDIF
   wordconsume(word=this.word3,Byte.MIN_VALUE+192,consumerParam);
-#IFSWITCH IsChecked==true
   checkMod(word,this.word3);
+#ELSE
+  wordconsume(this.word0,Byte.MIN_VALUE,consumerParam);
+  wordconsume(this.word1,Byte.MIN_VALUE+64,consumerParam);
+  wordconsume(this.word2,Byte.MIN_VALUE+128,consumerParam);
+  wordconsume(this.word3,Byte.MIN_VALUE+192,consumerParam);
 #ENDIF
 }
 #ENDDEF
@@ -916,10 +898,10 @@ private static int wordcopy(int dstOffset,ArrType[] dst,long word,SrcOffsetType 
     }
   }
 }
-private void word3copy(int dstOffset,ArrType[] dst)
+private static void word3copy(int dstOffset,ArrType[] dst,long word)
 {
   int srcOffset=Byte.MIN_VALUE+192;
-  for(long marker=1L<<(Byte.MIN_VALUE+192),word=this.word3;;++srcOffset)
+  for(long marker=1L<<(Byte.MIN_VALUE+192);;++srcOffset)
   {
     if((word&marker)!=0)
     {
