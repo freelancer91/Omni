@@ -1,5 +1,5 @@
 #TYPEDEF OfBoolean
-package omni.impl;
+package omni.impl.set;
 
 import java.util.ConcurrentModificationException;
 import java.util.NoSuchElementException;
@@ -12,6 +12,7 @@ import omni.function.BooleanConsumer;
 import omni.function.BooleanPredicate;
 import omni.util.OmniArray;
 import omni.util.TypeUtil;
+import omni.impl.AbstractBooleanItr;
 
 public class BooleanSet implements OmniSet.OfBoolean
 {

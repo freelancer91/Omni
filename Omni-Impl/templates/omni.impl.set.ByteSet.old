@@ -1,5 +1,5 @@
 #TYPEDEF OfByte
-package omni.impl;
+package omni.impl.set;
 import omni.api.OmniSet;
 import omni.api.OmniIterator;
 import omni.function.ByteConsumer;
@@ -10,13 +10,14 @@ import java.util.function.IntFunction;
 import omni.util.OmniArray;
 import java.util.ConcurrentModificationException;
 import java.util.NoSuchElementException;
+import omni.impl.AbstractByteItr;
 public class ByteSet implements OmniSet.OfByte
 {
-  #MACRO WordOps<false,word0>((Byte.MIN_VALUE))
-  #MACRO WordOps<false,word1>((Byte.MIN_VALUE+64))
-  #MACRO WordOps<false,word2>((Byte.MIN_VALUE+128))
-  #MACRO WordOps<false,word3>((Byte.MIN_VALUE+192))
-  #MACRO CopyWord(Object,int,)
+  #MACRO WordOps<false>(word0,(Byte.MIN_VALUE))
+  #MACRO WordOps<false>(word1,(Byte.MIN_VALUE+64))
+  #MACRO WordOps<false>(word2,(Byte.MIN_VALUE+128))
+  #MACRO WordOps<false>(word3,(Byte.MIN_VALUE+192))
+  #MACRO CopyWord(Object,int,(byte))
   #MACRO CopyWord(Byte,int,(byte))
   #MACRO CopyWord(double,int,)
   #MACRO CopyWord(float,int,)
@@ -385,10 +386,10 @@ public class ByteSet implements OmniSet.OfByte
     {
       super();
     }
-    #MACRO WordOps<true,word0>((Byte.MIN_VALUE))
-    #MACRO WordOps<true,word1>((Byte.MIN_VALUE+64))
-    #MACRO WordOps<true,word2>((Byte.MIN_VALUE+128))
-    #MACRO WordOps<true,word3>((Byte.MIN_VALUE+192))
+    #MACRO WordOps<true>(word0,(Byte.MIN_VALUE))
+    #MACRO WordOps<true>(word1,(Byte.MIN_VALUE+64))
+    #MACRO WordOps<true>(word2,(Byte.MIN_VALUE+128))
+    #MACRO WordOps<true>(word3,(Byte.MIN_VALUE+192))
     @Override
     public Object clone()
     {
@@ -830,7 +831,7 @@ public RetType MethodName(ParamType val)
   return val!=null && CastName(ParamCast(val));
 }
 #ENDDEF
-#MACRODEF WordOps<IsChecked,WORD>(SRCOFFSET)
+#MACRODEF WordOps<IsChecked>(WORD,SRCOFFSET)
 #IFSWITCH IsChecked==false
 transient long WORD;
 private boolean WORDadd(int val)
@@ -886,7 +887,7 @@ boolean WORDremoveIf(BytePredicate filter)
 #MACRODEF CopyWord(ArrType,SrcOffsetType,CAST)
 private static int wordcopy(int dstOffset,ArrType[] dst,long word,SrcOffsetType srcOffset)
 {
-  for(long marker=1L<<srcOffset;;++srcOffset)
+  for(long marker=1L;;++srcOffset)
   {
     if((word&marker)!=0)
     {
@@ -901,7 +902,7 @@ private static int wordcopy(int dstOffset,ArrType[] dst,long word,SrcOffsetType 
 private static void word3copy(int dstOffset,ArrType[] dst,long word)
 {
   int srcOffset=Byte.MIN_VALUE+192;
-  for(long marker=1L<<(Byte.MIN_VALUE+192);;++srcOffset)
+  for(long marker=1L;;++srcOffset)
   {
     if((word&marker)!=0)
     {

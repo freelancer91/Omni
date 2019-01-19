@@ -1,0 +1,483 @@
+#TYPEDEF OfBoolean
+#TYPEDEF OfByte
+#TYPEDEF OfChar
+package omni.impl.set;
+import omni.api.OmniSet;
+import omni.function.$TypeNameModifier$Predicate;
+import java.util.function.Predicate;
+import omni.util.OmniArray;
+import java.util.function.IntFunction;
+#IF OfBoolean,OfByte
+public class $ClassPrefix$Set implements OmniSet.Of$ClassPrefix$
+#ELSE
+abstract class $ClassPrefix$Set implements OmniSet.Of$ClassPrefix$
+#ENDIF
+{
+#IF OfBoolean
+  transient int state;
+#ELSEIF OfChar
+  transient int size;
+#ENDIF
+  #MACRO WordOps<false>(word0,($BoxedType$.MIN_VALUE))
+  #MACRO WordOps<false>(word1,($BoxedType$.MIN_VALUE+64))
+  #MACRO WordOps<false>(word2,($BoxedType$.MIN_VALUE+128))
+  #MACRO WordOps<false>(word3,($BoxedType$.MIN_VALUE+192))
+  $ClassPrefix$Set()
+  {
+    super();
+  }
+#IF OfBoolean
+  $ClassPrefix$Set(int state)
+  {
+    super();
+    this.state=state;
+  }
+#ELSE
+  $ClassPrefix$Set(long word0,long word1,long word2,long word3
+  #IF OfChar
+    ,int size
+  #ENDIF
+    )
+  {
+    this.word0=word0;
+    this.word1=word1;
+    this.word2=word2;
+    this.word3=word3;
+  #IF OfChar
+    this.size=size;
+  #ENDIF
+  }
+#ENDIF
+  #MACRO AddRemoveBoolean<false,add>()
+  #MACRO CallDelegate(add,Boolean,add,(boolean))
+#IF OfByte
+  #MACRO AddRemoveByte<add,add>()
+  #MACRO CallDelegate(add,Byte,add,(byte))
+#ENDIF
+#IF OfChar
+  abstract boolean addToTable(char val);
+  #MACRO AddRemoveChar<add,add,addToTable>()
+  #MACRO CallDelegate(add,Character,add,(char))
+#ENDIF
+  #MACRO AddRemoveBoolean<false,removeVal>()
+  @Override
+  public int size()
+  {
+#IF OfBoolean
+    switch(this.state)
+    {
+      case 0b01:
+      case 0b10:
+        return 1;
+      case 0b11:
+        return 2;
+      default:
+        return 0;
+    }
+#ELSEIF OfByte
+    return Long.bitCount(this.word0)+Long.bitCount(this.word1)+Long.bitCount(this.word2)+Long.bitCount(this.word3);
+#ELSEIF OfChar
+    return this.size;
+#ENDIF
+  }
+  @Override
+  public boolean isEmpty()
+  {
+#IF OfBoolean
+    return this.state==0b00;
+#ELSEIF OfByte
+    return this.word0==0 && this.word1==0 && this.word2==0 && this.word3==0;
+#ELSEIF OfChar
+    return this.size==0;
+#ENDIF
+  }
+#IF OfBoolean,OfByte
+  @Override
+  public boolean removeIf(Predicate<? super $BoxedType$> filter)
+  {
+    return removeIf(($TypeNameModifier$Predicate$<? super E>$)filter::test);
+  }
+  @Override
+  public boolean removeIf($TypeNameModifier$Predicate$<? super E>$ filter)
+  {
+  #IF OfBoolean
+    switch(this.state)
+    {
+      case 0b01:
+        if(filter.test(false))
+        {
+          break;
+        }
+        return false;
+      case 0b10:
+        if(filter.test(true))
+        {
+          break;
+        }
+        return false;
+      case 0b11:
+        if(filter.test(true))
+        {
+          this.state=filter.test(false)?0b00:0b01;
+          return true;
+        }
+        if(filter.test(false))
+        {
+          this.state=0b10;
+          return true;
+        }
+      default:
+        return false;
+    }
+    this.state=0b00;
+    return true;
+  #ELSE
+    return word0removeIf(filter)
+        |word1removeIf(filter)
+        |word2removeIf(filter)
+        |word3removeIf(filter);
+  #ENDIF
+  }
+#ELSEIF OfChar
+  abstract boolean uncheckedRemoveIf(int numLeft,$TypeNameModifier$Predicate$<? super E>$ filter);
+  @Override
+  public boolean removeIf(Predicate<? super $BoxedType$> filter)
+  {
+    final int size;
+    return (size=this.size)!=0 && uncheckedRemoveIf(size,filter::test);
+  }
+  @Override
+  public boolean removeIf($TypeNameModifier$Predicate$<? super E>$ filter)
+  {
+    final int size;
+    return (size=this.size)!=0 && uncheckedRemoveIf(size,filter);
+  }
+#ENDIF
+#IF OfBoolean,OfByte,OfChar
+  #MACRO ToArray($exposedType$,$TypeNameModifier$,Of$ClassPrefix$.DEFAULT_ARR,($ArrayType$),int,true,false)
+  #MACRO ToArray($BoxedType$,,Of$ClassPrefix$.DEFAULT_BOXED_ARR,($ArrayType$),int,$BoxedType$.TRUE,$BoxedType$.FALSE)
+  #MACRO ToArray(double,Double,OfDouble.DEFAULT_ARR,(double),int,1D,0D)
+  #MACRO ToArray(float,Float,OfFloat.DEFAULT_ARR,(float),int,1F,0F)
+  #MACRO ToArray(long,Long,OfLong.DEFAULT_ARR,(long),long,1L,0L)
+  #MACRO ToArray(int,Int,OfInt.DEFAULT_ARR,(int),int,1,0)
+  #IFNOT OfChar
+  #MACRO ToArray(short,Short,OfShort.DEFAULT_ARR,(short),int,(short)1,(short)0)
+    #IFNOT OfByte
+  #MACRO ToArray(byte,Byte,OfByte.DEFAULT_ARR,(byte),int,(byte)1,(byte)0)
+    #ENDIF
+  #ENDIF
+#ENDIF
+  @Override
+  public boolean remove(Object val)
+  {
+    return val instanceof $BoxedType$ && removeVal(($exposedType$)val);
+  }
+  #MACRO ToArrayIntFunc<false>()
+  @Override
+  public <T> T[] toArray(T[] arr)
+  {
+    //TODO
+    return arr;
+  }
+}
+#MACRODEF ToArrayIntFunc<IsChecked>()
+@Override
+public <T> T[] toArray(IntFunction<T[]> arrConstructor)
+{
+  //TODO
+  return null;
+}
+#ENDDEF
+#MACRODEF AddRemoveChar<Operation,WordMethod,TableMethod>()
+@Override
+public boolean Operation(char val)
+{
+  switch(val>>6)
+  {
+    default:
+      return TableMethod(val);
+    case 0:
+      return word0WordMethod(val);
+    case 1:
+      return word1WordMethod(val);
+    case 2:
+      return word2WordMethod(val);
+    case 3:
+      return word3WordMethod(val);
+  }
+}
+#ENDDEF
+#MACRODEF AddRemoveByte<Operation,WordMethod>()
+@Override
+public boolean Operation(byte val)
+{
+#IF OfBoolean
+  return Operation((int)val);
+#ELSEIF OfByte,OfChar
+  switch(val>>6)
+  {
+  #IF OfByte
+    case -2:
+      return word0WordMethod(val);
+    case -1:
+      return word1WordMethod(val);
+    case 0:
+      return word2WordMethod(val);
+    default:
+      return word3WordMethod(val);
+  #ELSE
+    default:
+      return false;
+    case 0:
+      return word0WordMethod(val);
+    case 1:
+      return word1WordMethod(val);
+  #ENDIF
+  }
+#ENDIF
+}
+#ENDDEF
+#MACRODEF CallDelegate(MethodName,ParamType,DelegateName,Cast)
+@Override
+public boolean MethodName(ParamType val)
+{
+  return DelegateName(Cast(val));
+}
+#ENDDEF
+#MACRODEF CheckNullAndCallDelegate(MethodName,ParamType,DelegateName,Cast)
+@Override
+public boolean MethodName(ParamType val)
+{
+  return val!=null && DelegateName(Cast(val));
+}
+#ENDDEF
+#MACRODEF AddRemoveBoolean<IsChecked,Operation>()
+@Override
+public boolean Operation(boolean val)
+{
+#IF OfBoolean
+  switch(this.state)
+  {
+  #IFSWITCH Operation==add
+    case 0b01:
+      if(val)
+      {
+        break;
+      }
+      return false;
+    case 0b10:
+      if(!val)
+      {
+        break;
+      }
+    case 0b11:
+      return false;
+    default:
+      this.state=val?0b10:0b01;
+      return true;
+  }
+  this.state=0b11;
+  #ELSE
+    case 0b01:
+      if(!val)
+      {
+        break;
+      }
+      return false;
+    case 0b10:
+      if(val)
+      {
+        break;
+      }
+    default:
+      return false;
+    case 0b11:
+      this.state=val?0b01:0b10;
+      return true;
+  }
+  this.state=0b00;
+  #ENDIF
+  return true;
+#ELSE
+  long word;
+  if((word=this.
+  #IF OfByte
+    word2
+  #ELSEIF OfChar
+    word0
+  #ENDIF
+    )!=(word
+  #IFSWITCH Operation==add
+    |=(val?(0b10L):
+  #ELSE
+    &=(val?~(0b10L):~
+  #ENDIF
+    (0b01L))))
+  {
+#IF OfByte
+     this.word2=word;
+#ELSEIF OfChar
+  #IFSWITCH IsChecked==true
+     ++this.modCount;
+  #ENDIF
+  #IFSWITCH Operation==add
+    ++this.size;
+  #ELSE
+    --this.size;
+  #ENDIF
+    this.word0=word;
+#ENDIF
+    return true;
+  }
+  return false;
+#ENDIF
+}
+#ENDDEF
+#MACRODEF ToArray(RETTYPE,METHODNAME,DEFAULTRET,CAST,SRCOFFSETTYPE,TRUEVAL,FALSEVAL)
+#IF OfChar
+abstract void copyTableToArray(int numLeft,RETTYPE[] dst,int dstOffset);
+#ENDIF
+@Override
+public RETTYPE[] toMETHODNAMEArray()
+{
+#IF OfBoolean
+  switch(this.state)
+  {
+    case 0b01:
+      return new RETTYPE[]{FALSEVAL};
+    case 0b10:
+      return new RETTYPE[]{TRUEVAL};
+    case 0b11:
+      return new RETTYPE[]{FALSEVAL,TRUEVAL};
+    default:
+  }
+#ELSE
+  int size;
+  #IF OfByte
+  long word0,word1,word2,word3;
+  if((size=Long.bitCount(word0=this.word0)+Long.bitCount(word1=this.word1)+Long.bitCount(word2=this.word2)+Long.bitCount(word3=this.word3))!=0)
+  #ELSEIF OfChar
+  if((size=this.size)!=0)
+  #ENDIF
+  {
+    RETTYPE[] dst=new RETTYPE[size];
+    SRCOFFSETTYPE srcOffset=$BoxedType$.MIN_VALUE;
+    outer:for(int dstOffset=0;;)
+    {
+      #MACRO WordCopyToArray<word0>(CAST)
+      #MACRO WordCopyToArray<word1>(CAST)
+      #MACRO WordCopyToArray<word2>(CAST)
+      #MACRO WordCopyToArray<word3>(CAST)
+  #IF OfChar
+      copyTableToArray(size,dst,dstOffset);
+  #ENDIF
+      break;
+    }
+    return dst;
+  }
+#ENDIF
+  return OmniArray.DEFAULTRET;
+}
+
+#ENDDEF
+#MACRODEF WordCopyToArray<WORD>(CAST)
+for(long marker=1L,word=this.WORD;;++srcOffset)
+{
+  if((word&marker)!=0)
+  {
+    dst[dstOffset]=CAST(srcOffset);
+    if(--size==0)
+    {
+      break outer;
+    }
+    ++dstOffset;
+  }
+  if((marker<<=1)==0)
+  {
+    break;
+  }
+}
+#ENDDEF
+#MACRODEF WordOps<IsChecked>(WORD,SRCOFFSET)
+#IF OfByte,OfChar
+  #IFSWITCH IsChecked==false
+transient long WORD;
+  #ENDIF
+  #IF OfByte
+private
+  #ELSEIF OfChar
+    #IFSWITCH IsChecked==true
+@Override
+    #ENDIF
+  #ENDIF
+boolean WORDadd(int val)
+{
+  long word;
+  if((word=this.WORD)!=(word|=1L<<val))
+  {
+  #IF OfChar
+    #IFSWITCH IsChecked==true
+    ++this.modCount;
+    #ENDIF
+    ++this.size;
+  #ENDIF
+    this.WORD=word;
+    return true;
+  }
+  return false;
+}
+  #IF OfByte
+private
+  #ELSEIF OfChar
+    #IFSWITCH IsChecked==true
+@Override
+    #ENDIF
+  #ENDIF
+boolean WORDremove(int val)
+{
+  long word;
+  if((word=this.WORD)!=(word&=(~(1L<<val))))
+  {
+  #IF OfChar
+    #IFSWITCH IsChecked==true
+    ++this.modCount;
+    #ENDIF
+    --this.size;
+  #ENDIF
+    this.WORD=word;
+    return true;
+  }
+  return false;
+}
+  #IF OfByte
+    #IFSWITCH IsChecked==true
+@Override
+    #ENDIF
+boolean WORDremoveIf($TypeNameModifier$Predicate$<? super E>$ filter)
+{
+  long originalWord,marker=1L,word=originalWord=this.WORD;
+  int srcOffset=SRCOFFSET;
+  for(;;)
+  {
+    if((word&marker)!=0 && filter.test((byte)srcOffset))
+    {
+      word&=(~(marker));
+    }
+    ++srcOffset;
+    if((marker<<=1)==0)
+    {
+    #IFSWITCH IsChecked==true
+      checkMod(originalWord,this.WORD);
+    #ENDIF
+      if(originalWord!=word)
+      {
+        this.WORD=word;
+        return true;
+      }
+      return false;
+    }
+  }
+}
+  #ENDIF
+#ENDIF
+#ENDDEF

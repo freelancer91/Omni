@@ -1,0 +1,613 @@
+#TYPEDEF OfChar
+package omni.impl.set;
+import omni.api.OmniSet;
+import java.util.function.IntFunction;
+import omni.function.CharConsumer;
+import omni.function.CharPredicate;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
+import omni.util.OmniArray;
+public abstract class CharSet implements OmniSet.OfChar
+{
+  
+
+  /*
+  private abstract static class AbstractChecked extends CharSet
+  {
+    transient int modCount;
+    #MACRO WordOps<true>(word0,0)
+    #MACRO WordOps<true>(word1,64)
+    #MACRO WordOps<true>(word2,128)
+    #MACRO WordOps<true>(word3,192)
+    AbstractChecked(long word0,long word1,long word2,long word3,int size)
+    {
+      super(word0,word1,word2,word3,size);
+    }
+    AbstractChecked()
+    {
+      super();
+    }
+    @Override
+    public void clear()
+    {
+      if(size!=0)
+      {
+        ++this.modCount;
+        super.clear();
+      }
+    }
+    #MACRO AddRemoveBoolean<true,removeVal>()
+    @Override
+    public <T> T[] toArray(IntFunction<T[]> arrConstructor)
+    {
+      return super.toArray(arrSize->
+      {
+        final int modCount=this.modCount;
+        try
+        {
+          return arrConstructor.apply(arrSize);
+        }
+        finally
+        {
+          CheckedCollection.checkModCount(modCount,this.modCount);
+        }
+      });
+    }
+    #MACRO AddRemoveBoolean<true,add>()
+    @Override
+    void uncheckedForEach(int numLeft,CharConsumer action)
+    {
+      int modCount=this.modCount;
+      try
+      {
+        super.uncheckedForEach(numLeft,action);
+      }
+      finally
+      {
+        CheckedCollection.checkModCount(modCount,this.modCount);
+      }
+    }
+  }
+  */
+  
+  transient int size;
+  #MACRO WordOps<false>(word0,0)
+  #MACRO WordOps<false>(word1,64)
+  #MACRO WordOps<false>(word2,128)
+  #MACRO WordOps<false>(word3,192)
+  private static boolean wordcontains(long word,int val)
+  {
+    return (word&1L<<val)!=0;
+  }
+  abstract void clearTable();
+  abstract boolean tableContains(int val);
+  abstract boolean removeFromTable(int val);
+  abstract boolean addToTable(char val);
+  abstract void consumeTable(int numLeft,CharConsumer action);
+  abstract void copyTableToArray(int numLeft,Object[] dst,int dstOffset);
+  abstract void tableToString(int numLeft,char[] arr,int dstOffset);
+  abstract int tableHash(int numLeft);
+  private CharSet()
+  {
+  }
+  private CharSet(long word0,long word1,long word2,long word3,int size)
+  {
+    this.word0=word0;
+    this.word1=word1;
+    this.word2=word2;
+    this.word3=word3;
+    this.size=size;
+  }
+  @Override
+  public void clear()
+  {
+    this.word0=0;
+    this.word1=0;
+    this.word2=0;
+    this.word3=0;
+    this.size=0;
+    clearTable();
+  }
+  @Override
+  public boolean contains(boolean val)
+  {
+    return (this.word0&(val?0b10:0b01))!=0;
+  }
+  #MACRO CheckNullAndCallDelegate(contains,Boolean,contains,(boolean))
+  @Override
+  public boolean contains(byte val)
+  {
+    final long word;
+    switch(val>>6)
+    {
+      default:
+        return false;
+      case 0:
+        word=this.word0;
+        break;
+      case 1:
+        word=this.word1;
+    }
+    return wordcontains(word,val);
+  }
+  #MACRO CheckNullAndCallDelegate(contains,Byte,contains,(byte))
+  @Override
+  public boolean contains(char val)
+  {
+    final long word;
+    switch(val>>6)
+    {
+      default:
+        return tableContains(val);
+      case 0:
+        word=this.word0;
+        break;
+      case 1:
+        word=this.word1;
+        break;
+      case 2:
+        word=this.word2;
+        break;
+      case 3:
+        word=this.word3;
+    }
+    return wordcontains(word,val);
+  }
+  #MACRO CheckNullAndCallDelegate(contains,Character,contains,(char))
+  #MACRO CheckRangeAndCallDelegate(contains,double,contains)
+  #MACRO CheckNullAndCallDelegate(contains,Double,contains,(double))
+  #MACRO CheckRangeAndCallDelegate(contains,float,contains)
+  #MACRO CheckNullAndCallDelegate(contains,Float,contains,(float))
+  @Override
+  public boolean contains(int val)
+  {
+    final long word;
+    switch(val>>6)
+    {
+      default:
+        return val>=0 && val<=Character.MAX_VALUE && tableContains(val);
+      case 0:
+        word=this.word0;
+        break;
+      case 1:
+        word=this.word1;
+        break;
+      case 2:
+        word=this.word2;
+        break;
+      case 3:
+        word=this.word3;
+    }
+    return wordcontains(word,val);
+  }
+  #MACRO CheckNullAndCallDelegate(contains,Integer,contains,(int))
+  #MACRO CheckRangeAndCallDelegate(contains,long,contains)
+  #MACRO CheckNullAndCallDelegate(contains,Long,contains,(long))
+  @Override
+  public boolean contains(Object val)
+  {
+    return this.size!=0 && val instanceof Character && contains((char)val);
+  }
+  @Override
+  public boolean contains(short val){
+    final long word;
+    switch(val>>6)
+    {
+      default:
+        return val>=0 && tableContains(val);
+      case 0:
+        word=this.word0;
+        break;
+      case 1:
+        word=this.word1;
+        break;
+      case 2:
+        word=this.word2;
+        break;
+      case 3:
+        word=this.word3;
+    }
+    return wordcontains(word,val);
+  }
+  #MACRO CheckNullAndCallDelegate(contains,Short,contains,(short))
+  @Override
+  public boolean isEmpty()
+  {
+    return this.size==0;
+  }
+  @Override
+  public boolean remove(Object val)
+  {
+    return this.size!=0 && val instanceof Character && removeVal((char)val);
+  }
+  #MACRO AddRemoveBoolean<false,removeVal>()
+  #MACRO CheckNullAndCallDelegate(removeVal,Boolean,removeVal,(boolean))
+  @Override
+  public boolean removeVal(byte val)
+  {
+    switch(val>>6)
+    {
+      default:
+        return false;
+      case 0:
+        return word0remove(val);
+      case 1:
+        return word1remove(val);
+    }
+  }
+  #MACRO CheckNullAndCallDelegate(removeVal,Byte,removeVal,(byte))
+  #MACRO AddRemoveChar(removeVal,remove,removeFromTable)
+  #MACRO CheckNullAndCallDelegate(removeVal,Character,removeVal,(char))
+  #MACRO CheckRangeAndCallDelegate(removeVal,double,removeVal)
+  #MACRO CheckNullAndCallDelegate(removeVal,Double,removeVal,(double))
+  #MACRO CheckRangeAndCallDelegate(removeVal,float,removeVal)
+  #MACRO CheckNullAndCallDelegate(removeVal,Float,removeVal,(float))
+  @Override
+  public boolean removeVal(int val)
+  {
+    switch(val>>6)
+    {
+      default:
+        return val>=0 && val<=Character.MAX_VALUE && removeFromTable(val);
+      case 0:
+        return word0remove(val);
+      case 1:
+        return word1remove(val);
+      case 2:
+        return word2remove(val);
+      case 3:
+        return word3remove(val);
+    }
+  }
+  #MACRO CheckNullAndCallDelegate(removeVal,Integer,removeVal,(int))
+  #MACRO CheckRangeAndCallDelegate(removeVal,long,removeVal)
+  #MACRO CheckNullAndCallDelegate(removeVal,Long,removeVal,(long))
+  @Override
+  public boolean removeVal(short val)
+  {
+    switch(val>>6)
+    {
+      default:
+        return val>=0 && removeFromTable(val);
+      case 0:
+        return word0remove(val);
+      case 1:
+        return word1remove(val);
+      case 2:
+        return word2remove(val);
+      case 3:
+        return word3remove(val);
+    }
+  }
+  #MACRO CheckNullAndCallDelegate(removeVal,Short,removeVal,(short))
+  @Override
+  public int size()
+  {
+    return this.size;
+  }
+  private void uncheckedCopyToArray(int numLeft,Object[] dst)
+  {
+    int srcOffset=0,dstOffset=0;
+    #MACRO CopyWord((char),word0,)
+    #MACRO CopyWord((char),word1,)
+    #MACRO CopyWord((char),word2,)
+    #MACRO CopyWord((char),word3,);
+    copyTableToArray(numLeft,dst,dstOffset);
+  }
+  @Override
+  public <T> T[] toArray(IntFunction<T[]> arrConstructor)
+  {
+    int numLeft;
+    T[] dst=arrConstructor.apply(numLeft=this.size);
+    if(numLeft!=0)
+    {
+      uncheckedCopyToArray(numLeft,dst);
+    }
+    return dst;
+  }
+  @Override
+  public <T> T[] toArray(T[] arr)
+  {
+    int numLeft;
+    if((numLeft=this.size)!=0)
+    {
+      uncheckedCopyToArray(numLeft,arr=OmniArray.uncheckedArrResize(size,arr));
+    }
+    else if(arr.length!=0)
+    {
+      arr[0]=null;
+    }
+    return arr;
+  }
+  #MACRO AddRemoveBoolean<false,add>()
+  #MACRO AddRemoveChar(add,add,addToTable)
+  @Override
+  public boolean add(Character val)
+  {
+    return add((char)val);
+  }
+  static int wordconsume(long word,int srcOffset,CharConsumer action,int numLeft)
+  {
+    for(long marker=1L;;++srcOffset)
+    {
+      if((word&marker)!=0)
+      {
+        action.accept((char)srcOffset);
+        if(--numLeft==0)
+        {
+          return 0;
+        }
+      }
+      if((marker<<=1)==0)
+      {
+        return numLeft;
+      }
+    }
+  }
+  void uncheckedForEach(int numLeft,CharConsumer action)
+  {
+    if((numLeft=wordconsume(this.word0,0,action,numLeft))!=0)
+    {
+      if((numLeft=wordconsume(this.word1,64,action,numLeft))!=0)
+      {
+        if((numLeft=wordconsume(this.word2,128,action,numLeft))!=0)
+        {
+          if((numLeft=wordconsume(this.word3,192,action,numLeft))!=0)
+          {
+            consumeTable(numLeft,action);
+          }
+        }
+      }
+    }
+  }
+  #MACRO ForEachMethods(ForEach)
+  abstract boolean uncheckedremoveIf(int numLeft,CharPredicate filter);
+  #MACRO RemoveIf(CharPredicate,filter)
+  #MACRO RemoveIf(Predicate<? super Character>,filter::test)
+  #MACRO ToArray(Character,,(char),OfChar.DEFAULT_BOXED_ARR,int)
+  #MACRO ToArray(char,Char,(char),OfChar.DEFAULT_ARR,int)
+  #MACRO ToArray(int,Int,,OfInt.DEFAULT_ARR,int)
+  #MACRO ToArray(long,Long,,OfLong.DEFAULT_ARR,long)
+  #MACRO ToArray(float,Float,,OfFloat.DEFAULT_ARR,int)
+  #MACRO ToArray(double,Double,,OfDouble.DEFAULT_ARR,int)
+  @Override
+  public String toString()
+  {
+    int numLeft;
+    if((numLeft=this.size)!=0)
+    {
+      char[] arr;
+      int bufferSize;
+      (arr=new char[bufferSize=numLeft*3])[0]='[';
+      outer: for(int srcOffset=0,dstOffset=1;;)
+      {
+        #MACRO WordToString(word0)
+        #MACRO WordToString(word1)
+        #MACRO WordToString(word2)
+        #MACRO WordToString(word3)
+        tableToString(numLeft,arr,dstOffset);
+        break;
+      }
+      arr[bufferSize-1]=']';
+      return new String(arr,0,bufferSize);
+    }
+    return "[]";
+  }
+  @Override
+  public int hashCode()
+  {
+    int numLeft,hash;
+    if((numLeft=this.size)!=(hash=0))
+    {
+      outer: for(int srcOffset=0;;)
+      {
+        #MACRO WordHash(word0)
+        #MACRO WordHash(word1)
+        #MACRO WordHash(word2)
+        #MACRO WordHash(word3)
+        hash+=tableHash(numLeft);
+        break;
+      }
+    }
+    return hash;
+  }
+  @Override
+  public abstract boolean equals(Object val);
+  @Override
+  public abstract Object clone();
+}
+#MACRODEF WordHash(WORD)
+for(long marker=1L,word=this.WORD;;++srcOffset)
+{
+  if((word&marker)!=0)
+  {
+    hash+=srcOffset;
+    if(--numLeft==0)
+    {
+      break outer;
+    }
+  }
+  if((marker<<=1)==0)
+  {
+    break;
+  }
+}
+#ENDDEF
+#MACRODEF WordToString(WORD)
+for(long marker=1L,word=this.WORD;;++srcOffset)
+{
+  if((word&marker)!=0)
+  {
+    arr[dstOffset]=(char)srcOffset;
+    if(--numLeft==0)
+    {
+      break outer;
+    }
+    arr[++dstOffset]=',';
+    arr[++dstOffset]=' ';
+    ++dstOffset;
+  }
+  if((marker<<=1)==0)
+  {
+    break;
+  }
+}
+#ENDDEF
+#MACRODEF RemoveIf(Predicate,predicateParam)
+@Override
+public boolean removeIf(Predicate filter)
+{
+  final int size;
+  return (size=this.size)!=0 && uncheckedremoveIf(size,predicateParam);
+}
+#ENDDEF
+#MACRODEF ForEachMethods(MacroName)
+#MACRO MacroName(CharConsumer,action)
+#MACRO MacroName(Consumer<? super Character>,action::accept)
+#ENDDEF
+#MACRODEF ForEach(Consumer,consumerParam)
+@Override
+public void forEach(Consumer action)
+{
+  final int size;
+  if((size=this.size)!=0)
+  {
+    uncheckedForEach(size,consumerParam);
+  }
+}
+#ENDDEF
+#MACRODEF AddRemoveChar(MethodName,WordMethod,TableMethod)
+@Override
+public boolean MethodName(char val)
+{
+  switch(val>>6)
+  {
+    default:
+      return TableMethod(val);
+    case 0:
+      return word0WordMethod(val);
+    case 1:
+      return word1WordMethod(val);
+    case 2:
+      return word2WordMethod(val);
+    case 3:
+      return word3WordMethod(val);
+  }
+}
+#ENDDEF
+#MACRODEF AddRemoveBoolean<IsChecked,Operation>()
+@Override
+public boolean Operation(boolean val)
+{
+  long word;
+#IFSWITCH Operation==add
+  if((word=this.word0)!=(word|=(val?(0b10L):(0b01L))))
+#ELSE
+  if((word=this.word0)!=(word&=(val?~(0b10L):~(0b01L))))
+#ENDIF
+  {
+#IFSWITCH IsChecked==true
+    ++this.modCount;
+#ENDIF
+    this.word0=word;
+#IFSWITCH Operation==add;
+    ++this.size;
+#ELSE
+    --this.size;
+#ENDIF
+    return true;
+  }
+  return false;
+}
+#ENDDEF
+#MACRODEF CheckRangeAndCallDelegate(MethodName,ParamType,DelegateName)
+@Override
+public boolean MethodName(ParamType val)
+{
+  final char v;
+  return val==(v=(char)val) && DelegateName(v);
+}
+#ENDDEF
+#MACRODEF CheckNullAndCallDelegate(MethodName,ParamType,DelegateName,Cast)
+@Override
+public boolean MethodName(ParamType val)
+{
+  return val!=null && DelegateName(Cast(val));
+}
+#ENDDEF
+#MACRODEF WordOps<IsChecked>(WORD,SRCOFFSET)
+#IFSWITCH IsChecked==false
+transient long WORD;
+#ELSE
+@Override
+#ENDIF
+boolean WORDadd(int val)
+{
+  long word;
+  if((word=this.WORD)!=(word|=1L<<val))
+  {
+#IFSWITCH IsChecked==true
+    ++this.modCount;
+#ENDIF
+    ++this.size;
+    this.WORD=word;
+    return true;
+  }
+  return false;
+}
+#IFSWITCH IsChecked==true
+@Override
+#ENDIF
+boolean WORDremove(int val)
+{
+  long word;
+  if((word=this.WORD)!=(word&=(~(1L<<val))))
+  {
+#IFSWITCH IsChecked==true
+    ++this.modCount;
+#ENDIF
+    --this.size;
+    this.WORD=word;
+    return true;
+  }
+  return false;
+}
+#ENDDEF
+#MACRODEF ToArray(ArrType,MethodName,CAST,defaultRet,SrcOffsetType)
+abstract void copyTableToArray(int numLeft,ArrType[] dst,int dstOffset);
+@Override
+public ArrType[] toMethodNameArray()
+{
+  int numLeft;
+  if((numLeft=this.size)!=0)
+  {
+    final ArrType[] dst=new ArrType[numLeft];
+    SrcOffsetType srcOffset=0;
+    int dstOffset=0;
+    #MACRO CopyWord(CAST,word0,dst)
+    #MACRO CopyWord(CAST,word1,dst)
+    #MACRO CopyWord(CAST,word2,dst)
+    #MACRO CopyWord(CAST,word3,dst);
+    copyTableToArray(numLeft,dst,dstOffset);
+    return dst;
+  }
+  return OmniArray.defaultRet;
+}
+#ENDDEF
+#MACRODEF CopyWord(CAST,WORD,RET)
+for(long marker=1L,word=this.WORD;;++srcOffset)
+{
+  if((word&marker)!=0)
+  {
+    dst[dstOffset++]=CAST(srcOffset);
+    if(--numLeft==0)
+    {
+      return RET;
+    }
+  }
+  if((marker<<=1)==0)
+  {
+    break;
+  }
+}
+#ENDDEF
