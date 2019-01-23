@@ -1,155 +1,79 @@
 package omni.impl.set;
 import omni.api.OmniSet;
 import omni.function.CharPredicate;
+import omni.function.CharConsumer;
 import java.util.function.Predicate;
+import java.util.function.Consumer;
 import omni.util.OmniArray;
 import java.util.function.IntFunction;
+import omni.api.OmniIterator;
 abstract class CharSet implements OmniSet.OfChar
 {
-  transient int size;
   transient long word0;
-  boolean word0add(int val)
-  {
-    long word;
-    if((word=this.word0)!=(word|=1L<<val))
-    {
-      ++this.size;
-      this.word0=word;
-      return true;
-    }
-    return false;
-  }
-  boolean word0remove(int val)
-  {
-    long word;
-    if((word=this.word0)!=(word&=(~(1L<<val))))
-    {
-      --this.size;
-      this.word0=word;
-      return true;
-    }
-    return false;
-  }
   transient long word1;
-  boolean word1add(int val)
-  {
-    long word;
-    if((word=this.word1)!=(word|=1L<<val))
-    {
-      ++this.size;
-      this.word1=word;
-      return true;
-    }
-    return false;
-  }
-  boolean word1remove(int val)
-  {
-    long word;
-    if((word=this.word1)!=(word&=(~(1L<<val))))
-    {
-      --this.size;
-      this.word1=word;
-      return true;
-    }
-    return false;
-  }
   transient long word2;
-  boolean word2add(int val)
-  {
-    long word;
-    if((word=this.word2)!=(word|=1L<<val))
-    {
-      ++this.size;
-      this.word2=word;
-      return true;
-    }
-    return false;
-  }
-  boolean word2remove(int val)
-  {
-    long word;
-    if((word=this.word2)!=(word&=(~(1L<<val))))
-    {
-      --this.size;
-      this.word2=word;
-      return true;
-    }
-    return false;
-  }
   transient long word3;
-  boolean word3add(int val)
-  {
-    long word;
-    if((word=this.word3)!=(word|=1L<<val))
-    {
-      ++this.size;
-      this.word3=word;
-      return true;
-    }
-    return false;
-  }
-  boolean word3remove(int val)
-  {
-    long word;
-    if((word=this.word3)!=(word&=(~(1L<<val))))
-    {
-      --this.size;
-      this.word3=word;
-      return true;
-    }
-    return false;
-  }
   CharSet()
   {
-    super();
   }
-  CharSet(long word0,long word1,long word2,long word3
-    ,int size
-    )
+  CharSet(long word0,long word1,long word2,long word3)
   {
     this.word0=word0;
     this.word1=word1;
     this.word2=word2;
     this.word3=word3;
-    this.size=size;
   }
   @Override
-  public boolean add(boolean val)
+  public int size()
   {
-    long word;
-    if((word=this.
-      word0
-      )!=(word
-      |=(val?(0b10L):
-      (0b01L))))
-    {
-      ++this.size;
-      this.word0=word;
-      return true;
-    }
+    return Long.bitCount(this.word0)+Long.bitCount(this.word1)+Long.bitCount(this.word2)+Long.bitCount(this.word3);
+  }
+  @Override
+  public boolean isEmpty()
+  {
+    return this.word0==0 && this.word1==0 && this.word2==0 && this.word3==0;
+  }
+  @Override
+  public void clear()
+  {
+    this.word0=0;
+    this.word1=0;
+    this.word2=0;
+    this.word3=0;
+  }
+  @Override
+  public boolean equals(Object val)
+  {
+    //TODO
     return false;
   }
   @Override
-  public boolean add(Boolean val)
+  public OmniIterator.OfChar iterator()
   {
-    return add((boolean)(val));
+    //TODO
+    return null;
   }
-  abstract boolean addToTable(char val);
   @Override
-  public boolean add(char val)
+  public int hashCode()
   {
-    switch(val>>6)
+    return wordHash(this.word0,Character.MIN_VALUE)
+      +wordHash(this.word1,Character.MIN_VALUE+64)
+      +wordHash(this.word2,Character.MIN_VALUE+128)
+      +wordHash(this.word3,Character.MIN_VALUE+192);
+  }
+  private static int wordHash(long word,int offset)
+  {
+    int hash=0;
+    for(long marker=1L;;++offset)
     {
-      default:
-        return addToTable(val);
-      case 0:
-        return word0add(val);
-      case 1:
-        return word1add(val);
-      case 2:
-        return word2add(val);
-      case 3:
-        return word3add(val);
+      if((word&marker)!=0)
+      {
+        hash+=offset;
+      }
+      if((marker<<=1)==0)
+      {
+        return hash;
+      }
     }
   }
   @Override
@@ -158,551 +82,60 @@ abstract class CharSet implements OmniSet.OfChar
     return add((char)(val));
   }
   @Override
-  public boolean removeVal(boolean val)
+  public boolean add(boolean val)
   {
     long word;
-    if((word=this.
-      word0
-      )!=(word
-      &=(val?~(0b10L):~
-      (0b01L))))
+    if((word=this.word2)!=(word|=(val?0b10L:0b01L)))
     {
-      --this.size;
-      this.word0=word;
+      this.word2=word;
       return true;
     }
     return false;
   }
   @Override
-  public int size()
+  public boolean contains(double val)
   {
-    return this.size;
+    final char v;
+    return val==(v=(char)val) && contains(v);
   }
   @Override
-  public boolean isEmpty()
+  public boolean contains(float val)
   {
-    return this.size==0;
-  }
-  abstract boolean uncheckedRemoveIf(int numLeft,CharPredicate filter);
-  @Override
-  public boolean removeIf(Predicate<? super Character> filter)
-  {
-    final int size;
-    return (size=this.size)!=0 && uncheckedRemoveIf(size,filter::test);
+    final char v;
+    return val==(v=(char)val) && contains(v);
   }
   @Override
-  public boolean removeIf(CharPredicate filter)
+  public boolean contains(long val)
   {
-    final int size;
-    return (size=this.size)!=0 && uncheckedRemoveIf(size,filter);
+    final char v;
+    return val==(v=(char)val) && contains(v);
   }
-  abstract void copyTableToArray(int numLeft,char[] dst,int dstOffset);
   @Override
-  public char[] toCharArray()
+  public boolean removeVal(double val)
   {
-    int size;
-    if((size=this.size)!=0)
-    {
-      char[] dst=new char[size];
-      int srcOffset=Character.MIN_VALUE;
-      outer:for(int dstOffset=0;;)
-      {
-        for(long marker=1L,word=this.word0;;++srcOffset)
-        {
-          if((word&marker)!=0)
-          {
-            dst[dstOffset]=(char)(srcOffset);
-            if(--size==0)
-            {
-              break outer;
-            }
-            ++dstOffset;
-          }
-          if((marker<<=1)==0)
-          {
-            break;
-          }
-        }
-        for(long marker=1L,word=this.word1;;++srcOffset)
-        {
-          if((word&marker)!=0)
-          {
-            dst[dstOffset]=(char)(srcOffset);
-            if(--size==0)
-            {
-              break outer;
-            }
-            ++dstOffset;
-          }
-          if((marker<<=1)==0)
-          {
-            break;
-          }
-        }
-        for(long marker=1L,word=this.word2;;++srcOffset)
-        {
-          if((word&marker)!=0)
-          {
-            dst[dstOffset]=(char)(srcOffset);
-            if(--size==0)
-            {
-              break outer;
-            }
-            ++dstOffset;
-          }
-          if((marker<<=1)==0)
-          {
-            break;
-          }
-        }
-        for(long marker=1L,word=this.word3;;++srcOffset)
-        {
-          if((word&marker)!=0)
-          {
-            dst[dstOffset]=(char)(srcOffset);
-            if(--size==0)
-            {
-              break outer;
-            }
-            ++dstOffset;
-          }
-          if((marker<<=1)==0)
-          {
-            break;
-          }
-        }
-        copyTableToArray(size,dst,dstOffset);
-        break;
-      }
-      return dst;
-    }
-    return OmniArray.OfChar.DEFAULT_ARR;
+    final char v;
+    return val==(v=(char)val) && removeVal(v);
   }
-  abstract void copyTableToArray(int numLeft,Character[] dst,int dstOffset);
   @Override
-  public Character[] toArray()
+  public boolean removeVal(float val)
   {
-    int size;
-    if((size=this.size)!=0)
-    {
-      Character[] dst=new Character[size];
-      int srcOffset=Character.MIN_VALUE;
-      outer:for(int dstOffset=0;;)
-      {
-        for(long marker=1L,word=this.word0;;++srcOffset)
-        {
-          if((word&marker)!=0)
-          {
-            dst[dstOffset]=(char)(srcOffset);
-            if(--size==0)
-            {
-              break outer;
-            }
-            ++dstOffset;
-          }
-          if((marker<<=1)==0)
-          {
-            break;
-          }
-        }
-        for(long marker=1L,word=this.word1;;++srcOffset)
-        {
-          if((word&marker)!=0)
-          {
-            dst[dstOffset]=(char)(srcOffset);
-            if(--size==0)
-            {
-              break outer;
-            }
-            ++dstOffset;
-          }
-          if((marker<<=1)==0)
-          {
-            break;
-          }
-        }
-        for(long marker=1L,word=this.word2;;++srcOffset)
-        {
-          if((word&marker)!=0)
-          {
-            dst[dstOffset]=(char)(srcOffset);
-            if(--size==0)
-            {
-              break outer;
-            }
-            ++dstOffset;
-          }
-          if((marker<<=1)==0)
-          {
-            break;
-          }
-        }
-        for(long marker=1L,word=this.word3;;++srcOffset)
-        {
-          if((word&marker)!=0)
-          {
-            dst[dstOffset]=(char)(srcOffset);
-            if(--size==0)
-            {
-              break outer;
-            }
-            ++dstOffset;
-          }
-          if((marker<<=1)==0)
-          {
-            break;
-          }
-        }
-        copyTableToArray(size,dst,dstOffset);
-        break;
-      }
-      return dst;
-    }
-    return OmniArray.OfChar.DEFAULT_BOXED_ARR;
+    final char v;
+    return val==(v=(char)val) && removeVal(v);
   }
-  abstract void copyTableToArray(int numLeft,double[] dst,int dstOffset);
   @Override
-  public double[] toDoubleArray()
+  public boolean removeVal(long val)
   {
-    int size;
-    if((size=this.size)!=0)
-    {
-      double[] dst=new double[size];
-      int srcOffset=Character.MIN_VALUE;
-      outer:for(int dstOffset=0;;)
-      {
-        for(long marker=1L,word=this.word0;;++srcOffset)
-        {
-          if((word&marker)!=0)
-          {
-            dst[dstOffset]=(double)(srcOffset);
-            if(--size==0)
-            {
-              break outer;
-            }
-            ++dstOffset;
-          }
-          if((marker<<=1)==0)
-          {
-            break;
-          }
-        }
-        for(long marker=1L,word=this.word1;;++srcOffset)
-        {
-          if((word&marker)!=0)
-          {
-            dst[dstOffset]=(double)(srcOffset);
-            if(--size==0)
-            {
-              break outer;
-            }
-            ++dstOffset;
-          }
-          if((marker<<=1)==0)
-          {
-            break;
-          }
-        }
-        for(long marker=1L,word=this.word2;;++srcOffset)
-        {
-          if((word&marker)!=0)
-          {
-            dst[dstOffset]=(double)(srcOffset);
-            if(--size==0)
-            {
-              break outer;
-            }
-            ++dstOffset;
-          }
-          if((marker<<=1)==0)
-          {
-            break;
-          }
-        }
-        for(long marker=1L,word=this.word3;;++srcOffset)
-        {
-          if((word&marker)!=0)
-          {
-            dst[dstOffset]=(double)(srcOffset);
-            if(--size==0)
-            {
-              break outer;
-            }
-            ++dstOffset;
-          }
-          if((marker<<=1)==0)
-          {
-            break;
-          }
-        }
-        copyTableToArray(size,dst,dstOffset);
-        break;
-      }
-      return dst;
-    }
-    return OmniArray.OfDouble.DEFAULT_ARR;
+    final char v;
+    return val==(v=(char)val) && removeVal(v);
   }
-  abstract void copyTableToArray(int numLeft,float[] dst,int dstOffset);
   @Override
-  public float[] toFloatArray()
+  public boolean contains(Object val)
   {
-    int size;
-    if((size=this.size)!=0)
-    {
-      float[] dst=new float[size];
-      int srcOffset=Character.MIN_VALUE;
-      outer:for(int dstOffset=0;;)
-      {
-        for(long marker=1L,word=this.word0;;++srcOffset)
-        {
-          if((word&marker)!=0)
-          {
-            dst[dstOffset]=(float)(srcOffset);
-            if(--size==0)
-            {
-              break outer;
-            }
-            ++dstOffset;
-          }
-          if((marker<<=1)==0)
-          {
-            break;
-          }
-        }
-        for(long marker=1L,word=this.word1;;++srcOffset)
-        {
-          if((word&marker)!=0)
-          {
-            dst[dstOffset]=(float)(srcOffset);
-            if(--size==0)
-            {
-              break outer;
-            }
-            ++dstOffset;
-          }
-          if((marker<<=1)==0)
-          {
-            break;
-          }
-        }
-        for(long marker=1L,word=this.word2;;++srcOffset)
-        {
-          if((word&marker)!=0)
-          {
-            dst[dstOffset]=(float)(srcOffset);
-            if(--size==0)
-            {
-              break outer;
-            }
-            ++dstOffset;
-          }
-          if((marker<<=1)==0)
-          {
-            break;
-          }
-        }
-        for(long marker=1L,word=this.word3;;++srcOffset)
-        {
-          if((word&marker)!=0)
-          {
-            dst[dstOffset]=(float)(srcOffset);
-            if(--size==0)
-            {
-              break outer;
-            }
-            ++dstOffset;
-          }
-          if((marker<<=1)==0)
-          {
-            break;
-          }
-        }
-        copyTableToArray(size,dst,dstOffset);
-        break;
-      }
-      return dst;
-    }
-    return OmniArray.OfFloat.DEFAULT_ARR;
-  }
-  abstract void copyTableToArray(int numLeft,long[] dst,int dstOffset);
-  @Override
-  public long[] toLongArray()
-  {
-    int size;
-    if((size=this.size)!=0)
-    {
-      long[] dst=new long[size];
-      long srcOffset=Character.MIN_VALUE;
-      outer:for(int dstOffset=0;;)
-      {
-        for(long marker=1L,word=this.word0;;++srcOffset)
-        {
-          if((word&marker)!=0)
-          {
-            dst[dstOffset]=(long)(srcOffset);
-            if(--size==0)
-            {
-              break outer;
-            }
-            ++dstOffset;
-          }
-          if((marker<<=1)==0)
-          {
-            break;
-          }
-        }
-        for(long marker=1L,word=this.word1;;++srcOffset)
-        {
-          if((word&marker)!=0)
-          {
-            dst[dstOffset]=(long)(srcOffset);
-            if(--size==0)
-            {
-              break outer;
-            }
-            ++dstOffset;
-          }
-          if((marker<<=1)==0)
-          {
-            break;
-          }
-        }
-        for(long marker=1L,word=this.word2;;++srcOffset)
-        {
-          if((word&marker)!=0)
-          {
-            dst[dstOffset]=(long)(srcOffset);
-            if(--size==0)
-            {
-              break outer;
-            }
-            ++dstOffset;
-          }
-          if((marker<<=1)==0)
-          {
-            break;
-          }
-        }
-        for(long marker=1L,word=this.word3;;++srcOffset)
-        {
-          if((word&marker)!=0)
-          {
-            dst[dstOffset]=(long)(srcOffset);
-            if(--size==0)
-            {
-              break outer;
-            }
-            ++dstOffset;
-          }
-          if((marker<<=1)==0)
-          {
-            break;
-          }
-        }
-        copyTableToArray(size,dst,dstOffset);
-        break;
-      }
-      return dst;
-    }
-    return OmniArray.OfLong.DEFAULT_ARR;
-  }
-  abstract void copyTableToArray(int numLeft,int[] dst,int dstOffset);
-  @Override
-  public int[] toIntArray()
-  {
-    int size;
-    if((size=this.size)!=0)
-    {
-      int[] dst=new int[size];
-      int srcOffset=Character.MIN_VALUE;
-      outer:for(int dstOffset=0;;)
-      {
-        for(long marker=1L,word=this.word0;;++srcOffset)
-        {
-          if((word&marker)!=0)
-          {
-            dst[dstOffset]=(int)(srcOffset);
-            if(--size==0)
-            {
-              break outer;
-            }
-            ++dstOffset;
-          }
-          if((marker<<=1)==0)
-          {
-            break;
-          }
-        }
-        for(long marker=1L,word=this.word1;;++srcOffset)
-        {
-          if((word&marker)!=0)
-          {
-            dst[dstOffset]=(int)(srcOffset);
-            if(--size==0)
-            {
-              break outer;
-            }
-            ++dstOffset;
-          }
-          if((marker<<=1)==0)
-          {
-            break;
-          }
-        }
-        for(long marker=1L,word=this.word2;;++srcOffset)
-        {
-          if((word&marker)!=0)
-          {
-            dst[dstOffset]=(int)(srcOffset);
-            if(--size==0)
-            {
-              break outer;
-            }
-            ++dstOffset;
-          }
-          if((marker<<=1)==0)
-          {
-            break;
-          }
-        }
-        for(long marker=1L,word=this.word3;;++srcOffset)
-        {
-          if((word&marker)!=0)
-          {
-            dst[dstOffset]=(int)(srcOffset);
-            if(--size==0)
-            {
-              break outer;
-            }
-            ++dstOffset;
-          }
-          if((marker<<=1)==0)
-          {
-            break;
-          }
-        }
-        copyTableToArray(size,dst,dstOffset);
-        break;
-      }
-      return dst;
-    }
-    return OmniArray.OfInt.DEFAULT_ARR;
+    return val instanceof Character && contains((char)val);
   }
   @Override
   public boolean remove(Object val)
   {
     return val instanceof Character && removeVal((char)val);
-  }
-  @Override
-  public <T> T[] toArray(IntFunction<T[]> arrConstructor)
-  {
-    //TODO
-    return null;
-  }
-  @Override
-  public <T> T[] toArray(T[] arr)
-  {
-    //TODO
-    return arr;
   }
 }
