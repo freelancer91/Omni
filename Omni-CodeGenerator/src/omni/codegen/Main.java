@@ -25,6 +25,8 @@ public class Main{
         for(final String projectName:projectNames){
             TEMPLATE_AND_SOURCE_FOLDERS.put(Paths.get(workingSetRoot,projectName,"templates"),
                     Paths.get(workingSetRoot,projectName,"src-generated"));
+            TEMPLATE_AND_SOURCE_FOLDERS.put(Paths.get(workingSetRoot,projectName,"templates-test"),
+                    Paths.get(workingSetRoot,projectName,"test-generated"));
         }
     }
     public static void main(String[] args) throws Exception{
@@ -32,6 +34,7 @@ public class Main{
     }
     private static void processTemplates(Path templateFolder,Path outputFolder){
         try{
+            Files.createDirectories(templateFolder);
             Files.walkFileTree(templateFolder,new SimpleFileVisitor<>(){
                 @SuppressWarnings("unused") public FileVisitResult visitFile(Path file,BasicFileAttributes attributes)
                         throws IOException{

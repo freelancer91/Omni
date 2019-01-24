@@ -7,6 +7,7 @@
 #TYPEDEF OfFloat
 #TYPEDEF OfDouble
 #TYPEDEF OfRef
+//TODO combine these implementations into one file
 package omni.util;
 #IF OfInt
 import java.util.function.$Comparator$;

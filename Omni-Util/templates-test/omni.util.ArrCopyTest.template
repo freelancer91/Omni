@@ -1,0 +1,171 @@
+#TYPEDEF OfGeneric
+package omni.util;
+
+import org.junit.Test;
+import org.junit.Assert;
+import java.util.Random;
+
+public class ArrCopyTest
+{
+  #MACRO TestCopy<boolean,Boolean>()
+  #MACRO TestCopy<byte,Byte>()
+  #MACRO TestCopy<char,Character>()
+  #MACRO TestCopy<short,Short>()
+  #MACRO TestCopy<int,Integer>()
+  #MACRO TestCopy<long,Long>()
+  #MACRO TestCopy<float,Float>()
+  #MACRO TestCopy<double,Double>()
+  
+  #MACRO TestCopy<Boolean,boolean>()
+  #MACRO TestCopy<Byte,byte>()
+  #MACRO TestCopy<Character,car>()
+  #MACRO TestCopy<Short,short>()
+  #MACRO TestCopy<Integer,int>()
+  #MACRO TestCopy<Long,long>()
+  #MACRO TestCopy<Float,float>()
+  #MACRO TestCopy<Double,double>()
+
+  #MACRO TestCopy<boolean,boolean>()
+  #MACRO TestCopy<boolean,byte>()
+  #MACRO TestCopy<boolean,char>()
+  #MACRO TestCopy<boolean,short>()
+  #MACRO TestCopy<boolean,int>()
+  #MACRO TestCopy<boolean,long>()
+  #MACRO TestCopy<boolean,float>()
+  #MACRO TestCopy<boolean,double>()
+  #MACRO TestCopy<byte,byte>()
+  #MACRO TestCopy<byte,short>()
+  #MACRO TestCopy<byte,int>()
+  #MACRO TestCopy<byte,long>()
+  #MACRO TestCopy<byte,float>()
+  #MACRO TestCopy<byte,double>()
+  #MACRO TestCopy<char,char>()
+  #MACRO TestCopy<char,int>()
+  #MACRO TestCopy<char,long>()
+  #MACRO TestCopy<char,float>()
+  #MACRO TestCopy<char,double>()
+  #MACRO TestCopy<short,short>()
+  #MACRO TestCopy<short,int>()
+  #MACRO TestCopy<short,long>()
+  #MACRO TestCopy<short,float>()
+  #MACRO TestCopy<short,double>()
+  #MACRO TestCopy<int,int>()
+  #MACRO TestCopy<int,long>()
+  #MACRO TestCopy<int,float>()
+  #MACRO TestCopy<int,double>()
+  #MACRO TestCopy<long,long>()
+  #MACRO TestCopy<long,float>()
+  #MACRO TestCopy<long,double>()
+  #MACRO TestCopy<float,float>()
+  #MACRO TestCopy<float,double>()
+  #MACRO TestCopy<double,double>()
+  #MACRO TestCopy<String,String>()
+  #MACRO GetSrcArr<boolean>()
+  #MACRO GetSrcArr<byte>()
+  #MACRO GetSrcArr<char>()
+  #MACRO GetSrcArr<short>()
+  #MACRO GetSrcArr<int>()
+  #MACRO GetSrcArr<long>()
+  #MACRO GetSrcArr<float>()
+  #MACRO GetSrcArr<double>()
+  #MACRO GetSrcArr<Boolean>()
+  #MACRO GetSrcArr<Byte>()
+  #MACRO GetSrcArr<Character>()
+  #MACRO GetSrcArr<Short>()
+  #MACRO GetSrcArr<Integer>()
+  #MACRO GetSrcArr<Long>()
+  #MACRO GetSrcArr<Float>()
+  #MACRO GetSrcArr<Double>()
+  #MACRO GetSrcArr<String>()
+}
+
+#MACRODEF TestCopy<SRC,DST>()
+@Test
+public void testSemiCheckedCopySRCDST() throws Throwable
+{
+
+  Random rand=new Random(0);
+  for(int i=0;i<1000;++i)
+  {
+    int srcLength=rand.nextInt(1000);
+    SRC[] src=getSRCArr(rand,srcLength);
+    int dstLength=srcLength+rand.nextInt(1000);
+    DST[] dst=new DST[dstLength];
+    int copyLength=rand.nextInt(srcLength+1);
+    int srcOffset=rand.nextInt(srcLength-copyLength+1);
+    int dstOffset=rand.nextInt(dstLength-copyLength+1);
+    ArrCopy.semicheckedCopy(src,srcOffset,dst,dstOffset,copyLength);
+    for(int j=0;j<copyLength;++j)
+    {
+#IFSWITCH SRC==boolean
+  #IFSWITCH DST==double,Double
+      Assert.assertTrue(dst[dstOffset+j]==TypeUtil.castToDouble(src[srcOffset+j]));
+  #ELSEIFSWITCH DST==float,Float
+      Assert.assertTrue(dst[dstOffset+j]==TypeUtil.castToFloat(src[srcOffset+j]));
+  #ELSEIFSWITCH DST==long,Long
+      Assert.assertTrue(dst[dstOffset+j]==TypeUtil.castToLong(src[srcOffset+j]));
+  #ELSEIFSWITCH DST==int,short,char,byte,Integer,Short,Character,Byte
+      Assert.assertTrue(dst[dstOffset+j]==TypeUtil.castToByte(src[srcOffset+j]));
+  #ELSEIFSWITCH DST==boolean,Boolean
+      Assert.assertTrue(dst[dstOffset+j]==src[srcOffset+j]);
+  #ENDIF
+#ELSE
+  #IFSWITCH DST==String
+      Assert.assertEquals(dst[dstOffset+j],src[srcOffset+j]);
+  #ELSEIFSWITCH DST==double,float
+      DST dstVal=dst[dstOffset+j];
+      if(dstVal==dstVal)
+      {
+        Assert.assertTrue(dstVal==src[srcOffset+j]);
+      }
+      else
+      {
+        Assert.assertTrue((dstVal=src[srcOffset+j])!=dstVal);
+      }
+  #ELSEIFSWITCH DST==Double,Float
+      #IFSWITCH DST==Double
+      double dstVal=dst[dstOffset+j];
+      #ELSE
+      float dstVal=dst[dstOffset+j];
+      #ENDIF
+      if(dstVal==dstVal)
+      {
+        
+      }
+  #ELSE
+      Assert.assertEquals(dst[dstOffset+j],src[srcOffset+j]);
+  #ENDIF
+#ENDIF
+    }
+  }
+}
+#ENDDEF
+#MACRODEF GetSrcArr<SRC>()
+private static SRC[] getSRCArr(Random rand,int length)
+{
+  SRC[] src=new SRC[length];
+  for(int i=0;i<length;++i)
+  {
+#IFSWITCH SRC==String
+    src[i]=Long.toString(rand.nextLong());
+#ELSEIFSWITCH SRC==double,Double
+    src[i]=rand.nextDouble();
+#ELSEIFSWITCH SRC==float,Float
+    src[i]=rand.nextFloat();
+#ELSEIFSWITCH SRC==long,Long
+    src[i]=rand.nextLong();
+#ELSEIFSWITCH SRC==int,Integer
+    src[i]=rand.nextInt();
+#ELSEIFSWITCH SRC==short,Short
+    src[i]=(short)(Short.MIN_VALUE+rand.nextInt(Short.MAX_VALUE-Short.MIN_VALUE));
+#ELSEIFSWITCH SRC==char,Character
+    src[i]=(char)(rand.nextInt(Character.MAX_VALUE));
+#ELSEIFSWITCH SRC==byte,Byte
+    src[i]=(byte)(Byte.MIN_VALUE+rand.nextInt(Byte.MAX_VALUE-Byte.MIN_VALUE));
+#ELSEIFSWITCH SRC==boolean,Boolean
+    src[i]=rand.nextBoolean();
+#ENDIF
+  }
+  return src;
+}
+#ENDDEF

@@ -1,0 +1,225 @@
+#TYPEDEF OfGeneric
+package omni.util;
+
+public interface ArrCopy
+{
+  #MACRO HomogenousUncheckedCopy<Object>()
+  #MACRO HomogenousUncheckedCopy<boolean>()
+  #MACRO HomogenousUncheckedCopy<byte>()
+  #MACRO HomogenousUncheckedCopy<char>()
+  #MACRO HomogenousUncheckedCopy<short>()
+  #MACRO HomogenousUncheckedCopy<int>()
+  #MACRO HomogenousUncheckedCopy<long>()
+  #MACRO HomogenousUncheckedCopy<float>()
+  #MACRO HomogenousUncheckedCopy<double>()
+  #MACRO SemicheckedCopy(SRC,DST,<SRC extends DST\,DST>)
+  #MACRO SemicheckedCopy(boolean,boolean,)
+  #MACRO SemicheckedCopy(byte,byte,)
+  #MACRO SemicheckedCopy(char,char,)
+  #MACRO SemicheckedCopy(short,short,)
+  #MACRO SemicheckedCopy(int,int,)
+  #MACRO SemicheckedCopy(long,long,)
+  #MACRO SemicheckedCopy(float,float,)
+  #MACRO SemicheckedCopy(double,double,)
+  
+  #MACRO SemicheckedCopy(Boolean,boolean,)
+  #MACRO SemicheckedCopy(Byte,byte,)
+  #MACRO SemicheckedCopy(Character,char,)
+  #MACRO SemicheckedCopy(Short,short,)
+  #MACRO SemicheckedCopy(Integer,int,)
+  #MACRO SemicheckedCopy(Long,long,)
+  #MACRO SemicheckedCopy(Float,float,)
+  #MACRO SemicheckedCopy(Double,double,)
+  #MACRO SemicheckedCopy(boolean,Boolean,)
+  #MACRO SemicheckedCopy(byte,Byte,)
+  #MACRO SemicheckedCopy(char,Character,)
+  #MACRO SemicheckedCopy(short,Short,)
+  #MACRO SemicheckedCopy(int,Integer,)
+  #MACRO SemicheckedCopy(long,Long,)
+  #MACRO SemicheckedCopy(float,Float,)
+  #MACRO SemicheckedCopy(double,Double,)
+  #MACRO SemicheckedCopy(boolean,Object,)
+  #MACRO SemicheckedCopy(byte,Object,)
+  #MACRO SemicheckedCopy(char,Object,)
+  #MACRO SemicheckedCopy(short,Object,)
+  #MACRO SemicheckedCopy(int,Object,)
+  #MACRO SemicheckedCopy(long,Object,)
+  #MACRO SemicheckedCopy(float,Object,)
+  #MACRO SemicheckedCopy(double,Object,)
+  #MACRO SemicheckedCopy(boolean,byte,)
+  #MACRO SemicheckedCopy(boolean,char,)
+  #MACRO SemicheckedCopy(boolean,short,)
+  #MACRO SemicheckedCopy(boolean,int,)
+  #MACRO SemicheckedCopy(boolean,long,)
+  #MACRO SemicheckedCopy(boolean,float,)
+  #MACRO SemicheckedCopy(boolean,double,)
+  #MACRO SemicheckedCopy(byte,short,)
+  #MACRO SemicheckedCopy(byte,int,)
+  #MACRO SemicheckedCopy(byte,long,)
+  #MACRO SemicheckedCopy(byte,float,)
+  #MACRO SemicheckedCopy(byte,double,)
+  #MACRO SemicheckedCopy(char,int,)
+  #MACRO SemicheckedCopy(char,long,)
+  #MACRO SemicheckedCopy(char,float,)
+  #MACRO SemicheckedCopy(char,double,)
+  #MACRO SemicheckedCopy(short,int,)
+  #MACRO SemicheckedCopy(short,long,)
+  #MACRO SemicheckedCopy(short,float,)
+  #MACRO SemicheckedCopy(short,double,)
+  #MACRO SemicheckedCopy(int,long,)
+  #MACRO SemicheckedCopy(int,float,)
+  #MACRO SemicheckedCopy(int,double,)
+  #MACRO SemicheckedCopy(long,float,)
+  #MACRO SemicheckedCopy(long,double,)
+  #MACRO SemicheckedCopy(float,double,)
+  
+  
+  #MACRO NonHomogenousUncheckedCopy(Boolean,boolean,)
+  #MACRO NonHomogenousUncheckedCopy(Byte,byte,)
+  #MACRO NonHomogenousUncheckedCopy(Character,char,)
+  #MACRO NonHomogenousUncheckedCopy(Short,short,)
+  #MACRO NonHomogenousUncheckedCopy(Integer,int,)
+  #MACRO NonHomogenousUncheckedCopy(Long,long,)
+  #MACRO NonHomogenousUncheckedCopy(Float,float,)
+  #MACRO NonHomogenousUncheckedCopy(Double,double,)
+  #MACRO NonHomogenousUncheckedCopy(boolean,Boolean,)
+  #MACRO NonHomogenousUncheckedCopy(byte,Byte,)
+  #MACRO NonHomogenousUncheckedCopy(char,Character,)
+  #MACRO NonHomogenousUncheckedCopy(short,Short,)
+  #MACRO NonHomogenousUncheckedCopy(int,Integer,)
+  #MACRO NonHomogenousUncheckedCopy(long,Long,)
+  #MACRO NonHomogenousUncheckedCopy(float,Float,)
+  #MACRO NonHomogenousUncheckedCopy(double,Double,)
+  #MACRO NonHomogenousUncheckedCopy(boolean,Object,)
+  #MACRO NonHomogenousUncheckedCopy(byte,Object,)
+  #MACRO NonHomogenousUncheckedCopy(char,Object,)
+  #MACRO NonHomogenousUncheckedCopy(short,Object,)
+  #MACRO NonHomogenousUncheckedCopy(int,Object,)
+  #MACRO NonHomogenousUncheckedCopy(long,Object,)
+  #MACRO NonHomogenousUncheckedCopy(float,Object,)
+  #MACRO NonHomogenousUncheckedCopy(double,Object,)
+  #MACRO NonHomogenousUncheckedCopy(boolean,byte,TypeUtil.castToByte)
+  #MACRO NonHomogenousUncheckedCopy(boolean,char,TypeUtil.castToChar)
+  #MACRO NonHomogenousUncheckedCopy(boolean,short,TypeUtil.castToByte)
+  #MACRO NonHomogenousUncheckedCopy(boolean,int,TypeUtil.castToByte)
+  #MACRO NonHomogenousUncheckedCopy(boolean,long,TypeUtil.castToLong)
+  #MACRO NonHomogenousUncheckedCopy(boolean,float,TypeUtil.castToFloat)
+  #MACRO NonHomogenousUncheckedCopy(boolean,double,TypeUtil.castToDouble)
+  #MACRO NonHomogenousUncheckedCopy(byte,short,)
+  #MACRO NonHomogenousUncheckedCopy(byte,int,)
+  #MACRO NonHomogenousUncheckedCopy(byte,long,)
+  #MACRO NonHomogenousUncheckedCopy(byte,float,)
+  #MACRO NonHomogenousUncheckedCopy(byte,double,)
+  #MACRO NonHomogenousUncheckedCopy(char,int,)
+  #MACRO NonHomogenousUncheckedCopy(char,long,)
+  #MACRO NonHomogenousUncheckedCopy(char,float,)
+  #MACRO NonHomogenousUncheckedCopy(char,double,)
+  #MACRO NonHomogenousUncheckedCopy(short,int,)
+  #MACRO NonHomogenousUncheckedCopy(short,long,)
+  #MACRO NonHomogenousUncheckedCopy(short,float,)
+  #MACRO NonHomogenousUncheckedCopy(short,double,)
+  #MACRO NonHomogenousUncheckedCopy(int,long,)
+  #MACRO NonHomogenousUncheckedCopy(int,float,)
+  #MACRO NonHomogenousUncheckedCopy(int,double,)
+  #MACRO NonHomogenousUncheckedCopy(long,float,)
+  #MACRO NonHomogenousUncheckedCopy(long,double,)
+  #MACRO NonHomogenousUncheckedCopy(float,double,)
+  #MACRO UncheckedReverseCopy(boolean,boolean,,)
+  #MACRO UncheckedReverseCopy(boolean,Boolean,,)
+  #MACRO UncheckedReverseCopy(boolean,Object,,)
+  #MACRO UncheckedReverseCopy(boolean,double,TypeUtil.castToDouble,)
+  #MACRO UncheckedReverseCopy(boolean,float,TypeUtil.castToFloat,)
+  #MACRO UncheckedReverseCopy(boolean,long,TypeUtil.castToLong,)
+  #MACRO UncheckedReverseCopy(boolean,int,TypeUtil.castToByte,)
+  #MACRO UncheckedReverseCopy(boolean,short,TypeUtil.castToByte,)
+  #MACRO UncheckedReverseCopy(boolean,char,TypeUtil.castToChar,)
+  #MACRO UncheckedReverseCopy(boolean,byte,TypeUtil.castToByte,)
+  #MACRO UncheckedReverseCopy(byte,byte,,)
+  #MACRO UncheckedReverseCopy(byte,Byte,,)
+  #MACRO UncheckedReverseCopy(byte,Object,,)
+  #MACRO UncheckedReverseCopy(byte,double,,)
+  #MACRO UncheckedReverseCopy(byte,float,,)
+  #MACRO UncheckedReverseCopy(byte,long,,)
+  #MACRO UncheckedReverseCopy(byte,int,,)
+  #MACRO UncheckedReverseCopy(byte,short,,)
+  #MACRO UncheckedReverseCopy(char,char,,)
+  #MACRO UncheckedReverseCopy(char,Character,,)
+  #MACRO UncheckedReverseCopy(char,Object,,)
+  #MACRO UncheckedReverseCopy(char,double,,)
+  #MACRO UncheckedReverseCopy(char,float,,)
+  #MACRO UncheckedReverseCopy(char,long,,)
+  #MACRO UncheckedReverseCopy(char,int,,)
+  #MACRO UncheckedReverseCopy(short,short,,)
+  #MACRO UncheckedReverseCopy(short,Short,,)
+  #MACRO UncheckedReverseCopy(short,Object,,)
+  #MACRO UncheckedReverseCopy(short,double,,)
+  #MACRO UncheckedReverseCopy(short,float,,)
+  #MACRO UncheckedReverseCopy(short,long,,)
+  #MACRO UncheckedReverseCopy(short,int,,)
+  #MACRO UncheckedReverseCopy(int,int,,)
+  #MACRO UncheckedReverseCopy(int,Integer,,)
+  #MACRO UncheckedReverseCopy(int,Object,,)
+  #MACRO UncheckedReverseCopy(int,double,,)
+  #MACRO UncheckedReverseCopy(int,float,,)
+  #MACRO UncheckedReverseCopy(int,long,,)
+  #MACRO UncheckedReverseCopy(long,long,,)
+  #MACRO UncheckedReverseCopy(long,Long,,)
+  #MACRO UncheckedReverseCopy(long,Object,,)
+  #MACRO UncheckedReverseCopy(long,double,,)
+  #MACRO UncheckedReverseCopy(long,float,,)
+  #MACRO UncheckedReverseCopy(float,float,,)
+  #MACRO UncheckedReverseCopy(float,Float,,)
+  #MACRO UncheckedReverseCopy(float,Object,,)
+  #MACRO UncheckedReverseCopy(float,double,,)
+  #MACRO UncheckedReverseCopy(double,double,,)
+  #MACRO UncheckedReverseCopy(double,Double,,)
+  #MACRO UncheckedReverseCopy(double,Object,,)
+  #MACRO UncheckedReverseCopy(SRC,DST,,<SRC extends DST\,DST>)
+  
+}
+#MACRODEF NonHomogenousUncheckedCopy(SRCARR,DSTARR,CAST)
+static void uncheckedCopy(SRCARR[] src,int srcOffset,DSTARR[] dst,int dstOffset,int length)
+{
+  for(dst[dstOffset+=--length]=(DSTARR)CAST(src[length+=srcOffset]);length!=srcOffset;dst[--dstOffset]=(DSTARR)CAST(src[--length])){}
+}
+#ENDDEF
+#MACRODEF UncheckedReverseCopy(SRCARR,DSTARR,CAST,GENERICPARAM)
+static GENERICPARAM void uncheckedReverseCopy(SRCARR[] src,int srcOffset,DSTARR[] dst,int dstOffset,int length)
+{
+  for(dst[dstOffset]=(DSTARR)CAST(src[length+=(srcOffset-1)]);length!=srcOffset;dst[++dstOffset]=(DSTARR)CAST(src[--length])){}
+}
+#ENDDEF
+#MACRODEF HomogenousUncheckedCopy<ARR>()
+#IFSWITCH ARR==Object
+static <SRC extends DST,DST> void uncheckedCopy(SRC[] src,int srcOffset,DST[] dst,int dstOffset,int length)
+#ELSE
+static void uncheckedCopy(ARR[] src,int srcOffset,ARR[] dst,int dstOffset,int length)
+#ENDIF
+{
+  switch(length)
+  {
+  case 5:
+    dst[dstOffset+4]=src[srcOffset+4];
+  case 4:
+    dst[dstOffset+3]=src[srcOffset+3];
+  case 3:
+    dst[dstOffset+2]=src[srcOffset+2];
+  case 2:
+    dst[dstOffset+1]=src[srcOffset+1];
+  case 1:
+    dst[dstOffset]=src[srcOffset];
+    return;
+  default:
+    System.arraycopy(src,srcOffset,dst,dstOffset,length);
+  }
+}
+#ENDDEF
+#MACRODEF SemicheckedCopy(SRCARR,DSTARR,GENERICPARAM)
+static GENERICPARAM void semicheckedCopy(SRCARR[] src,int srcOffset,DSTARR[] dst,int dstOffset,int length)
+{
+  if(length!=0)
+  {
+    uncheckedCopy(src,srcOffset,dst,dstOffset,length);
+  }
+}
+#ENDDEF

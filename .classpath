@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="src" path="Omni-API/src"/>
+	<classpathentry kind="src" path="Omni-CodeGenerator/src"/>
+	<classpathentry kind="src" path="Omni-Function/src-generated"/>
+	<classpathentry kind="src" path="Omni-Impl/src"/>
+	<classpathentry kind="src" path="Omni-Impl/src-generated"/>
+	<classpathentry kind="src" path="Omni-Util/src"/>
+	<classpathentry kind="src" path="Omni-Util/src-generated"/>
+	<classpathentry kind="output" path="Omni-API/bin"/>
+</classpath>

@@ -2,9 +2,13 @@ package omni.codegen;
 import java.util.ArrayList;
 import java.util.List;
 enum TypeDefinition{
-    OfRef(getOfRef()),OfDouble(getOfDouble()),OfFloat(getOfFloat()),OfLong(getOfLong()),OfInt(getOfInt()),
+    OfGeneric(getOfGeneric()),OfRef(getOfRef()),OfDouble(getOfDouble()),OfFloat(getOfFloat()),OfLong(getOfLong()),
+    OfInt(getOfInt()),
     OfShort(getOfShort()),OfChar(getOfChar()),OfByte(getOfByte()),OfBoolean(getOfBoolean());
     final List<DefVar> definitionVars;
+    private static List<DefVar> getOfGeneric(){
+        return new ArrayList<>();
+    }
     private static List<DefVar> getOfBoolean(){
         final List<DefVar> defVars=new ArrayList<>();
         defVars.add(new DefVar("<E>",""));
