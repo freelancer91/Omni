@@ -50,7 +50,7 @@ import omni.function.$UnaryOperator$;
   #ENDIF
 #ENDIF
 #IFNOT OfBoolean
-import omni.util.$ClassPrefix$SortUtil;
+import omni.util.SortUtil;
 #ENDIF
 #IF OfRef
 public abstract class $ClassPrefix$DblLnkSeq$<E>$ extends AbstractSeq implements OmniList.Of$ClassPrefix$$<E>$
@@ -2584,7 +2584,7 @@ private void uncheckedMethodName(int size,Node$<E>$ end,$Comparator$$<? super E>
 {
   $ArrayType$[] tmpArr;
   uncheckedCopyForward(tmpArr=new $ArrayType$[size],0,size);
-  $ClassPrefix$SortUtil.uncheckedMethodName(tmpArr,0,size-1,sorter);
+  SortUtil.uncheckedMethodName(tmpArr,0,size-1,sorter);
   copyFromArray(tmpArr,0,size);
 }
   #ENDIF
@@ -2708,7 +2708,7 @@ private void uncheckedMethodName(int size,Node$<E>$ end)
     //doSort
     $ArrayType$[] tmpArr;
     uncheckedCopyForward(tmpArr=new $ArrayType$[size],0,size);
-    $ClassPrefix$SortUtil.doMethodName(tmpArr,0,size-1);
+    SortUtil.doMethodName(tmpArr,0,size-1);
     copyFromArray(tmpArr,0,size);
   }
   else
@@ -2718,7 +2718,7 @@ private void uncheckedMethodName(int size,Node$<E>$ end)
     #ELSE
   $ArrayType$[] tmpArr;
   uncheckedCopyForward(tmpArr=new $ArrayType$[size],0,size);
-  $ClassPrefix$SortUtil.uncheckedMethodName(tmpArr,0,size-1);
+  SortUtil.uncheckedMethodName(tmpArr,0,size-1);
   copyFromArray(tmpArr,0,size);
     #ENDIF
 }

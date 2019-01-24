@@ -19,7 +19,7 @@ import omni.function.DoubleComparator;
 import java.util.function.DoubleConsumer;
 import java.util.function.DoublePredicate;
 import java.util.function.DoubleUnaryOperator;
-import omni.util.DoubleSortUtil;
+import omni.util.SortUtil;
 public abstract class DoubleDblLnkSeq extends AbstractDoubleList implements OmniList.OfDouble
 {
   private static  boolean uncheckedcontains0(Node begin,Node end)
@@ -5995,21 +5995,21 @@ public abstract class DoubleDblLnkSeq extends AbstractDoubleList implements Omni
     {
       double[] tmpArr;
       uncheckedCopyForward(tmpArr=new double[size],0,size);
-      DoubleSortUtil.uncheckedsort(tmpArr,0,size-1);
+      SortUtil.uncheckedsort(tmpArr,0,size-1);
       copyFromArray(tmpArr,0,size);
     }
     private void uncheckedreverseSort(int size,Node end)
     {
       double[] tmpArr;
       uncheckedCopyForward(tmpArr=new double[size],0,size);
-      DoubleSortUtil.uncheckedreverseSort(tmpArr,0,size-1);
+      SortUtil.uncheckedreverseSort(tmpArr,0,size-1);
       copyFromArray(tmpArr,0,size);
     }
     private void uncheckedcomparatorSort(int size,Node end,DoubleComparator sorter)
     {
       double[] tmpArr;
       uncheckedCopyForward(tmpArr=new double[size],0,size);
-      DoubleSortUtil.uncheckedcomparatorSort(tmpArr,0,size-1,sorter);
+      SortUtil.uncheckedcomparatorSort(tmpArr,0,size-1,sorter);
       copyFromArray(tmpArr,0,size);
     }
     private void uncheckedCopyForward(double[] dst,int dstOffset,int length)

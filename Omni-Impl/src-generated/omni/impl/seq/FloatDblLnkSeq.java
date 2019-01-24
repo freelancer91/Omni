@@ -19,7 +19,7 @@ import omni.function.FloatComparator;
 import omni.function.FloatPredicate;
 import omni.function.FloatConsumer;
 import omni.function.FloatUnaryOperator;
-import omni.util.FloatSortUtil;
+import omni.util.SortUtil;
 public abstract class FloatDblLnkSeq extends AbstractFloatList implements OmniList.OfFloat
 {
   private static  boolean uncheckedcontains0(Node begin,Node end)
@@ -6324,21 +6324,21 @@ public abstract class FloatDblLnkSeq extends AbstractFloatList implements OmniLi
     {
       float[] tmpArr;
       uncheckedCopyForward(tmpArr=new float[size],0,size);
-      FloatSortUtil.uncheckedsort(tmpArr,0,size-1);
+      SortUtil.uncheckedsort(tmpArr,0,size-1);
       copyFromArray(tmpArr,0,size);
     }
     private void uncheckedreverseSort(int size,Node end)
     {
       float[] tmpArr;
       uncheckedCopyForward(tmpArr=new float[size],0,size);
-      FloatSortUtil.uncheckedreverseSort(tmpArr,0,size-1);
+      SortUtil.uncheckedreverseSort(tmpArr,0,size-1);
       copyFromArray(tmpArr,0,size);
     }
     private void uncheckedcomparatorSort(int size,Node end,FloatComparator sorter)
     {
       float[] tmpArr;
       uncheckedCopyForward(tmpArr=new float[size],0,size);
-      FloatSortUtil.uncheckedcomparatorSort(tmpArr,0,size-1,sorter);
+      SortUtil.uncheckedcomparatorSort(tmpArr,0,size-1,sorter);
       copyFromArray(tmpArr,0,size);
     }
     private void uncheckedCopyForward(float[] dst,int dstOffset,int length)

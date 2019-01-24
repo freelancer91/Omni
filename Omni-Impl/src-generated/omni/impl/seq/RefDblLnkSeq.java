@@ -14,7 +14,7 @@ import java.util.NoSuchElementException;
 import omni.util.BitSetUtils;
 import java.util.Objects;
 import omni.util.OmniPred;
-import omni.util.RefSortUtil;
+import omni.util.SortUtil;
 public abstract class RefDblLnkSeq<E> extends AbstractSeq implements OmniList.OfRef<E>
 {
   private static <E> boolean uncheckedcontains(Node<E> begin,Node<E> end,Predicate<Object> pred)
@@ -6286,21 +6286,21 @@ public abstract class RefDblLnkSeq<E> extends AbstractSeq implements OmniList.Of
     {
       Object[] tmpArr;
       uncheckedCopyForward(tmpArr=new Object[size],0,size);
-      RefSortUtil.uncheckedsort(tmpArr,0,size-1);
+      SortUtil.uncheckedsort(tmpArr,0,size-1);
       copyFromArray(tmpArr,0,size);
     }
     private void uncheckedreverseSort(int size,Node<E> end)
     {
       Object[] tmpArr;
       uncheckedCopyForward(tmpArr=new Object[size],0,size);
-      RefSortUtil.uncheckedreverseSort(tmpArr,0,size-1);
+      SortUtil.uncheckedreverseSort(tmpArr,0,size-1);
       copyFromArray(tmpArr,0,size);
     }
     private void uncheckedcomparatorSort(int size,Node<E> end,Comparator<? super E> sorter)
     {
       Object[] tmpArr;
       uncheckedCopyForward(tmpArr=new Object[size],0,size);
-      RefSortUtil.uncheckedcomparatorSort(tmpArr,0,size-1,sorter);
+      SortUtil.uncheckedcomparatorSort(tmpArr,0,size-1,sorter);
       copyFromArray(tmpArr,0,size);
     }
     private void uncheckedCopyForward(Object[] dst,int dstOffset,int length)

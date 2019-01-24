@@ -4,6 +4,7 @@ package omni.util;
 import org.junit.Test;
 import org.junit.Assert;
 import java.util.Random;
+import java.util.Objects;
 
 public class ArrCopyTest
 {
@@ -16,9 +17,19 @@ public class ArrCopyTest
   #MACRO TestCopy<float,Float>()
   #MACRO TestCopy<double,Double>()
   
+  #MACRO TestCopy<boolean,Object>()
+  #MACRO TestCopy<byte,Object>()
+  #MACRO TestCopy<char,Object>()
+  #MACRO TestCopy<short,Object>()
+  #MACRO TestCopy<int,Object>()
+  #MACRO TestCopy<long,Object>()
+  #MACRO TestCopy<float,Object>()
+  #MACRO TestCopy<double,Object>()
+  
+  
   #MACRO TestCopy<Boolean,boolean>()
   #MACRO TestCopy<Byte,byte>()
-  #MACRO TestCopy<Character,car>()
+  #MACRO TestCopy<Character,char>()
   #MACRO TestCopy<Short,short>()
   #MACRO TestCopy<Integer,int>()
   #MACRO TestCopy<Long,long>()
@@ -78,7 +89,19 @@ public class ArrCopyTest
   #MACRO GetSrcArr<Double>()
   #MACRO GetSrcArr<String>()
 }
-
+#MACRODEF IsEqual(src,dst)
+#IFSWITCH DST==Object
+Assert.assertTrue(Objects.equals(src,dst));
+#ELSEIFSWITCH SRC==boolean
+  #IFSWITCH DST==byte,char,short,int,long,float,double
+Assert.assertTrue(TypeUtil.castToByte(src)==dst);
+  #ELSE
+Assert.assertTrue(src==dst);
+  #ENDIF
+#ELSE
+Assert.assertTrue(src==dst);
+#ENDIF
+#ENDDEF
 #MACRODEF TestCopy<SRC,DST>()
 @Test
 public void testSemiCheckedCopySRCDST() throws Throwable
@@ -97,45 +120,28 @@ public void testSemiCheckedCopySRCDST() throws Throwable
     ArrCopy.semicheckedCopy(src,srcOffset,dst,dstOffset,copyLength);
     for(int j=0;j<copyLength;++j)
     {
-#IFSWITCH SRC==boolean
-  #IFSWITCH DST==double,Double
-      Assert.assertTrue(dst[dstOffset+j]==TypeUtil.castToDouble(src[srcOffset+j]));
-  #ELSEIFSWITCH DST==float,Float
-      Assert.assertTrue(dst[dstOffset+j]==TypeUtil.castToFloat(src[srcOffset+j]));
-  #ELSEIFSWITCH DST==long,Long
-      Assert.assertTrue(dst[dstOffset+j]==TypeUtil.castToLong(src[srcOffset+j]));
-  #ELSEIFSWITCH DST==int,short,char,byte,Integer,Short,Character,Byte
-      Assert.assertTrue(dst[dstOffset+j]==TypeUtil.castToByte(src[srcOffset+j]));
-  #ELSEIFSWITCH DST==boolean,Boolean
-      Assert.assertTrue(dst[dstOffset+j]==src[srcOffset+j]);
-  #ENDIF
-#ELSE
-  #IFSWITCH DST==String
-      Assert.assertEquals(dst[dstOffset+j],src[srcOffset+j]);
-  #ELSEIFSWITCH DST==double,float
-      DST dstVal=dst[dstOffset+j];
-      if(dstVal==dstVal)
-      {
-        Assert.assertTrue(dstVal==src[srcOffset+j]);
-      }
-      else
-      {
-        Assert.assertTrue((dstVal=src[srcOffset+j])!=dstVal);
-      }
-  #ELSEIFSWITCH DST==Double,Float
-      #IFSWITCH DST==Double
-      double dstVal=dst[dstOffset+j];
-      #ELSE
-      float dstVal=dst[dstOffset+j];
-      #ENDIF
-      if(dstVal==dstVal)
-      {
-        
-      }
-  #ELSE
-      Assert.assertEquals(dst[dstOffset+j],src[srcOffset+j]);
-  #ENDIF
-#ENDIF
+      #MACRO IsEqual(src[srcOffset+j],dst[dstOffset+j])
+    }
+  }
+}
+@Test
+public void testSemiCheckedReverseCopySRCDST() throws Throwable
+{
+
+  Random rand=new Random(0);
+  for(int i=0;i<1000;++i)
+  {
+    int srcLength=rand.nextInt(1000);
+    SRC[] src=getSRCArr(rand,srcLength);
+    int dstLength=srcLength+rand.nextInt(1000);
+    DST[] dst=new DST[dstLength];
+    int copyLength=rand.nextInt(srcLength+1);
+    int srcOffset=rand.nextInt(srcLength-copyLength+1);
+    int dstOffset=rand.nextInt(dstLength-copyLength+1);
+    ArrCopy.semicheckedReverseCopy(src,srcOffset,dst,dstOffset,copyLength);
+    for(int j=0;j<copyLength;++j)
+    {
+      #MACRO IsEqual(src[srcOffset+copyLength-1-j],dst[dstOffset+j])
     }
   }
 }

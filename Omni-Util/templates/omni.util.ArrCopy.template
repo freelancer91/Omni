@@ -124,78 +124,53 @@ public interface ArrCopy
   #MACRO NonHomogenousUncheckedCopy(long,float,)
   #MACRO NonHomogenousUncheckedCopy(long,double,)
   #MACRO NonHomogenousUncheckedCopy(float,double,)
-  #MACRO UncheckedReverseCopy(boolean,boolean,,)
-  #MACRO UncheckedReverseCopy(boolean,Boolean,,)
-  #MACRO UncheckedReverseCopy(boolean,Object,,)
-  #MACRO UncheckedReverseCopy(boolean,double,TypeUtil.castToDouble,)
-  #MACRO UncheckedReverseCopy(boolean,float,TypeUtil.castToFloat,)
-  #MACRO UncheckedReverseCopy(boolean,long,TypeUtil.castToLong,)
-  #MACRO UncheckedReverseCopy(boolean,int,TypeUtil.castToByte,)
-  #MACRO UncheckedReverseCopy(boolean,short,TypeUtil.castToByte,)
-  #MACRO UncheckedReverseCopy(boolean,char,TypeUtil.castToChar,)
-  #MACRO UncheckedReverseCopy(boolean,byte,TypeUtil.castToByte,)
-  #MACRO UncheckedReverseCopy(byte,byte,,)
-  #MACRO UncheckedReverseCopy(byte,Byte,,)
-  #MACRO UncheckedReverseCopy(byte,Object,,)
-  #MACRO UncheckedReverseCopy(byte,double,,)
-  #MACRO UncheckedReverseCopy(byte,float,,)
-  #MACRO UncheckedReverseCopy(byte,long,,)
-  #MACRO UncheckedReverseCopy(byte,int,,)
-  #MACRO UncheckedReverseCopy(byte,short,,)
-  #MACRO UncheckedReverseCopy(char,char,,)
-  #MACRO UncheckedReverseCopy(char,Character,,)
-  #MACRO UncheckedReverseCopy(char,Object,,)
-  #MACRO UncheckedReverseCopy(char,double,,)
-  #MACRO UncheckedReverseCopy(char,float,,)
-  #MACRO UncheckedReverseCopy(char,long,,)
-  #MACRO UncheckedReverseCopy(char,int,,)
-  #MACRO UncheckedReverseCopy(short,short,,)
-  #MACRO UncheckedReverseCopy(short,Short,,)
-  #MACRO UncheckedReverseCopy(short,Object,,)
-  #MACRO UncheckedReverseCopy(short,double,,)
-  #MACRO UncheckedReverseCopy(short,float,,)
-  #MACRO UncheckedReverseCopy(short,long,,)
-  #MACRO UncheckedReverseCopy(short,int,,)
-  #MACRO UncheckedReverseCopy(int,int,,)
-  #MACRO UncheckedReverseCopy(int,Integer,,)
-  #MACRO UncheckedReverseCopy(int,Object,,)
-  #MACRO UncheckedReverseCopy(int,double,,)
-  #MACRO UncheckedReverseCopy(int,float,,)
-  #MACRO UncheckedReverseCopy(int,long,,)
-  #MACRO UncheckedReverseCopy(long,long,,)
-  #MACRO UncheckedReverseCopy(long,Long,,)
-  #MACRO UncheckedReverseCopy(long,Object,,)
-  #MACRO UncheckedReverseCopy(long,double,,)
-  #MACRO UncheckedReverseCopy(long,float,,)
-  #MACRO UncheckedReverseCopy(float,float,,)
-  #MACRO UncheckedReverseCopy(float,Float,,)
-  #MACRO UncheckedReverseCopy(float,Object,,)
-  #MACRO UncheckedReverseCopy(float,double,,)
-  #MACRO UncheckedReverseCopy(double,double,,)
-  #MACRO UncheckedReverseCopy(double,Double,,)
-  #MACRO UncheckedReverseCopy(double,Object,,)
-  #MACRO UncheckedReverseCopy(SRC,DST,,<SRC extends DST\,DST>)
   
 }
 #MACRODEF NonHomogenousUncheckedCopy(SRCARR,DSTARR,CAST)
+static void uncheckedReverseCopy(SRCARR[] src,int srcOffset,DSTARR[] dst,int dstOffset,int length)
+{
+  //assert srcOffset>=0;
+  //assert dstOffset>=0;
+  //assert length>0;
+  //assert srcOffset+length<=src.length;
+  //assert dstOffset+length<=dst.length;
+  for(dst[dstOffset]=(DSTARR)CAST(src[length+=(srcOffset-1)]);length!=srcOffset;dst[++dstOffset]=(DSTARR)CAST(src[--length])){}
+}
 static void uncheckedCopy(SRCARR[] src,int srcOffset,DSTARR[] dst,int dstOffset,int length)
 {
+  //assert srcOffset>=0;
+  //assert dstOffset>=0;
+  //assert length>0;
+  //assert srcOffset+length<=src.length;
+  //assert dstOffset+length<=dst.length;
   for(dst[dstOffset+=--length]=(DSTARR)CAST(src[length+=srcOffset]);length!=srcOffset;dst[--dstOffset]=(DSTARR)CAST(src[--length])){}
 }
 #ENDDEF
-#MACRODEF UncheckedReverseCopy(SRCARR,DSTARR,CAST,GENERICPARAM)
-static GENERICPARAM void uncheckedReverseCopy(SRCARR[] src,int srcOffset,DSTARR[] dst,int dstOffset,int length)
-{
-  for(dst[dstOffset]=(DSTARR)CAST(src[length+=(srcOffset-1)]);length!=srcOffset;dst[++dstOffset]=(DSTARR)CAST(src[--length])){}
-}
-#ENDDEF
 #MACRODEF HomogenousUncheckedCopy<ARR>()
+#IFSWITCH ARR==Object
+static <SRC extends DST,DST> void uncheckedReverseCopy(SRC[] src,int srcOffset,DST[] dst,int dstOffset,int length)
+#ELSE
+static void uncheckedReverseCopy(ARR[] src,int srcOffset,ARR[] dst,int dstOffset,int length)
+#ENDIF
+{
+  //assert srcOffset>=0;
+  //assert dstOffset>=0;
+  //assert length>0;
+  //assert srcOffset+length<=src.length;
+  //assert dstOffset+length<=dst.length;
+  for(dst[dstOffset]=(src[length+=(srcOffset-1)]);length!=srcOffset;dst[++dstOffset]=(src[--length])){}
+}
 #IFSWITCH ARR==Object
 static <SRC extends DST,DST> void uncheckedCopy(SRC[] src,int srcOffset,DST[] dst,int dstOffset,int length)
 #ELSE
 static void uncheckedCopy(ARR[] src,int srcOffset,ARR[] dst,int dstOffset,int length)
 #ENDIF
 {
+  //assert srcOffset>=0;
+  //assert dstOffset>=0;
+  //assert length>0;
+  //assert srcOffset+length<=src.length;
+  //assert dstOffset+length<=dst.length;
   switch(length)
   {
   case 5:
@@ -215,8 +190,25 @@ static void uncheckedCopy(ARR[] src,int srcOffset,ARR[] dst,int dstOffset,int le
 }
 #ENDDEF
 #MACRODEF SemicheckedCopy(SRCARR,DSTARR,GENERICPARAM)
+static GENERICPARAM void semicheckedReverseCopy(SRCARR[] src,int srcOffset,DSTARR[] dst,int dstOffset,int length)
+{
+  //assert srcOffset>=0;
+  //assert dstOffset>=0;
+  //assert length>=0;
+  //assert srcOffset+length<=src.length;
+  //assert dstOffset+length<=dst.length;
+  if(length!=0)
+  {
+    uncheckedReverseCopy(src,srcOffset,dst,dstOffset,length);
+  }
+}
 static GENERICPARAM void semicheckedCopy(SRCARR[] src,int srcOffset,DSTARR[] dst,int dstOffset,int length)
 {
+  //assert srcOffset>=0;
+  //assert dstOffset>=0;
+  //assert length>=0;
+  //assert srcOffset+length<=src.length;
+  //assert dstOffset+length<=dst.length;
   if(length!=0)
   {
     uncheckedCopy(src,srcOffset,dst,dstOffset,length);

@@ -13,7 +13,7 @@ import omni.api.OmniListIterator;
 import omni.impl.CheckedCollection;
 import omni.util.ArrCopy;
 import omni.util.OmniArray;
-import omni.util.RefSortUtil;
+import omni.util.SortUtil;
 import omni.impl.seq.AbstractSeq;
 import omni.util.BitSetUtils;
 import java.util.Objects;
@@ -1717,7 +1717,7 @@ public abstract class RefArrSeq<E> extends AbstractSeq implements OmniCollection
         int modCount=this.modCount;
         try
         {
-          RefSortUtil.uncheckedcomparatorSort(arr,0,size-1,sorter);
+          SortUtil.uncheckedcomparatorSort(arr,0,size-1,sorter);
         }
         finally
         {
@@ -1734,7 +1734,7 @@ public abstract class RefArrSeq<E> extends AbstractSeq implements OmniCollection
         int modCount=this.modCount;
         try
         {
-          RefSortUtil.uncheckedreverseSort(arr,0,size-1);
+          SortUtil.uncheckedreverseSort(arr,0,size-1);
         }
         finally
         {
@@ -1751,7 +1751,7 @@ public abstract class RefArrSeq<E> extends AbstractSeq implements OmniCollection
         int modCount=this.modCount;
         try
         {
-          RefSortUtil.uncheckedsort(arr,0,size-1);
+          SortUtil.uncheckedsort(arr,0,size-1);
         }
         finally
         {
@@ -3067,7 +3067,7 @@ public abstract class RefArrSeq<E> extends AbstractSeq implements OmniCollection
           int modCount=this.modCount;
           try
           {
-            final int rootOffset;RefSortUtil.uncheckedcomparatorSort(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,sorter);
+            final int rootOffset;SortUtil.uncheckedcomparatorSort(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,sorter);
           }
           finally
           {
@@ -3092,7 +3092,7 @@ public abstract class RefArrSeq<E> extends AbstractSeq implements OmniCollection
           int modCount=this.modCount;
           try
           {
-            final int rootOffset;RefSortUtil.uncheckedreverseSort(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
+            final int rootOffset;SortUtil.uncheckedreverseSort(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
           }
           finally
           {
@@ -3117,7 +3117,7 @@ public abstract class RefArrSeq<E> extends AbstractSeq implements OmniCollection
           int modCount=this.modCount;
           try
           {
-            final int rootOffset;RefSortUtil.uncheckedsort(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
+            final int rootOffset;SortUtil.uncheckedsort(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
           }
           finally
           {
@@ -3879,7 +3879,7 @@ public abstract class RefArrSeq<E> extends AbstractSeq implements OmniCollection
       final int size;
       if(1<((size=this.size)))
       {
-        RefSortUtil.uncheckedreverseSort(arr,0,size-1);
+        SortUtil.uncheckedreverseSort(arr,0,size-1);
       }
     }
     @Override
@@ -3888,7 +3888,7 @@ public abstract class RefArrSeq<E> extends AbstractSeq implements OmniCollection
       final int size;
       if(1<((size=this.size)))
       {
-        RefSortUtil.uncheckedsort(arr,0,size-1);
+        SortUtil.uncheckedsort(arr,0,size-1);
       }
     }
     @Override
@@ -3897,7 +3897,7 @@ public abstract class RefArrSeq<E> extends AbstractSeq implements OmniCollection
       final int size;
       if(1<((size=this.size)))
       {
-        RefSortUtil.uncheckedcomparatorSort(arr,0,size-1,sorter);
+        SortUtil.uncheckedcomparatorSort(arr,0,size-1,sorter);
       }
     }
     @Override
@@ -4996,7 +4996,7 @@ public abstract class RefArrSeq<E> extends AbstractSeq implements OmniCollection
         if(1<((size=this.size)))
         {
           final int rootOffset;
-          RefSortUtil.uncheckedreverseSort(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
+          SortUtil.uncheckedreverseSort(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
         }
       }
       @Override
@@ -5006,7 +5006,7 @@ public abstract class RefArrSeq<E> extends AbstractSeq implements OmniCollection
         if(1<((size=this.size)))
         {
           final int rootOffset;
-          RefSortUtil.uncheckedsort(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
+          SortUtil.uncheckedsort(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
         }
       }
       @Override
@@ -5016,7 +5016,7 @@ public abstract class RefArrSeq<E> extends AbstractSeq implements OmniCollection
         if(1<((size=this.size)))
         {
           final int rootOffset;
-          RefSortUtil.uncheckedcomparatorSort(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,sorter);
+          SortUtil.uncheckedcomparatorSort(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,sorter);
         }
       }
       @Override

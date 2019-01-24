@@ -13,7 +13,7 @@ import omni.api.OmniListIterator;
 import omni.impl.CheckedCollection;
 import omni.util.ArrCopy;
 import omni.util.OmniArray;
-import omni.util.ByteSortUtil;
+import omni.util.SortUtil;
 import omni.impl.seq.AbstractByteList;
 import omni.impl.AbstractByteItr;
 import omni.util.BitSetUtils;
@@ -1409,7 +1409,7 @@ public abstract class ByteArrSeq extends AbstractByteList implements OmniCollect
         int modCount=this.modCount;
         try
         {
-          ByteSortUtil.uncheckedcomparatorSort(arr,0,size-1,sorter);
+          SortUtil.uncheckedcomparatorSort(arr,0,size-1,sorter);
         }
         finally
         {
@@ -1445,7 +1445,7 @@ public abstract class ByteArrSeq extends AbstractByteList implements OmniCollect
         int modCount=this.modCount;
         try
         {
-          ByteSortUtil.uncheckedcomparatorSort(arr,0,size-1,sorter::compare);
+          SortUtil.uncheckedcomparatorSort(arr,0,size-1,sorter::compare);
         }
         finally
         {
@@ -1459,7 +1459,7 @@ public abstract class ByteArrSeq extends AbstractByteList implements OmniCollect
       final int size;
       if((size=this.size)>1)
       {
-         ByteSortUtil.uncheckedreverseSort(arr,0,size-1);
+         SortUtil.uncheckedreverseSort(arr,0,size-1);
          ++this.modCount;
       }
     }
@@ -1468,7 +1468,7 @@ public abstract class ByteArrSeq extends AbstractByteList implements OmniCollect
       final int size;
       if((size=this.size)>1)
       {
-         ByteSortUtil.uncheckedsort(arr,0,size-1);
+         SortUtil.uncheckedsort(arr,0,size-1);
          ++this.modCount;
       }
     }
@@ -2441,7 +2441,7 @@ public abstract class ByteArrSeq extends AbstractByteList implements OmniCollect
           int modCount=this.modCount;
           try
           {
-            final int rootOffset;ByteSortUtil.uncheckedcomparatorSort(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,sorter);
+            final int rootOffset;SortUtil.uncheckedcomparatorSort(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,sorter);
           }
           finally
           {
@@ -2466,7 +2466,7 @@ public abstract class ByteArrSeq extends AbstractByteList implements OmniCollect
         if((size=this.size)>1)
         {
           final int rootOffset;
-          ByteSortUtil.uncheckedreverseSort(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
+          SortUtil.uncheckedreverseSort(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
               root.modCount=++modCount;
               bubbleUpIncrementModCount(parent);
               this.modCount=modCount;
@@ -2482,7 +2482,7 @@ public abstract class ByteArrSeq extends AbstractByteList implements OmniCollect
         if((size=this.size)>1)
         {
           final int rootOffset;
-          ByteSortUtil.uncheckedsort(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
+          SortUtil.uncheckedsort(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
               root.modCount=++modCount;
               bubbleUpIncrementModCount(parent);
               this.modCount=modCount;
@@ -2534,7 +2534,7 @@ public abstract class ByteArrSeq extends AbstractByteList implements OmniCollect
           int modCount=this.modCount;
           try
           {
-            final int rootOffset;ByteSortUtil.uncheckedcomparatorSort(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,sorter::compare);
+            final int rootOffset;SortUtil.uncheckedcomparatorSort(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,sorter::compare);
           }
           finally
           {
@@ -3375,7 +3375,7 @@ public abstract class ByteArrSeq extends AbstractByteList implements OmniCollect
       final int size;
       if(1<((size=this.size)))
       {
-        ByteSortUtil.uncheckedreverseSort(arr,0,size-1);
+        SortUtil.uncheckedreverseSort(arr,0,size-1);
       }
     }
     @Override
@@ -3384,7 +3384,7 @@ public abstract class ByteArrSeq extends AbstractByteList implements OmniCollect
       final int size;
       if(1<((size=this.size)))
       {
-        ByteSortUtil.uncheckedsort(arr,0,size-1);
+        SortUtil.uncheckedsort(arr,0,size-1);
       }
     }
     @Override
@@ -3393,7 +3393,7 @@ public abstract class ByteArrSeq extends AbstractByteList implements OmniCollect
       final int size;
       if(1<((size=this.size)))
       {
-        ByteSortUtil.uncheckedcomparatorSort(arr,0,size-1,sorter);
+        SortUtil.uncheckedcomparatorSort(arr,0,size-1,sorter);
       }
     }
     @Override
@@ -3411,7 +3411,7 @@ public abstract class ByteArrSeq extends AbstractByteList implements OmniCollect
       final int size;
       if(1<((size=this.size)))
       {
-        ByteSortUtil.uncheckedcomparatorSort(arr,0,size-1,sorter::compare);
+        SortUtil.uncheckedcomparatorSort(arr,0,size-1,sorter::compare);
       }
     }
     @Override
@@ -4248,7 +4248,7 @@ public abstract class ByteArrSeq extends AbstractByteList implements OmniCollect
         if(1<((size=this.size)))
         {
           final int rootOffset;
-          ByteSortUtil.uncheckedreverseSort(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
+          SortUtil.uncheckedreverseSort(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
         }
       }
       @Override
@@ -4258,7 +4258,7 @@ public abstract class ByteArrSeq extends AbstractByteList implements OmniCollect
         if(1<((size=this.size)))
         {
           final int rootOffset;
-          ByteSortUtil.uncheckedsort(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
+          SortUtil.uncheckedsort(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
         }
       }
       @Override
@@ -4268,7 +4268,7 @@ public abstract class ByteArrSeq extends AbstractByteList implements OmniCollect
         if(1<((size=this.size)))
         {
           final int rootOffset;
-          ByteSortUtil.uncheckedcomparatorSort(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,sorter);
+          SortUtil.uncheckedcomparatorSort(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,sorter);
         }
       }
       @Override
@@ -4288,7 +4288,7 @@ public abstract class ByteArrSeq extends AbstractByteList implements OmniCollect
         if(1<((size=this.size)))
         {
           final int rootOffset;
-          ByteSortUtil.uncheckedcomparatorSort(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,sorter::compare);
+          SortUtil.uncheckedcomparatorSort(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,sorter::compare);
         }
       }
       @Override

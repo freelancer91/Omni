@@ -2,6 +2,7 @@ package omni.util;
 import org.junit.Test;
 import org.junit.Assert;
 import java.util.Random;
+import java.util.Objects;
 public class ArrCopyTest
 {
   @Test
@@ -20,7 +21,27 @@ public class ArrCopyTest
       ArrCopy.semicheckedCopy(src,srcOffset,dst,dstOffset,copyLength);
       for(int j=0;j<copyLength;++j)
       {
-        Assert.assertTrue(dst[dstOffset+j]==src[srcOffset+j]);
+        Assert.assertTrue(src[srcOffset+j]==dst[dstOffset+j]);
+      }
+    }
+  }
+  @Test
+  public void testSemiCheckedReverseCopybooleanBoolean() throws Throwable
+  {
+    Random rand=new Random(0);
+    for(int i=0;i<1000;++i)
+    {
+      int srcLength=rand.nextInt(1000);
+      boolean[] src=getbooleanArr(rand,srcLength);
+      int dstLength=srcLength+rand.nextInt(1000);
+      Boolean[] dst=new Boolean[dstLength];
+      int copyLength=rand.nextInt(srcLength+1);
+      int srcOffset=rand.nextInt(srcLength-copyLength+1);
+      int dstOffset=rand.nextInt(dstLength-copyLength+1);
+      ArrCopy.semicheckedReverseCopy(src,srcOffset,dst,dstOffset,copyLength);
+      for(int j=0;j<copyLength;++j)
+      {
+        Assert.assertTrue(src[srcOffset+copyLength-1-j]==dst[dstOffset+j]);
       }
     }
   }
@@ -40,7 +61,27 @@ public class ArrCopyTest
       ArrCopy.semicheckedCopy(src,srcOffset,dst,dstOffset,copyLength);
       for(int j=0;j<copyLength;++j)
       {
-        Assert.assertEquals(dst[dstOffset+j],src[srcOffset+j]);
+        Assert.assertTrue(src[srcOffset+j]==dst[dstOffset+j]);
+      }
+    }
+  }
+  @Test
+  public void testSemiCheckedReverseCopybyteByte() throws Throwable
+  {
+    Random rand=new Random(0);
+    for(int i=0;i<1000;++i)
+    {
+      int srcLength=rand.nextInt(1000);
+      byte[] src=getbyteArr(rand,srcLength);
+      int dstLength=srcLength+rand.nextInt(1000);
+      Byte[] dst=new Byte[dstLength];
+      int copyLength=rand.nextInt(srcLength+1);
+      int srcOffset=rand.nextInt(srcLength-copyLength+1);
+      int dstOffset=rand.nextInt(dstLength-copyLength+1);
+      ArrCopy.semicheckedReverseCopy(src,srcOffset,dst,dstOffset,copyLength);
+      for(int j=0;j<copyLength;++j)
+      {
+        Assert.assertTrue(src[srcOffset+copyLength-1-j]==dst[dstOffset+j]);
       }
     }
   }
@@ -60,7 +101,27 @@ public class ArrCopyTest
       ArrCopy.semicheckedCopy(src,srcOffset,dst,dstOffset,copyLength);
       for(int j=0;j<copyLength;++j)
       {
-        Assert.assertEquals(dst[dstOffset+j],src[srcOffset+j]);
+        Assert.assertTrue(src[srcOffset+j]==dst[dstOffset+j]);
+      }
+    }
+  }
+  @Test
+  public void testSemiCheckedReverseCopycharCharacter() throws Throwable
+  {
+    Random rand=new Random(0);
+    for(int i=0;i<1000;++i)
+    {
+      int srcLength=rand.nextInt(1000);
+      char[] src=getcharArr(rand,srcLength);
+      int dstLength=srcLength+rand.nextInt(1000);
+      Character[] dst=new Character[dstLength];
+      int copyLength=rand.nextInt(srcLength+1);
+      int srcOffset=rand.nextInt(srcLength-copyLength+1);
+      int dstOffset=rand.nextInt(dstLength-copyLength+1);
+      ArrCopy.semicheckedReverseCopy(src,srcOffset,dst,dstOffset,copyLength);
+      for(int j=0;j<copyLength;++j)
+      {
+        Assert.assertTrue(src[srcOffset+copyLength-1-j]==dst[dstOffset+j]);
       }
     }
   }
@@ -80,7 +141,27 @@ public class ArrCopyTest
       ArrCopy.semicheckedCopy(src,srcOffset,dst,dstOffset,copyLength);
       for(int j=0;j<copyLength;++j)
       {
-        Assert.assertEquals(dst[dstOffset+j],src[srcOffset+j]);
+        Assert.assertTrue(src[srcOffset+j]==dst[dstOffset+j]);
+      }
+    }
+  }
+  @Test
+  public void testSemiCheckedReverseCopyshortShort() throws Throwable
+  {
+    Random rand=new Random(0);
+    for(int i=0;i<1000;++i)
+    {
+      int srcLength=rand.nextInt(1000);
+      short[] src=getshortArr(rand,srcLength);
+      int dstLength=srcLength+rand.nextInt(1000);
+      Short[] dst=new Short[dstLength];
+      int copyLength=rand.nextInt(srcLength+1);
+      int srcOffset=rand.nextInt(srcLength-copyLength+1);
+      int dstOffset=rand.nextInt(dstLength-copyLength+1);
+      ArrCopy.semicheckedReverseCopy(src,srcOffset,dst,dstOffset,copyLength);
+      for(int j=0;j<copyLength;++j)
+      {
+        Assert.assertTrue(src[srcOffset+copyLength-1-j]==dst[dstOffset+j]);
       }
     }
   }
@@ -100,7 +181,27 @@ public class ArrCopyTest
       ArrCopy.semicheckedCopy(src,srcOffset,dst,dstOffset,copyLength);
       for(int j=0;j<copyLength;++j)
       {
-        Assert.assertEquals(dst[dstOffset+j],src[srcOffset+j]);
+        Assert.assertTrue(src[srcOffset+j]==dst[dstOffset+j]);
+      }
+    }
+  }
+  @Test
+  public void testSemiCheckedReverseCopyintInteger() throws Throwable
+  {
+    Random rand=new Random(0);
+    for(int i=0;i<1000;++i)
+    {
+      int srcLength=rand.nextInt(1000);
+      int[] src=getintArr(rand,srcLength);
+      int dstLength=srcLength+rand.nextInt(1000);
+      Integer[] dst=new Integer[dstLength];
+      int copyLength=rand.nextInt(srcLength+1);
+      int srcOffset=rand.nextInt(srcLength-copyLength+1);
+      int dstOffset=rand.nextInt(dstLength-copyLength+1);
+      ArrCopy.semicheckedReverseCopy(src,srcOffset,dst,dstOffset,copyLength);
+      for(int j=0;j<copyLength;++j)
+      {
+        Assert.assertTrue(src[srcOffset+copyLength-1-j]==dst[dstOffset+j]);
       }
     }
   }
@@ -120,7 +221,27 @@ public class ArrCopyTest
       ArrCopy.semicheckedCopy(src,srcOffset,dst,dstOffset,copyLength);
       for(int j=0;j<copyLength;++j)
       {
-        Assert.assertEquals(dst[dstOffset+j],src[srcOffset+j]);
+        Assert.assertTrue(src[srcOffset+j]==dst[dstOffset+j]);
+      }
+    }
+  }
+  @Test
+  public void testSemiCheckedReverseCopylongLong() throws Throwable
+  {
+    Random rand=new Random(0);
+    for(int i=0;i<1000;++i)
+    {
+      int srcLength=rand.nextInt(1000);
+      long[] src=getlongArr(rand,srcLength);
+      int dstLength=srcLength+rand.nextInt(1000);
+      Long[] dst=new Long[dstLength];
+      int copyLength=rand.nextInt(srcLength+1);
+      int srcOffset=rand.nextInt(srcLength-copyLength+1);
+      int dstOffset=rand.nextInt(dstLength-copyLength+1);
+      ArrCopy.semicheckedReverseCopy(src,srcOffset,dst,dstOffset,copyLength);
+      for(int j=0;j<copyLength;++j)
+      {
+        Assert.assertTrue(src[srcOffset+copyLength-1-j]==dst[dstOffset+j]);
       }
     }
   }
@@ -140,10 +261,27 @@ public class ArrCopyTest
       ArrCopy.semicheckedCopy(src,srcOffset,dst,dstOffset,copyLength);
       for(int j=0;j<copyLength;++j)
       {
-        float dstVal=dst[dstOffset+j];
-        if(dstVal==dstVal)
-        {
-        }
+        Assert.assertTrue(src[srcOffset+j]==dst[dstOffset+j]);
+      }
+    }
+  }
+  @Test
+  public void testSemiCheckedReverseCopyfloatFloat() throws Throwable
+  {
+    Random rand=new Random(0);
+    for(int i=0;i<1000;++i)
+    {
+      int srcLength=rand.nextInt(1000);
+      float[] src=getfloatArr(rand,srcLength);
+      int dstLength=srcLength+rand.nextInt(1000);
+      Float[] dst=new Float[dstLength];
+      int copyLength=rand.nextInt(srcLength+1);
+      int srcOffset=rand.nextInt(srcLength-copyLength+1);
+      int dstOffset=rand.nextInt(dstLength-copyLength+1);
+      ArrCopy.semicheckedReverseCopy(src,srcOffset,dst,dstOffset,copyLength);
+      for(int j=0;j<copyLength;++j)
+      {
+        Assert.assertTrue(src[srcOffset+copyLength-1-j]==dst[dstOffset+j]);
       }
     }
   }
@@ -163,10 +301,347 @@ public class ArrCopyTest
       ArrCopy.semicheckedCopy(src,srcOffset,dst,dstOffset,copyLength);
       for(int j=0;j<copyLength;++j)
       {
-        double dstVal=dst[dstOffset+j];
-        if(dstVal==dstVal)
-        {
-        }
+        Assert.assertTrue(src[srcOffset+j]==dst[dstOffset+j]);
+      }
+    }
+  }
+  @Test
+  public void testSemiCheckedReverseCopydoubleDouble() throws Throwable
+  {
+    Random rand=new Random(0);
+    for(int i=0;i<1000;++i)
+    {
+      int srcLength=rand.nextInt(1000);
+      double[] src=getdoubleArr(rand,srcLength);
+      int dstLength=srcLength+rand.nextInt(1000);
+      Double[] dst=new Double[dstLength];
+      int copyLength=rand.nextInt(srcLength+1);
+      int srcOffset=rand.nextInt(srcLength-copyLength+1);
+      int dstOffset=rand.nextInt(dstLength-copyLength+1);
+      ArrCopy.semicheckedReverseCopy(src,srcOffset,dst,dstOffset,copyLength);
+      for(int j=0;j<copyLength;++j)
+      {
+        Assert.assertTrue(src[srcOffset+copyLength-1-j]==dst[dstOffset+j]);
+      }
+    }
+  }
+  @Test
+  public void testSemiCheckedCopybooleanObject() throws Throwable
+  {
+    Random rand=new Random(0);
+    for(int i=0;i<1000;++i)
+    {
+      int srcLength=rand.nextInt(1000);
+      boolean[] src=getbooleanArr(rand,srcLength);
+      int dstLength=srcLength+rand.nextInt(1000);
+      Object[] dst=new Object[dstLength];
+      int copyLength=rand.nextInt(srcLength+1);
+      int srcOffset=rand.nextInt(srcLength-copyLength+1);
+      int dstOffset=rand.nextInt(dstLength-copyLength+1);
+      ArrCopy.semicheckedCopy(src,srcOffset,dst,dstOffset,copyLength);
+      for(int j=0;j<copyLength;++j)
+      {
+        Assert.assertTrue(Objects.equals(src[srcOffset+j],dst[dstOffset+j]));
+      }
+    }
+  }
+  @Test
+  public void testSemiCheckedReverseCopybooleanObject() throws Throwable
+  {
+    Random rand=new Random(0);
+    for(int i=0;i<1000;++i)
+    {
+      int srcLength=rand.nextInt(1000);
+      boolean[] src=getbooleanArr(rand,srcLength);
+      int dstLength=srcLength+rand.nextInt(1000);
+      Object[] dst=new Object[dstLength];
+      int copyLength=rand.nextInt(srcLength+1);
+      int srcOffset=rand.nextInt(srcLength-copyLength+1);
+      int dstOffset=rand.nextInt(dstLength-copyLength+1);
+      ArrCopy.semicheckedReverseCopy(src,srcOffset,dst,dstOffset,copyLength);
+      for(int j=0;j<copyLength;++j)
+      {
+        Assert.assertTrue(Objects.equals(src[srcOffset+copyLength-1-j],dst[dstOffset+j]));
+      }
+    }
+  }
+  @Test
+  public void testSemiCheckedCopybyteObject() throws Throwable
+  {
+    Random rand=new Random(0);
+    for(int i=0;i<1000;++i)
+    {
+      int srcLength=rand.nextInt(1000);
+      byte[] src=getbyteArr(rand,srcLength);
+      int dstLength=srcLength+rand.nextInt(1000);
+      Object[] dst=new Object[dstLength];
+      int copyLength=rand.nextInt(srcLength+1);
+      int srcOffset=rand.nextInt(srcLength-copyLength+1);
+      int dstOffset=rand.nextInt(dstLength-copyLength+1);
+      ArrCopy.semicheckedCopy(src,srcOffset,dst,dstOffset,copyLength);
+      for(int j=0;j<copyLength;++j)
+      {
+        Assert.assertTrue(Objects.equals(src[srcOffset+j],dst[dstOffset+j]));
+      }
+    }
+  }
+  @Test
+  public void testSemiCheckedReverseCopybyteObject() throws Throwable
+  {
+    Random rand=new Random(0);
+    for(int i=0;i<1000;++i)
+    {
+      int srcLength=rand.nextInt(1000);
+      byte[] src=getbyteArr(rand,srcLength);
+      int dstLength=srcLength+rand.nextInt(1000);
+      Object[] dst=new Object[dstLength];
+      int copyLength=rand.nextInt(srcLength+1);
+      int srcOffset=rand.nextInt(srcLength-copyLength+1);
+      int dstOffset=rand.nextInt(dstLength-copyLength+1);
+      ArrCopy.semicheckedReverseCopy(src,srcOffset,dst,dstOffset,copyLength);
+      for(int j=0;j<copyLength;++j)
+      {
+        Assert.assertTrue(Objects.equals(src[srcOffset+copyLength-1-j],dst[dstOffset+j]));
+      }
+    }
+  }
+  @Test
+  public void testSemiCheckedCopycharObject() throws Throwable
+  {
+    Random rand=new Random(0);
+    for(int i=0;i<1000;++i)
+    {
+      int srcLength=rand.nextInt(1000);
+      char[] src=getcharArr(rand,srcLength);
+      int dstLength=srcLength+rand.nextInt(1000);
+      Object[] dst=new Object[dstLength];
+      int copyLength=rand.nextInt(srcLength+1);
+      int srcOffset=rand.nextInt(srcLength-copyLength+1);
+      int dstOffset=rand.nextInt(dstLength-copyLength+1);
+      ArrCopy.semicheckedCopy(src,srcOffset,dst,dstOffset,copyLength);
+      for(int j=0;j<copyLength;++j)
+      {
+        Assert.assertTrue(Objects.equals(src[srcOffset+j],dst[dstOffset+j]));
+      }
+    }
+  }
+  @Test
+  public void testSemiCheckedReverseCopycharObject() throws Throwable
+  {
+    Random rand=new Random(0);
+    for(int i=0;i<1000;++i)
+    {
+      int srcLength=rand.nextInt(1000);
+      char[] src=getcharArr(rand,srcLength);
+      int dstLength=srcLength+rand.nextInt(1000);
+      Object[] dst=new Object[dstLength];
+      int copyLength=rand.nextInt(srcLength+1);
+      int srcOffset=rand.nextInt(srcLength-copyLength+1);
+      int dstOffset=rand.nextInt(dstLength-copyLength+1);
+      ArrCopy.semicheckedReverseCopy(src,srcOffset,dst,dstOffset,copyLength);
+      for(int j=0;j<copyLength;++j)
+      {
+        Assert.assertTrue(Objects.equals(src[srcOffset+copyLength-1-j],dst[dstOffset+j]));
+      }
+    }
+  }
+  @Test
+  public void testSemiCheckedCopyshortObject() throws Throwable
+  {
+    Random rand=new Random(0);
+    for(int i=0;i<1000;++i)
+    {
+      int srcLength=rand.nextInt(1000);
+      short[] src=getshortArr(rand,srcLength);
+      int dstLength=srcLength+rand.nextInt(1000);
+      Object[] dst=new Object[dstLength];
+      int copyLength=rand.nextInt(srcLength+1);
+      int srcOffset=rand.nextInt(srcLength-copyLength+1);
+      int dstOffset=rand.nextInt(dstLength-copyLength+1);
+      ArrCopy.semicheckedCopy(src,srcOffset,dst,dstOffset,copyLength);
+      for(int j=0;j<copyLength;++j)
+      {
+        Assert.assertTrue(Objects.equals(src[srcOffset+j],dst[dstOffset+j]));
+      }
+    }
+  }
+  @Test
+  public void testSemiCheckedReverseCopyshortObject() throws Throwable
+  {
+    Random rand=new Random(0);
+    for(int i=0;i<1000;++i)
+    {
+      int srcLength=rand.nextInt(1000);
+      short[] src=getshortArr(rand,srcLength);
+      int dstLength=srcLength+rand.nextInt(1000);
+      Object[] dst=new Object[dstLength];
+      int copyLength=rand.nextInt(srcLength+1);
+      int srcOffset=rand.nextInt(srcLength-copyLength+1);
+      int dstOffset=rand.nextInt(dstLength-copyLength+1);
+      ArrCopy.semicheckedReverseCopy(src,srcOffset,dst,dstOffset,copyLength);
+      for(int j=0;j<copyLength;++j)
+      {
+        Assert.assertTrue(Objects.equals(src[srcOffset+copyLength-1-j],dst[dstOffset+j]));
+      }
+    }
+  }
+  @Test
+  public void testSemiCheckedCopyintObject() throws Throwable
+  {
+    Random rand=new Random(0);
+    for(int i=0;i<1000;++i)
+    {
+      int srcLength=rand.nextInt(1000);
+      int[] src=getintArr(rand,srcLength);
+      int dstLength=srcLength+rand.nextInt(1000);
+      Object[] dst=new Object[dstLength];
+      int copyLength=rand.nextInt(srcLength+1);
+      int srcOffset=rand.nextInt(srcLength-copyLength+1);
+      int dstOffset=rand.nextInt(dstLength-copyLength+1);
+      ArrCopy.semicheckedCopy(src,srcOffset,dst,dstOffset,copyLength);
+      for(int j=0;j<copyLength;++j)
+      {
+        Assert.assertTrue(Objects.equals(src[srcOffset+j],dst[dstOffset+j]));
+      }
+    }
+  }
+  @Test
+  public void testSemiCheckedReverseCopyintObject() throws Throwable
+  {
+    Random rand=new Random(0);
+    for(int i=0;i<1000;++i)
+    {
+      int srcLength=rand.nextInt(1000);
+      int[] src=getintArr(rand,srcLength);
+      int dstLength=srcLength+rand.nextInt(1000);
+      Object[] dst=new Object[dstLength];
+      int copyLength=rand.nextInt(srcLength+1);
+      int srcOffset=rand.nextInt(srcLength-copyLength+1);
+      int dstOffset=rand.nextInt(dstLength-copyLength+1);
+      ArrCopy.semicheckedReverseCopy(src,srcOffset,dst,dstOffset,copyLength);
+      for(int j=0;j<copyLength;++j)
+      {
+        Assert.assertTrue(Objects.equals(src[srcOffset+copyLength-1-j],dst[dstOffset+j]));
+      }
+    }
+  }
+  @Test
+  public void testSemiCheckedCopylongObject() throws Throwable
+  {
+    Random rand=new Random(0);
+    for(int i=0;i<1000;++i)
+    {
+      int srcLength=rand.nextInt(1000);
+      long[] src=getlongArr(rand,srcLength);
+      int dstLength=srcLength+rand.nextInt(1000);
+      Object[] dst=new Object[dstLength];
+      int copyLength=rand.nextInt(srcLength+1);
+      int srcOffset=rand.nextInt(srcLength-copyLength+1);
+      int dstOffset=rand.nextInt(dstLength-copyLength+1);
+      ArrCopy.semicheckedCopy(src,srcOffset,dst,dstOffset,copyLength);
+      for(int j=0;j<copyLength;++j)
+      {
+        Assert.assertTrue(Objects.equals(src[srcOffset+j],dst[dstOffset+j]));
+      }
+    }
+  }
+  @Test
+  public void testSemiCheckedReverseCopylongObject() throws Throwable
+  {
+    Random rand=new Random(0);
+    for(int i=0;i<1000;++i)
+    {
+      int srcLength=rand.nextInt(1000);
+      long[] src=getlongArr(rand,srcLength);
+      int dstLength=srcLength+rand.nextInt(1000);
+      Object[] dst=new Object[dstLength];
+      int copyLength=rand.nextInt(srcLength+1);
+      int srcOffset=rand.nextInt(srcLength-copyLength+1);
+      int dstOffset=rand.nextInt(dstLength-copyLength+1);
+      ArrCopy.semicheckedReverseCopy(src,srcOffset,dst,dstOffset,copyLength);
+      for(int j=0;j<copyLength;++j)
+      {
+        Assert.assertTrue(Objects.equals(src[srcOffset+copyLength-1-j],dst[dstOffset+j]));
+      }
+    }
+  }
+  @Test
+  public void testSemiCheckedCopyfloatObject() throws Throwable
+  {
+    Random rand=new Random(0);
+    for(int i=0;i<1000;++i)
+    {
+      int srcLength=rand.nextInt(1000);
+      float[] src=getfloatArr(rand,srcLength);
+      int dstLength=srcLength+rand.nextInt(1000);
+      Object[] dst=new Object[dstLength];
+      int copyLength=rand.nextInt(srcLength+1);
+      int srcOffset=rand.nextInt(srcLength-copyLength+1);
+      int dstOffset=rand.nextInt(dstLength-copyLength+1);
+      ArrCopy.semicheckedCopy(src,srcOffset,dst,dstOffset,copyLength);
+      for(int j=0;j<copyLength;++j)
+      {
+        Assert.assertTrue(Objects.equals(src[srcOffset+j],dst[dstOffset+j]));
+      }
+    }
+  }
+  @Test
+  public void testSemiCheckedReverseCopyfloatObject() throws Throwable
+  {
+    Random rand=new Random(0);
+    for(int i=0;i<1000;++i)
+    {
+      int srcLength=rand.nextInt(1000);
+      float[] src=getfloatArr(rand,srcLength);
+      int dstLength=srcLength+rand.nextInt(1000);
+      Object[] dst=new Object[dstLength];
+      int copyLength=rand.nextInt(srcLength+1);
+      int srcOffset=rand.nextInt(srcLength-copyLength+1);
+      int dstOffset=rand.nextInt(dstLength-copyLength+1);
+      ArrCopy.semicheckedReverseCopy(src,srcOffset,dst,dstOffset,copyLength);
+      for(int j=0;j<copyLength;++j)
+      {
+        Assert.assertTrue(Objects.equals(src[srcOffset+copyLength-1-j],dst[dstOffset+j]));
+      }
+    }
+  }
+  @Test
+  public void testSemiCheckedCopydoubleObject() throws Throwable
+  {
+    Random rand=new Random(0);
+    for(int i=0;i<1000;++i)
+    {
+      int srcLength=rand.nextInt(1000);
+      double[] src=getdoubleArr(rand,srcLength);
+      int dstLength=srcLength+rand.nextInt(1000);
+      Object[] dst=new Object[dstLength];
+      int copyLength=rand.nextInt(srcLength+1);
+      int srcOffset=rand.nextInt(srcLength-copyLength+1);
+      int dstOffset=rand.nextInt(dstLength-copyLength+1);
+      ArrCopy.semicheckedCopy(src,srcOffset,dst,dstOffset,copyLength);
+      for(int j=0;j<copyLength;++j)
+      {
+        Assert.assertTrue(Objects.equals(src[srcOffset+j],dst[dstOffset+j]));
+      }
+    }
+  }
+  @Test
+  public void testSemiCheckedReverseCopydoubleObject() throws Throwable
+  {
+    Random rand=new Random(0);
+    for(int i=0;i<1000;++i)
+    {
+      int srcLength=rand.nextInt(1000);
+      double[] src=getdoubleArr(rand,srcLength);
+      int dstLength=srcLength+rand.nextInt(1000);
+      Object[] dst=new Object[dstLength];
+      int copyLength=rand.nextInt(srcLength+1);
+      int srcOffset=rand.nextInt(srcLength-copyLength+1);
+      int dstOffset=rand.nextInt(dstLength-copyLength+1);
+      ArrCopy.semicheckedReverseCopy(src,srcOffset,dst,dstOffset,copyLength);
+      for(int j=0;j<copyLength;++j)
+      {
+        Assert.assertTrue(Objects.equals(src[srcOffset+copyLength-1-j],dst[dstOffset+j]));
       }
     }
   }
@@ -186,7 +661,27 @@ public class ArrCopyTest
       ArrCopy.semicheckedCopy(src,srcOffset,dst,dstOffset,copyLength);
       for(int j=0;j<copyLength;++j)
       {
-        Assert.assertEquals(dst[dstOffset+j],src[srcOffset+j]);
+        Assert.assertTrue(src[srcOffset+j]==dst[dstOffset+j]);
+      }
+    }
+  }
+  @Test
+  public void testSemiCheckedReverseCopyBooleanboolean() throws Throwable
+  {
+    Random rand=new Random(0);
+    for(int i=0;i<1000;++i)
+    {
+      int srcLength=rand.nextInt(1000);
+      Boolean[] src=getBooleanArr(rand,srcLength);
+      int dstLength=srcLength+rand.nextInt(1000);
+      boolean[] dst=new boolean[dstLength];
+      int copyLength=rand.nextInt(srcLength+1);
+      int srcOffset=rand.nextInt(srcLength-copyLength+1);
+      int dstOffset=rand.nextInt(dstLength-copyLength+1);
+      ArrCopy.semicheckedReverseCopy(src,srcOffset,dst,dstOffset,copyLength);
+      for(int j=0;j<copyLength;++j)
+      {
+        Assert.assertTrue(src[srcOffset+copyLength-1-j]==dst[dstOffset+j]);
       }
     }
   }
@@ -206,12 +701,32 @@ public class ArrCopyTest
       ArrCopy.semicheckedCopy(src,srcOffset,dst,dstOffset,copyLength);
       for(int j=0;j<copyLength;++j)
       {
-        Assert.assertEquals(dst[dstOffset+j],src[srcOffset+j]);
+        Assert.assertTrue(src[srcOffset+j]==dst[dstOffset+j]);
       }
     }
   }
   @Test
-  public void testSemiCheckedCopyCharactercar() throws Throwable
+  public void testSemiCheckedReverseCopyBytebyte() throws Throwable
+  {
+    Random rand=new Random(0);
+    for(int i=0;i<1000;++i)
+    {
+      int srcLength=rand.nextInt(1000);
+      Byte[] src=getByteArr(rand,srcLength);
+      int dstLength=srcLength+rand.nextInt(1000);
+      byte[] dst=new byte[dstLength];
+      int copyLength=rand.nextInt(srcLength+1);
+      int srcOffset=rand.nextInt(srcLength-copyLength+1);
+      int dstOffset=rand.nextInt(dstLength-copyLength+1);
+      ArrCopy.semicheckedReverseCopy(src,srcOffset,dst,dstOffset,copyLength);
+      for(int j=0;j<copyLength;++j)
+      {
+        Assert.assertTrue(src[srcOffset+copyLength-1-j]==dst[dstOffset+j]);
+      }
+    }
+  }
+  @Test
+  public void testSemiCheckedCopyCharacterchar() throws Throwable
   {
     Random rand=new Random(0);
     for(int i=0;i<1000;++i)
@@ -219,14 +734,34 @@ public class ArrCopyTest
       int srcLength=rand.nextInt(1000);
       Character[] src=getCharacterArr(rand,srcLength);
       int dstLength=srcLength+rand.nextInt(1000);
-      car[] dst=new car[dstLength];
+      char[] dst=new char[dstLength];
       int copyLength=rand.nextInt(srcLength+1);
       int srcOffset=rand.nextInt(srcLength-copyLength+1);
       int dstOffset=rand.nextInt(dstLength-copyLength+1);
       ArrCopy.semicheckedCopy(src,srcOffset,dst,dstOffset,copyLength);
       for(int j=0;j<copyLength;++j)
       {
-        Assert.assertEquals(dst[dstOffset+j],src[srcOffset+j]);
+        Assert.assertTrue(src[srcOffset+j]==dst[dstOffset+j]);
+      }
+    }
+  }
+  @Test
+  public void testSemiCheckedReverseCopyCharacterchar() throws Throwable
+  {
+    Random rand=new Random(0);
+    for(int i=0;i<1000;++i)
+    {
+      int srcLength=rand.nextInt(1000);
+      Character[] src=getCharacterArr(rand,srcLength);
+      int dstLength=srcLength+rand.nextInt(1000);
+      char[] dst=new char[dstLength];
+      int copyLength=rand.nextInt(srcLength+1);
+      int srcOffset=rand.nextInt(srcLength-copyLength+1);
+      int dstOffset=rand.nextInt(dstLength-copyLength+1);
+      ArrCopy.semicheckedReverseCopy(src,srcOffset,dst,dstOffset,copyLength);
+      for(int j=0;j<copyLength;++j)
+      {
+        Assert.assertTrue(src[srcOffset+copyLength-1-j]==dst[dstOffset+j]);
       }
     }
   }
@@ -246,7 +781,27 @@ public class ArrCopyTest
       ArrCopy.semicheckedCopy(src,srcOffset,dst,dstOffset,copyLength);
       for(int j=0;j<copyLength;++j)
       {
-        Assert.assertEquals(dst[dstOffset+j],src[srcOffset+j]);
+        Assert.assertTrue(src[srcOffset+j]==dst[dstOffset+j]);
+      }
+    }
+  }
+  @Test
+  public void testSemiCheckedReverseCopyShortshort() throws Throwable
+  {
+    Random rand=new Random(0);
+    for(int i=0;i<1000;++i)
+    {
+      int srcLength=rand.nextInt(1000);
+      Short[] src=getShortArr(rand,srcLength);
+      int dstLength=srcLength+rand.nextInt(1000);
+      short[] dst=new short[dstLength];
+      int copyLength=rand.nextInt(srcLength+1);
+      int srcOffset=rand.nextInt(srcLength-copyLength+1);
+      int dstOffset=rand.nextInt(dstLength-copyLength+1);
+      ArrCopy.semicheckedReverseCopy(src,srcOffset,dst,dstOffset,copyLength);
+      for(int j=0;j<copyLength;++j)
+      {
+        Assert.assertTrue(src[srcOffset+copyLength-1-j]==dst[dstOffset+j]);
       }
     }
   }
@@ -266,7 +821,27 @@ public class ArrCopyTest
       ArrCopy.semicheckedCopy(src,srcOffset,dst,dstOffset,copyLength);
       for(int j=0;j<copyLength;++j)
       {
-        Assert.assertEquals(dst[dstOffset+j],src[srcOffset+j]);
+        Assert.assertTrue(src[srcOffset+j]==dst[dstOffset+j]);
+      }
+    }
+  }
+  @Test
+  public void testSemiCheckedReverseCopyIntegerint() throws Throwable
+  {
+    Random rand=new Random(0);
+    for(int i=0;i<1000;++i)
+    {
+      int srcLength=rand.nextInt(1000);
+      Integer[] src=getIntegerArr(rand,srcLength);
+      int dstLength=srcLength+rand.nextInt(1000);
+      int[] dst=new int[dstLength];
+      int copyLength=rand.nextInt(srcLength+1);
+      int srcOffset=rand.nextInt(srcLength-copyLength+1);
+      int dstOffset=rand.nextInt(dstLength-copyLength+1);
+      ArrCopy.semicheckedReverseCopy(src,srcOffset,dst,dstOffset,copyLength);
+      for(int j=0;j<copyLength;++j)
+      {
+        Assert.assertTrue(src[srcOffset+copyLength-1-j]==dst[dstOffset+j]);
       }
     }
   }
@@ -286,7 +861,27 @@ public class ArrCopyTest
       ArrCopy.semicheckedCopy(src,srcOffset,dst,dstOffset,copyLength);
       for(int j=0;j<copyLength;++j)
       {
-        Assert.assertEquals(dst[dstOffset+j],src[srcOffset+j]);
+        Assert.assertTrue(src[srcOffset+j]==dst[dstOffset+j]);
+      }
+    }
+  }
+  @Test
+  public void testSemiCheckedReverseCopyLonglong() throws Throwable
+  {
+    Random rand=new Random(0);
+    for(int i=0;i<1000;++i)
+    {
+      int srcLength=rand.nextInt(1000);
+      Long[] src=getLongArr(rand,srcLength);
+      int dstLength=srcLength+rand.nextInt(1000);
+      long[] dst=new long[dstLength];
+      int copyLength=rand.nextInt(srcLength+1);
+      int srcOffset=rand.nextInt(srcLength-copyLength+1);
+      int dstOffset=rand.nextInt(dstLength-copyLength+1);
+      ArrCopy.semicheckedReverseCopy(src,srcOffset,dst,dstOffset,copyLength);
+      for(int j=0;j<copyLength;++j)
+      {
+        Assert.assertTrue(src[srcOffset+copyLength-1-j]==dst[dstOffset+j]);
       }
     }
   }
@@ -306,15 +901,27 @@ public class ArrCopyTest
       ArrCopy.semicheckedCopy(src,srcOffset,dst,dstOffset,copyLength);
       for(int j=0;j<copyLength;++j)
       {
-        float dstVal=dst[dstOffset+j];
-        if(dstVal==dstVal)
-        {
-          Assert.assertTrue(dstVal==src[srcOffset+j]);
-        }
-        else
-        {
-          Assert.assertTrue((dstVal=src[srcOffset+j])!=dstVal);
-        }
+        Assert.assertTrue(src[srcOffset+j]==dst[dstOffset+j]);
+      }
+    }
+  }
+  @Test
+  public void testSemiCheckedReverseCopyFloatfloat() throws Throwable
+  {
+    Random rand=new Random(0);
+    for(int i=0;i<1000;++i)
+    {
+      int srcLength=rand.nextInt(1000);
+      Float[] src=getFloatArr(rand,srcLength);
+      int dstLength=srcLength+rand.nextInt(1000);
+      float[] dst=new float[dstLength];
+      int copyLength=rand.nextInt(srcLength+1);
+      int srcOffset=rand.nextInt(srcLength-copyLength+1);
+      int dstOffset=rand.nextInt(dstLength-copyLength+1);
+      ArrCopy.semicheckedReverseCopy(src,srcOffset,dst,dstOffset,copyLength);
+      for(int j=0;j<copyLength;++j)
+      {
+        Assert.assertTrue(src[srcOffset+copyLength-1-j]==dst[dstOffset+j]);
       }
     }
   }
@@ -334,15 +941,27 @@ public class ArrCopyTest
       ArrCopy.semicheckedCopy(src,srcOffset,dst,dstOffset,copyLength);
       for(int j=0;j<copyLength;++j)
       {
-        double dstVal=dst[dstOffset+j];
-        if(dstVal==dstVal)
-        {
-          Assert.assertTrue(dstVal==src[srcOffset+j]);
-        }
-        else
-        {
-          Assert.assertTrue((dstVal=src[srcOffset+j])!=dstVal);
-        }
+        Assert.assertTrue(src[srcOffset+j]==dst[dstOffset+j]);
+      }
+    }
+  }
+  @Test
+  public void testSemiCheckedReverseCopyDoubledouble() throws Throwable
+  {
+    Random rand=new Random(0);
+    for(int i=0;i<1000;++i)
+    {
+      int srcLength=rand.nextInt(1000);
+      Double[] src=getDoubleArr(rand,srcLength);
+      int dstLength=srcLength+rand.nextInt(1000);
+      double[] dst=new double[dstLength];
+      int copyLength=rand.nextInt(srcLength+1);
+      int srcOffset=rand.nextInt(srcLength-copyLength+1);
+      int dstOffset=rand.nextInt(dstLength-copyLength+1);
+      ArrCopy.semicheckedReverseCopy(src,srcOffset,dst,dstOffset,copyLength);
+      for(int j=0;j<copyLength;++j)
+      {
+        Assert.assertTrue(src[srcOffset+copyLength-1-j]==dst[dstOffset+j]);
       }
     }
   }
@@ -362,7 +981,27 @@ public class ArrCopyTest
       ArrCopy.semicheckedCopy(src,srcOffset,dst,dstOffset,copyLength);
       for(int j=0;j<copyLength;++j)
       {
-        Assert.assertTrue(dst[dstOffset+j]==src[srcOffset+j]);
+        Assert.assertTrue(src[srcOffset+j]==dst[dstOffset+j]);
+      }
+    }
+  }
+  @Test
+  public void testSemiCheckedReverseCopybooleanboolean() throws Throwable
+  {
+    Random rand=new Random(0);
+    for(int i=0;i<1000;++i)
+    {
+      int srcLength=rand.nextInt(1000);
+      boolean[] src=getbooleanArr(rand,srcLength);
+      int dstLength=srcLength+rand.nextInt(1000);
+      boolean[] dst=new boolean[dstLength];
+      int copyLength=rand.nextInt(srcLength+1);
+      int srcOffset=rand.nextInt(srcLength-copyLength+1);
+      int dstOffset=rand.nextInt(dstLength-copyLength+1);
+      ArrCopy.semicheckedReverseCopy(src,srcOffset,dst,dstOffset,copyLength);
+      for(int j=0;j<copyLength;++j)
+      {
+        Assert.assertTrue(src[srcOffset+copyLength-1-j]==dst[dstOffset+j]);
       }
     }
   }
@@ -382,7 +1021,27 @@ public class ArrCopyTest
       ArrCopy.semicheckedCopy(src,srcOffset,dst,dstOffset,copyLength);
       for(int j=0;j<copyLength;++j)
       {
-        Assert.assertTrue(dst[dstOffset+j]==TypeUtil.castToByte(src[srcOffset+j]));
+        Assert.assertTrue(TypeUtil.castToByte(src[srcOffset+j])==dst[dstOffset+j]);
+      }
+    }
+  }
+  @Test
+  public void testSemiCheckedReverseCopybooleanbyte() throws Throwable
+  {
+    Random rand=new Random(0);
+    for(int i=0;i<1000;++i)
+    {
+      int srcLength=rand.nextInt(1000);
+      boolean[] src=getbooleanArr(rand,srcLength);
+      int dstLength=srcLength+rand.nextInt(1000);
+      byte[] dst=new byte[dstLength];
+      int copyLength=rand.nextInt(srcLength+1);
+      int srcOffset=rand.nextInt(srcLength-copyLength+1);
+      int dstOffset=rand.nextInt(dstLength-copyLength+1);
+      ArrCopy.semicheckedReverseCopy(src,srcOffset,dst,dstOffset,copyLength);
+      for(int j=0;j<copyLength;++j)
+      {
+        Assert.assertTrue(TypeUtil.castToByte(src[srcOffset+copyLength-1-j])==dst[dstOffset+j]);
       }
     }
   }
@@ -402,7 +1061,27 @@ public class ArrCopyTest
       ArrCopy.semicheckedCopy(src,srcOffset,dst,dstOffset,copyLength);
       for(int j=0;j<copyLength;++j)
       {
-        Assert.assertTrue(dst[dstOffset+j]==TypeUtil.castToByte(src[srcOffset+j]));
+        Assert.assertTrue(TypeUtil.castToByte(src[srcOffset+j])==dst[dstOffset+j]);
+      }
+    }
+  }
+  @Test
+  public void testSemiCheckedReverseCopybooleanchar() throws Throwable
+  {
+    Random rand=new Random(0);
+    for(int i=0;i<1000;++i)
+    {
+      int srcLength=rand.nextInt(1000);
+      boolean[] src=getbooleanArr(rand,srcLength);
+      int dstLength=srcLength+rand.nextInt(1000);
+      char[] dst=new char[dstLength];
+      int copyLength=rand.nextInt(srcLength+1);
+      int srcOffset=rand.nextInt(srcLength-copyLength+1);
+      int dstOffset=rand.nextInt(dstLength-copyLength+1);
+      ArrCopy.semicheckedReverseCopy(src,srcOffset,dst,dstOffset,copyLength);
+      for(int j=0;j<copyLength;++j)
+      {
+        Assert.assertTrue(TypeUtil.castToByte(src[srcOffset+copyLength-1-j])==dst[dstOffset+j]);
       }
     }
   }
@@ -422,7 +1101,27 @@ public class ArrCopyTest
       ArrCopy.semicheckedCopy(src,srcOffset,dst,dstOffset,copyLength);
       for(int j=0;j<copyLength;++j)
       {
-        Assert.assertTrue(dst[dstOffset+j]==TypeUtil.castToByte(src[srcOffset+j]));
+        Assert.assertTrue(TypeUtil.castToByte(src[srcOffset+j])==dst[dstOffset+j]);
+      }
+    }
+  }
+  @Test
+  public void testSemiCheckedReverseCopybooleanshort() throws Throwable
+  {
+    Random rand=new Random(0);
+    for(int i=0;i<1000;++i)
+    {
+      int srcLength=rand.nextInt(1000);
+      boolean[] src=getbooleanArr(rand,srcLength);
+      int dstLength=srcLength+rand.nextInt(1000);
+      short[] dst=new short[dstLength];
+      int copyLength=rand.nextInt(srcLength+1);
+      int srcOffset=rand.nextInt(srcLength-copyLength+1);
+      int dstOffset=rand.nextInt(dstLength-copyLength+1);
+      ArrCopy.semicheckedReverseCopy(src,srcOffset,dst,dstOffset,copyLength);
+      for(int j=0;j<copyLength;++j)
+      {
+        Assert.assertTrue(TypeUtil.castToByte(src[srcOffset+copyLength-1-j])==dst[dstOffset+j]);
       }
     }
   }
@@ -442,7 +1141,27 @@ public class ArrCopyTest
       ArrCopy.semicheckedCopy(src,srcOffset,dst,dstOffset,copyLength);
       for(int j=0;j<copyLength;++j)
       {
-        Assert.assertTrue(dst[dstOffset+j]==TypeUtil.castToByte(src[srcOffset+j]));
+        Assert.assertTrue(TypeUtil.castToByte(src[srcOffset+j])==dst[dstOffset+j]);
+      }
+    }
+  }
+  @Test
+  public void testSemiCheckedReverseCopybooleanint() throws Throwable
+  {
+    Random rand=new Random(0);
+    for(int i=0;i<1000;++i)
+    {
+      int srcLength=rand.nextInt(1000);
+      boolean[] src=getbooleanArr(rand,srcLength);
+      int dstLength=srcLength+rand.nextInt(1000);
+      int[] dst=new int[dstLength];
+      int copyLength=rand.nextInt(srcLength+1);
+      int srcOffset=rand.nextInt(srcLength-copyLength+1);
+      int dstOffset=rand.nextInt(dstLength-copyLength+1);
+      ArrCopy.semicheckedReverseCopy(src,srcOffset,dst,dstOffset,copyLength);
+      for(int j=0;j<copyLength;++j)
+      {
+        Assert.assertTrue(TypeUtil.castToByte(src[srcOffset+copyLength-1-j])==dst[dstOffset+j]);
       }
     }
   }
@@ -462,7 +1181,27 @@ public class ArrCopyTest
       ArrCopy.semicheckedCopy(src,srcOffset,dst,dstOffset,copyLength);
       for(int j=0;j<copyLength;++j)
       {
-        Assert.assertTrue(dst[dstOffset+j]==TypeUtil.castToLong(src[srcOffset+j]));
+        Assert.assertTrue(TypeUtil.castToByte(src[srcOffset+j])==dst[dstOffset+j]);
+      }
+    }
+  }
+  @Test
+  public void testSemiCheckedReverseCopybooleanlong() throws Throwable
+  {
+    Random rand=new Random(0);
+    for(int i=0;i<1000;++i)
+    {
+      int srcLength=rand.nextInt(1000);
+      boolean[] src=getbooleanArr(rand,srcLength);
+      int dstLength=srcLength+rand.nextInt(1000);
+      long[] dst=new long[dstLength];
+      int copyLength=rand.nextInt(srcLength+1);
+      int srcOffset=rand.nextInt(srcLength-copyLength+1);
+      int dstOffset=rand.nextInt(dstLength-copyLength+1);
+      ArrCopy.semicheckedReverseCopy(src,srcOffset,dst,dstOffset,copyLength);
+      for(int j=0;j<copyLength;++j)
+      {
+        Assert.assertTrue(TypeUtil.castToByte(src[srcOffset+copyLength-1-j])==dst[dstOffset+j]);
       }
     }
   }
@@ -482,7 +1221,27 @@ public class ArrCopyTest
       ArrCopy.semicheckedCopy(src,srcOffset,dst,dstOffset,copyLength);
       for(int j=0;j<copyLength;++j)
       {
-        Assert.assertTrue(dst[dstOffset+j]==TypeUtil.castToFloat(src[srcOffset+j]));
+        Assert.assertTrue(TypeUtil.castToByte(src[srcOffset+j])==dst[dstOffset+j]);
+      }
+    }
+  }
+  @Test
+  public void testSemiCheckedReverseCopybooleanfloat() throws Throwable
+  {
+    Random rand=new Random(0);
+    for(int i=0;i<1000;++i)
+    {
+      int srcLength=rand.nextInt(1000);
+      boolean[] src=getbooleanArr(rand,srcLength);
+      int dstLength=srcLength+rand.nextInt(1000);
+      float[] dst=new float[dstLength];
+      int copyLength=rand.nextInt(srcLength+1);
+      int srcOffset=rand.nextInt(srcLength-copyLength+1);
+      int dstOffset=rand.nextInt(dstLength-copyLength+1);
+      ArrCopy.semicheckedReverseCopy(src,srcOffset,dst,dstOffset,copyLength);
+      for(int j=0;j<copyLength;++j)
+      {
+        Assert.assertTrue(TypeUtil.castToByte(src[srcOffset+copyLength-1-j])==dst[dstOffset+j]);
       }
     }
   }
@@ -502,7 +1261,27 @@ public class ArrCopyTest
       ArrCopy.semicheckedCopy(src,srcOffset,dst,dstOffset,copyLength);
       for(int j=0;j<copyLength;++j)
       {
-        Assert.assertTrue(dst[dstOffset+j]==TypeUtil.castToDouble(src[srcOffset+j]));
+        Assert.assertTrue(TypeUtil.castToByte(src[srcOffset+j])==dst[dstOffset+j]);
+      }
+    }
+  }
+  @Test
+  public void testSemiCheckedReverseCopybooleandouble() throws Throwable
+  {
+    Random rand=new Random(0);
+    for(int i=0;i<1000;++i)
+    {
+      int srcLength=rand.nextInt(1000);
+      boolean[] src=getbooleanArr(rand,srcLength);
+      int dstLength=srcLength+rand.nextInt(1000);
+      double[] dst=new double[dstLength];
+      int copyLength=rand.nextInt(srcLength+1);
+      int srcOffset=rand.nextInt(srcLength-copyLength+1);
+      int dstOffset=rand.nextInt(dstLength-copyLength+1);
+      ArrCopy.semicheckedReverseCopy(src,srcOffset,dst,dstOffset,copyLength);
+      for(int j=0;j<copyLength;++j)
+      {
+        Assert.assertTrue(TypeUtil.castToByte(src[srcOffset+copyLength-1-j])==dst[dstOffset+j]);
       }
     }
   }
@@ -522,7 +1301,27 @@ public class ArrCopyTest
       ArrCopy.semicheckedCopy(src,srcOffset,dst,dstOffset,copyLength);
       for(int j=0;j<copyLength;++j)
       {
-        Assert.assertEquals(dst[dstOffset+j],src[srcOffset+j]);
+        Assert.assertTrue(src[srcOffset+j]==dst[dstOffset+j]);
+      }
+    }
+  }
+  @Test
+  public void testSemiCheckedReverseCopybytebyte() throws Throwable
+  {
+    Random rand=new Random(0);
+    for(int i=0;i<1000;++i)
+    {
+      int srcLength=rand.nextInt(1000);
+      byte[] src=getbyteArr(rand,srcLength);
+      int dstLength=srcLength+rand.nextInt(1000);
+      byte[] dst=new byte[dstLength];
+      int copyLength=rand.nextInt(srcLength+1);
+      int srcOffset=rand.nextInt(srcLength-copyLength+1);
+      int dstOffset=rand.nextInt(dstLength-copyLength+1);
+      ArrCopy.semicheckedReverseCopy(src,srcOffset,dst,dstOffset,copyLength);
+      for(int j=0;j<copyLength;++j)
+      {
+        Assert.assertTrue(src[srcOffset+copyLength-1-j]==dst[dstOffset+j]);
       }
     }
   }
@@ -542,7 +1341,27 @@ public class ArrCopyTest
       ArrCopy.semicheckedCopy(src,srcOffset,dst,dstOffset,copyLength);
       for(int j=0;j<copyLength;++j)
       {
-        Assert.assertEquals(dst[dstOffset+j],src[srcOffset+j]);
+        Assert.assertTrue(src[srcOffset+j]==dst[dstOffset+j]);
+      }
+    }
+  }
+  @Test
+  public void testSemiCheckedReverseCopybyteshort() throws Throwable
+  {
+    Random rand=new Random(0);
+    for(int i=0;i<1000;++i)
+    {
+      int srcLength=rand.nextInt(1000);
+      byte[] src=getbyteArr(rand,srcLength);
+      int dstLength=srcLength+rand.nextInt(1000);
+      short[] dst=new short[dstLength];
+      int copyLength=rand.nextInt(srcLength+1);
+      int srcOffset=rand.nextInt(srcLength-copyLength+1);
+      int dstOffset=rand.nextInt(dstLength-copyLength+1);
+      ArrCopy.semicheckedReverseCopy(src,srcOffset,dst,dstOffset,copyLength);
+      for(int j=0;j<copyLength;++j)
+      {
+        Assert.assertTrue(src[srcOffset+copyLength-1-j]==dst[dstOffset+j]);
       }
     }
   }
@@ -562,7 +1381,27 @@ public class ArrCopyTest
       ArrCopy.semicheckedCopy(src,srcOffset,dst,dstOffset,copyLength);
       for(int j=0;j<copyLength;++j)
       {
-        Assert.assertEquals(dst[dstOffset+j],src[srcOffset+j]);
+        Assert.assertTrue(src[srcOffset+j]==dst[dstOffset+j]);
+      }
+    }
+  }
+  @Test
+  public void testSemiCheckedReverseCopybyteint() throws Throwable
+  {
+    Random rand=new Random(0);
+    for(int i=0;i<1000;++i)
+    {
+      int srcLength=rand.nextInt(1000);
+      byte[] src=getbyteArr(rand,srcLength);
+      int dstLength=srcLength+rand.nextInt(1000);
+      int[] dst=new int[dstLength];
+      int copyLength=rand.nextInt(srcLength+1);
+      int srcOffset=rand.nextInt(srcLength-copyLength+1);
+      int dstOffset=rand.nextInt(dstLength-copyLength+1);
+      ArrCopy.semicheckedReverseCopy(src,srcOffset,dst,dstOffset,copyLength);
+      for(int j=0;j<copyLength;++j)
+      {
+        Assert.assertTrue(src[srcOffset+copyLength-1-j]==dst[dstOffset+j]);
       }
     }
   }
@@ -582,7 +1421,27 @@ public class ArrCopyTest
       ArrCopy.semicheckedCopy(src,srcOffset,dst,dstOffset,copyLength);
       for(int j=0;j<copyLength;++j)
       {
-        Assert.assertEquals(dst[dstOffset+j],src[srcOffset+j]);
+        Assert.assertTrue(src[srcOffset+j]==dst[dstOffset+j]);
+      }
+    }
+  }
+  @Test
+  public void testSemiCheckedReverseCopybytelong() throws Throwable
+  {
+    Random rand=new Random(0);
+    for(int i=0;i<1000;++i)
+    {
+      int srcLength=rand.nextInt(1000);
+      byte[] src=getbyteArr(rand,srcLength);
+      int dstLength=srcLength+rand.nextInt(1000);
+      long[] dst=new long[dstLength];
+      int copyLength=rand.nextInt(srcLength+1);
+      int srcOffset=rand.nextInt(srcLength-copyLength+1);
+      int dstOffset=rand.nextInt(dstLength-copyLength+1);
+      ArrCopy.semicheckedReverseCopy(src,srcOffset,dst,dstOffset,copyLength);
+      for(int j=0;j<copyLength;++j)
+      {
+        Assert.assertTrue(src[srcOffset+copyLength-1-j]==dst[dstOffset+j]);
       }
     }
   }
@@ -602,15 +1461,27 @@ public class ArrCopyTest
       ArrCopy.semicheckedCopy(src,srcOffset,dst,dstOffset,copyLength);
       for(int j=0;j<copyLength;++j)
       {
-        float dstVal=dst[dstOffset+j];
-        if(dstVal==dstVal)
-        {
-          Assert.assertTrue(dstVal==src[srcOffset+j]);
-        }
-        else
-        {
-          Assert.assertTrue((dstVal=src[srcOffset+j])!=dstVal);
-        }
+        Assert.assertTrue(src[srcOffset+j]==dst[dstOffset+j]);
+      }
+    }
+  }
+  @Test
+  public void testSemiCheckedReverseCopybytefloat() throws Throwable
+  {
+    Random rand=new Random(0);
+    for(int i=0;i<1000;++i)
+    {
+      int srcLength=rand.nextInt(1000);
+      byte[] src=getbyteArr(rand,srcLength);
+      int dstLength=srcLength+rand.nextInt(1000);
+      float[] dst=new float[dstLength];
+      int copyLength=rand.nextInt(srcLength+1);
+      int srcOffset=rand.nextInt(srcLength-copyLength+1);
+      int dstOffset=rand.nextInt(dstLength-copyLength+1);
+      ArrCopy.semicheckedReverseCopy(src,srcOffset,dst,dstOffset,copyLength);
+      for(int j=0;j<copyLength;++j)
+      {
+        Assert.assertTrue(src[srcOffset+copyLength-1-j]==dst[dstOffset+j]);
       }
     }
   }
@@ -630,15 +1501,27 @@ public class ArrCopyTest
       ArrCopy.semicheckedCopy(src,srcOffset,dst,dstOffset,copyLength);
       for(int j=0;j<copyLength;++j)
       {
-        double dstVal=dst[dstOffset+j];
-        if(dstVal==dstVal)
-        {
-          Assert.assertTrue(dstVal==src[srcOffset+j]);
-        }
-        else
-        {
-          Assert.assertTrue((dstVal=src[srcOffset+j])!=dstVal);
-        }
+        Assert.assertTrue(src[srcOffset+j]==dst[dstOffset+j]);
+      }
+    }
+  }
+  @Test
+  public void testSemiCheckedReverseCopybytedouble() throws Throwable
+  {
+    Random rand=new Random(0);
+    for(int i=0;i<1000;++i)
+    {
+      int srcLength=rand.nextInt(1000);
+      byte[] src=getbyteArr(rand,srcLength);
+      int dstLength=srcLength+rand.nextInt(1000);
+      double[] dst=new double[dstLength];
+      int copyLength=rand.nextInt(srcLength+1);
+      int srcOffset=rand.nextInt(srcLength-copyLength+1);
+      int dstOffset=rand.nextInt(dstLength-copyLength+1);
+      ArrCopy.semicheckedReverseCopy(src,srcOffset,dst,dstOffset,copyLength);
+      for(int j=0;j<copyLength;++j)
+      {
+        Assert.assertTrue(src[srcOffset+copyLength-1-j]==dst[dstOffset+j]);
       }
     }
   }
@@ -658,7 +1541,27 @@ public class ArrCopyTest
       ArrCopy.semicheckedCopy(src,srcOffset,dst,dstOffset,copyLength);
       for(int j=0;j<copyLength;++j)
       {
-        Assert.assertEquals(dst[dstOffset+j],src[srcOffset+j]);
+        Assert.assertTrue(src[srcOffset+j]==dst[dstOffset+j]);
+      }
+    }
+  }
+  @Test
+  public void testSemiCheckedReverseCopycharchar() throws Throwable
+  {
+    Random rand=new Random(0);
+    for(int i=0;i<1000;++i)
+    {
+      int srcLength=rand.nextInt(1000);
+      char[] src=getcharArr(rand,srcLength);
+      int dstLength=srcLength+rand.nextInt(1000);
+      char[] dst=new char[dstLength];
+      int copyLength=rand.nextInt(srcLength+1);
+      int srcOffset=rand.nextInt(srcLength-copyLength+1);
+      int dstOffset=rand.nextInt(dstLength-copyLength+1);
+      ArrCopy.semicheckedReverseCopy(src,srcOffset,dst,dstOffset,copyLength);
+      for(int j=0;j<copyLength;++j)
+      {
+        Assert.assertTrue(src[srcOffset+copyLength-1-j]==dst[dstOffset+j]);
       }
     }
   }
@@ -678,7 +1581,27 @@ public class ArrCopyTest
       ArrCopy.semicheckedCopy(src,srcOffset,dst,dstOffset,copyLength);
       for(int j=0;j<copyLength;++j)
       {
-        Assert.assertEquals(dst[dstOffset+j],src[srcOffset+j]);
+        Assert.assertTrue(src[srcOffset+j]==dst[dstOffset+j]);
+      }
+    }
+  }
+  @Test
+  public void testSemiCheckedReverseCopycharint() throws Throwable
+  {
+    Random rand=new Random(0);
+    for(int i=0;i<1000;++i)
+    {
+      int srcLength=rand.nextInt(1000);
+      char[] src=getcharArr(rand,srcLength);
+      int dstLength=srcLength+rand.nextInt(1000);
+      int[] dst=new int[dstLength];
+      int copyLength=rand.nextInt(srcLength+1);
+      int srcOffset=rand.nextInt(srcLength-copyLength+1);
+      int dstOffset=rand.nextInt(dstLength-copyLength+1);
+      ArrCopy.semicheckedReverseCopy(src,srcOffset,dst,dstOffset,copyLength);
+      for(int j=0;j<copyLength;++j)
+      {
+        Assert.assertTrue(src[srcOffset+copyLength-1-j]==dst[dstOffset+j]);
       }
     }
   }
@@ -698,7 +1621,27 @@ public class ArrCopyTest
       ArrCopy.semicheckedCopy(src,srcOffset,dst,dstOffset,copyLength);
       for(int j=0;j<copyLength;++j)
       {
-        Assert.assertEquals(dst[dstOffset+j],src[srcOffset+j]);
+        Assert.assertTrue(src[srcOffset+j]==dst[dstOffset+j]);
+      }
+    }
+  }
+  @Test
+  public void testSemiCheckedReverseCopycharlong() throws Throwable
+  {
+    Random rand=new Random(0);
+    for(int i=0;i<1000;++i)
+    {
+      int srcLength=rand.nextInt(1000);
+      char[] src=getcharArr(rand,srcLength);
+      int dstLength=srcLength+rand.nextInt(1000);
+      long[] dst=new long[dstLength];
+      int copyLength=rand.nextInt(srcLength+1);
+      int srcOffset=rand.nextInt(srcLength-copyLength+1);
+      int dstOffset=rand.nextInt(dstLength-copyLength+1);
+      ArrCopy.semicheckedReverseCopy(src,srcOffset,dst,dstOffset,copyLength);
+      for(int j=0;j<copyLength;++j)
+      {
+        Assert.assertTrue(src[srcOffset+copyLength-1-j]==dst[dstOffset+j]);
       }
     }
   }
@@ -718,15 +1661,27 @@ public class ArrCopyTest
       ArrCopy.semicheckedCopy(src,srcOffset,dst,dstOffset,copyLength);
       for(int j=0;j<copyLength;++j)
       {
-        float dstVal=dst[dstOffset+j];
-        if(dstVal==dstVal)
-        {
-          Assert.assertTrue(dstVal==src[srcOffset+j]);
-        }
-        else
-        {
-          Assert.assertTrue((dstVal=src[srcOffset+j])!=dstVal);
-        }
+        Assert.assertTrue(src[srcOffset+j]==dst[dstOffset+j]);
+      }
+    }
+  }
+  @Test
+  public void testSemiCheckedReverseCopycharfloat() throws Throwable
+  {
+    Random rand=new Random(0);
+    for(int i=0;i<1000;++i)
+    {
+      int srcLength=rand.nextInt(1000);
+      char[] src=getcharArr(rand,srcLength);
+      int dstLength=srcLength+rand.nextInt(1000);
+      float[] dst=new float[dstLength];
+      int copyLength=rand.nextInt(srcLength+1);
+      int srcOffset=rand.nextInt(srcLength-copyLength+1);
+      int dstOffset=rand.nextInt(dstLength-copyLength+1);
+      ArrCopy.semicheckedReverseCopy(src,srcOffset,dst,dstOffset,copyLength);
+      for(int j=0;j<copyLength;++j)
+      {
+        Assert.assertTrue(src[srcOffset+copyLength-1-j]==dst[dstOffset+j]);
       }
     }
   }
@@ -746,15 +1701,27 @@ public class ArrCopyTest
       ArrCopy.semicheckedCopy(src,srcOffset,dst,dstOffset,copyLength);
       for(int j=0;j<copyLength;++j)
       {
-        double dstVal=dst[dstOffset+j];
-        if(dstVal==dstVal)
-        {
-          Assert.assertTrue(dstVal==src[srcOffset+j]);
-        }
-        else
-        {
-          Assert.assertTrue((dstVal=src[srcOffset+j])!=dstVal);
-        }
+        Assert.assertTrue(src[srcOffset+j]==dst[dstOffset+j]);
+      }
+    }
+  }
+  @Test
+  public void testSemiCheckedReverseCopychardouble() throws Throwable
+  {
+    Random rand=new Random(0);
+    for(int i=0;i<1000;++i)
+    {
+      int srcLength=rand.nextInt(1000);
+      char[] src=getcharArr(rand,srcLength);
+      int dstLength=srcLength+rand.nextInt(1000);
+      double[] dst=new double[dstLength];
+      int copyLength=rand.nextInt(srcLength+1);
+      int srcOffset=rand.nextInt(srcLength-copyLength+1);
+      int dstOffset=rand.nextInt(dstLength-copyLength+1);
+      ArrCopy.semicheckedReverseCopy(src,srcOffset,dst,dstOffset,copyLength);
+      for(int j=0;j<copyLength;++j)
+      {
+        Assert.assertTrue(src[srcOffset+copyLength-1-j]==dst[dstOffset+j]);
       }
     }
   }
@@ -774,7 +1741,27 @@ public class ArrCopyTest
       ArrCopy.semicheckedCopy(src,srcOffset,dst,dstOffset,copyLength);
       for(int j=0;j<copyLength;++j)
       {
-        Assert.assertEquals(dst[dstOffset+j],src[srcOffset+j]);
+        Assert.assertTrue(src[srcOffset+j]==dst[dstOffset+j]);
+      }
+    }
+  }
+  @Test
+  public void testSemiCheckedReverseCopyshortshort() throws Throwable
+  {
+    Random rand=new Random(0);
+    for(int i=0;i<1000;++i)
+    {
+      int srcLength=rand.nextInt(1000);
+      short[] src=getshortArr(rand,srcLength);
+      int dstLength=srcLength+rand.nextInt(1000);
+      short[] dst=new short[dstLength];
+      int copyLength=rand.nextInt(srcLength+1);
+      int srcOffset=rand.nextInt(srcLength-copyLength+1);
+      int dstOffset=rand.nextInt(dstLength-copyLength+1);
+      ArrCopy.semicheckedReverseCopy(src,srcOffset,dst,dstOffset,copyLength);
+      for(int j=0;j<copyLength;++j)
+      {
+        Assert.assertTrue(src[srcOffset+copyLength-1-j]==dst[dstOffset+j]);
       }
     }
   }
@@ -794,7 +1781,27 @@ public class ArrCopyTest
       ArrCopy.semicheckedCopy(src,srcOffset,dst,dstOffset,copyLength);
       for(int j=0;j<copyLength;++j)
       {
-        Assert.assertEquals(dst[dstOffset+j],src[srcOffset+j]);
+        Assert.assertTrue(src[srcOffset+j]==dst[dstOffset+j]);
+      }
+    }
+  }
+  @Test
+  public void testSemiCheckedReverseCopyshortint() throws Throwable
+  {
+    Random rand=new Random(0);
+    for(int i=0;i<1000;++i)
+    {
+      int srcLength=rand.nextInt(1000);
+      short[] src=getshortArr(rand,srcLength);
+      int dstLength=srcLength+rand.nextInt(1000);
+      int[] dst=new int[dstLength];
+      int copyLength=rand.nextInt(srcLength+1);
+      int srcOffset=rand.nextInt(srcLength-copyLength+1);
+      int dstOffset=rand.nextInt(dstLength-copyLength+1);
+      ArrCopy.semicheckedReverseCopy(src,srcOffset,dst,dstOffset,copyLength);
+      for(int j=0;j<copyLength;++j)
+      {
+        Assert.assertTrue(src[srcOffset+copyLength-1-j]==dst[dstOffset+j]);
       }
     }
   }
@@ -814,7 +1821,27 @@ public class ArrCopyTest
       ArrCopy.semicheckedCopy(src,srcOffset,dst,dstOffset,copyLength);
       for(int j=0;j<copyLength;++j)
       {
-        Assert.assertEquals(dst[dstOffset+j],src[srcOffset+j]);
+        Assert.assertTrue(src[srcOffset+j]==dst[dstOffset+j]);
+      }
+    }
+  }
+  @Test
+  public void testSemiCheckedReverseCopyshortlong() throws Throwable
+  {
+    Random rand=new Random(0);
+    for(int i=0;i<1000;++i)
+    {
+      int srcLength=rand.nextInt(1000);
+      short[] src=getshortArr(rand,srcLength);
+      int dstLength=srcLength+rand.nextInt(1000);
+      long[] dst=new long[dstLength];
+      int copyLength=rand.nextInt(srcLength+1);
+      int srcOffset=rand.nextInt(srcLength-copyLength+1);
+      int dstOffset=rand.nextInt(dstLength-copyLength+1);
+      ArrCopy.semicheckedReverseCopy(src,srcOffset,dst,dstOffset,copyLength);
+      for(int j=0;j<copyLength;++j)
+      {
+        Assert.assertTrue(src[srcOffset+copyLength-1-j]==dst[dstOffset+j]);
       }
     }
   }
@@ -834,15 +1861,27 @@ public class ArrCopyTest
       ArrCopy.semicheckedCopy(src,srcOffset,dst,dstOffset,copyLength);
       for(int j=0;j<copyLength;++j)
       {
-        float dstVal=dst[dstOffset+j];
-        if(dstVal==dstVal)
-        {
-          Assert.assertTrue(dstVal==src[srcOffset+j]);
-        }
-        else
-        {
-          Assert.assertTrue((dstVal=src[srcOffset+j])!=dstVal);
-        }
+        Assert.assertTrue(src[srcOffset+j]==dst[dstOffset+j]);
+      }
+    }
+  }
+  @Test
+  public void testSemiCheckedReverseCopyshortfloat() throws Throwable
+  {
+    Random rand=new Random(0);
+    for(int i=0;i<1000;++i)
+    {
+      int srcLength=rand.nextInt(1000);
+      short[] src=getshortArr(rand,srcLength);
+      int dstLength=srcLength+rand.nextInt(1000);
+      float[] dst=new float[dstLength];
+      int copyLength=rand.nextInt(srcLength+1);
+      int srcOffset=rand.nextInt(srcLength-copyLength+1);
+      int dstOffset=rand.nextInt(dstLength-copyLength+1);
+      ArrCopy.semicheckedReverseCopy(src,srcOffset,dst,dstOffset,copyLength);
+      for(int j=0;j<copyLength;++j)
+      {
+        Assert.assertTrue(src[srcOffset+copyLength-1-j]==dst[dstOffset+j]);
       }
     }
   }
@@ -862,15 +1901,27 @@ public class ArrCopyTest
       ArrCopy.semicheckedCopy(src,srcOffset,dst,dstOffset,copyLength);
       for(int j=0;j<copyLength;++j)
       {
-        double dstVal=dst[dstOffset+j];
-        if(dstVal==dstVal)
-        {
-          Assert.assertTrue(dstVal==src[srcOffset+j]);
-        }
-        else
-        {
-          Assert.assertTrue((dstVal=src[srcOffset+j])!=dstVal);
-        }
+        Assert.assertTrue(src[srcOffset+j]==dst[dstOffset+j]);
+      }
+    }
+  }
+  @Test
+  public void testSemiCheckedReverseCopyshortdouble() throws Throwable
+  {
+    Random rand=new Random(0);
+    for(int i=0;i<1000;++i)
+    {
+      int srcLength=rand.nextInt(1000);
+      short[] src=getshortArr(rand,srcLength);
+      int dstLength=srcLength+rand.nextInt(1000);
+      double[] dst=new double[dstLength];
+      int copyLength=rand.nextInt(srcLength+1);
+      int srcOffset=rand.nextInt(srcLength-copyLength+1);
+      int dstOffset=rand.nextInt(dstLength-copyLength+1);
+      ArrCopy.semicheckedReverseCopy(src,srcOffset,dst,dstOffset,copyLength);
+      for(int j=0;j<copyLength;++j)
+      {
+        Assert.assertTrue(src[srcOffset+copyLength-1-j]==dst[dstOffset+j]);
       }
     }
   }
@@ -890,7 +1941,27 @@ public class ArrCopyTest
       ArrCopy.semicheckedCopy(src,srcOffset,dst,dstOffset,copyLength);
       for(int j=0;j<copyLength;++j)
       {
-        Assert.assertEquals(dst[dstOffset+j],src[srcOffset+j]);
+        Assert.assertTrue(src[srcOffset+j]==dst[dstOffset+j]);
+      }
+    }
+  }
+  @Test
+  public void testSemiCheckedReverseCopyintint() throws Throwable
+  {
+    Random rand=new Random(0);
+    for(int i=0;i<1000;++i)
+    {
+      int srcLength=rand.nextInt(1000);
+      int[] src=getintArr(rand,srcLength);
+      int dstLength=srcLength+rand.nextInt(1000);
+      int[] dst=new int[dstLength];
+      int copyLength=rand.nextInt(srcLength+1);
+      int srcOffset=rand.nextInt(srcLength-copyLength+1);
+      int dstOffset=rand.nextInt(dstLength-copyLength+1);
+      ArrCopy.semicheckedReverseCopy(src,srcOffset,dst,dstOffset,copyLength);
+      for(int j=0;j<copyLength;++j)
+      {
+        Assert.assertTrue(src[srcOffset+copyLength-1-j]==dst[dstOffset+j]);
       }
     }
   }
@@ -910,7 +1981,27 @@ public class ArrCopyTest
       ArrCopy.semicheckedCopy(src,srcOffset,dst,dstOffset,copyLength);
       for(int j=0;j<copyLength;++j)
       {
-        Assert.assertEquals(dst[dstOffset+j],src[srcOffset+j]);
+        Assert.assertTrue(src[srcOffset+j]==dst[dstOffset+j]);
+      }
+    }
+  }
+  @Test
+  public void testSemiCheckedReverseCopyintlong() throws Throwable
+  {
+    Random rand=new Random(0);
+    for(int i=0;i<1000;++i)
+    {
+      int srcLength=rand.nextInt(1000);
+      int[] src=getintArr(rand,srcLength);
+      int dstLength=srcLength+rand.nextInt(1000);
+      long[] dst=new long[dstLength];
+      int copyLength=rand.nextInt(srcLength+1);
+      int srcOffset=rand.nextInt(srcLength-copyLength+1);
+      int dstOffset=rand.nextInt(dstLength-copyLength+1);
+      ArrCopy.semicheckedReverseCopy(src,srcOffset,dst,dstOffset,copyLength);
+      for(int j=0;j<copyLength;++j)
+      {
+        Assert.assertTrue(src[srcOffset+copyLength-1-j]==dst[dstOffset+j]);
       }
     }
   }
@@ -930,15 +2021,27 @@ public class ArrCopyTest
       ArrCopy.semicheckedCopy(src,srcOffset,dst,dstOffset,copyLength);
       for(int j=0;j<copyLength;++j)
       {
-        float dstVal=dst[dstOffset+j];
-        if(dstVal==dstVal)
-        {
-          Assert.assertTrue(dstVal==src[srcOffset+j]);
-        }
-        else
-        {
-          Assert.assertTrue((dstVal=src[srcOffset+j])!=dstVal);
-        }
+        Assert.assertTrue(src[srcOffset+j]==dst[dstOffset+j]);
+      }
+    }
+  }
+  @Test
+  public void testSemiCheckedReverseCopyintfloat() throws Throwable
+  {
+    Random rand=new Random(0);
+    for(int i=0;i<1000;++i)
+    {
+      int srcLength=rand.nextInt(1000);
+      int[] src=getintArr(rand,srcLength);
+      int dstLength=srcLength+rand.nextInt(1000);
+      float[] dst=new float[dstLength];
+      int copyLength=rand.nextInt(srcLength+1);
+      int srcOffset=rand.nextInt(srcLength-copyLength+1);
+      int dstOffset=rand.nextInt(dstLength-copyLength+1);
+      ArrCopy.semicheckedReverseCopy(src,srcOffset,dst,dstOffset,copyLength);
+      for(int j=0;j<copyLength;++j)
+      {
+        Assert.assertTrue(src[srcOffset+copyLength-1-j]==dst[dstOffset+j]);
       }
     }
   }
@@ -958,15 +2061,27 @@ public class ArrCopyTest
       ArrCopy.semicheckedCopy(src,srcOffset,dst,dstOffset,copyLength);
       for(int j=0;j<copyLength;++j)
       {
-        double dstVal=dst[dstOffset+j];
-        if(dstVal==dstVal)
-        {
-          Assert.assertTrue(dstVal==src[srcOffset+j]);
-        }
-        else
-        {
-          Assert.assertTrue((dstVal=src[srcOffset+j])!=dstVal);
-        }
+        Assert.assertTrue(src[srcOffset+j]==dst[dstOffset+j]);
+      }
+    }
+  }
+  @Test
+  public void testSemiCheckedReverseCopyintdouble() throws Throwable
+  {
+    Random rand=new Random(0);
+    for(int i=0;i<1000;++i)
+    {
+      int srcLength=rand.nextInt(1000);
+      int[] src=getintArr(rand,srcLength);
+      int dstLength=srcLength+rand.nextInt(1000);
+      double[] dst=new double[dstLength];
+      int copyLength=rand.nextInt(srcLength+1);
+      int srcOffset=rand.nextInt(srcLength-copyLength+1);
+      int dstOffset=rand.nextInt(dstLength-copyLength+1);
+      ArrCopy.semicheckedReverseCopy(src,srcOffset,dst,dstOffset,copyLength);
+      for(int j=0;j<copyLength;++j)
+      {
+        Assert.assertTrue(src[srcOffset+copyLength-1-j]==dst[dstOffset+j]);
       }
     }
   }
@@ -986,7 +2101,27 @@ public class ArrCopyTest
       ArrCopy.semicheckedCopy(src,srcOffset,dst,dstOffset,copyLength);
       for(int j=0;j<copyLength;++j)
       {
-        Assert.assertEquals(dst[dstOffset+j],src[srcOffset+j]);
+        Assert.assertTrue(src[srcOffset+j]==dst[dstOffset+j]);
+      }
+    }
+  }
+  @Test
+  public void testSemiCheckedReverseCopylonglong() throws Throwable
+  {
+    Random rand=new Random(0);
+    for(int i=0;i<1000;++i)
+    {
+      int srcLength=rand.nextInt(1000);
+      long[] src=getlongArr(rand,srcLength);
+      int dstLength=srcLength+rand.nextInt(1000);
+      long[] dst=new long[dstLength];
+      int copyLength=rand.nextInt(srcLength+1);
+      int srcOffset=rand.nextInt(srcLength-copyLength+1);
+      int dstOffset=rand.nextInt(dstLength-copyLength+1);
+      ArrCopy.semicheckedReverseCopy(src,srcOffset,dst,dstOffset,copyLength);
+      for(int j=0;j<copyLength;++j)
+      {
+        Assert.assertTrue(src[srcOffset+copyLength-1-j]==dst[dstOffset+j]);
       }
     }
   }
@@ -1006,15 +2141,27 @@ public class ArrCopyTest
       ArrCopy.semicheckedCopy(src,srcOffset,dst,dstOffset,copyLength);
       for(int j=0;j<copyLength;++j)
       {
-        float dstVal=dst[dstOffset+j];
-        if(dstVal==dstVal)
-        {
-          Assert.assertTrue(dstVal==src[srcOffset+j]);
-        }
-        else
-        {
-          Assert.assertTrue((dstVal=src[srcOffset+j])!=dstVal);
-        }
+        Assert.assertTrue(src[srcOffset+j]==dst[dstOffset+j]);
+      }
+    }
+  }
+  @Test
+  public void testSemiCheckedReverseCopylongfloat() throws Throwable
+  {
+    Random rand=new Random(0);
+    for(int i=0;i<1000;++i)
+    {
+      int srcLength=rand.nextInt(1000);
+      long[] src=getlongArr(rand,srcLength);
+      int dstLength=srcLength+rand.nextInt(1000);
+      float[] dst=new float[dstLength];
+      int copyLength=rand.nextInt(srcLength+1);
+      int srcOffset=rand.nextInt(srcLength-copyLength+1);
+      int dstOffset=rand.nextInt(dstLength-copyLength+1);
+      ArrCopy.semicheckedReverseCopy(src,srcOffset,dst,dstOffset,copyLength);
+      for(int j=0;j<copyLength;++j)
+      {
+        Assert.assertTrue(src[srcOffset+copyLength-1-j]==dst[dstOffset+j]);
       }
     }
   }
@@ -1034,15 +2181,27 @@ public class ArrCopyTest
       ArrCopy.semicheckedCopy(src,srcOffset,dst,dstOffset,copyLength);
       for(int j=0;j<copyLength;++j)
       {
-        double dstVal=dst[dstOffset+j];
-        if(dstVal==dstVal)
-        {
-          Assert.assertTrue(dstVal==src[srcOffset+j]);
-        }
-        else
-        {
-          Assert.assertTrue((dstVal=src[srcOffset+j])!=dstVal);
-        }
+        Assert.assertTrue(src[srcOffset+j]==dst[dstOffset+j]);
+      }
+    }
+  }
+  @Test
+  public void testSemiCheckedReverseCopylongdouble() throws Throwable
+  {
+    Random rand=new Random(0);
+    for(int i=0;i<1000;++i)
+    {
+      int srcLength=rand.nextInt(1000);
+      long[] src=getlongArr(rand,srcLength);
+      int dstLength=srcLength+rand.nextInt(1000);
+      double[] dst=new double[dstLength];
+      int copyLength=rand.nextInt(srcLength+1);
+      int srcOffset=rand.nextInt(srcLength-copyLength+1);
+      int dstOffset=rand.nextInt(dstLength-copyLength+1);
+      ArrCopy.semicheckedReverseCopy(src,srcOffset,dst,dstOffset,copyLength);
+      for(int j=0;j<copyLength;++j)
+      {
+        Assert.assertTrue(src[srcOffset+copyLength-1-j]==dst[dstOffset+j]);
       }
     }
   }
@@ -1062,15 +2221,27 @@ public class ArrCopyTest
       ArrCopy.semicheckedCopy(src,srcOffset,dst,dstOffset,copyLength);
       for(int j=0;j<copyLength;++j)
       {
-        float dstVal=dst[dstOffset+j];
-        if(dstVal==dstVal)
-        {
-          Assert.assertTrue(dstVal==src[srcOffset+j]);
-        }
-        else
-        {
-          Assert.assertTrue((dstVal=src[srcOffset+j])!=dstVal);
-        }
+        Assert.assertTrue(src[srcOffset+j]==dst[dstOffset+j]);
+      }
+    }
+  }
+  @Test
+  public void testSemiCheckedReverseCopyfloatfloat() throws Throwable
+  {
+    Random rand=new Random(0);
+    for(int i=0;i<1000;++i)
+    {
+      int srcLength=rand.nextInt(1000);
+      float[] src=getfloatArr(rand,srcLength);
+      int dstLength=srcLength+rand.nextInt(1000);
+      float[] dst=new float[dstLength];
+      int copyLength=rand.nextInt(srcLength+1);
+      int srcOffset=rand.nextInt(srcLength-copyLength+1);
+      int dstOffset=rand.nextInt(dstLength-copyLength+1);
+      ArrCopy.semicheckedReverseCopy(src,srcOffset,dst,dstOffset,copyLength);
+      for(int j=0;j<copyLength;++j)
+      {
+        Assert.assertTrue(src[srcOffset+copyLength-1-j]==dst[dstOffset+j]);
       }
     }
   }
@@ -1090,15 +2261,27 @@ public class ArrCopyTest
       ArrCopy.semicheckedCopy(src,srcOffset,dst,dstOffset,copyLength);
       for(int j=0;j<copyLength;++j)
       {
-        double dstVal=dst[dstOffset+j];
-        if(dstVal==dstVal)
-        {
-          Assert.assertTrue(dstVal==src[srcOffset+j]);
-        }
-        else
-        {
-          Assert.assertTrue((dstVal=src[srcOffset+j])!=dstVal);
-        }
+        Assert.assertTrue(src[srcOffset+j]==dst[dstOffset+j]);
+      }
+    }
+  }
+  @Test
+  public void testSemiCheckedReverseCopyfloatdouble() throws Throwable
+  {
+    Random rand=new Random(0);
+    for(int i=0;i<1000;++i)
+    {
+      int srcLength=rand.nextInt(1000);
+      float[] src=getfloatArr(rand,srcLength);
+      int dstLength=srcLength+rand.nextInt(1000);
+      double[] dst=new double[dstLength];
+      int copyLength=rand.nextInt(srcLength+1);
+      int srcOffset=rand.nextInt(srcLength-copyLength+1);
+      int dstOffset=rand.nextInt(dstLength-copyLength+1);
+      ArrCopy.semicheckedReverseCopy(src,srcOffset,dst,dstOffset,copyLength);
+      for(int j=0;j<copyLength;++j)
+      {
+        Assert.assertTrue(src[srcOffset+copyLength-1-j]==dst[dstOffset+j]);
       }
     }
   }
@@ -1118,15 +2301,27 @@ public class ArrCopyTest
       ArrCopy.semicheckedCopy(src,srcOffset,dst,dstOffset,copyLength);
       for(int j=0;j<copyLength;++j)
       {
-        double dstVal=dst[dstOffset+j];
-        if(dstVal==dstVal)
-        {
-          Assert.assertTrue(dstVal==src[srcOffset+j]);
-        }
-        else
-        {
-          Assert.assertTrue((dstVal=src[srcOffset+j])!=dstVal);
-        }
+        Assert.assertTrue(src[srcOffset+j]==dst[dstOffset+j]);
+      }
+    }
+  }
+  @Test
+  public void testSemiCheckedReverseCopydoubledouble() throws Throwable
+  {
+    Random rand=new Random(0);
+    for(int i=0;i<1000;++i)
+    {
+      int srcLength=rand.nextInt(1000);
+      double[] src=getdoubleArr(rand,srcLength);
+      int dstLength=srcLength+rand.nextInt(1000);
+      double[] dst=new double[dstLength];
+      int copyLength=rand.nextInt(srcLength+1);
+      int srcOffset=rand.nextInt(srcLength-copyLength+1);
+      int dstOffset=rand.nextInt(dstLength-copyLength+1);
+      ArrCopy.semicheckedReverseCopy(src,srcOffset,dst,dstOffset,copyLength);
+      for(int j=0;j<copyLength;++j)
+      {
+        Assert.assertTrue(src[srcOffset+copyLength-1-j]==dst[dstOffset+j]);
       }
     }
   }
@@ -1146,7 +2341,27 @@ public class ArrCopyTest
       ArrCopy.semicheckedCopy(src,srcOffset,dst,dstOffset,copyLength);
       for(int j=0;j<copyLength;++j)
       {
-        Assert.assertEquals(dst[dstOffset+j],src[srcOffset+j]);
+        Assert.assertTrue(src[srcOffset+j]==dst[dstOffset+j]);
+      }
+    }
+  }
+  @Test
+  public void testSemiCheckedReverseCopyStringString() throws Throwable
+  {
+    Random rand=new Random(0);
+    for(int i=0;i<1000;++i)
+    {
+      int srcLength=rand.nextInt(1000);
+      String[] src=getStringArr(rand,srcLength);
+      int dstLength=srcLength+rand.nextInt(1000);
+      String[] dst=new String[dstLength];
+      int copyLength=rand.nextInt(srcLength+1);
+      int srcOffset=rand.nextInt(srcLength-copyLength+1);
+      int dstOffset=rand.nextInt(dstLength-copyLength+1);
+      ArrCopy.semicheckedReverseCopy(src,srcOffset,dst,dstOffset,copyLength);
+      for(int j=0;j<copyLength;++j)
+      {
+        Assert.assertTrue(src[srcOffset+copyLength-1-j]==dst[dstOffset+j]);
       }
     }
   }

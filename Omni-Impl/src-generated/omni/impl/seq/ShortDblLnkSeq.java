@@ -18,7 +18,7 @@ import omni.function.ShortComparator;
 import omni.function.ShortPredicate;
 import omni.function.ShortConsumer;
 import omni.function.ShortUnaryOperator;
-import omni.util.ShortSortUtil;
+import omni.util.SortUtil;
 public abstract class ShortDblLnkSeq extends AbstractShortList implements OmniList.OfShort
 {
   private static  boolean uncheckedcontains(Node begin,Node end,int val)
@@ -6074,7 +6074,7 @@ public abstract class ShortDblLnkSeq extends AbstractShortList implements OmniLi
         //doSort
         short[] tmpArr;
         uncheckedCopyForward(tmpArr=new short[size],0,size);
-        ShortSortUtil.dosort(tmpArr,0,size-1);
+        SortUtil.dosort(tmpArr,0,size-1);
         copyFromArray(tmpArr,0,size);
       }
       else
@@ -6119,7 +6119,7 @@ public abstract class ShortDblLnkSeq extends AbstractShortList implements OmniLi
         //doSort
         short[] tmpArr;
         uncheckedCopyForward(tmpArr=new short[size],0,size);
-        ShortSortUtil.doreverseSort(tmpArr,0,size-1);
+        SortUtil.doreverseSort(tmpArr,0,size-1);
         copyFromArray(tmpArr,0,size);
       }
       else
@@ -6131,7 +6131,7 @@ public abstract class ShortDblLnkSeq extends AbstractShortList implements OmniLi
     {
       short[] tmpArr;
       uncheckedCopyForward(tmpArr=new short[size],0,size);
-      ShortSortUtil.uncheckedcomparatorSort(tmpArr,0,size-1,sorter);
+      SortUtil.uncheckedcomparatorSort(tmpArr,0,size-1,sorter);
       copyFromArray(tmpArr,0,size);
     }
     private void uncheckedCopyForward(short[] dst,int dstOffset,int length)

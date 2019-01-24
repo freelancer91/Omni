@@ -13,7 +13,7 @@ import omni.api.OmniListIterator;
 import omni.impl.CheckedCollection;
 import omni.util.ArrCopy;
 import omni.util.OmniArray;
-import omni.util.DoubleSortUtil;
+import omni.util.SortUtil;
 import omni.util.HashUtils;
 import omni.impl.seq.AbstractDoubleList;
 import omni.impl.AbstractDoubleItr;
@@ -1458,7 +1458,7 @@ public abstract class DoubleArrSeq extends AbstractDoubleList implements OmniCol
         int modCount=this.modCount;
         try
         {
-          DoubleSortUtil.uncheckedcomparatorSort(arr,0,size-1,sorter);
+          SortUtil.uncheckedcomparatorSort(arr,0,size-1,sorter);
         }
         finally
         {
@@ -1494,7 +1494,7 @@ public abstract class DoubleArrSeq extends AbstractDoubleList implements OmniCol
         int modCount=this.modCount;
         try
         {
-          DoubleSortUtil.uncheckedcomparatorSort(arr,0,size-1,sorter::compare);
+          SortUtil.uncheckedcomparatorSort(arr,0,size-1,sorter::compare);
         }
         finally
         {
@@ -1508,7 +1508,7 @@ public abstract class DoubleArrSeq extends AbstractDoubleList implements OmniCol
       final int size;
       if((size=this.size)>1)
       {
-         DoubleSortUtil.uncheckedreverseSort(arr,0,size-1);
+         SortUtil.uncheckedreverseSort(arr,0,size-1);
          ++this.modCount;
       }
     }
@@ -1517,7 +1517,7 @@ public abstract class DoubleArrSeq extends AbstractDoubleList implements OmniCol
       final int size;
       if((size=this.size)>1)
       {
-         DoubleSortUtil.uncheckedsort(arr,0,size-1);
+         SortUtil.uncheckedsort(arr,0,size-1);
          ++this.modCount;
       }
     }
@@ -2445,7 +2445,7 @@ public abstract class DoubleArrSeq extends AbstractDoubleList implements OmniCol
           int modCount=this.modCount;
           try
           {
-            final int rootOffset;DoubleSortUtil.uncheckedcomparatorSort(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,sorter);
+            final int rootOffset;SortUtil.uncheckedcomparatorSort(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,sorter);
           }
           finally
           {
@@ -2470,7 +2470,7 @@ public abstract class DoubleArrSeq extends AbstractDoubleList implements OmniCol
         if((size=this.size)>1)
         {
           final int rootOffset;
-          DoubleSortUtil.uncheckedreverseSort(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
+          SortUtil.uncheckedreverseSort(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
               root.modCount=++modCount;
               bubbleUpIncrementModCount(parent);
               this.modCount=modCount;
@@ -2486,7 +2486,7 @@ public abstract class DoubleArrSeq extends AbstractDoubleList implements OmniCol
         if((size=this.size)>1)
         {
           final int rootOffset;
-          DoubleSortUtil.uncheckedsort(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
+          SortUtil.uncheckedsort(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
               root.modCount=++modCount;
               bubbleUpIncrementModCount(parent);
               this.modCount=modCount;
@@ -2538,7 +2538,7 @@ public abstract class DoubleArrSeq extends AbstractDoubleList implements OmniCol
           int modCount=this.modCount;
           try
           {
-            final int rootOffset;DoubleSortUtil.uncheckedcomparatorSort(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,sorter::compare);
+            final int rootOffset;SortUtil.uncheckedcomparatorSort(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,sorter::compare);
           }
           finally
           {
@@ -3368,7 +3368,7 @@ public abstract class DoubleArrSeq extends AbstractDoubleList implements OmniCol
       final int size;
       if(1<((size=this.size)))
       {
-        DoubleSortUtil.uncheckedreverseSort(arr,0,size-1);
+        SortUtil.uncheckedreverseSort(arr,0,size-1);
       }
     }
     @Override
@@ -3377,7 +3377,7 @@ public abstract class DoubleArrSeq extends AbstractDoubleList implements OmniCol
       final int size;
       if(1<((size=this.size)))
       {
-        DoubleSortUtil.uncheckedsort(arr,0,size-1);
+        SortUtil.uncheckedsort(arr,0,size-1);
       }
     }
     @Override
@@ -3386,7 +3386,7 @@ public abstract class DoubleArrSeq extends AbstractDoubleList implements OmniCol
       final int size;
       if(1<((size=this.size)))
       {
-        DoubleSortUtil.uncheckedcomparatorSort(arr,0,size-1,sorter);
+        SortUtil.uncheckedcomparatorSort(arr,0,size-1,sorter);
       }
     }
     @Override
@@ -3404,7 +3404,7 @@ public abstract class DoubleArrSeq extends AbstractDoubleList implements OmniCol
       final int size;
       if(1<((size=this.size)))
       {
-        DoubleSortUtil.uncheckedcomparatorSort(arr,0,size-1,sorter::compare);
+        SortUtil.uncheckedcomparatorSort(arr,0,size-1,sorter::compare);
       }
     }
     @Override
@@ -4202,7 +4202,7 @@ public abstract class DoubleArrSeq extends AbstractDoubleList implements OmniCol
         if(1<((size=this.size)))
         {
           final int rootOffset;
-          DoubleSortUtil.uncheckedreverseSort(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
+          SortUtil.uncheckedreverseSort(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
         }
       }
       @Override
@@ -4212,7 +4212,7 @@ public abstract class DoubleArrSeq extends AbstractDoubleList implements OmniCol
         if(1<((size=this.size)))
         {
           final int rootOffset;
-          DoubleSortUtil.uncheckedsort(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
+          SortUtil.uncheckedsort(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
         }
       }
       @Override
@@ -4222,7 +4222,7 @@ public abstract class DoubleArrSeq extends AbstractDoubleList implements OmniCol
         if(1<((size=this.size)))
         {
           final int rootOffset;
-          DoubleSortUtil.uncheckedcomparatorSort(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,sorter);
+          SortUtil.uncheckedcomparatorSort(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,sorter);
         }
       }
       @Override
@@ -4242,7 +4242,7 @@ public abstract class DoubleArrSeq extends AbstractDoubleList implements OmniCol
         if(1<((size=this.size)))
         {
           final int rootOffset;
-          DoubleSortUtil.uncheckedcomparatorSort(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,sorter::compare);
+          SortUtil.uncheckedcomparatorSort(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,sorter::compare);
         }
       }
       @Override

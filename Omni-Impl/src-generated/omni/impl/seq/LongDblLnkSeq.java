@@ -18,7 +18,7 @@ import omni.function.LongComparator;
 import java.util.function.LongConsumer;
 import java.util.function.LongPredicate;
 import java.util.function.LongUnaryOperator;
-import omni.util.LongSortUtil;
+import omni.util.SortUtil;
 public abstract class LongDblLnkSeq extends AbstractLongList implements OmniList.OfLong
 {
   private static  boolean uncheckedcontains(Node begin,Node end,long val)
@@ -5613,21 +5613,21 @@ public abstract class LongDblLnkSeq extends AbstractLongList implements OmniList
     {
       long[] tmpArr;
       uncheckedCopyForward(tmpArr=new long[size],0,size);
-      LongSortUtil.uncheckedsort(tmpArr,0,size-1);
+      SortUtil.uncheckedsort(tmpArr,0,size-1);
       copyFromArray(tmpArr,0,size);
     }
     private void uncheckedreverseSort(int size,Node end)
     {
       long[] tmpArr;
       uncheckedCopyForward(tmpArr=new long[size],0,size);
-      LongSortUtil.uncheckedreverseSort(tmpArr,0,size-1);
+      SortUtil.uncheckedreverseSort(tmpArr,0,size-1);
       copyFromArray(tmpArr,0,size);
     }
     private void uncheckedcomparatorSort(int size,Node end,LongComparator sorter)
     {
       long[] tmpArr;
       uncheckedCopyForward(tmpArr=new long[size],0,size);
-      LongSortUtil.uncheckedcomparatorSort(tmpArr,0,size-1,sorter);
+      SortUtil.uncheckedcomparatorSort(tmpArr,0,size-1,sorter);
       copyFromArray(tmpArr,0,size);
     }
     private void uncheckedCopyForward(long[] dst,int dstOffset,int length)

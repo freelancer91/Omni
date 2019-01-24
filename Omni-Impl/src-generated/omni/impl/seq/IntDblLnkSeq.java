@@ -18,7 +18,7 @@ import java.util.function.IntBinaryOperator;
 import java.util.function.IntConsumer;
 import java.util.function.IntPredicate;
 import java.util.function.IntUnaryOperator;
-import omni.util.IntSortUtil;
+import omni.util.SortUtil;
 public abstract class IntDblLnkSeq extends AbstractIntList implements OmniList.OfInt
 {
   private static  boolean uncheckedcontains(Node begin,Node end,int val)
@@ -5732,21 +5732,21 @@ public abstract class IntDblLnkSeq extends AbstractIntList implements OmniList.O
     {
       int[] tmpArr;
       uncheckedCopyForward(tmpArr=new int[size],0,size);
-      IntSortUtil.uncheckedsort(tmpArr,0,size-1);
+      SortUtil.uncheckedsort(tmpArr,0,size-1);
       copyFromArray(tmpArr,0,size);
     }
     private void uncheckedreverseSort(int size,Node end)
     {
       int[] tmpArr;
       uncheckedCopyForward(tmpArr=new int[size],0,size);
-      IntSortUtil.uncheckedreverseSort(tmpArr,0,size-1);
+      SortUtil.uncheckedreverseSort(tmpArr,0,size-1);
       copyFromArray(tmpArr,0,size);
     }
     private void uncheckedcomparatorSort(int size,Node end,IntBinaryOperator sorter)
     {
       int[] tmpArr;
       uncheckedCopyForward(tmpArr=new int[size],0,size);
-      IntSortUtil.uncheckedcomparatorSort(tmpArr,0,size-1,sorter);
+      SortUtil.uncheckedcomparatorSort(tmpArr,0,size-1,sorter);
       copyFromArray(tmpArr,0,size);
     }
     private void uncheckedCopyForward(int[] dst,int dstOffset,int length)

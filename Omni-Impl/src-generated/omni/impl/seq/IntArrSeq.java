@@ -13,7 +13,7 @@ import omni.api.OmniListIterator;
 import omni.impl.CheckedCollection;
 import omni.util.ArrCopy;
 import omni.util.OmniArray;
-import omni.util.IntSortUtil;
+import omni.util.SortUtil;
 import omni.impl.seq.AbstractIntList;
 import omni.impl.AbstractIntItr;
 import omni.util.BitSetUtils;
@@ -1251,7 +1251,7 @@ public abstract class IntArrSeq extends AbstractIntList implements OmniCollectio
         int modCount=this.modCount;
         try
         {
-          IntSortUtil.uncheckedcomparatorSort(arr,0,size-1,sorter);
+          SortUtil.uncheckedcomparatorSort(arr,0,size-1,sorter);
         }
         finally
         {
@@ -1287,7 +1287,7 @@ public abstract class IntArrSeq extends AbstractIntList implements OmniCollectio
         int modCount=this.modCount;
         try
         {
-          IntSortUtil.uncheckedcomparatorSort(arr,0,size-1,sorter::compare);
+          SortUtil.uncheckedcomparatorSort(arr,0,size-1,sorter::compare);
         }
         finally
         {
@@ -1301,7 +1301,7 @@ public abstract class IntArrSeq extends AbstractIntList implements OmniCollectio
       final int size;
       if((size=this.size)>1)
       {
-         IntSortUtil.uncheckedreverseSort(arr,0,size-1);
+         SortUtil.uncheckedreverseSort(arr,0,size-1);
          ++this.modCount;
       }
     }
@@ -1310,7 +1310,7 @@ public abstract class IntArrSeq extends AbstractIntList implements OmniCollectio
       final int size;
       if((size=this.size)>1)
       {
-         IntSortUtil.uncheckedsort(arr,0,size-1);
+         SortUtil.uncheckedsort(arr,0,size-1);
          ++this.modCount;
       }
     }
@@ -2169,7 +2169,7 @@ public abstract class IntArrSeq extends AbstractIntList implements OmniCollectio
           int modCount=this.modCount;
           try
           {
-            final int rootOffset;IntSortUtil.uncheckedcomparatorSort(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,sorter);
+            final int rootOffset;SortUtil.uncheckedcomparatorSort(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,sorter);
           }
           finally
           {
@@ -2194,7 +2194,7 @@ public abstract class IntArrSeq extends AbstractIntList implements OmniCollectio
         if((size=this.size)>1)
         {
           final int rootOffset;
-          IntSortUtil.uncheckedreverseSort(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
+          SortUtil.uncheckedreverseSort(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
               root.modCount=++modCount;
               bubbleUpIncrementModCount(parent);
               this.modCount=modCount;
@@ -2210,7 +2210,7 @@ public abstract class IntArrSeq extends AbstractIntList implements OmniCollectio
         if((size=this.size)>1)
         {
           final int rootOffset;
-          IntSortUtil.uncheckedsort(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
+          SortUtil.uncheckedsort(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
               root.modCount=++modCount;
               bubbleUpIncrementModCount(parent);
               this.modCount=modCount;
@@ -2262,7 +2262,7 @@ public abstract class IntArrSeq extends AbstractIntList implements OmniCollectio
           int modCount=this.modCount;
           try
           {
-            final int rootOffset;IntSortUtil.uncheckedcomparatorSort(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,sorter::compare);
+            final int rootOffset;SortUtil.uncheckedcomparatorSort(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,sorter::compare);
           }
           finally
           {
@@ -3045,7 +3045,7 @@ public abstract class IntArrSeq extends AbstractIntList implements OmniCollectio
       final int size;
       if(1<((size=this.size)))
       {
-        IntSortUtil.uncheckedreverseSort(arr,0,size-1);
+        SortUtil.uncheckedreverseSort(arr,0,size-1);
       }
     }
     @Override
@@ -3054,7 +3054,7 @@ public abstract class IntArrSeq extends AbstractIntList implements OmniCollectio
       final int size;
       if(1<((size=this.size)))
       {
-        IntSortUtil.uncheckedsort(arr,0,size-1);
+        SortUtil.uncheckedsort(arr,0,size-1);
       }
     }
     @Override
@@ -3063,7 +3063,7 @@ public abstract class IntArrSeq extends AbstractIntList implements OmniCollectio
       final int size;
       if(1<((size=this.size)))
       {
-        IntSortUtil.uncheckedcomparatorSort(arr,0,size-1,sorter);
+        SortUtil.uncheckedcomparatorSort(arr,0,size-1,sorter);
       }
     }
     @Override
@@ -3081,7 +3081,7 @@ public abstract class IntArrSeq extends AbstractIntList implements OmniCollectio
       final int size;
       if(1<((size=this.size)))
       {
-        IntSortUtil.uncheckedcomparatorSort(arr,0,size-1,sorter::compare);
+        SortUtil.uncheckedcomparatorSort(arr,0,size-1,sorter::compare);
       }
     }
     @Override
@@ -3812,7 +3812,7 @@ public abstract class IntArrSeq extends AbstractIntList implements OmniCollectio
         if(1<((size=this.size)))
         {
           final int rootOffset;
-          IntSortUtil.uncheckedreverseSort(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
+          SortUtil.uncheckedreverseSort(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
         }
       }
       @Override
@@ -3822,7 +3822,7 @@ public abstract class IntArrSeq extends AbstractIntList implements OmniCollectio
         if(1<((size=this.size)))
         {
           final int rootOffset;
-          IntSortUtil.uncheckedsort(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
+          SortUtil.uncheckedsort(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
         }
       }
       @Override
@@ -3832,7 +3832,7 @@ public abstract class IntArrSeq extends AbstractIntList implements OmniCollectio
         if(1<((size=this.size)))
         {
           final int rootOffset;
-          IntSortUtil.uncheckedcomparatorSort(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,sorter);
+          SortUtil.uncheckedcomparatorSort(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,sorter);
         }
       }
       @Override
@@ -3852,7 +3852,7 @@ public abstract class IntArrSeq extends AbstractIntList implements OmniCollectio
         if(1<((size=this.size)))
         {
           final int rootOffset;
-          IntSortUtil.uncheckedcomparatorSort(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,sorter::compare);
+          SortUtil.uncheckedcomparatorSort(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,sorter::compare);
         }
       }
       @Override

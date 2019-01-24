@@ -18,7 +18,7 @@ import omni.function.ByteComparator;
 import omni.function.BytePredicate;
 import omni.function.ByteConsumer;
 import omni.function.ByteUnaryOperator;
-import omni.util.ByteSortUtil;
+import omni.util.SortUtil;
 public abstract class ByteDblLnkSeq extends AbstractByteList implements OmniList.OfByte
 {
   private static  boolean uncheckedcontains(Node begin,Node end,int val)
@@ -6238,7 +6238,7 @@ public abstract class ByteDblLnkSeq extends AbstractByteList implements OmniList
     {
       byte[] tmpArr;
       uncheckedCopyForward(tmpArr=new byte[size],0,size);
-      ByteSortUtil.uncheckedcomparatorSort(tmpArr,0,size-1,sorter);
+      SortUtil.uncheckedcomparatorSort(tmpArr,0,size-1,sorter);
       copyFromArray(tmpArr,0,size);
     }
     private void uncheckedCopyForward(byte[] dst,int dstOffset,int length)

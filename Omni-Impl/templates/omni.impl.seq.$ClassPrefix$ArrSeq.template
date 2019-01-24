@@ -22,7 +22,7 @@ import omni.api.OmniListIterator;
 import omni.impl.CheckedCollection;
 import omni.util.ArrCopy;
 import omni.util.OmniArray;
-import omni.util.$ClassPrefix$SortUtil;
+import omni.util.SortUtil;
 #IF OfDouble,OfFloat
 import omni.util.HashUtils;
 #ENDIF
@@ -916,10 +916,10 @@ public abstract class $ClassPrefix$ArrSeq$<E>$ extends Abstract$ClassPrefix$List
       arr[index]=val;
     }
     #MACRO CheckedRootTryModifyFunc(replaceAll,$UnaryOperator$$<E>$ operator,0!=,$ClassPrefix$ArrSeq,size,replaceAll,operator)
-    #MACRO CheckedRootTryModifyFunc(sort,$Comparator$$<? super E>$ sorter,1<,$ClassPrefix$SortUtil,size-1,comparatorSort,sorter)
+    #MACRO CheckedRootTryModifyFunc(sort,$Comparator$$<? super E>$ sorter,1<,SortUtil,size-1,comparatorSort,sorter)
 #IFNOT OfRef
     #MACRO CheckedRootTryModifyFunc(replaceAll,UnaryOperator<$BoxedType$> operator,0!=,$ClassPrefix$ArrSeq,size,replaceAll,operator::apply)
-    #MACRO CheckedRootTryModifyFunc(sort,Comparator<? super $BoxedType$> sorter,1<,$ClassPrefix$SortUtil,size-1,comparatorSort,sorter::compare)
+    #MACRO CheckedRootTryModifyFunc(sort,Comparator<? super $BoxedType$> sorter,1<,SortUtil,size-1,comparatorSort,sorter::compare)
 #ENDIF
     #MACRO CheckedRootSortNoComparator(reverseSort)
     #MACRO CheckedRootSortNoComparator(sort)
@@ -1350,16 +1350,16 @@ public abstract class $ClassPrefix$ArrSeq$<E>$ extends Abstract$ClassPrefix$List
       }
       #MACRO RemoveIf($TypeNameModifier$Predicate$<? super E>$,filter,CheckedCollection.checkModCount(this.modCount\,root.modCount);)
       #MACRO CheckedSubListTryModify(replaceAll(final $UnaryOperator$$<E>$ operator),0!=,uncheckedreplaceAll(root.arr\\,rootOffset=this.rootOffset\\,rootOffset+size\\,operator);)      
-      #MACRO CheckedSubListTryModify(sort(final $Comparator$$<? super E>$ sorter),1<,$ClassPrefix$SortUtil.uncheckedcomparatorSort(root.arr\\,rootOffset=this.rootOffset\\,rootOffset+size-1\\,sorter);)
+      #MACRO CheckedSubListTryModify(sort(final $Comparator$$<? super E>$ sorter),1<,SortUtil.uncheckedcomparatorSort(root.arr\\,rootOffset=this.rootOffset\\,rootOffset+size-1\\,sorter);)
 #IF OfRef
-      #MACRO CheckedSubListTryModify(reverseSort(),1<,$ClassPrefix$SortUtil.uncheckedreverseSort(root.arr\\,rootOffset=this.rootOffset\\,rootOffset+size-1);)
-      #MACRO CheckedSubListTryModify(sort(),1<,$ClassPrefix$SortUtil.uncheckedsort(root.arr\\,rootOffset=this.rootOffset\\,rootOffset+size-1);)
+      #MACRO CheckedSubListTryModify(reverseSort(),1<,SortUtil.uncheckedreverseSort(root.arr\\,rootOffset=this.rootOffset\\,rootOffset+size-1);)
+      #MACRO CheckedSubListTryModify(sort(),1<,SortUtil.uncheckedsort(root.arr\\,rootOffset=this.rootOffset\\,rootOffset+size-1);)
 #ELSE
       #MACRO CheckedSubListSortNoComparator(reverseSort)
       #MACRO CheckedSubListSortNoComparator(sort)
       #MACRO RemoveIf(Predicate<? super $BoxedType$>,filter::test,CheckedCollection.checkModCount(this.modCount\,root.modCount);)
       #MACRO CheckedSubListTryModify(replaceAll(final UnaryOperator<$BoxedType$> operator),0!=,uncheckedreplaceAll(root.arr\\,rootOffset=this.rootOffset\\,rootOffset+size\\,operator::apply);)
-      #MACRO CheckedSubListTryModify(sort(final Comparator<? super $BoxedType$> sorter),1<,$ClassPrefix$SortUtil.uncheckedcomparatorSort(root.arr\\,rootOffset=this.rootOffset\\,rootOffset+size-1\\,sorter::compare);)
+      #MACRO CheckedSubListTryModify(sort(final Comparator<? super $BoxedType$> sorter),1<,SortUtil.uncheckedcomparatorSort(root.arr\\,rootOffset=this.rootOffset\\,rootOffset+size-1\\,sorter::compare);)
 #ENDIF
       @Override
       public $exposedType$ set(int index,final $exposedType$ val)
@@ -2009,12 +2009,12 @@ public abstract class $ClassPrefix$ArrSeq$<E>$ extends Abstract$ClassPrefix$List
       arr[index]=val;
     }
     #MACRO UncheckedRootModifyingFunc(replaceAll,final $UnaryOperator$$<E>$ operator,0!=,$ClassPrefix$ArrSeq,replaceAll,size\,operator)
-    #MACRO UncheckedRootModifyingFunc(reverseSort,,1<,$ClassPrefix$SortUtil,reverseSort,size-1)
-    #MACRO UncheckedRootModifyingFunc(sort,,1<,$ClassPrefix$SortUtil,sort,size-1)
-    #MACRO UncheckedRootModifyingFunc(sort,final $Comparator$$<? super E>$ sorter,1<,$ClassPrefix$SortUtil,comparatorSort,size-1\,sorter)
+    #MACRO UncheckedRootModifyingFunc(reverseSort,,1<,SortUtil,reverseSort,size-1)
+    #MACRO UncheckedRootModifyingFunc(sort,,1<,SortUtil,sort,size-1)
+    #MACRO UncheckedRootModifyingFunc(sort,final $Comparator$$<? super E>$ sorter,1<,SortUtil,comparatorSort,size-1\,sorter)
 #IFNOT OfRef
     #MACRO UncheckedRootModifyingFunc(replaceAll,final UnaryOperator<$BoxedType$> operator,0!=,$ClassPrefix$ArrSeq,replaceAll,size\,operator::apply)
-    #MACRO UncheckedRootModifyingFunc(sort,final Comparator<? super $BoxedType$> sorter,1<,$ClassPrefix$SortUtil,comparatorSort,size-1\,sorter::compare)
+    #MACRO UncheckedRootModifyingFunc(sort,final Comparator<? super $BoxedType$> sorter,1<,SortUtil,comparatorSort,size-1\,sorter::compare)
 #ENDIF
     @Override
     public OmniList.Of$ClassPrefix$$<E>$ subList(final int fromIndex,final int toIndex)
@@ -2354,12 +2354,12 @@ public abstract class $ClassPrefix$ArrSeq$<E>$ extends Abstract$ClassPrefix$List
       }
       #MACRO RemoveIf($TypeNameModifier$Predicate$<? super E>$,filter,)
       #MACRO UncheckedSubListModifyingFunc(replaceAll,final $UnaryOperator$$<E>$ operator,0!=,$ClassPrefix$ArrSeq,replaceAll,size\,operator)
-      #MACRO UncheckedSubListModifyingFunc(reverseSort,,1<,$ClassPrefix$SortUtil,reverseSort,size-1)
-      #MACRO UncheckedSubListModifyingFunc(sort,,1<,$ClassPrefix$SortUtil,sort,size-1)
-      #MACRO UncheckedSubListModifyingFunc(sort,final $Comparator$$<? super E>$ sorter,1<,$ClassPrefix$SortUtil,comparatorSort,size-1\,sorter)
+      #MACRO UncheckedSubListModifyingFunc(reverseSort,,1<,SortUtil,reverseSort,size-1)
+      #MACRO UncheckedSubListModifyingFunc(sort,,1<,SortUtil,sort,size-1)
+      #MACRO UncheckedSubListModifyingFunc(sort,final $Comparator$$<? super E>$ sorter,1<,SortUtil,comparatorSort,size-1\,sorter)
 #IFNOT OfRef
       #MACRO UncheckedSubListModifyingFunc(replaceAll,final UnaryOperator<$BoxedType$> operator,0!=,$ClassPrefix$ArrSeq,replaceAll,size\,operator::apply)
-      #MACRO UncheckedSubListModifyingFunc(sort,final Comparator<? super $BoxedType$> sorter,1<,$ClassPrefix$SortUtil,comparatorSort,size-1\,sorter::compare)
+      #MACRO UncheckedSubListModifyingFunc(sort,final Comparator<? super $BoxedType$> sorter,1<,SortUtil,comparatorSort,size-1\,sorter::compare)
       #MACRO RemoveIf(Predicate<? super $BoxedType$>,filter::test,)    
 #ENDIF
       @Override
@@ -2875,10 +2875,10 @@ public void sortMethod()
   if((size=this.size)>1)
   {
 #IF OfRef
-    #MACRO TryCheckModCount(this,$ClassPrefix$SortUtil.uncheckedsortMethod(arr\,0\,size-1);)
+    #MACRO TryCheckModCount(this,SortUtil.uncheckedsortMethod(arr\,0\,size-1);)
     this.modCount=modCount+1;
 #ELSE
-     $ClassPrefix$SortUtil.uncheckedsortMethod(arr,0,size-1);
+     SortUtil.uncheckedsortMethod(arr,0,size-1);
      ++this.modCount;
 #ENDIF
   }
@@ -2946,7 +2946,7 @@ public void methodName()
   if((size=this.size)>1)
   {
     final int rootOffset;
-    $ClassPrefix$SortUtil.uncheckedmethodName(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
+    SortUtil.uncheckedmethodName(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
     #MACRO SubListIncrementModCount()
   }
 }

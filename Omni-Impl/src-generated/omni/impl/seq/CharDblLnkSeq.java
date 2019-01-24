@@ -18,7 +18,7 @@ import omni.function.CharComparator;
 import omni.function.CharPredicate;
 import omni.function.CharConsumer;
 import omni.function.CharUnaryOperator;
-import omni.util.CharSortUtil;
+import omni.util.SortUtil;
 public abstract class CharDblLnkSeq extends AbstractCharList implements OmniList.OfChar
 {
   private static  boolean uncheckedcontains(Node begin,Node end,int val)
@@ -6074,7 +6074,7 @@ public abstract class CharDblLnkSeq extends AbstractCharList implements OmniList
         //doSort
         char[] tmpArr;
         uncheckedCopyForward(tmpArr=new char[size],0,size);
-        CharSortUtil.dosort(tmpArr,0,size-1);
+        SortUtil.dosort(tmpArr,0,size-1);
         copyFromArray(tmpArr,0,size);
       }
       else
@@ -6119,7 +6119,7 @@ public abstract class CharDblLnkSeq extends AbstractCharList implements OmniList
         //doSort
         char[] tmpArr;
         uncheckedCopyForward(tmpArr=new char[size],0,size);
-        CharSortUtil.doreverseSort(tmpArr,0,size-1);
+        SortUtil.doreverseSort(tmpArr,0,size-1);
         copyFromArray(tmpArr,0,size);
       }
       else
@@ -6131,7 +6131,7 @@ public abstract class CharDblLnkSeq extends AbstractCharList implements OmniList
     {
       char[] tmpArr;
       uncheckedCopyForward(tmpArr=new char[size],0,size);
-      CharSortUtil.uncheckedcomparatorSort(tmpArr,0,size-1,sorter);
+      SortUtil.uncheckedcomparatorSort(tmpArr,0,size-1,sorter);
       copyFromArray(tmpArr,0,size);
     }
     private void uncheckedCopyForward(char[] dst,int dstOffset,int length)

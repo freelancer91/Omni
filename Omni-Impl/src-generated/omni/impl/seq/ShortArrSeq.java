@@ -13,7 +13,7 @@ import omni.api.OmniListIterator;
 import omni.impl.CheckedCollection;
 import omni.util.ArrCopy;
 import omni.util.OmniArray;
-import omni.util.ShortSortUtil;
+import omni.util.SortUtil;
 import omni.impl.seq.AbstractShortList;
 import omni.impl.AbstractShortItr;
 import omni.util.BitSetUtils;
@@ -1397,7 +1397,7 @@ public abstract class ShortArrSeq extends AbstractShortList implements OmniColle
         int modCount=this.modCount;
         try
         {
-          ShortSortUtil.uncheckedcomparatorSort(arr,0,size-1,sorter);
+          SortUtil.uncheckedcomparatorSort(arr,0,size-1,sorter);
         }
         finally
         {
@@ -1433,7 +1433,7 @@ public abstract class ShortArrSeq extends AbstractShortList implements OmniColle
         int modCount=this.modCount;
         try
         {
-          ShortSortUtil.uncheckedcomparatorSort(arr,0,size-1,sorter::compare);
+          SortUtil.uncheckedcomparatorSort(arr,0,size-1,sorter::compare);
         }
         finally
         {
@@ -1447,7 +1447,7 @@ public abstract class ShortArrSeq extends AbstractShortList implements OmniColle
       final int size;
       if((size=this.size)>1)
       {
-         ShortSortUtil.uncheckedreverseSort(arr,0,size-1);
+         SortUtil.uncheckedreverseSort(arr,0,size-1);
          ++this.modCount;
       }
     }
@@ -1456,7 +1456,7 @@ public abstract class ShortArrSeq extends AbstractShortList implements OmniColle
       final int size;
       if((size=this.size)>1)
       {
-         ShortSortUtil.uncheckedsort(arr,0,size-1);
+         SortUtil.uncheckedsort(arr,0,size-1);
          ++this.modCount;
       }
     }
@@ -2432,7 +2432,7 @@ public abstract class ShortArrSeq extends AbstractShortList implements OmniColle
           int modCount=this.modCount;
           try
           {
-            final int rootOffset;ShortSortUtil.uncheckedcomparatorSort(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,sorter);
+            final int rootOffset;SortUtil.uncheckedcomparatorSort(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,sorter);
           }
           finally
           {
@@ -2457,7 +2457,7 @@ public abstract class ShortArrSeq extends AbstractShortList implements OmniColle
         if((size=this.size)>1)
         {
           final int rootOffset;
-          ShortSortUtil.uncheckedreverseSort(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
+          SortUtil.uncheckedreverseSort(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
               root.modCount=++modCount;
               bubbleUpIncrementModCount(parent);
               this.modCount=modCount;
@@ -2473,7 +2473,7 @@ public abstract class ShortArrSeq extends AbstractShortList implements OmniColle
         if((size=this.size)>1)
         {
           final int rootOffset;
-          ShortSortUtil.uncheckedsort(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
+          SortUtil.uncheckedsort(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
               root.modCount=++modCount;
               bubbleUpIncrementModCount(parent);
               this.modCount=modCount;
@@ -2525,7 +2525,7 @@ public abstract class ShortArrSeq extends AbstractShortList implements OmniColle
           int modCount=this.modCount;
           try
           {
-            final int rootOffset;ShortSortUtil.uncheckedcomparatorSort(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,sorter::compare);
+            final int rootOffset;SortUtil.uncheckedcomparatorSort(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,sorter::compare);
           }
           finally
           {
@@ -3337,7 +3337,7 @@ public abstract class ShortArrSeq extends AbstractShortList implements OmniColle
       final int size;
       if(1<((size=this.size)))
       {
-        ShortSortUtil.uncheckedreverseSort(arr,0,size-1);
+        SortUtil.uncheckedreverseSort(arr,0,size-1);
       }
     }
     @Override
@@ -3346,7 +3346,7 @@ public abstract class ShortArrSeq extends AbstractShortList implements OmniColle
       final int size;
       if(1<((size=this.size)))
       {
-        ShortSortUtil.uncheckedsort(arr,0,size-1);
+        SortUtil.uncheckedsort(arr,0,size-1);
       }
     }
     @Override
@@ -3355,7 +3355,7 @@ public abstract class ShortArrSeq extends AbstractShortList implements OmniColle
       final int size;
       if(1<((size=this.size)))
       {
-        ShortSortUtil.uncheckedcomparatorSort(arr,0,size-1,sorter);
+        SortUtil.uncheckedcomparatorSort(arr,0,size-1,sorter);
       }
     }
     @Override
@@ -3373,7 +3373,7 @@ public abstract class ShortArrSeq extends AbstractShortList implements OmniColle
       final int size;
       if(1<((size=this.size)))
       {
-        ShortSortUtil.uncheckedcomparatorSort(arr,0,size-1,sorter::compare);
+        SortUtil.uncheckedcomparatorSort(arr,0,size-1,sorter::compare);
       }
     }
     @Override
@@ -4213,7 +4213,7 @@ public abstract class ShortArrSeq extends AbstractShortList implements OmniColle
         if(1<((size=this.size)))
         {
           final int rootOffset;
-          ShortSortUtil.uncheckedreverseSort(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
+          SortUtil.uncheckedreverseSort(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
         }
       }
       @Override
@@ -4223,7 +4223,7 @@ public abstract class ShortArrSeq extends AbstractShortList implements OmniColle
         if(1<((size=this.size)))
         {
           final int rootOffset;
-          ShortSortUtil.uncheckedsort(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
+          SortUtil.uncheckedsort(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
         }
       }
       @Override
@@ -4233,7 +4233,7 @@ public abstract class ShortArrSeq extends AbstractShortList implements OmniColle
         if(1<((size=this.size)))
         {
           final int rootOffset;
-          ShortSortUtil.uncheckedcomparatorSort(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,sorter);
+          SortUtil.uncheckedcomparatorSort(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,sorter);
         }
       }
       @Override
@@ -4253,7 +4253,7 @@ public abstract class ShortArrSeq extends AbstractShortList implements OmniColle
         if(1<((size=this.size)))
         {
           final int rootOffset;
-          ShortSortUtil.uncheckedcomparatorSort(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,sorter::compare);
+          SortUtil.uncheckedcomparatorSort(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,sorter::compare);
         }
       }
       @Override

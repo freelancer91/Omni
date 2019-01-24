@@ -13,7 +13,7 @@ import omni.api.OmniListIterator;
 import omni.impl.CheckedCollection;
 import omni.util.ArrCopy;
 import omni.util.OmniArray;
-import omni.util.BooleanSortUtil;
+import omni.util.SortUtil;
 import omni.impl.seq.AbstractBooleanList;
 import omni.impl.AbstractBooleanItr;
 import omni.util.TypeUtil;
@@ -1421,7 +1421,7 @@ public abstract class BooleanArrSeq extends AbstractBooleanList implements OmniC
         int modCount=this.modCount;
         try
         {
-          BooleanSortUtil.uncheckedcomparatorSort(arr,0,size-1,sorter);
+          SortUtil.uncheckedcomparatorSort(arr,0,size-1,sorter);
         }
         finally
         {
@@ -1457,7 +1457,7 @@ public abstract class BooleanArrSeq extends AbstractBooleanList implements OmniC
         int modCount=this.modCount;
         try
         {
-          BooleanSortUtil.uncheckedcomparatorSort(arr,0,size-1,sorter::compare);
+          SortUtil.uncheckedcomparatorSort(arr,0,size-1,sorter::compare);
         }
         finally
         {
@@ -1471,7 +1471,7 @@ public abstract class BooleanArrSeq extends AbstractBooleanList implements OmniC
       final int size;
       if((size=this.size)>1)
       {
-         BooleanSortUtil.uncheckedreverseSort(arr,0,size-1);
+         SortUtil.uncheckedreverseSort(arr,0,size-1);
          ++this.modCount;
       }
     }
@@ -1480,7 +1480,7 @@ public abstract class BooleanArrSeq extends AbstractBooleanList implements OmniC
       final int size;
       if((size=this.size)>1)
       {
-         BooleanSortUtil.uncheckedsort(arr,0,size-1);
+         SortUtil.uncheckedsort(arr,0,size-1);
          ++this.modCount;
       }
     }
@@ -2543,7 +2543,7 @@ public abstract class BooleanArrSeq extends AbstractBooleanList implements OmniC
           int modCount=this.modCount;
           try
           {
-            final int rootOffset;BooleanSortUtil.uncheckedcomparatorSort(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,sorter);
+            final int rootOffset;SortUtil.uncheckedcomparatorSort(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,sorter);
           }
           finally
           {
@@ -2568,7 +2568,7 @@ public abstract class BooleanArrSeq extends AbstractBooleanList implements OmniC
         if((size=this.size)>1)
         {
           final int rootOffset;
-          BooleanSortUtil.uncheckedreverseSort(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
+          SortUtil.uncheckedreverseSort(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
               root.modCount=++modCount;
               bubbleUpIncrementModCount(parent);
               this.modCount=modCount;
@@ -2584,7 +2584,7 @@ public abstract class BooleanArrSeq extends AbstractBooleanList implements OmniC
         if((size=this.size)>1)
         {
           final int rootOffset;
-          BooleanSortUtil.uncheckedsort(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
+          SortUtil.uncheckedsort(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
               root.modCount=++modCount;
               bubbleUpIncrementModCount(parent);
               this.modCount=modCount;
@@ -2636,7 +2636,7 @@ public abstract class BooleanArrSeq extends AbstractBooleanList implements OmniC
           int modCount=this.modCount;
           try
           {
-            final int rootOffset;BooleanSortUtil.uncheckedcomparatorSort(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,sorter::compare);
+            final int rootOffset;SortUtil.uncheckedcomparatorSort(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,sorter::compare);
           }
           finally
           {
@@ -3594,7 +3594,7 @@ public abstract class BooleanArrSeq extends AbstractBooleanList implements OmniC
       final int size;
       if(1<((size=this.size)))
       {
-        BooleanSortUtil.uncheckedreverseSort(arr,0,size-1);
+        SortUtil.uncheckedreverseSort(arr,0,size-1);
       }
     }
     @Override
@@ -3603,7 +3603,7 @@ public abstract class BooleanArrSeq extends AbstractBooleanList implements OmniC
       final int size;
       if(1<((size=this.size)))
       {
-        BooleanSortUtil.uncheckedsort(arr,0,size-1);
+        SortUtil.uncheckedsort(arr,0,size-1);
       }
     }
     @Override
@@ -3612,7 +3612,7 @@ public abstract class BooleanArrSeq extends AbstractBooleanList implements OmniC
       final int size;
       if(1<((size=this.size)))
       {
-        BooleanSortUtil.uncheckedcomparatorSort(arr,0,size-1,sorter);
+        SortUtil.uncheckedcomparatorSort(arr,0,size-1,sorter);
       }
     }
     @Override
@@ -3630,7 +3630,7 @@ public abstract class BooleanArrSeq extends AbstractBooleanList implements OmniC
       final int size;
       if(1<((size=this.size)))
       {
-        BooleanSortUtil.uncheckedcomparatorSort(arr,0,size-1,sorter::compare);
+        SortUtil.uncheckedcomparatorSort(arr,0,size-1,sorter::compare);
       }
     }
     @Override
@@ -4549,7 +4549,7 @@ public abstract class BooleanArrSeq extends AbstractBooleanList implements OmniC
         if(1<((size=this.size)))
         {
           final int rootOffset;
-          BooleanSortUtil.uncheckedreverseSort(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
+          SortUtil.uncheckedreverseSort(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
         }
       }
       @Override
@@ -4559,7 +4559,7 @@ public abstract class BooleanArrSeq extends AbstractBooleanList implements OmniC
         if(1<((size=this.size)))
         {
           final int rootOffset;
-          BooleanSortUtil.uncheckedsort(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
+          SortUtil.uncheckedsort(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
         }
       }
       @Override
@@ -4569,7 +4569,7 @@ public abstract class BooleanArrSeq extends AbstractBooleanList implements OmniC
         if(1<((size=this.size)))
         {
           final int rootOffset;
-          BooleanSortUtil.uncheckedcomparatorSort(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,sorter);
+          SortUtil.uncheckedcomparatorSort(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,sorter);
         }
       }
       @Override
@@ -4589,7 +4589,7 @@ public abstract class BooleanArrSeq extends AbstractBooleanList implements OmniC
         if(1<((size=this.size)))
         {
           final int rootOffset;
-          BooleanSortUtil.uncheckedcomparatorSort(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,sorter::compare);
+          SortUtil.uncheckedcomparatorSort(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,sorter::compare);
         }
       }
       @Override
