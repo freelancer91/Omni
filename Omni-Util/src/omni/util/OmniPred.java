@@ -75,18 +75,6 @@ public interface OmniPred{
     }
   }
   interface OfRef{
-    // static <E> boolean equalsDblNaN(E val){
-    // return val instanceof Double&&Double.isNaN((double)val);
-    // }
-    // static <E> boolean equalsFalse(E val){
-    // return val instanceof Boolean&&!(boolean)val;
-    // }
-    // static <E> boolean equalsFltNaN(E val){
-    // return val instanceof Float&&Float.isNaN((float)val);
-    // }
-    // static <E> boolean equalsTrue(E val){
-    // return val instanceof Boolean&&(boolean)val;
-    // }
     static <E> Predicate<E> getEqualsDblBitsPred(long dblBits){
       return v->TypeUtil.refEqualsDblBits(v,dblBits);
     }
