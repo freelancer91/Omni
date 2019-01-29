@@ -168,14 +168,16 @@ public static TYPEPARAMETER void uncheckedMETHODNAME(ARRTYPE[] arr,int begin,int
     }
   }
 #ELSEIFSWITCH ARRTYPE==Object
+  /*
+  //FIXME this sorting implementation is currently broken
   int nRemaining;
-  if((nRemaining=end-begin)<31)
+  if((nRemaining=++end-begin)<32)
   {
      
      binaryMETHODNAME(arr,begin,end,begin+countRunAndMakeAscendingMETHODNAME(arr,begin,end));
      return;
   }
-  final AbstractTimSort ts=new METHODNAMEARRTYPETimSortTYPEPARAMETER(arr,++nRemaining);
+  final AbstractTimSort ts=new METHODNAMEARRTYPETimSortTYPEPARAMETER(arr,nRemaining);
   int minRun=minRunLength(nRemaining);
   int runLen;
   do
@@ -192,6 +194,7 @@ public static TYPEPARAMETER void uncheckedMETHODNAME(ARRTYPE[] arr,int begin,int
   while((nRemaining-=runLen)!=0);
   //assert begin==end+1;
   ts.mergeForceCollapse();
+  */
 #ELSE
 ERROR Unknown array type ARRTYPE
 #ENDIF
@@ -280,14 +283,16 @@ public static TYPEPARAMETER void uncheckedMETHODNAME(ARRTYPE[] arr,int begin,int
       }
   }
 #ELSE
+/*
+  //FIXME this sorting implementation is currently broken
   int nRemaining;
-  if((nRemaining=end-begin)<31)
+  if((nRemaining=++end-begin)<32)
   {
      
      binaryMETHODNAME(arr,begin,end,begin+countRunAndMakeAscendingMETHODNAME(arr,begin,end,sorter),sorter);
      return;
   }
-  final AbstractTimSort ts=new METHODNAMEARRTYPETimSortTYPEPARAMETER(arr,sorter,++nRemaining);
+  final AbstractTimSort ts=new METHODNAMEARRTYPETimSortTYPEPARAMETER(arr,sorter,nRemaining);
   int minRun=minRunLength(nRemaining);
   int runLen;
   do
@@ -304,6 +309,7 @@ public static TYPEPARAMETER void uncheckedMETHODNAME(ARRTYPE[] arr,int begin,int
   while((nRemaining-=runLen)!=0);
   //assert begin==end+1;
   ts.mergeForceCollapse();
+  */
 #ENDIF
 }
 
@@ -316,19 +322,6 @@ public static TYPEPARAMETER void uncheckedMETHODNAME(ARRTYPE[] arr,int begin,int
     super();
     //private constructor
   }
-
-  private static int minRunLength(int n)
-  {
-    //assert n>=0;
-    int r=0;
-    while(n>31)
-    {
-      r|=(n&1);
-      n>>=1;
-    }
-    return n+r;
-  }
-  
   #MACRO InsertSort<sort,byte,byte>()
   #MACRO InsertSort<sort,char,char>()
   #MACRO InsertSort<sort,short,short>()
@@ -860,7 +853,6 @@ private static void quickMETHODNAME(ARRTYPE[] arr,int begin,int end)
 }
 #ENDDEF
 
-
   #MACRO MergeMethod<sort,char,char>()
   #MACRO MergeMethod<sort,short,short>()
   #MACRO MergeMethod<sort,int,int>()
@@ -985,6 +977,49 @@ private static void countingMETHODNAME(ARRTYPE[] arr,int begin,int end)
 }
 #ENDDEF
 
+  private static void uncheckedSortHelper(boolean[] arr,int begin,int end,boolean firstVal)
+  {
+    //assert arr!=null;
+    //assert begin>=0;
+    //assert end<arr.length;
+    //assert begin<end;
+    //assert firstVal!=arr[begin];
+    //assert firstVal==arr[end];
+    int endValCounter=1;
+    for(int curr=begin+1;curr!=end;++curr)
+    {
+      if(arr[curr]^firstVal)
+      {
+        ++endValCounter;
+      }
+    }
+    for(final var endVal=!firstVal;;--end)
+    {
+      arr[end]=endVal;
+      if(--endValCounter==0)
+      {
+        do
+        {
+          arr[--end]=firstVal;
+        }
+        while(end!=begin);
+        return;
+      }
+    }
+  }
+/*
+  //FIXME fix the TimSort methods
+  private static int minRunLength(int n)
+  {
+    //assert n>=0;
+    int r=0;
+    while(n>31)
+    {
+      r|=(n&1);
+      n>>=1;
+    }
+    return n+r;
+  }
   #MACRO TimSort<comparatorSort,byte,ByteComparator,byte>( )
   #MACRO TimSort<comparatorSort,char,CharComparator,char>( )
   #MACRO TimSort<comparatorSort,short,ShortComparator,short>( )
@@ -1120,7 +1155,6 @@ private void mergeSide(ARRTYPE[] arr,int base1,int len1,int base2,int len2
 #ENDIF
 )
 {
-  //FIXME this code is broken
   ARRTYPE[] tmp;
   int cursor1,dest;
 #IFSWITCH Side==Lo
@@ -1416,7 +1450,6 @@ private static void reverseRange(ARRTYPE[] arr,int begin,int end)
   while(++begin<--end);
 }
 #ENDDEF
-
   #MACRO BinarySort<comparatorSort,byte,ByteComparator,byte>( )
   #MACRO BinarySort<comparatorSort,char,CharComparator,char>( )
   #MACRO BinarySort<comparatorSort,short,ShortComparator,short>( )
@@ -1457,7 +1490,6 @@ private static TYPEPARAMETER void binaryMETHODNAME(ARRTYPE[] arr,int lo,int hi,i
   }
 }
 #ENDDEF
-  
   #MACRO CountRunAndMakeAscending<comparatorSort,byte,ByteComparator,byte>( )
   #MACRO CountRunAndMakeAscending<comparatorSort,char,CharComparator,char>( )
   #MACRO CountRunAndMakeAscending<comparatorSort,short,ShortComparator,short>( )
@@ -1479,44 +1511,36 @@ private static TYPEPARAMETER int countRunAndMakeAscendingMETHODNAME(ARRTYPE[] ar
   //assert arr!=null;
   //assert begin<end;
   //assert begin>=0;
-  //assert end<arr.length;
+  //assert end<=arr.length;
   //assert sorter!=null;
+  
   int runHi;
-  #MACRO IfClause(LessThan,arr[runHi=begin+1],arr[begin])
+  if((runHi=begin+1)==end)
   {
-    for(;;)
+    return 1;
+  }
+  #MACRO IfClause(LessThan,arr[runHi++],arr[begin])
+  {
+    while(runHi<end &&
+    #MACRO METHODNAMELessThan(arr[runHi],arr[runHi-1])
+    )
     {
-      if(runHi==end)
-      {
-        reverseRange(arr,begin,runHi++);
-        break;
-      }
-      #MACRO IfClause(LessThanOrEqual,arr[runHi],arr[++runHi])
-      {
-        reverseRange(arr,begin,runHi-1);
-        break;
-      }
+      ++runHi;
     }
+    reverseRange(arr,begin,runHi-1);
   }
   else
   {
-    for(;;)
+    while(runHi<end &&
+    #MACRO METHODNAMEGreaterThanOrEqual(arr[runHi],arr[runHi-1])
+    )
     {
-      if(runHi==end)
-      {
-        ++runHi;
-        break;
-      }
-      #MACRO IfClause(GreaterThan,arr[runHi],arr[++runHi])
-      {
-        break;
-      }
+      ++runHi;
     }
   }
   return runHi-begin;
 }
 #ENDDEF
-  
   #MACRO Gallop<Left,comparatorSort,byte,byte,ByteComparator>( )
   #MACRO Gallop<Left,comparatorSort,char,char,CharComparator>( )
   #MACRO Gallop<Left,comparatorSort,short,short,ShortComparator>( )
@@ -1651,36 +1675,7 @@ private static TYPEPARAMETER int gallopDirectionMETHODNAME(EXPOSEDTYPE key,ARRTY
   return ofs;
 }
 #ENDDEF
-  private static void uncheckedSortHelper(boolean[] arr,int begin,int end,boolean firstVal)
-  {
-    //assert arr!=null;
-    //assert begin>=0;
-    //assert end<arr.length;
-    //assert begin<end;
-    //assert firstVal!=arr[begin];
-    //assert firstVal==arr[end];
-    int endValCounter=1;
-    for(int curr=begin+1;curr!=end;++curr)
-    {
-      if(arr[curr]^firstVal)
-      {
-        ++endValCounter;
-      }
-    }
-    for(final var endVal=!firstVal;;--end)
-    {
-      arr[end]=endVal;
-      if(--endValCounter==0)
-      {
-        do
-        {
-          arr[--end]=firstVal;
-        }
-        while(end!=begin);
-        return;
-      }
-    }
-  }
+*/
 }
 
 
@@ -1725,6 +1720,13 @@ while(
 (Val1)<=(Val2)
 #ENDIF
 #ENDDEF
+#MACRODEF sortGreaterThanOrEqual(Val1,Val2)
+#IFSWITCH ARRTYPE==Object
+((Comparable<E>)(Val1)).compareTo((E)(Val2))>=0
+#ELSE
+(Val1)>=(Val2)
+#ENDIF
+#ENDDEF
 #MACRODEF sortEqual(Val1,Val2)
 #IFSWITCH ARRTYPE==Object
 ((Comparable<E>)(Val1)).compareTo((E)(Val2))==0
@@ -1756,6 +1758,15 @@ sorter.applyAsInt((int)(Val1),(int)(Val2))<=0
 sorter.compare((E)(Val1),(E)(Val2))<=0
 #ELSE
 sorter.compare((ARRTYPE)(Val1),(ARRTYPE)(Val2))<=0
+#ENDIF
+#ENDDEF
+#MACRODEF comparatorSortGreaterThanOrEqual(Val1,Val2)
+#IFSWITCH ARRTYPE==int
+sorter.applyAsInt((int)(Val1),(int)(Val2))>=0
+#ELSEIFSWITCH ARRTYPE==Object
+sorter.compare((E)(Val1),(E)(Val2))>=0
+#ELSE
+sorter.compare((ARRTYPE)(Val1),(ARRTYPE)(Val2))>=0
 #ENDIF
 #ENDDEF
 #MACRODEF comparatorSortGreaterThan(Val1,Val2)
@@ -1790,16 +1801,23 @@ Integer.signum((Val1)-(Val2))
 
 #MACRODEF reverseSortLessThan(Val1,Val2)
 #IFSWITCH ARRTYPE==Object
-((Comparable<E>)(Val1)).compareTo((E)(Val2))<0
+((Comparable<E>)(Val1)).compareTo((E)(Val2))>=0
 #ELSE
 (Val1)>=(Val2)
 #ENDIF
 #ENDDEF
 #MACRODEF reverseSortLessThanOrEqual(Val1,Val2)
 #IFSWITCH ARRTYPE==Object
-((Comparable<E>)(Val1)).compareTo((E)(Val2))<=0
+((Comparable<E>)(Val1)).compareTo((E)(Val2))>0
 #ELSE
 (Val1)>(Val2)
+#ENDIF
+#ENDDEF
+#MACRODEF reverseSortGreaterThanOrEqual(Val1,Val2)
+#IFSWITCH ARRTYPE==Object
+((Comparable<E>)(Val1)).compareTo((E)(Val2))<0
+#ELSE
+(Val1)<(Val2)
 #ENDIF
 #ENDDEF
 #MACRODEF reverseSortEqual(Val1,Val2)
@@ -1811,7 +1829,7 @@ Integer.signum((Val1)-(Val2))
 #ENDDEF
 #MACRODEF reverseSortGreaterThan(Val1,Val2)
 #IFSWITCH ARRTYPE==Object
-((Comparable<E>)(Val1)).compareTo((E)(Val2))>0
+((Comparable<E>)(Val1)).compareTo((E)(Val2))<=0
 #ELSE
 (Val1)<=(Val2)
 #ENDIF

@@ -1,0 +1,144 @@
+#TYPEDEF OfGeneric
+package omni.util;
+import java.lang.reflect.Array;
+import java.util.function.DoublePredicate;
+import java.util.function.IntPredicate;
+import java.util.function.LongPredicate;
+import java.util.function.Predicate;
+import omni.function.CharPredicate;
+import omni.function.FloatPredicate;
+import omni.function.ShortPredicate;
+public final class OmniArray
+{
+  private OmniArray()
+  {
+    super();
+  }
+  public static final int DEFAULT_ARR_SEQ_CAP=10;
+  private static final int DEFAULT_ARR_SEQ_CAP_PLUS_50_PCT=DEFAULT_ARR_SEQ_CAP+(DEFAULT_ARR_SEQ_CAP>>>1);
+  public static final int MAX_ARR_SIZE=Integer.MAX_VALUE-8;
+  private static final int MAX_ARR_SIZE_50_PCT_GROWTH_THRESHOLD=(MAX_ARR_SIZE/3<<1)+1;
+  public static int growBy100Pct(int currentCapacity){
+    if(currentCapacity!=0){
+      if(currentCapacity<MAX_ARR_SIZE){
+        if(currentCapacity>MAX_ARR_SIZE>>>1){ return MAX_ARR_SIZE; }
+        return currentCapacity<<1;
+      }else if(currentCapacity==Integer.MAX_VALUE){
+        throw new OutOfMemoryError();
+      }
+    }
+    return currentCapacity+1;
+  }
+  public static int growBy100Pct(int currentCapacity,int minCapacity){
+    if(currentCapacity!=0){
+      if(minCapacity<MAX_ARR_SIZE){
+        if(minCapacity<0){
+          throw new OutOfMemoryError();
+        }
+        if(currentCapacity>MAX_ARR_SIZE>>>1){ return MAX_ARR_SIZE; }
+        if((currentCapacity<<=1)>=minCapacity){ return currentCapacity; }
+      }
+    }else if(minCapacity<0){
+      throw new OutOfMemoryError();
+    }
+    return minCapacity;
+  }
+  public static int growBy50Pct(int currentCapacity){
+    if(currentCapacity>1){
+      if(currentCapacity<MAX_ARR_SIZE){
+        if(currentCapacity>MAX_ARR_SIZE_50_PCT_GROWTH_THRESHOLD){ return MAX_ARR_SIZE; }
+        return currentCapacity+(currentCapacity>>>1);
+      }else if(currentCapacity==Integer.MAX_VALUE){
+        throw new OutOfMemoryError();
+      }
+    }
+    return currentCapacity+1;
+  }
+  public static int growBy50Pct(int currentCapacity,int minCapacity){
+    if(currentCapacity>1){
+      if(minCapacity<MAX_ARR_SIZE){
+        if(minCapacity<0){
+          throw new OutOfMemoryError();
+        }
+        if(currentCapacity>MAX_ARR_SIZE_50_PCT_GROWTH_THRESHOLD){ return MAX_ARR_SIZE; }
+        if((currentCapacity+=currentCapacity>>>1)>=minCapacity){ return currentCapacity; }
+      }
+    }else if(minCapacity<0){
+      throw new OutOfMemoryError();
+    }
+    return minCapacity;
+  }
+  public static int growToArrSeqDefault(int minCapacity){
+    if(minCapacity>=DEFAULT_ARR_SEQ_CAP_PLUS_50_PCT){ return minCapacity; }
+    if(minCapacity>=DEFAULT_ARR_SEQ_CAP){ return DEFAULT_ARR_SEQ_CAP_PLUS_50_PCT; }
+    return DEFAULT_ARR_SEQ_CAP;
+  }
+  @SuppressWarnings("unchecked") public static <T> T[] uncheckedArrResize(int size,T[] arr){
+    switch(Integer.signum(size-arr.length)){
+    case -1:
+        arr[size]=null;
+    default:
+        break;
+    case 1:
+        arr=(T[])Array.newInstance(arr.getClass().getComponentType(),size);
+    }
+    return arr;
+  }
+  #MACRO SubInterface<Boolean>(boolean,Boolean)
+  #MACRO SubInterface<Byte>(byte,Byte)
+  #MACRO SubInterface<Char>(char,Character)
+  #MACRO SubInterface<Short>(short,Short)
+  #MACRO SubInterface<Int>(int,Integer)
+  #MACRO SubInterface<Long>(long,Long)
+  #MACRO SubInterface<Float>(float,Float)
+  #MACRO SubInterface<Double>(double,Double)
+  #MACRO SubInterface<Ref>(Object,Object)
+}
+#MACRODEF SubInterface<CLASSPREFIX>(PRIMITIVETYPE,BOXEDTYPE)
+public interface OfCLASSPREFIX
+{
+  public static final PRIMITIVETYPE[] DEFAULT_ARR=new PRIMITIVETYPE[]{};
+#IFNOTSWITCH CLASSPREFIX==Ref
+  public static final BOXEDTYPE[] DEFAULT_BOXED_ARR=new BOXEDTYPE[]{};
+#ENDIF
+  static void reverseRange(PRIMITIVETYPE[] arr,int begin,int end)
+  {
+    do
+    {
+      var tmp=arr[begin];
+      arr[begin]=arr[end];
+      arr[end]=tmp;
+    }
+    while(++begin<--end);
+  }
+#IFSWITCH CLASSPREFIX==Char,Double,Float,Int,Long,Ref,Short
+  #IFSWITCH CLASSPREFIX==Ref
+  static void nullifyRange(Object[] arr,int begin,int end)
+  {
+    for(;;++begin){
+      arr[begin]=null;
+      if(begin==end){ return; }
+    }
+  }
+  @SafeVarargs
+  static <E> IntPredicate getIndexPredicate(Predicate<? super E> predicate,E...arr)
+  #ELSE
+  static IntPredicate getIndexPredicate(CLASSPREFIXPredicate predicate,PRIMITIVETYPE...arr)
+  #ENDIF
+  {
+    return index->predicate.test(arr[index]);
+  }
+#ENDIF
+#IFSWITCH CLASSPREFIX==Float
+  static IntPredicate getFltBitsIndexPredicate(CLASSPREFIXPredicate predicate,int...arr)
+  {
+    return index->predicate.test(Float.intBitsToFloat(arr[index]));
+  }
+#ELSEIFSWITCH CLASSPREFIX==Double
+  static IntPredicate getDblBitsIndexPredicate(CLASSPREFIXPredicate predicate,long...arr)
+  {
+    return index->predicate.test(Double.longBitsToDouble(arr[index]));
+  }
+#ENDIF
+}
+#ENDDEF

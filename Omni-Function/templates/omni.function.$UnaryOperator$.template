@@ -3,6 +3,8 @@
 #TYPEDEF OfShort
 #TYPEDEF OfFloat
 package omni.function;
+
+@FunctionalInterface
 public interface $UnaryOperator$
 {
   public abstract $exposedType$ $applyMethod$(final $exposedType$ val);

@@ -16,281 +16,50 @@ import omni.function.FloatComparator;
 import omni.function.DoubleComparator;
 public class SortUtilTest
 {
-  //TODO uncomment when the module bug is fixed
-  //MACRO GetComparator<Ascending,String,Comparator<String>>(NULL)
-  #MACRO GetComparator<Ascending,boolean,BooleanComparator>(Boolean)
-  #MACRO GetComparator<Ascending,byte,ByteComparator>(Byte)
-  #MACRO GetComparator<Ascending,char,CharComparator>(Character)
-  #MACRO GetComparator<Ascending,short,ShortComparator>(Short)
-  #MACRO GetComparator<Ascending,int,IntBinaryOperator>(Integer)
-  #MACRO GetComparator<Ascending,long,LongComparator>(Long)
-  #MACRO GetComparator<Ascending,float,FloatComparator>(Float)
-  #MACRO GetComparator<Ascending,double,DoubleComparator>(Double)
-  //TODO uncomment when the module bug is fixed
-  //MACRO GetComparator<Unsorted,String,Comparator<String>>(NULL)
-  #MACRO GetComparator<Unsorted,boolean,BooleanComparator>(Boolean)
-  #MACRO GetComparator<Unsorted,byte,ByteComparator>(Byte)
-  #MACRO GetComparator<Unsorted,char,CharComparator>(Character)
-  #MACRO GetComparator<Unsorted,short,ShortComparator>(Short)
-  #MACRO GetComparator<Unsorted,int,IntBinaryOperator>(Integer)
-  #MACRO GetComparator<Unsorted,long,LongComparator>(Long)
-  #MACRO GetComparator<Unsorted,float,FloatComparator>(Float)
-  #MACRO GetComparator<Unsorted,double,DoubleComparator>(Double)
-  //TODO uncomment when the module bug is fixed
-  //MACRO GetComparator<Descending,String,Comparator<String>>(NULL)
-  #MACRO GetComparator<Descending,boolean,BooleanComparator>(Boolean)
-  #MACRO GetComparator<Descending,byte,ByteComparator>(Byte)
-  #MACRO GetComparator<Descending,char,CharComparator>(Character)
-  #MACRO GetComparator<Descending,short,ShortComparator>(Short)
-  #MACRO GetComparator<Descending,int,IntBinaryOperator>(Integer)
-  #MACRO GetComparator<Descending,long,LongComparator>(Long)
-  #MACRO GetComparator<Descending,float,FloatComparator>(Float)
-  #MACRO GetComparator<Descending,double,DoubleComparator>(Double)
-  
-  //TODO uncomment when the module bug is fixed
-  //MACRO TestComparatorSortHelper<String,Ascending>()
-  #MACRO TestComparatorSortHelper<boolean,Ascending>()
-  #MACRO TestComparatorSortHelper<byte,Ascending>()
-  #MACRO TestComparatorSortHelper<char,Ascending>()
-  #MACRO TestComparatorSortHelper<short,Ascending>()
-  #MACRO TestComparatorSortHelper<int,Ascending>()
-  #MACRO TestComparatorSortHelper<long,Ascending>()
-  #MACRO TestComparatorSortHelper<float,Ascending>()
-  #MACRO TestComparatorSortHelper<double,Ascending>()
-  
-  //TODO uncomment when the module bug is fixed
-  //MACRO TestComparatorSortHelper<String,Unsorted>()
-  #MACRO TestComparatorSortHelper<boolean,Unsorted>()
-  #MACRO TestComparatorSortHelper<byte,Unsorted>()
-  #MACRO TestComparatorSortHelper<char,Unsorted>()
-  #MACRO TestComparatorSortHelper<short,Unsorted>()
-  #MACRO TestComparatorSortHelper<int,Unsorted>()
-  #MACRO TestComparatorSortHelper<long,Unsorted>()
-  #MACRO TestComparatorSortHelper<float,Unsorted>()
-  #MACRO TestComparatorSortHelper<double,Unsorted>()
-  
-  //TODO uncomment when the module bug is fixed
-  //MACRO TestComparatorSortHelper<String,Descending>()
-  #MACRO TestComparatorSortHelper<boolean,Descending>()
-  #MACRO TestComparatorSortHelper<byte,Descending>()
-  #MACRO TestComparatorSortHelper<char,Descending>()
-  #MACRO TestComparatorSortHelper<short,Descending>()
-  #MACRO TestComparatorSortHelper<int,Descending>()
-  #MACRO TestComparatorSortHelper<long,Descending>()
-  #MACRO TestComparatorSortHelper<float,Descending>()
-  #MACRO TestComparatorSortHelper<double,Descending>()
-  
-    //TODO uncomment when the module bug is fixed
-  //MACRO TestComparatorSortHelperAlreadySorted<String,Ascending>()
-  #MACRO TestComparatorSortHelperAlreadySorted<boolean,Ascending>()
-  #MACRO TestComparatorSortHelperAlreadySorted<byte,Ascending>()
-  #MACRO TestComparatorSortHelperAlreadySorted<char,Ascending>()
-  #MACRO TestComparatorSortHelperAlreadySorted<short,Ascending>()
-  #MACRO TestComparatorSortHelperAlreadySorted<int,Ascending>()
-  #MACRO TestComparatorSortHelperAlreadySorted<long,Ascending>()
-  #MACRO TestComparatorSortHelperAlreadySorted<float,Ascending>()
-  #MACRO TestComparatorSortHelperAlreadySorted<double,Ascending>()
-  
-
-  
-  //TODO uncomment when the module bug is fixed
-  //MACRO TestComparatorSortHelperAlreadySorted<String,Descending>()
-  #MACRO TestComparatorSortHelperAlreadySorted<boolean,Descending>()
-  #MACRO TestComparatorSortHelperAlreadySorted<byte,Descending>()
-  #MACRO TestComparatorSortHelperAlreadySorted<char,Descending>()
-  #MACRO TestComparatorSortHelperAlreadySorted<short,Descending>()
-  #MACRO TestComparatorSortHelperAlreadySorted<int,Descending>()
-  #MACRO TestComparatorSortHelperAlreadySorted<long,Descending>()
-  #MACRO TestComparatorSortHelperAlreadySorted<float,Descending>()
-  #MACRO TestComparatorSortHelperAlreadySorted<double,Descending>()
-  
-  @Test
-  public void testComparatorSortboolean()
-  {
-    Random rand=new Random(0);
-    int length=1000;
-    for(int i=0;i<100;++i)
-    {
-      testComparatorSortHelperAscendingboolean(rand,length);
-      testComparatorSortHelperUnsortedboolean(rand,length);
-      testComparatorSortHelperDescendingboolean(rand,length);
-      testComparatorSortHelperAlreadySortedAscendingboolean(rand,length);
-      testComparatorSortHelperAlreadySortedDescendingboolean(rand,length);
-    }
-    boolean[] homogenousArr=new boolean[1000];
-    SortUtil.uncheckedcomparatorSort(homogenousArr,0,999,getAscendingbooleanComparator());
-    for(int i=0;i<1000;++i)
-    {
-      Assert.assertFalse(homogenousArr[i]);
-    }
-  }
-  
-  @Test
-  public void testComparatorSortbyte()
-  {
-    Random rand=new Random(0);
-    int length=1000;
-    for(int i=0;i<100;++i)
-    {
-      testComparatorSortHelperAscendingbyte(rand,length);
-      //testComparatorSortHelperUnsortedbyte(rand,length);
-      testComparatorSortHelperDescendingbyte(rand,length);
-      testComparatorSortHelperAlreadySortedAscendingbyte(rand,length);
-      testComparatorSortHelperAlreadySortedDescendingbyte(rand,length);
-    }
-    length=29;
-    for(int i=0;i<100;++i)
-    {
-      testComparatorSortHelperAscendingbyte(rand,length);
-      //testComparatorSortHelperUnsortedbyte(rand,length);
-      testComparatorSortHelperDescendingbyte(rand,length);
-      testComparatorSortHelperAlreadySortedAscendingbyte(rand,length);
-      testComparatorSortHelperAlreadySortedDescendingbyte(rand,length);
-    }
-  }
-  
-  #MACRO ReverseRange(Object)
-  #MACRO ReverseRange(boolean)
-  #MACRO ReverseRange(byte)
-  #MACRO ReverseRange(char)
-  #MACRO ReverseRange(short)
-  #MACRO ReverseRange(int)
-  #MACRO ReverseRange(long)
-  #MACRO ReverseRange(float)
-  #MACRO ReverseRange(double)
-  
-  //TODO uncomment when the module bug is fixed
-  //MACRO GetSortedArray<String,Ascending>()
-  #MACRO GetSortedArray<boolean,Ascending>()
-  #MACRO GetSortedArray<byte,Ascending>()
-  #MACRO GetSortedArray<char,Ascending>()
-  #MACRO GetSortedArray<short,Ascending>()
-  #MACRO GetSortedArray<int,Ascending>()
-  #MACRO GetSortedArray<long,Ascending>()
-  #MACRO GetSortedArray<float,Ascending>()
-  #MACRO GetSortedArray<double,Ascending>()
-  
-  //TODO uncomment when the module bug is fixed
-  //MACRO GetSortedArray<String,Descending>()
-  #MACRO GetSortedArray<boolean,Descending>()
-  #MACRO GetSortedArray<byte,Descending>()
-  #MACRO GetSortedArray<char,Descending>()
-  #MACRO GetSortedArray<short,Descending>()
-  #MACRO GetSortedArray<int,Descending>()
-  #MACRO GetSortedArray<long,Descending>()
-  #MACRO GetSortedArray<float,Descending>()
-  #MACRO GetSortedArray<double,Descending>()
-}
-
-
-
-#MACRODEF ReverseRange(ARRTYPE)
-private static void reverseRange(ARRTYPE[] arr,int begin,int end)
-{
-  do
-  {
-    var tmp=arr[begin];
-    arr[begin]=arr[end];
-    arr[end]=tmp;
-  }
-  while(++begin<--end);
-}
-#ENDDEF
-
-#MACRODEF GetSortedArray<ARRTYPE,ASCENDINGORDESCENDING>()
-private static ARRTYPE[] getSortedARRTYPEASCENDINGORDESCENDINGArray(Random rand,int length)
-{
-  ARRTYPE[] arr=ArrCopyTest.getARRTYPEArr(rand,length);
-  #IFSWITCH ARRTYPE==boolean
-  Boolean[] boxedCopy=new Boolean[length];
-  ArrCopy.uncheckedCopy(arr,0,boxedCopy,0,length);
-  Arrays.sort(boxedCopy,0,length);
-  ArrCopy.uncheckedCopy(boxedCopy,0,arr,0,length);
-  #ELSE
-  Arrays.sort(arr,0,length);
-  #ENDIF
-  #IFSWITCH ASCENDINGORDESCENDING==Descending
-  reverseRange(arr,0,length-1);
-  #ENDIF
-  return arr;
-}
-#ENDDEF
-
-#MACRODEF TestComparatorSortHelperAlreadySorted<ARRTYPE,ASCENDINGORDESCENDING>()
-private static void testComparatorSortHelperAlreadySortedASCENDINGORDESCENDINGARRTYPE(Random rand,int length)
-{
-  ARRTYPE[] arr=getSortedARRTYPEASCENDINGORDESCENDINGArray(rand,length);
-  ARRTYPE[] copy=new ARRTYPE[length];
-  ArrCopy.uncheckedCopy(arr,0,copy,0,length);
-  var sorter=getASCENDINGORDESCENDINGARRTYPEComparator();
-  SortUtil.uncheckedcomparatorSort(arr,0,length-1,sorter);
-  for(int i=0;i<length;++i)
-  {
-#IFSWITCH ARRTYPE==String
-    Assert.assertTrue(arr[i].equals(copy[i]));
-#ELSEIFSWITCH ARRTYPE==boolean,byte,char,short,int,long
-    Assert.assertTrue(arr[i]==copy[i]);
-#ELSEIFSWITCH ARRTYPE==float,double
-    Assert.assertTrue(TypeUtil.ARRTYPEEquals(arr[i],copy[i]));
-#ELSE
-    ERROR unknown array type ARRTYPE
-#ENDIF
-  }
-}
-#ENDDEF
-
-
-#MACRODEF TestComparatorSortHelper<ARRTYPE,ASCENDINGORDESCENDING>()
-private static void testComparatorSortHelperASCENDINGORDESCENDINGARRTYPE(Random rand,int length)
-{
-  ARRTYPE[] arr=ArrCopyTest.getARRTYPEArr(rand,length);
-  ARRTYPE[] copy=new ARRTYPE[length];
-#IFSWITCH ASCENDINGORDESCENDING==Unsorted
-  ArrCopy.uncheckedCopy(arr,0,copy,0,length);
-#ELSE
-  #IFSWITCH ARRTYPE==boolean
-  Boolean[] boxedCopy=new Boolean[length];
-  ArrCopy.uncheckedCopy(arr,0,boxedCopy,0,length);
-  Arrays.sort(boxedCopy,0,length);
-  ArrCopy.uncheckedCopy(boxedCopy,0,copy,0,length);
-  #ELSE
-  ArrCopy.uncheckedCopy(arr,0,copy,0,length);
-  Arrays.sort(copy,0,length);
-  #ENDIF
-  #IFSWITCH ASCENDINGORDESCENDING==Descending
-  reverseRange(copy,0,length-1);
-  #ENDIF
-#ENDIF
-
-  var sorter=getASCENDINGORDESCENDINGARRTYPEComparator();
-  SortUtil.uncheckedcomparatorSort(arr,0,length-1,sorter);
-  for(int i=0;i<length;++i)
-  {
-#IFSWITCH ARRTYPE==String
-    Assert.assertTrue(arr[i].equals(copy[i]));
-#ELSEIFSWITCH ARRTYPE==boolean,byte,char,short,int,long
-    Assert.assertTrue(arr[i]==copy[i]);
-#ELSEIFSWITCH ARRTYPE==float,double
-    Assert.assertTrue(TypeUtil.ARRTYPEEquals(arr[i],copy[i]));
-#ELSE
-    ERROR unknown array type ARRTYPE
-#ENDIF
-  }
-}
-#ENDDEF
-
-#MACRODEF GetComparator<ASCENDINGORDESCENDING,ARRTYPE,COMPARATORTYPE>(BOXEDTYPE)
-private static COMPARATORTYPE getASCENDINGORDESCENDINGARRTYPEComparator()
+  /*//TODO uncomment when they fix the module bug in eclipse
+  #MACRO GetComparator<Ascending,String>(String,Comparator<String>)
+  */
+  #MACRO GetComparator<Ascending,boolean>(Boolean,BooleanComparator)
+  #MACRO GetComparator<Ascending,byte>(Byte,ByteComparator)
+  #MACRO GetComparator<Ascending,char>(Character,CharComparator)
+  #MACRO GetComparator<Ascending,short>(Short,ShortComparator)
+  #MACRO GetComparator<Ascending,int>(Integer,IntBinaryOperator)
+  #MACRO GetComparator<Ascending,long>(Long,LongComparator)
+  #MACRO GetComparator<Ascending,float>(Float,FloatComparator)
+  #MACRO GetComparator<Ascending,double>(Double,DoubleComparator)
+  /*//TODO uncomment when they fix the module bug in eclipse
+  #MACRO GetComparator<Unsorted,String>(String,Comparator<String>)
+  */
+  #MACRO GetComparator<Unsorted,boolean>(Boolean,BooleanComparator)
+  #MACRO GetComparator<Unsorted,byte>(Byte,ByteComparator)
+  #MACRO GetComparator<Unsorted,char>(Character,CharComparator)
+  #MACRO GetComparator<Unsorted,short>(Short,ShortComparator)
+  #MACRO GetComparator<Unsorted,int>(Integer,IntBinaryOperator)
+  #MACRO GetComparator<Unsorted,long>(Long,LongComparator)
+  #MACRO GetComparator<Unsorted,float>(Float,FloatComparator)
+  #MACRO GetComparator<Unsorted,double>(Double,DoubleComparator)
+  /*//TODO uncomment when they fix the module bug in eclipse
+  #MACRO GetComparator<Descending,String>(String,Comparator<String>)
+  */
+  #MACRO GetComparator<Descending,boolean>(Boolean,BooleanComparator)
+  #MACRO GetComparator<Descending,byte>(Byte,ByteComparator)
+  #MACRO GetComparator<Descending,char>(Character,CharComparator)
+  #MACRO GetComparator<Descending,short>(Short,ShortComparator)
+  #MACRO GetComparator<Descending,int>(Integer,IntBinaryOperator)
+  #MACRO GetComparator<Descending,long>(Long,LongComparator)
+  #MACRO GetComparator<Descending,float>(Float,FloatComparator)
+  #MACRO GetComparator<Descending,double>(Double,DoubleComparator)
+#MACRODEF GetComparator<SORTTYPE,ARRTYPE>(BOXEDTYPE,COMPARATORTYPE)
+private static COMPARATORTYPE getSORTTYPEARRTYPEComparator()
 {
   return (val1,val2)->
   {
     return
-
-#IFSWITCH ASCENDINGORDESCENDING==Descending
+#IFSWITCH SORTTYPE==Descending
       -
 #ENDIF
       (
-#IFSWITCH ASCENDINGORDESCENDING==Unsorted
+#IFSWITCH SORTTYPE==Unsorted
       0
 #ELSE
   #IFSWITCH ARRTYPE==String
@@ -303,5 +72,96 @@ private static COMPARATORTYPE getASCENDINGORDESCENDINGARRTYPEComparator()
   };
 }
 #ENDDEF
+
+  /*//TODO uncomment when they fix the module bug in eclipse
+  #MACRO IsSorted<String,Ascending>(String)
+  */
+  #MACRO IsSorted<boolean,Ascending>(Boolean)
+  #MACRO IsSorted<byte,Ascending>(Byte)
+  #MACRO IsSorted<char,Ascending>(Character)
+  #MACRO IsSorted<short,Ascending>(Short)
+  #MACRO IsSorted<int,Ascending>(Integer)
+  #MACRO IsSorted<long,Ascending>(Long)
+  #MACRO IsSorted<float,Ascending>(Float)
+  #MACRO IsSorted<double,Ascending>(Double)
+  /*//TODO uncomment when they fix the module bug in eclipse
+  #MACRO IsSorted<String,Descending>(String)
+  */
+  #MACRO IsSorted<boolean,Descending>(Boolean)
+  #MACRO IsSorted<byte,Descending>(Byte)
+  #MACRO IsSorted<char,Descending>(Character)
+  #MACRO IsSorted<short,Descending>(Short)
+  #MACRO IsSorted<int,Descending>(Integer)
+  #MACRO IsSorted<long,Descending>(Long)
+  #MACRO IsSorted<float,Descending>(Float)
+  #MACRO IsSorted<double,Descending>(Double)
+#MACRODEF IsSorted<ARRTYPE,SORTTYPE>(BOXEDTYPE)
+private static boolean isSortedSORTTYPE(ARRTYPE[] arr)
+{
+  ARRTYPE prev,curr;
+  int i;
+  for(prev=arr[0],curr=arr[i=1];
+  #IFSWITCH ARRTYPE==String
+  prev.compareTo(curr)
+  #ELSE
+  BOXEDTYPE.compare(prev,curr)
+  #ENDIF
+  #IFSWITCH SORTTYPE==Descending
+  >=
+  #ELSE
+  <=
+  #ENDIF
+  0
+  ;prev=curr,curr=arr[i])
+  {
+    if(++i==arr.length)
+    {
+      return true;
+    }
+  }
+  return false;
+}
+#ENDDEF
+  /*//TODO uncomment when they fix the module bug in eclipse
+  #MACRO IsSorted<String>(Comparator<? super String>,compare)
+  */
+  #MACRO IsSorted<boolean>(BooleanComparator,compare)
+  #MACRO IsSorted<byte>(ByteComparator,compare)
+  #MACRO IsSorted<char>(CharComparator,compare)
+  #MACRO IsSorted<short>(ShortComparator,compare)
+  #MACRO IsSorted<int>(IntBinaryOperator,applyAsInt)
+  #MACRO IsSorted<long>(LongComparator,compare)
+  #MACRO IsSorted<float>(FloatComparator,compare)
+  #MACRO IsSorted<double>(DoubleComparator,compare)
+#MACRODEF IsSorted<ARRTYPE>(COMPARATORTYPE,COMPARATORMETHOD)
+private static boolean isSorted(ARRTYPE[] arr,COMPARATORTYPE sorter)
+{
+  ARRTYPE prev,curr;
+  int i;
+  for(prev=arr[0],curr=arr[i=1];sorter.COMPARATORMETHOD(prev,curr)<=0;prev=curr,curr=arr[i])
+  {
+    if(++i==arr.length)
+    {
+      return true;
+    }
+  }
+  return false;
+}
+#ENDDEF
+
+
+  
+
+ 
+
+
+}
+
+
+
+
+
+
+
 
 

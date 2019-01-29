@@ -4,6 +4,8 @@
 #TYPEDEF OfShort
 #TYPEDEF OfFloat
 package omni.function;
+
+@FunctionalInterface
 public interface $TypeNameModifier$Consumer
 {
   public abstract void accept(final $exposedType$ val);

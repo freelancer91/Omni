@@ -182,9 +182,17 @@ public class TemplateProcessor2{
                     }
                     final String firstToken=args[0];
                     final int delimiterIndex=firstToken.indexOf("==");
+                    if(delimiterIndex<0){
+                        trouble=true;
+                        throw new Exception("Invalid IFSWITCH statement at line "+currIndex);
+                    }
                     final String key=firstToken.substring(0,delimiterIndex).trim();
                     String value=firstToken.substring(delimiterIndex+2).trim();
                     final String definedValue=currentSwitches.get(key);
+                    if(definedValue==null){
+                        trouble=true;
+                        throw new Exception("Unknown If-switch parameter "+key+" on line "+currIndex);
+                    }
                     for(int i=1;;){
                         if(matchArg==definedValue.equals(value)){
                             ++activeDepth;
@@ -224,9 +232,17 @@ public class TemplateProcessor2{
                         }
                         final String firstToken=args[0];
                         final int delimiterIndex=firstToken.indexOf("==");
+                        if(delimiterIndex<0){
+                            trouble=true;
+                            throw new Exception("Invalid IFSWITCH statement at line "+currIndex);
+                        }
                         final String key=firstToken.substring(0,delimiterIndex).trim();
                         String value=firstToken.substring(delimiterIndex+2).trim();
                         final String definedValue=currentSwitches.get(key);
+                        if(definedValue==null){
+                            trouble=true;
+                            throw new Exception("Unknown IFSWITCH parameter "+key+" on line "+currIndex);
+                        }
                         for(int i=1;;){
                             if(matchArg==definedValue.equals(value)){
                                 ++activeDepth;

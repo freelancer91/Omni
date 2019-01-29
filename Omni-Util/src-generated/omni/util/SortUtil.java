@@ -230,13 +230,15 @@ public final class SortUtil
       //assert begin>=0;
       //assert end<arr.length;
       //assert begin<end;
+      /*
+      //FIXME this sorting implementation is currently broken
       int nRemaining;
-      if((nRemaining=end-begin)<31)
+      if((nRemaining=++end-begin)<32)
       {
          binarysort(arr,begin,end,begin+countRunAndMakeAscendingsort(arr,begin,end));
          return;
       }
-      final AbstractTimSort ts=new sortObjectTimSort<E>(arr,++nRemaining);
+      final AbstractTimSort ts=new sortObjectTimSort<E>(arr,nRemaining);
       int minRun=minRunLength(nRemaining);
       int runLen;
       do
@@ -253,6 +255,7 @@ public final class SortUtil
       while((nRemaining-=runLen)!=0);
       //assert begin==end+1;
       ts.mergeForceCollapse();
+      */
     }
     public static   void uncheckedreverseSort(boolean[] arr,int begin,int end)
     {
@@ -474,13 +477,15 @@ public final class SortUtil
       //assert begin>=0;
       //assert end<arr.length;
       //assert begin<end;
+      /*
+      //FIXME this sorting implementation is currently broken
       int nRemaining;
-      if((nRemaining=end-begin)<31)
+      if((nRemaining=++end-begin)<32)
       {
          binaryreverseSort(arr,begin,end,begin+countRunAndMakeAscendingreverseSort(arr,begin,end));
          return;
       }
-      final AbstractTimSort ts=new reverseSortObjectTimSort<E>(arr,++nRemaining);
+      final AbstractTimSort ts=new reverseSortObjectTimSort<E>(arr,nRemaining);
       int minRun=minRunLength(nRemaining);
       int runLen;
       do
@@ -497,6 +502,7 @@ public final class SortUtil
       while((nRemaining-=runLen)!=0);
       //assert begin==end+1;
       ts.mergeForceCollapse();
+      */
     }
   public static   void uncheckedcomparatorSort(boolean[] arr,int begin,int end,BooleanComparator sorter)
   {
@@ -561,13 +567,15 @@ public final class SortUtil
     //assert begin>=0;
     //assert end<arr.length;
     //assert end-begin>0;
+  /*
+    //FIXME this sorting implementation is currently broken
     int nRemaining;
-    if((nRemaining=end-begin)<31)
+    if((nRemaining=++end-begin)<32)
     {
        binarycomparatorSort(arr,begin,end,begin+countRunAndMakeAscendingcomparatorSort(arr,begin,end,sorter),sorter);
        return;
     }
-    final AbstractTimSort ts=new comparatorSortbyteTimSort (arr,sorter,++nRemaining);
+    final AbstractTimSort ts=new comparatorSortbyteTimSort (arr,sorter,nRemaining);
     int minRun=minRunLength(nRemaining);
     int runLen;
     do
@@ -584,6 +592,7 @@ public final class SortUtil
     while((nRemaining-=runLen)!=0);
     //assert begin==end+1;
     ts.mergeForceCollapse();
+    */
   }
   public static   void uncheckedcomparatorSort(char[] arr,int begin,int end,CharComparator sorter)
   {
@@ -592,13 +601,15 @@ public final class SortUtil
     //assert begin>=0;
     //assert end<arr.length;
     //assert end-begin>0;
+  /*
+    //FIXME this sorting implementation is currently broken
     int nRemaining;
-    if((nRemaining=end-begin)<31)
+    if((nRemaining=++end-begin)<32)
     {
        binarycomparatorSort(arr,begin,end,begin+countRunAndMakeAscendingcomparatorSort(arr,begin,end,sorter),sorter);
        return;
     }
-    final AbstractTimSort ts=new comparatorSortcharTimSort (arr,sorter,++nRemaining);
+    final AbstractTimSort ts=new comparatorSortcharTimSort (arr,sorter,nRemaining);
     int minRun=minRunLength(nRemaining);
     int runLen;
     do
@@ -615,6 +626,7 @@ public final class SortUtil
     while((nRemaining-=runLen)!=0);
     //assert begin==end+1;
     ts.mergeForceCollapse();
+    */
   }
   public static   void uncheckedcomparatorSort(short[] arr,int begin,int end,ShortComparator sorter)
   {
@@ -623,13 +635,15 @@ public final class SortUtil
     //assert begin>=0;
     //assert end<arr.length;
     //assert end-begin>0;
+  /*
+    //FIXME this sorting implementation is currently broken
     int nRemaining;
-    if((nRemaining=end-begin)<31)
+    if((nRemaining=++end-begin)<32)
     {
        binarycomparatorSort(arr,begin,end,begin+countRunAndMakeAscendingcomparatorSort(arr,begin,end,sorter),sorter);
        return;
     }
-    final AbstractTimSort ts=new comparatorSortshortTimSort (arr,sorter,++nRemaining);
+    final AbstractTimSort ts=new comparatorSortshortTimSort (arr,sorter,nRemaining);
     int minRun=minRunLength(nRemaining);
     int runLen;
     do
@@ -646,6 +660,7 @@ public final class SortUtil
     while((nRemaining-=runLen)!=0);
     //assert begin==end+1;
     ts.mergeForceCollapse();
+    */
   }
   public static   void uncheckedcomparatorSort(int[] arr,int begin,int end,IntBinaryOperator sorter)
   {
@@ -654,13 +669,15 @@ public final class SortUtil
     //assert begin>=0;
     //assert end<arr.length;
     //assert end-begin>0;
+  /*
+    //FIXME this sorting implementation is currently broken
     int nRemaining;
-    if((nRemaining=end-begin)<31)
+    if((nRemaining=++end-begin)<32)
     {
        binarycomparatorSort(arr,begin,end,begin+countRunAndMakeAscendingcomparatorSort(arr,begin,end,sorter),sorter);
        return;
     }
-    final AbstractTimSort ts=new comparatorSortintTimSort (arr,sorter,++nRemaining);
+    final AbstractTimSort ts=new comparatorSortintTimSort (arr,sorter,nRemaining);
     int minRun=minRunLength(nRemaining);
     int runLen;
     do
@@ -677,6 +694,7 @@ public final class SortUtil
     while((nRemaining-=runLen)!=0);
     //assert begin==end+1;
     ts.mergeForceCollapse();
+    */
   }
   public static   void uncheckedcomparatorSort(long[] arr,int begin,int end,LongComparator sorter)
   {
@@ -685,13 +703,15 @@ public final class SortUtil
     //assert begin>=0;
     //assert end<arr.length;
     //assert end-begin>0;
+  /*
+    //FIXME this sorting implementation is currently broken
     int nRemaining;
-    if((nRemaining=end-begin)<31)
+    if((nRemaining=++end-begin)<32)
     {
        binarycomparatorSort(arr,begin,end,begin+countRunAndMakeAscendingcomparatorSort(arr,begin,end,sorter),sorter);
        return;
     }
-    final AbstractTimSort ts=new comparatorSortlongTimSort (arr,sorter,++nRemaining);
+    final AbstractTimSort ts=new comparatorSortlongTimSort (arr,sorter,nRemaining);
     int minRun=minRunLength(nRemaining);
     int runLen;
     do
@@ -708,6 +728,7 @@ public final class SortUtil
     while((nRemaining-=runLen)!=0);
     //assert begin==end+1;
     ts.mergeForceCollapse();
+    */
   }
   public static   void uncheckedcomparatorSort(float[] arr,int begin,int end,FloatComparator sorter)
   {
@@ -716,13 +737,15 @@ public final class SortUtil
     //assert begin>=0;
     //assert end<arr.length;
     //assert end-begin>0;
+  /*
+    //FIXME this sorting implementation is currently broken
     int nRemaining;
-    if((nRemaining=end-begin)<31)
+    if((nRemaining=++end-begin)<32)
     {
        binarycomparatorSort(arr,begin,end,begin+countRunAndMakeAscendingcomparatorSort(arr,begin,end,sorter),sorter);
        return;
     }
-    final AbstractTimSort ts=new comparatorSortfloatTimSort (arr,sorter,++nRemaining);
+    final AbstractTimSort ts=new comparatorSortfloatTimSort (arr,sorter,nRemaining);
     int minRun=minRunLength(nRemaining);
     int runLen;
     do
@@ -739,6 +762,7 @@ public final class SortUtil
     while((nRemaining-=runLen)!=0);
     //assert begin==end+1;
     ts.mergeForceCollapse();
+    */
   }
   public static   void uncheckedcomparatorSort(double[] arr,int begin,int end,DoubleComparator sorter)
   {
@@ -747,13 +771,15 @@ public final class SortUtil
     //assert begin>=0;
     //assert end<arr.length;
     //assert end-begin>0;
+  /*
+    //FIXME this sorting implementation is currently broken
     int nRemaining;
-    if((nRemaining=end-begin)<31)
+    if((nRemaining=++end-begin)<32)
     {
        binarycomparatorSort(arr,begin,end,begin+countRunAndMakeAscendingcomparatorSort(arr,begin,end,sorter),sorter);
        return;
     }
-    final AbstractTimSort ts=new comparatorSortdoubleTimSort (arr,sorter,++nRemaining);
+    final AbstractTimSort ts=new comparatorSortdoubleTimSort (arr,sorter,nRemaining);
     int minRun=minRunLength(nRemaining);
     int runLen;
     do
@@ -770,6 +796,7 @@ public final class SortUtil
     while((nRemaining-=runLen)!=0);
     //assert begin==end+1;
     ts.mergeForceCollapse();
+    */
   }
   public static <E> void uncheckedcomparatorSort(Object[] arr,int begin,int end,Comparator<? super E> sorter)
   {
@@ -778,13 +805,15 @@ public final class SortUtil
     //assert begin>=0;
     //assert end<arr.length;
     //assert end-begin>0;
+  /*
+    //FIXME this sorting implementation is currently broken
     int nRemaining;
-    if((nRemaining=end-begin)<31)
+    if((nRemaining=++end-begin)<32)
     {
        binarycomparatorSort(arr,begin,end,begin+countRunAndMakeAscendingcomparatorSort(arr,begin,end,sorter),sorter);
        return;
     }
-    final AbstractTimSort ts=new comparatorSortObjectTimSort<E>(arr,sorter,++nRemaining);
+    final AbstractTimSort ts=new comparatorSortObjectTimSort<E>(arr,sorter,nRemaining);
     int minRun=minRunLength(nRemaining);
     int runLen;
     do
@@ -801,22 +830,12 @@ public final class SortUtil
     while((nRemaining-=runLen)!=0);
     //assert begin==end+1;
     ts.mergeForceCollapse();
+    */
   }
   private SortUtil()
   {
     super();
     //private constructor
-  }
-  private static int minRunLength(int n)
-  {
-    //assert n>=0;
-    int r=0;
-    while(n>31)
-    {
-      r|=(n&1);
-      n>>=1;
-    }
-    return n+r;
   }
   private static void insertsort(byte[] arr,int begin,int end)
   {
@@ -10428,6 +10447,49 @@ public final class SortUtil
       }
     }
   }
+  private static void uncheckedSortHelper(boolean[] arr,int begin,int end,boolean firstVal)
+  {
+    //assert arr!=null;
+    //assert begin>=0;
+    //assert end<arr.length;
+    //assert begin<end;
+    //assert firstVal!=arr[begin];
+    //assert firstVal==arr[end];
+    int endValCounter=1;
+    for(int curr=begin+1;curr!=end;++curr)
+    {
+      if(arr[curr]^firstVal)
+      {
+        ++endValCounter;
+      }
+    }
+    for(final var endVal=!firstVal;;--end)
+    {
+      arr[end]=endVal;
+      if(--endValCounter==0)
+      {
+        do
+        {
+          arr[--end]=firstVal;
+        }
+        while(end!=begin);
+        return;
+      }
+    }
+  }
+/*
+  //FIXME fix the TimSort methods
+  private static int minRunLength(int n)
+  {
+    //assert n>=0;
+    int r=0;
+    while(n>31)
+    {
+      r|=(n&1);
+      n>>=1;
+    }
+    return n+r;
+  }
   private static class comparatorSortbyteTimSort 
     extends AbstractTimSort
   {
@@ -13286,7 +13348,7 @@ public final class SortUtil
         {
           //assert len1>1 && len2>0;
           if(
-          ((Comparable<E>)(arr[cursor2])).compareTo((E)(tmp[cursor1]))<0
+          ((Comparable<E>)(arr[cursor2])).compareTo((E)(tmp[cursor1]))>=0
           )
           {
             arr[dest++]=arr[cursor2++];
@@ -13405,7 +13467,7 @@ public final class SortUtil
         {
           //assert len2>1 && len1>0;
           if(
-          ((Comparable<E>)(tmp[cursor2])).compareTo((E)(arr[cursor1]))<0
+          ((Comparable<E>)(tmp[cursor2])).compareTo((E)(arr[cursor1]))>=0
           )
           {
             arr[dest--]=arr[cursor1--];
@@ -13956,7 +14018,7 @@ public final class SortUtil
       {
         final int mid;
         if(
-        ((Comparable<E>)(pivot)).compareTo((E)(arr[mid=(left+right)>>>1]))<0
+        ((Comparable<E>)(pivot)).compareTo((E)(arr[mid=(left+right)>>>1]))>=0
         )
         {
           right=mid;
@@ -13977,44 +14039,32 @@ public final class SortUtil
     //assert arr!=null;
     //assert begin<end;
     //assert begin>=0;
-    //assert end<arr.length;
+    //assert end<=arr.length;
     //assert sorter!=null;
     int runHi;
+    if((runHi=begin+1)==end)
+    {
+      return 1;
+    }
     if(
-    sorter.compare((byte)(arr[runHi=begin+1]),(byte)(arr[begin]))<0
+    sorter.compare((byte)(arr[runHi++]),(byte)(arr[begin]))<0
     )
     {
-      for(;;)
+      while(runHi<end &&
+      sorter.compare((byte)(arr[runHi]),(byte)(arr[runHi-1]))<0
+      )
       {
-        if(runHi==end)
-        {
-          reverseRange(arr,begin,runHi++);
-          break;
-        }
-        if(
-        sorter.compare((byte)(arr[runHi]),(byte)(arr[++runHi]))<=0
-        )
-        {
-          reverseRange(arr,begin,runHi-1);
-          break;
-        }
+        ++runHi;
       }
+      reverseRange(arr,begin,runHi-1);
     }
     else
     {
-      for(;;)
+      while(runHi<end &&
+      sorter.compare((byte)(arr[runHi]),(byte)(arr[runHi-1]))>=0
+      )
       {
-        if(runHi==end)
-        {
-          ++runHi;
-          break;
-        }
-        if(
-        sorter.compare((byte)(arr[runHi]),(byte)(arr[++runHi]))>0
-        )
-        {
-          break;
-        }
+        ++runHi;
       }
     }
     return runHi-begin;
@@ -14026,44 +14076,32 @@ public final class SortUtil
     //assert arr!=null;
     //assert begin<end;
     //assert begin>=0;
-    //assert end<arr.length;
+    //assert end<=arr.length;
     //assert sorter!=null;
     int runHi;
+    if((runHi=begin+1)==end)
+    {
+      return 1;
+    }
     if(
-    sorter.compare((char)(arr[runHi=begin+1]),(char)(arr[begin]))<0
+    sorter.compare((char)(arr[runHi++]),(char)(arr[begin]))<0
     )
     {
-      for(;;)
+      while(runHi<end &&
+      sorter.compare((char)(arr[runHi]),(char)(arr[runHi-1]))<0
+      )
       {
-        if(runHi==end)
-        {
-          reverseRange(arr,begin,runHi++);
-          break;
-        }
-        if(
-        sorter.compare((char)(arr[runHi]),(char)(arr[++runHi]))<=0
-        )
-        {
-          reverseRange(arr,begin,runHi-1);
-          break;
-        }
+        ++runHi;
       }
+      reverseRange(arr,begin,runHi-1);
     }
     else
     {
-      for(;;)
+      while(runHi<end &&
+      sorter.compare((char)(arr[runHi]),(char)(arr[runHi-1]))>=0
+      )
       {
-        if(runHi==end)
-        {
-          ++runHi;
-          break;
-        }
-        if(
-        sorter.compare((char)(arr[runHi]),(char)(arr[++runHi]))>0
-        )
-        {
-          break;
-        }
+        ++runHi;
       }
     }
     return runHi-begin;
@@ -14075,44 +14113,32 @@ public final class SortUtil
     //assert arr!=null;
     //assert begin<end;
     //assert begin>=0;
-    //assert end<arr.length;
+    //assert end<=arr.length;
     //assert sorter!=null;
     int runHi;
+    if((runHi=begin+1)==end)
+    {
+      return 1;
+    }
     if(
-    sorter.compare((short)(arr[runHi=begin+1]),(short)(arr[begin]))<0
+    sorter.compare((short)(arr[runHi++]),(short)(arr[begin]))<0
     )
     {
-      for(;;)
+      while(runHi<end &&
+      sorter.compare((short)(arr[runHi]),(short)(arr[runHi-1]))<0
+      )
       {
-        if(runHi==end)
-        {
-          reverseRange(arr,begin,runHi++);
-          break;
-        }
-        if(
-        sorter.compare((short)(arr[runHi]),(short)(arr[++runHi]))<=0
-        )
-        {
-          reverseRange(arr,begin,runHi-1);
-          break;
-        }
+        ++runHi;
       }
+      reverseRange(arr,begin,runHi-1);
     }
     else
     {
-      for(;;)
+      while(runHi<end &&
+      sorter.compare((short)(arr[runHi]),(short)(arr[runHi-1]))>=0
+      )
       {
-        if(runHi==end)
-        {
-          ++runHi;
-          break;
-        }
-        if(
-        sorter.compare((short)(arr[runHi]),(short)(arr[++runHi]))>0
-        )
-        {
-          break;
-        }
+        ++runHi;
       }
     }
     return runHi-begin;
@@ -14124,44 +14150,32 @@ public final class SortUtil
     //assert arr!=null;
     //assert begin<end;
     //assert begin>=0;
-    //assert end<arr.length;
+    //assert end<=arr.length;
     //assert sorter!=null;
     int runHi;
+    if((runHi=begin+1)==end)
+    {
+      return 1;
+    }
     if(
-    sorter.applyAsInt((int)(arr[runHi=begin+1]),(int)(arr[begin]))<0
+    sorter.applyAsInt((int)(arr[runHi++]),(int)(arr[begin]))<0
     )
     {
-      for(;;)
+      while(runHi<end &&
+      sorter.applyAsInt((int)(arr[runHi]),(int)(arr[runHi-1]))<0
+      )
       {
-        if(runHi==end)
-        {
-          reverseRange(arr,begin,runHi++);
-          break;
-        }
-        if(
-        sorter.applyAsInt((int)(arr[runHi]),(int)(arr[++runHi]))<=0
-        )
-        {
-          reverseRange(arr,begin,runHi-1);
-          break;
-        }
+        ++runHi;
       }
+      reverseRange(arr,begin,runHi-1);
     }
     else
     {
-      for(;;)
+      while(runHi<end &&
+      sorter.applyAsInt((int)(arr[runHi]),(int)(arr[runHi-1]))>=0
+      )
       {
-        if(runHi==end)
-        {
-          ++runHi;
-          break;
-        }
-        if(
-        sorter.applyAsInt((int)(arr[runHi]),(int)(arr[++runHi]))>0
-        )
-        {
-          break;
-        }
+        ++runHi;
       }
     }
     return runHi-begin;
@@ -14173,44 +14187,32 @@ public final class SortUtil
     //assert arr!=null;
     //assert begin<end;
     //assert begin>=0;
-    //assert end<arr.length;
+    //assert end<=arr.length;
     //assert sorter!=null;
     int runHi;
+    if((runHi=begin+1)==end)
+    {
+      return 1;
+    }
     if(
-    sorter.compare((long)(arr[runHi=begin+1]),(long)(arr[begin]))<0
+    sorter.compare((long)(arr[runHi++]),(long)(arr[begin]))<0
     )
     {
-      for(;;)
+      while(runHi<end &&
+      sorter.compare((long)(arr[runHi]),(long)(arr[runHi-1]))<0
+      )
       {
-        if(runHi==end)
-        {
-          reverseRange(arr,begin,runHi++);
-          break;
-        }
-        if(
-        sorter.compare((long)(arr[runHi]),(long)(arr[++runHi]))<=0
-        )
-        {
-          reverseRange(arr,begin,runHi-1);
-          break;
-        }
+        ++runHi;
       }
+      reverseRange(arr,begin,runHi-1);
     }
     else
     {
-      for(;;)
+      while(runHi<end &&
+      sorter.compare((long)(arr[runHi]),(long)(arr[runHi-1]))>=0
+      )
       {
-        if(runHi==end)
-        {
-          ++runHi;
-          break;
-        }
-        if(
-        sorter.compare((long)(arr[runHi]),(long)(arr[++runHi]))>0
-        )
-        {
-          break;
-        }
+        ++runHi;
       }
     }
     return runHi-begin;
@@ -14222,44 +14224,32 @@ public final class SortUtil
     //assert arr!=null;
     //assert begin<end;
     //assert begin>=0;
-    //assert end<arr.length;
+    //assert end<=arr.length;
     //assert sorter!=null;
     int runHi;
+    if((runHi=begin+1)==end)
+    {
+      return 1;
+    }
     if(
-    sorter.compare((float)(arr[runHi=begin+1]),(float)(arr[begin]))<0
+    sorter.compare((float)(arr[runHi++]),(float)(arr[begin]))<0
     )
     {
-      for(;;)
+      while(runHi<end &&
+      sorter.compare((float)(arr[runHi]),(float)(arr[runHi-1]))<0
+      )
       {
-        if(runHi==end)
-        {
-          reverseRange(arr,begin,runHi++);
-          break;
-        }
-        if(
-        sorter.compare((float)(arr[runHi]),(float)(arr[++runHi]))<=0
-        )
-        {
-          reverseRange(arr,begin,runHi-1);
-          break;
-        }
+        ++runHi;
       }
+      reverseRange(arr,begin,runHi-1);
     }
     else
     {
-      for(;;)
+      while(runHi<end &&
+      sorter.compare((float)(arr[runHi]),(float)(arr[runHi-1]))>=0
+      )
       {
-        if(runHi==end)
-        {
-          ++runHi;
-          break;
-        }
-        if(
-        sorter.compare((float)(arr[runHi]),(float)(arr[++runHi]))>0
-        )
-        {
-          break;
-        }
+        ++runHi;
       }
     }
     return runHi-begin;
@@ -14271,44 +14261,32 @@ public final class SortUtil
     //assert arr!=null;
     //assert begin<end;
     //assert begin>=0;
-    //assert end<arr.length;
+    //assert end<=arr.length;
     //assert sorter!=null;
     int runHi;
+    if((runHi=begin+1)==end)
+    {
+      return 1;
+    }
     if(
-    sorter.compare((double)(arr[runHi=begin+1]),(double)(arr[begin]))<0
+    sorter.compare((double)(arr[runHi++]),(double)(arr[begin]))<0
     )
     {
-      for(;;)
+      while(runHi<end &&
+      sorter.compare((double)(arr[runHi]),(double)(arr[runHi-1]))<0
+      )
       {
-        if(runHi==end)
-        {
-          reverseRange(arr,begin,runHi++);
-          break;
-        }
-        if(
-        sorter.compare((double)(arr[runHi]),(double)(arr[++runHi]))<=0
-        )
-        {
-          reverseRange(arr,begin,runHi-1);
-          break;
-        }
+        ++runHi;
       }
+      reverseRange(arr,begin,runHi-1);
     }
     else
     {
-      for(;;)
+      while(runHi<end &&
+      sorter.compare((double)(arr[runHi]),(double)(arr[runHi-1]))>=0
+      )
       {
-        if(runHi==end)
-        {
-          ++runHi;
-          break;
-        }
-        if(
-        sorter.compare((double)(arr[runHi]),(double)(arr[++runHi]))>0
-        )
-        {
-          break;
-        }
+        ++runHi;
       }
     }
     return runHi-begin;
@@ -14321,44 +14299,32 @@ public final class SortUtil
     //assert arr!=null;
     //assert begin<end;
     //assert begin>=0;
-    //assert end<arr.length;
+    //assert end<=arr.length;
     //assert sorter!=null;
     int runHi;
+    if((runHi=begin+1)==end)
+    {
+      return 1;
+    }
     if(
-    sorter.compare((E)(arr[runHi=begin+1]),(E)(arr[begin]))<0
+    sorter.compare((E)(arr[runHi++]),(E)(arr[begin]))<0
     )
     {
-      for(;;)
+      while(runHi<end &&
+      sorter.compare((E)(arr[runHi]),(E)(arr[runHi-1]))<0
+      )
       {
-        if(runHi==end)
-        {
-          reverseRange(arr,begin,runHi++);
-          break;
-        }
-        if(
-        sorter.compare((E)(arr[runHi]),(E)(arr[++runHi]))<=0
-        )
-        {
-          reverseRange(arr,begin,runHi-1);
-          break;
-        }
+        ++runHi;
       }
+      reverseRange(arr,begin,runHi-1);
     }
     else
     {
-      for(;;)
+      while(runHi<end &&
+      sorter.compare((E)(arr[runHi]),(E)(arr[runHi-1]))>=0
+      )
       {
-        if(runHi==end)
-        {
-          ++runHi;
-          break;
-        }
-        if(
-        sorter.compare((E)(arr[runHi]),(E)(arr[++runHi]))>0
-        )
-        {
-          break;
-        }
+        ++runHi;
       }
     }
     return runHi-begin;
@@ -14370,44 +14336,32 @@ public final class SortUtil
     //assert arr!=null;
     //assert begin<end;
     //assert begin>=0;
-    //assert end<arr.length;
+    //assert end<=arr.length;
     //assert sorter!=null;
     int runHi;
+    if((runHi=begin+1)==end)
+    {
+      return 1;
+    }
     if(
-    ((Comparable<E>)(arr[runHi=begin+1])).compareTo((E)(arr[begin]))<0
+    ((Comparable<E>)(arr[runHi++])).compareTo((E)(arr[begin]))<0
     )
     {
-      for(;;)
+      while(runHi<end &&
+      ((Comparable<E>)(arr[runHi])).compareTo((E)(arr[runHi-1]))<0
+      )
       {
-        if(runHi==end)
-        {
-          reverseRange(arr,begin,runHi++);
-          break;
-        }
-        if(
-        ((Comparable<E>)(arr[runHi])).compareTo((E)(arr[++runHi]))<=0
-        )
-        {
-          reverseRange(arr,begin,runHi-1);
-          break;
-        }
+        ++runHi;
       }
+      reverseRange(arr,begin,runHi-1);
     }
     else
     {
-      for(;;)
+      while(runHi<end &&
+      ((Comparable<E>)(arr[runHi])).compareTo((E)(arr[runHi-1]))>=0
+      )
       {
-        if(runHi==end)
-        {
-          ++runHi;
-          break;
-        }
-        if(
-        ((Comparable<E>)(arr[runHi])).compareTo((E)(arr[++runHi]))>0
-        )
-        {
-          break;
-        }
+        ++runHi;
       }
     }
     return runHi-begin;
@@ -14419,44 +14373,32 @@ public final class SortUtil
     //assert arr!=null;
     //assert begin<end;
     //assert begin>=0;
-    //assert end<arr.length;
+    //assert end<=arr.length;
     //assert sorter!=null;
     int runHi;
+    if((runHi=begin+1)==end)
+    {
+      return 1;
+    }
     if(
-    ((Comparable<E>)(arr[runHi=begin+1])).compareTo((E)(arr[begin]))<0
+    ((Comparable<E>)(arr[runHi++])).compareTo((E)(arr[begin]))>=0
     )
     {
-      for(;;)
+      while(runHi<end &&
+      ((Comparable<E>)(arr[runHi])).compareTo((E)(arr[runHi-1]))>=0
+      )
       {
-        if(runHi==end)
-        {
-          reverseRange(arr,begin,runHi++);
-          break;
-        }
-        if(
-        ((Comparable<E>)(arr[runHi])).compareTo((E)(arr[++runHi]))<=0
-        )
-        {
-          reverseRange(arr,begin,runHi-1);
-          break;
-        }
+        ++runHi;
       }
+      reverseRange(arr,begin,runHi-1);
     }
     else
     {
-      for(;;)
+      while(runHi<end &&
+      ((Comparable<E>)(arr[runHi])).compareTo((E)(arr[runHi-1]))<0
+      )
       {
-        if(runHi==end)
-        {
-          ++runHi;
-          break;
-        }
-        if(
-        ((Comparable<E>)(arr[runHi])).compareTo((E)(arr[++runHi]))>0
-        )
-        {
-          break;
-        }
+        ++runHi;
       }
     }
     return runHi-begin;
@@ -15821,12 +15763,12 @@ public final class SortUtil
     int ofs=1;
     int lastOfs=0;
     if(
-    ((Comparable<E>)(arr[base+hint])).compareTo((E)(key))<0
+    ((Comparable<E>)(arr[base+hint])).compareTo((E)(key))>=0
     )
     {
       int maxOfs=len-hint;
       while(ofs < maxOfs &&
-      ((Comparable<E>)(arr[base+hint+ofs])).compareTo((E)(key))<0
+      ((Comparable<E>)(arr[base+hint+ofs])).compareTo((E)(key))>=0
       )
       {
         if((ofs=((lastOfs=ofs)<<1)+1)<=0)
@@ -15847,7 +15789,7 @@ public final class SortUtil
       for(;;)
       {
         if(ofs>=maxOfs || 
-        ((Comparable<E>)(arr[base+hint-ofs])).compareTo((E)(key))<0
+        ((Comparable<E>)(arr[base+hint-ofs])).compareTo((E)(key))>=0
         )
         {
           break;
@@ -15873,7 +15815,7 @@ public final class SortUtil
       {
         int m;
         if(
-        ((Comparable<E>)(arr[base+(m=lastOfs+(diff>>>1))])).compareTo((E)(key))<0
+        ((Comparable<E>)(arr[base+(m=lastOfs+(diff>>>1))])).compareTo((E)(key))>=0
         )
         {
           lastOfs=m+1;
@@ -15896,12 +15838,12 @@ public final class SortUtil
     int ofs=1;
     int lastOfs=0;
     if(
-    ((Comparable<E>)(key)).compareTo((E)(arr[base+hint]))<0
+    ((Comparable<E>)(key)).compareTo((E)(arr[base+hint]))>=0
     )
     {
       int maxOfs=hint+1;
       while(ofs < maxOfs &&
-      ((Comparable<E>)(key)).compareTo((E)(arr[base+hint-ofs]))<0
+      ((Comparable<E>)(key)).compareTo((E)(arr[base+hint-ofs]))>=0
       )
       {
         if((ofs=((lastOfs=ofs)<<1)+1)<=0)
@@ -15923,7 +15865,7 @@ public final class SortUtil
       for(;;)
       {
         if(ofs>=maxOfs || 
-        ((Comparable<E>)(key)).compareTo((E)(arr[base+hint+ofs]))<0
+        ((Comparable<E>)(key)).compareTo((E)(arr[base+hint+ofs]))>=0
         )
         {
           break;
@@ -15948,7 +15890,7 @@ public final class SortUtil
       {
         int m;
         if(
-        ((Comparable<E>)(key)).compareTo((E)(arr[base+(m=lastOfs+(diff>>>1))]))<0
+        ((Comparable<E>)(key)).compareTo((E)(arr[base+(m=lastOfs+(diff>>>1))]))>=0
         )
         {
           ofs=m;
@@ -15963,34 +15905,5 @@ public final class SortUtil
     //assert lastOfs==ofs;
     return ofs;
   }
-  private static void uncheckedSortHelper(boolean[] arr,int begin,int end,boolean firstVal)
-  {
-    //assert arr!=null;
-    //assert begin>=0;
-    //assert end<arr.length;
-    //assert begin<end;
-    //assert firstVal!=arr[begin];
-    //assert firstVal==arr[end];
-    int endValCounter=1;
-    for(int curr=begin+1;curr!=end;++curr)
-    {
-      if(arr[curr]^firstVal)
-      {
-        ++endValCounter;
-      }
-    }
-    for(final var endVal=!firstVal;;--end)
-    {
-      arr[end]=endVal;
-      if(--endValCounter==0)
-      {
-        do
-        {
-          arr[--end]=firstVal;
-        }
-        while(end!=begin);
-        return;
-      }
-    }
-  }
+*/
 }
