@@ -2365,7 +2365,7 @@ public class ArrCopyTest
       }
     }
   }
-  private static boolean[] getbooleanArr(Random rand,int length)
+  static boolean[] getbooleanArr(Random rand,int length)
   {
     boolean[] src=new boolean[length];
     for(int i=0;i<length;++i)
@@ -2374,7 +2374,7 @@ public class ArrCopyTest
     }
     return src;
   }
-  private static byte[] getbyteArr(Random rand,int length)
+  static byte[] getbyteArr(Random rand,int length)
   {
     byte[] src=new byte[length];
     for(int i=0;i<length;++i)
@@ -2383,7 +2383,7 @@ public class ArrCopyTest
     }
     return src;
   }
-  private static char[] getcharArr(Random rand,int length)
+  static char[] getcharArr(Random rand,int length)
   {
     char[] src=new char[length];
     for(int i=0;i<length;++i)
@@ -2392,7 +2392,7 @@ public class ArrCopyTest
     }
     return src;
   }
-  private static short[] getshortArr(Random rand,int length)
+  static short[] getshortArr(Random rand,int length)
   {
     short[] src=new short[length];
     for(int i=0;i<length;++i)
@@ -2401,7 +2401,7 @@ public class ArrCopyTest
     }
     return src;
   }
-  private static int[] getintArr(Random rand,int length)
+  static int[] getintArr(Random rand,int length)
   {
     int[] src=new int[length];
     for(int i=0;i<length;++i)
@@ -2410,7 +2410,7 @@ public class ArrCopyTest
     }
     return src;
   }
-  private static long[] getlongArr(Random rand,int length)
+  static long[] getlongArr(Random rand,int length)
   {
     long[] src=new long[length];
     for(int i=0;i<length;++i)
@@ -2419,7 +2419,7 @@ public class ArrCopyTest
     }
     return src;
   }
-  private static float[] getfloatArr(Random rand,int length)
+  static float[] getfloatArr(Random rand,int length)
   {
     float[] src=new float[length];
     for(int i=0;i<length;++i)
@@ -2428,7 +2428,7 @@ public class ArrCopyTest
     }
     return src;
   }
-  private static double[] getdoubleArr(Random rand,int length)
+  static double[] getdoubleArr(Random rand,int length)
   {
     double[] src=new double[length];
     for(int i=0;i<length;++i)
@@ -2437,7 +2437,7 @@ public class ArrCopyTest
     }
     return src;
   }
-  private static Boolean[] getBooleanArr(Random rand,int length)
+  static Boolean[] getBooleanArr(Random rand,int length)
   {
     Boolean[] src=new Boolean[length];
     for(int i=0;i<length;++i)
@@ -2446,7 +2446,7 @@ public class ArrCopyTest
     }
     return src;
   }
-  private static Byte[] getByteArr(Random rand,int length)
+  static Byte[] getByteArr(Random rand,int length)
   {
     Byte[] src=new Byte[length];
     for(int i=0;i<length;++i)
@@ -2455,7 +2455,7 @@ public class ArrCopyTest
     }
     return src;
   }
-  private static Character[] getCharacterArr(Random rand,int length)
+  static Character[] getCharacterArr(Random rand,int length)
   {
     Character[] src=new Character[length];
     for(int i=0;i<length;++i)
@@ -2464,7 +2464,7 @@ public class ArrCopyTest
     }
     return src;
   }
-  private static Short[] getShortArr(Random rand,int length)
+  static Short[] getShortArr(Random rand,int length)
   {
     Short[] src=new Short[length];
     for(int i=0;i<length;++i)
@@ -2473,7 +2473,7 @@ public class ArrCopyTest
     }
     return src;
   }
-  private static Integer[] getIntegerArr(Random rand,int length)
+  static Integer[] getIntegerArr(Random rand,int length)
   {
     Integer[] src=new Integer[length];
     for(int i=0;i<length;++i)
@@ -2482,7 +2482,7 @@ public class ArrCopyTest
     }
     return src;
   }
-  private static Long[] getLongArr(Random rand,int length)
+  static Long[] getLongArr(Random rand,int length)
   {
     Long[] src=new Long[length];
     for(int i=0;i<length;++i)
@@ -2491,7 +2491,7 @@ public class ArrCopyTest
     }
     return src;
   }
-  private static Float[] getFloatArr(Random rand,int length)
+  static Float[] getFloatArr(Random rand,int length)
   {
     Float[] src=new Float[length];
     for(int i=0;i<length;++i)
@@ -2500,7 +2500,7 @@ public class ArrCopyTest
     }
     return src;
   }
-  private static Double[] getDoubleArr(Random rand,int length)
+  static Double[] getDoubleArr(Random rand,int length)
   {
     Double[] src=new Double[length];
     for(int i=0;i<length;++i)
@@ -2509,7 +2509,7 @@ public class ArrCopyTest
     }
     return src;
   }
-  private static String[] getStringArr(Random rand,int length)
+  static String[] getStringArr(Random rand,int length)
   {
     String[] src=new String[length];
     for(int i=0;i<length;++i)

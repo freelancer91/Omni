@@ -1120,6 +1120,7 @@ private void mergeSide(ARRTYPE[] arr,int base1,int len1,int base2,int len2
 #ENDIF
 )
 {
+  //FIXME this code is broken
   ARRTYPE[] tmp;
   int cursor1,dest;
 #IFSWITCH Side==Lo
@@ -1176,9 +1177,10 @@ private void mergeSide(ARRTYPE[] arr,int base1,int len1,int base2,int len2
   #MACRO MergeImpl(len2,len1,--,cursor2,cursor1,count2,count1,tmp,arr)
     ArrCopy.uncheckedCopy(arr,(cursor1-=len1)+1,arr,(dest-=len1)+1,len1);
     arr[dest]=tmp[cursor2];
+    break;
   default:
-    assert len1==0;
-    assert len2>0;
+    //assert len1==0;
+    //assert len2>0;
     ArrCopy.uncheckedCopy(tmp,tmpBase,arr,dest-(len2-1),len2);
 #ENDIF
   }
@@ -1247,7 +1249,7 @@ outer:for(;;)
       }
     }
 #ENDIF
-    arr[destINCREMENT]=tmp[cursor2INCREMENT];
+    arr[destINCREMENT]=ARR2[cursor2INCREMENT];
 #IFSWITCH Side==Lo
     if(--len2==0)
 #ELSE
@@ -1434,7 +1436,7 @@ private static TYPEPARAMETER void binaryMETHODNAME(ARRTYPE[] arr,int lo,int hi,i
 )
 {
   //assert lo < begin;
-  for(;begin<=hi;++begin)
+  for(;begin<hi;++begin)
   {
     final var pivot=(EXPOSEDTYPE)arr[begin];
     int left=lo;

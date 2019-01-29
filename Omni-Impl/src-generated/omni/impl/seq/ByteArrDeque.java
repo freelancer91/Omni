@@ -8,7 +8,7 @@ import omni.api.OmniIterator;
 import java.util.function.IntFunction;
 import java.util.NoSuchElementException;
 import omni.impl.CheckedCollection;
-import omni.util.BitSetUtils;
+import omni.util.BitSetUtil;
 import omni.function.BytePredicate;
 import omni.function.ByteConsumer;
 import omni.impl.AbstractByteItr;
@@ -3448,7 +3448,7 @@ public class ByteArrDeque implements OmniDeque.OfByte
               if((numTailSurvivors=tail-++tailOffset)!=0)
               {
                 final long[] survivors;
-                numTailSurvivors=ByteArrSeq.markSurvivors(arr,survivors=BitSetUtils.getBitSet(numTailSurvivors),tailOffset,tail,filter);
+                numTailSurvivors=ByteArrSeq.markSurvivors(arr,survivors=BitSetUtil.getBitSet(numTailSurvivors),tailOffset,tail,filter);
                 CheckedCollection.checkModCount(modCount,this.modCount);
                 arr[tailDstOffset++]=tailVal;
                 if(numTailSurvivors!=0)

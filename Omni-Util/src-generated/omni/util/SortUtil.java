@@ -10579,7 +10579,7 @@ public final class SortUtil
               break outer;
             }
           }
-          arr[dest++]=tmp[cursor2++];
+          arr[dest++]=arr[cursor2++];
           if(--len2==0)
           {
             break outer;
@@ -10735,9 +10735,10 @@ public final class SortUtil
           //assert len1>0;
         ArrCopy.uncheckedCopy(arr,(cursor1-=len1)+1,arr,(dest-=len1)+1,len1);
         arr[dest]=tmp[cursor2];
+        break;
       default:
-        assert len1==0;
-        assert len2>0;
+        //assert len1==0;
+        //assert len2>0;
         ArrCopy.uncheckedCopy(tmp,tmpBase,arr,dest-(len2-1),len2);
       }
     }
@@ -10893,7 +10894,7 @@ public final class SortUtil
               break outer;
             }
           }
-          arr[dest++]=tmp[cursor2++];
+          arr[dest++]=arr[cursor2++];
           if(--len2==0)
           {
             break outer;
@@ -11049,9 +11050,10 @@ public final class SortUtil
           //assert len1>0;
         ArrCopy.uncheckedCopy(arr,(cursor1-=len1)+1,arr,(dest-=len1)+1,len1);
         arr[dest]=tmp[cursor2];
+        break;
       default:
-        assert len1==0;
-        assert len2>0;
+        //assert len1==0;
+        //assert len2>0;
         ArrCopy.uncheckedCopy(tmp,tmpBase,arr,dest-(len2-1),len2);
       }
     }
@@ -11207,7 +11209,7 @@ public final class SortUtil
               break outer;
             }
           }
-          arr[dest++]=tmp[cursor2++];
+          arr[dest++]=arr[cursor2++];
           if(--len2==0)
           {
             break outer;
@@ -11363,9 +11365,10 @@ public final class SortUtil
           //assert len1>0;
         ArrCopy.uncheckedCopy(arr,(cursor1-=len1)+1,arr,(dest-=len1)+1,len1);
         arr[dest]=tmp[cursor2];
+        break;
       default:
-        assert len1==0;
-        assert len2>0;
+        //assert len1==0;
+        //assert len2>0;
         ArrCopy.uncheckedCopy(tmp,tmpBase,arr,dest-(len2-1),len2);
       }
     }
@@ -11521,7 +11524,7 @@ public final class SortUtil
               break outer;
             }
           }
-          arr[dest++]=tmp[cursor2++];
+          arr[dest++]=arr[cursor2++];
           if(--len2==0)
           {
             break outer;
@@ -11677,9 +11680,10 @@ public final class SortUtil
           //assert len1>0;
         ArrCopy.uncheckedCopy(arr,(cursor1-=len1)+1,arr,(dest-=len1)+1,len1);
         arr[dest]=tmp[cursor2];
+        break;
       default:
-        assert len1==0;
-        assert len2>0;
+        //assert len1==0;
+        //assert len2>0;
         ArrCopy.uncheckedCopy(tmp,tmpBase,arr,dest-(len2-1),len2);
       }
     }
@@ -11835,7 +11839,7 @@ public final class SortUtil
               break outer;
             }
           }
-          arr[dest++]=tmp[cursor2++];
+          arr[dest++]=arr[cursor2++];
           if(--len2==0)
           {
             break outer;
@@ -11991,9 +11995,10 @@ public final class SortUtil
           //assert len1>0;
         ArrCopy.uncheckedCopy(arr,(cursor1-=len1)+1,arr,(dest-=len1)+1,len1);
         arr[dest]=tmp[cursor2];
+        break;
       default:
-        assert len1==0;
-        assert len2>0;
+        //assert len1==0;
+        //assert len2>0;
         ArrCopy.uncheckedCopy(tmp,tmpBase,arr,dest-(len2-1),len2);
       }
     }
@@ -12149,7 +12154,7 @@ public final class SortUtil
               break outer;
             }
           }
-          arr[dest++]=tmp[cursor2++];
+          arr[dest++]=arr[cursor2++];
           if(--len2==0)
           {
             break outer;
@@ -12305,9 +12310,10 @@ public final class SortUtil
           //assert len1>0;
         ArrCopy.uncheckedCopy(arr,(cursor1-=len1)+1,arr,(dest-=len1)+1,len1);
         arr[dest]=tmp[cursor2];
+        break;
       default:
-        assert len1==0;
-        assert len2>0;
+        //assert len1==0;
+        //assert len2>0;
         ArrCopy.uncheckedCopy(tmp,tmpBase,arr,dest-(len2-1),len2);
       }
     }
@@ -12463,7 +12469,7 @@ public final class SortUtil
               break outer;
             }
           }
-          arr[dest++]=tmp[cursor2++];
+          arr[dest++]=arr[cursor2++];
           if(--len2==0)
           {
             break outer;
@@ -12619,9 +12625,10 @@ public final class SortUtil
           //assert len1>0;
         ArrCopy.uncheckedCopy(arr,(cursor1-=len1)+1,arr,(dest-=len1)+1,len1);
         arr[dest]=tmp[cursor2];
+        break;
       default:
-        assert len1==0;
-        assert len2>0;
+        //assert len1==0;
+        //assert len2>0;
         ArrCopy.uncheckedCopy(tmp,tmpBase,arr,dest-(len2-1),len2);
       }
     }
@@ -12752,7 +12759,7 @@ public final class SortUtil
               break outer;
             }
           }
-          arr[dest++]=tmp[cursor2++];
+          arr[dest++]=arr[cursor2++];
           if(--len2==0)
           {
             break outer;
@@ -12910,9 +12917,10 @@ public final class SortUtil
           //assert len1>0;
         ArrCopy.uncheckedCopy(arr,(cursor1-=len1)+1,arr,(dest-=len1)+1,len1);
         arr[dest]=tmp[cursor2];
+        break;
       default:
-        assert len1==0;
-        assert len2>0;
+        //assert len1==0;
+        //assert len2>0;
         ArrCopy.uncheckedCopy(tmp,tmpBase,arr,dest-(len2-1),len2);
       }
     }
@@ -13035,7 +13043,7 @@ public final class SortUtil
               break outer;
             }
           }
-          arr[dest++]=tmp[cursor2++];
+          arr[dest++]=arr[cursor2++];
           if(--len2==0)
           {
             break outer;
@@ -13189,9 +13197,10 @@ public final class SortUtil
           //assert len1>0;
         ArrCopy.uncheckedCopy(arr,(cursor1-=len1)+1,arr,(dest-=len1)+1,len1);
         arr[dest]=tmp[cursor2];
+        break;
       default:
-        assert len1==0;
-        assert len2>0;
+        //assert len1==0;
+        //assert len2>0;
         ArrCopy.uncheckedCopy(tmp,tmpBase,arr,dest-(len2-1),len2);
       }
     }
@@ -13314,7 +13323,7 @@ public final class SortUtil
               break outer;
             }
           }
-          arr[dest++]=tmp[cursor2++];
+          arr[dest++]=arr[cursor2++];
           if(--len2==0)
           {
             break outer;
@@ -13468,9 +13477,10 @@ public final class SortUtil
           //assert len1>0;
         ArrCopy.uncheckedCopy(arr,(cursor1-=len1)+1,arr,(dest-=len1)+1,len1);
         arr[dest]=tmp[cursor2];
+        break;
       default:
-        assert len1==0;
-        assert len2>0;
+        //assert len1==0;
+        //assert len2>0;
         ArrCopy.uncheckedCopy(tmp,tmpBase,arr,dest-(len2-1),len2);
       }
     }
@@ -13694,7 +13704,7 @@ public final class SortUtil
   )
   {
     //assert lo < begin;
-    for(;begin<=hi;++begin)
+    for(;begin<hi;++begin)
     {
       final var pivot=(byte)arr[begin];
       int left=lo;
@@ -13721,7 +13731,7 @@ public final class SortUtil
   )
   {
     //assert lo < begin;
-    for(;begin<=hi;++begin)
+    for(;begin<hi;++begin)
     {
       final var pivot=(char)arr[begin];
       int left=lo;
@@ -13748,7 +13758,7 @@ public final class SortUtil
   )
   {
     //assert lo < begin;
-    for(;begin<=hi;++begin)
+    for(;begin<hi;++begin)
     {
       final var pivot=(short)arr[begin];
       int left=lo;
@@ -13775,7 +13785,7 @@ public final class SortUtil
   )
   {
     //assert lo < begin;
-    for(;begin<=hi;++begin)
+    for(;begin<hi;++begin)
     {
       final var pivot=(int)arr[begin];
       int left=lo;
@@ -13802,7 +13812,7 @@ public final class SortUtil
   )
   {
     //assert lo < begin;
-    for(;begin<=hi;++begin)
+    for(;begin<hi;++begin)
     {
       final var pivot=(long)arr[begin];
       int left=lo;
@@ -13829,7 +13839,7 @@ public final class SortUtil
   )
   {
     //assert lo < begin;
-    for(;begin<=hi;++begin)
+    for(;begin<hi;++begin)
     {
       final var pivot=(float)arr[begin];
       int left=lo;
@@ -13856,7 +13866,7 @@ public final class SortUtil
   )
   {
     //assert lo < begin;
-    for(;begin<=hi;++begin)
+    for(;begin<hi;++begin)
     {
       final var pivot=(double)arr[begin];
       int left=lo;
@@ -13884,7 +13894,7 @@ public final class SortUtil
   )
   {
     //assert lo < begin;
-    for(;begin<=hi;++begin)
+    for(;begin<hi;++begin)
     {
       final var pivot=(E)arr[begin];
       int left=lo;
@@ -13911,7 +13921,7 @@ public final class SortUtil
   )
   {
     //assert lo < begin;
-    for(;begin<=hi;++begin)
+    for(;begin<hi;++begin)
     {
       final var pivot=(Comparable<E>)arr[begin];
       int left=lo;
@@ -13938,7 +13948,7 @@ public final class SortUtil
   )
   {
     //assert lo < begin;
-    for(;begin<=hi;++begin)
+    for(;begin<hi;++begin)
     {
       final var pivot=(Comparable<E>)arr[begin];
       int left=lo;

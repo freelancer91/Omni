@@ -19,7 +19,7 @@ import omni.util.OmniArray;
 import omni.api.OmniIterator;
 import java.util.NoSuchElementException;
 #IFNOT OfBoolean
-import omni.util.BitSetUtils;
+import omni.util.BitSetUtil;
 #ENDIF
 #IF OfRef
 import java.util.Objects;
@@ -29,7 +29,7 @@ import omni.util.TypeUtil;
 import omni.impl.Abstract$TypeNameModifier$Itr;
 #ENDIF
 #IF OfDouble,OfFloat
-import omni.util.HashUtils;
+import omni.util.HashUtil;
 #ENDIF
 #IF OfDouble,OfLong,OfInt
 import java.util.function.$TypeNameModifier$Predicate;
@@ -940,7 +940,7 @@ private int uncheckedRemoveIfHelper(Node$<E>$ curr,SigParam)
           if(filter.test((curr=(prev=curr).next).val))
           {
             long[] survivorSet;
-            if(numLeft!=0 && (numLeft=(curr=curr.next).markSurvivors(numLeft,survivorSet=BitSetUtils.getBitSet(numLeft),filter))!=0)
+            if(numLeft!=0 && (numLeft=(curr=curr.next).markSurvivors(numLeft,survivorSet=BitSetUtil.getBitSet(numLeft),filter))!=0)
             {
               CheckedCollection.checkModCount(modCount,this.modCount);
               numSurvivors+=numLeft;
@@ -961,7 +961,7 @@ private int uncheckedRemoveIfHelper(Node$<E>$ curr,SigParam)
       {
         int numSurvivors;
         long[] survivorSet;
-        if(numLeft!=0 && (numSurvivors=(curr=curr.next).markSurvivors(numLeft,survivorSet=BitSetUtils.getBitSet(numLeft),filter))!=0)
+        if(numLeft!=0 && (numSurvivors=(curr=curr.next).markSurvivors(numLeft,survivorSet=BitSetUtil.getBitSet(numLeft),filter))!=0)
         {
           CheckedCollection.checkModCount(modCount,this.modCount);
           this.size-=(1+(numLeft-numSurvivors));
@@ -1173,10 +1173,10 @@ boolean uncheckedRemoveIf(Node$<E>$ curr,$TypeNameModifier$Predicate$<? super E>
          break;
         }
         --numLeft;
-        if(filter.test((before=prev.next).val))
+        if(filter.test((before=prev.next).val)) 
         {
           long[] survivorSet;
-          if(numLeft!=0 && (numLeft=(before=before.next).markSurvivors(numLeft,survivorSet=BitSetUtils.getBitSet(numLeft),filter))!=0)
+          if(numLeft!=0 && (numLeft=(before=before.next).markSurvivors(numLeft,survivorSet=BitSetUtil.getBitSet(numLeft),filter))!=0)
           {
             modCountChecker.checkModCount();
             numSurvivors+=numLeft;
@@ -1207,7 +1207,7 @@ boolean uncheckedRemoveIf(Node$<E>$ curr,$TypeNameModifier$Predicate$<? super E>
           int numRemoved=1;
           long[] survivorSet;
           int numSurvivors;
-          if(numLeft!=0 && (numSurvivors=(before=before.next).markSurvivors(numLeft,survivorSet=BitSetUtils.getBitSet(numLeft),filter))!=0)
+          if(numLeft!=0 && (numSurvivors=(before=before.next).markSurvivors(numLeft,survivorSet=BitSetUtil.getBitSet(numLeft),filter))!=0)
           {
             modCountChecker.checkModCount();
             numRemoved+=numLeft-numSurvivors;

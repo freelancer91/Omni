@@ -11,7 +11,7 @@ import omni.api.OmniIterator;
 import omni.api.OmniListIterator;
 import omni.impl.CheckedCollection;
 import java.util.NoSuchElementException;
-import omni.util.BitSetUtils;
+import omni.util.BitSetUtil;
 import omni.util.TypeUtil;
 import omni.impl.AbstractIntItr;
 import java.util.function.IntBinaryOperator;
@@ -1994,7 +1994,7 @@ public abstract class IntDblLnkSeq extends AbstractIntList implements OmniList.O
             if(filter.test((after=next.prev).val))
             {
               long[] survivorSet;
-              if((numLeft-=numConsumed)!=0&&(numLeft=(before=before.next).markSurvivors(numLeft,survivorSet=BitSetUtils.getBitSet(numLeft),filter))!=0)
+              if((numLeft-=numConsumed)!=0&&(numLeft=(before=before.next).markSurvivors(numLeft,survivorSet=BitSetUtil.getBitSet(numLeft),filter))!=0)
               {
                 CheckedCollection.checkModCount(modCount,this.modCount);
                 newSize+=numLeft;
@@ -2566,7 +2566,7 @@ public abstract class IntDblLnkSeq extends AbstractIntList implements OmniList.O
                 ++numRemoved;
                 long[] survivorSet;
                 int numLeft,numSurvivors;
-                if((numLeft=oldSize-numConsumed)!=0&&(numSurvivors=(before=before.next).markSurvivors(numLeft,survivorSet=BitSetUtils.getBitSet(numLeft),filter))!=0)
+                if((numLeft=oldSize-numConsumed)!=0&&(numSurvivors=(before=before.next).markSurvivors(numLeft,survivorSet=BitSetUtil.getBitSet(numLeft),filter))!=0)
                 {
                   CheckedCollection.checkModCount(modCount,root.modCount);
                   numRemoved+=numLeft-numSurvivors;
@@ -5527,9 +5527,9 @@ public abstract class IntDblLnkSeq extends AbstractIntList implements OmniList.O
             if(filter.test((after=next.prev).val))
             {
               ++numRemoved;
-              long[] survivorSet;
+              long[] survivorSet; 
               int numSurvivors;
-              if(numLeft!=0&&(numSurvivors=(before=before.next).markSurvivors(numLeft,survivorSet=BitSetUtils.getBitSet(numLeft),filter))!=0)
+              if(numLeft!=0&&(numSurvivors=(before=before.next).markSurvivors(numLeft,survivorSet=BitSetUtil.getBitSet(numLeft),filter))!=0)
               {
                 modCountChecker.checkModCount();
                 numRemoved+=numLeft-numSurvivors;

@@ -8,7 +8,7 @@ import omni.api.OmniIterator;
 import java.util.function.IntFunction;
 import java.util.NoSuchElementException;
 import omni.impl.CheckedCollection;
-import omni.util.BitSetUtils;
+import omni.util.BitSetUtil;
 import java.util.Objects;
 import omni.util.OmniPred;
 public class RefArrDeque<E> implements OmniDeque.OfRef<E>
@@ -3246,7 +3246,7 @@ public class RefArrDeque<E> implements OmniDeque.OfRef<E>
               if((numTailSurvivors=tail-++tailOffset)!=0)
               {
                 final long[] survivors;
-                numTailSurvivors=RefArrSeq.markSurvivors(arr,survivors=BitSetUtils.getBitSet(numTailSurvivors),tailOffset,tail,filter);
+                numTailSurvivors=RefArrSeq.markSurvivors(arr,survivors=BitSetUtil.getBitSet(numTailSurvivors),tailOffset,tail,filter);
                 CheckedCollection.checkModCount(modCount,this.modCount);
                 arr[tailDstOffset++]=tailVal;
                 if(numTailSurvivors!=0)

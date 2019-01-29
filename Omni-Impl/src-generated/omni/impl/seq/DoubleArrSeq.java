@@ -14,10 +14,10 @@ import omni.impl.CheckedCollection;
 import omni.util.ArrCopy;
 import omni.util.OmniArray;
 import omni.util.SortUtil;
-import omni.util.HashUtils;
+import omni.util.HashUtil;
 import omni.impl.seq.AbstractDoubleList;
 import omni.impl.AbstractDoubleItr;
-import omni.util.BitSetUtils;
+import omni.util.BitSetUtil;
 import omni.util.TypeUtil;
 import omni.function.DoubleComparator;
 import java.util.function.DoubleUnaryOperator;
@@ -321,19 +321,19 @@ public abstract class DoubleArrSeq extends AbstractDoubleList implements OmniCol
   }
   private static int forwardHashCode(double[] arr,int offset,int bound)
   {
-    int hash=31+HashUtils.hashDouble(arr[offset]);
+    int hash=31+HashUtil.hashDouble(arr[offset]);
     while(++offset!=bound)
     {
-      hash=hash*31+HashUtils.hashDouble(arr[offset]);
+      hash=hash*31+HashUtil.hashDouble(arr[offset]);
     }
     return hash;
   }
   private static int reverseHashCode(double[] arr,int offset,int bound)
   {
-    int hash=31+HashUtils.hashDouble(arr[offset]);
+    int hash=31+HashUtil.hashDouble(arr[offset]);
     while(bound!=offset)
     {
-      hash=hash*31+HashUtils.hashDouble(arr[offset]);
+      hash=hash*31+HashUtil.hashDouble(arr[offset]);
     }
     return hash;
   }
@@ -388,7 +388,7 @@ public abstract class DoubleArrSeq extends AbstractDoubleList implements OmniCol
         if((numSurvivors=(--srcOffset)-srcBound)!=0)
         {
           final long[] survivors;
-          numSurvivors=markSurvivorsReverse(arr,survivors=BitSetUtils.getBitSet(numSurvivors),srcOffset,srcBound,filter);
+          numSurvivors=markSurvivorsReverse(arr,survivors=BitSetUtil.getBitSet(numSurvivors),srcOffset,srcBound,filter);
           modCountChecker.checkModCount();
           arr[dstOffset--]=v;
           if(numSurvivors!=0)
@@ -423,7 +423,7 @@ public abstract class DoubleArrSeq extends AbstractDoubleList implements OmniCol
         if((numSurvivors=srcBound-++srcOffset)!=0)
         {
           final long[] survivors;
-          numSurvivors=markSurvivors(arr,survivors=BitSetUtils.getBitSet(numSurvivors),srcOffset,srcBound,filter);
+          numSurvivors=markSurvivors(arr,survivors=BitSetUtil.getBitSet(numSurvivors),srcOffset,srcBound,filter);
           modCountChecker.checkModCount();
           arr[dstOffset++]=v;
           if(numSurvivors!=0)

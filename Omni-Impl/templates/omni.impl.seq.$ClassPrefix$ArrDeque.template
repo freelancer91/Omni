@@ -18,10 +18,10 @@ import java.util.function.IntFunction;
 import java.util.NoSuchElementException;
 import omni.impl.CheckedCollection;
 #IFNOT OfBoolean
-import omni.util.BitSetUtils;
+import omni.util.BitSetUtil;
 #ENDIF
 #IF OfDouble,OfFloat
-import omni.util.HashUtils;
+import omni.util.HashUtil;
 #ENDIF
 #IF OfDouble,OfLong,OfInt
 import java.util.function.$TypeNameModifier$Predicate;
@@ -1702,7 +1702,7 @@ private void collapseLASTINDEXNonFragmented(int modCount,$ArrayType$[] arr,int h
               if((numTailSurvivors=tail-++tailOffset)!=0)
               {
                 final long[] survivors;
-                numTailSurvivors=$ClassPrefix$ArrSeq.markSurvivors(arr,survivors=BitSetUtils.getBitSet(numTailSurvivors),tailOffset,tail,filter);
+                numTailSurvivors=$ClassPrefix$ArrSeq.markSurvivors(arr,survivors=BitSetUtil.getBitSet(numTailSurvivors),tailOffset,tail,filter);
                 CheckedCollection.checkModCount(modCount,this.modCount);
                 arr[tailDstOffset++]=tailVal;
                 if(numTailSurvivors!=0)

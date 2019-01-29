@@ -8,8 +8,8 @@ import omni.api.OmniIterator;
 import java.util.function.IntFunction;
 import java.util.NoSuchElementException;
 import omni.impl.CheckedCollection;
-import omni.util.BitSetUtils;
-import omni.util.HashUtils;
+import omni.util.BitSetUtil;
+import omni.util.HashUtil;
 import java.util.function.DoublePredicate;
 import java.util.function.DoubleConsumer;
 import omni.impl.AbstractDoubleItr;
@@ -108,13 +108,13 @@ public class DoubleArrDeque implements OmniDeque.OfDouble
   {
     final double[] arr;
     int head;
-    int hash=31+HashUtils.hashDouble((arr=this.arr)[head=this.head]);
+    int hash=31+HashUtil.hashDouble((arr=this.arr)[head=this.head]);
     if(tail<=head)
     {
-      for(int bound=arr.length;++head!=bound;hash=(hash*31)+HashUtils.hashDouble(arr[head])){}
-      hash=(hash*31)+HashUtils.hashDouble(arr[head=0]);
+      for(int bound=arr.length;++head!=bound;hash=(hash*31)+HashUtil.hashDouble(arr[head])){}
+      hash=(hash*31)+HashUtil.hashDouble(arr[head=0]);
     }
-    for(;++head!=tail;hash=(hash*31)+HashUtils.hashDouble(arr[head])){}
+    for(;++head!=tail;hash=(hash*31)+HashUtil.hashDouble(arr[head])){}
     return hash;
   }
   @Override
@@ -3338,7 +3338,7 @@ public class DoubleArrDeque implements OmniDeque.OfDouble
               if((numTailSurvivors=tail-++tailOffset)!=0)
               {
                 final long[] survivors;
-                numTailSurvivors=DoubleArrSeq.markSurvivors(arr,survivors=BitSetUtils.getBitSet(numTailSurvivors),tailOffset,tail,filter);
+                numTailSurvivors=DoubleArrSeq.markSurvivors(arr,survivors=BitSetUtil.getBitSet(numTailSurvivors),tailOffset,tail,filter);
                 CheckedCollection.checkModCount(modCount,this.modCount);
                 arr[tailDstOffset++]=tailVal;
                 if(numTailSurvivors!=0)

@@ -9,7 +9,7 @@ import java.util.function.IntFunction;
 import omni.util.OmniArray;
 import omni.api.OmniIterator;
 import java.util.NoSuchElementException;
-import omni.util.BitSetUtils;
+import omni.util.BitSetUtil;
 import omni.util.TypeUtil;
 import omni.impl.AbstractLongItr;
 import java.util.function.LongPredicate;
@@ -1381,7 +1381,7 @@ implements OmniCollection.OfLong
           if(filter.test((curr=(prev=curr).next).val))
           {
             long[] survivorSet;
-            if(numLeft!=0 && (numLeft=(curr=curr.next).markSurvivors(numLeft,survivorSet=BitSetUtils.getBitSet(numLeft),filter))!=0)
+            if(numLeft!=0 && (numLeft=(curr=curr.next).markSurvivors(numLeft,survivorSet=BitSetUtil.getBitSet(numLeft),filter))!=0)
             {
               CheckedCollection.checkModCount(modCount,this.modCount);
               numSurvivors+=numLeft;
@@ -1402,7 +1402,7 @@ implements OmniCollection.OfLong
       {
         int numSurvivors;
         long[] survivorSet;
-        if(numLeft!=0 && (numSurvivors=(curr=curr.next).markSurvivors(numLeft,survivorSet=BitSetUtils.getBitSet(numLeft),filter))!=0)
+        if(numLeft!=0 && (numSurvivors=(curr=curr.next).markSurvivors(numLeft,survivorSet=BitSetUtil.getBitSet(numLeft),filter))!=0)
         {
           CheckedCollection.checkModCount(modCount,this.modCount);
           this.size-=(1+(numLeft-numSurvivors));
@@ -1682,10 +1682,10 @@ implements OmniCollection.OfLong
          break;
         }
         --numLeft;
-        if(filter.test((before=prev.next).val))
+        if(filter.test((before=prev.next).val)) 
         {
           long[] survivorSet;
-          if(numLeft!=0 && (numLeft=(before=before.next).markSurvivors(numLeft,survivorSet=BitSetUtils.getBitSet(numLeft),filter))!=0)
+          if(numLeft!=0 && (numLeft=(before=before.next).markSurvivors(numLeft,survivorSet=BitSetUtil.getBitSet(numLeft),filter))!=0)
           {
             modCountChecker.checkModCount();
             numSurvivors+=numLeft;
@@ -1716,7 +1716,7 @@ implements OmniCollection.OfLong
           int numRemoved=1;
           long[] survivorSet;
           int numSurvivors;
-          if(numLeft!=0 && (numSurvivors=(before=before.next).markSurvivors(numLeft,survivorSet=BitSetUtils.getBitSet(numLeft),filter))!=0)
+          if(numLeft!=0 && (numSurvivors=(before=before.next).markSurvivors(numLeft,survivorSet=BitSetUtil.getBitSet(numLeft),filter))!=0)
           {
             modCountChecker.checkModCount();
             numRemoved+=numLeft-numSurvivors;

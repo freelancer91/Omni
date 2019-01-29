@@ -9,10 +9,10 @@ import java.util.function.IntFunction;
 import omni.util.OmniArray;
 import omni.api.OmniIterator;
 import java.util.NoSuchElementException;
-import omni.util.BitSetUtils;
+import omni.util.BitSetUtil;
 import omni.util.TypeUtil;
 import omni.impl.AbstractFloatItr;
-import omni.util.HashUtils;
+import omni.util.HashUtil;
 import omni.function.FloatPredicate;
 import omni.function.FloatConsumer;
 public abstract class FloatSnglLnkSeq 
@@ -1633,7 +1633,7 @@ implements OmniCollection.OfFloat
           if(filter.test((curr=(prev=curr).next).val))
           {
             long[] survivorSet;
-            if(numLeft!=0 && (numLeft=(curr=curr.next).markSurvivors(numLeft,survivorSet=BitSetUtils.getBitSet(numLeft),filter))!=0)
+            if(numLeft!=0 && (numLeft=(curr=curr.next).markSurvivors(numLeft,survivorSet=BitSetUtil.getBitSet(numLeft),filter))!=0)
             {
               CheckedCollection.checkModCount(modCount,this.modCount);
               numSurvivors+=numLeft;
@@ -1654,7 +1654,7 @@ implements OmniCollection.OfFloat
       {
         int numSurvivors;
         long[] survivorSet;
-        if(numLeft!=0 && (numSurvivors=(curr=curr.next).markSurvivors(numLeft,survivorSet=BitSetUtils.getBitSet(numLeft),filter))!=0)
+        if(numLeft!=0 && (numSurvivors=(curr=curr.next).markSurvivors(numLeft,survivorSet=BitSetUtil.getBitSet(numLeft),filter))!=0)
         {
           CheckedCollection.checkModCount(modCount,this.modCount);
           this.size-=(1+(numLeft-numSurvivors));
@@ -1985,10 +1985,10 @@ implements OmniCollection.OfFloat
          break;
         }
         --numLeft;
-        if(filter.test((before=prev.next).val))
+        if(filter.test((before=prev.next).val)) 
         {
           long[] survivorSet;
-          if(numLeft!=0 && (numLeft=(before=before.next).markSurvivors(numLeft,survivorSet=BitSetUtils.getBitSet(numLeft),filter))!=0)
+          if(numLeft!=0 && (numLeft=(before=before.next).markSurvivors(numLeft,survivorSet=BitSetUtil.getBitSet(numLeft),filter))!=0)
           {
             modCountChecker.checkModCount();
             numSurvivors+=numLeft;
@@ -2019,7 +2019,7 @@ implements OmniCollection.OfFloat
           int numRemoved=1;
           long[] survivorSet;
           int numSurvivors;
-          if(numLeft!=0 && (numSurvivors=(before=before.next).markSurvivors(numLeft,survivorSet=BitSetUtils.getBitSet(numLeft),filter))!=0)
+          if(numLeft!=0 && (numSurvivors=(before=before.next).markSurvivors(numLeft,survivorSet=BitSetUtil.getBitSet(numLeft),filter))!=0)
           {
             modCountChecker.checkModCount();
             numRemoved+=numLeft-numSurvivors;
@@ -2172,8 +2172,8 @@ implements OmniCollection.OfFloat
     }
     private int uncheckedForwardHashCode()
     {
-      int hash=31+HashUtils.hashFloat(this.val);
-      for(var curr=next;curr!=null;hash=hash*31+HashUtils.hashFloat(curr.val),curr=curr.next)
+      int hash=31+HashUtil.hashFloat(this.val);
+      for(var curr=next;curr!=null;hash=hash*31+HashUtil.hashFloat(curr.val),curr=curr.next)
       {  
       }
       return hash;

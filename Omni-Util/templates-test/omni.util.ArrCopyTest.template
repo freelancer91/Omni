@@ -147,7 +147,7 @@ public void testSemiCheckedReverseCopySRCDST() throws Throwable
 }
 #ENDDEF
 #MACRODEF GetSrcArr<SRC>()
-private static SRC[] getSRCArr(Random rand,int length)
+static SRC[] getSRCArr(Random rand,int length)
 {
   SRC[] src=new SRC[length];
   for(int i=0;i<length;++i)
