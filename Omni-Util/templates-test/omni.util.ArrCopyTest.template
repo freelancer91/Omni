@@ -71,6 +71,7 @@ public class ArrCopyTest
   #MACRO TestCopy<float,double>()
   #MACRO TestCopy<double,double>()
   #MACRO TestCopy<String,String>()
+  /*
   #MACRO GetSrcArr<boolean>()
   #MACRO GetSrcArr<byte>()
   #MACRO GetSrcArr<char>()
@@ -88,6 +89,7 @@ public class ArrCopyTest
   #MACRO GetSrcArr<Float>()
   #MACRO GetSrcArr<Double>()
   #MACRO GetSrcArr<String>()
+  */
 }
 #MACRODEF IsEqual(src,dst)
 #IFSWITCH DST==Object
@@ -111,7 +113,7 @@ public void testSemiCheckedCopySRCDST() throws Throwable
   for(int i=0;i<1000;++i)
   {
     int srcLength=rand.nextInt(1000);
-    SRC[] src=getSRCArr(rand,srcLength);
+    SRC[] src=JunitUtil.getUnsortedSRCArray(rand,srcLength);
     int dstLength=srcLength+rand.nextInt(1000);
     DST[] dst=new DST[dstLength];
     int copyLength=rand.nextInt(srcLength+1);
@@ -132,7 +134,7 @@ public void testSemiCheckedReverseCopySRCDST() throws Throwable
   for(int i=0;i<1000;++i)
   {
     int srcLength=rand.nextInt(1000);
-    SRC[] src=getSRCArr(rand,srcLength);
+    SRC[] src=JunitUtil.getUnsortedSRCArray(rand,srcLength);
     int dstLength=srcLength+rand.nextInt(1000);
     DST[] dst=new DST[dstLength];
     int copyLength=rand.nextInt(srcLength+1);

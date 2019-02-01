@@ -12,7 +12,7 @@ public class ArrCopyTest
     for(int i=0;i<1000;++i)
     {
       int srcLength=rand.nextInt(1000);
-      boolean[] src=getbooleanArr(rand,srcLength);
+      boolean[] src=JunitUtil.getUnsortedbooleanArray(rand,srcLength);
       int dstLength=srcLength+rand.nextInt(1000);
       Boolean[] dst=new Boolean[dstLength];
       int copyLength=rand.nextInt(srcLength+1);
@@ -32,7 +32,7 @@ public class ArrCopyTest
     for(int i=0;i<1000;++i)
     {
       int srcLength=rand.nextInt(1000);
-      boolean[] src=getbooleanArr(rand,srcLength);
+      boolean[] src=JunitUtil.getUnsortedbooleanArray(rand,srcLength);
       int dstLength=srcLength+rand.nextInt(1000);
       Boolean[] dst=new Boolean[dstLength];
       int copyLength=rand.nextInt(srcLength+1);
@@ -52,7 +52,7 @@ public class ArrCopyTest
     for(int i=0;i<1000;++i)
     {
       int srcLength=rand.nextInt(1000);
-      byte[] src=getbyteArr(rand,srcLength);
+      byte[] src=JunitUtil.getUnsortedbyteArray(rand,srcLength);
       int dstLength=srcLength+rand.nextInt(1000);
       Byte[] dst=new Byte[dstLength];
       int copyLength=rand.nextInt(srcLength+1);
@@ -72,7 +72,7 @@ public class ArrCopyTest
     for(int i=0;i<1000;++i)
     {
       int srcLength=rand.nextInt(1000);
-      byte[] src=getbyteArr(rand,srcLength);
+      byte[] src=JunitUtil.getUnsortedbyteArray(rand,srcLength);
       int dstLength=srcLength+rand.nextInt(1000);
       Byte[] dst=new Byte[dstLength];
       int copyLength=rand.nextInt(srcLength+1);
@@ -92,7 +92,7 @@ public class ArrCopyTest
     for(int i=0;i<1000;++i)
     {
       int srcLength=rand.nextInt(1000);
-      char[] src=getcharArr(rand,srcLength);
+      char[] src=JunitUtil.getUnsortedcharArray(rand,srcLength);
       int dstLength=srcLength+rand.nextInt(1000);
       Character[] dst=new Character[dstLength];
       int copyLength=rand.nextInt(srcLength+1);
@@ -112,7 +112,7 @@ public class ArrCopyTest
     for(int i=0;i<1000;++i)
     {
       int srcLength=rand.nextInt(1000);
-      char[] src=getcharArr(rand,srcLength);
+      char[] src=JunitUtil.getUnsortedcharArray(rand,srcLength);
       int dstLength=srcLength+rand.nextInt(1000);
       Character[] dst=new Character[dstLength];
       int copyLength=rand.nextInt(srcLength+1);
@@ -132,7 +132,7 @@ public class ArrCopyTest
     for(int i=0;i<1000;++i)
     {
       int srcLength=rand.nextInt(1000);
-      short[] src=getshortArr(rand,srcLength);
+      short[] src=JunitUtil.getUnsortedshortArray(rand,srcLength);
       int dstLength=srcLength+rand.nextInt(1000);
       Short[] dst=new Short[dstLength];
       int copyLength=rand.nextInt(srcLength+1);
@@ -152,7 +152,7 @@ public class ArrCopyTest
     for(int i=0;i<1000;++i)
     {
       int srcLength=rand.nextInt(1000);
-      short[] src=getshortArr(rand,srcLength);
+      short[] src=JunitUtil.getUnsortedshortArray(rand,srcLength);
       int dstLength=srcLength+rand.nextInt(1000);
       Short[] dst=new Short[dstLength];
       int copyLength=rand.nextInt(srcLength+1);
@@ -172,7 +172,7 @@ public class ArrCopyTest
     for(int i=0;i<1000;++i)
     {
       int srcLength=rand.nextInt(1000);
-      int[] src=getintArr(rand,srcLength);
+      int[] src=JunitUtil.getUnsortedintArray(rand,srcLength);
       int dstLength=srcLength+rand.nextInt(1000);
       Integer[] dst=new Integer[dstLength];
       int copyLength=rand.nextInt(srcLength+1);
@@ -192,7 +192,7 @@ public class ArrCopyTest
     for(int i=0;i<1000;++i)
     {
       int srcLength=rand.nextInt(1000);
-      int[] src=getintArr(rand,srcLength);
+      int[] src=JunitUtil.getUnsortedintArray(rand,srcLength);
       int dstLength=srcLength+rand.nextInt(1000);
       Integer[] dst=new Integer[dstLength];
       int copyLength=rand.nextInt(srcLength+1);
@@ -212,7 +212,7 @@ public class ArrCopyTest
     for(int i=0;i<1000;++i)
     {
       int srcLength=rand.nextInt(1000);
-      long[] src=getlongArr(rand,srcLength);
+      long[] src=JunitUtil.getUnsortedlongArray(rand,srcLength);
       int dstLength=srcLength+rand.nextInt(1000);
       Long[] dst=new Long[dstLength];
       int copyLength=rand.nextInt(srcLength+1);
@@ -232,7 +232,7 @@ public class ArrCopyTest
     for(int i=0;i<1000;++i)
     {
       int srcLength=rand.nextInt(1000);
-      long[] src=getlongArr(rand,srcLength);
+      long[] src=JunitUtil.getUnsortedlongArray(rand,srcLength);
       int dstLength=srcLength+rand.nextInt(1000);
       Long[] dst=new Long[dstLength];
       int copyLength=rand.nextInt(srcLength+1);
@@ -252,7 +252,7 @@ public class ArrCopyTest
     for(int i=0;i<1000;++i)
     {
       int srcLength=rand.nextInt(1000);
-      float[] src=getfloatArr(rand,srcLength);
+      float[] src=JunitUtil.getUnsortedfloatArray(rand,srcLength);
       int dstLength=srcLength+rand.nextInt(1000);
       Float[] dst=new Float[dstLength];
       int copyLength=rand.nextInt(srcLength+1);
@@ -272,7 +272,7 @@ public class ArrCopyTest
     for(int i=0;i<1000;++i)
     {
       int srcLength=rand.nextInt(1000);
-      float[] src=getfloatArr(rand,srcLength);
+      float[] src=JunitUtil.getUnsortedfloatArray(rand,srcLength);
       int dstLength=srcLength+rand.nextInt(1000);
       Float[] dst=new Float[dstLength];
       int copyLength=rand.nextInt(srcLength+1);
@@ -292,7 +292,7 @@ public class ArrCopyTest
     for(int i=0;i<1000;++i)
     {
       int srcLength=rand.nextInt(1000);
-      double[] src=getdoubleArr(rand,srcLength);
+      double[] src=JunitUtil.getUnsorteddoubleArray(rand,srcLength);
       int dstLength=srcLength+rand.nextInt(1000);
       Double[] dst=new Double[dstLength];
       int copyLength=rand.nextInt(srcLength+1);
@@ -312,7 +312,7 @@ public class ArrCopyTest
     for(int i=0;i<1000;++i)
     {
       int srcLength=rand.nextInt(1000);
-      double[] src=getdoubleArr(rand,srcLength);
+      double[] src=JunitUtil.getUnsorteddoubleArray(rand,srcLength);
       int dstLength=srcLength+rand.nextInt(1000);
       Double[] dst=new Double[dstLength];
       int copyLength=rand.nextInt(srcLength+1);
@@ -332,7 +332,7 @@ public class ArrCopyTest
     for(int i=0;i<1000;++i)
     {
       int srcLength=rand.nextInt(1000);
-      boolean[] src=getbooleanArr(rand,srcLength);
+      boolean[] src=JunitUtil.getUnsortedbooleanArray(rand,srcLength);
       int dstLength=srcLength+rand.nextInt(1000);
       Object[] dst=new Object[dstLength];
       int copyLength=rand.nextInt(srcLength+1);
@@ -352,7 +352,7 @@ public class ArrCopyTest
     for(int i=0;i<1000;++i)
     {
       int srcLength=rand.nextInt(1000);
-      boolean[] src=getbooleanArr(rand,srcLength);
+      boolean[] src=JunitUtil.getUnsortedbooleanArray(rand,srcLength);
       int dstLength=srcLength+rand.nextInt(1000);
       Object[] dst=new Object[dstLength];
       int copyLength=rand.nextInt(srcLength+1);
@@ -372,7 +372,7 @@ public class ArrCopyTest
     for(int i=0;i<1000;++i)
     {
       int srcLength=rand.nextInt(1000);
-      byte[] src=getbyteArr(rand,srcLength);
+      byte[] src=JunitUtil.getUnsortedbyteArray(rand,srcLength);
       int dstLength=srcLength+rand.nextInt(1000);
       Object[] dst=new Object[dstLength];
       int copyLength=rand.nextInt(srcLength+1);
@@ -392,7 +392,7 @@ public class ArrCopyTest
     for(int i=0;i<1000;++i)
     {
       int srcLength=rand.nextInt(1000);
-      byte[] src=getbyteArr(rand,srcLength);
+      byte[] src=JunitUtil.getUnsortedbyteArray(rand,srcLength);
       int dstLength=srcLength+rand.nextInt(1000);
       Object[] dst=new Object[dstLength];
       int copyLength=rand.nextInt(srcLength+1);
@@ -412,7 +412,7 @@ public class ArrCopyTest
     for(int i=0;i<1000;++i)
     {
       int srcLength=rand.nextInt(1000);
-      char[] src=getcharArr(rand,srcLength);
+      char[] src=JunitUtil.getUnsortedcharArray(rand,srcLength);
       int dstLength=srcLength+rand.nextInt(1000);
       Object[] dst=new Object[dstLength];
       int copyLength=rand.nextInt(srcLength+1);
@@ -432,7 +432,7 @@ public class ArrCopyTest
     for(int i=0;i<1000;++i)
     {
       int srcLength=rand.nextInt(1000);
-      char[] src=getcharArr(rand,srcLength);
+      char[] src=JunitUtil.getUnsortedcharArray(rand,srcLength);
       int dstLength=srcLength+rand.nextInt(1000);
       Object[] dst=new Object[dstLength];
       int copyLength=rand.nextInt(srcLength+1);
@@ -452,7 +452,7 @@ public class ArrCopyTest
     for(int i=0;i<1000;++i)
     {
       int srcLength=rand.nextInt(1000);
-      short[] src=getshortArr(rand,srcLength);
+      short[] src=JunitUtil.getUnsortedshortArray(rand,srcLength);
       int dstLength=srcLength+rand.nextInt(1000);
       Object[] dst=new Object[dstLength];
       int copyLength=rand.nextInt(srcLength+1);
@@ -472,7 +472,7 @@ public class ArrCopyTest
     for(int i=0;i<1000;++i)
     {
       int srcLength=rand.nextInt(1000);
-      short[] src=getshortArr(rand,srcLength);
+      short[] src=JunitUtil.getUnsortedshortArray(rand,srcLength);
       int dstLength=srcLength+rand.nextInt(1000);
       Object[] dst=new Object[dstLength];
       int copyLength=rand.nextInt(srcLength+1);
@@ -492,7 +492,7 @@ public class ArrCopyTest
     for(int i=0;i<1000;++i)
     {
       int srcLength=rand.nextInt(1000);
-      int[] src=getintArr(rand,srcLength);
+      int[] src=JunitUtil.getUnsortedintArray(rand,srcLength);
       int dstLength=srcLength+rand.nextInt(1000);
       Object[] dst=new Object[dstLength];
       int copyLength=rand.nextInt(srcLength+1);
@@ -512,7 +512,7 @@ public class ArrCopyTest
     for(int i=0;i<1000;++i)
     {
       int srcLength=rand.nextInt(1000);
-      int[] src=getintArr(rand,srcLength);
+      int[] src=JunitUtil.getUnsortedintArray(rand,srcLength);
       int dstLength=srcLength+rand.nextInt(1000);
       Object[] dst=new Object[dstLength];
       int copyLength=rand.nextInt(srcLength+1);
@@ -532,7 +532,7 @@ public class ArrCopyTest
     for(int i=0;i<1000;++i)
     {
       int srcLength=rand.nextInt(1000);
-      long[] src=getlongArr(rand,srcLength);
+      long[] src=JunitUtil.getUnsortedlongArray(rand,srcLength);
       int dstLength=srcLength+rand.nextInt(1000);
       Object[] dst=new Object[dstLength];
       int copyLength=rand.nextInt(srcLength+1);
@@ -552,7 +552,7 @@ public class ArrCopyTest
     for(int i=0;i<1000;++i)
     {
       int srcLength=rand.nextInt(1000);
-      long[] src=getlongArr(rand,srcLength);
+      long[] src=JunitUtil.getUnsortedlongArray(rand,srcLength);
       int dstLength=srcLength+rand.nextInt(1000);
       Object[] dst=new Object[dstLength];
       int copyLength=rand.nextInt(srcLength+1);
@@ -572,7 +572,7 @@ public class ArrCopyTest
     for(int i=0;i<1000;++i)
     {
       int srcLength=rand.nextInt(1000);
-      float[] src=getfloatArr(rand,srcLength);
+      float[] src=JunitUtil.getUnsortedfloatArray(rand,srcLength);
       int dstLength=srcLength+rand.nextInt(1000);
       Object[] dst=new Object[dstLength];
       int copyLength=rand.nextInt(srcLength+1);
@@ -592,7 +592,7 @@ public class ArrCopyTest
     for(int i=0;i<1000;++i)
     {
       int srcLength=rand.nextInt(1000);
-      float[] src=getfloatArr(rand,srcLength);
+      float[] src=JunitUtil.getUnsortedfloatArray(rand,srcLength);
       int dstLength=srcLength+rand.nextInt(1000);
       Object[] dst=new Object[dstLength];
       int copyLength=rand.nextInt(srcLength+1);
@@ -612,7 +612,7 @@ public class ArrCopyTest
     for(int i=0;i<1000;++i)
     {
       int srcLength=rand.nextInt(1000);
-      double[] src=getdoubleArr(rand,srcLength);
+      double[] src=JunitUtil.getUnsorteddoubleArray(rand,srcLength);
       int dstLength=srcLength+rand.nextInt(1000);
       Object[] dst=new Object[dstLength];
       int copyLength=rand.nextInt(srcLength+1);
@@ -632,7 +632,7 @@ public class ArrCopyTest
     for(int i=0;i<1000;++i)
     {
       int srcLength=rand.nextInt(1000);
-      double[] src=getdoubleArr(rand,srcLength);
+      double[] src=JunitUtil.getUnsorteddoubleArray(rand,srcLength);
       int dstLength=srcLength+rand.nextInt(1000);
       Object[] dst=new Object[dstLength];
       int copyLength=rand.nextInt(srcLength+1);
@@ -652,7 +652,7 @@ public class ArrCopyTest
     for(int i=0;i<1000;++i)
     {
       int srcLength=rand.nextInt(1000);
-      Boolean[] src=getBooleanArr(rand,srcLength);
+      Boolean[] src=JunitUtil.getUnsortedBooleanArray(rand,srcLength);
       int dstLength=srcLength+rand.nextInt(1000);
       boolean[] dst=new boolean[dstLength];
       int copyLength=rand.nextInt(srcLength+1);
@@ -672,7 +672,7 @@ public class ArrCopyTest
     for(int i=0;i<1000;++i)
     {
       int srcLength=rand.nextInt(1000);
-      Boolean[] src=getBooleanArr(rand,srcLength);
+      Boolean[] src=JunitUtil.getUnsortedBooleanArray(rand,srcLength);
       int dstLength=srcLength+rand.nextInt(1000);
       boolean[] dst=new boolean[dstLength];
       int copyLength=rand.nextInt(srcLength+1);
@@ -692,7 +692,7 @@ public class ArrCopyTest
     for(int i=0;i<1000;++i)
     {
       int srcLength=rand.nextInt(1000);
-      Byte[] src=getByteArr(rand,srcLength);
+      Byte[] src=JunitUtil.getUnsortedByteArray(rand,srcLength);
       int dstLength=srcLength+rand.nextInt(1000);
       byte[] dst=new byte[dstLength];
       int copyLength=rand.nextInt(srcLength+1);
@@ -712,7 +712,7 @@ public class ArrCopyTest
     for(int i=0;i<1000;++i)
     {
       int srcLength=rand.nextInt(1000);
-      Byte[] src=getByteArr(rand,srcLength);
+      Byte[] src=JunitUtil.getUnsortedByteArray(rand,srcLength);
       int dstLength=srcLength+rand.nextInt(1000);
       byte[] dst=new byte[dstLength];
       int copyLength=rand.nextInt(srcLength+1);
@@ -732,7 +732,7 @@ public class ArrCopyTest
     for(int i=0;i<1000;++i)
     {
       int srcLength=rand.nextInt(1000);
-      Character[] src=getCharacterArr(rand,srcLength);
+      Character[] src=JunitUtil.getUnsortedCharacterArray(rand,srcLength);
       int dstLength=srcLength+rand.nextInt(1000);
       char[] dst=new char[dstLength];
       int copyLength=rand.nextInt(srcLength+1);
@@ -752,7 +752,7 @@ public class ArrCopyTest
     for(int i=0;i<1000;++i)
     {
       int srcLength=rand.nextInt(1000);
-      Character[] src=getCharacterArr(rand,srcLength);
+      Character[] src=JunitUtil.getUnsortedCharacterArray(rand,srcLength);
       int dstLength=srcLength+rand.nextInt(1000);
       char[] dst=new char[dstLength];
       int copyLength=rand.nextInt(srcLength+1);
@@ -772,7 +772,7 @@ public class ArrCopyTest
     for(int i=0;i<1000;++i)
     {
       int srcLength=rand.nextInt(1000);
-      Short[] src=getShortArr(rand,srcLength);
+      Short[] src=JunitUtil.getUnsortedShortArray(rand,srcLength);
       int dstLength=srcLength+rand.nextInt(1000);
       short[] dst=new short[dstLength];
       int copyLength=rand.nextInt(srcLength+1);
@@ -792,7 +792,7 @@ public class ArrCopyTest
     for(int i=0;i<1000;++i)
     {
       int srcLength=rand.nextInt(1000);
-      Short[] src=getShortArr(rand,srcLength);
+      Short[] src=JunitUtil.getUnsortedShortArray(rand,srcLength);
       int dstLength=srcLength+rand.nextInt(1000);
       short[] dst=new short[dstLength];
       int copyLength=rand.nextInt(srcLength+1);
@@ -812,7 +812,7 @@ public class ArrCopyTest
     for(int i=0;i<1000;++i)
     {
       int srcLength=rand.nextInt(1000);
-      Integer[] src=getIntegerArr(rand,srcLength);
+      Integer[] src=JunitUtil.getUnsortedIntegerArray(rand,srcLength);
       int dstLength=srcLength+rand.nextInt(1000);
       int[] dst=new int[dstLength];
       int copyLength=rand.nextInt(srcLength+1);
@@ -832,7 +832,7 @@ public class ArrCopyTest
     for(int i=0;i<1000;++i)
     {
       int srcLength=rand.nextInt(1000);
-      Integer[] src=getIntegerArr(rand,srcLength);
+      Integer[] src=JunitUtil.getUnsortedIntegerArray(rand,srcLength);
       int dstLength=srcLength+rand.nextInt(1000);
       int[] dst=new int[dstLength];
       int copyLength=rand.nextInt(srcLength+1);
@@ -852,7 +852,7 @@ public class ArrCopyTest
     for(int i=0;i<1000;++i)
     {
       int srcLength=rand.nextInt(1000);
-      Long[] src=getLongArr(rand,srcLength);
+      Long[] src=JunitUtil.getUnsortedLongArray(rand,srcLength);
       int dstLength=srcLength+rand.nextInt(1000);
       long[] dst=new long[dstLength];
       int copyLength=rand.nextInt(srcLength+1);
@@ -872,7 +872,7 @@ public class ArrCopyTest
     for(int i=0;i<1000;++i)
     {
       int srcLength=rand.nextInt(1000);
-      Long[] src=getLongArr(rand,srcLength);
+      Long[] src=JunitUtil.getUnsortedLongArray(rand,srcLength);
       int dstLength=srcLength+rand.nextInt(1000);
       long[] dst=new long[dstLength];
       int copyLength=rand.nextInt(srcLength+1);
@@ -892,7 +892,7 @@ public class ArrCopyTest
     for(int i=0;i<1000;++i)
     {
       int srcLength=rand.nextInt(1000);
-      Float[] src=getFloatArr(rand,srcLength);
+      Float[] src=JunitUtil.getUnsortedFloatArray(rand,srcLength);
       int dstLength=srcLength+rand.nextInt(1000);
       float[] dst=new float[dstLength];
       int copyLength=rand.nextInt(srcLength+1);
@@ -912,7 +912,7 @@ public class ArrCopyTest
     for(int i=0;i<1000;++i)
     {
       int srcLength=rand.nextInt(1000);
-      Float[] src=getFloatArr(rand,srcLength);
+      Float[] src=JunitUtil.getUnsortedFloatArray(rand,srcLength);
       int dstLength=srcLength+rand.nextInt(1000);
       float[] dst=new float[dstLength];
       int copyLength=rand.nextInt(srcLength+1);
@@ -932,7 +932,7 @@ public class ArrCopyTest
     for(int i=0;i<1000;++i)
     {
       int srcLength=rand.nextInt(1000);
-      Double[] src=getDoubleArr(rand,srcLength);
+      Double[] src=JunitUtil.getUnsortedDoubleArray(rand,srcLength);
       int dstLength=srcLength+rand.nextInt(1000);
       double[] dst=new double[dstLength];
       int copyLength=rand.nextInt(srcLength+1);
@@ -952,7 +952,7 @@ public class ArrCopyTest
     for(int i=0;i<1000;++i)
     {
       int srcLength=rand.nextInt(1000);
-      Double[] src=getDoubleArr(rand,srcLength);
+      Double[] src=JunitUtil.getUnsortedDoubleArray(rand,srcLength);
       int dstLength=srcLength+rand.nextInt(1000);
       double[] dst=new double[dstLength];
       int copyLength=rand.nextInt(srcLength+1);
@@ -972,7 +972,7 @@ public class ArrCopyTest
     for(int i=0;i<1000;++i)
     {
       int srcLength=rand.nextInt(1000);
-      boolean[] src=getbooleanArr(rand,srcLength);
+      boolean[] src=JunitUtil.getUnsortedbooleanArray(rand,srcLength);
       int dstLength=srcLength+rand.nextInt(1000);
       boolean[] dst=new boolean[dstLength];
       int copyLength=rand.nextInt(srcLength+1);
@@ -992,7 +992,7 @@ public class ArrCopyTest
     for(int i=0;i<1000;++i)
     {
       int srcLength=rand.nextInt(1000);
-      boolean[] src=getbooleanArr(rand,srcLength);
+      boolean[] src=JunitUtil.getUnsortedbooleanArray(rand,srcLength);
       int dstLength=srcLength+rand.nextInt(1000);
       boolean[] dst=new boolean[dstLength];
       int copyLength=rand.nextInt(srcLength+1);
@@ -1012,7 +1012,7 @@ public class ArrCopyTest
     for(int i=0;i<1000;++i)
     {
       int srcLength=rand.nextInt(1000);
-      boolean[] src=getbooleanArr(rand,srcLength);
+      boolean[] src=JunitUtil.getUnsortedbooleanArray(rand,srcLength);
       int dstLength=srcLength+rand.nextInt(1000);
       byte[] dst=new byte[dstLength];
       int copyLength=rand.nextInt(srcLength+1);
@@ -1032,7 +1032,7 @@ public class ArrCopyTest
     for(int i=0;i<1000;++i)
     {
       int srcLength=rand.nextInt(1000);
-      boolean[] src=getbooleanArr(rand,srcLength);
+      boolean[] src=JunitUtil.getUnsortedbooleanArray(rand,srcLength);
       int dstLength=srcLength+rand.nextInt(1000);
       byte[] dst=new byte[dstLength];
       int copyLength=rand.nextInt(srcLength+1);
@@ -1052,7 +1052,7 @@ public class ArrCopyTest
     for(int i=0;i<1000;++i)
     {
       int srcLength=rand.nextInt(1000);
-      boolean[] src=getbooleanArr(rand,srcLength);
+      boolean[] src=JunitUtil.getUnsortedbooleanArray(rand,srcLength);
       int dstLength=srcLength+rand.nextInt(1000);
       char[] dst=new char[dstLength];
       int copyLength=rand.nextInt(srcLength+1);
@@ -1072,7 +1072,7 @@ public class ArrCopyTest
     for(int i=0;i<1000;++i)
     {
       int srcLength=rand.nextInt(1000);
-      boolean[] src=getbooleanArr(rand,srcLength);
+      boolean[] src=JunitUtil.getUnsortedbooleanArray(rand,srcLength);
       int dstLength=srcLength+rand.nextInt(1000);
       char[] dst=new char[dstLength];
       int copyLength=rand.nextInt(srcLength+1);
@@ -1092,7 +1092,7 @@ public class ArrCopyTest
     for(int i=0;i<1000;++i)
     {
       int srcLength=rand.nextInt(1000);
-      boolean[] src=getbooleanArr(rand,srcLength);
+      boolean[] src=JunitUtil.getUnsortedbooleanArray(rand,srcLength);
       int dstLength=srcLength+rand.nextInt(1000);
       short[] dst=new short[dstLength];
       int copyLength=rand.nextInt(srcLength+1);
@@ -1112,7 +1112,7 @@ public class ArrCopyTest
     for(int i=0;i<1000;++i)
     {
       int srcLength=rand.nextInt(1000);
-      boolean[] src=getbooleanArr(rand,srcLength);
+      boolean[] src=JunitUtil.getUnsortedbooleanArray(rand,srcLength);
       int dstLength=srcLength+rand.nextInt(1000);
       short[] dst=new short[dstLength];
       int copyLength=rand.nextInt(srcLength+1);
@@ -1132,7 +1132,7 @@ public class ArrCopyTest
     for(int i=0;i<1000;++i)
     {
       int srcLength=rand.nextInt(1000);
-      boolean[] src=getbooleanArr(rand,srcLength);
+      boolean[] src=JunitUtil.getUnsortedbooleanArray(rand,srcLength);
       int dstLength=srcLength+rand.nextInt(1000);
       int[] dst=new int[dstLength];
       int copyLength=rand.nextInt(srcLength+1);
@@ -1152,7 +1152,7 @@ public class ArrCopyTest
     for(int i=0;i<1000;++i)
     {
       int srcLength=rand.nextInt(1000);
-      boolean[] src=getbooleanArr(rand,srcLength);
+      boolean[] src=JunitUtil.getUnsortedbooleanArray(rand,srcLength);
       int dstLength=srcLength+rand.nextInt(1000);
       int[] dst=new int[dstLength];
       int copyLength=rand.nextInt(srcLength+1);
@@ -1172,7 +1172,7 @@ public class ArrCopyTest
     for(int i=0;i<1000;++i)
     {
       int srcLength=rand.nextInt(1000);
-      boolean[] src=getbooleanArr(rand,srcLength);
+      boolean[] src=JunitUtil.getUnsortedbooleanArray(rand,srcLength);
       int dstLength=srcLength+rand.nextInt(1000);
       long[] dst=new long[dstLength];
       int copyLength=rand.nextInt(srcLength+1);
@@ -1192,7 +1192,7 @@ public class ArrCopyTest
     for(int i=0;i<1000;++i)
     {
       int srcLength=rand.nextInt(1000);
-      boolean[] src=getbooleanArr(rand,srcLength);
+      boolean[] src=JunitUtil.getUnsortedbooleanArray(rand,srcLength);
       int dstLength=srcLength+rand.nextInt(1000);
       long[] dst=new long[dstLength];
       int copyLength=rand.nextInt(srcLength+1);
@@ -1212,7 +1212,7 @@ public class ArrCopyTest
     for(int i=0;i<1000;++i)
     {
       int srcLength=rand.nextInt(1000);
-      boolean[] src=getbooleanArr(rand,srcLength);
+      boolean[] src=JunitUtil.getUnsortedbooleanArray(rand,srcLength);
       int dstLength=srcLength+rand.nextInt(1000);
       float[] dst=new float[dstLength];
       int copyLength=rand.nextInt(srcLength+1);
@@ -1232,7 +1232,7 @@ public class ArrCopyTest
     for(int i=0;i<1000;++i)
     {
       int srcLength=rand.nextInt(1000);
-      boolean[] src=getbooleanArr(rand,srcLength);
+      boolean[] src=JunitUtil.getUnsortedbooleanArray(rand,srcLength);
       int dstLength=srcLength+rand.nextInt(1000);
       float[] dst=new float[dstLength];
       int copyLength=rand.nextInt(srcLength+1);
@@ -1252,7 +1252,7 @@ public class ArrCopyTest
     for(int i=0;i<1000;++i)
     {
       int srcLength=rand.nextInt(1000);
-      boolean[] src=getbooleanArr(rand,srcLength);
+      boolean[] src=JunitUtil.getUnsortedbooleanArray(rand,srcLength);
       int dstLength=srcLength+rand.nextInt(1000);
       double[] dst=new double[dstLength];
       int copyLength=rand.nextInt(srcLength+1);
@@ -1272,7 +1272,7 @@ public class ArrCopyTest
     for(int i=0;i<1000;++i)
     {
       int srcLength=rand.nextInt(1000);
-      boolean[] src=getbooleanArr(rand,srcLength);
+      boolean[] src=JunitUtil.getUnsortedbooleanArray(rand,srcLength);
       int dstLength=srcLength+rand.nextInt(1000);
       double[] dst=new double[dstLength];
       int copyLength=rand.nextInt(srcLength+1);
@@ -1292,7 +1292,7 @@ public class ArrCopyTest
     for(int i=0;i<1000;++i)
     {
       int srcLength=rand.nextInt(1000);
-      byte[] src=getbyteArr(rand,srcLength);
+      byte[] src=JunitUtil.getUnsortedbyteArray(rand,srcLength);
       int dstLength=srcLength+rand.nextInt(1000);
       byte[] dst=new byte[dstLength];
       int copyLength=rand.nextInt(srcLength+1);
@@ -1312,7 +1312,7 @@ public class ArrCopyTest
     for(int i=0;i<1000;++i)
     {
       int srcLength=rand.nextInt(1000);
-      byte[] src=getbyteArr(rand,srcLength);
+      byte[] src=JunitUtil.getUnsortedbyteArray(rand,srcLength);
       int dstLength=srcLength+rand.nextInt(1000);
       byte[] dst=new byte[dstLength];
       int copyLength=rand.nextInt(srcLength+1);
@@ -1332,7 +1332,7 @@ public class ArrCopyTest
     for(int i=0;i<1000;++i)
     {
       int srcLength=rand.nextInt(1000);
-      byte[] src=getbyteArr(rand,srcLength);
+      byte[] src=JunitUtil.getUnsortedbyteArray(rand,srcLength);
       int dstLength=srcLength+rand.nextInt(1000);
       short[] dst=new short[dstLength];
       int copyLength=rand.nextInt(srcLength+1);
@@ -1352,7 +1352,7 @@ public class ArrCopyTest
     for(int i=0;i<1000;++i)
     {
       int srcLength=rand.nextInt(1000);
-      byte[] src=getbyteArr(rand,srcLength);
+      byte[] src=JunitUtil.getUnsortedbyteArray(rand,srcLength);
       int dstLength=srcLength+rand.nextInt(1000);
       short[] dst=new short[dstLength];
       int copyLength=rand.nextInt(srcLength+1);
@@ -1372,7 +1372,7 @@ public class ArrCopyTest
     for(int i=0;i<1000;++i)
     {
       int srcLength=rand.nextInt(1000);
-      byte[] src=getbyteArr(rand,srcLength);
+      byte[] src=JunitUtil.getUnsortedbyteArray(rand,srcLength);
       int dstLength=srcLength+rand.nextInt(1000);
       int[] dst=new int[dstLength];
       int copyLength=rand.nextInt(srcLength+1);
@@ -1392,7 +1392,7 @@ public class ArrCopyTest
     for(int i=0;i<1000;++i)
     {
       int srcLength=rand.nextInt(1000);
-      byte[] src=getbyteArr(rand,srcLength);
+      byte[] src=JunitUtil.getUnsortedbyteArray(rand,srcLength);
       int dstLength=srcLength+rand.nextInt(1000);
       int[] dst=new int[dstLength];
       int copyLength=rand.nextInt(srcLength+1);
@@ -1412,7 +1412,7 @@ public class ArrCopyTest
     for(int i=0;i<1000;++i)
     {
       int srcLength=rand.nextInt(1000);
-      byte[] src=getbyteArr(rand,srcLength);
+      byte[] src=JunitUtil.getUnsortedbyteArray(rand,srcLength);
       int dstLength=srcLength+rand.nextInt(1000);
       long[] dst=new long[dstLength];
       int copyLength=rand.nextInt(srcLength+1);
@@ -1432,7 +1432,7 @@ public class ArrCopyTest
     for(int i=0;i<1000;++i)
     {
       int srcLength=rand.nextInt(1000);
-      byte[] src=getbyteArr(rand,srcLength);
+      byte[] src=JunitUtil.getUnsortedbyteArray(rand,srcLength);
       int dstLength=srcLength+rand.nextInt(1000);
       long[] dst=new long[dstLength];
       int copyLength=rand.nextInt(srcLength+1);
@@ -1452,7 +1452,7 @@ public class ArrCopyTest
     for(int i=0;i<1000;++i)
     {
       int srcLength=rand.nextInt(1000);
-      byte[] src=getbyteArr(rand,srcLength);
+      byte[] src=JunitUtil.getUnsortedbyteArray(rand,srcLength);
       int dstLength=srcLength+rand.nextInt(1000);
       float[] dst=new float[dstLength];
       int copyLength=rand.nextInt(srcLength+1);
@@ -1472,7 +1472,7 @@ public class ArrCopyTest
     for(int i=0;i<1000;++i)
     {
       int srcLength=rand.nextInt(1000);
-      byte[] src=getbyteArr(rand,srcLength);
+      byte[] src=JunitUtil.getUnsortedbyteArray(rand,srcLength);
       int dstLength=srcLength+rand.nextInt(1000);
       float[] dst=new float[dstLength];
       int copyLength=rand.nextInt(srcLength+1);
@@ -1492,7 +1492,7 @@ public class ArrCopyTest
     for(int i=0;i<1000;++i)
     {
       int srcLength=rand.nextInt(1000);
-      byte[] src=getbyteArr(rand,srcLength);
+      byte[] src=JunitUtil.getUnsortedbyteArray(rand,srcLength);
       int dstLength=srcLength+rand.nextInt(1000);
       double[] dst=new double[dstLength];
       int copyLength=rand.nextInt(srcLength+1);
@@ -1512,7 +1512,7 @@ public class ArrCopyTest
     for(int i=0;i<1000;++i)
     {
       int srcLength=rand.nextInt(1000);
-      byte[] src=getbyteArr(rand,srcLength);
+      byte[] src=JunitUtil.getUnsortedbyteArray(rand,srcLength);
       int dstLength=srcLength+rand.nextInt(1000);
       double[] dst=new double[dstLength];
       int copyLength=rand.nextInt(srcLength+1);
@@ -1532,7 +1532,7 @@ public class ArrCopyTest
     for(int i=0;i<1000;++i)
     {
       int srcLength=rand.nextInt(1000);
-      char[] src=getcharArr(rand,srcLength);
+      char[] src=JunitUtil.getUnsortedcharArray(rand,srcLength);
       int dstLength=srcLength+rand.nextInt(1000);
       char[] dst=new char[dstLength];
       int copyLength=rand.nextInt(srcLength+1);
@@ -1552,7 +1552,7 @@ public class ArrCopyTest
     for(int i=0;i<1000;++i)
     {
       int srcLength=rand.nextInt(1000);
-      char[] src=getcharArr(rand,srcLength);
+      char[] src=JunitUtil.getUnsortedcharArray(rand,srcLength);
       int dstLength=srcLength+rand.nextInt(1000);
       char[] dst=new char[dstLength];
       int copyLength=rand.nextInt(srcLength+1);
@@ -1572,7 +1572,7 @@ public class ArrCopyTest
     for(int i=0;i<1000;++i)
     {
       int srcLength=rand.nextInt(1000);
-      char[] src=getcharArr(rand,srcLength);
+      char[] src=JunitUtil.getUnsortedcharArray(rand,srcLength);
       int dstLength=srcLength+rand.nextInt(1000);
       int[] dst=new int[dstLength];
       int copyLength=rand.nextInt(srcLength+1);
@@ -1592,7 +1592,7 @@ public class ArrCopyTest
     for(int i=0;i<1000;++i)
     {
       int srcLength=rand.nextInt(1000);
-      char[] src=getcharArr(rand,srcLength);
+      char[] src=JunitUtil.getUnsortedcharArray(rand,srcLength);
       int dstLength=srcLength+rand.nextInt(1000);
       int[] dst=new int[dstLength];
       int copyLength=rand.nextInt(srcLength+1);
@@ -1612,7 +1612,7 @@ public class ArrCopyTest
     for(int i=0;i<1000;++i)
     {
       int srcLength=rand.nextInt(1000);
-      char[] src=getcharArr(rand,srcLength);
+      char[] src=JunitUtil.getUnsortedcharArray(rand,srcLength);
       int dstLength=srcLength+rand.nextInt(1000);
       long[] dst=new long[dstLength];
       int copyLength=rand.nextInt(srcLength+1);
@@ -1632,7 +1632,7 @@ public class ArrCopyTest
     for(int i=0;i<1000;++i)
     {
       int srcLength=rand.nextInt(1000);
-      char[] src=getcharArr(rand,srcLength);
+      char[] src=JunitUtil.getUnsortedcharArray(rand,srcLength);
       int dstLength=srcLength+rand.nextInt(1000);
       long[] dst=new long[dstLength];
       int copyLength=rand.nextInt(srcLength+1);
@@ -1652,7 +1652,7 @@ public class ArrCopyTest
     for(int i=0;i<1000;++i)
     {
       int srcLength=rand.nextInt(1000);
-      char[] src=getcharArr(rand,srcLength);
+      char[] src=JunitUtil.getUnsortedcharArray(rand,srcLength);
       int dstLength=srcLength+rand.nextInt(1000);
       float[] dst=new float[dstLength];
       int copyLength=rand.nextInt(srcLength+1);
@@ -1672,7 +1672,7 @@ public class ArrCopyTest
     for(int i=0;i<1000;++i)
     {
       int srcLength=rand.nextInt(1000);
-      char[] src=getcharArr(rand,srcLength);
+      char[] src=JunitUtil.getUnsortedcharArray(rand,srcLength);
       int dstLength=srcLength+rand.nextInt(1000);
       float[] dst=new float[dstLength];
       int copyLength=rand.nextInt(srcLength+1);
@@ -1692,7 +1692,7 @@ public class ArrCopyTest
     for(int i=0;i<1000;++i)
     {
       int srcLength=rand.nextInt(1000);
-      char[] src=getcharArr(rand,srcLength);
+      char[] src=JunitUtil.getUnsortedcharArray(rand,srcLength);
       int dstLength=srcLength+rand.nextInt(1000);
       double[] dst=new double[dstLength];
       int copyLength=rand.nextInt(srcLength+1);
@@ -1712,7 +1712,7 @@ public class ArrCopyTest
     for(int i=0;i<1000;++i)
     {
       int srcLength=rand.nextInt(1000);
-      char[] src=getcharArr(rand,srcLength);
+      char[] src=JunitUtil.getUnsortedcharArray(rand,srcLength);
       int dstLength=srcLength+rand.nextInt(1000);
       double[] dst=new double[dstLength];
       int copyLength=rand.nextInt(srcLength+1);
@@ -1732,7 +1732,7 @@ public class ArrCopyTest
     for(int i=0;i<1000;++i)
     {
       int srcLength=rand.nextInt(1000);
-      short[] src=getshortArr(rand,srcLength);
+      short[] src=JunitUtil.getUnsortedshortArray(rand,srcLength);
       int dstLength=srcLength+rand.nextInt(1000);
       short[] dst=new short[dstLength];
       int copyLength=rand.nextInt(srcLength+1);
@@ -1752,7 +1752,7 @@ public class ArrCopyTest
     for(int i=0;i<1000;++i)
     {
       int srcLength=rand.nextInt(1000);
-      short[] src=getshortArr(rand,srcLength);
+      short[] src=JunitUtil.getUnsortedshortArray(rand,srcLength);
       int dstLength=srcLength+rand.nextInt(1000);
       short[] dst=new short[dstLength];
       int copyLength=rand.nextInt(srcLength+1);
@@ -1772,7 +1772,7 @@ public class ArrCopyTest
     for(int i=0;i<1000;++i)
     {
       int srcLength=rand.nextInt(1000);
-      short[] src=getshortArr(rand,srcLength);
+      short[] src=JunitUtil.getUnsortedshortArray(rand,srcLength);
       int dstLength=srcLength+rand.nextInt(1000);
       int[] dst=new int[dstLength];
       int copyLength=rand.nextInt(srcLength+1);
@@ -1792,7 +1792,7 @@ public class ArrCopyTest
     for(int i=0;i<1000;++i)
     {
       int srcLength=rand.nextInt(1000);
-      short[] src=getshortArr(rand,srcLength);
+      short[] src=JunitUtil.getUnsortedshortArray(rand,srcLength);
       int dstLength=srcLength+rand.nextInt(1000);
       int[] dst=new int[dstLength];
       int copyLength=rand.nextInt(srcLength+1);
@@ -1812,7 +1812,7 @@ public class ArrCopyTest
     for(int i=0;i<1000;++i)
     {
       int srcLength=rand.nextInt(1000);
-      short[] src=getshortArr(rand,srcLength);
+      short[] src=JunitUtil.getUnsortedshortArray(rand,srcLength);
       int dstLength=srcLength+rand.nextInt(1000);
       long[] dst=new long[dstLength];
       int copyLength=rand.nextInt(srcLength+1);
@@ -1832,7 +1832,7 @@ public class ArrCopyTest
     for(int i=0;i<1000;++i)
     {
       int srcLength=rand.nextInt(1000);
-      short[] src=getshortArr(rand,srcLength);
+      short[] src=JunitUtil.getUnsortedshortArray(rand,srcLength);
       int dstLength=srcLength+rand.nextInt(1000);
       long[] dst=new long[dstLength];
       int copyLength=rand.nextInt(srcLength+1);
@@ -1852,7 +1852,7 @@ public class ArrCopyTest
     for(int i=0;i<1000;++i)
     {
       int srcLength=rand.nextInt(1000);
-      short[] src=getshortArr(rand,srcLength);
+      short[] src=JunitUtil.getUnsortedshortArray(rand,srcLength);
       int dstLength=srcLength+rand.nextInt(1000);
       float[] dst=new float[dstLength];
       int copyLength=rand.nextInt(srcLength+1);
@@ -1872,7 +1872,7 @@ public class ArrCopyTest
     for(int i=0;i<1000;++i)
     {
       int srcLength=rand.nextInt(1000);
-      short[] src=getshortArr(rand,srcLength);
+      short[] src=JunitUtil.getUnsortedshortArray(rand,srcLength);
       int dstLength=srcLength+rand.nextInt(1000);
       float[] dst=new float[dstLength];
       int copyLength=rand.nextInt(srcLength+1);
@@ -1892,7 +1892,7 @@ public class ArrCopyTest
     for(int i=0;i<1000;++i)
     {
       int srcLength=rand.nextInt(1000);
-      short[] src=getshortArr(rand,srcLength);
+      short[] src=JunitUtil.getUnsortedshortArray(rand,srcLength);
       int dstLength=srcLength+rand.nextInt(1000);
       double[] dst=new double[dstLength];
       int copyLength=rand.nextInt(srcLength+1);
@@ -1912,7 +1912,7 @@ public class ArrCopyTest
     for(int i=0;i<1000;++i)
     {
       int srcLength=rand.nextInt(1000);
-      short[] src=getshortArr(rand,srcLength);
+      short[] src=JunitUtil.getUnsortedshortArray(rand,srcLength);
       int dstLength=srcLength+rand.nextInt(1000);
       double[] dst=new double[dstLength];
       int copyLength=rand.nextInt(srcLength+1);
@@ -1932,7 +1932,7 @@ public class ArrCopyTest
     for(int i=0;i<1000;++i)
     {
       int srcLength=rand.nextInt(1000);
-      int[] src=getintArr(rand,srcLength);
+      int[] src=JunitUtil.getUnsortedintArray(rand,srcLength);
       int dstLength=srcLength+rand.nextInt(1000);
       int[] dst=new int[dstLength];
       int copyLength=rand.nextInt(srcLength+1);
@@ -1952,7 +1952,7 @@ public class ArrCopyTest
     for(int i=0;i<1000;++i)
     {
       int srcLength=rand.nextInt(1000);
-      int[] src=getintArr(rand,srcLength);
+      int[] src=JunitUtil.getUnsortedintArray(rand,srcLength);
       int dstLength=srcLength+rand.nextInt(1000);
       int[] dst=new int[dstLength];
       int copyLength=rand.nextInt(srcLength+1);
@@ -1972,7 +1972,7 @@ public class ArrCopyTest
     for(int i=0;i<1000;++i)
     {
       int srcLength=rand.nextInt(1000);
-      int[] src=getintArr(rand,srcLength);
+      int[] src=JunitUtil.getUnsortedintArray(rand,srcLength);
       int dstLength=srcLength+rand.nextInt(1000);
       long[] dst=new long[dstLength];
       int copyLength=rand.nextInt(srcLength+1);
@@ -1992,7 +1992,7 @@ public class ArrCopyTest
     for(int i=0;i<1000;++i)
     {
       int srcLength=rand.nextInt(1000);
-      int[] src=getintArr(rand,srcLength);
+      int[] src=JunitUtil.getUnsortedintArray(rand,srcLength);
       int dstLength=srcLength+rand.nextInt(1000);
       long[] dst=new long[dstLength];
       int copyLength=rand.nextInt(srcLength+1);
@@ -2012,7 +2012,7 @@ public class ArrCopyTest
     for(int i=0;i<1000;++i)
     {
       int srcLength=rand.nextInt(1000);
-      int[] src=getintArr(rand,srcLength);
+      int[] src=JunitUtil.getUnsortedintArray(rand,srcLength);
       int dstLength=srcLength+rand.nextInt(1000);
       float[] dst=new float[dstLength];
       int copyLength=rand.nextInt(srcLength+1);
@@ -2032,7 +2032,7 @@ public class ArrCopyTest
     for(int i=0;i<1000;++i)
     {
       int srcLength=rand.nextInt(1000);
-      int[] src=getintArr(rand,srcLength);
+      int[] src=JunitUtil.getUnsortedintArray(rand,srcLength);
       int dstLength=srcLength+rand.nextInt(1000);
       float[] dst=new float[dstLength];
       int copyLength=rand.nextInt(srcLength+1);
@@ -2052,7 +2052,7 @@ public class ArrCopyTest
     for(int i=0;i<1000;++i)
     {
       int srcLength=rand.nextInt(1000);
-      int[] src=getintArr(rand,srcLength);
+      int[] src=JunitUtil.getUnsortedintArray(rand,srcLength);
       int dstLength=srcLength+rand.nextInt(1000);
       double[] dst=new double[dstLength];
       int copyLength=rand.nextInt(srcLength+1);
@@ -2072,7 +2072,7 @@ public class ArrCopyTest
     for(int i=0;i<1000;++i)
     {
       int srcLength=rand.nextInt(1000);
-      int[] src=getintArr(rand,srcLength);
+      int[] src=JunitUtil.getUnsortedintArray(rand,srcLength);
       int dstLength=srcLength+rand.nextInt(1000);
       double[] dst=new double[dstLength];
       int copyLength=rand.nextInt(srcLength+1);
@@ -2092,7 +2092,7 @@ public class ArrCopyTest
     for(int i=0;i<1000;++i)
     {
       int srcLength=rand.nextInt(1000);
-      long[] src=getlongArr(rand,srcLength);
+      long[] src=JunitUtil.getUnsortedlongArray(rand,srcLength);
       int dstLength=srcLength+rand.nextInt(1000);
       long[] dst=new long[dstLength];
       int copyLength=rand.nextInt(srcLength+1);
@@ -2112,7 +2112,7 @@ public class ArrCopyTest
     for(int i=0;i<1000;++i)
     {
       int srcLength=rand.nextInt(1000);
-      long[] src=getlongArr(rand,srcLength);
+      long[] src=JunitUtil.getUnsortedlongArray(rand,srcLength);
       int dstLength=srcLength+rand.nextInt(1000);
       long[] dst=new long[dstLength];
       int copyLength=rand.nextInt(srcLength+1);
@@ -2132,7 +2132,7 @@ public class ArrCopyTest
     for(int i=0;i<1000;++i)
     {
       int srcLength=rand.nextInt(1000);
-      long[] src=getlongArr(rand,srcLength);
+      long[] src=JunitUtil.getUnsortedlongArray(rand,srcLength);
       int dstLength=srcLength+rand.nextInt(1000);
       float[] dst=new float[dstLength];
       int copyLength=rand.nextInt(srcLength+1);
@@ -2152,7 +2152,7 @@ public class ArrCopyTest
     for(int i=0;i<1000;++i)
     {
       int srcLength=rand.nextInt(1000);
-      long[] src=getlongArr(rand,srcLength);
+      long[] src=JunitUtil.getUnsortedlongArray(rand,srcLength);
       int dstLength=srcLength+rand.nextInt(1000);
       float[] dst=new float[dstLength];
       int copyLength=rand.nextInt(srcLength+1);
@@ -2172,7 +2172,7 @@ public class ArrCopyTest
     for(int i=0;i<1000;++i)
     {
       int srcLength=rand.nextInt(1000);
-      long[] src=getlongArr(rand,srcLength);
+      long[] src=JunitUtil.getUnsortedlongArray(rand,srcLength);
       int dstLength=srcLength+rand.nextInt(1000);
       double[] dst=new double[dstLength];
       int copyLength=rand.nextInt(srcLength+1);
@@ -2192,7 +2192,7 @@ public class ArrCopyTest
     for(int i=0;i<1000;++i)
     {
       int srcLength=rand.nextInt(1000);
-      long[] src=getlongArr(rand,srcLength);
+      long[] src=JunitUtil.getUnsortedlongArray(rand,srcLength);
       int dstLength=srcLength+rand.nextInt(1000);
       double[] dst=new double[dstLength];
       int copyLength=rand.nextInt(srcLength+1);
@@ -2212,7 +2212,7 @@ public class ArrCopyTest
     for(int i=0;i<1000;++i)
     {
       int srcLength=rand.nextInt(1000);
-      float[] src=getfloatArr(rand,srcLength);
+      float[] src=JunitUtil.getUnsortedfloatArray(rand,srcLength);
       int dstLength=srcLength+rand.nextInt(1000);
       float[] dst=new float[dstLength];
       int copyLength=rand.nextInt(srcLength+1);
@@ -2232,7 +2232,7 @@ public class ArrCopyTest
     for(int i=0;i<1000;++i)
     {
       int srcLength=rand.nextInt(1000);
-      float[] src=getfloatArr(rand,srcLength);
+      float[] src=JunitUtil.getUnsortedfloatArray(rand,srcLength);
       int dstLength=srcLength+rand.nextInt(1000);
       float[] dst=new float[dstLength];
       int copyLength=rand.nextInt(srcLength+1);
@@ -2252,7 +2252,7 @@ public class ArrCopyTest
     for(int i=0;i<1000;++i)
     {
       int srcLength=rand.nextInt(1000);
-      float[] src=getfloatArr(rand,srcLength);
+      float[] src=JunitUtil.getUnsortedfloatArray(rand,srcLength);
       int dstLength=srcLength+rand.nextInt(1000);
       double[] dst=new double[dstLength];
       int copyLength=rand.nextInt(srcLength+1);
@@ -2272,7 +2272,7 @@ public class ArrCopyTest
     for(int i=0;i<1000;++i)
     {
       int srcLength=rand.nextInt(1000);
-      float[] src=getfloatArr(rand,srcLength);
+      float[] src=JunitUtil.getUnsortedfloatArray(rand,srcLength);
       int dstLength=srcLength+rand.nextInt(1000);
       double[] dst=new double[dstLength];
       int copyLength=rand.nextInt(srcLength+1);
@@ -2292,7 +2292,7 @@ public class ArrCopyTest
     for(int i=0;i<1000;++i)
     {
       int srcLength=rand.nextInt(1000);
-      double[] src=getdoubleArr(rand,srcLength);
+      double[] src=JunitUtil.getUnsorteddoubleArray(rand,srcLength);
       int dstLength=srcLength+rand.nextInt(1000);
       double[] dst=new double[dstLength];
       int copyLength=rand.nextInt(srcLength+1);
@@ -2312,7 +2312,7 @@ public class ArrCopyTest
     for(int i=0;i<1000;++i)
     {
       int srcLength=rand.nextInt(1000);
-      double[] src=getdoubleArr(rand,srcLength);
+      double[] src=JunitUtil.getUnsorteddoubleArray(rand,srcLength);
       int dstLength=srcLength+rand.nextInt(1000);
       double[] dst=new double[dstLength];
       int copyLength=rand.nextInt(srcLength+1);
@@ -2332,7 +2332,7 @@ public class ArrCopyTest
     for(int i=0;i<1000;++i)
     {
       int srcLength=rand.nextInt(1000);
-      String[] src=getStringArr(rand,srcLength);
+      String[] src=JunitUtil.getUnsortedStringArray(rand,srcLength);
       int dstLength=srcLength+rand.nextInt(1000);
       String[] dst=new String[dstLength];
       int copyLength=rand.nextInt(srcLength+1);
@@ -2352,7 +2352,7 @@ public class ArrCopyTest
     for(int i=0;i<1000;++i)
     {
       int srcLength=rand.nextInt(1000);
-      String[] src=getStringArr(rand,srcLength);
+      String[] src=JunitUtil.getUnsortedStringArray(rand,srcLength);
       int dstLength=srcLength+rand.nextInt(1000);
       String[] dst=new String[dstLength];
       int copyLength=rand.nextInt(srcLength+1);
@@ -2365,6 +2365,7 @@ public class ArrCopyTest
       }
     }
   }
+  /*
   static boolean[] getbooleanArr(Random rand,int length)
   {
     boolean[] src=new boolean[length];
@@ -2518,4 +2519,5 @@ public class ArrCopyTest
     }
     return src;
   }
+  */
 }

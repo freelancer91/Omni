@@ -42,19 +42,53 @@ public interface JunitUtil
   #MACRO GetArray<Unsorted,float>(FloatSupplier,getAsFloat,Float)
   #MACRO GetArray<Unsorted,double>(DoubleSupplier,getAsDouble,Double)
   #MACRO GetArray<Unsorted,String>(Supplier<? extends String>,get,Ref)
+  #MACRO GetArray<Ascending,Boolean>(BooleanSupplier,getAsBoolean,Boolean)
+  #MACRO GetArray<Ascending,Byte>(ByteSupplier,getAsByte,Byte)
+  #MACRO GetArray<Ascending,Character>(CharSupplier,getAsChar,Char)
+  #MACRO GetArray<Ascending,Short>(ShortSupplier,getAsShort,Short)
+  #MACRO GetArray<Ascending,Integer>(IntSupplier,getAsInt,Int)
+  #MACRO GetArray<Ascending,Long>(LongSupplier,getAsLong,Long)
+  #MACRO GetArray<Ascending,Float>(FloatSupplier,getAsFloat,Float)
+  #MACRO GetArray<Ascending,Double>(DoubleSupplier,getAsDouble,Double)
+  #MACRO GetArray<Descending,Boolean>(BooleanSupplier,getAsBoolean,Boolean)
+  #MACRO GetArray<Descending,Byte>(ByteSupplier,getAsByte,Byte)
+  #MACRO GetArray<Descending,Character>(CharSupplier,getAsChar,Char)
+  #MACRO GetArray<Descending,Short>(ShortSupplier,getAsShort,Short)
+  #MACRO GetArray<Descending,Integer>(IntSupplier,getAsInt,Int)
+  #MACRO GetArray<Descending,Long>(LongSupplier,getAsLong,Long)
+  #MACRO GetArray<Descending,Float>(FloatSupplier,getAsFloat,Float)
+  #MACRO GetArray<Descending,Double>(DoubleSupplier,getAsDouble,Double)
+  #MACRO GetArray<Unsorted,Boolean>(BooleanSupplier,getAsBoolean,Boolean)
+  #MACRO GetArray<Unsorted,Byte>(ByteSupplier,getAsByte,Byte)
+  #MACRO GetArray<Unsorted,Character>(CharSupplier,getAsChar,Char)
+  #MACRO GetArray<Unsorted,Short>(ShortSupplier,getAsShort,Short)
+  #MACRO GetArray<Unsorted,Integer>(IntSupplier,getAsInt,Int)
+  #MACRO GetArray<Unsorted,Long>(LongSupplier,getAsLong,Long)
+  #MACRO GetArray<Unsorted,Float>(FloatSupplier,getAsFloat,Float)
+  #MACRO GetArray<Unsorted,Double>(DoubleSupplier,getAsDouble,Double)
   
   
 #MACRODEF GetArray<SORTTYPE,ARRTYPE>(SUPPLIERTYPE,SUPPLIERMETHOD,CLASSPREFIX)
 public static ARRTYPE[] getSORTTYPEARRTYPEArray(Random rand,int length)
 {
   return getSORTTYPEARRTYPEArray(
-#IFSWITCH ARRTYPE==boolean
+#IFSWITCH ARRTYPE==boolean,Boolean
     rand::nextBoolean
-#ELSEIFSWITCH ARRTYPE==byte,char,short,int,long
-    ()->(ARRTYPE)rand.nextLong()
-#ELSEIFSWITCH ARRTYPE==float
+#ELSEIFSWITCH ARRTYPE==byte,Byte,char,Character,short,Short,int,Integer,long,Long
+    ()->(ARRTYPE)
+    #IFSWITCH ARRTYPE==Byte
+    (byte)
+    #ELSEIFSWITCH ARRTYPE==Character
+    (char)
+    #ELSEIFSWITCH ARRTYPE==Short
+    (short)
+    #ELSEIFSWITCH ARRTYPE==Integer
+    (int)
+    #ENDIF
+    rand.nextLong()
+#ELSEIFSWITCH ARRTYPE==float,Float
     rand::nextFloat
-#ELSEIFSWITCH ARRTYPE==double
+#ELSEIFSWITCH ARRTYPE==double,Double
     rand::nextDouble
 #ELSEIFSWITCH ARRTYPE==String
     ()->Long.toString(rand.nextLong())
@@ -68,7 +102,7 @@ public static ARRTYPE[] getSORTTYPEARRTYPEArray(SUPPLIERTYPE supplier,int length
   ARRTYPE[] arr=new ARRTYPE[length];
   for(int i=0;i<length;++i)
   {
-    arr[i]=supplier.SUPPLIERMETHOD();
+    arr[i]=(ARRTYPE)supplier.SUPPLIERMETHOD();
   }
 #IFNOTSWITCH SORTTYPE==Unsorted
   #IFSWITCH ARRTYPE==boolean

@@ -5,6 +5,8 @@ import java.util.function.IntPredicate;
 import java.util.function.LongPredicate;
 //TODO uncomment when the module bug is fixed
 //import java.util.function.Predicate;
+import java.util.Objects;
+import java.util.Random;
 import org.junit.Assert;
 import org.junit.Test;
 import omni.function.CharPredicate;
@@ -205,8 +207,10 @@ public class OmniArrayTest
   #MACRO TestIndexPredicate<long>(Long,LongPredicate,)
   #MACRO TestIndexPredicate<float>(Float,FloatPredicate,)
   #MACRO TestIndexPredicate<double>(Double,DoublePredicate,)
+  /*
   //TODO uncomment when the module bug is fixed
-  //MACRO TestIndexPredicate<Double>(Ref,Predicate<Double>,new Double)
+  #MACRO TestIndexPredicate<Double>(Ref,Predicate<Double>,new Double)
+  */
 #MACRODEF TestIndexPredicate<EXPOSEDTYPE>(CLASSPREFIX,PREDICATETYPE,CREATEVAL)
 #IFSWITCH EXPOSEDTYPE==Double
 @SuppressWarnings("deprecation")
@@ -230,6 +234,39 @@ private static class CLASSPREFIXIndexPredicate implements PREDICATETYPE
   }
 }
 #ENDDEF
+
+  #MACRO TestReverseRange<boolean>(Boolean)
+  #MACRO TestReverseRange<byte>(Byte)
+  #MACRO TestReverseRange<char>(Char)
+  #MACRO TestReverseRange<short>(Short)
+  #MACRO TestReverseRange<int>(Int)
+  #MACRO TestReverseRange<long>(Long)
+  #MACRO TestReverseRange<float>(Float)
+  #MACRO TestReverseRange<double>(Double)
+  #MACRO TestReverseRange<String>(Ref)
+#MACRODEF TestReverseRange<ARRTYPE>(CLASSPREFIX)
+@Test
+public void testReverseRangeARRTYPE()
+{
+  Random rand=new Random(0);
+  ARRTYPE[] arr=JunitUtil.getUnsortedARRTYPEArray(rand,100);
+  ARRTYPE[] copy=new ARRTYPE[arr.length];
+  ArrCopy.uncheckedCopy(arr,0,copy,0,arr.length);
+  OmniArray.OfCLASSPREFIX.reverseRange(arr,0,arr.length-1);
+  
+  for(int i=0,j=arr.length-1;i<arr.length;++i,--j)
+  {
+#IFSWITCH ARRTYPE==boolean,byte,char,short,int,long
+    Assert.assertTrue(arr[i]==copy[j]);
+#ELSEIFSWITCH ARRTYPE==float,double
+    Assert.assertTrue(TypeUtil.ARRTYPEEquals(arr[i],copy[j]));
+#ELSE
+    Assert.assertTrue(Objects.equals(arr[i],copy[j]));
+#ENDIF
+  }
+}
+#ENDDEF
+
   @Test
   public void testGetFltBitsIndexPredicate()
   {

@@ -4,6 +4,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import java.util.Random;
 import java.util.Arrays;
+import java.util.Objects;
 //TODO uncomment when the module bug is fixed
 //import java.util.Comparator;
 import java.util.function.IntBinaryOperator;
@@ -14,6 +15,15 @@ import omni.function.ShortComparator;
 import omni.function.LongComparator;
 import omni.function.FloatComparator;
 import omni.function.DoubleComparator;
+import java.util.function.Supplier;
+import java.util.function.BooleanSupplier;
+import java.util.function.IntSupplier;
+import java.util.function.LongSupplier;
+import java.util.function.DoubleSupplier;
+import omni.function.ByteSupplier;
+import omni.function.CharSupplier;
+import omni.function.ShortSupplier;
+import omni.function.FloatSupplier;
 public class SortUtilTest
 {
   /*//TODO uncomment when they fix the module bug in eclipse
@@ -74,87 +84,275 @@ private static COMPARATORTYPE getSORTTYPEARRTYPEComparator()
 #ENDDEF
 
   /*//TODO uncomment when they fix the module bug in eclipse
-  #MACRO IsSorted<String,Ascending>(String)
+  #MACRO IsSorted<String,Ascending>(String,Ref)
   */
-  #MACRO IsSorted<boolean,Ascending>(Boolean)
-  #MACRO IsSorted<byte,Ascending>(Byte)
-  #MACRO IsSorted<char,Ascending>(Character)
-  #MACRO IsSorted<short,Ascending>(Short)
-  #MACRO IsSorted<int,Ascending>(Integer)
-  #MACRO IsSorted<long,Ascending>(Long)
-  #MACRO IsSorted<float,Ascending>(Float)
-  #MACRO IsSorted<double,Ascending>(Double)
+  #MACRO IsSorted<boolean,Ascending>(Boolean,Boolean)
+  #MACRO IsSorted<byte,Ascending>(Byte,Byte)
+  #MACRO IsSorted<char,Ascending>(Character,Char)
+  #MACRO IsSorted<short,Ascending>(Short,Short)
+  #MACRO IsSorted<int,Ascending>(Integer,Int)
+  #MACRO IsSorted<long,Ascending>(Long,Long)
+  #MACRO IsSorted<float,Ascending>(Float,Float)
+  #MACRO IsSorted<double,Ascending>(Double,Double)
   /*//TODO uncomment when they fix the module bug in eclipse
-  #MACRO IsSorted<String,Descending>(String)
+  #MACRO IsSorted<String,Descending>(String,Ref)
   */
-  #MACRO IsSorted<boolean,Descending>(Boolean)
-  #MACRO IsSorted<byte,Descending>(Byte)
-  #MACRO IsSorted<char,Descending>(Character)
-  #MACRO IsSorted<short,Descending>(Short)
-  #MACRO IsSorted<int,Descending>(Integer)
-  #MACRO IsSorted<long,Descending>(Long)
-  #MACRO IsSorted<float,Descending>(Float)
-  #MACRO IsSorted<double,Descending>(Double)
-#MACRODEF IsSorted<ARRTYPE,SORTTYPE>(BOXEDTYPE)
-private static boolean isSortedSORTTYPE(ARRTYPE[] arr)
+  #MACRO IsSorted<boolean,Descending>(Boolean,Boolean)
+  #MACRO IsSorted<byte,Descending>(Byte,Byte)
+  #MACRO IsSorted<char,Descending>(Character,Char)
+  #MACRO IsSorted<short,Descending>(Short,Short)
+  #MACRO IsSorted<int,Descending>(Integer,Int)
+  #MACRO IsSorted<long,Descending>(Long,Long)
+  #MACRO IsSorted<float,Descending>(Float,Float)
+  #MACRO IsSorted<double,Descending>(Double,Double)
+#MACRODEF IsSorted<ARRTYPE,SORTTYPE>(BOXEDTYPE,CLASSPREFIX)
+private static void isSortedSORTTYPE(ARRTYPE[] arr,ARRTYPE[] copy)
 {
-  ARRTYPE prev,curr;
-  int i;
-  for(prev=arr[0],curr=arr[i=1];
-  #IFSWITCH ARRTYPE==String
-  prev.compareTo(curr)
-  #ELSE
-  BOXEDTYPE.compare(prev,curr)
-  #ENDIF
-  #IFSWITCH SORTTYPE==Descending
-  >=
-  #ELSE
-  <=
-  #ENDIF
-  0
-  ;prev=curr,curr=arr[i])
+#IFSWITCH ARRTYPE==boolean
+  BOXEDTYPE[] boxedCopy=new BOXEDTYPE[copy.length];
+  ArrCopy.uncheckedCopy(copy,0,boxedCopy,0,copy.length);
+  Arrays.sort(boxedCopy,0,copy.length);
+  ArrCopy.uncheckedCopy(boxedCopy,0,copy,0,copy.length);
+#ELSE
+  Arrays.sort(copy,0,copy.length);
+#ENDIF
+#IFSWITCH SORTTYPE==Descending
+  OmniArray.OfCLASSPREFIX.reverseRange(copy,0,copy.length-1);
+#ENDIF
+  for(int i=0;i<copy.length;++i)
   {
-    if(++i==arr.length)
-    {
-      return true;
-    }
+#IFSWITCH ARRTYPE==boolean,byte,char,short,int long
+    Assert.assertTrue(arr[i]==copy[i]);
+#ELSEIFSWITCH ARRTYPE==float,double
+    Assert.assertTrue(TypeUtil.ARRTYPEEquals(arr[i],copy[i]));
+#ELSE
+    Assert.assertTrue(Objects.equals(arr[i],copy[i]));
+#ENDIF
   }
-  return false;
 }
 #ENDDEF
   /*//TODO uncomment when they fix the module bug in eclipse
-  #MACRO IsSorted<String>(Comparator<? super String>,compare)
+  #MACRO IsSorted<String>(Comparator<? super String>,compare,String)
   */
-  #MACRO IsSorted<boolean>(BooleanComparator,compare)
-  #MACRO IsSorted<byte>(ByteComparator,compare)
-  #MACRO IsSorted<char>(CharComparator,compare)
-  #MACRO IsSorted<short>(ShortComparator,compare)
-  #MACRO IsSorted<int>(IntBinaryOperator,applyAsInt)
-  #MACRO IsSorted<long>(LongComparator,compare)
-  #MACRO IsSorted<float>(FloatComparator,compare)
-  #MACRO IsSorted<double>(DoubleComparator,compare)
-#MACRODEF IsSorted<ARRTYPE>(COMPARATORTYPE,COMPARATORMETHOD)
-private static boolean isSorted(ARRTYPE[] arr,COMPARATORTYPE sorter)
+  #MACRO IsSorted<boolean>(BooleanComparator,compare,Boolean)
+  #MACRO IsSorted<byte>(ByteComparator,compare,Byte)
+  #MACRO IsSorted<char>(CharComparator,compare,Character)
+  #MACRO IsSorted<short>(ShortComparator,compare,Short)
+  #MACRO IsSorted<int>(IntBinaryOperator,applyAsInt,Integer)
+  #MACRO IsSorted<long>(LongComparator,compare,Long)
+  #MACRO IsSorted<float>(FloatComparator,compare,Float)
+  #MACRO IsSorted<double>(DoubleComparator,compare,Double)
+#MACRODEF IsSorted<ARRTYPE>(COMPARATORTYPE,COMPARATORMETHOD,BOXEDTYPE)
+private static void isSorted(ARRTYPE[] arr,ARRTYPE[] copy,COMPARATORTYPE sorter)
 {
-  ARRTYPE prev,curr;
-  int i;
-  for(prev=arr[0],curr=arr[i=1];sorter.COMPARATORMETHOD(prev,curr)<=0;prev=curr,curr=arr[i])
+#IFSWITCH ARRTYPE==String
+  Arrays.sort(copy,0,copy.length,sorter);
+#ELSE
+  BOXEDTYPE[] boxedCopy=new BOXEDTYPE[copy.length];
+  ArrCopy.uncheckedCopy(copy,0,boxedCopy,0,copy.length);
+  Arrays.sort(boxedCopy,0,copy.length,sorter::COMPARATORMETHOD);
+  ArrCopy.uncheckedCopy(boxedCopy,0,copy,0,copy.length);
+#ENDIF
+  for(int i=0;i<copy.length;++i)
   {
-    if(++i==arr.length)
-    {
-      return true;
-    }
+  #IFSWITCH ARRTYPE==boolean,byte,char,short,int long
+    Assert.assertTrue(arr[i]==copy[i]);
+  #ELSEIFSWITCH ARRTYPE==float,double
+    Assert.assertTrue(TypeUtil.ARRTYPEEquals(arr[i],copy[i]));
+  #ELSE
+    Assert.assertTrue(Objects.equals(arr[i],copy[i]));
+  #ENDIF
   }
-  return false;
 }
 #ENDDEF
-
-
-  
 
  
+  #MACRO TestSortHelper<Ascending,Without,boolean>(BooleanSupplier)
+  #MACRO TestSortHelper<Ascending,Without,byte>(ByteSupplier)
+  #MACRO TestSortHelper<Ascending,Without,char>(CharSupplier)
+  #MACRO TestSortHelper<Ascending,Without,short>(ShortSupplier)
+  #MACRO TestSortHelper<Ascending,Without,int>(IntSupplier)
+  #MACRO TestSortHelper<Ascending,Without,long>(LongSupplier)
+  #MACRO TestSortHelper<Ascending,Without,float>(FloatSupplier)
+  #MACRO TestSortHelper<Ascending,Without,double>(DoubleSupplier)
+  
+  
+  #MACRO TestSortHelper<Descending,Without,boolean>(BooleanSupplier)
+  #MACRO TestSortHelper<Descending,Without,byte>(ByteSupplier)
+  #MACRO TestSortHelper<Descending,Without,char>(CharSupplier)
+  #MACRO TestSortHelper<Descending,Without,short>(ShortSupplier)
+  #MACRO TestSortHelper<Descending,Without,int>(IntSupplier)
+  #MACRO TestSortHelper<Descending,Without,long>(LongSupplier)
+  #MACRO TestSortHelper<Descending,Without,float>(FloatSupplier)
+  #MACRO TestSortHelper<Descending,Without,double>(DoubleSupplier)
+  
+  #MACRO TestSortHelper<Ascending,With,boolean>(BooleanSupplier)
+  #MACRO TestSortHelper<Ascending,With,byte>(ByteSupplier)
+  #MACRO TestSortHelper<Ascending,With,char>(CharSupplier)
+  #MACRO TestSortHelper<Ascending,With,short>(ShortSupplier)
+  #MACRO TestSortHelper<Ascending,With,int>(IntSupplier)
+  #MACRO TestSortHelper<Ascending,With,long>(LongSupplier)
+  #MACRO TestSortHelper<Ascending,With,float>(FloatSupplier)
+  #MACRO TestSortHelper<Ascending,With,double>(DoubleSupplier)
+  
+  
+  #MACRO TestSortHelper<Descending,With,boolean>(BooleanSupplier)
+  #MACRO TestSortHelper<Descending,With,byte>(ByteSupplier)
+  #MACRO TestSortHelper<Descending,With,char>(CharSupplier)
+  #MACRO TestSortHelper<Descending,With,short>(ShortSupplier)
+  #MACRO TestSortHelper<Descending,With,int>(IntSupplier)
+  #MACRO TestSortHelper<Descending,With,long>(LongSupplier)
+  #MACRO TestSortHelper<Descending,With,float>(FloatSupplier)
+  #MACRO TestSortHelper<Descending,With,double>(DoubleSupplier)
+  
+  #MACRO TestSortHelper<Unsorted,With,boolean>(BooleanSupplier)
+  #MACRO TestSortHelper<Unsorted,With,byte>(ByteSupplier)
+  #MACRO TestSortHelper<Unsorted,With,char>(CharSupplier)
+  #MACRO TestSortHelper<Unsorted,With,short>(ShortSupplier)
+  #MACRO TestSortHelper<Unsorted,With,int>(IntSupplier)
+  #MACRO TestSortHelper<Unsorted,With,long>(LongSupplier)
+  #MACRO TestSortHelper<Unsorted,With,float>(FloatSupplier)
+  #MACRO TestSortHelper<Unsorted,With,double>(DoubleSupplier)
+  /*//TODO uncomment when they fix the eclipse module bug
+  #MACRO TestSortHelper<Ascending,Without,String>(Supplier<String>)
+  #MACRO TestSortHelper<Descending,Without,String>(Supplier<String>)
+  #MACRO TestSortHelper<Ascending,With,String>(Supplier<String>)
+  #MACRO TestSortHelper<Descending,With,String>(Supplier<String>)
+  #MACRO TestSortHelper<Unsorted,With,String>(Supplier<String>)
+  */
+  
+#MACRODEF TestSortHelper<SORTTYPE,COMPARATORTYPE,ARRTYPE>(SUPPLIERTYPE)
+private static void testCOMPARATORTYPEComparatorSORTTYPEARRTYPEHelper(SUPPLIERTYPE supplier,int numiterations,int arrLength,boolean presorted)
+{
+  for(int i=0;i<numiterations;++i)
+  {
+    ARRTYPE[] arr;
+    if(presorted)
+    {
+      arr=JunitUtil.getSORTTYPEARRTYPEArray(supplier,arrLength);
+    }
+    else
+    {
+      arr=JunitUtil.getUnsortedARRTYPEArray(supplier,arrLength);
+    }
+    ARRTYPE[] copy=new ARRTYPE[arrLength];
+    ArrCopy.uncheckedCopy(arr,0,copy,0,arrLength);
+    #IFSWITCH COMPARATORTYPE==Without
+      #IFSWITCH SORTTYPE==Ascending
+    SortUtil.uncheckedsort(arr,0,arrLength-1);
+      #ELSE
+    SortUtil.uncheckedreverseSort(arr,0,arrLength-1);
+      #ENDIF
+    isSortedSORTTYPE(arr,copy);
+    #ELSE
+    var sorter=getSORTTYPEARRTYPEComparator();
+    SortUtil.uncheckedcomparatorSort(arr,0,arrLength-1,sorter);
+    isSorted(arr,copy,sorter);
+    #ENDIF
+    
+  }
+}
+#ENDDEF
 
 
+  @Test
+  public void testUncheckedSortboolean()
+  {
+    var rand=new Random(0);
+    testWithoutComparatorAscendingbooleanHelper(rand::nextBoolean,100,100,false);
+    testWithoutComparatorAscendingbooleanHelper(rand::nextBoolean,1,100,true);
+    testWithoutComparatorAscendingbooleanHelper(()->false,1,100,false);
+    testWithoutComparatorAscendingbooleanHelper(()->true,1,100,false);
+  }
+  @Test
+  public void testUncheckedReverseSortboolean()
+  {
+    var rand=new Random(0);
+    testWithoutComparatorDescendingbooleanHelper(rand::nextBoolean,100,100,false);
+    testWithoutComparatorDescendingbooleanHelper(rand::nextBoolean,1,100,true);
+    testWithoutComparatorDescendingbooleanHelper(()->false,1,100,false);
+    testWithoutComparatorDescendingbooleanHelper(()->true,1,100,false);
+  }
+  /*//TODO uncomment when the module bug is fixed
+  @Test
+  public void testUncheckedComparatorSortboolean()
+  {
+    Random rand=new Random(0);
+    BooleanSupplier falseSupplier=()->false;
+    BooleanSupplier trueSupplier=()->true;
+    testWithComparatorAscendingbooleanHelper(rand::nextBoolean,100,100,false);
+    testWithComparatorAscendingbooleanHelper(rand::nextBoolean,1,100,true);
+    testWithComparatorAscendingbooleanHelper(falseSupplier,1,100,false);
+    testWithComparatorAscendingbooleanHelper(trueSupplier,1,100,false);
+    testWithComparatorDescendingbooleanHelper(rand::nextBoolean,100,100,false);
+    testWithComparatorDescendingbooleanHelper(rand::nextBoolean,1,100,true);
+    testWithComparatorDescendingbooleanHelper(falseSupplier,1,100,false);
+    testWithComparatorDescendingbooleanHelper(trueSupplier,1,100,false);
+    testWithComparatorUnsortedbooleanHelper(rand::nextBoolean,100,100,false);
+    testWithComparatorUnsortedbooleanHelper(falseSupplier,1,100,false);
+    testWithComparatorUnsortedbooleanHelper(trueSupplier,1,100,false);
+  }
+  */
+  @Test
+  public void testUncheckedSortbyte()
+  {
+    var rand=new Random(0);
+    ByteSupplier supplier=()->(byte)rand.nextInt();
+    testWithoutComparatorAscendingbyteHelper(supplier,1000,29,false);
+    testWithoutComparatorAscendingbyteHelper(supplier,1,29,true);
+    testWithoutComparatorAscendingbyteHelper(supplier,1000,1000,false);
+    testWithoutComparatorAscendingbyteHelper(supplier,1,1000,true);
+  }
+  @Test
+  public void testUncheckedReverseSortbyte()
+  {
+    Random rand=new Random(0);
+    ByteSupplier supplier=()->(byte)rand.nextInt();
+    testWithoutComparatorDescendingbyteHelper(supplier,1000,29,false);
+    testWithoutComparatorDescendingbyteHelper(supplier,1,29,true);
+    testWithoutComparatorDescendingbyteHelper(supplier,1000,1000,false);
+    testWithoutComparatorDescendingbyteHelper(supplier,1,1000,true);
+  }
+  @Test
+  public void testUncheckedsortchar()
+  {
+    var rand=new Random(0);
+    CharSupplier supplier=()->(char)rand.nextInt();
+    //testWithoutComparatorAscendingcharHelper(supplier,1000,3201,false);
+    //testWithoutComparatorAscendingcharHelper(supplier,1,3201,true);
+    testWithoutComparatorAscendingcharHelper(supplier,1000,3202,false);
+    testWithoutComparatorAscendingcharHelper(supplier,1,3202,true);
+  }
+  @Test
+  public void testUncheckedReverseSortchar()
+  {
+    Random rand=new Random(0);
+    CharSupplier supplier=()->(char)rand.nextInt();
+    //testWithoutComparatorDescendingcharHelper(supplier,1000,3201,false);
+    //testWithoutComparatorDescendingcharHelper(supplier,1,3201,true);
+    testWithoutComparatorDescendingcharHelper(supplier,1000,3202,false);
+    testWithoutComparatorDescendingcharHelper(supplier,1,3202,true);
+  }
+  @Test
+  public void testUncheckedsortshort()
+  {
+    var rand=new Random(0);
+    ShortSupplier supplier=()->(short)rand.nextInt();
+    //testWithoutComparatorAscendingshortHelper(supplier,1000,3201,false);
+    //testWithoutComparatorAscendingshortHelper(supplier,1,3201,true);
+    testWithoutComparatorAscendingshortHelper(supplier,1000,3202,false);
+    testWithoutComparatorAscendingshortHelper(supplier,1,3202,true);
+  }
+  @Test
+  public void testUncheckedReverseSortshort()
+  {
+    Random rand=new Random(0);
+    ShortSupplier supplier=()->(short)rand.nextInt();
+    //testWithoutComparatorDescendingshortHelper(supplier,1000,3201,false);
+    //testWithoutComparatorDescendingshortHelper(supplier,1,3201,true);
+    testWithoutComparatorDescendingshortHelper(supplier,1000,3202,false);
+    testWithoutComparatorDescendingshortHelper(supplier,1,3202,true);
+  }
 }
 
 

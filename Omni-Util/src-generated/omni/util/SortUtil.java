@@ -24,18 +24,18 @@ public final class SortUtil
           return;
         }
       }
-      while(arr[end])
+      do
       {
-        --end;
+        if(!arr[end])
+        {
+          uncheckedSortHelper(arr,begin,end,
+          false
+          );
+          return;
+        }
       }
-      if(begin==end)
-      {
-        //already sorted
-        return;
-      }
-      uncheckedSortHelper(arr,begin,end,
-      false
-      );
+      while(--end!=begin);
+      //already sorted
     }
     public static   void uncheckedsort(byte[] arr,int begin,int end)
     {
@@ -271,18 +271,18 @@ public final class SortUtil
           return;
         }
       }
-      while(!arr[end])
+      do
       {
-        --end;
+        if(arr[end])
+        {
+          uncheckedSortHelper(arr,begin,end,
+          true
+          );
+          return;
+        }
       }
-      if(begin==end)
-      {
-        //already sorted
-        return;
-      }
-      uncheckedSortHelper(arr,begin,end,
-      true
-      );
+      while(--end!=begin);
+      //already sorted
     }
     public static   void uncheckedreverseSort(byte[] arr,int begin,int end)
     {
@@ -848,7 +848,7 @@ public final class SortUtil
       )
       {
         arr[j+1]=aj;
-        if(--j==begin)
+        if(j--==begin)
         {
           break;
         }
@@ -867,7 +867,7 @@ public final class SortUtil
       )
       {
         arr[j+1]=aj;
-        if(--j==begin)
+        if(j--==begin)
         {
           break;
         }
@@ -886,7 +886,7 @@ public final class SortUtil
       )
       {
         arr[j+1]=aj;
-        if(--j==begin)
+        if(j--==begin)
         {
           break;
         }
@@ -905,7 +905,7 @@ public final class SortUtil
       )
       {
         arr[j+1]=aj;
-        if(--j==begin)
+        if(j--==begin)
         {
           break;
         }
@@ -924,7 +924,7 @@ public final class SortUtil
       )
       {
         arr[j+1]=aj;
-        if(--j==begin)
+        if(j--==begin)
         {
           break;
         }
@@ -943,7 +943,7 @@ public final class SortUtil
       )
       {
         arr[j+1]=aj;
-        if(--j==begin)
+        if(j--==begin)
         {
           break;
         }
@@ -962,7 +962,7 @@ public final class SortUtil
       )
       {
         arr[j+1]=aj;
-        if(--j==begin)
+        if(j--==begin)
         {
           break;
         }
@@ -981,7 +981,7 @@ public final class SortUtil
       )
       {
         arr[j+1]=aj;
-        if(--j==begin)
+        if(j--==begin)
         {
           break;
         }
@@ -1000,7 +1000,7 @@ public final class SortUtil
       )
       {
         arr[j+1]=aj;
-        if(--j==begin)
+        if(j--==begin)
         {
           break;
         }
@@ -1019,7 +1019,7 @@ public final class SortUtil
       )
       {
         arr[j+1]=aj;
-        if(--j==begin)
+        if(j--==begin)
         {
           break;
         }
@@ -1038,7 +1038,7 @@ public final class SortUtil
       )
       {
         arr[j+1]=aj;
-        if(--j==begin)
+        if(j--==begin)
         {
           break;
         }
@@ -1057,7 +1057,7 @@ public final class SortUtil
       )
       {
         arr[j+1]=aj;
-        if(--j==begin)
+        if(j--==begin)
         {
           break;
         }
@@ -1076,7 +1076,7 @@ public final class SortUtil
       )
       {
         arr[j+1]=aj;
-        if(--j==begin)
+        if(j--==begin)
         {
           break;
         }
@@ -1095,7 +1095,7 @@ public final class SortUtil
       )
       {
         arr[j+1]=aj;
-        if(--j==begin)
+        if(j--==begin)
         {
           break;
         }
@@ -10283,18 +10283,15 @@ public final class SortUtil
       int s;
       while((s=count[--i])==0){}
       var value=(byte)(i+Byte.MIN_VALUE);
-      for(;;--end)
+      do
       {
         arr[end]=value;
-        if(end==begin)
+        if(--end<begin)
         {
           return;
         }
-        if(--s==0)
-        {
-          break;
-        }
       }
+      while(--s!=0);
     }
   }
   private static void countingsort(char[] arr,int begin,int end)
@@ -10313,18 +10310,15 @@ public final class SortUtil
       int s;
       while((s=count[--i])==0){}
       var value=(char)i;
-      for(;;--end)
+      do
       {
         arr[end]=value;
-        if(end==begin)
+        if(--end<begin)
         {
           return;
         }
-        if(--s==0)
-        {
-          break;
-        }
       }
+      while(--s!=0);
     }
   }
   private static void countingsort(short[] arr,int begin,int end)
@@ -10343,18 +10337,15 @@ public final class SortUtil
       int s;
       while((s=count[--i])==0){}
       var value=(short)(i+Short.MIN_VALUE);
-      for(;;--end)
+      do
       {
         arr[end]=value;
-        if(end==begin)
+        if(--end<begin)
         {
           return;
         }
-        if(--s==0)
-        {
-          break;
-        }
       }
+      while(--s!=0);
     }
   }
   private static void countingreverseSort(byte[] arr,int begin,int end)
@@ -10373,18 +10364,15 @@ public final class SortUtil
       int s;
       while((s=count[++i])==0){}
       var value=(byte)(i+Byte.MIN_VALUE);
-      for(;;--end)
+      do
       {
         arr[end]=value;
-        if(end==begin)
+        if(--end<begin)
         {
           return;
         }
-        if(--s==0)
-        {
-          break;
-        }
       }
+      while(--s!=0);
     }
   }
   private static void countingreverseSort(char[] arr,int begin,int end)
@@ -10403,18 +10391,15 @@ public final class SortUtil
       int s;
       while((s=count[++i])==0){}
       var value=(char)i;
-      for(;;--end)
+      do
       {
         arr[end]=value;
-        if(end==begin)
+        if(--end<begin)
         {
           return;
         }
-        if(--s==0)
-        {
-          break;
-        }
       }
+      while(--s!=0);
     }
   }
   private static void countingreverseSort(short[] arr,int begin,int end)
@@ -10433,18 +10418,15 @@ public final class SortUtil
       int s;
       while((s=count[++i])==0){}
       var value=(short)(i+Short.MIN_VALUE);
-      for(;;--end)
+      do
       {
         arr[end]=value;
-        if(end==begin)
+        if(--end<begin)
         {
           return;
         }
-        if(--s==0)
-        {
-          break;
-        }
       }
+      while(--s!=0);
     }
   }
   private static void uncheckedSortHelper(boolean[] arr,int begin,int end,boolean firstVal)

@@ -4,6 +4,8 @@ import java.util.function.IntPredicate;
 import java.util.function.LongPredicate;
 //TODO uncomment when the module bug is fixed
 //import java.util.function.Predicate;
+import java.util.Objects;
+import java.util.Random;
 import org.junit.Assert;
 import org.junit.Test;
 import omni.function.CharPredicate;
@@ -302,8 +304,145 @@ public class OmniArrayTest
       return true;
     }
   }
+  /*
   //TODO uncomment when the module bug is fixed
-  //MACRO TestIndexPredicate<Double>(Ref,Predicate<Double>,new Double)
+  @SuppressWarnings("deprecation")
+  @Test
+  public void testGetIndexPredicateRef()
+  {
+    var inputPred=new RefIndexPredicate();
+    Double testVal=(Double)new Double(1);
+    OmniArray.OfRef.getIndexPredicate(inputPred,(Double)new Double(3),(Double)new Double(2),testVal).test(2);
+    Assert.assertTrue(inputPred.captured==testVal);
+  }
+  private static class RefIndexPredicate implements Predicate<Double>
+  {
+    Double captured;
+    @Override
+    public boolean test(Double val)
+    {
+      captured=val;
+      return true;
+    }
+  }
+  */
+  @Test
+  public void testReverseRangeboolean()
+  {
+    Random rand=new Random(0);
+    boolean[] arr=JunitUtil.getUnsortedbooleanArray(rand,100);
+    boolean[] copy=new boolean[arr.length];
+    ArrCopy.uncheckedCopy(arr,0,copy,0,arr.length);
+    OmniArray.OfBoolean.reverseRange(arr,0,arr.length-1);
+    for(int i=0,j=arr.length-1;i<arr.length;++i,--j)
+    {
+      Assert.assertTrue(arr[i]==copy[j]);
+    }
+  }
+  @Test
+  public void testReverseRangebyte()
+  {
+    Random rand=new Random(0);
+    byte[] arr=JunitUtil.getUnsortedbyteArray(rand,100);
+    byte[] copy=new byte[arr.length];
+    ArrCopy.uncheckedCopy(arr,0,copy,0,arr.length);
+    OmniArray.OfByte.reverseRange(arr,0,arr.length-1);
+    for(int i=0,j=arr.length-1;i<arr.length;++i,--j)
+    {
+      Assert.assertTrue(arr[i]==copy[j]);
+    }
+  }
+  @Test
+  public void testReverseRangechar()
+  {
+    Random rand=new Random(0);
+    char[] arr=JunitUtil.getUnsortedcharArray(rand,100);
+    char[] copy=new char[arr.length];
+    ArrCopy.uncheckedCopy(arr,0,copy,0,arr.length);
+    OmniArray.OfChar.reverseRange(arr,0,arr.length-1);
+    for(int i=0,j=arr.length-1;i<arr.length;++i,--j)
+    {
+      Assert.assertTrue(arr[i]==copy[j]);
+    }
+  }
+  @Test
+  public void testReverseRangeshort()
+  {
+    Random rand=new Random(0);
+    short[] arr=JunitUtil.getUnsortedshortArray(rand,100);
+    short[] copy=new short[arr.length];
+    ArrCopy.uncheckedCopy(arr,0,copy,0,arr.length);
+    OmniArray.OfShort.reverseRange(arr,0,arr.length-1);
+    for(int i=0,j=arr.length-1;i<arr.length;++i,--j)
+    {
+      Assert.assertTrue(arr[i]==copy[j]);
+    }
+  }
+  @Test
+  public void testReverseRangeint()
+  {
+    Random rand=new Random(0);
+    int[] arr=JunitUtil.getUnsortedintArray(rand,100);
+    int[] copy=new int[arr.length];
+    ArrCopy.uncheckedCopy(arr,0,copy,0,arr.length);
+    OmniArray.OfInt.reverseRange(arr,0,arr.length-1);
+    for(int i=0,j=arr.length-1;i<arr.length;++i,--j)
+    {
+      Assert.assertTrue(arr[i]==copy[j]);
+    }
+  }
+  @Test
+  public void testReverseRangelong()
+  {
+    Random rand=new Random(0);
+    long[] arr=JunitUtil.getUnsortedlongArray(rand,100);
+    long[] copy=new long[arr.length];
+    ArrCopy.uncheckedCopy(arr,0,copy,0,arr.length);
+    OmniArray.OfLong.reverseRange(arr,0,arr.length-1);
+    for(int i=0,j=arr.length-1;i<arr.length;++i,--j)
+    {
+      Assert.assertTrue(arr[i]==copy[j]);
+    }
+  }
+  @Test
+  public void testReverseRangefloat()
+  {
+    Random rand=new Random(0);
+    float[] arr=JunitUtil.getUnsortedfloatArray(rand,100);
+    float[] copy=new float[arr.length];
+    ArrCopy.uncheckedCopy(arr,0,copy,0,arr.length);
+    OmniArray.OfFloat.reverseRange(arr,0,arr.length-1);
+    for(int i=0,j=arr.length-1;i<arr.length;++i,--j)
+    {
+      Assert.assertTrue(TypeUtil.floatEquals(arr[i],copy[j]));
+    }
+  }
+  @Test
+  public void testReverseRangedouble()
+  {
+    Random rand=new Random(0);
+    double[] arr=JunitUtil.getUnsorteddoubleArray(rand,100);
+    double[] copy=new double[arr.length];
+    ArrCopy.uncheckedCopy(arr,0,copy,0,arr.length);
+    OmniArray.OfDouble.reverseRange(arr,0,arr.length-1);
+    for(int i=0,j=arr.length-1;i<arr.length;++i,--j)
+    {
+      Assert.assertTrue(TypeUtil.doubleEquals(arr[i],copy[j]));
+    }
+  }
+  @Test
+  public void testReverseRangeString()
+  {
+    Random rand=new Random(0);
+    String[] arr=JunitUtil.getUnsortedStringArray(rand,100);
+    String[] copy=new String[arr.length];
+    ArrCopy.uncheckedCopy(arr,0,copy,0,arr.length);
+    OmniArray.OfRef.reverseRange(arr,0,arr.length-1);
+    for(int i=0,j=arr.length-1;i<arr.length;++i,--j)
+    {
+      Assert.assertTrue(Objects.equals(arr[i],copy[j]));
+    }
+  }
   @Test
   public void testGetFltBitsIndexPredicate()
   {

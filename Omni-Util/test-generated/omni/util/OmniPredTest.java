@@ -11,7 +11,7 @@ public class OmniPredTest
   @Test
   public void testGetEqualsDblBitsPred()
   {
-    Assert.assertTrue(OmniPred.OfRef.getEqualsDblBitsPred(Double.doubleToRawLongBits((double)5.0)).test(Double.valueOf((double)5.0)));
+    Assert.assertTrue(OmniPred.OfRef.getEqualsDblBitsPred(Double.doubleToRawLongBits(5.0)).test(Double.valueOf(5.0)));
   }
   @Test
   public void testGetEqualsPred()
@@ -73,8 +73,8 @@ public class OmniPredTest
       Assert.assertTrue(pred.test((short)0));
     }
     {
-      var pred=OmniPred.OfRef.getEqualsPred((int)0);
-      Assert.assertTrue(pred.test((int)0));
+      var pred=OmniPred.OfRef.getEqualsPred(0);
+      Assert.assertTrue(pred.test(0));
     }
     {
       var pred=OmniPred.OfRef.getEqualsPred((long)0);
@@ -121,20 +121,20 @@ public class OmniPredTest
       Assert.assertTrue(pred.test(Short.valueOf((short)0)));
     }
     {
-      var pred=OmniPred.OfRef.getEqualsPred(Integer.valueOf((int)0));
-      Assert.assertTrue(pred.test(Integer.valueOf((int)0)));
+      var pred=OmniPred.OfRef.getEqualsPred(Integer.valueOf(0));
+      Assert.assertTrue(pred.test(Integer.valueOf(0)));
     }
     {
-      var pred=OmniPred.OfRef.getEqualsPred(Long.valueOf((long)0));
-      Assert.assertTrue(pred.test(Long.valueOf((long)0)));
+      var pred=OmniPred.OfRef.getEqualsPred(Long.valueOf(0));
+      Assert.assertTrue(pred.test(Long.valueOf(0)));
     }
     {
-      var pred=OmniPred.OfRef.getEqualsPred(Float.valueOf((float)0));
-      Assert.assertTrue(pred.test(Float.valueOf((float)0)));
+      var pred=OmniPred.OfRef.getEqualsPred(Float.valueOf(0));
+      Assert.assertTrue(pred.test(Float.valueOf(0)));
     }
     {
-      var pred=OmniPred.OfRef.getEqualsPred(Double.valueOf((double)0));
-      Assert.assertTrue(pred.test(Double.valueOf((double)0)));
+      var pred=OmniPred.OfRef.getEqualsPred(Double.valueOf(0));
+      Assert.assertTrue(pred.test(Double.valueOf(0)));
     }
     {
       var pred=OmniPred.OfRef.getEqualsPred(Float.valueOf(Float.NaN));

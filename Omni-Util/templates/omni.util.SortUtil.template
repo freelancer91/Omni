@@ -68,7 +68,7 @@ public static TYPEPARAMETER void uncheckedMETHODNAME(ARRTYPE[] arr,int begin,int
   //assert end<arr.length;
   //assert begin<end;
 #IFSWITCH ARRTYPE==boolean
-  #IFSWITCH  METHODNAME==sort
+  #IFSWITCH METHODNAME==sort
   while(!arr[begin])
   #ELSE
   while(arr[begin])
@@ -80,26 +80,26 @@ public static TYPEPARAMETER void uncheckedMETHODNAME(ARRTYPE[] arr,int begin,int
       return;
     }
   }
-  #IFSWITCH METHODNAME==sort
-  while(arr[end])
-  #ELSE
-  while(!arr[end])
-  #ENDIF
+  do
   {
-    --end;
-  }
-  if(begin==end)
-  {
-    //already sorted
-    return;
-  }
-  uncheckedSortHelper(arr,begin,end,
   #IFSWITCH METHODNAME==sort
-  false
+    if(!arr[end])
   #ELSE
-  true
+    if(arr[end])
   #ENDIF
-  );
+    {
+      uncheckedSortHelper(arr,begin,end,
+  #IFSWITCH METHODNAME==sort
+      false
+  #ELSE
+      true
+  #ENDIF
+      );
+      return;
+    }
+  }
+  while(--end!=begin);
+  //already sorted
 #ELSEIFSWITCH ARRTYPE==byte
   if(end-begin<30)
   {
@@ -346,7 +346,7 @@ private static void insertMETHODNAME(ARRTYPE[] arr,int begin,int end)
     #MACRO WhileClause(LessThan,ai,aj=arr[j])
     {
       arr[j+1]=aj;
-      if(--j==begin)
+      if(j--==begin)
       {
         break;
       }
@@ -961,18 +961,15 @@ private static void countingMETHODNAME(ARRTYPE[] arr,int begin,int end)
     #ELSE
     var value=(ARRTYPE)(i+BOXEDTYPE.MIN_VALUE);
     #ENDIF
-    for(;;--end)
+    do
     {
       arr[end]=value;
-      if(end==begin)
+      if(--end<begin)
       {
         return;
       }
-      if(--s==0)
-      {
-        break;
-      }
     }
+    while(--s!=0);
   }
 }
 #ENDDEF
