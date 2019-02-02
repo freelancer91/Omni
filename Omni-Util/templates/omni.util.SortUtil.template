@@ -377,11 +377,12 @@ private static void sentinelInsertMETHODNAME(ARRTYPE[] arr,int begin,int end)
     {
       return;
     }
-    #MACRO IfClause(LessThan,arr[++begin],arr[begin-1])
+    #MACRO IfClause(GreaterThanOrEqual,arr[begin],arr[++begin])
     {
       break;
     }
   }
+  //FIXME this causes an AIOB exception
   for(int k=begin;++begin<=end;k=++begin)
   {
     ARRTYPE a1,a2;
@@ -411,19 +412,19 @@ private static void sentinelInsertMETHODNAME(ARRTYPE[] arr,int begin,int end)
 }
 #ENDDEF
 
-  #MACRO DoSort<sort,char,char>()
-  #MACRO DoSort<sort,short,short>()
-  #MACRO DoSort<sort,int,int>()
-  #MACRO DoSort<sort,long,long>()
-  #MACRO DoSort<sort,float,float>()
-  #MACRO DoSort<sort,double,double>()
-  #MACRO DoSort<reverseSort,char,char>()
-  #MACRO DoSort<reverseSort,short,short>()
-  #MACRO DoSort<reverseSort,int,int>()
-  #MACRO DoSort<reverseSort,long,long>()
-  #MACRO DoSort<reverseSort,float,float>()
-  #MACRO DoSort<reverseSort,double,double>()
-#MACRODEF DoSort<METHODNAME,ARRTYPE,EXPOSEDTYPE>()
+  #MACRO DoSort<sort,char,char>(Char)
+  #MACRO DoSort<sort,short,short>(Short)
+  #MACRO DoSort<sort,int,int>(Int)
+  #MACRO DoSort<sort,long,long>(Long)
+  #MACRO DoSort<sort,float,float>(Float)
+  #MACRO DoSort<sort,double,double>(Double)
+  #MACRO DoSort<reverseSort,char,char>(Char)
+  #MACRO DoSort<reverseSort,short,short>(Short)
+  #MACRO DoSort<reverseSort,int,int>(Int)
+  #MACRO DoSort<reverseSort,long,long>(Long)
+  #MACRO DoSort<reverseSort,float,float>(Float)
+  #MACRO DoSort<reverseSort,double,double>(Double)
+#MACRODEF DoSort<METHODNAME,ARRTYPE,EXPOSEDTYPE>(CLASSPREFIX)
 #IFSWITCH ARRTYPE==int,long
 public static void uncheckedMETHODNAME(ARRTYPE[] arr,int begin,int end)
 #ELSE
@@ -439,59 +440,53 @@ public static void doMETHODNAME(ARRTYPE[] arr,int begin,int end)
     int[] run;
     int count=0;
     (run=new int[68])[0]=begin;
+    //checkIfSortedLoop:
     for(int k=begin;k!=end;)
     {
-    #IFSWITCH ARRTYPE==double,float
+  #IFSWITCH ARRTYPE==double,float
       #MACRO IfClause(LessThan,arr[k],arr[k+1])
       {
-    #ELSE
+  #ELSE
       #MACRO SwitchSigNum(arr[k],arr[k+1])
       {
       case -1:
-    #ENDIF
+  #ENDIF
         for(;;)
         {
-          if(++k>end
-          ||
+          if(++k>=end ||
           #MACRO METHODNAMELessThan(arr[k],arr[k-1])
           )
           {
             break;
           }
         }
-    #IFSWITCH ARRTYPE==double,float
+  #IFSWITCH ARRTYPE==double,float
       }
       else
       #MACRO IfClause(GreaterThan,arr[k],arr[k+1])
       {
-    #ELSE
+  #ELSE
         break;
       default:
-    #ENDIF
+  #ENDIF
         for(;;)
         {
-          if(++k>end
-          ||
+          if(++k>=end ||
           #MACRO METHODNAMELessThan(arr[k-1],arr[k])
           )
           {
             break;
           }
         }
-        for(int lo=run[count],hi=k;lo<--hi;++lo)
-        {
-          var tmp=arr[lo];
-          arr[lo]=arr[hi];
-          arr[hi]=tmp;
-        }
-    #IFSWITCH ARRTYPE==double,float
+        OmniArray.OfCLASSPREFIX.reverseRange(arr,run[count],k-1);
+  #IFSWITCH ARRTYPE==double,float
       }
       else
       {
-    #ELSE
+  #ELSE
         break;
       case 0:
-    #ENDIF
+  #ENDIF
         ++k;
         continue;
       }
@@ -507,10 +502,30 @@ public static void doMETHODNAME(ARRTYPE[] arr,int begin,int end)
       }
       run[count]=k;
     }
-    if(count==0 || (count==1 && run[count]>end))
+    if(count==0)
     {
       return;
     }
+    if(count==1)
+    {
+      if(run[count]>end)
+      {
+        return;
+      }
+    }
+    else
+    {
+      if(run[count]>end)
+      {
+        System.out.println("branch");
+      }
+    }
+    
+    
+    //if(count==0 || (count==1 && run[count]>end))
+    //{
+    //  return;
+    //}
     if(run[count]<++end)
     {
       run[++count]=end;
@@ -617,12 +632,21 @@ private static void quickMETHODNAMESinglePivot(ARRTYPE[] arr,int begin,int end,A
     }
 #ENDIF
   }
+  if(--less>begin)
+  {
 #IFSWITCH LEFTMOST==true
-  quickMETHODNAMEleftmost(arr,begin,less-1);
+  quickMETHODNAMEleftmost(arr,begin,less);
 #ELSE
-  quickMETHODNAME(arr,begin,less-1);
+  quickMETHODNAME(arr,begin,less);
 #ENDIF
+  }
   quickMETHODNAME(arr,great+1,end);
+  //TODO check to see if this is necessary
+  //if(++great!=end)
+  //{
+  //  quickMETHODNAME(arr,great,end);
+  //}
+  
 }
 #IFSWITCH LEFTMOST==true
 private static void quickMETHODNAMEleftmostDualPivot(ARRTYPE[] arr,int begin,int end,ARRTYPE pivot1, ARRTYPE pivot2,int e1,int e5)

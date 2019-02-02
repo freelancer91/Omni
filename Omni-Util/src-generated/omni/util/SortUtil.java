@@ -1112,12 +1112,13 @@ public final class SortUtil
         return;
       }
       if(
-      (arr[++begin])<(arr[begin-1])
+      (arr[begin])>=(arr[++begin])
       )
       {
         break;
       }
     }
+    //FIXME this causes an AIOB exception
     for(int k=begin;++begin<=end;k=++begin)
     {
       char a1,a2;
@@ -1162,12 +1163,13 @@ public final class SortUtil
         return;
       }
       if(
-      (arr[++begin])<(arr[begin-1])
+      (arr[begin])>=(arr[++begin])
       )
       {
         break;
       }
     }
+    //FIXME this causes an AIOB exception
     for(int k=begin;++begin<=end;k=++begin)
     {
       short a1,a2;
@@ -1212,12 +1214,13 @@ public final class SortUtil
         return;
       }
       if(
-      (arr[++begin])<(arr[begin-1])
+      (arr[begin])>=(arr[++begin])
       )
       {
         break;
       }
     }
+    //FIXME this causes an AIOB exception
     for(int k=begin;++begin<=end;k=++begin)
     {
       int a1,a2;
@@ -1262,12 +1265,13 @@ public final class SortUtil
         return;
       }
       if(
-      (arr[++begin])<(arr[begin-1])
+      (arr[begin])>=(arr[++begin])
       )
       {
         break;
       }
     }
+    //FIXME this causes an AIOB exception
     for(int k=begin;++begin<=end;k=++begin)
     {
       long a1,a2;
@@ -1312,12 +1316,13 @@ public final class SortUtil
         return;
       }
       if(
-      (arr[++begin])<(arr[begin-1])
+      (arr[begin])>=(arr[++begin])
       )
       {
         break;
       }
     }
+    //FIXME this causes an AIOB exception
     for(int k=begin;++begin<=end;k=++begin)
     {
       float a1,a2;
@@ -1362,12 +1367,13 @@ public final class SortUtil
         return;
       }
       if(
-      (arr[++begin])<(arr[begin-1])
+      (arr[begin])>=(arr[++begin])
       )
       {
         break;
       }
     }
+    //FIXME this causes an AIOB exception
     for(int k=begin;++begin<=end;k=++begin)
     {
       double a1,a2;
@@ -1412,12 +1418,13 @@ public final class SortUtil
         return;
       }
       if(
-      (arr[++begin])>=(arr[begin-1])
+      (arr[begin])<(arr[++begin])
       )
       {
         break;
       }
     }
+    //FIXME this causes an AIOB exception
     for(int k=begin;++begin<=end;k=++begin)
     {
       char a1,a2;
@@ -1462,12 +1469,13 @@ public final class SortUtil
         return;
       }
       if(
-      (arr[++begin])>=(arr[begin-1])
+      (arr[begin])<(arr[++begin])
       )
       {
         break;
       }
     }
+    //FIXME this causes an AIOB exception
     for(int k=begin;++begin<=end;k=++begin)
     {
       short a1,a2;
@@ -1512,12 +1520,13 @@ public final class SortUtil
         return;
       }
       if(
-      (arr[++begin])>=(arr[begin-1])
+      (arr[begin])<(arr[++begin])
       )
       {
         break;
       }
     }
+    //FIXME this causes an AIOB exception
     for(int k=begin;++begin<=end;k=++begin)
     {
       int a1,a2;
@@ -1562,12 +1571,13 @@ public final class SortUtil
         return;
       }
       if(
-      (arr[++begin])>=(arr[begin-1])
+      (arr[begin])<(arr[++begin])
       )
       {
         break;
       }
     }
+    //FIXME this causes an AIOB exception
     for(int k=begin;++begin<=end;k=++begin)
     {
       long a1,a2;
@@ -1612,12 +1622,13 @@ public final class SortUtil
         return;
       }
       if(
-      (arr[++begin])>=(arr[begin-1])
+      (arr[begin])<(arr[++begin])
       )
       {
         break;
       }
     }
+    //FIXME this causes an AIOB exception
     for(int k=begin;++begin<=end;k=++begin)
     {
       float a1,a2;
@@ -1662,12 +1673,13 @@ public final class SortUtil
         return;
       }
       if(
-      (arr[++begin])>=(arr[begin-1])
+      (arr[begin])<(arr[++begin])
       )
       {
         break;
       }
     }
+    //FIXME this causes an AIOB exception
     for(int k=begin;++begin<=end;k=++begin)
     {
       double a1,a2;
@@ -1714,6 +1726,7 @@ public final class SortUtil
       int[] run;
       int count=0;
       (run=new int[68])[0]=begin;
+      //checkIfSortedLoop:
       for(int k=begin;k!=end;)
       {
         switch(
@@ -1723,8 +1736,7 @@ public final class SortUtil
         case -1:
           for(;;)
           {
-            if(++k>end
-            ||
+            if(++k>=end ||
             (arr[k])<(arr[k-1])
             )
             {
@@ -1735,20 +1747,14 @@ public final class SortUtil
         default:
           for(;;)
           {
-            if(++k>end
-            ||
+            if(++k>=end ||
             (arr[k-1])<(arr[k])
             )
             {
               break;
             }
           }
-          for(int lo=run[count],hi=k;lo<--hi;++lo)
-          {
-            var tmp=arr[lo];
-            arr[lo]=arr[hi];
-            arr[hi]=tmp;
-          }
+          OmniArray.OfChar.reverseRange(arr,run[count],k-1);
           break;
         case 0:
           ++k;
@@ -1766,10 +1772,28 @@ public final class SortUtil
         }
         run[count]=k;
       }
-      if(count==0 || (count==1 && run[count]>end))
+      if(count==0)
       {
         return;
       }
+      if(count==1)
+      {
+        if(run[count]>end)
+        {
+          return;
+        }
+      }
+      else
+      {
+        if(run[count]>end)
+        {
+          System.out.println("branch");
+        }
+      }
+      //if(count==0 || (count==1 && run[count]>end))
+      //{
+      //  return;
+      //}
       if(run[count]<++end)
       {
         run[++count]=end;
@@ -1788,6 +1812,7 @@ public final class SortUtil
       int[] run;
       int count=0;
       (run=new int[68])[0]=begin;
+      //checkIfSortedLoop:
       for(int k=begin;k!=end;)
       {
         switch(
@@ -1797,8 +1822,7 @@ public final class SortUtil
         case -1:
           for(;;)
           {
-            if(++k>end
-            ||
+            if(++k>=end ||
             (arr[k])<(arr[k-1])
             )
             {
@@ -1809,20 +1833,14 @@ public final class SortUtil
         default:
           for(;;)
           {
-            if(++k>end
-            ||
+            if(++k>=end ||
             (arr[k-1])<(arr[k])
             )
             {
               break;
             }
           }
-          for(int lo=run[count],hi=k;lo<--hi;++lo)
-          {
-            var tmp=arr[lo];
-            arr[lo]=arr[hi];
-            arr[hi]=tmp;
-          }
+          OmniArray.OfShort.reverseRange(arr,run[count],k-1);
           break;
         case 0:
           ++k;
@@ -1840,10 +1858,28 @@ public final class SortUtil
         }
         run[count]=k;
       }
-      if(count==0 || (count==1 && run[count]>end))
+      if(count==0)
       {
         return;
       }
+      if(count==1)
+      {
+        if(run[count]>end)
+        {
+          return;
+        }
+      }
+      else
+      {
+        if(run[count]>end)
+        {
+          System.out.println("branch");
+        }
+      }
+      //if(count==0 || (count==1 && run[count]>end))
+      //{
+      //  return;
+      //}
       if(run[count]<++end)
       {
         run[++count]=end;
@@ -1862,6 +1898,7 @@ public final class SortUtil
       int[] run;
       int count=0;
       (run=new int[68])[0]=begin;
+      //checkIfSortedLoop:
       for(int k=begin;k!=end;)
       {
         switch(
@@ -1871,8 +1908,7 @@ public final class SortUtil
         case -1:
           for(;;)
           {
-            if(++k>end
-            ||
+            if(++k>=end ||
             (arr[k])<(arr[k-1])
             )
             {
@@ -1883,20 +1919,14 @@ public final class SortUtil
         default:
           for(;;)
           {
-            if(++k>end
-            ||
+            if(++k>=end ||
             (arr[k-1])<(arr[k])
             )
             {
               break;
             }
           }
-          for(int lo=run[count],hi=k;lo<--hi;++lo)
-          {
-            var tmp=arr[lo];
-            arr[lo]=arr[hi];
-            arr[hi]=tmp;
-          }
+          OmniArray.OfInt.reverseRange(arr,run[count],k-1);
           break;
         case 0:
           ++k;
@@ -1914,10 +1944,28 @@ public final class SortUtil
         }
         run[count]=k;
       }
-      if(count==0 || (count==1 && run[count]>end))
+      if(count==0)
       {
         return;
       }
+      if(count==1)
+      {
+        if(run[count]>end)
+        {
+          return;
+        }
+      }
+      else
+      {
+        if(run[count]>end)
+        {
+          System.out.println("branch");
+        }
+      }
+      //if(count==0 || (count==1 && run[count]>end))
+      //{
+      //  return;
+      //}
       if(run[count]<++end)
       {
         run[++count]=end;
@@ -1936,6 +1984,7 @@ public final class SortUtil
       int[] run;
       int count=0;
       (run=new int[68])[0]=begin;
+      //checkIfSortedLoop:
       for(int k=begin;k!=end;)
       {
         switch(
@@ -1945,8 +1994,7 @@ public final class SortUtil
         case -1:
           for(;;)
           {
-            if(++k>end
-            ||
+            if(++k>=end ||
             (arr[k])<(arr[k-1])
             )
             {
@@ -1957,20 +2005,14 @@ public final class SortUtil
         default:
           for(;;)
           {
-            if(++k>end
-            ||
+            if(++k>=end ||
             (arr[k-1])<(arr[k])
             )
             {
               break;
             }
           }
-          for(int lo=run[count],hi=k;lo<--hi;++lo)
-          {
-            var tmp=arr[lo];
-            arr[lo]=arr[hi];
-            arr[hi]=tmp;
-          }
+          OmniArray.OfLong.reverseRange(arr,run[count],k-1);
           break;
         case 0:
           ++k;
@@ -1988,10 +2030,28 @@ public final class SortUtil
         }
         run[count]=k;
       }
-      if(count==0 || (count==1 && run[count]>end))
+      if(count==0)
       {
         return;
       }
+      if(count==1)
+      {
+        if(run[count]>end)
+        {
+          return;
+        }
+      }
+      else
+      {
+        if(run[count]>end)
+        {
+          System.out.println("branch");
+        }
+      }
+      //if(count==0 || (count==1 && run[count]>end))
+      //{
+      //  return;
+      //}
       if(run[count]<++end)
       {
         run[++count]=end;
@@ -2010,6 +2070,7 @@ public final class SortUtil
       int[] run;
       int count=0;
       (run=new int[68])[0]=begin;
+      //checkIfSortedLoop:
       for(int k=begin;k!=end;)
       {
         if(
@@ -2018,8 +2079,7 @@ public final class SortUtil
         {
           for(;;)
           {
-            if(++k>end
-            ||
+            if(++k>=end ||
             (arr[k])<(arr[k-1])
             )
             {
@@ -2034,20 +2094,14 @@ public final class SortUtil
         {
           for(;;)
           {
-            if(++k>end
-            ||
+            if(++k>=end ||
             (arr[k-1])<(arr[k])
             )
             {
               break;
             }
           }
-          for(int lo=run[count],hi=k;lo<--hi;++lo)
-          {
-            var tmp=arr[lo];
-            arr[lo]=arr[hi];
-            arr[hi]=tmp;
-          }
+          OmniArray.OfFloat.reverseRange(arr,run[count],k-1);
         }
         else
         {
@@ -2066,10 +2120,28 @@ public final class SortUtil
         }
         run[count]=k;
       }
-      if(count==0 || (count==1 && run[count]>end))
+      if(count==0)
       {
         return;
       }
+      if(count==1)
+      {
+        if(run[count]>end)
+        {
+          return;
+        }
+      }
+      else
+      {
+        if(run[count]>end)
+        {
+          System.out.println("branch");
+        }
+      }
+      //if(count==0 || (count==1 && run[count]>end))
+      //{
+      //  return;
+      //}
       if(run[count]<++end)
       {
         run[++count]=end;
@@ -2088,6 +2160,7 @@ public final class SortUtil
       int[] run;
       int count=0;
       (run=new int[68])[0]=begin;
+      //checkIfSortedLoop:
       for(int k=begin;k!=end;)
       {
         if(
@@ -2096,8 +2169,7 @@ public final class SortUtil
         {
           for(;;)
           {
-            if(++k>end
-            ||
+            if(++k>=end ||
             (arr[k])<(arr[k-1])
             )
             {
@@ -2112,20 +2184,14 @@ public final class SortUtil
         {
           for(;;)
           {
-            if(++k>end
-            ||
+            if(++k>=end ||
             (arr[k-1])<(arr[k])
             )
             {
               break;
             }
           }
-          for(int lo=run[count],hi=k;lo<--hi;++lo)
-          {
-            var tmp=arr[lo];
-            arr[lo]=arr[hi];
-            arr[hi]=tmp;
-          }
+          OmniArray.OfDouble.reverseRange(arr,run[count],k-1);
         }
         else
         {
@@ -2144,10 +2210,28 @@ public final class SortUtil
         }
         run[count]=k;
       }
-      if(count==0 || (count==1 && run[count]>end))
+      if(count==0)
       {
         return;
       }
+      if(count==1)
+      {
+        if(run[count]>end)
+        {
+          return;
+        }
+      }
+      else
+      {
+        if(run[count]>end)
+        {
+          System.out.println("branch");
+        }
+      }
+      //if(count==0 || (count==1 && run[count]>end))
+      //{
+      //  return;
+      //}
       if(run[count]<++end)
       {
         run[++count]=end;
@@ -2166,6 +2250,7 @@ public final class SortUtil
       int[] run;
       int count=0;
       (run=new int[68])[0]=begin;
+      //checkIfSortedLoop:
       for(int k=begin;k!=end;)
       {
         switch(
@@ -2175,8 +2260,7 @@ public final class SortUtil
         case -1:
           for(;;)
           {
-            if(++k>end
-            ||
+            if(++k>=end ||
             (arr[k])>=(arr[k-1])
             )
             {
@@ -2187,20 +2271,14 @@ public final class SortUtil
         default:
           for(;;)
           {
-            if(++k>end
-            ||
+            if(++k>=end ||
             (arr[k-1])>=(arr[k])
             )
             {
               break;
             }
           }
-          for(int lo=run[count],hi=k;lo<--hi;++lo)
-          {
-            var tmp=arr[lo];
-            arr[lo]=arr[hi];
-            arr[hi]=tmp;
-          }
+          OmniArray.OfChar.reverseRange(arr,run[count],k-1);
           break;
         case 0:
           ++k;
@@ -2218,10 +2296,28 @@ public final class SortUtil
         }
         run[count]=k;
       }
-      if(count==0 || (count==1 && run[count]>end))
+      if(count==0)
       {
         return;
       }
+      if(count==1)
+      {
+        if(run[count]>end)
+        {
+          return;
+        }
+      }
+      else
+      {
+        if(run[count]>end)
+        {
+          System.out.println("branch");
+        }
+      }
+      //if(count==0 || (count==1 && run[count]>end))
+      //{
+      //  return;
+      //}
       if(run[count]<++end)
       {
         run[++count]=end;
@@ -2240,6 +2336,7 @@ public final class SortUtil
       int[] run;
       int count=0;
       (run=new int[68])[0]=begin;
+      //checkIfSortedLoop:
       for(int k=begin;k!=end;)
       {
         switch(
@@ -2249,8 +2346,7 @@ public final class SortUtil
         case -1:
           for(;;)
           {
-            if(++k>end
-            ||
+            if(++k>=end ||
             (arr[k])>=(arr[k-1])
             )
             {
@@ -2261,20 +2357,14 @@ public final class SortUtil
         default:
           for(;;)
           {
-            if(++k>end
-            ||
+            if(++k>=end ||
             (arr[k-1])>=(arr[k])
             )
             {
               break;
             }
           }
-          for(int lo=run[count],hi=k;lo<--hi;++lo)
-          {
-            var tmp=arr[lo];
-            arr[lo]=arr[hi];
-            arr[hi]=tmp;
-          }
+          OmniArray.OfShort.reverseRange(arr,run[count],k-1);
           break;
         case 0:
           ++k;
@@ -2292,10 +2382,28 @@ public final class SortUtil
         }
         run[count]=k;
       }
-      if(count==0 || (count==1 && run[count]>end))
+      if(count==0)
       {
         return;
       }
+      if(count==1)
+      {
+        if(run[count]>end)
+        {
+          return;
+        }
+      }
+      else
+      {
+        if(run[count]>end)
+        {
+          System.out.println("branch");
+        }
+      }
+      //if(count==0 || (count==1 && run[count]>end))
+      //{
+      //  return;
+      //}
       if(run[count]<++end)
       {
         run[++count]=end;
@@ -2314,6 +2422,7 @@ public final class SortUtil
       int[] run;
       int count=0;
       (run=new int[68])[0]=begin;
+      //checkIfSortedLoop:
       for(int k=begin;k!=end;)
       {
         switch(
@@ -2323,8 +2432,7 @@ public final class SortUtil
         case -1:
           for(;;)
           {
-            if(++k>end
-            ||
+            if(++k>=end ||
             (arr[k])>=(arr[k-1])
             )
             {
@@ -2335,20 +2443,14 @@ public final class SortUtil
         default:
           for(;;)
           {
-            if(++k>end
-            ||
+            if(++k>=end ||
             (arr[k-1])>=(arr[k])
             )
             {
               break;
             }
           }
-          for(int lo=run[count],hi=k;lo<--hi;++lo)
-          {
-            var tmp=arr[lo];
-            arr[lo]=arr[hi];
-            arr[hi]=tmp;
-          }
+          OmniArray.OfInt.reverseRange(arr,run[count],k-1);
           break;
         case 0:
           ++k;
@@ -2366,10 +2468,28 @@ public final class SortUtil
         }
         run[count]=k;
       }
-      if(count==0 || (count==1 && run[count]>end))
+      if(count==0)
       {
         return;
       }
+      if(count==1)
+      {
+        if(run[count]>end)
+        {
+          return;
+        }
+      }
+      else
+      {
+        if(run[count]>end)
+        {
+          System.out.println("branch");
+        }
+      }
+      //if(count==0 || (count==1 && run[count]>end))
+      //{
+      //  return;
+      //}
       if(run[count]<++end)
       {
         run[++count]=end;
@@ -2388,6 +2508,7 @@ public final class SortUtil
       int[] run;
       int count=0;
       (run=new int[68])[0]=begin;
+      //checkIfSortedLoop:
       for(int k=begin;k!=end;)
       {
         switch(
@@ -2397,8 +2518,7 @@ public final class SortUtil
         case -1:
           for(;;)
           {
-            if(++k>end
-            ||
+            if(++k>=end ||
             (arr[k])>=(arr[k-1])
             )
             {
@@ -2409,20 +2529,14 @@ public final class SortUtil
         default:
           for(;;)
           {
-            if(++k>end
-            ||
+            if(++k>=end ||
             (arr[k-1])>=(arr[k])
             )
             {
               break;
             }
           }
-          for(int lo=run[count],hi=k;lo<--hi;++lo)
-          {
-            var tmp=arr[lo];
-            arr[lo]=arr[hi];
-            arr[hi]=tmp;
-          }
+          OmniArray.OfLong.reverseRange(arr,run[count],k-1);
           break;
         case 0:
           ++k;
@@ -2440,10 +2554,28 @@ public final class SortUtil
         }
         run[count]=k;
       }
-      if(count==0 || (count==1 && run[count]>end))
+      if(count==0)
       {
         return;
       }
+      if(count==1)
+      {
+        if(run[count]>end)
+        {
+          return;
+        }
+      }
+      else
+      {
+        if(run[count]>end)
+        {
+          System.out.println("branch");
+        }
+      }
+      //if(count==0 || (count==1 && run[count]>end))
+      //{
+      //  return;
+      //}
       if(run[count]<++end)
       {
         run[++count]=end;
@@ -2462,6 +2594,7 @@ public final class SortUtil
       int[] run;
       int count=0;
       (run=new int[68])[0]=begin;
+      //checkIfSortedLoop:
       for(int k=begin;k!=end;)
       {
         if(
@@ -2470,8 +2603,7 @@ public final class SortUtil
         {
           for(;;)
           {
-            if(++k>end
-            ||
+            if(++k>=end ||
             (arr[k])>=(arr[k-1])
             )
             {
@@ -2486,20 +2618,14 @@ public final class SortUtil
         {
           for(;;)
           {
-            if(++k>end
-            ||
+            if(++k>=end ||
             (arr[k-1])>=(arr[k])
             )
             {
               break;
             }
           }
-          for(int lo=run[count],hi=k;lo<--hi;++lo)
-          {
-            var tmp=arr[lo];
-            arr[lo]=arr[hi];
-            arr[hi]=tmp;
-          }
+          OmniArray.OfFloat.reverseRange(arr,run[count],k-1);
         }
         else
         {
@@ -2518,10 +2644,28 @@ public final class SortUtil
         }
         run[count]=k;
       }
-      if(count==0 || (count==1 && run[count]>end))
+      if(count==0)
       {
         return;
       }
+      if(count==1)
+      {
+        if(run[count]>end)
+        {
+          return;
+        }
+      }
+      else
+      {
+        if(run[count]>end)
+        {
+          System.out.println("branch");
+        }
+      }
+      //if(count==0 || (count==1 && run[count]>end))
+      //{
+      //  return;
+      //}
       if(run[count]<++end)
       {
         run[++count]=end;
@@ -2540,6 +2684,7 @@ public final class SortUtil
       int[] run;
       int count=0;
       (run=new int[68])[0]=begin;
+      //checkIfSortedLoop:
       for(int k=begin;k!=end;)
       {
         if(
@@ -2548,8 +2693,7 @@ public final class SortUtil
         {
           for(;;)
           {
-            if(++k>end
-            ||
+            if(++k>=end ||
             (arr[k])>=(arr[k-1])
             )
             {
@@ -2564,20 +2708,14 @@ public final class SortUtil
         {
           for(;;)
           {
-            if(++k>end
-            ||
+            if(++k>=end ||
             (arr[k-1])>=(arr[k])
             )
             {
               break;
             }
           }
-          for(int lo=run[count],hi=k;lo<--hi;++lo)
-          {
-            var tmp=arr[lo];
-            arr[lo]=arr[hi];
-            arr[hi]=tmp;
-          }
+          OmniArray.OfDouble.reverseRange(arr,run[count],k-1);
         }
         else
         {
@@ -2596,10 +2734,28 @@ public final class SortUtil
         }
         run[count]=k;
       }
-      if(count==0 || (count==1 && run[count]>end))
+      if(count==0)
       {
         return;
       }
+      if(count==1)
+      {
+        if(run[count]>end)
+        {
+          return;
+        }
+      }
+      else
+      {
+        if(run[count]>end)
+        {
+          System.out.println("branch");
+        }
+      }
+      //if(count==0 || (count==1 && run[count]>end))
+      //{
+      //  return;
+      //}
       if(run[count]<++end)
       {
         run[++count]=end;
@@ -2648,8 +2804,16 @@ public final class SortUtil
         --great;
       }
     }
-    quicksortleftmost(arr,begin,less-1);
+    if(--less>begin)
+    {
+    quicksortleftmost(arr,begin,less);
+    }
     quicksort(arr,great+1,end);
+    //TODO check to see if this is necessary
+    //if(++great!=end)
+    //{
+    //  quicksort(arr,great,end);
+    //}
   }
   private static void quicksortleftmostDualPivot(char[] arr,int begin,int end,char pivot1, char pivot2,int e1,int e5)
   {
@@ -2939,8 +3103,16 @@ public final class SortUtil
         --great;
       }
     }
-    quicksortleftmost(arr,begin,less-1);
+    if(--less>begin)
+    {
+    quicksortleftmost(arr,begin,less);
+    }
     quicksort(arr,great+1,end);
+    //TODO check to see if this is necessary
+    //if(++great!=end)
+    //{
+    //  quicksort(arr,great,end);
+    //}
   }
   private static void quicksortleftmostDualPivot(short[] arr,int begin,int end,short pivot1, short pivot2,int e1,int e5)
   {
@@ -3230,8 +3402,16 @@ public final class SortUtil
         --great;
       }
     }
-    quicksortleftmost(arr,begin,less-1);
+    if(--less>begin)
+    {
+    quicksortleftmost(arr,begin,less);
+    }
     quicksort(arr,great+1,end);
+    //TODO check to see if this is necessary
+    //if(++great!=end)
+    //{
+    //  quicksort(arr,great,end);
+    //}
   }
   private static void quicksortleftmostDualPivot(int[] arr,int begin,int end,int pivot1, int pivot2,int e1,int e5)
   {
@@ -3521,8 +3701,16 @@ public final class SortUtil
         --great;
       }
     }
-    quicksortleftmost(arr,begin,less-1);
+    if(--less>begin)
+    {
+    quicksortleftmost(arr,begin,less);
+    }
     quicksort(arr,great+1,end);
+    //TODO check to see if this is necessary
+    //if(++great!=end)
+    //{
+    //  quicksort(arr,great,end);
+    //}
   }
   private static void quicksortleftmostDualPivot(long[] arr,int begin,int end,long pivot1, long pivot2,int e1,int e5)
   {
@@ -3814,8 +4002,16 @@ public final class SortUtil
         --great;
       }
     }
-    quicksortleftmost(arr,begin,less-1);
+    if(--less>begin)
+    {
+    quicksortleftmost(arr,begin,less);
+    }
     quicksort(arr,great+1,end);
+    //TODO check to see if this is necessary
+    //if(++great!=end)
+    //{
+    //  quicksort(arr,great,end);
+    //}
   }
   private static void quicksortleftmostDualPivot(float[] arr,int begin,int end,float pivot1, float pivot2,int e1,int e5)
   {
@@ -4107,8 +4303,16 @@ public final class SortUtil
         --great;
       }
     }
-    quicksortleftmost(arr,begin,less-1);
+    if(--less>begin)
+    {
+    quicksortleftmost(arr,begin,less);
+    }
     quicksort(arr,great+1,end);
+    //TODO check to see if this is necessary
+    //if(++great!=end)
+    //{
+    //  quicksort(arr,great,end);
+    //}
   }
   private static void quicksortleftmostDualPivot(double[] arr,int begin,int end,double pivot1, double pivot2,int e1,int e5)
   {
@@ -4398,8 +4602,16 @@ public final class SortUtil
         --great;
       }
     }
-    quicksort(arr,begin,less-1);
+    if(--less>begin)
+    {
+    quicksort(arr,begin,less);
+    }
     quicksort(arr,great+1,end);
+    //TODO check to see if this is necessary
+    //if(++great!=end)
+    //{
+    //  quicksort(arr,great,end);
+    //}
   }
   private static void quicksortDualPivot(char[] arr,int begin,int end,char pivot1, char pivot2,int e1,int e5)
   {
@@ -4689,8 +4901,16 @@ public final class SortUtil
         --great;
       }
     }
-    quicksort(arr,begin,less-1);
+    if(--less>begin)
+    {
+    quicksort(arr,begin,less);
+    }
     quicksort(arr,great+1,end);
+    //TODO check to see if this is necessary
+    //if(++great!=end)
+    //{
+    //  quicksort(arr,great,end);
+    //}
   }
   private static void quicksortDualPivot(short[] arr,int begin,int end,short pivot1, short pivot2,int e1,int e5)
   {
@@ -4980,8 +5200,16 @@ public final class SortUtil
         --great;
       }
     }
-    quicksort(arr,begin,less-1);
+    if(--less>begin)
+    {
+    quicksort(arr,begin,less);
+    }
     quicksort(arr,great+1,end);
+    //TODO check to see if this is necessary
+    //if(++great!=end)
+    //{
+    //  quicksort(arr,great,end);
+    //}
   }
   private static void quicksortDualPivot(int[] arr,int begin,int end,int pivot1, int pivot2,int e1,int e5)
   {
@@ -5271,8 +5499,16 @@ public final class SortUtil
         --great;
       }
     }
-    quicksort(arr,begin,less-1);
+    if(--less>begin)
+    {
+    quicksort(arr,begin,less);
+    }
     quicksort(arr,great+1,end);
+    //TODO check to see if this is necessary
+    //if(++great!=end)
+    //{
+    //  quicksort(arr,great,end);
+    //}
   }
   private static void quicksortDualPivot(long[] arr,int begin,int end,long pivot1, long pivot2,int e1,int e5)
   {
@@ -5564,8 +5800,16 @@ public final class SortUtil
         --great;
       }
     }
-    quicksort(arr,begin,less-1);
+    if(--less>begin)
+    {
+    quicksort(arr,begin,less);
+    }
     quicksort(arr,great+1,end);
+    //TODO check to see if this is necessary
+    //if(++great!=end)
+    //{
+    //  quicksort(arr,great,end);
+    //}
   }
   private static void quicksortDualPivot(float[] arr,int begin,int end,float pivot1, float pivot2,int e1,int e5)
   {
@@ -5857,8 +6101,16 @@ public final class SortUtil
         --great;
       }
     }
-    quicksort(arr,begin,less-1);
+    if(--less>begin)
+    {
+    quicksort(arr,begin,less);
+    }
     quicksort(arr,great+1,end);
+    //TODO check to see if this is necessary
+    //if(++great!=end)
+    //{
+    //  quicksort(arr,great,end);
+    //}
   }
   private static void quicksortDualPivot(double[] arr,int begin,int end,double pivot1, double pivot2,int e1,int e5)
   {
@@ -6148,8 +6400,16 @@ public final class SortUtil
         --great;
       }
     }
-    quickreverseSortleftmost(arr,begin,less-1);
+    if(--less>begin)
+    {
+    quickreverseSortleftmost(arr,begin,less);
+    }
     quickreverseSort(arr,great+1,end);
+    //TODO check to see if this is necessary
+    //if(++great!=end)
+    //{
+    //  quickreverseSort(arr,great,end);
+    //}
   }
   private static void quickreverseSortleftmostDualPivot(char[] arr,int begin,int end,char pivot1, char pivot2,int e1,int e5)
   {
@@ -6439,8 +6699,16 @@ public final class SortUtil
         --great;
       }
     }
-    quickreverseSortleftmost(arr,begin,less-1);
+    if(--less>begin)
+    {
+    quickreverseSortleftmost(arr,begin,less);
+    }
     quickreverseSort(arr,great+1,end);
+    //TODO check to see if this is necessary
+    //if(++great!=end)
+    //{
+    //  quickreverseSort(arr,great,end);
+    //}
   }
   private static void quickreverseSortleftmostDualPivot(short[] arr,int begin,int end,short pivot1, short pivot2,int e1,int e5)
   {
@@ -6730,8 +6998,16 @@ public final class SortUtil
         --great;
       }
     }
-    quickreverseSortleftmost(arr,begin,less-1);
+    if(--less>begin)
+    {
+    quickreverseSortleftmost(arr,begin,less);
+    }
     quickreverseSort(arr,great+1,end);
+    //TODO check to see if this is necessary
+    //if(++great!=end)
+    //{
+    //  quickreverseSort(arr,great,end);
+    //}
   }
   private static void quickreverseSortleftmostDualPivot(int[] arr,int begin,int end,int pivot1, int pivot2,int e1,int e5)
   {
@@ -7021,8 +7297,16 @@ public final class SortUtil
         --great;
       }
     }
-    quickreverseSortleftmost(arr,begin,less-1);
+    if(--less>begin)
+    {
+    quickreverseSortleftmost(arr,begin,less);
+    }
     quickreverseSort(arr,great+1,end);
+    //TODO check to see if this is necessary
+    //if(++great!=end)
+    //{
+    //  quickreverseSort(arr,great,end);
+    //}
   }
   private static void quickreverseSortleftmostDualPivot(long[] arr,int begin,int end,long pivot1, long pivot2,int e1,int e5)
   {
@@ -7314,8 +7598,16 @@ public final class SortUtil
         --great;
       }
     }
-    quickreverseSortleftmost(arr,begin,less-1);
+    if(--less>begin)
+    {
+    quickreverseSortleftmost(arr,begin,less);
+    }
     quickreverseSort(arr,great+1,end);
+    //TODO check to see if this is necessary
+    //if(++great!=end)
+    //{
+    //  quickreverseSort(arr,great,end);
+    //}
   }
   private static void quickreverseSortleftmostDualPivot(float[] arr,int begin,int end,float pivot1, float pivot2,int e1,int e5)
   {
@@ -7607,8 +7899,16 @@ public final class SortUtil
         --great;
       }
     }
-    quickreverseSortleftmost(arr,begin,less-1);
+    if(--less>begin)
+    {
+    quickreverseSortleftmost(arr,begin,less);
+    }
     quickreverseSort(arr,great+1,end);
+    //TODO check to see if this is necessary
+    //if(++great!=end)
+    //{
+    //  quickreverseSort(arr,great,end);
+    //}
   }
   private static void quickreverseSortleftmostDualPivot(double[] arr,int begin,int end,double pivot1, double pivot2,int e1,int e5)
   {
@@ -7898,8 +8198,16 @@ public final class SortUtil
         --great;
       }
     }
-    quickreverseSort(arr,begin,less-1);
+    if(--less>begin)
+    {
+    quickreverseSort(arr,begin,less);
+    }
     quickreverseSort(arr,great+1,end);
+    //TODO check to see if this is necessary
+    //if(++great!=end)
+    //{
+    //  quickreverseSort(arr,great,end);
+    //}
   }
   private static void quickreverseSortDualPivot(char[] arr,int begin,int end,char pivot1, char pivot2,int e1,int e5)
   {
@@ -8189,8 +8497,16 @@ public final class SortUtil
         --great;
       }
     }
-    quickreverseSort(arr,begin,less-1);
+    if(--less>begin)
+    {
+    quickreverseSort(arr,begin,less);
+    }
     quickreverseSort(arr,great+1,end);
+    //TODO check to see if this is necessary
+    //if(++great!=end)
+    //{
+    //  quickreverseSort(arr,great,end);
+    //}
   }
   private static void quickreverseSortDualPivot(short[] arr,int begin,int end,short pivot1, short pivot2,int e1,int e5)
   {
@@ -8480,8 +8796,16 @@ public final class SortUtil
         --great;
       }
     }
-    quickreverseSort(arr,begin,less-1);
+    if(--less>begin)
+    {
+    quickreverseSort(arr,begin,less);
+    }
     quickreverseSort(arr,great+1,end);
+    //TODO check to see if this is necessary
+    //if(++great!=end)
+    //{
+    //  quickreverseSort(arr,great,end);
+    //}
   }
   private static void quickreverseSortDualPivot(int[] arr,int begin,int end,int pivot1, int pivot2,int e1,int e5)
   {
@@ -8771,8 +9095,16 @@ public final class SortUtil
         --great;
       }
     }
-    quickreverseSort(arr,begin,less-1);
+    if(--less>begin)
+    {
+    quickreverseSort(arr,begin,less);
+    }
     quickreverseSort(arr,great+1,end);
+    //TODO check to see if this is necessary
+    //if(++great!=end)
+    //{
+    //  quickreverseSort(arr,great,end);
+    //}
   }
   private static void quickreverseSortDualPivot(long[] arr,int begin,int end,long pivot1, long pivot2,int e1,int e5)
   {
@@ -9064,8 +9396,16 @@ public final class SortUtil
         --great;
       }
     }
-    quickreverseSort(arr,begin,less-1);
+    if(--less>begin)
+    {
+    quickreverseSort(arr,begin,less);
+    }
     quickreverseSort(arr,great+1,end);
+    //TODO check to see if this is necessary
+    //if(++great!=end)
+    //{
+    //  quickreverseSort(arr,great,end);
+    //}
   }
   private static void quickreverseSortDualPivot(float[] arr,int begin,int end,float pivot1, float pivot2,int e1,int e5)
   {
@@ -9357,8 +9697,16 @@ public final class SortUtil
         --great;
       }
     }
-    quickreverseSort(arr,begin,less-1);
+    if(--less>begin)
+    {
+    quickreverseSort(arr,begin,less);
+    }
     quickreverseSort(arr,great+1,end);
+    //TODO check to see if this is necessary
+    //if(++great!=end)
+    //{
+    //  quickreverseSort(arr,great,end);
+    //}
   }
   private static void quickreverseSortDualPivot(double[] arr,int begin,int end,double pivot1, double pivot2,int e1,int e5)
   {
