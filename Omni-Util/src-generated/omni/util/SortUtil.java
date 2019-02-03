@@ -1103,28 +1103,28 @@ public final class SortUtil
       arr[j+1]=ai;
     }
   }
-  private static void sentinelInsertsort(char[] arr,int left,int right)
+  private static void sentinelInsertsort(char[] arr,int begin,int end)
   {
     do
     {
-      if(left>=right)
+      if(begin>=end)
       {
         return;
       }
     }
     while(
-    (arr[left])<=(arr[++left])
+    (arr[begin])<=(arr[++begin])
     )
     ;
-    for(int k=left;++left<=right;k=++left)
+    for(int k=begin;++begin<=end;k=++begin)
     {
       char a1,a2;
       if(
-      (a1=arr[k])<(a2=arr[left])
+      (a1=arr[k])<(a2=arr[begin])
       )
       {
         a2=a1;
-        a1=arr[left];
+        a1=arr[begin];
       }
       char ak;
       while(
@@ -1142,37 +1142,37 @@ public final class SortUtil
       }
       arr[k+1]=a2;
     }
-    char ar,last=arr[right];
+    char ae,last=arr[end];
     while(
-    (last)<(ar=arr[--right])
+    (last)<(ae=arr[--end])
     )
     {
-      arr[right+1]=ar;
+      arr[end+1]=ae;
     }
-    arr[right+1]=last;
+    arr[end+1]=last;
   }
-  private static void sentinelInsertsort(short[] arr,int left,int right)
+  private static void sentinelInsertsort(short[] arr,int begin,int end)
   {
     do
     {
-      if(left>=right)
+      if(begin>=end)
       {
         return;
       }
     }
     while(
-    (arr[left])<=(arr[++left])
+    (arr[begin])<=(arr[++begin])
     )
     ;
-    for(int k=left;++left<=right;k=++left)
+    for(int k=begin;++begin<=end;k=++begin)
     {
       short a1,a2;
       if(
-      (a1=arr[k])<(a2=arr[left])
+      (a1=arr[k])<(a2=arr[begin])
       )
       {
         a2=a1;
-        a1=arr[left];
+        a1=arr[begin];
       }
       short ak;
       while(
@@ -1190,37 +1190,37 @@ public final class SortUtil
       }
       arr[k+1]=a2;
     }
-    short ar,last=arr[right];
+    short ae,last=arr[end];
     while(
-    (last)<(ar=arr[--right])
+    (last)<(ae=arr[--end])
     )
     {
-      arr[right+1]=ar;
+      arr[end+1]=ae;
     }
-    arr[right+1]=last;
+    arr[end+1]=last;
   }
-  private static void sentinelInsertsort(int[] arr,int left,int right)
+  private static void sentinelInsertsort(int[] arr,int begin,int end)
   {
     do
     {
-      if(left>=right)
+      if(begin>=end)
       {
         return;
       }
     }
     while(
-    (arr[left])<=(arr[++left])
+    (arr[begin])<=(arr[++begin])
     )
     ;
-    for(int k=left;++left<=right;k=++left)
+    for(int k=begin;++begin<=end;k=++begin)
     {
       int a1,a2;
       if(
-      (a1=arr[k])<(a2=arr[left])
+      (a1=arr[k])<(a2=arr[begin])
       )
       {
         a2=a1;
-        a1=arr[left];
+        a1=arr[begin];
       }
       int ak;
       while(
@@ -1238,37 +1238,37 @@ public final class SortUtil
       }
       arr[k+1]=a2;
     }
-    int ar,last=arr[right];
+    int ae,last=arr[end];
     while(
-    (last)<(ar=arr[--right])
+    (last)<(ae=arr[--end])
     )
     {
-      arr[right+1]=ar;
+      arr[end+1]=ae;
     }
-    arr[right+1]=last;
+    arr[end+1]=last;
   }
-  private static void sentinelInsertsort(long[] arr,int left,int right)
+  private static void sentinelInsertsort(long[] arr,int begin,int end)
   {
     do
     {
-      if(left>=right)
+      if(begin>=end)
       {
         return;
       }
     }
     while(
-    (arr[left])<=(arr[++left])
+    (arr[begin])<=(arr[++begin])
     )
     ;
-    for(int k=left;++left<=right;k=++left)
+    for(int k=begin;++begin<=end;k=++begin)
     {
       long a1,a2;
       if(
-      (a1=arr[k])<(a2=arr[left])
+      (a1=arr[k])<(a2=arr[begin])
       )
       {
         a2=a1;
-        a1=arr[left];
+        a1=arr[begin];
       }
       long ak;
       while(
@@ -1286,37 +1286,37 @@ public final class SortUtil
       }
       arr[k+1]=a2;
     }
-    long ar,last=arr[right];
+    long ae,last=arr[end];
     while(
-    (last)<(ar=arr[--right])
+    (last)<(ae=arr[--end])
     )
     {
-      arr[right+1]=ar;
+      arr[end+1]=ae;
     }
-    arr[right+1]=last;
+    arr[end+1]=last;
   }
-  private static void sentinelInsertsort(float[] arr,int left,int right)
+  private static void sentinelInsertsort(float[] arr,int begin,int end)
   {
     do
     {
-      if(left>=right)
+      if(begin>=end)
       {
         return;
       }
     }
     while(
-    (arr[left])<=(arr[++left])
+    (arr[begin])<=(arr[++begin])
     )
     ;
-    for(int k=left;++left<=right;k=++left)
+    for(int k=begin;++begin<=end;k=++begin)
     {
       float a1,a2;
       if(
-      (a1=arr[k])<(a2=arr[left])
+      (a1=arr[k])<(a2=arr[begin])
       )
       {
         a2=a1;
-        a1=arr[left];
+        a1=arr[begin];
       }
       float ak;
       while(
@@ -1334,37 +1334,37 @@ public final class SortUtil
       }
       arr[k+1]=a2;
     }
-    float ar,last=arr[right];
+    float ae,last=arr[end];
     while(
-    (last)<(ar=arr[--right])
+    (last)<(ae=arr[--end])
     )
     {
-      arr[right+1]=ar;
+      arr[end+1]=ae;
     }
-    arr[right+1]=last;
+    arr[end+1]=last;
   }
-  private static void sentinelInsertsort(double[] arr,int left,int right)
+  private static void sentinelInsertsort(double[] arr,int begin,int end)
   {
     do
     {
-      if(left>=right)
+      if(begin>=end)
       {
         return;
       }
     }
     while(
-    (arr[left])<=(arr[++left])
+    (arr[begin])<=(arr[++begin])
     )
     ;
-    for(int k=left;++left<=right;k=++left)
+    for(int k=begin;++begin<=end;k=++begin)
     {
       double a1,a2;
       if(
-      (a1=arr[k])<(a2=arr[left])
+      (a1=arr[k])<(a2=arr[begin])
       )
       {
         a2=a1;
-        a1=arr[left];
+        a1=arr[begin];
       }
       double ak;
       while(
@@ -1382,37 +1382,37 @@ public final class SortUtil
       }
       arr[k+1]=a2;
     }
-    double ar,last=arr[right];
+    double ae,last=arr[end];
     while(
-    (last)<(ar=arr[--right])
+    (last)<(ae=arr[--end])
     )
     {
-      arr[right+1]=ar;
+      arr[end+1]=ae;
     }
-    arr[right+1]=last;
+    arr[end+1]=last;
   }
-  private static void sentinelInsertreverseSort(char[] arr,int left,int right)
+  private static void sentinelInsertreverseSort(char[] arr,int begin,int end)
   {
     do
     {
-      if(left>=right)
+      if(begin>=end)
       {
         return;
       }
     }
     while(
-    (arr[left])>=(arr[++left])
+    (arr[begin])>=(arr[++begin])
     )
     ;
-    for(int k=left;++left<=right;k=++left)
+    for(int k=begin;++begin<=end;k=++begin)
     {
       char a1,a2;
       if(
-      (a1=arr[k])>=(a2=arr[left])
+      (a1=arr[k])>=(a2=arr[begin])
       )
       {
         a2=a1;
-        a1=arr[left];
+        a1=arr[begin];
       }
       char ak;
       while(
@@ -1430,37 +1430,37 @@ public final class SortUtil
       }
       arr[k+1]=a2;
     }
-    char ar,last=arr[right];
+    char ae,last=arr[end];
     while(
-    (last)>(ar=arr[--right])
+    (last)>(ae=arr[--end])
     )
     {
-      arr[right+1]=ar;
+      arr[end+1]=ae;
     }
-    arr[right+1]=last;
+    arr[end+1]=last;
   }
-  private static void sentinelInsertreverseSort(short[] arr,int left,int right)
+  private static void sentinelInsertreverseSort(short[] arr,int begin,int end)
   {
     do
     {
-      if(left>=right)
+      if(begin>=end)
       {
         return;
       }
     }
     while(
-    (arr[left])>=(arr[++left])
+    (arr[begin])>=(arr[++begin])
     )
     ;
-    for(int k=left;++left<=right;k=++left)
+    for(int k=begin;++begin<=end;k=++begin)
     {
       short a1,a2;
       if(
-      (a1=arr[k])>=(a2=arr[left])
+      (a1=arr[k])>=(a2=arr[begin])
       )
       {
         a2=a1;
-        a1=arr[left];
+        a1=arr[begin];
       }
       short ak;
       while(
@@ -1478,37 +1478,37 @@ public final class SortUtil
       }
       arr[k+1]=a2;
     }
-    short ar,last=arr[right];
+    short ae,last=arr[end];
     while(
-    (last)>(ar=arr[--right])
+    (last)>(ae=arr[--end])
     )
     {
-      arr[right+1]=ar;
+      arr[end+1]=ae;
     }
-    arr[right+1]=last;
+    arr[end+1]=last;
   }
-  private static void sentinelInsertreverseSort(int[] arr,int left,int right)
+  private static void sentinelInsertreverseSort(int[] arr,int begin,int end)
   {
     do
     {
-      if(left>=right)
+      if(begin>=end)
       {
         return;
       }
     }
     while(
-    (arr[left])>=(arr[++left])
+    (arr[begin])>=(arr[++begin])
     )
     ;
-    for(int k=left;++left<=right;k=++left)
+    for(int k=begin;++begin<=end;k=++begin)
     {
       int a1,a2;
       if(
-      (a1=arr[k])>=(a2=arr[left])
+      (a1=arr[k])>=(a2=arr[begin])
       )
       {
         a2=a1;
-        a1=arr[left];
+        a1=arr[begin];
       }
       int ak;
       while(
@@ -1526,37 +1526,37 @@ public final class SortUtil
       }
       arr[k+1]=a2;
     }
-    int ar,last=arr[right];
+    int ae,last=arr[end];
     while(
-    (last)>(ar=arr[--right])
+    (last)>(ae=arr[--end])
     )
     {
-      arr[right+1]=ar;
+      arr[end+1]=ae;
     }
-    arr[right+1]=last;
+    arr[end+1]=last;
   }
-  private static void sentinelInsertreverseSort(long[] arr,int left,int right)
+  private static void sentinelInsertreverseSort(long[] arr,int begin,int end)
   {
     do
     {
-      if(left>=right)
+      if(begin>=end)
       {
         return;
       }
     }
     while(
-    (arr[left])>=(arr[++left])
+    (arr[begin])>=(arr[++begin])
     )
     ;
-    for(int k=left;++left<=right;k=++left)
+    for(int k=begin;++begin<=end;k=++begin)
     {
       long a1,a2;
       if(
-      (a1=arr[k])>=(a2=arr[left])
+      (a1=arr[k])>=(a2=arr[begin])
       )
       {
         a2=a1;
-        a1=arr[left];
+        a1=arr[begin];
       }
       long ak;
       while(
@@ -1574,37 +1574,37 @@ public final class SortUtil
       }
       arr[k+1]=a2;
     }
-    long ar,last=arr[right];
+    long ae,last=arr[end];
     while(
-    (last)>(ar=arr[--right])
+    (last)>(ae=arr[--end])
     )
     {
-      arr[right+1]=ar;
+      arr[end+1]=ae;
     }
-    arr[right+1]=last;
+    arr[end+1]=last;
   }
-  private static void sentinelInsertreverseSort(float[] arr,int left,int right)
+  private static void sentinelInsertreverseSort(float[] arr,int begin,int end)
   {
     do
     {
-      if(left>=right)
+      if(begin>=end)
       {
         return;
       }
     }
     while(
-    (arr[left])>=(arr[++left])
+    (arr[begin])>=(arr[++begin])
     )
     ;
-    for(int k=left;++left<=right;k=++left)
+    for(int k=begin;++begin<=end;k=++begin)
     {
       float a1,a2;
       if(
-      (a1=arr[k])>=(a2=arr[left])
+      (a1=arr[k])>=(a2=arr[begin])
       )
       {
         a2=a1;
-        a1=arr[left];
+        a1=arr[begin];
       }
       float ak;
       while(
@@ -1622,37 +1622,37 @@ public final class SortUtil
       }
       arr[k+1]=a2;
     }
-    float ar,last=arr[right];
+    float ae,last=arr[end];
     while(
-    (last)>(ar=arr[--right])
+    (last)>(ae=arr[--end])
     )
     {
-      arr[right+1]=ar;
+      arr[end+1]=ae;
     }
-    arr[right+1]=last;
+    arr[end+1]=last;
   }
-  private static void sentinelInsertreverseSort(double[] arr,int left,int right)
+  private static void sentinelInsertreverseSort(double[] arr,int begin,int end)
   {
     do
     {
-      if(left>=right)
+      if(begin>=end)
       {
         return;
       }
     }
     while(
-    (arr[left])>=(arr[++left])
+    (arr[begin])>=(arr[++begin])
     )
     ;
-    for(int k=left;++left<=right;k=++left)
+    for(int k=begin;++begin<=end;k=++begin)
     {
       double a1,a2;
       if(
-      (a1=arr[k])>=(a2=arr[left])
+      (a1=arr[k])>=(a2=arr[begin])
       )
       {
         a2=a1;
-        a1=arr[left];
+        a1=arr[begin];
       }
       double ak;
       while(
@@ -1670,14 +1670,14 @@ public final class SortUtil
       }
       arr[k+1]=a2;
     }
-    double ar,last=arr[right];
+    double ae,last=arr[end];
     while(
-    (last)>(ar=arr[--right])
+    (last)>(ae=arr[--end])
     )
     {
-      arr[right+1]=ar;
+      arr[end+1]=ae;
     }
-    arr[right+1]=last;
+    arr[end+1]=last;
   }
   public static void dosort(char[] arr,int begin,int end)
   {

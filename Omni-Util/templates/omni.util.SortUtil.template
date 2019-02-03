@@ -369,28 +369,28 @@ private static void insertMETHODNAME(ARRTYPE[] arr,int begin,int end)
   #MACRO SentinelInsertSort<reverseSort,float,float>()
   #MACRO SentinelInsertSort<reverseSort,double,double>()
 #MACRODEF SentinelInsertSort<METHODNAME,ARRTYPE,EXPOSEDTYPE>()
-private static void sentinelInsertMETHODNAME(ARRTYPE[] arr,int left,int right)
+private static void sentinelInsertMETHODNAME(ARRTYPE[] arr,int begin,int end)
 {
   do
   {
-    if(left>=right)
+    if(begin>=end)
     {
       return;
     }
   }
 #IFSWITCH METHODNAME==sort
-  #MACRO WhileClause(LessThanOrEqual,arr[left],arr[++left])
+  #MACRO WhileClause(LessThanOrEqual,arr[begin],arr[++begin])
 #ELSEIFSWITCH METHODNAME==reverseSort
-  #MACRO WhileClause(LessThan,arr[left],arr[++left])
+  #MACRO WhileClause(LessThan,arr[begin],arr[++begin])
 #ENDIF
   ;
-  for(int k=left;++left<=right;k=++left)
+  for(int k=begin;++begin<=end;k=++begin)
   {
     ARRTYPE a1,a2;
-    #MACRO IfClause(LessThan,a1=arr[k],a2=arr[left])
+    #MACRO IfClause(LessThan,a1=arr[k],a2=arr[begin])
     {
       a2=a1;
-      a1=arr[left];
+      a1=arr[begin];
     }
     ARRTYPE ak;
 #IFSWITCH METHODNAME==sort
@@ -412,16 +412,16 @@ private static void sentinelInsertMETHODNAME(ARRTYPE[] arr,int left,int right)
     }
     arr[k+1]=a2;
   }
-  ARRTYPE ar,last=arr[right];
+  ARRTYPE ae,last=arr[end];
 #IFSWITCH METHODNAME==sort
-  #MACRO WhileClause(LessThan,last,ar=arr[--right])
+  #MACRO WhileClause(LessThan,last,ae=arr[--end])
 #ELSEIFSWITCH METHODNAME==reverseSort
-  #MACRO WhileClause(LessThanOrEqual,last,ar=arr[--right])
+  #MACRO WhileClause(LessThanOrEqual,last,ae=arr[--end])
 #ENDIF
   {
-    arr[right+1]=ar;
+    arr[end+1]=ae;
   }
-  arr[right+1]=last;
+  arr[end+1]=last;
 }
 #ENDDEF
 
