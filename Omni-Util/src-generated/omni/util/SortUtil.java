@@ -7527,7 +7527,7 @@ public final class SortUtil
     {
       float ak;
       if(
-      (ak=arr[k])>=(pivot)
+      (ak=arr[k])>(pivot)
       )
       {
         arr[k]=arr[less];
@@ -7536,18 +7536,18 @@ public final class SortUtil
       }
       else
       if(
-      (ak)<=(pivot)
+      (ak)<(pivot)
       )
       {
         float ag;
         while(
-        (ag=arr[great])<=(pivot)
+        (ag=arr[great])<(pivot)
         )
         {
           --great;
         }
         if(
-        (ag)>=(pivot)
+        (ag)>(pivot)
         )
         {
           arr[k]=arr[less];
@@ -7828,7 +7828,7 @@ public final class SortUtil
     {
       double ak;
       if(
-      (ak=arr[k])>=(pivot)
+      (ak=arr[k])>(pivot)
       )
       {
         arr[k]=arr[less];
@@ -7837,18 +7837,18 @@ public final class SortUtil
       }
       else
       if(
-      (ak)<=(pivot)
+      (ak)<(pivot)
       )
       {
         double ag;
         while(
-        (ag=arr[great])<=(pivot)
+        (ag=arr[great])<(pivot)
         )
         {
           --great;
         }
         if(
-        (ag)>=(pivot)
+        (ag)>(pivot)
         )
         {
           arr[k]=arr[less];
@@ -9325,7 +9325,7 @@ public final class SortUtil
     {
       float ak;
       if(
-      (ak=arr[k])>=(pivot)
+      (ak=arr[k])>(pivot)
       )
       {
         arr[k]=arr[less];
@@ -9334,18 +9334,18 @@ public final class SortUtil
       }
       else
       if(
-      (ak)<=(pivot)
+      (ak)<(pivot)
       )
       {
         float ag;
         while(
-        (ag=arr[great])<=(pivot)
+        (ag=arr[great])<(pivot)
         )
         {
           --great;
         }
         if(
-        (ag)>=(pivot)
+        (ag)>(pivot)
         )
         {
           arr[k]=arr[less];
@@ -9626,7 +9626,7 @@ public final class SortUtil
     {
       double ak;
       if(
-      (ak=arr[k])>=(pivot)
+      (ak=arr[k])>(pivot)
       )
       {
         arr[k]=arr[less];
@@ -9635,18 +9635,18 @@ public final class SortUtil
       }
       else
       if(
-      (ak)<=(pivot)
+      (ak)<(pivot)
       )
       {
         double ag;
         while(
-        (ag=arr[great])<=(pivot)
+        (ag=arr[great])<(pivot)
         )
         {
           --great;
         }
         if(
-        (ag)>=(pivot)
+        (ag)>(pivot)
         )
         {
           arr[k]=arr[less];

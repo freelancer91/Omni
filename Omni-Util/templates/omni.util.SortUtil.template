@@ -586,21 +586,37 @@ private static void quickMETHODNAMESinglePivot(ARRTYPE[] arr,int begin,int end,A
   {
     ARRTYPE ak;
 #IFSWITCH ARRTYPE==double,float
+  #IFSWITCH METHODNAME==sort
     #MACRO IfClause(LessThan,ak=arr[k],pivot)
+  #ELSEIFSWITCH METHODNAME==reverseSort
+    #MACRO IfClause(LessThanOrEqual,ak=arr[k],pivot)
+  #ENDIF
     {
       arr[k]=arr[less];
       arr[less]=ak;
       ++less;
     }
     else
+  #IFSWITCH METHODNAME==sort
     #MACRO IfClause(GreaterThan,ak,pivot)
+  #ELSEIFSWITCH METHODNAME==reverseSort
+    #MACRO IfClause(GreaterThanOrEqual,ak,pivot)
+  #ENDIF
     {
       ARRTYPE ag;
+  #IFSWITCH METHODNAME==sort
       #MACRO WhileClause(GreaterThan,ag=arr[great],pivot)
+  #ELSEIFSWITCH METHODNAME==reverseSort
+      #MACRO WhileClause(GreaterThanOrEqual,ag=arr[great],pivot)
+  #ENDIF
       {
         --great;
       }
+  #IFSWITCH METHODNAME==sort
       #MACRO IfClause(LessThan,ag,pivot)
+  #ELSEIFSWITCH METHODNAME==reverseSort
+      #MACRO IfClause(LessThanOrEqual,ag,pivot)
+  #ENDIF
       {
         arr[k]=arr[less];
         arr[less]=ag;
