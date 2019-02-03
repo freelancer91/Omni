@@ -8,7 +8,7 @@ import omni.api.OmniIterator;
 import java.util.function.IntFunction;
 import java.util.NoSuchElementException;
 import omni.impl.CheckedCollection;
-import omni.util.BitSetUtils;
+import omni.util.BitSetUtil;
 import java.util.function.LongPredicate;
 import java.util.function.LongConsumer;
 import omni.impl.AbstractLongItr;
@@ -2935,7 +2935,7 @@ public class LongArrDeque implements OmniDeque.OfLong
               if((numTailSurvivors=tail-++tailOffset)!=0)
               {
                 final long[] survivors;
-                numTailSurvivors=LongArrSeq.markSurvivors(arr,survivors=BitSetUtils.getBitSet(numTailSurvivors),tailOffset,tail,filter);
+                numTailSurvivors=LongArrSeq.markSurvivors(arr,survivors=BitSetUtil.getBitSet(numTailSurvivors),tailOffset,tail,filter);
                 CheckedCollection.checkModCount(modCount,this.modCount);
                 arr[tailDstOffset++]=tailVal;
                 if(numTailSurvivors!=0)

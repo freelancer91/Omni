@@ -1,0 +1,67 @@
+#TYPEDEF OfGeneric
+package omni.util;
+import org.junit.Assert;
+import org.junit.Test;
+public class OmniPredTest
+{
+  #MACRO TestGetEqualsBitsPred(Flt,Float,float,Int)
+  #MACRO TestGetEqualsBitsPred(Dbl,Double,double,Long)
+#MACRODEF TestGetEqualsBitsPred(SHRTNAME,BOXEDTYPE,PRIMITIVETYPE,BITSTYPE)
+@Test
+public void testGetEqualsSHRTNAMEBitsPred()
+{
+  Assert.assertTrue(OmniPred.OfRef.getEqualsSHRTNAMEBitsPred(BOXEDTYPE.PRIMITIVETYPEToRawBITSTYPEBits((PRIMITIVETYPE)5.0)).test(BOXEDTYPE.valueOf((PRIMITIVETYPE)5.0)));
+}
+#ENDDEF
+  @Test
+  public void testGetEqualsPred()
+  {
+    #MACRO TestPred((Boolean)null)
+    #MACRO TestPred((Byte)null)
+    #MACRO TestPred((Character)null)
+    #MACRO TestPred((Short)null)
+    #MACRO TestPred((Integer)null)
+    #MACRO TestPred((Long)null)
+    #MACRO TestPred((Float)null)
+    #MACRO TestPred((Double)null)
+    #MACRO TestPred((String)null)
+    
+    #MACRO TestPred(true)
+    #MACRO TestPred(false)
+    #MACRO TestPred((byte)0)
+    #MACRO TestPred((char)0)
+    #MACRO TestPred((short)0)
+    #MACRO TestPred((int)0)
+    #MACRO TestPred((long)0)
+    #MACRO TestPred((float)0)
+    #MACRO TestPred((double)0)
+    #MACRO TestPred(Float.NaN)
+    #MACRO TestPred(Double.NaN)
+    #MACRO TestPred(new String("abc"))
+    
+    #MACRO TestPred(Boolean.TRUE)
+    #MACRO TestPred(Boolean.FALSE)
+    #MACRO TestPred(Byte.valueOf((byte)0))
+    #MACRO TestPred(Character.valueOf((char)0))
+    #MACRO TestPred(Short.valueOf((short)0))
+    #MACRO TestPred(Integer.valueOf((int)0))
+    #MACRO TestPred(Long.valueOf((long)0))
+    #MACRO TestPred(Float.valueOf((float)0))
+    #MACRO TestPred(Double.valueOf((double)0))
+    #MACRO TestPred(Float.valueOf(Float.NaN))
+    #MACRO TestPred(Double.valueOf(Double.NaN))
+    
+#MACRODEF TestPred(VAL)
+{
+  var pred=OmniPred.OfRef.getEqualsPred(VAL);
+  Assert.assertTrue(pred.test(VAL));
+}
+#ENDDEF
+    
+  }
+
+}
+
+
+
+

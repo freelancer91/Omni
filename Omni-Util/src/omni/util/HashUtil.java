@@ -1,5 +1,5 @@
 package omni.util;
-public interface HashUtils{
+public interface HashUtil{
   static int DBL_NAN_HASH=(int)(TypeUtil.DBL_NAN_BITS^TypeUtil.DBL_NAN_BITS>>>32);
   static int hashDouble(double val){
     if(val==val){ return Long.hashCode(Double.doubleToRawLongBits(val)); }

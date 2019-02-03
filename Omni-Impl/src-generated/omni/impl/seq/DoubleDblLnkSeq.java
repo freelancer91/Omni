@@ -11,10 +11,10 @@ import omni.api.OmniIterator;
 import omni.api.OmniListIterator;
 import omni.impl.CheckedCollection;
 import java.util.NoSuchElementException;
-import omni.util.BitSetUtils;
+import omni.util.BitSetUtil;
 import omni.util.TypeUtil;
 import omni.impl.AbstractDoubleItr;
-import omni.util.HashUtils;
+import omni.util.HashUtil;
 import omni.function.DoubleComparator;
 import java.util.function.DoubleConsumer;
 import java.util.function.DoublePredicate;
@@ -2127,7 +2127,7 @@ public abstract class DoubleDblLnkSeq extends AbstractDoubleList implements Omni
             if(filter.test((after=next.prev).val))
             {
               long[] survivorSet;
-              if((numLeft-=numConsumed)!=0&&(numLeft=(before=before.next).markSurvivors(numLeft,survivorSet=BitSetUtils.getBitSet(numLeft),filter))!=0)
+              if((numLeft-=numConsumed)!=0&&(numLeft=(before=before.next).markSurvivors(numLeft,survivorSet=BitSetUtil.getBitSet(numLeft),filter))!=0)
               {
                 CheckedCollection.checkModCount(modCount,this.modCount);
                 newSize+=numLeft;
@@ -2720,7 +2720,7 @@ public abstract class DoubleDblLnkSeq extends AbstractDoubleList implements Omni
                 ++numRemoved;
                 long[] survivorSet;
                 int numLeft,numSurvivors;
-                if((numLeft=oldSize-numConsumed)!=0&&(numSurvivors=(before=before.next).markSurvivors(numLeft,survivorSet=BitSetUtils.getBitSet(numLeft),filter))!=0)
+                if((numLeft=oldSize-numConsumed)!=0&&(numSurvivors=(before=before.next).markSurvivors(numLeft,survivorSet=BitSetUtil.getBitSet(numLeft),filter))!=0)
                 {
                   CheckedCollection.checkModCount(modCount,root.modCount);
                   numRemoved+=numLeft-numSurvivors;
@@ -5790,9 +5790,9 @@ public abstract class DoubleDblLnkSeq extends AbstractDoubleList implements Omni
             if(filter.test((after=next.prev).val))
             {
               ++numRemoved;
-              long[] survivorSet;
+              long[] survivorSet; 
               int numSurvivors;
-              if(numLeft!=0&&(numSurvivors=(before=before.next).markSurvivors(numLeft,survivorSet=BitSetUtils.getBitSet(numLeft),filter))!=0)
+              if(numLeft!=0&&(numSurvivors=(before=before.next).markSurvivors(numLeft,survivorSet=BitSetUtil.getBitSet(numLeft),filter))!=0)
               {
                 modCountChecker.checkModCount();
                 numRemoved+=numLeft-numSurvivors;
@@ -5938,8 +5938,8 @@ public abstract class DoubleDblLnkSeq extends AbstractDoubleList implements Omni
     }
     private int uncheckedForwardHashCode(Node end)
     {
-      int hash=31+HashUtils.hashDouble(this.val);
-      for(var curr=this;curr!=end;hash=hash*31+HashUtils.hashDouble((curr=curr.next).val))
+      int hash=31+HashUtil.hashDouble(this.val);
+      for(var curr=this;curr!=end;hash=hash*31+HashUtil.hashDouble((curr=curr.next).val))
       {  
       }
       return hash;

@@ -114,7 +114,7 @@ enum TypeDefinition{
         defVars.add(new DefVar("TRUE_BITS","TypeUtil.DBL_TRUE_BITS"));
         defVars.add(new DefVar("convertToBits","Double.doubleToRawLongBits"));
         defVars.add(new DefVar("defaultVal","Double.NaN"));
-        defVars.add(new DefVar("hashCodeMethod","HashUtils.hashDouble"));
+        defVars.add(new DefVar("hashCodeMethod","HashUtil.hashDouble"));
         defVars.add(new DefVar("elementMethod","doubleElement"));
         defVars.add(new DefVar("Comparator","DoubleComparator"));
         defVars.add(new DefVar("UnaryOperator","DoubleUnaryOperator"));
@@ -141,7 +141,7 @@ enum TypeDefinition{
         defVars.add(new DefVar("TRUE_BITS","TypeUtil.FLT_TRUE_BITS"));
         defVars.add(new DefVar("convertToBits","Float.floatToRawIntBits"));
         defVars.add(new DefVar("defaultVal","Float.NaN"));
-        defVars.add(new DefVar("hashCodeMethod","HashUtils.hashFloat"));
+        defVars.add(new DefVar("hashCodeMethod","HashUtil.hashFloat"));
         defVars.add(new DefVar("elementMethod","floatElement"));
         defVars.add(new DefVar("Comparator","FloatComparator"));
         defVars.add(new DefVar("UnaryOperator","FloatUnaryOperator"));

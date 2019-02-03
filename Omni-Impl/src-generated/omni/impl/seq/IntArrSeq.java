@@ -16,7 +16,7 @@ import omni.util.OmniArray;
 import omni.util.SortUtil;
 import omni.impl.seq.AbstractIntList;
 import omni.impl.AbstractIntItr;
-import omni.util.BitSetUtils;
+import omni.util.BitSetUtil;
 import omni.util.TypeUtil;
 import java.util.function.IntBinaryOperator;
 import java.util.function.IntUnaryOperator;
@@ -190,7 +190,7 @@ public abstract class IntArrSeq extends AbstractIntList implements OmniCollectio
         if((numSurvivors=(--srcOffset)-srcBound)!=0)
         {
           final long[] survivors;
-          numSurvivors=markSurvivorsReverse(arr,survivors=BitSetUtils.getBitSet(numSurvivors),srcOffset,srcBound,filter);
+          numSurvivors=markSurvivorsReverse(arr,survivors=BitSetUtil.getBitSet(numSurvivors),srcOffset,srcBound,filter);
           modCountChecker.checkModCount();
           arr[dstOffset--]=v;
           if(numSurvivors!=0)
@@ -225,7 +225,7 @@ public abstract class IntArrSeq extends AbstractIntList implements OmniCollectio
         if((numSurvivors=srcBound-++srcOffset)!=0)
         {
           final long[] survivors;
-          numSurvivors=markSurvivors(arr,survivors=BitSetUtils.getBitSet(numSurvivors),srcOffset,srcBound,filter);
+          numSurvivors=markSurvivors(arr,survivors=BitSetUtil.getBitSet(numSurvivors),srcOffset,srcBound,filter);
           modCountChecker.checkModCount();
           arr[dstOffset++]=v;
           if(numSurvivors!=0)

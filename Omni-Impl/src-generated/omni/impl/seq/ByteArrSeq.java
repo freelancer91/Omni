@@ -16,7 +16,7 @@ import omni.util.OmniArray;
 import omni.util.SortUtil;
 import omni.impl.seq.AbstractByteList;
 import omni.impl.AbstractByteItr;
-import omni.util.BitSetUtils;
+import omni.util.BitSetUtil;
 import omni.util.TypeUtil;
 import omni.function.ByteComparator;
 import omni.function.ByteUnaryOperator;
@@ -190,7 +190,7 @@ public abstract class ByteArrSeq extends AbstractByteList implements OmniCollect
         if((numSurvivors=(--srcOffset)-srcBound)!=0)
         {
           final long[] survivors;
-          numSurvivors=markSurvivorsReverse(arr,survivors=BitSetUtils.getBitSet(numSurvivors),srcOffset,srcBound,filter);
+          numSurvivors=markSurvivorsReverse(arr,survivors=BitSetUtil.getBitSet(numSurvivors),srcOffset,srcBound,filter);
           modCountChecker.checkModCount();
           arr[dstOffset--]=v;
           if(numSurvivors!=0)
@@ -225,7 +225,7 @@ public abstract class ByteArrSeq extends AbstractByteList implements OmniCollect
         if((numSurvivors=srcBound-++srcOffset)!=0)
         {
           final long[] survivors;
-          numSurvivors=markSurvivors(arr,survivors=BitSetUtils.getBitSet(numSurvivors),srcOffset,srcBound,filter);
+          numSurvivors=markSurvivors(arr,survivors=BitSetUtil.getBitSet(numSurvivors),srcOffset,srcBound,filter);
           modCountChecker.checkModCount();
           arr[dstOffset++]=v;
           if(numSurvivors!=0)

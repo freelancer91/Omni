@@ -6,7 +6,9 @@
 #TYPEDEF OfFloat
 #TYPEDEF OfDouble
 package omni.function;
+
+@FunctionalInterface
 public interface $Comparator$
 {
-  public abstract int compare(final $exposedType$ val1,$exposedType$ val2);
+  public abstract int $compareMethod$(final $exposedType$ val1,$exposedType$ val2);
 }

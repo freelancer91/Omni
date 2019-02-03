@@ -1,0 +1,123 @@
+#TYPEDEF OfGeneric
+package omni.util;
+import java.util.Random;
+import java.util.function.Supplier;
+import java.util.function.BooleanSupplier;
+import java.util.function.IntSupplier;
+import java.util.function.LongSupplier;
+import java.util.function.DoubleSupplier;
+import omni.function.ByteSupplier;
+import omni.function.CharSupplier;
+import omni.function.ShortSupplier;
+import omni.function.FloatSupplier;
+import java.util.Arrays;
+
+public interface JunitUtil
+{
+  
+  #MACRO GetArray<Ascending,boolean>(BooleanSupplier,getAsBoolean,Boolean)
+  #MACRO GetArray<Ascending,byte>(ByteSupplier,getAsByte,Byte)
+  #MACRO GetArray<Ascending,char>(CharSupplier,getAsChar,Char)
+  #MACRO GetArray<Ascending,short>(ShortSupplier,getAsShort,Short)
+  #MACRO GetArray<Ascending,int>(IntSupplier,getAsInt,Int)
+  #MACRO GetArray<Ascending,long>(LongSupplier,getAsLong,Long)
+  #MACRO GetArray<Ascending,float>(FloatSupplier,getAsFloat,Float)
+  #MACRO GetArray<Ascending,double>(DoubleSupplier,getAsDouble,Double)
+  #MACRO GetArray<Ascending,String>(Supplier<? extends String>,get,Ref)
+  #MACRO GetArray<Descending,boolean>(BooleanSupplier,getAsBoolean,Boolean)
+  #MACRO GetArray<Descending,byte>(ByteSupplier,getAsByte,Byte)
+  #MACRO GetArray<Descending,char>(CharSupplier,getAsChar,Char)
+  #MACRO GetArray<Descending,short>(ShortSupplier,getAsShort,Short)
+  #MACRO GetArray<Descending,int>(IntSupplier,getAsInt,Int)
+  #MACRO GetArray<Descending,long>(LongSupplier,getAsLong,Long)
+  #MACRO GetArray<Descending,float>(FloatSupplier,getAsFloat,Float)
+  #MACRO GetArray<Descending,double>(DoubleSupplier,getAsDouble,Double)
+  #MACRO GetArray<Descending,String>(Supplier<? extends String>,get,Ref)
+  #MACRO GetArray<Unsorted,boolean>(BooleanSupplier,getAsBoolean,Boolean)
+  #MACRO GetArray<Unsorted,byte>(ByteSupplier,getAsByte,Byte)
+  #MACRO GetArray<Unsorted,char>(CharSupplier,getAsChar,Char)
+  #MACRO GetArray<Unsorted,short>(ShortSupplier,getAsShort,Short)
+  #MACRO GetArray<Unsorted,int>(IntSupplier,getAsInt,Int)
+  #MACRO GetArray<Unsorted,long>(LongSupplier,getAsLong,Long)
+  #MACRO GetArray<Unsorted,float>(FloatSupplier,getAsFloat,Float)
+  #MACRO GetArray<Unsorted,double>(DoubleSupplier,getAsDouble,Double)
+  #MACRO GetArray<Unsorted,String>(Supplier<? extends String>,get,Ref)
+  #MACRO GetArray<Ascending,Boolean>(BooleanSupplier,getAsBoolean,Ref)
+  #MACRO GetArray<Ascending,Byte>(ByteSupplier,getAsByte,Ref)
+  #MACRO GetArray<Ascending,Character>(CharSupplier,getAsChar,Ref)
+  #MACRO GetArray<Ascending,Short>(ShortSupplier,getAsShort,Ref)
+  #MACRO GetArray<Ascending,Integer>(IntSupplier,getAsInt,Ref)
+  #MACRO GetArray<Ascending,Long>(LongSupplier,getAsLong,Ref)
+  #MACRO GetArray<Ascending,Float>(FloatSupplier,getAsFloat,Ref)
+  #MACRO GetArray<Ascending,Double>(DoubleSupplier,getAsDouble,Ref)
+  #MACRO GetArray<Descending,Boolean>(BooleanSupplier,getAsBoolean,Ref)
+  #MACRO GetArray<Descending,Byte>(ByteSupplier,getAsByte,Ref)
+  #MACRO GetArray<Descending,Character>(CharSupplier,getAsChar,Ref)
+  #MACRO GetArray<Descending,Short>(ShortSupplier,getAsShort,Ref)
+  #MACRO GetArray<Descending,Integer>(IntSupplier,getAsInt,Ref)
+  #MACRO GetArray<Descending,Long>(LongSupplier,getAsLong,Ref)
+  #MACRO GetArray<Descending,Float>(FloatSupplier,getAsFloat,Ref)
+  #MACRO GetArray<Descending,Double>(DoubleSupplier,getAsDouble,Ref)
+  #MACRO GetArray<Unsorted,Boolean>(BooleanSupplier,getAsBoolean,Ref)
+  #MACRO GetArray<Unsorted,Byte>(ByteSupplier,getAsByte,Ref)
+  #MACRO GetArray<Unsorted,Character>(CharSupplier,getAsChar,Ref)
+  #MACRO GetArray<Unsorted,Short>(ShortSupplier,getAsShort,Ref)
+  #MACRO GetArray<Unsorted,Integer>(IntSupplier,getAsInt,Ref)
+  #MACRO GetArray<Unsorted,Long>(LongSupplier,getAsLong,Ref)
+  #MACRO GetArray<Unsorted,Float>(FloatSupplier,getAsFloat,Ref)
+  #MACRO GetArray<Unsorted,Double>(DoubleSupplier,getAsDouble,Ref)
+  
+  
+#MACRODEF GetArray<SORTTYPE,ARRTYPE>(SUPPLIERTYPE,SUPPLIERMETHOD,CLASSPREFIX)
+public static ARRTYPE[] getSORTTYPEARRTYPEArray(Random rand,int length)
+{
+  return getSORTTYPEARRTYPEArray(
+#IFSWITCH ARRTYPE==boolean,Boolean
+    rand::nextBoolean
+#ELSEIFSWITCH ARRTYPE==byte,Byte,char,Character,short,Short,int,Integer,long,Long
+    ()->(ARRTYPE)
+    #IFSWITCH ARRTYPE==Byte
+    (byte)
+    #ELSEIFSWITCH ARRTYPE==Character
+    (char)
+    #ELSEIFSWITCH ARRTYPE==Short
+    (short)
+    #ELSEIFSWITCH ARRTYPE==Integer
+    (int)
+    #ENDIF
+    rand.nextLong()
+#ELSEIFSWITCH ARRTYPE==float,Float
+    rand::nextFloat
+#ELSEIFSWITCH ARRTYPE==double,Double
+    rand::nextDouble
+#ELSEIFSWITCH ARRTYPE==String
+    ()->Long.toString(rand.nextLong())
+#ELSE
+  ERROR unknown array type ARRTYPE
+#ENDIF
+  ,length);
+}
+public static ARRTYPE[] getSORTTYPEARRTYPEArray(SUPPLIERTYPE supplier,int length)
+{
+  ARRTYPE[] arr=new ARRTYPE[length];
+  for(int i=0;i<length;++i)
+  {
+    arr[i]=(ARRTYPE)supplier.SUPPLIERMETHOD();
+  }
+#IFNOTSWITCH SORTTYPE==Unsorted
+  #IFSWITCH ARRTYPE==boolean
+  Boolean[] boxedCopy=new Boolean[length];
+  ArrCopy.uncheckedCopy(arr,0,boxedCopy,0,length);
+  Arrays.sort(boxedCopy,0,length);
+  ArrCopy.uncheckedCopy(boxedCopy,0,arr,0,length);
+  #ELSE
+  Arrays.sort(arr,0,length);
+  #ENDIF
+  #IFSWITCH SORTTYPE==Descending
+  OmniArray.OfCLASSPREFIX.reverseRange(arr,0,length-1);
+  #ENDIF
+#ENDIF
+  return arr;
+}
+#ENDDEF  
+}

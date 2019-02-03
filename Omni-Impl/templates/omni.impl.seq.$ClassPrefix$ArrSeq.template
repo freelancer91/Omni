@@ -24,7 +24,7 @@ import omni.util.ArrCopy;
 import omni.util.OmniArray;
 import omni.util.SortUtil;
 #IF OfDouble,OfFloat
-import omni.util.HashUtils;
+import omni.util.HashUtil;
 #ENDIF
 #IF OfRef
 import omni.impl.seq.AbstractSeq;
@@ -33,7 +33,7 @@ import omni.impl.seq.Abstract$ClassPrefix$List;
 import omni.impl.Abstract$TypeNameModifier$Itr;
 #ENDIF
 #IFNOT OfBoolean
-import omni.util.BitSetUtils;
+import omni.util.BitSetUtil;
 #ENDIF
 #IF OfRef
 import java.util.Objects;
@@ -233,7 +233,7 @@ public abstract class $ClassPrefix$ArrSeq$<E>$ extends Abstract$ClassPrefix$List
         if((numSurvivors=(--srcOffset)-srcBound)!=0)
         {
           final long[] survivors;
-          numSurvivors=markSurvivorsReverse(arr,survivors=BitSetUtils.getBitSet(numSurvivors),srcOffset,srcBound,filter);
+          numSurvivors=markSurvivorsReverse(arr,survivors=BitSetUtil.getBitSet(numSurvivors),srcOffset,srcBound,filter);
           modCountChecker.checkModCount();
           arr[dstOffset--]=v;
           if(numSurvivors!=0)
@@ -269,7 +269,7 @@ public abstract class $ClassPrefix$ArrSeq$<E>$ extends Abstract$ClassPrefix$List
         if((numSurvivors=srcBound-++srcOffset)!=0)
         {
           final long[] survivors;
-          numSurvivors=markSurvivors(arr,survivors=BitSetUtils.getBitSet(numSurvivors),srcOffset,srcBound,filter);
+          numSurvivors=markSurvivors(arr,survivors=BitSetUtil.getBitSet(numSurvivors),srcOffset,srcBound,filter);
           modCountChecker.checkModCount();
           arr[dstOffset++]=v;
           if(numSurvivors!=0)

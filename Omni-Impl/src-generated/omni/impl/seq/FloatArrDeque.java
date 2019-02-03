@@ -8,8 +8,8 @@ import omni.api.OmniIterator;
 import java.util.function.IntFunction;
 import java.util.NoSuchElementException;
 import omni.impl.CheckedCollection;
-import omni.util.BitSetUtils;
-import omni.util.HashUtils;
+import omni.util.BitSetUtil;
+import omni.util.HashUtil;
 import omni.function.FloatPredicate;
 import omni.function.FloatConsumer;
 import omni.impl.AbstractFloatItr;
@@ -108,13 +108,13 @@ public class FloatArrDeque implements OmniDeque.OfFloat
   {
     final float[] arr;
     int head;
-    int hash=31+HashUtils.hashFloat((arr=this.arr)[head=this.head]);
+    int hash=31+HashUtil.hashFloat((arr=this.arr)[head=this.head]);
     if(tail<=head)
     {
-      for(int bound=arr.length;++head!=bound;hash=(hash*31)+HashUtils.hashFloat(arr[head])){}
-      hash=(hash*31)+HashUtils.hashFloat(arr[head=0]);
+      for(int bound=arr.length;++head!=bound;hash=(hash*31)+HashUtil.hashFloat(arr[head])){}
+      hash=(hash*31)+HashUtil.hashFloat(arr[head=0]);
     }
-    for(;++head!=tail;hash=(hash*31)+HashUtils.hashFloat(arr[head])){}
+    for(;++head!=tail;hash=(hash*31)+HashUtil.hashFloat(arr[head])){}
     return hash;
   }
   @Override
@@ -3565,7 +3565,7 @@ public class FloatArrDeque implements OmniDeque.OfFloat
               if((numTailSurvivors=tail-++tailOffset)!=0)
               {
                 final long[] survivors;
-                numTailSurvivors=FloatArrSeq.markSurvivors(arr,survivors=BitSetUtils.getBitSet(numTailSurvivors),tailOffset,tail,filter);
+                numTailSurvivors=FloatArrSeq.markSurvivors(arr,survivors=BitSetUtil.getBitSet(numTailSurvivors),tailOffset,tail,filter);
                 CheckedCollection.checkModCount(modCount,this.modCount);
                 arr[tailDstOffset++]=tailVal;
                 if(numTailSurvivors!=0)
