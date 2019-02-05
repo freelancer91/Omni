@@ -209,7 +209,7 @@ public final class SortUtil
       final var ai=arr[i+1];
       byte aj;
       while(
-      (ai)>=(aj=arr[j])
+      (ai)>(aj=arr[j])
       )
       {
         arr[j+1]=aj;
@@ -328,111 +328,6 @@ public final class SortUtil
       }
     }
   }
-  /*
-  public static void dosort(char[] a,int left,int right)
-  {
-    if(right-left<286)
-    {
-      quicksortleftmost(a,left,right);
-      return;
-    }
-    int MAX_RUN_COUNT=67;
-    int[] run = new int[MAX_RUN_COUNT + 1];
-    int count = 0; run[0] = left;
-    // Check if the array is nearly sorted
-    for (int k = left; k < right; run[count] = k) {
-        // Equal items in the beginning of the sequence
-        while (k < right && a[k] == a[k + 1])
-            k++;
-        if (k == right) break;  // Sequence finishes with equal items
-        if (a[k] < a[k + 1]) { // ascending
-            while (++k <= right && a[k - 1] <= a[k]);
-        } else if (a[k] > a[k + 1]) { // descending
-            while (++k <= right && a[k - 1] >= a[k]);
-            // Transform into an ascending sequence
-            for (int lo = run[count] - 1, hi = k; ++lo < --hi; ) {
-                char t = a[lo]; a[lo] = a[hi]; a[hi] = t;
-            }
-        }
-        // Merge a transformed descending sequence followed by an
-        // ascending sequence
-        if (run[count] > left && a[run[count]] >= a[run[count] - 1]) {
-            count--;
-        }
-        if (++count == MAX_RUN_COUNT) {
-            quicksortleftmost(a, left, right);
-            return;
-        }
-    }
-    // These invariants should hold true:
-    //    run[0] = 0
-    //    run[<last>] = right + 1; (terminator)
-    if (count == 0) {
-        // A single equal run
-        return;
-    } else if (count == 1 && run[count] > right) {
-        // Either a single ascending or a transformed descending run.
-        // Always check that a final run is a proper terminator, otherwise
-        // we have an unterminated trailing run, to handle downstream.
-        return;
-    }
-    right++;
-    if (run[count] < right) {
-        // Corner case: the final run is not a terminator. This may happen
-        // if a final run is an equals run, or there is a single-element run
-        // at the end. Fix up by adding a proper terminator at the end.
-        // Note that we terminate with (right + 1), incremented earlier.
-        run[++count] = right;
-    }
-    // Determine alternation base for merge
-    byte odd = 0;
-    for (int n = 1; (n <<= 1) < count; odd ^= 1);
-    // Use or create temporary array b for merging
-    char[] work=null;
-    int workBase=0;
-    int workLen=0;
-    char[] b;                 // temp array; alternates with a
-    int ao, bo;              // array offsets from 'left'
-    int blen = right - left; // space needed for b
-    if (work == null || workLen < blen || workBase + blen > work.length) {
-        work = new char[blen];
-        workBase = 0;
-    }
-    if (odd == 0) {
-        System.arraycopy(a, left, work, workBase, blen);
-        b = a;
-        bo = 0;
-        a = work;
-        ao = workBase - left;
-    } else {
-        b = work;
-        ao = 0;
-        bo = workBase - left;
-    }
-    // Merging
-    for (int last; count > 1; count = last) {
-        for (int k = (last = 0) + 2; k <= count; k += 2) {
-            int hi = run[k], mi = run[k - 1];
-            for (int i = run[k - 2], p = i, q = mi; i < hi; ++i) {
-                if (q >= hi || p < mi && a[p + ao] <= a[q + ao]) {
-                    b[i + bo] = a[p++ + ao];
-                } else {
-                    b[i + bo] = a[q++ + ao];
-                }
-            }
-            run[++last] = hi;
-        }
-        if ((count & 1) != 0) {
-            for (int i = right, lo = run[count - 1]; --i >= lo;
-                b[i + bo] = a[i + ao]
-            );
-            run[++last] = right;
-        }
-        char[] t = a; a = b; b = t;
-        int o = ao; ao = bo; bo = o;
-    }
-  }
-  */
   private static void sortmerge(char[] arr,int begin,int end,int[] run,int count)
   {
     byte odd=0;
@@ -454,12 +349,11 @@ public final class SortUtil
       ao=0;
       bo=-begin;
     }
-    //TODO streamline
-    //assert count>0;
     run[++count]=++end;
-    for(int last;count>1;count=last)
+    int last,k;
+    do
     {
-      for(int k=(last=0)+2;k<=count;k+=2)
+      for(last=0,k=2;k<=count;k+=2)
       {
         int hi=run[k];
         int mi;
@@ -490,6 +384,7 @@ public final class SortUtil
       ao=bo;
       bo=o;
     }
+    while((count=last)>1);
   }
   private static void insertsort(char[] arr,int begin,int end)
   {
@@ -856,11 +751,6 @@ public final class SortUtil
     quicksortleftmost(arr,begin,less);
     }
     quicksort(arr,great+1,end);
-    //TODO check to see if this is necessary
-    //if(++great!=end)
-    //{
-    //  quicksort(arr,great,end);
-    //}
   }
   private static void quicksortSinglePivot(char[] arr,int begin,int end,char pivot)
   {
@@ -908,23 +798,18 @@ public final class SortUtil
     quicksort(arr,begin,less);
     }
     quicksort(arr,great+1,end);
-    //TODO check to see if this is necessary
-    //if(++great!=end)
-    //{
-    //  quicksort(arr,great,end);
-    //}
   }
   private static void quicksortleftmostDualPivot(char[] arr,int begin,int end,char pivot1, char pivot2,int e1,int e5)
   {
     int less=begin;
     int great=end;
     while(
-    (arr[++less])<(pivot1)
+    (arr[++less])<=(pivot1)
     )
     {
     }
     while(
-    (arr[--great])>(pivot2)
+    (arr[--great])>=(pivot2)
     )
     {
     }
@@ -1040,12 +925,12 @@ public final class SortUtil
     int less=begin;
     int great=end;
     while(
-    (arr[++less])<(pivot1)
+    (arr[++less])<=(pivot1)
     )
     {
     }
     while(
-    (arr[--great])>(pivot2)
+    (arr[--great])>=(pivot2)
     )
     {
     }
@@ -1220,7 +1105,7 @@ public final class SortUtil
           for(;;)
           {
             if(++k==end ||
-            (arr[k])>=(arr[k-1])
+            (arr[k])>(arr[k-1])
             )
             {
               break;
@@ -1231,7 +1116,7 @@ public final class SortUtil
           for(;;)
           {
             if(++k==end||
-            (arr[k-1])>=(arr[k])
+            (arr[k-1])>(arr[k])
             )
             {
               break;
@@ -1249,7 +1134,7 @@ public final class SortUtil
           ++count;
         }
         else if(
-        (arr[r=run[count]])>=(arr[r-1])
+        (arr[r=run[count]])>(arr[r-1])
         && ++count==67)
         {
           quickreverseSortleftmost(arr,begin,end);
@@ -1284,19 +1169,18 @@ public final class SortUtil
       ao=0;
       bo=-begin;
     }
-    //TODO streamline
-    //assert count>0;
     run[++count]=++end;
-    for(int last;count>1;count=last)
+    int last,k;
+    do
     {
-      for(int k=(last=0)+2;k<=count;k+=2)
+      for(last=0,k=2;k<=count;k+=2)
       {
         int hi=run[k];
         int mi;
         for(int i=run[k-2],p=i,q=(mi=run[k-1]);i<hi;++i)
         {
           if(q<hi && (p>=mi ||
-          (arr[q+ao])>=(arr[p+ao])
+          (arr[q+ao])>(arr[p+ao])
           ))
           {
             b[i+bo]=arr[q++ +ao];
@@ -1320,6 +1204,7 @@ public final class SortUtil
       ao=bo;
       bo=o;
     }
+    while((count=last)>1);
   }
   private static void insertreverseSort(char[] arr,int begin,int end)
   {
@@ -1328,7 +1213,7 @@ public final class SortUtil
       final var ai=arr[i+1];
       char aj;
       while(
-      (ai)>=(aj=arr[j])
+      (ai)>(aj=arr[j])
       )
       {
         arr[j+1]=aj;
@@ -1357,7 +1242,7 @@ public final class SortUtil
     {
       char a1,a2;
       if(
-      (a1=arr[k])>=(a2=arr[begin])
+      (a1=arr[k])>(a2=arr[begin])
       )
       {
         a2=a1;
@@ -1399,7 +1284,7 @@ public final class SortUtil
     int seventh,e1,e2,e3,e4,e5;
     char val1,val2,val3,val4,val5;
     if(
-    (val2=arr[e2=(e3=(begin+end)>>>1)-(seventh=(length>>3)+(length>>6)+1)])>=(val1=arr[e1=e2-seventh])
+    (val2=arr[e2=(e3=(begin+end)>>>1)-(seventh=(length>>3)+(length>>6)+1)])>(val1=arr[e1=e2-seventh])
     )
     {
       var tmp=val2;
@@ -1407,13 +1292,13 @@ public final class SortUtil
       val1=tmp;
     }
     if(
-    (val3=arr[e3])>=(val2)
+    (val3=arr[e3])>(val2)
     )
     {
       var tmp=val3;
       val3=val2;
       if(
-      (tmp)>=(val1)
+      (tmp)>(val1)
       )
       {
         val2=val1;
@@ -1425,18 +1310,18 @@ public final class SortUtil
       }
     }
     if(
-    (val4=arr[e4=e3+seventh])>=(val3)
+    (val4=arr[e4=e3+seventh])>(val3)
     )
     {
       var tmp=val4;
       val4=val3;
       if(
-      (tmp)>=(val2)
+      (tmp)>(val2)
       )
       {
         val3=val2;
         if(
-        (tmp)>=(val1)
+        (tmp)>(val1)
         )
         {
           val2=val1;
@@ -1453,23 +1338,23 @@ public final class SortUtil
       }
     }
     if(
-    (val5=arr[e5=e4+seventh])>=(val4)
+    (val5=arr[e5=e4+seventh])>(val4)
     )
     {
       var tmp=val5;
       val5=val4;
       if(
-      (tmp)>=(val3)
+      (tmp)>(val3)
       )
       {
         val4=val3;
         if(
-        (tmp)>=(val2)
+        (tmp)>(val2)
         )
         {
           val3=val2;
           if(
-          (tmp)>=(val1)
+          (tmp)>(val1)
           )
           {
             val2=val1;
@@ -1525,7 +1410,7 @@ public final class SortUtil
     int seventh,e1,e2,e3,e4,e5;
     char val1,val2,val3,val4,val5;
     if(
-    (val2=arr[e2=(e3=(begin+end)>>>1)-(seventh=(length>>3)+(length>>6)+1)])>=(val1=arr[e1=e2-seventh])
+    (val2=arr[e2=(e3=(begin+end)>>>1)-(seventh=(length>>3)+(length>>6)+1)])>(val1=arr[e1=e2-seventh])
     )
     {
       var tmp=val2;
@@ -1533,13 +1418,13 @@ public final class SortUtil
       val1=tmp;
     }
     if(
-    (val3=arr[e3])>=(val2)
+    (val3=arr[e3])>(val2)
     )
     {
       var tmp=val3;
       val3=val2;
       if(
-      (tmp)>=(val1)
+      (tmp)>(val1)
       )
       {
         val2=val1;
@@ -1551,18 +1436,18 @@ public final class SortUtil
       }
     }
     if(
-    (val4=arr[e4=e3+seventh])>=(val3)
+    (val4=arr[e4=e3+seventh])>(val3)
     )
     {
       var tmp=val4;
       val4=val3;
       if(
-      (tmp)>=(val2)
+      (tmp)>(val2)
       )
       {
         val3=val2;
         if(
-        (tmp)>=(val1)
+        (tmp)>(val1)
         )
         {
           val2=val1;
@@ -1579,23 +1464,23 @@ public final class SortUtil
       }
     }
     if(
-    (val5=arr[e5=e4+seventh])>=(val4)
+    (val5=arr[e5=e4+seventh])>(val4)
     )
     {
       var tmp=val5;
       val5=val4;
       if(
-      (tmp)>=(val3)
+      (tmp)>(val3)
       )
       {
         val4=val3;
         if(
-        (tmp)>=(val2)
+        (tmp)>(val2)
         )
         {
           val3=val2;
           if(
-          (tmp)>=(val1)
+          (tmp)>(val1)
           )
           {
             val2=val1;
@@ -1686,11 +1571,6 @@ public final class SortUtil
     quickreverseSortleftmost(arr,begin,less);
     }
     quickreverseSort(arr,great+1,end);
-    //TODO check to see if this is necessary
-    //if(++great!=end)
-    //{
-    //  quickreverseSort(arr,great,end);
-    //}
   }
   private static void quickreverseSortSinglePivot(char[] arr,int begin,int end,char pivot)
   {
@@ -1738,11 +1618,6 @@ public final class SortUtil
     quickreverseSort(arr,begin,less);
     }
     quickreverseSort(arr,great+1,end);
-    //TODO check to see if this is necessary
-    //if(++great!=end)
-    //{
-    //  quickreverseSort(arr,great,end);
-    //}
   }
   private static void quickreverseSortleftmostDualPivot(char[] arr,int begin,int end,char pivot1, char pivot2,int e1,int e5)
   {
@@ -1762,7 +1637,7 @@ public final class SortUtil
     {
       char ak;
       if(
-      (ak=arr[k])>=(pivot1)
+      (ak=arr[k])>(pivot1)
       )
       {
         arr[k]=arr[less];
@@ -1771,12 +1646,12 @@ public final class SortUtil
       }
       else
       if(
-      (ak)<=(pivot2)
+      (ak)<(pivot2)
       )
       {
         char ag;
         while(
-        (ag=arr[great])<=(pivot2)
+        (ag=arr[great])<(pivot2)
         )
         {
           if(great--==k)
@@ -1785,7 +1660,7 @@ public final class SortUtil
           }
         }
         if(
-        (ag)>=(pivot1)
+        (ag)>(pivot1)
         )
         {
           arr[k]=arr[less];
@@ -1883,7 +1758,7 @@ public final class SortUtil
     {
       char ak;
       if(
-      (ak=arr[k])>=(pivot1)
+      (ak=arr[k])>(pivot1)
       )
       {
         arr[k]=arr[less];
@@ -1892,12 +1767,12 @@ public final class SortUtil
       }
       else
       if(
-      (ak)<=(pivot2)
+      (ak)<(pivot2)
       )
       {
         char ag;
         while(
-        (ag=arr[great])<=(pivot2)
+        (ag=arr[great])<(pivot2)
         )
         {
           if(great--==k)
@@ -1906,7 +1781,7 @@ public final class SortUtil
           }
         }
         if(
-        (ag)>=(pivot1)
+        (ag)>(pivot1)
         )
         {
           arr[k]=arr[less];
@@ -2114,12 +1989,11 @@ public final class SortUtil
       ao=0;
       bo=-begin;
     }
-    //TODO streamline
-    //assert count>0;
     run[++count]=++end;
-    for(int last;count>1;count=last)
+    int last,k;
+    do
     {
-      for(int k=(last=0)+2;k<=count;k+=2)
+      for(last=0,k=2;k<=count;k+=2)
       {
         int hi=run[k];
         int mi;
@@ -2150,6 +2024,7 @@ public final class SortUtil
       ao=bo;
       bo=o;
     }
+    while((count=last)>1);
   }
   private static void insertsort(short[] arr,int begin,int end)
   {
@@ -2516,11 +2391,6 @@ public final class SortUtil
     quicksortleftmost(arr,begin,less);
     }
     quicksort(arr,great+1,end);
-    //TODO check to see if this is necessary
-    //if(++great!=end)
-    //{
-    //  quicksort(arr,great,end);
-    //}
   }
   private static void quicksortSinglePivot(short[] arr,int begin,int end,short pivot)
   {
@@ -2568,23 +2438,18 @@ public final class SortUtil
     quicksort(arr,begin,less);
     }
     quicksort(arr,great+1,end);
-    //TODO check to see if this is necessary
-    //if(++great!=end)
-    //{
-    //  quicksort(arr,great,end);
-    //}
   }
   private static void quicksortleftmostDualPivot(short[] arr,int begin,int end,short pivot1, short pivot2,int e1,int e5)
   {
     int less=begin;
     int great=end;
     while(
-    (arr[++less])<(pivot1)
+    (arr[++less])<=(pivot1)
     )
     {
     }
     while(
-    (arr[--great])>(pivot2)
+    (arr[--great])>=(pivot2)
     )
     {
     }
@@ -2700,12 +2565,12 @@ public final class SortUtil
     int less=begin;
     int great=end;
     while(
-    (arr[++less])<(pivot1)
+    (arr[++less])<=(pivot1)
     )
     {
     }
     while(
-    (arr[--great])>(pivot2)
+    (arr[--great])>=(pivot2)
     )
     {
     }
@@ -2880,7 +2745,7 @@ public final class SortUtil
           for(;;)
           {
             if(++k==end ||
-            (arr[k])>=(arr[k-1])
+            (arr[k])>(arr[k-1])
             )
             {
               break;
@@ -2891,7 +2756,7 @@ public final class SortUtil
           for(;;)
           {
             if(++k==end||
-            (arr[k-1])>=(arr[k])
+            (arr[k-1])>(arr[k])
             )
             {
               break;
@@ -2909,7 +2774,7 @@ public final class SortUtil
           ++count;
         }
         else if(
-        (arr[r=run[count]])>=(arr[r-1])
+        (arr[r=run[count]])>(arr[r-1])
         && ++count==67)
         {
           quickreverseSortleftmost(arr,begin,end);
@@ -2944,19 +2809,18 @@ public final class SortUtil
       ao=0;
       bo=-begin;
     }
-    //TODO streamline
-    //assert count>0;
     run[++count]=++end;
-    for(int last;count>1;count=last)
+    int last,k;
+    do
     {
-      for(int k=(last=0)+2;k<=count;k+=2)
+      for(last=0,k=2;k<=count;k+=2)
       {
         int hi=run[k];
         int mi;
         for(int i=run[k-2],p=i,q=(mi=run[k-1]);i<hi;++i)
         {
           if(q<hi && (p>=mi ||
-          (arr[q+ao])>=(arr[p+ao])
+          (arr[q+ao])>(arr[p+ao])
           ))
           {
             b[i+bo]=arr[q++ +ao];
@@ -2980,6 +2844,7 @@ public final class SortUtil
       ao=bo;
       bo=o;
     }
+    while((count=last)>1);
   }
   private static void insertreverseSort(short[] arr,int begin,int end)
   {
@@ -2988,7 +2853,7 @@ public final class SortUtil
       final var ai=arr[i+1];
       short aj;
       while(
-      (ai)>=(aj=arr[j])
+      (ai)>(aj=arr[j])
       )
       {
         arr[j+1]=aj;
@@ -3017,7 +2882,7 @@ public final class SortUtil
     {
       short a1,a2;
       if(
-      (a1=arr[k])>=(a2=arr[begin])
+      (a1=arr[k])>(a2=arr[begin])
       )
       {
         a2=a1;
@@ -3059,7 +2924,7 @@ public final class SortUtil
     int seventh,e1,e2,e3,e4,e5;
     short val1,val2,val3,val4,val5;
     if(
-    (val2=arr[e2=(e3=(begin+end)>>>1)-(seventh=(length>>3)+(length>>6)+1)])>=(val1=arr[e1=e2-seventh])
+    (val2=arr[e2=(e3=(begin+end)>>>1)-(seventh=(length>>3)+(length>>6)+1)])>(val1=arr[e1=e2-seventh])
     )
     {
       var tmp=val2;
@@ -3067,13 +2932,13 @@ public final class SortUtil
       val1=tmp;
     }
     if(
-    (val3=arr[e3])>=(val2)
+    (val3=arr[e3])>(val2)
     )
     {
       var tmp=val3;
       val3=val2;
       if(
-      (tmp)>=(val1)
+      (tmp)>(val1)
       )
       {
         val2=val1;
@@ -3085,18 +2950,18 @@ public final class SortUtil
       }
     }
     if(
-    (val4=arr[e4=e3+seventh])>=(val3)
+    (val4=arr[e4=e3+seventh])>(val3)
     )
     {
       var tmp=val4;
       val4=val3;
       if(
-      (tmp)>=(val2)
+      (tmp)>(val2)
       )
       {
         val3=val2;
         if(
-        (tmp)>=(val1)
+        (tmp)>(val1)
         )
         {
           val2=val1;
@@ -3113,23 +2978,23 @@ public final class SortUtil
       }
     }
     if(
-    (val5=arr[e5=e4+seventh])>=(val4)
+    (val5=arr[e5=e4+seventh])>(val4)
     )
     {
       var tmp=val5;
       val5=val4;
       if(
-      (tmp)>=(val3)
+      (tmp)>(val3)
       )
       {
         val4=val3;
         if(
-        (tmp)>=(val2)
+        (tmp)>(val2)
         )
         {
           val3=val2;
           if(
-          (tmp)>=(val1)
+          (tmp)>(val1)
           )
           {
             val2=val1;
@@ -3185,7 +3050,7 @@ public final class SortUtil
     int seventh,e1,e2,e3,e4,e5;
     short val1,val2,val3,val4,val5;
     if(
-    (val2=arr[e2=(e3=(begin+end)>>>1)-(seventh=(length>>3)+(length>>6)+1)])>=(val1=arr[e1=e2-seventh])
+    (val2=arr[e2=(e3=(begin+end)>>>1)-(seventh=(length>>3)+(length>>6)+1)])>(val1=arr[e1=e2-seventh])
     )
     {
       var tmp=val2;
@@ -3193,13 +3058,13 @@ public final class SortUtil
       val1=tmp;
     }
     if(
-    (val3=arr[e3])>=(val2)
+    (val3=arr[e3])>(val2)
     )
     {
       var tmp=val3;
       val3=val2;
       if(
-      (tmp)>=(val1)
+      (tmp)>(val1)
       )
       {
         val2=val1;
@@ -3211,18 +3076,18 @@ public final class SortUtil
       }
     }
     if(
-    (val4=arr[e4=e3+seventh])>=(val3)
+    (val4=arr[e4=e3+seventh])>(val3)
     )
     {
       var tmp=val4;
       val4=val3;
       if(
-      (tmp)>=(val2)
+      (tmp)>(val2)
       )
       {
         val3=val2;
         if(
-        (tmp)>=(val1)
+        (tmp)>(val1)
         )
         {
           val2=val1;
@@ -3239,23 +3104,23 @@ public final class SortUtil
       }
     }
     if(
-    (val5=arr[e5=e4+seventh])>=(val4)
+    (val5=arr[e5=e4+seventh])>(val4)
     )
     {
       var tmp=val5;
       val5=val4;
       if(
-      (tmp)>=(val3)
+      (tmp)>(val3)
       )
       {
         val4=val3;
         if(
-        (tmp)>=(val2)
+        (tmp)>(val2)
         )
         {
           val3=val2;
           if(
-          (tmp)>=(val1)
+          (tmp)>(val1)
           )
           {
             val2=val1;
@@ -3346,11 +3211,6 @@ public final class SortUtil
     quickreverseSortleftmost(arr,begin,less);
     }
     quickreverseSort(arr,great+1,end);
-    //TODO check to see if this is necessary
-    //if(++great!=end)
-    //{
-    //  quickreverseSort(arr,great,end);
-    //}
   }
   private static void quickreverseSortSinglePivot(short[] arr,int begin,int end,short pivot)
   {
@@ -3398,11 +3258,6 @@ public final class SortUtil
     quickreverseSort(arr,begin,less);
     }
     quickreverseSort(arr,great+1,end);
-    //TODO check to see if this is necessary
-    //if(++great!=end)
-    //{
-    //  quickreverseSort(arr,great,end);
-    //}
   }
   private static void quickreverseSortleftmostDualPivot(short[] arr,int begin,int end,short pivot1, short pivot2,int e1,int e5)
   {
@@ -3422,7 +3277,7 @@ public final class SortUtil
     {
       short ak;
       if(
-      (ak=arr[k])>=(pivot1)
+      (ak=arr[k])>(pivot1)
       )
       {
         arr[k]=arr[less];
@@ -3431,12 +3286,12 @@ public final class SortUtil
       }
       else
       if(
-      (ak)<=(pivot2)
+      (ak)<(pivot2)
       )
       {
         short ag;
         while(
-        (ag=arr[great])<=(pivot2)
+        (ag=arr[great])<(pivot2)
         )
         {
           if(great--==k)
@@ -3445,7 +3300,7 @@ public final class SortUtil
           }
         }
         if(
-        (ag)>=(pivot1)
+        (ag)>(pivot1)
         )
         {
           arr[k]=arr[less];
@@ -3543,7 +3398,7 @@ public final class SortUtil
     {
       short ak;
       if(
-      (ak=arr[k])>=(pivot1)
+      (ak=arr[k])>(pivot1)
       )
       {
         arr[k]=arr[less];
@@ -3552,12 +3407,12 @@ public final class SortUtil
       }
       else
       if(
-      (ak)<=(pivot2)
+      (ak)<(pivot2)
       )
       {
         short ag;
         while(
-        (ag=arr[great])<=(pivot2)
+        (ag=arr[great])<(pivot2)
         )
         {
           if(great--==k)
@@ -3566,7 +3421,7 @@ public final class SortUtil
           }
         }
         if(
-        (ag)>=(pivot1)
+        (ag)>(pivot1)
         )
         {
           arr[k]=arr[less];
@@ -3732,12 +3587,11 @@ public final class SortUtil
       ao=0;
       bo=-begin;
     }
-    //TODO streamline
-    //assert count>0;
     run[++count]=++end;
-    for(int last;count>1;count=last)
+    int last,k;
+    do
     {
-      for(int k=(last=0)+2;k<=count;k+=2)
+      for(last=0,k=2;k<=count;k+=2)
       {
         int hi=run[k];
         int mi;
@@ -3768,6 +3622,7 @@ public final class SortUtil
       ao=bo;
       bo=o;
     }
+    while((count=last)>1);
   }
   private static void insertsort(int[] arr,int begin,int end)
   {
@@ -4134,11 +3989,6 @@ public final class SortUtil
     quicksortleftmost(arr,begin,less);
     }
     quicksort(arr,great+1,end);
-    //TODO check to see if this is necessary
-    //if(++great!=end)
-    //{
-    //  quicksort(arr,great,end);
-    //}
   }
   private static void quicksortSinglePivot(int[] arr,int begin,int end,int pivot)
   {
@@ -4186,23 +4036,18 @@ public final class SortUtil
     quicksort(arr,begin,less);
     }
     quicksort(arr,great+1,end);
-    //TODO check to see if this is necessary
-    //if(++great!=end)
-    //{
-    //  quicksort(arr,great,end);
-    //}
   }
   private static void quicksortleftmostDualPivot(int[] arr,int begin,int end,int pivot1, int pivot2,int e1,int e5)
   {
     int less=begin;
     int great=end;
     while(
-    (arr[++less])<(pivot1)
+    (arr[++less])<=(pivot1)
     )
     {
     }
     while(
-    (arr[--great])>(pivot2)
+    (arr[--great])>=(pivot2)
     )
     {
     }
@@ -4318,12 +4163,12 @@ public final class SortUtil
     int less=begin;
     int great=end;
     while(
-    (arr[++less])<(pivot1)
+    (arr[++less])<=(pivot1)
     )
     {
     }
     while(
-    (arr[--great])>(pivot2)
+    (arr[--great])>=(pivot2)
     )
     {
     }
@@ -4456,7 +4301,7 @@ public final class SortUtil
           for(;;)
           {
             if(++k==end ||
-            (arr[k])>=(arr[k-1])
+            (arr[k])>(arr[k-1])
             )
             {
               break;
@@ -4467,7 +4312,7 @@ public final class SortUtil
           for(;;)
           {
             if(++k==end||
-            (arr[k-1])>=(arr[k])
+            (arr[k-1])>(arr[k])
             )
             {
               break;
@@ -4485,7 +4330,7 @@ public final class SortUtil
           ++count;
         }
         else if(
-        (arr[r=run[count]])>=(arr[r-1])
+        (arr[r=run[count]])>(arr[r-1])
         && ++count==67)
         {
           quickreverseSortleftmost(arr,begin,end);
@@ -4520,19 +4365,18 @@ public final class SortUtil
       ao=0;
       bo=-begin;
     }
-    //TODO streamline
-    //assert count>0;
     run[++count]=++end;
-    for(int last;count>1;count=last)
+    int last,k;
+    do
     {
-      for(int k=(last=0)+2;k<=count;k+=2)
+      for(last=0,k=2;k<=count;k+=2)
       {
         int hi=run[k];
         int mi;
         for(int i=run[k-2],p=i,q=(mi=run[k-1]);i<hi;++i)
         {
           if(q<hi && (p>=mi ||
-          (arr[q+ao])>=(arr[p+ao])
+          (arr[q+ao])>(arr[p+ao])
           ))
           {
             b[i+bo]=arr[q++ +ao];
@@ -4556,6 +4400,7 @@ public final class SortUtil
       ao=bo;
       bo=o;
     }
+    while((count=last)>1);
   }
   private static void insertreverseSort(int[] arr,int begin,int end)
   {
@@ -4564,7 +4409,7 @@ public final class SortUtil
       final var ai=arr[i+1];
       int aj;
       while(
-      (ai)>=(aj=arr[j])
+      (ai)>(aj=arr[j])
       )
       {
         arr[j+1]=aj;
@@ -4593,7 +4438,7 @@ public final class SortUtil
     {
       int a1,a2;
       if(
-      (a1=arr[k])>=(a2=arr[begin])
+      (a1=arr[k])>(a2=arr[begin])
       )
       {
         a2=a1;
@@ -4635,7 +4480,7 @@ public final class SortUtil
     int seventh,e1,e2,e3,e4,e5;
     int val1,val2,val3,val4,val5;
     if(
-    (val2=arr[e2=(e3=(begin+end)>>>1)-(seventh=(length>>3)+(length>>6)+1)])>=(val1=arr[e1=e2-seventh])
+    (val2=arr[e2=(e3=(begin+end)>>>1)-(seventh=(length>>3)+(length>>6)+1)])>(val1=arr[e1=e2-seventh])
     )
     {
       var tmp=val2;
@@ -4643,13 +4488,13 @@ public final class SortUtil
       val1=tmp;
     }
     if(
-    (val3=arr[e3])>=(val2)
+    (val3=arr[e3])>(val2)
     )
     {
       var tmp=val3;
       val3=val2;
       if(
-      (tmp)>=(val1)
+      (tmp)>(val1)
       )
       {
         val2=val1;
@@ -4661,18 +4506,18 @@ public final class SortUtil
       }
     }
     if(
-    (val4=arr[e4=e3+seventh])>=(val3)
+    (val4=arr[e4=e3+seventh])>(val3)
     )
     {
       var tmp=val4;
       val4=val3;
       if(
-      (tmp)>=(val2)
+      (tmp)>(val2)
       )
       {
         val3=val2;
         if(
-        (tmp)>=(val1)
+        (tmp)>(val1)
         )
         {
           val2=val1;
@@ -4689,23 +4534,23 @@ public final class SortUtil
       }
     }
     if(
-    (val5=arr[e5=e4+seventh])>=(val4)
+    (val5=arr[e5=e4+seventh])>(val4)
     )
     {
       var tmp=val5;
       val5=val4;
       if(
-      (tmp)>=(val3)
+      (tmp)>(val3)
       )
       {
         val4=val3;
         if(
-        (tmp)>=(val2)
+        (tmp)>(val2)
         )
         {
           val3=val2;
           if(
-          (tmp)>=(val1)
+          (tmp)>(val1)
           )
           {
             val2=val1;
@@ -4761,7 +4606,7 @@ public final class SortUtil
     int seventh,e1,e2,e3,e4,e5;
     int val1,val2,val3,val4,val5;
     if(
-    (val2=arr[e2=(e3=(begin+end)>>>1)-(seventh=(length>>3)+(length>>6)+1)])>=(val1=arr[e1=e2-seventh])
+    (val2=arr[e2=(e3=(begin+end)>>>1)-(seventh=(length>>3)+(length>>6)+1)])>(val1=arr[e1=e2-seventh])
     )
     {
       var tmp=val2;
@@ -4769,13 +4614,13 @@ public final class SortUtil
       val1=tmp;
     }
     if(
-    (val3=arr[e3])>=(val2)
+    (val3=arr[e3])>(val2)
     )
     {
       var tmp=val3;
       val3=val2;
       if(
-      (tmp)>=(val1)
+      (tmp)>(val1)
       )
       {
         val2=val1;
@@ -4787,18 +4632,18 @@ public final class SortUtil
       }
     }
     if(
-    (val4=arr[e4=e3+seventh])>=(val3)
+    (val4=arr[e4=e3+seventh])>(val3)
     )
     {
       var tmp=val4;
       val4=val3;
       if(
-      (tmp)>=(val2)
+      (tmp)>(val2)
       )
       {
         val3=val2;
         if(
-        (tmp)>=(val1)
+        (tmp)>(val1)
         )
         {
           val2=val1;
@@ -4815,23 +4660,23 @@ public final class SortUtil
       }
     }
     if(
-    (val5=arr[e5=e4+seventh])>=(val4)
+    (val5=arr[e5=e4+seventh])>(val4)
     )
     {
       var tmp=val5;
       val5=val4;
       if(
-      (tmp)>=(val3)
+      (tmp)>(val3)
       )
       {
         val4=val3;
         if(
-        (tmp)>=(val2)
+        (tmp)>(val2)
         )
         {
           val3=val2;
           if(
-          (tmp)>=(val1)
+          (tmp)>(val1)
           )
           {
             val2=val1;
@@ -4922,11 +4767,6 @@ public final class SortUtil
     quickreverseSortleftmost(arr,begin,less);
     }
     quickreverseSort(arr,great+1,end);
-    //TODO check to see if this is necessary
-    //if(++great!=end)
-    //{
-    //  quickreverseSort(arr,great,end);
-    //}
   }
   private static void quickreverseSortSinglePivot(int[] arr,int begin,int end,int pivot)
   {
@@ -4974,11 +4814,6 @@ public final class SortUtil
     quickreverseSort(arr,begin,less);
     }
     quickreverseSort(arr,great+1,end);
-    //TODO check to see if this is necessary
-    //if(++great!=end)
-    //{
-    //  quickreverseSort(arr,great,end);
-    //}
   }
   private static void quickreverseSortleftmostDualPivot(int[] arr,int begin,int end,int pivot1, int pivot2,int e1,int e5)
   {
@@ -4998,7 +4833,7 @@ public final class SortUtil
     {
       int ak;
       if(
-      (ak=arr[k])>=(pivot1)
+      (ak=arr[k])>(pivot1)
       )
       {
         arr[k]=arr[less];
@@ -5007,12 +4842,12 @@ public final class SortUtil
       }
       else
       if(
-      (ak)<=(pivot2)
+      (ak)<(pivot2)
       )
       {
         int ag;
         while(
-        (ag=arr[great])<=(pivot2)
+        (ag=arr[great])<(pivot2)
         )
         {
           if(great--==k)
@@ -5021,7 +4856,7 @@ public final class SortUtil
           }
         }
         if(
-        (ag)>=(pivot1)
+        (ag)>(pivot1)
         )
         {
           arr[k]=arr[less];
@@ -5119,7 +4954,7 @@ public final class SortUtil
     {
       int ak;
       if(
-      (ak=arr[k])>=(pivot1)
+      (ak=arr[k])>(pivot1)
       )
       {
         arr[k]=arr[less];
@@ -5128,12 +4963,12 @@ public final class SortUtil
       }
       else
       if(
-      (ak)<=(pivot2)
+      (ak)<(pivot2)
       )
       {
         int ag;
         while(
-        (ag=arr[great])<=(pivot2)
+        (ag=arr[great])<(pivot2)
         )
         {
           if(great--==k)
@@ -5142,7 +4977,7 @@ public final class SortUtil
           }
         }
         if(
-        (ag)>=(pivot1)
+        (ag)>(pivot1)
         )
         {
           arr[k]=arr[less];
@@ -5308,12 +5143,11 @@ public final class SortUtil
       ao=0;
       bo=-begin;
     }
-    //TODO streamline
-    //assert count>0;
     run[++count]=++end;
-    for(int last;count>1;count=last)
+    int last,k;
+    do
     {
-      for(int k=(last=0)+2;k<=count;k+=2)
+      for(last=0,k=2;k<=count;k+=2)
       {
         int hi=run[k];
         int mi;
@@ -5344,6 +5178,7 @@ public final class SortUtil
       ao=bo;
       bo=o;
     }
+    while((count=last)>1);
   }
   private static void insertsort(long[] arr,int begin,int end)
   {
@@ -5710,11 +5545,6 @@ public final class SortUtil
     quicksortleftmost(arr,begin,less);
     }
     quicksort(arr,great+1,end);
-    //TODO check to see if this is necessary
-    //if(++great!=end)
-    //{
-    //  quicksort(arr,great,end);
-    //}
   }
   private static void quicksortSinglePivot(long[] arr,int begin,int end,long pivot)
   {
@@ -5762,23 +5592,18 @@ public final class SortUtil
     quicksort(arr,begin,less);
     }
     quicksort(arr,great+1,end);
-    //TODO check to see if this is necessary
-    //if(++great!=end)
-    //{
-    //  quicksort(arr,great,end);
-    //}
   }
   private static void quicksortleftmostDualPivot(long[] arr,int begin,int end,long pivot1, long pivot2,int e1,int e5)
   {
     int less=begin;
     int great=end;
     while(
-    (arr[++less])<(pivot1)
+    (arr[++less])<=(pivot1)
     )
     {
     }
     while(
-    (arr[--great])>(pivot2)
+    (arr[--great])>=(pivot2)
     )
     {
     }
@@ -5894,12 +5719,12 @@ public final class SortUtil
     int less=begin;
     int great=end;
     while(
-    (arr[++less])<(pivot1)
+    (arr[++less])<=(pivot1)
     )
     {
     }
     while(
-    (arr[--great])>(pivot2)
+    (arr[--great])>=(pivot2)
     )
     {
     }
@@ -6032,7 +5857,7 @@ public final class SortUtil
           for(;;)
           {
             if(++k==end ||
-            (arr[k])>=(arr[k-1])
+            (arr[k])>(arr[k-1])
             )
             {
               break;
@@ -6043,7 +5868,7 @@ public final class SortUtil
           for(;;)
           {
             if(++k==end||
-            (arr[k-1])>=(arr[k])
+            (arr[k-1])>(arr[k])
             )
             {
               break;
@@ -6061,7 +5886,7 @@ public final class SortUtil
           ++count;
         }
         else if(
-        (arr[r=run[count]])>=(arr[r-1])
+        (arr[r=run[count]])>(arr[r-1])
         && ++count==67)
         {
           quickreverseSortleftmost(arr,begin,end);
@@ -6096,19 +5921,18 @@ public final class SortUtil
       ao=0;
       bo=-begin;
     }
-    //TODO streamline
-    //assert count>0;
     run[++count]=++end;
-    for(int last;count>1;count=last)
+    int last,k;
+    do
     {
-      for(int k=(last=0)+2;k<=count;k+=2)
+      for(last=0,k=2;k<=count;k+=2)
       {
         int hi=run[k];
         int mi;
         for(int i=run[k-2],p=i,q=(mi=run[k-1]);i<hi;++i)
         {
           if(q<hi && (p>=mi ||
-          (arr[q+ao])>=(arr[p+ao])
+          (arr[q+ao])>(arr[p+ao])
           ))
           {
             b[i+bo]=arr[q++ +ao];
@@ -6132,6 +5956,7 @@ public final class SortUtil
       ao=bo;
       bo=o;
     }
+    while((count=last)>1);
   }
   private static void insertreverseSort(long[] arr,int begin,int end)
   {
@@ -6140,7 +5965,7 @@ public final class SortUtil
       final var ai=arr[i+1];
       long aj;
       while(
-      (ai)>=(aj=arr[j])
+      (ai)>(aj=arr[j])
       )
       {
         arr[j+1]=aj;
@@ -6169,7 +5994,7 @@ public final class SortUtil
     {
       long a1,a2;
       if(
-      (a1=arr[k])>=(a2=arr[begin])
+      (a1=arr[k])>(a2=arr[begin])
       )
       {
         a2=a1;
@@ -6211,7 +6036,7 @@ public final class SortUtil
     int seventh,e1,e2,e3,e4,e5;
     long val1,val2,val3,val4,val5;
     if(
-    (val2=arr[e2=(e3=(begin+end)>>>1)-(seventh=(length>>3)+(length>>6)+1)])>=(val1=arr[e1=e2-seventh])
+    (val2=arr[e2=(e3=(begin+end)>>>1)-(seventh=(length>>3)+(length>>6)+1)])>(val1=arr[e1=e2-seventh])
     )
     {
       var tmp=val2;
@@ -6219,13 +6044,13 @@ public final class SortUtil
       val1=tmp;
     }
     if(
-    (val3=arr[e3])>=(val2)
+    (val3=arr[e3])>(val2)
     )
     {
       var tmp=val3;
       val3=val2;
       if(
-      (tmp)>=(val1)
+      (tmp)>(val1)
       )
       {
         val2=val1;
@@ -6237,18 +6062,18 @@ public final class SortUtil
       }
     }
     if(
-    (val4=arr[e4=e3+seventh])>=(val3)
+    (val4=arr[e4=e3+seventh])>(val3)
     )
     {
       var tmp=val4;
       val4=val3;
       if(
-      (tmp)>=(val2)
+      (tmp)>(val2)
       )
       {
         val3=val2;
         if(
-        (tmp)>=(val1)
+        (tmp)>(val1)
         )
         {
           val2=val1;
@@ -6265,23 +6090,23 @@ public final class SortUtil
       }
     }
     if(
-    (val5=arr[e5=e4+seventh])>=(val4)
+    (val5=arr[e5=e4+seventh])>(val4)
     )
     {
       var tmp=val5;
       val5=val4;
       if(
-      (tmp)>=(val3)
+      (tmp)>(val3)
       )
       {
         val4=val3;
         if(
-        (tmp)>=(val2)
+        (tmp)>(val2)
         )
         {
           val3=val2;
           if(
-          (tmp)>=(val1)
+          (tmp)>(val1)
           )
           {
             val2=val1;
@@ -6337,7 +6162,7 @@ public final class SortUtil
     int seventh,e1,e2,e3,e4,e5;
     long val1,val2,val3,val4,val5;
     if(
-    (val2=arr[e2=(e3=(begin+end)>>>1)-(seventh=(length>>3)+(length>>6)+1)])>=(val1=arr[e1=e2-seventh])
+    (val2=arr[e2=(e3=(begin+end)>>>1)-(seventh=(length>>3)+(length>>6)+1)])>(val1=arr[e1=e2-seventh])
     )
     {
       var tmp=val2;
@@ -6345,13 +6170,13 @@ public final class SortUtil
       val1=tmp;
     }
     if(
-    (val3=arr[e3])>=(val2)
+    (val3=arr[e3])>(val2)
     )
     {
       var tmp=val3;
       val3=val2;
       if(
-      (tmp)>=(val1)
+      (tmp)>(val1)
       )
       {
         val2=val1;
@@ -6363,18 +6188,18 @@ public final class SortUtil
       }
     }
     if(
-    (val4=arr[e4=e3+seventh])>=(val3)
+    (val4=arr[e4=e3+seventh])>(val3)
     )
     {
       var tmp=val4;
       val4=val3;
       if(
-      (tmp)>=(val2)
+      (tmp)>(val2)
       )
       {
         val3=val2;
         if(
-        (tmp)>=(val1)
+        (tmp)>(val1)
         )
         {
           val2=val1;
@@ -6391,23 +6216,23 @@ public final class SortUtil
       }
     }
     if(
-    (val5=arr[e5=e4+seventh])>=(val4)
+    (val5=arr[e5=e4+seventh])>(val4)
     )
     {
       var tmp=val5;
       val5=val4;
       if(
-      (tmp)>=(val3)
+      (tmp)>(val3)
       )
       {
         val4=val3;
         if(
-        (tmp)>=(val2)
+        (tmp)>(val2)
         )
         {
           val3=val2;
           if(
-          (tmp)>=(val1)
+          (tmp)>(val1)
           )
           {
             val2=val1;
@@ -6498,11 +6323,6 @@ public final class SortUtil
     quickreverseSortleftmost(arr,begin,less);
     }
     quickreverseSort(arr,great+1,end);
-    //TODO check to see if this is necessary
-    //if(++great!=end)
-    //{
-    //  quickreverseSort(arr,great,end);
-    //}
   }
   private static void quickreverseSortSinglePivot(long[] arr,int begin,int end,long pivot)
   {
@@ -6550,11 +6370,6 @@ public final class SortUtil
     quickreverseSort(arr,begin,less);
     }
     quickreverseSort(arr,great+1,end);
-    //TODO check to see if this is necessary
-    //if(++great!=end)
-    //{
-    //  quickreverseSort(arr,great,end);
-    //}
   }
   private static void quickreverseSortleftmostDualPivot(long[] arr,int begin,int end,long pivot1, long pivot2,int e1,int e5)
   {
@@ -6574,7 +6389,7 @@ public final class SortUtil
     {
       long ak;
       if(
-      (ak=arr[k])>=(pivot1)
+      (ak=arr[k])>(pivot1)
       )
       {
         arr[k]=arr[less];
@@ -6583,12 +6398,12 @@ public final class SortUtil
       }
       else
       if(
-      (ak)<=(pivot2)
+      (ak)<(pivot2)
       )
       {
         long ag;
         while(
-        (ag=arr[great])<=(pivot2)
+        (ag=arr[great])<(pivot2)
         )
         {
           if(great--==k)
@@ -6597,7 +6412,7 @@ public final class SortUtil
           }
         }
         if(
-        (ag)>=(pivot1)
+        (ag)>(pivot1)
         )
         {
           arr[k]=arr[less];
@@ -6695,7 +6510,7 @@ public final class SortUtil
     {
       long ak;
       if(
-      (ak=arr[k])>=(pivot1)
+      (ak=arr[k])>(pivot1)
       )
       {
         arr[k]=arr[less];
@@ -6704,12 +6519,12 @@ public final class SortUtil
       }
       else
       if(
-      (ak)<=(pivot2)
+      (ak)<(pivot2)
       )
       {
         long ag;
         while(
-        (ag=arr[great])<=(pivot2)
+        (ag=arr[great])<(pivot2)
         )
         {
           if(great--==k)
@@ -6718,7 +6533,7 @@ public final class SortUtil
           }
         }
         if(
-        (ag)>=(pivot1)
+        (ag)>(pivot1)
         )
         {
           arr[k]=arr[less];
@@ -6804,7 +6619,29 @@ public final class SortUtil
     //assert begin>=0;
     //assert end<arr.length;
     //assert begin<end;
-    dosort(arr,begin,end=moveNaNsort(arr,begin,end));
+    for(;;)
+    {
+      if(!Float.isNaN(arr[end]))
+      {
+        break;
+      }
+      if(--end==begin)
+      {
+        //already sorted
+        return;
+      }
+    }
+    for(int k=end;--k>=begin;)
+    {
+      float ak;
+      if(Float.isNaN(ak=arr[k]))
+      {
+        arr[k]=arr[end];
+        arr[end]=ak;
+        --end;
+      }
+    }
+    dosort(arr,begin,end);
     moveZerossort(arr,begin,end);
   }
   public static void dosort(float[] arr,int begin,int end)
@@ -6876,31 +6713,6 @@ public final class SortUtil
       }
     }
   }
-  private static int moveNaNsort(float[] arr,int begin,int end)
-  {
-    for(;;)
-    {
-      if(!Float.isNaN(arr[end]))
-      {
-        break;
-      }
-      if(--end==begin)
-      {
-        return end;
-      }
-    }
-    for(int k=end;--k!=begin;)
-    {
-      float ak;
-      if(Float.isNaN(ak=arr[k]))
-      {
-        arr[k]=arr[end];
-        arr[end]=ak;
-        --end;
-      }
-    }
-    return end;
-  }
   private static void moveZerossort(float[] arr,int begin,int end)
   {
     int hi;
@@ -6967,12 +6779,11 @@ public final class SortUtil
       ao=0;
       bo=-begin;
     }
-    //TODO streamline
-    //assert count>0;
     run[++count]=++end;
-    for(int last;count>1;count=last)
+    int last,k;
+    do
     {
-      for(int k=(last=0)+2;k<=count;k+=2)
+      for(last=0,k=2;k<=count;k+=2)
       {
         int hi=run[k];
         int mi;
@@ -7003,6 +6814,7 @@ public final class SortUtil
       ao=bo;
       bo=o;
     }
+    while((count=last)>1);
   }
   private static void insertsort(float[] arr,int begin,int end)
   {
@@ -7371,11 +7183,6 @@ public final class SortUtil
     quicksortleftmost(arr,begin,less);
     }
     quicksort(arr,great+1,end);
-    //TODO check to see if this is necessary
-    //if(++great!=end)
-    //{
-    //  quicksort(arr,great,end);
-    //}
   }
   private static void quicksortSinglePivot(float[] arr,int begin,int end,float pivot)
   {
@@ -7425,23 +7232,18 @@ public final class SortUtil
     quicksort(arr,begin,less);
     }
     quicksort(arr,great+1,end);
-    //TODO check to see if this is necessary
-    //if(++great!=end)
-    //{
-    //  quicksort(arr,great,end);
-    //}
   }
   private static void quicksortleftmostDualPivot(float[] arr,int begin,int end,float pivot1, float pivot2,int e1,int e5)
   {
     int less=begin;
     int great=end;
     while(
-    (arr[++less])<(pivot1)
+    (arr[++less])<=(pivot1)
     )
     {
     }
     while(
-    (arr[--great])>(pivot2)
+    (arr[--great])>=(pivot2)
     )
     {
     }
@@ -7557,12 +7359,12 @@ public final class SortUtil
     int less=begin;
     int great=end;
     while(
-    (arr[++less])<(pivot1)
+    (arr[++less])<=(pivot1)
     )
     {
     }
     while(
-    (arr[--great])>(pivot2)
+    (arr[--great])>=(pivot2)
     )
     {
     }
@@ -7679,7 +7481,29 @@ public final class SortUtil
     //assert begin>=0;
     //assert end<arr.length;
     //assert begin<end;
-    doreverseSort(arr,begin=moveNaNreverseSort(arr,begin,end),end);
+    for(;;)
+    {
+      if(!Float.isNaN(arr[begin]))
+      {
+        break;
+      }
+      if(++begin==end)
+      {
+        //already sorted
+        return;
+      }
+    }
+    for(int k=begin;++k<=end;)
+    {
+      float ak;
+      if(Float.isNaN(ak=arr[k]))
+      {
+        arr[k]=arr[begin];
+        arr[begin]=ak;
+        ++begin;
+      }
+    }
+    doreverseSort(arr,begin,end);
     moveZerosreverseSort(arr,begin,end);
   }
   public static void doreverseSort(float[] arr,int begin,int end)
@@ -7697,13 +7521,13 @@ public final class SortUtil
       for(int k=begin;k!=end;)
       {
         if(
-        (arr[k])>=(arr[k+1])
+        (arr[k])>(arr[k+1])
         )
         {
           for(;;)
           {
             if(++k==end ||
-            (arr[k])>=(arr[k-1])
+            (arr[k])>(arr[k-1])
             )
             {
               break;
@@ -7712,13 +7536,13 @@ public final class SortUtil
         }
         else
         if(
-        (arr[k])<=(arr[k+1])
+        (arr[k])<(arr[k+1])
         )
         {
           for(;;)
           {
             if(++k==end||
-            (arr[k-1])>=(arr[k])
+            (arr[k-1])>(arr[k])
             )
             {
               break;
@@ -7737,7 +7561,7 @@ public final class SortUtil
           ++count;
         }
         else if(
-        (arr[r=run[count]])>=(arr[r-1])
+        (arr[r=run[count]])>(arr[r-1])
         && ++count==67)
         {
           quickreverseSortleftmost(arr,begin,end);
@@ -7750,31 +7574,6 @@ public final class SortUtil
         reverseSortmerge(arr,begin,end,run,count);
       }
     }
-  }
-  private static int moveNaNreverseSort(float[] arr,int begin,int end)
-  {
-    for(;;)
-    {
-      if(!Float.isNaN(arr[begin]))
-      {
-        break;
-      }
-      if(++begin==end)
-      {
-        return begin;
-      }
-    }
-    for(int k=begin;++k!=end;)
-    {
-      float ak;
-      if(Float.isNaN(ak=arr[k]))
-      {
-        arr[k]=arr[begin];
-        arr[begin]=ak;
-        ++begin;
-      }
-    }
-    return begin;
   }
   private static void moveZerosreverseSort(float[] arr,int begin,int end)
   {
@@ -7842,19 +7641,18 @@ public final class SortUtil
       ao=0;
       bo=-begin;
     }
-    //TODO streamline
-    //assert count>0;
     run[++count]=++end;
-    for(int last;count>1;count=last)
+    int last,k;
+    do
     {
-      for(int k=(last=0)+2;k<=count;k+=2)
+      for(last=0,k=2;k<=count;k+=2)
       {
         int hi=run[k];
         int mi;
         for(int i=run[k-2],p=i,q=(mi=run[k-1]);i<hi;++i)
         {
           if(q<hi && (p>=mi ||
-          (arr[q+ao])>=(arr[p+ao])
+          (arr[q+ao])>(arr[p+ao])
           ))
           {
             b[i+bo]=arr[q++ +ao];
@@ -7878,6 +7676,7 @@ public final class SortUtil
       ao=bo;
       bo=o;
     }
+    while((count=last)>1);
   }
   private static void insertreverseSort(float[] arr,int begin,int end)
   {
@@ -7886,7 +7685,7 @@ public final class SortUtil
       final var ai=arr[i+1];
       float aj;
       while(
-      (ai)>=(aj=arr[j])
+      (ai)>(aj=arr[j])
       )
       {
         arr[j+1]=aj;
@@ -7915,7 +7714,7 @@ public final class SortUtil
     {
       float a1,a2;
       if(
-      (a1=arr[k])>=(a2=arr[begin])
+      (a1=arr[k])>(a2=arr[begin])
       )
       {
         a2=a1;
@@ -7957,7 +7756,7 @@ public final class SortUtil
     int seventh,e1,e2,e3,e4,e5;
     float val1,val2,val3,val4,val5;
     if(
-    (val2=arr[e2=(e3=(begin+end)>>>1)-(seventh=(length>>3)+(length>>6)+1)])>=(val1=arr[e1=e2-seventh])
+    (val2=arr[e2=(e3=(begin+end)>>>1)-(seventh=(length>>3)+(length>>6)+1)])>(val1=arr[e1=e2-seventh])
     )
     {
       var tmp=val2;
@@ -7965,13 +7764,13 @@ public final class SortUtil
       val1=tmp;
     }
     if(
-    (val3=arr[e3])>=(val2)
+    (val3=arr[e3])>(val2)
     )
     {
       var tmp=val3;
       val3=val2;
       if(
-      (tmp)>=(val1)
+      (tmp)>(val1)
       )
       {
         val2=val1;
@@ -7983,18 +7782,18 @@ public final class SortUtil
       }
     }
     if(
-    (val4=arr[e4=e3+seventh])>=(val3)
+    (val4=arr[e4=e3+seventh])>(val3)
     )
     {
       var tmp=val4;
       val4=val3;
       if(
-      (tmp)>=(val2)
+      (tmp)>(val2)
       )
       {
         val3=val2;
         if(
-        (tmp)>=(val1)
+        (tmp)>(val1)
         )
         {
           val2=val1;
@@ -8011,23 +7810,23 @@ public final class SortUtil
       }
     }
     if(
-    (val5=arr[e5=e4+seventh])>=(val4)
+    (val5=arr[e5=e4+seventh])>(val4)
     )
     {
       var tmp=val5;
       val5=val4;
       if(
-      (tmp)>=(val3)
+      (tmp)>(val3)
       )
       {
         val4=val3;
         if(
-        (tmp)>=(val2)
+        (tmp)>(val2)
         )
         {
           val3=val2;
           if(
-          (tmp)>=(val1)
+          (tmp)>(val1)
           )
           {
             val2=val1;
@@ -8083,7 +7882,7 @@ public final class SortUtil
     int seventh,e1,e2,e3,e4,e5;
     float val1,val2,val3,val4,val5;
     if(
-    (val2=arr[e2=(e3=(begin+end)>>>1)-(seventh=(length>>3)+(length>>6)+1)])>=(val1=arr[e1=e2-seventh])
+    (val2=arr[e2=(e3=(begin+end)>>>1)-(seventh=(length>>3)+(length>>6)+1)])>(val1=arr[e1=e2-seventh])
     )
     {
       var tmp=val2;
@@ -8091,13 +7890,13 @@ public final class SortUtil
       val1=tmp;
     }
     if(
-    (val3=arr[e3])>=(val2)
+    (val3=arr[e3])>(val2)
     )
     {
       var tmp=val3;
       val3=val2;
       if(
-      (tmp)>=(val1)
+      (tmp)>(val1)
       )
       {
         val2=val1;
@@ -8109,18 +7908,18 @@ public final class SortUtil
       }
     }
     if(
-    (val4=arr[e4=e3+seventh])>=(val3)
+    (val4=arr[e4=e3+seventh])>(val3)
     )
     {
       var tmp=val4;
       val4=val3;
       if(
-      (tmp)>=(val2)
+      (tmp)>(val2)
       )
       {
         val3=val2;
         if(
-        (tmp)>=(val1)
+        (tmp)>(val1)
         )
         {
           val2=val1;
@@ -8137,23 +7936,23 @@ public final class SortUtil
       }
     }
     if(
-    (val5=arr[e5=e4+seventh])>=(val4)
+    (val5=arr[e5=e4+seventh])>(val4)
     )
     {
       var tmp=val5;
       val5=val4;
       if(
-      (tmp)>=(val3)
+      (tmp)>(val3)
       )
       {
         val4=val3;
         if(
-        (tmp)>=(val2)
+        (tmp)>(val2)
         )
         {
           val3=val2;
           if(
-          (tmp)>=(val1)
+          (tmp)>(val1)
           )
           {
             val2=val1;
@@ -8246,11 +8045,6 @@ public final class SortUtil
     quickreverseSortleftmost(arr,begin,less);
     }
     quickreverseSort(arr,great+1,end);
-    //TODO check to see if this is necessary
-    //if(++great!=end)
-    //{
-    //  quickreverseSort(arr,great,end);
-    //}
   }
   private static void quickreverseSortSinglePivot(float[] arr,int begin,int end,float pivot)
   {
@@ -8300,11 +8094,6 @@ public final class SortUtil
     quickreverseSort(arr,begin,less);
     }
     quickreverseSort(arr,great+1,end);
-    //TODO check to see if this is necessary
-    //if(++great!=end)
-    //{
-    //  quickreverseSort(arr,great,end);
-    //}
   }
   private static void quickreverseSortleftmostDualPivot(float[] arr,int begin,int end,float pivot1, float pivot2,int e1,int e5)
   {
@@ -8324,7 +8113,7 @@ public final class SortUtil
     {
       float ak;
       if(
-      (ak=arr[k])>=(pivot1)
+      (ak=arr[k])>(pivot1)
       )
       {
         arr[k]=arr[less];
@@ -8333,12 +8122,12 @@ public final class SortUtil
       }
       else
       if(
-      (ak)<=(pivot2)
+      (ak)<(pivot2)
       )
       {
         float ag;
         while(
-        (ag=arr[great])<=(pivot2)
+        (ag=arr[great])<(pivot2)
         )
         {
           if(great--==k)
@@ -8347,7 +8136,7 @@ public final class SortUtil
           }
         }
         if(
-        (ag)>=(pivot1)
+        (ag)>(pivot1)
         )
         {
           arr[k]=arr[less];
@@ -8445,7 +8234,7 @@ public final class SortUtil
     {
       float ak;
       if(
-      (ak=arr[k])>=(pivot1)
+      (ak=arr[k])>(pivot1)
       )
       {
         arr[k]=arr[less];
@@ -8454,12 +8243,12 @@ public final class SortUtil
       }
       else
       if(
-      (ak)<=(pivot2)
+      (ak)<(pivot2)
       )
       {
         float ag;
         while(
-        (ag=arr[great])<=(pivot2)
+        (ag=arr[great])<(pivot2)
         )
         {
           if(great--==k)
@@ -8468,7 +8257,7 @@ public final class SortUtil
           }
         }
         if(
-        (ag)>=(pivot1)
+        (ag)>(pivot1)
         )
         {
           arr[k]=arr[less];
@@ -8554,7 +8343,29 @@ public final class SortUtil
     //assert begin>=0;
     //assert end<arr.length;
     //assert begin<end;
-    dosort(arr,begin,end=moveNaNsort(arr,begin,end));
+    for(;;)
+    {
+      if(!Double.isNaN(arr[end]))
+      {
+        break;
+      }
+      if(--end==begin)
+      {
+        //already sorted
+        return;
+      }
+    }
+    for(int k=end;--k>=begin;)
+    {
+      double ak;
+      if(Double.isNaN(ak=arr[k]))
+      {
+        arr[k]=arr[end];
+        arr[end]=ak;
+        --end;
+      }
+    }
+    dosort(arr,begin,end);
     moveZerossort(arr,begin,end);
   }
   public static void dosort(double[] arr,int begin,int end)
@@ -8626,31 +8437,6 @@ public final class SortUtil
       }
     }
   }
-  private static int moveNaNsort(double[] arr,int begin,int end)
-  {
-    for(;;)
-    {
-      if(!Double.isNaN(arr[end]))
-      {
-        break;
-      }
-      if(--end==begin)
-      {
-        return end;
-      }
-    }
-    for(int k=end;--k!=begin;)
-    {
-      double ak;
-      if(Double.isNaN(ak=arr[k]))
-      {
-        arr[k]=arr[end];
-        arr[end]=ak;
-        --end;
-      }
-    }
-    return end;
-  }
   private static void moveZerossort(double[] arr,int begin,int end)
   {
     int hi;
@@ -8718,12 +8504,11 @@ public final class SortUtil
       ao=0;
       bo=-begin;
     }
-    //TODO streamline
-    //assert count>0;
     run[++count]=++end;
-    for(int last;count>1;count=last)
+    int last,k;
+    do
     {
-      for(int k=(last=0)+2;k<=count;k+=2)
+      for(last=0,k=2;k<=count;k+=2)
       {
         int hi=run[k];
         int mi;
@@ -8754,6 +8539,7 @@ public final class SortUtil
       ao=bo;
       bo=o;
     }
+    while((count=last)>1);
   }
   private static void insertsort(double[] arr,int begin,int end)
   {
@@ -9122,11 +8908,6 @@ public final class SortUtil
     quicksortleftmost(arr,begin,less);
     }
     quicksort(arr,great+1,end);
-    //TODO check to see if this is necessary
-    //if(++great!=end)
-    //{
-    //  quicksort(arr,great,end);
-    //}
   }
   private static void quicksortSinglePivot(double[] arr,int begin,int end,double pivot)
   {
@@ -9176,23 +8957,18 @@ public final class SortUtil
     quicksort(arr,begin,less);
     }
     quicksort(arr,great+1,end);
-    //TODO check to see if this is necessary
-    //if(++great!=end)
-    //{
-    //  quicksort(arr,great,end);
-    //}
   }
   private static void quicksortleftmostDualPivot(double[] arr,int begin,int end,double pivot1, double pivot2,int e1,int e5)
   {
     int less=begin;
     int great=end;
     while(
-    (arr[++less])<(pivot1)
+    (arr[++less])<=(pivot1)
     )
     {
     }
     while(
-    (arr[--great])>(pivot2)
+    (arr[--great])>=(pivot2)
     )
     {
     }
@@ -9308,12 +9084,12 @@ public final class SortUtil
     int less=begin;
     int great=end;
     while(
-    (arr[++less])<(pivot1)
+    (arr[++less])<=(pivot1)
     )
     {
     }
     while(
-    (arr[--great])>(pivot2)
+    (arr[--great])>=(pivot2)
     )
     {
     }
@@ -9430,7 +9206,29 @@ public final class SortUtil
     //assert begin>=0;
     //assert end<arr.length;
     //assert begin<end;
-    doreverseSort(arr,begin=moveNaNreverseSort(arr,begin,end),end);
+    for(;;)
+    {
+      if(!Double.isNaN(arr[begin]))
+      {
+        break;
+      }
+      if(++begin==end)
+      {
+        //already sorted
+        return;
+      }
+    }
+    for(int k=begin;++k<=end;)
+    {
+      double ak;
+      if(Double.isNaN(ak=arr[k]))
+      {
+        arr[k]=arr[begin];
+        arr[begin]=ak;
+        ++begin;
+      }
+    }
+    doreverseSort(arr,begin,end);
     moveZerosreverseSort(arr,begin,end);
   }
   public static void doreverseSort(double[] arr,int begin,int end)
@@ -9448,13 +9246,13 @@ public final class SortUtil
       for(int k=begin;k!=end;)
       {
         if(
-        (arr[k])>=(arr[k+1])
+        (arr[k])>(arr[k+1])
         )
         {
           for(;;)
           {
             if(++k==end ||
-            (arr[k])>=(arr[k-1])
+            (arr[k])>(arr[k-1])
             )
             {
               break;
@@ -9463,13 +9261,13 @@ public final class SortUtil
         }
         else
         if(
-        (arr[k])<=(arr[k+1])
+        (arr[k])<(arr[k+1])
         )
         {
           for(;;)
           {
             if(++k==end||
-            (arr[k-1])>=(arr[k])
+            (arr[k-1])>(arr[k])
             )
             {
               break;
@@ -9488,7 +9286,7 @@ public final class SortUtil
           ++count;
         }
         else if(
-        (arr[r=run[count]])>=(arr[r-1])
+        (arr[r=run[count]])>(arr[r-1])
         && ++count==67)
         {
           quickreverseSortleftmost(arr,begin,end);
@@ -9501,31 +9299,6 @@ public final class SortUtil
         reverseSortmerge(arr,begin,end,run,count);
       }
     }
-  }
-  private static int moveNaNreverseSort(double[] arr,int begin,int end)
-  {
-    for(;;)
-    {
-      if(!Double.isNaN(arr[begin]))
-      {
-        break;
-      }
-      if(++begin==end)
-      {
-        return begin;
-      }
-    }
-    for(int k=begin;++k!=end;)
-    {
-      double ak;
-      if(Double.isNaN(ak=arr[k]))
-      {
-        arr[k]=arr[begin];
-        arr[begin]=ak;
-        ++begin;
-      }
-    }
-    return begin;
   }
   private static void moveZerosreverseSort(double[] arr,int begin,int end)
   {
@@ -9594,19 +9367,18 @@ public final class SortUtil
       ao=0;
       bo=-begin;
     }
-    //TODO streamline
-    //assert count>0;
     run[++count]=++end;
-    for(int last;count>1;count=last)
+    int last,k;
+    do
     {
-      for(int k=(last=0)+2;k<=count;k+=2)
+      for(last=0,k=2;k<=count;k+=2)
       {
         int hi=run[k];
         int mi;
         for(int i=run[k-2],p=i,q=(mi=run[k-1]);i<hi;++i)
         {
           if(q<hi && (p>=mi ||
-          (arr[q+ao])>=(arr[p+ao])
+          (arr[q+ao])>(arr[p+ao])
           ))
           {
             b[i+bo]=arr[q++ +ao];
@@ -9630,6 +9402,7 @@ public final class SortUtil
       ao=bo;
       bo=o;
     }
+    while((count=last)>1);
   }
   private static void insertreverseSort(double[] arr,int begin,int end)
   {
@@ -9638,7 +9411,7 @@ public final class SortUtil
       final var ai=arr[i+1];
       double aj;
       while(
-      (ai)>=(aj=arr[j])
+      (ai)>(aj=arr[j])
       )
       {
         arr[j+1]=aj;
@@ -9667,7 +9440,7 @@ public final class SortUtil
     {
       double a1,a2;
       if(
-      (a1=arr[k])>=(a2=arr[begin])
+      (a1=arr[k])>(a2=arr[begin])
       )
       {
         a2=a1;
@@ -9709,7 +9482,7 @@ public final class SortUtil
     int seventh,e1,e2,e3,e4,e5;
     double val1,val2,val3,val4,val5;
     if(
-    (val2=arr[e2=(e3=(begin+end)>>>1)-(seventh=(length>>3)+(length>>6)+1)])>=(val1=arr[e1=e2-seventh])
+    (val2=arr[e2=(e3=(begin+end)>>>1)-(seventh=(length>>3)+(length>>6)+1)])>(val1=arr[e1=e2-seventh])
     )
     {
       var tmp=val2;
@@ -9717,13 +9490,13 @@ public final class SortUtil
       val1=tmp;
     }
     if(
-    (val3=arr[e3])>=(val2)
+    (val3=arr[e3])>(val2)
     )
     {
       var tmp=val3;
       val3=val2;
       if(
-      (tmp)>=(val1)
+      (tmp)>(val1)
       )
       {
         val2=val1;
@@ -9735,18 +9508,18 @@ public final class SortUtil
       }
     }
     if(
-    (val4=arr[e4=e3+seventh])>=(val3)
+    (val4=arr[e4=e3+seventh])>(val3)
     )
     {
       var tmp=val4;
       val4=val3;
       if(
-      (tmp)>=(val2)
+      (tmp)>(val2)
       )
       {
         val3=val2;
         if(
-        (tmp)>=(val1)
+        (tmp)>(val1)
         )
         {
           val2=val1;
@@ -9763,23 +9536,23 @@ public final class SortUtil
       }
     }
     if(
-    (val5=arr[e5=e4+seventh])>=(val4)
+    (val5=arr[e5=e4+seventh])>(val4)
     )
     {
       var tmp=val5;
       val5=val4;
       if(
-      (tmp)>=(val3)
+      (tmp)>(val3)
       )
       {
         val4=val3;
         if(
-        (tmp)>=(val2)
+        (tmp)>(val2)
         )
         {
           val3=val2;
           if(
-          (tmp)>=(val1)
+          (tmp)>(val1)
           )
           {
             val2=val1;
@@ -9835,7 +9608,7 @@ public final class SortUtil
     int seventh,e1,e2,e3,e4,e5;
     double val1,val2,val3,val4,val5;
     if(
-    (val2=arr[e2=(e3=(begin+end)>>>1)-(seventh=(length>>3)+(length>>6)+1)])>=(val1=arr[e1=e2-seventh])
+    (val2=arr[e2=(e3=(begin+end)>>>1)-(seventh=(length>>3)+(length>>6)+1)])>(val1=arr[e1=e2-seventh])
     )
     {
       var tmp=val2;
@@ -9843,13 +9616,13 @@ public final class SortUtil
       val1=tmp;
     }
     if(
-    (val3=arr[e3])>=(val2)
+    (val3=arr[e3])>(val2)
     )
     {
       var tmp=val3;
       val3=val2;
       if(
-      (tmp)>=(val1)
+      (tmp)>(val1)
       )
       {
         val2=val1;
@@ -9861,18 +9634,18 @@ public final class SortUtil
       }
     }
     if(
-    (val4=arr[e4=e3+seventh])>=(val3)
+    (val4=arr[e4=e3+seventh])>(val3)
     )
     {
       var tmp=val4;
       val4=val3;
       if(
-      (tmp)>=(val2)
+      (tmp)>(val2)
       )
       {
         val3=val2;
         if(
-        (tmp)>=(val1)
+        (tmp)>(val1)
         )
         {
           val2=val1;
@@ -9889,23 +9662,23 @@ public final class SortUtil
       }
     }
     if(
-    (val5=arr[e5=e4+seventh])>=(val4)
+    (val5=arr[e5=e4+seventh])>(val4)
     )
     {
       var tmp=val5;
       val5=val4;
       if(
-      (tmp)>=(val3)
+      (tmp)>(val3)
       )
       {
         val4=val3;
         if(
-        (tmp)>=(val2)
+        (tmp)>(val2)
         )
         {
           val3=val2;
           if(
-          (tmp)>=(val1)
+          (tmp)>(val1)
           )
           {
             val2=val1;
@@ -9998,11 +9771,6 @@ public final class SortUtil
     quickreverseSortleftmost(arr,begin,less);
     }
     quickreverseSort(arr,great+1,end);
-    //TODO check to see if this is necessary
-    //if(++great!=end)
-    //{
-    //  quickreverseSort(arr,great,end);
-    //}
   }
   private static void quickreverseSortSinglePivot(double[] arr,int begin,int end,double pivot)
   {
@@ -10052,11 +9820,6 @@ public final class SortUtil
     quickreverseSort(arr,begin,less);
     }
     quickreverseSort(arr,great+1,end);
-    //TODO check to see if this is necessary
-    //if(++great!=end)
-    //{
-    //  quickreverseSort(arr,great,end);
-    //}
   }
   private static void quickreverseSortleftmostDualPivot(double[] arr,int begin,int end,double pivot1, double pivot2,int e1,int e5)
   {
@@ -10076,7 +9839,7 @@ public final class SortUtil
     {
       double ak;
       if(
-      (ak=arr[k])>=(pivot1)
+      (ak=arr[k])>(pivot1)
       )
       {
         arr[k]=arr[less];
@@ -10085,12 +9848,12 @@ public final class SortUtil
       }
       else
       if(
-      (ak)<=(pivot2)
+      (ak)<(pivot2)
       )
       {
         double ag;
         while(
-        (ag=arr[great])<=(pivot2)
+        (ag=arr[great])<(pivot2)
         )
         {
           if(great--==k)
@@ -10099,7 +9862,7 @@ public final class SortUtil
           }
         }
         if(
-        (ag)>=(pivot1)
+        (ag)>(pivot1)
         )
         {
           arr[k]=arr[less];
@@ -10197,7 +9960,7 @@ public final class SortUtil
     {
       double ak;
       if(
-      (ak=arr[k])>=(pivot1)
+      (ak=arr[k])>(pivot1)
       )
       {
         arr[k]=arr[less];
@@ -10206,12 +9969,12 @@ public final class SortUtil
       }
       else
       if(
-      (ak)<=(pivot2)
+      (ak)<(pivot2)
       )
       {
         double ag;
         while(
-        (ag=arr[great])<=(pivot2)
+        (ag=arr[great])<(pivot2)
         )
         {
           if(great--==k)
@@ -10220,7 +9983,7 @@ public final class SortUtil
           }
         }
         if(
-        (ag)>=(pivot1)
+        (ag)>(pivot1)
         )
         {
           arr[k]=arr[less];
@@ -13544,7 +13307,7 @@ public final class SortUtil
         {
           //assert len1>1 && len2>0;
           if(
-          ((Comparable<E>)(arr[cursor2])).compareTo((E)(tmp[cursor1]))>=0
+          ((Comparable<E>)(arr[cursor2])).compareTo((E)(tmp[cursor1]))>0
           )
           {
             arr[dest++]=arr[cursor2++];
@@ -13663,7 +13426,7 @@ public final class SortUtil
         {
           //assert len2>1 && len1>0;
           if(
-          ((Comparable<E>)(tmp[cursor2])).compareTo((E)(arr[cursor1]))>=0
+          ((Comparable<E>)(tmp[cursor2])).compareTo((E)(arr[cursor1]))>0
           )
           {
             arr[dest--]=arr[cursor1--];
@@ -14214,7 +13977,7 @@ public final class SortUtil
       {
         final int mid;
         if(
-        ((Comparable<E>)(pivot)).compareTo((E)(arr[mid=(left+right)>>>1]))>=0
+        ((Comparable<E>)(pivot)).compareTo((E)(arr[mid=(left+right)>>>1]))>0
         )
         {
           right=mid;
@@ -14577,11 +14340,11 @@ public final class SortUtil
       return 1;
     }
     if(
-    ((Comparable<E>)(arr[runHi++])).compareTo((E)(arr[begin]))>=0
+    ((Comparable<E>)(arr[runHi++])).compareTo((E)(arr[begin]))>0
     )
     {
       while(runHi<end &&
-      ((Comparable<E>)(arr[runHi])).compareTo((E)(arr[runHi-1]))>=0
+      ((Comparable<E>)(arr[runHi])).compareTo((E)(arr[runHi-1]))>0
       )
       {
         ++runHi;
@@ -14591,7 +14354,7 @@ public final class SortUtil
     else
     {
       while(runHi<end &&
-      ((Comparable<E>)(arr[runHi])).compareTo((E)(arr[runHi-1]))<0
+      ((Comparable<E>)(arr[runHi])).compareTo((E)(arr[runHi-1]))<=0
       )
       {
         ++runHi;
@@ -15959,12 +15722,12 @@ public final class SortUtil
     int ofs=1;
     int lastOfs=0;
     if(
-    ((Comparable<E>)(arr[base+hint])).compareTo((E)(key))>=0
+    ((Comparable<E>)(arr[base+hint])).compareTo((E)(key))>0
     )
     {
       int maxOfs=len-hint;
       while(ofs < maxOfs &&
-      ((Comparable<E>)(arr[base+hint+ofs])).compareTo((E)(key))>=0
+      ((Comparable<E>)(arr[base+hint+ofs])).compareTo((E)(key))>0
       )
       {
         if((ofs=((lastOfs=ofs)<<1)+1)<=0)
@@ -15985,7 +15748,7 @@ public final class SortUtil
       for(;;)
       {
         if(ofs>=maxOfs || 
-        ((Comparable<E>)(arr[base+hint-ofs])).compareTo((E)(key))>=0
+        ((Comparable<E>)(arr[base+hint-ofs])).compareTo((E)(key))>0
         )
         {
           break;
@@ -16011,7 +15774,7 @@ public final class SortUtil
       {
         int m;
         if(
-        ((Comparable<E>)(arr[base+(m=lastOfs+(diff>>>1))])).compareTo((E)(key))>=0
+        ((Comparable<E>)(arr[base+(m=lastOfs+(diff>>>1))])).compareTo((E)(key))>0
         )
         {
           lastOfs=m+1;
@@ -16034,12 +15797,12 @@ public final class SortUtil
     int ofs=1;
     int lastOfs=0;
     if(
-    ((Comparable<E>)(key)).compareTo((E)(arr[base+hint]))>=0
+    ((Comparable<E>)(key)).compareTo((E)(arr[base+hint]))>0
     )
     {
       int maxOfs=hint+1;
       while(ofs < maxOfs &&
-      ((Comparable<E>)(key)).compareTo((E)(arr[base+hint-ofs]))>=0
+      ((Comparable<E>)(key)).compareTo((E)(arr[base+hint-ofs]))>0
       )
       {
         if((ofs=((lastOfs=ofs)<<1)+1)<=0)
@@ -16061,7 +15824,7 @@ public final class SortUtil
       for(;;)
       {
         if(ofs>=maxOfs || 
-        ((Comparable<E>)(key)).compareTo((E)(arr[base+hint+ofs]))>=0
+        ((Comparable<E>)(key)).compareTo((E)(arr[base+hint+ofs]))>0
         )
         {
           break;
@@ -16086,7 +15849,7 @@ public final class SortUtil
       {
         int m;
         if(
-        ((Comparable<E>)(key)).compareTo((E)(arr[base+(m=lastOfs+(diff>>>1))]))>=0
+        ((Comparable<E>)(key)).compareTo((E)(arr[base+(m=lastOfs+(diff>>>1))]))>0
         )
         {
           ofs=m;
@@ -16102,28 +15865,3 @@ public final class SortUtil
     return ofs;
   }
 }
-/*
-MACRODEF MoveNaN(BEGIN,END,ITERATE)
-for(;;)
-{
-  if(!BOXEDTYPE.isNaN(arr[END]))
-  {
-    break;
-  }
-  if(ITERATEEND==BEGIN)
-  {
-    return;
-  }
-}
-for(int k=END;ITERATEk!=BEGIN;)
-{
-  ARRTYPE ak;
-  if(BOXEDTYPE.isNaN(ak=arr[k]))
-  {
-    arr[k]=arr[END];
-    arr[END]=ak;
-    ITERATEEND;
-  }
-}
-ENDDEF
-*/

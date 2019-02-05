@@ -40,7 +40,6 @@ private static final int[] lengths=new int[]{2, 3, 21, 55, 1000, 10000};
 private static final long[] randSeeds=new long[]{666};
 #ENDIF
 
-
 #ENDDEF
 
   /*//TODO uncomment when they fix the module bug in eclipse
@@ -96,6 +95,9 @@ private static COMPARATORTYPE getSORTTYPEARRTYPEComparator()
 }
 #ENDDEF
 
+  #MACRO IsSortedMethods<true>()
+
+#MACRODEF IsSortedMethods<PARALLEL>()
   /*//TODO uncomment when they fix the module bug in eclipse
   #MACRO IsSorted<String,sort>(String,Ref)
   */
@@ -118,6 +120,9 @@ private static COMPARATORTYPE getSORTTYPEARRTYPEComparator()
   #MACRO IsSorted<long,reverseSort>(Long,Long)
   #MACRO IsSorted<float,reverseSort>(Float,Float)
   #MACRO IsSorted<double,reverseSort>(Double,Double)
+#ENDDEF
+
+
 #MACRODEF IsSorted<ARRTYPE,SORTTYPE>(BOXEDTYPE,CLASSPREFIX)
 private static void isSortedSORTTYPE(ARRTYPE[] arr,ARRTYPE[] copy) throws InterruptedException
 {
@@ -138,7 +143,12 @@ private static void isSortedSORTTYPE(ARRTYPE[] arr,ARRTYPE[] copy) throws Interr
   stockSorterThread.start();
   SortUtil.uncheckedSORTTYPE(arr,0,arr.length-1);
   stockSorterThread.join();
-  IntStream.range(0,copy.length).parallel().forEach(index->
+  IntStream.range(0,copy.length)
+  
+#IFSWITCH PARALLEL==true
+  .parallel()
+#ENDIF
+  .forEach(index->
   {
 #IFSWITCH ARRTYPE==boolean,byte,char,short,int long
     Assert.assertTrue(arr[index]==copy[index]);
@@ -272,16 +282,12 @@ private static ARRTYPE convertToARRTYPE(int val)
 #MACRODEF GetMaxReps<ARRTYPE>()
 private static int getMaxRepsARRTYPE(int arrLength)
 {
-#IFSWITCH ARRTYPE==boolean
-      return 1;
-#ELSEIFSWITCH ARRTYPE==byte
-      return 1;
-#ELSEIFSWITCH ARRTYPE==char,short
-      if(arrLength>3201)
+#IFSWITCH ARRTYPE==char,short
+      if(arrLength>3201 || arrLength<47)
       {
         return 1;
       }
-      return 1000;
+      return 7;
 #ELSE
       return 1;
 #ENDIF
@@ -816,21 +822,18 @@ private static enum ArrayBuilderARRTYPE
 
 #ENDDEF
 
-/*
   #MACRO BasicSortTest<boolean,sort>()
   #MACRO BasicSortTest<boolean,reverseSort>()
   
   #MACRO BasicSortTest<byte,sort>()
   #MACRO BasicSortTest<byte,reverseSort>()
-  */
   
   #MACRO BasicSortTest<char,sort>()
-  /*
   #MACRO BasicSortTest<char,reverseSort>()
   
   #MACRO BasicSortTest<short,sort>()
   #MACRO BasicSortTest<short,reverseSort>()
-  
+
   #MACRO BasicSortTest<int,sort>()
   #MACRO BasicSortTest<int,reverseSort>()
   
@@ -842,26 +845,60 @@ private static enum ArrayBuilderARRTYPE
   
   #MACRO BasicSortTest<double,sort>()
   #MACRO BasicSortTest<double,reverseSort>()
-  */
+
+
 
 #MACRODEF BasicSortTest<ARRTYPE,SORTTYPE>()
 private static void testuncheckedSORTTYPEARRTYPEHelper(long randSeed,int arrLength) throws InterruptedException
 {
-  Random rand=new Random(randSeed);
+ 
   ARRTYPE[] golden=new ARRTYPE[arrLength];
   ARRTYPE[] test=new ARRTYPE[arrLength];
-  for(ArrayBuilderARRTYPE builder:ArrayBuilderARRTYPE.values())
+#IFSWITCH ARRTYPE==float,double
   {
-    
-    for(int m=builder.getMLo(),mHi=builder.getMHi(arrLength);m<=mHi;m=builder.incrementM(m))
+    Random rand=new Random(randSeed);
+    for(ARRTYPEBuilder builder:ARRTYPEBuilder.values())
     {
-      System.out.println("sortType = SORTTYPE; arrType = ARRTYPE; randSeed= "+randSeed+"; length= "+arrLength+"; builder type "+builder.name()+"; m = "+m);
-    
-      for(int i=0,numReps=builder.getNumRepetitions(arrLength);i<numReps;++i)
+      for(int a=0;a<10;++a)
       {
-        builder.build(golden,m,rand);
-        ArrCopy.uncheckedCopy(golden,0,test,0,arrLength);
-        isSortedSORTTYPE(test,golden);
+        for(int g=0;g<=10;++g)
+        {
+          for(int z=0;z<=10;++z)
+          {
+            for(int n=0;n<=10;++n)
+            {
+              for(int p=0;p<=10;++p)
+              {
+                if(a+g+z+n+p==arrLength)
+                {
+                  System.out.println("sortType = SORTTYPE; arrType = ARRTYPE; randSeed= "+randSeed+"; length= "+arrLength+"; builder type "+builder.name()+"; a ="+a+"; g="+g+"; z="+z+"; n="+n+"; p="+p);
+                  builder.build(golden,a,g,z,n,p,rand);
+                  ArrCopy.uncheckedCopy(golden,0,test,0,arrLength);
+                  isSortedSORTTYPE(test,golden);
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+#ENDIF
+  {
+    Random rand=new Random(randSeed);
+    for(ArrayBuilderARRTYPE builder:ArrayBuilderARRTYPE.values())
+    {
+      
+      for(int m=builder.getMLo(),mHi=builder.getMHi(arrLength);m<=mHi;m=builder.incrementM(m))
+      {
+        System.out.println("sortType = SORTTYPE; arrType = ARRTYPE; randSeed= "+randSeed+"; length= "+arrLength+"; builder type "+builder.name()+"; m = "+m);
+      
+        for(int i=0,numReps=builder.getNumRepetitions(arrLength);i<numReps;++i)
+        {
+          builder.build(golden,m,rand);
+          ArrCopy.uncheckedCopy(golden,0,test,0,arrLength);
+          isSortedSORTTYPE(test,golden);
+        }
       }
     }
   }
@@ -888,7 +925,43 @@ public void testuncheckedSORTTYPEARRTYPE() throws InterruptedException
 }
 #ENDDEF
 
-
+  #MACRO FloatBuilder<float>(0.0f,-0.0f,Float.NaN)
+  #MACRO FloatBuilder<double>(0.0d,-0.0d,Double.NaN)
+#MACRODEF FloatBuilder<ARRTYPE>(POSZERO,NEGZERO,NAN)
+private static enum ARRTYPEBuilder
+{
+  SIMPLE
+  {
+    void build(ARRTYPE[] arr,int a,int g,int z,int n,int p,Random rand)
+    {
+      int fromIndex,toIndex;
+      ARRTYPE negVal=-getRandARRTYPE(rand);
+      ARRTYPE posVal=getRandARRTYPE(rand);
+      for(fromIndex=0,toIndex=n;fromIndex<toIndex;++fromIndex)
+      {
+        arr[fromIndex]=negVal;
+      }
+      for(toIndex=fromIndex+g;fromIndex<toIndex;++fromIndex)
+      {
+        arr[fromIndex]=NEGZERO;
+      }
+      for(toIndex=fromIndex+z;fromIndex<toIndex;++fromIndex)
+      {
+        arr[fromIndex]=POSZERO;
+      }
+      for(toIndex=fromIndex+p;fromIndex<toIndex;++fromIndex)
+      {
+        arr[fromIndex]=posVal;
+      }
+      for(toIndex=fromIndex+a;fromIndex<toIndex;++fromIndex)
+      {
+        arr[fromIndex]=NAN;
+      }
+    }
+  };
+  abstract void build(ARRTYPE[] arr,int a,int g,int z,int n,int p,Random rand);
+}
+#ENDDEF
 }
 
 

@@ -310,277 +310,313 @@ public class SortUtilTest
     };
   }
   */
-  /*//TODO uncomment when they fix the module bug in eclipse
-  private static void isSortedsort(String[] arr,String[] copy) throws InterruptedException
-  {
-    Thread stockSorterThread=new Thread(()->
+    /*//TODO uncomment when they fix the module bug in eclipse
+    private static void isSortedsort(String[] arr,String[] copy) throws InterruptedException
     {
-    Arrays.parallelSort(copy,0,copy.length);
-    });
-    stockSorterThread.start();
-    SortUtil.uncheckedsort(arr,0,arr.length-1);
-    stockSorterThread.join();
-    IntStream.range(0,copy.length).parallel().forEach(index->
+      Thread stockSorterThread=new Thread(()->
+      {
+      Arrays.parallelSort(copy,0,copy.length);
+      });
+      stockSorterThread.start();
+      SortUtil.uncheckedsort(arr,0,arr.length-1);
+      stockSorterThread.join();
+      IntStream.range(0,copy.length)
+      .parallel()
+      .forEach(index->
+      {
+        Assert.assertTrue(Objects.equals(arr[index],copy[index]));
+      });
+    }
+    */
+    private static void isSortedsort(boolean[] arr,boolean[] copy) throws InterruptedException
     {
-      Assert.assertTrue(Objects.equals(arr[index],copy[index]));
-    });
-  }
-  */
-  private static void isSortedsort(boolean[] arr,boolean[] copy) throws InterruptedException
-  {
-    Thread stockSorterThread=new Thread(()->
+      Thread stockSorterThread=new Thread(()->
+      {
+      Boolean[] boxedCopy=new Boolean[copy.length];
+      ArrCopy.uncheckedCopy(copy,0,boxedCopy,0,copy.length);
+      Arrays.parallelSort(boxedCopy,0,copy.length);
+      ArrCopy.uncheckedCopy(boxedCopy,0,copy,0,copy.length);
+      });
+      stockSorterThread.start();
+      SortUtil.uncheckedsort(arr,0,arr.length-1);
+      stockSorterThread.join();
+      IntStream.range(0,copy.length)
+      .parallel()
+      .forEach(index->
+      {
+        Assert.assertTrue(arr[index]==copy[index]);
+      });
+    }
+    private static void isSortedsort(byte[] arr,byte[] copy) throws InterruptedException
     {
-    Boolean[] boxedCopy=new Boolean[copy.length];
-    ArrCopy.uncheckedCopy(copy,0,boxedCopy,0,copy.length);
-    Arrays.parallelSort(boxedCopy,0,copy.length);
-    ArrCopy.uncheckedCopy(boxedCopy,0,copy,0,copy.length);
-    });
-    stockSorterThread.start();
-    SortUtil.uncheckedsort(arr,0,arr.length-1);
-    stockSorterThread.join();
-    IntStream.range(0,copy.length).parallel().forEach(index->
+      Thread stockSorterThread=new Thread(()->
+      {
+      Arrays.parallelSort(copy,0,copy.length);
+      });
+      stockSorterThread.start();
+      SortUtil.uncheckedsort(arr,0,arr.length-1);
+      stockSorterThread.join();
+      IntStream.range(0,copy.length)
+      .parallel()
+      .forEach(index->
+      {
+        Assert.assertTrue(arr[index]==copy[index]);
+      });
+    }
+    private static void isSortedsort(char[] arr,char[] copy) throws InterruptedException
     {
-      Assert.assertTrue(arr[index]==copy[index]);
-    });
-  }
-  private static void isSortedsort(byte[] arr,byte[] copy) throws InterruptedException
-  {
-    Thread stockSorterThread=new Thread(()->
+      Thread stockSorterThread=new Thread(()->
+      {
+      Arrays.parallelSort(copy,0,copy.length);
+      });
+      stockSorterThread.start();
+      SortUtil.uncheckedsort(arr,0,arr.length-1);
+      stockSorterThread.join();
+      IntStream.range(0,copy.length)
+      .parallel()
+      .forEach(index->
+      {
+        Assert.assertTrue(arr[index]==copy[index]);
+      });
+    }
+    private static void isSortedsort(short[] arr,short[] copy) throws InterruptedException
     {
-    Arrays.parallelSort(copy,0,copy.length);
-    });
-    stockSorterThread.start();
-    SortUtil.uncheckedsort(arr,0,arr.length-1);
-    stockSorterThread.join();
-    IntStream.range(0,copy.length).parallel().forEach(index->
+      Thread stockSorterThread=new Thread(()->
+      {
+      Arrays.parallelSort(copy,0,copy.length);
+      });
+      stockSorterThread.start();
+      SortUtil.uncheckedsort(arr,0,arr.length-1);
+      stockSorterThread.join();
+      IntStream.range(0,copy.length)
+      .parallel()
+      .forEach(index->
+      {
+        Assert.assertTrue(arr[index]==copy[index]);
+      });
+    }
+    private static void isSortedsort(int[] arr,int[] copy) throws InterruptedException
     {
-      Assert.assertTrue(arr[index]==copy[index]);
-    });
-  }
-  private static void isSortedsort(char[] arr,char[] copy) throws InterruptedException
-  {
-    Thread stockSorterThread=new Thread(()->
+      Thread stockSorterThread=new Thread(()->
+      {
+      Arrays.parallelSort(copy,0,copy.length);
+      });
+      stockSorterThread.start();
+      SortUtil.uncheckedsort(arr,0,arr.length-1);
+      stockSorterThread.join();
+      IntStream.range(0,copy.length)
+      .parallel()
+      .forEach(index->
+      {
+        Assert.assertTrue(Objects.equals(arr[index],copy[index]));
+      });
+    }
+    private static void isSortedsort(long[] arr,long[] copy) throws InterruptedException
     {
-    Arrays.parallelSort(copy,0,copy.length);
-    });
-    stockSorterThread.start();
-    SortUtil.uncheckedsort(arr,0,arr.length-1);
-    stockSorterThread.join();
-    IntStream.range(0,copy.length).parallel().forEach(index->
+      Thread stockSorterThread=new Thread(()->
+      {
+      Arrays.parallelSort(copy,0,copy.length);
+      });
+      stockSorterThread.start();
+      SortUtil.uncheckedsort(arr,0,arr.length-1);
+      stockSorterThread.join();
+      IntStream.range(0,copy.length)
+      .parallel()
+      .forEach(index->
+      {
+        Assert.assertTrue(Objects.equals(arr[index],copy[index]));
+      });
+    }
+    private static void isSortedsort(float[] arr,float[] copy) throws InterruptedException
     {
-      Assert.assertTrue(arr[index]==copy[index]);
-    });
-  }
-  private static void isSortedsort(short[] arr,short[] copy) throws InterruptedException
-  {
-    Thread stockSorterThread=new Thread(()->
+      Thread stockSorterThread=new Thread(()->
+      {
+      Arrays.parallelSort(copy,0,copy.length);
+      });
+      stockSorterThread.start();
+      SortUtil.uncheckedsort(arr,0,arr.length-1);
+      stockSorterThread.join();
+      IntStream.range(0,copy.length)
+      .parallel()
+      .forEach(index->
+      {
+        Assert.assertTrue(TypeUtil.floatEquals(arr[index],copy[index]));
+      });
+    }
+    private static void isSortedsort(double[] arr,double[] copy) throws InterruptedException
     {
-    Arrays.parallelSort(copy,0,copy.length);
-    });
-    stockSorterThread.start();
-    SortUtil.uncheckedsort(arr,0,arr.length-1);
-    stockSorterThread.join();
-    IntStream.range(0,copy.length).parallel().forEach(index->
+      Thread stockSorterThread=new Thread(()->
+      {
+      Arrays.parallelSort(copy,0,copy.length);
+      });
+      stockSorterThread.start();
+      SortUtil.uncheckedsort(arr,0,arr.length-1);
+      stockSorterThread.join();
+      IntStream.range(0,copy.length)
+      .parallel()
+      .forEach(index->
+      {
+        Assert.assertTrue(TypeUtil.doubleEquals(arr[index],copy[index]));
+      });
+    }
+    /*//TODO uncomment when they fix the module bug in eclipse
+    private static void isSortedreverseSort(String[] arr,String[] copy) throws InterruptedException
     {
-      Assert.assertTrue(arr[index]==copy[index]);
-    });
-  }
-  private static void isSortedsort(int[] arr,int[] copy) throws InterruptedException
-  {
-    Thread stockSorterThread=new Thread(()->
+      Thread stockSorterThread=new Thread(()->
+      {
+      Arrays.parallelSort(copy,0,copy.length);
+      OmniArray.OfRef.reverseRange(copy,0,copy.length-1);
+      });
+      stockSorterThread.start();
+      SortUtil.uncheckedreverseSort(arr,0,arr.length-1);
+      stockSorterThread.join();
+      IntStream.range(0,copy.length)
+      .parallel()
+      .forEach(index->
+      {
+        Assert.assertTrue(Objects.equals(arr[index],copy[index]));
+      });
+    }
+    */
+    private static void isSortedreverseSort(boolean[] arr,boolean[] copy) throws InterruptedException
     {
-    Arrays.parallelSort(copy,0,copy.length);
-    });
-    stockSorterThread.start();
-    SortUtil.uncheckedsort(arr,0,arr.length-1);
-    stockSorterThread.join();
-    IntStream.range(0,copy.length).parallel().forEach(index->
+      Thread stockSorterThread=new Thread(()->
+      {
+      Boolean[] boxedCopy=new Boolean[copy.length];
+      ArrCopy.uncheckedCopy(copy,0,boxedCopy,0,copy.length);
+      Arrays.parallelSort(boxedCopy,0,copy.length);
+      ArrCopy.uncheckedCopy(boxedCopy,0,copy,0,copy.length);
+      OmniArray.OfBoolean.reverseRange(copy,0,copy.length-1);
+      });
+      stockSorterThread.start();
+      SortUtil.uncheckedreverseSort(arr,0,arr.length-1);
+      stockSorterThread.join();
+      IntStream.range(0,copy.length)
+      .parallel()
+      .forEach(index->
+      {
+        Assert.assertTrue(arr[index]==copy[index]);
+      });
+    }
+    private static void isSortedreverseSort(byte[] arr,byte[] copy) throws InterruptedException
     {
-      Assert.assertTrue(Objects.equals(arr[index],copy[index]));
-    });
-  }
-  private static void isSortedsort(long[] arr,long[] copy) throws InterruptedException
-  {
-    Thread stockSorterThread=new Thread(()->
+      Thread stockSorterThread=new Thread(()->
+      {
+      Arrays.parallelSort(copy,0,copy.length);
+      OmniArray.OfByte.reverseRange(copy,0,copy.length-1);
+      });
+      stockSorterThread.start();
+      SortUtil.uncheckedreverseSort(arr,0,arr.length-1);
+      stockSorterThread.join();
+      IntStream.range(0,copy.length)
+      .parallel()
+      .forEach(index->
+      {
+        Assert.assertTrue(arr[index]==copy[index]);
+      });
+    }
+    private static void isSortedreverseSort(char[] arr,char[] copy) throws InterruptedException
     {
-    Arrays.parallelSort(copy,0,copy.length);
-    });
-    stockSorterThread.start();
-    SortUtil.uncheckedsort(arr,0,arr.length-1);
-    stockSorterThread.join();
-    IntStream.range(0,copy.length).parallel().forEach(index->
+      Thread stockSorterThread=new Thread(()->
+      {
+      Arrays.parallelSort(copy,0,copy.length);
+      OmniArray.OfChar.reverseRange(copy,0,copy.length-1);
+      });
+      stockSorterThread.start();
+      SortUtil.uncheckedreverseSort(arr,0,arr.length-1);
+      stockSorterThread.join();
+      IntStream.range(0,copy.length)
+      .parallel()
+      .forEach(index->
+      {
+        Assert.assertTrue(arr[index]==copy[index]);
+      });
+    }
+    private static void isSortedreverseSort(short[] arr,short[] copy) throws InterruptedException
     {
-      Assert.assertTrue(Objects.equals(arr[index],copy[index]));
-    });
-  }
-  private static void isSortedsort(float[] arr,float[] copy) throws InterruptedException
-  {
-    Thread stockSorterThread=new Thread(()->
+      Thread stockSorterThread=new Thread(()->
+      {
+      Arrays.parallelSort(copy,0,copy.length);
+      OmniArray.OfShort.reverseRange(copy,0,copy.length-1);
+      });
+      stockSorterThread.start();
+      SortUtil.uncheckedreverseSort(arr,0,arr.length-1);
+      stockSorterThread.join();
+      IntStream.range(0,copy.length)
+      .parallel()
+      .forEach(index->
+      {
+        Assert.assertTrue(arr[index]==copy[index]);
+      });
+    }
+    private static void isSortedreverseSort(int[] arr,int[] copy) throws InterruptedException
     {
-    Arrays.parallelSort(copy,0,copy.length);
-    });
-    stockSorterThread.start();
-    SortUtil.uncheckedsort(arr,0,arr.length-1);
-    stockSorterThread.join();
-    IntStream.range(0,copy.length).parallel().forEach(index->
+      Thread stockSorterThread=new Thread(()->
+      {
+      Arrays.parallelSort(copy,0,copy.length);
+      OmniArray.OfInt.reverseRange(copy,0,copy.length-1);
+      });
+      stockSorterThread.start();
+      SortUtil.uncheckedreverseSort(arr,0,arr.length-1);
+      stockSorterThread.join();
+      IntStream.range(0,copy.length)
+      .parallel()
+      .forEach(index->
+      {
+        Assert.assertTrue(Objects.equals(arr[index],copy[index]));
+      });
+    }
+    private static void isSortedreverseSort(long[] arr,long[] copy) throws InterruptedException
     {
-      Assert.assertTrue(TypeUtil.floatEquals(arr[index],copy[index]));
-    });
-  }
-  private static void isSortedsort(double[] arr,double[] copy) throws InterruptedException
-  {
-    Thread stockSorterThread=new Thread(()->
+      Thread stockSorterThread=new Thread(()->
+      {
+      Arrays.parallelSort(copy,0,copy.length);
+      OmniArray.OfLong.reverseRange(copy,0,copy.length-1);
+      });
+      stockSorterThread.start();
+      SortUtil.uncheckedreverseSort(arr,0,arr.length-1);
+      stockSorterThread.join();
+      IntStream.range(0,copy.length)
+      .parallel()
+      .forEach(index->
+      {
+        Assert.assertTrue(Objects.equals(arr[index],copy[index]));
+      });
+    }
+    private static void isSortedreverseSort(float[] arr,float[] copy) throws InterruptedException
     {
-    Arrays.parallelSort(copy,0,copy.length);
-    });
-    stockSorterThread.start();
-    SortUtil.uncheckedsort(arr,0,arr.length-1);
-    stockSorterThread.join();
-    IntStream.range(0,copy.length).parallel().forEach(index->
+      Thread stockSorterThread=new Thread(()->
+      {
+      Arrays.parallelSort(copy,0,copy.length);
+      OmniArray.OfFloat.reverseRange(copy,0,copy.length-1);
+      });
+      stockSorterThread.start();
+      SortUtil.uncheckedreverseSort(arr,0,arr.length-1);
+      stockSorterThread.join();
+      IntStream.range(0,copy.length)
+      .parallel()
+      .forEach(index->
+      {
+        Assert.assertTrue(TypeUtil.floatEquals(arr[index],copy[index]));
+      });
+    }
+    private static void isSortedreverseSort(double[] arr,double[] copy) throws InterruptedException
     {
-      Assert.assertTrue(TypeUtil.doubleEquals(arr[index],copy[index]));
-    });
-  }
-  /*//TODO uncomment when they fix the module bug in eclipse
-  private static void isSortedreverseSort(String[] arr,String[] copy) throws InterruptedException
-  {
-    Thread stockSorterThread=new Thread(()->
-    {
-    Arrays.parallelSort(copy,0,copy.length);
-    OmniArray.OfRef.reverseRange(copy,0,copy.length-1);
-    });
-    stockSorterThread.start();
-    SortUtil.uncheckedreverseSort(arr,0,arr.length-1);
-    stockSorterThread.join();
-    IntStream.range(0,copy.length).parallel().forEach(index->
-    {
-      Assert.assertTrue(Objects.equals(arr[index],copy[index]));
-    });
-  }
-  */
-  private static void isSortedreverseSort(boolean[] arr,boolean[] copy) throws InterruptedException
-  {
-    Thread stockSorterThread=new Thread(()->
-    {
-    Boolean[] boxedCopy=new Boolean[copy.length];
-    ArrCopy.uncheckedCopy(copy,0,boxedCopy,0,copy.length);
-    Arrays.parallelSort(boxedCopy,0,copy.length);
-    ArrCopy.uncheckedCopy(boxedCopy,0,copy,0,copy.length);
-    OmniArray.OfBoolean.reverseRange(copy,0,copy.length-1);
-    });
-    stockSorterThread.start();
-    SortUtil.uncheckedreverseSort(arr,0,arr.length-1);
-    stockSorterThread.join();
-    IntStream.range(0,copy.length).parallel().forEach(index->
-    {
-      Assert.assertTrue(arr[index]==copy[index]);
-    });
-  }
-  private static void isSortedreverseSort(byte[] arr,byte[] copy) throws InterruptedException
-  {
-    Thread stockSorterThread=new Thread(()->
-    {
-    Arrays.parallelSort(copy,0,copy.length);
-    OmniArray.OfByte.reverseRange(copy,0,copy.length-1);
-    });
-    stockSorterThread.start();
-    SortUtil.uncheckedreverseSort(arr,0,arr.length-1);
-    stockSorterThread.join();
-    IntStream.range(0,copy.length).parallel().forEach(index->
-    {
-      Assert.assertTrue(arr[index]==copy[index]);
-    });
-  }
-  private static void isSortedreverseSort(char[] arr,char[] copy) throws InterruptedException
-  {
-    Thread stockSorterThread=new Thread(()->
-    {
-    Arrays.parallelSort(copy,0,copy.length);
-    OmniArray.OfChar.reverseRange(copy,0,copy.length-1);
-    });
-    stockSorterThread.start();
-    SortUtil.uncheckedreverseSort(arr,0,arr.length-1);
-    stockSorterThread.join();
-    IntStream.range(0,copy.length).parallel().forEach(index->
-    {
-      Assert.assertTrue(arr[index]==copy[index]);
-    });
-  }
-  private static void isSortedreverseSort(short[] arr,short[] copy) throws InterruptedException
-  {
-    Thread stockSorterThread=new Thread(()->
-    {
-    Arrays.parallelSort(copy,0,copy.length);
-    OmniArray.OfShort.reverseRange(copy,0,copy.length-1);
-    });
-    stockSorterThread.start();
-    SortUtil.uncheckedreverseSort(arr,0,arr.length-1);
-    stockSorterThread.join();
-    IntStream.range(0,copy.length).parallel().forEach(index->
-    {
-      Assert.assertTrue(arr[index]==copy[index]);
-    });
-  }
-  private static void isSortedreverseSort(int[] arr,int[] copy) throws InterruptedException
-  {
-    Thread stockSorterThread=new Thread(()->
-    {
-    Arrays.parallelSort(copy,0,copy.length);
-    OmniArray.OfInt.reverseRange(copy,0,copy.length-1);
-    });
-    stockSorterThread.start();
-    SortUtil.uncheckedreverseSort(arr,0,arr.length-1);
-    stockSorterThread.join();
-    IntStream.range(0,copy.length).parallel().forEach(index->
-    {
-      Assert.assertTrue(Objects.equals(arr[index],copy[index]));
-    });
-  }
-  private static void isSortedreverseSort(long[] arr,long[] copy) throws InterruptedException
-  {
-    Thread stockSorterThread=new Thread(()->
-    {
-    Arrays.parallelSort(copy,0,copy.length);
-    OmniArray.OfLong.reverseRange(copy,0,copy.length-1);
-    });
-    stockSorterThread.start();
-    SortUtil.uncheckedreverseSort(arr,0,arr.length-1);
-    stockSorterThread.join();
-    IntStream.range(0,copy.length).parallel().forEach(index->
-    {
-      Assert.assertTrue(Objects.equals(arr[index],copy[index]));
-    });
-  }
-  private static void isSortedreverseSort(float[] arr,float[] copy) throws InterruptedException
-  {
-    Thread stockSorterThread=new Thread(()->
-    {
-    Arrays.parallelSort(copy,0,copy.length);
-    OmniArray.OfFloat.reverseRange(copy,0,copy.length-1);
-    });
-    stockSorterThread.start();
-    SortUtil.uncheckedreverseSort(arr,0,arr.length-1);
-    stockSorterThread.join();
-    IntStream.range(0,copy.length).parallel().forEach(index->
-    {
-      Assert.assertTrue(TypeUtil.floatEquals(arr[index],copy[index]));
-    });
-  }
-  private static void isSortedreverseSort(double[] arr,double[] copy) throws InterruptedException
-  {
-    Thread stockSorterThread=new Thread(()->
-    {
-    Arrays.parallelSort(copy,0,copy.length);
-    OmniArray.OfDouble.reverseRange(copy,0,copy.length-1);
-    });
-    stockSorterThread.start();
-    SortUtil.uncheckedreverseSort(arr,0,arr.length-1);
-    stockSorterThread.join();
-    IntStream.range(0,copy.length).parallel().forEach(index->
-    {
-      Assert.assertTrue(TypeUtil.doubleEquals(arr[index],copy[index]));
-    });
-  }
+      Thread stockSorterThread=new Thread(()->
+      {
+      Arrays.parallelSort(copy,0,copy.length);
+      OmniArray.OfDouble.reverseRange(copy,0,copy.length-1);
+      });
+      stockSorterThread.start();
+      SortUtil.uncheckedreverseSort(arr,0,arr.length-1);
+      stockSorterThread.join();
+      IntStream.range(0,copy.length)
+      .parallel()
+      .forEach(index->
+      {
+        Assert.assertTrue(TypeUtil.doubleEquals(arr[index],copy[index]));
+      });
+    }
   /*//TODO uncomment when they fix the module bug in eclipse
   private static void isSorted(String[] arr,String[] copy,Comparator<? super String> sorter) throws InterruptedException
   {
@@ -4656,19 +4692,19 @@ public class SortUtilTest
   }
   private static int getMaxRepschar(int arrLength)
   {
-        if(arrLength>3201)
+        if(arrLength>3201 || arrLength<47)
         {
           return 1;
         }
-        return 1000;
+        return 7;
   }
   private static int getMaxRepsshort(int arrLength)
   {
-        if(arrLength>3201)
+        if(arrLength>3201 || arrLength<47)
         {
           return 1;
         }
-        return 1000;
+        return 7;
   }
   private static int getMaxRepsint(int arrLength)
   {
@@ -4690,22 +4726,23 @@ public class SortUtilTest
   {
         return 1;
   }
-/*
   private static void testuncheckedsortbooleanHelper(long randSeed,int arrLength) throws InterruptedException
   {
-    Random rand=new Random(randSeed);
     boolean[] golden=new boolean[arrLength];
     boolean[] test=new boolean[arrLength];
-    for(ArrayBuilderboolean builder:ArrayBuilderboolean.values())
     {
-      for(int m=builder.getMLo(),mHi=builder.getMHi(arrLength);m<=mHi;m=builder.incrementM(m))
+      Random rand=new Random(randSeed);
+      for(ArrayBuilderboolean builder:ArrayBuilderboolean.values())
       {
-        System.out.println("sortType = sort; arrType = boolean; randSeed= "+randSeed+"; length= "+arrLength+"; builder type "+builder.name()+"; m = "+m);
-        for(int i=0,numReps=builder.getNumRepetitions(arrLength);i<numReps;++i)
+        for(int m=builder.getMLo(),mHi=builder.getMHi(arrLength);m<=mHi;m=builder.incrementM(m))
         {
-          builder.build(golden,m,rand);
-          ArrCopy.uncheckedCopy(golden,0,test,0,arrLength);
-          isSortedsort(test,golden);
+          System.out.println("sortType = sort; arrType = boolean; randSeed= "+randSeed+"; length= "+arrLength+"; builder type "+builder.name()+"; m = "+m);
+          for(int i=0,numReps=builder.getNumRepetitions(arrLength);i<numReps;++i)
+          {
+            builder.build(golden,m,rand);
+            ArrCopy.uncheckedCopy(golden,0,test,0,arrLength);
+            isSortedsort(test,golden);
+          }
         }
       }
     }
@@ -4717,19 +4754,21 @@ public class SortUtilTest
   }
   private static void testuncheckedreverseSortbooleanHelper(long randSeed,int arrLength) throws InterruptedException
   {
-    Random rand=new Random(randSeed);
     boolean[] golden=new boolean[arrLength];
     boolean[] test=new boolean[arrLength];
-    for(ArrayBuilderboolean builder:ArrayBuilderboolean.values())
     {
-      for(int m=builder.getMLo(),mHi=builder.getMHi(arrLength);m<=mHi;m=builder.incrementM(m))
+      Random rand=new Random(randSeed);
+      for(ArrayBuilderboolean builder:ArrayBuilderboolean.values())
       {
-        System.out.println("sortType = reverseSort; arrType = boolean; randSeed= "+randSeed+"; length= "+arrLength+"; builder type "+builder.name()+"; m = "+m);
-        for(int i=0,numReps=builder.getNumRepetitions(arrLength);i<numReps;++i)
+        for(int m=builder.getMLo(),mHi=builder.getMHi(arrLength);m<=mHi;m=builder.incrementM(m))
         {
-          builder.build(golden,m,rand);
-          ArrCopy.uncheckedCopy(golden,0,test,0,arrLength);
-          isSortedreverseSort(test,golden);
+          System.out.println("sortType = reverseSort; arrType = boolean; randSeed= "+randSeed+"; length= "+arrLength+"; builder type "+builder.name()+"; m = "+m);
+          for(int i=0,numReps=builder.getNumRepetitions(arrLength);i<numReps;++i)
+          {
+            builder.build(golden,m,rand);
+            ArrCopy.uncheckedCopy(golden,0,test,0,arrLength);
+            isSortedreverseSort(test,golden);
+          }
         }
       }
     }
@@ -4741,19 +4780,21 @@ public class SortUtilTest
   }
   private static void testuncheckedsortbyteHelper(long randSeed,int arrLength) throws InterruptedException
   {
-    Random rand=new Random(randSeed);
     byte[] golden=new byte[arrLength];
     byte[] test=new byte[arrLength];
-    for(ArrayBuilderbyte builder:ArrayBuilderbyte.values())
     {
-      for(int m=builder.getMLo(),mHi=builder.getMHi(arrLength);m<=mHi;m=builder.incrementM(m))
+      Random rand=new Random(randSeed);
+      for(ArrayBuilderbyte builder:ArrayBuilderbyte.values())
       {
-        System.out.println("sortType = sort; arrType = byte; randSeed= "+randSeed+"; length= "+arrLength+"; builder type "+builder.name()+"; m = "+m);
-        for(int i=0,numReps=builder.getNumRepetitions(arrLength);i<numReps;++i)
+        for(int m=builder.getMLo(),mHi=builder.getMHi(arrLength);m<=mHi;m=builder.incrementM(m))
         {
-          builder.build(golden,m,rand);
-          ArrCopy.uncheckedCopy(golden,0,test,0,arrLength);
-          isSortedsort(test,golden);
+          System.out.println("sortType = sort; arrType = byte; randSeed= "+randSeed+"; length= "+arrLength+"; builder type "+builder.name()+"; m = "+m);
+          for(int i=0,numReps=builder.getNumRepetitions(arrLength);i<numReps;++i)
+          {
+            builder.build(golden,m,rand);
+            ArrCopy.uncheckedCopy(golden,0,test,0,arrLength);
+            isSortedsort(test,golden);
+          }
         }
       }
     }
@@ -4766,19 +4807,21 @@ public class SortUtilTest
   }
   private static void testuncheckedreverseSortbyteHelper(long randSeed,int arrLength) throws InterruptedException
   {
-    Random rand=new Random(randSeed);
     byte[] golden=new byte[arrLength];
     byte[] test=new byte[arrLength];
-    for(ArrayBuilderbyte builder:ArrayBuilderbyte.values())
     {
-      for(int m=builder.getMLo(),mHi=builder.getMHi(arrLength);m<=mHi;m=builder.incrementM(m))
+      Random rand=new Random(randSeed);
+      for(ArrayBuilderbyte builder:ArrayBuilderbyte.values())
       {
-        System.out.println("sortType = reverseSort; arrType = byte; randSeed= "+randSeed+"; length= "+arrLength+"; builder type "+builder.name()+"; m = "+m);
-        for(int i=0,numReps=builder.getNumRepetitions(arrLength);i<numReps;++i)
+        for(int m=builder.getMLo(),mHi=builder.getMHi(arrLength);m<=mHi;m=builder.incrementM(m))
         {
-          builder.build(golden,m,rand);
-          ArrCopy.uncheckedCopy(golden,0,test,0,arrLength);
-          isSortedreverseSort(test,golden);
+          System.out.println("sortType = reverseSort; arrType = byte; randSeed= "+randSeed+"; length= "+arrLength+"; builder type "+builder.name()+"; m = "+m);
+          for(int i=0,numReps=builder.getNumRepetitions(arrLength);i<numReps;++i)
+          {
+            builder.build(golden,m,rand);
+            ArrCopy.uncheckedCopy(golden,0,test,0,arrLength);
+            isSortedreverseSort(test,golden);
+          }
         }
       }
     }
@@ -4789,22 +4832,23 @@ public class SortUtilTest
     testuncheckedreverseSortbyteHelper(0,30);
     testuncheckedreverseSortbyteHelper(0,31);
   }
-  */
   private static void testuncheckedsortcharHelper(long randSeed,int arrLength) throws InterruptedException
   {
-    Random rand=new Random(randSeed);
     char[] golden=new char[arrLength];
     char[] test=new char[arrLength];
-    for(ArrayBuilderchar builder:ArrayBuilderchar.values())
     {
-      for(int m=builder.getMLo(),mHi=builder.getMHi(arrLength);m<=mHi;m=builder.incrementM(m))
+      Random rand=new Random(randSeed);
+      for(ArrayBuilderchar builder:ArrayBuilderchar.values())
       {
-        System.out.println("sortType = sort; arrType = char; randSeed= "+randSeed+"; length= "+arrLength+"; builder type "+builder.name()+"; m = "+m);
-        for(int i=0,numReps=builder.getNumRepetitions(arrLength);i<numReps;++i)
+        for(int m=builder.getMLo(),mHi=builder.getMHi(arrLength);m<=mHi;m=builder.incrementM(m))
         {
-          builder.build(golden,m,rand);
-          ArrCopy.uncheckedCopy(golden,0,test,0,arrLength);
-          isSortedsort(test,golden);
+          System.out.println("sortType = sort; arrType = char; randSeed= "+randSeed+"; length= "+arrLength+"; builder type "+builder.name()+"; m = "+m);
+          for(int i=0,numReps=builder.getNumRepetitions(arrLength);i<numReps;++i)
+          {
+            builder.build(golden,m,rand);
+            ArrCopy.uncheckedCopy(golden,0,test,0,arrLength);
+            isSortedsort(test,golden);
+          }
         }
       }
     }
@@ -4822,22 +4866,23 @@ public class SortUtilTest
       }
     }
   }
-  /*
   private static void testuncheckedreverseSortcharHelper(long randSeed,int arrLength) throws InterruptedException
   {
-    Random rand=new Random(randSeed);
     char[] golden=new char[arrLength];
     char[] test=new char[arrLength];
-    for(ArrayBuilderchar builder:ArrayBuilderchar.values())
     {
-      for(int m=builder.getMLo(),mHi=builder.getMHi(arrLength);m<=mHi;m=builder.incrementM(m))
+      Random rand=new Random(randSeed);
+      for(ArrayBuilderchar builder:ArrayBuilderchar.values())
       {
-        System.out.println("sortType = reverseSort; arrType = char; randSeed= "+randSeed+"; length= "+arrLength+"; builder type "+builder.name()+"; m = "+m);
-        for(int i=0,numReps=builder.getNumRepetitions(arrLength);i<numReps;++i)
+        for(int m=builder.getMLo(),mHi=builder.getMHi(arrLength);m<=mHi;m=builder.incrementM(m))
         {
-          builder.build(golden,m,rand);
-          ArrCopy.uncheckedCopy(golden,0,test,0,arrLength);
-          isSortedreverseSort(test,golden);
+          System.out.println("sortType = reverseSort; arrType = char; randSeed= "+randSeed+"; length= "+arrLength+"; builder type "+builder.name()+"; m = "+m);
+          for(int i=0,numReps=builder.getNumRepetitions(arrLength);i<numReps;++i)
+          {
+            builder.build(golden,m,rand);
+            ArrCopy.uncheckedCopy(golden,0,test,0,arrLength);
+            isSortedreverseSort(test,golden);
+          }
         }
       }
     }
@@ -4857,19 +4902,21 @@ public class SortUtilTest
   }
   private static void testuncheckedsortshortHelper(long randSeed,int arrLength) throws InterruptedException
   {
-    Random rand=new Random(randSeed);
     short[] golden=new short[arrLength];
     short[] test=new short[arrLength];
-    for(ArrayBuildershort builder:ArrayBuildershort.values())
     {
-      for(int m=builder.getMLo(),mHi=builder.getMHi(arrLength);m<=mHi;m=builder.incrementM(m))
+      Random rand=new Random(randSeed);
+      for(ArrayBuildershort builder:ArrayBuildershort.values())
       {
-        System.out.println("sortType = sort; arrType = short; randSeed= "+randSeed+"; length= "+arrLength+"; builder type "+builder.name()+"; m = "+m);
-        for(int i=0,numReps=builder.getNumRepetitions(arrLength);i<numReps;++i)
+        for(int m=builder.getMLo(),mHi=builder.getMHi(arrLength);m<=mHi;m=builder.incrementM(m))
         {
-          builder.build(golden,m,rand);
-          ArrCopy.uncheckedCopy(golden,0,test,0,arrLength);
-          isSortedsort(test,golden);
+          System.out.println("sortType = sort; arrType = short; randSeed= "+randSeed+"; length= "+arrLength+"; builder type "+builder.name()+"; m = "+m);
+          for(int i=0,numReps=builder.getNumRepetitions(arrLength);i<numReps;++i)
+          {
+            builder.build(golden,m,rand);
+            ArrCopy.uncheckedCopy(golden,0,test,0,arrLength);
+            isSortedsort(test,golden);
+          }
         }
       }
     }
@@ -4889,19 +4936,21 @@ public class SortUtilTest
   }
   private static void testuncheckedreverseSortshortHelper(long randSeed,int arrLength) throws InterruptedException
   {
-    Random rand=new Random(randSeed);
     short[] golden=new short[arrLength];
     short[] test=new short[arrLength];
-    for(ArrayBuildershort builder:ArrayBuildershort.values())
     {
-      for(int m=builder.getMLo(),mHi=builder.getMHi(arrLength);m<=mHi;m=builder.incrementM(m))
+      Random rand=new Random(randSeed);
+      for(ArrayBuildershort builder:ArrayBuildershort.values())
       {
-        System.out.println("sortType = reverseSort; arrType = short; randSeed= "+randSeed+"; length= "+arrLength+"; builder type "+builder.name()+"; m = "+m);
-        for(int i=0,numReps=builder.getNumRepetitions(arrLength);i<numReps;++i)
+        for(int m=builder.getMLo(),mHi=builder.getMHi(arrLength);m<=mHi;m=builder.incrementM(m))
         {
-          builder.build(golden,m,rand);
-          ArrCopy.uncheckedCopy(golden,0,test,0,arrLength);
-          isSortedreverseSort(test,golden);
+          System.out.println("sortType = reverseSort; arrType = short; randSeed= "+randSeed+"; length= "+arrLength+"; builder type "+builder.name()+"; m = "+m);
+          for(int i=0,numReps=builder.getNumRepetitions(arrLength);i<numReps;++i)
+          {
+            builder.build(golden,m,rand);
+            ArrCopy.uncheckedCopy(golden,0,test,0,arrLength);
+            isSortedreverseSort(test,golden);
+          }
         }
       }
     }
@@ -4921,19 +4970,21 @@ public class SortUtilTest
   }
   private static void testuncheckedsortintHelper(long randSeed,int arrLength) throws InterruptedException
   {
-    Random rand=new Random(randSeed);
     int[] golden=new int[arrLength];
     int[] test=new int[arrLength];
-    for(ArrayBuilderint builder:ArrayBuilderint.values())
     {
-      for(int m=builder.getMLo(),mHi=builder.getMHi(arrLength);m<=mHi;m=builder.incrementM(m))
+      Random rand=new Random(randSeed);
+      for(ArrayBuilderint builder:ArrayBuilderint.values())
       {
-        System.out.println("sortType = sort; arrType = int; randSeed= "+randSeed+"; length= "+arrLength+"; builder type "+builder.name()+"; m = "+m);
-        for(int i=0,numReps=builder.getNumRepetitions(arrLength);i<numReps;++i)
+        for(int m=builder.getMLo(),mHi=builder.getMHi(arrLength);m<=mHi;m=builder.incrementM(m))
         {
-          builder.build(golden,m,rand);
-          ArrCopy.uncheckedCopy(golden,0,test,0,arrLength);
-          isSortedsort(test,golden);
+          System.out.println("sortType = sort; arrType = int; randSeed= "+randSeed+"; length= "+arrLength+"; builder type "+builder.name()+"; m = "+m);
+          for(int i=0,numReps=builder.getNumRepetitions(arrLength);i<numReps;++i)
+          {
+            builder.build(golden,m,rand);
+            ArrCopy.uncheckedCopy(golden,0,test,0,arrLength);
+            isSortedsort(test,golden);
+          }
         }
       }
     }
@@ -4953,19 +5004,21 @@ public class SortUtilTest
   }
   private static void testuncheckedreverseSortintHelper(long randSeed,int arrLength) throws InterruptedException
   {
-    Random rand=new Random(randSeed);
     int[] golden=new int[arrLength];
     int[] test=new int[arrLength];
-    for(ArrayBuilderint builder:ArrayBuilderint.values())
     {
-      for(int m=builder.getMLo(),mHi=builder.getMHi(arrLength);m<=mHi;m=builder.incrementM(m))
+      Random rand=new Random(randSeed);
+      for(ArrayBuilderint builder:ArrayBuilderint.values())
       {
-        System.out.println("sortType = reverseSort; arrType = int; randSeed= "+randSeed+"; length= "+arrLength+"; builder type "+builder.name()+"; m = "+m);
-        for(int i=0,numReps=builder.getNumRepetitions(arrLength);i<numReps;++i)
+        for(int m=builder.getMLo(),mHi=builder.getMHi(arrLength);m<=mHi;m=builder.incrementM(m))
         {
-          builder.build(golden,m,rand);
-          ArrCopy.uncheckedCopy(golden,0,test,0,arrLength);
-          isSortedreverseSort(test,golden);
+          System.out.println("sortType = reverseSort; arrType = int; randSeed= "+randSeed+"; length= "+arrLength+"; builder type "+builder.name()+"; m = "+m);
+          for(int i=0,numReps=builder.getNumRepetitions(arrLength);i<numReps;++i)
+          {
+            builder.build(golden,m,rand);
+            ArrCopy.uncheckedCopy(golden,0,test,0,arrLength);
+            isSortedreverseSort(test,golden);
+          }
         }
       }
     }
@@ -4985,19 +5038,21 @@ public class SortUtilTest
   }
   private static void testuncheckedsortlongHelper(long randSeed,int arrLength) throws InterruptedException
   {
-    Random rand=new Random(randSeed);
     long[] golden=new long[arrLength];
     long[] test=new long[arrLength];
-    for(ArrayBuilderlong builder:ArrayBuilderlong.values())
     {
-      for(int m=builder.getMLo(),mHi=builder.getMHi(arrLength);m<=mHi;m=builder.incrementM(m))
+      Random rand=new Random(randSeed);
+      for(ArrayBuilderlong builder:ArrayBuilderlong.values())
       {
-        System.out.println("sortType = sort; arrType = long; randSeed= "+randSeed+"; length= "+arrLength+"; builder type "+builder.name()+"; m = "+m);
-        for(int i=0,numReps=builder.getNumRepetitions(arrLength);i<numReps;++i)
+        for(int m=builder.getMLo(),mHi=builder.getMHi(arrLength);m<=mHi;m=builder.incrementM(m))
         {
-          builder.build(golden,m,rand);
-          ArrCopy.uncheckedCopy(golden,0,test,0,arrLength);
-          isSortedsort(test,golden);
+          System.out.println("sortType = sort; arrType = long; randSeed= "+randSeed+"; length= "+arrLength+"; builder type "+builder.name()+"; m = "+m);
+          for(int i=0,numReps=builder.getNumRepetitions(arrLength);i<numReps;++i)
+          {
+            builder.build(golden,m,rand);
+            ArrCopy.uncheckedCopy(golden,0,test,0,arrLength);
+            isSortedsort(test,golden);
+          }
         }
       }
     }
@@ -5017,19 +5072,21 @@ public class SortUtilTest
   }
   private static void testuncheckedreverseSortlongHelper(long randSeed,int arrLength) throws InterruptedException
   {
-    Random rand=new Random(randSeed);
     long[] golden=new long[arrLength];
     long[] test=new long[arrLength];
-    for(ArrayBuilderlong builder:ArrayBuilderlong.values())
     {
-      for(int m=builder.getMLo(),mHi=builder.getMHi(arrLength);m<=mHi;m=builder.incrementM(m))
+      Random rand=new Random(randSeed);
+      for(ArrayBuilderlong builder:ArrayBuilderlong.values())
       {
-        System.out.println("sortType = reverseSort; arrType = long; randSeed= "+randSeed+"; length= "+arrLength+"; builder type "+builder.name()+"; m = "+m);
-        for(int i=0,numReps=builder.getNumRepetitions(arrLength);i<numReps;++i)
+        for(int m=builder.getMLo(),mHi=builder.getMHi(arrLength);m<=mHi;m=builder.incrementM(m))
         {
-          builder.build(golden,m,rand);
-          ArrCopy.uncheckedCopy(golden,0,test,0,arrLength);
-          isSortedreverseSort(test,golden);
+          System.out.println("sortType = reverseSort; arrType = long; randSeed= "+randSeed+"; length= "+arrLength+"; builder type "+builder.name()+"; m = "+m);
+          for(int i=0,numReps=builder.getNumRepetitions(arrLength);i<numReps;++i)
+          {
+            builder.build(golden,m,rand);
+            ArrCopy.uncheckedCopy(golden,0,test,0,arrLength);
+            isSortedreverseSort(test,golden);
+          }
         }
       }
     }
@@ -5049,19 +5106,49 @@ public class SortUtilTest
   }
   private static void testuncheckedsortfloatHelper(long randSeed,int arrLength) throws InterruptedException
   {
-    Random rand=new Random(randSeed);
     float[] golden=new float[arrLength];
     float[] test=new float[arrLength];
-    for(ArrayBuilderfloat builder:ArrayBuilderfloat.values())
     {
-      for(int m=builder.getMLo(),mHi=builder.getMHi(arrLength);m<=mHi;m=builder.incrementM(m))
+      Random rand=new Random(randSeed);
+      for(floatBuilder builder:floatBuilder.values())
       {
-        System.out.println("sortType = sort; arrType = float; randSeed= "+randSeed+"; length= "+arrLength+"; builder type "+builder.name()+"; m = "+m);
-        for(int i=0,numReps=builder.getNumRepetitions(arrLength);i<numReps;++i)
+        for(int a=0;a<10;++a)
         {
-          builder.build(golden,m,rand);
-          ArrCopy.uncheckedCopy(golden,0,test,0,arrLength);
-          isSortedsort(test,golden);
+          for(int g=0;g<=10;++g)
+          {
+            for(int z=0;z<=10;++z)
+            {
+              for(int n=0;n<=10;++n)
+              {
+                for(int p=0;p<=10;++p)
+                {
+                  if(a+g+z+n+p==arrLength)
+                  {
+                    System.out.println("sortType = sort; arrType = float; randSeed= "+randSeed+"; length= "+arrLength+"; builder type "+builder.name()+"; a ="+a+"; g="+g+"; z="+z+"; n="+n+"; p="+p);
+                    builder.build(golden,a,g,z,n,p,rand);
+                    ArrCopy.uncheckedCopy(golden,0,test,0,arrLength);
+                    isSortedsort(test,golden);
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    {
+      Random rand=new Random(randSeed);
+      for(ArrayBuilderfloat builder:ArrayBuilderfloat.values())
+      {
+        for(int m=builder.getMLo(),mHi=builder.getMHi(arrLength);m<=mHi;m=builder.incrementM(m))
+        {
+          System.out.println("sortType = sort; arrType = float; randSeed= "+randSeed+"; length= "+arrLength+"; builder type "+builder.name()+"; m = "+m);
+          for(int i=0,numReps=builder.getNumRepetitions(arrLength);i<numReps;++i)
+          {
+            builder.build(golden,m,rand);
+            ArrCopy.uncheckedCopy(golden,0,test,0,arrLength);
+            isSortedsort(test,golden);
+          }
         }
       }
     }
@@ -5081,19 +5168,49 @@ public class SortUtilTest
   }
   private static void testuncheckedreverseSortfloatHelper(long randSeed,int arrLength) throws InterruptedException
   {
-    Random rand=new Random(randSeed);
     float[] golden=new float[arrLength];
     float[] test=new float[arrLength];
-    for(ArrayBuilderfloat builder:ArrayBuilderfloat.values())
     {
-      for(int m=builder.getMLo(),mHi=builder.getMHi(arrLength);m<=mHi;m=builder.incrementM(m))
+      Random rand=new Random(randSeed);
+      for(floatBuilder builder:floatBuilder.values())
       {
-        System.out.println("sortType = reverseSort; arrType = float; randSeed= "+randSeed+"; length= "+arrLength+"; builder type "+builder.name()+"; m = "+m);
-        for(int i=0,numReps=builder.getNumRepetitions(arrLength);i<numReps;++i)
+        for(int a=0;a<10;++a)
         {
-          builder.build(golden,m,rand);
-          ArrCopy.uncheckedCopy(golden,0,test,0,arrLength);
-          isSortedreverseSort(test,golden);
+          for(int g=0;g<=10;++g)
+          {
+            for(int z=0;z<=10;++z)
+            {
+              for(int n=0;n<=10;++n)
+              {
+                for(int p=0;p<=10;++p)
+                {
+                  if(a+g+z+n+p==arrLength)
+                  {
+                    System.out.println("sortType = reverseSort; arrType = float; randSeed= "+randSeed+"; length= "+arrLength+"; builder type "+builder.name()+"; a ="+a+"; g="+g+"; z="+z+"; n="+n+"; p="+p);
+                    builder.build(golden,a,g,z,n,p,rand);
+                    ArrCopy.uncheckedCopy(golden,0,test,0,arrLength);
+                    isSortedreverseSort(test,golden);
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    {
+      Random rand=new Random(randSeed);
+      for(ArrayBuilderfloat builder:ArrayBuilderfloat.values())
+      {
+        for(int m=builder.getMLo(),mHi=builder.getMHi(arrLength);m<=mHi;m=builder.incrementM(m))
+        {
+          System.out.println("sortType = reverseSort; arrType = float; randSeed= "+randSeed+"; length= "+arrLength+"; builder type "+builder.name()+"; m = "+m);
+          for(int i=0,numReps=builder.getNumRepetitions(arrLength);i<numReps;++i)
+          {
+            builder.build(golden,m,rand);
+            ArrCopy.uncheckedCopy(golden,0,test,0,arrLength);
+            isSortedreverseSort(test,golden);
+          }
         }
       }
     }
@@ -5113,19 +5230,49 @@ public class SortUtilTest
   }
   private static void testuncheckedsortdoubleHelper(long randSeed,int arrLength) throws InterruptedException
   {
-    Random rand=new Random(randSeed);
     double[] golden=new double[arrLength];
     double[] test=new double[arrLength];
-    for(ArrayBuilderdouble builder:ArrayBuilderdouble.values())
     {
-      for(int m=builder.getMLo(),mHi=builder.getMHi(arrLength);m<=mHi;m=builder.incrementM(m))
+      Random rand=new Random(randSeed);
+      for(doubleBuilder builder:doubleBuilder.values())
       {
-        System.out.println("sortType = sort; arrType = double; randSeed= "+randSeed+"; length= "+arrLength+"; builder type "+builder.name()+"; m = "+m);
-        for(int i=0,numReps=builder.getNumRepetitions(arrLength);i<numReps;++i)
+        for(int a=0;a<10;++a)
         {
-          builder.build(golden,m,rand);
-          ArrCopy.uncheckedCopy(golden,0,test,0,arrLength);
-          isSortedsort(test,golden);
+          for(int g=0;g<=10;++g)
+          {
+            for(int z=0;z<=10;++z)
+            {
+              for(int n=0;n<=10;++n)
+              {
+                for(int p=0;p<=10;++p)
+                {
+                  if(a+g+z+n+p==arrLength)
+                  {
+                    System.out.println("sortType = sort; arrType = double; randSeed= "+randSeed+"; length= "+arrLength+"; builder type "+builder.name()+"; a ="+a+"; g="+g+"; z="+z+"; n="+n+"; p="+p);
+                    builder.build(golden,a,g,z,n,p,rand);
+                    ArrCopy.uncheckedCopy(golden,0,test,0,arrLength);
+                    isSortedsort(test,golden);
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    {
+      Random rand=new Random(randSeed);
+      for(ArrayBuilderdouble builder:ArrayBuilderdouble.values())
+      {
+        for(int m=builder.getMLo(),mHi=builder.getMHi(arrLength);m<=mHi;m=builder.incrementM(m))
+        {
+          System.out.println("sortType = sort; arrType = double; randSeed= "+randSeed+"; length= "+arrLength+"; builder type "+builder.name()+"; m = "+m);
+          for(int i=0,numReps=builder.getNumRepetitions(arrLength);i<numReps;++i)
+          {
+            builder.build(golden,m,rand);
+            ArrCopy.uncheckedCopy(golden,0,test,0,arrLength);
+            isSortedsort(test,golden);
+          }
         }
       }
     }
@@ -5145,19 +5292,49 @@ public class SortUtilTest
   }
   private static void testuncheckedreverseSortdoubleHelper(long randSeed,int arrLength) throws InterruptedException
   {
-    Random rand=new Random(randSeed);
     double[] golden=new double[arrLength];
     double[] test=new double[arrLength];
-    for(ArrayBuilderdouble builder:ArrayBuilderdouble.values())
     {
-      for(int m=builder.getMLo(),mHi=builder.getMHi(arrLength);m<=mHi;m=builder.incrementM(m))
+      Random rand=new Random(randSeed);
+      for(doubleBuilder builder:doubleBuilder.values())
       {
-        System.out.println("sortType = reverseSort; arrType = double; randSeed= "+randSeed+"; length= "+arrLength+"; builder type "+builder.name()+"; m = "+m);
-        for(int i=0,numReps=builder.getNumRepetitions(arrLength);i<numReps;++i)
+        for(int a=0;a<10;++a)
         {
-          builder.build(golden,m,rand);
-          ArrCopy.uncheckedCopy(golden,0,test,0,arrLength);
-          isSortedreverseSort(test,golden);
+          for(int g=0;g<=10;++g)
+          {
+            for(int z=0;z<=10;++z)
+            {
+              for(int n=0;n<=10;++n)
+              {
+                for(int p=0;p<=10;++p)
+                {
+                  if(a+g+z+n+p==arrLength)
+                  {
+                    System.out.println("sortType = reverseSort; arrType = double; randSeed= "+randSeed+"; length= "+arrLength+"; builder type "+builder.name()+"; a ="+a+"; g="+g+"; z="+z+"; n="+n+"; p="+p);
+                    builder.build(golden,a,g,z,n,p,rand);
+                    ArrCopy.uncheckedCopy(golden,0,test,0,arrLength);
+                    isSortedreverseSort(test,golden);
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    {
+      Random rand=new Random(randSeed);
+      for(ArrayBuilderdouble builder:ArrayBuilderdouble.values())
+      {
+        for(int m=builder.getMLo(),mHi=builder.getMHi(arrLength);m<=mHi;m=builder.incrementM(m))
+        {
+          System.out.println("sortType = reverseSort; arrType = double; randSeed= "+randSeed+"; length= "+arrLength+"; builder type "+builder.name()+"; m = "+m);
+          for(int i=0,numReps=builder.getNumRepetitions(arrLength);i<numReps;++i)
+          {
+            builder.build(golden,m,rand);
+            ArrCopy.uncheckedCopy(golden,0,test,0,arrLength);
+            isSortedreverseSort(test,golden);
+          }
         }
       }
     }
@@ -5175,5 +5352,70 @@ public class SortUtilTest
       }
     }
   }
-  */
+  private static enum floatBuilder
+  {
+    SIMPLE
+    {
+      void build(float[] arr,int a,int g,int z,int n,int p,Random rand)
+      {
+        int fromIndex,toIndex;
+        float negVal=-getRandfloat(rand);
+        float posVal=getRandfloat(rand);
+        for(fromIndex=0,toIndex=n;fromIndex<toIndex;++fromIndex)
+        {
+          arr[fromIndex]=negVal;
+        }
+        for(toIndex=fromIndex+g;fromIndex<toIndex;++fromIndex)
+        {
+          arr[fromIndex]=-0.0f;
+        }
+        for(toIndex=fromIndex+z;fromIndex<toIndex;++fromIndex)
+        {
+          arr[fromIndex]=0.0f;
+        }
+        for(toIndex=fromIndex+p;fromIndex<toIndex;++fromIndex)
+        {
+          arr[fromIndex]=posVal;
+        }
+        for(toIndex=fromIndex+a;fromIndex<toIndex;++fromIndex)
+        {
+          arr[fromIndex]=Float.NaN;
+        }
+      }
+    };
+    abstract void build(float[] arr,int a,int g,int z,int n,int p,Random rand);
+  }
+  private static enum doubleBuilder
+  {
+    SIMPLE
+    {
+      void build(double[] arr,int a,int g,int z,int n,int p,Random rand)
+      {
+        int fromIndex,toIndex;
+        double negVal=-getRanddouble(rand);
+        double posVal=getRanddouble(rand);
+        for(fromIndex=0,toIndex=n;fromIndex<toIndex;++fromIndex)
+        {
+          arr[fromIndex]=negVal;
+        }
+        for(toIndex=fromIndex+g;fromIndex<toIndex;++fromIndex)
+        {
+          arr[fromIndex]=-0.0d;
+        }
+        for(toIndex=fromIndex+z;fromIndex<toIndex;++fromIndex)
+        {
+          arr[fromIndex]=0.0d;
+        }
+        for(toIndex=fromIndex+p;fromIndex<toIndex;++fromIndex)
+        {
+          arr[fromIndex]=posVal;
+        }
+        for(toIndex=fromIndex+a;fromIndex<toIndex;++fromIndex)
+        {
+          arr[fromIndex]=Double.NaN;
+        }
+      }
+    };
+    abstract void build(double[] arr,int a,int g,int z,int n,int p,Random rand);
+  }
 }
