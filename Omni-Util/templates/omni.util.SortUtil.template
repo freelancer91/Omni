@@ -13,219 +13,237 @@ import omni.function.DoubleComparator;
 
 public final class SortUtil
 {
-  #MACRO SortMethods<sort,boolean,BooleanComparator,boolean,Boolean,NULL>( )
-  #MACRO SortMethods<sort,byte,ByteComparator,byte,Byte,NULL>( )
-  #MACRO SortMethods<sort,char,CharComparator,char,Character,NULL>( )
-  #MACRO SortMethods<sort,short,ShortComparator,short,Short,NULL>( )
-  #MACRO SortMethods<sort,int,IntBinaryOperator,int,Integer,NULL>( )
-  #MACRO SortMethods<sort,long,LongComparator,long,Long,NULL>( )
-  #MACRO SortMethods<sort,float,FloatComparator,float,Float,Float.floatToRawIntBits>( )
-  #MACRO SortMethods<sort,double,DoubleComparator,double,Double,Double.doubleToRawLongBits>( )
-  #MACRO SortMethods<sort,Object,Comparator<? super E>,E,Object,NULL>(<E>)
+  private SortUtil()
+  {
+    super();
+    //private constructor
+  }
   
-  #MACRO SortMethods<reverseSort,boolean,BooleanComparator,boolean,Boolean,NULL>( )
-  #MACRO SortMethods<reverseSort,byte,ByteComparator,byte,Byte,NULL>( )
-  #MACRO SortMethods<reverseSort,char,CharComparator,char,Character,NULL>( )
-  #MACRO SortMethods<reverseSort,short,ShortComparator,short,Short,NULL>( )
-  #MACRO SortMethods<reverseSort,int,IntBinaryOperator,int,Integer,NULL>( )
-  #MACRO SortMethods<reverseSort,long,LongComparator,long,Long,NULL>( )
-  #MACRO SortMethods<reverseSort,float,FloatComparator,float,Float,Float.floatToRawIntBits>( )
-  #MACRO SortMethods<reverseSort,double,DoubleComparator,double,Double,Double.doubleToRawLongBits>( )
-  #MACRO SortMethods<reverseSort,Object,Comparator<? super E>,E,Object,NULL>(<E>)
+
+
+  #MACRO noncomparatorSortMethod<sort,boolean,BooleanComparator,boolean,Boolean,NULL>( )
+  #MACRO noncomparatorSortMethod<reverseSort,boolean,BooleanComparator,boolean,Boolean,NULL>( )
+  private static void uncheckedSortHelper(boolean[] arr,int begin,int end,boolean firstVal)
+  {
+    //assert arr!=null;
+    //assert begin>=0;
+    //assert end<arr.length;
+    //assert begin<end;
+    //assert firstVal!=arr[begin];
+    //assert firstVal==arr[end];
+    int endValCounter=1;
+    for(int curr=begin+1;curr!=end;++curr)
+    {
+      if(arr[curr]^firstVal)
+      {
+        ++endValCounter;
+      }
+    }
+    for(final var endVal=!firstVal;;--end)
+    {
+      arr[end]=endVal;
+      if(--endValCounter==0)
+      {
+        do
+        {
+          arr[--end]=firstVal;
+        }
+        while(end!=begin);
+        return;
+      }
+    }
+  }
   
-  #MACRO SortMethods<comparatorSort,boolean,BooleanComparator,boolean,Boolean,NULL>( )
-  #MACRO SortMethods<comparatorSort,byte,ByteComparator,byte,Byte,NULL>( )
-  #MACRO SortMethods<comparatorSort,char,CharComparator,char,Character,NULL>( )
-  #MACRO SortMethods<comparatorSort,short,ShortComparator,short,Short,NULL>( )
-  #MACRO SortMethods<comparatorSort,int,IntBinaryOperator,int,Integer,NULL>( )
-  #MACRO SortMethods<comparatorSort,long,LongComparator,long,Long,NULL>( )
-  #MACRO SortMethods<comparatorSort,float,FloatComparator,float,Float,Float.floatToRawIntBits>( )
-  #MACRO SortMethods<comparatorSort,double,DoubleComparator,double,Double,Double.doubleToRawLongBits>( )
-  #MACRO SortMethods<comparatorSort,Object,Comparator<? super E>,E,Object,NULL>(<E>)
-
-#MACRODEF SortMethods<METHODNAME,ARRTYPE,COMPARATORTYPE,EXPOSEDTYPE,BOXEDTYPE,CONVERTTOBITS>(TYPEPARAMETER)
-#IFSWITCH METHODNAME==sort,reverseSort
-  #IFSWITCH ARRTYPE==int,long
-  //MACRO noncomparatorSortMethod(TYPEPARAMETER)
-  #ELSE
-  #MACRO noncomparatorSortMethod(TYPEPARAMETER)
-  #ENDIF
-
-#ELSEIFSWITCH METHODNAME==comparatorSort
+  #MACRO noncomparatorSortMethod<sort,byte,ByteComparator,byte,Byte,NULL>( )
+  #MACRO CountingSort<sort,byte>(Byte)
+  #MACRO InsertSort<sort,byte,byte>()
   
-#MACRO comparatorSortMethod(TYPEPARAMETER)
-#ELSE
-ERROR unknown methodName METHODNAME
-#ENDIF
-#ENDDEF
-
-#MACRODEF noncomparatorSortMethod(TYPEPARAMETER)
-#IFNOTSWITCH ARRTYPE==long,int
-public static TYPEPARAMETER void uncheckedMETHODNAME(ARRTYPE[] arr,int begin,int end)
-{
-  //assert arr!=null;
-  //assert begin>=0;
-  //assert end<arr.length;
-  //assert begin<end;
-#IFSWITCH ARRTYPE==boolean
-  #IFSWITCH METHODNAME==sort
-  while(!arr[begin])
-  #ELSE
-  while(arr[begin])
-  #ENDIF
-  {
-    if(++begin==end)
-    {
-      //already sorted
-      return;
-    }
-  }
-  do
-  {
-  #IFSWITCH METHODNAME==sort
-    if(!arr[end])
-  #ELSE
-    if(arr[end])
-  #ENDIF
-    {
-      uncheckedSortHelper(arr,begin,end,
-  #IFSWITCH METHODNAME==sort
-      false
-  #ELSE
-      true
-  #ENDIF
-      );
-      return;
-    }
-  }
-  while(--end!=begin);
-  //already sorted
-#ELSEIFSWITCH ARRTYPE==byte
-  if(end-begin<30)
-  {
-    insertMETHODNAME(arr,begin,end);
-  }
-  else
-  {
-    countingMETHODNAME(arr,begin,end);
-  }
-#ELSEIFSWITCH ARRTYPE==char,short
-  if(end-begin>3200)
-  {
-    countingMETHODNAME(arr,begin,end);
-  }
-  else
-  {
-    doMETHODNAME(arr,begin,end);
-  }
-#ELSEIFSWITCH ARRTYPE==double,float
-  #IFSWITCH METHODNAME==sort
-  #MACRO MoveNaN(begin,end,--)
-  #ELSE
-  #MACRO MoveNaN(end,begin,++)
-  #ENDIF
-  doMETHODNAME(arr,begin,end);
-  int hi=end;
-  for(;;)
-  {
-    int middle;
-    #MACRO IfClause(LessThan,arr[middle=(begin+hi)>>>1],(EXPOSEDTYPE)0.0)
-    {
-      begin=middle+1;
-    }
-    else
-    {
-      hi=middle;
-    }
-    if(begin<hi)
-    {
-      break;
-    }
-  }
-  while(begin<=end &&
-    #MACRO METHODNAMELessThan(CONVERTTOBITS(arr[begin]),0)
-  )
-  {
-    ++begin;
-  }
-  for(int k=begin;++k<=end;)
-  {
-    ARRTYPE ak;
-    if((ak=arr[k])!=(EXPOSEDTYPE)0.0)
-    {
-      break;
-    }
-    #MACRO IfClause(LessThan,CONVERTTOBITS(ak),0)
-    {
-      #IFSWITCH METHODNAME==sort
-      arr[k]=(EXPOSEDTYPE)0.0;
-      arr[begin]=(EXPOSEDTYPE)-0.0;
-      #ELSE
-      arr[k]=(EXPOSEDTYPE)-0.0;
-      arr[begin]=(EXPOSEDTYPE)0.0;
-      #ENDIF
-      ++begin;
-    }
-  }
-#ELSEIFSWITCH ARRTYPE==Object
+  #MACRO noncomparatorSortMethod<reverseSort,byte,ByteComparator,byte,Byte,NULL>( )
+  #MACRO CountingSort<reverseSort,byte>(Byte)
+  #MACRO InsertSort<reverseSort,byte,byte>()
+   
+  #MACRO noncomparatorSortMethod<sort,char,CharComparator,char,Character,NULL>( )
+  #MACRO CountingSort<sort,char>(Character)
+  #MACRO DoSort<sort,char,char>(Char)
   /*
-  //FIXME this sorting implementation is currently broken
-  int nRemaining;
-  if((nRemaining=++end-begin)<32)
-  {
-     
-     binaryMETHODNAME(arr,begin,end,begin+countRunAndMakeAscendingMETHODNAME(arr,begin,end));
-     return;
-  }
-  final AbstractTimSort ts=new METHODNAMEARRTYPETimSortTYPEPARAMETER(arr,nRemaining);
-  int minRun=minRunLength(nRemaining);
-  int runLen;
-  do
-  {
-    if((runLen=countRunAndMakeAscendingMETHODNAME(arr,begin,end))<minRun)
-    {
-      int force;
-      binaryMETHODNAME(arr,begin,begin+(force=nRemaining<=minRun?nRemaining:minRun),begin+runLen);
-      runLen=force;
-    }
-    ts.mergeCollapse(begin,runLen);
-    begin+=runLen;
-  }
-  while((nRemaining-=runLen)!=0);
-  //assert begin==end+1;
-  ts.mergeForceCollapse();
+  #MACRO DoSortAlt<sort,char,char>(Char)
   */
-#ELSE
-ERROR Unknown array type ARRTYPE
-#ENDIF
-}
-#ELSE
-#ENDIF
-#ENDDEF
-#MACRODEF MoveNaN(BEGIN,END,ITERATE)
-for(;;)
-{
-  if(!BOXEDTYPE.isNaN(arr[END]))
-  {
-    break;
-  }
-  if(ITERATEEND==BEGIN)
-  {
-    return;
-  }
-}
-for(int k=END;ITERATEk!=BEGIN;)
-{
-  ARRTYPE ak;
-  if(BOXEDTYPE.isNaN(ak=arr[k]))
-  {
-    arr[k]=arr[END];
-    arr[END]=ak;
-    ITERATEEND;
-  }
-}
-#ENDDEF
-#MACRODEF comparatorSortMethod(TYPEPARAMETER)
+  #MACRO MergeMethod<sort,char,char>()
+  #MACRO InsertSort<sort,char,char>()
+  #MACRO SentinelInsertSort<sort,char,char>()
+  #MACRO QuickSort<sort,char,char,true>()
+  #MACRO QuickSort<sort,char,char,false>()
+  #MACRO QuickSortSinglePivot<sort,char,char,true>()
+  #MACRO QuickSortSinglePivot<sort,char,char,false>()
+  #MACRO QuickSortDualPivot<sort,char,char,true>()
+  #MACRO QuickSortDualPivot<sort,char,char,false>()
+
+  #MACRO noncomparatorSortMethod<reverseSort,char,CharComparator,char,Character,NULL>( )
+  #MACRO CountingSort<reverseSort,char>(Character)
+  #MACRO DoSort<reverseSort,char,char>(Char)
+  #MACRO MergeMethod<reverseSort,char,char>()
+  #MACRO InsertSort<reverseSort,char,char>()
+  #MACRO SentinelInsertSort<reverseSort,char,char>()
+  #MACRO QuickSort<reverseSort,char,char,true>()
+  #MACRO QuickSort<reverseSort,char,char,false>()
+  #MACRO QuickSortSinglePivot<reverseSort,char,char,true>()
+  #MACRO QuickSortSinglePivot<reverseSort,char,char,false>()
+  #MACRO QuickSortDualPivot<reverseSort,char,char,true>()
+  #MACRO QuickSortDualPivot<reverseSort,char,char,false>()
+  
+  #MACRO noncomparatorSortMethod<sort,short,ShortComparator,short,Short,NULL>( )
+  #MACRO CountingSort<sort,short>(Short)
+  #MACRO DoSort<sort,short,short>(Short)
+  #MACRO MergeMethod<sort,short,short>()
+  #MACRO InsertSort<sort,short,short>()
+  #MACRO SentinelInsertSort<sort,short,short>()
+  #MACRO QuickSort<sort,short,short,true>()
+  #MACRO QuickSort<sort,short,short,false>()
+  #MACRO QuickSortSinglePivot<sort,short,short,true>()
+  #MACRO QuickSortSinglePivot<sort,short,short,false>()
+  #MACRO QuickSortDualPivot<sort,short,short,true>()
+  #MACRO QuickSortDualPivot<sort,short,short,false>()
+ 
+  #MACRO noncomparatorSortMethod<reverseSort,short,ShortComparator,short,Short,NULL>( )
+  #MACRO CountingSort<reverseSort,short>(Short)
+  #MACRO DoSort<reverseSort,short,short>(Short)
+  #MACRO MergeMethod<reverseSort,short,short>()
+  #MACRO InsertSort<reverseSort,short,short>()
+  #MACRO SentinelInsertSort<reverseSort,short,short>()
+  #MACRO QuickSort<reverseSort,short,short,true>()
+  #MACRO QuickSort<reverseSort,short,short,false>()
+  #MACRO QuickSortSinglePivot<reverseSort,short,short,true>()
+  #MACRO QuickSortSinglePivot<reverseSort,short,short,false>()
+  #MACRO QuickSortDualPivot<reverseSort,short,short,true>()
+  #MACRO QuickSortDualPivot<reverseSort,short,short,false>()
+  
+  #MACRO DoSort<sort,int,int>(Int)
+  #MACRO MergeMethod<sort,int,int>()
+  #MACRO InsertSort<sort,int,int>()
+  #MACRO SentinelInsertSort<sort,int,int>()
+  #MACRO QuickSort<sort,int,int,true>()
+  #MACRO QuickSort<sort,int,int,false>()
+  #MACRO QuickSortSinglePivot<sort,int,int,true>()
+  #MACRO QuickSortSinglePivot<sort,int,int,false>()
+  #MACRO QuickSortDualPivot<sort,int,int,true>()
+  #MACRO QuickSortDualPivot<sort,int,int,false>()
+
+  #MACRO DoSort<reverseSort,int,int>(Int)
+  #MACRO MergeMethod<reverseSort,int,int>()
+  #MACRO InsertSort<reverseSort,int,int>()
+  #MACRO SentinelInsertSort<reverseSort,int,int>()
+  #MACRO QuickSort<reverseSort,int,int,true>()
+  #MACRO QuickSort<reverseSort,int,int,false>()
+  #MACRO QuickSortSinglePivot<reverseSort,int,int,true>()
+  #MACRO QuickSortSinglePivot<reverseSort,int,int,false>()
+  #MACRO QuickSortDualPivot<reverseSort,int,int,true>()
+  #MACRO QuickSortDualPivot<reverseSort,int,int,false>()
+  
+  #MACRO DoSort<sort,long,long>(Long)
+  #MACRO MergeMethod<sort,long,long>()
+  #MACRO InsertSort<sort,long,long>()
+  #MACRO SentinelInsertSort<sort,long,long>()
+  #MACRO QuickSort<sort,long,long,true>()
+  #MACRO QuickSort<sort,long,long,false>()
+  #MACRO QuickSortSinglePivot<sort,long,long,true>()
+  #MACRO QuickSortSinglePivot<sort,long,long,false>()
+  #MACRO QuickSortDualPivot<sort,long,long,true>()
+  #MACRO QuickSortDualPivot<sort,long,long,false>()
+
+  #MACRO DoSort<reverseSort,long,long>(Long)
+  #MACRO MergeMethod<reverseSort,long,long>()
+  #MACRO InsertSort<reverseSort,long,long>()
+  #MACRO SentinelInsertSort<reverseSort,long,long>()
+  #MACRO QuickSort<reverseSort,long,long,true>()
+  #MACRO QuickSort<reverseSort,long,long,false>()
+  #MACRO QuickSortSinglePivot<reverseSort,long,long,true>()
+  #MACRO QuickSortSinglePivot<reverseSort,long,long,false>()
+  #MACRO QuickSortDualPivot<reverseSort,long,long,true>()
+  #MACRO QuickSortDualPivot<reverseSort,long,long,false>()
+  
+  #MACRO noncomparatorSortMethod<sort,float,FloatComparator,float,Float,Float.floatToRawIntBits>( )
+  #MACRO DoSort<sort,float,float>(Float)
+  #MACRO MoveNaN(sort,begin,end,--,float,Float)
+  #MACRO MoveZeros<sort,float>(Float.floatToRawIntBits)
+  #MACRO MergeMethod<sort,float,float>()
+  #MACRO InsertSort<sort,float,float>()
+  #MACRO SentinelInsertSort<sort,float,float>()
+  #MACRO QuickSort<sort,float,float,true>()
+  #MACRO QuickSort<sort,float,float,false>()
+  #MACRO QuickSortSinglePivot<sort,float,float,true>()
+  #MACRO QuickSortSinglePivot<sort,float,float,false>()
+  #MACRO QuickSortDualPivot<sort,float,float,true>()
+  #MACRO QuickSortDualPivot<sort,float,float,false>()
+  
+  #MACRO noncomparatorSortMethod<reverseSort,float,FloatComparator,float,Float,Float.floatToRawIntBits>( )
+  #MACRO DoSort<reverseSort,float,float>(Float)
+  #MACRO MoveNaN(reverseSort,end,begin,++,float,Float)
+  #MACRO MoveZeros<reverseSort,float>(Float.floatToRawIntBits)
+  #MACRO MergeMethod<reverseSort,float,float>()
+  #MACRO InsertSort<reverseSort,float,float>()
+  #MACRO SentinelInsertSort<reverseSort,float,float>()
+  #MACRO QuickSort<reverseSort,float,float,true>()
+  #MACRO QuickSort<reverseSort,float,float,false>()
+  #MACRO QuickSortSinglePivot<reverseSort,float,float,true>()
+  #MACRO QuickSortSinglePivot<reverseSort,float,float,false>()
+  #MACRO QuickSortDualPivot<reverseSort,float,float,true>()
+  #MACRO QuickSortDualPivot<reverseSort,float,float,false>()
+  
+  #MACRO noncomparatorSortMethod<sort,double,DoubleComparator,double,Double,Double.doubleToRawLongBits>( )
+  #MACRO DoSort<sort,double,double>(Double)
+  #MACRO MoveNaN(sort,begin,end,--,double,Double)
+  #MACRO MoveZeros<sort,double>(Double.doubleToRawLongBits)
+  #MACRO MergeMethod<sort,double,double>()
+  #MACRO InsertSort<sort,double,double>()
+  #MACRO SentinelInsertSort<sort,double,double>()
+  #MACRO QuickSort<sort,double,double,true>()
+  #MACRO QuickSort<sort,double,double,false>()
+  #MACRO QuickSortSinglePivot<sort,double,double,true>()
+  #MACRO QuickSortSinglePivot<sort,double,double,false>()
+  #MACRO QuickSortDualPivot<sort,double,double,true>()
+  #MACRO QuickSortDualPivot<sort,double,double,false>()
+  
+  #MACRO noncomparatorSortMethod<reverseSort,double,DoubleComparator,double,Double,Double.doubleToRawLongBits>( )
+  #MACRO DoSort<reverseSort,double,double>(Double)
+  #MACRO MoveNaN(reverseSort,end,begin,++,double,Double)
+  #MACRO MoveZeros<reverseSort,double>(Double.doubleToRawLongBits)
+  #MACRO MergeMethod<reverseSort,double,double>()
+  #MACRO InsertSort<reverseSort,double,double>()
+  #MACRO SentinelInsertSort<reverseSort,double,double>()
+  #MACRO QuickSort<reverseSort,double,double,true>()
+  #MACRO QuickSort<reverseSort,double,double,false>()
+  #MACRO QuickSortSinglePivot<reverseSort,double,double,true>()
+  #MACRO QuickSortSinglePivot<reverseSort,double,double,false>()
+  #MACRO QuickSortDualPivot<reverseSort,double,double,true>()
+  #MACRO QuickSortDualPivot<reverseSort,double,double,false>()
+  
+  #MACRO noncomparatorSortMethod<sort,Object,Comparator<? super E>,E,Object,NULL>(<E>)
+  #MACRO noncomparatorSortMethod<reverseSort,Object,Comparator<? super E>,E,Object,NULL>(<E>)
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+
+
+  #MACRO comparatorSortMethod<comparatorSort,boolean,BooleanComparator,boolean,Boolean,NULL>( )
+  #MACRO comparatorSortMethod<comparatorSort,byte,ByteComparator,byte,Byte,NULL>( )
+  #MACRO comparatorSortMethod<comparatorSort,char,CharComparator,char,Character,NULL>( )
+  #MACRO comparatorSortMethod<comparatorSort,short,ShortComparator,short,Short,NULL>( )
+  #MACRO comparatorSortMethod<comparatorSort,int,IntBinaryOperator,int,Integer,NULL>( )
+  #MACRO comparatorSortMethod<comparatorSort,long,LongComparator,long,Long,NULL>( )
+  #MACRO comparatorSortMethod<comparatorSort,float,FloatComparator,float,Float,Float.floatToRawIntBits>( )
+  #MACRO comparatorSortMethod<comparatorSort,double,DoubleComparator,double,Double,Double.doubleToRawLongBits>( )
+  #MACRO comparatorSortMethod<comparatorSort,Object,Comparator<? super E>,E,Object,NULL>(<E>)
+#MACRODEF comparatorSortMethod<METHODNAME,ARRTYPE,COMPARATORTYPE,EXPOSEDTYPE,BOXEDTYPE,CONVERTTOBITS>(TYPEPARAMETER)
 public static TYPEPARAMETER void uncheckedMETHODNAME(ARRTYPE[] arr,int begin,int end,COMPARATORTYPE sorter)
 {
   //assert sorter!=null;
@@ -283,7 +301,6 @@ public static TYPEPARAMETER void uncheckedMETHODNAME(ARRTYPE[] arr,int begin,int
       }
   }
 #ELSE
-/*
   //FIXME this sorting implementation is currently broken
   int nRemaining;
   if((nRemaining=++end-begin)<32)
@@ -309,755 +326,16 @@ public static TYPEPARAMETER void uncheckedMETHODNAME(ARRTYPE[] arr,int begin,int
   while((nRemaining-=runLen)!=0);
   //assert begin==end+1;
   ts.mergeForceCollapse();
-  */
 #ENDIF
 }
 
 #ENDDEF
 
+ 
 
 
-  private SortUtil()
-  {
-    super();
-    //private constructor
-  }
-  #MACRO InsertSort<sort,byte,byte>()
-  #MACRO InsertSort<sort,char,char>()
-  #MACRO InsertSort<sort,short,short>()
-  #MACRO InsertSort<sort,int,int>()
-  #MACRO InsertSort<sort,long,long>()
-  #MACRO InsertSort<sort,float,float>()
-  #MACRO InsertSort<sort,double,double>()
-  #MACRO InsertSort<reverseSort,byte,byte>()
-  #MACRO InsertSort<reverseSort,char,char>()
-  #MACRO InsertSort<reverseSort,short,short>()
-  #MACRO InsertSort<reverseSort,int,int>()
-  #MACRO InsertSort<reverseSort,long,long>()
-  #MACRO InsertSort<reverseSort,float,float>()
-  #MACRO InsertSort<reverseSort,double,double>()
-#MACRODEF InsertSort<METHODNAME,ARRTYPE,EXPOSEDTYPE>()
-private static void insertMETHODNAME(ARRTYPE[] arr,int begin,int end)
-{
-  for(int i=begin,j=i;i!=end;j=++i)
-  {
-    final var ai=arr[i+1];
-    ARRTYPE aj;
-    #MACRO WhileClause(LessThan,ai,aj=arr[j])
-    {
-      arr[j+1]=aj;
-      if(j--==begin)
-      {
-        break;
-      }
-    }
-    arr[j+1]=ai;
-  }
-}
-#ENDDEF
 
-  #MACRO SentinelInsertSort<sort,char,char>()
-  #MACRO SentinelInsertSort<sort,short,short>()
-  #MACRO SentinelInsertSort<sort,int,int>()
-  #MACRO SentinelInsertSort<sort,long,long>()
-  #MACRO SentinelInsertSort<sort,float,float>()
-  #MACRO SentinelInsertSort<sort,double,double>()
-  #MACRO SentinelInsertSort<reverseSort,char,char>()
-  #MACRO SentinelInsertSort<reverseSort,short,short>()
-  #MACRO SentinelInsertSort<reverseSort,int,int>()
-  #MACRO SentinelInsertSort<reverseSort,long,long>()
-  #MACRO SentinelInsertSort<reverseSort,float,float>()
-  #MACRO SentinelInsertSort<reverseSort,double,double>()
-#MACRODEF SentinelInsertSort<METHODNAME,ARRTYPE,EXPOSEDTYPE>()
-private static void sentinelInsertMETHODNAME(ARRTYPE[] arr,int begin,int end)
-{
-  do
-  {
-    if(begin>=end)
-    {
-      return;
-    }
-  }
-#IFSWITCH METHODNAME==sort
-  #MACRO WhileClause(LessThanOrEqual,arr[begin],arr[++begin])
-#ELSEIFSWITCH METHODNAME==reverseSort
-  #MACRO WhileClause(LessThan,arr[begin],arr[++begin])
-#ENDIF
-  ;
-  for(int k=begin;++begin<=end;k=++begin)
-  {
-    ARRTYPE a1,a2;
-    #MACRO IfClause(LessThan,a1=arr[k],a2=arr[begin])
-    {
-      a2=a1;
-      a1=arr[begin];
-    }
-    ARRTYPE ak;
-#IFSWITCH METHODNAME==sort
-    #MACRO WhileClause(LessThan,a1,ak=arr[--k])
-#ELSEIFSWITCH METHODNAME==reverseSort
-    #MACRO WhileClause(LessThanOrEqual,a1,ak=arr[--k])
-#ENDIF
-    {
-      arr[k+2]=ak;
-    }
-    arr[++k+1]=a1;
-#IFSWITCH METHODNAME==sort
-    #MACRO WhileClause(LessThan,a2,ak=arr[--k])
-#ELSEIFSWITCH METHODNAME==reverseSort
-    #MACRO WhileClause(LessThanOrEqual,a2,ak=arr[--k])
-#ENDIF
-    {
-      arr[k+1]=ak;
-    }
-    arr[k+1]=a2;
-  }
-  ARRTYPE ae,last=arr[end];
-#IFSWITCH METHODNAME==sort
-  #MACRO WhileClause(LessThan,last,ae=arr[--end])
-#ELSEIFSWITCH METHODNAME==reverseSort
-  #MACRO WhileClause(LessThanOrEqual,last,ae=arr[--end])
-#ENDIF
-  {
-    arr[end+1]=ae;
-  }
-  arr[end+1]=last;
-}
-#ENDDEF
 
-  #MACRO DoSort<sort,char,char>(Char)
-  #MACRO DoSort<sort,short,short>(Short)
-  #MACRO DoSort<sort,int,int>(Int)
-  #MACRO DoSort<sort,long,long>(Long)
-  #MACRO DoSort<sort,float,float>(Float)
-  #MACRO DoSort<sort,double,double>(Double)
-  #MACRO DoSort<reverseSort,char,char>(Char)
-  #MACRO DoSort<reverseSort,short,short>(Short)
-  #MACRO DoSort<reverseSort,int,int>(Int)
-  #MACRO DoSort<reverseSort,long,long>(Long)
-  #MACRO DoSort<reverseSort,float,float>(Float)
-  #MACRO DoSort<reverseSort,double,double>(Double)
-#MACRODEF DoSort<METHODNAME,ARRTYPE,EXPOSEDTYPE>(CLASSPREFIX)
-#IFSWITCH ARRTYPE==int,long
-public static void uncheckedMETHODNAME(ARRTYPE[] arr,int begin,int end)
-#ELSE
-public static void doMETHODNAME(ARRTYPE[] arr,int begin,int end)
-#ENDIF
-{
-  if(end-begin<286)
-  {
-    quickMETHODNAMEleftmost(arr,begin,end);
-  }
-  else
-  {
-    int[] run;
-    int count=0;
-    (run=new int[68])[0]=begin;
-    //checkIfSortedLoop:
-    for(int k=begin;k!=end;)
-    {
-  #IFSWITCH ARRTYPE==double,float
-      #MACRO IfClause(LessThan,arr[k],arr[k+1])
-      {
-  #ELSE
-      #MACRO SwitchSigNum(arr[k],arr[k+1])
-      {
-      case -1:
-  #ENDIF
-        for(;;)
-        {
-          if(++k>=end ||
-          #MACRO METHODNAMELessThan(arr[k],arr[k-1])
-          )
-          {
-            break;
-          }
-        }
-  #IFSWITCH ARRTYPE==double,float
-      }
-      else
-      #MACRO IfClause(GreaterThan,arr[k],arr[k+1])
-      {
-  #ELSE
-        break;
-      default:
-  #ENDIF
-        for(;;)
-        {
-          if(++k>=end ||
-          #MACRO METHODNAMELessThan(arr[k-1],arr[k])
-          )
-          {
-            break;
-          }
-        }
-        OmniArray.OfCLASSPREFIX.reverseRange(arr,run[count],k-1);
-  #IFSWITCH ARRTYPE==double,float
-      }
-      else
-      {
-  #ELSE
-        break;
-      case 0:
-  #ENDIF
-        ++k;
-        continue;
-      }
-      if(run[count]<=begin ||
-      #MACRO METHODNAMELessThan(arr[run[count]],arr[run[count]-1])
-      )
-      {
-        if(++count==67)
-        {
-          quickMETHODNAMEleftmost(arr,begin,end);
-          return;
-        }
-      }
-      run[count]=k;
-    }
-    if(count==0)
-    {
-      return;
-    }
-    if(count==1)
-    {
-      if(run[count]>end)
-      {
-        return;
-      }
-    }
-    else
-    {
-      if(run[count]>end)
-      {
-        System.out.println("branch");
-      }
-    }
-    
-    
-    //if(count==0 || (count==1 && run[count]>end))
-    //{
-    //  return;
-    //}
-    if(run[count]<++end)
-    {
-      run[++count]=end;
-    }
-    METHODNAMEmerge(arr,begin,end,run,count);
-  }
-}
-#ENDDEF
-
-  #MACRO QuickSort<sort,char,char,true>()
-  #MACRO QuickSort<sort,short,short,true>()
-  #MACRO QuickSort<sort,int,int,true>()
-  #MACRO QuickSort<sort,long,long,true>()
-  #MACRO QuickSort<sort,float,float,true>()
-  #MACRO QuickSort<sort,double,double,true>()
-  #MACRO QuickSort<sort,char,char,false>()
-  #MACRO QuickSort<sort,short,short,false>()
-  #MACRO QuickSort<sort,int,int,false>()
-  #MACRO QuickSort<sort,long,long,false>()
-  #MACRO QuickSort<sort,float,float,false>()
-  #MACRO QuickSort<sort,double,double,false>()
-  #MACRO QuickSort<reverseSort,char,char,true>()
-  #MACRO QuickSort<reverseSort,short,short,true>()
-  #MACRO QuickSort<reverseSort,int,int,true>()
-  #MACRO QuickSort<reverseSort,long,long,true>()
-  #MACRO QuickSort<reverseSort,float,float,true>()
-  #MACRO QuickSort<reverseSort,double,double,true>()
-  #MACRO QuickSort<reverseSort,char,char,false>()
-  #MACRO QuickSort<reverseSort,short,short,false>()
-  #MACRO QuickSort<reverseSort,int,int,false>()
-  #MACRO QuickSort<reverseSort,long,long,false>()
-  #MACRO QuickSort<reverseSort,float,float,false>()
-  #MACRO QuickSort<reverseSort,double,double,false>()
-  
-#MACRODEF QuickSort<METHODNAME,ARRTYPE,EXPOSEDTYPE,LEFTMOST>()
-#IFSWITCH LEFTMOST==true
-private static void quickMETHODNAMEleftmostSinglePivot(ARRTYPE[] arr,int begin,int end,ARRTYPE pivot)
-#ELSE
-private static void quickMETHODNAMESinglePivot(ARRTYPE[] arr,int begin,int end,ARRTYPE pivot)
-#ENDIF
-{
-  int less=begin;
-  int great=end;
-  for(int k=less;k<=great;++k)
-  {
-    ARRTYPE ak;
-#IFSWITCH ARRTYPE==double,float
-  #IFSWITCH METHODNAME==sort
-    #MACRO IfClause(LessThan,ak=arr[k],pivot)
-  #ELSEIFSWITCH METHODNAME==reverseSort
-    #MACRO IfClause(LessThanOrEqual,ak=arr[k],pivot)
-  #ENDIF
-    {
-      arr[k]=arr[less];
-      arr[less]=ak;
-      ++less;
-    }
-    else
-  #IFSWITCH METHODNAME==sort
-    #MACRO IfClause(GreaterThan,ak,pivot)
-  #ELSEIFSWITCH METHODNAME==reverseSort
-    #MACRO IfClause(GreaterThanOrEqual,ak,pivot)
-  #ENDIF
-    {
-      ARRTYPE ag;
-  #IFSWITCH METHODNAME==sort
-      #MACRO WhileClause(GreaterThan,ag=arr[great],pivot)
-  #ELSEIFSWITCH METHODNAME==reverseSort
-      #MACRO WhileClause(GreaterThanOrEqual,ag=arr[great],pivot)
-  #ENDIF
-      {
-        --great;
-      }
-  #IFSWITCH METHODNAME==sort
-      #MACRO IfClause(LessThan,ag,pivot)
-  #ELSEIFSWITCH METHODNAME==reverseSort
-      #MACRO IfClause(LessThanOrEqual,ag,pivot)
-  #ENDIF
-      {
-        arr[k]=arr[less];
-        arr[less]=ag;
-        ++less;
-      }
-      else
-      {
-        arr[k]=pivot;
-      }
-      arr[great]=ak;
-      --great;
-    }
-#ELSE
-    #MACRO SwitchSigNum(ak=arr[k],pivot)
-    {
-    case -1:
-      arr[k]=arr[less];
-      arr[less]=ak;
-      ++less;
-    case 0:
-      break;
-    default:
-      forLoop: for(;;)
-      {
-        ARRTYPE ag;
-        #MACRO SwitchSigNum(pivot,ag=arr[great])
-        {
-          case 0:
-            arr[k]=pivot;
-            break forLoop;
-          default:
-            arr[k]=arr[less];
-            arr[less]=ag;
-            ++less;
-            break forLoop;
-          case -1:
-            --great;
-        }
-      }
-      arr[great]=ak;
-      --great;
-    }
-#ENDIF
-  }
-  if(--less>begin)
-  {
-#IFSWITCH LEFTMOST==true
-  quickMETHODNAMEleftmost(arr,begin,less);
-#ELSE
-  quickMETHODNAME(arr,begin,less);
-#ENDIF
-  }
-  quickMETHODNAME(arr,great+1,end);
-  //TODO check to see if this is necessary
-  //if(++great!=end)
-  //{
-  //  quickMETHODNAME(arr,great,end);
-  //}
-  
-}
-#IFSWITCH LEFTMOST==true
-private static void quickMETHODNAMEleftmostDualPivot(ARRTYPE[] arr,int begin,int end,ARRTYPE pivot1, ARRTYPE pivot2,int e1,int e5)
-#ELSE
-private static void quickMETHODNAMEDualPivot(ARRTYPE[] arr,int begin,int end,ARRTYPE pivot1, ARRTYPE pivot2,int e1,int e5)
-#ENDIF
-{
-  int less=begin;
-  int great=end;
-  #MACRO WhileClause(LessThan,arr[++less],pivot1)
-  {
-  }
-  #MACRO WhileClause(GreaterThan,arr[--great],pivot2)
-  {
-  }
-  outer: for(int k=less;k<=great;++k)
-  {
-    ARRTYPE ak;
-    #MACRO IfClause(LessThan,ak=arr[k],pivot1)
-    {
-      arr[k]=arr[less];
-      arr[less]=ak;
-      ++less;
-    }
-    else
-    #MACRO IfClause(GreaterThan,ak,pivot2)
-    {
-      ARRTYPE ag;
-      #MACRO WhileClause(GreaterThan,ag=arr[great],pivot2)
-      {
-        if(great--==k)
-        {
-          break outer;
-        }
-      }
-      #MACRO IfClause(LessThan,ag,pivot1)
-      {
-        arr[k]=arr[less];
-        arr[less]=ag;
-        ++less;
-      }
-      else
-      {
-        arr[k]=ag;
-      }
-      arr[great]=ak;
-      --great;
-    }
-  }
-  arr[begin]=arr[less-1];
-  arr[less-1]=pivot1;
-  arr[end]=arr[great+1];
-  arr[great+1]=pivot2;
-#IFSWITCH LEFTMOST==true
-  quickMETHODNAMEleftmost(arr,begin,less-2);
-#ELSE
-  quickMETHODNAME(arr,begin,less-2);
-#ENDIF
-  quickMETHODNAME(arr,great+2,end);
-  if(less<e1 && e5<great)
-  {
-    #MACRO WhileClause(Equal,arr[less],pivot1)
-    {
-      ++less;
-    }
-    #MACRO WhileClause(Equal,arr[great],pivot2)
-    {
-      --great;
-    }
-    outer: for(int k=less;k<=great;++k)
-    {
-      ARRTYPE ak;
-      #MACRO IfClause(Equal,ak=arr[k],pivot1)
-      {
-        arr[k]=arr[less];
-        arr[less]=ak;
-        ++less;
-      }
-      else
-      #MACRO IfClause(Equal,ak,pivot2)
-      {
-        ARRTYPE ag;
-        #MACRO WhileClause(Equal,ag=arr[great],pivot2)
-        {
-          if(great--==k)
-          {
-            break outer;
-          }
-        }
-        #MACRO IfClause(Equal,ag,pivot1)
-        {
-          arr[k]=arr[less];
-          arr[less]=pivot1;
-          ++less;
-        }
-        else
-        {
-          arr[k]=ag;
-        }
-        arr[great]=ak;
-        --great;
-      }
-    }
-  }
-  quickMETHODNAME(arr,less,great);
-}
-#IFSWITCH LEFTMOST==true
-private static void quickMETHODNAMEleftmost(ARRTYPE[] arr,int begin,int end)
-#ELSE
-private static void quickMETHODNAME(ARRTYPE[] arr,int begin,int end)
-#ENDIF
-{
-  int length;
-  if((length=end-begin+1)<47)
-  {
-#IFSWITCH LEFTMOST==true
-    insertMETHODNAME(arr,begin,end);
-#ELSE
-    sentinelInsertMETHODNAME(arr,begin,end);
-#ENDIF
-    return;
-  }
-  int seventh,e1,e2,e3,e4,e5;
-  ARRTYPE val1,val2,val3,val4,val5;
-  #MACRO IfClause(LessThan,val2=arr[e2=(e3=(begin+end)>>>1)-(seventh=(length>>3)+(length>>6)+1)],val1=arr[e1=e2-seventh])
-  {
-    var tmp=val2;
-    val2=val1;
-    val1=tmp;
-  }
-  #MACRO IfClause(LessThan,val3=arr[e3],val2)
-  {
-    var tmp=val3;
-    val3=val2;
-    #MACRO IfClause(LessThan,tmp,val1)
-    {
-      val2=val1;
-      val1=tmp;
-    }
-    else
-    {
-      val2=tmp;
-    }
-  }
-  #MACRO IfClause(LessThan,val4=arr[e4=e3+seventh],val3)
-  {
-    var tmp=val4;
-    val4=val3;
-    #MACRO IfClause(LessThan,tmp,val2)
-    {
-      val3=val2;
-      #MACRO IfClause(LessThan,tmp,val1)
-      {
-        val2=val1;
-        val1=tmp;
-      }
-      else
-      {
-        val2=tmp;
-      }
-    }
-    else
-    {
-      val3=tmp;
-    }
-  }
-  #MACRO IfClause(LessThan,val5=arr[e5=e4+seventh],val4)
-  {
-    var tmp=val5;
-    val5=val4;
-    #MACRO IfClause(LessThan,tmp,val3)
-    {
-      val4=val3;
-      #MACRO IfClause(LessThan,tmp,val2)
-      {
-        val3=val2;
-        #MACRO IfClause(LessThan,tmp,val1)
-        {
-          val2=val1;
-          val1=tmp;
-        }
-        else
-        {
-          val2=tmp;
-        }
-      }
-      else
-      {
-        val3=tmp;
-      }
-    }
-    else
-    {
-      val4=tmp;
-    }
-  }
-  arr[e1]=val1;
-  arr[e3]=val3;
-  arr[e5]=val5;
-  if(
-  #MACRO METHODNAMEEqual(val1,val2)
-  ||
-  #MACRO METHODNAMEEqual(val2,val3)
-  ||
-  #MACRO METHODNAMEEqual(val3,val4)
-  ||
-  #MACRO METHODNAMEEqual(val4,val5)
-  )
-  {
-    arr[e2]=val2;
-    arr[e4]=val4;
-#IFSWITCH LEFTMOST==true
-    quickMETHODNAMEleftmostSinglePivot(arr,begin,end,val3);
-#ELSE
-    quickMETHODNAMESinglePivot(arr,begin,end,val3);
-#ENDIF
-  }
-  else
-  {
-     arr[e2]=arr[begin];
-     arr[e4]=arr[end];
-#IFSWITCH LEFTMOST==true
-    quickMETHODNAMEleftmostDualPivot(arr,begin,end,val2,val4,e1,e5);
-#ELSE
-    quickMETHODNAMEDualPivot(arr,begin,end,val2,val4,e1,e5);
-#ENDIF
-  }
-}
-#ENDDEF
-
-  #MACRO MergeMethod<sort,char,char>()
-  #MACRO MergeMethod<sort,short,short>()
-  #MACRO MergeMethod<sort,int,int>()
-  #MACRO MergeMethod<sort,long,long>()
-  #MACRO MergeMethod<sort,float,float>()
-  #MACRO MergeMethod<sort,double,double>()
-  #MACRO MergeMethod<reverseSort,char,char>()
-  #MACRO MergeMethod<reverseSort,short,short>()
-  #MACRO MergeMethod<reverseSort,int,int>()
-  #MACRO MergeMethod<reverseSort,long,long>()
-  #MACRO MergeMethod<reverseSort,float,float>()
-  #MACRO MergeMethod<reverseSort,double,double>()
-#MACRODEF MergeMethod<METHODNAME,ARRTYPE,EXPOSEDTYPE>()
-private static void METHODNAMEmerge(ARRTYPE[] arr,int begin,int end,int[] run,int count)
-{
-  byte odd=0;
-  for(int n=1;(n<<=1)<count;odd^=1){}
-  ARRTYPE[] b;
-  int ao,bo,blen;
-  var work=new ARRTYPE[blen=end-begin];
-  if(odd==0)
-  {
-    ArrCopy.uncheckedCopy(arr,begin,work,0,blen);
-    b=arr;
-    bo=0;
-    arr=work;
-    ao=-begin;
-  }
-  else
-  {
-    b=work;
-    ao=0;
-    bo=-begin;
-  }
-  for(int last;count>1;count=last)
-  {
-    for(int k=(last=0)+2;k<=count;k+=2)
-    {
-      int hi=run[k];
-      int mi;
-      for(int i=run[k-2],p=i,q=(mi=run[k-1]);i<hi;++i)
-      {
-        if(q<hi && (p>=mi ||
-        #MACRO METHODNAMELessThan(arr[q+ao],arr[p+ao])
-        ))
-        {
-          b[i+bo]=arr[q++ +ao];
-        }
-        else
-        {
-          b[i+bo]=arr[p++ +ao];
-        }
-      }
-      run[++last]=hi;
-    }
-    if((count&1)!=0)
-    {
-      for(int i=end,lo=run[count-1];--i>=lo;b[i+bo]=arr[i+ao]){}
-      run[++last]=end;
-    }
-    var tmp=arr;
-    arr=b;
-    b=tmp;
-    int o=ao;
-    ao=bo;
-    bo=o;
-  }
-}
-#ENDDEF
-  
-  #MACRO CountingSort<sort,byte>(Byte)
-  #MACRO CountingSort<sort,char>(Character)
-  #MACRO CountingSort<sort,short>(Short)
-  #MACRO CountingSort<reverseSort,byte>(Byte)
-  #MACRO CountingSort<reverseSort,char>(Character)
-  #MACRO CountingSort<reverseSort,short>(Short)
-#MACRODEF CountingSort<METHODNAME,ARRTYPE>(BOXEDTYPE)
-private static void countingMETHODNAME(ARRTYPE[] arr,int begin,int end)
-{
-  int[] count=new int[(BOXEDTYPE.MAX_VALUE+1)-BOXEDTYPE.MIN_VALUE];
-  for(int i=begin;;++i)
-  {
-    #IFSWITCH ARRTYPE==char
-    ++count[arr[i]];
-    #ELSE
-    ++count[arr[i]-BOXEDTYPE.MIN_VALUE];
-    #ENDIF
-    if(i==end)
-    {
-      break;
-    }
-  }
-    #IFSWITCH METHODNAME==sort
-  for(int i=(BOXEDTYPE.MAX_VALUE+1)-BOXEDTYPE.MIN_VALUE;;)
-  {
-    int s;
-    while((s=count[--i])==0){}
-    #ELSE
-  for(int i=-1;;)
-  {
-    int s;
-    while((s=count[++i])==0){}
-    #ENDIF
-    #IFSWITCH ARRTYPE==char
-    var value=(ARRTYPE)i;
-    #ELSE
-    var value=(ARRTYPE)(i+BOXEDTYPE.MIN_VALUE);
-    #ENDIF
-    do
-    {
-      arr[end]=value;
-      if(--end<begin)
-      {
-        return;
-      }
-    }
-    while(--s!=0);
-  }
-}
-#ENDDEF
-
-  private static void uncheckedSortHelper(boolean[] arr,int begin,int end,boolean firstVal)
-  {
-    //assert arr!=null;
-    //assert begin>=0;
-    //assert end<arr.length;
-    //assert begin<end;
-    //assert firstVal!=arr[begin];
-    //assert firstVal==arr[end];
-    int endValCounter=1;
-    for(int curr=begin+1;curr!=end;++curr)
-    {
-      if(arr[curr]^firstVal)
-      {
-        ++endValCounter;
-      }
-    }
-    for(final var endVal=!firstVal;;--end)
-    {
-      arr[end]=endVal;
-      if(--endValCounter==0)
-      {
-        do
-        {
-          arr[--end]=firstVal;
-        }
-        while(end!=begin);
-        return;
-      }
-    }
-  }
-/*
   //FIXME fix the TimSort methods
   private static int minRunLength(int n)
   {
@@ -1725,13 +1003,1013 @@ private static TYPEPARAMETER int gallopDirectionMETHODNAME(EXPOSEDTYPE key,ARRTY
   return ofs;
 }
 #ENDDEF
-*/
+
 }
+#MACRODEF noncomparatorSortMethod<METHODNAME,ARRTYPE,COMPARATORTYPE,EXPOSEDTYPE,BOXEDTYPE,CONVERTTOBITS>(TYPEPARAMETER)
+#IFNOTSWITCH ARRTYPE==long,int
+public static TYPEPARAMETER void uncheckedMETHODNAME(ARRTYPE[] arr,int begin,int end)
+{
+  //assert arr!=null;
+  //assert begin>=0;
+  //assert end<arr.length;
+  //assert begin<end;
+#IFSWITCH ARRTYPE==boolean
+  #IFSWITCH METHODNAME==sort
+  while(!arr[begin])
+  #ELSE
+  while(arr[begin])
+  #ENDIF
+  {
+    if(++begin==end)
+    {
+      //already sorted
+      return;
+    }
+  }
+  do
+  {
+  #IFSWITCH METHODNAME==sort
+    if(!arr[end])
+  #ELSE
+    if(arr[end])
+  #ENDIF
+    {
+      uncheckedSortHelper(arr,begin,end,
+  #IFSWITCH METHODNAME==sort
+      false
+  #ELSE
+      true
+  #ENDIF
+      );
+      return;
+    }
+  }
+  while(--end!=begin);
+  //already sorted
+#ELSEIFSWITCH ARRTYPE==byte
+  if(end-begin<30)
+  {
+    insertMETHODNAME(arr,begin,end);
+  }
+  else
+  {
+    countingMETHODNAME(arr,begin,end);
+  }
+#ELSEIFSWITCH ARRTYPE==char,short
+  if(end-begin>3200)
+  {
+    countingMETHODNAME(arr,begin,end);
+  }
+  else
+  {
+    doMETHODNAME(arr,begin,end);
+  }
+#ELSEIFSWITCH ARRTYPE==double,float
+  #IFSWITCH METHODNAME==sort
+  doMETHODNAME(arr,begin,end=moveNaNMETHODNAME(arr,begin,end));
+  #ELSE
+  doMETHODNAME(arr,begin=moveNaNMETHODNAME(arr,begin,end),end);
+  #ENDIF
+  moveZerosMETHODNAME(arr,begin,end);
+#ELSEIFSWITCH ARRTYPE==Object
+  //FIXME this sorting implementation is currently broken
+  int nRemaining;
+  if((nRemaining=++end-begin)<32)
+  {
+     
+     binaryMETHODNAME(arr,begin,end,begin+countRunAndMakeAscendingMETHODNAME(arr,begin,end));
+     return;
+  }
+  final AbstractTimSort ts=new METHODNAMEARRTYPETimSortTYPEPARAMETER(arr,nRemaining);
+  int minRun=minRunLength(nRemaining);
+  int runLen;
+  do
+  {
+    if((runLen=countRunAndMakeAscendingMETHODNAME(arr,begin,end))<minRun)
+    {
+      int force;
+      binaryMETHODNAME(arr,begin,begin+(force=nRemaining<=minRun?nRemaining:minRun),begin+runLen);
+      runLen=force;
+    }
+    ts.mergeCollapse(begin,runLen);
+    begin+=runLen;
+  }
+  while((nRemaining-=runLen)!=0);
+  //assert begin==end+1;
+  ts.mergeForceCollapse();
+#ELSE
+ERROR Unknown array type ARRTYPE
+#ENDIF
+}
+#ELSE
+#ENDIF
+#ENDDEF
 
 
 
+#MACRODEF MoveZeros<METHODNAME,ARRTYPE>(CONVERTTOBITS)
+private static void moveZerosMETHODNAME(ARRTYPE[] arr,int begin,int end)
+{
+#IFSWITCH METHODNAME==sort
+  int hi;
+  switch(Integer.signum(begin-(hi=end)))
+  {
+    case -1:
+      //find the first zero, or first positive, or last negative
+      do
+      {
+        int middle;
+        if(arr[middle=(begin+hi)>>>1]<0)
+        {
+          begin=middle+1;
+        }
+        else
+        {
+          hi=middle;
+        }
+      }
+      while(begin<hi);
+    case 0:
+      //skip the last negative or all leading negative zeros
+      while(CONVERTTOBITS(arr[begin])<0)
+      {
+        if(++begin>end)
+        {
+          return;
+        }
+      }
+      //move the negative zeros to the beginning of the sub-range
+      for(int p=begin-1;++begin<=end;)
+      {
+  #IFSWITCH ARRTYPE==float
+        switch(CONVERTTOBITS(arr[begin]))
+        {
+        default:
+          return;
+        case Integer.MIN_VALUE:
+          arr[begin]=0.0f;
+          arr[++p]=-0.0f;
+        case 0:
+        }
+  #ELSE
+       long bits;
+       if((bits=CONVERTTOBITS(arr[begin]))==Long.MIN_VALUE)
+       {
+          arr[begin]=0.0d;
+          arr[++p]=-0.0d;
+       }
+       else if(bits!=0L)
+       {
+         return;
+       }
+  #ENDIF
+      }
+    default:
+  }
+#ELSE
+  int hi;
+  switch(Integer.signum(begin-(hi=end)))
+  {
+    case -1:
+      //find the first zero, or first negative, or last positive
+      do
+      {
+        int middle;
+        if(arr[middle=(begin+hi)>>>1]>0)
+        {
+          begin=middle+1;
+        }
+        else
+        {
+          hi=middle;
+        }
+      }
+      while(begin<hi);
+    case 0:
+      //skip the last positive or all leading positive zeros
+      while(CONVERTTOBITS(arr[begin])>=0)
+      {
+        if(++begin>end)
+        {
+          return;
+        }
+      }
+      //move the positive zeros to the beginning of the sub-range
+      for(int p=begin-1;++begin<=end;)
+      {
+  #IFSWITCH ARRTYPE==float
+        switch(CONVERTTOBITS(arr[begin]))
+        {
+        default:
+          return;
+        case 0:
+          arr[begin]=-0.0f;
+          arr[++p]=0.0f;
+        case Integer.MIN_VALUE:
+        }
+  #ELSE
+       long bits;
+       if((bits=CONVERTTOBITS(arr[begin]))==0L)
+       {
+          arr[begin]=-0.0d;
+          arr[++p]=0.0d;
+       }
+       else if(bits!=Long.MIN_VALUE)
+       {
+         return;
+       }
+  #ENDIF
+      }
+    default:
+  }
+#ENDIF
+}
+#ENDDEF
 
 
+
+#MACRODEF MoveNaN(METHODNAME,BEGIN,END,ITERATE,ARRTYPE,BOXEDTYPE)
+private static int moveNaNMETHODNAME(ARRTYPE[] arr,int begin,int end)
+{
+  for(;;)
+  {
+    if(!BOXEDTYPE.isNaN(arr[END]))
+    {
+      break;
+    }
+    if(ITERATEEND==BEGIN)
+    {
+      return END;
+    }
+  }
+  for(int k=END;ITERATEk!=BEGIN;)
+  {
+    ARRTYPE ak;
+    if(BOXEDTYPE.isNaN(ak=arr[k]))
+    {
+      arr[k]=arr[END];
+      arr[END]=ak;
+      ITERATEEND;
+    }
+  }
+  return END;
+}
+#ENDDEF
+
+/*
+MACRODEF MoveNaN(BEGIN,END,ITERATE)
+for(;;)
+{
+  if(!BOXEDTYPE.isNaN(arr[END]))
+  {
+    break;
+  }
+  if(ITERATEEND==BEGIN)
+  {
+    return;
+  }
+}
+for(int k=END;ITERATEk!=BEGIN;)
+{
+  ARRTYPE ak;
+  if(BOXEDTYPE.isNaN(ak=arr[k]))
+  {
+    arr[k]=arr[END];
+    arr[END]=ak;
+    ITERATEEND;
+  }
+}
+ENDDEF
+*/
+
+#MACRODEF CountingSort<METHODNAME,ARRTYPE>(BOXEDTYPE)
+private static void countingMETHODNAME(ARRTYPE[] arr,int begin,int end)
+{
+  int[] count=new int[(BOXEDTYPE.MAX_VALUE+1)-BOXEDTYPE.MIN_VALUE];
+  for(int i=begin;;++i)
+  {
+    #IFSWITCH ARRTYPE==char
+    ++count[arr[i]];
+    #ELSE
+    ++count[arr[i]-BOXEDTYPE.MIN_VALUE];
+    #ENDIF
+    if(i==end)
+    {
+      break;
+    }
+  }
+    #IFSWITCH METHODNAME==sort
+  for(int i=(BOXEDTYPE.MAX_VALUE+1)-BOXEDTYPE.MIN_VALUE;;)
+  {
+    int s;
+    while((s=count[--i])==0){}
+    #ELSE
+  for(int i=-1;;)
+  {
+    int s;
+    while((s=count[++i])==0){}
+    #ENDIF
+    #IFSWITCH ARRTYPE==char
+    var value=(ARRTYPE)i;
+    #ELSE
+    var value=(ARRTYPE)(i+BOXEDTYPE.MIN_VALUE);
+    #ENDIF
+    do
+    {
+      arr[end]=value;
+      if(--end<begin)
+      {
+        return;
+      }
+    }
+    while(--s!=0);
+  }
+}
+#ENDDEF
+#MACRODEF InsertSort<METHODNAME,ARRTYPE,EXPOSEDTYPE>()
+private static void insertMETHODNAME(ARRTYPE[] arr,int begin,int end)
+{
+  for(int i=begin,j=i;i!=end;j=++i)
+  {
+    final var ai=arr[i+1];
+    ARRTYPE aj;
+    #MACRO WhileClause(LessThan,ai,aj=arr[j])
+    {
+      arr[j+1]=aj;
+      if(j--==begin)
+      {
+        break;
+      }
+    }
+    arr[j+1]=ai;
+  }
+}
+#ENDDEF
+#MACRODEF SentinelInsertSort<METHODNAME,ARRTYPE,EXPOSEDTYPE>()
+private static void sentinelInsertMETHODNAME(ARRTYPE[] arr,int begin,int end)
+{
+  do
+  {
+    if(begin>=end)
+    {
+      return;
+    }
+  }
+#IFSWITCH METHODNAME==sort
+  #MACRO WhileClause(LessThanOrEqual,arr[begin],arr[++begin])
+#ELSEIFSWITCH METHODNAME==reverseSort
+  #MACRO WhileClause(LessThan,arr[begin],arr[++begin])
+#ENDIF
+  ;
+  for(int k=begin;++begin<=end;k=++begin)
+  {
+    ARRTYPE a1,a2;
+    #MACRO IfClause(LessThan,a1=arr[k],a2=arr[begin])
+    {
+      a2=a1;
+      a1=arr[begin];
+    }
+    ARRTYPE ak;
+#IFSWITCH METHODNAME==sort
+    #MACRO WhileClause(LessThan,a1,ak=arr[--k])
+#ELSEIFSWITCH METHODNAME==reverseSort
+    #MACRO WhileClause(LessThanOrEqual,a1,ak=arr[--k])
+#ENDIF
+    {
+      arr[k+2]=ak;
+    }
+    arr[++k+1]=a1;
+#IFSWITCH METHODNAME==sort
+    #MACRO WhileClause(LessThan,a2,ak=arr[--k])
+#ELSEIFSWITCH METHODNAME==reverseSort
+    #MACRO WhileClause(LessThanOrEqual,a2,ak=arr[--k])
+#ENDIF
+    {
+      arr[k+1]=ak;
+    }
+    arr[k+1]=a2;
+  }
+  ARRTYPE ae,last=arr[end];
+#IFSWITCH METHODNAME==sort
+  #MACRO WhileClause(LessThan,last,ae=arr[--end])
+#ELSEIFSWITCH METHODNAME==reverseSort
+  #MACRO WhileClause(LessThanOrEqual,last,ae=arr[--end])
+#ENDIF
+  {
+    arr[end+1]=ae;
+  }
+  arr[end+1]=last;
+}
+#ENDDEF
+
+#MACRODEF DoSortAlt<METHODNAME,ARRTYPE,EXPOSEDTYPE>(CLASSPREFIX)
+#IFSWITCH ARRTYPE==int,long
+public static void uncheckedMETHODNAME(ARRTYPE[] a,int left,int right)
+#ELSE
+public static void doMETHODNAME(ARRTYPE[] a,int left,int right)
+#ENDIF
+{
+  if(right-left<286)
+  {
+    quickMETHODNAMEleftmost(a,left,right);
+    return;
+  }
+  int MAX_RUN_COUNT=67;
+  int[] run = new int[MAX_RUN_COUNT + 1];
+  int count = 0; run[0] = left;
+
+  // Check if the array is nearly sorted
+  for (int k = left; k < right; run[count] = k) {
+      // Equal items in the beginning of the sequence
+      while (k < right && a[k] == a[k + 1])
+          k++;
+      if (k == right) break;  // Sequence finishes with equal items
+      if (a[k] < a[k + 1]) { // ascending
+          while (++k <= right && a[k - 1] <= a[k]);
+      } else if (a[k] > a[k + 1]) { // descending
+          while (++k <= right && a[k - 1] >= a[k]);
+          // Transform into an ascending sequence
+          for (int lo = run[count] - 1, hi = k; ++lo < --hi; ) {
+              ARRTYPE t = a[lo]; a[lo] = a[hi]; a[hi] = t;
+          }
+      }
+
+      // Merge a transformed descending sequence followed by an
+      // ascending sequence
+      if (run[count] > left && a[run[count]] >= a[run[count] - 1]) {
+          count--;
+      }
+
+      if (++count == MAX_RUN_COUNT) {
+          quicksortleftmost(a, left, right);
+          return;
+      }
+  }
+
+  // These invariants should hold true:
+  //    run[0] = 0
+  //    run[<last>] = right + 1; (terminator)
+
+  if (count == 0) {
+      // A single equal run
+      return;
+  } else if (count == 1 && run[count] > right) {
+      // Either a single ascending or a transformed descending run.
+      // Always check that a final run is a proper terminator, otherwise
+      // we have an unterminated trailing run, to handle downstream.
+      return;
+  }
+  right++;
+  if (run[count] < right) {
+      // Corner case: the final run is not a terminator. This may happen
+      // if a final run is an equals run, or there is a single-element run
+      // at the end. Fix up by adding a proper terminator at the end.
+      // Note that we terminate with (right + 1), incremented earlier.
+      run[++count] = right;
+  }
+
+  // Determine alternation base for merge
+  byte odd = 0;
+  for (int n = 1; (n <<= 1) < count; odd ^= 1);
+
+  // Use or create temporary array b for merging
+  ARRTYPE[] work=null;
+  int workBase=0;
+  int workLen=0;
+  ARRTYPE[] b;                 // temp array; alternates with a
+  int ao, bo;              // array offsets from 'left'
+  int blen = right - left; // space needed for b
+  if (work == null || workLen < blen || workBase + blen > work.length) {
+      work = new ARRTYPE[blen];
+      workBase = 0;
+  }
+  if (odd == 0) {
+      System.arraycopy(a, left, work, workBase, blen);
+      b = a;
+      bo = 0;
+      a = work;
+      ao = workBase - left;
+  } else {
+      b = work;
+      ao = 0;
+      bo = workBase - left;
+  }
+
+  // Merging
+  for (int last; count > 1; count = last) {
+      for (int k = (last = 0) + 2; k <= count; k += 2) {
+          int hi = run[k], mi = run[k - 1];
+          for (int i = run[k - 2], p = i, q = mi; i < hi; ++i) {
+              if (q >= hi || p < mi && a[p + ao] <= a[q + ao]) {
+                  b[i + bo] = a[p++ + ao];
+              } else {
+                  b[i + bo] = a[q++ + ao];
+              }
+          }
+          run[++last] = hi;
+      }
+      if ((count & 1) != 0) {
+          for (int i = right, lo = run[count - 1]; --i >= lo;
+              b[i + bo] = a[i + ao]
+          );
+          run[++last] = right;
+      }
+      ARRTYPE[] t = a; a = b; b = t;
+      int o = ao; ao = bo; bo = o;
+  }
+}
+#ENDDEF
+  
+#MACRODEF DoSort<METHODNAME,ARRTYPE,EXPOSEDTYPE>(CLASSPREFIX)
+#IFSWITCH ARRTYPE==int,long
+public static void uncheckedMETHODNAME(ARRTYPE[] arr,int begin,int end)
+#ELSE
+public static void doMETHODNAME(ARRTYPE[] arr,int begin,int end)
+#ENDIF
+{
+  if(end-begin<286)
+  {
+    quickMETHODNAMEleftmost(arr,begin,end);
+  }
+  else
+  {
+    int[] run;
+    int count=0;
+    (run=new int[68])[0]=begin;
+    //checkIfSortedLoop:
+    for(int k=begin;k!=end;)
+    {
+  #IFSWITCH ARRTYPE==double,float
+      #MACRO IfClause(LessThan,arr[k],arr[k+1])
+      {
+  #ELSE
+      #MACRO SwitchSigNum(arr[k],arr[k+1])
+      {
+      case -1:
+  #ENDIF
+        for(;;)
+        {
+          if(++k==end ||
+          #MACRO METHODNAMELessThan(arr[k],arr[k-1])
+          )
+          {
+            break;
+          }
+        }
+  #IFSWITCH ARRTYPE==double,float
+      }
+      else
+      #MACRO IfClause(GreaterThan,arr[k],arr[k+1])
+      {
+  #ELSE
+        break;
+      default:
+  #ENDIF
+        for(;;)
+        {
+          if(++k==end||
+          #MACRO METHODNAMELessThan(arr[k-1],arr[k])
+          )
+          {
+            break;
+          }
+        }
+        OmniArray.OfCLASSPREFIX.reverseRange(arr,run[count],k-1);
+  #IFSWITCH ARRTYPE==double,float
+      }
+      else
+      {
+  #ELSE
+        break;
+      case 0:
+  #ENDIF
+        ++k;
+        continue;
+      }
+      int r;
+      if(count==0)
+      {
+        ++count;
+      }
+      else if(
+      #MACRO METHODNAMELessThan(arr[r=run[count]],arr[r-1])
+      && ++count==67)
+      {
+        quickMETHODNAMEleftmost(arr,begin,end);
+        return;
+      }
+      run[count]=k;
+    }
+    if(count!=0)
+    {
+      METHODNAMEmerge(arr,begin,end,run,count);
+    }
+  }
+}
+#ENDDEF
+
+  
+#MACRODEF QuickSortSinglePivot<METHODNAME,ARRTYPE,EXPOSEDTYPE,LEFTMOST>()
+#IFSWITCH LEFTMOST==true
+private static void quickMETHODNAMEleftmostSinglePivot(ARRTYPE[] arr,int begin,int end,ARRTYPE pivot)
+#ELSE
+private static void quickMETHODNAMESinglePivot(ARRTYPE[] arr,int begin,int end,ARRTYPE pivot)
+#ENDIF
+{
+  int less=begin;
+  int great=end;
+  for(int k=less;k<=great;++k)
+  {
+    ARRTYPE ak;
+#IFSWITCH ARRTYPE==double,float
+  #IFSWITCH METHODNAME==sort
+    #MACRO IfClause(LessThan,ak=arr[k],pivot)
+  #ELSEIFSWITCH METHODNAME==reverseSort
+    #MACRO IfClause(LessThanOrEqual,ak=arr[k],pivot)
+  #ENDIF
+    {
+      arr[k]=arr[less];
+      arr[less]=ak;
+      ++less;
+    }
+    else
+  #IFSWITCH METHODNAME==sort
+    #MACRO IfClause(GreaterThan,ak,pivot)
+  #ELSEIFSWITCH METHODNAME==reverseSort
+    #MACRO IfClause(GreaterThanOrEqual,ak,pivot)
+  #ENDIF
+    {
+      ARRTYPE ag;
+  #IFSWITCH METHODNAME==sort
+      #MACRO WhileClause(GreaterThan,ag=arr[great],pivot)
+  #ELSEIFSWITCH METHODNAME==reverseSort
+      #MACRO WhileClause(GreaterThanOrEqual,ag=arr[great],pivot)
+  #ENDIF
+      {
+        --great;
+      }
+  #IFSWITCH METHODNAME==sort
+      #MACRO IfClause(LessThan,ag,pivot)
+  #ELSEIFSWITCH METHODNAME==reverseSort
+      #MACRO IfClause(LessThanOrEqual,ag,pivot)
+  #ENDIF
+      {
+        arr[k]=arr[less];
+        arr[less]=ag;
+        ++less;
+      }
+      else
+      {
+        arr[k]=pivot;
+      }
+      arr[great]=ak;
+      --great;
+    }
+#ELSE
+    #MACRO SwitchSigNum(ak=arr[k],pivot)
+    {
+    case -1:
+      arr[k]=arr[less];
+      arr[less]=ak;
+      ++less;
+    case 0:
+      break;
+    default:
+      forLoop: for(;;)
+      {
+        ARRTYPE ag;
+        #MACRO SwitchSigNum(pivot,ag=arr[great])
+        {
+          case 0:
+            arr[k]=pivot;
+            break forLoop;
+          default:
+            arr[k]=arr[less];
+            arr[less]=ag;
+            ++less;
+            break forLoop;
+          case -1:
+            --great;
+        }
+      }
+      arr[great]=ak;
+      --great;
+    }
+#ENDIF
+  }
+  if(--less>begin)
+  {
+#IFSWITCH LEFTMOST==true
+  quickMETHODNAMEleftmost(arr,begin,less);
+#ELSE
+  quickMETHODNAME(arr,begin,less);
+#ENDIF
+  }
+  quickMETHODNAME(arr,great+1,end);
+  //TODO check to see if this is necessary
+  //if(++great!=end)
+  //{
+  //  quickMETHODNAME(arr,great,end);
+  //}
+  
+}
+#ENDDEF  
+  
+#MACRODEF QuickSortDualPivot<METHODNAME,ARRTYPE,EXPOSEDTYPE,LEFTMOST>()
+#IFSWITCH LEFTMOST==true
+private static void quickMETHODNAMEleftmostDualPivot(ARRTYPE[] arr,int begin,int end,ARRTYPE pivot1, ARRTYPE pivot2,int e1,int e5)
+#ELSE
+private static void quickMETHODNAMEDualPivot(ARRTYPE[] arr,int begin,int end,ARRTYPE pivot1, ARRTYPE pivot2,int e1,int e5)
+#ENDIF
+{
+  int less=begin;
+  int great=end;
+  #MACRO WhileClause(LessThan,arr[++less],pivot1)
+  {
+  }
+  #MACRO WhileClause(GreaterThan,arr[--great],pivot2)
+  {
+  }
+  outer: for(int k=less;k<=great;++k)
+  {
+    ARRTYPE ak;
+    #MACRO IfClause(LessThan,ak=arr[k],pivot1)
+    {
+      arr[k]=arr[less];
+      arr[less]=ak;
+      ++less;
+    }
+    else
+    #MACRO IfClause(GreaterThan,ak,pivot2)
+    {
+      ARRTYPE ag;
+      #MACRO WhileClause(GreaterThan,ag=arr[great],pivot2)
+      {
+        if(great--==k)
+        {
+          break outer;
+        }
+      }
+      #MACRO IfClause(LessThan,ag,pivot1)
+      {
+        arr[k]=arr[less];
+        arr[less]=ag;
+        ++less;
+      }
+      else
+      {
+        arr[k]=ag;
+      }
+      arr[great]=ak;
+      --great;
+    }
+  }
+  arr[begin]=arr[less-1];
+  arr[less-1]=pivot1;
+  arr[end]=arr[great+1];
+  arr[great+1]=pivot2;
+#IFSWITCH LEFTMOST==true
+  quickMETHODNAMEleftmost(arr,begin,less-2);
+#ELSE
+  quickMETHODNAME(arr,begin,less-2);
+#ENDIF
+  quickMETHODNAME(arr,great+2,end);
+  if(less<e1 && e5<great)
+  {
+    #MACRO WhileClause(Equal,arr[less],pivot1)
+    {
+      ++less;
+    }
+    #MACRO WhileClause(Equal,arr[great],pivot2)
+    {
+      --great;
+    }
+    outer: for(int k=less;k<=great;++k)
+    {
+      ARRTYPE ak;
+      #MACRO IfClause(Equal,ak=arr[k],pivot1)
+      {
+        arr[k]=arr[less];
+        arr[less]=ak;
+        ++less;
+      }
+      else
+      #MACRO IfClause(Equal,ak,pivot2)
+      {
+        ARRTYPE ag;
+        #MACRO WhileClause(Equal,ag=arr[great],pivot2)
+        {
+          if(great--==k)
+          {
+            break outer;
+          }
+        }
+        #MACRO IfClause(Equal,ag,pivot1)
+        {
+          arr[k]=arr[less];
+          arr[less]=pivot1;
+          ++less;
+        }
+        else
+        {
+          arr[k]=ag;
+        }
+        arr[great]=ak;
+        --great;
+      }
+    }
+  }
+  quickMETHODNAME(arr,less,great);
+}
+#ENDDEF
+
+#MACRODEF QuickSort<METHODNAME,ARRTYPE,EXPOSEDTYPE,LEFTMOST>()
+#IFSWITCH LEFTMOST==true
+private static void quickMETHODNAMEleftmost(ARRTYPE[] arr,int begin,int end)
+#ELSE
+private static void quickMETHODNAME(ARRTYPE[] arr,int begin,int end)
+#ENDIF
+{
+  int length;
+  if((length=end-begin+1)<47)
+  {
+#IFSWITCH LEFTMOST==true
+    insertMETHODNAME(arr,begin,end);
+#ELSE
+    sentinelInsertMETHODNAME(arr,begin,end);
+#ENDIF
+    return;
+  }
+  int seventh,e1,e2,e3,e4,e5;
+  ARRTYPE val1,val2,val3,val4,val5;
+  #MACRO IfClause(LessThan,val2=arr[e2=(e3=(begin+end)>>>1)-(seventh=(length>>3)+(length>>6)+1)],val1=arr[e1=e2-seventh])
+  {
+    var tmp=val2;
+    val2=val1;
+    val1=tmp;
+  }
+  #MACRO IfClause(LessThan,val3=arr[e3],val2)
+  {
+    var tmp=val3;
+    val3=val2;
+    #MACRO IfClause(LessThan,tmp,val1)
+    {
+      val2=val1;
+      val1=tmp;
+    }
+    else
+    {
+      val2=tmp;
+    }
+  }
+  #MACRO IfClause(LessThan,val4=arr[e4=e3+seventh],val3)
+  {
+    var tmp=val4;
+    val4=val3;
+    #MACRO IfClause(LessThan,tmp,val2)
+    {
+      val3=val2;
+      #MACRO IfClause(LessThan,tmp,val1)
+      {
+        val2=val1;
+        val1=tmp;
+      }
+      else
+      {
+        val2=tmp;
+      }
+    }
+    else
+    {
+      val3=tmp;
+    }
+  }
+  #MACRO IfClause(LessThan,val5=arr[e5=e4+seventh],val4)
+  {
+    var tmp=val5;
+    val5=val4;
+    #MACRO IfClause(LessThan,tmp,val3)
+    {
+      val4=val3;
+      #MACRO IfClause(LessThan,tmp,val2)
+      {
+        val3=val2;
+        #MACRO IfClause(LessThan,tmp,val1)
+        {
+          val2=val1;
+          val1=tmp;
+        }
+        else
+        {
+          val2=tmp;
+        }
+      }
+      else
+      {
+        val3=tmp;
+      }
+    }
+    else
+    {
+      val4=tmp;
+    }
+  }
+  arr[e1]=val1;
+  arr[e3]=val3;
+  arr[e5]=val5;
+  if(
+  #MACRO METHODNAMEEqual(val1,val2)
+  ||
+  #MACRO METHODNAMEEqual(val2,val3)
+  ||
+  #MACRO METHODNAMEEqual(val3,val4)
+  ||
+  #MACRO METHODNAMEEqual(val4,val5)
+  )
+  {
+    arr[e2]=val2;
+    arr[e4]=val4;
+#IFSWITCH LEFTMOST==true
+    quickMETHODNAMEleftmostSinglePivot(arr,begin,end,val3);
+#ELSE
+    quickMETHODNAMESinglePivot(arr,begin,end,val3);
+#ENDIF
+  }
+  else
+  {
+     arr[e2]=arr[begin];
+     arr[e4]=arr[end];
+#IFSWITCH LEFTMOST==true
+    quickMETHODNAMEleftmostDualPivot(arr,begin,end,val2,val4,e1,e5);
+#ELSE
+    quickMETHODNAMEDualPivot(arr,begin,end,val2,val4,e1,e5);
+#ENDIF
+  }
+}
+#ENDDEF
+
+#MACRODEF MergeMethod<METHODNAME,ARRTYPE,EXPOSEDTYPE>()
+private static void METHODNAMEmerge(ARRTYPE[] arr,int begin,int end,int[] run,int count)
+{
+  
+  byte odd=0;
+  for(int n=1;(n<<=1)<=count;odd^=1){}
+  ARRTYPE[] b;
+  int ao,bo,blen;
+  var work=new ARRTYPE[blen=end-begin+1];
+  if(odd==0)
+  {
+    ArrCopy.uncheckedCopy(arr,begin,work,0,blen);
+    b=arr;
+    bo=0;
+    arr=work;
+    ao=-begin;
+  }
+  else
+  {
+    b=work;
+    ao=0;
+    bo=-begin;
+  }
+
+  //TODO streamline
+  //assert count>0;
+  run[++count]=++end;
+  for(int last;count>1;count=last)
+  {
+    for(int k=(last=0)+2;k<=count;k+=2)
+    {
+      int hi=run[k];
+      int mi;
+      for(int i=run[k-2],p=i,q=(mi=run[k-1]);i<hi;++i)
+      {
+        if(q<hi && (p>=mi ||
+        #MACRO METHODNAMELessThan(arr[q+ao],arr[p+ao])
+        ))
+        {
+          b[i+bo]=arr[q++ +ao];
+        }
+        else
+        {
+          b[i+bo]=arr[p++ +ao];
+        }
+      }
+      run[++last]=hi;
+    }
+    if((count&1)!=0)
+    {
+      for(int i=end,lo=run[count-1];--i>=lo;b[i+bo]=arr[i+ao]){}
+      run[++last]=end;
+    }
+    var tmp=arr;
+    arr=b;
+    b=tmp;
+    int o=ao;
+    ao=bo;
+    bo=o;
+  }
+}
+#ENDDEF
 
 #MACRODEF SuppressUnchecked()
 #IFSWITCH ARRTYPE==Object

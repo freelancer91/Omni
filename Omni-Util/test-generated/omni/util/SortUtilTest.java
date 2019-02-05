@@ -1,9 +1,11 @@
 package omni.util;
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.BeforeClass;
 import java.util.Random;
 import java.util.Arrays;
 import java.util.Objects;
+import java.util.stream.IntStream;
 //TODO uncomment when the module bug is fixed
 //import java.util.Comparator;
 import java.util.function.IntBinaryOperator;
@@ -25,6 +27,8 @@ import omni.function.ShortSupplier;
 import omni.function.FloatSupplier;
 public class SortUtilTest
 {
+  private static final int[] lengths=new int[]{2, 3, 5, 8, 13, 21, 34, 55, 100, 1000, 10000, 100000, 1000000};
+  private static final long[] randSeeds=new long[]{666L,0xC0FFEEL,999L};
   /*//TODO uncomment when they fix the module bug in eclipse
   private static Comparator<String> getAscendingStringComparator()
   {
@@ -36,7 +40,6 @@ public class SortUtilTest
         );
     };
   }
-  */
   private static BooleanComparator getAscendingbooleanComparator()
   {
     return (val1,val2)->
@@ -117,7 +120,6 @@ public class SortUtilTest
         );
     };
   }
-  /*//TODO uncomment when they fix the module bug in eclipse
   private static Comparator<String> getUnsortedStringComparator()
   {
     return (val1,val2)->
@@ -128,7 +130,6 @@ public class SortUtilTest
         );
     };
   }
-  */
   private static BooleanComparator getUnsortedbooleanComparator()
   {
     return (val1,val2)->
@@ -209,7 +210,6 @@ public class SortUtilTest
         );
     };
   }
-  /*//TODO uncomment when they fix the module bug in eclipse
   private static Comparator<String> getDescendingStringComparator()
   {
     return (val1,val2)->
@@ -221,7 +221,6 @@ public class SortUtilTest
         );
     };
   }
-  */
   private static BooleanComparator getDescendingbooleanComparator()
   {
     return (val1,val2)->
@@ -310,267 +309,430 @@ public class SortUtilTest
         );
     };
   }
+  */
   /*//TODO uncomment when they fix the module bug in eclipse
-  private static void isSortedsort(String[] arr,String[] copy)
+  private static void isSortedsort(String[] arr,String[] copy) throws InterruptedException
   {
-    Arrays.sort(copy,0,copy.length);
-    for(int i=0;i<copy.length;++i)
+    Thread stockSorterThread=new Thread(()->
     {
-      Assert.assertTrue(Objects.equals(arr[i],copy[i]));
-    }
+    Arrays.parallelSort(copy,0,copy.length);
+    });
+    stockSorterThread.start();
+    SortUtil.uncheckedsort(arr,0,arr.length-1);
+    stockSorterThread.join();
+    IntStream.range(0,copy.length).parallel().forEach(index->
+    {
+      Assert.assertTrue(Objects.equals(arr[index],copy[index]));
+    });
   }
   */
-  private static void isSortedsort(boolean[] arr,boolean[] copy)
+  private static void isSortedsort(boolean[] arr,boolean[] copy) throws InterruptedException
   {
+    Thread stockSorterThread=new Thread(()->
+    {
     Boolean[] boxedCopy=new Boolean[copy.length];
     ArrCopy.uncheckedCopy(copy,0,boxedCopy,0,copy.length);
-    Arrays.sort(boxedCopy,0,copy.length);
+    Arrays.parallelSort(boxedCopy,0,copy.length);
     ArrCopy.uncheckedCopy(boxedCopy,0,copy,0,copy.length);
-    for(int i=0;i<copy.length;++i)
+    });
+    stockSorterThread.start();
+    SortUtil.uncheckedsort(arr,0,arr.length-1);
+    stockSorterThread.join();
+    IntStream.range(0,copy.length).parallel().forEach(index->
     {
-      Assert.assertTrue(arr[i]==copy[i]);
-    }
+      Assert.assertTrue(arr[index]==copy[index]);
+    });
   }
-  private static void isSortedsort(byte[] arr,byte[] copy)
+  private static void isSortedsort(byte[] arr,byte[] copy) throws InterruptedException
   {
-    Arrays.sort(copy,0,copy.length);
-    for(int i=0;i<copy.length;++i)
+    Thread stockSorterThread=new Thread(()->
     {
-      Assert.assertTrue(arr[i]==copy[i]);
-    }
+    Arrays.parallelSort(copy,0,copy.length);
+    });
+    stockSorterThread.start();
+    SortUtil.uncheckedsort(arr,0,arr.length-1);
+    stockSorterThread.join();
+    IntStream.range(0,copy.length).parallel().forEach(index->
+    {
+      Assert.assertTrue(arr[index]==copy[index]);
+    });
   }
-  private static void isSortedsort(char[] arr,char[] copy)
+  private static void isSortedsort(char[] arr,char[] copy) throws InterruptedException
   {
-    Arrays.sort(copy,0,copy.length);
-    for(int i=0;i<copy.length;++i)
+    Thread stockSorterThread=new Thread(()->
     {
-      Assert.assertTrue(arr[i]==copy[i]);
-    }
+    Arrays.parallelSort(copy,0,copy.length);
+    });
+    stockSorterThread.start();
+    SortUtil.uncheckedsort(arr,0,arr.length-1);
+    stockSorterThread.join();
+    IntStream.range(0,copy.length).parallel().forEach(index->
+    {
+      Assert.assertTrue(arr[index]==copy[index]);
+    });
   }
-  private static void isSortedsort(short[] arr,short[] copy)
+  private static void isSortedsort(short[] arr,short[] copy) throws InterruptedException
   {
-    Arrays.sort(copy,0,copy.length);
-    for(int i=0;i<copy.length;++i)
+    Thread stockSorterThread=new Thread(()->
     {
-      Assert.assertTrue(arr[i]==copy[i]);
-    }
+    Arrays.parallelSort(copy,0,copy.length);
+    });
+    stockSorterThread.start();
+    SortUtil.uncheckedsort(arr,0,arr.length-1);
+    stockSorterThread.join();
+    IntStream.range(0,copy.length).parallel().forEach(index->
+    {
+      Assert.assertTrue(arr[index]==copy[index]);
+    });
   }
-  private static void isSortedsort(int[] arr,int[] copy)
+  private static void isSortedsort(int[] arr,int[] copy) throws InterruptedException
   {
-    Arrays.sort(copy,0,copy.length);
-    for(int i=0;i<copy.length;++i)
+    Thread stockSorterThread=new Thread(()->
     {
-      Assert.assertTrue(Objects.equals(arr[i],copy[i]));
-    }
+    Arrays.parallelSort(copy,0,copy.length);
+    });
+    stockSorterThread.start();
+    SortUtil.uncheckedsort(arr,0,arr.length-1);
+    stockSorterThread.join();
+    IntStream.range(0,copy.length).parallel().forEach(index->
+    {
+      Assert.assertTrue(Objects.equals(arr[index],copy[index]));
+    });
   }
-  private static void isSortedsort(long[] arr,long[] copy)
+  private static void isSortedsort(long[] arr,long[] copy) throws InterruptedException
   {
-    Arrays.sort(copy,0,copy.length);
-    for(int i=0;i<copy.length;++i)
+    Thread stockSorterThread=new Thread(()->
     {
-      Assert.assertTrue(Objects.equals(arr[i],copy[i]));
-    }
+    Arrays.parallelSort(copy,0,copy.length);
+    });
+    stockSorterThread.start();
+    SortUtil.uncheckedsort(arr,0,arr.length-1);
+    stockSorterThread.join();
+    IntStream.range(0,copy.length).parallel().forEach(index->
+    {
+      Assert.assertTrue(Objects.equals(arr[index],copy[index]));
+    });
   }
-  private static void isSortedsort(float[] arr,float[] copy)
+  private static void isSortedsort(float[] arr,float[] copy) throws InterruptedException
   {
-    Arrays.sort(copy,0,copy.length);
-    for(int i=0;i<copy.length;++i)
+    Thread stockSorterThread=new Thread(()->
     {
-      Assert.assertTrue(TypeUtil.floatEquals(arr[i],copy[i]));
-    }
+    Arrays.parallelSort(copy,0,copy.length);
+    });
+    stockSorterThread.start();
+    SortUtil.uncheckedsort(arr,0,arr.length-1);
+    stockSorterThread.join();
+    IntStream.range(0,copy.length).parallel().forEach(index->
+    {
+      Assert.assertTrue(TypeUtil.floatEquals(arr[index],copy[index]));
+    });
   }
-  private static void isSortedsort(double[] arr,double[] copy)
+  private static void isSortedsort(double[] arr,double[] copy) throws InterruptedException
   {
-    Arrays.sort(copy,0,copy.length);
-    for(int i=0;i<copy.length;++i)
+    Thread stockSorterThread=new Thread(()->
     {
-      Assert.assertTrue(TypeUtil.doubleEquals(arr[i],copy[i]));
-    }
+    Arrays.parallelSort(copy,0,copy.length);
+    });
+    stockSorterThread.start();
+    SortUtil.uncheckedsort(arr,0,arr.length-1);
+    stockSorterThread.join();
+    IntStream.range(0,copy.length).parallel().forEach(index->
+    {
+      Assert.assertTrue(TypeUtil.doubleEquals(arr[index],copy[index]));
+    });
   }
   /*//TODO uncomment when they fix the module bug in eclipse
-  private static void isSortedreverseSort(String[] arr,String[] copy)
+  private static void isSortedreverseSort(String[] arr,String[] copy) throws InterruptedException
   {
-    Arrays.sort(copy,0,copy.length);
-    OmniArray.OfRef.reverseRange(copy,0,copy.length-1);
-    for(int i=0;i<copy.length;++i)
+    Thread stockSorterThread=new Thread(()->
     {
-      Assert.assertTrue(Objects.equals(arr[i],copy[i]));
-    }
+    Arrays.parallelSort(copy,0,copy.length);
+    OmniArray.OfRef.reverseRange(copy,0,copy.length-1);
+    });
+    stockSorterThread.start();
+    SortUtil.uncheckedreverseSort(arr,0,arr.length-1);
+    stockSorterThread.join();
+    IntStream.range(0,copy.length).parallel().forEach(index->
+    {
+      Assert.assertTrue(Objects.equals(arr[index],copy[index]));
+    });
   }
   */
-  private static void isSortedreverseSort(boolean[] arr,boolean[] copy)
+  private static void isSortedreverseSort(boolean[] arr,boolean[] copy) throws InterruptedException
   {
+    Thread stockSorterThread=new Thread(()->
+    {
     Boolean[] boxedCopy=new Boolean[copy.length];
     ArrCopy.uncheckedCopy(copy,0,boxedCopy,0,copy.length);
-    Arrays.sort(boxedCopy,0,copy.length);
+    Arrays.parallelSort(boxedCopy,0,copy.length);
     ArrCopy.uncheckedCopy(boxedCopy,0,copy,0,copy.length);
     OmniArray.OfBoolean.reverseRange(copy,0,copy.length-1);
-    for(int i=0;i<copy.length;++i)
+    });
+    stockSorterThread.start();
+    SortUtil.uncheckedreverseSort(arr,0,arr.length-1);
+    stockSorterThread.join();
+    IntStream.range(0,copy.length).parallel().forEach(index->
     {
-      Assert.assertTrue(arr[i]==copy[i]);
-    }
+      Assert.assertTrue(arr[index]==copy[index]);
+    });
   }
-  private static void isSortedreverseSort(byte[] arr,byte[] copy)
+  private static void isSortedreverseSort(byte[] arr,byte[] copy) throws InterruptedException
   {
-    Arrays.sort(copy,0,copy.length);
+    Thread stockSorterThread=new Thread(()->
+    {
+    Arrays.parallelSort(copy,0,copy.length);
     OmniArray.OfByte.reverseRange(copy,0,copy.length-1);
-    for(int i=0;i<copy.length;++i)
+    });
+    stockSorterThread.start();
+    SortUtil.uncheckedreverseSort(arr,0,arr.length-1);
+    stockSorterThread.join();
+    IntStream.range(0,copy.length).parallel().forEach(index->
     {
-      Assert.assertTrue(arr[i]==copy[i]);
-    }
+      Assert.assertTrue(arr[index]==copy[index]);
+    });
   }
-  private static void isSortedreverseSort(char[] arr,char[] copy)
+  private static void isSortedreverseSort(char[] arr,char[] copy) throws InterruptedException
   {
-    Arrays.sort(copy,0,copy.length);
+    Thread stockSorterThread=new Thread(()->
+    {
+    Arrays.parallelSort(copy,0,copy.length);
     OmniArray.OfChar.reverseRange(copy,0,copy.length-1);
-    for(int i=0;i<copy.length;++i)
+    });
+    stockSorterThread.start();
+    SortUtil.uncheckedreverseSort(arr,0,arr.length-1);
+    stockSorterThread.join();
+    IntStream.range(0,copy.length).parallel().forEach(index->
     {
-      Assert.assertTrue(arr[i]==copy[i]);
-    }
+      Assert.assertTrue(arr[index]==copy[index]);
+    });
   }
-  private static void isSortedreverseSort(short[] arr,short[] copy)
+  private static void isSortedreverseSort(short[] arr,short[] copy) throws InterruptedException
   {
-    Arrays.sort(copy,0,copy.length);
+    Thread stockSorterThread=new Thread(()->
+    {
+    Arrays.parallelSort(copy,0,copy.length);
     OmniArray.OfShort.reverseRange(copy,0,copy.length-1);
-    for(int i=0;i<copy.length;++i)
+    });
+    stockSorterThread.start();
+    SortUtil.uncheckedreverseSort(arr,0,arr.length-1);
+    stockSorterThread.join();
+    IntStream.range(0,copy.length).parallel().forEach(index->
     {
-      Assert.assertTrue(arr[i]==copy[i]);
-    }
+      Assert.assertTrue(arr[index]==copy[index]);
+    });
   }
-  private static void isSortedreverseSort(int[] arr,int[] copy)
+  private static void isSortedreverseSort(int[] arr,int[] copy) throws InterruptedException
   {
-    Arrays.sort(copy,0,copy.length);
+    Thread stockSorterThread=new Thread(()->
+    {
+    Arrays.parallelSort(copy,0,copy.length);
     OmniArray.OfInt.reverseRange(copy,0,copy.length-1);
-    for(int i=0;i<copy.length;++i)
+    });
+    stockSorterThread.start();
+    SortUtil.uncheckedreverseSort(arr,0,arr.length-1);
+    stockSorterThread.join();
+    IntStream.range(0,copy.length).parallel().forEach(index->
     {
-      Assert.assertTrue(Objects.equals(arr[i],copy[i]));
-    }
+      Assert.assertTrue(Objects.equals(arr[index],copy[index]));
+    });
   }
-  private static void isSortedreverseSort(long[] arr,long[] copy)
+  private static void isSortedreverseSort(long[] arr,long[] copy) throws InterruptedException
   {
-    Arrays.sort(copy,0,copy.length);
+    Thread stockSorterThread=new Thread(()->
+    {
+    Arrays.parallelSort(copy,0,copy.length);
     OmniArray.OfLong.reverseRange(copy,0,copy.length-1);
-    for(int i=0;i<copy.length;++i)
+    });
+    stockSorterThread.start();
+    SortUtil.uncheckedreverseSort(arr,0,arr.length-1);
+    stockSorterThread.join();
+    IntStream.range(0,copy.length).parallel().forEach(index->
     {
-      Assert.assertTrue(Objects.equals(arr[i],copy[i]));
-    }
+      Assert.assertTrue(Objects.equals(arr[index],copy[index]));
+    });
   }
-  private static void isSortedreverseSort(float[] arr,float[] copy)
+  private static void isSortedreverseSort(float[] arr,float[] copy) throws InterruptedException
   {
-    Arrays.sort(copy,0,copy.length);
+    Thread stockSorterThread=new Thread(()->
+    {
+    Arrays.parallelSort(copy,0,copy.length);
     OmniArray.OfFloat.reverseRange(copy,0,copy.length-1);
-    for(int i=0;i<copy.length;++i)
+    });
+    stockSorterThread.start();
+    SortUtil.uncheckedreverseSort(arr,0,arr.length-1);
+    stockSorterThread.join();
+    IntStream.range(0,copy.length).parallel().forEach(index->
     {
-      Assert.assertTrue(TypeUtil.floatEquals(arr[i],copy[i]));
-    }
+      Assert.assertTrue(TypeUtil.floatEquals(arr[index],copy[index]));
+    });
   }
-  private static void isSortedreverseSort(double[] arr,double[] copy)
+  private static void isSortedreverseSort(double[] arr,double[] copy) throws InterruptedException
   {
-    Arrays.sort(copy,0,copy.length);
-    OmniArray.OfDouble.reverseRange(copy,0,copy.length-1);
-    for(int i=0;i<copy.length;++i)
+    Thread stockSorterThread=new Thread(()->
     {
-      Assert.assertTrue(TypeUtil.doubleEquals(arr[i],copy[i]));
-    }
+    Arrays.parallelSort(copy,0,copy.length);
+    OmniArray.OfDouble.reverseRange(copy,0,copy.length-1);
+    });
+    stockSorterThread.start();
+    SortUtil.uncheckedreverseSort(arr,0,arr.length-1);
+    stockSorterThread.join();
+    IntStream.range(0,copy.length).parallel().forEach(index->
+    {
+      Assert.assertTrue(TypeUtil.doubleEquals(arr[index],copy[index]));
+    });
   }
   /*//TODO uncomment when they fix the module bug in eclipse
-  private static void isSorted(String[] arr,String[] copy,Comparator<? super String> sorter)
+  private static void isSorted(String[] arr,String[] copy,Comparator<? super String> sorter) throws InterruptedException
   {
-    Arrays.sort(copy,0,copy.length,sorter);
-    for(int i=0;i<copy.length;++i)
+    Thread stockSorterThread=new Thread(()->
     {
-      Assert.assertTrue(Objects.equals(arr[i],copy[i]));
-    }
+    Arrays.parallelSort(copy,0,copy.length,sorter);
+    });
+    stockSorterThread.start();
+    SortUtil.uncheckedcomparatorSort(arr,0,arr.length-1,sorter);
+    stockSorterThread.join();
+    IntStream.range(0,copy.length).parallel().forEach(index->
+    {
+      Assert.assertTrue(Objects.equals(arr[index],copy[index]));
+    });
   }
-  */
-  private static void isSorted(boolean[] arr,boolean[] copy,BooleanComparator sorter)
+  private static void isSorted(boolean[] arr,boolean[] copy,BooleanComparator sorter) throws InterruptedException
   {
+    Thread stockSorterThread=new Thread(()->
+    {
     Boolean[] boxedCopy=new Boolean[copy.length];
     ArrCopy.uncheckedCopy(copy,0,boxedCopy,0,copy.length);
-    Arrays.sort(boxedCopy,0,copy.length,sorter::compare);
+    Arrays.parallelSort(boxedCopy,0,copy.length,sorter::compare);
     ArrCopy.uncheckedCopy(boxedCopy,0,copy,0,copy.length);
-    for(int i=0;i<copy.length;++i)
+    });
+    stockSorterThread.start();
+    SortUtil.uncheckedcomparatorSort(arr,0,arr.length-1,sorter);
+    stockSorterThread.join();
+    IntStream.range(0,copy.length).parallel().forEach(index->
     {
-      Assert.assertTrue(arr[i]==copy[i]);
-    }
+      Assert.assertTrue(arr[index]==copy[index]);
+    });
   }
-  private static void isSorted(byte[] arr,byte[] copy,ByteComparator sorter)
+  private static void isSorted(byte[] arr,byte[] copy,ByteComparator sorter) throws InterruptedException
   {
+    Thread stockSorterThread=new Thread(()->
+    {
     Byte[] boxedCopy=new Byte[copy.length];
     ArrCopy.uncheckedCopy(copy,0,boxedCopy,0,copy.length);
-    Arrays.sort(boxedCopy,0,copy.length,sorter::compare);
+    Arrays.parallelSort(boxedCopy,0,copy.length,sorter::compare);
     ArrCopy.uncheckedCopy(boxedCopy,0,copy,0,copy.length);
-    for(int i=0;i<copy.length;++i)
+    });
+    stockSorterThread.start();
+    SortUtil.uncheckedcomparatorSort(arr,0,arr.length-1,sorter);
+    stockSorterThread.join();
+    IntStream.range(0,copy.length).parallel().forEach(index->
     {
-      Assert.assertTrue(arr[i]==copy[i]);
-    }
+      Assert.assertTrue(arr[index]==copy[index]);
+    });
   }
-  private static void isSorted(char[] arr,char[] copy,CharComparator sorter)
+  private static void isSorted(char[] arr,char[] copy,CharComparator sorter) throws InterruptedException
   {
+    Thread stockSorterThread=new Thread(()->
+    {
     Character[] boxedCopy=new Character[copy.length];
     ArrCopy.uncheckedCopy(copy,0,boxedCopy,0,copy.length);
-    Arrays.sort(boxedCopy,0,copy.length,sorter::compare);
+    Arrays.parallelSort(boxedCopy,0,copy.length,sorter::compare);
     ArrCopy.uncheckedCopy(boxedCopy,0,copy,0,copy.length);
-    for(int i=0;i<copy.length;++i)
+    });
+    stockSorterThread.start();
+    SortUtil.uncheckedcomparatorSort(arr,0,arr.length-1,sorter);
+    stockSorterThread.join();
+    IntStream.range(0,copy.length).parallel().forEach(index->
     {
-      Assert.assertTrue(arr[i]==copy[i]);
-    }
+      Assert.assertTrue(arr[index]==copy[index]);
+    });
   }
-  private static void isSorted(short[] arr,short[] copy,ShortComparator sorter)
+  private static void isSorted(short[] arr,short[] copy,ShortComparator sorter) throws InterruptedException
   {
+    Thread stockSorterThread=new Thread(()->
+    {
     Short[] boxedCopy=new Short[copy.length];
     ArrCopy.uncheckedCopy(copy,0,boxedCopy,0,copy.length);
-    Arrays.sort(boxedCopy,0,copy.length,sorter::compare);
+    Arrays.parallelSort(boxedCopy,0,copy.length,sorter::compare);
     ArrCopy.uncheckedCopy(boxedCopy,0,copy,0,copy.length);
-    for(int i=0;i<copy.length;++i)
+    });
+    stockSorterThread.start();
+    SortUtil.uncheckedcomparatorSort(arr,0,arr.length-1,sorter);
+    stockSorterThread.join();
+    IntStream.range(0,copy.length).parallel().forEach(index->
     {
-      Assert.assertTrue(arr[i]==copy[i]);
-    }
+      Assert.assertTrue(arr[index]==copy[index]);
+    });
   }
-  private static void isSorted(int[] arr,int[] copy,IntBinaryOperator sorter)
+  private static void isSorted(int[] arr,int[] copy,IntBinaryOperator sorter) throws InterruptedException
   {
+    Thread stockSorterThread=new Thread(()->
+    {
     Integer[] boxedCopy=new Integer[copy.length];
     ArrCopy.uncheckedCopy(copy,0,boxedCopy,0,copy.length);
-    Arrays.sort(boxedCopy,0,copy.length,sorter::applyAsInt);
+    Arrays.parallelSort(boxedCopy,0,copy.length,sorter::applyAsInt);
     ArrCopy.uncheckedCopy(boxedCopy,0,copy,0,copy.length);
-    for(int i=0;i<copy.length;++i)
+    });
+    stockSorterThread.start();
+    SortUtil.uncheckedcomparatorSort(arr,0,arr.length-1,sorter);
+    stockSorterThread.join();
+    IntStream.range(0,copy.length).parallel().forEach(index->
     {
-      Assert.assertTrue(Objects.equals(arr[i],copy[i]));
-    }
+      Assert.assertTrue(Objects.equals(arr[index],copy[index]));
+    });
   }
-  private static void isSorted(long[] arr,long[] copy,LongComparator sorter)
+  private static void isSorted(long[] arr,long[] copy,LongComparator sorter) throws InterruptedException
   {
+    Thread stockSorterThread=new Thread(()->
+    {
     Long[] boxedCopy=new Long[copy.length];
     ArrCopy.uncheckedCopy(copy,0,boxedCopy,0,copy.length);
-    Arrays.sort(boxedCopy,0,copy.length,sorter::compare);
+    Arrays.parallelSort(boxedCopy,0,copy.length,sorter::compare);
     ArrCopy.uncheckedCopy(boxedCopy,0,copy,0,copy.length);
-    for(int i=0;i<copy.length;++i)
+    });
+    stockSorterThread.start();
+    SortUtil.uncheckedcomparatorSort(arr,0,arr.length-1,sorter);
+    stockSorterThread.join();
+    IntStream.range(0,copy.length).parallel().forEach(index->
     {
-      Assert.assertTrue(Objects.equals(arr[i],copy[i]));
-    }
+      Assert.assertTrue(Objects.equals(arr[index],copy[index]));
+    });
   }
-  private static void isSorted(float[] arr,float[] copy,FloatComparator sorter)
+  private static void isSorted(float[] arr,float[] copy,FloatComparator sorter) throws InterruptedException
   {
+    Thread stockSorterThread=new Thread(()->
+    {
     Float[] boxedCopy=new Float[copy.length];
     ArrCopy.uncheckedCopy(copy,0,boxedCopy,0,copy.length);
-    Arrays.sort(boxedCopy,0,copy.length,sorter::compare);
+    Arrays.parallelSort(boxedCopy,0,copy.length,sorter::compare);
     ArrCopy.uncheckedCopy(boxedCopy,0,copy,0,copy.length);
-    for(int i=0;i<copy.length;++i)
+    });
+    stockSorterThread.start();
+    SortUtil.uncheckedcomparatorSort(arr,0,arr.length-1,sorter);
+    stockSorterThread.join();
+    IntStream.range(0,copy.length).parallel().forEach(index->
     {
-      Assert.assertTrue(TypeUtil.floatEquals(arr[i],copy[i]));
-    }
+      Assert.assertTrue(TypeUtil.floatEquals(arr[index],copy[index]));
+    });
   }
-  private static void isSorted(double[] arr,double[] copy,DoubleComparator sorter)
+  private static void isSorted(double[] arr,double[] copy,DoubleComparator sorter) throws InterruptedException
   {
+    Thread stockSorterThread=new Thread(()->
+    {
     Double[] boxedCopy=new Double[copy.length];
     ArrCopy.uncheckedCopy(copy,0,boxedCopy,0,copy.length);
-    Arrays.sort(boxedCopy,0,copy.length,sorter::compare);
+    Arrays.parallelSort(boxedCopy,0,copy.length,sorter::compare);
     ArrCopy.uncheckedCopy(boxedCopy,0,copy,0,copy.length);
-    for(int i=0;i<copy.length;++i)
+    });
+    stockSorterThread.start();
+    SortUtil.uncheckedcomparatorSort(arr,0,arr.length-1,sorter);
+    stockSorterThread.join();
+    IntStream.range(0,copy.length).parallel().forEach(index->
     {
-      Assert.assertTrue(TypeUtil.doubleEquals(arr[i],copy[i]));
-    }
+      Assert.assertTrue(TypeUtil.doubleEquals(arr[index],copy[index]));
+    });
   }
+  */
   private static boolean getRandboolean(Random rand)
   {
     return rand.nextBoolean();
@@ -658,9 +820,9 @@ public class SortUtilTest
           arr[i]=getRandboolean(rand);
         }
       }
-      int getNumRepetitions()
+      int getNumRepetitions(int arrLength)
       {
-        return 1000;
+        return getMaxRepsboolean(arrLength);
       }
       int getMLo()
       {
@@ -689,9 +851,9 @@ public class SortUtilTest
           arr[i]=true;
         }
       }
-      int getNumRepetitions()
+      int getNumRepetitions(int arrLength)
       {
-        return 100;
+        return getMaxRepsboolean(arrLength);
       }
       int getMLo()
       {
@@ -706,7 +868,7 @@ public class SortUtilTest
         return m+1;
       }
     },
-    Descending
+    DESCENDING
     {
       void build(boolean[] arr,int m,Random rand)
       {
@@ -720,9 +882,9 @@ public class SortUtilTest
           arr[i]=false;
         }
       }
-      int getNumRepetitions()
+      int getNumRepetitions(int arrLength)
       {
-        return 100;
+        return getMaxRepsboolean(arrLength);
       }
       int getMLo()
       {
@@ -746,7 +908,7 @@ public class SortUtilTest
           arr[i]=convertToboolean(m);
         }
       }
-      int getNumRepetitions()
+      int getNumRepetitions(int arrLength)
       {
         return 1;
       }
@@ -763,361 +925,9 @@ public class SortUtilTest
         return m+1;
       }
     }
-    ,MERGE_ASCENDING
-    {
-      void build(boolean[] arr,int m,Random rand)
-      {
-        int period=arr.length/m;
-        int v=1;
-        int i=0;
-        for(int k=0;k<m;++k)
-        {
-          v=1;
-          for(int p=0;p<period;++p)
-          {
-            arr[i++]=convertToboolean(v++);
-          }
-        }
-        for(int j=1;j<arr.length-1;j++)
-        {
-          arr[j]=convertToboolean(v++);
-        }
-      }
-      int getNumRepetitions()
-      {
-        return 1;
-      }
-      int getMLo()
-      {
-        return 65;
-      }
-      int getMHi(int arrLength)
-      {
-        return 69;
-      }
-      int incrementM(int m)
-      {
-        return m+1;
-      }
-    }
-    ,MERGE_DESCENDING
-    {
-      void build(boolean[] arr,int m,Random rand)
-      {
-        int period=arr.length/m;
-        int v=-1;
-        int i=0;
-        for(int k=0;k<m;++k)
-        {
-          v=-1;
-          for(int p=0;p<period;++p)
-          {
-            arr[i++]=convertToboolean(v--);
-          }
-        }
-        for(int j=1;j<arr.length-1;j++)
-        {
-          arr[j]=convertToboolean(v--);
-        }
-      }
-      int getNumRepetitions()
-      {
-        return 1;
-      }
-      int getMLo()
-      {
-        return 65;
-      }
-      int getMHi(int arrLength)
-      {
-        return 69;
-      }
-      int incrementM(int m)
-      {
-        return m+1;
-      }
-    }
-    ,SAW
-    {
-      void build(boolean[] arr,int m,Random rand)
-      {
-        int incCount=1;
-        int decCount=arr.length;
-        int i=0;
-        int period=m--;
-        for(;;)
-        {
-          for(int k=1;k<=period;k++)
-          {
-            if(i>=arr.length)
-            {
-              return;
-            }
-            arr[i++]=convertToboolean(incCount++);
-          }
-          period+=m;
-          for(int k=1;k<=period;k++)
-          {
-            if(i>=arr.length)
-            {
-              return;
-            }
-            arr[i++]=convertToboolean(decCount--);
-          }
-          period+=m;
-        }
-      }
-      int getNumRepetitions()
-      {
-        return 1;
-      }
-      int getMLo()
-      {
-        return 1;
-      }
-      int getMHi(int arrLength)
-      {
-        return (2*arrLength)-1;
-      }
-      int incrementM(int m)
-      {
-        return m*2;
-      }
-    }
-    ,SORTED_REPEATED
-    {
-      void build(boolean[] arr,int m,Random rand)
-      {
-        int period=arr.length/m;
-        int i=0;
-        int k=0;
-        for(;;)
-        {
-          for(int t=1;t<=period;++t)
-          {
-            if(i>=arr.length)
-            {
-              return;
-            }
-            arr[i++]=convertToboolean(k);
-          }
-          if(i>=arr.length)
-          {
-            return;
-          }
-          ++k;
-        }
-      }
-      int getNumRepetitions()
-      {
-        return 1;
-      }
-      int getMLo()
-      {
-        return 1;
-      }
-      int getMHi(int arrLength)
-      {
-        return Math.min(arrLength,7);
-      }
-      int incrementM(int m)
-      {
-        return m+1;
-      }
-    }
-    //FIXME REPEATED and DUPLICATED cause an AIOB exception
-    ,REPEATED
-    {
-      void build(boolean[] arr, int m, Random rand)
-      {
-        for(int i=0;i<arr.length;++i)
-        {
-          arr[i]=convertToboolean(i%m);
-        }
-      }
-      int getNumRepetitions()
-      {
-        return 1;
-      }
-      int getMLo()
-      {
-        return 1;
-      }
-      int getMHi(int arrLength)
-      {
-        return (2*arrLength)-1;
-      }
-      int incrementM(int m)
-      {
-        return m*2;
-      }
-    }
-    ,DUPLICATED
-    {
-      void build(boolean[] arr, int m, Random rand)
-      {
-        for (int i = 0; i < arr.length; i++)
-        {
-          arr[i] = convertToboolean(rand.nextInt(m));
-        }
-      }
-      int getNumRepetitions()
-      {
-        return 1000;
-      }
-      int getMLo()
-      {
-        return 1;
-      }
-      int getMHi(int arrLength)
-      {
-        return (2*arrLength)-1;
-      }
-      int incrementM(int m)
-      {
-        return m*2;
-      }
-    }
-    ,SORTED_ORGAN_PIPES
-    {
-      void build(boolean[] arr,int m,Random rand)
-      {
-        int i=0;
-        int k=m;
-        for(;;)
-        {
-          for(int t=1;t<=m;++t)
-          {
-            if(i>=arr.length)
-            {
-              return;
-            }
-            arr[i++]=convertToboolean(k);
-          }
-        }
-      }
-      int getNumRepetitions()
-      {
-        return 1;
-      }
-      int getMLo()
-      {
-        return 1;
-      }
-      int getMHi(int arrLength)
-      {
-        return Math.min(arrLength,7);
-      }
-      int incrementM(int m)
-      {
-        return m+1;
-      }
-    }
-    ,ORGAN_PIPES
-    {
-      void build(boolean[] arr, int m, Random rand)
-      {
-        int middle = arr.length / (m + 1);
-        for (int i = 0; i < middle; i++) {
-            arr[i] = convertToboolean(i);
-        }
-        for (int i = middle; i < arr.length; i++) {
-            arr[i] = convertToboolean(arr.length - i - 1);
-        }
-      }
-      int getNumRepetitions()
-      {
-        return 1;
-      }
-      int getMLo()
-      {
-        return 1;
-      }
-      int getMHi(int arrLength)
-      {
-        return (2*arrLength)-1;
-      }
-      int incrementM(int m)
-      {
-        return m*2;
-      }
-    }
-    ,STAGGER
-    {
-      void build(boolean[] arr, int m, Random rand) {
-        for (int i = 0; i < arr.length; i++) {
-          arr[i] = convertToboolean((i * m + i) % arr.length);
-        }
-      }
-      int getNumRepetitions()
-      {
-        return 1;
-      }
-      int getMLo()
-      {
-        return 1;
-      }
-      int getMHi(int arrLength)
-      {
-        return (2*arrLength)-1;
-      }
-      int incrementM(int m)
-      {
-        return m*2;
-      }
-    }
-    ,PLATEAU
-    {
-      void build(boolean[] arr, int m, Random rand) {
-        for (int i = 0; i < arr.length; i++) {
-          arr[i] = convertToboolean(Math.min(i, m));
-        }
-      }
-      int getNumRepetitions()
-      {
-        return 1;
-      }
-      int getMLo()
-      {
-        return 1;
-      }
-      int getMHi(int arrLength)
-      {
-        return (2*arrLength)-1;
-      }
-      int incrementM(int m)
-      {
-        return m*2;
-      }
-    }
-    ,SHUFFLE
-    {
-      void build(boolean[] arr, int m, Random rand) {
-        int x = 0, y = 0;
-        for (int i = 0; i < arr.length; i++) {
-          arr[i] = convertToboolean(rand.nextBoolean() ? (x += 2) : (y += 2));
-        }
-      }
-      int getNumRepetitions()
-      {
-        return 1000;
-      }
-      int getMLo()
-      {
-        return 1;
-      }
-      int getMHi(int arrLength)
-      {
-        return 1;
-      }
-      int incrementM(int m)
-      {
-        return m+1;
-      }
-    }
     ;
     abstract void build(boolean[] arr,int m,Random rand); 
-    abstract int getNumRepetitions();
+    abstract int getNumRepetitions(int arrLength);
     abstract int getMLo();
     abstract int getMHi(int arrLength);
     abstract int incrementM(int m);
@@ -1133,9 +943,9 @@ public class SortUtilTest
           arr[i]=getRandbyte(rand);
         }
       }
-      int getNumRepetitions()
+      int getNumRepetitions(int arrLength)
       {
-        return 1000;
+        return getMaxRepsbyte(arrLength);
       }
       int getMLo()
       {
@@ -1159,7 +969,7 @@ public class SortUtilTest
           arr[i]=convertTobyte(m+i);
         }
       }
-      int getNumRepetitions()
+      int getNumRepetitions(int arrLength)
       {
         return 1;
       }
@@ -1176,7 +986,7 @@ public class SortUtilTest
         return m*2;
       }
     },
-    Descending
+    DESCENDING
     {
       void build(byte[] arr,int m,Random rand)
       {
@@ -1185,7 +995,7 @@ public class SortUtilTest
           arr[i]=convertTobyte(arr.length-m-i);
         }
       }
-      int getNumRepetitions()
+      int getNumRepetitions(int arrLength)
       {
         return 1;
       }
@@ -1211,7 +1021,7 @@ public class SortUtilTest
           arr[i]=convertTobyte(m);
         }
       }
-      int getNumRepetitions()
+      int getNumRepetitions(int arrLength)
       {
         return 1;
       }
@@ -1248,7 +1058,7 @@ public class SortUtilTest
           arr[j]=convertTobyte(v++);
         }
       }
-      int getNumRepetitions()
+      int getNumRepetitions(int arrLength)
       {
         return 1;
       }
@@ -1285,7 +1095,7 @@ public class SortUtilTest
           arr[j]=convertTobyte(v--);
         }
       }
-      int getNumRepetitions()
+      int getNumRepetitions(int arrLength)
       {
         return 1;
       }
@@ -1332,7 +1142,7 @@ public class SortUtilTest
           period+=m;
         }
       }
-      int getNumRepetitions()
+      int getNumRepetitions(int arrLength)
       {
         return 1;
       }
@@ -1373,7 +1183,7 @@ public class SortUtilTest
           ++k;
         }
       }
-      int getNumRepetitions()
+      int getNumRepetitions(int arrLength)
       {
         return 1;
       }
@@ -1390,7 +1200,6 @@ public class SortUtilTest
         return m+1;
       }
     }
-    //FIXME REPEATED and DUPLICATED cause an AIOB exception
     ,REPEATED
     {
       void build(byte[] arr, int m, Random rand)
@@ -1400,7 +1209,7 @@ public class SortUtilTest
           arr[i]=convertTobyte(i%m);
         }
       }
-      int getNumRepetitions()
+      int getNumRepetitions(int arrLength)
       {
         return 1;
       }
@@ -1426,9 +1235,9 @@ public class SortUtilTest
           arr[i] = convertTobyte(rand.nextInt(m));
         }
       }
-      int getNumRepetitions()
+      int getNumRepetitions(int arrLength)
       {
-        return 1000;
+        return getMaxRepsbyte(arrLength);
       }
       int getMLo()
       {
@@ -1461,7 +1270,7 @@ public class SortUtilTest
           }
         }
       }
-      int getNumRepetitions()
+      int getNumRepetitions(int arrLength)
       {
         return 1;
       }
@@ -1490,7 +1299,7 @@ public class SortUtilTest
             arr[i] = convertTobyte(arr.length - i - 1);
         }
       }
-      int getNumRepetitions()
+      int getNumRepetitions(int arrLength)
       {
         return 1;
       }
@@ -1514,7 +1323,7 @@ public class SortUtilTest
           arr[i] = convertTobyte((i * m + i) % arr.length);
         }
       }
-      int getNumRepetitions()
+      int getNumRepetitions(int arrLength)
       {
         return 1;
       }
@@ -1538,7 +1347,7 @@ public class SortUtilTest
           arr[i] = convertTobyte(Math.min(i, m));
         }
       }
-      int getNumRepetitions()
+      int getNumRepetitions(int arrLength)
       {
         return 1;
       }
@@ -1563,9 +1372,9 @@ public class SortUtilTest
           arr[i] = convertTobyte(rand.nextBoolean() ? (x += 2) : (y += 2));
         }
       }
-      int getNumRepetitions()
+      int getNumRepetitions(int arrLength)
       {
-        return 1000;
+        return getMaxRepsbyte(arrLength);
       }
       int getMLo()
       {
@@ -1582,7 +1391,7 @@ public class SortUtilTest
     }
     ;
     abstract void build(byte[] arr,int m,Random rand); 
-    abstract int getNumRepetitions();
+    abstract int getNumRepetitions(int arrLength);
     abstract int getMLo();
     abstract int getMHi(int arrLength);
     abstract int incrementM(int m);
@@ -1598,9 +1407,9 @@ public class SortUtilTest
           arr[i]=getRandchar(rand);
         }
       }
-      int getNumRepetitions()
+      int getNumRepetitions(int arrLength)
       {
-        return 1000;
+        return getMaxRepschar(arrLength);
       }
       int getMLo()
       {
@@ -1624,7 +1433,7 @@ public class SortUtilTest
           arr[i]=convertTochar(m+i);
         }
       }
-      int getNumRepetitions()
+      int getNumRepetitions(int arrLength)
       {
         return 1;
       }
@@ -1641,7 +1450,7 @@ public class SortUtilTest
         return m*2;
       }
     },
-    Descending
+    DESCENDING
     {
       void build(char[] arr,int m,Random rand)
       {
@@ -1650,7 +1459,7 @@ public class SortUtilTest
           arr[i]=convertTochar(arr.length-m-i);
         }
       }
-      int getNumRepetitions()
+      int getNumRepetitions(int arrLength)
       {
         return 1;
       }
@@ -1676,7 +1485,7 @@ public class SortUtilTest
           arr[i]=convertTochar(m);
         }
       }
-      int getNumRepetitions()
+      int getNumRepetitions(int arrLength)
       {
         return 1;
       }
@@ -1713,7 +1522,7 @@ public class SortUtilTest
           arr[j]=convertTochar(v++);
         }
       }
-      int getNumRepetitions()
+      int getNumRepetitions(int arrLength)
       {
         return 1;
       }
@@ -1750,7 +1559,7 @@ public class SortUtilTest
           arr[j]=convertTochar(v--);
         }
       }
-      int getNumRepetitions()
+      int getNumRepetitions(int arrLength)
       {
         return 1;
       }
@@ -1797,7 +1606,7 @@ public class SortUtilTest
           period+=m;
         }
       }
-      int getNumRepetitions()
+      int getNumRepetitions(int arrLength)
       {
         return 1;
       }
@@ -1838,7 +1647,7 @@ public class SortUtilTest
           ++k;
         }
       }
-      int getNumRepetitions()
+      int getNumRepetitions(int arrLength)
       {
         return 1;
       }
@@ -1855,7 +1664,6 @@ public class SortUtilTest
         return m+1;
       }
     }
-    //FIXME REPEATED and DUPLICATED cause an AIOB exception
     ,REPEATED
     {
       void build(char[] arr, int m, Random rand)
@@ -1865,7 +1673,7 @@ public class SortUtilTest
           arr[i]=convertTochar(i%m);
         }
       }
-      int getNumRepetitions()
+      int getNumRepetitions(int arrLength)
       {
         return 1;
       }
@@ -1891,9 +1699,9 @@ public class SortUtilTest
           arr[i] = convertTochar(rand.nextInt(m));
         }
       }
-      int getNumRepetitions()
+      int getNumRepetitions(int arrLength)
       {
-        return 1000;
+        return getMaxRepschar(arrLength);
       }
       int getMLo()
       {
@@ -1926,7 +1734,7 @@ public class SortUtilTest
           }
         }
       }
-      int getNumRepetitions()
+      int getNumRepetitions(int arrLength)
       {
         return 1;
       }
@@ -1955,7 +1763,7 @@ public class SortUtilTest
             arr[i] = convertTochar(arr.length - i - 1);
         }
       }
-      int getNumRepetitions()
+      int getNumRepetitions(int arrLength)
       {
         return 1;
       }
@@ -1979,7 +1787,7 @@ public class SortUtilTest
           arr[i] = convertTochar((i * m + i) % arr.length);
         }
       }
-      int getNumRepetitions()
+      int getNumRepetitions(int arrLength)
       {
         return 1;
       }
@@ -2003,7 +1811,7 @@ public class SortUtilTest
           arr[i] = convertTochar(Math.min(i, m));
         }
       }
-      int getNumRepetitions()
+      int getNumRepetitions(int arrLength)
       {
         return 1;
       }
@@ -2028,9 +1836,9 @@ public class SortUtilTest
           arr[i] = convertTochar(rand.nextBoolean() ? (x += 2) : (y += 2));
         }
       }
-      int getNumRepetitions()
+      int getNumRepetitions(int arrLength)
       {
-        return 1000;
+        return getMaxRepschar(arrLength);
       }
       int getMLo()
       {
@@ -2047,7 +1855,7 @@ public class SortUtilTest
     }
     ;
     abstract void build(char[] arr,int m,Random rand); 
-    abstract int getNumRepetitions();
+    abstract int getNumRepetitions(int arrLength);
     abstract int getMLo();
     abstract int getMHi(int arrLength);
     abstract int incrementM(int m);
@@ -2063,9 +1871,9 @@ public class SortUtilTest
           arr[i]=getRandshort(rand);
         }
       }
-      int getNumRepetitions()
+      int getNumRepetitions(int arrLength)
       {
-        return 1000;
+        return getMaxRepsshort(arrLength);
       }
       int getMLo()
       {
@@ -2089,7 +1897,7 @@ public class SortUtilTest
           arr[i]=convertToshort(m+i);
         }
       }
-      int getNumRepetitions()
+      int getNumRepetitions(int arrLength)
       {
         return 1;
       }
@@ -2106,7 +1914,7 @@ public class SortUtilTest
         return m*2;
       }
     },
-    Descending
+    DESCENDING
     {
       void build(short[] arr,int m,Random rand)
       {
@@ -2115,7 +1923,7 @@ public class SortUtilTest
           arr[i]=convertToshort(arr.length-m-i);
         }
       }
-      int getNumRepetitions()
+      int getNumRepetitions(int arrLength)
       {
         return 1;
       }
@@ -2141,7 +1949,7 @@ public class SortUtilTest
           arr[i]=convertToshort(m);
         }
       }
-      int getNumRepetitions()
+      int getNumRepetitions(int arrLength)
       {
         return 1;
       }
@@ -2178,7 +1986,7 @@ public class SortUtilTest
           arr[j]=convertToshort(v++);
         }
       }
-      int getNumRepetitions()
+      int getNumRepetitions(int arrLength)
       {
         return 1;
       }
@@ -2215,7 +2023,7 @@ public class SortUtilTest
           arr[j]=convertToshort(v--);
         }
       }
-      int getNumRepetitions()
+      int getNumRepetitions(int arrLength)
       {
         return 1;
       }
@@ -2262,7 +2070,7 @@ public class SortUtilTest
           period+=m;
         }
       }
-      int getNumRepetitions()
+      int getNumRepetitions(int arrLength)
       {
         return 1;
       }
@@ -2303,7 +2111,7 @@ public class SortUtilTest
           ++k;
         }
       }
-      int getNumRepetitions()
+      int getNumRepetitions(int arrLength)
       {
         return 1;
       }
@@ -2320,7 +2128,6 @@ public class SortUtilTest
         return m+1;
       }
     }
-    //FIXME REPEATED and DUPLICATED cause an AIOB exception
     ,REPEATED
     {
       void build(short[] arr, int m, Random rand)
@@ -2330,7 +2137,7 @@ public class SortUtilTest
           arr[i]=convertToshort(i%m);
         }
       }
-      int getNumRepetitions()
+      int getNumRepetitions(int arrLength)
       {
         return 1;
       }
@@ -2356,9 +2163,9 @@ public class SortUtilTest
           arr[i] = convertToshort(rand.nextInt(m));
         }
       }
-      int getNumRepetitions()
+      int getNumRepetitions(int arrLength)
       {
-        return 1000;
+        return getMaxRepsshort(arrLength);
       }
       int getMLo()
       {
@@ -2391,7 +2198,7 @@ public class SortUtilTest
           }
         }
       }
-      int getNumRepetitions()
+      int getNumRepetitions(int arrLength)
       {
         return 1;
       }
@@ -2420,7 +2227,7 @@ public class SortUtilTest
             arr[i] = convertToshort(arr.length - i - 1);
         }
       }
-      int getNumRepetitions()
+      int getNumRepetitions(int arrLength)
       {
         return 1;
       }
@@ -2444,7 +2251,7 @@ public class SortUtilTest
           arr[i] = convertToshort((i * m + i) % arr.length);
         }
       }
-      int getNumRepetitions()
+      int getNumRepetitions(int arrLength)
       {
         return 1;
       }
@@ -2468,7 +2275,7 @@ public class SortUtilTest
           arr[i] = convertToshort(Math.min(i, m));
         }
       }
-      int getNumRepetitions()
+      int getNumRepetitions(int arrLength)
       {
         return 1;
       }
@@ -2493,9 +2300,9 @@ public class SortUtilTest
           arr[i] = convertToshort(rand.nextBoolean() ? (x += 2) : (y += 2));
         }
       }
-      int getNumRepetitions()
+      int getNumRepetitions(int arrLength)
       {
-        return 1000;
+        return getMaxRepsshort(arrLength);
       }
       int getMLo()
       {
@@ -2512,7 +2319,7 @@ public class SortUtilTest
     }
     ;
     abstract void build(short[] arr,int m,Random rand); 
-    abstract int getNumRepetitions();
+    abstract int getNumRepetitions(int arrLength);
     abstract int getMLo();
     abstract int getMHi(int arrLength);
     abstract int incrementM(int m);
@@ -2528,9 +2335,9 @@ public class SortUtilTest
           arr[i]=getRandint(rand);
         }
       }
-      int getNumRepetitions()
+      int getNumRepetitions(int arrLength)
       {
-        return 1000;
+        return getMaxRepsint(arrLength);
       }
       int getMLo()
       {
@@ -2554,7 +2361,7 @@ public class SortUtilTest
           arr[i]=convertToint(m+i);
         }
       }
-      int getNumRepetitions()
+      int getNumRepetitions(int arrLength)
       {
         return 1;
       }
@@ -2571,7 +2378,7 @@ public class SortUtilTest
         return m*2;
       }
     },
-    Descending
+    DESCENDING
     {
       void build(int[] arr,int m,Random rand)
       {
@@ -2580,7 +2387,7 @@ public class SortUtilTest
           arr[i]=convertToint(arr.length-m-i);
         }
       }
-      int getNumRepetitions()
+      int getNumRepetitions(int arrLength)
       {
         return 1;
       }
@@ -2606,7 +2413,7 @@ public class SortUtilTest
           arr[i]=convertToint(m);
         }
       }
-      int getNumRepetitions()
+      int getNumRepetitions(int arrLength)
       {
         return 1;
       }
@@ -2643,7 +2450,7 @@ public class SortUtilTest
           arr[j]=convertToint(v++);
         }
       }
-      int getNumRepetitions()
+      int getNumRepetitions(int arrLength)
       {
         return 1;
       }
@@ -2680,7 +2487,7 @@ public class SortUtilTest
           arr[j]=convertToint(v--);
         }
       }
-      int getNumRepetitions()
+      int getNumRepetitions(int arrLength)
       {
         return 1;
       }
@@ -2727,7 +2534,7 @@ public class SortUtilTest
           period+=m;
         }
       }
-      int getNumRepetitions()
+      int getNumRepetitions(int arrLength)
       {
         return 1;
       }
@@ -2768,7 +2575,7 @@ public class SortUtilTest
           ++k;
         }
       }
-      int getNumRepetitions()
+      int getNumRepetitions(int arrLength)
       {
         return 1;
       }
@@ -2785,7 +2592,6 @@ public class SortUtilTest
         return m+1;
       }
     }
-    //FIXME REPEATED and DUPLICATED cause an AIOB exception
     ,REPEATED
     {
       void build(int[] arr, int m, Random rand)
@@ -2795,7 +2601,7 @@ public class SortUtilTest
           arr[i]=convertToint(i%m);
         }
       }
-      int getNumRepetitions()
+      int getNumRepetitions(int arrLength)
       {
         return 1;
       }
@@ -2821,9 +2627,9 @@ public class SortUtilTest
           arr[i] = convertToint(rand.nextInt(m));
         }
       }
-      int getNumRepetitions()
+      int getNumRepetitions(int arrLength)
       {
-        return 1000;
+        return getMaxRepsint(arrLength);
       }
       int getMLo()
       {
@@ -2856,7 +2662,7 @@ public class SortUtilTest
           }
         }
       }
-      int getNumRepetitions()
+      int getNumRepetitions(int arrLength)
       {
         return 1;
       }
@@ -2885,7 +2691,7 @@ public class SortUtilTest
             arr[i] = convertToint(arr.length - i - 1);
         }
       }
-      int getNumRepetitions()
+      int getNumRepetitions(int arrLength)
       {
         return 1;
       }
@@ -2909,7 +2715,7 @@ public class SortUtilTest
           arr[i] = convertToint((i * m + i) % arr.length);
         }
       }
-      int getNumRepetitions()
+      int getNumRepetitions(int arrLength)
       {
         return 1;
       }
@@ -2933,7 +2739,7 @@ public class SortUtilTest
           arr[i] = convertToint(Math.min(i, m));
         }
       }
-      int getNumRepetitions()
+      int getNumRepetitions(int arrLength)
       {
         return 1;
       }
@@ -2958,9 +2764,9 @@ public class SortUtilTest
           arr[i] = convertToint(rand.nextBoolean() ? (x += 2) : (y += 2));
         }
       }
-      int getNumRepetitions()
+      int getNumRepetitions(int arrLength)
       {
-        return 1000;
+        return getMaxRepsint(arrLength);
       }
       int getMLo()
       {
@@ -2977,7 +2783,7 @@ public class SortUtilTest
     }
     ;
     abstract void build(int[] arr,int m,Random rand); 
-    abstract int getNumRepetitions();
+    abstract int getNumRepetitions(int arrLength);
     abstract int getMLo();
     abstract int getMHi(int arrLength);
     abstract int incrementM(int m);
@@ -2993,9 +2799,9 @@ public class SortUtilTest
           arr[i]=getRandlong(rand);
         }
       }
-      int getNumRepetitions()
+      int getNumRepetitions(int arrLength)
       {
-        return 1000;
+        return getMaxRepslong(arrLength);
       }
       int getMLo()
       {
@@ -3019,7 +2825,7 @@ public class SortUtilTest
           arr[i]=convertTolong(m+i);
         }
       }
-      int getNumRepetitions()
+      int getNumRepetitions(int arrLength)
       {
         return 1;
       }
@@ -3036,7 +2842,7 @@ public class SortUtilTest
         return m*2;
       }
     },
-    Descending
+    DESCENDING
     {
       void build(long[] arr,int m,Random rand)
       {
@@ -3045,7 +2851,7 @@ public class SortUtilTest
           arr[i]=convertTolong(arr.length-m-i);
         }
       }
-      int getNumRepetitions()
+      int getNumRepetitions(int arrLength)
       {
         return 1;
       }
@@ -3071,7 +2877,7 @@ public class SortUtilTest
           arr[i]=convertTolong(m);
         }
       }
-      int getNumRepetitions()
+      int getNumRepetitions(int arrLength)
       {
         return 1;
       }
@@ -3108,7 +2914,7 @@ public class SortUtilTest
           arr[j]=convertTolong(v++);
         }
       }
-      int getNumRepetitions()
+      int getNumRepetitions(int arrLength)
       {
         return 1;
       }
@@ -3145,7 +2951,7 @@ public class SortUtilTest
           arr[j]=convertTolong(v--);
         }
       }
-      int getNumRepetitions()
+      int getNumRepetitions(int arrLength)
       {
         return 1;
       }
@@ -3192,7 +2998,7 @@ public class SortUtilTest
           period+=m;
         }
       }
-      int getNumRepetitions()
+      int getNumRepetitions(int arrLength)
       {
         return 1;
       }
@@ -3233,7 +3039,7 @@ public class SortUtilTest
           ++k;
         }
       }
-      int getNumRepetitions()
+      int getNumRepetitions(int arrLength)
       {
         return 1;
       }
@@ -3250,7 +3056,6 @@ public class SortUtilTest
         return m+1;
       }
     }
-    //FIXME REPEATED and DUPLICATED cause an AIOB exception
     ,REPEATED
     {
       void build(long[] arr, int m, Random rand)
@@ -3260,7 +3065,7 @@ public class SortUtilTest
           arr[i]=convertTolong(i%m);
         }
       }
-      int getNumRepetitions()
+      int getNumRepetitions(int arrLength)
       {
         return 1;
       }
@@ -3286,9 +3091,9 @@ public class SortUtilTest
           arr[i] = convertTolong(rand.nextInt(m));
         }
       }
-      int getNumRepetitions()
+      int getNumRepetitions(int arrLength)
       {
-        return 1000;
+        return getMaxRepslong(arrLength);
       }
       int getMLo()
       {
@@ -3321,7 +3126,7 @@ public class SortUtilTest
           }
         }
       }
-      int getNumRepetitions()
+      int getNumRepetitions(int arrLength)
       {
         return 1;
       }
@@ -3350,7 +3155,7 @@ public class SortUtilTest
             arr[i] = convertTolong(arr.length - i - 1);
         }
       }
-      int getNumRepetitions()
+      int getNumRepetitions(int arrLength)
       {
         return 1;
       }
@@ -3374,7 +3179,7 @@ public class SortUtilTest
           arr[i] = convertTolong((i * m + i) % arr.length);
         }
       }
-      int getNumRepetitions()
+      int getNumRepetitions(int arrLength)
       {
         return 1;
       }
@@ -3398,7 +3203,7 @@ public class SortUtilTest
           arr[i] = convertTolong(Math.min(i, m));
         }
       }
-      int getNumRepetitions()
+      int getNumRepetitions(int arrLength)
       {
         return 1;
       }
@@ -3423,9 +3228,9 @@ public class SortUtilTest
           arr[i] = convertTolong(rand.nextBoolean() ? (x += 2) : (y += 2));
         }
       }
-      int getNumRepetitions()
+      int getNumRepetitions(int arrLength)
       {
-        return 1000;
+        return getMaxRepslong(arrLength);
       }
       int getMLo()
       {
@@ -3442,7 +3247,7 @@ public class SortUtilTest
     }
     ;
     abstract void build(long[] arr,int m,Random rand); 
-    abstract int getNumRepetitions();
+    abstract int getNumRepetitions(int arrLength);
     abstract int getMLo();
     abstract int getMHi(int arrLength);
     abstract int incrementM(int m);
@@ -3458,9 +3263,9 @@ public class SortUtilTest
           arr[i]=getRandfloat(rand);
         }
       }
-      int getNumRepetitions()
+      int getNumRepetitions(int arrLength)
       {
-        return 1000;
+        return getMaxRepsfloat(arrLength);
       }
       int getMLo()
       {
@@ -3484,7 +3289,7 @@ public class SortUtilTest
           arr[i]=convertTofloat(m+i);
         }
       }
-      int getNumRepetitions()
+      int getNumRepetitions(int arrLength)
       {
         return 1;
       }
@@ -3501,7 +3306,7 @@ public class SortUtilTest
         return m*2;
       }
     },
-    Descending
+    DESCENDING
     {
       void build(float[] arr,int m,Random rand)
       {
@@ -3510,7 +3315,7 @@ public class SortUtilTest
           arr[i]=convertTofloat(arr.length-m-i);
         }
       }
-      int getNumRepetitions()
+      int getNumRepetitions(int arrLength)
       {
         return 1;
       }
@@ -3536,7 +3341,7 @@ public class SortUtilTest
           arr[i]=convertTofloat(m);
         }
       }
-      int getNumRepetitions()
+      int getNumRepetitions(int arrLength)
       {
         return 1;
       }
@@ -3573,7 +3378,7 @@ public class SortUtilTest
           arr[j]=convertTofloat(v++);
         }
       }
-      int getNumRepetitions()
+      int getNumRepetitions(int arrLength)
       {
         return 1;
       }
@@ -3610,7 +3415,7 @@ public class SortUtilTest
           arr[j]=convertTofloat(v--);
         }
       }
-      int getNumRepetitions()
+      int getNumRepetitions(int arrLength)
       {
         return 1;
       }
@@ -3657,7 +3462,7 @@ public class SortUtilTest
           period+=m;
         }
       }
-      int getNumRepetitions()
+      int getNumRepetitions(int arrLength)
       {
         return 1;
       }
@@ -3698,7 +3503,7 @@ public class SortUtilTest
           ++k;
         }
       }
-      int getNumRepetitions()
+      int getNumRepetitions(int arrLength)
       {
         return 1;
       }
@@ -3715,7 +3520,6 @@ public class SortUtilTest
         return m+1;
       }
     }
-    //FIXME REPEATED and DUPLICATED cause an AIOB exception
     ,REPEATED
     {
       void build(float[] arr, int m, Random rand)
@@ -3725,7 +3529,7 @@ public class SortUtilTest
           arr[i]=convertTofloat(i%m);
         }
       }
-      int getNumRepetitions()
+      int getNumRepetitions(int arrLength)
       {
         return 1;
       }
@@ -3751,9 +3555,9 @@ public class SortUtilTest
           arr[i] = convertTofloat(rand.nextInt(m));
         }
       }
-      int getNumRepetitions()
+      int getNumRepetitions(int arrLength)
       {
-        return 1000;
+        return getMaxRepsfloat(arrLength);
       }
       int getMLo()
       {
@@ -3786,7 +3590,7 @@ public class SortUtilTest
           }
         }
       }
-      int getNumRepetitions()
+      int getNumRepetitions(int arrLength)
       {
         return 1;
       }
@@ -3815,7 +3619,7 @@ public class SortUtilTest
             arr[i] = convertTofloat(arr.length - i - 1);
         }
       }
-      int getNumRepetitions()
+      int getNumRepetitions(int arrLength)
       {
         return 1;
       }
@@ -3839,7 +3643,7 @@ public class SortUtilTest
           arr[i] = convertTofloat((i * m + i) % arr.length);
         }
       }
-      int getNumRepetitions()
+      int getNumRepetitions(int arrLength)
       {
         return 1;
       }
@@ -3863,7 +3667,7 @@ public class SortUtilTest
           arr[i] = convertTofloat(Math.min(i, m));
         }
       }
-      int getNumRepetitions()
+      int getNumRepetitions(int arrLength)
       {
         return 1;
       }
@@ -3888,9 +3692,9 @@ public class SortUtilTest
           arr[i] = convertTofloat(rand.nextBoolean() ? (x += 2) : (y += 2));
         }
       }
-      int getNumRepetitions()
+      int getNumRepetitions(int arrLength)
       {
-        return 1000;
+        return getMaxRepsfloat(arrLength);
       }
       int getMLo()
       {
@@ -3907,7 +3711,7 @@ public class SortUtilTest
     }
     ;
     abstract void build(float[] arr,int m,Random rand); 
-    abstract int getNumRepetitions();
+    abstract int getNumRepetitions(int arrLength);
     abstract int getMLo();
     abstract int getMHi(int arrLength);
     abstract int incrementM(int m);
@@ -3923,9 +3727,9 @@ public class SortUtilTest
           arr[i]=getRanddouble(rand);
         }
       }
-      int getNumRepetitions()
+      int getNumRepetitions(int arrLength)
       {
-        return 1000;
+        return getMaxRepsdouble(arrLength);
       }
       int getMLo()
       {
@@ -3949,7 +3753,7 @@ public class SortUtilTest
           arr[i]=convertTodouble(m+i);
         }
       }
-      int getNumRepetitions()
+      int getNumRepetitions(int arrLength)
       {
         return 1;
       }
@@ -3966,7 +3770,7 @@ public class SortUtilTest
         return m*2;
       }
     },
-    Descending
+    DESCENDING
     {
       void build(double[] arr,int m,Random rand)
       {
@@ -3975,7 +3779,7 @@ public class SortUtilTest
           arr[i]=convertTodouble(arr.length-m-i);
         }
       }
-      int getNumRepetitions()
+      int getNumRepetitions(int arrLength)
       {
         return 1;
       }
@@ -4001,7 +3805,7 @@ public class SortUtilTest
           arr[i]=convertTodouble(m);
         }
       }
-      int getNumRepetitions()
+      int getNumRepetitions(int arrLength)
       {
         return 1;
       }
@@ -4038,7 +3842,7 @@ public class SortUtilTest
           arr[j]=convertTodouble(v++);
         }
       }
-      int getNumRepetitions()
+      int getNumRepetitions(int arrLength)
       {
         return 1;
       }
@@ -4075,7 +3879,7 @@ public class SortUtilTest
           arr[j]=convertTodouble(v--);
         }
       }
-      int getNumRepetitions()
+      int getNumRepetitions(int arrLength)
       {
         return 1;
       }
@@ -4122,7 +3926,7 @@ public class SortUtilTest
           period+=m;
         }
       }
-      int getNumRepetitions()
+      int getNumRepetitions(int arrLength)
       {
         return 1;
       }
@@ -4163,7 +3967,7 @@ public class SortUtilTest
           ++k;
         }
       }
-      int getNumRepetitions()
+      int getNumRepetitions(int arrLength)
       {
         return 1;
       }
@@ -4180,7 +3984,6 @@ public class SortUtilTest
         return m+1;
       }
     }
-    //FIXME REPEATED and DUPLICATED cause an AIOB exception
     ,REPEATED
     {
       void build(double[] arr, int m, Random rand)
@@ -4190,7 +3993,7 @@ public class SortUtilTest
           arr[i]=convertTodouble(i%m);
         }
       }
-      int getNumRepetitions()
+      int getNumRepetitions(int arrLength)
       {
         return 1;
       }
@@ -4216,9 +4019,9 @@ public class SortUtilTest
           arr[i] = convertTodouble(rand.nextInt(m));
         }
       }
-      int getNumRepetitions()
+      int getNumRepetitions(int arrLength)
       {
-        return 1000;
+        return getMaxRepsdouble(arrLength);
       }
       int getMLo()
       {
@@ -4251,7 +4054,7 @@ public class SortUtilTest
           }
         }
       }
-      int getNumRepetitions()
+      int getNumRepetitions(int arrLength)
       {
         return 1;
       }
@@ -4280,7 +4083,7 @@ public class SortUtilTest
             arr[i] = convertTodouble(arr.length - i - 1);
         }
       }
-      int getNumRepetitions()
+      int getNumRepetitions(int arrLength)
       {
         return 1;
       }
@@ -4304,7 +4107,7 @@ public class SortUtilTest
           arr[i] = convertTodouble((i * m + i) % arr.length);
         }
       }
-      int getNumRepetitions()
+      int getNumRepetitions(int arrLength)
       {
         return 1;
       }
@@ -4328,7 +4131,7 @@ public class SortUtilTest
           arr[i] = convertTodouble(Math.min(i, m));
         }
       }
-      int getNumRepetitions()
+      int getNumRepetitions(int arrLength)
       {
         return 1;
       }
@@ -4353,9 +4156,9 @@ public class SortUtilTest
           arr[i] = convertTodouble(rand.nextBoolean() ? (x += 2) : (y += 2));
         }
       }
-      int getNumRepetitions()
+      int getNumRepetitions(int arrLength)
       {
-        return 1000;
+        return getMaxRepsdouble(arrLength);
       }
       int getMLo()
       {
@@ -4372,7 +4175,7 @@ public class SortUtilTest
     }
     ;
     abstract void build(double[] arr,int m,Random rand); 
-    abstract int getNumRepetitions();
+    abstract int getNumRepetitions(int arrLength);
     abstract int getMLo();
     abstract int getMHi(int arrLength);
     abstract int incrementM(int m);
@@ -4389,9 +4192,9 @@ public class SortUtilTest
           arr[i]=getRandString(rand);
         }
       }
-      int getNumRepetitions()
+      int getNumRepetitions(int arrLength)
       {
-        return 1000;
+        return getMaxRepsString(arrLength);
       }
       int getMLo()
       {
@@ -4415,7 +4218,7 @@ public class SortUtilTest
           arr[i]=convertToString(m+i);
         }
       }
-      int getNumRepetitions()
+      int getNumRepetitions(int arrLength)
       {
         return 1;
       }
@@ -4432,7 +4235,7 @@ public class SortUtilTest
         return m*2;
       }
     },
-    Descending
+    DESCENDING
     {
       void build(String[] arr,int m,Random rand)
       {
@@ -4441,7 +4244,7 @@ public class SortUtilTest
           arr[i]=convertToString(arr.length-m-i);
         }
       }
-      int getNumRepetitions()
+      int getNumRepetitions(int arrLength)
       {
         return 1;
       }
@@ -4467,7 +4270,7 @@ public class SortUtilTest
           arr[i]=convertToString(m);
         }
       }
-      int getNumRepetitions()
+      int getNumRepetitions(int arrLength)
       {
         return 1;
       }
@@ -4504,7 +4307,7 @@ public class SortUtilTest
           arr[j]=convertToString(v++);
         }
       }
-      int getNumRepetitions()
+      int getNumRepetitions(int arrLength)
       {
         return 1;
       }
@@ -4541,7 +4344,7 @@ public class SortUtilTest
           arr[j]=convertToString(v--);
         }
       }
-      int getNumRepetitions()
+      int getNumRepetitions(int arrLength)
       {
         return 1;
       }
@@ -4588,7 +4391,7 @@ public class SortUtilTest
           period+=m;
         }
       }
-      int getNumRepetitions()
+      int getNumRepetitions(int arrLength)
       {
         return 1;
       }
@@ -4629,7 +4432,7 @@ public class SortUtilTest
           ++k;
         }
       }
-      int getNumRepetitions()
+      int getNumRepetitions(int arrLength)
       {
         return 1;
       }
@@ -4646,7 +4449,6 @@ public class SortUtilTest
         return m+1;
       }
     }
-    //FIXME REPEATED and DUPLICATED cause an AIOB exception
     ,REPEATED
     {
       void build(String[] arr, int m, Random rand)
@@ -4656,7 +4458,7 @@ public class SortUtilTest
           arr[i]=convertToString(i%m);
         }
       }
-      int getNumRepetitions()
+      int getNumRepetitions(int arrLength)
       {
         return 1;
       }
@@ -4682,9 +4484,9 @@ public class SortUtilTest
           arr[i] = convertToString(rand.nextInt(m));
         }
       }
-      int getNumRepetitions()
+      int getNumRepetitions(int arrLength)
       {
-        return 1000;
+        return getMaxRepsString(arrLength);
       }
       int getMLo()
       {
@@ -4717,7 +4519,7 @@ public class SortUtilTest
           }
         }
       }
-      int getNumRepetitions()
+      int getNumRepetitions(int arrLength)
       {
         return 1;
       }
@@ -4746,7 +4548,7 @@ public class SortUtilTest
             arr[i] = convertToString(arr.length - i - 1);
         }
       }
-      int getNumRepetitions()
+      int getNumRepetitions(int arrLength)
       {
         return 1;
       }
@@ -4770,7 +4572,7 @@ public class SortUtilTest
           arr[i] = convertToString((i * m + i) % arr.length);
         }
       }
-      int getNumRepetitions()
+      int getNumRepetitions(int arrLength)
       {
         return 1;
       }
@@ -4794,7 +4596,7 @@ public class SortUtilTest
           arr[i] = convertToString(Math.min(i, m));
         }
       }
-      int getNumRepetitions()
+      int getNumRepetitions(int arrLength)
       {
         return 1;
       }
@@ -4819,9 +4621,9 @@ public class SortUtilTest
           arr[i] = convertToString(rand.nextBoolean() ? (x += 2) : (y += 2));
         }
       }
-      int getNumRepetitions()
+      int getNumRepetitions(int arrLength)
       {
-        return 1000;
+        return getMaxRepsString(arrLength);
       }
       int getMLo()
       {
@@ -4838,473 +4640,540 @@ public class SortUtilTest
     }
     ;
     abstract void build(String[] arr,int m,Random rand); 
-    abstract int getNumRepetitions();
+    abstract int getNumRepetitions(int arrLength);
     abstract int getMLo();
     abstract int getMHi(int arrLength);
     abstract int incrementM(int m);
   }
   */
-  private static void testuncheckedsortHelperboolean(int arrLength,Random rand)
+  private static int getMaxRepsboolean(int arrLength)
   {
+        return 1;
+  }
+  private static int getMaxRepsbyte(int arrLength)
+  {
+        return 1;
+  }
+  private static int getMaxRepschar(int arrLength)
+  {
+        if(arrLength>3201)
+        {
+          return 1;
+        }
+        return 1000;
+  }
+  private static int getMaxRepsshort(int arrLength)
+  {
+        if(arrLength>3201)
+        {
+          return 1;
+        }
+        return 1000;
+  }
+  private static int getMaxRepsint(int arrLength)
+  {
+        return 1;
+  }
+  private static int getMaxRepslong(int arrLength)
+  {
+        return 1;
+  }
+  private static int getMaxRepsfloat(int arrLength)
+  {
+        return 1;
+  }
+  private static int getMaxRepsdouble(int arrLength)
+  {
+        return 1;
+  }
+  private static int getMaxRepsString(int arrLength)
+  {
+        return 1;
+  }
+/*
+  private static void testuncheckedsortbooleanHelper(long randSeed,int arrLength) throws InterruptedException
+  {
+    Random rand=new Random(randSeed);
     boolean[] golden=new boolean[arrLength];
+    boolean[] test=new boolean[arrLength];
     for(ArrayBuilderboolean builder:ArrayBuilderboolean.values())
     {
       for(int m=builder.getMLo(),mHi=builder.getMHi(arrLength);m<=mHi;m=builder.incrementM(m))
       {
-        for(int i=0,numReps=builder.getNumRepetitions();i<numReps;++i)
+        System.out.println("sortType = sort; arrType = boolean; randSeed= "+randSeed+"; length= "+arrLength+"; builder type "+builder.name()+"; m = "+m);
+        for(int i=0,numReps=builder.getNumRepetitions(arrLength);i<numReps;++i)
         {
           builder.build(golden,m,rand);
-          boolean[] test=golden.clone();
-          SortUtil.uncheckedsort(test,0,arrLength-1);
+          ArrCopy.uncheckedCopy(golden,0,test,0,arrLength);
           isSortedsort(test,golden);
         }
       }
     }
   }
-  private static void testuncheckedsortHelperbyte(int arrLength,Random rand)
+  @Test
+  public void testuncheckedsortboolean() throws InterruptedException
   {
-    byte[] golden=new byte[arrLength];
-    for(ArrayBuilderbyte builder:ArrayBuilderbyte.values())
-    {
-      for(int m=builder.getMLo(),mHi=builder.getMHi(arrLength);m<=mHi;m=builder.incrementM(m))
-      {
-        for(int i=0,numReps=builder.getNumRepetitions();i<numReps;++i)
-        {
-          builder.build(golden,m,rand);
-          byte[] test=golden.clone();
-          SortUtil.uncheckedsort(test,0,arrLength-1);
-          isSortedsort(test,golden);
-        }
-      }
-    }
+    testuncheckedsortbooleanHelper(0,30);
   }
-  private static void testuncheckedsortHelperchar(int arrLength,Random rand)
+  private static void testuncheckedreverseSortbooleanHelper(long randSeed,int arrLength) throws InterruptedException
   {
-    char[] golden=new char[arrLength];
-    for(ArrayBuilderchar builder:ArrayBuilderchar.values())
-    {
-      for(int m=builder.getMLo(),mHi=builder.getMHi(arrLength);m<=mHi;m=builder.incrementM(m))
-      {
-        for(int i=0,numReps=builder.getNumRepetitions();i<numReps;++i)
-        {
-          builder.build(golden,m,rand);
-          char[] test=golden.clone();
-          SortUtil.uncheckedsort(test,0,arrLength-1);
-          isSortedsort(test,golden);
-        }
-      }
-    }
-  }
-  private static void testuncheckedsortHelpershort(int arrLength,Random rand)
-  {
-    short[] golden=new short[arrLength];
-    for(ArrayBuildershort builder:ArrayBuildershort.values())
-    {
-      for(int m=builder.getMLo(),mHi=builder.getMHi(arrLength);m<=mHi;m=builder.incrementM(m))
-      {
-        for(int i=0,numReps=builder.getNumRepetitions();i<numReps;++i)
-        {
-          builder.build(golden,m,rand);
-          short[] test=golden.clone();
-          SortUtil.uncheckedsort(test,0,arrLength-1);
-          isSortedsort(test,golden);
-        }
-      }
-    }
-  }
-  private static void testuncheckedsortHelperint(int arrLength,Random rand)
-  {
-    int[] golden=new int[arrLength];
-    for(ArrayBuilderint builder:ArrayBuilderint.values())
-    {
-      for(int m=builder.getMLo(),mHi=builder.getMHi(arrLength);m<=mHi;m=builder.incrementM(m))
-      {
-        for(int i=0,numReps=builder.getNumRepetitions();i<numReps;++i)
-        {
-          builder.build(golden,m,rand);
-          int[] test=golden.clone();
-          SortUtil.uncheckedsort(test,0,arrLength-1);
-          isSortedsort(test,golden);
-        }
-      }
-    }
-  }
-  private static void testuncheckedsortHelperlong(int arrLength,Random rand)
-  {
-    long[] golden=new long[arrLength];
-    for(ArrayBuilderlong builder:ArrayBuilderlong.values())
-    {
-      for(int m=builder.getMLo(),mHi=builder.getMHi(arrLength);m<=mHi;m=builder.incrementM(m))
-      {
-        for(int i=0,numReps=builder.getNumRepetitions();i<numReps;++i)
-        {
-          builder.build(golden,m,rand);
-          long[] test=golden.clone();
-          SortUtil.uncheckedsort(test,0,arrLength-1);
-          isSortedsort(test,golden);
-        }
-      }
-    }
-  }
-  private static void testuncheckedsortHelperfloat(int arrLength,Random rand)
-  {
-    float[] golden=new float[arrLength];
-    for(ArrayBuilderfloat builder:ArrayBuilderfloat.values())
-    {
-      for(int m=builder.getMLo(),mHi=builder.getMHi(arrLength);m<=mHi;m=builder.incrementM(m))
-      {
-        for(int i=0,numReps=builder.getNumRepetitions();i<numReps;++i)
-        {
-          builder.build(golden,m,rand);
-          float[] test=golden.clone();
-          SortUtil.uncheckedsort(test,0,arrLength-1);
-          isSortedsort(test,golden);
-        }
-      }
-    }
-  }
-  private static void testuncheckedsortHelperdouble(int arrLength,Random rand)
-  {
-    double[] golden=new double[arrLength];
-    for(ArrayBuilderdouble builder:ArrayBuilderdouble.values())
-    {
-      for(int m=builder.getMLo(),mHi=builder.getMHi(arrLength);m<=mHi;m=builder.incrementM(m))
-      {
-        for(int i=0,numReps=builder.getNumRepetitions();i<numReps;++i)
-        {
-          builder.build(golden,m,rand);
-          double[] test=golden.clone();
-          SortUtil.uncheckedsort(test,0,arrLength-1);
-          isSortedsort(test,golden);
-        }
-      }
-    }
-  }
-  /*/TODO uncomment when the eclipse module bug is fixed
-  private static void testuncheckedsortHelperString(int arrLength,Random rand)
-  {
-    String[] golden=new String[arrLength];
-    for(ArrayBuilderString builder:ArrayBuilderString.values())
-    {
-      for(int m=builder.getMLo(),mHi=builder.getMHi(arrLength);m<=mHi;m=builder.incrementM(m))
-      {
-        for(int i=0,numReps=builder.getNumRepetitions();i<numReps;++i)
-        {
-          builder.build(golden,m,rand);
-          String[] test=golden.clone();
-          SortUtil.uncheckedsort(test,0,arrLength-1);
-          isSortedsort(test,golden);
-        }
-      }
-    }
-  }
-  */
-  private static void testuncheckedreverseSortHelperboolean(int arrLength,Random rand)
-  {
+    Random rand=new Random(randSeed);
     boolean[] golden=new boolean[arrLength];
+    boolean[] test=new boolean[arrLength];
     for(ArrayBuilderboolean builder:ArrayBuilderboolean.values())
     {
       for(int m=builder.getMLo(),mHi=builder.getMHi(arrLength);m<=mHi;m=builder.incrementM(m))
       {
-        for(int i=0,numReps=builder.getNumRepetitions();i<numReps;++i)
+        System.out.println("sortType = reverseSort; arrType = boolean; randSeed= "+randSeed+"; length= "+arrLength+"; builder type "+builder.name()+"; m = "+m);
+        for(int i=0,numReps=builder.getNumRepetitions(arrLength);i<numReps;++i)
         {
           builder.build(golden,m,rand);
-          boolean[] test=golden.clone();
-          SortUtil.uncheckedreverseSort(test,0,arrLength-1);
+          ArrCopy.uncheckedCopy(golden,0,test,0,arrLength);
           isSortedreverseSort(test,golden);
         }
       }
     }
   }
-  private static void testuncheckedreverseSortHelperbyte(int arrLength,Random rand)
+  @Test
+  public void testuncheckedreverseSortboolean() throws InterruptedException
   {
+    testuncheckedreverseSortbooleanHelper(0,30);
+  }
+  private static void testuncheckedsortbyteHelper(long randSeed,int arrLength) throws InterruptedException
+  {
+    Random rand=new Random(randSeed);
     byte[] golden=new byte[arrLength];
+    byte[] test=new byte[arrLength];
     for(ArrayBuilderbyte builder:ArrayBuilderbyte.values())
     {
       for(int m=builder.getMLo(),mHi=builder.getMHi(arrLength);m<=mHi;m=builder.incrementM(m))
       {
-        for(int i=0,numReps=builder.getNumRepetitions();i<numReps;++i)
+        System.out.println("sortType = sort; arrType = byte; randSeed= "+randSeed+"; length= "+arrLength+"; builder type "+builder.name()+"; m = "+m);
+        for(int i=0,numReps=builder.getNumRepetitions(arrLength);i<numReps;++i)
         {
           builder.build(golden,m,rand);
-          byte[] test=golden.clone();
-          SortUtil.uncheckedreverseSort(test,0,arrLength-1);
+          ArrCopy.uncheckedCopy(golden,0,test,0,arrLength);
+          isSortedsort(test,golden);
+        }
+      }
+    }
+  }
+  @Test
+  public void testuncheckedsortbyte() throws InterruptedException
+  {
+    testuncheckedsortbyteHelper(0,30);
+    testuncheckedsortbyteHelper(0,31);
+  }
+  private static void testuncheckedreverseSortbyteHelper(long randSeed,int arrLength) throws InterruptedException
+  {
+    Random rand=new Random(randSeed);
+    byte[] golden=new byte[arrLength];
+    byte[] test=new byte[arrLength];
+    for(ArrayBuilderbyte builder:ArrayBuilderbyte.values())
+    {
+      for(int m=builder.getMLo(),mHi=builder.getMHi(arrLength);m<=mHi;m=builder.incrementM(m))
+      {
+        System.out.println("sortType = reverseSort; arrType = byte; randSeed= "+randSeed+"; length= "+arrLength+"; builder type "+builder.name()+"; m = "+m);
+        for(int i=0,numReps=builder.getNumRepetitions(arrLength);i<numReps;++i)
+        {
+          builder.build(golden,m,rand);
+          ArrCopy.uncheckedCopy(golden,0,test,0,arrLength);
           isSortedreverseSort(test,golden);
         }
       }
     }
   }
-  private static void testuncheckedreverseSortHelperchar(int arrLength,Random rand)
+  @Test
+  public void testuncheckedreverseSortbyte() throws InterruptedException
   {
+    testuncheckedreverseSortbyteHelper(0,30);
+    testuncheckedreverseSortbyteHelper(0,31);
+  }
+  */
+  private static void testuncheckedsortcharHelper(long randSeed,int arrLength) throws InterruptedException
+  {
+    Random rand=new Random(randSeed);
     char[] golden=new char[arrLength];
+    char[] test=new char[arrLength];
     for(ArrayBuilderchar builder:ArrayBuilderchar.values())
     {
       for(int m=builder.getMLo(),mHi=builder.getMHi(arrLength);m<=mHi;m=builder.incrementM(m))
       {
-        for(int i=0,numReps=builder.getNumRepetitions();i<numReps;++i)
+        System.out.println("sortType = sort; arrType = char; randSeed= "+randSeed+"; length= "+arrLength+"; builder type "+builder.name()+"; m = "+m);
+        for(int i=0,numReps=builder.getNumRepetitions(arrLength);i<numReps;++i)
         {
           builder.build(golden,m,rand);
-          char[] test=golden.clone();
-          SortUtil.uncheckedreverseSort(test,0,arrLength-1);
+          ArrCopy.uncheckedCopy(golden,0,test,0,arrLength);
+          isSortedsort(test,golden);
+        }
+      }
+    }
+  }
+  @Test
+  public void testuncheckedsortchar() throws InterruptedException
+  {
+    for(int i=0;i<lengths.length;++i)
+    {
+      int arrLength=lengths[i];
+      for(int j=0;j<randSeeds.length;++j)
+      {
+        long randSeed=randSeeds[j];
+        testuncheckedsortcharHelper(randSeed,arrLength);
+      }
+    }
+  }
+  /*
+  private static void testuncheckedreverseSortcharHelper(long randSeed,int arrLength) throws InterruptedException
+  {
+    Random rand=new Random(randSeed);
+    char[] golden=new char[arrLength];
+    char[] test=new char[arrLength];
+    for(ArrayBuilderchar builder:ArrayBuilderchar.values())
+    {
+      for(int m=builder.getMLo(),mHi=builder.getMHi(arrLength);m<=mHi;m=builder.incrementM(m))
+      {
+        System.out.println("sortType = reverseSort; arrType = char; randSeed= "+randSeed+"; length= "+arrLength+"; builder type "+builder.name()+"; m = "+m);
+        for(int i=0,numReps=builder.getNumRepetitions(arrLength);i<numReps;++i)
+        {
+          builder.build(golden,m,rand);
+          ArrCopy.uncheckedCopy(golden,0,test,0,arrLength);
           isSortedreverseSort(test,golden);
         }
       }
     }
   }
-  private static void testuncheckedreverseSortHelpershort(int arrLength,Random rand)
+  @Test
+  public void testuncheckedreverseSortchar() throws InterruptedException
   {
+    for(int i=0;i<lengths.length;++i)
+    {
+      int arrLength=lengths[i];
+      for(int j=0;j<randSeeds.length;++j)
+      {
+        long randSeed=randSeeds[j];
+        testuncheckedreverseSortcharHelper(randSeed,arrLength);
+      }
+    }
+  }
+  private static void testuncheckedsortshortHelper(long randSeed,int arrLength) throws InterruptedException
+  {
+    Random rand=new Random(randSeed);
     short[] golden=new short[arrLength];
+    short[] test=new short[arrLength];
     for(ArrayBuildershort builder:ArrayBuildershort.values())
     {
       for(int m=builder.getMLo(),mHi=builder.getMHi(arrLength);m<=mHi;m=builder.incrementM(m))
       {
-        for(int i=0,numReps=builder.getNumRepetitions();i<numReps;++i)
+        System.out.println("sortType = sort; arrType = short; randSeed= "+randSeed+"; length= "+arrLength+"; builder type "+builder.name()+"; m = "+m);
+        for(int i=0,numReps=builder.getNumRepetitions(arrLength);i<numReps;++i)
         {
           builder.build(golden,m,rand);
-          short[] test=golden.clone();
-          SortUtil.uncheckedreverseSort(test,0,arrLength-1);
+          ArrCopy.uncheckedCopy(golden,0,test,0,arrLength);
+          isSortedsort(test,golden);
+        }
+      }
+    }
+  }
+  @Test
+  public void testuncheckedsortshort() throws InterruptedException
+  {
+    for(int i=0;i<lengths.length;++i)
+    {
+      int arrLength=lengths[i];
+      for(int j=0;j<randSeeds.length;++j)
+      {
+        long randSeed=randSeeds[j];
+        testuncheckedsortshortHelper(randSeed,arrLength);
+      }
+    }
+  }
+  private static void testuncheckedreverseSortshortHelper(long randSeed,int arrLength) throws InterruptedException
+  {
+    Random rand=new Random(randSeed);
+    short[] golden=new short[arrLength];
+    short[] test=new short[arrLength];
+    for(ArrayBuildershort builder:ArrayBuildershort.values())
+    {
+      for(int m=builder.getMLo(),mHi=builder.getMHi(arrLength);m<=mHi;m=builder.incrementM(m))
+      {
+        System.out.println("sortType = reverseSort; arrType = short; randSeed= "+randSeed+"; length= "+arrLength+"; builder type "+builder.name()+"; m = "+m);
+        for(int i=0,numReps=builder.getNumRepetitions(arrLength);i<numReps;++i)
+        {
+          builder.build(golden,m,rand);
+          ArrCopy.uncheckedCopy(golden,0,test,0,arrLength);
           isSortedreverseSort(test,golden);
         }
       }
     }
   }
-  private static void testuncheckedreverseSortHelperint(int arrLength,Random rand)
+  @Test
+  public void testuncheckedreverseSortshort() throws InterruptedException
   {
+    for(int i=0;i<lengths.length;++i)
+    {
+      int arrLength=lengths[i];
+      for(int j=0;j<randSeeds.length;++j)
+      {
+        long randSeed=randSeeds[j];
+        testuncheckedreverseSortshortHelper(randSeed,arrLength);
+      }
+    }
+  }
+  private static void testuncheckedsortintHelper(long randSeed,int arrLength) throws InterruptedException
+  {
+    Random rand=new Random(randSeed);
     int[] golden=new int[arrLength];
+    int[] test=new int[arrLength];
     for(ArrayBuilderint builder:ArrayBuilderint.values())
     {
       for(int m=builder.getMLo(),mHi=builder.getMHi(arrLength);m<=mHi;m=builder.incrementM(m))
       {
-        for(int i=0,numReps=builder.getNumRepetitions();i<numReps;++i)
+        System.out.println("sortType = sort; arrType = int; randSeed= "+randSeed+"; length= "+arrLength+"; builder type "+builder.name()+"; m = "+m);
+        for(int i=0,numReps=builder.getNumRepetitions(arrLength);i<numReps;++i)
         {
           builder.build(golden,m,rand);
-          int[] test=golden.clone();
-          SortUtil.uncheckedreverseSort(test,0,arrLength-1);
+          ArrCopy.uncheckedCopy(golden,0,test,0,arrLength);
+          isSortedsort(test,golden);
+        }
+      }
+    }
+  }
+  @Test
+  public void testuncheckedsortint() throws InterruptedException
+  {
+    for(int i=0;i<lengths.length;++i)
+    {
+      int arrLength=lengths[i];
+      for(int j=0;j<randSeeds.length;++j)
+      {
+        long randSeed=randSeeds[j];
+        testuncheckedsortintHelper(randSeed,arrLength);
+      }
+    }
+  }
+  private static void testuncheckedreverseSortintHelper(long randSeed,int arrLength) throws InterruptedException
+  {
+    Random rand=new Random(randSeed);
+    int[] golden=new int[arrLength];
+    int[] test=new int[arrLength];
+    for(ArrayBuilderint builder:ArrayBuilderint.values())
+    {
+      for(int m=builder.getMLo(),mHi=builder.getMHi(arrLength);m<=mHi;m=builder.incrementM(m))
+      {
+        System.out.println("sortType = reverseSort; arrType = int; randSeed= "+randSeed+"; length= "+arrLength+"; builder type "+builder.name()+"; m = "+m);
+        for(int i=0,numReps=builder.getNumRepetitions(arrLength);i<numReps;++i)
+        {
+          builder.build(golden,m,rand);
+          ArrCopy.uncheckedCopy(golden,0,test,0,arrLength);
           isSortedreverseSort(test,golden);
         }
       }
     }
   }
-  private static void testuncheckedreverseSortHelperlong(int arrLength,Random rand)
+  @Test
+  public void testuncheckedreverseSortint() throws InterruptedException
   {
+    for(int i=0;i<lengths.length;++i)
+    {
+      int arrLength=lengths[i];
+      for(int j=0;j<randSeeds.length;++j)
+      {
+        long randSeed=randSeeds[j];
+        testuncheckedreverseSortintHelper(randSeed,arrLength);
+      }
+    }
+  }
+  private static void testuncheckedsortlongHelper(long randSeed,int arrLength) throws InterruptedException
+  {
+    Random rand=new Random(randSeed);
     long[] golden=new long[arrLength];
+    long[] test=new long[arrLength];
     for(ArrayBuilderlong builder:ArrayBuilderlong.values())
     {
       for(int m=builder.getMLo(),mHi=builder.getMHi(arrLength);m<=mHi;m=builder.incrementM(m))
       {
-        for(int i=0,numReps=builder.getNumRepetitions();i<numReps;++i)
+        System.out.println("sortType = sort; arrType = long; randSeed= "+randSeed+"; length= "+arrLength+"; builder type "+builder.name()+"; m = "+m);
+        for(int i=0,numReps=builder.getNumRepetitions(arrLength);i<numReps;++i)
         {
           builder.build(golden,m,rand);
-          long[] test=golden.clone();
-          SortUtil.uncheckedreverseSort(test,0,arrLength-1);
+          ArrCopy.uncheckedCopy(golden,0,test,0,arrLength);
+          isSortedsort(test,golden);
+        }
+      }
+    }
+  }
+  @Test
+  public void testuncheckedsortlong() throws InterruptedException
+  {
+    for(int i=0;i<lengths.length;++i)
+    {
+      int arrLength=lengths[i];
+      for(int j=0;j<randSeeds.length;++j)
+      {
+        long randSeed=randSeeds[j];
+        testuncheckedsortlongHelper(randSeed,arrLength);
+      }
+    }
+  }
+  private static void testuncheckedreverseSortlongHelper(long randSeed,int arrLength) throws InterruptedException
+  {
+    Random rand=new Random(randSeed);
+    long[] golden=new long[arrLength];
+    long[] test=new long[arrLength];
+    for(ArrayBuilderlong builder:ArrayBuilderlong.values())
+    {
+      for(int m=builder.getMLo(),mHi=builder.getMHi(arrLength);m<=mHi;m=builder.incrementM(m))
+      {
+        System.out.println("sortType = reverseSort; arrType = long; randSeed= "+randSeed+"; length= "+arrLength+"; builder type "+builder.name()+"; m = "+m);
+        for(int i=0,numReps=builder.getNumRepetitions(arrLength);i<numReps;++i)
+        {
+          builder.build(golden,m,rand);
+          ArrCopy.uncheckedCopy(golden,0,test,0,arrLength);
           isSortedreverseSort(test,golden);
         }
       }
     }
   }
-  private static void testuncheckedreverseSortHelperfloat(int arrLength,Random rand)
+  @Test
+  public void testuncheckedreverseSortlong() throws InterruptedException
   {
+    for(int i=0;i<lengths.length;++i)
+    {
+      int arrLength=lengths[i];
+      for(int j=0;j<randSeeds.length;++j)
+      {
+        long randSeed=randSeeds[j];
+        testuncheckedreverseSortlongHelper(randSeed,arrLength);
+      }
+    }
+  }
+  private static void testuncheckedsortfloatHelper(long randSeed,int arrLength) throws InterruptedException
+  {
+    Random rand=new Random(randSeed);
     float[] golden=new float[arrLength];
+    float[] test=new float[arrLength];
     for(ArrayBuilderfloat builder:ArrayBuilderfloat.values())
     {
       for(int m=builder.getMLo(),mHi=builder.getMHi(arrLength);m<=mHi;m=builder.incrementM(m))
       {
-        for(int i=0,numReps=builder.getNumRepetitions();i<numReps;++i)
+        System.out.println("sortType = sort; arrType = float; randSeed= "+randSeed+"; length= "+arrLength+"; builder type "+builder.name()+"; m = "+m);
+        for(int i=0,numReps=builder.getNumRepetitions(arrLength);i<numReps;++i)
         {
           builder.build(golden,m,rand);
-          float[] test=golden.clone();
-          SortUtil.uncheckedreverseSort(test,0,arrLength-1);
+          ArrCopy.uncheckedCopy(golden,0,test,0,arrLength);
+          isSortedsort(test,golden);
+        }
+      }
+    }
+  }
+  @Test
+  public void testuncheckedsortfloat() throws InterruptedException
+  {
+    for(int i=0;i<lengths.length;++i)
+    {
+      int arrLength=lengths[i];
+      for(int j=0;j<randSeeds.length;++j)
+      {
+        long randSeed=randSeeds[j];
+        testuncheckedsortfloatHelper(randSeed,arrLength);
+      }
+    }
+  }
+  private static void testuncheckedreverseSortfloatHelper(long randSeed,int arrLength) throws InterruptedException
+  {
+    Random rand=new Random(randSeed);
+    float[] golden=new float[arrLength];
+    float[] test=new float[arrLength];
+    for(ArrayBuilderfloat builder:ArrayBuilderfloat.values())
+    {
+      for(int m=builder.getMLo(),mHi=builder.getMHi(arrLength);m<=mHi;m=builder.incrementM(m))
+      {
+        System.out.println("sortType = reverseSort; arrType = float; randSeed= "+randSeed+"; length= "+arrLength+"; builder type "+builder.name()+"; m = "+m);
+        for(int i=0,numReps=builder.getNumRepetitions(arrLength);i<numReps;++i)
+        {
+          builder.build(golden,m,rand);
+          ArrCopy.uncheckedCopy(golden,0,test,0,arrLength);
           isSortedreverseSort(test,golden);
         }
       }
     }
   }
-  private static void testuncheckedreverseSortHelperdouble(int arrLength,Random rand)
+  @Test
+  public void testuncheckedreverseSortfloat() throws InterruptedException
   {
+    for(int i=0;i<lengths.length;++i)
+    {
+      int arrLength=lengths[i];
+      for(int j=0;j<randSeeds.length;++j)
+      {
+        long randSeed=randSeeds[j];
+        testuncheckedreverseSortfloatHelper(randSeed,arrLength);
+      }
+    }
+  }
+  private static void testuncheckedsortdoubleHelper(long randSeed,int arrLength) throws InterruptedException
+  {
+    Random rand=new Random(randSeed);
     double[] golden=new double[arrLength];
+    double[] test=new double[arrLength];
     for(ArrayBuilderdouble builder:ArrayBuilderdouble.values())
     {
       for(int m=builder.getMLo(),mHi=builder.getMHi(arrLength);m<=mHi;m=builder.incrementM(m))
       {
-        for(int i=0,numReps=builder.getNumRepetitions();i<numReps;++i)
+        System.out.println("sortType = sort; arrType = double; randSeed= "+randSeed+"; length= "+arrLength+"; builder type "+builder.name()+"; m = "+m);
+        for(int i=0,numReps=builder.getNumRepetitions(arrLength);i<numReps;++i)
         {
           builder.build(golden,m,rand);
-          double[] test=golden.clone();
-          SortUtil.uncheckedreverseSort(test,0,arrLength-1);
-          isSortedreverseSort(test,golden);
+          ArrCopy.uncheckedCopy(golden,0,test,0,arrLength);
+          isSortedsort(test,golden);
         }
       }
     }
   }
-  /*/TODO uncomment when the eclipse module bug is fixed
-  private static void testuncheckedreverseSortHelperString(int arrLength,Random rand)
+  @Test
+  public void testuncheckedsortdouble() throws InterruptedException
   {
-    String[] golden=new String[arrLength];
-    for(ArrayBuilderString builder:ArrayBuilderString.values())
+    for(int i=0;i<lengths.length;++i)
+    {
+      int arrLength=lengths[i];
+      for(int j=0;j<randSeeds.length;++j)
+      {
+        long randSeed=randSeeds[j];
+        testuncheckedsortdoubleHelper(randSeed,arrLength);
+      }
+    }
+  }
+  private static void testuncheckedreverseSortdoubleHelper(long randSeed,int arrLength) throws InterruptedException
+  {
+    Random rand=new Random(randSeed);
+    double[] golden=new double[arrLength];
+    double[] test=new double[arrLength];
+    for(ArrayBuilderdouble builder:ArrayBuilderdouble.values())
     {
       for(int m=builder.getMLo(),mHi=builder.getMHi(arrLength);m<=mHi;m=builder.incrementM(m))
       {
-        for(int i=0,numReps=builder.getNumRepetitions();i<numReps;++i)
+        System.out.println("sortType = reverseSort; arrType = double; randSeed= "+randSeed+"; length= "+arrLength+"; builder type "+builder.name()+"; m = "+m);
+        for(int i=0,numReps=builder.getNumRepetitions(arrLength);i<numReps;++i)
         {
           builder.build(golden,m,rand);
-          String[] test=golden.clone();
-          SortUtil.uncheckedreverseSort(test,0,arrLength-1);
+          ArrCopy.uncheckedCopy(golden,0,test,0,arrLength);
           isSortedreverseSort(test,golden);
         }
       }
     }
   }
-  */
   @Test
-  public void testUncheckedSortboolean()
+  public void testuncheckedreverseSortdouble() throws InterruptedException
   {
-    var rand=new Random(0);
-    testuncheckedsortHelperboolean(100,rand);
-  }
-  @Test
-  public void testUncheckedReverseSortboolean()
-  {
-    var rand=new Random(0);
-    testuncheckedreverseSortHelperboolean(100,rand);
-  }
-  /*//TODO uncomment when the module bug is fixed
-  @Test
-  public void testUncheckedComparatorSortboolean()
-  {
-    //TODO
+    for(int i=0;i<lengths.length;++i)
+    {
+      int arrLength=lengths[i];
+      for(int j=0;j<randSeeds.length;++j)
+      {
+        long randSeed=randSeeds[j];
+        testuncheckedreverseSortdoubleHelper(randSeed,arrLength);
+      }
+    }
   }
   */
-  @Test
-  public void testUncheckedSortbyte()
-  {
-    var rand=new Random(0);
-    testuncheckedsortHelperbyte(29,rand);
-    testuncheckedsortHelperbyte(1000,rand);
-  }
-  @Test
-  public void testUncheckedReverseSortbyte()
-  {
-    var rand=new Random(0);
-    testuncheckedreverseSortHelperbyte(29,rand);
-    testuncheckedreverseSortHelperbyte(1000,rand);
-  }
-  @Test
-  public void testUncheckedsortchar()
-  {
-    var rand=new Random(0);
-    int[] lengths=new int[]{286,3201,3202};
-    for(int i=0;i<lengths.length;++i)
-    {
-      testuncheckedsortHelperchar(lengths[i],rand);
-    }
-  }
-  @Test
-  public void testUncheckedReverseSortchar()
-  {
-    var rand=new Random(0);
-    int[] lengths=new int[]{286,3201,3202};
-    for(int i=0;i<lengths.length;++i)
-    {
-      testuncheckedreverseSortHelperchar(lengths[i],rand);
-    }
-  }
-  @Test
-  public void testUncheckedsortshort()
-  {
-    var rand=new Random(0);
-    int[] lengths=new int[]{286,3201,3202};
-    for(int i=0;i<lengths.length;++i)
-    {
-      testuncheckedsortHelpershort(lengths[i],rand);
-    }
-  }
-  @Test
-  public void testUncheckedReverseSortshort()
-  {
-    var rand=new Random(0);
-    int[] lengths=new int[]{286,3201,3202};
-    for(int i=0;i<lengths.length;++i)
-    {
-      testuncheckedreverseSortHelpershort(lengths[i],rand);
-    }
-  }
-  @Test
-  public void testUncheckedsortint()
-  {
-    var rand=new Random(0);
-    int[] lengths=new int[]{286,3201,3202};
-    for(int i=0;i<lengths.length;++i)
-    {
-      testuncheckedsortHelperint(lengths[i],rand);
-    }
-  }
-  @Test
-  public void testUncheckedReverseSortint()
-  {
-    var rand=new Random(0);
-    int[] lengths=new int[]{286,3201,3202};
-    for(int i=0;i<lengths.length;++i)
-    {
-      testuncheckedreverseSortHelperint(lengths[i],rand);
-    }
-  }
-  @Test
-  public void testUncheckedsortlong()
-  {
-    var rand=new Random(0);
-    int[] lengths=new int[]{286,3201,3202};
-    for(int i=0;i<lengths.length;++i)
-    {
-      testuncheckedsortHelperlong(lengths[i],rand);
-    }
-  }
-  @Test
-  public void testUncheckedReverseSortlong()
-  {
-    var rand=new Random(0);
-    int[] lengths=new int[]{286,3201,3202};
-    for(int i=0;i<lengths.length;++i)
-    {
-      testuncheckedreverseSortHelperlong(lengths[i],rand);
-    }
-  }
-  @Test
-  public void testUncheckedsortfloat()
-  {
-    var rand=new Random(0);
-    int[] lengths=new int[]{286,3201,3202};
-    for(int i=0;i<lengths.length;++i)
-    {
-      testuncheckedsortHelperfloat(lengths[i],rand);
-    }
-  }
-  @Test
-  public void testUncheckedReverseSortfloat()
-  {
-    var rand=new Random(0);
-    int[] lengths=new int[]{286,3201,3202};
-    for(int i=0;i<lengths.length;++i)
-    {
-      testuncheckedreverseSortHelperfloat(lengths[i],rand);
-    }
-  }
-  @Test
-  public void testUncheckedsortdouble()
-  {
-    var rand=new Random(0);
-    int[] lengths=new int[]{286,3201,3202};
-    for(int i=0;i<lengths.length;++i)
-    {
-      testuncheckedsortHelperdouble(lengths[i],rand);
-    }
-  }
-  @Test
-  public void testUncheckedReverseSortdouble()
-  {
-    var rand=new Random(0);
-    int[] lengths=new int[]{286,3201,3202};
-    for(int i=0;i<lengths.length;++i)
-    {
-      testuncheckedreverseSortHelperdouble(lengths[i],rand);
-    }
-  }
 }
