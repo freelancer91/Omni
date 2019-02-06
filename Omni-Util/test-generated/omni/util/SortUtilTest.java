@@ -6,8 +6,7 @@ import java.util.Random;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.stream.IntStream;
-//TODO uncomment when the module bug is fixed
-//import java.util.Comparator;
+import java.util.Comparator;
 import java.util.function.IntBinaryOperator;
 import omni.function.BooleanComparator;
 import omni.function.ByteComparator;
@@ -29,7 +28,6 @@ public class SortUtilTest
 {
   private static final int[] lengths=new int[]{2, 3, 5, 8, 13, 21, 34, 55, 100, 1000, 10000, 100000, 1000000};
   private static final long[] randSeeds=new long[]{666L,0xC0FFEEL,999L};
-  /*//TODO uncomment when they fix the module bug in eclipse
   private static Comparator<String> getAscendingStringComparator()
   {
     return (val1,val2)->
@@ -309,8 +307,6 @@ public class SortUtilTest
         );
     };
   }
-  */
-    /*//TODO uncomment when they fix the module bug in eclipse
     private static void isSortedsort(String[] arr,String[] copy) throws InterruptedException
     {
       Thread stockSorterThread=new Thread(()->
@@ -327,7 +323,6 @@ public class SortUtilTest
         Assert.assertTrue(Objects.equals(arr[index],copy[index]));
       });
     }
-    */
     private static void isSortedsort(boolean[] arr,boolean[] copy) throws InterruptedException
     {
       Thread stockSorterThread=new Thread(()->
@@ -459,7 +454,6 @@ public class SortUtilTest
         Assert.assertTrue(TypeUtil.doubleEquals(arr[index],copy[index]));
       });
     }
-    /*//TODO uncomment when they fix the module bug in eclipse
     private static void isSortedreverseSort(String[] arr,String[] copy) throws InterruptedException
     {
       Thread stockSorterThread=new Thread(()->
@@ -477,7 +471,6 @@ public class SortUtilTest
         Assert.assertTrue(Objects.equals(arr[index],copy[index]));
       });
     }
-    */
     private static void isSortedreverseSort(boolean[] arr,boolean[] copy) throws InterruptedException
     {
       Thread stockSorterThread=new Thread(()->
@@ -617,7 +610,6 @@ public class SortUtilTest
         Assert.assertTrue(TypeUtil.doubleEquals(arr[index],copy[index]));
       });
     }
-  /*//TODO uncomment when they fix the module bug in eclipse
   private static void isSorted(String[] arr,String[] copy,Comparator<? super String> sorter) throws InterruptedException
   {
     Thread stockSorterThread=new Thread(()->
@@ -768,7 +760,7 @@ public class SortUtilTest
       Assert.assertTrue(TypeUtil.doubleEquals(arr[index],copy[index]));
     });
   }
-  */
+/*
   private static boolean getRandboolean(Random rand)
   {
     return rand.nextBoolean();
@@ -801,12 +793,10 @@ public class SortUtilTest
   {
     return rand.nextDouble();
   }
-  /*//TODO uncomment when the eclipse module bug is fixed
   private static String getRandString(Random rand)
   {
     return Long.toString(rand.nextLong());
   }
-  */
   private static boolean convertToboolean(int val)
   {
     return val!=0;
@@ -839,12 +829,10 @@ public class SortUtilTest
   {
     return (double)val;
   }
-  /*//TODO uncomment when the eclipse module bug is fixed
   private static String convertToString(int val)
   {
     return Integer.toString(val);
   }
-  */
   private static enum ArrayBuilderboolean
   {
     RANDOM
@@ -4216,7 +4204,6 @@ public class SortUtilTest
     abstract int getMHi(int arrLength);
     abstract int incrementM(int m);
   }
-  /*//TODO uncomment when the eclipse module bug is fixed
   private static enum ArrayBuilderString
   {
     RANDOM
@@ -4732,16 +4719,18 @@ public class SortUtilTest
     boolean[] test=new boolean[arrLength];
     {
       Random rand=new Random(randSeed);
-      for(ArrayBuilderboolean builder:ArrayBuilderboolean.values())
+      for(JunitUtil.booleanArrayBuilder builder:JunitUtil.booleanArrayBuilder.values())
       {
-        for(int m=builder.getMLo(),mHi=builder.getMHi(arrLength);m<=mHi;m=builder.incrementM(m))
         {
-          System.out.println("sortType = sort; arrType = boolean; randSeed= "+randSeed+"; length= "+arrLength+"; builder type "+builder.name()+"; m = "+m);
-          for(int i=0,numReps=builder.getNumRepetitions(arrLength);i<numReps;++i)
+          for(int m=getMLo(builder),mHi=getMHi(builder,arrLength),numReps=getNumReps(builder,arrLength);m<=mHi;m=incrementM(builder,m))
           {
-            builder.build(golden,m,rand);
-            ArrCopy.uncheckedCopy(golden,0,test,0,arrLength);
-            isSortedsort(test,golden);
+            System.out.println("sortType = sort; arrType = boolean; randSeed= "+randSeed+"; length= "+arrLength+"; builder type "+builder+"; m = "+m);
+            for(int i=0;i<numReps;++i)
+            {
+              builder.build(golden,rand,m);
+              ArrCopy.uncheckedCopy(golden,0,test,0,arrLength);
+              isSortedsort(test,golden);
+            }
           }
         }
       }
@@ -4758,16 +4747,18 @@ public class SortUtilTest
     boolean[] test=new boolean[arrLength];
     {
       Random rand=new Random(randSeed);
-      for(ArrayBuilderboolean builder:ArrayBuilderboolean.values())
+      for(JunitUtil.booleanArrayBuilder builder:JunitUtil.booleanArrayBuilder.values())
       {
-        for(int m=builder.getMLo(),mHi=builder.getMHi(arrLength);m<=mHi;m=builder.incrementM(m))
         {
-          System.out.println("sortType = reverseSort; arrType = boolean; randSeed= "+randSeed+"; length= "+arrLength+"; builder type "+builder.name()+"; m = "+m);
-          for(int i=0,numReps=builder.getNumRepetitions(arrLength);i<numReps;++i)
+          for(int m=getMLo(builder),mHi=getMHi(builder,arrLength),numReps=getNumReps(builder,arrLength);m<=mHi;m=incrementM(builder,m))
           {
-            builder.build(golden,m,rand);
-            ArrCopy.uncheckedCopy(golden,0,test,0,arrLength);
-            isSortedreverseSort(test,golden);
+            System.out.println("sortType = reverseSort; arrType = boolean; randSeed= "+randSeed+"; length= "+arrLength+"; builder type "+builder+"; m = "+m);
+            for(int i=0;i<numReps;++i)
+            {
+              builder.build(golden,rand,m);
+              ArrCopy.uncheckedCopy(golden,0,test,0,arrLength);
+              isSortedreverseSort(test,golden);
+            }
           }
         }
       }
@@ -4784,16 +4775,18 @@ public class SortUtilTest
     byte[] test=new byte[arrLength];
     {
       Random rand=new Random(randSeed);
-      for(ArrayBuilderbyte builder:ArrayBuilderbyte.values())
+      for(JunitUtil.byteArrayBuilder builder:JunitUtil.byteArrayBuilder.values())
       {
-        for(int m=builder.getMLo(),mHi=builder.getMHi(arrLength);m<=mHi;m=builder.incrementM(m))
         {
-          System.out.println("sortType = sort; arrType = byte; randSeed= "+randSeed+"; length= "+arrLength+"; builder type "+builder.name()+"; m = "+m);
-          for(int i=0,numReps=builder.getNumRepetitions(arrLength);i<numReps;++i)
+          for(int m=getMLo(builder),mHi=getMHi(builder,arrLength),numReps=getNumReps(builder,arrLength);m<=mHi;m=incrementM(builder,m))
           {
-            builder.build(golden,m,rand);
-            ArrCopy.uncheckedCopy(golden,0,test,0,arrLength);
-            isSortedsort(test,golden);
+            System.out.println("sortType = sort; arrType = byte; randSeed= "+randSeed+"; length= "+arrLength+"; builder type "+builder+"; m = "+m);
+            for(int i=0;i<numReps;++i)
+            {
+              builder.build(golden,rand,m);
+              ArrCopy.uncheckedCopy(golden,0,test,0,arrLength);
+              isSortedsort(test,golden);
+            }
           }
         }
       }
@@ -4811,16 +4804,18 @@ public class SortUtilTest
     byte[] test=new byte[arrLength];
     {
       Random rand=new Random(randSeed);
-      for(ArrayBuilderbyte builder:ArrayBuilderbyte.values())
+      for(JunitUtil.byteArrayBuilder builder:JunitUtil.byteArrayBuilder.values())
       {
-        for(int m=builder.getMLo(),mHi=builder.getMHi(arrLength);m<=mHi;m=builder.incrementM(m))
         {
-          System.out.println("sortType = reverseSort; arrType = byte; randSeed= "+randSeed+"; length= "+arrLength+"; builder type "+builder.name()+"; m = "+m);
-          for(int i=0,numReps=builder.getNumRepetitions(arrLength);i<numReps;++i)
+          for(int m=getMLo(builder),mHi=getMHi(builder,arrLength),numReps=getNumReps(builder,arrLength);m<=mHi;m=incrementM(builder,m))
           {
-            builder.build(golden,m,rand);
-            ArrCopy.uncheckedCopy(golden,0,test,0,arrLength);
-            isSortedreverseSort(test,golden);
+            System.out.println("sortType = reverseSort; arrType = byte; randSeed= "+randSeed+"; length= "+arrLength+"; builder type "+builder+"; m = "+m);
+            for(int i=0;i<numReps;++i)
+            {
+              builder.build(golden,rand,m);
+              ArrCopy.uncheckedCopy(golden,0,test,0,arrLength);
+              isSortedreverseSort(test,golden);
+            }
           }
         }
       }
@@ -4838,16 +4833,18 @@ public class SortUtilTest
     char[] test=new char[arrLength];
     {
       Random rand=new Random(randSeed);
-      for(ArrayBuilderchar builder:ArrayBuilderchar.values())
+      for(JunitUtil.charArrayBuilder builder:JunitUtil.charArrayBuilder.values())
       {
-        for(int m=builder.getMLo(),mHi=builder.getMHi(arrLength);m<=mHi;m=builder.incrementM(m))
         {
-          System.out.println("sortType = sort; arrType = char; randSeed= "+randSeed+"; length= "+arrLength+"; builder type "+builder.name()+"; m = "+m);
-          for(int i=0,numReps=builder.getNumRepetitions(arrLength);i<numReps;++i)
+          for(int m=getMLo(builder),mHi=getMHi(builder,arrLength),numReps=getNumReps(builder,arrLength);m<=mHi;m=incrementM(builder,m))
           {
-            builder.build(golden,m,rand);
-            ArrCopy.uncheckedCopy(golden,0,test,0,arrLength);
-            isSortedsort(test,golden);
+            System.out.println("sortType = sort; arrType = char; randSeed= "+randSeed+"; length= "+arrLength+"; builder type "+builder+"; m = "+m);
+            for(int i=0;i<numReps;++i)
+            {
+              builder.build(golden,rand,m);
+              ArrCopy.uncheckedCopy(golden,0,test,0,arrLength);
+              isSortedsort(test,golden);
+            }
           }
         }
       }
@@ -4872,16 +4869,18 @@ public class SortUtilTest
     char[] test=new char[arrLength];
     {
       Random rand=new Random(randSeed);
-      for(ArrayBuilderchar builder:ArrayBuilderchar.values())
+      for(JunitUtil.charArrayBuilder builder:JunitUtil.charArrayBuilder.values())
       {
-        for(int m=builder.getMLo(),mHi=builder.getMHi(arrLength);m<=mHi;m=builder.incrementM(m))
         {
-          System.out.println("sortType = reverseSort; arrType = char; randSeed= "+randSeed+"; length= "+arrLength+"; builder type "+builder.name()+"; m = "+m);
-          for(int i=0,numReps=builder.getNumRepetitions(arrLength);i<numReps;++i)
+          for(int m=getMLo(builder),mHi=getMHi(builder,arrLength),numReps=getNumReps(builder,arrLength);m<=mHi;m=incrementM(builder,m))
           {
-            builder.build(golden,m,rand);
-            ArrCopy.uncheckedCopy(golden,0,test,0,arrLength);
-            isSortedreverseSort(test,golden);
+            System.out.println("sortType = reverseSort; arrType = char; randSeed= "+randSeed+"; length= "+arrLength+"; builder type "+builder+"; m = "+m);
+            for(int i=0;i<numReps;++i)
+            {
+              builder.build(golden,rand,m);
+              ArrCopy.uncheckedCopy(golden,0,test,0,arrLength);
+              isSortedreverseSort(test,golden);
+            }
           }
         }
       }
@@ -4906,16 +4905,18 @@ public class SortUtilTest
     short[] test=new short[arrLength];
     {
       Random rand=new Random(randSeed);
-      for(ArrayBuildershort builder:ArrayBuildershort.values())
+      for(JunitUtil.shortArrayBuilder builder:JunitUtil.shortArrayBuilder.values())
       {
-        for(int m=builder.getMLo(),mHi=builder.getMHi(arrLength);m<=mHi;m=builder.incrementM(m))
         {
-          System.out.println("sortType = sort; arrType = short; randSeed= "+randSeed+"; length= "+arrLength+"; builder type "+builder.name()+"; m = "+m);
-          for(int i=0,numReps=builder.getNumRepetitions(arrLength);i<numReps;++i)
+          for(int m=getMLo(builder),mHi=getMHi(builder,arrLength),numReps=getNumReps(builder,arrLength);m<=mHi;m=incrementM(builder,m))
           {
-            builder.build(golden,m,rand);
-            ArrCopy.uncheckedCopy(golden,0,test,0,arrLength);
-            isSortedsort(test,golden);
+            System.out.println("sortType = sort; arrType = short; randSeed= "+randSeed+"; length= "+arrLength+"; builder type "+builder+"; m = "+m);
+            for(int i=0;i<numReps;++i)
+            {
+              builder.build(golden,rand,m);
+              ArrCopy.uncheckedCopy(golden,0,test,0,arrLength);
+              isSortedsort(test,golden);
+            }
           }
         }
       }
@@ -4940,16 +4941,18 @@ public class SortUtilTest
     short[] test=new short[arrLength];
     {
       Random rand=new Random(randSeed);
-      for(ArrayBuildershort builder:ArrayBuildershort.values())
+      for(JunitUtil.shortArrayBuilder builder:JunitUtil.shortArrayBuilder.values())
       {
-        for(int m=builder.getMLo(),mHi=builder.getMHi(arrLength);m<=mHi;m=builder.incrementM(m))
         {
-          System.out.println("sortType = reverseSort; arrType = short; randSeed= "+randSeed+"; length= "+arrLength+"; builder type "+builder.name()+"; m = "+m);
-          for(int i=0,numReps=builder.getNumRepetitions(arrLength);i<numReps;++i)
+          for(int m=getMLo(builder),mHi=getMHi(builder,arrLength),numReps=getNumReps(builder,arrLength);m<=mHi;m=incrementM(builder,m))
           {
-            builder.build(golden,m,rand);
-            ArrCopy.uncheckedCopy(golden,0,test,0,arrLength);
-            isSortedreverseSort(test,golden);
+            System.out.println("sortType = reverseSort; arrType = short; randSeed= "+randSeed+"; length= "+arrLength+"; builder type "+builder+"; m = "+m);
+            for(int i=0;i<numReps;++i)
+            {
+              builder.build(golden,rand,m);
+              ArrCopy.uncheckedCopy(golden,0,test,0,arrLength);
+              isSortedreverseSort(test,golden);
+            }
           }
         }
       }
@@ -4974,16 +4977,18 @@ public class SortUtilTest
     int[] test=new int[arrLength];
     {
       Random rand=new Random(randSeed);
-      for(ArrayBuilderint builder:ArrayBuilderint.values())
+      for(JunitUtil.intArrayBuilder builder:JunitUtil.intArrayBuilder.values())
       {
-        for(int m=builder.getMLo(),mHi=builder.getMHi(arrLength);m<=mHi;m=builder.incrementM(m))
         {
-          System.out.println("sortType = sort; arrType = int; randSeed= "+randSeed+"; length= "+arrLength+"; builder type "+builder.name()+"; m = "+m);
-          for(int i=0,numReps=builder.getNumRepetitions(arrLength);i<numReps;++i)
+          for(int m=getMLo(builder),mHi=getMHi(builder,arrLength),numReps=getNumReps(builder,arrLength);m<=mHi;m=incrementM(builder,m))
           {
-            builder.build(golden,m,rand);
-            ArrCopy.uncheckedCopy(golden,0,test,0,arrLength);
-            isSortedsort(test,golden);
+            System.out.println("sortType = sort; arrType = int; randSeed= "+randSeed+"; length= "+arrLength+"; builder type "+builder+"; m = "+m);
+            for(int i=0;i<numReps;++i)
+            {
+              builder.build(golden,rand,m);
+              ArrCopy.uncheckedCopy(golden,0,test,0,arrLength);
+              isSortedsort(test,golden);
+            }
           }
         }
       }
@@ -5008,16 +5013,18 @@ public class SortUtilTest
     int[] test=new int[arrLength];
     {
       Random rand=new Random(randSeed);
-      for(ArrayBuilderint builder:ArrayBuilderint.values())
+      for(JunitUtil.intArrayBuilder builder:JunitUtil.intArrayBuilder.values())
       {
-        for(int m=builder.getMLo(),mHi=builder.getMHi(arrLength);m<=mHi;m=builder.incrementM(m))
         {
-          System.out.println("sortType = reverseSort; arrType = int; randSeed= "+randSeed+"; length= "+arrLength+"; builder type "+builder.name()+"; m = "+m);
-          for(int i=0,numReps=builder.getNumRepetitions(arrLength);i<numReps;++i)
+          for(int m=getMLo(builder),mHi=getMHi(builder,arrLength),numReps=getNumReps(builder,arrLength);m<=mHi;m=incrementM(builder,m))
           {
-            builder.build(golden,m,rand);
-            ArrCopy.uncheckedCopy(golden,0,test,0,arrLength);
-            isSortedreverseSort(test,golden);
+            System.out.println("sortType = reverseSort; arrType = int; randSeed= "+randSeed+"; length= "+arrLength+"; builder type "+builder+"; m = "+m);
+            for(int i=0;i<numReps;++i)
+            {
+              builder.build(golden,rand,m);
+              ArrCopy.uncheckedCopy(golden,0,test,0,arrLength);
+              isSortedreverseSort(test,golden);
+            }
           }
         }
       }
@@ -5042,16 +5049,18 @@ public class SortUtilTest
     long[] test=new long[arrLength];
     {
       Random rand=new Random(randSeed);
-      for(ArrayBuilderlong builder:ArrayBuilderlong.values())
+      for(JunitUtil.longArrayBuilder builder:JunitUtil.longArrayBuilder.values())
       {
-        for(int m=builder.getMLo(),mHi=builder.getMHi(arrLength);m<=mHi;m=builder.incrementM(m))
         {
-          System.out.println("sortType = sort; arrType = long; randSeed= "+randSeed+"; length= "+arrLength+"; builder type "+builder.name()+"; m = "+m);
-          for(int i=0,numReps=builder.getNumRepetitions(arrLength);i<numReps;++i)
+          for(int m=getMLo(builder),mHi=getMHi(builder,arrLength),numReps=getNumReps(builder,arrLength);m<=mHi;m=incrementM(builder,m))
           {
-            builder.build(golden,m,rand);
-            ArrCopy.uncheckedCopy(golden,0,test,0,arrLength);
-            isSortedsort(test,golden);
+            System.out.println("sortType = sort; arrType = long; randSeed= "+randSeed+"; length= "+arrLength+"; builder type "+builder+"; m = "+m);
+            for(int i=0;i<numReps;++i)
+            {
+              builder.build(golden,rand,m);
+              ArrCopy.uncheckedCopy(golden,0,test,0,arrLength);
+              isSortedsort(test,golden);
+            }
           }
         }
       }
@@ -5076,16 +5085,18 @@ public class SortUtilTest
     long[] test=new long[arrLength];
     {
       Random rand=new Random(randSeed);
-      for(ArrayBuilderlong builder:ArrayBuilderlong.values())
+      for(JunitUtil.longArrayBuilder builder:JunitUtil.longArrayBuilder.values())
       {
-        for(int m=builder.getMLo(),mHi=builder.getMHi(arrLength);m<=mHi;m=builder.incrementM(m))
         {
-          System.out.println("sortType = reverseSort; arrType = long; randSeed= "+randSeed+"; length= "+arrLength+"; builder type "+builder.name()+"; m = "+m);
-          for(int i=0,numReps=builder.getNumRepetitions(arrLength);i<numReps;++i)
+          for(int m=getMLo(builder),mHi=getMHi(builder,arrLength),numReps=getNumReps(builder,arrLength);m<=mHi;m=incrementM(builder,m))
           {
-            builder.build(golden,m,rand);
-            ArrCopy.uncheckedCopy(golden,0,test,0,arrLength);
-            isSortedreverseSort(test,golden);
+            System.out.println("sortType = reverseSort; arrType = long; randSeed= "+randSeed+"; length= "+arrLength+"; builder type "+builder+"; m = "+m);
+            for(int i=0;i<numReps;++i)
+            {
+              builder.build(golden,rand,m);
+              ArrCopy.uncheckedCopy(golden,0,test,0,arrLength);
+              isSortedreverseSort(test,golden);
+            }
           }
         }
       }
@@ -5110,44 +5121,44 @@ public class SortUtilTest
     float[] test=new float[arrLength];
     {
       Random rand=new Random(randSeed);
-      for(floatBuilder builder:floatBuilder.values())
+      for(JunitUtil.floatArrayBuilder builder:JunitUtil.floatArrayBuilder.values())
       {
-        for(int a=0;a<10;++a)
+        if(builder==JunitUtil.floatArrayBuilder.WithNaNsAndZeros)
         {
-          for(int g=0;g<=10;++g)
+          for(int a=0;a<10;++a)
           {
-            for(int z=0;z<=10;++z)
+            for(int g=0;g<=10;++g)
             {
-              for(int n=0;n<=10;++n)
+              for(int z=0;z<=10;++z)
               {
-                for(int p=0;p<=10;++p)
+                for(int n=0;n<=10;++n)
                 {
-                  if(a+g+z+n+p==arrLength)
+                  for(int p=0;p<=10;++p)
                   {
-                    System.out.println("sortType = sort; arrType = float; randSeed= "+randSeed+"; length= "+arrLength+"; builder type "+builder.name()+"; a ="+a+"; g="+g+"; z="+z+"; n="+n+"; p="+p);
-                    builder.build(golden,a,g,z,n,p,rand);
-                    ArrCopy.uncheckedCopy(golden,0,test,0,arrLength);
-                    isSortedsort(test,golden);
+                    if(a+g+z+n+p==arrLength)
+                    {
+                      System.out.println("sortType = sort; arrType = float; randSeed= "+randSeed+"; length= "+arrLength+"; builder type "+builder.name()+"; a ="+a+"; g="+g+"; z="+z+"; n="+n+"; p="+p);
+                      builder.build(golden,rand,a,g,z,n,p);
+                      ArrCopy.uncheckedCopy(golden,0,test,0,arrLength);
+                      isSortedsort(test,golden);
+                    }
                   }
                 }
               }
             }
           }
         }
-      }
-    }
-    {
-      Random rand=new Random(randSeed);
-      for(ArrayBuilderfloat builder:ArrayBuilderfloat.values())
-      {
-        for(int m=builder.getMLo(),mHi=builder.getMHi(arrLength);m<=mHi;m=builder.incrementM(m))
+        else
         {
-          System.out.println("sortType = sort; arrType = float; randSeed= "+randSeed+"; length= "+arrLength+"; builder type "+builder.name()+"; m = "+m);
-          for(int i=0,numReps=builder.getNumRepetitions(arrLength);i<numReps;++i)
+          for(int m=getMLo(builder),mHi=getMHi(builder,arrLength),numReps=getNumReps(builder,arrLength);m<=mHi;m=incrementM(builder,m))
           {
-            builder.build(golden,m,rand);
-            ArrCopy.uncheckedCopy(golden,0,test,0,arrLength);
-            isSortedsort(test,golden);
+            System.out.println("sortType = sort; arrType = float; randSeed= "+randSeed+"; length= "+arrLength+"; builder type "+builder+"; m = "+m);
+            for(int i=0;i<numReps;++i)
+            {
+              builder.build(golden,rand,m);
+              ArrCopy.uncheckedCopy(golden,0,test,0,arrLength);
+              isSortedsort(test,golden);
+            }
           }
         }
       }
@@ -5172,44 +5183,44 @@ public class SortUtilTest
     float[] test=new float[arrLength];
     {
       Random rand=new Random(randSeed);
-      for(floatBuilder builder:floatBuilder.values())
+      for(JunitUtil.floatArrayBuilder builder:JunitUtil.floatArrayBuilder.values())
       {
-        for(int a=0;a<10;++a)
+        if(builder==JunitUtil.floatArrayBuilder.WithNaNsAndZeros)
         {
-          for(int g=0;g<=10;++g)
+          for(int a=0;a<10;++a)
           {
-            for(int z=0;z<=10;++z)
+            for(int g=0;g<=10;++g)
             {
-              for(int n=0;n<=10;++n)
+              for(int z=0;z<=10;++z)
               {
-                for(int p=0;p<=10;++p)
+                for(int n=0;n<=10;++n)
                 {
-                  if(a+g+z+n+p==arrLength)
+                  for(int p=0;p<=10;++p)
                   {
-                    System.out.println("sortType = reverseSort; arrType = float; randSeed= "+randSeed+"; length= "+arrLength+"; builder type "+builder.name()+"; a ="+a+"; g="+g+"; z="+z+"; n="+n+"; p="+p);
-                    builder.build(golden,a,g,z,n,p,rand);
-                    ArrCopy.uncheckedCopy(golden,0,test,0,arrLength);
-                    isSortedreverseSort(test,golden);
+                    if(a+g+z+n+p==arrLength)
+                    {
+                      System.out.println("sortType = reverseSort; arrType = float; randSeed= "+randSeed+"; length= "+arrLength+"; builder type "+builder.name()+"; a ="+a+"; g="+g+"; z="+z+"; n="+n+"; p="+p);
+                      builder.build(golden,rand,a,g,z,n,p);
+                      ArrCopy.uncheckedCopy(golden,0,test,0,arrLength);
+                      isSortedreverseSort(test,golden);
+                    }
                   }
                 }
               }
             }
           }
         }
-      }
-    }
-    {
-      Random rand=new Random(randSeed);
-      for(ArrayBuilderfloat builder:ArrayBuilderfloat.values())
-      {
-        for(int m=builder.getMLo(),mHi=builder.getMHi(arrLength);m<=mHi;m=builder.incrementM(m))
+        else
         {
-          System.out.println("sortType = reverseSort; arrType = float; randSeed= "+randSeed+"; length= "+arrLength+"; builder type "+builder.name()+"; m = "+m);
-          for(int i=0,numReps=builder.getNumRepetitions(arrLength);i<numReps;++i)
+          for(int m=getMLo(builder),mHi=getMHi(builder,arrLength),numReps=getNumReps(builder,arrLength);m<=mHi;m=incrementM(builder,m))
           {
-            builder.build(golden,m,rand);
-            ArrCopy.uncheckedCopy(golden,0,test,0,arrLength);
-            isSortedreverseSort(test,golden);
+            System.out.println("sortType = reverseSort; arrType = float; randSeed= "+randSeed+"; length= "+arrLength+"; builder type "+builder+"; m = "+m);
+            for(int i=0;i<numReps;++i)
+            {
+              builder.build(golden,rand,m);
+              ArrCopy.uncheckedCopy(golden,0,test,0,arrLength);
+              isSortedreverseSort(test,golden);
+            }
           }
         }
       }
@@ -5234,44 +5245,44 @@ public class SortUtilTest
     double[] test=new double[arrLength];
     {
       Random rand=new Random(randSeed);
-      for(doubleBuilder builder:doubleBuilder.values())
+      for(JunitUtil.doubleArrayBuilder builder:JunitUtil.doubleArrayBuilder.values())
       {
-        for(int a=0;a<10;++a)
+        if(builder==JunitUtil.doubleArrayBuilder.WithNaNsAndZeros)
         {
-          for(int g=0;g<=10;++g)
+          for(int a=0;a<10;++a)
           {
-            for(int z=0;z<=10;++z)
+            for(int g=0;g<=10;++g)
             {
-              for(int n=0;n<=10;++n)
+              for(int z=0;z<=10;++z)
               {
-                for(int p=0;p<=10;++p)
+                for(int n=0;n<=10;++n)
                 {
-                  if(a+g+z+n+p==arrLength)
+                  for(int p=0;p<=10;++p)
                   {
-                    System.out.println("sortType = sort; arrType = double; randSeed= "+randSeed+"; length= "+arrLength+"; builder type "+builder.name()+"; a ="+a+"; g="+g+"; z="+z+"; n="+n+"; p="+p);
-                    builder.build(golden,a,g,z,n,p,rand);
-                    ArrCopy.uncheckedCopy(golden,0,test,0,arrLength);
-                    isSortedsort(test,golden);
+                    if(a+g+z+n+p==arrLength)
+                    {
+                      System.out.println("sortType = sort; arrType = double; randSeed= "+randSeed+"; length= "+arrLength+"; builder type "+builder.name()+"; a ="+a+"; g="+g+"; z="+z+"; n="+n+"; p="+p);
+                      builder.build(golden,rand,a,g,z,n,p);
+                      ArrCopy.uncheckedCopy(golden,0,test,0,arrLength);
+                      isSortedsort(test,golden);
+                    }
                   }
                 }
               }
             }
           }
         }
-      }
-    }
-    {
-      Random rand=new Random(randSeed);
-      for(ArrayBuilderdouble builder:ArrayBuilderdouble.values())
-      {
-        for(int m=builder.getMLo(),mHi=builder.getMHi(arrLength);m<=mHi;m=builder.incrementM(m))
+        else
         {
-          System.out.println("sortType = sort; arrType = double; randSeed= "+randSeed+"; length= "+arrLength+"; builder type "+builder.name()+"; m = "+m);
-          for(int i=0,numReps=builder.getNumRepetitions(arrLength);i<numReps;++i)
+          for(int m=getMLo(builder),mHi=getMHi(builder,arrLength),numReps=getNumReps(builder,arrLength);m<=mHi;m=incrementM(builder,m))
           {
-            builder.build(golden,m,rand);
-            ArrCopy.uncheckedCopy(golden,0,test,0,arrLength);
-            isSortedsort(test,golden);
+            System.out.println("sortType = sort; arrType = double; randSeed= "+randSeed+"; length= "+arrLength+"; builder type "+builder+"; m = "+m);
+            for(int i=0;i<numReps;++i)
+            {
+              builder.build(golden,rand,m);
+              ArrCopy.uncheckedCopy(golden,0,test,0,arrLength);
+              isSortedsort(test,golden);
+            }
           }
         }
       }
@@ -5296,44 +5307,44 @@ public class SortUtilTest
     double[] test=new double[arrLength];
     {
       Random rand=new Random(randSeed);
-      for(doubleBuilder builder:doubleBuilder.values())
+      for(JunitUtil.doubleArrayBuilder builder:JunitUtil.doubleArrayBuilder.values())
       {
-        for(int a=0;a<10;++a)
+        if(builder==JunitUtil.doubleArrayBuilder.WithNaNsAndZeros)
         {
-          for(int g=0;g<=10;++g)
+          for(int a=0;a<10;++a)
           {
-            for(int z=0;z<=10;++z)
+            for(int g=0;g<=10;++g)
             {
-              for(int n=0;n<=10;++n)
+              for(int z=0;z<=10;++z)
               {
-                for(int p=0;p<=10;++p)
+                for(int n=0;n<=10;++n)
                 {
-                  if(a+g+z+n+p==arrLength)
+                  for(int p=0;p<=10;++p)
                   {
-                    System.out.println("sortType = reverseSort; arrType = double; randSeed= "+randSeed+"; length= "+arrLength+"; builder type "+builder.name()+"; a ="+a+"; g="+g+"; z="+z+"; n="+n+"; p="+p);
-                    builder.build(golden,a,g,z,n,p,rand);
-                    ArrCopy.uncheckedCopy(golden,0,test,0,arrLength);
-                    isSortedreverseSort(test,golden);
+                    if(a+g+z+n+p==arrLength)
+                    {
+                      System.out.println("sortType = reverseSort; arrType = double; randSeed= "+randSeed+"; length= "+arrLength+"; builder type "+builder.name()+"; a ="+a+"; g="+g+"; z="+z+"; n="+n+"; p="+p);
+                      builder.build(golden,rand,a,g,z,n,p);
+                      ArrCopy.uncheckedCopy(golden,0,test,0,arrLength);
+                      isSortedreverseSort(test,golden);
+                    }
                   }
                 }
               }
             }
           }
         }
-      }
-    }
-    {
-      Random rand=new Random(randSeed);
-      for(ArrayBuilderdouble builder:ArrayBuilderdouble.values())
-      {
-        for(int m=builder.getMLo(),mHi=builder.getMHi(arrLength);m<=mHi;m=builder.incrementM(m))
+        else
         {
-          System.out.println("sortType = reverseSort; arrType = double; randSeed= "+randSeed+"; length= "+arrLength+"; builder type "+builder.name()+"; m = "+m);
-          for(int i=0,numReps=builder.getNumRepetitions(arrLength);i<numReps;++i)
+          for(int m=getMLo(builder),mHi=getMHi(builder,arrLength),numReps=getNumReps(builder,arrLength);m<=mHi;m=incrementM(builder,m))
           {
-            builder.build(golden,m,rand);
-            ArrCopy.uncheckedCopy(golden,0,test,0,arrLength);
-            isSortedreverseSort(test,golden);
+            System.out.println("sortType = reverseSort; arrType = double; randSeed= "+randSeed+"; length= "+arrLength+"; builder type "+builder+"; m = "+m);
+            for(int i=0;i<numReps;++i)
+            {
+              builder.build(golden,rand,m);
+              ArrCopy.uncheckedCopy(golden,0,test,0,arrLength);
+              isSortedreverseSort(test,golden);
+            }
           }
         }
       }
@@ -5352,6 +5363,525 @@ public class SortUtilTest
       }
     }
   }
+  private static int getMLo(JunitUtil.booleanArrayBuilder builder)
+  {
+    switch(builder)
+    {
+      case AllEquals:
+        return 0;
+      default:
+        return 1;
+    }
+  }
+  private static int getMHi(JunitUtil.booleanArrayBuilder builder,int arrLength)
+  {
+    switch(builder)
+    {
+      default:
+        return 1;
+    }
+  }
+  private static int getNumReps(JunitUtil.booleanArrayBuilder builder,int arrLength)
+  {
+    return 1;
+  }
+  private static int incrementM(JunitUtil.booleanArrayBuilder builder,int m)
+  {
+    switch(builder)
+    {
+      default:
+        return m+1;
+    }
+  }
+  private static int getMLo(JunitUtil.byteArrayBuilder builder)
+  {
+    switch(builder)
+    {
+      case AllEquals:
+        return 0;
+      case MergeAscending:
+      case MergeDescending:
+        return 65;
+      default:
+        return 1;
+    }
+  }
+  private static int getMHi(JunitUtil.byteArrayBuilder builder,int arrLength)
+  {
+    switch(builder)
+    {
+      case Ascending:
+      case Descending:
+      case Saw:
+      case Repeated:
+      case Duplicated:
+      case OrganPipes:
+      case Stagger:
+      case Plateau:
+        return (2*arrLength)-1;
+      case AllEquals:
+        return 0;
+      case MergeAscending:
+      case MergeDescending:
+        return 69;
+      case SortedRepeated:
+      case SortedOrganPipes:
+        return Math.min(arrLength,7);
+      default:
+        return 1;
+    }
+  }
+  private static int getNumReps(JunitUtil.byteArrayBuilder builder,int arrLength)
+  {
+    return 1;
+  }
+  private static int incrementM(JunitUtil.byteArrayBuilder builder,int m)
+  {
+    switch(builder)
+    {
+      case Ascending:
+      case Descending:
+      case Saw:
+      case Repeated:
+      case Duplicated:
+      case OrganPipes:
+      case Stagger:
+      case Plateau:
+        return m*2;
+      default:
+        return m+1;
+    }
+  }
+  private static int getMLo(JunitUtil.charArrayBuilder builder)
+  {
+    switch(builder)
+    {
+      case AllEquals:
+        return 0;
+      case MergeAscending:
+      case MergeDescending:
+        return 65;
+      default:
+        return 1;
+    }
+  }
+  private static int getMHi(JunitUtil.charArrayBuilder builder,int arrLength)
+  {
+    switch(builder)
+    {
+      case Ascending:
+      case Descending:
+      case Saw:
+      case Repeated:
+      case Duplicated:
+      case OrganPipes:
+      case Stagger:
+      case Plateau:
+        return (2*arrLength)-1;
+      case AllEquals:
+        return 0;
+      case MergeAscending:
+      case MergeDescending:
+        return 69;
+      case SortedRepeated:
+      case SortedOrganPipes:
+        return Math.min(arrLength,7);
+      default:
+        return 1;
+    }
+  }
+  private static int getNumReps(JunitUtil.charArrayBuilder builder,int arrLength)
+  {
+    if(builder.isRandomized())
+    {
+      if(arrLength>3201 || arrLength<47)
+        {
+          return 1;
+        }
+        return 7;
+    }
+    return 1;
+  }
+  private static int incrementM(JunitUtil.charArrayBuilder builder,int m)
+  {
+    switch(builder)
+    {
+      case Ascending:
+      case Descending:
+      case Saw:
+      case Repeated:
+      case Duplicated:
+      case OrganPipes:
+      case Stagger:
+      case Plateau:
+        return m*2;
+      default:
+        return m+1;
+    }
+  }
+  private static int getMLo(JunitUtil.shortArrayBuilder builder)
+  {
+    switch(builder)
+    {
+      case AllEquals:
+        return 0;
+      case MergeAscending:
+      case MergeDescending:
+        return 65;
+      default:
+        return 1;
+    }
+  }
+  private static int getMHi(JunitUtil.shortArrayBuilder builder,int arrLength)
+  {
+    switch(builder)
+    {
+      case Ascending:
+      case Descending:
+      case Saw:
+      case Repeated:
+      case Duplicated:
+      case OrganPipes:
+      case Stagger:
+      case Plateau:
+        return (2*arrLength)-1;
+      case AllEquals:
+        return 0;
+      case MergeAscending:
+      case MergeDescending:
+        return 69;
+      case SortedRepeated:
+      case SortedOrganPipes:
+        return Math.min(arrLength,7);
+      default:
+        return 1;
+    }
+  }
+  private static int getNumReps(JunitUtil.shortArrayBuilder builder,int arrLength)
+  {
+    if(builder.isRandomized())
+    {
+      if(arrLength>3201 || arrLength<47)
+        {
+          return 1;
+        }
+        return 7;
+    }
+    return 1;
+  }
+  private static int incrementM(JunitUtil.shortArrayBuilder builder,int m)
+  {
+    switch(builder)
+    {
+      case Ascending:
+      case Descending:
+      case Saw:
+      case Repeated:
+      case Duplicated:
+      case OrganPipes:
+      case Stagger:
+      case Plateau:
+        return m*2;
+      default:
+        return m+1;
+    }
+  }
+  private static int getMLo(JunitUtil.intArrayBuilder builder)
+  {
+    switch(builder)
+    {
+      case AllEquals:
+        return 0;
+      case MergeAscending:
+      case MergeDescending:
+        return 65;
+      default:
+        return 1;
+    }
+  }
+  private static int getMHi(JunitUtil.intArrayBuilder builder,int arrLength)
+  {
+    switch(builder)
+    {
+      case Ascending:
+      case Descending:
+      case Saw:
+      case Repeated:
+      case Duplicated:
+      case OrganPipes:
+      case Stagger:
+      case Plateau:
+        return (2*arrLength)-1;
+      case AllEquals:
+        return 0;
+      case MergeAscending:
+      case MergeDescending:
+        return 69;
+      case SortedRepeated:
+      case SortedOrganPipes:
+        return Math.min(arrLength,7);
+      default:
+        return 1;
+    }
+  }
+  private static int getNumReps(JunitUtil.intArrayBuilder builder,int arrLength)
+  {
+    return 1;
+  }
+  private static int incrementM(JunitUtil.intArrayBuilder builder,int m)
+  {
+    switch(builder)
+    {
+      case Ascending:
+      case Descending:
+      case Saw:
+      case Repeated:
+      case Duplicated:
+      case OrganPipes:
+      case Stagger:
+      case Plateau:
+        return m*2;
+      default:
+        return m+1;
+    }
+  }
+  private static int getMLo(JunitUtil.longArrayBuilder builder)
+  {
+    switch(builder)
+    {
+      case AllEquals:
+        return 0;
+      case MergeAscending:
+      case MergeDescending:
+        return 65;
+      default:
+        return 1;
+    }
+  }
+  private static int getMHi(JunitUtil.longArrayBuilder builder,int arrLength)
+  {
+    switch(builder)
+    {
+      case Ascending:
+      case Descending:
+      case Saw:
+      case Repeated:
+      case Duplicated:
+      case OrganPipes:
+      case Stagger:
+      case Plateau:
+        return (2*arrLength)-1;
+      case AllEquals:
+        return 0;
+      case MergeAscending:
+      case MergeDescending:
+        return 69;
+      case SortedRepeated:
+      case SortedOrganPipes:
+        return Math.min(arrLength,7);
+      default:
+        return 1;
+    }
+  }
+  private static int getNumReps(JunitUtil.longArrayBuilder builder,int arrLength)
+  {
+    return 1;
+  }
+  private static int incrementM(JunitUtil.longArrayBuilder builder,int m)
+  {
+    switch(builder)
+    {
+      case Ascending:
+      case Descending:
+      case Saw:
+      case Repeated:
+      case Duplicated:
+      case OrganPipes:
+      case Stagger:
+      case Plateau:
+        return m*2;
+      default:
+        return m+1;
+    }
+  }
+  private static int getMLo(JunitUtil.floatArrayBuilder builder)
+  {
+    switch(builder)
+    {
+      case AllEquals:
+        return 0;
+      case MergeAscending:
+      case MergeDescending:
+        return 65;
+      default:
+        return 1;
+    }
+  }
+  private static int getMHi(JunitUtil.floatArrayBuilder builder,int arrLength)
+  {
+    switch(builder)
+    {
+      case Ascending:
+      case Descending:
+      case Saw:
+      case Repeated:
+      case Duplicated:
+      case OrganPipes:
+      case Stagger:
+      case Plateau:
+        return (2*arrLength)-1;
+      case AllEquals:
+        return 0;
+      case MergeAscending:
+      case MergeDescending:
+        return 69;
+      case SortedRepeated:
+      case SortedOrganPipes:
+        return Math.min(arrLength,7);
+      default:
+        return 1;
+    }
+  }
+  private static int getNumReps(JunitUtil.floatArrayBuilder builder,int arrLength)
+  {
+    return 1;
+  }
+  private static int incrementM(JunitUtil.floatArrayBuilder builder,int m)
+  {
+    switch(builder)
+    {
+      case Ascending:
+      case Descending:
+      case Saw:
+      case Repeated:
+      case Duplicated:
+      case OrganPipes:
+      case Stagger:
+      case Plateau:
+        return m*2;
+      default:
+        return m+1;
+    }
+  }
+  private static int getMLo(JunitUtil.doubleArrayBuilder builder)
+  {
+    switch(builder)
+    {
+      case AllEquals:
+        return 0;
+      case MergeAscending:
+      case MergeDescending:
+        return 65;
+      default:
+        return 1;
+    }
+  }
+  private static int getMHi(JunitUtil.doubleArrayBuilder builder,int arrLength)
+  {
+    switch(builder)
+    {
+      case Ascending:
+      case Descending:
+      case Saw:
+      case Repeated:
+      case Duplicated:
+      case OrganPipes:
+      case Stagger:
+      case Plateau:
+        return (2*arrLength)-1;
+      case AllEquals:
+        return 0;
+      case MergeAscending:
+      case MergeDescending:
+        return 69;
+      case SortedRepeated:
+      case SortedOrganPipes:
+        return Math.min(arrLength,7);
+      default:
+        return 1;
+    }
+  }
+  private static int getNumReps(JunitUtil.doubleArrayBuilder builder,int arrLength)
+  {
+    return 1;
+  }
+  private static int incrementM(JunitUtil.doubleArrayBuilder builder,int m)
+  {
+    switch(builder)
+    {
+      case Ascending:
+      case Descending:
+      case Saw:
+      case Repeated:
+      case Duplicated:
+      case OrganPipes:
+      case Stagger:
+      case Plateau:
+        return m*2;
+      default:
+        return m+1;
+    }
+  }
+  private static int getMLo(JunitUtil.StringArrayBuilder builder)
+  {
+    switch(builder)
+    {
+      case AllEquals:
+        return 0;
+      case MergeAscending:
+      case MergeDescending:
+        return 65;
+      default:
+        return 1;
+    }
+  }
+  private static int getMHi(JunitUtil.StringArrayBuilder builder,int arrLength)
+  {
+    switch(builder)
+    {
+      case Ascending:
+      case Descending:
+      case Saw:
+      case Repeated:
+      case Duplicated:
+      case OrganPipes:
+      case Stagger:
+      case Plateau:
+        return (2*arrLength)-1;
+      case AllEquals:
+        return 0;
+      case MergeAscending:
+      case MergeDescending:
+        return 69;
+      case SortedRepeated:
+      case SortedOrganPipes:
+        return Math.min(arrLength,7);
+      default:
+        return 1;
+    }
+  }
+  private static int getNumReps(JunitUtil.StringArrayBuilder builder,int arrLength)
+  {
+    return 1;
+  }
+  private static int incrementM(JunitUtil.StringArrayBuilder builder,int m)
+  {
+    switch(builder)
+    {
+      case Ascending:
+      case Descending:
+      case Saw:
+      case Repeated:
+      case Duplicated:
+      case OrganPipes:
+      case Stagger:
+      case Plateau:
+        return m*2;
+      default:
+        return m+1;
+    }
+  }
+/*
   private static enum floatBuilder
   {
     SIMPLE
@@ -5418,4 +5948,5 @@ public class SortUtilTest
     };
     abstract void build(double[] arr,int a,int g,int z,int n,int p,Random rand);
   }
+*/
 }

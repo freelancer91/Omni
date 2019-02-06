@@ -1,20 +1,588 @@
 #TYPEDEF OfGeneric
 package omni.util;
 import java.util.Random;
-import java.util.function.Supplier;
-import java.util.function.BooleanSupplier;
-import java.util.function.IntSupplier;
-import java.util.function.LongSupplier;
-import java.util.function.DoubleSupplier;
-import omni.function.ByteSupplier;
-import omni.function.CharSupplier;
-import omni.function.ShortSupplier;
-import omni.function.FloatSupplier;
-import java.util.Arrays;
 
 public interface JunitUtil
 {
-  
+
+  #MACRO ConvertMethods<boolean>()
+  #MACRO ConvertMethods<byte>()
+  #MACRO ConvertMethods<char>()
+  #MACRO ConvertMethods<short>()
+  #MACRO ConvertMethods<int>()
+  #MACRO ConvertMethods<long>()
+  #MACRO ConvertMethods<float>()
+  #MACRO ConvertMethods<double>()
+  #MACRO ConvertMethods<Boolean>()
+  #MACRO ConvertMethods<Byte>()
+  #MACRO ConvertMethods<Character>()
+  #MACRO ConvertMethods<Short>()
+  #MACRO ConvertMethods<Integer>()
+  #MACRO ConvertMethods<Long>()
+  #MACRO ConvertMethods<Float>()
+  #MACRO ConvertMethods<Double>()
+  #MACRO ConvertMethods<String>()
+#MACRODEF ConvertMethods<ARRTYPE>()
+#IFSWITCH ARRTYPE==Boolean,Byte,Character,Short,Integer,Long,Float,Double
+@SuppressWarnings("deprecation")
+#ENDIF
+public static ARRTYPE convertToARRTYPE(int val)
+{
+#IFSWITCH ARRTYPE==String
+  return Integer.toString(val);
+#ELSEIFSWITCH ARRTYPE==double,float,long,int,short,char,byte
+  return (ARRTYPE)val;
+#ELSEIFSWITCH ARRTYPE==boolean
+  return (val&0b1)!=0;
+#ELSEIFSWITCH ARRTYPE==Double,Float,Long,Integer
+  return new ARRTYPE(val);
+#ELSEIFSWITCH ARRTYPE==Short
+  return new ARRTYPE((short)val);
+#ELSEIFSWITCH ARRTYPE==Character
+  return new ARRTYPE((char)val);
+#ELSEIFSWITCH ARRTYPE==Byte
+  return new ARRTYPE((byte)val);
+#ELSEIFSWITCH ARRTYPE==Boolean
+  return new ARRTYPE((val&0b1)!=0);
+#ELSE
+  ERROR unknown type ARRTYPE
+#ENDIF
+}
+#ENDDEF
+
+  #MACRO GetRandom<boolean>()
+  #MACRO GetRandom<byte>()
+  #MACRO GetRandom<char>()
+  #MACRO GetRandom<short>()
+  #MACRO GetRandom<int>()
+  #MACRO GetRandom<long>()
+  #MACRO GetRandom<float>()
+  #MACRO GetRandom<double>()
+  #MACRO GetRandom<Boolean>()
+  #MACRO GetRandom<Byte>()
+  #MACRO GetRandom<Character>()
+  #MACRO GetRandom<Short>()
+  #MACRO GetRandom<Integer>()
+  #MACRO GetRandom<Long>()
+  #MACRO GetRandom<Float>()
+  #MACRO GetRandom<Double>()
+  #MACRO GetRandom<String>()
+#MACRODEF GetRandom<ARRTYPE>()
+#IFSWITCH ARRTYPE==Boolean,Byte,Character,Short,Integer,Long,Float,Double
+@SuppressWarnings("deprecation")
+#ENDIF
+public static ARRTYPE getRandomARRTYPE(Random rand)
+{
+#IFSWITCH ARRTYPE==String
+  return Long.toString(rand.nextLong());
+#ELSEIFSWITCH ARRTYPE==boolean
+  return rand.nextBoolean();
+#ELSEIFSWITCH ARRTYPE==byte,char,short,int,long
+  return (ARRTYPE)rand.nextLong();
+#ELSEIFSWITCH ARRTYPE==float
+  return rand.nextFloat();
+#ELSEIFSWITCH ARRTYPE==double
+  return rand.nextDouble();
+#ELSEIFSWITCH ARRTYPE==Byte
+  return new ARRTYPE((byte)rand.nextInt());
+#ELSEIFSWITCH ARRTYPE==Character
+  return new ARRTYPE((char)rand.nextInt());
+#ELSEIFSWITCH ARRTYPE==Short
+  return new ARRTYPE((short)rand.nextInt());
+#ELSEIFSWITCH ARRTYPE==Integer
+  return new ARRTYPE(rand.nextInt());
+#ELSEIFSWITCH ARRTYPE==Boolean,Long,Float,Double
+  return new ARRTYPE(rand.nextARRTYPE());
+#ELSE
+ERROR unknown array type ARRTYPE
+#ENDIF
+}
+#ENDDEF
+
+  #MACRO ArrayBuilder<boolean,Boolean>()
+  #MACRO ArrayBuilder<byte,Byte>()
+  #MACRO ArrayBuilder<char,Character>()
+  #MACRO ArrayBuilder<short,Short>()
+  #MACRO ArrayBuilder<int,Integer>()
+  #MACRO ArrayBuilder<long,Long>()
+  #MACRO ArrayBuilder<float,Float>()
+  #MACRO ArrayBuilder<double,Double>()
+  #MACRO ArrayBuilder<String,String>()
+ 
+#MACRODEF RandomizedBuild<THETYPE>()
+@Override
+void buildUnchecked(THETYPE[] arr,int offset,int length,Random rand,int...params)
+{
+  length+=offset;
+  do
+  {
+    arr[offset]=getRandomTHETYPE(rand);
+  }
+  while(++offset!=length);
+}
+#ENDDEF
+#MACRODEF AscendingBuild<THETYPE>()
+@Override
+void buildUnchecked(THETYPE[] arr,int offset,int length,Random rand,int...params)
+{
+#IFSWITCH ARRTYPE==boolean
+  int i=0;
+  for(int middle=length/2;i<middle;arr[(i++)+offset]=convertToTHETYPE(0)){}
+  do
+  {
+    arr[i+offset]=convertToTHETYPE(1);
+  }
+  while(++i!=length);
+#ELSE
+  if(params.length<1)
+  {
+    throw new IllegalArgumentException(this.toString()+" requires 1 parameter");
+  }
+  for(int i=0,m=params[0];i<length;arr[(i++)+offset]=convertToTHETYPE(m+i)){}
+#ENDIF
+}
+#ENDDEF
+#MACRODEF DescendingBuild<THETYPE>()
+@Override
+void buildUnchecked(THETYPE[] arr,int offset,int length,Random rand,int...params)
+{
+#IFSWITCH ARRTYPE==boolean
+  int i=0;
+  for(int middle=length/2;i<middle;arr[(i++)+offset]=convertToTHETYPE(1)){}
+  do
+  {
+    arr[i+offset]=convertToTHETYPE(0);
+  }
+  while(++i!=length);
+#ELSE
+  if(params.length<1)
+  {
+    throw new IllegalArgumentException(this.toString()+" requires 1 parameter");
+  }
+  for(int i=0,m=params[0];i<length;arr[(i++)+offset]=convertToTHETYPE(length-m-i)){}
+#ENDIF
+}
+#ENDDEF
+#MACRODEF AllEqualsBuild<THETYPE>()
+@Override
+void buildUnchecked(THETYPE[] arr,int offset,int length,Random rand,int...params)
+{
+  if(params.length<1)
+  {
+    throw new IllegalArgumentException(this.toString()+" requires 1 parameter");
+  }
+  THETYPE val=convertToTHETYPE(params[0]);
+  length+=offset;
+  do
+  {
+    arr[offset]=val;
+  }
+  while(++offset!=length);
+}
+#ENDDEF
+#MACRODEF MergeAscendingBuild<THETYPE>()
+@Override
+void buildUnchecked(THETYPE[] arr,int offset,int length,Random rand,int...params)
+{
+  if(params.length<1)
+  {
+    throw new IllegalArgumentException(this.toString()+" requires 1 parameter");
+  }
+  int v=0;
+  for(int m=params[0],i=0, k=0,period=length/m;k<m;++k)
+  {
+    v=0;
+    for(int p=0;p<period;arr[(i++)+offset]=convertToTHETYPE(++v),++p){}
+  }
+  for(int j=1;j<length-1;arr[j++]=convertToTHETYPE(++v)){}
+}
+#ENDDEF
+#MACRODEF MergeDescendingBuild<THETYPE>()
+@Override
+void buildUnchecked(THETYPE[] arr,int offset,int length,Random rand,int...params)
+{
+  if(params.length<1)
+  {
+    throw new IllegalArgumentException(this.toString()+" requires 1 parameter");
+  }
+  int v=0;
+  for(int m=params[0],i=0, k=0,period=length/m;k<m;++k)
+  {
+    v=0;
+    for(int p=0;p<period;arr[(i++)+offset]=convertToTHETYPE(--v),++p){}
+  }
+  for(int j=1;j<length-1;arr[j++]=convertToTHETYPE(--v)){}
+}
+#ENDDEF
+#MACRODEF SawBuild<THETYPE>()
+@Override
+void buildUnchecked(THETYPE[] arr,int offset,int length,Random rand,int...params)
+{
+  if(params.length<1)
+  {
+    throw new IllegalArgumentException(this.toString()+" requires 1 parameter");
+  }
+  for(int m=params[0],incCount=1,decCount=length,i=0,period=m--;;period+=m)
+  {
+    for(int k=0;++k<=period;arr[(i++)+offset]=convertToTHETYPE(incCount++))
+    {
+      if(i>=length)
+      {
+        return;
+      }
+    }
+    period+=m;
+    for(int k=0;++k<=period;arr[(i++)+offset]=convertToTHETYPE(decCount--))
+    {
+      if(i>=length)
+      {
+        return;
+      }
+    }
+  }
+}
+#ENDDEF
+#MACRODEF SortedRepeatedBuild<THETYPE>()
+@Override
+void buildUnchecked(THETYPE[] arr,int offset,int length,Random rand,int...params)
+{
+  if(params.length<1)
+  {
+    throw new IllegalArgumentException(this.toString()+" requires 1 parameter");
+  }
+  for(int period=length/params[0],i=0,k=0;;++k)
+  {
+    for(int t=0;++t<=period;arr[(i++)+offset]=convertToTHETYPE(k))
+    {
+      if(i>=length)
+      {
+        return;
+      }
+    }
+    if(i>=length)
+    {
+      return;
+    }
+  }
+}
+#ENDDEF
+#MACRODEF RepeatedBuild<THETYPE>()
+@Override
+void buildUnchecked(THETYPE[] arr,int offset,int length,Random rand,int...params)
+{
+  if(params.length<1)
+  {
+    throw new IllegalArgumentException(this.toString()+" requires 1 parameter");
+  }
+  int m=params[0];
+  int i=0;
+  do
+  {
+    arr[i+offset]=convertToTHETYPE(i%m);
+  }
+  while(++i!=length);
+}
+#ENDDEF
+#MACRODEF DuplicatedBuild<THETYPE>()
+@Override
+void buildUnchecked(THETYPE[] arr,int offset,int length,Random rand,int...params)
+{
+  if(params.length<1)
+  {
+    throw new IllegalArgumentException(this.toString()+" requires 1 parameter");
+  }
+  int m=params[0];
+  int i=0;
+  do
+  {
+    arr[i+offset]=convertToTHETYPE(rand.nextInt(m));
+  }
+  while(++i!=length);
+}
+#ENDDEF
+#MACRODEF SortedOrganPipesBuild<THETYPE>()
+@Override
+void buildUnchecked(THETYPE[] arr,int offset,int length,Random rand,int...params)
+{
+  if(params.length<1)
+  {
+    throw new IllegalArgumentException(this.toString()+" requires 1 parameter");
+  }
+  for(int m=params[0],i=0;;)
+  {
+    for(int t=0;++t<=m;arr[(i++)+offset]=convertToTHETYPE(m))
+    {
+      if(i>=length)
+      {
+        return;
+      }
+    }
+  }
+}
+#ENDDEF
+#MACRODEF OrganPipesBuild<THETYPE>()
+@Override
+void buildUnchecked(THETYPE[] arr,int offset,int length,Random rand,int...params)
+{
+  if(params.length<1)
+  {
+    throw new IllegalArgumentException(this.toString()+" requires 1 parameter");
+  }
+  int i=0;
+  for(int middle=length/(params[0]+1);i<middle;arr[i+offset]=convertToTHETYPE(i++)){}
+  while(i<length)
+  {
+    arr[i+offset]=convertToTHETYPE(length-(i++)-1);
+  }
+}
+#ENDDEF
+#MACRODEF StaggerBuild<THETYPE>()
+@Override
+void buildUnchecked(THETYPE[] arr,int offset,int length,Random rand,int...params)
+{
+  if(params.length<1)
+  {
+    throw new IllegalArgumentException(this.toString()+" requires 1 parameter");
+  }
+  int m=params[0];
+  int i=0;
+  do
+  {
+    arr[i+offset]=convertToTHETYPE((i*m+i)%length);
+  }
+  while(++i!=length);
+}
+#ENDDEF
+#MACRODEF PlateauBuild<THETYPE>()
+@Override
+void buildUnchecked(THETYPE[] arr,int offset,int length,Random rand,int...params)
+{
+  if(params.length<1)
+  {
+    throw new IllegalArgumentException(this.toString()+" requires 1 parameter");
+  }
+  int m=params[0];
+  int i=0;
+  do
+  {
+    arr[offset+i]=convertToTHETYPE(Math.min(i,m));
+  }
+  while(++i!=length);
+}
+#ENDDEF
+#MACRODEF ShuffleBuild<THETYPE>()
+@Override
+void buildUnchecked(THETYPE[] arr,int offset,int length,Random rand,int...params)
+{
+  int x=0,y=0;
+  int bound=offset+length;
+  do
+  {
+    arr[offset]=convertToTHETYPE(rand.nextBoolean()?(x+2):(y+2));
+  }
+  while(++offset!=bound);
+}
+#ENDDEF
+#MACRODEF WithNaNsAndZerosBuild<THETYPE>()
+#IFSWITCH THETYPE==Float,Double
+@SuppressWarnings("deprecation")
+#ENDIF
+@Override
+void buildUnchecked(THETYPE[] arr,int offset,int length,Random rand,int...params)
+{
+  if(params.length<5)
+  {
+    throw new IllegalArgumentException(this.toString()+" requires 5 parameters");
+  }
+  THETYPE negVal=-getRandomTHETYPE(rand);
+  THETYPE posVal=getRandomTHETYPE(rand);
+  for(int toIndex=offset+params[0];offset<toIndex;++offset)
+  {
+    arr[offset]=negVal;
+  }
+  for(int toIndex=offset+params[1];offset<toIndex;++offset)
+  {
+    #IFSWITCH THETYPE==Float
+    arr[offset]=new THETYPE(-0.0f);
+    #ELSEIFSWITCH THETYPE==Double
+    arr[offset]=new THETYPE(-0.0);
+    #ELSE
+    arr[offset]=(THETYPE)-0.0;
+    #ENDIF
+  }
+  for(int toIndex=offset+params[2];offset<toIndex;++offset)
+  {
+    #IFSWITCH THETYPE==Float
+    arr[offset]=new THETYPE(0.0f);
+    #ELSEIFSWITCH THETYPE==Double
+    arr[offset]=new THETYPE(0.0);
+    #ELSE
+    arr[offset]=(THETYPE)0.0;
+    #ENDIF
+  }
+  for(int toIndex=offset+params[3];offset<toIndex;++offset)
+  {
+    arr[offset]=posVal;
+  }
+  for(int toIndex=offset+params[4];offset<toIndex;++offset)
+  {
+    #IFSWITCH THETYPE==Float,Double
+    arr[offset]=new THETYPE(BOXEDTYPE.NaN);
+    #ELSE
+    arr[offset]=(THETYPE)BOXEDTYPE.NaN;
+    #ENDIF
+  }
+}
+#ENDDEF
+#MACRODEF ArrayBuilderValue<VALUENAME,RANDOMIZED,NUMPARAMS>()
+VALUENAME
+{
+#IFNOTSWITCH NUMPARAMS==1
+  @Override
+  public int numRequiredParams()
+  {
+    return NUMPARAMS;
+  }
+#ENDIF
+#IFSWITCH RANDOMIZED==true
+  @Override
+  public boolean isRandomized()
+  {
+    return true;
+  }
+#ENDIF
+  #MACRO VALUENAMEBuild<ARRTYPE>()
+#IFSWITCH ARRTYPE==boolean,byte,char,short,int,long,float,double
+  #MACRO VALUENAMEBuild<BOXEDTYPE>()
+#ENDIF
+}
+#ENDDEF
+
+#MACRODEF ArrayBuilder<ARRTYPE,BOXEDTYPE>()
+public static enum ARRTYPEArrayBuilder
+{
+  #MACRO ArrayBuilderValue<Randomized,true,0>()
+  ,
+  #IFSWITCH ARRTYPE==boolean
+  #MACRO ArrayBuilderValue<Ascending,false,0>()
+  #ELSE
+  #MACRO ArrayBuilderValue<Ascending,false,1>()
+  #ENDIF
+  ,
+  #IFSWITCH ARRTYPE==boolean
+  #MACRO ArrayBuilderValue<Descending,false,0>()
+  #ELSE
+  #MACRO ArrayBuilderValue<Descending,false,1>()
+  #ENDIF
+  ,
+  #MACRO ArrayBuilderValue<AllEquals,false,1>()
+#IFNOTSWITCH ARRTYPE==boolean
+  ,
+  #MACRO ArrayBuilderValue<MergeAscending,false,1>()
+  ,
+  #MACRO ArrayBuilderValue<MergeDescending,false,1>()
+  ,
+  #MACRO ArrayBuilderValue<Saw,false,1>()
+  ,
+  #MACRO ArrayBuilderValue<SortedRepeated,false,1>()
+  ,
+  #MACRO ArrayBuilderValue<Repeated,false,1>()
+  ,
+  #MACRO ArrayBuilderValue<Duplicated,true,1>()
+  ,
+  #MACRO ArrayBuilderValue<SortedOrganPipes,false,1>()
+  ,
+  #MACRO ArrayBuilderValue<OrganPipes,false,1>()
+  ,
+  #MACRO ArrayBuilderValue<Stagger,false,1>()
+  ,
+  #MACRO ArrayBuilderValue<Plateau,false,1>()
+  ,
+  #MACRO ArrayBuilderValue<Shuffle,true,0>()
+  #IFSWITCH ARRTYPE==float,double
+  ,
+  #MACRO ArrayBuilderValue<WithNaNsAndZeros,true,5>()
+  #ENDIF
+#ENDIF
+  ;
+  public int numRequiredParams()
+  {
+    //most sub-types require 1, so make that the default
+    return 1;
+  }
+  public boolean isRandomized()
+  {
+    //most sub-types are not randomized, so make that the default
+    return false;
+  }
+  abstract void buildUnchecked(ARRTYPE[] arr,int offset,int length,Random rand,int...params);
+  public void build(ARRTYPE[] arr,Random rand,int...params)
+  {
+    if(arr==null)
+    {
+      throw new NullPointerException("arr cannot be null");
+    }
+    int length;
+    if((length=arr.length)!=0)
+    {
+      buildUnchecked(arr,0,length,rand,params);
+    }
+  }  
+  public void build(ARRTYPE[] arr,int offset,int length,Random rand,int...params)
+  {
+    if(arr==null)
+    {
+      throw new NullPointerException("arr cannot be null");
+    }
+    if(offset<0 || length<0 || offset+length>arr.length)
+    {
+      throw new ArrayIndexOutOfBoundsException("offset = "+offset+"; length="+length+"; arr.length="+arr.length);
+    }
+    if(length!=0)
+    {
+      buildUnchecked(arr,offset,length,rand,params);
+    }
+  }
+#IFSWITCH ARRTYPE==boolean,byte,char,short,int,long,float,double
+  abstract void buildUnchecked(BOXEDTYPE[] arr,int offset,int length,Random rand,int...params);
+  public void build(BOXEDTYPE[] arr,Random rand,int...params)
+  {
+    if(arr==null)
+    {
+      throw new NullPointerException("arr cannot be null");
+    }
+    int length;
+    if((length=arr.length)!=0)
+    {
+      buildUnchecked(arr,0,length,rand,params);
+    }
+  }  
+  public void build(BOXEDTYPE[] arr,int offset,int length,Random rand,int...params)
+  {
+    if(arr==null)
+    {
+      throw new NullPointerException("arr cannot be null");
+    }
+    if(offset<0 || length<0 || offset+length>arr.length)
+    {
+      throw new ArrayIndexOutOfBoundsException("offset = "+offset+"; length="+length+"; arr.length="+arr.length);
+    }
+    if(length!=0)
+    {
+      buildUnchecked(arr,offset,length,rand,params);
+    }
+  }
+#ENDIF
+  @Override
+  public String toString()
+  {
+    return "ARRTYPEArrayBuilder."+this.name();
+  }
+}
+#ENDDEF
+
+
+  /*
   #MACRO GetArray<Ascending,boolean>(BooleanSupplier,getAsBoolean,Boolean)
   #MACRO GetArray<Ascending,byte>(ByteSupplier,getAsByte,Byte)
   #MACRO GetArray<Ascending,char>(CharSupplier,getAsChar,Char)
@@ -66,6 +634,10 @@ public interface JunitUtil
   #MACRO GetArray<Unsorted,Long>(LongSupplier,getAsLong,Ref)
   #MACRO GetArray<Unsorted,Float>(FloatSupplier,getAsFloat,Ref)
   #MACRO GetArray<Unsorted,Double>(DoubleSupplier,getAsDouble,Ref)
+  */
+  
+  
+  
   
   
 #MACRODEF GetArray<SORTTYPE,ARRTYPE>(SUPPLIERTYPE,SUPPLIERMETHOD,CLASSPREFIX)

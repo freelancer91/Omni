@@ -2,8 +2,7 @@ package omni.util;
 import java.util.function.DoublePredicate;
 import java.util.function.IntPredicate;
 import java.util.function.LongPredicate;
-//TODO uncomment when the module bug is fixed
-//import java.util.function.Predicate;
+import java.util.function.Predicate;
 import java.util.Objects;
 import java.util.Random;
 import org.junit.Assert;
@@ -186,15 +185,14 @@ public class OmniArrayTest
       Assert.assertTrue(OmniArray.OfFloat.DEFAULT_ARR.length==0);
       Assert.assertTrue(OmniArray.OfDouble.DEFAULT_ARR.length==0);
       Assert.assertTrue(OmniArray.OfRef.DEFAULT_ARR.length==0);
-      //TODO uncomment when the module bug is fixed
-      //Assert.assertTrue(OmniArray.OfBoolean.DEFAULT_BOXED_ARR.length==0);
-      //Assert.assertTrue(OmniArray.OfByte.DEFAULT_BOXED_ARR.length==0);
-      //Assert.assertTrue(OmniArray.OfChar.DEFAULT_BOXED_ARR.length==0);
-      //Assert.assertTrue(OmniArray.OfShort.DEFAULT_BOXED_ARR.length==0);
-      //Assert.assertTrue(OmniArray.OfInt.DEFAULT_BOXED_ARR.length==0);
-      //Assert.assertTrue(OmniArray.OfLong.DEFAULT_BOXED_ARR.length==0);
-      //Assert.assertTrue(OmniArray.OfFloat.DEFAULT_BOXED_ARR.length==0);
-      //Assert.assertTrue(OmniArray.OfDouble.DEFAULT_BOXED_ARR.length==0);
+      Assert.assertTrue(OmniArray.OfBoolean.DEFAULT_BOXED_ARR.length==0);
+      Assert.assertTrue(OmniArray.OfByte.DEFAULT_BOXED_ARR.length==0);
+      Assert.assertTrue(OmniArray.OfChar.DEFAULT_BOXED_ARR.length==0);
+      Assert.assertTrue(OmniArray.OfShort.DEFAULT_BOXED_ARR.length==0);
+      Assert.assertTrue(OmniArray.OfInt.DEFAULT_BOXED_ARR.length==0);
+      Assert.assertTrue(OmniArray.OfLong.DEFAULT_BOXED_ARR.length==0);
+      Assert.assertTrue(OmniArray.OfFloat.DEFAULT_BOXED_ARR.length==0);
+      Assert.assertTrue(OmniArray.OfDouble.DEFAULT_BOXED_ARR.length==0);
   }
   @Test
   public void testGetIndexPredicateChar()
@@ -304,8 +302,6 @@ public class OmniArrayTest
       return true;
     }
   }
-  /*
-  //TODO uncomment when the module bug is fixed
   @SuppressWarnings("deprecation")
   @Test
   public void testGetIndexPredicateRef()
@@ -325,12 +321,12 @@ public class OmniArrayTest
       return true;
     }
   }
-  */
   @Test
   public void testReverseRangeboolean()
   {
     Random rand=new Random(0);
-    boolean[] arr=JunitUtil.getUnsortedbooleanArray(rand,100);
+    boolean[] arr;
+    JunitUtil.booleanArrayBuilder.Randomized.build(arr=new boolean[100],rand);
     boolean[] copy=new boolean[arr.length];
     ArrCopy.uncheckedCopy(arr,0,copy,0,arr.length);
     OmniArray.OfBoolean.reverseRange(arr,0,arr.length-1);
@@ -343,7 +339,8 @@ public class OmniArrayTest
   public void testReverseRangebyte()
   {
     Random rand=new Random(0);
-    byte[] arr=JunitUtil.getUnsortedbyteArray(rand,100);
+    byte[] arr;
+    JunitUtil.byteArrayBuilder.Randomized.build(arr=new byte[100],rand);
     byte[] copy=new byte[arr.length];
     ArrCopy.uncheckedCopy(arr,0,copy,0,arr.length);
     OmniArray.OfByte.reverseRange(arr,0,arr.length-1);
@@ -356,7 +353,8 @@ public class OmniArrayTest
   public void testReverseRangechar()
   {
     Random rand=new Random(0);
-    char[] arr=JunitUtil.getUnsortedcharArray(rand,100);
+    char[] arr;
+    JunitUtil.charArrayBuilder.Randomized.build(arr=new char[100],rand);
     char[] copy=new char[arr.length];
     ArrCopy.uncheckedCopy(arr,0,copy,0,arr.length);
     OmniArray.OfChar.reverseRange(arr,0,arr.length-1);
@@ -369,7 +367,8 @@ public class OmniArrayTest
   public void testReverseRangeshort()
   {
     Random rand=new Random(0);
-    short[] arr=JunitUtil.getUnsortedshortArray(rand,100);
+    short[] arr;
+    JunitUtil.shortArrayBuilder.Randomized.build(arr=new short[100],rand);
     short[] copy=new short[arr.length];
     ArrCopy.uncheckedCopy(arr,0,copy,0,arr.length);
     OmniArray.OfShort.reverseRange(arr,0,arr.length-1);
@@ -382,7 +381,8 @@ public class OmniArrayTest
   public void testReverseRangeint()
   {
     Random rand=new Random(0);
-    int[] arr=JunitUtil.getUnsortedintArray(rand,100);
+    int[] arr;
+    JunitUtil.intArrayBuilder.Randomized.build(arr=new int[100],rand);
     int[] copy=new int[arr.length];
     ArrCopy.uncheckedCopy(arr,0,copy,0,arr.length);
     OmniArray.OfInt.reverseRange(arr,0,arr.length-1);
@@ -395,7 +395,8 @@ public class OmniArrayTest
   public void testReverseRangelong()
   {
     Random rand=new Random(0);
-    long[] arr=JunitUtil.getUnsortedlongArray(rand,100);
+    long[] arr;
+    JunitUtil.longArrayBuilder.Randomized.build(arr=new long[100],rand);
     long[] copy=new long[arr.length];
     ArrCopy.uncheckedCopy(arr,0,copy,0,arr.length);
     OmniArray.OfLong.reverseRange(arr,0,arr.length-1);
@@ -408,7 +409,8 @@ public class OmniArrayTest
   public void testReverseRangefloat()
   {
     Random rand=new Random(0);
-    float[] arr=JunitUtil.getUnsortedfloatArray(rand,100);
+    float[] arr;
+    JunitUtil.floatArrayBuilder.Randomized.build(arr=new float[100],rand);
     float[] copy=new float[arr.length];
     ArrCopy.uncheckedCopy(arr,0,copy,0,arr.length);
     OmniArray.OfFloat.reverseRange(arr,0,arr.length-1);
@@ -421,7 +423,8 @@ public class OmniArrayTest
   public void testReverseRangedouble()
   {
     Random rand=new Random(0);
-    double[] arr=JunitUtil.getUnsorteddoubleArray(rand,100);
+    double[] arr;
+    JunitUtil.doubleArrayBuilder.Randomized.build(arr=new double[100],rand);
     double[] copy=new double[arr.length];
     ArrCopy.uncheckedCopy(arr,0,copy,0,arr.length);
     OmniArray.OfDouble.reverseRange(arr,0,arr.length-1);
@@ -434,7 +437,8 @@ public class OmniArrayTest
   public void testReverseRangeString()
   {
     Random rand=new Random(0);
-    String[] arr=JunitUtil.getUnsortedStringArray(rand,100);
+    String[] arr;
+    JunitUtil.StringArrayBuilder.Randomized.build(arr=new String[100],rand);
     String[] copy=new String[arr.length];
     ArrCopy.uncheckedCopy(arr,0,copy,0,arr.length);
     OmniArray.OfRef.reverseRange(arr,0,arr.length-1);

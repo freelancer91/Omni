@@ -7,8 +7,7 @@ import java.util.Random;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.stream.IntStream;
-//TODO uncomment when the module bug is fixed
-//import java.util.Comparator;
+import java.util.Comparator;
 import java.util.function.IntBinaryOperator;
 import omni.function.BooleanComparator;
 import omni.function.ByteComparator;
@@ -42,7 +41,6 @@ private static final long[] randSeeds=new long[]{666};
 
 #ENDDEF
 
-  /*//TODO uncomment when they fix the module bug in eclipse
   #MACRO GetComparator<Ascending,String>(String,Comparator<String>)
   #MACRO GetComparator<Ascending,boolean>(Boolean,BooleanComparator)
   #MACRO GetComparator<Ascending,byte>(Byte,ByteComparator)
@@ -70,7 +68,6 @@ private static final long[] randSeeds=new long[]{666};
   #MACRO GetComparator<Descending,long>(Long,LongComparator)
   #MACRO GetComparator<Descending,float>(Float,FloatComparator)
   #MACRO GetComparator<Descending,double>(Double,DoubleComparator)
-  */
 #MACRODEF GetComparator<SORTTYPE,ARRTYPE>(BOXEDTYPE,COMPARATORTYPE)
 private static COMPARATORTYPE getSORTTYPEARRTYPEComparator()
 {
@@ -98,9 +95,7 @@ private static COMPARATORTYPE getSORTTYPEARRTYPEComparator()
   #MACRO IsSortedMethods<true>()
 
 #MACRODEF IsSortedMethods<PARALLEL>()
-  /*//TODO uncomment when they fix the module bug in eclipse
   #MACRO IsSorted<String,sort>(String,Ref)
-  */
   #MACRO IsSorted<boolean,sort>(Boolean,Boolean)
   #MACRO IsSorted<byte,sort>(Byte,Byte)
   #MACRO IsSorted<char,sort>(Character,Char)
@@ -109,9 +104,7 @@ private static COMPARATORTYPE getSORTTYPEARRTYPEComparator()
   #MACRO IsSorted<long,sort>(Long,Long)
   #MACRO IsSorted<float,sort>(Float,Float)
   #MACRO IsSorted<double,sort>(Double,Double)
-  /*//TODO uncomment when they fix the module bug in eclipse
   #MACRO IsSorted<String,reverseSort>(String,Ref)
-  */
   #MACRO IsSorted<boolean,reverseSort>(Boolean,Boolean)
   #MACRO IsSorted<byte,reverseSort>(Byte,Byte)
   #MACRO IsSorted<char,reverseSort>(Character,Char)
@@ -160,7 +153,6 @@ private static void isSortedSORTTYPE(ARRTYPE[] arr,ARRTYPE[] copy) throws Interr
   });
 }
 #ENDDEF
-  /*//TODO uncomment when they fix the module bug in eclipse
   #MACRO IsSorted<String>(Comparator<? super String>,compare,String)
   #MACRO IsSorted<boolean>(BooleanComparator,compare,Boolean)
   #MACRO IsSorted<byte>(ByteComparator,compare,Byte)
@@ -170,7 +162,6 @@ private static void isSortedSORTTYPE(ARRTYPE[] arr,ARRTYPE[] copy) throws Interr
   #MACRO IsSorted<long>(LongComparator,compare,Long)
   #MACRO IsSorted<float>(FloatComparator,compare,Float)
   #MACRO IsSorted<double>(DoubleComparator,compare,Double)
-  */
 #MACRODEF IsSorted<ARRTYPE>(COMPARATORTYPE,COMPARATORMETHOD,BOXEDTYPE)
 private static void isSorted(ARRTYPE[] arr,ARRTYPE[] copy,COMPARATORTYPE sorter) throws InterruptedException
 {
@@ -200,7 +191,7 @@ private static void isSorted(ARRTYPE[] arr,ARRTYPE[] copy,COMPARATORTYPE sorter)
   });
 }
 #ENDDEF
-
+/*
   #MACRO GetRandom<boolean>()
   #MACRO GetRandom<byte>()
   #MACRO GetRandom<char>()
@@ -209,9 +200,8 @@ private static void isSorted(ARRTYPE[] arr,ARRTYPE[] copy,COMPARATORTYPE sorter)
   #MACRO GetRandom<long>()
   #MACRO GetRandom<float>()
   #MACRO GetRandom<double>()
-  /*//TODO uncomment when the eclipse module bug is fixed
   #MACRO GetRandom<String>()
-  */
+
 #MACRODEF GetRandom<ARRTYPE>()
 private static ARRTYPE getRandARRTYPE(Random rand)
 {
@@ -239,9 +229,7 @@ ERROR unknown array type ARRTYPE
   #MACRO ConvertMethods<long>()
   #MACRO ConvertMethods<float>()
   #MACRO ConvertMethods<double>()
-  /*//TODO uncomment when the eclipse module bug is fixed
   #MACRO ConvertMethods<String>()
-  */
 #MACRODEF ConvertMethods<ARRTYPE>()
 private static ARRTYPE convertToARRTYPE(int val)
 {
@@ -265,10 +253,8 @@ private static ARRTYPE convertToARRTYPE(int val)
   #MACRO ArrayBuilders<long>()
   #MACRO ArrayBuilders<float>()
   #MACRO ArrayBuilders<double>()
-  /*//TODO uncomment when the eclipse module bug is fixed
   #MACRO ArrayBuilders<String>()
   */
-  
   #MACRO GetMaxReps<boolean>()
   #MACRO GetMaxReps<byte>()
   #MACRO GetMaxReps<char>()
@@ -847,6 +833,93 @@ private static enum ArrayBuilderARRTYPE
   #MACRO BasicSortTest<double,reverseSort>()
 
 
+  #MACRO BuilderMethods<boolean>()
+  #MACRO BuilderMethods<byte>()
+  #MACRO BuilderMethods<char>()
+  #MACRO BuilderMethods<short>()
+  #MACRO BuilderMethods<int>()
+  #MACRO BuilderMethods<long>()
+  #MACRO BuilderMethods<float>()
+  #MACRO BuilderMethods<double>()
+  #MACRO BuilderMethods<String>()
+#MACRODEF BuilderMethods<ARRTYPE>()
+private static int getMLo(JunitUtil.ARRTYPEArrayBuilder builder)
+{
+  switch(builder)
+  {
+    case AllEquals:
+      return 0;
+#IFNOTSWITCH ARRTYPE==boolean
+    case MergeAscending:
+    case MergeDescending:
+      return 65;
+#ENDIF
+    default:
+      return 1;
+  }
+}
+private static int getMHi(JunitUtil.ARRTYPEArrayBuilder builder,int arrLength)
+{
+  switch(builder)
+  {
+#IFNOTSWITCH ARRTYPE==boolean
+    case Ascending:
+    case Descending:
+    case Saw:
+    case Repeated:
+    case Duplicated:
+    case OrganPipes:
+    case Stagger:
+    case Plateau:
+      return (2*arrLength)-1;
+    case AllEquals:
+      return 0;
+    case MergeAscending:
+    case MergeDescending:
+      return 69;
+    case SortedRepeated:
+    case SortedOrganPipes:
+      return Math.min(arrLength,7);
+#ENDIF
+    default:
+      return 1;
+  }
+}
+private static int getNumReps(JunitUtil.ARRTYPEArrayBuilder builder,int arrLength)
+{
+#IFSWITCH ARRTYPE==char,short
+  if(builder.isRandomized())
+  {
+    if(arrLength>3201 || arrLength<47)
+      {
+        return 1;
+      }
+      return 7;
+  }
+#ENDIF
+  return 1;
+}
+private static int incrementM(JunitUtil.ARRTYPEArrayBuilder builder,int m)
+{
+  switch(builder)
+  {
+#IFNOTSWITCH ARRTYPE==boolean
+    case Ascending:
+    case Descending:
+    case Saw:
+    case Repeated:
+    case Duplicated:
+    case OrganPipes:
+    case Stagger:
+    case Plateau:
+      return m*2;
+#ENDIF
+    default:
+      return m+1;
+  }
+}
+#ENDDEF
+
 
 #MACRODEF BasicSortTest<ARRTYPE,SORTTYPE>()
 private static void testuncheckedSORTTYPEARRTYPEHelper(long randSeed,int arrLength) throws InterruptedException
@@ -854,50 +927,48 @@ private static void testuncheckedSORTTYPEARRTYPEHelper(long randSeed,int arrLeng
  
   ARRTYPE[] golden=new ARRTYPE[arrLength];
   ARRTYPE[] test=new ARRTYPE[arrLength];
-#IFSWITCH ARRTYPE==float,double
   {
     Random rand=new Random(randSeed);
-    for(ARRTYPEBuilder builder:ARRTYPEBuilder.values())
+    for(JunitUtil.ARRTYPEArrayBuilder builder:JunitUtil.ARRTYPEArrayBuilder.values())
     {
-      for(int a=0;a<10;++a)
+#IFSWITCH ARRTYPE==float,double
+      if(builder==JunitUtil.ARRTYPEArrayBuilder.WithNaNsAndZeros)
       {
-        for(int g=0;g<=10;++g)
+        for(int a=0;a<10;++a)
         {
-          for(int z=0;z<=10;++z)
+          for(int g=0;g<=10;++g)
           {
-            for(int n=0;n<=10;++n)
+            for(int z=0;z<=10;++z)
             {
-              for(int p=0;p<=10;++p)
+              for(int n=0;n<=10;++n)
               {
-                if(a+g+z+n+p==arrLength)
+                for(int p=0;p<=10;++p)
                 {
-                  System.out.println("sortType = SORTTYPE; arrType = ARRTYPE; randSeed= "+randSeed+"; length= "+arrLength+"; builder type "+builder.name()+"; a ="+a+"; g="+g+"; z="+z+"; n="+n+"; p="+p);
-                  builder.build(golden,a,g,z,n,p,rand);
-                  ArrCopy.uncheckedCopy(golden,0,test,0,arrLength);
-                  isSortedSORTTYPE(test,golden);
+                  if(a+g+z+n+p==arrLength)
+                  {
+                    System.out.println("sortType = SORTTYPE; arrType = ARRTYPE; randSeed= "+randSeed+"; length= "+arrLength+"; builder type "+builder.name()+"; a ="+a+"; g="+g+"; z="+z+"; n="+n+"; p="+p);
+                    builder.build(golden,rand,a,g,z,n,p);
+                    ArrCopy.uncheckedCopy(golden,0,test,0,arrLength);
+                    isSortedSORTTYPE(test,golden);
+                  }
                 }
               }
             }
           }
         }
       }
-    }
-  }
+      else
 #ENDIF
-  {
-    Random rand=new Random(randSeed);
-    for(ArrayBuilderARRTYPE builder:ArrayBuilderARRTYPE.values())
-    {
-      
-      for(int m=builder.getMLo(),mHi=builder.getMHi(arrLength);m<=mHi;m=builder.incrementM(m))
       {
-        System.out.println("sortType = SORTTYPE; arrType = ARRTYPE; randSeed= "+randSeed+"; length= "+arrLength+"; builder type "+builder.name()+"; m = "+m);
-      
-        for(int i=0,numReps=builder.getNumRepetitions(arrLength);i<numReps;++i)
+        for(int m=getMLo(builder),mHi=getMHi(builder,arrLength),numReps=getNumReps(builder,arrLength);m<=mHi;m=incrementM(builder,m))
         {
-          builder.build(golden,m,rand);
-          ArrCopy.uncheckedCopy(golden,0,test,0,arrLength);
-          isSortedSORTTYPE(test,golden);
+          System.out.println("sortType = SORTTYPE; arrType = ARRTYPE; randSeed= "+randSeed+"; length= "+arrLength+"; builder type "+builder+"; m = "+m);
+          for(int i=0;i<numReps;++i)
+          {
+            builder.build(golden,rand,m);
+            ArrCopy.uncheckedCopy(golden,0,test,0,arrLength);
+            isSortedSORTTYPE(test,golden);
+          }
         }
       }
     }
@@ -924,7 +995,7 @@ public void testuncheckedSORTTYPEARRTYPE() throws InterruptedException
 #ENDIF
 }
 #ENDDEF
-
+/*
   #MACRO FloatBuilder<float>(0.0f,-0.0f,Float.NaN)
   #MACRO FloatBuilder<double>(0.0d,-0.0d,Double.NaN)
 #MACRODEF FloatBuilder<ARRTYPE>(POSZERO,NEGZERO,NAN)
@@ -962,6 +1033,7 @@ private static enum ARRTYPEBuilder
   abstract void build(ARRTYPE[] arr,int a,int g,int z,int n,int p,Random rand);
 }
 #ENDDEF
+*/
 }
 
 
