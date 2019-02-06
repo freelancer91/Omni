@@ -1,13 +1,10 @@
 #TYPEDEF OfGeneric
 package omni.util;
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.BeforeClass;
+import org.junit.jupiter.api.Test;
 import java.util.Random;
 import java.util.Arrays;
-import java.util.Objects;
-import java.util.stream.IntStream;
 import java.util.Comparator;
+import java.util.stream.LongStream;
 import java.util.function.IntBinaryOperator;
 import omni.function.BooleanComparator;
 import omni.function.ByteComparator;
@@ -16,15 +13,6 @@ import omni.function.ShortComparator;
 import omni.function.LongComparator;
 import omni.function.FloatComparator;
 import omni.function.DoubleComparator;
-import java.util.function.Supplier;
-import java.util.function.BooleanSupplier;
-import java.util.function.IntSupplier;
-import java.util.function.LongSupplier;
-import java.util.function.DoubleSupplier;
-import omni.function.ByteSupplier;
-import omni.function.CharSupplier;
-import omni.function.ShortSupplier;
-import omni.function.FloatSupplier;
 public class SortUtilTest
 {
   
@@ -92,42 +80,51 @@ private static COMPARATORTYPE getSORTTYPEARRTYPEComparator()
 }
 #ENDDEF
 
-  #MACRO IsSortedMethods<true>()
+  #MACRO IsSortedMethods<false>()
 
 #MACRODEF IsSortedMethods<PARALLEL>()
-  #MACRO IsSorted<String,sort>(String,Ref)
-  #MACRO IsSorted<boolean,sort>(Boolean,Boolean)
-  #MACRO IsSorted<byte,sort>(Byte,Byte)
-  #MACRO IsSorted<char,sort>(Character,Char)
-  #MACRO IsSorted<short,sort>(Short,Short)
-  #MACRO IsSorted<int,sort>(Integer,Int)
-  #MACRO IsSorted<long,sort>(Long,Long)
-  #MACRO IsSorted<float,sort>(Float,Float)
-  #MACRO IsSorted<double,sort>(Double,Double)
-  #MACRO IsSorted<String,reverseSort>(String,Ref)
-  #MACRO IsSorted<boolean,reverseSort>(Boolean,Boolean)
-  #MACRO IsSorted<byte,reverseSort>(Byte,Byte)
-  #MACRO IsSorted<char,reverseSort>(Character,Char)
-  #MACRO IsSorted<short,reverseSort>(Short,Short)
-  #MACRO IsSorted<int,reverseSort>(Integer,Int)
-  #MACRO IsSorted<long,reverseSort>(Long,Long)
-  #MACRO IsSorted<float,reverseSort>(Float,Float)
-  #MACRO IsSorted<double,reverseSort>(Double,Double)
+#MACRO IsSorted<String,sort>(String,Ref)
+#MACRO IsSorted<boolean,sort>(Boolean,Boolean)
+#MACRO IsSorted<byte,sort>(Byte,Byte)
+#MACRO IsSorted<char,sort>(Character,Char)
+#MACRO IsSorted<short,sort>(Short,Short)
+#MACRO IsSorted<int,sort>(Integer,Int)
+#MACRO IsSorted<long,sort>(Long,Long)
+#MACRO IsSorted<float,sort>(Float,Float)
+#MACRO IsSorted<double,sort>(Double,Double)
+#MACRO IsSorted<String,reverseSort>(String,Ref)
+#MACRO IsSorted<boolean,reverseSort>(Boolean,Boolean)
+#MACRO IsSorted<byte,reverseSort>(Byte,Byte)
+#MACRO IsSorted<char,reverseSort>(Character,Char)
+#MACRO IsSorted<short,reverseSort>(Short,Short)
+#MACRO IsSorted<int,reverseSort>(Integer,Int)
+#MACRO IsSorted<long,reverseSort>(Long,Long)
+#MACRO IsSorted<float,reverseSort>(Float,Float)
+#MACRO IsSorted<double,reverseSort>(Double,Double)
+#MACRO IsSorted<String>(Comparator<? super String>,compare,String)
+#MACRO IsSorted<boolean>(BooleanComparator,compare,Boolean)
+#MACRO IsSorted<byte>(ByteComparator,compare,Byte)
+#MACRO IsSorted<char>(CharComparator,compare,Character)
+#MACRO IsSorted<short>(ShortComparator,compare,Short)
+#MACRO IsSorted<int>(IntBinaryOperator,applyAsInt,Integer)
+#MACRO IsSorted<long>(LongComparator,compare,Long)
+#MACRO IsSorted<float>(FloatComparator,compare,Float)
+#MACRO IsSorted<double>(DoubleComparator,compare,Double)
 #ENDDEF
 
 
 #MACRODEF IsSorted<ARRTYPE,SORTTYPE>(BOXEDTYPE,CLASSPREFIX)
-private static void isSortedSORTTYPE(ARRTYPE[] arr,ARRTYPE[] copy) throws InterruptedException
+private static void isSortedSORTTYPE(ARRTYPE[] arr,ARRTYPE[] copy)
 {
   Thread stockSorterThread=new Thread(()->
   {
 #IFSWITCH ARRTYPE==boolean
   BOXEDTYPE[] boxedCopy=new BOXEDTYPE[copy.length];
   ArrCopy.uncheckedCopy(copy,0,boxedCopy,0,copy.length);
-  Arrays.parallelSort(boxedCopy,0,copy.length);
+  Arrays.sort(boxedCopy,0,copy.length);
   ArrCopy.uncheckedCopy(boxedCopy,0,copy,0,copy.length);
 #ELSE
-  Arrays.parallelSort(copy,0,copy.length);
+  Arrays.sort(copy,0,copy.length);
 #ENDIF
 #IFSWITCH SORTTYPE==reverseSort
   OmniArray.OfCLASSPREFIX.reverseRange(copy,0,copy.length-1);
@@ -135,35 +132,24 @@ private static void isSortedSORTTYPE(ARRTYPE[] arr,ARRTYPE[] copy) throws Interr
   });
   stockSorterThread.start();
   SortUtil.uncheckedSORTTYPE(arr,0,arr.length-1);
-  stockSorterThread.join();
-  IntStream.range(0,copy.length)
-  
-#IFSWITCH PARALLEL==true
-  .parallel()
-#ENDIF
-  .forEach(index->
+  try
   {
-#IFSWITCH ARRTYPE==boolean,byte,char,short,int long
-    Assert.assertTrue(arr[index]==copy[index]);
-#ELSEIFSWITCH ARRTYPE==float,double
-    Assert.assertTrue(TypeUtil.ARRTYPEEquals(arr[index],copy[index]));
-#ELSE
-    Assert.assertTrue(Objects.equals(arr[index],copy[index]));
-#ENDIF
-  });
+    stockSorterThread.join();
+  }
+  catch(InterruptedException e)
+  {
+    throw new AssertionError(e);
+  }
+  #IFSWITCH PARALLEL==true
+  JunitUtil.uncheckedparallelassertarraysAreEqual(arr,0,copy,0,copy.length);
+  #ELSE
+  JunitUtil.uncheckedassertarraysAreEqual(arr,0,copy,0,copy.length);
+  #ENDIF
 }
 #ENDDEF
-  #MACRO IsSorted<String>(Comparator<? super String>,compare,String)
-  #MACRO IsSorted<boolean>(BooleanComparator,compare,Boolean)
-  #MACRO IsSorted<byte>(ByteComparator,compare,Byte)
-  #MACRO IsSorted<char>(CharComparator,compare,Character)
-  #MACRO IsSorted<short>(ShortComparator,compare,Short)
-  #MACRO IsSorted<int>(IntBinaryOperator,applyAsInt,Integer)
-  #MACRO IsSorted<long>(LongComparator,compare,Long)
-  #MACRO IsSorted<float>(FloatComparator,compare,Float)
-  #MACRO IsSorted<double>(DoubleComparator,compare,Double)
+ 
 #MACRODEF IsSorted<ARRTYPE>(COMPARATORTYPE,COMPARATORMETHOD,BOXEDTYPE)
-private static void isSorted(ARRTYPE[] arr,ARRTYPE[] copy,COMPARATORTYPE sorter) throws InterruptedException
+private static void isSorted(ARRTYPE[] arr,ARRTYPE[] copy,COMPARATORTYPE sorter)
 {
   Thread stockSorterThread=new Thread(()->
   {
@@ -178,660 +164,21 @@ private static void isSorted(ARRTYPE[] arr,ARRTYPE[] copy,COMPARATORTYPE sorter)
   });
   stockSorterThread.start();
   SortUtil.uncheckedcomparatorSort(arr,0,arr.length-1,sorter);
-  stockSorterThread.join();
-  IntStream.range(0,copy.length).parallel().forEach(index->
+  try
   {
-#IFSWITCH ARRTYPE==boolean,byte,char,short,int long
-    Assert.assertTrue(arr[index]==copy[index]);
-#ELSEIFSWITCH ARRTYPE==float,double
-    Assert.assertTrue(TypeUtil.ARRTYPEEquals(arr[index],copy[index]));
-#ELSE
-    Assert.assertTrue(Objects.equals(arr[index],copy[index]));
-#ENDIF
-  });
+    stockSorterThread.join();
+  }
+  catch(InterruptedException e)
+  {
+    throw new AssertionError(e);
+  }
+  #IFSWITCH PARALLEL==true
+  JunitUtil.uncheckedparallelassertarraysAreEqual(arr,0,copy,0,copy.length);
+  #ELSE
+  JunitUtil.uncheckedassertarraysAreEqual(arr,0,copy,0,copy.length);
+  #ENDIF
 }
 #ENDDEF
-/*
-  #MACRO GetRandom<boolean>()
-  #MACRO GetRandom<byte>()
-  #MACRO GetRandom<char>()
-  #MACRO GetRandom<short>()
-  #MACRO GetRandom<int>()
-  #MACRO GetRandom<long>()
-  #MACRO GetRandom<float>()
-  #MACRO GetRandom<double>()
-  #MACRO GetRandom<String>()
-
-#MACRODEF GetRandom<ARRTYPE>()
-private static ARRTYPE getRandARRTYPE(Random rand)
-{
-#IFSWITCH ARRTYPE==String
-  return Long.toString(rand.nextLong());
-#ELSEIFSWITCH ARRTYPE==boolean
-  return rand.nextBoolean();
-#ELSEIFSWITCH ARRTYPE==byte,char,short,int,long
-  return (ARRTYPE)rand.nextLong();
-#ELSEIFSWITCH ARRTYPE==float
-  return rand.nextFloat();
-#ELSEIFSWITCH ARRTYPE==double
-  return rand.nextDouble();
-#ELSE
-ERROR unknown array type ARRTYPE
-#ENDIF
-}
-#ENDDEF
-
-  #MACRO ConvertMethods<boolean>()
-  #MACRO ConvertMethods<byte>()
-  #MACRO ConvertMethods<char>()
-  #MACRO ConvertMethods<short>()
-  #MACRO ConvertMethods<int>()
-  #MACRO ConvertMethods<long>()
-  #MACRO ConvertMethods<float>()
-  #MACRO ConvertMethods<double>()
-  #MACRO ConvertMethods<String>()
-#MACRODEF ConvertMethods<ARRTYPE>()
-private static ARRTYPE convertToARRTYPE(int val)
-{
-#IFSWITCH ARRTYPE==String
-  return Integer.toString(val);
-#ELSEIFSWITCH ARRTYPE==double,float,long,int,short,char,byte
-  return (ARRTYPE)val;
-#ELSE
-  return val!=0;
-#ENDIF
-}
-#ENDDEF
-
-
-
-  #MACRO ArrayBuilders<boolean>()
-  #MACRO ArrayBuilders<byte>()
-  #MACRO ArrayBuilders<char>()
-  #MACRO ArrayBuilders<short>()
-  #MACRO ArrayBuilders<int>()
-  #MACRO ArrayBuilders<long>()
-  #MACRO ArrayBuilders<float>()
-  #MACRO ArrayBuilders<double>()
-  #MACRO ArrayBuilders<String>()
-  */
-  #MACRO GetMaxReps<boolean>()
-  #MACRO GetMaxReps<byte>()
-  #MACRO GetMaxReps<char>()
-  #MACRO GetMaxReps<short>()
-  #MACRO GetMaxReps<int>()
-  #MACRO GetMaxReps<long>()
-  #MACRO GetMaxReps<float>()
-  #MACRO GetMaxReps<double>()
-  #MACRO GetMaxReps<String>()
-
-#MACRODEF GetMaxReps<ARRTYPE>()
-private static int getMaxRepsARRTYPE(int arrLength)
-{
-#IFSWITCH ARRTYPE==char,short
-      if(arrLength>3201 || arrLength<47)
-      {
-        return 1;
-      }
-      return 7;
-#ELSE
-      return 1;
-#ENDIF
-}
-#ENDDEF
-
-#MACRODEF ArrayBuilders<ARRTYPE>()
-private static enum ArrayBuilderARRTYPE
-{
-  RANDOM
-  {
-    void build(ARRTYPE[] arr,int m,Random rand)
-    {
-      for(int i=0;i<arr.length;++i)
-      {
-        arr[i]=getRandARRTYPE(rand);
-      }
-    }
-    int getNumRepetitions(int arrLength)
-    {
-      return getMaxRepsARRTYPE(arrLength);
-    }
-    int getMLo()
-    {
-      return 1;
-    }
-    int getMHi(int arrLength)
-    {
-      return 1;
-    }
-    int incrementM(int m)
-    {
-      return m+1;
-    }
-  },
-  ASCENDING
-  {
-    void build(ARRTYPE[] arr,int m,Random rand)
-    {
-#IFSWITCH ARRTYPE==boolean
-      int pivotPoint=(arr.length/4)+rand.nextInt(arr.length/2);
-      for(int i=0;i<pivotPoint;++i)
-      {
-        arr[i]=false;
-      }
-      for(int i=pivotPoint;i<arr.length;++i)
-      {
-        arr[i]=true;
-      }
-#ELSE
-      for(int i=0;i<arr.length;++i)
-      {
-        arr[i]=convertToARRTYPE(m+i);
-      }
-#ENDIF
-    }
-    int getNumRepetitions(int arrLength)
-    {
-#IFSWITCH ARRTYPE==boolean
-      return getMaxRepsARRTYPE(arrLength);
-#ELSE
-      return 1;
-#ENDIF
-    }
-    int getMLo()
-    {
-      return 1;
-    }
-    int getMHi(int arrLength)
-    {
-#IFSWITCH ARRTYPE==boolean
-      return 1;
-#ELSE
-      return (2*arrLength)-1;
-#ENDIF
-    }
-    int incrementM(int m)
-    {
-#IFSWITCH ARRTYPE==boolean
-      return m+1;
-#ELSE
-      return m*2;
-#ENDIF
-    }
-  },
-  DESCENDING
-  {
-    void build(ARRTYPE[] arr,int m,Random rand)
-    {
-#IFSWITCH ARRTYPE==boolean
-      int pivotPoint=(arr.length/4)+rand.nextInt(arr.length/2);
-      for(int i=0;i<pivotPoint;++i)
-      {
-        arr[i]=true;
-      }
-      for(int i=pivotPoint;i<arr.length;++i)
-      {
-        arr[i]=false;
-      }
-#ELSE
-      for(int i=0;i<arr.length;++i)
-      {
-        arr[i]=convertToARRTYPE(arr.length-m-i);
-      }
-#ENDIF
-    }
-
-    int getNumRepetitions(int arrLength)
-    {
-#IFSWITCH ARRTYPE==boolean
-      return getMaxRepsARRTYPE(arrLength);
-#ELSE
-      return 1;
-#ENDIF
-    }
-    int getMLo()
-    {
-      return 1;
-    }
-    int getMHi(int arrLength)
-    {
-#IFSWITCH ARRTYPE==boolean
-      return 1;
-#ELSE
-      return (2*arrLength)-1;
-#ENDIF
-    }
-    int incrementM(int m)
-    {
-#IFSWITCH ARRTYPE==boolean
-      return m+1;
-#ELSE
-      return m*2;
-#ENDIF
-    }
-
-  },
-  ALL_EQUAL
-  {
-    void build(ARRTYPE[] arr,int m,Random rand)
-    {
-      for(int i=0;i<arr.length;++i)
-      {
-        arr[i]=convertToARRTYPE(m);
-      }
-    }
-    int getNumRepetitions(int arrLength)
-    {
-      return 1;
-    }
-    int getMLo()
-    {
-      return 0;
-    }
-    int getMHi(int arrLength)
-    {
-#IFSWITCH ARRTYPE==boolean
-      return 1;
-#ELSE
-      return 0;
-#ENDIF
-    }
-    int incrementM(int m)
-    {
-      return m+1;
-    }
-  }
-#IFNOTSWITCH ARRTYPE==boolean
- 
-  ,MERGE_ASCENDING
-  {
-    void build(ARRTYPE[] arr,int m,Random rand)
-    {
-      int period=arr.length/m;
-      int v=1;
-      int i=0;
-      for(int k=0;k<m;++k)
-      {
-        v=1;
-        for(int p=0;p<period;++p)
-        {
-          arr[i++]=convertToARRTYPE(v++);
-        }
-      }
-      for(int j=1;j<arr.length-1;j++)
-      {
-        arr[j]=convertToARRTYPE(v++);
-
-      }
-    }
-    int getNumRepetitions(int arrLength)
-    {
-      return 1;
-    }
-    int getMLo()
-    {
-      return 65;
-    }
-    int getMHi(int arrLength)
-    {
-      return 69;
-    }
-    int incrementM(int m)
-    {
-      return m+1;
-    }
-  }
-  ,MERGE_DESCENDING
-  {
-    void build(ARRTYPE[] arr,int m,Random rand)
-    {
-      int period=arr.length/m;
-      int v=-1;
-      int i=0;
-      for(int k=0;k<m;++k)
-      {
-        v=-1;
-        for(int p=0;p<period;++p)
-        {
-          arr[i++]=convertToARRTYPE(v--);
-        }
-      }
-      for(int j=1;j<arr.length-1;j++)
-      {
-        arr[j]=convertToARRTYPE(v--);
-      }
-    }
-    int getNumRepetitions(int arrLength)
-    {
-      return 1;
-    }
-    int getMLo()
-    {
-      return 65;
-    }
-    int getMHi(int arrLength)
-    {
-      return 69;
-    }
-    int incrementM(int m)
-    {
-      return m+1;
-    }
-  }
-  ,SAW
-  {
-    void build(ARRTYPE[] arr,int m,Random rand)
-    {
-      int incCount=1;
-      int decCount=arr.length;
-      int i=0;
-      int period=m--;
-      for(;;)
-      {
-        for(int k=1;k<=period;k++)
-        {
-          if(i>=arr.length)
-          {
-            return;
-          }
-          arr[i++]=convertToARRTYPE(incCount++);
-        }
-        period+=m;
-        for(int k=1;k<=period;k++)
-        {
-          if(i>=arr.length)
-          {
-            return;
-          }
-          arr[i++]=convertToARRTYPE(decCount--);
-        }
-        period+=m;
-      }
-    }
-    int getNumRepetitions(int arrLength)
-    {
-      return 1;
-    }
-    int getMLo()
-    {
-      return 1;
-    }
-    int getMHi(int arrLength)
-    {
-      return (2*arrLength)-1;
-    }
-    int incrementM(int m)
-    {
-      return m*2;
-    }
-  }
-  ,SORTED_REPEATED
-  {
-    void build(ARRTYPE[] arr,int m,Random rand)
-    {
-      int period=arr.length/m;
-      int i=0;
-      int k=0;
-      for(;;)
-      {
-        for(int t=1;t<=period;++t)
-        {
-          if(i>=arr.length)
-          {
-            return;
-          }
-          arr[i++]=convertToARRTYPE(k);
-        }
-        if(i>=arr.length)
-        {
-          return;
-        }
-        ++k;
-      }
-    }
-    int getNumRepetitions(int arrLength)
-    {
-      return 1;
-    }
-    int getMLo()
-    {
-      return 1;
-    }
-    int getMHi(int arrLength)
-    {
-      return Math.min(arrLength,7);
-    }
-    int incrementM(int m)
-    {
-      return m+1;
-    }
-  }
-  ,REPEATED
-  {
-    void build(ARRTYPE[] arr, int m, Random rand)
-    {
-      for(int i=0;i<arr.length;++i)
-      {
-        arr[i]=convertToARRTYPE(i%m);
-      }
-    }
-    int getNumRepetitions(int arrLength)
-    {
-      return 1;
-    }
-    int getMLo()
-    {
-      return 1;
-    }
-    int getMHi(int arrLength)
-    {
-      return (2*arrLength)-1;
-    }
-    int incrementM(int m)
-    {
-      return m*2;
-    }
-  }
-  ,DUPLICATED
-  {
-    void build(ARRTYPE[] arr, int m, Random rand)
-    {
-      for (int i = 0; i < arr.length; i++)
-      {
-        arr[i] = convertToARRTYPE(rand.nextInt(m));
-      }
-    }
-    int getNumRepetitions(int arrLength)
-    {
-      return getMaxRepsARRTYPE(arrLength);
-    }
-    int getMLo()
-    {
-      return 1;
-    }
-    int getMHi(int arrLength)
-    {
-      return (2*arrLength)-1;
-    }
-    int incrementM(int m)
-    {
-      return m*2;
-    }
-  }
-  ,SORTED_ORGAN_PIPES
-  {
-    void build(ARRTYPE[] arr,int m,Random rand)
-    {
-      int i=0;
-      int k=m;
-      for(;;)
-      {
-        for(int t=1;t<=m;++t)
-        {
-          if(i>=arr.length)
-          {
-            return;
-          }
-          arr[i++]=convertToARRTYPE(k);
-        }
-      }
-    }
-    int getNumRepetitions(int arrLength)
-    {
-      return 1;
-    }
-    int getMLo()
-    {
-      return 1;
-    }
-    int getMHi(int arrLength)
-    {
-      return Math.min(arrLength,7);
-    }
-    int incrementM(int m)
-    {
-      return m+1;
-    }
-  }
-  ,ORGAN_PIPES
-  {
-    void build(ARRTYPE[] arr, int m, Random rand)
-    {
-      int middle = arr.length / (m + 1);
-      for (int i = 0; i < middle; i++) {
-          arr[i] = convertToARRTYPE(i);
-      }
-      for (int i = middle; i < arr.length; i++) {
-          arr[i] = convertToARRTYPE(arr.length - i - 1);
-      }
-    }
-    int getNumRepetitions(int arrLength)
-    {
-      return 1;
-    }
-    int getMLo()
-    {
-      return 1;
-    }
-    int getMHi(int arrLength)
-    {
-      return (2*arrLength)-1;
-    }
-    int incrementM(int m)
-    {
-      return m*2;
-    }
-  }
-  ,STAGGER
-  {
-    void build(ARRTYPE[] arr, int m, Random rand) {
-      for (int i = 0; i < arr.length; i++) {
-        arr[i] = convertToARRTYPE((i * m + i) % arr.length);
-      }
-      
-    }
-    int getNumRepetitions(int arrLength)
-    {
-      return 1;
-    }
-    int getMLo()
-    {
-      return 1;
-    }
-    int getMHi(int arrLength)
-    {
-      return (2*arrLength)-1;
-    }
-    int incrementM(int m)
-    {
-      return m*2;
-    }
-  }
-  ,PLATEAU
-  {
-    void build(ARRTYPE[] arr, int m, Random rand) {
-      for (int i = 0; i < arr.length; i++) {
-        arr[i] = convertToARRTYPE(Math.min(i, m));
-      }
-    }
-    int getNumRepetitions(int arrLength)
-    {
-      return 1;
-    }
-    int getMLo()
-    {
-      return 1;
-    }
-    int getMHi(int arrLength)
-    {
-      return (2*arrLength)-1;
-    }
-    int incrementM(int m)
-    {
-      return m*2;
-    }
-  }
-  ,SHUFFLE
-  {
-    void build(ARRTYPE[] arr, int m, Random rand) {
-      int x = 0, y = 0;
-      for (int i = 0; i < arr.length; i++) {
-        arr[i] = convertToARRTYPE(rand.nextBoolean() ? (x += 2) : (y += 2));
-      }
-    }
-    int getNumRepetitions(int arrLength)
-    {
-      return getMaxRepsARRTYPE(arrLength);
-    }
-    int getMLo()
-    {
-      return 1;
-    }
-    int getMHi(int arrLength)
-    {
-      return 1;
-    }
-    int incrementM(int m)
-    {
-      return m+1;
-    }
-  }
-#ENDIF
-  ;
-
-  abstract void build(ARRTYPE[] arr,int m,Random rand); 
-  abstract int getNumRepetitions(int arrLength);
-  abstract int getMLo();
-  abstract int getMHi(int arrLength);
-  abstract int incrementM(int m);
-}
-
-#ENDDEF
-
-  #MACRO BasicSortTest<boolean,sort>()
-  #MACRO BasicSortTest<boolean,reverseSort>()
-  
-  #MACRO BasicSortTest<byte,sort>()
-  #MACRO BasicSortTest<byte,reverseSort>()
-  
-  #MACRO BasicSortTest<char,sort>()
-  #MACRO BasicSortTest<char,reverseSort>()
-  
-  #MACRO BasicSortTest<short,sort>()
-  #MACRO BasicSortTest<short,reverseSort>()
-
-  #MACRO BasicSortTest<int,sort>()
-  #MACRO BasicSortTest<int,reverseSort>()
-  
-  #MACRO BasicSortTest<long,sort>()
-  #MACRO BasicSortTest<long,reverseSort>()
-
-  #MACRO BasicSortTest<float,sort>()
-  #MACRO BasicSortTest<float,reverseSort>()
-  
-  #MACRO BasicSortTest<double,sort>()
-  #MACRO BasicSortTest<double,reverseSort>()
-
 
   #MACRO BuilderMethods<boolean>()
   #MACRO BuilderMethods<byte>()
@@ -896,6 +243,11 @@ private static int getNumReps(JunitUtil.ARRTYPEArrayBuilder builder,int arrLengt
       }
       return 7;
   }
+#ELSEIFSWITCH ARRTYPE==float,double
+  if(builder==JunitUtil.ARRTYPEArrayBuilder.WithNaNsAndZeros)
+  {
+    return 2;
+  }
 #ENDIF
   return 1;
 }
@@ -920,62 +272,53 @@ private static int incrementM(JunitUtil.ARRTYPEArrayBuilder builder,int m)
 }
 #ENDDEF
 
+  #MACRO BasicSortTest<boolean,sort>()
+  #MACRO BasicSortTest<boolean,reverseSort>()
+  
+  #MACRO BasicSortTest<byte,sort>()
+  #MACRO BasicSortTest<byte,reverseSort>()
+  
+  #MACRO BasicSortTest<char,sort>()
+  #MACRO BasicSortTest<char,reverseSort>()
+  
+  #MACRO BasicSortTest<short,sort>()
+  #MACRO BasicSortTest<short,reverseSort>()
+
+  #MACRO BasicSortTest<int,sort>()
+  #MACRO BasicSortTest<int,reverseSort>()
+  
+  #MACRO BasicSortTest<long,sort>()
+  #MACRO BasicSortTest<long,reverseSort>()
+
+  #MACRO BasicSortTest<float,sort>()
+  #MACRO BasicSortTest<float,reverseSort>()
+  
+  #MACRO BasicSortTest<double,sort>()
+  #MACRO BasicSortTest<double,reverseSort>()
 
 #MACRODEF BasicSortTest<ARRTYPE,SORTTYPE>()
-private static void testuncheckedSORTTYPEARRTYPEHelper(long randSeed,int arrLength) throws InterruptedException
+private static void testuncheckedSORTTYPEARRTYPEHelper(long randSeed,int arrLength)
 {
- 
   ARRTYPE[] golden=new ARRTYPE[arrLength];
   ARRTYPE[] test=new ARRTYPE[arrLength];
+  Random rand=new Random(randSeed);
+  
+  for(JunitUtil.ARRTYPEArrayBuilder builder:JunitUtil.ARRTYPEArrayBuilder.values())
   {
-    Random rand=new Random(randSeed);
-    for(JunitUtil.ARRTYPEArrayBuilder builder:JunitUtil.ARRTYPEArrayBuilder.values())
+    for(int m=getMLo(builder),mHi=getMHi(builder,arrLength),numReps=getNumReps(builder,arrLength);m<=mHi;m=incrementM(builder,m))
     {
-#IFSWITCH ARRTYPE==float,double
-      if(builder==JunitUtil.ARRTYPEArrayBuilder.WithNaNsAndZeros)
+      //System.out.println("sortType = SORTTYPE; arrType = ARRTYPE; randSeed= "+randSeed+"; length= "+arrLength+"; builder type "+builder+"; m = "+m);
+      for(int i=0;i<numReps;++i)
       {
-        for(int a=0;a<10;++a)
-        {
-          for(int g=0;g<=10;++g)
-          {
-            for(int z=0;z<=10;++z)
-            {
-              for(int n=0;n<=10;++n)
-              {
-                for(int p=0;p<=10;++p)
-                {
-                  if(a+g+z+n+p==arrLength)
-                  {
-                    System.out.println("sortType = SORTTYPE; arrType = ARRTYPE; randSeed= "+randSeed+"; length= "+arrLength+"; builder type "+builder.name()+"; a ="+a+"; g="+g+"; z="+z+"; n="+n+"; p="+p);
-                    builder.build(golden,rand,a,g,z,n,p);
-                    ArrCopy.uncheckedCopy(golden,0,test,0,arrLength);
-                    isSortedSORTTYPE(test,golden);
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-      else
-#ENDIF
-      {
-        for(int m=getMLo(builder),mHi=getMHi(builder,arrLength),numReps=getNumReps(builder,arrLength);m<=mHi;m=incrementM(builder,m))
-        {
-          System.out.println("sortType = SORTTYPE; arrType = ARRTYPE; randSeed= "+randSeed+"; length= "+arrLength+"; builder type "+builder+"; m = "+m);
-          for(int i=0;i<numReps;++i)
-          {
-            builder.build(golden,rand,m);
-            ArrCopy.uncheckedCopy(golden,0,test,0,arrLength);
-            isSortedSORTTYPE(test,golden);
-          }
-        }
+        builder.build(golden,rand,m);
+        ArrCopy.uncheckedCopy(golden,0,test,0,arrLength);
+        isSortedSORTTYPE(test,golden);
       }
     }
   }
 }
 @Test
-public void testuncheckedSORTTYPEARRTYPE() throws InterruptedException
+public void testuncheckedSORTTYPEARRTYPE()
 {
 #IFSWITCH ARRTYPE==boolean,byte
   testuncheckedSORTTYPEARRTYPEHelper(0,30);
@@ -983,64 +326,25 @@ public void testuncheckedSORTTYPEARRTYPE() throws InterruptedException
   testuncheckedSORTTYPEARRTYPEHelper(0,31);
   #ENDIF
 #ELSE
+  
+
   for(int i=0;i<lengths.length;++i)
   {
-    int arrLength=lengths[i];
-    for(int j=0;j<randSeeds.length;++j)
+    
+    final int arrLength=lengths[i];
+    System.out.println("testuncheckedSORTTYPEARRTYPE length = "+arrLength);
+    var stream=LongStream.of(randSeeds);
+    //if(true)
     {
-      long randSeed=randSeeds[j];
-      testuncheckedSORTTYPEARRTYPEHelper(randSeed,arrLength);
+      stream=stream.parallel();
     }
+    stream.forEach(randSeed->
+    {
+      testuncheckedSORTTYPEARRTYPEHelper(randSeed,arrLength);
+    });
   }
 #ENDIF
 }
 #ENDDEF
-/*
-  #MACRO FloatBuilder<float>(0.0f,-0.0f,Float.NaN)
-  #MACRO FloatBuilder<double>(0.0d,-0.0d,Double.NaN)
-#MACRODEF FloatBuilder<ARRTYPE>(POSZERO,NEGZERO,NAN)
-private static enum ARRTYPEBuilder
-{
-  SIMPLE
-  {
-    void build(ARRTYPE[] arr,int a,int g,int z,int n,int p,Random rand)
-    {
-      int fromIndex,toIndex;
-      ARRTYPE negVal=-getRandARRTYPE(rand);
-      ARRTYPE posVal=getRandARRTYPE(rand);
-      for(fromIndex=0,toIndex=n;fromIndex<toIndex;++fromIndex)
-      {
-        arr[fromIndex]=negVal;
-      }
-      for(toIndex=fromIndex+g;fromIndex<toIndex;++fromIndex)
-      {
-        arr[fromIndex]=NEGZERO;
-      }
-      for(toIndex=fromIndex+z;fromIndex<toIndex;++fromIndex)
-      {
-        arr[fromIndex]=POSZERO;
-      }
-      for(toIndex=fromIndex+p;fromIndex<toIndex;++fromIndex)
-      {
-        arr[fromIndex]=posVal;
-      }
-      for(toIndex=fromIndex+a;fromIndex<toIndex;++fromIndex)
-      {
-        arr[fromIndex]=NAN;
-      }
-    }
-  };
-  abstract void build(ARRTYPE[] arr,int a,int g,int z,int n,int p,Random rand);
+
 }
-#ENDDEF
-*/
-}
-
-
-
-
-
-
-
-
-

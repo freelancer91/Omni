@@ -1478,7 +1478,7 @@ private static void quickMETHODNAMESinglePivot(ARRTYPE[] arr,int begin,int end,A
       }
       else
       {
-        arr[k]=pivot;
+        arr[k]=ag;
       }
       arr[great]=ak;
       --great;
@@ -1619,7 +1619,7 @@ private static void quickMETHODNAMEDualPivot(ARRTYPE[] arr,int begin,int end,ARR
         #MACRO IfClause(Equal,ag,pivot1)
         {
           arr[k]=arr[less];
-          arr[less]=pivot1;
+          arr[less]=ag;
           ++less;
         }
         else

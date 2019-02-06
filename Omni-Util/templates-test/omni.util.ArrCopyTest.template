@@ -1,13 +1,14 @@
 #TYPEDEF OfGeneric
 package omni.util;
 
-import org.junit.Test;
-import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import java.util.Random;
-import java.util.Objects;
 
 public class ArrCopyTest
 {
+  #MACRO TestMethods<true>()
+
+#MACRODEF TestMethods<PARALLEL>()
   #MACRO TestCopy<boolean,Boolean>(boolean)
   #MACRO TestCopy<byte,Byte>(byte)
   #MACRO TestCopy<char,Character>(char)
@@ -71,41 +72,30 @@ public class ArrCopyTest
   #MACRO TestCopy<float,double>(float)
   #MACRO TestCopy<double,double>(double)
   #MACRO TestCopy<String,String>(String)
-}
-#MACRODEF IsEqual(src,dst)
-#IFSWITCH DST==Object
-Assert.assertTrue(Objects.equals(src,dst));
-#ELSEIFSWITCH SRC==boolean
-  #IFSWITCH DST==byte,char,short,int,long,float,double
-Assert.assertTrue(TypeUtil.castToByte(src)==dst);
-  #ELSE
-Assert.assertTrue(src==dst);
-  #ENDIF
-#ELSE
-Assert.assertTrue(src==dst);
-#ENDIF
 #ENDDEF
+}
+
 #MACRODEF TestCopy<SRC,DST>(PRIMITIVE)
 @Test
 public void testSemiCheckedCopySRCDST() throws Throwable
 {
-
   Random rand=new Random(0);
   for(int i=0;i<1000;++i)
   {
     int srcLength=rand.nextInt(1000);
     SRC[] src;
-    JunitUtil.PRIMITIVEArrayBuilder.Randomized.build(src=new SRC[srcLength],rand);
+    JunitUtil.PRIMITIVEArrayBuilder.Randomized.buildUnchecked(src=new SRC[srcLength],0,srcLength,rand,0);
     int dstLength=srcLength+rand.nextInt(1000);
     DST[] dst=new DST[dstLength];
     int copyLength=rand.nextInt(srcLength+1);
     int srcOffset=rand.nextInt(srcLength-copyLength+1);
     int dstOffset=rand.nextInt(dstLength-copyLength+1);
     ArrCopy.semicheckedCopy(src,srcOffset,dst,dstOffset,copyLength);
-    for(int j=0;j<copyLength;++j)
-    {
-      #MACRO IsEqual(src[srcOffset+j],dst[dstOffset+j])
-    }
+#IFSWITCH PARALLEL==true
+    JunitUtil.uncheckedparallelassertarraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+#ELSE
+    JunitUtil.uncheckedassertarraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+#ENDIF
   }
 }
 @Test
@@ -117,17 +107,18 @@ public void testSemiCheckedReverseCopySRCDST() throws Throwable
   {
     int srcLength=rand.nextInt(1000);
     SRC[] src;
-    JunitUtil.PRIMITIVEArrayBuilder.Randomized.build(src=new SRC[srcLength],rand);
+    JunitUtil.PRIMITIVEArrayBuilder.Randomized.buildUnchecked(src=new SRC[srcLength],0,srcLength,rand,0);
     int dstLength=srcLength+rand.nextInt(1000);
     DST[] dst=new DST[dstLength];
     int copyLength=rand.nextInt(srcLength+1);
     int srcOffset=rand.nextInt(srcLength-copyLength+1);
     int dstOffset=rand.nextInt(dstLength-copyLength+1);
     ArrCopy.semicheckedReverseCopy(src,srcOffset,dst,dstOffset,copyLength);
-    for(int j=0;j<copyLength;++j)
-    {
-      #MACRO IsEqual(src[srcOffset+copyLength-1-j],dst[dstOffset+j])
-    }
+#IFSWITCH PARALLEL==true
+    JunitUtil.uncheckedparallelassertreversearraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+#ELSE
+    JunitUtil.uncheckedassertreversearraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+#ENDIF
   }
 }
 #ENDDEF
