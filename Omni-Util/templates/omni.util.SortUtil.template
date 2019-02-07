@@ -210,33 +210,537 @@ public final class SortUtil
   #MACRO QuickSortDualPivot<reverseSort,double,double,true>()
   #MACRO QuickSortDualPivot<reverseSort,double,double,false>()
   
-  #MACRO noncomparatorSortMethod<sort,Object,Comparator<? super E>,E,Object,NULL>(<E>)
-  #MACRO noncomparatorSortMethod<reverseSort,Object,Comparator<? super E>,E,Object,NULL>(<E>)
+  
+  private static abstract class AbstractTimSort
+  {
+    transient int stackSize;
+    transient final int runLenAndBase[];
+    
+    
+    AbstractTimSort(int nRemaining)
+    {
+      this.runLenAndBase=new int[nRemaining<120?10:nRemaining<1542?20:nRemaining<119151?48:98];
+    }
+    abstract int mergeAt(int n,int stackSize,int[] runLenAndBase);
+    private void mergeCollapse(int runBase,int runLength)
+    {
+      int stackSize;
+      int[] runLenAndBase;
+      (runLenAndBase=this.runLenAndBase)[stackSize=this.stackSize]=runLength;
+      runLenAndBase[++stackSize]=runBase;
+      ++stackSize;
+      int n;
+      gotoReturn:
+      do
+      {
+        gotoMergeAt:
+        for(;;)
+        {
+          switch((n=stackSize-4)>>1)
+          {
+            default:
+              if(runLenAndBase[n-4]<=runLenAndBase[n] + runLenAndBase[n-2])
+              {
+                break;
+              }
+            case 1:
+              if(runLenAndBase[n-2]<=runLenAndBase[n] + runLenAndBase[n+2])
+              {
+                break;
+              }
+            case 0:
+              if(runLenAndBase[n]<=runLenAndBase[n+2])
+              {
+                break gotoMergeAt;
+              }
+            case -1:
+             break gotoReturn;
+          }
+          if(runLenAndBase[n-2]<runLenAndBase[n+2])
+          {
+            n-=2;
+          }
+          break gotoMergeAt;
+        }
+        //gotoMergeAt goes here
+      }
+      while((stackSize=mergeAt(n,stackSize,runLenAndBase))>2);
+      //gotoReturn goes here
+      this.stackSize=stackSize;
+    }
+    private void mergeForceCollapse()
+    {
+      int stackSize;
+      if((stackSize=this.stackSize)>2)
+      {
+        final var runLenAndBase=this.runLenAndBase;
+        int n;
+        do
+        {
+          if((n=stackSize-4)>0 && runLenAndBase[n-2]<runLenAndBase[n+2])
+          {
+            n-=2;
+          }
+        }
+        while((stackSize=mergeAt(n,stackSize,runLenAndBase))>2);
+      }
+      //no need to set the stack size field since we are done
+    }
+  }
+  private static abstract class AbstractObjectTimSort<E> extends AbstractTimSort
+  {
+    transient final Object[] arr;
+    transient Object[] tmp;
+    transient int tmpLength;
+    transient int tmpOffset;
+    transient int minGallop;
+    AbstractObjectTimSort(Object[] arr,int nRemaining)
+    {
+      super(nRemaining);
+      this.arr=arr;
+      this.tmpLength=nRemaining=nRemaining<512?nRemaining>>>1:256;
+      this.tmp=new Object[nRemaining];
+      this.minGallop=7;
+    }
+    #MACRO EnsureCapacity(Object)
+  }
+  
+  #MACRO TimSort<comparatorSort,boolean,BooleanComparator,boolean>( )
+  #MACRO TimSort<comparatorSort,byte,ByteComparator,byte>( )
+  #MACRO TimSort<comparatorSort,char,CharComparator,char>( )
+  #MACRO TimSort<comparatorSort,short,ShortComparator,short>( )
+  #MACRO TimSort<comparatorSort,int,IntBinaryOperator,int>( )
+  #MACRO TimSort<comparatorSort,long,LongComparator,long>( )
+  #MACRO TimSort<comparatorSort,float,FloatComparator,float>( )
+  #MACRO TimSort<comparatorSort,double,DoubleComparator,double>( )
+  #MACRO TimSort<comparatorSort,Object,Comparator<? super E>,E>(<E>)
+  #MACRO TimSort<sort,Object,NULL,Comparable<E>>(<E>)
+  #MACRO TimSort<reverseSort,Object,NULL,Comparable<E>>(<E>)
+  
+#MACRODEF TimSort<METHODNAME,ARRTYPE,COMPARATORTYPE,EXPOSEDTYPE>(TYPEPARAMETER)
+private static class METHODNAMEARRTYPETimSortTYPEPARAMETER
+#IFSWITCH ARRTYPE==Object
+  extends  AbstractARRTYPETimSortTYPEPARAMETER
+{
+  #IFSWITCH METHODNAME==comparatorSort
+  private final COMPARATORTYPE sorter;
+  METHODNAMEARRTYPETimSort(ARRTYPE[] arr,int nRemaining,COMPARATORTYPE sorter)
+  {
+    super(arr,nRemaining);
+    this.sorter=sorter;
+  }
+  #ELSE
+  METHODNAMEARRTYPETimSort(ARRTYPE[] arr,int nRemaining)
+  {
+    super(arr,nRemaining);
+  }
+  #ENDIF
+#ELSE
+  extends AbstractTimSort
+{
+  private transient final COMPARATORTYPE sorter;
+  private transient final ARRTYPE[] arr;
+  private transient ARRTYPE[] tmp;
+  private transient int tmpOffset;
+  private transient int tmpLength;
+  private transient int minGallop;
+  METHODNAMEARRTYPETimSort(ARRTYPE[] arr,int nRemaining,COMPARATORTYPE sorter)
+  {
+    super(nRemaining);
+    this.sorter=sorter;
+    this.arr=arr;
+    this.tmpLength=nRemaining=nRemaining<512?nRemaining>>>1:256;
+    this.tmp=new ARRTYPE[nRemaining];
+    this.minGallop=7;
+  }
+  #MACRO EnsureCapacity(ARRTYPE)
+#ENDIF
+  #MACRO SuppressUnchecked()
+  @Override
+  int mergeAt(int n,int stackSize,int[] runLenAndBase)
+  {
+    //assert stackSize>=4;
+    //assert n>=0;
+    //assert n==stackSize-4 || n==stackSize-6;
+    //assert runLenAndBase[n]>0;
+    //assert runLenAndBase[n+2]>0;
+    //assert runLenAndBase[n]+runBaseAndLen[n+1]==runBaseAndLen[n+3];
+    int len1,base1,len2,base2;
+    
+    runLenAndBase[n]=(len1=runLenAndBase[n])+(len2=runLenAndBase[n+2]);
+    if(n==stackSize-6)
+    {
+      runLenAndBase[n+3]=runLenAndBase[n+5];
+      runLenAndBase[n+2]=runLenAndBase[n+4];
+    }
+    ARRTYPE[] arr;
+    int k;
+    base1=(base1=runLenAndBase[n+1])+(k=gallopRight((EXPOSEDTYPE)(arr=this.arr)[base2=runLenAndBase[n+3]],arr,base1,len1,0
+#IFSWITCH METHODNAME==comparatorSort
+      ,sorter
+#ENDIF
+    ));
+    //assert k>=0;
+    if((len1-=k)!=0)
+    {
+      if((len2=gallopLeft((EXPOSEDTYPE)arr[base1+len1-2],arr,base2,len2,len2-1
+#IFSWITCH METHODNAME==comparatorSort
+        ,sorter
+#ENDIF
+      ))!=0)
+      {
+        //assert len2>0;
+        if(len1<=len2)
+        {
+          mergeLo(arr,base1,len1,base2,len2);
+        }
+        else
+        {
+          mergeHi(arr,base1,len1,base2,len2);
+        }
+      }
+    }
+    return stackSize-2;
+  }
+  #MACRO Merge<Lo,arr,tmp,++,1,2>()
+  #MACRO Merge<Hi,tmp,arr,--,2,1>()
+  #MACRO Gallop<Right>(TYPEPARAMETER)
+  #MACRO Gallop<Left>(TYPEPARAMETER)
+}
+#ENDDEF
+#MACRODEF Merge<HILO,LEFTARR,RIGHTARR,INCREMENT,ONE,TWO>()
+#MACRO SuppressUnchecked()
+private void mergeHILO(ARRTYPE[] arr,int base1,int len1,int base2,int len2)
+{
+  //assert len1>0;
+  //assert len2>0;
+  //assert base1+len1==base2;
+  //TODO
+  ARRTYPE[] tmp;
+  
+#IFSWITCH HILO==Lo
+  int cursor1;
+  int dest;
+  ArrCopy.uncheckedCopy(arr,dest=base1,tmp=
+#IFSWITCH ARRTYPE==Object
+  super.
+#ENDIF
+  ensureCapacity(len1),cursor1=this.tmpOffset,len1);
+  int cursor2=base2;
+  arr[dest++]=arr[cursor2++];
+  //TODO make these pre-decrement for performance
+  if(--len2==0)
+  {
+    ArrCopy.uncheckedCopy(tmp,cursor1,arr,dest,len1);
+    return;
+  }
+  if(len1==1)
+  {
+    ArrCopy.uncheckedCopy(arr,cursor2,arr,dest,len2);
+    arr[dest+len2]=tmp[cursor1];
+    return;
+  }
+#ELSE
+  int tmpOffset;
+  ArrCopy.uncheckedCopy(arr,base2,tmp=
+#IFSWITCH ARRTYPE==Object
+  super.
+#ENDIF
+  ensureCapacity(len2),tmpOffset=this.tmpOffset,len2);
+  int cursor1=base1+len1-1;
+  int cursor2=tmpOffset+len2-1;
+  int dest=base2+len2-1;
+  arr[dest--]=arr[cursor1--];
+  //TODO make these pre-decrement for performance
+  if(--len1==0)
+  {
+    ArrCopy.uncheckedCopy(tmp,tmpOffset,arr,dest-(len2-1),len2);
+    return;
+  }
+  if(len2==1)
+  {
+    ArrCopy.uncheckedCopy(arr,cursor1-len1+1,arr,(dest-=len1)+1,len1);
+    arr[dest]=tmp[cursor2];
+    return;
+  }
+#ENDIF
+  int minGallop=this.minGallop;
+#IFSWITCH METHODNAME==comparatorSort
+  final var sorter=this.sorter;
+#ENDIF
+  outer:
+  for(;;)
+  {
+    int count1=0;
+    int count2=0;
+    do
+    {
+      //assert lenONE>1;
+      //assert lenTWO=0;
+      #MACRO IfClause(LessThan,LEFTARR[cursor2],RIGHTARR[cursor1])
+      {
+        arr[destINCREMENT]=arr[cursorTWOINCREMENT];
+        ++countTWO;
+        countONE=0;
+        if(--lenTWO==0)
+        {
+          break outer;
+        }
+      }
+      else
+      {
+        arr[destINCREMENT]=tmp[cursorONEINCREMENT];
+        ++countONE;
+        countTWO=0;
+        if(--lenONE==1)
+        {
+          break outer;
+        }
+      }
+    }
+    while((count1|count2)<minGallop);
+    do
+    {
+      //assert lenONE>1;
+      //assert lenTWO>0;
+      if((
+#IFSWITCH HILO==Lo
+      count1=gallopRight((EXPOSEDTYPE)arr[cursor2],tmp,cursor1,len1,0
+#ELSE
+      count1=len1-gallopRight((EXPOSEDTYPE)tmp[cursor2],arr,base1,len1,len1-1
+#ENDIF
+#IFSWITCH METHODNAME==comparatorSort
+        ,sorter
+#ENDIF
+        ))!=0)
+      {
+#IFSWITCH HILO==Lo
+        ArrCopy.uncheckedCopy(tmp,cursor1,arr,dest,count1);
+        dest+=count1;
+        cursor1+=count1;
+        if((len1-=count1)<2)
+        {
+          break outer;
+        }
+        
+#ELSE
+        ArrCopy.uncheckedCopy(arr,(cursor1-=count1)+1,arr,(dest-=count1)+1,count1);
+        if((len1-=count1)==0)
+        {
+          break outer;
+        }
+#ENDIF
+      }
+      arr[destINCREMENT]=LEFTARR[cursor2INCREMENT];
+#IFSWITCH HILO==Lo
+      if(--len2==0)
+      {
+        break outer;
+      }
+      if((count2=gallopLeft((EXPOSEDTYPE)tmp[cursor1],arr,cursor2,len2,0
+#ELSE
+      if(--len2==1)
+      {
+        break outer;
+      }
+      if((count2=len2-gallopLeft((EXPOSEDTYPE)arr[cursor1],tmp,tmpOffset,len2,len2-1
+#ENDIF
+#IFSWITCH METHODNAME==comparatorSort
+        ,sorter
+#ENDIF
+      ))!=0)
+      {
+#IFSWITCH HILO==Lo
+        ArrCopy.uncheckedCopy(arr,cursor2,arr,dest,count2);
+        dest+=count2;
+        cursor2+=count2;
+        if((len2-=count2)==0)
+        {
+          break outer;
+        }
+#ELSE
+        ArrCopy.uncheckedCopy(tmp,(cursor2-=count2)+1,arr,(dest-=count2)+1,count2);
+        if((len2-=count2)<2)
+        {
+          break outer;
+        }
+#ENDIF
+      }
+      arr[destINCREMENT]=RIGHTARR[cursor1INCREMENT];
+#IFSWITCH HILO==Lo
+      if(--len1==1)
+#ELSE
+      if(--len1==0)
+#ENDIF
+      {
+        break outer;
+      }
+      --minGallop;
+    }
+    while(count1>=7 || count2>=7);
+    if(minGallop<0)
+    {
+      minGallop=2;
+    }
+    else
+    {
+      minGallop+=2;
+    }
+  }
+  this.minGallop = minGallop < 1 ? 1 : minGallop;
+  if(lenONE==1)
+  {
+    //assert lenTWO>0;
+#IFSWITCH HILO==Lo
+    ArrCopy.uncheckedCopy(arr,cursor2,arr,dest,len2);
+    arr[dest+len2]=tmp[cursor1];
+#ELSE
+    ArrCopy.uncheckedCopy(arr,(cursor1-=len1)+1,arr,(dest-=len1)+1,len1);
+    arr[dest]=tmp[cursor2];
+#ENDIF
+  }
+  else
+  {
+#IFSWITCH HILO==Lo
+    //assert len2==0;
+    //assert len1>1;
+    ArrCopy.uncheckedCopy(tmp,cursor1,arr,dest,len1);
+#ELSE
+    //assert len1==0;
+    //assert len2>0;
+    ArrCopy.uncheckedCopy(tmp,tmpOffset,arr,dest+(len2-1),len2);
+#ENDIF
+  }
+}
+#ENDDEF
+
+#MACRODEF Gallop<DIRECTION>(TYPEPARAMETER)
+private static TYPEPARAMETER int gallopDIRECTION(EXPOSEDTYPE key,ARRTYPE[] arr,int base,int len,int hint
+#IFSWITCH METHODNAME==comparatorSort
+  ,COMPARATORTYPE sorter
+#ENDIF
+)
+{
+  //TODO
+  return 0;
+}
+#ENDDEF
+
+
+
+
 
   
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
+/* 
 
+MACRODEF TimSort<METHODNAME,ARRTYPE,COMPARATORTYPE,EXPOSEDTYPE>(TYPEPARAMETER)
+private static class METHODNAMEARRTYPETimSortTYPEPARAMETER
+IFSWITCH ARRTYPE==Object
+  extends AbstractARRTYPETimSortTYPEPARAMETER
+ELSE
+  extends AbstractTimSort
+ENDIF
+{
+IFNOTSWITCH ARRTYPE==Object
+  final ARRTYPE[] arr;
+  ARRTYPE[] tmp;
+  @Override
+  void initTmpArr(int tmpLen)
+  {
+    this.tmp=new ARRTYPE[tmpLen];
+  }
+  MACRO EnsureCapacity(ARRTYPE)
+ENDIF
+IFSWITCH METHODNAME==comparatorSort
+  final COMPARATORTYPE sorter;
+  METHODNAMEARRTYPETimSort(ARRTYPE[] arr,COMPARATORTYPE sorter,int nRemaining)
+  {
+  IFSWITCH ARRTYPE==Object
+    super(arr,nRemaining);
+  ELSE
+    super(nRemaining);
+    this.arr=arr;
+  ENDIF
+    this.sorter=sorter;
+  }
+ELSE
+  METHODNAMEARRTYPETimSort(ARRTYPE[] arr,int nRemaining)
+  {
+    super(arr,nRemaining);
+  }
+ENDIF
+  MACRO SuppressUnchecked()
+  @Override
+  int mergeAt(int i,int stackSize,int[] runLen)
+  {
+    //assert stackSize>=2;
+    //assert i>=0;
+    //assert i==stackSize-2 || i==stackSize-3;
+    int base1,len1,base2,len2;
+    int[] runBase=this.runBase;
+    //assert runLen[i]>0 && runLen[i+1]>0;
+    //assert runBase[i]+runLen[i]==runBase[i+1];
+    runLen[i]=(len1=runLen[i])+(len2=runLen[i+1]);
+    if(i==stackSize-3)
+    {
+      runBase[i+1]=runBase[i+2];
+      runLen[i+1]=runLen[i+2];
+    }
+    --stackSize;
+    ARRTYPE[] arr;
+    int k;
+    base1=(base1=runBase[i])+(k=SortUtil.gallopRightMETHODNAME((EXPOSEDTYPE)(arr=this.arr)[base2=runBase[i+1]],arr,base1,len1,0
+IFSWITCH METHODNAME==comparatorSort
+      ,sorter
+ENDIF
+    ));
+    if((len1-=k)!=0)
+    {
+       //assert k>=0;
+       if((len2=SortUtil.gallopLeftMETHODNAME((EXPOSEDTYPE)arr[base1+len1-1],arr,base2,len2,len2-1
+IFSWITCH METHODNAME==comparatorSort
+         ,sorter
+ENDIF
+       ))!=0)
+       {
+         //assert len2>0;
+         if(len1>len2)
+         {
+           mergeHi(arr,base1,len1,base2,len2
+IFSWITCH METHODNAME==comparatorSort
+             ,sorter
+ENDIF
+           );
+         }
+         else
+         {
+           mergeLo(arr,base1,len1,base2,len2
+IFSWITCH METHODNAME==comparatorSort
+             ,sorter
+ENDIF
+           );
+         }
+       }
+    }
+    return stackSize;
+  }
+  MACRO MergeMethod<Lo>()
+  MACRO MergeMethod<Hi>()
+}
+ENDDEF
 
-  #MACRO comparatorSortMethod<comparatorSort,boolean,BooleanComparator,boolean,Boolean,NULL>( )
-  #MACRO comparatorSortMethod<comparatorSort,byte,ByteComparator,byte,Byte,NULL>( )
-  #MACRO comparatorSortMethod<comparatorSort,char,CharComparator,char,Character,NULL>( )
-  #MACRO comparatorSortMethod<comparatorSort,short,ShortComparator,short,Short,NULL>( )
-  #MACRO comparatorSortMethod<comparatorSort,int,IntBinaryOperator,int,Integer,NULL>( )
-  #MACRO comparatorSortMethod<comparatorSort,long,LongComparator,long,Long,NULL>( )
-  #MACRO comparatorSortMethod<comparatorSort,float,FloatComparator,float,Float,Float.floatToRawIntBits>( )
-  #MACRO comparatorSortMethod<comparatorSort,double,DoubleComparator,double,Double,Double.doubleToRawLongBits>( )
-  #MACRO comparatorSortMethod<comparatorSort,Object,Comparator<? super E>,E,Object,NULL>(<E>)
-#MACRODEF comparatorSortMethod<METHODNAME,ARRTYPE,COMPARATORTYPE,EXPOSEDTYPE,BOXEDTYPE,CONVERTTOBITS>(TYPEPARAMETER)
+  MACRO noncomparatorSortMethod<sort,Object,Comparator<? super E>,E,Object,NULL>(<E>)
+  MACRO noncomparatorSortMethod<reverseSort,Object,Comparator<? super E>,E,Object,NULL>(<E>)
+  MACRO comparatorSortMethod<comparatorSort,boolean,BooleanComparator,boolean,Boolean,NULL>( )
+  MACRO comparatorSortMethod<comparatorSort,byte,ByteComparator,byte,Byte,NULL>( )
+  MACRO comparatorSortMethod<comparatorSort,char,CharComparator,char,Character,NULL>( )
+  MACRO comparatorSortMethod<comparatorSort,short,ShortComparator,short,Short,NULL>( )
+  MACRO comparatorSortMethod<comparatorSort,int,IntBinaryOperator,int,Integer,NULL>( )
+  MACRO comparatorSortMethod<comparatorSort,long,LongComparator,long,Long,NULL>( )
+  MACRO comparatorSortMethod<comparatorSort,float,FloatComparator,float,Float,Float.floatToRawIntBits>( )
+  MACRO comparatorSortMethod<comparatorSort,double,DoubleComparator,double,Double,Double.doubleToRawLongBits>( )
+  MACRO comparatorSortMethod<comparatorSort,Object,Comparator<? super E>,E,Object,NULL>(<E>)
+MACRODEF comparatorSortMethod<METHODNAME,ARRTYPE,COMPARATORTYPE,EXPOSEDTYPE,BOXEDTYPE,CONVERTTOBITS>(TYPEPARAMETER)
 public static TYPEPARAMETER void uncheckedMETHODNAME(ARRTYPE[] arr,int begin,int end,COMPARATORTYPE sorter)
 {
   //assert sorter!=null;
@@ -244,7 +748,7 @@ public static TYPEPARAMETER void uncheckedMETHODNAME(ARRTYPE[] arr,int begin,int
   //assert begin>=0;
   //assert end<arr.length;
   //assert end-begin>0;
-#IFSWITCH ARRTYPE==boolean
+IFSWITCH ARRTYPE==boolean
   var firstVal=arr[begin];
   int newBegin;
   for(newBegin=begin+1;arr[newBegin]==firstVal;++newBegin)
@@ -293,7 +797,7 @@ public static TYPEPARAMETER void uncheckedMETHODNAME(ARRTYPE[] arr,int begin,int
         }
       }
   }
-#ELSE
+ELSE
   //FIXME this sorting implementation is currently broken
   int nRemaining;
   if((nRemaining=++end-begin)<32)
@@ -319,16 +823,10 @@ public static TYPEPARAMETER void uncheckedMETHODNAME(ARRTYPE[] arr,int begin,int
   while((nRemaining-=runLen)!=0);
   //assert begin==end+1;
   ts.mergeForceCollapse();
-#ENDIF
+ENDIF
 }
 
-#ENDDEF
-
- 
-
-
-
-
+ENDDEF
   //FIXME fix the TimSort methods
   private static int minRunLength(int n)
   {
@@ -341,112 +839,18 @@ public static TYPEPARAMETER void uncheckedMETHODNAME(ARRTYPE[] arr,int begin,int
     }
     return n+r;
   }
-  #MACRO TimSort<comparatorSort,byte,ByteComparator,byte>( )
-  #MACRO TimSort<comparatorSort,char,CharComparator,char>( )
-  #MACRO TimSort<comparatorSort,short,ShortComparator,short>( )
-  #MACRO TimSort<comparatorSort,int,IntBinaryOperator,int>( )
-  #MACRO TimSort<comparatorSort,long,LongComparator,long>( )
-  #MACRO TimSort<comparatorSort,float,FloatComparator,float>( )
-  #MACRO TimSort<comparatorSort,double,DoubleComparator,double>( )
-  #MACRO TimSort<comparatorSort,Object,Comparator<? super E>,E>(<E>)
-  #MACRO TimSort<sort,Object,Comparator<? super E>,Comparable<E>>(<E>)
-  #MACRO TimSort<reverseSort,Object,Comparator<? super E>,Comparable<E>>(<E>)
-#MACRODEF TimSort<METHODNAME,ARRTYPE,COMPARATORTYPE,EXPOSEDTYPE>(TYPEPARAMETER)
-private static class METHODNAMEARRTYPETimSortTYPEPARAMETER
-#IFSWITCH ARRTYPE==Object
-  extends AbstractARRTYPETimSortTYPEPARAMETER
-#ELSE
-  extends AbstractTimSort
-#ENDIF
-{
-#IFNOTSWITCH ARRTYPE==Object
-  final ARRTYPE[] arr;
-  ARRTYPE[] tmp;
-  @Override
-  void initTmpArr(int tmpLen)
-  {
-    this.tmp=new ARRTYPE[tmpLen];
-  }
-  #MACRO EnsureCapacity(ARRTYPE)
-#ENDIF
-#IFSWITCH METHODNAME==comparatorSort
-  final COMPARATORTYPE sorter;
-  METHODNAMEARRTYPETimSort(ARRTYPE[] arr,COMPARATORTYPE sorter,int nRemaining)
-  {
-  #IFSWITCH ARRTYPE==Object
-    super(arr,nRemaining);
-  #ELSE
-    super(nRemaining);
-    this.arr=arr;
-  #ENDIF
-    this.sorter=sorter;
-  }
-#ELSE
-  METHODNAMEARRTYPETimSort(ARRTYPE[] arr,int nRemaining)
-  {
-    super(arr,nRemaining);
-  }
-#ENDIF
-  #MACRO SuppressUnchecked()
-  @Override
-  int mergeAt(int i,int stackSize,int[] runLen)
-  {
-    //assert stackSize>=2;
-    //assert i>=0;
-    //assert i==stackSize-2 || i==stackSize-3;
-    int base1,len1,base2,len2;
-    int[] runBase=this.runBase;
-    //assert runLen[i]>0 && runLen[i+1]>0;
-    //assert runBase[i]+runLen[i]==runBase[i+1];
-    runLen[i]=(len1=runLen[i])+(len2=runLen[i+1]);
-    if(i==stackSize-3)
-    {
-      runBase[i+1]=runBase[i+2];
-      runLen[i+1]=runLen[i+2];
-    }
-    --stackSize;
-    ARRTYPE[] arr;
-    int k;
-    base1=(base1=runBase[i])+(k=SortUtil.gallopRightMETHODNAME((EXPOSEDTYPE)(arr=this.arr)[base2=runBase[i+1]],arr,base1,len1,0
-#IFSWITCH METHODNAME==comparatorSort
-      ,sorter
-#ENDIF
-    ));
-    if((len1-=k)!=0)
-    {
-       //assert k>=0;
-       if((len2=SortUtil.gallopLeftMETHODNAME((EXPOSEDTYPE)arr[base1+len1-1],arr,base2,len2,len2-1
-#IFSWITCH METHODNAME==comparatorSort
-         ,sorter
-#ENDIF
-       ))!=0)
-       {
-         //assert len2>0;
-         if(len1>len2)
-         {
-           mergeHi(arr,base1,len1,base2,len2
-#IFSWITCH METHODNAME==comparatorSort
-             ,sorter
-#ENDIF
-           );
-         }
-         else
-         {
-           mergeLo(arr,base1,len1,base2,len2
-#IFSWITCH METHODNAME==comparatorSort
-             ,sorter
-#ENDIF
-           );
-         }
-       }
-    }
-    return stackSize;
-  }
-  #MACRO MergeMethod<Lo>()
-  #MACRO MergeMethod<Hi>()
-}
-#ENDDEF
-#MACRODEF EnsureCapacity(ARRTYPE)
+  MACRO TimSort<comparatorSort,byte,ByteComparator,byte>( )
+  MACRO TimSort<comparatorSort,char,CharComparator,char>( )
+  MACRO TimSort<comparatorSort,short,ShortComparator,short>( )
+  MACRO TimSort<comparatorSort,int,IntBinaryOperator,int>( )
+  MACRO TimSort<comparatorSort,long,LongComparator,long>( )
+  MACRO TimSort<comparatorSort,float,FloatComparator,float>( )
+  MACRO TimSort<comparatorSort,double,DoubleComparator,double>( )
+  MACRO TimSort<comparatorSort,Object,Comparator<? super E>,E>(<E>)
+  MACRO TimSort<sort,Object,Comparator<? super E>,Comparable<E>>(<E>)
+  MACRO TimSort<reverseSort,Object,Comparator<? super E>,Comparable<E>>(<E>)
+
+MACRODEF EnsureCapacity(ARRTYPE)
 private ARRTYPE[] ensureCapacity(int minCapacity)
 {
   ARRTYPE[] tmp;
@@ -467,23 +871,23 @@ private ARRTYPE[] ensureCapacity(int minCapacity)
   }
   return tmp;
 }
-#ENDDEF
-#MACRODEF MergeMethod<Side>()
-#MACRO SuppressUnchecked()
+ENDDEF
+MACRODEF MergeMethod<Side>()
+MACRO SuppressUnchecked()
 private void mergeSide(ARRTYPE[] arr,int base1,int len1,int base2,int len2
-#IFSWITCH METHODNAME==comparatorSort
+IFSWITCH METHODNAME==comparatorSort
 ,COMPARATORTYPE sorter
-#ENDIF
+ENDIF
 )
 {
   ARRTYPE[] tmp;
   int cursor1,dest;
-#IFSWITCH Side==Lo
+IFSWITCH Side==Lo
   int cursor2=base2;
   ArrCopy.uncheckedCopy(arr,dest=base1,tmp=
-#IFSWITCH ARRTYPE==Object
+IFSWITCH ARRTYPE==Object
   super.
-#ENDIF
+ENDIF
   ensureCapacity(len1),cursor1=this.tmpBase,len1);
   arr[dest++]=arr[cursor2++];
   if(--len2==0)
@@ -497,7 +901,7 @@ private void mergeSide(ARRTYPE[] arr,int base1,int len1,int base2,int len2
     arr[dest+len2]=tmp[cursor1];
     return;
   }
-  #MACRO MergeImpl(len1,len2,++,cursor1,cursor2,count1,count2,arr,tmp)
+  MACRO MergeImpl(len1,len2,++,cursor1,cursor2,count1,count2,arr,tmp)
     ArrCopy.uncheckedCopy(arr,cursor2,arr,dest,len2);
     arr[dest+len2]=tmp[cursor1];
     break;
@@ -505,12 +909,12 @@ private void mergeSide(ARRTYPE[] arr,int base1,int len1,int base2,int len2
     assert len2==0;
     assert len1>1;
     ArrCopy.uncheckedCopy(tmp,cursor1,arr,dest,len1);
-#ELSE
+ELSE
   int tmpBase;
   ArrCopy.uncheckedCopy(arr,base2,tmp=
-#IFSWITCH ARRTYPE==Object
+IFSWITCH ARRTYPE==Object
   super.
-#ENDIF
+ENDIF
   ensureCapacity(len2),tmpBase=this.tmpBase,len2);
   dest=base2+len2-1;
   cursor1=base1+len1-1;
@@ -529,7 +933,7 @@ private void mergeSide(ARRTYPE[] arr,int base1,int len1,int base2,int len2
     return;
   }
   int cursor2=tmpBase+len2-1;
-  #MACRO MergeImpl(len2,len1,--,cursor2,cursor1,count2,count1,tmp,arr)
+  MACRO MergeImpl(len2,len1,--,cursor2,cursor1,count2,count1,tmp,arr)
     ArrCopy.uncheckedCopy(arr,(cursor1-=len1)+1,arr,(dest-=len1)+1,len1);
     arr[dest]=tmp[cursor2];
     break;
@@ -537,11 +941,11 @@ private void mergeSide(ARRTYPE[] arr,int base1,int len1,int base2,int len2
     //assert len1==0;
     //assert len2>0;
     ArrCopy.uncheckedCopy(tmp,tmpBase,arr,dest-(len2-1),len2);
-#ENDIF
+ENDIF
   }
 }
-#ENDDEF
-#MACRODEF MergeImpl(LEN1,LEN2,INCREMENT,CURSOR1,CURSOR2,COUNT1,COUNT2,ARR2,TMP)
+ENDDEF
+MACRODEF MergeImpl(LEN1,LEN2,INCREMENT,CURSOR1,CURSOR2,COUNT1,COUNT2,ARR2,TMP)
 int minGallop=this.minGallop;
 outer:for(;;)
 {
@@ -550,7 +954,7 @@ outer:for(;;)
   do
   {
     //assert LEN1>1 && LEN2>0;
-    #MACRO IfClause(LessThan,ARR2[cursor2],TMP[cursor1])
+    MACRO IfClause(LessThan,ARR2[cursor2],TMP[cursor1])
     {
       arr[destINCREMENT]=arr[CURSOR2INCREMENT];
       ++COUNT2;
@@ -575,11 +979,11 @@ outer:for(;;)
   do
   {
     //assert LEN1>1 && LEN2>0;
-#IFSWITCH Side==Lo
+IFSWITCH Side==Lo
     if((count1=SortUtil.gallopRightMETHODNAME((EXPOSEDTYPE)arr[cursor2],tmp,cursor1,len1,0
-#IFSWITCH METHODNAME==comparatorSort
+IFSWITCH METHODNAME==comparatorSort
       ,sorter
-#ENDIF
+ENDIF
     ))!=0)
     {
       ArrCopy.uncheckedCopy(tmp,cursor1,arr,dest,count1);
@@ -590,11 +994,11 @@ outer:for(;;)
         break outer;
       }
     }
-#ELSE
+ELSE
     if((count1=len1-SortUtil.gallopRightMETHODNAME((EXPOSEDTYPE)tmp[cursor2],arr,base1,len1,len1-1
-#IFSWITCH METHODNAME==comparatorSort
+IFSWITCH METHODNAME==comparatorSort
       ,sorter
-#ENDIF
+ENDIF
     ))!=0)
     {
       ArrCopy.uncheckedCopy(arr,(cursor1-=count1),arr,(dest-=count1)+1,count1);
@@ -603,47 +1007,47 @@ outer:for(;;)
         break outer;
       }
     }
-#ENDIF
+ENDIF
     arr[destINCREMENT]=ARR2[cursor2INCREMENT];
-#IFSWITCH Side==Lo
+IFSWITCH Side==Lo
     if(--len2==0)
-#ELSE
+ELSE
     if(--len2==1)
-#ENDIF
+ENDIF
     {
       break outer;
     }
-#IFSWITCH Side==Lo
+IFSWITCH Side==Lo
     if((count2=SortUtil.gallopLeftMETHODNAME((EXPOSEDTYPE)tmp[cursor1],arr,cursor2,len2,0
-#IFSWITCH METHODNAME==comparatorSort
+IFSWITCH METHODNAME==comparatorSort
       ,sorter
-#ENDIF
+ENDIF
     ))!=0)
     {
       ArrCopy.uncheckedCopy(arr,cursor2,arr,dest,count2);
       dest+=count2;
       cursor2+=count2;
       if((len2-=count2)==0)
-#ELSE
+ELSE
     if((count2=len2-SortUtil.gallopLeftMETHODNAME((EXPOSEDTYPE)arr[cursor1],tmp,tmpBase,len2,len2-1
-#IFSWITCH METHODNAME==comparatorSort
+IFSWITCH METHODNAME==comparatorSort
       ,sorter
-#ENDIF
+ENDIF
     ))!=0)
     {
       ArrCopy.uncheckedCopy(tmp,(cursor2-=count2)+1,arr,(dest-=count2)+1,count2);
       if((len2-=count2)<=1)
-#ENDIF
+ENDIF
       {
         break outer;
       }
     }
     arr[destINCREMENT]=tmp[CURSOR1INCREMENT];
-#IFSWITCH Side==Lo
+IFSWITCH Side==Lo
     if(len1==1)
-#ELSE
+ELSE
     if(len1==0)
-#ENDIF
+ENDIF
     {
       break outer;
     }
@@ -663,7 +1067,7 @@ switch(LEN1)
     throw new IllegalArgumentException("Comparison method violates its general contract!");
   case 1:
     //assert LEN2>0;
-#ENDDEF
+ENDDEF
   private static abstract class AbstractObjectTimSort<E> extends AbstractTimSort
   {
     final Object[] arr;
@@ -673,7 +1077,7 @@ switch(LEN1)
     {
       this.tmp=new Object[tmpLen];
     }
-    #MACRO EnsureCapacity(Object)
+    MACRO EnsureCapacity(Object)
     AbstractObjectTimSort(Object[] arr,int nRemaining)
     {
       super(nRemaining);
@@ -747,15 +1151,15 @@ switch(LEN1)
       }
     }
   }
-  #MACRO ReverseRange<byte>()
-  #MACRO ReverseRange<char>()
-  #MACRO ReverseRange<short>()
-  #MACRO ReverseRange<int>()
-  #MACRO ReverseRange<long>()
-  #MACRO ReverseRange<float>()
-  #MACRO ReverseRange<double>()
-  #MACRO ReverseRange<Object>()
-#MACRODEF ReverseRange<ARRTYPE>()
+  MACRO ReverseRange<byte>()
+  MACRO ReverseRange<char>()
+  MACRO ReverseRange<short>()
+  MACRO ReverseRange<int>()
+  MACRO ReverseRange<long>()
+  MACRO ReverseRange<float>()
+  MACRO ReverseRange<double>()
+  MACRO ReverseRange<Object>()
+MACRODEF ReverseRange<ARRTYPE>()
 private static void reverseRange(ARRTYPE[] arr,int begin,int end)
 {
   //assert arr!=null;
@@ -770,23 +1174,23 @@ private static void reverseRange(ARRTYPE[] arr,int begin,int end)
   }
   while(++begin<--end);
 }
-#ENDDEF
-  #MACRO BinarySort<comparatorSort,byte,ByteComparator,byte>( )
-  #MACRO BinarySort<comparatorSort,char,CharComparator,char>( )
-  #MACRO BinarySort<comparatorSort,short,ShortComparator,short>( )
-  #MACRO BinarySort<comparatorSort,int,IntBinaryOperator,int>( )
-  #MACRO BinarySort<comparatorSort,long,LongComparator,long>( )
-  #MACRO BinarySort<comparatorSort,float,FloatComparator,float>( )
-  #MACRO BinarySort<comparatorSort,double,DoubleComparator,double>( )
-  #MACRO BinarySort<comparatorSort,Object,Comparator<? super E>,E>(<E>)
-  #MACRO BinarySort<sort,Object,Comparator<? super E>,Comparable<E>>(<E>)
-  #MACRO BinarySort<reverseSort,Object,Comparator<? super E>,Comparable<E>>(<E>)
-#MACRODEF BinarySort<METHODNAME,ARRTYPE,COMPARATORTYPE,EXPOSEDTYPE>(TYPEPARAMETER)
-#MACRO SuppressUnchecked()
+ENDDEF
+  MACRO BinarySort<comparatorSort,byte,ByteComparator,byte>( )
+  MACRO BinarySort<comparatorSort,char,CharComparator,char>( )
+  MACRO BinarySort<comparatorSort,short,ShortComparator,short>( )
+  MACRO BinarySort<comparatorSort,int,IntBinaryOperator,int>( )
+  MACRO BinarySort<comparatorSort,long,LongComparator,long>( )
+  MACRO BinarySort<comparatorSort,float,FloatComparator,float>( )
+  MACRO BinarySort<comparatorSort,double,DoubleComparator,double>( )
+  MACRO BinarySort<comparatorSort,Object,Comparator<? super E>,E>(<E>)
+  MACRO BinarySort<sort,Object,Comparator<? super E>,Comparable<E>>(<E>)
+  MACRO BinarySort<reverseSort,Object,Comparator<? super E>,Comparable<E>>(<E>)
+MACRODEF BinarySort<METHODNAME,ARRTYPE,COMPARATORTYPE,EXPOSEDTYPE>(TYPEPARAMETER)
+MACRO SuppressUnchecked()
 private static TYPEPARAMETER void binaryMETHODNAME(ARRTYPE[] arr,int lo,int hi,int begin
-#IFSWITCH METHODNAME==comparatorSort
+IFSWITCH METHODNAME==comparatorSort
 ,COMPARATORTYPE sorter
-#ENDIF
+ENDIF
 )
 {
   //assert lo < begin;
@@ -797,7 +1201,7 @@ private static TYPEPARAMETER void binaryMETHODNAME(ARRTYPE[] arr,int lo,int hi,i
     for(int right=begin;left<right;)
     {
       final int mid;
-      #MACRO IfClause(LessThan,pivot,arr[mid=(left+right)>>>1])
+      MACRO IfClause(LessThan,pivot,arr[mid=(left+right)>>>1])
       {
         right=mid;
       }
@@ -810,23 +1214,23 @@ private static TYPEPARAMETER void binaryMETHODNAME(ARRTYPE[] arr,int lo,int hi,i
     arr[left]=pivot;
   }
 }
-#ENDDEF
-  #MACRO CountRunAndMakeAscending<comparatorSort,byte,ByteComparator,byte>( )
-  #MACRO CountRunAndMakeAscending<comparatorSort,char,CharComparator,char>( )
-  #MACRO CountRunAndMakeAscending<comparatorSort,short,ShortComparator,short>( )
-  #MACRO CountRunAndMakeAscending<comparatorSort,int,IntBinaryOperator,int>( )
-  #MACRO CountRunAndMakeAscending<comparatorSort,long,LongComparator,long>( )
-  #MACRO CountRunAndMakeAscending<comparatorSort,float,FloatComparator,float>( )
-  #MACRO CountRunAndMakeAscending<comparatorSort,double,DoubleComparator,double>( )
-  #MACRO CountRunAndMakeAscending<comparatorSort,Object,Comparator<? super E>,E>(<E>)
-  #MACRO CountRunAndMakeAscending<sort,Object,Comparator<? super E>,Comparable<E>>(<E>)
-  #MACRO CountRunAndMakeAscending<reverseSort,Object,Comparator<? super E>,Comparable<E>>(<E>)
-#MACRODEF CountRunAndMakeAscending<METHODNAME,ARRTYPE,COMPARATORTYPE,EXPOSEDTYPE>(TYPEPARAMETER)
-#MACRO SuppressUnchecked()
+ENDDEF
+  MACRO CountRunAndMakeAscending<comparatorSort,byte,ByteComparator,byte>( )
+  MACRO CountRunAndMakeAscending<comparatorSort,char,CharComparator,char>( )
+  MACRO CountRunAndMakeAscending<comparatorSort,short,ShortComparator,short>( )
+  MACRO CountRunAndMakeAscending<comparatorSort,int,IntBinaryOperator,int>( )
+  MACRO CountRunAndMakeAscending<comparatorSort,long,LongComparator,long>( )
+  MACRO CountRunAndMakeAscending<comparatorSort,float,FloatComparator,float>( )
+  MACRO CountRunAndMakeAscending<comparatorSort,double,DoubleComparator,double>( )
+  MACRO CountRunAndMakeAscending<comparatorSort,Object,Comparator<? super E>,E>(<E>)
+  MACRO CountRunAndMakeAscending<sort,Object,Comparator<? super E>,Comparable<E>>(<E>)
+  MACRO CountRunAndMakeAscending<reverseSort,Object,Comparator<? super E>,Comparable<E>>(<E>)
+MACRODEF CountRunAndMakeAscending<METHODNAME,ARRTYPE,COMPARATORTYPE,EXPOSEDTYPE>(TYPEPARAMETER)
+MACRO SuppressUnchecked()
 private static TYPEPARAMETER int countRunAndMakeAscendingMETHODNAME(ARRTYPE[] arr,int begin,int end
-#IFSWITCH METHODNAME==comparatorSort
+IFSWITCH METHODNAME==comparatorSort
 ,COMPARATORTYPE sorter
-#ENDIF
+ENDIF
 )
 {
   //assert arr!=null;
@@ -840,10 +1244,10 @@ private static TYPEPARAMETER int countRunAndMakeAscendingMETHODNAME(ARRTYPE[] ar
   {
     return 1;
   }
-  #MACRO IfClause(LessThan,arr[runHi++],arr[begin])
+  MACRO IfClause(LessThan,arr[runHi++],arr[begin])
   {
     while(runHi<end &&
-    #MACRO METHODNAMELessThan(arr[runHi],arr[runHi-1])
+    MACRO METHODNAMELessThan(arr[runHi],arr[runHi-1])
     )
     {
       ++runHi;
@@ -853,7 +1257,7 @@ private static TYPEPARAMETER int countRunAndMakeAscendingMETHODNAME(ARRTYPE[] ar
   else
   {
     while(runHi<end &&
-    #MACRO METHODNAMEGreaterThanOrEqual(arr[runHi],arr[runHi-1])
+    MACRO METHODNAMEGreaterThanOrEqual(arr[runHi],arr[runHi-1])
     )
     {
       ++runHi;
@@ -861,51 +1265,51 @@ private static TYPEPARAMETER int countRunAndMakeAscendingMETHODNAME(ARRTYPE[] ar
   }
   return runHi-begin;
 }
-#ENDDEF
-  #MACRO Gallop<Left,comparatorSort,byte,byte,ByteComparator>( )
-  #MACRO Gallop<Left,comparatorSort,char,char,CharComparator>( )
-  #MACRO Gallop<Left,comparatorSort,short,short,ShortComparator>( )
-  #MACRO Gallop<Left,comparatorSort,int,int,IntBinaryOperator>( )
-  #MACRO Gallop<Left,comparatorSort,long,long,LongComparator>( )
-  #MACRO Gallop<Left,comparatorSort,float,float,FloatComparator>( )
-  #MACRO Gallop<Left,comparatorSort,double,double,DoubleComparator>( )
-  #MACRO Gallop<Left,comparatorSort,Object,E,Comparator<? super E>>(<E>)
-  #MACRO Gallop<Right,comparatorSort,byte,byte,ByteComparator>( )
-  #MACRO Gallop<Right,comparatorSort,char,char,CharComparator>( )
-  #MACRO Gallop<Right,comparatorSort,short,short,ShortComparator>( )
-  #MACRO Gallop<Right,comparatorSort,int,int,IntBinaryOperator>( )
-  #MACRO Gallop<Right,comparatorSort,long,long,LongComparator>( )
-  #MACRO Gallop<Right,comparatorSort,float,float,FloatComparator>( )
-  #MACRO Gallop<Right,comparatorSort,double,double,DoubleComparator>( )
-  #MACRO Gallop<Right,comparatorSort,Object,E,Comparator<? super E>>(<E>)
-  #MACRO Gallop<Left,sort,Object,Comparable<E>,Comparator<? super E>>(<E>)
-  #MACRO Gallop<Right,sort,Object,Comparable<E>,Comparator<? super E>>(<E>)
-  #MACRO Gallop<Left,reverseSort,Object,Comparable<E>,Comparator<? super E>>(<E>)
-  #MACRO Gallop<Right,reverseSort,Object,Comparable<E>,Comparator<? super E>>(<E>)
-#MACRODEF Gallop<Direction,METHODNAME,ARRTYPE,EXPOSEDTYPE,COMPARATORTYPE>(TYPEPARAMETER)
-#MACRO SuppressUnchecked()
+ENDDEF
+  MACRO Gallop<Left,comparatorSort,byte,byte,ByteComparator>( )
+  MACRO Gallop<Left,comparatorSort,char,char,CharComparator>( )
+  MACRO Gallop<Left,comparatorSort,short,short,ShortComparator>( )
+  MACRO Gallop<Left,comparatorSort,int,int,IntBinaryOperator>( )
+  MACRO Gallop<Left,comparatorSort,long,long,LongComparator>( )
+  MACRO Gallop<Left,comparatorSort,float,float,FloatComparator>( )
+  MACRO Gallop<Left,comparatorSort,double,double,DoubleComparator>( )
+  MACRO Gallop<Left,comparatorSort,Object,E,Comparator<? super E>>(<E>)
+  MACRO Gallop<Right,comparatorSort,byte,byte,ByteComparator>( )
+  MACRO Gallop<Right,comparatorSort,char,char,CharComparator>( )
+  MACRO Gallop<Right,comparatorSort,short,short,ShortComparator>( )
+  MACRO Gallop<Right,comparatorSort,int,int,IntBinaryOperator>( )
+  MACRO Gallop<Right,comparatorSort,long,long,LongComparator>( )
+  MACRO Gallop<Right,comparatorSort,float,float,FloatComparator>( )
+  MACRO Gallop<Right,comparatorSort,double,double,DoubleComparator>( )
+  MACRO Gallop<Right,comparatorSort,Object,E,Comparator<? super E>>(<E>)
+  MACRO Gallop<Left,sort,Object,Comparable<E>,Comparator<? super E>>(<E>)
+  MACRO Gallop<Right,sort,Object,Comparable<E>,Comparator<? super E>>(<E>)
+  MACRO Gallop<Left,reverseSort,Object,Comparable<E>,Comparator<? super E>>(<E>)
+  MACRO Gallop<Right,reverseSort,Object,Comparable<E>,Comparator<? super E>>(<E>)
+MACRODEF Gallop<Direction,METHODNAME,ARRTYPE,EXPOSEDTYPE,COMPARATORTYPE>(TYPEPARAMETER)
+MACRO SuppressUnchecked()
 private static TYPEPARAMETER int gallopDirectionMETHODNAME(EXPOSEDTYPE key,ARRTYPE[] arr,int base,int len,int hint
-#IFSWITCH METHODNAME==comparatorSort
+IFSWITCH METHODNAME==comparatorSort
 ,COMPARATORTYPE sorter
-#ENDIF
+ENDIF
 )
 {
   //assert len > 0 && hint >= 0 && hint < len;
   int ofs=1;
   int lastOfs=0;
-#IFSWITCH Direction==Right
-  #MACRO IfClause(LessThan,key,arr[base+hint])
+IFSWITCH Direction==Right
+  MACRO IfClause(LessThan,key,arr[base+hint])
   {
     int maxOfs=hint+1;
     while(ofs < maxOfs &&
-    #MACRO METHODNAMELessThan(key,arr[base+hint-ofs])
-#ELSE
-  #MACRO IfClause(LessThan,arr[base+hint],key)
+    MACRO METHODNAMELessThan(key,arr[base+hint-ofs])
+ELSE
+  MACRO IfClause(LessThan,arr[base+hint],key)
   {
     int maxOfs=len-hint;
     while(ofs < maxOfs &&
-    #MACRO METHODNAMELessThan(arr[base+hint+ofs],key)
-#ENDIF
+    MACRO METHODNAMELessThan(arr[base+hint+ofs],key)
+ENDIF
     )
     {
       if((ofs=((lastOfs=ofs)<<1)+1)<=0)
@@ -917,7 +1321,7 @@ private static TYPEPARAMETER int gallopDirectionMETHODNAME(EXPOSEDTYPE key,ARRTY
     {
       ofs=maxOfs;
     }
-#IFSWITCH Direction==Right
+IFSWITCH Direction==Right
     int tmp=lastOfs;
     lastOfs=hint-ofs;
     ofs=hint-tmp;
@@ -925,22 +1329,22 @@ private static TYPEPARAMETER int gallopDirectionMETHODNAME(EXPOSEDTYPE key,ARRTY
   else
   {
     int maxOfs=len-hint;
-#ELSE
+ELSE
     lastOfs+=hint;
     ofs+=hint;
   }
   else
   {
     final int maxOfs=hint+1;
-#ENDIF
+ENDIF
     for(;;)
     {
       if(ofs>=maxOfs || 
-#IFSWITCH Direction==Right
-      #MACRO METHODNAMELessThan(key,arr[base+hint+ofs])
-#ELSE
-      #MACRO METHODNAMELessThan(arr[base+hint-ofs],key)
-#ENDIF
+IFSWITCH Direction==Right
+      MACRO METHODNAMELessThan(key,arr[base+hint+ofs])
+ELSE
+      MACRO METHODNAMELessThan(arr[base+hint-ofs],key)
+ENDIF
       )
       {
         break;
@@ -954,14 +1358,14 @@ private static TYPEPARAMETER int gallopDirectionMETHODNAME(EXPOSEDTYPE key,ARRTY
     {
       ofs=maxOfs;
     }
-#IFSWITCH Direction==Right
+IFSWITCH Direction==Right
     lastOfs+=hint;
     ofs+=hint;
-#ELSE
+ELSE
     int tmp=lastOfs;
     lastOfs=hint-ofs;
     ofs=hint-tmp;
-#ENDIF
+ENDIF
   }
   //assert -1 <= lastOfs && lastOfs < ofs && ofs <=len;
   int diff;
@@ -970,8 +1374,8 @@ private static TYPEPARAMETER int gallopDirectionMETHODNAME(EXPOSEDTYPE key,ARRTY
     do
     {
       int m;
-#IFSWITCH Direction==Right
-      #MACRO IfClause(LessThan,key,arr[base+(m=lastOfs+(diff>>>1))])
+IFSWITCH Direction==Right
+      MACRO IfClause(LessThan,key,arr[base+(m=lastOfs+(diff>>>1))])
       {
         ofs=m;
       }
@@ -979,8 +1383,8 @@ private static TYPEPARAMETER int gallopDirectionMETHODNAME(EXPOSEDTYPE key,ARRTY
       {
         lastOfs=m+1;
       }
-#ELSE
-      #MACRO IfClause(LessThan,arr[base+(m=lastOfs+(diff>>>1))],key)
+ELSE
+      MACRO IfClause(LessThan,arr[base+(m=lastOfs+(diff>>>1))],key)
       {
         lastOfs=m+1;
       }
@@ -988,16 +1392,38 @@ private static TYPEPARAMETER int gallopDirectionMETHODNAME(EXPOSEDTYPE key,ARRTY
       {
         ofs=m;
       }
-#ENDIF
+ENDIF
     }
     while((diff=ofs-lastOfs)>0);
   }
   //assert lastOfs==ofs;
   return ofs;
 }
-#ENDDEF
-
+ENDDEF
+*/
 }
+#MACRODEF EnsureCapacity(THETYPE)
+private THETYPE[] ensureCapacity(int minCapacity)
+{
+  THETYPE[] tmp;
+  if(tmpLength<minCapacity)
+  {
+    int newSize;
+    if((newSize=(-1>>>Integer.numberOfLeadingZeros(minCapacity))+1)<0 || newSize>(minCapacity=arr.length>>>1))
+    {
+      newSize=minCapacity;
+    }
+    this.tmp=tmp=new THETYPE[newSize];
+    this.tmpLength=newSize;
+    tmpOffset=0;
+  }
+  else
+  {
+    tmp=this.tmp;
+  }
+  return tmp;
+}
+#ENDDEF
 #MACRODEF MoveNaN(BEGIN,END,GREATERTHANOREQUAL,DECREMENT)
 for(;;)
 {
@@ -1940,6 +2366,15 @@ sorter.compare((ARRTYPE)(Val1),(ARRTYPE)(Val2))>0
 #ENDIF
 #ENDDEF
 
+#MACRODEF comparatorSortEqual(Val1,Val2)
+#IFSWITCH ARRTYPE==int
+sorter.applyAsInt((int)(Val1),(int)(Val2))==0
+#ELSEIFSWITCH ARRTYPE==Object
+sorter.compare((E)(Val1),(E)(Val2))==0
+#ELSE
+sorter.compare((ARRTYPE)(Val1),(ARRTYPE)(Val2))==0
+#ENDIF
+#ENDDEF
 #MACRODEF sortEqual(Val1,Val2)
 #IFSWITCH ARRTYPE==Object
 ((Comparable<E>)(Val1)).compareTo((E)(Val2))==0

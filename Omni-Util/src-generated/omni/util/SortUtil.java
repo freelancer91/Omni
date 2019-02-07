@@ -10063,415 +10063,108 @@ public final class SortUtil
     }
     quickreverseSort(arr,less,great);
   }
-  public static <E> void uncheckedsort(Object[] arr,int begin,int end)
+  private static abstract class AbstractTimSort
   {
-    //assert arr!=null;
-    //assert begin>=0;
-    //assert end<arr.length;
-    //assert begin<end;
-    //FIXME this sorting implementation is currently broken
-    int nRemaining;
-    if((nRemaining=++end-begin)<32)
+    transient int stackSize;
+    transient final int runLenAndBase[];
+    AbstractTimSort(int nRemaining)
     {
-       binarysort(arr,begin,end,begin+countRunAndMakeAscendingsort(arr,begin,end));
-       return;
+      this.runLenAndBase=new int[nRemaining<120?10:nRemaining<1542?20:nRemaining<119151?48:98];
     }
-    final AbstractTimSort ts=new sortObjectTimSort<E>(arr,nRemaining);
-    int minRun=minRunLength(nRemaining);
-    int runLen;
-    do
+    abstract int mergeAt(int n,int stackSize,int[] runLenAndBase);
+    private void mergeCollapse(int runBase,int runLength)
     {
-      if((runLen=countRunAndMakeAscendingsort(arr,begin,end))<minRun)
+      int stackSize;
+      int[] runLenAndBase;
+      (runLenAndBase=this.runLenAndBase)[stackSize=this.stackSize]=runLength;
+      runLenAndBase[++stackSize]=runBase;
+      ++stackSize;
+      int n;
+      gotoReturn:
+      do
       {
-        int force;
-        binarysort(arr,begin,begin+(force=nRemaining<=minRun?nRemaining:minRun),begin+runLen);
-        runLen=force;
-      }
-      ts.mergeCollapse(begin,runLen);
-      begin+=runLen;
-    }
-    while((nRemaining-=runLen)!=0);
-    //assert begin==end+1;
-    ts.mergeForceCollapse();
-  }
-  public static <E> void uncheckedreverseSort(Object[] arr,int begin,int end)
-  {
-    //assert arr!=null;
-    //assert begin>=0;
-    //assert end<arr.length;
-    //assert begin<end;
-    //FIXME this sorting implementation is currently broken
-    int nRemaining;
-    if((nRemaining=++end-begin)<32)
-    {
-       binaryreverseSort(arr,begin,end,begin+countRunAndMakeAscendingreverseSort(arr,begin,end));
-       return;
-    }
-    final AbstractTimSort ts=new reverseSortObjectTimSort<E>(arr,nRemaining);
-    int minRun=minRunLength(nRemaining);
-    int runLen;
-    do
-    {
-      if((runLen=countRunAndMakeAscendingreverseSort(arr,begin,end))<minRun)
-      {
-        int force;
-        binaryreverseSort(arr,begin,begin+(force=nRemaining<=minRun?nRemaining:minRun),begin+runLen);
-        runLen=force;
-      }
-      ts.mergeCollapse(begin,runLen);
-      begin+=runLen;
-    }
-    while((nRemaining-=runLen)!=0);
-    //assert begin==end+1;
-    ts.mergeForceCollapse();
-  }
-  public static   void uncheckedcomparatorSort(boolean[] arr,int begin,int end,BooleanComparator sorter)
-  {
-    //assert sorter!=null;
-    //assert arr!=null;
-    //assert begin>=0;
-    //assert end<arr.length;
-    //assert end-begin>0;
-    var firstVal=arr[begin];
-    int newBegin;
-    for(newBegin=begin+1;arr[newBegin]==firstVal;++newBegin)
-    {
-      if(newBegin==end)
-      {
-        //already sorted
-        return;
-      }
-    }
-    switch(Integer.signum(sorter.compare(firstVal,!firstVal)))
-    {
-      case -1:
-        for(int newEnd=end;newEnd!=newBegin;--newEnd)
+        gotoMergeAt:
+        for(;;)
         {
-          if(arr[newEnd]==firstVal)
+          switch((n=stackSize-4)>>1)
           {
-            uncheckedSortHelper(arr,newBegin,newEnd,firstVal);
-            return;
+            default:
+              if(runLenAndBase[n-4]<=runLenAndBase[n] + runLenAndBase[n-2])
+              {
+                break;
+              }
+            case 1:
+              if(runLenAndBase[n-2]<=runLenAndBase[n] + runLenAndBase[n+2])
+              {
+                break;
+              }
+            case 0:
+              if(runLenAndBase[n]<=runLenAndBase[n+2])
+              {
+                break gotoMergeAt;
+              }
+            case -1:
+             break gotoReturn;
+          }
+          if(runLenAndBase[n-2]<runLenAndBase[n+2])
+          {
+            n-=2;
+          }
+          break gotoMergeAt;
+        }
+        //gotoMergeAt goes here
+      }
+      while((stackSize=mergeAt(n,stackSize,runLenAndBase))>2);
+      //gotoReturn goes here
+      this.stackSize=stackSize;
+    }
+    private void mergeForceCollapse()
+    {
+      int stackSize;
+      if((stackSize=this.stackSize)>2)
+      {
+        final var runLenAndBase=this.runLenAndBase;
+        int n;
+        do
+        {
+          if((n=stackSize-4)>0 && runLenAndBase[n-2]<runLenAndBase[n+2])
+          {
+            n-=2;
           }
         }
-        //already sorted
-      case 0:
-        //unsorted comparator
-        return;
-      default:
-        int endValCounter=newBegin-begin;
-        while(newBegin!=end)
-        {
-          if(arr[++newBegin]==firstVal)
-          {
-            ++endValCounter;
-          }
-        }
-        for(;;--end)
-        {
-          arr[end]=firstVal;
-          if(--endValCounter==0)
-          {
-            do
-            {
-              arr[--end]=!firstVal;
-            }
-            while(end!=begin);
-            return;
-          }
-        }
-    }
-  }
-  public static   void uncheckedcomparatorSort(byte[] arr,int begin,int end,ByteComparator sorter)
-  {
-    //assert sorter!=null;
-    //assert arr!=null;
-    //assert begin>=0;
-    //assert end<arr.length;
-    //assert end-begin>0;
-    //FIXME this sorting implementation is currently broken
-    int nRemaining;
-    if((nRemaining=++end-begin)<32)
-    {
-       binarycomparatorSort(arr,begin,end,begin+countRunAndMakeAscendingcomparatorSort(arr,begin,end,sorter),sorter);
-       return;
-    }
-    final AbstractTimSort ts=new comparatorSortbyteTimSort (arr,sorter,nRemaining);
-    int minRun=minRunLength(nRemaining);
-    int runLen;
-    do
-    {
-      if((runLen=countRunAndMakeAscendingcomparatorSort(arr,begin,end,sorter))<minRun)
-      {
-        int force;
-        binarycomparatorSort(arr,begin,begin+(force=nRemaining<=minRun?nRemaining:minRun),begin+runLen,sorter);
-        runLen=force;
+        while((stackSize=mergeAt(n,stackSize,runLenAndBase))>2);
       }
-      ts.mergeCollapse(begin,runLen);
-      begin+=runLen;
+      //no need to set the stack size field since we are done
     }
-    while((nRemaining-=runLen)!=0);
-    //assert begin==end+1;
-    ts.mergeForceCollapse();
   }
-  public static   void uncheckedcomparatorSort(char[] arr,int begin,int end,CharComparator sorter)
+  private static abstract class AbstractObjectTimSort<E> extends AbstractTimSort
   {
-    //assert sorter!=null;
-    //assert arr!=null;
-    //assert begin>=0;
-    //assert end<arr.length;
-    //assert end-begin>0;
-    //FIXME this sorting implementation is currently broken
-    int nRemaining;
-    if((nRemaining=++end-begin)<32)
+    transient final Object[] arr;
+    transient Object[] tmp;
+    transient int tmpLength;
+    transient int tmpOffset;
+    transient int minGallop;
+    AbstractObjectTimSort(Object[] arr,int nRemaining)
     {
-       binarycomparatorSort(arr,begin,end,begin+countRunAndMakeAscendingcomparatorSort(arr,begin,end,sorter),sorter);
-       return;
+      super(nRemaining);
+      this.arr=arr;
+      this.tmpLength=nRemaining=nRemaining<512?nRemaining>>>1:256;
+      this.tmp=new Object[nRemaining];
+      this.minGallop=7;
     }
-    final AbstractTimSort ts=new comparatorSortcharTimSort (arr,sorter,nRemaining);
-    int minRun=minRunLength(nRemaining);
-    int runLen;
-    do
+    private Object[] ensureCapacity(int minCapacity)
     {
-      if((runLen=countRunAndMakeAscendingcomparatorSort(arr,begin,end,sorter))<minRun)
-      {
-        int force;
-        binarycomparatorSort(arr,begin,begin+(force=nRemaining<=minRun?nRemaining:minRun),begin+runLen,sorter);
-        runLen=force;
-      }
-      ts.mergeCollapse(begin,runLen);
-      begin+=runLen;
-    }
-    while((nRemaining-=runLen)!=0);
-    //assert begin==end+1;
-    ts.mergeForceCollapse();
-  }
-  public static   void uncheckedcomparatorSort(short[] arr,int begin,int end,ShortComparator sorter)
-  {
-    //assert sorter!=null;
-    //assert arr!=null;
-    //assert begin>=0;
-    //assert end<arr.length;
-    //assert end-begin>0;
-    //FIXME this sorting implementation is currently broken
-    int nRemaining;
-    if((nRemaining=++end-begin)<32)
-    {
-       binarycomparatorSort(arr,begin,end,begin+countRunAndMakeAscendingcomparatorSort(arr,begin,end,sorter),sorter);
-       return;
-    }
-    final AbstractTimSort ts=new comparatorSortshortTimSort (arr,sorter,nRemaining);
-    int minRun=minRunLength(nRemaining);
-    int runLen;
-    do
-    {
-      if((runLen=countRunAndMakeAscendingcomparatorSort(arr,begin,end,sorter))<minRun)
-      {
-        int force;
-        binarycomparatorSort(arr,begin,begin+(force=nRemaining<=minRun?nRemaining:minRun),begin+runLen,sorter);
-        runLen=force;
-      }
-      ts.mergeCollapse(begin,runLen);
-      begin+=runLen;
-    }
-    while((nRemaining-=runLen)!=0);
-    //assert begin==end+1;
-    ts.mergeForceCollapse();
-  }
-  public static   void uncheckedcomparatorSort(int[] arr,int begin,int end,IntBinaryOperator sorter)
-  {
-    //assert sorter!=null;
-    //assert arr!=null;
-    //assert begin>=0;
-    //assert end<arr.length;
-    //assert end-begin>0;
-    //FIXME this sorting implementation is currently broken
-    int nRemaining;
-    if((nRemaining=++end-begin)<32)
-    {
-       binarycomparatorSort(arr,begin,end,begin+countRunAndMakeAscendingcomparatorSort(arr,begin,end,sorter),sorter);
-       return;
-    }
-    final AbstractTimSort ts=new comparatorSortintTimSort (arr,sorter,nRemaining);
-    int minRun=minRunLength(nRemaining);
-    int runLen;
-    do
-    {
-      if((runLen=countRunAndMakeAscendingcomparatorSort(arr,begin,end,sorter))<minRun)
-      {
-        int force;
-        binarycomparatorSort(arr,begin,begin+(force=nRemaining<=minRun?nRemaining:minRun),begin+runLen,sorter);
-        runLen=force;
-      }
-      ts.mergeCollapse(begin,runLen);
-      begin+=runLen;
-    }
-    while((nRemaining-=runLen)!=0);
-    //assert begin==end+1;
-    ts.mergeForceCollapse();
-  }
-  public static   void uncheckedcomparatorSort(long[] arr,int begin,int end,LongComparator sorter)
-  {
-    //assert sorter!=null;
-    //assert arr!=null;
-    //assert begin>=0;
-    //assert end<arr.length;
-    //assert end-begin>0;
-    //FIXME this sorting implementation is currently broken
-    int nRemaining;
-    if((nRemaining=++end-begin)<32)
-    {
-       binarycomparatorSort(arr,begin,end,begin+countRunAndMakeAscendingcomparatorSort(arr,begin,end,sorter),sorter);
-       return;
-    }
-    final AbstractTimSort ts=new comparatorSortlongTimSort (arr,sorter,nRemaining);
-    int minRun=minRunLength(nRemaining);
-    int runLen;
-    do
-    {
-      if((runLen=countRunAndMakeAscendingcomparatorSort(arr,begin,end,sorter))<minRun)
-      {
-        int force;
-        binarycomparatorSort(arr,begin,begin+(force=nRemaining<=minRun?nRemaining:minRun),begin+runLen,sorter);
-        runLen=force;
-      }
-      ts.mergeCollapse(begin,runLen);
-      begin+=runLen;
-    }
-    while((nRemaining-=runLen)!=0);
-    //assert begin==end+1;
-    ts.mergeForceCollapse();
-  }
-  public static   void uncheckedcomparatorSort(float[] arr,int begin,int end,FloatComparator sorter)
-  {
-    //assert sorter!=null;
-    //assert arr!=null;
-    //assert begin>=0;
-    //assert end<arr.length;
-    //assert end-begin>0;
-    //FIXME this sorting implementation is currently broken
-    int nRemaining;
-    if((nRemaining=++end-begin)<32)
-    {
-       binarycomparatorSort(arr,begin,end,begin+countRunAndMakeAscendingcomparatorSort(arr,begin,end,sorter),sorter);
-       return;
-    }
-    final AbstractTimSort ts=new comparatorSortfloatTimSort (arr,sorter,nRemaining);
-    int minRun=minRunLength(nRemaining);
-    int runLen;
-    do
-    {
-      if((runLen=countRunAndMakeAscendingcomparatorSort(arr,begin,end,sorter))<minRun)
-      {
-        int force;
-        binarycomparatorSort(arr,begin,begin+(force=nRemaining<=minRun?nRemaining:minRun),begin+runLen,sorter);
-        runLen=force;
-      }
-      ts.mergeCollapse(begin,runLen);
-      begin+=runLen;
-    }
-    while((nRemaining-=runLen)!=0);
-    //assert begin==end+1;
-    ts.mergeForceCollapse();
-  }
-  public static   void uncheckedcomparatorSort(double[] arr,int begin,int end,DoubleComparator sorter)
-  {
-    //assert sorter!=null;
-    //assert arr!=null;
-    //assert begin>=0;
-    //assert end<arr.length;
-    //assert end-begin>0;
-    //FIXME this sorting implementation is currently broken
-    int nRemaining;
-    if((nRemaining=++end-begin)<32)
-    {
-       binarycomparatorSort(arr,begin,end,begin+countRunAndMakeAscendingcomparatorSort(arr,begin,end,sorter),sorter);
-       return;
-    }
-    final AbstractTimSort ts=new comparatorSortdoubleTimSort (arr,sorter,nRemaining);
-    int minRun=minRunLength(nRemaining);
-    int runLen;
-    do
-    {
-      if((runLen=countRunAndMakeAscendingcomparatorSort(arr,begin,end,sorter))<minRun)
-      {
-        int force;
-        binarycomparatorSort(arr,begin,begin+(force=nRemaining<=minRun?nRemaining:minRun),begin+runLen,sorter);
-        runLen=force;
-      }
-      ts.mergeCollapse(begin,runLen);
-      begin+=runLen;
-    }
-    while((nRemaining-=runLen)!=0);
-    //assert begin==end+1;
-    ts.mergeForceCollapse();
-  }
-  public static <E> void uncheckedcomparatorSort(Object[] arr,int begin,int end,Comparator<? super E> sorter)
-  {
-    //assert sorter!=null;
-    //assert arr!=null;
-    //assert begin>=0;
-    //assert end<arr.length;
-    //assert end-begin>0;
-    //FIXME this sorting implementation is currently broken
-    int nRemaining;
-    if((nRemaining=++end-begin)<32)
-    {
-       binarycomparatorSort(arr,begin,end,begin+countRunAndMakeAscendingcomparatorSort(arr,begin,end,sorter),sorter);
-       return;
-    }
-    final AbstractTimSort ts=new comparatorSortObjectTimSort<E>(arr,sorter,nRemaining);
-    int minRun=minRunLength(nRemaining);
-    int runLen;
-    do
-    {
-      if((runLen=countRunAndMakeAscendingcomparatorSort(arr,begin,end,sorter))<minRun)
-      {
-        int force;
-        binarycomparatorSort(arr,begin,begin+(force=nRemaining<=minRun?nRemaining:minRun),begin+runLen,sorter);
-        runLen=force;
-      }
-      ts.mergeCollapse(begin,runLen);
-      begin+=runLen;
-    }
-    while((nRemaining-=runLen)!=0);
-    //assert begin==end+1;
-    ts.mergeForceCollapse();
-  }
-  //FIXME fix the TimSort methods
-  private static int minRunLength(int n)
-  {
-    //assert n>=0;
-    int r=0;
-    while(n>31)
-    {
-      r|=(n&1);
-      n>>=1;
-    }
-    return n+r;
-  }
-  private static class comparatorSortbyteTimSort 
-    extends AbstractTimSort
-  {
-    final byte[] arr;
-    byte[] tmp;
-    @Override
-    void initTmpArr(int tmpLen)
-    {
-      this.tmp=new byte[tmpLen];
-    }
-    private byte[] ensureCapacity(int minCapacity)
-    {
-      byte[] tmp;
-      if(tmpLen<minCapacity)
+      Object[] tmp;
+      if(tmpLength<minCapacity)
       {
         int newSize;
         if((newSize=(-1>>>Integer.numberOfLeadingZeros(minCapacity))+1)<0 || newSize>(minCapacity=arr.length>>>1))
         {
           newSize=minCapacity;
         }
-        this.tmp=tmp=new byte[newSize];
-        this.tmpLen=newSize;
-        tmpBase=0;
+        this.tmp=tmp=new Object[newSize];
+        this.tmpLength=newSize;
+        tmpOffset=0;
       }
       else
       {
@@ -10479,69 +10172,100 @@ public final class SortUtil
       }
       return tmp;
     }
-    final ByteComparator sorter;
-    comparatorSortbyteTimSort(byte[] arr,ByteComparator sorter,int nRemaining)
+  }
+  private static class comparatorSortbooleanTimSort 
+    extends AbstractTimSort
+  {
+    private transient final BooleanComparator sorter;
+    private transient final boolean[] arr;
+    private transient boolean[] tmp;
+    private transient int tmpOffset;
+    private transient int tmpLength;
+    private transient int minGallop;
+    comparatorSortbooleanTimSort(boolean[] arr,int nRemaining,BooleanComparator sorter)
     {
       super(nRemaining);
-      this.arr=arr;
       this.sorter=sorter;
+      this.arr=arr;
+      this.tmpLength=nRemaining=nRemaining<512?nRemaining>>>1:256;
+      this.tmp=new boolean[nRemaining];
+      this.minGallop=7;
+    }
+    private boolean[] ensureCapacity(int minCapacity)
+    {
+      boolean[] tmp;
+      if(tmpLength<minCapacity)
+      {
+        int newSize;
+        if((newSize=(-1>>>Integer.numberOfLeadingZeros(minCapacity))+1)<0 || newSize>(minCapacity=arr.length>>>1))
+        {
+          newSize=minCapacity;
+        }
+        this.tmp=tmp=new boolean[newSize];
+        this.tmpLength=newSize;
+        tmpOffset=0;
+      }
+      else
+      {
+        tmp=this.tmp;
+      }
+      return tmp;
     }
     @Override
-    int mergeAt(int i,int stackSize,int[] runLen)
+    int mergeAt(int n,int stackSize,int[] runLenAndBase)
     {
-      //assert stackSize>=2;
-      //assert i>=0;
-      //assert i==stackSize-2 || i==stackSize-3;
-      int base1,len1,base2,len2;
-      int[] runBase=this.runBase;
-      //assert runLen[i]>0 && runLen[i+1]>0;
-      //assert runBase[i]+runLen[i]==runBase[i+1];
-      runLen[i]=(len1=runLen[i])+(len2=runLen[i+1]);
-      if(i==stackSize-3)
+      //assert stackSize>=4;
+      //assert n>=0;
+      //assert n==stackSize-4 || n==stackSize-6;
+      //assert runLenAndBase[n]>0;
+      //assert runLenAndBase[n+2]>0;
+      //assert runLenAndBase[n]+runBaseAndLen[n+1]==runBaseAndLen[n+3];
+      int len1,base1,len2,base2;
+      runLenAndBase[n]=(len1=runLenAndBase[n])+(len2=runLenAndBase[n+2]);
+      if(n==stackSize-6)
       {
-        runBase[i+1]=runBase[i+2];
-        runLen[i+1]=runLen[i+2];
+        runLenAndBase[n+3]=runLenAndBase[n+5];
+        runLenAndBase[n+2]=runLenAndBase[n+4];
       }
-      --stackSize;
-      byte[] arr;
+      boolean[] arr;
       int k;
-      base1=(base1=runBase[i])+(k=SortUtil.gallopRightcomparatorSort((byte)(arr=this.arr)[base2=runBase[i+1]],arr,base1,len1,0
+      base1=(base1=runLenAndBase[n+1])+(k=gallopRight((boolean)(arr=this.arr)[base2=runLenAndBase[n+3]],arr,base1,len1,0
         ,sorter
       ));
+      //assert k>=0;
       if((len1-=k)!=0)
       {
-         //assert k>=0;
-         if((len2=SortUtil.gallopLeftcomparatorSort((byte)arr[base1+len1-1],arr,base2,len2,len2-1
-           ,sorter
-         ))!=0)
-         {
-           //assert len2>0;
-           if(len1>len2)
-           {
-             mergeHi(arr,base1,len1,base2,len2
-               ,sorter
-             );
-           }
-           else
-           {
-             mergeLo(arr,base1,len1,base2,len2
-               ,sorter
-             );
-           }
-         }
+        if((len2=gallopLeft((boolean)arr[base1+len1-2],arr,base2,len2,len2-1
+          ,sorter
+        ))!=0)
+        {
+          //assert len2>0;
+          if(len1<=len2)
+          {
+            mergeLo(arr,base1,len1,base2,len2);
+          }
+          else
+          {
+            mergeHi(arr,base1,len1,base2,len2);
+          }
+        }
       }
-      return stackSize;
+      return stackSize-2;
     }
-    private void mergeLo(byte[] arr,int base1,int len1,int base2,int len2
-    ,ByteComparator sorter
-    )
+    private void mergeLo(boolean[] arr,int base1,int len1,int base2,int len2)
     {
-      byte[] tmp;
-      int cursor1,dest;
-      int cursor2=base2;
+      //assert len1>0;
+      //assert len2>0;
+      //assert base1+len1==base2;
+      //TODO
+      boolean[] tmp;
+      int cursor1;
+      int dest;
       ArrCopy.uncheckedCopy(arr,dest=base1,tmp=
-      ensureCapacity(len1),cursor1=this.tmpBase,len1);
+      ensureCapacity(len1),cursor1=this.tmpOffset,len1);
+      int cursor2=base2;
       arr[dest++]=arr[cursor2++];
+      //TODO make these pre-decrement for performance
       if(--len2==0)
       {
         ArrCopy.uncheckedCopy(tmp,cursor1,arr,dest,len1);
@@ -10554,13 +10278,357 @@ public final class SortUtil
         return;
       }
       int minGallop=this.minGallop;
-      outer:for(;;)
+      final var sorter=this.sorter;
+      outer:
+      for(;;)
       {
         int count1=0;
         int count2=0;
         do
         {
-          //assert len1>1 && len2>0;
+          //assert len1>1;
+          //assert len2=0;
+          if(
+          sorter.compare((boolean)(arr[cursor2]),(boolean)(tmp[cursor1]))<0
+          )
+          {
+            arr[dest++]=arr[cursor2++];
+            ++count2;
+            count1=0;
+            if(--len2==0)
+            {
+              break outer;
+            }
+          }
+          else
+          {
+            arr[dest++]=tmp[cursor1++];
+            ++count1;
+            count2=0;
+            if(--len1==1)
+            {
+              break outer;
+            }
+          }
+        }
+        while((count1|count2)<minGallop);
+        do
+        {
+          //assert len1>1;
+          //assert len2>0;
+          if((
+          count1=gallopRight((boolean)arr[cursor2],tmp,cursor1,len1,0
+            ,sorter
+            ))!=0)
+          {
+            ArrCopy.uncheckedCopy(tmp,cursor1,arr,dest,count1);
+            dest+=count1;
+            cursor1+=count1;
+            if((len1-=count1)<2)
+            {
+              break outer;
+            }
+          }
+          arr[dest++]=arr[cursor2++];
+          if(--len2==0)
+          {
+            break outer;
+          }
+          if((count2=gallopLeft((boolean)tmp[cursor1],arr,cursor2,len2,0
+            ,sorter
+          ))!=0)
+          {
+            ArrCopy.uncheckedCopy(arr,cursor2,arr,dest,count2);
+            dest+=count2;
+            cursor2+=count2;
+            if((len2-=count2)==0)
+            {
+              break outer;
+            }
+          }
+          arr[dest++]=tmp[cursor1++];
+          if(--len1==1)
+          {
+            break outer;
+          }
+          --minGallop;
+        }
+        while(count1>=7 || count2>=7);
+        if(minGallop<0)
+        {
+          minGallop=2;
+        }
+        else
+        {
+          minGallop+=2;
+        }
+      }
+      this.minGallop = minGallop < 1 ? 1 : minGallop;
+      if(len1==1)
+      {
+        //assert len2>0;
+        ArrCopy.uncheckedCopy(arr,cursor2,arr,dest,len2);
+        arr[dest+len2]=tmp[cursor1];
+      }
+      else
+      {
+        //assert len2==0;
+        //assert len1>1;
+        ArrCopy.uncheckedCopy(tmp,cursor1,arr,dest,len1);
+      }
+    }
+    private void mergeHi(boolean[] arr,int base1,int len1,int base2,int len2)
+    {
+      //assert len1>0;
+      //assert len2>0;
+      //assert base1+len1==base2;
+      //TODO
+      boolean[] tmp;
+      int tmpOffset;
+      ArrCopy.uncheckedCopy(arr,base2,tmp=
+      ensureCapacity(len2),tmpOffset=this.tmpOffset,len2);
+      int cursor1=base1+len1-1;
+      int cursor2=tmpOffset+len2-1;
+      int dest=base2+len2-1;
+      arr[dest--]=arr[cursor1--];
+      //TODO make these pre-decrement for performance
+      if(--len1==0)
+      {
+        ArrCopy.uncheckedCopy(tmp,tmpOffset,arr,dest-(len2-1),len2);
+        return;
+      }
+      if(len2==1)
+      {
+        ArrCopy.uncheckedCopy(arr,cursor1-len1+1,arr,(dest-=len1)+1,len1);
+        arr[dest]=tmp[cursor2];
+        return;
+      }
+      int minGallop=this.minGallop;
+      final var sorter=this.sorter;
+      outer:
+      for(;;)
+      {
+        int count1=0;
+        int count2=0;
+        do
+        {
+          //assert len2>1;
+          //assert len1=0;
+          if(
+          sorter.compare((boolean)(tmp[cursor2]),(boolean)(arr[cursor1]))<0
+          )
+          {
+            arr[dest--]=arr[cursor1--];
+            ++count1;
+            count2=0;
+            if(--len1==0)
+            {
+              break outer;
+            }
+          }
+          else
+          {
+            arr[dest--]=tmp[cursor2--];
+            ++count2;
+            count1=0;
+            if(--len2==1)
+            {
+              break outer;
+            }
+          }
+        }
+        while((count1|count2)<minGallop);
+        do
+        {
+          //assert len2>1;
+          //assert len1>0;
+          if((
+          count1=len1-gallopRight((boolean)tmp[cursor2],arr,base1,len1,len1-1
+            ,sorter
+            ))!=0)
+          {
+            ArrCopy.uncheckedCopy(arr,(cursor1-=count1)+1,arr,(dest-=count1)+1,count1);
+            if((len1-=count1)==0)
+            {
+              break outer;
+            }
+          }
+          arr[dest--]=tmp[cursor2--];
+          if(--len2==1)
+          {
+            break outer;
+          }
+          if((count2=len2-gallopLeft((boolean)arr[cursor1],tmp,tmpOffset,len2,len2-1
+            ,sorter
+          ))!=0)
+          {
+            ArrCopy.uncheckedCopy(tmp,(cursor2-=count2)+1,arr,(dest-=count2)+1,count2);
+            if((len2-=count2)<2)
+            {
+              break outer;
+            }
+          }
+          arr[dest--]=arr[cursor1--];
+          if(--len1==0)
+          {
+            break outer;
+          }
+          --minGallop;
+        }
+        while(count1>=7 || count2>=7);
+        if(minGallop<0)
+        {
+          minGallop=2;
+        }
+        else
+        {
+          minGallop+=2;
+        }
+      }
+      this.minGallop = minGallop < 1 ? 1 : minGallop;
+      if(len2==1)
+      {
+        //assert len1>0;
+        ArrCopy.uncheckedCopy(arr,(cursor1-=len1)+1,arr,(dest-=len1)+1,len1);
+        arr[dest]=tmp[cursor2];
+      }
+      else
+      {
+        //assert len1==0;
+        //assert len2>0;
+        ArrCopy.uncheckedCopy(tmp,tmpOffset,arr,dest+(len2-1),len2);
+      }
+    }
+    private static   int gallopRight(boolean key,boolean[] arr,int base,int len,int hint
+      ,BooleanComparator sorter
+    )
+    {
+      //TODO
+      return 0;
+    }
+    private static   int gallopLeft(boolean key,boolean[] arr,int base,int len,int hint
+      ,BooleanComparator sorter
+    )
+    {
+      //TODO
+      return 0;
+    }
+  }
+  private static class comparatorSortbyteTimSort 
+    extends AbstractTimSort
+  {
+    private transient final ByteComparator sorter;
+    private transient final byte[] arr;
+    private transient byte[] tmp;
+    private transient int tmpOffset;
+    private transient int tmpLength;
+    private transient int minGallop;
+    comparatorSortbyteTimSort(byte[] arr,int nRemaining,ByteComparator sorter)
+    {
+      super(nRemaining);
+      this.sorter=sorter;
+      this.arr=arr;
+      this.tmpLength=nRemaining=nRemaining<512?nRemaining>>>1:256;
+      this.tmp=new byte[nRemaining];
+      this.minGallop=7;
+    }
+    private byte[] ensureCapacity(int minCapacity)
+    {
+      byte[] tmp;
+      if(tmpLength<minCapacity)
+      {
+        int newSize;
+        if((newSize=(-1>>>Integer.numberOfLeadingZeros(minCapacity))+1)<0 || newSize>(minCapacity=arr.length>>>1))
+        {
+          newSize=minCapacity;
+        }
+        this.tmp=tmp=new byte[newSize];
+        this.tmpLength=newSize;
+        tmpOffset=0;
+      }
+      else
+      {
+        tmp=this.tmp;
+      }
+      return tmp;
+    }
+    @Override
+    int mergeAt(int n,int stackSize,int[] runLenAndBase)
+    {
+      //assert stackSize>=4;
+      //assert n>=0;
+      //assert n==stackSize-4 || n==stackSize-6;
+      //assert runLenAndBase[n]>0;
+      //assert runLenAndBase[n+2]>0;
+      //assert runLenAndBase[n]+runBaseAndLen[n+1]==runBaseAndLen[n+3];
+      int len1,base1,len2,base2;
+      runLenAndBase[n]=(len1=runLenAndBase[n])+(len2=runLenAndBase[n+2]);
+      if(n==stackSize-6)
+      {
+        runLenAndBase[n+3]=runLenAndBase[n+5];
+        runLenAndBase[n+2]=runLenAndBase[n+4];
+      }
+      byte[] arr;
+      int k;
+      base1=(base1=runLenAndBase[n+1])+(k=gallopRight((byte)(arr=this.arr)[base2=runLenAndBase[n+3]],arr,base1,len1,0
+        ,sorter
+      ));
+      //assert k>=0;
+      if((len1-=k)!=0)
+      {
+        if((len2=gallopLeft((byte)arr[base1+len1-2],arr,base2,len2,len2-1
+          ,sorter
+        ))!=0)
+        {
+          //assert len2>0;
+          if(len1<=len2)
+          {
+            mergeLo(arr,base1,len1,base2,len2);
+          }
+          else
+          {
+            mergeHi(arr,base1,len1,base2,len2);
+          }
+        }
+      }
+      return stackSize-2;
+    }
+    private void mergeLo(byte[] arr,int base1,int len1,int base2,int len2)
+    {
+      //assert len1>0;
+      //assert len2>0;
+      //assert base1+len1==base2;
+      //TODO
+      byte[] tmp;
+      int cursor1;
+      int dest;
+      ArrCopy.uncheckedCopy(arr,dest=base1,tmp=
+      ensureCapacity(len1),cursor1=this.tmpOffset,len1);
+      int cursor2=base2;
+      arr[dest++]=arr[cursor2++];
+      //TODO make these pre-decrement for performance
+      if(--len2==0)
+      {
+        ArrCopy.uncheckedCopy(tmp,cursor1,arr,dest,len1);
+        return;
+      }
+      if(len1==1)
+      {
+        ArrCopy.uncheckedCopy(arr,cursor2,arr,dest,len2);
+        arr[dest+len2]=tmp[cursor1];
+        return;
+      }
+      int minGallop=this.minGallop;
+      final var sorter=this.sorter;
+      outer:
+      for(;;)
+      {
+        int count1=0;
+        int count2=0;
+        do
+        {
+          //assert len1>1;
+          //assert len2=0;
           if(
           sorter.compare((byte)(arr[cursor2]),(byte)(tmp[cursor1]))<0
           )
@@ -10578,24 +10646,26 @@ public final class SortUtil
             arr[dest++]=tmp[cursor1++];
             ++count1;
             count2=0;
-            if(--len1==0)
+            if(--len1==1)
             {
-              break;
+              break outer;
             }
           }
         }
         while((count1|count2)<minGallop);
         do
         {
-          //assert len1>1 && len2>0;
-          if((count1=SortUtil.gallopRightcomparatorSort((byte)arr[cursor2],tmp,cursor1,len1,0
+          //assert len1>1;
+          //assert len2>0;
+          if((
+          count1=gallopRight((byte)arr[cursor2],tmp,cursor1,len1,0
             ,sorter
-          ))!=0)
+            ))!=0)
           {
             ArrCopy.uncheckedCopy(tmp,cursor1,arr,dest,count1);
             dest+=count1;
             cursor1+=count1;
-            if((len1-=count1)<=1)
+            if((len1-=count1)<2)
             {
               break outer;
             }
@@ -10605,7 +10675,7 @@ public final class SortUtil
           {
             break outer;
           }
-          if((count2=SortUtil.gallopLeftcomparatorSort((byte)tmp[cursor1],arr,cursor2,len2,0
+          if((count2=gallopLeft((byte)tmp[cursor1],arr,cursor2,len2,0
             ,sorter
           ))!=0)
           {
@@ -10618,7 +10688,7 @@ public final class SortUtil
             }
           }
           arr[dest++]=tmp[cursor1++];
-          if(len1==1)
+          if(--len1==1)
           {
             break outer;
           }
@@ -10627,60 +10697,64 @@ public final class SortUtil
         while(count1>=7 || count2>=7);
         if(minGallop<0)
         {
-          minGallop=0;
+          minGallop=2;
         }
-        minGallop+=2;
+        else
+        {
+          minGallop+=2;
+        }
       }
-      this.minGallop=(minGallop<1?1:minGallop);
-      switch(len1)
+      this.minGallop = minGallop < 1 ? 1 : minGallop;
+      if(len1==1)
       {
-        case 0:
-          throw new IllegalArgumentException("Comparison method violates its general contract!");
-        case 1:
-          //assert len2>0;
+        //assert len2>0;
         ArrCopy.uncheckedCopy(arr,cursor2,arr,dest,len2);
         arr[dest+len2]=tmp[cursor1];
-        break;
-      default:
-        assert len2==0;
-        assert len1>1;
+      }
+      else
+      {
+        //assert len2==0;
+        //assert len1>1;
         ArrCopy.uncheckedCopy(tmp,cursor1,arr,dest,len1);
       }
     }
-    private void mergeHi(byte[] arr,int base1,int len1,int base2,int len2
-    ,ByteComparator sorter
-    )
+    private void mergeHi(byte[] arr,int base1,int len1,int base2,int len2)
     {
+      //assert len1>0;
+      //assert len2>0;
+      //assert base1+len1==base2;
+      //TODO
       byte[] tmp;
-      int cursor1,dest;
-      int tmpBase;
+      int tmpOffset;
       ArrCopy.uncheckedCopy(arr,base2,tmp=
-      ensureCapacity(len2),tmpBase=this.tmpBase,len2);
-      dest=base2+len2-1;
-      cursor1=base1+len1-1;
+      ensureCapacity(len2),tmpOffset=this.tmpOffset,len2);
+      int cursor1=base1+len1-1;
+      int cursor2=tmpOffset+len2-1;
+      int dest=base2+len2-1;
       arr[dest--]=arr[cursor1--];
+      //TODO make these pre-decrement for performance
       if(--len1==0)
       {
-        ArrCopy.uncheckedCopy(tmp,tmpBase,arr,dest-(len2-1),len2);
+        ArrCopy.uncheckedCopy(tmp,tmpOffset,arr,dest-(len2-1),len2);
         return;
       }
       if(len2==1)
       {
-        dest-=len1;
-        cursor1-=len1;
-        ArrCopy.uncheckedCopy(arr,(cursor1-=len1)+1,arr,(dest-=len1)+1,len1);
-        arr[dest]=tmp[tmpBase];
+        ArrCopy.uncheckedCopy(arr,cursor1-len1+1,arr,(dest-=len1)+1,len1);
+        arr[dest]=tmp[cursor2];
         return;
       }
-      int cursor2=tmpBase+len2-1;
       int minGallop=this.minGallop;
-      outer:for(;;)
+      final var sorter=this.sorter;
+      outer:
+      for(;;)
       {
         int count1=0;
         int count2=0;
         do
         {
-          //assert len2>1 && len1>0;
+          //assert len2>1;
+          //assert len1=0;
           if(
           sorter.compare((byte)(tmp[cursor2]),(byte)(arr[cursor1]))<0
           )
@@ -10698,21 +10772,23 @@ public final class SortUtil
             arr[dest--]=tmp[cursor2--];
             ++count2;
             count1=0;
-            if(--len2==0)
+            if(--len2==1)
             {
-              break;
+              break outer;
             }
           }
         }
         while((count1|count2)<minGallop);
         do
         {
-          //assert len2>1 && len1>0;
-          if((count1=len1-SortUtil.gallopRightcomparatorSort((byte)tmp[cursor2],arr,base1,len1,len1-1
+          //assert len2>1;
+          //assert len1>0;
+          if((
+          count1=len1-gallopRight((byte)tmp[cursor2],arr,base1,len1,len1-1
             ,sorter
-          ))!=0)
+            ))!=0)
           {
-            ArrCopy.uncheckedCopy(arr,(cursor1-=count1),arr,(dest-=count1)+1,count1);
+            ArrCopy.uncheckedCopy(arr,(cursor1-=count1)+1,arr,(dest-=count1)+1,count1);
             if((len1-=count1)==0)
             {
               break outer;
@@ -10723,18 +10799,18 @@ public final class SortUtil
           {
             break outer;
           }
-          if((count2=len2-SortUtil.gallopLeftcomparatorSort((byte)arr[cursor1],tmp,tmpBase,len2,len2-1
+          if((count2=len2-gallopLeft((byte)arr[cursor1],tmp,tmpOffset,len2,len2-1
             ,sorter
           ))!=0)
           {
             ArrCopy.uncheckedCopy(tmp,(cursor2-=count2)+1,arr,(dest-=count2)+1,count2);
-            if((len2-=count2)<=1)
+            if((len2-=count2)<2)
             {
               break outer;
             }
           }
-          arr[dest--]=tmp[cursor2--];
-          if(len1==0)
+          arr[dest--]=arr[cursor1--];
+          if(--len1==0)
           {
             break outer;
           }
@@ -10743,41 +10819,64 @@ public final class SortUtil
         while(count1>=7 || count2>=7);
         if(minGallop<0)
         {
-          minGallop=0;
+          minGallop=2;
         }
-        minGallop+=2;
+        else
+        {
+          minGallop+=2;
+        }
       }
-      this.minGallop=(minGallop<1?1:minGallop);
-      switch(len2)
+      this.minGallop = minGallop < 1 ? 1 : minGallop;
+      if(len2==1)
       {
-        case 0:
-          throw new IllegalArgumentException("Comparison method violates its general contract!");
-        case 1:
-          //assert len1>0;
+        //assert len1>0;
         ArrCopy.uncheckedCopy(arr,(cursor1-=len1)+1,arr,(dest-=len1)+1,len1);
         arr[dest]=tmp[cursor2];
-        break;
-      default:
+      }
+      else
+      {
         //assert len1==0;
         //assert len2>0;
-        ArrCopy.uncheckedCopy(tmp,tmpBase,arr,dest-(len2-1),len2);
+        ArrCopy.uncheckedCopy(tmp,tmpOffset,arr,dest+(len2-1),len2);
       }
+    }
+    private static   int gallopRight(byte key,byte[] arr,int base,int len,int hint
+      ,ByteComparator sorter
+    )
+    {
+      //TODO
+      return 0;
+    }
+    private static   int gallopLeft(byte key,byte[] arr,int base,int len,int hint
+      ,ByteComparator sorter
+    )
+    {
+      //TODO
+      return 0;
     }
   }
   private static class comparatorSortcharTimSort 
     extends AbstractTimSort
   {
-    final char[] arr;
-    char[] tmp;
-    @Override
-    void initTmpArr(int tmpLen)
+    private transient final CharComparator sorter;
+    private transient final char[] arr;
+    private transient char[] tmp;
+    private transient int tmpOffset;
+    private transient int tmpLength;
+    private transient int minGallop;
+    comparatorSortcharTimSort(char[] arr,int nRemaining,CharComparator sorter)
     {
-      this.tmp=new char[tmpLen];
+      super(nRemaining);
+      this.sorter=sorter;
+      this.arr=arr;
+      this.tmpLength=nRemaining=nRemaining<512?nRemaining>>>1:256;
+      this.tmp=new char[nRemaining];
+      this.minGallop=7;
     }
     private char[] ensureCapacity(int minCapacity)
     {
       char[] tmp;
-      if(tmpLen<minCapacity)
+      if(tmpLength<minCapacity)
       {
         int newSize;
         if((newSize=(-1>>>Integer.numberOfLeadingZeros(minCapacity))+1)<0 || newSize>(minCapacity=arr.length>>>1))
@@ -10785,8 +10884,8 @@ public final class SortUtil
           newSize=minCapacity;
         }
         this.tmp=tmp=new char[newSize];
-        this.tmpLen=newSize;
-        tmpBase=0;
+        this.tmpLength=newSize;
+        tmpOffset=0;
       }
       else
       {
@@ -10794,69 +10893,61 @@ public final class SortUtil
       }
       return tmp;
     }
-    final CharComparator sorter;
-    comparatorSortcharTimSort(char[] arr,CharComparator sorter,int nRemaining)
-    {
-      super(nRemaining);
-      this.arr=arr;
-      this.sorter=sorter;
-    }
     @Override
-    int mergeAt(int i,int stackSize,int[] runLen)
+    int mergeAt(int n,int stackSize,int[] runLenAndBase)
     {
-      //assert stackSize>=2;
-      //assert i>=0;
-      //assert i==stackSize-2 || i==stackSize-3;
-      int base1,len1,base2,len2;
-      int[] runBase=this.runBase;
-      //assert runLen[i]>0 && runLen[i+1]>0;
-      //assert runBase[i]+runLen[i]==runBase[i+1];
-      runLen[i]=(len1=runLen[i])+(len2=runLen[i+1]);
-      if(i==stackSize-3)
+      //assert stackSize>=4;
+      //assert n>=0;
+      //assert n==stackSize-4 || n==stackSize-6;
+      //assert runLenAndBase[n]>0;
+      //assert runLenAndBase[n+2]>0;
+      //assert runLenAndBase[n]+runBaseAndLen[n+1]==runBaseAndLen[n+3];
+      int len1,base1,len2,base2;
+      runLenAndBase[n]=(len1=runLenAndBase[n])+(len2=runLenAndBase[n+2]);
+      if(n==stackSize-6)
       {
-        runBase[i+1]=runBase[i+2];
-        runLen[i+1]=runLen[i+2];
+        runLenAndBase[n+3]=runLenAndBase[n+5];
+        runLenAndBase[n+2]=runLenAndBase[n+4];
       }
-      --stackSize;
       char[] arr;
       int k;
-      base1=(base1=runBase[i])+(k=SortUtil.gallopRightcomparatorSort((char)(arr=this.arr)[base2=runBase[i+1]],arr,base1,len1,0
+      base1=(base1=runLenAndBase[n+1])+(k=gallopRight((char)(arr=this.arr)[base2=runLenAndBase[n+3]],arr,base1,len1,0
         ,sorter
       ));
+      //assert k>=0;
       if((len1-=k)!=0)
       {
-         //assert k>=0;
-         if((len2=SortUtil.gallopLeftcomparatorSort((char)arr[base1+len1-1],arr,base2,len2,len2-1
-           ,sorter
-         ))!=0)
-         {
-           //assert len2>0;
-           if(len1>len2)
-           {
-             mergeHi(arr,base1,len1,base2,len2
-               ,sorter
-             );
-           }
-           else
-           {
-             mergeLo(arr,base1,len1,base2,len2
-               ,sorter
-             );
-           }
-         }
+        if((len2=gallopLeft((char)arr[base1+len1-2],arr,base2,len2,len2-1
+          ,sorter
+        ))!=0)
+        {
+          //assert len2>0;
+          if(len1<=len2)
+          {
+            mergeLo(arr,base1,len1,base2,len2);
+          }
+          else
+          {
+            mergeHi(arr,base1,len1,base2,len2);
+          }
+        }
       }
-      return stackSize;
+      return stackSize-2;
     }
-    private void mergeLo(char[] arr,int base1,int len1,int base2,int len2
-    ,CharComparator sorter
-    )
+    private void mergeLo(char[] arr,int base1,int len1,int base2,int len2)
     {
+      //assert len1>0;
+      //assert len2>0;
+      //assert base1+len1==base2;
+      //TODO
       char[] tmp;
-      int cursor1,dest;
-      int cursor2=base2;
+      int cursor1;
+      int dest;
       ArrCopy.uncheckedCopy(arr,dest=base1,tmp=
-      ensureCapacity(len1),cursor1=this.tmpBase,len1);
+      ensureCapacity(len1),cursor1=this.tmpOffset,len1);
+      int cursor2=base2;
       arr[dest++]=arr[cursor2++];
+      //TODO make these pre-decrement for performance
       if(--len2==0)
       {
         ArrCopy.uncheckedCopy(tmp,cursor1,arr,dest,len1);
@@ -10869,13 +10960,16 @@ public final class SortUtil
         return;
       }
       int minGallop=this.minGallop;
-      outer:for(;;)
+      final var sorter=this.sorter;
+      outer:
+      for(;;)
       {
         int count1=0;
         int count2=0;
         do
         {
-          //assert len1>1 && len2>0;
+          //assert len1>1;
+          //assert len2=0;
           if(
           sorter.compare((char)(arr[cursor2]),(char)(tmp[cursor1]))<0
           )
@@ -10893,24 +10987,26 @@ public final class SortUtil
             arr[dest++]=tmp[cursor1++];
             ++count1;
             count2=0;
-            if(--len1==0)
+            if(--len1==1)
             {
-              break;
+              break outer;
             }
           }
         }
         while((count1|count2)<minGallop);
         do
         {
-          //assert len1>1 && len2>0;
-          if((count1=SortUtil.gallopRightcomparatorSort((char)arr[cursor2],tmp,cursor1,len1,0
+          //assert len1>1;
+          //assert len2>0;
+          if((
+          count1=gallopRight((char)arr[cursor2],tmp,cursor1,len1,0
             ,sorter
-          ))!=0)
+            ))!=0)
           {
             ArrCopy.uncheckedCopy(tmp,cursor1,arr,dest,count1);
             dest+=count1;
             cursor1+=count1;
-            if((len1-=count1)<=1)
+            if((len1-=count1)<2)
             {
               break outer;
             }
@@ -10920,7 +11016,7 @@ public final class SortUtil
           {
             break outer;
           }
-          if((count2=SortUtil.gallopLeftcomparatorSort((char)tmp[cursor1],arr,cursor2,len2,0
+          if((count2=gallopLeft((char)tmp[cursor1],arr,cursor2,len2,0
             ,sorter
           ))!=0)
           {
@@ -10933,7 +11029,7 @@ public final class SortUtil
             }
           }
           arr[dest++]=tmp[cursor1++];
-          if(len1==1)
+          if(--len1==1)
           {
             break outer;
           }
@@ -10942,60 +11038,64 @@ public final class SortUtil
         while(count1>=7 || count2>=7);
         if(minGallop<0)
         {
-          minGallop=0;
+          minGallop=2;
         }
-        minGallop+=2;
+        else
+        {
+          minGallop+=2;
+        }
       }
-      this.minGallop=(minGallop<1?1:minGallop);
-      switch(len1)
+      this.minGallop = minGallop < 1 ? 1 : minGallop;
+      if(len1==1)
       {
-        case 0:
-          throw new IllegalArgumentException("Comparison method violates its general contract!");
-        case 1:
-          //assert len2>0;
+        //assert len2>0;
         ArrCopy.uncheckedCopy(arr,cursor2,arr,dest,len2);
         arr[dest+len2]=tmp[cursor1];
-        break;
-      default:
-        assert len2==0;
-        assert len1>1;
+      }
+      else
+      {
+        //assert len2==0;
+        //assert len1>1;
         ArrCopy.uncheckedCopy(tmp,cursor1,arr,dest,len1);
       }
     }
-    private void mergeHi(char[] arr,int base1,int len1,int base2,int len2
-    ,CharComparator sorter
-    )
+    private void mergeHi(char[] arr,int base1,int len1,int base2,int len2)
     {
+      //assert len1>0;
+      //assert len2>0;
+      //assert base1+len1==base2;
+      //TODO
       char[] tmp;
-      int cursor1,dest;
-      int tmpBase;
+      int tmpOffset;
       ArrCopy.uncheckedCopy(arr,base2,tmp=
-      ensureCapacity(len2),tmpBase=this.tmpBase,len2);
-      dest=base2+len2-1;
-      cursor1=base1+len1-1;
+      ensureCapacity(len2),tmpOffset=this.tmpOffset,len2);
+      int cursor1=base1+len1-1;
+      int cursor2=tmpOffset+len2-1;
+      int dest=base2+len2-1;
       arr[dest--]=arr[cursor1--];
+      //TODO make these pre-decrement for performance
       if(--len1==0)
       {
-        ArrCopy.uncheckedCopy(tmp,tmpBase,arr,dest-(len2-1),len2);
+        ArrCopy.uncheckedCopy(tmp,tmpOffset,arr,dest-(len2-1),len2);
         return;
       }
       if(len2==1)
       {
-        dest-=len1;
-        cursor1-=len1;
-        ArrCopy.uncheckedCopy(arr,(cursor1-=len1)+1,arr,(dest-=len1)+1,len1);
-        arr[dest]=tmp[tmpBase];
+        ArrCopy.uncheckedCopy(arr,cursor1-len1+1,arr,(dest-=len1)+1,len1);
+        arr[dest]=tmp[cursor2];
         return;
       }
-      int cursor2=tmpBase+len2-1;
       int minGallop=this.minGallop;
-      outer:for(;;)
+      final var sorter=this.sorter;
+      outer:
+      for(;;)
       {
         int count1=0;
         int count2=0;
         do
         {
-          //assert len2>1 && len1>0;
+          //assert len2>1;
+          //assert len1=0;
           if(
           sorter.compare((char)(tmp[cursor2]),(char)(arr[cursor1]))<0
           )
@@ -11013,21 +11113,23 @@ public final class SortUtil
             arr[dest--]=tmp[cursor2--];
             ++count2;
             count1=0;
-            if(--len2==0)
+            if(--len2==1)
             {
-              break;
+              break outer;
             }
           }
         }
         while((count1|count2)<minGallop);
         do
         {
-          //assert len2>1 && len1>0;
-          if((count1=len1-SortUtil.gallopRightcomparatorSort((char)tmp[cursor2],arr,base1,len1,len1-1
+          //assert len2>1;
+          //assert len1>0;
+          if((
+          count1=len1-gallopRight((char)tmp[cursor2],arr,base1,len1,len1-1
             ,sorter
-          ))!=0)
+            ))!=0)
           {
-            ArrCopy.uncheckedCopy(arr,(cursor1-=count1),arr,(dest-=count1)+1,count1);
+            ArrCopy.uncheckedCopy(arr,(cursor1-=count1)+1,arr,(dest-=count1)+1,count1);
             if((len1-=count1)==0)
             {
               break outer;
@@ -11038,18 +11140,18 @@ public final class SortUtil
           {
             break outer;
           }
-          if((count2=len2-SortUtil.gallopLeftcomparatorSort((char)arr[cursor1],tmp,tmpBase,len2,len2-1
+          if((count2=len2-gallopLeft((char)arr[cursor1],tmp,tmpOffset,len2,len2-1
             ,sorter
           ))!=0)
           {
             ArrCopy.uncheckedCopy(tmp,(cursor2-=count2)+1,arr,(dest-=count2)+1,count2);
-            if((len2-=count2)<=1)
+            if((len2-=count2)<2)
             {
               break outer;
             }
           }
-          arr[dest--]=tmp[cursor2--];
-          if(len1==0)
+          arr[dest--]=arr[cursor1--];
+          if(--len1==0)
           {
             break outer;
           }
@@ -11058,41 +11160,64 @@ public final class SortUtil
         while(count1>=7 || count2>=7);
         if(minGallop<0)
         {
-          minGallop=0;
+          minGallop=2;
         }
-        minGallop+=2;
+        else
+        {
+          minGallop+=2;
+        }
       }
-      this.minGallop=(minGallop<1?1:minGallop);
-      switch(len2)
+      this.minGallop = minGallop < 1 ? 1 : minGallop;
+      if(len2==1)
       {
-        case 0:
-          throw new IllegalArgumentException("Comparison method violates its general contract!");
-        case 1:
-          //assert len1>0;
+        //assert len1>0;
         ArrCopy.uncheckedCopy(arr,(cursor1-=len1)+1,arr,(dest-=len1)+1,len1);
         arr[dest]=tmp[cursor2];
-        break;
-      default:
+      }
+      else
+      {
         //assert len1==0;
         //assert len2>0;
-        ArrCopy.uncheckedCopy(tmp,tmpBase,arr,dest-(len2-1),len2);
+        ArrCopy.uncheckedCopy(tmp,tmpOffset,arr,dest+(len2-1),len2);
       }
+    }
+    private static   int gallopRight(char key,char[] arr,int base,int len,int hint
+      ,CharComparator sorter
+    )
+    {
+      //TODO
+      return 0;
+    }
+    private static   int gallopLeft(char key,char[] arr,int base,int len,int hint
+      ,CharComparator sorter
+    )
+    {
+      //TODO
+      return 0;
     }
   }
   private static class comparatorSortshortTimSort 
     extends AbstractTimSort
   {
-    final short[] arr;
-    short[] tmp;
-    @Override
-    void initTmpArr(int tmpLen)
+    private transient final ShortComparator sorter;
+    private transient final short[] arr;
+    private transient short[] tmp;
+    private transient int tmpOffset;
+    private transient int tmpLength;
+    private transient int minGallop;
+    comparatorSortshortTimSort(short[] arr,int nRemaining,ShortComparator sorter)
     {
-      this.tmp=new short[tmpLen];
+      super(nRemaining);
+      this.sorter=sorter;
+      this.arr=arr;
+      this.tmpLength=nRemaining=nRemaining<512?nRemaining>>>1:256;
+      this.tmp=new short[nRemaining];
+      this.minGallop=7;
     }
     private short[] ensureCapacity(int minCapacity)
     {
       short[] tmp;
-      if(tmpLen<minCapacity)
+      if(tmpLength<minCapacity)
       {
         int newSize;
         if((newSize=(-1>>>Integer.numberOfLeadingZeros(minCapacity))+1)<0 || newSize>(minCapacity=arr.length>>>1))
@@ -11100,8 +11225,8 @@ public final class SortUtil
           newSize=minCapacity;
         }
         this.tmp=tmp=new short[newSize];
-        this.tmpLen=newSize;
-        tmpBase=0;
+        this.tmpLength=newSize;
+        tmpOffset=0;
       }
       else
       {
@@ -11109,69 +11234,61 @@ public final class SortUtil
       }
       return tmp;
     }
-    final ShortComparator sorter;
-    comparatorSortshortTimSort(short[] arr,ShortComparator sorter,int nRemaining)
-    {
-      super(nRemaining);
-      this.arr=arr;
-      this.sorter=sorter;
-    }
     @Override
-    int mergeAt(int i,int stackSize,int[] runLen)
+    int mergeAt(int n,int stackSize,int[] runLenAndBase)
     {
-      //assert stackSize>=2;
-      //assert i>=0;
-      //assert i==stackSize-2 || i==stackSize-3;
-      int base1,len1,base2,len2;
-      int[] runBase=this.runBase;
-      //assert runLen[i]>0 && runLen[i+1]>0;
-      //assert runBase[i]+runLen[i]==runBase[i+1];
-      runLen[i]=(len1=runLen[i])+(len2=runLen[i+1]);
-      if(i==stackSize-3)
+      //assert stackSize>=4;
+      //assert n>=0;
+      //assert n==stackSize-4 || n==stackSize-6;
+      //assert runLenAndBase[n]>0;
+      //assert runLenAndBase[n+2]>0;
+      //assert runLenAndBase[n]+runBaseAndLen[n+1]==runBaseAndLen[n+3];
+      int len1,base1,len2,base2;
+      runLenAndBase[n]=(len1=runLenAndBase[n])+(len2=runLenAndBase[n+2]);
+      if(n==stackSize-6)
       {
-        runBase[i+1]=runBase[i+2];
-        runLen[i+1]=runLen[i+2];
+        runLenAndBase[n+3]=runLenAndBase[n+5];
+        runLenAndBase[n+2]=runLenAndBase[n+4];
       }
-      --stackSize;
       short[] arr;
       int k;
-      base1=(base1=runBase[i])+(k=SortUtil.gallopRightcomparatorSort((short)(arr=this.arr)[base2=runBase[i+1]],arr,base1,len1,0
+      base1=(base1=runLenAndBase[n+1])+(k=gallopRight((short)(arr=this.arr)[base2=runLenAndBase[n+3]],arr,base1,len1,0
         ,sorter
       ));
+      //assert k>=0;
       if((len1-=k)!=0)
       {
-         //assert k>=0;
-         if((len2=SortUtil.gallopLeftcomparatorSort((short)arr[base1+len1-1],arr,base2,len2,len2-1
-           ,sorter
-         ))!=0)
-         {
-           //assert len2>0;
-           if(len1>len2)
-           {
-             mergeHi(arr,base1,len1,base2,len2
-               ,sorter
-             );
-           }
-           else
-           {
-             mergeLo(arr,base1,len1,base2,len2
-               ,sorter
-             );
-           }
-         }
+        if((len2=gallopLeft((short)arr[base1+len1-2],arr,base2,len2,len2-1
+          ,sorter
+        ))!=0)
+        {
+          //assert len2>0;
+          if(len1<=len2)
+          {
+            mergeLo(arr,base1,len1,base2,len2);
+          }
+          else
+          {
+            mergeHi(arr,base1,len1,base2,len2);
+          }
+        }
       }
-      return stackSize;
+      return stackSize-2;
     }
-    private void mergeLo(short[] arr,int base1,int len1,int base2,int len2
-    ,ShortComparator sorter
-    )
+    private void mergeLo(short[] arr,int base1,int len1,int base2,int len2)
     {
+      //assert len1>0;
+      //assert len2>0;
+      //assert base1+len1==base2;
+      //TODO
       short[] tmp;
-      int cursor1,dest;
-      int cursor2=base2;
+      int cursor1;
+      int dest;
       ArrCopy.uncheckedCopy(arr,dest=base1,tmp=
-      ensureCapacity(len1),cursor1=this.tmpBase,len1);
+      ensureCapacity(len1),cursor1=this.tmpOffset,len1);
+      int cursor2=base2;
       arr[dest++]=arr[cursor2++];
+      //TODO make these pre-decrement for performance
       if(--len2==0)
       {
         ArrCopy.uncheckedCopy(tmp,cursor1,arr,dest,len1);
@@ -11184,13 +11301,16 @@ public final class SortUtil
         return;
       }
       int minGallop=this.minGallop;
-      outer:for(;;)
+      final var sorter=this.sorter;
+      outer:
+      for(;;)
       {
         int count1=0;
         int count2=0;
         do
         {
-          //assert len1>1 && len2>0;
+          //assert len1>1;
+          //assert len2=0;
           if(
           sorter.compare((short)(arr[cursor2]),(short)(tmp[cursor1]))<0
           )
@@ -11208,24 +11328,26 @@ public final class SortUtil
             arr[dest++]=tmp[cursor1++];
             ++count1;
             count2=0;
-            if(--len1==0)
+            if(--len1==1)
             {
-              break;
+              break outer;
             }
           }
         }
         while((count1|count2)<minGallop);
         do
         {
-          //assert len1>1 && len2>0;
-          if((count1=SortUtil.gallopRightcomparatorSort((short)arr[cursor2],tmp,cursor1,len1,0
+          //assert len1>1;
+          //assert len2>0;
+          if((
+          count1=gallopRight((short)arr[cursor2],tmp,cursor1,len1,0
             ,sorter
-          ))!=0)
+            ))!=0)
           {
             ArrCopy.uncheckedCopy(tmp,cursor1,arr,dest,count1);
             dest+=count1;
             cursor1+=count1;
-            if((len1-=count1)<=1)
+            if((len1-=count1)<2)
             {
               break outer;
             }
@@ -11235,7 +11357,7 @@ public final class SortUtil
           {
             break outer;
           }
-          if((count2=SortUtil.gallopLeftcomparatorSort((short)tmp[cursor1],arr,cursor2,len2,0
+          if((count2=gallopLeft((short)tmp[cursor1],arr,cursor2,len2,0
             ,sorter
           ))!=0)
           {
@@ -11248,7 +11370,7 @@ public final class SortUtil
             }
           }
           arr[dest++]=tmp[cursor1++];
-          if(len1==1)
+          if(--len1==1)
           {
             break outer;
           }
@@ -11257,60 +11379,64 @@ public final class SortUtil
         while(count1>=7 || count2>=7);
         if(minGallop<0)
         {
-          minGallop=0;
+          minGallop=2;
         }
-        minGallop+=2;
+        else
+        {
+          minGallop+=2;
+        }
       }
-      this.minGallop=(minGallop<1?1:minGallop);
-      switch(len1)
+      this.minGallop = minGallop < 1 ? 1 : minGallop;
+      if(len1==1)
       {
-        case 0:
-          throw new IllegalArgumentException("Comparison method violates its general contract!");
-        case 1:
-          //assert len2>0;
+        //assert len2>0;
         ArrCopy.uncheckedCopy(arr,cursor2,arr,dest,len2);
         arr[dest+len2]=tmp[cursor1];
-        break;
-      default:
-        assert len2==0;
-        assert len1>1;
+      }
+      else
+      {
+        //assert len2==0;
+        //assert len1>1;
         ArrCopy.uncheckedCopy(tmp,cursor1,arr,dest,len1);
       }
     }
-    private void mergeHi(short[] arr,int base1,int len1,int base2,int len2
-    ,ShortComparator sorter
-    )
+    private void mergeHi(short[] arr,int base1,int len1,int base2,int len2)
     {
+      //assert len1>0;
+      //assert len2>0;
+      //assert base1+len1==base2;
+      //TODO
       short[] tmp;
-      int cursor1,dest;
-      int tmpBase;
+      int tmpOffset;
       ArrCopy.uncheckedCopy(arr,base2,tmp=
-      ensureCapacity(len2),tmpBase=this.tmpBase,len2);
-      dest=base2+len2-1;
-      cursor1=base1+len1-1;
+      ensureCapacity(len2),tmpOffset=this.tmpOffset,len2);
+      int cursor1=base1+len1-1;
+      int cursor2=tmpOffset+len2-1;
+      int dest=base2+len2-1;
       arr[dest--]=arr[cursor1--];
+      //TODO make these pre-decrement for performance
       if(--len1==0)
       {
-        ArrCopy.uncheckedCopy(tmp,tmpBase,arr,dest-(len2-1),len2);
+        ArrCopy.uncheckedCopy(tmp,tmpOffset,arr,dest-(len2-1),len2);
         return;
       }
       if(len2==1)
       {
-        dest-=len1;
-        cursor1-=len1;
-        ArrCopy.uncheckedCopy(arr,(cursor1-=len1)+1,arr,(dest-=len1)+1,len1);
-        arr[dest]=tmp[tmpBase];
+        ArrCopy.uncheckedCopy(arr,cursor1-len1+1,arr,(dest-=len1)+1,len1);
+        arr[dest]=tmp[cursor2];
         return;
       }
-      int cursor2=tmpBase+len2-1;
       int minGallop=this.minGallop;
-      outer:for(;;)
+      final var sorter=this.sorter;
+      outer:
+      for(;;)
       {
         int count1=0;
         int count2=0;
         do
         {
-          //assert len2>1 && len1>0;
+          //assert len2>1;
+          //assert len1=0;
           if(
           sorter.compare((short)(tmp[cursor2]),(short)(arr[cursor1]))<0
           )
@@ -11328,21 +11454,23 @@ public final class SortUtil
             arr[dest--]=tmp[cursor2--];
             ++count2;
             count1=0;
-            if(--len2==0)
+            if(--len2==1)
             {
-              break;
+              break outer;
             }
           }
         }
         while((count1|count2)<minGallop);
         do
         {
-          //assert len2>1 && len1>0;
-          if((count1=len1-SortUtil.gallopRightcomparatorSort((short)tmp[cursor2],arr,base1,len1,len1-1
+          //assert len2>1;
+          //assert len1>0;
+          if((
+          count1=len1-gallopRight((short)tmp[cursor2],arr,base1,len1,len1-1
             ,sorter
-          ))!=0)
+            ))!=0)
           {
-            ArrCopy.uncheckedCopy(arr,(cursor1-=count1),arr,(dest-=count1)+1,count1);
+            ArrCopy.uncheckedCopy(arr,(cursor1-=count1)+1,arr,(dest-=count1)+1,count1);
             if((len1-=count1)==0)
             {
               break outer;
@@ -11353,18 +11481,18 @@ public final class SortUtil
           {
             break outer;
           }
-          if((count2=len2-SortUtil.gallopLeftcomparatorSort((short)arr[cursor1],tmp,tmpBase,len2,len2-1
+          if((count2=len2-gallopLeft((short)arr[cursor1],tmp,tmpOffset,len2,len2-1
             ,sorter
           ))!=0)
           {
             ArrCopy.uncheckedCopy(tmp,(cursor2-=count2)+1,arr,(dest-=count2)+1,count2);
-            if((len2-=count2)<=1)
+            if((len2-=count2)<2)
             {
               break outer;
             }
           }
-          arr[dest--]=tmp[cursor2--];
-          if(len1==0)
+          arr[dest--]=arr[cursor1--];
+          if(--len1==0)
           {
             break outer;
           }
@@ -11373,41 +11501,64 @@ public final class SortUtil
         while(count1>=7 || count2>=7);
         if(minGallop<0)
         {
-          minGallop=0;
+          minGallop=2;
         }
-        minGallop+=2;
+        else
+        {
+          minGallop+=2;
+        }
       }
-      this.minGallop=(minGallop<1?1:minGallop);
-      switch(len2)
+      this.minGallop = minGallop < 1 ? 1 : minGallop;
+      if(len2==1)
       {
-        case 0:
-          throw new IllegalArgumentException("Comparison method violates its general contract!");
-        case 1:
-          //assert len1>0;
+        //assert len1>0;
         ArrCopy.uncheckedCopy(arr,(cursor1-=len1)+1,arr,(dest-=len1)+1,len1);
         arr[dest]=tmp[cursor2];
-        break;
-      default:
+      }
+      else
+      {
         //assert len1==0;
         //assert len2>0;
-        ArrCopy.uncheckedCopy(tmp,tmpBase,arr,dest-(len2-1),len2);
+        ArrCopy.uncheckedCopy(tmp,tmpOffset,arr,dest+(len2-1),len2);
       }
+    }
+    private static   int gallopRight(short key,short[] arr,int base,int len,int hint
+      ,ShortComparator sorter
+    )
+    {
+      //TODO
+      return 0;
+    }
+    private static   int gallopLeft(short key,short[] arr,int base,int len,int hint
+      ,ShortComparator sorter
+    )
+    {
+      //TODO
+      return 0;
     }
   }
   private static class comparatorSortintTimSort 
     extends AbstractTimSort
   {
-    final int[] arr;
-    int[] tmp;
-    @Override
-    void initTmpArr(int tmpLen)
+    private transient final IntBinaryOperator sorter;
+    private transient final int[] arr;
+    private transient int[] tmp;
+    private transient int tmpOffset;
+    private transient int tmpLength;
+    private transient int minGallop;
+    comparatorSortintTimSort(int[] arr,int nRemaining,IntBinaryOperator sorter)
     {
-      this.tmp=new int[tmpLen];
+      super(nRemaining);
+      this.sorter=sorter;
+      this.arr=arr;
+      this.tmpLength=nRemaining=nRemaining<512?nRemaining>>>1:256;
+      this.tmp=new int[nRemaining];
+      this.minGallop=7;
     }
     private int[] ensureCapacity(int minCapacity)
     {
       int[] tmp;
-      if(tmpLen<minCapacity)
+      if(tmpLength<minCapacity)
       {
         int newSize;
         if((newSize=(-1>>>Integer.numberOfLeadingZeros(minCapacity))+1)<0 || newSize>(minCapacity=arr.length>>>1))
@@ -11415,8 +11566,8 @@ public final class SortUtil
           newSize=minCapacity;
         }
         this.tmp=tmp=new int[newSize];
-        this.tmpLen=newSize;
-        tmpBase=0;
+        this.tmpLength=newSize;
+        tmpOffset=0;
       }
       else
       {
@@ -11424,69 +11575,61 @@ public final class SortUtil
       }
       return tmp;
     }
-    final IntBinaryOperator sorter;
-    comparatorSortintTimSort(int[] arr,IntBinaryOperator sorter,int nRemaining)
-    {
-      super(nRemaining);
-      this.arr=arr;
-      this.sorter=sorter;
-    }
     @Override
-    int mergeAt(int i,int stackSize,int[] runLen)
+    int mergeAt(int n,int stackSize,int[] runLenAndBase)
     {
-      //assert stackSize>=2;
-      //assert i>=0;
-      //assert i==stackSize-2 || i==stackSize-3;
-      int base1,len1,base2,len2;
-      int[] runBase=this.runBase;
-      //assert runLen[i]>0 && runLen[i+1]>0;
-      //assert runBase[i]+runLen[i]==runBase[i+1];
-      runLen[i]=(len1=runLen[i])+(len2=runLen[i+1]);
-      if(i==stackSize-3)
+      //assert stackSize>=4;
+      //assert n>=0;
+      //assert n==stackSize-4 || n==stackSize-6;
+      //assert runLenAndBase[n]>0;
+      //assert runLenAndBase[n+2]>0;
+      //assert runLenAndBase[n]+runBaseAndLen[n+1]==runBaseAndLen[n+3];
+      int len1,base1,len2,base2;
+      runLenAndBase[n]=(len1=runLenAndBase[n])+(len2=runLenAndBase[n+2]);
+      if(n==stackSize-6)
       {
-        runBase[i+1]=runBase[i+2];
-        runLen[i+1]=runLen[i+2];
+        runLenAndBase[n+3]=runLenAndBase[n+5];
+        runLenAndBase[n+2]=runLenAndBase[n+4];
       }
-      --stackSize;
       int[] arr;
       int k;
-      base1=(base1=runBase[i])+(k=SortUtil.gallopRightcomparatorSort((int)(arr=this.arr)[base2=runBase[i+1]],arr,base1,len1,0
+      base1=(base1=runLenAndBase[n+1])+(k=gallopRight((int)(arr=this.arr)[base2=runLenAndBase[n+3]],arr,base1,len1,0
         ,sorter
       ));
+      //assert k>=0;
       if((len1-=k)!=0)
       {
-         //assert k>=0;
-         if((len2=SortUtil.gallopLeftcomparatorSort((int)arr[base1+len1-1],arr,base2,len2,len2-1
-           ,sorter
-         ))!=0)
-         {
-           //assert len2>0;
-           if(len1>len2)
-           {
-             mergeHi(arr,base1,len1,base2,len2
-               ,sorter
-             );
-           }
-           else
-           {
-             mergeLo(arr,base1,len1,base2,len2
-               ,sorter
-             );
-           }
-         }
+        if((len2=gallopLeft((int)arr[base1+len1-2],arr,base2,len2,len2-1
+          ,sorter
+        ))!=0)
+        {
+          //assert len2>0;
+          if(len1<=len2)
+          {
+            mergeLo(arr,base1,len1,base2,len2);
+          }
+          else
+          {
+            mergeHi(arr,base1,len1,base2,len2);
+          }
+        }
       }
-      return stackSize;
+      return stackSize-2;
     }
-    private void mergeLo(int[] arr,int base1,int len1,int base2,int len2
-    ,IntBinaryOperator sorter
-    )
+    private void mergeLo(int[] arr,int base1,int len1,int base2,int len2)
     {
+      //assert len1>0;
+      //assert len2>0;
+      //assert base1+len1==base2;
+      //TODO
       int[] tmp;
-      int cursor1,dest;
-      int cursor2=base2;
+      int cursor1;
+      int dest;
       ArrCopy.uncheckedCopy(arr,dest=base1,tmp=
-      ensureCapacity(len1),cursor1=this.tmpBase,len1);
+      ensureCapacity(len1),cursor1=this.tmpOffset,len1);
+      int cursor2=base2;
       arr[dest++]=arr[cursor2++];
+      //TODO make these pre-decrement for performance
       if(--len2==0)
       {
         ArrCopy.uncheckedCopy(tmp,cursor1,arr,dest,len1);
@@ -11499,13 +11642,16 @@ public final class SortUtil
         return;
       }
       int minGallop=this.minGallop;
-      outer:for(;;)
+      final var sorter=this.sorter;
+      outer:
+      for(;;)
       {
         int count1=0;
         int count2=0;
         do
         {
-          //assert len1>1 && len2>0;
+          //assert len1>1;
+          //assert len2=0;
           if(
           sorter.applyAsInt((int)(arr[cursor2]),(int)(tmp[cursor1]))<0
           )
@@ -11523,24 +11669,26 @@ public final class SortUtil
             arr[dest++]=tmp[cursor1++];
             ++count1;
             count2=0;
-            if(--len1==0)
+            if(--len1==1)
             {
-              break;
+              break outer;
             }
           }
         }
         while((count1|count2)<minGallop);
         do
         {
-          //assert len1>1 && len2>0;
-          if((count1=SortUtil.gallopRightcomparatorSort((int)arr[cursor2],tmp,cursor1,len1,0
+          //assert len1>1;
+          //assert len2>0;
+          if((
+          count1=gallopRight((int)arr[cursor2],tmp,cursor1,len1,0
             ,sorter
-          ))!=0)
+            ))!=0)
           {
             ArrCopy.uncheckedCopy(tmp,cursor1,arr,dest,count1);
             dest+=count1;
             cursor1+=count1;
-            if((len1-=count1)<=1)
+            if((len1-=count1)<2)
             {
               break outer;
             }
@@ -11550,7 +11698,7 @@ public final class SortUtil
           {
             break outer;
           }
-          if((count2=SortUtil.gallopLeftcomparatorSort((int)tmp[cursor1],arr,cursor2,len2,0
+          if((count2=gallopLeft((int)tmp[cursor1],arr,cursor2,len2,0
             ,sorter
           ))!=0)
           {
@@ -11563,7 +11711,7 @@ public final class SortUtil
             }
           }
           arr[dest++]=tmp[cursor1++];
-          if(len1==1)
+          if(--len1==1)
           {
             break outer;
           }
@@ -11572,60 +11720,64 @@ public final class SortUtil
         while(count1>=7 || count2>=7);
         if(minGallop<0)
         {
-          minGallop=0;
+          minGallop=2;
         }
-        minGallop+=2;
+        else
+        {
+          minGallop+=2;
+        }
       }
-      this.minGallop=(minGallop<1?1:minGallop);
-      switch(len1)
+      this.minGallop = minGallop < 1 ? 1 : minGallop;
+      if(len1==1)
       {
-        case 0:
-          throw new IllegalArgumentException("Comparison method violates its general contract!");
-        case 1:
-          //assert len2>0;
+        //assert len2>0;
         ArrCopy.uncheckedCopy(arr,cursor2,arr,dest,len2);
         arr[dest+len2]=tmp[cursor1];
-        break;
-      default:
-        assert len2==0;
-        assert len1>1;
+      }
+      else
+      {
+        //assert len2==0;
+        //assert len1>1;
         ArrCopy.uncheckedCopy(tmp,cursor1,arr,dest,len1);
       }
     }
-    private void mergeHi(int[] arr,int base1,int len1,int base2,int len2
-    ,IntBinaryOperator sorter
-    )
+    private void mergeHi(int[] arr,int base1,int len1,int base2,int len2)
     {
+      //assert len1>0;
+      //assert len2>0;
+      //assert base1+len1==base2;
+      //TODO
       int[] tmp;
-      int cursor1,dest;
-      int tmpBase;
+      int tmpOffset;
       ArrCopy.uncheckedCopy(arr,base2,tmp=
-      ensureCapacity(len2),tmpBase=this.tmpBase,len2);
-      dest=base2+len2-1;
-      cursor1=base1+len1-1;
+      ensureCapacity(len2),tmpOffset=this.tmpOffset,len2);
+      int cursor1=base1+len1-1;
+      int cursor2=tmpOffset+len2-1;
+      int dest=base2+len2-1;
       arr[dest--]=arr[cursor1--];
+      //TODO make these pre-decrement for performance
       if(--len1==0)
       {
-        ArrCopy.uncheckedCopy(tmp,tmpBase,arr,dest-(len2-1),len2);
+        ArrCopy.uncheckedCopy(tmp,tmpOffset,arr,dest-(len2-1),len2);
         return;
       }
       if(len2==1)
       {
-        dest-=len1;
-        cursor1-=len1;
-        ArrCopy.uncheckedCopy(arr,(cursor1-=len1)+1,arr,(dest-=len1)+1,len1);
-        arr[dest]=tmp[tmpBase];
+        ArrCopy.uncheckedCopy(arr,cursor1-len1+1,arr,(dest-=len1)+1,len1);
+        arr[dest]=tmp[cursor2];
         return;
       }
-      int cursor2=tmpBase+len2-1;
       int minGallop=this.minGallop;
-      outer:for(;;)
+      final var sorter=this.sorter;
+      outer:
+      for(;;)
       {
         int count1=0;
         int count2=0;
         do
         {
-          //assert len2>1 && len1>0;
+          //assert len2>1;
+          //assert len1=0;
           if(
           sorter.applyAsInt((int)(tmp[cursor2]),(int)(arr[cursor1]))<0
           )
@@ -11643,21 +11795,23 @@ public final class SortUtil
             arr[dest--]=tmp[cursor2--];
             ++count2;
             count1=0;
-            if(--len2==0)
+            if(--len2==1)
             {
-              break;
+              break outer;
             }
           }
         }
         while((count1|count2)<minGallop);
         do
         {
-          //assert len2>1 && len1>0;
-          if((count1=len1-SortUtil.gallopRightcomparatorSort((int)tmp[cursor2],arr,base1,len1,len1-1
+          //assert len2>1;
+          //assert len1>0;
+          if((
+          count1=len1-gallopRight((int)tmp[cursor2],arr,base1,len1,len1-1
             ,sorter
-          ))!=0)
+            ))!=0)
           {
-            ArrCopy.uncheckedCopy(arr,(cursor1-=count1),arr,(dest-=count1)+1,count1);
+            ArrCopy.uncheckedCopy(arr,(cursor1-=count1)+1,arr,(dest-=count1)+1,count1);
             if((len1-=count1)==0)
             {
               break outer;
@@ -11668,18 +11822,18 @@ public final class SortUtil
           {
             break outer;
           }
-          if((count2=len2-SortUtil.gallopLeftcomparatorSort((int)arr[cursor1],tmp,tmpBase,len2,len2-1
+          if((count2=len2-gallopLeft((int)arr[cursor1],tmp,tmpOffset,len2,len2-1
             ,sorter
           ))!=0)
           {
             ArrCopy.uncheckedCopy(tmp,(cursor2-=count2)+1,arr,(dest-=count2)+1,count2);
-            if((len2-=count2)<=1)
+            if((len2-=count2)<2)
             {
               break outer;
             }
           }
-          arr[dest--]=tmp[cursor2--];
-          if(len1==0)
+          arr[dest--]=arr[cursor1--];
+          if(--len1==0)
           {
             break outer;
           }
@@ -11688,41 +11842,64 @@ public final class SortUtil
         while(count1>=7 || count2>=7);
         if(minGallop<0)
         {
-          minGallop=0;
+          minGallop=2;
         }
-        minGallop+=2;
+        else
+        {
+          minGallop+=2;
+        }
       }
-      this.minGallop=(minGallop<1?1:minGallop);
-      switch(len2)
+      this.minGallop = minGallop < 1 ? 1 : minGallop;
+      if(len2==1)
       {
-        case 0:
-          throw new IllegalArgumentException("Comparison method violates its general contract!");
-        case 1:
-          //assert len1>0;
+        //assert len1>0;
         ArrCopy.uncheckedCopy(arr,(cursor1-=len1)+1,arr,(dest-=len1)+1,len1);
         arr[dest]=tmp[cursor2];
-        break;
-      default:
+      }
+      else
+      {
         //assert len1==0;
         //assert len2>0;
-        ArrCopy.uncheckedCopy(tmp,tmpBase,arr,dest-(len2-1),len2);
+        ArrCopy.uncheckedCopy(tmp,tmpOffset,arr,dest+(len2-1),len2);
       }
+    }
+    private static   int gallopRight(int key,int[] arr,int base,int len,int hint
+      ,IntBinaryOperator sorter
+    )
+    {
+      //TODO
+      return 0;
+    }
+    private static   int gallopLeft(int key,int[] arr,int base,int len,int hint
+      ,IntBinaryOperator sorter
+    )
+    {
+      //TODO
+      return 0;
     }
   }
   private static class comparatorSortlongTimSort 
     extends AbstractTimSort
   {
-    final long[] arr;
-    long[] tmp;
-    @Override
-    void initTmpArr(int tmpLen)
+    private transient final LongComparator sorter;
+    private transient final long[] arr;
+    private transient long[] tmp;
+    private transient int tmpOffset;
+    private transient int tmpLength;
+    private transient int minGallop;
+    comparatorSortlongTimSort(long[] arr,int nRemaining,LongComparator sorter)
     {
-      this.tmp=new long[tmpLen];
+      super(nRemaining);
+      this.sorter=sorter;
+      this.arr=arr;
+      this.tmpLength=nRemaining=nRemaining<512?nRemaining>>>1:256;
+      this.tmp=new long[nRemaining];
+      this.minGallop=7;
     }
     private long[] ensureCapacity(int minCapacity)
     {
       long[] tmp;
-      if(tmpLen<minCapacity)
+      if(tmpLength<minCapacity)
       {
         int newSize;
         if((newSize=(-1>>>Integer.numberOfLeadingZeros(minCapacity))+1)<0 || newSize>(minCapacity=arr.length>>>1))
@@ -11730,8 +11907,8 @@ public final class SortUtil
           newSize=minCapacity;
         }
         this.tmp=tmp=new long[newSize];
-        this.tmpLen=newSize;
-        tmpBase=0;
+        this.tmpLength=newSize;
+        tmpOffset=0;
       }
       else
       {
@@ -11739,69 +11916,61 @@ public final class SortUtil
       }
       return tmp;
     }
-    final LongComparator sorter;
-    comparatorSortlongTimSort(long[] arr,LongComparator sorter,int nRemaining)
-    {
-      super(nRemaining);
-      this.arr=arr;
-      this.sorter=sorter;
-    }
     @Override
-    int mergeAt(int i,int stackSize,int[] runLen)
+    int mergeAt(int n,int stackSize,int[] runLenAndBase)
     {
-      //assert stackSize>=2;
-      //assert i>=0;
-      //assert i==stackSize-2 || i==stackSize-3;
-      int base1,len1,base2,len2;
-      int[] runBase=this.runBase;
-      //assert runLen[i]>0 && runLen[i+1]>0;
-      //assert runBase[i]+runLen[i]==runBase[i+1];
-      runLen[i]=(len1=runLen[i])+(len2=runLen[i+1]);
-      if(i==stackSize-3)
+      //assert stackSize>=4;
+      //assert n>=0;
+      //assert n==stackSize-4 || n==stackSize-6;
+      //assert runLenAndBase[n]>0;
+      //assert runLenAndBase[n+2]>0;
+      //assert runLenAndBase[n]+runBaseAndLen[n+1]==runBaseAndLen[n+3];
+      int len1,base1,len2,base2;
+      runLenAndBase[n]=(len1=runLenAndBase[n])+(len2=runLenAndBase[n+2]);
+      if(n==stackSize-6)
       {
-        runBase[i+1]=runBase[i+2];
-        runLen[i+1]=runLen[i+2];
+        runLenAndBase[n+3]=runLenAndBase[n+5];
+        runLenAndBase[n+2]=runLenAndBase[n+4];
       }
-      --stackSize;
       long[] arr;
       int k;
-      base1=(base1=runBase[i])+(k=SortUtil.gallopRightcomparatorSort((long)(arr=this.arr)[base2=runBase[i+1]],arr,base1,len1,0
+      base1=(base1=runLenAndBase[n+1])+(k=gallopRight((long)(arr=this.arr)[base2=runLenAndBase[n+3]],arr,base1,len1,0
         ,sorter
       ));
+      //assert k>=0;
       if((len1-=k)!=0)
       {
-         //assert k>=0;
-         if((len2=SortUtil.gallopLeftcomparatorSort((long)arr[base1+len1-1],arr,base2,len2,len2-1
-           ,sorter
-         ))!=0)
-         {
-           //assert len2>0;
-           if(len1>len2)
-           {
-             mergeHi(arr,base1,len1,base2,len2
-               ,sorter
-             );
-           }
-           else
-           {
-             mergeLo(arr,base1,len1,base2,len2
-               ,sorter
-             );
-           }
-         }
+        if((len2=gallopLeft((long)arr[base1+len1-2],arr,base2,len2,len2-1
+          ,sorter
+        ))!=0)
+        {
+          //assert len2>0;
+          if(len1<=len2)
+          {
+            mergeLo(arr,base1,len1,base2,len2);
+          }
+          else
+          {
+            mergeHi(arr,base1,len1,base2,len2);
+          }
+        }
       }
-      return stackSize;
+      return stackSize-2;
     }
-    private void mergeLo(long[] arr,int base1,int len1,int base2,int len2
-    ,LongComparator sorter
-    )
+    private void mergeLo(long[] arr,int base1,int len1,int base2,int len2)
     {
+      //assert len1>0;
+      //assert len2>0;
+      //assert base1+len1==base2;
+      //TODO
       long[] tmp;
-      int cursor1,dest;
-      int cursor2=base2;
+      int cursor1;
+      int dest;
       ArrCopy.uncheckedCopy(arr,dest=base1,tmp=
-      ensureCapacity(len1),cursor1=this.tmpBase,len1);
+      ensureCapacity(len1),cursor1=this.tmpOffset,len1);
+      int cursor2=base2;
       arr[dest++]=arr[cursor2++];
+      //TODO make these pre-decrement for performance
       if(--len2==0)
       {
         ArrCopy.uncheckedCopy(tmp,cursor1,arr,dest,len1);
@@ -11814,13 +11983,16 @@ public final class SortUtil
         return;
       }
       int minGallop=this.minGallop;
-      outer:for(;;)
+      final var sorter=this.sorter;
+      outer:
+      for(;;)
       {
         int count1=0;
         int count2=0;
         do
         {
-          //assert len1>1 && len2>0;
+          //assert len1>1;
+          //assert len2=0;
           if(
           sorter.compare((long)(arr[cursor2]),(long)(tmp[cursor1]))<0
           )
@@ -11838,24 +12010,26 @@ public final class SortUtil
             arr[dest++]=tmp[cursor1++];
             ++count1;
             count2=0;
-            if(--len1==0)
+            if(--len1==1)
             {
-              break;
+              break outer;
             }
           }
         }
         while((count1|count2)<minGallop);
         do
         {
-          //assert len1>1 && len2>0;
-          if((count1=SortUtil.gallopRightcomparatorSort((long)arr[cursor2],tmp,cursor1,len1,0
+          //assert len1>1;
+          //assert len2>0;
+          if((
+          count1=gallopRight((long)arr[cursor2],tmp,cursor1,len1,0
             ,sorter
-          ))!=0)
+            ))!=0)
           {
             ArrCopy.uncheckedCopy(tmp,cursor1,arr,dest,count1);
             dest+=count1;
             cursor1+=count1;
-            if((len1-=count1)<=1)
+            if((len1-=count1)<2)
             {
               break outer;
             }
@@ -11865,7 +12039,7 @@ public final class SortUtil
           {
             break outer;
           }
-          if((count2=SortUtil.gallopLeftcomparatorSort((long)tmp[cursor1],arr,cursor2,len2,0
+          if((count2=gallopLeft((long)tmp[cursor1],arr,cursor2,len2,0
             ,sorter
           ))!=0)
           {
@@ -11878,7 +12052,7 @@ public final class SortUtil
             }
           }
           arr[dest++]=tmp[cursor1++];
-          if(len1==1)
+          if(--len1==1)
           {
             break outer;
           }
@@ -11887,60 +12061,64 @@ public final class SortUtil
         while(count1>=7 || count2>=7);
         if(minGallop<0)
         {
-          minGallop=0;
+          minGallop=2;
         }
-        minGallop+=2;
+        else
+        {
+          minGallop+=2;
+        }
       }
-      this.minGallop=(minGallop<1?1:minGallop);
-      switch(len1)
+      this.minGallop = minGallop < 1 ? 1 : minGallop;
+      if(len1==1)
       {
-        case 0:
-          throw new IllegalArgumentException("Comparison method violates its general contract!");
-        case 1:
-          //assert len2>0;
+        //assert len2>0;
         ArrCopy.uncheckedCopy(arr,cursor2,arr,dest,len2);
         arr[dest+len2]=tmp[cursor1];
-        break;
-      default:
-        assert len2==0;
-        assert len1>1;
+      }
+      else
+      {
+        //assert len2==0;
+        //assert len1>1;
         ArrCopy.uncheckedCopy(tmp,cursor1,arr,dest,len1);
       }
     }
-    private void mergeHi(long[] arr,int base1,int len1,int base2,int len2
-    ,LongComparator sorter
-    )
+    private void mergeHi(long[] arr,int base1,int len1,int base2,int len2)
     {
+      //assert len1>0;
+      //assert len2>0;
+      //assert base1+len1==base2;
+      //TODO
       long[] tmp;
-      int cursor1,dest;
-      int tmpBase;
+      int tmpOffset;
       ArrCopy.uncheckedCopy(arr,base2,tmp=
-      ensureCapacity(len2),tmpBase=this.tmpBase,len2);
-      dest=base2+len2-1;
-      cursor1=base1+len1-1;
+      ensureCapacity(len2),tmpOffset=this.tmpOffset,len2);
+      int cursor1=base1+len1-1;
+      int cursor2=tmpOffset+len2-1;
+      int dest=base2+len2-1;
       arr[dest--]=arr[cursor1--];
+      //TODO make these pre-decrement for performance
       if(--len1==0)
       {
-        ArrCopy.uncheckedCopy(tmp,tmpBase,arr,dest-(len2-1),len2);
+        ArrCopy.uncheckedCopy(tmp,tmpOffset,arr,dest-(len2-1),len2);
         return;
       }
       if(len2==1)
       {
-        dest-=len1;
-        cursor1-=len1;
-        ArrCopy.uncheckedCopy(arr,(cursor1-=len1)+1,arr,(dest-=len1)+1,len1);
-        arr[dest]=tmp[tmpBase];
+        ArrCopy.uncheckedCopy(arr,cursor1-len1+1,arr,(dest-=len1)+1,len1);
+        arr[dest]=tmp[cursor2];
         return;
       }
-      int cursor2=tmpBase+len2-1;
       int minGallop=this.minGallop;
-      outer:for(;;)
+      final var sorter=this.sorter;
+      outer:
+      for(;;)
       {
         int count1=0;
         int count2=0;
         do
         {
-          //assert len2>1 && len1>0;
+          //assert len2>1;
+          //assert len1=0;
           if(
           sorter.compare((long)(tmp[cursor2]),(long)(arr[cursor1]))<0
           )
@@ -11958,21 +12136,23 @@ public final class SortUtil
             arr[dest--]=tmp[cursor2--];
             ++count2;
             count1=0;
-            if(--len2==0)
+            if(--len2==1)
             {
-              break;
+              break outer;
             }
           }
         }
         while((count1|count2)<minGallop);
         do
         {
-          //assert len2>1 && len1>0;
-          if((count1=len1-SortUtil.gallopRightcomparatorSort((long)tmp[cursor2],arr,base1,len1,len1-1
+          //assert len2>1;
+          //assert len1>0;
+          if((
+          count1=len1-gallopRight((long)tmp[cursor2],arr,base1,len1,len1-1
             ,sorter
-          ))!=0)
+            ))!=0)
           {
-            ArrCopy.uncheckedCopy(arr,(cursor1-=count1),arr,(dest-=count1)+1,count1);
+            ArrCopy.uncheckedCopy(arr,(cursor1-=count1)+1,arr,(dest-=count1)+1,count1);
             if((len1-=count1)==0)
             {
               break outer;
@@ -11983,18 +12163,18 @@ public final class SortUtil
           {
             break outer;
           }
-          if((count2=len2-SortUtil.gallopLeftcomparatorSort((long)arr[cursor1],tmp,tmpBase,len2,len2-1
+          if((count2=len2-gallopLeft((long)arr[cursor1],tmp,tmpOffset,len2,len2-1
             ,sorter
           ))!=0)
           {
             ArrCopy.uncheckedCopy(tmp,(cursor2-=count2)+1,arr,(dest-=count2)+1,count2);
-            if((len2-=count2)<=1)
+            if((len2-=count2)<2)
             {
               break outer;
             }
           }
-          arr[dest--]=tmp[cursor2--];
-          if(len1==0)
+          arr[dest--]=arr[cursor1--];
+          if(--len1==0)
           {
             break outer;
           }
@@ -12003,41 +12183,64 @@ public final class SortUtil
         while(count1>=7 || count2>=7);
         if(minGallop<0)
         {
-          minGallop=0;
+          minGallop=2;
         }
-        minGallop+=2;
+        else
+        {
+          minGallop+=2;
+        }
       }
-      this.minGallop=(minGallop<1?1:minGallop);
-      switch(len2)
+      this.minGallop = minGallop < 1 ? 1 : minGallop;
+      if(len2==1)
       {
-        case 0:
-          throw new IllegalArgumentException("Comparison method violates its general contract!");
-        case 1:
-          //assert len1>0;
+        //assert len1>0;
         ArrCopy.uncheckedCopy(arr,(cursor1-=len1)+1,arr,(dest-=len1)+1,len1);
         arr[dest]=tmp[cursor2];
-        break;
-      default:
+      }
+      else
+      {
         //assert len1==0;
         //assert len2>0;
-        ArrCopy.uncheckedCopy(tmp,tmpBase,arr,dest-(len2-1),len2);
+        ArrCopy.uncheckedCopy(tmp,tmpOffset,arr,dest+(len2-1),len2);
       }
+    }
+    private static   int gallopRight(long key,long[] arr,int base,int len,int hint
+      ,LongComparator sorter
+    )
+    {
+      //TODO
+      return 0;
+    }
+    private static   int gallopLeft(long key,long[] arr,int base,int len,int hint
+      ,LongComparator sorter
+    )
+    {
+      //TODO
+      return 0;
     }
   }
   private static class comparatorSortfloatTimSort 
     extends AbstractTimSort
   {
-    final float[] arr;
-    float[] tmp;
-    @Override
-    void initTmpArr(int tmpLen)
+    private transient final FloatComparator sorter;
+    private transient final float[] arr;
+    private transient float[] tmp;
+    private transient int tmpOffset;
+    private transient int tmpLength;
+    private transient int minGallop;
+    comparatorSortfloatTimSort(float[] arr,int nRemaining,FloatComparator sorter)
     {
-      this.tmp=new float[tmpLen];
+      super(nRemaining);
+      this.sorter=sorter;
+      this.arr=arr;
+      this.tmpLength=nRemaining=nRemaining<512?nRemaining>>>1:256;
+      this.tmp=new float[nRemaining];
+      this.minGallop=7;
     }
     private float[] ensureCapacity(int minCapacity)
     {
       float[] tmp;
-      if(tmpLen<minCapacity)
+      if(tmpLength<minCapacity)
       {
         int newSize;
         if((newSize=(-1>>>Integer.numberOfLeadingZeros(minCapacity))+1)<0 || newSize>(minCapacity=arr.length>>>1))
@@ -12045,8 +12248,8 @@ public final class SortUtil
           newSize=minCapacity;
         }
         this.tmp=tmp=new float[newSize];
-        this.tmpLen=newSize;
-        tmpBase=0;
+        this.tmpLength=newSize;
+        tmpOffset=0;
       }
       else
       {
@@ -12054,69 +12257,61 @@ public final class SortUtil
       }
       return tmp;
     }
-    final FloatComparator sorter;
-    comparatorSortfloatTimSort(float[] arr,FloatComparator sorter,int nRemaining)
-    {
-      super(nRemaining);
-      this.arr=arr;
-      this.sorter=sorter;
-    }
     @Override
-    int mergeAt(int i,int stackSize,int[] runLen)
+    int mergeAt(int n,int stackSize,int[] runLenAndBase)
     {
-      //assert stackSize>=2;
-      //assert i>=0;
-      //assert i==stackSize-2 || i==stackSize-3;
-      int base1,len1,base2,len2;
-      int[] runBase=this.runBase;
-      //assert runLen[i]>0 && runLen[i+1]>0;
-      //assert runBase[i]+runLen[i]==runBase[i+1];
-      runLen[i]=(len1=runLen[i])+(len2=runLen[i+1]);
-      if(i==stackSize-3)
+      //assert stackSize>=4;
+      //assert n>=0;
+      //assert n==stackSize-4 || n==stackSize-6;
+      //assert runLenAndBase[n]>0;
+      //assert runLenAndBase[n+2]>0;
+      //assert runLenAndBase[n]+runBaseAndLen[n+1]==runBaseAndLen[n+3];
+      int len1,base1,len2,base2;
+      runLenAndBase[n]=(len1=runLenAndBase[n])+(len2=runLenAndBase[n+2]);
+      if(n==stackSize-6)
       {
-        runBase[i+1]=runBase[i+2];
-        runLen[i+1]=runLen[i+2];
+        runLenAndBase[n+3]=runLenAndBase[n+5];
+        runLenAndBase[n+2]=runLenAndBase[n+4];
       }
-      --stackSize;
       float[] arr;
       int k;
-      base1=(base1=runBase[i])+(k=SortUtil.gallopRightcomparatorSort((float)(arr=this.arr)[base2=runBase[i+1]],arr,base1,len1,0
+      base1=(base1=runLenAndBase[n+1])+(k=gallopRight((float)(arr=this.arr)[base2=runLenAndBase[n+3]],arr,base1,len1,0
         ,sorter
       ));
+      //assert k>=0;
       if((len1-=k)!=0)
       {
-         //assert k>=0;
-         if((len2=SortUtil.gallopLeftcomparatorSort((float)arr[base1+len1-1],arr,base2,len2,len2-1
-           ,sorter
-         ))!=0)
-         {
-           //assert len2>0;
-           if(len1>len2)
-           {
-             mergeHi(arr,base1,len1,base2,len2
-               ,sorter
-             );
-           }
-           else
-           {
-             mergeLo(arr,base1,len1,base2,len2
-               ,sorter
-             );
-           }
-         }
+        if((len2=gallopLeft((float)arr[base1+len1-2],arr,base2,len2,len2-1
+          ,sorter
+        ))!=0)
+        {
+          //assert len2>0;
+          if(len1<=len2)
+          {
+            mergeLo(arr,base1,len1,base2,len2);
+          }
+          else
+          {
+            mergeHi(arr,base1,len1,base2,len2);
+          }
+        }
       }
-      return stackSize;
+      return stackSize-2;
     }
-    private void mergeLo(float[] arr,int base1,int len1,int base2,int len2
-    ,FloatComparator sorter
-    )
+    private void mergeLo(float[] arr,int base1,int len1,int base2,int len2)
     {
+      //assert len1>0;
+      //assert len2>0;
+      //assert base1+len1==base2;
+      //TODO
       float[] tmp;
-      int cursor1,dest;
-      int cursor2=base2;
+      int cursor1;
+      int dest;
       ArrCopy.uncheckedCopy(arr,dest=base1,tmp=
-      ensureCapacity(len1),cursor1=this.tmpBase,len1);
+      ensureCapacity(len1),cursor1=this.tmpOffset,len1);
+      int cursor2=base2;
       arr[dest++]=arr[cursor2++];
+      //TODO make these pre-decrement for performance
       if(--len2==0)
       {
         ArrCopy.uncheckedCopy(tmp,cursor1,arr,dest,len1);
@@ -12129,13 +12324,16 @@ public final class SortUtil
         return;
       }
       int minGallop=this.minGallop;
-      outer:for(;;)
+      final var sorter=this.sorter;
+      outer:
+      for(;;)
       {
         int count1=0;
         int count2=0;
         do
         {
-          //assert len1>1 && len2>0;
+          //assert len1>1;
+          //assert len2=0;
           if(
           sorter.compare((float)(arr[cursor2]),(float)(tmp[cursor1]))<0
           )
@@ -12153,24 +12351,26 @@ public final class SortUtil
             arr[dest++]=tmp[cursor1++];
             ++count1;
             count2=0;
-            if(--len1==0)
+            if(--len1==1)
             {
-              break;
+              break outer;
             }
           }
         }
         while((count1|count2)<minGallop);
         do
         {
-          //assert len1>1 && len2>0;
-          if((count1=SortUtil.gallopRightcomparatorSort((float)arr[cursor2],tmp,cursor1,len1,0
+          //assert len1>1;
+          //assert len2>0;
+          if((
+          count1=gallopRight((float)arr[cursor2],tmp,cursor1,len1,0
             ,sorter
-          ))!=0)
+            ))!=0)
           {
             ArrCopy.uncheckedCopy(tmp,cursor1,arr,dest,count1);
             dest+=count1;
             cursor1+=count1;
-            if((len1-=count1)<=1)
+            if((len1-=count1)<2)
             {
               break outer;
             }
@@ -12180,7 +12380,7 @@ public final class SortUtil
           {
             break outer;
           }
-          if((count2=SortUtil.gallopLeftcomparatorSort((float)tmp[cursor1],arr,cursor2,len2,0
+          if((count2=gallopLeft((float)tmp[cursor1],arr,cursor2,len2,0
             ,sorter
           ))!=0)
           {
@@ -12193,7 +12393,7 @@ public final class SortUtil
             }
           }
           arr[dest++]=tmp[cursor1++];
-          if(len1==1)
+          if(--len1==1)
           {
             break outer;
           }
@@ -12202,60 +12402,64 @@ public final class SortUtil
         while(count1>=7 || count2>=7);
         if(minGallop<0)
         {
-          minGallop=0;
+          minGallop=2;
         }
-        minGallop+=2;
+        else
+        {
+          minGallop+=2;
+        }
       }
-      this.minGallop=(minGallop<1?1:minGallop);
-      switch(len1)
+      this.minGallop = minGallop < 1 ? 1 : minGallop;
+      if(len1==1)
       {
-        case 0:
-          throw new IllegalArgumentException("Comparison method violates its general contract!");
-        case 1:
-          //assert len2>0;
+        //assert len2>0;
         ArrCopy.uncheckedCopy(arr,cursor2,arr,dest,len2);
         arr[dest+len2]=tmp[cursor1];
-        break;
-      default:
-        assert len2==0;
-        assert len1>1;
+      }
+      else
+      {
+        //assert len2==0;
+        //assert len1>1;
         ArrCopy.uncheckedCopy(tmp,cursor1,arr,dest,len1);
       }
     }
-    private void mergeHi(float[] arr,int base1,int len1,int base2,int len2
-    ,FloatComparator sorter
-    )
+    private void mergeHi(float[] arr,int base1,int len1,int base2,int len2)
     {
+      //assert len1>0;
+      //assert len2>0;
+      //assert base1+len1==base2;
+      //TODO
       float[] tmp;
-      int cursor1,dest;
-      int tmpBase;
+      int tmpOffset;
       ArrCopy.uncheckedCopy(arr,base2,tmp=
-      ensureCapacity(len2),tmpBase=this.tmpBase,len2);
-      dest=base2+len2-1;
-      cursor1=base1+len1-1;
+      ensureCapacity(len2),tmpOffset=this.tmpOffset,len2);
+      int cursor1=base1+len1-1;
+      int cursor2=tmpOffset+len2-1;
+      int dest=base2+len2-1;
       arr[dest--]=arr[cursor1--];
+      //TODO make these pre-decrement for performance
       if(--len1==0)
       {
-        ArrCopy.uncheckedCopy(tmp,tmpBase,arr,dest-(len2-1),len2);
+        ArrCopy.uncheckedCopy(tmp,tmpOffset,arr,dest-(len2-1),len2);
         return;
       }
       if(len2==1)
       {
-        dest-=len1;
-        cursor1-=len1;
-        ArrCopy.uncheckedCopy(arr,(cursor1-=len1)+1,arr,(dest-=len1)+1,len1);
-        arr[dest]=tmp[tmpBase];
+        ArrCopy.uncheckedCopy(arr,cursor1-len1+1,arr,(dest-=len1)+1,len1);
+        arr[dest]=tmp[cursor2];
         return;
       }
-      int cursor2=tmpBase+len2-1;
       int minGallop=this.minGallop;
-      outer:for(;;)
+      final var sorter=this.sorter;
+      outer:
+      for(;;)
       {
         int count1=0;
         int count2=0;
         do
         {
-          //assert len2>1 && len1>0;
+          //assert len2>1;
+          //assert len1=0;
           if(
           sorter.compare((float)(tmp[cursor2]),(float)(arr[cursor1]))<0
           )
@@ -12273,21 +12477,23 @@ public final class SortUtil
             arr[dest--]=tmp[cursor2--];
             ++count2;
             count1=0;
-            if(--len2==0)
+            if(--len2==1)
             {
-              break;
+              break outer;
             }
           }
         }
         while((count1|count2)<minGallop);
         do
         {
-          //assert len2>1 && len1>0;
-          if((count1=len1-SortUtil.gallopRightcomparatorSort((float)tmp[cursor2],arr,base1,len1,len1-1
+          //assert len2>1;
+          //assert len1>0;
+          if((
+          count1=len1-gallopRight((float)tmp[cursor2],arr,base1,len1,len1-1
             ,sorter
-          ))!=0)
+            ))!=0)
           {
-            ArrCopy.uncheckedCopy(arr,(cursor1-=count1),arr,(dest-=count1)+1,count1);
+            ArrCopy.uncheckedCopy(arr,(cursor1-=count1)+1,arr,(dest-=count1)+1,count1);
             if((len1-=count1)==0)
             {
               break outer;
@@ -12298,18 +12504,18 @@ public final class SortUtil
           {
             break outer;
           }
-          if((count2=len2-SortUtil.gallopLeftcomparatorSort((float)arr[cursor1],tmp,tmpBase,len2,len2-1
+          if((count2=len2-gallopLeft((float)arr[cursor1],tmp,tmpOffset,len2,len2-1
             ,sorter
           ))!=0)
           {
             ArrCopy.uncheckedCopy(tmp,(cursor2-=count2)+1,arr,(dest-=count2)+1,count2);
-            if((len2-=count2)<=1)
+            if((len2-=count2)<2)
             {
               break outer;
             }
           }
-          arr[dest--]=tmp[cursor2--];
-          if(len1==0)
+          arr[dest--]=arr[cursor1--];
+          if(--len1==0)
           {
             break outer;
           }
@@ -12318,41 +12524,64 @@ public final class SortUtil
         while(count1>=7 || count2>=7);
         if(minGallop<0)
         {
-          minGallop=0;
+          minGallop=2;
         }
-        minGallop+=2;
+        else
+        {
+          minGallop+=2;
+        }
       }
-      this.minGallop=(minGallop<1?1:minGallop);
-      switch(len2)
+      this.minGallop = minGallop < 1 ? 1 : minGallop;
+      if(len2==1)
       {
-        case 0:
-          throw new IllegalArgumentException("Comparison method violates its general contract!");
-        case 1:
-          //assert len1>0;
+        //assert len1>0;
         ArrCopy.uncheckedCopy(arr,(cursor1-=len1)+1,arr,(dest-=len1)+1,len1);
         arr[dest]=tmp[cursor2];
-        break;
-      default:
+      }
+      else
+      {
         //assert len1==0;
         //assert len2>0;
-        ArrCopy.uncheckedCopy(tmp,tmpBase,arr,dest-(len2-1),len2);
+        ArrCopy.uncheckedCopy(tmp,tmpOffset,arr,dest+(len2-1),len2);
       }
+    }
+    private static   int gallopRight(float key,float[] arr,int base,int len,int hint
+      ,FloatComparator sorter
+    )
+    {
+      //TODO
+      return 0;
+    }
+    private static   int gallopLeft(float key,float[] arr,int base,int len,int hint
+      ,FloatComparator sorter
+    )
+    {
+      //TODO
+      return 0;
     }
   }
   private static class comparatorSortdoubleTimSort 
     extends AbstractTimSort
   {
-    final double[] arr;
-    double[] tmp;
-    @Override
-    void initTmpArr(int tmpLen)
+    private transient final DoubleComparator sorter;
+    private transient final double[] arr;
+    private transient double[] tmp;
+    private transient int tmpOffset;
+    private transient int tmpLength;
+    private transient int minGallop;
+    comparatorSortdoubleTimSort(double[] arr,int nRemaining,DoubleComparator sorter)
     {
-      this.tmp=new double[tmpLen];
+      super(nRemaining);
+      this.sorter=sorter;
+      this.arr=arr;
+      this.tmpLength=nRemaining=nRemaining<512?nRemaining>>>1:256;
+      this.tmp=new double[nRemaining];
+      this.minGallop=7;
     }
     private double[] ensureCapacity(int minCapacity)
     {
       double[] tmp;
-      if(tmpLen<minCapacity)
+      if(tmpLength<minCapacity)
       {
         int newSize;
         if((newSize=(-1>>>Integer.numberOfLeadingZeros(minCapacity))+1)<0 || newSize>(minCapacity=arr.length>>>1))
@@ -12360,8 +12589,8 @@ public final class SortUtil
           newSize=minCapacity;
         }
         this.tmp=tmp=new double[newSize];
-        this.tmpLen=newSize;
-        tmpBase=0;
+        this.tmpLength=newSize;
+        tmpOffset=0;
       }
       else
       {
@@ -12369,69 +12598,61 @@ public final class SortUtil
       }
       return tmp;
     }
-    final DoubleComparator sorter;
-    comparatorSortdoubleTimSort(double[] arr,DoubleComparator sorter,int nRemaining)
-    {
-      super(nRemaining);
-      this.arr=arr;
-      this.sorter=sorter;
-    }
     @Override
-    int mergeAt(int i,int stackSize,int[] runLen)
+    int mergeAt(int n,int stackSize,int[] runLenAndBase)
     {
-      //assert stackSize>=2;
-      //assert i>=0;
-      //assert i==stackSize-2 || i==stackSize-3;
-      int base1,len1,base2,len2;
-      int[] runBase=this.runBase;
-      //assert runLen[i]>0 && runLen[i+1]>0;
-      //assert runBase[i]+runLen[i]==runBase[i+1];
-      runLen[i]=(len1=runLen[i])+(len2=runLen[i+1]);
-      if(i==stackSize-3)
+      //assert stackSize>=4;
+      //assert n>=0;
+      //assert n==stackSize-4 || n==stackSize-6;
+      //assert runLenAndBase[n]>0;
+      //assert runLenAndBase[n+2]>0;
+      //assert runLenAndBase[n]+runBaseAndLen[n+1]==runBaseAndLen[n+3];
+      int len1,base1,len2,base2;
+      runLenAndBase[n]=(len1=runLenAndBase[n])+(len2=runLenAndBase[n+2]);
+      if(n==stackSize-6)
       {
-        runBase[i+1]=runBase[i+2];
-        runLen[i+1]=runLen[i+2];
+        runLenAndBase[n+3]=runLenAndBase[n+5];
+        runLenAndBase[n+2]=runLenAndBase[n+4];
       }
-      --stackSize;
       double[] arr;
       int k;
-      base1=(base1=runBase[i])+(k=SortUtil.gallopRightcomparatorSort((double)(arr=this.arr)[base2=runBase[i+1]],arr,base1,len1,0
+      base1=(base1=runLenAndBase[n+1])+(k=gallopRight((double)(arr=this.arr)[base2=runLenAndBase[n+3]],arr,base1,len1,0
         ,sorter
       ));
+      //assert k>=0;
       if((len1-=k)!=0)
       {
-         //assert k>=0;
-         if((len2=SortUtil.gallopLeftcomparatorSort((double)arr[base1+len1-1],arr,base2,len2,len2-1
-           ,sorter
-         ))!=0)
-         {
-           //assert len2>0;
-           if(len1>len2)
-           {
-             mergeHi(arr,base1,len1,base2,len2
-               ,sorter
-             );
-           }
-           else
-           {
-             mergeLo(arr,base1,len1,base2,len2
-               ,sorter
-             );
-           }
-         }
+        if((len2=gallopLeft((double)arr[base1+len1-2],arr,base2,len2,len2-1
+          ,sorter
+        ))!=0)
+        {
+          //assert len2>0;
+          if(len1<=len2)
+          {
+            mergeLo(arr,base1,len1,base2,len2);
+          }
+          else
+          {
+            mergeHi(arr,base1,len1,base2,len2);
+          }
+        }
       }
-      return stackSize;
+      return stackSize-2;
     }
-    private void mergeLo(double[] arr,int base1,int len1,int base2,int len2
-    ,DoubleComparator sorter
-    )
+    private void mergeLo(double[] arr,int base1,int len1,int base2,int len2)
     {
+      //assert len1>0;
+      //assert len2>0;
+      //assert base1+len1==base2;
+      //TODO
       double[] tmp;
-      int cursor1,dest;
-      int cursor2=base2;
+      int cursor1;
+      int dest;
       ArrCopy.uncheckedCopy(arr,dest=base1,tmp=
-      ensureCapacity(len1),cursor1=this.tmpBase,len1);
+      ensureCapacity(len1),cursor1=this.tmpOffset,len1);
+      int cursor2=base2;
       arr[dest++]=arr[cursor2++];
+      //TODO make these pre-decrement for performance
       if(--len2==0)
       {
         ArrCopy.uncheckedCopy(tmp,cursor1,arr,dest,len1);
@@ -12444,13 +12665,16 @@ public final class SortUtil
         return;
       }
       int minGallop=this.minGallop;
-      outer:for(;;)
+      final var sorter=this.sorter;
+      outer:
+      for(;;)
       {
         int count1=0;
         int count2=0;
         do
         {
-          //assert len1>1 && len2>0;
+          //assert len1>1;
+          //assert len2=0;
           if(
           sorter.compare((double)(arr[cursor2]),(double)(tmp[cursor1]))<0
           )
@@ -12468,24 +12692,26 @@ public final class SortUtil
             arr[dest++]=tmp[cursor1++];
             ++count1;
             count2=0;
-            if(--len1==0)
+            if(--len1==1)
             {
-              break;
+              break outer;
             }
           }
         }
         while((count1|count2)<minGallop);
         do
         {
-          //assert len1>1 && len2>0;
-          if((count1=SortUtil.gallopRightcomparatorSort((double)arr[cursor2],tmp,cursor1,len1,0
+          //assert len1>1;
+          //assert len2>0;
+          if((
+          count1=gallopRight((double)arr[cursor2],tmp,cursor1,len1,0
             ,sorter
-          ))!=0)
+            ))!=0)
           {
             ArrCopy.uncheckedCopy(tmp,cursor1,arr,dest,count1);
             dest+=count1;
             cursor1+=count1;
-            if((len1-=count1)<=1)
+            if((len1-=count1)<2)
             {
               break outer;
             }
@@ -12495,7 +12721,7 @@ public final class SortUtil
           {
             break outer;
           }
-          if((count2=SortUtil.gallopLeftcomparatorSort((double)tmp[cursor1],arr,cursor2,len2,0
+          if((count2=gallopLeft((double)tmp[cursor1],arr,cursor2,len2,0
             ,sorter
           ))!=0)
           {
@@ -12508,7 +12734,7 @@ public final class SortUtil
             }
           }
           arr[dest++]=tmp[cursor1++];
-          if(len1==1)
+          if(--len1==1)
           {
             break outer;
           }
@@ -12517,60 +12743,64 @@ public final class SortUtil
         while(count1>=7 || count2>=7);
         if(minGallop<0)
         {
-          minGallop=0;
+          minGallop=2;
         }
-        minGallop+=2;
+        else
+        {
+          minGallop+=2;
+        }
       }
-      this.minGallop=(minGallop<1?1:minGallop);
-      switch(len1)
+      this.minGallop = minGallop < 1 ? 1 : minGallop;
+      if(len1==1)
       {
-        case 0:
-          throw new IllegalArgumentException("Comparison method violates its general contract!");
-        case 1:
-          //assert len2>0;
+        //assert len2>0;
         ArrCopy.uncheckedCopy(arr,cursor2,arr,dest,len2);
         arr[dest+len2]=tmp[cursor1];
-        break;
-      default:
-        assert len2==0;
-        assert len1>1;
+      }
+      else
+      {
+        //assert len2==0;
+        //assert len1>1;
         ArrCopy.uncheckedCopy(tmp,cursor1,arr,dest,len1);
       }
     }
-    private void mergeHi(double[] arr,int base1,int len1,int base2,int len2
-    ,DoubleComparator sorter
-    )
+    private void mergeHi(double[] arr,int base1,int len1,int base2,int len2)
     {
+      //assert len1>0;
+      //assert len2>0;
+      //assert base1+len1==base2;
+      //TODO
       double[] tmp;
-      int cursor1,dest;
-      int tmpBase;
+      int tmpOffset;
       ArrCopy.uncheckedCopy(arr,base2,tmp=
-      ensureCapacity(len2),tmpBase=this.tmpBase,len2);
-      dest=base2+len2-1;
-      cursor1=base1+len1-1;
+      ensureCapacity(len2),tmpOffset=this.tmpOffset,len2);
+      int cursor1=base1+len1-1;
+      int cursor2=tmpOffset+len2-1;
+      int dest=base2+len2-1;
       arr[dest--]=arr[cursor1--];
+      //TODO make these pre-decrement for performance
       if(--len1==0)
       {
-        ArrCopy.uncheckedCopy(tmp,tmpBase,arr,dest-(len2-1),len2);
+        ArrCopy.uncheckedCopy(tmp,tmpOffset,arr,dest-(len2-1),len2);
         return;
       }
       if(len2==1)
       {
-        dest-=len1;
-        cursor1-=len1;
-        ArrCopy.uncheckedCopy(arr,(cursor1-=len1)+1,arr,(dest-=len1)+1,len1);
-        arr[dest]=tmp[tmpBase];
+        ArrCopy.uncheckedCopy(arr,cursor1-len1+1,arr,(dest-=len1)+1,len1);
+        arr[dest]=tmp[cursor2];
         return;
       }
-      int cursor2=tmpBase+len2-1;
       int minGallop=this.minGallop;
-      outer:for(;;)
+      final var sorter=this.sorter;
+      outer:
+      for(;;)
       {
         int count1=0;
         int count2=0;
         do
         {
-          //assert len2>1 && len1>0;
+          //assert len2>1;
+          //assert len1=0;
           if(
           sorter.compare((double)(tmp[cursor2]),(double)(arr[cursor1]))<0
           )
@@ -12588,21 +12818,23 @@ public final class SortUtil
             arr[dest--]=tmp[cursor2--];
             ++count2;
             count1=0;
-            if(--len2==0)
+            if(--len2==1)
             {
-              break;
+              break outer;
             }
           }
         }
         while((count1|count2)<minGallop);
         do
         {
-          //assert len2>1 && len1>0;
-          if((count1=len1-SortUtil.gallopRightcomparatorSort((double)tmp[cursor2],arr,base1,len1,len1-1
+          //assert len2>1;
+          //assert len1>0;
+          if((
+          count1=len1-gallopRight((double)tmp[cursor2],arr,base1,len1,len1-1
             ,sorter
-          ))!=0)
+            ))!=0)
           {
-            ArrCopy.uncheckedCopy(arr,(cursor1-=count1),arr,(dest-=count1)+1,count1);
+            ArrCopy.uncheckedCopy(arr,(cursor1-=count1)+1,arr,(dest-=count1)+1,count1);
             if((len1-=count1)==0)
             {
               break outer;
@@ -12613,18 +12845,18 @@ public final class SortUtil
           {
             break outer;
           }
-          if((count2=len2-SortUtil.gallopLeftcomparatorSort((double)arr[cursor1],tmp,tmpBase,len2,len2-1
+          if((count2=len2-gallopLeft((double)arr[cursor1],tmp,tmpOffset,len2,len2-1
             ,sorter
           ))!=0)
           {
             ArrCopy.uncheckedCopy(tmp,(cursor2-=count2)+1,arr,(dest-=count2)+1,count2);
-            if((len2-=count2)<=1)
+            if((len2-=count2)<2)
             {
               break outer;
             }
           }
-          arr[dest--]=tmp[cursor2--];
-          if(len1==0)
+          arr[dest--]=arr[cursor1--];
+          if(--len1==0)
           {
             break outer;
           }
@@ -12633,95 +12865,109 @@ public final class SortUtil
         while(count1>=7 || count2>=7);
         if(minGallop<0)
         {
-          minGallop=0;
+          minGallop=2;
         }
-        minGallop+=2;
+        else
+        {
+          minGallop+=2;
+        }
       }
-      this.minGallop=(minGallop<1?1:minGallop);
-      switch(len2)
+      this.minGallop = minGallop < 1 ? 1 : minGallop;
+      if(len2==1)
       {
-        case 0:
-          throw new IllegalArgumentException("Comparison method violates its general contract!");
-        case 1:
-          //assert len1>0;
+        //assert len1>0;
         ArrCopy.uncheckedCopy(arr,(cursor1-=len1)+1,arr,(dest-=len1)+1,len1);
         arr[dest]=tmp[cursor2];
-        break;
-      default:
+      }
+      else
+      {
         //assert len1==0;
         //assert len2>0;
-        ArrCopy.uncheckedCopy(tmp,tmpBase,arr,dest-(len2-1),len2);
+        ArrCopy.uncheckedCopy(tmp,tmpOffset,arr,dest+(len2-1),len2);
       }
+    }
+    private static   int gallopRight(double key,double[] arr,int base,int len,int hint
+      ,DoubleComparator sorter
+    )
+    {
+      //TODO
+      return 0;
+    }
+    private static   int gallopLeft(double key,double[] arr,int base,int len,int hint
+      ,DoubleComparator sorter
+    )
+    {
+      //TODO
+      return 0;
     }
   }
   private static class comparatorSortObjectTimSort<E>
-    extends AbstractObjectTimSort<E>
+    extends  AbstractObjectTimSort<E>
   {
-    final Comparator<? super E> sorter;
-    comparatorSortObjectTimSort(Object[] arr,Comparator<? super E> sorter,int nRemaining)
+    private final Comparator<? super E> sorter;
+    comparatorSortObjectTimSort(Object[] arr,int nRemaining,Comparator<? super E> sorter)
     {
       super(arr,nRemaining);
       this.sorter=sorter;
     }
     @SuppressWarnings("unchecked")
     @Override
-    int mergeAt(int i,int stackSize,int[] runLen)
+    int mergeAt(int n,int stackSize,int[] runLenAndBase)
     {
-      //assert stackSize>=2;
-      //assert i>=0;
-      //assert i==stackSize-2 || i==stackSize-3;
-      int base1,len1,base2,len2;
-      int[] runBase=this.runBase;
-      //assert runLen[i]>0 && runLen[i+1]>0;
-      //assert runBase[i]+runLen[i]==runBase[i+1];
-      runLen[i]=(len1=runLen[i])+(len2=runLen[i+1]);
-      if(i==stackSize-3)
+      //assert stackSize>=4;
+      //assert n>=0;
+      //assert n==stackSize-4 || n==stackSize-6;
+      //assert runLenAndBase[n]>0;
+      //assert runLenAndBase[n+2]>0;
+      //assert runLenAndBase[n]+runBaseAndLen[n+1]==runBaseAndLen[n+3];
+      int len1,base1,len2,base2;
+      runLenAndBase[n]=(len1=runLenAndBase[n])+(len2=runLenAndBase[n+2]);
+      if(n==stackSize-6)
       {
-        runBase[i+1]=runBase[i+2];
-        runLen[i+1]=runLen[i+2];
+        runLenAndBase[n+3]=runLenAndBase[n+5];
+        runLenAndBase[n+2]=runLenAndBase[n+4];
       }
-      --stackSize;
       Object[] arr;
       int k;
-      base1=(base1=runBase[i])+(k=SortUtil.gallopRightcomparatorSort((E)(arr=this.arr)[base2=runBase[i+1]],arr,base1,len1,0
+      base1=(base1=runLenAndBase[n+1])+(k=gallopRight((E)(arr=this.arr)[base2=runLenAndBase[n+3]],arr,base1,len1,0
         ,sorter
       ));
+      //assert k>=0;
       if((len1-=k)!=0)
       {
-         //assert k>=0;
-         if((len2=SortUtil.gallopLeftcomparatorSort((E)arr[base1+len1-1],arr,base2,len2,len2-1
-           ,sorter
-         ))!=0)
-         {
-           //assert len2>0;
-           if(len1>len2)
-           {
-             mergeHi(arr,base1,len1,base2,len2
-               ,sorter
-             );
-           }
-           else
-           {
-             mergeLo(arr,base1,len1,base2,len2
-               ,sorter
-             );
-           }
-         }
+        if((len2=gallopLeft((E)arr[base1+len1-2],arr,base2,len2,len2-1
+          ,sorter
+        ))!=0)
+        {
+          //assert len2>0;
+          if(len1<=len2)
+          {
+            mergeLo(arr,base1,len1,base2,len2);
+          }
+          else
+          {
+            mergeHi(arr,base1,len1,base2,len2);
+          }
+        }
       }
-      return stackSize;
+      return stackSize-2;
     }
     @SuppressWarnings("unchecked")
-    private void mergeLo(Object[] arr,int base1,int len1,int base2,int len2
-    ,Comparator<? super E> sorter
-    )
+    private void mergeLo(Object[] arr,int base1,int len1,int base2,int len2)
     {
+      //assert len1>0;
+      //assert len2>0;
+      //assert base1+len1==base2;
+      //TODO
       Object[] tmp;
-      int cursor1,dest;
-      int cursor2=base2;
+      int cursor1;
+      int dest;
       ArrCopy.uncheckedCopy(arr,dest=base1,tmp=
       super.
-      ensureCapacity(len1),cursor1=this.tmpBase,len1);
+      ensureCapacity(len1),cursor1=this.tmpOffset,len1);
+      int cursor2=base2;
       arr[dest++]=arr[cursor2++];
+      //TODO make these pre-decrement for performance
       if(--len2==0)
       {
         ArrCopy.uncheckedCopy(tmp,cursor1,arr,dest,len1);
@@ -12734,13 +12980,16 @@ public final class SortUtil
         return;
       }
       int minGallop=this.minGallop;
-      outer:for(;;)
+      final var sorter=this.sorter;
+      outer:
+      for(;;)
       {
         int count1=0;
         int count2=0;
         do
         {
-          //assert len1>1 && len2>0;
+          //assert len1>1;
+          //assert len2=0;
           if(
           sorter.compare((E)(arr[cursor2]),(E)(tmp[cursor1]))<0
           )
@@ -12758,24 +13007,26 @@ public final class SortUtil
             arr[dest++]=tmp[cursor1++];
             ++count1;
             count2=0;
-            if(--len1==0)
+            if(--len1==1)
             {
-              break;
+              break outer;
             }
           }
         }
         while((count1|count2)<minGallop);
         do
         {
-          //assert len1>1 && len2>0;
-          if((count1=SortUtil.gallopRightcomparatorSort((E)arr[cursor2],tmp,cursor1,len1,0
+          //assert len1>1;
+          //assert len2>0;
+          if((
+          count1=gallopRight((E)arr[cursor2],tmp,cursor1,len1,0
             ,sorter
-          ))!=0)
+            ))!=0)
           {
             ArrCopy.uncheckedCopy(tmp,cursor1,arr,dest,count1);
             dest+=count1;
             cursor1+=count1;
-            if((len1-=count1)<=1)
+            if((len1-=count1)<2)
             {
               break outer;
             }
@@ -12785,7 +13036,7 @@ public final class SortUtil
           {
             break outer;
           }
-          if((count2=SortUtil.gallopLeftcomparatorSort((E)tmp[cursor1],arr,cursor2,len2,0
+          if((count2=gallopLeft((E)tmp[cursor1],arr,cursor2,len2,0
             ,sorter
           ))!=0)
           {
@@ -12798,7 +13049,7 @@ public final class SortUtil
             }
           }
           arr[dest++]=tmp[cursor1++];
-          if(len1==1)
+          if(--len1==1)
           {
             break outer;
           }
@@ -12807,62 +13058,66 @@ public final class SortUtil
         while(count1>=7 || count2>=7);
         if(minGallop<0)
         {
-          minGallop=0;
+          minGallop=2;
         }
-        minGallop+=2;
+        else
+        {
+          minGallop+=2;
+        }
       }
-      this.minGallop=(minGallop<1?1:minGallop);
-      switch(len1)
+      this.minGallop = minGallop < 1 ? 1 : minGallop;
+      if(len1==1)
       {
-        case 0:
-          throw new IllegalArgumentException("Comparison method violates its general contract!");
-        case 1:
-          //assert len2>0;
+        //assert len2>0;
         ArrCopy.uncheckedCopy(arr,cursor2,arr,dest,len2);
         arr[dest+len2]=tmp[cursor1];
-        break;
-      default:
-        assert len2==0;
-        assert len1>1;
+      }
+      else
+      {
+        //assert len2==0;
+        //assert len1>1;
         ArrCopy.uncheckedCopy(tmp,cursor1,arr,dest,len1);
       }
     }
     @SuppressWarnings("unchecked")
-    private void mergeHi(Object[] arr,int base1,int len1,int base2,int len2
-    ,Comparator<? super E> sorter
-    )
+    private void mergeHi(Object[] arr,int base1,int len1,int base2,int len2)
     {
+      //assert len1>0;
+      //assert len2>0;
+      //assert base1+len1==base2;
+      //TODO
       Object[] tmp;
-      int cursor1,dest;
-      int tmpBase;
+      int tmpOffset;
       ArrCopy.uncheckedCopy(arr,base2,tmp=
       super.
-      ensureCapacity(len2),tmpBase=this.tmpBase,len2);
-      dest=base2+len2-1;
-      cursor1=base1+len1-1;
+      ensureCapacity(len2),tmpOffset=this.tmpOffset,len2);
+      int cursor1=base1+len1-1;
+      int cursor2=tmpOffset+len2-1;
+      int dest=base2+len2-1;
       arr[dest--]=arr[cursor1--];
+      //TODO make these pre-decrement for performance
       if(--len1==0)
       {
-        ArrCopy.uncheckedCopy(tmp,tmpBase,arr,dest-(len2-1),len2);
+        ArrCopy.uncheckedCopy(tmp,tmpOffset,arr,dest-(len2-1),len2);
         return;
       }
       if(len2==1)
       {
-        dest-=len1;
-        cursor1-=len1;
-        ArrCopy.uncheckedCopy(arr,(cursor1-=len1)+1,arr,(dest-=len1)+1,len1);
-        arr[dest]=tmp[tmpBase];
+        ArrCopy.uncheckedCopy(arr,cursor1-len1+1,arr,(dest-=len1)+1,len1);
+        arr[dest]=tmp[cursor2];
         return;
       }
-      int cursor2=tmpBase+len2-1;
       int minGallop=this.minGallop;
-      outer:for(;;)
+      final var sorter=this.sorter;
+      outer:
+      for(;;)
       {
         int count1=0;
         int count2=0;
         do
         {
-          //assert len2>1 && len1>0;
+          //assert len2>1;
+          //assert len1=0;
           if(
           sorter.compare((E)(tmp[cursor2]),(E)(arr[cursor1]))<0
           )
@@ -12880,21 +13135,23 @@ public final class SortUtil
             arr[dest--]=tmp[cursor2--];
             ++count2;
             count1=0;
-            if(--len2==0)
+            if(--len2==1)
             {
-              break;
+              break outer;
             }
           }
         }
         while((count1|count2)<minGallop);
         do
         {
-          //assert len2>1 && len1>0;
-          if((count1=len1-SortUtil.gallopRightcomparatorSort((E)tmp[cursor2],arr,base1,len1,len1-1
+          //assert len2>1;
+          //assert len1>0;
+          if((
+          count1=len1-gallopRight((E)tmp[cursor2],arr,base1,len1,len1-1
             ,sorter
-          ))!=0)
+            ))!=0)
           {
-            ArrCopy.uncheckedCopy(arr,(cursor1-=count1),arr,(dest-=count1)+1,count1);
+            ArrCopy.uncheckedCopy(arr,(cursor1-=count1)+1,arr,(dest-=count1)+1,count1);
             if((len1-=count1)==0)
             {
               break outer;
@@ -12905,18 +13162,18 @@ public final class SortUtil
           {
             break outer;
           }
-          if((count2=len2-SortUtil.gallopLeftcomparatorSort((E)arr[cursor1],tmp,tmpBase,len2,len2-1
+          if((count2=len2-gallopLeft((E)arr[cursor1],tmp,tmpOffset,len2,len2-1
             ,sorter
           ))!=0)
           {
             ArrCopy.uncheckedCopy(tmp,(cursor2-=count2)+1,arr,(dest-=count2)+1,count2);
-            if((len2-=count2)<=1)
+            if((len2-=count2)<2)
             {
               break outer;
             }
           }
-          arr[dest--]=tmp[cursor2--];
-          if(len1==0)
+          arr[dest--]=arr[cursor1--];
+          if(--len1==0)
           {
             break outer;
           }
@@ -12925,29 +13182,44 @@ public final class SortUtil
         while(count1>=7 || count2>=7);
         if(minGallop<0)
         {
-          minGallop=0;
+          minGallop=2;
         }
-        minGallop+=2;
+        else
+        {
+          minGallop+=2;
+        }
       }
-      this.minGallop=(minGallop<1?1:minGallop);
-      switch(len2)
+      this.minGallop = minGallop < 1 ? 1 : minGallop;
+      if(len2==1)
       {
-        case 0:
-          throw new IllegalArgumentException("Comparison method violates its general contract!");
-        case 1:
-          //assert len1>0;
+        //assert len1>0;
         ArrCopy.uncheckedCopy(arr,(cursor1-=len1)+1,arr,(dest-=len1)+1,len1);
         arr[dest]=tmp[cursor2];
-        break;
-      default:
+      }
+      else
+      {
         //assert len1==0;
         //assert len2>0;
-        ArrCopy.uncheckedCopy(tmp,tmpBase,arr,dest-(len2-1),len2);
+        ArrCopy.uncheckedCopy(tmp,tmpOffset,arr,dest+(len2-1),len2);
       }
+    }
+    private static <E> int gallopRight(E key,Object[] arr,int base,int len,int hint
+      ,Comparator<? super E> sorter
+    )
+    {
+      //TODO
+      return 0;
+    }
+    private static <E> int gallopLeft(E key,Object[] arr,int base,int len,int hint
+      ,Comparator<? super E> sorter
+    )
+    {
+      //TODO
+      return 0;
     }
   }
   private static class sortObjectTimSort<E>
-    extends AbstractObjectTimSort<E>
+    extends  AbstractObjectTimSort<E>
   {
     sortObjectTimSort(Object[] arr,int nRemaining)
     {
@@ -12955,58 +13227,60 @@ public final class SortUtil
     }
     @SuppressWarnings("unchecked")
     @Override
-    int mergeAt(int i,int stackSize,int[] runLen)
+    int mergeAt(int n,int stackSize,int[] runLenAndBase)
     {
-      //assert stackSize>=2;
-      //assert i>=0;
-      //assert i==stackSize-2 || i==stackSize-3;
-      int base1,len1,base2,len2;
-      int[] runBase=this.runBase;
-      //assert runLen[i]>0 && runLen[i+1]>0;
-      //assert runBase[i]+runLen[i]==runBase[i+1];
-      runLen[i]=(len1=runLen[i])+(len2=runLen[i+1]);
-      if(i==stackSize-3)
+      //assert stackSize>=4;
+      //assert n>=0;
+      //assert n==stackSize-4 || n==stackSize-6;
+      //assert runLenAndBase[n]>0;
+      //assert runLenAndBase[n+2]>0;
+      //assert runLenAndBase[n]+runBaseAndLen[n+1]==runBaseAndLen[n+3];
+      int len1,base1,len2,base2;
+      runLenAndBase[n]=(len1=runLenAndBase[n])+(len2=runLenAndBase[n+2]);
+      if(n==stackSize-6)
       {
-        runBase[i+1]=runBase[i+2];
-        runLen[i+1]=runLen[i+2];
+        runLenAndBase[n+3]=runLenAndBase[n+5];
+        runLenAndBase[n+2]=runLenAndBase[n+4];
       }
-      --stackSize;
       Object[] arr;
       int k;
-      base1=(base1=runBase[i])+(k=SortUtil.gallopRightsort((Comparable<E>)(arr=this.arr)[base2=runBase[i+1]],arr,base1,len1,0
+      base1=(base1=runLenAndBase[n+1])+(k=gallopRight((Comparable<E>)(arr=this.arr)[base2=runLenAndBase[n+3]],arr,base1,len1,0
       ));
+      //assert k>=0;
       if((len1-=k)!=0)
       {
-         //assert k>=0;
-         if((len2=SortUtil.gallopLeftsort((Comparable<E>)arr[base1+len1-1],arr,base2,len2,len2-1
-         ))!=0)
-         {
-           //assert len2>0;
-           if(len1>len2)
-           {
-             mergeHi(arr,base1,len1,base2,len2
-             );
-           }
-           else
-           {
-             mergeLo(arr,base1,len1,base2,len2
-             );
-           }
-         }
+        if((len2=gallopLeft((Comparable<E>)arr[base1+len1-2],arr,base2,len2,len2-1
+        ))!=0)
+        {
+          //assert len2>0;
+          if(len1<=len2)
+          {
+            mergeLo(arr,base1,len1,base2,len2);
+          }
+          else
+          {
+            mergeHi(arr,base1,len1,base2,len2);
+          }
+        }
       }
-      return stackSize;
+      return stackSize-2;
     }
     @SuppressWarnings("unchecked")
-    private void mergeLo(Object[] arr,int base1,int len1,int base2,int len2
-    )
+    private void mergeLo(Object[] arr,int base1,int len1,int base2,int len2)
     {
+      //assert len1>0;
+      //assert len2>0;
+      //assert base1+len1==base2;
+      //TODO
       Object[] tmp;
-      int cursor1,dest;
-      int cursor2=base2;
+      int cursor1;
+      int dest;
       ArrCopy.uncheckedCopy(arr,dest=base1,tmp=
       super.
-      ensureCapacity(len1),cursor1=this.tmpBase,len1);
+      ensureCapacity(len1),cursor1=this.tmpOffset,len1);
+      int cursor2=base2;
       arr[dest++]=arr[cursor2++];
+      //TODO make these pre-decrement for performance
       if(--len2==0)
       {
         ArrCopy.uncheckedCopy(tmp,cursor1,arr,dest,len1);
@@ -13019,13 +13293,15 @@ public final class SortUtil
         return;
       }
       int minGallop=this.minGallop;
-      outer:for(;;)
+      outer:
+      for(;;)
       {
         int count1=0;
         int count2=0;
         do
         {
-          //assert len1>1 && len2>0;
+          //assert len1>1;
+          //assert len2=0;
           if(
           ((Comparable<E>)(arr[cursor2])).compareTo((E)(tmp[cursor1]))<0
           )
@@ -13043,23 +13319,25 @@ public final class SortUtil
             arr[dest++]=tmp[cursor1++];
             ++count1;
             count2=0;
-            if(--len1==0)
+            if(--len1==1)
             {
-              break;
+              break outer;
             }
           }
         }
         while((count1|count2)<minGallop);
         do
         {
-          //assert len1>1 && len2>0;
-          if((count1=SortUtil.gallopRightsort((Comparable<E>)arr[cursor2],tmp,cursor1,len1,0
-          ))!=0)
+          //assert len1>1;
+          //assert len2>0;
+          if((
+          count1=gallopRight((Comparable<E>)arr[cursor2],tmp,cursor1,len1,0
+            ))!=0)
           {
             ArrCopy.uncheckedCopy(tmp,cursor1,arr,dest,count1);
             dest+=count1;
             cursor1+=count1;
-            if((len1-=count1)<=1)
+            if((len1-=count1)<2)
             {
               break outer;
             }
@@ -13069,7 +13347,7 @@ public final class SortUtil
           {
             break outer;
           }
-          if((count2=SortUtil.gallopLeftsort((Comparable<E>)tmp[cursor1],arr,cursor2,len2,0
+          if((count2=gallopLeft((Comparable<E>)tmp[cursor1],arr,cursor2,len2,0
           ))!=0)
           {
             ArrCopy.uncheckedCopy(arr,cursor2,arr,dest,count2);
@@ -13081,7 +13359,7 @@ public final class SortUtil
             }
           }
           arr[dest++]=tmp[cursor1++];
-          if(len1==1)
+          if(--len1==1)
           {
             break outer;
           }
@@ -13090,61 +13368,65 @@ public final class SortUtil
         while(count1>=7 || count2>=7);
         if(minGallop<0)
         {
-          minGallop=0;
+          minGallop=2;
         }
-        minGallop+=2;
+        else
+        {
+          minGallop+=2;
+        }
       }
-      this.minGallop=(minGallop<1?1:minGallop);
-      switch(len1)
+      this.minGallop = minGallop < 1 ? 1 : minGallop;
+      if(len1==1)
       {
-        case 0:
-          throw new IllegalArgumentException("Comparison method violates its general contract!");
-        case 1:
-          //assert len2>0;
+        //assert len2>0;
         ArrCopy.uncheckedCopy(arr,cursor2,arr,dest,len2);
         arr[dest+len2]=tmp[cursor1];
-        break;
-      default:
-        assert len2==0;
-        assert len1>1;
+      }
+      else
+      {
+        //assert len2==0;
+        //assert len1>1;
         ArrCopy.uncheckedCopy(tmp,cursor1,arr,dest,len1);
       }
     }
     @SuppressWarnings("unchecked")
-    private void mergeHi(Object[] arr,int base1,int len1,int base2,int len2
-    )
+    private void mergeHi(Object[] arr,int base1,int len1,int base2,int len2)
     {
+      //assert len1>0;
+      //assert len2>0;
+      //assert base1+len1==base2;
+      //TODO
       Object[] tmp;
-      int cursor1,dest;
-      int tmpBase;
+      int tmpOffset;
       ArrCopy.uncheckedCopy(arr,base2,tmp=
       super.
-      ensureCapacity(len2),tmpBase=this.tmpBase,len2);
-      dest=base2+len2-1;
-      cursor1=base1+len1-1;
+      ensureCapacity(len2),tmpOffset=this.tmpOffset,len2);
+      int cursor1=base1+len1-1;
+      int cursor2=tmpOffset+len2-1;
+      int dest=base2+len2-1;
       arr[dest--]=arr[cursor1--];
+      //TODO make these pre-decrement for performance
       if(--len1==0)
       {
-        ArrCopy.uncheckedCopy(tmp,tmpBase,arr,dest-(len2-1),len2);
+        ArrCopy.uncheckedCopy(tmp,tmpOffset,arr,dest-(len2-1),len2);
         return;
       }
       if(len2==1)
       {
-        dest-=len1;
-        cursor1-=len1;
-        ArrCopy.uncheckedCopy(arr,(cursor1-=len1)+1,arr,(dest-=len1)+1,len1);
-        arr[dest]=tmp[tmpBase];
+        ArrCopy.uncheckedCopy(arr,cursor1-len1+1,arr,(dest-=len1)+1,len1);
+        arr[dest]=tmp[cursor2];
         return;
       }
-      int cursor2=tmpBase+len2-1;
       int minGallop=this.minGallop;
-      outer:for(;;)
+      outer:
+      for(;;)
       {
         int count1=0;
         int count2=0;
         do
         {
-          //assert len2>1 && len1>0;
+          //assert len2>1;
+          //assert len1=0;
           if(
           ((Comparable<E>)(tmp[cursor2])).compareTo((E)(arr[cursor1]))<0
           )
@@ -13162,20 +13444,22 @@ public final class SortUtil
             arr[dest--]=tmp[cursor2--];
             ++count2;
             count1=0;
-            if(--len2==0)
+            if(--len2==1)
             {
-              break;
+              break outer;
             }
           }
         }
         while((count1|count2)<minGallop);
         do
         {
-          //assert len2>1 && len1>0;
-          if((count1=len1-SortUtil.gallopRightsort((Comparable<E>)tmp[cursor2],arr,base1,len1,len1-1
-          ))!=0)
+          //assert len2>1;
+          //assert len1>0;
+          if((
+          count1=len1-gallopRight((Comparable<E>)tmp[cursor2],arr,base1,len1,len1-1
+            ))!=0)
           {
-            ArrCopy.uncheckedCopy(arr,(cursor1-=count1),arr,(dest-=count1)+1,count1);
+            ArrCopy.uncheckedCopy(arr,(cursor1-=count1)+1,arr,(dest-=count1)+1,count1);
             if((len1-=count1)==0)
             {
               break outer;
@@ -13186,17 +13470,17 @@ public final class SortUtil
           {
             break outer;
           }
-          if((count2=len2-SortUtil.gallopLeftsort((Comparable<E>)arr[cursor1],tmp,tmpBase,len2,len2-1
+          if((count2=len2-gallopLeft((Comparable<E>)arr[cursor1],tmp,tmpOffset,len2,len2-1
           ))!=0)
           {
             ArrCopy.uncheckedCopy(tmp,(cursor2-=count2)+1,arr,(dest-=count2)+1,count2);
-            if((len2-=count2)<=1)
+            if((len2-=count2)<2)
             {
               break outer;
             }
           }
-          arr[dest--]=tmp[cursor2--];
-          if(len1==0)
+          arr[dest--]=arr[cursor1--];
+          if(--len1==0)
           {
             break outer;
           }
@@ -13205,29 +13489,42 @@ public final class SortUtil
         while(count1>=7 || count2>=7);
         if(minGallop<0)
         {
-          minGallop=0;
+          minGallop=2;
         }
-        minGallop+=2;
+        else
+        {
+          minGallop+=2;
+        }
       }
-      this.minGallop=(minGallop<1?1:minGallop);
-      switch(len2)
+      this.minGallop = minGallop < 1 ? 1 : minGallop;
+      if(len2==1)
       {
-        case 0:
-          throw new IllegalArgumentException("Comparison method violates its general contract!");
-        case 1:
-          //assert len1>0;
+        //assert len1>0;
         ArrCopy.uncheckedCopy(arr,(cursor1-=len1)+1,arr,(dest-=len1)+1,len1);
         arr[dest]=tmp[cursor2];
-        break;
-      default:
+      }
+      else
+      {
         //assert len1==0;
         //assert len2>0;
-        ArrCopy.uncheckedCopy(tmp,tmpBase,arr,dest-(len2-1),len2);
+        ArrCopy.uncheckedCopy(tmp,tmpOffset,arr,dest+(len2-1),len2);
       }
+    }
+    private static <E> int gallopRight(Comparable<E> key,Object[] arr,int base,int len,int hint
+    )
+    {
+      //TODO
+      return 0;
+    }
+    private static <E> int gallopLeft(Comparable<E> key,Object[] arr,int base,int len,int hint
+    )
+    {
+      //TODO
+      return 0;
     }
   }
   private static class reverseSortObjectTimSort<E>
-    extends AbstractObjectTimSort<E>
+    extends  AbstractObjectTimSort<E>
   {
     reverseSortObjectTimSort(Object[] arr,int nRemaining)
     {
@@ -13235,58 +13532,60 @@ public final class SortUtil
     }
     @SuppressWarnings("unchecked")
     @Override
-    int mergeAt(int i,int stackSize,int[] runLen)
+    int mergeAt(int n,int stackSize,int[] runLenAndBase)
     {
-      //assert stackSize>=2;
-      //assert i>=0;
-      //assert i==stackSize-2 || i==stackSize-3;
-      int base1,len1,base2,len2;
-      int[] runBase=this.runBase;
-      //assert runLen[i]>0 && runLen[i+1]>0;
-      //assert runBase[i]+runLen[i]==runBase[i+1];
-      runLen[i]=(len1=runLen[i])+(len2=runLen[i+1]);
-      if(i==stackSize-3)
+      //assert stackSize>=4;
+      //assert n>=0;
+      //assert n==stackSize-4 || n==stackSize-6;
+      //assert runLenAndBase[n]>0;
+      //assert runLenAndBase[n+2]>0;
+      //assert runLenAndBase[n]+runBaseAndLen[n+1]==runBaseAndLen[n+3];
+      int len1,base1,len2,base2;
+      runLenAndBase[n]=(len1=runLenAndBase[n])+(len2=runLenAndBase[n+2]);
+      if(n==stackSize-6)
       {
-        runBase[i+1]=runBase[i+2];
-        runLen[i+1]=runLen[i+2];
+        runLenAndBase[n+3]=runLenAndBase[n+5];
+        runLenAndBase[n+2]=runLenAndBase[n+4];
       }
-      --stackSize;
       Object[] arr;
       int k;
-      base1=(base1=runBase[i])+(k=SortUtil.gallopRightreverseSort((Comparable<E>)(arr=this.arr)[base2=runBase[i+1]],arr,base1,len1,0
+      base1=(base1=runLenAndBase[n+1])+(k=gallopRight((Comparable<E>)(arr=this.arr)[base2=runLenAndBase[n+3]],arr,base1,len1,0
       ));
+      //assert k>=0;
       if((len1-=k)!=0)
       {
-         //assert k>=0;
-         if((len2=SortUtil.gallopLeftreverseSort((Comparable<E>)arr[base1+len1-1],arr,base2,len2,len2-1
-         ))!=0)
-         {
-           //assert len2>0;
-           if(len1>len2)
-           {
-             mergeHi(arr,base1,len1,base2,len2
-             );
-           }
-           else
-           {
-             mergeLo(arr,base1,len1,base2,len2
-             );
-           }
-         }
+        if((len2=gallopLeft((Comparable<E>)arr[base1+len1-2],arr,base2,len2,len2-1
+        ))!=0)
+        {
+          //assert len2>0;
+          if(len1<=len2)
+          {
+            mergeLo(arr,base1,len1,base2,len2);
+          }
+          else
+          {
+            mergeHi(arr,base1,len1,base2,len2);
+          }
+        }
       }
-      return stackSize;
+      return stackSize-2;
     }
     @SuppressWarnings("unchecked")
-    private void mergeLo(Object[] arr,int base1,int len1,int base2,int len2
-    )
+    private void mergeLo(Object[] arr,int base1,int len1,int base2,int len2)
     {
+      //assert len1>0;
+      //assert len2>0;
+      //assert base1+len1==base2;
+      //TODO
       Object[] tmp;
-      int cursor1,dest;
-      int cursor2=base2;
+      int cursor1;
+      int dest;
       ArrCopy.uncheckedCopy(arr,dest=base1,tmp=
       super.
-      ensureCapacity(len1),cursor1=this.tmpBase,len1);
+      ensureCapacity(len1),cursor1=this.tmpOffset,len1);
+      int cursor2=base2;
       arr[dest++]=arr[cursor2++];
+      //TODO make these pre-decrement for performance
       if(--len2==0)
       {
         ArrCopy.uncheckedCopy(tmp,cursor1,arr,dest,len1);
@@ -13299,13 +13598,15 @@ public final class SortUtil
         return;
       }
       int minGallop=this.minGallop;
-      outer:for(;;)
+      outer:
+      for(;;)
       {
         int count1=0;
         int count2=0;
         do
         {
-          //assert len1>1 && len2>0;
+          //assert len1>1;
+          //assert len2=0;
           if(
           ((Comparable<E>)(arr[cursor2])).compareTo((E)(tmp[cursor1]))>0
           )
@@ -13323,23 +13624,25 @@ public final class SortUtil
             arr[dest++]=tmp[cursor1++];
             ++count1;
             count2=0;
-            if(--len1==0)
+            if(--len1==1)
             {
-              break;
+              break outer;
             }
           }
         }
         while((count1|count2)<minGallop);
         do
         {
-          //assert len1>1 && len2>0;
-          if((count1=SortUtil.gallopRightreverseSort((Comparable<E>)arr[cursor2],tmp,cursor1,len1,0
-          ))!=0)
+          //assert len1>1;
+          //assert len2>0;
+          if((
+          count1=gallopRight((Comparable<E>)arr[cursor2],tmp,cursor1,len1,0
+            ))!=0)
           {
             ArrCopy.uncheckedCopy(tmp,cursor1,arr,dest,count1);
             dest+=count1;
             cursor1+=count1;
-            if((len1-=count1)<=1)
+            if((len1-=count1)<2)
             {
               break outer;
             }
@@ -13349,7 +13652,7 @@ public final class SortUtil
           {
             break outer;
           }
-          if((count2=SortUtil.gallopLeftreverseSort((Comparable<E>)tmp[cursor1],arr,cursor2,len2,0
+          if((count2=gallopLeft((Comparable<E>)tmp[cursor1],arr,cursor2,len2,0
           ))!=0)
           {
             ArrCopy.uncheckedCopy(arr,cursor2,arr,dest,count2);
@@ -13361,7 +13664,7 @@ public final class SortUtil
             }
           }
           arr[dest++]=tmp[cursor1++];
-          if(len1==1)
+          if(--len1==1)
           {
             break outer;
           }
@@ -13370,61 +13673,65 @@ public final class SortUtil
         while(count1>=7 || count2>=7);
         if(minGallop<0)
         {
-          minGallop=0;
+          minGallop=2;
         }
-        minGallop+=2;
+        else
+        {
+          minGallop+=2;
+        }
       }
-      this.minGallop=(minGallop<1?1:minGallop);
-      switch(len1)
+      this.minGallop = minGallop < 1 ? 1 : minGallop;
+      if(len1==1)
       {
-        case 0:
-          throw new IllegalArgumentException("Comparison method violates its general contract!");
-        case 1:
-          //assert len2>0;
+        //assert len2>0;
         ArrCopy.uncheckedCopy(arr,cursor2,arr,dest,len2);
         arr[dest+len2]=tmp[cursor1];
-        break;
-      default:
-        assert len2==0;
-        assert len1>1;
+      }
+      else
+      {
+        //assert len2==0;
+        //assert len1>1;
         ArrCopy.uncheckedCopy(tmp,cursor1,arr,dest,len1);
       }
     }
     @SuppressWarnings("unchecked")
-    private void mergeHi(Object[] arr,int base1,int len1,int base2,int len2
-    )
+    private void mergeHi(Object[] arr,int base1,int len1,int base2,int len2)
     {
+      //assert len1>0;
+      //assert len2>0;
+      //assert base1+len1==base2;
+      //TODO
       Object[] tmp;
-      int cursor1,dest;
-      int tmpBase;
+      int tmpOffset;
       ArrCopy.uncheckedCopy(arr,base2,tmp=
       super.
-      ensureCapacity(len2),tmpBase=this.tmpBase,len2);
-      dest=base2+len2-1;
-      cursor1=base1+len1-1;
+      ensureCapacity(len2),tmpOffset=this.tmpOffset,len2);
+      int cursor1=base1+len1-1;
+      int cursor2=tmpOffset+len2-1;
+      int dest=base2+len2-1;
       arr[dest--]=arr[cursor1--];
+      //TODO make these pre-decrement for performance
       if(--len1==0)
       {
-        ArrCopy.uncheckedCopy(tmp,tmpBase,arr,dest-(len2-1),len2);
+        ArrCopy.uncheckedCopy(tmp,tmpOffset,arr,dest-(len2-1),len2);
         return;
       }
       if(len2==1)
       {
-        dest-=len1;
-        cursor1-=len1;
-        ArrCopy.uncheckedCopy(arr,(cursor1-=len1)+1,arr,(dest-=len1)+1,len1);
-        arr[dest]=tmp[tmpBase];
+        ArrCopy.uncheckedCopy(arr,cursor1-len1+1,arr,(dest-=len1)+1,len1);
+        arr[dest]=tmp[cursor2];
         return;
       }
-      int cursor2=tmpBase+len2-1;
       int minGallop=this.minGallop;
-      outer:for(;;)
+      outer:
+      for(;;)
       {
         int count1=0;
         int count2=0;
         do
         {
-          //assert len2>1 && len1>0;
+          //assert len2>1;
+          //assert len1=0;
           if(
           ((Comparable<E>)(tmp[cursor2])).compareTo((E)(arr[cursor1]))>0
           )
@@ -13442,20 +13749,22 @@ public final class SortUtil
             arr[dest--]=tmp[cursor2--];
             ++count2;
             count1=0;
-            if(--len2==0)
+            if(--len2==1)
             {
-              break;
+              break outer;
             }
           }
         }
         while((count1|count2)<minGallop);
         do
         {
-          //assert len2>1 && len1>0;
-          if((count1=len1-SortUtil.gallopRightreverseSort((Comparable<E>)tmp[cursor2],arr,base1,len1,len1-1
-          ))!=0)
+          //assert len2>1;
+          //assert len1>0;
+          if((
+          count1=len1-gallopRight((Comparable<E>)tmp[cursor2],arr,base1,len1,len1-1
+            ))!=0)
           {
-            ArrCopy.uncheckedCopy(arr,(cursor1-=count1),arr,(dest-=count1)+1,count1);
+            ArrCopy.uncheckedCopy(arr,(cursor1-=count1)+1,arr,(dest-=count1)+1,count1);
             if((len1-=count1)==0)
             {
               break outer;
@@ -13466,17 +13775,17 @@ public final class SortUtil
           {
             break outer;
           }
-          if((count2=len2-SortUtil.gallopLeftreverseSort((Comparable<E>)arr[cursor1],tmp,tmpBase,len2,len2-1
+          if((count2=len2-gallopLeft((Comparable<E>)arr[cursor1],tmp,tmpOffset,len2,len2-1
           ))!=0)
           {
             ArrCopy.uncheckedCopy(tmp,(cursor2-=count2)+1,arr,(dest-=count2)+1,count2);
-            if((len2-=count2)<=1)
+            if((len2-=count2)<2)
             {
               break outer;
             }
           }
-          arr[dest--]=tmp[cursor2--];
-          if(len1==0)
+          arr[dest--]=arr[cursor1--];
+          if(--len1==0)
           {
             break outer;
           }
@@ -13485,27 +13794,472 @@ public final class SortUtil
         while(count1>=7 || count2>=7);
         if(minGallop<0)
         {
-          minGallop=0;
+          minGallop=2;
         }
-        minGallop+=2;
+        else
+        {
+          minGallop+=2;
+        }
       }
-      this.minGallop=(minGallop<1?1:minGallop);
-      switch(len2)
+      this.minGallop = minGallop < 1 ? 1 : minGallop;
+      if(len2==1)
       {
-        case 0:
-          throw new IllegalArgumentException("Comparison method violates its general contract!");
-        case 1:
-          //assert len1>0;
+        //assert len1>0;
         ArrCopy.uncheckedCopy(arr,(cursor1-=len1)+1,arr,(dest-=len1)+1,len1);
         arr[dest]=tmp[cursor2];
-        break;
-      default:
+      }
+      else
+      {
         //assert len1==0;
         //assert len2>0;
-        ArrCopy.uncheckedCopy(tmp,tmpBase,arr,dest-(len2-1),len2);
+        ArrCopy.uncheckedCopy(tmp,tmpOffset,arr,dest+(len2-1),len2);
+      }
+    }
+    private static <E> int gallopRight(Comparable<E> key,Object[] arr,int base,int len,int hint
+    )
+    {
+      //TODO
+      return 0;
+    }
+    private static <E> int gallopLeft(Comparable<E> key,Object[] arr,int base,int len,int hint
+    )
+    {
+      //TODO
+      return 0;
+    }
+  }
+/* 
+MACRODEF TimSort<METHODNAME,ARRTYPE,COMPARATORTYPE,EXPOSEDTYPE>(TYPEPARAMETER)
+private static class METHODNAMEARRTYPETimSortTYPEPARAMETER
+IFSWITCH ARRTYPE==Object
+  extends AbstractARRTYPETimSortTYPEPARAMETER
+ELSE
+  extends AbstractTimSort
+ENDIF
+{
+IFNOTSWITCH ARRTYPE==Object
+  final ARRTYPE[] arr;
+  ARRTYPE[] tmp;
+  @Override
+  void initTmpArr(int tmpLen)
+  {
+    this.tmp=new ARRTYPE[tmpLen];
+  }
+  MACRO EnsureCapacity(ARRTYPE)
+ENDIF
+IFSWITCH METHODNAME==comparatorSort
+  final COMPARATORTYPE sorter;
+  METHODNAMEARRTYPETimSort(ARRTYPE[] arr,COMPARATORTYPE sorter,int nRemaining)
+  {
+  IFSWITCH ARRTYPE==Object
+    super(arr,nRemaining);
+  ELSE
+    super(nRemaining);
+    this.arr=arr;
+  ENDIF
+    this.sorter=sorter;
+  }
+ELSE
+  METHODNAMEARRTYPETimSort(ARRTYPE[] arr,int nRemaining)
+  {
+    super(arr,nRemaining);
+  }
+ENDIF
+  MACRO SuppressUnchecked()
+  @Override
+  int mergeAt(int i,int stackSize,int[] runLen)
+  {
+    //assert stackSize>=2;
+    //assert i>=0;
+    //assert i==stackSize-2 || i==stackSize-3;
+    int base1,len1,base2,len2;
+    int[] runBase=this.runBase;
+    //assert runLen[i]>0 && runLen[i+1]>0;
+    //assert runBase[i]+runLen[i]==runBase[i+1];
+    runLen[i]=(len1=runLen[i])+(len2=runLen[i+1]);
+    if(i==stackSize-3)
+    {
+      runBase[i+1]=runBase[i+2];
+      runLen[i+1]=runLen[i+2];
+    }
+    --stackSize;
+    ARRTYPE[] arr;
+    int k;
+    base1=(base1=runBase[i])+(k=SortUtil.gallopRightMETHODNAME((EXPOSEDTYPE)(arr=this.arr)[base2=runBase[i+1]],arr,base1,len1,0
+IFSWITCH METHODNAME==comparatorSort
+      ,sorter
+ENDIF
+    ));
+    if((len1-=k)!=0)
+    {
+       //assert k>=0;
+       if((len2=SortUtil.gallopLeftMETHODNAME((EXPOSEDTYPE)arr[base1+len1-1],arr,base2,len2,len2-1
+IFSWITCH METHODNAME==comparatorSort
+         ,sorter
+ENDIF
+       ))!=0)
+       {
+         //assert len2>0;
+         if(len1>len2)
+         {
+           mergeHi(arr,base1,len1,base2,len2
+IFSWITCH METHODNAME==comparatorSort
+             ,sorter
+ENDIF
+           );
+         }
+         else
+         {
+           mergeLo(arr,base1,len1,base2,len2
+IFSWITCH METHODNAME==comparatorSort
+             ,sorter
+ENDIF
+           );
+         }
+       }
+    }
+    return stackSize;
+  }
+  MACRO MergeMethod<Lo>()
+  MACRO MergeMethod<Hi>()
+}
+ENDDEF
+  MACRO noncomparatorSortMethod<sort,Object,Comparator<? super E>,E,Object,NULL>(<E>)
+  MACRO noncomparatorSortMethod<reverseSort,Object,Comparator<? super E>,E,Object,NULL>(<E>)
+  MACRO comparatorSortMethod<comparatorSort,boolean,BooleanComparator,boolean,Boolean,NULL>( )
+  MACRO comparatorSortMethod<comparatorSort,byte,ByteComparator,byte,Byte,NULL>( )
+  MACRO comparatorSortMethod<comparatorSort,char,CharComparator,char,Character,NULL>( )
+  MACRO comparatorSortMethod<comparatorSort,short,ShortComparator,short,Short,NULL>( )
+  MACRO comparatorSortMethod<comparatorSort,int,IntBinaryOperator,int,Integer,NULL>( )
+  MACRO comparatorSortMethod<comparatorSort,long,LongComparator,long,Long,NULL>( )
+  MACRO comparatorSortMethod<comparatorSort,float,FloatComparator,float,Float,Float.floatToRawIntBits>( )
+  MACRO comparatorSortMethod<comparatorSort,double,DoubleComparator,double,Double,Double.doubleToRawLongBits>( )
+  MACRO comparatorSortMethod<comparatorSort,Object,Comparator<? super E>,E,Object,NULL>(<E>)
+MACRODEF comparatorSortMethod<METHODNAME,ARRTYPE,COMPARATORTYPE,EXPOSEDTYPE,BOXEDTYPE,CONVERTTOBITS>(TYPEPARAMETER)
+public static TYPEPARAMETER void uncheckedMETHODNAME(ARRTYPE[] arr,int begin,int end,COMPARATORTYPE sorter)
+{
+  //assert sorter!=null;
+  //assert arr!=null;
+  //assert begin>=0;
+  //assert end<arr.length;
+  //assert end-begin>0;
+IFSWITCH ARRTYPE==boolean
+  var firstVal=arr[begin];
+  int newBegin;
+  for(newBegin=begin+1;arr[newBegin]==firstVal;++newBegin)
+  {
+    if(newBegin==end)
+    {
+      //already sorted
+      return;
+    }
+  }
+  switch(Integer.signum(sorter.compare(firstVal,!firstVal)))
+  {
+    case -1:
+      for(int newEnd=end;newEnd!=newBegin;--newEnd)
+      {
+        if(arr[newEnd]==firstVal)
+        {
+          uncheckedSortHelper(arr,newBegin,newEnd,firstVal);
+          return;
+        }
+      }
+      //already sorted
+    case 0:
+      //unsorted comparator
+      return;
+    default:
+      int endValCounter=newBegin-begin;
+      while(newBegin!=end)
+      {
+        if(arr[++newBegin]==firstVal)
+        {
+          ++endValCounter;
+        }
+      }
+      for(;;--end)
+      {
+        arr[end]=firstVal;
+        if(--endValCounter==0)
+        {
+          do
+          {
+            arr[--end]=!firstVal;
+          }
+          while(end!=begin);
+          return;
+        }
+      }
+  }
+ELSE
+  //FIXME this sorting implementation is currently broken
+  int nRemaining;
+  if((nRemaining=++end-begin)<32)
+  {
+     binaryMETHODNAME(arr,begin,end,begin+countRunAndMakeAscendingMETHODNAME(arr,begin,end,sorter),sorter);
+     return;
+  }
+  final AbstractTimSort ts=new METHODNAMEARRTYPETimSortTYPEPARAMETER(arr,sorter,nRemaining);
+  int minRun=minRunLength(nRemaining);
+  int runLen;
+  do
+  {
+    if((runLen=countRunAndMakeAscendingMETHODNAME(arr,begin,end,sorter))<minRun)
+    {
+      int force;
+      binaryMETHODNAME(arr,begin,begin+(force=nRemaining<=minRun?nRemaining:minRun),begin+runLen,sorter);
+      runLen=force;
+    }
+    ts.mergeCollapse(begin,runLen);
+    begin+=runLen;
+  }
+  while((nRemaining-=runLen)!=0);
+  //assert begin==end+1;
+  ts.mergeForceCollapse();
+ENDIF
+}
+ENDDEF
+  //FIXME fix the TimSort methods
+  private static int minRunLength(int n)
+  {
+    //assert n>=0;
+    int r=0;
+    while(n>31)
+    {
+      r|=(n&1);
+      n>>=1;
+    }
+    return n+r;
+  }
+  MACRO TimSort<comparatorSort,byte,ByteComparator,byte>( )
+  MACRO TimSort<comparatorSort,char,CharComparator,char>( )
+  MACRO TimSort<comparatorSort,short,ShortComparator,short>( )
+  MACRO TimSort<comparatorSort,int,IntBinaryOperator,int>( )
+  MACRO TimSort<comparatorSort,long,LongComparator,long>( )
+  MACRO TimSort<comparatorSort,float,FloatComparator,float>( )
+  MACRO TimSort<comparatorSort,double,DoubleComparator,double>( )
+  MACRO TimSort<comparatorSort,Object,Comparator<? super E>,E>(<E>)
+  MACRO TimSort<sort,Object,Comparator<? super E>,Comparable<E>>(<E>)
+  MACRO TimSort<reverseSort,Object,Comparator<? super E>,Comparable<E>>(<E>)
+MACRODEF EnsureCapacity(ARRTYPE)
+private ARRTYPE[] ensureCapacity(int minCapacity)
+{
+  ARRTYPE[] tmp;
+  if(tmpLen<minCapacity)
+  {
+    int newSize;
+    if((newSize=(-1>>>Integer.numberOfLeadingZeros(minCapacity))+1)<0 || newSize>(minCapacity=arr.length>>>1))
+    {
+      newSize=minCapacity;
+    }
+    this.tmp=tmp=new ARRTYPE[newSize];
+    this.tmpLen=newSize;
+    tmpBase=0;
+  }
+  else
+  {
+    tmp=this.tmp;
+  }
+  return tmp;
+}
+ENDDEF
+MACRODEF MergeMethod<Side>()
+MACRO SuppressUnchecked()
+private void mergeSide(ARRTYPE[] arr,int base1,int len1,int base2,int len2
+IFSWITCH METHODNAME==comparatorSort
+,COMPARATORTYPE sorter
+ENDIF
+)
+{
+  ARRTYPE[] tmp;
+  int cursor1,dest;
+IFSWITCH Side==Lo
+  int cursor2=base2;
+  ArrCopy.uncheckedCopy(arr,dest=base1,tmp=
+IFSWITCH ARRTYPE==Object
+  super.
+ENDIF
+  ensureCapacity(len1),cursor1=this.tmpBase,len1);
+  arr[dest++]=arr[cursor2++];
+  if(--len2==0)
+  {
+    ArrCopy.uncheckedCopy(tmp,cursor1,arr,dest,len1);
+    return;
+  }
+  if(len1==1)
+  {
+    ArrCopy.uncheckedCopy(arr,cursor2,arr,dest,len2);
+    arr[dest+len2]=tmp[cursor1];
+    return;
+  }
+  MACRO MergeImpl(len1,len2,++,cursor1,cursor2,count1,count2,arr,tmp)
+    ArrCopy.uncheckedCopy(arr,cursor2,arr,dest,len2);
+    arr[dest+len2]=tmp[cursor1];
+    break;
+  default:
+    assert len2==0;
+    assert len1>1;
+    ArrCopy.uncheckedCopy(tmp,cursor1,arr,dest,len1);
+ELSE
+  int tmpBase;
+  ArrCopy.uncheckedCopy(arr,base2,tmp=
+IFSWITCH ARRTYPE==Object
+  super.
+ENDIF
+  ensureCapacity(len2),tmpBase=this.tmpBase,len2);
+  dest=base2+len2-1;
+  cursor1=base1+len1-1;
+  arr[dest--]=arr[cursor1--];
+  if(--len1==0)
+  {
+    ArrCopy.uncheckedCopy(tmp,tmpBase,arr,dest-(len2-1),len2);
+    return;
+  }
+  if(len2==1)
+  {
+    dest-=len1;
+    cursor1-=len1;
+    ArrCopy.uncheckedCopy(arr,(cursor1-=len1)+1,arr,(dest-=len1)+1,len1);
+    arr[dest]=tmp[tmpBase];
+    return;
+  }
+  int cursor2=tmpBase+len2-1;
+  MACRO MergeImpl(len2,len1,--,cursor2,cursor1,count2,count1,tmp,arr)
+    ArrCopy.uncheckedCopy(arr,(cursor1-=len1)+1,arr,(dest-=len1)+1,len1);
+    arr[dest]=tmp[cursor2];
+    break;
+  default:
+    //assert len1==0;
+    //assert len2>0;
+    ArrCopy.uncheckedCopy(tmp,tmpBase,arr,dest-(len2-1),len2);
+ENDIF
+  }
+}
+ENDDEF
+MACRODEF MergeImpl(LEN1,LEN2,INCREMENT,CURSOR1,CURSOR2,COUNT1,COUNT2,ARR2,TMP)
+int minGallop=this.minGallop;
+outer:for(;;)
+{
+  int count1=0;
+  int count2=0;
+  do
+  {
+    //assert LEN1>1 && LEN2>0;
+    MACRO IfClause(LessThan,ARR2[cursor2],TMP[cursor1])
+    {
+      arr[destINCREMENT]=arr[CURSOR2INCREMENT];
+      ++COUNT2;
+      COUNT1=0;
+      if(--LEN2==0)
+      {
+        break outer;
+      }
+    }
+    else
+    {
+      arr[destINCREMENT]=tmp[CURSOR1INCREMENT];
+      ++COUNT1;
+      COUNT2=0;
+      if(--LEN1==0)
+      {
+        break;
       }
     }
   }
+  while((count1|count2)<minGallop);
+  do
+  {
+    //assert LEN1>1 && LEN2>0;
+IFSWITCH Side==Lo
+    if((count1=SortUtil.gallopRightMETHODNAME((EXPOSEDTYPE)arr[cursor2],tmp,cursor1,len1,0
+IFSWITCH METHODNAME==comparatorSort
+      ,sorter
+ENDIF
+    ))!=0)
+    {
+      ArrCopy.uncheckedCopy(tmp,cursor1,arr,dest,count1);
+      dest+=count1;
+      cursor1+=count1;
+      if((len1-=count1)<=1)
+      {
+        break outer;
+      }
+    }
+ELSE
+    if((count1=len1-SortUtil.gallopRightMETHODNAME((EXPOSEDTYPE)tmp[cursor2],arr,base1,len1,len1-1
+IFSWITCH METHODNAME==comparatorSort
+      ,sorter
+ENDIF
+    ))!=0)
+    {
+      ArrCopy.uncheckedCopy(arr,(cursor1-=count1),arr,(dest-=count1)+1,count1);
+      if((len1-=count1)==0)
+      {
+        break outer;
+      }
+    }
+ENDIF
+    arr[destINCREMENT]=ARR2[cursor2INCREMENT];
+IFSWITCH Side==Lo
+    if(--len2==0)
+ELSE
+    if(--len2==1)
+ENDIF
+    {
+      break outer;
+    }
+IFSWITCH Side==Lo
+    if((count2=SortUtil.gallopLeftMETHODNAME((EXPOSEDTYPE)tmp[cursor1],arr,cursor2,len2,0
+IFSWITCH METHODNAME==comparatorSort
+      ,sorter
+ENDIF
+    ))!=0)
+    {
+      ArrCopy.uncheckedCopy(arr,cursor2,arr,dest,count2);
+      dest+=count2;
+      cursor2+=count2;
+      if((len2-=count2)==0)
+ELSE
+    if((count2=len2-SortUtil.gallopLeftMETHODNAME((EXPOSEDTYPE)arr[cursor1],tmp,tmpBase,len2,len2-1
+IFSWITCH METHODNAME==comparatorSort
+      ,sorter
+ENDIF
+    ))!=0)
+    {
+      ArrCopy.uncheckedCopy(tmp,(cursor2-=count2)+1,arr,(dest-=count2)+1,count2);
+      if((len2-=count2)<=1)
+ENDIF
+      {
+        break outer;
+      }
+    }
+    arr[destINCREMENT]=tmp[CURSOR1INCREMENT];
+IFSWITCH Side==Lo
+    if(len1==1)
+ELSE
+    if(len1==0)
+ENDIF
+    {
+      break outer;
+    }
+    --minGallop;
+  }
+  while(count1>=7 || count2>=7);
+  if(minGallop<0)
+  {
+    minGallop=0;
+  }
+  minGallop+=2;
+}
+this.minGallop=(minGallop<1?1:minGallop);
+switch(LEN1)
+{
+  case 0:
+    throw new IllegalArgumentException("Comparison method violates its general contract!");
+  case 1:
+    //assert LEN2>0;
+ENDDEF
   private static abstract class AbstractObjectTimSort<E> extends AbstractTimSort
   {
     final Object[] arr;
@@ -13515,26 +14269,7 @@ public final class SortUtil
     {
       this.tmp=new Object[tmpLen];
     }
-    private Object[] ensureCapacity(int minCapacity)
-    {
-      Object[] tmp;
-      if(tmpLen<minCapacity)
-      {
-        int newSize;
-        if((newSize=(-1>>>Integer.numberOfLeadingZeros(minCapacity))+1)<0 || newSize>(minCapacity=arr.length>>>1))
-        {
-          newSize=minCapacity;
-        }
-        this.tmp=tmp=new Object[newSize];
-        this.tmpLen=newSize;
-        tmpBase=0;
-      }
-      else
-      {
-        tmp=this.tmp;
-      }
-      return tmp;
-    }
+    MACRO EnsureCapacity(Object)
     AbstractObjectTimSort(Object[] arr,int nRemaining)
     {
       super(nRemaining);
@@ -13608,2260 +14343,253 @@ public final class SortUtil
       }
     }
   }
-  private static void reverseRange(byte[] arr,int begin,int end)
+  MACRO ReverseRange<byte>()
+  MACRO ReverseRange<char>()
+  MACRO ReverseRange<short>()
+  MACRO ReverseRange<int>()
+  MACRO ReverseRange<long>()
+  MACRO ReverseRange<float>()
+  MACRO ReverseRange<double>()
+  MACRO ReverseRange<Object>()
+MACRODEF ReverseRange<ARRTYPE>()
+private static void reverseRange(ARRTYPE[] arr,int begin,int end)
+{
+  //assert arr!=null;
+  //assert begin<end;
+  //assert begin>=0;
+  //assert end<arr.length;
+  do
   {
-    //assert arr!=null;
-    //assert begin<end;
-    //assert begin>=0;
-    //assert end<arr.length;
+    var tmp=arr[begin];
+    arr[begin]=arr[end];
+    arr[end]=tmp;
+  }
+  while(++begin<--end);
+}
+ENDDEF
+  MACRO BinarySort<comparatorSort,byte,ByteComparator,byte>( )
+  MACRO BinarySort<comparatorSort,char,CharComparator,char>( )
+  MACRO BinarySort<comparatorSort,short,ShortComparator,short>( )
+  MACRO BinarySort<comparatorSort,int,IntBinaryOperator,int>( )
+  MACRO BinarySort<comparatorSort,long,LongComparator,long>( )
+  MACRO BinarySort<comparatorSort,float,FloatComparator,float>( )
+  MACRO BinarySort<comparatorSort,double,DoubleComparator,double>( )
+  MACRO BinarySort<comparatorSort,Object,Comparator<? super E>,E>(<E>)
+  MACRO BinarySort<sort,Object,Comparator<? super E>,Comparable<E>>(<E>)
+  MACRO BinarySort<reverseSort,Object,Comparator<? super E>,Comparable<E>>(<E>)
+MACRODEF BinarySort<METHODNAME,ARRTYPE,COMPARATORTYPE,EXPOSEDTYPE>(TYPEPARAMETER)
+MACRO SuppressUnchecked()
+private static TYPEPARAMETER void binaryMETHODNAME(ARRTYPE[] arr,int lo,int hi,int begin
+IFSWITCH METHODNAME==comparatorSort
+,COMPARATORTYPE sorter
+ENDIF
+)
+{
+  //assert lo < begin;
+  for(;begin<hi;++begin)
+  {
+    final var pivot=(EXPOSEDTYPE)arr[begin];
+    int left=lo;
+    for(int right=begin;left<right;)
+    {
+      final int mid;
+      MACRO IfClause(LessThan,pivot,arr[mid=(left+right)>>>1])
+      {
+        right=mid;
+      }
+      else
+      {
+        left=mid+1;
+      }
+    }
+    ArrCopy.uncheckedCopy(arr,left,arr,left+1,begin-left);
+    arr[left]=pivot;
+  }
+}
+ENDDEF
+  MACRO CountRunAndMakeAscending<comparatorSort,byte,ByteComparator,byte>( )
+  MACRO CountRunAndMakeAscending<comparatorSort,char,CharComparator,char>( )
+  MACRO CountRunAndMakeAscending<comparatorSort,short,ShortComparator,short>( )
+  MACRO CountRunAndMakeAscending<comparatorSort,int,IntBinaryOperator,int>( )
+  MACRO CountRunAndMakeAscending<comparatorSort,long,LongComparator,long>( )
+  MACRO CountRunAndMakeAscending<comparatorSort,float,FloatComparator,float>( )
+  MACRO CountRunAndMakeAscending<comparatorSort,double,DoubleComparator,double>( )
+  MACRO CountRunAndMakeAscending<comparatorSort,Object,Comparator<? super E>,E>(<E>)
+  MACRO CountRunAndMakeAscending<sort,Object,Comparator<? super E>,Comparable<E>>(<E>)
+  MACRO CountRunAndMakeAscending<reverseSort,Object,Comparator<? super E>,Comparable<E>>(<E>)
+MACRODEF CountRunAndMakeAscending<METHODNAME,ARRTYPE,COMPARATORTYPE,EXPOSEDTYPE>(TYPEPARAMETER)
+MACRO SuppressUnchecked()
+private static TYPEPARAMETER int countRunAndMakeAscendingMETHODNAME(ARRTYPE[] arr,int begin,int end
+IFSWITCH METHODNAME==comparatorSort
+,COMPARATORTYPE sorter
+ENDIF
+)
+{
+  //assert arr!=null;
+  //assert begin<end;
+  //assert begin>=0;
+  //assert end<=arr.length;
+  //assert sorter!=null;
+  int runHi;
+  if((runHi=begin+1)==end)
+  {
+    return 1;
+  }
+  MACRO IfClause(LessThan,arr[runHi++],arr[begin])
+  {
+    while(runHi<end &&
+    MACRO METHODNAMELessThan(arr[runHi],arr[runHi-1])
+    )
+    {
+      ++runHi;
+    }
+    reverseRange(arr,begin,runHi-1);
+  }
+  else
+  {
+    while(runHi<end &&
+    MACRO METHODNAMEGreaterThanOrEqual(arr[runHi],arr[runHi-1])
+    )
+    {
+      ++runHi;
+    }
+  }
+  return runHi-begin;
+}
+ENDDEF
+  MACRO Gallop<Left,comparatorSort,byte,byte,ByteComparator>( )
+  MACRO Gallop<Left,comparatorSort,char,char,CharComparator>( )
+  MACRO Gallop<Left,comparatorSort,short,short,ShortComparator>( )
+  MACRO Gallop<Left,comparatorSort,int,int,IntBinaryOperator>( )
+  MACRO Gallop<Left,comparatorSort,long,long,LongComparator>( )
+  MACRO Gallop<Left,comparatorSort,float,float,FloatComparator>( )
+  MACRO Gallop<Left,comparatorSort,double,double,DoubleComparator>( )
+  MACRO Gallop<Left,comparatorSort,Object,E,Comparator<? super E>>(<E>)
+  MACRO Gallop<Right,comparatorSort,byte,byte,ByteComparator>( )
+  MACRO Gallop<Right,comparatorSort,char,char,CharComparator>( )
+  MACRO Gallop<Right,comparatorSort,short,short,ShortComparator>( )
+  MACRO Gallop<Right,comparatorSort,int,int,IntBinaryOperator>( )
+  MACRO Gallop<Right,comparatorSort,long,long,LongComparator>( )
+  MACRO Gallop<Right,comparatorSort,float,float,FloatComparator>( )
+  MACRO Gallop<Right,comparatorSort,double,double,DoubleComparator>( )
+  MACRO Gallop<Right,comparatorSort,Object,E,Comparator<? super E>>(<E>)
+  MACRO Gallop<Left,sort,Object,Comparable<E>,Comparator<? super E>>(<E>)
+  MACRO Gallop<Right,sort,Object,Comparable<E>,Comparator<? super E>>(<E>)
+  MACRO Gallop<Left,reverseSort,Object,Comparable<E>,Comparator<? super E>>(<E>)
+  MACRO Gallop<Right,reverseSort,Object,Comparable<E>,Comparator<? super E>>(<E>)
+MACRODEF Gallop<Direction,METHODNAME,ARRTYPE,EXPOSEDTYPE,COMPARATORTYPE>(TYPEPARAMETER)
+MACRO SuppressUnchecked()
+private static TYPEPARAMETER int gallopDirectionMETHODNAME(EXPOSEDTYPE key,ARRTYPE[] arr,int base,int len,int hint
+IFSWITCH METHODNAME==comparatorSort
+,COMPARATORTYPE sorter
+ENDIF
+)
+{
+  //assert len > 0 && hint >= 0 && hint < len;
+  int ofs=1;
+  int lastOfs=0;
+IFSWITCH Direction==Right
+  MACRO IfClause(LessThan,key,arr[base+hint])
+  {
+    int maxOfs=hint+1;
+    while(ofs < maxOfs &&
+    MACRO METHODNAMELessThan(key,arr[base+hint-ofs])
+ELSE
+  MACRO IfClause(LessThan,arr[base+hint],key)
+  {
+    int maxOfs=len-hint;
+    while(ofs < maxOfs &&
+    MACRO METHODNAMELessThan(arr[base+hint+ofs],key)
+ENDIF
+    )
+    {
+      if((ofs=((lastOfs=ofs)<<1)+1)<=0)
+      {
+        ofs=maxOfs;
+      }
+    }
+    if(ofs>maxOfs)
+    {
+      ofs=maxOfs;
+    }
+IFSWITCH Direction==Right
+    int tmp=lastOfs;
+    lastOfs=hint-ofs;
+    ofs=hint-tmp;
+  }
+  else
+  {
+    int maxOfs=len-hint;
+ELSE
+    lastOfs+=hint;
+    ofs+=hint;
+  }
+  else
+  {
+    final int maxOfs=hint+1;
+ENDIF
+    for(;;)
+    {
+      if(ofs>=maxOfs || 
+IFSWITCH Direction==Right
+      MACRO METHODNAMELessThan(key,arr[base+hint+ofs])
+ELSE
+      MACRO METHODNAMELessThan(arr[base+hint-ofs],key)
+ENDIF
+      )
+      {
+        break;
+      }
+      if((ofs=((lastOfs=ofs)<<1)+1)<=0)
+      {
+        ofs=maxOfs;
+      }
+    }
+    if(ofs>maxOfs)
+    {
+      ofs=maxOfs;
+    }
+IFSWITCH Direction==Right
+    lastOfs+=hint;
+    ofs+=hint;
+ELSE
+    int tmp=lastOfs;
+    lastOfs=hint-ofs;
+    ofs=hint-tmp;
+ENDIF
+  }
+  //assert -1 <= lastOfs && lastOfs < ofs && ofs <=len;
+  int diff;
+  if((diff=ofs-(++lastOfs))>0)
+  {
     do
     {
-      var tmp=arr[begin];
-      arr[begin]=arr[end];
-      arr[end]=tmp;
+      int m;
+IFSWITCH Direction==Right
+      MACRO IfClause(LessThan,key,arr[base+(m=lastOfs+(diff>>>1))])
+      {
+        ofs=m;
+      }
+      else
+      {
+        lastOfs=m+1;
+      }
+ELSE
+      MACRO IfClause(LessThan,arr[base+(m=lastOfs+(diff>>>1))],key)
+      {
+        lastOfs=m+1;
+      }
+      else
+      {
+        ofs=m;
+      }
+ENDIF
     }
-    while(++begin<--end);
+    while((diff=ofs-lastOfs)>0);
   }
-  private static void reverseRange(char[] arr,int begin,int end)
-  {
-    //assert arr!=null;
-    //assert begin<end;
-    //assert begin>=0;
-    //assert end<arr.length;
-    do
-    {
-      var tmp=arr[begin];
-      arr[begin]=arr[end];
-      arr[end]=tmp;
-    }
-    while(++begin<--end);
-  }
-  private static void reverseRange(short[] arr,int begin,int end)
-  {
-    //assert arr!=null;
-    //assert begin<end;
-    //assert begin>=0;
-    //assert end<arr.length;
-    do
-    {
-      var tmp=arr[begin];
-      arr[begin]=arr[end];
-      arr[end]=tmp;
-    }
-    while(++begin<--end);
-  }
-  private static void reverseRange(int[] arr,int begin,int end)
-  {
-    //assert arr!=null;
-    //assert begin<end;
-    //assert begin>=0;
-    //assert end<arr.length;
-    do
-    {
-      var tmp=arr[begin];
-      arr[begin]=arr[end];
-      arr[end]=tmp;
-    }
-    while(++begin<--end);
-  }
-  private static void reverseRange(long[] arr,int begin,int end)
-  {
-    //assert arr!=null;
-    //assert begin<end;
-    //assert begin>=0;
-    //assert end<arr.length;
-    do
-    {
-      var tmp=arr[begin];
-      arr[begin]=arr[end];
-      arr[end]=tmp;
-    }
-    while(++begin<--end);
-  }
-  private static void reverseRange(float[] arr,int begin,int end)
-  {
-    //assert arr!=null;
-    //assert begin<end;
-    //assert begin>=0;
-    //assert end<arr.length;
-    do
-    {
-      var tmp=arr[begin];
-      arr[begin]=arr[end];
-      arr[end]=tmp;
-    }
-    while(++begin<--end);
-  }
-  private static void reverseRange(double[] arr,int begin,int end)
-  {
-    //assert arr!=null;
-    //assert begin<end;
-    //assert begin>=0;
-    //assert end<arr.length;
-    do
-    {
-      var tmp=arr[begin];
-      arr[begin]=arr[end];
-      arr[end]=tmp;
-    }
-    while(++begin<--end);
-  }
-  private static void reverseRange(Object[] arr,int begin,int end)
-  {
-    //assert arr!=null;
-    //assert begin<end;
-    //assert begin>=0;
-    //assert end<arr.length;
-    do
-    {
-      var tmp=arr[begin];
-      arr[begin]=arr[end];
-      arr[end]=tmp;
-    }
-    while(++begin<--end);
-  }
-  private static   void binarycomparatorSort(byte[] arr,int lo,int hi,int begin
-  ,ByteComparator sorter
-  )
-  {
-    //assert lo < begin;
-    for(;begin<hi;++begin)
-    {
-      final var pivot=(byte)arr[begin];
-      int left=lo;
-      for(int right=begin;left<right;)
-      {
-        final int mid;
-        if(
-        sorter.compare((byte)(pivot),(byte)(arr[mid=(left+right)>>>1]))<0
-        )
-        {
-          right=mid;
-        }
-        else
-        {
-          left=mid+1;
-        }
-      }
-      ArrCopy.uncheckedCopy(arr,left,arr,left+1,begin-left);
-      arr[left]=pivot;
-    }
-  }
-  private static   void binarycomparatorSort(char[] arr,int lo,int hi,int begin
-  ,CharComparator sorter
-  )
-  {
-    //assert lo < begin;
-    for(;begin<hi;++begin)
-    {
-      final var pivot=(char)arr[begin];
-      int left=lo;
-      for(int right=begin;left<right;)
-      {
-        final int mid;
-        if(
-        sorter.compare((char)(pivot),(char)(arr[mid=(left+right)>>>1]))<0
-        )
-        {
-          right=mid;
-        }
-        else
-        {
-          left=mid+1;
-        }
-      }
-      ArrCopy.uncheckedCopy(arr,left,arr,left+1,begin-left);
-      arr[left]=pivot;
-    }
-  }
-  private static   void binarycomparatorSort(short[] arr,int lo,int hi,int begin
-  ,ShortComparator sorter
-  )
-  {
-    //assert lo < begin;
-    for(;begin<hi;++begin)
-    {
-      final var pivot=(short)arr[begin];
-      int left=lo;
-      for(int right=begin;left<right;)
-      {
-        final int mid;
-        if(
-        sorter.compare((short)(pivot),(short)(arr[mid=(left+right)>>>1]))<0
-        )
-        {
-          right=mid;
-        }
-        else
-        {
-          left=mid+1;
-        }
-      }
-      ArrCopy.uncheckedCopy(arr,left,arr,left+1,begin-left);
-      arr[left]=pivot;
-    }
-  }
-  private static   void binarycomparatorSort(int[] arr,int lo,int hi,int begin
-  ,IntBinaryOperator sorter
-  )
-  {
-    //assert lo < begin;
-    for(;begin<hi;++begin)
-    {
-      final var pivot=(int)arr[begin];
-      int left=lo;
-      for(int right=begin;left<right;)
-      {
-        final int mid;
-        if(
-        sorter.applyAsInt((int)(pivot),(int)(arr[mid=(left+right)>>>1]))<0
-        )
-        {
-          right=mid;
-        }
-        else
-        {
-          left=mid+1;
-        }
-      }
-      ArrCopy.uncheckedCopy(arr,left,arr,left+1,begin-left);
-      arr[left]=pivot;
-    }
-  }
-  private static   void binarycomparatorSort(long[] arr,int lo,int hi,int begin
-  ,LongComparator sorter
-  )
-  {
-    //assert lo < begin;
-    for(;begin<hi;++begin)
-    {
-      final var pivot=(long)arr[begin];
-      int left=lo;
-      for(int right=begin;left<right;)
-      {
-        final int mid;
-        if(
-        sorter.compare((long)(pivot),(long)(arr[mid=(left+right)>>>1]))<0
-        )
-        {
-          right=mid;
-        }
-        else
-        {
-          left=mid+1;
-        }
-      }
-      ArrCopy.uncheckedCopy(arr,left,arr,left+1,begin-left);
-      arr[left]=pivot;
-    }
-  }
-  private static   void binarycomparatorSort(float[] arr,int lo,int hi,int begin
-  ,FloatComparator sorter
-  )
-  {
-    //assert lo < begin;
-    for(;begin<hi;++begin)
-    {
-      final var pivot=(float)arr[begin];
-      int left=lo;
-      for(int right=begin;left<right;)
-      {
-        final int mid;
-        if(
-        sorter.compare((float)(pivot),(float)(arr[mid=(left+right)>>>1]))<0
-        )
-        {
-          right=mid;
-        }
-        else
-        {
-          left=mid+1;
-        }
-      }
-      ArrCopy.uncheckedCopy(arr,left,arr,left+1,begin-left);
-      arr[left]=pivot;
-    }
-  }
-  private static   void binarycomparatorSort(double[] arr,int lo,int hi,int begin
-  ,DoubleComparator sorter
-  )
-  {
-    //assert lo < begin;
-    for(;begin<hi;++begin)
-    {
-      final var pivot=(double)arr[begin];
-      int left=lo;
-      for(int right=begin;left<right;)
-      {
-        final int mid;
-        if(
-        sorter.compare((double)(pivot),(double)(arr[mid=(left+right)>>>1]))<0
-        )
-        {
-          right=mid;
-        }
-        else
-        {
-          left=mid+1;
-        }
-      }
-      ArrCopy.uncheckedCopy(arr,left,arr,left+1,begin-left);
-      arr[left]=pivot;
-    }
-  }
-  @SuppressWarnings("unchecked")
-  private static <E> void binarycomparatorSort(Object[] arr,int lo,int hi,int begin
-  ,Comparator<? super E> sorter
-  )
-  {
-    //assert lo < begin;
-    for(;begin<hi;++begin)
-    {
-      final var pivot=(E)arr[begin];
-      int left=lo;
-      for(int right=begin;left<right;)
-      {
-        final int mid;
-        if(
-        sorter.compare((E)(pivot),(E)(arr[mid=(left+right)>>>1]))<0
-        )
-        {
-          right=mid;
-        }
-        else
-        {
-          left=mid+1;
-        }
-      }
-      ArrCopy.uncheckedCopy(arr,left,arr,left+1,begin-left);
-      arr[left]=pivot;
-    }
-  }
-  @SuppressWarnings("unchecked")
-  private static <E> void binarysort(Object[] arr,int lo,int hi,int begin
-  )
-  {
-    //assert lo < begin;
-    for(;begin<hi;++begin)
-    {
-      final var pivot=(Comparable<E>)arr[begin];
-      int left=lo;
-      for(int right=begin;left<right;)
-      {
-        final int mid;
-        if(
-        ((Comparable<E>)(pivot)).compareTo((E)(arr[mid=(left+right)>>>1]))<0
-        )
-        {
-          right=mid;
-        }
-        else
-        {
-          left=mid+1;
-        }
-      }
-      ArrCopy.uncheckedCopy(arr,left,arr,left+1,begin-left);
-      arr[left]=pivot;
-    }
-  }
-  @SuppressWarnings("unchecked")
-  private static <E> void binaryreverseSort(Object[] arr,int lo,int hi,int begin
-  )
-  {
-    //assert lo < begin;
-    for(;begin<hi;++begin)
-    {
-      final var pivot=(Comparable<E>)arr[begin];
-      int left=lo;
-      for(int right=begin;left<right;)
-      {
-        final int mid;
-        if(
-        ((Comparable<E>)(pivot)).compareTo((E)(arr[mid=(left+right)>>>1]))>0
-        )
-        {
-          right=mid;
-        }
-        else
-        {
-          left=mid+1;
-        }
-      }
-      ArrCopy.uncheckedCopy(arr,left,arr,left+1,begin-left);
-      arr[left]=pivot;
-    }
-  }
-  private static   int countRunAndMakeAscendingcomparatorSort(byte[] arr,int begin,int end
-  ,ByteComparator sorter
-  )
-  {
-    //assert arr!=null;
-    //assert begin<end;
-    //assert begin>=0;
-    //assert end<=arr.length;
-    //assert sorter!=null;
-    int runHi;
-    if((runHi=begin+1)==end)
-    {
-      return 1;
-    }
-    if(
-    sorter.compare((byte)(arr[runHi++]),(byte)(arr[begin]))<0
-    )
-    {
-      while(runHi<end &&
-      sorter.compare((byte)(arr[runHi]),(byte)(arr[runHi-1]))<0
-      )
-      {
-        ++runHi;
-      }
-      reverseRange(arr,begin,runHi-1);
-    }
-    else
-    {
-      while(runHi<end &&
-      sorter.compare((byte)(arr[runHi]),(byte)(arr[runHi-1]))>=0
-      )
-      {
-        ++runHi;
-      }
-    }
-    return runHi-begin;
-  }
-  private static   int countRunAndMakeAscendingcomparatorSort(char[] arr,int begin,int end
-  ,CharComparator sorter
-  )
-  {
-    //assert arr!=null;
-    //assert begin<end;
-    //assert begin>=0;
-    //assert end<=arr.length;
-    //assert sorter!=null;
-    int runHi;
-    if((runHi=begin+1)==end)
-    {
-      return 1;
-    }
-    if(
-    sorter.compare((char)(arr[runHi++]),(char)(arr[begin]))<0
-    )
-    {
-      while(runHi<end &&
-      sorter.compare((char)(arr[runHi]),(char)(arr[runHi-1]))<0
-      )
-      {
-        ++runHi;
-      }
-      reverseRange(arr,begin,runHi-1);
-    }
-    else
-    {
-      while(runHi<end &&
-      sorter.compare((char)(arr[runHi]),(char)(arr[runHi-1]))>=0
-      )
-      {
-        ++runHi;
-      }
-    }
-    return runHi-begin;
-  }
-  private static   int countRunAndMakeAscendingcomparatorSort(short[] arr,int begin,int end
-  ,ShortComparator sorter
-  )
-  {
-    //assert arr!=null;
-    //assert begin<end;
-    //assert begin>=0;
-    //assert end<=arr.length;
-    //assert sorter!=null;
-    int runHi;
-    if((runHi=begin+1)==end)
-    {
-      return 1;
-    }
-    if(
-    sorter.compare((short)(arr[runHi++]),(short)(arr[begin]))<0
-    )
-    {
-      while(runHi<end &&
-      sorter.compare((short)(arr[runHi]),(short)(arr[runHi-1]))<0
-      )
-      {
-        ++runHi;
-      }
-      reverseRange(arr,begin,runHi-1);
-    }
-    else
-    {
-      while(runHi<end &&
-      sorter.compare((short)(arr[runHi]),(short)(arr[runHi-1]))>=0
-      )
-      {
-        ++runHi;
-      }
-    }
-    return runHi-begin;
-  }
-  private static   int countRunAndMakeAscendingcomparatorSort(int[] arr,int begin,int end
-  ,IntBinaryOperator sorter
-  )
-  {
-    //assert arr!=null;
-    //assert begin<end;
-    //assert begin>=0;
-    //assert end<=arr.length;
-    //assert sorter!=null;
-    int runHi;
-    if((runHi=begin+1)==end)
-    {
-      return 1;
-    }
-    if(
-    sorter.applyAsInt((int)(arr[runHi++]),(int)(arr[begin]))<0
-    )
-    {
-      while(runHi<end &&
-      sorter.applyAsInt((int)(arr[runHi]),(int)(arr[runHi-1]))<0
-      )
-      {
-        ++runHi;
-      }
-      reverseRange(arr,begin,runHi-1);
-    }
-    else
-    {
-      while(runHi<end &&
-      sorter.applyAsInt((int)(arr[runHi]),(int)(arr[runHi-1]))>=0
-      )
-      {
-        ++runHi;
-      }
-    }
-    return runHi-begin;
-  }
-  private static   int countRunAndMakeAscendingcomparatorSort(long[] arr,int begin,int end
-  ,LongComparator sorter
-  )
-  {
-    //assert arr!=null;
-    //assert begin<end;
-    //assert begin>=0;
-    //assert end<=arr.length;
-    //assert sorter!=null;
-    int runHi;
-    if((runHi=begin+1)==end)
-    {
-      return 1;
-    }
-    if(
-    sorter.compare((long)(arr[runHi++]),(long)(arr[begin]))<0
-    )
-    {
-      while(runHi<end &&
-      sorter.compare((long)(arr[runHi]),(long)(arr[runHi-1]))<0
-      )
-      {
-        ++runHi;
-      }
-      reverseRange(arr,begin,runHi-1);
-    }
-    else
-    {
-      while(runHi<end &&
-      sorter.compare((long)(arr[runHi]),(long)(arr[runHi-1]))>=0
-      )
-      {
-        ++runHi;
-      }
-    }
-    return runHi-begin;
-  }
-  private static   int countRunAndMakeAscendingcomparatorSort(float[] arr,int begin,int end
-  ,FloatComparator sorter
-  )
-  {
-    //assert arr!=null;
-    //assert begin<end;
-    //assert begin>=0;
-    //assert end<=arr.length;
-    //assert sorter!=null;
-    int runHi;
-    if((runHi=begin+1)==end)
-    {
-      return 1;
-    }
-    if(
-    sorter.compare((float)(arr[runHi++]),(float)(arr[begin]))<0
-    )
-    {
-      while(runHi<end &&
-      sorter.compare((float)(arr[runHi]),(float)(arr[runHi-1]))<0
-      )
-      {
-        ++runHi;
-      }
-      reverseRange(arr,begin,runHi-1);
-    }
-    else
-    {
-      while(runHi<end &&
-      sorter.compare((float)(arr[runHi]),(float)(arr[runHi-1]))>=0
-      )
-      {
-        ++runHi;
-      }
-    }
-    return runHi-begin;
-  }
-  private static   int countRunAndMakeAscendingcomparatorSort(double[] arr,int begin,int end
-  ,DoubleComparator sorter
-  )
-  {
-    //assert arr!=null;
-    //assert begin<end;
-    //assert begin>=0;
-    //assert end<=arr.length;
-    //assert sorter!=null;
-    int runHi;
-    if((runHi=begin+1)==end)
-    {
-      return 1;
-    }
-    if(
-    sorter.compare((double)(arr[runHi++]),(double)(arr[begin]))<0
-    )
-    {
-      while(runHi<end &&
-      sorter.compare((double)(arr[runHi]),(double)(arr[runHi-1]))<0
-      )
-      {
-        ++runHi;
-      }
-      reverseRange(arr,begin,runHi-1);
-    }
-    else
-    {
-      while(runHi<end &&
-      sorter.compare((double)(arr[runHi]),(double)(arr[runHi-1]))>=0
-      )
-      {
-        ++runHi;
-      }
-    }
-    return runHi-begin;
-  }
-  @SuppressWarnings("unchecked")
-  private static <E> int countRunAndMakeAscendingcomparatorSort(Object[] arr,int begin,int end
-  ,Comparator<? super E> sorter
-  )
-  {
-    //assert arr!=null;
-    //assert begin<end;
-    //assert begin>=0;
-    //assert end<=arr.length;
-    //assert sorter!=null;
-    int runHi;
-    if((runHi=begin+1)==end)
-    {
-      return 1;
-    }
-    if(
-    sorter.compare((E)(arr[runHi++]),(E)(arr[begin]))<0
-    )
-    {
-      while(runHi<end &&
-      sorter.compare((E)(arr[runHi]),(E)(arr[runHi-1]))<0
-      )
-      {
-        ++runHi;
-      }
-      reverseRange(arr,begin,runHi-1);
-    }
-    else
-    {
-      while(runHi<end &&
-      sorter.compare((E)(arr[runHi]),(E)(arr[runHi-1]))>=0
-      )
-      {
-        ++runHi;
-      }
-    }
-    return runHi-begin;
-  }
-  @SuppressWarnings("unchecked")
-  private static <E> int countRunAndMakeAscendingsort(Object[] arr,int begin,int end
-  )
-  {
-    //assert arr!=null;
-    //assert begin<end;
-    //assert begin>=0;
-    //assert end<=arr.length;
-    //assert sorter!=null;
-    int runHi;
-    if((runHi=begin+1)==end)
-    {
-      return 1;
-    }
-    if(
-    ((Comparable<E>)(arr[runHi++])).compareTo((E)(arr[begin]))<0
-    )
-    {
-      while(runHi<end &&
-      ((Comparable<E>)(arr[runHi])).compareTo((E)(arr[runHi-1]))<0
-      )
-      {
-        ++runHi;
-      }
-      reverseRange(arr,begin,runHi-1);
-    }
-    else
-    {
-      while(runHi<end &&
-      ((Comparable<E>)(arr[runHi])).compareTo((E)(arr[runHi-1]))>=0
-      )
-      {
-        ++runHi;
-      }
-    }
-    return runHi-begin;
-  }
-  @SuppressWarnings("unchecked")
-  private static <E> int countRunAndMakeAscendingreverseSort(Object[] arr,int begin,int end
-  )
-  {
-    //assert arr!=null;
-    //assert begin<end;
-    //assert begin>=0;
-    //assert end<=arr.length;
-    //assert sorter!=null;
-    int runHi;
-    if((runHi=begin+1)==end)
-    {
-      return 1;
-    }
-    if(
-    ((Comparable<E>)(arr[runHi++])).compareTo((E)(arr[begin]))>0
-    )
-    {
-      while(runHi<end &&
-      ((Comparable<E>)(arr[runHi])).compareTo((E)(arr[runHi-1]))>0
-      )
-      {
-        ++runHi;
-      }
-      reverseRange(arr,begin,runHi-1);
-    }
-    else
-    {
-      while(runHi<end &&
-      ((Comparable<E>)(arr[runHi])).compareTo((E)(arr[runHi-1]))<=0
-      )
-      {
-        ++runHi;
-      }
-    }
-    return runHi-begin;
-  }
-  private static   int gallopLeftcomparatorSort(byte key,byte[] arr,int base,int len,int hint
-  ,ByteComparator sorter
-  )
-  {
-    //assert len > 0 && hint >= 0 && hint < len;
-    int ofs=1;
-    int lastOfs=0;
-    if(
-    sorter.compare((byte)(arr[base+hint]),(byte)(key))<0
-    )
-    {
-      int maxOfs=len-hint;
-      while(ofs < maxOfs &&
-      sorter.compare((byte)(arr[base+hint+ofs]),(byte)(key))<0
-      )
-      {
-        if((ofs=((lastOfs=ofs)<<1)+1)<=0)
-        {
-          ofs=maxOfs;
-        }
-      }
-      if(ofs>maxOfs)
-      {
-        ofs=maxOfs;
-      }
-      lastOfs+=hint;
-      ofs+=hint;
-    }
-    else
-    {
-      final int maxOfs=hint+1;
-      for(;;)
-      {
-        if(ofs>=maxOfs || 
-        sorter.compare((byte)(arr[base+hint-ofs]),(byte)(key))<0
-        )
-        {
-          break;
-        }
-        if((ofs=((lastOfs=ofs)<<1)+1)<=0)
-        {
-          ofs=maxOfs;
-        }
-      }
-      if(ofs>maxOfs)
-      {
-        ofs=maxOfs;
-      }
-      int tmp=lastOfs;
-      lastOfs=hint-ofs;
-      ofs=hint-tmp;
-    }
-    //assert -1 <= lastOfs && lastOfs < ofs && ofs <=len;
-    int diff;
-    if((diff=ofs-(++lastOfs))>0)
-    {
-      do
-      {
-        int m;
-        if(
-        sorter.compare((byte)(arr[base+(m=lastOfs+(diff>>>1))]),(byte)(key))<0
-        )
-        {
-          lastOfs=m+1;
-        }
-        else
-        {
-          ofs=m;
-        }
-      }
-      while((diff=ofs-lastOfs)>0);
-    }
-    //assert lastOfs==ofs;
-    return ofs;
-  }
-  private static   int gallopLeftcomparatorSort(char key,char[] arr,int base,int len,int hint
-  ,CharComparator sorter
-  )
-  {
-    //assert len > 0 && hint >= 0 && hint < len;
-    int ofs=1;
-    int lastOfs=0;
-    if(
-    sorter.compare((char)(arr[base+hint]),(char)(key))<0
-    )
-    {
-      int maxOfs=len-hint;
-      while(ofs < maxOfs &&
-      sorter.compare((char)(arr[base+hint+ofs]),(char)(key))<0
-      )
-      {
-        if((ofs=((lastOfs=ofs)<<1)+1)<=0)
-        {
-          ofs=maxOfs;
-        }
-      }
-      if(ofs>maxOfs)
-      {
-        ofs=maxOfs;
-      }
-      lastOfs+=hint;
-      ofs+=hint;
-    }
-    else
-    {
-      final int maxOfs=hint+1;
-      for(;;)
-      {
-        if(ofs>=maxOfs || 
-        sorter.compare((char)(arr[base+hint-ofs]),(char)(key))<0
-        )
-        {
-          break;
-        }
-        if((ofs=((lastOfs=ofs)<<1)+1)<=0)
-        {
-          ofs=maxOfs;
-        }
-      }
-      if(ofs>maxOfs)
-      {
-        ofs=maxOfs;
-      }
-      int tmp=lastOfs;
-      lastOfs=hint-ofs;
-      ofs=hint-tmp;
-    }
-    //assert -1 <= lastOfs && lastOfs < ofs && ofs <=len;
-    int diff;
-    if((diff=ofs-(++lastOfs))>0)
-    {
-      do
-      {
-        int m;
-        if(
-        sorter.compare((char)(arr[base+(m=lastOfs+(diff>>>1))]),(char)(key))<0
-        )
-        {
-          lastOfs=m+1;
-        }
-        else
-        {
-          ofs=m;
-        }
-      }
-      while((diff=ofs-lastOfs)>0);
-    }
-    //assert lastOfs==ofs;
-    return ofs;
-  }
-  private static   int gallopLeftcomparatorSort(short key,short[] arr,int base,int len,int hint
-  ,ShortComparator sorter
-  )
-  {
-    //assert len > 0 && hint >= 0 && hint < len;
-    int ofs=1;
-    int lastOfs=0;
-    if(
-    sorter.compare((short)(arr[base+hint]),(short)(key))<0
-    )
-    {
-      int maxOfs=len-hint;
-      while(ofs < maxOfs &&
-      sorter.compare((short)(arr[base+hint+ofs]),(short)(key))<0
-      )
-      {
-        if((ofs=((lastOfs=ofs)<<1)+1)<=0)
-        {
-          ofs=maxOfs;
-        }
-      }
-      if(ofs>maxOfs)
-      {
-        ofs=maxOfs;
-      }
-      lastOfs+=hint;
-      ofs+=hint;
-    }
-    else
-    {
-      final int maxOfs=hint+1;
-      for(;;)
-      {
-        if(ofs>=maxOfs || 
-        sorter.compare((short)(arr[base+hint-ofs]),(short)(key))<0
-        )
-        {
-          break;
-        }
-        if((ofs=((lastOfs=ofs)<<1)+1)<=0)
-        {
-          ofs=maxOfs;
-        }
-      }
-      if(ofs>maxOfs)
-      {
-        ofs=maxOfs;
-      }
-      int tmp=lastOfs;
-      lastOfs=hint-ofs;
-      ofs=hint-tmp;
-    }
-    //assert -1 <= lastOfs && lastOfs < ofs && ofs <=len;
-    int diff;
-    if((diff=ofs-(++lastOfs))>0)
-    {
-      do
-      {
-        int m;
-        if(
-        sorter.compare((short)(arr[base+(m=lastOfs+(diff>>>1))]),(short)(key))<0
-        )
-        {
-          lastOfs=m+1;
-        }
-        else
-        {
-          ofs=m;
-        }
-      }
-      while((diff=ofs-lastOfs)>0);
-    }
-    //assert lastOfs==ofs;
-    return ofs;
-  }
-  private static   int gallopLeftcomparatorSort(int key,int[] arr,int base,int len,int hint
-  ,IntBinaryOperator sorter
-  )
-  {
-    //assert len > 0 && hint >= 0 && hint < len;
-    int ofs=1;
-    int lastOfs=0;
-    if(
-    sorter.applyAsInt((int)(arr[base+hint]),(int)(key))<0
-    )
-    {
-      int maxOfs=len-hint;
-      while(ofs < maxOfs &&
-      sorter.applyAsInt((int)(arr[base+hint+ofs]),(int)(key))<0
-      )
-      {
-        if((ofs=((lastOfs=ofs)<<1)+1)<=0)
-        {
-          ofs=maxOfs;
-        }
-      }
-      if(ofs>maxOfs)
-      {
-        ofs=maxOfs;
-      }
-      lastOfs+=hint;
-      ofs+=hint;
-    }
-    else
-    {
-      final int maxOfs=hint+1;
-      for(;;)
-      {
-        if(ofs>=maxOfs || 
-        sorter.applyAsInt((int)(arr[base+hint-ofs]),(int)(key))<0
-        )
-        {
-          break;
-        }
-        if((ofs=((lastOfs=ofs)<<1)+1)<=0)
-        {
-          ofs=maxOfs;
-        }
-      }
-      if(ofs>maxOfs)
-      {
-        ofs=maxOfs;
-      }
-      int tmp=lastOfs;
-      lastOfs=hint-ofs;
-      ofs=hint-tmp;
-    }
-    //assert -1 <= lastOfs && lastOfs < ofs && ofs <=len;
-    int diff;
-    if((diff=ofs-(++lastOfs))>0)
-    {
-      do
-      {
-        int m;
-        if(
-        sorter.applyAsInt((int)(arr[base+(m=lastOfs+(diff>>>1))]),(int)(key))<0
-        )
-        {
-          lastOfs=m+1;
-        }
-        else
-        {
-          ofs=m;
-        }
-      }
-      while((diff=ofs-lastOfs)>0);
-    }
-    //assert lastOfs==ofs;
-    return ofs;
-  }
-  private static   int gallopLeftcomparatorSort(long key,long[] arr,int base,int len,int hint
-  ,LongComparator sorter
-  )
-  {
-    //assert len > 0 && hint >= 0 && hint < len;
-    int ofs=1;
-    int lastOfs=0;
-    if(
-    sorter.compare((long)(arr[base+hint]),(long)(key))<0
-    )
-    {
-      int maxOfs=len-hint;
-      while(ofs < maxOfs &&
-      sorter.compare((long)(arr[base+hint+ofs]),(long)(key))<0
-      )
-      {
-        if((ofs=((lastOfs=ofs)<<1)+1)<=0)
-        {
-          ofs=maxOfs;
-        }
-      }
-      if(ofs>maxOfs)
-      {
-        ofs=maxOfs;
-      }
-      lastOfs+=hint;
-      ofs+=hint;
-    }
-    else
-    {
-      final int maxOfs=hint+1;
-      for(;;)
-      {
-        if(ofs>=maxOfs || 
-        sorter.compare((long)(arr[base+hint-ofs]),(long)(key))<0
-        )
-        {
-          break;
-        }
-        if((ofs=((lastOfs=ofs)<<1)+1)<=0)
-        {
-          ofs=maxOfs;
-        }
-      }
-      if(ofs>maxOfs)
-      {
-        ofs=maxOfs;
-      }
-      int tmp=lastOfs;
-      lastOfs=hint-ofs;
-      ofs=hint-tmp;
-    }
-    //assert -1 <= lastOfs && lastOfs < ofs && ofs <=len;
-    int diff;
-    if((diff=ofs-(++lastOfs))>0)
-    {
-      do
-      {
-        int m;
-        if(
-        sorter.compare((long)(arr[base+(m=lastOfs+(diff>>>1))]),(long)(key))<0
-        )
-        {
-          lastOfs=m+1;
-        }
-        else
-        {
-          ofs=m;
-        }
-      }
-      while((diff=ofs-lastOfs)>0);
-    }
-    //assert lastOfs==ofs;
-    return ofs;
-  }
-  private static   int gallopLeftcomparatorSort(float key,float[] arr,int base,int len,int hint
-  ,FloatComparator sorter
-  )
-  {
-    //assert len > 0 && hint >= 0 && hint < len;
-    int ofs=1;
-    int lastOfs=0;
-    if(
-    sorter.compare((float)(arr[base+hint]),(float)(key))<0
-    )
-    {
-      int maxOfs=len-hint;
-      while(ofs < maxOfs &&
-      sorter.compare((float)(arr[base+hint+ofs]),(float)(key))<0
-      )
-      {
-        if((ofs=((lastOfs=ofs)<<1)+1)<=0)
-        {
-          ofs=maxOfs;
-        }
-      }
-      if(ofs>maxOfs)
-      {
-        ofs=maxOfs;
-      }
-      lastOfs+=hint;
-      ofs+=hint;
-    }
-    else
-    {
-      final int maxOfs=hint+1;
-      for(;;)
-      {
-        if(ofs>=maxOfs || 
-        sorter.compare((float)(arr[base+hint-ofs]),(float)(key))<0
-        )
-        {
-          break;
-        }
-        if((ofs=((lastOfs=ofs)<<1)+1)<=0)
-        {
-          ofs=maxOfs;
-        }
-      }
-      if(ofs>maxOfs)
-      {
-        ofs=maxOfs;
-      }
-      int tmp=lastOfs;
-      lastOfs=hint-ofs;
-      ofs=hint-tmp;
-    }
-    //assert -1 <= lastOfs && lastOfs < ofs && ofs <=len;
-    int diff;
-    if((diff=ofs-(++lastOfs))>0)
-    {
-      do
-      {
-        int m;
-        if(
-        sorter.compare((float)(arr[base+(m=lastOfs+(diff>>>1))]),(float)(key))<0
-        )
-        {
-          lastOfs=m+1;
-        }
-        else
-        {
-          ofs=m;
-        }
-      }
-      while((diff=ofs-lastOfs)>0);
-    }
-    //assert lastOfs==ofs;
-    return ofs;
-  }
-  private static   int gallopLeftcomparatorSort(double key,double[] arr,int base,int len,int hint
-  ,DoubleComparator sorter
-  )
-  {
-    //assert len > 0 && hint >= 0 && hint < len;
-    int ofs=1;
-    int lastOfs=0;
-    if(
-    sorter.compare((double)(arr[base+hint]),(double)(key))<0
-    )
-    {
-      int maxOfs=len-hint;
-      while(ofs < maxOfs &&
-      sorter.compare((double)(arr[base+hint+ofs]),(double)(key))<0
-      )
-      {
-        if((ofs=((lastOfs=ofs)<<1)+1)<=0)
-        {
-          ofs=maxOfs;
-        }
-      }
-      if(ofs>maxOfs)
-      {
-        ofs=maxOfs;
-      }
-      lastOfs+=hint;
-      ofs+=hint;
-    }
-    else
-    {
-      final int maxOfs=hint+1;
-      for(;;)
-      {
-        if(ofs>=maxOfs || 
-        sorter.compare((double)(arr[base+hint-ofs]),(double)(key))<0
-        )
-        {
-          break;
-        }
-        if((ofs=((lastOfs=ofs)<<1)+1)<=0)
-        {
-          ofs=maxOfs;
-        }
-      }
-      if(ofs>maxOfs)
-      {
-        ofs=maxOfs;
-      }
-      int tmp=lastOfs;
-      lastOfs=hint-ofs;
-      ofs=hint-tmp;
-    }
-    //assert -1 <= lastOfs && lastOfs < ofs && ofs <=len;
-    int diff;
-    if((diff=ofs-(++lastOfs))>0)
-    {
-      do
-      {
-        int m;
-        if(
-        sorter.compare((double)(arr[base+(m=lastOfs+(diff>>>1))]),(double)(key))<0
-        )
-        {
-          lastOfs=m+1;
-        }
-        else
-        {
-          ofs=m;
-        }
-      }
-      while((diff=ofs-lastOfs)>0);
-    }
-    //assert lastOfs==ofs;
-    return ofs;
-  }
-  @SuppressWarnings("unchecked")
-  private static <E> int gallopLeftcomparatorSort(E key,Object[] arr,int base,int len,int hint
-  ,Comparator<? super E> sorter
-  )
-  {
-    //assert len > 0 && hint >= 0 && hint < len;
-    int ofs=1;
-    int lastOfs=0;
-    if(
-    sorter.compare((E)(arr[base+hint]),(E)(key))<0
-    )
-    {
-      int maxOfs=len-hint;
-      while(ofs < maxOfs &&
-      sorter.compare((E)(arr[base+hint+ofs]),(E)(key))<0
-      )
-      {
-        if((ofs=((lastOfs=ofs)<<1)+1)<=0)
-        {
-          ofs=maxOfs;
-        }
-      }
-      if(ofs>maxOfs)
-      {
-        ofs=maxOfs;
-      }
-      lastOfs+=hint;
-      ofs+=hint;
-    }
-    else
-    {
-      final int maxOfs=hint+1;
-      for(;;)
-      {
-        if(ofs>=maxOfs || 
-        sorter.compare((E)(arr[base+hint-ofs]),(E)(key))<0
-        )
-        {
-          break;
-        }
-        if((ofs=((lastOfs=ofs)<<1)+1)<=0)
-        {
-          ofs=maxOfs;
-        }
-      }
-      if(ofs>maxOfs)
-      {
-        ofs=maxOfs;
-      }
-      int tmp=lastOfs;
-      lastOfs=hint-ofs;
-      ofs=hint-tmp;
-    }
-    //assert -1 <= lastOfs && lastOfs < ofs && ofs <=len;
-    int diff;
-    if((diff=ofs-(++lastOfs))>0)
-    {
-      do
-      {
-        int m;
-        if(
-        sorter.compare((E)(arr[base+(m=lastOfs+(diff>>>1))]),(E)(key))<0
-        )
-        {
-          lastOfs=m+1;
-        }
-        else
-        {
-          ofs=m;
-        }
-      }
-      while((diff=ofs-lastOfs)>0);
-    }
-    //assert lastOfs==ofs;
-    return ofs;
-  }
-  private static   int gallopRightcomparatorSort(byte key,byte[] arr,int base,int len,int hint
-  ,ByteComparator sorter
-  )
-  {
-    //assert len > 0 && hint >= 0 && hint < len;
-    int ofs=1;
-    int lastOfs=0;
-    if(
-    sorter.compare((byte)(key),(byte)(arr[base+hint]))<0
-    )
-    {
-      int maxOfs=hint+1;
-      while(ofs < maxOfs &&
-      sorter.compare((byte)(key),(byte)(arr[base+hint-ofs]))<0
-      )
-      {
-        if((ofs=((lastOfs=ofs)<<1)+1)<=0)
-        {
-          ofs=maxOfs;
-        }
-      }
-      if(ofs>maxOfs)
-      {
-        ofs=maxOfs;
-      }
-      int tmp=lastOfs;
-      lastOfs=hint-ofs;
-      ofs=hint-tmp;
-    }
-    else
-    {
-      int maxOfs=len-hint;
-      for(;;)
-      {
-        if(ofs>=maxOfs || 
-        sorter.compare((byte)(key),(byte)(arr[base+hint+ofs]))<0
-        )
-        {
-          break;
-        }
-        if((ofs=((lastOfs=ofs)<<1)+1)<=0)
-        {
-          ofs=maxOfs;
-        }
-      }
-      if(ofs>maxOfs)
-      {
-        ofs=maxOfs;
-      }
-      lastOfs+=hint;
-      ofs+=hint;
-    }
-    //assert -1 <= lastOfs && lastOfs < ofs && ofs <=len;
-    int diff;
-    if((diff=ofs-(++lastOfs))>0)
-    {
-      do
-      {
-        int m;
-        if(
-        sorter.compare((byte)(key),(byte)(arr[base+(m=lastOfs+(diff>>>1))]))<0
-        )
-        {
-          ofs=m;
-        }
-        else
-        {
-          lastOfs=m+1;
-        }
-      }
-      while((diff=ofs-lastOfs)>0);
-    }
-    //assert lastOfs==ofs;
-    return ofs;
-  }
-  private static   int gallopRightcomparatorSort(char key,char[] arr,int base,int len,int hint
-  ,CharComparator sorter
-  )
-  {
-    //assert len > 0 && hint >= 0 && hint < len;
-    int ofs=1;
-    int lastOfs=0;
-    if(
-    sorter.compare((char)(key),(char)(arr[base+hint]))<0
-    )
-    {
-      int maxOfs=hint+1;
-      while(ofs < maxOfs &&
-      sorter.compare((char)(key),(char)(arr[base+hint-ofs]))<0
-      )
-      {
-        if((ofs=((lastOfs=ofs)<<1)+1)<=0)
-        {
-          ofs=maxOfs;
-        }
-      }
-      if(ofs>maxOfs)
-      {
-        ofs=maxOfs;
-      }
-      int tmp=lastOfs;
-      lastOfs=hint-ofs;
-      ofs=hint-tmp;
-    }
-    else
-    {
-      int maxOfs=len-hint;
-      for(;;)
-      {
-        if(ofs>=maxOfs || 
-        sorter.compare((char)(key),(char)(arr[base+hint+ofs]))<0
-        )
-        {
-          break;
-        }
-        if((ofs=((lastOfs=ofs)<<1)+1)<=0)
-        {
-          ofs=maxOfs;
-        }
-      }
-      if(ofs>maxOfs)
-      {
-        ofs=maxOfs;
-      }
-      lastOfs+=hint;
-      ofs+=hint;
-    }
-    //assert -1 <= lastOfs && lastOfs < ofs && ofs <=len;
-    int diff;
-    if((diff=ofs-(++lastOfs))>0)
-    {
-      do
-      {
-        int m;
-        if(
-        sorter.compare((char)(key),(char)(arr[base+(m=lastOfs+(diff>>>1))]))<0
-        )
-        {
-          ofs=m;
-        }
-        else
-        {
-          lastOfs=m+1;
-        }
-      }
-      while((diff=ofs-lastOfs)>0);
-    }
-    //assert lastOfs==ofs;
-    return ofs;
-  }
-  private static   int gallopRightcomparatorSort(short key,short[] arr,int base,int len,int hint
-  ,ShortComparator sorter
-  )
-  {
-    //assert len > 0 && hint >= 0 && hint < len;
-    int ofs=1;
-    int lastOfs=0;
-    if(
-    sorter.compare((short)(key),(short)(arr[base+hint]))<0
-    )
-    {
-      int maxOfs=hint+1;
-      while(ofs < maxOfs &&
-      sorter.compare((short)(key),(short)(arr[base+hint-ofs]))<0
-      )
-      {
-        if((ofs=((lastOfs=ofs)<<1)+1)<=0)
-        {
-          ofs=maxOfs;
-        }
-      }
-      if(ofs>maxOfs)
-      {
-        ofs=maxOfs;
-      }
-      int tmp=lastOfs;
-      lastOfs=hint-ofs;
-      ofs=hint-tmp;
-    }
-    else
-    {
-      int maxOfs=len-hint;
-      for(;;)
-      {
-        if(ofs>=maxOfs || 
-        sorter.compare((short)(key),(short)(arr[base+hint+ofs]))<0
-        )
-        {
-          break;
-        }
-        if((ofs=((lastOfs=ofs)<<1)+1)<=0)
-        {
-          ofs=maxOfs;
-        }
-      }
-      if(ofs>maxOfs)
-      {
-        ofs=maxOfs;
-      }
-      lastOfs+=hint;
-      ofs+=hint;
-    }
-    //assert -1 <= lastOfs && lastOfs < ofs && ofs <=len;
-    int diff;
-    if((diff=ofs-(++lastOfs))>0)
-    {
-      do
-      {
-        int m;
-        if(
-        sorter.compare((short)(key),(short)(arr[base+(m=lastOfs+(diff>>>1))]))<0
-        )
-        {
-          ofs=m;
-        }
-        else
-        {
-          lastOfs=m+1;
-        }
-      }
-      while((diff=ofs-lastOfs)>0);
-    }
-    //assert lastOfs==ofs;
-    return ofs;
-  }
-  private static   int gallopRightcomparatorSort(int key,int[] arr,int base,int len,int hint
-  ,IntBinaryOperator sorter
-  )
-  {
-    //assert len > 0 && hint >= 0 && hint < len;
-    int ofs=1;
-    int lastOfs=0;
-    if(
-    sorter.applyAsInt((int)(key),(int)(arr[base+hint]))<0
-    )
-    {
-      int maxOfs=hint+1;
-      while(ofs < maxOfs &&
-      sorter.applyAsInt((int)(key),(int)(arr[base+hint-ofs]))<0
-      )
-      {
-        if((ofs=((lastOfs=ofs)<<1)+1)<=0)
-        {
-          ofs=maxOfs;
-        }
-      }
-      if(ofs>maxOfs)
-      {
-        ofs=maxOfs;
-      }
-      int tmp=lastOfs;
-      lastOfs=hint-ofs;
-      ofs=hint-tmp;
-    }
-    else
-    {
-      int maxOfs=len-hint;
-      for(;;)
-      {
-        if(ofs>=maxOfs || 
-        sorter.applyAsInt((int)(key),(int)(arr[base+hint+ofs]))<0
-        )
-        {
-          break;
-        }
-        if((ofs=((lastOfs=ofs)<<1)+1)<=0)
-        {
-          ofs=maxOfs;
-        }
-      }
-      if(ofs>maxOfs)
-      {
-        ofs=maxOfs;
-      }
-      lastOfs+=hint;
-      ofs+=hint;
-    }
-    //assert -1 <= lastOfs && lastOfs < ofs && ofs <=len;
-    int diff;
-    if((diff=ofs-(++lastOfs))>0)
-    {
-      do
-      {
-        int m;
-        if(
-        sorter.applyAsInt((int)(key),(int)(arr[base+(m=lastOfs+(diff>>>1))]))<0
-        )
-        {
-          ofs=m;
-        }
-        else
-        {
-          lastOfs=m+1;
-        }
-      }
-      while((diff=ofs-lastOfs)>0);
-    }
-    //assert lastOfs==ofs;
-    return ofs;
-  }
-  private static   int gallopRightcomparatorSort(long key,long[] arr,int base,int len,int hint
-  ,LongComparator sorter
-  )
-  {
-    //assert len > 0 && hint >= 0 && hint < len;
-    int ofs=1;
-    int lastOfs=0;
-    if(
-    sorter.compare((long)(key),(long)(arr[base+hint]))<0
-    )
-    {
-      int maxOfs=hint+1;
-      while(ofs < maxOfs &&
-      sorter.compare((long)(key),(long)(arr[base+hint-ofs]))<0
-      )
-      {
-        if((ofs=((lastOfs=ofs)<<1)+1)<=0)
-        {
-          ofs=maxOfs;
-        }
-      }
-      if(ofs>maxOfs)
-      {
-        ofs=maxOfs;
-      }
-      int tmp=lastOfs;
-      lastOfs=hint-ofs;
-      ofs=hint-tmp;
-    }
-    else
-    {
-      int maxOfs=len-hint;
-      for(;;)
-      {
-        if(ofs>=maxOfs || 
-        sorter.compare((long)(key),(long)(arr[base+hint+ofs]))<0
-        )
-        {
-          break;
-        }
-        if((ofs=((lastOfs=ofs)<<1)+1)<=0)
-        {
-          ofs=maxOfs;
-        }
-      }
-      if(ofs>maxOfs)
-      {
-        ofs=maxOfs;
-      }
-      lastOfs+=hint;
-      ofs+=hint;
-    }
-    //assert -1 <= lastOfs && lastOfs < ofs && ofs <=len;
-    int diff;
-    if((diff=ofs-(++lastOfs))>0)
-    {
-      do
-      {
-        int m;
-        if(
-        sorter.compare((long)(key),(long)(arr[base+(m=lastOfs+(diff>>>1))]))<0
-        )
-        {
-          ofs=m;
-        }
-        else
-        {
-          lastOfs=m+1;
-        }
-      }
-      while((diff=ofs-lastOfs)>0);
-    }
-    //assert lastOfs==ofs;
-    return ofs;
-  }
-  private static   int gallopRightcomparatorSort(float key,float[] arr,int base,int len,int hint
-  ,FloatComparator sorter
-  )
-  {
-    //assert len > 0 && hint >= 0 && hint < len;
-    int ofs=1;
-    int lastOfs=0;
-    if(
-    sorter.compare((float)(key),(float)(arr[base+hint]))<0
-    )
-    {
-      int maxOfs=hint+1;
-      while(ofs < maxOfs &&
-      sorter.compare((float)(key),(float)(arr[base+hint-ofs]))<0
-      )
-      {
-        if((ofs=((lastOfs=ofs)<<1)+1)<=0)
-        {
-          ofs=maxOfs;
-        }
-      }
-      if(ofs>maxOfs)
-      {
-        ofs=maxOfs;
-      }
-      int tmp=lastOfs;
-      lastOfs=hint-ofs;
-      ofs=hint-tmp;
-    }
-    else
-    {
-      int maxOfs=len-hint;
-      for(;;)
-      {
-        if(ofs>=maxOfs || 
-        sorter.compare((float)(key),(float)(arr[base+hint+ofs]))<0
-        )
-        {
-          break;
-        }
-        if((ofs=((lastOfs=ofs)<<1)+1)<=0)
-        {
-          ofs=maxOfs;
-        }
-      }
-      if(ofs>maxOfs)
-      {
-        ofs=maxOfs;
-      }
-      lastOfs+=hint;
-      ofs+=hint;
-    }
-    //assert -1 <= lastOfs && lastOfs < ofs && ofs <=len;
-    int diff;
-    if((diff=ofs-(++lastOfs))>0)
-    {
-      do
-      {
-        int m;
-        if(
-        sorter.compare((float)(key),(float)(arr[base+(m=lastOfs+(diff>>>1))]))<0
-        )
-        {
-          ofs=m;
-        }
-        else
-        {
-          lastOfs=m+1;
-        }
-      }
-      while((diff=ofs-lastOfs)>0);
-    }
-    //assert lastOfs==ofs;
-    return ofs;
-  }
-  private static   int gallopRightcomparatorSort(double key,double[] arr,int base,int len,int hint
-  ,DoubleComparator sorter
-  )
-  {
-    //assert len > 0 && hint >= 0 && hint < len;
-    int ofs=1;
-    int lastOfs=0;
-    if(
-    sorter.compare((double)(key),(double)(arr[base+hint]))<0
-    )
-    {
-      int maxOfs=hint+1;
-      while(ofs < maxOfs &&
-      sorter.compare((double)(key),(double)(arr[base+hint-ofs]))<0
-      )
-      {
-        if((ofs=((lastOfs=ofs)<<1)+1)<=0)
-        {
-          ofs=maxOfs;
-        }
-      }
-      if(ofs>maxOfs)
-      {
-        ofs=maxOfs;
-      }
-      int tmp=lastOfs;
-      lastOfs=hint-ofs;
-      ofs=hint-tmp;
-    }
-    else
-    {
-      int maxOfs=len-hint;
-      for(;;)
-      {
-        if(ofs>=maxOfs || 
-        sorter.compare((double)(key),(double)(arr[base+hint+ofs]))<0
-        )
-        {
-          break;
-        }
-        if((ofs=((lastOfs=ofs)<<1)+1)<=0)
-        {
-          ofs=maxOfs;
-        }
-      }
-      if(ofs>maxOfs)
-      {
-        ofs=maxOfs;
-      }
-      lastOfs+=hint;
-      ofs+=hint;
-    }
-    //assert -1 <= lastOfs && lastOfs < ofs && ofs <=len;
-    int diff;
-    if((diff=ofs-(++lastOfs))>0)
-    {
-      do
-      {
-        int m;
-        if(
-        sorter.compare((double)(key),(double)(arr[base+(m=lastOfs+(diff>>>1))]))<0
-        )
-        {
-          ofs=m;
-        }
-        else
-        {
-          lastOfs=m+1;
-        }
-      }
-      while((diff=ofs-lastOfs)>0);
-    }
-    //assert lastOfs==ofs;
-    return ofs;
-  }
-  @SuppressWarnings("unchecked")
-  private static <E> int gallopRightcomparatorSort(E key,Object[] arr,int base,int len,int hint
-  ,Comparator<? super E> sorter
-  )
-  {
-    //assert len > 0 && hint >= 0 && hint < len;
-    int ofs=1;
-    int lastOfs=0;
-    if(
-    sorter.compare((E)(key),(E)(arr[base+hint]))<0
-    )
-    {
-      int maxOfs=hint+1;
-      while(ofs < maxOfs &&
-      sorter.compare((E)(key),(E)(arr[base+hint-ofs]))<0
-      )
-      {
-        if((ofs=((lastOfs=ofs)<<1)+1)<=0)
-        {
-          ofs=maxOfs;
-        }
-      }
-      if(ofs>maxOfs)
-      {
-        ofs=maxOfs;
-      }
-      int tmp=lastOfs;
-      lastOfs=hint-ofs;
-      ofs=hint-tmp;
-    }
-    else
-    {
-      int maxOfs=len-hint;
-      for(;;)
-      {
-        if(ofs>=maxOfs || 
-        sorter.compare((E)(key),(E)(arr[base+hint+ofs]))<0
-        )
-        {
-          break;
-        }
-        if((ofs=((lastOfs=ofs)<<1)+1)<=0)
-        {
-          ofs=maxOfs;
-        }
-      }
-      if(ofs>maxOfs)
-      {
-        ofs=maxOfs;
-      }
-      lastOfs+=hint;
-      ofs+=hint;
-    }
-    //assert -1 <= lastOfs && lastOfs < ofs && ofs <=len;
-    int diff;
-    if((diff=ofs-(++lastOfs))>0)
-    {
-      do
-      {
-        int m;
-        if(
-        sorter.compare((E)(key),(E)(arr[base+(m=lastOfs+(diff>>>1))]))<0
-        )
-        {
-          ofs=m;
-        }
-        else
-        {
-          lastOfs=m+1;
-        }
-      }
-      while((diff=ofs-lastOfs)>0);
-    }
-    //assert lastOfs==ofs;
-    return ofs;
-  }
-  @SuppressWarnings("unchecked")
-  private static <E> int gallopLeftsort(Comparable<E> key,Object[] arr,int base,int len,int hint
-  )
-  {
-    //assert len > 0 && hint >= 0 && hint < len;
-    int ofs=1;
-    int lastOfs=0;
-    if(
-    ((Comparable<E>)(arr[base+hint])).compareTo((E)(key))<0
-    )
-    {
-      int maxOfs=len-hint;
-      while(ofs < maxOfs &&
-      ((Comparable<E>)(arr[base+hint+ofs])).compareTo((E)(key))<0
-      )
-      {
-        if((ofs=((lastOfs=ofs)<<1)+1)<=0)
-        {
-          ofs=maxOfs;
-        }
-      }
-      if(ofs>maxOfs)
-      {
-        ofs=maxOfs;
-      }
-      lastOfs+=hint;
-      ofs+=hint;
-    }
-    else
-    {
-      final int maxOfs=hint+1;
-      for(;;)
-      {
-        if(ofs>=maxOfs || 
-        ((Comparable<E>)(arr[base+hint-ofs])).compareTo((E)(key))<0
-        )
-        {
-          break;
-        }
-        if((ofs=((lastOfs=ofs)<<1)+1)<=0)
-        {
-          ofs=maxOfs;
-        }
-      }
-      if(ofs>maxOfs)
-      {
-        ofs=maxOfs;
-      }
-      int tmp=lastOfs;
-      lastOfs=hint-ofs;
-      ofs=hint-tmp;
-    }
-    //assert -1 <= lastOfs && lastOfs < ofs && ofs <=len;
-    int diff;
-    if((diff=ofs-(++lastOfs))>0)
-    {
-      do
-      {
-        int m;
-        if(
-        ((Comparable<E>)(arr[base+(m=lastOfs+(diff>>>1))])).compareTo((E)(key))<0
-        )
-        {
-          lastOfs=m+1;
-        }
-        else
-        {
-          ofs=m;
-        }
-      }
-      while((diff=ofs-lastOfs)>0);
-    }
-    //assert lastOfs==ofs;
-    return ofs;
-  }
-  @SuppressWarnings("unchecked")
-  private static <E> int gallopRightsort(Comparable<E> key,Object[] arr,int base,int len,int hint
-  )
-  {
-    //assert len > 0 && hint >= 0 && hint < len;
-    int ofs=1;
-    int lastOfs=0;
-    if(
-    ((Comparable<E>)(key)).compareTo((E)(arr[base+hint]))<0
-    )
-    {
-      int maxOfs=hint+1;
-      while(ofs < maxOfs &&
-      ((Comparable<E>)(key)).compareTo((E)(arr[base+hint-ofs]))<0
-      )
-      {
-        if((ofs=((lastOfs=ofs)<<1)+1)<=0)
-        {
-          ofs=maxOfs;
-        }
-      }
-      if(ofs>maxOfs)
-      {
-        ofs=maxOfs;
-      }
-      int tmp=lastOfs;
-      lastOfs=hint-ofs;
-      ofs=hint-tmp;
-    }
-    else
-    {
-      int maxOfs=len-hint;
-      for(;;)
-      {
-        if(ofs>=maxOfs || 
-        ((Comparable<E>)(key)).compareTo((E)(arr[base+hint+ofs]))<0
-        )
-        {
-          break;
-        }
-        if((ofs=((lastOfs=ofs)<<1)+1)<=0)
-        {
-          ofs=maxOfs;
-        }
-      }
-      if(ofs>maxOfs)
-      {
-        ofs=maxOfs;
-      }
-      lastOfs+=hint;
-      ofs+=hint;
-    }
-    //assert -1 <= lastOfs && lastOfs < ofs && ofs <=len;
-    int diff;
-    if((diff=ofs-(++lastOfs))>0)
-    {
-      do
-      {
-        int m;
-        if(
-        ((Comparable<E>)(key)).compareTo((E)(arr[base+(m=lastOfs+(diff>>>1))]))<0
-        )
-        {
-          ofs=m;
-        }
-        else
-        {
-          lastOfs=m+1;
-        }
-      }
-      while((diff=ofs-lastOfs)>0);
-    }
-    //assert lastOfs==ofs;
-    return ofs;
-  }
-  @SuppressWarnings("unchecked")
-  private static <E> int gallopLeftreverseSort(Comparable<E> key,Object[] arr,int base,int len,int hint
-  )
-  {
-    //assert len > 0 && hint >= 0 && hint < len;
-    int ofs=1;
-    int lastOfs=0;
-    if(
-    ((Comparable<E>)(arr[base+hint])).compareTo((E)(key))>0
-    )
-    {
-      int maxOfs=len-hint;
-      while(ofs < maxOfs &&
-      ((Comparable<E>)(arr[base+hint+ofs])).compareTo((E)(key))>0
-      )
-      {
-        if((ofs=((lastOfs=ofs)<<1)+1)<=0)
-        {
-          ofs=maxOfs;
-        }
-      }
-      if(ofs>maxOfs)
-      {
-        ofs=maxOfs;
-      }
-      lastOfs+=hint;
-      ofs+=hint;
-    }
-    else
-    {
-      final int maxOfs=hint+1;
-      for(;;)
-      {
-        if(ofs>=maxOfs || 
-        ((Comparable<E>)(arr[base+hint-ofs])).compareTo((E)(key))>0
-        )
-        {
-          break;
-        }
-        if((ofs=((lastOfs=ofs)<<1)+1)<=0)
-        {
-          ofs=maxOfs;
-        }
-      }
-      if(ofs>maxOfs)
-      {
-        ofs=maxOfs;
-      }
-      int tmp=lastOfs;
-      lastOfs=hint-ofs;
-      ofs=hint-tmp;
-    }
-    //assert -1 <= lastOfs && lastOfs < ofs && ofs <=len;
-    int diff;
-    if((diff=ofs-(++lastOfs))>0)
-    {
-      do
-      {
-        int m;
-        if(
-        ((Comparable<E>)(arr[base+(m=lastOfs+(diff>>>1))])).compareTo((E)(key))>0
-        )
-        {
-          lastOfs=m+1;
-        }
-        else
-        {
-          ofs=m;
-        }
-      }
-      while((diff=ofs-lastOfs)>0);
-    }
-    //assert lastOfs==ofs;
-    return ofs;
-  }
-  @SuppressWarnings("unchecked")
-  private static <E> int gallopRightreverseSort(Comparable<E> key,Object[] arr,int base,int len,int hint
-  )
-  {
-    //assert len > 0 && hint >= 0 && hint < len;
-    int ofs=1;
-    int lastOfs=0;
-    if(
-    ((Comparable<E>)(key)).compareTo((E)(arr[base+hint]))>0
-    )
-    {
-      int maxOfs=hint+1;
-      while(ofs < maxOfs &&
-      ((Comparable<E>)(key)).compareTo((E)(arr[base+hint-ofs]))>0
-      )
-      {
-        if((ofs=((lastOfs=ofs)<<1)+1)<=0)
-        {
-          ofs=maxOfs;
-        }
-      }
-      if(ofs>maxOfs)
-      {
-        ofs=maxOfs;
-      }
-      int tmp=lastOfs;
-      lastOfs=hint-ofs;
-      ofs=hint-tmp;
-    }
-    else
-    {
-      int maxOfs=len-hint;
-      for(;;)
-      {
-        if(ofs>=maxOfs || 
-        ((Comparable<E>)(key)).compareTo((E)(arr[base+hint+ofs]))>0
-        )
-        {
-          break;
-        }
-        if((ofs=((lastOfs=ofs)<<1)+1)<=0)
-        {
-          ofs=maxOfs;
-        }
-      }
-      if(ofs>maxOfs)
-      {
-        ofs=maxOfs;
-      }
-      lastOfs+=hint;
-      ofs+=hint;
-    }
-    //assert -1 <= lastOfs && lastOfs < ofs && ofs <=len;
-    int diff;
-    if((diff=ofs-(++lastOfs))>0)
-    {
-      do
-      {
-        int m;
-        if(
-        ((Comparable<E>)(key)).compareTo((E)(arr[base+(m=lastOfs+(diff>>>1))]))>0
-        )
-        {
-          ofs=m;
-        }
-        else
-        {
-          lastOfs=m+1;
-        }
-      }
-      while((diff=ofs-lastOfs)>0);
-    }
-    //assert lastOfs==ofs;
-    return ofs;
-  }
+  //assert lastOfs==ofs;
+  return ofs;
+}
+ENDDEF
+*/
 }

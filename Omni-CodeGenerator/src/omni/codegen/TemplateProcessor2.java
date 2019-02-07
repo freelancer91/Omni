@@ -348,7 +348,7 @@ public class TemplateProcessor2{
             }
             String[] switches;
             String switchStr="";
-            int switchBegin=lineTail.indexOf('<',tagEnd);
+            int switchBegin=lineTail.indexOf('<');
             if(switchBegin>=0&&switchBegin<paramBegin){
                 final int switchEnd=lineTail.lastIndexOf('>',paramBegin);
                 switchStr=lineTail.substring(switchBegin+1,switchEnd);
