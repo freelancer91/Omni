@@ -203,7 +203,7 @@ ERROR unknown array type ARRTYPE
   #MACRO ArrayBuilder<float,Float>()
   #MACRO ArrayBuilder<double,Double>()
   #MACRO ArrayBuilder<String,String>()
- 
+  #MACRO ArrayBuilder<Integer,Integer>()
 #MACRODEF RandomizedBuild<THETYPE>()
 @Override
 public void buildUnchecked(THETYPE[] arr,int offset,int length,Random rand,int m)
@@ -274,6 +274,15 @@ public void buildUnchecked(THETYPE[] arr,int offset,int length,Random rand,int m
     for(int p=0;p<period;arr[(i++)+offset]=convertToTHETYPE(++v),++p){}
   }
   for(int j=1;j<length-1;arr[j++]=convertToTHETYPE(++v)){}
+#IFSWITCH THETYPE==Boolean,Byte,Character,Short,Integer,Long,Float,Double,String
+  for(int i=offset,bound=offset+length;i<bound;++i)
+  {
+    if(arr[i]==null)
+    {
+      arr[i]=convertToTHETYPE(0);
+    }
+  }
+#ENDIF
 }
 #ENDDEF
 #MACRODEF MergeDescendingBuild<THETYPE>()
@@ -287,6 +296,15 @@ public void buildUnchecked(THETYPE[] arr,int offset,int length,Random rand,int m
     for(int p=0;p<period;arr[(i++)+offset]=convertToTHETYPE(--v),++p){}
   }
   for(int j=1;j<length-1;arr[j++]=convertToTHETYPE(--v)){}
+#IFSWITCH THETYPE==Boolean,Byte,Character,Short,Integer,Long,Float,Double,String
+  for(int i=offset,bound=offset+length;i<bound;++i)
+  {
+    if(arr[i]==null)
+    {
+      arr[i]=convertToTHETYPE(0);
+    }
+  }
+#ENDIF
 }
 #ENDDEF
 #MACRODEF SawBuild<THETYPE>()
@@ -483,17 +501,9 @@ public static enum ARRTYPEArrayBuilder
 {
   #MACRO ArrayBuilderValue<Randomized,true>()
   ,
-  #IFSWITCH ARRTYPE==boolean
   #MACRO ArrayBuilderValue<Ascending,false>()
-  #ELSE
-  #MACRO ArrayBuilderValue<Ascending,false>()
-  #ENDIF
   ,
-  #IFSWITCH ARRTYPE==boolean
   #MACRO ArrayBuilderValue<Descending,false>()
-  #ELSE
-  #MACRO ArrayBuilderValue<Descending,false>()
-  #ENDIF
   ,
   #MACRO ArrayBuilderValue<AllEquals,false>()
 #IFNOTSWITCH ARRTYPE==boolean

@@ -709,6 +709,13 @@ public interface JunitUtil
           for(int p=0;p<period;arr[(i++)+offset]=convertToByte(++v),++p){}
         }
         for(int j=1;j<length-1;arr[j++]=convertToByte(++v)){}
+        for(int i=offset,bound=offset+length;i<bound;++i)
+        {
+          if(arr[i]==null)
+          {
+            arr[i]=convertToByte(0);
+          }
+        }
       }
     }
     ,
@@ -735,6 +742,13 @@ public interface JunitUtil
           for(int p=0;p<period;arr[(i++)+offset]=convertToByte(--v),++p){}
         }
         for(int j=1;j<length-1;arr[j++]=convertToByte(--v)){}
+        for(int i=offset,bound=offset+length;i<bound;++i)
+        {
+          if(arr[i]==null)
+          {
+            arr[i]=convertToByte(0);
+          }
+        }
       }
     }
     ,
@@ -1189,6 +1203,13 @@ public interface JunitUtil
           for(int p=0;p<period;arr[(i++)+offset]=convertToCharacter(++v),++p){}
         }
         for(int j=1;j<length-1;arr[j++]=convertToCharacter(++v)){}
+        for(int i=offset,bound=offset+length;i<bound;++i)
+        {
+          if(arr[i]==null)
+          {
+            arr[i]=convertToCharacter(0);
+          }
+        }
       }
     }
     ,
@@ -1215,6 +1236,13 @@ public interface JunitUtil
           for(int p=0;p<period;arr[(i++)+offset]=convertToCharacter(--v),++p){}
         }
         for(int j=1;j<length-1;arr[j++]=convertToCharacter(--v)){}
+        for(int i=offset,bound=offset+length;i<bound;++i)
+        {
+          if(arr[i]==null)
+          {
+            arr[i]=convertToCharacter(0);
+          }
+        }
       }
     }
     ,
@@ -1669,6 +1697,13 @@ public interface JunitUtil
           for(int p=0;p<period;arr[(i++)+offset]=convertToShort(++v),++p){}
         }
         for(int j=1;j<length-1;arr[j++]=convertToShort(++v)){}
+        for(int i=offset,bound=offset+length;i<bound;++i)
+        {
+          if(arr[i]==null)
+          {
+            arr[i]=convertToShort(0);
+          }
+        }
       }
     }
     ,
@@ -1695,6 +1730,13 @@ public interface JunitUtil
           for(int p=0;p<period;arr[(i++)+offset]=convertToShort(--v),++p){}
         }
         for(int j=1;j<length-1;arr[j++]=convertToShort(--v)){}
+        for(int i=offset,bound=offset+length;i<bound;++i)
+        {
+          if(arr[i]==null)
+          {
+            arr[i]=convertToShort(0);
+          }
+        }
       }
     }
     ,
@@ -2149,6 +2191,13 @@ public interface JunitUtil
           for(int p=0;p<period;arr[(i++)+offset]=convertToInteger(++v),++p){}
         }
         for(int j=1;j<length-1;arr[j++]=convertToInteger(++v)){}
+        for(int i=offset,bound=offset+length;i<bound;++i)
+        {
+          if(arr[i]==null)
+          {
+            arr[i]=convertToInteger(0);
+          }
+        }
       }
     }
     ,
@@ -2175,6 +2224,13 @@ public interface JunitUtil
           for(int p=0;p<period;arr[(i++)+offset]=convertToInteger(--v),++p){}
         }
         for(int j=1;j<length-1;arr[j++]=convertToInteger(--v)){}
+        for(int i=offset,bound=offset+length;i<bound;++i)
+        {
+          if(arr[i]==null)
+          {
+            arr[i]=convertToInteger(0);
+          }
+        }
       }
     }
     ,
@@ -2629,6 +2685,13 @@ public interface JunitUtil
           for(int p=0;p<period;arr[(i++)+offset]=convertToLong(++v),++p){}
         }
         for(int j=1;j<length-1;arr[j++]=convertToLong(++v)){}
+        for(int i=offset,bound=offset+length;i<bound;++i)
+        {
+          if(arr[i]==null)
+          {
+            arr[i]=convertToLong(0);
+          }
+        }
       }
     }
     ,
@@ -2655,6 +2718,13 @@ public interface JunitUtil
           for(int p=0;p<period;arr[(i++)+offset]=convertToLong(--v),++p){}
         }
         for(int j=1;j<length-1;arr[j++]=convertToLong(--v)){}
+        for(int i=offset,bound=offset+length;i<bound;++i)
+        {
+          if(arr[i]==null)
+          {
+            arr[i]=convertToLong(0);
+          }
+        }
       }
     }
     ,
@@ -3109,6 +3179,13 @@ public interface JunitUtil
           for(int p=0;p<period;arr[(i++)+offset]=convertToFloat(++v),++p){}
         }
         for(int j=1;j<length-1;arr[j++]=convertToFloat(++v)){}
+        for(int i=offset,bound=offset+length;i<bound;++i)
+        {
+          if(arr[i]==null)
+          {
+            arr[i]=convertToFloat(0);
+          }
+        }
       }
     }
     ,
@@ -3135,6 +3212,13 @@ public interface JunitUtil
           for(int p=0;p<period;arr[(i++)+offset]=convertToFloat(--v),++p){}
         }
         for(int j=1;j<length-1;arr[j++]=convertToFloat(--v)){}
+        for(int i=offset,bound=offset+length;i<bound;++i)
+        {
+          if(arr[i]==null)
+          {
+            arr[i]=convertToFloat(0);
+          }
+        }
       }
     }
     ,
@@ -3642,6 +3726,13 @@ public interface JunitUtil
           for(int p=0;p<period;arr[(i++)+offset]=convertToDouble(++v),++p){}
         }
         for(int j=1;j<length-1;arr[j++]=convertToDouble(++v)){}
+        for(int i=offset,bound=offset+length;i<bound;++i)
+        {
+          if(arr[i]==null)
+          {
+            arr[i]=convertToDouble(0);
+          }
+        }
       }
     }
     ,
@@ -3668,6 +3759,13 @@ public interface JunitUtil
           for(int p=0;p<period;arr[(i++)+offset]=convertToDouble(--v),++p){}
         }
         for(int j=1;j<length-1;arr[j++]=convertToDouble(--v)){}
+        for(int i=offset,bound=offset+length;i<bound;++i)
+        {
+          if(arr[i]==null)
+          {
+            arr[i]=convertToDouble(0);
+          }
+        }
       }
     }
     ,
@@ -4133,6 +4231,13 @@ public interface JunitUtil
           for(int p=0;p<period;arr[(i++)+offset]=convertToString(++v),++p){}
         }
         for(int j=1;j<length-1;arr[j++]=convertToString(++v)){}
+        for(int i=offset,bound=offset+length;i<bound;++i)
+        {
+          if(arr[i]==null)
+          {
+            arr[i]=convertToString(0);
+          }
+        }
       }
     }
     ,
@@ -4148,6 +4253,13 @@ public interface JunitUtil
           for(int p=0;p<period;arr[(i++)+offset]=convertToString(--v),++p){}
         }
         for(int j=1;j<length-1;arr[j++]=convertToString(--v)){}
+        for(int i=offset,bound=offset+length;i<bound;++i)
+        {
+          if(arr[i]==null)
+          {
+            arr[i]=convertToString(0);
+          }
+        }
       }
     }
     ,
@@ -4349,6 +4461,304 @@ public interface JunitUtil
     public String toString()
     {
       return "StringArrayBuilder."+this.name();
+    }
+  }
+  public static enum IntegerArrayBuilder
+  {
+    Randomized
+    {
+      @Override
+      public boolean isRandomized()
+      {
+        return true;
+      }
+      @Override
+      public void buildUnchecked(Integer[] arr,int offset,int length,Random rand,int m)
+      {
+        length+=offset;
+        do
+        {
+          arr[offset]=getRandomInteger(rand);
+        }
+        while(++offset!=length);
+      }
+    }
+    ,
+    Ascending
+    {
+      @Override
+      public void buildUnchecked(Integer[] arr,int offset,int length,Random rand,int m)
+      {
+        for(int i=0;i<length;arr[(i++)+offset]=convertToInteger(m+i)){}
+      }
+    }
+    ,
+    Descending
+    {
+      @Override
+      public void buildUnchecked(Integer[] arr,int offset,int length,Random rand,int m)
+      {
+        for(int i=0;i<length;arr[(i++)+offset]=convertToInteger(length-m-i)){}
+      }
+    }
+    ,
+    AllEquals
+    {
+      @Override
+      public void buildUnchecked(Integer[] arr,int offset,int length,Random rand,int m)
+      {
+        Integer val=convertToInteger(m);
+        length+=offset;
+        do
+        {
+          arr[offset]=val;
+        }
+        while(++offset!=length);
+      }
+    }
+    ,
+    MergeAscending
+    {
+      @Override
+      public void buildUnchecked(Integer[] arr,int offset,int length,Random rand,int m)
+      {
+        int v=0;
+        for(int i=0, k=0,period=length/m;k<m;++k)
+        {
+          v=0;
+          for(int p=0;p<period;arr[(i++)+offset]=convertToInteger(++v),++p){}
+        }
+        for(int j=1;j<length-1;arr[j++]=convertToInteger(++v)){}
+        for(int i=offset,bound=offset+length;i<bound;++i)
+        {
+          if(arr[i]==null)
+          {
+            arr[i]=convertToInteger(0);
+          }
+        }
+      }
+    }
+    ,
+    MergeDescending
+    {
+      @Override
+      public void buildUnchecked(Integer[] arr,int offset,int length,Random rand,int m)
+      {
+        int v=0;
+        for(int i=0, k=0,period=length/m;k<m;++k)
+        {
+          v=0;
+          for(int p=0;p<period;arr[(i++)+offset]=convertToInteger(--v),++p){}
+        }
+        for(int j=1;j<length-1;arr[j++]=convertToInteger(--v)){}
+        for(int i=offset,bound=offset+length;i<bound;++i)
+        {
+          if(arr[i]==null)
+          {
+            arr[i]=convertToInteger(0);
+          }
+        }
+      }
+    }
+    ,
+    Saw
+    {
+      @Override
+      public void buildUnchecked(Integer[] arr,int offset,int length,Random rand,int m)
+      {
+        for(int incCount=1,decCount=length,i=0,period=m--;;period+=m)
+        {
+          for(int k=0;++k<=period;arr[(i++)+offset]=convertToInteger(incCount++))
+          {
+            if(i>=length)
+            {
+              return;
+            }
+          }
+          period+=m;
+          for(int k=0;++k<=period;arr[(i++)+offset]=convertToInteger(decCount--))
+          {
+            if(i>=length)
+            {
+              return;
+            }
+          }
+        }
+      }
+    }
+    ,
+    SortedRepeated
+    {
+      @Override
+      public void buildUnchecked(Integer[] arr,int offset,int length,Random rand,int m)
+      {
+        for(int period=length/m,i=0,k=0;;++k)
+        {
+          for(int t=0;++t<=period;arr[(i++)+offset]=convertToInteger(k))
+          {
+            if(i>=length)
+            {
+              return;
+            }
+          }
+          if(i>=length)
+          {
+            return;
+          }
+        }
+      }
+    }
+    ,
+    Repeated
+    {
+      @Override
+      public void buildUnchecked(Integer[] arr,int offset,int length,Random rand,int m)
+      {
+        int i=0;
+        do
+        {
+          arr[i+offset]=convertToInteger(i%m);
+        }
+        while(++i!=length);
+      }
+    }
+    ,
+    Duplicated
+    {
+      @Override
+      public boolean isRandomized()
+      {
+        return true;
+      }
+      @Override
+      public void buildUnchecked(Integer[] arr,int offset,int length,Random rand,int m)
+      {
+        int i=0;
+        do
+        {
+          arr[i+offset]=convertToInteger(rand.nextInt(m));
+        }
+        while(++i!=length);
+      }
+    }
+    ,
+    SortedOrganPipes
+    {
+      @Override
+      public void buildUnchecked(Integer[] arr,int offset,int length,Random rand,int m)
+      {
+        for(int i=0;;)
+        {
+          for(int t=0;++t<=m;arr[(i++)+offset]=convertToInteger(m))
+          {
+            if(i>=length)
+            {
+              return;
+            }
+          }
+        }
+      }
+    }
+    ,
+    OrganPipes
+    {
+      @Override
+      public void buildUnchecked(Integer[] arr,int offset,int length,Random rand,int m)
+      {
+        int i=0;
+        for(int middle=length/(m+1);i<middle;arr[i+offset]=convertToInteger(i++)){}
+        while(i<length)
+        {
+          arr[i+offset]=convertToInteger(length-(i++)-1);
+        }
+      }
+    }
+    ,
+    Stagger
+    {
+      @Override
+      public void buildUnchecked(Integer[] arr,int offset,int length,Random rand,int m)
+      {
+        int i=0;
+        do
+        {
+          arr[i+offset]=convertToInteger((i*m+i)%length);
+        }
+        while(++i!=length);
+      }
+    }
+    ,
+    Plateau
+    {
+      @Override
+      public void buildUnchecked(Integer[] arr,int offset,int length,Random rand,int m)
+      {
+        int i=0;
+        do
+        {
+          arr[offset+i]=convertToInteger(Math.min(i,m));
+        }
+        while(++i!=length);
+      }
+    }
+    ,
+    Shuffle
+    {
+      @Override
+      public boolean isRandomized()
+      {
+        return true;
+      }
+      @Override
+      public void buildUnchecked(Integer[] arr,int offset,int length,Random rand,int m)
+      {
+        int x=0,y=0;
+        int bound=offset+length;
+        do
+        {
+          arr[offset]=convertToInteger(rand.nextBoolean()?(x+2):(y+2));
+        }
+        while(++offset!=bound);
+      }
+    }
+    ;
+    public boolean isRandomized()
+    {
+      //most sub-types are not randomized, so make that the default
+      return false;
+    }
+    public abstract void buildUnchecked(Integer[] arr,int offset,int length,Random rand,int m);
+    public void build(Integer[] arr,Random rand,int m)
+    {
+      if(arr==null)
+      {
+        throw new NullPointerException("arr cannot be null");
+      }
+      int length;
+      if((length=arr.length)!=0)
+      {
+        buildUnchecked(arr,0,length,rand,m);
+      }
+    }  
+    public void build(Integer[] arr,int offset,int length,Random rand,int m)
+    {
+      if(arr==null)
+      {
+        throw new NullPointerException("arr cannot be null");
+      }
+      if(offset<0 || length<0 || offset+length>arr.length)
+      {
+        throw new ArrayIndexOutOfBoundsException("offset = "+offset+"; length="+length+"; arr.length="+arr.length);
+      }
+      if(length!=0)
+      {
+        buildUnchecked(arr,offset,length,rand,m);
+      }
+    }
+    @Override
+    public String toString()
+    {
+      return "IntegerArrayBuilder."+this.name();
     }
   }
   public static boolean isEqual(boolean l,boolean r)
