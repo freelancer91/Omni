@@ -160,12 +160,51 @@ static void uncheckedReverseCopy(ARR[] src,int srcOffset,ARR[] dst,int dstOffset
   //assert dstOffset+length<=dst.length;
   for(dst[dstOffset]=(src[length+=(srcOffset-1)]);length!=srcOffset;dst[++dstOffset]=(src[--length])){}
 }
+static void uncheckedSelfCopy(ARR[] src,int srcOffset,int dstOffset,int length)
+{
+  //assert srcOffset>=0;
+  //assert dstOffset>=0;
+  //assert length>0;
+  //assert srcOffset+length<=src.length;
+  //assert dstOffset+length<=dst.length;
+  switch(length)
+  {
+  case 5:
+    src[dstOffset]=src[srcOffset];
+    src[dstOffset+1]=src[srcOffset+1];
+    src[dstOffset+2]=src[srcOffset+2];
+    src[dstOffset+3]=src[srcOffset+3];
+    src[dstOffset+4]=src[srcOffset+4];
+    return;
+  case 4:
+    src[dstOffset]=src[srcOffset];
+    src[dstOffset+1]=src[srcOffset+1];
+    src[dstOffset+2]=src[srcOffset+2];
+    src[dstOffset+3]=src[srcOffset+3];
+    return;
+  case 3:
+    src[dstOffset]=src[srcOffset];
+    src[dstOffset+1]=src[srcOffset+1];
+    src[dstOffset+2]=src[srcOffset+2];
+    return;
+  case 2:
+    src[dstOffset]=src[srcOffset];
+    src[dstOffset+1]=src[srcOffset+1];
+    return;
+  case 1:
+    src[dstOffset]=src[srcOffset];
+    return;
+  default:
+    System.arraycopy(src,srcOffset,src,dstOffset,length);
+  }
+}
 #IFSWITCH ARR==Object
 static <SRC extends DST,DST> void uncheckedCopy(SRC[] src,int srcOffset,DST[] dst,int dstOffset,int length)
 #ELSE
 static void uncheckedCopy(ARR[] src,int srcOffset,ARR[] dst,int dstOffset,int length)
 #ENDIF
 {
+  assert src!=dst || (length>5||dstOffset+length<=srcOffset||srcOffset<=dstOffset);
   //assert srcOffset>=0;
   //assert dstOffset>=0;
   //assert length>0;

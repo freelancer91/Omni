@@ -1,12 +1,10 @@
 #TYPEDEF OfGeneric
 package omni.util;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import java.util.Random;
 import java.util.Arrays;
-import java.util.Objects;
-//TODO uncomment when the module bug is fixed
-//import java.util.Comparator;
+import java.util.Comparator;
+import java.util.stream.LongStream;
 import java.util.function.IntBinaryOperator;
 import omni.function.BooleanComparator;
 import omni.function.ByteComparator;
@@ -15,20 +13,25 @@ import omni.function.ShortComparator;
 import omni.function.LongComparator;
 import omni.function.FloatComparator;
 import omni.function.DoubleComparator;
-import java.util.function.Supplier;
-import java.util.function.BooleanSupplier;
-import java.util.function.IntSupplier;
-import java.util.function.LongSupplier;
-import java.util.function.DoubleSupplier;
-import omni.function.ByteSupplier;
-import omni.function.CharSupplier;
-import omni.function.ShortSupplier;
-import omni.function.FloatSupplier;
 public class SortUtilTest
 {
-  /*//TODO uncomment when they fix the module bug in eclipse
-  #MACRO GetComparator<Ascending,String>(String,Comparator<String>)
-  */
+  
+  #MACRO Fields<true>()
+
+#MACRODEF Fields<LONGRUN>()
+#IFSWITCH LONGRUN==true
+private static final int[] lengths=new int[]{34};
+//private static final int[] lengths=new int[]{2,3,5,8,13,21};
+//private static final int[] lengths=new int[]{2, 3, 5, 8, 13, 21, 34, 55, 100, 1000, 10000, 100000, 1000000};
+private static final long[] randSeeds=new long[]{666L,0xC0FFEEL,999L};
+#ELSE
+private static final int[] lengths=new int[]{2, 3, 21, 55, 1000, 10000};
+private static final long[] randSeeds=new long[]{666};
+#ENDIF
+
+#ENDDEF
+
+  #MACRO GetComparator<Ascending,Integer>(Integer,Comparator<Integer>)
   #MACRO GetComparator<Ascending,boolean>(Boolean,BooleanComparator)
   #MACRO GetComparator<Ascending,byte>(Byte,ByteComparator)
   #MACRO GetComparator<Ascending,char>(Character,CharComparator)
@@ -37,9 +40,7 @@ public class SortUtilTest
   #MACRO GetComparator<Ascending,long>(Long,LongComparator)
   #MACRO GetComparator<Ascending,float>(Float,FloatComparator)
   #MACRO GetComparator<Ascending,double>(Double,DoubleComparator)
-  /*//TODO uncomment when they fix the module bug in eclipse
-  #MACRO GetComparator<Unsorted,String>(String,Comparator<String>)
-  */
+  #MACRO GetComparator<Unsorted,Integer>(Integer,Comparator<Integer>)
   #MACRO GetComparator<Unsorted,boolean>(Boolean,BooleanComparator)
   #MACRO GetComparator<Unsorted,byte>(Byte,ByteComparator)
   #MACRO GetComparator<Unsorted,char>(Character,CharComparator)
@@ -48,9 +49,7 @@ public class SortUtilTest
   #MACRO GetComparator<Unsorted,long>(Long,LongComparator)
   #MACRO GetComparator<Unsorted,float>(Float,FloatComparator)
   #MACRO GetComparator<Unsorted,double>(Double,DoubleComparator)
-  /*//TODO uncomment when they fix the module bug in eclipse
-  #MACRO GetComparator<Descending,String>(String,Comparator<String>)
-  */
+  #MACRO GetComparator<Descending,Integer>(Integer,Comparator<Integer>)
   #MACRO GetComparator<Descending,boolean>(Boolean,BooleanComparator)
   #MACRO GetComparator<Descending,byte>(Byte,ByteComparator)
   #MACRO GetComparator<Descending,char>(Character,CharComparator)
@@ -83,31 +82,44 @@ private static COMPARATORTYPE getSORTTYPEARRTYPEComparator()
 }
 #ENDDEF
 
-  /*//TODO uncomment when they fix the module bug in eclipse
-  #MACRO IsSorted<String,sort>(String,Ref)
-  */
-  #MACRO IsSorted<boolean,sort>(Boolean,Boolean)
-  #MACRO IsSorted<byte,sort>(Byte,Byte)
-  #MACRO IsSorted<char,sort>(Character,Char)
-  #MACRO IsSorted<short,sort>(Short,Short)
-  #MACRO IsSorted<int,sort>(Integer,Int)
-  #MACRO IsSorted<long,sort>(Long,Long)
-  #MACRO IsSorted<float,sort>(Float,Float)
-  #MACRO IsSorted<double,sort>(Double,Double)
-  /*//TODO uncomment when they fix the module bug in eclipse
-  #MACRO IsSorted<String,reverseSort>(String,Ref)
-  */
-  #MACRO IsSorted<boolean,reverseSort>(Boolean,Boolean)
-  #MACRO IsSorted<byte,reverseSort>(Byte,Byte)
-  #MACRO IsSorted<char,reverseSort>(Character,Char)
-  #MACRO IsSorted<short,reverseSort>(Short,Short)
-  #MACRO IsSorted<int,reverseSort>(Integer,Int)
-  #MACRO IsSorted<long,reverseSort>(Long,Long)
-  #MACRO IsSorted<float,reverseSort>(Float,Float)
-  #MACRO IsSorted<double,reverseSort>(Double,Double)
+  #MACRO IsSortedMethods<false>()
+
+#MACRODEF IsSortedMethods<PARALLEL>()
+#MACRO IsSorted<Integer,Ascending>(Integer,Ref)
+#MACRO IsSorted<boolean,Ascending>(Boolean,Boolean)
+#MACRO IsSorted<byte,Ascending>(Byte,Byte)
+#MACRO IsSorted<char,Ascending>(Character,Char)
+#MACRO IsSorted<short,Ascending>(Short,Short)
+#MACRO IsSorted<int,Ascending>(Integer,Int)
+#MACRO IsSorted<long,Ascending>(Long,Long)
+#MACRO IsSorted<float,Ascending>(Float,Float)
+#MACRO IsSorted<double,Ascending>(Double,Double)
+#MACRO IsSorted<Integer,Descending>(Integer,Ref)
+#MACRO IsSorted<boolean,Descending>(Boolean,Boolean)
+#MACRO IsSorted<byte,Descending>(Byte,Byte)
+#MACRO IsSorted<char,Descending>(Character,Char)
+#MACRO IsSorted<short,Descending>(Short,Short)
+#MACRO IsSorted<int,Descending>(Integer,Int)
+#MACRO IsSorted<long,Descending>(Long,Long)
+#MACRO IsSorted<float,Descending>(Float,Float)
+#MACRO IsSorted<double,Descending>(Double,Double)
+#MACRO IsSorted<Integer>(Comparator<? super Integer>,compare,Integer)
+#MACRO IsSorted<boolean>(BooleanComparator,compare,Boolean)
+#MACRO IsSorted<byte>(ByteComparator,compare,Byte)
+#MACRO IsSorted<char>(CharComparator,compare,Character)
+#MACRO IsSorted<short>(ShortComparator,compare,Short)
+#MACRO IsSorted<int>(IntBinaryOperator,applyAsInt,Integer)
+#MACRO IsSorted<long>(LongComparator,compare,Long)
+#MACRO IsSorted<float>(FloatComparator,compare,Float)
+#MACRO IsSorted<double>(DoubleComparator,compare,Double)
+#ENDDEF
+
+
 #MACRODEF IsSorted<ARRTYPE,SORTTYPE>(BOXEDTYPE,CLASSPREFIX)
 private static void isSortedSORTTYPE(ARRTYPE[] arr,ARRTYPE[] copy)
 {
+  Thread stockSorterThread=new Thread(()->
+  {
 #IFSWITCH ARRTYPE==boolean
   BOXEDTYPE[] boxedCopy=new BOXEDTYPE[copy.length];
   ArrCopy.uncheckedCopy(copy,0,boxedCopy,0,copy.length);
@@ -116,36 +128,46 @@ private static void isSortedSORTTYPE(ARRTYPE[] arr,ARRTYPE[] copy)
 #ELSE
   Arrays.sort(copy,0,copy.length);
 #ENDIF
-#IFSWITCH SORTTYPE==reverseSort
+#IFSWITCH SORTTYPE==Descending
   OmniArray.OfCLASSPREFIX.reverseRange(copy,0,copy.length-1);
 #ENDIF
-  for(int i=0;i<copy.length;++i)
-  {
-#IFSWITCH ARRTYPE==boolean,byte,char,short,int long
-    Assert.assertTrue(arr[i]==copy[i]);
-#ELSEIFSWITCH ARRTYPE==float,double
-    Assert.assertTrue(TypeUtil.ARRTYPEEquals(arr[i],copy[i]));
+  });
+  stockSorterThread.start();
+#IFSWITCH ARRTYPE==double,float,long,int,short,char,byte,boolean
+  #IFSWITCH SORTTYPE==Ascending
+  SortUtil.uncheckedsort(arr,0,arr.length-1);
+  #ELSE
+  SortUtil.uncheckedreverseSort(arr,0,arr.length-1);
+  #ENDIF
 #ELSE
-    Assert.assertTrue(Objects.equals(arr[i],copy[i]));
+  #IFSWITCH SORTTYPE==Ascending
+  SortUtil.sortObjectTimSort.uncheckedsort(arr,0,arr.length);
+  #ELSE
+  SortUtil.reverseSortObjectTimSort.uncheckedsort(arr,0,arr.length);
+  #ENDIF
 #ENDIF
+  try
+  {
+    stockSorterThread.join();
   }
+  catch(InterruptedException e)
+  {
+    throw new AssertionError(e);
+  }
+  #IFSWITCH PARALLEL==true
+  JunitUtil.uncheckedparallelassertarraysAreEqual(arr,0,copy,0,copy.length);
+  #ELSE
+  JunitUtil.uncheckedassertarraysAreEqual(arr,0,copy,0,copy.length);
+  #ENDIF
 }
 #ENDDEF
-  /*//TODO uncomment when they fix the module bug in eclipse
-  #MACRO IsSorted<String>(Comparator<? super String>,compare,String)
-  */
-  #MACRO IsSorted<boolean>(BooleanComparator,compare,Boolean)
-  #MACRO IsSorted<byte>(ByteComparator,compare,Byte)
-  #MACRO IsSorted<char>(CharComparator,compare,Character)
-  #MACRO IsSorted<short>(ShortComparator,compare,Short)
-  #MACRO IsSorted<int>(IntBinaryOperator,applyAsInt,Integer)
-  #MACRO IsSorted<long>(LongComparator,compare,Long)
-  #MACRO IsSorted<float>(FloatComparator,compare,Float)
-  #MACRO IsSorted<double>(DoubleComparator,compare,Double)
+ 
 #MACRODEF IsSorted<ARRTYPE>(COMPARATORTYPE,COMPARATORMETHOD,BOXEDTYPE)
 private static void isSorted(ARRTYPE[] arr,ARRTYPE[] copy,COMPARATORTYPE sorter)
 {
-#IFSWITCH ARRTYPE==String
+  Thread stockSorterThread=new Thread(()->
+  {
+#IFSWITCH ARRTYPE==Integer
   Arrays.sort(copy,0,copy.length,sorter);
 #ELSE
   BOXEDTYPE[] boxedCopy=new BOXEDTYPE[copy.length];
@@ -153,834 +175,260 @@ private static void isSorted(ARRTYPE[] arr,ARRTYPE[] copy,COMPARATORTYPE sorter)
   Arrays.sort(boxedCopy,0,copy.length,sorter::COMPARATORMETHOD);
   ArrCopy.uncheckedCopy(boxedCopy,0,copy,0,copy.length);
 #ENDIF
-  for(int i=0;i<copy.length;++i)
-  {
-  #IFSWITCH ARRTYPE==boolean,byte,char,short,int long
-    Assert.assertTrue(arr[i]==copy[i]);
-  #ELSEIFSWITCH ARRTYPE==float,double
-    Assert.assertTrue(TypeUtil.ARRTYPEEquals(arr[i],copy[i]));
-  #ELSE
-    Assert.assertTrue(Objects.equals(arr[i],copy[i]));
-  #ENDIF
-  }
-}
-#ENDDEF
-
-  #MACRO GetRandom<boolean>()
-  #MACRO GetRandom<byte>()
-  #MACRO GetRandom<char>()
-  #MACRO GetRandom<short>()
-  #MACRO GetRandom<int>()
-  #MACRO GetRandom<long>()
-  #MACRO GetRandom<float>()
-  #MACRO GetRandom<double>()
-  /*//TODO uncomment when the eclipse module bug is fixed
-  #MACRO GetRandom<String>()
-  */
-#MACRODEF GetRandom<ARRTYPE>()
-private static ARRTYPE getRandARRTYPE(Random rand)
-{
-#IFSWITCH ARRTYPE==String
-  return Long.toString(rand.nextLong());
+  });
+  stockSorterThread.start();
+#IFSWITCH ARRTYPE==Integer
+  SortUtil.comparatorSortObjectTimSort.uncheckedsort(arr,0,arr.length,sorter);
 #ELSEIFSWITCH ARRTYPE==boolean
-  return rand.nextBoolean();
-#ELSEIFSWITCH ARRTYPE==byte,char,short,int,long
-  return (ARRTYPE)rand.nextLong();
-#ELSEIFSWITCH ARRTYPE==float
-  return rand.nextFloat();
-#ELSEIFSWITCH ARRTYPE==double
-  return rand.nextDouble();
+  SortUtil.uncheckedcomparatorSort(arr,0,arr.length-1,sorter);
 #ELSE
-ERROR unknown array type ARRTYPE
+  SortUtil.comparatorSortARRTYPETimSort.uncheckedsort(arr,0,arr.length,sorter);
 #ENDIF
+  try
+  {
+    stockSorterThread.join();
+  }
+  catch(InterruptedException e)
+  {
+    throw new AssertionError(e);
+  }
+  #IFSWITCH PARALLEL==true
+  JunitUtil.uncheckedparallelassertarraysAreEqual(arr,0,copy,0,copy.length);
+  #ELSE
+  JunitUtil.uncheckedassertarraysAreEqual(arr,0,copy,0,copy.length);
+  #ENDIF
 }
 #ENDDEF
 
-  #MACRO ConvertMethods<boolean>()
-  #MACRO ConvertMethods<byte>()
-  #MACRO ConvertMethods<char>()
-  #MACRO ConvertMethods<short>()
-  #MACRO ConvertMethods<int>()
-  #MACRO ConvertMethods<long>()
-  #MACRO ConvertMethods<float>()
-  #MACRO ConvertMethods<double>()
-  /*//TODO uncomment when the eclipse module bug is fixed
-  #MACRO ConvertMethods<String>()
-  */
-#MACRODEF ConvertMethods<ARRTYPE>()
-private static ARRTYPE convertToARRTYPE(int val)
+  #MACRO BuilderMethods<boolean>()
+  #MACRO BuilderMethods<byte>()
+  #MACRO BuilderMethods<char>()
+  #MACRO BuilderMethods<short>()
+  #MACRO BuilderMethods<int>()
+  #MACRO BuilderMethods<long>()
+  #MACRO BuilderMethods<float>()
+  #MACRO BuilderMethods<double>()
+  #MACRO BuilderMethods<Integer>()
+#MACRODEF BuilderMethods<ARRTYPE>()
+private static int getMLo(JunitUtil.ARRTYPEArrayBuilder builder)
 {
-#IFSWITCH ARRTYPE==String
-  return Integer.toString(val);
-#ELSEIFSWITCH ARRTYPE==double,float,long,int,short,char,byte
-  return (ARRTYPE)val;
-#ELSE
-  return val!=0;
+  switch(builder)
+  {
+    case AllEquals:
+      return 0;
+#IFNOTSWITCH ARRTYPE==boolean
+    case MergeAscending:
+    case MergeDescending:
+      return 65;
 #ENDIF
+    default:
+      return 1;
+  }
 }
-#ENDDEF
-
-
-
-  #MACRO ArrayBuilders<boolean>()
-  #MACRO ArrayBuilders<byte>()
-  #MACRO ArrayBuilders<char>()
-  #MACRO ArrayBuilders<short>()
-  #MACRO ArrayBuilders<int>()
-  #MACRO ArrayBuilders<long>()
-  #MACRO ArrayBuilders<float>()
-  #MACRO ArrayBuilders<double>()
-  /*//TODO uncomment when the eclipse module bug is fixed
-  #MACRO ArrayBuilders<String>()
-  */
-  
-
-#MACRODEF ArrayBuilders<ARRTYPE>()
-private static enum ArrayBuilderARRTYPE
+private static int getMHi(JunitUtil.ARRTYPEArrayBuilder builder,int arrLength)
 {
-  RANDOM
+  switch(builder)
   {
-    void build(ARRTYPE[] arr,int m,Random rand)
-    {
-      for(int i=0;i<arr.length;++i)
-      {
-        arr[i]=getRandARRTYPE(rand);
-      }
-    }
-    int getNumRepetitions()
-    {
-      return 1000;
-    }
-    int getMLo()
-    {
-      return 1;
-    }
-    int getMHi(int arrLength)
-    {
-      return 1;
-    }
-    int incrementM(int m)
-    {
-      return m+1;
-    }
-  },
-  ASCENDING
-  {
-    void build(ARRTYPE[] arr,int m,Random rand)
-    {
-#IFSWITCH ARRTYPE==boolean
-      int pivotPoint=(arr.length/4)+rand.nextInt(arr.length/2);
-      for(int i=0;i<pivotPoint;++i)
-      {
-        arr[i]=false;
-      }
-      for(int i=pivotPoint;i<arr.length;++i)
-      {
-        arr[i]=true;
-      }
-#ELSE
-      for(int i=0;i<arr.length;++i)
-      {
-        arr[i]=convertToARRTYPE(m+i);
-      }
-#ENDIF
-    }
-    int getNumRepetitions()
-    {
-#IFSWITCH ARRTYPE==boolean
-      return 100;
-#ELSE
-      return 1;
-#ENDIF
-    }
-    int getMLo()
-    {
-      return 1;
-    }
-    int getMHi(int arrLength)
-    {
-#IFSWITCH ARRTYPE==boolean
-      return 1;
-#ELSE
+#IFNOTSWITCH ARRTYPE==boolean
+    case Ascending:
+    case Descending:
+    case Saw:
+    case Repeated:
+    case Duplicated:
+    case OrganPipes:
+    case Stagger:
+    case Plateau:
       return (2*arrLength)-1;
-#ENDIF
-    }
-    int incrementM(int m)
-    {
-#IFSWITCH ARRTYPE==boolean
-      return m+1;
-#ELSE
-      return m*2;
-#ENDIF
-    }
-  },
-  Descending
-  {
-    void build(ARRTYPE[] arr,int m,Random rand)
-    {
-#IFSWITCH ARRTYPE==boolean
-      int pivotPoint=(arr.length/4)+rand.nextInt(arr.length/2);
-      for(int i=0;i<pivotPoint;++i)
-      {
-        arr[i]=true;
-      }
-      for(int i=pivotPoint;i<arr.length;++i)
-      {
-        arr[i]=false;
-      }
-#ELSE
-      for(int i=0;i<arr.length;++i)
-      {
-        arr[i]=convertToARRTYPE(arr.length-m-i);
-      }
-#ENDIF
-    }
-
-    int getNumRepetitions()
-    {
-#IFSWITCH ARRTYPE==boolean
-      return 100;
-#ELSE
-      return 1;
-#ENDIF
-    }
-    int getMLo()
-    {
-      return 1;
-    }
-    int getMHi(int arrLength)
-    {
-#IFSWITCH ARRTYPE==boolean
-      return 1;
-#ELSE
-      return (2*arrLength)-1;
-#ENDIF
-    }
-    int incrementM(int m)
-    {
-#IFSWITCH ARRTYPE==boolean
-      return m+1;
-#ELSE
-      return m*2;
-#ENDIF
-    }
-
-  },
-  ALL_EQUAL
-  {
-    void build(ARRTYPE[] arr,int m,Random rand)
-    {
-      for(int i=0;i<arr.length;++i)
-      {
-        arr[i]=convertToARRTYPE(m);
-      }
-    }
-    int getNumRepetitions()
-    {
-      return 1;
-    }
-    int getMLo()
-    {
+    case AllEquals:
       return 0;
-    }
-    int getMHi(int arrLength)
-    {
-#IFSWITCH ARRTYPE==boolean
-      return 1;
-#ELSE
-      return 0;
-#ENDIF
-    }
-    int incrementM(int m)
-    {
-      return m+1;
-    }
-  }
-#IFNOTSWITCH ARRTYPE==boolean,byte
- 
-  ,MERGE_ASCENDING
-  {
-    void build(ARRTYPE[] arr,int m,Random rand)
-    {
-      int period=arr.length/m;
-      int v=1;
-      int i=0;
-      for(int k=0;k<m;++k)
-      {
-        v=1;
-        for(int p=0;p<period;++p)
-        {
-          arr[i++]=convertToARRTYPE(v++);
-        }
-      }
-      for(int j=1;j<arr.length-1;j++)
-      {
-        arr[j]=convertToARRTYPE(v++);
-
-      }
-    }
-    int getNumRepetitions()
-    {
-      return 1;
-    }
-    int getMLo()
-    {
-      return 65;
-    }
-    int getMHi(int arrLength)
-    {
+    case MergeAscending:
+    case MergeDescending:
       return 69;
-    }
-    int incrementM(int m)
-    {
-      return m+1;
-    }
-  }
-  ,MERGE_DESCENDING
-  {
-    void build(ARRTYPE[] arr,int m,Random rand)
-    {
-      int period=arr.length/m;
-      int v=-1;
-      int i=0;
-      for(int k=0;k<m;++k)
-      {
-        v=-1;
-        for(int p=0;p<period;++p)
-        {
-          arr[i++]=convertToARRTYPE(v--);
-        }
-      }
-      for(int j=1;j<arr.length-1;j++)
-      {
-        arr[j]=convertToARRTYPE(v--);
-      }
-    }
-    int getNumRepetitions()
-    {
-      return 1;
-    }
-    int getMLo()
-    {
-      return 65;
-    }
-    int getMHi(int arrLength)
-    {
-      return 69;
-    }
-    int incrementM(int m)
-    {
-      return m+1;
-    }
-  }
-  ,SAW
-  {
-    void build(ARRTYPE[] arr,int m,Random rand)
-    {
-      int incCount=1;
-      int decCount=arr.length;
-      int i=0;
-      int period=m--;
-      for(;;)
-      {
-        for(int k=1;k<=period;k++)
-        {
-          if(i>=arr.length)
-          {
-            return;
-          }
-          arr[i++]=convertToARRTYPE(incCount++);
-        }
-        period+=m;
-        for(int k=1;k<=period;k++)
-        {
-          if(i>=arr.length)
-          {
-            return;
-          }
-          arr[i++]=convertToARRTYPE(decCount--);
-        }
-        period+=m;
-      }
-    }
-    int getNumRepetitions()
-    {
-      return 1;
-    }
-    int getMLo()
-    {
-      return 1;
-    }
-    int getMHi(int arrLength)
-    {
-      return (2*arrLength)-1;
-    }
-    int incrementM(int m)
-    {
-      return m*2;
-    }
-  }
-  ,SORTED_REPEATED
-  {
-    void build(ARRTYPE[] arr,int m,Random rand)
-    {
-      int period=arr.length/m;
-      int i=0;
-      int k=0;
-      for(;;)
-      {
-        for(int t=1;t<=period;++t)
-        {
-          if(i>=arr.length)
-          {
-            return;
-          }
-          arr[i++]=convertToARRTYPE(k);
-        }
-        if(i>=arr.length)
-        {
-          return;
-        }
-        ++k;
-      }
-    }
-    int getNumRepetitions()
-    {
-      return 1;
-    }
-    int getMLo()
-    {
-      return 1;
-    }
-    int getMHi(int arrLength)
-    {
+    case SortedRepeated:
+    case SortedOrganPipes:
       return Math.min(arrLength,7);
-    }
-    int incrementM(int m)
-    {
-      return m+1;
-    }
-  }
-  //FIXME REPEATED and DUPLICATED cause an AIOB exception
-  ,REPEATED
-  {
-    void build(ARRTYPE[] arr, int m, Random rand)
-    {
-      for(int i=0;i<arr.length;++i)
-      {
-        arr[i]=convertToARRTYPE(i%m);
-      }
-    }
-    int getNumRepetitions()
-    {
-      return 1;
-    }
-    int getMLo()
-    {
-      return 1;
-    }
-    int getMHi(int arrLength)
-    {
-      return (2*arrLength)-1;
-    }
-    int incrementM(int m)
-    {
-      return m*2;
-    }
-  }
-  ,DUPLICATED
-  {
-    void build(ARRTYPE[] arr, int m, Random rand)
-    {
-      for (int i = 0; i < arr.length; i++)
-      {
-        arr[i] = convertToARRTYPE(rand.nextInt(m));
-      }
-    }
-    int getNumRepetitions()
-    {
-      return 1000;
-    }
-    int getMLo()
-    {
-      return 1;
-    }
-    int getMHi(int arrLength)
-    {
-      return (2*arrLength)-1;
-    }
-    int incrementM(int m)
-    {
-      return m*2;
-    }
-  }
-  ,SORTED_ORGAN_PIPES
-  {
-    void build(ARRTYPE[] arr,int m,Random rand)
-    {
-      int i=0;
-      int k=m;
-      for(;;)
-      {
-        for(int t=1;t<=m;++t)
-        {
-          if(i>=arr.length)
-          {
-            return;
-          }
-          arr[i++]=convertToARRTYPE(k);
-        }
-      }
-    }
-    int getNumRepetitions()
-    {
-      return 1;
-    }
-    int getMLo()
-    {
-      return 1;
-    }
-    int getMHi(int arrLength)
-    {
-      return Math.min(arrLength,7);
-    }
-    int incrementM(int m)
-    {
-      return m+1;
-    }
-  }
-  ,ORGAN_PIPES
-  {
-    void build(ARRTYPE[] arr, int m, Random rand)
-    {
-      int middle = arr.length / (m + 1);
-      for (int i = 0; i < middle; i++) {
-          arr[i] = convertToARRTYPE(i);
-      }
-      for (int i = middle; i < arr.length; i++) {
-          arr[i] = convertToARRTYPE(arr.length - i - 1);
-      }
-    }
-    int getNumRepetitions()
-    {
-      return 1;
-    }
-    int getMLo()
-    {
-      return 1;
-    }
-    int getMHi(int arrLength)
-    {
-      return (2*arrLength)-1;
-    }
-    int incrementM(int m)
-    {
-      return m*2;
-    }
-  }
-  ,STAGGER
-  {
-    void build(ARRTYPE[] arr, int m, Random rand) {
-      for (int i = 0; i < arr.length; i++) {
-        arr[i] = convertToARRTYPE((i * m + i) % arr.length);
-      }
-      
-    }
-    int getNumRepetitions()
-    {
-      return 1;
-    }
-    int getMLo()
-    {
-      return 1;
-    }
-    int getMHi(int arrLength)
-    {
-      return (2*arrLength)-1;
-    }
-    int incrementM(int m)
-    {
-      return m*2;
-    }
-  }
-  ,PLATEAU
-  {
-    void build(ARRTYPE[] arr, int m, Random rand) {
-      for (int i = 0; i < arr.length; i++) {
-        arr[i] = convertToARRTYPE(Math.min(i, m));
-      }
-    }
-    int getNumRepetitions()
-    {
-      return 1;
-    }
-    int getMLo()
-    {
-      return 1;
-    }
-    int getMHi(int arrLength)
-    {
-      return (2*arrLength)-1;
-    }
-    int incrementM(int m)
-    {
-      return m*2;
-    }
-  }
-  ,SHUFFLE
-  {
-    void build(ARRTYPE[] arr, int m, Random rand) {
-      int x = 0, y = 0;
-      for (int i = 0; i < arr.length; i++) {
-        arr[i] = convertToARRTYPE(rand.nextBoolean() ? (x += 2) : (y += 2));
-      }
-    }
-    int getNumRepetitions()
-    {
-      return 1000;
-    }
-    int getMLo()
-    {
-      return 1;
-    }
-    int getMHi(int arrLength)
-    {
-      return 1;
-    }
-    int incrementM(int m)
-    {
-      return m+1;
-    }
-  }
 #ENDIF
-  ;
-
-  abstract void build(ARRTYPE[] arr,int m,Random rand); 
-  abstract int getNumRepetitions();
-  abstract int getMLo();
-  abstract int getMHi(int arrLength);
-  abstract int incrementM(int m);
+    default:
+      return 1;
+  }
 }
-
+private static int getNumReps(JunitUtil.ARRTYPEArrayBuilder builder,int arrLength)
+{
+#IFSWITCH ARRTYPE==char,short
+  if(builder.isRandomized())
+  {
+    if(arrLength>3201 || arrLength<47)
+      {
+        return 1;
+      }
+      return 7;
+  }
+#ELSEIFSWITCH ARRTYPE==float,double
+  if(builder==JunitUtil.ARRTYPEArrayBuilder.WithNaNsAndZeros)
+  {
+    return 2;
+  }
+#ENDIF
+  return 1;
+}
+private static int incrementM(JunitUtil.ARRTYPEArrayBuilder builder,int m)
+{
+  switch(builder)
+  {
+#IFNOTSWITCH ARRTYPE==boolean
+    case Ascending:
+    case Descending:
+    case Saw:
+    case Repeated:
+    case Duplicated:
+    case OrganPipes:
+    case Stagger:
+    case Plateau:
+      return m*2;
+#ENDIF
+    default:
+      return m+1;
+  }
+}
 #ENDDEF
+
+  //#MACRO TestMethods<boolean,comparatorSort,Ascending>()
+  //#MACRO TestMethods<boolean,comparatorSort,Descending>()
+
+/*
+  #MACRO TestMethods<boolean,nonComparatorSort,Ascending>()
+  #MACRO TestMethods<byte,nonComparatorSort,Ascending>()
+  #MACRO TestMethods<char,nonComparatorSort,Ascending>()
+  #MACRO TestMethods<short,nonComparatorSort,Ascending>()
+  #MACRO TestMethods<int,nonComparatorSort,Ascending>()
+  #MACRO TestMethods<long,nonComparatorSort,Ascending>()
+  #MACRO TestMethods<float,nonComparatorSort,Ascending>()
+  #MACRO TestMethods<double,nonComparatorSort,Ascending>()
+*/
+/*
+  #MACRO TestMethods<boolean,nonComparatorSort,Descending>()
+  #MACRO TestMethods<char,nonComparatorSort,Descending>()
+  #MACRO TestMethods<short,nonComparatorSort,Descending>()
+  #MACRO TestMethods<int,nonComparatorSort,Descending>()
+  #MACRO TestMethods<long,nonComparatorSort,Descending>()
+  #MACRO TestMethods<float,nonComparatorSort,Descending>()
+  #MACRO TestMethods<double,nonComparatorSort,Descending>()
+*/
+/*
+  #MACRO TestMethods<boolean,comparatorSort,Unsorted>()
+  #MACRO TestMethods<byte,comparatorSort,Unsorted>()
+  #MACRO TestMethods<char,comparatorSort,Unsorted>()
+  #MACRO TestMethods<short,comparatorSort,Unsorted>()
+  #MACRO TestMethods<int,comparatorSort,Unsorted>()
+  #MACRO TestMethods<long,comparatorSort,Unsorted>()
+  #MACRO TestMethods<float,comparatorSort,Unsorted>()
+  #MACRO TestMethods<double,comparatorSort,Unsorted>()
+  #MACRO TestMethods<Integer,comparatorSort,Unsorted>()
+*/
+
  
 
+  #MACRO TestMethods<byte,comparatorSort,Ascending>()
+/*
+  #MACRO TestMethods<char,comparatorSort,Ascending>()
+  #MACRO TestMethods<short,comparatorSort,Ascending>()
+  #MACRO TestMethods<int,comparatorSort,Ascending>()
+  #MACRO TestMethods<long,comparatorSort,Ascending>()
+  #MACRO TestMethods<float,comparatorSort,Ascending>()
+  #MACRO TestMethods<double,comparatorSort,Ascending>()
+  #MACRO TestMethods<Integer,comparatorSort,Ascending>()
+*/
 
-  #MACRO TestNonComparatorSortHelper<sort,boolean>()
-  #MACRO TestNonComparatorSortHelper<sort,byte>()
-  #MACRO TestNonComparatorSortHelper<sort,char>()
-  #MACRO TestNonComparatorSortHelper<sort,short>()
-  #MACRO TestNonComparatorSortHelper<sort,int>()
-  #MACRO TestNonComparatorSortHelper<sort,long>()
-  #MACRO TestNonComparatorSortHelper<sort,float>()
-  #MACRO TestNonComparatorSortHelper<sort,double>()
-  /*/TODO uncomment when the eclipse module bug is fixed
-  #MACRO TestNonComparatorSortHelper<sort,String>()
-  */
-  
-  #MACRO TestNonComparatorSortHelper<reverseSort,boolean>()
-  #MACRO TestNonComparatorSortHelper<reverseSort,byte>()
-  #MACRO TestNonComparatorSortHelper<reverseSort,char>()
-  #MACRO TestNonComparatorSortHelper<reverseSort,short>()
-  #MACRO TestNonComparatorSortHelper<reverseSort,int>()
-  #MACRO TestNonComparatorSortHelper<reverseSort,long>()
-  #MACRO TestNonComparatorSortHelper<reverseSort,float>()
-  #MACRO TestNonComparatorSortHelper<reverseSort,double>()
-  /*/TODO uncomment when the eclipse module bug is fixed
-  #MACRO TestNonComparatorSortHelper<reverseSort,String>()
-  */
+/*
+  #MACRO TestMethods<byte,comparatorSort,Descending>()
+  #MACRO TestMethods<char,comparatorSort,Descending>()
+  #MACRO TestMethods<short,comparatorSort,Descending>()
+  #MACRO TestMethods<int,comparatorSort,Descending>()
+  #MACRO TestMethods<long,comparatorSort,Descending>()
+  #MACRO TestMethods<float,comparatorSort,Descending>()
+  #MACRO TestMethods<double,comparatorSort,Descending>()
+  #MACRO TestMethods<Integer,comparatorSort,Descending>()
+*/
+/*
+  #MACRO TestMethods<Integer,nonComparatorSort,Ascending>()
+  #MACRO TestMethods<Integer,nonComparatorSort,Descending>()
+*/
 
-#MACRODEF TestNonComparatorSortHelper<SORTTYPE,ARRTYPE>()
-private static void testuncheckedSORTTYPEHelperARRTYPE(int arrLength,Random rand)
+#MACRODEF TestMethods<ARRTYPE,SORTTYPE,DIRECTION>()
+private static void testARRTYPEDIRECTIONSORTTYPEHelper(JunitUtil.ARRTYPEArrayBuilder builder,int arrLength,long randSeed)
 {
   ARRTYPE[] golden=new ARRTYPE[arrLength];
-  for(ArrayBuilderARRTYPE builder:ArrayBuilderARRTYPE.values())
+  ARRTYPE[] test=new ARRTYPE[arrLength];
+  Random rand=new Random(randSeed);
+#IFSWITCH SORTTYPE==comparatorSort
+  var sorter=getDIRECTIONARRTYPEComparator();
+#ENDIF
+  for(int m=getMLo(builder),mHi=getMHi(builder,arrLength),numReps=getNumReps(builder,arrLength);m<=mHi;m=incrementM(builder,m))
   {
-    
-    for(int m=builder.getMLo(),mHi=builder.getMHi(arrLength);m<=mHi;m=builder.incrementM(m))
+    for(int i=0;i<numReps;++i)
     {
-      for(int i=0,numReps=builder.getNumRepetitions();i<numReps;++i)
-      {
-        builder.build(golden,m,rand);
-        ARRTYPE[] test=golden.clone();
-        SortUtil.uncheckedSORTTYPE(test,0,arrLength-1);
-        isSortedSORTTYPE(test,golden);
-      }
-      
+      builder.build(golden,rand,m);
+      ArrCopy.uncheckedCopy(golden,0,test,0,arrLength);
+#IFSWITCH SORTTYPE==comparatorSort
+      isSorted(test,golden,sorter);
+#ELSE
+      isSortedDIRECTION(test,golden);
+#ENDIF
     }
+  }
+}
+//#MACRO TestMethod<Randomized>()
+//#MACRO TestMethod<Ascending>()
+//#MACRO TestMethod<Descending>()
+//#MACRO TestMethod<AllEquals>()
+#IFNOTSWITCH ARRTYPE==boolean
+//#MACRO TestMethod<MergeAscending>()
+//#MACRO TestMethod<MergeDescending>()
+//#MACRO TestMethod<Saw>()
+//#MACRO TestMethod<SortedRepeated>()
+//#MACRO TestMethod<Repeated>()
+#MACRO TestMethod<Duplicated>()
+//#MACRO TestMethod<SortedOrganPipes>()
+//#MACRO TestMethod<OrganPipes>()
+//#MACRO TestMethod<Stagger>()
+//#MACRO TestMethod<Plateau>()
+//#MACRO TestMethod<Shuffle>()
+  #IFSWITCH ARRTYPE==float,double
+#MACRO TestMethod<WithNaNsAndZeros>()
+  #ENDIF
+#ENDIF
+#ENDDEF
+
+#MACRODEF TestMethod<ARRAYBUILDER>()
+@Test
+public void testARRTYPEDIRECTIONSORTTYPEARRAYBUILDERArrayBuilder()
+{
+  for(int i=0;i<lengths.length;++i)
+  {
+    final int arrLength=lengths[i];
+    System.out.println("testARRTYPEDIRECTIONSORTTYPEARRAYBUILDERArrayBuilder length = "+arrLength);
+   if(JunitUtil.ARRTYPEArrayBuilder.ARRAYBUILDER.isRandomized())
+   {
+       testARRTYPEDIRECTIONSORTTYPEHelper(JunitUtil.ARRTYPEArrayBuilder.ARRAYBUILDER,arrLength,0);
+   }
+   else
+   {
+     var stream=LongStream.of(randSeeds);
+     if(false)
+     {
+       stream=stream.parallel();
+     }
+     stream.forEach(randSeed->
+     {
+       testARRTYPEDIRECTIONSORTTYPEHelper(JunitUtil.ARRTYPEArrayBuilder.ARRAYBUILDER,arrLength,randSeed);
+     });
+   }
   }
 }
 #ENDDEF
 
- 
 
 
 
 
-  @Test
-  public void testUncheckedSortboolean()
-  {
-    
-  
-    var rand=new Random(0);
-    testuncheckedsortHelperboolean(100,rand);
-    
-  }
-  @Test
-  public void testUncheckedReverseSortboolean()
-  {
-    var rand=new Random(0);
-    testuncheckedreverseSortHelperboolean(100,rand);
-    
-  }
-  /*//TODO uncomment when the module bug is fixed
-  @Test
-  public void testUncheckedComparatorSortboolean()
-  {
-    //TODO
-  }
-  */
-  @Test
-  public void testUncheckedSortbyte()
-  {
-    var rand=new Random(0);
-    testuncheckedsortHelperbyte(29,rand);
-    testuncheckedsortHelperbyte(1000,rand);
-  }
-  @Test
-  public void testUncheckedReverseSortbyte()
-  {
-    var rand=new Random(0);
-    testuncheckedreverseSortHelperbyte(29,rand);
-    testuncheckedreverseSortHelperbyte(1000,rand);
-  }
-  @Test
-  public void testUncheckedsortchar()
-  {
-    var rand=new Random(0);
-    int[] lengths=new int[]{286,3201,3202};
-    for(int i=0;i<lengths.length;++i)
-    {
-      testuncheckedsortHelperchar(lengths[i],rand);
-    }
-  }
-  @Test
-  public void testUncheckedReverseSortchar()
-  {
-    var rand=new Random(0);
-    int[] lengths=new int[]{286,3201,3202};
-    for(int i=0;i<lengths.length;++i)
-    {
-      testuncheckedreverseSortHelperchar(lengths[i],rand);
-    }
-  }
-  @Test
-  public void testUncheckedsortshort()
-  {
-    var rand=new Random(0);
-    int[] lengths=new int[]{286,3201,3202};
-    for(int i=0;i<lengths.length;++i)
-    {
-      testuncheckedsortHelpershort(lengths[i],rand);
-    }
-  }
-  @Test
-  public void testUncheckedReverseSortshort()
-  {
-    var rand=new Random(0);
-    int[] lengths=new int[]{286,3201,3202};
-    for(int i=0;i<lengths.length;++i)
-    {
-      testuncheckedreverseSortHelpershort(lengths[i],rand);
-    }
-  }
-  @Test
-  public void testUncheckedsortint()
-  {
-    var rand=new Random(0);
-    int[] lengths=new int[]{286,3201,3202};
-    for(int i=0;i<lengths.length;++i)
-    {
-      testuncheckedsortHelperint(lengths[i],rand);
-    }
-  }
-  @Test
-  public void testUncheckedReverseSortint()
-  {
-    var rand=new Random(0);
-    int[] lengths=new int[]{286,3201,3202};
-    for(int i=0;i<lengths.length;++i)
-    {
-      testuncheckedreverseSortHelperint(lengths[i],rand);
-    }
-  }
-  @Test
-  public void testUncheckedsortlong()
-  {
-    var rand=new Random(0);
-    int[] lengths=new int[]{286,3201,3202};
-    for(int i=0;i<lengths.length;++i)
-    {
-      testuncheckedsortHelperlong(lengths[i],rand);
-    }
-  }
-  @Test
-  public void testUncheckedReverseSortlong()
-  {
-    var rand=new Random(0);
-    int[] lengths=new int[]{286,3201,3202};
-    for(int i=0;i<lengths.length;++i)
-    {
-      testuncheckedreverseSortHelperlong(lengths[i],rand);
-    }
-  }
-  @Test
-  public void testUncheckedsortfloat()
-  {
-    var rand=new Random(0);
-    int[] lengths=new int[]{286,3201,3202};
-    for(int i=0;i<lengths.length;++i)
-    {
-      testuncheckedsortHelperfloat(lengths[i],rand);
-    }
-  }
-  @Test
-  public void testUncheckedReverseSortfloat()
-  {
-    var rand=new Random(0);
-    int[] lengths=new int[]{286,3201,3202};
-    for(int i=0;i<lengths.length;++i)
-    {
-      testuncheckedreverseSortHelperfloat(lengths[i],rand);
-    }
-  }
-  @Test
-  public void testUncheckedsortdouble()
-  {
-    var rand=new Random(0);
-    int[] lengths=new int[]{286,3201,3202};
-    for(int i=0;i<lengths.length;++i)
-    {
-      testuncheckedsortHelperdouble(lengths[i],rand);
-    }
-  }
-  @Test
-  public void testUncheckedReverseSortdouble()
-  {
-    var rand=new Random(0);
-    int[] lengths=new int[]{286,3201,3202};
-    for(int i=0;i<lengths.length;++i)
-    {
-      testuncheckedreverseSortHelperdouble(lengths[i],rand);
-    }
-  }
 }
-
-
-
-
-
-
-
-
-

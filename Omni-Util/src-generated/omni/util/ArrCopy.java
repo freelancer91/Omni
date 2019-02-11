@@ -10,8 +10,47 @@ public interface ArrCopy
     //assert dstOffset+length<=dst.length;
     for(dst[dstOffset]=(src[length+=(srcOffset-1)]);length!=srcOffset;dst[++dstOffset]=(src[--length])){}
   }
+  static void uncheckedSelfCopy(Object[] src,int srcOffset,int dstOffset,int length)
+  {
+    //assert srcOffset>=0;
+    //assert dstOffset>=0;
+    //assert length>0;
+    //assert srcOffset+length<=src.length;
+    //assert dstOffset+length<=dst.length;
+    switch(length)
+    {
+    case 5:
+      src[dstOffset]=src[srcOffset];
+      src[dstOffset+1]=src[srcOffset+1];
+      src[dstOffset+2]=src[srcOffset+2];
+      src[dstOffset+3]=src[srcOffset+3];
+      src[dstOffset+4]=src[srcOffset+4];
+      return;
+    case 4:
+      src[dstOffset]=src[srcOffset];
+      src[dstOffset+1]=src[srcOffset+1];
+      src[dstOffset+2]=src[srcOffset+2];
+      src[dstOffset+3]=src[srcOffset+3];
+      return;
+    case 3:
+      src[dstOffset]=src[srcOffset];
+      src[dstOffset+1]=src[srcOffset+1];
+      src[dstOffset+2]=src[srcOffset+2];
+      return;
+    case 2:
+      src[dstOffset]=src[srcOffset];
+      src[dstOffset+1]=src[srcOffset+1];
+      return;
+    case 1:
+      src[dstOffset]=src[srcOffset];
+      return;
+    default:
+      System.arraycopy(src,srcOffset,src,dstOffset,length);
+    }
+  }
   static <SRC extends DST,DST> void uncheckedCopy(SRC[] src,int srcOffset,DST[] dst,int dstOffset,int length)
   {
+    assert src!=dst || (length>5||dstOffset+length<=srcOffset||srcOffset<=dstOffset);
     //assert srcOffset>=0;
     //assert dstOffset>=0;
     //assert length>0;
@@ -43,8 +82,47 @@ public interface ArrCopy
     //assert dstOffset+length<=dst.length;
     for(dst[dstOffset]=(src[length+=(srcOffset-1)]);length!=srcOffset;dst[++dstOffset]=(src[--length])){}
   }
+  static void uncheckedSelfCopy(boolean[] src,int srcOffset,int dstOffset,int length)
+  {
+    //assert srcOffset>=0;
+    //assert dstOffset>=0;
+    //assert length>0;
+    //assert srcOffset+length<=src.length;
+    //assert dstOffset+length<=dst.length;
+    switch(length)
+    {
+    case 5:
+      src[dstOffset]=src[srcOffset];
+      src[dstOffset+1]=src[srcOffset+1];
+      src[dstOffset+2]=src[srcOffset+2];
+      src[dstOffset+3]=src[srcOffset+3];
+      src[dstOffset+4]=src[srcOffset+4];
+      return;
+    case 4:
+      src[dstOffset]=src[srcOffset];
+      src[dstOffset+1]=src[srcOffset+1];
+      src[dstOffset+2]=src[srcOffset+2];
+      src[dstOffset+3]=src[srcOffset+3];
+      return;
+    case 3:
+      src[dstOffset]=src[srcOffset];
+      src[dstOffset+1]=src[srcOffset+1];
+      src[dstOffset+2]=src[srcOffset+2];
+      return;
+    case 2:
+      src[dstOffset]=src[srcOffset];
+      src[dstOffset+1]=src[srcOffset+1];
+      return;
+    case 1:
+      src[dstOffset]=src[srcOffset];
+      return;
+    default:
+      System.arraycopy(src,srcOffset,src,dstOffset,length);
+    }
+  }
   static void uncheckedCopy(boolean[] src,int srcOffset,boolean[] dst,int dstOffset,int length)
   {
+    assert src!=dst || (length>5||dstOffset+length<=srcOffset||srcOffset<=dstOffset);
     //assert srcOffset>=0;
     //assert dstOffset>=0;
     //assert length>0;
@@ -76,8 +154,47 @@ public interface ArrCopy
     //assert dstOffset+length<=dst.length;
     for(dst[dstOffset]=(src[length+=(srcOffset-1)]);length!=srcOffset;dst[++dstOffset]=(src[--length])){}
   }
+  static void uncheckedSelfCopy(byte[] src,int srcOffset,int dstOffset,int length)
+  {
+    //assert srcOffset>=0;
+    //assert dstOffset>=0;
+    //assert length>0;
+    //assert srcOffset+length<=src.length;
+    //assert dstOffset+length<=dst.length;
+    switch(length)
+    {
+    case 5:
+      src[dstOffset]=src[srcOffset];
+      src[dstOffset+1]=src[srcOffset+1];
+      src[dstOffset+2]=src[srcOffset+2];
+      src[dstOffset+3]=src[srcOffset+3];
+      src[dstOffset+4]=src[srcOffset+4];
+      return;
+    case 4:
+      src[dstOffset]=src[srcOffset];
+      src[dstOffset+1]=src[srcOffset+1];
+      src[dstOffset+2]=src[srcOffset+2];
+      src[dstOffset+3]=src[srcOffset+3];
+      return;
+    case 3:
+      src[dstOffset]=src[srcOffset];
+      src[dstOffset+1]=src[srcOffset+1];
+      src[dstOffset+2]=src[srcOffset+2];
+      return;
+    case 2:
+      src[dstOffset]=src[srcOffset];
+      src[dstOffset+1]=src[srcOffset+1];
+      return;
+    case 1:
+      src[dstOffset]=src[srcOffset];
+      return;
+    default:
+      System.arraycopy(src,srcOffset,src,dstOffset,length);
+    }
+  }
   static void uncheckedCopy(byte[] src,int srcOffset,byte[] dst,int dstOffset,int length)
   {
+    assert src!=dst || (length>5||dstOffset+length<=srcOffset||srcOffset<=dstOffset);
     //assert srcOffset>=0;
     //assert dstOffset>=0;
     //assert length>0;
@@ -109,8 +226,47 @@ public interface ArrCopy
     //assert dstOffset+length<=dst.length;
     for(dst[dstOffset]=(src[length+=(srcOffset-1)]);length!=srcOffset;dst[++dstOffset]=(src[--length])){}
   }
+  static void uncheckedSelfCopy(char[] src,int srcOffset,int dstOffset,int length)
+  {
+    //assert srcOffset>=0;
+    //assert dstOffset>=0;
+    //assert length>0;
+    //assert srcOffset+length<=src.length;
+    //assert dstOffset+length<=dst.length;
+    switch(length)
+    {
+    case 5:
+      src[dstOffset]=src[srcOffset];
+      src[dstOffset+1]=src[srcOffset+1];
+      src[dstOffset+2]=src[srcOffset+2];
+      src[dstOffset+3]=src[srcOffset+3];
+      src[dstOffset+4]=src[srcOffset+4];
+      return;
+    case 4:
+      src[dstOffset]=src[srcOffset];
+      src[dstOffset+1]=src[srcOffset+1];
+      src[dstOffset+2]=src[srcOffset+2];
+      src[dstOffset+3]=src[srcOffset+3];
+      return;
+    case 3:
+      src[dstOffset]=src[srcOffset];
+      src[dstOffset+1]=src[srcOffset+1];
+      src[dstOffset+2]=src[srcOffset+2];
+      return;
+    case 2:
+      src[dstOffset]=src[srcOffset];
+      src[dstOffset+1]=src[srcOffset+1];
+      return;
+    case 1:
+      src[dstOffset]=src[srcOffset];
+      return;
+    default:
+      System.arraycopy(src,srcOffset,src,dstOffset,length);
+    }
+  }
   static void uncheckedCopy(char[] src,int srcOffset,char[] dst,int dstOffset,int length)
   {
+    assert src!=dst || (length>5||dstOffset+length<=srcOffset||srcOffset<=dstOffset);
     //assert srcOffset>=0;
     //assert dstOffset>=0;
     //assert length>0;
@@ -142,8 +298,47 @@ public interface ArrCopy
     //assert dstOffset+length<=dst.length;
     for(dst[dstOffset]=(src[length+=(srcOffset-1)]);length!=srcOffset;dst[++dstOffset]=(src[--length])){}
   }
+  static void uncheckedSelfCopy(short[] src,int srcOffset,int dstOffset,int length)
+  {
+    //assert srcOffset>=0;
+    //assert dstOffset>=0;
+    //assert length>0;
+    //assert srcOffset+length<=src.length;
+    //assert dstOffset+length<=dst.length;
+    switch(length)
+    {
+    case 5:
+      src[dstOffset]=src[srcOffset];
+      src[dstOffset+1]=src[srcOffset+1];
+      src[dstOffset+2]=src[srcOffset+2];
+      src[dstOffset+3]=src[srcOffset+3];
+      src[dstOffset+4]=src[srcOffset+4];
+      return;
+    case 4:
+      src[dstOffset]=src[srcOffset];
+      src[dstOffset+1]=src[srcOffset+1];
+      src[dstOffset+2]=src[srcOffset+2];
+      src[dstOffset+3]=src[srcOffset+3];
+      return;
+    case 3:
+      src[dstOffset]=src[srcOffset];
+      src[dstOffset+1]=src[srcOffset+1];
+      src[dstOffset+2]=src[srcOffset+2];
+      return;
+    case 2:
+      src[dstOffset]=src[srcOffset];
+      src[dstOffset+1]=src[srcOffset+1];
+      return;
+    case 1:
+      src[dstOffset]=src[srcOffset];
+      return;
+    default:
+      System.arraycopy(src,srcOffset,src,dstOffset,length);
+    }
+  }
   static void uncheckedCopy(short[] src,int srcOffset,short[] dst,int dstOffset,int length)
   {
+    assert src!=dst || (length>5||dstOffset+length<=srcOffset||srcOffset<=dstOffset);
     //assert srcOffset>=0;
     //assert dstOffset>=0;
     //assert length>0;
@@ -175,8 +370,47 @@ public interface ArrCopy
     //assert dstOffset+length<=dst.length;
     for(dst[dstOffset]=(src[length+=(srcOffset-1)]);length!=srcOffset;dst[++dstOffset]=(src[--length])){}
   }
+  static void uncheckedSelfCopy(int[] src,int srcOffset,int dstOffset,int length)
+  {
+    //assert srcOffset>=0;
+    //assert dstOffset>=0;
+    //assert length>0;
+    //assert srcOffset+length<=src.length;
+    //assert dstOffset+length<=dst.length;
+    switch(length)
+    {
+    case 5:
+      src[dstOffset]=src[srcOffset];
+      src[dstOffset+1]=src[srcOffset+1];
+      src[dstOffset+2]=src[srcOffset+2];
+      src[dstOffset+3]=src[srcOffset+3];
+      src[dstOffset+4]=src[srcOffset+4];
+      return;
+    case 4:
+      src[dstOffset]=src[srcOffset];
+      src[dstOffset+1]=src[srcOffset+1];
+      src[dstOffset+2]=src[srcOffset+2];
+      src[dstOffset+3]=src[srcOffset+3];
+      return;
+    case 3:
+      src[dstOffset]=src[srcOffset];
+      src[dstOffset+1]=src[srcOffset+1];
+      src[dstOffset+2]=src[srcOffset+2];
+      return;
+    case 2:
+      src[dstOffset]=src[srcOffset];
+      src[dstOffset+1]=src[srcOffset+1];
+      return;
+    case 1:
+      src[dstOffset]=src[srcOffset];
+      return;
+    default:
+      System.arraycopy(src,srcOffset,src,dstOffset,length);
+    }
+  }
   static void uncheckedCopy(int[] src,int srcOffset,int[] dst,int dstOffset,int length)
   {
+    assert src!=dst || (length>5||dstOffset+length<=srcOffset||srcOffset<=dstOffset);
     //assert srcOffset>=0;
     //assert dstOffset>=0;
     //assert length>0;
@@ -208,8 +442,47 @@ public interface ArrCopy
     //assert dstOffset+length<=dst.length;
     for(dst[dstOffset]=(src[length+=(srcOffset-1)]);length!=srcOffset;dst[++dstOffset]=(src[--length])){}
   }
+  static void uncheckedSelfCopy(long[] src,int srcOffset,int dstOffset,int length)
+  {
+    //assert srcOffset>=0;
+    //assert dstOffset>=0;
+    //assert length>0;
+    //assert srcOffset+length<=src.length;
+    //assert dstOffset+length<=dst.length;
+    switch(length)
+    {
+    case 5:
+      src[dstOffset]=src[srcOffset];
+      src[dstOffset+1]=src[srcOffset+1];
+      src[dstOffset+2]=src[srcOffset+2];
+      src[dstOffset+3]=src[srcOffset+3];
+      src[dstOffset+4]=src[srcOffset+4];
+      return;
+    case 4:
+      src[dstOffset]=src[srcOffset];
+      src[dstOffset+1]=src[srcOffset+1];
+      src[dstOffset+2]=src[srcOffset+2];
+      src[dstOffset+3]=src[srcOffset+3];
+      return;
+    case 3:
+      src[dstOffset]=src[srcOffset];
+      src[dstOffset+1]=src[srcOffset+1];
+      src[dstOffset+2]=src[srcOffset+2];
+      return;
+    case 2:
+      src[dstOffset]=src[srcOffset];
+      src[dstOffset+1]=src[srcOffset+1];
+      return;
+    case 1:
+      src[dstOffset]=src[srcOffset];
+      return;
+    default:
+      System.arraycopy(src,srcOffset,src,dstOffset,length);
+    }
+  }
   static void uncheckedCopy(long[] src,int srcOffset,long[] dst,int dstOffset,int length)
   {
+    assert src!=dst || (length>5||dstOffset+length<=srcOffset||srcOffset<=dstOffset);
     //assert srcOffset>=0;
     //assert dstOffset>=0;
     //assert length>0;
@@ -241,8 +514,47 @@ public interface ArrCopy
     //assert dstOffset+length<=dst.length;
     for(dst[dstOffset]=(src[length+=(srcOffset-1)]);length!=srcOffset;dst[++dstOffset]=(src[--length])){}
   }
+  static void uncheckedSelfCopy(float[] src,int srcOffset,int dstOffset,int length)
+  {
+    //assert srcOffset>=0;
+    //assert dstOffset>=0;
+    //assert length>0;
+    //assert srcOffset+length<=src.length;
+    //assert dstOffset+length<=dst.length;
+    switch(length)
+    {
+    case 5:
+      src[dstOffset]=src[srcOffset];
+      src[dstOffset+1]=src[srcOffset+1];
+      src[dstOffset+2]=src[srcOffset+2];
+      src[dstOffset+3]=src[srcOffset+3];
+      src[dstOffset+4]=src[srcOffset+4];
+      return;
+    case 4:
+      src[dstOffset]=src[srcOffset];
+      src[dstOffset+1]=src[srcOffset+1];
+      src[dstOffset+2]=src[srcOffset+2];
+      src[dstOffset+3]=src[srcOffset+3];
+      return;
+    case 3:
+      src[dstOffset]=src[srcOffset];
+      src[dstOffset+1]=src[srcOffset+1];
+      src[dstOffset+2]=src[srcOffset+2];
+      return;
+    case 2:
+      src[dstOffset]=src[srcOffset];
+      src[dstOffset+1]=src[srcOffset+1];
+      return;
+    case 1:
+      src[dstOffset]=src[srcOffset];
+      return;
+    default:
+      System.arraycopy(src,srcOffset,src,dstOffset,length);
+    }
+  }
   static void uncheckedCopy(float[] src,int srcOffset,float[] dst,int dstOffset,int length)
   {
+    assert src!=dst || (length>5||dstOffset+length<=srcOffset||srcOffset<=dstOffset);
     //assert srcOffset>=0;
     //assert dstOffset>=0;
     //assert length>0;
@@ -274,8 +586,47 @@ public interface ArrCopy
     //assert dstOffset+length<=dst.length;
     for(dst[dstOffset]=(src[length+=(srcOffset-1)]);length!=srcOffset;dst[++dstOffset]=(src[--length])){}
   }
+  static void uncheckedSelfCopy(double[] src,int srcOffset,int dstOffset,int length)
+  {
+    //assert srcOffset>=0;
+    //assert dstOffset>=0;
+    //assert length>0;
+    //assert srcOffset+length<=src.length;
+    //assert dstOffset+length<=dst.length;
+    switch(length)
+    {
+    case 5:
+      src[dstOffset]=src[srcOffset];
+      src[dstOffset+1]=src[srcOffset+1];
+      src[dstOffset+2]=src[srcOffset+2];
+      src[dstOffset+3]=src[srcOffset+3];
+      src[dstOffset+4]=src[srcOffset+4];
+      return;
+    case 4:
+      src[dstOffset]=src[srcOffset];
+      src[dstOffset+1]=src[srcOffset+1];
+      src[dstOffset+2]=src[srcOffset+2];
+      src[dstOffset+3]=src[srcOffset+3];
+      return;
+    case 3:
+      src[dstOffset]=src[srcOffset];
+      src[dstOffset+1]=src[srcOffset+1];
+      src[dstOffset+2]=src[srcOffset+2];
+      return;
+    case 2:
+      src[dstOffset]=src[srcOffset];
+      src[dstOffset+1]=src[srcOffset+1];
+      return;
+    case 1:
+      src[dstOffset]=src[srcOffset];
+      return;
+    default:
+      System.arraycopy(src,srcOffset,src,dstOffset,length);
+    }
+  }
   static void uncheckedCopy(double[] src,int srcOffset,double[] dst,int dstOffset,int length)
   {
+    assert src!=dst || (length>5||dstOffset+length<=srcOffset||srcOffset<=dstOffset);
     //assert srcOffset>=0;
     //assert dstOffset>=0;
     //assert length>0;

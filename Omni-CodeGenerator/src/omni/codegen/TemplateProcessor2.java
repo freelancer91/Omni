@@ -348,7 +348,7 @@ public class TemplateProcessor2{
             }
             String[] switches;
             String switchStr="";
-            int switchBegin=lineTail.indexOf('<',tagEnd);
+            int switchBegin=lineTail.indexOf('<');
             if(switchBegin>=0&&switchBegin<paramBegin){
                 final int switchEnd=lineTail.lastIndexOf('>',paramBegin);
                 switchStr=lineTail.substring(switchBegin+1,switchEnd);
@@ -523,7 +523,10 @@ public class TemplateProcessor2{
                 }
             }
             for(final var srcItr=output.listIterator();srcItr.hasNext();){
-                final String line=srcItr.next();
+                final String line=srcItr.next().trim();
+                if(line.startsWith("//")){
+                    continue;
+                }
                 if(line.indexOf('#')>=0||line.indexOf('$')>=0){
                     trouble=true;
                     System.err.println("WARNING: output line "+srcItr.nextIndex()+" for definition "+typeDef.name()

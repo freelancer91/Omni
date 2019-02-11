@@ -1,129 +1,101 @@
 #TYPEDEF OfGeneric
 package omni.util;
 
-import org.junit.Test;
-import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 import java.util.Random;
-import java.util.Objects;
 
 public class ArrCopyTest
 {
-  #MACRO TestCopy<boolean,Boolean>()
-  #MACRO TestCopy<byte,Byte>()
-  #MACRO TestCopy<char,Character>()
-  #MACRO TestCopy<short,Short>()
-  #MACRO TestCopy<int,Integer>()
-  #MACRO TestCopy<long,Long>()
-  #MACRO TestCopy<float,Float>()
-  #MACRO TestCopy<double,Double>()
-  
-  #MACRO TestCopy<boolean,Object>()
-  #MACRO TestCopy<byte,Object>()
-  #MACRO TestCopy<char,Object>()
-  #MACRO TestCopy<short,Object>()
-  #MACRO TestCopy<int,Object>()
-  #MACRO TestCopy<long,Object>()
-  #MACRO TestCopy<float,Object>()
-  #MACRO TestCopy<double,Object>()
-  
-  
-  #MACRO TestCopy<Boolean,boolean>()
-  #MACRO TestCopy<Byte,byte>()
-  #MACRO TestCopy<Character,char>()
-  #MACRO TestCopy<Short,short>()
-  #MACRO TestCopy<Integer,int>()
-  #MACRO TestCopy<Long,long>()
-  #MACRO TestCopy<Float,float>()
-  #MACRO TestCopy<Double,double>()
+  #MACRO TestMethods<true>()
 
-  #MACRO TestCopy<boolean,boolean>()
-  #MACRO TestCopy<boolean,byte>()
-  #MACRO TestCopy<boolean,char>()
-  #MACRO TestCopy<boolean,short>()
-  #MACRO TestCopy<boolean,int>()
-  #MACRO TestCopy<boolean,long>()
-  #MACRO TestCopy<boolean,float>()
-  #MACRO TestCopy<boolean,double>()
-  #MACRO TestCopy<byte,byte>()
-  #MACRO TestCopy<byte,short>()
-  #MACRO TestCopy<byte,int>()
-  #MACRO TestCopy<byte,long>()
-  #MACRO TestCopy<byte,float>()
-  #MACRO TestCopy<byte,double>()
-  #MACRO TestCopy<char,char>()
-  #MACRO TestCopy<char,int>()
-  #MACRO TestCopy<char,long>()
-  #MACRO TestCopy<char,float>()
-  #MACRO TestCopy<char,double>()
-  #MACRO TestCopy<short,short>()
-  #MACRO TestCopy<short,int>()
-  #MACRO TestCopy<short,long>()
-  #MACRO TestCopy<short,float>()
-  #MACRO TestCopy<short,double>()
-  #MACRO TestCopy<int,int>()
-  #MACRO TestCopy<int,long>()
-  #MACRO TestCopy<int,float>()
-  #MACRO TestCopy<int,double>()
-  #MACRO TestCopy<long,long>()
-  #MACRO TestCopy<long,float>()
-  #MACRO TestCopy<long,double>()
-  #MACRO TestCopy<float,float>()
-  #MACRO TestCopy<float,double>()
-  #MACRO TestCopy<double,double>()
-  #MACRO TestCopy<String,String>()
-  /*
-  #MACRO GetSrcArr<boolean>()
-  #MACRO GetSrcArr<byte>()
-  #MACRO GetSrcArr<char>()
-  #MACRO GetSrcArr<short>()
-  #MACRO GetSrcArr<int>()
-  #MACRO GetSrcArr<long>()
-  #MACRO GetSrcArr<float>()
-  #MACRO GetSrcArr<double>()
-  #MACRO GetSrcArr<Boolean>()
-  #MACRO GetSrcArr<Byte>()
-  #MACRO GetSrcArr<Character>()
-  #MACRO GetSrcArr<Short>()
-  #MACRO GetSrcArr<Integer>()
-  #MACRO GetSrcArr<Long>()
-  #MACRO GetSrcArr<Float>()
-  #MACRO GetSrcArr<Double>()
-  #MACRO GetSrcArr<String>()
-  */
-}
-#MACRODEF IsEqual(src,dst)
-#IFSWITCH DST==Object
-Assert.assertTrue(Objects.equals(src,dst));
-#ELSEIFSWITCH SRC==boolean
-  #IFSWITCH DST==byte,char,short,int,long,float,double
-Assert.assertTrue(TypeUtil.castToByte(src)==dst);
-  #ELSE
-Assert.assertTrue(src==dst);
-  #ENDIF
-#ELSE
-Assert.assertTrue(src==dst);
-#ENDIF
+#MACRODEF TestMethods<PARALLEL>()
+  #MACRO TestCopy<boolean,Boolean>(boolean)
+  #MACRO TestCopy<byte,Byte>(byte)
+  #MACRO TestCopy<char,Character>(char)
+  #MACRO TestCopy<short,Short>(short)
+  #MACRO TestCopy<int,Integer>(int)
+  #MACRO TestCopy<long,Long>(long)
+  #MACRO TestCopy<float,Float>(float)
+  #MACRO TestCopy<double,Double>(double)
+  
+  #MACRO TestCopy<boolean,Object>(boolean)
+  #MACRO TestCopy<byte,Object>(byte)
+  #MACRO TestCopy<char,Object>(char)
+  #MACRO TestCopy<short,Object>(short)
+  #MACRO TestCopy<int,Object>(int)
+  #MACRO TestCopy<long,Object>(long)
+  #MACRO TestCopy<float,Object>(float)
+  #MACRO TestCopy<double,Object>(double)
+  
+  
+  #MACRO TestCopy<Boolean,boolean>(boolean)
+  #MACRO TestCopy<Byte,byte>(byte)
+  #MACRO TestCopy<Character,char>(char)
+  #MACRO TestCopy<Short,short>(short)
+  #MACRO TestCopy<Integer,int>(int)
+  #MACRO TestCopy<Long,long>(long)
+  #MACRO TestCopy<Float,float>(float)
+  #MACRO TestCopy<Double,double>(double)
+
+  #MACRO TestCopy<boolean,boolean>(boolean)
+  #MACRO TestCopy<boolean,byte>(boolean)
+  #MACRO TestCopy<boolean,char>(boolean)
+  #MACRO TestCopy<boolean,short>(boolean)
+  #MACRO TestCopy<boolean,int>(boolean)
+  #MACRO TestCopy<boolean,long>(boolean)
+  #MACRO TestCopy<boolean,float>(boolean)
+  #MACRO TestCopy<boolean,double>(boolean)
+  #MACRO TestCopy<byte,byte>(byte)
+  #MACRO TestCopy<byte,short>(byte)
+  #MACRO TestCopy<byte,int>(byte)
+  #MACRO TestCopy<byte,long>(byte)
+  #MACRO TestCopy<byte,float>(byte)
+  #MACRO TestCopy<byte,double>(byte)
+  #MACRO TestCopy<char,char>(char)
+  #MACRO TestCopy<char,int>(char)
+  #MACRO TestCopy<char,long>(char)
+  #MACRO TestCopy<char,float>(char)
+  #MACRO TestCopy<char,double>(char)
+  #MACRO TestCopy<short,short>(short)
+  #MACRO TestCopy<short,int>(short)
+  #MACRO TestCopy<short,long>(short)
+  #MACRO TestCopy<short,float>(short)
+  #MACRO TestCopy<short,double>(short)
+  #MACRO TestCopy<int,int>(int)
+  #MACRO TestCopy<int,long>(int)
+  #MACRO TestCopy<int,float>(int)
+  #MACRO TestCopy<int,double>(int)
+  #MACRO TestCopy<long,long>(long)
+  #MACRO TestCopy<long,float>(long)
+  #MACRO TestCopy<long,double>(long)
+  #MACRO TestCopy<float,float>(float)
+  #MACRO TestCopy<float,double>(float)
+  #MACRO TestCopy<double,double>(double)
+  #MACRO TestCopy<String,String>(String)
 #ENDDEF
-#MACRODEF TestCopy<SRC,DST>()
+}
+
+#MACRODEF TestCopy<SRC,DST>(PRIMITIVE)
 @Test
 public void testSemiCheckedCopySRCDST() throws Throwable
 {
-
   Random rand=new Random(0);
   for(int i=0;i<1000;++i)
   {
     int srcLength=rand.nextInt(1000);
-    SRC[] src=JunitUtil.getUnsortedSRCArray(rand,srcLength);
+    SRC[] src;
+    JunitUtil.PRIMITIVEArrayBuilder.Randomized.buildUnchecked(src=new SRC[srcLength],0,srcLength,rand,0);
     int dstLength=srcLength+rand.nextInt(1000);
     DST[] dst=new DST[dstLength];
     int copyLength=rand.nextInt(srcLength+1);
     int srcOffset=rand.nextInt(srcLength-copyLength+1);
     int dstOffset=rand.nextInt(dstLength-copyLength+1);
     ArrCopy.semicheckedCopy(src,srcOffset,dst,dstOffset,copyLength);
-    for(int j=0;j<copyLength;++j)
-    {
-      #MACRO IsEqual(src[srcOffset+j],dst[dstOffset+j])
-    }
+#IFSWITCH PARALLEL==true
+    JunitUtil.uncheckedparallelassertarraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+#ELSE
+    JunitUtil.uncheckedassertarraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+#ENDIF
   }
 }
 @Test
@@ -134,46 +106,19 @@ public void testSemiCheckedReverseCopySRCDST() throws Throwable
   for(int i=0;i<1000;++i)
   {
     int srcLength=rand.nextInt(1000);
-    SRC[] src=JunitUtil.getUnsortedSRCArray(rand,srcLength);
+    SRC[] src;
+    JunitUtil.PRIMITIVEArrayBuilder.Randomized.buildUnchecked(src=new SRC[srcLength],0,srcLength,rand,0);
     int dstLength=srcLength+rand.nextInt(1000);
     DST[] dst=new DST[dstLength];
     int copyLength=rand.nextInt(srcLength+1);
     int srcOffset=rand.nextInt(srcLength-copyLength+1);
     int dstOffset=rand.nextInt(dstLength-copyLength+1);
     ArrCopy.semicheckedReverseCopy(src,srcOffset,dst,dstOffset,copyLength);
-    for(int j=0;j<copyLength;++j)
-    {
-      #MACRO IsEqual(src[srcOffset+copyLength-1-j],dst[dstOffset+j])
-    }
-  }
-}
-#ENDDEF
-#MACRODEF GetSrcArr<SRC>()
-static SRC[] getSRCArr(Random rand,int length)
-{
-  SRC[] src=new SRC[length];
-  for(int i=0;i<length;++i)
-  {
-#IFSWITCH SRC==String
-    src[i]=Long.toString(rand.nextLong());
-#ELSEIFSWITCH SRC==double,Double
-    src[i]=rand.nextDouble();
-#ELSEIFSWITCH SRC==float,Float
-    src[i]=rand.nextFloat();
-#ELSEIFSWITCH SRC==long,Long
-    src[i]=rand.nextLong();
-#ELSEIFSWITCH SRC==int,Integer
-    src[i]=rand.nextInt();
-#ELSEIFSWITCH SRC==short,Short
-    src[i]=(short)(Short.MIN_VALUE+rand.nextInt(Short.MAX_VALUE-Short.MIN_VALUE));
-#ELSEIFSWITCH SRC==char,Character
-    src[i]=(char)(rand.nextInt(Character.MAX_VALUE));
-#ELSEIFSWITCH SRC==byte,Byte
-    src[i]=(byte)(Byte.MIN_VALUE+rand.nextInt(Byte.MAX_VALUE-Byte.MIN_VALUE));
-#ELSEIFSWITCH SRC==boolean,Boolean
-    src[i]=rand.nextBoolean();
+#IFSWITCH PARALLEL==true
+    JunitUtil.uncheckedparallelassertreversearraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+#ELSE
+    JunitUtil.uncheckedassertreversearraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
 #ENDIF
   }
-  return src;
 }
 #ENDDEF

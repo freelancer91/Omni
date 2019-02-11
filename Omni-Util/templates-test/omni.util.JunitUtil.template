@@ -1,123 +1,880 @@
 #TYPEDEF OfGeneric
 package omni.util;
 import java.util.Random;
-import java.util.function.Supplier;
-import java.util.function.BooleanSupplier;
-import java.util.function.IntSupplier;
-import java.util.function.LongSupplier;
-import java.util.function.DoubleSupplier;
-import omni.function.ByteSupplier;
-import omni.function.CharSupplier;
-import omni.function.ShortSupplier;
-import omni.function.FloatSupplier;
-import java.util.Arrays;
+import java.util.Objects;
+import java.util.stream.IntStream;
+import org.junit.jupiter.api.Assertions;
 
 public interface JunitUtil
 {
-  
-  #MACRO GetArray<Ascending,boolean>(BooleanSupplier,getAsBoolean,Boolean)
-  #MACRO GetArray<Ascending,byte>(ByteSupplier,getAsByte,Byte)
-  #MACRO GetArray<Ascending,char>(CharSupplier,getAsChar,Char)
-  #MACRO GetArray<Ascending,short>(ShortSupplier,getAsShort,Short)
-  #MACRO GetArray<Ascending,int>(IntSupplier,getAsInt,Int)
-  #MACRO GetArray<Ascending,long>(LongSupplier,getAsLong,Long)
-  #MACRO GetArray<Ascending,float>(FloatSupplier,getAsFloat,Float)
-  #MACRO GetArray<Ascending,double>(DoubleSupplier,getAsDouble,Double)
-  #MACRO GetArray<Ascending,String>(Supplier<? extends String>,get,Ref)
-  #MACRO GetArray<Descending,boolean>(BooleanSupplier,getAsBoolean,Boolean)
-  #MACRO GetArray<Descending,byte>(ByteSupplier,getAsByte,Byte)
-  #MACRO GetArray<Descending,char>(CharSupplier,getAsChar,Char)
-  #MACRO GetArray<Descending,short>(ShortSupplier,getAsShort,Short)
-  #MACRO GetArray<Descending,int>(IntSupplier,getAsInt,Int)
-  #MACRO GetArray<Descending,long>(LongSupplier,getAsLong,Long)
-  #MACRO GetArray<Descending,float>(FloatSupplier,getAsFloat,Float)
-  #MACRO GetArray<Descending,double>(DoubleSupplier,getAsDouble,Double)
-  #MACRO GetArray<Descending,String>(Supplier<? extends String>,get,Ref)
-  #MACRO GetArray<Unsorted,boolean>(BooleanSupplier,getAsBoolean,Boolean)
-  #MACRO GetArray<Unsorted,byte>(ByteSupplier,getAsByte,Byte)
-  #MACRO GetArray<Unsorted,char>(CharSupplier,getAsChar,Char)
-  #MACRO GetArray<Unsorted,short>(ShortSupplier,getAsShort,Short)
-  #MACRO GetArray<Unsorted,int>(IntSupplier,getAsInt,Int)
-  #MACRO GetArray<Unsorted,long>(LongSupplier,getAsLong,Long)
-  #MACRO GetArray<Unsorted,float>(FloatSupplier,getAsFloat,Float)
-  #MACRO GetArray<Unsorted,double>(DoubleSupplier,getAsDouble,Double)
-  #MACRO GetArray<Unsorted,String>(Supplier<? extends String>,get,Ref)
-  #MACRO GetArray<Ascending,Boolean>(BooleanSupplier,getAsBoolean,Ref)
-  #MACRO GetArray<Ascending,Byte>(ByteSupplier,getAsByte,Ref)
-  #MACRO GetArray<Ascending,Character>(CharSupplier,getAsChar,Ref)
-  #MACRO GetArray<Ascending,Short>(ShortSupplier,getAsShort,Ref)
-  #MACRO GetArray<Ascending,Integer>(IntSupplier,getAsInt,Ref)
-  #MACRO GetArray<Ascending,Long>(LongSupplier,getAsLong,Ref)
-  #MACRO GetArray<Ascending,Float>(FloatSupplier,getAsFloat,Ref)
-  #MACRO GetArray<Ascending,Double>(DoubleSupplier,getAsDouble,Ref)
-  #MACRO GetArray<Descending,Boolean>(BooleanSupplier,getAsBoolean,Ref)
-  #MACRO GetArray<Descending,Byte>(ByteSupplier,getAsByte,Ref)
-  #MACRO GetArray<Descending,Character>(CharSupplier,getAsChar,Ref)
-  #MACRO GetArray<Descending,Short>(ShortSupplier,getAsShort,Ref)
-  #MACRO GetArray<Descending,Integer>(IntSupplier,getAsInt,Ref)
-  #MACRO GetArray<Descending,Long>(LongSupplier,getAsLong,Ref)
-  #MACRO GetArray<Descending,Float>(FloatSupplier,getAsFloat,Ref)
-  #MACRO GetArray<Descending,Double>(DoubleSupplier,getAsDouble,Ref)
-  #MACRO GetArray<Unsorted,Boolean>(BooleanSupplier,getAsBoolean,Ref)
-  #MACRO GetArray<Unsorted,Byte>(ByteSupplier,getAsByte,Ref)
-  #MACRO GetArray<Unsorted,Character>(CharSupplier,getAsChar,Ref)
-  #MACRO GetArray<Unsorted,Short>(ShortSupplier,getAsShort,Ref)
-  #MACRO GetArray<Unsorted,Integer>(IntSupplier,getAsInt,Ref)
-  #MACRO GetArray<Unsorted,Long>(LongSupplier,getAsLong,Ref)
-  #MACRO GetArray<Unsorted,Float>(FloatSupplier,getAsFloat,Ref)
-  #MACRO GetArray<Unsorted,Double>(DoubleSupplier,getAsDouble,Ref)
-  
-  
-#MACRODEF GetArray<SORTTYPE,ARRTYPE>(SUPPLIERTYPE,SUPPLIERMETHOD,CLASSPREFIX)
-public static ARRTYPE[] getSORTTYPEARRTYPEArray(Random rand,int length)
-{
-  return getSORTTYPEARRTYPEArray(
-#IFSWITCH ARRTYPE==boolean,Boolean
-    rand::nextBoolean
-#ELSEIFSWITCH ARRTYPE==byte,Byte,char,Character,short,Short,int,Integer,long,Long
-    ()->(ARRTYPE)
-    #IFSWITCH ARRTYPE==Byte
-    (byte)
-    #ELSEIFSWITCH ARRTYPE==Character
-    (char)
-    #ELSEIFSWITCH ARRTYPE==Short
-    (short)
-    #ELSEIFSWITCH ARRTYPE==Integer
-    (int)
-    #ENDIF
-    rand.nextLong()
-#ELSEIFSWITCH ARRTYPE==float,Float
-    rand::nextFloat
-#ELSEIFSWITCH ARRTYPE==double,Double
-    rand::nextDouble
-#ELSEIFSWITCH ARRTYPE==String
-    ()->Long.toString(rand.nextLong())
-#ELSE
-  ERROR unknown array type ARRTYPE
+
+  #MACRO ConvertMethods<boolean>()
+  #MACRO ConvertMethods<byte>()
+  #MACRO ConvertMethods<char>()
+  #MACRO ConvertMethods<short>()
+  #MACRO ConvertMethods<int>()
+  #MACRO ConvertMethods<long>()
+  #MACRO ConvertMethods<float>()
+  #MACRO ConvertMethods<double>()
+  #MACRO ConvertMethods<Boolean>()
+  #MACRO ConvertMethods<Byte>()
+  #MACRO ConvertMethods<Character>()
+  #MACRO ConvertMethods<Short>()
+  #MACRO ConvertMethods<Integer>()
+  #MACRO ConvertMethods<Long>()
+  #MACRO ConvertMethods<Float>()
+  #MACRO ConvertMethods<Double>()
+  #MACRO ConvertMethods<String>()
+#MACRODEF ConvertMethods<ARRTYPE>()
+#IFSWITCH ARRTYPE==Boolean,Byte,Character,Short,Integer,Long,Float,Double
+//Ignore deprecation because we need would like to be able to use identity equality on the newly created boxed types
+@SuppressWarnings("deprecation")
 #ENDIF
-  ,length);
-}
-public static ARRTYPE[] getSORTTYPEARRTYPEArray(SUPPLIERTYPE supplier,int length)
+public static ARRTYPE convertToARRTYPE(double val)
 {
-  ARRTYPE[] arr=new ARRTYPE[length];
+#IFSWITCH ARRTYPE==String
+  return Double.toString(val);
+#ELSEIFSWITCH ARRTYPE==double,float,long,int,short,char,byte
+  return (ARRTYPE)val;
+#ELSEIFSWITCH ARRTYPE==boolean
+  return (Double.doubleToRawLongBits(val)&0b1L)!=0L;
+#ELSEIFSWITCH ARRTYPE==Double
+  return new ARRTYPE(val);
+#ELSEIFSWITCH ARRTYPE==Float
+  return new ARRTYPE((float)val);
+#ELSEIFSWITCH ARRTYPE==Long
+  return new ARRTYPE((long)val);
+#ELSEIFSWITCH ARRTYPE==Integer
+  return new ARRTYPE((int)val);
+#ELSEIFSWITCH ARRTYPE==Short
+  return new ARRTYPE((short)val);
+#ELSEIFSWITCH ARRTYPE==Character
+  return new ARRTYPE((char)val);
+#ELSEIFSWITCH ARRTYPE==Byte
+  return new ARRTYPE((byte)val);
+#ELSEIFSWITCH ARRTYPE==Boolean
+  return new ARRTYPE((Double.doubleToRawLongBits(val)&0b1L)!=0L);
+#ELSE
+  ERROR unknown type ARRTYPE
+#ENDIF
+}
+#IFSWITCH ARRTYPE==Boolean,Byte,Character,Short,Integer,Long,Float,Double
+//Ignore deprecation because we need would like to be able to use identity equality on the newly created boxed types
+@SuppressWarnings("deprecation")
+#ENDIF
+public static ARRTYPE convertToARRTYPE(float val)
+{
+#IFSWITCH ARRTYPE==String
+  return Float.toString(val);
+#ELSEIFSWITCH ARRTYPE==double,float,long,int,short,char,byte
+  return (ARRTYPE)val;
+#ELSEIFSWITCH ARRTYPE==boolean
+  return (Float.floatToRawIntBits(val)&0b1)!=0;
+#ELSEIFSWITCH ARRTYPE==Double,Float
+  return new ARRTYPE(val);
+#ELSEIFSWITCH ARRTYPE==Long
+  return new ARRTYPE((long)val);
+#ELSEIFSWITCH ARRTYPE==Integer
+  return new ARRTYPE((int)val);
+#ELSEIFSWITCH ARRTYPE==Short
+  return new ARRTYPE((short)val);
+#ELSEIFSWITCH ARRTYPE==Character
+  return new ARRTYPE((char)val);
+#ELSEIFSWITCH ARRTYPE==Byte
+  return new ARRTYPE((byte)val);
+#ELSEIFSWITCH ARRTYPE==Boolean
+  return new ARRTYPE((Float.floatToRawIntBits(val)&0b1)!=0);
+#ELSE
+  ERROR unknown type ARRTYPE
+#ENDIF
+}
+#IFSWITCH ARRTYPE==Boolean,Byte,Character,Short,Integer,Long,Float,Double
+//Ignore deprecation because we need would like to be able to use identity equality on the newly created boxed types
+@SuppressWarnings("deprecation")
+#ENDIF
+public static ARRTYPE convertToARRTYPE(long val)
+{
+#IFSWITCH ARRTYPE==String
+  return Long.toString(val);
+#ELSEIFSWITCH ARRTYPE==double,float,long,int,short,char,byte
+  return (ARRTYPE)val;
+#ELSEIFSWITCH ARRTYPE==boolean
+  return (val&0b1L)!=0;
+#ELSEIFSWITCH ARRTYPE==Double,Float,Long
+  return new ARRTYPE(val);
+#ELSEIFSWITCH ARRTYPE==Integer
+  return new ARRTYPE((int)val);
+#ELSEIFSWITCH ARRTYPE==Short
+  return new ARRTYPE((short)val);
+#ELSEIFSWITCH ARRTYPE==Character
+  return new ARRTYPE((char)val);
+#ELSEIFSWITCH ARRTYPE==Byte
+  return new ARRTYPE((byte)val);
+#ELSEIFSWITCH ARRTYPE==Boolean
+  return new ARRTYPE((val&0b1)!=0);
+#ELSE
+  ERROR unknown type ARRTYPE
+#ENDIF
+}
+#IFSWITCH ARRTYPE==Boolean,Byte,Character,Short,Integer,Long,Float,Double
+//Ignore deprecation because we need would like to be able to use identity equality on the newly created boxed types
+@SuppressWarnings("deprecation")
+#ENDIF
+public static ARRTYPE convertToARRTYPE(int val)
+{
+#IFSWITCH ARRTYPE==String
+  return Integer.toString(val);
+#ELSEIFSWITCH ARRTYPE==double,float,long,int,short,char,byte
+  return (ARRTYPE)val;
+#ELSEIFSWITCH ARRTYPE==boolean
+  return (val&0b1)!=0;
+#ELSEIFSWITCH ARRTYPE==Double,Float,Long,Integer
+  return new ARRTYPE(val);
+#ELSEIFSWITCH ARRTYPE==Short
+  return new ARRTYPE((short)val);
+#ELSEIFSWITCH ARRTYPE==Character
+  return new ARRTYPE((char)val);
+#ELSEIFSWITCH ARRTYPE==Byte
+  return new ARRTYPE((byte)val);
+#ELSEIFSWITCH ARRTYPE==Boolean
+  return new ARRTYPE((val&0b1)!=0);
+#ELSE
+  ERROR unknown type ARRTYPE
+#ENDIF
+}
+#ENDDEF
+
+  #MACRO GetRandom<boolean>()
+  #MACRO GetRandom<byte>()
+  #MACRO GetRandom<char>()
+  #MACRO GetRandom<short>()
+  #MACRO GetRandom<int>()
+  #MACRO GetRandom<long>()
+  #MACRO GetRandom<float>()
+  #MACRO GetRandom<double>()
+  #MACRO GetRandom<Boolean>()
+  #MACRO GetRandom<Byte>()
+  #MACRO GetRandom<Character>()
+  #MACRO GetRandom<Short>()
+  #MACRO GetRandom<Integer>()
+  #MACRO GetRandom<Long>()
+  #MACRO GetRandom<Float>()
+  #MACRO GetRandom<Double>()
+  #MACRO GetRandom<String>()
+#MACRODEF GetRandom<ARRTYPE>()
+#IFSWITCH ARRTYPE==Boolean,Byte,Character,Short,Integer,Long,Float,Double
+//Ignore deprecation because we need would like to be able to use identity equality on the newly created boxed types
+@SuppressWarnings("deprecation")
+#ENDIF
+public static ARRTYPE getRandomARRTYPE(Random rand)
+{
+#IFSWITCH ARRTYPE==String
+  return Long.toString(rand.nextLong());
+#ELSEIFSWITCH ARRTYPE==boolean
+  return rand.nextBoolean();
+#ELSEIFSWITCH ARRTYPE==byte,char,short,int,long
+  return (ARRTYPE)rand.nextLong();
+#ELSEIFSWITCH ARRTYPE==float
+  return rand.nextFloat();
+#ELSEIFSWITCH ARRTYPE==double
+  return rand.nextDouble();
+#ELSEIFSWITCH ARRTYPE==Byte
+  return new ARRTYPE((byte)rand.nextInt());
+#ELSEIFSWITCH ARRTYPE==Character
+  return new ARRTYPE((char)rand.nextInt());
+#ELSEIFSWITCH ARRTYPE==Short
+  return new ARRTYPE((short)rand.nextInt());
+#ELSEIFSWITCH ARRTYPE==Integer
+  return new ARRTYPE(rand.nextInt());
+#ELSEIFSWITCH ARRTYPE==Boolean,Long,Float,Double
+  return new ARRTYPE(rand.nextARRTYPE());
+#ELSE
+ERROR unknown array type ARRTYPE
+#ENDIF
+}
+#ENDDEF
+
+  #MACRO ArrayBuilder<boolean,Boolean>()
+  #MACRO ArrayBuilder<byte,Byte>()
+  #MACRO ArrayBuilder<char,Character>()
+  #MACRO ArrayBuilder<short,Short>()
+  #MACRO ArrayBuilder<int,Integer>()
+  #MACRO ArrayBuilder<long,Long>()
+  #MACRO ArrayBuilder<float,Float>()
+  #MACRO ArrayBuilder<double,Double>()
+  #MACRO ArrayBuilder<String,String>()
+  #MACRO ArrayBuilder<Integer,Integer>()
+#MACRODEF RandomizedBuild<THETYPE>()
+@Override
+public void buildUnchecked(THETYPE[] arr,int offset,int length,Random rand,int m)
+{
+  length+=offset;
+  do
+  {
+    arr[offset]=getRandomTHETYPE(rand);
+  }
+  while(++offset!=length);
+}
+#ENDDEF
+#MACRODEF AscendingBuild<THETYPE>()
+@Override
+public void buildUnchecked(THETYPE[] arr,int offset,int length,Random rand,int m)
+{
+#IFSWITCH ARRTYPE==boolean
+  int i=0;
+  for(int middle=length/2;i<middle;arr[(i++)+offset]=convertToTHETYPE(0)){}
+  do
+  {
+    arr[i+offset]=convertToTHETYPE(1);
+  }
+  while(++i!=length);
+#ELSE
+  for(int i=0;i<length;arr[(i++)+offset]=convertToTHETYPE(m+i)){}
+#ENDIF
+}
+#ENDDEF
+#MACRODEF DescendingBuild<THETYPE>()
+@Override
+public void buildUnchecked(THETYPE[] arr,int offset,int length,Random rand,int m)
+{
+#IFSWITCH ARRTYPE==boolean
+  int i=0;
+  for(int middle=length/2;i<middle;arr[(i++)+offset]=convertToTHETYPE(1)){}
+  do
+  {
+    arr[i+offset]=convertToTHETYPE(0);
+  }
+  while(++i!=length);
+#ELSE
+  for(int i=0;i<length;arr[(i++)+offset]=convertToTHETYPE(length-m-i)){}
+#ENDIF
+}
+#ENDDEF
+#MACRODEF AllEqualsBuild<THETYPE>()
+@Override
+public void buildUnchecked(THETYPE[] arr,int offset,int length,Random rand,int m)
+{
+  THETYPE val=convertToTHETYPE(m);
+  length+=offset;
+  do
+  {
+    arr[offset]=val;
+  }
+  while(++offset!=length);
+}
+#ENDDEF
+#MACRODEF MergeAscendingBuild<THETYPE>()
+@Override
+public void buildUnchecked(THETYPE[] arr,int offset,int length,Random rand,int m)
+{
+  int v=0;
+  for(int i=0, k=0,period=length/m;k<m;++k)
+  {
+    v=0;
+    for(int p=0;p<period;arr[(i++)+offset]=convertToTHETYPE(++v),++p){}
+  }
+  for(int j=1;j<length-1;arr[j++]=convertToTHETYPE(++v)){}
+#IFSWITCH THETYPE==Boolean,Byte,Character,Short,Integer,Long,Float,Double,String
+  for(int i=offset,bound=offset+length;i<bound;++i)
+  {
+    if(arr[i]==null)
+    {
+      arr[i]=convertToTHETYPE(0);
+    }
+  }
+#ENDIF
+}
+#ENDDEF
+#MACRODEF MergeDescendingBuild<THETYPE>()
+@Override
+public void buildUnchecked(THETYPE[] arr,int offset,int length,Random rand,int m)
+{
+  int v=0;
+  for(int i=0, k=0,period=length/m;k<m;++k)
+  {
+    v=0;
+    for(int p=0;p<period;arr[(i++)+offset]=convertToTHETYPE(--v),++p){}
+  }
+  for(int j=1;j<length-1;arr[j++]=convertToTHETYPE(--v)){}
+#IFSWITCH THETYPE==Boolean,Byte,Character,Short,Integer,Long,Float,Double,String
+  for(int i=offset,bound=offset+length;i<bound;++i)
+  {
+    if(arr[i]==null)
+    {
+      arr[i]=convertToTHETYPE(0);
+    }
+  }
+#ENDIF
+}
+#ENDDEF
+#MACRODEF SawBuild<THETYPE>()
+@Override
+public void buildUnchecked(THETYPE[] arr,int offset,int length,Random rand,int m)
+{
+  for(int incCount=1,decCount=length,i=0,period=m--;;period+=m)
+  {
+    for(int k=0;++k<=period;arr[(i++)+offset]=convertToTHETYPE(incCount++))
+    {
+      if(i>=length)
+      {
+        return;
+      }
+    }
+    period+=m;
+    for(int k=0;++k<=period;arr[(i++)+offset]=convertToTHETYPE(decCount--))
+    {
+      if(i>=length)
+      {
+        return;
+      }
+    }
+  }
+}
+#ENDDEF
+#MACRODEF SortedRepeatedBuild<THETYPE>()
+@Override
+public void buildUnchecked(THETYPE[] arr,int offset,int length,Random rand,int m)
+{
+  for(int period=length/m,i=0,k=0;;++k)
+  {
+    for(int t=0;++t<=period;arr[(i++)+offset]=convertToTHETYPE(k))
+    {
+      if(i>=length)
+      {
+        return;
+      }
+    }
+    if(i>=length)
+    {
+      return;
+    }
+  }
+}
+#ENDDEF
+#MACRODEF RepeatedBuild<THETYPE>()
+@Override
+public void buildUnchecked(THETYPE[] arr,int offset,int length,Random rand,int m)
+{
+  int i=0;
+  do
+  {
+    arr[i+offset]=convertToTHETYPE(i%m);
+  }
+  while(++i!=length);
+}
+#ENDDEF
+#MACRODEF DuplicatedBuild<THETYPE>()
+@Override
+public void buildUnchecked(THETYPE[] arr,int offset,int length,Random rand,int m)
+{
+  int i=0;
+  do
+  {
+    arr[i+offset]=convertToTHETYPE(rand.nextInt(m));
+  }
+  while(++i!=length);
+}
+#ENDDEF
+#MACRODEF SortedOrganPipesBuild<THETYPE>()
+@Override
+public void buildUnchecked(THETYPE[] arr,int offset,int length,Random rand,int m)
+{
+  for(int i=0;;)
+  {
+    for(int t=0;++t<=m;arr[(i++)+offset]=convertToTHETYPE(m))
+    {
+      if(i>=length)
+      {
+        return;
+      }
+    }
+  }
+}
+#ENDDEF
+#MACRODEF OrganPipesBuild<THETYPE>()
+@Override
+public void buildUnchecked(THETYPE[] arr,int offset,int length,Random rand,int m)
+{
+  int i=0;
+  for(int middle=length/(m+1);i<middle;arr[i+offset]=convertToTHETYPE(i++)){}
+  while(i<length)
+  {
+    arr[i+offset]=convertToTHETYPE(length-(i++)-1);
+  }
+}
+#ENDDEF
+#MACRODEF StaggerBuild<THETYPE>()
+@Override
+public void buildUnchecked(THETYPE[] arr,int offset,int length,Random rand,int m)
+{
+  int i=0;
+  do
+  {
+    arr[i+offset]=convertToTHETYPE((i*m+i)%length);
+  }
+  while(++i!=length);
+}
+#ENDDEF
+#MACRODEF PlateauBuild<THETYPE>()
+@Override
+public void buildUnchecked(THETYPE[] arr,int offset,int length,Random rand,int m)
+{
+  int i=0;
+  do
+  {
+    arr[offset+i]=convertToTHETYPE(Math.min(i,m));
+  }
+  while(++i!=length);
+}
+#ENDDEF
+#MACRODEF ShuffleBuild<THETYPE>()
+@Override
+public void buildUnchecked(THETYPE[] arr,int offset,int length,Random rand,int m)
+{
+  int x=0,y=0;
+  int bound=offset+length;
+  do
+  {
+    arr[offset]=convertToTHETYPE(rand.nextBoolean()?(x+2):(y+2));
+  }
+  while(++offset!=bound);
+}
+#ENDDEF
+#MACRODEF WithNaNsAndZerosBuild<THETYPE>()
+#IFSWITCH THETYPE==Float,Double
+//Ignore deprecation because we need would like to be able to use identity equality on the newly created boxed types
+@SuppressWarnings("deprecation")
+#ENDIF
+@Override
+public void buildUnchecked(THETYPE[] arr,int offset,int length,Random rand,int m)
+{
   for(int i=0;i<length;++i)
   {
-    arr[i]=(ARRTYPE)supplier.SUPPLIERMETHOD();
+    switch(rand.nextInt(4))
+    {
+    case 0:
+#IFSWITCH THETYPE==Float,Double
+      arr[i+offset]=new THETYPE((ARRTYPE)0.0);
+#ELSE
+      arr[i+offset]=(ARRTYPE)0.0;
+#ENDIF
+      break;
+    case 1:
+#IFSWITCH THETYPE==Float,Double
+      arr[i+offset]=new THETYPE((ARRTYPE)-0.0);
+#ELSE
+      arr[i+offset]=(ARRTYPE)-0.0;
+#ENDIF
+      break;
+    case 2:
+#IFSWITCH THETYPE==Float,Double
+      arr[i+offset]=new THETYPE(BOXEDTYPE.NaN);
+#ELSE
+      arr[i+offset]=BOXEDTYPE.NaN;
+#ENDIF
+      break;
+    default:
+      arr[i+offset]=getRandomTHETYPE(rand);
+    }
   }
-#IFNOTSWITCH SORTTYPE==Unsorted
-  #IFSWITCH ARRTYPE==boolean
-  Boolean[] boxedCopy=new Boolean[length];
-  ArrCopy.uncheckedCopy(arr,0,boxedCopy,0,length);
-  Arrays.sort(boxedCopy,0,length);
-  ArrCopy.uncheckedCopy(boxedCopy,0,arr,0,length);
-  #ELSE
-  Arrays.sort(arr,0,length);
-  #ENDIF
-  #IFSWITCH SORTTYPE==Descending
-  OmniArray.OfCLASSPREFIX.reverseRange(arr,0,length-1);
+}
+#ENDDEF
+#MACRODEF ArrayBuilderValue<VALUENAME,RANDOMIZED>()
+VALUENAME
+{
+#IFSWITCH RANDOMIZED==true
+  @Override
+  public boolean isRandomized()
+  {
+    return true;
+  }
+#ENDIF
+  #MACRO VALUENAMEBuild<ARRTYPE>()
+#IFSWITCH ARRTYPE==boolean,byte,char,short,int,long,float,double
+  #MACRO VALUENAMEBuild<BOXEDTYPE>()
+#ENDIF
+}
+#ENDDEF
+
+#MACRODEF ArrayBuilder<ARRTYPE,BOXEDTYPE>()
+public static enum ARRTYPEArrayBuilder
+{
+  #MACRO ArrayBuilderValue<Randomized,true>()
+  ,
+  #MACRO ArrayBuilderValue<Ascending,false>()
+  ,
+  #MACRO ArrayBuilderValue<Descending,false>()
+  ,
+  #MACRO ArrayBuilderValue<AllEquals,false>()
+#IFNOTSWITCH ARRTYPE==boolean
+  ,
+  #MACRO ArrayBuilderValue<MergeAscending,false>()
+  ,
+  #MACRO ArrayBuilderValue<MergeDescending,false>()
+  ,
+  #MACRO ArrayBuilderValue<Saw,false>()
+  ,
+  #MACRO ArrayBuilderValue<SortedRepeated,false>()
+  ,
+  #MACRO ArrayBuilderValue<Repeated,false>()
+  ,
+  #MACRO ArrayBuilderValue<Duplicated,true>()
+  ,
+  #MACRO ArrayBuilderValue<SortedOrganPipes,false>()
+  ,
+  #MACRO ArrayBuilderValue<OrganPipes,false>()
+  ,
+  #MACRO ArrayBuilderValue<Stagger,false>()
+  ,
+  #MACRO ArrayBuilderValue<Plateau,false>()
+  ,
+  #MACRO ArrayBuilderValue<Shuffle,true>()
+  #IFSWITCH ARRTYPE==float,double
+  ,
+  #MACRO ArrayBuilderValue<WithNaNsAndZeros,true>()
   #ENDIF
 #ENDIF
-  return arr;
+  ;
+  public boolean isRandomized()
+  {
+    //most sub-types are not randomized, so make that the default
+    return false;
+  }
+  public abstract void buildUnchecked(ARRTYPE[] arr,int offset,int length,Random rand,int m);
+  public void build(ARRTYPE[] arr,Random rand,int m)
+  {
+    if(arr==null)
+    {
+      throw new NullPointerException("arr cannot be null");
+    }
+    int length;
+    if((length=arr.length)!=0)
+    {
+      buildUnchecked(arr,0,length,rand,m);
+    }
+  }  
+  public void build(ARRTYPE[] arr,int offset,int length,Random rand,int m)
+  {
+    if(arr==null)
+    {
+      throw new NullPointerException("arr cannot be null");
+    }
+    if(offset<0 || length<0 || offset+length>arr.length)
+    {
+      throw new ArrayIndexOutOfBoundsException("offset = "+offset+"; length="+length+"; arr.length="+arr.length);
+    }
+    if(length!=0)
+    {
+      buildUnchecked(arr,offset,length,rand,m);
+    }
+  }
+#IFSWITCH ARRTYPE==boolean,byte,char,short,int,long,float,double
+  public abstract void buildUnchecked(BOXEDTYPE[] arr,int offset,int length,Random rand,int m);
+  public void build(BOXEDTYPE[] arr,Random rand,int m)
+  {
+    if(arr==null)
+    {
+      throw new NullPointerException("arr cannot be null");
+    }
+    int length;
+    if((length=arr.length)!=0)
+    {
+      buildUnchecked(arr,0,length,rand,m);
+    }
+  }  
+  public void build(BOXEDTYPE[] arr,int offset,int length,Random rand,int m)
+  {
+    if(arr==null)
+    {
+      throw new NullPointerException("arr cannot be null");
+    }
+    if(offset<0 || length<0 || offset+length>arr.length)
+    {
+      throw new ArrayIndexOutOfBoundsException("offset = "+offset+"; length="+length+"; arr.length="+arr.length);
+    }
+    if(length!=0)
+    {
+      buildUnchecked(arr,offset,length,rand,m);
+    }
+  }
+#ENDIF
+  @Override
+  public String toString()
+  {
+    return "ARRTYPEArrayBuilder."+this.name();
+  }
 }
-#ENDDEF  
+#ENDDEF
+
+  #MACRO ArraysAreEqual<boolean>()
+  #MACRO ArraysAreEqual<byte>()
+  #MACRO ArraysAreEqual<char>()
+  #MACRO ArraysAreEqual<short>()
+  #MACRO ArraysAreEqual<int>()
+  #MACRO ArraysAreEqual<long>()
+  #MACRO ArraysAreEqual<float>()
+  #MACRO ArraysAreEqual<double>()
+  #MACRO ArraysAreEqual<Boolean>()
+  #MACRO ArraysAreEqual<Byte>()
+  #MACRO ArraysAreEqual<Character>()
+  #MACRO ArraysAreEqual<Short>()
+  #MACRO ArraysAreEqual<Integer>()
+  #MACRO ArraysAreEqual<Long>()
+  #MACRO ArraysAreEqual<Float>()
+  #MACRO ArraysAreEqual<Double>()
+  #MACRO ArraysAreEqual<Object>()
+
+
+#MACRODEF ArraysAreEqual<LEFT>()
+#MACRO ArraysAreEqualHelper<boolean>()
+#MACRO ArraysAreEqualHelper<byte>()
+#MACRO ArraysAreEqualHelper<char>()
+#MACRO ArraysAreEqualHelper<short>()
+#MACRO ArraysAreEqualHelper<int>()
+#MACRO ArraysAreEqualHelper<long>()
+#MACRO ArraysAreEqualHelper<float>()
+#MACRO ArraysAreEqualHelper<double>()
+#MACRO ArraysAreEqualHelper<Boolean>()
+#MACRO ArraysAreEqualHelper<Byte>()
+#MACRO ArraysAreEqualHelper<Character>()
+#MACRO ArraysAreEqualHelper<Short>()
+#MACRO ArraysAreEqualHelper<Integer>()
+#MACRO ArraysAreEqualHelper<Long>()
+#MACRO ArraysAreEqualHelper<Float>()
+#MACRO ArraysAreEqualHelper<Double>()
+#MACRO ArraysAreEqualHelper<Object>()
+#ENDDEF
+
+#MACRODEF ArraysAreEqualHelper<RIGHT>()
+public static boolean isEqual(LEFT l,RIGHT r)
+{
+#IFSWITCH LEFT==boolean,byte,char,short,int,long,float,double
+  #IFSWITCH RIGHT==boolean
+    #IFSWITCH LEFT==boolean
+  return l==r;
+    #ELSEIFSWITCH LEFT==byte,char,short,int
+  return l==TypeUtil.castToByte(r);
+    #ELSEIFSWITCH LEFT==long
+  return l==TypeUtil.castToLong(r);
+    #ELSEIFSWITCH LEFT==float
+  return l==TypeUtil.castToFloat(r);
+    #ELSE
+  return l==TypeUtil.castToDouble(r);
+    #ENDIF
+  #ELSEIFSWITCH RIGHT==byte,char,short
+    #IFSWITCH LEFT==boolean
+  return TypeUtil.castToByte(l)==r;
+    #ELSE
+  return l==r;
+    #ENDIF
+  #ELSEIFSWITCH RIGHT==int
+    #IFSWITCH LEFT==boolean
+  return TypeUtil.castToByte(l)==r;
+    #ELSEIFSWITCH LEFT==byte,char,short,int,long,double
+  return l==r;
+    #ELSE
+  return ((double)l)==((double)r);
+    #ENDIF
+  #ELSEIFSWITCH RIGHT==long
+    #IFSWITCH LEFT==boolean
+  return TypeUtil.castToLong(l)==r;
+    #ELSEIFSWITCH LEFT==byte,char,short,int,long
+  return l==r;
+    #ELSEIFSWITCH LEFT==float
+  return TypeUtil.floatEquals(l,r);
+    #ELSE
+  return TypeUtil.doubleEquals(l,r);
+    #ENDIF
+  #ELSEIFSWITCH RIGHT==float
+    #IFSWITCH LEFT==boolean
+  return TypeUtil.castToFloat(l)==r;
+    #ELSEIFSWITCH LEFT==byte,char,short
+  return l==r;
+    #ELSEIFSWITCH LEFT==int
+  return ((double)l)==((double)r);
+    #ELSEIFSWITCH LEFT==long,float
+  return TypeUtil.floatEquals(r,l);
+    #ELSE
+  return TypeUtil.doubleEquals(l,r);
+    #ENDIF
+  #ELSEIFSWITCH RIGHT==double
+    #IFSWITCH LEFT==boolean
+  return TypeUtil.doubleEquals(r,TypeUtil.castToDouble(l));
+    #ELSEIFSWITCH LEFT==byte,char,short,int
+  return l==r;
+    #ELSE
+  return TypeUtil.doubleEquals(r,l);
+    #ENDIF
+  #ELSE
+  if(r==null)
+  {
+    return false;
+  }
+    #IFSWITCH RIGHT==Boolean
+  return isEqual(l,(boolean)r);
+    #ELSEIFSWITCH RIGHT==Byte
+  return isEqual(l,(byte)r);
+    #ELSEIFSWITCH RIGHT==Character
+  return isEqual(l,(char)r);
+    #ELSEIFSWITCH RIGHT==Short
+  return isEqual(l,(short)r);
+    #ELSEIFSWITCH RIGHT==Integer
+  return isEqual(l,(int)r);
+    #ELSEIFSWITCH RIGHT==Long
+  return isEqual(l,(long)r);
+    #ELSEIFSWITCH RIGHT==Float
+  return isEqual(l,(float)r);
+    #ELSEIFSWITCH RIGHT==Double
+  return isEqual(l,(double)r);
+    #ELSE
+  return r.equals(l);
+    #ENDIF
+  #ENDIF
+#ELSE
+  if(l==null)
+  {
+    #IFSWITCH RIGHT==boolean,byte,char,short,int,long,float,double
+    return false;
+    #ELSE
+    return r==null;
+    #ENDIF
+  }
+  #IFSWITCH LEFT==Boolean
+  return isEqual((boolean)l,r);
+  #ELSEIFSWITCH LEFT==Byte
+  return isEqual((byte)l,r);
+  #ELSEIFSWITCH LEFT==Character
+  return isEqual((char)l,r);
+  #ELSEIFSWITCH LEFT==Short
+  return isEqual((short)l,r);
+  #ELSEIFSWITCH LEFT==Integer
+  return isEqual((int)l,r);
+  #ELSEIFSWITCH LEFT==Long
+  return isEqual((long)l,r);
+  #ELSEIFSWITCH LEFT==Float
+  return isEqual((float)l,r);
+  #ELSEIFSWITCH LEFT==Double
+  return isEqual((double)l,r);
+  #ELSE
+  return l.equals(r);
+  #ENDIF
+#ENDIF
+
+}
+public static void uncheckedparallelassertarraysAreEqual(LEFT[] lArr,int lOffset,RIGHT[] rArr,int rOffset,int length)
+{
+  IntStream.range(0,length).parallel().forEach(index->
+  {
+    Assertions.assertTrue(isEqual(lArr[lOffset+index],rArr[rOffset+index]));
+  });
+}
+public static void parallelassertarraysAreEqual(LEFT[] lArr,int lOffset,RIGHT[] rArr,int rOffset,int length)
+{
+  #MACRO CheckArrays()
+  if(length!=0)
+  {
+    uncheckedparallelassertarraysAreEqual(lArr,lOffset,rArr,rOffset,length);
+  }
+}
+public static void uncheckedassertarraysAreEqual(LEFT[] lArr,int lOffset,RIGHT[] rArr,int rOffset,int length)
+{
+  for(length+=lOffset;;++rOffset)
+  {
+    Assertions.assertTrue(isEqual(lArr[lOffset],rArr[rOffset]));
+    if(++lOffset==length)
+    {
+      return;
+    }
+  }
+}
+public static void assertarraysAreEqual(LEFT[] lArr,int lOffset,RIGHT[] rArr,int rOffset,int length)
+{
+  #MACRO CheckArrays()
+  if(length!=0)
+  {
+    uncheckedassertarraysAreEqual(lArr,lOffset,rArr,rOffset,length);
+  }
+}
+public static boolean uncheckedarraysAreEqual(LEFT[] lArr,int lOffset,RIGHT[] rArr,int rOffset,int length)
+{
+  for(length+=lOffset;isEqual(lArr[lOffset],rArr[rOffset]);++rOffset)
+  {
+    if(++lOffset==length)
+    {
+      return true;
+    }
+  }
+  return false;
+}
+public static boolean arraysAreEqual(LEFT[] lArr,int lOffset,RIGHT[] rArr,int rOffset,int length)
+{
+  #MACRO CheckArrays()
+  return length==0 || uncheckedarraysAreEqual(lArr,lOffset,rArr,rOffset,length);
+}
+
+
+public static void uncheckedparallelassertreversearraysAreEqual(LEFT[] lArr,int lOffset,RIGHT[] rArr,int rOffset,int length)
+{
+  IntStream.range(0,length).parallel().forEach(index->
+  {
+    Assertions.assertTrue(isEqual(lArr[lOffset+(length-index-1)],rArr[rOffset+index]));
+  });
+}
+public static void parallelassertreversearraysAreEqual(LEFT[] lArr,int lOffset,RIGHT[] rArr,int rOffset,int length)
+{
+  #MACRO CheckArrays()
+  if(length!=0)
+  {
+    uncheckedparallelassertreversearraysAreEqual(lArr,lOffset,rArr,rOffset,length);
+  }
+}
+public static void uncheckedassertreversearraysAreEqual(LEFT[] lArr,int lOffset,RIGHT[] rArr,int rOffset,int length)
+{
+  for(lOffset+=length;;++rOffset)
+  {
+    Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
+    if(lOffset==length)
+    {
+      return;
+    }
+  }
+}
+public static void assertreversearraysAreEqual(LEFT[] lArr,int lOffset,RIGHT[] rArr,int rOffset,int length)
+{
+  #MACRO CheckArrays()
+  if(length!=0)
+  {
+    uncheckedassertreversearraysAreEqual(lArr,lOffset,rArr,rOffset,length);
+  }
+}
+public static boolean uncheckedreversearraysAreEqual(LEFT[] lArr,int lOffset,RIGHT[] rArr,int rOffset,int length)
+{
+  for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+  {
+    if(lOffset==length)
+    {
+      return true;
+    }
+  }
+  return false;
+}
+public static boolean reversearraysAreEqual(LEFT[] lArr,int lOffset,RIGHT[] rArr,int rOffset,int length)
+{
+  #MACRO CheckArrays()
+  return length==0 || uncheckedreversearraysAreEqual(lArr,lOffset,rArr,rOffset,length);
+}
+
+
+#ENDDEF
+#MACRODEF CheckArrays()
+Objects.requireNonNull(lArr);
+Objects.requireNonNull(rArr);
+if(length<0 || lOffset<0 || rOffset<0 || lOffset+length>lArr.length || rOffset+length>rArr.length)
+{
+  throw new ArrayIndexOutOfBoundsException("lArr.length="+lArr.length+"; rArr.length="+rArr.length+"; lOffset="+lOffset+"; rOffset="+rOffset+"; length="+length);
+}
+#ENDDEF
+
+
+
 }

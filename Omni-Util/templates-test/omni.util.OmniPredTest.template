@@ -1,7 +1,7 @@
 #TYPEDEF OfGeneric
 package omni.util;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 public class OmniPredTest
 {
   #MACRO TestGetEqualsBitsPred(Flt,Float,float,Int)
@@ -10,7 +10,7 @@ public class OmniPredTest
 @Test
 public void testGetEqualsSHRTNAMEBitsPred()
 {
-  Assert.assertTrue(OmniPred.OfRef.getEqualsSHRTNAMEBitsPred(BOXEDTYPE.PRIMITIVETYPEToRawBITSTYPEBits((PRIMITIVETYPE)5.0)).test(BOXEDTYPE.valueOf((PRIMITIVETYPE)5.0)));
+  Assertions.assertTrue(OmniPred.OfRef.getEqualsSHRTNAMEBitsPred(BOXEDTYPE.PRIMITIVETYPEToRawBITSTYPEBits((PRIMITIVETYPE)5.0)).test(BOXEDTYPE.valueOf((PRIMITIVETYPE)5.0)));
 }
 #ENDDEF
   @Test
@@ -54,7 +54,7 @@ public void testGetEqualsSHRTNAMEBitsPred()
 #MACRODEF TestPred(VAL)
 {
   var pred=OmniPred.OfRef.getEqualsPred(VAL);
-  Assert.assertTrue(pred.test(VAL));
+  Assertions.assertTrue(pred.test(VAL));
 }
 #ENDDEF
     
