@@ -396,206 +396,206 @@ public class SortUtilTest
   }
   private static void isSorted(Integer[] arr,Integer[] copy,Comparator<? super Integer> sorter)
   {
-    Thread stockSorterThread=new Thread(()->
-    {
-    Arrays.sort(copy,0,copy.length,sorter);
-    });
-    stockSorterThread.start();
     SortUtil.comparatorSortObjectTimSort.uncheckedsort(arr,0,arr.length,sorter);
-    try
-    {
-      stockSorterThread.join();
-    }
-    catch(InterruptedException e)
-    {
-      throw new AssertionError(e);
-    }
+    //Thread stockSorterThread=new Thread(()->
+    //{
+    Arrays.sort(copy,0,copy.length,sorter);
+    //});
+    //stockSorterThread.start();
+    //try
+    //{
+    //  stockSorterThread.join();
+    //}
+    //catch(InterruptedException e)
+    //{
+    //  throw new AssertionError(e);
+    //}
     JunitUtil.uncheckedparallelassertarraysAreEqual(arr,0,copy,0,copy.length);
   }
   private static void isSorted(String[] arr,String[] copy,Comparator<? super String> sorter)
   {
-    Thread stockSorterThread=new Thread(()->
-    {
-    Arrays.sort(copy,0,copy.length,sorter);
-    });
-    stockSorterThread.start();
     SortUtil.comparatorSortObjectTimSort.uncheckedsort(arr,0,arr.length,sorter);
-    try
-    {
-      stockSorterThread.join();
-    }
-    catch(InterruptedException e)
-    {
-      throw new AssertionError(e);
-    }
+    //Thread stockSorterThread=new Thread(()->
+    //{
+    Arrays.sort(copy,0,copy.length,sorter);
+    //});
+    //stockSorterThread.start();
+    //try
+    //{
+    //  stockSorterThread.join();
+    //}
+    //catch(InterruptedException e)
+    //{
+    //  throw new AssertionError(e);
+    //}
     JunitUtil.uncheckedparallelassertarraysAreEqual(arr,0,copy,0,copy.length);
   }
   private static void isSorted(boolean[] arr,boolean[] copy,BooleanComparator sorter)
   {
-    Thread stockSorterThread=new Thread(()->
-    {
+    SortUtil.uncheckedcomparatorSort(arr,0,arr.length-1,sorter);
+    //Thread stockSorterThread=new Thread(()->
+    //{
     Boolean[] boxedCopy=new Boolean[copy.length];
     ArrCopy.uncheckedCopy(copy,0,boxedCopy,0,copy.length);
     Arrays.sort(boxedCopy,0,copy.length,sorter::compare);
     ArrCopy.uncheckedCopy(boxedCopy,0,copy,0,copy.length);
-    });
-    stockSorterThread.start();
-    SortUtil.uncheckedcomparatorSort(arr,0,arr.length-1,sorter);
-    try
-    {
-      stockSorterThread.join();
-    }
-    catch(InterruptedException e)
-    {
-      throw new AssertionError(e);
-    }
+    //});
+    //stockSorterThread.start();
+    //try
+    //{
+    //  stockSorterThread.join();
+    //}
+    //catch(InterruptedException e)
+    //{
+    //  throw new AssertionError(e);
+    //}
     JunitUtil.uncheckedparallelassertarraysAreEqual(arr,0,copy,0,copy.length);
   }
   private static void isSorted(byte[] arr,byte[] copy,ByteComparator sorter)
   {
-    Thread stockSorterThread=new Thread(()->
-    {
+    SortUtil.comparatorSortbyteTimSort.uncheckedsort(arr,0,arr.length,sorter);
+    //Thread stockSorterThread=new Thread(()->
+    //{
     Byte[] boxedCopy=new Byte[copy.length];
     ArrCopy.uncheckedCopy(copy,0,boxedCopy,0,copy.length);
     Arrays.sort(boxedCopy,0,copy.length,sorter::compare);
     ArrCopy.uncheckedCopy(boxedCopy,0,copy,0,copy.length);
-    });
-    stockSorterThread.start();
-    SortUtil.comparatorSortbyteTimSort.uncheckedsort(arr,0,arr.length,sorter);
-    try
-    {
-      stockSorterThread.join();
-    }
-    catch(InterruptedException e)
-    {
-      throw new AssertionError(e);
-    }
+    //});
+    //stockSorterThread.start();
+    //try
+    //{
+    //  stockSorterThread.join();
+    //}
+    //catch(InterruptedException e)
+    //{
+    //  throw new AssertionError(e);
+    //}
     JunitUtil.uncheckedparallelassertarraysAreEqual(arr,0,copy,0,copy.length);
   }
   private static void isSorted(char[] arr,char[] copy,CharComparator sorter)
   {
-    Thread stockSorterThread=new Thread(()->
-    {
+    SortUtil.comparatorSortcharTimSort.uncheckedsort(arr,0,arr.length,sorter);
+    //Thread stockSorterThread=new Thread(()->
+    //{
     Character[] boxedCopy=new Character[copy.length];
     ArrCopy.uncheckedCopy(copy,0,boxedCopy,0,copy.length);
     Arrays.sort(boxedCopy,0,copy.length,sorter::compare);
     ArrCopy.uncheckedCopy(boxedCopy,0,copy,0,copy.length);
-    });
-    stockSorterThread.start();
-    SortUtil.comparatorSortcharTimSort.uncheckedsort(arr,0,arr.length,sorter);
-    try
-    {
-      stockSorterThread.join();
-    }
-    catch(InterruptedException e)
-    {
-      throw new AssertionError(e);
-    }
+    //});
+    //stockSorterThread.start();
+    //try
+    //{
+    //  stockSorterThread.join();
+    //}
+    //catch(InterruptedException e)
+    //{
+    //  throw new AssertionError(e);
+    //}
     JunitUtil.uncheckedparallelassertarraysAreEqual(arr,0,copy,0,copy.length);
   }
   private static void isSorted(short[] arr,short[] copy,ShortComparator sorter)
   {
-    Thread stockSorterThread=new Thread(()->
-    {
+    SortUtil.comparatorSortshortTimSort.uncheckedsort(arr,0,arr.length,sorter);
+    //Thread stockSorterThread=new Thread(()->
+    //{
     Short[] boxedCopy=new Short[copy.length];
     ArrCopy.uncheckedCopy(copy,0,boxedCopy,0,copy.length);
     Arrays.sort(boxedCopy,0,copy.length,sorter::compare);
     ArrCopy.uncheckedCopy(boxedCopy,0,copy,0,copy.length);
-    });
-    stockSorterThread.start();
-    SortUtil.comparatorSortshortTimSort.uncheckedsort(arr,0,arr.length,sorter);
-    try
-    {
-      stockSorterThread.join();
-    }
-    catch(InterruptedException e)
-    {
-      throw new AssertionError(e);
-    }
+    //});
+    //stockSorterThread.start();
+    //try
+    //{
+    //  stockSorterThread.join();
+    //}
+    //catch(InterruptedException e)
+    //{
+    //  throw new AssertionError(e);
+    //}
     JunitUtil.uncheckedparallelassertarraysAreEqual(arr,0,copy,0,copy.length);
   }
   private static void isSorted(int[] arr,int[] copy,IntBinaryOperator sorter)
   {
-    Thread stockSorterThread=new Thread(()->
-    {
+    SortUtil.comparatorSortintTimSort.uncheckedsort(arr,0,arr.length,sorter);
+    //Thread stockSorterThread=new Thread(()->
+    //{
     Integer[] boxedCopy=new Integer[copy.length];
     ArrCopy.uncheckedCopy(copy,0,boxedCopy,0,copy.length);
     Arrays.sort(boxedCopy,0,copy.length,sorter::applyAsInt);
     ArrCopy.uncheckedCopy(boxedCopy,0,copy,0,copy.length);
-    });
-    stockSorterThread.start();
-    SortUtil.comparatorSortintTimSort.uncheckedsort(arr,0,arr.length,sorter);
-    try
-    {
-      stockSorterThread.join();
-    }
-    catch(InterruptedException e)
-    {
-      throw new AssertionError(e);
-    }
+    //});
+    //stockSorterThread.start();
+    //try
+    //{
+    //  stockSorterThread.join();
+    //}
+    //catch(InterruptedException e)
+    //{
+    //  throw new AssertionError(e);
+    //}
     JunitUtil.uncheckedparallelassertarraysAreEqual(arr,0,copy,0,copy.length);
   }
   private static void isSorted(long[] arr,long[] copy,LongComparator sorter)
   {
-    Thread stockSorterThread=new Thread(()->
-    {
+    SortUtil.comparatorSortlongTimSort.uncheckedsort(arr,0,arr.length,sorter);
+    //Thread stockSorterThread=new Thread(()->
+    //{
     Long[] boxedCopy=new Long[copy.length];
     ArrCopy.uncheckedCopy(copy,0,boxedCopy,0,copy.length);
     Arrays.sort(boxedCopy,0,copy.length,sorter::compare);
     ArrCopy.uncheckedCopy(boxedCopy,0,copy,0,copy.length);
-    });
-    stockSorterThread.start();
-    SortUtil.comparatorSortlongTimSort.uncheckedsort(arr,0,arr.length,sorter);
-    try
-    {
-      stockSorterThread.join();
-    }
-    catch(InterruptedException e)
-    {
-      throw new AssertionError(e);
-    }
+    //});
+    //stockSorterThread.start();
+    //try
+    //{
+    //  stockSorterThread.join();
+    //}
+    //catch(InterruptedException e)
+    //{
+    //  throw new AssertionError(e);
+    //}
     JunitUtil.uncheckedparallelassertarraysAreEqual(arr,0,copy,0,copy.length);
   }
   private static void isSorted(float[] arr,float[] copy,FloatComparator sorter)
   {
-    Thread stockSorterThread=new Thread(()->
-    {
+    SortUtil.comparatorSortfloatTimSort.uncheckedsort(arr,0,arr.length,sorter);
+    //Thread stockSorterThread=new Thread(()->
+    //{
     Float[] boxedCopy=new Float[copy.length];
     ArrCopy.uncheckedCopy(copy,0,boxedCopy,0,copy.length);
     Arrays.sort(boxedCopy,0,copy.length,sorter::compare);
     ArrCopy.uncheckedCopy(boxedCopy,0,copy,0,copy.length);
-    });
-    stockSorterThread.start();
-    SortUtil.comparatorSortfloatTimSort.uncheckedsort(arr,0,arr.length,sorter);
-    try
-    {
-      stockSorterThread.join();
-    }
-    catch(InterruptedException e)
-    {
-      throw new AssertionError(e);
-    }
+    //});
+    //stockSorterThread.start();
+    //try
+    //{
+    //  stockSorterThread.join();
+    //}
+    //catch(InterruptedException e)
+    //{
+    //  throw new AssertionError(e);
+    //}
     JunitUtil.uncheckedparallelassertarraysAreEqual(arr,0,copy,0,copy.length);
   }
   private static void isSorted(double[] arr,double[] copy,DoubleComparator sorter)
   {
-    Thread stockSorterThread=new Thread(()->
-    {
+    SortUtil.comparatorSortdoubleTimSort.uncheckedsort(arr,0,arr.length,sorter);
+    //Thread stockSorterThread=new Thread(()->
+    //{
     Double[] boxedCopy=new Double[copy.length];
     ArrCopy.uncheckedCopy(copy,0,boxedCopy,0,copy.length);
     Arrays.sort(boxedCopy,0,copy.length,sorter::compare);
     ArrCopy.uncheckedCopy(boxedCopy,0,copy,0,copy.length);
-    });
-    stockSorterThread.start();
-    SortUtil.comparatorSortdoubleTimSort.uncheckedsort(arr,0,arr.length,sorter);
-    try
-    {
-      stockSorterThread.join();
-    }
-    catch(InterruptedException e)
-    {
-      throw new AssertionError(e);
-    }
+    //});
+    //stockSorterThread.start();
+    //try
+    //{
+    //  stockSorterThread.join();
+    //}
+    //catch(InterruptedException e)
+    //{
+    //  throw new AssertionError(e);
+    //}
     JunitUtil.uncheckedparallelassertarraysAreEqual(arr,0,copy,0,copy.length);
   }
   private static int getMLo(JunitUtil.booleanArrayBuilder builder)

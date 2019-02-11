@@ -120,8 +120,15 @@ private static void isSortedSORTTYPE(ARRTYPE[] arr,ARRTYPE[] copy)
 #MACRODEF IsSorted<ARRTYPE>(COMPARATORTYPE,COMPARATORMETHOD,BOXEDTYPE)
 private static void isSorted(ARRTYPE[] arr,ARRTYPE[] copy,COMPARATORTYPE sorter)
 {
-  Thread stockSorterThread=new Thread(()->
-  {
+#IFSWITCH ARRTYPE==Integer,String
+  SortUtil.comparatorSortObjectTimSort.uncheckedsort(arr,0,arr.length,sorter);
+#ELSEIFSWITCH ARRTYPE==boolean
+  SortUtil.uncheckedcomparatorSort(arr,0,arr.length-1,sorter);
+#ELSE
+  SortUtil.comparatorSortARRTYPETimSort.uncheckedsort(arr,0,arr.length,sorter);
+#ENDIF
+  //Thread stockSorterThread=new Thread(()->
+  //{
 #IFSWITCH ARRTYPE==Integer,String
   Arrays.sort(copy,0,copy.length,sorter);
 #ELSE
@@ -130,23 +137,17 @@ private static void isSorted(ARRTYPE[] arr,ARRTYPE[] copy,COMPARATORTYPE sorter)
   Arrays.sort(boxedCopy,0,copy.length,sorter::COMPARATORMETHOD);
   ArrCopy.uncheckedCopy(boxedCopy,0,copy,0,copy.length);
 #ENDIF
-  });
-  stockSorterThread.start();
-#IFSWITCH ARRTYPE==Integer,String
-  SortUtil.comparatorSortObjectTimSort.uncheckedsort(arr,0,arr.length,sorter);
-#ELSEIFSWITCH ARRTYPE==boolean
-  SortUtil.uncheckedcomparatorSort(arr,0,arr.length-1,sorter);
-#ELSE
-  SortUtil.comparatorSortARRTYPETimSort.uncheckedsort(arr,0,arr.length,sorter);
-#ENDIF
-  try
-  {
-    stockSorterThread.join();
-  }
-  catch(InterruptedException e)
-  {
-    throw new AssertionError(e);
-  }
+  //});
+  //stockSorterThread.start();
+
+  //try
+  //{
+  //  stockSorterThread.join();
+  //}
+  //catch(InterruptedException e)
+  //{
+  //  throw new AssertionError(e);
+  //}
   #IFSWITCH PARALLEL==true
   JunitUtil.uncheckedparallelassertarraysAreEqual(arr,0,copy,0,copy.length);
   #ELSE
