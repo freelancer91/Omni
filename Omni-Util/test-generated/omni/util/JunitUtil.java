@@ -3,153 +3,48 @@ import java.util.Random;
 import java.util.Objects;
 import java.util.stream.IntStream;
 import org.junit.jupiter.api.Assertions;
+import java.util.function.IntBinaryOperator;
+import omni.function.BooleanComparator;
+import omni.function.ByteComparator;
+import omni.function.CharComparator;
+import omni.function.ShortComparator;
+import omni.function.LongComparator;
+import omni.function.FloatComparator;
+import omni.function.DoubleComparator;
+import java.util.Comparator;
 public interface JunitUtil
 {
-  public static boolean convertToboolean(double val)
-  {
-    return (Double.doubleToRawLongBits(val)&0b1L)!=0L;
-  }
-  public static boolean convertToboolean(float val)
-  {
-    return (Float.floatToRawIntBits(val)&0b1)!=0;
-  }
-  public static boolean convertToboolean(long val)
-  {
-    return (val&0b1L)!=0;
-  }
   public static boolean convertToboolean(int val)
   {
     return (val&0b1)!=0;
-  }
-  public static byte convertTobyte(double val)
-  {
-    return (byte)val;
-  }
-  public static byte convertTobyte(float val)
-  {
-    return (byte)val;
-  }
-  public static byte convertTobyte(long val)
-  {
-    return (byte)val;
   }
   public static byte convertTobyte(int val)
   {
     return (byte)val;
   }
-  public static char convertTochar(double val)
-  {
-    return (char)val;
-  }
-  public static char convertTochar(float val)
-  {
-    return (char)val;
-  }
-  public static char convertTochar(long val)
-  {
-    return (char)val;
-  }
   public static char convertTochar(int val)
   {
     return (char)val;
-  }
-  public static short convertToshort(double val)
-  {
-    return (short)val;
-  }
-  public static short convertToshort(float val)
-  {
-    return (short)val;
-  }
-  public static short convertToshort(long val)
-  {
-    return (short)val;
   }
   public static short convertToshort(int val)
   {
     return (short)val;
   }
-  public static int convertToint(double val)
-  {
-    return (int)val;
-  }
-  public static int convertToint(float val)
-  {
-    return (int)val;
-  }
-  public static int convertToint(long val)
-  {
-    return (int)val;
-  }
   public static int convertToint(int val)
   {
     return (int)val;
-  }
-  public static long convertTolong(double val)
-  {
-    return (long)val;
-  }
-  public static long convertTolong(float val)
-  {
-    return (long)val;
-  }
-  public static long convertTolong(long val)
-  {
-    return (long)val;
   }
   public static long convertTolong(int val)
   {
     return (long)val;
   }
-  public static float convertTofloat(double val)
-  {
-    return (float)val;
-  }
-  public static float convertTofloat(float val)
-  {
-    return (float)val;
-  }
-  public static float convertTofloat(long val)
-  {
-    return (float)val;
-  }
   public static float convertTofloat(int val)
   {
     return (float)val;
   }
-  public static double convertTodouble(double val)
-  {
-    return (double)val;
-  }
-  public static double convertTodouble(float val)
-  {
-    return (double)val;
-  }
-  public static double convertTodouble(long val)
-  {
-    return (double)val;
-  }
   public static double convertTodouble(int val)
   {
     return (double)val;
-  }
-  //Ignore deprecation because we need would like to be able to use identity equality on the newly created boxed types
-  @SuppressWarnings("deprecation")
-  public static Boolean convertToBoolean(double val)
-  {
-    return new Boolean((Double.doubleToRawLongBits(val)&0b1L)!=0L);
-  }
-  //Ignore deprecation because we need would like to be able to use identity equality on the newly created boxed types
-  @SuppressWarnings("deprecation")
-  public static Boolean convertToBoolean(float val)
-  {
-    return new Boolean((Float.floatToRawIntBits(val)&0b1)!=0);
-  }
-  //Ignore deprecation because we need would like to be able to use identity equality on the newly created boxed types
-  @SuppressWarnings("deprecation")
-  public static Boolean convertToBoolean(long val)
-  {
-    return new Boolean((val&0b1)!=0);
   }
   //Ignore deprecation because we need would like to be able to use identity equality on the newly created boxed types
   @SuppressWarnings("deprecation")
@@ -159,45 +54,9 @@ public interface JunitUtil
   }
   //Ignore deprecation because we need would like to be able to use identity equality on the newly created boxed types
   @SuppressWarnings("deprecation")
-  public static Byte convertToByte(double val)
-  {
-    return new Byte((byte)val);
-  }
-  //Ignore deprecation because we need would like to be able to use identity equality on the newly created boxed types
-  @SuppressWarnings("deprecation")
-  public static Byte convertToByte(float val)
-  {
-    return new Byte((byte)val);
-  }
-  //Ignore deprecation because we need would like to be able to use identity equality on the newly created boxed types
-  @SuppressWarnings("deprecation")
-  public static Byte convertToByte(long val)
-  {
-    return new Byte((byte)val);
-  }
-  //Ignore deprecation because we need would like to be able to use identity equality on the newly created boxed types
-  @SuppressWarnings("deprecation")
   public static Byte convertToByte(int val)
   {
     return new Byte((byte)val);
-  }
-  //Ignore deprecation because we need would like to be able to use identity equality on the newly created boxed types
-  @SuppressWarnings("deprecation")
-  public static Character convertToCharacter(double val)
-  {
-    return new Character((char)val);
-  }
-  //Ignore deprecation because we need would like to be able to use identity equality on the newly created boxed types
-  @SuppressWarnings("deprecation")
-  public static Character convertToCharacter(float val)
-  {
-    return new Character((char)val);
-  }
-  //Ignore deprecation because we need would like to be able to use identity equality on the newly created boxed types
-  @SuppressWarnings("deprecation")
-  public static Character convertToCharacter(long val)
-  {
-    return new Character((char)val);
   }
   //Ignore deprecation because we need would like to be able to use identity equality on the newly created boxed types
   @SuppressWarnings("deprecation")
@@ -207,45 +66,9 @@ public interface JunitUtil
   }
   //Ignore deprecation because we need would like to be able to use identity equality on the newly created boxed types
   @SuppressWarnings("deprecation")
-  public static Short convertToShort(double val)
-  {
-    return new Short((short)val);
-  }
-  //Ignore deprecation because we need would like to be able to use identity equality on the newly created boxed types
-  @SuppressWarnings("deprecation")
-  public static Short convertToShort(float val)
-  {
-    return new Short((short)val);
-  }
-  //Ignore deprecation because we need would like to be able to use identity equality on the newly created boxed types
-  @SuppressWarnings("deprecation")
-  public static Short convertToShort(long val)
-  {
-    return new Short((short)val);
-  }
-  //Ignore deprecation because we need would like to be able to use identity equality on the newly created boxed types
-  @SuppressWarnings("deprecation")
   public static Short convertToShort(int val)
   {
     return new Short((short)val);
-  }
-  //Ignore deprecation because we need would like to be able to use identity equality on the newly created boxed types
-  @SuppressWarnings("deprecation")
-  public static Integer convertToInteger(double val)
-  {
-    return new Integer((int)val);
-  }
-  //Ignore deprecation because we need would like to be able to use identity equality on the newly created boxed types
-  @SuppressWarnings("deprecation")
-  public static Integer convertToInteger(float val)
-  {
-    return new Integer((int)val);
-  }
-  //Ignore deprecation because we need would like to be able to use identity equality on the newly created boxed types
-  @SuppressWarnings("deprecation")
-  public static Integer convertToInteger(long val)
-  {
-    return new Integer((int)val);
   }
   //Ignore deprecation because we need would like to be able to use identity equality on the newly created boxed types
   @SuppressWarnings("deprecation")
@@ -255,45 +78,9 @@ public interface JunitUtil
   }
   //Ignore deprecation because we need would like to be able to use identity equality on the newly created boxed types
   @SuppressWarnings("deprecation")
-  public static Long convertToLong(double val)
-  {
-    return new Long((long)val);
-  }
-  //Ignore deprecation because we need would like to be able to use identity equality on the newly created boxed types
-  @SuppressWarnings("deprecation")
-  public static Long convertToLong(float val)
-  {
-    return new Long((long)val);
-  }
-  //Ignore deprecation because we need would like to be able to use identity equality on the newly created boxed types
-  @SuppressWarnings("deprecation")
-  public static Long convertToLong(long val)
-  {
-    return new Long(val);
-  }
-  //Ignore deprecation because we need would like to be able to use identity equality on the newly created boxed types
-  @SuppressWarnings("deprecation")
   public static Long convertToLong(int val)
   {
     return new Long(val);
-  }
-  //Ignore deprecation because we need would like to be able to use identity equality on the newly created boxed types
-  @SuppressWarnings("deprecation")
-  public static Float convertToFloat(double val)
-  {
-    return new Float((float)val);
-  }
-  //Ignore deprecation because we need would like to be able to use identity equality on the newly created boxed types
-  @SuppressWarnings("deprecation")
-  public static Float convertToFloat(float val)
-  {
-    return new Float(val);
-  }
-  //Ignore deprecation because we need would like to be able to use identity equality on the newly created boxed types
-  @SuppressWarnings("deprecation")
-  public static Float convertToFloat(long val)
-  {
-    return new Float(val);
   }
   //Ignore deprecation because we need would like to be able to use identity equality on the newly created boxed types
   @SuppressWarnings("deprecation")
@@ -303,39 +90,9 @@ public interface JunitUtil
   }
   //Ignore deprecation because we need would like to be able to use identity equality on the newly created boxed types
   @SuppressWarnings("deprecation")
-  public static Double convertToDouble(double val)
-  {
-    return new Double(val);
-  }
-  //Ignore deprecation because we need would like to be able to use identity equality on the newly created boxed types
-  @SuppressWarnings("deprecation")
-  public static Double convertToDouble(float val)
-  {
-    return new Double(val);
-  }
-  //Ignore deprecation because we need would like to be able to use identity equality on the newly created boxed types
-  @SuppressWarnings("deprecation")
-  public static Double convertToDouble(long val)
-  {
-    return new Double(val);
-  }
-  //Ignore deprecation because we need would like to be able to use identity equality on the newly created boxed types
-  @SuppressWarnings("deprecation")
   public static Double convertToDouble(int val)
   {
     return new Double(val);
-  }
-  public static String convertToString(double val)
-  {
-    return Double.toString(val);
-  }
-  public static String convertToString(float val)
-  {
-    return Float.toString(val);
-  }
-  public static String convertToString(long val)
-  {
-    return Long.toString(val);
   }
   public static String convertToString(int val)
   {
@@ -347,19 +104,19 @@ public interface JunitUtil
   }
   public static byte getRandombyte(Random rand)
   {
-    return (byte)rand.nextLong();
+    return convertTobyte(rand.nextInt());
   }
   public static char getRandomchar(Random rand)
   {
-    return (char)rand.nextLong();
+    return convertTochar(rand.nextInt());
   }
   public static short getRandomshort(Random rand)
   {
-    return (short)rand.nextLong();
+    return convertToshort(rand.nextInt());
   }
   public static int getRandomint(Random rand)
   {
-    return (int)rand.nextLong();
+    return convertToint(rand.nextInt());
   }
   public static long getRandomlong(Random rand)
   {
@@ -379,29 +136,21 @@ public interface JunitUtil
   {
     return new Boolean(rand.nextBoolean());
   }
-  //Ignore deprecation because we need would like to be able to use identity equality on the newly created boxed types
-  @SuppressWarnings("deprecation")
   public static Byte getRandomByte(Random rand)
   {
-    return new Byte((byte)rand.nextInt());
+    return convertToByte(rand.nextInt());
   }
-  //Ignore deprecation because we need would like to be able to use identity equality on the newly created boxed types
-  @SuppressWarnings("deprecation")
   public static Character getRandomCharacter(Random rand)
   {
-    return new Character((char)rand.nextInt());
+    return convertToCharacter(rand.nextInt());
   }
-  //Ignore deprecation because we need would like to be able to use identity equality on the newly created boxed types
-  @SuppressWarnings("deprecation")
   public static Short getRandomShort(Random rand)
   {
-    return new Short((short)rand.nextInt());
+    return convertToShort(rand.nextInt());
   }
-  //Ignore deprecation because we need would like to be able to use identity equality on the newly created boxed types
-  @SuppressWarnings("deprecation")
   public static Integer getRandomInteger(Random rand)
   {
-    return new Integer(rand.nextInt());
+    return convertToInteger(rand.nextInt());
   }
   //Ignore deprecation because we need would like to be able to use identity equality on the newly created boxed types
   @SuppressWarnings("deprecation")
@@ -423,7 +172,317 @@ public interface JunitUtil
   }
   public static String getRandomString(Random rand)
   {
-    return Long.toString(rand.nextLong());
+    return convertToString(rand.nextInt());
+  }
+  public static Comparator<String> getAscendingStringComparator()
+  {
+    return (val1,val2)->
+    {
+      return
+        (
+      Integer.compare(Integer.parseInt(val1),Integer.parseInt(val2))
+        );
+    };
+  }
+  public static Comparator<Integer> getAscendingIntegerComparator()
+  {
+    return (val1,val2)->
+    {
+      return
+        (
+      val1.compareTo(val2)
+        );
+    };
+  }
+  public static BooleanComparator getAscendingbooleanComparator()
+  {
+    return (val1,val2)->
+    {
+      return
+        (
+      Boolean.compare(val1,val2)
+        );
+    };
+  }
+  public static ByteComparator getAscendingbyteComparator()
+  {
+    return (val1,val2)->
+    {
+      return
+        (
+      Byte.compare(val1,val2)
+        );
+    };
+  }
+  public static CharComparator getAscendingcharComparator()
+  {
+    return (val1,val2)->
+    {
+      return
+        (
+      Character.compare(val1,val2)
+        );
+    };
+  }
+  public static ShortComparator getAscendingshortComparator()
+  {
+    return (val1,val2)->
+    {
+      return
+        (
+      Short.compare(val1,val2)
+        );
+    };
+  }
+  public static IntBinaryOperator getAscendingintComparator()
+  {
+    return (val1,val2)->
+    {
+      return
+        (
+      Integer.compare(val1,val2)
+        );
+    };
+  }
+  public static LongComparator getAscendinglongComparator()
+  {
+    return (val1,val2)->
+    {
+      return
+        (
+      Long.compare(val1,val2)
+        );
+    };
+  }
+  public static FloatComparator getAscendingfloatComparator()
+  {
+    return (val1,val2)->
+    {
+      return
+        (
+      Float.compare(val1,val2)
+        );
+    };
+  }
+  public static DoubleComparator getAscendingdoubleComparator()
+  {
+    return (val1,val2)->
+    {
+      return
+        (
+      Double.compare(val1,val2)
+        );
+    };
+  }
+  public static Comparator<String> getUnsortedStringComparator()
+  {
+    return (val1,val2)->
+    {
+      return
+        (
+        0
+        );
+    };
+  }
+  public static Comparator<Integer> getUnsortedIntegerComparator()
+  {
+    return (val1,val2)->
+    {
+      return
+        (
+        0
+        );
+    };
+  }
+  public static BooleanComparator getUnsortedbooleanComparator()
+  {
+    return (val1,val2)->
+    {
+      return
+        (
+        0
+        );
+    };
+  }
+  public static ByteComparator getUnsortedbyteComparator()
+  {
+    return (val1,val2)->
+    {
+      return
+        (
+        0
+        );
+    };
+  }
+  public static CharComparator getUnsortedcharComparator()
+  {
+    return (val1,val2)->
+    {
+      return
+        (
+        0
+        );
+    };
+  }
+  public static ShortComparator getUnsortedshortComparator()
+  {
+    return (val1,val2)->
+    {
+      return
+        (
+        0
+        );
+    };
+  }
+  public static IntBinaryOperator getUnsortedintComparator()
+  {
+    return (val1,val2)->
+    {
+      return
+        (
+        0
+        );
+    };
+  }
+  public static LongComparator getUnsortedlongComparator()
+  {
+    return (val1,val2)->
+    {
+      return
+        (
+        0
+        );
+    };
+  }
+  public static FloatComparator getUnsortedfloatComparator()
+  {
+    return (val1,val2)->
+    {
+      return
+        (
+        0
+        );
+    };
+  }
+  public static DoubleComparator getUnsorteddoubleComparator()
+  {
+    return (val1,val2)->
+    {
+      return
+        (
+        0
+        );
+    };
+  }
+  public static Comparator<String> getDescendingStringComparator()
+  {
+    return (val1,val2)->
+    {
+      return
+        -
+        (
+      Integer.compare(Integer.parseInt(val1),Integer.parseInt(val2))
+        );
+    };
+  }
+  public static Comparator<Integer> getDescendingIntegerComparator()
+  {
+    return (val1,val2)->
+    {
+      return
+        -
+        (
+      val1.compareTo(val2)
+        );
+    };
+  }
+  public static BooleanComparator getDescendingbooleanComparator()
+  {
+    return (val1,val2)->
+    {
+      return
+        -
+        (
+      Boolean.compare(val1,val2)
+        );
+    };
+  }
+  public static ByteComparator getDescendingbyteComparator()
+  {
+    return (val1,val2)->
+    {
+      return
+        -
+        (
+      Byte.compare(val1,val2)
+        );
+    };
+  }
+  public static CharComparator getDescendingcharComparator()
+  {
+    return (val1,val2)->
+    {
+      return
+        -
+        (
+      Character.compare(val1,val2)
+        );
+    };
+  }
+  public static ShortComparator getDescendingshortComparator()
+  {
+    return (val1,val2)->
+    {
+      return
+        -
+        (
+      Short.compare(val1,val2)
+        );
+    };
+  }
+  public static IntBinaryOperator getDescendingintComparator()
+  {
+    return (val1,val2)->
+    {
+      return
+        -
+        (
+      Integer.compare(val1,val2)
+        );
+    };
+  }
+  public static LongComparator getDescendinglongComparator()
+  {
+    return (val1,val2)->
+    {
+      return
+        -
+        (
+      Long.compare(val1,val2)
+        );
+    };
+  }
+  public static FloatComparator getDescendingfloatComparator()
+  {
+    return (val1,val2)->
+    {
+      return
+        -
+        (
+      Float.compare(val1,val2)
+        );
+    };
+  }
+  public static DoubleComparator getDescendingdoubleComparator()
+  {
+    return (val1,val2)->
+    {
+      return
+        -
+        (
+      Double.compare(val1,val2)
+        );
+    };
   }
   public static enum booleanArrayBuilder
   {

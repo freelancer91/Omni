@@ -50,7 +50,7 @@ public interface ArrCopy
   }
   static <SRC extends DST,DST> void uncheckedCopy(SRC[] src,int srcOffset,DST[] dst,int dstOffset,int length)
   {
-    assert src!=dst || (length>5||dstOffset+length<=srcOffset||srcOffset<=dstOffset);
+    //assert src!=dst || (length>5||dstOffset+length<=srcOffset||srcOffset<=dstOffset);
     //assert srcOffset>=0;
     //assert dstOffset>=0;
     //assert length>0;
@@ -122,7 +122,7 @@ public interface ArrCopy
   }
   static void uncheckedCopy(boolean[] src,int srcOffset,boolean[] dst,int dstOffset,int length)
   {
-    assert src!=dst || (length>5||dstOffset+length<=srcOffset||srcOffset<=dstOffset);
+    //assert src!=dst || (length>5||dstOffset+length<=srcOffset||srcOffset<=dstOffset);
     //assert srcOffset>=0;
     //assert dstOffset>=0;
     //assert length>0;
@@ -194,7 +194,7 @@ public interface ArrCopy
   }
   static void uncheckedCopy(byte[] src,int srcOffset,byte[] dst,int dstOffset,int length)
   {
-    assert src!=dst || (length>5||dstOffset+length<=srcOffset||srcOffset<=dstOffset);
+    //assert src!=dst || (length>5||dstOffset+length<=srcOffset||srcOffset<=dstOffset);
     //assert srcOffset>=0;
     //assert dstOffset>=0;
     //assert length>0;
@@ -266,7 +266,7 @@ public interface ArrCopy
   }
   static void uncheckedCopy(char[] src,int srcOffset,char[] dst,int dstOffset,int length)
   {
-    assert src!=dst || (length>5||dstOffset+length<=srcOffset||srcOffset<=dstOffset);
+    //assert src!=dst || (length>5||dstOffset+length<=srcOffset||srcOffset<=dstOffset);
     //assert srcOffset>=0;
     //assert dstOffset>=0;
     //assert length>0;
@@ -338,7 +338,7 @@ public interface ArrCopy
   }
   static void uncheckedCopy(short[] src,int srcOffset,short[] dst,int dstOffset,int length)
   {
-    assert src!=dst || (length>5||dstOffset+length<=srcOffset||srcOffset<=dstOffset);
+    //assert src!=dst || (length>5||dstOffset+length<=srcOffset||srcOffset<=dstOffset);
     //assert srcOffset>=0;
     //assert dstOffset>=0;
     //assert length>0;
@@ -410,7 +410,7 @@ public interface ArrCopy
   }
   static void uncheckedCopy(int[] src,int srcOffset,int[] dst,int dstOffset,int length)
   {
-    assert src!=dst || (length>5||dstOffset+length<=srcOffset||srcOffset<=dstOffset);
+    //assert src!=dst || (length>5||dstOffset+length<=srcOffset||srcOffset<=dstOffset);
     //assert srcOffset>=0;
     //assert dstOffset>=0;
     //assert length>0;
@@ -482,7 +482,7 @@ public interface ArrCopy
   }
   static void uncheckedCopy(long[] src,int srcOffset,long[] dst,int dstOffset,int length)
   {
-    assert src!=dst || (length>5||dstOffset+length<=srcOffset||srcOffset<=dstOffset);
+    //assert src!=dst || (length>5||dstOffset+length<=srcOffset||srcOffset<=dstOffset);
     //assert srcOffset>=0;
     //assert dstOffset>=0;
     //assert length>0;
@@ -554,7 +554,7 @@ public interface ArrCopy
   }
   static void uncheckedCopy(float[] src,int srcOffset,float[] dst,int dstOffset,int length)
   {
-    assert src!=dst || (length>5||dstOffset+length<=srcOffset||srcOffset<=dstOffset);
+    //assert src!=dst || (length>5||dstOffset+length<=srcOffset||srcOffset<=dstOffset);
     //assert srcOffset>=0;
     //assert dstOffset>=0;
     //assert length>0;
@@ -626,7 +626,7 @@ public interface ArrCopy
   }
   static void uncheckedCopy(double[] src,int srcOffset,double[] dst,int dstOffset,int length)
   {
-    assert src!=dst || (length>5||dstOffset+length<=srcOffset||srcOffset<=dstOffset);
+    //assert src!=dst || (length>5||dstOffset+length<=srcOffset||srcOffset<=dstOffset);
     //assert srcOffset>=0;
     //assert dstOffset>=0;
     //assert length>0;
