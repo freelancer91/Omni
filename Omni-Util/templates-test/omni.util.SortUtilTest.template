@@ -72,6 +72,19 @@ private static final long[] randSeeds=new long[]{666};
 #MACRODEF IsSorted<ARRTYPE,SORTTYPE>(BOXEDTYPE,CLASSPREFIX)
 private static void isSortedSORTTYPE(ARRTYPE[] arr,ARRTYPE[] copy)
 {
+#IFSWITCH ARRTYPE==double,float,long,int,short,char,byte,boolean
+  #IFSWITCH SORTTYPE==Ascending
+  SortUtil.uncheckedsort(arr,0,arr.length-1);
+  #ELSE
+  SortUtil.uncheckedreverseSort(arr,0,arr.length-1);
+  #ENDIF
+#ELSE
+  #IFSWITCH SORTTYPE==Ascending
+  SortUtil.sortObjectTimSort.uncheckedsort(arr,0,arr.length);
+  #ELSE
+  SortUtil.reverseSortObjectTimSort.uncheckedsort(arr,0,arr.length);
+  #ENDIF
+#ENDIF
   //Thread stockSorterThread=new Thread(()->
   //{
 #IFSWITCH ARRTYPE==boolean
@@ -87,19 +100,7 @@ private static void isSortedSORTTYPE(ARRTYPE[] arr,ARRTYPE[] copy)
 #ENDIF
   //});
   //stockSorterThread.start();
-#IFSWITCH ARRTYPE==double,float,long,int,short,char,byte,boolean
-  #IFSWITCH SORTTYPE==Ascending
-  SortUtil.uncheckedsort(arr,0,arr.length-1);
-  #ELSE
-  SortUtil.uncheckedreverseSort(arr,0,arr.length-1);
-  #ENDIF
-#ELSE
-  #IFSWITCH SORTTYPE==Ascending
-  SortUtil.sortObjectTimSort.uncheckedsort(arr,0,arr.length);
-  #ELSE
-  SortUtil.reverseSortObjectTimSort.uncheckedsort(arr,0,arr.length);
-  #ENDIF
-#ENDIF
+
   //try
   //{
   //  stockSorterThread.join();

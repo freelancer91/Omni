@@ -20,12 +20,12 @@ public class SortUtilTest
   private static final long[] randSeeds=new long[]{666L,0xC0FFEEL,999L};
   private static void isSortedAscending(Integer[] arr,Integer[] copy)
   {
+    SortUtil.sortObjectTimSort.uncheckedsort(arr,0,arr.length);
     //Thread stockSorterThread=new Thread(()->
     //{
     Arrays.sort(copy,0,copy.length);
     //});
     //stockSorterThread.start();
-    SortUtil.sortObjectTimSort.uncheckedsort(arr,0,arr.length);
     //try
     //{
     //  stockSorterThread.join();
@@ -38,12 +38,12 @@ public class SortUtilTest
   }
   private static void isSortedAscending(String[] arr,String[] copy)
   {
+    SortUtil.sortObjectTimSort.uncheckedsort(arr,0,arr.length);
     //Thread stockSorterThread=new Thread(()->
     //{
     Arrays.sort(copy,0,copy.length);
     //});
     //stockSorterThread.start();
-    SortUtil.sortObjectTimSort.uncheckedsort(arr,0,arr.length);
     //try
     //{
     //  stockSorterThread.join();
@@ -56,6 +56,7 @@ public class SortUtilTest
   }
   private static void isSortedAscending(boolean[] arr,boolean[] copy)
   {
+    SortUtil.uncheckedsort(arr,0,arr.length-1);
     //Thread stockSorterThread=new Thread(()->
     //{
     Boolean[] boxedCopy=new Boolean[copy.length];
@@ -64,7 +65,6 @@ public class SortUtilTest
     ArrCopy.uncheckedCopy(boxedCopy,0,copy,0,copy.length);
     //});
     //stockSorterThread.start();
-    SortUtil.uncheckedsort(arr,0,arr.length-1);
     //try
     //{
     //  stockSorterThread.join();
@@ -77,12 +77,12 @@ public class SortUtilTest
   }
   private static void isSortedAscending(byte[] arr,byte[] copy)
   {
+    SortUtil.uncheckedsort(arr,0,arr.length-1);
     //Thread stockSorterThread=new Thread(()->
     //{
     Arrays.sort(copy,0,copy.length);
     //});
     //stockSorterThread.start();
-    SortUtil.uncheckedsort(arr,0,arr.length-1);
     //try
     //{
     //  stockSorterThread.join();
@@ -95,12 +95,12 @@ public class SortUtilTest
   }
   private static void isSortedAscending(char[] arr,char[] copy)
   {
+    SortUtil.uncheckedsort(arr,0,arr.length-1);
     //Thread stockSorterThread=new Thread(()->
     //{
     Arrays.sort(copy,0,copy.length);
     //});
     //stockSorterThread.start();
-    SortUtil.uncheckedsort(arr,0,arr.length-1);
     //try
     //{
     //  stockSorterThread.join();
@@ -113,12 +113,12 @@ public class SortUtilTest
   }
   private static void isSortedAscending(short[] arr,short[] copy)
   {
+    SortUtil.uncheckedsort(arr,0,arr.length-1);
     //Thread stockSorterThread=new Thread(()->
     //{
     Arrays.sort(copy,0,copy.length);
     //});
     //stockSorterThread.start();
-    SortUtil.uncheckedsort(arr,0,arr.length-1);
     //try
     //{
     //  stockSorterThread.join();
@@ -131,12 +131,12 @@ public class SortUtilTest
   }
   private static void isSortedAscending(int[] arr,int[] copy)
   {
+    SortUtil.uncheckedsort(arr,0,arr.length-1);
     //Thread stockSorterThread=new Thread(()->
     //{
     Arrays.sort(copy,0,copy.length);
     //});
     //stockSorterThread.start();
-    SortUtil.uncheckedsort(arr,0,arr.length-1);
     //try
     //{
     //  stockSorterThread.join();
@@ -149,12 +149,12 @@ public class SortUtilTest
   }
   private static void isSortedAscending(long[] arr,long[] copy)
   {
+    SortUtil.uncheckedsort(arr,0,arr.length-1);
     //Thread stockSorterThread=new Thread(()->
     //{
     Arrays.sort(copy,0,copy.length);
     //});
     //stockSorterThread.start();
-    SortUtil.uncheckedsort(arr,0,arr.length-1);
     //try
     //{
     //  stockSorterThread.join();
@@ -167,12 +167,12 @@ public class SortUtilTest
   }
   private static void isSortedAscending(float[] arr,float[] copy)
   {
+    SortUtil.uncheckedsort(arr,0,arr.length-1);
     //Thread stockSorterThread=new Thread(()->
     //{
     Arrays.sort(copy,0,copy.length);
     //});
     //stockSorterThread.start();
-    SortUtil.uncheckedsort(arr,0,arr.length-1);
     //try
     //{
     //  stockSorterThread.join();
@@ -185,12 +185,12 @@ public class SortUtilTest
   }
   private static void isSortedAscending(double[] arr,double[] copy)
   {
+    SortUtil.uncheckedsort(arr,0,arr.length-1);
     //Thread stockSorterThread=new Thread(()->
     //{
     Arrays.sort(copy,0,copy.length);
     //});
     //stockSorterThread.start();
-    SortUtil.uncheckedsort(arr,0,arr.length-1);
     //try
     //{
     //  stockSorterThread.join();
@@ -203,13 +203,13 @@ public class SortUtilTest
   }
   private static void isSortedDescending(Integer[] arr,Integer[] copy)
   {
+    SortUtil.reverseSortObjectTimSort.uncheckedsort(arr,0,arr.length);
     //Thread stockSorterThread=new Thread(()->
     //{
     Arrays.sort(copy,0,copy.length);
     OmniArray.OfRef.reverseRange(copy,0,copy.length-1);
     //});
     //stockSorterThread.start();
-    SortUtil.reverseSortObjectTimSort.uncheckedsort(arr,0,arr.length);
     //try
     //{
     //  stockSorterThread.join();
@@ -222,13 +222,13 @@ public class SortUtilTest
   }
   private static void isSortedDescending(String[] arr,String[] copy)
   {
+    SortUtil.reverseSortObjectTimSort.uncheckedsort(arr,0,arr.length);
     //Thread stockSorterThread=new Thread(()->
     //{
     Arrays.sort(copy,0,copy.length);
     OmniArray.OfRef.reverseRange(copy,0,copy.length-1);
     //});
     //stockSorterThread.start();
-    SortUtil.reverseSortObjectTimSort.uncheckedsort(arr,0,arr.length);
     //try
     //{
     //  stockSorterThread.join();
@@ -241,6 +241,7 @@ public class SortUtilTest
   }
   private static void isSortedDescending(boolean[] arr,boolean[] copy)
   {
+    SortUtil.uncheckedreverseSort(arr,0,arr.length-1);
     //Thread stockSorterThread=new Thread(()->
     //{
     Boolean[] boxedCopy=new Boolean[copy.length];
@@ -250,7 +251,6 @@ public class SortUtilTest
     OmniArray.OfBoolean.reverseRange(copy,0,copy.length-1);
     //});
     //stockSorterThread.start();
-    SortUtil.uncheckedreverseSort(arr,0,arr.length-1);
     //try
     //{
     //  stockSorterThread.join();
@@ -263,13 +263,13 @@ public class SortUtilTest
   }
   private static void isSortedDescending(byte[] arr,byte[] copy)
   {
+    SortUtil.uncheckedreverseSort(arr,0,arr.length-1);
     //Thread stockSorterThread=new Thread(()->
     //{
     Arrays.sort(copy,0,copy.length);
     OmniArray.OfByte.reverseRange(copy,0,copy.length-1);
     //});
     //stockSorterThread.start();
-    SortUtil.uncheckedreverseSort(arr,0,arr.length-1);
     //try
     //{
     //  stockSorterThread.join();
@@ -282,13 +282,13 @@ public class SortUtilTest
   }
   private static void isSortedDescending(char[] arr,char[] copy)
   {
+    SortUtil.uncheckedreverseSort(arr,0,arr.length-1);
     //Thread stockSorterThread=new Thread(()->
     //{
     Arrays.sort(copy,0,copy.length);
     OmniArray.OfChar.reverseRange(copy,0,copy.length-1);
     //});
     //stockSorterThread.start();
-    SortUtil.uncheckedreverseSort(arr,0,arr.length-1);
     //try
     //{
     //  stockSorterThread.join();
@@ -301,13 +301,13 @@ public class SortUtilTest
   }
   private static void isSortedDescending(short[] arr,short[] copy)
   {
+    SortUtil.uncheckedreverseSort(arr,0,arr.length-1);
     //Thread stockSorterThread=new Thread(()->
     //{
     Arrays.sort(copy,0,copy.length);
     OmniArray.OfShort.reverseRange(copy,0,copy.length-1);
     //});
     //stockSorterThread.start();
-    SortUtil.uncheckedreverseSort(arr,0,arr.length-1);
     //try
     //{
     //  stockSorterThread.join();
@@ -320,13 +320,13 @@ public class SortUtilTest
   }
   private static void isSortedDescending(int[] arr,int[] copy)
   {
+    SortUtil.uncheckedreverseSort(arr,0,arr.length-1);
     //Thread stockSorterThread=new Thread(()->
     //{
     Arrays.sort(copy,0,copy.length);
     OmniArray.OfInt.reverseRange(copy,0,copy.length-1);
     //});
     //stockSorterThread.start();
-    SortUtil.uncheckedreverseSort(arr,0,arr.length-1);
     //try
     //{
     //  stockSorterThread.join();
@@ -339,13 +339,13 @@ public class SortUtilTest
   }
   private static void isSortedDescending(long[] arr,long[] copy)
   {
+    SortUtil.uncheckedreverseSort(arr,0,arr.length-1);
     //Thread stockSorterThread=new Thread(()->
     //{
     Arrays.sort(copy,0,copy.length);
     OmniArray.OfLong.reverseRange(copy,0,copy.length-1);
     //});
     //stockSorterThread.start();
-    SortUtil.uncheckedreverseSort(arr,0,arr.length-1);
     //try
     //{
     //  stockSorterThread.join();
@@ -358,13 +358,13 @@ public class SortUtilTest
   }
   private static void isSortedDescending(float[] arr,float[] copy)
   {
+    SortUtil.uncheckedreverseSort(arr,0,arr.length-1);
     //Thread stockSorterThread=new Thread(()->
     //{
     Arrays.sort(copy,0,copy.length);
     OmniArray.OfFloat.reverseRange(copy,0,copy.length-1);
     //});
     //stockSorterThread.start();
-    SortUtil.uncheckedreverseSort(arr,0,arr.length-1);
     //try
     //{
     //  stockSorterThread.join();
@@ -377,13 +377,13 @@ public class SortUtilTest
   }
   private static void isSortedDescending(double[] arr,double[] copy)
   {
+    SortUtil.uncheckedreverseSort(arr,0,arr.length-1);
     //Thread stockSorterThread=new Thread(()->
     //{
     Arrays.sort(copy,0,copy.length);
     OmniArray.OfDouble.reverseRange(copy,0,copy.length-1);
     //});
     //stockSorterThread.start();
-    SortUtil.uncheckedreverseSort(arr,0,arr.length-1);
     //try
     //{
     //  stockSorterThread.join();
