@@ -126,23 +126,24 @@ public interface ArrCopy
   #MACRO NonHomogenousUncheckedCopy(float,double,)
   
 }
+
 #MACRODEF NonHomogenousUncheckedCopy(SRCARR,DSTARR,CAST)
 static void uncheckedReverseCopy(SRCARR[] src,int srcOffset,DSTARR[] dst,int dstOffset,int length)
 {
-  //assert srcOffset>=0;
-  //assert dstOffset>=0;
-  //assert length>0;
-  //assert srcOffset+length<=src.length;
-  //assert dstOffset+length<=dst.length;
+  #MACRO Assert(srcOffset>=0)
+  #MACRO Assert(dstOffset>=0)
+  #MACRO Assert(length>0)
+  #MACRO Assert(srcOffset+length<=src.length)
+  #MACRO Assert(dstOffset+length<=dst.length)
   for(dst[dstOffset]=(DSTARR)CAST(src[length+=(srcOffset-1)]);length!=srcOffset;dst[++dstOffset]=(DSTARR)CAST(src[--length])){}
 }
 static void uncheckedCopy(SRCARR[] src,int srcOffset,DSTARR[] dst,int dstOffset,int length)
 {
-  //assert srcOffset>=0;
-  //assert dstOffset>=0;
-  //assert length>0;
-  //assert srcOffset+length<=src.length;
-  //assert dstOffset+length<=dst.length;
+  #MACRO Assert(srcOffset>=0)
+  #MACRO Assert(dstOffset>=0)
+  #MACRO Assert(length>0)
+  #MACRO Assert(srcOffset+length<=src.length)
+  #MACRO Assert(dstOffset+length<=dst.length)
   for(dst[dstOffset+=--length]=(DSTARR)CAST(src[length+=srcOffset]);length!=srcOffset;dst[--dstOffset]=(DSTARR)CAST(src[--length])){}
 }
 #ENDDEF
@@ -153,20 +154,20 @@ static <SRC extends DST,DST> void uncheckedReverseCopy(SRC[] src,int srcOffset,D
 static void uncheckedReverseCopy(ARR[] src,int srcOffset,ARR[] dst,int dstOffset,int length)
 #ENDIF
 {
-  //assert srcOffset>=0;
-  //assert dstOffset>=0;
-  //assert length>0;
-  //assert srcOffset+length<=src.length;
-  //assert dstOffset+length<=dst.length;
+  #MACRO Assert(srcOffset>=0)
+  #MACRO Assert(dstOffset>=0)
+  #MACRO Assert(length>0)
+  #MACRO Assert(srcOffset+length<=src.length)
+  #MACRO Assert(dstOffset+length<=dst.length)
   for(dst[dstOffset]=(src[length+=(srcOffset-1)]);length!=srcOffset;dst[++dstOffset]=(src[--length])){}
 }
 static void uncheckedSelfCopy(ARR[] src,int srcOffset,int dstOffset,int length)
 {
-  //assert srcOffset>=0;
-  //assert dstOffset>=0;
-  //assert length>0;
-  //assert srcOffset+length<=src.length;
-  //assert dstOffset+length<=dst.length;
+  #MACRO Assert(srcOffset>=0)
+  #MACRO Assert(dstOffset>=0)
+  #MACRO Assert(length>0)
+  #MACRO Assert(srcOffset+length<=src.length)
+  #MACRO Assert(dstOffset+length<=dst.length)
   switch(length)
   {
   case 5:
@@ -204,12 +205,12 @@ static <SRC extends DST,DST> void uncheckedCopy(SRC[] src,int srcOffset,DST[] ds
 static void uncheckedCopy(ARR[] src,int srcOffset,ARR[] dst,int dstOffset,int length)
 #ENDIF
 {
-  assert src!=dst || (length>5||dstOffset+length<=srcOffset||srcOffset<=dstOffset);
-  //assert srcOffset>=0;
-  //assert dstOffset>=0;
-  //assert length>0;
-  //assert srcOffset+length<=src.length;
-  //assert dstOffset+length<=dst.length;
+  #MACRO Assert(src!=dst || (length>5||dstOffset+length<=srcOffset||srcOffset<=dstOffset))
+  #MACRO Assert(srcOffset>=0)
+  #MACRO Assert(dstOffset>=0)
+  #MACRO Assert(length>0)
+  #MACRO Assert(srcOffset+length<=src.length)
+  #MACRO Assert(dstOffset+length<=dst.length)
   switch(length)
   {
   case 5:
@@ -231,11 +232,11 @@ static void uncheckedCopy(ARR[] src,int srcOffset,ARR[] dst,int dstOffset,int le
 #MACRODEF SemicheckedCopy(SRCARR,DSTARR,GENERICPARAM)
 static GENERICPARAM void semicheckedReverseCopy(SRCARR[] src,int srcOffset,DSTARR[] dst,int dstOffset,int length)
 {
-  //assert srcOffset>=0;
-  //assert dstOffset>=0;
-  //assert length>=0;
-  //assert srcOffset+length<=src.length;
-  //assert dstOffset+length<=dst.length;
+  #MACRO Assert(srcOffset>=0)
+  #MACRO Assert(dstOffset>=0)
+  #MACRO Assert(length>=0)
+  #MACRO Assert(srcOffset+length<=src.length)
+  #MACRO Assert(dstOffset+length<=dst.length)
   if(length!=0)
   {
     uncheckedReverseCopy(src,srcOffset,dst,dstOffset,length);
@@ -243,14 +244,17 @@ static GENERICPARAM void semicheckedReverseCopy(SRCARR[] src,int srcOffset,DSTAR
 }
 static GENERICPARAM void semicheckedCopy(SRCARR[] src,int srcOffset,DSTARR[] dst,int dstOffset,int length)
 {
-  //assert srcOffset>=0;
-  //assert dstOffset>=0;
-  //assert length>=0;
-  //assert srcOffset+length<=src.length;
-  //assert dstOffset+length<=dst.length;
+  #MACRO Assert(srcOffset>=0)
+  #MACRO Assert(dstOffset>=0)
+  #MACRO Assert(length>=0)
+  #MACRO Assert(srcOffset+length<=src.length)
+  #MACRO Assert(dstOffset+length<=dst.length)
   if(length!=0)
   {
     uncheckedCopy(src,srcOffset,dst,dstOffset,length);
   }
 }
+#ENDDEF
+#MACRODEF Assert(expr)
+//assert expr;
 #ENDDEF

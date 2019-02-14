@@ -4,7 +4,15 @@ import java.util.Random;
 import java.util.Objects;
 import java.util.stream.IntStream;
 import org.junit.jupiter.api.Assertions;
-
+import java.util.function.IntBinaryOperator;
+import omni.function.BooleanComparator;
+import omni.function.ByteComparator;
+import omni.function.CharComparator;
+import omni.function.ShortComparator;
+import omni.function.LongComparator;
+import omni.function.FloatComparator;
+import omni.function.DoubleComparator;
+import java.util.Comparator;
 public interface JunitUtil
 {
 
@@ -26,96 +34,6 @@ public interface JunitUtil
   #MACRO ConvertMethods<Double>()
   #MACRO ConvertMethods<String>()
 #MACRODEF ConvertMethods<ARRTYPE>()
-#IFSWITCH ARRTYPE==Boolean,Byte,Character,Short,Integer,Long,Float,Double
-//Ignore deprecation because we need would like to be able to use identity equality on the newly created boxed types
-@SuppressWarnings("deprecation")
-#ENDIF
-public static ARRTYPE convertToARRTYPE(double val)
-{
-#IFSWITCH ARRTYPE==String
-  return Double.toString(val);
-#ELSEIFSWITCH ARRTYPE==double,float,long,int,short,char,byte
-  return (ARRTYPE)val;
-#ELSEIFSWITCH ARRTYPE==boolean
-  return (Double.doubleToRawLongBits(val)&0b1L)!=0L;
-#ELSEIFSWITCH ARRTYPE==Double
-  return new ARRTYPE(val);
-#ELSEIFSWITCH ARRTYPE==Float
-  return new ARRTYPE((float)val);
-#ELSEIFSWITCH ARRTYPE==Long
-  return new ARRTYPE((long)val);
-#ELSEIFSWITCH ARRTYPE==Integer
-  return new ARRTYPE((int)val);
-#ELSEIFSWITCH ARRTYPE==Short
-  return new ARRTYPE((short)val);
-#ELSEIFSWITCH ARRTYPE==Character
-  return new ARRTYPE((char)val);
-#ELSEIFSWITCH ARRTYPE==Byte
-  return new ARRTYPE((byte)val);
-#ELSEIFSWITCH ARRTYPE==Boolean
-  return new ARRTYPE((Double.doubleToRawLongBits(val)&0b1L)!=0L);
-#ELSE
-  ERROR unknown type ARRTYPE
-#ENDIF
-}
-#IFSWITCH ARRTYPE==Boolean,Byte,Character,Short,Integer,Long,Float,Double
-//Ignore deprecation because we need would like to be able to use identity equality on the newly created boxed types
-@SuppressWarnings("deprecation")
-#ENDIF
-public static ARRTYPE convertToARRTYPE(float val)
-{
-#IFSWITCH ARRTYPE==String
-  return Float.toString(val);
-#ELSEIFSWITCH ARRTYPE==double,float,long,int,short,char,byte
-  return (ARRTYPE)val;
-#ELSEIFSWITCH ARRTYPE==boolean
-  return (Float.floatToRawIntBits(val)&0b1)!=0;
-#ELSEIFSWITCH ARRTYPE==Double,Float
-  return new ARRTYPE(val);
-#ELSEIFSWITCH ARRTYPE==Long
-  return new ARRTYPE((long)val);
-#ELSEIFSWITCH ARRTYPE==Integer
-  return new ARRTYPE((int)val);
-#ELSEIFSWITCH ARRTYPE==Short
-  return new ARRTYPE((short)val);
-#ELSEIFSWITCH ARRTYPE==Character
-  return new ARRTYPE((char)val);
-#ELSEIFSWITCH ARRTYPE==Byte
-  return new ARRTYPE((byte)val);
-#ELSEIFSWITCH ARRTYPE==Boolean
-  return new ARRTYPE((Float.floatToRawIntBits(val)&0b1)!=0);
-#ELSE
-  ERROR unknown type ARRTYPE
-#ENDIF
-}
-#IFSWITCH ARRTYPE==Boolean,Byte,Character,Short,Integer,Long,Float,Double
-//Ignore deprecation because we need would like to be able to use identity equality on the newly created boxed types
-@SuppressWarnings("deprecation")
-#ENDIF
-public static ARRTYPE convertToARRTYPE(long val)
-{
-#IFSWITCH ARRTYPE==String
-  return Long.toString(val);
-#ELSEIFSWITCH ARRTYPE==double,float,long,int,short,char,byte
-  return (ARRTYPE)val;
-#ELSEIFSWITCH ARRTYPE==boolean
-  return (val&0b1L)!=0;
-#ELSEIFSWITCH ARRTYPE==Double,Float,Long
-  return new ARRTYPE(val);
-#ELSEIFSWITCH ARRTYPE==Integer
-  return new ARRTYPE((int)val);
-#ELSEIFSWITCH ARRTYPE==Short
-  return new ARRTYPE((short)val);
-#ELSEIFSWITCH ARRTYPE==Character
-  return new ARRTYPE((char)val);
-#ELSEIFSWITCH ARRTYPE==Byte
-  return new ARRTYPE((byte)val);
-#ELSEIFSWITCH ARRTYPE==Boolean
-  return new ARRTYPE((val&0b1)!=0);
-#ELSE
-  ERROR unknown type ARRTYPE
-#ENDIF
-}
 #IFSWITCH ARRTYPE==Boolean,Byte,Character,Short,Integer,Long,Float,Double
 //Ignore deprecation because we need would like to be able to use identity equality on the newly created boxed types
 @SuppressWarnings("deprecation")
@@ -143,7 +61,6 @@ public static ARRTYPE convertToARRTYPE(int val)
 #ENDIF
 }
 #ENDDEF
-
   #MACRO GetRandom<boolean>()
   #MACRO GetRandom<byte>()
   #MACRO GetRandom<char>()
@@ -162,35 +79,82 @@ public static ARRTYPE convertToARRTYPE(int val)
   #MACRO GetRandom<Double>()
   #MACRO GetRandom<String>()
 #MACRODEF GetRandom<ARRTYPE>()
-#IFSWITCH ARRTYPE==Boolean,Byte,Character,Short,Integer,Long,Float,Double
+#IFSWITCH ARRTYPE==Boolean,Long,Float,Double
 //Ignore deprecation because we need would like to be able to use identity equality on the newly created boxed types
 @SuppressWarnings("deprecation")
 #ENDIF
 public static ARRTYPE getRandomARRTYPE(Random rand)
 {
-#IFSWITCH ARRTYPE==String
-  return Long.toString(rand.nextLong());
+#IFSWITCH ARRTYPE==String,byte,char,short,int,Byte,Character,Short,Integer
+  return convertToARRTYPE(rand.nextInt());
 #ELSEIFSWITCH ARRTYPE==boolean
   return rand.nextBoolean();
-#ELSEIFSWITCH ARRTYPE==byte,char,short,int,long
+#ELSEIFSWITCH ARRTYPE==long
   return (ARRTYPE)rand.nextLong();
 #ELSEIFSWITCH ARRTYPE==float
   return rand.nextFloat();
 #ELSEIFSWITCH ARRTYPE==double
   return rand.nextDouble();
-#ELSEIFSWITCH ARRTYPE==Byte
-  return new ARRTYPE((byte)rand.nextInt());
-#ELSEIFSWITCH ARRTYPE==Character
-  return new ARRTYPE((char)rand.nextInt());
-#ELSEIFSWITCH ARRTYPE==Short
-  return new ARRTYPE((short)rand.nextInt());
-#ELSEIFSWITCH ARRTYPE==Integer
-  return new ARRTYPE(rand.nextInt());
 #ELSEIFSWITCH ARRTYPE==Boolean,Long,Float,Double
   return new ARRTYPE(rand.nextARRTYPE());
 #ELSE
 ERROR unknown array type ARRTYPE
 #ENDIF
+}
+#ENDDEF
+  #MACRO GetComparator<Ascending,String>(String,Comparator<String>)
+  #MACRO GetComparator<Ascending,Integer>(Integer,Comparator<Integer>)
+  #MACRO GetComparator<Ascending,boolean>(Boolean,BooleanComparator)
+  #MACRO GetComparator<Ascending,byte>(Byte,ByteComparator)
+  #MACRO GetComparator<Ascending,char>(Character,CharComparator)
+  #MACRO GetComparator<Ascending,short>(Short,ShortComparator)
+  #MACRO GetComparator<Ascending,int>(Integer,IntBinaryOperator)
+  #MACRO GetComparator<Ascending,long>(Long,LongComparator)
+  #MACRO GetComparator<Ascending,float>(Float,FloatComparator)
+  #MACRO GetComparator<Ascending,double>(Double,DoubleComparator)
+  #MACRO GetComparator<Unsorted,String>(String,Comparator<String>)
+  #MACRO GetComparator<Unsorted,Integer>(Integer,Comparator<Integer>)
+  #MACRO GetComparator<Unsorted,boolean>(Boolean,BooleanComparator)
+  #MACRO GetComparator<Unsorted,byte>(Byte,ByteComparator)
+  #MACRO GetComparator<Unsorted,char>(Character,CharComparator)
+  #MACRO GetComparator<Unsorted,short>(Short,ShortComparator)
+  #MACRO GetComparator<Unsorted,int>(Integer,IntBinaryOperator)
+  #MACRO GetComparator<Unsorted,long>(Long,LongComparator)
+  #MACRO GetComparator<Unsorted,float>(Float,FloatComparator)
+  #MACRO GetComparator<Unsorted,double>(Double,DoubleComparator)
+  #MACRO GetComparator<Descending,String>(String,Comparator<String>)
+  #MACRO GetComparator<Descending,Integer>(Integer,Comparator<Integer>)
+  #MACRO GetComparator<Descending,boolean>(Boolean,BooleanComparator)
+  #MACRO GetComparator<Descending,byte>(Byte,ByteComparator)
+  #MACRO GetComparator<Descending,char>(Character,CharComparator)
+  #MACRO GetComparator<Descending,short>(Short,ShortComparator)
+  #MACRO GetComparator<Descending,int>(Integer,IntBinaryOperator)
+  #MACRO GetComparator<Descending,long>(Long,LongComparator)
+  #MACRO GetComparator<Descending,float>(Float,FloatComparator)
+  #MACRO GetComparator<Descending,double>(Double,DoubleComparator)
+#MACRODEF GetComparator<SORTTYPE,ARRTYPE>(BOXEDTYPE,COMPARATORTYPE)
+public static COMPARATORTYPE getSORTTYPEARRTYPEComparator()
+{
+  return (val1,val2)->
+  {
+    return
+#IFSWITCH SORTTYPE==Descending
+      -
+#ENDIF
+      (
+#IFSWITCH SORTTYPE==Unsorted
+      0
+#ELSE
+  #IFSWITCH ARRTYPE==String
+    Integer.compare(Integer.parseInt(val1),Integer.parseInt(val2))
+  #ELSEIFSWITCH ARRTYPE==Boolean,Byte,Character,Short,Integer,Long,Float,Double
+    val1.compareTo(val2)
+  #ELSE
+    BOXEDTYPE.compare(val1,val2)
+  #ENDIF
+#ENDIF
+      );
+  };
 }
 #ENDDEF
 

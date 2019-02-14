@@ -1,6 +1,8 @@
 #TYPEDEF OfGeneric
 package omni.util;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.Execution;
+import org.junit.jupiter.api.parallel.ExecutionMode;
 import java.util.Random;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -20,9 +22,9 @@ public class SortUtilTest
 
 #MACRODEF Fields<LONGRUN>()
 #IFSWITCH LONGRUN==true
-private static final int[] lengths=new int[]{34};
+//private static final int[] lengths=new int[]{34};
 //private static final int[] lengths=new int[]{2,3,5,8,13,21};
-//private static final int[] lengths=new int[]{2, 3, 5, 8, 13, 21, 34, 55, 100, 1000, 10000, 100000, 1000000};
+private static final int[] lengths=new int[]{2, 3, 5, 8, 13, 21, 34, 55, 100, 1000, 10000, 100000, 1000000};
 private static final long[] randSeeds=new long[]{666L,0xC0FFEEL,999L};
 #ELSE
 private static final int[] lengths=new int[]{2, 3, 21, 55, 1000, 10000};
@@ -31,61 +33,13 @@ private static final long[] randSeeds=new long[]{666};
 
 #ENDDEF
 
-  #MACRO GetComparator<Ascending,Integer>(Integer,Comparator<Integer>)
-  #MACRO GetComparator<Ascending,boolean>(Boolean,BooleanComparator)
-  #MACRO GetComparator<Ascending,byte>(Byte,ByteComparator)
-  #MACRO GetComparator<Ascending,char>(Character,CharComparator)
-  #MACRO GetComparator<Ascending,short>(Short,ShortComparator)
-  #MACRO GetComparator<Ascending,int>(Integer,IntBinaryOperator)
-  #MACRO GetComparator<Ascending,long>(Long,LongComparator)
-  #MACRO GetComparator<Ascending,float>(Float,FloatComparator)
-  #MACRO GetComparator<Ascending,double>(Double,DoubleComparator)
-  #MACRO GetComparator<Unsorted,Integer>(Integer,Comparator<Integer>)
-  #MACRO GetComparator<Unsorted,boolean>(Boolean,BooleanComparator)
-  #MACRO GetComparator<Unsorted,byte>(Byte,ByteComparator)
-  #MACRO GetComparator<Unsorted,char>(Character,CharComparator)
-  #MACRO GetComparator<Unsorted,short>(Short,ShortComparator)
-  #MACRO GetComparator<Unsorted,int>(Integer,IntBinaryOperator)
-  #MACRO GetComparator<Unsorted,long>(Long,LongComparator)
-  #MACRO GetComparator<Unsorted,float>(Float,FloatComparator)
-  #MACRO GetComparator<Unsorted,double>(Double,DoubleComparator)
-  #MACRO GetComparator<Descending,Integer>(Integer,Comparator<Integer>)
-  #MACRO GetComparator<Descending,boolean>(Boolean,BooleanComparator)
-  #MACRO GetComparator<Descending,byte>(Byte,ByteComparator)
-  #MACRO GetComparator<Descending,char>(Character,CharComparator)
-  #MACRO GetComparator<Descending,short>(Short,ShortComparator)
-  #MACRO GetComparator<Descending,int>(Integer,IntBinaryOperator)
-  #MACRO GetComparator<Descending,long>(Long,LongComparator)
-  #MACRO GetComparator<Descending,float>(Float,FloatComparator)
-  #MACRO GetComparator<Descending,double>(Double,DoubleComparator)
-#MACRODEF GetComparator<SORTTYPE,ARRTYPE>(BOXEDTYPE,COMPARATORTYPE)
-private static COMPARATORTYPE getSORTTYPEARRTYPEComparator()
-{
-  return (val1,val2)->
-  {
-    return
-#IFSWITCH SORTTYPE==Descending
-      -
-#ENDIF
-      (
-#IFSWITCH SORTTYPE==Unsorted
-      0
-#ELSE
-  #IFSWITCH ARRTYPE==String
-    val1.compareTo(val2)
-  #ELSE
-    BOXEDTYPE.compare(val1,val2)
-  #ENDIF
-#ENDIF
-      );
-  };
-}
-#ENDDEF
 
-  #MACRO IsSortedMethods<false>()
+
+  #MACRO IsSortedMethods<true>()
 
 #MACRODEF IsSortedMethods<PARALLEL>()
 #MACRO IsSorted<Integer,Ascending>(Integer,Ref)
+#MACRO IsSorted<String,Ascending>(String,Ref)
 #MACRO IsSorted<boolean,Ascending>(Boolean,Boolean)
 #MACRO IsSorted<byte,Ascending>(Byte,Byte)
 #MACRO IsSorted<char,Ascending>(Character,Char)
@@ -95,6 +49,7 @@ private static COMPARATORTYPE getSORTTYPEARRTYPEComparator()
 #MACRO IsSorted<float,Ascending>(Float,Float)
 #MACRO IsSorted<double,Ascending>(Double,Double)
 #MACRO IsSorted<Integer,Descending>(Integer,Ref)
+#MACRO IsSorted<String,Descending>(String,Ref)
 #MACRO IsSorted<boolean,Descending>(Boolean,Boolean)
 #MACRO IsSorted<byte,Descending>(Byte,Byte)
 #MACRO IsSorted<char,Descending>(Character,Char)
@@ -104,6 +59,7 @@ private static COMPARATORTYPE getSORTTYPEARRTYPEComparator()
 #MACRO IsSorted<float,Descending>(Float,Float)
 #MACRO IsSorted<double,Descending>(Double,Double)
 #MACRO IsSorted<Integer>(Comparator<? super Integer>,compare,Integer)
+#MACRO IsSorted<String>(Comparator<? super String>,compare,String)
 #MACRO IsSorted<boolean>(BooleanComparator,compare,Boolean)
 #MACRO IsSorted<byte>(ByteComparator,compare,Byte)
 #MACRO IsSorted<char>(CharComparator,compare,Character)
@@ -118,6 +74,7 @@ private static COMPARATORTYPE getSORTTYPEARRTYPEComparator()
 #MACRODEF IsSorted<ARRTYPE,SORTTYPE>(BOXEDTYPE,CLASSPREFIX)
 private static void isSortedSORTTYPE(ARRTYPE[] arr,ARRTYPE[] copy)
 {
+
   Thread stockSorterThread=new Thread(()->
   {
 #IFSWITCH ARRTYPE==boolean
@@ -131,6 +88,7 @@ private static void isSortedSORTTYPE(ARRTYPE[] arr,ARRTYPE[] copy)
 #IFSWITCH SORTTYPE==Descending
   OmniArray.OfCLASSPREFIX.reverseRange(copy,0,copy.length-1);
 #ENDIF
+  System.out.println("Finished standard sort");
   });
   stockSorterThread.start();
 #IFSWITCH ARRTYPE==double,float,long,int,short,char,byte,boolean
@@ -146,6 +104,7 @@ private static void isSortedSORTTYPE(ARRTYPE[] arr,ARRTYPE[] copy)
   SortUtil.reverseSortObjectTimSort.uncheckedsort(arr,0,arr.length);
   #ENDIF
 #ENDIF
+  System.out.println("Finished custom sort");
   try
   {
     stockSorterThread.join();
@@ -155,7 +114,10 @@ private static void isSortedSORTTYPE(ARRTYPE[] arr,ARRTYPE[] copy)
     throw new AssertionError(e);
   }
   #IFSWITCH PARALLEL==true
-  JunitUtil.uncheckedparallelassertarraysAreEqual(arr,0,copy,0,copy.length);
+  if(copy.length>=10000)
+  {
+    JunitUtil.uncheckedparallelassertarraysAreEqual(arr,0,copy,0,copy.length);
+  }
   #ELSE
   JunitUtil.uncheckedassertarraysAreEqual(arr,0,copy,0,copy.length);
   #ENDIF
@@ -165,9 +127,10 @@ private static void isSortedSORTTYPE(ARRTYPE[] arr,ARRTYPE[] copy)
 #MACRODEF IsSorted<ARRTYPE>(COMPARATORTYPE,COMPARATORMETHOD,BOXEDTYPE)
 private static void isSorted(ARRTYPE[] arr,ARRTYPE[] copy,COMPARATORTYPE sorter)
 {
+
   Thread stockSorterThread=new Thread(()->
   {
-#IFSWITCH ARRTYPE==Integer
+#IFSWITCH ARRTYPE==Integer,String
   Arrays.sort(copy,0,copy.length,sorter);
 #ELSE
   BOXEDTYPE[] boxedCopy=new BOXEDTYPE[copy.length];
@@ -175,15 +138,17 @@ private static void isSorted(ARRTYPE[] arr,ARRTYPE[] copy,COMPARATORTYPE sorter)
   Arrays.sort(boxedCopy,0,copy.length,sorter::COMPARATORMETHOD);
   ArrCopy.uncheckedCopy(boxedCopy,0,copy,0,copy.length);
 #ENDIF
+  System.out.println("finished standard sort");
   });
   stockSorterThread.start();
-#IFSWITCH ARRTYPE==Integer
+#IFSWITCH ARRTYPE==Integer,String
   SortUtil.comparatorSortObjectTimSort.uncheckedsort(arr,0,arr.length,sorter);
 #ELSEIFSWITCH ARRTYPE==boolean
   SortUtil.uncheckedcomparatorSort(arr,0,arr.length-1,sorter);
 #ELSE
   SortUtil.comparatorSortARRTYPETimSort.uncheckedsort(arr,0,arr.length,sorter);
 #ENDIF
+  System.out.println("finished custom sort");
   try
   {
     stockSorterThread.join();
@@ -193,7 +158,10 @@ private static void isSorted(ARRTYPE[] arr,ARRTYPE[] copy,COMPARATORTYPE sorter)
     throw new AssertionError(e);
   }
   #IFSWITCH PARALLEL==true
-  JunitUtil.uncheckedparallelassertarraysAreEqual(arr,0,copy,0,copy.length);
+  if(copy.length>=10000)
+  {
+    JunitUtil.uncheckedparallelassertarraysAreEqual(arr,0,copy,0,copy.length);
+  }
   #ELSE
   JunitUtil.uncheckedassertarraysAreEqual(arr,0,copy,0,copy.length);
   #ENDIF
@@ -209,6 +177,7 @@ private static void isSorted(ARRTYPE[] arr,ARRTYPE[] copy,COMPARATORTYPE sorter)
   #MACRO BuilderMethods<float>()
   #MACRO BuilderMethods<double>()
   #MACRO BuilderMethods<Integer>()
+  #MACRO BuilderMethods<String>()
 #MACRODEF BuilderMethods<ARRTYPE>()
 private static int getMLo(JunitUtil.ARRTYPEArrayBuilder builder)
 {
@@ -254,6 +223,12 @@ private static int getMHi(JunitUtil.ARRTYPEArrayBuilder builder,int arrLength)
 }
 private static int getNumReps(JunitUtil.ARRTYPEArrayBuilder builder,int arrLength)
 {
+  if(builder.isRandomized())
+  {
+    return 10;
+  }
+  return 1;
+  /*
 #IFSWITCH ARRTYPE==char,short
   if(builder.isRandomized())
   {
@@ -270,6 +245,7 @@ private static int getNumReps(JunitUtil.ARRTYPEArrayBuilder builder,int arrLengt
   }
 #ENDIF
   return 1;
+  */
 }
 private static int incrementM(JunitUtil.ARRTYPEArrayBuilder builder,int m)
 {
@@ -292,67 +268,56 @@ private static int incrementM(JunitUtil.ARRTYPEArrayBuilder builder,int m)
 }
 #ENDDEF
 
-  //#MACRO TestMethods<boolean,comparatorSort,Ascending>()
-  //#MACRO TestMethods<boolean,comparatorSort,Descending>()
-
-/*
-  #MACRO TestMethods<boolean,nonComparatorSort,Ascending>()
-  #MACRO TestMethods<byte,nonComparatorSort,Ascending>()
-  #MACRO TestMethods<char,nonComparatorSort,Ascending>()
-  #MACRO TestMethods<short,nonComparatorSort,Ascending>()
-  #MACRO TestMethods<int,nonComparatorSort,Ascending>()
-  #MACRO TestMethods<long,nonComparatorSort,Ascending>()
-  #MACRO TestMethods<float,nonComparatorSort,Ascending>()
-  #MACRO TestMethods<double,nonComparatorSort,Ascending>()
-*/
-/*
-  #MACRO TestMethods<boolean,nonComparatorSort,Descending>()
-  #MACRO TestMethods<char,nonComparatorSort,Descending>()
-  #MACRO TestMethods<short,nonComparatorSort,Descending>()
-  #MACRO TestMethods<int,nonComparatorSort,Descending>()
-  #MACRO TestMethods<long,nonComparatorSort,Descending>()
-  #MACRO TestMethods<float,nonComparatorSort,Descending>()
-  #MACRO TestMethods<double,nonComparatorSort,Descending>()
-*/
-/*
+  #MACRO TestMethods<boolean,comparatorSort,Ascending>()
+  #MACRO TestMethods<boolean,comparatorSort,Descending>()
   #MACRO TestMethods<boolean,comparatorSort,Unsorted>()
+  #MACRO TestMethods<boolean,nonComparatorSort,Ascending>()
+  #MACRO TestMethods<boolean,nonComparatorSort,Descending>()
+  #MACRO TestMethods<byte,nonComparatorSort,Ascending>()
+  #MACRO TestMethods<byte,nonComparatorSort,Descending>()
+  #MACRO TestMethods<char,nonComparatorSort,Ascending>()
+  #MACRO TestMethods<char,nonComparatorSort,Descending>()
+  #MACRO TestMethods<short,nonComparatorSort,Ascending>()
+  #MACRO TestMethods<short,nonComparatorSort,Descending>()
+  #MACRO TestMethods<int,nonComparatorSort,Ascending>()
+  #MACRO TestMethods<int,nonComparatorSort,Descending>()
+  #MACRO TestMethods<long,nonComparatorSort,Ascending>()
+  #MACRO TestMethods<long,nonComparatorSort,Descending>()
+  #MACRO TestMethods<float,nonComparatorSort,Ascending>()
+  #MACRO TestMethods<float,nonComparatorSort,Descending>()
+  #MACRO TestMethods<double,nonComparatorSort,Ascending>()
+  #MACRO TestMethods<double,nonComparatorSort,Descending>()
+
+  
   #MACRO TestMethods<byte,comparatorSort,Unsorted>()
-  #MACRO TestMethods<char,comparatorSort,Unsorted>()
-  #MACRO TestMethods<short,comparatorSort,Unsorted>()
-  #MACRO TestMethods<int,comparatorSort,Unsorted>()
-  #MACRO TestMethods<long,comparatorSort,Unsorted>()
-  #MACRO TestMethods<float,comparatorSort,Unsorted>()
-  #MACRO TestMethods<double,comparatorSort,Unsorted>()
-  #MACRO TestMethods<Integer,comparatorSort,Unsorted>()
-*/
-
- 
-
   #MACRO TestMethods<byte,comparatorSort,Ascending>()
-/*
-  #MACRO TestMethods<char,comparatorSort,Ascending>()
-  #MACRO TestMethods<short,comparatorSort,Ascending>()
-  #MACRO TestMethods<int,comparatorSort,Ascending>()
-  #MACRO TestMethods<long,comparatorSort,Ascending>()
-  #MACRO TestMethods<float,comparatorSort,Ascending>()
-  #MACRO TestMethods<double,comparatorSort,Ascending>()
-  #MACRO TestMethods<Integer,comparatorSort,Ascending>()
-*/
-
-/*
   #MACRO TestMethods<byte,comparatorSort,Descending>()
+
+  #MACRO TestMethods<char,comparatorSort,Unsorted>()
+  #MACRO TestMethods<char,comparatorSort,Ascending>()
   #MACRO TestMethods<char,comparatorSort,Descending>()
+  #MACRO TestMethods<short,comparatorSort,Unsorted>()
+  #MACRO TestMethods<short,comparatorSort,Ascending>()
   #MACRO TestMethods<short,comparatorSort,Descending>()
+  #MACRO TestMethods<int,comparatorSort,Unsorted>()
+  #MACRO TestMethods<int,comparatorSort,Ascending>()
   #MACRO TestMethods<int,comparatorSort,Descending>()
+  #MACRO TestMethods<long,comparatorSort,Unsorted>()
+  #MACRO TestMethods<long,comparatorSort,Ascending>()
   #MACRO TestMethods<long,comparatorSort,Descending>()
+  #MACRO TestMethods<float,comparatorSort,Unsorted>()
+  #MACRO TestMethods<float,comparatorSort,Ascending>()
   #MACRO TestMethods<float,comparatorSort,Descending>()
+  #MACRO TestMethods<double,comparatorSort,Unsorted>()
+  #MACRO TestMethods<double,comparatorSort,Ascending>()
   #MACRO TestMethods<double,comparatorSort,Descending>()
+  #MACRO TestMethods<Integer,comparatorSort,Unsorted>()
+  #MACRO TestMethods<Integer,comparatorSort,Ascending>()
   #MACRO TestMethods<Integer,comparatorSort,Descending>()
-*/
-/*
   #MACRO TestMethods<Integer,nonComparatorSort,Ascending>()
   #MACRO TestMethods<Integer,nonComparatorSort,Descending>()
-*/
+
+
 
 #MACRODEF TestMethods<ARRTYPE,SORTTYPE,DIRECTION>()
 private static void testARRTYPEDIRECTIONSORTTYPEHelper(JunitUtil.ARRTYPEArrayBuilder builder,int arrLength,long randSeed)
@@ -361,7 +326,7 @@ private static void testARRTYPEDIRECTIONSORTTYPEHelper(JunitUtil.ARRTYPEArrayBui
   ARRTYPE[] test=new ARRTYPE[arrLength];
   Random rand=new Random(randSeed);
 #IFSWITCH SORTTYPE==comparatorSort
-  var sorter=getDIRECTIONARRTYPEComparator();
+  var sorter=JunitUtil.getDIRECTIONARRTYPEComparator();
 #ENDIF
   for(int m=getMLo(builder),mHi=getMHi(builder,arrLength),numReps=getNumReps(builder,arrLength);m<=mHi;m=incrementM(builder,m))
   {
@@ -377,22 +342,22 @@ private static void testARRTYPEDIRECTIONSORTTYPEHelper(JunitUtil.ARRTYPEArrayBui
     }
   }
 }
-//#MACRO TestMethod<Randomized>()
-//#MACRO TestMethod<Ascending>()
-//#MACRO TestMethod<Descending>()
-//#MACRO TestMethod<AllEquals>()
+#MACRO TestMethod<Randomized>()
+#MACRO TestMethod<Ascending>()
+#MACRO TestMethod<Descending>()
+#MACRO TestMethod<AllEquals>()
 #IFNOTSWITCH ARRTYPE==boolean
-//#MACRO TestMethod<MergeAscending>()
-//#MACRO TestMethod<MergeDescending>()
-//#MACRO TestMethod<Saw>()
-//#MACRO TestMethod<SortedRepeated>()
-//#MACRO TestMethod<Repeated>()
+#MACRO TestMethod<MergeAscending>()
+#MACRO TestMethod<MergeDescending>()
+#MACRO TestMethod<Saw>()
+#MACRO TestMethod<SortedRepeated>()
+#MACRO TestMethod<Repeated>()
 #MACRO TestMethod<Duplicated>()
-//#MACRO TestMethod<SortedOrganPipes>()
-//#MACRO TestMethod<OrganPipes>()
-//#MACRO TestMethod<Stagger>()
-//#MACRO TestMethod<Plateau>()
-//#MACRO TestMethod<Shuffle>()
+#MACRO TestMethod<SortedOrganPipes>()
+#MACRO TestMethod<OrganPipes>()
+#MACRO TestMethod<Stagger>()
+#MACRO TestMethod<Plateau>()
+#MACRO TestMethod<Shuffle>()
   #IFSWITCH ARRTYPE==float,double
 #MACRO TestMethod<WithNaNsAndZeros>()
   #ENDIF
@@ -409,12 +374,8 @@ public void testARRTYPEDIRECTIONSORTTYPEARRAYBUILDERArrayBuilder()
     System.out.println("testARRTYPEDIRECTIONSORTTYPEARRAYBUILDERArrayBuilder length = "+arrLength);
    if(JunitUtil.ARRTYPEArrayBuilder.ARRAYBUILDER.isRandomized())
    {
-       testARRTYPEDIRECTIONSORTTYPEHelper(JunitUtil.ARRTYPEArrayBuilder.ARRAYBUILDER,arrLength,0);
-   }
-   else
-   {
-     var stream=LongStream.of(randSeeds);
-     if(false)
+      var stream=LongStream.of(randSeeds);
+     //if(true)
      {
        stream=stream.parallel();
      }
@@ -422,6 +383,11 @@ public void testARRTYPEDIRECTIONSORTTYPEARRAYBUILDERArrayBuilder()
      {
        testARRTYPEDIRECTIONSORTTYPEHelper(JunitUtil.ARRTYPEArrayBuilder.ARRAYBUILDER,arrLength,randSeed);
      });
+   }
+   else
+   {
+     testARRTYPEDIRECTIONSORTTYPEHelper(JunitUtil.ARRTYPEArrayBuilder.ARRAYBUILDER,arrLength,0);
+    
    }
   }
 }
