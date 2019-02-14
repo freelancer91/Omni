@@ -132,17 +132,17 @@ ERROR unknown array type ARRTYPE
   #MACRO GetComparator<Descending,long>(Long,LongComparator)
   #MACRO GetComparator<Descending,float>(Float,FloatComparator)
   #MACRO GetComparator<Descending,double>(Double,DoubleComparator)
-#MACRODEF GetComparator<SORTTYPE,ARRTYPE>(BOXEDTYPE,COMPARATORTYPE)
-public static COMPARATORTYPE getSORTTYPEARRTYPEComparator()
+#MACRODEF GetComparator<DIRECTION,ARRTYPE>(BOXEDTYPE,COMPARATORTYPE)
+public static COMPARATORTYPE getDIRECTIONARRTYPEComparator()
 {
   return (val1,val2)->
   {
     return
-#IFSWITCH SORTTYPE==Descending
+#IFSWITCH DIRECTION==Descending
       -
 #ENDIF
       (
-#IFSWITCH SORTTYPE==Unsorted
+#IFSWITCH DIRECTION==Unsorted
       0
 #ELSE
   #IFSWITCH ARRTYPE==String

@@ -1,20 +1,11 @@
 #TYPEDEF OfGeneric
 package omni.util;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.parallel.Execution;
-import org.junit.jupiter.api.parallel.ExecutionMode;
 import java.util.Random;
 import java.util.Arrays;
-import java.util.Comparator;
+import java.util.ArrayList;
+import java.util.stream.IntStream;
 import java.util.stream.LongStream;
-import java.util.function.IntBinaryOperator;
-import omni.function.BooleanComparator;
-import omni.function.ByteComparator;
-import omni.function.CharComparator;
-import omni.function.ShortComparator;
-import omni.function.LongComparator;
-import omni.function.FloatComparator;
-import omni.function.DoubleComparator;
 public class SortUtilTest
 {
   
@@ -22,13 +13,7 @@ public class SortUtilTest
 
 #MACRODEF Fields<LONGRUN>()
 #IFSWITCH LONGRUN==true
-//private static final int[] lengths=new int[]{34};
-//private static final int[] lengths=new int[]{2,3,5,8,13,21};
-<<<<<<< HEAD
 private static final int[] lengths=new int[]{2, 3, 5, 8, 13, 21, 34, 55, 100, 1000, 10000, 100000, 1000000};
-=======
-private static final int[] lengths=new int[]{2, 3, 5, 8, 13, 21, 34, 55, 100, 1000, 10000, 100000, 1000000,Integer.MAX_VALUE-8};
->>>>>>> branch 'master' of https://github.com/freelancer91/Omni.git
 private static final long[] randSeeds=new long[]{666L,0xC0FFEEL,999L};
 #ELSE
 private static final int[] lengths=new int[]{2, 3, 21, 55, 1000, 10000};
@@ -39,206 +24,168 @@ private static final long[] randSeeds=new long[]{666};
 
 
 
-  #MACRO IsSortedMethods<true>()
 
-#MACRODEF IsSortedMethods<PARALLEL>()
-#MACRO IsSorted<Integer,Ascending>(Integer,Ref)
-#MACRO IsSorted<String,Ascending>(String,Ref)
-#MACRO IsSorted<boolean,Ascending>(Boolean,Boolean)
-#MACRO IsSorted<byte,Ascending>(Byte,Byte)
-#MACRO IsSorted<char,Ascending>(Character,Char)
-#MACRO IsSorted<short,Ascending>(Short,Short)
-#MACRO IsSorted<int,Ascending>(Integer,Int)
-#MACRO IsSorted<long,Ascending>(Long,Long)
-#MACRO IsSorted<float,Ascending>(Float,Float)
-#MACRO IsSorted<double,Ascending>(Double,Double)
-#MACRO IsSorted<Integer,Descending>(Integer,Ref)
-#MACRO IsSorted<String,Descending>(String,Ref)
-#MACRO IsSorted<boolean,Descending>(Boolean,Boolean)
-#MACRO IsSorted<byte,Descending>(Byte,Byte)
-#MACRO IsSorted<char,Descending>(Character,Char)
-#MACRO IsSorted<short,Descending>(Short,Short)
-#MACRO IsSorted<int,Descending>(Integer,Int)
-#MACRO IsSorted<long,Descending>(Long,Long)
-#MACRO IsSorted<float,Descending>(Float,Float)
-#MACRO IsSorted<double,Descending>(Double,Double)
-#MACRO IsSorted<Integer>(Comparator<? super Integer>,compare,Integer)
-#MACRO IsSorted<String>(Comparator<? super String>,compare,String)
-#MACRO IsSorted<boolean>(BooleanComparator,compare,Boolean)
-#MACRO IsSorted<byte>(ByteComparator,compare,Byte)
-#MACRO IsSorted<char>(CharComparator,compare,Character)
-#MACRO IsSorted<short>(ShortComparator,compare,Short)
-#MACRO IsSorted<int>(IntBinaryOperator,applyAsInt,Integer)
-#MACRO IsSorted<long>(LongComparator,compare,Long)
-#MACRO IsSorted<float>(FloatComparator,compare,Float)
-#MACRO IsSorted<double>(DoubleComparator,compare,Double)
-#ENDDEF
+  #MACRO TestMethods<boolean,comparatorSort,Ascending,Boolean>()
+  #MACRO TestMethods<boolean,comparatorSort,Descending,Boolean>()
+  #MACRO TestMethods<boolean,comparatorSort,Unsorted,Boolean>()
+  #MACRO TestMethods<boolean,nonComparatorSort,Ascending,Boolean>()
+  #MACRO TestMethods<boolean,nonComparatorSort,Descending,Boolean>()
+  #MACRO TestMethods<byte,nonComparatorSort,Ascending,Byte>()
+  #MACRO TestMethods<byte,nonComparatorSort,Descending,Byte>()
+  #MACRO TestMethods<char,nonComparatorSort,Ascending,Char>()
+  #MACRO TestMethods<char,nonComparatorSort,Descending,Char>()
+  #MACRO TestMethods<short,nonComparatorSort,Ascending,Short>()
+  #MACRO TestMethods<short,nonComparatorSort,Descending,Short>()
+  #MACRO TestMethods<int,nonComparatorSort,Ascending,Int>()
+  #MACRO TestMethods<int,nonComparatorSort,Descending,Int>()
+  #MACRO TestMethods<long,nonComparatorSort,Ascending,Long>()
+  #MACRO TestMethods<long,nonComparatorSort,Descending,Long>()
+  #MACRO TestMethods<float,nonComparatorSort,Ascending,Float>()
+  #MACRO TestMethods<float,nonComparatorSort,Descending,Float>()
+  #MACRO TestMethods<double,nonComparatorSort,Ascending,Double>()
+  #MACRO TestMethods<double,nonComparatorSort,Descending,Double>()
 
 
-#MACRODEF IsSorted<ARRTYPE,SORTTYPE>(BOXEDTYPE,CLASSPREFIX)
-private static void isSortedSORTTYPE(ARRTYPE[] arr,ARRTYPE[] copy)
+  
+  #MACRO TestMethods<byte,comparatorSort,Unsorted,Byte>()
+  #MACRO TestMethods<byte,comparatorSort,Ascending,Byte>()
+  #MACRO TestMethods<byte,comparatorSort,Descending,Byte>()
+
+  #MACRO TestMethods<char,comparatorSort,Unsorted,Char>()
+  #MACRO TestMethods<char,comparatorSort,Ascending,Char>()
+  #MACRO TestMethods<char,comparatorSort,Descending,Char>()
+  #MACRO TestMethods<short,comparatorSort,Unsorted,Short>()
+  #MACRO TestMethods<short,comparatorSort,Ascending,Short>()
+  #MACRO TestMethods<short,comparatorSort,Descending,Short>()
+  #MACRO TestMethods<int,comparatorSort,Unsorted,Int>()
+  #MACRO TestMethods<int,comparatorSort,Ascending,Int>()
+  #MACRO TestMethods<int,comparatorSort,Descending,Int>()
+  #MACRO TestMethods<long,comparatorSort,Unsorted,Long>()
+  #MACRO TestMethods<long,comparatorSort,Ascending,Long>()
+  #MACRO TestMethods<long,comparatorSort,Descending,Long>()
+  #MACRO TestMethods<float,comparatorSort,Unsorted,Float>()
+  #MACRO TestMethods<float,comparatorSort,Ascending,Float>()
+  #MACRO TestMethods<float,comparatorSort,Descending,Float>()
+  #MACRO TestMethods<double,comparatorSort,Unsorted,Double>()
+  #MACRO TestMethods<double,comparatorSort,Ascending,Double>()
+  #MACRO TestMethods<double,comparatorSort,Descending,Double>()
+  #MACRO TestMethods<Integer,comparatorSort,Unsorted,Ref>()
+  #MACRO TestMethods<Integer,comparatorSort,Ascending,Ref>()
+  #MACRO TestMethods<Integer,comparatorSort,Descending,Ref>()
+  #MACRO TestMethods<Integer,nonComparatorSort,Ascending,Ref>()
+  #MACRO TestMethods<Integer,nonComparatorSort,Descending,Ref>()
+
+
+
+
+
+  #MACRO BuildRandomArrays<boolean>()
+  #MACRO BuildRandomArrays<byte>()
+  #MACRO BuildRandomArrays<char>()
+  #MACRO BuildRandomArrays<short>()
+  #MACRO BuildRandomArrays<int>()
+  #MACRO BuildRandomArrays<long>()
+  #MACRO BuildRandomArrays<float>()
+  #MACRO BuildRandomArrays<double>()
+  #MACRO BuildRandomArrays<Integer>()
+
+
+
+
+
+  
+
+
+
+
+}
+#MACRODEF TestMethod<ARRAYBUILDER>()
+@Test
+public void testARRTYPEDIRECTIONSORTTYPEARRAYBUILDERArrayBuilder()
 {
-<<<<<<< HEAD
-
-  Thread stockSorterThread=new Thread(()->
+  
+  RandomArrayContainerARRTYPE  arrs=new RandomArrayContainerARRTYPE();
+  System.out.println("Building arrays for testARRTYPEDIRECTIONSORTTYPEARRAYBUILDERArrayBuilder");
+  IntStream.of(lengths).parallel().forEach(arrLength->
   {
-#IFSWITCH ARRTYPE==boolean
-  BOXEDTYPE[] boxedCopy=new BOXEDTYPE[copy.length];
-  ArrCopy.uncheckedCopy(copy,0,boxedCopy,0,copy.length);
-  Arrays.sort(boxedCopy,0,copy.length);
-  ArrCopy.uncheckedCopy(boxedCopy,0,copy,0,copy.length);
-#ELSE
-  Arrays.sort(copy,0,copy.length);
-#ENDIF
-#IFSWITCH SORTTYPE==Descending
-  OmniArray.OfCLASSPREFIX.reverseRange(copy,0,copy.length-1);
-#ENDIF
-  System.out.println("Finished standard sort");
+    if(JunitUtil.ARRTYPEArrayBuilder.ARRAYBUILDER.isRandomized())
+    {
+      LongStream.of(randSeeds).parallel().forEach(randSeed->
+      {
+        arrs.addArrays(randSeed,arrLength,JunitUtil.ARRTYPEArrayBuilder.ARRAYBUILDER);
+      });
+      
+    }
+    else
+    {
+      arrs.addArrays(0,arrLength,JunitUtil.ARRTYPEArrayBuilder.ARRAYBUILDER);
+    }
   });
-  stockSorterThread.start();
-=======
->>>>>>> branch 'master' of https://github.com/freelancer91/Omni.git
-#IFSWITCH ARRTYPE==double,float,long,int,short,char,byte,boolean
-  #IFSWITCH SORTTYPE==Ascending
-  SortUtil.uncheckedsort(arr,0,arr.length-1);
-  #ELSE
-  SortUtil.uncheckedreverseSort(arr,0,arr.length-1);
-  #ENDIF
-#ELSE
-  #IFSWITCH SORTTYPE==Ascending
-  SortUtil.sortObjectTimSort.uncheckedsort(arr,0,arr.length);
-  #ELSE
-  SortUtil.reverseSortObjectTimSort.uncheckedsort(arr,0,arr.length);
-  #ENDIF
+  System.out.println("Built "+arrs.size()+" arrays");
+#IFSWITCH SORTTYPE==comparatorSort
+  var sorter=JunitUtil.getDIRECTIONARRTYPEComparator();
 #ENDIF
-<<<<<<< HEAD
-  System.out.println("Finished custom sort");
-  try
+  arrs.stream().parallel().forEach(arr->
   {
-    stockSorterThread.join();
-  }
-  catch(InterruptedException e)
-  {
-    throw new AssertionError(e);
-  }
-=======
-  //Thread stockSorterThread=new Thread(()->
-  //{
-#IFSWITCH ARRTYPE==boolean
-  BOXEDTYPE[] boxedCopy=new BOXEDTYPE[copy.length];
-  ArrCopy.uncheckedCopy(copy,0,boxedCopy,0,copy.length);
-  Arrays.sort(boxedCopy,0,copy.length);
-  ArrCopy.uncheckedCopy(boxedCopy,0,copy,0,copy.length);
-#ELSE
-  Arrays.sort(copy,0,copy.length);
-#ENDIF
-#IFSWITCH SORTTYPE==Descending
-  OmniArray.OfCLASSPREFIX.reverseRange(copy,0,copy.length-1);
-#ENDIF
-  //});
-  //stockSorterThread.start();
-
-  //try
-  //{
-  //  stockSorterThread.join();
-  //}
-  //catch(InterruptedException e)
-  //{
-  //  throw new AssertionError(e);
-  //}
->>>>>>> branch 'master' of https://github.com/freelancer91/Omni.git
-  #IFSWITCH PARALLEL==true
-  if(copy.length>=10000)
-  {
-    JunitUtil.uncheckedparallelassertarraysAreEqual(arr,0,copy,0,copy.length);
-  }
-  #ELSE
-  JunitUtil.uncheckedassertarraysAreEqual(arr,0,copy,0,copy.length);
-  #ENDIF
+    int arrLength;
+    ARRTYPE[] copy;
+    ArrCopy.uncheckedCopy(arr,0,copy=new ARRTYPE[arrLength=arr.length],0,arrLength);
+    #MACRO CallCustomSorter(arr,arrLength,sorter)
+    #MACRO CallStockSorter(copy,arrLength)
+    JunitUtil.uncheckedassertarraysAreEqual(arr,0,copy,0,arrLength);
+  });
 }
 #ENDDEF
- 
-#MACRODEF IsSorted<ARRTYPE>(COMPARATORTYPE,COMPARATORMETHOD,BOXEDTYPE)
-private static void isSorted(ARRTYPE[] arr,ARRTYPE[] copy,COMPARATORTYPE sorter)
-{
-<<<<<<< HEAD
-
-  Thread stockSorterThread=new Thread(()->
-  {
-=======
-#IFSWITCH ARRTYPE==Integer,String
-  SortUtil.comparatorSortObjectTimSort.uncheckedsort(arr,0,arr.length,sorter);
-#ELSEIFSWITCH ARRTYPE==boolean
-  SortUtil.uncheckedcomparatorSort(arr,0,arr.length-1,sorter);
-#ELSE
-  SortUtil.comparatorSortARRTYPETimSort.uncheckedsort(arr,0,arr.length,sorter);
-#ENDIF
-  //Thread stockSorterThread=new Thread(()->
-  //{
->>>>>>> branch 'master' of https://github.com/freelancer91/Omni.git
-#IFSWITCH ARRTYPE==Integer,String
-  Arrays.sort(copy,0,copy.length,sorter);
-#ELSE
-  BOXEDTYPE[] boxedCopy=new BOXEDTYPE[copy.length];
-  ArrCopy.uncheckedCopy(copy,0,boxedCopy,0,copy.length);
-  Arrays.sort(boxedCopy,0,copy.length,sorter::COMPARATORMETHOD);
-  ArrCopy.uncheckedCopy(boxedCopy,0,copy,0,copy.length);
-#ENDIF
-<<<<<<< HEAD
-  System.out.println("finished standard sort");
-  });
-  stockSorterThread.start();
-#IFSWITCH ARRTYPE==Integer,String
-  SortUtil.comparatorSortObjectTimSort.uncheckedsort(arr,0,arr.length,sorter);
-#ELSEIFSWITCH ARRTYPE==boolean
-  SortUtil.uncheckedcomparatorSort(arr,0,arr.length-1,sorter);
-#ELSE
-  SortUtil.comparatorSortARRTYPETimSort.uncheckedsort(arr,0,arr.length,sorter);
-#ENDIF
-  System.out.println("finished custom sort");
-  try
-  {
-    stockSorterThread.join();
-  }
-  catch(InterruptedException e)
-  {
-    throw new AssertionError(e);
-  }
-=======
-  //});
-  //stockSorterThread.start();
-
-  //try
-  //{
-  //  stockSorterThread.join();
-  //}
-  //catch(InterruptedException e)
-  //{
-  //  throw new AssertionError(e);
-  //}
->>>>>>> branch 'master' of https://github.com/freelancer91/Omni.git
-  #IFSWITCH PARALLEL==true
-  if(copy.length>=10000)
-  {
-    JunitUtil.uncheckedparallelassertarraysAreEqual(arr,0,copy,0,copy.length);
-  }
-  #ELSE
-  JunitUtil.uncheckedassertarraysAreEqual(arr,0,copy,0,copy.length);
+#MACRODEF TestMethods<ARRTYPE,SORTTYPE,DIRECTION,CLASSPREFIX>()
+#MACRO TestMethod<Randomized>()
+#MACRO TestMethod<Ascending>()
+#MACRO TestMethod<Descending>()
+#MACRO TestMethod<AllEquals>()
+#IFNOTSWITCH ARRTYPE==boolean
+#MACRO TestMethod<MergeAscending>()
+#MACRO TestMethod<MergeDescending>()
+#MACRO TestMethod<Saw>()
+#MACRO TestMethod<SortedRepeated>()
+#MACRO TestMethod<Repeated>()
+#MACRO TestMethod<Duplicated>()
+#MACRO TestMethod<SortedOrganPipes>()
+#MACRO TestMethod<OrganPipes>()
+#MACRO TestMethod<Stagger>()
+#MACRO TestMethod<Plateau>()
+#MACRO TestMethod<Shuffle>()
+  #IFSWITCH ARRTYPE==float,double
+#MACRO TestMethod<WithNaNsAndZeros>()
   #ENDIF
-}
+#ENDIF
 #ENDDEF
 
-  #MACRO BuilderMethods<boolean>()
-  #MACRO BuilderMethods<byte>()
-  #MACRO BuilderMethods<char>()
-  #MACRO BuilderMethods<short>()
-  #MACRO BuilderMethods<int>()
-  #MACRO BuilderMethods<long>()
-  #MACRO BuilderMethods<float>()
-  #MACRO BuilderMethods<double>()
-  #MACRO BuilderMethods<Integer>()
-  #MACRO BuilderMethods<String>()
-#MACRODEF BuilderMethods<ARRTYPE>()
+#MACRODEF BuildRandomArrays<ARRTYPE>()
+private static class RandomArrayContainerARRTYPE extends ArrayList<ARRTYPE[]>
+{
+  private static final long serialVersionUID=1L;
+  private RandomArrayContainerARRTYPE()
+  {
+    super(13);
+  }
+  
+  private void addArrays(long randSeed,int arrLength,JunitUtil.ARRTYPEArrayBuilder builder)
+  {
+    Random rand=new Random(randSeed);
+    for(int m=getMLo(builder),mHi=getMHi(builder,arrLength),numReps=getNumReps(builder,arrLength);m<=mHi;m=incrementM(builder,m))
+    {
+      for(int i=0;i<numReps;++i)
+      {
+        ARRTYPE[] arr=new ARRTYPE[arrLength];
+        builder.build(arr,rand,m);
+        synchronized(this)
+        {
+          super.add(arr);
+        }
+      }
+    }
+  }
+}
+
 private static int getMLo(JunitUtil.ARRTYPEArrayBuilder builder)
 {
   switch(builder)
@@ -326,171 +273,49 @@ private static int incrementM(JunitUtil.ARRTYPEArrayBuilder builder,int m)
       return m+1;
   }
 }
+
 #ENDDEF
-<<<<<<< HEAD
-
-  #MACRO TestMethods<boolean,comparatorSort,Ascending>()
-  #MACRO TestMethods<boolean,comparatorSort,Descending>()
-  #MACRO TestMethods<boolean,comparatorSort,Unsorted>()
-  #MACRO TestMethods<boolean,nonComparatorSort,Ascending>()
-  #MACRO TestMethods<boolean,nonComparatorSort,Descending>()
-  #MACRO TestMethods<byte,nonComparatorSort,Ascending>()
-  #MACRO TestMethods<byte,nonComparatorSort,Descending>()
-  #MACRO TestMethods<char,nonComparatorSort,Ascending>()
-  #MACRO TestMethods<char,nonComparatorSort,Descending>()
-  #MACRO TestMethods<short,nonComparatorSort,Ascending>()
-  #MACRO TestMethods<short,nonComparatorSort,Descending>()
-  #MACRO TestMethods<int,nonComparatorSort,Ascending>()
-  #MACRO TestMethods<int,nonComparatorSort,Descending>()
-  #MACRO TestMethods<long,nonComparatorSort,Ascending>()
-  #MACRO TestMethods<long,nonComparatorSort,Descending>()
-  #MACRO TestMethods<float,nonComparatorSort,Ascending>()
-  #MACRO TestMethods<float,nonComparatorSort,Descending>()
-  #MACRO TestMethods<double,nonComparatorSort,Ascending>()
-  #MACRO TestMethods<double,nonComparatorSort,Descending>()
-
-=======
-/*
-  #MACRO TestMethods<boolean,comparatorSort,Ascending>()
-  #MACRO TestMethods<boolean,comparatorSort,Descending>()
-  #MACRO TestMethods<boolean,comparatorSort,Unsorted>()
-  #MACRO TestMethods<boolean,nonComparatorSort,Ascending>()
-  #MACRO TestMethods<boolean,nonComparatorSort,Descending>()
-  #MACRO TestMethods<byte,nonComparatorSort,Ascending>()
-  #MACRO TestMethods<byte,nonComparatorSort,Descending>()
-  #MACRO TestMethods<char,nonComparatorSort,Ascending>()
-  #MACRO TestMethods<char,nonComparatorSort,Descending>()
-  #MACRO TestMethods<short,nonComparatorSort,Ascending>()
-  #MACRO TestMethods<short,nonComparatorSort,Descending>()
-  #MACRO TestMethods<int,nonComparatorSort,Ascending>()
-  #MACRO TestMethods<int,nonComparatorSort,Descending>()
-  #MACRO TestMethods<long,nonComparatorSort,Ascending>()
-  #MACRO TestMethods<long,nonComparatorSort,Descending>()
-  #MACRO TestMethods<float,nonComparatorSort,Ascending>()
-  #MACRO TestMethods<float,nonComparatorSort,Descending>()
-  #MACRO TestMethods<double,nonComparatorSort,Ascending>()
-  #MACRO TestMethods<double,nonComparatorSort,Descending>()
-*/
->>>>>>> branch 'master' of https://github.com/freelancer91/Omni.git
-  
-  #MACRO TestMethods<byte,comparatorSort,Unsorted>()
-  #MACRO TestMethods<byte,comparatorSort,Ascending>()
-  #MACRO TestMethods<byte,comparatorSort,Descending>()
-<<<<<<< HEAD
-
-=======
-  /*
->>>>>>> branch 'master' of https://github.com/freelancer91/Omni.git
-  #MACRO TestMethods<char,comparatorSort,Unsorted>()
-  #MACRO TestMethods<char,comparatorSort,Ascending>()
-  #MACRO TestMethods<char,comparatorSort,Descending>()
-  #MACRO TestMethods<short,comparatorSort,Unsorted>()
-  #MACRO TestMethods<short,comparatorSort,Ascending>()
-  #MACRO TestMethods<short,comparatorSort,Descending>()
-  #MACRO TestMethods<int,comparatorSort,Unsorted>()
-  #MACRO TestMethods<int,comparatorSort,Ascending>()
-  #MACRO TestMethods<int,comparatorSort,Descending>()
-  #MACRO TestMethods<long,comparatorSort,Unsorted>()
-  #MACRO TestMethods<long,comparatorSort,Ascending>()
-  #MACRO TestMethods<long,comparatorSort,Descending>()
-  #MACRO TestMethods<float,comparatorSort,Unsorted>()
-  #MACRO TestMethods<float,comparatorSort,Ascending>()
-  #MACRO TestMethods<float,comparatorSort,Descending>()
-  #MACRO TestMethods<double,comparatorSort,Unsorted>()
-  #MACRO TestMethods<double,comparatorSort,Ascending>()
-  #MACRO TestMethods<double,comparatorSort,Descending>()
-  #MACRO TestMethods<Integer,comparatorSort,Unsorted>()
-  #MACRO TestMethods<Integer,comparatorSort,Ascending>()
-  #MACRO TestMethods<Integer,comparatorSort,Descending>()
-  #MACRO TestMethods<Integer,nonComparatorSort,Ascending>()
-  #MACRO TestMethods<Integer,nonComparatorSort,Descending>()
-<<<<<<< HEAD
-
-=======
-  */
->>>>>>> branch 'master' of https://github.com/freelancer91/Omni.git
-
-
-#MACRODEF TestMethods<ARRTYPE,SORTTYPE,DIRECTION>()
-private static void testARRTYPEDIRECTIONSORTTYPEHelper(JunitUtil.ARRTYPEArrayBuilder builder,int arrLength,long randSeed)
+#MACRODEF CallStockSorter(copy,arrLength)
 {
-  ARRTYPE[] golden=new ARRTYPE[arrLength];
-  ARRTYPE[] test=new ARRTYPE[arrLength];
-  Random rand=new Random(randSeed);
-#IFSWITCH SORTTYPE==comparatorSort
-  var sorter=JunitUtil.getDIRECTIONARRTYPEComparator();
-#ENDIF
-  for(int m=getMLo(builder),mHi=getMHi(builder,arrLength),numReps=getNumReps(builder,arrLength);m<=mHi;m=incrementM(builder,m))
-  {
-    for(int i=0;i<numReps;++i)
-    {
-      builder.build(golden,rand,m);
-      ArrCopy.uncheckedCopy(golden,0,test,0,arrLength);
-#IFSWITCH SORTTYPE==comparatorSort
-      isSorted(test,golden,sorter);
-#ELSE
-      isSortedDIRECTION(test,golden);
-#ENDIF
-    }
-  }
-}
-#MACRO TestMethod<Randomized>()
-#MACRO TestMethod<Ascending>()
-#MACRO TestMethod<Descending>()
-#MACRO TestMethod<AllEquals>()
-#IFNOTSWITCH ARRTYPE==boolean
-#MACRO TestMethod<MergeAscending>()
-#MACRO TestMethod<MergeDescending>()
-#MACRO TestMethod<Saw>()
-#MACRO TestMethod<SortedRepeated>()
-#MACRO TestMethod<Repeated>()
-#MACRO TestMethod<Duplicated>()
-#MACRO TestMethod<SortedOrganPipes>()
-#MACRO TestMethod<OrganPipes>()
-#MACRO TestMethod<Stagger>()
-#MACRO TestMethod<Plateau>()
-#MACRO TestMethod<Shuffle>()
-  #IFSWITCH ARRTYPE==float,double
-#MACRO TestMethod<WithNaNsAndZeros>()
+#IFNOTSWITCH DIRECTION==Unsorted
+  #IFSWITCH ARRTYPE==boolean
+  Boolean[] boxedCopy=new Boolean[arrLength];
+  ArrCopy.uncheckedCopy(copy,0,boxedCopy=new Boolean[arrLength],0,arrLength);
+  Arrays.sort(boxedCopy,0,arrLength);
+  ArrCopy.uncheckedCopy(boxedCopy,0,copy,0,arrLength);
+  #ELSE
+  Arrays.sort(copy,0,arrLength);
+  #ENDIF
+  #IFSWITCH DIRECTION==Descending
+  OmniArray.OfCLASSPREFIX.reverseRange(copy,0,arrLength-1);
   #ENDIF
 #ENDIF
+}
 #ENDDEF
-
-#MACRODEF TestMethod<ARRAYBUILDER>()
-@Test
-public void testARRTYPEDIRECTIONSORTTYPEARRAYBUILDERArrayBuilder()
+#MACRODEF CallCustomSorter(arr,arrLength,sorter)
 {
-  for(int i=0;i<lengths.length;++i)
-  {
-    final int arrLength=lengths[i];
-    System.out.println("testARRTYPEDIRECTIONSORTTYPEARRAYBUILDERArrayBuilder length = "+arrLength);
-   if(JunitUtil.ARRTYPEArrayBuilder.ARRAYBUILDER.isRandomized())
-   {
-      var stream=LongStream.of(randSeeds);
-<<<<<<< HEAD
-     //if(true)
-=======
-     if(false)
->>>>>>> branch 'master' of https://github.com/freelancer91/Omni.git
-     {
-       stream=stream.parallel();
-     }
-     stream.forEach(randSeed->
-     {
-       testARRTYPEDIRECTIONSORTTYPEHelper(JunitUtil.ARRTYPEArrayBuilder.ARRAYBUILDER,arrLength,randSeed);
-     });
-   }
-   else
-   {
-     testARRTYPEDIRECTIONSORTTYPEHelper(JunitUtil.ARRTYPEArrayBuilder.ARRAYBUILDER,arrLength,0);
-    
-   }
-  }
+#IFSWITCH SORTTYPE==comparatorSort
+  #IFSWITCH ARRTYPE==byte,char,short,int,long,float,double
+  SortUtil.comparatorSortARRTYPETimSort.uncheckedsort(arr,0,arrLength,sorter);
+  #ELSEIFSWITCH ARRTYPE==boolean
+  SortUtil.uncheckedcomparatorSort(arr,0,arrLength-1,sorter);
+  #ELSE
+  SortUtil.comparatorSortObjectTimSort.uncheckedsort(arr,0,arrLength,sorter);
+  #ENDIF
+#ELSE
+  #IFSWITCH ARRTYPE==boolean,byte,char,short,int,long,float,double
+    #IFSWITCH DIRECTION==Ascending
+  SortUtil.uncheckedsort(arr,0,arrLength-1);
+    #ELSE
+  SortUtil.uncheckedreverseSort(arr,0,arrLength-1);
+    #ENDIF
+  #ELSE
+    #IFSWITCH DIRECTION==Ascending
+  SortUtil.sortObjectTimSort.uncheckedsort(arr,0,arrLength);
+    #ELSE
+  SortUtil.reverseSortObjectTimSort.uncheckedsort(arr,0,arrLength);
+    #ENDIF
+  #ENDIF
+#ENDIF
 }
 #ENDDEF
-
-
-
-
-
-}

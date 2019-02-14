@@ -470,6 +470,8 @@ public static class METHODNAMEARRTYPETimSortTYPEPARAMETER
   private transient int tmpOffset;
   private transient int tmpLength;
   private transient int minGallop;
+  
+  
   private METHODNAMEARRTYPETimSort(ARRTYPE[] arr,int nRemaining,COMPARATORTYPE sorter)
   {
     super(nRemaining);
