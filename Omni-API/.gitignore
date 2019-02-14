@@ -1,2 +1,5 @@
+**bin/**
+**.semaphore
+**target/**
+**.class
 /bin/
-*.semaphore

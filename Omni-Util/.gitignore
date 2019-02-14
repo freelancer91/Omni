@@ -1,2 +1,4 @@
-/bin/
-*.semaphore
+**bin/**
+**.semaphore
+**target/**
+**.class
