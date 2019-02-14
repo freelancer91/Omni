@@ -40,7 +40,7 @@ public class Main{
                         throws IOException{
                     final String fileName=file.getFileName().toString();
                     if(fileName.endsWith(".template")){
-                        final Path semaphoreFile=file.resolveSibling(fileName+".semaphore");
+                        final Path semaphoreFile=file.resolveSibling("."+fileName+".semaphore");
                         if(Files.exists(semaphoreFile)){
                             final FileTime lastModified=Files.getLastModifiedTime(file);
                             final List<String> semaphoreLines=Files.readAllLines(semaphoreFile);
@@ -122,7 +122,8 @@ public class Main{
     }
     private static void writeSemaphoreFile(long currentTime,Path templateFile) throws IOException{
         final String currentTimeStr=Long.toString(currentTime);
-        final Path semaphoreFile=templateFile.resolveSibling(templateFile.getFileName().toString()+".semaphore");
+        // it's a hidden file
+        final Path semaphoreFile=templateFile.resolveSibling("."+templateFile.getFileName().toString()+".semaphore");
         Files.write(semaphoreFile,List.of(currentTimeStr));
     }
 }
