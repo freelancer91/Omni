@@ -12,6 +12,7 @@ import omni.function.LongComparator;
 import omni.function.FloatComparator;
 import omni.function.DoubleComparator;
 import java.util.Comparator;
+import java.util.Collection;
 public interface JunitUtil
 {
   public static boolean convertToboolean(int val)
@@ -570,6 +571,11 @@ public interface JunitUtil
     AllEquals
     {
       @Override
+      public int getMLo()
+      {
+        return 0;
+      }
+      @Override
       public void buildUnchecked(boolean[] arr,int offset,int length,Random rand,int m)
       {
         boolean val=convertToboolean(m);
@@ -593,6 +599,26 @@ public interface JunitUtil
       }
     }
     ;
+    public int getMLo()
+    {
+      return 1;
+    }
+    public int getMHi(int arrLength)
+    {
+      return 1;
+    }
+    public int getNumReps(int arrLength)
+    {
+      if(isRandomized())
+      {
+        return 10;
+      }
+      return 1;
+    }
+    public int incrementM(int m)
+    {
+      return m+1;
+    }
     public boolean isRandomized()
     {
       //most sub-types are not randomized, so make that the default
@@ -659,6 +685,25 @@ public interface JunitUtil
     {
       return "booleanArrayBuilder."+this.name();
     }
+    public void addArrays(long randSeed,int arrLength,Collection<boolean[]> arrays)
+    {
+      Random rand=new Random(randSeed);
+      for(int m=getMLo(),mHi=getMHi(arrLength),numReps=getNumReps(arrLength);m<=mHi;m=incrementM(m))
+      {
+        for(int i=0;i<numReps;++i)
+        {
+          boolean[] arr=new boolean[arrLength];
+          if(arrLength!=0)
+          {
+            buildUnchecked(arr,0,arrLength,rand,m);
+          }
+          synchronized(arrays)
+          {
+            arrays.add(arr);
+          }
+        }
+      }
+    }
   }
   public static enum byteArrayBuilder
   {
@@ -694,6 +739,15 @@ public interface JunitUtil
     Ascending
     {
       @Override
+      public int getMHi(int arrLength)
+      {
+        return (arrLength<<1)-1;
+      }
+      public int incrementM(int m)
+      {
+        return m<<1;
+      }
+      @Override
       public void buildUnchecked(byte[] arr,int offset,int length,Random rand,int m)
       {
         for(int i=0;i<length;arr[(i++)+offset]=convertTobyte(m+i)){}
@@ -708,6 +762,15 @@ public interface JunitUtil
     Descending
     {
       @Override
+      public int getMHi(int arrLength)
+      {
+        return (arrLength<<1)-1;
+      }
+      public int incrementM(int m)
+      {
+        return m<<1;
+      }
+      @Override
       public void buildUnchecked(byte[] arr,int offset,int length,Random rand,int m)
       {
         for(int i=0;i<length;arr[(i++)+offset]=convertTobyte(length-m-i)){}
@@ -721,6 +784,16 @@ public interface JunitUtil
     ,
     AllEquals
     {
+      @Override
+      public int getMLo()
+      {
+        return 0;
+      }
+      @Override
+      public int getMHi(int arrLength)
+      {
+        return 0;
+      }
       @Override
       public void buildUnchecked(byte[] arr,int offset,int length,Random rand,int m)
       {
@@ -747,6 +820,16 @@ public interface JunitUtil
     ,
     MergeAscending
     {
+      @Override
+      public int getMLo()
+      {
+        return 65;
+      }
+      @Override
+      public int getMHi(int arrLength)
+      {
+        return 69;
+      }
       @Override
       public void buildUnchecked(byte[] arr,int offset,int length,Random rand,int m)
       {
@@ -781,6 +864,16 @@ public interface JunitUtil
     MergeDescending
     {
       @Override
+      public int getMLo()
+      {
+        return 65;
+      }
+      @Override
+      public int getMHi(int arrLength)
+      {
+        return 69;
+      }
+      @Override
       public void buildUnchecked(byte[] arr,int offset,int length,Random rand,int m)
       {
         int v=0;
@@ -813,6 +906,15 @@ public interface JunitUtil
     ,
     Saw
     {
+      @Override
+      public int getMHi(int arrLength)
+      {
+        return (arrLength<<1)-1;
+      }
+      public int incrementM(int m)
+      {
+        return m<<1;
+      }
       @Override
       public void buildUnchecked(byte[] arr,int offset,int length,Random rand,int m)
       {
@@ -862,6 +964,11 @@ public interface JunitUtil
     SortedRepeated
     {
       @Override
+      public int getMHi(int arrLength)
+      {
+        return Math.min(arrLength,7);
+      }
+      @Override
       public void buildUnchecked(byte[] arr,int offset,int length,Random rand,int m)
       {
         for(int period=length/m,i=0,k=0;;++k)
@@ -902,6 +1009,15 @@ public interface JunitUtil
     Repeated
     {
       @Override
+      public int getMHi(int arrLength)
+      {
+        return (arrLength<<1)-1;
+      }
+      public int incrementM(int m)
+      {
+        return m<<1;
+      }
+      @Override
       public void buildUnchecked(byte[] arr,int offset,int length,Random rand,int m)
       {
         int i=0;
@@ -925,6 +1041,15 @@ public interface JunitUtil
     ,
     Duplicated
     {
+      @Override
+      public int getMHi(int arrLength)
+      {
+        return (arrLength<<1)-1;
+      }
+      public int incrementM(int m)
+      {
+        return m<<1;
+      }
       @Override
       public boolean isRandomized()
       {
@@ -954,6 +1079,11 @@ public interface JunitUtil
     ,
     SortedOrganPipes
     {
+      @Override
+      public int getMHi(int arrLength)
+      {
+        return Math.min(arrLength,7);
+      }
       @Override
       public void buildUnchecked(byte[] arr,int offset,int length,Random rand,int m)
       {
@@ -987,6 +1117,15 @@ public interface JunitUtil
     OrganPipes
     {
       @Override
+      public int getMHi(int arrLength)
+      {
+        return (arrLength<<1)-1;
+      }
+      public int incrementM(int m)
+      {
+        return m<<1;
+      }
+      @Override
       public void buildUnchecked(byte[] arr,int offset,int length,Random rand,int m)
       {
         int i=0;
@@ -1011,6 +1150,15 @@ public interface JunitUtil
     Stagger
     {
       @Override
+      public int getMHi(int arrLength)
+      {
+        return (arrLength<<1)-1;
+      }
+      public int incrementM(int m)
+      {
+        return m<<1;
+      }
+      @Override
       public void buildUnchecked(byte[] arr,int offset,int length,Random rand,int m)
       {
         int i=0;
@@ -1034,6 +1182,15 @@ public interface JunitUtil
     ,
     Plateau
     {
+      @Override
+      public int getMHi(int arrLength)
+      {
+        return (arrLength<<1)-1;
+      }
+      public int incrementM(int m)
+      {
+        return m<<1;
+      }
       @Override
       public void buildUnchecked(byte[] arr,int offset,int length,Random rand,int m)
       {
@@ -1087,6 +1244,26 @@ public interface JunitUtil
       }
     }
     ;
+    public int getMLo()
+    {
+      return 1;
+    }
+    public int getMHi(int arrLength)
+    {
+      return 1;
+    }
+    public int getNumReps(int arrLength)
+    {
+      if(isRandomized())
+      {
+        return 10;
+      }
+      return 1;
+    }
+    public int incrementM(int m)
+    {
+      return m+1;
+    }
     public boolean isRandomized()
     {
       //most sub-types are not randomized, so make that the default
@@ -1153,11 +1330,32 @@ public interface JunitUtil
     {
       return "byteArrayBuilder."+this.name();
     }
+    public void addArrays(long randSeed,int arrLength,Collection<byte[]> arrays)
+    {
+      Random rand=new Random(randSeed);
+      for(int m=getMLo(),mHi=getMHi(arrLength),numReps=getNumReps(arrLength);m<=mHi;m=incrementM(m))
+      {
+        for(int i=0;i<numReps;++i)
+        {
+          byte[] arr=new byte[arrLength];
+          if(arrLength!=0)
+          {
+            buildUnchecked(arr,0,arrLength,rand,m);
+          }
+          synchronized(arrays)
+          {
+            arrays.add(arr);
+          }
+        }
+      }
+    }
   }
   public static enum charArrayBuilder
   {
     Randomized
     {
+    /*
+    */
       @Override
       public boolean isRandomized()
       {
@@ -1188,6 +1386,17 @@ public interface JunitUtil
     Ascending
     {
       @Override
+      public int getMHi(int arrLength)
+      {
+        return (arrLength<<1)-1;
+      }
+    /*
+    */
+      public int incrementM(int m)
+      {
+        return m<<1;
+      }
+      @Override
       public void buildUnchecked(char[] arr,int offset,int length,Random rand,int m)
       {
         for(int i=0;i<length;arr[(i++)+offset]=convertTochar(m+i)){}
@@ -1202,6 +1411,17 @@ public interface JunitUtil
     Descending
     {
       @Override
+      public int getMHi(int arrLength)
+      {
+        return (arrLength<<1)-1;
+      }
+    /*
+    */
+      public int incrementM(int m)
+      {
+        return m<<1;
+      }
+      @Override
       public void buildUnchecked(char[] arr,int offset,int length,Random rand,int m)
       {
         for(int i=0;i<length;arr[(i++)+offset]=convertTochar(length-m-i)){}
@@ -1215,6 +1435,18 @@ public interface JunitUtil
     ,
     AllEquals
     {
+      @Override
+      public int getMLo()
+      {
+        return 0;
+      }
+      @Override
+      public int getMHi(int arrLength)
+      {
+        return 0;
+      }
+    /*
+    */
       @Override
       public void buildUnchecked(char[] arr,int offset,int length,Random rand,int m)
       {
@@ -1241,6 +1473,18 @@ public interface JunitUtil
     ,
     MergeAscending
     {
+      @Override
+      public int getMLo()
+      {
+        return 65;
+      }
+      @Override
+      public int getMHi(int arrLength)
+      {
+        return 69;
+      }
+    /*
+    */
       @Override
       public void buildUnchecked(char[] arr,int offset,int length,Random rand,int m)
       {
@@ -1275,6 +1519,18 @@ public interface JunitUtil
     MergeDescending
     {
       @Override
+      public int getMLo()
+      {
+        return 65;
+      }
+      @Override
+      public int getMHi(int arrLength)
+      {
+        return 69;
+      }
+    /*
+    */
+      @Override
       public void buildUnchecked(char[] arr,int offset,int length,Random rand,int m)
       {
         int v=0;
@@ -1307,6 +1563,17 @@ public interface JunitUtil
     ,
     Saw
     {
+      @Override
+      public int getMHi(int arrLength)
+      {
+        return (arrLength<<1)-1;
+      }
+    /*
+    */
+      public int incrementM(int m)
+      {
+        return m<<1;
+      }
       @Override
       public void buildUnchecked(char[] arr,int offset,int length,Random rand,int m)
       {
@@ -1356,6 +1623,13 @@ public interface JunitUtil
     SortedRepeated
     {
       @Override
+      public int getMHi(int arrLength)
+      {
+        return Math.min(arrLength,7);
+      }
+    /*
+    */
+      @Override
       public void buildUnchecked(char[] arr,int offset,int length,Random rand,int m)
       {
         for(int period=length/m,i=0,k=0;;++k)
@@ -1396,6 +1670,17 @@ public interface JunitUtil
     Repeated
     {
       @Override
+      public int getMHi(int arrLength)
+      {
+        return (arrLength<<1)-1;
+      }
+    /*
+    */
+      public int incrementM(int m)
+      {
+        return m<<1;
+      }
+      @Override
       public void buildUnchecked(char[] arr,int offset,int length,Random rand,int m)
       {
         int i=0;
@@ -1419,6 +1704,26 @@ public interface JunitUtil
     ,
     Duplicated
     {
+      @Override
+      public int getMHi(int arrLength)
+      {
+        return (arrLength<<1)-1;
+      }
+    /*
+      @Override
+      public int getNumReps(int arrLength)
+      {
+        if(arrLength<=3201 && arrLength>=47)
+        {
+          return 9;
+        }
+        return 1;
+      }
+    */
+      public int incrementM(int m)
+      {
+        return m<<1;
+      }
       @Override
       public boolean isRandomized()
       {
@@ -1448,6 +1753,13 @@ public interface JunitUtil
     ,
     SortedOrganPipes
     {
+      @Override
+      public int getMHi(int arrLength)
+      {
+        return Math.min(arrLength,7);
+      }
+    /*
+    */
       @Override
       public void buildUnchecked(char[] arr,int offset,int length,Random rand,int m)
       {
@@ -1481,6 +1793,17 @@ public interface JunitUtil
     OrganPipes
     {
       @Override
+      public int getMHi(int arrLength)
+      {
+        return (arrLength<<1)-1;
+      }
+    /*
+    */
+      public int incrementM(int m)
+      {
+        return m<<1;
+      }
+      @Override
       public void buildUnchecked(char[] arr,int offset,int length,Random rand,int m)
       {
         int i=0;
@@ -1504,6 +1827,17 @@ public interface JunitUtil
     ,
     Stagger
     {
+      @Override
+      public int getMHi(int arrLength)
+      {
+        return (arrLength<<1)-1;
+      }
+    /*
+    */
+      public int incrementM(int m)
+      {
+        return m<<1;
+      }
       @Override
       public void buildUnchecked(char[] arr,int offset,int length,Random rand,int m)
       {
@@ -1529,6 +1863,17 @@ public interface JunitUtil
     Plateau
     {
       @Override
+      public int getMHi(int arrLength)
+      {
+        return (arrLength<<1)-1;
+      }
+    /*
+    */
+      public int incrementM(int m)
+      {
+        return m<<1;
+      }
+      @Override
       public void buildUnchecked(char[] arr,int offset,int length,Random rand,int m)
       {
         int i=0;
@@ -1552,6 +1897,8 @@ public interface JunitUtil
     ,
     Shuffle
     {
+    /*
+    */
       @Override
       public boolean isRandomized()
       {
@@ -1581,6 +1928,26 @@ public interface JunitUtil
       }
     }
     ;
+    public int getMLo()
+    {
+      return 1;
+    }
+    public int getMHi(int arrLength)
+    {
+      return 1;
+    }
+    public int getNumReps(int arrLength)
+    {
+      if(isRandomized())
+      {
+        return 10;
+      }
+      return 1;
+    }
+    public int incrementM(int m)
+    {
+      return m+1;
+    }
     public boolean isRandomized()
     {
       //most sub-types are not randomized, so make that the default
@@ -1647,11 +2014,32 @@ public interface JunitUtil
     {
       return "charArrayBuilder."+this.name();
     }
+    public void addArrays(long randSeed,int arrLength,Collection<char[]> arrays)
+    {
+      Random rand=new Random(randSeed);
+      for(int m=getMLo(),mHi=getMHi(arrLength),numReps=getNumReps(arrLength);m<=mHi;m=incrementM(m))
+      {
+        for(int i=0;i<numReps;++i)
+        {
+          char[] arr=new char[arrLength];
+          if(arrLength!=0)
+          {
+            buildUnchecked(arr,0,arrLength,rand,m);
+          }
+          synchronized(arrays)
+          {
+            arrays.add(arr);
+          }
+        }
+      }
+    }
   }
   public static enum shortArrayBuilder
   {
     Randomized
     {
+    /*
+    */
       @Override
       public boolean isRandomized()
       {
@@ -1682,6 +2070,17 @@ public interface JunitUtil
     Ascending
     {
       @Override
+      public int getMHi(int arrLength)
+      {
+        return (arrLength<<1)-1;
+      }
+    /*
+    */
+      public int incrementM(int m)
+      {
+        return m<<1;
+      }
+      @Override
       public void buildUnchecked(short[] arr,int offset,int length,Random rand,int m)
       {
         for(int i=0;i<length;arr[(i++)+offset]=convertToshort(m+i)){}
@@ -1696,6 +2095,17 @@ public interface JunitUtil
     Descending
     {
       @Override
+      public int getMHi(int arrLength)
+      {
+        return (arrLength<<1)-1;
+      }
+    /*
+    */
+      public int incrementM(int m)
+      {
+        return m<<1;
+      }
+      @Override
       public void buildUnchecked(short[] arr,int offset,int length,Random rand,int m)
       {
         for(int i=0;i<length;arr[(i++)+offset]=convertToshort(length-m-i)){}
@@ -1709,6 +2119,18 @@ public interface JunitUtil
     ,
     AllEquals
     {
+      @Override
+      public int getMLo()
+      {
+        return 0;
+      }
+      @Override
+      public int getMHi(int arrLength)
+      {
+        return 0;
+      }
+    /*
+    */
       @Override
       public void buildUnchecked(short[] arr,int offset,int length,Random rand,int m)
       {
@@ -1735,6 +2157,18 @@ public interface JunitUtil
     ,
     MergeAscending
     {
+      @Override
+      public int getMLo()
+      {
+        return 65;
+      }
+      @Override
+      public int getMHi(int arrLength)
+      {
+        return 69;
+      }
+    /*
+    */
       @Override
       public void buildUnchecked(short[] arr,int offset,int length,Random rand,int m)
       {
@@ -1769,6 +2203,18 @@ public interface JunitUtil
     MergeDescending
     {
       @Override
+      public int getMLo()
+      {
+        return 65;
+      }
+      @Override
+      public int getMHi(int arrLength)
+      {
+        return 69;
+      }
+    /*
+    */
+      @Override
       public void buildUnchecked(short[] arr,int offset,int length,Random rand,int m)
       {
         int v=0;
@@ -1801,6 +2247,17 @@ public interface JunitUtil
     ,
     Saw
     {
+      @Override
+      public int getMHi(int arrLength)
+      {
+        return (arrLength<<1)-1;
+      }
+    /*
+    */
+      public int incrementM(int m)
+      {
+        return m<<1;
+      }
       @Override
       public void buildUnchecked(short[] arr,int offset,int length,Random rand,int m)
       {
@@ -1850,6 +2307,13 @@ public interface JunitUtil
     SortedRepeated
     {
       @Override
+      public int getMHi(int arrLength)
+      {
+        return Math.min(arrLength,7);
+      }
+    /*
+    */
+      @Override
       public void buildUnchecked(short[] arr,int offset,int length,Random rand,int m)
       {
         for(int period=length/m,i=0,k=0;;++k)
@@ -1890,6 +2354,17 @@ public interface JunitUtil
     Repeated
     {
       @Override
+      public int getMHi(int arrLength)
+      {
+        return (arrLength<<1)-1;
+      }
+    /*
+    */
+      public int incrementM(int m)
+      {
+        return m<<1;
+      }
+      @Override
       public void buildUnchecked(short[] arr,int offset,int length,Random rand,int m)
       {
         int i=0;
@@ -1913,6 +2388,26 @@ public interface JunitUtil
     ,
     Duplicated
     {
+      @Override
+      public int getMHi(int arrLength)
+      {
+        return (arrLength<<1)-1;
+      }
+    /*
+      @Override
+      public int getNumReps(int arrLength)
+      {
+        if(arrLength<=3201 && arrLength>=47)
+        {
+          return 9;
+        }
+        return 1;
+      }
+    */
+      public int incrementM(int m)
+      {
+        return m<<1;
+      }
       @Override
       public boolean isRandomized()
       {
@@ -1942,6 +2437,13 @@ public interface JunitUtil
     ,
     SortedOrganPipes
     {
+      @Override
+      public int getMHi(int arrLength)
+      {
+        return Math.min(arrLength,7);
+      }
+    /*
+    */
       @Override
       public void buildUnchecked(short[] arr,int offset,int length,Random rand,int m)
       {
@@ -1975,6 +2477,17 @@ public interface JunitUtil
     OrganPipes
     {
       @Override
+      public int getMHi(int arrLength)
+      {
+        return (arrLength<<1)-1;
+      }
+    /*
+    */
+      public int incrementM(int m)
+      {
+        return m<<1;
+      }
+      @Override
       public void buildUnchecked(short[] arr,int offset,int length,Random rand,int m)
       {
         int i=0;
@@ -1998,6 +2511,17 @@ public interface JunitUtil
     ,
     Stagger
     {
+      @Override
+      public int getMHi(int arrLength)
+      {
+        return (arrLength<<1)-1;
+      }
+    /*
+    */
+      public int incrementM(int m)
+      {
+        return m<<1;
+      }
       @Override
       public void buildUnchecked(short[] arr,int offset,int length,Random rand,int m)
       {
@@ -2023,6 +2547,17 @@ public interface JunitUtil
     Plateau
     {
       @Override
+      public int getMHi(int arrLength)
+      {
+        return (arrLength<<1)-1;
+      }
+    /*
+    */
+      public int incrementM(int m)
+      {
+        return m<<1;
+      }
+      @Override
       public void buildUnchecked(short[] arr,int offset,int length,Random rand,int m)
       {
         int i=0;
@@ -2046,6 +2581,8 @@ public interface JunitUtil
     ,
     Shuffle
     {
+    /*
+    */
       @Override
       public boolean isRandomized()
       {
@@ -2075,6 +2612,26 @@ public interface JunitUtil
       }
     }
     ;
+    public int getMLo()
+    {
+      return 1;
+    }
+    public int getMHi(int arrLength)
+    {
+      return 1;
+    }
+    public int getNumReps(int arrLength)
+    {
+      if(isRandomized())
+      {
+        return 10;
+      }
+      return 1;
+    }
+    public int incrementM(int m)
+    {
+      return m+1;
+    }
     public boolean isRandomized()
     {
       //most sub-types are not randomized, so make that the default
@@ -2141,6 +2698,25 @@ public interface JunitUtil
     {
       return "shortArrayBuilder."+this.name();
     }
+    public void addArrays(long randSeed,int arrLength,Collection<short[]> arrays)
+    {
+      Random rand=new Random(randSeed);
+      for(int m=getMLo(),mHi=getMHi(arrLength),numReps=getNumReps(arrLength);m<=mHi;m=incrementM(m))
+      {
+        for(int i=0;i<numReps;++i)
+        {
+          short[] arr=new short[arrLength];
+          if(arrLength!=0)
+          {
+            buildUnchecked(arr,0,arrLength,rand,m);
+          }
+          synchronized(arrays)
+          {
+            arrays.add(arr);
+          }
+        }
+      }
+    }
   }
   public static enum intArrayBuilder
   {
@@ -2176,6 +2752,15 @@ public interface JunitUtil
     Ascending
     {
       @Override
+      public int getMHi(int arrLength)
+      {
+        return (arrLength<<1)-1;
+      }
+      public int incrementM(int m)
+      {
+        return m<<1;
+      }
+      @Override
       public void buildUnchecked(int[] arr,int offset,int length,Random rand,int m)
       {
         for(int i=0;i<length;arr[(i++)+offset]=convertToint(m+i)){}
@@ -2190,6 +2775,15 @@ public interface JunitUtil
     Descending
     {
       @Override
+      public int getMHi(int arrLength)
+      {
+        return (arrLength<<1)-1;
+      }
+      public int incrementM(int m)
+      {
+        return m<<1;
+      }
+      @Override
       public void buildUnchecked(int[] arr,int offset,int length,Random rand,int m)
       {
         for(int i=0;i<length;arr[(i++)+offset]=convertToint(length-m-i)){}
@@ -2203,6 +2797,16 @@ public interface JunitUtil
     ,
     AllEquals
     {
+      @Override
+      public int getMLo()
+      {
+        return 0;
+      }
+      @Override
+      public int getMHi(int arrLength)
+      {
+        return 0;
+      }
       @Override
       public void buildUnchecked(int[] arr,int offset,int length,Random rand,int m)
       {
@@ -2229,6 +2833,16 @@ public interface JunitUtil
     ,
     MergeAscending
     {
+      @Override
+      public int getMLo()
+      {
+        return 65;
+      }
+      @Override
+      public int getMHi(int arrLength)
+      {
+        return 69;
+      }
       @Override
       public void buildUnchecked(int[] arr,int offset,int length,Random rand,int m)
       {
@@ -2263,6 +2877,16 @@ public interface JunitUtil
     MergeDescending
     {
       @Override
+      public int getMLo()
+      {
+        return 65;
+      }
+      @Override
+      public int getMHi(int arrLength)
+      {
+        return 69;
+      }
+      @Override
       public void buildUnchecked(int[] arr,int offset,int length,Random rand,int m)
       {
         int v=0;
@@ -2295,6 +2919,15 @@ public interface JunitUtil
     ,
     Saw
     {
+      @Override
+      public int getMHi(int arrLength)
+      {
+        return (arrLength<<1)-1;
+      }
+      public int incrementM(int m)
+      {
+        return m<<1;
+      }
       @Override
       public void buildUnchecked(int[] arr,int offset,int length,Random rand,int m)
       {
@@ -2344,6 +2977,11 @@ public interface JunitUtil
     SortedRepeated
     {
       @Override
+      public int getMHi(int arrLength)
+      {
+        return Math.min(arrLength,7);
+      }
+      @Override
       public void buildUnchecked(int[] arr,int offset,int length,Random rand,int m)
       {
         for(int period=length/m,i=0,k=0;;++k)
@@ -2384,6 +3022,15 @@ public interface JunitUtil
     Repeated
     {
       @Override
+      public int getMHi(int arrLength)
+      {
+        return (arrLength<<1)-1;
+      }
+      public int incrementM(int m)
+      {
+        return m<<1;
+      }
+      @Override
       public void buildUnchecked(int[] arr,int offset,int length,Random rand,int m)
       {
         int i=0;
@@ -2407,6 +3054,15 @@ public interface JunitUtil
     ,
     Duplicated
     {
+      @Override
+      public int getMHi(int arrLength)
+      {
+        return (arrLength<<1)-1;
+      }
+      public int incrementM(int m)
+      {
+        return m<<1;
+      }
       @Override
       public boolean isRandomized()
       {
@@ -2436,6 +3092,11 @@ public interface JunitUtil
     ,
     SortedOrganPipes
     {
+      @Override
+      public int getMHi(int arrLength)
+      {
+        return Math.min(arrLength,7);
+      }
       @Override
       public void buildUnchecked(int[] arr,int offset,int length,Random rand,int m)
       {
@@ -2469,6 +3130,15 @@ public interface JunitUtil
     OrganPipes
     {
       @Override
+      public int getMHi(int arrLength)
+      {
+        return (arrLength<<1)-1;
+      }
+      public int incrementM(int m)
+      {
+        return m<<1;
+      }
+      @Override
       public void buildUnchecked(int[] arr,int offset,int length,Random rand,int m)
       {
         int i=0;
@@ -2493,6 +3163,15 @@ public interface JunitUtil
     Stagger
     {
       @Override
+      public int getMHi(int arrLength)
+      {
+        return (arrLength<<1)-1;
+      }
+      public int incrementM(int m)
+      {
+        return m<<1;
+      }
+      @Override
       public void buildUnchecked(int[] arr,int offset,int length,Random rand,int m)
       {
         int i=0;
@@ -2516,6 +3195,15 @@ public interface JunitUtil
     ,
     Plateau
     {
+      @Override
+      public int getMHi(int arrLength)
+      {
+        return (arrLength<<1)-1;
+      }
+      public int incrementM(int m)
+      {
+        return m<<1;
+      }
       @Override
       public void buildUnchecked(int[] arr,int offset,int length,Random rand,int m)
       {
@@ -2569,6 +3257,26 @@ public interface JunitUtil
       }
     }
     ;
+    public int getMLo()
+    {
+      return 1;
+    }
+    public int getMHi(int arrLength)
+    {
+      return 1;
+    }
+    public int getNumReps(int arrLength)
+    {
+      if(isRandomized())
+      {
+        return 10;
+      }
+      return 1;
+    }
+    public int incrementM(int m)
+    {
+      return m+1;
+    }
     public boolean isRandomized()
     {
       //most sub-types are not randomized, so make that the default
@@ -2635,6 +3343,25 @@ public interface JunitUtil
     {
       return "intArrayBuilder."+this.name();
     }
+    public void addArrays(long randSeed,int arrLength,Collection<int[]> arrays)
+    {
+      Random rand=new Random(randSeed);
+      for(int m=getMLo(),mHi=getMHi(arrLength),numReps=getNumReps(arrLength);m<=mHi;m=incrementM(m))
+      {
+        for(int i=0;i<numReps;++i)
+        {
+          int[] arr=new int[arrLength];
+          if(arrLength!=0)
+          {
+            buildUnchecked(arr,0,arrLength,rand,m);
+          }
+          synchronized(arrays)
+          {
+            arrays.add(arr);
+          }
+        }
+      }
+    }
   }
   public static enum longArrayBuilder
   {
@@ -2670,6 +3397,15 @@ public interface JunitUtil
     Ascending
     {
       @Override
+      public int getMHi(int arrLength)
+      {
+        return (arrLength<<1)-1;
+      }
+      public int incrementM(int m)
+      {
+        return m<<1;
+      }
+      @Override
       public void buildUnchecked(long[] arr,int offset,int length,Random rand,int m)
       {
         for(int i=0;i<length;arr[(i++)+offset]=convertTolong(m+i)){}
@@ -2684,6 +3420,15 @@ public interface JunitUtil
     Descending
     {
       @Override
+      public int getMHi(int arrLength)
+      {
+        return (arrLength<<1)-1;
+      }
+      public int incrementM(int m)
+      {
+        return m<<1;
+      }
+      @Override
       public void buildUnchecked(long[] arr,int offset,int length,Random rand,int m)
       {
         for(int i=0;i<length;arr[(i++)+offset]=convertTolong(length-m-i)){}
@@ -2697,6 +3442,16 @@ public interface JunitUtil
     ,
     AllEquals
     {
+      @Override
+      public int getMLo()
+      {
+        return 0;
+      }
+      @Override
+      public int getMHi(int arrLength)
+      {
+        return 0;
+      }
       @Override
       public void buildUnchecked(long[] arr,int offset,int length,Random rand,int m)
       {
@@ -2723,6 +3478,16 @@ public interface JunitUtil
     ,
     MergeAscending
     {
+      @Override
+      public int getMLo()
+      {
+        return 65;
+      }
+      @Override
+      public int getMHi(int arrLength)
+      {
+        return 69;
+      }
       @Override
       public void buildUnchecked(long[] arr,int offset,int length,Random rand,int m)
       {
@@ -2757,6 +3522,16 @@ public interface JunitUtil
     MergeDescending
     {
       @Override
+      public int getMLo()
+      {
+        return 65;
+      }
+      @Override
+      public int getMHi(int arrLength)
+      {
+        return 69;
+      }
+      @Override
       public void buildUnchecked(long[] arr,int offset,int length,Random rand,int m)
       {
         int v=0;
@@ -2789,6 +3564,15 @@ public interface JunitUtil
     ,
     Saw
     {
+      @Override
+      public int getMHi(int arrLength)
+      {
+        return (arrLength<<1)-1;
+      }
+      public int incrementM(int m)
+      {
+        return m<<1;
+      }
       @Override
       public void buildUnchecked(long[] arr,int offset,int length,Random rand,int m)
       {
@@ -2838,6 +3622,11 @@ public interface JunitUtil
     SortedRepeated
     {
       @Override
+      public int getMHi(int arrLength)
+      {
+        return Math.min(arrLength,7);
+      }
+      @Override
       public void buildUnchecked(long[] arr,int offset,int length,Random rand,int m)
       {
         for(int period=length/m,i=0,k=0;;++k)
@@ -2878,6 +3667,15 @@ public interface JunitUtil
     Repeated
     {
       @Override
+      public int getMHi(int arrLength)
+      {
+        return (arrLength<<1)-1;
+      }
+      public int incrementM(int m)
+      {
+        return m<<1;
+      }
+      @Override
       public void buildUnchecked(long[] arr,int offset,int length,Random rand,int m)
       {
         int i=0;
@@ -2901,6 +3699,15 @@ public interface JunitUtil
     ,
     Duplicated
     {
+      @Override
+      public int getMHi(int arrLength)
+      {
+        return (arrLength<<1)-1;
+      }
+      public int incrementM(int m)
+      {
+        return m<<1;
+      }
       @Override
       public boolean isRandomized()
       {
@@ -2930,6 +3737,11 @@ public interface JunitUtil
     ,
     SortedOrganPipes
     {
+      @Override
+      public int getMHi(int arrLength)
+      {
+        return Math.min(arrLength,7);
+      }
       @Override
       public void buildUnchecked(long[] arr,int offset,int length,Random rand,int m)
       {
@@ -2963,6 +3775,15 @@ public interface JunitUtil
     OrganPipes
     {
       @Override
+      public int getMHi(int arrLength)
+      {
+        return (arrLength<<1)-1;
+      }
+      public int incrementM(int m)
+      {
+        return m<<1;
+      }
+      @Override
       public void buildUnchecked(long[] arr,int offset,int length,Random rand,int m)
       {
         int i=0;
@@ -2987,6 +3808,15 @@ public interface JunitUtil
     Stagger
     {
       @Override
+      public int getMHi(int arrLength)
+      {
+        return (arrLength<<1)-1;
+      }
+      public int incrementM(int m)
+      {
+        return m<<1;
+      }
+      @Override
       public void buildUnchecked(long[] arr,int offset,int length,Random rand,int m)
       {
         int i=0;
@@ -3010,6 +3840,15 @@ public interface JunitUtil
     ,
     Plateau
     {
+      @Override
+      public int getMHi(int arrLength)
+      {
+        return (arrLength<<1)-1;
+      }
+      public int incrementM(int m)
+      {
+        return m<<1;
+      }
       @Override
       public void buildUnchecked(long[] arr,int offset,int length,Random rand,int m)
       {
@@ -3063,6 +3902,26 @@ public interface JunitUtil
       }
     }
     ;
+    public int getMLo()
+    {
+      return 1;
+    }
+    public int getMHi(int arrLength)
+    {
+      return 1;
+    }
+    public int getNumReps(int arrLength)
+    {
+      if(isRandomized())
+      {
+        return 10;
+      }
+      return 1;
+    }
+    public int incrementM(int m)
+    {
+      return m+1;
+    }
     public boolean isRandomized()
     {
       //most sub-types are not randomized, so make that the default
@@ -3129,11 +3988,32 @@ public interface JunitUtil
     {
       return "longArrayBuilder."+this.name();
     }
+    public void addArrays(long randSeed,int arrLength,Collection<long[]> arrays)
+    {
+      Random rand=new Random(randSeed);
+      for(int m=getMLo(),mHi=getMHi(arrLength),numReps=getNumReps(arrLength);m<=mHi;m=incrementM(m))
+      {
+        for(int i=0;i<numReps;++i)
+        {
+          long[] arr=new long[arrLength];
+          if(arrLength!=0)
+          {
+            buildUnchecked(arr,0,arrLength,rand,m);
+          }
+          synchronized(arrays)
+          {
+            arrays.add(arr);
+          }
+        }
+      }
+    }
   }
   public static enum floatArrayBuilder
   {
     Randomized
     {
+    /*
+    */
       @Override
       public boolean isRandomized()
       {
@@ -3164,6 +4044,17 @@ public interface JunitUtil
     Ascending
     {
       @Override
+      public int getMHi(int arrLength)
+      {
+        return (arrLength<<1)-1;
+      }
+    /*
+    */
+      public int incrementM(int m)
+      {
+        return m<<1;
+      }
+      @Override
       public void buildUnchecked(float[] arr,int offset,int length,Random rand,int m)
       {
         for(int i=0;i<length;arr[(i++)+offset]=convertTofloat(m+i)){}
@@ -3178,6 +4069,17 @@ public interface JunitUtil
     Descending
     {
       @Override
+      public int getMHi(int arrLength)
+      {
+        return (arrLength<<1)-1;
+      }
+    /*
+    */
+      public int incrementM(int m)
+      {
+        return m<<1;
+      }
+      @Override
       public void buildUnchecked(float[] arr,int offset,int length,Random rand,int m)
       {
         for(int i=0;i<length;arr[(i++)+offset]=convertTofloat(length-m-i)){}
@@ -3191,6 +4093,18 @@ public interface JunitUtil
     ,
     AllEquals
     {
+      @Override
+      public int getMLo()
+      {
+        return 0;
+      }
+      @Override
+      public int getMHi(int arrLength)
+      {
+        return 0;
+      }
+    /*
+    */
       @Override
       public void buildUnchecked(float[] arr,int offset,int length,Random rand,int m)
       {
@@ -3217,6 +4131,18 @@ public interface JunitUtil
     ,
     MergeAscending
     {
+      @Override
+      public int getMLo()
+      {
+        return 65;
+      }
+      @Override
+      public int getMHi(int arrLength)
+      {
+        return 69;
+      }
+    /*
+    */
       @Override
       public void buildUnchecked(float[] arr,int offset,int length,Random rand,int m)
       {
@@ -3251,6 +4177,18 @@ public interface JunitUtil
     MergeDescending
     {
       @Override
+      public int getMLo()
+      {
+        return 65;
+      }
+      @Override
+      public int getMHi(int arrLength)
+      {
+        return 69;
+      }
+    /*
+    */
+      @Override
       public void buildUnchecked(float[] arr,int offset,int length,Random rand,int m)
       {
         int v=0;
@@ -3283,6 +4221,17 @@ public interface JunitUtil
     ,
     Saw
     {
+      @Override
+      public int getMHi(int arrLength)
+      {
+        return (arrLength<<1)-1;
+      }
+    /*
+    */
+      public int incrementM(int m)
+      {
+        return m<<1;
+      }
       @Override
       public void buildUnchecked(float[] arr,int offset,int length,Random rand,int m)
       {
@@ -3332,6 +4281,13 @@ public interface JunitUtil
     SortedRepeated
     {
       @Override
+      public int getMHi(int arrLength)
+      {
+        return Math.min(arrLength,7);
+      }
+    /*
+    */
+      @Override
       public void buildUnchecked(float[] arr,int offset,int length,Random rand,int m)
       {
         for(int period=length/m,i=0,k=0;;++k)
@@ -3372,6 +4328,17 @@ public interface JunitUtil
     Repeated
     {
       @Override
+      public int getMHi(int arrLength)
+      {
+        return (arrLength<<1)-1;
+      }
+    /*
+    */
+      public int incrementM(int m)
+      {
+        return m<<1;
+      }
+      @Override
       public void buildUnchecked(float[] arr,int offset,int length,Random rand,int m)
       {
         int i=0;
@@ -3395,6 +4362,17 @@ public interface JunitUtil
     ,
     Duplicated
     {
+      @Override
+      public int getMHi(int arrLength)
+      {
+        return (arrLength<<1)-1;
+      }
+    /*
+    */
+      public int incrementM(int m)
+      {
+        return m<<1;
+      }
       @Override
       public boolean isRandomized()
       {
@@ -3424,6 +4402,13 @@ public interface JunitUtil
     ,
     SortedOrganPipes
     {
+      @Override
+      public int getMHi(int arrLength)
+      {
+        return Math.min(arrLength,7);
+      }
+    /*
+    */
       @Override
       public void buildUnchecked(float[] arr,int offset,int length,Random rand,int m)
       {
@@ -3457,6 +4442,17 @@ public interface JunitUtil
     OrganPipes
     {
       @Override
+      public int getMHi(int arrLength)
+      {
+        return (arrLength<<1)-1;
+      }
+    /*
+    */
+      public int incrementM(int m)
+      {
+        return m<<1;
+      }
+      @Override
       public void buildUnchecked(float[] arr,int offset,int length,Random rand,int m)
       {
         int i=0;
@@ -3480,6 +4476,17 @@ public interface JunitUtil
     ,
     Stagger
     {
+      @Override
+      public int getMHi(int arrLength)
+      {
+        return (arrLength<<1)-1;
+      }
+    /*
+    */
+      public int incrementM(int m)
+      {
+        return m<<1;
+      }
       @Override
       public void buildUnchecked(float[] arr,int offset,int length,Random rand,int m)
       {
@@ -3505,6 +4512,17 @@ public interface JunitUtil
     Plateau
     {
       @Override
+      public int getMHi(int arrLength)
+      {
+        return (arrLength<<1)-1;
+      }
+    /*
+    */
+      public int incrementM(int m)
+      {
+        return m<<1;
+      }
+      @Override
       public void buildUnchecked(float[] arr,int offset,int length,Random rand,int m)
       {
         int i=0;
@@ -3528,6 +4546,8 @@ public interface JunitUtil
     ,
     Shuffle
     {
+    /*
+    */
       @Override
       public boolean isRandomized()
       {
@@ -3559,6 +4579,13 @@ public interface JunitUtil
     ,
     WithNaNsAndZeros
     {
+    /*
+      @Override
+      public int getNumReps(int arrLength)
+      {
+        return 2;
+      }
+    */
       @Override
       public boolean isRandomized()
       {
@@ -3610,6 +4637,26 @@ public interface JunitUtil
       }
     }
     ;
+    public int getMLo()
+    {
+      return 1;
+    }
+    public int getMHi(int arrLength)
+    {
+      return 1;
+    }
+    public int getNumReps(int arrLength)
+    {
+      if(isRandomized())
+      {
+        return 10;
+      }
+      return 1;
+    }
+    public int incrementM(int m)
+    {
+      return m+1;
+    }
     public boolean isRandomized()
     {
       //most sub-types are not randomized, so make that the default
@@ -3676,11 +4723,32 @@ public interface JunitUtil
     {
       return "floatArrayBuilder."+this.name();
     }
+    public void addArrays(long randSeed,int arrLength,Collection<float[]> arrays)
+    {
+      Random rand=new Random(randSeed);
+      for(int m=getMLo(),mHi=getMHi(arrLength),numReps=getNumReps(arrLength);m<=mHi;m=incrementM(m))
+      {
+        for(int i=0;i<numReps;++i)
+        {
+          float[] arr=new float[arrLength];
+          if(arrLength!=0)
+          {
+            buildUnchecked(arr,0,arrLength,rand,m);
+          }
+          synchronized(arrays)
+          {
+            arrays.add(arr);
+          }
+        }
+      }
+    }
   }
   public static enum doubleArrayBuilder
   {
     Randomized
     {
+    /*
+    */
       @Override
       public boolean isRandomized()
       {
@@ -3711,6 +4779,17 @@ public interface JunitUtil
     Ascending
     {
       @Override
+      public int getMHi(int arrLength)
+      {
+        return (arrLength<<1)-1;
+      }
+    /*
+    */
+      public int incrementM(int m)
+      {
+        return m<<1;
+      }
+      @Override
       public void buildUnchecked(double[] arr,int offset,int length,Random rand,int m)
       {
         for(int i=0;i<length;arr[(i++)+offset]=convertTodouble(m+i)){}
@@ -3725,6 +4804,17 @@ public interface JunitUtil
     Descending
     {
       @Override
+      public int getMHi(int arrLength)
+      {
+        return (arrLength<<1)-1;
+      }
+    /*
+    */
+      public int incrementM(int m)
+      {
+        return m<<1;
+      }
+      @Override
       public void buildUnchecked(double[] arr,int offset,int length,Random rand,int m)
       {
         for(int i=0;i<length;arr[(i++)+offset]=convertTodouble(length-m-i)){}
@@ -3738,6 +4828,18 @@ public interface JunitUtil
     ,
     AllEquals
     {
+      @Override
+      public int getMLo()
+      {
+        return 0;
+      }
+      @Override
+      public int getMHi(int arrLength)
+      {
+        return 0;
+      }
+    /*
+    */
       @Override
       public void buildUnchecked(double[] arr,int offset,int length,Random rand,int m)
       {
@@ -3764,6 +4866,18 @@ public interface JunitUtil
     ,
     MergeAscending
     {
+      @Override
+      public int getMLo()
+      {
+        return 65;
+      }
+      @Override
+      public int getMHi(int arrLength)
+      {
+        return 69;
+      }
+    /*
+    */
       @Override
       public void buildUnchecked(double[] arr,int offset,int length,Random rand,int m)
       {
@@ -3798,6 +4912,18 @@ public interface JunitUtil
     MergeDescending
     {
       @Override
+      public int getMLo()
+      {
+        return 65;
+      }
+      @Override
+      public int getMHi(int arrLength)
+      {
+        return 69;
+      }
+    /*
+    */
+      @Override
       public void buildUnchecked(double[] arr,int offset,int length,Random rand,int m)
       {
         int v=0;
@@ -3830,6 +4956,17 @@ public interface JunitUtil
     ,
     Saw
     {
+      @Override
+      public int getMHi(int arrLength)
+      {
+        return (arrLength<<1)-1;
+      }
+    /*
+    */
+      public int incrementM(int m)
+      {
+        return m<<1;
+      }
       @Override
       public void buildUnchecked(double[] arr,int offset,int length,Random rand,int m)
       {
@@ -3879,6 +5016,13 @@ public interface JunitUtil
     SortedRepeated
     {
       @Override
+      public int getMHi(int arrLength)
+      {
+        return Math.min(arrLength,7);
+      }
+    /*
+    */
+      @Override
       public void buildUnchecked(double[] arr,int offset,int length,Random rand,int m)
       {
         for(int period=length/m,i=0,k=0;;++k)
@@ -3919,6 +5063,17 @@ public interface JunitUtil
     Repeated
     {
       @Override
+      public int getMHi(int arrLength)
+      {
+        return (arrLength<<1)-1;
+      }
+    /*
+    */
+      public int incrementM(int m)
+      {
+        return m<<1;
+      }
+      @Override
       public void buildUnchecked(double[] arr,int offset,int length,Random rand,int m)
       {
         int i=0;
@@ -3942,6 +5097,17 @@ public interface JunitUtil
     ,
     Duplicated
     {
+      @Override
+      public int getMHi(int arrLength)
+      {
+        return (arrLength<<1)-1;
+      }
+    /*
+    */
+      public int incrementM(int m)
+      {
+        return m<<1;
+      }
       @Override
       public boolean isRandomized()
       {
@@ -3971,6 +5137,13 @@ public interface JunitUtil
     ,
     SortedOrganPipes
     {
+      @Override
+      public int getMHi(int arrLength)
+      {
+        return Math.min(arrLength,7);
+      }
+    /*
+    */
       @Override
       public void buildUnchecked(double[] arr,int offset,int length,Random rand,int m)
       {
@@ -4004,6 +5177,17 @@ public interface JunitUtil
     OrganPipes
     {
       @Override
+      public int getMHi(int arrLength)
+      {
+        return (arrLength<<1)-1;
+      }
+    /*
+    */
+      public int incrementM(int m)
+      {
+        return m<<1;
+      }
+      @Override
       public void buildUnchecked(double[] arr,int offset,int length,Random rand,int m)
       {
         int i=0;
@@ -4027,6 +5211,17 @@ public interface JunitUtil
     ,
     Stagger
     {
+      @Override
+      public int getMHi(int arrLength)
+      {
+        return (arrLength<<1)-1;
+      }
+    /*
+    */
+      public int incrementM(int m)
+      {
+        return m<<1;
+      }
       @Override
       public void buildUnchecked(double[] arr,int offset,int length,Random rand,int m)
       {
@@ -4052,6 +5247,17 @@ public interface JunitUtil
     Plateau
     {
       @Override
+      public int getMHi(int arrLength)
+      {
+        return (arrLength<<1)-1;
+      }
+    /*
+    */
+      public int incrementM(int m)
+      {
+        return m<<1;
+      }
+      @Override
       public void buildUnchecked(double[] arr,int offset,int length,Random rand,int m)
       {
         int i=0;
@@ -4075,6 +5281,8 @@ public interface JunitUtil
     ,
     Shuffle
     {
+    /*
+    */
       @Override
       public boolean isRandomized()
       {
@@ -4106,6 +5314,13 @@ public interface JunitUtil
     ,
     WithNaNsAndZeros
     {
+    /*
+      @Override
+      public int getNumReps(int arrLength)
+      {
+        return 2;
+      }
+    */
       @Override
       public boolean isRandomized()
       {
@@ -4157,6 +5372,26 @@ public interface JunitUtil
       }
     }
     ;
+    public int getMLo()
+    {
+      return 1;
+    }
+    public int getMHi(int arrLength)
+    {
+      return 1;
+    }
+    public int getNumReps(int arrLength)
+    {
+      if(isRandomized())
+      {
+        return 10;
+      }
+      return 1;
+    }
+    public int incrementM(int m)
+    {
+      return m+1;
+    }
     public boolean isRandomized()
     {
       //most sub-types are not randomized, so make that the default
@@ -4223,6 +5458,25 @@ public interface JunitUtil
     {
       return "doubleArrayBuilder."+this.name();
     }
+    public void addArrays(long randSeed,int arrLength,Collection<double[]> arrays)
+    {
+      Random rand=new Random(randSeed);
+      for(int m=getMLo(),mHi=getMHi(arrLength),numReps=getNumReps(arrLength);m<=mHi;m=incrementM(m))
+      {
+        for(int i=0;i<numReps;++i)
+        {
+          double[] arr=new double[arrLength];
+          if(arrLength!=0)
+          {
+            buildUnchecked(arr,0,arrLength,rand,m);
+          }
+          synchronized(arrays)
+          {
+            arrays.add(arr);
+          }
+        }
+      }
+    }
   }
   public static enum StringArrayBuilder
   {
@@ -4248,6 +5502,15 @@ public interface JunitUtil
     Ascending
     {
       @Override
+      public int getMHi(int arrLength)
+      {
+        return (arrLength<<1)-1;
+      }
+      public int incrementM(int m)
+      {
+        return m<<1;
+      }
+      @Override
       public void buildUnchecked(String[] arr,int offset,int length,Random rand,int m)
       {
         for(int i=0;i<length;arr[(i++)+offset]=convertToString(m+i)){}
@@ -4257,6 +5520,15 @@ public interface JunitUtil
     Descending
     {
       @Override
+      public int getMHi(int arrLength)
+      {
+        return (arrLength<<1)-1;
+      }
+      public int incrementM(int m)
+      {
+        return m<<1;
+      }
+      @Override
       public void buildUnchecked(String[] arr,int offset,int length,Random rand,int m)
       {
         for(int i=0;i<length;arr[(i++)+offset]=convertToString(length-m-i)){}
@@ -4265,6 +5537,16 @@ public interface JunitUtil
     ,
     AllEquals
     {
+      @Override
+      public int getMLo()
+      {
+        return 0;
+      }
+      @Override
+      public int getMHi(int arrLength)
+      {
+        return 0;
+      }
       @Override
       public void buildUnchecked(String[] arr,int offset,int length,Random rand,int m)
       {
@@ -4280,6 +5562,16 @@ public interface JunitUtil
     ,
     MergeAscending
     {
+      @Override
+      public int getMLo()
+      {
+        return 65;
+      }
+      @Override
+      public int getMHi(int arrLength)
+      {
+        return 69;
+      }
       @Override
       public void buildUnchecked(String[] arr,int offset,int length,Random rand,int m)
       {
@@ -4303,6 +5595,16 @@ public interface JunitUtil
     MergeDescending
     {
       @Override
+      public int getMLo()
+      {
+        return 65;
+      }
+      @Override
+      public int getMHi(int arrLength)
+      {
+        return 69;
+      }
+      @Override
       public void buildUnchecked(String[] arr,int offset,int length,Random rand,int m)
       {
         int v=0;
@@ -4324,6 +5626,15 @@ public interface JunitUtil
     ,
     Saw
     {
+      @Override
+      public int getMHi(int arrLength)
+      {
+        return (arrLength<<1)-1;
+      }
+      public int incrementM(int m)
+      {
+        return m<<1;
+      }
       @Override
       public void buildUnchecked(String[] arr,int offset,int length,Random rand,int m)
       {
@@ -4351,6 +5662,11 @@ public interface JunitUtil
     SortedRepeated
     {
       @Override
+      public int getMHi(int arrLength)
+      {
+        return Math.min(arrLength,7);
+      }
+      @Override
       public void buildUnchecked(String[] arr,int offset,int length,Random rand,int m)
       {
         for(int period=length/m,i=0,k=0;;++k)
@@ -4373,6 +5689,15 @@ public interface JunitUtil
     Repeated
     {
       @Override
+      public int getMHi(int arrLength)
+      {
+        return (arrLength<<1)-1;
+      }
+      public int incrementM(int m)
+      {
+        return m<<1;
+      }
+      @Override
       public void buildUnchecked(String[] arr,int offset,int length,Random rand,int m)
       {
         int i=0;
@@ -4386,6 +5711,15 @@ public interface JunitUtil
     ,
     Duplicated
     {
+      @Override
+      public int getMHi(int arrLength)
+      {
+        return (arrLength<<1)-1;
+      }
+      public int incrementM(int m)
+      {
+        return m<<1;
+      }
       @Override
       public boolean isRandomized()
       {
@@ -4406,6 +5740,11 @@ public interface JunitUtil
     SortedOrganPipes
     {
       @Override
+      public int getMHi(int arrLength)
+      {
+        return Math.min(arrLength,7);
+      }
+      @Override
       public void buildUnchecked(String[] arr,int offset,int length,Random rand,int m)
       {
         for(int i=0;;)
@@ -4424,6 +5763,15 @@ public interface JunitUtil
     OrganPipes
     {
       @Override
+      public int getMHi(int arrLength)
+      {
+        return (arrLength<<1)-1;
+      }
+      public int incrementM(int m)
+      {
+        return m<<1;
+      }
+      @Override
       public void buildUnchecked(String[] arr,int offset,int length,Random rand,int m)
       {
         int i=0;
@@ -4438,6 +5786,15 @@ public interface JunitUtil
     Stagger
     {
       @Override
+      public int getMHi(int arrLength)
+      {
+        return (arrLength<<1)-1;
+      }
+      public int incrementM(int m)
+      {
+        return m<<1;
+      }
+      @Override
       public void buildUnchecked(String[] arr,int offset,int length,Random rand,int m)
       {
         int i=0;
@@ -4451,6 +5808,15 @@ public interface JunitUtil
     ,
     Plateau
     {
+      @Override
+      public int getMHi(int arrLength)
+      {
+        return (arrLength<<1)-1;
+      }
+      public int incrementM(int m)
+      {
+        return m<<1;
+      }
       @Override
       public void buildUnchecked(String[] arr,int offset,int length,Random rand,int m)
       {
@@ -4483,6 +5849,26 @@ public interface JunitUtil
       }
     }
     ;
+    public int getMLo()
+    {
+      return 1;
+    }
+    public int getMHi(int arrLength)
+    {
+      return 1;
+    }
+    public int getNumReps(int arrLength)
+    {
+      if(isRandomized())
+      {
+        return 10;
+      }
+      return 1;
+    }
+    public int incrementM(int m)
+    {
+      return m+1;
+    }
     public boolean isRandomized()
     {
       //most sub-types are not randomized, so make that the default
@@ -4521,6 +5907,25 @@ public interface JunitUtil
     {
       return "StringArrayBuilder."+this.name();
     }
+    public void addArrays(long randSeed,int arrLength,Collection<String[]> arrays)
+    {
+      Random rand=new Random(randSeed);
+      for(int m=getMLo(),mHi=getMHi(arrLength),numReps=getNumReps(arrLength);m<=mHi;m=incrementM(m))
+      {
+        for(int i=0;i<numReps;++i)
+        {
+          String[] arr=new String[arrLength];
+          if(arrLength!=0)
+          {
+            buildUnchecked(arr,0,arrLength,rand,m);
+          }
+          synchronized(arrays)
+          {
+            arrays.add(arr);
+          }
+        }
+      }
+    }
   }
   public static enum IntegerArrayBuilder
   {
@@ -4546,6 +5951,15 @@ public interface JunitUtil
     Ascending
     {
       @Override
+      public int getMHi(int arrLength)
+      {
+        return (arrLength<<1)-1;
+      }
+      public int incrementM(int m)
+      {
+        return m<<1;
+      }
+      @Override
       public void buildUnchecked(Integer[] arr,int offset,int length,Random rand,int m)
       {
         for(int i=0;i<length;arr[(i++)+offset]=convertToInteger(m+i)){}
@@ -4555,6 +5969,15 @@ public interface JunitUtil
     Descending
     {
       @Override
+      public int getMHi(int arrLength)
+      {
+        return (arrLength<<1)-1;
+      }
+      public int incrementM(int m)
+      {
+        return m<<1;
+      }
+      @Override
       public void buildUnchecked(Integer[] arr,int offset,int length,Random rand,int m)
       {
         for(int i=0;i<length;arr[(i++)+offset]=convertToInteger(length-m-i)){}
@@ -4563,6 +5986,16 @@ public interface JunitUtil
     ,
     AllEquals
     {
+      @Override
+      public int getMLo()
+      {
+        return 0;
+      }
+      @Override
+      public int getMHi(int arrLength)
+      {
+        return 0;
+      }
       @Override
       public void buildUnchecked(Integer[] arr,int offset,int length,Random rand,int m)
       {
@@ -4578,6 +6011,16 @@ public interface JunitUtil
     ,
     MergeAscending
     {
+      @Override
+      public int getMLo()
+      {
+        return 65;
+      }
+      @Override
+      public int getMHi(int arrLength)
+      {
+        return 69;
+      }
       @Override
       public void buildUnchecked(Integer[] arr,int offset,int length,Random rand,int m)
       {
@@ -4601,6 +6044,16 @@ public interface JunitUtil
     MergeDescending
     {
       @Override
+      public int getMLo()
+      {
+        return 65;
+      }
+      @Override
+      public int getMHi(int arrLength)
+      {
+        return 69;
+      }
+      @Override
       public void buildUnchecked(Integer[] arr,int offset,int length,Random rand,int m)
       {
         int v=0;
@@ -4622,6 +6075,15 @@ public interface JunitUtil
     ,
     Saw
     {
+      @Override
+      public int getMHi(int arrLength)
+      {
+        return (arrLength<<1)-1;
+      }
+      public int incrementM(int m)
+      {
+        return m<<1;
+      }
       @Override
       public void buildUnchecked(Integer[] arr,int offset,int length,Random rand,int m)
       {
@@ -4649,6 +6111,11 @@ public interface JunitUtil
     SortedRepeated
     {
       @Override
+      public int getMHi(int arrLength)
+      {
+        return Math.min(arrLength,7);
+      }
+      @Override
       public void buildUnchecked(Integer[] arr,int offset,int length,Random rand,int m)
       {
         for(int period=length/m,i=0,k=0;;++k)
@@ -4671,6 +6138,15 @@ public interface JunitUtil
     Repeated
     {
       @Override
+      public int getMHi(int arrLength)
+      {
+        return (arrLength<<1)-1;
+      }
+      public int incrementM(int m)
+      {
+        return m<<1;
+      }
+      @Override
       public void buildUnchecked(Integer[] arr,int offset,int length,Random rand,int m)
       {
         int i=0;
@@ -4684,6 +6160,15 @@ public interface JunitUtil
     ,
     Duplicated
     {
+      @Override
+      public int getMHi(int arrLength)
+      {
+        return (arrLength<<1)-1;
+      }
+      public int incrementM(int m)
+      {
+        return m<<1;
+      }
       @Override
       public boolean isRandomized()
       {
@@ -4704,6 +6189,11 @@ public interface JunitUtil
     SortedOrganPipes
     {
       @Override
+      public int getMHi(int arrLength)
+      {
+        return Math.min(arrLength,7);
+      }
+      @Override
       public void buildUnchecked(Integer[] arr,int offset,int length,Random rand,int m)
       {
         for(int i=0;;)
@@ -4722,6 +6212,15 @@ public interface JunitUtil
     OrganPipes
     {
       @Override
+      public int getMHi(int arrLength)
+      {
+        return (arrLength<<1)-1;
+      }
+      public int incrementM(int m)
+      {
+        return m<<1;
+      }
+      @Override
       public void buildUnchecked(Integer[] arr,int offset,int length,Random rand,int m)
       {
         int i=0;
@@ -4736,6 +6235,15 @@ public interface JunitUtil
     Stagger
     {
       @Override
+      public int getMHi(int arrLength)
+      {
+        return (arrLength<<1)-1;
+      }
+      public int incrementM(int m)
+      {
+        return m<<1;
+      }
+      @Override
       public void buildUnchecked(Integer[] arr,int offset,int length,Random rand,int m)
       {
         int i=0;
@@ -4749,6 +6257,15 @@ public interface JunitUtil
     ,
     Plateau
     {
+      @Override
+      public int getMHi(int arrLength)
+      {
+        return (arrLength<<1)-1;
+      }
+      public int incrementM(int m)
+      {
+        return m<<1;
+      }
       @Override
       public void buildUnchecked(Integer[] arr,int offset,int length,Random rand,int m)
       {
@@ -4781,6 +6298,26 @@ public interface JunitUtil
       }
     }
     ;
+    public int getMLo()
+    {
+      return 1;
+    }
+    public int getMHi(int arrLength)
+    {
+      return 1;
+    }
+    public int getNumReps(int arrLength)
+    {
+      if(isRandomized())
+      {
+        return 10;
+      }
+      return 1;
+    }
+    public int incrementM(int m)
+    {
+      return m+1;
+    }
     public boolean isRandomized()
     {
       //most sub-types are not randomized, so make that the default
@@ -4819,10 +6356,29 @@ public interface JunitUtil
     {
       return "IntegerArrayBuilder."+this.name();
     }
+    public void addArrays(long randSeed,int arrLength,Collection<Integer[]> arrays)
+    {
+      Random rand=new Random(randSeed);
+      for(int m=getMLo(),mHi=getMHi(arrLength),numReps=getNumReps(arrLength);m<=mHi;m=incrementM(m))
+      {
+        for(int i=0;i<numReps;++i)
+        {
+          Integer[] arr=new Integer[arrLength];
+          if(arrLength!=0)
+          {
+            buildUnchecked(arr,0,arrLength,rand,m);
+          }
+          synchronized(arrays)
+          {
+            arrays.add(arr);
+          }
+        }
+      }
+    }
   }
   public static boolean isEqual(boolean l,boolean r)
   {
-    return l==r;
+        return l==r;
   }
   public static void uncheckedparallelassertarraysAreEqual(boolean[] lArr,int lOffset,boolean[] rArr,int rOffset,int length)
   {
@@ -4956,7 +6512,7 @@ public interface JunitUtil
   }
   public static boolean isEqual(boolean l,byte r)
   {
-    return TypeUtil.castToByte(l)==r;
+        return TypeUtil.castToByte(l)==r;
   }
   public static void uncheckedparallelassertarraysAreEqual(boolean[] lArr,int lOffset,byte[] rArr,int rOffset,int length)
   {
@@ -5090,7 +6646,7 @@ public interface JunitUtil
   }
   public static boolean isEqual(boolean l,char r)
   {
-    return TypeUtil.castToByte(l)==r;
+        return TypeUtil.castToByte(l)==r;
   }
   public static void uncheckedparallelassertarraysAreEqual(boolean[] lArr,int lOffset,char[] rArr,int rOffset,int length)
   {
@@ -5224,7 +6780,7 @@ public interface JunitUtil
   }
   public static boolean isEqual(boolean l,short r)
   {
-    return TypeUtil.castToByte(l)==r;
+        return TypeUtil.castToByte(l)==r;
   }
   public static void uncheckedparallelassertarraysAreEqual(boolean[] lArr,int lOffset,short[] rArr,int rOffset,int length)
   {
@@ -5358,7 +6914,7 @@ public interface JunitUtil
   }
   public static boolean isEqual(boolean l,int r)
   {
-    return TypeUtil.castToByte(l)==r;
+        return TypeUtil.castToByte(l)==r;
   }
   public static void uncheckedparallelassertarraysAreEqual(boolean[] lArr,int lOffset,int[] rArr,int rOffset,int length)
   {
@@ -5492,7 +7048,7 @@ public interface JunitUtil
   }
   public static boolean isEqual(boolean l,long r)
   {
-    return TypeUtil.castToLong(l)==r;
+        return TypeUtil.castToLong(l)==r;
   }
   public static void uncheckedparallelassertarraysAreEqual(boolean[] lArr,int lOffset,long[] rArr,int rOffset,int length)
   {
@@ -5626,7 +7182,7 @@ public interface JunitUtil
   }
   public static boolean isEqual(boolean l,float r)
   {
-    return TypeUtil.castToFloat(l)==r;
+        return TypeUtil.castToFloat(l)==r;
   }
   public static void uncheckedparallelassertarraysAreEqual(boolean[] lArr,int lOffset,float[] rArr,int rOffset,int length)
   {
@@ -5760,7 +7316,7 @@ public interface JunitUtil
   }
   public static boolean isEqual(boolean l,double r)
   {
-    return TypeUtil.doubleEquals(r,TypeUtil.castToDouble(l));
+        return TypeUtil.doubleEquals(r,TypeUtil.castToDouble(l));
   }
   public static void uncheckedparallelassertarraysAreEqual(boolean[] lArr,int lOffset,double[] rArr,int rOffset,int length)
   {
@@ -5898,7 +7454,7 @@ public interface JunitUtil
     {
       return false;
     }
-    return isEqual(l,(boolean)r);
+        return isEqual(l,(boolean)r);
   }
   public static void uncheckedparallelassertarraysAreEqual(boolean[] lArr,int lOffset,Boolean[] rArr,int rOffset,int length)
   {
@@ -6036,7 +7592,7 @@ public interface JunitUtil
     {
       return false;
     }
-    return isEqual(l,(byte)r);
+        return isEqual(l,(byte)r);
   }
   public static void uncheckedparallelassertarraysAreEqual(boolean[] lArr,int lOffset,Byte[] rArr,int rOffset,int length)
   {
@@ -6174,7 +7730,7 @@ public interface JunitUtil
     {
       return false;
     }
-    return isEqual(l,(char)r);
+        return isEqual(l,(char)r);
   }
   public static void uncheckedparallelassertarraysAreEqual(boolean[] lArr,int lOffset,Character[] rArr,int rOffset,int length)
   {
@@ -6312,7 +7868,7 @@ public interface JunitUtil
     {
       return false;
     }
-    return isEqual(l,(short)r);
+        return isEqual(l,(short)r);
   }
   public static void uncheckedparallelassertarraysAreEqual(boolean[] lArr,int lOffset,Short[] rArr,int rOffset,int length)
   {
@@ -6450,7 +8006,7 @@ public interface JunitUtil
     {
       return false;
     }
-    return isEqual(l,(int)r);
+        return isEqual(l,(int)r);
   }
   public static void uncheckedparallelassertarraysAreEqual(boolean[] lArr,int lOffset,Integer[] rArr,int rOffset,int length)
   {
@@ -6588,7 +8144,7 @@ public interface JunitUtil
     {
       return false;
     }
-    return isEqual(l,(long)r);
+        return isEqual(l,(long)r);
   }
   public static void uncheckedparallelassertarraysAreEqual(boolean[] lArr,int lOffset,Long[] rArr,int rOffset,int length)
   {
@@ -6726,7 +8282,7 @@ public interface JunitUtil
     {
       return false;
     }
-    return isEqual(l,(float)r);
+        return isEqual(l,(float)r);
   }
   public static void uncheckedparallelassertarraysAreEqual(boolean[] lArr,int lOffset,Float[] rArr,int rOffset,int length)
   {
@@ -6864,7 +8420,7 @@ public interface JunitUtil
     {
       return false;
     }
-    return isEqual(l,(double)r);
+        return isEqual(l,(double)r);
   }
   public static void uncheckedparallelassertarraysAreEqual(boolean[] lArr,int lOffset,Double[] rArr,int rOffset,int length)
   {
@@ -7002,7 +8558,7 @@ public interface JunitUtil
     {
       return false;
     }
-    return r.equals(l);
+        return r.equals(l);
   }
   public static void uncheckedparallelassertarraysAreEqual(boolean[] lArr,int lOffset,Object[] rArr,int rOffset,int length)
   {
@@ -7136,7 +8692,7 @@ public interface JunitUtil
   }
   public static boolean isEqual(byte l,boolean r)
   {
-    return l==TypeUtil.castToByte(r);
+        return l==TypeUtil.castToByte(r);
   }
   public static void uncheckedparallelassertarraysAreEqual(byte[] lArr,int lOffset,boolean[] rArr,int rOffset,int length)
   {
@@ -7270,7 +8826,7 @@ public interface JunitUtil
   }
   public static boolean isEqual(byte l,byte r)
   {
-    return l==r;
+        return l==r;
   }
   public static void uncheckedparallelassertarraysAreEqual(byte[] lArr,int lOffset,byte[] rArr,int rOffset,int length)
   {
@@ -7404,7 +8960,7 @@ public interface JunitUtil
   }
   public static boolean isEqual(byte l,char r)
   {
-    return l==r;
+        return l==r;
   }
   public static void uncheckedparallelassertarraysAreEqual(byte[] lArr,int lOffset,char[] rArr,int rOffset,int length)
   {
@@ -7538,7 +9094,7 @@ public interface JunitUtil
   }
   public static boolean isEqual(byte l,short r)
   {
-    return l==r;
+        return l==r;
   }
   public static void uncheckedparallelassertarraysAreEqual(byte[] lArr,int lOffset,short[] rArr,int rOffset,int length)
   {
@@ -7672,7 +9228,7 @@ public interface JunitUtil
   }
   public static boolean isEqual(byte l,int r)
   {
-    return l==r;
+        return l==r;
   }
   public static void uncheckedparallelassertarraysAreEqual(byte[] lArr,int lOffset,int[] rArr,int rOffset,int length)
   {
@@ -7806,7 +9362,7 @@ public interface JunitUtil
   }
   public static boolean isEqual(byte l,long r)
   {
-    return l==r;
+        return l==r;
   }
   public static void uncheckedparallelassertarraysAreEqual(byte[] lArr,int lOffset,long[] rArr,int rOffset,int length)
   {
@@ -7940,7 +9496,7 @@ public interface JunitUtil
   }
   public static boolean isEqual(byte l,float r)
   {
-    return l==r;
+        return l==r;
   }
   public static void uncheckedparallelassertarraysAreEqual(byte[] lArr,int lOffset,float[] rArr,int rOffset,int length)
   {
@@ -8074,7 +9630,7 @@ public interface JunitUtil
   }
   public static boolean isEqual(byte l,double r)
   {
-    return l==r;
+        return l==r;
   }
   public static void uncheckedparallelassertarraysAreEqual(byte[] lArr,int lOffset,double[] rArr,int rOffset,int length)
   {
@@ -8212,7 +9768,7 @@ public interface JunitUtil
     {
       return false;
     }
-    return isEqual(l,(boolean)r);
+        return isEqual(l,(boolean)r);
   }
   public static void uncheckedparallelassertarraysAreEqual(byte[] lArr,int lOffset,Boolean[] rArr,int rOffset,int length)
   {
@@ -8350,7 +9906,7 @@ public interface JunitUtil
     {
       return false;
     }
-    return isEqual(l,(byte)r);
+        return isEqual(l,(byte)r);
   }
   public static void uncheckedparallelassertarraysAreEqual(byte[] lArr,int lOffset,Byte[] rArr,int rOffset,int length)
   {
@@ -8488,7 +10044,7 @@ public interface JunitUtil
     {
       return false;
     }
-    return isEqual(l,(char)r);
+        return isEqual(l,(char)r);
   }
   public static void uncheckedparallelassertarraysAreEqual(byte[] lArr,int lOffset,Character[] rArr,int rOffset,int length)
   {
@@ -8626,7 +10182,7 @@ public interface JunitUtil
     {
       return false;
     }
-    return isEqual(l,(short)r);
+        return isEqual(l,(short)r);
   }
   public static void uncheckedparallelassertarraysAreEqual(byte[] lArr,int lOffset,Short[] rArr,int rOffset,int length)
   {
@@ -8764,7 +10320,7 @@ public interface JunitUtil
     {
       return false;
     }
-    return isEqual(l,(int)r);
+        return isEqual(l,(int)r);
   }
   public static void uncheckedparallelassertarraysAreEqual(byte[] lArr,int lOffset,Integer[] rArr,int rOffset,int length)
   {
@@ -8902,7 +10458,7 @@ public interface JunitUtil
     {
       return false;
     }
-    return isEqual(l,(long)r);
+        return isEqual(l,(long)r);
   }
   public static void uncheckedparallelassertarraysAreEqual(byte[] lArr,int lOffset,Long[] rArr,int rOffset,int length)
   {
@@ -9040,7 +10596,7 @@ public interface JunitUtil
     {
       return false;
     }
-    return isEqual(l,(float)r);
+        return isEqual(l,(float)r);
   }
   public static void uncheckedparallelassertarraysAreEqual(byte[] lArr,int lOffset,Float[] rArr,int rOffset,int length)
   {
@@ -9178,7 +10734,7 @@ public interface JunitUtil
     {
       return false;
     }
-    return isEqual(l,(double)r);
+        return isEqual(l,(double)r);
   }
   public static void uncheckedparallelassertarraysAreEqual(byte[] lArr,int lOffset,Double[] rArr,int rOffset,int length)
   {
@@ -9316,7 +10872,7 @@ public interface JunitUtil
     {
       return false;
     }
-    return r.equals(l);
+        return r.equals(l);
   }
   public static void uncheckedparallelassertarraysAreEqual(byte[] lArr,int lOffset,Object[] rArr,int rOffset,int length)
   {
@@ -9450,7 +11006,7 @@ public interface JunitUtil
   }
   public static boolean isEqual(char l,boolean r)
   {
-    return l==TypeUtil.castToByte(r);
+        return l==TypeUtil.castToByte(r);
   }
   public static void uncheckedparallelassertarraysAreEqual(char[] lArr,int lOffset,boolean[] rArr,int rOffset,int length)
   {
@@ -9584,7 +11140,7 @@ public interface JunitUtil
   }
   public static boolean isEqual(char l,byte r)
   {
-    return l==r;
+        return l==r;
   }
   public static void uncheckedparallelassertarraysAreEqual(char[] lArr,int lOffset,byte[] rArr,int rOffset,int length)
   {
@@ -9718,7 +11274,7 @@ public interface JunitUtil
   }
   public static boolean isEqual(char l,char r)
   {
-    return l==r;
+        return l==r;
   }
   public static void uncheckedparallelassertarraysAreEqual(char[] lArr,int lOffset,char[] rArr,int rOffset,int length)
   {
@@ -9852,7 +11408,7 @@ public interface JunitUtil
   }
   public static boolean isEqual(char l,short r)
   {
-    return l==r;
+        return l==r;
   }
   public static void uncheckedparallelassertarraysAreEqual(char[] lArr,int lOffset,short[] rArr,int rOffset,int length)
   {
@@ -9986,7 +11542,7 @@ public interface JunitUtil
   }
   public static boolean isEqual(char l,int r)
   {
-    return l==r;
+        return l==r;
   }
   public static void uncheckedparallelassertarraysAreEqual(char[] lArr,int lOffset,int[] rArr,int rOffset,int length)
   {
@@ -10120,7 +11676,7 @@ public interface JunitUtil
   }
   public static boolean isEqual(char l,long r)
   {
-    return l==r;
+        return l==r;
   }
   public static void uncheckedparallelassertarraysAreEqual(char[] lArr,int lOffset,long[] rArr,int rOffset,int length)
   {
@@ -10254,7 +11810,7 @@ public interface JunitUtil
   }
   public static boolean isEqual(char l,float r)
   {
-    return l==r;
+        return l==r;
   }
   public static void uncheckedparallelassertarraysAreEqual(char[] lArr,int lOffset,float[] rArr,int rOffset,int length)
   {
@@ -10388,7 +11944,7 @@ public interface JunitUtil
   }
   public static boolean isEqual(char l,double r)
   {
-    return l==r;
+        return l==r;
   }
   public static void uncheckedparallelassertarraysAreEqual(char[] lArr,int lOffset,double[] rArr,int rOffset,int length)
   {
@@ -10526,7 +12082,7 @@ public interface JunitUtil
     {
       return false;
     }
-    return isEqual(l,(boolean)r);
+        return isEqual(l,(boolean)r);
   }
   public static void uncheckedparallelassertarraysAreEqual(char[] lArr,int lOffset,Boolean[] rArr,int rOffset,int length)
   {
@@ -10664,7 +12220,7 @@ public interface JunitUtil
     {
       return false;
     }
-    return isEqual(l,(byte)r);
+        return isEqual(l,(byte)r);
   }
   public static void uncheckedparallelassertarraysAreEqual(char[] lArr,int lOffset,Byte[] rArr,int rOffset,int length)
   {
@@ -10802,7 +12358,7 @@ public interface JunitUtil
     {
       return false;
     }
-    return isEqual(l,(char)r);
+        return isEqual(l,(char)r);
   }
   public static void uncheckedparallelassertarraysAreEqual(char[] lArr,int lOffset,Character[] rArr,int rOffset,int length)
   {
@@ -10940,7 +12496,7 @@ public interface JunitUtil
     {
       return false;
     }
-    return isEqual(l,(short)r);
+        return isEqual(l,(short)r);
   }
   public static void uncheckedparallelassertarraysAreEqual(char[] lArr,int lOffset,Short[] rArr,int rOffset,int length)
   {
@@ -11078,7 +12634,7 @@ public interface JunitUtil
     {
       return false;
     }
-    return isEqual(l,(int)r);
+        return isEqual(l,(int)r);
   }
   public static void uncheckedparallelassertarraysAreEqual(char[] lArr,int lOffset,Integer[] rArr,int rOffset,int length)
   {
@@ -11216,7 +12772,7 @@ public interface JunitUtil
     {
       return false;
     }
-    return isEqual(l,(long)r);
+        return isEqual(l,(long)r);
   }
   public static void uncheckedparallelassertarraysAreEqual(char[] lArr,int lOffset,Long[] rArr,int rOffset,int length)
   {
@@ -11354,7 +12910,7 @@ public interface JunitUtil
     {
       return false;
     }
-    return isEqual(l,(float)r);
+        return isEqual(l,(float)r);
   }
   public static void uncheckedparallelassertarraysAreEqual(char[] lArr,int lOffset,Float[] rArr,int rOffset,int length)
   {
@@ -11492,7 +13048,7 @@ public interface JunitUtil
     {
       return false;
     }
-    return isEqual(l,(double)r);
+        return isEqual(l,(double)r);
   }
   public static void uncheckedparallelassertarraysAreEqual(char[] lArr,int lOffset,Double[] rArr,int rOffset,int length)
   {
@@ -11630,7 +13186,7 @@ public interface JunitUtil
     {
       return false;
     }
-    return r.equals(l);
+        return r.equals(l);
   }
   public static void uncheckedparallelassertarraysAreEqual(char[] lArr,int lOffset,Object[] rArr,int rOffset,int length)
   {
@@ -11764,7 +13320,7 @@ public interface JunitUtil
   }
   public static boolean isEqual(short l,boolean r)
   {
-    return l==TypeUtil.castToByte(r);
+        return l==TypeUtil.castToByte(r);
   }
   public static void uncheckedparallelassertarraysAreEqual(short[] lArr,int lOffset,boolean[] rArr,int rOffset,int length)
   {
@@ -11898,7 +13454,7 @@ public interface JunitUtil
   }
   public static boolean isEqual(short l,byte r)
   {
-    return l==r;
+        return l==r;
   }
   public static void uncheckedparallelassertarraysAreEqual(short[] lArr,int lOffset,byte[] rArr,int rOffset,int length)
   {
@@ -12032,7 +13588,7 @@ public interface JunitUtil
   }
   public static boolean isEqual(short l,char r)
   {
-    return l==r;
+        return l==r;
   }
   public static void uncheckedparallelassertarraysAreEqual(short[] lArr,int lOffset,char[] rArr,int rOffset,int length)
   {
@@ -12166,7 +13722,7 @@ public interface JunitUtil
   }
   public static boolean isEqual(short l,short r)
   {
-    return l==r;
+        return l==r;
   }
   public static void uncheckedparallelassertarraysAreEqual(short[] lArr,int lOffset,short[] rArr,int rOffset,int length)
   {
@@ -12300,7 +13856,7 @@ public interface JunitUtil
   }
   public static boolean isEqual(short l,int r)
   {
-    return l==r;
+        return l==r;
   }
   public static void uncheckedparallelassertarraysAreEqual(short[] lArr,int lOffset,int[] rArr,int rOffset,int length)
   {
@@ -12434,7 +13990,7 @@ public interface JunitUtil
   }
   public static boolean isEqual(short l,long r)
   {
-    return l==r;
+        return l==r;
   }
   public static void uncheckedparallelassertarraysAreEqual(short[] lArr,int lOffset,long[] rArr,int rOffset,int length)
   {
@@ -12568,7 +14124,7 @@ public interface JunitUtil
   }
   public static boolean isEqual(short l,float r)
   {
-    return l==r;
+        return l==r;
   }
   public static void uncheckedparallelassertarraysAreEqual(short[] lArr,int lOffset,float[] rArr,int rOffset,int length)
   {
@@ -12702,7 +14258,7 @@ public interface JunitUtil
   }
   public static boolean isEqual(short l,double r)
   {
-    return l==r;
+        return l==r;
   }
   public static void uncheckedparallelassertarraysAreEqual(short[] lArr,int lOffset,double[] rArr,int rOffset,int length)
   {
@@ -12840,7 +14396,7 @@ public interface JunitUtil
     {
       return false;
     }
-    return isEqual(l,(boolean)r);
+        return isEqual(l,(boolean)r);
   }
   public static void uncheckedparallelassertarraysAreEqual(short[] lArr,int lOffset,Boolean[] rArr,int rOffset,int length)
   {
@@ -12978,7 +14534,7 @@ public interface JunitUtil
     {
       return false;
     }
-    return isEqual(l,(byte)r);
+        return isEqual(l,(byte)r);
   }
   public static void uncheckedparallelassertarraysAreEqual(short[] lArr,int lOffset,Byte[] rArr,int rOffset,int length)
   {
@@ -13116,7 +14672,7 @@ public interface JunitUtil
     {
       return false;
     }
-    return isEqual(l,(char)r);
+        return isEqual(l,(char)r);
   }
   public static void uncheckedparallelassertarraysAreEqual(short[] lArr,int lOffset,Character[] rArr,int rOffset,int length)
   {
@@ -13254,7 +14810,7 @@ public interface JunitUtil
     {
       return false;
     }
-    return isEqual(l,(short)r);
+        return isEqual(l,(short)r);
   }
   public static void uncheckedparallelassertarraysAreEqual(short[] lArr,int lOffset,Short[] rArr,int rOffset,int length)
   {
@@ -13392,7 +14948,7 @@ public interface JunitUtil
     {
       return false;
     }
-    return isEqual(l,(int)r);
+        return isEqual(l,(int)r);
   }
   public static void uncheckedparallelassertarraysAreEqual(short[] lArr,int lOffset,Integer[] rArr,int rOffset,int length)
   {
@@ -13530,7 +15086,7 @@ public interface JunitUtil
     {
       return false;
     }
-    return isEqual(l,(long)r);
+        return isEqual(l,(long)r);
   }
   public static void uncheckedparallelassertarraysAreEqual(short[] lArr,int lOffset,Long[] rArr,int rOffset,int length)
   {
@@ -13668,7 +15224,7 @@ public interface JunitUtil
     {
       return false;
     }
-    return isEqual(l,(float)r);
+        return isEqual(l,(float)r);
   }
   public static void uncheckedparallelassertarraysAreEqual(short[] lArr,int lOffset,Float[] rArr,int rOffset,int length)
   {
@@ -13806,7 +15362,7 @@ public interface JunitUtil
     {
       return false;
     }
-    return isEqual(l,(double)r);
+        return isEqual(l,(double)r);
   }
   public static void uncheckedparallelassertarraysAreEqual(short[] lArr,int lOffset,Double[] rArr,int rOffset,int length)
   {
@@ -13944,7 +15500,7 @@ public interface JunitUtil
     {
       return false;
     }
-    return r.equals(l);
+        return r.equals(l);
   }
   public static void uncheckedparallelassertarraysAreEqual(short[] lArr,int lOffset,Object[] rArr,int rOffset,int length)
   {
@@ -14078,7 +15634,7 @@ public interface JunitUtil
   }
   public static boolean isEqual(int l,boolean r)
   {
-    return l==TypeUtil.castToByte(r);
+        return l==TypeUtil.castToByte(r);
   }
   public static void uncheckedparallelassertarraysAreEqual(int[] lArr,int lOffset,boolean[] rArr,int rOffset,int length)
   {
@@ -14212,7 +15768,7 @@ public interface JunitUtil
   }
   public static boolean isEqual(int l,byte r)
   {
-    return l==r;
+        return l==r;
   }
   public static void uncheckedparallelassertarraysAreEqual(int[] lArr,int lOffset,byte[] rArr,int rOffset,int length)
   {
@@ -14346,7 +15902,7 @@ public interface JunitUtil
   }
   public static boolean isEqual(int l,char r)
   {
-    return l==r;
+        return l==r;
   }
   public static void uncheckedparallelassertarraysAreEqual(int[] lArr,int lOffset,char[] rArr,int rOffset,int length)
   {
@@ -14480,7 +16036,7 @@ public interface JunitUtil
   }
   public static boolean isEqual(int l,short r)
   {
-    return l==r;
+        return l==r;
   }
   public static void uncheckedparallelassertarraysAreEqual(int[] lArr,int lOffset,short[] rArr,int rOffset,int length)
   {
@@ -14614,7 +16170,7 @@ public interface JunitUtil
   }
   public static boolean isEqual(int l,int r)
   {
-    return l==r;
+        return l==r;
   }
   public static void uncheckedparallelassertarraysAreEqual(int[] lArr,int lOffset,int[] rArr,int rOffset,int length)
   {
@@ -14748,7 +16304,7 @@ public interface JunitUtil
   }
   public static boolean isEqual(int l,long r)
   {
-    return l==r;
+        return l==r;
   }
   public static void uncheckedparallelassertarraysAreEqual(int[] lArr,int lOffset,long[] rArr,int rOffset,int length)
   {
@@ -14882,7 +16438,8 @@ public interface JunitUtil
   }
   public static boolean isEqual(int l,float r)
   {
-    return ((double)l)==((double)r);
+        return l==r;
+        //return ((double)l)==((double)r);
   }
   public static void uncheckedparallelassertarraysAreEqual(int[] lArr,int lOffset,float[] rArr,int rOffset,int length)
   {
@@ -15016,7 +16573,7 @@ public interface JunitUtil
   }
   public static boolean isEqual(int l,double r)
   {
-    return l==r;
+        return l==r;
   }
   public static void uncheckedparallelassertarraysAreEqual(int[] lArr,int lOffset,double[] rArr,int rOffset,int length)
   {
@@ -15154,7 +16711,7 @@ public interface JunitUtil
     {
       return false;
     }
-    return isEqual(l,(boolean)r);
+        return isEqual(l,(boolean)r);
   }
   public static void uncheckedparallelassertarraysAreEqual(int[] lArr,int lOffset,Boolean[] rArr,int rOffset,int length)
   {
@@ -15292,7 +16849,7 @@ public interface JunitUtil
     {
       return false;
     }
-    return isEqual(l,(byte)r);
+        return isEqual(l,(byte)r);
   }
   public static void uncheckedparallelassertarraysAreEqual(int[] lArr,int lOffset,Byte[] rArr,int rOffset,int length)
   {
@@ -15430,7 +16987,7 @@ public interface JunitUtil
     {
       return false;
     }
-    return isEqual(l,(char)r);
+        return isEqual(l,(char)r);
   }
   public static void uncheckedparallelassertarraysAreEqual(int[] lArr,int lOffset,Character[] rArr,int rOffset,int length)
   {
@@ -15568,7 +17125,7 @@ public interface JunitUtil
     {
       return false;
     }
-    return isEqual(l,(short)r);
+        return isEqual(l,(short)r);
   }
   public static void uncheckedparallelassertarraysAreEqual(int[] lArr,int lOffset,Short[] rArr,int rOffset,int length)
   {
@@ -15706,7 +17263,7 @@ public interface JunitUtil
     {
       return false;
     }
-    return isEqual(l,(int)r);
+        return isEqual(l,(int)r);
   }
   public static void uncheckedparallelassertarraysAreEqual(int[] lArr,int lOffset,Integer[] rArr,int rOffset,int length)
   {
@@ -15844,7 +17401,7 @@ public interface JunitUtil
     {
       return false;
     }
-    return isEqual(l,(long)r);
+        return isEqual(l,(long)r);
   }
   public static void uncheckedparallelassertarraysAreEqual(int[] lArr,int lOffset,Long[] rArr,int rOffset,int length)
   {
@@ -15982,7 +17539,7 @@ public interface JunitUtil
     {
       return false;
     }
-    return isEqual(l,(float)r);
+        return isEqual(l,(float)r);
   }
   public static void uncheckedparallelassertarraysAreEqual(int[] lArr,int lOffset,Float[] rArr,int rOffset,int length)
   {
@@ -16120,7 +17677,7 @@ public interface JunitUtil
     {
       return false;
     }
-    return isEqual(l,(double)r);
+        return isEqual(l,(double)r);
   }
   public static void uncheckedparallelassertarraysAreEqual(int[] lArr,int lOffset,Double[] rArr,int rOffset,int length)
   {
@@ -16258,7 +17815,7 @@ public interface JunitUtil
     {
       return false;
     }
-    return r.equals(l);
+        return r.equals(l);
   }
   public static void uncheckedparallelassertarraysAreEqual(int[] lArr,int lOffset,Object[] rArr,int rOffset,int length)
   {
@@ -16392,7 +17949,7 @@ public interface JunitUtil
   }
   public static boolean isEqual(long l,boolean r)
   {
-    return l==TypeUtil.castToLong(r);
+        return l==TypeUtil.castToLong(r);
   }
   public static void uncheckedparallelassertarraysAreEqual(long[] lArr,int lOffset,boolean[] rArr,int rOffset,int length)
   {
@@ -16526,7 +18083,7 @@ public interface JunitUtil
   }
   public static boolean isEqual(long l,byte r)
   {
-    return l==r;
+        return l==r;
   }
   public static void uncheckedparallelassertarraysAreEqual(long[] lArr,int lOffset,byte[] rArr,int rOffset,int length)
   {
@@ -16660,7 +18217,7 @@ public interface JunitUtil
   }
   public static boolean isEqual(long l,char r)
   {
-    return l==r;
+        return l==r;
   }
   public static void uncheckedparallelassertarraysAreEqual(long[] lArr,int lOffset,char[] rArr,int rOffset,int length)
   {
@@ -16794,7 +18351,7 @@ public interface JunitUtil
   }
   public static boolean isEqual(long l,short r)
   {
-    return l==r;
+        return l==r;
   }
   public static void uncheckedparallelassertarraysAreEqual(long[] lArr,int lOffset,short[] rArr,int rOffset,int length)
   {
@@ -16928,7 +18485,7 @@ public interface JunitUtil
   }
   public static boolean isEqual(long l,int r)
   {
-    return l==r;
+        return l==r;
   }
   public static void uncheckedparallelassertarraysAreEqual(long[] lArr,int lOffset,int[] rArr,int rOffset,int length)
   {
@@ -17062,7 +18619,7 @@ public interface JunitUtil
   }
   public static boolean isEqual(long l,long r)
   {
-    return l==r;
+        return l==r;
   }
   public static void uncheckedparallelassertarraysAreEqual(long[] lArr,int lOffset,long[] rArr,int rOffset,int length)
   {
@@ -17196,7 +18753,8 @@ public interface JunitUtil
   }
   public static boolean isEqual(long l,float r)
   {
-    return TypeUtil.floatEquals(r,l);
+          return l==r;
+        //return TypeUtil.floatEquals(r,l);
   }
   public static void uncheckedparallelassertarraysAreEqual(long[] lArr,int lOffset,float[] rArr,int rOffset,int length)
   {
@@ -17330,7 +18888,8 @@ public interface JunitUtil
   }
   public static boolean isEqual(long l,double r)
   {
-    return TypeUtil.doubleEquals(r,l);
+          return l==r;
+        //return TypeUtil.doubleEquals(r,l);
   }
   public static void uncheckedparallelassertarraysAreEqual(long[] lArr,int lOffset,double[] rArr,int rOffset,int length)
   {
@@ -17468,7 +19027,7 @@ public interface JunitUtil
     {
       return false;
     }
-    return isEqual(l,(boolean)r);
+        return isEqual(l,(boolean)r);
   }
   public static void uncheckedparallelassertarraysAreEqual(long[] lArr,int lOffset,Boolean[] rArr,int rOffset,int length)
   {
@@ -17606,7 +19165,7 @@ public interface JunitUtil
     {
       return false;
     }
-    return isEqual(l,(byte)r);
+        return isEqual(l,(byte)r);
   }
   public static void uncheckedparallelassertarraysAreEqual(long[] lArr,int lOffset,Byte[] rArr,int rOffset,int length)
   {
@@ -17744,7 +19303,7 @@ public interface JunitUtil
     {
       return false;
     }
-    return isEqual(l,(char)r);
+        return isEqual(l,(char)r);
   }
   public static void uncheckedparallelassertarraysAreEqual(long[] lArr,int lOffset,Character[] rArr,int rOffset,int length)
   {
@@ -17882,7 +19441,7 @@ public interface JunitUtil
     {
       return false;
     }
-    return isEqual(l,(short)r);
+        return isEqual(l,(short)r);
   }
   public static void uncheckedparallelassertarraysAreEqual(long[] lArr,int lOffset,Short[] rArr,int rOffset,int length)
   {
@@ -18020,7 +19579,7 @@ public interface JunitUtil
     {
       return false;
     }
-    return isEqual(l,(int)r);
+        return isEqual(l,(int)r);
   }
   public static void uncheckedparallelassertarraysAreEqual(long[] lArr,int lOffset,Integer[] rArr,int rOffset,int length)
   {
@@ -18158,7 +19717,7 @@ public interface JunitUtil
     {
       return false;
     }
-    return isEqual(l,(long)r);
+        return isEqual(l,(long)r);
   }
   public static void uncheckedparallelassertarraysAreEqual(long[] lArr,int lOffset,Long[] rArr,int rOffset,int length)
   {
@@ -18296,7 +19855,7 @@ public interface JunitUtil
     {
       return false;
     }
-    return isEqual(l,(float)r);
+        return isEqual(l,(float)r);
   }
   public static void uncheckedparallelassertarraysAreEqual(long[] lArr,int lOffset,Float[] rArr,int rOffset,int length)
   {
@@ -18434,7 +19993,7 @@ public interface JunitUtil
     {
       return false;
     }
-    return isEqual(l,(double)r);
+        return isEqual(l,(double)r);
   }
   public static void uncheckedparallelassertarraysAreEqual(long[] lArr,int lOffset,Double[] rArr,int rOffset,int length)
   {
@@ -18572,7 +20131,7 @@ public interface JunitUtil
     {
       return false;
     }
-    return r.equals(l);
+        return r.equals(l);
   }
   public static void uncheckedparallelassertarraysAreEqual(long[] lArr,int lOffset,Object[] rArr,int rOffset,int length)
   {
@@ -18706,7 +20265,7 @@ public interface JunitUtil
   }
   public static boolean isEqual(float l,boolean r)
   {
-    return l==TypeUtil.castToFloat(r);
+        return l==TypeUtil.castToFloat(r);
   }
   public static void uncheckedparallelassertarraysAreEqual(float[] lArr,int lOffset,boolean[] rArr,int rOffset,int length)
   {
@@ -18840,7 +20399,7 @@ public interface JunitUtil
   }
   public static boolean isEqual(float l,byte r)
   {
-    return l==r;
+        return l==r;
   }
   public static void uncheckedparallelassertarraysAreEqual(float[] lArr,int lOffset,byte[] rArr,int rOffset,int length)
   {
@@ -18974,7 +20533,7 @@ public interface JunitUtil
   }
   public static boolean isEqual(float l,char r)
   {
-    return l==r;
+        return l==r;
   }
   public static void uncheckedparallelassertarraysAreEqual(float[] lArr,int lOffset,char[] rArr,int rOffset,int length)
   {
@@ -19108,7 +20667,7 @@ public interface JunitUtil
   }
   public static boolean isEqual(float l,short r)
   {
-    return l==r;
+        return l==r;
   }
   public static void uncheckedparallelassertarraysAreEqual(float[] lArr,int lOffset,short[] rArr,int rOffset,int length)
   {
@@ -19242,7 +20801,7 @@ public interface JunitUtil
   }
   public static boolean isEqual(float l,int r)
   {
-    return ((double)l)==((double)r);
+        return ((double)l)==((double)r);
   }
   public static void uncheckedparallelassertarraysAreEqual(float[] lArr,int lOffset,int[] rArr,int rOffset,int length)
   {
@@ -19376,7 +20935,8 @@ public interface JunitUtil
   }
   public static boolean isEqual(float l,long r)
   {
-    return TypeUtil.floatEquals(l,r);
+        return l==r;
+        //return TypeUtil.floatEquals(l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(float[] lArr,int lOffset,long[] rArr,int rOffset,int length)
   {
@@ -19510,7 +21070,8 @@ public interface JunitUtil
   }
   public static boolean isEqual(float l,float r)
   {
-    return TypeUtil.floatEquals(r,l);
+          return TypeUtil.floatEquals(r,l);
+        //return TypeUtil.floatEquals(r,l);
   }
   public static void uncheckedparallelassertarraysAreEqual(float[] lArr,int lOffset,float[] rArr,int rOffset,int length)
   {
@@ -19644,7 +21205,8 @@ public interface JunitUtil
   }
   public static boolean isEqual(float l,double r)
   {
-    return TypeUtil.doubleEquals(r,l);
+          return TypeUtil.doubleEquals(r,l);
+        //return TypeUtil.doubleEquals(r,l);
   }
   public static void uncheckedparallelassertarraysAreEqual(float[] lArr,int lOffset,double[] rArr,int rOffset,int length)
   {
@@ -19782,7 +21344,7 @@ public interface JunitUtil
     {
       return false;
     }
-    return isEqual(l,(boolean)r);
+        return isEqual(l,(boolean)r);
   }
   public static void uncheckedparallelassertarraysAreEqual(float[] lArr,int lOffset,Boolean[] rArr,int rOffset,int length)
   {
@@ -19920,7 +21482,7 @@ public interface JunitUtil
     {
       return false;
     }
-    return isEqual(l,(byte)r);
+        return isEqual(l,(byte)r);
   }
   public static void uncheckedparallelassertarraysAreEqual(float[] lArr,int lOffset,Byte[] rArr,int rOffset,int length)
   {
@@ -20058,7 +21620,7 @@ public interface JunitUtil
     {
       return false;
     }
-    return isEqual(l,(char)r);
+        return isEqual(l,(char)r);
   }
   public static void uncheckedparallelassertarraysAreEqual(float[] lArr,int lOffset,Character[] rArr,int rOffset,int length)
   {
@@ -20196,7 +21758,7 @@ public interface JunitUtil
     {
       return false;
     }
-    return isEqual(l,(short)r);
+        return isEqual(l,(short)r);
   }
   public static void uncheckedparallelassertarraysAreEqual(float[] lArr,int lOffset,Short[] rArr,int rOffset,int length)
   {
@@ -20334,7 +21896,7 @@ public interface JunitUtil
     {
       return false;
     }
-    return isEqual(l,(int)r);
+        return isEqual(l,(int)r);
   }
   public static void uncheckedparallelassertarraysAreEqual(float[] lArr,int lOffset,Integer[] rArr,int rOffset,int length)
   {
@@ -20472,7 +22034,7 @@ public interface JunitUtil
     {
       return false;
     }
-    return isEqual(l,(long)r);
+        return isEqual(l,(long)r);
   }
   public static void uncheckedparallelassertarraysAreEqual(float[] lArr,int lOffset,Long[] rArr,int rOffset,int length)
   {
@@ -20610,7 +22172,7 @@ public interface JunitUtil
     {
       return false;
     }
-    return isEqual(l,(float)r);
+        return isEqual(l,(float)r);
   }
   public static void uncheckedparallelassertarraysAreEqual(float[] lArr,int lOffset,Float[] rArr,int rOffset,int length)
   {
@@ -20748,7 +22310,7 @@ public interface JunitUtil
     {
       return false;
     }
-    return isEqual(l,(double)r);
+        return isEqual(l,(double)r);
   }
   public static void uncheckedparallelassertarraysAreEqual(float[] lArr,int lOffset,Double[] rArr,int rOffset,int length)
   {
@@ -20886,7 +22448,7 @@ public interface JunitUtil
     {
       return false;
     }
-    return r.equals(l);
+        return r.equals(l);
   }
   public static void uncheckedparallelassertarraysAreEqual(float[] lArr,int lOffset,Object[] rArr,int rOffset,int length)
   {
@@ -21020,7 +22582,7 @@ public interface JunitUtil
   }
   public static boolean isEqual(double l,boolean r)
   {
-    return l==TypeUtil.castToDouble(r);
+        return l==TypeUtil.castToDouble(r);
   }
   public static void uncheckedparallelassertarraysAreEqual(double[] lArr,int lOffset,boolean[] rArr,int rOffset,int length)
   {
@@ -21154,7 +22716,7 @@ public interface JunitUtil
   }
   public static boolean isEqual(double l,byte r)
   {
-    return l==r;
+        return l==r;
   }
   public static void uncheckedparallelassertarraysAreEqual(double[] lArr,int lOffset,byte[] rArr,int rOffset,int length)
   {
@@ -21288,7 +22850,7 @@ public interface JunitUtil
   }
   public static boolean isEqual(double l,char r)
   {
-    return l==r;
+        return l==r;
   }
   public static void uncheckedparallelassertarraysAreEqual(double[] lArr,int lOffset,char[] rArr,int rOffset,int length)
   {
@@ -21422,7 +22984,7 @@ public interface JunitUtil
   }
   public static boolean isEqual(double l,short r)
   {
-    return l==r;
+        return l==r;
   }
   public static void uncheckedparallelassertarraysAreEqual(double[] lArr,int lOffset,short[] rArr,int rOffset,int length)
   {
@@ -21556,7 +23118,7 @@ public interface JunitUtil
   }
   public static boolean isEqual(double l,int r)
   {
-    return l==r;
+        return l==r;
   }
   public static void uncheckedparallelassertarraysAreEqual(double[] lArr,int lOffset,int[] rArr,int rOffset,int length)
   {
@@ -21690,7 +23252,8 @@ public interface JunitUtil
   }
   public static boolean isEqual(double l,long r)
   {
-    return TypeUtil.doubleEquals(l,r);
+        return l==r;
+        //return TypeUtil.doubleEquals(l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(double[] lArr,int lOffset,long[] rArr,int rOffset,int length)
   {
@@ -21824,7 +23387,7 @@ public interface JunitUtil
   }
   public static boolean isEqual(double l,float r)
   {
-    return TypeUtil.doubleEquals(l,r);
+        return TypeUtil.doubleEquals(l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(double[] lArr,int lOffset,float[] rArr,int rOffset,int length)
   {
@@ -21958,7 +23521,8 @@ public interface JunitUtil
   }
   public static boolean isEqual(double l,double r)
   {
-    return TypeUtil.doubleEquals(r,l);
+          return TypeUtil.doubleEquals(r,l);
+        //return TypeUtil.doubleEquals(r,l);
   }
   public static void uncheckedparallelassertarraysAreEqual(double[] lArr,int lOffset,double[] rArr,int rOffset,int length)
   {
@@ -22096,7 +23660,7 @@ public interface JunitUtil
     {
       return false;
     }
-    return isEqual(l,(boolean)r);
+        return isEqual(l,(boolean)r);
   }
   public static void uncheckedparallelassertarraysAreEqual(double[] lArr,int lOffset,Boolean[] rArr,int rOffset,int length)
   {
@@ -22234,7 +23798,7 @@ public interface JunitUtil
     {
       return false;
     }
-    return isEqual(l,(byte)r);
+        return isEqual(l,(byte)r);
   }
   public static void uncheckedparallelassertarraysAreEqual(double[] lArr,int lOffset,Byte[] rArr,int rOffset,int length)
   {
@@ -22372,7 +23936,7 @@ public interface JunitUtil
     {
       return false;
     }
-    return isEqual(l,(char)r);
+        return isEqual(l,(char)r);
   }
   public static void uncheckedparallelassertarraysAreEqual(double[] lArr,int lOffset,Character[] rArr,int rOffset,int length)
   {
@@ -22510,7 +24074,7 @@ public interface JunitUtil
     {
       return false;
     }
-    return isEqual(l,(short)r);
+        return isEqual(l,(short)r);
   }
   public static void uncheckedparallelassertarraysAreEqual(double[] lArr,int lOffset,Short[] rArr,int rOffset,int length)
   {
@@ -22648,7 +24212,7 @@ public interface JunitUtil
     {
       return false;
     }
-    return isEqual(l,(int)r);
+        return isEqual(l,(int)r);
   }
   public static void uncheckedparallelassertarraysAreEqual(double[] lArr,int lOffset,Integer[] rArr,int rOffset,int length)
   {
@@ -22786,7 +24350,7 @@ public interface JunitUtil
     {
       return false;
     }
-    return isEqual(l,(long)r);
+        return isEqual(l,(long)r);
   }
   public static void uncheckedparallelassertarraysAreEqual(double[] lArr,int lOffset,Long[] rArr,int rOffset,int length)
   {
@@ -22924,7 +24488,7 @@ public interface JunitUtil
     {
       return false;
     }
-    return isEqual(l,(float)r);
+        return isEqual(l,(float)r);
   }
   public static void uncheckedparallelassertarraysAreEqual(double[] lArr,int lOffset,Float[] rArr,int rOffset,int length)
   {
@@ -23062,7 +24626,7 @@ public interface JunitUtil
     {
       return false;
     }
-    return isEqual(l,(double)r);
+        return isEqual(l,(double)r);
   }
   public static void uncheckedparallelassertarraysAreEqual(double[] lArr,int lOffset,Double[] rArr,int rOffset,int length)
   {
@@ -23200,7 +24764,7 @@ public interface JunitUtil
     {
       return false;
     }
-    return r.equals(l);
+        return r.equals(l);
   }
   public static void uncheckedparallelassertarraysAreEqual(double[] lArr,int lOffset,Object[] rArr,int rOffset,int length)
   {
@@ -23336,9 +24900,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return false;
+        return false;
     }
-    return isEqual((boolean)l,r);
+      return isEqual((boolean)l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Boolean[] lArr,int lOffset,boolean[] rArr,int rOffset,int length)
   {
@@ -23474,9 +25038,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return false;
+        return false;
     }
-    return isEqual((boolean)l,r);
+      return isEqual((boolean)l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Boolean[] lArr,int lOffset,byte[] rArr,int rOffset,int length)
   {
@@ -23612,9 +25176,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return false;
+        return false;
     }
-    return isEqual((boolean)l,r);
+      return isEqual((boolean)l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Boolean[] lArr,int lOffset,char[] rArr,int rOffset,int length)
   {
@@ -23750,9 +25314,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return false;
+        return false;
     }
-    return isEqual((boolean)l,r);
+      return isEqual((boolean)l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Boolean[] lArr,int lOffset,short[] rArr,int rOffset,int length)
   {
@@ -23888,9 +25452,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return false;
+        return false;
     }
-    return isEqual((boolean)l,r);
+      return isEqual((boolean)l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Boolean[] lArr,int lOffset,int[] rArr,int rOffset,int length)
   {
@@ -24026,9 +25590,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return false;
+        return false;
     }
-    return isEqual((boolean)l,r);
+      return isEqual((boolean)l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Boolean[] lArr,int lOffset,long[] rArr,int rOffset,int length)
   {
@@ -24164,9 +25728,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return false;
+        return false;
     }
-    return isEqual((boolean)l,r);
+      return isEqual((boolean)l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Boolean[] lArr,int lOffset,float[] rArr,int rOffset,int length)
   {
@@ -24302,9 +25866,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return false;
+        return false;
     }
-    return isEqual((boolean)l,r);
+      return isEqual((boolean)l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Boolean[] lArr,int lOffset,double[] rArr,int rOffset,int length)
   {
@@ -24440,9 +26004,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return r==null;
+        return r==null;
     }
-    return isEqual((boolean)l,r);
+      return isEqual((boolean)l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Boolean[] lArr,int lOffset,Boolean[] rArr,int rOffset,int length)
   {
@@ -24578,9 +26142,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return r==null;
+        return r==null;
     }
-    return isEqual((boolean)l,r);
+      return isEqual((boolean)l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Boolean[] lArr,int lOffset,Byte[] rArr,int rOffset,int length)
   {
@@ -24716,9 +26280,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return r==null;
+        return r==null;
     }
-    return isEqual((boolean)l,r);
+      return isEqual((boolean)l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Boolean[] lArr,int lOffset,Character[] rArr,int rOffset,int length)
   {
@@ -24854,9 +26418,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return r==null;
+        return r==null;
     }
-    return isEqual((boolean)l,r);
+      return isEqual((boolean)l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Boolean[] lArr,int lOffset,Short[] rArr,int rOffset,int length)
   {
@@ -24992,9 +26556,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return r==null;
+        return r==null;
     }
-    return isEqual((boolean)l,r);
+      return isEqual((boolean)l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Boolean[] lArr,int lOffset,Integer[] rArr,int rOffset,int length)
   {
@@ -25130,9 +26694,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return r==null;
+        return r==null;
     }
-    return isEqual((boolean)l,r);
+      return isEqual((boolean)l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Boolean[] lArr,int lOffset,Long[] rArr,int rOffset,int length)
   {
@@ -25268,9 +26832,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return r==null;
+        return r==null;
     }
-    return isEqual((boolean)l,r);
+      return isEqual((boolean)l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Boolean[] lArr,int lOffset,Float[] rArr,int rOffset,int length)
   {
@@ -25406,9 +26970,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return r==null;
+        return r==null;
     }
-    return isEqual((boolean)l,r);
+      return isEqual((boolean)l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Boolean[] lArr,int lOffset,Double[] rArr,int rOffset,int length)
   {
@@ -25544,9 +27108,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return r==null;
+        return r==null;
     }
-    return isEqual((boolean)l,r);
+      return isEqual((boolean)l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Boolean[] lArr,int lOffset,Object[] rArr,int rOffset,int length)
   {
@@ -25682,9 +27246,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return false;
+        return false;
     }
-    return isEqual((byte)l,r);
+      return isEqual((byte)l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Byte[] lArr,int lOffset,boolean[] rArr,int rOffset,int length)
   {
@@ -25820,9 +27384,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return false;
+        return false;
     }
-    return isEqual((byte)l,r);
+      return isEqual((byte)l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Byte[] lArr,int lOffset,byte[] rArr,int rOffset,int length)
   {
@@ -25958,9 +27522,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return false;
+        return false;
     }
-    return isEqual((byte)l,r);
+      return isEqual((byte)l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Byte[] lArr,int lOffset,char[] rArr,int rOffset,int length)
   {
@@ -26096,9 +27660,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return false;
+        return false;
     }
-    return isEqual((byte)l,r);
+      return isEqual((byte)l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Byte[] lArr,int lOffset,short[] rArr,int rOffset,int length)
   {
@@ -26234,9 +27798,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return false;
+        return false;
     }
-    return isEqual((byte)l,r);
+      return isEqual((byte)l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Byte[] lArr,int lOffset,int[] rArr,int rOffset,int length)
   {
@@ -26372,9 +27936,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return false;
+        return false;
     }
-    return isEqual((byte)l,r);
+      return isEqual((byte)l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Byte[] lArr,int lOffset,long[] rArr,int rOffset,int length)
   {
@@ -26510,9 +28074,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return false;
+        return false;
     }
-    return isEqual((byte)l,r);
+      return isEqual((byte)l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Byte[] lArr,int lOffset,float[] rArr,int rOffset,int length)
   {
@@ -26648,9 +28212,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return false;
+        return false;
     }
-    return isEqual((byte)l,r);
+      return isEqual((byte)l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Byte[] lArr,int lOffset,double[] rArr,int rOffset,int length)
   {
@@ -26786,9 +28350,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return r==null;
+        return r==null;
     }
-    return isEqual((byte)l,r);
+      return isEqual((byte)l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Byte[] lArr,int lOffset,Boolean[] rArr,int rOffset,int length)
   {
@@ -26924,9 +28488,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return r==null;
+        return r==null;
     }
-    return isEqual((byte)l,r);
+      return isEqual((byte)l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Byte[] lArr,int lOffset,Byte[] rArr,int rOffset,int length)
   {
@@ -27062,9 +28626,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return r==null;
+        return r==null;
     }
-    return isEqual((byte)l,r);
+      return isEqual((byte)l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Byte[] lArr,int lOffset,Character[] rArr,int rOffset,int length)
   {
@@ -27200,9 +28764,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return r==null;
+        return r==null;
     }
-    return isEqual((byte)l,r);
+      return isEqual((byte)l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Byte[] lArr,int lOffset,Short[] rArr,int rOffset,int length)
   {
@@ -27338,9 +28902,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return r==null;
+        return r==null;
     }
-    return isEqual((byte)l,r);
+      return isEqual((byte)l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Byte[] lArr,int lOffset,Integer[] rArr,int rOffset,int length)
   {
@@ -27476,9 +29040,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return r==null;
+        return r==null;
     }
-    return isEqual((byte)l,r);
+      return isEqual((byte)l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Byte[] lArr,int lOffset,Long[] rArr,int rOffset,int length)
   {
@@ -27614,9 +29178,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return r==null;
+        return r==null;
     }
-    return isEqual((byte)l,r);
+      return isEqual((byte)l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Byte[] lArr,int lOffset,Float[] rArr,int rOffset,int length)
   {
@@ -27752,9 +29316,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return r==null;
+        return r==null;
     }
-    return isEqual((byte)l,r);
+      return isEqual((byte)l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Byte[] lArr,int lOffset,Double[] rArr,int rOffset,int length)
   {
@@ -27890,9 +29454,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return r==null;
+        return r==null;
     }
-    return isEqual((byte)l,r);
+      return isEqual((byte)l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Byte[] lArr,int lOffset,Object[] rArr,int rOffset,int length)
   {
@@ -28028,9 +29592,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return false;
+        return false;
     }
-    return isEqual((char)l,r);
+      return isEqual((char)l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Character[] lArr,int lOffset,boolean[] rArr,int rOffset,int length)
   {
@@ -28166,9 +29730,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return false;
+        return false;
     }
-    return isEqual((char)l,r);
+      return isEqual((char)l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Character[] lArr,int lOffset,byte[] rArr,int rOffset,int length)
   {
@@ -28304,9 +29868,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return false;
+        return false;
     }
-    return isEqual((char)l,r);
+      return isEqual((char)l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Character[] lArr,int lOffset,char[] rArr,int rOffset,int length)
   {
@@ -28442,9 +30006,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return false;
+        return false;
     }
-    return isEqual((char)l,r);
+      return isEqual((char)l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Character[] lArr,int lOffset,short[] rArr,int rOffset,int length)
   {
@@ -28580,9 +30144,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return false;
+        return false;
     }
-    return isEqual((char)l,r);
+      return isEqual((char)l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Character[] lArr,int lOffset,int[] rArr,int rOffset,int length)
   {
@@ -28718,9 +30282,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return false;
+        return false;
     }
-    return isEqual((char)l,r);
+      return isEqual((char)l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Character[] lArr,int lOffset,long[] rArr,int rOffset,int length)
   {
@@ -28856,9 +30420,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return false;
+        return false;
     }
-    return isEqual((char)l,r);
+      return isEqual((char)l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Character[] lArr,int lOffset,float[] rArr,int rOffset,int length)
   {
@@ -28994,9 +30558,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return false;
+        return false;
     }
-    return isEqual((char)l,r);
+      return isEqual((char)l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Character[] lArr,int lOffset,double[] rArr,int rOffset,int length)
   {
@@ -29132,9 +30696,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return r==null;
+        return r==null;
     }
-    return isEqual((char)l,r);
+      return isEqual((char)l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Character[] lArr,int lOffset,Boolean[] rArr,int rOffset,int length)
   {
@@ -29270,9 +30834,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return r==null;
+        return r==null;
     }
-    return isEqual((char)l,r);
+      return isEqual((char)l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Character[] lArr,int lOffset,Byte[] rArr,int rOffset,int length)
   {
@@ -29408,9 +30972,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return r==null;
+        return r==null;
     }
-    return isEqual((char)l,r);
+      return isEqual((char)l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Character[] lArr,int lOffset,Character[] rArr,int rOffset,int length)
   {
@@ -29546,9 +31110,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return r==null;
+        return r==null;
     }
-    return isEqual((char)l,r);
+      return isEqual((char)l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Character[] lArr,int lOffset,Short[] rArr,int rOffset,int length)
   {
@@ -29684,9 +31248,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return r==null;
+        return r==null;
     }
-    return isEqual((char)l,r);
+      return isEqual((char)l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Character[] lArr,int lOffset,Integer[] rArr,int rOffset,int length)
   {
@@ -29822,9 +31386,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return r==null;
+        return r==null;
     }
-    return isEqual((char)l,r);
+      return isEqual((char)l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Character[] lArr,int lOffset,Long[] rArr,int rOffset,int length)
   {
@@ -29960,9 +31524,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return r==null;
+        return r==null;
     }
-    return isEqual((char)l,r);
+      return isEqual((char)l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Character[] lArr,int lOffset,Float[] rArr,int rOffset,int length)
   {
@@ -30098,9 +31662,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return r==null;
+        return r==null;
     }
-    return isEqual((char)l,r);
+      return isEqual((char)l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Character[] lArr,int lOffset,Double[] rArr,int rOffset,int length)
   {
@@ -30236,9 +31800,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return r==null;
+        return r==null;
     }
-    return isEqual((char)l,r);
+      return isEqual((char)l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Character[] lArr,int lOffset,Object[] rArr,int rOffset,int length)
   {
@@ -30374,9 +31938,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return false;
+        return false;
     }
-    return isEqual((short)l,r);
+      return isEqual((short)l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Short[] lArr,int lOffset,boolean[] rArr,int rOffset,int length)
   {
@@ -30512,9 +32076,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return false;
+        return false;
     }
-    return isEqual((short)l,r);
+      return isEqual((short)l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Short[] lArr,int lOffset,byte[] rArr,int rOffset,int length)
   {
@@ -30650,9 +32214,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return false;
+        return false;
     }
-    return isEqual((short)l,r);
+      return isEqual((short)l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Short[] lArr,int lOffset,char[] rArr,int rOffset,int length)
   {
@@ -30788,9 +32352,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return false;
+        return false;
     }
-    return isEqual((short)l,r);
+      return isEqual((short)l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Short[] lArr,int lOffset,short[] rArr,int rOffset,int length)
   {
@@ -30926,9 +32490,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return false;
+        return false;
     }
-    return isEqual((short)l,r);
+      return isEqual((short)l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Short[] lArr,int lOffset,int[] rArr,int rOffset,int length)
   {
@@ -31064,9 +32628,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return false;
+        return false;
     }
-    return isEqual((short)l,r);
+      return isEqual((short)l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Short[] lArr,int lOffset,long[] rArr,int rOffset,int length)
   {
@@ -31202,9 +32766,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return false;
+        return false;
     }
-    return isEqual((short)l,r);
+      return isEqual((short)l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Short[] lArr,int lOffset,float[] rArr,int rOffset,int length)
   {
@@ -31340,9 +32904,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return false;
+        return false;
     }
-    return isEqual((short)l,r);
+      return isEqual((short)l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Short[] lArr,int lOffset,double[] rArr,int rOffset,int length)
   {
@@ -31478,9 +33042,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return r==null;
+        return r==null;
     }
-    return isEqual((short)l,r);
+      return isEqual((short)l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Short[] lArr,int lOffset,Boolean[] rArr,int rOffset,int length)
   {
@@ -31616,9 +33180,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return r==null;
+        return r==null;
     }
-    return isEqual((short)l,r);
+      return isEqual((short)l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Short[] lArr,int lOffset,Byte[] rArr,int rOffset,int length)
   {
@@ -31754,9 +33318,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return r==null;
+        return r==null;
     }
-    return isEqual((short)l,r);
+      return isEqual((short)l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Short[] lArr,int lOffset,Character[] rArr,int rOffset,int length)
   {
@@ -31892,9 +33456,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return r==null;
+        return r==null;
     }
-    return isEqual((short)l,r);
+      return isEqual((short)l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Short[] lArr,int lOffset,Short[] rArr,int rOffset,int length)
   {
@@ -32030,9 +33594,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return r==null;
+        return r==null;
     }
-    return isEqual((short)l,r);
+      return isEqual((short)l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Short[] lArr,int lOffset,Integer[] rArr,int rOffset,int length)
   {
@@ -32168,9 +33732,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return r==null;
+        return r==null;
     }
-    return isEqual((short)l,r);
+      return isEqual((short)l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Short[] lArr,int lOffset,Long[] rArr,int rOffset,int length)
   {
@@ -32306,9 +33870,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return r==null;
+        return r==null;
     }
-    return isEqual((short)l,r);
+      return isEqual((short)l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Short[] lArr,int lOffset,Float[] rArr,int rOffset,int length)
   {
@@ -32444,9 +34008,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return r==null;
+        return r==null;
     }
-    return isEqual((short)l,r);
+      return isEqual((short)l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Short[] lArr,int lOffset,Double[] rArr,int rOffset,int length)
   {
@@ -32582,9 +34146,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return r==null;
+        return r==null;
     }
-    return isEqual((short)l,r);
+      return isEqual((short)l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Short[] lArr,int lOffset,Object[] rArr,int rOffset,int length)
   {
@@ -32720,9 +34284,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return false;
+        return false;
     }
-    return isEqual((int)l,r);
+      return isEqual((int)l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Integer[] lArr,int lOffset,boolean[] rArr,int rOffset,int length)
   {
@@ -32858,9 +34422,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return false;
+        return false;
     }
-    return isEqual((int)l,r);
+      return isEqual((int)l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Integer[] lArr,int lOffset,byte[] rArr,int rOffset,int length)
   {
@@ -32996,9 +34560,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return false;
+        return false;
     }
-    return isEqual((int)l,r);
+      return isEqual((int)l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Integer[] lArr,int lOffset,char[] rArr,int rOffset,int length)
   {
@@ -33134,9 +34698,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return false;
+        return false;
     }
-    return isEqual((int)l,r);
+      return isEqual((int)l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Integer[] lArr,int lOffset,short[] rArr,int rOffset,int length)
   {
@@ -33272,9 +34836,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return false;
+        return false;
     }
-    return isEqual((int)l,r);
+      return isEqual((int)l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Integer[] lArr,int lOffset,int[] rArr,int rOffset,int length)
   {
@@ -33410,9 +34974,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return false;
+        return false;
     }
-    return isEqual((int)l,r);
+      return isEqual((int)l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Integer[] lArr,int lOffset,long[] rArr,int rOffset,int length)
   {
@@ -33548,9 +35112,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return false;
+        return false;
     }
-    return isEqual((int)l,r);
+      return isEqual((int)l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Integer[] lArr,int lOffset,float[] rArr,int rOffset,int length)
   {
@@ -33686,9 +35250,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return false;
+        return false;
     }
-    return isEqual((int)l,r);
+      return isEqual((int)l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Integer[] lArr,int lOffset,double[] rArr,int rOffset,int length)
   {
@@ -33824,9 +35388,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return r==null;
+        return r==null;
     }
-    return isEqual((int)l,r);
+      return isEqual((int)l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Integer[] lArr,int lOffset,Boolean[] rArr,int rOffset,int length)
   {
@@ -33962,9 +35526,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return r==null;
+        return r==null;
     }
-    return isEqual((int)l,r);
+      return isEqual((int)l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Integer[] lArr,int lOffset,Byte[] rArr,int rOffset,int length)
   {
@@ -34100,9 +35664,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return r==null;
+        return r==null;
     }
-    return isEqual((int)l,r);
+      return isEqual((int)l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Integer[] lArr,int lOffset,Character[] rArr,int rOffset,int length)
   {
@@ -34238,9 +35802,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return r==null;
+        return r==null;
     }
-    return isEqual((int)l,r);
+      return isEqual((int)l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Integer[] lArr,int lOffset,Short[] rArr,int rOffset,int length)
   {
@@ -34376,9 +35940,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return r==null;
+        return r==null;
     }
-    return isEqual((int)l,r);
+      return isEqual((int)l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Integer[] lArr,int lOffset,Integer[] rArr,int rOffset,int length)
   {
@@ -34514,9 +36078,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return r==null;
+        return r==null;
     }
-    return isEqual((int)l,r);
+      return isEqual((int)l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Integer[] lArr,int lOffset,Long[] rArr,int rOffset,int length)
   {
@@ -34652,9 +36216,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return r==null;
+        return r==null;
     }
-    return isEqual((int)l,r);
+      return isEqual((int)l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Integer[] lArr,int lOffset,Float[] rArr,int rOffset,int length)
   {
@@ -34790,9 +36354,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return r==null;
+        return r==null;
     }
-    return isEqual((int)l,r);
+      return isEqual((int)l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Integer[] lArr,int lOffset,Double[] rArr,int rOffset,int length)
   {
@@ -34928,9 +36492,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return r==null;
+        return r==null;
     }
-    return isEqual((int)l,r);
+      return isEqual((int)l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Integer[] lArr,int lOffset,Object[] rArr,int rOffset,int length)
   {
@@ -35066,9 +36630,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return false;
+        return false;
     }
-    return isEqual((long)l,r);
+      return isEqual((long)l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Long[] lArr,int lOffset,boolean[] rArr,int rOffset,int length)
   {
@@ -35204,9 +36768,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return false;
+        return false;
     }
-    return isEqual((long)l,r);
+      return isEqual((long)l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Long[] lArr,int lOffset,byte[] rArr,int rOffset,int length)
   {
@@ -35342,9 +36906,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return false;
+        return false;
     }
-    return isEqual((long)l,r);
+      return isEqual((long)l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Long[] lArr,int lOffset,char[] rArr,int rOffset,int length)
   {
@@ -35480,9 +37044,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return false;
+        return false;
     }
-    return isEqual((long)l,r);
+      return isEqual((long)l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Long[] lArr,int lOffset,short[] rArr,int rOffset,int length)
   {
@@ -35618,9 +37182,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return false;
+        return false;
     }
-    return isEqual((long)l,r);
+      return isEqual((long)l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Long[] lArr,int lOffset,int[] rArr,int rOffset,int length)
   {
@@ -35756,9 +37320,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return false;
+        return false;
     }
-    return isEqual((long)l,r);
+      return isEqual((long)l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Long[] lArr,int lOffset,long[] rArr,int rOffset,int length)
   {
@@ -35894,9 +37458,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return false;
+        return false;
     }
-    return isEqual((long)l,r);
+      return isEqual((long)l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Long[] lArr,int lOffset,float[] rArr,int rOffset,int length)
   {
@@ -36032,9 +37596,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return false;
+        return false;
     }
-    return isEqual((long)l,r);
+      return isEqual((long)l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Long[] lArr,int lOffset,double[] rArr,int rOffset,int length)
   {
@@ -36170,9 +37734,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return r==null;
+        return r==null;
     }
-    return isEqual((long)l,r);
+      return isEqual((long)l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Long[] lArr,int lOffset,Boolean[] rArr,int rOffset,int length)
   {
@@ -36308,9 +37872,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return r==null;
+        return r==null;
     }
-    return isEqual((long)l,r);
+      return isEqual((long)l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Long[] lArr,int lOffset,Byte[] rArr,int rOffset,int length)
   {
@@ -36446,9 +38010,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return r==null;
+        return r==null;
     }
-    return isEqual((long)l,r);
+      return isEqual((long)l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Long[] lArr,int lOffset,Character[] rArr,int rOffset,int length)
   {
@@ -36584,9 +38148,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return r==null;
+        return r==null;
     }
-    return isEqual((long)l,r);
+      return isEqual((long)l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Long[] lArr,int lOffset,Short[] rArr,int rOffset,int length)
   {
@@ -36722,9 +38286,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return r==null;
+        return r==null;
     }
-    return isEqual((long)l,r);
+      return isEqual((long)l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Long[] lArr,int lOffset,Integer[] rArr,int rOffset,int length)
   {
@@ -36860,9 +38424,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return r==null;
+        return r==null;
     }
-    return isEqual((long)l,r);
+      return isEqual((long)l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Long[] lArr,int lOffset,Long[] rArr,int rOffset,int length)
   {
@@ -36998,9 +38562,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return r==null;
+        return r==null;
     }
-    return isEqual((long)l,r);
+      return isEqual((long)l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Long[] lArr,int lOffset,Float[] rArr,int rOffset,int length)
   {
@@ -37136,9 +38700,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return r==null;
+        return r==null;
     }
-    return isEqual((long)l,r);
+      return isEqual((long)l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Long[] lArr,int lOffset,Double[] rArr,int rOffset,int length)
   {
@@ -37274,9 +38838,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return r==null;
+        return r==null;
     }
-    return isEqual((long)l,r);
+      return isEqual((long)l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Long[] lArr,int lOffset,Object[] rArr,int rOffset,int length)
   {
@@ -37412,9 +38976,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return false;
+        return false;
     }
-    return isEqual((float)l,r);
+      return isEqual((float)l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Float[] lArr,int lOffset,boolean[] rArr,int rOffset,int length)
   {
@@ -37550,9 +39114,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return false;
+        return false;
     }
-    return isEqual((float)l,r);
+      return isEqual((float)l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Float[] lArr,int lOffset,byte[] rArr,int rOffset,int length)
   {
@@ -37688,9 +39252,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return false;
+        return false;
     }
-    return isEqual((float)l,r);
+      return isEqual((float)l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Float[] lArr,int lOffset,char[] rArr,int rOffset,int length)
   {
@@ -37826,9 +39390,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return false;
+        return false;
     }
-    return isEqual((float)l,r);
+      return isEqual((float)l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Float[] lArr,int lOffset,short[] rArr,int rOffset,int length)
   {
@@ -37964,9 +39528,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return false;
+        return false;
     }
-    return isEqual((float)l,r);
+      return isEqual((float)l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Float[] lArr,int lOffset,int[] rArr,int rOffset,int length)
   {
@@ -38102,9 +39666,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return false;
+        return false;
     }
-    return isEqual((float)l,r);
+      return isEqual((float)l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Float[] lArr,int lOffset,long[] rArr,int rOffset,int length)
   {
@@ -38240,9 +39804,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return false;
+        return false;
     }
-    return isEqual((float)l,r);
+      return isEqual((float)l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Float[] lArr,int lOffset,float[] rArr,int rOffset,int length)
   {
@@ -38378,9 +39942,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return false;
+        return false;
     }
-    return isEqual((float)l,r);
+      return isEqual((float)l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Float[] lArr,int lOffset,double[] rArr,int rOffset,int length)
   {
@@ -38516,9 +40080,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return r==null;
+        return r==null;
     }
-    return isEqual((float)l,r);
+      return isEqual((float)l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Float[] lArr,int lOffset,Boolean[] rArr,int rOffset,int length)
   {
@@ -38654,9 +40218,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return r==null;
+        return r==null;
     }
-    return isEqual((float)l,r);
+      return isEqual((float)l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Float[] lArr,int lOffset,Byte[] rArr,int rOffset,int length)
   {
@@ -38792,9 +40356,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return r==null;
+        return r==null;
     }
-    return isEqual((float)l,r);
+      return isEqual((float)l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Float[] lArr,int lOffset,Character[] rArr,int rOffset,int length)
   {
@@ -38930,9 +40494,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return r==null;
+        return r==null;
     }
-    return isEqual((float)l,r);
+      return isEqual((float)l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Float[] lArr,int lOffset,Short[] rArr,int rOffset,int length)
   {
@@ -39068,9 +40632,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return r==null;
+        return r==null;
     }
-    return isEqual((float)l,r);
+      return isEqual((float)l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Float[] lArr,int lOffset,Integer[] rArr,int rOffset,int length)
   {
@@ -39206,9 +40770,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return r==null;
+        return r==null;
     }
-    return isEqual((float)l,r);
+      return isEqual((float)l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Float[] lArr,int lOffset,Long[] rArr,int rOffset,int length)
   {
@@ -39344,9 +40908,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return r==null;
+        return r==null;
     }
-    return isEqual((float)l,r);
+      return isEqual((float)l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Float[] lArr,int lOffset,Float[] rArr,int rOffset,int length)
   {
@@ -39482,9 +41046,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return r==null;
+        return r==null;
     }
-    return isEqual((float)l,r);
+      return isEqual((float)l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Float[] lArr,int lOffset,Double[] rArr,int rOffset,int length)
   {
@@ -39620,9 +41184,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return r==null;
+        return r==null;
     }
-    return isEqual((float)l,r);
+      return isEqual((float)l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Float[] lArr,int lOffset,Object[] rArr,int rOffset,int length)
   {
@@ -39758,9 +41322,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return false;
+        return false;
     }
-    return isEqual((double)l,r);
+      return isEqual((double)l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Double[] lArr,int lOffset,boolean[] rArr,int rOffset,int length)
   {
@@ -39896,9 +41460,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return false;
+        return false;
     }
-    return isEqual((double)l,r);
+      return isEqual((double)l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Double[] lArr,int lOffset,byte[] rArr,int rOffset,int length)
   {
@@ -40034,9 +41598,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return false;
+        return false;
     }
-    return isEqual((double)l,r);
+      return isEqual((double)l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Double[] lArr,int lOffset,char[] rArr,int rOffset,int length)
   {
@@ -40172,9 +41736,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return false;
+        return false;
     }
-    return isEqual((double)l,r);
+      return isEqual((double)l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Double[] lArr,int lOffset,short[] rArr,int rOffset,int length)
   {
@@ -40310,9 +41874,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return false;
+        return false;
     }
-    return isEqual((double)l,r);
+      return isEqual((double)l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Double[] lArr,int lOffset,int[] rArr,int rOffset,int length)
   {
@@ -40448,9 +42012,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return false;
+        return false;
     }
-    return isEqual((double)l,r);
+      return isEqual((double)l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Double[] lArr,int lOffset,long[] rArr,int rOffset,int length)
   {
@@ -40586,9 +42150,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return false;
+        return false;
     }
-    return isEqual((double)l,r);
+      return isEqual((double)l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Double[] lArr,int lOffset,float[] rArr,int rOffset,int length)
   {
@@ -40724,9 +42288,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return false;
+        return false;
     }
-    return isEqual((double)l,r);
+      return isEqual((double)l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Double[] lArr,int lOffset,double[] rArr,int rOffset,int length)
   {
@@ -40862,9 +42426,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return r==null;
+        return r==null;
     }
-    return isEqual((double)l,r);
+      return isEqual((double)l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Double[] lArr,int lOffset,Boolean[] rArr,int rOffset,int length)
   {
@@ -41000,9 +42564,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return r==null;
+        return r==null;
     }
-    return isEqual((double)l,r);
+      return isEqual((double)l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Double[] lArr,int lOffset,Byte[] rArr,int rOffset,int length)
   {
@@ -41138,9 +42702,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return r==null;
+        return r==null;
     }
-    return isEqual((double)l,r);
+      return isEqual((double)l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Double[] lArr,int lOffset,Character[] rArr,int rOffset,int length)
   {
@@ -41276,9 +42840,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return r==null;
+        return r==null;
     }
-    return isEqual((double)l,r);
+      return isEqual((double)l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Double[] lArr,int lOffset,Short[] rArr,int rOffset,int length)
   {
@@ -41414,9 +42978,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return r==null;
+        return r==null;
     }
-    return isEqual((double)l,r);
+      return isEqual((double)l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Double[] lArr,int lOffset,Integer[] rArr,int rOffset,int length)
   {
@@ -41552,9 +43116,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return r==null;
+        return r==null;
     }
-    return isEqual((double)l,r);
+      return isEqual((double)l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Double[] lArr,int lOffset,Long[] rArr,int rOffset,int length)
   {
@@ -41690,9 +43254,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return r==null;
+        return r==null;
     }
-    return isEqual((double)l,r);
+      return isEqual((double)l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Double[] lArr,int lOffset,Float[] rArr,int rOffset,int length)
   {
@@ -41828,9 +43392,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return r==null;
+        return r==null;
     }
-    return isEqual((double)l,r);
+      return isEqual((double)l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Double[] lArr,int lOffset,Double[] rArr,int rOffset,int length)
   {
@@ -41966,9 +43530,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return r==null;
+        return r==null;
     }
-    return isEqual((double)l,r);
+      return isEqual((double)l,r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Double[] lArr,int lOffset,Object[] rArr,int rOffset,int length)
   {
@@ -42104,9 +43668,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return false;
+        return false;
     }
-    return l.equals(r);
+      return l.equals(r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Object[] lArr,int lOffset,boolean[] rArr,int rOffset,int length)
   {
@@ -42242,9 +43806,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return false;
+        return false;
     }
-    return l.equals(r);
+      return l.equals(r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Object[] lArr,int lOffset,byte[] rArr,int rOffset,int length)
   {
@@ -42380,9 +43944,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return false;
+        return false;
     }
-    return l.equals(r);
+      return l.equals(r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Object[] lArr,int lOffset,char[] rArr,int rOffset,int length)
   {
@@ -42518,9 +44082,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return false;
+        return false;
     }
-    return l.equals(r);
+      return l.equals(r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Object[] lArr,int lOffset,short[] rArr,int rOffset,int length)
   {
@@ -42656,9 +44220,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return false;
+        return false;
     }
-    return l.equals(r);
+      return l.equals(r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Object[] lArr,int lOffset,int[] rArr,int rOffset,int length)
   {
@@ -42794,9 +44358,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return false;
+        return false;
     }
-    return l.equals(r);
+      return l.equals(r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Object[] lArr,int lOffset,long[] rArr,int rOffset,int length)
   {
@@ -42932,9 +44496,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return false;
+        return false;
     }
-    return l.equals(r);
+      return l.equals(r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Object[] lArr,int lOffset,float[] rArr,int rOffset,int length)
   {
@@ -43070,9 +44634,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return false;
+        return false;
     }
-    return l.equals(r);
+      return l.equals(r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Object[] lArr,int lOffset,double[] rArr,int rOffset,int length)
   {
@@ -43208,9 +44772,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return r==null;
+        return r==null;
     }
-    return l.equals(r);
+      return l.equals(r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Object[] lArr,int lOffset,Boolean[] rArr,int rOffset,int length)
   {
@@ -43346,9 +44910,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return r==null;
+        return r==null;
     }
-    return l.equals(r);
+      return l.equals(r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Object[] lArr,int lOffset,Byte[] rArr,int rOffset,int length)
   {
@@ -43484,9 +45048,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return r==null;
+        return r==null;
     }
-    return l.equals(r);
+      return l.equals(r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Object[] lArr,int lOffset,Character[] rArr,int rOffset,int length)
   {
@@ -43622,9 +45186,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return r==null;
+        return r==null;
     }
-    return l.equals(r);
+      return l.equals(r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Object[] lArr,int lOffset,Short[] rArr,int rOffset,int length)
   {
@@ -43760,9 +45324,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return r==null;
+        return r==null;
     }
-    return l.equals(r);
+      return l.equals(r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Object[] lArr,int lOffset,Integer[] rArr,int rOffset,int length)
   {
@@ -43898,9 +45462,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return r==null;
+        return r==null;
     }
-    return l.equals(r);
+      return l.equals(r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Object[] lArr,int lOffset,Long[] rArr,int rOffset,int length)
   {
@@ -44036,9 +45600,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return r==null;
+        return r==null;
     }
-    return l.equals(r);
+      return l.equals(r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Object[] lArr,int lOffset,Float[] rArr,int rOffset,int length)
   {
@@ -44174,9 +45738,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return r==null;
+        return r==null;
     }
-    return l.equals(r);
+      return l.equals(r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Object[] lArr,int lOffset,Double[] rArr,int rOffset,int length)
   {
@@ -44312,9 +45876,9 @@ public interface JunitUtil
   {
     if(l==null)
     {
-      return r==null;
+        return r==null;
     }
-    return l.equals(r);
+      return l.equals(r);
   }
   public static void uncheckedparallelassertarraysAreEqual(Object[] lArr,int lOffset,Object[] rArr,int rOffset,int length)
   {

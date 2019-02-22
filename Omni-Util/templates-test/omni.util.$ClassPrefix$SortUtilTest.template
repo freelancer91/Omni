@@ -1,0 +1,758 @@
+#TYPEDEF OfBoolean
+#TYPEDEF OfByte
+#TYPEDEF OfChar
+#TYPEDEF OfShort
+#TYPEDEF OfInt
+#TYPEDEF OfLong
+#TYPEDEF OfFloat
+#TYPEDEF OfDouble
+#TYPEDEF OfRef
+package omni.util;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
+import org.junit.jupiter.api.Order;
+import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.Random;
+
+#IF OfRef
+import java.util.Comparator;
+#ELSEIF OfInt
+import java.util.function.$Comparator$;
+#ELSE
+import omni.function.$Comparator$;
+#ENDIF
+
+@TestMethodOrder(OrderAnnotation.class)
+public class $ClassPrefix$SortUtilTest
+{
+  private static final boolean LONGRUN=true;
+  
+  private static final int[] lengths;
+  private static final long[] randSeeds;
+  private static final ArrayList<TestData> TEST_DATA=new ArrayList<>();
+  static
+  {
+   if(LONGRUN)
+    {
+      lengths=new int[]{2, 3, 5, 8, 13, 21, 34, 55, 100, 1000, 10000, 100000, 1000000};
+      randSeeds=new long[]{666L,0xC0FFEEL,999L};
+    }
+    else
+    {
+      lengths=new int[]{2, 3, 21, 55, 1000, 10000};
+      randSeeds=new long[]{666};
+    }
+  }
+  private static long TIMER;
+  @BeforeAll
+  public static void startTimer()
+  {
+    TIMER=System.currentTimeMillis();
+  }
+
+#IF OfRef
+  #MACRO JunitImpl<Integer,int>()
+#ELSEIF OfBoolean
+  #MACRO JunitImpl<boolean,Boolean>()
+#ELSE
+  #MACRO JunitImpl<$ArrayType$,$ArrayType$>()
+#ENDIF
+  @AfterAll
+  public static void stopTimer()
+  {
+    long dur=System.currentTimeMillis()-TIMER;
+    StringBuilder builder=new StringBuilder(34).append("Test suite time: ");
+    long hours=dur/(1000*60*60);
+    long minutes=(dur-=(hours*1000*60*60))/(1000*60);
+    long seconds=(dur-=(minutes*1000*60))/1000;
+    dur=(dur-=(seconds*1000));
+    minutesLoop: for(;;)
+    {
+      for(;;)
+      {
+        if(hours==0)
+        {
+          if(minutes==0)
+          {
+            break minutesLoop;
+          }
+          break;
+        }
+        builder.append(hours).append(':');
+        if(minutes<10)
+        {
+          builder.append('0');
+        }
+        break;
+      }
+      builder.append(minutes).append(':');
+      if(seconds<10)
+      {
+        builder.append('0');
+      }
+      break;
+    }
+    builder.append(seconds).append('.');
+    if(dur<100)
+    {
+      builder.append('0');
+      if(dur<10)
+      {
+        builder.append('0');
+      }
+    }
+    builder.append(dur);
+    System.out.println(builder);
+  }
+  
+  
+
+#MACRODEF JunitImpl<CUSTOMARRTYPE,STOCKARRTYPE>()
+private static class TestData
+{
+  final long randSeed;
+  final int m;
+  final JunitUtil.CUSTOMARRTYPEArrayBuilder builder;
+  final CUSTOMARRTYPE[] customArr;
+  final STOCKARRTYPE[] stockArr;
+  private TestData(long randSeed,int m,JunitUtil.CUSTOMARRTYPEArrayBuilder builder,int arrLength,Random rand)
+  {
+    this.randSeed=randSeed;
+    this.m=m;
+    this.builder=builder;
+    this.customArr=new CUSTOMARRTYPE[arrLength];
+    this.stockArr=new STOCKARRTYPE[arrLength];
+    builder.buildUnchecked(customArr,0,arrLength,rand,m);
+    ArrCopy.uncheckedCopy(customArr,0,stockArr,0,arrLength);
+  }
+  private CUSTOMARRTYPE[] copyCustomArr()
+  {
+    CUSTOMARRTYPE[] copy=new CUSTOMARRTYPE[customArr.length];
+    ArrCopy.uncheckedCopy(customArr,0,copy,0,customArr.length);
+    return copy;
+  }
+  private void reverseStockArr()
+  {
+#IF OfRef
+    OmniArray.OfInt.reverseRange(stockArr,0,stockArr.length-1);
+#ELSEIF OfBoolean
+    OmniArray.OfRef.reverseRange(stockArr,0,stockArr.length-1);
+#ELSE
+    OmniArray.Of$ClassPrefix$.reverseRange(stockArr,0,stockArr.length-1);
+#ENDIF
+  }
+  @Override
+  public boolean equals(Object val)
+  {
+    TestData td;
+    return val instanceof TestData && (td=(TestData)val).builder==this.builder && td.customArr==this.customArr;
+  }
+  @Override
+  public int hashCode()
+  {
+    return builder.hashCode()*31+customArr.hashCode();
+  }
+  @Override
+  public String toString()
+  {
+    return "TestData{builder="+builder+"; arrayType=$ArrayType$; arrLength="+customArr.length+"; m="+m+"; randSeed="+randSeed+"}";
+  }
+  private static void initializeTestData(JunitUtil.CUSTOMARRTYPEArrayBuilder builder,long randSeed,int arrLength,ArrayList<TestData> testDatas)
+  {
+    Random rand=new Random(randSeed);
+    for(int m=getMLo(builder),mHi=getMHi(arrLength,builder),numReps=getNumReps(arrLength,builder);m<=mHi;m=incrementM(m,builder))
+    {
+      for(int i=0;i<numReps;++i)
+      {
+        TestData td=new TestData(randSeed,m,builder,arrLength,rand);
+        synchronized(testDatas)
+        {
+          testDatas.add(td);
+        }
+      }
+    }
+  }
+  private static int getMLo(JunitUtil.CUSTOMARRTYPEArrayBuilder builder)
+  {
+    switch(builder)
+    {
+    case AllEquals:
+      return 0;
+#IFNOT OfBoolean
+    case MergeAscending:
+    case MergeDescending:
+      return 65;
+#ENDIF
+    default:
+      return 1;
+    }
+  }
+  private static int getMHi(int arrLength,JunitUtil.CUSTOMARRTYPEArrayBuilder builder)
+  {
+    switch(builder)
+    {
+#IFNOT OfBoolean
+    case Ascending:
+    case Descending:
+    case Saw:
+    case Repeated:
+    case Duplicated:
+    case OrganPipes:
+    case Stagger:
+    case Plateau:
+      return (arrLength<<1)-1;
+    case AllEquals:
+      return 0;
+    case MergeAscending:
+    case MergeDescending:
+      return 69;
+    case SortedRepeated:
+    case SortedOrganPipes:
+      return Math.min(arrLength,7);
+#ENDIF
+    default:
+      return 1;
+    }
+  }
+  private static int getNumReps(int arrLength,JunitUtil.CUSTOMARRTYPEArrayBuilder builder)
+  {
+    switch(builder)
+    {
+    case Randomized:
+      return 10;
+#IFNOT OfBoolean
+    case Duplicated:
+      return 1;
+    case Shuffle:
+      return 10;
+  #IF OfFloat,OfDouble
+    case WithNaNsAndZeros:
+      return 2;
+  #ENDIF
+#ENDIF
+    default:
+      return 1;
+    }
+  }
+  private static int incrementM(int m,JunitUtil.CUSTOMARRTYPEArrayBuilder builder)
+  {
+    switch(builder)
+    {
+#IFNOT OfBoolean
+    case Ascending:
+    case Descending:
+    case Saw:
+    case Repeated:
+    case Duplicated:
+    case OrganPipes:
+    case Stagger:
+    case Plateau:
+      return m<<1;
+#ENDIF
+    default:
+      return m+1;
+    }
+  }
+}
+#IF OfRef
+private static final $Comparator$<Integer> Unsorted=(val1,val2)->
+{
+  return 0;
+};
+private static final $Comparator$<Integer> Ascending=(val1,val2)->
+{
+  return val1.compareTo(val2);
+};
+private static final $Comparator$<Integer> Descending=(val1,val2)->
+{
+  return val2.compareTo(val1);
+};
+#ELSE
+private static final $Comparator$ Unsorted=(val1,val2)->
+{
+  return 0;
+};
+private static final $Comparator$ Ascending=(val1,val2)->
+{
+  return $BoxedType$.compare(val1,val2);
+};
+private static final $Comparator$ Descending=(val1,val2)->
+{
+  return $BoxedType$.compare(val2,val1);
+};
+#ENDIF
+
+#MACRO AllTestMethods<true>()
+#ENDDEF
+
+
+  
+  
+#MACRODEF AllTestMethods<PARALLEL>()
+#IF OfBoolean
+
+#MACRO BasicTestSuite<AllEquals,0>()
+#MACRO BasicTestSuite<Ascending,1>()
+#MACRO BasicTestSuite<Descending,2>()
+#MACRO BasicTestSuite<Randomized,3>()
+
+#ELSEIF OfFloat,OfDouble
+
+#MACRO BasicTestSuite<AllEquals,0>()
+#MACRO BasicTestSuite<MergeAscending,1>()
+#MACRO BasicTestSuite<MergeDescending,2>()
+#MACRO BasicTestSuite<SortedRepeated,3>()
+#MACRO BasicTestSuite<SortedOrganPipes,4>()
+#MACRO BasicTestSuite<Ascending,5>()
+#MACRO BasicTestSuite<Descending,6>()
+#MACRO BasicTestSuite<Saw,7>()
+#MACRO BasicTestSuite<Repeated,8>()
+#MACRO BasicTestSuite<OrganPipes,9>()
+#MACRO BasicTestSuite<Stagger,10>()
+#MACRO BasicTestSuite<Plateau,11>()
+#MACRO BasicTestSuite<WithNaNsAndZeros,12>()
+#MACRO BasicTestSuite<Shuffle,13>()
+#MACRO BasicTestSuite<Randomized,14>()
+#MACRO BasicTestSuite<Duplicated,15>()
+
+#ELSE
+
+#MACRO BasicTestSuite<AllEquals,0>()
+#MACRO BasicTestSuite<MergeAscending,1>()
+#MACRO BasicTestSuite<MergeDescending,2>()
+#MACRO BasicTestSuite<SortedRepeated,3>()
+#MACRO BasicTestSuite<SortedOrganPipes,4>()
+#MACRO BasicTestSuite<Ascending,5>()
+#MACRO BasicTestSuite<Descending,6>()
+#MACRO BasicTestSuite<Saw,7>()
+#MACRO BasicTestSuite<Repeated,8>()
+#MACRO BasicTestSuite<OrganPipes,9>()
+#MACRO BasicTestSuite<Stagger,10>()
+#MACRO BasicTestSuite<Plateau,11>()
+#MACRO BasicTestSuite<Shuffle,12>()
+#MACRO BasicTestSuite<Randomized,13>()
+#MACRO BasicTestSuite<Duplicated,14>()
+
+#ENDIF
+#ENDDEF
+
+
+#MACRODEF BasicTestSuite<ARRAYBUILDER,SUITEORDER>()
+@Test
+#IF OfBoolean
+@Order(6*SUITEORDER+1)
+#ELSEIF OfRef
+@Order(10*SUITEORDER+1)
+#ELSE
+@Order(8*SUITEORDER+1)
+#ENDIF
+public void initializeArraysForARRAYBUILDER()
+{
+#IFNOTSWITCH SUITEORDER==0
+  stopTimer();
+  TEST_DATA.clear();
+#ENDIF
+  System.out.println("Initializing arrays for arrType=$ArrayType$; builder=ARRAYBUILDER");
+  Arrays.stream(lengths)
+  #IFSWITCH PARALLEL==true
+  .parallel()
+#ENDIF
+  .forEach(arrLength->
+  {
+    if(JunitUtil.CUSTOMARRTYPEArrayBuilder.ARRAYBUILDER.isRandomized())
+    {
+      Arrays.stream(randSeeds)
+#IFSWITCH PARALLEL==true
+      .parallel()
+#ENDIF
+      .forEach(randSeed->
+      {
+        TestData.initializeTestData(JunitUtil.CUSTOMARRTYPEArrayBuilder.ARRAYBUILDER,randSeed,arrLength,TEST_DATA);
+      });
+    }
+    else
+    {
+      TestData.initializeTestData(JunitUtil.CUSTOMARRTYPEArrayBuilder.ARRAYBUILDER,0,arrLength,TEST_DATA);
+    }
+  });
+  System.out.println("Initialized "+TEST_DATA.size()+" arrays");
+  TIMER=System.currentTimeMillis();
+}
+#IFSWITCH ARRAYBUILDER==Ascending
+  #IF OfBoolean
+#MACRO TestMethod<6*SUITEORDER+2,UnsortedComparator,Stable,NoStockAction,DontCopyCustom>()
+#MACRO TestMethod<6*SUITEORDER+3,AscendingComparator,Stable,NoStockAction,DontCopyCustom>()
+#MACRO TestMethod<6*SUITEORDER+4,Ascending,Stable,NoStockAction,DontCopyCustom>()
+#MACRO TestMethod<6*SUITEORDER+5,DescendingComparator,Stable,ReverseStock,CopyCustom>()
+#MACRO TestMethod<6*SUITEORDER+6,Descending,Stable,NoStockAction,DontCopyCustom>()
+  #ELSEIF OfRef
+#MACRO TestMethod<10*SUITEORDER+2,UnsortedComparator,Stable,NoStockAction,DontCopyCustom>()
+#MACRO TestMethod<10*SUITEORDER+3,AscendingComparator,Stable,NoStockAction,DontCopyCustom>()
+#MACRO TestMethod<10*SUITEORDER+4,AscendingComparator,Unstable,NoStockAction,DontCopyCustom>()
+#MACRO TestMethod<10*SUITEORDER+5,Ascending,Stable,NoStockAction,DontCopyCustom>()
+#MACRO TestMethod<10*SUITEORDER+6,Ascending,Unstable,NoStockAction,DontCopyCustom>()
+#MACRO TestMethod<10*SUITEORDER+7,DescendingComparator,Stable,ReverseStock,CopyCustom>()
+#MACRO TestMethod<10*SUITEORDER+8,DescendingComparator,Unstable,NoStockAction,CopyCustom>()
+#MACRO TestMethod<10*SUITEORDER+9,Descending,Stable,NoStockAction,DontCopyCustom>()
+#MACRO TestMethod<10*SUITEORDER+10,Descending,Unstable,NoStockAction,DontCopyCustom>()
+  #ELSE
+#MACRO TestMethod<8*SUITEORDER+2,UnsortedComparator,Stable,NoStockAction,DontCopyCustom>()
+    #IF OfByte,OfChar,OfShort
+#MACRO TestMethod<8*SUITEORDER+3,AscendingComparator,Stable,SortStockAscending,DontCopyCustom>()
+    #ELSE
+#MACRO TestMethod<8*SUITEORDER+3,AscendingComparator,Stable,NoStockAction,DontCopyCustom>()
+    #ENDIF
+#MACRO TestMethod<8*SUITEORDER+4,AscendingComparator,Unstable,NoStockAction,DontCopyCustom>()
+#MACRO TestMethod<8*SUITEORDER+5,Ascending,Stable,NoStockAction,DontCopyCustom>()
+#MACRO TestMethod<8*SUITEORDER+6,DescendingComparator,Stable,ReverseStock,CopyCustom>()
+#MACRO TestMethod<8*SUITEORDER+7,DescendingComparator,Unstable,NoStockAction,CopyCustom>()
+#MACRO TestMethod<8*SUITEORDER+8,Descending,Stable,NoStockAction,DontCopyCustom>()
+  #ENDIF
+#ELSEIFSWITCH ARRAYBUILDER==Descending
+  #IF OfBoolean
+#MACRO TestMethod<6*SUITEORDER+2,UnsortedComparator,Stable,NoStockAction,DontCopyCustom>()
+#MACRO TestMethod<6*SUITEORDER+3,DescendingComparator,Stable,NoStockAction,DontCopyCustom>()
+#MACRO TestMethod<6*SUITEORDER+4,Descending,Stable,NoStockAction,DontCopyCustom>()
+#MACRO TestMethod<6*SUITEORDER+5,AscendingComparator,Stable,ReverseStock,CopyCustom>()
+#MACRO TestMethod<6*SUITEORDER+6,Ascending,Stable,NoStockAction,DontCopyCustom>()
+  #ELSEIF OfRef
+#MACRO TestMethod<10*SUITEORDER+2,UnsortedComparator,Stable,NoStockAction,DontCopyCustom>()
+#MACRO TestMethod<10*SUITEORDER+3,DescendingComparator,Stable,NoStockAction,DontCopyCustom>()
+#MACRO TestMethod<10*SUITEORDER+4,DescendingComparator,Unstable,NoStockAction,DontCopyCustom>()
+#MACRO TestMethod<10*SUITEORDER+5,Descending,Stable,NoStockAction,DontCopyCustom>()
+#MACRO TestMethod<10*SUITEORDER+6,Descending,Unstable,NoStockAction,DontCopyCustom>()
+#MACRO TestMethod<10*SUITEORDER+7,AscendingComparator,Stable,ReverseStock,CopyCustom>()
+#MACRO TestMethod<10*SUITEORDER+8,AscendingComparator,Unstable,NoStockAction,CopyCustom>()
+#MACRO TestMethod<10*SUITEORDER+9,Ascending,Stable,NoStockAction,DontCopyCustom>()
+#MACRO TestMethod<10*SUITEORDER+10,Ascending,Unstable,NoStockAction,DontCopyCustom>()
+  #ELSE
+#MACRO TestMethod<8*SUITEORDER+2,UnsortedComparator,Stable,NoStockAction,DontCopyCustom>()
+    #IF OfByte,OfChar,OfShort
+#MACRO TestMethod<8*SUITEORDER+3,DescendingComparator,Stable,SortStockDescending,DontCopyCustom>()
+    #ELSE
+#MACRO TestMethod<8*SUITEORDER+3,DescendingComparator,Stable,NoStockAction,DontCopyCustom>()
+    #ENDIF
+#MACRO TestMethod<8*SUITEORDER+4,DescendingComparator,Unstable,NoStockAction,DontCopyCustom>()
+#MACRO TestMethod<8*SUITEORDER+5,Descending,Stable,NoStockAction,DontCopyCustom>()
+#MACRO TestMethod<8*SUITEORDER+6,AscendingComparator,Stable,ReverseStock,CopyCustom>()
+#MACRO TestMethod<8*SUITEORDER+7,AscendingComparator,Unstable,NoStockAction,CopyCustom>()
+#MACRO TestMethod<8*SUITEORDER+8,Ascending,Stable,NoStockAction,DontCopyCustom>()
+  #ENDIF
+#ELSEIFSWITCH ARRAYBUILDER==AllEquals
+  #IF OfBoolean
+#MACRO TestMethod<6*SUITEORDER+2,UnsortedComparator,Stable,NoStockAction,DontCopyCustom>()
+#MACRO TestMethod<6*SUITEORDER+3,DescendingComparator,Stable,NoStockAction,DontCopyCustom>()
+#MACRO TestMethod<6*SUITEORDER+4,Descending,Stable,NoStockAction,DontCopyCustom>()
+#MACRO TestMethod<6*SUITEORDER+5,AscendingComparator,Stable,NoStockAction,DontCopyCustom>()
+#MACRO TestMethod<6*SUITEORDER+6,Ascending,Stable,NoStockAction,DontCopyCustom>()
+  #ELSEIF OfRef
+#MACRO TestMethod<10*SUITEORDER+2,UnsortedComparator,Stable,NoStockAction,DontCopyCustom>()
+#MACRO TestMethod<10*SUITEORDER+3,DescendingComparator,Stable,NoStockAction,DontCopyCustom>()
+#MACRO TestMethod<10*SUITEORDER+4,DescendingComparator,Unstable,NoStockAction,DontCopyCustom>()
+#MACRO TestMethod<10*SUITEORDER+5,Descending,Stable,NoStockAction,DontCopyCustom>()
+#MACRO TestMethod<10*SUITEORDER+6,Descending,Unstable,NoStockAction,DontCopyCustom>()
+#MACRO TestMethod<10*SUITEORDER+7,AscendingComparator,Stable,NoStockAction,DontCopyCustom>()
+#MACRO TestMethod<10*SUITEORDER+8,AscendingComparator,Unstable,NoStockAction,DontCopyCustom>()
+#MACRO TestMethod<10*SUITEORDER+9,Ascending,Stable,NoStockAction,DontCopyCustom>()
+#MACRO TestMethod<10*SUITEORDER+10,Ascending,Unstable,NoStockAction,DontCopyCustom>()
+  #ELSE
+#MACRO TestMethod<8*SUITEORDER+2,UnsortedComparator,Stable,NoStockAction,DontCopyCustom>()
+#MACRO TestMethod<8*SUITEORDER+3,DescendingComparator,Stable,NoStockAction,DontCopyCustom>()
+#MACRO TestMethod<8*SUITEORDER+4,DescendingComparator,Unstable,NoStockAction,DontCopyCustom>()
+#MACRO TestMethod<8*SUITEORDER+5,Descending,Stable,NoStockAction,DontCopyCustom>()
+#MACRO TestMethod<8*SUITEORDER+6,AscendingComparator,Stable,NoStockAction,DontCopyCustom>()
+#MACRO TestMethod<8*SUITEORDER+7,AscendingComparator,Unstable,NoStockAction,DontCopyCustom>()
+#MACRO TestMethod<8*SUITEORDER+8,Ascending,Stable,NoStockAction,DontCopyCustom>()
+  #ENDIF
+#ELSE
+  #IF OfBoolean
+#MACRO TestMethod<6*SUITEORDER+2,UnsortedComparator,Stable,NoStockAction,DontCopyCustom>()
+#MACRO TestMethod<6*SUITEORDER+3,AscendingComparator,Stable,SortStockAscending,CopyCustom>()
+#MACRO TestMethod<6*SUITEORDER+4,Ascending,Stable,NoStockAction,CopyCustom>()
+#MACRO TestMethod<6*SUITEORDER+5,DescendingComparator,Stable,ReverseStock,CopyCustom>()
+#MACRO TestMethod<6*SUITEORDER+6,Descending,Stable,NoStockAction,DontCopyCustom>()
+  #ELSEIF OfRef
+#MACRO TestMethod<10*SUITEORDER+2,UnsortedComparator,Stable,NoStockAction,DontCopyCustom>()
+#MACRO TestMethod<10*SUITEORDER+3,AscendingComparator,Stable,SortStockAscending,CopyCustom>()
+#MACRO TestMethod<10*SUITEORDER+4,AscendingComparator,Unstable,NoStockAction,CopyCustom>()
+#MACRO TestMethod<10*SUITEORDER+5,Ascending,Stable,NoStockAction,CopyCustom>()
+#MACRO TestMethod<10*SUITEORDER+6,Ascending,Unstable,NoStockAction,CopyCustom>()
+#MACRO TestMethod<10*SUITEORDER+7,DescendingComparator,Stable,ReverseStock,CopyCustom>()
+#MACRO TestMethod<10*SUITEORDER+8,DescendingComparator,Unstable,NoStockAction,CopyCustom>()
+#MACRO TestMethod<10*SUITEORDER+9,Descending,Stable,NoStockAction,CopyCustom>()
+#MACRO TestMethod<10*SUITEORDER+10,Descending,Unstable,NoStockAction,DontCopyCustom>()
+  #ELSE
+#MACRO TestMethod<8*SUITEORDER+2,UnsortedComparator,Stable,NoStockAction,DontCopyCustom>()
+#MACRO TestMethod<8*SUITEORDER+3,AscendingComparator,Stable,SortStockAscending,CopyCustom>()
+#MACRO TestMethod<8*SUITEORDER+4,AscendingComparator,Unstable,NoStockAction,CopyCustom>()
+#MACRO TestMethod<8*SUITEORDER+5,Ascending,Stable,NoStockAction,CopyCustom>()
+#MACRO TestMethod<8*SUITEORDER+6,DescendingComparator,Stable,ReverseStock,CopyCustom>()
+#MACRO TestMethod<8*SUITEORDER+7,DescendingComparator,Unstable,NoStockAction,CopyCustom>()
+#MACRO TestMethod<8*SUITEORDER+8,Descending,Stable,NoStockAction,DontCopyCustom>()
+  #ENDIF
+#ENDIF
+#ENDDEF
+
+#MACRODEF TestMethod<METHODORDER,COMPARATORTYPE,STABLE,STOCKACTION,COPYCUSTOM>()
+@Test
+@Order(METHODORDER)
+#IFSWITCH STABLE==Stable
+public void testUncheckedStableCOMPARATORTYPESortWithARRAYBUILDERArray()
+#ELSEIFSWITCH STABLE==Unstable
+public void testUncheckedUnstableCOMPARATORTYPESortWithARRAYBUILDERArray()
+#ELSE
+ERROR unknown stable flag STABLE
+#ENDIF
+{
+  TEST_DATA.stream()
+#IFSWITCH PARALLEL==true
+    .parallel()
+#ENDIF
+    .forEach(testData->
+  {
+    var stockArr=testData.stockArr;
+#IFSWITCH COPYCUSTOM==CopyCustom
+    var customArr=testData.copyCustomArr();
+#ELSEIFSWITCH COPYCUSTOM==DontCopyCustom
+    var customArr=testData.customArr;
+#ELSE
+    ERROR unknown copy custom array flag COPYCUSTOM
+#ENDIF
+    int arrLength=stockArr.length;
+#IFSWITCH STOCKACTION==SortStockAscending
+    //sort the stock array
+    Arrays.sort(stockArr,0,arrLength);
+#ELSEIFSWITCH STOCKACTION==ReverseStock
+    //reverse the stock array
+    testData.reverseStockArr();
+#ELSEIFSWITCH STOCKACTION==NoStockAction
+    //make no alterations to the stock array
+#ELSEIFSWITCH STOCKACTION==SortStockDescending
+    //reverse-sort the stock array
+    Arrays.sort(stockArr,0,arrLength);
+    testData.reverseStockArr();
+#ELSE
+    ERROR unknown stock action STOCKACTION
+#ENDIF
+#IFSWITCH COMPARATORTYPE==AscendingComparator
+  #IFSWITCH STABLE==Stable
+    #IF OfBoolean
+    $ClassPrefix$SortUtil.uncheckedSort(customArr,0,arrLength,Ascending);
+    #ELSE
+    $ClassPrefix$SortUtil.uncheckedStableSort(customArr,0,arrLength,Ascending);
+    #ENDIF
+  #ELSEIFSWITCH STABLE==Unstable
+    #IF OfBoolean
+    ERROR invalid type $ArrayType$ for unstable comparator sort
+    #ELSE
+    $ClassPrefix$SortUtil.uncheckedUnstableSort(customArr,0,arrLength,Ascending);
+    #ENDIF
+  #ELSE
+    ERROR unknown stable flag STABLE
+  #ENDIF
+#ELSEIFSWITCH COMPARATORTYPE==DescendingComparator
+  #IFSWITCH STABLE==Stable
+    #IF OfBoolean
+    $ClassPrefix$SortUtil.uncheckedSort(customArr,0,arrLength,Descending);
+    #ELSE
+    $ClassPrefix$SortUtil.uncheckedStableSort(customArr,0,arrLength,Descending);
+    #ENDIF
+  #ELSEIFSWITCH STABLE==Unstable
+    #IF OfBoolean
+    ERROR valid type $ArrayType$ for unstable comparator sort
+    #ELSE
+    $ClassPrefix$SortUtil.uncheckedUnstableSort(customArr,0,arrLength,Descending);
+    #ENDIF
+  #ELSE
+    ERROR unknown stable flag STABLE
+  #ENDIF
+#ELSEIFSWITCH COMPARATORTYPE==UnsortedComparator
+  #IFSWITCH STABLE==Stable
+    #IF OfBoolean
+    $ClassPrefix$SortUtil.uncheckedSort(customArr,0,arrLength,Unsorted);
+    #ELSE
+    $ClassPrefix$SortUtil.uncheckedStableSort(customArr,0,arrLength,Unsorted);
+    #ENDIF
+  #ELSEIFSWITCH STABLE==Unstable
+    ERROR unstable sort is not valid for comparator type COMPARATORTYPE
+  #ELSE
+    ERROR unknown stable flag STABLE
+  #ENDIF
+#ELSEIFSWITCH COMPARATORTYPE==Ascending
+  #IFSWITCH STABLE==Stable
+    #IF OfRef
+    $ClassPrefix$SortUtil.uncheckedStableAscendingSort(customArr,0,arrLength);
+    #ELSE
+    $ClassPrefix$SortUtil.uncheckedAscendingSort(customArr,0,arrLength);
+    #ENDIF
+  #ELSEIFSWITCH STABLE==Unstable
+    #IF OfRef
+    $ClassPrefix$SortUtil.uncheckedUnstableAscendingSort(customArr,0,arrLength);
+    #ELSE
+    ERROR invalid type $ArrayType$ for unstable noncomparator sort
+    #ENDIF
+  #ELSE
+    ERROR unknown stable flag STABLE
+  #ENDIF
+#ELSEIFSWITCH COMPARATORTYPE==Descending
+  #IFSWITCH STABLE==Stable
+    #IF OfRef
+    $ClassPrefix$SortUtil.uncheckedStableDescendingSort(customArr,0,arrLength);
+    #ELSE
+    $ClassPrefix$SortUtil.uncheckedDescendingSort(customArr,0,arrLength);
+    #ENDIF
+  #ELSEIFSWITCH STABLE==Unstable
+    #IF OfRef
+    $ClassPrefix$SortUtil.uncheckedUnstableDescendingSort(customArr,0,arrLength);
+    #ELSE
+    ERROR invalid type $ArrayType$ for unstable noncomparator sort
+    #ENDIF
+  #ELSE
+    ERROR unknown stable flag STABLE
+  #ENDIF
+#ELSE
+    ERROR unknown comparator type COMPARATORTYPE
+#ENDIF
+#IFSWITCH PARALLEL==true
+    JunitUtil.uncheckedparallelassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
+#ELSE
+    JunitUtil.uncheckedassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
+#ENDIF
+  });
+}
+#ENDDEF
+
+/*
+ 
+ 
+ 
+
+ 
+  #MACRO TestMethod<true>() 
+  
+#MACRODEF CompareArrays(ARR1,ARR2)
+#IFSWITCH PARALLEL==true
+JunitUtil.uncheckedparallelassertarraysAreEqual(ARR1,0,ARR2,0,arrLength);  
+#ELSE
+JunitUtil.uncheckedassertarraysAreEqual(ARR1,0,ARR2,0,arrLength);  
+#ENDIF
+#ENDDEF
+#MACRODEF TestMethod<PARALLEL>() 
+  @Test
+  public void testSortMethods()
+  {
+    final var arrays=initializeArrays();
+    arrays.stream()
+#IFSWITCH PARALLEL==true
+    .parallel()
+#ENDIF
+    .forEach(arr->
+    {
+      int arrLength=arr.length;
+#IF OfBoolean
+      $BoxedType$[] copy=new $BoxedType$[arrLength];
+#ELSEIF OfRef
+      int[] copy=new int[arrLength];
+#ELSE
+      $ArrayType$[] copy=new $ArrayType$[arrLength];
+#ENDIF
+      ArrCopy.uncheckedCopy(arr,0,copy,0,arrLength);
+      
+      //test stable unsorted comparator sort
+#IF OfBoolean
+      $ClassPrefix$SortUtil.uncheckedSort(arr,0,arrLength,Unsorted);
+#ELSE
+      $ClassPrefix$SortUtil.uncheckedStableSort(arr,0,arrLength,Unsorted);
+#ENDIF
+      #MACRO CompareArrays(arr,copy)
+      Arrays.sort(copy,0,arrLength);
+      
+      $ArrayType$[] copy1;
+
+#IFNOT OfBoolean 
+      //test unstable ascending comparator sort
+      copy1=new $ArrayType$[arrLength];
+      ArrCopy.uncheckedCopy(arr,0,copy1,0,arrLength);
+      $ClassPrefix$SortUtil.uncheckedUnstableSort(copy1,0,arrLength,Ascending);
+      #MACRO CompareArrays(copy1,copy)
+  #IF OfRef
+  
+      //test unstable ascending non-comparator sort
+      copy1=new $ArrayType$[arrLength];
+      ArrCopy.uncheckedCopy(arr,0,copy1,0,arrLength);
+      $ClassPrefix$SortUtil.uncheckedUnstableAscendingSort(copy1,0,arrLength);
+      #MACRO CompareArrays(copy1,copy)
+  #ENDIF
+#ENDIF
+      
+      //test stable ascending comparator sort  
+      copy1=new $ArrayType$[arrLength];
+      ArrCopy.uncheckedCopy(arr,0,copy1,0,arrLength);
+#IF OfBoolean
+      $ClassPrefix$SortUtil.uncheckedSort(copy1,0,arrLength,Ascending);
+#ELSE
+      $ClassPrefix$SortUtil.uncheckedStableSort(copy1,0,arrLength,Ascending);
+#ENDIF
+      #MACRO CompareArrays(copy1,copy)
+      
+      //test stable ascending non-comparator sort
+      copy1=new $ArrayType$[arrLength];
+      ArrCopy.uncheckedCopy(arr,0,copy1,0,arrLength);
+#IF OfRef
+      $ClassPrefix$SortUtil.uncheckedStableAscendingSort(copy1,0,arrLength);
+#ELSE
+      $ClassPrefix$SortUtil.uncheckedAscendingSort(copy1,0,arrLength);
+#ENDIF
+      #MACRO CompareArrays(copy1,copy)
+
+#IF OfBoolean
+      OmniArray.OfRef.reverseRange(copy,0,arrLength-1);
+#ELSEIF OfRef
+      OmniArray.OfInt.reverseRange(copy,0,arrLength-1);
+#ELSE
+      OmniArray.Of$ClassPrefix$.reverseRange(copy,0,arrLength-1);
+#ENDIF
+
+#IFNOT OfBoolean 
+      //test unstable descending comparator sort
+      copy1=new $ArrayType$[arrLength];
+      ArrCopy.uncheckedCopy(arr,0,copy1,0,arrLength);
+      $ClassPrefix$SortUtil.uncheckedUnstableSort(copy1,0,arrLength,Descending);
+      #MACRO CompareArrays(copy1,copy)
+  #IF OfRef
+  
+      //test unstable descending non-comparator sort
+      copy1=new $ArrayType$[arrLength];
+      ArrCopy.uncheckedCopy(arr,0,copy1,0,arrLength);
+      $ClassPrefix$SortUtil.uncheckedUnstableDescendingSort(copy1,0,arrLength);
+      #MACRO CompareArrays(copy1,copy)
+  #ENDIF
+#ENDIF
+
+      //test stable descending comparator sort
+      copy1=new $ArrayType$[arrLength];
+      ArrCopy.uncheckedCopy(arr,0,copy1,0,arrLength);
+#IF OfBoolean
+      $ClassPrefix$SortUtil.uncheckedSort(copy1,0,arrLength,Descending);
+#ELSE
+      $ClassPrefix$SortUtil.uncheckedStableSort(copy1,0,arrLength,Descending);
+#ENDIF
+      #MACRO CompareArrays(copy1,copy)
+           
+      //test stable descending non-comparator sort
+#IF OfRef
+      $ClassPrefix$SortUtil.uncheckedStableDescendingSort(arr,0,arrLength);
+#ELSE
+      $ClassPrefix$SortUtil.uncheckedDescendingSort(arr,0,arrLength);
+#ENDIF
+      #MACRO CompareArrays(arr,copy)
+    });
+  }
+#ENDDEF
+*/
+}
+

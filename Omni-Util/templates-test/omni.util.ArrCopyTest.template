@@ -83,19 +83,27 @@ public void testSemiCheckedCopySRCDST() throws Throwable
   for(int i=0;i<1000;++i)
   {
     int srcLength=rand.nextInt(1000);
-    SRC[] src;
-    JunitUtil.PRIMITIVEArrayBuilder.Randomized.buildUnchecked(src=new SRC[srcLength],0,srcLength,rand,0);
+    
+    SRC[] src=new SRC[srcLength];
+    if(srcLength!=0)
+    {
+      JunitUtil.PRIMITIVEArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+    }
     int dstLength=srcLength+rand.nextInt(1000);
     DST[] dst=new DST[dstLength];
     int copyLength=rand.nextInt(srcLength+1);
     int srcOffset=rand.nextInt(srcLength-copyLength+1);
     int dstOffset=rand.nextInt(dstLength-copyLength+1);
     ArrCopy.semicheckedCopy(src,srcOffset,dst,dstOffset,copyLength);
+    if(copyLength!=0)
+    {
 #IFSWITCH PARALLEL==true
-    JunitUtil.uncheckedparallelassertarraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+      JunitUtil.uncheckedparallelassertarraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
 #ELSE
-    JunitUtil.uncheckedassertarraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+      JunitUtil.uncheckedassertarraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
 #ENDIF
+    }
+
   }
 }
 @Test
@@ -106,19 +114,25 @@ public void testSemiCheckedReverseCopySRCDST() throws Throwable
   for(int i=0;i<1000;++i)
   {
     int srcLength=rand.nextInt(1000);
-    SRC[] src;
-    JunitUtil.PRIMITIVEArrayBuilder.Randomized.buildUnchecked(src=new SRC[srcLength],0,srcLength,rand,0);
+    SRC[] src=new SRC[srcLength];
+    if(srcLength!=0)
+    {
+      JunitUtil.PRIMITIVEArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+    }
     int dstLength=srcLength+rand.nextInt(1000);
     DST[] dst=new DST[dstLength];
     int copyLength=rand.nextInt(srcLength+1);
     int srcOffset=rand.nextInt(srcLength-copyLength+1);
     int dstOffset=rand.nextInt(dstLength-copyLength+1);
     ArrCopy.semicheckedReverseCopy(src,srcOffset,dst,dstOffset,copyLength);
+    if(copyLength!=0)
+    {
 #IFSWITCH PARALLEL==true
-    JunitUtil.uncheckedparallelassertreversearraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+      JunitUtil.uncheckedparallelassertreversearraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
 #ELSE
-    JunitUtil.uncheckedassertreversearraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+      JunitUtil.uncheckedassertreversearraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
 #ENDIF
+    }
   }
 }
 #ENDDEF

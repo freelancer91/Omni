@@ -37,6 +37,7 @@ enum TypeDefinition{
         defVars.add(new DefVar("UnaryOperator","BooleanPredicate"));
         defVars.add(new DefVar("applyMethod","test"));
         defVars.add(new DefVar("compareMethod","compare"));
+        defVars.add(new DefVar("comparableType","boolean"));
         return defVars;
     }
     private static List<DefVar> getOfByte(){
@@ -66,6 +67,7 @@ enum TypeDefinition{
         defVars.add(new DefVar("UnaryOperator","ByteUnaryOperator"));
         defVars.add(new DefVar("applyMethod","applyAsByte"));
         defVars.add(new DefVar("compareMethod","compare"));
+        defVars.add(new DefVar("comparableType","byte"));
         return defVars;
     }
     private static List<DefVar> getOfChar(){
@@ -94,6 +96,7 @@ enum TypeDefinition{
         defVars.add(new DefVar("UnaryOperator","CharUnaryOperator"));
         defVars.add(new DefVar("applyMethod","applyAsChar"));
         defVars.add(new DefVar("compareMethod","compare"));
+        defVars.add(new DefVar("comparableType","char"));
         return defVars;
     }
     private static List<DefVar> getOfDouble(){
@@ -120,6 +123,7 @@ enum TypeDefinition{
         defVars.add(new DefVar("UnaryOperator","DoubleUnaryOperator"));
         defVars.add(new DefVar("applyMethod","applyAsDouble"));
         defVars.add(new DefVar("compareMethod","compare"));
+        defVars.add(new DefVar("comparableType","double"));
         return defVars;
     }
     private static List<DefVar> getOfFloat(){
@@ -147,6 +151,7 @@ enum TypeDefinition{
         defVars.add(new DefVar("UnaryOperator","FloatUnaryOperator"));
         defVars.add(new DefVar("applyMethod","applyAsFloat"));
         defVars.add(new DefVar("compareMethod","compare"));
+        defVars.add(new DefVar("comparableType","float"));
         return defVars;
     }
     private static List<DefVar> getOfInt(){
@@ -174,6 +179,7 @@ enum TypeDefinition{
         defVars.add(new DefVar("UnaryOperator","IntUnaryOperator"));
         defVars.add(new DefVar("applyMethod","applyAsInt"));
         defVars.add(new DefVar("compareMethod","applyAsInt"));
+        defVars.add(new DefVar("comparableType","int"));
         return defVars;
     }
     private static List<DefVar> getOfLong(){
@@ -200,6 +206,7 @@ enum TypeDefinition{
         defVars.add(new DefVar("UnaryOperator","LongUnaryOperator"));
         defVars.add(new DefVar("applyMethod","applyAsLong"));
         defVars.add(new DefVar("compareMethod","compare"));
+        defVars.add(new DefVar("comparableType","long"));
         return defVars;
     }
     private static List<DefVar> getOfRef(){
@@ -222,6 +229,7 @@ enum TypeDefinition{
         defVars.add(new DefVar("UnaryOperator","UnaryOperator"));
         defVars.add(new DefVar("applyMethod","apply"));
         defVars.add(new DefVar("compareMethod","compare"));
+        defVars.add(new DefVar("comparableType","Comparable<E>"));
         return defVars;
     }
     private static List<DefVar> getOfShort(){
@@ -250,6 +258,7 @@ enum TypeDefinition{
         defVars.add(new DefVar("UnaryOperator","ShortUnaryOperator"));
         defVars.add(new DefVar("applyMethod","applyAsShort"));
         defVars.add(new DefVar("compareMethod","compare"));
+        defVars.add(new DefVar("comparableType","short"));
         return defVars;
     }
     boolean matchTypeDef(String...args){

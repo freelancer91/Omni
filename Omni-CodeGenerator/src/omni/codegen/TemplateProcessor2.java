@@ -193,16 +193,30 @@ public class TemplateProcessor2{
                         trouble=true;
                         throw new Exception("Unknown If-switch parameter "+key+" on line "+currIndex);
                     }
-                    for(int i=1;;){
-                        if(matchArg==definedValue.equals(value)){
-                            ++activeDepth;
-                            break;
+                    if(matchArg){
+                        for(int i=1;;){
+                            if(definedValue.equals(value)){
+                                ++activeDepth;
+                                break;
+                            }
+                            if(i==args.length){
+                                break;
+                            }
+                            value=args[i++].trim();
                         }
-                        if(i==args.length){
-                            break;
+                    }else{
+                        for(int i=1;;){
+                            if(definedValue.equals(value)){
+                                break;
+                            }
+                            if(i==args.length){
+                                ++activeDepth;
+                                break;
+                            }
+                            value=args[i++].trim();
                         }
-                        value=args[i++].trim();
                     }
+
                 }else{
                     if(validate){
                         validateControlStatementArgs(args);
