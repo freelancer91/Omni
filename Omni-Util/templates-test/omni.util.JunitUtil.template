@@ -13,6 +13,7 @@ import omni.function.LongComparator;
 import omni.function.FloatComparator;
 import omni.function.DoubleComparator;
 import java.util.Comparator;
+import java.util.Collection;
 public interface JunitUtil
 {
 
@@ -168,6 +169,252 @@ public static COMPARATORTYPE getDIRECTIONARRTYPEComparator()
   #MACRO ArrayBuilder<double,Double>()
   #MACRO ArrayBuilder<String,String>()
   #MACRO ArrayBuilder<Integer,Integer>()
+  
+
+
+#MACRODEF ArrayBuilder<ARRTYPE,BOXEDTYPE>()
+public static enum ARRTYPEArrayBuilder
+{
+  #MACRO ArrayBuilderValue<Randomized>()
+  ,
+  #MACRO ArrayBuilderValue<Ascending>()
+  ,
+  #MACRO ArrayBuilderValue<Descending>()
+  ,
+  #MACRO ArrayBuilderValue<AllEquals>()
+#IFNOTSWITCH ARRTYPE==boolean
+  ,
+  #MACRO ArrayBuilderValue<MergeAscending>()
+  ,
+  #MACRO ArrayBuilderValue<MergeDescending>()
+  ,
+  #MACRO ArrayBuilderValue<Saw>()
+  ,
+  #MACRO ArrayBuilderValue<SortedRepeated>()
+  ,
+  #MACRO ArrayBuilderValue<Repeated>()
+  ,
+  #MACRO ArrayBuilderValue<Duplicated>()
+  ,
+  #MACRO ArrayBuilderValue<SortedOrganPipes>()
+  ,
+  #MACRO ArrayBuilderValue<OrganPipes>()
+  ,
+  #MACRO ArrayBuilderValue<Stagger>()
+  ,
+  #MACRO ArrayBuilderValue<Plateau>()
+  ,
+  #MACRO ArrayBuilderValue<Shuffle>()
+  #IFSWITCH ARRTYPE==float,double
+  ,
+  #MACRO ArrayBuilderValue<WithNaNsAndZeros>()
+  #ENDIF
+#ENDIF
+  ;
+  public int getMLo()
+  {
+    return 1;
+  }
+  public int getMHi(int arrLength)
+  {
+    return 1;
+  }
+  public int getNumReps(int arrLength)
+  {
+    if(isRandomized())
+    {
+      return 10;
+    }
+    return 1;
+  }
+  public int incrementM(int m)
+  {
+    return m+1;
+  }
+  
+  
+  public boolean isRandomized()
+  {
+    //most sub-types are not randomized, so make that the default
+    return false;
+  }
+  public abstract void buildUnchecked(ARRTYPE[] arr,int offset,int length,Random rand,int m);
+  public void build(ARRTYPE[] arr,Random rand,int m)
+  {
+    if(arr==null)
+    {
+      throw new NullPointerException("arr cannot be null");
+    }
+    int length;
+    if((length=arr.length)!=0)
+    {
+      buildUnchecked(arr,0,length,rand,m);
+    }
+  }  
+  public void build(ARRTYPE[] arr,int offset,int length,Random rand,int m)
+  {
+    if(arr==null)
+    {
+      throw new NullPointerException("arr cannot be null");
+    }
+    if(offset<0 || length<0 || offset+length>arr.length)
+    {
+      throw new ArrayIndexOutOfBoundsException("offset = "+offset+"; length="+length+"; arr.length="+arr.length);
+    }
+    if(length!=0)
+    {
+      buildUnchecked(arr,offset,length,rand,m);
+    }
+  }
+#IFSWITCH ARRTYPE==boolean,byte,char,short,int,long,float,double
+  public abstract void buildUnchecked(BOXEDTYPE[] arr,int offset,int length,Random rand,int m);
+  public void build(BOXEDTYPE[] arr,Random rand,int m)
+  {
+    if(arr==null)
+    {
+      throw new NullPointerException("arr cannot be null");
+    }
+    int length;
+    if((length=arr.length)!=0)
+    {
+      buildUnchecked(arr,0,length,rand,m);
+    }
+  }  
+  public void build(BOXEDTYPE[] arr,int offset,int length,Random rand,int m)
+  {
+    if(arr==null)
+    {
+      throw new NullPointerException("arr cannot be null");
+    }
+    if(offset<0 || length<0 || offset+length>arr.length)
+    {
+      throw new ArrayIndexOutOfBoundsException("offset = "+offset+"; length="+length+"; arr.length="+arr.length);
+    }
+    if(length!=0)
+    {
+      buildUnchecked(arr,offset,length,rand,m);
+    }
+  }
+#ENDIF
+  @Override
+  public String toString()
+  {
+    return "ARRTYPEArrayBuilder."+this.name();
+  }
+  public void addArrays(long randSeed,int arrLength,Collection<ARRTYPE[]> arrays)
+  {
+    Random rand=new Random(randSeed);
+    for(int m=getMLo(),mHi=getMHi(arrLength),numReps=getNumReps(arrLength);m<=mHi;m=incrementM(m))
+    {
+      for(int i=0;i<numReps;++i)
+      {
+        ARRTYPE[] arr=new ARRTYPE[arrLength];
+        if(arrLength!=0)
+        {
+          buildUnchecked(arr,0,arrLength,rand,m);
+        }
+        synchronized(arrays)
+        {
+          arrays.add(arr);
+        }
+      }
+      
+    }
+  }
+ 
+  
+}
+#ENDDEF
+#MACRODEF ArrayBuilderValue<VALUENAME>()
+VALUENAME
+{
+#IFSWITCH VALUENAME==AllEquals
+  @Override
+  public int getMLo()
+  {
+    return 0;
+  }
+#ELSEIFSWITCH VALUENAME==MergeAscending,MergeDescending
+  @Override
+  public int getMLo()
+  {
+    return 65;
+  }
+#ENDIF
+  
+#IFNOTSWITCH ARRTYPE==boolean
+  #IFSWITCH VALUENAME==Ascending,Descending,Saw,Repeated,Duplicated,OrganPipes,Stagger,Plateau
+  @Override
+  public int getMHi(int arrLength)
+  {
+    return (arrLength<<1)-1;
+  }
+  #ELSEIFSWITCH VALUENAME==AllEquals
+  @Override
+  public int getMHi(int arrLength)
+  {
+    return 0;
+  }
+  #ELSEIFSWITCH VALUENAME==MergeAscending,MergeDescending
+  @Override
+  public int getMHi(int arrLength)
+  {
+    return 69;
+  }
+  #ELSEIFSWITCH VALUENAME==SortedRepeated,SortedOrganPipes
+  @Override
+  public int getMHi(int arrLength)
+  {
+    return Math.min(arrLength,7);
+  }
+  #ENDIF
+#ENDIF
+#IFSWITCH ARRTYPE==char,short
+/*
+  #IFSWITCH VALUENAME==Duplicated
+  @Override
+  public int getNumReps(int arrLength)
+  {
+    if(arrLength<=3201 && arrLength>=47)
+    {
+      return 9;
+    }
+    return 1;
+  }
+  #ENDIF
+*/
+#ELSEIFSWITCH ARRTYPE==float,double
+/*
+  #IFSWITCH VALUENAME==WithNaNsAndZeros
+  @Override
+  public int getNumReps(int arrLength)
+  {
+    return 2;
+  }
+  #ENDIF
+*/
+#ENDIF
+#IFNOTSWITCH ARRTYPE==boolean
+  #IFSWITCH VALUENAME==Ascending,Descending,Saw,Repeated,Duplicated,OrganPipes,Stagger,Plateau
+  public int incrementM(int m)
+  {
+    return m<<1;
+  }
+  #ENDIF
+#ENDIF
+#IFSWITCH VALUENAME==Randomized,Duplicated,Shuffle,WithNaNsAndZeros
+  @Override
+  public boolean isRandomized()
+  {
+    return true;
+  }
+#ENDIF
+  #MACRO VALUENAMEBuild<ARRTYPE>()
+#IFSWITCH ARRTYPE==boolean,byte,char,short,int,long,float,double
+  #MACRO VALUENAMEBuild<BOXEDTYPE>()
+#ENDIF
+}
+#ENDDEF
 #MACRODEF RandomizedBuild<THETYPE>()
 @Override
 public void buildUnchecked(THETYPE[] arr,int offset,int length,Random rand,int m)
@@ -443,132 +690,7 @@ public void buildUnchecked(THETYPE[] arr,int offset,int length,Random rand,int m
   }
 }
 #ENDDEF
-#MACRODEF ArrayBuilderValue<VALUENAME,RANDOMIZED>()
-VALUENAME
-{
-#IFSWITCH RANDOMIZED==true
-  @Override
-  public boolean isRandomized()
-  {
-    return true;
-  }
-#ENDIF
-  #MACRO VALUENAMEBuild<ARRTYPE>()
-#IFSWITCH ARRTYPE==boolean,byte,char,short,int,long,float,double
-  #MACRO VALUENAMEBuild<BOXEDTYPE>()
-#ENDIF
-}
-#ENDDEF
 
-#MACRODEF ArrayBuilder<ARRTYPE,BOXEDTYPE>()
-public static enum ARRTYPEArrayBuilder
-{
-  #MACRO ArrayBuilderValue<Randomized,true>()
-  ,
-  #MACRO ArrayBuilderValue<Ascending,false>()
-  ,
-  #MACRO ArrayBuilderValue<Descending,false>()
-  ,
-  #MACRO ArrayBuilderValue<AllEquals,false>()
-#IFNOTSWITCH ARRTYPE==boolean
-  ,
-  #MACRO ArrayBuilderValue<MergeAscending,false>()
-  ,
-  #MACRO ArrayBuilderValue<MergeDescending,false>()
-  ,
-  #MACRO ArrayBuilderValue<Saw,false>()
-  ,
-  #MACRO ArrayBuilderValue<SortedRepeated,false>()
-  ,
-  #MACRO ArrayBuilderValue<Repeated,false>()
-  ,
-  #MACRO ArrayBuilderValue<Duplicated,true>()
-  ,
-  #MACRO ArrayBuilderValue<SortedOrganPipes,false>()
-  ,
-  #MACRO ArrayBuilderValue<OrganPipes,false>()
-  ,
-  #MACRO ArrayBuilderValue<Stagger,false>()
-  ,
-  #MACRO ArrayBuilderValue<Plateau,false>()
-  ,
-  #MACRO ArrayBuilderValue<Shuffle,true>()
-  #IFSWITCH ARRTYPE==float,double
-  ,
-  #MACRO ArrayBuilderValue<WithNaNsAndZeros,true>()
-  #ENDIF
-#ENDIF
-  ;
-  public boolean isRandomized()
-  {
-    //most sub-types are not randomized, so make that the default
-    return false;
-  }
-  public abstract void buildUnchecked(ARRTYPE[] arr,int offset,int length,Random rand,int m);
-  public void build(ARRTYPE[] arr,Random rand,int m)
-  {
-    if(arr==null)
-    {
-      throw new NullPointerException("arr cannot be null");
-    }
-    int length;
-    if((length=arr.length)!=0)
-    {
-      buildUnchecked(arr,0,length,rand,m);
-    }
-  }  
-  public void build(ARRTYPE[] arr,int offset,int length,Random rand,int m)
-  {
-    if(arr==null)
-    {
-      throw new NullPointerException("arr cannot be null");
-    }
-    if(offset<0 || length<0 || offset+length>arr.length)
-    {
-      throw new ArrayIndexOutOfBoundsException("offset = "+offset+"; length="+length+"; arr.length="+arr.length);
-    }
-    if(length!=0)
-    {
-      buildUnchecked(arr,offset,length,rand,m);
-    }
-  }
-#IFSWITCH ARRTYPE==boolean,byte,char,short,int,long,float,double
-  public abstract void buildUnchecked(BOXEDTYPE[] arr,int offset,int length,Random rand,int m);
-  public void build(BOXEDTYPE[] arr,Random rand,int m)
-  {
-    if(arr==null)
-    {
-      throw new NullPointerException("arr cannot be null");
-    }
-    int length;
-    if((length=arr.length)!=0)
-    {
-      buildUnchecked(arr,0,length,rand,m);
-    }
-  }  
-  public void build(BOXEDTYPE[] arr,int offset,int length,Random rand,int m)
-  {
-    if(arr==null)
-    {
-      throw new NullPointerException("arr cannot be null");
-    }
-    if(offset<0 || length<0 || offset+length>arr.length)
-    {
-      throw new ArrayIndexOutOfBoundsException("offset = "+offset+"; length="+length+"; arr.length="+arr.length);
-    }
-    if(length!=0)
-    {
-      buildUnchecked(arr,offset,length,rand,m);
-    }
-  }
-#ENDIF
-  @Override
-  public String toString()
-  {
-    return "ARRTYPEArrayBuilder."+this.name();
-  }
-}
-#ENDDEF
 
   #MACRO ArraysAreEqual<boolean>()
   #MACRO ArraysAreEqual<byte>()
@@ -615,59 +737,72 @@ public static boolean isEqual(LEFT l,RIGHT r)
 #IFSWITCH LEFT==boolean,byte,char,short,int,long,float,double
   #IFSWITCH RIGHT==boolean
     #IFSWITCH LEFT==boolean
-  return l==r;
+      return l==r;
     #ELSEIFSWITCH LEFT==byte,char,short,int
-  return l==TypeUtil.castToByte(r);
+      return l==TypeUtil.castToByte(r);
     #ELSEIFSWITCH LEFT==long
-  return l==TypeUtil.castToLong(r);
+      return l==TypeUtil.castToLong(r);
     #ELSEIFSWITCH LEFT==float
-  return l==TypeUtil.castToFloat(r);
+      return l==TypeUtil.castToFloat(r);
     #ELSE
-  return l==TypeUtil.castToDouble(r);
+      return l==TypeUtil.castToDouble(r);
     #ENDIF
   #ELSEIFSWITCH RIGHT==byte,char,short
     #IFSWITCH LEFT==boolean
-  return TypeUtil.castToByte(l)==r;
+      return TypeUtil.castToByte(l)==r;
     #ELSE
-  return l==r;
+      return l==r;
     #ENDIF
   #ELSEIFSWITCH RIGHT==int
     #IFSWITCH LEFT==boolean
-  return TypeUtil.castToByte(l)==r;
+      return TypeUtil.castToByte(l)==r;
     #ELSEIFSWITCH LEFT==byte,char,short,int,long,double
-  return l==r;
+      return l==r;
     #ELSE
-  return ((double)l)==((double)r);
+      return ((double)l)==((double)r);
     #ENDIF
   #ELSEIFSWITCH RIGHT==long
     #IFSWITCH LEFT==boolean
-  return TypeUtil.castToLong(l)==r;
+      return TypeUtil.castToLong(l)==r;
     #ELSEIFSWITCH LEFT==byte,char,short,int,long
-  return l==r;
+      return l==r;
     #ELSEIFSWITCH LEFT==float
-  return TypeUtil.floatEquals(l,r);
+      return l==r;
+      //return TypeUtil.floatEquals(l,r);
     #ELSE
-  return TypeUtil.doubleEquals(l,r);
+      return l==r;
+      //return TypeUtil.doubleEquals(l,r);
     #ENDIF
   #ELSEIFSWITCH RIGHT==float
     #IFSWITCH LEFT==boolean
-  return TypeUtil.castToFloat(l)==r;
+      return TypeUtil.castToFloat(l)==r;
     #ELSEIFSWITCH LEFT==byte,char,short
-  return l==r;
+      return l==r;
     #ELSEIFSWITCH LEFT==int
-  return ((double)l)==((double)r);
+      return l==r;
+      //return ((double)l)==((double)r);
     #ELSEIFSWITCH LEFT==long,float
-  return TypeUtil.floatEquals(r,l);
+      #IFSWITCH LEFT==long
+        return l==r;
+      #ELSE
+        return TypeUtil.floatEquals(r,l);
+      #ENDIF
+      //return TypeUtil.floatEquals(r,l);
     #ELSE
-  return TypeUtil.doubleEquals(l,r);
+      return TypeUtil.doubleEquals(l,r);
     #ENDIF
   #ELSEIFSWITCH RIGHT==double
     #IFSWITCH LEFT==boolean
-  return TypeUtil.doubleEquals(r,TypeUtil.castToDouble(l));
+      return TypeUtil.doubleEquals(r,TypeUtil.castToDouble(l));
     #ELSEIFSWITCH LEFT==byte,char,short,int
-  return l==r;
+      return l==r;
     #ELSE
-  return TypeUtil.doubleEquals(r,l);
+      #IFSWITCH LEFT==long
+        return l==r;
+      #ELSE
+        return TypeUtil.doubleEquals(r,l);
+      #ENDIF
+      //return TypeUtil.doubleEquals(r,l);
     #ENDIF
   #ELSE
   if(r==null)
@@ -675,52 +810,52 @@ public static boolean isEqual(LEFT l,RIGHT r)
     return false;
   }
     #IFSWITCH RIGHT==Boolean
-  return isEqual(l,(boolean)r);
+      return isEqual(l,(boolean)r);
     #ELSEIFSWITCH RIGHT==Byte
-  return isEqual(l,(byte)r);
+      return isEqual(l,(byte)r);
     #ELSEIFSWITCH RIGHT==Character
-  return isEqual(l,(char)r);
+      return isEqual(l,(char)r);
     #ELSEIFSWITCH RIGHT==Short
-  return isEqual(l,(short)r);
+      return isEqual(l,(short)r);
     #ELSEIFSWITCH RIGHT==Integer
-  return isEqual(l,(int)r);
+      return isEqual(l,(int)r);
     #ELSEIFSWITCH RIGHT==Long
-  return isEqual(l,(long)r);
+      return isEqual(l,(long)r);
     #ELSEIFSWITCH RIGHT==Float
-  return isEqual(l,(float)r);
+      return isEqual(l,(float)r);
     #ELSEIFSWITCH RIGHT==Double
-  return isEqual(l,(double)r);
+      return isEqual(l,(double)r);
     #ELSE
-  return r.equals(l);
+      return r.equals(l);
     #ENDIF
   #ENDIF
 #ELSE
   if(l==null)
   {
     #IFSWITCH RIGHT==boolean,byte,char,short,int,long,float,double
-    return false;
+      return false;
     #ELSE
-    return r==null;
+      return r==null;
     #ENDIF
   }
   #IFSWITCH LEFT==Boolean
-  return isEqual((boolean)l,r);
+    return isEqual((boolean)l,r);
   #ELSEIFSWITCH LEFT==Byte
-  return isEqual((byte)l,r);
+    return isEqual((byte)l,r);
   #ELSEIFSWITCH LEFT==Character
-  return isEqual((char)l,r);
+    return isEqual((char)l,r);
   #ELSEIFSWITCH LEFT==Short
-  return isEqual((short)l,r);
+    return isEqual((short)l,r);
   #ELSEIFSWITCH LEFT==Integer
-  return isEqual((int)l,r);
+    return isEqual((int)l,r);
   #ELSEIFSWITCH LEFT==Long
-  return isEqual((long)l,r);
+    return isEqual((long)l,r);
   #ELSEIFSWITCH LEFT==Float
-  return isEqual((float)l,r);
+    return isEqual((float)l,r);
   #ELSEIFSWITCH LEFT==Double
-  return isEqual((double)l,r);
+    return isEqual((double)l,r);
   #ELSE
-  return l.equals(r);
+    return l.equals(r);
   #ENDIF
 #ENDIF
 

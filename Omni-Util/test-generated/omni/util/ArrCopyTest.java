@@ -10,15 +10,21 @@ public class ArrCopyTest
       for(int i=0;i<1000;++i)
       {
         int srcLength=rand.nextInt(1000);
-        boolean[] src;
-        JunitUtil.booleanArrayBuilder.Randomized.buildUnchecked(src=new boolean[srcLength],0,srcLength,rand,0);
+        boolean[] src=new boolean[srcLength];
+        if(srcLength!=0)
+        {
+          JunitUtil.booleanArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+        }
         int dstLength=srcLength+rand.nextInt(1000);
         Boolean[] dst=new Boolean[dstLength];
         int copyLength=rand.nextInt(srcLength+1);
         int srcOffset=rand.nextInt(srcLength-copyLength+1);
         int dstOffset=rand.nextInt(dstLength-copyLength+1);
         ArrCopy.semicheckedCopy(src,srcOffset,dst,dstOffset,copyLength);
-        JunitUtil.uncheckedparallelassertarraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        if(copyLength!=0)
+        {
+          JunitUtil.uncheckedparallelassertarraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        }
       }
     }
     @Test
@@ -28,15 +34,21 @@ public class ArrCopyTest
       for(int i=0;i<1000;++i)
       {
         int srcLength=rand.nextInt(1000);
-        boolean[] src;
-        JunitUtil.booleanArrayBuilder.Randomized.buildUnchecked(src=new boolean[srcLength],0,srcLength,rand,0);
+        boolean[] src=new boolean[srcLength];
+        if(srcLength!=0)
+        {
+          JunitUtil.booleanArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+        }
         int dstLength=srcLength+rand.nextInt(1000);
         Boolean[] dst=new Boolean[dstLength];
         int copyLength=rand.nextInt(srcLength+1);
         int srcOffset=rand.nextInt(srcLength-copyLength+1);
         int dstOffset=rand.nextInt(dstLength-copyLength+1);
         ArrCopy.semicheckedReverseCopy(src,srcOffset,dst,dstOffset,copyLength);
-        JunitUtil.uncheckedparallelassertreversearraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        if(copyLength!=0)
+        {
+          JunitUtil.uncheckedparallelassertreversearraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        }
       }
     }
     @Test
@@ -46,15 +58,21 @@ public class ArrCopyTest
       for(int i=0;i<1000;++i)
       {
         int srcLength=rand.nextInt(1000);
-        byte[] src;
-        JunitUtil.byteArrayBuilder.Randomized.buildUnchecked(src=new byte[srcLength],0,srcLength,rand,0);
+        byte[] src=new byte[srcLength];
+        if(srcLength!=0)
+        {
+          JunitUtil.byteArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+        }
         int dstLength=srcLength+rand.nextInt(1000);
         Byte[] dst=new Byte[dstLength];
         int copyLength=rand.nextInt(srcLength+1);
         int srcOffset=rand.nextInt(srcLength-copyLength+1);
         int dstOffset=rand.nextInt(dstLength-copyLength+1);
         ArrCopy.semicheckedCopy(src,srcOffset,dst,dstOffset,copyLength);
-        JunitUtil.uncheckedparallelassertarraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        if(copyLength!=0)
+        {
+          JunitUtil.uncheckedparallelassertarraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        }
       }
     }
     @Test
@@ -64,15 +82,21 @@ public class ArrCopyTest
       for(int i=0;i<1000;++i)
       {
         int srcLength=rand.nextInt(1000);
-        byte[] src;
-        JunitUtil.byteArrayBuilder.Randomized.buildUnchecked(src=new byte[srcLength],0,srcLength,rand,0);
+        byte[] src=new byte[srcLength];
+        if(srcLength!=0)
+        {
+          JunitUtil.byteArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+        }
         int dstLength=srcLength+rand.nextInt(1000);
         Byte[] dst=new Byte[dstLength];
         int copyLength=rand.nextInt(srcLength+1);
         int srcOffset=rand.nextInt(srcLength-copyLength+1);
         int dstOffset=rand.nextInt(dstLength-copyLength+1);
         ArrCopy.semicheckedReverseCopy(src,srcOffset,dst,dstOffset,copyLength);
-        JunitUtil.uncheckedparallelassertreversearraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        if(copyLength!=0)
+        {
+          JunitUtil.uncheckedparallelassertreversearraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        }
       }
     }
     @Test
@@ -82,15 +106,21 @@ public class ArrCopyTest
       for(int i=0;i<1000;++i)
       {
         int srcLength=rand.nextInt(1000);
-        char[] src;
-        JunitUtil.charArrayBuilder.Randomized.buildUnchecked(src=new char[srcLength],0,srcLength,rand,0);
+        char[] src=new char[srcLength];
+        if(srcLength!=0)
+        {
+          JunitUtil.charArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+        }
         int dstLength=srcLength+rand.nextInt(1000);
         Character[] dst=new Character[dstLength];
         int copyLength=rand.nextInt(srcLength+1);
         int srcOffset=rand.nextInt(srcLength-copyLength+1);
         int dstOffset=rand.nextInt(dstLength-copyLength+1);
         ArrCopy.semicheckedCopy(src,srcOffset,dst,dstOffset,copyLength);
-        JunitUtil.uncheckedparallelassertarraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        if(copyLength!=0)
+        {
+          JunitUtil.uncheckedparallelassertarraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        }
       }
     }
     @Test
@@ -100,15 +130,21 @@ public class ArrCopyTest
       for(int i=0;i<1000;++i)
       {
         int srcLength=rand.nextInt(1000);
-        char[] src;
-        JunitUtil.charArrayBuilder.Randomized.buildUnchecked(src=new char[srcLength],0,srcLength,rand,0);
+        char[] src=new char[srcLength];
+        if(srcLength!=0)
+        {
+          JunitUtil.charArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+        }
         int dstLength=srcLength+rand.nextInt(1000);
         Character[] dst=new Character[dstLength];
         int copyLength=rand.nextInt(srcLength+1);
         int srcOffset=rand.nextInt(srcLength-copyLength+1);
         int dstOffset=rand.nextInt(dstLength-copyLength+1);
         ArrCopy.semicheckedReverseCopy(src,srcOffset,dst,dstOffset,copyLength);
-        JunitUtil.uncheckedparallelassertreversearraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        if(copyLength!=0)
+        {
+          JunitUtil.uncheckedparallelassertreversearraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        }
       }
     }
     @Test
@@ -118,15 +154,21 @@ public class ArrCopyTest
       for(int i=0;i<1000;++i)
       {
         int srcLength=rand.nextInt(1000);
-        short[] src;
-        JunitUtil.shortArrayBuilder.Randomized.buildUnchecked(src=new short[srcLength],0,srcLength,rand,0);
+        short[] src=new short[srcLength];
+        if(srcLength!=0)
+        {
+          JunitUtil.shortArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+        }
         int dstLength=srcLength+rand.nextInt(1000);
         Short[] dst=new Short[dstLength];
         int copyLength=rand.nextInt(srcLength+1);
         int srcOffset=rand.nextInt(srcLength-copyLength+1);
         int dstOffset=rand.nextInt(dstLength-copyLength+1);
         ArrCopy.semicheckedCopy(src,srcOffset,dst,dstOffset,copyLength);
-        JunitUtil.uncheckedparallelassertarraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        if(copyLength!=0)
+        {
+          JunitUtil.uncheckedparallelassertarraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        }
       }
     }
     @Test
@@ -136,15 +178,21 @@ public class ArrCopyTest
       for(int i=0;i<1000;++i)
       {
         int srcLength=rand.nextInt(1000);
-        short[] src;
-        JunitUtil.shortArrayBuilder.Randomized.buildUnchecked(src=new short[srcLength],0,srcLength,rand,0);
+        short[] src=new short[srcLength];
+        if(srcLength!=0)
+        {
+          JunitUtil.shortArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+        }
         int dstLength=srcLength+rand.nextInt(1000);
         Short[] dst=new Short[dstLength];
         int copyLength=rand.nextInt(srcLength+1);
         int srcOffset=rand.nextInt(srcLength-copyLength+1);
         int dstOffset=rand.nextInt(dstLength-copyLength+1);
         ArrCopy.semicheckedReverseCopy(src,srcOffset,dst,dstOffset,copyLength);
-        JunitUtil.uncheckedparallelassertreversearraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        if(copyLength!=0)
+        {
+          JunitUtil.uncheckedparallelassertreversearraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        }
       }
     }
     @Test
@@ -154,15 +202,21 @@ public class ArrCopyTest
       for(int i=0;i<1000;++i)
       {
         int srcLength=rand.nextInt(1000);
-        int[] src;
-        JunitUtil.intArrayBuilder.Randomized.buildUnchecked(src=new int[srcLength],0,srcLength,rand,0);
+        int[] src=new int[srcLength];
+        if(srcLength!=0)
+        {
+          JunitUtil.intArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+        }
         int dstLength=srcLength+rand.nextInt(1000);
         Integer[] dst=new Integer[dstLength];
         int copyLength=rand.nextInt(srcLength+1);
         int srcOffset=rand.nextInt(srcLength-copyLength+1);
         int dstOffset=rand.nextInt(dstLength-copyLength+1);
         ArrCopy.semicheckedCopy(src,srcOffset,dst,dstOffset,copyLength);
-        JunitUtil.uncheckedparallelassertarraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        if(copyLength!=0)
+        {
+          JunitUtil.uncheckedparallelassertarraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        }
       }
     }
     @Test
@@ -172,15 +226,21 @@ public class ArrCopyTest
       for(int i=0;i<1000;++i)
       {
         int srcLength=rand.nextInt(1000);
-        int[] src;
-        JunitUtil.intArrayBuilder.Randomized.buildUnchecked(src=new int[srcLength],0,srcLength,rand,0);
+        int[] src=new int[srcLength];
+        if(srcLength!=0)
+        {
+          JunitUtil.intArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+        }
         int dstLength=srcLength+rand.nextInt(1000);
         Integer[] dst=new Integer[dstLength];
         int copyLength=rand.nextInt(srcLength+1);
         int srcOffset=rand.nextInt(srcLength-copyLength+1);
         int dstOffset=rand.nextInt(dstLength-copyLength+1);
         ArrCopy.semicheckedReverseCopy(src,srcOffset,dst,dstOffset,copyLength);
-        JunitUtil.uncheckedparallelassertreversearraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        if(copyLength!=0)
+        {
+          JunitUtil.uncheckedparallelassertreversearraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        }
       }
     }
     @Test
@@ -190,15 +250,21 @@ public class ArrCopyTest
       for(int i=0;i<1000;++i)
       {
         int srcLength=rand.nextInt(1000);
-        long[] src;
-        JunitUtil.longArrayBuilder.Randomized.buildUnchecked(src=new long[srcLength],0,srcLength,rand,0);
+        long[] src=new long[srcLength];
+        if(srcLength!=0)
+        {
+          JunitUtil.longArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+        }
         int dstLength=srcLength+rand.nextInt(1000);
         Long[] dst=new Long[dstLength];
         int copyLength=rand.nextInt(srcLength+1);
         int srcOffset=rand.nextInt(srcLength-copyLength+1);
         int dstOffset=rand.nextInt(dstLength-copyLength+1);
         ArrCopy.semicheckedCopy(src,srcOffset,dst,dstOffset,copyLength);
-        JunitUtil.uncheckedparallelassertarraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        if(copyLength!=0)
+        {
+          JunitUtil.uncheckedparallelassertarraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        }
       }
     }
     @Test
@@ -208,15 +274,21 @@ public class ArrCopyTest
       for(int i=0;i<1000;++i)
       {
         int srcLength=rand.nextInt(1000);
-        long[] src;
-        JunitUtil.longArrayBuilder.Randomized.buildUnchecked(src=new long[srcLength],0,srcLength,rand,0);
+        long[] src=new long[srcLength];
+        if(srcLength!=0)
+        {
+          JunitUtil.longArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+        }
         int dstLength=srcLength+rand.nextInt(1000);
         Long[] dst=new Long[dstLength];
         int copyLength=rand.nextInt(srcLength+1);
         int srcOffset=rand.nextInt(srcLength-copyLength+1);
         int dstOffset=rand.nextInt(dstLength-copyLength+1);
         ArrCopy.semicheckedReverseCopy(src,srcOffset,dst,dstOffset,copyLength);
-        JunitUtil.uncheckedparallelassertreversearraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        if(copyLength!=0)
+        {
+          JunitUtil.uncheckedparallelassertreversearraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        }
       }
     }
     @Test
@@ -226,15 +298,21 @@ public class ArrCopyTest
       for(int i=0;i<1000;++i)
       {
         int srcLength=rand.nextInt(1000);
-        float[] src;
-        JunitUtil.floatArrayBuilder.Randomized.buildUnchecked(src=new float[srcLength],0,srcLength,rand,0);
+        float[] src=new float[srcLength];
+        if(srcLength!=0)
+        {
+          JunitUtil.floatArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+        }
         int dstLength=srcLength+rand.nextInt(1000);
         Float[] dst=new Float[dstLength];
         int copyLength=rand.nextInt(srcLength+1);
         int srcOffset=rand.nextInt(srcLength-copyLength+1);
         int dstOffset=rand.nextInt(dstLength-copyLength+1);
         ArrCopy.semicheckedCopy(src,srcOffset,dst,dstOffset,copyLength);
-        JunitUtil.uncheckedparallelassertarraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        if(copyLength!=0)
+        {
+          JunitUtil.uncheckedparallelassertarraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        }
       }
     }
     @Test
@@ -244,15 +322,21 @@ public class ArrCopyTest
       for(int i=0;i<1000;++i)
       {
         int srcLength=rand.nextInt(1000);
-        float[] src;
-        JunitUtil.floatArrayBuilder.Randomized.buildUnchecked(src=new float[srcLength],0,srcLength,rand,0);
+        float[] src=new float[srcLength];
+        if(srcLength!=0)
+        {
+          JunitUtil.floatArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+        }
         int dstLength=srcLength+rand.nextInt(1000);
         Float[] dst=new Float[dstLength];
         int copyLength=rand.nextInt(srcLength+1);
         int srcOffset=rand.nextInt(srcLength-copyLength+1);
         int dstOffset=rand.nextInt(dstLength-copyLength+1);
         ArrCopy.semicheckedReverseCopy(src,srcOffset,dst,dstOffset,copyLength);
-        JunitUtil.uncheckedparallelassertreversearraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        if(copyLength!=0)
+        {
+          JunitUtil.uncheckedparallelassertreversearraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        }
       }
     }
     @Test
@@ -262,15 +346,21 @@ public class ArrCopyTest
       for(int i=0;i<1000;++i)
       {
         int srcLength=rand.nextInt(1000);
-        double[] src;
-        JunitUtil.doubleArrayBuilder.Randomized.buildUnchecked(src=new double[srcLength],0,srcLength,rand,0);
+        double[] src=new double[srcLength];
+        if(srcLength!=0)
+        {
+          JunitUtil.doubleArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+        }
         int dstLength=srcLength+rand.nextInt(1000);
         Double[] dst=new Double[dstLength];
         int copyLength=rand.nextInt(srcLength+1);
         int srcOffset=rand.nextInt(srcLength-copyLength+1);
         int dstOffset=rand.nextInt(dstLength-copyLength+1);
         ArrCopy.semicheckedCopy(src,srcOffset,dst,dstOffset,copyLength);
-        JunitUtil.uncheckedparallelassertarraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        if(copyLength!=0)
+        {
+          JunitUtil.uncheckedparallelassertarraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        }
       }
     }
     @Test
@@ -280,15 +370,21 @@ public class ArrCopyTest
       for(int i=0;i<1000;++i)
       {
         int srcLength=rand.nextInt(1000);
-        double[] src;
-        JunitUtil.doubleArrayBuilder.Randomized.buildUnchecked(src=new double[srcLength],0,srcLength,rand,0);
+        double[] src=new double[srcLength];
+        if(srcLength!=0)
+        {
+          JunitUtil.doubleArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+        }
         int dstLength=srcLength+rand.nextInt(1000);
         Double[] dst=new Double[dstLength];
         int copyLength=rand.nextInt(srcLength+1);
         int srcOffset=rand.nextInt(srcLength-copyLength+1);
         int dstOffset=rand.nextInt(dstLength-copyLength+1);
         ArrCopy.semicheckedReverseCopy(src,srcOffset,dst,dstOffset,copyLength);
-        JunitUtil.uncheckedparallelassertreversearraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        if(copyLength!=0)
+        {
+          JunitUtil.uncheckedparallelassertreversearraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        }
       }
     }
     @Test
@@ -298,15 +394,21 @@ public class ArrCopyTest
       for(int i=0;i<1000;++i)
       {
         int srcLength=rand.nextInt(1000);
-        boolean[] src;
-        JunitUtil.booleanArrayBuilder.Randomized.buildUnchecked(src=new boolean[srcLength],0,srcLength,rand,0);
+        boolean[] src=new boolean[srcLength];
+        if(srcLength!=0)
+        {
+          JunitUtil.booleanArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+        }
         int dstLength=srcLength+rand.nextInt(1000);
         Object[] dst=new Object[dstLength];
         int copyLength=rand.nextInt(srcLength+1);
         int srcOffset=rand.nextInt(srcLength-copyLength+1);
         int dstOffset=rand.nextInt(dstLength-copyLength+1);
         ArrCopy.semicheckedCopy(src,srcOffset,dst,dstOffset,copyLength);
-        JunitUtil.uncheckedparallelassertarraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        if(copyLength!=0)
+        {
+          JunitUtil.uncheckedparallelassertarraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        }
       }
     }
     @Test
@@ -316,15 +418,21 @@ public class ArrCopyTest
       for(int i=0;i<1000;++i)
       {
         int srcLength=rand.nextInt(1000);
-        boolean[] src;
-        JunitUtil.booleanArrayBuilder.Randomized.buildUnchecked(src=new boolean[srcLength],0,srcLength,rand,0);
+        boolean[] src=new boolean[srcLength];
+        if(srcLength!=0)
+        {
+          JunitUtil.booleanArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+        }
         int dstLength=srcLength+rand.nextInt(1000);
         Object[] dst=new Object[dstLength];
         int copyLength=rand.nextInt(srcLength+1);
         int srcOffset=rand.nextInt(srcLength-copyLength+1);
         int dstOffset=rand.nextInt(dstLength-copyLength+1);
         ArrCopy.semicheckedReverseCopy(src,srcOffset,dst,dstOffset,copyLength);
-        JunitUtil.uncheckedparallelassertreversearraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        if(copyLength!=0)
+        {
+          JunitUtil.uncheckedparallelassertreversearraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        }
       }
     }
     @Test
@@ -334,15 +442,21 @@ public class ArrCopyTest
       for(int i=0;i<1000;++i)
       {
         int srcLength=rand.nextInt(1000);
-        byte[] src;
-        JunitUtil.byteArrayBuilder.Randomized.buildUnchecked(src=new byte[srcLength],0,srcLength,rand,0);
+        byte[] src=new byte[srcLength];
+        if(srcLength!=0)
+        {
+          JunitUtil.byteArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+        }
         int dstLength=srcLength+rand.nextInt(1000);
         Object[] dst=new Object[dstLength];
         int copyLength=rand.nextInt(srcLength+1);
         int srcOffset=rand.nextInt(srcLength-copyLength+1);
         int dstOffset=rand.nextInt(dstLength-copyLength+1);
         ArrCopy.semicheckedCopy(src,srcOffset,dst,dstOffset,copyLength);
-        JunitUtil.uncheckedparallelassertarraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        if(copyLength!=0)
+        {
+          JunitUtil.uncheckedparallelassertarraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        }
       }
     }
     @Test
@@ -352,15 +466,21 @@ public class ArrCopyTest
       for(int i=0;i<1000;++i)
       {
         int srcLength=rand.nextInt(1000);
-        byte[] src;
-        JunitUtil.byteArrayBuilder.Randomized.buildUnchecked(src=new byte[srcLength],0,srcLength,rand,0);
+        byte[] src=new byte[srcLength];
+        if(srcLength!=0)
+        {
+          JunitUtil.byteArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+        }
         int dstLength=srcLength+rand.nextInt(1000);
         Object[] dst=new Object[dstLength];
         int copyLength=rand.nextInt(srcLength+1);
         int srcOffset=rand.nextInt(srcLength-copyLength+1);
         int dstOffset=rand.nextInt(dstLength-copyLength+1);
         ArrCopy.semicheckedReverseCopy(src,srcOffset,dst,dstOffset,copyLength);
-        JunitUtil.uncheckedparallelassertreversearraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        if(copyLength!=0)
+        {
+          JunitUtil.uncheckedparallelassertreversearraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        }
       }
     }
     @Test
@@ -370,15 +490,21 @@ public class ArrCopyTest
       for(int i=0;i<1000;++i)
       {
         int srcLength=rand.nextInt(1000);
-        char[] src;
-        JunitUtil.charArrayBuilder.Randomized.buildUnchecked(src=new char[srcLength],0,srcLength,rand,0);
+        char[] src=new char[srcLength];
+        if(srcLength!=0)
+        {
+          JunitUtil.charArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+        }
         int dstLength=srcLength+rand.nextInt(1000);
         Object[] dst=new Object[dstLength];
         int copyLength=rand.nextInt(srcLength+1);
         int srcOffset=rand.nextInt(srcLength-copyLength+1);
         int dstOffset=rand.nextInt(dstLength-copyLength+1);
         ArrCopy.semicheckedCopy(src,srcOffset,dst,dstOffset,copyLength);
-        JunitUtil.uncheckedparallelassertarraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        if(copyLength!=0)
+        {
+          JunitUtil.uncheckedparallelassertarraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        }
       }
     }
     @Test
@@ -388,15 +514,21 @@ public class ArrCopyTest
       for(int i=0;i<1000;++i)
       {
         int srcLength=rand.nextInt(1000);
-        char[] src;
-        JunitUtil.charArrayBuilder.Randomized.buildUnchecked(src=new char[srcLength],0,srcLength,rand,0);
+        char[] src=new char[srcLength];
+        if(srcLength!=0)
+        {
+          JunitUtil.charArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+        }
         int dstLength=srcLength+rand.nextInt(1000);
         Object[] dst=new Object[dstLength];
         int copyLength=rand.nextInt(srcLength+1);
         int srcOffset=rand.nextInt(srcLength-copyLength+1);
         int dstOffset=rand.nextInt(dstLength-copyLength+1);
         ArrCopy.semicheckedReverseCopy(src,srcOffset,dst,dstOffset,copyLength);
-        JunitUtil.uncheckedparallelassertreversearraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        if(copyLength!=0)
+        {
+          JunitUtil.uncheckedparallelassertreversearraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        }
       }
     }
     @Test
@@ -406,15 +538,21 @@ public class ArrCopyTest
       for(int i=0;i<1000;++i)
       {
         int srcLength=rand.nextInt(1000);
-        short[] src;
-        JunitUtil.shortArrayBuilder.Randomized.buildUnchecked(src=new short[srcLength],0,srcLength,rand,0);
+        short[] src=new short[srcLength];
+        if(srcLength!=0)
+        {
+          JunitUtil.shortArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+        }
         int dstLength=srcLength+rand.nextInt(1000);
         Object[] dst=new Object[dstLength];
         int copyLength=rand.nextInt(srcLength+1);
         int srcOffset=rand.nextInt(srcLength-copyLength+1);
         int dstOffset=rand.nextInt(dstLength-copyLength+1);
         ArrCopy.semicheckedCopy(src,srcOffset,dst,dstOffset,copyLength);
-        JunitUtil.uncheckedparallelassertarraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        if(copyLength!=0)
+        {
+          JunitUtil.uncheckedparallelassertarraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        }
       }
     }
     @Test
@@ -424,15 +562,21 @@ public class ArrCopyTest
       for(int i=0;i<1000;++i)
       {
         int srcLength=rand.nextInt(1000);
-        short[] src;
-        JunitUtil.shortArrayBuilder.Randomized.buildUnchecked(src=new short[srcLength],0,srcLength,rand,0);
+        short[] src=new short[srcLength];
+        if(srcLength!=0)
+        {
+          JunitUtil.shortArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+        }
         int dstLength=srcLength+rand.nextInt(1000);
         Object[] dst=new Object[dstLength];
         int copyLength=rand.nextInt(srcLength+1);
         int srcOffset=rand.nextInt(srcLength-copyLength+1);
         int dstOffset=rand.nextInt(dstLength-copyLength+1);
         ArrCopy.semicheckedReverseCopy(src,srcOffset,dst,dstOffset,copyLength);
-        JunitUtil.uncheckedparallelassertreversearraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        if(copyLength!=0)
+        {
+          JunitUtil.uncheckedparallelassertreversearraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        }
       }
     }
     @Test
@@ -442,15 +586,21 @@ public class ArrCopyTest
       for(int i=0;i<1000;++i)
       {
         int srcLength=rand.nextInt(1000);
-        int[] src;
-        JunitUtil.intArrayBuilder.Randomized.buildUnchecked(src=new int[srcLength],0,srcLength,rand,0);
+        int[] src=new int[srcLength];
+        if(srcLength!=0)
+        {
+          JunitUtil.intArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+        }
         int dstLength=srcLength+rand.nextInt(1000);
         Object[] dst=new Object[dstLength];
         int copyLength=rand.nextInt(srcLength+1);
         int srcOffset=rand.nextInt(srcLength-copyLength+1);
         int dstOffset=rand.nextInt(dstLength-copyLength+1);
         ArrCopy.semicheckedCopy(src,srcOffset,dst,dstOffset,copyLength);
-        JunitUtil.uncheckedparallelassertarraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        if(copyLength!=0)
+        {
+          JunitUtil.uncheckedparallelassertarraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        }
       }
     }
     @Test
@@ -460,15 +610,21 @@ public class ArrCopyTest
       for(int i=0;i<1000;++i)
       {
         int srcLength=rand.nextInt(1000);
-        int[] src;
-        JunitUtil.intArrayBuilder.Randomized.buildUnchecked(src=new int[srcLength],0,srcLength,rand,0);
+        int[] src=new int[srcLength];
+        if(srcLength!=0)
+        {
+          JunitUtil.intArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+        }
         int dstLength=srcLength+rand.nextInt(1000);
         Object[] dst=new Object[dstLength];
         int copyLength=rand.nextInt(srcLength+1);
         int srcOffset=rand.nextInt(srcLength-copyLength+1);
         int dstOffset=rand.nextInt(dstLength-copyLength+1);
         ArrCopy.semicheckedReverseCopy(src,srcOffset,dst,dstOffset,copyLength);
-        JunitUtil.uncheckedparallelassertreversearraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        if(copyLength!=0)
+        {
+          JunitUtil.uncheckedparallelassertreversearraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        }
       }
     }
     @Test
@@ -478,15 +634,21 @@ public class ArrCopyTest
       for(int i=0;i<1000;++i)
       {
         int srcLength=rand.nextInt(1000);
-        long[] src;
-        JunitUtil.longArrayBuilder.Randomized.buildUnchecked(src=new long[srcLength],0,srcLength,rand,0);
+        long[] src=new long[srcLength];
+        if(srcLength!=0)
+        {
+          JunitUtil.longArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+        }
         int dstLength=srcLength+rand.nextInt(1000);
         Object[] dst=new Object[dstLength];
         int copyLength=rand.nextInt(srcLength+1);
         int srcOffset=rand.nextInt(srcLength-copyLength+1);
         int dstOffset=rand.nextInt(dstLength-copyLength+1);
         ArrCopy.semicheckedCopy(src,srcOffset,dst,dstOffset,copyLength);
-        JunitUtil.uncheckedparallelassertarraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        if(copyLength!=0)
+        {
+          JunitUtil.uncheckedparallelassertarraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        }
       }
     }
     @Test
@@ -496,15 +658,21 @@ public class ArrCopyTest
       for(int i=0;i<1000;++i)
       {
         int srcLength=rand.nextInt(1000);
-        long[] src;
-        JunitUtil.longArrayBuilder.Randomized.buildUnchecked(src=new long[srcLength],0,srcLength,rand,0);
+        long[] src=new long[srcLength];
+        if(srcLength!=0)
+        {
+          JunitUtil.longArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+        }
         int dstLength=srcLength+rand.nextInt(1000);
         Object[] dst=new Object[dstLength];
         int copyLength=rand.nextInt(srcLength+1);
         int srcOffset=rand.nextInt(srcLength-copyLength+1);
         int dstOffset=rand.nextInt(dstLength-copyLength+1);
         ArrCopy.semicheckedReverseCopy(src,srcOffset,dst,dstOffset,copyLength);
-        JunitUtil.uncheckedparallelassertreversearraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        if(copyLength!=0)
+        {
+          JunitUtil.uncheckedparallelassertreversearraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        }
       }
     }
     @Test
@@ -514,15 +682,21 @@ public class ArrCopyTest
       for(int i=0;i<1000;++i)
       {
         int srcLength=rand.nextInt(1000);
-        float[] src;
-        JunitUtil.floatArrayBuilder.Randomized.buildUnchecked(src=new float[srcLength],0,srcLength,rand,0);
+        float[] src=new float[srcLength];
+        if(srcLength!=0)
+        {
+          JunitUtil.floatArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+        }
         int dstLength=srcLength+rand.nextInt(1000);
         Object[] dst=new Object[dstLength];
         int copyLength=rand.nextInt(srcLength+1);
         int srcOffset=rand.nextInt(srcLength-copyLength+1);
         int dstOffset=rand.nextInt(dstLength-copyLength+1);
         ArrCopy.semicheckedCopy(src,srcOffset,dst,dstOffset,copyLength);
-        JunitUtil.uncheckedparallelassertarraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        if(copyLength!=0)
+        {
+          JunitUtil.uncheckedparallelassertarraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        }
       }
     }
     @Test
@@ -532,15 +706,21 @@ public class ArrCopyTest
       for(int i=0;i<1000;++i)
       {
         int srcLength=rand.nextInt(1000);
-        float[] src;
-        JunitUtil.floatArrayBuilder.Randomized.buildUnchecked(src=new float[srcLength],0,srcLength,rand,0);
+        float[] src=new float[srcLength];
+        if(srcLength!=0)
+        {
+          JunitUtil.floatArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+        }
         int dstLength=srcLength+rand.nextInt(1000);
         Object[] dst=new Object[dstLength];
         int copyLength=rand.nextInt(srcLength+1);
         int srcOffset=rand.nextInt(srcLength-copyLength+1);
         int dstOffset=rand.nextInt(dstLength-copyLength+1);
         ArrCopy.semicheckedReverseCopy(src,srcOffset,dst,dstOffset,copyLength);
-        JunitUtil.uncheckedparallelassertreversearraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        if(copyLength!=0)
+        {
+          JunitUtil.uncheckedparallelassertreversearraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        }
       }
     }
     @Test
@@ -550,15 +730,21 @@ public class ArrCopyTest
       for(int i=0;i<1000;++i)
       {
         int srcLength=rand.nextInt(1000);
-        double[] src;
-        JunitUtil.doubleArrayBuilder.Randomized.buildUnchecked(src=new double[srcLength],0,srcLength,rand,0);
+        double[] src=new double[srcLength];
+        if(srcLength!=0)
+        {
+          JunitUtil.doubleArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+        }
         int dstLength=srcLength+rand.nextInt(1000);
         Object[] dst=new Object[dstLength];
         int copyLength=rand.nextInt(srcLength+1);
         int srcOffset=rand.nextInt(srcLength-copyLength+1);
         int dstOffset=rand.nextInt(dstLength-copyLength+1);
         ArrCopy.semicheckedCopy(src,srcOffset,dst,dstOffset,copyLength);
-        JunitUtil.uncheckedparallelassertarraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        if(copyLength!=0)
+        {
+          JunitUtil.uncheckedparallelassertarraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        }
       }
     }
     @Test
@@ -568,15 +754,21 @@ public class ArrCopyTest
       for(int i=0;i<1000;++i)
       {
         int srcLength=rand.nextInt(1000);
-        double[] src;
-        JunitUtil.doubleArrayBuilder.Randomized.buildUnchecked(src=new double[srcLength],0,srcLength,rand,0);
+        double[] src=new double[srcLength];
+        if(srcLength!=0)
+        {
+          JunitUtil.doubleArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+        }
         int dstLength=srcLength+rand.nextInt(1000);
         Object[] dst=new Object[dstLength];
         int copyLength=rand.nextInt(srcLength+1);
         int srcOffset=rand.nextInt(srcLength-copyLength+1);
         int dstOffset=rand.nextInt(dstLength-copyLength+1);
         ArrCopy.semicheckedReverseCopy(src,srcOffset,dst,dstOffset,copyLength);
-        JunitUtil.uncheckedparallelassertreversearraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        if(copyLength!=0)
+        {
+          JunitUtil.uncheckedparallelassertreversearraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        }
       }
     }
     @Test
@@ -586,15 +778,21 @@ public class ArrCopyTest
       for(int i=0;i<1000;++i)
       {
         int srcLength=rand.nextInt(1000);
-        Boolean[] src;
-        JunitUtil.booleanArrayBuilder.Randomized.buildUnchecked(src=new Boolean[srcLength],0,srcLength,rand,0);
+        Boolean[] src=new Boolean[srcLength];
+        if(srcLength!=0)
+        {
+          JunitUtil.booleanArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+        }
         int dstLength=srcLength+rand.nextInt(1000);
         boolean[] dst=new boolean[dstLength];
         int copyLength=rand.nextInt(srcLength+1);
         int srcOffset=rand.nextInt(srcLength-copyLength+1);
         int dstOffset=rand.nextInt(dstLength-copyLength+1);
         ArrCopy.semicheckedCopy(src,srcOffset,dst,dstOffset,copyLength);
-        JunitUtil.uncheckedparallelassertarraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        if(copyLength!=0)
+        {
+          JunitUtil.uncheckedparallelassertarraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        }
       }
     }
     @Test
@@ -604,15 +802,21 @@ public class ArrCopyTest
       for(int i=0;i<1000;++i)
       {
         int srcLength=rand.nextInt(1000);
-        Boolean[] src;
-        JunitUtil.booleanArrayBuilder.Randomized.buildUnchecked(src=new Boolean[srcLength],0,srcLength,rand,0);
+        Boolean[] src=new Boolean[srcLength];
+        if(srcLength!=0)
+        {
+          JunitUtil.booleanArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+        }
         int dstLength=srcLength+rand.nextInt(1000);
         boolean[] dst=new boolean[dstLength];
         int copyLength=rand.nextInt(srcLength+1);
         int srcOffset=rand.nextInt(srcLength-copyLength+1);
         int dstOffset=rand.nextInt(dstLength-copyLength+1);
         ArrCopy.semicheckedReverseCopy(src,srcOffset,dst,dstOffset,copyLength);
-        JunitUtil.uncheckedparallelassertreversearraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        if(copyLength!=0)
+        {
+          JunitUtil.uncheckedparallelassertreversearraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        }
       }
     }
     @Test
@@ -622,15 +826,21 @@ public class ArrCopyTest
       for(int i=0;i<1000;++i)
       {
         int srcLength=rand.nextInt(1000);
-        Byte[] src;
-        JunitUtil.byteArrayBuilder.Randomized.buildUnchecked(src=new Byte[srcLength],0,srcLength,rand,0);
+        Byte[] src=new Byte[srcLength];
+        if(srcLength!=0)
+        {
+          JunitUtil.byteArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+        }
         int dstLength=srcLength+rand.nextInt(1000);
         byte[] dst=new byte[dstLength];
         int copyLength=rand.nextInt(srcLength+1);
         int srcOffset=rand.nextInt(srcLength-copyLength+1);
         int dstOffset=rand.nextInt(dstLength-copyLength+1);
         ArrCopy.semicheckedCopy(src,srcOffset,dst,dstOffset,copyLength);
-        JunitUtil.uncheckedparallelassertarraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        if(copyLength!=0)
+        {
+          JunitUtil.uncheckedparallelassertarraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        }
       }
     }
     @Test
@@ -640,15 +850,21 @@ public class ArrCopyTest
       for(int i=0;i<1000;++i)
       {
         int srcLength=rand.nextInt(1000);
-        Byte[] src;
-        JunitUtil.byteArrayBuilder.Randomized.buildUnchecked(src=new Byte[srcLength],0,srcLength,rand,0);
+        Byte[] src=new Byte[srcLength];
+        if(srcLength!=0)
+        {
+          JunitUtil.byteArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+        }
         int dstLength=srcLength+rand.nextInt(1000);
         byte[] dst=new byte[dstLength];
         int copyLength=rand.nextInt(srcLength+1);
         int srcOffset=rand.nextInt(srcLength-copyLength+1);
         int dstOffset=rand.nextInt(dstLength-copyLength+1);
         ArrCopy.semicheckedReverseCopy(src,srcOffset,dst,dstOffset,copyLength);
-        JunitUtil.uncheckedparallelassertreversearraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        if(copyLength!=0)
+        {
+          JunitUtil.uncheckedparallelassertreversearraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        }
       }
     }
     @Test
@@ -658,15 +874,21 @@ public class ArrCopyTest
       for(int i=0;i<1000;++i)
       {
         int srcLength=rand.nextInt(1000);
-        Character[] src;
-        JunitUtil.charArrayBuilder.Randomized.buildUnchecked(src=new Character[srcLength],0,srcLength,rand,0);
+        Character[] src=new Character[srcLength];
+        if(srcLength!=0)
+        {
+          JunitUtil.charArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+        }
         int dstLength=srcLength+rand.nextInt(1000);
         char[] dst=new char[dstLength];
         int copyLength=rand.nextInt(srcLength+1);
         int srcOffset=rand.nextInt(srcLength-copyLength+1);
         int dstOffset=rand.nextInt(dstLength-copyLength+1);
         ArrCopy.semicheckedCopy(src,srcOffset,dst,dstOffset,copyLength);
-        JunitUtil.uncheckedparallelassertarraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        if(copyLength!=0)
+        {
+          JunitUtil.uncheckedparallelassertarraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        }
       }
     }
     @Test
@@ -676,15 +898,21 @@ public class ArrCopyTest
       for(int i=0;i<1000;++i)
       {
         int srcLength=rand.nextInt(1000);
-        Character[] src;
-        JunitUtil.charArrayBuilder.Randomized.buildUnchecked(src=new Character[srcLength],0,srcLength,rand,0);
+        Character[] src=new Character[srcLength];
+        if(srcLength!=0)
+        {
+          JunitUtil.charArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+        }
         int dstLength=srcLength+rand.nextInt(1000);
         char[] dst=new char[dstLength];
         int copyLength=rand.nextInt(srcLength+1);
         int srcOffset=rand.nextInt(srcLength-copyLength+1);
         int dstOffset=rand.nextInt(dstLength-copyLength+1);
         ArrCopy.semicheckedReverseCopy(src,srcOffset,dst,dstOffset,copyLength);
-        JunitUtil.uncheckedparallelassertreversearraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        if(copyLength!=0)
+        {
+          JunitUtil.uncheckedparallelassertreversearraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        }
       }
     }
     @Test
@@ -694,15 +922,21 @@ public class ArrCopyTest
       for(int i=0;i<1000;++i)
       {
         int srcLength=rand.nextInt(1000);
-        Short[] src;
-        JunitUtil.shortArrayBuilder.Randomized.buildUnchecked(src=new Short[srcLength],0,srcLength,rand,0);
+        Short[] src=new Short[srcLength];
+        if(srcLength!=0)
+        {
+          JunitUtil.shortArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+        }
         int dstLength=srcLength+rand.nextInt(1000);
         short[] dst=new short[dstLength];
         int copyLength=rand.nextInt(srcLength+1);
         int srcOffset=rand.nextInt(srcLength-copyLength+1);
         int dstOffset=rand.nextInt(dstLength-copyLength+1);
         ArrCopy.semicheckedCopy(src,srcOffset,dst,dstOffset,copyLength);
-        JunitUtil.uncheckedparallelassertarraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        if(copyLength!=0)
+        {
+          JunitUtil.uncheckedparallelassertarraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        }
       }
     }
     @Test
@@ -712,15 +946,21 @@ public class ArrCopyTest
       for(int i=0;i<1000;++i)
       {
         int srcLength=rand.nextInt(1000);
-        Short[] src;
-        JunitUtil.shortArrayBuilder.Randomized.buildUnchecked(src=new Short[srcLength],0,srcLength,rand,0);
+        Short[] src=new Short[srcLength];
+        if(srcLength!=0)
+        {
+          JunitUtil.shortArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+        }
         int dstLength=srcLength+rand.nextInt(1000);
         short[] dst=new short[dstLength];
         int copyLength=rand.nextInt(srcLength+1);
         int srcOffset=rand.nextInt(srcLength-copyLength+1);
         int dstOffset=rand.nextInt(dstLength-copyLength+1);
         ArrCopy.semicheckedReverseCopy(src,srcOffset,dst,dstOffset,copyLength);
-        JunitUtil.uncheckedparallelassertreversearraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        if(copyLength!=0)
+        {
+          JunitUtil.uncheckedparallelassertreversearraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        }
       }
     }
     @Test
@@ -730,15 +970,21 @@ public class ArrCopyTest
       for(int i=0;i<1000;++i)
       {
         int srcLength=rand.nextInt(1000);
-        Integer[] src;
-        JunitUtil.intArrayBuilder.Randomized.buildUnchecked(src=new Integer[srcLength],0,srcLength,rand,0);
+        Integer[] src=new Integer[srcLength];
+        if(srcLength!=0)
+        {
+          JunitUtil.intArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+        }
         int dstLength=srcLength+rand.nextInt(1000);
         int[] dst=new int[dstLength];
         int copyLength=rand.nextInt(srcLength+1);
         int srcOffset=rand.nextInt(srcLength-copyLength+1);
         int dstOffset=rand.nextInt(dstLength-copyLength+1);
         ArrCopy.semicheckedCopy(src,srcOffset,dst,dstOffset,copyLength);
-        JunitUtil.uncheckedparallelassertarraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        if(copyLength!=0)
+        {
+          JunitUtil.uncheckedparallelassertarraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        }
       }
     }
     @Test
@@ -748,15 +994,21 @@ public class ArrCopyTest
       for(int i=0;i<1000;++i)
       {
         int srcLength=rand.nextInt(1000);
-        Integer[] src;
-        JunitUtil.intArrayBuilder.Randomized.buildUnchecked(src=new Integer[srcLength],0,srcLength,rand,0);
+        Integer[] src=new Integer[srcLength];
+        if(srcLength!=0)
+        {
+          JunitUtil.intArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+        }
         int dstLength=srcLength+rand.nextInt(1000);
         int[] dst=new int[dstLength];
         int copyLength=rand.nextInt(srcLength+1);
         int srcOffset=rand.nextInt(srcLength-copyLength+1);
         int dstOffset=rand.nextInt(dstLength-copyLength+1);
         ArrCopy.semicheckedReverseCopy(src,srcOffset,dst,dstOffset,copyLength);
-        JunitUtil.uncheckedparallelassertreversearraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        if(copyLength!=0)
+        {
+          JunitUtil.uncheckedparallelassertreversearraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        }
       }
     }
     @Test
@@ -766,15 +1018,21 @@ public class ArrCopyTest
       for(int i=0;i<1000;++i)
       {
         int srcLength=rand.nextInt(1000);
-        Long[] src;
-        JunitUtil.longArrayBuilder.Randomized.buildUnchecked(src=new Long[srcLength],0,srcLength,rand,0);
+        Long[] src=new Long[srcLength];
+        if(srcLength!=0)
+        {
+          JunitUtil.longArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+        }
         int dstLength=srcLength+rand.nextInt(1000);
         long[] dst=new long[dstLength];
         int copyLength=rand.nextInt(srcLength+1);
         int srcOffset=rand.nextInt(srcLength-copyLength+1);
         int dstOffset=rand.nextInt(dstLength-copyLength+1);
         ArrCopy.semicheckedCopy(src,srcOffset,dst,dstOffset,copyLength);
-        JunitUtil.uncheckedparallelassertarraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        if(copyLength!=0)
+        {
+          JunitUtil.uncheckedparallelassertarraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        }
       }
     }
     @Test
@@ -784,15 +1042,21 @@ public class ArrCopyTest
       for(int i=0;i<1000;++i)
       {
         int srcLength=rand.nextInt(1000);
-        Long[] src;
-        JunitUtil.longArrayBuilder.Randomized.buildUnchecked(src=new Long[srcLength],0,srcLength,rand,0);
+        Long[] src=new Long[srcLength];
+        if(srcLength!=0)
+        {
+          JunitUtil.longArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+        }
         int dstLength=srcLength+rand.nextInt(1000);
         long[] dst=new long[dstLength];
         int copyLength=rand.nextInt(srcLength+1);
         int srcOffset=rand.nextInt(srcLength-copyLength+1);
         int dstOffset=rand.nextInt(dstLength-copyLength+1);
         ArrCopy.semicheckedReverseCopy(src,srcOffset,dst,dstOffset,copyLength);
-        JunitUtil.uncheckedparallelassertreversearraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        if(copyLength!=0)
+        {
+          JunitUtil.uncheckedparallelassertreversearraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        }
       }
     }
     @Test
@@ -802,15 +1066,21 @@ public class ArrCopyTest
       for(int i=0;i<1000;++i)
       {
         int srcLength=rand.nextInt(1000);
-        Float[] src;
-        JunitUtil.floatArrayBuilder.Randomized.buildUnchecked(src=new Float[srcLength],0,srcLength,rand,0);
+        Float[] src=new Float[srcLength];
+        if(srcLength!=0)
+        {
+          JunitUtil.floatArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+        }
         int dstLength=srcLength+rand.nextInt(1000);
         float[] dst=new float[dstLength];
         int copyLength=rand.nextInt(srcLength+1);
         int srcOffset=rand.nextInt(srcLength-copyLength+1);
         int dstOffset=rand.nextInt(dstLength-copyLength+1);
         ArrCopy.semicheckedCopy(src,srcOffset,dst,dstOffset,copyLength);
-        JunitUtil.uncheckedparallelassertarraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        if(copyLength!=0)
+        {
+          JunitUtil.uncheckedparallelassertarraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        }
       }
     }
     @Test
@@ -820,15 +1090,21 @@ public class ArrCopyTest
       for(int i=0;i<1000;++i)
       {
         int srcLength=rand.nextInt(1000);
-        Float[] src;
-        JunitUtil.floatArrayBuilder.Randomized.buildUnchecked(src=new Float[srcLength],0,srcLength,rand,0);
+        Float[] src=new Float[srcLength];
+        if(srcLength!=0)
+        {
+          JunitUtil.floatArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+        }
         int dstLength=srcLength+rand.nextInt(1000);
         float[] dst=new float[dstLength];
         int copyLength=rand.nextInt(srcLength+1);
         int srcOffset=rand.nextInt(srcLength-copyLength+1);
         int dstOffset=rand.nextInt(dstLength-copyLength+1);
         ArrCopy.semicheckedReverseCopy(src,srcOffset,dst,dstOffset,copyLength);
-        JunitUtil.uncheckedparallelassertreversearraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        if(copyLength!=0)
+        {
+          JunitUtil.uncheckedparallelassertreversearraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        }
       }
     }
     @Test
@@ -838,15 +1114,21 @@ public class ArrCopyTest
       for(int i=0;i<1000;++i)
       {
         int srcLength=rand.nextInt(1000);
-        Double[] src;
-        JunitUtil.doubleArrayBuilder.Randomized.buildUnchecked(src=new Double[srcLength],0,srcLength,rand,0);
+        Double[] src=new Double[srcLength];
+        if(srcLength!=0)
+        {
+          JunitUtil.doubleArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+        }
         int dstLength=srcLength+rand.nextInt(1000);
         double[] dst=new double[dstLength];
         int copyLength=rand.nextInt(srcLength+1);
         int srcOffset=rand.nextInt(srcLength-copyLength+1);
         int dstOffset=rand.nextInt(dstLength-copyLength+1);
         ArrCopy.semicheckedCopy(src,srcOffset,dst,dstOffset,copyLength);
-        JunitUtil.uncheckedparallelassertarraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        if(copyLength!=0)
+        {
+          JunitUtil.uncheckedparallelassertarraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        }
       }
     }
     @Test
@@ -856,15 +1138,21 @@ public class ArrCopyTest
       for(int i=0;i<1000;++i)
       {
         int srcLength=rand.nextInt(1000);
-        Double[] src;
-        JunitUtil.doubleArrayBuilder.Randomized.buildUnchecked(src=new Double[srcLength],0,srcLength,rand,0);
+        Double[] src=new Double[srcLength];
+        if(srcLength!=0)
+        {
+          JunitUtil.doubleArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+        }
         int dstLength=srcLength+rand.nextInt(1000);
         double[] dst=new double[dstLength];
         int copyLength=rand.nextInt(srcLength+1);
         int srcOffset=rand.nextInt(srcLength-copyLength+1);
         int dstOffset=rand.nextInt(dstLength-copyLength+1);
         ArrCopy.semicheckedReverseCopy(src,srcOffset,dst,dstOffset,copyLength);
-        JunitUtil.uncheckedparallelassertreversearraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        if(copyLength!=0)
+        {
+          JunitUtil.uncheckedparallelassertreversearraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        }
       }
     }
     @Test
@@ -874,15 +1162,21 @@ public class ArrCopyTest
       for(int i=0;i<1000;++i)
       {
         int srcLength=rand.nextInt(1000);
-        boolean[] src;
-        JunitUtil.booleanArrayBuilder.Randomized.buildUnchecked(src=new boolean[srcLength],0,srcLength,rand,0);
+        boolean[] src=new boolean[srcLength];
+        if(srcLength!=0)
+        {
+          JunitUtil.booleanArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+        }
         int dstLength=srcLength+rand.nextInt(1000);
         boolean[] dst=new boolean[dstLength];
         int copyLength=rand.nextInt(srcLength+1);
         int srcOffset=rand.nextInt(srcLength-copyLength+1);
         int dstOffset=rand.nextInt(dstLength-copyLength+1);
         ArrCopy.semicheckedCopy(src,srcOffset,dst,dstOffset,copyLength);
-        JunitUtil.uncheckedparallelassertarraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        if(copyLength!=0)
+        {
+          JunitUtil.uncheckedparallelassertarraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        }
       }
     }
     @Test
@@ -892,15 +1186,21 @@ public class ArrCopyTest
       for(int i=0;i<1000;++i)
       {
         int srcLength=rand.nextInt(1000);
-        boolean[] src;
-        JunitUtil.booleanArrayBuilder.Randomized.buildUnchecked(src=new boolean[srcLength],0,srcLength,rand,0);
+        boolean[] src=new boolean[srcLength];
+        if(srcLength!=0)
+        {
+          JunitUtil.booleanArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+        }
         int dstLength=srcLength+rand.nextInt(1000);
         boolean[] dst=new boolean[dstLength];
         int copyLength=rand.nextInt(srcLength+1);
         int srcOffset=rand.nextInt(srcLength-copyLength+1);
         int dstOffset=rand.nextInt(dstLength-copyLength+1);
         ArrCopy.semicheckedReverseCopy(src,srcOffset,dst,dstOffset,copyLength);
-        JunitUtil.uncheckedparallelassertreversearraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        if(copyLength!=0)
+        {
+          JunitUtil.uncheckedparallelassertreversearraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        }
       }
     }
     @Test
@@ -910,15 +1210,21 @@ public class ArrCopyTest
       for(int i=0;i<1000;++i)
       {
         int srcLength=rand.nextInt(1000);
-        boolean[] src;
-        JunitUtil.booleanArrayBuilder.Randomized.buildUnchecked(src=new boolean[srcLength],0,srcLength,rand,0);
+        boolean[] src=new boolean[srcLength];
+        if(srcLength!=0)
+        {
+          JunitUtil.booleanArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+        }
         int dstLength=srcLength+rand.nextInt(1000);
         byte[] dst=new byte[dstLength];
         int copyLength=rand.nextInt(srcLength+1);
         int srcOffset=rand.nextInt(srcLength-copyLength+1);
         int dstOffset=rand.nextInt(dstLength-copyLength+1);
         ArrCopy.semicheckedCopy(src,srcOffset,dst,dstOffset,copyLength);
-        JunitUtil.uncheckedparallelassertarraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        if(copyLength!=0)
+        {
+          JunitUtil.uncheckedparallelassertarraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        }
       }
     }
     @Test
@@ -928,15 +1234,21 @@ public class ArrCopyTest
       for(int i=0;i<1000;++i)
       {
         int srcLength=rand.nextInt(1000);
-        boolean[] src;
-        JunitUtil.booleanArrayBuilder.Randomized.buildUnchecked(src=new boolean[srcLength],0,srcLength,rand,0);
+        boolean[] src=new boolean[srcLength];
+        if(srcLength!=0)
+        {
+          JunitUtil.booleanArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+        }
         int dstLength=srcLength+rand.nextInt(1000);
         byte[] dst=new byte[dstLength];
         int copyLength=rand.nextInt(srcLength+1);
         int srcOffset=rand.nextInt(srcLength-copyLength+1);
         int dstOffset=rand.nextInt(dstLength-copyLength+1);
         ArrCopy.semicheckedReverseCopy(src,srcOffset,dst,dstOffset,copyLength);
-        JunitUtil.uncheckedparallelassertreversearraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        if(copyLength!=0)
+        {
+          JunitUtil.uncheckedparallelassertreversearraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        }
       }
     }
     @Test
@@ -946,15 +1258,21 @@ public class ArrCopyTest
       for(int i=0;i<1000;++i)
       {
         int srcLength=rand.nextInt(1000);
-        boolean[] src;
-        JunitUtil.booleanArrayBuilder.Randomized.buildUnchecked(src=new boolean[srcLength],0,srcLength,rand,0);
+        boolean[] src=new boolean[srcLength];
+        if(srcLength!=0)
+        {
+          JunitUtil.booleanArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+        }
         int dstLength=srcLength+rand.nextInt(1000);
         char[] dst=new char[dstLength];
         int copyLength=rand.nextInt(srcLength+1);
         int srcOffset=rand.nextInt(srcLength-copyLength+1);
         int dstOffset=rand.nextInt(dstLength-copyLength+1);
         ArrCopy.semicheckedCopy(src,srcOffset,dst,dstOffset,copyLength);
-        JunitUtil.uncheckedparallelassertarraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        if(copyLength!=0)
+        {
+          JunitUtil.uncheckedparallelassertarraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        }
       }
     }
     @Test
@@ -964,15 +1282,21 @@ public class ArrCopyTest
       for(int i=0;i<1000;++i)
       {
         int srcLength=rand.nextInt(1000);
-        boolean[] src;
-        JunitUtil.booleanArrayBuilder.Randomized.buildUnchecked(src=new boolean[srcLength],0,srcLength,rand,0);
+        boolean[] src=new boolean[srcLength];
+        if(srcLength!=0)
+        {
+          JunitUtil.booleanArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+        }
         int dstLength=srcLength+rand.nextInt(1000);
         char[] dst=new char[dstLength];
         int copyLength=rand.nextInt(srcLength+1);
         int srcOffset=rand.nextInt(srcLength-copyLength+1);
         int dstOffset=rand.nextInt(dstLength-copyLength+1);
         ArrCopy.semicheckedReverseCopy(src,srcOffset,dst,dstOffset,copyLength);
-        JunitUtil.uncheckedparallelassertreversearraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        if(copyLength!=0)
+        {
+          JunitUtil.uncheckedparallelassertreversearraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        }
       }
     }
     @Test
@@ -982,15 +1306,21 @@ public class ArrCopyTest
       for(int i=0;i<1000;++i)
       {
         int srcLength=rand.nextInt(1000);
-        boolean[] src;
-        JunitUtil.booleanArrayBuilder.Randomized.buildUnchecked(src=new boolean[srcLength],0,srcLength,rand,0);
+        boolean[] src=new boolean[srcLength];
+        if(srcLength!=0)
+        {
+          JunitUtil.booleanArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+        }
         int dstLength=srcLength+rand.nextInt(1000);
         short[] dst=new short[dstLength];
         int copyLength=rand.nextInt(srcLength+1);
         int srcOffset=rand.nextInt(srcLength-copyLength+1);
         int dstOffset=rand.nextInt(dstLength-copyLength+1);
         ArrCopy.semicheckedCopy(src,srcOffset,dst,dstOffset,copyLength);
-        JunitUtil.uncheckedparallelassertarraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        if(copyLength!=0)
+        {
+          JunitUtil.uncheckedparallelassertarraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        }
       }
     }
     @Test
@@ -1000,15 +1330,21 @@ public class ArrCopyTest
       for(int i=0;i<1000;++i)
       {
         int srcLength=rand.nextInt(1000);
-        boolean[] src;
-        JunitUtil.booleanArrayBuilder.Randomized.buildUnchecked(src=new boolean[srcLength],0,srcLength,rand,0);
+        boolean[] src=new boolean[srcLength];
+        if(srcLength!=0)
+        {
+          JunitUtil.booleanArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+        }
         int dstLength=srcLength+rand.nextInt(1000);
         short[] dst=new short[dstLength];
         int copyLength=rand.nextInt(srcLength+1);
         int srcOffset=rand.nextInt(srcLength-copyLength+1);
         int dstOffset=rand.nextInt(dstLength-copyLength+1);
         ArrCopy.semicheckedReverseCopy(src,srcOffset,dst,dstOffset,copyLength);
-        JunitUtil.uncheckedparallelassertreversearraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        if(copyLength!=0)
+        {
+          JunitUtil.uncheckedparallelassertreversearraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        }
       }
     }
     @Test
@@ -1018,15 +1354,21 @@ public class ArrCopyTest
       for(int i=0;i<1000;++i)
       {
         int srcLength=rand.nextInt(1000);
-        boolean[] src;
-        JunitUtil.booleanArrayBuilder.Randomized.buildUnchecked(src=new boolean[srcLength],0,srcLength,rand,0);
+        boolean[] src=new boolean[srcLength];
+        if(srcLength!=0)
+        {
+          JunitUtil.booleanArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+        }
         int dstLength=srcLength+rand.nextInt(1000);
         int[] dst=new int[dstLength];
         int copyLength=rand.nextInt(srcLength+1);
         int srcOffset=rand.nextInt(srcLength-copyLength+1);
         int dstOffset=rand.nextInt(dstLength-copyLength+1);
         ArrCopy.semicheckedCopy(src,srcOffset,dst,dstOffset,copyLength);
-        JunitUtil.uncheckedparallelassertarraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        if(copyLength!=0)
+        {
+          JunitUtil.uncheckedparallelassertarraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        }
       }
     }
     @Test
@@ -1036,15 +1378,21 @@ public class ArrCopyTest
       for(int i=0;i<1000;++i)
       {
         int srcLength=rand.nextInt(1000);
-        boolean[] src;
-        JunitUtil.booleanArrayBuilder.Randomized.buildUnchecked(src=new boolean[srcLength],0,srcLength,rand,0);
+        boolean[] src=new boolean[srcLength];
+        if(srcLength!=0)
+        {
+          JunitUtil.booleanArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+        }
         int dstLength=srcLength+rand.nextInt(1000);
         int[] dst=new int[dstLength];
         int copyLength=rand.nextInt(srcLength+1);
         int srcOffset=rand.nextInt(srcLength-copyLength+1);
         int dstOffset=rand.nextInt(dstLength-copyLength+1);
         ArrCopy.semicheckedReverseCopy(src,srcOffset,dst,dstOffset,copyLength);
-        JunitUtil.uncheckedparallelassertreversearraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        if(copyLength!=0)
+        {
+          JunitUtil.uncheckedparallelassertreversearraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        }
       }
     }
     @Test
@@ -1054,15 +1402,21 @@ public class ArrCopyTest
       for(int i=0;i<1000;++i)
       {
         int srcLength=rand.nextInt(1000);
-        boolean[] src;
-        JunitUtil.booleanArrayBuilder.Randomized.buildUnchecked(src=new boolean[srcLength],0,srcLength,rand,0);
+        boolean[] src=new boolean[srcLength];
+        if(srcLength!=0)
+        {
+          JunitUtil.booleanArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+        }
         int dstLength=srcLength+rand.nextInt(1000);
         long[] dst=new long[dstLength];
         int copyLength=rand.nextInt(srcLength+1);
         int srcOffset=rand.nextInt(srcLength-copyLength+1);
         int dstOffset=rand.nextInt(dstLength-copyLength+1);
         ArrCopy.semicheckedCopy(src,srcOffset,dst,dstOffset,copyLength);
-        JunitUtil.uncheckedparallelassertarraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        if(copyLength!=0)
+        {
+          JunitUtil.uncheckedparallelassertarraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        }
       }
     }
     @Test
@@ -1072,15 +1426,21 @@ public class ArrCopyTest
       for(int i=0;i<1000;++i)
       {
         int srcLength=rand.nextInt(1000);
-        boolean[] src;
-        JunitUtil.booleanArrayBuilder.Randomized.buildUnchecked(src=new boolean[srcLength],0,srcLength,rand,0);
+        boolean[] src=new boolean[srcLength];
+        if(srcLength!=0)
+        {
+          JunitUtil.booleanArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+        }
         int dstLength=srcLength+rand.nextInt(1000);
         long[] dst=new long[dstLength];
         int copyLength=rand.nextInt(srcLength+1);
         int srcOffset=rand.nextInt(srcLength-copyLength+1);
         int dstOffset=rand.nextInt(dstLength-copyLength+1);
         ArrCopy.semicheckedReverseCopy(src,srcOffset,dst,dstOffset,copyLength);
-        JunitUtil.uncheckedparallelassertreversearraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        if(copyLength!=0)
+        {
+          JunitUtil.uncheckedparallelassertreversearraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        }
       }
     }
     @Test
@@ -1090,15 +1450,21 @@ public class ArrCopyTest
       for(int i=0;i<1000;++i)
       {
         int srcLength=rand.nextInt(1000);
-        boolean[] src;
-        JunitUtil.booleanArrayBuilder.Randomized.buildUnchecked(src=new boolean[srcLength],0,srcLength,rand,0);
+        boolean[] src=new boolean[srcLength];
+        if(srcLength!=0)
+        {
+          JunitUtil.booleanArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+        }
         int dstLength=srcLength+rand.nextInt(1000);
         float[] dst=new float[dstLength];
         int copyLength=rand.nextInt(srcLength+1);
         int srcOffset=rand.nextInt(srcLength-copyLength+1);
         int dstOffset=rand.nextInt(dstLength-copyLength+1);
         ArrCopy.semicheckedCopy(src,srcOffset,dst,dstOffset,copyLength);
-        JunitUtil.uncheckedparallelassertarraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        if(copyLength!=0)
+        {
+          JunitUtil.uncheckedparallelassertarraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        }
       }
     }
     @Test
@@ -1108,15 +1474,21 @@ public class ArrCopyTest
       for(int i=0;i<1000;++i)
       {
         int srcLength=rand.nextInt(1000);
-        boolean[] src;
-        JunitUtil.booleanArrayBuilder.Randomized.buildUnchecked(src=new boolean[srcLength],0,srcLength,rand,0);
+        boolean[] src=new boolean[srcLength];
+        if(srcLength!=0)
+        {
+          JunitUtil.booleanArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+        }
         int dstLength=srcLength+rand.nextInt(1000);
         float[] dst=new float[dstLength];
         int copyLength=rand.nextInt(srcLength+1);
         int srcOffset=rand.nextInt(srcLength-copyLength+1);
         int dstOffset=rand.nextInt(dstLength-copyLength+1);
         ArrCopy.semicheckedReverseCopy(src,srcOffset,dst,dstOffset,copyLength);
-        JunitUtil.uncheckedparallelassertreversearraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        if(copyLength!=0)
+        {
+          JunitUtil.uncheckedparallelassertreversearraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        }
       }
     }
     @Test
@@ -1126,15 +1498,21 @@ public class ArrCopyTest
       for(int i=0;i<1000;++i)
       {
         int srcLength=rand.nextInt(1000);
-        boolean[] src;
-        JunitUtil.booleanArrayBuilder.Randomized.buildUnchecked(src=new boolean[srcLength],0,srcLength,rand,0);
+        boolean[] src=new boolean[srcLength];
+        if(srcLength!=0)
+        {
+          JunitUtil.booleanArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+        }
         int dstLength=srcLength+rand.nextInt(1000);
         double[] dst=new double[dstLength];
         int copyLength=rand.nextInt(srcLength+1);
         int srcOffset=rand.nextInt(srcLength-copyLength+1);
         int dstOffset=rand.nextInt(dstLength-copyLength+1);
         ArrCopy.semicheckedCopy(src,srcOffset,dst,dstOffset,copyLength);
-        JunitUtil.uncheckedparallelassertarraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        if(copyLength!=0)
+        {
+          JunitUtil.uncheckedparallelassertarraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        }
       }
     }
     @Test
@@ -1144,15 +1522,21 @@ public class ArrCopyTest
       for(int i=0;i<1000;++i)
       {
         int srcLength=rand.nextInt(1000);
-        boolean[] src;
-        JunitUtil.booleanArrayBuilder.Randomized.buildUnchecked(src=new boolean[srcLength],0,srcLength,rand,0);
+        boolean[] src=new boolean[srcLength];
+        if(srcLength!=0)
+        {
+          JunitUtil.booleanArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+        }
         int dstLength=srcLength+rand.nextInt(1000);
         double[] dst=new double[dstLength];
         int copyLength=rand.nextInt(srcLength+1);
         int srcOffset=rand.nextInt(srcLength-copyLength+1);
         int dstOffset=rand.nextInt(dstLength-copyLength+1);
         ArrCopy.semicheckedReverseCopy(src,srcOffset,dst,dstOffset,copyLength);
-        JunitUtil.uncheckedparallelassertreversearraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        if(copyLength!=0)
+        {
+          JunitUtil.uncheckedparallelassertreversearraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        }
       }
     }
     @Test
@@ -1162,15 +1546,21 @@ public class ArrCopyTest
       for(int i=0;i<1000;++i)
       {
         int srcLength=rand.nextInt(1000);
-        byte[] src;
-        JunitUtil.byteArrayBuilder.Randomized.buildUnchecked(src=new byte[srcLength],0,srcLength,rand,0);
+        byte[] src=new byte[srcLength];
+        if(srcLength!=0)
+        {
+          JunitUtil.byteArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+        }
         int dstLength=srcLength+rand.nextInt(1000);
         byte[] dst=new byte[dstLength];
         int copyLength=rand.nextInt(srcLength+1);
         int srcOffset=rand.nextInt(srcLength-copyLength+1);
         int dstOffset=rand.nextInt(dstLength-copyLength+1);
         ArrCopy.semicheckedCopy(src,srcOffset,dst,dstOffset,copyLength);
-        JunitUtil.uncheckedparallelassertarraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        if(copyLength!=0)
+        {
+          JunitUtil.uncheckedparallelassertarraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        }
       }
     }
     @Test
@@ -1180,15 +1570,21 @@ public class ArrCopyTest
       for(int i=0;i<1000;++i)
       {
         int srcLength=rand.nextInt(1000);
-        byte[] src;
-        JunitUtil.byteArrayBuilder.Randomized.buildUnchecked(src=new byte[srcLength],0,srcLength,rand,0);
+        byte[] src=new byte[srcLength];
+        if(srcLength!=0)
+        {
+          JunitUtil.byteArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+        }
         int dstLength=srcLength+rand.nextInt(1000);
         byte[] dst=new byte[dstLength];
         int copyLength=rand.nextInt(srcLength+1);
         int srcOffset=rand.nextInt(srcLength-copyLength+1);
         int dstOffset=rand.nextInt(dstLength-copyLength+1);
         ArrCopy.semicheckedReverseCopy(src,srcOffset,dst,dstOffset,copyLength);
-        JunitUtil.uncheckedparallelassertreversearraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        if(copyLength!=0)
+        {
+          JunitUtil.uncheckedparallelassertreversearraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        }
       }
     }
     @Test
@@ -1198,15 +1594,21 @@ public class ArrCopyTest
       for(int i=0;i<1000;++i)
       {
         int srcLength=rand.nextInt(1000);
-        byte[] src;
-        JunitUtil.byteArrayBuilder.Randomized.buildUnchecked(src=new byte[srcLength],0,srcLength,rand,0);
+        byte[] src=new byte[srcLength];
+        if(srcLength!=0)
+        {
+          JunitUtil.byteArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+        }
         int dstLength=srcLength+rand.nextInt(1000);
         short[] dst=new short[dstLength];
         int copyLength=rand.nextInt(srcLength+1);
         int srcOffset=rand.nextInt(srcLength-copyLength+1);
         int dstOffset=rand.nextInt(dstLength-copyLength+1);
         ArrCopy.semicheckedCopy(src,srcOffset,dst,dstOffset,copyLength);
-        JunitUtil.uncheckedparallelassertarraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        if(copyLength!=0)
+        {
+          JunitUtil.uncheckedparallelassertarraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        }
       }
     }
     @Test
@@ -1216,15 +1618,21 @@ public class ArrCopyTest
       for(int i=0;i<1000;++i)
       {
         int srcLength=rand.nextInt(1000);
-        byte[] src;
-        JunitUtil.byteArrayBuilder.Randomized.buildUnchecked(src=new byte[srcLength],0,srcLength,rand,0);
+        byte[] src=new byte[srcLength];
+        if(srcLength!=0)
+        {
+          JunitUtil.byteArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+        }
         int dstLength=srcLength+rand.nextInt(1000);
         short[] dst=new short[dstLength];
         int copyLength=rand.nextInt(srcLength+1);
         int srcOffset=rand.nextInt(srcLength-copyLength+1);
         int dstOffset=rand.nextInt(dstLength-copyLength+1);
         ArrCopy.semicheckedReverseCopy(src,srcOffset,dst,dstOffset,copyLength);
-        JunitUtil.uncheckedparallelassertreversearraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        if(copyLength!=0)
+        {
+          JunitUtil.uncheckedparallelassertreversearraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        }
       }
     }
     @Test
@@ -1234,15 +1642,21 @@ public class ArrCopyTest
       for(int i=0;i<1000;++i)
       {
         int srcLength=rand.nextInt(1000);
-        byte[] src;
-        JunitUtil.byteArrayBuilder.Randomized.buildUnchecked(src=new byte[srcLength],0,srcLength,rand,0);
+        byte[] src=new byte[srcLength];
+        if(srcLength!=0)
+        {
+          JunitUtil.byteArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+        }
         int dstLength=srcLength+rand.nextInt(1000);
         int[] dst=new int[dstLength];
         int copyLength=rand.nextInt(srcLength+1);
         int srcOffset=rand.nextInt(srcLength-copyLength+1);
         int dstOffset=rand.nextInt(dstLength-copyLength+1);
         ArrCopy.semicheckedCopy(src,srcOffset,dst,dstOffset,copyLength);
-        JunitUtil.uncheckedparallelassertarraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        if(copyLength!=0)
+        {
+          JunitUtil.uncheckedparallelassertarraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        }
       }
     }
     @Test
@@ -1252,15 +1666,21 @@ public class ArrCopyTest
       for(int i=0;i<1000;++i)
       {
         int srcLength=rand.nextInt(1000);
-        byte[] src;
-        JunitUtil.byteArrayBuilder.Randomized.buildUnchecked(src=new byte[srcLength],0,srcLength,rand,0);
+        byte[] src=new byte[srcLength];
+        if(srcLength!=0)
+        {
+          JunitUtil.byteArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+        }
         int dstLength=srcLength+rand.nextInt(1000);
         int[] dst=new int[dstLength];
         int copyLength=rand.nextInt(srcLength+1);
         int srcOffset=rand.nextInt(srcLength-copyLength+1);
         int dstOffset=rand.nextInt(dstLength-copyLength+1);
         ArrCopy.semicheckedReverseCopy(src,srcOffset,dst,dstOffset,copyLength);
-        JunitUtil.uncheckedparallelassertreversearraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        if(copyLength!=0)
+        {
+          JunitUtil.uncheckedparallelassertreversearraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        }
       }
     }
     @Test
@@ -1270,15 +1690,21 @@ public class ArrCopyTest
       for(int i=0;i<1000;++i)
       {
         int srcLength=rand.nextInt(1000);
-        byte[] src;
-        JunitUtil.byteArrayBuilder.Randomized.buildUnchecked(src=new byte[srcLength],0,srcLength,rand,0);
+        byte[] src=new byte[srcLength];
+        if(srcLength!=0)
+        {
+          JunitUtil.byteArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+        }
         int dstLength=srcLength+rand.nextInt(1000);
         long[] dst=new long[dstLength];
         int copyLength=rand.nextInt(srcLength+1);
         int srcOffset=rand.nextInt(srcLength-copyLength+1);
         int dstOffset=rand.nextInt(dstLength-copyLength+1);
         ArrCopy.semicheckedCopy(src,srcOffset,dst,dstOffset,copyLength);
-        JunitUtil.uncheckedparallelassertarraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        if(copyLength!=0)
+        {
+          JunitUtil.uncheckedparallelassertarraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        }
       }
     }
     @Test
@@ -1288,15 +1714,21 @@ public class ArrCopyTest
       for(int i=0;i<1000;++i)
       {
         int srcLength=rand.nextInt(1000);
-        byte[] src;
-        JunitUtil.byteArrayBuilder.Randomized.buildUnchecked(src=new byte[srcLength],0,srcLength,rand,0);
+        byte[] src=new byte[srcLength];
+        if(srcLength!=0)
+        {
+          JunitUtil.byteArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+        }
         int dstLength=srcLength+rand.nextInt(1000);
         long[] dst=new long[dstLength];
         int copyLength=rand.nextInt(srcLength+1);
         int srcOffset=rand.nextInt(srcLength-copyLength+1);
         int dstOffset=rand.nextInt(dstLength-copyLength+1);
         ArrCopy.semicheckedReverseCopy(src,srcOffset,dst,dstOffset,copyLength);
-        JunitUtil.uncheckedparallelassertreversearraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        if(copyLength!=0)
+        {
+          JunitUtil.uncheckedparallelassertreversearraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        }
       }
     }
     @Test
@@ -1306,15 +1738,21 @@ public class ArrCopyTest
       for(int i=0;i<1000;++i)
       {
         int srcLength=rand.nextInt(1000);
-        byte[] src;
-        JunitUtil.byteArrayBuilder.Randomized.buildUnchecked(src=new byte[srcLength],0,srcLength,rand,0);
+        byte[] src=new byte[srcLength];
+        if(srcLength!=0)
+        {
+          JunitUtil.byteArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+        }
         int dstLength=srcLength+rand.nextInt(1000);
         float[] dst=new float[dstLength];
         int copyLength=rand.nextInt(srcLength+1);
         int srcOffset=rand.nextInt(srcLength-copyLength+1);
         int dstOffset=rand.nextInt(dstLength-copyLength+1);
         ArrCopy.semicheckedCopy(src,srcOffset,dst,dstOffset,copyLength);
-        JunitUtil.uncheckedparallelassertarraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        if(copyLength!=0)
+        {
+          JunitUtil.uncheckedparallelassertarraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        }
       }
     }
     @Test
@@ -1324,15 +1762,21 @@ public class ArrCopyTest
       for(int i=0;i<1000;++i)
       {
         int srcLength=rand.nextInt(1000);
-        byte[] src;
-        JunitUtil.byteArrayBuilder.Randomized.buildUnchecked(src=new byte[srcLength],0,srcLength,rand,0);
+        byte[] src=new byte[srcLength];
+        if(srcLength!=0)
+        {
+          JunitUtil.byteArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+        }
         int dstLength=srcLength+rand.nextInt(1000);
         float[] dst=new float[dstLength];
         int copyLength=rand.nextInt(srcLength+1);
         int srcOffset=rand.nextInt(srcLength-copyLength+1);
         int dstOffset=rand.nextInt(dstLength-copyLength+1);
         ArrCopy.semicheckedReverseCopy(src,srcOffset,dst,dstOffset,copyLength);
-        JunitUtil.uncheckedparallelassertreversearraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        if(copyLength!=0)
+        {
+          JunitUtil.uncheckedparallelassertreversearraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        }
       }
     }
     @Test
@@ -1342,15 +1786,21 @@ public class ArrCopyTest
       for(int i=0;i<1000;++i)
       {
         int srcLength=rand.nextInt(1000);
-        byte[] src;
-        JunitUtil.byteArrayBuilder.Randomized.buildUnchecked(src=new byte[srcLength],0,srcLength,rand,0);
+        byte[] src=new byte[srcLength];
+        if(srcLength!=0)
+        {
+          JunitUtil.byteArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+        }
         int dstLength=srcLength+rand.nextInt(1000);
         double[] dst=new double[dstLength];
         int copyLength=rand.nextInt(srcLength+1);
         int srcOffset=rand.nextInt(srcLength-copyLength+1);
         int dstOffset=rand.nextInt(dstLength-copyLength+1);
         ArrCopy.semicheckedCopy(src,srcOffset,dst,dstOffset,copyLength);
-        JunitUtil.uncheckedparallelassertarraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        if(copyLength!=0)
+        {
+          JunitUtil.uncheckedparallelassertarraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        }
       }
     }
     @Test
@@ -1360,15 +1810,21 @@ public class ArrCopyTest
       for(int i=0;i<1000;++i)
       {
         int srcLength=rand.nextInt(1000);
-        byte[] src;
-        JunitUtil.byteArrayBuilder.Randomized.buildUnchecked(src=new byte[srcLength],0,srcLength,rand,0);
+        byte[] src=new byte[srcLength];
+        if(srcLength!=0)
+        {
+          JunitUtil.byteArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+        }
         int dstLength=srcLength+rand.nextInt(1000);
         double[] dst=new double[dstLength];
         int copyLength=rand.nextInt(srcLength+1);
         int srcOffset=rand.nextInt(srcLength-copyLength+1);
         int dstOffset=rand.nextInt(dstLength-copyLength+1);
         ArrCopy.semicheckedReverseCopy(src,srcOffset,dst,dstOffset,copyLength);
-        JunitUtil.uncheckedparallelassertreversearraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        if(copyLength!=0)
+        {
+          JunitUtil.uncheckedparallelassertreversearraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        }
       }
     }
     @Test
@@ -1378,15 +1834,21 @@ public class ArrCopyTest
       for(int i=0;i<1000;++i)
       {
         int srcLength=rand.nextInt(1000);
-        char[] src;
-        JunitUtil.charArrayBuilder.Randomized.buildUnchecked(src=new char[srcLength],0,srcLength,rand,0);
+        char[] src=new char[srcLength];
+        if(srcLength!=0)
+        {
+          JunitUtil.charArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+        }
         int dstLength=srcLength+rand.nextInt(1000);
         char[] dst=new char[dstLength];
         int copyLength=rand.nextInt(srcLength+1);
         int srcOffset=rand.nextInt(srcLength-copyLength+1);
         int dstOffset=rand.nextInt(dstLength-copyLength+1);
         ArrCopy.semicheckedCopy(src,srcOffset,dst,dstOffset,copyLength);
-        JunitUtil.uncheckedparallelassertarraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        if(copyLength!=0)
+        {
+          JunitUtil.uncheckedparallelassertarraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        }
       }
     }
     @Test
@@ -1396,15 +1858,21 @@ public class ArrCopyTest
       for(int i=0;i<1000;++i)
       {
         int srcLength=rand.nextInt(1000);
-        char[] src;
-        JunitUtil.charArrayBuilder.Randomized.buildUnchecked(src=new char[srcLength],0,srcLength,rand,0);
+        char[] src=new char[srcLength];
+        if(srcLength!=0)
+        {
+          JunitUtil.charArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+        }
         int dstLength=srcLength+rand.nextInt(1000);
         char[] dst=new char[dstLength];
         int copyLength=rand.nextInt(srcLength+1);
         int srcOffset=rand.nextInt(srcLength-copyLength+1);
         int dstOffset=rand.nextInt(dstLength-copyLength+1);
         ArrCopy.semicheckedReverseCopy(src,srcOffset,dst,dstOffset,copyLength);
-        JunitUtil.uncheckedparallelassertreversearraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        if(copyLength!=0)
+        {
+          JunitUtil.uncheckedparallelassertreversearraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        }
       }
     }
     @Test
@@ -1414,15 +1882,21 @@ public class ArrCopyTest
       for(int i=0;i<1000;++i)
       {
         int srcLength=rand.nextInt(1000);
-        char[] src;
-        JunitUtil.charArrayBuilder.Randomized.buildUnchecked(src=new char[srcLength],0,srcLength,rand,0);
+        char[] src=new char[srcLength];
+        if(srcLength!=0)
+        {
+          JunitUtil.charArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+        }
         int dstLength=srcLength+rand.nextInt(1000);
         int[] dst=new int[dstLength];
         int copyLength=rand.nextInt(srcLength+1);
         int srcOffset=rand.nextInt(srcLength-copyLength+1);
         int dstOffset=rand.nextInt(dstLength-copyLength+1);
         ArrCopy.semicheckedCopy(src,srcOffset,dst,dstOffset,copyLength);
-        JunitUtil.uncheckedparallelassertarraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        if(copyLength!=0)
+        {
+          JunitUtil.uncheckedparallelassertarraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        }
       }
     }
     @Test
@@ -1432,15 +1906,21 @@ public class ArrCopyTest
       for(int i=0;i<1000;++i)
       {
         int srcLength=rand.nextInt(1000);
-        char[] src;
-        JunitUtil.charArrayBuilder.Randomized.buildUnchecked(src=new char[srcLength],0,srcLength,rand,0);
+        char[] src=new char[srcLength];
+        if(srcLength!=0)
+        {
+          JunitUtil.charArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+        }
         int dstLength=srcLength+rand.nextInt(1000);
         int[] dst=new int[dstLength];
         int copyLength=rand.nextInt(srcLength+1);
         int srcOffset=rand.nextInt(srcLength-copyLength+1);
         int dstOffset=rand.nextInt(dstLength-copyLength+1);
         ArrCopy.semicheckedReverseCopy(src,srcOffset,dst,dstOffset,copyLength);
-        JunitUtil.uncheckedparallelassertreversearraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        if(copyLength!=0)
+        {
+          JunitUtil.uncheckedparallelassertreversearraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        }
       }
     }
     @Test
@@ -1450,15 +1930,21 @@ public class ArrCopyTest
       for(int i=0;i<1000;++i)
       {
         int srcLength=rand.nextInt(1000);
-        char[] src;
-        JunitUtil.charArrayBuilder.Randomized.buildUnchecked(src=new char[srcLength],0,srcLength,rand,0);
+        char[] src=new char[srcLength];
+        if(srcLength!=0)
+        {
+          JunitUtil.charArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+        }
         int dstLength=srcLength+rand.nextInt(1000);
         long[] dst=new long[dstLength];
         int copyLength=rand.nextInt(srcLength+1);
         int srcOffset=rand.nextInt(srcLength-copyLength+1);
         int dstOffset=rand.nextInt(dstLength-copyLength+1);
         ArrCopy.semicheckedCopy(src,srcOffset,dst,dstOffset,copyLength);
-        JunitUtil.uncheckedparallelassertarraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        if(copyLength!=0)
+        {
+          JunitUtil.uncheckedparallelassertarraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        }
       }
     }
     @Test
@@ -1468,15 +1954,21 @@ public class ArrCopyTest
       for(int i=0;i<1000;++i)
       {
         int srcLength=rand.nextInt(1000);
-        char[] src;
-        JunitUtil.charArrayBuilder.Randomized.buildUnchecked(src=new char[srcLength],0,srcLength,rand,0);
+        char[] src=new char[srcLength];
+        if(srcLength!=0)
+        {
+          JunitUtil.charArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+        }
         int dstLength=srcLength+rand.nextInt(1000);
         long[] dst=new long[dstLength];
         int copyLength=rand.nextInt(srcLength+1);
         int srcOffset=rand.nextInt(srcLength-copyLength+1);
         int dstOffset=rand.nextInt(dstLength-copyLength+1);
         ArrCopy.semicheckedReverseCopy(src,srcOffset,dst,dstOffset,copyLength);
-        JunitUtil.uncheckedparallelassertreversearraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        if(copyLength!=0)
+        {
+          JunitUtil.uncheckedparallelassertreversearraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        }
       }
     }
     @Test
@@ -1486,15 +1978,21 @@ public class ArrCopyTest
       for(int i=0;i<1000;++i)
       {
         int srcLength=rand.nextInt(1000);
-        char[] src;
-        JunitUtil.charArrayBuilder.Randomized.buildUnchecked(src=new char[srcLength],0,srcLength,rand,0);
+        char[] src=new char[srcLength];
+        if(srcLength!=0)
+        {
+          JunitUtil.charArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+        }
         int dstLength=srcLength+rand.nextInt(1000);
         float[] dst=new float[dstLength];
         int copyLength=rand.nextInt(srcLength+1);
         int srcOffset=rand.nextInt(srcLength-copyLength+1);
         int dstOffset=rand.nextInt(dstLength-copyLength+1);
         ArrCopy.semicheckedCopy(src,srcOffset,dst,dstOffset,copyLength);
-        JunitUtil.uncheckedparallelassertarraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        if(copyLength!=0)
+        {
+          JunitUtil.uncheckedparallelassertarraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        }
       }
     }
     @Test
@@ -1504,15 +2002,21 @@ public class ArrCopyTest
       for(int i=0;i<1000;++i)
       {
         int srcLength=rand.nextInt(1000);
-        char[] src;
-        JunitUtil.charArrayBuilder.Randomized.buildUnchecked(src=new char[srcLength],0,srcLength,rand,0);
+        char[] src=new char[srcLength];
+        if(srcLength!=0)
+        {
+          JunitUtil.charArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+        }
         int dstLength=srcLength+rand.nextInt(1000);
         float[] dst=new float[dstLength];
         int copyLength=rand.nextInt(srcLength+1);
         int srcOffset=rand.nextInt(srcLength-copyLength+1);
         int dstOffset=rand.nextInt(dstLength-copyLength+1);
         ArrCopy.semicheckedReverseCopy(src,srcOffset,dst,dstOffset,copyLength);
-        JunitUtil.uncheckedparallelassertreversearraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        if(copyLength!=0)
+        {
+          JunitUtil.uncheckedparallelassertreversearraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        }
       }
     }
     @Test
@@ -1522,15 +2026,21 @@ public class ArrCopyTest
       for(int i=0;i<1000;++i)
       {
         int srcLength=rand.nextInt(1000);
-        char[] src;
-        JunitUtil.charArrayBuilder.Randomized.buildUnchecked(src=new char[srcLength],0,srcLength,rand,0);
+        char[] src=new char[srcLength];
+        if(srcLength!=0)
+        {
+          JunitUtil.charArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+        }
         int dstLength=srcLength+rand.nextInt(1000);
         double[] dst=new double[dstLength];
         int copyLength=rand.nextInt(srcLength+1);
         int srcOffset=rand.nextInt(srcLength-copyLength+1);
         int dstOffset=rand.nextInt(dstLength-copyLength+1);
         ArrCopy.semicheckedCopy(src,srcOffset,dst,dstOffset,copyLength);
-        JunitUtil.uncheckedparallelassertarraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        if(copyLength!=0)
+        {
+          JunitUtil.uncheckedparallelassertarraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        }
       }
     }
     @Test
@@ -1540,15 +2050,21 @@ public class ArrCopyTest
       for(int i=0;i<1000;++i)
       {
         int srcLength=rand.nextInt(1000);
-        char[] src;
-        JunitUtil.charArrayBuilder.Randomized.buildUnchecked(src=new char[srcLength],0,srcLength,rand,0);
+        char[] src=new char[srcLength];
+        if(srcLength!=0)
+        {
+          JunitUtil.charArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+        }
         int dstLength=srcLength+rand.nextInt(1000);
         double[] dst=new double[dstLength];
         int copyLength=rand.nextInt(srcLength+1);
         int srcOffset=rand.nextInt(srcLength-copyLength+1);
         int dstOffset=rand.nextInt(dstLength-copyLength+1);
         ArrCopy.semicheckedReverseCopy(src,srcOffset,dst,dstOffset,copyLength);
-        JunitUtil.uncheckedparallelassertreversearraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        if(copyLength!=0)
+        {
+          JunitUtil.uncheckedparallelassertreversearraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        }
       }
     }
     @Test
@@ -1558,15 +2074,21 @@ public class ArrCopyTest
       for(int i=0;i<1000;++i)
       {
         int srcLength=rand.nextInt(1000);
-        short[] src;
-        JunitUtil.shortArrayBuilder.Randomized.buildUnchecked(src=new short[srcLength],0,srcLength,rand,0);
+        short[] src=new short[srcLength];
+        if(srcLength!=0)
+        {
+          JunitUtil.shortArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+        }
         int dstLength=srcLength+rand.nextInt(1000);
         short[] dst=new short[dstLength];
         int copyLength=rand.nextInt(srcLength+1);
         int srcOffset=rand.nextInt(srcLength-copyLength+1);
         int dstOffset=rand.nextInt(dstLength-copyLength+1);
         ArrCopy.semicheckedCopy(src,srcOffset,dst,dstOffset,copyLength);
-        JunitUtil.uncheckedparallelassertarraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        if(copyLength!=0)
+        {
+          JunitUtil.uncheckedparallelassertarraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        }
       }
     }
     @Test
@@ -1576,15 +2098,21 @@ public class ArrCopyTest
       for(int i=0;i<1000;++i)
       {
         int srcLength=rand.nextInt(1000);
-        short[] src;
-        JunitUtil.shortArrayBuilder.Randomized.buildUnchecked(src=new short[srcLength],0,srcLength,rand,0);
+        short[] src=new short[srcLength];
+        if(srcLength!=0)
+        {
+          JunitUtil.shortArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+        }
         int dstLength=srcLength+rand.nextInt(1000);
         short[] dst=new short[dstLength];
         int copyLength=rand.nextInt(srcLength+1);
         int srcOffset=rand.nextInt(srcLength-copyLength+1);
         int dstOffset=rand.nextInt(dstLength-copyLength+1);
         ArrCopy.semicheckedReverseCopy(src,srcOffset,dst,dstOffset,copyLength);
-        JunitUtil.uncheckedparallelassertreversearraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        if(copyLength!=0)
+        {
+          JunitUtil.uncheckedparallelassertreversearraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        }
       }
     }
     @Test
@@ -1594,15 +2122,21 @@ public class ArrCopyTest
       for(int i=0;i<1000;++i)
       {
         int srcLength=rand.nextInt(1000);
-        short[] src;
-        JunitUtil.shortArrayBuilder.Randomized.buildUnchecked(src=new short[srcLength],0,srcLength,rand,0);
+        short[] src=new short[srcLength];
+        if(srcLength!=0)
+        {
+          JunitUtil.shortArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+        }
         int dstLength=srcLength+rand.nextInt(1000);
         int[] dst=new int[dstLength];
         int copyLength=rand.nextInt(srcLength+1);
         int srcOffset=rand.nextInt(srcLength-copyLength+1);
         int dstOffset=rand.nextInt(dstLength-copyLength+1);
         ArrCopy.semicheckedCopy(src,srcOffset,dst,dstOffset,copyLength);
-        JunitUtil.uncheckedparallelassertarraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        if(copyLength!=0)
+        {
+          JunitUtil.uncheckedparallelassertarraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        }
       }
     }
     @Test
@@ -1612,15 +2146,21 @@ public class ArrCopyTest
       for(int i=0;i<1000;++i)
       {
         int srcLength=rand.nextInt(1000);
-        short[] src;
-        JunitUtil.shortArrayBuilder.Randomized.buildUnchecked(src=new short[srcLength],0,srcLength,rand,0);
+        short[] src=new short[srcLength];
+        if(srcLength!=0)
+        {
+          JunitUtil.shortArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+        }
         int dstLength=srcLength+rand.nextInt(1000);
         int[] dst=new int[dstLength];
         int copyLength=rand.nextInt(srcLength+1);
         int srcOffset=rand.nextInt(srcLength-copyLength+1);
         int dstOffset=rand.nextInt(dstLength-copyLength+1);
         ArrCopy.semicheckedReverseCopy(src,srcOffset,dst,dstOffset,copyLength);
-        JunitUtil.uncheckedparallelassertreversearraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        if(copyLength!=0)
+        {
+          JunitUtil.uncheckedparallelassertreversearraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        }
       }
     }
     @Test
@@ -1630,15 +2170,21 @@ public class ArrCopyTest
       for(int i=0;i<1000;++i)
       {
         int srcLength=rand.nextInt(1000);
-        short[] src;
-        JunitUtil.shortArrayBuilder.Randomized.buildUnchecked(src=new short[srcLength],0,srcLength,rand,0);
+        short[] src=new short[srcLength];
+        if(srcLength!=0)
+        {
+          JunitUtil.shortArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+        }
         int dstLength=srcLength+rand.nextInt(1000);
         long[] dst=new long[dstLength];
         int copyLength=rand.nextInt(srcLength+1);
         int srcOffset=rand.nextInt(srcLength-copyLength+1);
         int dstOffset=rand.nextInt(dstLength-copyLength+1);
         ArrCopy.semicheckedCopy(src,srcOffset,dst,dstOffset,copyLength);
-        JunitUtil.uncheckedparallelassertarraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        if(copyLength!=0)
+        {
+          JunitUtil.uncheckedparallelassertarraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        }
       }
     }
     @Test
@@ -1648,15 +2194,21 @@ public class ArrCopyTest
       for(int i=0;i<1000;++i)
       {
         int srcLength=rand.nextInt(1000);
-        short[] src;
-        JunitUtil.shortArrayBuilder.Randomized.buildUnchecked(src=new short[srcLength],0,srcLength,rand,0);
+        short[] src=new short[srcLength];
+        if(srcLength!=0)
+        {
+          JunitUtil.shortArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+        }
         int dstLength=srcLength+rand.nextInt(1000);
         long[] dst=new long[dstLength];
         int copyLength=rand.nextInt(srcLength+1);
         int srcOffset=rand.nextInt(srcLength-copyLength+1);
         int dstOffset=rand.nextInt(dstLength-copyLength+1);
         ArrCopy.semicheckedReverseCopy(src,srcOffset,dst,dstOffset,copyLength);
-        JunitUtil.uncheckedparallelassertreversearraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        if(copyLength!=0)
+        {
+          JunitUtil.uncheckedparallelassertreversearraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        }
       }
     }
     @Test
@@ -1666,15 +2218,21 @@ public class ArrCopyTest
       for(int i=0;i<1000;++i)
       {
         int srcLength=rand.nextInt(1000);
-        short[] src;
-        JunitUtil.shortArrayBuilder.Randomized.buildUnchecked(src=new short[srcLength],0,srcLength,rand,0);
+        short[] src=new short[srcLength];
+        if(srcLength!=0)
+        {
+          JunitUtil.shortArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+        }
         int dstLength=srcLength+rand.nextInt(1000);
         float[] dst=new float[dstLength];
         int copyLength=rand.nextInt(srcLength+1);
         int srcOffset=rand.nextInt(srcLength-copyLength+1);
         int dstOffset=rand.nextInt(dstLength-copyLength+1);
         ArrCopy.semicheckedCopy(src,srcOffset,dst,dstOffset,copyLength);
-        JunitUtil.uncheckedparallelassertarraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        if(copyLength!=0)
+        {
+          JunitUtil.uncheckedparallelassertarraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        }
       }
     }
     @Test
@@ -1684,15 +2242,21 @@ public class ArrCopyTest
       for(int i=0;i<1000;++i)
       {
         int srcLength=rand.nextInt(1000);
-        short[] src;
-        JunitUtil.shortArrayBuilder.Randomized.buildUnchecked(src=new short[srcLength],0,srcLength,rand,0);
+        short[] src=new short[srcLength];
+        if(srcLength!=0)
+        {
+          JunitUtil.shortArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+        }
         int dstLength=srcLength+rand.nextInt(1000);
         float[] dst=new float[dstLength];
         int copyLength=rand.nextInt(srcLength+1);
         int srcOffset=rand.nextInt(srcLength-copyLength+1);
         int dstOffset=rand.nextInt(dstLength-copyLength+1);
         ArrCopy.semicheckedReverseCopy(src,srcOffset,dst,dstOffset,copyLength);
-        JunitUtil.uncheckedparallelassertreversearraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        if(copyLength!=0)
+        {
+          JunitUtil.uncheckedparallelassertreversearraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        }
       }
     }
     @Test
@@ -1702,15 +2266,21 @@ public class ArrCopyTest
       for(int i=0;i<1000;++i)
       {
         int srcLength=rand.nextInt(1000);
-        short[] src;
-        JunitUtil.shortArrayBuilder.Randomized.buildUnchecked(src=new short[srcLength],0,srcLength,rand,0);
+        short[] src=new short[srcLength];
+        if(srcLength!=0)
+        {
+          JunitUtil.shortArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+        }
         int dstLength=srcLength+rand.nextInt(1000);
         double[] dst=new double[dstLength];
         int copyLength=rand.nextInt(srcLength+1);
         int srcOffset=rand.nextInt(srcLength-copyLength+1);
         int dstOffset=rand.nextInt(dstLength-copyLength+1);
         ArrCopy.semicheckedCopy(src,srcOffset,dst,dstOffset,copyLength);
-        JunitUtil.uncheckedparallelassertarraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        if(copyLength!=0)
+        {
+          JunitUtil.uncheckedparallelassertarraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        }
       }
     }
     @Test
@@ -1720,15 +2290,21 @@ public class ArrCopyTest
       for(int i=0;i<1000;++i)
       {
         int srcLength=rand.nextInt(1000);
-        short[] src;
-        JunitUtil.shortArrayBuilder.Randomized.buildUnchecked(src=new short[srcLength],0,srcLength,rand,0);
+        short[] src=new short[srcLength];
+        if(srcLength!=0)
+        {
+          JunitUtil.shortArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+        }
         int dstLength=srcLength+rand.nextInt(1000);
         double[] dst=new double[dstLength];
         int copyLength=rand.nextInt(srcLength+1);
         int srcOffset=rand.nextInt(srcLength-copyLength+1);
         int dstOffset=rand.nextInt(dstLength-copyLength+1);
         ArrCopy.semicheckedReverseCopy(src,srcOffset,dst,dstOffset,copyLength);
-        JunitUtil.uncheckedparallelassertreversearraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        if(copyLength!=0)
+        {
+          JunitUtil.uncheckedparallelassertreversearraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        }
       }
     }
     @Test
@@ -1738,15 +2314,21 @@ public class ArrCopyTest
       for(int i=0;i<1000;++i)
       {
         int srcLength=rand.nextInt(1000);
-        int[] src;
-        JunitUtil.intArrayBuilder.Randomized.buildUnchecked(src=new int[srcLength],0,srcLength,rand,0);
+        int[] src=new int[srcLength];
+        if(srcLength!=0)
+        {
+          JunitUtil.intArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+        }
         int dstLength=srcLength+rand.nextInt(1000);
         int[] dst=new int[dstLength];
         int copyLength=rand.nextInt(srcLength+1);
         int srcOffset=rand.nextInt(srcLength-copyLength+1);
         int dstOffset=rand.nextInt(dstLength-copyLength+1);
         ArrCopy.semicheckedCopy(src,srcOffset,dst,dstOffset,copyLength);
-        JunitUtil.uncheckedparallelassertarraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        if(copyLength!=0)
+        {
+          JunitUtil.uncheckedparallelassertarraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        }
       }
     }
     @Test
@@ -1756,15 +2338,21 @@ public class ArrCopyTest
       for(int i=0;i<1000;++i)
       {
         int srcLength=rand.nextInt(1000);
-        int[] src;
-        JunitUtil.intArrayBuilder.Randomized.buildUnchecked(src=new int[srcLength],0,srcLength,rand,0);
+        int[] src=new int[srcLength];
+        if(srcLength!=0)
+        {
+          JunitUtil.intArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+        }
         int dstLength=srcLength+rand.nextInt(1000);
         int[] dst=new int[dstLength];
         int copyLength=rand.nextInt(srcLength+1);
         int srcOffset=rand.nextInt(srcLength-copyLength+1);
         int dstOffset=rand.nextInt(dstLength-copyLength+1);
         ArrCopy.semicheckedReverseCopy(src,srcOffset,dst,dstOffset,copyLength);
-        JunitUtil.uncheckedparallelassertreversearraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        if(copyLength!=0)
+        {
+          JunitUtil.uncheckedparallelassertreversearraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        }
       }
     }
     @Test
@@ -1774,15 +2362,21 @@ public class ArrCopyTest
       for(int i=0;i<1000;++i)
       {
         int srcLength=rand.nextInt(1000);
-        int[] src;
-        JunitUtil.intArrayBuilder.Randomized.buildUnchecked(src=new int[srcLength],0,srcLength,rand,0);
+        int[] src=new int[srcLength];
+        if(srcLength!=0)
+        {
+          JunitUtil.intArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+        }
         int dstLength=srcLength+rand.nextInt(1000);
         long[] dst=new long[dstLength];
         int copyLength=rand.nextInt(srcLength+1);
         int srcOffset=rand.nextInt(srcLength-copyLength+1);
         int dstOffset=rand.nextInt(dstLength-copyLength+1);
         ArrCopy.semicheckedCopy(src,srcOffset,dst,dstOffset,copyLength);
-        JunitUtil.uncheckedparallelassertarraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        if(copyLength!=0)
+        {
+          JunitUtil.uncheckedparallelassertarraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        }
       }
     }
     @Test
@@ -1792,15 +2386,21 @@ public class ArrCopyTest
       for(int i=0;i<1000;++i)
       {
         int srcLength=rand.nextInt(1000);
-        int[] src;
-        JunitUtil.intArrayBuilder.Randomized.buildUnchecked(src=new int[srcLength],0,srcLength,rand,0);
+        int[] src=new int[srcLength];
+        if(srcLength!=0)
+        {
+          JunitUtil.intArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+        }
         int dstLength=srcLength+rand.nextInt(1000);
         long[] dst=new long[dstLength];
         int copyLength=rand.nextInt(srcLength+1);
         int srcOffset=rand.nextInt(srcLength-copyLength+1);
         int dstOffset=rand.nextInt(dstLength-copyLength+1);
         ArrCopy.semicheckedReverseCopy(src,srcOffset,dst,dstOffset,copyLength);
-        JunitUtil.uncheckedparallelassertreversearraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        if(copyLength!=0)
+        {
+          JunitUtil.uncheckedparallelassertreversearraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        }
       }
     }
     @Test
@@ -1810,15 +2410,21 @@ public class ArrCopyTest
       for(int i=0;i<1000;++i)
       {
         int srcLength=rand.nextInt(1000);
-        int[] src;
-        JunitUtil.intArrayBuilder.Randomized.buildUnchecked(src=new int[srcLength],0,srcLength,rand,0);
+        int[] src=new int[srcLength];
+        if(srcLength!=0)
+        {
+          JunitUtil.intArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+        }
         int dstLength=srcLength+rand.nextInt(1000);
         float[] dst=new float[dstLength];
         int copyLength=rand.nextInt(srcLength+1);
         int srcOffset=rand.nextInt(srcLength-copyLength+1);
         int dstOffset=rand.nextInt(dstLength-copyLength+1);
         ArrCopy.semicheckedCopy(src,srcOffset,dst,dstOffset,copyLength);
-        JunitUtil.uncheckedparallelassertarraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        if(copyLength!=0)
+        {
+          JunitUtil.uncheckedparallelassertarraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        }
       }
     }
     @Test
@@ -1828,15 +2434,21 @@ public class ArrCopyTest
       for(int i=0;i<1000;++i)
       {
         int srcLength=rand.nextInt(1000);
-        int[] src;
-        JunitUtil.intArrayBuilder.Randomized.buildUnchecked(src=new int[srcLength],0,srcLength,rand,0);
+        int[] src=new int[srcLength];
+        if(srcLength!=0)
+        {
+          JunitUtil.intArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+        }
         int dstLength=srcLength+rand.nextInt(1000);
         float[] dst=new float[dstLength];
         int copyLength=rand.nextInt(srcLength+1);
         int srcOffset=rand.nextInt(srcLength-copyLength+1);
         int dstOffset=rand.nextInt(dstLength-copyLength+1);
         ArrCopy.semicheckedReverseCopy(src,srcOffset,dst,dstOffset,copyLength);
-        JunitUtil.uncheckedparallelassertreversearraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        if(copyLength!=0)
+        {
+          JunitUtil.uncheckedparallelassertreversearraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        }
       }
     }
     @Test
@@ -1846,15 +2458,21 @@ public class ArrCopyTest
       for(int i=0;i<1000;++i)
       {
         int srcLength=rand.nextInt(1000);
-        int[] src;
-        JunitUtil.intArrayBuilder.Randomized.buildUnchecked(src=new int[srcLength],0,srcLength,rand,0);
+        int[] src=new int[srcLength];
+        if(srcLength!=0)
+        {
+          JunitUtil.intArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+        }
         int dstLength=srcLength+rand.nextInt(1000);
         double[] dst=new double[dstLength];
         int copyLength=rand.nextInt(srcLength+1);
         int srcOffset=rand.nextInt(srcLength-copyLength+1);
         int dstOffset=rand.nextInt(dstLength-copyLength+1);
         ArrCopy.semicheckedCopy(src,srcOffset,dst,dstOffset,copyLength);
-        JunitUtil.uncheckedparallelassertarraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        if(copyLength!=0)
+        {
+          JunitUtil.uncheckedparallelassertarraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        }
       }
     }
     @Test
@@ -1864,15 +2482,21 @@ public class ArrCopyTest
       for(int i=0;i<1000;++i)
       {
         int srcLength=rand.nextInt(1000);
-        int[] src;
-        JunitUtil.intArrayBuilder.Randomized.buildUnchecked(src=new int[srcLength],0,srcLength,rand,0);
+        int[] src=new int[srcLength];
+        if(srcLength!=0)
+        {
+          JunitUtil.intArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+        }
         int dstLength=srcLength+rand.nextInt(1000);
         double[] dst=new double[dstLength];
         int copyLength=rand.nextInt(srcLength+1);
         int srcOffset=rand.nextInt(srcLength-copyLength+1);
         int dstOffset=rand.nextInt(dstLength-copyLength+1);
         ArrCopy.semicheckedReverseCopy(src,srcOffset,dst,dstOffset,copyLength);
-        JunitUtil.uncheckedparallelassertreversearraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        if(copyLength!=0)
+        {
+          JunitUtil.uncheckedparallelassertreversearraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        }
       }
     }
     @Test
@@ -1882,15 +2506,21 @@ public class ArrCopyTest
       for(int i=0;i<1000;++i)
       {
         int srcLength=rand.nextInt(1000);
-        long[] src;
-        JunitUtil.longArrayBuilder.Randomized.buildUnchecked(src=new long[srcLength],0,srcLength,rand,0);
+        long[] src=new long[srcLength];
+        if(srcLength!=0)
+        {
+          JunitUtil.longArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+        }
         int dstLength=srcLength+rand.nextInt(1000);
         long[] dst=new long[dstLength];
         int copyLength=rand.nextInt(srcLength+1);
         int srcOffset=rand.nextInt(srcLength-copyLength+1);
         int dstOffset=rand.nextInt(dstLength-copyLength+1);
         ArrCopy.semicheckedCopy(src,srcOffset,dst,dstOffset,copyLength);
-        JunitUtil.uncheckedparallelassertarraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        if(copyLength!=0)
+        {
+          JunitUtil.uncheckedparallelassertarraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        }
       }
     }
     @Test
@@ -1900,15 +2530,21 @@ public class ArrCopyTest
       for(int i=0;i<1000;++i)
       {
         int srcLength=rand.nextInt(1000);
-        long[] src;
-        JunitUtil.longArrayBuilder.Randomized.buildUnchecked(src=new long[srcLength],0,srcLength,rand,0);
+        long[] src=new long[srcLength];
+        if(srcLength!=0)
+        {
+          JunitUtil.longArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+        }
         int dstLength=srcLength+rand.nextInt(1000);
         long[] dst=new long[dstLength];
         int copyLength=rand.nextInt(srcLength+1);
         int srcOffset=rand.nextInt(srcLength-copyLength+1);
         int dstOffset=rand.nextInt(dstLength-copyLength+1);
         ArrCopy.semicheckedReverseCopy(src,srcOffset,dst,dstOffset,copyLength);
-        JunitUtil.uncheckedparallelassertreversearraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        if(copyLength!=0)
+        {
+          JunitUtil.uncheckedparallelassertreversearraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        }
       }
     }
     @Test
@@ -1918,15 +2554,21 @@ public class ArrCopyTest
       for(int i=0;i<1000;++i)
       {
         int srcLength=rand.nextInt(1000);
-        long[] src;
-        JunitUtil.longArrayBuilder.Randomized.buildUnchecked(src=new long[srcLength],0,srcLength,rand,0);
+        long[] src=new long[srcLength];
+        if(srcLength!=0)
+        {
+          JunitUtil.longArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+        }
         int dstLength=srcLength+rand.nextInt(1000);
         float[] dst=new float[dstLength];
         int copyLength=rand.nextInt(srcLength+1);
         int srcOffset=rand.nextInt(srcLength-copyLength+1);
         int dstOffset=rand.nextInt(dstLength-copyLength+1);
         ArrCopy.semicheckedCopy(src,srcOffset,dst,dstOffset,copyLength);
-        JunitUtil.uncheckedparallelassertarraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        if(copyLength!=0)
+        {
+          JunitUtil.uncheckedparallelassertarraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        }
       }
     }
     @Test
@@ -1936,15 +2578,21 @@ public class ArrCopyTest
       for(int i=0;i<1000;++i)
       {
         int srcLength=rand.nextInt(1000);
-        long[] src;
-        JunitUtil.longArrayBuilder.Randomized.buildUnchecked(src=new long[srcLength],0,srcLength,rand,0);
+        long[] src=new long[srcLength];
+        if(srcLength!=0)
+        {
+          JunitUtil.longArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+        }
         int dstLength=srcLength+rand.nextInt(1000);
         float[] dst=new float[dstLength];
         int copyLength=rand.nextInt(srcLength+1);
         int srcOffset=rand.nextInt(srcLength-copyLength+1);
         int dstOffset=rand.nextInt(dstLength-copyLength+1);
         ArrCopy.semicheckedReverseCopy(src,srcOffset,dst,dstOffset,copyLength);
-        JunitUtil.uncheckedparallelassertreversearraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        if(copyLength!=0)
+        {
+          JunitUtil.uncheckedparallelassertreversearraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        }
       }
     }
     @Test
@@ -1954,15 +2602,21 @@ public class ArrCopyTest
       for(int i=0;i<1000;++i)
       {
         int srcLength=rand.nextInt(1000);
-        long[] src;
-        JunitUtil.longArrayBuilder.Randomized.buildUnchecked(src=new long[srcLength],0,srcLength,rand,0);
+        long[] src=new long[srcLength];
+        if(srcLength!=0)
+        {
+          JunitUtil.longArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+        }
         int dstLength=srcLength+rand.nextInt(1000);
         double[] dst=new double[dstLength];
         int copyLength=rand.nextInt(srcLength+1);
         int srcOffset=rand.nextInt(srcLength-copyLength+1);
         int dstOffset=rand.nextInt(dstLength-copyLength+1);
         ArrCopy.semicheckedCopy(src,srcOffset,dst,dstOffset,copyLength);
-        JunitUtil.uncheckedparallelassertarraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        if(copyLength!=0)
+        {
+          JunitUtil.uncheckedparallelassertarraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        }
       }
     }
     @Test
@@ -1972,15 +2626,21 @@ public class ArrCopyTest
       for(int i=0;i<1000;++i)
       {
         int srcLength=rand.nextInt(1000);
-        long[] src;
-        JunitUtil.longArrayBuilder.Randomized.buildUnchecked(src=new long[srcLength],0,srcLength,rand,0);
+        long[] src=new long[srcLength];
+        if(srcLength!=0)
+        {
+          JunitUtil.longArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+        }
         int dstLength=srcLength+rand.nextInt(1000);
         double[] dst=new double[dstLength];
         int copyLength=rand.nextInt(srcLength+1);
         int srcOffset=rand.nextInt(srcLength-copyLength+1);
         int dstOffset=rand.nextInt(dstLength-copyLength+1);
         ArrCopy.semicheckedReverseCopy(src,srcOffset,dst,dstOffset,copyLength);
-        JunitUtil.uncheckedparallelassertreversearraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        if(copyLength!=0)
+        {
+          JunitUtil.uncheckedparallelassertreversearraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        }
       }
     }
     @Test
@@ -1990,15 +2650,21 @@ public class ArrCopyTest
       for(int i=0;i<1000;++i)
       {
         int srcLength=rand.nextInt(1000);
-        float[] src;
-        JunitUtil.floatArrayBuilder.Randomized.buildUnchecked(src=new float[srcLength],0,srcLength,rand,0);
+        float[] src=new float[srcLength];
+        if(srcLength!=0)
+        {
+          JunitUtil.floatArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+        }
         int dstLength=srcLength+rand.nextInt(1000);
         float[] dst=new float[dstLength];
         int copyLength=rand.nextInt(srcLength+1);
         int srcOffset=rand.nextInt(srcLength-copyLength+1);
         int dstOffset=rand.nextInt(dstLength-copyLength+1);
         ArrCopy.semicheckedCopy(src,srcOffset,dst,dstOffset,copyLength);
-        JunitUtil.uncheckedparallelassertarraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        if(copyLength!=0)
+        {
+          JunitUtil.uncheckedparallelassertarraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        }
       }
     }
     @Test
@@ -2008,15 +2674,21 @@ public class ArrCopyTest
       for(int i=0;i<1000;++i)
       {
         int srcLength=rand.nextInt(1000);
-        float[] src;
-        JunitUtil.floatArrayBuilder.Randomized.buildUnchecked(src=new float[srcLength],0,srcLength,rand,0);
+        float[] src=new float[srcLength];
+        if(srcLength!=0)
+        {
+          JunitUtil.floatArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+        }
         int dstLength=srcLength+rand.nextInt(1000);
         float[] dst=new float[dstLength];
         int copyLength=rand.nextInt(srcLength+1);
         int srcOffset=rand.nextInt(srcLength-copyLength+1);
         int dstOffset=rand.nextInt(dstLength-copyLength+1);
         ArrCopy.semicheckedReverseCopy(src,srcOffset,dst,dstOffset,copyLength);
-        JunitUtil.uncheckedparallelassertreversearraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        if(copyLength!=0)
+        {
+          JunitUtil.uncheckedparallelassertreversearraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        }
       }
     }
     @Test
@@ -2026,15 +2698,21 @@ public class ArrCopyTest
       for(int i=0;i<1000;++i)
       {
         int srcLength=rand.nextInt(1000);
-        float[] src;
-        JunitUtil.floatArrayBuilder.Randomized.buildUnchecked(src=new float[srcLength],0,srcLength,rand,0);
+        float[] src=new float[srcLength];
+        if(srcLength!=0)
+        {
+          JunitUtil.floatArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+        }
         int dstLength=srcLength+rand.nextInt(1000);
         double[] dst=new double[dstLength];
         int copyLength=rand.nextInt(srcLength+1);
         int srcOffset=rand.nextInt(srcLength-copyLength+1);
         int dstOffset=rand.nextInt(dstLength-copyLength+1);
         ArrCopy.semicheckedCopy(src,srcOffset,dst,dstOffset,copyLength);
-        JunitUtil.uncheckedparallelassertarraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        if(copyLength!=0)
+        {
+          JunitUtil.uncheckedparallelassertarraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        }
       }
     }
     @Test
@@ -2044,15 +2722,21 @@ public class ArrCopyTest
       for(int i=0;i<1000;++i)
       {
         int srcLength=rand.nextInt(1000);
-        float[] src;
-        JunitUtil.floatArrayBuilder.Randomized.buildUnchecked(src=new float[srcLength],0,srcLength,rand,0);
+        float[] src=new float[srcLength];
+        if(srcLength!=0)
+        {
+          JunitUtil.floatArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+        }
         int dstLength=srcLength+rand.nextInt(1000);
         double[] dst=new double[dstLength];
         int copyLength=rand.nextInt(srcLength+1);
         int srcOffset=rand.nextInt(srcLength-copyLength+1);
         int dstOffset=rand.nextInt(dstLength-copyLength+1);
         ArrCopy.semicheckedReverseCopy(src,srcOffset,dst,dstOffset,copyLength);
-        JunitUtil.uncheckedparallelassertreversearraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        if(copyLength!=0)
+        {
+          JunitUtil.uncheckedparallelassertreversearraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        }
       }
     }
     @Test
@@ -2062,15 +2746,21 @@ public class ArrCopyTest
       for(int i=0;i<1000;++i)
       {
         int srcLength=rand.nextInt(1000);
-        double[] src;
-        JunitUtil.doubleArrayBuilder.Randomized.buildUnchecked(src=new double[srcLength],0,srcLength,rand,0);
+        double[] src=new double[srcLength];
+        if(srcLength!=0)
+        {
+          JunitUtil.doubleArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+        }
         int dstLength=srcLength+rand.nextInt(1000);
         double[] dst=new double[dstLength];
         int copyLength=rand.nextInt(srcLength+1);
         int srcOffset=rand.nextInt(srcLength-copyLength+1);
         int dstOffset=rand.nextInt(dstLength-copyLength+1);
         ArrCopy.semicheckedCopy(src,srcOffset,dst,dstOffset,copyLength);
-        JunitUtil.uncheckedparallelassertarraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        if(copyLength!=0)
+        {
+          JunitUtil.uncheckedparallelassertarraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        }
       }
     }
     @Test
@@ -2080,15 +2770,21 @@ public class ArrCopyTest
       for(int i=0;i<1000;++i)
       {
         int srcLength=rand.nextInt(1000);
-        double[] src;
-        JunitUtil.doubleArrayBuilder.Randomized.buildUnchecked(src=new double[srcLength],0,srcLength,rand,0);
+        double[] src=new double[srcLength];
+        if(srcLength!=0)
+        {
+          JunitUtil.doubleArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+        }
         int dstLength=srcLength+rand.nextInt(1000);
         double[] dst=new double[dstLength];
         int copyLength=rand.nextInt(srcLength+1);
         int srcOffset=rand.nextInt(srcLength-copyLength+1);
         int dstOffset=rand.nextInt(dstLength-copyLength+1);
         ArrCopy.semicheckedReverseCopy(src,srcOffset,dst,dstOffset,copyLength);
-        JunitUtil.uncheckedparallelassertreversearraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        if(copyLength!=0)
+        {
+          JunitUtil.uncheckedparallelassertreversearraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        }
       }
     }
     @Test
@@ -2098,15 +2794,21 @@ public class ArrCopyTest
       for(int i=0;i<1000;++i)
       {
         int srcLength=rand.nextInt(1000);
-        String[] src;
-        JunitUtil.StringArrayBuilder.Randomized.buildUnchecked(src=new String[srcLength],0,srcLength,rand,0);
+        String[] src=new String[srcLength];
+        if(srcLength!=0)
+        {
+          JunitUtil.StringArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+        }
         int dstLength=srcLength+rand.nextInt(1000);
         String[] dst=new String[dstLength];
         int copyLength=rand.nextInt(srcLength+1);
         int srcOffset=rand.nextInt(srcLength-copyLength+1);
         int dstOffset=rand.nextInt(dstLength-copyLength+1);
         ArrCopy.semicheckedCopy(src,srcOffset,dst,dstOffset,copyLength);
-        JunitUtil.uncheckedparallelassertarraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        if(copyLength!=0)
+        {
+          JunitUtil.uncheckedparallelassertarraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        }
       }
     }
     @Test
@@ -2116,15 +2818,21 @@ public class ArrCopyTest
       for(int i=0;i<1000;++i)
       {
         int srcLength=rand.nextInt(1000);
-        String[] src;
-        JunitUtil.StringArrayBuilder.Randomized.buildUnchecked(src=new String[srcLength],0,srcLength,rand,0);
+        String[] src=new String[srcLength];
+        if(srcLength!=0)
+        {
+          JunitUtil.StringArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+        }
         int dstLength=srcLength+rand.nextInt(1000);
         String[] dst=new String[dstLength];
         int copyLength=rand.nextInt(srcLength+1);
         int srcOffset=rand.nextInt(srcLength-copyLength+1);
         int dstOffset=rand.nextInt(dstLength-copyLength+1);
         ArrCopy.semicheckedReverseCopy(src,srcOffset,dst,dstOffset,copyLength);
-        JunitUtil.uncheckedparallelassertreversearraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        if(copyLength!=0)
+        {
+          JunitUtil.uncheckedparallelassertreversearraysAreEqual(src,srcOffset,dst,dstOffset,copyLength);
+        }
       }
     }
 }

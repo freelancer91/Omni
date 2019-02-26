@@ -29,6 +29,7 @@ public class ToStringUtilTest{
 
     @Test
     public void testGetStringFloat(){
+<<<<<<< HEAD
       
       
       
@@ -69,6 +70,81 @@ public class ToStringUtilTest{
     }
     private interface TestThreadGenerator{
         private Runnable getRunnable(int minIncl,int maxIncl){
+=======
+        // TODO find more test cases that can be skipped
+        char[] b=new char[15];
+        float f=constructFloat(false,128,0);// -infinity
+        assertStringsEqual(b,ToStringUtil.getStringFloat(f,b,0),Float.toString(f));
+        f=constructFloat(false,-127,0);// -0.0f
+        assertStringsEqual(b,ToStringUtil.getStringFloat(f,b,0),Float.toString(f));
+        f=constructFloat(true,128,0);// +infinity
+        assertStringsEqual(b,ToStringUtil.getStringFloat(f,b,0),Float.toString(f));
+        f=constructFloat(true,-127,0);// +0.0f
+        assertStringsEqual(b,ToStringUtil.getStringFloat(f,b,0),Float.toString(f));
+        f=constructFloat(true,128,1);// NaN
+        assertStringsEqual(b,ToStringUtil.getStringFloat(f,b,0),Float.toString(f));
+        multiThreadedTest(1,0x7fffff,(minIncl,maxIncl)->{
+            final char[] buffer=new char[15];
+            for(int i=minIncl;i <= maxIncl;++i){
+                final float f1;
+                assertStringsEqual(buffer,ToStringUtil.getStringFloat(f1=constructFloat(true,-127,i),buffer,0),
+                        Float.toString(f1));
+            }
+        });
+        multiThreadedTest(-9,-1,(minIncl,maxIncl)->{
+            final char[] buffer=new char[15];
+            for(int i=minIncl;i <= maxIncl;++i){
+                for(int j=0;j <= 0x7fffff;++j){
+                    final float f1;
+                    assertStringsEqual(buffer,ToStringUtil.getStringFloat(f1=constructFloat(true,i,j),buffer,0),
+                            Float.toString(f1));
+                }
+            }
+        });
+        multiThreadedTest(-126,-10,(minIncl,maxIncl)->{
+            final char[] buffer=new char[15];
+            for(int i=minIncl;i <= maxIncl;++i){
+                for(int j=0;j <= 0x7fffff - 17;j+=17){
+                    final float f1;
+                    assertStringsEqual(buffer,ToStringUtil.getStringFloat(f1=constructFloat(true,i,j),buffer,0),
+                            Float.toString(f1));
+                }
+            }
+        });
+        multiThreadedTest(0,22,(minIncl,maxIncl)->{
+            final char[] buffer=new char[15];
+            for(int i=minIncl;i <= maxIncl;++i){
+                for(int j=0;j <= 0x7fffff-3;j+=3){
+                    final float f1;
+                    assertStringsEqual(buffer,ToStringUtil.getStringFloat(f1=constructFloat(true,i,j),buffer,0),
+                            Float.toString(f1));
+                }
+            }
+        });
+        multiThreadedTest(23,85,(minIncl,maxIncl)->{
+            final char[] buffer=new char[15];
+            for(int i=minIncl;i <= maxIncl;++i){
+                for(int j=0;j <= 0x7fffff - 17;j+=17){
+                    final float f1;
+                    assertStringsEqual(buffer,ToStringUtil.getStringFloat(f1=constructFloat(true,i,j),buffer,0),
+                            Float.toString(f1));
+                }
+            }
+        });
+        multiThreadedTest(86,127,(minIncl,maxIncl)->{
+            final char[] buffer=new char[15];
+            for(int i=minIncl;i <= maxIncl;++i){
+                for(int j=0;j <= 0x7fffff;++j){
+                    final float f1;
+                    assertStringsEqual(buffer,ToStringUtil.getStringFloat(f1=constructFloat(true,i,j),buffer,0),
+                            Float.toString(f1));
+                }
+            }
+        });
+    }
+    private interface TestThreadGenerator{
+        default Runnable getRunnable(int minIncl,int maxIncl){
+>>>>>>> branch 'master' of https://github.com/freelancer91/Omni.git
             return ()->runInMain(minIncl,maxIncl);
         }
         void runInMain(int minIncl,int maxIncl);
