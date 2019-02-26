@@ -116,7 +116,7 @@ public class BooleanSortUtilTest
       switch(builder)
       {
       case Randomized:
-        return 10;
+        return 20;
       default:
         return 1;
       }

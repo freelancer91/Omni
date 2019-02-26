@@ -223,12 +223,12 @@ private static class TestData
     switch(builder)
     {
     case Randomized:
-      return 10;
+      return 20;
 #IFNOT OfBoolean
     case Duplicated:
       return 1;
     case Shuffle:
-      return 10;
+      return 20;
   #IF OfFloat,OfDouble
     case WithNaNsAndZeros:
       return 2;

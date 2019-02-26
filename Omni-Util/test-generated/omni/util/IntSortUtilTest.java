@@ -136,11 +136,11 @@ public class IntSortUtilTest
       switch(builder)
       {
       case Randomized:
-        return 10;
+        return 20;
       case Duplicated:
         return 1;
       case Shuffle:
-        return 10;
+        return 20;
       default:
         return 1;
       }
