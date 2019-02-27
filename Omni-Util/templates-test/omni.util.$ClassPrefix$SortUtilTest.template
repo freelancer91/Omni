@@ -223,15 +223,33 @@ private static class TestData
     switch(builder)
     {
     case Randomized:
-      return 20;
+#IF OfChar,OfShort
+      if(arrLength<=3201 && arrLength>=287)
+      {
+        return 40;
+      }
+#ENDIF
+      return 10;
 #IFNOT OfBoolean
     case Duplicated:
+  #IF OfChar,OfShort
+      if(arrLength<=3201 && arrLength>=287)
+      {
+        return 40;
+      }
+  #ENDIF
       return 1;
     case Shuffle:
-      return 20;
+  #IF OfChar,OfShort
+      if(arrLength<=3201 && arrLength>=287)
+      {
+        return 40;
+      }
+  #ENDIF
+      return 10;
   #IF OfFloat,OfDouble
     case WithNaNsAndZeros:
-      return 2;
+      return 20;
   #ENDIF
 #ENDIF
     default:

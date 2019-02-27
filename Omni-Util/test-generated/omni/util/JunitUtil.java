@@ -15,6 +15,10 @@ import java.util.Comparator;
 import java.util.Collection;
 public interface JunitUtil
 {
+  static int randomIntBetween(int minIncl,int maxIncl,Random rand)
+  {
+    return minIncl+rand.nextInt(maxIncl-minIncl+1);
+  }
   public static boolean convertToboolean(int val)
   {
     return (val&0b1)!=0;
@@ -6467,14 +6471,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(boolean[] lArr,int lOffset,boolean[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(boolean[] lArr,int lOffset,boolean[] rArr,int rOffset,int length)
   {
@@ -6491,9 +6493,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(boolean[] lArr,int lOffset,boolean[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -6601,14 +6603,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(boolean[] lArr,int lOffset,byte[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(boolean[] lArr,int lOffset,byte[] rArr,int rOffset,int length)
   {
@@ -6625,9 +6625,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(boolean[] lArr,int lOffset,byte[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -6735,14 +6735,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(boolean[] lArr,int lOffset,char[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(boolean[] lArr,int lOffset,char[] rArr,int rOffset,int length)
   {
@@ -6759,9 +6757,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(boolean[] lArr,int lOffset,char[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -6869,14 +6867,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(boolean[] lArr,int lOffset,short[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(boolean[] lArr,int lOffset,short[] rArr,int rOffset,int length)
   {
@@ -6893,9 +6889,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(boolean[] lArr,int lOffset,short[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -7003,14 +6999,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(boolean[] lArr,int lOffset,int[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(boolean[] lArr,int lOffset,int[] rArr,int rOffset,int length)
   {
@@ -7027,9 +7021,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(boolean[] lArr,int lOffset,int[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -7137,14 +7131,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(boolean[] lArr,int lOffset,long[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(boolean[] lArr,int lOffset,long[] rArr,int rOffset,int length)
   {
@@ -7161,9 +7153,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(boolean[] lArr,int lOffset,long[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -7271,14 +7263,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(boolean[] lArr,int lOffset,float[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(boolean[] lArr,int lOffset,float[] rArr,int rOffset,int length)
   {
@@ -7295,9 +7285,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(boolean[] lArr,int lOffset,float[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -7405,14 +7395,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(boolean[] lArr,int lOffset,double[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(boolean[] lArr,int lOffset,double[] rArr,int rOffset,int length)
   {
@@ -7429,9 +7417,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(boolean[] lArr,int lOffset,double[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -7543,14 +7531,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(boolean[] lArr,int lOffset,Boolean[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(boolean[] lArr,int lOffset,Boolean[] rArr,int rOffset,int length)
   {
@@ -7567,9 +7553,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(boolean[] lArr,int lOffset,Boolean[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -7681,14 +7667,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(boolean[] lArr,int lOffset,Byte[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(boolean[] lArr,int lOffset,Byte[] rArr,int rOffset,int length)
   {
@@ -7705,9 +7689,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(boolean[] lArr,int lOffset,Byte[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -7819,14 +7803,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(boolean[] lArr,int lOffset,Character[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(boolean[] lArr,int lOffset,Character[] rArr,int rOffset,int length)
   {
@@ -7843,9 +7825,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(boolean[] lArr,int lOffset,Character[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -7957,14 +7939,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(boolean[] lArr,int lOffset,Short[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(boolean[] lArr,int lOffset,Short[] rArr,int rOffset,int length)
   {
@@ -7981,9 +7961,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(boolean[] lArr,int lOffset,Short[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -8095,14 +8075,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(boolean[] lArr,int lOffset,Integer[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(boolean[] lArr,int lOffset,Integer[] rArr,int rOffset,int length)
   {
@@ -8119,9 +8097,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(boolean[] lArr,int lOffset,Integer[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -8233,14 +8211,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(boolean[] lArr,int lOffset,Long[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(boolean[] lArr,int lOffset,Long[] rArr,int rOffset,int length)
   {
@@ -8257,9 +8233,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(boolean[] lArr,int lOffset,Long[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -8371,14 +8347,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(boolean[] lArr,int lOffset,Float[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(boolean[] lArr,int lOffset,Float[] rArr,int rOffset,int length)
   {
@@ -8395,9 +8369,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(boolean[] lArr,int lOffset,Float[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -8509,14 +8483,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(boolean[] lArr,int lOffset,Double[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(boolean[] lArr,int lOffset,Double[] rArr,int rOffset,int length)
   {
@@ -8533,9 +8505,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(boolean[] lArr,int lOffset,Double[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -8647,14 +8619,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(boolean[] lArr,int lOffset,Object[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(boolean[] lArr,int lOffset,Object[] rArr,int rOffset,int length)
   {
@@ -8671,9 +8641,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(boolean[] lArr,int lOffset,Object[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -8781,14 +8751,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(byte[] lArr,int lOffset,boolean[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(byte[] lArr,int lOffset,boolean[] rArr,int rOffset,int length)
   {
@@ -8805,9 +8773,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(byte[] lArr,int lOffset,boolean[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -8915,14 +8883,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(byte[] lArr,int lOffset,byte[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(byte[] lArr,int lOffset,byte[] rArr,int rOffset,int length)
   {
@@ -8939,9 +8905,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(byte[] lArr,int lOffset,byte[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -9049,14 +9015,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(byte[] lArr,int lOffset,char[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(byte[] lArr,int lOffset,char[] rArr,int rOffset,int length)
   {
@@ -9073,9 +9037,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(byte[] lArr,int lOffset,char[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -9183,14 +9147,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(byte[] lArr,int lOffset,short[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(byte[] lArr,int lOffset,short[] rArr,int rOffset,int length)
   {
@@ -9207,9 +9169,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(byte[] lArr,int lOffset,short[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -9317,14 +9279,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(byte[] lArr,int lOffset,int[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(byte[] lArr,int lOffset,int[] rArr,int rOffset,int length)
   {
@@ -9341,9 +9301,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(byte[] lArr,int lOffset,int[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -9451,14 +9411,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(byte[] lArr,int lOffset,long[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(byte[] lArr,int lOffset,long[] rArr,int rOffset,int length)
   {
@@ -9475,9 +9433,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(byte[] lArr,int lOffset,long[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -9585,14 +9543,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(byte[] lArr,int lOffset,float[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(byte[] lArr,int lOffset,float[] rArr,int rOffset,int length)
   {
@@ -9609,9 +9565,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(byte[] lArr,int lOffset,float[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -9719,14 +9675,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(byte[] lArr,int lOffset,double[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(byte[] lArr,int lOffset,double[] rArr,int rOffset,int length)
   {
@@ -9743,9 +9697,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(byte[] lArr,int lOffset,double[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -9857,14 +9811,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(byte[] lArr,int lOffset,Boolean[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(byte[] lArr,int lOffset,Boolean[] rArr,int rOffset,int length)
   {
@@ -9881,9 +9833,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(byte[] lArr,int lOffset,Boolean[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -9995,14 +9947,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(byte[] lArr,int lOffset,Byte[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(byte[] lArr,int lOffset,Byte[] rArr,int rOffset,int length)
   {
@@ -10019,9 +9969,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(byte[] lArr,int lOffset,Byte[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -10133,14 +10083,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(byte[] lArr,int lOffset,Character[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(byte[] lArr,int lOffset,Character[] rArr,int rOffset,int length)
   {
@@ -10157,9 +10105,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(byte[] lArr,int lOffset,Character[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -10271,14 +10219,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(byte[] lArr,int lOffset,Short[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(byte[] lArr,int lOffset,Short[] rArr,int rOffset,int length)
   {
@@ -10295,9 +10241,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(byte[] lArr,int lOffset,Short[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -10409,14 +10355,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(byte[] lArr,int lOffset,Integer[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(byte[] lArr,int lOffset,Integer[] rArr,int rOffset,int length)
   {
@@ -10433,9 +10377,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(byte[] lArr,int lOffset,Integer[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -10547,14 +10491,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(byte[] lArr,int lOffset,Long[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(byte[] lArr,int lOffset,Long[] rArr,int rOffset,int length)
   {
@@ -10571,9 +10513,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(byte[] lArr,int lOffset,Long[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -10685,14 +10627,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(byte[] lArr,int lOffset,Float[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(byte[] lArr,int lOffset,Float[] rArr,int rOffset,int length)
   {
@@ -10709,9 +10649,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(byte[] lArr,int lOffset,Float[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -10823,14 +10763,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(byte[] lArr,int lOffset,Double[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(byte[] lArr,int lOffset,Double[] rArr,int rOffset,int length)
   {
@@ -10847,9 +10785,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(byte[] lArr,int lOffset,Double[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -10961,14 +10899,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(byte[] lArr,int lOffset,Object[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(byte[] lArr,int lOffset,Object[] rArr,int rOffset,int length)
   {
@@ -10985,9 +10921,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(byte[] lArr,int lOffset,Object[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -11095,14 +11031,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(char[] lArr,int lOffset,boolean[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(char[] lArr,int lOffset,boolean[] rArr,int rOffset,int length)
   {
@@ -11119,9 +11053,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(char[] lArr,int lOffset,boolean[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -11229,14 +11163,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(char[] lArr,int lOffset,byte[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(char[] lArr,int lOffset,byte[] rArr,int rOffset,int length)
   {
@@ -11253,9 +11185,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(char[] lArr,int lOffset,byte[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -11363,14 +11295,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(char[] lArr,int lOffset,char[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(char[] lArr,int lOffset,char[] rArr,int rOffset,int length)
   {
@@ -11387,9 +11317,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(char[] lArr,int lOffset,char[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -11497,14 +11427,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(char[] lArr,int lOffset,short[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(char[] lArr,int lOffset,short[] rArr,int rOffset,int length)
   {
@@ -11521,9 +11449,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(char[] lArr,int lOffset,short[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -11631,14 +11559,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(char[] lArr,int lOffset,int[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(char[] lArr,int lOffset,int[] rArr,int rOffset,int length)
   {
@@ -11655,9 +11581,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(char[] lArr,int lOffset,int[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -11765,14 +11691,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(char[] lArr,int lOffset,long[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(char[] lArr,int lOffset,long[] rArr,int rOffset,int length)
   {
@@ -11789,9 +11713,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(char[] lArr,int lOffset,long[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -11899,14 +11823,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(char[] lArr,int lOffset,float[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(char[] lArr,int lOffset,float[] rArr,int rOffset,int length)
   {
@@ -11923,9 +11845,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(char[] lArr,int lOffset,float[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -12033,14 +11955,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(char[] lArr,int lOffset,double[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(char[] lArr,int lOffset,double[] rArr,int rOffset,int length)
   {
@@ -12057,9 +11977,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(char[] lArr,int lOffset,double[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -12171,14 +12091,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(char[] lArr,int lOffset,Boolean[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(char[] lArr,int lOffset,Boolean[] rArr,int rOffset,int length)
   {
@@ -12195,9 +12113,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(char[] lArr,int lOffset,Boolean[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -12309,14 +12227,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(char[] lArr,int lOffset,Byte[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(char[] lArr,int lOffset,Byte[] rArr,int rOffset,int length)
   {
@@ -12333,9 +12249,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(char[] lArr,int lOffset,Byte[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -12447,14 +12363,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(char[] lArr,int lOffset,Character[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(char[] lArr,int lOffset,Character[] rArr,int rOffset,int length)
   {
@@ -12471,9 +12385,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(char[] lArr,int lOffset,Character[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -12585,14 +12499,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(char[] lArr,int lOffset,Short[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(char[] lArr,int lOffset,Short[] rArr,int rOffset,int length)
   {
@@ -12609,9 +12521,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(char[] lArr,int lOffset,Short[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -12723,14 +12635,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(char[] lArr,int lOffset,Integer[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(char[] lArr,int lOffset,Integer[] rArr,int rOffset,int length)
   {
@@ -12747,9 +12657,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(char[] lArr,int lOffset,Integer[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -12861,14 +12771,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(char[] lArr,int lOffset,Long[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(char[] lArr,int lOffset,Long[] rArr,int rOffset,int length)
   {
@@ -12885,9 +12793,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(char[] lArr,int lOffset,Long[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -12999,14 +12907,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(char[] lArr,int lOffset,Float[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(char[] lArr,int lOffset,Float[] rArr,int rOffset,int length)
   {
@@ -13023,9 +12929,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(char[] lArr,int lOffset,Float[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -13137,14 +13043,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(char[] lArr,int lOffset,Double[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(char[] lArr,int lOffset,Double[] rArr,int rOffset,int length)
   {
@@ -13161,9 +13065,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(char[] lArr,int lOffset,Double[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -13275,14 +13179,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(char[] lArr,int lOffset,Object[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(char[] lArr,int lOffset,Object[] rArr,int rOffset,int length)
   {
@@ -13299,9 +13201,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(char[] lArr,int lOffset,Object[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -13409,14 +13311,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(short[] lArr,int lOffset,boolean[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(short[] lArr,int lOffset,boolean[] rArr,int rOffset,int length)
   {
@@ -13433,9 +13333,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(short[] lArr,int lOffset,boolean[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -13543,14 +13443,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(short[] lArr,int lOffset,byte[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(short[] lArr,int lOffset,byte[] rArr,int rOffset,int length)
   {
@@ -13567,9 +13465,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(short[] lArr,int lOffset,byte[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -13677,14 +13575,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(short[] lArr,int lOffset,char[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(short[] lArr,int lOffset,char[] rArr,int rOffset,int length)
   {
@@ -13701,9 +13597,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(short[] lArr,int lOffset,char[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -13811,14 +13707,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(short[] lArr,int lOffset,short[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(short[] lArr,int lOffset,short[] rArr,int rOffset,int length)
   {
@@ -13835,9 +13729,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(short[] lArr,int lOffset,short[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -13945,14 +13839,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(short[] lArr,int lOffset,int[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(short[] lArr,int lOffset,int[] rArr,int rOffset,int length)
   {
@@ -13969,9 +13861,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(short[] lArr,int lOffset,int[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -14079,14 +13971,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(short[] lArr,int lOffset,long[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(short[] lArr,int lOffset,long[] rArr,int rOffset,int length)
   {
@@ -14103,9 +13993,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(short[] lArr,int lOffset,long[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -14213,14 +14103,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(short[] lArr,int lOffset,float[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(short[] lArr,int lOffset,float[] rArr,int rOffset,int length)
   {
@@ -14237,9 +14125,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(short[] lArr,int lOffset,float[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -14347,14 +14235,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(short[] lArr,int lOffset,double[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(short[] lArr,int lOffset,double[] rArr,int rOffset,int length)
   {
@@ -14371,9 +14257,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(short[] lArr,int lOffset,double[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -14485,14 +14371,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(short[] lArr,int lOffset,Boolean[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(short[] lArr,int lOffset,Boolean[] rArr,int rOffset,int length)
   {
@@ -14509,9 +14393,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(short[] lArr,int lOffset,Boolean[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -14623,14 +14507,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(short[] lArr,int lOffset,Byte[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(short[] lArr,int lOffset,Byte[] rArr,int rOffset,int length)
   {
@@ -14647,9 +14529,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(short[] lArr,int lOffset,Byte[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -14761,14 +14643,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(short[] lArr,int lOffset,Character[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(short[] lArr,int lOffset,Character[] rArr,int rOffset,int length)
   {
@@ -14785,9 +14665,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(short[] lArr,int lOffset,Character[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -14899,14 +14779,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(short[] lArr,int lOffset,Short[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(short[] lArr,int lOffset,Short[] rArr,int rOffset,int length)
   {
@@ -14923,9 +14801,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(short[] lArr,int lOffset,Short[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -15037,14 +14915,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(short[] lArr,int lOffset,Integer[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(short[] lArr,int lOffset,Integer[] rArr,int rOffset,int length)
   {
@@ -15061,9 +14937,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(short[] lArr,int lOffset,Integer[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -15175,14 +15051,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(short[] lArr,int lOffset,Long[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(short[] lArr,int lOffset,Long[] rArr,int rOffset,int length)
   {
@@ -15199,9 +15073,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(short[] lArr,int lOffset,Long[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -15313,14 +15187,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(short[] lArr,int lOffset,Float[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(short[] lArr,int lOffset,Float[] rArr,int rOffset,int length)
   {
@@ -15337,9 +15209,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(short[] lArr,int lOffset,Float[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -15451,14 +15323,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(short[] lArr,int lOffset,Double[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(short[] lArr,int lOffset,Double[] rArr,int rOffset,int length)
   {
@@ -15475,9 +15345,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(short[] lArr,int lOffset,Double[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -15589,14 +15459,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(short[] lArr,int lOffset,Object[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(short[] lArr,int lOffset,Object[] rArr,int rOffset,int length)
   {
@@ -15613,9 +15481,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(short[] lArr,int lOffset,Object[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -15723,14 +15591,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(int[] lArr,int lOffset,boolean[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(int[] lArr,int lOffset,boolean[] rArr,int rOffset,int length)
   {
@@ -15747,9 +15613,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(int[] lArr,int lOffset,boolean[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -15857,14 +15723,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(int[] lArr,int lOffset,byte[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(int[] lArr,int lOffset,byte[] rArr,int rOffset,int length)
   {
@@ -15881,9 +15745,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(int[] lArr,int lOffset,byte[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -15991,14 +15855,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(int[] lArr,int lOffset,char[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(int[] lArr,int lOffset,char[] rArr,int rOffset,int length)
   {
@@ -16015,9 +15877,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(int[] lArr,int lOffset,char[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -16125,14 +15987,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(int[] lArr,int lOffset,short[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(int[] lArr,int lOffset,short[] rArr,int rOffset,int length)
   {
@@ -16149,9 +16009,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(int[] lArr,int lOffset,short[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -16259,14 +16119,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(int[] lArr,int lOffset,int[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(int[] lArr,int lOffset,int[] rArr,int rOffset,int length)
   {
@@ -16283,9 +16141,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(int[] lArr,int lOffset,int[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -16393,14 +16251,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(int[] lArr,int lOffset,long[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(int[] lArr,int lOffset,long[] rArr,int rOffset,int length)
   {
@@ -16417,9 +16273,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(int[] lArr,int lOffset,long[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -16528,14 +16384,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(int[] lArr,int lOffset,float[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(int[] lArr,int lOffset,float[] rArr,int rOffset,int length)
   {
@@ -16552,9 +16406,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(int[] lArr,int lOffset,float[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -16662,14 +16516,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(int[] lArr,int lOffset,double[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(int[] lArr,int lOffset,double[] rArr,int rOffset,int length)
   {
@@ -16686,9 +16538,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(int[] lArr,int lOffset,double[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -16800,14 +16652,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(int[] lArr,int lOffset,Boolean[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(int[] lArr,int lOffset,Boolean[] rArr,int rOffset,int length)
   {
@@ -16824,9 +16674,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(int[] lArr,int lOffset,Boolean[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -16938,14 +16788,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(int[] lArr,int lOffset,Byte[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(int[] lArr,int lOffset,Byte[] rArr,int rOffset,int length)
   {
@@ -16962,9 +16810,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(int[] lArr,int lOffset,Byte[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -17076,14 +16924,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(int[] lArr,int lOffset,Character[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(int[] lArr,int lOffset,Character[] rArr,int rOffset,int length)
   {
@@ -17100,9 +16946,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(int[] lArr,int lOffset,Character[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -17214,14 +17060,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(int[] lArr,int lOffset,Short[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(int[] lArr,int lOffset,Short[] rArr,int rOffset,int length)
   {
@@ -17238,9 +17082,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(int[] lArr,int lOffset,Short[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -17352,14 +17196,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(int[] lArr,int lOffset,Integer[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(int[] lArr,int lOffset,Integer[] rArr,int rOffset,int length)
   {
@@ -17376,9 +17218,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(int[] lArr,int lOffset,Integer[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -17490,14 +17332,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(int[] lArr,int lOffset,Long[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(int[] lArr,int lOffset,Long[] rArr,int rOffset,int length)
   {
@@ -17514,9 +17354,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(int[] lArr,int lOffset,Long[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -17628,14 +17468,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(int[] lArr,int lOffset,Float[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(int[] lArr,int lOffset,Float[] rArr,int rOffset,int length)
   {
@@ -17652,9 +17490,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(int[] lArr,int lOffset,Float[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -17766,14 +17604,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(int[] lArr,int lOffset,Double[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(int[] lArr,int lOffset,Double[] rArr,int rOffset,int length)
   {
@@ -17790,9 +17626,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(int[] lArr,int lOffset,Double[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -17904,14 +17740,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(int[] lArr,int lOffset,Object[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(int[] lArr,int lOffset,Object[] rArr,int rOffset,int length)
   {
@@ -17928,9 +17762,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(int[] lArr,int lOffset,Object[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -18038,14 +17872,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(long[] lArr,int lOffset,boolean[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(long[] lArr,int lOffset,boolean[] rArr,int rOffset,int length)
   {
@@ -18062,9 +17894,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(long[] lArr,int lOffset,boolean[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -18172,14 +18004,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(long[] lArr,int lOffset,byte[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(long[] lArr,int lOffset,byte[] rArr,int rOffset,int length)
   {
@@ -18196,9 +18026,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(long[] lArr,int lOffset,byte[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -18306,14 +18136,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(long[] lArr,int lOffset,char[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(long[] lArr,int lOffset,char[] rArr,int rOffset,int length)
   {
@@ -18330,9 +18158,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(long[] lArr,int lOffset,char[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -18440,14 +18268,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(long[] lArr,int lOffset,short[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(long[] lArr,int lOffset,short[] rArr,int rOffset,int length)
   {
@@ -18464,9 +18290,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(long[] lArr,int lOffset,short[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -18574,14 +18400,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(long[] lArr,int lOffset,int[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(long[] lArr,int lOffset,int[] rArr,int rOffset,int length)
   {
@@ -18598,9 +18422,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(long[] lArr,int lOffset,int[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -18708,14 +18532,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(long[] lArr,int lOffset,long[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(long[] lArr,int lOffset,long[] rArr,int rOffset,int length)
   {
@@ -18732,9 +18554,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(long[] lArr,int lOffset,long[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -18843,14 +18665,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(long[] lArr,int lOffset,float[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(long[] lArr,int lOffset,float[] rArr,int rOffset,int length)
   {
@@ -18867,9 +18687,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(long[] lArr,int lOffset,float[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -18978,14 +18798,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(long[] lArr,int lOffset,double[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(long[] lArr,int lOffset,double[] rArr,int rOffset,int length)
   {
@@ -19002,9 +18820,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(long[] lArr,int lOffset,double[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -19116,14 +18934,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(long[] lArr,int lOffset,Boolean[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(long[] lArr,int lOffset,Boolean[] rArr,int rOffset,int length)
   {
@@ -19140,9 +18956,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(long[] lArr,int lOffset,Boolean[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -19254,14 +19070,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(long[] lArr,int lOffset,Byte[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(long[] lArr,int lOffset,Byte[] rArr,int rOffset,int length)
   {
@@ -19278,9 +19092,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(long[] lArr,int lOffset,Byte[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -19392,14 +19206,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(long[] lArr,int lOffset,Character[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(long[] lArr,int lOffset,Character[] rArr,int rOffset,int length)
   {
@@ -19416,9 +19228,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(long[] lArr,int lOffset,Character[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -19530,14 +19342,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(long[] lArr,int lOffset,Short[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(long[] lArr,int lOffset,Short[] rArr,int rOffset,int length)
   {
@@ -19554,9 +19364,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(long[] lArr,int lOffset,Short[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -19668,14 +19478,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(long[] lArr,int lOffset,Integer[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(long[] lArr,int lOffset,Integer[] rArr,int rOffset,int length)
   {
@@ -19692,9 +19500,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(long[] lArr,int lOffset,Integer[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -19806,14 +19614,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(long[] lArr,int lOffset,Long[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(long[] lArr,int lOffset,Long[] rArr,int rOffset,int length)
   {
@@ -19830,9 +19636,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(long[] lArr,int lOffset,Long[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -19944,14 +19750,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(long[] lArr,int lOffset,Float[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(long[] lArr,int lOffset,Float[] rArr,int rOffset,int length)
   {
@@ -19968,9 +19772,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(long[] lArr,int lOffset,Float[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -20082,14 +19886,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(long[] lArr,int lOffset,Double[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(long[] lArr,int lOffset,Double[] rArr,int rOffset,int length)
   {
@@ -20106,9 +19908,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(long[] lArr,int lOffset,Double[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -20220,14 +20022,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(long[] lArr,int lOffset,Object[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(long[] lArr,int lOffset,Object[] rArr,int rOffset,int length)
   {
@@ -20244,9 +20044,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(long[] lArr,int lOffset,Object[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -20354,14 +20154,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(float[] lArr,int lOffset,boolean[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(float[] lArr,int lOffset,boolean[] rArr,int rOffset,int length)
   {
@@ -20378,9 +20176,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(float[] lArr,int lOffset,boolean[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -20488,14 +20286,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(float[] lArr,int lOffset,byte[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(float[] lArr,int lOffset,byte[] rArr,int rOffset,int length)
   {
@@ -20512,9 +20308,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(float[] lArr,int lOffset,byte[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -20622,14 +20418,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(float[] lArr,int lOffset,char[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(float[] lArr,int lOffset,char[] rArr,int rOffset,int length)
   {
@@ -20646,9 +20440,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(float[] lArr,int lOffset,char[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -20756,14 +20550,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(float[] lArr,int lOffset,short[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(float[] lArr,int lOffset,short[] rArr,int rOffset,int length)
   {
@@ -20780,9 +20572,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(float[] lArr,int lOffset,short[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -20890,14 +20682,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(float[] lArr,int lOffset,int[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(float[] lArr,int lOffset,int[] rArr,int rOffset,int length)
   {
@@ -20914,9 +20704,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(float[] lArr,int lOffset,int[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -21025,14 +20815,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(float[] lArr,int lOffset,long[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(float[] lArr,int lOffset,long[] rArr,int rOffset,int length)
   {
@@ -21049,9 +20837,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(float[] lArr,int lOffset,long[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -21160,14 +20948,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(float[] lArr,int lOffset,float[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(float[] lArr,int lOffset,float[] rArr,int rOffset,int length)
   {
@@ -21184,9 +20970,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(float[] lArr,int lOffset,float[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -21295,14 +21081,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(float[] lArr,int lOffset,double[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(float[] lArr,int lOffset,double[] rArr,int rOffset,int length)
   {
@@ -21319,9 +21103,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(float[] lArr,int lOffset,double[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -21433,14 +21217,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(float[] lArr,int lOffset,Boolean[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(float[] lArr,int lOffset,Boolean[] rArr,int rOffset,int length)
   {
@@ -21457,9 +21239,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(float[] lArr,int lOffset,Boolean[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -21571,14 +21353,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(float[] lArr,int lOffset,Byte[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(float[] lArr,int lOffset,Byte[] rArr,int rOffset,int length)
   {
@@ -21595,9 +21375,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(float[] lArr,int lOffset,Byte[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -21709,14 +21489,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(float[] lArr,int lOffset,Character[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(float[] lArr,int lOffset,Character[] rArr,int rOffset,int length)
   {
@@ -21733,9 +21511,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(float[] lArr,int lOffset,Character[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -21847,14 +21625,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(float[] lArr,int lOffset,Short[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(float[] lArr,int lOffset,Short[] rArr,int rOffset,int length)
   {
@@ -21871,9 +21647,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(float[] lArr,int lOffset,Short[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -21985,14 +21761,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(float[] lArr,int lOffset,Integer[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(float[] lArr,int lOffset,Integer[] rArr,int rOffset,int length)
   {
@@ -22009,9 +21783,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(float[] lArr,int lOffset,Integer[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -22123,14 +21897,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(float[] lArr,int lOffset,Long[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(float[] lArr,int lOffset,Long[] rArr,int rOffset,int length)
   {
@@ -22147,9 +21919,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(float[] lArr,int lOffset,Long[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -22261,14 +22033,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(float[] lArr,int lOffset,Float[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(float[] lArr,int lOffset,Float[] rArr,int rOffset,int length)
   {
@@ -22285,9 +22055,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(float[] lArr,int lOffset,Float[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -22399,14 +22169,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(float[] lArr,int lOffset,Double[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(float[] lArr,int lOffset,Double[] rArr,int rOffset,int length)
   {
@@ -22423,9 +22191,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(float[] lArr,int lOffset,Double[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -22537,14 +22305,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(float[] lArr,int lOffset,Object[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(float[] lArr,int lOffset,Object[] rArr,int rOffset,int length)
   {
@@ -22561,9 +22327,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(float[] lArr,int lOffset,Object[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -22671,14 +22437,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(double[] lArr,int lOffset,boolean[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(double[] lArr,int lOffset,boolean[] rArr,int rOffset,int length)
   {
@@ -22695,9 +22459,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(double[] lArr,int lOffset,boolean[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -22805,14 +22569,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(double[] lArr,int lOffset,byte[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(double[] lArr,int lOffset,byte[] rArr,int rOffset,int length)
   {
@@ -22829,9 +22591,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(double[] lArr,int lOffset,byte[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -22939,14 +22701,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(double[] lArr,int lOffset,char[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(double[] lArr,int lOffset,char[] rArr,int rOffset,int length)
   {
@@ -22963,9 +22723,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(double[] lArr,int lOffset,char[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -23073,14 +22833,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(double[] lArr,int lOffset,short[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(double[] lArr,int lOffset,short[] rArr,int rOffset,int length)
   {
@@ -23097,9 +22855,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(double[] lArr,int lOffset,short[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -23207,14 +22965,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(double[] lArr,int lOffset,int[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(double[] lArr,int lOffset,int[] rArr,int rOffset,int length)
   {
@@ -23231,9 +22987,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(double[] lArr,int lOffset,int[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -23342,14 +23098,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(double[] lArr,int lOffset,long[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(double[] lArr,int lOffset,long[] rArr,int rOffset,int length)
   {
@@ -23366,9 +23120,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(double[] lArr,int lOffset,long[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -23476,14 +23230,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(double[] lArr,int lOffset,float[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(double[] lArr,int lOffset,float[] rArr,int rOffset,int length)
   {
@@ -23500,9 +23252,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(double[] lArr,int lOffset,float[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -23611,14 +23363,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(double[] lArr,int lOffset,double[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(double[] lArr,int lOffset,double[] rArr,int rOffset,int length)
   {
@@ -23635,9 +23385,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(double[] lArr,int lOffset,double[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -23749,14 +23499,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(double[] lArr,int lOffset,Boolean[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(double[] lArr,int lOffset,Boolean[] rArr,int rOffset,int length)
   {
@@ -23773,9 +23521,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(double[] lArr,int lOffset,Boolean[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -23887,14 +23635,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(double[] lArr,int lOffset,Byte[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(double[] lArr,int lOffset,Byte[] rArr,int rOffset,int length)
   {
@@ -23911,9 +23657,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(double[] lArr,int lOffset,Byte[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -24025,14 +23771,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(double[] lArr,int lOffset,Character[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(double[] lArr,int lOffset,Character[] rArr,int rOffset,int length)
   {
@@ -24049,9 +23793,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(double[] lArr,int lOffset,Character[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -24163,14 +23907,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(double[] lArr,int lOffset,Short[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(double[] lArr,int lOffset,Short[] rArr,int rOffset,int length)
   {
@@ -24187,9 +23929,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(double[] lArr,int lOffset,Short[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -24301,14 +24043,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(double[] lArr,int lOffset,Integer[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(double[] lArr,int lOffset,Integer[] rArr,int rOffset,int length)
   {
@@ -24325,9 +24065,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(double[] lArr,int lOffset,Integer[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -24439,14 +24179,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(double[] lArr,int lOffset,Long[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(double[] lArr,int lOffset,Long[] rArr,int rOffset,int length)
   {
@@ -24463,9 +24201,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(double[] lArr,int lOffset,Long[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -24577,14 +24315,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(double[] lArr,int lOffset,Float[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(double[] lArr,int lOffset,Float[] rArr,int rOffset,int length)
   {
@@ -24601,9 +24337,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(double[] lArr,int lOffset,Float[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -24715,14 +24451,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(double[] lArr,int lOffset,Double[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(double[] lArr,int lOffset,Double[] rArr,int rOffset,int length)
   {
@@ -24739,9 +24473,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(double[] lArr,int lOffset,Double[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -24853,14 +24587,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(double[] lArr,int lOffset,Object[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(double[] lArr,int lOffset,Object[] rArr,int rOffset,int length)
   {
@@ -24877,9 +24609,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(double[] lArr,int lOffset,Object[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -24991,14 +24723,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Boolean[] lArr,int lOffset,boolean[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Boolean[] lArr,int lOffset,boolean[] rArr,int rOffset,int length)
   {
@@ -25015,9 +24745,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Boolean[] lArr,int lOffset,boolean[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -25129,14 +24859,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Boolean[] lArr,int lOffset,byte[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Boolean[] lArr,int lOffset,byte[] rArr,int rOffset,int length)
   {
@@ -25153,9 +24881,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Boolean[] lArr,int lOffset,byte[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -25267,14 +24995,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Boolean[] lArr,int lOffset,char[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Boolean[] lArr,int lOffset,char[] rArr,int rOffset,int length)
   {
@@ -25291,9 +25017,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Boolean[] lArr,int lOffset,char[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -25405,14 +25131,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Boolean[] lArr,int lOffset,short[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Boolean[] lArr,int lOffset,short[] rArr,int rOffset,int length)
   {
@@ -25429,9 +25153,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Boolean[] lArr,int lOffset,short[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -25543,14 +25267,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Boolean[] lArr,int lOffset,int[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Boolean[] lArr,int lOffset,int[] rArr,int rOffset,int length)
   {
@@ -25567,9 +25289,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Boolean[] lArr,int lOffset,int[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -25681,14 +25403,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Boolean[] lArr,int lOffset,long[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Boolean[] lArr,int lOffset,long[] rArr,int rOffset,int length)
   {
@@ -25705,9 +25425,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Boolean[] lArr,int lOffset,long[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -25819,14 +25539,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Boolean[] lArr,int lOffset,float[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Boolean[] lArr,int lOffset,float[] rArr,int rOffset,int length)
   {
@@ -25843,9 +25561,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Boolean[] lArr,int lOffset,float[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -25957,14 +25675,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Boolean[] lArr,int lOffset,double[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Boolean[] lArr,int lOffset,double[] rArr,int rOffset,int length)
   {
@@ -25981,9 +25697,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Boolean[] lArr,int lOffset,double[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -26095,14 +25811,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Boolean[] lArr,int lOffset,Boolean[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Boolean[] lArr,int lOffset,Boolean[] rArr,int rOffset,int length)
   {
@@ -26119,9 +25833,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Boolean[] lArr,int lOffset,Boolean[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -26233,14 +25947,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Boolean[] lArr,int lOffset,Byte[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Boolean[] lArr,int lOffset,Byte[] rArr,int rOffset,int length)
   {
@@ -26257,9 +25969,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Boolean[] lArr,int lOffset,Byte[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -26371,14 +26083,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Boolean[] lArr,int lOffset,Character[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Boolean[] lArr,int lOffset,Character[] rArr,int rOffset,int length)
   {
@@ -26395,9 +26105,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Boolean[] lArr,int lOffset,Character[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -26509,14 +26219,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Boolean[] lArr,int lOffset,Short[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Boolean[] lArr,int lOffset,Short[] rArr,int rOffset,int length)
   {
@@ -26533,9 +26241,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Boolean[] lArr,int lOffset,Short[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -26647,14 +26355,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Boolean[] lArr,int lOffset,Integer[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Boolean[] lArr,int lOffset,Integer[] rArr,int rOffset,int length)
   {
@@ -26671,9 +26377,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Boolean[] lArr,int lOffset,Integer[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -26785,14 +26491,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Boolean[] lArr,int lOffset,Long[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Boolean[] lArr,int lOffset,Long[] rArr,int rOffset,int length)
   {
@@ -26809,9 +26513,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Boolean[] lArr,int lOffset,Long[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -26923,14 +26627,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Boolean[] lArr,int lOffset,Float[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Boolean[] lArr,int lOffset,Float[] rArr,int rOffset,int length)
   {
@@ -26947,9 +26649,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Boolean[] lArr,int lOffset,Float[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -27061,14 +26763,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Boolean[] lArr,int lOffset,Double[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Boolean[] lArr,int lOffset,Double[] rArr,int rOffset,int length)
   {
@@ -27085,9 +26785,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Boolean[] lArr,int lOffset,Double[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -27199,14 +26899,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Boolean[] lArr,int lOffset,Object[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Boolean[] lArr,int lOffset,Object[] rArr,int rOffset,int length)
   {
@@ -27223,9 +26921,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Boolean[] lArr,int lOffset,Object[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -27337,14 +27035,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Byte[] lArr,int lOffset,boolean[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Byte[] lArr,int lOffset,boolean[] rArr,int rOffset,int length)
   {
@@ -27361,9 +27057,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Byte[] lArr,int lOffset,boolean[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -27475,14 +27171,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Byte[] lArr,int lOffset,byte[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Byte[] lArr,int lOffset,byte[] rArr,int rOffset,int length)
   {
@@ -27499,9 +27193,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Byte[] lArr,int lOffset,byte[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -27613,14 +27307,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Byte[] lArr,int lOffset,char[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Byte[] lArr,int lOffset,char[] rArr,int rOffset,int length)
   {
@@ -27637,9 +27329,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Byte[] lArr,int lOffset,char[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -27751,14 +27443,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Byte[] lArr,int lOffset,short[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Byte[] lArr,int lOffset,short[] rArr,int rOffset,int length)
   {
@@ -27775,9 +27465,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Byte[] lArr,int lOffset,short[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -27889,14 +27579,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Byte[] lArr,int lOffset,int[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Byte[] lArr,int lOffset,int[] rArr,int rOffset,int length)
   {
@@ -27913,9 +27601,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Byte[] lArr,int lOffset,int[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -28027,14 +27715,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Byte[] lArr,int lOffset,long[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Byte[] lArr,int lOffset,long[] rArr,int rOffset,int length)
   {
@@ -28051,9 +27737,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Byte[] lArr,int lOffset,long[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -28165,14 +27851,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Byte[] lArr,int lOffset,float[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Byte[] lArr,int lOffset,float[] rArr,int rOffset,int length)
   {
@@ -28189,9 +27873,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Byte[] lArr,int lOffset,float[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -28303,14 +27987,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Byte[] lArr,int lOffset,double[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Byte[] lArr,int lOffset,double[] rArr,int rOffset,int length)
   {
@@ -28327,9 +28009,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Byte[] lArr,int lOffset,double[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -28441,14 +28123,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Byte[] lArr,int lOffset,Boolean[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Byte[] lArr,int lOffset,Boolean[] rArr,int rOffset,int length)
   {
@@ -28465,9 +28145,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Byte[] lArr,int lOffset,Boolean[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -28579,14 +28259,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Byte[] lArr,int lOffset,Byte[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Byte[] lArr,int lOffset,Byte[] rArr,int rOffset,int length)
   {
@@ -28603,9 +28281,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Byte[] lArr,int lOffset,Byte[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -28717,14 +28395,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Byte[] lArr,int lOffset,Character[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Byte[] lArr,int lOffset,Character[] rArr,int rOffset,int length)
   {
@@ -28741,9 +28417,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Byte[] lArr,int lOffset,Character[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -28855,14 +28531,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Byte[] lArr,int lOffset,Short[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Byte[] lArr,int lOffset,Short[] rArr,int rOffset,int length)
   {
@@ -28879,9 +28553,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Byte[] lArr,int lOffset,Short[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -28993,14 +28667,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Byte[] lArr,int lOffset,Integer[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Byte[] lArr,int lOffset,Integer[] rArr,int rOffset,int length)
   {
@@ -29017,9 +28689,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Byte[] lArr,int lOffset,Integer[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -29131,14 +28803,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Byte[] lArr,int lOffset,Long[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Byte[] lArr,int lOffset,Long[] rArr,int rOffset,int length)
   {
@@ -29155,9 +28825,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Byte[] lArr,int lOffset,Long[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -29269,14 +28939,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Byte[] lArr,int lOffset,Float[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Byte[] lArr,int lOffset,Float[] rArr,int rOffset,int length)
   {
@@ -29293,9 +28961,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Byte[] lArr,int lOffset,Float[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -29407,14 +29075,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Byte[] lArr,int lOffset,Double[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Byte[] lArr,int lOffset,Double[] rArr,int rOffset,int length)
   {
@@ -29431,9 +29097,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Byte[] lArr,int lOffset,Double[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -29545,14 +29211,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Byte[] lArr,int lOffset,Object[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Byte[] lArr,int lOffset,Object[] rArr,int rOffset,int length)
   {
@@ -29569,9 +29233,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Byte[] lArr,int lOffset,Object[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -29683,14 +29347,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Character[] lArr,int lOffset,boolean[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Character[] lArr,int lOffset,boolean[] rArr,int rOffset,int length)
   {
@@ -29707,9 +29369,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Character[] lArr,int lOffset,boolean[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -29821,14 +29483,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Character[] lArr,int lOffset,byte[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Character[] lArr,int lOffset,byte[] rArr,int rOffset,int length)
   {
@@ -29845,9 +29505,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Character[] lArr,int lOffset,byte[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -29959,14 +29619,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Character[] lArr,int lOffset,char[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Character[] lArr,int lOffset,char[] rArr,int rOffset,int length)
   {
@@ -29983,9 +29641,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Character[] lArr,int lOffset,char[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -30097,14 +29755,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Character[] lArr,int lOffset,short[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Character[] lArr,int lOffset,short[] rArr,int rOffset,int length)
   {
@@ -30121,9 +29777,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Character[] lArr,int lOffset,short[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -30235,14 +29891,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Character[] lArr,int lOffset,int[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Character[] lArr,int lOffset,int[] rArr,int rOffset,int length)
   {
@@ -30259,9 +29913,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Character[] lArr,int lOffset,int[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -30373,14 +30027,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Character[] lArr,int lOffset,long[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Character[] lArr,int lOffset,long[] rArr,int rOffset,int length)
   {
@@ -30397,9 +30049,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Character[] lArr,int lOffset,long[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -30511,14 +30163,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Character[] lArr,int lOffset,float[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Character[] lArr,int lOffset,float[] rArr,int rOffset,int length)
   {
@@ -30535,9 +30185,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Character[] lArr,int lOffset,float[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -30649,14 +30299,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Character[] lArr,int lOffset,double[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Character[] lArr,int lOffset,double[] rArr,int rOffset,int length)
   {
@@ -30673,9 +30321,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Character[] lArr,int lOffset,double[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -30787,14 +30435,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Character[] lArr,int lOffset,Boolean[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Character[] lArr,int lOffset,Boolean[] rArr,int rOffset,int length)
   {
@@ -30811,9 +30457,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Character[] lArr,int lOffset,Boolean[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -30925,14 +30571,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Character[] lArr,int lOffset,Byte[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Character[] lArr,int lOffset,Byte[] rArr,int rOffset,int length)
   {
@@ -30949,9 +30593,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Character[] lArr,int lOffset,Byte[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -31063,14 +30707,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Character[] lArr,int lOffset,Character[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Character[] lArr,int lOffset,Character[] rArr,int rOffset,int length)
   {
@@ -31087,9 +30729,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Character[] lArr,int lOffset,Character[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -31201,14 +30843,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Character[] lArr,int lOffset,Short[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Character[] lArr,int lOffset,Short[] rArr,int rOffset,int length)
   {
@@ -31225,9 +30865,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Character[] lArr,int lOffset,Short[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -31339,14 +30979,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Character[] lArr,int lOffset,Integer[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Character[] lArr,int lOffset,Integer[] rArr,int rOffset,int length)
   {
@@ -31363,9 +31001,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Character[] lArr,int lOffset,Integer[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -31477,14 +31115,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Character[] lArr,int lOffset,Long[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Character[] lArr,int lOffset,Long[] rArr,int rOffset,int length)
   {
@@ -31501,9 +31137,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Character[] lArr,int lOffset,Long[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -31615,14 +31251,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Character[] lArr,int lOffset,Float[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Character[] lArr,int lOffset,Float[] rArr,int rOffset,int length)
   {
@@ -31639,9 +31273,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Character[] lArr,int lOffset,Float[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -31753,14 +31387,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Character[] lArr,int lOffset,Double[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Character[] lArr,int lOffset,Double[] rArr,int rOffset,int length)
   {
@@ -31777,9 +31409,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Character[] lArr,int lOffset,Double[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -31891,14 +31523,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Character[] lArr,int lOffset,Object[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Character[] lArr,int lOffset,Object[] rArr,int rOffset,int length)
   {
@@ -31915,9 +31545,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Character[] lArr,int lOffset,Object[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -32029,14 +31659,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Short[] lArr,int lOffset,boolean[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Short[] lArr,int lOffset,boolean[] rArr,int rOffset,int length)
   {
@@ -32053,9 +31681,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Short[] lArr,int lOffset,boolean[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -32167,14 +31795,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Short[] lArr,int lOffset,byte[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Short[] lArr,int lOffset,byte[] rArr,int rOffset,int length)
   {
@@ -32191,9 +31817,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Short[] lArr,int lOffset,byte[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -32305,14 +31931,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Short[] lArr,int lOffset,char[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Short[] lArr,int lOffset,char[] rArr,int rOffset,int length)
   {
@@ -32329,9 +31953,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Short[] lArr,int lOffset,char[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -32443,14 +32067,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Short[] lArr,int lOffset,short[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Short[] lArr,int lOffset,short[] rArr,int rOffset,int length)
   {
@@ -32467,9 +32089,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Short[] lArr,int lOffset,short[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -32581,14 +32203,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Short[] lArr,int lOffset,int[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Short[] lArr,int lOffset,int[] rArr,int rOffset,int length)
   {
@@ -32605,9 +32225,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Short[] lArr,int lOffset,int[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -32719,14 +32339,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Short[] lArr,int lOffset,long[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Short[] lArr,int lOffset,long[] rArr,int rOffset,int length)
   {
@@ -32743,9 +32361,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Short[] lArr,int lOffset,long[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -32857,14 +32475,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Short[] lArr,int lOffset,float[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Short[] lArr,int lOffset,float[] rArr,int rOffset,int length)
   {
@@ -32881,9 +32497,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Short[] lArr,int lOffset,float[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -32995,14 +32611,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Short[] lArr,int lOffset,double[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Short[] lArr,int lOffset,double[] rArr,int rOffset,int length)
   {
@@ -33019,9 +32633,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Short[] lArr,int lOffset,double[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -33133,14 +32747,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Short[] lArr,int lOffset,Boolean[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Short[] lArr,int lOffset,Boolean[] rArr,int rOffset,int length)
   {
@@ -33157,9 +32769,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Short[] lArr,int lOffset,Boolean[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -33271,14 +32883,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Short[] lArr,int lOffset,Byte[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Short[] lArr,int lOffset,Byte[] rArr,int rOffset,int length)
   {
@@ -33295,9 +32905,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Short[] lArr,int lOffset,Byte[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -33409,14 +33019,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Short[] lArr,int lOffset,Character[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Short[] lArr,int lOffset,Character[] rArr,int rOffset,int length)
   {
@@ -33433,9 +33041,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Short[] lArr,int lOffset,Character[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -33547,14 +33155,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Short[] lArr,int lOffset,Short[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Short[] lArr,int lOffset,Short[] rArr,int rOffset,int length)
   {
@@ -33571,9 +33177,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Short[] lArr,int lOffset,Short[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -33685,14 +33291,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Short[] lArr,int lOffset,Integer[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Short[] lArr,int lOffset,Integer[] rArr,int rOffset,int length)
   {
@@ -33709,9 +33313,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Short[] lArr,int lOffset,Integer[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -33823,14 +33427,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Short[] lArr,int lOffset,Long[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Short[] lArr,int lOffset,Long[] rArr,int rOffset,int length)
   {
@@ -33847,9 +33449,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Short[] lArr,int lOffset,Long[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -33961,14 +33563,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Short[] lArr,int lOffset,Float[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Short[] lArr,int lOffset,Float[] rArr,int rOffset,int length)
   {
@@ -33985,9 +33585,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Short[] lArr,int lOffset,Float[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -34099,14 +33699,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Short[] lArr,int lOffset,Double[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Short[] lArr,int lOffset,Double[] rArr,int rOffset,int length)
   {
@@ -34123,9 +33721,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Short[] lArr,int lOffset,Double[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -34237,14 +33835,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Short[] lArr,int lOffset,Object[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Short[] lArr,int lOffset,Object[] rArr,int rOffset,int length)
   {
@@ -34261,9 +33857,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Short[] lArr,int lOffset,Object[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -34375,14 +33971,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Integer[] lArr,int lOffset,boolean[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Integer[] lArr,int lOffset,boolean[] rArr,int rOffset,int length)
   {
@@ -34399,9 +33993,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Integer[] lArr,int lOffset,boolean[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -34513,14 +34107,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Integer[] lArr,int lOffset,byte[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Integer[] lArr,int lOffset,byte[] rArr,int rOffset,int length)
   {
@@ -34537,9 +34129,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Integer[] lArr,int lOffset,byte[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -34651,14 +34243,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Integer[] lArr,int lOffset,char[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Integer[] lArr,int lOffset,char[] rArr,int rOffset,int length)
   {
@@ -34675,9 +34265,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Integer[] lArr,int lOffset,char[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -34789,14 +34379,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Integer[] lArr,int lOffset,short[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Integer[] lArr,int lOffset,short[] rArr,int rOffset,int length)
   {
@@ -34813,9 +34401,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Integer[] lArr,int lOffset,short[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -34927,14 +34515,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Integer[] lArr,int lOffset,int[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Integer[] lArr,int lOffset,int[] rArr,int rOffset,int length)
   {
@@ -34951,9 +34537,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Integer[] lArr,int lOffset,int[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -35065,14 +34651,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Integer[] lArr,int lOffset,long[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Integer[] lArr,int lOffset,long[] rArr,int rOffset,int length)
   {
@@ -35089,9 +34673,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Integer[] lArr,int lOffset,long[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -35203,14 +34787,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Integer[] lArr,int lOffset,float[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Integer[] lArr,int lOffset,float[] rArr,int rOffset,int length)
   {
@@ -35227,9 +34809,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Integer[] lArr,int lOffset,float[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -35341,14 +34923,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Integer[] lArr,int lOffset,double[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Integer[] lArr,int lOffset,double[] rArr,int rOffset,int length)
   {
@@ -35365,9 +34945,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Integer[] lArr,int lOffset,double[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -35479,14 +35059,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Integer[] lArr,int lOffset,Boolean[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Integer[] lArr,int lOffset,Boolean[] rArr,int rOffset,int length)
   {
@@ -35503,9 +35081,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Integer[] lArr,int lOffset,Boolean[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -35617,14 +35195,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Integer[] lArr,int lOffset,Byte[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Integer[] lArr,int lOffset,Byte[] rArr,int rOffset,int length)
   {
@@ -35641,9 +35217,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Integer[] lArr,int lOffset,Byte[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -35755,14 +35331,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Integer[] lArr,int lOffset,Character[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Integer[] lArr,int lOffset,Character[] rArr,int rOffset,int length)
   {
@@ -35779,9 +35353,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Integer[] lArr,int lOffset,Character[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -35893,14 +35467,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Integer[] lArr,int lOffset,Short[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Integer[] lArr,int lOffset,Short[] rArr,int rOffset,int length)
   {
@@ -35917,9 +35489,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Integer[] lArr,int lOffset,Short[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -36031,14 +35603,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Integer[] lArr,int lOffset,Integer[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Integer[] lArr,int lOffset,Integer[] rArr,int rOffset,int length)
   {
@@ -36055,9 +35625,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Integer[] lArr,int lOffset,Integer[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -36169,14 +35739,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Integer[] lArr,int lOffset,Long[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Integer[] lArr,int lOffset,Long[] rArr,int rOffset,int length)
   {
@@ -36193,9 +35761,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Integer[] lArr,int lOffset,Long[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -36307,14 +35875,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Integer[] lArr,int lOffset,Float[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Integer[] lArr,int lOffset,Float[] rArr,int rOffset,int length)
   {
@@ -36331,9 +35897,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Integer[] lArr,int lOffset,Float[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -36445,14 +36011,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Integer[] lArr,int lOffset,Double[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Integer[] lArr,int lOffset,Double[] rArr,int rOffset,int length)
   {
@@ -36469,9 +36033,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Integer[] lArr,int lOffset,Double[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -36583,14 +36147,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Integer[] lArr,int lOffset,Object[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Integer[] lArr,int lOffset,Object[] rArr,int rOffset,int length)
   {
@@ -36607,9 +36169,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Integer[] lArr,int lOffset,Object[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -36721,14 +36283,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Long[] lArr,int lOffset,boolean[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Long[] lArr,int lOffset,boolean[] rArr,int rOffset,int length)
   {
@@ -36745,9 +36305,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Long[] lArr,int lOffset,boolean[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -36859,14 +36419,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Long[] lArr,int lOffset,byte[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Long[] lArr,int lOffset,byte[] rArr,int rOffset,int length)
   {
@@ -36883,9 +36441,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Long[] lArr,int lOffset,byte[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -36997,14 +36555,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Long[] lArr,int lOffset,char[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Long[] lArr,int lOffset,char[] rArr,int rOffset,int length)
   {
@@ -37021,9 +36577,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Long[] lArr,int lOffset,char[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -37135,14 +36691,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Long[] lArr,int lOffset,short[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Long[] lArr,int lOffset,short[] rArr,int rOffset,int length)
   {
@@ -37159,9 +36713,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Long[] lArr,int lOffset,short[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -37273,14 +36827,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Long[] lArr,int lOffset,int[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Long[] lArr,int lOffset,int[] rArr,int rOffset,int length)
   {
@@ -37297,9 +36849,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Long[] lArr,int lOffset,int[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -37411,14 +36963,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Long[] lArr,int lOffset,long[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Long[] lArr,int lOffset,long[] rArr,int rOffset,int length)
   {
@@ -37435,9 +36985,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Long[] lArr,int lOffset,long[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -37549,14 +37099,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Long[] lArr,int lOffset,float[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Long[] lArr,int lOffset,float[] rArr,int rOffset,int length)
   {
@@ -37573,9 +37121,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Long[] lArr,int lOffset,float[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -37687,14 +37235,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Long[] lArr,int lOffset,double[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Long[] lArr,int lOffset,double[] rArr,int rOffset,int length)
   {
@@ -37711,9 +37257,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Long[] lArr,int lOffset,double[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -37825,14 +37371,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Long[] lArr,int lOffset,Boolean[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Long[] lArr,int lOffset,Boolean[] rArr,int rOffset,int length)
   {
@@ -37849,9 +37393,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Long[] lArr,int lOffset,Boolean[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -37963,14 +37507,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Long[] lArr,int lOffset,Byte[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Long[] lArr,int lOffset,Byte[] rArr,int rOffset,int length)
   {
@@ -37987,9 +37529,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Long[] lArr,int lOffset,Byte[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -38101,14 +37643,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Long[] lArr,int lOffset,Character[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Long[] lArr,int lOffset,Character[] rArr,int rOffset,int length)
   {
@@ -38125,9 +37665,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Long[] lArr,int lOffset,Character[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -38239,14 +37779,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Long[] lArr,int lOffset,Short[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Long[] lArr,int lOffset,Short[] rArr,int rOffset,int length)
   {
@@ -38263,9 +37801,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Long[] lArr,int lOffset,Short[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -38377,14 +37915,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Long[] lArr,int lOffset,Integer[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Long[] lArr,int lOffset,Integer[] rArr,int rOffset,int length)
   {
@@ -38401,9 +37937,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Long[] lArr,int lOffset,Integer[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -38515,14 +38051,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Long[] lArr,int lOffset,Long[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Long[] lArr,int lOffset,Long[] rArr,int rOffset,int length)
   {
@@ -38539,9 +38073,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Long[] lArr,int lOffset,Long[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -38653,14 +38187,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Long[] lArr,int lOffset,Float[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Long[] lArr,int lOffset,Float[] rArr,int rOffset,int length)
   {
@@ -38677,9 +38209,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Long[] lArr,int lOffset,Float[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -38791,14 +38323,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Long[] lArr,int lOffset,Double[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Long[] lArr,int lOffset,Double[] rArr,int rOffset,int length)
   {
@@ -38815,9 +38345,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Long[] lArr,int lOffset,Double[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -38929,14 +38459,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Long[] lArr,int lOffset,Object[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Long[] lArr,int lOffset,Object[] rArr,int rOffset,int length)
   {
@@ -38953,9 +38481,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Long[] lArr,int lOffset,Object[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -39067,14 +38595,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Float[] lArr,int lOffset,boolean[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Float[] lArr,int lOffset,boolean[] rArr,int rOffset,int length)
   {
@@ -39091,9 +38617,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Float[] lArr,int lOffset,boolean[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -39205,14 +38731,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Float[] lArr,int lOffset,byte[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Float[] lArr,int lOffset,byte[] rArr,int rOffset,int length)
   {
@@ -39229,9 +38753,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Float[] lArr,int lOffset,byte[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -39343,14 +38867,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Float[] lArr,int lOffset,char[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Float[] lArr,int lOffset,char[] rArr,int rOffset,int length)
   {
@@ -39367,9 +38889,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Float[] lArr,int lOffset,char[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -39481,14 +39003,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Float[] lArr,int lOffset,short[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Float[] lArr,int lOffset,short[] rArr,int rOffset,int length)
   {
@@ -39505,9 +39025,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Float[] lArr,int lOffset,short[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -39619,14 +39139,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Float[] lArr,int lOffset,int[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Float[] lArr,int lOffset,int[] rArr,int rOffset,int length)
   {
@@ -39643,9 +39161,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Float[] lArr,int lOffset,int[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -39757,14 +39275,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Float[] lArr,int lOffset,long[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Float[] lArr,int lOffset,long[] rArr,int rOffset,int length)
   {
@@ -39781,9 +39297,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Float[] lArr,int lOffset,long[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -39895,14 +39411,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Float[] lArr,int lOffset,float[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Float[] lArr,int lOffset,float[] rArr,int rOffset,int length)
   {
@@ -39919,9 +39433,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Float[] lArr,int lOffset,float[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -40033,14 +39547,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Float[] lArr,int lOffset,double[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Float[] lArr,int lOffset,double[] rArr,int rOffset,int length)
   {
@@ -40057,9 +39569,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Float[] lArr,int lOffset,double[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -40171,14 +39683,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Float[] lArr,int lOffset,Boolean[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Float[] lArr,int lOffset,Boolean[] rArr,int rOffset,int length)
   {
@@ -40195,9 +39705,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Float[] lArr,int lOffset,Boolean[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -40309,14 +39819,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Float[] lArr,int lOffset,Byte[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Float[] lArr,int lOffset,Byte[] rArr,int rOffset,int length)
   {
@@ -40333,9 +39841,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Float[] lArr,int lOffset,Byte[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -40447,14 +39955,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Float[] lArr,int lOffset,Character[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Float[] lArr,int lOffset,Character[] rArr,int rOffset,int length)
   {
@@ -40471,9 +39977,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Float[] lArr,int lOffset,Character[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -40585,14 +40091,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Float[] lArr,int lOffset,Short[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Float[] lArr,int lOffset,Short[] rArr,int rOffset,int length)
   {
@@ -40609,9 +40113,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Float[] lArr,int lOffset,Short[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -40723,14 +40227,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Float[] lArr,int lOffset,Integer[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Float[] lArr,int lOffset,Integer[] rArr,int rOffset,int length)
   {
@@ -40747,9 +40249,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Float[] lArr,int lOffset,Integer[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -40861,14 +40363,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Float[] lArr,int lOffset,Long[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Float[] lArr,int lOffset,Long[] rArr,int rOffset,int length)
   {
@@ -40885,9 +40385,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Float[] lArr,int lOffset,Long[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -40999,14 +40499,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Float[] lArr,int lOffset,Float[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Float[] lArr,int lOffset,Float[] rArr,int rOffset,int length)
   {
@@ -41023,9 +40521,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Float[] lArr,int lOffset,Float[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -41137,14 +40635,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Float[] lArr,int lOffset,Double[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Float[] lArr,int lOffset,Double[] rArr,int rOffset,int length)
   {
@@ -41161,9 +40657,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Float[] lArr,int lOffset,Double[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -41275,14 +40771,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Float[] lArr,int lOffset,Object[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Float[] lArr,int lOffset,Object[] rArr,int rOffset,int length)
   {
@@ -41299,9 +40793,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Float[] lArr,int lOffset,Object[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -41413,14 +40907,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Double[] lArr,int lOffset,boolean[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Double[] lArr,int lOffset,boolean[] rArr,int rOffset,int length)
   {
@@ -41437,9 +40929,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Double[] lArr,int lOffset,boolean[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -41551,14 +41043,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Double[] lArr,int lOffset,byte[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Double[] lArr,int lOffset,byte[] rArr,int rOffset,int length)
   {
@@ -41575,9 +41065,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Double[] lArr,int lOffset,byte[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -41689,14 +41179,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Double[] lArr,int lOffset,char[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Double[] lArr,int lOffset,char[] rArr,int rOffset,int length)
   {
@@ -41713,9 +41201,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Double[] lArr,int lOffset,char[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -41827,14 +41315,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Double[] lArr,int lOffset,short[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Double[] lArr,int lOffset,short[] rArr,int rOffset,int length)
   {
@@ -41851,9 +41337,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Double[] lArr,int lOffset,short[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -41965,14 +41451,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Double[] lArr,int lOffset,int[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Double[] lArr,int lOffset,int[] rArr,int rOffset,int length)
   {
@@ -41989,9 +41473,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Double[] lArr,int lOffset,int[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -42103,14 +41587,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Double[] lArr,int lOffset,long[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Double[] lArr,int lOffset,long[] rArr,int rOffset,int length)
   {
@@ -42127,9 +41609,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Double[] lArr,int lOffset,long[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -42241,14 +41723,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Double[] lArr,int lOffset,float[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Double[] lArr,int lOffset,float[] rArr,int rOffset,int length)
   {
@@ -42265,9 +41745,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Double[] lArr,int lOffset,float[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -42379,14 +41859,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Double[] lArr,int lOffset,double[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Double[] lArr,int lOffset,double[] rArr,int rOffset,int length)
   {
@@ -42403,9 +41881,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Double[] lArr,int lOffset,double[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -42517,14 +41995,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Double[] lArr,int lOffset,Boolean[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Double[] lArr,int lOffset,Boolean[] rArr,int rOffset,int length)
   {
@@ -42541,9 +42017,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Double[] lArr,int lOffset,Boolean[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -42655,14 +42131,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Double[] lArr,int lOffset,Byte[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Double[] lArr,int lOffset,Byte[] rArr,int rOffset,int length)
   {
@@ -42679,9 +42153,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Double[] lArr,int lOffset,Byte[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -42793,14 +42267,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Double[] lArr,int lOffset,Character[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Double[] lArr,int lOffset,Character[] rArr,int rOffset,int length)
   {
@@ -42817,9 +42289,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Double[] lArr,int lOffset,Character[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -42931,14 +42403,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Double[] lArr,int lOffset,Short[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Double[] lArr,int lOffset,Short[] rArr,int rOffset,int length)
   {
@@ -42955,9 +42425,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Double[] lArr,int lOffset,Short[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -43069,14 +42539,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Double[] lArr,int lOffset,Integer[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Double[] lArr,int lOffset,Integer[] rArr,int rOffset,int length)
   {
@@ -43093,9 +42561,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Double[] lArr,int lOffset,Integer[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -43207,14 +42675,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Double[] lArr,int lOffset,Long[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Double[] lArr,int lOffset,Long[] rArr,int rOffset,int length)
   {
@@ -43231,9 +42697,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Double[] lArr,int lOffset,Long[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -43345,14 +42811,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Double[] lArr,int lOffset,Float[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Double[] lArr,int lOffset,Float[] rArr,int rOffset,int length)
   {
@@ -43369,9 +42833,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Double[] lArr,int lOffset,Float[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -43483,14 +42947,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Double[] lArr,int lOffset,Double[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Double[] lArr,int lOffset,Double[] rArr,int rOffset,int length)
   {
@@ -43507,9 +42969,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Double[] lArr,int lOffset,Double[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -43621,14 +43083,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Double[] lArr,int lOffset,Object[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Double[] lArr,int lOffset,Object[] rArr,int rOffset,int length)
   {
@@ -43645,9 +43105,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Double[] lArr,int lOffset,Object[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -43759,14 +43219,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Object[] lArr,int lOffset,boolean[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Object[] lArr,int lOffset,boolean[] rArr,int rOffset,int length)
   {
@@ -43783,9 +43241,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Object[] lArr,int lOffset,boolean[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -43897,14 +43355,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Object[] lArr,int lOffset,byte[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Object[] lArr,int lOffset,byte[] rArr,int rOffset,int length)
   {
@@ -43921,9 +43377,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Object[] lArr,int lOffset,byte[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -44035,14 +43491,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Object[] lArr,int lOffset,char[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Object[] lArr,int lOffset,char[] rArr,int rOffset,int length)
   {
@@ -44059,9 +43513,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Object[] lArr,int lOffset,char[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -44173,14 +43627,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Object[] lArr,int lOffset,short[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Object[] lArr,int lOffset,short[] rArr,int rOffset,int length)
   {
@@ -44197,9 +43649,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Object[] lArr,int lOffset,short[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -44311,14 +43763,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Object[] lArr,int lOffset,int[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Object[] lArr,int lOffset,int[] rArr,int rOffset,int length)
   {
@@ -44335,9 +43785,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Object[] lArr,int lOffset,int[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -44449,14 +43899,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Object[] lArr,int lOffset,long[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Object[] lArr,int lOffset,long[] rArr,int rOffset,int length)
   {
@@ -44473,9 +43921,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Object[] lArr,int lOffset,long[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -44587,14 +44035,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Object[] lArr,int lOffset,float[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Object[] lArr,int lOffset,float[] rArr,int rOffset,int length)
   {
@@ -44611,9 +44057,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Object[] lArr,int lOffset,float[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -44725,14 +44171,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Object[] lArr,int lOffset,double[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Object[] lArr,int lOffset,double[] rArr,int rOffset,int length)
   {
@@ -44749,9 +44193,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Object[] lArr,int lOffset,double[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -44863,14 +44307,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Object[] lArr,int lOffset,Boolean[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Object[] lArr,int lOffset,Boolean[] rArr,int rOffset,int length)
   {
@@ -44887,9 +44329,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Object[] lArr,int lOffset,Boolean[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -45001,14 +44443,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Object[] lArr,int lOffset,Byte[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Object[] lArr,int lOffset,Byte[] rArr,int rOffset,int length)
   {
@@ -45025,9 +44465,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Object[] lArr,int lOffset,Byte[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -45139,14 +44579,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Object[] lArr,int lOffset,Character[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Object[] lArr,int lOffset,Character[] rArr,int rOffset,int length)
   {
@@ -45163,9 +44601,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Object[] lArr,int lOffset,Character[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -45277,14 +44715,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Object[] lArr,int lOffset,Short[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Object[] lArr,int lOffset,Short[] rArr,int rOffset,int length)
   {
@@ -45301,9 +44737,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Object[] lArr,int lOffset,Short[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -45415,14 +44851,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Object[] lArr,int lOffset,Integer[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Object[] lArr,int lOffset,Integer[] rArr,int rOffset,int length)
   {
@@ -45439,9 +44873,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Object[] lArr,int lOffset,Integer[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -45553,14 +44987,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Object[] lArr,int lOffset,Long[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Object[] lArr,int lOffset,Long[] rArr,int rOffset,int length)
   {
@@ -45577,9 +45009,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Object[] lArr,int lOffset,Long[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -45691,14 +45123,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Object[] lArr,int lOffset,Float[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Object[] lArr,int lOffset,Float[] rArr,int rOffset,int length)
   {
@@ -45715,9 +45145,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Object[] lArr,int lOffset,Float[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -45829,14 +45259,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Object[] lArr,int lOffset,Double[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Object[] lArr,int lOffset,Double[] rArr,int rOffset,int length)
   {
@@ -45853,9 +45281,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Object[] lArr,int lOffset,Double[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }
@@ -45967,14 +45395,12 @@ public interface JunitUtil
   }
   public static void uncheckedassertreversearraysAreEqual(Object[] lArr,int lOffset,Object[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;;++rOffset)
+    int i=lOffset+length;
+    do
     {
-      Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-      if(lOffset==length)
-      {
-        return;
-      }
+      Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
     }
+    while(i!=lOffset);
   }
   public static void assertreversearraysAreEqual(Object[] lArr,int lOffset,Object[] rArr,int rOffset,int length)
   {
@@ -45991,9 +45417,9 @@ public interface JunitUtil
   }
   public static boolean uncheckedreversearraysAreEqual(Object[] lArr,int lOffset,Object[] rArr,int rOffset,int length)
   {
-    for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+    for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
     {
-      if(lOffset==length)
+      if(i==lOffset)
       {
         return true;
       }

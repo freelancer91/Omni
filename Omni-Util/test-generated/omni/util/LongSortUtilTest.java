@@ -136,11 +136,11 @@ public class LongSortUtilTest
       switch(builder)
       {
       case Randomized:
-        return 20;
+        return 10;
       case Duplicated:
         return 1;
       case Shuffle:
-        return 20;
+        return 10;
       default:
         return 1;
       }

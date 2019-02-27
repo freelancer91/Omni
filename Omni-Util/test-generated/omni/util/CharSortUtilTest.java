@@ -136,11 +136,23 @@ public class CharSortUtilTest
       switch(builder)
       {
       case Randomized:
-        return 20;
+        if(arrLength<=3201 && arrLength>=287)
+        {
+          return 40;
+        }
+        return 10;
       case Duplicated:
+        if(arrLength<=3201 && arrLength>=287)
+        {
+          return 40;
+        }
         return 1;
       case Shuffle:
-        return 20;
+        if(arrLength<=3201 && arrLength>=287)
+        {
+          return 40;
+        }
+        return 10;
       default:
         return 1;
       }
