@@ -16,6 +16,11 @@ import java.util.Comparator;
 import java.util.Collection;
 public interface JunitUtil
 {
+  static int randomIntBetween(int minIncl,int maxIncl,Random rand)
+  {
+    return minIncl+rand.nextInt(maxIncl-minIncl+1);
+  }
+
 
   #MACRO ConvertMethods<boolean>()
   #MACRO ConvertMethods<byte>()
@@ -927,16 +932,16 @@ public static void parallelassertreversearraysAreEqual(LEFT[] lArr,int lOffset,R
     uncheckedparallelassertreversearraysAreEqual(lArr,lOffset,rArr,rOffset,length);
   }
 }
+
+
 public static void uncheckedassertreversearraysAreEqual(LEFT[] lArr,int lOffset,RIGHT[] rArr,int rOffset,int length)
 {
-  for(lOffset+=length;;++rOffset)
+  int i=lOffset+length;
+  do
   {
-    Assertions.assertTrue(isEqual(lArr[--lOffset],rArr[rOffset]));
-    if(lOffset==length)
-    {
-      return;
-    }
+    Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
   }
+  while(i!=lOffset);
 }
 public static void assertreversearraysAreEqual(LEFT[] lArr,int lOffset,RIGHT[] rArr,int rOffset,int length)
 {
@@ -948,9 +953,9 @@ public static void assertreversearraysAreEqual(LEFT[] lArr,int lOffset,RIGHT[] r
 }
 public static boolean uncheckedreversearraysAreEqual(LEFT[] lArr,int lOffset,RIGHT[] rArr,int rOffset,int length)
 {
-  for(lOffset+=length;isEqual(lArr[--lOffset],rArr[rOffset]);++rOffset)
+  for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
   {
-    if(lOffset==length)
+    if(i==lOffset)
     {
       return true;
     }

@@ -352,25 +352,27 @@ private static class $ClassPrefix$TimSort$<E>$
     #MACRO Assert(k>=0)
     if((len1-=k)!=0)
     {
+
 #IFSWITCH COMPARATORTYPE==Ascending,Descending
-      if((len2=mergeAtGallopLeft(($comparableType$)arr[base1+len1-1],arr,base2,len2))!=0)
+      //if((len2=mergeAtGallopLeft(($comparableType$)arr[base1+len1-1],arr,base2,len2))!=0)
+      //{
+      //  if(len1<=len2)
+      if(len1<=(len2=mergeAtGallopLeft(($comparableType$)arr[base1+len1-1],arr,base2,len2)))
 #ELSE
-      if((len2=mergeAtGallopLeft(($exposedType$)arr[base1+len1-1],arr,base2,len2,sorter))!=0)
+      //if((len2=mergeAtGallopLeft(($exposedType$)arr[base1+len1-1],arr,base2,len2),sorter)!=0)
+      //{
+      //  if(len1<=len2)
+      if(len1<=(len2=mergeAtGallopLeft(($exposedType$)arr[base1+len1-1],arr,base2,len2,sorter)))
 #ENDIF
       {
-        #MACRO Assert(len1>0)
-        #MACRO Assert(len2>0)
-        #MACRO Assert(base1+len1==base2)
-        if(len1<=len2)
-        {
-          mergeLo(arr,base1,len1,base2,len2);
-        }
-        else
-        {
-          
-          mergeHi(arr,base1,len1,base2,len2);
-        }
+      
+        mergeLo(arr,base1,len1,base2,len2);
       }
+      else
+      {
+        mergeHi(arr,base1,len1,base2,len2);
+      }
+      //}
     }
     return stackSize-2;
   }
@@ -388,9 +390,11 @@ private static class $ClassPrefix$TimSort$<E>$
     {
       return len;
     }
-    if(len<2 ||
-      #MACRO LessThanOrEqualTo(key,arr[base+len-2])
-    )
+    #MACRO Assert(len>=2)
+    //#if(len<2 ||
+    //#MACRO LessThanOrEqualTo(key,arr[base+len-2])
+    //)
+    #MACRO IfClause(LessThanOrEqualTo,key,arr[base+len-2])
     {
       lastOfs=-1;
     }
@@ -434,9 +438,11 @@ private static class $ClassPrefix$TimSort$<E>$
     {
       return 0;
     }
-    if(len<2 ||
-    #MACRO GreaterThanOrEqualTo(key,arr[base+1])
-    )
+    #MACRO Assert(len>=2)
+    //#if(len<2 ||
+    //#MACRO GreaterThanOrEqualTo(key,arr[base+1])
+    //)
+    #MACRO IfClause(GreaterThanOrEqualTo,key,arr[base+1])
     {
       ofs=len;
     }
@@ -510,7 +516,7 @@ private static class $ClassPrefix$TimSort$<E>$
    *   In other words, key belonds at index base + k; or in other words, the first k elements should precede the key,
    *   and the last len-k elements should follow it.
    */
-  #MACRO Gallop<Left,Right>(GreaterThan,hint+1,len-hint,LessThanOrEqualTo,-,+,GreaterThan)  
+  #MACRO Gallop<Left,Right>(GreaterThan,hint+1,len-hint,LessThanOrEqualTo,-,+,GreaterThan)
   /**
    * Like gallopLeft, except that if the range contains an element equal to key, gallopRight returns the index
    * after the rightmost equal element
@@ -975,7 +981,7 @@ private static $<E>$ void quickSortDualPivot($ArrayType$[] arr,int begin,int end
     {
       #MACRO WhileCompareAndSetLocal(GreaterThan,ag,arr[great],pivot2)
       {
-        if(great--==k)
+        if(--great<k)
         {
           break outer;
         }
@@ -1039,7 +1045,7 @@ private static $<E>$ void quickSortDualPivot($ArrayType$[] arr,int begin,int end
       {
         #MACRO WhileCompareAndSetLocal(EqualTo,ag,arr[great],pivot2)
         {
-          if(great--==k)
+          if(--great<k)
           {
             break outer;
           }
@@ -1399,11 +1405,8 @@ private static void COMPARATORTYPEmoveZeros($ArrayType$[] arr,int begin,int end)
 #ENDIF
 }
 
-
-
-
-
 #MACRODEF Gallop<LEFT,RIGHT>(GREATERTHAN,LMAXOFS,RMAXOFS,LCOMPARISON,LPLUS,RPLUS,BINARYSEARCHCOMPARISON)
+//TODO split this up into mergeLo and mergeHi versions
 #MACRO SuppressUnchecked()
 #IFSWITCH COMPARATORTYPE==Ascending,Descending
 private static $<E>$ int gallopLEFT($comparableType$ key,$ArrayType$[] arr,int base,int len,int hint)
@@ -1414,8 +1417,8 @@ private static $<E>$ int gallopLEFT($exposedType$ key,$ArrayType$[] arr,int base
   #MACRO Assert(len>0)
   #MACRO Assert(hint>=0)
   #MACRO Assert(hint<len)
-  int ofs=1;
-  int lastOfs=0;
+  int ofs;
+  int lastOfs;
   #MACRO IfClause(GREATERTHAN,key,arr[base+hint])
   {
     #MACRO GallopHelper<RIGHT>(RMAXOFS,GREATERTHAN,RPLUS)
@@ -1449,62 +1452,39 @@ private static $<E>$ int gallopLEFT($exposedType$ key,$ArrayType$[] arr,int base
 #ENDDEF
 #MACRODEF GallopHelper<HELPERDIRECTION>(MAXOFS,COMPARISON,PLUS)
 int maxOfs;
-if(ofs<(maxOfs=MAXOFS))
+if(2>(maxOfs=MAXOFS)||
+#MACRO COMPARISON(key,arr[base+hintPLUS1])
+)
+#IFSWITCH HELPERDIRECTION==Left
 {
-  #MACRO WhileClause(COMPARISON,key,arr[base+hintPLUSofs])
-  {
-    //Integer overflow is almost impossible given that every implementation of the JVM I've seen won't allow
-    //an array with a length of Integer.MAX_VALUE. Still, we cover out bases with this check
-    //Unfortunately, I have no idea how to coverage this branch with Junits.
-    //if((ofs=((lastOfs=ofs)<<1)+1)<=0 || ofs>=maxOfs)
-    //{
-    //  ofs=maxOfs;
-    //  break;
-    //}
-    
-    if((ofs=((lastOfs-ofs)<<1)+1)<=0)
-    {
-      if(ofs>=maxOfs)
-      {
-        ofs=maxOfs;
-        break;
-      }
-      else
-      {
-        ofs=maxOfs;
-        break;
-      }
-    }
-    else
-    {
-      if(ofs>=maxOfs)
-      {
-        ofs=maxOfs;
-        break;
-      }
-    }
-  }
+  lastOfs=hint-maxOfs;
 }
 else
 {
-  ofs=maxOfs;
+  lastOfs=hint-1;
 }
-#IFSWITCH HELPERDIRECTION==Left
-int tmp=lastOfs;
-lastOfs=hint-ofs;
-ofs=hint-tmp;
+ofs=hint;
 #ELSE
-lastOfs+=hint;
-ofs+=hint;
+{
+  ofs=maxOfs+hint;
+}
+else
+{
+  ofs=hint+1;
+}
+lastOfs=hint;
 #ENDIF
 #ENDDEF
 
-#MACRODEF Merge<HILO,LEFTARR,RIGHTARR,INCREMENT,ONE,TWO>()
+#MACRODEF Merge<LOHI,LEFTARR,RIGHTARR,INCREMENT,ONE,TWO>()
 #MACRO SuppressUnchecked()
-private void mergeHILO($ArrayType$[] arr,int base1,int len1,int base2,int len2)
+private void mergeLOHI($ArrayType$[] arr,int base1,int len1,int base2,int len2)
 {
+  #MACRO Assert(len1>0)
+  #MACRO Assert(len2>0)
+  #MACRO Assert(base1+len1==base2)
   final $ArrayType$[] tmp;
-#IFSWITCH HILO==Lo
+#IFSWITCH LOHI==Lo
   //copy the first run into the tmp array
   int cursor1;
   int dest;
@@ -1591,7 +1571,7 @@ private void mergeHILO($ArrayType$[] arr,int base1,int len1,int base2,int len2)
     {
       #MACRO Assert(lenONE>1)
       #MACRO Assert(lenTWO>0)
-#IFSWITCH HILO==Lo
+#IFSWITCH LOHI==Lo
   #IFSWITCH COMPARATORTYPE==Ascending,Descending
       if((count1=gallopRight(($comparableType$)arr[cursor2],tmp,cursor1,len1,0))!=0)
   #ELSE
@@ -1605,7 +1585,7 @@ private void mergeHILO($ArrayType$[] arr,int base1,int len1,int base2,int len2)
   #ENDIF
 #ENDIF
       {
-#IFSWITCH HILO==Lo
+#IFSWITCH LOHI==Lo
         ArrCopy.uncheckedCopy(tmp,cursor1,arr,dest,count1);
         dest+=count1;
         cursor1+=count1;
@@ -1622,7 +1602,7 @@ private void mergeHILO($ArrayType$[] arr,int base1,int len1,int base2,int len2)
 #ENDIF
       }
       arr[destINCREMENT]=LEFTARR[cursor2INCREMENT];
-#IFSWITCH HILO==Lo
+#IFSWITCH LOHI==Lo
       if(--len2==0)
       {
         break outer;
@@ -1644,7 +1624,7 @@ private void mergeHILO($ArrayType$[] arr,int base1,int len1,int base2,int len2)
   #ENDIF
 #ENDIF
       {
-#IFSWITCH HILO==Lo
+#IFSWITCH LOHI==Lo
         ArrCopy.uncheckedSelfCopy(arr,cursor2,dest,count2);
         dest+=count2;
         cursor2+=count2;
@@ -1661,7 +1641,7 @@ private void mergeHILO($ArrayType$[] arr,int base1,int len1,int base2,int len2)
 #ENDIF
       }
       arr[destINCREMENT]=RIGHTARR[cursor1INCREMENT];
-#IFSWITCH HILO==Lo
+#IFSWITCH LOHI==Lo
       if(--len1==1)
 #ELSE
       if(--len1==0)
@@ -1686,7 +1666,7 @@ private void mergeHILO($ArrayType$[] arr,int base1,int len1,int base2,int len2)
   if(lenONE==1)
   {
     #MACRO Assert(lenTWO>0)
-#IFSWITCH HILO==Lo
+#IFSWITCH LOHI==Lo
     ArrCopy.uncheckedSelfCopy(arr,cursor2,dest,len2);
     arr[dest+len2]=tmp[cursor1]; //last element of run 1 to the end of the merge
 #ELSE
@@ -1696,7 +1676,7 @@ private void mergeHILO($ArrayType$[] arr,int base1,int len1,int base2,int len2)
   }
   else
   {
-#IFSWITCH HILO==Lo
+#IFSWITCH LOHI==Lo
     #MACRO Assert(len2==0)
     #MACRO Assert(len1>1)
     ArrCopy.uncheckedCopy(tmp,cursor1,arr,dest,len1);
@@ -1727,11 +1707,13 @@ private $ArrayType$[] ensureCapacity(int minCapacity)
     //Integer overflow is almost impossible given that every implementation of the JVM I've seen won't allow
     //an array with a length of Integer.MAX_VALUE. Still, we cover out bases with this check
     //Unfortunately, I have no idea how to coverage this branch with Junits.
+    
     int newSize;
-    if((newSize=(-1>>>Integer.numberOfLeadingZeros(minCapacity))+1)<0 || newSize>(minCapacity=arr.length>>>1))
+    if((newSize=(-1>>>Integer.numberOfLeadingZeros(minCapacity))+1)>(minCapacity=arr.length>>>1))
     {
       newSize=minCapacity;
     }
+    #MACRO Assert(newSize>0)
     this.tmp=tmp=new $ArrayType$[newSize];
     this.tmpLength=newSize;
     tmpOffset=0;
@@ -1886,10 +1868,10 @@ $exposedType$ LocalName;
 #MACRODEF WhileCompareAndSetLocal(COMPARISON,LocalName,LocalVal,Val2Val)
 #IFSWITCH COMPARATORTYPE==Ascending,Descending
 $comparableType$ LocalName;
-#MACRO WhileClause(GreaterThan,LocalName=($comparableType$)LocalVal,Val2Val)
+#MACRO WhileClause(COMPARISON,LocalName=($comparableType$)LocalVal,Val2Val)
 #ELSE
 $exposedType$ LocalName;
-#MACRO WhileClause(GreaterThan,LocalName=($exposedType$)LocalVal,Val2Val)
+#MACRO WhileClause(COMPARISON,LocalName=($exposedType$)LocalVal,Val2Val)
 #ENDIF
 #ENDDEF
 

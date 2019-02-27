@@ -17,6 +17,7 @@ public interface ArrCopy
     //assert length>0;
     //assert srcOffset+length<=src.length;
     //assert dstOffset+length<=dst.length;
+    //assert length>5 || dstOffset<=srcOffset || srcOffset+length<=dstOffset;
     switch(length)
     {
     case 5:
@@ -89,6 +90,7 @@ public interface ArrCopy
     //assert length>0;
     //assert srcOffset+length<=src.length;
     //assert dstOffset+length<=dst.length;
+    //assert length>5 || dstOffset<=srcOffset || srcOffset+length<=dstOffset;
     switch(length)
     {
     case 5:
@@ -161,6 +163,7 @@ public interface ArrCopy
     //assert length>0;
     //assert srcOffset+length<=src.length;
     //assert dstOffset+length<=dst.length;
+    //assert length>5 || dstOffset<=srcOffset || srcOffset+length<=dstOffset;
     switch(length)
     {
     case 5:
@@ -233,6 +236,7 @@ public interface ArrCopy
     //assert length>0;
     //assert srcOffset+length<=src.length;
     //assert dstOffset+length<=dst.length;
+    //assert length>5 || dstOffset<=srcOffset || srcOffset+length<=dstOffset;
     switch(length)
     {
     case 5:
@@ -305,6 +309,7 @@ public interface ArrCopy
     //assert length>0;
     //assert srcOffset+length<=src.length;
     //assert dstOffset+length<=dst.length;
+    //assert length>5 || dstOffset<=srcOffset || srcOffset+length<=dstOffset;
     switch(length)
     {
     case 5:
@@ -377,6 +382,7 @@ public interface ArrCopy
     //assert length>0;
     //assert srcOffset+length<=src.length;
     //assert dstOffset+length<=dst.length;
+    //assert length>5 || dstOffset<=srcOffset || srcOffset+length<=dstOffset;
     switch(length)
     {
     case 5:
@@ -449,6 +455,7 @@ public interface ArrCopy
     //assert length>0;
     //assert srcOffset+length<=src.length;
     //assert dstOffset+length<=dst.length;
+    //assert length>5 || dstOffset<=srcOffset || srcOffset+length<=dstOffset;
     switch(length)
     {
     case 5:
@@ -521,6 +528,7 @@ public interface ArrCopy
     //assert length>0;
     //assert srcOffset+length<=src.length;
     //assert dstOffset+length<=dst.length;
+    //assert length>5 || dstOffset<=srcOffset || srcOffset+length<=dstOffset;
     switch(length)
     {
     case 5:
@@ -593,6 +601,7 @@ public interface ArrCopy
     //assert length>0;
     //assert srcOffset+length<=src.length;
     //assert dstOffset+length<=dst.length;
+    //assert length>5 || dstOffset<=srcOffset || srcOffset+length<=dstOffset;
     switch(length)
     {
     case 5:

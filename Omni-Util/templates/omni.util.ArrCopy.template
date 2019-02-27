@@ -168,6 +168,7 @@ static void uncheckedSelfCopy(ARR[] src,int srcOffset,int dstOffset,int length)
   #MACRO Assert(length>0)
   #MACRO Assert(srcOffset+length<=src.length)
   #MACRO Assert(dstOffset+length<=dst.length)
+  #MACRO Assert(length>5 || dstOffset<=srcOffset || srcOffset+length<=dstOffset)
   switch(length)
   {
   case 5:

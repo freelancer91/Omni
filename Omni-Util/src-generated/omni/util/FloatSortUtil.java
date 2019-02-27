@@ -308,10 +308,11 @@ public final class FloatSortUtil
         //an array with a length of Integer.MAX_VALUE. Still, we cover out bases with this check
         //Unfortunately, I have no idea how to coverage this branch with Junits.
         int newSize;
-        if((newSize=(-1>>>Integer.numberOfLeadingZeros(minCapacity))+1)<0 || newSize>(minCapacity=arr.length>>>1))
+        if((newSize=(-1>>>Integer.numberOfLeadingZeros(minCapacity))+1)>(minCapacity=arr.length>>>1))
         {
           newSize=minCapacity;
         }
+        //assert newSize>0;
         this.tmp=tmp=new float[newSize];
         this.tmpLength=newSize;
         tmpOffset=0;
@@ -372,20 +373,18 @@ public final class FloatSortUtil
       //assert k>=0;
       if((len1-=k)!=0)
       {
-        if((len2=mergeAtGallopLeft((float)arr[base1+len1-1],arr,base2,len2,sorter))!=0)
+        //if((len2=mergeAtGallopLeft((float)arr[base1+len1-1],arr,base2,len2),sorter)!=0)
+        //{
+        //  if(len1<=len2)
+        if(len1<=(len2=mergeAtGallopLeft((float)arr[base1+len1-1],arr,base2,len2,sorter)))
         {
-          //assert len1>0;
-          //assert len2>0;
-          //assert base1+len1==base2;
-          if(len1<=len2)
-          {
-            mergeLo(arr,base1,len1,base2,len2);
-          }
-          else
-          {
-            mergeHi(arr,base1,len1,base2,len2);
-          }
+          mergeLo(arr,base1,len1,base2,len2);
         }
+        else
+        {
+          mergeHi(arr,base1,len1,base2,len2);
+        }
+        //}
       }
       return stackSize-2;
     }
@@ -400,8 +399,12 @@ public final class FloatSortUtil
       {
         return len;
       }
-      if(len<2 ||
-        sorter.compare((float)(key),(float)(arr[base+len-2]))<=0
+      //assert len>=2;
+      //#if(len<2 ||
+      //#MACRO LessThanOrEqualTo(key,arr[base+len-2])
+      //)
+      if(
+      sorter.compare((float)(key),(float)(arr[base+len-2]))<=0
       )
       {
         lastOfs=-1;
@@ -444,7 +447,11 @@ public final class FloatSortUtil
       {
         return 0;
       }
-      if(len<2 ||
+      //assert len>=2;
+      //#if(len<2 ||
+      //#MACRO GreaterThanOrEqualTo(key,arr[base+1])
+      //)
+      if(
       sorter.compare((float)(key),(float)(arr[base+1]))>=0
       )
       {
@@ -493,6 +500,9 @@ public final class FloatSortUtil
      */
     private void mergeLo(float[] arr,int base1,int len1,int base2,int len2)
     {
+      //assert len1>0;
+      //assert len2>0;
+      //assert base1+len1==base2;
       final float[] tmp;
       //copy the first run into the tmp array
       int cursor1;
@@ -626,6 +636,9 @@ public final class FloatSortUtil
      */
     private void mergeHi(float[] arr,int base1,int len1,int base2,int len2)
     {
+      //assert len1>0;
+      //assert len2>0;
+      //assert base1+len1==base2;
       final float[] tmp;
       //copy the second run into the tmp array
       int tmpOffset;
@@ -754,109 +767,45 @@ public final class FloatSortUtil
      *   In other words, key belonds at index base + k; or in other words, the first k elements should precede the key,
      *   and the last len-k elements should follow it.
      */
+    //TODO split this up into mergeLo and mergeHi versions
     private static  int gallopLeft(float key,float[] arr,int base,int len,int hint,FloatComparator sorter)
     {
       //assert len>0;
       //assert hint>=0;
       //assert hint<len;
-      int ofs=1;
-      int lastOfs=0;
+      int ofs;
+      int lastOfs;
       if(
       sorter.compare((float)(key),(float)(arr[base+hint]))>0
       )
       {
         int maxOfs;
-        if(ofs<(maxOfs=len-hint))
+        if(2>(maxOfs=len-hint)||
+        sorter.compare((float)(key),(float)(arr[base+hint+1]))>0
+        )
         {
-          while(
-          sorter.compare((float)(key),(float)(arr[base+hint+ofs]))>0
-          )
-          {
-            //Integer overflow is almost impossible given that every implementation of the JVM I've seen won't allow
-            //an array with a length of Integer.MAX_VALUE. Still, we cover out bases with this check
-            //Unfortunately, I have no idea how to coverage this branch with Junits.
-            //if((ofs=((lastOfs=ofs)<<1)+1)<=0 || ofs>=maxOfs)
-            //{
-            //  ofs=maxOfs;
-            //  break;
-            //}
-            if((ofs=((lastOfs-ofs)<<1)+1)<=0)
-            {
-              if(ofs>=maxOfs)
-              {
-                ofs=maxOfs;
-                break;
-              }
-              else
-              {
-                ofs=maxOfs;
-                break;
-              }
-            }
-            else
-            {
-              if(ofs>=maxOfs)
-              {
-                ofs=maxOfs;
-                break;
-              }
-            }
-          }
+          ofs=maxOfs+hint;
         }
         else
         {
-          ofs=maxOfs;
+          ofs=hint+1;
         }
-        lastOfs+=hint;
-        ofs+=hint;
+        lastOfs=hint;
       }
       else
       {
         int maxOfs;
-        if(ofs<(maxOfs=hint+1))
+        if(2>(maxOfs=hint+1)||
+        sorter.compare((float)(key),(float)(arr[base+hint-1]))<=0
+        )
         {
-          while(
-          sorter.compare((float)(key),(float)(arr[base+hint-ofs]))<=0
-          )
-          {
-            //Integer overflow is almost impossible given that every implementation of the JVM I've seen won't allow
-            //an array with a length of Integer.MAX_VALUE. Still, we cover out bases with this check
-            //Unfortunately, I have no idea how to coverage this branch with Junits.
-            //if((ofs=((lastOfs=ofs)<<1)+1)<=0 || ofs>=maxOfs)
-            //{
-            //  ofs=maxOfs;
-            //  break;
-            //}
-            if((ofs=((lastOfs-ofs)<<1)+1)<=0)
-            {
-              if(ofs>=maxOfs)
-              {
-                ofs=maxOfs;
-                break;
-              }
-              else
-              {
-                ofs=maxOfs;
-                break;
-              }
-            }
-            else
-            {
-              if(ofs>=maxOfs)
-              {
-                ofs=maxOfs;
-                break;
-              }
-            }
-          }
+          lastOfs=hint-maxOfs;
         }
         else
         {
-          ofs=maxOfs;
+          lastOfs=hint-1;
         }
-        int tmp=lastOfs;
-        lastOfs=hint-ofs;
-        ofs=hint-tmp;
+        ofs=hint;
       }
       //assert -1<=lastOfs;
       //assert lastOfs<ofs;
@@ -895,109 +844,45 @@ public final class FloatSortUtil
      * @param sorter The comparator used to order the range and search
      * @return the int k, 0<=k<=len such that arr[base+k-1]<= key<arr[base+k]
      */
+    //TODO split this up into mergeLo and mergeHi versions
     private static  int gallopRight(float key,float[] arr,int base,int len,int hint,FloatComparator sorter)
     {
       //assert len>0;
       //assert hint>=0;
       //assert hint<len;
-      int ofs=1;
-      int lastOfs=0;
+      int ofs;
+      int lastOfs;
       if(
       sorter.compare((float)(key),(float)(arr[base+hint]))<0
       )
       {
         int maxOfs;
-        if(ofs<(maxOfs=hint+1))
+        if(2>(maxOfs=hint+1)||
+        sorter.compare((float)(key),(float)(arr[base+hint-1]))<0
+        )
         {
-          while(
-          sorter.compare((float)(key),(float)(arr[base+hint-ofs]))<0
-          )
-          {
-            //Integer overflow is almost impossible given that every implementation of the JVM I've seen won't allow
-            //an array with a length of Integer.MAX_VALUE. Still, we cover out bases with this check
-            //Unfortunately, I have no idea how to coverage this branch with Junits.
-            //if((ofs=((lastOfs=ofs)<<1)+1)<=0 || ofs>=maxOfs)
-            //{
-            //  ofs=maxOfs;
-            //  break;
-            //}
-            if((ofs=((lastOfs-ofs)<<1)+1)<=0)
-            {
-              if(ofs>=maxOfs)
-              {
-                ofs=maxOfs;
-                break;
-              }
-              else
-              {
-                ofs=maxOfs;
-                break;
-              }
-            }
-            else
-            {
-              if(ofs>=maxOfs)
-              {
-                ofs=maxOfs;
-                break;
-              }
-            }
-          }
+          lastOfs=hint-maxOfs;
         }
         else
         {
-          ofs=maxOfs;
+          lastOfs=hint-1;
         }
-        int tmp=lastOfs;
-        lastOfs=hint-ofs;
-        ofs=hint-tmp;
+        ofs=hint;
       }
       else
       {
         int maxOfs;
-        if(ofs<(maxOfs=len-hint))
+        if(2>(maxOfs=len-hint)||
+        sorter.compare((float)(key),(float)(arr[base+hint+1]))>=0
+        )
         {
-          while(
-          sorter.compare((float)(key),(float)(arr[base+hint+ofs]))>=0
-          )
-          {
-            //Integer overflow is almost impossible given that every implementation of the JVM I've seen won't allow
-            //an array with a length of Integer.MAX_VALUE. Still, we cover out bases with this check
-            //Unfortunately, I have no idea how to coverage this branch with Junits.
-            //if((ofs=((lastOfs=ofs)<<1)+1)<=0 || ofs>=maxOfs)
-            //{
-            //  ofs=maxOfs;
-            //  break;
-            //}
-            if((ofs=((lastOfs-ofs)<<1)+1)<=0)
-            {
-              if(ofs>=maxOfs)
-              {
-                ofs=maxOfs;
-                break;
-              }
-              else
-              {
-                ofs=maxOfs;
-                break;
-              }
-            }
-            else
-            {
-              if(ofs>=maxOfs)
-              {
-                ofs=maxOfs;
-                break;
-              }
-            }
-          }
+          ofs=maxOfs+hint;
         }
         else
         {
-          ofs=maxOfs;
+          ofs=hint+1;
         }
-        lastOfs+=hint;
-        ofs+=hint;
+        lastOfs=hint;
       }
       //assert -1<=lastOfs;
       //assert lastOfs<ofs;
@@ -2099,7 +1984,7 @@ public final class FloatSortUtil
         sorter.compare((float)(ag=(float)arr[great]),(float)(pivot2))>0
         )
         {
-          if(great--==k)
+          if(--great<k)
           {
             break outer;
           }
@@ -2158,10 +2043,10 @@ public final class FloatSortUtil
         {
           float ag;
           while(
-          sorter.compare((float)(ag=(float)arr[great]),(float)(pivot2))>0
+          sorter.compare((float)(ag=(float)arr[great]),(float)(pivot2))==0
           )
           {
-            if(great--==k)
+            if(--great<k)
             {
               break outer;
             }
@@ -2220,7 +2105,7 @@ public final class FloatSortUtil
         sorter.compare((float)(ag=(float)arr[great]),(float)(pivot2))>0
         )
         {
-          if(great--==k)
+          if(--great<k)
           {
             break outer;
           }
@@ -2279,10 +2164,10 @@ public final class FloatSortUtil
         {
           float ag;
           while(
-          sorter.compare((float)(ag=(float)arr[great]),(float)(pivot2))>0
+          sorter.compare((float)(ag=(float)arr[great]),(float)(pivot2))==0
           )
           {
-            if(great--==k)
+            if(--great<k)
             {
               break outer;
             }
@@ -2341,7 +2226,7 @@ public final class FloatSortUtil
         (ag=(float)arr[great])>(pivot2)
         )
         {
-          if(great--==k)
+          if(--great<k)
           {
             break outer;
           }
@@ -2400,10 +2285,10 @@ public final class FloatSortUtil
         {
           float ag;
           while(
-          (ag=(float)arr[great])>(pivot2)
+          (ag=(float)arr[great])==(pivot2)
           )
           {
-            if(great--==k)
+            if(--great<k)
             {
               break outer;
             }
@@ -2462,7 +2347,7 @@ public final class FloatSortUtil
         (ag=(float)arr[great])>(pivot2)
         )
         {
-          if(great--==k)
+          if(--great<k)
           {
             break outer;
           }
@@ -2521,10 +2406,10 @@ public final class FloatSortUtil
         {
           float ag;
           while(
-          (ag=(float)arr[great])>(pivot2)
+          (ag=(float)arr[great])==(pivot2)
           )
           {
-            if(great--==k)
+            if(--great<k)
             {
               break outer;
             }
@@ -2583,7 +2468,7 @@ public final class FloatSortUtil
         (ag=(float)arr[great])<(pivot2)
         )
         {
-          if(great--==k)
+          if(--great<k)
           {
             break outer;
           }
@@ -2642,10 +2527,10 @@ public final class FloatSortUtil
         {
           float ag;
           while(
-          (ag=(float)arr[great])<(pivot2)
+          (ag=(float)arr[great])==(pivot2)
           )
           {
-            if(great--==k)
+            if(--great<k)
             {
               break outer;
             }
@@ -2704,7 +2589,7 @@ public final class FloatSortUtil
         (ag=(float)arr[great])<(pivot2)
         )
         {
-          if(great--==k)
+          if(--great<k)
           {
             break outer;
           }
@@ -2763,10 +2648,10 @@ public final class FloatSortUtil
         {
           float ag;
           while(
-          (ag=(float)arr[great])<(pivot2)
+          (ag=(float)arr[great])==(pivot2)
           )
           {
-            if(great--==k)
+            if(--great<k)
             {
               break outer;
             }
