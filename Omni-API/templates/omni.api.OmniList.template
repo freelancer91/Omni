@@ -1,0 +1,383 @@
+#TYPEDEF OfGeneric
+package omni.api;
+import java.util.Comparator;
+import java.util.function.DoubleUnaryOperator;
+import java.util.function.IntBinaryOperator;
+import java.util.function.IntUnaryOperator;
+import java.util.function.LongUnaryOperator;
+import java.util.function.UnaryOperator;
+import omni.function.BooleanComparator;
+import omni.function.BooleanPredicate;
+import omni.function.ByteComparator;
+import omni.function.ByteUnaryOperator;
+import omni.function.CharComparator;
+import omni.function.CharUnaryOperator;
+import omni.function.DoubleComparator;
+import omni.function.FloatComparator;
+import omni.function.FloatUnaryOperator;
+import omni.function.LongComparator;
+import omni.function.ShortComparator;
+import omni.function.ShortUnaryOperator;
+import omni.util.TypeUtil;
+public abstract interface OmniList extends OmniCollection
+{
+  public abstract int indexOf(Object val);
+  #MACRO PrimitiveMethods(IndexOfMethodDecl)
+  #MACRO BoxedMethods(IndexOfMethodDecl)
+  public abstract int lastIndexOf(Object val);
+  #MACRO PrimitiveMethods(LastIndexOfMethodDecl)
+  #MACRO BoxedMethods(LastIndexOfMethodDecl)
+  public abstract void stableAscendingSort();
+  public abstract void stableDescendingSort();
+  
+  public abstract interface OfPrimitive extends OmniList,OmniCollection.OfPrimitive
+  {
+     #MACRO BoxedMethods(IndexOfMethodDefault)
+     #MACRO BoxedMethods(LastIndexOfMethodDefault)
+  }
+
+    #MACRO PrimitiveSubInterface<boolean,Boolean,Boolean>()
+    #MACRO PrimitiveSubInterface<byte,Byte,Byte>()
+    #MACRO PrimitiveSubInterface<char,Char,Character>()
+    #MACRO PrimitiveSubInterface<short,Short,Short>()
+    #MACRO PrimitiveSubInterface<int,Int,Integer>()
+    #MACRO PrimitiveSubInterface<long,Long,Long>()
+    #MACRO PrimitiveSubInterface<float,Float,Float>()
+    #MACRO PrimitiveSubInterface<double,Double,Double>()
+    
+#MACRODEF PrimitiveSubInterface<ARRTYPE,CLASSPREFIX,BOXEDTYPE>()
+public abstract interface OfCLASSPREFIX extends OfPrimitive,OmniCollection.OfCLASSPREFIX
+{
+  public abstract BOXEDTYPE get(int index);
+  public abstract ARRTYPE getCLASSPREFIX(int index);
+  public abstract void add(int index,ARRTYPE val);
+  public abstract void add(int index,BOXEDTYPE val);
+  public abstract OmniListIterator.OfCLASSPREFIX listIterator();
+  public abstract OmniListIterator.OfCLASSPREFIX listIterator(int index);
+  public abstract void put(int index,ARRTYPE val);
+  public default void put(int index,BOXEDTYPE val)
+  {
+    put(index,val.ARRTYPEValue());
+  }
+  public abstract BOXEDTYPE remove(int index);
+  public abstract ARRTYPE removeCLASSPREFIXAt(int index);
+  #IFSWITCH ARRTYPE==boolean
+  public abstract void replaceAll(CLASSPREFIXPredicate operator);
+  #ELSE
+  public abstract void replaceAll(CLASSPREFIXUnaryOperator operator);
+  #ENDIF
+  public abstract void replaceAll(UnaryOperator<BOXEDTYPE> operator);
+  public abstract ARRTYPE set(int index,ARRTYPE val);
+  public abstract BOXEDTYPE set(int index,BOXEDTYPE val);
+  #IFSWITCH ARRTYPE==int
+  public abstract void sort(CLASSPREFIXBinaryOperator sorter);
+  public abstract void unstableSort(CLASSPREFIXBinaryOperator sorter);
+  #ELSE
+  public abstract void sort(CLASSPREFIXComparator sorter);
+    #IFNOTSWITCH ARRTYPE==boolean
+  public abstract void unstableSort(CLASSPREFIXComparator sorter);  
+    #ENDIF
+  #ENDIF
+  public abstract void sort(Comparator<? super BOXEDTYPE> sorter);
+  public abstract OmniList.OfCLASSPREFIX subList(int fromIndex,int toIndex);
+  
+  
+#IFSWITCH ARRTYPE==boolean
+  public default byte getByte(int index){
+    return TypeUtil.castToByte(getCLASSPREFIX(index));
+  }
+  public default char getChar(int index){
+    return TypeUtil.castToChar(getCLASSPREFIX(index));
+  }
+  public default double getDouble(int index){
+    return TypeUtil.castToDouble(getCLASSPREFIX(index));
+  }
+  public default float getFloat(int index){
+    return TypeUtil.castToFloat(getCLASSPREFIX(index));
+  }
+  public default int getInt(int index){
+    return TypeUtil.castToByte(getCLASSPREFIX(index));
+  }
+  public default long getLong(int index){
+    return TypeUtil.castToLong(getCLASSPREFIX(index));
+  }
+  public default short getShort(int index){
+    return TypeUtil.castToByte(getCLASSPREFIX(index));
+  }
+  public default byte removeByteAt(int index){
+    return TypeUtil.castToByte(removeCLASSPREFIXAt(index));
+  }
+  public default char removeCharAt(int index){
+    return TypeUtil.castToChar(removeCLASSPREFIXAt(index));
+  }
+  public default double removeDoubleAt(int index){
+    return TypeUtil.castToDouble(removeCLASSPREFIXAt(index));
+  }
+  public default float removeFloatAt(int index){
+    return TypeUtil.castToFloat(removeCLASSPREFIXAt(index));
+  }
+  public default int removeIntAt(int index){
+    return TypeUtil.castToByte(removeCLASSPREFIXAt(index));
+  }
+  public default long removeLongAt(int index){
+    return TypeUtil.castToLong(removeCLASSPREFIXAt(index));
+  }
+  public default short removeShortAt(int index){
+    return TypeUtil.castToByte(removeCLASSPREFIXAt(index));
+  }
+#ELSE
+  public default void add(int index,boolean val)
+  {
+    add(index,(ARRTYPE)TypeUtil.
+    #IFSWITCH ARRTYPE==byte,short,int
+    castToByte
+    #ELSEIFSWITCH ARRTYPE==char,long,float,double
+    castToCLASSPREFIX
+    #ELSE
+    ERROR unknown array type ARRTYPE
+    #ENDIF
+    (val));
+  }
+  public default void add(int index,Boolean val)
+  {
+    add(index,(ARRTYPE)TypeUtil.
+    #IFSWITCH ARRTYPE==byte,short,int
+    castToByte
+    #ELSEIFSWITCH ARRTYPE==char,long,float,double
+    castToCLASSPREFIX
+    #ELSE
+    ERROR unknown array type ARRTYPE
+    #ENDIF
+    (val.booleanValue()));
+  }
+  public default void put(int index,boolean val)
+  {
+    put(index,(ARRTYPE)TypeUtil.
+    #IFSWITCH ARRTYPE==byte,short,int
+    castToByte
+    #ELSEIFSWITCH ARRTYPE==char,long,float,double
+    castToCLASSPREFIX
+    #ELSE
+    ERROR unknown array type ARRTYPE
+    #ENDIF
+    (val));
+  }
+  public default void put(int index,Boolean val)
+  {
+    put(index,(ARRTYPE)TypeUtil.
+    #IFSWITCH ARRTYPE==byte,short,int
+    castToByte
+    #ELSEIFSWITCH ARRTYPE==char,long,float,double
+    castToCLASSPREFIX
+    #ELSE
+    ERROR unknown array type ARRTYPE
+    #ENDIF
+    (val.booleanValue()));
+  }
+  #IFNOTSWITCH ARRTYPE==double
+  #MACRO GetAndRemoveImpl<double,Double>()
+    #IFNOTSWITCH ARRTYPE==float
+  #MACRO GetAndRemoveImpl<float,Float>()
+      #IFNOTSWITCH ARRTYPE==long
+  #MACRO GetAndRemoveImpl<long,Long>()
+        #IFNOTSWITCH ARRTYPE==int
+  #MACRO GetAndRemoveImpl<int,Int>()
+          #IFNOTSWITCH ARRTYPE==char,short
+  #MACRO GetAndRemoveImpl<short,Short>()
+          #ENDIF
+        #ENDIF
+      #ENDIF
+    #ENDIF
+  #ENDIF
+  #IFNOTSWITCH ARRTYPE==byte,char
+  #MACRO AddAndPutImpl<byte,Byte>()
+    #IFNOTSWITCH ARRTYPE==short
+  #MACRO AddAndPutImpl<short,Short>()
+      #IFNOTSWITCH ARRTYPE==int
+  #MACRO AddAndPutImpl<int,Integer>()
+        #IFNOTSWITCH ARRTYPE==long
+  #MACRO AddAndPutImpl<long,Long>()
+          #IFNOTSWITCH ARRTYPE==float
+  #MACRO AddAndPutImpl<float,Float>()
+          #ENDIF
+        #ENDIF
+      #ENDIF
+    #ENDIF
+  #ENDIF
+#ENDIF
+
+#IFSWITCH ARRTYPE==boolean,int,long,double
+  @Override 
+  public default int indexOf(byte val){
+    return indexOf((int)val);
+  }
+  @Override  
+  public default int lastIndexOf(byte val){
+    return lastIndexOf((int)val);
+  }
+  @Override 
+  public default int indexOf(char val){
+    return indexOf((int)val);
+  }
+  @Override  
+  public default int lastIndexOf(char val){
+    return lastIndexOf((int)val);
+  }
+#ENDIF
+#IFSWITCH ARRTYPE==boolean,byte,int,long,double
+  @Override 
+  public default int indexOf(short val){
+    return indexOf((int)val);
+  }
+  @Override  
+  public default int lastIndexOf(short val){
+    return lastIndexOf((int)val);
+  }
+#ENDIF
+#IFSWITCH ARRTYPE==char,short,float
+  @Override 
+  public default int indexOf(byte val){
+    return indexOf((short)val);
+  }
+  @Override  
+  public default int lastIndexOf(byte val){
+    return lastIndexOf((short)val);
+  }
+#ENDIF
+}
+#ENDDEF
+  public abstract interface OfRef<E> extends OmniList,OmniCollection.OfRef<E>{
+    public abstract void add(int index,E val);
+    public abstract E get(int index);
+    public abstract OmniListIterator.OfRef<E> listIterator();
+    public abstract OmniListIterator.OfRef<E> listIterator(int index);
+    public abstract void put(int index,E val);
+    public abstract E remove(int index);
+    public abstract void replaceAll(UnaryOperator<E> operator);
+    public abstract E set(int index,E val);
+    public abstract void sort(Comparator<? super E> sorter);
+    public abstract void unstableAscendingSort();
+    public abstract void unstableDescendingSort();
+    public abstract OmniList.OfRef<E> subList(int fromIndex,int toIndex);
+  }
+
+}
+#MACRODEF AddAndPutImpl<PRIMITIVEINPUTTYPE,BOXEDINPUTTYPE>()
+public default void add(int index,PRIMITIVEINPUTTYPE val)
+{
+  add(index,(ARRTYPE)val);
+}
+public default void add(int index,BOXEDINPUTTYPE val)
+{
+  add(index,(ARRTYPE)val.PRIMITIVEINPUTTYPEValue());
+}
+public default void put(int index,PRIMITIVEINPUTTYPE val)
+{
+  put(index,(ARRTYPE)val);
+}
+public default void put(int index,BOXEDINPUTTYPE val)
+{
+  put(index,(ARRTYPE)val.PRIMITIVEINPUTTYPEValue());
+}
+#ENDDEF
+#MACRODEF GetAndRemoveImpl<RETTYPE,METHODSUFFIX>()
+public default RETTYPE getMETHODSUFFIX(int index)
+{
+  return getCLASSPREFIX(index);
+}
+public default RETTYPE removeMETHODSUFFIXAt(int index)
+{
+  return removeCLASSPREFIXAt(index);
+}
+#ENDDEF
+#MACRODEF IndexOfMethodDefault<INPUTTYPE>()
+@Override
+public default int indexOf(INPUTTYPE val)
+{
+  if(val!=null)
+  {
+    return indexOf(val.
+    #IFSWITCH INPUTTYPE==Boolean
+    booleanValue
+    #ELSEIFSWITCH INPUTTYPE==Byte
+    byteValue
+    #ELSEIFSWITCH INPUTTYPE==Character
+    charValue
+    #ELSEIFSWITCH INPUTTYPE==Short
+    shortValue
+    #ELSEIFSWITCH INPUTTYPE==Integer
+    intValue
+    #ELSEIFSWITCH INPUTTYPE==Long
+    longValue
+    #ELSEIFSWITCH INPUTTYPE==Float
+    floatValue
+    #ELSEIFSWITCH INPUTTYPE==Double
+    doubleValue
+    #ELSE
+    ERROR unknown inputtype INPUTTYPE
+    #ENDIF
+    ());
+  }
+  return -1;
+}
+#ENDDEF
+#MACRODEF LastIndexOfMethodDefault<INPUTTYPE>()
+@Override
+public default int lastIndexOf(INPUTTYPE val)
+{
+  if(val!=null)
+  {
+    return lastIndexOf(val.
+    #IFSWITCH INPUTTYPE==Boolean
+    booleanValue
+    #ELSEIFSWITCH INPUTTYPE==Byte
+    byteValue
+    #ELSEIFSWITCH INPUTTYPE==Character
+    charValue
+    #ELSEIFSWITCH INPUTTYPE==Short
+    shortValue
+    #ELSEIFSWITCH INPUTTYPE==Integer
+    intValue
+    #ELSEIFSWITCH INPUTTYPE==Long
+    longValue
+    #ELSEIFSWITCH INPUTTYPE==Float
+    floatValue
+    #ELSEIFSWITCH INPUTTYPE==Double
+    doubleValue
+    #ELSE
+    ERROR unknown inputtype INPUTTYPE
+    #ENDIF
+    ());
+  }
+  return -1;
+}
+#ENDDEF
+
+#MACRODEF IndexOfMethodDecl<INPUTTYPE>()
+public abstract int indexOf(INPUTTYPE val);
+#ENDDEF
+#MACRODEF LastIndexOfMethodDecl<INPUTTYPE>()
+public abstract int lastIndexOf(INPUTTYPE val);
+#ENDDEF
+
+#MACRODEF BoxedMethods(METHODMACRO)
+#MACRO METHODMACRO<Boolean>()
+#MACRO METHODMACRO<Byte>()
+#MACRO METHODMACRO<Character>()
+#MACRO METHODMACRO<Short>()
+#MACRO METHODMACRO<Integer>()
+#MACRO METHODMACRO<Long>()
+#MACRO METHODMACRO<Float>()
+#MACRO METHODMACRO<Double>()
+#ENDDEF
+
+#MACRODEF PrimitiveMethods(METHODMACRO)
+#MACRO METHODMACRO<boolean>()
+#MACRO METHODMACRO<byte>()
+#MACRO METHODMACRO<char>()
+#MACRO METHODMACRO<short>()
+#MACRO METHODMACRO<int>()
+#MACRO METHODMACRO<long>()
+#MACRO METHODMACRO<float>()
+#MACRO METHODMACRO<double>()
+#ENDDEF

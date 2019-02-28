@@ -1,0 +1,254 @@
+#TYPEDEF OfGeneric
+package omni.api;
+import omni.util.PeekAndPollIfc;
+import omni.util.TypeUtil;
+public abstract interface OmniStack extends OmniCollection
+{
+    public abstract int search(Object val);
+    #MACRO PrimitiveMethods(SearchMethodDecl)
+    #MACRO BoxedMethods(SearchMethodDecl)
+    public abstract interface OfPrimitive extends OmniCollection,OmniStack,OmniCollection.OfPrimitive
+    {
+      #MACRO BoxedMethods(SearchMethodDefault)
+    }
+    #MACRO PrimitiveSubInterface<boolean,Boolean,Boolean>()
+    #MACRO PrimitiveSubInterface<byte,Byte,Byte>()
+    #MACRO PrimitiveSubInterface<char,Char,Character>()
+    #MACRO PrimitiveSubInterface<short,Short,Short>()
+    #MACRO PrimitiveSubInterface<int,Int,Integer>()
+    #MACRO PrimitiveSubInterface<long,Long,Long>()
+    #MACRO PrimitiveSubInterface<float,Float,Float>()
+    #MACRO PrimitiveSubInterface<double,Double,Double>()
+    
+#MACRODEF PrimitiveSubInterface<ARRTYPE,CLASSPREFIX,BOXEDTYPE>()
+public abstract interface OfCLASSPREFIX extends OmniCollection,OmniStack,OmniCollection.OfPrimitive,OfPrimitive,OmniCollection.OfCLASSPREFIX,PeekAndPollIfc<BOXEDTYPE>,PeekAndPollIfc.CLASSPREFIXInput
+#IFNOTSWITCH ARRTYPE==double
+,PeekAndPollIfc.DoubleInput
+  #IFNOTSWITCH ARRTYPE==float
+,PeekAndPollIfc.FloatInput
+    #IFNOTSWITCH ARRTYPE==long
+,PeekAndPollIfc.LongInput
+      #IFNOTSWITCH ARRTYPE==int
+,PeekAndPollIfc.IntInput
+        #IFNOTSWITCH ARRTYPE==char,short
+,PeekAndPollIfc.ShortInput
+          #IFNOTSWITCH ARRTYPE==byte
+,PeekAndPollIfc.ByteInput
+          #ENDIF
+        #ENDIF
+      #ENDIF
+    #ENDIF
+  #ENDIF
+#ENDIF
+{
+  public abstract BOXEDTYPE pop();
+  public abstract ARRTYPE popCLASSPREFIX();
+#IFSWITCH ARRTYPE==boolean
+  public default byte popByte()
+  {
+    return TypeUtil.castToByte(popCLASSPREFIX());
+  }
+  public default char popChar()
+  {
+    return TypeUtil.castToChar(popCLASSPREFIX());
+  }
+  public default short popShort()
+  {
+    return TypeUtil.castToByte(popCLASSPREFIX());
+  }
+  public default int popInt()
+  {
+    return TypeUtil.castToByte(popCLASSPREFIX());
+  }
+  public default long popLong()
+  {
+    return TypeUtil.castToLong(popCLASSPREFIX());
+  }
+  public default float popFloat()
+  {
+    return TypeUtil.castToFloat(popCLASSPREFIX());
+  }
+  public default double popDouble()
+  {
+    return TypeUtil.castToDouble(popCLASSPREFIX());
+  }
+#ELSEIFNOTSWITCH ARRTYPE==double
+  #MACRO PopImpl<double,Double>()
+  #IFNOTSWITCH ARRTYPE==float
+  #MACRO PopImpl<float,Float>()
+    #IFNOTSWITCH ARRTYPE==long
+  #MACRO PopImpl<long,Long>()
+      #IFNOTSWITCH ARRTYPE==int
+  #MACRO PopImpl<int,Int>()
+        #IFNOTSWITCH ARRTYPE==char,short
+  #MACRO PopImpl<short,Short>()
+        #ENDIF
+      #ENDIF
+    #ENDIF
+  #ENDIF
+#ENDIF
+  public abstract void push(ARRTYPE val);
+  public abstract void push(BOXEDTYPE val);
+#IFNOTSWITCH ARRTYPE==boolean
+  public default void push(boolean val)
+  {
+    push((ARRTYPE)TypeUtil.
+    #IFSWITCH ARRTYPE==double
+    castToDouble
+    #ELSEIFSWITCH ARRTYPE==float
+    castToFloat
+    #ELSEIFSWITCH ARRTYPE==long
+    castToLong
+    #ELSEIFSWITCH ARRTYPE==int,short,byte
+    castToByte
+    #ELSEIFSWITCH ARRTYPE==char
+    castToChar
+    #ELSE
+     ERROR unknown array type ARRTYPE
+    #ENDIF
+    (val));
+  }
+  public default void push(Boolean val)
+  {
+    push((ARRTYPE)TypeUtil.
+    #IFSWITCH ARRTYPE==double
+    castToDouble
+    #ELSEIFSWITCH ARRTYPE==float
+    castToFloat
+    #ELSEIFSWITCH ARRTYPE==long
+    castToLong
+    #ELSEIFSWITCH ARRTYPE==int,short,byte
+    castToByte
+    #ELSEIFSWITCH ARRTYPE==char
+    castToChar
+    #ELSE
+     ERROR unknown array type ARRTYPE
+    #ENDIF
+    (val.booleanValue()));
+  }
+  #IFNOTSWITCH ARRTYPE==byte,char
+  #MACRO PushImpl(byte,Byte)
+    #IFNOTSWITCH ARRTYPE==short
+  #MACRO PushImpl(short,Short)
+      #IFNOTSWITCH ARRTYPE==int
+  #MACRO PushImpl(int,Integer)
+        #IFNOTSWITCH ARRTYPE==long
+  #MACRO PushImpl(long,Long)
+          #IFNOTSWITCH ARRTYPE==float
+  #MACRO PushImpl(float,Float)
+          #ENDIF
+        #ENDIF
+      #ENDIF
+    #ENDIF
+  #ENDIF
+#ENDIF
+#IFSWITCH ARRTYPE==boolean,byte,int,long,double
+  @Override
+  public default int search(short val)
+  {
+    return search((int)val);
+  }
+#ENDIF
+#IFSWITCH ARRTYPE==char,short,float
+  @Override
+  public default int search(byte val)
+  {
+    return search((short)val);
+  }
+#ENDIF
+#IFSWITCH ARRTYPE==boolean,int,long,double
+  @Override
+  public default int search(byte val)
+  {
+    return search((int)val);
+  }
+  @Override
+  public default int search(char val)
+  {
+    return search((int)val);
+  }
+#ENDIF  
+}
+#ENDDEF
+  public abstract interface OfRef<E> extends OmniCollection,OmniStack,OmniCollection.OfRef<E>,PeekAndPollIfc<E>
+  {
+    public abstract E pop();
+    public abstract void push(E val);
+  }
+}
+
+#MACRODEF PushImpl(PRIMITIVEINPUTTYPE,BOXEDINPUTTYPE)
+public default void push(PRIMITIVEINPUTTYPE val)
+{
+  push((ARRTYPE)val);
+}
+public default void push(BOXEDINPUTTYPE val)
+{
+  push(val.ARRTYPEValue());
+}
+#ENDDEF
+
+#MACRODEF PopImpl<RETTYPE,METHODSUFFIX>()
+public default RETTYPE popMETHODSUFFIX()
+{
+  return popCLASSPREFIX();
+}
+#ENDDEF
+
+#MACRODEF SearchMethodDefault<INPUTTYPE>()
+@Override
+public default int search(INPUTTYPE val)
+{
+  if(val!=null)
+  {
+    return search(val.
+    #IFSWITCH INPUTTYPE==Boolean
+    booleanValue
+    #ELSEIFSWITCH INPUTTYPE==Byte
+    byteValue
+    #ELSEIFSWITCH INPUTTYPE==Character
+    charValue
+    #ELSEIFSWITCH INPUTTYPE==Short
+    shortValue
+    #ELSEIFSWITCH INPUTTYPE==Integer
+    intValue
+    #ELSEIFSWITCH INPUTTYPE==Long
+    longValue
+    #ELSEIFSWITCH INPUTTYPE==Float
+    floatValue
+    #ELSEIFSWITCH INPUTTYPE==Double
+    doubleValue
+    #ELSE
+    ERROR unknown inputtype INPUTTYPE
+    #ENDIF
+    ());
+  }
+  return -1;
+}
+#ENDDEF
+
+#MACRODEF SearchMethodDecl<INPUTTYPE>()
+public abstract int search(INPUTTYPE val);
+#ENDDEF
+
+#MACRODEF BoxedMethods(METHODMACRO)
+#MACRO METHODMACRO<Boolean>()
+#MACRO METHODMACRO<Byte>()
+#MACRO METHODMACRO<Character>()
+#MACRO METHODMACRO<Short>()
+#MACRO METHODMACRO<Integer>()
+#MACRO METHODMACRO<Long>()
+#MACRO METHODMACRO<Float>()
+#MACRO METHODMACRO<Double>()
+#ENDDEF
+
+#MACRODEF PrimitiveMethods(METHODMACRO)
+#MACRO METHODMACRO<boolean>()
+#MACRO METHODMACRO<byte>()
+#MACRO METHODMACRO<char>()
+#MACRO METHODMACRO<short>()
+#MACRO METHODMACRO<int>()
+#MACRO METHODMACRO<long>()
+#MACRO METHODMACRO<float>()
+#MACRO METHODMACRO<double>()
+#ENDDEF

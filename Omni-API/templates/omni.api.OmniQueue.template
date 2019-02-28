@@ -1,0 +1,183 @@
+#TYPEDEF OfGeneric
+package omni.api;
+import omni.util.PeekAndPollIfc;
+import omni.util.TypeUtil;
+public abstract interface OmniQueue extends OmniCollection
+{
+  #MACRO PrimitiveSubInterface<boolean,Boolean,Boolean>()
+  #MACRO PrimitiveSubInterface<byte,Byte,Byte>()
+  #MACRO PrimitiveSubInterface<char,Char,Character>()
+  #MACRO PrimitiveSubInterface<short,Short,Short>()
+  #MACRO PrimitiveSubInterface<int,Int,Integer>()
+  #MACRO PrimitiveSubInterface<long,Long,Long>()
+  #MACRO PrimitiveSubInterface<float,Float,Float>()
+  #MACRO PrimitiveSubInterface<double,Double,Double>()
+  
+#MACRODEF PrimitiveSubInterface<ARRTYPE,CLASSPREFIX,BOXEDTYPE>()
+public abstract interface OfCLASSPREFIX extends OmniCollection,OmniQueue,OmniCollection.OfPrimitive,OmniCollection.OfCLASSPREFIX,PeekAndPollIfc<BOXEDTYPE>,PeekAndPollIfc.CLASSPREFIXInput
+#IFNOTSWITCH ARRTYPE==double
+,PeekAndPollIfc.DoubleInput
+  #IFNOTSWITCH ARRTYPE==float
+,PeekAndPollIfc.FloatInput
+    #IFNOTSWITCH ARRTYPE==long
+,PeekAndPollIfc.LongInput
+      #IFNOTSWITCH ARRTYPE==int
+,PeekAndPollIfc.IntInput
+        #IFNOTSWITCH ARRTYPE==char,short
+,PeekAndPollIfc.ShortInput
+          #IFNOTSWITCH ARRTYPE==byte
+,PeekAndPollIfc.ByteInput
+          #ENDIF
+        #ENDIF
+      #ENDIF
+    #ENDIF
+  #ENDIF
+#ENDIF
+{
+  public abstract ARRTYPE ARRTYPEElement();
+  public abstract BOXEDTYPE element();
+  public abstract ARRTYPE removeCLASSPREFIX();
+  public abstract BOXEDTYPE remove();
+  
+#IFSWITCH ARRTYPE==boolean
+  public default byte byteElement(){
+    return TypeUtil.castToByte(booleanElement());
+  }
+  public default char charElement(){
+    return TypeUtil.castToChar(booleanElement());
+  }
+  public default double doubleElement(){
+    return TypeUtil.castToDouble(booleanElement());
+  }
+  public default float floatElement(){
+    return TypeUtil.castToFloat(booleanElement());
+  }
+  public default int intElement(){
+    return TypeUtil.castToByte(booleanElement());
+  }
+  public default long longElement(){
+    return TypeUtil.castToLong(booleanElement());
+  }
+  public default byte removeByte(){
+    return TypeUtil.castToByte(removeBoolean());
+  }
+  public default char removeChar(){
+    return TypeUtil.castToChar(removeBoolean());
+  }
+  public default double removeDouble(){
+    return TypeUtil.castToDouble(removeBoolean());
+  }
+  public default float removeFloat(){
+    return TypeUtil.castToFloat(removeBoolean());
+  }
+  public default int removeInt(){
+    return TypeUtil.castToByte(removeBoolean());
+  }
+  public default long removeLong(){
+    return TypeUtil.castToLong(removeBoolean());
+  }
+  public default short removeShort(){
+    return TypeUtil.castToByte(removeBoolean());
+  }
+  public default short shortElement(){
+    return TypeUtil.castToByte(booleanElement());
+  }
+#ELSEIFNOTSWITCH ARRTYPE==double
+  #MACRO ElementMethodImpls<double,Double>()
+  #IFNOTSWITCH ARRTYPE==float
+  #MACRO ElementMethodImpls<float,Float>()
+    #IFNOTSWITCH ARRTYPE==long
+  #MACRO ElementMethodImpls<long,Long>()
+      #IFNOTSWITCH ARRTYPE==int
+  #MACRO ElementMethodImpls<int,Int>()
+        #IFNOTSWITCH ARRTYPE==char,short
+  #MACRO ElementMethodImpls<short,Short>()
+        #ENDIF
+      #ENDIF
+    #ENDIF
+  #ENDIF
+#ENDIF
+  public abstract boolean offer(ARRTYPE val);
+  public abstract boolean offer(BOXEDTYPE val);
+#IFNOTSWITCH ARRTYPE==boolean
+  public default boolean offer(boolean val)
+  {
+    return offer((ARRTYPE)TypeUtil.
+    #IFSWITCH ARRTYPE==double
+    castToDouble
+    #ELSEIFSWITCH ARRTYPE==float
+    castToFloat
+    #ELSEIFSWITCH ARRTYPE==long
+    castToLong
+    #ELSEIFSWITCH ARRTYPE==int,short,byte
+    castToByte
+    #ELSEIFSWITCH ARRTYPE==char
+    castToChar
+    #ELSE
+     ERROR unknown array type ARRTYPE
+    #ENDIF
+    (val));
+  }
+  public default boolean offer(Boolean val)
+  {
+    return offer((ARRTYPE)TypeUtil.
+    #IFSWITCH ARRTYPE==double
+    castToDouble
+    #ELSEIFSWITCH ARRTYPE==float
+    castToFloat
+    #ELSEIFSWITCH ARRTYPE==long
+    castToLong
+    #ELSEIFSWITCH ARRTYPE==int,short,byte
+    castToByte
+    #ELSEIFSWITCH ARRTYPE==char
+    castToChar
+    #ELSE
+     ERROR unknown array type ARRTYPE
+    #ENDIF
+    (val.booleanValue()));
+  }
+  #IFNOTSWITCH ARRTYPE==byte,char
+  #MACRO OfferImpl(byte,Byte)
+    #IFNOTSWITCH ARRTYPE==short
+  #MACRO OfferImpl(short,Short)
+      #IFNOTSWITCH ARRTYPE==int
+  #MACRO OfferImpl(int,Integer)
+        #IFNOTSWITCH ARRTYPE==long
+  #MACRO OfferImpl(long,Long)
+          #IFNOTSWITCH ARRTYPE==float
+  #MACRO OfferImpl(float,Float)
+          #ENDIF
+        #ENDIF
+      #ENDIF
+    #ENDIF
+  #ENDIF
+#ENDIF
+}
+#ENDDEF
+  public abstract interface OfRef<E> extends OmniCollection,OmniQueue,OmniCollection.OfRef<E>,PeekAndPollIfc<E>
+  {
+    public abstract E element();
+    public abstract boolean offer(E val);
+    public abstract E remove();
+  }
+}
+#MACRODEF OfferImpl(PRIMITIVEINPUTTYPE,BOXEDINPUTTYPE)
+public default boolean offer(PRIMITIVEINPUTTYPE val)
+{
+  return offer((ARRTYPE)val);
+}
+public default boolean offer(BOXEDINPUTTYPE val)
+{
+  return offer(val.ARRTYPEValue());
+}
+#ENDDEF
+#MACRODEF ElementMethodImpls<RETTYPE,METHODSUFFIX>()
+public default RETTYPE RETTYPEElement()
+{
+  return ARRTYPEElement();
+}
+public default RETTYPE removeMETHODSUFFIX()
+{
+  return removeCLASSPREFIX();
+}
+#ENDDEF

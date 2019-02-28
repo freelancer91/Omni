@@ -1,0 +1,105 @@
+#TYPEDEF OfGeneric
+package omni.api;
+import java.util.Iterator;
+import java.util.PrimitiveIterator;
+import java.util.function.Consumer;
+import java.util.function.DoubleConsumer;
+import java.util.function.IntConsumer;
+import java.util.function.LongConsumer;
+import omni.function.BooleanConsumer;
+import omni.function.ByteConsumer;
+import omni.function.CharConsumer;
+import omni.function.FloatConsumer;
+import omni.function.ShortConsumer;
+import omni.util.TypeUtil;
+public interface OmniIterator<E> extends Iterator<E>
+{
+  //@Override
+  //public abstract boolean hasNext();
+  
+  #MACRO PrimitiveSubInterface<boolean,Boolean,Boolean>()
+  #MACRO PrimitiveSubInterface<byte,Byte,Byte>()
+  #MACRO PrimitiveSubInterface<char,Char,Character>()
+  #MACRO PrimitiveSubInterface<short,Short,Short>()
+  #MACRO PrimitiveSubInterface<int,Int,Integer>()
+  #MACRO PrimitiveSubInterface<long,Long,Long>()
+  #MACRO PrimitiveSubInterface<float,Float,Float>()
+  #MACRO PrimitiveSubInterface<double,Double,Double>()
+  
+#MACRODEF PrimitiveSubInterface<ARRTYPE,CLASSPREFIX,BOXEDTYPE>()
+public abstract interface OfCLASSPREFIX extends OmniIterator<BOXEDTYPE>
+#IFSWITCH ARRTYPE==int,long,double
+,PrimitiveIterator.OfCLASSPREFIX
+#ELSE
+,PrimitiveIterator<BOXEDTYPE,CLASSPREFIXConsumer>
+#ENDIF
+{
+  @Override
+  public abstract void forEachRemaining(Consumer<? super BOXEDTYPE> action);
+  @Override
+  public abstract void forEachRemaining(CLASSPREFIXConsumer action);
+
+#IFSWITCH ARRTYPE==int,long,double
+  @Override
+#ENDIF
+  public abstract ARRTYPE nextCLASSPREFIX();
+  @Override
+  public abstract BOXEDTYPE next();
+  
+#IFSWITCH ARRTYPE==boolean
+  public default byte nextByte(){
+    return TypeUtil.castToByte(nextCLASSPREFIX());
+  }
+  public default char nextChar(){
+    return TypeUtil.castToChar(nextCLASSPREFIX());
+  }
+  public default double nextDouble(){
+    return TypeUtil.castToDouble(nextCLASSPREFIX());
+  }
+  public default float nextFloat(){
+    return TypeUtil.castToFloat(nextCLASSPREFIX());
+  }
+  public default int nextInt(){
+    return TypeUtil.castToByte(nextCLASSPREFIX());
+  }
+  public default long nextLong(){
+    return TypeUtil.castToLong(nextCLASSPREFIX());
+  }
+  public default short nextShort(){
+    return TypeUtil.castToByte(nextCLASSPREFIX());
+  }
+#ELSEIFNOTSWITCH ARRTYPE==double
+  #MACRO NextImpl<double,Double>()
+  #IFNOTSWITCH ARRTYPE==float
+  #MACRO NextImpl<float,Float>()
+    #IFNOTSWITCH ARRTYPE==long
+  #MACRO NextImpl<long,Long>()
+      #IFNOTSWITCH ARRTYPE==int
+  #MACRO NextImpl<int,Int>()
+        #IFNOTSWITCH ARRTYPE==char,short
+  #MACRO NextImpl<short,Short>()
+        #ENDIF
+      #ENDIF
+    #ENDIF
+  #ENDIF
+#ENDIF
+}
+#ENDDEF
+  public interface OfRef<E>extends OmniIterator<E>
+  {
+    //@Override
+    //public abstract void forEachRemaining(Consumer<? super E> action);
+    //@Override
+    //public abstract E next();
+  }
+
+
+
+  
+}
+#MACRODEF NextImpl<RETTYPE,METHODSUFFIX>()
+public default RETTYPE nextMETHODSUFFIX()
+{
+  return nextCLASSPREFIX();
+}
+#ENDDEF

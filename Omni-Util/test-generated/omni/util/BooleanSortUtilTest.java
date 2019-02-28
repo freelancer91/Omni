@@ -13,6 +13,7 @@ import omni.function.BooleanComparator;
 public class BooleanSortUtilTest
 {
   private static final boolean LONGRUN=true;
+  private static final boolean PARALLEL=true;
   private static final int[] lengths;
   private static final long[] randSeeds;
   private static final ArrayList<TestData> TEST_DATA=new ArrayList<>();
@@ -147,15 +148,21 @@ public class BooleanSortUtilTest
   public void initializeArraysForAllEquals()
   {
     System.out.println("Initializing arrays for arrType=boolean; builder=AllEquals");
-    Arrays.stream(lengths)
-    .parallel()
-    .forEach(arrLength->
+    var lengthStream=Arrays.stream(lengths);
+    if(PARALLEL)
+    {
+      lengthStream=lengthStream.parallel();
+    }
+    lengthStream.forEach(arrLength->
     {
       if(JunitUtil.booleanArrayBuilder.AllEquals.isRandomized())
       {
-        Arrays.stream(randSeeds)
-        .parallel()
-        .forEach(randSeed->
+        var randStream=Arrays.stream(randSeeds);
+        if(PARALLEL)
+        {
+          randStream=randStream.parallel();
+        }
+        randStream.forEach(randSeed->
         {
           TestData.initializeTestData(JunitUtil.booleanArrayBuilder.AllEquals,randSeed,arrLength,TEST_DATA);
         });
@@ -172,80 +179,130 @@ public class BooleanSortUtilTest
   @Order(6*0+2)
   public void testUncheckedStableUnsortedComparatorSortWithAllEqualsArray()
   {
-    TEST_DATA.stream()
-      .parallel()
-      .forEach(testData->
+    var testDataStream=TEST_DATA.stream();
+    if(PARALLEL)
+    {
+      testDataStream=testDataStream.parallel();
+    }
+    testDataStream.forEach(testData->
     {
       var stockArr=testData.stockArr;
       var customArr=testData.customArr;
       int arrLength=stockArr.length;
       //make no alterations to the stock array
       BooleanSortUtil.uncheckedSort(customArr,0,arrLength,Unsorted);
-      JunitUtil.uncheckedparallelassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
+      if(PARALLEL)
+      {
+        JunitUtil.uncheckedparallelassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
+      }
+      else
+      {
+        JunitUtil.uncheckedassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
+      }
     });
   }
   @Test
   @Order(6*0+3)
   public void testUncheckedStableDescendingComparatorSortWithAllEqualsArray()
   {
-    TEST_DATA.stream()
-      .parallel()
-      .forEach(testData->
+    var testDataStream=TEST_DATA.stream();
+    if(PARALLEL)
+    {
+      testDataStream=testDataStream.parallel();
+    }
+    testDataStream.forEach(testData->
     {
       var stockArr=testData.stockArr;
       var customArr=testData.customArr;
       int arrLength=stockArr.length;
       //make no alterations to the stock array
       BooleanSortUtil.uncheckedSort(customArr,0,arrLength,Descending);
-      JunitUtil.uncheckedparallelassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
+      if(PARALLEL)
+      {
+        JunitUtil.uncheckedparallelassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
+      }
+      else
+      {
+        JunitUtil.uncheckedassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
+      }
     });
   }
   @Test
   @Order(6*0+4)
   public void testUncheckedStableDescendingSortWithAllEqualsArray()
   {
-    TEST_DATA.stream()
-      .parallel()
-      .forEach(testData->
+    var testDataStream=TEST_DATA.stream();
+    if(PARALLEL)
+    {
+      testDataStream=testDataStream.parallel();
+    }
+    testDataStream.forEach(testData->
     {
       var stockArr=testData.stockArr;
       var customArr=testData.customArr;
       int arrLength=stockArr.length;
       //make no alterations to the stock array
       BooleanSortUtil.uncheckedDescendingSort(customArr,0,arrLength);
-      JunitUtil.uncheckedparallelassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
+      if(PARALLEL)
+      {
+        JunitUtil.uncheckedparallelassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
+      }
+      else
+      {
+        JunitUtil.uncheckedassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
+      }
     });
   }
   @Test
   @Order(6*0+5)
   public void testUncheckedStableAscendingComparatorSortWithAllEqualsArray()
   {
-    TEST_DATA.stream()
-      .parallel()
-      .forEach(testData->
+    var testDataStream=TEST_DATA.stream();
+    if(PARALLEL)
+    {
+      testDataStream=testDataStream.parallel();
+    }
+    testDataStream.forEach(testData->
     {
       var stockArr=testData.stockArr;
       var customArr=testData.customArr;
       int arrLength=stockArr.length;
       //make no alterations to the stock array
       BooleanSortUtil.uncheckedSort(customArr,0,arrLength,Ascending);
-      JunitUtil.uncheckedparallelassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
+      if(PARALLEL)
+      {
+        JunitUtil.uncheckedparallelassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
+      }
+      else
+      {
+        JunitUtil.uncheckedassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
+      }
     });
   }
   @Test
   @Order(6*0+6)
   public void testUncheckedStableAscendingSortWithAllEqualsArray()
   {
-    TEST_DATA.stream()
-      .parallel()
-      .forEach(testData->
+    var testDataStream=TEST_DATA.stream();
+    if(PARALLEL)
+    {
+      testDataStream=testDataStream.parallel();
+    }
+    testDataStream.forEach(testData->
     {
       var stockArr=testData.stockArr;
       var customArr=testData.customArr;
       int arrLength=stockArr.length;
       //make no alterations to the stock array
       BooleanSortUtil.uncheckedAscendingSort(customArr,0,arrLength);
-      JunitUtil.uncheckedparallelassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
+      if(PARALLEL)
+      {
+        JunitUtil.uncheckedparallelassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
+      }
+      else
+      {
+        JunitUtil.uncheckedassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
+      }
     });
   }
   @Test
@@ -255,15 +312,21 @@ public class BooleanSortUtilTest
     stopTimer();
     TEST_DATA.clear();
     System.out.println("Initializing arrays for arrType=boolean; builder=Ascending");
-    Arrays.stream(lengths)
-    .parallel()
-    .forEach(arrLength->
+    var lengthStream=Arrays.stream(lengths);
+    if(PARALLEL)
+    {
+      lengthStream=lengthStream.parallel();
+    }
+    lengthStream.forEach(arrLength->
     {
       if(JunitUtil.booleanArrayBuilder.Ascending.isRandomized())
       {
-        Arrays.stream(randSeeds)
-        .parallel()
-        .forEach(randSeed->
+        var randStream=Arrays.stream(randSeeds);
+        if(PARALLEL)
+        {
+          randStream=randStream.parallel();
+        }
+        randStream.forEach(randSeed->
         {
           TestData.initializeTestData(JunitUtil.booleanArrayBuilder.Ascending,randSeed,arrLength,TEST_DATA);
         });
@@ -280,57 +343,90 @@ public class BooleanSortUtilTest
   @Order(6*1+2)
   public void testUncheckedStableUnsortedComparatorSortWithAscendingArray()
   {
-    TEST_DATA.stream()
-      .parallel()
-      .forEach(testData->
+    var testDataStream=TEST_DATA.stream();
+    if(PARALLEL)
+    {
+      testDataStream=testDataStream.parallel();
+    }
+    testDataStream.forEach(testData->
     {
       var stockArr=testData.stockArr;
       var customArr=testData.customArr;
       int arrLength=stockArr.length;
       //make no alterations to the stock array
       BooleanSortUtil.uncheckedSort(customArr,0,arrLength,Unsorted);
-      JunitUtil.uncheckedparallelassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
+      if(PARALLEL)
+      {
+        JunitUtil.uncheckedparallelassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
+      }
+      else
+      {
+        JunitUtil.uncheckedassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
+      }
     });
   }
   @Test
   @Order(6*1+3)
   public void testUncheckedStableAscendingComparatorSortWithAscendingArray()
   {
-    TEST_DATA.stream()
-      .parallel()
-      .forEach(testData->
+    var testDataStream=TEST_DATA.stream();
+    if(PARALLEL)
+    {
+      testDataStream=testDataStream.parallel();
+    }
+    testDataStream.forEach(testData->
     {
       var stockArr=testData.stockArr;
       var customArr=testData.customArr;
       int arrLength=stockArr.length;
       //make no alterations to the stock array
       BooleanSortUtil.uncheckedSort(customArr,0,arrLength,Ascending);
-      JunitUtil.uncheckedparallelassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
+      if(PARALLEL)
+      {
+        JunitUtil.uncheckedparallelassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
+      }
+      else
+      {
+        JunitUtil.uncheckedassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
+      }
     });
   }
   @Test
   @Order(6*1+4)
   public void testUncheckedStableAscendingSortWithAscendingArray()
   {
-    TEST_DATA.stream()
-      .parallel()
-      .forEach(testData->
+    var testDataStream=TEST_DATA.stream();
+    if(PARALLEL)
+    {
+      testDataStream=testDataStream.parallel();
+    }
+    testDataStream.forEach(testData->
     {
       var stockArr=testData.stockArr;
       var customArr=testData.customArr;
       int arrLength=stockArr.length;
       //make no alterations to the stock array
       BooleanSortUtil.uncheckedAscendingSort(customArr,0,arrLength);
-      JunitUtil.uncheckedparallelassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
+      if(PARALLEL)
+      {
+        JunitUtil.uncheckedparallelassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
+      }
+      else
+      {
+        JunitUtil.uncheckedassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
+      }
     });
   }
   @Test
   @Order(6*1+5)
   public void testUncheckedStableDescendingComparatorSortWithAscendingArray()
   {
-    TEST_DATA.stream()
-      .parallel()
-      .forEach(testData->
+    var testDataStream=TEST_DATA.stream();
+    if(PARALLEL)
+    {
+      testDataStream=testDataStream.parallel();
+    }
+    testDataStream.forEach(testData->
     {
       var stockArr=testData.stockArr;
       var customArr=testData.copyCustomArr();
@@ -338,23 +434,40 @@ public class BooleanSortUtilTest
       //reverse the stock array
       testData.reverseStockArr();
       BooleanSortUtil.uncheckedSort(customArr,0,arrLength,Descending);
-      JunitUtil.uncheckedparallelassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
+      if(PARALLEL)
+      {
+        JunitUtil.uncheckedparallelassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
+      }
+      else
+      {
+        JunitUtil.uncheckedassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
+      }
     });
   }
   @Test
   @Order(6*1+6)
   public void testUncheckedStableDescendingSortWithAscendingArray()
   {
-    TEST_DATA.stream()
-      .parallel()
-      .forEach(testData->
+    var testDataStream=TEST_DATA.stream();
+    if(PARALLEL)
+    {
+      testDataStream=testDataStream.parallel();
+    }
+    testDataStream.forEach(testData->
     {
       var stockArr=testData.stockArr;
       var customArr=testData.customArr;
       int arrLength=stockArr.length;
       //make no alterations to the stock array
       BooleanSortUtil.uncheckedDescendingSort(customArr,0,arrLength);
-      JunitUtil.uncheckedparallelassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
+      if(PARALLEL)
+      {
+        JunitUtil.uncheckedparallelassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
+      }
+      else
+      {
+        JunitUtil.uncheckedassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
+      }
     });
   }
   @Test
@@ -364,15 +477,21 @@ public class BooleanSortUtilTest
     stopTimer();
     TEST_DATA.clear();
     System.out.println("Initializing arrays for arrType=boolean; builder=Descending");
-    Arrays.stream(lengths)
-    .parallel()
-    .forEach(arrLength->
+    var lengthStream=Arrays.stream(lengths);
+    if(PARALLEL)
+    {
+      lengthStream=lengthStream.parallel();
+    }
+    lengthStream.forEach(arrLength->
     {
       if(JunitUtil.booleanArrayBuilder.Descending.isRandomized())
       {
-        Arrays.stream(randSeeds)
-        .parallel()
-        .forEach(randSeed->
+        var randStream=Arrays.stream(randSeeds);
+        if(PARALLEL)
+        {
+          randStream=randStream.parallel();
+        }
+        randStream.forEach(randSeed->
         {
           TestData.initializeTestData(JunitUtil.booleanArrayBuilder.Descending,randSeed,arrLength,TEST_DATA);
         });
@@ -389,57 +508,90 @@ public class BooleanSortUtilTest
   @Order(6*2+2)
   public void testUncheckedStableUnsortedComparatorSortWithDescendingArray()
   {
-    TEST_DATA.stream()
-      .parallel()
-      .forEach(testData->
+    var testDataStream=TEST_DATA.stream();
+    if(PARALLEL)
+    {
+      testDataStream=testDataStream.parallel();
+    }
+    testDataStream.forEach(testData->
     {
       var stockArr=testData.stockArr;
       var customArr=testData.customArr;
       int arrLength=stockArr.length;
       //make no alterations to the stock array
       BooleanSortUtil.uncheckedSort(customArr,0,arrLength,Unsorted);
-      JunitUtil.uncheckedparallelassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
+      if(PARALLEL)
+      {
+        JunitUtil.uncheckedparallelassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
+      }
+      else
+      {
+        JunitUtil.uncheckedassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
+      }
     });
   }
   @Test
   @Order(6*2+3)
   public void testUncheckedStableDescendingComparatorSortWithDescendingArray()
   {
-    TEST_DATA.stream()
-      .parallel()
-      .forEach(testData->
+    var testDataStream=TEST_DATA.stream();
+    if(PARALLEL)
+    {
+      testDataStream=testDataStream.parallel();
+    }
+    testDataStream.forEach(testData->
     {
       var stockArr=testData.stockArr;
       var customArr=testData.customArr;
       int arrLength=stockArr.length;
       //make no alterations to the stock array
       BooleanSortUtil.uncheckedSort(customArr,0,arrLength,Descending);
-      JunitUtil.uncheckedparallelassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
+      if(PARALLEL)
+      {
+        JunitUtil.uncheckedparallelassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
+      }
+      else
+      {
+        JunitUtil.uncheckedassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
+      }
     });
   }
   @Test
   @Order(6*2+4)
   public void testUncheckedStableDescendingSortWithDescendingArray()
   {
-    TEST_DATA.stream()
-      .parallel()
-      .forEach(testData->
+    var testDataStream=TEST_DATA.stream();
+    if(PARALLEL)
+    {
+      testDataStream=testDataStream.parallel();
+    }
+    testDataStream.forEach(testData->
     {
       var stockArr=testData.stockArr;
       var customArr=testData.customArr;
       int arrLength=stockArr.length;
       //make no alterations to the stock array
       BooleanSortUtil.uncheckedDescendingSort(customArr,0,arrLength);
-      JunitUtil.uncheckedparallelassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
+      if(PARALLEL)
+      {
+        JunitUtil.uncheckedparallelassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
+      }
+      else
+      {
+        JunitUtil.uncheckedassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
+      }
     });
   }
   @Test
   @Order(6*2+5)
   public void testUncheckedStableAscendingComparatorSortWithDescendingArray()
   {
-    TEST_DATA.stream()
-      .parallel()
-      .forEach(testData->
+    var testDataStream=TEST_DATA.stream();
+    if(PARALLEL)
+    {
+      testDataStream=testDataStream.parallel();
+    }
+    testDataStream.forEach(testData->
     {
       var stockArr=testData.stockArr;
       var customArr=testData.copyCustomArr();
@@ -447,23 +599,40 @@ public class BooleanSortUtilTest
       //reverse the stock array
       testData.reverseStockArr();
       BooleanSortUtil.uncheckedSort(customArr,0,arrLength,Ascending);
-      JunitUtil.uncheckedparallelassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
+      if(PARALLEL)
+      {
+        JunitUtil.uncheckedparallelassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
+      }
+      else
+      {
+        JunitUtil.uncheckedassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
+      }
     });
   }
   @Test
   @Order(6*2+6)
   public void testUncheckedStableAscendingSortWithDescendingArray()
   {
-    TEST_DATA.stream()
-      .parallel()
-      .forEach(testData->
+    var testDataStream=TEST_DATA.stream();
+    if(PARALLEL)
+    {
+      testDataStream=testDataStream.parallel();
+    }
+    testDataStream.forEach(testData->
     {
       var stockArr=testData.stockArr;
       var customArr=testData.customArr;
       int arrLength=stockArr.length;
       //make no alterations to the stock array
       BooleanSortUtil.uncheckedAscendingSort(customArr,0,arrLength);
-      JunitUtil.uncheckedparallelassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
+      if(PARALLEL)
+      {
+        JunitUtil.uncheckedparallelassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
+      }
+      else
+      {
+        JunitUtil.uncheckedassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
+      }
     });
   }
   @Test
@@ -473,15 +642,21 @@ public class BooleanSortUtilTest
     stopTimer();
     TEST_DATA.clear();
     System.out.println("Initializing arrays for arrType=boolean; builder=Randomized");
-    Arrays.stream(lengths)
-    .parallel()
-    .forEach(arrLength->
+    var lengthStream=Arrays.stream(lengths);
+    if(PARALLEL)
+    {
+      lengthStream=lengthStream.parallel();
+    }
+    lengthStream.forEach(arrLength->
     {
       if(JunitUtil.booleanArrayBuilder.Randomized.isRandomized())
       {
-        Arrays.stream(randSeeds)
-        .parallel()
-        .forEach(randSeed->
+        var randStream=Arrays.stream(randSeeds);
+        if(PARALLEL)
+        {
+          randStream=randStream.parallel();
+        }
+        randStream.forEach(randSeed->
         {
           TestData.initializeTestData(JunitUtil.booleanArrayBuilder.Randomized,randSeed,arrLength,TEST_DATA);
         });
@@ -498,25 +673,38 @@ public class BooleanSortUtilTest
   @Order(6*3+2)
   public void testUncheckedStableUnsortedComparatorSortWithRandomizedArray()
   {
-    TEST_DATA.stream()
-      .parallel()
-      .forEach(testData->
+    var testDataStream=TEST_DATA.stream();
+    if(PARALLEL)
+    {
+      testDataStream=testDataStream.parallel();
+    }
+    testDataStream.forEach(testData->
     {
       var stockArr=testData.stockArr;
       var customArr=testData.customArr;
       int arrLength=stockArr.length;
       //make no alterations to the stock array
       BooleanSortUtil.uncheckedSort(customArr,0,arrLength,Unsorted);
-      JunitUtil.uncheckedparallelassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
+      if(PARALLEL)
+      {
+        JunitUtil.uncheckedparallelassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
+      }
+      else
+      {
+        JunitUtil.uncheckedassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
+      }
     });
   }
   @Test
   @Order(6*3+3)
   public void testUncheckedStableAscendingComparatorSortWithRandomizedArray()
   {
-    TEST_DATA.stream()
-      .parallel()
-      .forEach(testData->
+    var testDataStream=TEST_DATA.stream();
+    if(PARALLEL)
+    {
+      testDataStream=testDataStream.parallel();
+    }
+    testDataStream.forEach(testData->
     {
       var stockArr=testData.stockArr;
       var customArr=testData.copyCustomArr();
@@ -524,32 +712,52 @@ public class BooleanSortUtilTest
       //sort the stock array
       Arrays.sort(stockArr,0,arrLength);
       BooleanSortUtil.uncheckedSort(customArr,0,arrLength,Ascending);
-      JunitUtil.uncheckedparallelassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
+      if(PARALLEL)
+      {
+        JunitUtil.uncheckedparallelassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
+      }
+      else
+      {
+        JunitUtil.uncheckedassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
+      }
     });
   }
   @Test
   @Order(6*3+4)
   public void testUncheckedStableAscendingSortWithRandomizedArray()
   {
-    TEST_DATA.stream()
-      .parallel()
-      .forEach(testData->
+    var testDataStream=TEST_DATA.stream();
+    if(PARALLEL)
+    {
+      testDataStream=testDataStream.parallel();
+    }
+    testDataStream.forEach(testData->
     {
       var stockArr=testData.stockArr;
       var customArr=testData.copyCustomArr();
       int arrLength=stockArr.length;
       //make no alterations to the stock array
       BooleanSortUtil.uncheckedAscendingSort(customArr,0,arrLength);
-      JunitUtil.uncheckedparallelassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
+      if(PARALLEL)
+      {
+        JunitUtil.uncheckedparallelassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
+      }
+      else
+      {
+        JunitUtil.uncheckedassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
+      }
     });
   }
   @Test
   @Order(6*3+5)
   public void testUncheckedStableDescendingComparatorSortWithRandomizedArray()
   {
-    TEST_DATA.stream()
-      .parallel()
-      .forEach(testData->
+    var testDataStream=TEST_DATA.stream();
+    if(PARALLEL)
+    {
+      testDataStream=testDataStream.parallel();
+    }
+    testDataStream.forEach(testData->
     {
       var stockArr=testData.stockArr;
       var customArr=testData.copyCustomArr();
@@ -557,23 +765,40 @@ public class BooleanSortUtilTest
       //reverse the stock array
       testData.reverseStockArr();
       BooleanSortUtil.uncheckedSort(customArr,0,arrLength,Descending);
-      JunitUtil.uncheckedparallelassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
+      if(PARALLEL)
+      {
+        JunitUtil.uncheckedparallelassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
+      }
+      else
+      {
+        JunitUtil.uncheckedassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
+      }
     });
   }
   @Test
   @Order(6*3+6)
   public void testUncheckedStableDescendingSortWithRandomizedArray()
   {
-    TEST_DATA.stream()
-      .parallel()
-      .forEach(testData->
+    var testDataStream=TEST_DATA.stream();
+    if(PARALLEL)
+    {
+      testDataStream=testDataStream.parallel();
+    }
+    testDataStream.forEach(testData->
     {
       var stockArr=testData.stockArr;
       var customArr=testData.customArr;
       int arrLength=stockArr.length;
       //make no alterations to the stock array
       BooleanSortUtil.uncheckedDescendingSort(customArr,0,arrLength);
-      JunitUtil.uncheckedparallelassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
+      if(PARALLEL)
+      {
+        JunitUtil.uncheckedparallelassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
+      }
+      else
+      {
+        JunitUtil.uncheckedassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
+      }
     });
   }
   @AfterAll
@@ -623,43 +848,4 @@ public class BooleanSortUtilTest
     builder.append(dur);
     System.out.println(builder);
   }
-/*
-    @Test
-    public void testSortMethods()
-    {
-      final var arrays=initializeArrays();
-      arrays.stream()
-      .parallel()
-      .forEach(arr->
-      {
-        int arrLength=arr.length;
-        Boolean[] copy=new Boolean[arrLength];
-        ArrCopy.uncheckedCopy(arr,0,copy,0,arrLength);
-        //test stable unsorted comparator sort
-        BooleanSortUtil.uncheckedSort(arr,0,arrLength,Unsorted);
-        JunitUtil.uncheckedparallelassertarraysAreEqual(arr,0,copy,0,arrLength);  
-        Arrays.sort(copy,0,arrLength);
-        boolean[] copy1;
-        //test stable ascending comparator sort  
-        copy1=new boolean[arrLength];
-        ArrCopy.uncheckedCopy(arr,0,copy1,0,arrLength);
-        BooleanSortUtil.uncheckedSort(copy1,0,arrLength,Ascending);
-        JunitUtil.uncheckedparallelassertarraysAreEqual(copy1,0,copy,0,arrLength);  
-        //test stable ascending non-comparator sort
-        copy1=new boolean[arrLength];
-        ArrCopy.uncheckedCopy(arr,0,copy1,0,arrLength);
-        BooleanSortUtil.uncheckedAscendingSort(copy1,0,arrLength);
-        JunitUtil.uncheckedparallelassertarraysAreEqual(copy1,0,copy,0,arrLength);  
-        OmniArray.OfRef.reverseRange(copy,0,arrLength-1);
-        //test stable descending comparator sort
-        copy1=new boolean[arrLength];
-        ArrCopy.uncheckedCopy(arr,0,copy1,0,arrLength);
-        BooleanSortUtil.uncheckedSort(copy1,0,arrLength,Descending);
-        JunitUtil.uncheckedparallelassertarraysAreEqual(copy1,0,copy,0,arrLength);  
-        //test stable descending non-comparator sort
-        BooleanSortUtil.uncheckedDescendingSort(arr,0,arrLength);
-        JunitUtil.uncheckedparallelassertarraysAreEqual(arr,0,copy,0,arrLength);  
-      });
-    }
-*/
 }

@@ -21,7 +21,7 @@ public class Main{
     static{
         String workingSetRoot=System.getenv(WORKING_SET_ROOT_KEY);
         System.out.println(WORKING_SET_ROOT_KEY+" = "+workingSetRoot);
-        final String[] projectNames=new String[]{"Omni-Function","Omni-Impl","Omni-Util"};
+        final String[] projectNames=new String[]{"Omni-Function","Omni-Impl","Omni-Util","Omni-API"};
         for(final String projectName:projectNames){
             TEMPLATE_AND_SOURCE_FOLDERS.put(Paths.get(workingSetRoot,projectName,"templates"),
                     Paths.get(workingSetRoot,projectName,"src-generated"));
@@ -69,7 +69,7 @@ public class Main{
                                 final TemplateProcessor2 processor=new TemplateProcessor2(file);
                                 final Map<TypeDefinition,List<String>> sources=processor.sources;
                                 final Map<TypeDefinition,Integer> typeDefs=processor.typeDefs;
-                                typeDefs.forEach((typeDef,lineNumber)->{
+                                typeDefs.keySet().parallelStream().forEach(typeDef->{
                                     final List<String> sourceCode=sources.get(typeDef);
                                     final var sourceFilePath=outputFolder.resolve(
                                             typeDef.parseLine(fqt).replaceAll("\\.",Matcher.quoteReplacement(File.separator))+".java");

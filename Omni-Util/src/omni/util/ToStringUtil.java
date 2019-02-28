@@ -6,13 +6,64 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.nio.CharBuffer;
 public class ToStringUtil{
-
+    public static String getString(boolean b){
+        if(b){
+            return "true";
+        }
+        return "false";
+    }
+    public static void getString(boolean b,Appendable appendable) throws IOException{
+        appendable.append(b?"true":"false");
+    }
+    public static void getString(boolean b,CharArrayWriter writer) throws IOException{
+        writer.write(b?"true":"false");
+    }
+    public static void getString(boolean b,CharBuffer buffer){
+        buffer.put(b?"true":"false");
+    }
+    public static void getString(boolean b,PrintWriter writer){
+        writer.write(b?"true":"false");
+    }
+    public static void getString(boolean b,StringWriter writer){
+        writer.write(b?"true":"false");
+    }
+    public static void getString(boolean b,Writer writer) throws IOException{
+        writer.write(b?"true":"false");
+    }
     public static String getString(byte i){
         char[] buffer;
         return new String(buffer=getByteStrBuffer(),0,getStringShort(i,buffer,0));
     }
     public static void getString(byte i,Appendable appendable) throws IOException{
         appendable.append(getString(i));
+    }
+    public static void getString(byte i,CharArrayWriter writer){
+        char[] arr;
+        writer.write(arr=getByteStrBuffer(),0,getStringShort(i,arr,0));
+    }
+    public static void getString(byte i,CharBuffer buffer){
+        char[] arr;
+        buffer.put(arr=getByteStrBuffer(),0,getStringShort(i,arr,0));
+    }
+    public static void getString(byte i,PrintWriter writer){
+        char[] arr;
+        writer.write(arr=getByteStrBuffer(),0,getStringShort(i,arr,0));
+    }
+    public static void getString(byte i,StringBuffer sBuffer){
+        char[] arr;
+        sBuffer.append(arr=getByteStrBuffer(),0,getStringShort(i,arr,0));
+    }
+    public static void getString(byte i,StringBuilder sBuilder){
+        char[] arr;
+        sBuilder.append(arr=getByteStrBuffer(),0,getStringShort(i,arr,0));
+    }
+    public static void getString(byte i,StringWriter writer){
+        char[] arr;
+        writer.write(arr=getByteStrBuffer(),0,getStringShort(i,arr,0));
+    }
+    public static void getString(byte i,Writer writer) throws IOException{
+        char[] arr;
+        writer.write(arr=getByteStrBuffer(),0,getStringShort(i,arr,0));
     }
     /** Return the string representation of the provided single-precision float value.
      *

@@ -39,11 +39,11 @@ public class ToStringUtilTest{
         assertStringsEqual(b,ToStringUtil.getStringFloat(f,b,0),Float.toString(f));
         f=constructFloat(true,128,1);// NaN
         assertStringsEqual(b,ToStringUtil.getStringFloat(f,b,0),Float.toString(f));
-        
+
         int[] intervals=new int[255];
         intervals[-127+127]=1;
         for(int i=-126;i<=126;++i) {
-          intervals[i+127]=17;
+            intervals[i+127]=17;
         }
         intervals[-9+127]=1;
         intervals[-1+127]=1;
@@ -53,15 +53,15 @@ public class ToStringUtilTest{
         intervals[102+127]=1;
         intervals[127+127]=1;
         multiThreadedTest(-127,127,(minIncl,maxIncl)->{
-          final char[] buffer=new char[15];
-          for(int i=minIncl;i<=maxIncl;++i) {
-            for(int j=0,interval=intervals[i+127];j<=0x7fffff;j+=interval) {
-              final float f1;
-              assertStringsEqual(buffer,ToStringUtil.getStringFloat(f1=constructFloat(true,i,j),buffer,0), Float.toString(f1));
+            final char[] buffer=new char[15];
+            for(int i=minIncl;i<=maxIncl;++i) {
+                for(int j=0,interval=intervals[i+127];j<=0x7fffff;j+=interval) {
+                    final float f1;
+                    assertStringsEqual(buffer,ToStringUtil.getStringFloat(f1=constructFloat(true,i,j),buffer,0), Float.toString(f1));
+                }
             }
-          }
         });
-        
+
     }
     private interface TestThreadGenerator{
         private Runnable getRunnable(int minIncl,int maxIncl){
@@ -186,6 +186,102 @@ public class ToStringUtilTest{
     public void testGetStringConvenienceMethods(){
         {
             final String stockVal;
+            Assertions.assertEquals(stockVal=Boolean.toString(true),ToStringUtil.getString(true));
+            final Appendable appendable=new StringBuilder(4);
+            try{
+                ToStringUtil.getString(true,appendable);
+            }catch(IOException e){
+                Assertions.fail(e);
+            }
+            Assertions.assertEquals(stockVal,appendable.toString());
+            final CharArrayWriter charArrayWriter=new CharArrayWriter(4);
+            try{
+                ToStringUtil.getString(true,charArrayWriter);
+            }catch(IOException e){
+                Assertions.fail(e);
+            }
+            Assertions.assertEquals(stockVal,charArrayWriter.toString());
+            final CharBuffer charBuffer;
+            ToStringUtil.getString(true,charBuffer=CharBuffer.allocate(4));
+            assertStringsEqual(charBuffer.array(),charBuffer.position(),stockVal);
+            final StringWriter stringWriter1;
+            ToStringUtil.getString(true,stringWriter1=new StringWriter(4));
+            Assertions.assertEquals(stockVal,stringWriter1.toString());
+            StringWriter stringWriter2;
+            ToStringUtil.getString(true,new PrintWriter(stringWriter2=new StringWriter(4)));
+            Assertions.assertEquals(stockVal,stringWriter2.toString());
+            final StringBuffer stringBuffer=new StringBuffer(4);
+            try{
+                ToStringUtil.getString(true,stringBuffer);
+            }catch(IOException e){
+                Assertions.fail(e);
+            }
+            Assertions.assertEquals(stockVal,stringBuffer.toString());
+            final StringBuilder stringBuilder=new StringBuilder(4);
+            try{
+                ToStringUtil.getString(true,stringBuilder);
+            }catch(IOException e){
+                Assertions.fail(e);
+            }
+            Assertions.assertEquals(stockVal,stringBuilder.toString());
+            final Writer writer=new StringWriter(4);
+            try{
+                ToStringUtil.getString(true,writer);
+            }catch(IOException e){
+                Assertions.fail(e);
+            }
+            Assertions.assertEquals(stockVal,writer.toString());
+        }
+        {
+            final String stockVal;
+            Assertions.assertEquals(stockVal=Boolean.toString(false),ToStringUtil.getString(false));
+            final Appendable appendable=new StringBuilder(5);
+            try{
+                ToStringUtil.getString(false,appendable);
+            }catch(IOException e){
+                Assertions.fail(e);
+            }
+            Assertions.assertEquals(stockVal,appendable.toString());
+            final CharArrayWriter charArrayWriter=new CharArrayWriter(5);
+            try{
+                ToStringUtil.getString(false,charArrayWriter);
+            }catch(IOException e){
+                Assertions.fail(e);
+            }
+            Assertions.assertEquals(stockVal,charArrayWriter.toString());
+            final CharBuffer charBuffer;
+            ToStringUtil.getString(false,charBuffer=CharBuffer.allocate(5));
+            assertStringsEqual(charBuffer.array(),charBuffer.position(),stockVal);
+            final StringWriter stringWriter1;
+            ToStringUtil.getString(false,stringWriter1=new StringWriter(5));
+            Assertions.assertEquals(stockVal,stringWriter1.toString());
+            StringWriter stringWriter2;
+            ToStringUtil.getString(false,new PrintWriter(stringWriter2=new StringWriter(5)));
+            Assertions.assertEquals(stockVal,stringWriter2.toString());
+            final StringBuffer stringBuffer=new StringBuffer(5);
+            try{
+                ToStringUtil.getString(false,stringBuffer);
+            }catch(IOException e){
+                Assertions.fail(e);
+            }
+            Assertions.assertEquals(stockVal,stringBuffer.toString());
+            final StringBuilder stringBuilder=new StringBuilder(5);
+            try{
+                ToStringUtil.getString(false,stringBuilder);
+            }catch(IOException e){
+                Assertions.fail(e);
+            }
+            Assertions.assertEquals(stockVal,stringBuilder.toString());
+            final Writer writer=new StringWriter(5);
+            try{
+                ToStringUtil.getString(false,writer);
+            }catch(IOException e){
+                Assertions.fail(e);
+            }
+            Assertions.assertEquals(stockVal,writer.toString());
+        }
+        {
+            final String stockVal;
             Assertions.assertEquals(stockVal=Byte.toString(Byte.MIN_VALUE),ToStringUtil.getString(Byte.MIN_VALUE));
             final Appendable appendable=new StringBuilder(4);
             try{
@@ -194,6 +290,31 @@ public class ToStringUtilTest{
                 Assertions.fail(e);
             }
             Assertions.assertEquals(stockVal,appendable.toString());
+            final CharArrayWriter charArrayWriter;
+            ToStringUtil.getString(Byte.MIN_VALUE,charArrayWriter=new CharArrayWriter(4));
+            Assertions.assertEquals(stockVal,charArrayWriter.toString());
+            final CharBuffer charBuffer;
+            ToStringUtil.getString(Byte.MIN_VALUE,charBuffer=CharBuffer.allocate(4));
+            assertStringsEqual(charBuffer.array(),charBuffer.position(),stockVal);
+            final StringWriter stringWriter1;
+            ToStringUtil.getString(Byte.MIN_VALUE,stringWriter1=new StringWriter(4));
+            Assertions.assertEquals(stockVal,stringWriter1.toString());
+            StringWriter stringWriter2;
+            ToStringUtil.getString(Byte.MIN_VALUE,new PrintWriter(stringWriter2=new StringWriter(4)));
+            Assertions.assertEquals(stockVal,stringWriter2.toString());
+            final StringBuffer stringBuffer;
+            ToStringUtil.getString(Byte.MIN_VALUE,stringBuffer=new StringBuffer(4));
+            Assertions.assertEquals(stockVal,stringBuffer.toString());
+            final StringBuilder stringBuilder;
+            ToStringUtil.getString(Byte.MIN_VALUE,stringBuilder=new StringBuilder(4));
+            Assertions.assertEquals(stockVal,stringBuilder.toString());
+            final Writer writer=new StringWriter(4);
+            try{
+                ToStringUtil.getString(Byte.MIN_VALUE,writer);
+            }catch(IOException e){
+                Assertions.fail(e);
+            }
+            Assertions.assertEquals(stockVal,writer.toString());
         }
         {
             final String stockVal;

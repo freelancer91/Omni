@@ -8,6 +8,9 @@
 #TYPEDEF OfDouble
 #TYPEDEF OfRef
 package omni.util;
+#IFNOT OfBoolean
+import org.junit.jupiter.api.Assertions;
+#ENDIF
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
@@ -30,6 +33,7 @@ import omni.function.$Comparator$;
 public class $ClassPrefix$SortUtilTest
 {
   private static final boolean LONGRUN=true;
+  private static final boolean PARALLEL=true;
   
   private static final int[] lengths;
   private static final long[] randSeeds;
@@ -302,15 +306,92 @@ private static final $Comparator$ Descending=(val1,val2)->
 {
   return $BoxedType$.compare(val2,val1);
 };
+  #IF OfByte,OfChar,OfShort,OfInt
+private static final $Comparator$ Unstable=(val1,val2)->
+{
+  //even comes first
+  if((val1&0b1)==0)
+  {
+    //val1 is even
+    if((val2&0b1)!=0)
+    {
+      return -1;
+    }
+  }
+  else if((val2&0b1)==0)
+  {
+    return 1; 
+  }
+  return 0;
+};
+  #ELSEIF OfLong
+private static final $Comparator$ Unstable=(val1,val2)->
+{
+  //even comes first
+  if((val1&0b1L)==0)
+  {
+    if((val2&0b1L)!=0)
+    {
+      return -1;
+    }
+  }
+  else if((val2&0b1L)==0)
+  {
+    return 1; 
+  }
+  return 0;
+};
+  #ELSEIF OfFloat
+private static final $Comparator$ Unstable=(val1,val2)->
+{
+  //even bits come first
+  int bits2=$convertToBits$(val2);
+  if(($convertToBits$(val1)&0b1)==0)
+  {
+    //val1 is even
+    if((bits2&0b1)!=0)
+    {
+      return -1;
+    }
+  }
+  else if((bits2&0b1)==0)
+  {
+    return 1; 
+  }
+  return 0;
+};
+  #ELSEIFNOT OfBoolean
+private static final $Comparator$ Unstable=(val1,val2)->
+{
+  //even bits come first
+  long bits2=$convertToBits$(val2);
+  if(($convertToBits$(val1)&0b1L)==0)
+  {
+    //val1 is even
+    if((bits2&0b1L)!=0)
+    {
+      return -1;
+    }
+  }
+  else if((bits2&0b1L)==0)
+  {
+    return 1; 
+  }
+  return 0;
+};
+  #ENDIF
 #ENDIF
 
-#MACRO AllTestMethods<true>()
-#ENDDEF
 
-
-  
-  
-#MACRODEF AllTestMethods<PARALLEL>()
+#IF OfRef
+#MACRO TestStable<UnsortedComparator>()
+#MACRO TestStable<AscendingComparator>()
+#MACRO TestStable<DescendingComparator>()
+#MACRO TestStable<Ascending>()
+#MACRO TestStable<Descending>()
+#ELSEIFNOT OfBoolean
+#MACRO TestStable<UnstableComparator>()
+#ENDIF
 #IF OfBoolean
 
 #MACRO BasicTestSuite<AllEquals,0>()
@@ -359,6 +440,9 @@ private static final $Comparator$ Descending=(val1,val2)->
 #ENDDEF
 
 
+  
+
+
 #MACRODEF BasicTestSuite<ARRAYBUILDER,SUITEORDER>()
 @Test
 #IF OfBoolean
@@ -375,19 +459,21 @@ public void initializeArraysForARRAYBUILDER()
   TEST_DATA.clear();
 #ENDIF
   System.out.println("Initializing arrays for arrType=$ArrayType$; builder=ARRAYBUILDER");
-  Arrays.stream(lengths)
-  #IFSWITCH PARALLEL==true
-  .parallel()
-#ENDIF
-  .forEach(arrLength->
+  var lengthStream=Arrays.stream(lengths);
+  if(PARALLEL)
+  {
+    lengthStream=lengthStream.parallel();
+  }
+  lengthStream.forEach(arrLength->
   {
     if(JunitUtil.CUSTOMARRTYPEArrayBuilder.ARRAYBUILDER.isRandomized())
     {
-      Arrays.stream(randSeeds)
-#IFSWITCH PARALLEL==true
-      .parallel()
-#ENDIF
-      .forEach(randSeed->
+      var randStream=Arrays.stream(randSeeds);
+      if(PARALLEL)
+      {
+        randStream=randStream.parallel();
+      }
+      randStream.forEach(randSeed->
       {
         TestData.initializeTestData(JunitUtil.CUSTOMARRTYPEArrayBuilder.ARRAYBUILDER,randSeed,arrLength,TEST_DATA);
       });
@@ -526,11 +612,12 @@ public void testUncheckedUnstableCOMPARATORTYPESortWithARRAYBUILDERArray()
 ERROR unknown stable flag STABLE
 #ENDIF
 {
-  TEST_DATA.stream()
-#IFSWITCH PARALLEL==true
-    .parallel()
-#ENDIF
-    .forEach(testData->
+  var testDataStream=TEST_DATA.stream();
+  if(PARALLEL)
+  {
+    testDataStream=testDataStream.parallel();
+  }
+  testDataStream.forEach(testData->
   {
     var stockArr=testData.stockArr;
 #IFSWITCH COPYCUSTOM==CopyCustom
@@ -635,142 +722,151 @@ ERROR unknown stable flag STABLE
 #ELSE
     ERROR unknown comparator type COMPARATORTYPE
 #ENDIF
-#IFSWITCH PARALLEL==true
-    JunitUtil.uncheckedparallelassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
-#ELSE
-    JunitUtil.uncheckedassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
-#ENDIF
+    if(PARALLEL)
+    {
+      JunitUtil.uncheckedparallelassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
+    }
+    else
+    {
+      JunitUtil.uncheckedassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
+    }
   });
 }
 #ENDDEF
-
-/*
- 
- 
- 
-
- 
-  #MACRO TestMethod<true>() 
-  
-#MACRODEF CompareArrays(ARR1,ARR2)
-#IFSWITCH PARALLEL==true
-JunitUtil.uncheckedparallelassertarraysAreEqual(ARR1,0,ARR2,0,arrLength);  
-#ELSE
-JunitUtil.uncheckedassertarraysAreEqual(ARR1,0,ARR2,0,arrLength);  
-#ENDIF
-#ENDDEF
-#MACRODEF TestMethod<PARALLEL>() 
-  @Test
-  public void testSortMethods()
+#IF OfRef
+  private static class StableVal implements Comparable<StableVal>
   {
-    final var arrays=initializeArrays();
-    arrays.stream()
-#IFSWITCH PARALLEL==true
-    .parallel()
-#ENDIF
-    .forEach(arr->
+    private int key;
+    private int val;
+    private StableVal(int key,int val)
     {
-      int arrLength=arr.length;
-#IF OfBoolean
-      $BoxedType$[] copy=new $BoxedType$[arrLength];
-#ELSEIF OfRef
-      int[] copy=new int[arrLength];
-#ELSE
-      $ArrayType$[] copy=new $ArrayType$[arrLength];
-#ENDIF
-      ArrCopy.uncheckedCopy(arr,0,copy,0,arrLength);
-      
-      //test stable unsorted comparator sort
-#IF OfBoolean
-      $ClassPrefix$SortUtil.uncheckedSort(arr,0,arrLength,Unsorted);
-#ELSE
-      $ClassPrefix$SortUtil.uncheckedStableSort(arr,0,arrLength,Unsorted);
-#ENDIF
-      #MACRO CompareArrays(arr,copy)
-      Arrays.sort(copy,0,arrLength);
-      
-      $ArrayType$[] copy1;
-
-#IFNOT OfBoolean 
-      //test unstable ascending comparator sort
-      copy1=new $ArrayType$[arrLength];
-      ArrCopy.uncheckedCopy(arr,0,copy1,0,arrLength);
-      $ClassPrefix$SortUtil.uncheckedUnstableSort(copy1,0,arrLength,Ascending);
-      #MACRO CompareArrays(copy1,copy)
-  #IF OfRef
-  
-      //test unstable ascending non-comparator sort
-      copy1=new $ArrayType$[arrLength];
-      ArrCopy.uncheckedCopy(arr,0,copy1,0,arrLength);
-      $ClassPrefix$SortUtil.uncheckedUnstableAscendingSort(copy1,0,arrLength);
-      #MACRO CompareArrays(copy1,copy)
-  #ENDIF
-#ENDIF
-      
-      //test stable ascending comparator sort  
-      copy1=new $ArrayType$[arrLength];
-      ArrCopy.uncheckedCopy(arr,0,copy1,0,arrLength);
-#IF OfBoolean
-      $ClassPrefix$SortUtil.uncheckedSort(copy1,0,arrLength,Ascending);
-#ELSE
-      $ClassPrefix$SortUtil.uncheckedStableSort(copy1,0,arrLength,Ascending);
-#ENDIF
-      #MACRO CompareArrays(copy1,copy)
-      
-      //test stable ascending non-comparator sort
-      copy1=new $ArrayType$[arrLength];
-      ArrCopy.uncheckedCopy(arr,0,copy1,0,arrLength);
-#IF OfRef
-      $ClassPrefix$SortUtil.uncheckedStableAscendingSort(copy1,0,arrLength);
-#ELSE
-      $ClassPrefix$SortUtil.uncheckedAscendingSort(copy1,0,arrLength);
-#ENDIF
-      #MACRO CompareArrays(copy1,copy)
-
-#IF OfBoolean
-      OmniArray.OfRef.reverseRange(copy,0,arrLength-1);
-#ELSEIF OfRef
-      OmniArray.OfInt.reverseRange(copy,0,arrLength-1);
-#ELSE
-      OmniArray.Of$ClassPrefix$.reverseRange(copy,0,arrLength-1);
-#ENDIF
-
-#IFNOT OfBoolean 
-      //test unstable descending comparator sort
-      copy1=new $ArrayType$[arrLength];
-      ArrCopy.uncheckedCopy(arr,0,copy1,0,arrLength);
-      $ClassPrefix$SortUtil.uncheckedUnstableSort(copy1,0,arrLength,Descending);
-      #MACRO CompareArrays(copy1,copy)
-  #IF OfRef
-  
-      //test unstable descending non-comparator sort
-      copy1=new $ArrayType$[arrLength];
-      ArrCopy.uncheckedCopy(arr,0,copy1,0,arrLength);
-      $ClassPrefix$SortUtil.uncheckedUnstableDescendingSort(copy1,0,arrLength);
-      #MACRO CompareArrays(copy1,copy)
-  #ENDIF
-#ENDIF
-
-      //test stable descending comparator sort
-      copy1=new $ArrayType$[arrLength];
-      ArrCopy.uncheckedCopy(arr,0,copy1,0,arrLength);
-#IF OfBoolean
-      $ClassPrefix$SortUtil.uncheckedSort(copy1,0,arrLength,Descending);
-#ELSE
-      $ClassPrefix$SortUtil.uncheckedStableSort(copy1,0,arrLength,Descending);
-#ENDIF
-      #MACRO CompareArrays(copy1,copy)
-           
-      //test stable descending non-comparator sort
-#IF OfRef
-      $ClassPrefix$SortUtil.uncheckedStableDescendingSort(arr,0,arrLength);
-#ELSE
-      $ClassPrefix$SortUtil.uncheckedDescendingSort(arr,0,arrLength);
-#ENDIF
-      #MACRO CompareArrays(arr,copy)
-    });
+      this.key=key;
+      this.val=val;
+    }
+    @Override
+    public int compareTo(StableVal that)
+    {
+      int thisKey,thatKey;
+      if((thisKey=this.key)<(thatKey=that.key))
+      {
+        return -1;
+      }
+      if(thisKey>thatKey)
+      {
+        return 1;
+      }
+      return 0;
+    }
+    @Override
+    public boolean equals(Object that)
+    {
+      return that==this;
+    }
+    @Override
+    public String toString()
+    {
+      return "("+key+", "+val+")";
+    }
   }
+#ENDIF
+
+#MACRODEF TestStable<COMPARATORTYPE>()
+@Test
+public void testIsStableCOMPARATORTYPESort()
+{
+  Random rand=new Random(0);
+#IF OfRef
+  StableVal[] customArr=new StableVal[4000];
+  for(int i=0;i<customArr.length;)
+  {
+    int key=rand.nextInt();
+    customArr[i++]=new StableVal(key,1);
+    customArr[i++]=new StableVal(key,2);
+    customArr[i++]=new StableVal(key,3);
+    customArr[i++]=new StableVal(key,4);
+  }
+  #IFSWITCH COMPARATORTYPE==UnsortedComparator
+  $ClassPrefix$SortUtil.uncheckedStableSort(customArr,0,customArr.length,(StableVal v1,StableVal v2)->0);
+  #ELSEIFSWITCH COMPARATORTYPE==AscendingComparator
+  $ClassPrefix$SortUtil.uncheckedStableSort(customArr,0,customArr.length,(StableVal v1,StableVal v2)->v1.compareTo(v2));
+  #ELSEIFSWITCH COMPARATORTYPE==DescendingComparator
+  $ClassPrefix$SortUtil.uncheckedStableSort(customArr,0,customArr.length,(StableVal v1,StableVal v2)->v2.compareTo(v1));
+  #ELSEIFSWITCH COMPARATORTYPE==Ascending
+  $ClassPrefix$SortUtil.uncheckedStableAscendingSort(customArr,0,customArr.length);
+  #ELSEIFSWITCH COMPARATORTYPE==Descending
+  $ClassPrefix$SortUtil.uncheckedStableDescendingSort(customArr,0,customArr.length);
+  #ELSE
+  ERROR unknown comparator type COMPARATORTYPE
+  #ENDIF
+  for(int i=0,bound=customArr.length/4;i<bound;)
+  {
+    int key1=customArr[i].key;
+    int val1=customArr[i++].val;
+    int key2=customArr[i].key;
+    int val2=customArr[i++].val;
+    int key3=customArr[i].key;
+    int val3=customArr[i++].val;
+    int key4=customArr[i].key;
+    int val4=customArr[i++].val;
+    Assertions.assertEquals(key1,key2);
+    Assertions.assertEquals(key2,key3);
+    Assertions.assertEquals(key3,key4);
+    Assertions.assertTrue(val1<val2);
+    Assertions.assertTrue(val2<val3);
+    Assertions.assertTrue(val3<val4);
+  }
+#ELSE
+  $ArrayType$[] customArr=new $ArrayType$[4000];
+  JunitUtil.$ArrayType$ArrayBuilder.Randomized.buildUnchecked(customArr,0,customArr.length,rand,0);
+  $ArrayType$[] copy=new $ArrayType$[customArr.length];
+  ArrCopy.uncheckedCopy(customArr,0,copy,0,customArr.length);
+  #IFSWITCH COMPARATORTYPE==UnstableComparator
+  $ClassPrefix$SortUtil.uncheckedStableSort(customArr,0,customArr.length,Unstable);
+  #ELSE
+  ERROR unknown comparator type COMPARATORTYPE
+  #ENDIF
+  int oddIndex;
+  //find the first odd index
+  for(oddIndex=0;oddIndex<customArr.length;++oddIndex)
+  {
+  #IF OfByte,OfChar,OfShort,OfInt
+    if((customArr[oddIndex]&0b1)!=0)
+  #ELSEIF OfLong
+    if((customArr[oddIndex]&0b1L)!=0)
+  #ELSEIF OfFloat
+    if(($convertToBits$(customArr[oddIndex])&0b1)!=0)
+  #ELSEIF OfDouble
+    if(($convertToBits$(customArr[oddIndex])&0b1L)!=0)
+  #ENDIF
+    {
+      break;
+    }
+  }
+  int evenIndex=0;
+  for(int i=0;i<copy.length;++i)
+  {
+   #IF OfByte,OfChar,OfShort,OfInt
+    if((copy[i]&0b1)!=0)
+  #ELSEIF OfLong
+    if((copy[i]&0b1L)!=0)
+  #ELSEIF OfFloat
+    if(($convertToBits$(copy[i])&0b1)!=0)
+  #ELSEIF OfDouble
+    if(($convertToBits$(copy[i])&0b1L)!=0)
+  #ENDIF
+    {
+      //is odd
+      Assertions.assertTrue(JunitUtil.isEqual(copy[i],customArr[oddIndex++]));
+    }
+    else
+    {
+      //is even
+      Assertions.assertTrue(JunitUtil.isEqual(copy[i],customArr[evenIndex++]));
+    }
+  }
+#ENDIF
+}
 #ENDDEF
-*/
+
 }
 

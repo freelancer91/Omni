@@ -577,8 +577,8 @@ public class TemplateProcessor2{
         final var defItr=typeDefs.keySet().iterator();
         if(defItr.hasNext()){
             TypeDefinition typeDef;
-            for(sources.put(typeDef=defItr.next(),new SourceGenerator(true,typeDef).output);defItr.hasNext();
-                    sources.put(typeDef=defItr.next(),new SourceGenerator(false,typeDef).output)){}
+            for(sources.put(typeDef=defItr.next(),new SourceGenerator(true,typeDef).output);defItr.hasNext();sources
+                    .put(typeDef=defItr.next(),new SourceGenerator(false,typeDef).output)){}
         }
     }
 }

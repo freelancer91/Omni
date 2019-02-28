@@ -1,0 +1,303 @@
+#TYPEDEF OfGeneric
+package omni.api;
+
+import java.util.function.Consumer;
+import java.util.function.DoubleConsumer;
+import java.util.function.DoublePredicate;
+import java.util.function.IntConsumer;
+import java.util.function.IntFunction;
+import java.util.function.IntPredicate;
+import java.util.function.LongConsumer;
+import java.util.function.LongPredicate;
+import java.util.function.Predicate;
+import omni.function.BooleanConsumer;
+import omni.function.BooleanPredicate;
+import omni.function.ByteConsumer;
+import omni.function.BytePredicate;
+import omni.function.CharConsumer;
+import omni.function.CharPredicate;
+import omni.function.FloatConsumer;
+import omni.function.FloatPredicate;
+import omni.function.ShortConsumer;
+import omni.function.ShortPredicate;
+//TODO integration into Java Collection library
+public abstract interface OmniCollection
+{
+  public abstract void clear();
+  #MACRO ContainsMethodDecl<Object>()
+  #MACRO PrimitiveMethods(ContainsMethodDecl)
+  #MACRO BoxedMethods(ContainsMethodDecl)
+  public abstract boolean remove(Object val);
+  #MACRO PrimitiveMethods(RemoveValMethodDecl)
+  #MACRO BoxedMethods(RemoveValMethodDecl)
+  public abstract boolean isEmpty();
+  public abstract int size();
+  public abstract Object[] toArray();
+  public abstract <T> T[] toArray(IntFunction<T[]> arrConstructor);
+  public abstract <T> T[] toArray(T[] dst);
+  public abstract interface OfPrimitive extends OmniCollection
+  {
+    #MACRO BoxedMethods(ContainsMethodDefault)
+    #MACRO BoxedMethods(RemoveValMethodDefault)
+  }
+  #MACRO PrimitiveSubInterface<boolean,Boolean,Boolean>()
+  #MACRO PrimitiveSubInterface<byte,Byte,Byte>()
+  #MACRO PrimitiveSubInterface<char,Char,Character>()
+  #MACRO PrimitiveSubInterface<short,Short,Short>()
+  #MACRO PrimitiveSubInterface<int,Int,Integer>()
+  #MACRO PrimitiveSubInterface<long,Long,Long>()
+  #MACRO PrimitiveSubInterface<float,Float,Float>()
+  #MACRO PrimitiveSubInterface<double,Double,Double>()
+  
+#MACRODEF PrimitiveSubInterface<ARRTYPE,CLASSPREFIX,BOXEDTYPE>()
+public abstract interface OfCLASSPREFIX extends OfPrimitive
+{
+  public abstract boolean add(boolean val);
+  public abstract boolean add(BOXEDTYPE val);
+  public abstract void forEach(CLASSPREFIXConsumer action);
+  public abstract void forEach(Consumer<? super BOXEDTYPE> action);
+  public abstract boolean removeIf(CLASSPREFIXPredicate filter);
+  public abstract boolean removeIf(Predicate<? super BOXEDTYPE> filter);
+  public abstract OmniIterator.OfCLASSPREFIX iterator();
+  @Override
+  public abstract BOXEDTYPE[] toArray();
+  public abstract ARRTYPE[] toCLASSPREFIXArray();
+  #IFNOTSWITCH ARRTYPE==double
+  public abstract double[] toDoubleArray();
+    #IFNOTSWITCH ARRTYPE==float
+  public abstract float[] toFloatArray();
+      #IFNOTSWITCH ARRTYPE==long
+  public abstract long[] toLongArray();
+        #IFNOTSWITCH ARRTYPE==int
+  public abstract int[] toIntArray();
+          #IFNOTSWITCH ARRTYPE==short,char
+  public abstract short[] toShortArray();
+            #IFNOTSWITCH ARRTYPE==byte
+  public abstract byte[] toByteArray();
+            #ENDIF
+          #ENDIF
+        #ENDIF
+      #ENDIF
+    #ENDIF
+  #ENDIF
+  #IFSWITCH ARRTYPE==boolean,byte,int,long
+  @Override
+  public default boolean contains(short val)
+  {
+    return contains((int)val);
+  }
+  @Override
+  public default boolean removeVal(short val)
+  {
+    return removeVal((int)val);
+  }
+    #IFSWITCH ARRTYPE==boolean
+  @Override
+  public default boolean contains(byte val)
+  {
+    return contains((int)val);
+  }
+  @Override
+  public default boolean contains(char val)
+  {
+    return contains((int)val);
+  }
+  @Override
+  public default boolean removeVal(byte val)
+  {
+    return removeVal((int)val);
+  }
+  @Override
+  public default boolean removeVal(char val)
+  {
+    return removeVal((int)val);
+  }
+    #ENDIF
+  #ENDIF
+  #IFSWITCH ARRTYPE==double
+  public abstract boolean add(float val);
+  public default boolean add(Float val)
+  {
+    return add(val.floatValue());
+  }
+  #ENDIF
+  #IFSWITCH ARRTYPE==float,double
+  public default boolean add(byte val)
+  {
+    return add((short)val);
+  }
+  public default boolean add(Byte val)
+  {
+    return add((short)val.byteValue());
+  }
+  public abstract boolean add(char val);
+  public default boolean add(Character val)
+  {
+    return add(val.charValue());
+  }
+  public abstract boolean add(long val);
+  public default boolean add(Long val)
+  {
+    return add(val.longValue());
+  }
+  public abstract boolean add(short val);
+  public default boolean add(Short val)
+  {
+    return add(val.shortValue());
+  }
+  #ENDIF
+  #IFSWITCH ARRTYPE==short,int
+  public default boolean add(byte val)
+  {
+    return add((ARRTYPE)val);
+  }
+  public default boolean add(Byte val)
+  {
+    return add((ARRTYPE)val.byteValue());
+  }
+  #ENDIF
+  #IFSWITCH ARRTYPE==int,long
+  public default boolean add(char val)
+  {
+    return add((int)val);
+  }
+  public default boolean add(Character val)
+  {
+    return add((int)val.charValue());
+  }
+  public default boolean add(short val)
+  {
+    return add((int)val);
+  }
+  public default boolean add(Short val)
+  {
+    return add((int)val.shortValue());
+  }
+  #ENDIF
+  #IFSWITCH ARRTYPE==long
+  public default boolean add(byte val)
+  {
+    return add((int)val);
+  }
+  public default boolean add(Byte val)
+  {
+    return add((int)val.byteValue());
+  }
+  
+  #ENDIF
+  #IFSWITCH ARRTYPE==long,float,double
+  public abstract boolean add(int val);
+  public default boolean add(Integer val)
+  {
+    return add(val.intValue());
+  }
+  #ENDIF
+  
+  #IFNOTSWITCH ARRTYPE==boolean
+  public abstract boolean add(ARRTYPE val);
+  public default boolean add(Boolean val)
+  {
+    return add(val.booleanValue());
+  }
+  #ENDIF
+  
+}
+#ENDDEF
+  
+  public abstract interface OfRef<E> extends OmniCollection
+  {
+    public abstract boolean add(E val);
+    public abstract void forEach(Consumer<? super E> action);
+    public abstract OmniIterator.OfRef<E> iterator();
+    public abstract boolean removeIf(Predicate<? super E> filter);
+  }
+}
+
+
+
+#MACRODEF ContainsMethodDefault<INPUTTYPE>()
+@Override
+public default boolean contains(INPUTTYPE val)
+{
+  return contains(val.
+  #IFSWITCH INPUTTYPE==Boolean
+    booleanValue
+  #ELSEIFSWITCH INPUTTYPE==Byte
+    byteValue
+  #ELSEIFSWITCH INPUTTYPE==Character
+    charValue
+  #ELSEIFSWITCH INPUTTYPE==Short
+    shortValue
+  #ELSEIFSWITCH INPUTTYPE==Integer
+    intValue
+  #ELSEIFSWITCH INPUTTYPE==Long
+    longValue
+  #ELSEIFSWITCH INPUTTYPE==Float
+    floatValue
+  #ELSEIFSWITCH INPUTTYPE==Double
+    doubleValue
+  #ELSE
+    ERROR unknown input type INPUTTYPE
+  #ENDIF
+      ());
+}
+#ENDDEF
+
+#MACRODEF RemoveValMethodDefault<INPUTTYPE>()
+@Override
+public default boolean removeVal(INPUTTYPE val)
+{
+  return removeVal(val.
+  #IFSWITCH INPUTTYPE==Boolean
+    booleanValue
+  #ELSEIFSWITCH INPUTTYPE==Byte
+    byteValue
+  #ELSEIFSWITCH INPUTTYPE==Character
+    charValue
+  #ELSEIFSWITCH INPUTTYPE==Short
+    shortValue
+  #ELSEIFSWITCH INPUTTYPE==Integer
+    intValue
+  #ELSEIFSWITCH INPUTTYPE==Long
+    longValue
+  #ELSEIFSWITCH INPUTTYPE==Float
+    floatValue
+  #ELSEIFSWITCH INPUTTYPE==Double
+    doubleValue
+  #ELSE
+    ERROR unknown input type INPUTTYPE
+  #ENDIF
+      ());
+}
+#ENDDEF
+
+#MACRODEF ContainsMethodDecl<INPUTTYPE>()
+public abstract boolean contains(INPUTTYPE val);
+#ENDDEF
+#MACRODEF RemoveValMethodDecl<INPUTTYPE>()
+public abstract boolean removeVal(INPUTTYPE val);
+#ENDDEF
+
+#MACRODEF BoxedMethods(METHODMACRO)
+#MACRO METHODMACRO<Boolean>()
+#MACRO METHODMACRO<Byte>()
+#MACRO METHODMACRO<Character>()
+#MACRO METHODMACRO<Short>()
+#MACRO METHODMACRO<Integer>()
+#MACRO METHODMACRO<Long>()
+#MACRO METHODMACRO<Float>()
+#MACRO METHODMACRO<Double>()
+#ENDDEF
+
+#MACRODEF PrimitiveMethods(METHODMACRO)
+#MACRO METHODMACRO<boolean>()
+#MACRO METHODMACRO<byte>()
+#MACRO METHODMACRO<char>()
+#MACRO METHODMACRO<short>()
+#MACRO METHODMACRO<int>()
+#MACRO METHODMACRO<long>()
+#MACRO METHODMACRO<float>()
+#MACRO METHODMACRO<double>()
+#ENDDEF
+
+

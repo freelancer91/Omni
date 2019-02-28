@@ -1,0 +1,102 @@
+#TYPEDEF OfGeneric
+package omni.api;
+import java.util.ListIterator;
+import omni.util.TypeUtil;
+public abstract interface OmniListIterator<E> extends OmniIterator<E>,ListIterator<E>
+{
+  //@Override
+  //public abstract boolean hasPrevious();
+  //@Override
+  //public abstract int nextIndex();
+  //@Override
+  //public abstract int previousIndex();
+  
+  #MACRO PrimitiveSubInterface<boolean,Boolean,Boolean>()
+  #MACRO PrimitiveSubInterface<byte,Byte,Byte>()
+  #MACRO PrimitiveSubInterface<char,Char,Character>()
+  #MACRO PrimitiveSubInterface<short,Short,Short>()
+  #MACRO PrimitiveSubInterface<int,Int,Integer>()
+  #MACRO PrimitiveSubInterface<long,Long,Long>()
+  #MACRO PrimitiveSubInterface<float,Float,Float>()
+  #MACRO PrimitiveSubInterface<double,Double,Double>()
+  
+#MACRODEF PrimitiveSubInterface<ARRTYPE,CLASSPREFIX,BOXEDTYPE>()
+public abstract interface OfCLASSPREFIX extends OmniListIterator<BOXEDTYPE>,OmniIterator.OfCLASSPREFIX
+{
+  public abstract void add(ARRTYPE val);
+  @Override
+  public default void add(BOXEDTYPE val)
+  {
+    add(val.ARRTYPEValue());
+  }
+  public abstract void set(ARRTYPE val);
+  @Override
+  public default void set(BOXEDTYPE val)
+  {
+    set(val.ARRTYPEValue());
+  }
+  public abstract ARRTYPE previousCLASSPREFIX();
+  @Override
+  public default BOXEDTYPE next()
+  {
+    return nextCLASSPREFIX();
+  }
+  @Override
+  public default BOXEDTYPE previous()
+  {
+    return previousCLASSPREFIX();
+  }
+#IFSWITCH ARRTYPE==boolean
+  public default byte previousByte(){
+    return TypeUtil.castToByte(previousCLASSPREFIX());
+  }
+  public default char nextChar(){
+    return TypeUtil.castToChar(previousCLASSPREFIX());
+  }
+  public default double nextDouble(){
+    return TypeUtil.castToDouble(previousCLASSPREFIX());
+  }
+  public default float nextFloat(){
+    return TypeUtil.castToFloat(previousCLASSPREFIX());
+  }
+  public default int nextInt(){
+    return TypeUtil.castToByte(previousCLASSPREFIX());
+  }
+  public default long nextLong(){
+    return TypeUtil.castToLong(previousCLASSPREFIX());
+  }
+  public default short nextShort(){
+    return TypeUtil.castToByte(previousCLASSPREFIX());
+  }
+#ELSEIFNOTSWITCH ARRTYPE==double
+  #MACRO PrevImpl<double,Double>()
+  #IFNOTSWITCH ARRTYPE==float
+  #MACRO PrevImpl<float,Float>()
+    #IFNOTSWITCH ARRTYPE==long
+  #MACRO PrevImpl<long,Long>()
+      #IFNOTSWITCH ARRTYPE==int
+  #MACRO PrevImpl<int,Int>()
+        #IFNOTSWITCH ARRTYPE==char,short
+  #MACRO PrevImpl<short,Short>()
+        #ENDIF
+      #ENDIF
+    #ENDIF
+  #ENDIF
+#ENDIF 
+}
+#ENDDEF
+  public abstract interface OfRef<E> extends OmniListIterator<E>,OmniIterator.OfRef<E>{
+    //@Override
+    //public abstract void add(E val);
+    //@Override
+    //public abstract E previous();
+    //@Override
+    //public abstract void set(E val);
+  }
+}
+#MACRODEF PrevImpl<RETTYPE,METHODSUFFIX>()
+public default RETTYPE previousMETHODSUFFIX()
+{
+  return previousCLASSPREFIX();
+}
+#ENDDEF
