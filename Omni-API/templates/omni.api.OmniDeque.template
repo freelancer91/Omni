@@ -1,0 +1,404 @@
+#TYPEDEF OfGeneric
+package omni.api;
+import omni.util.PeekAndPollIfc;
+import omni.util.TypeUtil;
+public interface OmniDeque extends OmniCollection,OmniQueue,OmniStack
+{
+  #MACRO RemoveFirstOccurrenceDefault<boolean>()
+  #MACRO RemoveFirstOccurrenceDecl<byte>()
+  #MACRO RemoveFirstOccurrenceDecl<char>()
+  #MACRO RemoveFirstOccurrenceDecl<short>()
+  #MACRO RemoveFirstOccurrenceDefault<int>()
+  #MACRO RemoveFirstOccurrenceDefault<long>()
+  #MACRO RemoveFirstOccurrenceDefault<float>()
+  #MACRO RemoveFirstOccurrenceDefault<double>()
+  #MACRO RemoveFirstOccurrenceDecl<Object>()
+  #MACRO BoxedMethods(RemoveFirstOccurrenceDecl)
+  #MACRO BoxedMethods(RemoveLastOccurrenceDecl)
+  public abstract interface OfPrimitive extends OmniCollection,OmniCollection.OfPrimitive,OmniStack,OMniQueue,OmniStack.OfPrimitive,OmniDeque
+  {
+    #MACRO RemoveOccurrenceBoxed<Boolean,boolean>()
+    #MACRO RemoveOccurrenceBoxed<Byte,byte>()
+    #MACRO RemoveOccurrenceBoxed<Character,char>()
+    #MACRO RemoveOccurrenceBoxed<Short,short>()
+    #MACRO RemoveOccurrenceBoxed<Integer,int>()
+    #MACRO RemoveOccurrenceBoxed<Long,long>()
+    #MACRO RemoveOccurrenceBoxed<Float,float>()
+    #MACRO RemoveOccurrenceBoxed<Double,double>()
+#MACRODEF RemoveOccurrenceBoxed<INPUTTYPE,PRIMITIVETYPE>()
+@Override
+public default boolean removeFirstOccurrence(INPUTTYPE val)
+{
+  return val!=null && removeFirstOccurrence(val.PRIMITIVETYPEValue());
+}
+@Override
+public default boolean removeLastOccurrence(INPUTTYPE val)
+{
+  return val!=null && removeLastOccurrence(val.PRIMITIVETYPEValue());
+}
+#ENDDEF
+  }
+  #MACRO PrimitiveSubInterface<boolean,Boolean,Boolean>()
+  #MACRO PrimitiveSubInterface<byte,Byte,Byte>()
+  #MACRO PrimitiveSubInterface<char,Char,Character>()
+  #MACRO PrimitiveSubInterface<short,Short,Short>()
+  #MACRO PrimitiveSubInterface<int,Int,Integer>()
+  #MACRO PrimitiveSubInterface<long,Long,Long>()
+  #MACRO PrimitiveSubInterface<float,Float,Float>()
+  #MACRO PrimitiveSubInterface<double,Double,Double>()
+#MACRODEF PrimitiveSubInterface<ARRTYPE,CLASSPREFIX,BOXEDTYPE>()
+public abstract interface OfCLASSPREFIX extends OmniCollection,OmniCollection.OfPrimitive,OmniCollection.OfCLASSPREFIX,PeekAndPollIfc<BOXEDTYPE>,PeekAndPollIfc.CLASSPREFIXInput,OmniStack,OmniStack.OfPrimitive,OMniStack.OfCLASSPREFIX,OmniQueue,OmniQueue.OfCLASSPREFIX,OmniDeque,OfPrimitive
+#IFNOTSWITCH ARRTYPE==double
+,PeekAndPollIfc.DoubleInput
+  #IFNOTSWITCH ARRTYPE==float
+,PeekAndPollIfc.FloatInput
+    #IFNOTSWITCH ARRTYPE==long
+,PeekAndPollIfc.LongInput
+      #IFNOTSWITCH ARRTYPE==int
+,PeekAndPollIfc.IntInput
+        #IFNOTSWITCH ARRTYPE==char,short
+,PeekAndPollIfc.ShortInput
+          #IFNOTSWITCH ARRTYPE==byte
+,PeekAndPollIfc.ByteInput
+          #ENDIF
+        #ENDIF
+      #ENDIF
+    #ENDIF
+  #ENDIF
+#ENDIF
+{
+  public default void addFirst(ARRTYPE val)
+  {
+    push(val);
+  }
+  public abstract void addFirst(BOXEDTYPE val);
+  public abstract void addLast(ARRTYPE val);
+  public abstract void addLast(BOXEDTYPE val);
+  public abstract boolean offerFirst(ARRTYPE val);
+  public abstract boolean offerLast(ARRTYPE val);
+  public abstract boolean offerFirst(BOXEDTYPE val);
+  public abstract boolean offerLast(BOXEDTYPE val);
+  
+#IFNOTSWITCH ARRTYPE==boolean
+  public default void addFirst(boolean val)
+  {
+    push((ARRTYPE)TypeUtil.
+    #IFSWITCH ARRTYPE==double
+    castToDouble
+    #ELSEIFSWITCH ARRTYPE==float
+    castToFloat
+    #ELSEIFSWITCH ARRTYPE==long
+    castToLong
+    #ELSEIFSWITCH ARRTYPE==int,short,byte
+    castToByte
+    #ELSEIFSWITCH ARRTYPE==char
+    castToChar
+    #ELSE
+     ERROR unknown array type ARRTYPE
+    #ENDIF
+    (val));
+  }
+  public default void addLast(boolean val)
+  {
+    addLast((ARRTYPE)TypeUtil.
+    #IFSWITCH ARRTYPE==double
+    castToDouble
+    #ELSEIFSWITCH ARRTYPE==float
+    castToFloat
+    #ELSEIFSWITCH ARRTYPE==long
+    castToLong
+    #ELSEIFSWITCH ARRTYPE==int,short,byte
+    castToByte
+    #ELSEIFSWITCH ARRTYPE==char
+    castToChar
+    #ELSE
+     ERROR unknown array type ARRTYPE
+    #ENDIF
+    (val));
+  }
+  public default void addFirst(Boolean val)
+  {
+    push((ARRTYPE)TypeUtil.
+    #IFSWITCH ARRTYPE==double
+    castToDouble
+    #ELSEIFSWITCH ARRTYPE==float
+    castToFloat
+    #ELSEIFSWITCH ARRTYPE==long
+    castToLong
+    #ELSEIFSWITCH ARRTYPE==int,short,byte
+    castToByte
+    #ELSEIFSWITCH ARRTYPE==char
+    castToChar
+    #ELSE
+     ERROR unknown array type ARRTYPE
+    #ENDIF
+    (val.booleanValue()));
+  }
+  public default void addLast(Boolean val)
+  {
+    addLast((ARRTYPE)TypeUtil.
+    #IFSWITCH ARRTYPE==double
+    castToDouble
+    #ELSEIFSWITCH ARRTYPE==float
+    castToFloat
+    #ELSEIFSWITCH ARRTYPE==long
+    castToLong
+    #ELSEIFSWITCH ARRTYPE==int,short,byte
+    castToByte
+    #ELSEIFSWITCH ARRTYPE==char
+    castToChar
+    #ELSE
+     ERROR unknown array type ARRTYPE
+    #ENDIF
+    (val.booleanValue()));
+  }
+  public default boolean offerFirst(boolean val)
+  {
+    return offerFirst((ARRTYPE)TypeUtil.
+    #IFSWITCH ARRTYPE==double
+    castToDouble
+    #ELSEIFSWITCH ARRTYPE==float
+    castToFloat
+    #ELSEIFSWITCH ARRTYPE==long
+    castToLong
+    #ELSEIFSWITCH ARRTYPE==int,short,byte
+    castToByte
+    #ELSEIFSWITCH ARRTYPE==char
+    castToChar
+    #ELSE
+     ERROR unknown array type ARRTYPE
+    #ENDIF
+    (val));
+  }
+  public default boolean offerLast(boolean val)
+  {
+    return offerLast((ARRTYPE)TypeUtil.
+    #IFSWITCH ARRTYPE==double
+    castToDouble
+    #ELSEIFSWITCH ARRTYPE==float
+    castToFloat
+    #ELSEIFSWITCH ARRTYPE==long
+    castToLong
+    #ELSEIFSWITCH ARRTYPE==int,short,byte
+    castToByte
+    #ELSEIFSWITCH ARRTYPE==char
+    castToChar
+    #ELSE
+     ERROR unknown array type ARRTYPE
+    #ENDIF
+    (val));
+  }
+  public default boolean offerFirst(Boolean val)
+  {
+    return offerFirst((ARRTYPE)TypeUtil.
+    #IFSWITCH ARRTYPE==double
+    castToDouble
+    #ELSEIFSWITCH ARRTYPE==float
+    castToFloat
+    #ELSEIFSWITCH ARRTYPE==long
+    castToLong
+    #ELSEIFSWITCH ARRTYPE==int,short,byte
+    castToByte
+    #ELSEIFSWITCH ARRTYPE==char
+    castToChar
+    #ELSE
+     ERROR unknown array type ARRTYPE
+    #ENDIF
+    (val.booleanValue()));
+  }
+  public default boolean offerLast(Boolean val)
+  {
+    return offerLast((ARRTYPE)TypeUtil.
+    #IFSWITCH ARRTYPE==double
+    castToDouble
+    #ELSEIFSWITCH ARRTYPE==float
+    castToFloat
+    #ELSEIFSWITCH ARRTYPE==long
+    castToLong
+    #ELSEIFSWITCH ARRTYPE==int,short,byte
+    castToByte
+    #ELSEIFSWITCH ARRTYPE==char
+    castToChar
+    #ELSE
+     ERROR unknown array type ARRTYPE
+    #ENDIF
+    (val.booleanValue()));
+  }
+  #IFNOTSWITCH ARRTYPE==byte,char
+  #MACRO AddAndOfferImpls<byte,Byte>()
+    #IFNOTSWITCH ARRTYPE==short
+  #MACRO AddAndOfferImpls<short,Short>()
+      #IFNOTSWITCH ARRTYPE==int
+  #MACRO AddAndOfferImpls<int,Integer>()
+        #IFNOTSWITCH ARRTYPE==long
+  #MACRO AddAndOfferImpls<long,Long>()
+          #IFNOTSWITCH ARRTYPE==float
+  #MACRO AddAndOfferImpls<float,Float>()
+          #ENDIF
+        #ENDIF
+      #ENDIF
+    #ENDIF
+  #ENDIF
+#ENDIF
+#IFSWITCH ARRTYPE==boolean
+  //TODO getAndRemoveImpls
+#ELSEIFNOTSWITCH ARRTYPE==double
+  #MACRO GetAndRemoveImpls<double,Double>()
+  #IFNOTSWITCH ARRTYPE==float
+  #MACRO GetAndRemoveImpls<float,Float>()
+    #IFNOTSWITCH ARRTYPE==long
+  #MACRO GetAndRemoveImpls<long,Long>()
+      #IFNOTSWITCH ARRTYPE==int
+  #MACRO GetAndRemoveImpls<int,Int>()
+        #IFNOTSWITCH ARRTYPE==char,short
+  #MACRO GetAndRemoveImpls<short,Short>()
+        #ENDIF
+      #ENDIF
+    #ENDIF
+  #ENDIF
+#ENDIF
+  
+  public abstract OmniIterator.OfCLASSPREFIX descendingIterator();
+  public abstract BOXEDTYPE getFirst();
+  public abstract BOXEDTYPE getLast();
+  public default ARRTYPE getFirstCLASSPREFIX()
+  {
+    return ARRTYPEElement();
+  }
+  public abstract ARRTYPE getLastCLASSPREFIX();
+
+  public abstract BOXEDTYPE peekFirst();
+  public abstract BOXEDTYPE peekLast();
+  public abstract BOXEDTYPE pollFirst();
+  public abstract BOXEDTYPE pollLast();
+  
+  @Override
+  public default ARRTYPE removeCLASSPREFIX()
+  {
+    return popCLASSPREFIX();
+  }
+  
+  //TODO get methods
+  //TODO remove
+
+  //TODO peek
+  //TODO peekFirst
+  //TODO peekLast
+  //TODO pollFirst
+  //TODO pollLast
+  //TODO poll
+  
+  //TODO removeFirstOccurrence defaults
+  //TODO removeLastOccurrence defaults
+  
+}
+#ENDDEF
+  public abstract interface OfRef<E> extends OmniCollection,OmniCollection.OfRef<E>,PeekAndPollIfc<E>,OmniStack,OmniStack.OfRef<E>,OmniQueue,OmniQueue.OfRef<E>,OmniDeque
+  {
+    public abstract void addFirst(E val);
+    public abstract void addLast(E val);
+    OmniIterator.OfRef<E> descendingIterator();
+    public abstract E getFirst();
+    public abstract E getLast();
+    public abstract boolean offerFirst(E val);
+    public abstract boolean offerLast(E val);
+    public abstract E peekFirst();
+    public abstract E peekLast();
+    public abstract E pollFirst();
+    public abstract E pollLast();
+    public abstract E removeFirst();
+    public abstract E removeLast();
+    #MACRO BoxedMethods(RemoveFirstOccurrenceDefault)
+    #MACRO RemoveFirstOccurrenceDefault<byte>()
+    #MACRO RemoveFirstOccurrenceDefault<char>()
+    #MACRO RemoveFirstOccurrenceDefault<short>()
+  }
+}
+#MACRODEF GetAndRemoveImpls<RETTYPE,METHODSUFFIX>()
+public default RETTYPE getFirstMETHODSUFFIX()
+{
+  return ARRTYPEElement();
+}
+public default RETTYPE getLastMETHODSUFFIX()
+{
+  return getLastCLASSPREFIX();
+}
+public default RETTYPE removeFirstMETHODSUFFIX()
+{
+  return popCLASSPREFIX();
+}
+public default RETTYPE removeLastMETHODSUFFIX()
+{
+  return removeLastCLASSPREFIX();
+}
+#ENDDEF
+#MACRODEF AddAndOfferImpls<PRIMITIVEINPUTTYPE,BOXEDINPUTTYPE>()
+public default void addFirst(PRIMITIVEINPUTTYPE val)
+{
+  push((ARRTYPE)val);
+}
+public default void addLast(PRIMITIVEINPUTTYPE val)
+{
+  addLast((ARRTYPE)val);
+}
+public default boolean offerFirst(PRIMITIVEINPUTTYPE val)
+{
+  return offerFirst((ARRTYPE)val);
+}
+public default boolean offerLast(PRIMITIVEINPUTTYPE val)
+{
+  return offerLast((ARRTYPE)val);
+}
+public default void addFirst(BOXEDINPUTTYPE val)
+{
+  push((ADDTYPE)val.PRIMITIVEINPUTTYPEValue());
+}
+public default void addLast(BOXEDINPUTTYPE val)
+{
+  addLast((ARRTYPE)val.PRIMITIVEINPUTTYPEValue());
+}
+public default boolean offerFirst(BOXEDINPUTTYPE val)
+{
+  return offerFirst((ARRTYPE)val.PRIMITIVEINPUTTYPEValue());
+}
+public default boolean offerLast(BOXEDINPUTTYPE val)
+{
+  return offerLast((ARRTYPE)val.PRIMITIVEINPUTTYPEValue());
+}
+#ENDDEF
+
+#MACRODEF RemoveFirstOccurrenceDecl<INPUTTYPE>()
+public abstract boolean removeFirstOccurrence(INPUTTYPE val);
+#ENDDEF
+#MACRODEF RemoveLastOccurrenceDecl<INPUTTYPE>()
+public abstract boolean removeLastOccurrence(INPUTTYPE val);
+#ENDDEF
+
+#MACRODEF RemoveFirstOccurrenceDefault<INPUTTYPE>()
+public default boolean removeFirstOccurrence(INPUTTYPE val)
+{
+  return removeVal(val);
+}
+#ENDDEF
+
+#MACRODEF PrimitiveMethods(MACRONAME)
+#MACRO MACRONAME<boolean>()
+#MACRO MACRONAME<byte>()
+#MACRO MACRONAME<char>()
+#MACRO MACRONAME<short>()
+#MACRO MACRONAME<int>()
+#MACRO MACRONAME<long>()
+#MACRO MACRONAME<float>()
+#MACRO MACRONAME<double>()
+#ENDDEF
+
+#MACRODEF BoxedMethods(MACRONAME)
+#MACRO MACRONAME<Boolean>()
+#MACRO MACRONAME<Byte>()
+#MACRO MACRONAME<Character>()
+#MACRO MACRONAME<Short>()
+#MACRO MACRONAME<Integer>()
+#MACRO MACRONAME<Long>()
+#MACRO MACRONAME<Float>()
+#MACRO MACRONAME<Double>()
+#ENDDEF
