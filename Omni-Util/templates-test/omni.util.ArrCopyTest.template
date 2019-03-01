@@ -87,12 +87,12 @@ public class ArrCopyTest
 
 #MACRODEF TestSelfCopy<ARRTYPE>()
 @Test
-public void testUncheckedSelfCopyARRTYPE()
+public void testsemicheckedSelfCopyARRTYPE()
 {
   Random rand=new Random(0);
   for(int i=0;i<1000;++i)
   {
-    int srcLength=JunitUtil.randomIntBetween(1,1000,rand);
+    int srcLength=JunitUtil.randomIntBetween(0,1000,rand);
     ARRTYPE[] src=new ARRTYPE[srcLength];
     JunitUtil.ARRTYPEArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
     int copyLength,srcOffset,dstOffset;
@@ -106,12 +106,12 @@ public void testUncheckedSelfCopyARRTYPE()
         dstOffset=JunitUtil.randomIntBetween(0,srcLength-copyLength,rand);
         break;
       case 1:
-        copyLength=JunitUtil.randomIntBetween(1,5,rand);
+        copyLength=JunitUtil.randomIntBetween(0,5,rand);
         srcOffset=JunitUtil.randomIntBetween(0,srcLength-copyLength,rand);
         dstOffset=JunitUtil.randomIntBetween(0,srcOffset,rand);
         break;
       default:
-        copyLength=JunitUtil.randomIntBetween(1,srcLength/2,rand);
+        copyLength=JunitUtil.randomIntBetween(0,srcLength/2,rand);
         dstOffset=JunitUtil.randomIntBetween(copyLength,srcLength-copyLength,rand);
         srcOffset=JunitUtil.randomIntBetween(0,dstOffset-copyLength,rand);
         break;
@@ -119,27 +119,31 @@ public void testUncheckedSelfCopyARRTYPE()
     }
     else
     {
-      if(srcLength==1||rand.nextBoolean())
+      if(srcLength<2||rand.nextBoolean())
       {
-        copyLength=JunitUtil.randomIntBetween(1,srcLength,rand);
+        copyLength=JunitUtil.randomIntBetween(0,srcLength,rand);
         srcOffset=JunitUtil.randomIntBetween(0,srcLength-copyLength,rand);
         dstOffset=JunitUtil.randomIntBetween(0,srcOffset,rand);
       }
       else
       {
-        copyLength=JunitUtil.randomIntBetween(1,srcLength/2,rand);
+        copyLength=JunitUtil.randomIntBetween(0,srcLength/2,rand);
         dstOffset=JunitUtil.randomIntBetween(copyLength,srcLength-copyLength,rand);
         srcOffset=JunitUtil.randomIntBetween(0,dstOffset-copyLength,rand);
       }
     }
     ARRTYPE[] copy=new ARRTYPE[copyLength];
-    ArrCopy.uncheckedCopy(src,srcOffset,copy,0,copyLength);
-    ArrCopy.uncheckedSelfCopy(src,srcOffset,dstOffset,copyLength);
-    #IFSWITCH PARALLEL==true
-    JunitUtil.uncheckedparallelassertarraysAreEqual(src,dstOffset,copy,0,copyLength);
-    #ELSE
-    JunitUtil.uncheckedassertarraysAreEqual(src,dstOffset,copy,0,copyLength);
-    #ENDIF
+    ArrCopy.semicheckedCopy(src,srcOffset,copy,0,copyLength);
+    ArrCopy.semicheckedSelfCopy(src,srcOffset,dstOffset,copyLength);
+    if(copyLength!=0)
+    {
+      #IFSWITCH PARALLEL==true
+      JunitUtil.uncheckedparallelassertarraysAreEqual(src,dstOffset,copy,0,copyLength);
+      #ELSE
+      JunitUtil.uncheckedassertarraysAreEqual(src,dstOffset,copy,0,copyLength);
+      #ENDIF
+    }
+
   }
 }
 #ENDDEF

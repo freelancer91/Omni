@@ -1,0 +1,19 @@
+#TYPEDEF OfGeneric
+package omni.api;
+public abstract interface OmniSet extends OmniCollection
+{
+  #MACRO PrimitiveSubInterface<boolean,Boolean,Boolean>()
+  #MACRO PrimitiveSubInterface<byte,Byte,Byte>()
+  #MACRO PrimitiveSubInterface<char,Char,Character>()
+  #MACRO PrimitiveSubInterface<short,Short,Short>()
+  #MACRO PrimitiveSubInterface<int,Int,Integer>()
+  #MACRO PrimitiveSubInterface<long,Long,Long>()
+  #MACRO PrimitiveSubInterface<float,Float,Float>()
+  #MACRO PrimitiveSubInterface<double,Double,Double>()
+  
+#MACRODEF PrimitiveSubInterface<ARRTYPE,CLASSPREFIX,BOXEDTYPE>()
+  public abstract interface OfCLASSPREFIX extends OmniCollection,OmniCollection.OfPrimitive,OmniCollection.OfCLASSPREFIX,OmniSet{}
+
+#ENDDEF
+  public abstract interface OfRef<E>extends OmniCollection,OmniCollection.OfRef<E>,OmniSet{}
+}

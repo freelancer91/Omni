@@ -194,6 +194,7 @@ public abstract interface OmniCollection
     public abstract int[] toIntArray();
     public abstract short[] toShortArray();
     public abstract byte[] toByteArray();
+    public abstract char[] toCharArray();
     @Override
     public default boolean contains(short val)
     {

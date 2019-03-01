@@ -161,6 +161,18 @@ static void uncheckedReverseCopy(ARR[] src,int srcOffset,ARR[] dst,int dstOffset
   #MACRO Assert(dstOffset+length<=dst.length)
   for(dst[dstOffset]=(src[length+=(srcOffset-1)]);length!=srcOffset;dst[++dstOffset]=(src[--length])){}
 }
+static void semicheckedSelfCopy(ARR[] src,int srcOffset,int dstOffset,int length)
+{
+  #MACRO Assert(srcOffset>=0)
+  #MACRO Assert(dstOffset>=0)
+  #MACRO Assert(length>=0)
+  #MACRO Assert(srcOffset+length<=src.length)
+  #MACRO Assert(dstOffset+length<=dst.length)
+  if(length!=0)
+  {
+    uncheckedSelfCopy(src,srcOffset,dstOffset,length);
+  }
+}
 static void uncheckedSelfCopy(ARR[] src,int srcOffset,int dstOffset,int length)
 {
   #MACRO Assert(srcOffset>=0)

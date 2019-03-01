@@ -74,6 +74,7 @@ public abstract interface OfCLASSPREFIX extends OfPrimitive
   public abstract short[] toShortArray();
             #IFNOTSWITCH ARRTYPE==byte
   public abstract byte[] toByteArray();
+  public abstract char[] toCharArray();
             #ENDIF
           #ENDIF
         #ENDIF

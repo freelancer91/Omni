@@ -2836,12 +2836,12 @@ public class ArrCopyTest
       }
     }
     @Test
-    public void testUncheckedSelfCopyboolean()
+    public void testsemicheckedSelfCopyboolean()
     {
       Random rand=new Random(0);
       for(int i=0;i<1000;++i)
       {
-        int srcLength=JunitUtil.randomIntBetween(1,1000,rand);
+        int srcLength=JunitUtil.randomIntBetween(0,1000,rand);
         boolean[] src=new boolean[srcLength];
         JunitUtil.booleanArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
         int copyLength,srcOffset,dstOffset;
@@ -2855,12 +2855,12 @@ public class ArrCopyTest
             dstOffset=JunitUtil.randomIntBetween(0,srcLength-copyLength,rand);
             break;
           case 1:
-            copyLength=JunitUtil.randomIntBetween(1,5,rand);
+            copyLength=JunitUtil.randomIntBetween(0,5,rand);
             srcOffset=JunitUtil.randomIntBetween(0,srcLength-copyLength,rand);
             dstOffset=JunitUtil.randomIntBetween(0,srcOffset,rand);
             break;
           default:
-            copyLength=JunitUtil.randomIntBetween(1,srcLength/2,rand);
+            copyLength=JunitUtil.randomIntBetween(0,srcLength/2,rand);
             dstOffset=JunitUtil.randomIntBetween(copyLength,srcLength-copyLength,rand);
             srcOffset=JunitUtil.randomIntBetween(0,dstOffset-copyLength,rand);
             break;
@@ -2868,32 +2868,35 @@ public class ArrCopyTest
         }
         else
         {
-          if(srcLength==1||rand.nextBoolean())
+          if(srcLength<2||rand.nextBoolean())
           {
-            copyLength=JunitUtil.randomIntBetween(1,srcLength,rand);
+            copyLength=JunitUtil.randomIntBetween(0,srcLength,rand);
             srcOffset=JunitUtil.randomIntBetween(0,srcLength-copyLength,rand);
             dstOffset=JunitUtil.randomIntBetween(0,srcOffset,rand);
           }
           else
           {
-            copyLength=JunitUtil.randomIntBetween(1,srcLength/2,rand);
+            copyLength=JunitUtil.randomIntBetween(0,srcLength/2,rand);
             dstOffset=JunitUtil.randomIntBetween(copyLength,srcLength-copyLength,rand);
             srcOffset=JunitUtil.randomIntBetween(0,dstOffset-copyLength,rand);
           }
         }
         boolean[] copy=new boolean[copyLength];
-        ArrCopy.uncheckedCopy(src,srcOffset,copy,0,copyLength);
-        ArrCopy.uncheckedSelfCopy(src,srcOffset,dstOffset,copyLength);
-        JunitUtil.uncheckedassertarraysAreEqual(src,dstOffset,copy,0,copyLength);
+        ArrCopy.semicheckedCopy(src,srcOffset,copy,0,copyLength);
+        ArrCopy.semicheckedSelfCopy(src,srcOffset,dstOffset,copyLength);
+        if(copyLength!=0)
+        {
+          JunitUtil.uncheckedassertarraysAreEqual(src,dstOffset,copy,0,copyLength);
+        }
       }
     }
     @Test
-    public void testUncheckedSelfCopybyte()
+    public void testsemicheckedSelfCopybyte()
     {
       Random rand=new Random(0);
       for(int i=0;i<1000;++i)
       {
-        int srcLength=JunitUtil.randomIntBetween(1,1000,rand);
+        int srcLength=JunitUtil.randomIntBetween(0,1000,rand);
         byte[] src=new byte[srcLength];
         JunitUtil.byteArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
         int copyLength,srcOffset,dstOffset;
@@ -2907,12 +2910,12 @@ public class ArrCopyTest
             dstOffset=JunitUtil.randomIntBetween(0,srcLength-copyLength,rand);
             break;
           case 1:
-            copyLength=JunitUtil.randomIntBetween(1,5,rand);
+            copyLength=JunitUtil.randomIntBetween(0,5,rand);
             srcOffset=JunitUtil.randomIntBetween(0,srcLength-copyLength,rand);
             dstOffset=JunitUtil.randomIntBetween(0,srcOffset,rand);
             break;
           default:
-            copyLength=JunitUtil.randomIntBetween(1,srcLength/2,rand);
+            copyLength=JunitUtil.randomIntBetween(0,srcLength/2,rand);
             dstOffset=JunitUtil.randomIntBetween(copyLength,srcLength-copyLength,rand);
             srcOffset=JunitUtil.randomIntBetween(0,dstOffset-copyLength,rand);
             break;
@@ -2920,32 +2923,35 @@ public class ArrCopyTest
         }
         else
         {
-          if(srcLength==1||rand.nextBoolean())
+          if(srcLength<2||rand.nextBoolean())
           {
-            copyLength=JunitUtil.randomIntBetween(1,srcLength,rand);
+            copyLength=JunitUtil.randomIntBetween(0,srcLength,rand);
             srcOffset=JunitUtil.randomIntBetween(0,srcLength-copyLength,rand);
             dstOffset=JunitUtil.randomIntBetween(0,srcOffset,rand);
           }
           else
           {
-            copyLength=JunitUtil.randomIntBetween(1,srcLength/2,rand);
+            copyLength=JunitUtil.randomIntBetween(0,srcLength/2,rand);
             dstOffset=JunitUtil.randomIntBetween(copyLength,srcLength-copyLength,rand);
             srcOffset=JunitUtil.randomIntBetween(0,dstOffset-copyLength,rand);
           }
         }
         byte[] copy=new byte[copyLength];
-        ArrCopy.uncheckedCopy(src,srcOffset,copy,0,copyLength);
-        ArrCopy.uncheckedSelfCopy(src,srcOffset,dstOffset,copyLength);
-        JunitUtil.uncheckedassertarraysAreEqual(src,dstOffset,copy,0,copyLength);
+        ArrCopy.semicheckedCopy(src,srcOffset,copy,0,copyLength);
+        ArrCopy.semicheckedSelfCopy(src,srcOffset,dstOffset,copyLength);
+        if(copyLength!=0)
+        {
+          JunitUtil.uncheckedassertarraysAreEqual(src,dstOffset,copy,0,copyLength);
+        }
       }
     }
     @Test
-    public void testUncheckedSelfCopychar()
+    public void testsemicheckedSelfCopychar()
     {
       Random rand=new Random(0);
       for(int i=0;i<1000;++i)
       {
-        int srcLength=JunitUtil.randomIntBetween(1,1000,rand);
+        int srcLength=JunitUtil.randomIntBetween(0,1000,rand);
         char[] src=new char[srcLength];
         JunitUtil.charArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
         int copyLength,srcOffset,dstOffset;
@@ -2959,12 +2965,12 @@ public class ArrCopyTest
             dstOffset=JunitUtil.randomIntBetween(0,srcLength-copyLength,rand);
             break;
           case 1:
-            copyLength=JunitUtil.randomIntBetween(1,5,rand);
+            copyLength=JunitUtil.randomIntBetween(0,5,rand);
             srcOffset=JunitUtil.randomIntBetween(0,srcLength-copyLength,rand);
             dstOffset=JunitUtil.randomIntBetween(0,srcOffset,rand);
             break;
           default:
-            copyLength=JunitUtil.randomIntBetween(1,srcLength/2,rand);
+            copyLength=JunitUtil.randomIntBetween(0,srcLength/2,rand);
             dstOffset=JunitUtil.randomIntBetween(copyLength,srcLength-copyLength,rand);
             srcOffset=JunitUtil.randomIntBetween(0,dstOffset-copyLength,rand);
             break;
@@ -2972,32 +2978,35 @@ public class ArrCopyTest
         }
         else
         {
-          if(srcLength==1||rand.nextBoolean())
+          if(srcLength<2||rand.nextBoolean())
           {
-            copyLength=JunitUtil.randomIntBetween(1,srcLength,rand);
+            copyLength=JunitUtil.randomIntBetween(0,srcLength,rand);
             srcOffset=JunitUtil.randomIntBetween(0,srcLength-copyLength,rand);
             dstOffset=JunitUtil.randomIntBetween(0,srcOffset,rand);
           }
           else
           {
-            copyLength=JunitUtil.randomIntBetween(1,srcLength/2,rand);
+            copyLength=JunitUtil.randomIntBetween(0,srcLength/2,rand);
             dstOffset=JunitUtil.randomIntBetween(copyLength,srcLength-copyLength,rand);
             srcOffset=JunitUtil.randomIntBetween(0,dstOffset-copyLength,rand);
           }
         }
         char[] copy=new char[copyLength];
-        ArrCopy.uncheckedCopy(src,srcOffset,copy,0,copyLength);
-        ArrCopy.uncheckedSelfCopy(src,srcOffset,dstOffset,copyLength);
-        JunitUtil.uncheckedassertarraysAreEqual(src,dstOffset,copy,0,copyLength);
+        ArrCopy.semicheckedCopy(src,srcOffset,copy,0,copyLength);
+        ArrCopy.semicheckedSelfCopy(src,srcOffset,dstOffset,copyLength);
+        if(copyLength!=0)
+        {
+          JunitUtil.uncheckedassertarraysAreEqual(src,dstOffset,copy,0,copyLength);
+        }
       }
     }
     @Test
-    public void testUncheckedSelfCopyshort()
+    public void testsemicheckedSelfCopyshort()
     {
       Random rand=new Random(0);
       for(int i=0;i<1000;++i)
       {
-        int srcLength=JunitUtil.randomIntBetween(1,1000,rand);
+        int srcLength=JunitUtil.randomIntBetween(0,1000,rand);
         short[] src=new short[srcLength];
         JunitUtil.shortArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
         int copyLength,srcOffset,dstOffset;
@@ -3011,12 +3020,12 @@ public class ArrCopyTest
             dstOffset=JunitUtil.randomIntBetween(0,srcLength-copyLength,rand);
             break;
           case 1:
-            copyLength=JunitUtil.randomIntBetween(1,5,rand);
+            copyLength=JunitUtil.randomIntBetween(0,5,rand);
             srcOffset=JunitUtil.randomIntBetween(0,srcLength-copyLength,rand);
             dstOffset=JunitUtil.randomIntBetween(0,srcOffset,rand);
             break;
           default:
-            copyLength=JunitUtil.randomIntBetween(1,srcLength/2,rand);
+            copyLength=JunitUtil.randomIntBetween(0,srcLength/2,rand);
             dstOffset=JunitUtil.randomIntBetween(copyLength,srcLength-copyLength,rand);
             srcOffset=JunitUtil.randomIntBetween(0,dstOffset-copyLength,rand);
             break;
@@ -3024,32 +3033,35 @@ public class ArrCopyTest
         }
         else
         {
-          if(srcLength==1||rand.nextBoolean())
+          if(srcLength<2||rand.nextBoolean())
           {
-            copyLength=JunitUtil.randomIntBetween(1,srcLength,rand);
+            copyLength=JunitUtil.randomIntBetween(0,srcLength,rand);
             srcOffset=JunitUtil.randomIntBetween(0,srcLength-copyLength,rand);
             dstOffset=JunitUtil.randomIntBetween(0,srcOffset,rand);
           }
           else
           {
-            copyLength=JunitUtil.randomIntBetween(1,srcLength/2,rand);
+            copyLength=JunitUtil.randomIntBetween(0,srcLength/2,rand);
             dstOffset=JunitUtil.randomIntBetween(copyLength,srcLength-copyLength,rand);
             srcOffset=JunitUtil.randomIntBetween(0,dstOffset-copyLength,rand);
           }
         }
         short[] copy=new short[copyLength];
-        ArrCopy.uncheckedCopy(src,srcOffset,copy,0,copyLength);
-        ArrCopy.uncheckedSelfCopy(src,srcOffset,dstOffset,copyLength);
-        JunitUtil.uncheckedassertarraysAreEqual(src,dstOffset,copy,0,copyLength);
+        ArrCopy.semicheckedCopy(src,srcOffset,copy,0,copyLength);
+        ArrCopy.semicheckedSelfCopy(src,srcOffset,dstOffset,copyLength);
+        if(copyLength!=0)
+        {
+          JunitUtil.uncheckedassertarraysAreEqual(src,dstOffset,copy,0,copyLength);
+        }
       }
     }
     @Test
-    public void testUncheckedSelfCopyint()
+    public void testsemicheckedSelfCopyint()
     {
       Random rand=new Random(0);
       for(int i=0;i<1000;++i)
       {
-        int srcLength=JunitUtil.randomIntBetween(1,1000,rand);
+        int srcLength=JunitUtil.randomIntBetween(0,1000,rand);
         int[] src=new int[srcLength];
         JunitUtil.intArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
         int copyLength,srcOffset,dstOffset;
@@ -3063,12 +3075,12 @@ public class ArrCopyTest
             dstOffset=JunitUtil.randomIntBetween(0,srcLength-copyLength,rand);
             break;
           case 1:
-            copyLength=JunitUtil.randomIntBetween(1,5,rand);
+            copyLength=JunitUtil.randomIntBetween(0,5,rand);
             srcOffset=JunitUtil.randomIntBetween(0,srcLength-copyLength,rand);
             dstOffset=JunitUtil.randomIntBetween(0,srcOffset,rand);
             break;
           default:
-            copyLength=JunitUtil.randomIntBetween(1,srcLength/2,rand);
+            copyLength=JunitUtil.randomIntBetween(0,srcLength/2,rand);
             dstOffset=JunitUtil.randomIntBetween(copyLength,srcLength-copyLength,rand);
             srcOffset=JunitUtil.randomIntBetween(0,dstOffset-copyLength,rand);
             break;
@@ -3076,32 +3088,35 @@ public class ArrCopyTest
         }
         else
         {
-          if(srcLength==1||rand.nextBoolean())
+          if(srcLength<2||rand.nextBoolean())
           {
-            copyLength=JunitUtil.randomIntBetween(1,srcLength,rand);
+            copyLength=JunitUtil.randomIntBetween(0,srcLength,rand);
             srcOffset=JunitUtil.randomIntBetween(0,srcLength-copyLength,rand);
             dstOffset=JunitUtil.randomIntBetween(0,srcOffset,rand);
           }
           else
           {
-            copyLength=JunitUtil.randomIntBetween(1,srcLength/2,rand);
+            copyLength=JunitUtil.randomIntBetween(0,srcLength/2,rand);
             dstOffset=JunitUtil.randomIntBetween(copyLength,srcLength-copyLength,rand);
             srcOffset=JunitUtil.randomIntBetween(0,dstOffset-copyLength,rand);
           }
         }
         int[] copy=new int[copyLength];
-        ArrCopy.uncheckedCopy(src,srcOffset,copy,0,copyLength);
-        ArrCopy.uncheckedSelfCopy(src,srcOffset,dstOffset,copyLength);
-        JunitUtil.uncheckedassertarraysAreEqual(src,dstOffset,copy,0,copyLength);
+        ArrCopy.semicheckedCopy(src,srcOffset,copy,0,copyLength);
+        ArrCopy.semicheckedSelfCopy(src,srcOffset,dstOffset,copyLength);
+        if(copyLength!=0)
+        {
+          JunitUtil.uncheckedassertarraysAreEqual(src,dstOffset,copy,0,copyLength);
+        }
       }
     }
     @Test
-    public void testUncheckedSelfCopylong()
+    public void testsemicheckedSelfCopylong()
     {
       Random rand=new Random(0);
       for(int i=0;i<1000;++i)
       {
-        int srcLength=JunitUtil.randomIntBetween(1,1000,rand);
+        int srcLength=JunitUtil.randomIntBetween(0,1000,rand);
         long[] src=new long[srcLength];
         JunitUtil.longArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
         int copyLength,srcOffset,dstOffset;
@@ -3115,12 +3130,12 @@ public class ArrCopyTest
             dstOffset=JunitUtil.randomIntBetween(0,srcLength-copyLength,rand);
             break;
           case 1:
-            copyLength=JunitUtil.randomIntBetween(1,5,rand);
+            copyLength=JunitUtil.randomIntBetween(0,5,rand);
             srcOffset=JunitUtil.randomIntBetween(0,srcLength-copyLength,rand);
             dstOffset=JunitUtil.randomIntBetween(0,srcOffset,rand);
             break;
           default:
-            copyLength=JunitUtil.randomIntBetween(1,srcLength/2,rand);
+            copyLength=JunitUtil.randomIntBetween(0,srcLength/2,rand);
             dstOffset=JunitUtil.randomIntBetween(copyLength,srcLength-copyLength,rand);
             srcOffset=JunitUtil.randomIntBetween(0,dstOffset-copyLength,rand);
             break;
@@ -3128,32 +3143,35 @@ public class ArrCopyTest
         }
         else
         {
-          if(srcLength==1||rand.nextBoolean())
+          if(srcLength<2||rand.nextBoolean())
           {
-            copyLength=JunitUtil.randomIntBetween(1,srcLength,rand);
+            copyLength=JunitUtil.randomIntBetween(0,srcLength,rand);
             srcOffset=JunitUtil.randomIntBetween(0,srcLength-copyLength,rand);
             dstOffset=JunitUtil.randomIntBetween(0,srcOffset,rand);
           }
           else
           {
-            copyLength=JunitUtil.randomIntBetween(1,srcLength/2,rand);
+            copyLength=JunitUtil.randomIntBetween(0,srcLength/2,rand);
             dstOffset=JunitUtil.randomIntBetween(copyLength,srcLength-copyLength,rand);
             srcOffset=JunitUtil.randomIntBetween(0,dstOffset-copyLength,rand);
           }
         }
         long[] copy=new long[copyLength];
-        ArrCopy.uncheckedCopy(src,srcOffset,copy,0,copyLength);
-        ArrCopy.uncheckedSelfCopy(src,srcOffset,dstOffset,copyLength);
-        JunitUtil.uncheckedassertarraysAreEqual(src,dstOffset,copy,0,copyLength);
+        ArrCopy.semicheckedCopy(src,srcOffset,copy,0,copyLength);
+        ArrCopy.semicheckedSelfCopy(src,srcOffset,dstOffset,copyLength);
+        if(copyLength!=0)
+        {
+          JunitUtil.uncheckedassertarraysAreEqual(src,dstOffset,copy,0,copyLength);
+        }
       }
     }
     @Test
-    public void testUncheckedSelfCopyfloat()
+    public void testsemicheckedSelfCopyfloat()
     {
       Random rand=new Random(0);
       for(int i=0;i<1000;++i)
       {
-        int srcLength=JunitUtil.randomIntBetween(1,1000,rand);
+        int srcLength=JunitUtil.randomIntBetween(0,1000,rand);
         float[] src=new float[srcLength];
         JunitUtil.floatArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
         int copyLength,srcOffset,dstOffset;
@@ -3167,12 +3185,12 @@ public class ArrCopyTest
             dstOffset=JunitUtil.randomIntBetween(0,srcLength-copyLength,rand);
             break;
           case 1:
-            copyLength=JunitUtil.randomIntBetween(1,5,rand);
+            copyLength=JunitUtil.randomIntBetween(0,5,rand);
             srcOffset=JunitUtil.randomIntBetween(0,srcLength-copyLength,rand);
             dstOffset=JunitUtil.randomIntBetween(0,srcOffset,rand);
             break;
           default:
-            copyLength=JunitUtil.randomIntBetween(1,srcLength/2,rand);
+            copyLength=JunitUtil.randomIntBetween(0,srcLength/2,rand);
             dstOffset=JunitUtil.randomIntBetween(copyLength,srcLength-copyLength,rand);
             srcOffset=JunitUtil.randomIntBetween(0,dstOffset-copyLength,rand);
             break;
@@ -3180,32 +3198,35 @@ public class ArrCopyTest
         }
         else
         {
-          if(srcLength==1||rand.nextBoolean())
+          if(srcLength<2||rand.nextBoolean())
           {
-            copyLength=JunitUtil.randomIntBetween(1,srcLength,rand);
+            copyLength=JunitUtil.randomIntBetween(0,srcLength,rand);
             srcOffset=JunitUtil.randomIntBetween(0,srcLength-copyLength,rand);
             dstOffset=JunitUtil.randomIntBetween(0,srcOffset,rand);
           }
           else
           {
-            copyLength=JunitUtil.randomIntBetween(1,srcLength/2,rand);
+            copyLength=JunitUtil.randomIntBetween(0,srcLength/2,rand);
             dstOffset=JunitUtil.randomIntBetween(copyLength,srcLength-copyLength,rand);
             srcOffset=JunitUtil.randomIntBetween(0,dstOffset-copyLength,rand);
           }
         }
         float[] copy=new float[copyLength];
-        ArrCopy.uncheckedCopy(src,srcOffset,copy,0,copyLength);
-        ArrCopy.uncheckedSelfCopy(src,srcOffset,dstOffset,copyLength);
-        JunitUtil.uncheckedassertarraysAreEqual(src,dstOffset,copy,0,copyLength);
+        ArrCopy.semicheckedCopy(src,srcOffset,copy,0,copyLength);
+        ArrCopy.semicheckedSelfCopy(src,srcOffset,dstOffset,copyLength);
+        if(copyLength!=0)
+        {
+          JunitUtil.uncheckedassertarraysAreEqual(src,dstOffset,copy,0,copyLength);
+        }
       }
     }
     @Test
-    public void testUncheckedSelfCopydouble()
+    public void testsemicheckedSelfCopydouble()
     {
       Random rand=new Random(0);
       for(int i=0;i<1000;++i)
       {
-        int srcLength=JunitUtil.randomIntBetween(1,1000,rand);
+        int srcLength=JunitUtil.randomIntBetween(0,1000,rand);
         double[] src=new double[srcLength];
         JunitUtil.doubleArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
         int copyLength,srcOffset,dstOffset;
@@ -3219,12 +3240,12 @@ public class ArrCopyTest
             dstOffset=JunitUtil.randomIntBetween(0,srcLength-copyLength,rand);
             break;
           case 1:
-            copyLength=JunitUtil.randomIntBetween(1,5,rand);
+            copyLength=JunitUtil.randomIntBetween(0,5,rand);
             srcOffset=JunitUtil.randomIntBetween(0,srcLength-copyLength,rand);
             dstOffset=JunitUtil.randomIntBetween(0,srcOffset,rand);
             break;
           default:
-            copyLength=JunitUtil.randomIntBetween(1,srcLength/2,rand);
+            copyLength=JunitUtil.randomIntBetween(0,srcLength/2,rand);
             dstOffset=JunitUtil.randomIntBetween(copyLength,srcLength-copyLength,rand);
             srcOffset=JunitUtil.randomIntBetween(0,dstOffset-copyLength,rand);
             break;
@@ -3232,32 +3253,35 @@ public class ArrCopyTest
         }
         else
         {
-          if(srcLength==1||rand.nextBoolean())
+          if(srcLength<2||rand.nextBoolean())
           {
-            copyLength=JunitUtil.randomIntBetween(1,srcLength,rand);
+            copyLength=JunitUtil.randomIntBetween(0,srcLength,rand);
             srcOffset=JunitUtil.randomIntBetween(0,srcLength-copyLength,rand);
             dstOffset=JunitUtil.randomIntBetween(0,srcOffset,rand);
           }
           else
           {
-            copyLength=JunitUtil.randomIntBetween(1,srcLength/2,rand);
+            copyLength=JunitUtil.randomIntBetween(0,srcLength/2,rand);
             dstOffset=JunitUtil.randomIntBetween(copyLength,srcLength-copyLength,rand);
             srcOffset=JunitUtil.randomIntBetween(0,dstOffset-copyLength,rand);
           }
         }
         double[] copy=new double[copyLength];
-        ArrCopy.uncheckedCopy(src,srcOffset,copy,0,copyLength);
-        ArrCopy.uncheckedSelfCopy(src,srcOffset,dstOffset,copyLength);
-        JunitUtil.uncheckedassertarraysAreEqual(src,dstOffset,copy,0,copyLength);
+        ArrCopy.semicheckedCopy(src,srcOffset,copy,0,copyLength);
+        ArrCopy.semicheckedSelfCopy(src,srcOffset,dstOffset,copyLength);
+        if(copyLength!=0)
+        {
+          JunitUtil.uncheckedassertarraysAreEqual(src,dstOffset,copy,0,copyLength);
+        }
       }
     }
     @Test
-    public void testUncheckedSelfCopyString()
+    public void testsemicheckedSelfCopyString()
     {
       Random rand=new Random(0);
       for(int i=0;i<1000;++i)
       {
-        int srcLength=JunitUtil.randomIntBetween(1,1000,rand);
+        int srcLength=JunitUtil.randomIntBetween(0,1000,rand);
         String[] src=new String[srcLength];
         JunitUtil.StringArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
         int copyLength,srcOffset,dstOffset;
@@ -3271,12 +3295,12 @@ public class ArrCopyTest
             dstOffset=JunitUtil.randomIntBetween(0,srcLength-copyLength,rand);
             break;
           case 1:
-            copyLength=JunitUtil.randomIntBetween(1,5,rand);
+            copyLength=JunitUtil.randomIntBetween(0,5,rand);
             srcOffset=JunitUtil.randomIntBetween(0,srcLength-copyLength,rand);
             dstOffset=JunitUtil.randomIntBetween(0,srcOffset,rand);
             break;
           default:
-            copyLength=JunitUtil.randomIntBetween(1,srcLength/2,rand);
+            copyLength=JunitUtil.randomIntBetween(0,srcLength/2,rand);
             dstOffset=JunitUtil.randomIntBetween(copyLength,srcLength-copyLength,rand);
             srcOffset=JunitUtil.randomIntBetween(0,dstOffset-copyLength,rand);
             break;
@@ -3284,23 +3308,26 @@ public class ArrCopyTest
         }
         else
         {
-          if(srcLength==1||rand.nextBoolean())
+          if(srcLength<2||rand.nextBoolean())
           {
-            copyLength=JunitUtil.randomIntBetween(1,srcLength,rand);
+            copyLength=JunitUtil.randomIntBetween(0,srcLength,rand);
             srcOffset=JunitUtil.randomIntBetween(0,srcLength-copyLength,rand);
             dstOffset=JunitUtil.randomIntBetween(0,srcOffset,rand);
           }
           else
           {
-            copyLength=JunitUtil.randomIntBetween(1,srcLength/2,rand);
+            copyLength=JunitUtil.randomIntBetween(0,srcLength/2,rand);
             dstOffset=JunitUtil.randomIntBetween(copyLength,srcLength-copyLength,rand);
             srcOffset=JunitUtil.randomIntBetween(0,dstOffset-copyLength,rand);
           }
         }
         String[] copy=new String[copyLength];
-        ArrCopy.uncheckedCopy(src,srcOffset,copy,0,copyLength);
-        ArrCopy.uncheckedSelfCopy(src,srcOffset,dstOffset,copyLength);
-        JunitUtil.uncheckedassertarraysAreEqual(src,dstOffset,copy,0,copyLength);
+        ArrCopy.semicheckedCopy(src,srcOffset,copy,0,copyLength);
+        ArrCopy.semicheckedSelfCopy(src,srcOffset,dstOffset,copyLength);
+        if(copyLength!=0)
+        {
+          JunitUtil.uncheckedassertarraysAreEqual(src,dstOffset,copy,0,copyLength);
+        }
       }
     }
 }

@@ -13,9 +13,11 @@ public interface OmniDeque extends OmniCollection,OmniQueue,OmniStack
   #MACRO RemoveFirstOccurrenceDefault<float>()
   #MACRO RemoveFirstOccurrenceDefault<double>()
   #MACRO RemoveFirstOccurrenceDecl<Object>()
+  #MACRO PrimitiveMethods(RemoveLastOccurrenceDecl)
+  #MACRO RemoveLastOccurrenceDecl<Object>()
   #MACRO BoxedMethods(RemoveFirstOccurrenceDecl)
   #MACRO BoxedMethods(RemoveLastOccurrenceDecl)
-  public abstract interface OfPrimitive extends OmniCollection,OmniCollection.OfPrimitive,OmniStack,OMniQueue,OmniStack.OfPrimitive,OmniDeque
+  public abstract interface OfPrimitive extends OmniCollection,OmniCollection.OfPrimitive,OmniStack,OmniQueue,OmniStack.OfPrimitive,OmniDeque
   {
     #MACRO RemoveOccurrenceBoxed<Boolean,boolean>()
     #MACRO RemoveOccurrenceBoxed<Byte,byte>()
@@ -47,7 +49,7 @@ public default boolean removeLastOccurrence(INPUTTYPE val)
   #MACRO PrimitiveSubInterface<float,Float,Float>()
   #MACRO PrimitiveSubInterface<double,Double,Double>()
 #MACRODEF PrimitiveSubInterface<ARRTYPE,CLASSPREFIX,BOXEDTYPE>()
-public abstract interface OfCLASSPREFIX extends OmniCollection,OmniCollection.OfPrimitive,OmniCollection.OfCLASSPREFIX,PeekAndPollIfc<BOXEDTYPE>,PeekAndPollIfc.CLASSPREFIXInput,OmniStack,OmniStack.OfPrimitive,OMniStack.OfCLASSPREFIX,OmniQueue,OmniQueue.OfCLASSPREFIX,OmniDeque,OfPrimitive
+public abstract interface OfCLASSPREFIX extends OmniCollection,OmniCollection.OfPrimitive,OmniCollection.OfCLASSPREFIX,PeekAndPollIfc<BOXEDTYPE>,PeekAndPollIfc.CLASSPREFIXInput,OmniStack,OmniStack.OfPrimitive,OmniStack.OfCLASSPREFIX,OmniQueue,OmniQueue.OfCLASSPREFIX,OmniDeque,OfPrimitive
 #IFNOTSWITCH ARRTYPE==double
 ,PeekAndPollIfc.DoubleInput
   #IFNOTSWITCH ARRTYPE==float
@@ -60,6 +62,7 @@ public abstract interface OfCLASSPREFIX extends OmniCollection,OmniCollection.Of
 ,PeekAndPollIfc.ShortInput
           #IFNOTSWITCH ARRTYPE==byte
 ,PeekAndPollIfc.ByteInput
+,PeekAndPollIfc.CharInput
           #ENDIF
         #ENDIF
       #ENDIF
@@ -240,8 +243,116 @@ public abstract interface OfCLASSPREFIX extends OmniCollection,OmniCollection.Of
     #ENDIF
   #ENDIF
 #ENDIF
+  public abstract BOXEDTYPE getFirst();
+  public abstract BOXEDTYPE getLast();
+  public abstract BOXEDTYPE removeFirst();
+  public abstract BOXEDTYPE removeLast();
+  public default ARRTYPE getFirstCLASSPREFIX()
+  {
+    return ARRTYPEElement();
+  }
+  public abstract ARRTYPE getLastCLASSPREFIX();
+  public default ARRTYPE removeFirstCLASSPREFIX()
+  {
+    return popCLASSPREFIX();
+  }
+  public abstract ARRTYPE removeLastCLASSPREFIX();
+  @Override
+  public default ARRTYPE removeCLASSPREFIX()
+  {
+    return popCLASSPREFIX();
+  }
+  
+   
+  //TODO get methods
+  //TODO remove
 #IFSWITCH ARRTYPE==boolean
+  
   //TODO getAndRemoveImpls
+  public default byte getFirstByte()
+  {
+    return TypeUtil.castToByte(ARRTYPEElement());
+  }
+  public default char getFirstChar()
+  {
+    return TypeUtil.castToChar(ARRTYPEElement());
+  }
+  public default short getFirstShort()
+  {
+    return TypeUtil.castToByte(ARRTYPEElement());
+  }
+  public default int getFirstInt()
+  {
+    return TypeUtil.castToByte(ARRTYPEElement());
+  }
+  public default long getFirstLong()
+  {
+    return TypeUtil.castToLong(ARRTYPEElement());
+  }
+  public default float getFirstFloat()
+  {
+    return TypeUtil.castToFloat(ARRTYPEElement());
+  }
+  public default double getFirstDouble()
+  {
+    return TypeUtil.castToDouble(ARRTYPEElement());
+  }
+  public default byte getLastByte()
+  {
+    return TypeUtil.castToByte(getLastCLASSPREFIX());
+  }
+  public default char getLastChar()
+  {
+    return TypeUtil.castToChar(getLastCLASSPREFIX());
+  }
+  public default short getLastShort()
+  {
+    return TypeUtil.castToByte(getLastCLASSPREFIX());
+  }
+  public default int getLastInt()
+  {
+    return TypeUtil.castToByte(getLastCLASSPREFIX());
+  }
+  public default long getLastLong()
+  {
+    return TypeUtil.castToLong(getLastCLASSPREFIX());
+  }
+  public default float getLastFloat()
+  {
+    return TypeUtil.castToFloat(getLastCLASSPREFIX());
+  }
+  public default double getLastDouble()
+  {
+    return TypeUtil.castToDouble(getLastCLASSPREFIX());
+  }
+  public default byte removeFirstByte()
+  {
+    return TypeUtil.castToByte(popCLASSPREFIX());
+  }
+  public default char removeFirstChar()
+  {
+    return TypeUtil.castToChar(popCLASSPREFIX());
+  }
+  public default short removeFirstShort()
+  {
+    return TypeUtil.castToByte(popCLASSPREFIX());
+  }
+  public default int removeFirstInt()
+  {
+    return TypeUtil.castToByte(popCLASSPREFIX());
+  }
+  public default long removeFirstLong()
+  {
+    return TypeUtil.castToLong(popCLASSPREFIX());
+  }
+  public default float removeFirstFloat()
+  {
+    return TypeUtil.castToFloat(popCLASSPREFIX());
+  }
+  public default double removeFirstDouble()
+  {
+    return TypeUtil.castToDouble(popCLASSPREFIX());
+  }
 #ELSEIFNOTSWITCH ARRTYPE==double
   #MACRO GetAndRemoveImpls<double,Double>()
   #IFNOTSWITCH ARRTYPE==float
@@ -258,39 +369,94 @@ public abstract interface OfCLASSPREFIX extends OmniCollection,OmniCollection.Of
   #ENDIF
 #ENDIF
   
-  public abstract OmniIterator.OfCLASSPREFIX descendingIterator();
-  public abstract BOXEDTYPE getFirst();
-  public abstract BOXEDTYPE getLast();
-  public default ARRTYPE getFirstCLASSPREFIX()
-  {
-    return ARRTYPEElement();
-  }
-  public abstract ARRTYPE getLastCLASSPREFIX();
-
+  
+  
+  
   public abstract BOXEDTYPE peekFirst();
   public abstract BOXEDTYPE peekLast();
   public abstract BOXEDTYPE pollFirst();
   public abstract BOXEDTYPE pollLast();
-  
+  #MACRO PeekAndPollImpls<ARRTYPE,CLASSPREFIX>()
+#IFNOTSWITCH ARRTYPE==double
+  #MACRO PeekAndPollImpls<double,Double>()
+  #IFNOTSWITCH ARRTYPE==float
+  #MACRO PeekAndPollImpls<float,Float>()
+    #IFNOTSWITCH ARRTYPE==long
+  #MACRO PeekAndPollImpls<long,Long>()
+      #IFNOTSWITCH ARRTYPE==int
+  #MACRO PeekAndPollImpls<int,Int>()
+        #IFNOTSWITCH ARRTYPE==char,short
+  #MACRO PeekAndPollImpls<short,Short>()
+          #IFNOTSWITCH ARRTYPE==byte
+  #MACRO PeekAndPollImpls<byte,Byte>()
+  #MACRO PeekAndPollImpls<char,Char>()
+          #ENDIF
+        #ENDIF
+      #ENDIF
+    #ENDIF
+  #ENDIF
+#ENDIF
+#IFSWITCH ARRTYPE==boolean,int,long,double
+ 
   @Override
-  public default ARRTYPE removeCLASSPREFIX()
+  public default boolean removeLastOccurrence(byte val)
   {
-    return popCLASSPREFIX();
+    return removeLastOccurrence((int)val);
   }
   
-  //TODO get methods
-  //TODO remove
-
-  //TODO peek
-  //TODO peekFirst
-  //TODO peekLast
-  //TODO pollFirst
-  //TODO pollLast
-  //TODO poll
+  @Override
+  public default boolean removeLastOccurrence(char val)
+  {
+    return removeLastOccurrence((int)val);
+  }
   
+  
+#ENDIF
+#IFSWITCH ARRTYPE==boolean,byte,int,long,double
+  @Override
+  public default boolean removeFirstOccurrence(byte val)
+  {
+    return removeVal((int)val);
+  }
+  @Override
+  public default boolean removeFirstOccurrence(char val)
+  {
+    return removeVal((int)val);
+  }
+  @Override
+  public default boolean removeFirstOccurrence(short val)
+  {
+    return removeVal((int)val);
+  }
+  @Override
+  public default boolean removeLastOccurrence(short val)
+  {
+    return removeLastOccurrence((int)val);
+  }
+#ENDIF
+
+#IFSWITCH ARRTYPE==char,short,float
+  @Override
+  public default boolean removeFirstOccurrence(byte val){
+    return removeVal((short)val);
+  }
+  @Override
+  public default boolean removeFirstOccurrence(char val){
+    return removeVal(val);
+  }
+  @Override
+  public default boolean removeFirstOccurrence(short val){
+    return removeVal(val);
+  }
+  @Override
+  public default boolean removeLastOccurrence(byte val){
+    return removeLastOccurrence((short)val);
+  }
+#ENDIF
+ 
   //TODO removeFirstOccurrence defaults
   //TODO removeLastOccurrence defaults
-  
+  public abstract OmniIterator.OfCLASSPREFIX descendingIterator();
 }
 #ENDDEF
   public abstract interface OfRef<E> extends OmniCollection,OmniCollection.OfRef<E>,PeekAndPollIfc<E>,OmniStack,OmniStack.OfRef<E>,OmniQueue,OmniQueue.OfRef<E>,OmniDeque
@@ -314,6 +480,18 @@ public abstract interface OfCLASSPREFIX extends OmniCollection,OmniCollection.Of
     #MACRO RemoveFirstOccurrenceDefault<short>()
   }
 }
+#MACRODEF PeekAndPollImpls<RETTYPE,METHODSUFFIX>()
+public default RETTYPE peekFirstMETHODSUFFIX()
+{
+  return peekMETHODSUFFIX();
+}
+public abstract RETTYPE peekLastMETHODSUFFIX();
+public default RETTYPE pollFirstMETHODSUFFIX()
+{
+  return pollMETHODSUFFIX();
+}
+public abstract RETTYPE pollLastMETHODSUFFIX();
+#ENDDEF
 #MACRODEF GetAndRemoveImpls<RETTYPE,METHODSUFFIX>()
 public default RETTYPE getFirstMETHODSUFFIX()
 {
@@ -351,7 +529,7 @@ public default boolean offerLast(PRIMITIVEINPUTTYPE val)
 }
 public default void addFirst(BOXEDINPUTTYPE val)
 {
-  push((ADDTYPE)val.PRIMITIVEINPUTTYPEValue());
+  push((ARRTYPE)val.PRIMITIVEINPUTTYPEValue());
 }
 public default void addLast(BOXEDINPUTTYPE val)
 {
