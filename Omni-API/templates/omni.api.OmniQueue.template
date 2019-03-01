@@ -27,6 +27,7 @@ public abstract interface OfCLASSPREFIX extends OmniCollection,OmniQueue,OmniCol
 ,PeekAndPollIfc.ShortInput
           #IFNOTSWITCH ARRTYPE==byte
 ,PeekAndPollIfc.ByteInput
+,PeekAndPollIfc.CharInput
           #ENDIF
         #ENDIF
       #ENDIF

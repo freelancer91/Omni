@@ -328,14 +328,14 @@ public class ToStringUtil{
         public String toString(){
             return new String(buffer,0,size);
         }
-        public void uncheckedAppend(boolean val){
+        public void uncheckedAppendBoolean(boolean val){
             if(val){
                 uncheckedAppendTrue();
             }else{
                 uncheckedAppendFalse();
             }
         }
-        public OmniStringBuilder uncheckedAppend(char val){
+        public OmniStringBuilder uncheckedAppendChar(char val){
             char[] buffer;
             final int size;
             if((size=this.size) == (buffer=this.buffer).length){

@@ -16,6 +16,26 @@ public class ToStringUtilTest{
             Assertions.assertEquals(buffer[j],stockVal.charAt(j));
         }
     }
+    //    private static void testStringLength(String type,int minInclInput,int maxInclInput,
+    //            IntFunction<String> getLengthFunc){
+    //        AtomicLong totalLength=new AtomicLong(0);
+    //        IntStream.range(minInclInput,maxInclInput).parallel().forEach(input->{
+    //            totalLength.addAndGet(getLengthFunc.apply(input).length());
+    //        });
+    //        long finalTotalLength=totalLength.get();
+    //        System.out.println(type + " TotalLength = " + finalTotalLength);
+    //        long range=(long)maxInclInput - (long)minInclInput + 1L;
+    //        double avg=(double)finalTotalLength / (double)range;
+    //        System.out.println(type + " average = " + avg);
+    //    }
+    //    @Test
+    //    public void testStringLengths(){
+    //        testStringLength("byte",Byte.MIN_VALUE,Byte.MAX_VALUE,(input)->ToStringUtil.getString((byte)input));
+    //        testStringLength("short",Short.MIN_VALUE,Short.MAX_VALUE,(input)->ToStringUtil.getString((short)input));
+    //        testStringLength("int",Integer.MIN_VALUE,Integer.MAX_VALUE,(input)->ToStringUtil.getString(input));
+    //        testStringLength("float",Integer.MIN_VALUE,Integer.MAX_VALUE,
+    //                (input)->ToStringUtil.getString(Float.intBitsToFloat(input)));
+    //    }
     private static float constructFloat(boolean positive,int binaryExponent,int fractBits){
         binaryExponent+=127;
         binaryExponent<<=23;
@@ -129,11 +149,11 @@ public class ToStringUtilTest{
     @Test
     public void testOmniStringBuilder(){
         OmniStringBuilder builder=new OmniStringBuilder(0,new char[0]);
-        builder.uncheckedAppend('a');
-        builder.uncheckedAppend('b');
-        builder.uncheckedAppend('c');
-        builder.uncheckedAppend('d');
-        builder.uncheckedAppend('e');
+        builder.uncheckedAppendChar('a');
+        builder.uncheckedAppendChar('b');
+        builder.uncheckedAppendChar('c');
+        builder.uncheckedAppendChar('d');
+        builder.uncheckedAppendChar('e');
         Assertions.assertEquals(builder.size,5);
         Assertions.assertEquals(builder.buffer[0],'a');
         Assertions.assertEquals(builder.buffer[1],'b');
@@ -141,10 +161,10 @@ public class ToStringUtilTest{
         Assertions.assertEquals(builder.buffer[3],'d');
         Assertions.assertEquals(builder.buffer[4],'e');
         builder.size=0;
-        builder.uncheckedAppend(false);
+        builder.uncheckedAppendBoolean(false);
         assertStringsEqual(builder.buffer,builder.size,Boolean.toString(false));
         builder.size=0;
-        builder.uncheckedAppend(true);
+        builder.uncheckedAppendBoolean(true);
         assertStringsEqual(builder.buffer,builder.size,Boolean.toString(true));
         builder.size=0;
         builder.uncheckedAppendCommaAndSpace();

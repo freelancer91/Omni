@@ -1,487 +1,1927 @@
 package omni.impl.seq;
-import java.util.function.IntFunction;
-import java.util.function.Consumer;
-import java.util.function.Predicate;
-import java.util.function.UnaryOperator;
-import java.util.Comparator;
-import java.util.NoSuchElementException;
 import omni.api.OmniCollection;
-import omni.api.OmniIterator;
+import omni.util.OmniArray;
 import omni.api.OmniList;
 import omni.api.OmniStack;
-import omni.api.OmniListIterator;
-import omni.impl.CheckedCollection;
-import omni.util.ArrCopy;
-import omni.util.OmniArray;
-import omni.util.ByteSortUtil;
-import omni.util.ToStringUtil;
-import omni.impl.seq.AbstractByteList;
-import omni.impl.AbstractByteItr;
-import omni.util.BitSetUtil;
-import omni.util.TypeUtil;
-import omni.function.ByteComparator;
-import omni.function.ByteUnaryOperator;
-import omni.function.ByteConsumer;
+import java.util.function.Predicate;
+import java.util.function.Consumer;
 import omni.function.BytePredicate;
-public abstract class ByteArrSeq extends AbstractByteList implements OmniCollection.OfByte
+import omni.function.ByteConsumer;
+import java.util.Comparator;
+import omni.function.ByteComparator;
+import omni.util.ToStringUtil;
+import omni.util.ArrCopy;
+import omni.util.ByteSortUtil;
+import omni.impl.CheckedCollection;
+import omni.util.TypeUtil;
+import java.util.NoSuchElementException;
+import omni.api.OmniIterator;
+import omni.api.OmniListIterator;
+import java.util.function.IntFunction;
+public abstract class ByteArrSeq implements OmniCollection.OfByte
 {
-  private static void eraseIndexHelper(byte[] arr,int index,int newSize)
-  {
-    ArrCopy.semicheckedSelfCopy(arr,index+1,index,newSize-index);
-  }
-  static  void uncheckedReplaceAll(byte[] arr,int offset,int bound,ByteUnaryOperator operator)
-  {
-    do
-    {
-      arr[offset]=operator.applyAsByte((byte)arr[offset]);
-    }
-    while(++offset!=bound);
-  }
-  static  void uncheckedAscendingForEach(byte[] arr,int begin,int end,ByteConsumer action)
-  {
-    for(;;++begin)
-    {
-      action.accept((byte)arr[begin]);
-      if(begin==end)
-      {
-        return;
-      }
-    }
-  }
-  static  void uncheckedDescendingForEach(byte[] arr,int begin,int end,ByteConsumer action)
-  {
-    for(;;--end)
-    {
-      action.accept((byte)arr[end]);
-      if(begin==end)
-      {
-        return;
-      }
-    }
-  }
-  static int ascendingHashCode(byte[] arr,int begin,int end)
-  {
-    int hash=31+(arr[begin]);
-    while(begin!=end)
-    {
-      hash=hash*31+(arr[++begin]);
-    }
-    return hash;
-  }
-  static int descendingHashCode(byte[] arr,int begin,int end)
-  {
-    int hash=31+(arr[end]);
-    while(begin!=end)
-    {
-      hash=hash*31+(arr[--end]);
-    }
-    return hash;
-  }
-  static int ascendingToString(byte[] arr,int begin,int end,char[] buffer,int bufferOffset)
-  {
-    for(bufferOffset=ToStringUtil.getStringShort(arr[begin],buffer,bufferOffset);begin!=end;buffer[bufferOffset]=',',buffer[++bufferOffset]=' ',bufferOffset=ToStringUtil.getStringShort(arr[++begin],buffer,++bufferOffset)){}
-    return bufferOffset;
-  }
-  static int descendingToString(byte[] arr,int begin,int end,char[] buffer,int bufferOffset)
-  {
-    for(bufferOffset=ToStringUtil.getStringShort(arr[end],buffer,bufferOffset);begin!=end;buffer[bufferOffset]=',',buffer[++bufferOffset]=' ',bufferOffset=ToStringUtil.getStringShort(arr[--end],buffer,++bufferOffset)){}
-    return bufferOffset;
-  }
-  static void ascendingToString(byte[] arr,int begin,int end,ToStringUtil.OmniStringBuilder builder)
-  {
-    for(builder.uncheckedAppendShort(arr[begin]);begin!=end;builder.uncheckedAppendCommaAndSpace(),builder.uncheckedAppendShort(arr[++begin])){}
-  }
-  static void descendingToString(byte[] arr,int begin,int end,ToStringUtil.OmniStringBuilder builder)
-  {
-    for(builder.uncheckedAppendShort(arr[end]);begin!=end;builder.uncheckedAppendCommaAndSpace(),builder.uncheckedAppendShort(arr[--end])){}
-  }
-    static boolean uncheckedcontains (byte[] arr,int begin,int end
-    ,int val
-    )
-    {
-      while(
-      val!=(arr[begin])
-      )
-      {
-        if(begin==end)
-        {
-          return false;
-        }
-        ++begin;
-      }
-      return true;
-    }
-    static int uncheckedsearch (byte[] arr,int end
-    ,int val
-    )
-    {
-      int index=end;
-      while(
-      val!=(arr[index])
-      )
-      {
-        if(index==0)
-        {
-          return -1;
-        }
-        --index;
-      }
-      return index-end+1;
-    }
-    static int uncheckedindexOf (byte[] arr,int bound
-    ,int val
-    )
-    {
-      int index=0;
-      while(
-      val!=(arr[index])
-      )
-      {
-        if(++index==bound)
-        {
-          return -1;
-        }
-      }
-      return index;
-    }
-    static int uncheckedlastIndexOf (byte[] arr,int bound
-    ,int val
-    )
-    {
-      while(
-      val!=(arr[--bound])
-      )
-      {
-        if(bound==0)
-        {
-          return -1;
-        }
-      }
-      return bound;
-    }
-    static int uncheckedindexOf (byte[] arr,int offset,int bound
-    ,int val
-    )
-    {
-      int index=offset;
-      while(
-      val!=(arr[index])
-      )
-      {
-        if(++index==bound)
-        {
-          return -1;
-        }
-      }
-      return index-offset;
-    }
-    static int uncheckedlastIndexOf (byte[] arr,int offset,int bound
-    ,int val
-    )
-    {
-      while(
-      val!=(arr[--bound])
-      )
-      {
-        if(bound==offset)
-        {
-          return -1;
-        }
-      }
-      return bound-offset;
-    }
-  //TODO mark/pull survivors up/down
+  transient int size;
   transient byte[] arr;
   private ByteArrSeq()
   {
     super();
-    this.arr=OmniArray.OfByte.DEFAULT_ARR;
   }
-  private ByteArrSeq(final int capacity)
+  private ByteArrSeq(int initialCapacity)
   {
     super();
-    switch(capacity)
-    {
+    switch(initialCapacity)
+    { 
     default:
-      this.arr=new byte[capacity];
+      this.arr=new byte[initialCapacity];
+      return;
     case OmniArray.DEFAULT_ARR_SEQ_CAP:
       this.arr=OmniArray.OfByte.DEFAULT_ARR;
     case 0:
     }
   }
-  private ByteArrSeq(final int size,final byte[] arr)
+  private ByteArrSeq(int size,byte[] arr)
   {
-    super(size);
+    super();
+    this.size=size;
     this.arr=arr;
   }
-  abstract int uncheckedHashCode(int size);
   @Override
-  public int hashCode()
+  public int size()
   {
-    final int size;
-    if((size=this.size)!=0)
-    {
-      return uncheckedHashCode(size);
-    }
-    return 1;
+    return this.size;
   }
-  abstract int uncheckedToString(int size,char[] buffer);
-  abstract void uncheckedToString(int size,ToStringUtil.OmniStringBuilder builder);
   @Override
-  public String toString()
+  public boolean isEmpty()
   {
-    int size;
-    if((size=this.size)!=0)
+    return this.size==0;
+  }
+  @Override
+  public void clear()
+  {
+    this.size=0;
+  }
+  public static class UncheckedListImpl extends ByteArrSeq implements OmniList.OfByte
+  {
+    static int uncheckedToString(byte[] arr,int begin,int end,char[] buffer)
     {
-      final char[] buffer;
-      if(size<=(OmniArray.MAX_ARR_SIZE/12))
+      int bufferOffset;
+      for(bufferOffset=ToStringUtil.getStringShort(arr[begin],buffer,1);begin!=end;buffer[bufferOffset]=',',buffer[++bufferOffset]=' ',bufferOffset=ToStringUtil.getStringShort(arr[++begin],buffer,bufferOffset)){}
+      return bufferOffset;
+    }
+    static void uncheckedToString(byte[] arr,int begin,int end,ToStringUtil.OmniStringBuilder builder)
+    {
+      for(builder.uncheckedAppendShort(arr[begin]);begin!=end;builder.uncheckedAppendCommaAndSpace(),builder.uncheckedAppendShort(arr[++begin])){}
+    }
+    static  void uncheckedForEach(byte[] arr,int begin,int end,ByteConsumer action)
+    {
+      for(;;++begin)
       {
-        buffer[size=uncheckedToString(size,buffer=new char[size*6])]=']';
+        action.accept((byte)arr[begin]);
+        if(begin==end)
+        {
+          return;
+        }
       }
-      else
+    }
+    static int uncheckedHashCode(byte[] arr,int begin,int end)
+    {
+      int hash=31+(arr[begin]);
+      while(begin!=end)
+      {
+        hash=hash*31+(arr[++begin]);
+      }
+      return hash;
+    }
+    public UncheckedListImpl()
+    {
+      super();
+    }
+    public UncheckedListImpl(int initialCapacity)
+    {
+      super(initialCapacity);
+    }
+    private UncheckedListImpl(int size,byte[] arr)
+    {
+      super(size,arr);
+    }
+    @Override
+    public String toString()
+    {
+      int size;
+      if((size=this.size)!=0)
       {
         if(size>(Integer.MAX_VALUE/3))
         {
           throw new OutOfMemoryError();
         }
-        final ToStringUtil.OmniStringBuilder builder;
-        uncheckedToString(size,builder=new ToStringUtil.OmniStringBuilder(1,new char[size<=(OmniArray.MAX_ARR_SIZE/5)?(size*5):(OmniArray.MAX_ARR_SIZE)]));
-        (buffer=builder.buffer)[size=builder.size]=']';
+        final char[] buffer;
+        if(size<=(OmniArray.MAX_ARR_SIZE/((6)<<1)))
+        {
+          (buffer=new char[size*(6)])[size=uncheckedToString(arr,0,size-1,buffer)]=']';
+          buffer[0]='[';
+          return new String(buffer,0,size+1);
+        }
+        else
+        {
+          final ToStringUtil.OmniStringBuilder builder;
+          uncheckedToString(arr,0,size-1,builder=new ToStringUtil.OmniStringBuilder(1,new char[size<=(int)(OmniArray.MAX_ARR_SIZE/5)?(size*5):OmniArray.MAX_ARR_SIZE]));
+          builder.uncheckedAppendChar(']');
+          (buffer=builder.buffer)[0]='[';
+          return new String(buffer,0,builder.size);
+        }
       }
-      buffer[0]='[';
-      return new String(buffer,0,size+1);
-    }
-    return "[]";
-  }
-  abstract void uncheckedForEach(final int size,final ByteConsumer action);
-  //TODO forEach methods
-  //TODO removeIf methods
-  //TODO peek methods
-  //TODO uncheckedCopyInto methods
-  //TODO contains methods
-  //TODO indexOf methods
-  //TODO lastIndexOf methods
-  //TODO search methods
-   public Byte pop()
-   {
-     return popByte();
-   }
-   public void push(final Byte val)
-   {
-     push((byte)val);
-   }
-  public byte popByte()
-  {
-    return uncheckedPop(size-1);
-  }
-  public void push(final byte val)
-  {
-    final int size;
-    if((size=this.size)!=0)
-    {
-      uncheckedAppend(val,size);
-    }
-    else
-    {
-      uncheckedInit(val);
-    }
-  }
-  @Override
-  public boolean remove(final Object val)
-  {
-    final int size;
-    if((size=this.size)!=0)
-    {
-      if(val instanceof Byte)
-      {
-        return this.uncheckedRemoveVal(size,(byte)(val));
-      }
-    }
-    return false;
-  }
-  @Override
-  public byte set(final int index,final byte val)
-  {
-    final byte[] arr;
-    final var oldVal=(byte)(arr=this.arr)[index];
-    arr[index]=val;
-    return oldVal;
-  }
-  @Override
-  public <T> T[] toArray(final IntFunction<T[]> arrConstructor)
-  {
-    final int size;
-    final T[] dst=arrConstructor.apply(size=this.size);
-    if(size!=0)
-    {
-      uncheckedCopyInto(dst,size);
-    }
-    return dst;
-  }
-  @Override
-  public <T> T[] toArray(T[] dst)
-  {
-    final int size;
-    if((size=this.size)!=0)
-    {
-      uncheckedCopyInto(dst=OmniArray.uncheckedArrResize(size,dst),size);
-    }
-    else if(dst.length!=0)
-    {
-      dst[0]=null;
-    }
-    return dst;
-  }
-  abstract boolean uncheckedRemoveVal(final int size,final int val);
-  abstract boolean uncheckedRemoveIf(final int size,final BytePredicate filter);
-  private int finalizeSubListBatchRemove(final byte[] arr,final int newBound,final int oldBound)
-  {
-    final int newRootSize,numRemoved;
-    size=newRootSize=size-(numRemoved=oldBound-newBound);
-    ArrCopy.semicheckedSelfCopy(arr,oldBound,newBound,newRootSize-newBound);
-    return numRemoved;
-  }
-  private byte[] growInsert(byte[] arr,final int index,final int size)
-  {
-    if(arr.length==size)
-    {
-      ArrCopy.semicheckedCopy(arr,0,arr=new byte[OmniArray.growBy50Pct(size)],0,index);
-      this.arr=arr;
-    }
-    return arr;
-  }
-  private void uncheckedAppend(final byte val,final int size)
-  {
-    byte[] arr;
-    if((arr=this.arr).length==size)
-    {
-      ArrCopy.uncheckedCopy(arr,0,arr=new byte[OmniArray.growBy50Pct(size)],0,size);
-    }
-    arr[size]=val;
-    this.size=size+1;
-  }
-  private void uncheckedInit(final byte val)
-  {
-    byte[] arr;
-    if((arr=this.arr)==OmniArray.OfByte.DEFAULT_ARR)
-    {
-      this.arr=arr=new byte[OmniArray.DEFAULT_ARR_SEQ_CAP];
-    }
-    else if(arr==null)
-    {
-      this.arr=arr=new byte[1];
-    }
-    arr[0]=val;
-    this.size=1;
-  }
-  private void uncheckedInsert(final int index,final byte val,final int size)
-  {
-    final int tailDist;
-    if((tailDist=size-index)==0)
-    {
-      uncheckedAppend(val,size);
-    }
-    else
-    {
-      byte[] arr;
-      ArrCopy.uncheckedCopy(arr=this.arr,index,arr=growInsert(arr,index,size),index+1,tailDist);
-      arr[index]=val;
-      this.size=size+1;
-    }
-  }
-  private byte uncheckedPop(final int newSize)
-  {
-    this.size=newSize;
-    return arr[newSize];
-  }
-  //TODO toArray methods
-  //TODO removeVal methods
-  public static abstract class Unchecked extends ByteArrSeq
-  {
-    private Unchecked()
-    {
-      super();
-    }
-    private Unchecked(final int capacity)
-    {
-      super(capacity);
-    }
-    private Unchecked(final int size,final byte[] arr)
-    {
-      super(size,arr);
+      return "[]";
     }
     @Override
-    public boolean add(final byte val)
-    {
-      super.push(val);
-      return true;
-    }
-    @Override
-    public void add(final int index,final byte val)
+    public int hashCode()
     {
       final int size;
       if((size=this.size)!=0)
       {
-        super.uncheckedInsert(index,val,size);
+        {
+          return uncheckedHashCode(arr,0,size-1);
+        }
       }
-      else
-      {
-        super.uncheckedInit(val);
-      }
+      return 1;
     }
     @Override
-    public byte getByte(final int index)
+    public <T> T[] toArray(T[] arr)
     {
-      return (byte)arr[index];
+      //TODO
+      return null;
     }
     @Override
-    public byte removeByteAt(final int index)
+    public <T> T[] toArray(IntFunction<T[]> arrConstructor)
     {
-      final byte[] arr;
-      final var removed=(byte)(arr=this.arr)[index];
-      eraseIndexHelper(arr,index,--size);
-      return removed;
+      //TODO
+      return null;
     }
-    //TODO uncheckedRemoveIf
-  }
-  public static class UncheckedList extends Unchecked
-  {
-    public UncheckedList()
+    @Override
+    public boolean equals(Object val)
     {
-      super();
-    }
-    public UncheckedList(final int capacity)
-    {
-      super(capacity);
-    }
-    public UncheckedList(final int size,final byte[] arr)
-    {
-      super(size,arr);
+      //TODO
+      return false;
     }
     @Override
     public Object clone()
     {
-      final byte[] arr;
       final int size;
       if((size=this.size)!=0)
       {
-        ArrCopy.uncheckedCopy(this.arr,0,arr=new byte[size],0,size);
+        final byte[] copy;
+        ArrCopy.uncheckedCopy(arr,0,copy=new byte[size],0,size);
+        return new UncheckedListImpl(size,copy);
       }
-      else
-      {
-        arr=null;
-      }
-      return new UncheckedList(size,arr);
+      return new UncheckedListImpl();
     }
     @Override
-    public boolean equals(final Object val)
+    public void forEach(ByteConsumer action)
     {
-      //TODO implements equals method
+      final int size;
+      if((size=this.size)!=0)
+      {
+        {
+          uncheckedForEach(arr,0,size-1,action);
+        }
+      }
+    }
+    @Override
+    public void forEach(Consumer<? super Byte> action)
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        {
+          uncheckedForEach(arr,0,size-1,action::accept);
+        }
+      }
+    }
+    @Override
+    public boolean removeIf(BytePredicate filter)
+    {
+      //TODO
       return false;
     }
+    @Override
+    public boolean removeIf(Predicate<? super Byte> filter)
+    {
+      //TODO
+      return false;
+    }
+   @Override
+   public
+   boolean
+   contains(boolean val)
+   {
+     final int size;
+     if((size=this.size)!=0)
+     {
+       return OmniArray.OfByte.uncheckedcontains(this.arr,0,size-1,TypeUtil.castToByte(val));
+     }
+     return false;
+   }
+   @Override
+   public
+   boolean
+   contains(int val)
+   {
+     final int size;
+     if((size=this.size)!=0)
+     {
+       if(val==(byte)val)
+       {
+         return OmniArray.OfByte.uncheckedcontains(this.arr,0,size-1,val);
+       }
+     }
+     return false;
+   }
+   @Override
+   public
+   boolean
+   contains(long val)
+   {
+     final int size;
+     if((size=this.size)!=0)
+     {
+       final byte v;
+       if(val==(v=(byte)val))
+       {
+         return OmniArray.OfByte.uncheckedcontains(this.arr,0,size-1,v);
+       }
+     }
+     return false;
+   }
+   @Override
+   public
+   boolean
+   contains(float val)
+   {
+     final int size;
+     if((size=this.size)!=0)
+     {
+       final byte v;
+       if(val==(v=(byte)val))
+       {
+         return OmniArray.OfByte.uncheckedcontains(this.arr,0,size-1,v);
+       }
+     }
+     return false;
+   }
+   @Override
+   public
+   boolean
+   contains(double val)
+   {
+     final int size;
+     if((size=this.size)!=0)
+     {
+       final byte v;
+       if((v=(byte)val)==val)
+       {
+         return OmniArray.OfByte.uncheckedcontains(this.arr,0,size-1,v);
+       }
+     }
+     return false;
+   }
+   @Override
+   public
+   boolean
+   contains
+   (Object val)
+   {
+     final int size;
+     if((size=this.size)!=0)
+     {
+       if(val instanceof Byte)
+       {
+         return OmniArray.OfByte.uncheckedcontains(this.arr,0,size-1,(byte)(val));
+       }
+     }
+     return false;
+   }
+    @Override
+    public boolean add(byte val)
+    {
+      //TODO
+      return false;
+    }
+    @Override
+    public void add(int index,byte val)
+    {
+      //TODO
+    }
+    @Override
+    public byte removeByteAt(int index)
+    {
+      final byte[] arr;
+      byte ret=(byte)(arr=this.arr)[index];
+      ArrCopy.semicheckedSelfCopy(arr,index+1,index,(--size)-index);
+      this.size=size;
+      return ret;
+    }
+    @Override
+    public OmniListIterator.OfByte listIterator()
+    {
+      //TODO
+      return null;
+    }
+    @Override
+    public OmniListIterator.OfByte listIterator(int index)
+    {
+      //TODO
+      return null;
+    }
+    @Override
+    public OmniList.OfByte subList(int fromIndex,int toIndex)
+    {
+      //TODO
+      return null;
+    }
+    @Override
+    public void stableDescendingSort()
+    {
+      final int size;
+      if((size=this.size)>1)
+      {
+        {
+          ByteSortUtil.uncheckedDescendingSort(arr,0,size);
+        }
+      }
+    }
+    @Override
+    public void stableAscendingSort()
+    {
+      final int size;
+      if((size=this.size)>1)
+      {
+        {
+          ByteSortUtil.uncheckedAscendingSort(arr,0,size);
+        }
+      }
+    }
+    @Override
+    public OmniIterator.OfByte iterator()
+    {
+      //TODO
+      return null;
+    }
+    @Override
+    public byte[] toByteArray()
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        final byte[] copy;
+        ArrCopy.uncheckedCopy(arr,0,copy=new byte[size],0,size);
+        return copy;
+      }
+      return OmniArray.OfByte.DEFAULT_ARR;
+    }
+    @Override
+    public Byte[] toArray()
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        final Byte[] copy;
+        ArrCopy.uncheckedCopy(arr,0,copy=new Byte[size],0,size);
+        return copy;
+      }
+      return OmniArray.OfByte.DEFAULT_BOXED_ARR;
+    }
+    @Override
+    public double[] toDoubleArray()
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        final double[] copy;
+        ArrCopy.uncheckedCopy(arr,0,copy=new double[size],0,size);
+        return copy;
+      }
+      return OmniArray.OfDouble.DEFAULT_ARR;
+    }
+    @Override
+    public float[] toFloatArray()
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        final float[] copy;
+        ArrCopy.uncheckedCopy(arr,0,copy=new float[size],0,size);
+        return copy;
+      }
+      return OmniArray.OfFloat.DEFAULT_ARR;
+    }
+    @Override
+    public long[] toLongArray()
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        final long[] copy;
+        ArrCopy.uncheckedCopy(arr,0,copy=new long[size],0,size);
+        return copy;
+      }
+      return OmniArray.OfLong.DEFAULT_ARR;
+    }
+    @Override
+    public int[] toIntArray()
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        final int[] copy;
+        ArrCopy.uncheckedCopy(arr,0,copy=new int[size],0,size);
+        return copy;
+      }
+      return OmniArray.OfInt.DEFAULT_ARR;
+    }
+    @Override
+    public short[] toShortArray()
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        final short[] copy;
+        ArrCopy.uncheckedCopy(arr,0,copy=new short[size],0,size);
+        return copy;
+      }
+      return OmniArray.OfShort.DEFAULT_ARR;
+    }
   }
-  //TODO UncheckedStack
-  //TODO Checked
-  //TODO CheckedList
-  //TODO CheckedStack
+  public static class UncheckedStackImpl extends ByteArrSeq implements OmniStack.OfByte
+  {
+    static int uncheckedToString(byte[] arr,int begin,int end,char[] buffer)
+    {
+      int bufferOffset;
+      for(bufferOffset=ToStringUtil.getStringShort(arr[end],buffer,1);begin!=end;buffer[bufferOffset]=',',buffer[++bufferOffset]=' ',bufferOffset=ToStringUtil.getStringShort(arr[--end],buffer,bufferOffset)){}
+      return bufferOffset;
+    }
+    static void uncheckedToString(byte[] arr,int begin,int end,ToStringUtil.OmniStringBuilder builder)
+    {
+      for(builder.uncheckedAppendShort(arr[end]);begin!=end;builder.uncheckedAppendCommaAndSpace(),builder.uncheckedAppendShort(arr[--end])){}
+    }
+    static  void uncheckedForEach(byte[] arr,int begin,int end,ByteConsumer action)
+    {
+      for(;;--end)
+      {
+        action.accept((byte)arr[end]);
+        if(begin==end)
+        {
+          return;
+        }
+      }
+    }
+    static int uncheckedHashCode(byte[] arr,int begin,int end)
+    {
+      int hash=31+(arr[end]);
+      while(begin!=end)
+      {
+        hash=hash*31+(arr[--end]);
+      }
+      return hash;
+    }
+    public UncheckedStackImpl()
+    {
+      super();
+    }
+    public UncheckedStackImpl(int initialCapacity)
+    {
+      super(initialCapacity);
+    }
+    private UncheckedStackImpl(int size,byte[] arr)
+    {
+      super(size,arr);
+    }
+    @Override
+    public String toString()
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        if(size>(Integer.MAX_VALUE/3))
+        {
+          throw new OutOfMemoryError();
+        }
+        final char[] buffer;
+        if(size<=(OmniArray.MAX_ARR_SIZE/((6)<<1)))
+        {
+          (buffer=new char[size*(6)])[size=uncheckedToString(arr,0,size-1,buffer)]=']';
+          buffer[0]='[';
+          return new String(buffer,0,size+1);
+        }
+        else
+        {
+          final ToStringUtil.OmniStringBuilder builder;
+          uncheckedToString(arr,0,size-1,builder=new ToStringUtil.OmniStringBuilder(1,new char[size<=(int)(OmniArray.MAX_ARR_SIZE/5)?(size*5):OmniArray.MAX_ARR_SIZE]));
+          builder.uncheckedAppendChar(']');
+          (buffer=builder.buffer)[0]='[';
+          return new String(buffer,0,builder.size);
+        }
+      }
+      return "[]";
+    }
+    @Override
+    public int hashCode()
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        {
+          return uncheckedHashCode(arr,0,size-1);
+        }
+      }
+      return 1;
+    }
+    @Override
+    public <T> T[] toArray(T[] arr)
+    {
+      //TODO
+      return null;
+    }
+    @Override
+    public <T> T[] toArray(IntFunction<T[]> arrConstructor)
+    {
+      //TODO
+      return null;
+    }
+    @Override
+    public boolean equals(Object val)
+    {
+      //TODO
+      return false;
+    }
+    @Override
+    public Object clone()
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        final byte[] copy;
+        ArrCopy.uncheckedCopy(arr,0,copy=new byte[size],0,size);
+        return new UncheckedStackImpl(size,copy);
+      }
+      return new UncheckedStackImpl();
+    }
+    @Override
+    public void forEach(ByteConsumer action)
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        {
+          uncheckedForEach(arr,0,size-1,action);
+        }
+      }
+    }
+    @Override
+    public void forEach(Consumer<? super Byte> action)
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        {
+          uncheckedForEach(arr,0,size-1,action::accept);
+        }
+      }
+    }
+    @Override
+    public boolean removeIf(BytePredicate filter)
+    {
+      //TODO
+      return false;
+    }
+    @Override
+    public boolean removeIf(Predicate<? super Byte> filter)
+    {
+      //TODO
+      return false;
+    }
+   @Override
+   public
+   boolean
+   contains(boolean val)
+   {
+     final int size;
+     if((size=this.size)!=0)
+     {
+       return OmniArray.OfByte.uncheckedcontains(this.arr,0,size-1,TypeUtil.castToByte(val));
+     }
+     return false;
+   }
+   @Override
+   public
+   boolean
+   contains(int val)
+   {
+     final int size;
+     if((size=this.size)!=0)
+     {
+       if(val==(byte)val)
+       {
+         return OmniArray.OfByte.uncheckedcontains(this.arr,0,size-1,val);
+       }
+     }
+     return false;
+   }
+   @Override
+   public
+   boolean
+   contains(long val)
+   {
+     final int size;
+     if((size=this.size)!=0)
+     {
+       final byte v;
+       if(val==(v=(byte)val))
+       {
+         return OmniArray.OfByte.uncheckedcontains(this.arr,0,size-1,v);
+       }
+     }
+     return false;
+   }
+   @Override
+   public
+   boolean
+   contains(float val)
+   {
+     final int size;
+     if((size=this.size)!=0)
+     {
+       final byte v;
+       if(val==(v=(byte)val))
+       {
+         return OmniArray.OfByte.uncheckedcontains(this.arr,0,size-1,v);
+       }
+     }
+     return false;
+   }
+   @Override
+   public
+   boolean
+   contains(double val)
+   {
+     final int size;
+     if((size=this.size)!=0)
+     {
+       final byte v;
+       if((v=(byte)val)==val)
+       {
+         return OmniArray.OfByte.uncheckedcontains(this.arr,0,size-1,v);
+       }
+     }
+     return false;
+   }
+   @Override
+   public
+   boolean
+   contains
+   (Object val)
+   {
+     final int size;
+     if((size=this.size)!=0)
+     {
+       if(val instanceof Byte)
+       {
+         return OmniArray.OfByte.uncheckedcontains(this.arr,0,size-1,(byte)(val));
+       }
+     }
+     return false;
+   }
+    @Override
+    public OmniIterator.OfByte iterator()
+    {
+      //TODO
+      return null;
+    }
+    @Override
+    public byte[] toByteArray()
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        final byte[] copy;
+        ArrCopy.uncheckedReverseCopy(arr,0,copy=new byte[size],0,size);
+        return copy;
+      }
+      return OmniArray.OfByte.DEFAULT_ARR;
+    }
+    @Override
+    public Byte[] toArray()
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        final Byte[] copy;
+        ArrCopy.uncheckedReverseCopy(arr,0,copy=new Byte[size],0,size);
+        return copy;
+      }
+      return OmniArray.OfByte.DEFAULT_BOXED_ARR;
+    }
+    @Override
+    public double[] toDoubleArray()
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        final double[] copy;
+        ArrCopy.uncheckedReverseCopy(arr,0,copy=new double[size],0,size);
+        return copy;
+      }
+      return OmniArray.OfDouble.DEFAULT_ARR;
+    }
+    @Override
+    public float[] toFloatArray()
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        final float[] copy;
+        ArrCopy.uncheckedReverseCopy(arr,0,copy=new float[size],0,size);
+        return copy;
+      }
+      return OmniArray.OfFloat.DEFAULT_ARR;
+    }
+    @Override
+    public long[] toLongArray()
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        final long[] copy;
+        ArrCopy.uncheckedReverseCopy(arr,0,copy=new long[size],0,size);
+        return copy;
+      }
+      return OmniArray.OfLong.DEFAULT_ARR;
+    }
+    @Override
+    public int[] toIntArray()
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        final int[] copy;
+        ArrCopy.uncheckedReverseCopy(arr,0,copy=new int[size],0,size);
+        return copy;
+      }
+      return OmniArray.OfInt.DEFAULT_ARR;
+    }
+    @Override
+    public short[] toShortArray()
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        final short[] copy;
+        ArrCopy.uncheckedReverseCopy(arr,0,copy=new short[size],0,size);
+        return copy;
+      }
+      return OmniArray.OfShort.DEFAULT_ARR;
+    }
+    @Override
+    public byte popByte()
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        byte ret=(byte)arr[--size];
+        this.size=size;
+        return ret;
+      }
+      throw new NoSuchElementException();
+    }
+    @Override
+    public Byte pop()
+    {
+      return popByte();
+    }
+    @Override
+    public void push(byte val)
+    {
+      //TODO
+    }
+    @Override
+    public void push(Byte val)
+    {
+      //TODO
+    }
+    @Override
+    public byte peekByte()
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        return (byte)((byte)arr[size-1]);
+      }
+      return Byte.MIN_VALUE;
+    }
+    @Override
+    public byte pollByte()
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        byte ret=(byte)((byte)arr[--size]);
+        this.size=size;
+        return ret;
+      }
+      return Byte.MIN_VALUE;
+    }
+    @Override
+    public Byte poll()
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        Byte ret=(Byte)((byte)arr[--size]);
+        this.size=size;
+        return ret;
+      }
+      return null;
+    }
+    @Override
+    public double pollDouble()
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        double ret=(double)((byte)arr[--size]);
+        this.size=size;
+        return ret;
+      }
+      return Double.NaN;
+    }
+    @Override
+    public float pollFloat()
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        float ret=(float)((byte)arr[--size]);
+        this.size=size;
+        return ret;
+      }
+      return Float.NaN;
+    }
+    @Override
+    public long pollLong()
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        long ret=(long)((byte)arr[--size]);
+        this.size=size;
+        return ret;
+      }
+      return Long.MIN_VALUE;
+    }
+    @Override
+    public int pollInt()
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        int ret=(int)((byte)arr[--size]);
+        this.size=size;
+        return ret;
+      }
+      return Integer.MIN_VALUE;
+    }
+    @Override
+    public short pollShort()
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        short ret=(short)((byte)arr[--size]);
+        this.size=size;
+        return ret;
+      }
+      return Short.MIN_VALUE;
+    }
+    @Override
+    public Byte peek()
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        return (Byte)((byte)arr[size-1]);
+      }
+      return null;
+    }
+    @Override
+    public double peekDouble()
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        return (double)((byte)arr[size-1]);
+      }
+      return Double.NaN;
+    }
+    @Override
+    public float peekFloat()
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        return (float)((byte)arr[size-1]);
+      }
+      return Float.NaN;
+    }
+    @Override
+    public long peekLong()
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        return (long)((byte)arr[size-1]);
+      }
+      return Long.MIN_VALUE;
+    }
+    @Override
+    public int peekInt()
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        return (int)((byte)arr[size-1]);
+      }
+      return Integer.MIN_VALUE;
+    }
+    @Override
+    public short peekShort()
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        return (short)((byte)arr[size-1]);
+      }
+      return Short.MIN_VALUE;
+    }
+  }
+  public static class CheckedListImpl extends ByteArrSeq implements OmniList.OfByte
+  {
+    static int uncheckedToString(byte[] arr,int begin,int end,char[] buffer)
+    {
+      int bufferOffset;
+      for(bufferOffset=ToStringUtil.getStringShort(arr[begin],buffer,1);begin!=end;buffer[bufferOffset]=',',buffer[++bufferOffset]=' ',bufferOffset=ToStringUtil.getStringShort(arr[++begin],buffer,bufferOffset)){}
+      return bufferOffset;
+    }
+    static void uncheckedToString(byte[] arr,int begin,int end,ToStringUtil.OmniStringBuilder builder)
+    {
+      for(builder.uncheckedAppendShort(arr[begin]);begin!=end;builder.uncheckedAppendCommaAndSpace(),builder.uncheckedAppendShort(arr[++begin])){}
+    }
+    static  void uncheckedForEach(byte[] arr,int begin,int end,ByteConsumer action)
+    {
+      for(;;++begin)
+      {
+        action.accept((byte)arr[begin]);
+        if(begin==end)
+        {
+          return;
+        }
+      }
+    }
+    static int uncheckedHashCode(byte[] arr,int begin,int end)
+    {
+      int hash=31+(arr[begin]);
+      while(begin!=end)
+      {
+        hash=hash*31+(arr[++begin]);
+      }
+      return hash;
+    }
+    transient int modCount;
+    public CheckedListImpl()
+    {
+      super();
+    }
+    public CheckedListImpl(int initialCapacity)
+    {
+      super(initialCapacity);
+    }
+    private CheckedListImpl(int size,byte[] arr)
+    {
+      super(size,arr);
+    }
+    @Override
+    public void clear()
+    {
+      if(this.size!=0)
+      {
+        ++this.modCount;
+        this.size=0;
+      }
+    }
+    @Override
+    public String toString()
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        if(size>(Integer.MAX_VALUE/3))
+        {
+          throw new OutOfMemoryError();
+        }
+        final char[] buffer;
+        if(size<=(OmniArray.MAX_ARR_SIZE/((6)<<1)))
+        {
+          (buffer=new char[size*(6)])[size=uncheckedToString(arr,0,size-1,buffer)]=']';
+          buffer[0]='[';
+          return new String(buffer,0,size+1);
+        }
+        else
+        {
+          final ToStringUtil.OmniStringBuilder builder;
+          uncheckedToString(arr,0,size-1,builder=new ToStringUtil.OmniStringBuilder(1,new char[size<=(int)(OmniArray.MAX_ARR_SIZE/5)?(size*5):OmniArray.MAX_ARR_SIZE]));
+          builder.uncheckedAppendChar(']');
+          (buffer=builder.buffer)[0]='[';
+          return new String(buffer,0,builder.size);
+        }
+      }
+      return "[]";
+    }
+    @Override
+    public int hashCode()
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        {
+          return uncheckedHashCode(arr,0,size-1);
+        }
+      }
+      return 1;
+    }
+    @Override
+    public <T> T[] toArray(T[] arr)
+    {
+      //TODO
+      return null;
+    }
+    @Override
+    public <T> T[] toArray(IntFunction<T[]> arrConstructor)
+    {
+      //TODO
+      return null;
+    }
+    @Override
+    public boolean equals(Object val)
+    {
+      //TODO
+      return false;
+    }
+    @Override
+    public Object clone()
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        final byte[] copy;
+        ArrCopy.uncheckedCopy(arr,0,copy=new byte[size],0,size);
+        return new CheckedListImpl(size,copy);
+      }
+      return new CheckedListImpl();
+    }
+    @Override
+    public void forEach(ByteConsumer action)
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        int modCount=this.modCount;
+        try
+        {
+          uncheckedForEach(arr,0,size-1,action);
+        }
+        finally
+        {
+          CheckedCollection.checkModCount(modCount,this.modCount);
+        }
+      }
+    }
+    @Override
+    public void forEach(Consumer<? super Byte> action)
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        int modCount=this.modCount;
+        try
+        {
+          uncheckedForEach(arr,0,size-1,action::accept);
+        }
+        finally
+        {
+          CheckedCollection.checkModCount(modCount,this.modCount);
+        }
+      }
+    }
+    @Override
+    public boolean removeIf(BytePredicate filter)
+    {
+      //TODO
+      return false;
+    }
+    @Override
+    public boolean removeIf(Predicate<? super Byte> filter)
+    {
+      //TODO
+      return false;
+    }
+   @Override
+   public
+   boolean
+   contains(boolean val)
+   {
+     final int size;
+     if((size=this.size)!=0)
+     {
+       return OmniArray.OfByte.uncheckedcontains(this.arr,0,size-1,TypeUtil.castToByte(val));
+     }
+     return false;
+   }
+   @Override
+   public
+   boolean
+   contains(int val)
+   {
+     final int size;
+     if((size=this.size)!=0)
+     {
+       if(val==(byte)val)
+       {
+         return OmniArray.OfByte.uncheckedcontains(this.arr,0,size-1,val);
+       }
+     }
+     return false;
+   }
+   @Override
+   public
+   boolean
+   contains(long val)
+   {
+     final int size;
+     if((size=this.size)!=0)
+     {
+       final byte v;
+       if(val==(v=(byte)val))
+       {
+         return OmniArray.OfByte.uncheckedcontains(this.arr,0,size-1,v);
+       }
+     }
+     return false;
+   }
+   @Override
+   public
+   boolean
+   contains(float val)
+   {
+     final int size;
+     if((size=this.size)!=0)
+     {
+       final byte v;
+       if(val==(v=(byte)val))
+       {
+         return OmniArray.OfByte.uncheckedcontains(this.arr,0,size-1,v);
+       }
+     }
+     return false;
+   }
+   @Override
+   public
+   boolean
+   contains(double val)
+   {
+     final int size;
+     if((size=this.size)!=0)
+     {
+       final byte v;
+       if((v=(byte)val)==val)
+       {
+         return OmniArray.OfByte.uncheckedcontains(this.arr,0,size-1,v);
+       }
+     }
+     return false;
+   }
+   @Override
+   public
+   boolean
+   contains
+   (Object val)
+   {
+     final int size;
+     if((size=this.size)!=0)
+     {
+       int modCount=this.modCount;
+       if(val instanceof Byte)
+       {
+         return OmniArray.OfByte.uncheckedcontains(this.arr,0,size-1,(byte)(val));
+       }
+     }
+     CheckedCollection.checkModCount(modCount,this.modCount);
+     return false;
+   }
+    @Override
+    public boolean add(byte val)
+    {
+      //TODO
+      return false;
+    }
+    @Override
+    public void add(int index,byte val)
+    {
+      //TODO
+    }
+    @Override
+    public byte removeByteAt(int index)
+    {
+      int size;
+      if(index<0 || index>=(size=this.size))
+      {
+        throw new IndexOutOfBoundsException("index = "+index+"; size="+this.size);
+      }
+      ++this.modCount;
+      final byte[] arr;
+      byte ret=(byte)(arr=this.arr)[index];
+      ArrCopy.semicheckedSelfCopy(arr,index+1,index,(--size)-index);
+      this.size=size;
+      return ret;
+    }
+    @Override
+    public OmniListIterator.OfByte listIterator()
+    {
+      //TODO
+      return null;
+    }
+    @Override
+    public OmniListIterator.OfByte listIterator(int index)
+    {
+      //TODO
+      return null;
+    }
+    @Override
+    public OmniList.OfByte subList(int fromIndex,int toIndex)
+    {
+      //TODO
+      return null;
+    }
+    @Override
+    public void stableDescendingSort()
+    {
+      final int size;
+      if((size=this.size)>1)
+      {
+        {
+          ByteSortUtil.uncheckedDescendingSort(arr,0,size);
+        }
+      }
+    }
+    @Override
+    public void stableAscendingSort()
+    {
+      final int size;
+      if((size=this.size)>1)
+      {
+        {
+          ByteSortUtil.uncheckedAscendingSort(arr,0,size);
+        }
+      }
+    }
+    @Override
+    public OmniIterator.OfByte iterator()
+    {
+      //TODO
+      return null;
+    }
+    @Override
+    public byte[] toByteArray()
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        final byte[] copy;
+        ArrCopy.uncheckedCopy(arr,0,copy=new byte[size],0,size);
+        return copy;
+      }
+      return OmniArray.OfByte.DEFAULT_ARR;
+    }
+    @Override
+    public Byte[] toArray()
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        final Byte[] copy;
+        ArrCopy.uncheckedCopy(arr,0,copy=new Byte[size],0,size);
+        return copy;
+      }
+      return OmniArray.OfByte.DEFAULT_BOXED_ARR;
+    }
+    @Override
+    public double[] toDoubleArray()
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        final double[] copy;
+        ArrCopy.uncheckedCopy(arr,0,copy=new double[size],0,size);
+        return copy;
+      }
+      return OmniArray.OfDouble.DEFAULT_ARR;
+    }
+    @Override
+    public float[] toFloatArray()
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        final float[] copy;
+        ArrCopy.uncheckedCopy(arr,0,copy=new float[size],0,size);
+        return copy;
+      }
+      return OmniArray.OfFloat.DEFAULT_ARR;
+    }
+    @Override
+    public long[] toLongArray()
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        final long[] copy;
+        ArrCopy.uncheckedCopy(arr,0,copy=new long[size],0,size);
+        return copy;
+      }
+      return OmniArray.OfLong.DEFAULT_ARR;
+    }
+    @Override
+    public int[] toIntArray()
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        final int[] copy;
+        ArrCopy.uncheckedCopy(arr,0,copy=new int[size],0,size);
+        return copy;
+      }
+      return OmniArray.OfInt.DEFAULT_ARR;
+    }
+    @Override
+    public short[] toShortArray()
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        final short[] copy;
+        ArrCopy.uncheckedCopy(arr,0,copy=new short[size],0,size);
+        return copy;
+      }
+      return OmniArray.OfShort.DEFAULT_ARR;
+    }
+  }
+  public static class CheckedStackImpl extends ByteArrSeq implements OmniStack.OfByte
+  {
+    static int uncheckedToString(byte[] arr,int begin,int end,char[] buffer)
+    {
+      int bufferOffset;
+      for(bufferOffset=ToStringUtil.getStringShort(arr[end],buffer,1);begin!=end;buffer[bufferOffset]=',',buffer[++bufferOffset]=' ',bufferOffset=ToStringUtil.getStringShort(arr[--end],buffer,bufferOffset)){}
+      return bufferOffset;
+    }
+    static void uncheckedToString(byte[] arr,int begin,int end,ToStringUtil.OmniStringBuilder builder)
+    {
+      for(builder.uncheckedAppendShort(arr[end]);begin!=end;builder.uncheckedAppendCommaAndSpace(),builder.uncheckedAppendShort(arr[--end])){}
+    }
+    static  void uncheckedForEach(byte[] arr,int begin,int end,ByteConsumer action)
+    {
+      for(;;--end)
+      {
+        action.accept((byte)arr[end]);
+        if(begin==end)
+        {
+          return;
+        }
+      }
+    }
+    static int uncheckedHashCode(byte[] arr,int begin,int end)
+    {
+      int hash=31+(arr[end]);
+      while(begin!=end)
+      {
+        hash=hash*31+(arr[--end]);
+      }
+      return hash;
+    }
+    transient int modCount;
+    public CheckedStackImpl()
+    {
+      super();
+    }
+    public CheckedStackImpl(int initialCapacity)
+    {
+      super(initialCapacity);
+    }
+    private CheckedStackImpl(int size,byte[] arr)
+    {
+      super(size,arr);
+    }
+    @Override
+    public void clear()
+    {
+      if(this.size!=0)
+      {
+        ++this.modCount;
+        this.size=0;
+      }
+    }
+    @Override
+    public String toString()
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        if(size>(Integer.MAX_VALUE/3))
+        {
+          throw new OutOfMemoryError();
+        }
+        final char[] buffer;
+        if(size<=(OmniArray.MAX_ARR_SIZE/((6)<<1)))
+        {
+          (buffer=new char[size*(6)])[size=uncheckedToString(arr,0,size-1,buffer)]=']';
+          buffer[0]='[';
+          return new String(buffer,0,size+1);
+        }
+        else
+        {
+          final ToStringUtil.OmniStringBuilder builder;
+          uncheckedToString(arr,0,size-1,builder=new ToStringUtil.OmniStringBuilder(1,new char[size<=(int)(OmniArray.MAX_ARR_SIZE/5)?(size*5):OmniArray.MAX_ARR_SIZE]));
+          builder.uncheckedAppendChar(']');
+          (buffer=builder.buffer)[0]='[';
+          return new String(buffer,0,builder.size);
+        }
+      }
+      return "[]";
+    }
+    @Override
+    public int hashCode()
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        {
+          return uncheckedHashCode(arr,0,size-1);
+        }
+      }
+      return 1;
+    }
+    @Override
+    public <T> T[] toArray(T[] arr)
+    {
+      //TODO
+      return null;
+    }
+    @Override
+    public <T> T[] toArray(IntFunction<T[]> arrConstructor)
+    {
+      //TODO
+      return null;
+    }
+    @Override
+    public boolean equals(Object val)
+    {
+      //TODO
+      return false;
+    }
+    @Override
+    public Object clone()
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        final byte[] copy;
+        ArrCopy.uncheckedCopy(arr,0,copy=new byte[size],0,size);
+        return new CheckedStackImpl(size,copy);
+      }
+      return new CheckedStackImpl();
+    }
+    @Override
+    public void forEach(ByteConsumer action)
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        int modCount=this.modCount;
+        try
+        {
+          uncheckedForEach(arr,0,size-1,action);
+        }
+        finally
+        {
+          CheckedCollection.checkModCount(modCount,this.modCount);
+        }
+      }
+    }
+    @Override
+    public void forEach(Consumer<? super Byte> action)
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        int modCount=this.modCount;
+        try
+        {
+          uncheckedForEach(arr,0,size-1,action::accept);
+        }
+        finally
+        {
+          CheckedCollection.checkModCount(modCount,this.modCount);
+        }
+      }
+    }
+    @Override
+    public boolean removeIf(BytePredicate filter)
+    {
+      //TODO
+      return false;
+    }
+    @Override
+    public boolean removeIf(Predicate<? super Byte> filter)
+    {
+      //TODO
+      return false;
+    }
+   @Override
+   public
+   boolean
+   contains(boolean val)
+   {
+     final int size;
+     if((size=this.size)!=0)
+     {
+       return OmniArray.OfByte.uncheckedcontains(this.arr,0,size-1,TypeUtil.castToByte(val));
+     }
+     return false;
+   }
+   @Override
+   public
+   boolean
+   contains(int val)
+   {
+     final int size;
+     if((size=this.size)!=0)
+     {
+       if(val==(byte)val)
+       {
+         return OmniArray.OfByte.uncheckedcontains(this.arr,0,size-1,val);
+       }
+     }
+     return false;
+   }
+   @Override
+   public
+   boolean
+   contains(long val)
+   {
+     final int size;
+     if((size=this.size)!=0)
+     {
+       final byte v;
+       if(val==(v=(byte)val))
+       {
+         return OmniArray.OfByte.uncheckedcontains(this.arr,0,size-1,v);
+       }
+     }
+     return false;
+   }
+   @Override
+   public
+   boolean
+   contains(float val)
+   {
+     final int size;
+     if((size=this.size)!=0)
+     {
+       final byte v;
+       if(val==(v=(byte)val))
+       {
+         return OmniArray.OfByte.uncheckedcontains(this.arr,0,size-1,v);
+       }
+     }
+     return false;
+   }
+   @Override
+   public
+   boolean
+   contains(double val)
+   {
+     final int size;
+     if((size=this.size)!=0)
+     {
+       final byte v;
+       if((v=(byte)val)==val)
+       {
+         return OmniArray.OfByte.uncheckedcontains(this.arr,0,size-1,v);
+       }
+     }
+     return false;
+   }
+   @Override
+   public
+   boolean
+   contains
+   (Object val)
+   {
+     final int size;
+     if((size=this.size)!=0)
+     {
+       int modCount=this.modCount;
+       if(val instanceof Byte)
+       {
+         return OmniArray.OfByte.uncheckedcontains(this.arr,0,size-1,(byte)(val));
+       }
+     }
+     CheckedCollection.checkModCount(modCount,this.modCount);
+     return false;
+   }
+    @Override
+    public OmniIterator.OfByte iterator()
+    {
+      //TODO
+      return null;
+    }
+    @Override
+    public byte[] toByteArray()
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        final byte[] copy;
+        ArrCopy.uncheckedReverseCopy(arr,0,copy=new byte[size],0,size);
+        return copy;
+      }
+      return OmniArray.OfByte.DEFAULT_ARR;
+    }
+    @Override
+    public Byte[] toArray()
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        final Byte[] copy;
+        ArrCopy.uncheckedReverseCopy(arr,0,copy=new Byte[size],0,size);
+        return copy;
+      }
+      return OmniArray.OfByte.DEFAULT_BOXED_ARR;
+    }
+    @Override
+    public double[] toDoubleArray()
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        final double[] copy;
+        ArrCopy.uncheckedReverseCopy(arr,0,copy=new double[size],0,size);
+        return copy;
+      }
+      return OmniArray.OfDouble.DEFAULT_ARR;
+    }
+    @Override
+    public float[] toFloatArray()
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        final float[] copy;
+        ArrCopy.uncheckedReverseCopy(arr,0,copy=new float[size],0,size);
+        return copy;
+      }
+      return OmniArray.OfFloat.DEFAULT_ARR;
+    }
+    @Override
+    public long[] toLongArray()
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        final long[] copy;
+        ArrCopy.uncheckedReverseCopy(arr,0,copy=new long[size],0,size);
+        return copy;
+      }
+      return OmniArray.OfLong.DEFAULT_ARR;
+    }
+    @Override
+    public int[] toIntArray()
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        final int[] copy;
+        ArrCopy.uncheckedReverseCopy(arr,0,copy=new int[size],0,size);
+        return copy;
+      }
+      return OmniArray.OfInt.DEFAULT_ARR;
+    }
+    @Override
+    public short[] toShortArray()
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        final short[] copy;
+        ArrCopy.uncheckedReverseCopy(arr,0,copy=new short[size],0,size);
+        return copy;
+      }
+      return OmniArray.OfShort.DEFAULT_ARR;
+    }
+    @Override
+    public byte popByte()
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        byte ret=(byte)arr[--size];
+        ++this.modCount;
+        this.size=size;
+        return ret;
+      }
+      throw new NoSuchElementException();
+    }
+    @Override
+    public Byte pop()
+    {
+      return popByte();
+    }
+    @Override
+    public void push(byte val)
+    {
+      //TODO
+    }
+    @Override
+    public void push(Byte val)
+    {
+      //TODO
+    }
+    @Override
+    public byte peekByte()
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        return (byte)((byte)arr[size-1]);
+      }
+      return Byte.MIN_VALUE;
+    }
+    @Override
+    public byte pollByte()
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        byte ret=(byte)((byte)arr[--size]);
+        ++this.modCount;
+        this.size=size;
+        return ret;
+      }
+      return Byte.MIN_VALUE;
+    }
+    @Override
+    public Byte poll()
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        Byte ret=(Byte)((byte)arr[--size]);
+        ++this.modCount;
+        this.size=size;
+        return ret;
+      }
+      return null;
+    }
+    @Override
+    public double pollDouble()
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        double ret=(double)((byte)arr[--size]);
+        ++this.modCount;
+        this.size=size;
+        return ret;
+      }
+      return Double.NaN;
+    }
+    @Override
+    public float pollFloat()
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        float ret=(float)((byte)arr[--size]);
+        ++this.modCount;
+        this.size=size;
+        return ret;
+      }
+      return Float.NaN;
+    }
+    @Override
+    public long pollLong()
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        long ret=(long)((byte)arr[--size]);
+        ++this.modCount;
+        this.size=size;
+        return ret;
+      }
+      return Long.MIN_VALUE;
+    }
+    @Override
+    public int pollInt()
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        int ret=(int)((byte)arr[--size]);
+        ++this.modCount;
+        this.size=size;
+        return ret;
+      }
+      return Integer.MIN_VALUE;
+    }
+    @Override
+    public short pollShort()
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        short ret=(short)((byte)arr[--size]);
+        ++this.modCount;
+        this.size=size;
+        return ret;
+      }
+      return Short.MIN_VALUE;
+    }
+    @Override
+    public Byte peek()
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        return (Byte)((byte)arr[size-1]);
+      }
+      return null;
+    }
+    @Override
+    public double peekDouble()
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        return (double)((byte)arr[size-1]);
+      }
+      return Double.NaN;
+    }
+    @Override
+    public float peekFloat()
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        return (float)((byte)arr[size-1]);
+      }
+      return Float.NaN;
+    }
+    @Override
+    public long peekLong()
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        return (long)((byte)arr[size-1]);
+      }
+      return Long.MIN_VALUE;
+    }
+    @Override
+    public int peekInt()
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        return (int)((byte)arr[size-1]);
+      }
+      return Integer.MIN_VALUE;
+    }
+    @Override
+    public short peekShort()
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        return (short)((byte)arr[size-1]);
+      }
+      return Short.MIN_VALUE;
+    }
+  }
 }

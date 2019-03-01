@@ -1,697 +1,1660 @@
 package omni.impl.seq;
-import java.util.function.IntFunction;
-import java.util.function.Consumer;
-import java.util.function.Predicate;
-import java.util.function.UnaryOperator;
-import java.util.Comparator;
-import java.util.NoSuchElementException;
 import omni.api.OmniCollection;
-import omni.api.OmniIterator;
+import omni.util.OmniArray;
 import omni.api.OmniList;
 import omni.api.OmniStack;
-import omni.api.OmniListIterator;
-import omni.impl.CheckedCollection;
-import omni.util.ArrCopy;
-import omni.util.OmniArray;
-import omni.util.FloatSortUtil;
-import omni.util.ToStringUtil;
-import omni.util.HashUtil;
-import omni.impl.seq.AbstractFloatList;
-import omni.impl.AbstractFloatItr;
-import omni.util.BitSetUtil;
-import omni.util.TypeUtil;
-import omni.function.FloatComparator;
-import omni.function.FloatUnaryOperator;
-import omni.function.FloatConsumer;
+import java.util.function.Predicate;
+import java.util.function.Consumer;
 import omni.function.FloatPredicate;
-public abstract class FloatArrSeq extends AbstractFloatList implements OmniCollection.OfFloat
+import omni.function.FloatConsumer;
+import java.util.Comparator;
+import omni.function.FloatComparator;
+import omni.util.ToStringUtil;
+import omni.util.ArrCopy;
+import omni.util.FloatSortUtil;
+import omni.impl.CheckedCollection;
+import omni.util.TypeUtil;
+import java.util.NoSuchElementException;
+import omni.util.HashUtil;
+import omni.api.OmniIterator;
+import omni.api.OmniListIterator;
+import java.util.function.IntFunction;
+public abstract class FloatArrSeq implements OmniCollection.OfFloat
 {
-  private static void eraseIndexHelper(float[] arr,int index,int newSize)
-  {
-    ArrCopy.semicheckedSelfCopy(arr,index+1,index,newSize-index);
-  }
-  static  void uncheckedReplaceAll(float[] arr,int offset,int bound,FloatUnaryOperator operator)
-  {
-    do
-    {
-      arr[offset]=operator.applyAsFloat((float)arr[offset]);
-    }
-    while(++offset!=bound);
-  }
-  static  void uncheckedAscendingForEach(float[] arr,int begin,int end,FloatConsumer action)
-  {
-    for(;;++begin)
-    {
-      action.accept((float)arr[begin]);
-      if(begin==end)
-      {
-        return;
-      }
-    }
-  }
-  static  void uncheckedDescendingForEach(float[] arr,int begin,int end,FloatConsumer action)
-  {
-    for(;;--end)
-    {
-      action.accept((float)arr[end]);
-      if(begin==end)
-      {
-        return;
-      }
-    }
-  }
-  static int ascendingHashCode(float[] arr,int begin,int end)
-  {
-    int hash=31+HashUtil.hashFloat(arr[begin]);
-    while(begin!=end)
-    {
-      hash=hash*31+HashUtil.hashFloat(arr[++begin]);
-    }
-    return hash;
-  }
-  static int descendingHashCode(float[] arr,int begin,int end)
-  {
-    int hash=31+HashUtil.hashFloat(arr[end]);
-    while(begin!=end)
-    {
-      hash=hash*31+HashUtil.hashFloat(arr[--end]);
-    }
-    return hash;
-  }
-  static int ascendingToString(float[] arr,int begin,int end,char[] buffer,int bufferOffset)
-  {
-    for(bufferOffset=ToStringUtil.getStringFloat(arr[begin],buffer,bufferOffset);begin!=end;buffer[bufferOffset]=',',buffer[++bufferOffset]=' ',bufferOffset=ToStringUtil.getStringFloat(arr[++begin],buffer,++bufferOffset)){}
-    return bufferOffset;
-  }
-  static int descendingToString(float[] arr,int begin,int end,char[] buffer,int bufferOffset)
-  {
-    for(bufferOffset=ToStringUtil.getStringFloat(arr[end],buffer,bufferOffset);begin!=end;buffer[bufferOffset]=',',buffer[++bufferOffset]=' ',bufferOffset=ToStringUtil.getStringFloat(arr[--end],buffer,++bufferOffset)){}
-    return bufferOffset;
-  }
-  static void ascendingToString(float[] arr,int begin,int end,ToStringUtil.OmniStringBuilder builder)
-  {
-    for(builder.uncheckedAppendFloat(arr[begin]);begin!=end;builder.uncheckedAppendCommaAndSpace(),builder.uncheckedAppendFloat(arr[++begin])){} 
-  }
-  static void descendingToString(float[] arr,int begin,int end,ToStringUtil.OmniStringBuilder builder)
-  {
-    for(builder.uncheckedAppendFloat(arr[end]);begin!=end;builder.uncheckedAppendCommaAndSpace(),builder.uncheckedAppendFloat(arr[--end])){} 
-  }
-    static boolean uncheckedcontainsBits(float[] arr,int begin,int end
-    ,int val
-    )
-    {
-      while(
-      val!=(arr[begin])
-      )
-      {
-        if(begin==end)
-        {
-          return false;
-        }
-        ++begin;
-      }
-      return true;
-    }
-    static int uncheckedsearchBits(float[] arr,int end
-    ,int val
-    )
-    {
-      int index=end;
-      while(
-      val!=(arr[index])
-      )
-      {
-        if(index==0)
-        {
-          return -1;
-        }
-        --index;
-      }
-      return index-end+1;
-    }
-    static int uncheckedindexOfBits(float[] arr,int bound
-    ,int val
-    )
-    {
-      int index=0;
-      while(
-      val!=(arr[index])
-      )
-      {
-        if(++index==bound)
-        {
-          return -1;
-        }
-      }
-      return index;
-    }
-    static int uncheckedlastIndexOfBits(float[] arr,int bound
-    ,int val
-    )
-    {
-      while(
-      val!=(arr[--bound])
-      )
-      {
-        if(bound==0)
-        {
-          return -1;
-        }
-      }
-      return bound;
-    }
-    static int uncheckedindexOfBits(float[] arr,int offset,int bound
-    ,int val
-    )
-    {
-      int index=offset;
-      while(
-      val!=(arr[index])
-      )
-      {
-        if(++index==bound)
-        {
-          return -1;
-        }
-      }
-      return index-offset;
-    }
-    static int uncheckedlastIndexOfBits(float[] arr,int offset,int bound
-    ,int val
-    )
-    {
-      while(
-      val!=(arr[--bound])
-      )
-      {
-        if(bound==offset)
-        {
-          return -1;
-        }
-      }
-      return bound-offset;
-    }
-    static boolean uncheckedcontainsNaN(float[] arr,int begin,int end
-    )
-    {
-      while(
-      !Float.isNaN(arr[begin])
-      )
-      {
-        if(begin==end)
-        {
-          return false;
-        }
-        ++begin;
-      }
-      return true;
-    }
-    static int uncheckedsearchNaN(float[] arr,int end
-    )
-    {
-      int index=end;
-      while(
-      !Float.isNaN(arr[index])
-      )
-      {
-        if(index==0)
-        {
-          return -1;
-        }
-        --index;
-      }
-      return index-end+1;
-    }
-    static int uncheckedindexOfNaN(float[] arr,int bound
-    )
-    {
-      int index=0;
-      while(
-      !Float.isNaN(arr[index])
-      )
-      {
-        if(++index==bound)
-        {
-          return -1;
-        }
-      }
-      return index;
-    }
-    static int uncheckedlastIndexOfNaN(float[] arr,int bound
-    )
-    {
-      while(
-      !Float.isNaN(arr[--bound])
-      )
-      {
-        if(bound==0)
-        {
-          return -1;
-        }
-      }
-      return bound;
-    }
-    static int uncheckedindexOfNaN(float[] arr,int offset,int bound
-    )
-    {
-      int index=offset;
-      while(
-      !Float.isNaN(arr[index])
-      )
-      {
-        if(++index==bound)
-        {
-          return -1;
-        }
-      }
-      return index-offset;
-    }
-    static int uncheckedlastIndexOfNaN(float[] arr,int offset,int bound
-    )
-    {
-      while(
-      !Float.isNaN(arr[--bound])
-      )
-      {
-        if(bound==offset)
-        {
-          return -1;
-        }
-      }
-      return bound-offset;
-    }
-    static boolean uncheckedcontains0(float[] arr,int begin,int end
-    )
-    {
-      while(
-      (arr[begin])!=0
-      )
-      {
-        if(begin==end)
-        {
-          return false;
-        }
-        ++begin;
-      }
-      return true;
-    }
-    static int uncheckedsearch0(float[] arr,int end
-    )
-    {
-      int index=end;
-      while(
-      (arr[index])!=0
-      )
-      {
-        if(index==0)
-        {
-          return -1;
-        }
-        --index;
-      }
-      return index-end+1;
-    }
-    static int uncheckedindexOf0(float[] arr,int bound
-    )
-    {
-      int index=0;
-      while(
-      (arr[index])!=0
-      )
-      {
-        if(++index==bound)
-        {
-          return -1;
-        }
-      }
-      return index;
-    }
-    static int uncheckedlastIndexOf0(float[] arr,int bound
-    )
-    {
-      while(
-      (arr[--bound])!=0
-      )
-      {
-        if(bound==0)
-        {
-          return -1;
-        }
-      }
-      return bound;
-    }
-    static int uncheckedindexOf0(float[] arr,int offset,int bound
-    )
-    {
-      int index=offset;
-      while(
-      (arr[index])!=0
-      )
-      {
-        if(++index==bound)
-        {
-          return -1;
-        }
-      }
-      return index-offset;
-    }
-    static int uncheckedlastIndexOf0(float[] arr,int offset,int bound
-    )
-    {
-      while(
-      (arr[--bound])!=0
-      )
-      {
-        if(bound==offset)
-        {
-          return -1;
-        }
-      }
-      return bound-offset;
-    }
-  //TODO static query helper methods
-  //TODO mark/pull survivors up/down
+  transient int size;
   transient float[] arr;
   private FloatArrSeq()
   {
     super();
-    this.arr=OmniArray.OfFloat.DEFAULT_ARR;
   }
-  private FloatArrSeq(final int capacity)
+  private FloatArrSeq(int initialCapacity)
   {
     super();
-    switch(capacity)
-    {
+    switch(initialCapacity)
+    { 
     default:
-      this.arr=new float[capacity];
+      this.arr=new float[initialCapacity];
+      return;
     case OmniArray.DEFAULT_ARR_SEQ_CAP:
       this.arr=OmniArray.OfFloat.DEFAULT_ARR;
     case 0:
     }
   }
-  private FloatArrSeq(final int size,final float[] arr)
+  private FloatArrSeq(int size,float[] arr)
   {
-    super(size);
+    super();
+    this.size=size;
     this.arr=arr;
   }
-  abstract int uncheckedHashCode(int size);
   @Override
-  public int hashCode()
+  public int size()
   {
-    final int size;
-    if((size=this.size)!=0)
-    {
-      return uncheckedHashCode(size);
-    }
-    return 1;
+    return this.size;
   }
-  abstract int uncheckedToString(int size,char[] buffer);
-  abstract void uncheckedToString(int size,ToStringUtil.OmniStringBuilder builder);
   @Override
-  public String toString()
+  public boolean isEmpty()
   {
-    int size;
-    if((size=this.size)!=0)
+    return this.size==0;
+  }
+  @Override
+  public void clear()
+  {
+    this.size=0;
+  }
+  public static class UncheckedListImpl extends FloatArrSeq implements OmniList.OfFloat
+  {
+    static int uncheckedToString(float[] arr,int begin,int end,char[] buffer)
     {
-      final char[] buffer;
-      if(size<=(OmniArray.MAX_ARR_SIZE/34))
+      int bufferOffset;
+      for(bufferOffset=ToStringUtil.getStringFloat(arr[begin],buffer,1);begin!=end;buffer[bufferOffset]=',',buffer[++bufferOffset]=' ',bufferOffset=ToStringUtil.getStringFloat(arr[++begin],buffer,bufferOffset)){}
+      return bufferOffset;
+    }
+    static void uncheckedToString(float[] arr,int begin,int end,ToStringUtil.OmniStringBuilder builder)
+    {
+      for(builder.uncheckedAppendFloat(arr[begin]);begin!=end;builder.uncheckedAppendCommaAndSpace(),builder.uncheckedAppendFloat(arr[++begin])){}
+    }
+    static  void uncheckedForEach(float[] arr,int begin,int end,FloatConsumer action)
+    {
+      for(;;++begin)
       {
-        buffer[size=uncheckedToString(size,buffer=new char[size*17])]=']';
+        action.accept((float)arr[begin]);
+        if(begin==end)
+        {
+          return;
+        }
       }
-      else
+    }
+    static int uncheckedHashCode(float[] arr,int begin,int end)
+    {
+      int hash=31+HashUtil.hashFloat(arr[begin]);
+      while(begin!=end)
+      {
+        hash=hash*31+HashUtil.hashFloat(arr[++begin]);
+      }
+      return hash;
+    }
+    public UncheckedListImpl()
+    {
+      super();
+    }
+    public UncheckedListImpl(int initialCapacity)
+    {
+      super(initialCapacity);
+    }
+    private UncheckedListImpl(int size,float[] arr)
+    {
+      super(size,arr);
+    }
+    @Override
+    public String toString()
+    {
+      int size;
+      if((size=this.size)!=0)
       {
         if(size>(Integer.MAX_VALUE/5))
         {
           throw new OutOfMemoryError();
         }
-        final ToStringUtil.OmniStringBuilder builder;
-        uncheckedToString(size,builder=new ToStringUtil.OmniStringBuilder(1,new char[size<=(OmniArray.MAX_ARR_SIZE/11)?(size*11):(OmniArray.MAX_ARR_SIZE)]));
-        (buffer=builder.buffer)[size=builder.size]=']';
+        final char[] buffer;
+        if(size<=(OmniArray.MAX_ARR_SIZE/((17)<<1)))
+        {
+          (buffer=new char[size*(17)])[size=uncheckedToString(arr,0,size-1,buffer)]=']';
+          buffer[0]='[';
+          return new String(buffer,0,size+1);
+        }
+        else
+        {
+          final ToStringUtil.OmniStringBuilder builder;
+          uncheckedToString(arr,0,size-1,builder=new ToStringUtil.OmniStringBuilder(1,new char[size<=(int)(OmniArray.MAX_ARR_SIZE/11)?(size*11):OmniArray.MAX_ARR_SIZE]));
+          builder.uncheckedAppendChar(']');
+          (buffer=builder.buffer)[0]='[';
+          return new String(buffer,0,builder.size);
+        }
       }
-      buffer[0]='[';
-      return new String(buffer,0,size+1);
-    }
-    return "[]";
-  }
-  abstract void uncheckedForEach(final int size,final FloatConsumer action);
-  //TODO forEach methods
-  //TODO removeIf methods
-  //TODO peek methods
-  //TODO uncheckedCopyInto methods
-  //TODO contains methods
-  //TODO indexOf methods
-  //TODO lastIndexOf methods
-  //TODO search methods
-  @Override
-  protected boolean containsRawInt(final int val)
-  {
-    final int size;
-    if((size=this.size)!=0)
-    {
-      if(val!=0)
-      {
-        return uncheckedcontainsBits(this.arr,0,size-1,Float.floatToRawIntBits(val));
-      }
-      return uncheckedcontains0(this.arr,0,size-1);
-    }
-    return false;
-  }
-  @Override
-  protected boolean removeValRawInt(final int val)
-  {
-    final int size;
-    if((size=this.size)!=0)
-    {
-      if(val!=0)
-      {
-        return uncheckedremoveValBits(size,Float.floatToRawIntBits(val));
-      }
-      return uncheckedremoveVal0(size);
-    }
-    return false;
-  }
-   public Float pop()
-   {
-     return popFloat();
-   }
-   public void push(final Float val)
-   {
-     push((float)val);
-   }
-  public float popFloat()
-  {
-    return uncheckedPop(size-1);
-  }
-  public void push(final float val)
-  {
-    final int size;
-    if((size=this.size)!=0)
-    {
-      uncheckedAppend(val,size);
-    }
-    else
-    {
-      uncheckedInit(val);
-    }
-  }
-  @Override
-  public boolean remove(final Object val)
-  {
-    final int size;
-    if((size=this.size)!=0)
-    {
-      if(val instanceof Float)
-      {
-        return this.uncheckedRemoveVal(size,(float)(val));
-      }
-    }
-    return false;
-  }
-  @Override
-  public float set(final int index,final float val)
-  {
-    final float[] arr;
-    final var oldVal=(float)(arr=this.arr)[index];
-    arr[index]=val;
-    return oldVal;
-  }
-  @Override
-  public <T> T[] toArray(final IntFunction<T[]> arrConstructor)
-  {
-    final int size;
-    final T[] dst=arrConstructor.apply(size=this.size);
-    if(size!=0)
-    {
-      uncheckedCopyInto(dst,size);
-    }
-    return dst;
-  }
-  @Override
-  public <T> T[] toArray(T[] dst)
-  {
-    final int size;
-    if((size=this.size)!=0)
-    {
-      uncheckedCopyInto(dst=OmniArray.uncheckedArrResize(size,dst),size);
-    }
-    else if(dst.length!=0)
-    {
-      dst[0]=null;
-    }
-    return dst;
-  }
-  abstract boolean uncheckedRemoveVal0(final int size);
-  abstract boolean uncheckedRemoveValBits(final int size,final int bits);
-  abstract boolean uncheckedRemoveValNaN(final int size);
-  abstract boolean uncheckedRemoveIf(final int size,final FloatPredicate filter);
-  private int finalizeSubListBatchRemove(final float[] arr,final int newBound,final int oldBound)
-  {
-    final int newRootSize,numRemoved;
-    size=newRootSize=size-(numRemoved=oldBound-newBound);
-    ArrCopy.semicheckedSelfCopy(arr,oldBound,newBound,newRootSize-newBound);
-    return numRemoved;
-  }
-  private float[] growInsert(float[] arr,final int index,final int size)
-  {
-    if(arr.length==size)
-    {
-      ArrCopy.semicheckedCopy(arr,0,arr=new float[OmniArray.growBy50Pct(size)],0,index);
-      this.arr=arr;
-    }
-    return arr;
-  }
-  private void uncheckedAppend(final float val,final int size)
-  {
-    float[] arr;
-    if((arr=this.arr).length==size)
-    {
-      ArrCopy.uncheckedCopy(arr,0,arr=new float[OmniArray.growBy50Pct(size)],0,size);
-    }
-    arr[size]=val;
-    this.size=size+1;
-  }
-  private void uncheckedInit(final float val)
-  {
-    float[] arr;
-    if((arr=this.arr)==OmniArray.OfFloat.DEFAULT_ARR)
-    {
-      this.arr=arr=new float[OmniArray.DEFAULT_ARR_SEQ_CAP];
-    }
-    else if(arr==null)
-    {
-      this.arr=arr=new float[1];
-    }
-    arr[0]=val;
-    this.size=1;
-  }
-  private void uncheckedInsert(final int index,final float val,final int size)
-  {
-    final int tailDist;
-    if((tailDist=size-index)==0)
-    {
-      uncheckedAppend(val,size);
-    }
-    else
-    {
-      float[] arr;
-      ArrCopy.uncheckedCopy(arr=this.arr,index,arr=growInsert(arr,index,size),index+1,tailDist);
-      arr[index]=val;
-      this.size=size+1;
-    }
-  }
-  private float uncheckedPop(final int newSize)
-  {
-    this.size=newSize;
-    return arr[newSize];
-  }
-  //TODO toArray methods
-  //TODO removeVal methods
-  public static abstract class Unchecked extends FloatArrSeq
-  {
-    private Unchecked()
-    {
-      super();
-    }
-    private Unchecked(final int capacity)
-    {
-      super(capacity);
-    }
-    private Unchecked(final int size,final float[] arr)
-    {
-      super(size,arr);
+      return "[]";
     }
     @Override
-    public boolean add(final float val)
-    {
-      super.push(val);
-      return true;
-    }
-    @Override
-    public void add(final int index,final float val)
+    public int hashCode()
     {
       final int size;
       if((size=this.size)!=0)
       {
-        super.uncheckedInsert(index,val,size);
+        {
+          return uncheckedHashCode(arr,0,size-1);
+        }
       }
-      else
-      {
-        super.uncheckedInit(val);
-      }
+      return 1;
     }
     @Override
-    public float getFloat(final int index)
+    public <T> T[] toArray(T[] arr)
     {
-      return (float)arr[index];
+      //TODO
+      return null;
     }
     @Override
-    public float removeFloatAt(final int index)
+    public <T> T[] toArray(IntFunction<T[]> arrConstructor)
     {
-      final float[] arr;
-      final var removed=(float)(arr=this.arr)[index];
-      eraseIndexHelper(arr,index,--size);
-      return removed;
+      //TODO
+      return null;
     }
-    //TODO uncheckedRemoveIf
-  }
-  public static class UncheckedList extends Unchecked
-  {
-    public UncheckedList()
+    @Override
+    public boolean equals(Object val)
     {
-      super();
-    }
-    public UncheckedList(final int capacity)
-    {
-      super(capacity);
-    }
-    public UncheckedList(final int size,final float[] arr)
-    {
-      super(size,arr);
+      //TODO
+      return false;
     }
     @Override
     public Object clone()
     {
-      final float[] arr;
       final int size;
       if((size=this.size)!=0)
       {
-        ArrCopy.uncheckedCopy(this.arr,0,arr=new float[size],0,size);
+        final float[] copy;
+        ArrCopy.uncheckedCopy(arr,0,copy=new float[size],0,size);
+        return new UncheckedListImpl(size,copy);
       }
-      else
-      {
-        arr=null;
-      }
-      return new UncheckedList(size,arr);
+      return new UncheckedListImpl();
     }
     @Override
-    public boolean equals(final Object val)
+    public void forEach(FloatConsumer action)
     {
-      //TODO implements equals method
+      final int size;
+      if((size=this.size)!=0)
+      {
+        {
+          uncheckedForEach(arr,0,size-1,action);
+        }
+      }
+    }
+    @Override
+    public void forEach(Consumer<? super Float> action)
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        {
+          uncheckedForEach(arr,0,size-1,action::accept);
+        }
+      }
+    }
+    @Override
+    public boolean removeIf(FloatPredicate filter)
+    {
+      //TODO
       return false;
     }
+    @Override
+    public boolean removeIf(Predicate<? super Float> filter)
+    {
+      //TODO
+      return false;
+    }
+   @Override
+   public
+   boolean
+   contains(boolean val)
+   {
+     final int size;
+     if((size=this.size)!=0)
+     {
+       if(val)
+       {
+         return OmniArray.OfFloat.uncheckedcontainsBits(this.arr,0,size-1,TypeUtil.FLT_TRUE_BITS);
+       }
+       return OmniArray.OfFloat.uncheckedcontains0(this.arr,0,size-1);
+     }
+     return false;
+   }
+   @Override
+   public
+   boolean
+   contains(int val)
+   {
+     final int size;
+     if((size=this.size)!=0)
+     {
+       if(val!=0)
+       {
+         if(TypeUtil.checkCastToFloat(val))
+         {
+           return OmniArray.OfFloat.uncheckedcontainsBits(this.arr,0,size-1,Float.floatToRawIntBits(val));
+         }
+       }
+       else
+       {
+         return OmniArray.OfFloat.uncheckedcontains0(this.arr,0,size-1);
+       }
+     }
+     return false;
+   }
+   @Override
+   public
+   boolean
+   contains(long val)
+   {
+     final int size;
+     if((size=this.size)!=0)
+     {
+       if(val!=0)
+       {
+         if(TypeUtil.checkCastToFloat(val))
+         {
+           return OmniArray.OfFloat.uncheckedcontainsBits(this.arr,0,size-1,Float.floatToRawIntBits(val));
+         }
+       }
+       else
+       {
+         return OmniArray.OfFloat.uncheckedcontains0(this.arr,0,size-1);
+       }
+     }
+     return false;
+   }
+   @Override
+   public
+   boolean
+   contains(float val)
+   {
+     final int size;
+     if((size=this.size)!=0)
+     {
+       if(val==val)
+       {
+         return OmniArray.OfFloat.uncheckedcontainsBits(this.arr,0,size-1,Float.floatToRawIntBits(val));
+       }
+       return OmniArray.OfFloat.uncheckedcontainsNaN(this.arr,0,size-1);
+     }
+     return false;
+   }
+   @Override
+   public
+   boolean
+   contains(double val)
+   {
+     final int size;
+     if((size=this.size)!=0)
+     {
+       final float v;
+       if((v=(float)val)==val)
+       {
+         return OmniArray.OfFloat.uncheckedcontainsBits(this.arr,0,size-1,Float.floatToRawIntBits(v));
+       }
+       else if(v!=v)
+       {
+         return OmniArray.OfFloat.uncheckedcontainsNaN(this.arr,0,size-1);
+       }
+     }
+     return false;
+   }
+   @Override
+   public
+   boolean
+   contains
+   (Object val)
+   {
+     final int size;
+     if((size=this.size)!=0)
+     {
+       if(val instanceof Float)
+       {
+         final float v;
+         if((v=(float)val)==v)
+         {
+           return OmniArray.OfFloat.uncheckedcontainsBits(this.arr,0,size-1,Float.floatToRawIntBits(v));
+         }
+         return OmniArray.OfFloat.uncheckedcontainsNaN(this.arr,0,size-1);
+       }
+     }
+     return false;
+   }
+    @Override
+    public boolean add(float val)
+    {
+      //TODO
+      return false;
+    }
+    @Override
+    public void add(int index,float val)
+    {
+      //TODO
+    }
+    @Override
+    public float removeFloatAt(int index)
+    {
+      final float[] arr;
+      float ret=(float)(arr=this.arr)[index];
+      ArrCopy.semicheckedSelfCopy(arr,index+1,index,(--size)-index);
+      this.size=size;
+      return ret;
+    }
+    @Override
+    public OmniListIterator.OfFloat listIterator()
+    {
+      //TODO
+      return null;
+    }
+    @Override
+    public OmniListIterator.OfFloat listIterator(int index)
+    {
+      //TODO
+      return null;
+    }
+    @Override
+    public OmniList.OfFloat subList(int fromIndex,int toIndex)
+    {
+      //TODO
+      return null;
+    }
+    @Override
+    public void stableDescendingSort()
+    {
+      final int size;
+      if((size=this.size)>1)
+      {
+        {
+          FloatSortUtil.uncheckedDescendingSort(arr,0,size);
+        }
+      }
+    }
+    @Override
+    public void stableAscendingSort()
+    {
+      final int size;
+      if((size=this.size)>1)
+      {
+        {
+          FloatSortUtil.uncheckedAscendingSort(arr,0,size);
+        }
+      }
+    }
+    @Override
+    public OmniIterator.OfFloat iterator()
+    {
+      //TODO
+      return null;
+    }
+    @Override
+    public float[] toFloatArray()
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        final float[] copy;
+        ArrCopy.uncheckedCopy(arr,0,copy=new float[size],0,size);
+        return copy;
+      }
+      return OmniArray.OfFloat.DEFAULT_ARR;
+    }
+    @Override
+    public Float[] toArray()
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        final Float[] copy;
+        ArrCopy.uncheckedCopy(arr,0,copy=new Float[size],0,size);
+        return copy;
+      }
+      return OmniArray.OfFloat.DEFAULT_BOXED_ARR;
+    }
+    @Override
+    public double[] toDoubleArray()
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        final double[] copy;
+        ArrCopy.uncheckedCopy(arr,0,copy=new double[size],0,size);
+        return copy;
+      }
+      return OmniArray.OfDouble.DEFAULT_ARR;
+    }
   }
-  //TODO UncheckedStack
-  //TODO Checked
-  //TODO CheckedList
-  //TODO CheckedStack
+  public static class UncheckedStackImpl extends FloatArrSeq implements OmniStack.OfFloat
+  {
+    static int uncheckedToString(float[] arr,int begin,int end,char[] buffer)
+    {
+      int bufferOffset;
+      for(bufferOffset=ToStringUtil.getStringFloat(arr[end],buffer,1);begin!=end;buffer[bufferOffset]=',',buffer[++bufferOffset]=' ',bufferOffset=ToStringUtil.getStringFloat(arr[--end],buffer,bufferOffset)){}
+      return bufferOffset;
+    }
+    static void uncheckedToString(float[] arr,int begin,int end,ToStringUtil.OmniStringBuilder builder)
+    {
+      for(builder.uncheckedAppendFloat(arr[end]);begin!=end;builder.uncheckedAppendCommaAndSpace(),builder.uncheckedAppendFloat(arr[--end])){}
+    }
+    static  void uncheckedForEach(float[] arr,int begin,int end,FloatConsumer action)
+    {
+      for(;;--end)
+      {
+        action.accept((float)arr[end]);
+        if(begin==end)
+        {
+          return;
+        }
+      }
+    }
+    static int uncheckedHashCode(float[] arr,int begin,int end)
+    {
+      int hash=31+HashUtil.hashFloat(arr[end]);
+      while(begin!=end)
+      {
+        hash=hash*31+HashUtil.hashFloat(arr[--end]);
+      }
+      return hash;
+    }
+    public UncheckedStackImpl()
+    {
+      super();
+    }
+    public UncheckedStackImpl(int initialCapacity)
+    {
+      super(initialCapacity);
+    }
+    private UncheckedStackImpl(int size,float[] arr)
+    {
+      super(size,arr);
+    }
+    @Override
+    public String toString()
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        if(size>(Integer.MAX_VALUE/5))
+        {
+          throw new OutOfMemoryError();
+        }
+        final char[] buffer;
+        if(size<=(OmniArray.MAX_ARR_SIZE/((17)<<1)))
+        {
+          (buffer=new char[size*(17)])[size=uncheckedToString(arr,0,size-1,buffer)]=']';
+          buffer[0]='[';
+          return new String(buffer,0,size+1);
+        }
+        else
+        {
+          final ToStringUtil.OmniStringBuilder builder;
+          uncheckedToString(arr,0,size-1,builder=new ToStringUtil.OmniStringBuilder(1,new char[size<=(int)(OmniArray.MAX_ARR_SIZE/11)?(size*11):OmniArray.MAX_ARR_SIZE]));
+          builder.uncheckedAppendChar(']');
+          (buffer=builder.buffer)[0]='[';
+          return new String(buffer,0,builder.size);
+        }
+      }
+      return "[]";
+    }
+    @Override
+    public int hashCode()
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        {
+          return uncheckedHashCode(arr,0,size-1);
+        }
+      }
+      return 1;
+    }
+    @Override
+    public <T> T[] toArray(T[] arr)
+    {
+      //TODO
+      return null;
+    }
+    @Override
+    public <T> T[] toArray(IntFunction<T[]> arrConstructor)
+    {
+      //TODO
+      return null;
+    }
+    @Override
+    public boolean equals(Object val)
+    {
+      //TODO
+      return false;
+    }
+    @Override
+    public Object clone()
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        final float[] copy;
+        ArrCopy.uncheckedCopy(arr,0,copy=new float[size],0,size);
+        return new UncheckedStackImpl(size,copy);
+      }
+      return new UncheckedStackImpl();
+    }
+    @Override
+    public void forEach(FloatConsumer action)
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        {
+          uncheckedForEach(arr,0,size-1,action);
+        }
+      }
+    }
+    @Override
+    public void forEach(Consumer<? super Float> action)
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        {
+          uncheckedForEach(arr,0,size-1,action::accept);
+        }
+      }
+    }
+    @Override
+    public boolean removeIf(FloatPredicate filter)
+    {
+      //TODO
+      return false;
+    }
+    @Override
+    public boolean removeIf(Predicate<? super Float> filter)
+    {
+      //TODO
+      return false;
+    }
+   @Override
+   public
+   boolean
+   contains(boolean val)
+   {
+     final int size;
+     if((size=this.size)!=0)
+     {
+       if(val)
+       {
+         return OmniArray.OfFloat.uncheckedcontainsBits(this.arr,0,size-1,TypeUtil.FLT_TRUE_BITS);
+       }
+       return OmniArray.OfFloat.uncheckedcontains0(this.arr,0,size-1);
+     }
+     return false;
+   }
+   @Override
+   public
+   boolean
+   contains(int val)
+   {
+     final int size;
+     if((size=this.size)!=0)
+     {
+       if(val!=0)
+       {
+         if(TypeUtil.checkCastToFloat(val))
+         {
+           return OmniArray.OfFloat.uncheckedcontainsBits(this.arr,0,size-1,Float.floatToRawIntBits(val));
+         }
+       }
+       else
+       {
+         return OmniArray.OfFloat.uncheckedcontains0(this.arr,0,size-1);
+       }
+     }
+     return false;
+   }
+   @Override
+   public
+   boolean
+   contains(long val)
+   {
+     final int size;
+     if((size=this.size)!=0)
+     {
+       if(val!=0)
+       {
+         if(TypeUtil.checkCastToFloat(val))
+         {
+           return OmniArray.OfFloat.uncheckedcontainsBits(this.arr,0,size-1,Float.floatToRawIntBits(val));
+         }
+       }
+       else
+       {
+         return OmniArray.OfFloat.uncheckedcontains0(this.arr,0,size-1);
+       }
+     }
+     return false;
+   }
+   @Override
+   public
+   boolean
+   contains(float val)
+   {
+     final int size;
+     if((size=this.size)!=0)
+     {
+       if(val==val)
+       {
+         return OmniArray.OfFloat.uncheckedcontainsBits(this.arr,0,size-1,Float.floatToRawIntBits(val));
+       }
+       return OmniArray.OfFloat.uncheckedcontainsNaN(this.arr,0,size-1);
+     }
+     return false;
+   }
+   @Override
+   public
+   boolean
+   contains(double val)
+   {
+     final int size;
+     if((size=this.size)!=0)
+     {
+       final float v;
+       if((v=(float)val)==val)
+       {
+         return OmniArray.OfFloat.uncheckedcontainsBits(this.arr,0,size-1,Float.floatToRawIntBits(v));
+       }
+       else if(v!=v)
+       {
+         return OmniArray.OfFloat.uncheckedcontainsNaN(this.arr,0,size-1);
+       }
+     }
+     return false;
+   }
+   @Override
+   public
+   boolean
+   contains
+   (Object val)
+   {
+     final int size;
+     if((size=this.size)!=0)
+     {
+       if(val instanceof Float)
+       {
+         final float v;
+         if((v=(float)val)==v)
+         {
+           return OmniArray.OfFloat.uncheckedcontainsBits(this.arr,0,size-1,Float.floatToRawIntBits(v));
+         }
+         return OmniArray.OfFloat.uncheckedcontainsNaN(this.arr,0,size-1);
+       }
+     }
+     return false;
+   }
+    @Override
+    public OmniIterator.OfFloat iterator()
+    {
+      //TODO
+      return null;
+    }
+    @Override
+    public float[] toFloatArray()
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        final float[] copy;
+        ArrCopy.uncheckedReverseCopy(arr,0,copy=new float[size],0,size);
+        return copy;
+      }
+      return OmniArray.OfFloat.DEFAULT_ARR;
+    }
+    @Override
+    public Float[] toArray()
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        final Float[] copy;
+        ArrCopy.uncheckedReverseCopy(arr,0,copy=new Float[size],0,size);
+        return copy;
+      }
+      return OmniArray.OfFloat.DEFAULT_BOXED_ARR;
+    }
+    @Override
+    public double[] toDoubleArray()
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        final double[] copy;
+        ArrCopy.uncheckedReverseCopy(arr,0,copy=new double[size],0,size);
+        return copy;
+      }
+      return OmniArray.OfDouble.DEFAULT_ARR;
+    }
+    @Override
+    public float popFloat()
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        float ret=(float)arr[--size];
+        this.size=size;
+        return ret;
+      }
+      throw new NoSuchElementException();
+    }
+    @Override
+    public Float pop()
+    {
+      return popFloat();
+    }
+    @Override
+    public void push(float val)
+    {
+      //TODO
+    }
+    @Override
+    public void push(Float val)
+    {
+      //TODO
+    }
+    @Override
+    public float peekFloat()
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        return (float)((float)arr[size-1]);
+      }
+      return Float.NaN;
+    }
+    @Override
+    public float pollFloat()
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        float ret=(float)((float)arr[--size]);
+        this.size=size;
+        return ret;
+      }
+      return Float.NaN;
+    }
+    @Override
+    public Float poll()
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        Float ret=(Float)((float)arr[--size]);
+        this.size=size;
+        return ret;
+      }
+      return null;
+    }
+    @Override
+    public double pollDouble()
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        double ret=(double)((float)arr[--size]);
+        this.size=size;
+        return ret;
+      }
+      return Double.NaN;
+    }
+    @Override
+    public Float peek()
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        return (Float)((float)arr[size-1]);
+      }
+      return null;
+    }
+    @Override
+    public double peekDouble()
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        return (double)((float)arr[size-1]);
+      }
+      return Double.NaN;
+    }
+  }
+  public static class CheckedListImpl extends FloatArrSeq implements OmniList.OfFloat
+  {
+    static int uncheckedToString(float[] arr,int begin,int end,char[] buffer)
+    {
+      int bufferOffset;
+      for(bufferOffset=ToStringUtil.getStringFloat(arr[begin],buffer,1);begin!=end;buffer[bufferOffset]=',',buffer[++bufferOffset]=' ',bufferOffset=ToStringUtil.getStringFloat(arr[++begin],buffer,bufferOffset)){}
+      return bufferOffset;
+    }
+    static void uncheckedToString(float[] arr,int begin,int end,ToStringUtil.OmniStringBuilder builder)
+    {
+      for(builder.uncheckedAppendFloat(arr[begin]);begin!=end;builder.uncheckedAppendCommaAndSpace(),builder.uncheckedAppendFloat(arr[++begin])){}
+    }
+    static  void uncheckedForEach(float[] arr,int begin,int end,FloatConsumer action)
+    {
+      for(;;++begin)
+      {
+        action.accept((float)arr[begin]);
+        if(begin==end)
+        {
+          return;
+        }
+      }
+    }
+    static int uncheckedHashCode(float[] arr,int begin,int end)
+    {
+      int hash=31+HashUtil.hashFloat(arr[begin]);
+      while(begin!=end)
+      {
+        hash=hash*31+HashUtil.hashFloat(arr[++begin]);
+      }
+      return hash;
+    }
+    transient int modCount;
+    public CheckedListImpl()
+    {
+      super();
+    }
+    public CheckedListImpl(int initialCapacity)
+    {
+      super(initialCapacity);
+    }
+    private CheckedListImpl(int size,float[] arr)
+    {
+      super(size,arr);
+    }
+    @Override
+    public void clear()
+    {
+      if(this.size!=0)
+      {
+        ++this.modCount;
+        this.size=0;
+      }
+    }
+    @Override
+    public String toString()
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        if(size>(Integer.MAX_VALUE/5))
+        {
+          throw new OutOfMemoryError();
+        }
+        final char[] buffer;
+        if(size<=(OmniArray.MAX_ARR_SIZE/((17)<<1)))
+        {
+          (buffer=new char[size*(17)])[size=uncheckedToString(arr,0,size-1,buffer)]=']';
+          buffer[0]='[';
+          return new String(buffer,0,size+1);
+        }
+        else
+        {
+          final ToStringUtil.OmniStringBuilder builder;
+          uncheckedToString(arr,0,size-1,builder=new ToStringUtil.OmniStringBuilder(1,new char[size<=(int)(OmniArray.MAX_ARR_SIZE/11)?(size*11):OmniArray.MAX_ARR_SIZE]));
+          builder.uncheckedAppendChar(']');
+          (buffer=builder.buffer)[0]='[';
+          return new String(buffer,0,builder.size);
+        }
+      }
+      return "[]";
+    }
+    @Override
+    public int hashCode()
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        {
+          return uncheckedHashCode(arr,0,size-1);
+        }
+      }
+      return 1;
+    }
+    @Override
+    public <T> T[] toArray(T[] arr)
+    {
+      //TODO
+      return null;
+    }
+    @Override
+    public <T> T[] toArray(IntFunction<T[]> arrConstructor)
+    {
+      //TODO
+      return null;
+    }
+    @Override
+    public boolean equals(Object val)
+    {
+      //TODO
+      return false;
+    }
+    @Override
+    public Object clone()
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        final float[] copy;
+        ArrCopy.uncheckedCopy(arr,0,copy=new float[size],0,size);
+        return new CheckedListImpl(size,copy);
+      }
+      return new CheckedListImpl();
+    }
+    @Override
+    public void forEach(FloatConsumer action)
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        int modCount=this.modCount;
+        try
+        {
+          uncheckedForEach(arr,0,size-1,action);
+        }
+        finally
+        {
+          CheckedCollection.checkModCount(modCount,this.modCount);
+        }
+      }
+    }
+    @Override
+    public void forEach(Consumer<? super Float> action)
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        int modCount=this.modCount;
+        try
+        {
+          uncheckedForEach(arr,0,size-1,action::accept);
+        }
+        finally
+        {
+          CheckedCollection.checkModCount(modCount,this.modCount);
+        }
+      }
+    }
+    @Override
+    public boolean removeIf(FloatPredicate filter)
+    {
+      //TODO
+      return false;
+    }
+    @Override
+    public boolean removeIf(Predicate<? super Float> filter)
+    {
+      //TODO
+      return false;
+    }
+   @Override
+   public
+   boolean
+   contains(boolean val)
+   {
+     final int size;
+     if((size=this.size)!=0)
+     {
+       if(val)
+       {
+         return OmniArray.OfFloat.uncheckedcontainsBits(this.arr,0,size-1,TypeUtil.FLT_TRUE_BITS);
+       }
+       return OmniArray.OfFloat.uncheckedcontains0(this.arr,0,size-1);
+     }
+     return false;
+   }
+   @Override
+   public
+   boolean
+   contains(int val)
+   {
+     final int size;
+     if((size=this.size)!=0)
+     {
+       if(val!=0)
+       {
+         if(TypeUtil.checkCastToFloat(val))
+         {
+           return OmniArray.OfFloat.uncheckedcontainsBits(this.arr,0,size-1,Float.floatToRawIntBits(val));
+         }
+       }
+       else
+       {
+         return OmniArray.OfFloat.uncheckedcontains0(this.arr,0,size-1);
+       }
+     }
+     return false;
+   }
+   @Override
+   public
+   boolean
+   contains(long val)
+   {
+     final int size;
+     if((size=this.size)!=0)
+     {
+       if(val!=0)
+       {
+         if(TypeUtil.checkCastToFloat(val))
+         {
+           return OmniArray.OfFloat.uncheckedcontainsBits(this.arr,0,size-1,Float.floatToRawIntBits(val));
+         }
+       }
+       else
+       {
+         return OmniArray.OfFloat.uncheckedcontains0(this.arr,0,size-1);
+       }
+     }
+     return false;
+   }
+   @Override
+   public
+   boolean
+   contains(float val)
+   {
+     final int size;
+     if((size=this.size)!=0)
+     {
+       if(val==val)
+       {
+         return OmniArray.OfFloat.uncheckedcontainsBits(this.arr,0,size-1,Float.floatToRawIntBits(val));
+       }
+       return OmniArray.OfFloat.uncheckedcontainsNaN(this.arr,0,size-1);
+     }
+     return false;
+   }
+   @Override
+   public
+   boolean
+   contains(double val)
+   {
+     final int size;
+     if((size=this.size)!=0)
+     {
+       final float v;
+       if((v=(float)val)==val)
+       {
+         return OmniArray.OfFloat.uncheckedcontainsBits(this.arr,0,size-1,Float.floatToRawIntBits(v));
+       }
+       else if(v!=v)
+       {
+         return OmniArray.OfFloat.uncheckedcontainsNaN(this.arr,0,size-1);
+       }
+     }
+     return false;
+   }
+   @Override
+   public
+   boolean
+   contains
+   (Object val)
+   {
+     final int size;
+     if((size=this.size)!=0)
+     {
+       int modCount=this.modCount;
+       if(val instanceof Float)
+       {
+         final float v;
+         if((v=(float)val)==v)
+         {
+           return OmniArray.OfFloat.uncheckedcontainsBits(this.arr,0,size-1,Float.floatToRawIntBits(v));
+         }
+         return OmniArray.OfFloat.uncheckedcontainsNaN(this.arr,0,size-1);
+       }
+     }
+     CheckedCollection.checkModCount(modCount,this.modCount);
+     return false;
+   }
+    @Override
+    public boolean add(float val)
+    {
+      //TODO
+      return false;
+    }
+    @Override
+    public void add(int index,float val)
+    {
+      //TODO
+    }
+    @Override
+    public float removeFloatAt(int index)
+    {
+      int size;
+      if(index<0 || index>=(size=this.size))
+      {
+        throw new IndexOutOfBoundsException("index = "+index+"; size="+this.size);
+      }
+      ++this.modCount;
+      final float[] arr;
+      float ret=(float)(arr=this.arr)[index];
+      ArrCopy.semicheckedSelfCopy(arr,index+1,index,(--size)-index);
+      this.size=size;
+      return ret;
+    }
+    @Override
+    public OmniListIterator.OfFloat listIterator()
+    {
+      //TODO
+      return null;
+    }
+    @Override
+    public OmniListIterator.OfFloat listIterator(int index)
+    {
+      //TODO
+      return null;
+    }
+    @Override
+    public OmniList.OfFloat subList(int fromIndex,int toIndex)
+    {
+      //TODO
+      return null;
+    }
+    @Override
+    public void stableDescendingSort()
+    {
+      final int size;
+      if((size=this.size)>1)
+      {
+        {
+          FloatSortUtil.uncheckedDescendingSort(arr,0,size);
+        }
+      }
+    }
+    @Override
+    public void stableAscendingSort()
+    {
+      final int size;
+      if((size=this.size)>1)
+      {
+        {
+          FloatSortUtil.uncheckedAscendingSort(arr,0,size);
+        }
+      }
+    }
+    @Override
+    public OmniIterator.OfFloat iterator()
+    {
+      //TODO
+      return null;
+    }
+    @Override
+    public float[] toFloatArray()
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        final float[] copy;
+        ArrCopy.uncheckedCopy(arr,0,copy=new float[size],0,size);
+        return copy;
+      }
+      return OmniArray.OfFloat.DEFAULT_ARR;
+    }
+    @Override
+    public Float[] toArray()
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        final Float[] copy;
+        ArrCopy.uncheckedCopy(arr,0,copy=new Float[size],0,size);
+        return copy;
+      }
+      return OmniArray.OfFloat.DEFAULT_BOXED_ARR;
+    }
+    @Override
+    public double[] toDoubleArray()
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        final double[] copy;
+        ArrCopy.uncheckedCopy(arr,0,copy=new double[size],0,size);
+        return copy;
+      }
+      return OmniArray.OfDouble.DEFAULT_ARR;
+    }
+  }
+  public static class CheckedStackImpl extends FloatArrSeq implements OmniStack.OfFloat
+  {
+    static int uncheckedToString(float[] arr,int begin,int end,char[] buffer)
+    {
+      int bufferOffset;
+      for(bufferOffset=ToStringUtil.getStringFloat(arr[end],buffer,1);begin!=end;buffer[bufferOffset]=',',buffer[++bufferOffset]=' ',bufferOffset=ToStringUtil.getStringFloat(arr[--end],buffer,bufferOffset)){}
+      return bufferOffset;
+    }
+    static void uncheckedToString(float[] arr,int begin,int end,ToStringUtil.OmniStringBuilder builder)
+    {
+      for(builder.uncheckedAppendFloat(arr[end]);begin!=end;builder.uncheckedAppendCommaAndSpace(),builder.uncheckedAppendFloat(arr[--end])){}
+    }
+    static  void uncheckedForEach(float[] arr,int begin,int end,FloatConsumer action)
+    {
+      for(;;--end)
+      {
+        action.accept((float)arr[end]);
+        if(begin==end)
+        {
+          return;
+        }
+      }
+    }
+    static int uncheckedHashCode(float[] arr,int begin,int end)
+    {
+      int hash=31+HashUtil.hashFloat(arr[end]);
+      while(begin!=end)
+      {
+        hash=hash*31+HashUtil.hashFloat(arr[--end]);
+      }
+      return hash;
+    }
+    transient int modCount;
+    public CheckedStackImpl()
+    {
+      super();
+    }
+    public CheckedStackImpl(int initialCapacity)
+    {
+      super(initialCapacity);
+    }
+    private CheckedStackImpl(int size,float[] arr)
+    {
+      super(size,arr);
+    }
+    @Override
+    public void clear()
+    {
+      if(this.size!=0)
+      {
+        ++this.modCount;
+        this.size=0;
+      }
+    }
+    @Override
+    public String toString()
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        if(size>(Integer.MAX_VALUE/5))
+        {
+          throw new OutOfMemoryError();
+        }
+        final char[] buffer;
+        if(size<=(OmniArray.MAX_ARR_SIZE/((17)<<1)))
+        {
+          (buffer=new char[size*(17)])[size=uncheckedToString(arr,0,size-1,buffer)]=']';
+          buffer[0]='[';
+          return new String(buffer,0,size+1);
+        }
+        else
+        {
+          final ToStringUtil.OmniStringBuilder builder;
+          uncheckedToString(arr,0,size-1,builder=new ToStringUtil.OmniStringBuilder(1,new char[size<=(int)(OmniArray.MAX_ARR_SIZE/11)?(size*11):OmniArray.MAX_ARR_SIZE]));
+          builder.uncheckedAppendChar(']');
+          (buffer=builder.buffer)[0]='[';
+          return new String(buffer,0,builder.size);
+        }
+      }
+      return "[]";
+    }
+    @Override
+    public int hashCode()
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        {
+          return uncheckedHashCode(arr,0,size-1);
+        }
+      }
+      return 1;
+    }
+    @Override
+    public <T> T[] toArray(T[] arr)
+    {
+      //TODO
+      return null;
+    }
+    @Override
+    public <T> T[] toArray(IntFunction<T[]> arrConstructor)
+    {
+      //TODO
+      return null;
+    }
+    @Override
+    public boolean equals(Object val)
+    {
+      //TODO
+      return false;
+    }
+    @Override
+    public Object clone()
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        final float[] copy;
+        ArrCopy.uncheckedCopy(arr,0,copy=new float[size],0,size);
+        return new CheckedStackImpl(size,copy);
+      }
+      return new CheckedStackImpl();
+    }
+    @Override
+    public void forEach(FloatConsumer action)
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        int modCount=this.modCount;
+        try
+        {
+          uncheckedForEach(arr,0,size-1,action);
+        }
+        finally
+        {
+          CheckedCollection.checkModCount(modCount,this.modCount);
+        }
+      }
+    }
+    @Override
+    public void forEach(Consumer<? super Float> action)
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        int modCount=this.modCount;
+        try
+        {
+          uncheckedForEach(arr,0,size-1,action::accept);
+        }
+        finally
+        {
+          CheckedCollection.checkModCount(modCount,this.modCount);
+        }
+      }
+    }
+    @Override
+    public boolean removeIf(FloatPredicate filter)
+    {
+      //TODO
+      return false;
+    }
+    @Override
+    public boolean removeIf(Predicate<? super Float> filter)
+    {
+      //TODO
+      return false;
+    }
+   @Override
+   public
+   boolean
+   contains(boolean val)
+   {
+     final int size;
+     if((size=this.size)!=0)
+     {
+       if(val)
+       {
+         return OmniArray.OfFloat.uncheckedcontainsBits(this.arr,0,size-1,TypeUtil.FLT_TRUE_BITS);
+       }
+       return OmniArray.OfFloat.uncheckedcontains0(this.arr,0,size-1);
+     }
+     return false;
+   }
+   @Override
+   public
+   boolean
+   contains(int val)
+   {
+     final int size;
+     if((size=this.size)!=0)
+     {
+       if(val!=0)
+       {
+         if(TypeUtil.checkCastToFloat(val))
+         {
+           return OmniArray.OfFloat.uncheckedcontainsBits(this.arr,0,size-1,Float.floatToRawIntBits(val));
+         }
+       }
+       else
+       {
+         return OmniArray.OfFloat.uncheckedcontains0(this.arr,0,size-1);
+       }
+     }
+     return false;
+   }
+   @Override
+   public
+   boolean
+   contains(long val)
+   {
+     final int size;
+     if((size=this.size)!=0)
+     {
+       if(val!=0)
+       {
+         if(TypeUtil.checkCastToFloat(val))
+         {
+           return OmniArray.OfFloat.uncheckedcontainsBits(this.arr,0,size-1,Float.floatToRawIntBits(val));
+         }
+       }
+       else
+       {
+         return OmniArray.OfFloat.uncheckedcontains0(this.arr,0,size-1);
+       }
+     }
+     return false;
+   }
+   @Override
+   public
+   boolean
+   contains(float val)
+   {
+     final int size;
+     if((size=this.size)!=0)
+     {
+       if(val==val)
+       {
+         return OmniArray.OfFloat.uncheckedcontainsBits(this.arr,0,size-1,Float.floatToRawIntBits(val));
+       }
+       return OmniArray.OfFloat.uncheckedcontainsNaN(this.arr,0,size-1);
+     }
+     return false;
+   }
+   @Override
+   public
+   boolean
+   contains(double val)
+   {
+     final int size;
+     if((size=this.size)!=0)
+     {
+       final float v;
+       if((v=(float)val)==val)
+       {
+         return OmniArray.OfFloat.uncheckedcontainsBits(this.arr,0,size-1,Float.floatToRawIntBits(v));
+       }
+       else if(v!=v)
+       {
+         return OmniArray.OfFloat.uncheckedcontainsNaN(this.arr,0,size-1);
+       }
+     }
+     return false;
+   }
+   @Override
+   public
+   boolean
+   contains
+   (Object val)
+   {
+     final int size;
+     if((size=this.size)!=0)
+     {
+       int modCount=this.modCount;
+       if(val instanceof Float)
+       {
+         final float v;
+         if((v=(float)val)==v)
+         {
+           return OmniArray.OfFloat.uncheckedcontainsBits(this.arr,0,size-1,Float.floatToRawIntBits(v));
+         }
+         return OmniArray.OfFloat.uncheckedcontainsNaN(this.arr,0,size-1);
+       }
+     }
+     CheckedCollection.checkModCount(modCount,this.modCount);
+     return false;
+   }
+    @Override
+    public OmniIterator.OfFloat iterator()
+    {
+      //TODO
+      return null;
+    }
+    @Override
+    public float[] toFloatArray()
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        final float[] copy;
+        ArrCopy.uncheckedReverseCopy(arr,0,copy=new float[size],0,size);
+        return copy;
+      }
+      return OmniArray.OfFloat.DEFAULT_ARR;
+    }
+    @Override
+    public Float[] toArray()
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        final Float[] copy;
+        ArrCopy.uncheckedReverseCopy(arr,0,copy=new Float[size],0,size);
+        return copy;
+      }
+      return OmniArray.OfFloat.DEFAULT_BOXED_ARR;
+    }
+    @Override
+    public double[] toDoubleArray()
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        final double[] copy;
+        ArrCopy.uncheckedReverseCopy(arr,0,copy=new double[size],0,size);
+        return copy;
+      }
+      return OmniArray.OfDouble.DEFAULT_ARR;
+    }
+    @Override
+    public float popFloat()
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        float ret=(float)arr[--size];
+        ++this.modCount;
+        this.size=size;
+        return ret;
+      }
+      throw new NoSuchElementException();
+    }
+    @Override
+    public Float pop()
+    {
+      return popFloat();
+    }
+    @Override
+    public void push(float val)
+    {
+      //TODO
+    }
+    @Override
+    public void push(Float val)
+    {
+      //TODO
+    }
+    @Override
+    public float peekFloat()
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        return (float)((float)arr[size-1]);
+      }
+      return Float.NaN;
+    }
+    @Override
+    public float pollFloat()
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        float ret=(float)((float)arr[--size]);
+        ++this.modCount;
+        this.size=size;
+        return ret;
+      }
+      return Float.NaN;
+    }
+    @Override
+    public Float poll()
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        Float ret=(Float)((float)arr[--size]);
+        ++this.modCount;
+        this.size=size;
+        return ret;
+      }
+      return null;
+    }
+    @Override
+    public double pollDouble()
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        double ret=(double)((float)arr[--size]);
+        ++this.modCount;
+        this.size=size;
+        return ret;
+      }
+      return Double.NaN;
+    }
+    @Override
+    public Float peek()
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        return (Float)((float)arr[size-1]);
+      }
+      return null;
+    }
+    @Override
+    public double peekDouble()
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        return (double)((float)arr[size-1]);
+      }
+      return Double.NaN;
+    }
+  }
 }

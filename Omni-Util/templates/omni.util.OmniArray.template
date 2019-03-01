@@ -97,6 +97,136 @@ public final class OmniArray
 #MACRODEF SubInterface<CLASSPREFIX>(PRIMITIVETYPE,BOXEDTYPE)
 public interface OfCLASSPREFIX
 {
+#IFSWITCH CLASSPREFIX==Boolean,Byte,Char,Short,Int,Long
+  public static boolean uncheckedcontains(PRIMITIVETYPE[] arr,int begin,int end,
+  #IFSWITCH CLASSPREFIX==Boolean
+    boolean val
+  #ELSEIFSWITCH CLASSPREFIX==Byte,Char,Short,Int
+    int val
+  #ELSEIFSWITCH CLASSPREFIX==Long
+    long val
+  #ENDIF
+  )
+  {
+    for(;;++begin)
+    {
+      if(arr[begin]==val)
+      {
+        return true;
+      }
+      if(begin==end)
+      {
+        return false;
+      }
+    }
+  }
+#ELSEIFSWITCH CLASSPREFIX==Ref
+  public static boolean uncheckedcontains(PRIMITIVETYPE[] arr,int begin,int end,Predicate<Object> pred)
+  {
+    for(;;++begin)
+    {
+      if(pred.test(arr[begin]))
+      {
+        return true;
+      }
+      if(begin==end)
+      {
+        return false;
+      }
+    }
+  }
+  public static boolean uncheckedcontainsNonNull(PRIMITIVETYPE[] arr,int begin,int end,Object nonNull)
+  {
+    for(;;++begin)
+    {
+      if(nonNull.equals(arr[begin]))
+      {
+        return true;
+      }
+      if(begin==end)
+      {
+        return false;
+      }
+    }
+  }
+  public static boolean uncheckedcontainsNull(PRIMITIVETYPE[] arr,int begin,int end)
+  {
+    for(;;++begin)
+    {
+      if(arr[begin]==null)
+      {
+        return true;
+      }
+      if(begin==end)
+      {
+        return false;
+      }
+    }
+  }
+#ELSE
+  public static boolean uncheckedcontains0(PRIMITIVETYPE[] arr,int begin,int end)
+  {
+    for(;;++begin)
+    {
+      if(arr[begin]==0)
+      {
+        return true;
+      }
+      if(begin==end)
+      {
+        return false;
+      }
+    }
+  }
+  public static boolean uncheckedcontainsNaN(PRIMITIVETYPE[] arr,int begin,int end)
+  {
+    for(;;++begin)
+    {
+      final PRIMITIVETYPE v;
+      if((v=arr[begin])!=v)
+      {
+        return true;
+      }
+      if(begin==end)
+      {
+        return false;
+      }
+    }
+  }
+  #IFSWITCH CLASSPREFIX==Double
+  public static boolean uncheckedcontainsBits(PRIMITIVETYPE[] arr,int begin,int end,long bits)
+  {
+    for(;;++begin)
+    {
+      if(bits==Double.doubleToRawLongBits(arr[begin]))
+      {
+        return true;
+      }
+      if(begin==end)
+      {
+        return false;
+      }
+    }
+  }
+  #ELSE
+  public static boolean uncheckedcontainsBits(PRIMITIVETYPE[] arr,int begin,int end,int bits)
+  {
+    for(;;++begin)
+    {
+      if(bits==Float.floatToRawIntBits(arr[begin]))
+      {
+        return true;
+      }
+      if(begin==end)
+      {
+        return false;
+      }
+    }
+  }
+  #ENDIF
+#ENDIF
+
+
   public static final PRIMITIVETYPE[] DEFAULT_ARR=new PRIMITIVETYPE[]{};
 #IFNOTSWITCH CLASSPREFIX==Ref
   public static final BOXEDTYPE[] DEFAULT_BOXED_ARR=new BOXEDTYPE[]{};
@@ -140,5 +270,6 @@ public interface OfCLASSPREFIX
     return index->predicate.test(Double.longBitsToDouble(arr[index]));
   }
 #ENDIF
+
 }
 #ENDDEF

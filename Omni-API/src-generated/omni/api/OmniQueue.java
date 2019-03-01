@@ -10,6 +10,7 @@ public abstract interface OmniQueue extends OmniCollection
   ,PeekAndPollIfc.IntInput
   ,PeekAndPollIfc.ShortInput
   ,PeekAndPollIfc.ByteInput
+  ,PeekAndPollIfc.CharInput
   {
     public abstract boolean booleanElement();
     public abstract Boolean element();

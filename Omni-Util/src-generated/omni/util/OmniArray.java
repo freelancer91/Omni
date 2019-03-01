@@ -85,6 +85,22 @@ public final class OmniArray
   }
   public interface OfBoolean
   {
+    public static boolean uncheckedcontains(boolean[] arr,int begin,int end,
+      boolean val
+    )
+    {
+      for(;;++begin)
+      {
+        if(arr[begin]==val)
+        {
+          return true;
+        }
+        if(begin==end)
+        {
+          return false;
+        }
+      }
+    }
     public static final boolean[] DEFAULT_ARR=new boolean[]{};
     public static final Boolean[] DEFAULT_BOXED_ARR=new Boolean[]{};
     static void reverseRange(boolean[] arr,int begin,int end)
@@ -100,6 +116,22 @@ public final class OmniArray
   }
   public interface OfByte
   {
+    public static boolean uncheckedcontains(byte[] arr,int begin,int end,
+      int val
+    )
+    {
+      for(;;++begin)
+      {
+        if(arr[begin]==val)
+        {
+          return true;
+        }
+        if(begin==end)
+        {
+          return false;
+        }
+      }
+    }
     public static final byte[] DEFAULT_ARR=new byte[]{};
     public static final Byte[] DEFAULT_BOXED_ARR=new Byte[]{};
     static void reverseRange(byte[] arr,int begin,int end)
@@ -115,6 +147,22 @@ public final class OmniArray
   }
   public interface OfChar
   {
+    public static boolean uncheckedcontains(char[] arr,int begin,int end,
+      int val
+    )
+    {
+      for(;;++begin)
+      {
+        if(arr[begin]==val)
+        {
+          return true;
+        }
+        if(begin==end)
+        {
+          return false;
+        }
+      }
+    }
     public static final char[] DEFAULT_ARR=new char[]{};
     public static final Character[] DEFAULT_BOXED_ARR=new Character[]{};
     static void reverseRange(char[] arr,int begin,int end)
@@ -134,6 +182,22 @@ public final class OmniArray
   }
   public interface OfShort
   {
+    public static boolean uncheckedcontains(short[] arr,int begin,int end,
+      int val
+    )
+    {
+      for(;;++begin)
+      {
+        if(arr[begin]==val)
+        {
+          return true;
+        }
+        if(begin==end)
+        {
+          return false;
+        }
+      }
+    }
     public static final short[] DEFAULT_ARR=new short[]{};
     public static final Short[] DEFAULT_BOXED_ARR=new Short[]{};
     static void reverseRange(short[] arr,int begin,int end)
@@ -153,6 +217,22 @@ public final class OmniArray
   }
   public interface OfInt
   {
+    public static boolean uncheckedcontains(int[] arr,int begin,int end,
+      int val
+    )
+    {
+      for(;;++begin)
+      {
+        if(arr[begin]==val)
+        {
+          return true;
+        }
+        if(begin==end)
+        {
+          return false;
+        }
+      }
+    }
     public static final int[] DEFAULT_ARR=new int[]{};
     public static final Integer[] DEFAULT_BOXED_ARR=new Integer[]{};
     static void reverseRange(int[] arr,int begin,int end)
@@ -172,6 +252,22 @@ public final class OmniArray
   }
   public interface OfLong
   {
+    public static boolean uncheckedcontains(long[] arr,int begin,int end,
+      long val
+    )
+    {
+      for(;;++begin)
+      {
+        if(arr[begin]==val)
+        {
+          return true;
+        }
+        if(begin==end)
+        {
+          return false;
+        }
+      }
+    }
     public static final long[] DEFAULT_ARR=new long[]{};
     public static final Long[] DEFAULT_BOXED_ARR=new Long[]{};
     static void reverseRange(long[] arr,int begin,int end)
@@ -191,6 +287,49 @@ public final class OmniArray
   }
   public interface OfFloat
   {
+    public static boolean uncheckedcontains0(float[] arr,int begin,int end)
+    {
+      for(;;++begin)
+      {
+        if(arr[begin]==0)
+        {
+          return true;
+        }
+        if(begin==end)
+        {
+          return false;
+        }
+      }
+    }
+    public static boolean uncheckedcontainsNaN(float[] arr,int begin,int end)
+    {
+      for(;;++begin)
+      {
+        final float v;
+        if((v=arr[begin])!=v)
+        {
+          return true;
+        }
+        if(begin==end)
+        {
+          return false;
+        }
+      }
+    }
+    public static boolean uncheckedcontainsBits(float[] arr,int begin,int end,int bits)
+    {
+      for(;;++begin)
+      {
+        if(bits==Float.floatToRawIntBits(arr[begin]))
+        {
+          return true;
+        }
+        if(begin==end)
+        {
+          return false;
+        }
+      }
+    }
     public static final float[] DEFAULT_ARR=new float[]{};
     public static final Float[] DEFAULT_BOXED_ARR=new Float[]{};
     static void reverseRange(float[] arr,int begin,int end)
@@ -214,6 +353,49 @@ public final class OmniArray
   }
   public interface OfDouble
   {
+    public static boolean uncheckedcontains0(double[] arr,int begin,int end)
+    {
+      for(;;++begin)
+      {
+        if(arr[begin]==0)
+        {
+          return true;
+        }
+        if(begin==end)
+        {
+          return false;
+        }
+      }
+    }
+    public static boolean uncheckedcontainsNaN(double[] arr,int begin,int end)
+    {
+      for(;;++begin)
+      {
+        final double v;
+        if((v=arr[begin])!=v)
+        {
+          return true;
+        }
+        if(begin==end)
+        {
+          return false;
+        }
+      }
+    }
+    public static boolean uncheckedcontainsBits(double[] arr,int begin,int end,long bits)
+    {
+      for(;;++begin)
+      {
+        if(bits==Double.doubleToRawLongBits(arr[begin]))
+        {
+          return true;
+        }
+        if(begin==end)
+        {
+          return false;
+        }
+      }
+    }
     public static final double[] DEFAULT_ARR=new double[]{};
     public static final Double[] DEFAULT_BOXED_ARR=new Double[]{};
     static void reverseRange(double[] arr,int begin,int end)
@@ -237,6 +419,48 @@ public final class OmniArray
   }
   public interface OfRef
   {
+    public static boolean uncheckedcontains(Object[] arr,int begin,int end,Predicate<Object> pred)
+    {
+      for(;;++begin)
+      {
+        if(pred.test(arr[begin]))
+        {
+          return true;
+        }
+        if(begin==end)
+        {
+          return false;
+        }
+      }
+    }
+    public static boolean uncheckedcontainsNonNull(Object[] arr,int begin,int end,Object nonNull)
+    {
+      for(;;++begin)
+      {
+        if(nonNull.equals(arr[begin]))
+        {
+          return true;
+        }
+        if(begin==end)
+        {
+          return false;
+        }
+      }
+    }
+    public static boolean uncheckedcontainsNull(Object[] arr,int begin,int end)
+    {
+      for(;;++begin)
+      {
+        if(arr[begin]==null)
+        {
+          return true;
+        }
+        if(begin==end)
+        {
+          return false;
+        }
+      }
+    }
     public static final Object[] DEFAULT_ARR=new Object[]{};
     static void reverseRange(Object[] arr,int begin,int end)
     {

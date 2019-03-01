@@ -118,6 +118,7 @@ public abstract interface OmniStack extends OmniCollection
     ,PeekAndPollIfc.IntInput
     ,PeekAndPollIfc.ShortInput
     ,PeekAndPollIfc.ByteInput
+    ,PeekAndPollIfc.CharInput
     {
       public abstract Boolean pop();
       public abstract boolean popBoolean();

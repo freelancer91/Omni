@@ -1,487 +1,1620 @@
 package omni.impl.seq;
-import java.util.function.IntFunction;
-import java.util.function.Consumer;
-import java.util.function.Predicate;
-import java.util.function.UnaryOperator;
-import java.util.Comparator;
-import java.util.NoSuchElementException;
 import omni.api.OmniCollection;
-import omni.api.OmniIterator;
+import omni.util.OmniArray;
 import omni.api.OmniList;
 import omni.api.OmniStack;
-import omni.api.OmniListIterator;
-import omni.impl.CheckedCollection;
-import omni.util.ArrCopy;
-import omni.util.OmniArray;
-import omni.util.LongSortUtil;
-import omni.util.ToStringUtil;
-import omni.impl.seq.AbstractLongList;
-import omni.impl.AbstractLongItr;
-import omni.util.BitSetUtil;
-import omni.util.TypeUtil;
-import omni.function.LongComparator;
-import java.util.function.LongUnaryOperator;
-import java.util.function.LongConsumer;
+import java.util.function.Predicate;
+import java.util.function.Consumer;
 import java.util.function.LongPredicate;
-public abstract class LongArrSeq extends AbstractLongList implements OmniCollection.OfLong
+import java.util.function.LongConsumer;
+import java.util.Comparator;
+import omni.function.LongComparator;
+import omni.util.ToStringUtil;
+import omni.util.ArrCopy;
+import omni.util.LongSortUtil;
+import omni.impl.CheckedCollection;
+import omni.util.TypeUtil;
+import java.util.NoSuchElementException;
+import omni.api.OmniIterator;
+import omni.api.OmniListIterator;
+import java.util.function.IntFunction;
+public abstract class LongArrSeq implements OmniCollection.OfLong
 {
-  private static void eraseIndexHelper(long[] arr,int index,int newSize)
-  {
-    ArrCopy.semicheckedSelfCopy(arr,index+1,index,newSize-index);
-  }
-  static  void uncheckedReplaceAll(long[] arr,int offset,int bound,LongUnaryOperator operator)
-  {
-    do
-    {
-      arr[offset]=operator.applyAsLong((long)arr[offset]);
-    }
-    while(++offset!=bound);
-  }
-  static  void uncheckedAscendingForEach(long[] arr,int begin,int end,LongConsumer action)
-  {
-    for(;;++begin)
-    {
-      action.accept((long)arr[begin]);
-      if(begin==end)
-      {
-        return;
-      }
-    }
-  }
-  static  void uncheckedDescendingForEach(long[] arr,int begin,int end,LongConsumer action)
-  {
-    for(;;--end)
-    {
-      action.accept((long)arr[end]);
-      if(begin==end)
-      {
-        return;
-      }
-    }
-  }
-  static int ascendingHashCode(long[] arr,int begin,int end)
-  {
-    int hash=31+Long.hashCode(arr[begin]);
-    while(begin!=end)
-    {
-      hash=hash*31+Long.hashCode(arr[++begin]);
-    }
-    return hash;
-  }
-  static int descendingHashCode(long[] arr,int begin,int end)
-  {
-    int hash=31+Long.hashCode(arr[end]);
-    while(begin!=end)
-    {
-      hash=hash*31+Long.hashCode(arr[--end]);
-    }
-    return hash;
-  }
-  static int ascendingToString(long[] arr,int begin,int end,char[] buffer,int bufferOffset)
-  {
-    for(bufferOffset=ToStringUtil.getStringLong(arr[begin],buffer,bufferOffset);begin!=end;buffer[bufferOffset]=',',buffer[++bufferOffset]=' ',bufferOffset=ToStringUtil.getStringLong(arr[++begin],buffer,++bufferOffset)){}
-    return bufferOffset;
-  }
-  static int descendingToString(long[] arr,int begin,int end,char[] buffer,int bufferOffset)
-  {
-    for(bufferOffset=ToStringUtil.getStringLong(arr[end],buffer,bufferOffset);begin!=end;buffer[bufferOffset]=',',buffer[++bufferOffset]=' ',bufferOffset=ToStringUtil.getStringLong(arr[--end],buffer,++bufferOffset)){}
-    return bufferOffset;
-  }
-  static void ascendingToString(long[] arr,int begin,int end,ToStringUtil.OmniStringBuilder builder)
-  {
-    for(builder.uncheckedAppendLong(arr[begin]);begin!=end;builder.uncheckedAppendCommaAndSpace(),builder.uncheckedAppendLong(arr[++begin])){} 
-  }
-  static void descendingToString(long[] arr,int begin,int end,ToStringUtil.OmniStringBuilder builder)
-  {
-    for(builder.uncheckedAppendLong(arr[end]);begin!=end;builder.uncheckedAppendCommaAndSpace(),builder.uncheckedAppendLong(arr[--end])){} 
-  }
-    static boolean uncheckedcontains (long[] arr,int begin,int end
-    ,long val
-    )
-    {
-      while(
-      val!=(arr[begin])
-      )
-      {
-        if(begin==end)
-        {
-          return false;
-        }
-        ++begin;
-      }
-      return true;
-    }
-    static int uncheckedsearch (long[] arr,int end
-    ,long val
-    )
-    {
-      int index=end;
-      while(
-      val!=(arr[index])
-      )
-      {
-        if(index==0)
-        {
-          return -1;
-        }
-        --index;
-      }
-      return index-end+1;
-    }
-    static int uncheckedindexOf (long[] arr,int bound
-    ,long val
-    )
-    {
-      int index=0;
-      while(
-      val!=(arr[index])
-      )
-      {
-        if(++index==bound)
-        {
-          return -1;
-        }
-      }
-      return index;
-    }
-    static int uncheckedlastIndexOf (long[] arr,int bound
-    ,long val
-    )
-    {
-      while(
-      val!=(arr[--bound])
-      )
-      {
-        if(bound==0)
-        {
-          return -1;
-        }
-      }
-      return bound;
-    }
-    static int uncheckedindexOf (long[] arr,int offset,int bound
-    ,long val
-    )
-    {
-      int index=offset;
-      while(
-      val!=(arr[index])
-      )
-      {
-        if(++index==bound)
-        {
-          return -1;
-        }
-      }
-      return index-offset;
-    }
-    static int uncheckedlastIndexOf (long[] arr,int offset,int bound
-    ,long val
-    )
-    {
-      while(
-      val!=(arr[--bound])
-      )
-      {
-        if(bound==offset)
-        {
-          return -1;
-        }
-      }
-      return bound-offset;
-    }
-  //TODO mark/pull survivors up/down
+  transient int size;
   transient long[] arr;
   private LongArrSeq()
   {
     super();
-    this.arr=OmniArray.OfLong.DEFAULT_ARR;
   }
-  private LongArrSeq(final int capacity)
+  private LongArrSeq(int initialCapacity)
   {
     super();
-    switch(capacity)
-    {
+    switch(initialCapacity)
+    { 
     default:
-      this.arr=new long[capacity];
+      this.arr=new long[initialCapacity];
+      return;
     case OmniArray.DEFAULT_ARR_SEQ_CAP:
       this.arr=OmniArray.OfLong.DEFAULT_ARR;
     case 0:
     }
   }
-  private LongArrSeq(final int size,final long[] arr)
+  private LongArrSeq(int size,long[] arr)
   {
-    super(size);
+    super();
+    this.size=size;
     this.arr=arr;
   }
-  abstract int uncheckedHashCode(int size);
   @Override
-  public int hashCode()
+  public int size()
   {
-    final int size;
-    if((size=this.size)!=0)
-    {
-      return uncheckedHashCode(size);
-    }
-    return 1;
+    return this.size;
   }
-  abstract int uncheckedToString(int size,char[] buffer);
-  abstract void uncheckedToString(int size,ToStringUtil.OmniStringBuilder builder);
   @Override
-  public String toString()
+  public boolean isEmpty()
   {
-    int size;
-    if((size=this.size)!=0)
+    return this.size==0;
+  }
+  @Override
+  public void clear()
+  {
+    this.size=0;
+  }
+  public static class UncheckedListImpl extends LongArrSeq implements OmniList.OfLong
+  {
+    static int uncheckedToString(long[] arr,int begin,int end,char[] buffer)
     {
-      final char[] buffer;
-      if(size<=(OmniArray.MAX_ARR_SIZE/44))
+      int bufferOffset;
+      for(bufferOffset=ToStringUtil.getStringLong(arr[begin],buffer,1);begin!=end;buffer[bufferOffset]=',',buffer[++bufferOffset]=' ',bufferOffset=ToStringUtil.getStringLong(arr[++begin],buffer,bufferOffset)){}
+      return bufferOffset;
+    }
+    static void uncheckedToString(long[] arr,int begin,int end,ToStringUtil.OmniStringBuilder builder)
+    {
+      for(builder.uncheckedAppendLong(arr[begin]);begin!=end;builder.uncheckedAppendCommaAndSpace(),builder.uncheckedAppendLong(arr[++begin])){}
+    }
+    static  void uncheckedForEach(long[] arr,int begin,int end,LongConsumer action)
+    {
+      for(;;++begin)
       {
-        buffer[size=uncheckedToString(size,buffer=new char[size*22])]=']';
+        action.accept((long)arr[begin]);
+        if(begin==end)
+        {
+          return;
+        }
       }
-      else
+    }
+    static int uncheckedHashCode(long[] arr,int begin,int end)
+    {
+      int hash=31+Long.hashCode(arr[begin]);
+      while(begin!=end)
+      {
+        hash=hash*31+Long.hashCode(arr[++begin]);
+      }
+      return hash;
+    }
+    public UncheckedListImpl()
+    {
+      super();
+    }
+    public UncheckedListImpl(int initialCapacity)
+    {
+      super(initialCapacity);
+    }
+    private UncheckedListImpl(int size,long[] arr)
+    {
+      super(size,arr);
+    }
+    @Override
+    public String toString()
+    {
+      int size;
+      if((size=this.size)!=0)
       {
         if(size>(Integer.MAX_VALUE/3))
         {
           throw new OutOfMemoryError();
         }
-        final ToStringUtil.OmniStringBuilder builder;
-        uncheckedToString(size,builder=new ToStringUtil.OmniStringBuilder(1,new char[size<=(int)((OmniArray.MAX_ARR_SIZE/12.5f))?((size*12)+(size>>1)):(OmniArray.MAX_ARR_SIZE)]));
-        (buffer=builder.buffer)[size=builder.size]=']';
+        final char[] buffer;
+        if(size<=(OmniArray.MAX_ARR_SIZE/((22)<<1)))
+        {
+          (buffer=new char[size*(22)])[size=uncheckedToString(arr,0,size-1,buffer)]=']';
+          buffer[0]='[';
+          return new String(buffer,0,size+1);
+        }
+        else
+        {
+          final ToStringUtil.OmniStringBuilder builder;
+          uncheckedToString(arr,0,size-1,builder=new ToStringUtil.OmniStringBuilder(1,new char[size<=(int)(OmniArray.MAX_ARR_SIZE/12.5f)?(size*12)+(size>>>1):OmniArray.MAX_ARR_SIZE]));
+          builder.uncheckedAppendChar(']');
+          (buffer=builder.buffer)[0]='[';
+          return new String(buffer,0,builder.size);
+        }
       }
-      buffer[0]='[';
-      return new String(buffer,0,size+1);
-    }
-    return "[]";
-  }
-  abstract void uncheckedForEach(final int size,final LongConsumer action);
-  //TODO forEach methods
-  //TODO removeIf methods
-  //TODO peek methods
-  //TODO uncheckedCopyInto methods
-  //TODO contains methods
-  //TODO indexOf methods
-  //TODO lastIndexOf methods
-  //TODO search methods
-   public Long pop()
-   {
-     return popLong();
-   }
-   public void push(final Long val)
-   {
-     push((long)val);
-   }
-  public long popLong()
-  {
-    return uncheckedPop(size-1);
-  }
-  public void push(final long val)
-  {
-    final int size;
-    if((size=this.size)!=0)
-    {
-      uncheckedAppend(val,size);
-    }
-    else
-    {
-      uncheckedInit(val);
-    }
-  }
-  @Override
-  public boolean remove(final Object val)
-  {
-    final int size;
-    if((size=this.size)!=0)
-    {
-      if(val instanceof Long)
-      {
-        return this.uncheckedRemoveVal(size,(long)(val));
-      }
-    }
-    return false;
-  }
-  @Override
-  public long set(final int index,final long val)
-  {
-    final long[] arr;
-    final var oldVal=(long)(arr=this.arr)[index];
-    arr[index]=val;
-    return oldVal;
-  }
-  @Override
-  public <T> T[] toArray(final IntFunction<T[]> arrConstructor)
-  {
-    final int size;
-    final T[] dst=arrConstructor.apply(size=this.size);
-    if(size!=0)
-    {
-      uncheckedCopyInto(dst,size);
-    }
-    return dst;
-  }
-  @Override
-  public <T> T[] toArray(T[] dst)
-  {
-    final int size;
-    if((size=this.size)!=0)
-    {
-      uncheckedCopyInto(dst=OmniArray.uncheckedArrResize(size,dst),size);
-    }
-    else if(dst.length!=0)
-    {
-      dst[0]=null;
-    }
-    return dst;
-  }
-  abstract boolean uncheckedRemoveVal(final int size,final long val);
-  abstract boolean uncheckedRemoveIf(final int size,final LongPredicate filter);
-  private int finalizeSubListBatchRemove(final long[] arr,final int newBound,final int oldBound)
-  {
-    final int newRootSize,numRemoved;
-    size=newRootSize=size-(numRemoved=oldBound-newBound);
-    ArrCopy.semicheckedSelfCopy(arr,oldBound,newBound,newRootSize-newBound);
-    return numRemoved;
-  }
-  private long[] growInsert(long[] arr,final int index,final int size)
-  {
-    if(arr.length==size)
-    {
-      ArrCopy.semicheckedCopy(arr,0,arr=new long[OmniArray.growBy50Pct(size)],0,index);
-      this.arr=arr;
-    }
-    return arr;
-  }
-  private void uncheckedAppend(final long val,final int size)
-  {
-    long[] arr;
-    if((arr=this.arr).length==size)
-    {
-      ArrCopy.uncheckedCopy(arr,0,arr=new long[OmniArray.growBy50Pct(size)],0,size);
-    }
-    arr[size]=val;
-    this.size=size+1;
-  }
-  private void uncheckedInit(final long val)
-  {
-    long[] arr;
-    if((arr=this.arr)==OmniArray.OfLong.DEFAULT_ARR)
-    {
-      this.arr=arr=new long[OmniArray.DEFAULT_ARR_SEQ_CAP];
-    }
-    else if(arr==null)
-    {
-      this.arr=arr=new long[1];
-    }
-    arr[0]=val;
-    this.size=1;
-  }
-  private void uncheckedInsert(final int index,final long val,final int size)
-  {
-    final int tailDist;
-    if((tailDist=size-index)==0)
-    {
-      uncheckedAppend(val,size);
-    }
-    else
-    {
-      long[] arr;
-      ArrCopy.uncheckedCopy(arr=this.arr,index,arr=growInsert(arr,index,size),index+1,tailDist);
-      arr[index]=val;
-      this.size=size+1;
-    }
-  }
-  private long uncheckedPop(final int newSize)
-  {
-    this.size=newSize;
-    return arr[newSize];
-  }
-  //TODO toArray methods
-  //TODO removeVal methods
-  public static abstract class Unchecked extends LongArrSeq
-  {
-    private Unchecked()
-    {
-      super();
-    }
-    private Unchecked(final int capacity)
-    {
-      super(capacity);
-    }
-    private Unchecked(final int size,final long[] arr)
-    {
-      super(size,arr);
+      return "[]";
     }
     @Override
-    public boolean add(final long val)
-    {
-      super.push(val);
-      return true;
-    }
-    @Override
-    public void add(final int index,final long val)
+    public int hashCode()
     {
       final int size;
       if((size=this.size)!=0)
       {
-        super.uncheckedInsert(index,val,size);
+        {
+          return uncheckedHashCode(arr,0,size-1);
+        }
       }
-      else
-      {
-        super.uncheckedInit(val);
-      }
+      return 1;
     }
     @Override
-    public long getLong(final int index)
+    public <T> T[] toArray(T[] arr)
     {
-      return (long)arr[index];
+      //TODO
+      return null;
     }
     @Override
-    public long removeLongAt(final int index)
+    public <T> T[] toArray(IntFunction<T[]> arrConstructor)
     {
-      final long[] arr;
-      final var removed=(long)(arr=this.arr)[index];
-      eraseIndexHelper(arr,index,--size);
-      return removed;
+      //TODO
+      return null;
     }
-    //TODO uncheckedRemoveIf
-  }
-  public static class UncheckedList extends Unchecked
-  {
-    public UncheckedList()
+    @Override
+    public boolean equals(Object val)
     {
-      super();
-    }
-    public UncheckedList(final int capacity)
-    {
-      super(capacity);
-    }
-    public UncheckedList(final int size,final long[] arr)
-    {
-      super(size,arr);
+      //TODO
+      return false;
     }
     @Override
     public Object clone()
     {
-      final long[] arr;
       final int size;
       if((size=this.size)!=0)
       {
-        ArrCopy.uncheckedCopy(this.arr,0,arr=new long[size],0,size);
+        final long[] copy;
+        ArrCopy.uncheckedCopy(arr,0,copy=new long[size],0,size);
+        return new UncheckedListImpl(size,copy);
       }
-      else
-      {
-        arr=null;
-      }
-      return new UncheckedList(size,arr);
+      return new UncheckedListImpl();
     }
     @Override
-    public boolean equals(final Object val)
+    public void forEach(LongConsumer action)
     {
-      //TODO implements equals method
+      final int size;
+      if((size=this.size)!=0)
+      {
+        {
+          uncheckedForEach(arr,0,size-1,action);
+        }
+      }
+    }
+    @Override
+    public void forEach(Consumer<? super Long> action)
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        {
+          uncheckedForEach(arr,0,size-1,action::accept);
+        }
+      }
+    }
+    @Override
+    public boolean removeIf(LongPredicate filter)
+    {
+      //TODO
       return false;
     }
+    @Override
+    public boolean removeIf(Predicate<? super Long> filter)
+    {
+      //TODO
+      return false;
+    }
+   @Override
+   public
+   boolean
+   contains(boolean val)
+   {
+     final int size;
+     if((size=this.size)!=0)
+     {
+       return OmniArray.OfLong.uncheckedcontains(this.arr,0,size-1,TypeUtil.castToLong(val));
+     }
+     return false;
+   }
+   @Override
+   public
+   boolean
+   contains(int val)
+   {
+     final int size;
+     if((size=this.size)!=0)
+     {
+       return OmniArray.OfLong.uncheckedcontains(this.arr,0,size-1,(val));
+     }
+     return false;
+   }
+   @Override
+   public
+   boolean
+   contains(long val)
+   {
+     final int size;
+     if((size=this.size)!=0)
+     {
+       return OmniArray.OfLong.uncheckedcontains(this.arr,0,size-1,(val));
+     }
+     return false;
+   }
+   @Override
+   public
+   boolean
+   contains(float val)
+   {
+     final int size;
+     if((size=this.size)!=0)
+     {
+       final long v;
+       if(TypeUtil.floatEquals(val,v=(long)val))
+       {
+         return OmniArray.OfLong.uncheckedcontains(this.arr,0,size-1,v);
+       }
+     }
+     return false;
+   }
+   @Override
+   public
+   boolean
+   contains(double val)
+   {
+     final int size;
+     if((size=this.size)!=0)
+     {
+       final long v;
+       if(TypeUtil.doubleEquals(val,v=(long)val))
+       {
+         return OmniArray.OfLong.uncheckedcontains(this.arr,0,size-1,v);
+       }
+     }
+     return false;
+   }
+   @Override
+   public
+   boolean
+   contains
+   (Object val)
+   {
+     final int size;
+     if((size=this.size)!=0)
+     {
+       if(val instanceof Long)
+       {
+         return OmniArray.OfLong.uncheckedcontains(this.arr,0,size-1,(long)(val));
+       }
+     }
+     return false;
+   }
+    @Override
+    public boolean add(long val)
+    {
+      //TODO
+      return false;
+    }
+    @Override
+    public void add(int index,long val)
+    {
+      //TODO
+    }
+    @Override
+    public long removeLongAt(int index)
+    {
+      final long[] arr;
+      long ret=(long)(arr=this.arr)[index];
+      ArrCopy.semicheckedSelfCopy(arr,index+1,index,(--size)-index);
+      this.size=size;
+      return ret;
+    }
+    @Override
+    public OmniListIterator.OfLong listIterator()
+    {
+      //TODO
+      return null;
+    }
+    @Override
+    public OmniListIterator.OfLong listIterator(int index)
+    {
+      //TODO
+      return null;
+    }
+    @Override
+    public OmniList.OfLong subList(int fromIndex,int toIndex)
+    {
+      //TODO
+      return null;
+    }
+    @Override
+    public void stableDescendingSort()
+    {
+      final int size;
+      if((size=this.size)>1)
+      {
+        {
+          LongSortUtil.uncheckedDescendingSort(arr,0,size);
+        }
+      }
+    }
+    @Override
+    public void stableAscendingSort()
+    {
+      final int size;
+      if((size=this.size)>1)
+      {
+        {
+          LongSortUtil.uncheckedAscendingSort(arr,0,size);
+        }
+      }
+    }
+    @Override
+    public OmniIterator.OfLong iterator()
+    {
+      //TODO
+      return null;
+    }
+    @Override
+    public long[] toLongArray()
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        final long[] copy;
+        ArrCopy.uncheckedCopy(arr,0,copy=new long[size],0,size);
+        return copy;
+      }
+      return OmniArray.OfLong.DEFAULT_ARR;
+    }
+    @Override
+    public Long[] toArray()
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        final Long[] copy;
+        ArrCopy.uncheckedCopy(arr,0,copy=new Long[size],0,size);
+        return copy;
+      }
+      return OmniArray.OfLong.DEFAULT_BOXED_ARR;
+    }
+    @Override
+    public double[] toDoubleArray()
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        final double[] copy;
+        ArrCopy.uncheckedCopy(arr,0,copy=new double[size],0,size);
+        return copy;
+      }
+      return OmniArray.OfDouble.DEFAULT_ARR;
+    }
+    @Override
+    public float[] toFloatArray()
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        final float[] copy;
+        ArrCopy.uncheckedCopy(arr,0,copy=new float[size],0,size);
+        return copy;
+      }
+      return OmniArray.OfFloat.DEFAULT_ARR;
+    }
   }
-  //TODO UncheckedStack
-  //TODO Checked
-  //TODO CheckedList
-  //TODO CheckedStack
+  public static class UncheckedStackImpl extends LongArrSeq implements OmniStack.OfLong
+  {
+    static int uncheckedToString(long[] arr,int begin,int end,char[] buffer)
+    {
+      int bufferOffset;
+      for(bufferOffset=ToStringUtil.getStringLong(arr[end],buffer,1);begin!=end;buffer[bufferOffset]=',',buffer[++bufferOffset]=' ',bufferOffset=ToStringUtil.getStringLong(arr[--end],buffer,bufferOffset)){}
+      return bufferOffset;
+    }
+    static void uncheckedToString(long[] arr,int begin,int end,ToStringUtil.OmniStringBuilder builder)
+    {
+      for(builder.uncheckedAppendLong(arr[end]);begin!=end;builder.uncheckedAppendCommaAndSpace(),builder.uncheckedAppendLong(arr[--end])){}
+    }
+    static  void uncheckedForEach(long[] arr,int begin,int end,LongConsumer action)
+    {
+      for(;;--end)
+      {
+        action.accept((long)arr[end]);
+        if(begin==end)
+        {
+          return;
+        }
+      }
+    }
+    static int uncheckedHashCode(long[] arr,int begin,int end)
+    {
+      int hash=31+Long.hashCode(arr[end]);
+      while(begin!=end)
+      {
+        hash=hash*31+Long.hashCode(arr[--end]);
+      }
+      return hash;
+    }
+    public UncheckedStackImpl()
+    {
+      super();
+    }
+    public UncheckedStackImpl(int initialCapacity)
+    {
+      super(initialCapacity);
+    }
+    private UncheckedStackImpl(int size,long[] arr)
+    {
+      super(size,arr);
+    }
+    @Override
+    public String toString()
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        if(size>(Integer.MAX_VALUE/3))
+        {
+          throw new OutOfMemoryError();
+        }
+        final char[] buffer;
+        if(size<=(OmniArray.MAX_ARR_SIZE/((22)<<1)))
+        {
+          (buffer=new char[size*(22)])[size=uncheckedToString(arr,0,size-1,buffer)]=']';
+          buffer[0]='[';
+          return new String(buffer,0,size+1);
+        }
+        else
+        {
+          final ToStringUtil.OmniStringBuilder builder;
+          uncheckedToString(arr,0,size-1,builder=new ToStringUtil.OmniStringBuilder(1,new char[size<=(int)(OmniArray.MAX_ARR_SIZE/12.5f)?(size*12)+(size>>>1):OmniArray.MAX_ARR_SIZE]));
+          builder.uncheckedAppendChar(']');
+          (buffer=builder.buffer)[0]='[';
+          return new String(buffer,0,builder.size);
+        }
+      }
+      return "[]";
+    }
+    @Override
+    public int hashCode()
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        {
+          return uncheckedHashCode(arr,0,size-1);
+        }
+      }
+      return 1;
+    }
+    @Override
+    public <T> T[] toArray(T[] arr)
+    {
+      //TODO
+      return null;
+    }
+    @Override
+    public <T> T[] toArray(IntFunction<T[]> arrConstructor)
+    {
+      //TODO
+      return null;
+    }
+    @Override
+    public boolean equals(Object val)
+    {
+      //TODO
+      return false;
+    }
+    @Override
+    public Object clone()
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        final long[] copy;
+        ArrCopy.uncheckedCopy(arr,0,copy=new long[size],0,size);
+        return new UncheckedStackImpl(size,copy);
+      }
+      return new UncheckedStackImpl();
+    }
+    @Override
+    public void forEach(LongConsumer action)
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        {
+          uncheckedForEach(arr,0,size-1,action);
+        }
+      }
+    }
+    @Override
+    public void forEach(Consumer<? super Long> action)
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        {
+          uncheckedForEach(arr,0,size-1,action::accept);
+        }
+      }
+    }
+    @Override
+    public boolean removeIf(LongPredicate filter)
+    {
+      //TODO
+      return false;
+    }
+    @Override
+    public boolean removeIf(Predicate<? super Long> filter)
+    {
+      //TODO
+      return false;
+    }
+   @Override
+   public
+   boolean
+   contains(boolean val)
+   {
+     final int size;
+     if((size=this.size)!=0)
+     {
+       return OmniArray.OfLong.uncheckedcontains(this.arr,0,size-1,TypeUtil.castToLong(val));
+     }
+     return false;
+   }
+   @Override
+   public
+   boolean
+   contains(int val)
+   {
+     final int size;
+     if((size=this.size)!=0)
+     {
+       return OmniArray.OfLong.uncheckedcontains(this.arr,0,size-1,(val));
+     }
+     return false;
+   }
+   @Override
+   public
+   boolean
+   contains(long val)
+   {
+     final int size;
+     if((size=this.size)!=0)
+     {
+       return OmniArray.OfLong.uncheckedcontains(this.arr,0,size-1,(val));
+     }
+     return false;
+   }
+   @Override
+   public
+   boolean
+   contains(float val)
+   {
+     final int size;
+     if((size=this.size)!=0)
+     {
+       final long v;
+       if(TypeUtil.floatEquals(val,v=(long)val))
+       {
+         return OmniArray.OfLong.uncheckedcontains(this.arr,0,size-1,v);
+       }
+     }
+     return false;
+   }
+   @Override
+   public
+   boolean
+   contains(double val)
+   {
+     final int size;
+     if((size=this.size)!=0)
+     {
+       final long v;
+       if(TypeUtil.doubleEquals(val,v=(long)val))
+       {
+         return OmniArray.OfLong.uncheckedcontains(this.arr,0,size-1,v);
+       }
+     }
+     return false;
+   }
+   @Override
+   public
+   boolean
+   contains
+   (Object val)
+   {
+     final int size;
+     if((size=this.size)!=0)
+     {
+       if(val instanceof Long)
+       {
+         return OmniArray.OfLong.uncheckedcontains(this.arr,0,size-1,(long)(val));
+       }
+     }
+     return false;
+   }
+    @Override
+    public OmniIterator.OfLong iterator()
+    {
+      //TODO
+      return null;
+    }
+    @Override
+    public long[] toLongArray()
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        final long[] copy;
+        ArrCopy.uncheckedReverseCopy(arr,0,copy=new long[size],0,size);
+        return copy;
+      }
+      return OmniArray.OfLong.DEFAULT_ARR;
+    }
+    @Override
+    public Long[] toArray()
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        final Long[] copy;
+        ArrCopy.uncheckedReverseCopy(arr,0,copy=new Long[size],0,size);
+        return copy;
+      }
+      return OmniArray.OfLong.DEFAULT_BOXED_ARR;
+    }
+    @Override
+    public double[] toDoubleArray()
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        final double[] copy;
+        ArrCopy.uncheckedReverseCopy(arr,0,copy=new double[size],0,size);
+        return copy;
+      }
+      return OmniArray.OfDouble.DEFAULT_ARR;
+    }
+    @Override
+    public float[] toFloatArray()
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        final float[] copy;
+        ArrCopy.uncheckedReverseCopy(arr,0,copy=new float[size],0,size);
+        return copy;
+      }
+      return OmniArray.OfFloat.DEFAULT_ARR;
+    }
+    @Override
+    public long popLong()
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        long ret=(long)arr[--size];
+        this.size=size;
+        return ret;
+      }
+      throw new NoSuchElementException();
+    }
+    @Override
+    public Long pop()
+    {
+      return popLong();
+    }
+    @Override
+    public void push(long val)
+    {
+      //TODO
+    }
+    @Override
+    public void push(Long val)
+    {
+      //TODO
+    }
+    @Override
+    public long peekLong()
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        return (long)((long)arr[size-1]);
+      }
+      return Long.MIN_VALUE;
+    }
+    @Override
+    public long pollLong()
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        long ret=(long)((long)arr[--size]);
+        this.size=size;
+        return ret;
+      }
+      return Long.MIN_VALUE;
+    }
+    @Override
+    public Long poll()
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        Long ret=(Long)((long)arr[--size]);
+        this.size=size;
+        return ret;
+      }
+      return null;
+    }
+    @Override
+    public double pollDouble()
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        double ret=(double)((long)arr[--size]);
+        this.size=size;
+        return ret;
+      }
+      return Double.NaN;
+    }
+    @Override
+    public float pollFloat()
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        float ret=(float)((long)arr[--size]);
+        this.size=size;
+        return ret;
+      }
+      return Float.NaN;
+    }
+    @Override
+    public Long peek()
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        return (Long)((long)arr[size-1]);
+      }
+      return null;
+    }
+    @Override
+    public double peekDouble()
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        return (double)((long)arr[size-1]);
+      }
+      return Double.NaN;
+    }
+    @Override
+    public float peekFloat()
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        return (float)((long)arr[size-1]);
+      }
+      return Float.NaN;
+    }
+  }
+  public static class CheckedListImpl extends LongArrSeq implements OmniList.OfLong
+  {
+    static int uncheckedToString(long[] arr,int begin,int end,char[] buffer)
+    {
+      int bufferOffset;
+      for(bufferOffset=ToStringUtil.getStringLong(arr[begin],buffer,1);begin!=end;buffer[bufferOffset]=',',buffer[++bufferOffset]=' ',bufferOffset=ToStringUtil.getStringLong(arr[++begin],buffer,bufferOffset)){}
+      return bufferOffset;
+    }
+    static void uncheckedToString(long[] arr,int begin,int end,ToStringUtil.OmniStringBuilder builder)
+    {
+      for(builder.uncheckedAppendLong(arr[begin]);begin!=end;builder.uncheckedAppendCommaAndSpace(),builder.uncheckedAppendLong(arr[++begin])){}
+    }
+    static  void uncheckedForEach(long[] arr,int begin,int end,LongConsumer action)
+    {
+      for(;;++begin)
+      {
+        action.accept((long)arr[begin]);
+        if(begin==end)
+        {
+          return;
+        }
+      }
+    }
+    static int uncheckedHashCode(long[] arr,int begin,int end)
+    {
+      int hash=31+Long.hashCode(arr[begin]);
+      while(begin!=end)
+      {
+        hash=hash*31+Long.hashCode(arr[++begin]);
+      }
+      return hash;
+    }
+    transient int modCount;
+    public CheckedListImpl()
+    {
+      super();
+    }
+    public CheckedListImpl(int initialCapacity)
+    {
+      super(initialCapacity);
+    }
+    private CheckedListImpl(int size,long[] arr)
+    {
+      super(size,arr);
+    }
+    @Override
+    public void clear()
+    {
+      if(this.size!=0)
+      {
+        ++this.modCount;
+        this.size=0;
+      }
+    }
+    @Override
+    public String toString()
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        if(size>(Integer.MAX_VALUE/3))
+        {
+          throw new OutOfMemoryError();
+        }
+        final char[] buffer;
+        if(size<=(OmniArray.MAX_ARR_SIZE/((22)<<1)))
+        {
+          (buffer=new char[size*(22)])[size=uncheckedToString(arr,0,size-1,buffer)]=']';
+          buffer[0]='[';
+          return new String(buffer,0,size+1);
+        }
+        else
+        {
+          final ToStringUtil.OmniStringBuilder builder;
+          uncheckedToString(arr,0,size-1,builder=new ToStringUtil.OmniStringBuilder(1,new char[size<=(int)(OmniArray.MAX_ARR_SIZE/12.5f)?(size*12)+(size>>>1):OmniArray.MAX_ARR_SIZE]));
+          builder.uncheckedAppendChar(']');
+          (buffer=builder.buffer)[0]='[';
+          return new String(buffer,0,builder.size);
+        }
+      }
+      return "[]";
+    }
+    @Override
+    public int hashCode()
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        {
+          return uncheckedHashCode(arr,0,size-1);
+        }
+      }
+      return 1;
+    }
+    @Override
+    public <T> T[] toArray(T[] arr)
+    {
+      //TODO
+      return null;
+    }
+    @Override
+    public <T> T[] toArray(IntFunction<T[]> arrConstructor)
+    {
+      //TODO
+      return null;
+    }
+    @Override
+    public boolean equals(Object val)
+    {
+      //TODO
+      return false;
+    }
+    @Override
+    public Object clone()
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        final long[] copy;
+        ArrCopy.uncheckedCopy(arr,0,copy=new long[size],0,size);
+        return new CheckedListImpl(size,copy);
+      }
+      return new CheckedListImpl();
+    }
+    @Override
+    public void forEach(LongConsumer action)
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        int modCount=this.modCount;
+        try
+        {
+          uncheckedForEach(arr,0,size-1,action);
+        }
+        finally
+        {
+          CheckedCollection.checkModCount(modCount,this.modCount);
+        }
+      }
+    }
+    @Override
+    public void forEach(Consumer<? super Long> action)
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        int modCount=this.modCount;
+        try
+        {
+          uncheckedForEach(arr,0,size-1,action::accept);
+        }
+        finally
+        {
+          CheckedCollection.checkModCount(modCount,this.modCount);
+        }
+      }
+    }
+    @Override
+    public boolean removeIf(LongPredicate filter)
+    {
+      //TODO
+      return false;
+    }
+    @Override
+    public boolean removeIf(Predicate<? super Long> filter)
+    {
+      //TODO
+      return false;
+    }
+   @Override
+   public
+   boolean
+   contains(boolean val)
+   {
+     final int size;
+     if((size=this.size)!=0)
+     {
+       return OmniArray.OfLong.uncheckedcontains(this.arr,0,size-1,TypeUtil.castToLong(val));
+     }
+     return false;
+   }
+   @Override
+   public
+   boolean
+   contains(int val)
+   {
+     final int size;
+     if((size=this.size)!=0)
+     {
+       return OmniArray.OfLong.uncheckedcontains(this.arr,0,size-1,(val));
+     }
+     return false;
+   }
+   @Override
+   public
+   boolean
+   contains(long val)
+   {
+     final int size;
+     if((size=this.size)!=0)
+     {
+       return OmniArray.OfLong.uncheckedcontains(this.arr,0,size-1,(val));
+     }
+     return false;
+   }
+   @Override
+   public
+   boolean
+   contains(float val)
+   {
+     final int size;
+     if((size=this.size)!=0)
+     {
+       final long v;
+       if(TypeUtil.floatEquals(val,v=(long)val))
+       {
+         return OmniArray.OfLong.uncheckedcontains(this.arr,0,size-1,v);
+       }
+     }
+     return false;
+   }
+   @Override
+   public
+   boolean
+   contains(double val)
+   {
+     final int size;
+     if((size=this.size)!=0)
+     {
+       final long v;
+       if(TypeUtil.doubleEquals(val,v=(long)val))
+       {
+         return OmniArray.OfLong.uncheckedcontains(this.arr,0,size-1,v);
+       }
+     }
+     return false;
+   }
+   @Override
+   public
+   boolean
+   contains
+   (Object val)
+   {
+     final int size;
+     if((size=this.size)!=0)
+     {
+       int modCount=this.modCount;
+       if(val instanceof Long)
+       {
+         return OmniArray.OfLong.uncheckedcontains(this.arr,0,size-1,(long)(val));
+       }
+     }
+     CheckedCollection.checkModCount(modCount,this.modCount);
+     return false;
+   }
+    @Override
+    public boolean add(long val)
+    {
+      //TODO
+      return false;
+    }
+    @Override
+    public void add(int index,long val)
+    {
+      //TODO
+    }
+    @Override
+    public long removeLongAt(int index)
+    {
+      int size;
+      if(index<0 || index>=(size=this.size))
+      {
+        throw new IndexOutOfBoundsException("index = "+index+"; size="+this.size);
+      }
+      ++this.modCount;
+      final long[] arr;
+      long ret=(long)(arr=this.arr)[index];
+      ArrCopy.semicheckedSelfCopy(arr,index+1,index,(--size)-index);
+      this.size=size;
+      return ret;
+    }
+    @Override
+    public OmniListIterator.OfLong listIterator()
+    {
+      //TODO
+      return null;
+    }
+    @Override
+    public OmniListIterator.OfLong listIterator(int index)
+    {
+      //TODO
+      return null;
+    }
+    @Override
+    public OmniList.OfLong subList(int fromIndex,int toIndex)
+    {
+      //TODO
+      return null;
+    }
+    @Override
+    public void stableDescendingSort()
+    {
+      final int size;
+      if((size=this.size)>1)
+      {
+        {
+          LongSortUtil.uncheckedDescendingSort(arr,0,size);
+        }
+      }
+    }
+    @Override
+    public void stableAscendingSort()
+    {
+      final int size;
+      if((size=this.size)>1)
+      {
+        {
+          LongSortUtil.uncheckedAscendingSort(arr,0,size);
+        }
+      }
+    }
+    @Override
+    public OmniIterator.OfLong iterator()
+    {
+      //TODO
+      return null;
+    }
+    @Override
+    public long[] toLongArray()
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        final long[] copy;
+        ArrCopy.uncheckedCopy(arr,0,copy=new long[size],0,size);
+        return copy;
+      }
+      return OmniArray.OfLong.DEFAULT_ARR;
+    }
+    @Override
+    public Long[] toArray()
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        final Long[] copy;
+        ArrCopy.uncheckedCopy(arr,0,copy=new Long[size],0,size);
+        return copy;
+      }
+      return OmniArray.OfLong.DEFAULT_BOXED_ARR;
+    }
+    @Override
+    public double[] toDoubleArray()
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        final double[] copy;
+        ArrCopy.uncheckedCopy(arr,0,copy=new double[size],0,size);
+        return copy;
+      }
+      return OmniArray.OfDouble.DEFAULT_ARR;
+    }
+    @Override
+    public float[] toFloatArray()
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        final float[] copy;
+        ArrCopy.uncheckedCopy(arr,0,copy=new float[size],0,size);
+        return copy;
+      }
+      return OmniArray.OfFloat.DEFAULT_ARR;
+    }
+  }
+  public static class CheckedStackImpl extends LongArrSeq implements OmniStack.OfLong
+  {
+    static int uncheckedToString(long[] arr,int begin,int end,char[] buffer)
+    {
+      int bufferOffset;
+      for(bufferOffset=ToStringUtil.getStringLong(arr[end],buffer,1);begin!=end;buffer[bufferOffset]=',',buffer[++bufferOffset]=' ',bufferOffset=ToStringUtil.getStringLong(arr[--end],buffer,bufferOffset)){}
+      return bufferOffset;
+    }
+    static void uncheckedToString(long[] arr,int begin,int end,ToStringUtil.OmniStringBuilder builder)
+    {
+      for(builder.uncheckedAppendLong(arr[end]);begin!=end;builder.uncheckedAppendCommaAndSpace(),builder.uncheckedAppendLong(arr[--end])){}
+    }
+    static  void uncheckedForEach(long[] arr,int begin,int end,LongConsumer action)
+    {
+      for(;;--end)
+      {
+        action.accept((long)arr[end]);
+        if(begin==end)
+        {
+          return;
+        }
+      }
+    }
+    static int uncheckedHashCode(long[] arr,int begin,int end)
+    {
+      int hash=31+Long.hashCode(arr[end]);
+      while(begin!=end)
+      {
+        hash=hash*31+Long.hashCode(arr[--end]);
+      }
+      return hash;
+    }
+    transient int modCount;
+    public CheckedStackImpl()
+    {
+      super();
+    }
+    public CheckedStackImpl(int initialCapacity)
+    {
+      super(initialCapacity);
+    }
+    private CheckedStackImpl(int size,long[] arr)
+    {
+      super(size,arr);
+    }
+    @Override
+    public void clear()
+    {
+      if(this.size!=0)
+      {
+        ++this.modCount;
+        this.size=0;
+      }
+    }
+    @Override
+    public String toString()
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        if(size>(Integer.MAX_VALUE/3))
+        {
+          throw new OutOfMemoryError();
+        }
+        final char[] buffer;
+        if(size<=(OmniArray.MAX_ARR_SIZE/((22)<<1)))
+        {
+          (buffer=new char[size*(22)])[size=uncheckedToString(arr,0,size-1,buffer)]=']';
+          buffer[0]='[';
+          return new String(buffer,0,size+1);
+        }
+        else
+        {
+          final ToStringUtil.OmniStringBuilder builder;
+          uncheckedToString(arr,0,size-1,builder=new ToStringUtil.OmniStringBuilder(1,new char[size<=(int)(OmniArray.MAX_ARR_SIZE/12.5f)?(size*12)+(size>>>1):OmniArray.MAX_ARR_SIZE]));
+          builder.uncheckedAppendChar(']');
+          (buffer=builder.buffer)[0]='[';
+          return new String(buffer,0,builder.size);
+        }
+      }
+      return "[]";
+    }
+    @Override
+    public int hashCode()
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        {
+          return uncheckedHashCode(arr,0,size-1);
+        }
+      }
+      return 1;
+    }
+    @Override
+    public <T> T[] toArray(T[] arr)
+    {
+      //TODO
+      return null;
+    }
+    @Override
+    public <T> T[] toArray(IntFunction<T[]> arrConstructor)
+    {
+      //TODO
+      return null;
+    }
+    @Override
+    public boolean equals(Object val)
+    {
+      //TODO
+      return false;
+    }
+    @Override
+    public Object clone()
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        final long[] copy;
+        ArrCopy.uncheckedCopy(arr,0,copy=new long[size],0,size);
+        return new CheckedStackImpl(size,copy);
+      }
+      return new CheckedStackImpl();
+    }
+    @Override
+    public void forEach(LongConsumer action)
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        int modCount=this.modCount;
+        try
+        {
+          uncheckedForEach(arr,0,size-1,action);
+        }
+        finally
+        {
+          CheckedCollection.checkModCount(modCount,this.modCount);
+        }
+      }
+    }
+    @Override
+    public void forEach(Consumer<? super Long> action)
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        int modCount=this.modCount;
+        try
+        {
+          uncheckedForEach(arr,0,size-1,action::accept);
+        }
+        finally
+        {
+          CheckedCollection.checkModCount(modCount,this.modCount);
+        }
+      }
+    }
+    @Override
+    public boolean removeIf(LongPredicate filter)
+    {
+      //TODO
+      return false;
+    }
+    @Override
+    public boolean removeIf(Predicate<? super Long> filter)
+    {
+      //TODO
+      return false;
+    }
+   @Override
+   public
+   boolean
+   contains(boolean val)
+   {
+     final int size;
+     if((size=this.size)!=0)
+     {
+       return OmniArray.OfLong.uncheckedcontains(this.arr,0,size-1,TypeUtil.castToLong(val));
+     }
+     return false;
+   }
+   @Override
+   public
+   boolean
+   contains(int val)
+   {
+     final int size;
+     if((size=this.size)!=0)
+     {
+       return OmniArray.OfLong.uncheckedcontains(this.arr,0,size-1,(val));
+     }
+     return false;
+   }
+   @Override
+   public
+   boolean
+   contains(long val)
+   {
+     final int size;
+     if((size=this.size)!=0)
+     {
+       return OmniArray.OfLong.uncheckedcontains(this.arr,0,size-1,(val));
+     }
+     return false;
+   }
+   @Override
+   public
+   boolean
+   contains(float val)
+   {
+     final int size;
+     if((size=this.size)!=0)
+     {
+       final long v;
+       if(TypeUtil.floatEquals(val,v=(long)val))
+       {
+         return OmniArray.OfLong.uncheckedcontains(this.arr,0,size-1,v);
+       }
+     }
+     return false;
+   }
+   @Override
+   public
+   boolean
+   contains(double val)
+   {
+     final int size;
+     if((size=this.size)!=0)
+     {
+       final long v;
+       if(TypeUtil.doubleEquals(val,v=(long)val))
+       {
+         return OmniArray.OfLong.uncheckedcontains(this.arr,0,size-1,v);
+       }
+     }
+     return false;
+   }
+   @Override
+   public
+   boolean
+   contains
+   (Object val)
+   {
+     final int size;
+     if((size=this.size)!=0)
+     {
+       int modCount=this.modCount;
+       if(val instanceof Long)
+       {
+         return OmniArray.OfLong.uncheckedcontains(this.arr,0,size-1,(long)(val));
+       }
+     }
+     CheckedCollection.checkModCount(modCount,this.modCount);
+     return false;
+   }
+    @Override
+    public OmniIterator.OfLong iterator()
+    {
+      //TODO
+      return null;
+    }
+    @Override
+    public long[] toLongArray()
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        final long[] copy;
+        ArrCopy.uncheckedReverseCopy(arr,0,copy=new long[size],0,size);
+        return copy;
+      }
+      return OmniArray.OfLong.DEFAULT_ARR;
+    }
+    @Override
+    public Long[] toArray()
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        final Long[] copy;
+        ArrCopy.uncheckedReverseCopy(arr,0,copy=new Long[size],0,size);
+        return copy;
+      }
+      return OmniArray.OfLong.DEFAULT_BOXED_ARR;
+    }
+    @Override
+    public double[] toDoubleArray()
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        final double[] copy;
+        ArrCopy.uncheckedReverseCopy(arr,0,copy=new double[size],0,size);
+        return copy;
+      }
+      return OmniArray.OfDouble.DEFAULT_ARR;
+    }
+    @Override
+    public float[] toFloatArray()
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        final float[] copy;
+        ArrCopy.uncheckedReverseCopy(arr,0,copy=new float[size],0,size);
+        return copy;
+      }
+      return OmniArray.OfFloat.DEFAULT_ARR;
+    }
+    @Override
+    public long popLong()
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        long ret=(long)arr[--size];
+        ++this.modCount;
+        this.size=size;
+        return ret;
+      }
+      throw new NoSuchElementException();
+    }
+    @Override
+    public Long pop()
+    {
+      return popLong();
+    }
+    @Override
+    public void push(long val)
+    {
+      //TODO
+    }
+    @Override
+    public void push(Long val)
+    {
+      //TODO
+    }
+    @Override
+    public long peekLong()
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        return (long)((long)arr[size-1]);
+      }
+      return Long.MIN_VALUE;
+    }
+    @Override
+    public long pollLong()
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        long ret=(long)((long)arr[--size]);
+        ++this.modCount;
+        this.size=size;
+        return ret;
+      }
+      return Long.MIN_VALUE;
+    }
+    @Override
+    public Long poll()
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        Long ret=(Long)((long)arr[--size]);
+        ++this.modCount;
+        this.size=size;
+        return ret;
+      }
+      return null;
+    }
+    @Override
+    public double pollDouble()
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        double ret=(double)((long)arr[--size]);
+        ++this.modCount;
+        this.size=size;
+        return ret;
+      }
+      return Double.NaN;
+    }
+    @Override
+    public float pollFloat()
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        float ret=(float)((long)arr[--size]);
+        ++this.modCount;
+        this.size=size;
+        return ret;
+      }
+      return Float.NaN;
+    }
+    @Override
+    public Long peek()
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        return (Long)((long)arr[size-1]);
+      }
+      return null;
+    }
+    @Override
+    public double peekDouble()
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        return (double)((long)arr[size-1]);
+      }
+      return Double.NaN;
+    }
+    @Override
+    public float peekFloat()
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        return (float)((long)arr[size-1]);
+      }
+      return Float.NaN;
+    }
+  }
 }
