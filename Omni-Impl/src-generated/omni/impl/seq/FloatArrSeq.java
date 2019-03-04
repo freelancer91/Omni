@@ -63,6 +63,281 @@ public abstract class FloatArrSeq implements OmniCollection.OfFloat
   }
   public static class UncheckedListImpl extends FloatArrSeq implements OmniList.OfFloat
   {
+    private static int uncheckedAbsoluteIndexOfBits(float[] arr,int offset,int bound
+    ,int val
+    )
+    {
+      for(;;)
+      {
+        if(
+        val==Float.floatToRawIntBits(arr[offset])
+        )
+        {
+          return offset;
+        }
+        if(++offset==bound)
+        {
+          return -1;
+        }
+      }
+    }
+    private static int uncheckedAbsoluteLastIndexOfBits(float[] arr,int offset,int bound
+    ,int val
+    )
+    {
+      for(;;)
+      {
+        if(
+        val==Float.floatToRawIntBits(arr[--bound])
+        )
+        {
+          return bound;
+        }
+        if(offset==bound)
+        {
+          return -1;
+        }
+      }
+    }
+    /*
+    private static int uncheckedRelativeIndexOfBits(float[] arr,int offset,int bound
+    ,int val
+    )
+    {
+      for(int i=offset;;)
+      {
+        if(
+        val==Float.floatToRawIntBits(arr[i])
+        )
+        {
+          return i-offset;
+        }
+        if(++i==bound)
+        {
+          return -1;
+        }
+      }
+    }
+    private static int uncheckedRelativeLastIndexOfBits(float[] arr,int offset,int bound
+    ,int val
+    )
+    {
+      for(;;)
+      {
+        if(
+        val==Float.floatToRawIntBits(arr[--bound])
+        )
+        {
+          return bound-offset;
+        }
+        if(offset==bound)
+        {
+          return -1;
+        }
+      }
+    }
+    */
+    private static int uncheckedAbsoluteIndexOf0(float[] arr,int offset,int bound
+    )
+    {
+      for(;;)
+      {
+        if(
+        0==(arr[offset])
+        )
+        {
+          return offset;
+        }
+        if(++offset==bound)
+        {
+          return -1;
+        }
+      }
+    }
+    private static int uncheckedAbsoluteLastIndexOf0(float[] arr,int offset,int bound
+    )
+    {
+      for(;;)
+      {
+        if(
+        0==(arr[--bound])
+        )
+        {
+          return bound;
+        }
+        if(offset==bound)
+        {
+          return -1;
+        }
+      }
+    }
+    /*
+    private static int uncheckedRelativeIndexOf0(float[] arr,int offset,int bound
+    )
+    {
+      for(int i=offset;;)
+      {
+        if(
+        0==(arr[i])
+        )
+        {
+          return i-offset;
+        }
+        if(++i==bound)
+        {
+          return -1;
+        }
+      }
+    }
+    private static int uncheckedRelativeLastIndexOf0(float[] arr,int offset,int bound
+    )
+    {
+      for(;;)
+      {
+        if(
+        0==(arr[--bound])
+        )
+        {
+          return bound-offset;
+        }
+        if(offset==bound)
+        {
+          return -1;
+        }
+      }
+    }
+    */
+    private static int uncheckedAbsoluteIndexOfNaN(float[] arr,int offset,int bound
+    )
+    {
+      for(;;)
+      {
+        if(
+        Float.isNaN(arr[offset])
+        )
+        {
+          return offset;
+        }
+        if(++offset==bound)
+        {
+          return -1;
+        }
+      }
+    }
+    private static int uncheckedAbsoluteLastIndexOfNaN(float[] arr,int offset,int bound
+    )
+    {
+      for(;;)
+      {
+        if(
+        Float.isNaN(arr[--bound])
+        )
+        {
+          return bound;
+        }
+        if(offset==bound)
+        {
+          return -1;
+        }
+      }
+    }
+    /*
+    private static int uncheckedRelativeIndexOfNaN(float[] arr,int offset,int bound
+    )
+    {
+      for(int i=offset;;)
+      {
+        if(
+        Float.isNaN(arr[i])
+        )
+        {
+          return i-offset;
+        }
+        if(++i==bound)
+        {
+          return -1;
+        }
+      }
+    }
+    private static int uncheckedRelativeLastIndexOfNaN(float[] arr,int offset,int bound
+    )
+    {
+      for(;;)
+      {
+        if(
+        Float.isNaN(arr[--bound])
+        )
+        {
+          return bound-offset;
+        }
+        if(offset==bound)
+        {
+          return -1;
+        }
+      }
+    }
+    */
+    private boolean uncheckedRemoveValBits(int size
+    ,int val
+    )
+    {
+      final var arr=this.arr;
+      for(int i=0;;)
+      {
+        if(
+        val==Float.floatToRawIntBits(arr[i])
+        )
+        {
+          ArrCopy.semicheckedSelfCopy(arr,i+1,i,(--size)-i);
+          this.size=size;
+          return true;
+        }
+        if(++i==size)
+        {
+          return false;
+        }
+      }
+    }
+    private boolean uncheckedRemoveVal0(int size
+    )
+    {
+      final var arr=this.arr;
+      for(int i=0;;)
+      {
+        if(
+        0==(arr[i])
+        )
+        {
+          ArrCopy.semicheckedSelfCopy(arr,i+1,i,(--size)-i);
+          this.size=size;
+          return true;
+        }
+        if(++i==size)
+        {
+          return false;
+        }
+      }
+    }
+    private boolean uncheckedRemoveValNaN(int size
+    )
+    {
+      final var arr=this.arr;
+      for(int i=0;;)
+      {
+        if(
+        Float.isNaN(arr[i])
+        )
+        {
+          ArrCopy.semicheckedSelfCopy(arr,i+1,i,(--size)-i);
+          this.size=size;
+          return true;
+        }
+        if(++i==size)
+        {
+          return false;
+        }
+      }
+    }
     static int uncheckedToString(float[] arr,int begin,int end,char[] buffer)
     {
       int bufferOffset;
@@ -146,16 +421,30 @@ public abstract class FloatArrSeq implements OmniCollection.OfFloat
       return 1;
     }
     @Override
-    public <T> T[] toArray(T[] arr)
+    public <T> T[] toArray(T[] dst)
     {
-      //TODO
-      return null;
+      final int size;
+      if((size=this.size)!=0)
+      {
+        ArrCopy.uncheckedCopy(this.arr,0,dst=OmniArray.uncheckedArrResize(size,dst),0,size);
+      }
+      else if(dst.length!=0)
+      {
+        dst[0]=null;
+      }
+      return dst;
     }
     @Override
     public <T> T[] toArray(IntFunction<T[]> arrConstructor)
     {
-      //TODO
-      return null;
+      final int size;
+      T[] dst;
+        dst=arrConstructor.apply(size=this.size);
+      if(size!=0)
+      {
+        ArrCopy.uncheckedCopy(this.arr,0,dst,0,size);
+      }
+      return dst;
     }
     @Override
     public boolean equals(Object val)
@@ -209,123 +498,6 @@ public abstract class FloatArrSeq implements OmniCollection.OfFloat
       //TODO
       return false;
     }
-   @Override
-   public
-   boolean
-   contains(boolean val)
-   {
-     final int size;
-     if((size=this.size)!=0)
-     {
-       if(val)
-       {
-         return OmniArray.OfFloat.uncheckedcontainsBits(this.arr,0,size-1,TypeUtil.FLT_TRUE_BITS);
-       }
-       return OmniArray.OfFloat.uncheckedcontains0(this.arr,0,size-1);
-     }
-     return false;
-   }
-   @Override
-   public
-   boolean
-   contains(int val)
-   {
-     final int size;
-     if((size=this.size)!=0)
-     {
-       if(val!=0)
-       {
-         if(TypeUtil.checkCastToFloat(val))
-         {
-           return OmniArray.OfFloat.uncheckedcontainsBits(this.arr,0,size-1,Float.floatToRawIntBits(val));
-         }
-       }
-       else
-       {
-         return OmniArray.OfFloat.uncheckedcontains0(this.arr,0,size-1);
-       }
-     }
-     return false;
-   }
-   @Override
-   public
-   boolean
-   contains(long val)
-   {
-     final int size;
-     if((size=this.size)!=0)
-     {
-       if(val!=0)
-       {
-         if(TypeUtil.checkCastToFloat(val))
-         {
-           return OmniArray.OfFloat.uncheckedcontainsBits(this.arr,0,size-1,Float.floatToRawIntBits(val));
-         }
-       }
-       else
-       {
-         return OmniArray.OfFloat.uncheckedcontains0(this.arr,0,size-1);
-       }
-     }
-     return false;
-   }
-   @Override
-   public
-   boolean
-   contains(float val)
-   {
-     final int size;
-     if((size=this.size)!=0)
-     {
-       if(val==val)
-       {
-         return OmniArray.OfFloat.uncheckedcontainsBits(this.arr,0,size-1,Float.floatToRawIntBits(val));
-       }
-       return OmniArray.OfFloat.uncheckedcontainsNaN(this.arr,0,size-1);
-     }
-     return false;
-   }
-   @Override
-   public
-   boolean
-   contains(double val)
-   {
-     final int size;
-     if((size=this.size)!=0)
-     {
-       final float v;
-       if((v=(float)val)==val)
-       {
-         return OmniArray.OfFloat.uncheckedcontainsBits(this.arr,0,size-1,Float.floatToRawIntBits(v));
-       }
-       else if(v!=v)
-       {
-         return OmniArray.OfFloat.uncheckedcontainsNaN(this.arr,0,size-1);
-       }
-     }
-     return false;
-   }
-   @Override
-   public
-   boolean
-   contains
-   (Object val)
-   {
-     final int size;
-     if((size=this.size)!=0)
-     {
-       if(val instanceof Float)
-       {
-         final float v;
-         if((v=(float)val)==v)
-         {
-           return OmniArray.OfFloat.uncheckedcontainsBits(this.arr,0,size-1,Float.floatToRawIntBits(v));
-         }
-         return OmniArray.OfFloat.uncheckedcontainsNaN(this.arr,0,size-1);
-       }
-     }
-     return false;
-   }
     @Override
     public boolean add(float val)
     {
@@ -333,7 +505,521 @@ public abstract class FloatArrSeq implements OmniCollection.OfFloat
       return false;
     }
     @Override
+    public boolean add(Float val)
+    {
+      //TODO
+      return false;
+    }
+    @Override
+    public
+    boolean
+    removeVal(boolean val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        if(val)
+        {
+          return uncheckedRemoveValBits(size,TypeUtil.FLT_TRUE_BITS);
+        }
+        return uncheckedRemoveVal0(size);
+      }
+      return false;
+    }
+    @Override
+    public
+    boolean
+    removeVal(int val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        if(val!=0)
+        {
+          if(TypeUtil.checkCastToFloat(val))
+          {
+            return uncheckedRemoveValBits(size,Float.floatToRawIntBits(val));
+          }
+        }
+        else
+        {
+          return uncheckedRemoveVal0(size);
+        }
+      }
+      return false;
+    }
+    @Override
+    public
+    boolean
+    removeVal(long val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        if(val!=0)
+        {
+          if(TypeUtil.checkCastToFloat(val))
+          {
+            return uncheckedRemoveValBits(size,Float.floatToRawIntBits(val));
+          }
+        }
+        else
+        {
+          return uncheckedRemoveVal0(size);
+        }
+      }
+      return false;
+    }
+    @Override
+    public
+    boolean
+    removeVal(float val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        if(val==val)
+        {
+          return uncheckedRemoveValBits(size,Float.floatToRawIntBits(val));
+        }
+        return uncheckedRemoveValNaN(size);
+      }
+      return false;
+    }
+    @Override
+    public
+    boolean
+    removeVal(double val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        final float v;
+        if((v=(float)val)==val)
+        {
+          return uncheckedRemoveValBits(size,Float.floatToRawIntBits(v));
+        }
+        else if(v!=v)
+        {
+          return uncheckedRemoveValNaN(size);
+        }
+      }
+      return false;
+    }
+    @Override
+    public
+    boolean
+    remove
+    (Object val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        if(val instanceof Float)
+        {
+          final float v;
+          if((v=(float)val)==v)
+          {
+            return uncheckedRemoveValBits(size,Float.floatToRawIntBits(v));
+          }
+          return uncheckedRemoveValNaN(size);
+        }
+      }
+      return false;
+    }
+    //#IFSWITCH removeVal==contains,removeVal
+    //  #IF OfRef,OfByte
+    //#MACRO QueryByte()
+    //  #ENDIF
+    //#ENDIF
+    @Override
+    public
+    boolean
+    contains(boolean val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        if(val)
+        {
+          return OmniArray.OfFloat.uncheckedcontainsBits(this.arr,0,size-1,TypeUtil.FLT_TRUE_BITS);
+        }
+        return OmniArray.OfFloat.uncheckedcontains0(this.arr,0,size-1);
+      }
+      return false;
+    }
+    @Override
+    public
+    boolean
+    contains(int val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        if(val!=0)
+        {
+          if(TypeUtil.checkCastToFloat(val))
+          {
+            return OmniArray.OfFloat.uncheckedcontainsBits(this.arr,0,size-1,Float.floatToRawIntBits(val));
+          }
+        }
+        else
+        {
+          return OmniArray.OfFloat.uncheckedcontains0(this.arr,0,size-1);
+        }
+      }
+      return false;
+    }
+    @Override
+    public
+    boolean
+    contains(long val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        if(val!=0)
+        {
+          if(TypeUtil.checkCastToFloat(val))
+          {
+            return OmniArray.OfFloat.uncheckedcontainsBits(this.arr,0,size-1,Float.floatToRawIntBits(val));
+          }
+        }
+        else
+        {
+          return OmniArray.OfFloat.uncheckedcontains0(this.arr,0,size-1);
+        }
+      }
+      return false;
+    }
+    @Override
+    public
+    boolean
+    contains(float val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        if(val==val)
+        {
+          return OmniArray.OfFloat.uncheckedcontainsBits(this.arr,0,size-1,Float.floatToRawIntBits(val));
+        }
+        return OmniArray.OfFloat.uncheckedcontainsNaN(this.arr,0,size-1);
+      }
+      return false;
+    }
+    @Override
+    public
+    boolean
+    contains(double val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        final float v;
+        if((v=(float)val)==val)
+        {
+          return OmniArray.OfFloat.uncheckedcontainsBits(this.arr,0,size-1,Float.floatToRawIntBits(v));
+        }
+        else if(v!=v)
+        {
+          return OmniArray.OfFloat.uncheckedcontainsNaN(this.arr,0,size-1);
+        }
+      }
+      return false;
+    }
+    @Override
+    public
+    boolean
+    contains
+    (Object val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        if(val instanceof Float)
+        {
+          final float v;
+          if((v=(float)val)==v)
+          {
+            return OmniArray.OfFloat.uncheckedcontainsBits(this.arr,0,size-1,Float.floatToRawIntBits(v));
+          }
+          return OmniArray.OfFloat.uncheckedcontainsNaN(this.arr,0,size-1);
+        }
+      }
+      return false;
+    }
+    //#IFSWITCH contains==contains,removeVal
+    //  #IF OfRef,OfByte
+    //#MACRO QueryByte()
+    //  #ENDIF
+    //#ENDIF
+    @Override
+    public
+    int
+    indexOf(boolean val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        if(val)
+        {
+          return uncheckedAbsoluteIndexOfBits(this.arr,0,size,TypeUtil.FLT_TRUE_BITS);
+        }
+        return uncheckedAbsoluteIndexOf0(this.arr,0,size);
+      }
+      return -1;
+    }
+    @Override
+    public
+    int
+    indexOf(int val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        if(val!=0)
+        {
+          if(TypeUtil.checkCastToFloat(val))
+          {
+            return uncheckedAbsoluteIndexOfBits(this.arr,0,size,Float.floatToRawIntBits(val));
+          }
+        }
+        else
+        {
+          return uncheckedAbsoluteIndexOf0(this.arr,0,size);
+        }
+      }
+      return -1;
+    }
+    @Override
+    public
+    int
+    indexOf(long val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        if(val!=0)
+        {
+          if(TypeUtil.checkCastToFloat(val))
+          {
+            return uncheckedAbsoluteIndexOfBits(this.arr,0,size,Float.floatToRawIntBits(val));
+          }
+        }
+        else
+        {
+          return uncheckedAbsoluteIndexOf0(this.arr,0,size);
+        }
+      }
+      return -1;
+    }
+    @Override
+    public
+    int
+    indexOf(float val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        if(val==val)
+        {
+          return uncheckedAbsoluteIndexOfBits(this.arr,0,size,Float.floatToRawIntBits(val));
+        }
+        return uncheckedAbsoluteIndexOfNaN(this.arr,0,size);
+      }
+      return -1;
+    }
+    @Override
+    public
+    int
+    indexOf(double val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        final float v;
+        if((v=(float)val)==val)
+        {
+          return uncheckedAbsoluteIndexOfBits(this.arr,0,size,Float.floatToRawIntBits(v));
+        }
+        else if(v!=v)
+        {
+          return uncheckedAbsoluteIndexOfNaN(this.arr,0,size);
+        }
+      }
+      return -1;
+    }
+    @Override
+    public
+    int
+    indexOf
+    (Object val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        if(val instanceof Float)
+        {
+          final float v;
+          if((v=(float)val)==v)
+          {
+            return uncheckedAbsoluteIndexOfBits(this.arr,0,size,Float.floatToRawIntBits(v));
+          }
+          return uncheckedAbsoluteIndexOfNaN(this.arr,0,size);
+        }
+      }
+      return -1;
+    }
+    //#IFSWITCH indexOf==contains,removeVal
+    //  #IF OfRef,OfByte
+    //#MACRO QueryByte()
+    //  #ENDIF
+    //#ENDIF
+    @Override
+    public
+    int
+    lastIndexOf(boolean val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        if(val)
+        {
+          return uncheckedAbsoluteLastIndexOfBits(this.arr,0,size,TypeUtil.FLT_TRUE_BITS);
+        }
+        return uncheckedAbsoluteLastIndexOf0(this.arr,0,size);
+      }
+      return -1;
+    }
+    @Override
+    public
+    int
+    lastIndexOf(int val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        if(val!=0)
+        {
+          if(TypeUtil.checkCastToFloat(val))
+          {
+            return uncheckedAbsoluteLastIndexOfBits(this.arr,0,size,Float.floatToRawIntBits(val));
+          }
+        }
+        else
+        {
+          return uncheckedAbsoluteLastIndexOf0(this.arr,0,size);
+        }
+      }
+      return -1;
+    }
+    @Override
+    public
+    int
+    lastIndexOf(long val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        if(val!=0)
+        {
+          if(TypeUtil.checkCastToFloat(val))
+          {
+            return uncheckedAbsoluteLastIndexOfBits(this.arr,0,size,Float.floatToRawIntBits(val));
+          }
+        }
+        else
+        {
+          return uncheckedAbsoluteLastIndexOf0(this.arr,0,size);
+        }
+      }
+      return -1;
+    }
+    @Override
+    public
+    int
+    lastIndexOf(float val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        if(val==val)
+        {
+          return uncheckedAbsoluteLastIndexOfBits(this.arr,0,size,Float.floatToRawIntBits(val));
+        }
+        return uncheckedAbsoluteLastIndexOfNaN(this.arr,0,size);
+      }
+      return -1;
+    }
+    @Override
+    public
+    int
+    lastIndexOf(double val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        final float v;
+        if((v=(float)val)==val)
+        {
+          return uncheckedAbsoluteLastIndexOfBits(this.arr,0,size,Float.floatToRawIntBits(v));
+        }
+        else if(v!=v)
+        {
+          return uncheckedAbsoluteLastIndexOfNaN(this.arr,0,size);
+        }
+      }
+      return -1;
+    }
+    @Override
+    public
+    int
+    lastIndexOf
+    (Object val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        if(val instanceof Float)
+        {
+          final float v;
+          if((v=(float)val)==v)
+          {
+            return uncheckedAbsoluteLastIndexOfBits(this.arr,0,size,Float.floatToRawIntBits(v));
+          }
+          return uncheckedAbsoluteLastIndexOfNaN(this.arr,0,size);
+        }
+      }
+      return -1;
+    }
+    //#IFSWITCH lastIndexOf==contains,removeVal
+    //  #IF OfRef,OfByte
+    //#MACRO QueryByte()
+    //  #ENDIF
+    //#ENDIF
+    @Override
+    public void put(int index,float val)
+    {
+      arr[index]=val;
+    }
+    @Override
+    public float getFloat(int index)
+    {
+      return (float)arr[index];
+    }
+    @Override
+    public Float get(int index)
+    {
+      return getFloat(index);
+    }
+    @Override
     public void add(int index,float val)
+    {
+      //TODO
+    }
+    @Override
+    public void add(int index,Float val)
     {
       //TODO
     }
@@ -343,7 +1029,6 @@ public abstract class FloatArrSeq implements OmniCollection.OfFloat
       final float[] arr;
       float ret=(float)(arr=this.arr)[index];
       ArrCopy.semicheckedSelfCopy(arr,index+1,index,(--size)-index);
-      this.size=size;
       return ret;
     }
     @Override
@@ -431,6 +1116,122 @@ public abstract class FloatArrSeq implements OmniCollection.OfFloat
   }
   public static class UncheckedStackImpl extends FloatArrSeq implements OmniStack.OfFloat
   {
+    private int uncheckedSearchBits(int bound
+    ,int val
+    )
+    {
+      final var arr=this.arr;
+      for(int index=bound-1;;)
+      {
+        if(
+        val==Float.floatToRawIntBits(arr[index])
+        )
+        {
+          return bound-index;
+        }
+        if(index==0)
+        {
+          return -1;
+        }
+      }
+    }
+    private int uncheckedSearch0(int bound
+    )
+    {
+      final var arr=this.arr;
+      for(int index=bound-1;;)
+      {
+        if(
+        0==(arr[index])
+        )
+        {
+          return bound-index;
+        }
+        if(index==0)
+        {
+          return -1;
+        }
+      }
+    }
+    private int uncheckedSearchNaN(int bound
+    )
+    {
+      final var arr=this.arr;
+      for(int index=bound-1;;)
+      {
+        if(
+        Float.isNaN(arr[index])
+        )
+        {
+          return bound-index;
+        }
+        if(index==0)
+        {
+          return -1;
+        }
+      }
+    }
+    private boolean uncheckedRemoveValBits(int size
+    ,int val
+    )
+    {
+      final var arr=this.arr;
+      for(int i=--size;;--i)
+      {
+        if(
+        val==Float.floatToRawIntBits(arr[i])
+        )
+        {
+          ArrCopy.semicheckedSelfCopy(arr,i+1,i,size-i);
+          this.size=size;
+          return true;
+        }
+        if(i==0)
+        {
+          return false;
+        }
+      }
+    }
+    private boolean uncheckedRemoveVal0(int size
+    )
+    {
+      final var arr=this.arr;
+      for(int i=--size;;--i)
+      {
+        if(
+        0==(arr[i])
+        )
+        {
+          ArrCopy.semicheckedSelfCopy(arr,i+1,i,size-i);
+          this.size=size;
+          return true;
+        }
+        if(i==0)
+        {
+          return false;
+        }
+      }
+    }
+    private boolean uncheckedRemoveValNaN(int size
+    )
+    {
+      final var arr=this.arr;
+      for(int i=--size;;--i)
+      {
+        if(
+        Float.isNaN(arr[i])
+        )
+        {
+          ArrCopy.semicheckedSelfCopy(arr,i+1,i,size-i);
+          this.size=size;
+          return true;
+        }
+        if(i==0)
+        {
+          return false;
+        }
+      }
+    }
     static int uncheckedToString(float[] arr,int begin,int end,char[] buffer)
     {
       int bufferOffset;
@@ -514,16 +1315,30 @@ public abstract class FloatArrSeq implements OmniCollection.OfFloat
       return 1;
     }
     @Override
-    public <T> T[] toArray(T[] arr)
+    public <T> T[] toArray(T[] dst)
     {
-      //TODO
-      return null;
+      final int size;
+      if((size=this.size)!=0)
+      {
+        ArrCopy.uncheckedReverseCopy(this.arr,0,dst=OmniArray.uncheckedArrResize(size,dst),0,size);
+      }
+      else if(dst.length!=0)
+      {
+        dst[0]=null;
+      }
+      return dst;
     }
     @Override
     public <T> T[] toArray(IntFunction<T[]> arrConstructor)
     {
-      //TODO
-      return null;
+      final int size;
+      T[] dst;
+        dst=arrConstructor.apply(size=this.size);
+      if(size!=0)
+      {
+        ArrCopy.uncheckedReverseCopy(this.arr,0,dst,0,size);
+      }
+      return dst;
     }
     @Override
     public boolean equals(Object val)
@@ -577,123 +1392,262 @@ public abstract class FloatArrSeq implements OmniCollection.OfFloat
       //TODO
       return false;
     }
-   @Override
-   public
-   boolean
-   contains(boolean val)
-   {
-     final int size;
-     if((size=this.size)!=0)
-     {
-       if(val)
-       {
-         return OmniArray.OfFloat.uncheckedcontainsBits(this.arr,0,size-1,TypeUtil.FLT_TRUE_BITS);
-       }
-       return OmniArray.OfFloat.uncheckedcontains0(this.arr,0,size-1);
-     }
-     return false;
-   }
-   @Override
-   public
-   boolean
-   contains(int val)
-   {
-     final int size;
-     if((size=this.size)!=0)
-     {
-       if(val!=0)
-       {
-         if(TypeUtil.checkCastToFloat(val))
-         {
-           return OmniArray.OfFloat.uncheckedcontainsBits(this.arr,0,size-1,Float.floatToRawIntBits(val));
-         }
-       }
-       else
-       {
-         return OmniArray.OfFloat.uncheckedcontains0(this.arr,0,size-1);
-       }
-     }
-     return false;
-   }
-   @Override
-   public
-   boolean
-   contains(long val)
-   {
-     final int size;
-     if((size=this.size)!=0)
-     {
-       if(val!=0)
-       {
-         if(TypeUtil.checkCastToFloat(val))
-         {
-           return OmniArray.OfFloat.uncheckedcontainsBits(this.arr,0,size-1,Float.floatToRawIntBits(val));
-         }
-       }
-       else
-       {
-         return OmniArray.OfFloat.uncheckedcontains0(this.arr,0,size-1);
-       }
-     }
-     return false;
-   }
-   @Override
-   public
-   boolean
-   contains(float val)
-   {
-     final int size;
-     if((size=this.size)!=0)
-     {
-       if(val==val)
-       {
-         return OmniArray.OfFloat.uncheckedcontainsBits(this.arr,0,size-1,Float.floatToRawIntBits(val));
-       }
-       return OmniArray.OfFloat.uncheckedcontainsNaN(this.arr,0,size-1);
-     }
-     return false;
-   }
-   @Override
-   public
-   boolean
-   contains(double val)
-   {
-     final int size;
-     if((size=this.size)!=0)
-     {
-       final float v;
-       if((v=(float)val)==val)
-       {
-         return OmniArray.OfFloat.uncheckedcontainsBits(this.arr,0,size-1,Float.floatToRawIntBits(v));
-       }
-       else if(v!=v)
-       {
-         return OmniArray.OfFloat.uncheckedcontainsNaN(this.arr,0,size-1);
-       }
-     }
-     return false;
-   }
-   @Override
-   public
-   boolean
-   contains
-   (Object val)
-   {
-     final int size;
-     if((size=this.size)!=0)
-     {
-       if(val instanceof Float)
-       {
-         final float v;
-         if((v=(float)val)==v)
-         {
-           return OmniArray.OfFloat.uncheckedcontainsBits(this.arr,0,size-1,Float.floatToRawIntBits(v));
-         }
-         return OmniArray.OfFloat.uncheckedcontainsNaN(this.arr,0,size-1);
-       }
-     }
-     return false;
-   }
+    @Override
+    public boolean add(float val)
+    {
+      //TODO
+      return false;
+    }
+    @Override
+    public boolean add(Float val)
+    {
+      //TODO
+      return false;
+    }
+    @Override
+    public
+    boolean
+    removeVal(boolean val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        if(val)
+        {
+          return uncheckedRemoveValBits(size,TypeUtil.FLT_TRUE_BITS);
+        }
+        return uncheckedRemoveVal0(size);
+      }
+      return false;
+    }
+    @Override
+    public
+    boolean
+    removeVal(int val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        if(val!=0)
+        {
+          if(TypeUtil.checkCastToFloat(val))
+          {
+            return uncheckedRemoveValBits(size,Float.floatToRawIntBits(val));
+          }
+        }
+        else
+        {
+          return uncheckedRemoveVal0(size);
+        }
+      }
+      return false;
+    }
+    @Override
+    public
+    boolean
+    removeVal(long val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        if(val!=0)
+        {
+          if(TypeUtil.checkCastToFloat(val))
+          {
+            return uncheckedRemoveValBits(size,Float.floatToRawIntBits(val));
+          }
+        }
+        else
+        {
+          return uncheckedRemoveVal0(size);
+        }
+      }
+      return false;
+    }
+    @Override
+    public
+    boolean
+    removeVal(float val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        if(val==val)
+        {
+          return uncheckedRemoveValBits(size,Float.floatToRawIntBits(val));
+        }
+        return uncheckedRemoveValNaN(size);
+      }
+      return false;
+    }
+    @Override
+    public
+    boolean
+    removeVal(double val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        final float v;
+        if((v=(float)val)==val)
+        {
+          return uncheckedRemoveValBits(size,Float.floatToRawIntBits(v));
+        }
+        else if(v!=v)
+        {
+          return uncheckedRemoveValNaN(size);
+        }
+      }
+      return false;
+    }
+    @Override
+    public
+    boolean
+    remove
+    (Object val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        if(val instanceof Float)
+        {
+          final float v;
+          if((v=(float)val)==v)
+          {
+            return uncheckedRemoveValBits(size,Float.floatToRawIntBits(v));
+          }
+          return uncheckedRemoveValNaN(size);
+        }
+      }
+      return false;
+    }
+    //#IFSWITCH removeVal==contains,removeVal
+    //  #IF OfRef,OfByte
+    //#MACRO QueryByte()
+    //  #ENDIF
+    //#ENDIF
+    @Override
+    public
+    boolean
+    contains(boolean val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        if(val)
+        {
+          return OmniArray.OfFloat.uncheckedcontainsBits(this.arr,0,size-1,TypeUtil.FLT_TRUE_BITS);
+        }
+        return OmniArray.OfFloat.uncheckedcontains0(this.arr,0,size-1);
+      }
+      return false;
+    }
+    @Override
+    public
+    boolean
+    contains(int val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        if(val!=0)
+        {
+          if(TypeUtil.checkCastToFloat(val))
+          {
+            return OmniArray.OfFloat.uncheckedcontainsBits(this.arr,0,size-1,Float.floatToRawIntBits(val));
+          }
+        }
+        else
+        {
+          return OmniArray.OfFloat.uncheckedcontains0(this.arr,0,size-1);
+        }
+      }
+      return false;
+    }
+    @Override
+    public
+    boolean
+    contains(long val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        if(val!=0)
+        {
+          if(TypeUtil.checkCastToFloat(val))
+          {
+            return OmniArray.OfFloat.uncheckedcontainsBits(this.arr,0,size-1,Float.floatToRawIntBits(val));
+          }
+        }
+        else
+        {
+          return OmniArray.OfFloat.uncheckedcontains0(this.arr,0,size-1);
+        }
+      }
+      return false;
+    }
+    @Override
+    public
+    boolean
+    contains(float val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        if(val==val)
+        {
+          return OmniArray.OfFloat.uncheckedcontainsBits(this.arr,0,size-1,Float.floatToRawIntBits(val));
+        }
+        return OmniArray.OfFloat.uncheckedcontainsNaN(this.arr,0,size-1);
+      }
+      return false;
+    }
+    @Override
+    public
+    boolean
+    contains(double val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        final float v;
+        if((v=(float)val)==val)
+        {
+          return OmniArray.OfFloat.uncheckedcontainsBits(this.arr,0,size-1,Float.floatToRawIntBits(v));
+        }
+        else if(v!=v)
+        {
+          return OmniArray.OfFloat.uncheckedcontainsNaN(this.arr,0,size-1);
+        }
+      }
+      return false;
+    }
+    @Override
+    public
+    boolean
+    contains
+    (Object val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        if(val instanceof Float)
+        {
+          final float v;
+          if((v=(float)val)==v)
+          {
+            return OmniArray.OfFloat.uncheckedcontainsBits(this.arr,0,size-1,Float.floatToRawIntBits(v));
+          }
+          return OmniArray.OfFloat.uncheckedcontainsNaN(this.arr,0,size-1);
+        }
+      }
+      return false;
+    }
+    //#IFSWITCH contains==contains,removeVal
+    //  #IF OfRef,OfByte
+    //#MACRO QueryByte()
+    //  #ENDIF
+    //#ENDIF
     @Override
     public OmniIterator.OfFloat iterator()
     {
@@ -736,6 +1690,128 @@ public abstract class FloatArrSeq implements OmniCollection.OfFloat
       }
       return OmniArray.OfDouble.DEFAULT_ARR;
     }
+    @Override
+    public
+    int
+    search(boolean val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        if(val)
+        {
+          return uncheckedSearchBits(size,TypeUtil.FLT_TRUE_BITS);
+        }
+        return uncheckedSearch0(size);
+      }
+      return -1;
+    }
+    @Override
+    public
+    int
+    search(int val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        if(val!=0)
+        {
+          if(TypeUtil.checkCastToFloat(val))
+          {
+            return uncheckedSearchBits(size,Float.floatToRawIntBits(val));
+          }
+        }
+        else
+        {
+          return uncheckedSearch0(size);
+        }
+      }
+      return -1;
+    }
+    @Override
+    public
+    int
+    search(long val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        if(val!=0)
+        {
+          if(TypeUtil.checkCastToFloat(val))
+          {
+            return uncheckedSearchBits(size,Float.floatToRawIntBits(val));
+          }
+        }
+        else
+        {
+          return uncheckedSearch0(size);
+        }
+      }
+      return -1;
+    }
+    @Override
+    public
+    int
+    search(float val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        if(val==val)
+        {
+          return uncheckedSearchBits(size,Float.floatToRawIntBits(val));
+        }
+        return uncheckedSearchNaN(size);
+      }
+      return -1;
+    }
+    @Override
+    public
+    int
+    search(double val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        final float v;
+        if((v=(float)val)==val)
+        {
+          return uncheckedSearchBits(size,Float.floatToRawIntBits(v));
+        }
+        else if(v!=v)
+        {
+          return uncheckedSearchNaN(size);
+        }
+      }
+      return -1;
+    }
+    @Override
+    public
+    int
+    search
+    (Object val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        if(val instanceof Float)
+        {
+          final float v;
+          if((v=(float)val)==v)
+          {
+            return uncheckedSearchBits(size,Float.floatToRawIntBits(v));
+          }
+          return uncheckedSearchNaN(size);
+        }
+      }
+      return -1;
+    }
+    //#IFSWITCH search==contains,removeVal
+    //  #IF OfRef,OfByte
+    //#MACRO QueryByte()
+    //  #ENDIF
+    //#ENDIF
     @Override
     public float popFloat()
     {
@@ -832,6 +1908,293 @@ public abstract class FloatArrSeq implements OmniCollection.OfFloat
   }
   public static class CheckedListImpl extends FloatArrSeq implements OmniList.OfFloat
   {
+    private static int uncheckedAbsoluteIndexOfBits(float[] arr,int offset,int bound
+    ,int val
+    )
+    {
+      for(;;)
+      {
+        if(
+        val==Float.floatToRawIntBits(arr[offset])
+        )
+        {
+          return offset;
+        }
+        if(++offset==bound)
+        {
+          return -1;
+        }
+      }
+    }
+    private static int uncheckedAbsoluteLastIndexOfBits(float[] arr,int offset,int bound
+    ,int val
+    )
+    {
+      for(;;)
+      {
+        if(
+        val==Float.floatToRawIntBits(arr[--bound])
+        )
+        {
+          return bound;
+        }
+        if(offset==bound)
+        {
+          return -1;
+        }
+      }
+    }
+    /*
+    private static int uncheckedRelativeIndexOfBits(float[] arr,int offset,int bound
+    ,int val
+    )
+    {
+      for(int i=offset;;)
+      {
+        if(
+        val==Float.floatToRawIntBits(arr[i])
+        )
+        {
+          return i-offset;
+        }
+        if(++i==bound)
+        {
+          return -1;
+        }
+      }
+    }
+    private static int uncheckedRelativeLastIndexOfBits(float[] arr,int offset,int bound
+    ,int val
+    )
+    {
+      for(;;)
+      {
+        if(
+        val==Float.floatToRawIntBits(arr[--bound])
+        )
+        {
+          return bound-offset;
+        }
+        if(offset==bound)
+        {
+          return -1;
+        }
+      }
+    }
+    */
+    private static int uncheckedAbsoluteIndexOf0(float[] arr,int offset,int bound
+    )
+    {
+      for(;;)
+      {
+        if(
+        0==(arr[offset])
+        )
+        {
+          return offset;
+        }
+        if(++offset==bound)
+        {
+          return -1;
+        }
+      }
+    }
+    private static int uncheckedAbsoluteLastIndexOf0(float[] arr,int offset,int bound
+    )
+    {
+      for(;;)
+      {
+        if(
+        0==(arr[--bound])
+        )
+        {
+          return bound;
+        }
+        if(offset==bound)
+        {
+          return -1;
+        }
+      }
+    }
+    /*
+    private static int uncheckedRelativeIndexOf0(float[] arr,int offset,int bound
+    )
+    {
+      for(int i=offset;;)
+      {
+        if(
+        0==(arr[i])
+        )
+        {
+          return i-offset;
+        }
+        if(++i==bound)
+        {
+          return -1;
+        }
+      }
+    }
+    private static int uncheckedRelativeLastIndexOf0(float[] arr,int offset,int bound
+    )
+    {
+      for(;;)
+      {
+        if(
+        0==(arr[--bound])
+        )
+        {
+          return bound-offset;
+        }
+        if(offset==bound)
+        {
+          return -1;
+        }
+      }
+    }
+    */
+    private static int uncheckedAbsoluteIndexOfNaN(float[] arr,int offset,int bound
+    )
+    {
+      for(;;)
+      {
+        if(
+        Float.isNaN(arr[offset])
+        )
+        {
+          return offset;
+        }
+        if(++offset==bound)
+        {
+          return -1;
+        }
+      }
+    }
+    private static int uncheckedAbsoluteLastIndexOfNaN(float[] arr,int offset,int bound
+    )
+    {
+      for(;;)
+      {
+        if(
+        Float.isNaN(arr[--bound])
+        )
+        {
+          return bound;
+        }
+        if(offset==bound)
+        {
+          return -1;
+        }
+      }
+    }
+    /*
+    private static int uncheckedRelativeIndexOfNaN(float[] arr,int offset,int bound
+    )
+    {
+      for(int i=offset;;)
+      {
+        if(
+        Float.isNaN(arr[i])
+        )
+        {
+          return i-offset;
+        }
+        if(++i==bound)
+        {
+          return -1;
+        }
+      }
+    }
+    private static int uncheckedRelativeLastIndexOfNaN(float[] arr,int offset,int bound
+    )
+    {
+      for(;;)
+      {
+        if(
+        Float.isNaN(arr[--bound])
+        )
+        {
+          return bound-offset;
+        }
+        if(offset==bound)
+        {
+          return -1;
+        }
+      }
+    }
+    */
+    private boolean uncheckedRemoveValBits(int size
+    ,int val
+    )
+    {
+      int modCount=this.modCount;
+      final var arr=this.arr;
+      for(int i=0;;)
+      {
+        if(
+        val==Float.floatToRawIntBits(arr[i])
+        )
+        {
+          CheckedCollection.checkModCount(modCount,this.modCount);
+          this.modCount=modCount+1;
+          ArrCopy.semicheckedSelfCopy(arr,i+1,i,(--size)-i);
+          this.size=size;
+          return true;
+        }
+        if(++i==size)
+        {
+          CheckedCollection.checkModCount(modCount,this.modCount);
+          return false;
+        }
+      }
+    }
+    private boolean uncheckedRemoveVal0(int size
+    )
+    {
+      int modCount=this.modCount;
+      final var arr=this.arr;
+      for(int i=0;;)
+      {
+        if(
+        0==(arr[i])
+        )
+        {
+          CheckedCollection.checkModCount(modCount,this.modCount);
+          this.modCount=modCount+1;
+          ArrCopy.semicheckedSelfCopy(arr,i+1,i,(--size)-i);
+          this.size=size;
+          return true;
+        }
+        if(++i==size)
+        {
+          CheckedCollection.checkModCount(modCount,this.modCount);
+          return false;
+        }
+      }
+    }
+    private boolean uncheckedRemoveValNaN(int size
+    )
+    {
+      int modCount=this.modCount;
+      final var arr=this.arr;
+      for(int i=0;;)
+      {
+        if(
+        Float.isNaN(arr[i])
+        )
+        {
+          CheckedCollection.checkModCount(modCount,this.modCount);
+          this.modCount=modCount+1;
+          ArrCopy.semicheckedSelfCopy(arr,i+1,i,(--size)-i);
+          this.size=size;
+          return true;
+        }
+        if(++i==size)
+        {
+          CheckedCollection.checkModCount(modCount,this.modCount);
+          return false;
+        }
+      }
+    }
     static int uncheckedToString(float[] arr,int begin,int end,char[] buffer)
     {
       int bufferOffset;
@@ -925,16 +2288,38 @@ public abstract class FloatArrSeq implements OmniCollection.OfFloat
       return 1;
     }
     @Override
-    public <T> T[] toArray(T[] arr)
+    public <T> T[] toArray(T[] dst)
     {
-      //TODO
-      return null;
+      final int size;
+      if((size=this.size)!=0)
+      {
+        ArrCopy.uncheckedCopy(this.arr,0,dst=OmniArray.uncheckedArrResize(size,dst),0,size);
+      }
+      else if(dst.length!=0)
+      {
+        dst[0]=null;
+      }
+      return dst;
     }
     @Override
     public <T> T[] toArray(IntFunction<T[]> arrConstructor)
     {
-      //TODO
-      return null;
+      final int size;
+      T[] dst;
+      int modCount=this.modCount;
+      try
+      {
+        dst=arrConstructor.apply(size=this.size);
+      }
+      finally
+      {
+        CheckedCollection.checkModCount(modCount,this.modCount);
+      }
+      if(size!=0)
+      {
+        ArrCopy.uncheckedCopy(this.arr,0,dst,0,size);
+      }
+      return dst;
     }
     @Override
     public boolean equals(Object val)
@@ -1000,125 +2385,6 @@ public abstract class FloatArrSeq implements OmniCollection.OfFloat
       //TODO
       return false;
     }
-   @Override
-   public
-   boolean
-   contains(boolean val)
-   {
-     final int size;
-     if((size=this.size)!=0)
-     {
-       if(val)
-       {
-         return OmniArray.OfFloat.uncheckedcontainsBits(this.arr,0,size-1,TypeUtil.FLT_TRUE_BITS);
-       }
-       return OmniArray.OfFloat.uncheckedcontains0(this.arr,0,size-1);
-     }
-     return false;
-   }
-   @Override
-   public
-   boolean
-   contains(int val)
-   {
-     final int size;
-     if((size=this.size)!=0)
-     {
-       if(val!=0)
-       {
-         if(TypeUtil.checkCastToFloat(val))
-         {
-           return OmniArray.OfFloat.uncheckedcontainsBits(this.arr,0,size-1,Float.floatToRawIntBits(val));
-         }
-       }
-       else
-       {
-         return OmniArray.OfFloat.uncheckedcontains0(this.arr,0,size-1);
-       }
-     }
-     return false;
-   }
-   @Override
-   public
-   boolean
-   contains(long val)
-   {
-     final int size;
-     if((size=this.size)!=0)
-     {
-       if(val!=0)
-       {
-         if(TypeUtil.checkCastToFloat(val))
-         {
-           return OmniArray.OfFloat.uncheckedcontainsBits(this.arr,0,size-1,Float.floatToRawIntBits(val));
-         }
-       }
-       else
-       {
-         return OmniArray.OfFloat.uncheckedcontains0(this.arr,0,size-1);
-       }
-     }
-     return false;
-   }
-   @Override
-   public
-   boolean
-   contains(float val)
-   {
-     final int size;
-     if((size=this.size)!=0)
-     {
-       if(val==val)
-       {
-         return OmniArray.OfFloat.uncheckedcontainsBits(this.arr,0,size-1,Float.floatToRawIntBits(val));
-       }
-       return OmniArray.OfFloat.uncheckedcontainsNaN(this.arr,0,size-1);
-     }
-     return false;
-   }
-   @Override
-   public
-   boolean
-   contains(double val)
-   {
-     final int size;
-     if((size=this.size)!=0)
-     {
-       final float v;
-       if((v=(float)val)==val)
-       {
-         return OmniArray.OfFloat.uncheckedcontainsBits(this.arr,0,size-1,Float.floatToRawIntBits(v));
-       }
-       else if(v!=v)
-       {
-         return OmniArray.OfFloat.uncheckedcontainsNaN(this.arr,0,size-1);
-       }
-     }
-     return false;
-   }
-   @Override
-   public
-   boolean
-   contains
-   (Object val)
-   {
-     final int size;
-     if((size=this.size)!=0)
-     {
-       int modCount=this.modCount;
-       if(val instanceof Float)
-       {
-         final float v;
-         if((v=(float)val)==v)
-         {
-           return OmniArray.OfFloat.uncheckedcontainsBits(this.arr,0,size-1,Float.floatToRawIntBits(v));
-         }
-         return OmniArray.OfFloat.uncheckedcontainsNaN(this.arr,0,size-1);
-       }
-     }
-     CheckedCollection.checkModCount(modCount,this.modCount);
-     return false;
-   }
     @Override
     public boolean add(float val)
     {
@@ -1126,7 +2392,529 @@ public abstract class FloatArrSeq implements OmniCollection.OfFloat
       return false;
     }
     @Override
+    public boolean add(Float val)
+    {
+      //TODO
+      return false;
+    }
+    @Override
+    public
+    boolean
+    removeVal(boolean val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        if(val)
+        {
+          return uncheckedRemoveValBits(size,TypeUtil.FLT_TRUE_BITS);
+        }
+        return uncheckedRemoveVal0(size);
+      }
+      return false;
+    }
+    @Override
+    public
+    boolean
+    removeVal(int val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        if(val!=0)
+        {
+          if(TypeUtil.checkCastToFloat(val))
+          {
+            return uncheckedRemoveValBits(size,Float.floatToRawIntBits(val));
+          }
+        }
+        else
+        {
+          return uncheckedRemoveVal0(size);
+        }
+      }
+      return false;
+    }
+    @Override
+    public
+    boolean
+    removeVal(long val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        if(val!=0)
+        {
+          if(TypeUtil.checkCastToFloat(val))
+          {
+            return uncheckedRemoveValBits(size,Float.floatToRawIntBits(val));
+          }
+        }
+        else
+        {
+          return uncheckedRemoveVal0(size);
+        }
+      }
+      return false;
+    }
+    @Override
+    public
+    boolean
+    removeVal(float val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        if(val==val)
+        {
+          return uncheckedRemoveValBits(size,Float.floatToRawIntBits(val));
+        }
+        return uncheckedRemoveValNaN(size);
+      }
+      return false;
+    }
+    @Override
+    public
+    boolean
+    removeVal(double val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        final float v;
+        if((v=(float)val)==val)
+        {
+          return uncheckedRemoveValBits(size,Float.floatToRawIntBits(v));
+        }
+        else if(v!=v)
+        {
+          return uncheckedRemoveValNaN(size);
+        }
+      }
+      return false;
+    }
+    @Override
+    public
+    boolean
+    remove
+    (Object val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        if(val instanceof Float)
+        {
+          final float v;
+          if((v=(float)val)==v)
+          {
+            return uncheckedRemoveValBits(size,Float.floatToRawIntBits(v));
+          }
+          return uncheckedRemoveValNaN(size);
+        }
+      }
+      return false;
+    }
+    //#IFSWITCH removeVal==contains,removeVal
+    //  #IF OfRef,OfByte
+    //#MACRO QueryByte()
+    //  #ENDIF
+    //#ENDIF
+    @Override
+    public
+    boolean
+    contains(boolean val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        if(val)
+        {
+          return OmniArray.OfFloat.uncheckedcontainsBits(this.arr,0,size-1,TypeUtil.FLT_TRUE_BITS);
+        }
+        return OmniArray.OfFloat.uncheckedcontains0(this.arr,0,size-1);
+      }
+      return false;
+    }
+    @Override
+    public
+    boolean
+    contains(int val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        if(val!=0)
+        {
+          if(TypeUtil.checkCastToFloat(val))
+          {
+            return OmniArray.OfFloat.uncheckedcontainsBits(this.arr,0,size-1,Float.floatToRawIntBits(val));
+          }
+        }
+        else
+        {
+          return OmniArray.OfFloat.uncheckedcontains0(this.arr,0,size-1);
+        }
+      }
+      return false;
+    }
+    @Override
+    public
+    boolean
+    contains(long val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        if(val!=0)
+        {
+          if(TypeUtil.checkCastToFloat(val))
+          {
+            return OmniArray.OfFloat.uncheckedcontainsBits(this.arr,0,size-1,Float.floatToRawIntBits(val));
+          }
+        }
+        else
+        {
+          return OmniArray.OfFloat.uncheckedcontains0(this.arr,0,size-1);
+        }
+      }
+      return false;
+    }
+    @Override
+    public
+    boolean
+    contains(float val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        if(val==val)
+        {
+          return OmniArray.OfFloat.uncheckedcontainsBits(this.arr,0,size-1,Float.floatToRawIntBits(val));
+        }
+        return OmniArray.OfFloat.uncheckedcontainsNaN(this.arr,0,size-1);
+      }
+      return false;
+    }
+    @Override
+    public
+    boolean
+    contains(double val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        final float v;
+        if((v=(float)val)==val)
+        {
+          return OmniArray.OfFloat.uncheckedcontainsBits(this.arr,0,size-1,Float.floatToRawIntBits(v));
+        }
+        else if(v!=v)
+        {
+          return OmniArray.OfFloat.uncheckedcontainsNaN(this.arr,0,size-1);
+        }
+      }
+      return false;
+    }
+    @Override
+    public
+    boolean
+    contains
+    (Object val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        if(val instanceof Float)
+        {
+          final float v;
+          if((v=(float)val)==v)
+          {
+            return OmniArray.OfFloat.uncheckedcontainsBits(this.arr,0,size-1,Float.floatToRawIntBits(v));
+          }
+          return OmniArray.OfFloat.uncheckedcontainsNaN(this.arr,0,size-1);
+        }
+      }
+      return false;
+    }
+    //#IFSWITCH contains==contains,removeVal
+    //  #IF OfRef,OfByte
+    //#MACRO QueryByte()
+    //  #ENDIF
+    //#ENDIF
+    @Override
+    public
+    int
+    indexOf(boolean val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        if(val)
+        {
+          return uncheckedAbsoluteIndexOfBits(this.arr,0,size,TypeUtil.FLT_TRUE_BITS);
+        }
+        return uncheckedAbsoluteIndexOf0(this.arr,0,size);
+      }
+      return -1;
+    }
+    @Override
+    public
+    int
+    indexOf(int val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        if(val!=0)
+        {
+          if(TypeUtil.checkCastToFloat(val))
+          {
+            return uncheckedAbsoluteIndexOfBits(this.arr,0,size,Float.floatToRawIntBits(val));
+          }
+        }
+        else
+        {
+          return uncheckedAbsoluteIndexOf0(this.arr,0,size);
+        }
+      }
+      return -1;
+    }
+    @Override
+    public
+    int
+    indexOf(long val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        if(val!=0)
+        {
+          if(TypeUtil.checkCastToFloat(val))
+          {
+            return uncheckedAbsoluteIndexOfBits(this.arr,0,size,Float.floatToRawIntBits(val));
+          }
+        }
+        else
+        {
+          return uncheckedAbsoluteIndexOf0(this.arr,0,size);
+        }
+      }
+      return -1;
+    }
+    @Override
+    public
+    int
+    indexOf(float val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        if(val==val)
+        {
+          return uncheckedAbsoluteIndexOfBits(this.arr,0,size,Float.floatToRawIntBits(val));
+        }
+        return uncheckedAbsoluteIndexOfNaN(this.arr,0,size);
+      }
+      return -1;
+    }
+    @Override
+    public
+    int
+    indexOf(double val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        final float v;
+        if((v=(float)val)==val)
+        {
+          return uncheckedAbsoluteIndexOfBits(this.arr,0,size,Float.floatToRawIntBits(v));
+        }
+        else if(v!=v)
+        {
+          return uncheckedAbsoluteIndexOfNaN(this.arr,0,size);
+        }
+      }
+      return -1;
+    }
+    @Override
+    public
+    int
+    indexOf
+    (Object val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        if(val instanceof Float)
+        {
+          final float v;
+          if((v=(float)val)==v)
+          {
+            return uncheckedAbsoluteIndexOfBits(this.arr,0,size,Float.floatToRawIntBits(v));
+          }
+          return uncheckedAbsoluteIndexOfNaN(this.arr,0,size);
+        }
+      }
+      return -1;
+    }
+    //#IFSWITCH indexOf==contains,removeVal
+    //  #IF OfRef,OfByte
+    //#MACRO QueryByte()
+    //  #ENDIF
+    //#ENDIF
+    @Override
+    public
+    int
+    lastIndexOf(boolean val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        if(val)
+        {
+          return uncheckedAbsoluteLastIndexOfBits(this.arr,0,size,TypeUtil.FLT_TRUE_BITS);
+        }
+        return uncheckedAbsoluteLastIndexOf0(this.arr,0,size);
+      }
+      return -1;
+    }
+    @Override
+    public
+    int
+    lastIndexOf(int val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        if(val!=0)
+        {
+          if(TypeUtil.checkCastToFloat(val))
+          {
+            return uncheckedAbsoluteLastIndexOfBits(this.arr,0,size,Float.floatToRawIntBits(val));
+          }
+        }
+        else
+        {
+          return uncheckedAbsoluteLastIndexOf0(this.arr,0,size);
+        }
+      }
+      return -1;
+    }
+    @Override
+    public
+    int
+    lastIndexOf(long val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        if(val!=0)
+        {
+          if(TypeUtil.checkCastToFloat(val))
+          {
+            return uncheckedAbsoluteLastIndexOfBits(this.arr,0,size,Float.floatToRawIntBits(val));
+          }
+        }
+        else
+        {
+          return uncheckedAbsoluteLastIndexOf0(this.arr,0,size);
+        }
+      }
+      return -1;
+    }
+    @Override
+    public
+    int
+    lastIndexOf(float val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        if(val==val)
+        {
+          return uncheckedAbsoluteLastIndexOfBits(this.arr,0,size,Float.floatToRawIntBits(val));
+        }
+        return uncheckedAbsoluteLastIndexOfNaN(this.arr,0,size);
+      }
+      return -1;
+    }
+    @Override
+    public
+    int
+    lastIndexOf(double val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        final float v;
+        if((v=(float)val)==val)
+        {
+          return uncheckedAbsoluteLastIndexOfBits(this.arr,0,size,Float.floatToRawIntBits(v));
+        }
+        else if(v!=v)
+        {
+          return uncheckedAbsoluteLastIndexOfNaN(this.arr,0,size);
+        }
+      }
+      return -1;
+    }
+    @Override
+    public
+    int
+    lastIndexOf
+    (Object val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        if(val instanceof Float)
+        {
+          final float v;
+          if((v=(float)val)==v)
+          {
+            return uncheckedAbsoluteLastIndexOfBits(this.arr,0,size,Float.floatToRawIntBits(v));
+          }
+          return uncheckedAbsoluteLastIndexOfNaN(this.arr,0,size);
+        }
+      }
+      return -1;
+    }
+    //#IFSWITCH lastIndexOf==contains,removeVal
+    //  #IF OfRef,OfByte
+    //#MACRO QueryByte()
+    //  #ENDIF
+    //#ENDIF
+    @Override
+    public void put(int index,float val)
+    {
+      if(index<0 || index>=this.size)
+      {
+        throw new IndexOutOfBoundsException("index="+index+"; size="+this.size);
+      }
+      arr[index]=val;
+    }
+    @Override
+    public float getFloat(int index)
+    {
+      if(index<0 || index>=this.size)
+      {
+        throw new IndexOutOfBoundsException("index="+index+"; size="+this.size);
+      }
+      return (float)arr[index];
+    }
+    @Override
+    public Float get(int index)
+    {
+      return getFloat(index);
+    }
+    @Override
     public void add(int index,float val)
+    {
+      //TODO
+    }
+    @Override
+    public void add(int index,Float val)
     {
       //TODO
     }
@@ -1230,6 +3018,134 @@ public abstract class FloatArrSeq implements OmniCollection.OfFloat
   }
   public static class CheckedStackImpl extends FloatArrSeq implements OmniStack.OfFloat
   {
+    private int uncheckedSearchBits(int bound
+    ,int val
+    )
+    {
+      final var arr=this.arr;
+      for(int index=bound-1;;)
+      {
+        if(
+        val==Float.floatToRawIntBits(arr[index])
+        )
+        {
+          return bound-index;
+        }
+        if(index==0)
+        {
+          return -1;
+        }
+      }
+    }
+    private int uncheckedSearch0(int bound
+    )
+    {
+      final var arr=this.arr;
+      for(int index=bound-1;;)
+      {
+        if(
+        0==(arr[index])
+        )
+        {
+          return bound-index;
+        }
+        if(index==0)
+        {
+          return -1;
+        }
+      }
+    }
+    private int uncheckedSearchNaN(int bound
+    )
+    {
+      final var arr=this.arr;
+      for(int index=bound-1;;)
+      {
+        if(
+        Float.isNaN(arr[index])
+        )
+        {
+          return bound-index;
+        }
+        if(index==0)
+        {
+          return -1;
+        }
+      }
+    }
+    private boolean uncheckedRemoveValBits(int size
+    ,int val
+    )
+    {
+      int modCount=this.modCount;
+      final var arr=this.arr;
+      for(int i=--size;;--i)
+      {
+        if(
+        val==Float.floatToRawIntBits(arr[i])
+        )
+        {
+          CheckedCollection.checkModCount(modCount,this.modCount);
+          this.modCount=modCount+1;
+          ArrCopy.semicheckedSelfCopy(arr,i+1,i,size-i);
+          this.size=size;
+          return true;
+        }
+        if(i==0)
+        {
+          CheckedCollection.checkModCount(modCount,this.modCount);
+          return false;
+        }
+      }
+    }
+    private boolean uncheckedRemoveVal0(int size
+    )
+    {
+      int modCount=this.modCount;
+      final var arr=this.arr;
+      for(int i=--size;;--i)
+      {
+        if(
+        0==(arr[i])
+        )
+        {
+          CheckedCollection.checkModCount(modCount,this.modCount);
+          this.modCount=modCount+1;
+          ArrCopy.semicheckedSelfCopy(arr,i+1,i,size-i);
+          this.size=size;
+          return true;
+        }
+        if(i==0)
+        {
+          CheckedCollection.checkModCount(modCount,this.modCount);
+          return false;
+        }
+      }
+    }
+    private boolean uncheckedRemoveValNaN(int size
+    )
+    {
+      int modCount=this.modCount;
+      final var arr=this.arr;
+      for(int i=--size;;--i)
+      {
+        if(
+        Float.isNaN(arr[i])
+        )
+        {
+          CheckedCollection.checkModCount(modCount,this.modCount);
+          this.modCount=modCount+1;
+          ArrCopy.semicheckedSelfCopy(arr,i+1,i,size-i);
+          this.size=size;
+          return true;
+        }
+        if(i==0)
+        {
+          CheckedCollection.checkModCount(modCount,this.modCount);
+          return false;
+        }
+      }
+    }
     static int uncheckedToString(float[] arr,int begin,int end,char[] buffer)
     {
       int bufferOffset;
@@ -1323,16 +3239,38 @@ public abstract class FloatArrSeq implements OmniCollection.OfFloat
       return 1;
     }
     @Override
-    public <T> T[] toArray(T[] arr)
+    public <T> T[] toArray(T[] dst)
     {
-      //TODO
-      return null;
+      final int size;
+      if((size=this.size)!=0)
+      {
+        ArrCopy.uncheckedReverseCopy(this.arr,0,dst=OmniArray.uncheckedArrResize(size,dst),0,size);
+      }
+      else if(dst.length!=0)
+      {
+        dst[0]=null;
+      }
+      return dst;
     }
     @Override
     public <T> T[] toArray(IntFunction<T[]> arrConstructor)
     {
-      //TODO
-      return null;
+      final int size;
+      T[] dst;
+      int modCount=this.modCount;
+      try
+      {
+        dst=arrConstructor.apply(size=this.size);
+      }
+      finally
+      {
+        CheckedCollection.checkModCount(modCount,this.modCount);
+      }
+      if(size!=0)
+      {
+        ArrCopy.uncheckedReverseCopy(this.arr,0,dst,0,size);
+      }
+      return dst;
     }
     @Override
     public boolean equals(Object val)
@@ -1398,125 +3336,262 @@ public abstract class FloatArrSeq implements OmniCollection.OfFloat
       //TODO
       return false;
     }
-   @Override
-   public
-   boolean
-   contains(boolean val)
-   {
-     final int size;
-     if((size=this.size)!=0)
-     {
-       if(val)
-       {
-         return OmniArray.OfFloat.uncheckedcontainsBits(this.arr,0,size-1,TypeUtil.FLT_TRUE_BITS);
-       }
-       return OmniArray.OfFloat.uncheckedcontains0(this.arr,0,size-1);
-     }
-     return false;
-   }
-   @Override
-   public
-   boolean
-   contains(int val)
-   {
-     final int size;
-     if((size=this.size)!=0)
-     {
-       if(val!=0)
-       {
-         if(TypeUtil.checkCastToFloat(val))
-         {
-           return OmniArray.OfFloat.uncheckedcontainsBits(this.arr,0,size-1,Float.floatToRawIntBits(val));
-         }
-       }
-       else
-       {
-         return OmniArray.OfFloat.uncheckedcontains0(this.arr,0,size-1);
-       }
-     }
-     return false;
-   }
-   @Override
-   public
-   boolean
-   contains(long val)
-   {
-     final int size;
-     if((size=this.size)!=0)
-     {
-       if(val!=0)
-       {
-         if(TypeUtil.checkCastToFloat(val))
-         {
-           return OmniArray.OfFloat.uncheckedcontainsBits(this.arr,0,size-1,Float.floatToRawIntBits(val));
-         }
-       }
-       else
-       {
-         return OmniArray.OfFloat.uncheckedcontains0(this.arr,0,size-1);
-       }
-     }
-     return false;
-   }
-   @Override
-   public
-   boolean
-   contains(float val)
-   {
-     final int size;
-     if((size=this.size)!=0)
-     {
-       if(val==val)
-       {
-         return OmniArray.OfFloat.uncheckedcontainsBits(this.arr,0,size-1,Float.floatToRawIntBits(val));
-       }
-       return OmniArray.OfFloat.uncheckedcontainsNaN(this.arr,0,size-1);
-     }
-     return false;
-   }
-   @Override
-   public
-   boolean
-   contains(double val)
-   {
-     final int size;
-     if((size=this.size)!=0)
-     {
-       final float v;
-       if((v=(float)val)==val)
-       {
-         return OmniArray.OfFloat.uncheckedcontainsBits(this.arr,0,size-1,Float.floatToRawIntBits(v));
-       }
-       else if(v!=v)
-       {
-         return OmniArray.OfFloat.uncheckedcontainsNaN(this.arr,0,size-1);
-       }
-     }
-     return false;
-   }
-   @Override
-   public
-   boolean
-   contains
-   (Object val)
-   {
-     final int size;
-     if((size=this.size)!=0)
-     {
-       int modCount=this.modCount;
-       if(val instanceof Float)
-       {
-         final float v;
-         if((v=(float)val)==v)
-         {
-           return OmniArray.OfFloat.uncheckedcontainsBits(this.arr,0,size-1,Float.floatToRawIntBits(v));
-         }
-         return OmniArray.OfFloat.uncheckedcontainsNaN(this.arr,0,size-1);
-       }
-     }
-     CheckedCollection.checkModCount(modCount,this.modCount);
-     return false;
-   }
+    @Override
+    public boolean add(float val)
+    {
+      //TODO
+      return false;
+    }
+    @Override
+    public boolean add(Float val)
+    {
+      //TODO
+      return false;
+    }
+    @Override
+    public
+    boolean
+    removeVal(boolean val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        if(val)
+        {
+          return uncheckedRemoveValBits(size,TypeUtil.FLT_TRUE_BITS);
+        }
+        return uncheckedRemoveVal0(size);
+      }
+      return false;
+    }
+    @Override
+    public
+    boolean
+    removeVal(int val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        if(val!=0)
+        {
+          if(TypeUtil.checkCastToFloat(val))
+          {
+            return uncheckedRemoveValBits(size,Float.floatToRawIntBits(val));
+          }
+        }
+        else
+        {
+          return uncheckedRemoveVal0(size);
+        }
+      }
+      return false;
+    }
+    @Override
+    public
+    boolean
+    removeVal(long val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        if(val!=0)
+        {
+          if(TypeUtil.checkCastToFloat(val))
+          {
+            return uncheckedRemoveValBits(size,Float.floatToRawIntBits(val));
+          }
+        }
+        else
+        {
+          return uncheckedRemoveVal0(size);
+        }
+      }
+      return false;
+    }
+    @Override
+    public
+    boolean
+    removeVal(float val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        if(val==val)
+        {
+          return uncheckedRemoveValBits(size,Float.floatToRawIntBits(val));
+        }
+        return uncheckedRemoveValNaN(size);
+      }
+      return false;
+    }
+    @Override
+    public
+    boolean
+    removeVal(double val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        final float v;
+        if((v=(float)val)==val)
+        {
+          return uncheckedRemoveValBits(size,Float.floatToRawIntBits(v));
+        }
+        else if(v!=v)
+        {
+          return uncheckedRemoveValNaN(size);
+        }
+      }
+      return false;
+    }
+    @Override
+    public
+    boolean
+    remove
+    (Object val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        if(val instanceof Float)
+        {
+          final float v;
+          if((v=(float)val)==v)
+          {
+            return uncheckedRemoveValBits(size,Float.floatToRawIntBits(v));
+          }
+          return uncheckedRemoveValNaN(size);
+        }
+      }
+      return false;
+    }
+    //#IFSWITCH removeVal==contains,removeVal
+    //  #IF OfRef,OfByte
+    //#MACRO QueryByte()
+    //  #ENDIF
+    //#ENDIF
+    @Override
+    public
+    boolean
+    contains(boolean val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        if(val)
+        {
+          return OmniArray.OfFloat.uncheckedcontainsBits(this.arr,0,size-1,TypeUtil.FLT_TRUE_BITS);
+        }
+        return OmniArray.OfFloat.uncheckedcontains0(this.arr,0,size-1);
+      }
+      return false;
+    }
+    @Override
+    public
+    boolean
+    contains(int val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        if(val!=0)
+        {
+          if(TypeUtil.checkCastToFloat(val))
+          {
+            return OmniArray.OfFloat.uncheckedcontainsBits(this.arr,0,size-1,Float.floatToRawIntBits(val));
+          }
+        }
+        else
+        {
+          return OmniArray.OfFloat.uncheckedcontains0(this.arr,0,size-1);
+        }
+      }
+      return false;
+    }
+    @Override
+    public
+    boolean
+    contains(long val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        if(val!=0)
+        {
+          if(TypeUtil.checkCastToFloat(val))
+          {
+            return OmniArray.OfFloat.uncheckedcontainsBits(this.arr,0,size-1,Float.floatToRawIntBits(val));
+          }
+        }
+        else
+        {
+          return OmniArray.OfFloat.uncheckedcontains0(this.arr,0,size-1);
+        }
+      }
+      return false;
+    }
+    @Override
+    public
+    boolean
+    contains(float val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        if(val==val)
+        {
+          return OmniArray.OfFloat.uncheckedcontainsBits(this.arr,0,size-1,Float.floatToRawIntBits(val));
+        }
+        return OmniArray.OfFloat.uncheckedcontainsNaN(this.arr,0,size-1);
+      }
+      return false;
+    }
+    @Override
+    public
+    boolean
+    contains(double val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        final float v;
+        if((v=(float)val)==val)
+        {
+          return OmniArray.OfFloat.uncheckedcontainsBits(this.arr,0,size-1,Float.floatToRawIntBits(v));
+        }
+        else if(v!=v)
+        {
+          return OmniArray.OfFloat.uncheckedcontainsNaN(this.arr,0,size-1);
+        }
+      }
+      return false;
+    }
+    @Override
+    public
+    boolean
+    contains
+    (Object val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        if(val instanceof Float)
+        {
+          final float v;
+          if((v=(float)val)==v)
+          {
+            return OmniArray.OfFloat.uncheckedcontainsBits(this.arr,0,size-1,Float.floatToRawIntBits(v));
+          }
+          return OmniArray.OfFloat.uncheckedcontainsNaN(this.arr,0,size-1);
+        }
+      }
+      return false;
+    }
+    //#IFSWITCH contains==contains,removeVal
+    //  #IF OfRef,OfByte
+    //#MACRO QueryByte()
+    //  #ENDIF
+    //#ENDIF
     @Override
     public OmniIterator.OfFloat iterator()
     {
@@ -1559,6 +3634,128 @@ public abstract class FloatArrSeq implements OmniCollection.OfFloat
       }
       return OmniArray.OfDouble.DEFAULT_ARR;
     }
+    @Override
+    public
+    int
+    search(boolean val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        if(val)
+        {
+          return uncheckedSearchBits(size,TypeUtil.FLT_TRUE_BITS);
+        }
+        return uncheckedSearch0(size);
+      }
+      return -1;
+    }
+    @Override
+    public
+    int
+    search(int val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        if(val!=0)
+        {
+          if(TypeUtil.checkCastToFloat(val))
+          {
+            return uncheckedSearchBits(size,Float.floatToRawIntBits(val));
+          }
+        }
+        else
+        {
+          return uncheckedSearch0(size);
+        }
+      }
+      return -1;
+    }
+    @Override
+    public
+    int
+    search(long val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        if(val!=0)
+        {
+          if(TypeUtil.checkCastToFloat(val))
+          {
+            return uncheckedSearchBits(size,Float.floatToRawIntBits(val));
+          }
+        }
+        else
+        {
+          return uncheckedSearch0(size);
+        }
+      }
+      return -1;
+    }
+    @Override
+    public
+    int
+    search(float val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        if(val==val)
+        {
+          return uncheckedSearchBits(size,Float.floatToRawIntBits(val));
+        }
+        return uncheckedSearchNaN(size);
+      }
+      return -1;
+    }
+    @Override
+    public
+    int
+    search(double val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        final float v;
+        if((v=(float)val)==val)
+        {
+          return uncheckedSearchBits(size,Float.floatToRawIntBits(v));
+        }
+        else if(v!=v)
+        {
+          return uncheckedSearchNaN(size);
+        }
+      }
+      return -1;
+    }
+    @Override
+    public
+    int
+    search
+    (Object val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        if(val instanceof Float)
+        {
+          final float v;
+          if((v=(float)val)==v)
+          {
+            return uncheckedSearchBits(size,Float.floatToRawIntBits(v));
+          }
+          return uncheckedSearchNaN(size);
+        }
+      }
+      return -1;
+    }
+    //#IFSWITCH search==contains,removeVal
+    //  #IF OfRef,OfByte
+    //#MACRO QueryByte()
+    //  #ENDIF
+    //#ENDIF
     @Override
     public float popFloat()
     {

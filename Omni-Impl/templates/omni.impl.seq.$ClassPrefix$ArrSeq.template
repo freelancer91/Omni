@@ -49,17 +49,14 @@ import java.util.function.IntFunction;
 #IF OfRef
 import omni.util.OmniPred;
 #ENDIF
-
 public abstract class $ClassPrefix$ArrSeq$<E>$ implements OmniCollection.Of$ClassPrefix$$<E>$
 {
   transient int size;
   transient $ArrayType$[] arr;
-  
   private $ClassPrefix$ArrSeq()
   {
     super();
   }
-  
   private $ClassPrefix$ArrSeq(int initialCapacity)
   {
     super();
@@ -89,7 +86,6 @@ public abstract class $ClassPrefix$ArrSeq$<E>$ implements OmniCollection.Of$Clas
   {
     return this.size==0;
   }
-  
   @Override
   public void clear()
   {
@@ -104,22 +100,39 @@ public abstract class $ClassPrefix$ArrSeq$<E>$ implements OmniCollection.Of$Clas
     this.size=0;
 #ENDIF
   }
-
-
   #MACRO Impl<Unchecked,List>()
   #MACRO Impl<Unchecked,Stack>()
   #MACRO Impl<Checked,List>()
   #MACRO Impl<Checked,Stack>()
-
-
-
 #MACRODEF Impl<CHECKED,STRUCTNAME>()
 public static class CHECKEDSTRUCTNAMEImpl$<E>$ extends $ClassPrefix$ArrSeq$<E>$ implements OmniSTRUCTNAME.Of$ClassPrefix$$<E>$
 {
+#IFSWITCH STRUCTNAME==List
+  #IF OfDouble,OfFloat
+  #MACRO UncheckedIndexOfMethods<Bits>()
+  #MACRO UncheckedIndexOfMethods<0>()
+  #MACRO UncheckedIndexOfMethods<NaN>()
+  #ELSE
+  #MACRO UncheckedIndexOfMethods< >()
+  #ENDIF
+#ENDIF
+#IFSWITCH STRUCTNAME==Stack
+ #IF OfDouble,OfFloat
+  #MACRO UncheckedSearchMethod<Bits>()
+  #MACRO UncheckedSearchMethod<0>()
+  #MACRO UncheckedSearchMethod<NaN>()
+  #ELSE
+  #MACRO UncheckedSearchMethod< >()
+  #ENDIF
+#ENDIF
 
-
-
-
+#IF OfDouble,OfFloat
+  #MACRO UncheckedRemoveVal<Bits>()
+  #MACRO UncheckedRemoveVal<0>()
+  #MACRO UncheckedRemoveVal<NaN>()
+#ELSE
+  #MACRO UncheckedRemoveVal< >()
+#ENDIF
 #IF OfRef,OfDouble
   static void uncheckedToString($ArrayType$[] arr,int begin,int end,StringBuilder builder)
   {
@@ -175,7 +188,6 @@ public static class CHECKEDSTRUCTNAMEImpl$<E>$ extends $ClassPrefix$ArrSeq$<E>$ 
   #ENDIF
   }
 #ENDIF
-
   #MACRO SuppressUnchecked()
   static $<E>$ void uncheckedForEach($ArrayType$[] arr,int begin,int end,$TypeNameModifier$Consumer$<? super E>$ action)
   {
@@ -199,7 +211,6 @@ public static class CHECKEDSTRUCTNAMEImpl$<E>$ extends $ClassPrefix$ArrSeq$<E>$ 
     }
 #ENDIF
   }
-
   static int uncheckedHashCode($ArrayType$[] arr,int begin,int end)
   {
 #IFSWITCH STRUCTNAME==Stack
@@ -217,8 +228,6 @@ public static class CHECKEDSTRUCTNAMEImpl$<E>$ extends $ClassPrefix$ArrSeq$<E>$ 
 #ENDIF
     return hash;
   }
-
-
 #IFSWITCH CHECKED==Checked
   transient int modCount;
 #ENDIF
@@ -238,7 +247,7 @@ public static class CHECKEDSTRUCTNAMEImpl$<E>$ extends $ClassPrefix$ArrSeq$<E>$ 
   @Override
   public void clear()
   {
-#IF OfRef
+  #IF OfRef
     final int size;
     if((size=this.size)!=0)
     {
@@ -246,13 +255,13 @@ public static class CHECKEDSTRUCTNAMEImpl$<E>$ extends $ClassPrefix$ArrSeq$<E>$ 
       this.size=0;
       OmniArray.OfRef.nullifyRange(arr,0,size-1);
     }
-#ELSE
+  #ELSE
     if(this.size!=0)
     {
       ++this.modCount;
       this.size=0;
     }
-#ENDIF
+  #ENDIF
   }
 #ENDIF
   @Override
@@ -347,20 +356,52 @@ public static class CHECKEDSTRUCTNAMEImpl$<E>$ extends $ClassPrefix$ArrSeq$<E>$ 
     }
     return 1;
   }
-  
   @Override
-  public <T> T[] toArray(T[] arr)
+  public <T> T[] toArray(T[] dst)
   {
-    //TODO
-    return null;
+    final int size;
+    if((size=this.size)!=0)
+    {
+#IFSWITCH STRUCTNAME==Stack
+      ArrCopy.uncheckedReverseCopy(this.arr,0,dst=OmniArray.uncheckedArrResize(size,dst),0,size);
+#ELSE
+      ArrCopy.uncheckedCopy(this.arr,0,dst=OmniArray.uncheckedArrResize(size,dst),0,size);
+#ENDIF
+    }
+    else if(dst.length!=0)
+    {
+      dst[0]=null;
+    }
+    return dst;
   }
   @Override
   public <T> T[] toArray(IntFunction<T[]> arrConstructor)
   {
-    //TODO
-    return null;
+    final int size;
+    T[] dst;
+#IFSWITCH CHECKED==Checked
+    int modCount=this.modCount;
+    try
+    {
+#ENDIF
+      dst=arrConstructor.apply(size=this.size);
+#IFSWITCH CHECKED==Checked
+    }
+    finally
+    {
+      CheckedCollection.checkModCount(modCount,this.modCount);
+    }
+#ENDIF
+    if(size!=0)
+    {
+#IFSWITCH STRUCTNAME==Stack
+      ArrCopy.uncheckedReverseCopy(this.arr,0,dst,0,size);
+#ELSE
+      ArrCopy.uncheckedCopy(this.arr,0,dst,0,size);
+#ENDIF
+    }
+    return dst;
   }
-  
   @Override
   public boolean equals(Object val)
   {
@@ -379,7 +420,6 @@ public static class CHECKEDSTRUCTNAMEImpl$<E>$ extends $ClassPrefix$ArrSeq$<E>$ 
     }
     return new CHECKEDSTRUCTNAMEImpl$<E>$();
   }
-
   #MACRO SuppressUnchecked()
   @Override
   public void forEach($TypeNameModifier$Consumer$<? super E>$ action)
@@ -425,7 +465,6 @@ public static class CHECKEDSTRUCTNAMEImpl$<E>$ extends $ClassPrefix$ArrSeq$<E>$ 
     }
   }
 #ENDIF
-
   @Override
   public boolean removeIf($TypeNameModifier$Predicate$<? super E>$ filter)
   {
@@ -440,25 +479,89 @@ public static class CHECKEDSTRUCTNAMEImpl$<E>$ extends $ClassPrefix$ArrSeq$<E>$ 
     return false;
   }
 #ENDIF
-
- #MACRO QueryMethods<contains>()
-
-#IFSWITCH STRUCTNAME==List
-
-
-
   @Override
   public boolean add($exposedType$ val)
   {
     //TODO
     return false;
   }
+#IFNOT OfRef
+  @Override
+  public boolean add($BoxedType$ val)
+  {
+    //TODO
+    return false;
+  }
+#ENDIF
+  #MACRO QueryMethods<removeVal>()
+  #MACRO QueryMethods<contains>()
+#IFSWITCH STRUCTNAME==List
+  #MACRO QueryMethods<indexOf>()
+  #MACRO QueryMethods<lastIndexOf>()
+  @Override
+  public void put(int index,$exposedType$ val)
+  {
+#IFSWITCH CHECKED==Checked
+    if(index<0 || index>=this.size)
+    {
+      throw new IndexOutOfBoundsException("index="+index+"; size="+this.size);
+    }
+#ENDIF
+    arr[index]=val;
+  }
+  @Override
+  public $exposedType$ set(int index,$exposedType$ val)
+  {
+#IFSWITCH CHECKED==Checked
+    if(index<0 || index>=this.size)
+    {
+      throw new IndexOutOfBoundsException("index="+index+"; size="+this.size);
+    }
+#ENDIF
+    #MACRO SuppressUnchecked()
+    var ret=($exposedType$)arr[index];
+    arr[index]=val;
+    return ret;
+  }
+#IFNOT OfRef
+  @Override
+  public $BoxedType$ set(int index,$BoxedType$ val)
+  {
+    return set(index,($exposedType$)val);
+  }
+#ENDIF
+  #MACRO SuppressUnchecked()
+  @Override
+  public $exposedType$ get$TypeNameModifier$(int index)
+  {
+#IFSWITCH CHECKED==Checked
+    if(index<0 || index>=this.size)
+    {
+      throw new IndexOutOfBoundsException("index="+index+"; size="+this.size);
+    }
+#ENDIF
+    return ($exposedType$)arr[index];
+  }
+#IFNOT OfRef
+  @Override
+  public $BoxedType$ get(int index)
+  {
+    return get$TypeNameModifier$(index);
+  }
+#ENDIF
+ 
   @Override
   public void add(int index,$exposedType$ val)
   {
     //TODO
   }
-  
+  #IFNOT OfRef
+  @Override
+  public void add(int index,$BoxedType$ val)
+  {
+    //TODO
+  }
+  #ENDIF
   @Override
   public $exposedType$ $removeAtIndexMethod$(int index)
   {
@@ -477,13 +580,11 @@ public static class CHECKEDSTRUCTNAMEImpl$<E>$ extends $ClassPrefix$ArrSeq$<E>$ 
 #IF OfRef
     arr[size]=null;
 #ENDIF
+#IFSWITCH CHECKED==Checked
     this.size=size;
+#ENDIF
     return ret;
   }
-  
-  
-  
-
   @Override
   public OmniListIterator.Of$ClassPrefix$$<E>$ listIterator()
   {
@@ -496,7 +597,6 @@ public static class CHECKEDSTRUCTNAMEImpl$<E>$ extends $ClassPrefix$ArrSeq$<E>$ 
     //TODO
     return null;
   }
-
   @Override
   public OmniList.Of$ClassPrefix$$<E>$ subList(int fromIndex,int toIndex)
   {
@@ -566,23 +666,19 @@ public static class CHECKEDSTRUCTNAMEImpl$<E>$ extends $ClassPrefix$ArrSeq$<E>$ 
     }
   }
 #ENDIF
-
   @Override
   public OmniIterator.Of$ClassPrefix$$<E>$ iterator()
   {
     //TODO
     return null;
   }
-
   #MACRO ToArrayImpl($ArrayType$,$TypeNameModifier$,NULL,NULL,OmniArray.Of$ClassPrefix$.DEFAULT_ARR)
 #IFNOT OfRef
   #MACRO ToArrayImpl($BoxedType$,,NULL,NULL,OmniArray.Of$ClassPrefix$.DEFAULT_BOXED_ARR)
   #MACRO GetterMethods(ToArrayImpl)
 #ENDIF  
 #IFSWITCH STRUCTNAME==Stack
-
-
-
+  #MACRO QueryMethods<search>()
   @Override
   public $exposedType$ pop$TypeNameModifier$()
   {
@@ -609,16 +705,11 @@ public static class CHECKEDSTRUCTNAMEImpl$<E>$ extends $ClassPrefix$ArrSeq$<E>$ 
     return pop$TypeNameModifier$();
   }
 #ENDIF
-  
-  
-
-
   @Override
   public void push($exposedType$ val)
   {
     //TODO
   }
-  
   #IFNOT OfRef
   @Override
   public void push($BoxedType$ val)
@@ -636,18 +727,9 @@ public static class CHECKEDSTRUCTNAMEImpl$<E>$ extends $ClassPrefix$ArrSeq$<E>$ 
   #MACRO GetterMethods(PeekImpl)
   #ENDIF
 #ENDIF
-  
-
-  
-  
 }
 #ENDDEF  
-  
 }
-
-
-
-
 
 #MACRODEF GetterMethods(MACRONAME)
 #IFNOT OfDouble
@@ -742,15 +824,24 @@ else
 #ENDDEF
 
 
+
 #MACRODEF ReturnUncheckedQuery(VAL)
 #IFSWITCH STRUCTNAME==Stack,List
   #IFSWITCH METHODNAME==contains
 return OmniArray.Of$ClassPrefix$.uncheckedcontains(this.arr,0,size-1,VAL);
+  #ELSEIFSWITCH METHODNAME==removeVal
+return uncheckedRemoveVal(size,VAL);
+  #ELSEIFSWITCH METHODNAME==indexOf
+return uncheckedAbsoluteIndexOf(this.arr,0,size,VAL);
+  #ELSEIFSWITCH METHODNAME==lastIndexOf
+return uncheckedAbsoluteLastIndexOf(this.arr,0,size,VAL);
+  #ELSEIFSWITCH METHODNAME==search
+return uncheckedSearch(size,VAL);
   #ELSE
-ERROR unknown method name METHODNAME
+ERROR ReturnUncheckedQuery(VAL) unknown method name METHODNAME
   #ENDIF
 #ELSE
-ERROR unknown struct name STRUCTNAME
+ERROR ReturnUncheckedQuery(VAL) unknown struct name STRUCTNAME
 #ENDIF
 #ENDDEF
 
@@ -758,11 +849,19 @@ ERROR unknown struct name STRUCTNAME
 #IFSWITCH STRUCTNAME==Stack,List
   #IFSWITCH METHODNAME==contains
 return OmniArray.Of$ClassPrefix$.uncheckedcontainsBits(this.arr,0,size-1,VAL);
+  #ELSEIFSWITCH METHODNAME==removeVal
+return uncheckedRemoveValBits(size,VAL);
+  #ELSEIFSWITCH METHODNAME==indexOf
+return uncheckedAbsoluteIndexOfBits(this.arr,0,size,VAL);
+  #ELSEIFSWITCH METHODNAME==lastIndexOf
+return uncheckedAbsoluteLastIndexOfBits(this.arr,0,size,VAL);
+  #ELSEIFSWITCH METHODNAME==search
+return uncheckedSearchBits(size,VAL);
   #ELSE
-ERROR unknown method name METHODNAME
+ERROR ReturnUncheckedQueryBits(VAL) unknown method name METHODNAME
   #ENDIF
 #ELSE
-ERROR unknown struct name STRUCTNAME
+ERROR ReturnUncheckedQueryBits(VAL) unknown struct name STRUCTNAME
 #ENDIF
 #ENDDEF
 
@@ -770,11 +869,19 @@ ERROR unknown struct name STRUCTNAME
 #IFSWITCH STRUCTNAME==Stack,List
   #IFSWITCH METHODNAME==contains
 return OmniArray.Of$ClassPrefix$.uncheckedcontains0(this.arr,0,size-1);
+  #ELSEIFSWITCH METHODNAME==removeVal
+return uncheckedRemoveVal0(size);
+  #ELSEIFSWITCH METHODNAME==indexOf
+return uncheckedAbsoluteIndexOf0(this.arr,0,size);
+  #ELSEIFSWITCH METHODNAME==lastIndexOf
+return uncheckedAbsoluteLastIndexOf0(this.arr,0,size);
+  #ELSEIFSWITCH METHODNAME==search
+return uncheckedSearch0(size);
   #ELSE
-ERROR unknown method name METHODNAME
+ERROR ReturnUncheckedQuery0() unknown method name METHODNAME
   #ENDIF
 #ELSE
-ERROR unknown struct name STRUCTNAME
+ERROR ReturnUncheckedQuery0() unknown struct name STRUCTNAME
 #ENDIF
 #ENDDEF
 
@@ -782,42 +889,60 @@ ERROR unknown struct name STRUCTNAME
 #IFSWITCH STRUCTNAME==Stack,List
   #IFSWITCH METHODNAME==contains
 return OmniArray.Of$ClassPrefix$.uncheckedcontainsNaN(this.arr,0,size-1);
+  #ELSEIFSWITCH METHODNAME==removeVal
+return uncheckedRemoveValNaN(size);
+  #ELSEIFSWITCH METHODNAME==indexOf
+return uncheckedAbsoluteIndexOfNaN(this.arr,0,size);
+  #ELSEIFSWITCH METHODNAME==lastIndexOf
+return uncheckedAbsoluteLastIndexOfNaN(this.arr,0,size);
+  #ELSEIFSWITCH METHODNAME==search
+return uncheckedSearchNaN(size);
   #ELSE
-ERROR unknown method name METHODNAME
+ERROR ReturnUncheckedQueryNaN() unknown method name METHODNAME
   #ENDIF
 #ELSE
-ERROR unknown struct name STRUCTNAME
+ERROR ReturnUncheckedQueryNaN() unknown struct name STRUCTNAME
 #ENDIF
 #ENDDEF
 
 #MACRODEF DeclareModCount<INPUTTYPE>()
 #IFSWITCH CHECKED==Checked
   #IFSWITCH STRUCTNAME==Stack,List
-    #IFSWITCH METHODNAME==contains
+    #IFSWITCH METHODNAME==contains,indexOf,lastIndexOf,search
       #IFSWITCH INPUTTYPE==Object
 int modCount=this.modCount;
       #ENDIF
+    #ELSEIFSWITCH METHODNAME==removeVal
     #ELSE
-ERROR unknown method name METHODNAME
+ERROR DeclareModCount<INPUTTYPE> unknown method name METHODNAME
     #ENDIF
   #ELSE
-ERROR unknown struct name STRUCTNAME
+ERROR DeclareModCount<INPUTTYPE> unknown struct name STRUCTNAME
   #ENDIF
+#ENDIF
+#ENDDEF
+
+#MACRODEF ReturnNegative<INPUTTYPE>()
+#IFSWITCH METHODNAME==contains,removeVal
+return false;
+#ELSE
+return -1;
 #ENDIF
 #ENDDEF
 
 #MACRODEF CheckModAndReturnNegative<INPUTTYPE>()
 #IFSWITCH CHECKED==Checked
   #IFSWITCH STRUCTNAME==Stack,List
-    #IFSWITCH METHODNAME==contains
+    #IFSWITCH METHODNAME==contains,indexOf,lastIndexOf,search
       #IFSWITCH INPUTTYPE==Object
 CheckedCollection.checkModCount(modCount,this.modCount);
       #ENDIF
+    #ELSEIFSWITCH METHODNAME==removeVal
     #ELSE
-ERROR unknown method name METHODNAME
+ERROR CheckModAndReturnNegative<INPUTTYPE> unknown method name METHODNAME
     #ENDIF
   #ELSE
-ERROR unknown struct name STRUCTNAME
+ERROR CheckModAndReturnNegative<INPUTTYPE> unknown struct name STRUCTNAME
   #ENDIF
 #ENDIF
 #IFSWITCH METHODNAME==contains,removeVal
@@ -834,6 +959,11 @@ return -1;
 #MACRO QueryFloat()
 #MACRO QueryDouble()
 #MACRO QueryObject()
+//#IFSWITCH METHODNAME==contains,removeVal
+//  #IF OfRef,OfByte
+//#MACRO QueryByte()
+//  #ENDIF
+//#ENDIF
 #ENDDEF
 
 #MACRODEF QueryBoolean()
@@ -846,10 +976,9 @@ int
 #ENDIF
 METHODNAME(boolean val)
 {
-  final int size;
+  int size;
   if((size=this.size)!=0)
   {
-    #MACRO DeclareModCount<boolean>()
 #IF OfDouble,OfFloat
     if(val)
     {
@@ -860,7 +989,26 @@ METHODNAME(boolean val)
     #MACRO ReturnUncheckedQuery($queryCastBoolean$(val))
 #ENDIF
   }
-  #MACRO CheckModAndReturnNegative<boolean>()
+  #MACRO ReturnNegative<boolean>()
+}
+#ENDDEF
+
+#MACRODEF QueryByte()
+@Override
+public
+#IFSWITCH METHODNAME==contains,removeVal
+boolean
+#ELSE
+int
+#ENDIF
+METHODNAME(byte val)
+{
+  int size;
+  if((size=this.size)!=0)
+  {
+    #MACRO ReturnUncheckedQuery($queryCastPrimitive$(val))
+  }
+  #MACRO ReturnNegative<byte>()
 }
 #ENDDEF
 
@@ -874,10 +1022,9 @@ int
 #ENDIF
 METHODNAME(int val)
 {
-  final int size;
+  int size;
   if((size=this.size)!=0)
   {
-    #MACRO DeclareModCount<int>()
 #IF OfRef,OfLong,OfInt
     #MACRO ReturnUncheckedQuery($queryCastPrimitive$(val))
 #ELSEIF OfDouble,OfFloat
@@ -904,7 +1051,7 @@ METHODNAME(int val)
     switch(val)
     {
       default:
-        #MACRO CheckModAndReturnNegative<int>()
+  		#MACRO ReturnNegative<int>()
       case 0:
         v=false;
         break;
@@ -914,7 +1061,7 @@ METHODNAME(int val)
     #MACRO ReturnUncheckedQuery(v)
 #ENDIF
   }
-  #MACRO CheckModAndReturnNegative<int>()
+  #MACRO ReturnNegative<int>()
 }
 #ENDDEF
 
@@ -928,10 +1075,9 @@ int
 #ENDIF
 METHODNAME(long val)
 {
-  final int size;
+  int size;
   if((size=this.size)!=0)
   {
-    #MACRO DeclareModCount<long>()
 #IF OfRef,OfLong
     #MACRO ReturnUncheckedQuery($queryCastPrimitive$(val))
 #ELSEIF OfDouble,OfFloat
@@ -961,7 +1107,7 @@ METHODNAME(long val)
     }
     else
     {
-      #MACRO CheckModAndReturnNegative<long>()
+      #MACRO ReturnNegative<long>()
     }
   #ENDIF
     {
@@ -969,7 +1115,7 @@ METHODNAME(long val)
     }
 #ENDIF
   }
-  #MACRO CheckModAndReturnNegative<long>()
+  #MACRO ReturnNegative<long>()
 }
 #ENDDEF
 #MACRODEF QueryFloat()
@@ -982,10 +1128,9 @@ int
 #ENDIF
 METHODNAME(float val)
 {
-  final int size;
+  int size;
   if((size=this.size)!=0)
   {
-    #MACRO DeclareModCount<float>()
 #IF OfRef
     #MACRO ReturnUncheckedQuery($queryCastPrimitive$(val))
 #ELSEIF OfDouble,OfFloat
@@ -1006,7 +1151,7 @@ METHODNAME(float val)
     switch(Float.floatToRawIntBits(val))
     {
       default:
-        #MACRO CheckModAndReturnNegative<float>()
+        #MACRO ReturnNegative<float>()
       case 0:
       case Integer.MIN_VALUE:
         v=false;
@@ -1020,7 +1165,7 @@ METHODNAME(float val)
     }
 #ENDIF
   }
-  #MACRO CheckModAndReturnNegative<float>()
+  #MACRO ReturnNegative<float>()
 }
 #ENDDEF
 
@@ -1034,10 +1179,9 @@ int
 #ENDIF
 METHODNAME(double val)
 {
-  final int size;
+  int size;
   if((size=this.size)!=0)
   {
-    #MACRO DeclareModCount<double>()
 #IF OfRef
     #MACRO ReturnUncheckedQuery($queryCastPrimitive$(val))
 #ELSEIF OfDouble,OfFloat
@@ -1075,7 +1219,7 @@ METHODNAME(double val)
     }
     else
     {
-      #MACRO CheckModAndReturnNegative<double>()
+      #MACRO ReturnNegative<double>()
     }
   #ENDIF
     {
@@ -1083,7 +1227,7 @@ METHODNAME(double val)
     }
 #ENDIF
   }
-  #MACRO CheckModAndReturnNegative<double>()
+  #MACRO ReturnNegative<double>()
 }
 #ENDDEF
 
@@ -1102,10 +1246,9 @@ METHODNAME
 #ENDIF
 (Object val)
 {
-  final int size;
+  int size;
   if((size=this.size)!=0)
   {
-    #MACRO DeclareModCount<Object>()
 #IFNOT OfRef
     if(val instanceof $BoxedType$)
 #ENDIF
@@ -1118,18 +1261,263 @@ METHODNAME
       }
       #MACRO ReturnUncheckedQueryNaN()
 #ELSE
-      #MACRO ReturnUncheckedQuery($queryCastRef$(val))
+  #IFSWITCH METHODNAME==containsVal,indexOf,lastIndexOf
+    #IFSWITCH CHECKED==Checked
+      int modCount=this.modCount;
+      try
+    #ENDIF
+  #ENDIF
+      {
+        #MACRO ReturnUncheckedQuery($queryCastRef$(val))
+      }
+  #IFSWITCH METHODNAME==containsVal,indexOf,lastIndexOf
+    #IFSWITCH CHECKED==Checked
+      finally
+      {
+        CheckedCollection.checkModCount(modCount,this.modCount);
+      }
+    #ENDIF
+  #ENDIF
+  
 #ENDIF
     }
   }
-  #MACRO CheckModAndReturnNegative<Object>()
+  #MACRO ReturnNegative<Object>()
 }
 #ENDDEF
 
+#MACRODEF IndexEquals(VAL)
+#IFSWITCH SUFFIX==Bits
+val==$convertToBits$(VAL)
+#ELSEIFSWITCH SUFFIX==0
+0==(VAL)
+#ELSEIFSWITCH SUFFIX==NaN
+$BoxedType$.isNaN(VAL)
+#ELSE
+  #IF OfRef
+val.test(VAL)
+  #ELSE
+val==(VAL)
+  #ENDIF
+#ENDIF
+#ENDDEF
+
+#MACRODEF IfClause(INDEXTEST,VAL)
+if(
+#MACRO INDEXTEST(VAL)
+)
+#ENDDEF
+#MACRODEF UncheckedSearchMethod<SUFFIX>()
+private int uncheckedSearchSUFFIX(int bound
+#IFSWITCH SUFFIX==Bits
+,$queryParameterType$ val
+#ELSEIFSWITCH SUFFIX==0
+#ELSEIFSWITCH SUFFIX==NaN
+#ELSE
+  #IF OfRef
+,Predicate<Object> val
+  #ELSE
+,$queryParameterType$ val
+  #ENDIF
+#ENDIF
+)
+{
+  final var arr=this.arr;
+  for(int index=bound-1;;)
+  {
+    #MACRO IfClause(IndexEquals,arr[index])
+    {
+      return bound-index;
+    }
+    if(index==0)
+    {
+      return -1;
+    }
+  }
+}
+#ENDDEF
+#MACRODEF UncheckedIndexOfMethods<SUFFIX>()
+private static int uncheckedAbsoluteIndexOfSUFFIX($ArrayType$[] arr,int offset,int bound
+#IFSWITCH SUFFIX==Bits
+,$queryParameterType$ val
+#ELSEIFSWITCH SUFFIX==0
+#ELSEIFSWITCH SUFFIX==NaN
+#ELSE
+  #IF OfRef
+,Predicate<Object> val
+  #ELSE
+,$queryParameterType$ val
+  #ENDIF
+#ENDIF
+)
+{
+  for(;;)
+  {
+    #MACRO IfClause(IndexEquals,arr[offset])
+    {
+      return offset;
+    }
+    if(++offset==bound)
+    {
+      return -1;
+    }
+  }
+}
+private static int uncheckedAbsoluteLastIndexOfSUFFIX($ArrayType$[] arr,int offset,int bound
+#IFSWITCH SUFFIX==Bits
+,$queryParameterType$ val
+#ELSEIFSWITCH SUFFIX==0
+#ELSEIFSWITCH SUFFIX==NaN
+#ELSE
+  #IF OfRef
+,Predicate<Object> val
+  #ELSE
+,$queryParameterType$ val
+  #ENDIF
+#ENDIF
+)
+{
+  for(;;)
+  {
+    #MACRO IfClause(IndexEquals,arr[--bound])
+    {
+      return bound;
+    }
+    if(offset==bound)
+    {
+      return -1;
+    }
+  }
+}
+/*
+private static int uncheckedRelativeIndexOfSUFFIX($ArrayType$[] arr,int offset,int bound
+#IFSWITCH SUFFIX==Bits
+,$queryParameterType$ val
+#ELSEIFSWITCH SUFFIX==0
+#ELSEIFSWITCH SUFFIX==NaN
+#ELSE
+  #IF OfRef
+,Predicate<Object> val
+  #ELSE
+,$queryParameterType$ val
+  #ENDIF
+#ENDIF
+)
+{
+  for(int i=offset;;)
+  {
+    #MACRO IfClause(IndexEquals,arr[i])
+    {
+      return i-offset;
+    }
+    if(++i==bound)
+    {
+      return -1;
+    }
+  }
+}
+private static int uncheckedRelativeLastIndexOfSUFFIX($ArrayType$[] arr,int offset,int bound
+#IFSWITCH SUFFIX==Bits
+,$queryParameterType$ val
+#ELSEIFSWITCH SUFFIX==0
+#ELSEIFSWITCH SUFFIX==NaN
+#ELSE
+  #IF OfRef
+,Predicate<Object> val
+  #ELSE
+,$queryParameterType$ val
+  #ENDIF
+#ENDIF
+)
+{
+  for(;;)
+  {
+    #MACRO IfClause(IndexEquals,arr[--bound])
+    {
+      return bound-offset;
+    }
+    if(offset==bound)
+    {
+      return -1;
+    }
+  }
+}
+*/
+#ENDDEF
+
+#MACRODEF UncheckedRemoveVal<SUFFIX>()
+private boolean uncheckedRemoveValSUFFIX(int size
+#IFSWITCH SUFFIX==Bits
+,$queryParameterType$ val
+#ELSEIFSWITCH SUFFIX==0
+#ELSEIFSWITCH SUFFIX==NaN
+#ELSE
+  #IF OfRef
+,Predicate<Object> val
+  #ELSE
+,$queryParameterType$ val
+  #ENDIF
+#ENDIF
+)
+{
+#IFSWITCH CHECKED==Checked
+  int modCount=this.modCount;
+#ENDIF
+  final var arr=this.arr;
+#IFSWITCH STRUCTNAME==Stack
+  for(int i=--size;;--i)
+  {
+    #MACRO IfClause(IndexEquals,arr[i])
+    {
+  #IFSWITCH CHECKED==Checked
+      CheckedCollection.checkModCount(modCount,this.modCount);
+      this.modCount=modCount+1;
+  #ENDIF
+      ArrCopy.semicheckedSelfCopy(arr,i+1,i,size-i);
+  #IF OfRef
+      arr[size]=null;
+  #ENDIF
+      this.size=size;
+      return true;
+    }
+    if(i==0)
+    {
+#IFSWITCH CHECKED==Checked
+      CheckedCollection.checkModCount(modCount,this.modCount);
+#ENDIF
+      return false;
+    }
+  }
+#ELSE
+  for(int i=0;;)
+  {
+    #MACRO IfClause(IndexEquals,arr[i])
+    {
+  #IFSWITCH CHECKED==Checked
+      CheckedCollection.checkModCount(modCount,this.modCount);
+      this.modCount=modCount+1;
+  #ENDIF
+      ArrCopy.semicheckedSelfCopy(arr,i+1,i,(--size)-i);
+  #IF OfRef
+      arr[size]=null;
+  #ENDIF
+      this.size=size;
+      return true;
+    }
+    if(++i==size)
+    {
+#IFSWITCH CHECKED==Checked
+      CheckedCollection.checkModCount(modCount,this.modCount);
+#ENDIF
+      return false;
+    }
+  }
+#ENDIF
+}
+#ENDDEF
 
 #MACRODEF SuppressUnchecked()
 #IF OfRef
 @SuppressWarnings("unchecked")
 #ENDIF
 #ENDDEF
-

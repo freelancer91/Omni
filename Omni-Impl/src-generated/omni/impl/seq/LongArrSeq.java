@@ -62,6 +62,101 @@ public abstract class LongArrSeq implements OmniCollection.OfLong
   }
   public static class UncheckedListImpl extends LongArrSeq implements OmniList.OfLong
   {
+    private static int uncheckedAbsoluteIndexOf (long[] arr,int offset,int bound
+    ,long val
+    )
+    {
+      for(;;)
+      {
+        if(
+        val==(arr[offset])
+        )
+        {
+          return offset;
+        }
+        if(++offset==bound)
+        {
+          return -1;
+        }
+      }
+    }
+    private static int uncheckedAbsoluteLastIndexOf (long[] arr,int offset,int bound
+    ,long val
+    )
+    {
+      for(;;)
+      {
+        if(
+        val==(arr[--bound])
+        )
+        {
+          return bound;
+        }
+        if(offset==bound)
+        {
+          return -1;
+        }
+      }
+    }
+    /*
+    private static int uncheckedRelativeIndexOf (long[] arr,int offset,int bound
+    ,long val
+    )
+    {
+      for(int i=offset;;)
+      {
+        if(
+        val==(arr[i])
+        )
+        {
+          return i-offset;
+        }
+        if(++i==bound)
+        {
+          return -1;
+        }
+      }
+    }
+    private static int uncheckedRelativeLastIndexOf (long[] arr,int offset,int bound
+    ,long val
+    )
+    {
+      for(;;)
+      {
+        if(
+        val==(arr[--bound])
+        )
+        {
+          return bound-offset;
+        }
+        if(offset==bound)
+        {
+          return -1;
+        }
+      }
+    }
+    */
+    private boolean uncheckedRemoveVal (int size
+    ,long val
+    )
+    {
+      final var arr=this.arr;
+      for(int i=0;;)
+      {
+        if(
+        val==(arr[i])
+        )
+        {
+          ArrCopy.semicheckedSelfCopy(arr,i+1,i,(--size)-i);
+          this.size=size;
+          return true;
+        }
+        if(++i==size)
+        {
+          return false;
+        }
+      }
+    }
     static int uncheckedToString(long[] arr,int begin,int end,char[] buffer)
     {
       int bufferOffset;
@@ -145,16 +240,30 @@ public abstract class LongArrSeq implements OmniCollection.OfLong
       return 1;
     }
     @Override
-    public <T> T[] toArray(T[] arr)
+    public <T> T[] toArray(T[] dst)
     {
-      //TODO
-      return null;
+      final int size;
+      if((size=this.size)!=0)
+      {
+        ArrCopy.uncheckedCopy(this.arr,0,dst=OmniArray.uncheckedArrResize(size,dst),0,size);
+      }
+      else if(dst.length!=0)
+      {
+        dst[0]=null;
+      }
+      return dst;
     }
     @Override
     public <T> T[] toArray(IntFunction<T[]> arrConstructor)
     {
-      //TODO
-      return null;
+      final int size;
+      T[] dst;
+        dst=arrConstructor.apply(size=this.size);
+      if(size!=0)
+      {
+        ArrCopy.uncheckedCopy(this.arr,0,dst,0,size);
+      }
+      return dst;
     }
     @Override
     public boolean equals(Object val)
@@ -208,90 +317,6 @@ public abstract class LongArrSeq implements OmniCollection.OfLong
       //TODO
       return false;
     }
-   @Override
-   public
-   boolean
-   contains(boolean val)
-   {
-     final int size;
-     if((size=this.size)!=0)
-     {
-       return OmniArray.OfLong.uncheckedcontains(this.arr,0,size-1,TypeUtil.castToLong(val));
-     }
-     return false;
-   }
-   @Override
-   public
-   boolean
-   contains(int val)
-   {
-     final int size;
-     if((size=this.size)!=0)
-     {
-       return OmniArray.OfLong.uncheckedcontains(this.arr,0,size-1,(val));
-     }
-     return false;
-   }
-   @Override
-   public
-   boolean
-   contains(long val)
-   {
-     final int size;
-     if((size=this.size)!=0)
-     {
-       return OmniArray.OfLong.uncheckedcontains(this.arr,0,size-1,(val));
-     }
-     return false;
-   }
-   @Override
-   public
-   boolean
-   contains(float val)
-   {
-     final int size;
-     if((size=this.size)!=0)
-     {
-       final long v;
-       if(TypeUtil.floatEquals(val,v=(long)val))
-       {
-         return OmniArray.OfLong.uncheckedcontains(this.arr,0,size-1,v);
-       }
-     }
-     return false;
-   }
-   @Override
-   public
-   boolean
-   contains(double val)
-   {
-     final int size;
-     if((size=this.size)!=0)
-     {
-       final long v;
-       if(TypeUtil.doubleEquals(val,v=(long)val))
-       {
-         return OmniArray.OfLong.uncheckedcontains(this.arr,0,size-1,v);
-       }
-     }
-     return false;
-   }
-   @Override
-   public
-   boolean
-   contains
-   (Object val)
-   {
-     final int size;
-     if((size=this.size)!=0)
-     {
-       if(val instanceof Long)
-       {
-         return OmniArray.OfLong.uncheckedcontains(this.arr,0,size-1,(long)(val));
-       }
-     }
-     return false;
-   }
     @Override
     public boolean add(long val)
     {
@@ -299,7 +324,397 @@ public abstract class LongArrSeq implements OmniCollection.OfLong
       return false;
     }
     @Override
+    public boolean add(Long val)
+    {
+      //TODO
+      return false;
+    }
+    @Override
+    public
+    boolean
+    removeVal(boolean val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        return uncheckedRemoveVal(size,TypeUtil.castToLong(val));
+      }
+      return false;
+    }
+    @Override
+    public
+    boolean
+    removeVal(int val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        return uncheckedRemoveVal(size,(val));
+      }
+      return false;
+    }
+    @Override
+    public
+    boolean
+    removeVal(long val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        return uncheckedRemoveVal(size,(val));
+      }
+      return false;
+    }
+    @Override
+    public
+    boolean
+    removeVal(float val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        final long v;
+        if(TypeUtil.floatEquals(val,v=(long)val))
+        {
+          return uncheckedRemoveVal(size,v);
+        }
+      }
+      return false;
+    }
+    @Override
+    public
+    boolean
+    removeVal(double val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        final long v;
+        if(TypeUtil.doubleEquals(val,v=(long)val))
+        {
+          return uncheckedRemoveVal(size,v);
+        }
+      }
+      return false;
+    }
+    @Override
+    public
+    boolean
+    remove
+    (Object val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        if(val instanceof Long)
+        {
+          {
+            return uncheckedRemoveVal(size,(long)(val));
+          }
+        }
+      }
+      return false;
+    }
+    //#IFSWITCH removeVal==contains,removeVal
+    //  #IF OfRef,OfByte
+    //#MACRO QueryByte()
+    //  #ENDIF
+    //#ENDIF
+    @Override
+    public
+    boolean
+    contains(boolean val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        return OmniArray.OfLong.uncheckedcontains(this.arr,0,size-1,TypeUtil.castToLong(val));
+      }
+      return false;
+    }
+    @Override
+    public
+    boolean
+    contains(int val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        return OmniArray.OfLong.uncheckedcontains(this.arr,0,size-1,(val));
+      }
+      return false;
+    }
+    @Override
+    public
+    boolean
+    contains(long val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        return OmniArray.OfLong.uncheckedcontains(this.arr,0,size-1,(val));
+      }
+      return false;
+    }
+    @Override
+    public
+    boolean
+    contains(float val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        final long v;
+        if(TypeUtil.floatEquals(val,v=(long)val))
+        {
+          return OmniArray.OfLong.uncheckedcontains(this.arr,0,size-1,v);
+        }
+      }
+      return false;
+    }
+    @Override
+    public
+    boolean
+    contains(double val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        final long v;
+        if(TypeUtil.doubleEquals(val,v=(long)val))
+        {
+          return OmniArray.OfLong.uncheckedcontains(this.arr,0,size-1,v);
+        }
+      }
+      return false;
+    }
+    @Override
+    public
+    boolean
+    contains
+    (Object val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        if(val instanceof Long)
+        {
+          {
+            return OmniArray.OfLong.uncheckedcontains(this.arr,0,size-1,(long)(val));
+          }
+        }
+      }
+      return false;
+    }
+    //#IFSWITCH contains==contains,removeVal
+    //  #IF OfRef,OfByte
+    //#MACRO QueryByte()
+    //  #ENDIF
+    //#ENDIF
+    @Override
+    public
+    int
+    indexOf(boolean val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        return uncheckedAbsoluteIndexOf(this.arr,0,size,TypeUtil.castToLong(val));
+      }
+      return -1;
+    }
+    @Override
+    public
+    int
+    indexOf(int val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        return uncheckedAbsoluteIndexOf(this.arr,0,size,(val));
+      }
+      return -1;
+    }
+    @Override
+    public
+    int
+    indexOf(long val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        return uncheckedAbsoluteIndexOf(this.arr,0,size,(val));
+      }
+      return -1;
+    }
+    @Override
+    public
+    int
+    indexOf(float val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        final long v;
+        if(TypeUtil.floatEquals(val,v=(long)val))
+        {
+          return uncheckedAbsoluteIndexOf(this.arr,0,size,v);
+        }
+      }
+      return -1;
+    }
+    @Override
+    public
+    int
+    indexOf(double val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        final long v;
+        if(TypeUtil.doubleEquals(val,v=(long)val))
+        {
+          return uncheckedAbsoluteIndexOf(this.arr,0,size,v);
+        }
+      }
+      return -1;
+    }
+    @Override
+    public
+    int
+    indexOf
+    (Object val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        if(val instanceof Long)
+        {
+          {
+            return uncheckedAbsoluteIndexOf(this.arr,0,size,(long)(val));
+          }
+        }
+      }
+      return -1;
+    }
+    //#IFSWITCH indexOf==contains,removeVal
+    //  #IF OfRef,OfByte
+    //#MACRO QueryByte()
+    //  #ENDIF
+    //#ENDIF
+    @Override
+    public
+    int
+    lastIndexOf(boolean val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        return uncheckedAbsoluteLastIndexOf(this.arr,0,size,TypeUtil.castToLong(val));
+      }
+      return -1;
+    }
+    @Override
+    public
+    int
+    lastIndexOf(int val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        return uncheckedAbsoluteLastIndexOf(this.arr,0,size,(val));
+      }
+      return -1;
+    }
+    @Override
+    public
+    int
+    lastIndexOf(long val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        return uncheckedAbsoluteLastIndexOf(this.arr,0,size,(val));
+      }
+      return -1;
+    }
+    @Override
+    public
+    int
+    lastIndexOf(float val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        final long v;
+        if(TypeUtil.floatEquals(val,v=(long)val))
+        {
+          return uncheckedAbsoluteLastIndexOf(this.arr,0,size,v);
+        }
+      }
+      return -1;
+    }
+    @Override
+    public
+    int
+    lastIndexOf(double val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        final long v;
+        if(TypeUtil.doubleEquals(val,v=(long)val))
+        {
+          return uncheckedAbsoluteLastIndexOf(this.arr,0,size,v);
+        }
+      }
+      return -1;
+    }
+    @Override
+    public
+    int
+    lastIndexOf
+    (Object val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        if(val instanceof Long)
+        {
+          {
+            return uncheckedAbsoluteLastIndexOf(this.arr,0,size,(long)(val));
+          }
+        }
+      }
+      return -1;
+    }
+    //#IFSWITCH lastIndexOf==contains,removeVal
+    //  #IF OfRef,OfByte
+    //#MACRO QueryByte()
+    //  #ENDIF
+    //#ENDIF
+    @Override
+    public void put(int index,long val)
+    {
+      arr[index]=val;
+    }
+    @Override
+    public long getLong(int index)
+    {
+      return (long)arr[index];
+    }
+    @Override
+    public Long get(int index)
+    {
+      return getLong(index);
+    }
+    @Override
     public void add(int index,long val)
+    {
+      //TODO
+    }
+    @Override
+    public void add(int index,Long val)
     {
       //TODO
     }
@@ -309,7 +724,6 @@ public abstract class LongArrSeq implements OmniCollection.OfLong
       final long[] arr;
       long ret=(long)(arr=this.arr)[index];
       ArrCopy.semicheckedSelfCopy(arr,index+1,index,(--size)-index);
-      this.size=size;
       return ret;
     }
     @Override
@@ -409,6 +823,46 @@ public abstract class LongArrSeq implements OmniCollection.OfLong
   }
   public static class UncheckedStackImpl extends LongArrSeq implements OmniStack.OfLong
   {
+    private int uncheckedSearch (int bound
+    ,long val
+    )
+    {
+      final var arr=this.arr;
+      for(int index=bound-1;;)
+      {
+        if(
+        val==(arr[index])
+        )
+        {
+          return bound-index;
+        }
+        if(index==0)
+        {
+          return -1;
+        }
+      }
+    }
+    private boolean uncheckedRemoveVal (int size
+    ,long val
+    )
+    {
+      final var arr=this.arr;
+      for(int i=--size;;--i)
+      {
+        if(
+        val==(arr[i])
+        )
+        {
+          ArrCopy.semicheckedSelfCopy(arr,i+1,i,size-i);
+          this.size=size;
+          return true;
+        }
+        if(i==0)
+        {
+          return false;
+        }
+      }
+    }
     static int uncheckedToString(long[] arr,int begin,int end,char[] buffer)
     {
       int bufferOffset;
@@ -492,16 +946,30 @@ public abstract class LongArrSeq implements OmniCollection.OfLong
       return 1;
     }
     @Override
-    public <T> T[] toArray(T[] arr)
+    public <T> T[] toArray(T[] dst)
     {
-      //TODO
-      return null;
+      final int size;
+      if((size=this.size)!=0)
+      {
+        ArrCopy.uncheckedReverseCopy(this.arr,0,dst=OmniArray.uncheckedArrResize(size,dst),0,size);
+      }
+      else if(dst.length!=0)
+      {
+        dst[0]=null;
+      }
+      return dst;
     }
     @Override
     public <T> T[] toArray(IntFunction<T[]> arrConstructor)
     {
-      //TODO
-      return null;
+      final int size;
+      T[] dst;
+        dst=arrConstructor.apply(size=this.size);
+      if(size!=0)
+      {
+        ArrCopy.uncheckedReverseCopy(this.arr,0,dst,0,size);
+      }
+      return dst;
     }
     @Override
     public boolean equals(Object val)
@@ -555,90 +1023,200 @@ public abstract class LongArrSeq implements OmniCollection.OfLong
       //TODO
       return false;
     }
-   @Override
-   public
-   boolean
-   contains(boolean val)
-   {
-     final int size;
-     if((size=this.size)!=0)
-     {
-       return OmniArray.OfLong.uncheckedcontains(this.arr,0,size-1,TypeUtil.castToLong(val));
-     }
-     return false;
-   }
-   @Override
-   public
-   boolean
-   contains(int val)
-   {
-     final int size;
-     if((size=this.size)!=0)
-     {
-       return OmniArray.OfLong.uncheckedcontains(this.arr,0,size-1,(val));
-     }
-     return false;
-   }
-   @Override
-   public
-   boolean
-   contains(long val)
-   {
-     final int size;
-     if((size=this.size)!=0)
-     {
-       return OmniArray.OfLong.uncheckedcontains(this.arr,0,size-1,(val));
-     }
-     return false;
-   }
-   @Override
-   public
-   boolean
-   contains(float val)
-   {
-     final int size;
-     if((size=this.size)!=0)
-     {
-       final long v;
-       if(TypeUtil.floatEquals(val,v=(long)val))
-       {
-         return OmniArray.OfLong.uncheckedcontains(this.arr,0,size-1,v);
-       }
-     }
-     return false;
-   }
-   @Override
-   public
-   boolean
-   contains(double val)
-   {
-     final int size;
-     if((size=this.size)!=0)
-     {
-       final long v;
-       if(TypeUtil.doubleEquals(val,v=(long)val))
-       {
-         return OmniArray.OfLong.uncheckedcontains(this.arr,0,size-1,v);
-       }
-     }
-     return false;
-   }
-   @Override
-   public
-   boolean
-   contains
-   (Object val)
-   {
-     final int size;
-     if((size=this.size)!=0)
-     {
-       if(val instanceof Long)
-       {
-         return OmniArray.OfLong.uncheckedcontains(this.arr,0,size-1,(long)(val));
-       }
-     }
-     return false;
-   }
+    @Override
+    public boolean add(long val)
+    {
+      //TODO
+      return false;
+    }
+    @Override
+    public boolean add(Long val)
+    {
+      //TODO
+      return false;
+    }
+    @Override
+    public
+    boolean
+    removeVal(boolean val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        return uncheckedRemoveVal(size,TypeUtil.castToLong(val));
+      }
+      return false;
+    }
+    @Override
+    public
+    boolean
+    removeVal(int val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        return uncheckedRemoveVal(size,(val));
+      }
+      return false;
+    }
+    @Override
+    public
+    boolean
+    removeVal(long val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        return uncheckedRemoveVal(size,(val));
+      }
+      return false;
+    }
+    @Override
+    public
+    boolean
+    removeVal(float val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        final long v;
+        if(TypeUtil.floatEquals(val,v=(long)val))
+        {
+          return uncheckedRemoveVal(size,v);
+        }
+      }
+      return false;
+    }
+    @Override
+    public
+    boolean
+    removeVal(double val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        final long v;
+        if(TypeUtil.doubleEquals(val,v=(long)val))
+        {
+          return uncheckedRemoveVal(size,v);
+        }
+      }
+      return false;
+    }
+    @Override
+    public
+    boolean
+    remove
+    (Object val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        if(val instanceof Long)
+        {
+          {
+            return uncheckedRemoveVal(size,(long)(val));
+          }
+        }
+      }
+      return false;
+    }
+    //#IFSWITCH removeVal==contains,removeVal
+    //  #IF OfRef,OfByte
+    //#MACRO QueryByte()
+    //  #ENDIF
+    //#ENDIF
+    @Override
+    public
+    boolean
+    contains(boolean val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        return OmniArray.OfLong.uncheckedcontains(this.arr,0,size-1,TypeUtil.castToLong(val));
+      }
+      return false;
+    }
+    @Override
+    public
+    boolean
+    contains(int val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        return OmniArray.OfLong.uncheckedcontains(this.arr,0,size-1,(val));
+      }
+      return false;
+    }
+    @Override
+    public
+    boolean
+    contains(long val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        return OmniArray.OfLong.uncheckedcontains(this.arr,0,size-1,(val));
+      }
+      return false;
+    }
+    @Override
+    public
+    boolean
+    contains(float val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        final long v;
+        if(TypeUtil.floatEquals(val,v=(long)val))
+        {
+          return OmniArray.OfLong.uncheckedcontains(this.arr,0,size-1,v);
+        }
+      }
+      return false;
+    }
+    @Override
+    public
+    boolean
+    contains(double val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        final long v;
+        if(TypeUtil.doubleEquals(val,v=(long)val))
+        {
+          return OmniArray.OfLong.uncheckedcontains(this.arr,0,size-1,v);
+        }
+      }
+      return false;
+    }
+    @Override
+    public
+    boolean
+    contains
+    (Object val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        if(val instanceof Long)
+        {
+          {
+            return OmniArray.OfLong.uncheckedcontains(this.arr,0,size-1,(long)(val));
+          }
+        }
+      }
+      return false;
+    }
+    //#IFSWITCH contains==contains,removeVal
+    //  #IF OfRef,OfByte
+    //#MACRO QueryByte()
+    //  #ENDIF
+    //#ENDIF
     @Override
     public OmniIterator.OfLong iterator()
     {
@@ -693,6 +1271,97 @@ public abstract class LongArrSeq implements OmniCollection.OfLong
       }
       return OmniArray.OfFloat.DEFAULT_ARR;
     }
+    @Override
+    public
+    int
+    search(boolean val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        return uncheckedSearch(size,TypeUtil.castToLong(val));
+      }
+      return -1;
+    }
+    @Override
+    public
+    int
+    search(int val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        return uncheckedSearch(size,(val));
+      }
+      return -1;
+    }
+    @Override
+    public
+    int
+    search(long val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        return uncheckedSearch(size,(val));
+      }
+      return -1;
+    }
+    @Override
+    public
+    int
+    search(float val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        final long v;
+        if(TypeUtil.floatEquals(val,v=(long)val))
+        {
+          return uncheckedSearch(size,v);
+        }
+      }
+      return -1;
+    }
+    @Override
+    public
+    int
+    search(double val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        final long v;
+        if(TypeUtil.doubleEquals(val,v=(long)val))
+        {
+          return uncheckedSearch(size,v);
+        }
+      }
+      return -1;
+    }
+    @Override
+    public
+    int
+    search
+    (Object val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        if(val instanceof Long)
+        {
+          {
+            return uncheckedSearch(size,(long)(val));
+          }
+        }
+      }
+      return -1;
+    }
+    //#IFSWITCH search==contains,removeVal
+    //  #IF OfRef,OfByte
+    //#MACRO QueryByte()
+    //  #ENDIF
+    //#ENDIF
     @Override
     public long popLong()
     {
@@ -811,6 +1480,105 @@ public abstract class LongArrSeq implements OmniCollection.OfLong
   }
   public static class CheckedListImpl extends LongArrSeq implements OmniList.OfLong
   {
+    private static int uncheckedAbsoluteIndexOf (long[] arr,int offset,int bound
+    ,long val
+    )
+    {
+      for(;;)
+      {
+        if(
+        val==(arr[offset])
+        )
+        {
+          return offset;
+        }
+        if(++offset==bound)
+        {
+          return -1;
+        }
+      }
+    }
+    private static int uncheckedAbsoluteLastIndexOf (long[] arr,int offset,int bound
+    ,long val
+    )
+    {
+      for(;;)
+      {
+        if(
+        val==(arr[--bound])
+        )
+        {
+          return bound;
+        }
+        if(offset==bound)
+        {
+          return -1;
+        }
+      }
+    }
+    /*
+    private static int uncheckedRelativeIndexOf (long[] arr,int offset,int bound
+    ,long val
+    )
+    {
+      for(int i=offset;;)
+      {
+        if(
+        val==(arr[i])
+        )
+        {
+          return i-offset;
+        }
+        if(++i==bound)
+        {
+          return -1;
+        }
+      }
+    }
+    private static int uncheckedRelativeLastIndexOf (long[] arr,int offset,int bound
+    ,long val
+    )
+    {
+      for(;;)
+      {
+        if(
+        val==(arr[--bound])
+        )
+        {
+          return bound-offset;
+        }
+        if(offset==bound)
+        {
+          return -1;
+        }
+      }
+    }
+    */
+    private boolean uncheckedRemoveVal (int size
+    ,long val
+    )
+    {
+      int modCount=this.modCount;
+      final var arr=this.arr;
+      for(int i=0;;)
+      {
+        if(
+        val==(arr[i])
+        )
+        {
+          CheckedCollection.checkModCount(modCount,this.modCount);
+          this.modCount=modCount+1;
+          ArrCopy.semicheckedSelfCopy(arr,i+1,i,(--size)-i);
+          this.size=size;
+          return true;
+        }
+        if(++i==size)
+        {
+          CheckedCollection.checkModCount(modCount,this.modCount);
+          return false;
+        }
+      }
+    }
     static int uncheckedToString(long[] arr,int begin,int end,char[] buffer)
     {
       int bufferOffset;
@@ -904,16 +1672,38 @@ public abstract class LongArrSeq implements OmniCollection.OfLong
       return 1;
     }
     @Override
-    public <T> T[] toArray(T[] arr)
+    public <T> T[] toArray(T[] dst)
     {
-      //TODO
-      return null;
+      final int size;
+      if((size=this.size)!=0)
+      {
+        ArrCopy.uncheckedCopy(this.arr,0,dst=OmniArray.uncheckedArrResize(size,dst),0,size);
+      }
+      else if(dst.length!=0)
+      {
+        dst[0]=null;
+      }
+      return dst;
     }
     @Override
     public <T> T[] toArray(IntFunction<T[]> arrConstructor)
     {
-      //TODO
-      return null;
+      final int size;
+      T[] dst;
+      int modCount=this.modCount;
+      try
+      {
+        dst=arrConstructor.apply(size=this.size);
+      }
+      finally
+      {
+        CheckedCollection.checkModCount(modCount,this.modCount);
+      }
+      if(size!=0)
+      {
+        ArrCopy.uncheckedCopy(this.arr,0,dst,0,size);
+      }
+      return dst;
     }
     @Override
     public boolean equals(Object val)
@@ -979,92 +1769,6 @@ public abstract class LongArrSeq implements OmniCollection.OfLong
       //TODO
       return false;
     }
-   @Override
-   public
-   boolean
-   contains(boolean val)
-   {
-     final int size;
-     if((size=this.size)!=0)
-     {
-       return OmniArray.OfLong.uncheckedcontains(this.arr,0,size-1,TypeUtil.castToLong(val));
-     }
-     return false;
-   }
-   @Override
-   public
-   boolean
-   contains(int val)
-   {
-     final int size;
-     if((size=this.size)!=0)
-     {
-       return OmniArray.OfLong.uncheckedcontains(this.arr,0,size-1,(val));
-     }
-     return false;
-   }
-   @Override
-   public
-   boolean
-   contains(long val)
-   {
-     final int size;
-     if((size=this.size)!=0)
-     {
-       return OmniArray.OfLong.uncheckedcontains(this.arr,0,size-1,(val));
-     }
-     return false;
-   }
-   @Override
-   public
-   boolean
-   contains(float val)
-   {
-     final int size;
-     if((size=this.size)!=0)
-     {
-       final long v;
-       if(TypeUtil.floatEquals(val,v=(long)val))
-       {
-         return OmniArray.OfLong.uncheckedcontains(this.arr,0,size-1,v);
-       }
-     }
-     return false;
-   }
-   @Override
-   public
-   boolean
-   contains(double val)
-   {
-     final int size;
-     if((size=this.size)!=0)
-     {
-       final long v;
-       if(TypeUtil.doubleEquals(val,v=(long)val))
-       {
-         return OmniArray.OfLong.uncheckedcontains(this.arr,0,size-1,v);
-       }
-     }
-     return false;
-   }
-   @Override
-   public
-   boolean
-   contains
-   (Object val)
-   {
-     final int size;
-     if((size=this.size)!=0)
-     {
-       int modCount=this.modCount;
-       if(val instanceof Long)
-       {
-         return OmniArray.OfLong.uncheckedcontains(this.arr,0,size-1,(long)(val));
-       }
-     }
-     CheckedCollection.checkModCount(modCount,this.modCount);
-     return false;
-   }
     @Override
     public boolean add(long val)
     {
@@ -1072,7 +1776,417 @@ public abstract class LongArrSeq implements OmniCollection.OfLong
       return false;
     }
     @Override
+    public boolean add(Long val)
+    {
+      //TODO
+      return false;
+    }
+    @Override
+    public
+    boolean
+    removeVal(boolean val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        return uncheckedRemoveVal(size,TypeUtil.castToLong(val));
+      }
+      return false;
+    }
+    @Override
+    public
+    boolean
+    removeVal(int val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        return uncheckedRemoveVal(size,(val));
+      }
+      return false;
+    }
+    @Override
+    public
+    boolean
+    removeVal(long val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        return uncheckedRemoveVal(size,(val));
+      }
+      return false;
+    }
+    @Override
+    public
+    boolean
+    removeVal(float val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        final long v;
+        if(TypeUtil.floatEquals(val,v=(long)val))
+        {
+          return uncheckedRemoveVal(size,v);
+        }
+      }
+      return false;
+    }
+    @Override
+    public
+    boolean
+    removeVal(double val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        final long v;
+        if(TypeUtil.doubleEquals(val,v=(long)val))
+        {
+          return uncheckedRemoveVal(size,v);
+        }
+      }
+      return false;
+    }
+    @Override
+    public
+    boolean
+    remove
+    (Object val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        if(val instanceof Long)
+        {
+          {
+            return uncheckedRemoveVal(size,(long)(val));
+          }
+        }
+      }
+      return false;
+    }
+    //#IFSWITCH removeVal==contains,removeVal
+    //  #IF OfRef,OfByte
+    //#MACRO QueryByte()
+    //  #ENDIF
+    //#ENDIF
+    @Override
+    public
+    boolean
+    contains(boolean val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        return OmniArray.OfLong.uncheckedcontains(this.arr,0,size-1,TypeUtil.castToLong(val));
+      }
+      return false;
+    }
+    @Override
+    public
+    boolean
+    contains(int val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        return OmniArray.OfLong.uncheckedcontains(this.arr,0,size-1,(val));
+      }
+      return false;
+    }
+    @Override
+    public
+    boolean
+    contains(long val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        return OmniArray.OfLong.uncheckedcontains(this.arr,0,size-1,(val));
+      }
+      return false;
+    }
+    @Override
+    public
+    boolean
+    contains(float val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        final long v;
+        if(TypeUtil.floatEquals(val,v=(long)val))
+        {
+          return OmniArray.OfLong.uncheckedcontains(this.arr,0,size-1,v);
+        }
+      }
+      return false;
+    }
+    @Override
+    public
+    boolean
+    contains(double val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        final long v;
+        if(TypeUtil.doubleEquals(val,v=(long)val))
+        {
+          return OmniArray.OfLong.uncheckedcontains(this.arr,0,size-1,v);
+        }
+      }
+      return false;
+    }
+    @Override
+    public
+    boolean
+    contains
+    (Object val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        if(val instanceof Long)
+        {
+          {
+            return OmniArray.OfLong.uncheckedcontains(this.arr,0,size-1,(long)(val));
+          }
+        }
+      }
+      return false;
+    }
+    //#IFSWITCH contains==contains,removeVal
+    //  #IF OfRef,OfByte
+    //#MACRO QueryByte()
+    //  #ENDIF
+    //#ENDIF
+    @Override
+    public
+    int
+    indexOf(boolean val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        return uncheckedAbsoluteIndexOf(this.arr,0,size,TypeUtil.castToLong(val));
+      }
+      return -1;
+    }
+    @Override
+    public
+    int
+    indexOf(int val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        return uncheckedAbsoluteIndexOf(this.arr,0,size,(val));
+      }
+      return -1;
+    }
+    @Override
+    public
+    int
+    indexOf(long val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        return uncheckedAbsoluteIndexOf(this.arr,0,size,(val));
+      }
+      return -1;
+    }
+    @Override
+    public
+    int
+    indexOf(float val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        final long v;
+        if(TypeUtil.floatEquals(val,v=(long)val))
+        {
+          return uncheckedAbsoluteIndexOf(this.arr,0,size,v);
+        }
+      }
+      return -1;
+    }
+    @Override
+    public
+    int
+    indexOf(double val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        final long v;
+        if(TypeUtil.doubleEquals(val,v=(long)val))
+        {
+          return uncheckedAbsoluteIndexOf(this.arr,0,size,v);
+        }
+      }
+      return -1;
+    }
+    @Override
+    public
+    int
+    indexOf
+    (Object val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        if(val instanceof Long)
+        {
+          int modCount=this.modCount;
+          try
+          {
+            return uncheckedAbsoluteIndexOf(this.arr,0,size,(long)(val));
+          }
+          finally
+          {
+            CheckedCollection.checkModCount(modCount,this.modCount);
+          }
+        }
+      }
+      return -1;
+    }
+    //#IFSWITCH indexOf==contains,removeVal
+    //  #IF OfRef,OfByte
+    //#MACRO QueryByte()
+    //  #ENDIF
+    //#ENDIF
+    @Override
+    public
+    int
+    lastIndexOf(boolean val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        return uncheckedAbsoluteLastIndexOf(this.arr,0,size,TypeUtil.castToLong(val));
+      }
+      return -1;
+    }
+    @Override
+    public
+    int
+    lastIndexOf(int val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        return uncheckedAbsoluteLastIndexOf(this.arr,0,size,(val));
+      }
+      return -1;
+    }
+    @Override
+    public
+    int
+    lastIndexOf(long val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        return uncheckedAbsoluteLastIndexOf(this.arr,0,size,(val));
+      }
+      return -1;
+    }
+    @Override
+    public
+    int
+    lastIndexOf(float val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        final long v;
+        if(TypeUtil.floatEquals(val,v=(long)val))
+        {
+          return uncheckedAbsoluteLastIndexOf(this.arr,0,size,v);
+        }
+      }
+      return -1;
+    }
+    @Override
+    public
+    int
+    lastIndexOf(double val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        final long v;
+        if(TypeUtil.doubleEquals(val,v=(long)val))
+        {
+          return uncheckedAbsoluteLastIndexOf(this.arr,0,size,v);
+        }
+      }
+      return -1;
+    }
+    @Override
+    public
+    int
+    lastIndexOf
+    (Object val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        if(val instanceof Long)
+        {
+          int modCount=this.modCount;
+          try
+          {
+            return uncheckedAbsoluteLastIndexOf(this.arr,0,size,(long)(val));
+          }
+          finally
+          {
+            CheckedCollection.checkModCount(modCount,this.modCount);
+          }
+        }
+      }
+      return -1;
+    }
+    //#IFSWITCH lastIndexOf==contains,removeVal
+    //  #IF OfRef,OfByte
+    //#MACRO QueryByte()
+    //  #ENDIF
+    //#ENDIF
+    @Override
+    public void put(int index,long val)
+    {
+      if(index<0 || index>=this.size)
+      {
+        throw new IndexOutOfBoundsException("index="+index+"; size="+this.size);
+      }
+      arr[index]=val;
+    }
+    @Override
+    public long getLong(int index)
+    {
+      if(index<0 || index>=this.size)
+      {
+        throw new IndexOutOfBoundsException("index="+index+"; size="+this.size);
+      }
+      return (long)arr[index];
+    }
+    @Override
+    public Long get(int index)
+    {
+      return getLong(index);
+    }
+    @Override
     public void add(int index,long val)
+    {
+      //TODO
+    }
+    @Override
+    public void add(int index,Long val)
     {
       //TODO
     }
@@ -1188,6 +2302,50 @@ public abstract class LongArrSeq implements OmniCollection.OfLong
   }
   public static class CheckedStackImpl extends LongArrSeq implements OmniStack.OfLong
   {
+    private int uncheckedSearch (int bound
+    ,long val
+    )
+    {
+      final var arr=this.arr;
+      for(int index=bound-1;;)
+      {
+        if(
+        val==(arr[index])
+        )
+        {
+          return bound-index;
+        }
+        if(index==0)
+        {
+          return -1;
+        }
+      }
+    }
+    private boolean uncheckedRemoveVal (int size
+    ,long val
+    )
+    {
+      int modCount=this.modCount;
+      final var arr=this.arr;
+      for(int i=--size;;--i)
+      {
+        if(
+        val==(arr[i])
+        )
+        {
+          CheckedCollection.checkModCount(modCount,this.modCount);
+          this.modCount=modCount+1;
+          ArrCopy.semicheckedSelfCopy(arr,i+1,i,size-i);
+          this.size=size;
+          return true;
+        }
+        if(i==0)
+        {
+          CheckedCollection.checkModCount(modCount,this.modCount);
+          return false;
+        }
+      }
+    }
     static int uncheckedToString(long[] arr,int begin,int end,char[] buffer)
     {
       int bufferOffset;
@@ -1281,16 +2439,38 @@ public abstract class LongArrSeq implements OmniCollection.OfLong
       return 1;
     }
     @Override
-    public <T> T[] toArray(T[] arr)
+    public <T> T[] toArray(T[] dst)
     {
-      //TODO
-      return null;
+      final int size;
+      if((size=this.size)!=0)
+      {
+        ArrCopy.uncheckedReverseCopy(this.arr,0,dst=OmniArray.uncheckedArrResize(size,dst),0,size);
+      }
+      else if(dst.length!=0)
+      {
+        dst[0]=null;
+      }
+      return dst;
     }
     @Override
     public <T> T[] toArray(IntFunction<T[]> arrConstructor)
     {
-      //TODO
-      return null;
+      final int size;
+      T[] dst;
+      int modCount=this.modCount;
+      try
+      {
+        dst=arrConstructor.apply(size=this.size);
+      }
+      finally
+      {
+        CheckedCollection.checkModCount(modCount,this.modCount);
+      }
+      if(size!=0)
+      {
+        ArrCopy.uncheckedReverseCopy(this.arr,0,dst,0,size);
+      }
+      return dst;
     }
     @Override
     public boolean equals(Object val)
@@ -1356,92 +2536,200 @@ public abstract class LongArrSeq implements OmniCollection.OfLong
       //TODO
       return false;
     }
-   @Override
-   public
-   boolean
-   contains(boolean val)
-   {
-     final int size;
-     if((size=this.size)!=0)
-     {
-       return OmniArray.OfLong.uncheckedcontains(this.arr,0,size-1,TypeUtil.castToLong(val));
-     }
-     return false;
-   }
-   @Override
-   public
-   boolean
-   contains(int val)
-   {
-     final int size;
-     if((size=this.size)!=0)
-     {
-       return OmniArray.OfLong.uncheckedcontains(this.arr,0,size-1,(val));
-     }
-     return false;
-   }
-   @Override
-   public
-   boolean
-   contains(long val)
-   {
-     final int size;
-     if((size=this.size)!=0)
-     {
-       return OmniArray.OfLong.uncheckedcontains(this.arr,0,size-1,(val));
-     }
-     return false;
-   }
-   @Override
-   public
-   boolean
-   contains(float val)
-   {
-     final int size;
-     if((size=this.size)!=0)
-     {
-       final long v;
-       if(TypeUtil.floatEquals(val,v=(long)val))
-       {
-         return OmniArray.OfLong.uncheckedcontains(this.arr,0,size-1,v);
-       }
-     }
-     return false;
-   }
-   @Override
-   public
-   boolean
-   contains(double val)
-   {
-     final int size;
-     if((size=this.size)!=0)
-     {
-       final long v;
-       if(TypeUtil.doubleEquals(val,v=(long)val))
-       {
-         return OmniArray.OfLong.uncheckedcontains(this.arr,0,size-1,v);
-       }
-     }
-     return false;
-   }
-   @Override
-   public
-   boolean
-   contains
-   (Object val)
-   {
-     final int size;
-     if((size=this.size)!=0)
-     {
-       int modCount=this.modCount;
-       if(val instanceof Long)
-       {
-         return OmniArray.OfLong.uncheckedcontains(this.arr,0,size-1,(long)(val));
-       }
-     }
-     CheckedCollection.checkModCount(modCount,this.modCount);
-     return false;
-   }
+    @Override
+    public boolean add(long val)
+    {
+      //TODO
+      return false;
+    }
+    @Override
+    public boolean add(Long val)
+    {
+      //TODO
+      return false;
+    }
+    @Override
+    public
+    boolean
+    removeVal(boolean val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        return uncheckedRemoveVal(size,TypeUtil.castToLong(val));
+      }
+      return false;
+    }
+    @Override
+    public
+    boolean
+    removeVal(int val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        return uncheckedRemoveVal(size,(val));
+      }
+      return false;
+    }
+    @Override
+    public
+    boolean
+    removeVal(long val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        return uncheckedRemoveVal(size,(val));
+      }
+      return false;
+    }
+    @Override
+    public
+    boolean
+    removeVal(float val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        final long v;
+        if(TypeUtil.floatEquals(val,v=(long)val))
+        {
+          return uncheckedRemoveVal(size,v);
+        }
+      }
+      return false;
+    }
+    @Override
+    public
+    boolean
+    removeVal(double val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        final long v;
+        if(TypeUtil.doubleEquals(val,v=(long)val))
+        {
+          return uncheckedRemoveVal(size,v);
+        }
+      }
+      return false;
+    }
+    @Override
+    public
+    boolean
+    remove
+    (Object val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        if(val instanceof Long)
+        {
+          {
+            return uncheckedRemoveVal(size,(long)(val));
+          }
+        }
+      }
+      return false;
+    }
+    //#IFSWITCH removeVal==contains,removeVal
+    //  #IF OfRef,OfByte
+    //#MACRO QueryByte()
+    //  #ENDIF
+    //#ENDIF
+    @Override
+    public
+    boolean
+    contains(boolean val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        return OmniArray.OfLong.uncheckedcontains(this.arr,0,size-1,TypeUtil.castToLong(val));
+      }
+      return false;
+    }
+    @Override
+    public
+    boolean
+    contains(int val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        return OmniArray.OfLong.uncheckedcontains(this.arr,0,size-1,(val));
+      }
+      return false;
+    }
+    @Override
+    public
+    boolean
+    contains(long val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        return OmniArray.OfLong.uncheckedcontains(this.arr,0,size-1,(val));
+      }
+      return false;
+    }
+    @Override
+    public
+    boolean
+    contains(float val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        final long v;
+        if(TypeUtil.floatEquals(val,v=(long)val))
+        {
+          return OmniArray.OfLong.uncheckedcontains(this.arr,0,size-1,v);
+        }
+      }
+      return false;
+    }
+    @Override
+    public
+    boolean
+    contains(double val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        final long v;
+        if(TypeUtil.doubleEquals(val,v=(long)val))
+        {
+          return OmniArray.OfLong.uncheckedcontains(this.arr,0,size-1,v);
+        }
+      }
+      return false;
+    }
+    @Override
+    public
+    boolean
+    contains
+    (Object val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        if(val instanceof Long)
+        {
+          {
+            return OmniArray.OfLong.uncheckedcontains(this.arr,0,size-1,(long)(val));
+          }
+        }
+      }
+      return false;
+    }
+    //#IFSWITCH contains==contains,removeVal
+    //  #IF OfRef,OfByte
+    //#MACRO QueryByte()
+    //  #ENDIF
+    //#ENDIF
     @Override
     public OmniIterator.OfLong iterator()
     {
@@ -1496,6 +2784,97 @@ public abstract class LongArrSeq implements OmniCollection.OfLong
       }
       return OmniArray.OfFloat.DEFAULT_ARR;
     }
+    @Override
+    public
+    int
+    search(boolean val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        return uncheckedSearch(size,TypeUtil.castToLong(val));
+      }
+      return -1;
+    }
+    @Override
+    public
+    int
+    search(int val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        return uncheckedSearch(size,(val));
+      }
+      return -1;
+    }
+    @Override
+    public
+    int
+    search(long val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        return uncheckedSearch(size,(val));
+      }
+      return -1;
+    }
+    @Override
+    public
+    int
+    search(float val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        final long v;
+        if(TypeUtil.floatEquals(val,v=(long)val))
+        {
+          return uncheckedSearch(size,v);
+        }
+      }
+      return -1;
+    }
+    @Override
+    public
+    int
+    search(double val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        final long v;
+        if(TypeUtil.doubleEquals(val,v=(long)val))
+        {
+          return uncheckedSearch(size,v);
+        }
+      }
+      return -1;
+    }
+    @Override
+    public
+    int
+    search
+    (Object val)
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        if(val instanceof Long)
+        {
+          {
+            return uncheckedSearch(size,(long)(val));
+          }
+        }
+      }
+      return -1;
+    }
+    //#IFSWITCH search==contains,removeVal
+    //  #IF OfRef,OfByte
+    //#MACRO QueryByte()
+    //  #ENDIF
+    //#ENDIF
     @Override
     public long popLong()
     {
