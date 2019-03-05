@@ -1166,6 +1166,7 @@ public abstract interface OmniList extends OmniCollection
     public abstract void replaceAll(UnaryOperator<E> operator);
     public abstract E set(int index,E val);
     public abstract void sort(Comparator<? super E> sorter);
+    public abstract void unstableSort(Comparator<? super E> sorter);
     public abstract void unstableAscendingSort();
     public abstract void unstableDescendingSort();
     public abstract OmniList.OfRef<E> subList(int fromIndex,int toIndex);
