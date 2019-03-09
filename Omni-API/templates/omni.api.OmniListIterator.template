@@ -50,22 +50,22 @@ public abstract interface OfCLASSPREFIX extends OmniListIterator<BOXEDTYPE>,Omni
   public default byte previousByte(){
     return TypeUtil.castToByte(previousCLASSPREFIX());
   }
-  public default char nextChar(){
+  public default char previousChar(){
     return TypeUtil.castToChar(previousCLASSPREFIX());
   }
-  public default double nextDouble(){
+  public default double previousDouble(){
     return TypeUtil.castToDouble(previousCLASSPREFIX());
   }
-  public default float nextFloat(){
+  public default float previousFloat(){
     return TypeUtil.castToFloat(previousCLASSPREFIX());
   }
-  public default int nextInt(){
+  public default int previousInt(){
     return TypeUtil.castToByte(previousCLASSPREFIX());
   }
-  public default long nextLong(){
+  public default long previousLong(){
     return TypeUtil.castToLong(previousCLASSPREFIX());
   }
-  public default short nextShort(){
+  public default short prevousShort(){
     return TypeUtil.castToByte(previousCLASSPREFIX());
   }
 #ELSEIFNOTSWITCH ARRTYPE==double

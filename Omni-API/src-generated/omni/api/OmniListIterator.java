@@ -37,22 +37,22 @@ public abstract interface OmniListIterator<E> extends OmniIterator<E>,ListIterat
     public default byte previousByte(){
       return TypeUtil.castToByte(previousBoolean());
     }
-    public default char nextChar(){
+    public default char previousChar(){
       return TypeUtil.castToChar(previousBoolean());
     }
-    public default double nextDouble(){
+    public default double previousDouble(){
       return TypeUtil.castToDouble(previousBoolean());
     }
-    public default float nextFloat(){
+    public default float previousFloat(){
       return TypeUtil.castToFloat(previousBoolean());
     }
-    public default int nextInt(){
+    public default int previousInt(){
       return TypeUtil.castToByte(previousBoolean());
     }
-    public default long nextLong(){
+    public default long previousLong(){
       return TypeUtil.castToLong(previousBoolean());
     }
-    public default short nextShort(){
+    public default short prevousShort(){
       return TypeUtil.castToByte(previousBoolean());
     }
   }

@@ -189,33 +189,33 @@ public class TemplateProcessor2{
                     final String key=firstToken.substring(0,delimiterIndex).trim();
                     String value=firstToken.substring(delimiterIndex+2).trim();
                     final String definedValue=currentSwitches.get(key);
-                    if(definedValue==null){
-                        trouble=true;
-                        throw new Exception("Unknown If-switch parameter "+key+" on line "+currIndex);
-                    }
-                    if(matchArg){
-                        for(int i=1;;){
-                            if(definedValue.equals(value)){
-                                ++activeDepth;
-                                break;
+                    // an undefined value cancels the branch
+                    if(definedValue != null){
+                        if(matchArg){
+                            for(int i=1;;){
+                                if(definedValue.equals(value)){
+                                    ++activeDepth;
+                                    break;
+                                }
+                                if(i == args.length){
+                                    break;
+                                }
+                                value=args[i++].trim();
                             }
-                            if(i==args.length){
-                                break;
+                        }else{
+                            for(int i=1;;){
+                                if(definedValue.equals(value)){
+                                    break;
+                                }
+                                if(i == args.length){
+                                    ++activeDepth;
+                                    break;
+                                }
+                                value=args[i++].trim();
                             }
-                            value=args[i++].trim();
                         }
-                    }else{
-                        for(int i=1;;){
-                            if(definedValue.equals(value)){
-                                break;
-                            }
-                            if(i==args.length){
-                                ++activeDepth;
-                                break;
-                            }
-                            value=args[i++].trim();
-                        }
                     }
+
 
                 }else{
                     if(validate){
@@ -253,20 +253,33 @@ public class TemplateProcessor2{
                         final String key=firstToken.substring(0,delimiterIndex).trim();
                         String value=firstToken.substring(delimiterIndex+2).trim();
                         final String definedValue=currentSwitches.get(key);
-                        if(definedValue==null){
-                            trouble=true;
-                            throw new Exception("Unknown IFSWITCH parameter "+key+" on line "+currIndex);
-                        }
-                        for(int i=1;;){
-                            if(matchArg==definedValue.equals(value)){
-                                ++activeDepth;
-                                break;
+                        // an undefined value cancels the branch
+                        if(definedValue != null){
+                            if(matchArg){
+                                for(int i=1;;){
+                                    if(definedValue.equals(value)){
+                                        ++activeDepth;
+                                        break;
+                                    }
+                                    if(i == args.length){
+                                        break;
+                                    }
+                                    value=args[i++].trim();
+                                }
+                            }else{
+                                for(int i=1;;){
+                                    if(definedValue.equals(value)){
+                                        break;
+                                    }
+                                    if(i == args.length){
+                                        ++activeDepth;
+                                        break;
+                                    }
+                                    value=args[i++].trim();
+                                }
                             }
-                            if(i==args.length){
-                                break;
-                            }
-                            value=args[i++].trim();
                         }
+
                     }else{
                         if(validate){
                             validateControlStatementArgs(args);
@@ -398,7 +411,7 @@ public class TemplateProcessor2{
                 for(int i=0;i!=switches.length;++i){
                     System.err.println("  switch "+i+" = \""+switches[i]+"\"");
                 }
-                throw new Exception("Unknown macro reference "+macroName+" on line "+currIndex);
+                throw new Exception("Unknown macro reference " + macroName + " on line " + currIndex);
             }
             ++macroDef.numUses;
             for(int i=0;i<macroSig.numSwitches;++i){
@@ -407,7 +420,7 @@ public class TemplateProcessor2{
                 final String definedVal=currentSwitches.put(key,value);
                 if(definedVal!=null&&!definedVal.equals(value)){
                     trouble=true;
-                    throw new Exception("Redefinition of switch "+key+" at line "+currIndex);
+                    throw new Exception("Redefinition of switch " + key + " at line " + currIndex);
                 }
             }
             final int oldIndex=currIndex;
@@ -473,7 +486,7 @@ public class TemplateProcessor2{
                         break;
                     default:
                         trouble=true;
-                        throw new Exception("Unexpected tag "+tag+" found on line "+currIndex);
+                        throw new Exception("Unexpected tag " + tag + " found on line " + currIndex);
                     }
                 }else{
                     if(activeDepth==ifElseStack.size()){
@@ -492,8 +505,8 @@ public class TemplateProcessor2{
                     processSourceLine(lines[currIndex++]);
                 }catch(final Exception e){
                     trouble=true;
-                    System.err.println("Exception thrown in typeDef "+typeDef.name()+". currIndex = "+currIndex+"; outputIndex = "
-                            +output.size());
+                    System.err.println("Exception thrown in typeDef " + typeDef.name() + ". currIndex = " + currIndex
+                            + "; outputIndex = " + output.size());
                     throw e;
                 }
             }

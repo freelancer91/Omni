@@ -23,19 +23,17 @@ import omni.api.OmniListIterator;
 import java.util.function.IntFunction;
 import java.util.function.UnaryOperator;
 import omni.util.TypeUtil;
+import java.util.ConcurrentModificationException;
 #IF OfInt,OfLong,OfDouble
 import java.util.function.$UnaryOperator$;
 #ELSEIFNOT OfBoolean
 import omni.function.$UnaryOperator$;
 #ENDIF
-
-
 #IF OfInt
 import java.util.function.$Comparator$;
 #ELSE
 import omni.function.$Comparator$;
 #ENDIF
-
 #IF OfInt,OfLong,OfDouble
 import java.util.function.$TypeNameModifier$Predicate;
 import java.util.function.$TypeNameModifier$Consumer;
@@ -43,20 +41,17 @@ import java.util.function.$TypeNameModifier$Consumer;
 import omni.function.$TypeNameModifier$Predicate;
 import omni.function.$TypeNameModifier$Consumer;
 #ENDIF
-
-
-
 #IFNOT OfDouble,OfChar
 import omni.util.ToStringUtil;
 #ENDIF
-
 #IF OfDouble,OfFloat
 import omni.util.HashUtil;
 #ENDIF
-
+#IFNOT OfBoolean
+import omni.util.BitSetUtil;
+#ENDIF
 public abstract class $ClassPrefix$ArrSeq$<E>$ implements OmniCollection.Of$ClassPrefix$$<E>$
 {
-
   transient int size;
   transient $ArrayType$[] arr;
   private $ClassPrefix$ArrSeq()
@@ -97,6 +92,238 @@ public abstract class $ClassPrefix$ArrSeq$<E>$ implements OmniCollection.Of$Clas
   {
     return this.size;
   }
+  #MACRO RemoveIfImpl($TypeNameModifier$Predicate$<? super E>$,filter)
+  #MACRO RemoveIfImpl(Predicate<? super $BoxedType$>,filter::test)
+  
+  
+  static void uncheckedForEachAscending($ArrayType$[] arr,int offset,int bound,$TypeNameModifier$Consumer$<? super E>$ action)
+  {
+    do
+    {
+      action.accept(($exposedType$)arr[offset]);
+    }
+    while(++offset!=bound);
+  }
+  static void uncheckedForEachDescending($ArrayType$[] arr,int offset,int bound,$TypeNameModifier$Consumer$<? super E>$ action)
+  {
+    do
+    {
+      action.accept(($exposedType$)arr[--bound]);
+    }
+    while(bound!=offset);
+  }
+  
+
+  private static int doRemoveIf($ArrayType$[] arr,int srcOffset,int srcBound,$TypeNameModifier$Predicate$<? super E>$ filter)
+  {
+#IF OfBoolean
+    $ArrayType$ v;
+    
+    if(filter.test(v=arr[srcOffset]))
+    {
+      int dstOffset=srcOffset;
+      while(++srcOffset!=srcBound)
+      {
+        if(arr[srcOffset]^v)
+        {
+          if(!filter.test(v=!v))
+          {
+            arr[dstOffset]=v;
+            return pullSurvivorsDown(arr,srcOffset,srcBound,dstOffset+1,v);
+          }
+          break;
+        }
+      }
+      return dstOffset;
+    }
+    else
+    {
+      while(++srcOffset!=srcBound)
+      {
+        if(arr[srcOffset]^v)
+        {
+          if(filter.test(!v))
+          {
+            return pullSurvivorsDown(arr,srcOffset,srcBound,srcOffset,v);
+          }
+          break;
+        }
+      }
+      return srcBound;
+    }
+#ELSE
+    do
+    {
+      if(filter.test(($exposedType$)arr[srcOffset]))
+      {
+        return pullSurvivorsDown(arr,srcOffset,srcBound,filter);
+      }
+    }
+    while(++srcOffset!=srcBound);
+    return srcBound;
+#ENDIF
+  }
+  
+  
+#IF OfBoolean
+    private static int pullSurvivorsDown($ArrayType$[] arr,int srcOffset,int srcBound,int dstOffset,$ArrayType$ retainThis)
+    {
+      while(++srcOffset!=srcBound)
+      {
+        if(arr[srcOffset]==retainThis)
+        {
+          arr[dstOffset++]=retainThis;
+        }
+      }
+      return dstOffset;
+    }
+#ELSE
+    private static $<E>$ int pullSurvivorsDown($ArrayType$[] arr,int srcOffset,int srcBound,$TypeNameModifier$Predicate$<? super E>$ filter)
+    {
+      int dstOffset=srcOffset;
+      while(++srcOffset!=srcBound)
+      {
+        final $ArrayType$ v;
+        if(!filter.test(($exposedType$)(v=arr[srcOffset])))
+        {
+          arr[dstOffset++]=v;
+        }
+      }
+      return dstOffset;
+    }
+#ENDIF
+  
+
+    private static int doRemoveIf($ArrayType$[] arr,int srcOffset,int srcBound,$TypeNameModifier$Predicate$<? super E>$ filter,CheckedCollection.AbstractModCountChecker modCountChecker)
+    {
+      try
+      {
+#IF OfBoolean
+        $ArrayType$ v;
+        if(filter.test(v=arr[srcOffset]))
+        {
+          int dstOffset=srcOffset;
+          while(++srcOffset!=srcBound)
+          {
+            if(arr[srcOffset]^v)
+            {
+              if(!filter.test(v=!v))
+              {
+                modCountChecker.checkModCount();
+                arr[dstOffset]=v;
+                return pullSurvivorsDown(arr,srcOffset,srcBound,dstOffset+1,v);
+              }
+              break;
+            }
+          }
+          modCountChecker.checkModCount();
+          return dstOffset;
+        }
+        else
+        {
+          while(++srcOffset!=srcBound)
+          {
+            if(arr[srcOffset]^v)
+            {
+              if(!filter.test(!v))
+              {
+                break;
+              }
+              modCountChecker.checkModCount();
+              return pullSurvivorsDown(arr,srcOffset,srcBound,srcOffset,v);
+            }
+          }
+        }
+        modCountChecker.checkModCount();
+        return srcBound;
+#ELSE
+        do
+        {
+          if(filter.test(($exposedType$)arr[srcOffset]))
+          {
+            int dstOffset=srcOffset;
+            while(++srcOffset!=srcBound)
+            {
+              final $ArrayType$ v;
+              if(!filter.test(v=arr[srcOffset]))
+              {
+                int newDstOffset=markAndPullDown(arr,srcOffset+1,srcBound,filter,dstOffset+1,modCountChecker);
+                arr[dstOffset]=v;
+                return newDstOffset;
+              }
+            }
+            modCountChecker.checkModCount();
+            return dstOffset;
+          }
+        }
+        while(++srcOffset!=srcBound);
+        modCountChecker.checkModCount();
+        return srcBound;
+#ENDIF
+      }
+      catch(final ConcurrentModificationException e)
+      {
+        throw e;
+      }
+      catch(final RuntimeException e)
+      {
+        throw modCountChecker.handleException(e);
+      }
+    }
+#IFNOT OfBoolean
+    private static int markAndPullDown($ArrayType$[] arr,int srcOffset,int srcBound,$TypeNameModifier$Predicate$<? super E>$ filter,int dstOffset,CheckedCollection.AbstractModCountChecker modCountChecker)
+    {
+      int nRemaining;
+      if((nRemaining=(srcBound-srcOffset))!=0)
+      {
+        if(nRemaining>64)
+        {
+          long[] survivorSet;
+          int numSurvivors=BitSetUtil.markSurvivors(arr,srcOffset,srcBound,filter,survivorSet=BitSetUtil.getBitSet(nRemaining));
+          modCountChecker.checkModCount();
+          if(numSurvivors!=0)
+          {
+            if(numSurvivors==nRemaining)
+            {
+              System.arraycopy(arr,srcOffset,arr,dstOffset,numSurvivors);
+              dstOffset+=numSurvivors;
+            }
+            else
+            {
+              BitSetUtil.pullSurvivorsDown(arr,srcOffset,dstOffset,dstOffset+=numSurvivors,survivorSet);
+            }
+          }
+        }
+        else
+        {
+          long word=BitSetUtil.markSurvivors(arr,srcOffset,srcBound,filter);
+          modCountChecker.checkModCount();
+          int numSurvivors;
+          if((numSurvivors=Long.bitCount(word))!=0)
+          {
+            if(numSurvivors==nRemaining)
+            {
+              ArrCopy.uncheckedCopy(arr,srcOffset,arr,dstOffset,numSurvivors);
+              dstOffset+=numSurvivors;
+            }
+            else
+            {
+              BitSetUtil.pullSurvivorsDown(arr,srcOffset,dstOffset,dstOffset+=numSurvivors,word);
+            }
+          }
+        }
+      }
+      else
+      {
+        modCountChecker.checkModCount();
+      }
+      return dstOffset;
+    }
+#ENDIF
+  
+  
+  
+  
 #IFNOT OfBoolean
   @Override
   public boolean add(boolean val)
@@ -141,7 +368,6 @@ public abstract class $ClassPrefix$ArrSeq$<E>$ implements OmniCollection.Of$Clas
     #ENDIF
   #ENDIF
 #ENDIF
-  
   @Override
   public boolean add($exposedType$ val)
   {
@@ -155,44 +381,7 @@ public abstract class $ClassPrefix$ArrSeq$<E>$ implements OmniCollection.Of$Clas
     return true;
   }
 
-  @Override
-  public void forEach($TypeNameModifier$Consumer$<? super E>$ action)
-  {
-    int size;
-    if((size=this.size)!=0)
-    {
-      uncheckedForEach(size,action);
-    }
-  }
-  @Override
-  public void forEach(Consumer<? super $BoxedType$> action)
-  {
-    int size;
-    if((size=this.size)!=0)
-    {
-      uncheckedForEach(size,action::accept);
-    }
-  }
-  @Override
-  public boolean removeIf($TypeNameModifier$Predicate$<? super E>$ filter)
-  {
-    int size;
-    if((size=this.size)!=0)
-    {
-      return uncheckedRemoveIf(size,filter);
-    }
-    return false;
-  }
-  @Override
-  public boolean removeIf(Predicate<? super $BoxedType$> filter)
-  {
-    int size;
-    if((size=this.size)!=0)
-    {
-      return uncheckedRemoveIf(size,filter::test);
-    }
-    return false;
-  }
+ 
   
   @Override
   public int hashCode()
@@ -267,7 +456,6 @@ public abstract class $ClassPrefix$ArrSeq$<E>$ implements OmniCollection.Of$Clas
     }
     return dst;
   }
-
 #IF OfDouble,OfFloat
   #MACRO UncheckedContains<Bits>()
   #MACRO UncheckedContains<0>()
@@ -279,14 +467,13 @@ public abstract class $ClassPrefix$ArrSeq$<E>$ implements OmniCollection.Of$Clas
   #MACRO UncheckedContains< >()
   abstract boolean uncheckedremoveVal(int size,$queryParameterType$ val);
 #ENDIF
-  #MACRO QueryMethods<removeVal,List>()
-  #MACRO QueryMethods<contains,List>()
+  #MACRO QueryMethods<removeVal>()
+  #MACRO QueryMethods<contains>()
   abstract void uncheckedCopyInto(Object[] dst,int size);
+  #MACRO ToArrayImpl($exposedType$,$ClassPrefix$,($exposedType$),$defaultVal$,OmniArray.Of$ClassPrefix$.DEFAULT_ARR)
   #MACRO GetterMethods(ToArrayImpl)
 
-#IF OfDouble,OfFloat
-#ELSE
-#ENDIF
+
 
   abstract int uncheckedHashCode(int size);
 #IF OfDouble
@@ -299,7 +486,7 @@ public abstract class $ClassPrefix$ArrSeq$<E>$ implements OmniCollection.Of$Clas
 #ENDIF
   
   abstract void uncheckedForEach(int size,$TypeNameModifier$Consumer$<? super E>$ action);
-  abstract boolean uncheckedRemoveIf(int size,$TypeNameModifier$Predicate$<? super E>$ filter);
+
   
   
   private void uncheckedInit($exposedType$ val)
@@ -379,113 +566,251 @@ public abstract class $ClassPrefix$ArrSeq$<E>$ implements OmniCollection.Of$Clas
     return ret;
   }
   
-  #MACRO ArrStackImpl<Unchecked>()
-  #MACRO ArrStackImpl<Checked>()
-  #MACRO ArrListImpl<Unchecked>()
-  #MACRO ArrListImpl<Checked>()
-  #MACRO SubListImpl<UnChecked>()
-  #MACRO SubListImpl<Checked>()
+  #MACRO StructImpl<Stack,Unchecked>()
+  #MACRO StructImpl<Stack,Checked>()
+  #MACRO StructImpl<List,Unchecked>()
+  #MACRO StructImpl<List,Checked>()
+  #MACRO StructImpl<SubList,Unchecked>()
+  #MACRO StructImpl<SubList,Checked>()
+
+  private static abstract class AbstractItr$<E>$ implements OmniIterator.Of$ClassPrefix$$<E>$
+  {
+    #MACRO GetterMethods(IteratorNextImpl)
+  }
+
+  private static abstract interface ListDefault$<E>$ extends OmniList.Of$ClassPrefix$$<E>$
+  {
+    @Override
+    public default void add(int index,$BoxedType$ val)
+    {
+      add(index,($exposedType$)val);
+    }
+    @Override
+    public default $BoxedType$ get(int index)
+    {
+      return get$TypeNameModifier$(index);
+    }
+    @Override
+    public default $BoxedType$ set(int index,$BoxedType$ val)
+    {
+      return set(index,($exposedType$)val);
+    }
+    @Override
+    public default  $BoxedType$ remove(int index)
+    {
+      return $removeAtIndexMethod$(index);
+    }
+  }
+  private static abstract interface SubListDefault$<E>$ extends ListDefault$<E>$
+  {
+    @Override
+    public default boolean add($BoxedType$ val)
+    {
+      return this.add(($exposedType$)val);
+    }
+#IFNOT OfBoolean
+    @Override
+    public default boolean add(boolean val)
+    {
+      return this.add($queryCastBoolean$(val));
+    }
+  #IF OfLong,OfFloat,OfDouble
+    @Override
+    public default boolean add(int val)
+    {
+      return this.add(($exposedType$)val);
+    }
+    #IFNOT OfLong
+    @Override
+    public default boolean add(char val)
+    {
+      return this.add(($exposedType$)val);
+    }
+    @Override
+    public default boolean add(short val)
+    {
+      return this.add(($exposedType$)val);
+    }
+    @Override
+    public default boolean add(long val)
+    {
+      return this.add(($exposedType$)val);
+    }
+      #IFNOT OfFloat
+    @Override
+    public default boolean add(float val)
+    {
+      return this.add(($exposedType$)val);
+    }
+      #ENDIF
+    #ENDIF
+  #ENDIF
+#ENDIF
+  }
   
-#MACRODEF ArrStackImpl<CHECKED>()
-public static class CHECKEDArrStack$<E>$ extends
-#IFSWITCH CHECKED==Unchecked
-  $ClassPrefix$ArrSeq$<E>$ implements OmniStack.Of$ClassPrefix$$<E>$
+
+}
+
+
+
+
+#MACRODEF StructImpl<STRUCTNAME,CHECKED>()
+#IFSWITCH STRUCTNAME==SubList
+private
 #ELSE
-  UncheckedArrStack$<E>$
+public
+#ENDIF
+static class CHECKEDSTRUCTNAME$<E>$
+#IFSWITCH STRUCTNAME==List,Stack
+  #IFSWITCH CHECKED==Unchecked
+  extends $ClassPrefix$ArrSeq$<E>$
+  #ELSE
+  extends UncheckedSTRUCTNAME$<E>$
+  #ENDIF
+#ENDIF
+#IFSWITCH STRUCTNAME==SubList
+  implements STRUCTNAMEDefault$<E>$
+#ELSE
+  #IFSWITCH CHECKED==Unchecked
+    #IFSWITCH STRUCTNAME==Stack
+  implements OmniSTRUCTNAME.Of$ClassPrefix$$<E>$
+    #ELSE
+  implements STRUCTNAMEDefault$<E>$
+    #ENDIF
+  #ENDIF
 #ENDIF
 {
+#IFSWITCH STRUCTNAME==SubList
+  transient final CHECKEDList$<E>$ root;
+  transient final CHECKEDSTRUCTNAME$<E>$ parent;
+  transient final int rootOffset;
+  transient int size;
+#ENDIF
 #IFSWITCH CHECKED==Checked
   transient int modCount;
 #ENDIF
-  public CHECKEDArrStack()
+
+
+
+#IFSWITCH STRUCTNAME==SubList
+  private CHECKEDSTRUCTNAME(CHECKEDList$<E>$ root,int rootOffset,int size
+  #IFSWITCH CHECKED==Checked
+    ,int modCount
+  #ENDIF
+  )
+  {
+  #IFSWITCH CHECKED==Checked
+    this.modCount=modCount;
+  #ENDIF
+    this.root=root;
+    this.parent=null;
+    this.rootOffset=rootOffset;
+    this.size=size;
+  }
+  private CHECKEDSTRUCTNAME(CHECKEDSTRUCTNAME$<E>$ parent,int rootOffset,int size
+  #IFSWITCH CHECKED==Checked
+    ,int modCount
+  #ENDIF
+  )
+  {
+  #IFSWITCH CHECKED==Checked
+    this.modCount=modCount;
+  #ENDIF
+    this.root=parent.root;
+    this.parent=parent;
+    this.rootOffset=rootOffset;
+    this.size=size;
+  }
+#ELSE
+  public CHECKEDSTRUCTNAME()
   {
     super();
   }
-  public CHECKEDArrStack(int initialCapacity)
+  public CHECKEDSTRUCTNAME(int initialCapacity)
   {
     super(initialCapacity);
   }
-  public CHECKEDArrStack(int size,$ArrayType$[] arr)
+  private CHECKEDSTRUCTNAME(int size,$ArrayType$[] arr)
   {
     super(size,arr);
   }
+#ENDIF
+
   @Override
   public boolean equals(Object val)
   {
-    //TODO
+    //TODO implement equals(Object) method
     return false;
   }
   @Override
   public Object clone()
   {
-    $ArrayType$[] copy;
-    int size;
+    final $ArrayType$[] copy;
+    final int size;
+    #MACRO SubListCheckModCount<clone>()
     if((size=this.size)!=0)
     {
+#IFSWITCH STRUCTNAME==SubList
+      ArrCopy.uncheckedCopy(root.arr,this.rootOffset,copy=new $ArrayType$[size],0,size);
+#ELSE
       ArrCopy.uncheckedCopy(this.arr,0,copy=new $ArrayType$[size],0,size);
+#ENDIF
     }
     else
     {
       copy=OmniArray.Of$ClassPrefix$.DEFAULT_ARR;
     }
-    return new CHECKEDArrStack$<E>$(size,copy);
-  }
-  @Override
-  void uncheckedForEach(int size,$TypeNameModifier$Consumer$<? super E>$ action)
-  {
-#IFSWITCH CHECKED==Unchecked
-    final var arr=this.arr;
-    for(;;)
-    {
-      action.accept(($exposedType$)arr[--size]);
-      if(size==0)
-      {
-        return;
-      }
-    }
+#IFSWITCH STRUCTNAME==SubList
+    return new CHECKEDList$<E>$(size,copy);
 #ELSE
-    int modCount=this.modCount;
-    try
-    {
-      super.uncheckedForEach(size,action);
-    }
-    finally
-    {
-      CheckedCollection.checkModCount(modCount,this.modCount);
-    }
+    return new CHECKEDSTRUCTNAME$<E>$(size,copy);
 #ENDIF
   }
   @Override
-  public $exposedType$ pop$TypeNameModifier$()
+  public OmniIterator.Of$ClassPrefix$$<E>$ iterator()
   {
-#IFSWITCH CHECKED==Unchecked
-    return ($exposedType$)arr[--this.size];
-#ELSE
-    int size;
-    if((size=this.size)!=0)
-    {
-      ++this.modCount;
-      final $exposedType$ ret=($exposedType$)arr[--size];
-      this.size=size;
-      return ret;
-    }
-    throw new NoSuchElementException();
-#ENDIF
+    #MACRO SubListCheckModCount<iterator>()
+    return new Itr$<E>$(this);
   }
-  #MACRO GetterMethods(PollImpl)
-   
- @Override
+  @Override
   public <T> T[] toArray(IntFunction<T[]> arrConstructor)
   {
-#IFSWITCH CHECKED==Unchecked
-    int size;
-    T[] dst=arrConstructor.apply(size=this.size);
+#IFSWITCH STRUCTNAME==SubList
+    final int size;
+    final T[] dst;
+  #IFSWITCH CHECKED==Checked
+    int modCount=this.modCount;
+    final var root=this.root;
+    try
+  #ENDIF
+    {
+      dst=arrConstructor.apply(size=this.size);
+    }
+  #IFSWITCH CHECKED==Checked
+    finally
+    {
+      CheckedCollection.checkModCount(modCount,root.modCount);
+    }
+  #ENDIF
     if(size!=0)
     {
-      ArrCopy.uncheckedReverseCopy(this.arr,0,dst,0,size);
+      ArrCopy.uncheckedCopy(root.arr,this.rootOffset,dst,0,size);
     }
     return dst;
 #ELSE
+  #IFSWITCH CHECKED==Unchecked
+    final int size;
+    T[] dst=arrConstructor.apply(size=this.size);
+    if(size!=0)
+    {
+    #IFSWITCH STRUCTNAME==Stack
+      ArrCopy.uncheckedReverseCopy(this.arr,0,dst,0,size);
+    #ELSE
+      ArrCopy.uncheckedCopy(this.arr,0,dst,0,size);
+    #ENDIF
+    }
+    return dst;
+  #ELSE
     return super.toArray((arrSize)->
     {
       int modCount=this.modCount;
@@ -498,667 +823,863 @@ public static class CHECKEDArrStack$<E>$ extends
         CheckedCollection.checkModCount(modCount,this.modCount);
       }
     });
+  #ENDIF
 #ENDIF
   }
-  @Override
-  public OmniIterator.Of$ClassPrefix$$<E>$ iterator()
-  {
-    //TODO
-    return null;
-  }
-  @Override
-  boolean uncheckedRemoveIf(int size,$TypeNameModifier$Predicate$<? super E>$ filter)
-  {
-    //TODO
-    return false;
-  }
+  #MACRO SubTypeToArrayImpl($exposedType$,$ClassPrefix$,($exposedType$),$defaultVal$,OmniArray.Of$ClassPrefix$.DEFAULT_ARR)
+  #MACRO GetterMethods(SubTypeToArrayImpl)
+  #MACRO ItrImpl<Itr>()
 #IF OfDouble,OfFloat
-  #MACRO UncheckedRemoveVal<Stack,Bits>()
-  #MACRO UncheckedRemoveVal<Stack,0>()
-  #MACRO UncheckedRemoveVal<Stack,NaN>()
+  #MACRO UncheckedRemoveVal<Bits>()
+  #MACRO UncheckedRemoveVal<0>()
+  #MACRO UncheckedRemoveVal<NaN>()
 #ELSE
-  #MACRO UncheckedRemoveVal<Stack, >()
+  #MACRO UncheckedRemoveVal< >()
 #ENDIF
-#IFSWITCH CHECKED==Unchecked
+
+
+   #MACRO ForEachImpl($TypeNameModifier$Consumer$<? super E>$,action)
+  #MACRO ForEachImpl(Consumer<? super $BoxedType$>,action::accept)
+  
+
+ 
+
+
+#IFSWITCH STRUCTNAME==Stack
+  @Override
+  public $exposedType$ pop$TypeNameModifier$()
+  {
+  #IFSWITCH CHECKED==Unchecked
+    return ($exposedType$)arr[--this.size];
+  #ELSE
+    int size;
+    if((size=this.size)!=0)
+    {
+      ++this.modCount;
+      final $exposedType$ ret=($exposedType$)arr[--size];
+      this.size=size;
+      return ret;
+    }
+    throw new NoSuchElementException();
+  #ENDIF
+  }
+  #MACRO PollImpl($exposedType$,$ClassPrefix$,($exposedType$),$defaultVal$,OmniArray.Of$ClassPrefix$.DEFAULT_ARR)
+  #MACRO GetterMethods(PollImpl)
+  #IFSWITCH CHECKED==Unchecked
   @Override
   public $BoxedType$ pop()
   {
     return pop$TypeNameModifier$();
   }
-  #MACRO QueryMethods<search,Stack>()
+  #MACRO QueryMethods<search>()
+  #MACRO PeekImpl($exposedType$,$ClassPrefix$,($exposedType$),$defaultVal$,OmniArray.Of$ClassPrefix$.DEFAULT_ARR)
   #MACRO GetterMethods(PeekImpl)
-  #MACRO GetterMethods(StackToArrayImpl)
-  #MACRO StackToArrayImpl(Object,,,,)
+    #IF OfDouble,OfFloat
+  #MACRO UncheckedSearch<Bits>()
+  #MACRO UncheckedSearch<0>()
+  #MACRO UncheckedSearch<NaN>()
+    #ELSE
+  #MACRO UncheckedSearch< >()
+    #ENDIF
+  #ENDIF
+#ENDIF
+
+
+
+
+#IFSWITCH STRUCTNAME==List
+  #IFSWITCH CHECKED==Unchecked
+  private void uncheckedAdd(int index,$exposedType$ val,int size)
+  {
+    if(size!=0)
+    {
+      super.uncheckedInsert(size,index,val);
+    }
+    else
+    {
+      super.uncheckedInit(val);
+    }
+  }
+  /*
+  private void sublistForEach(int rootOffset,int size,$TypeNameModifier$Consumer$<? super E>$ action)
+  {
+    final var arr=this.arr;
+    for(size+=rootOffset;;)
+    {
+      action.accept(($exposedType$)arr[rootOffset]);
+      if(++rootOffset==size)
+      {
+        return;
+      }
+    }
+  }
+  */
+  private void uncheckedReplaceAll(int offset,int bound,$UnaryOperator$$<E>$ operator)
+  {
+    final var arr=this.arr;
+    for(;;)
+    {
+      arr[offset]=operator.$applyMethod$(($exposedType$)arr[offset]);
+      if(++offset==bound)
+      {
+        return;
+      }
+    }
+  }
+    #IF OfDouble,OfFloat
+  #MACRO SubListContains<Bits>()
+  #MACRO SubListContains<0>()
+  #MACRO SubListContains<NaN>()
+  #MACRO SubListIndexOf<Bits>()
+  #MACRO UncheckedIndexOf<Bits>()
+  #MACRO SubListIndexOf<0>()
+  #MACRO UncheckedIndexOf<0>()
+  #MACRO SubListIndexOf<NaN>()
+  #MACRO UncheckedIndexOf<NaN>()
+  #MACRO SubListLastIndexOf<Bits>()
+  #MACRO UncheckedLastIndexOf<Bits>()
+  #MACRO SubListLastIndexOf<0>()
+  #MACRO UncheckedLastIndexOf<0>()
+  #MACRO SubListLastIndexOf<NaN>()
+  #MACRO UncheckedLastIndexOf<NaN>()
+    #ELSE
+  #MACRO SubListContains< >()
+  #MACRO SubListIndexOf< >()
+  #MACRO UncheckedIndexOf< >()
+  #MACRO SubListLastIndexOf< >()
+  #MACRO UncheckedLastIndexOf< >()
+    #ENDIF
+  #ENDIF
+#ENDIF
+
+
+#IFSWITCH STRUCTNAME==SubList
+
+  #MACRO RemoveIfImpl($TypeNameModifier$Predicate$<? super E>$,filter)
+  #MACRO RemoveIfImpl(Predicate<? super $BoxedType$>,filter::test)
+  #MACRO QueryMethods<contains>()
+   
+  @Override
+  public int hashCode()
+  {
+    #MACRO SubListCheckModCount<hashCode>()
+    int size;
+    if((size=this.size)!=0)
+    {
+      final $ArrayType$[] arr;
+      int hash;
+      int i;
+      for(hash=31+$hashCodeMethod$((arr=root.arr)[i=this.rootOffset]),size+=i;++i!=size;hash=hash*31+$hashCodeMethod$(arr[i])){}
+      return hash;
+    }
+    return 1;
+  }
+  @Override
+  public boolean isEmpty()
+  {
+    #MACRO SubListCheckModCount<isEmpty>()
+    return this.size==0;
+  }
+
+  #MACRO QueryMethods<removeVal>()
+  @Override
+  public int size()
+  {
+    #MACRO SubListCheckModCount<size>()
+    return this.size;
+  }
+  @Override
+  public <T> T[] toArray(T[] dst)
+  {
+    #MACRO SubListCheckModCount<toArray>()
+    int size;
+    if((size=this.size)!=0)
+    {
+      ArrCopy.uncheckedCopy(root.arr,this.rootOffset,dst=OmniArray.uncheckedArrResize(size,dst),0,size);
+    }
+    else if(dst.length!=0)
+    {
+      dst[0]=null;
+    }
+    return dst;
+  }
+  @Override
+  public String toString()
+  {
+    #MACRO SubListCheckModCount<toString>()
+    int size;
+    if((size=this.size)!=0)
+    {
+ #IF OfBoolean
+      if(size>(Integer.MAX_VALUE/6))
+      {
+        throw new OutOfMemoryError();
+      }
+#ELSEIF OfDouble,OfFloat
+      if(size>(Integer.MAX_VALUE/5))
+      {
+        throw new OutOfMemoryError();
+      }
+#ELSE
+      if(size>(Integer.MAX_VALUE/3))
+      {
+        throw new OutOfMemoryError();
+      }
+#ENDIF
+#IF OfDouble
+      final StringBuilder builder;
+      final $ArrayType$[] arr;
+      int i;
+      for(builder=new StringBuilder("[").append((arr=root.arr)[i=this.rootOffset]),size+=i;++i!=size;builder.append(',').append(' ').append(arr[i])){}
+      return builder.append(']').toString();
+#ELSEIF OfChar
+      final char[] buffer;
+      final $ArrayType$[] arr;
+      int bufferOffset,i;
+      for((buffer=new char[size*3])[bufferOffset=1]=(arr=root.arr)[i=this.rootOffset],size+=i;++i!=size;buffer[++bufferOffset]=',',buffer[++bufferOffset]=' ',buffer[++bufferOffset]=arr[i]){}
+      buffer[++bufferOffset]=']';
+      buffer[0]='[';
+      return new String(buffer,0,bufferOffset+1);
+#ELSEIF OfBoolean
+      #MACRO ToStringFastImpl<true>(7,size<=(int)(OmniArray.MAX_ARR_SIZE/6.5f)?(size*6)+(size>>>1):OmniArray.MAX_ARR_SIZE)
+#ELSEIF OfByte
+      #MACRO ToStringFastImpl<true>(6,size<=(int)(OmniArray.MAX_ARR_SIZE/5)?(size*5):OmniArray.MAX_ARR_SIZE)
+#ELSEIF OfShort
+      #MACRO ToStringFastImpl<true>(8,size<=(int)(OmniArray.MAX_ARR_SIZE/5.5f)?(size*5)+(size>>>1):OmniArray.MAX_ARR_SIZE)
+#ELSEIF OfInt
+      #MACRO ToStringFastImpl<true>(13,size<=(int)(OmniArray.MAX_ARR_SIZE>>>3)?(size<<3):OmniArray.MAX_ARR_SIZE)
+#ELSEIF OfLong
+      #MACRO ToStringFastImpl<true>(22,size<=(int)(OmniArray.MAX_ARR_SIZE/12.5f)?(size*12)+(size>>>1):OmniArray.MAX_ARR_SIZE)
+#ELSE
+      #MACRO ToStringFastImpl<true>(17,size<=(int)(OmniArray.MAX_ARR_SIZE/11)?(size*11):OmniArray.MAX_ARR_SIZE)
+#ENDIF
+    }
+    return "[]";
+  }
+  @Override
+  public boolean add($exposedType$ val)
+  {
+    int rootSize;
+#IFSWITCH CHECKED==Checked
+    #MACRO SubListCheckModCount<add>()
+    root.modCount=++modCount;
+    this.modCount=modCount;
+    if((rootSize=root.size)!=0)
+#ELSE
+    final UncheckedList$<E>$ root;
+    if((rootSize=(root=this.root).size)!=0)
+#ENDIF
+    {
+      #MACRO BubbleUpIncrementSize()
+      (($ClassPrefix$ArrSeq$<E>$)root).uncheckedInsert(rootSize,this.rootOffset,val);
+      ++this.size;
+    }
+    else
+    {
+      #MACRO BubbleUpInit()
+      (($ClassPrefix$ArrSeq$<E>$)root).uncheckedInit(val);
+      this.size=1;
+    }
+    return true;
+  }
+#IFSWITCH CHECKED==Checked
+  private $ClassPrefix$ArrSeq$<E>$ checkModCountAndGetRoot()
+  {
+    final CHECKEDList$<E>$ root;
+    CheckedCollection.checkModCount(this.modCount,(root=this.root).modCount);
+    return root;
+  }
+#ENDIF
+  @Override
+  public void clear()
+  {
+    #MACRO SubListCheckModCount<clear>()
+    int size;
+    if((size=this.size)!=0)
+    {
+#IFSWITCH CHECKED==Checked
+      root.modCount=++modCount;
+      this.modCount=modCount;
+      for(var curr=parent;curr!=null;parent.modCount=modCount,parent.size-=size){}
+      int rootOffset;
+      ArrCopy.semicheckedSelfCopy(root.arr,(rootOffset=this.rootOffset)+size,rootOffset,(root.size-=size)-rootOffset);
+#ELSE
+      for(var curr=parent;curr!=null;parent.size-=size){}
+      final UncheckedList$<E>$ root;
+      int rootOffset;
+      ArrCopy.semicheckedSelfCopy((root=this.root).arr,(rootOffset=this.rootOffset)+size,rootOffset,(root.size-=size)-rootOffset);
+#ENDIF
+      this.size=0;
+    }
+  }
+#ENDIF
+
+
+
+
+
+#IFSWITCH STRUCTNAME==List,Stack
+  @Override
+  void uncheckedForEach(int size,$TypeNameModifier$Consumer$<? super E>$ action)
+  {
+  #IFSWITCH CHECKED==Checked
+    int modCount=this.modCount;
+    try
+  #ENDIF
+    {
+  #IFSWITCH STRUCTNAME==Stack
+      uncheckedForEachDescending(this.arr,0,size,action);
+  #ELSE
+      uncheckedForEachAscending(this.arr,0,size,action);
+  #ENDIF
+    }
+  #IFSWITCH CHECKED==Checked
+    finally
+    {
+      CheckedCollection.checkModCount(modCount,this.modCount);
+    }
+  #ENDIF
+  }
+
+  
+
+  #MACRO SubTypeToArrayImpl(Object,,,,)
+  
+  #IFSWITCH CHECKED==Unchecked
   @Override
   int uncheckedHashCode(int size)
   {
     final $ArrayType$[] arr;
     int hash;
+    #IFSWITCH STRUCTNAME==Stack
     for(hash=31+$hashCodeMethod$((arr=this.arr)[--size]);size!=0;hash=hash*31+$hashCodeMethod$(arr[--size])){}
+    #ELSE
+    int i;
+    for(hash=31+$hashCodeMethod$((arr=this.arr)[i=0]);++i!=size;hash=hash*31+$hashCodeMethod$(arr[i])){}
+    #ENDIF
     return hash;
   }
-  #IF OfDouble
+    #IF OfDouble
   @Override
   void uncheckedToString(int size,StringBuilder builder)
   {
     final $ArrayType$[] arr;
+      #IFSWITCH STRUCTNAME==Stack
     for(builder.append((arr=this.arr)[--size]);size!=0;builder.append(',').append(' ').append(arr[--size])){}
+      #ELSE
+    int i;
+    for(builder.append((arr=this.arr)[i=0]);++i!=size;builder.append(',').append(' ').append(arr[i])){}
+      #ENDIF
   }
-  #ELSEIF OfChar
+    #ELSEIF OfChar
   @Override
   void uncheckedToString(int size,char[] buffer)
   {
     final $ArrayType$[] arr;
     int bufferOffset;
+      #IFSWITCH STRUCTNAME==Stack
     for(buffer[bufferOffset=1]=(arr=this.arr)[--size];size!=0;buffer[++bufferOffset]=',',buffer[++bufferOffset]=' ',buffer[++bufferOffset]=arr[--size]){}
+      #ELSE
+    int i;
+    for(buffer[bufferOffset=1]=(arr=this.arr)[i=0];++i!=size;buffer[++bufferOffset]=',',buffer[++bufferOffset]=' ',buffer[++bufferOffset]=arr[i]){}
+      #ENDIF
   }
-  #ELSE
+    #ELSE
   @Override
   int uncheckedToString(int size,char[] buffer)
   {
     final $ArrayType$[] arr;
     int bufferOffset;
-    #IF OfByte
+      #IFSWITCH STRUCTNAME==Stack
+        #IF OfByte
     for(bufferOffset=ToStringUtil.getStringShort((arr=this.arr)[--size],buffer,1);size!=0;buffer[bufferOffset]=',',buffer[++bufferOffset]=' ',bufferOffset=ToStringUtil.getStringShort(arr[--size],buffer,bufferOffset)){}
-    #ELSE
+        #ELSE
     for(bufferOffset=ToStringUtil.getString$ClassPrefix$((arr=this.arr)[--size],buffer,1);size!=0;buffer[bufferOffset]=',',buffer[++bufferOffset]=' ',bufferOffset=ToStringUtil.getString$ClassPrefix$(arr[--size],buffer,bufferOffset)){}
-    #ENDIF
+        #ENDIF
+      #ELSE
+    int i;
+        #IF OfByte
+    for(bufferOffset=ToStringUtil.getStringShort((arr=this.arr)[i=0],buffer,1);++i!=size;buffer[bufferOffset]=',',buffer[++bufferOffset]=' ',bufferOffset=ToStringUtil.getStringShort(arr[i],buffer,bufferOffset)){}
+        #ELSE
+    for(bufferOffset=ToStringUtil.getString$ClassPrefix$((arr=this.arr)[i=0],buffer,1);++i!=size;buffer[bufferOffset]=',',buffer[++bufferOffset]=' ',bufferOffset=ToStringUtil.getString$ClassPrefix$(arr[i],buffer,bufferOffset)){}
+        #ENDIF
+      #ENDIF
     return bufferOffset;
   }
   @Override
   void uncheckedToString(int size,ToStringUtil.OmniStringBuilder builder)
   {
     final $ArrayType$[] arr;
-    #IF OfByte
+      #IFSWITCH STRUCTNAME==Stack
+        #IF OfByte
     for(builder.uncheckedAppendShort((arr=this.arr)[--size]);size!=0;builder.uncheckedAppendCommaAndSpace(),builder.uncheckedAppendShort(arr[--size])){}
-    #ELSE
+        #ELSE
     for(builder.uncheckedAppend$ClassPrefix$((arr=this.arr)[--size]);size!=0;builder.uncheckedAppendCommaAndSpace(),builder.uncheckedAppend$ClassPrefix$(arr[--size])){}
-    #ENDIF
+        #ENDIF
+      #ELSE
+    int i;
+        #IF OfByte
+    for(builder.uncheckedAppendShort((arr=this.arr)[i=0]);++i!=size;builder.uncheckedAppendCommaAndSpace(),builder.uncheckedAppendShort(arr[i])){}
+        #ELSE
+    for(builder.uncheckedAppend$ClassPrefix$((arr=this.arr)[i=0]);++i!=size;builder.uncheckedAppendCommaAndSpace(),builder.uncheckedAppend$ClassPrefix$(arr[i])){}
+        #ENDIF
+      #ENDIF
   }
-  #ENDIF
-  #IF OfDouble,OfFloat
-    #MACRO UncheckedSearch<Bits>()
-    #MACRO UncheckedSearch<0>()
-    #MACRO UncheckedSearch<NaN>()
+    #ENDIF
   #ELSE
-    #MACRO UncheckedSearch< >()
-  #ENDIF
-#ELSE
- @Override
+  #MACRO RemoveIfImpl($TypeNameModifier$Predicate$<? super E>$,filter)
+  #MACRO RemoveIfImpl(Predicate<? super $BoxedType$>,filter::test)
   public void push($exposedType$ val)
   {
     ++this.modCount;
     super.push(val);
   }
+  @Override
+  public void clear()
+  {
+    if(this.size!=0)
+    {
+      ++this.modCount;
+      this.size=0;
+    }
+  }
+  #ENDIF
 #ENDIF
+
+
+
+
+
+#IFSWITCH STRUCTNAME==List,SubList
+
+   #MACRO ItrImpl<LstItr>()
+
+
+
+
+  @Override
+  public OmniList.Of$ClassPrefix$$<E>$ subList(int fromIndex,int toIndex)
+  {
+  #IFSWITCH CHECKED==Checked
+    #MACRO SubListCheckModCount<subList>()
+    int span;
+    if((span=toIndex-fromIndex)<0|| fromIndex<0 ||  toIndex>this.size)
+    {
+      throw new InvalidReadIndexException("fromIndex="+fromIndex+"; toIndex="+toIndex+"; size="+this.size);
+    }
+  #ENDIF
+  #IFSWITCH STRUCTNAME==SubList
+    #IFSWITCH CHECKED==Unchecked
+    return new CHECKEDSTRUCTNAME$<E>$(this,this.rootOffset+fromIndex,toIndex-fromIndex);
+    #ELSE
+    return new CHECKEDSTRUCTNAME$<E>$(this,this.rootOffset+fromIndex,span,modCount);
+    #ENDIF
+  #ELSE
+    #IFSWITCH CHECKED==Unchecked
+    return new CHECKEDSubList$<E>$(this,fromIndex,toIndex-fromIndex);
+    #ELSE
+    return new CHECKEDSubList$<E>$(this,fromIndex,span,modCount);
+    #ENDIF
+  #ENDIF
+  }
+  @Override
+  public OmniListIterator.Of$ClassPrefix$$<E>$ listIterator()
+  {
+    #MACRO SubListCheckModCount<listIterator>()
+    return new LstItr$<E>$(this);
+  }
+  @Override
+  public OmniListIterator.Of$ClassPrefix$$<E>$ listIterator(int index)
+  {
+    #MACRO SubListCheckModCount<listIterator>()
+  #IFSWITCH CHECKED==Checked
+    if(index<0 || size<index)
+    {
+      throw new InvalidWriteIndexException(index,size);
+    }
+  #ENDIF
+  #IFSWITCH STRUCTNAME==SubList
+    return new LstItr$<E>$(this,index+this.rootOffset);
+  #ELSE
+    return new LstItr$<E>$(this,index);
+  #ENDIF
+  }
+  #MACRO ComparatorSortImpl<Stable>($Comparator$$<? super E>$,sorter)
+  #MACRO ComparatorSortImpl<Stable>(Comparator<? super $BoxedType$>,sorter::compare)
+  #IFNOT OfBoolean
+  #MACRO ComparatorSortImpl<Unstable>($Comparator$$<? super E>$,sorter)
+  #ENDIF
+  #MACRO NonComparatorSortImpl(Ascending)
+  #MACRO NonComparatorSortImpl(Descending)
+  #MACRO ReplaceAllImpl($UnaryOperator$$<E>$,operator)
+  #MACRO ReplaceAllImpl(UnaryOperator<$BoxedType$>,operator::apply)
+  @Override
+  public void add(int index,$exposedType$ val)
+  {
+    #MACRO SubListCheckModCount<add>()
+  #IFSWITCH CHECKED==Checked
+    int size;
+    if((size=this.size)<index || index<0)
+    {
+      throw new InvalidWriteIndexException(index,size);
+    }
+    #IFSWITCH STRUCTNAME==SubList
+    root.modCount=++modCount;
+    this.modCount=modCount;
+    #ELSE
+    ++this.modCount;
+    #ENDIF
+  #ENDIF
+  #IFSWITCH STRUCTNAME==SubList
+    int rootSize;
+    #IFSWITCH CHECKED==Checked
+    if((rootSize=root.size)!=0)
+    #ELSE
+    final CHECKEDList$<E>$ root;
+    if((rootSize=(root=this.root).size)!=0)
+    #ENDIF
+    {
+      #MACRO BubbleUpIncrementSize()
+      (($ClassPrefix$ArrSeq$<E>$)root).uncheckedInsert(rootSize,index+this.rootOffset,val);
+      ++this.size;
+    }
+    else
+    {
+      #MACRO BubbleUpInit()
+      (($ClassPrefix$ArrSeq$<E>$)root).uncheckedInit(val);
+      this.size=1;
+    }
+  #ELSE
+    ((UncheckedList$<E>$)this).uncheckedAdd(index,val,size);
+  #ENDIF
+  }
+   
+  @Override
+  public $exposedType$ get$TypeNameModifier$(int index)
+  {
+    #MACRO SubListCheckModCount<get>()
+    #MACRO CheckGetPutIndex<Read>()
+  #IFSWITCH STRUCTNAME==List
+    return ($exposedType$)arr[index];
+  #ELSE
+    return ($exposedType$)root.arr[index+this.rootOffset];
+  #ENDIF
+  }
+  @Override
+  public void put(int index,$exposedType$ val)
+  {
+    #MACRO SubListCheckModCount<put>()
+    #MACRO CheckGetPutIndex<Write>()
+  #IFSWITCH STRUCTNAME==List
+    arr[index]=val;
+  #ELSE
+    root.arr[index+this.rootOffset]=val;
+  #ENDIF
+  }
+  @Override
+  public $exposedType$ set(int index,$exposedType$ val)
+  {
+    #MACRO SubListCheckModCount<set>()
+    #MACRO CheckGetPutIndex<Read>()
+    final $ArrayType$[] arr;
+  #IFSWITCH STRUCTNAME==List
+    final $exposedType$ ret=($exposedType$)(arr=this.arr)[index];
+  #ELSE
+    final $exposedType$ ret=($exposedType$)(arr=root.arr)[index+=this.rootOffset];
+  #ENDIF
+    arr[index]=val;
+    return ret;
+  }
+  @Override
+  public $exposedType$ $removeAtIndexMethod$(int index)
+  {
+    #MACRO SubListCheckModCount<removeAtIndex>()
+  #IFSWITCH CHECKED==Checked
+    int size;
+    if((size=this.size)<=index || index<0)
+    {
+      throw new InvalidWriteIndexException(index,size);
+    }
+  #ENDIF
+  #IFSWITCH STRUCTNAME==List
+    #IFSWITCH CHECKED==Checked
+    ++this.modCount;
+    #ENDIF
+    return (($ClassPrefix$ArrSeq$<E>$)this).uncheckedremoveAtIndex(index,size);
+  #ELSE
+    #IFSWITCH CHECKED==Checked
+    root.modCount=++modCount;
+    this.modCount=modCount;
+    #ENDIF
+    #MACRO BubbleUpDecrementSize()
+    #IFSWITCH CHECKED==Checked
+    this.size=size-1;
+    return (($ClassPrefix$ArrSeq$<E>$)root).uncheckedremoveAtIndex(index+this.rootOffset,root.size);
+    #ELSE
+    --this.size;
+    final $ClassPrefix$ArrSeq$<E>$ root;
+    return (root=this.root).uncheckedremoveAtIndex(index+this.rootOffset,root.size);
+    #ENDIF
+  #ENDIF
+  }
+  #IFSWITCH CHECKED==Unchecked
+
+  //TODO implement AND and OR in the template switches to avoid writing this twice
+  #MACRO QueryMethods<indexOf>()
+  //TODO implement AND and OR in the template switches to avoid writing this twice
+  #MACRO QueryMethods<lastIndexOf>()
+  #ELSEIFSWITCH STRUCTNAME==SubList
+
+  //TODO implement AND and OR in the template switches to avoid writing this twice
+  #MACRO QueryMethods<indexOf>()
+  //TODO implement AND and OR in the template switches to avoid writing this twice
+  #MACRO QueryMethods<lastIndexOf>()
+  #ENDIF
+
+  
+  
+#ENDIF
+
+
+
 }
 #ENDDEF
-  
-  public static class UncheckedArrStack$<E>$ extends $ClassPrefix$ArrSeq$<E>$ implements OmniStack.Of$ClassPrefix$$<E>$
-  {
-   
-   
 
-   
-    @Override
-    public <T> T[] toArray(IntFunction<T[]> arrConstructor)
-    {
-      int size;
-      T[] dst=arrConstructor.apply(size=this.size);
-      if(size!=0)
-      {
-        ArrCopy.uncheckedReverseCopy(this.arr,0,dst,0,size);
-      }
-      return dst;
-    }
-  }
-  
- 
-  
-  public static class CheckedArrStack$<E>$ extends UncheckedArrStack$<E>$
-  {
-   
-    
 
-   
 
-  }
-  
-  
-#MACRODEF ArrListImpl<CHECKED>()
-  private static class CHECKEDArrList$<E>$ extends
-#IFSWITCH CHECKED==Unchecked
-    $ClassPrefix$ArrSeq$<E>$ implements OmniList.Of$ClassPrefix$$<E>$
+
+
+
+#MACRODEF ComparatorSortImpl<STABLE>(COMPARATOR,ACTION)
+@Override
+#IFSWITCH STABLE==Stable
+public void sort(COMPARATOR sorter)
 #ELSE
-    UncheckedArrList$<E>$
+public void unstableSort(COMPARATOR sorter)
 #ENDIF
+{
+  int size;
+  if((size=this.size)>1)
   {
-    
-#IFSWITCH CHECKED==Checked
-    transient int modCount;
-#ENDIF
-    
-    public CHECKEDArrList()
-    {
-      super();
-    }
-    public CHECKEDArrList(int initialCapacity)
-    {
-      super(initialCapacity);
-    }
-    public CHECKEDArrList(int size,$ArrayType$[] arr)
-    {
-      super(size,arr);
-    }
-    @Override
-    public boolean equals(Object val)
-    {
-      //TODO
-      return false;
-    }
-    
-    @Override
-    public Object clone()
-    {
-      $ArrayType$[] copy;
-      int size;
-      if((size=this.size)!=0)
-      {
-        ArrCopy.uncheckedCopy(this.arr,0,copy=new $ArrayType$[size],0,size);
-      }
-      else
-      {
-        copy=OmniArray.Of$ClassPrefix$.DEFAULT_ARR;
-      }
-      return new CHECKEDArrList$<E>$(size,copy);
-    }
-    
-    @Override
-    public $exposedType$ get$TypeNameModifier$(int index)
-    {
-       #MACRO CheckedGetPutIndex<Read>()
-       return ($exposedType$)arr[index];
-    }
-    @Override
-    public void put(int index,$exposedType$ val)
-    {
-      #MACRO CheckedGetPutIndex<Write>()
-      arr[index]=val;
-    }
-    @Override
-    public $exposedType$ set(int index,$exposedType$ val)
-    {
-      #MACRO CheckGetPutIndex<Read>()
-      final $ArrayType$[] arr;
-      final $exposedType$ ret=($exposedType$)(arr=this.arr)[index];
-      arr[index]=val;
-      return ret;
-    }
-    @Override
-    public void add(int index,$exposedType$ val)
-    {
-#IFSWITCH CHECKED==Checked
-      int size;
-      if(index>(size=this.size) || index<0)
-      {
-        throw new InvalidWriteIndexException(index,size);
-      }
-      ++this.modCount;
-#ENDIF
-      (($ClassPrefix$ArrSeq$<E>$)this).uncheckedAdd(index,val,size);
-    }
-    @Override
-    void uncheckedForEach(int size,$TypeNameModifier$Consumer$<? super E>$ action)
-    {
-#IFSWITCH CHECKED==Unchecked
-      final var arr=this.arr;
-      for(int i=0;;)
-      {
-        action.accept(($exposedType$)arr[i]);
-        if(++i==size)
-        {
-          return;
-        }
-      }
-#ELSE
-      int modCount=this.modCount;
-      try
-      {
-        super.uncheckedForEach(size,action);
-      }
-      finally
-      {
-        CheckedCollection.checkModCount(modCount,this.modCount);
-      }
-#ENDIF
-    }
-    //TODO combine these 2 methods into 1 macro
-    @Override
-    public void replaceAll($UnaryOperator$$<E>$ operator)
-    {
-      int size;
-      if((size=this.size)!=0)
-      {
-#IFSWITCH CHECKED==Checked
-        int modCount=this.modCount;
-        try
-#ENDIF
-        {
-          ((UncheckedArrList$<E>$)this).uncheckedReplaceAll(size,operator);
-        }
-#IFSWITCH CHECKED==Checked
-        finally
-        {
-          CheckedCollection.checkModCount(modCount,this.modCount);
-          this.modCount=modCount+1;
-        }
-#ENDIF
-      }
-    }
-    @Override
-    public void replaceAll(UnaryOperator<$BoxedType$> operator)
-    {
-      int size;
-      if((size=this.size)!=0)
-      {
-#IFSWITCH CHECKED==Checked
-        int modCount=this.modCount;
-        try
-#ENDIF
-        {
-          ((UncheckedArrList$<E>$)this).uncheckedReplaceAll(size,operator::apply);
-        }
-#IFSWITCH CHECKED==Checked
-        finally
-        {
-          CheckedCollection.checkModCount(modCount,this.modCount);
-          this.modCount=modCount+1;
-        }
-#ENDIF
-      }
-    }
-    //TODO combine these 3 methods into 1 macro
-    @Override
-    public void sort($Comparator$$<? super E>$ sorter)
-    {
-      int size;
-      if((size=this.size)>1)
-      {
-        if(sorter==null)
-        {
-          $ClassPrefix$SortUtil.uncheckedAscendingSort(this.arr,0,size);
-#IFSWITCH CHECKED==Checked
-          ++this.modCount;
-#ENDIF
-        }
-        else
-        {
-#IFSWITCH CHECKED==Checked
-          int modCount=this.modCount;
-          try
-#ENDIF
-          {
-#IF OfBoolean
-            $ClassPrefix$SortUtil.uncheckedSort(this.arr,0,size,sorter);
-#ELSE
-            $ClassPrefix$SortUtil.uncheckedStableSort(this.arr,0,size,sorter);
-#ENDIF  
-          }
-#IFSWITCH CHECKED==Checked
-          finally
-          {
-            CheckedCollection.checkModCount(modCount,this.modCount);
-            this.modCount=modCount+1;
-          }
-#ENDIF
-        }
-      }
-    }
-    @Override
-    public void sort(Comparator<? super $BoxedType$> sorter)
-    {
-      int size;
-      if((size=this.size)>1)
-      {
-        if(sorter==null)
-        {
-          $ClassPrefix$SortUtil.uncheckedAscendingSort(this.arr,0,size);
-#IFSWITCH CHECKED==Checked
-          ++this.modCount;
-#ENDIF
-        }
-        else
-        {
-#IFSWITCH CHECKED==Checked
-          int modCount=this.modCount;
-          try
-#ENDIF
-          {
-#IF OfBoolean
-            $ClassPrefix$SortUtil.uncheckedSort(this.arr,0,size,sorter::compare);
-#ELSE
-            $ClassPrefix$SortUtil.uncheckedStableSort(this.arr,0,size,sorter::compare);
-#ENDIF  
-          }
-#IFSWITCH CHECKED==Checked
-          finally
-          {
-            CheckedCollection.checkModCount(modCount,this.modCount);
-            this.modCount=modCount+1;
-          }
-#ENDIF
-        }
-      }
-    }
-#IFNOT OfBoolean
-    @Override
-    public void unstableSort($Comparator$$<? super E>$ sorter)
-    {
-      int size;
-      if((size=this.size)>1)
-      {
-        if(sorter==null)
-        {
-          $ClassPrefix$SortUtil.uncheckedAscendingSort(this.arr,0,size);
+#IFSWITCH STRUCTNAME==SubList
   #IFSWITCH CHECKED==Checked
-          ++this.modCount;
+    int modCount=this.modCount;
+    final var root=this.root;
+    try
   #ENDIF
-        }
-        else
-        {
-  #IFSWITCH CHECKED==Checked
-          int modCount=this.modCount;
-          try
-  #ENDIF
-          {
-            $ClassPrefix$SortUtil.uncheckedUnstableSort(this.arr,0,size,sorter);
-          }
-  #IFSWITCH CHECKED==Checked
-          finally
-          {
-            CheckedCollection.checkModCount(modCount,this.modCount);
-            this.modCount=modCount+1;
-          }
-  #ENDIF
-        }
-      }
-    }
 #ENDIF
-        
-    //TODO combine these 2 methods into 1 macro
-    @Override
-    public void stableAscendingSort()
     {
-      int size;
-      if((size=this.size)>1)
+      if(sorter==null)
       {
+#IFSWITCH STRUCTNAME==List
         $ClassPrefix$SortUtil.uncheckedAscendingSort(this.arr,0,size);
-#IFSWITCH CHECKED==Checked
-        ++this.modCount;
-#ENDIF
-      }
-    }
-    @Override
-    public void stableDescendingSort()
-    {
-      int size;
-      if((size=this.size)>1)
-      {
-        $ClassPrefix$SortUtil.uncheckedDescendingSort(this.arr,0,size);
-#IFSWITCH CHECKED==Checked
-        ++this.modCount;
-#ENDIF
-      }
-    }    
-    
-    @Override
-    public OmniList.Of$ClassPrefix$$<E>$ subList(int fromIndex,int toIndex)
-    {
-      //TODO
-      return null;
-    }
-    @Override
-    public OmniIterator.Of$ClassPrefix$$<E>$ iterator()
-    {
-      //TODO
-      return null;
-    }
-    @Override
-    public OmniListIterator.Of$ClassPrefix$$<E>$ listIterator()
-    {
-      //TODO
-      return null;
-    }
-    @Override
-    public OmniListIterator.Of$ClassPrefix$$<E>$ listIterator(int index)
-    {
-      //TODO
-      return null;
-    }
-    
-    @Override
-    boolean uncheckedRemoveIf(int size,$TypeNameModifier$Predicate$<? super E>$ filter)
-    {
-      //TODO
-      return false;
-    }
-
-
-   
-    @Override
-    public <T> T[] toArray(IntFunction<T[]> arrConstructor)
-    {
-#IFSWITCH CHECKED==Unchecked
-      int size;
-      T[] dst=arrConstructor.apply(size=this.size);
-      if(size!=0)
-      {
-        ArrCopy.uncheckedCopy(this.arr,0,dst,0,size);
-      }
-      return dst;
 #ELSE
-      return super.toArray((arrSize)->
-      {
-        int modCount=this.modCount;
-        try
-        {
-          return arrConstructor.apply(arrSize);
-        }
-        finally
-        {
-          CheckedCollection.checkModCount(modCount,this.modCount);
-        }
-      });
+        final int rootOffset;
+        $ClassPrefix$SortUtil.uncheckedAscendingSort(root.arr,rootOffset=this.rootOffset,rootOffset+size);
 #ENDIF
-    }
-    
-    @Override
-    public $exposedType$ $removeAtIndexMethod$(int index)
-    {
-#IFSWITCH CHECKED==Checked
-      int size;
-      if((size=this.size)<=index || index<0)
-      {
-        throw new InvalidWriteIndexException(index,size);
-      }
-      ++this.modCount;
-#ENDIF
-      return (($ClassPrefix$ArrSeq$<E>$)this).uncheckedremoveAtIndex(index,size);
-    }
-
-#IF OfDouble,OfFloat
-   
-    #MACRO UncheckedRemoveVal<List,Bits>()
-    #MACRO UncheckedRemoveVal<List,0>()
-    #MACRO UncheckedRemoveVal<List,NaN>()
-   
-#ELSE
-    #MACRO UncheckedRemoveVal<List, >()
-    
-#ENDIF
-    
-#IFSWITCH CHECKED==Unchecked
-    @Override
-    public $BoxedType$ get(int index)
-    {
-      return get$TypeNameModifier$(index);
-    }
-    @Override
-    public $BoxedType$ set(int index,$BoxedType$ val)
-    {
-      return set(index,($exposedType$)val);
-    }
-    @Override
-    public $BoxedType$ remove(int index)
-    {
-      return $removeAtIndexMethod$(index);
-    }
-    @Override
-    public void add(int index,$BoxedType$ val)
-    {
-      add(index,($exposedType$)val);
-    }
-    #MACRO QueryMethods<indexOf,List>()
-    #MACRO QueryMethods<lastIndexOf,List>()
-    #MACRO GetterMethods(ListToArrayImpl)
-    #MACRO ListToArrayImpl(Object,,,,)
-    
-    @Override
-    int uncheckedHashCode(int size)
-    {
-      final $ArrayType$[] arr;
-      int hash,i;
-      for(hash=31+$hashCodeMethod$((arr=this.arr)[i=0]);++i!=size;hash=hash*31+$hashCodeMethod$(arr[i])){}
-      return hash;
-    }
-    private void uncheckedAdd(int index,$exposedType$ val,int size)
-    {
-      if(size!=0)
-      {
-        super.uncheckedInsert(size,index,val);
       }
       else
       {
-        super.uncheckedInit(val);
-      }
-    }
-    private void sublistForEach(int rootOffset,int size,$TypeNameModifier$Consumer$<? super E>$ action)
-    {
-      final var arr=this.arr;
-      for(size+=rootOffset;;)
-      {
-        action.accept(($exposedType$)arr[rootOffset]);
-        if(++rootOffset==size)
-        {
-          return;
-        }
-      }
-    }
-    private void uncheckedReplaceAll(int size,$UnaryOperator$$<E>$ operator)
-    {
-      final var arr=this.arr;
-      for(int i=0;;)
-      {
-        arr[i]=operator.$applyMethod$(($exposedType$)arr[i]);
-        if(++i==size)
-        {
-          return;
-        }
-      }
-    }
-  #IF OfDouble,OfFloat
-    #MACRO SubListContains<Bits>()
-    #MACRO SubListContains<0>()
-    #MACRO SubListContains<NaN>()
-    #MACRO SubListIndexOf<Bits>()
-    #MACRO UncheckedIndexOf<Bits>()
-    #MACRO SubListIndexOf<0>()
-    #MACRO UncheckedIndexOf<0>()
-    #MACRO SubListIndexOf<NaN>()
-    #MACRO UncheckedIndexOf<NaN>()
-    #MACRO SubListLastIndexOf<Bits>()
-    #MACRO UncheckedLastIndexOf<Bits>()
-    #MACRO SubListLastIndexOf<0>()
-    #MACRO UncheckedLastIndexOf<0>()
-    #MACRO SubListLastIndexOf<NaN>()
-    #MACRO UncheckedLastIndexOf<NaN>()
-  #ELSE
-    #MACRO SubListContains< >()
-    #MACRO SubListIndexOf< >()
-    #MACRO UncheckedIndexOf< >()
-    #MACRO SubListLastIndexOf< >()
-    #MACRO UncheckedLastIndexOf< >()
-  #ENDIF
-  #IF OfDouble
-    @Override
-    void uncheckedToString(int size,StringBuilder builder)
-    {
-      final $ArrayType$[] arr;
-      int i;
-      for(builder.append((arr=this.arr)[i=0]);++i!=size;builder.append(',').append(' ').append(arr[i])){}
-    }
-  #ELSEIF OfChar
-    @Override
-    void uncheckedToString(int size,char[] buffer)
-    {
-      final $ArrayType$[] arr;
-      int bufferOffset,i;
-      for(buffer[bufferOffset=1]=(arr=this.arr)[i=0];++i!=size;buffer[++bufferOffset]=',',buffer[++bufferOffset]=' ',buffer[++bufferOffset]=arr[i]){}
-    }
-  #ELSE
-    @Override
-    int uncheckedToString(int size,char[] buffer)
-    {
-      final $ArrayType$[] arr;
-      int bufferOffset,i;
-    #IF OfByte
-      for(bufferOffset=ToStringUtil.getStringShort((arr=this.arr)[i=0],buffer,1);++i!=size;buffer[bufferOffset]=',',buffer[++bufferOffset]=' ',bufferOffset=ToStringUtil.getStringShort(arr[i],buffer,bufferOffset)){}
+#IFSWITCH STRUCTNAME==List
+  #IFSWITCH STABLE==Stable
+    #IF OfBoolean
+        $ClassPrefix$SortUtil.uncheckedSort(this.arr,0,size,ACTION);
     #ELSE
-      for(bufferOffset=ToStringUtil.getString$ClassPrefix$((arr=this.arr)[i=0],buffer,1);++i!=size;buffer[bufferOffset]=',',buffer[++bufferOffset]=' ',bufferOffset=ToStringUtil.getString$ClassPrefix$(arr[i],buffer,bufferOffset)){}
-    #ENDIF
-      return bufferOffset;
-    }
-    @Override
-    void uncheckedToString(int size,ToStringUtil.OmniStringBuilder builder)
-    {
-      final $ArrayType$[] arr;
-      int i;
-    #IF OfByte
-      for(builder.uncheckedAppendShort((arr=this.arr)[i=0]);++i!=size;builder.uncheckedAppendCommaAndSpace(),builder.uncheckedAppendShort(arr[i])){}
-    #ELSE
-      for(builder.uncheckedAppend$ClassPrefix$((arr=this.arr)[i=0]);++i!=size;builder.uncheckedAppendCommaAndSpace(),builder.uncheckedAppend$ClassPrefix$(arr[i])){}
-    #ENDIF
-    }
+        $ClassPrefix$SortUtil.uncheckedStableSort(this.arr,0,size,ACTION);
+    #ENDIF  
+  #ELSE
+        $ClassPrefix$SortUtil.uncheckedUnstableSort(this.arr,0,size,ACTION);
   #ENDIF
 #ELSE
-    @Override
-    public void push($exposedType$ val)
-    {
+        final int rootOffset;
+  #IFSWITCH STABLE==Stable
+    #IF OfBoolean
+        $ClassPrefix$SortUtil.uncheckedSort(root.arr,rootOffset=this.rootOffset,rootOffset+size,ACTION);
+    #ELSE
+        $ClassPrefix$SortUtil.uncheckedStableSort(root.arr,rootOffset=this.rootOffset,rootOffset+size,ACTION);
+    #ENDIF  
+  #ELSE
+        $ClassPrefix$SortUtil.uncheckedUnstableSort(root.arr,rootOffset=this.rootOffset,rootOffset+size,ACTION);
+  #ENDIF
+#ENDIF
+      }
+#IFSWITCH STRUCTNAME==List
+  #IFSWITCH CHECKED==Checked
       ++this.modCount;
-      super.push(val);
+  #ENDIF
+#ENDIF
+    }
+#IFSWITCH STRUCTNAME==SubList
+  #IFSWITCH CHECKED==Checked
+    finally
+    {
+      #MACRO BubbleUpIncrementModCount()
+    }
+  #ENDIF
+#ENDIF
+  }
+#IFSWITCH CHECKED==Checked
+  #IFSWITCH STRUCTNAME==SubList
+  else
+  {
+    CheckedCollection.checkModCount(modCount,root.modCount);
+  }
+  #ENDIF
+#ENDIF
+}
+#ENDDEF
+
+
+
+#MACRODEF BubbleUpIncrementModCount()
+#IFSWITCH CHECKED==Checked
+  #IFSWITCH STRUCTNAME==SubList
+CheckedCollection.checkModCount(modCount,root.modCount);
+root.modCount=++modCount;
+this.modCount=modCount;
+for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}
+  #ENDIF
+#ENDIF
+#ENDDEF
+
+#MACRODEF NonComparatorSortImpl(DIRECTION)
+@Override
+public void stableDIRECTIONSort()
+{
+  int size;
+  if((size=this.size)>1)
+  {
+#IFSWITCH CHECKED==Checked
+  #IFSWITCH STRUCTNAME==SubList
+    int modCount=this.modCount;
+    final var root=this.root;
+    try
+  #ENDIF
+#ENDIF
+    {
+#IFSWITCH STRUCTNAME==List
+      $ClassPrefix$SortUtil.uncheckedDIRECTIONSort(this.arr,0,size);
+  #IFSWITCH CHECKED==Checked
+      ++this.modCount;
+  #ENDIF
+#ELSE
+      final int rootOffset;
+      $ClassPrefix$SortUtil.uncheckedDIRECTIONSort(root.arr,rootOffset=this.rootOffset,rootOffset+size);
+#ENDIF
+    }
+#IFSWITCH CHECKED==Checked
+  #IFSWITCH STRUCTNAME==SubList
+    finally
+    {
+      #MACRO BubbleUpIncrementModCount()
+    }
+  #ENDIF
+#ENDIF
+
+  }
+#IFSWITCH CHECKED==Checked
+  #IFSWITCH STRUCTNAME==SubList
+  else
+  {
+    CheckedCollection.checkModCount(modCount,root.modCount);
+  }
+  #ENDIF
+#ENDIF
+}
+#ENDDEF
+
+#MACRODEF ReplaceAllImpl(UNARYOPERATOR,ACTION)
+@Override
+public void replaceAll(UNARYOPERATOR operator)
+{
+  int size;
+  if((size=this.size)!=0)
+  {
+#IFSWITCH CHECKED==Checked
+    int modCount=this.modCount;
+  #IFSWITCH STRUCTNAME==SubList
+    final var root=this.root;
+  #ENDIF
+    try
+#ENDIF
+    {
+#IFSWITCH STRUCTNAME==List
+      ((UncheckedList$<E>$)this).uncheckedReplaceAll(0,size,ACTION);
+#ELSE
+      final int rootOffset;
+      ((UncheckedList$<E>$)root).uncheckedReplaceAll(rootOffset=this.rootOffset,rootOffset+size,ACTION);
+#ENDIF
+    }
+#IFSWITCH CHECKED==Checked
+    finally
+    {
+  #IFSWITCH STRUCTNAME==List
+      CheckedCollection.checkModCount(modCount,this.modCount);
+      this.modCount=modCount+1;
+  #ELSE
+      #MACRO BubbleUpIncrementModCount()
+  #ENDIF
     }
 #ENDIF
-    
   }
+#IFSWITCH CHECKED==Checked
+  #IFSWITCH STRUCTNAME==SubList
+  else
+  {
+    CheckedCollection.checkModCount(modCount,root.modCount);
+  }
+  #ENDIF
+#ENDIF
+}
 #ENDDEF
-  
-  private static class UncheckedArrList$<E>$ extends $ClassPrefix$ArrSeq$<E>$ implements OmniList.Of$ClassPrefix$$<E>$
+
+#MACRODEF ForEachImpl(CONSUMER,ACTION)
+
+@Override
+public void forEach(CONSUMER action)
+{
+  int size;
+  if((size=this.size)!=0)
   {
-    #MACRO SubListImpl<Unchecked>()
-
+#IFSWITCH CHECKED==Checked
+  #IFSWITCH STRUCTNAME==SubList
+    final var root=this.root;
+  #ENDIF
+    int modCount=this.modCount;
+    try
+#ENDIF
+    {
+#IFSWITCH STRUCTNAME==SubList
+      int rootOffset;
+      uncheckedForEachAscending(root.arr,rootOffset=this.rootOffset,rootOffset+size,ACTION);
+#ELSEIFSWITCH STRUCTNAME==List
+      uncheckedForEachAscending(arr,0,size,ACTION);
+#ELSE
+      uncheckedForEachDescending(arr,0,size,ACTION);
+#ENDIF
+    }
+#IFSWITCH CHECKED==Checked
+    finally
+    {
+  #IFSWITCH STRUCTNAME==SubList
+      CheckedCollection.checkModCount(modCount,root.modCount);
+  #ELSE
+      CheckedCollection.checkModCount(modCount,this.modCount);
+  #ENDIF
+    }
+#ENDIF
   }
-
-  public static class CheckedArrList$<E>$ extends UncheckedArrList$<E>$
+#IFSWITCH STRUCTNAME==SubList
+  #IFSWITCH CHECKED==Checked
+  else
   {
-    #MACRO SubListImpl<Checked>()
-
-
-
-
+    CheckedCollection.checkModCount(modCount,root.modCount);
   }
-
+  #ENDIF
+#ENDIF
 }
 
+#ENDDEF
 
 #MACRODEF UncheckedSearch<SUFFIX>()
 private int uncheckedsearchSUFFIX(int size
@@ -1238,14 +1759,84 @@ private int uncheckedlastIndexOfSUFFIX(int size
 }
 #ENDDEF
 
-#MACRODEF UncheckedRemoveVal<STRUCTNAME,SUFFIX>()
+#MACRODEF RemoveIfImpl(FILTER,ACTION)
+@Override
+public boolean removeIf(FILTER filter)
+{
+  int size;
+  if((size=this.size)!=0)
+  {
+    int newBound;
+#IFSWITCH STRUCTNAME==SubList
+    final $ArrayType$[] arr;
+    final CHECKEDList$<E>$ root;
+    int rootOffset,rootBound,numRemoved;
+  #IFSWITCH CHECKED==Checked
+    int modCount;
+    if((numRemoved=(rootBound=(rootOffset=this.rootOffset)+size)-(newBound=doRemoveIf(arr=(root=this.root).arr,rootOffset,rootBound,ACTION,new CheckedCollection.AbstractModCountChecker(modCount=this.modCount){
+      @Override
+      protected int getActualModCount(){
+        return root.modCount;
+      }
+    })))!=0)
+  #ELSE
+    if((numRemoved=(rootBound=(rootOffset=this.rootOffset)+size)-(newBound=doRemoveIf(arr=(root=this.root).arr,rootOffset,rootBound,ACTION)))!=0)
+  #ENDIF
+    {
+  #IFSWITCH CHECKED==Checked
+      root.modCount=++modCount;
+      this.modCount=modCount;
+      for(var curr=parent;curr!=null;curr.modCount=modCount,curr.size-=numRemoved,curr=curr.parent){}
+  #ELSE
+      for(var curr=parent;curr!=null;curr.size-=numRemoved,curr=curr.parent){}
+  #ENDIF
+      int rootSize;
+      ArrCopy.semicheckedSelfCopy(arr,rootBound,newBound,(rootSize=root.size)-rootBound);
+      root.size=rootSize-numRemoved;
+      this.size=size-numRemoved;
+      return true;
+    }
+#ELSE
+  #IFSWITCH CHECKED==Checked
+    int modCount;
+    if(size!=(newBound=doRemoveIf(this.arr,0,size,ACTION,new CheckedCollection.AbstractModCountChecker(modCount=this.modCount){
+      @Override
+      protected int getActualModCount(){
+        return CHECKEDSTRUCTNAME.this.modCount;
+      }
+    })))
+  #ELSE
+    if(size!=(newBound=doRemoveIf(this.arr,0,size,ACTION)))
+  #ENDIF
+    {
+  #IFSWITCH CHECKED==Checked
+      this.modCount=modCount+1;
+  #ENDIF
+      this.size=newBound;
+      return true;
+    }
+#ENDIF
+  }
+#IFSWITCH CHECKED==Checked
+  #IFSWITCH STRUCTNAME==SubList
+  else
+  {
+    CheckedCollection.checkModCount(modCount,root.modCount);
+  }
+  #ENDIF
+#ENDIF
+  return false;
+}
+#ENDDEF
+
+#MACRODEF UncheckedRemoveVal<SUFFIX>()
 #IFSWITCH STRUCTNAME==List,Stack
 @Override
 boolean
 #ELSEIFSWITCH STRUCTNAME==SubList
 private boolean
 #ELSE
-ERROR unknown struct name STRUCTNAME in UncheckedRemoveVal<STRUCTNAME,SUFFIX>()
+ERROR unknown struct name STRUCTNAME in UncheckedRemoveVal<SUFFIX>()
 #ENDIF
 uncheckedremoveValSUFFIX(int size
 #IFSWITCH SUFFIX==Bits
@@ -1258,14 +1849,11 @@ uncheckedremoveValSUFFIX(int size
 )
 {
 #IFSWITCH STRUCTNAME==SubList
+  final CHECKEDList$<E>$ root;
+  final var arr=(root=this.root).arr;
   #IFSWITCH CHECKED==Checked
   int modCount=this.modCount;
-  final CheckedArrList$<E>$ root;
-  final var arr=(root=this.root).arr;
   try
-  #ELSE
-  final UncheckedArrList$<E>$ root;
-  final var arr=(root=this.root).arr;
   #ENDIF
   {
     for(int i=this.rootOffset,bound=i+size;;)
@@ -1276,10 +1864,8 @@ uncheckedremoveValSUFFIX(int size
         CheckedCollection.checkModCount(modCount,root.modCount);
         root.modCount=++modCount;
         this.modCount=modCount;
-        for(var curr=parent;curr!=null;--curr.size,curr.modCount=modCount){}
-  #ELSE
-        for(var curr=parent;curr!=null;--curr.size){}
   #ENDIF
+        #MACRO BubbleUpDecrementSize()
         this.size=size-1;
         ArrCopy.semicheckedSelfCopy(arr,i+1,i,(--root.size)-i);
         return true;
@@ -1294,9 +1880,13 @@ uncheckedremoveValSUFFIX(int size
     }
   }
   #IFSWITCH CHECKED==Checked
+  catch(ConcurrentModificationException e)
+  {
+    throw e;
+  }
   catch(RuntimeException e)
   {
-    throw CheckedCollection.checkModCount(modCount,root.modCount,e);
+    throw CheckedCollection.checkModCount(modCount,this.modCount,e);
   }
   #ENDIF
 #ELSEIFSWITCH STRUCTNAME==Stack
@@ -1336,7 +1926,7 @@ uncheckedremoveValSUFFIX(int size
     }
   }
 #ELSE
-ERROR unknown struct name STRUCTNAME in UncheckedRemoveVal<STRUCTNAME,SUFFIX>()
+ERROR unknown struct name STRUCTNAME in UncheckedRemoveVal<SUFFIX>()
 #ENDIF
 }
 #ENDDEF
@@ -1359,32 +1949,12 @@ public RETTYPE pollCLASSPREFIX()
 }
 #ENDDEF
 
-
-
-#MACRODEF StackToArrayImpl(RETTYPE,CLASSPREFIX,CAST,DEFAULTRET,DEFAULTARR)
-@Override
-void uncheckedCopyInto(RETTYPE[] dst,int size)
-{
-  ArrCopy.uncheckedReverseCopy(this.arr,0,dst,0,size);
-}
-#ENDDEF
-
-#MACRODEF ListToArrayImpl(RETTYPE,CLASSPREFIX,CAST,DEFAULTRET,DEFAULTARR)
-@Override
-void uncheckedCopyInto(RETTYPE[] dst,int size)
-{
-  ArrCopy.uncheckedCopy(this.arr,0,dst,0,size);
-}
-#ENDDEF
-
-#MACRODEF SubListToArrayImpl(RETTYPE,CLASSPREFIX,CAST,DEFAULTRET,DEFAULTARR)
+#MACRODEF SubTypeToArrayImpl(RETTYPE,CLASSPREFIX,CAST,DEFAULTRET,DEFAULTARR)
+#IFSWITCH STRUCTNAME==SubList
 @Override
 public RETTYPE[] toCLASSPREFIXArray()
 {
-#IFSWITCH CHECKED==Checked
-  final CheckedArrList$<E>$ root;
-  CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
-#ENDIF
+  #MACRO SubListCheckModCount<toArray>()
   final int size;
   if((size=this.size)!=0)
   {
@@ -1394,7 +1964,22 @@ public RETTYPE[] toCLASSPREFIXArray()
   }
   return DEFAULTARR;
 }
+#ELSE
+  #IFSWITCH CHECKED==Unchecked
+@Override
+void uncheckedCopyInto(RETTYPE[] dst,int size)
+{
+  #IFSWITCH STRUCTNAME==Stack
+  ArrCopy.uncheckedReverseCopy(this.arr,0,dst,0,size);
+  #ELSE
+  ArrCopy.uncheckedCopy(this.arr,0,dst,0,size);
+  #ENDIF
+}
+  #ENDIF
+#ENDIF
 #ENDDEF
+
+
 
 #MACRODEF ToArrayImpl(RETTYPE,CLASSPREFIX,CAST,DEFAULTRET,DEFAULTARR)
 abstract void uncheckedCopyInto(RETTYPE[] dst,int size);
@@ -1569,7 +2154,6 @@ else
 #ENDDEF
 
 #MACRODEF GetterMethods(MACRONAME)
-#MACRO MACRONAME($exposedType$,$ClassPrefix$,($exposedType$),$defaultVal$,OmniArray.Of$ClassPrefix$.DEFAULT_ARR)
 #MACRO MACRONAME($BoxedType$,,($BoxedType$),null,OmniArray.Of$ClassPrefix$.DEFAULT_BOXED_ARR)
 #IFNOT OfDouble
 #MACRO MACRONAME(double,Double,$castToDouble$,Double.NaN,OmniArray.OfDouble.DEFAULT_ARR)
@@ -1592,17 +2176,26 @@ else
 #ENDIF
 #ENDDEF
 
+#MACRODEF IteratorNextImpl(RETTYPE,CLASSPREFIX,CAST,DEFAULTRET,DEFAULTARR)
+@Override
+public RETTYPE nextCLASSPREFIX()
+{
+  return CAST(next$ClassPrefix$());
+}
+#ENDDEF
+
+
 
 #MACRODEF ReturnUncheckedQuery(VAL)
 #IFSWITCH STRUCTNAME==SubList
   #IFSWITCH METHODNAME==contains
-return ((UncheckedArrList$<E>$)root).sublistcontains(this.rootOffset,size,VAL);
+return ((UncheckedList$<E>$)root).sublistcontains(this.rootOffset,size,VAL);
   #ELSEIFSWITCH METHODNAME==removeVal
 return uncheckedremoveVal(size,VAL);
   #ELSEIFSWITCH METHODNAME==indexOf
-return ((UncheckedArrList$<E>$)root).sublistindexOf(this.rootOffset,size,VAL);
+return ((UncheckedList$<E>$)root).sublistindexOf(this.rootOffset,size,VAL);
   #ELSEIFSWITCH METHODNAME==lastIndexOf
-return ((UncheckedArrList$<E>$)root).sublistlastIndexOf(this.rootOffset,size,VAL);
+return ((UncheckedList$<E>$)root).sublistlastIndexOf(this.rootOffset,size,VAL);
   #ELSE
 ERROR unknown method name METHODNAME in macro ReturnUncheckedQuery(VAL)
   #ENDIF
@@ -1626,13 +2219,13 @@ ERROR unknown method name METHODNAME in macro ReturnUncheckedQuery(VAL)
 #MACRODEF ReturnUncheckedQueryBits(VAL)
 #IFSWITCH STRUCTNAME==SubList
   #IFSWITCH METHODNAME==contains
-return ((UncheckedArrList$<E>$)root).sublistcontainsBits(this.rootOffset,size,VAL);
+return ((UncheckedList$<E>$)root).sublistcontainsBits(this.rootOffset,size,VAL);
   #ELSEIFSWITCH METHODNAME==removeVal
 return uncheckedremoveValBits(size,VAL);
   #ELSEIFSWITCH METHODNAME==indexOf
-return ((UncheckedArrList$<E>$)root).sublistindexOfBits(this.rootOffset,size,VAL);
+return ((UncheckedList$<E>$)root).sublistindexOfBits(this.rootOffset,size,VAL);
   #ELSEIFSWITCH METHODNAME==lastIndexOf
-return ((UncheckedArrList$<E>$)root).sublistlastIndexOfBits(this.rootOffset,size,VAL);
+return ((UncheckedList$<E>$)root).sublistlastIndexOfBits(this.rootOffset,size,VAL);
   #ELSE
 ERROR unknown method name METHODNAME in macro ReturnUncheckedQueryBits(VAL)
   #ENDIF
@@ -1656,13 +2249,13 @@ ERROR unknown method name METHODNAME in macro ReturnUncheckedQueryBits(VAL)
 #MACRODEF ReturnUncheckedQuery0()
 #IFSWITCH STRUCTNAME==SubList
   #IFSWITCH METHODNAME==contains
-return ((UncheckedArrList$<E>$)root).sublistcontains0(this.rootOffset,size);
+return ((UncheckedList$<E>$)root).sublistcontains0(this.rootOffset,size);
   #ELSEIFSWITCH METHODNAME==removeVal
 return uncheckedremoveVal0(size);
   #ELSEIFSWITCH METHODNAME==indexOf
-return ((UncheckedArrList$<E>$)root).sublistindexOf0(this.rootOffset,size);
+return ((UncheckedList$<E>$)root).sublistindexOf0(this.rootOffset,size);
   #ELSEIFSWITCH METHODNAME==lastIndexOf
-return ((UncheckedArrList$<E>$)root).sublistlastIndexOf0(this.rootOffset,size);
+return ((UncheckedList$<E>$)root).sublistlastIndexOf0(this.rootOffset,size);
   #ELSE
 ERROR unknown method name METHODNAME in macro ReturnUncheckedQuery0()
   #ENDIF
@@ -1686,13 +2279,13 @@ ERROR unknown method name METHODNAME in macro ReturnUncheckedQuery0()
 #MACRODEF ReturnUncheckedQueryNaN()
 #IFSWITCH STRUCTNAME==SubList
   #IFSWITCH METHODNAME==contains
-return ((UncheckedArrList$<E>$)root).sublistcontainsNaN(this.rootOffset,size);
+return ((UncheckedList$<E>$)root).sublistcontainsNaN(this.rootOffset,size);
   #ELSEIFSWITCH METHODNAME==removeVal
 return uncheckedremoveValNaN(size);
   #ELSEIFSWITCH METHODNAME==indexOf
-return ((UncheckedArrList$<E>$)root).sublistindexOfNaN(this.rootOffset,size);
+return ((UncheckedList$<E>$)root).sublistindexOfNaN(this.rootOffset,size);
   #ELSEIFSWITCH METHODNAME==lastIndexOf
-return ((UncheckedArrList$<E>$)root).sublistlastIndexOfNaN(this.rootOffset,size);
+return ((UncheckedList$<E>$)root).sublistlastIndexOfNaN(this.rootOffset,size);
   #ELSE
 ERROR unknown method name METHODNAME in macro ReturnUncheckedQueryNaN()
   #ENDIF
@@ -1722,16 +2315,7 @@ return -1;
 #ENDIF
 #ENDDEF
 
-#MACRODEF QueryDeclareModCount()
-#IFSWITCH STRUCTNAME==SubList
-  #IFSWITCH CHECKED==Checked
-    #IFSWITCH METHODNAME==indexOf,lastIndexOf,contains
-final CHECKEDArrList$<E>$ root;
-CheckedCollection.checkModCount(this.modCount,(root=this.root).modCount);
-    #ENDIF
-  #ENDIF
-#ENDIF
-#ENDDEF
+
 
 #MACRODEF QueryCheckModCount()
 #IFSWITCH STRUCTNAME==SubList
@@ -1743,7 +2327,7 @@ CheckedCollection.checkModCount(this.modCount,root.modCount);
 #ENDIF
 #ENDDEF
 
-#MACRODEF QueryMethods<METHODNAME,STRUCTNAME>()
+#MACRODEF QueryMethods<METHODNAME>()
 #MACRO QueryBoolean()
 #MACRO QueryInt()
 #MACRO QueryLong()
@@ -1768,7 +2352,7 @@ CheckedCollection.checkModCount(this.modCount,root.modCount);
       #ENDIF
     #ENDIF
   #ELSE
-ERROR unknown method name METHODNAME in QueryMethods<METHODNAME,STRUCTNAME>
+ERROR unknown method name METHODNAME in QueryMethods<METHODNAME>
   #ENDIF
 #ENDDEF
 
@@ -2196,438 +2780,420 @@ if(
 )
 #ENDDEF
 
+#MACRODEF BubbleUpDecrementSize()
+#IFSWITCH CHECKED==Checked
+for(var curr=parent;curr!=null;curr.modCount=modCount,--curr.size,curr=curr.parent){}
+#ELSE
+for(var curr=parent;curr!=null;--curr.size,curr=curr.parent){}
+#ENDIF
+#ENDDEF
+
 #MACRODEF BubbleUpIncrementSize()
 #IFSWITCH CHECKED==Checked
-      for(var curr=parent;curr!=null;parent.modCount=modCount,++parent.size){}
+for(var curr=parent;curr!=null;curr.modCount=modCount,++curr.size,curr=curr.parent){}
 #ELSE
-      for(var curr=parent;curr!=null;++parent.size){}
+for(var curr=parent;curr!=null;++curr.size,curr=curr.parent){}
 #ENDIF
 #ENDDEF
 #MACRODEF BubbleUpInit()
 #IFSWITCH CHECKED==Checked
-      for(var curr=parent;curr!=null;parent.modCount=modCount,parent.size=1){}
+for(var curr=parent;curr!=null;curr.modCount=modCount,curr.size=1,curr=curr.parent){}
 #ELSE
-      for(var curr=parent;curr!=null;parent.size=1){}
+for(var curr=parent;curr!=null;curr.size=1,curr=curr.parent){}
 #ENDIF
 #ENDDEF
 
-#MACRODEF SubListImpl<CHECKED>()
-private static class CHECKEDSubListImpl$<E>$ implements OmniList.Of$ClassPrefix$$<E>$
-{
-#IFSWITCH CHECKED==Checked
-  transient int modCount;
-#ENDIF
-  transient final CHECKEDArrList$<E>$ root;
-  transient final CHECKEDSubListImpl$<E>$ parent;
-  transient final int rootOffset;
-  transient int size;
-  CHECKEDSubListImpl(CHECKEDArrList$<E>$ root,int rootOffset,int size
-#IFSWITCH CHECKED==Checked
-    ,int modCount
-#ENDIF
-  )
-  {
-#IFSWITCH CHECKED==Checked
-    this.modCount=modCount;
-#ENDIF
-    this.root=root;
-    this.parent=null;
-    this.rootOffset=rootOffset;
-    this.size=size;
-  }
-  CHECKEDSubListImpl(SubListImpl$<E>$ parent,int rootOffset,int size
-#IFSWITCH CHECKED==Checked
-    ,int modCount
-#ENDIF
-  )
-  {
-#IFSWITCH CHECKED==Checked
-    this.modCount=modCount;
-#ENDIF
-    this.root=parent.root;
-    this.parent=parent;
-    this.rootOffset=rootOffset;
-    this.size=size;
-  }
-#IFSWITCH CHECKED==Checked
-  private $ClassPrefix$ArrSeq$<E>$ checkModCountAndGetRoot()
-  {
-    final CheckedArrList$<E>$ root;
-    CheckedCollection.checkModCount(this.modCount,(root=this.root).modCount);
-    return root;
-  }
-#ENDIF
-  
-  @Override
-  public Object clone()
-  {
-    #MACRO SubListCheckModCount<clone>()
-    final $ArrayType$[] copy;
-    int size;
-    if((size=this.size)!=0)
-    {
-      ArrCopy.uncheckedCopy(root.arr,this.rootOffset,copy=new $ArrayType$[size],0,size);
-    }
-    else
-    {
-      copy=OmniArray.Of$ClassPrefix$.DEFAULT_ARR;
-    }
-    return new CHECKEDArrList$<E>$(size,copy);
-  }
-  
-  
-  @Override
-  public boolean add($exposedType$ val)
-  {
-    int rootSize;
-#IFSWITCH CHECKED==Checked
-    #MACRO SubListCheckModCount<add>()
-    root.modCount=++modCount;
-    this.modCount=modCount;
-    if((rootSize=root.size)!=0)
-#ELSE
-    final UncheckedArrList$<E>$ root;
-    if((rootSize=(root=this.root).size)!=0)
-#ENDIF
-    {
-      #MACRO BubbleUpIncrementSize()
-      (($ClassPrefix$ArrSeq$<E>$)root).uncheckedInsert(rootSize,this.rootOffset,val);
-      ++this.size;
-    }
-    else
-    {
-      #MACRO BubbleUpInit()
-      (($ClassPrefix$ArrSeq$<E>$)root).uncheckedInit(val);
-      this.size=1;
-    }
-    return true;
-  }
-  @Override
-  public void add(int index,$exposedType$ val)
-  {
-    int rootSize;
-#IFSWITCH CHECKED==Checked
-    #MACRO SubListCheckModCount<add>()
-    int size;
-    if((size=this.size)<index||index<0)
-    {
-      throw new InvalidReadIndexException(index,size);
-    }
-    root.modCount=++modCount;
-    this.modCount=modCount;
-    if((rootSize=root.size)!=0)
-#ELSE
-    final UncheckedArrList$<E>$ root;
-    if((rootSize=(root=this.root).size)!=0)
-#ENDIF
-    {
-      #MACRO BubbleUpIncrementSize()
-      (($ClassPrefix$ArrSeq$<E>$)root).uncheckedInsert(rootSize,index+this.rootOffset,val);
-      ++this.size;
-    }
-    else
-    {
-      #MACRO BubbleUpInit()
-      (($ClassPrefix$ArrSeq$<E>$)root).uncheckedInit(val);
-      this.size=1;
-    }
-  }
-  
-  @Override
-  public boolean add($BoxedType$ val)
-  {
-    return add(($exposedType$)val);
-  }
-  @Override
-  public void add(int index,$BoxedType$ val)
-  {
-    add(index,($exposedType$)val);
-  }
-  @Override
-  public void forEach($TypeNameModifier$Consumer$<? super E>$ action)
-  {
-#IFSWITCH CHECKED==Checked
-    int modCount=this.modCount;
-    final var root=this.root;
-    try
-#ENDIF
-    {
-      int size;
-      if((size=this.size)!=0)
-      {
-        ((UncheckedArrList$<E>$)root).sublistForEach(this.rootOffset,size,action);
-      }
-    }
-#IFSWITCH CHECKED==Checked
-    finally
-    {
-      CheckedCollection.checkModCount(modCount,root.modCount);
-    }
-#ENDIF
-  }
-  @Override
-  public void forEach(Consumer<? super $BoxedType$> action)
-  {
-#IFSWITCH CHECKED==Checked
-    int modCount=this.modCount;
-    final var root=this.root;
-    try
-#ENDIF
-    {
-      int size;
-      if((size=this.size)!=0)
-      {
-        ((UncheckedArrList$<E>$)root).sublistForEach(this.rootOffset,size,action::accept);
-      }
-    }
-#IFSWITCH CHECKED==Checked
-    finally
-    {
-      CheckedCollection.checkModCount(modCount,root.modCount);
-    }
-#ENDIF
-  }
-  @Override
-  public boolean removeIf($TypeNameModifier$Predicate$<? super E>$ filter)
-  {
-    //TODO
-    return false;
-  }
-  @Override
-  public boolean removeIf(Predicate<? super $BoxedType$> action)
-  {
-    //TODO
-    return false;
-  }
-  
-  #MACRO GetterMethods(SubListToArrayImpl)
-  
-  @Override
-  public <T> T[] toArray(IntFunction<T[]> arrConstructor)
-  {
-    int size;
-    final T[] dst;
-#IFSWITCH CHECKED==Checked
-    int modCount=this.modCount;
-    final var root=this.root;
-    try
-#ENDIF
-    {
-      dst=arrConstructor.apply(size=this.size);
-    }
-#IFSWITCH CHECKED==Checked
-    finally
-    {
-      CheckedCollection.checkModCount(modCount,root.modCount);
-    }
-#ENDIF
-    if(size!=0)
-    {
-      ArrCopy.uncheckedCopy(root.arr,this.rootOffset,dst,0,size);
-    }
-    return dst;
-  }
-  
-
-  
-  @Override
-  public void put(int index,$exposedType$ val)
-  {
-   
-    #MACRO SubListCheckModCount<put>()
-    #MACRO CheckeGetPutIndex<Write>()
-    root.arr[index+this.rootOffset]=val;
-  }
-  
-  @Override
-  public $exposedType$ get$TypeNameModifier$(int index)
-  {
-    #MACRO SubListCheckModCount<get>()
-    #MACRO CheckeGetPutIndex<Read>()
-    return ($exposedType$)root.arr[index+this.rootOffset];
-  }
-  @Override
-  public $BoxedType$ get(int index)
-  {
-    return get$TypeNameModifier$(index);
-  }
-  
-  @Override
-  public <T> T[] toArray(T[] dst)
-  {
-    #MACRO SubListCheckModCount<toArray>()
-    int size;
-    if((size=this.size)!=0)
-    {
-      ArrCopy.uncheckedCopy(root.arr,this.rootOffset,dst=OmniArray.uncheckedArrResize(size,dst),0,size);
-    }
-    else if(dst.length!=0)
-    {
-      dst[0]=null;
-    }
-    return dst;
-  }
-
-  @Override
-  public void clear()
-  {
-    #MACRO SubListCheckModCount<clear>()
-    int size;
-    if((size=this.size)!=0)
-    {
-#IFSWITCH CHECKED==Checked
-      root.modCount=++modCount;
-      this.modCount=modCount;
-      for(var curr=parent;curr!=null;parent.modCount=modCount,parent.size-=size){}
-      int rootOffset;
-      ArrCopy.semicheckedSelfCopy(root.arr,(rootOffset=this.rootOffset)+size,rootOffset,(root.size-=size)-rootOffset);
-#ELSE
-      for(var curr=parent;curr!=null;parent.size-=size){}
-      final UncheckedArrList$<E>$ root;
-      int rootOffset;
-      ArrCopy.semicheckedSelfCopy((root=this.root).arr,(rootOffset=this.rootOffset)+size,rootOffset,(root.size-=size)-rootOffset);
-#ENDIF
-      this.size=0;
-    }
-  }
-  
-  @Override
-  public OmniIterator.Of$ClassPrefix$$<E>$ iterator()
-  {
-    //TODO
-    return null;
-  }
-  @Override
-  public OmniListIterator.Of$ClassPrefix$$<E>$ listIterator()
-  {
-    //TODO
-    return null;
-  }
-  @Override
-  public OmniListIterator.Of$ClassPrefix$$<E>$ listIterator(int index)
-  {
-    //TODO
-    return null;
-  }
-  #MACRO QueryMethods<contains,SubList>()
-  #MACRO QueryMethods<removeVal,SubList>()
-  #MACRO QueryMethods<indexOf,SubList>()
-  #MACRO QueryMethods<lastIndexOf,SubList>()
-  
-
-  
-  @Override
-  public String toString()
-  {
-    #MACRO SubListCheckModCount<toString>()
-    int size;
-    if((size=this.size)!=0)
-    {
- #IF OfBoolean
-      if(size>(Integer.MAX_VALUE/6))
-      {
-        throw new OutOfMemoryError();
-      }
-#ELSEIF OfDouble,OfFloat
-      if(size>(Integer.MAX_VALUE/5))
-      {
-        throw new OutOfMemoryError();
-      }
-#ELSE
-      if(size>(Integer.MAX_VALUE/3))
-      {
-        throw new OutOfMemoryError();
-      }
-#ENDIF
-#IF OfDouble
-      final StringBuilder builder;
-      final $ArrayType$[] arr;
-      int i;
-      for(builder=new StringBuilder("[").append((arr=root.arr)[i=this.rootOffset]),size+=i;++i!=size;builder.append(',').append(' ').append(arr[i])){}
-      return builder.append(']').toString();
-#ELSEIF OfChar
-      final char[] buffer;
-      final $ArrayType$[] arr;
-      int bufferOffset,i;
-      for((buffer=new char[size*3])[bufferOffset=1]=(arr=root.arr)[i=this.rootOffset],size+=i;++i!=size;buffer[++bufferOffset]=',',buffer[++bufferOffset]=' ',buffer[++bufferOffset]=arr[i]){}
-      buffer[++bufferOffset]=']';
-      buffer[0]='[';
-      return new String(buffer,0,bufferOffset+1);
-#ELSEIF OfBoolean
-      #MACRO ToStringFastImpl<true>(7,size<=(int)(OmniArray.MAX_ARR_SIZE/6.5f)?(size*6)+(size>>>1):OmniArray.MAX_ARR_SIZE)
-#ELSEIF OfByte
-      #MACRO ToStringFastImpl<true>(6,size<=(int)(OmniArray.MAX_ARR_SIZE/5)?(size*5):OmniArray.MAX_ARR_SIZE)
-#ELSEIF OfShort
-      #MACRO ToStringFastImpl<true>(8,size<=(int)(OmniArray.MAX_ARR_SIZE/5.5f)?(size*5)+(size>>>1):OmniArray.MAX_ARR_SIZE)
-#ELSEIF OfInt
-      #MACRO ToStringFastImpl<true>(13,size<=(int)(OmniArray.MAX_ARR_SIZE>>>3)?(size<<3):OmniArray.MAX_ARR_SIZE)
-#ELSEIF OfLong
-      #MACRO ToStringFastImpl<true>(22,size<=(int)(OmniArray.MAX_ARR_SIZE/12.5f)?(size*12)+(size>>>1):OmniArray.MAX_ARR_SIZE)
-#ELSE
-      #MACRO ToStringFastImpl<true>(17,size<=(int)(OmniArray.MAX_ARR_SIZE/11)?(size*11):OmniArray.MAX_ARR_SIZE)
-#ENDIF
-    }
-    return "[]";
-  }
-  
-  @Override
-  public boolean equals(Object val)
-  {
-    //TODO
-    return false;
-  }
-  @Override
-  public int hashCode()
-  {
-    #MACRO SubListCheckModCount<hashCode>()
-    int size;
-    if((size=this.size)!=0)
-    {
-      final $ArrayType$[] arr;
-      int hash;
-      int i;
-      for(hash=31+$hashCodeMethod$((arr=root.arr)[i=this.rootOffset]),size+=i;++i!=size;hash=hash*31+$hashCodeMethod$(arr[i])){}
-      return hash;
-    }
-    return 1;
-  }
-  @Override
-  public int size()
-  {
-    #MACRO SubListCheckModCount<size>()
-    return this.size;
-  }
-  @Override
-  public boolean isEmpty()
-  {
-    #MACRO SubListCheckModCount<isEmpty>()
-    return this.size==0;
-  }
-#IF OfDouble,OfFloat
-    #MACRO UncheckedRemoveVal<SubList,Bits>()
-    #MACRO UncheckedRemoveVal<SubList,0>()
-    #MACRO UncheckedRemoveVal<SubList,NaN>()
-#ELSE
-    #MACRO UncheckedRemoveVal<SubList, >()
-#ENDIF
-}
-#ENDDEF
-
-
-#MACRODEF SubListCheckModCount<METHODNAME>()
-#IFSWITCH CHECKED==Checked
-  #IFSWITCH METHODNAME==isEmpty,size
-CheckedCollection.checkModCount(this.modCount,root.modCount);
-  #ELSEIFSWITCH METHODNAME==hashCode,toString,toArray,get,put,clone
+#MACRODEF QueryDeclareModCount()
+#IFSWITCH STRUCTNAME==SubList
+  #IFSWITCH CHECKED==Checked
+    #IFSWITCH METHODNAME==indexOf,lastIndexOf,contains
 final var root=checkModCountAndGetRoot();
-  #ELSEIFSWITCH METHODNAME==clear,add
-int modCount;
-final CheckedArrList$<E>$ root;
-CheckedCollection.checkModCount(modCount=this.modCount,(root=this.root).modCount);
-  #ELSE
-ERROR unknown method name METHODNAME for SubListCheckModCount<METHODNAME>()
+    #ENDIF
   #ENDIF
 #ENDIF
 #ENDDEF
 
+
+#MACRODEF SubListCheckModCount<METHODNAME>()
+#IFSWITCH STRUCTNAME==SubList
+  #IFSWITCH CHECKED==Checked
+    #IFSWITCH METHODNAME==isEmpty,size,iterator,listIterator
+CheckedCollection.checkModCount(this.modCount,root.modCount);
+    #ELSEIFSWITCH METHODNAME==hashCode,toString,toArray,get,put,clone,set
+final var root=checkModCountAndGetRoot();
+    #ELSEIFSWITCH METHODNAME==clear,add,removeAtIndex
+int modCount;
+final CHECKEDList$<E>$ root;
+CheckedCollection.checkModCount(modCount=this.modCount,(root=this.root).modCount);
+    #ELSEIFSWITCH METHODNAME==subList
+final int modCount;
+CheckedCollection.checkModCount(modCount=this.modCount,root.modCount);
+    #ELSE
+ERROR unknown method name METHODNAME for SubListCheckModCount<METHODNAME>()
+    #ENDIF
+  #ENDIF
+#ENDIF
+#ENDDEF
+
+#MACRODEF ItrImpl<ITRTYPE>()
+private static class ITRTYPE$<E>$
+#IFSWITCH ITRTYPE==LstItr
+  extends Itr$<E>$ implements OmniListIterator.Of$ClassPrefix$$<E>$
+#ELSEIFSWITCH ITRTYPE==Itr
+  extends AbstractItr$<E>$
+#ELSE
+ERROR unknown itr type ITRTYPE
+#ENDIF
+{
+#IFSWITCH ITRTYPE==Itr
+  transient final CHECKEDSTRUCTNAME$<E>$ parent;
+  transient int cursor;
+  #IFSWITCH CHECKED==Checked
+  transient int modCount;
+  transient int lastRet;
+  #ENDIF
+#ELSE
+  #IFSWITCH CHECKED==Unchecked
+  transient int lastRet;
+  #ENDIF
+#ENDIF
+  private ITRTYPE(CHECKEDSTRUCTNAME$<E>$ parent)
+  {
+#IFSWITCH ITRTYPE==Itr
+    this.parent=parent;
+  #IFSWITCH STRUCTNAME==SubList
+    this.cursor=parent.rootOffset;
+  #ELSEIFSWITCH STRUCTNAME==Stack
+    this.cursor=parent.size;
+  #ENDIF
+  #IFSWITCH CHECKED==Checked
+    this.modCount=parent.modCount;
+    this.lastRet=-1;
+  #ENDIF
+#ELSE
+    super(parent);
+  #IFSWITCH CHECKED==Unchecked
+    this.lastRet=-1;
+  #ENDIF
+#ENDIF
+  }
+#IFSWITCH STRUCTNAME==List,SubList
+  private ITRTYPE(CHECKEDSTRUCTNAME$<E>$ parent,int cursor)
+  {
+#IFSWITCH ITRTYPE==Itr
+    this.parent=parent;
+    #IFSWITCH STRUCTNAME==SubList
+    this.cursor=cursor+parent.rootOffset;
+    #ELSE
+    this.cursor=cursor;
+    #ENDIF
+    #IFSWITCH CHECKED==Checked
+    this.modCount=parent.modCount;
+    this.lastRet=-1;
+    #ENDIF
+#ELSE
+    super(parent);
+  #IFSWITCH CHECKED==Unchecked
+    this.lastRet=-1;
+  #ENDIF
+#ENDIF
+  }
+#ENDIF
+
+#IFSWITCH ITRTYPE==Itr
+  #MACRO IteratorNext()
+  #MACRO IteratorForEach($TypeNameModifier$Consumer$<? super E>$,action)
+  #MACRO IteratorForEach(Consumer<? super $BoxedType$>,action::accept)
+  @Override
+  public boolean hasNext()
+  {
+#IFSWITCH STRUCTNAME==Stack
+    return this.cursor>0;
+#ELSEIFSWITCH STRUCTNAME==SubList
+    final CHECKEDSTRUCTNAME$<E>$ parent;
+    return this.cursor<(parent=this.parent).rootOffset+parent.size;
+#ELSE
+    return this.cursor<parent.size;
+#ENDIF
+  }
+  #MACRO IteratorRemove()
+#ELSE
+  #IFSWITCH CHECKED==Unchecked
+  #MACRO IteratorNext()
+  #MACRO IteratorForEach($TypeNameModifier$Consumer$<? super E>$,action)
+  #MACRO IteratorForEach(Consumer<? super $BoxedType$>,action::accept)
+  #MACRO IteratorRemove()
+  #ENDIF
+  @Override
+  public boolean hasPrevious()
+  {
+#IFSWITCH STRUCTNAME==SubList
+    return this.cursor>parent.rootOffset;
+#ELSE
+    return this.cursor>0;
+#ENDIF
+  }
+  @Override
+  public int nextIndex()
+  {
+#IFSWITCH STRUCTNAME==SubList
+    return this.cursor-parent.rootOffset;
+#ELSE
+    return this.cursor;
+#ENDIF
+  }
+  @Override
+  public int previousIndex()
+  {
+#IFSWITCH STRUCTNAME==SubList
+    return this.cursor-parent.rootOffset-1;
+#ELSE
+    return this.cursor-1;
+#ENDIF
+  }
+  @Override
+  public $exposedType$ previous$ClassPrefix$()
+  {
+  #IFSWITCH CHECKED==Checked
+        int cursor;
+        final CHECKEDList$<E>$ root;
+      #IFSWITCH STRUCTNAME==List
+        CheckedCollection.checkModCount(this.modCount,(root=this.parent).modCount);
+        if((cursor=this.cursor)<=0)
+      #ELSE
+        final CHECKEDSTRUCTNAME$<E>$ parent;
+        CheckedCollection.checkModCount(this.modCount,(root=(parent=this.parent).root).modCount);
+        if((cursor=this.cursor)<=parent.rootOffset)
+      #ENDIF
+        {
+           throw new NoSuchElementException();
+        }
+        this.cursor=--cursor;
+        this.lastRet=cursor;
+        return ($exposedType$)root.arr[cursor];
+  #ELSE
+        final int ret;
+        this.lastRet=ret=--this.cursor;
+      #IFSWITCH STRUCTNAME==List
+        return ($exposedType$)parent.arr[ret];
+      #ELSE
+        return ($exposedType$)parent.root.arr[ret];
+      #ENDIF
+
+  #ENDIF
+  }
+  
+  @Override
+  public void add($exposedType$ val)
+  {
+    //TODO implement LstItr.add($exposedType$)
+  }
+  @Override
+  public void set($exposedType$ val)
+  {
+    //TODO implement LstItr.set($exposedType$)
+  }
+  
+#ENDIF
+
+
+}
+#ENDDEF
+
+#MACRODEF IteratorRemove()
+@Override
+public void remove()
+{
+#IFSWITCH CHECKED==Checked
+  int cursor;
+  if((cursor=this.lastRet)==-1)
+  {
+    throw new IllegalStateException();
+  }
+  int modCount;
+  #IFSWITCH STRUCTNAME==SubList
+  CHECKEDSTRUCTNAME$<E>$ parent;
+  final CHECKEDList$<E>$ root;
+  CheckedCollection.checkModCount(modCount=this.modCount,(root=(parent=this.parent).root).modCount);
+  root.modCount=++modCount;
+  do{
+    parent.modCount=modCount;
+    --parent.size;
+  }while((parent=parent.parent)!=null);
+  #ELSE
+  final CHECKEDSTRUCTNAME$<E>$ root;
+  CheckedCollection.checkModCount(modCount=this.modCount,(root=this.parent).modCount);
+  root.modCount=++modCount;
+  #ENDIF
+  this.modCount=modCount;
+  ArrCopy.semicheckedSelfCopy(root.arr,cursor+1,cursor,(--root.size)-cursor);
+  this.cursor=cursor;
+  this.lastRet=-1;
+#ELSE
+  #IFSWITCH ITRTYPE==LstItr
+    #IFSWITCH STRUCTNAME==SubList
+  CHECKEDSTRUCTNAME$<E>$ parent;
+  final CHECKEDList$<E>$ root;
+  int cursor;
+  ArrCopy.semicheckedSelfCopy((root=(parent=this.parent).root).arr,(cursor=this.lastRet)+1,cursor,(--root.size)-cursor);
+  do{
+    --parent.size;
+  }while((parent=parent.parent)!=null);
+  this.cursor=cursor;
+    #ELSE
+  final CHECKEDSTRUCTNAME$<E>$ parent;
+  int cursor;
+  ArrCopy.semicheckedSelfCopy((parent=this.parent).arr,(cursor=this.lastRet)+1,cursor,(--parent.size)-cursor);
+  this.cursor=cursor;
+    #ENDIF
+  this.lastRet=-1;
+  #ELSE
+    #IFSWITCH STRUCTNAME==SubList
+  CHECKEDSTRUCTNAME$<E>$ parent;
+  final CHECKEDList$<E>$ root;
+  int cursor;
+  ArrCopy.semicheckedSelfCopy((root=(parent=this.parent).root).arr,cursor=this.cursor,--cursor,(--root.size)-cursor);
+  do{
+    --parent.size;
+  }while((parent=parent.parent)!=null);
+  this.cursor=cursor;
+    #ELSE
+  final CHECKEDSTRUCTNAME$<E>$ parent;
+  int cursor;
+      #IFSWITCH STRUCTNAME==Stack
+  ArrCopy.semicheckedSelfCopy((parent=this.parent).arr,(cursor=this.cursor)+1,cursor,(--parent.size)-cursor);
+      #ELSE
+  ArrCopy.semicheckedSelfCopy((parent=this.parent).arr,cursor=this.cursor,--cursor,(--parent.size)-cursor);
+  this.cursor=cursor;
+      #ENDIF
+    #ENDIF
+  #ENDIF
+#ENDIF
+}
+#ENDDEF
+#MACRODEF IteratorForEach(CONSUMER,ACTION)
+@Override
+public void forEachRemaining(CONSUMER action)
+{
+  int cursor;
+#IFSWITCH STRUCTNAME==Stack
+  if((cursor=this.cursor)>0)
+  {
+  #IFSWITCH CHECKED==Checked
+    final CHECKEDSTRUCTNAME$<E>$ root=this.parent;
+  #ENDIF
+#ELSE
+  int bound;
+  #IFSWITCH STRUCTNAME==List
+  final CHECKEDSTRUCTNAME$<E>$ root;
+  
+  if((cursor=this.cursor)<(bound=(root=this.parent).size))
+  {
+  #ELSE
+  
+  
+  final CHECKEDSTRUCTNAME$<E>$ parent;
+  if((cursor=this.cursor)<(bound=(parent=this.parent).rootOffset+parent.size))
+  {
+#IFSWITCH CHECKED==Checked
+    final CHECKEDList$<E>$ root=parent.root;
+#ENDIF
+  #ENDIF
+#ENDIF
+#IFSWITCH CHECKED==Checked
+    int modCount=this.modCount;
+    try
+#ENDIF
+    {
+#IFSWITCH STRUCTNAME==Stack
+      #IFSWITCH CHECKED==Checked
+      uncheckedForEachDescending(root.arr,0,cursor,ACTION);
+      #ELSE
+      uncheckedForEachDescending(this.parent.arr,0,cursor,ACTION);
+      #ENDIF
+#ELSEIFSWITCH STRUCTNAME==SubList
+      #IFSWITCH CHECKED==Checked
+      uncheckedForEachAscending(root.arr,cursor,bound,ACTION);
+      #ELSE
+      uncheckedForEachAscending(parent.root.arr,cursor,bound,ACTION);
+      #ENDIF
+#ELSE
+      uncheckedForEachAscending(root.arr,cursor,bound,ACTION);
+#ENDIF
+    }
+#IFSWITCH CHECKED==Checked
+    finally
+    {
+      CheckedCollection.checkModCount(modCount,root.modCount);
+    }
+    #IFSWITCH STRUCTNAME==Stack
+    this.lastRet=0;
+    #ELSE
+    this.lastRet=bound-1;
+    #ENDIF
+#ELSE
+  #IFSWITCH ITRTYPE==LstItr
+    this.lastRet=bound-1;
+  #ENDIF
+#ENDIF
+#IFSWITCH STRUCTNAME==Stack
+    this.cursor=0;
+#ELSE
+    this.cursor=bound;
+#ENDIF
+  }
+}
+#ENDDEF
+#MACRODEF IteratorNext()
+@Override
+public $exposedType$ next$ClassPrefix$()
+{
+#IFSWITCH CHECKED==Checked
+      final int cursor;
+  #IFSWITCH STRUCTNAME==Stack
+      final CHECKEDSTRUCTNAME$<E>$ root;
+      CheckedCollection.checkModCount(this.modCount,(root=this.parent).modCount);
+      if((cursor=this.cursor)<0)
+      {
+        throw new NoSuchElementException();
+      }
+      this.cursor=cursor-1;
+  #ELSE
+      final CHECKEDList$<E>$ root;
+    #IFSWITCH STRUCTNAME==List
+      CheckedCollection.checkModCount(this.modCount,(root=this.parent).modCount);
+      if((cursor=this.cursor)>=root.size)
+    #ELSE
+      final CHECKEDSTRUCTNAME$<E>$ parent;
+      CheckedCollection.checkModCount(this.modCount,(root=(parent=this.parent).root).modCount);
+      if((cursor=this.cursor)>=parent.rootOffset+parent.size)
+    #ENDIF
+      {
+         throw new NoSuchElementException();
+      }
+      this.cursor=cursor+1;
+  #ENDIF
+      this.lastRet=cursor;
+      return ($exposedType$)root.arr[cursor];
+#ELSE
+  #IFSWITCH ITRTYPE==LstItr
+      final int ret;
+      this.lastRet=ret=this.cursor++;
+    #IFSWITCH STRUCTNAME==List
+      return ($exposedType$)parent.arr[ret];
+    #ELSE
+      return ($exposedType$)parent.root.arr[ret];
+    #ENDIF
+  #ELSE
+    #IFSWITCH STRUCTNAME==Stack
+      return ($exposedType$)parent.arr[this.cursor--];
+    #ELSEIFSWITCH STRUCTNAME==List
+      return ($exposedType$)parent.arr[this.cursor++];
+    #ELSE
+      return ($exposedType$)parent.root.arr[this.cursor++];
+    #ENDIF
+  #ENDIF
+#ENDIF
+}
+#ENDDEF
 

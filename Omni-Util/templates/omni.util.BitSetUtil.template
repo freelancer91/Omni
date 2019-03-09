@@ -1,0 +1,109 @@
+#TYPEDEF OfGeneric
+package omni.util;
+import omni.function.BytePredicate;
+import omni.function.CharPredicate;
+import java.util.function.DoublePredicate;
+import omni.function.FloatPredicate;
+import java.util.function.IntPredicate;
+import java.util.function.LongPredicate;
+import java.util.function.Predicate;
+import omni.function.ShortPredicate;
+public interface BitSetUtil
+{
+  static long[] getBitSet(int count){
+    return new long[(count-1>>6)+1];
+  }
+  static boolean containsword(long word,int val){
+    return (word&1L<<val)!=0;
+  }
+  
+ 
+  #MACRO MarkSurvivors<byte>(,BytePredicate,byte)
+  #MACRO MarkSurvivors<char>(,CharPredicate,char)
+  #MACRO MarkSurvivors<short>(,ShortPredicate,short)
+  #MACRO MarkSurvivors<int>(,IntPredicate,int)
+  #MACRO MarkSurvivors<long>(,LongPredicate,long)
+  #MACRO MarkSurvivors<float>(,FloatPredicate,float)
+  #MACRO MarkSurvivors<double>(,DoublePredicate,double)
+  #MACRO MarkSurvivors<Object>(<E>,Predicate,E)
+#MACRODEF MarkSurvivors<ARRTYPE>(TYPEPARAMETER,FILTER,EXPOSEDTYPE)
+#IFSWITCH ARRTYPE==Object
+  @SuppressWarnings("unchecked")
+#ENDIF
+  public static TYPEPARAMETER long markSurvivors(ARRTYPE[] arr,int srcOffset,int srcBound,FILTERTYPEPARAMETER filter)
+  {
+    for(long word=0L,marker=1L;;marker<<=1)
+    {
+      if(!filter.test((EXPOSEDTYPE)arr[srcOffset]))
+      {
+        word|=marker;
+      }
+      if(++srcOffset==srcBound)
+      {
+        return word;
+      }
+    }
+  }
+  
+#IFSWITCH ARRTYPE==Object
+  @SuppressWarnings("unchecked")
+#ENDIF
+  public static TYPEPARAMETER int markSurvivors(ARRTYPE[] arr,int srcOffset,int srcBound,FILTERTYPEPARAMETER filter,long[] survivorSet)
+  {
+    for(int numSurvivors=0,wordOffset=0;;)
+    {
+      long word=0L,marker=1L;
+      do
+      {
+        if(!filter.test((EXPOSEDTYPE)arr[srcOffset]))
+        {
+          word|=marker;
+          ++numSurvivors;
+        }
+        if(++srcOffset==srcBound)
+        {
+          survivorSet[wordOffset]=word;
+          return numSurvivors;
+        }
+      }
+      while((marker<<=1)!=0L);
+      survivorSet[wordOffset++]=word;
+    }
+  }
+#ENDDEF
+  
+  #MACRO PullSurvivorsDown<byte>()
+  #MACRO PullSurvivorsDown<char>()
+  #MACRO PullSurvivorsDown<short>()
+  #MACRO PullSurvivorsDown<int>()
+  #MACRO PullSurvivorsDown<long>()
+  #MACRO PullSurvivorsDown<float>()
+  #MACRO PullSurvivorsDown<double>()
+  #MACRO PullSurvivorsDown<Object>()
+#MACRODEF PullSurvivorsDown<ARRTYPE>()
+private static int pullWordDown(ARRTYPE[] arr,int srcOffset,int dstOffset,long word)
+{
+  for(int numTail0s;(numTail0s=Long.numberOfTrailingZeros(word))!=64;ArrCopy.uncheckedSelfCopy(arr,srcOffset+=numTail0s,dstOffset,numTail0s=Long.numberOfTrailingZeros(~(word>>>=numTail0s))),srcOffset+=numTail0s,dstOffset+=numTail0s,word>>>=numTail0s){}
+  return dstOffset;
+}
+public static void pullSurvivorsDown(ARRTYPE[] arr,int srcOffset,int dstOffset,int dstBound,long word)
+{
+  int numTail0s=Long.numberOfTrailingZeros(word);
+  do{
+    ArrCopy.uncheckedSelfCopy(arr,srcOffset+=numTail0s,dstOffset,numTail0s=Long.numberOfTrailingZeros(~(word>>>=numTail0s)));
+    srcOffset+=numTail0s;
+    dstOffset+=numTail0s;
+  }while((numTail0s=Long.numberOfTrailingZeros(word>>>=numTail0s))!=64);
+}
+public static void pullSurvivorsDown(ARRTYPE[] arr,int srcOffset,int dstOffset,int dstBound,long[] survivorSet)
+{
+  for(int wordOffset=0;(dstOffset=pullWordDown(arr,srcOffset,dstOffset,survivorSet[wordOffset]))!=dstBound;++wordOffset,srcOffset+=64){}
+}
+#ENDDEF
+
+
+
+ 
+}
+
+
