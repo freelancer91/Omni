@@ -1,0 +1,300 @@
+#TYPEDEF OfGeneric
+package omni.util;
+import java.util.Objects;
+import java.util.stream.IntStream;
+import org.junit.jupiter.api.Assertions;
+
+public interface EqualityUtil
+{
+
+
+
+
+
+
+
+  #MACRO ArraysAreEqual<boolean>()
+  #MACRO ArraysAreEqual<byte>()
+  #MACRO ArraysAreEqual<char>()
+  #MACRO ArraysAreEqual<short>()
+  #MACRO ArraysAreEqual<int>()
+  #MACRO ArraysAreEqual<long>()
+  #MACRO ArraysAreEqual<float>()
+  #MACRO ArraysAreEqual<double>()
+  #MACRO ArraysAreEqual<Boolean>()
+  #MACRO ArraysAreEqual<Byte>()
+  #MACRO ArraysAreEqual<Character>()
+  #MACRO ArraysAreEqual<Short>()
+  #MACRO ArraysAreEqual<Integer>()
+  #MACRO ArraysAreEqual<Long>()
+  #MACRO ArraysAreEqual<Float>()
+  #MACRO ArraysAreEqual<Double>()
+  #MACRO ArraysAreEqual<Object>()
+
+
+#MACRODEF ArraysAreEqual<LEFT>()
+#MACRO ArraysAreEqualHelper<boolean>()
+#MACRO ArraysAreEqualHelper<byte>()
+#MACRO ArraysAreEqualHelper<char>()
+#MACRO ArraysAreEqualHelper<short>()
+#MACRO ArraysAreEqualHelper<int>()
+#MACRO ArraysAreEqualHelper<long>()
+#MACRO ArraysAreEqualHelper<float>()
+#MACRO ArraysAreEqualHelper<double>()
+#MACRO ArraysAreEqualHelper<Boolean>()
+#MACRO ArraysAreEqualHelper<Byte>()
+#MACRO ArraysAreEqualHelper<Character>()
+#MACRO ArraysAreEqualHelper<Short>()
+#MACRO ArraysAreEqualHelper<Integer>()
+#MACRO ArraysAreEqualHelper<Long>()
+#MACRO ArraysAreEqualHelper<Float>()
+#MACRO ArraysAreEqualHelper<Double>()
+#MACRO ArraysAreEqualHelper<Object>()
+#ENDDEF
+
+#MACRODEF ArraysAreEqualHelper<RIGHT>()
+public static boolean isEqual(LEFT l,RIGHT r)
+{
+#IFSWITCH LEFT==boolean,byte,char,short,int,long,float,double
+  #IFSWITCH RIGHT==boolean
+    #IFSWITCH LEFT==boolean
+      return l==r;
+    #ELSEIFSWITCH LEFT==byte,char,short,int
+      return l==TypeUtil.castToByte(r);
+    #ELSEIFSWITCH LEFT==long
+      return l==TypeUtil.castToLong(r);
+    #ELSEIFSWITCH LEFT==float
+      return l==TypeUtil.castToFloat(r);
+    #ELSE
+      return l==TypeUtil.castToDouble(r);
+    #ENDIF
+  #ELSEIFSWITCH RIGHT==byte,char,short
+    #IFSWITCH LEFT==boolean
+      return TypeUtil.castToByte(l)==r;
+    #ELSE
+      return l==r;
+    #ENDIF
+  #ELSEIFSWITCH RIGHT==int
+    #IFSWITCH LEFT==boolean
+      return TypeUtil.castToByte(l)==r;
+    #ELSEIFSWITCH LEFT==byte,char,short,int,long,double
+      return l==r;
+    #ELSE
+      return ((double)l)==((double)r);
+    #ENDIF
+  #ELSEIFSWITCH RIGHT==long
+    #IFSWITCH LEFT==boolean
+      return TypeUtil.castToLong(l)==r;
+    #ELSEIFSWITCH LEFT==byte,char,short,int,long
+      return l==r;
+    #ELSEIFSWITCH LEFT==float
+      return l==r;
+      //return TypeUtil.floatEquals(l,r);
+    #ELSE
+      return l==r;
+      //return TypeUtil.doubleEquals(l,r);
+    #ENDIF
+  #ELSEIFSWITCH RIGHT==float
+    #IFSWITCH LEFT==boolean
+      return TypeUtil.castToFloat(l)==r;
+    #ELSEIFSWITCH LEFT==byte,char,short
+      return l==r;
+    #ELSEIFSWITCH LEFT==int
+      return l==r;
+      //return ((double)l)==((double)r);
+    #ELSEIFSWITCH LEFT==long,float
+      #IFSWITCH LEFT==long
+        return l==r;
+      #ELSE
+        return TypeUtil.floatEquals(r,l);
+      #ENDIF
+      //return TypeUtil.floatEquals(r,l);
+    #ELSE
+      return TypeUtil.doubleEquals(l,r);
+    #ENDIF
+  #ELSEIFSWITCH RIGHT==double
+    #IFSWITCH LEFT==boolean
+      return TypeUtil.doubleEquals(r,TypeUtil.castToDouble(l));
+    #ELSEIFSWITCH LEFT==byte,char,short,int
+      return l==r;
+    #ELSE
+      #IFSWITCH LEFT==long
+        return l==r;
+      #ELSE
+        return TypeUtil.doubleEquals(r,l);
+      #ENDIF
+      //return TypeUtil.doubleEquals(r,l);
+    #ENDIF
+  #ELSE
+  if(r==null)
+  {
+    return false;
+  }
+    #IFSWITCH RIGHT==Boolean
+      return isEqual(l,(boolean)r);
+    #ELSEIFSWITCH RIGHT==Byte
+      return isEqual(l,(byte)r);
+    #ELSEIFSWITCH RIGHT==Character
+      return isEqual(l,(char)r);
+    #ELSEIFSWITCH RIGHT==Short
+      return isEqual(l,(short)r);
+    #ELSEIFSWITCH RIGHT==Integer
+      return isEqual(l,(int)r);
+    #ELSEIFSWITCH RIGHT==Long
+      return isEqual(l,(long)r);
+    #ELSEIFSWITCH RIGHT==Float
+      return isEqual(l,(float)r);
+    #ELSEIFSWITCH RIGHT==Double
+      return isEqual(l,(double)r);
+    #ELSE
+      return r.equals(l);
+    #ENDIF
+  #ENDIF
+#ELSE
+  if(l==null)
+  {
+    #IFSWITCH RIGHT==boolean,byte,char,short,int,long,float,double
+      return false;
+    #ELSE
+      return r==null;
+    #ENDIF
+  }
+  #IFSWITCH LEFT==Boolean
+    return isEqual((boolean)l,r);
+  #ELSEIFSWITCH LEFT==Byte
+    return isEqual((byte)l,r);
+  #ELSEIFSWITCH LEFT==Character
+    return isEqual((char)l,r);
+  #ELSEIFSWITCH LEFT==Short
+    return isEqual((short)l,r);
+  #ELSEIFSWITCH LEFT==Integer
+    return isEqual((int)l,r);
+  #ELSEIFSWITCH LEFT==Long
+    return isEqual((long)l,r);
+  #ELSEIFSWITCH LEFT==Float
+    return isEqual((float)l,r);
+  #ELSEIFSWITCH LEFT==Double
+    return isEqual((double)l,r);
+  #ELSE
+    return l.equals(r);
+  #ENDIF
+#ENDIF
+
+}
+public static void uncheckedparallelassertarraysAreEqual(LEFT[] lArr,int lOffset,RIGHT[] rArr,int rOffset,int length)
+{
+  IntStream.range(0,length).parallel().forEach(index->
+  {
+    Assertions.assertTrue(isEqual(lArr[lOffset+index],rArr[rOffset+index]));
+  });
+}
+public static void parallelassertarraysAreEqual(LEFT[] lArr,int lOffset,RIGHT[] rArr,int rOffset,int length)
+{
+  #MACRO CheckArrays()
+  if(length!=0)
+  {
+    uncheckedparallelassertarraysAreEqual(lArr,lOffset,rArr,rOffset,length);
+  }
+}
+public static void uncheckedassertarraysAreEqual(LEFT[] lArr,int lOffset,RIGHT[] rArr,int rOffset,int length)
+{
+  for(length+=lOffset;;++rOffset)
+  {
+    Assertions.assertTrue(isEqual(lArr[lOffset],rArr[rOffset]));
+    if(++lOffset==length)
+    {
+      return;
+    }
+  }
+}
+public static void assertarraysAreEqual(LEFT[] lArr,int lOffset,RIGHT[] rArr,int rOffset,int length)
+{
+  #MACRO CheckArrays()
+  if(length!=0)
+  {
+    uncheckedassertarraysAreEqual(lArr,lOffset,rArr,rOffset,length);
+  }
+}
+public static boolean uncheckedarraysAreEqual(LEFT[] lArr,int lOffset,RIGHT[] rArr,int rOffset,int length)
+{
+  for(length+=lOffset;isEqual(lArr[lOffset],rArr[rOffset]);++rOffset)
+  {
+    if(++lOffset==length)
+    {
+      return true;
+    }
+  }
+  return false;
+}
+public static boolean arraysAreEqual(LEFT[] lArr,int lOffset,RIGHT[] rArr,int rOffset,int length)
+{
+  #MACRO CheckArrays()
+  return length==0 || uncheckedarraysAreEqual(lArr,lOffset,rArr,rOffset,length);
+}
+
+
+public static void uncheckedparallelassertreversearraysAreEqual(LEFT[] lArr,int lOffset,RIGHT[] rArr,int rOffset,int length)
+{
+  IntStream.range(0,length).parallel().forEach(index->
+  {
+    Assertions.assertTrue(isEqual(lArr[lOffset+(length-index-1)],rArr[rOffset+index]));
+  });
+}
+public static void parallelassertreversearraysAreEqual(LEFT[] lArr,int lOffset,RIGHT[] rArr,int rOffset,int length)
+{
+  #MACRO CheckArrays()
+  if(length!=0)
+  {
+    uncheckedparallelassertreversearraysAreEqual(lArr,lOffset,rArr,rOffset,length);
+  }
+}
+
+
+public static void uncheckedassertreversearraysAreEqual(LEFT[] lArr,int lOffset,RIGHT[] rArr,int rOffset,int length)
+{
+  int i=lOffset+length;
+  do
+  {
+    Assertions.assertTrue(isEqual(lArr[--i],rArr[rOffset++]));
+  }
+  while(i!=lOffset);
+}
+public static void assertreversearraysAreEqual(LEFT[] lArr,int lOffset,RIGHT[] rArr,int rOffset,int length)
+{
+  #MACRO CheckArrays()
+  if(length!=0)
+  {
+    uncheckedassertreversearraysAreEqual(lArr,lOffset,rArr,rOffset,length);
+  }
+}
+public static boolean uncheckedreversearraysAreEqual(LEFT[] lArr,int lOffset,RIGHT[] rArr,int rOffset,int length)
+{
+  for(int i=lOffset+length;isEqual(lArr[--i],rArr[rOffset]);++rOffset)
+  {
+    if(i==lOffset)
+    {
+      return true;
+    }
+  }
+  return false;
+}
+public static boolean reversearraysAreEqual(LEFT[] lArr,int lOffset,RIGHT[] rArr,int rOffset,int length)
+{
+  #MACRO CheckArrays()
+  return length==0 || uncheckedreversearraysAreEqual(lArr,lOffset,rArr,rOffset,length);
+}
+
+
+#ENDDEF
+#MACRODEF CheckArrays()
+Objects.requireNonNull(lArr);
+Objects.requireNonNull(rArr);
+if(length<0 || lOffset<0 || rOffset<0 || lOffset+length>lArr.length || rOffset+length>rArr.length)
+{
+  throw new ArrayIndexOutOfBoundsException("lArr.length="+lArr.length+"; rArr.length="+rArr.length+"; lOffset="+lOffset+"; rOffset="+rOffset+"; length="+length);
+}
+#ENDDEF
+
+
+
+}

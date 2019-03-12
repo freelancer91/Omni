@@ -1,0 +1,56 @@
+#TYPEDEF OfGeneric
+package omni.util;
+
+public final class TypeConversionUtil
+{
+  private TypeConversionUtil()
+  {
+  }
+  
+  #MACRO ConvertMethods<boolean>()
+  #MACRO ConvertMethods<byte>()
+  #MACRO ConvertMethods<char>()
+  #MACRO ConvertMethods<short>()
+  #MACRO ConvertMethods<int>()
+  #MACRO ConvertMethods<long>()
+  #MACRO ConvertMethods<float>()
+  #MACRO ConvertMethods<double>()
+  #MACRO ConvertMethods<Boolean>()
+  #MACRO ConvertMethods<Byte>()
+  #MACRO ConvertMethods<Character>()
+  #MACRO ConvertMethods<Short>()
+  #MACRO ConvertMethods<Integer>()
+  #MACRO ConvertMethods<Long>()
+  #MACRO ConvertMethods<Float>()
+  #MACRO ConvertMethods<Double>()
+  #MACRO ConvertMethods<String>()
+#MACRODEF ConvertMethods<ARRTYPE>()
+#IFSWITCH ARRTYPE==Boolean,Byte,Character,Short,Integer,Long,Float,Double
+//Ignore deprecation because we need would like to be able to use identity equality on the newly created boxed types
+@SuppressWarnings("deprecation")
+#ENDIF
+public static ARRTYPE convertToARRTYPE(int val)
+{
+#IFSWITCH ARRTYPE==String
+  return Integer.toString(val);
+#ELSEIFSWITCH ARRTYPE==double,float,long,int,short,char,byte
+  return (ARRTYPE)val;
+#ELSEIFSWITCH ARRTYPE==boolean
+  return (val&0b1)!=0;
+#ELSEIFSWITCH ARRTYPE==Double,Float,Long,Integer
+  return new ARRTYPE(val);
+#ELSEIFSWITCH ARRTYPE==Short
+  return new ARRTYPE((short)val);
+#ELSEIFSWITCH ARRTYPE==Character
+  return new ARRTYPE((char)val);
+#ELSEIFSWITCH ARRTYPE==Byte
+  return new ARRTYPE((byte)val);
+#ELSEIFSWITCH ARRTYPE==Boolean
+  return new ARRTYPE((val&0b1)!=0);
+#ELSE
+  ERROR unknown type ARRTYPE
+#ENDIF
+}
+#ENDDEF
+  
+}

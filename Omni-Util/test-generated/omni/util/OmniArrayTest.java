@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import omni.function.CharPredicate;
 import omni.function.FloatPredicate;
 import omni.function.ShortPredicate;
+import java.util.Objects;
 public class OmniArrayTest
 {
   private void testGrowBy100PctHelper(int currCapacityBaseLine){
@@ -303,99 +304,99 @@ public class OmniArrayTest
     {
       Random rand=new Random(0);
       boolean[] arr;
-      JunitUtil.booleanArrayBuilder.Randomized.buildUnchecked(arr=new boolean[100],0,arr.length,rand,0);
+      booleanArrayBuilder.Randomized.buildUnchecked(arr=new boolean[100],0,arr.length,rand,0);
       boolean[] copy=new boolean[arr.length];
       ArrCopy.uncheckedCopy(arr,0,copy,0,arr.length);
       OmniArray.OfBoolean.reverseRange(arr,0,arr.length-1);
-      JunitUtil.uncheckedparallelassertreversearraysAreEqual(arr,0,copy,0,arr.length);
+      EqualityUtil.uncheckedparallelassertreversearraysAreEqual(arr,0,copy,0,arr.length);
     }
     @Test
     public void testReverseRangebyte()
     {
       Random rand=new Random(0);
       byte[] arr;
-      JunitUtil.byteArrayBuilder.Randomized.buildUnchecked(arr=new byte[100],0,arr.length,rand,0);
+      byteArrayBuilder.Randomized.buildUnchecked(arr=new byte[100],0,arr.length,rand,0);
       byte[] copy=new byte[arr.length];
       ArrCopy.uncheckedCopy(arr,0,copy,0,arr.length);
       OmniArray.OfByte.reverseRange(arr,0,arr.length-1);
-      JunitUtil.uncheckedparallelassertreversearraysAreEqual(arr,0,copy,0,arr.length);
+      EqualityUtil.uncheckedparallelassertreversearraysAreEqual(arr,0,copy,0,arr.length);
     }
     @Test
     public void testReverseRangechar()
     {
       Random rand=new Random(0);
       char[] arr;
-      JunitUtil.charArrayBuilder.Randomized.buildUnchecked(arr=new char[100],0,arr.length,rand,0);
+      charArrayBuilder.Randomized.buildUnchecked(arr=new char[100],0,arr.length,rand,0);
       char[] copy=new char[arr.length];
       ArrCopy.uncheckedCopy(arr,0,copy,0,arr.length);
       OmniArray.OfChar.reverseRange(arr,0,arr.length-1);
-      JunitUtil.uncheckedparallelassertreversearraysAreEqual(arr,0,copy,0,arr.length);
+      EqualityUtil.uncheckedparallelassertreversearraysAreEqual(arr,0,copy,0,arr.length);
     }
     @Test
     public void testReverseRangeshort()
     {
       Random rand=new Random(0);
       short[] arr;
-      JunitUtil.shortArrayBuilder.Randomized.buildUnchecked(arr=new short[100],0,arr.length,rand,0);
+      shortArrayBuilder.Randomized.buildUnchecked(arr=new short[100],0,arr.length,rand,0);
       short[] copy=new short[arr.length];
       ArrCopy.uncheckedCopy(arr,0,copy,0,arr.length);
       OmniArray.OfShort.reverseRange(arr,0,arr.length-1);
-      JunitUtil.uncheckedparallelassertreversearraysAreEqual(arr,0,copy,0,arr.length);
+      EqualityUtil.uncheckedparallelassertreversearraysAreEqual(arr,0,copy,0,arr.length);
     }
     @Test
     public void testReverseRangeint()
     {
       Random rand=new Random(0);
       int[] arr;
-      JunitUtil.intArrayBuilder.Randomized.buildUnchecked(arr=new int[100],0,arr.length,rand,0);
+      intArrayBuilder.Randomized.buildUnchecked(arr=new int[100],0,arr.length,rand,0);
       int[] copy=new int[arr.length];
       ArrCopy.uncheckedCopy(arr,0,copy,0,arr.length);
       OmniArray.OfInt.reverseRange(arr,0,arr.length-1);
-      JunitUtil.uncheckedparallelassertreversearraysAreEqual(arr,0,copy,0,arr.length);
+      EqualityUtil.uncheckedparallelassertreversearraysAreEqual(arr,0,copy,0,arr.length);
     }
     @Test
     public void testReverseRangelong()
     {
       Random rand=new Random(0);
       long[] arr;
-      JunitUtil.longArrayBuilder.Randomized.buildUnchecked(arr=new long[100],0,arr.length,rand,0);
+      longArrayBuilder.Randomized.buildUnchecked(arr=new long[100],0,arr.length,rand,0);
       long[] copy=new long[arr.length];
       ArrCopy.uncheckedCopy(arr,0,copy,0,arr.length);
       OmniArray.OfLong.reverseRange(arr,0,arr.length-1);
-      JunitUtil.uncheckedparallelassertreversearraysAreEqual(arr,0,copy,0,arr.length);
+      EqualityUtil.uncheckedparallelassertreversearraysAreEqual(arr,0,copy,0,arr.length);
     }
     @Test
     public void testReverseRangefloat()
     {
       Random rand=new Random(0);
       float[] arr;
-      JunitUtil.floatArrayBuilder.Randomized.buildUnchecked(arr=new float[100],0,arr.length,rand,0);
+      floatArrayBuilder.Randomized.buildUnchecked(arr=new float[100],0,arr.length,rand,0);
       float[] copy=new float[arr.length];
       ArrCopy.uncheckedCopy(arr,0,copy,0,arr.length);
       OmniArray.OfFloat.reverseRange(arr,0,arr.length-1);
-      JunitUtil.uncheckedparallelassertreversearraysAreEqual(arr,0,copy,0,arr.length);
+      EqualityUtil.uncheckedparallelassertreversearraysAreEqual(arr,0,copy,0,arr.length);
     }
     @Test
     public void testReverseRangedouble()
     {
       Random rand=new Random(0);
       double[] arr;
-      JunitUtil.doubleArrayBuilder.Randomized.buildUnchecked(arr=new double[100],0,arr.length,rand,0);
+      doubleArrayBuilder.Randomized.buildUnchecked(arr=new double[100],0,arr.length,rand,0);
       double[] copy=new double[arr.length];
       ArrCopy.uncheckedCopy(arr,0,copy,0,arr.length);
       OmniArray.OfDouble.reverseRange(arr,0,arr.length-1);
-      JunitUtil.uncheckedparallelassertreversearraysAreEqual(arr,0,copy,0,arr.length);
+      EqualityUtil.uncheckedparallelassertreversearraysAreEqual(arr,0,copy,0,arr.length);
     }
     @Test
     public void testReverseRangeString()
     {
       Random rand=new Random(0);
       String[] arr;
-      JunitUtil.StringArrayBuilder.Randomized.buildUnchecked(arr=new String[100],0,arr.length,rand,0);
+      StringArrayBuilder.Randomized.buildUnchecked(arr=new String[100],0,arr.length,rand,0);
       String[] copy=new String[arr.length];
       ArrCopy.uncheckedCopy(arr,0,copy,0,arr.length);
       OmniArray.OfRef.reverseRange(arr,0,arr.length-1);
-      JunitUtil.uncheckedparallelassertreversearraysAreEqual(arr,0,copy,0,arr.length);
+      EqualityUtil.uncheckedparallelassertreversearraysAreEqual(arr,0,copy,0,arr.length);
     }
   @Test
   public void testGetFltBitsIndexPredicate()
@@ -415,7 +416,7 @@ public class OmniArrayTest
   public void testNullifyRange()
   {
       String[] arr=new String[]{"a","b","c","d","e","f","g"};
-      OmniArray.OfRef.nullifyRange(arr,2,4);
+      OmniArray.OfRef.nullifyRange(arr,4,2);
       Assertions.assertTrue("a".equals(arr[0]));
       Assertions.assertTrue("b".equals(arr[1]));
       Assertions.assertTrue(arr[2]==null);
@@ -423,5 +424,308 @@ public class OmniArrayTest
       Assertions.assertTrue(arr[4]==null);
       Assertions.assertTrue("f".equals(arr[5]));
       Assertions.assertTrue("g".equals(arr[6]));
+  }
+  @Test
+  public void testUncheckedContainsboolean()
+  {
+    Random rand=new Random(0);
+    for(int i=0;i<100;++i)
+    {
+      boolean willContain=rand.nextBoolean();
+      boolean[] arr=new boolean[1000];
+      if(willContain)
+      {
+        booleanArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,rand,rand.nextInt());
+        int index=RandomUtil.randomIntBetween(0,arr.length-1,rand);
+        boolean v=arr[index];
+        Assertions.assertTrue(OmniArray.OfBoolean.uncheckedcontains(arr,0,arr.length-1,v));
+      }
+      else
+      {
+        booleanArrayBuilder.AllEquals.buildUnchecked(arr,0,arr.length,rand,rand.nextInt());
+        boolean v=arr[0];
+        Assertions.assertFalse(OmniArray.OfBoolean.uncheckedcontains(arr,0,arr.length-1,!v));
+      }
+    }
+  }
+  @Test
+  public void testUncheckedContainsbyte()
+  {
+    Random rand=new Random(0);
+    for(int i=0;i<100;++i)
+    {
+      boolean willContain=rand.nextBoolean();
+      var arr=byteArrayBuilder.buildRandomArray(1000,1,100,rand);
+      if(willContain)
+      {
+        int index=RandomUtil.randomIntBetween(0,arr.length-1,rand);
+        var v=arr[index];
+        Assertions.assertTrue(OmniArray.OfByte.uncheckedcontains(arr,0,arr.length-1,v));
+      }
+      else
+      {
+        var v=TypeConversionUtil.convertTobyte(RandomUtil.randomIntBetween(101,120,rand));
+        Assertions.assertFalse(OmniArray.OfByte.uncheckedcontains(arr,0,arr.length-1,v));
+      }
+    }
+  }
+  @Test
+  public void testUncheckedContainschar()
+  {
+    Random rand=new Random(0);
+    for(int i=0;i<100;++i)
+    {
+      boolean willContain=rand.nextBoolean();
+      var arr=charArrayBuilder.buildRandomArray(1000,1,100,rand);
+      if(willContain)
+      {
+        int index=RandomUtil.randomIntBetween(0,arr.length-1,rand);
+        var v=arr[index];
+        Assertions.assertTrue(OmniArray.OfChar.uncheckedcontains(arr,0,arr.length-1,v));
+      }
+      else
+      {
+        var v=TypeConversionUtil.convertTochar(RandomUtil.randomIntBetween(101,120,rand));
+        Assertions.assertFalse(OmniArray.OfChar.uncheckedcontains(arr,0,arr.length-1,v));
+      }
+    }
+  }
+  @Test
+  public void testUncheckedContainsshort()
+  {
+    Random rand=new Random(0);
+    for(int i=0;i<100;++i)
+    {
+      boolean willContain=rand.nextBoolean();
+      var arr=shortArrayBuilder.buildRandomArray(1000,1,100,rand);
+      if(willContain)
+      {
+        int index=RandomUtil.randomIntBetween(0,arr.length-1,rand);
+        var v=arr[index];
+        Assertions.assertTrue(OmniArray.OfShort.uncheckedcontains(arr,0,arr.length-1,v));
+      }
+      else
+      {
+        var v=TypeConversionUtil.convertToshort(RandomUtil.randomIntBetween(101,120,rand));
+        Assertions.assertFalse(OmniArray.OfShort.uncheckedcontains(arr,0,arr.length-1,v));
+      }
+    }
+  }
+  @Test
+  public void testUncheckedContainsint()
+  {
+    Random rand=new Random(0);
+    for(int i=0;i<100;++i)
+    {
+      boolean willContain=rand.nextBoolean();
+      var arr=intArrayBuilder.buildRandomArray(1000,1,100,rand);
+      if(willContain)
+      {
+        int index=RandomUtil.randomIntBetween(0,arr.length-1,rand);
+        var v=arr[index];
+        Assertions.assertTrue(OmniArray.OfInt.uncheckedcontains(arr,0,arr.length-1,v));
+      }
+      else
+      {
+        var v=TypeConversionUtil.convertToint(RandomUtil.randomIntBetween(101,120,rand));
+        Assertions.assertFalse(OmniArray.OfInt.uncheckedcontains(arr,0,arr.length-1,v));
+      }
+    }
+  }
+  @Test
+  public void testUncheckedContainslong()
+  {
+    Random rand=new Random(0);
+    for(int i=0;i<100;++i)
+    {
+      boolean willContain=rand.nextBoolean();
+      var arr=longArrayBuilder.buildRandomArray(1000,1,100,rand);
+      if(willContain)
+      {
+        int index=RandomUtil.randomIntBetween(0,arr.length-1,rand);
+        var v=arr[index];
+        Assertions.assertTrue(OmniArray.OfLong.uncheckedcontains(arr,0,arr.length-1,v));
+      }
+      else
+      {
+        var v=TypeConversionUtil.convertTolong(RandomUtil.randomIntBetween(101,120,rand));
+        Assertions.assertFalse(OmniArray.OfLong.uncheckedcontains(arr,0,arr.length-1,v));
+      }
+    }
+  }
+  @Test
+  public void testUncheckedContainsfloat()
+  {
+    Random rand=new Random(0);
+    for(int i=0;i<100;++i)
+    {
+      boolean willContain=rand.nextBoolean();
+      var arr=floatArrayBuilder.buildRandomArray(1000,1,100,rand);
+      switch(RandomUtil.randomIntBetween(0,2,rand))
+      {
+        case 0:
+        {
+          //test bits
+          if(willContain)
+          {
+            int index=RandomUtil.randomIntBetween(0,arr.length-1,rand);
+            var v=arr[index];
+            var bits=Float.floatToRawIntBits(v);
+            Assertions.assertTrue(OmniArray.OfFloat.uncheckedcontainsBits(arr,0,arr.length-1,bits));
+          }
+          else
+          {
+            var bits=Float.floatToRawIntBits(1000);
+            Assertions.assertFalse(OmniArray.OfFloat.uncheckedcontainsBits(arr,0,arr.length-1,bits));
+          }
+          break;
+        }
+        case 1:
+        {
+          //test NaN
+          if(willContain)
+          {
+            int index=RandomUtil.randomIntBetween(0,arr.length-1,rand);
+            arr[index]=Float.NaN;
+            Assertions.assertTrue(OmniArray.OfFloat.uncheckedcontainsNaN(arr,0,arr.length-1));
+          }
+          else
+          {
+            Assertions.assertFalse(OmniArray.OfFloat.uncheckedcontainsNaN(arr,0,arr.length-1));
+          }
+          break;
+        }
+        default:
+        {
+          //test 0
+          if(willContain)
+          {
+            int index=RandomUtil.randomIntBetween(0,arr.length-1,rand);
+            arr[index]=0;
+            Assertions.assertTrue(OmniArray.OfFloat.uncheckedcontains0(arr,0,arr.length-1));
+          }
+          else
+          {
+            Assertions.assertFalse(OmniArray.OfFloat.uncheckedcontains0(arr,0,arr.length-1));
+          }
+        }
+      }
+    }
+  }
+  @Test
+  public void testUncheckedContainsdouble()
+  {
+    Random rand=new Random(0);
+    for(int i=0;i<100;++i)
+    {
+      boolean willContain=rand.nextBoolean();
+      var arr=doubleArrayBuilder.buildRandomArray(1000,1,100,rand);
+      switch(RandomUtil.randomIntBetween(0,2,rand))
+      {
+        case 0:
+        {
+          //test bits
+          if(willContain)
+          {
+            int index=RandomUtil.randomIntBetween(0,arr.length-1,rand);
+            var v=arr[index];
+            var bits=Double.doubleToRawLongBits(v);
+            Assertions.assertTrue(OmniArray.OfDouble.uncheckedcontainsBits(arr,0,arr.length-1,bits));
+          }
+          else
+          {
+            var bits=Double.doubleToRawLongBits(1000);
+            Assertions.assertFalse(OmniArray.OfDouble.uncheckedcontainsBits(arr,0,arr.length-1,bits));
+          }
+          break;
+        }
+        case 1:
+        {
+          //test NaN
+          if(willContain)
+          {
+            int index=RandomUtil.randomIntBetween(0,arr.length-1,rand);
+            arr[index]=Double.NaN;
+            Assertions.assertTrue(OmniArray.OfDouble.uncheckedcontainsNaN(arr,0,arr.length-1));
+          }
+          else
+          {
+            Assertions.assertFalse(OmniArray.OfDouble.uncheckedcontainsNaN(arr,0,arr.length-1));
+          }
+          break;
+        }
+        default:
+        {
+          //test 0
+          if(willContain)
+          {
+            int index=RandomUtil.randomIntBetween(0,arr.length-1,rand);
+            arr[index]=0;
+            Assertions.assertTrue(OmniArray.OfDouble.uncheckedcontains0(arr,0,arr.length-1));
+          }
+          else
+          {
+            Assertions.assertFalse(OmniArray.OfDouble.uncheckedcontains0(arr,0,arr.length-1));
+          }
+        }
+      }
+    }
+  }
+  @Test
+  public void testUncheckedContainsInteger()
+  {
+    Random rand=new Random(0);
+    for(int i=0;i<100;++i)
+    {
+      boolean willContain=rand.nextBoolean();
+      var arr=IntegerArrayBuilder.buildRandomArray(1000,1,100,rand);
+      switch(RandomUtil.randomIntBetween(0,2,rand))
+      {
+        case 0:
+        {
+          //test non-null
+          if(willContain)
+          {
+            int index=RandomUtil.randomIntBetween(0,arr.length-1,rand);
+            var v=arr[index];
+            Assertions.assertTrue(OmniArray.OfRef.uncheckedcontainsNonNull(arr,0,arr.length-1,v));
+          }
+          else
+          {
+            Assertions.assertFalse(OmniArray.OfRef.uncheckedcontainsNonNull(arr,0,arr.length-1,new Object()));
+          }
+          break;
+        }
+        case 1:
+        {
+          //test null
+          if(willContain)
+          {
+            int index=RandomUtil.randomIntBetween(0,arr.length-1,rand);
+            arr[index]=null;
+            Assertions.assertTrue(OmniArray.OfRef.uncheckedcontainsNull(arr,0,arr.length-1));
+          }
+          else
+          {
+            Assertions.assertFalse(OmniArray.OfRef.uncheckedcontainsNull(arr,0,arr.length-1));
+          }
+          break;
+        }
+        default:
+        {
+          //test predicate
+          if(willContain)
+          {
+            int index=RandomUtil.randomIntBetween(0,arr.length-1,rand);
+            var v=arr[index];
+            Assertions.assertTrue(OmniArray.OfRef.uncheckedcontains(arr,0,arr.length-1,v::equals));
+          }
+          else
+          {
+            Assertions.assertFalse(OmniArray.OfRef.uncheckedcontains(arr,0,arr.length-1,Objects::isNull));
+          }
+        }
+      }
+    }
   }
 }

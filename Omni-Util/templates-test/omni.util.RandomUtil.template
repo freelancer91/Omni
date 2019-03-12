@@ -1,0 +1,52 @@
+#TYPEDEF OfGeneric
+package omni.util;
+import java.util.Random;
+
+public interface RandomUtil
+{
+  static int randomIntBetween(int minIncl,int maxIncl,Random rand)
+  {
+    return minIncl+rand.nextInt(maxIncl-minIncl+1);
+  }
+  #MACRO GetRandom<boolean>()
+  #MACRO GetRandom<byte>()
+  #MACRO GetRandom<char>()
+  #MACRO GetRandom<short>()
+  #MACRO GetRandom<int>()
+  #MACRO GetRandom<long>()
+  #MACRO GetRandom<float>()
+  #MACRO GetRandom<double>()
+  #MACRO GetRandom<Boolean>()
+  #MACRO GetRandom<Byte>()
+  #MACRO GetRandom<Character>()
+  #MACRO GetRandom<Short>()
+  #MACRO GetRandom<Integer>()
+  #MACRO GetRandom<Long>()
+  #MACRO GetRandom<Float>()
+  #MACRO GetRandom<Double>()
+  #MACRO GetRandom<String>()
+#MACRODEF GetRandom<ARRTYPE>()
+#IFSWITCH ARRTYPE==Boolean,Long,Float,Double
+//Ignore deprecation because we need would like to be able to use identity equality on the newly created boxed types
+@SuppressWarnings("deprecation")
+#ENDIF
+public static ARRTYPE getRandomARRTYPE(Random rand)
+{
+#IFSWITCH ARRTYPE==String,byte,char,short,int,Byte,Character,Short,Integer
+  return TypeConversionUtil.convertToARRTYPE(rand.nextInt());
+#ELSEIFSWITCH ARRTYPE==boolean
+  return rand.nextBoolean();
+#ELSEIFSWITCH ARRTYPE==long
+  return (ARRTYPE)rand.nextLong();
+#ELSEIFSWITCH ARRTYPE==float
+  return rand.nextFloat();
+#ELSEIFSWITCH ARRTYPE==double
+  return rand.nextDouble();
+#ELSEIFSWITCH ARRTYPE==Boolean,Long,Float,Double
+  return new ARRTYPE(rand.nextARRTYPE());
+#ELSE
+ERROR unknown array type ARRTYPE
+#ENDIF
+}
+#ENDDEF
+}

@@ -474,7 +474,7 @@ public final class CharSortUtil
       }
       if(len1==1)
       {
-        ArrCopy.uncheckedSelfCopy(arr,cursor2,dest,len2);
+        ArrCopy.uncheckedSelfCopy(arr,dest,cursor2,len2);
         arr[dest+len2]=tmp[cursor1]; //last element of run 1 to the end of the merge
         return;
       }
@@ -537,7 +537,7 @@ public final class CharSortUtil
           }
           if((count2=gallopLeft((char)tmp[cursor1],arr,cursor2,len2,0,sorter))!=0)
           {
-            ArrCopy.uncheckedSelfCopy(arr,cursor2,dest,count2);
+            ArrCopy.uncheckedSelfCopy(arr,dest,cursor2,count2);
             dest+=count2;
             cursor2+=count2;
             if((len2-=count2)==0)
@@ -567,7 +567,7 @@ public final class CharSortUtil
       if(len1==1)
       {
         //assert len2>0;
-        ArrCopy.uncheckedSelfCopy(arr,cursor2,dest,len2);
+        ArrCopy.uncheckedSelfCopy(arr,dest,cursor2,len2);
         arr[dest+len2]=tmp[cursor1]; //last element of run 1 to the end of the merge
       }
       else

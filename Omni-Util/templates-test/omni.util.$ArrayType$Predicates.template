@@ -1,0 +1,158 @@
+#TYPEDEF OfBoolean
+#TYPEDEF OfByte
+#TYPEDEF OfChar
+#TYPEDEF OfShort
+#TYPEDEF OfInt
+#TYPEDEF OfLong
+#TYPEDEF OfFloat
+#TYPEDEF OfDouble
+#TYPEDEF OfString
+#TYPEDEF OfInteger
+package omni.util;
+import java.util.Random;
+#IF OfBoolean,OfByte,OfChar,OfShort,OfFloat
+import omni.function.$TypeNameModifier$Predicate;
+#ELSE
+import java.util.function.$TypeNameModifier$Predicate;
+#ENDIF
+
+public enum $ArrayType$Predicates
+{
+  MarkAll
+  {
+    $TypeNameModifier$Predicate
+#IF OfString,OfInteger
+    <$ArrayType$>
+#ENDIF
+    getPred(Random rand,int m)
+    {
+      return val->true;
+    }
+  },
+  MarkNone
+  {
+    $TypeNameModifier$Predicate
+#IF OfString,OfInteger
+    <$ArrayType$>
+#ENDIF
+    getPred(Random rand,int m)
+    {
+      return val->false;
+    }
+  },
+#IF OfBoolean
+  MarkTrue
+  {
+    $TypeNameModifier$Predicate getPred(Random rand,int m)
+    {
+      return val->val;
+    }
+  },
+  MarkFalse
+  {
+    $TypeNameModifier$Predicate getPred(Random rand,int m)
+    {
+      return val->!val;
+    }
+  }
+#ELSE
+  MarkGreaterThan
+  {
+    $TypeNameModifier$Predicate
+  #IF OfString,OfInteger
+    <$ArrayType$>
+  #ENDIF
+    getPred(Random rand,int m)
+    {
+      final $ArrayType$ mConverted=TypeConversionUtil.convertTo$ArrayType$(m);
+      return val->{
+  #IF OfString,OfInteger
+       return val.compareTo(mConverted)>0;
+  #ELSE
+       return $BoxedType$.compare(val,mConverted)>0;
+  #ENDIF
+      };
+    }
+  },
+  MarkGreaterThanOrEqualTo
+  {
+    $TypeNameModifier$Predicate
+  #IF OfString,OfInteger
+    <$ArrayType$>
+  #ENDIF
+    getPred(Random rand,int m)
+    {
+      final $ArrayType$ mConverted=TypeConversionUtil.convertTo$ArrayType$(m);
+      return val->{
+  #IF OfString,OfInteger
+       return val.compareTo(mConverted)>=0;
+  #ELSE
+       return $BoxedType$.compare(val,mConverted)>=0;
+  #ENDIF
+      };
+    }
+  },
+  MarkEqualTo
+  {
+    $TypeNameModifier$Predicate
+  #IF OfString,OfInteger
+    <$ArrayType$>
+  #ENDIF
+    getPred(Random rand,int m)
+    {
+      final $ArrayType$ mConverted=TypeConversionUtil.convertTo$ArrayType$(m);
+      return val->{
+  #IF OfString,OfInteger
+       return val.compareTo(mConverted)==0;
+  #ELSE
+       return $BoxedType$.compare(val,mConverted)==0;
+  #ENDIF
+      };
+    }
+  },
+  MarkLessThan
+  {
+    $TypeNameModifier$Predicate
+  #IF OfString,OfInteger
+    <$ArrayType$>
+  #ENDIF
+    getPred(Random rand,int m)
+    {
+      final $ArrayType$ mConverted=TypeConversionUtil.convertTo$ArrayType$(m);
+      return val->{
+  #IF OfString,OfInteger
+       return val.compareTo(mConverted)<0;
+  #ELSE
+       return $BoxedType$.compare(val,mConverted)<0;
+  #ENDIF
+      };
+    }
+  },
+  MarkLessThanOrEqualTo
+  {
+    $TypeNameModifier$Predicate
+  #IF OfString,OfInteger
+    <$ArrayType$>
+  #ENDIF
+    getPred(Random rand,int m)
+    {
+      final $ArrayType$ mConverted=TypeConversionUtil.convertTo$ArrayType$(m);
+      return val->{
+  #IF OfString,OfInteger
+       return val.compareTo(mConverted)<=0;
+  #ELSE
+       return $BoxedType$.compare(val,mConverted)<=0;
+  #ENDIF
+      };
+    }
+  },
+#ENDIF
+  ;
+
+  abstract $TypeNameModifier$Predicate
+#IF OfString,OfInteger
+  <$ArrayType$>
+#ENDIF
+  getPred(Random rand,int m);
+  
+}

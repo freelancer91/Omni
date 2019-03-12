@@ -8,7 +8,6 @@ import org.junit.jupiter.api.Order;
 import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Random;
-import omni.function.BooleanComparator;
 @TestMethodOrder(OrderAnnotation.class)
 public class BooleanSortUtilTest
 {
@@ -40,10 +39,10 @@ public class BooleanSortUtilTest
   {
     final long randSeed;
     final int m;
-    final JunitUtil.booleanArrayBuilder builder;
+    final booleanArrayBuilder builder;
     final boolean[] customArr;
     final Boolean[] stockArr;
-    private TestData(long randSeed,int m,JunitUtil.booleanArrayBuilder builder,int arrLength,Random rand)
+    private TestData(long randSeed,int m,booleanArrayBuilder builder,int arrLength,Random rand)
     {
       this.randSeed=randSeed;
       this.m=m;
@@ -79,7 +78,7 @@ public class BooleanSortUtilTest
     {
       return "TestData{builder="+builder+"; arrayType=boolean; arrLength="+customArr.length+"; m="+m+"; randSeed="+randSeed+"}";
     }
-    private static void initializeTestData(JunitUtil.booleanArrayBuilder builder,long randSeed,int arrLength,ArrayList<TestData> testDatas)
+    private static void initializeTestData(booleanArrayBuilder builder,long randSeed,int arrLength,ArrayList<TestData> testDatas)
     {
       Random rand=new Random(randSeed);
       for(int m=getMLo(builder),mHi=getMHi(arrLength,builder),numReps=getNumReps(arrLength,builder);m<=mHi;m=incrementM(m,builder))
@@ -94,7 +93,7 @@ public class BooleanSortUtilTest
         }
       }
     }
-    private static int getMLo(JunitUtil.booleanArrayBuilder builder)
+    private static int getMLo(booleanArrayBuilder builder)
     {
       switch(builder)
       {
@@ -104,7 +103,7 @@ public class BooleanSortUtilTest
         return 1;
       }
     }
-    private static int getMHi(int arrLength,JunitUtil.booleanArrayBuilder builder)
+    private static int getMHi(int arrLength,booleanArrayBuilder builder)
     {
       switch(builder)
       {
@@ -112,7 +111,7 @@ public class BooleanSortUtilTest
         return 1;
       }
     }
-    private static int getNumReps(int arrLength,JunitUtil.booleanArrayBuilder builder)
+    private static int getNumReps(int arrLength,booleanArrayBuilder builder)
     {
       switch(builder)
       {
@@ -122,7 +121,7 @@ public class BooleanSortUtilTest
         return 1;
       }
     }
-    private static int incrementM(int m,JunitUtil.booleanArrayBuilder builder)
+    private static int incrementM(int m,booleanArrayBuilder builder)
     {
       switch(builder)
       {
@@ -131,18 +130,6 @@ public class BooleanSortUtilTest
       }
     }
   }
-  private static final BooleanComparator Unsorted=(val1,val2)->
-  {
-    return 0;
-  };
-  private static final BooleanComparator Ascending=(val1,val2)->
-  {
-    return Boolean.compare(val1,val2);
-  };
-  private static final BooleanComparator Descending=(val1,val2)->
-  {
-    return Boolean.compare(val2,val1);
-  };
   @Test
   @Order(6*0+1)
   public void initializeArraysForAllEquals()
@@ -155,7 +142,7 @@ public class BooleanSortUtilTest
     }
     lengthStream.forEach(arrLength->
     {
-      if(JunitUtil.booleanArrayBuilder.AllEquals.isRandomized())
+      if(booleanArrayBuilder.AllEquals.isRandomized())
       {
         var randStream=Arrays.stream(randSeeds);
         if(PARALLEL)
@@ -164,12 +151,12 @@ public class BooleanSortUtilTest
         }
         randStream.forEach(randSeed->
         {
-          TestData.initializeTestData(JunitUtil.booleanArrayBuilder.AllEquals,randSeed,arrLength,TEST_DATA);
+          TestData.initializeTestData(booleanArrayBuilder.AllEquals,randSeed,arrLength,TEST_DATA);
         });
       }
       else
       {
-        TestData.initializeTestData(JunitUtil.booleanArrayBuilder.AllEquals,0,arrLength,TEST_DATA);
+        TestData.initializeTestData(booleanArrayBuilder.AllEquals,0,arrLength,TEST_DATA);
       }
     });
     System.out.println("Initialized "+TEST_DATA.size()+" arrays");
@@ -190,14 +177,14 @@ public class BooleanSortUtilTest
       var customArr=testData.customArr;
       int arrLength=stockArr.length;
       //make no alterations to the stock array
-      BooleanSortUtil.uncheckedSort(customArr,0,arrLength,Unsorted);
+      BooleanSortUtil.uncheckedSort(customArr,0,arrLength,booleanComparators.Unsorted);
       if(PARALLEL)
       {
-        JunitUtil.uncheckedparallelassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
+        EqualityUtil.uncheckedparallelassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
       }
       else
       {
-        JunitUtil.uncheckedassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
+        EqualityUtil.uncheckedassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
       }
     });
   }
@@ -216,14 +203,14 @@ public class BooleanSortUtilTest
       var customArr=testData.customArr;
       int arrLength=stockArr.length;
       //make no alterations to the stock array
-      BooleanSortUtil.uncheckedSort(customArr,0,arrLength,Descending);
+      BooleanSortUtil.uncheckedSort(customArr,0,arrLength,booleanComparators.Descending);
       if(PARALLEL)
       {
-        JunitUtil.uncheckedparallelassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
+        EqualityUtil.uncheckedparallelassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
       }
       else
       {
-        JunitUtil.uncheckedassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
+        EqualityUtil.uncheckedassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
       }
     });
   }
@@ -245,11 +232,11 @@ public class BooleanSortUtilTest
       BooleanSortUtil.uncheckedDescendingSort(customArr,0,arrLength);
       if(PARALLEL)
       {
-        JunitUtil.uncheckedparallelassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
+        EqualityUtil.uncheckedparallelassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
       }
       else
       {
-        JunitUtil.uncheckedassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
+        EqualityUtil.uncheckedassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
       }
     });
   }
@@ -268,14 +255,14 @@ public class BooleanSortUtilTest
       var customArr=testData.customArr;
       int arrLength=stockArr.length;
       //make no alterations to the stock array
-      BooleanSortUtil.uncheckedSort(customArr,0,arrLength,Ascending);
+      BooleanSortUtil.uncheckedSort(customArr,0,arrLength,booleanComparators.Ascending);
       if(PARALLEL)
       {
-        JunitUtil.uncheckedparallelassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
+        EqualityUtil.uncheckedparallelassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
       }
       else
       {
-        JunitUtil.uncheckedassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
+        EqualityUtil.uncheckedassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
       }
     });
   }
@@ -297,11 +284,11 @@ public class BooleanSortUtilTest
       BooleanSortUtil.uncheckedAscendingSort(customArr,0,arrLength);
       if(PARALLEL)
       {
-        JunitUtil.uncheckedparallelassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
+        EqualityUtil.uncheckedparallelassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
       }
       else
       {
-        JunitUtil.uncheckedassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
+        EqualityUtil.uncheckedassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
       }
     });
   }
@@ -319,7 +306,7 @@ public class BooleanSortUtilTest
     }
     lengthStream.forEach(arrLength->
     {
-      if(JunitUtil.booleanArrayBuilder.Ascending.isRandomized())
+      if(booleanArrayBuilder.Ascending.isRandomized())
       {
         var randStream=Arrays.stream(randSeeds);
         if(PARALLEL)
@@ -328,12 +315,12 @@ public class BooleanSortUtilTest
         }
         randStream.forEach(randSeed->
         {
-          TestData.initializeTestData(JunitUtil.booleanArrayBuilder.Ascending,randSeed,arrLength,TEST_DATA);
+          TestData.initializeTestData(booleanArrayBuilder.Ascending,randSeed,arrLength,TEST_DATA);
         });
       }
       else
       {
-        TestData.initializeTestData(JunitUtil.booleanArrayBuilder.Ascending,0,arrLength,TEST_DATA);
+        TestData.initializeTestData(booleanArrayBuilder.Ascending,0,arrLength,TEST_DATA);
       }
     });
     System.out.println("Initialized "+TEST_DATA.size()+" arrays");
@@ -354,14 +341,14 @@ public class BooleanSortUtilTest
       var customArr=testData.customArr;
       int arrLength=stockArr.length;
       //make no alterations to the stock array
-      BooleanSortUtil.uncheckedSort(customArr,0,arrLength,Unsorted);
+      BooleanSortUtil.uncheckedSort(customArr,0,arrLength,booleanComparators.Unsorted);
       if(PARALLEL)
       {
-        JunitUtil.uncheckedparallelassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
+        EqualityUtil.uncheckedparallelassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
       }
       else
       {
-        JunitUtil.uncheckedassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
+        EqualityUtil.uncheckedassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
       }
     });
   }
@@ -380,14 +367,14 @@ public class BooleanSortUtilTest
       var customArr=testData.customArr;
       int arrLength=stockArr.length;
       //make no alterations to the stock array
-      BooleanSortUtil.uncheckedSort(customArr,0,arrLength,Ascending);
+      BooleanSortUtil.uncheckedSort(customArr,0,arrLength,booleanComparators.Ascending);
       if(PARALLEL)
       {
-        JunitUtil.uncheckedparallelassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
+        EqualityUtil.uncheckedparallelassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
       }
       else
       {
-        JunitUtil.uncheckedassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
+        EqualityUtil.uncheckedassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
       }
     });
   }
@@ -409,11 +396,11 @@ public class BooleanSortUtilTest
       BooleanSortUtil.uncheckedAscendingSort(customArr,0,arrLength);
       if(PARALLEL)
       {
-        JunitUtil.uncheckedparallelassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
+        EqualityUtil.uncheckedparallelassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
       }
       else
       {
-        JunitUtil.uncheckedassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
+        EqualityUtil.uncheckedassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
       }
     });
   }
@@ -433,14 +420,14 @@ public class BooleanSortUtilTest
       int arrLength=stockArr.length;
       //reverse the stock array
       testData.reverseStockArr();
-      BooleanSortUtil.uncheckedSort(customArr,0,arrLength,Descending);
+      BooleanSortUtil.uncheckedSort(customArr,0,arrLength,booleanComparators.Descending);
       if(PARALLEL)
       {
-        JunitUtil.uncheckedparallelassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
+        EqualityUtil.uncheckedparallelassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
       }
       else
       {
-        JunitUtil.uncheckedassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
+        EqualityUtil.uncheckedassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
       }
     });
   }
@@ -462,11 +449,11 @@ public class BooleanSortUtilTest
       BooleanSortUtil.uncheckedDescendingSort(customArr,0,arrLength);
       if(PARALLEL)
       {
-        JunitUtil.uncheckedparallelassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
+        EqualityUtil.uncheckedparallelassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
       }
       else
       {
-        JunitUtil.uncheckedassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
+        EqualityUtil.uncheckedassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
       }
     });
   }
@@ -484,7 +471,7 @@ public class BooleanSortUtilTest
     }
     lengthStream.forEach(arrLength->
     {
-      if(JunitUtil.booleanArrayBuilder.Descending.isRandomized())
+      if(booleanArrayBuilder.Descending.isRandomized())
       {
         var randStream=Arrays.stream(randSeeds);
         if(PARALLEL)
@@ -493,12 +480,12 @@ public class BooleanSortUtilTest
         }
         randStream.forEach(randSeed->
         {
-          TestData.initializeTestData(JunitUtil.booleanArrayBuilder.Descending,randSeed,arrLength,TEST_DATA);
+          TestData.initializeTestData(booleanArrayBuilder.Descending,randSeed,arrLength,TEST_DATA);
         });
       }
       else
       {
-        TestData.initializeTestData(JunitUtil.booleanArrayBuilder.Descending,0,arrLength,TEST_DATA);
+        TestData.initializeTestData(booleanArrayBuilder.Descending,0,arrLength,TEST_DATA);
       }
     });
     System.out.println("Initialized "+TEST_DATA.size()+" arrays");
@@ -519,14 +506,14 @@ public class BooleanSortUtilTest
       var customArr=testData.customArr;
       int arrLength=stockArr.length;
       //make no alterations to the stock array
-      BooleanSortUtil.uncheckedSort(customArr,0,arrLength,Unsorted);
+      BooleanSortUtil.uncheckedSort(customArr,0,arrLength,booleanComparators.Unsorted);
       if(PARALLEL)
       {
-        JunitUtil.uncheckedparallelassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
+        EqualityUtil.uncheckedparallelassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
       }
       else
       {
-        JunitUtil.uncheckedassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
+        EqualityUtil.uncheckedassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
       }
     });
   }
@@ -545,14 +532,14 @@ public class BooleanSortUtilTest
       var customArr=testData.customArr;
       int arrLength=stockArr.length;
       //make no alterations to the stock array
-      BooleanSortUtil.uncheckedSort(customArr,0,arrLength,Descending);
+      BooleanSortUtil.uncheckedSort(customArr,0,arrLength,booleanComparators.Descending);
       if(PARALLEL)
       {
-        JunitUtil.uncheckedparallelassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
+        EqualityUtil.uncheckedparallelassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
       }
       else
       {
-        JunitUtil.uncheckedassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
+        EqualityUtil.uncheckedassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
       }
     });
   }
@@ -574,11 +561,11 @@ public class BooleanSortUtilTest
       BooleanSortUtil.uncheckedDescendingSort(customArr,0,arrLength);
       if(PARALLEL)
       {
-        JunitUtil.uncheckedparallelassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
+        EqualityUtil.uncheckedparallelassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
       }
       else
       {
-        JunitUtil.uncheckedassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
+        EqualityUtil.uncheckedassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
       }
     });
   }
@@ -598,14 +585,14 @@ public class BooleanSortUtilTest
       int arrLength=stockArr.length;
       //reverse the stock array
       testData.reverseStockArr();
-      BooleanSortUtil.uncheckedSort(customArr,0,arrLength,Ascending);
+      BooleanSortUtil.uncheckedSort(customArr,0,arrLength,booleanComparators.Ascending);
       if(PARALLEL)
       {
-        JunitUtil.uncheckedparallelassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
+        EqualityUtil.uncheckedparallelassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
       }
       else
       {
-        JunitUtil.uncheckedassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
+        EqualityUtil.uncheckedassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
       }
     });
   }
@@ -627,11 +614,11 @@ public class BooleanSortUtilTest
       BooleanSortUtil.uncheckedAscendingSort(customArr,0,arrLength);
       if(PARALLEL)
       {
-        JunitUtil.uncheckedparallelassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
+        EqualityUtil.uncheckedparallelassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
       }
       else
       {
-        JunitUtil.uncheckedassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
+        EqualityUtil.uncheckedassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
       }
     });
   }
@@ -649,7 +636,7 @@ public class BooleanSortUtilTest
     }
     lengthStream.forEach(arrLength->
     {
-      if(JunitUtil.booleanArrayBuilder.Randomized.isRandomized())
+      if(booleanArrayBuilder.Randomized.isRandomized())
       {
         var randStream=Arrays.stream(randSeeds);
         if(PARALLEL)
@@ -658,12 +645,12 @@ public class BooleanSortUtilTest
         }
         randStream.forEach(randSeed->
         {
-          TestData.initializeTestData(JunitUtil.booleanArrayBuilder.Randomized,randSeed,arrLength,TEST_DATA);
+          TestData.initializeTestData(booleanArrayBuilder.Randomized,randSeed,arrLength,TEST_DATA);
         });
       }
       else
       {
-        TestData.initializeTestData(JunitUtil.booleanArrayBuilder.Randomized,0,arrLength,TEST_DATA);
+        TestData.initializeTestData(booleanArrayBuilder.Randomized,0,arrLength,TEST_DATA);
       }
     });
     System.out.println("Initialized "+TEST_DATA.size()+" arrays");
@@ -684,14 +671,14 @@ public class BooleanSortUtilTest
       var customArr=testData.customArr;
       int arrLength=stockArr.length;
       //make no alterations to the stock array
-      BooleanSortUtil.uncheckedSort(customArr,0,arrLength,Unsorted);
+      BooleanSortUtil.uncheckedSort(customArr,0,arrLength,booleanComparators.Unsorted);
       if(PARALLEL)
       {
-        JunitUtil.uncheckedparallelassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
+        EqualityUtil.uncheckedparallelassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
       }
       else
       {
-        JunitUtil.uncheckedassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
+        EqualityUtil.uncheckedassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
       }
     });
   }
@@ -711,14 +698,14 @@ public class BooleanSortUtilTest
       int arrLength=stockArr.length;
       //sort the stock array
       Arrays.sort(stockArr,0,arrLength);
-      BooleanSortUtil.uncheckedSort(customArr,0,arrLength,Ascending);
+      BooleanSortUtil.uncheckedSort(customArr,0,arrLength,booleanComparators.Ascending);
       if(PARALLEL)
       {
-        JunitUtil.uncheckedparallelassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
+        EqualityUtil.uncheckedparallelassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
       }
       else
       {
-        JunitUtil.uncheckedassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
+        EqualityUtil.uncheckedassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
       }
     });
   }
@@ -740,11 +727,11 @@ public class BooleanSortUtilTest
       BooleanSortUtil.uncheckedAscendingSort(customArr,0,arrLength);
       if(PARALLEL)
       {
-        JunitUtil.uncheckedparallelassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
+        EqualityUtil.uncheckedparallelassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
       }
       else
       {
-        JunitUtil.uncheckedassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
+        EqualityUtil.uncheckedassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
       }
     });
   }
@@ -764,14 +751,14 @@ public class BooleanSortUtilTest
       int arrLength=stockArr.length;
       //reverse the stock array
       testData.reverseStockArr();
-      BooleanSortUtil.uncheckedSort(customArr,0,arrLength,Descending);
+      BooleanSortUtil.uncheckedSort(customArr,0,arrLength,booleanComparators.Descending);
       if(PARALLEL)
       {
-        JunitUtil.uncheckedparallelassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
+        EqualityUtil.uncheckedparallelassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
       }
       else
       {
-        JunitUtil.uncheckedassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
+        EqualityUtil.uncheckedassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
       }
     });
   }
@@ -793,11 +780,11 @@ public class BooleanSortUtilTest
       BooleanSortUtil.uncheckedDescendingSort(customArr,0,arrLength);
       if(PARALLEL)
       {
-        JunitUtil.uncheckedparallelassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
+        EqualityUtil.uncheckedparallelassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
       }
       else
       {
-        JunitUtil.uncheckedassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
+        EqualityUtil.uncheckedassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
       }
     });
   }

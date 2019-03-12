@@ -307,14 +307,14 @@ public interface BitSetUtil
     }
   private static int pullWordDown(byte[] arr,int srcOffset,int dstOffset,long word)
   {
-    for(int numTail0s;(numTail0s=Long.numberOfTrailingZeros(word))!=64;ArrCopy.uncheckedSelfCopy(arr,srcOffset+=numTail0s,dstOffset,numTail0s=Long.numberOfTrailingZeros(~(word>>>=numTail0s))),srcOffset+=numTail0s,dstOffset+=numTail0s,word>>>=numTail0s){}
+    for(int numTail0s;(numTail0s=Long.numberOfTrailingZeros(word))!=64;ArrCopy.uncheckedSelfCopy(arr,dstOffset,srcOffset+=numTail0s,numTail0s=Long.numberOfTrailingZeros(~(word>>>=numTail0s))),srcOffset+=numTail0s,dstOffset+=numTail0s,word>>>=numTail0s){}
     return dstOffset;
   }
   public static void pullSurvivorsDown(byte[] arr,int srcOffset,int dstOffset,int dstBound,long word)
   {
     int numTail0s=Long.numberOfTrailingZeros(word);
     do{
-      ArrCopy.uncheckedSelfCopy(arr,srcOffset+=numTail0s,dstOffset,numTail0s=Long.numberOfTrailingZeros(~(word>>>=numTail0s)));
+      ArrCopy.uncheckedSelfCopy(arr,dstOffset,srcOffset+=numTail0s,numTail0s=Long.numberOfTrailingZeros(~(word>>>=numTail0s)));
       srcOffset+=numTail0s;
       dstOffset+=numTail0s;
     }while((numTail0s=Long.numberOfTrailingZeros(word>>>=numTail0s))!=64);
@@ -325,14 +325,14 @@ public interface BitSetUtil
   }
   private static int pullWordDown(char[] arr,int srcOffset,int dstOffset,long word)
   {
-    for(int numTail0s;(numTail0s=Long.numberOfTrailingZeros(word))!=64;ArrCopy.uncheckedSelfCopy(arr,srcOffset+=numTail0s,dstOffset,numTail0s=Long.numberOfTrailingZeros(~(word>>>=numTail0s))),srcOffset+=numTail0s,dstOffset+=numTail0s,word>>>=numTail0s){}
+    for(int numTail0s;(numTail0s=Long.numberOfTrailingZeros(word))!=64;ArrCopy.uncheckedSelfCopy(arr,dstOffset,srcOffset+=numTail0s,numTail0s=Long.numberOfTrailingZeros(~(word>>>=numTail0s))),srcOffset+=numTail0s,dstOffset+=numTail0s,word>>>=numTail0s){}
     return dstOffset;
   }
   public static void pullSurvivorsDown(char[] arr,int srcOffset,int dstOffset,int dstBound,long word)
   {
     int numTail0s=Long.numberOfTrailingZeros(word);
     do{
-      ArrCopy.uncheckedSelfCopy(arr,srcOffset+=numTail0s,dstOffset,numTail0s=Long.numberOfTrailingZeros(~(word>>>=numTail0s)));
+      ArrCopy.uncheckedSelfCopy(arr,dstOffset,srcOffset+=numTail0s,numTail0s=Long.numberOfTrailingZeros(~(word>>>=numTail0s)));
       srcOffset+=numTail0s;
       dstOffset+=numTail0s;
     }while((numTail0s=Long.numberOfTrailingZeros(word>>>=numTail0s))!=64);
@@ -343,14 +343,14 @@ public interface BitSetUtil
   }
   private static int pullWordDown(short[] arr,int srcOffset,int dstOffset,long word)
   {
-    for(int numTail0s;(numTail0s=Long.numberOfTrailingZeros(word))!=64;ArrCopy.uncheckedSelfCopy(arr,srcOffset+=numTail0s,dstOffset,numTail0s=Long.numberOfTrailingZeros(~(word>>>=numTail0s))),srcOffset+=numTail0s,dstOffset+=numTail0s,word>>>=numTail0s){}
+    for(int numTail0s;(numTail0s=Long.numberOfTrailingZeros(word))!=64;ArrCopy.uncheckedSelfCopy(arr,dstOffset,srcOffset+=numTail0s,numTail0s=Long.numberOfTrailingZeros(~(word>>>=numTail0s))),srcOffset+=numTail0s,dstOffset+=numTail0s,word>>>=numTail0s){}
     return dstOffset;
   }
   public static void pullSurvivorsDown(short[] arr,int srcOffset,int dstOffset,int dstBound,long word)
   {
     int numTail0s=Long.numberOfTrailingZeros(word);
     do{
-      ArrCopy.uncheckedSelfCopy(arr,srcOffset+=numTail0s,dstOffset,numTail0s=Long.numberOfTrailingZeros(~(word>>>=numTail0s)));
+      ArrCopy.uncheckedSelfCopy(arr,dstOffset,srcOffset+=numTail0s,numTail0s=Long.numberOfTrailingZeros(~(word>>>=numTail0s)));
       srcOffset+=numTail0s;
       dstOffset+=numTail0s;
     }while((numTail0s=Long.numberOfTrailingZeros(word>>>=numTail0s))!=64);
@@ -361,14 +361,14 @@ public interface BitSetUtil
   }
   private static int pullWordDown(int[] arr,int srcOffset,int dstOffset,long word)
   {
-    for(int numTail0s;(numTail0s=Long.numberOfTrailingZeros(word))!=64;ArrCopy.uncheckedSelfCopy(arr,srcOffset+=numTail0s,dstOffset,numTail0s=Long.numberOfTrailingZeros(~(word>>>=numTail0s))),srcOffset+=numTail0s,dstOffset+=numTail0s,word>>>=numTail0s){}
+    for(int numTail0s;(numTail0s=Long.numberOfTrailingZeros(word))!=64;ArrCopy.uncheckedSelfCopy(arr,dstOffset,srcOffset+=numTail0s,numTail0s=Long.numberOfTrailingZeros(~(word>>>=numTail0s))),srcOffset+=numTail0s,dstOffset+=numTail0s,word>>>=numTail0s){}
     return dstOffset;
   }
   public static void pullSurvivorsDown(int[] arr,int srcOffset,int dstOffset,int dstBound,long word)
   {
     int numTail0s=Long.numberOfTrailingZeros(word);
     do{
-      ArrCopy.uncheckedSelfCopy(arr,srcOffset+=numTail0s,dstOffset,numTail0s=Long.numberOfTrailingZeros(~(word>>>=numTail0s)));
+      ArrCopy.uncheckedSelfCopy(arr,dstOffset,srcOffset+=numTail0s,numTail0s=Long.numberOfTrailingZeros(~(word>>>=numTail0s)));
       srcOffset+=numTail0s;
       dstOffset+=numTail0s;
     }while((numTail0s=Long.numberOfTrailingZeros(word>>>=numTail0s))!=64);
@@ -379,14 +379,14 @@ public interface BitSetUtil
   }
   private static int pullWordDown(long[] arr,int srcOffset,int dstOffset,long word)
   {
-    for(int numTail0s;(numTail0s=Long.numberOfTrailingZeros(word))!=64;ArrCopy.uncheckedSelfCopy(arr,srcOffset+=numTail0s,dstOffset,numTail0s=Long.numberOfTrailingZeros(~(word>>>=numTail0s))),srcOffset+=numTail0s,dstOffset+=numTail0s,word>>>=numTail0s){}
+    for(int numTail0s;(numTail0s=Long.numberOfTrailingZeros(word))!=64;ArrCopy.uncheckedSelfCopy(arr,dstOffset,srcOffset+=numTail0s,numTail0s=Long.numberOfTrailingZeros(~(word>>>=numTail0s))),srcOffset+=numTail0s,dstOffset+=numTail0s,word>>>=numTail0s){}
     return dstOffset;
   }
   public static void pullSurvivorsDown(long[] arr,int srcOffset,int dstOffset,int dstBound,long word)
   {
     int numTail0s=Long.numberOfTrailingZeros(word);
     do{
-      ArrCopy.uncheckedSelfCopy(arr,srcOffset+=numTail0s,dstOffset,numTail0s=Long.numberOfTrailingZeros(~(word>>>=numTail0s)));
+      ArrCopy.uncheckedSelfCopy(arr,dstOffset,srcOffset+=numTail0s,numTail0s=Long.numberOfTrailingZeros(~(word>>>=numTail0s)));
       srcOffset+=numTail0s;
       dstOffset+=numTail0s;
     }while((numTail0s=Long.numberOfTrailingZeros(word>>>=numTail0s))!=64);
@@ -397,14 +397,14 @@ public interface BitSetUtil
   }
   private static int pullWordDown(float[] arr,int srcOffset,int dstOffset,long word)
   {
-    for(int numTail0s;(numTail0s=Long.numberOfTrailingZeros(word))!=64;ArrCopy.uncheckedSelfCopy(arr,srcOffset+=numTail0s,dstOffset,numTail0s=Long.numberOfTrailingZeros(~(word>>>=numTail0s))),srcOffset+=numTail0s,dstOffset+=numTail0s,word>>>=numTail0s){}
+    for(int numTail0s;(numTail0s=Long.numberOfTrailingZeros(word))!=64;ArrCopy.uncheckedSelfCopy(arr,dstOffset,srcOffset+=numTail0s,numTail0s=Long.numberOfTrailingZeros(~(word>>>=numTail0s))),srcOffset+=numTail0s,dstOffset+=numTail0s,word>>>=numTail0s){}
     return dstOffset;
   }
   public static void pullSurvivorsDown(float[] arr,int srcOffset,int dstOffset,int dstBound,long word)
   {
     int numTail0s=Long.numberOfTrailingZeros(word);
     do{
-      ArrCopy.uncheckedSelfCopy(arr,srcOffset+=numTail0s,dstOffset,numTail0s=Long.numberOfTrailingZeros(~(word>>>=numTail0s)));
+      ArrCopy.uncheckedSelfCopy(arr,dstOffset,srcOffset+=numTail0s,numTail0s=Long.numberOfTrailingZeros(~(word>>>=numTail0s)));
       srcOffset+=numTail0s;
       dstOffset+=numTail0s;
     }while((numTail0s=Long.numberOfTrailingZeros(word>>>=numTail0s))!=64);
@@ -415,14 +415,14 @@ public interface BitSetUtil
   }
   private static int pullWordDown(double[] arr,int srcOffset,int dstOffset,long word)
   {
-    for(int numTail0s;(numTail0s=Long.numberOfTrailingZeros(word))!=64;ArrCopy.uncheckedSelfCopy(arr,srcOffset+=numTail0s,dstOffset,numTail0s=Long.numberOfTrailingZeros(~(word>>>=numTail0s))),srcOffset+=numTail0s,dstOffset+=numTail0s,word>>>=numTail0s){}
+    for(int numTail0s;(numTail0s=Long.numberOfTrailingZeros(word))!=64;ArrCopy.uncheckedSelfCopy(arr,dstOffset,srcOffset+=numTail0s,numTail0s=Long.numberOfTrailingZeros(~(word>>>=numTail0s))),srcOffset+=numTail0s,dstOffset+=numTail0s,word>>>=numTail0s){}
     return dstOffset;
   }
   public static void pullSurvivorsDown(double[] arr,int srcOffset,int dstOffset,int dstBound,long word)
   {
     int numTail0s=Long.numberOfTrailingZeros(word);
     do{
-      ArrCopy.uncheckedSelfCopy(arr,srcOffset+=numTail0s,dstOffset,numTail0s=Long.numberOfTrailingZeros(~(word>>>=numTail0s)));
+      ArrCopy.uncheckedSelfCopy(arr,dstOffset,srcOffset+=numTail0s,numTail0s=Long.numberOfTrailingZeros(~(word>>>=numTail0s)));
       srcOffset+=numTail0s;
       dstOffset+=numTail0s;
     }while((numTail0s=Long.numberOfTrailingZeros(word>>>=numTail0s))!=64);
@@ -433,14 +433,14 @@ public interface BitSetUtil
   }
   private static int pullWordDown(Object[] arr,int srcOffset,int dstOffset,long word)
   {
-    for(int numTail0s;(numTail0s=Long.numberOfTrailingZeros(word))!=64;ArrCopy.uncheckedSelfCopy(arr,srcOffset+=numTail0s,dstOffset,numTail0s=Long.numberOfTrailingZeros(~(word>>>=numTail0s))),srcOffset+=numTail0s,dstOffset+=numTail0s,word>>>=numTail0s){}
+    for(int numTail0s;(numTail0s=Long.numberOfTrailingZeros(word))!=64;ArrCopy.uncheckedSelfCopy(arr,dstOffset,srcOffset+=numTail0s,numTail0s=Long.numberOfTrailingZeros(~(word>>>=numTail0s))),srcOffset+=numTail0s,dstOffset+=numTail0s,word>>>=numTail0s){}
     return dstOffset;
   }
   public static void pullSurvivorsDown(Object[] arr,int srcOffset,int dstOffset,int dstBound,long word)
   {
     int numTail0s=Long.numberOfTrailingZeros(word);
     do{
-      ArrCopy.uncheckedSelfCopy(arr,srcOffset+=numTail0s,dstOffset,numTail0s=Long.numberOfTrailingZeros(~(word>>>=numTail0s)));
+      ArrCopy.uncheckedSelfCopy(arr,dstOffset,srcOffset+=numTail0s,numTail0s=Long.numberOfTrailingZeros(~(word>>>=numTail0s)));
       srcOffset+=numTail0s;
       dstOffset+=numTail0s;
     }while((numTail0s=Long.numberOfTrailingZeros(word>>>=numTail0s))!=64);

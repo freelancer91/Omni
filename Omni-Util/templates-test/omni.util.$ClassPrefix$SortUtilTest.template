@@ -21,13 +21,7 @@ import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Random;
 
-#IF OfRef
-import java.util.Comparator;
-#ELSEIF OfInt
-import java.util.function.$Comparator$;
-#ELSE
-import omni.function.$Comparator$;
-#ENDIF
+
 
 @TestMethodOrder(OrderAnnotation.class)
 public class $ClassPrefix$SortUtilTest
@@ -120,10 +114,10 @@ private static class TestData
 {
   final long randSeed;
   final int m;
-  final JunitUtil.CUSTOMARRTYPEArrayBuilder builder;
+  final CUSTOMARRTYPEArrayBuilder builder;
   final CUSTOMARRTYPE[] customArr;
   final STOCKARRTYPE[] stockArr;
-  private TestData(long randSeed,int m,JunitUtil.CUSTOMARRTYPEArrayBuilder builder,int arrLength,Random rand)
+  private TestData(long randSeed,int m,CUSTOMARRTYPEArrayBuilder builder,int arrLength,Random rand)
   {
     this.randSeed=randSeed;
     this.m=m;
@@ -165,7 +159,7 @@ private static class TestData
   {
     return "TestData{builder="+builder+"; arrayType=$ArrayType$; arrLength="+customArr.length+"; m="+m+"; randSeed="+randSeed+"}";
   }
-  private static void initializeTestData(JunitUtil.CUSTOMARRTYPEArrayBuilder builder,long randSeed,int arrLength,ArrayList<TestData> testDatas)
+  private static void initializeTestData(CUSTOMARRTYPEArrayBuilder builder,long randSeed,int arrLength,ArrayList<TestData> testDatas)
   {
     Random rand=new Random(randSeed);
     for(int m=getMLo(builder),mHi=getMHi(arrLength,builder),numReps=getNumReps(arrLength,builder);m<=mHi;m=incrementM(m,builder))
@@ -180,7 +174,7 @@ private static class TestData
       }
     }
   }
-  private static int getMLo(JunitUtil.CUSTOMARRTYPEArrayBuilder builder)
+  private static int getMLo(CUSTOMARRTYPEArrayBuilder builder)
   {
     switch(builder)
     {
@@ -195,7 +189,7 @@ private static class TestData
       return 1;
     }
   }
-  private static int getMHi(int arrLength,JunitUtil.CUSTOMARRTYPEArrayBuilder builder)
+  private static int getMHi(int arrLength,CUSTOMARRTYPEArrayBuilder builder)
   {
     switch(builder)
     {
@@ -222,7 +216,7 @@ private static class TestData
       return 1;
     }
   }
-  private static int getNumReps(int arrLength,JunitUtil.CUSTOMARRTYPEArrayBuilder builder)
+  private static int getNumReps(int arrLength,CUSTOMARRTYPEArrayBuilder builder)
   {
     switch(builder)
     {
@@ -260,7 +254,7 @@ private static class TestData
       return 1;
     }
   }
-  private static int incrementM(int m,JunitUtil.CUSTOMARRTYPEArrayBuilder builder)
+  private static int incrementM(int m,CUSTOMARRTYPEArrayBuilder builder)
   {
     switch(builder)
     {
@@ -280,107 +274,7 @@ private static class TestData
     }
   }
 }
-#IF OfRef
-private static final $Comparator$<Integer> Unsorted=(val1,val2)->
-{
-  return 0;
-};
-private static final $Comparator$<Integer> Ascending=(val1,val2)->
-{
-  return val1.compareTo(val2);
-};
-private static final $Comparator$<Integer> Descending=(val1,val2)->
-{
-  return val2.compareTo(val1);
-};
-#ELSE
-private static final $Comparator$ Unsorted=(val1,val2)->
-{
-  return 0;
-};
-private static final $Comparator$ Ascending=(val1,val2)->
-{
-  return $BoxedType$.compare(val1,val2);
-};
-private static final $Comparator$ Descending=(val1,val2)->
-{
-  return $BoxedType$.compare(val2,val1);
-};
-  #IF OfByte,OfChar,OfShort,OfInt
-private static final $Comparator$ Unstable=(val1,val2)->
-{
-  //even comes first
-  if((val1&0b1)==0)
-  {
-    //val1 is even
-    if((val2&0b1)!=0)
-    {
-      return -1;
-    }
-  }
-  else if((val2&0b1)==0)
-  {
-    return 1; 
-  }
-  return 0;
-};
-  #ELSEIF OfLong
-private static final $Comparator$ Unstable=(val1,val2)->
-{
-  //even comes first
-  if((val1&0b1L)==0)
-  {
-    if((val2&0b1L)!=0)
-    {
-      return -1;
-    }
-  }
-  else if((val2&0b1L)==0)
-  {
-    return 1; 
-  }
-  return 0;
-};
-  #ELSEIF OfFloat
-private static final $Comparator$ Unstable=(val1,val2)->
-{
-  //even bits come first
-  int bits2=$convertToBits$(val2);
-  if(($convertToBits$(val1)&0b1)==0)
-  {
-    //val1 is even
-    if((bits2&0b1)!=0)
-    {
-      return -1;
-    }
-  }
-  else if((bits2&0b1)==0)
-  {
-    return 1; 
-  }
-  return 0;
-};
-  #ELSEIFNOT OfBoolean
-private static final $Comparator$ Unstable=(val1,val2)->
-{
-  //even bits come first
-  long bits2=$convertToBits$(val2);
-  if(($convertToBits$(val1)&0b1L)==0)
-  {
-    //val1 is even
-    if((bits2&0b1L)!=0)
-    {
-      return -1;
-    }
-  }
-  else if((bits2&0b1L)==0)
-  {
-    return 1; 
-  }
-  return 0;
-};
-  #ENDIF
-#ENDIF
+
 
 
 #IF OfRef
@@ -466,7 +360,7 @@ public void initializeArraysForARRAYBUILDER()
   }
   lengthStream.forEach(arrLength->
   {
-    if(JunitUtil.CUSTOMARRTYPEArrayBuilder.ARRAYBUILDER.isRandomized())
+    if(CUSTOMARRTYPEArrayBuilder.ARRAYBUILDER.isRandomized())
     {
       var randStream=Arrays.stream(randSeeds);
       if(PARALLEL)
@@ -475,12 +369,12 @@ public void initializeArraysForARRAYBUILDER()
       }
       randStream.forEach(randSeed->
       {
-        TestData.initializeTestData(JunitUtil.CUSTOMARRTYPEArrayBuilder.ARRAYBUILDER,randSeed,arrLength,TEST_DATA);
+        TestData.initializeTestData(CUSTOMARRTYPEArrayBuilder.ARRAYBUILDER,randSeed,arrLength,TEST_DATA);
       });
     }
     else
     {
-      TestData.initializeTestData(JunitUtil.CUSTOMARRTYPEArrayBuilder.ARRAYBUILDER,0,arrLength,TEST_DATA);
+      TestData.initializeTestData(CUSTOMARRTYPEArrayBuilder.ARRAYBUILDER,0,arrLength,TEST_DATA);
     }
   });
   System.out.println("Initialized "+TEST_DATA.size()+" arrays");
@@ -646,15 +540,15 @@ ERROR unknown stable flag STABLE
 #IFSWITCH COMPARATORTYPE==AscendingComparator
   #IFSWITCH STABLE==Stable
     #IF OfBoolean
-    $ClassPrefix$SortUtil.uncheckedSort(customArr,0,arrLength,Ascending);
+    $ClassPrefix$SortUtil.uncheckedSort(customArr,0,arrLength,CUSTOMARRTYPEComparators.Ascending);
     #ELSE
-    $ClassPrefix$SortUtil.uncheckedStableSort(customArr,0,arrLength,Ascending);
+    $ClassPrefix$SortUtil.uncheckedStableSort(customArr,0,arrLength,CUSTOMARRTYPEComparators.Ascending);
     #ENDIF
   #ELSEIFSWITCH STABLE==Unstable
     #IF OfBoolean
     ERROR invalid type $ArrayType$ for unstable comparator sort
     #ELSE
-    $ClassPrefix$SortUtil.uncheckedUnstableSort(customArr,0,arrLength,Ascending);
+    $ClassPrefix$SortUtil.uncheckedUnstableSort(customArr,0,arrLength,CUSTOMARRTYPEComparators.Ascending);
     #ENDIF
   #ELSE
     ERROR unknown stable flag STABLE
@@ -662,15 +556,15 @@ ERROR unknown stable flag STABLE
 #ELSEIFSWITCH COMPARATORTYPE==DescendingComparator
   #IFSWITCH STABLE==Stable
     #IF OfBoolean
-    $ClassPrefix$SortUtil.uncheckedSort(customArr,0,arrLength,Descending);
+    $ClassPrefix$SortUtil.uncheckedSort(customArr,0,arrLength,CUSTOMARRTYPEComparators.Descending);
     #ELSE
-    $ClassPrefix$SortUtil.uncheckedStableSort(customArr,0,arrLength,Descending);
+    $ClassPrefix$SortUtil.uncheckedStableSort(customArr,0,arrLength,CUSTOMARRTYPEComparators.Descending);
     #ENDIF
   #ELSEIFSWITCH STABLE==Unstable
     #IF OfBoolean
     ERROR valid type $ArrayType$ for unstable comparator sort
     #ELSE
-    $ClassPrefix$SortUtil.uncheckedUnstableSort(customArr,0,arrLength,Descending);
+    $ClassPrefix$SortUtil.uncheckedUnstableSort(customArr,0,arrLength,CUSTOMARRTYPEComparators.Descending);
     #ENDIF
   #ELSE
     ERROR unknown stable flag STABLE
@@ -678,9 +572,9 @@ ERROR unknown stable flag STABLE
 #ELSEIFSWITCH COMPARATORTYPE==UnsortedComparator
   #IFSWITCH STABLE==Stable
     #IF OfBoolean
-    $ClassPrefix$SortUtil.uncheckedSort(customArr,0,arrLength,Unsorted);
+    $ClassPrefix$SortUtil.uncheckedSort(customArr,0,arrLength,CUSTOMARRTYPEComparators.Unsorted);
     #ELSE
-    $ClassPrefix$SortUtil.uncheckedStableSort(customArr,0,arrLength,Unsorted);
+    $ClassPrefix$SortUtil.uncheckedStableSort(customArr,0,arrLength,CUSTOMARRTYPEComparators.Unsorted);
     #ENDIF
   #ELSEIFSWITCH STABLE==Unstable
     ERROR unstable sort is not valid for comparator type COMPARATORTYPE
@@ -724,11 +618,11 @@ ERROR unknown stable flag STABLE
 #ENDIF
     if(PARALLEL)
     {
-      JunitUtil.uncheckedparallelassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
+      EqualityUtil.uncheckedparallelassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
     }
     else
     {
-      JunitUtil.uncheckedassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
+      EqualityUtil.uncheckedassertarraysAreEqual(customArr,0,stockArr,0,arrLength);  
     }
   });
 }
@@ -817,11 +711,11 @@ public void testIsStableCOMPARATORTYPESort()
   }
 #ELSE
   $ArrayType$[] customArr=new $ArrayType$[4000];
-  JunitUtil.$ArrayType$ArrayBuilder.Randomized.buildUnchecked(customArr,0,customArr.length,rand,0);
+  $ArrayType$ArrayBuilder.Randomized.buildUnchecked(customArr,0,customArr.length,rand,0);
   $ArrayType$[] copy=new $ArrayType$[customArr.length];
   ArrCopy.uncheckedCopy(customArr,0,copy,0,customArr.length);
   #IFSWITCH COMPARATORTYPE==UnstableComparator
-  $ClassPrefix$SortUtil.uncheckedStableSort(customArr,0,customArr.length,Unstable);
+  $ClassPrefix$SortUtil.uncheckedStableSort(customArr,0,customArr.length,CUSTOMARRTYPEComparators.Unstable);
   #ELSE
   ERROR unknown comparator type COMPARATORTYPE
   #ENDIF
@@ -856,12 +750,12 @@ public void testIsStableCOMPARATORTYPESort()
   #ENDIF
     {
       //is odd
-      Assertions.assertTrue(JunitUtil.isEqual(copy[i],customArr[oddIndex++]));
+      Assertions.assertTrue(EqualityUtil.isEqual(copy[i],customArr[oddIndex++]));
     }
     else
     {
       //is even
-      Assertions.assertTrue(JunitUtil.isEqual(copy[i],customArr[evenIndex++]));
+      Assertions.assertTrue(EqualityUtil.isEqual(copy[i],customArr[evenIndex++]));
     }
   }
 #ENDIF

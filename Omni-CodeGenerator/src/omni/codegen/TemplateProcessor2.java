@@ -130,6 +130,10 @@ public class TemplateProcessor2{
                 }
             }
         }
+        if(this.typeDefs.isEmpty()){
+            trouble=true;
+            throw new Exception("No type defnitions were found");
+        }
     }
     private static class StackElement{
         int lineNumber;

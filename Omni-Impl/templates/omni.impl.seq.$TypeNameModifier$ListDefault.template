@@ -1,0 +1,33 @@
+#TYPEDEF OfBoolean
+#TYPEDEF OfByte
+#TYPEDEF OfChar
+#TYPEDEF OfShort
+#TYPEDEF OfInt
+#TYPEDEF OfLong
+#TYPEDEF OfFloat
+#TYPEDEF OfDouble
+package omni.impl.seq;
+import omni.api.OmniList;
+abstract interface $TypeNameModifier$ListDefault$<E>$ extends OmniList.Of$ClassPrefix$$<E>$
+{
+  @Override
+  public default void add(int index,$BoxedType$ val)
+  {
+    add(index,($exposedType$)val);
+  }
+  @Override
+  public default $BoxedType$ get(int index)
+  {
+    return get$TypeNameModifier$(index);
+  }
+  @Override
+  public default $BoxedType$ set(int index,$BoxedType$ val)
+  {
+    return set(index,($exposedType$)val);
+  }
+  @Override
+  public default  $BoxedType$ remove(int index)
+  {
+    return $removeAtIndexMethod$(index);
+  }
+}

@@ -2,13 +2,15 @@ package omni.codegen;
 import java.util.ArrayList;
 import java.util.List;
 enum TypeDefinition{
-    OfGeneric(getOfGeneric()),OfRef(getOfRef()),OfDouble(getOfDouble()),OfFloat(getOfFloat()),OfLong(getOfLong()),
+    OfGeneric(getOfGeneric()),OfRef(getOfRef()),OfString(getOfString()),OfInteger(getOfInteger()),
+    OfDouble(getOfDouble()),OfFloat(getOfFloat()),OfLong(getOfLong()),
     OfInt(getOfInt()),
     OfShort(getOfShort()),OfChar(getOfChar()),OfByte(getOfByte()),OfBoolean(getOfBoolean());
     final List<DefVar> definitionVars;
     private static List<DefVar> getOfGeneric(){
         return new ArrayList<>();
     }
+
     private static List<DefVar> getOfBoolean(){
         final List<DefVar> defVars=new ArrayList<>();
         defVars.add(new DefVar("DNode","BooleanDblLnkNode"));
@@ -221,6 +223,24 @@ enum TypeDefinition{
         defVars.add(new DefVar("applyMethod","applyAsLong"));
         defVars.add(new DefVar("compareMethod","compare"));
         defVars.add(new DefVar("comparableType","long"));
+        return defVars;
+    }
+    private static List<DefVar> getOfString(){
+        final List<DefVar> defVars=new ArrayList<>();
+        defVars.add(new DefVar("ArrayType","String"));
+        defVars.add(new DefVar("BoxedType","String"));
+        defVars.add(new DefVar("compareMethod","compare"));
+        defVars.add(new DefVar("Comparator","Comparator"));
+        defVars.add(new DefVar("TypeNameModifier",""));
+        return defVars;
+    }
+    private static List<DefVar> getOfInteger(){
+        final List<DefVar> defVars=new ArrayList<>();
+        defVars.add(new DefVar("ArrayType","Integer"));
+        defVars.add(new DefVar("BoxedType","Integer"));
+        defVars.add(new DefVar("compareMethod","compare"));
+        defVars.add(new DefVar("Comparator","Comparator"));
+        defVars.add(new DefVar("TypeNameModifier",""));
         return defVars;
     }
     private static List<DefVar> getOfRef(){

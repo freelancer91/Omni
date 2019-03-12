@@ -1,0 +1,46 @@
+#TYPEDEF OfBoolean
+#TYPEDEF OfByte
+#TYPEDEF OfChar
+#TYPEDEF OfShort
+#TYPEDEF OfInt
+#TYPEDEF OfLong
+#TYPEDEF OfFloat
+#TYPEDEF OfDouble
+package omni.impl;
+import omni.api.OmniIterator;
+#IF OfBoolean
+import omni.util.TypeUtil;
+#ENDIF
+public abstract class Abstract$TypeNameModifier$Itr implements OmniIterator.Of$TypeNameModifier$$<E>$
+{
+
+  #MACRO NextImpl($BoxedType$,,($BoxedType$))
+#IFNOT OfDouble
+  #MACRO NextImpl(double,Double,$castToDouble$)
+  #IFNOT OfFloat
+  #MACRO NextImpl(float,Float,$castToFloat$)
+    #IFNOT OfLong
+  #MACRO NextImpl(long,Long,$castToLong$)
+      #IFNOT OfInt
+  #MACRO NextImpl(int,Int,$castToInt$)
+        #IFNOT OfShort,OfChar
+  #MACRO NextImpl(short,Short,$castToShort$)
+          #IFNOT OfByte
+  #MACRO NextImpl(byte,Byte,$castToByte$)
+  #MACRO NextImpl(char,Char,$castToChar$)
+          #ENDIF
+        #ENDIF
+      #ENDIF
+    #ENDIF
+  #ENDIF
+#ENDIF
+}
+
+
+#MACRODEF NextImpl(RETTYPE,CLASSPREFIX,CAST)
+@Override
+public RETTYPE nextCLASSPREFIX()
+{
+  return CAST(next$ClassPrefix$());
+}
+#ENDDEF

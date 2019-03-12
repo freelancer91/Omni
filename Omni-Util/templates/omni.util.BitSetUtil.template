@@ -83,14 +83,14 @@ public interface BitSetUtil
 #MACRODEF PullSurvivorsDown<ARRTYPE>()
 private static int pullWordDown(ARRTYPE[] arr,int srcOffset,int dstOffset,long word)
 {
-  for(int numTail0s;(numTail0s=Long.numberOfTrailingZeros(word))!=64;ArrCopy.uncheckedSelfCopy(arr,srcOffset+=numTail0s,dstOffset,numTail0s=Long.numberOfTrailingZeros(~(word>>>=numTail0s))),srcOffset+=numTail0s,dstOffset+=numTail0s,word>>>=numTail0s){}
+  for(int numTail0s;(numTail0s=Long.numberOfTrailingZeros(word))!=64;ArrCopy.uncheckedSelfCopy(arr,dstOffset,srcOffset+=numTail0s,numTail0s=Long.numberOfTrailingZeros(~(word>>>=numTail0s))),srcOffset+=numTail0s,dstOffset+=numTail0s,word>>>=numTail0s){}
   return dstOffset;
 }
 public static void pullSurvivorsDown(ARRTYPE[] arr,int srcOffset,int dstOffset,int dstBound,long word)
 {
   int numTail0s=Long.numberOfTrailingZeros(word);
   do{
-    ArrCopy.uncheckedSelfCopy(arr,srcOffset+=numTail0s,dstOffset,numTail0s=Long.numberOfTrailingZeros(~(word>>>=numTail0s)));
+    ArrCopy.uncheckedSelfCopy(arr,dstOffset,srcOffset+=numTail0s,numTail0s=Long.numberOfTrailingZeros(~(word>>>=numTail0s)));
     srcOffset+=numTail0s;
     dstOffset+=numTail0s;
   }while((numTail0s=Long.numberOfTrailingZeros(word>>>=numTail0s))!=64);

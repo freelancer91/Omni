@@ -1498,7 +1498,7 @@ private void mergeLOHI($ArrayType$[] arr,int base1,int len1,int base2,int len2)
   }
   if(len1==1)
   {
-    ArrCopy.uncheckedSelfCopy(arr,cursor2,dest,len2);
+    ArrCopy.uncheckedSelfCopy(arr,dest,cursor2,len2);
     arr[dest+len2]=tmp[cursor1]; //last element of run 1 to the end of the merge
     return;
   }
@@ -1619,7 +1619,7 @@ private void mergeLOHI($ArrayType$[] arr,int base1,int len1,int base2,int len2)
 #ENDIF
       {
 #IFSWITCH LOHI==Lo
-        ArrCopy.uncheckedSelfCopy(arr,cursor2,dest,count2);
+        ArrCopy.uncheckedSelfCopy(arr,dest,cursor2,count2);
         dest+=count2;
         cursor2+=count2;
         if((len2-=count2)==0)
@@ -1661,7 +1661,7 @@ private void mergeLOHI($ArrayType$[] arr,int base1,int len1,int base2,int len2)
   {
     #MACRO Assert(lenTWO>0)
 #IFSWITCH LOHI==Lo
-    ArrCopy.uncheckedSelfCopy(arr,cursor2,dest,len2);
+    ArrCopy.uncheckedSelfCopy(arr,dest,cursor2,len2);
     arr[dest+len2]=tmp[cursor1]; //last element of run 1 to the end of the merge
 #ELSE
     ArrCopy.uncheckedCopy(arr,(cursor1-=len1)+1,arr,(dest-=len1)+1,len1);

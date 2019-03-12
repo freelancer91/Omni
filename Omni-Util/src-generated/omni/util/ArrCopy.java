@@ -10,7 +10,7 @@ public interface ArrCopy
     //assert dstOffset+length<=dst.length;
     for(dst[dstOffset]=(src[length+=(srcOffset-1)]);length!=srcOffset;dst[++dstOffset]=(src[--length])){}
   }
-  static void semicheckedSelfCopy(Object[] src,int srcOffset,int dstOffset,int length)
+  static void semicheckedSelfCopy(Object[] src,int dstOffset,int srcOffset,int length)
   {
     //assert srcOffset>=0;
     //assert dstOffset>=0;
@@ -19,10 +19,10 @@ public interface ArrCopy
     //assert dstOffset+length<=dst.length;
     if(length!=0)
     {
-      uncheckedSelfCopy(src,srcOffset,dstOffset,length);
+      uncheckedSelfCopy(src,dstOffset,srcOffset,length);
     }
   }
-  static void uncheckedSelfCopy(Object[] src,int srcOffset,int dstOffset,int length)
+  static void uncheckedSelfCopy(Object[] src,int dstOffset,int srcOffset,int length)
   {
     //assert srcOffset>=0;
     //assert dstOffset>=0;
@@ -95,7 +95,7 @@ public interface ArrCopy
     //assert dstOffset+length<=dst.length;
     for(dst[dstOffset]=(src[length+=(srcOffset-1)]);length!=srcOffset;dst[++dstOffset]=(src[--length])){}
   }
-  static void semicheckedSelfCopy(boolean[] src,int srcOffset,int dstOffset,int length)
+  static void semicheckedSelfCopy(boolean[] src,int dstOffset,int srcOffset,int length)
   {
     //assert srcOffset>=0;
     //assert dstOffset>=0;
@@ -104,10 +104,10 @@ public interface ArrCopy
     //assert dstOffset+length<=dst.length;
     if(length!=0)
     {
-      uncheckedSelfCopy(src,srcOffset,dstOffset,length);
+      uncheckedSelfCopy(src,dstOffset,srcOffset,length);
     }
   }
-  static void uncheckedSelfCopy(boolean[] src,int srcOffset,int dstOffset,int length)
+  static void uncheckedSelfCopy(boolean[] src,int dstOffset,int srcOffset,int length)
   {
     //assert srcOffset>=0;
     //assert dstOffset>=0;
@@ -180,7 +180,7 @@ public interface ArrCopy
     //assert dstOffset+length<=dst.length;
     for(dst[dstOffset]=(src[length+=(srcOffset-1)]);length!=srcOffset;dst[++dstOffset]=(src[--length])){}
   }
-  static void semicheckedSelfCopy(byte[] src,int srcOffset,int dstOffset,int length)
+  static void semicheckedSelfCopy(byte[] src,int dstOffset,int srcOffset,int length)
   {
     //assert srcOffset>=0;
     //assert dstOffset>=0;
@@ -189,10 +189,10 @@ public interface ArrCopy
     //assert dstOffset+length<=dst.length;
     if(length!=0)
     {
-      uncheckedSelfCopy(src,srcOffset,dstOffset,length);
+      uncheckedSelfCopy(src,dstOffset,srcOffset,length);
     }
   }
-  static void uncheckedSelfCopy(byte[] src,int srcOffset,int dstOffset,int length)
+  static void uncheckedSelfCopy(byte[] src,int dstOffset,int srcOffset,int length)
   {
     //assert srcOffset>=0;
     //assert dstOffset>=0;
@@ -265,7 +265,7 @@ public interface ArrCopy
     //assert dstOffset+length<=dst.length;
     for(dst[dstOffset]=(src[length+=(srcOffset-1)]);length!=srcOffset;dst[++dstOffset]=(src[--length])){}
   }
-  static void semicheckedSelfCopy(char[] src,int srcOffset,int dstOffset,int length)
+  static void semicheckedSelfCopy(char[] src,int dstOffset,int srcOffset,int length)
   {
     //assert srcOffset>=0;
     //assert dstOffset>=0;
@@ -274,10 +274,10 @@ public interface ArrCopy
     //assert dstOffset+length<=dst.length;
     if(length!=0)
     {
-      uncheckedSelfCopy(src,srcOffset,dstOffset,length);
+      uncheckedSelfCopy(src,dstOffset,srcOffset,length);
     }
   }
-  static void uncheckedSelfCopy(char[] src,int srcOffset,int dstOffset,int length)
+  static void uncheckedSelfCopy(char[] src,int dstOffset,int srcOffset,int length)
   {
     //assert srcOffset>=0;
     //assert dstOffset>=0;
@@ -350,7 +350,7 @@ public interface ArrCopy
     //assert dstOffset+length<=dst.length;
     for(dst[dstOffset]=(src[length+=(srcOffset-1)]);length!=srcOffset;dst[++dstOffset]=(src[--length])){}
   }
-  static void semicheckedSelfCopy(short[] src,int srcOffset,int dstOffset,int length)
+  static void semicheckedSelfCopy(short[] src,int dstOffset,int srcOffset,int length)
   {
     //assert srcOffset>=0;
     //assert dstOffset>=0;
@@ -359,10 +359,10 @@ public interface ArrCopy
     //assert dstOffset+length<=dst.length;
     if(length!=0)
     {
-      uncheckedSelfCopy(src,srcOffset,dstOffset,length);
+      uncheckedSelfCopy(src,dstOffset,srcOffset,length);
     }
   }
-  static void uncheckedSelfCopy(short[] src,int srcOffset,int dstOffset,int length)
+  static void uncheckedSelfCopy(short[] src,int dstOffset,int srcOffset,int length)
   {
     //assert srcOffset>=0;
     //assert dstOffset>=0;
@@ -435,7 +435,7 @@ public interface ArrCopy
     //assert dstOffset+length<=dst.length;
     for(dst[dstOffset]=(src[length+=(srcOffset-1)]);length!=srcOffset;dst[++dstOffset]=(src[--length])){}
   }
-  static void semicheckedSelfCopy(int[] src,int srcOffset,int dstOffset,int length)
+  static void semicheckedSelfCopy(int[] src,int dstOffset,int srcOffset,int length)
   {
     //assert srcOffset>=0;
     //assert dstOffset>=0;
@@ -444,10 +444,10 @@ public interface ArrCopy
     //assert dstOffset+length<=dst.length;
     if(length!=0)
     {
-      uncheckedSelfCopy(src,srcOffset,dstOffset,length);
+      uncheckedSelfCopy(src,dstOffset,srcOffset,length);
     }
   }
-  static void uncheckedSelfCopy(int[] src,int srcOffset,int dstOffset,int length)
+  static void uncheckedSelfCopy(int[] src,int dstOffset,int srcOffset,int length)
   {
     //assert srcOffset>=0;
     //assert dstOffset>=0;
@@ -520,7 +520,7 @@ public interface ArrCopy
     //assert dstOffset+length<=dst.length;
     for(dst[dstOffset]=(src[length+=(srcOffset-1)]);length!=srcOffset;dst[++dstOffset]=(src[--length])){}
   }
-  static void semicheckedSelfCopy(long[] src,int srcOffset,int dstOffset,int length)
+  static void semicheckedSelfCopy(long[] src,int dstOffset,int srcOffset,int length)
   {
     //assert srcOffset>=0;
     //assert dstOffset>=0;
@@ -529,10 +529,10 @@ public interface ArrCopy
     //assert dstOffset+length<=dst.length;
     if(length!=0)
     {
-      uncheckedSelfCopy(src,srcOffset,dstOffset,length);
+      uncheckedSelfCopy(src,dstOffset,srcOffset,length);
     }
   }
-  static void uncheckedSelfCopy(long[] src,int srcOffset,int dstOffset,int length)
+  static void uncheckedSelfCopy(long[] src,int dstOffset,int srcOffset,int length)
   {
     //assert srcOffset>=0;
     //assert dstOffset>=0;
@@ -605,7 +605,7 @@ public interface ArrCopy
     //assert dstOffset+length<=dst.length;
     for(dst[dstOffset]=(src[length+=(srcOffset-1)]);length!=srcOffset;dst[++dstOffset]=(src[--length])){}
   }
-  static void semicheckedSelfCopy(float[] src,int srcOffset,int dstOffset,int length)
+  static void semicheckedSelfCopy(float[] src,int dstOffset,int srcOffset,int length)
   {
     //assert srcOffset>=0;
     //assert dstOffset>=0;
@@ -614,10 +614,10 @@ public interface ArrCopy
     //assert dstOffset+length<=dst.length;
     if(length!=0)
     {
-      uncheckedSelfCopy(src,srcOffset,dstOffset,length);
+      uncheckedSelfCopy(src,dstOffset,srcOffset,length);
     }
   }
-  static void uncheckedSelfCopy(float[] src,int srcOffset,int dstOffset,int length)
+  static void uncheckedSelfCopy(float[] src,int dstOffset,int srcOffset,int length)
   {
     //assert srcOffset>=0;
     //assert dstOffset>=0;
@@ -690,7 +690,7 @@ public interface ArrCopy
     //assert dstOffset+length<=dst.length;
     for(dst[dstOffset]=(src[length+=(srcOffset-1)]);length!=srcOffset;dst[++dstOffset]=(src[--length])){}
   }
-  static void semicheckedSelfCopy(double[] src,int srcOffset,int dstOffset,int length)
+  static void semicheckedSelfCopy(double[] src,int dstOffset,int srcOffset,int length)
   {
     //assert srcOffset>=0;
     //assert dstOffset>=0;
@@ -699,10 +699,10 @@ public interface ArrCopy
     //assert dstOffset+length<=dst.length;
     if(length!=0)
     {
-      uncheckedSelfCopy(src,srcOffset,dstOffset,length);
+      uncheckedSelfCopy(src,dstOffset,srcOffset,length);
     }
   }
-  static void uncheckedSelfCopy(double[] src,int srcOffset,int dstOffset,int length)
+  static void uncheckedSelfCopy(double[] src,int dstOffset,int srcOffset,int length)
   {
     //assert srcOffset>=0;
     //assert dstOffset>=0;

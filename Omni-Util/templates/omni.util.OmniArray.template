@@ -84,154 +84,207 @@ public final class OmniArray
     }
     return arr;
   }
-  #MACRO SubInterface<Boolean>(boolean,Boolean)
-  #MACRO SubInterface<Byte>(byte,Byte)
-  #MACRO SubInterface<Char>(char,Character)
-  #MACRO SubInterface<Short>(short,Short)
-  #MACRO SubInterface<Int>(int,Integer)
-  #MACRO SubInterface<Long>(long,Long)
-  #MACRO SubInterface<Float>(float,Float)
-  #MACRO SubInterface<Double>(double,Double)
-  #MACRO SubInterface<Ref>(Object,Object)
+  #MACRO SubInterface<Boolean,boolean,Boolean>()
+  #MACRO SubInterface<Byte,byte,Byte>()
+  #MACRO SubInterface<Char,char,Character>()
+  #MACRO SubInterface<Short,short,Short>()
+  #MACRO SubInterface<Int,int,Integer>()
+  #MACRO SubInterface<Long,long,Long>()
+  #MACRO SubInterface<Float,float,Float>()
+  #MACRO SubInterface<Double,double,Double>()
+  #MACRO SubInterface<Ref,Object,Object>()
 }
-#MACRODEF SubInterface<CLASSPREFIX>(PRIMITIVETYPE,BOXEDTYPE)
-public interface OfCLASSPREFIX
-{
-#IFSWITCH CLASSPREFIX==Boolean,Byte,Char,Short,Int,Long
-  public static boolean uncheckedcontains(PRIMITIVETYPE[] arr,int begin,int end,
-  #IFSWITCH CLASSPREFIX==Boolean
-    boolean val
-  #ELSEIFSWITCH CLASSPREFIX==Byte,Char,Short,Int
-    int val
-  #ELSEIFSWITCH CLASSPREFIX==Long
-    long val
-  #ENDIF
-  )
-  {
-    for(;;++begin)
-    {
-      if(arr[begin]==val)
-      {
-        return true;
-      }
-      if(begin==end)
-      {
-        return false;
-      }
-    }
-  }
-#ELSEIFSWITCH CLASSPREFIX==Ref
-  public static boolean uncheckedcontains(PRIMITIVETYPE[] arr,int begin,int end,Predicate<Object> pred)
-  {
-    for(;;++begin)
-    {
-      if(pred.test(arr[begin]))
-      {
-        return true;
-      }
-      if(begin==end)
-      {
-        return false;
-      }
-    }
-  }
-  public static boolean uncheckedcontainsNonNull(PRIMITIVETYPE[] arr,int begin,int end,Object nonNull)
-  {
-    for(;;++begin)
-    {
-      if(nonNull.equals(arr[begin]))
-      {
-        return true;
-      }
-      if(begin==end)
-      {
-        return false;
-      }
-    }
-  }
-  public static boolean uncheckedcontainsNull(PRIMITIVETYPE[] arr,int begin,int end)
-  {
-    for(;;++begin)
-    {
-      if(arr[begin]==null)
-      {
-        return true;
-      }
-      if(begin==end)
-      {
-        return false;
-      }
-    }
-  }
-#ELSE
-  public static boolean uncheckedcontains0(PRIMITIVETYPE[] arr,int begin,int end)
-  {
-    for(;;++begin)
-    {
-      if(arr[begin]==0)
-      {
-        return true;
-      }
-      if(begin==end)
-      {
-        return false;
-      }
-    }
-  }
-  public static boolean uncheckedcontainsNaN(PRIMITIVETYPE[] arr,int begin,int end)
-  {
-    for(;;++begin)
-    {
-      final PRIMITIVETYPE v;
-      if((v=arr[begin])!=v)
-      {
-        return true;
-      }
-      if(begin==end)
-      {
-        return false;
-      }
-    }
-  }
-  #IFSWITCH CLASSPREFIX==Double
-  public static boolean uncheckedcontainsBits(PRIMITIVETYPE[] arr,int begin,int end,long bits)
-  {
-    for(;;++begin)
-    {
-      if(bits==Double.doubleToRawLongBits(arr[begin]))
-      {
-        return true;
-      }
-      if(begin==end)
-      {
-        return false;
-      }
-    }
-  }
+
+
+#MACRODEF IndexEquals(VAL)
+#IFSWITCH SUFFIX==Null
+VAL==null
+#ELSEIFSWITCH SUFFIX==NonNull
+nonNull.equals(VAL)
+#ELSEIFSWITCH SUFFIX==Bits
+  #IFSWITCH CLASSPREFIX==Float
+bits==Float.floatToRawIntBits(VAL)
   #ELSE
-  public static boolean uncheckedcontainsBits(PRIMITIVETYPE[] arr,int begin,int end,int bits)
-  {
-    for(;;++begin)
-    {
-      if(bits==Float.floatToRawIntBits(arr[begin]))
-      {
-        return true;
-      }
-      if(begin==end)
-      {
-        return false;
-      }
-    }
-  }
+bits==Double.doubleToRawLongBits(VAL)
+  #ENDIF
+#ELSEIFSWITCH SUFFIX==NaN
+BOXEDTYPE.isNaN(VAL)
+#ELSEIFSWITCH SUFFIX==0
+VAL==0
+#ELSE
+VAL==val
+#ENDIF
+#ENDDEF
+
+#MACRODEF OptionalParameter()
+#IFSWITCH SUFFIX==NonNull
+,Object nonNull
+#ELSEIFSWITCH SUFFIX==Bits
+  #IFSWITCH CLASSPREFIX==Float
+,int bits
+  #ELSE
+,long bits
+  #ENDIF
+#ELSEIFSWITCH SUFFIX==Null,NaN,0
+#ELSE
+ #IFSWITCH CLASSPREFIX==Boolean
+,boolean val
+  #ELSEIFSWITCH CLASSPREFIX==Byte,Char,Short,Int
+,int val
+  #ELSEIFSWITCH CLASSPREFIX==Long
+,long val
   #ENDIF
 #ENDIF
+#ENDDEF
+
+#MACRODEF IfClause(MACRONAME,VAL)
+if
+(
+#MACRO MACRONAME(VAL)
+)
+#ENDDEF
+
+#MACRODEF UncheckedQueryMethods<SUFFIX>()
+public static boolean uncheckedcontainsSUFFIX(PRIMITIVETYPE[] arr,int begin,int end
+#MACRO OptionalParameter()
+)
+{
+  for(;;++begin)
+  {
+    #MACRO IfClause(IndexEquals,arr[begin])
+    {
+      return true;
+    }
+    if(begin==end)
+    {
+      return false;
+    }
+  }
+}
+public static int uncheckedindexOfSUFFIX(PRIMITIVETYPE[] arr,int bound
+#MACRO OptionalParameter()
+)
+{
+  for(int offset=0;;)
+  {
+    #MACRO IfClause(IndexEquals,arr[offset])
+    {
+      return offset;
+    }
+    if(++offset==bound)
+    {
+      return -1;
+    }
+  }
+}
+public static int uncheckedlastIndexOfSUFFIX(PRIMITIVETYPE[] arr,int bound
+#MACRO OptionalParameter()
+)
+{
+  for(;;)
+  {
+    #MACRO IfClause(IndexEquals,arr[--bound])
+    {
+      return bound;
+    }
+    if(bound==0)
+    {
+      return -1;
+    }
+  }
+}
+public static int uncheckedindexOfSUFFIX(PRIMITIVETYPE[] arr,int offset,int length
+#MACRO OptionalParameter()
+)
+{
+  int i;
+  for(i=offset,length+=offset;;)
+  {
+    #MACRO IfClause(IndexEquals,arr[i])
+    {
+      return i-offset;
+    }
+    if(++i==length)
+    {
+      return -1;
+    }
+  }
+}
+public static int uncheckedlastIndexOfSUFFIX(PRIMITIVETYPE[] arr,int offset,int length
+#MACRO OptionalParameter()
+)
+{
+  for(length+=(offset-1);;--length)
+  {
+    #MACRO IfClause(IndexEquals,arr[length])
+    {
+      return length-offset;
+    }
+    if(length==offset)
+    {
+      return -1;
+    }
+  }
+}
+public static int uncheckedsearchSUFFIX(PRIMITIVETYPE[] arr,int bound
+#MACRO OptionalParameter()
+)
+{
+  for(int i=bound-1;;--i)
+  {
+    #MACRO IfClause(IndexEquals,arr[i])
+    {
+      return bound-i;
+    }
+    if(i==0)
+    {
+      return -1;
+    }
+  }
+}
+#ENDDEF
 
 
+
+#MACRODEF SubInterface<CLASSPREFIX,PRIMITIVETYPE,BOXEDTYPE>()
+public interface OfCLASSPREFIX
+{
   public static final PRIMITIVETYPE[] DEFAULT_ARR=new PRIMITIVETYPE[]{};
 #IFNOTSWITCH CLASSPREFIX==Ref
   public static final BOXEDTYPE[] DEFAULT_BOXED_ARR=new BOXEDTYPE[]{};
 #ENDIF
-  static void reverseRange(PRIMITIVETYPE[] arr,int begin,int end)
+
+#IFSWITCH CLASSPREFIX==Boolean,Byte,Char,Short,Int,Long
+  #MACRO UncheckedQueryMethods< >()
+#ELSEIFSWITCH CLASSPREFIX==Ref
+  #MACRO UncheckedQueryMethods<Null>()
+  #MACRO UncheckedQueryMethods<NonNull>()
+#ELSE
+  #MACRO UncheckedQueryMethods<0>()
+  #MACRO UncheckedQueryMethods<NaN>()
+  #MACRO UncheckedQueryMethods<Bits>()
+#ENDIF
+
+  public static void removeIndexAndPullDown(PRIMITIVETYPE[] arr,int index,int newBound)
+  {
+    ArrCopy.semicheckedSelfCopy(arr,index,index+1,newBound-index);
+#IFSWITCH CLASSPREFIX==Ref
+    arr[newBound]=null;
+#ENDIF
+  }
+  public static int removeRangeAndPullDown(PRIMITIVETYPE[] arr,int index,int oldBound,int numRemoved)
+  {
+    ArrCopy.semicheckedSelfCopy(arr,index,index+=numRemoved,oldBound-index);
+#IFSWITCH CLASSPREFIX==Ref
+    nullifyRange(arr,oldBound-1,oldBound-=numRemoved);
+    return oldBound;
+#ELSE
+    return oldBound-numRemoved;
+#ENDIF
+  }
+
+
+  public static void reverseRange(PRIMITIVETYPE[] arr,int begin,int end)
   {
     do
     {
@@ -243,7 +296,7 @@ public interface OfCLASSPREFIX
   }
 #IFSWITCH CLASSPREFIX==Char,Double,Float,Int,Long,Ref,Short
   #IFSWITCH CLASSPREFIX==Ref
-  static void nullifyRange(Object[] arr,int begin,int end)
+  public static void nullifyRange(Object[] arr,int end,int begin)
   {
     for(;;++begin){
       arr[begin]=null;
@@ -251,21 +304,21 @@ public interface OfCLASSPREFIX
     }
   }
   @SafeVarargs
-  static <E> IntPredicate getIndexPredicate(Predicate<? super E> predicate,E...arr)
+  public static <E> IntPredicate getIndexPredicate(Predicate<? super E> predicate,E...arr)
   #ELSE
-  static IntPredicate getIndexPredicate(CLASSPREFIXPredicate predicate,PRIMITIVETYPE...arr)
+  public static IntPredicate getIndexPredicate(CLASSPREFIXPredicate predicate,PRIMITIVETYPE...arr)
   #ENDIF
   {
     return index->predicate.test(arr[index]);
   }
 #ENDIF
 #IFSWITCH CLASSPREFIX==Float
-  static IntPredicate getFltBitsIndexPredicate(CLASSPREFIXPredicate predicate,int...arr)
+  public static IntPredicate getFltBitsIndexPredicate(CLASSPREFIXPredicate predicate,int...arr)
   {
     return index->predicate.test(Float.intBitsToFloat(arr[index]));
   }
 #ELSEIFSWITCH CLASSPREFIX==Double
-  static IntPredicate getDblBitsIndexPredicate(CLASSPREFIXPredicate predicate,long...arr)
+  public static IntPredicate getDblBitsIndexPredicate(CLASSPREFIXPredicate predicate,long...arr)
   {
     return index->predicate.test(Double.longBitsToDouble(arr[index]));
   }
