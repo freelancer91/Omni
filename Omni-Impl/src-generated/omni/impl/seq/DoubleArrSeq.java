@@ -60,4 +60,428 @@ public abstract class DoubleArrSeq implements OmniCollection.OfDouble
   {
     return this.size==0;
   }
- }
+  @Override
+  public void clear()
+  {
+    this.size=0;
+  }
+  @Override
+  public int hashCode()
+  {
+    final int size;
+    if((size=this.size)!=0)
+    {
+      return uncheckedHashCode(size);
+    }
+    return 1;
+  }
+  @Override
+  public String toString()
+  {
+    int size;
+    if((size=this.size)!=0)
+    {
+      if(size>(Integer.MAX_VALUE/5))
+      {
+        throw new OutOfMemoryError();
+      }
+      final StringBuilder builder=new StringBuilder("[");
+      uncheckedToString(size,builder);
+      return builder.append(']').toString();
+    }
+    return "[]";
+  }
+  abstract int uncheckedHashCode(int size);
+  abstract void uncheckedToString(int size,StringBuilder builder);
+  public
+    static class UncheckedStack
+      extends DoubleArrSeq
+      implements OmniStack.OfDouble
+  {
+    public UncheckedStack()
+    {
+      super();
+    }
+    public UncheckedStack(int initialCapacity)
+    {
+      super(initialCapacity);
+    }
+    private UncheckedStack(int size,double[] arr)
+    {
+      super(size,arr);
+    }
+    @Override
+    public boolean equals(Object val)
+    {
+      //TODO implements equals method for UncheckedStack
+      return false;
+    }
+    @Override
+    public Object clone()
+    {
+      final double[] copy;
+      final int size;
+      if((size=this.size)!=0)
+      {
+        ArrCopy.uncheckedCopy(this.arr,0,copy=new double[size],0,size);
+      }
+      else
+      {
+        copy=OmniArray.OfDouble.DEFAULT_ARR;
+      }
+      return new UncheckedStack(size,copy);
+    }
+    @Override
+    void uncheckedToString(int size,StringBuilder builder)
+    {
+      OmniArray.OfDouble.descendingToString(this.arr,0,size-1,builder);
+    }
+    @Override
+    int uncheckedHashCode(int size)
+    {
+      return OmniArray.OfDouble.descendingSeqHashCode(this.arr,0,size-1);
+    }
+  }
+  public
+    static class UncheckedList
+      extends DoubleArrSeq
+      implements DoubleListDefault
+  {
+    public UncheckedList()
+    {
+      super();
+    }
+    public UncheckedList(int initialCapacity)
+    {
+      super(initialCapacity);
+    }
+    private UncheckedList(int size,double[] arr)
+    {
+      super(size,arr);
+    }
+    @Override
+    public boolean equals(Object val)
+    {
+      //TODO implements equals method for UncheckedList
+      return false;
+    }
+    @Override
+    public Object clone()
+    {
+      final double[] copy;
+      final int size;
+      if((size=this.size)!=0)
+      {
+        ArrCopy.uncheckedCopy(this.arr,0,copy=new double[size],0,size);
+      }
+      else
+      {
+        copy=OmniArray.OfDouble.DEFAULT_ARR;
+      }
+      return new UncheckedList(size,copy);
+    }
+    @Override
+    void uncheckedToString(int size,StringBuilder builder)
+    {
+      OmniArray.OfDouble.ascendingToString(this.arr,0,size-1,builder);
+    }
+    @Override
+    int uncheckedHashCode(int size)
+    {
+      return OmniArray.OfDouble.ascendingSeqHashCode(this.arr,0,size-1);
+    }
+  }
+  public
+    static class UncheckedSubList
+      implements DoubleListDefault
+  {
+    transient final int rootOffset;
+    transient int size;
+    transient final UncheckedList root;
+    transient final UncheckedSubList parent;
+    private UncheckedSubList(UncheckedList root,int rootOffset,int size)
+    {
+      super();
+      this.root=root;
+      this.parent=null;
+      this.rootOffset=rootOffset;
+      this.size=size;
+    }
+    private UncheckedSubList(UncheckedSubList parent,int rootOffset,int size)
+    {
+      super();
+      this.root=parent.root;
+      this.parent=parent;
+      this.rootOffset=rootOffset;
+      this.size=size;
+    }
+    @Override
+    public boolean equals(Object val)
+    {
+      //TODO implements equals method for UncheckedSubList
+      return false;
+    }
+    @Override
+    public Object clone()
+    {
+      final double[] copy;
+      final int size;
+      if((size=this.size)!=0)
+      {
+        ArrCopy.uncheckedCopy(root.arr,rootOffset,copy=new double[size],0,size);
+      }
+      else
+      {
+        copy=OmniArray.OfDouble.DEFAULT_ARR;
+      }
+      return new UncheckedList(size,copy);
+    }
+    @Override
+    public String toString()
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        if(size>(Integer.MAX_VALUE/5))
+        {
+          throw new OutOfMemoryError();
+        }
+          final int rootOffset;
+          final StringBuilder builder;
+          OmniArray.OfDouble.ascendingToString(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,builder=new StringBuilder("["));
+          return builder.append(']').toString();
+      }
+      return "[]";
+    }
+    @Override
+    public int hashCode()
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        final int rootOffset;
+        return OmniArray.OfDouble.ascendingSeqHashCode(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
+      }
+      return 1;
+    }
+    @Override
+    public void clear()
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        for(var curr=parent;curr!=null;curr.size-=size,curr=curr.parent){}
+        final UncheckedList root;
+        (root=this.root).size=OmniArray.OfDouble.removeRangeAndPullDown(root.arr,this.rootOffset,root.size,size);
+        this.size=0;
+      }
+    }
+  }
+  public
+    static class CheckedStack
+      extends UncheckedStack
+  {
+    transient int modCount;
+    public CheckedStack()
+    {
+      super();
+    }
+    public CheckedStack(int initialCapacity)
+    {
+      super(initialCapacity);
+    }
+    private CheckedStack(int size,double[] arr)
+    {
+      super(size,arr);
+    }
+    @Override
+    public boolean equals(Object val)
+    {
+      //TODO implements equals method for CheckedStack
+      return false;
+    }
+    @Override
+    public Object clone()
+    {
+      final double[] copy;
+      final int size;
+      if((size=this.size)!=0)
+      {
+        ArrCopy.uncheckedCopy(this.arr,0,copy=new double[size],0,size);
+      }
+      else
+      {
+        copy=OmniArray.OfDouble.DEFAULT_ARR;
+      }
+      return new CheckedStack(size,copy);
+    }
+    @Override
+    public void clear()
+    {
+      if(this.size!=0)
+      {
+        ++this.modCount;
+        this.size=0;
+      }
+    }
+  }
+  public
+    static class CheckedList
+      extends UncheckedList
+  {
+    transient int modCount;
+    public CheckedList()
+    {
+      super();
+    }
+    public CheckedList(int initialCapacity)
+    {
+      super(initialCapacity);
+    }
+    private CheckedList(int size,double[] arr)
+    {
+      super(size,arr);
+    }
+    @Override
+    public boolean equals(Object val)
+    {
+      //TODO implements equals method for CheckedList
+      return false;
+    }
+    @Override
+    public Object clone()
+    {
+      final double[] copy;
+      final int size;
+      if((size=this.size)!=0)
+      {
+        ArrCopy.uncheckedCopy(this.arr,0,copy=new double[size],0,size);
+      }
+      else
+      {
+        copy=OmniArray.OfDouble.DEFAULT_ARR;
+      }
+      return new CheckedList(size,copy);
+    }
+    @Override
+    public void clear()
+    {
+      if(this.size!=0)
+      {
+        ++this.modCount;
+        this.size=0;
+      }
+    }
+  }
+  private
+    static class CheckedSubList
+      implements DoubleListDefault
+  {
+    transient int modCount;
+    transient final int rootOffset;
+    transient int size;
+    transient final CheckedList root;
+    transient final CheckedSubList parent;
+    private CheckedSubList(CheckedList root,int rootOffset,int size)
+    {
+      super();
+      this.root=root;
+      this.parent=null;
+      this.rootOffset=rootOffset;
+      this.size=size;
+      this.modCount=root.modCount;
+    }
+    private CheckedSubList(CheckedSubList parent,int rootOffset,int size)
+    {
+      super();
+      this.root=parent.root;
+      this.parent=parent;
+      this.rootOffset=rootOffset;
+      this.size=size;
+      this.modCount=parent.modCount;
+    }
+    @Override
+    public boolean equals(Object val)
+    {
+      //TODO implements equals method for CheckedSubList
+      return false;
+    }
+    @Override
+    public Object clone()
+    {
+      final CheckedList root;
+      CheckedCollection.checkModCount(this.modCount,(root=this.root).modCount);
+      final double[] copy;
+      final int size;
+      if((size=this.size)!=0)
+      {
+        ArrCopy.uncheckedCopy(root.arr,rootOffset,copy=new double[size],0,size);
+      }
+      else
+      {
+        copy=OmniArray.OfDouble.DEFAULT_ARR;
+      }
+      return new CheckedList(size,copy);
+    }
+    @Override
+    public String toString()
+    {
+      final CheckedList root;
+      CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+      int size;
+      if((size=this.size)!=0)
+      {
+        if(size>(Integer.MAX_VALUE/5))
+        {
+          throw new OutOfMemoryError();
+        }
+          final int rootOffset;
+          final StringBuilder builder;
+          OmniArray.OfDouble.ascendingToString(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,builder=new StringBuilder("["));
+          return builder.append(']').toString();
+      }
+      return "[]";
+    }
+    @Override
+    public int hashCode()
+    {
+      final CheckedList root;
+      CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+      final int size;
+      if((size=this.size)!=0)
+      {
+        final int rootOffset;
+        return OmniArray.OfDouble.ascendingSeqHashCode(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
+      }
+      return 1;
+    }
+    @Override
+    public int size()
+    {
+      CheckedCollection.checkModCount(modCount,root.modCount);
+      return this.size;
+    }
+    @Override
+    public boolean isEmpty()
+    {
+      CheckedCollection.checkModCount(modCount,root.modCount);
+      return this.size==0;
+    }
+    @Override
+    public void clear()
+    {
+      final CheckedList root;
+      int modCount;
+      CheckedCollection.checkModCount(modCount=this.modCount,(root=this.root).modCount);
+      final int size;
+      if((size=this.size)!=0)
+      {
+        root.modCount=++modCount;
+        this.modCount=modCount;
+        for(var curr=parent;curr!=null;curr.modCount=modCount,curr.size-=size,curr=curr.parent){}
+        root.size=OmniArray.OfDouble.removeRangeAndPullDown(root.arr,this.rootOffset,root.size,size);
+        this.size=0;
+      }
+    }
+  }
+}

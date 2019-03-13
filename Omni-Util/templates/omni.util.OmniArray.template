@@ -1,6 +1,7 @@
 #TYPEDEF OfGeneric
 package omni.util;
 import java.lang.reflect.Array;
+import java.util.Objects;
 import java.util.function.DoublePredicate;
 import java.util.function.IntPredicate;
 import java.util.function.LongPredicate;
@@ -8,6 +9,7 @@ import java.util.function.Predicate;
 import omni.function.CharPredicate;
 import omni.function.FloatPredicate;
 import omni.function.ShortPredicate;
+
 public final class OmniArray
 {
   private OmniArray()
@@ -112,7 +114,11 @@ BOXEDTYPE.isNaN(VAL)
 #ELSEIFSWITCH SUFFIX==0
 VAL==0
 #ELSE
+  #IFSWITCH CLASSPREFIX==Ref
+pred.test(VAL)
+  #ELSE
 VAL==val
+  #ENDIF
 #ENDIF
 #ENDDEF
 
@@ -133,6 +139,8 @@ VAL==val
 ,int val
   #ELSEIFSWITCH CLASSPREFIX==Long
 ,long val
+  #ELSEIFSWITCH CLASSPREFIX==Ref
+,Predicate<Object> pred
   #ENDIF
 #ENDIF
 #ENDDEF
@@ -245,6 +253,19 @@ public static int uncheckedsearchSUFFIX(PRIMITIVETYPE[] arr,int bound
 #ENDDEF
 
 
+#MACRODEF GetHashCode(VAL)
+#IFSWITCH CLASSPREFIX==Boolean
+((VAL)?1231:1237)
+#ELSEIFSWITCH CLASSPREFIX==Byte,Char,Short,Int
+VAL
+#ELSEIFSWITCH CLASSPREFIX==Long
+Long.hashCode(VAL)
+#ELSEIFSWITCH CLASSPREFIX==Float,Double
+HashUtil.hashCLASSPREFIX(VAL)
+#ELSEIFSWITCH CLASSPREFIX==Ref
+Objects.hashCode(VAL)
+#ENDIF
+#ENDDEF
 
 #MACRODEF SubInterface<CLASSPREFIX,PRIMITIVETYPE,BOXEDTYPE>()
 public interface OfCLASSPREFIX
@@ -254,11 +275,165 @@ public interface OfCLASSPREFIX
   public static final BOXEDTYPE[] DEFAULT_BOXED_ARR=new BOXEDTYPE[]{};
 #ENDIF
 
-#IFSWITCH CLASSPREFIX==Boolean,Byte,Char,Short,Int,Long
+  public static int ascendingSeqHashCode(PRIMITIVETYPE[] arr,int begin,int end)
+  {
+    for(int hash=31+
+      #MACRO GetHashCode(arr[begin])
+      ;;)
+    {
+      if(begin==end)
+      {
+        return hash;
+      }
+      hash=hash*31+(
+        #MACRO GetHashCode(arr[++begin])
+        );
+    }
+  }
+  public static int descendingSeqHashCode(PRIMITIVETYPE[] arr,int begin,int end)
+  {
+    for(int hash=31+
+      #MACRO GetHashCode(arr[end])
+      ;;)
+    {
+      if(begin==end)
+      {
+        return hash;
+      }
+      hash=hash*31+(
+        #MACRO GetHashCode(arr[--end])
+        );
+    }
+  }
+
+#IFSWITCH CLASSPREFIX==Double,Ref
+  public static void ascendingToString(PRIMITIVETYPE[] arr,int begin,int end,StringBuilder builder)
+  {
+    for(;;++begin)
+    {
+      builder.append(arr[begin]);
+      if(begin==end)
+      {
+        return;
+      }
+      builder.append(',').append(' ');
+    }
+  }
+  public static void descendingToString(PRIMITIVETYPE[] arr,int begin,int end,StringBuilder builder)
+  {
+    for(;;--end)
+    {
+      builder.append(arr[end]);
+      if(begin==end)
+      {
+        return;
+      }
+      builder.append(',').append(' ');
+    }
+  }
+#ELSEIFSWITCH CLASSPREFIX==Char
+  public static void ascendingToString(PRIMITIVETYPE[] arr,int begin,int end,char[] buffer,int bufferOffset)
+  {
+    for(;;++bufferOffset,++begin)
+    {
+      buffer[bufferOffset]=arr[begin];
+      if(begin==end)
+      {
+        return;
+      }
+      buffer[++bufferOffset]=',';
+      buffer[++bufferOffset]=' ';
+    }
+  }
+  public static void descendingToString(PRIMITIVETYPE[] arr,int begin,int end,char[] buffer,int bufferOffset)
+  {
+    for(;;++bufferOffset,--end)
+    {
+      buffer[bufferOffset]=arr[end];
+      if(begin==end)
+      {
+        return;
+      }
+      buffer[++bufferOffset]=',';
+      buffer[++bufferOffset]=' ';
+    }
+  }
+#ELSEIFSWITCH CLASSPREFIX==Boolean,Byte,Short,Int,Long,Float
+  public static void ascendingToString(PRIMITIVETYPE[] arr,int begin,int end,ToStringUtil.OmniStringBuilder builder)
+  {
+    for(;;++begin)
+    {
+  #IFSWITCH CLASSPREFIX==Byte
+      builder.uncheckedAppendShort(arr[begin]);
+  #ELSE
+      builder.uncheckedAppendCLASSPREFIX(arr[begin]);
+  #ENDIF
+      if(begin==end)
+      {
+        return;
+      }
+      builder.uncheckedAppendCommaAndSpace();
+    }
+  }
+  public static int ascendingToString(PRIMITIVETYPE[] arr,int begin,int end,char[] buffer,int bufferOffset)
+  {
+    for(;;++begin,++bufferOffset)
+    {
+  #IFSWITCH CLASSPREFIX==Byte
+      bufferOffset=ToStringUtil.getStringShort(arr[begin],buffer,bufferOffset);
+  #ELSE
+      bufferOffset=ToStringUtil.getStringCLASSPREFIX(arr[begin],buffer,bufferOffset);
+  #ENDIF
+      if(begin==end)
+      {
+        return bufferOffset;
+      }
+      buffer[bufferOffset]=',';
+      buffer[++bufferOffset]=' ';
+    }
+  }
+  public static void descendingToString(PRIMITIVETYPE[] arr,int begin,int end,ToStringUtil.OmniStringBuilder builder)
+  {
+    for(;;--end)
+    {
+  #IFSWITCH CLASSPREFIX==Byte
+      builder.uncheckedAppendShort(arr[end]);
+  #ELSE
+      builder.uncheckedAppendCLASSPREFIX(arr[end]);
+  #ENDIF
+      if(begin==end)
+      {
+        return;
+      }
+      builder.uncheckedAppendCommaAndSpace();
+    }
+  }
+  public static int descendingToString(PRIMITIVETYPE[] arr,int begin,int end,char[] buffer,int bufferOffset)
+  {
+    for(;;--end,++bufferOffset)
+    {
+  #IFSWITCH CLASSPREFIX==Byte
+      bufferOffset=ToStringUtil.getStringShort(arr[end],buffer,bufferOffset);
+  #ELSE
+      bufferOffset=ToStringUtil.getStringCLASSPREFIX(arr[end],buffer,bufferOffset);
+  #ENDIF
+      if(begin==end)
+      {
+        return bufferOffset;
+      }
+      buffer[bufferOffset]=',';
+      buffer[++bufferOffset]=' ';
+    }
+  }
+#ENDIF
+
+
+#IFSWITCH CLASSPREFIX==Boolean,Byte,Char,Short,Int,Long,Ref
   #MACRO UncheckedQueryMethods< >()
-#ELSEIFSWITCH CLASSPREFIX==Ref
+  #IFSWITCH CLASSPREFIX==Ref
   #MACRO UncheckedQueryMethods<Null>()
   #MACRO UncheckedQueryMethods<NonNull>()
+  #ENDIF
 #ELSE
   #MACRO UncheckedQueryMethods<0>()
   #MACRO UncheckedQueryMethods<NaN>()

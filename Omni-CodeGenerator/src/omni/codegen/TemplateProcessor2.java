@@ -219,6 +219,10 @@ public class TemplateProcessor2{
                             }
                         }
                     }
+                    else{
+                        trouble=true;
+                        throw new Exception("The key " + key + " has no defined value on line " + currIndex);
+                    }
 
 
                 }else{
@@ -282,6 +286,10 @@ public class TemplateProcessor2{
                                     value=args[i++].trim();
                                 }
                             }
+                        }
+                        else{
+                            trouble=true;
+                            throw new Exception("The key " + key + " has no defined value on line " + currIndex);
                         }
 
                     }else{

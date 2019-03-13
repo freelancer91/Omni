@@ -27,18 +27,18 @@ import omni.util.TypeUtil;
 import java.util.ConcurrentModificationException;
 #IF OfInt,OfLong,OfDouble
 import java.util.function.$UnaryOperator$;
-#ELSEIFNOT OfBoolean
+#ELSEIFNOT OfBoolean,OfRef
 import omni.function.$UnaryOperator$;
 #ENDIF
 #IF OfInt
 import java.util.function.$Comparator$;
-#ELSE
+#ELSEIFNOT OfRef
 import omni.function.$Comparator$;
 #ENDIF
 #IF OfInt,OfLong,OfDouble
 import java.util.function.$TypeNameModifier$Predicate;
 import java.util.function.$TypeNameModifier$Consumer;
-#ELSE
+#ELSEIFNOT OfRef
 import omni.function.$TypeNameModifier$Predicate;
 import omni.function.$TypeNameModifier$Consumer;
 #ENDIF
@@ -51,8 +51,9 @@ import omni.util.HashUtil;
 #IFNOT OfBoolean
 import omni.util.BitSetUtil;
 #ENDIF
+#IFNOT OfRef
 import omni.impl.Abstract$TypeNameModifier$Itr;
-
+#ENDIF
 public abstract class $ClassPrefix$ArrSeq$<E>$ implements OmniCollection.Of$ClassPrefix$$<E>$
 {
   transient int size;
@@ -91,68 +92,1255 @@ public abstract class $ClassPrefix$ArrSeq$<E>$ implements OmniCollection.Of$Clas
   {
     return this.size==0;
   }
+  @Override
+  public void clear()
+  {
+#IF OfRef
+    int size;
+    if((size=this.size)!=0)
+    {
+      this.size=0;
+      OmniArray.Of$ClassPrefix$.nullifyRange(this.arr,size-1,0);
+    }
+#ELSE
+    this.size=0;
+#ENDIF
+  }
+  @Override
+  public int hashCode()
+  {
+    final int size;
+    if((size=this.size)!=0)
+    {
+      return uncheckedHashCode(size);
+    }
+    return 1;
+  }
+  @Override
+  public String toString()
+  {
+    int size;
+    if((size=this.size)!=0)
+    {
+#IF OfBoolean
+      if(size>(Integer.MAX_VALUE/6))
+#ELSEIF OfByte,OfChar,OfShort,OfInt,OfLong
+      if(size>(Integer.MAX_VALUE/3))
+#ELSEIF OfFloat,OfDouble
+      if(size>(Integer.MAX_VALUE/5))
+#ELSE
+      if(size>(Integer.MAX_VALUE>>1))
+#ENDIF
+      {
+        throw new OutOfMemoryError();
+      }
+#IF OfDouble,OfRef
+      final StringBuilder builder=new StringBuilder("[");
+      uncheckedToString(size,builder);
+      return builder.append(']').toString();
+#ELSE
+      final char[] buffer;
+  #IF OfChar
+      uncheckedToString(size,buffer=new char[size*=3]);
+      buffer[0]='[';
+      buffer[size-1]=']';
+      return new String(buffer,0,size);
+  #ELSE
+    #IF OfBoolean
+      if(size<=(OmniArray.MAX_ARR_SIZE/7)){
+        (buffer=new char[size*7])[size=uncheckedToString(size,buffer)]=']';
+      }else{
+        final ToStringUtil.OmniStringBuilder builder;
+        uncheckedToString(size,builder=new ToStringUtil.OmniStringBuilder(1,new char[(size>>=2)*21+(size*6)]));
+    #ELSEIF OfByte
+      if(size<=(OmniArray.MAX_ARR_SIZE/6)){
+        (buffer=new char[size*6])[size=uncheckedToString(size,buffer)]=']';
+      }else{
+        final ToStringUtil.OmniStringBuilder builder;
+        uncheckedToString(size,builder=new ToStringUtil.OmniStringBuilder(1,new char[size*5]));
+    #ELSEIF OfShort
+      if(size<=(OmniArray.MAX_ARR_SIZE>>3)){
+        (buffer=new char[size<<3])[size=uncheckedToString(size,buffer)]=']';
+      }else{
+        final ToStringUtil.OmniStringBuilder builder;
+        uncheckedToString(size,builder=new ToStringUtil.OmniStringBuilder(1,new char[size*6]));
+    #ELSEIF OfInt
+      if(size<=(OmniArray.MAX_ARR_SIZE/13)){
+        (buffer=new char[size*13])[size=uncheckedToString(size,buffer)]=']';
+      }else{
+        final ToStringUtil.OmniStringBuilder builder;
+        uncheckedToString(size,builder=new ToStringUtil.OmniStringBuilder(1,new char[size<<3]));
+    #ELSEIF OfLong
+      if(size<=(OmniArray.MAX_ARR_SIZE/22)){
+        (buffer=new char[size*22])[size=uncheckedToString(size,buffer)]=']';
+      }else{
+        final ToStringUtil.OmniStringBuilder builder;
+        uncheckedToString(size,builder=new ToStringUtil.OmniStringBuilder(1,new char[size*13]));
+    #ELSEIF OfFloat
+      if(size<=(OmniArray.MAX_ARR_SIZE/17)){
+        (buffer=new char[size*17])[size=uncheckedToString(size,buffer)]=']';
+      }else{
+        final ToStringUtil.OmniStringBuilder builder;
+        uncheckedToString(size,builder=new ToStringUtil.OmniStringBuilder(1,new char[size*10]));
+    #ENDIF
+        (buffer=builder.buffer)[size=builder.size]=']';
+      }
+      buffer[0]='[';
+      return new String(buffer,0,size+1);
+  #ENDIF 
+#ENDIF
+    }
+    return "[]";
+  }
+  abstract int uncheckedHashCode(int size);
+#IF OfDouble,OfRef
+  abstract void uncheckedToString(int size,StringBuilder builder);
+#ELSEIF OfChar
+  abstract void uncheckedToString(int size,char[] buffer);
+#ELSE
+  abstract int uncheckedToString(int size,char[] buffer);
+  abstract void uncheckedToString(int size,ToStringUtil.OmniStringBuilder builder);
+#ENDIF
+ 
   
- }
- 
- 
+  
+
+  
+  #MACRO StructImpl<UncheckedStack>()
+  #MACRO StructImpl<UncheckedList>()
+  #MACRO StructImpl<UncheckedSubList>()
+  #MACRO StructImpl<CheckedStack>()
+  #MACRO StructImpl<CheckedList>()
+  #MACRO StructImpl<CheckedSubList>()
+}
+
+
+#MACRODEF QueryBoolean()
+#MACRO QuerySignature<boolean>()
+{
+  final int size;
+  if((size=this.size)!=0)
+  {
+#IF OfDouble,OfFloat
+    if(val)
+    {
+      #MACRO ReturnUncheckedQueryBits($TRUE_BITS$)
+    }
+    #MACRO ReturnUncheckedQuery0()
+#ELSE
+    #MACRO ReturnUncheckedQuery($queryCastBoolean$(VAL))
+#ENDIF
+  }
+  #MACRO CheckedSubListNegativeReturnCheckModCount()
+  #MACRO QueryReturnNegative()
+}
+#ENDDEF
+
+#MACRODEF QueryByte()
+#MACRO QuerySignature<byte>()
+{
+#IF OfChar
+  if(val>=0)
+#ENDIF
+  {
+    final int size;
+    if((size=this.size)!=0)
+    {
+#IF OfDouble,OfFloat
+      if(val!=0)
+      {
+        #MACRO ReturnUncheckedQueryBits($convertToBits$(val))
+      }
+      #MACRO ReturnUncheckedQuery0()
+#ELSE
+      #MACRO ReturnUncheckedQuery($queryCastPrimitive$(val))
+#ENDIF
+    }
+  }
+  #MACRO CheckedSubListNegativeReturnCheckModCount()
+  #MACRO QueryReturnNegative()
+}
+#ENDDEF
+
+#MACRODEF QueryChar()
+#MACRO QuerySignature<char>()
+{
+#IF OfByte,OfShort
+  if(val<=$BoxedType$.MAX_VALUE)
+#ENDIF
+  {
+    final int size;
+    if((size=this.size)!=0)
+    {
+#IF OfDouble,OfFloat
+      if(val!=0)
+      {
+        #MACRO ReturnUncheckedQueryBits($convertToBits$(val))
+      }
+      #MACRO ReturnUncheckedQuery0()
+#ELSE
+      #MACRO ReturnUncheckedQuery($queryCastPrimitive$(val))
+#ENDIF
+    }
+  }
+  #MACRO CheckedSubListNegativeReturnCheckModCount()
+  #MACRO QueryReturnNegative()
+}
+#ENDDEF
+
+#MACRODEF QueryShort()
+#MACRO QuerySignature<short>()
+{
+#IF OfByte,OfBoolean
+ERROR QueryShort<STRUCTNAME,METHODNAME> not allowed for $ClassPrefix$
+#ENDIF
+
+#IF OfChar
+  if(val>=0)
+#ENDIF
+  {
+    final int size;
+    if((size=this.size)!=0)
+    {
+#IF OfDouble,OfFloat
+      if(val!=0)
+      {
+        #MACRO ReturnUncheckedQueryBits($convertToBits$(val))
+      }
+      #MACRO ReturnUncheckedQuery0()
+#ELSE
+      #MACRO ReturnUncheckedQuery($queryCastPrimitive$(val))
+#ENDIF
+    }
+  }
+  #MACRO CheckedSubListNegativeReturnCheckModCount()
+  #MACRO QueryReturnNegative()
+}
+#ENDDEF
+
+#MACRODEF QueryInt()
+#MACRO QuerySignature<int>()
+{
+#IF OfByte,OfChar,OfShort
+  if(val==($ArrayType$)val)
+#ENDIF
+  {
+    final int size;
+    if((size=this.size)!=0)
+    {
+#IF OfBoolean
+      returnFalse:for(;;)
+      {
+        final $ArrayType$ v;
+        switch(val)
+        {
+        default;
+          break returnFalse;
+        case 0:
+          v=false;
+          break;
+        case 1:
+          v=true;
+        }
+        #MACRO ReturnUncheckedQuery(v)
+      }
+#ELSEIF OfFloat,OfDouble
+      if(val!=0)
+      {
+        #IF OfFloat
+        if(TypeUtil.checkCastTo$ClassPrefix$(val))
+        #ENDIF
+        {
+          #MACRO ReturnUncheckedQueryBits($convertToBits$(val))
+        }
+      }
+      else
+      {
+        #MACRO ReturnUncheckedQuery0()
+      }
+#ELSE
+      #MACRO ReturnUncheckedQuery($queryCastPrimitive$(val))
+#ENDIF
+    }
+  }
+  #MACRO CheckedSubListNegativeReturnCheckModCount()
+  #MACRO QueryReturnNegative()
+}
+#ENDDEF
+
+#MACRODEF QueryLong()
+#MACRO QuerySignature<long>()
+{
+  final int size;
+  if((size=this.size)!=0)
+  {
+    #IF OfBoolean
+    returnFalse:for(;;)
+    {
+      final $ArrayType$ v;
+      if(val==0L)
+      {
+        v=false;
+      }else if(val==1L)
+      {
+        v=true;
+      }
+      else
+      {
+        break returnFalse;
+      }
+      #MACRO ReturnUncheckedQuery(v)
+    }
+    #ELSEIF OfFloat,OfDouble
+    if(val!=0)
+    {
+      if(TypeUtil.checkCastTo$ClassPrefix$(val))
+      {
+        #MACRO ReturnUncheckedQueryBits($convertToBits$(val))
+      }
+    }
+    else
+    {
+      #MACRO ReturnUncheckedQuery0()
+    }
+    #ELSEIF OfByte,OfChar,OfShort,OfInt
+    final $ArrayType$ v;
+    if((v=($ArrayType$)val)==val)
+    {
+      #MACRO ReturnUncheckedQuery(v)
+    }
+    #ELSE
+    #MACRO ReturnUncheckedQuery($queryCastPrimitive$(val))
+    #ENDIF
+  }
+  #MACRO CheckedSubListNegativeReturnCheckModCount()
+  #MACRO QueryReturnNegative()
+}
+#ENDDEF
+
+#MACRODEF QueryFloat()
+#MACRO QuerySignature<float>()
+{
+  final int size;
+  if((size=this.size)!=0)
+  {
+    #IF OfBoolean
+    returnFalse:for(;;)
+    {
+      final $ArrayType$ v;
+      switch(Float.floatToRawIntBits(val))
+      {
+        default:
+          break returnFalse;
+        case 0:
+        case Integer.MIN_VALUE:
+          v=false;
+          break;
+        case TypeUtil.FLT_TRUE_BITS:
+          v=true;
+      }
+      #MACRO ReturnUncheckedQuery(v)
+    }
+    #ELSEIF OfFloat,OfDouble
+    if(val==val)
+    {
+      #MACRO ReturnUncheckedQueryBits($convertToBits$(val))
+    }
+    #MACRO ReturnUncheckedQueryNaN()
+    #ELSEIF OfRef
+    #MACRO ReturnUncheckedQuery($queryCastPrimitive$(val))
+    #ELSE
+    final $ArrayType$ v;
+      #IF OfLong
+    if(TypeUtil.floatEquals(val,v=($ArrayType$)val))
+      #ELSEIF OfInt
+    if((double)val==(double)(v=($ArrayType$)val))
+      #ELSE
+    if(val==(v=($ArrayType$)val))
+      #ENDIF
+    {
+      #MACRO ReturnUncheckedQuery(v)
+    }
+    #ENDIF
+  }
+  #MACRO CheckedSubListNegativeReturnCheckModCount()
+  #MACRO QueryReturnNegative()
+}
+#ENDDEF
+
+#MACRODEF QueryDouble()
+#MACRO QuerySignature<double>()
+{
+  final int size;
+  if((size=this.size)!=0)
+  {
+    #IF OfBoolean
+    returnFalse:for(;;)
+    {
+      final $ArrayType$ v;
+      long bits;
+      if((bits=Double.doubleToRawLongBits(val))==0 || bits==Long.MIN_VALUE)
+      {
+        v=false;
+      }
+      else if(bits==TypeUtil.DBL_TRUE_BITS)
+      {
+        v=true;
+      }
+      else
+      {
+        break returnFalse;
+      }
+      #MACRO ReturnUncheckedQuery(v)
+    }
+    #ELSEIF OfFloat
+    final $ArrayType$ v;
+    if(val==(v=($ArrayType$)val))
+    {
+      #MACRO ReturnUncheckedQueryBits($convertToBits$(v))
+    }
+    else if(v!=v)
+    {
+      #MACRO ReturnUncheckedQueryNaN()
+    }
+    #ELSEIF OfDouble
+    if(val==val)
+    {
+      #MACRO ReturnUncheckedQueryBits($convertToBits$(val))
+    }
+    #MACRO ReturnUncheckedQueryNaN()
+    #ELSEIF OfRef
+    #MACRO ReturnUncheckedQuery($queryCastPrimitive$(val))
+    #ELSE
+    final $ArrayType$ v;
+      #IF OfLong
+    if(TypeUtil.doubleEquals(val,v=($ArrayType$)val))
+      #ELSE
+    if(val==(v=($ArrayType$)val))
+      #ENDIF
+    {
+      #MACRO ReturnUncheckedQuery(v)
+    }
+    #ENDIF
+  }
+  #MACRO CheckedSubListNegativeReturnCheckModCount()
+  #MACRO QueryReturnNegative()
+}
+#ENDDEF
+
+//TODO QueryObject()
+
+#MACRODEF CheckedSubListNegativeReturnCheckModCount()
+#IFSWITCH STRUCTNAME==CheckedSubList
+CheckedCollection.checkModCount(modCount,root.modCount);
+#ENDIF
+#ENDDEF
+
+
+#MACRODEF QuerySignature<INPUTTYPE>()
+@Override
+#IFSWITCH METHODNAME==removeVal
+  #IFSWITCH INPUTTYPE==Object
+public boolean remove(INPUTTYPE val)
+  #ELSE
+public boolean METHODNAME(INPUTTYPE val)
+  #ENDIF
+#ELSEIFSWITCH METHODNAME==contains
+public boolean METHODNAME(INPUTTYPE val)
+#ELSE
+public int METHODNAME(INPUTTYPE val)
+#ENDIF
+#ENDDEF
+
+
+#MACRODEF QueryReturnNegative()
+#IFSWITCH METHDONAME==contains,removeVal
+return false;
+#ELSE
+return -1;
+#ENDIF
+#ENDDEF
+
+
+#MACRODEF ReturnUncheckedQueryNonNull(VAL)
+#IFNOT OfRef
+ERROR ReturnUncheckedQueryNonNull<METHODNAME,STRUCTNAME>(VAL) is only allowed for OfRef
+#ENDIF
+#IFSWITCH STRUCTNAME==UncheckedSubList,CheckedSubList
+
+  #IFSWITCH METHODNAME==contains
+final int rootOffset;
+return OmniArray.Of$ClassPrefix$.uncheckedMETHODNAMENonNull(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,VAL);
+  #ELSEIFSWITCH METHODNAME==removeVal
+return this.uncheckedMETHODNAMENonNull(root.arr,size,VAL);
+  #ELSEIFSWITCH METHODNAME==indexOf,lastIndexOf
+return OmniArray.Of$ClassPrefix$.uncheckedMETHODNAMENonNull(root.arr,this.rootOffset,size,VAL);
+  #ELSE
+ERROR invalid methodname METHODNAME for struct STRUCTNAME (ReturnUncheckedQueryNonNull<METHODNAME,STRUCTNAME>(VAL))
+  #ENDIF
+
+#ELSEIFSWITCH STRUCTNAME==Root
+
+  #IFSWITCH METHODNAME==contains
+return OmniArray.Of$ClassPrefix$.uncheckedMETHODNAMENonNull(this.arr,0,size-1,VAL);
+  #ELSEIFSWITCH METHODNAME==removeVal
+return this.uncheckedMETHODNAMENonNull(size,VAL);
+  #ELSE
+ERROR invalid methodname METHODNAME for struct STRUCTNAME (ReturnUncheckedQueryNonNull<METHODNAME,STRUCTNAME>(VAL))
+  #ENDIF
+
+#ELSEIFSWITCH STRUCTNAME==UncheckedList
+
+  #IFSWITCH METHODNAME==indexOf,lastIndexOf
+return OmniArray.Of$ClassPrefix$.uncheckedMETHODNAMENonNull(this.arr,size,VAL);
+  #ELSE
+ERROR invalid methodname METHODNAME for struct STRUCTNAME (ReturnUncheckedQueryNonNull<METHODNAME,STRUCTNAME>(VAL))
+  #ENDIF
+
+#ELSEIFSWITCH STRUCTNAME==UncheckedStack
+
+  #IFSWITCH METHODNAME==search
+return OmniArray.Of$ClassPrefix$.uncheckedMETHODNAMENonNull(this.arr,size,VAL);
+  #ELSE
+ERROR invalid methodname METHODNAME for struct STRUCTNAME (ReturnUncheckedQueryNonNull<METHODNAME,STRUCTNAME>(VAL))
+  #ENDIF
+
+#ELSEIFSWITCH STRUCTNAME==CheckedList
+
+  #IFSWITCH METHODNAME==indexOf,lastIndexOf
+final int modCount=this.modCount;
+try
+{
+  return OmniArray.Of$ClassPrefix$.uncheckedMETHODNAMENonNull(this.arr,size,VAL);
+}
+finally
+{
+  CheckedCollection.checkModCount(modCount,this.modCount);
+}
+  #ELSE
+ERROR invalid methodname METHODNAME for struct STRUCTNAME (ReturnUncheckedQueryNonNull<METHODNAME,STRUCTNAME>(VAL))
+  #ENDIF
+
+#ELSEIFSWITCH STRUCTNAME==CheckedStack
+
+  #IFSWITCH METHODNAME==search
+final int modCount=this.modCount;
+try
+{
+  return OmniArray.Of$ClassPrefix$.uncheckedMETHODNAMENonNull(this.arr,size,VAL);
+}
+finally
+{
+  CheckedCollection.checkModCount(modCount,this.modCount);
+}
+  #ELSE
+ERROR invalid methodname METHODNAME for struct STRUCTNAME (ReturnUncheckedQueryNonNull<METHODNAME,STRUCTNAME>(VAL))
+  #ENDIF
+
+#ELSE
+
+ERROR unknown struct STRUCTNAME for (ReturnUncheckedQueryNonNull<METHODNAME,STRUCTNAME>(VAL))
+
+#ENDIF
+#ENDDEF
+
+#MACRODEF ReturnUncheckedQueryNull()
+#IFNOT OfFloat,OfDouble
+ERROR ReturnUncheckedQueryNull<METHODNAME,STRUCTNAME>() is only allowed for OfRef
+#ENDIF
+#IFSWITCH STRUCTNAME==UncheckedSubList,CheckedSubList
+
+  #IFSWITCH METHODNAME==contains
+final int rootOffset;
+return OmniArray.Of$ClassPrefix$.uncheckedMETHODNAMENull(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
+  #ELSEIFSWITCH METHODNAME==removeVal
+return this.uncheckedMETHODNAMENull(root.arr,size);
+  #ELSEIFSWITCH METHODNAME==indexOf,lastIndexOf
+return OmniArray.Of$ClassPrefix$.uncheckedMETHODNAMENull(root.arr,this.rootOffset,size);
+  #ELSE
+ERROR invalid methodname METHODNAME for struct STRUCTNAME (ReturnUncheckedQueryNull<METHODNAME,STRUCTNAME>())
+  #ENDIF
+
+#ELSEIFSWITCH STRUCTNAME==Root
+
+  #IFSWITCH METHODNAME==contains
+return OmniArray.Of$ClassPrefix$.uncheckedMETHODNAMENull(this.arr,0,size-1);
+  #ELSEIFSWITCH METHODNAME==removeVal
+return this.uncheckedMETHODNAMENull(size);
+  #ELSE
+ERROR invalid methodname METHODNAME for struct STRUCTNAME (ReturnUncheckedQueryNull<METHODNAME,STRUCTNAME>())
+  #ENDIF
+
+#ELSEIFSWITCH STRUCTNAME==UncheckedList
+
+  #IFSWITCH METHODNAME==indexOf,lastIndexOf
+return OmniArray.Of$ClassPrefix$.uncheckedMETHODNAMENull(this.arr,size);
+  #ELSE
+ERROR invalid methodname METHODNAME for struct STRUCTNAME (ReturnUncheckedQueryNull<METHODNAME,STRUCTNAME>())
+  #ENDIF
+
+#ELSEIFSWITCH STRUCTNAME==UncheckedStack
+
+  #IFSWITCH METHODNAME==search
+return OmniArray.Of$ClassPrefix$.uncheckedMETHODNAMENull(this.arr,size);
+  #ELSE
+ERROR invalid methodname METHODNAME for struct STRUCTNAME (ReturnUncheckedQueryNull<METHODNAME,STRUCTNAME>())
+  #ENDIF
+
+#ELSE
+
+ERROR unknown struct STRUCTNAME for (ReturnUncheckedQueryNull<METHODNAME,STRUCTNAME>())
+
+#ENDIF
+#ENDDEF
+
+#MACRODEF ReturnUncheckedQueryNaN()
+#IFNOT OfFloat,OfDouble
+ERROR ReturnUncheckedQueryNaN<METHODNAME,STRUCTNAME>() is only allowed for OfFloat and OfDouble
+#ENDIF
+#IFSWITCH STRUCTNAME==UncheckedSubList,CheckedSubList
+
+  #IFSWITCH METHODNAME==contains
+final int rootOffset;
+return OmniArray.Of$ClassPrefix$.uncheckedMETHODNAMENaN(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
+  #ELSEIFSWITCH METHODNAME==removeVal
+return this.uncheckedMETHODNAMENaN(root.arr,size);
+  #ELSEIFSWITCH METHODNAME==indexOf,lastIndexOf
+return OmniArray.Of$ClassPrefix$.uncheckedMETHODNAMENaN(root.arr,this.rootOffset,size);
+  #ELSE
+ERROR invalid methodname METHODNAME for struct STRUCTNAME (ReturnUncheckedQueryNaN<METHODNAME,STRUCTNAME>())
+  #ENDIF
+
+#ELSEIFSWITCH STRUCTNAME==Root
+
+  #IFSWITCH METHODNAME==contains
+return OmniArray.Of$ClassPrefix$.uncheckedMETHODNAMENaN(this.arr,0,size-1);
+  #ELSEIFSWITCH METHODNAME==removeVal
+return this.uncheckedMETHODNAMENaN(size);
+  #ELSE
+ERROR invalid methodname METHODNAME for struct STRUCTNAME (ReturnUncheckedQueryNaN<METHODNAME,STRUCTNAME>())
+  #ENDIF
+
+#ELSEIFSWITCH STRUCTNAME==UncheckedList
+
+  #IFSWITCH METHODNAME==indexOf,lastIndexOf
+return OmniArray.Of$ClassPrefix$.uncheckedMETHODNAMENaN(this.arr,size);
+  #ELSE
+ERROR invalid methodname METHODNAME for struct STRUCTNAME (ReturnUncheckedQueryNaN<METHODNAME,STRUCTNAME>())
+  #ENDIF
+
+#ELSEIFSWITCH STRUCTNAME==UncheckedStack
+
+  #IFSWITCH METHODNAME==search
+return OmniArray.Of$ClassPrefix$.uncheckedMETHODNAMENaN(this.arr,size);
+  #ELSE
+ERROR invalid methodname METHODNAME for struct STRUCTNAME (ReturnUncheckedQueryNaN<METHODNAME,STRUCTNAME>())
+  #ENDIF
+
+#ELSE
+
+ERROR unknown struct STRUCTNAME for (ReturnUncheckedQueryNaN<METHODNAME,STRUCTNAME>())
+
+#ENDIF
+#ENDDEF
+
+
+#MACRODEF ReturnUncheckedQuery0()
+#IFNOT OfFloat,OfDouble
+ERROR ReturnUncheckedQuery0<METHODNAME,STRUCTNAME>() is only allowed for OfFloat and OfDouble
+#ENDIF
+#IFSWITCH STRUCTNAME==UncheckedSubList,CheckedSubList
+
+  #IFSWITCH METHODNAME==contains
+final int rootOffset;
+return OmniArray.Of$ClassPrefix$.uncheckedMETHODNAME0(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
+  #ELSEIFSWITCH METHODNAME==removeVal
+return this.uncheckedMETHODNAME0(root.arr,size);
+  #ELSEIFSWITCH METHODNAME==indexOf,lastIndexOf
+return OmniArray.Of$ClassPrefix$.uncheckedMETHODNAME0(root.arr,this.rootOffset,size);
+  #ELSE
+ERROR invalid methodname METHODNAME for struct STRUCTNAME (ReturnUncheckedQuery0<METHODNAME,STRUCTNAME>())
+  #ENDIF
+
+#ELSEIFSWITCH STRUCTNAME==Root
+
+  #IFSWITCH METHODNAME==contains
+return OmniArray.Of$ClassPrefix$.uncheckedMETHODNAME0(this.arr,0,size-1);
+  #ELSEIFSWITCH METHODNAME==removeVal
+return this.uncheckedMETHODNAME0(size);
+  #ELSE
+ERROR invalid methodname METHODNAME for struct STRUCTNAME (ReturnUncheckedQuery0<METHODNAME,STRUCTNAME>())
+  #ENDIF
+
+#ELSEIFSWITCH STRUCTNAME==UncheckedList
+
+  #IFSWITCH METHODNAME==indexOf,lastIndexOf
+return OmniArray.Of$ClassPrefix$.uncheckedMETHODNAME0(this.arr,size);
+  #ELSE
+ERROR invalid methodname METHODNAME for struct STRUCTNAME (ReturnUncheckedQuery0<METHODNAME,STRUCTNAME>())
+  #ENDIF
+
+#ELSEIFSWITCH STRUCTNAME==UncheckedStack
+
+  #IFSWITCH METHODNAME==search
+return OmniArray.Of$ClassPrefix$.uncheckedMETHODNAME0(this.arr,size);
+  #ELSE
+ERROR invalid methodname METHODNAME for struct STRUCTNAME (ReturnUncheckedQuery0<METHODNAME,STRUCTNAME>())
+  #ENDIF
+
+#ELSE
+
+ERROR unknown struct STRUCTNAME for (ReturnUncheckedQuery0<METHODNAME,STRUCTNAME>())
+
+#ENDIF
+#ENDDEF
+
+
+#MACRODEF ReturnUncheckedQueryBits(VAL)
+#IFNOT OfFloat,OfDouble
+ERROR ReturnUncheckedQueryBits<METHODNAME,STRUCTNAME>(VAL) is only allowed for OfFloat and OfDouble
+#ENDIF
+#IFSWITCH STRUCTNAME==UncheckedSubList,CheckedSubList
+
+  #IFSWITCH METHODNAME==contains
+final int rootOffset;
+return OmniArray.Of$ClassPrefix$.uncheckedMETHODNAMEBits(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,VAL);
+  #ELSEIFSWITCH METHODNAME==removeVal
+return this.uncheckedMETHODNAMEBits(root.arr,size,VAL);
+  #ELSEIFSWITCH METHODNAME==indexOf,lastIndexOf
+return OmniArray.Of$ClassPrefix$.uncheckedMETHODNAMEBits(root.arr,this.rootOffset,size,VAL);
+  #ELSE
+ERROR invalid methodname METHODNAME for struct STRUCTNAME (ReturnUncheckedQueryBits<METHODNAME,STRUCTNAME>(VAL))
+  #ENDIF
+
+#ELSEIFSWITCH STRUCTNAME==Root
+
+  #IFSWITCH METHODNAME==contains
+return OmniArray.Of$ClassPrefix$.uncheckedMETHODNAMEBits(this.arr,0,size-1,VAL);
+  #ELSEIFSWITCH METHODNAME==removeVal
+return this.uncheckedMETHODNAMEBits(size,VAL);
+  #ELSE
+ERROR invalid methodname METHODNAME for struct STRUCTNAME (ReturnUncheckedQueryBits<METHODNAME,STRUCTNAME>(VAL))
+  #ENDIF
+
+#ELSEIFSWITCH STRUCTNAME==UncheckedList
+
+  #IFSWITCH METHODNAME==indexOf,lastIndexOf
+return OmniArray.Of$ClassPrefix$.uncheckedMETHODNAMEBits(this.arr,size,VAL);
+  #ELSE
+ERROR invalid methodname METHODNAME for struct STRUCTNAME (ReturnUncheckedQueryBits<METHODNAME,STRUCTNAME>(VAL))
+  #ENDIF
+
+#ELSEIFSWITCH STRUCTNAME==UncheckedStack
+
+  #IFSWITCH METHODNAME==search
+return OmniArray.Of$ClassPrefix$.uncheckedMETHODNAMEBits(this.arr,size,VAL);
+  #ELSE
+ERROR invalid methodname METHODNAME for struct STRUCTNAME (ReturnUncheckedQueryBits<METHODNAME,STRUCTNAME>(VAL))
+  #ENDIF
+
+#ELSE
+
+ERROR unknown struct STRUCTNAME for (ReturnUncheckedQueryBits<METHODNAME,STRUCTNAME>(VAL))
+
+#ENDIF
+#ENDDEF
+
+
+#MACRODEF ReturnUncheckedQuery(VAL)
+#IF OfFloat,OfDouble
+ERROR ReturnUncheckedQuery<METHODNAME,STRUCTNAME>(VAL) is not valid for OfFloat and OfDouble
+#ENDIF
+#IFSWITCH STRUCTNAME==UncheckedSubList,CheckedSubList
+
+  #IFSWITCH METHODNAME==contains
+final int rootOffset;
+return OmniArray.Of$ClassPrefix$.uncheckedMETHODNAME(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,VAL);
+  #ELSEIFSWITCH METHODNAME==removeVal
+return this.uncheckedMETHODNAME(root.arr,size,VAL);
+  #ELSEIFSWITCH METHODNAME==indexOf,lastIndexOf
+return OmniArray.Of$ClassPrefix$.uncheckedMETHODNAME(root.arr,this.rootOffset,size,VAL);
+  #ELSE
+ERROR invalid methodname METHODNAME for struct STRUCTNAME (ReturnUncheckedQuery<METHODNAME,STRUCTNAME>(VAL))
+  #ENDIF
+  
+#ELSEIFSWITCH STRUCTNAME==Root
+  
+  #IFSWITCH METHODNAME==contains
+return OmniArray.Of$ClassPrefix$.uncheckedMETHODNAME(this.arr,0,size-1,VAL);
+  #ELSEIFSWITCH METHODNAME==removeVal
+return this.uncheckedMETHODNAME(size,VAL);
+  #ELSE
+ERROR invalid methodname METHODNAME for struct STRUCTNAME (ReturnUncheckedQuery<METHODNAME,STRUCTNAME>(VAL))
+  #ENDIF
+
+#ELSEIFSWITCH STRUCTNAME==UncheckedList
+
+  #IFSWITCH METHODNAME==indexOf,lastIndexOf
+return OmniArray.Of$ClassPrefix$.uncheckedMETHODNAME(this.arr,size,VAL);
+  #ELSE
+ERROR invalid methodname METHODNAME for struct STRUCTNAME (ReturnUncheckedQuery<METHODNAME,STRUCTNAME>(VAL))
+  #ENDIF
+
+#ELSEIFSWITCH STRUCTNAME==UncheckedStack
+
+  #IFSWITCH METHODNAME==search
+return OmniArray.Of$ClassPrefix$.uncheckedMETHODNAME(this.arr,size,VAL);
+  #ELSE
+ERROR invalid methodname METHODNAME for struct STRUCTNAME (ReturnUncheckedQuery<METHODNAME,STRUCTNAME>(VAL))
+  #ENDIF
+
+#ELSE
+
+ERROR unknown struct STRUCTNAME for (ReturnUncheckedQuery<METHODNAME,STRUCTNAME>(VAL))
+
+#ENDIF
+#ENDDEF
+
+
+
+#MACRODEF StructImpl<STRUCTNAME>()
+#IFSWITCH STRUCTNAME==CheckedSubList,UncheckedSublist
+private
+#ELSE
+public
+#ENDIF
+  static class STRUCTNAME$<E>$
+#IFSWITCH STRUCTNAME==CheckedStack
+    extends UncheckedStack$<E>$
+#ELSEIFSWITCH STRUCTNAME==CheckedList
+    extends UncheckedList$<E>$
+#ELSEIFSWITCH STRUCTNAME==UncheckedStack,UncheckedList
+    extends $ClassPrefix$ArrSeq$<E>$
+#ENDIF
+#IFSWITCH STRUCTNAME==UncheckedList,CheckedSubList,UncheckedSubList
+  #IF OfRef
+    implements OmniList.Of$ClassPrefix$$<E>$
+  #ELSE
+    implements $ClassPrefix$ListDefault$<E>$
+  #ENDIF
+#ENDIF
+#IFSWITCH STRUCTNAME==UncheckedStack
+    implements OmniStack.Of$ClassPrefix$$<E>$
+#ENDIF
+{
+  #IFSWITCH STRUCTNAME==CheckedSubList,CheckedList,CheckedStack
+  transient int modCount;
+  #ENDIF
+  #IFSWITCH STRUCTNAME==CheckedSubList,UncheckedSubList
+  transient final int rootOffset;
+  transient int size;
+  #ENDIF
+  #IFSWITCH STRUCTNAME==CheckedSubList
+  transient final CheckedList$<E>$ root;
+  transient final CheckedSubList$<E>$ parent;
+  #ELSEIFSWITCH STRUCTNAME==UncheckedSubList
+  transient final UncheckedList$<E>$ root;
+  transient final UncheckedSubList$<E>$ parent;
+  #ENDIF
+  #IFSWITCH STRUCTNAME==CheckedSubList
+  private CheckedSubList(CheckedList$<E>$ root,int rootOffset,int size)
+  {
+    super();
+    this.root=root;
+    this.parent=null;
+    this.rootOffset=rootOffset;
+    this.size=size;
+    this.modCount=root.modCount;
+  }
+  private CheckedSubList(CheckedSubList$<E>$ parent,int rootOffset,int size)
+  {
+    super();
+    this.root=parent.root;
+    this.parent=parent;
+    this.rootOffset=rootOffset;
+    this.size=size;
+    this.modCount=parent.modCount;
+  }
+  #ELSEIFSWITCH STRUCTNAME==UncheckedSubList
+  private UncheckedSubList(UncheckedList$<E>$ root,int rootOffset,int size)
+  {
+    super();
+    this.root=root;
+    this.parent=null;
+    this.rootOffset=rootOffset;
+    this.size=size;
+  }
+  private UncheckedSubList(UncheckedSubList$<E>$ parent,int rootOffset,int size)
+  {
+    super();
+    this.root=parent.root;
+    this.parent=parent;
+    this.rootOffset=rootOffset;
+    this.size=size;
+  }
+  #ELSE
+  public STRUCTNAME()
+  {
+    super();
+  }
+  public STRUCTNAME(int initialCapacity)
+  {
+    super(initialCapacity);
+  }
+  private STRUCTNAME(int size,$ArrayType$[] arr)
+  {
+    super(size,arr);
+  }
+  #ENDIF
+  #MACRO Equals()
+  #MACRO Clone()
+  #MACRO ToString()
+  #MACRO HashCode()
+  #MACRO Size()
+  #MACRO IsEmpty()
+  #MACRO Clear()
+}
+#ENDDEF
 #MACRODEF Size()
+#IFSWITCH STRUCTNAME==CheckedSubList
 @Override
 public int size()
 {
-  #IFSWITCH STRUCTNAME==CheckedSubList
   CheckedCollection.checkModCount(modCount,root.modCount);
-  #ENDIF
   return this.size;
 }
+#ENDIF
 #ENDDEF
 
 #MACRODEF IsEmpty()
+#IFSWITCH STRUCTNAME==CheckedSubList
 @Override
 public boolean isEmpty()
 {
-  #IFSWITCH STRUCTNAME==CheckedSubList
   CheckedCollection.checkModCount(modCount,root.modCount);
-  #ENDIF
   return this.size==0;
 }
+#ENDIF
 #ENDDEF
 
 #MACRODEF Clear()
+#IFSWITCH STRUCTNAME==CheckedSubList,UncheckedSubList,CheckedList,CheckedStack
 @Override
 public void clear()
 {
-  #IFSWITCH STRUCTNAME==CheckedSubList,UncheckedSubList
+  #IFSWITCH STRUCTNAME==CheckedList,CheckedStack
+    #IF OfRef
+  final int size;
+  if((size=this.size)!=0)
+  {
+    ++this.modCount;
+    this.size=0;
+    OmniArray.Of$ClassPrefix$.nullifyRange(this.arr,size-1,0);
+  }
+    #ELSE
+  if(this.size!=0)
+  {
+    ++this.modCount;
+    this.size=0;
+  }
+    #ENDIF
+  #ELSE
     #IFSWITCH STRUCTNAME==CheckedSubList
   final CheckedList$<E>$ root;
-  int modCount
-  CheckedCollection.checkModCount(modCount=this.modCount,(root=this.root).modCount); 
+  int modCount;
+  CheckedCollection.checkModCount(modCount=this.modCount,(root=this.root).modCount);
     #ENDIF
-  int size;
+  final int size;
   if((size=this.size)!=0)
   {
     #IFSWITCH STRUCTNAME==CheckedSubList
     root.modCount=++modCount;
     this.modCount=modCount;
     for(var curr=parent;curr!=null;curr.modCount=modCount,curr.size-=size,curr=curr.parent){}
+    root.size=OmniArray.Of$ClassPrefix$.removeRangeAndPullDown(root.arr,this.rootOffset,root.size,size);
     #ELSE
     for(var curr=parent;curr!=null;curr.size-=size,curr=curr.parent){}
+    final UncheckedList$<E>$ root;
+    (root=this.root).size=OmniArray.Of$ClassPrefix$.removeRangeAndPullDown(root.arr,this.rootOffset,root.size,size);
     #ENDIF
-    int rootSize;
-    root.size=OmniArray.Of$ClassPrefix$.removeRangeAndPullDown(root.arr,this.rootOffset,root.size,size);
     this.size=0;
   }
   #ENDIF
-  //TODO
-  
-  #IFSWITCH STRUCTNAME==CheckedSubList,UncheckedSubList
+}
+#ENDIF
+#ENDDEF
+
+#MACRODEF Equals()
+@Override
+public boolean equals(Object val)
+{
+  //TODO implements equals method for STRUCTNAME$<E>$
+  return false;
+}
+#ENDDEF
+
+#MACRODEF Clone()
+@Override
+public Object clone()
+{
+#IFSWITCH STRUCTNAME==CheckedSubList
+  final CheckedList$<E>$ root;
+  CheckedCollection.checkModCount(this.modCount,(root=this.root).modCount);
+#ENDIF
+  final $ArrayType$[] copy;
+  final int size;
+  if((size=this.size)!=0)
+  {
+#IFSWITCH STRUCTNAME==CheckedSubList,UncheckedSubList
+    ArrCopy.uncheckedCopy(root.arr,rootOffset,copy=new $ArrayType$[size],0,size);
+#ELSE
+    ArrCopy.uncheckedCopy(this.arr,0,copy=new $ArrayType$[size],0,size);
+#ENDIF
+  }
+  else
+  {
+    copy=OmniArray.Of$ClassPrefix$.DEFAULT_ARR;
+  }
+#IFSWITCH STRUCTNAME==CheckedSubList
+  return new CheckedList$<E>$(size,copy);
+#ELSEIFSWITCH STRUCTNAME==UncheckedSubList
+  return new UncheckedList$<E>$(size,copy);
+#ELSE
+  return new STRUCTNAME$<E>$(size,copy);
+#ENDIF
+}
+#ENDDEF
+#MACRODEF HashCode()
+#IFSWITCH STRUCTNAME==CheckedList,CheckedStack
+  #IF OfRef
+@Override
+int uncheckedHashCode(int size)
+{
+  final int modCount=this.modCount;
+  try
+  {
+    return super.uncheckedHashCode(size);
+  }
+  finally
+  {
+    CheckedCollection.checkModCount(modCount,this.modCount);
+  }
+}
+  #ENDIF
+#ELSEIFSWITCH STRUCTNAME==UncheckedList,UncheckedStack
+@Override
+int uncheckedHashCode(int size)
+{
+  #IFSWITCH STRUCTNAME==UncheckedList
+  return OmniArray.Of$ClassPrefix$.ascendingSeqHashCode(this.arr,0,size-1);
+  #ELSE
+  return OmniArray.Of$ClassPrefix$.descendingSeqHashCode(this.arr,0,size-1);
+  #ENDIF
+}
+#ELSE
+@Override
+public int hashCode()
+{
+  #IF OfRef
+    #IFSWITCH STRUCTNAME==CheckedSubList
+  final int modCount=this.modCount;
+  final var root=this.root;
+  try
+    #ENDIF
+  {
+    final int size;
+    if((size=this.size)!=0)
+    {
+      final int rootOffset;
+      return OmniArray.Of$ClassPrefix$.ascendingSeqHashCode(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
+    }
+    return 1;
+  }
+    #IFSWITCH STRUCTNAME==CheckedSubList
+  finally
+  {
+    CheckedCollection.checkModCount(modCount,root.modCount);
+  }
+    #ENDIF
+  #ELSE
+    #IFSWITCH STRUCTNAME==CheckedSubList
+  final CheckedList$<E>$ root;
+  CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+    #ENDIF
+  final int size;
+  if((size=this.size)!=0)
+  {
+    final int rootOffset;
+    return OmniArray.Of$ClassPrefix$.ascendingSeqHashCode(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
+  }
+  return 1;
+  #ENDIF
+}
+#ENDIF
+#ENDDEF
+#MACRODEF ToString()
+#IFSWITCH STRUCTNAME==CheckedList,CheckedStack
+  #IF OfRef
+@Override
+void uncheckedToString(int size,StringBuilder builder)
+{
+  final int modCount=this.modCount;
+  try
+  {
+    super.uncheckedToString(size,builder);
+  }
+  finally
+  {
+    CheckedCollection.checkModCount(modCount,this.modCount);
+  }
+}
+  #ENDIF
+#ELSEIFSWITCH STRUCTNAME==UncheckedList,UncheckedStack
+  #IF OfRef,OfDouble
+@Override
+void uncheckedToString(int size,StringBuilder builder)
+{
+  #IFSWITCH STRUCTNAME==UncheckedList
+  OmniArray.Of$ClassPrefix$.ascendingToString(this.arr,0,size-1,builder);
+  #ELSE
+  OmniArray.Of$ClassPrefix$.descendingToString(this.arr,0,size-1,builder);
+  #ENDIF
+}
+  #ELSEIF OfChar
+void uncheckedToString(int size,char[] buffer)
+{
+  #IFSWITCH STRUCTNAME==UncheckedList
+  OmniArray.Of$ClassPrefix$.ascendingToString(this.arr,0,size-1,buffer,1);
+  #ELSE
+  OmniArray.Of$ClassPrefix$.descendingToString(this.arr,0,size-1,buffer,1);
+  #ENDIF
+}
+  #ELSE
+int uncheckedToString(int size,char[] buffer)
+{
+  #IFSWITCH STRUCTNAME==UncheckedList
+  return OmniArray.Of$ClassPrefix$.ascendingToString(this.arr,0,size-1,buffer,1);
+  #ELSE
+  return OmniArray.Of$ClassPrefix$.descendingToString(this.arr,0,size-1,buffer,1);
+  #ENDIF
+}
+void uncheckedToString(int size,ToStringUtil.OmniStringBuilder builder)
+{
+  #IFSWITCH STRUCTNAME==UncheckedList
+  OmniArray.Of$ClassPrefix$.ascendingToString(this.arr,0,size-1,builder);
+  #ELSE
+  OmniArray.Of$ClassPrefix$.descendingToString(this.arr,0,size-1,builder);
+  #ENDIF
+}
+  #ENDIF
+#ELSE
+@Override
+public String toString()
+{
+  #IF OfRef
+    #IFSWITCH STRUCTNAME==CheckedSubList
+  final int modCount=this.modCount;
+  final var root=this.root;
+  try
+    #ENDIF
+  {
+    final int size;
+    if((size=this.size)!=0)
+    {
+      if(size>(Integer.MAX_VALUE>>1))
+      {
+        throw new OutOfMemoryError();
+      }
+      final StringBuilder builder;
+      final int rootOffset;
+      OmniArray.Of$ClassPrefix$.ascendingToString(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,builder=new StringBuilder("["));
+      return builder.append(']').toString();
+    }
+    return "[]";
+  }
+    #IFSWITCH STRUCTNAME==CheckedSubList
+  finally
+  {
+    CheckedCollection.checkModCount(modCount,root.modCount);
+  }
+    #ENDIF
+  #ELSE
+    #IFSWITCH STRUCTNAME==CheckedSubList
+  final CheckedList$<E>$ root;
+  CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+    #ENDIF
   int size;
   if((size=this.size)!=0)
   {
-    
+    #IF OfBoolean
+    if(size>(Integer.MAX_VALUE/6))
+    #ELSEIF OfByte,OfChar,OfShort,OfInt,OfLong
+    if(size>(Integer.MAX_VALUE/3))
+    #ELSE
+    if(size>(Integer.MAX_VALUE/5))
+    #ENDIF
+    {
+      throw new OutOfMemoryError();
+    }
+      final int rootOffset;
+    #IF OfDouble
+      final StringBuilder builder;
+      OmniArray.Of$ClassPrefix$.ascendingToString(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,builder=new StringBuilder("["));
+      return builder.append(']').toString();
+    #ELSE
+      final char[] buffer;
+      #IF OfChar
+      OmniArray.Of$ClassPrefix$.ascendingToString(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,buffer=new char[size*=3],1);
+      buffer[0]='[';
+      buffer[size-1]=']';
+      return new String(buffer,0,size);
+      #ELSE
+        #IF OfBoolean
+      if(size<=(OmniArray.MAX_ARR_SIZE/7)){
+        (buffer=new char[size*7])[size=OmniArray.Of$ClassPrefix$.ascendingToString(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,buffer,1)]=']';
+      }else{
+        final ToStringUtil.OmniStringBuilder builder;
+        OmniArray.Of$ClassPrefix$.ascendingToString(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,builder=new ToStringUtil.OmniStringBuilder(1,new char[(size>>=2)*21+(size*6)]));
+        #ELSEIF OfByte
+      if(size<=(OmniArray.MAX_ARR_SIZE/6)){
+        (buffer=new char[size*6])[size=OmniArray.Of$ClassPrefix$.ascendingToString(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,buffer,1)]=']';
+      }else{
+        final ToStringUtil.OmniStringBuilder builder;
+        OmniArray.Of$ClassPrefix$.ascendingToString(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,builder=new ToStringUtil.OmniStringBuilder(1,new char[size*5]));
+        #ELSEIF OfShort
+      if(size<=(OmniArray.MAX_ARR_SIZE>>3)){
+        (buffer=new char[size<<3])[size=OmniArray.Of$ClassPrefix$.ascendingToString(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,buffer,1)]=']';
+      }else{
+        final ToStringUtil.OmniStringBuilder builder;
+        OmniArray.Of$ClassPrefix$.ascendingToString(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,builder=new ToStringUtil.OmniStringBuilder(1,new char[size*6]));
+        #ELSEIF OfInt
+      if(size<=(OmniArray.MAX_ARR_SIZE/13)){
+         (buffer=new char[size*13])[size=OmniArray.Of$ClassPrefix$.ascendingToString(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,buffer,1)]=']';
+      }else{
+        final ToStringUtil.OmniStringBuilder builder;
+        OmniArray.Of$ClassPrefix$.ascendingToString(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,builder=new ToStringUtil.OmniStringBuilder(1,new char[size<<3]));
+        #ELSEIF OfLong
+      if(size<=(OmniArray.MAX_ARR_SIZE/22)){
+         (buffer=new char[size*22])[size=OmniArray.Of$ClassPrefix$.ascendingToString(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,buffer,1)]=']';
+      }else{
+        final ToStringUtil.OmniStringBuilder builder;
+        OmniArray.Of$ClassPrefix$.ascendingToString(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,builder=new ToStringUtil.OmniStringBuilder(1,new char[size*13]));
+        #ELSEIF OfFloat
+      if(size<=(OmniArray.MAX_ARR_SIZE/17)){
+         (buffer=new char[size*17])[size=OmniArray.Of$ClassPrefix$.ascendingToString(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,buffer,1)]=']';
+      }else{
+        final ToStringUtil.OmniStringBuilder builder;
+        OmniArray.Of$ClassPrefix$.ascendingToString(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,builder=new ToStringUtil.OmniStringBuilder(1,new char[size*10]));
+        #ENDIF
+        (buffer=builder.buffer)[size=builder.size]=']';
+      }
+      buffer[0]='[';
+      return new String(buffer,0,size+1);
+      #ENDIF 
+    #ENDIF
   }
+  return "[]";
   #ENDIF
-  
-  
 }
+#ENDIF
 #ENDDEF
+
+
+
  

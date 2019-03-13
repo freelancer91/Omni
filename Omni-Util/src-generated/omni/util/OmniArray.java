@@ -1,5 +1,6 @@
 package omni.util;
 import java.lang.reflect.Array;
+import java.util.Objects;
 import java.util.function.DoublePredicate;
 import java.util.function.IntPredicate;
 import java.util.function.LongPredicate;
@@ -87,6 +88,86 @@ public final class OmniArray
   {
     public static final boolean[] DEFAULT_ARR=new boolean[]{};
     public static final Boolean[] DEFAULT_BOXED_ARR=new Boolean[]{};
+    public static int ascendingSeqHashCode(boolean[] arr,int begin,int end)
+    {
+      for(int hash=31+
+        ((arr[begin])?1231:1237)
+        ;;)
+      {
+        if(begin==end)
+        {
+          return hash;
+        }
+        hash=hash*31+(
+          ((arr[++begin])?1231:1237)
+          );
+      }
+    }
+    public static int descendingSeqHashCode(boolean[] arr,int begin,int end)
+    {
+      for(int hash=31+
+        ((arr[end])?1231:1237)
+        ;;)
+      {
+        if(begin==end)
+        {
+          return hash;
+        }
+        hash=hash*31+(
+          ((arr[--end])?1231:1237)
+          );
+      }
+    }
+    public static void ascendingToString(boolean[] arr,int begin,int end,ToStringUtil.OmniStringBuilder builder)
+    {
+      for(;;++begin)
+      {
+        builder.uncheckedAppendBoolean(arr[begin]);
+        if(begin==end)
+        {
+          return;
+        }
+        builder.uncheckedAppendCommaAndSpace();
+      }
+    }
+    public static int ascendingToString(boolean[] arr,int begin,int end,char[] buffer,int bufferOffset)
+    {
+      for(;;++begin,++bufferOffset)
+      {
+        bufferOffset=ToStringUtil.getStringBoolean(arr[begin],buffer,bufferOffset);
+        if(begin==end)
+        {
+          return bufferOffset;
+        }
+        buffer[bufferOffset]=',';
+        buffer[++bufferOffset]=' ';
+      }
+    }
+    public static void descendingToString(boolean[] arr,int begin,int end,ToStringUtil.OmniStringBuilder builder)
+    {
+      for(;;--end)
+      {
+        builder.uncheckedAppendBoolean(arr[end]);
+        if(begin==end)
+        {
+          return;
+        }
+        builder.uncheckedAppendCommaAndSpace();
+      }
+    }
+    public static int descendingToString(boolean[] arr,int begin,int end,char[] buffer,int bufferOffset)
+    {
+      for(;;--end,++bufferOffset)
+      {
+        bufferOffset=ToStringUtil.getStringBoolean(arr[end],buffer,bufferOffset);
+        if(begin==end)
+        {
+          return bufferOffset;
+        }
+        buffer[bufferOffset]=',';
+        buffer[++bufferOffset]=' ';
+      }
+    }
     public static boolean uncheckedcontains (boolean[] arr,int begin,int end
     ,boolean val
     )
@@ -226,6 +307,86 @@ public final class OmniArray
   {
     public static final byte[] DEFAULT_ARR=new byte[]{};
     public static final Byte[] DEFAULT_BOXED_ARR=new Byte[]{};
+    public static int ascendingSeqHashCode(byte[] arr,int begin,int end)
+    {
+      for(int hash=31+
+        arr[begin]
+        ;;)
+      {
+        if(begin==end)
+        {
+          return hash;
+        }
+        hash=hash*31+(
+          arr[++begin]
+          );
+      }
+    }
+    public static int descendingSeqHashCode(byte[] arr,int begin,int end)
+    {
+      for(int hash=31+
+        arr[end]
+        ;;)
+      {
+        if(begin==end)
+        {
+          return hash;
+        }
+        hash=hash*31+(
+          arr[--end]
+          );
+      }
+    }
+    public static void ascendingToString(byte[] arr,int begin,int end,ToStringUtil.OmniStringBuilder builder)
+    {
+      for(;;++begin)
+      {
+        builder.uncheckedAppendShort(arr[begin]);
+        if(begin==end)
+        {
+          return;
+        }
+        builder.uncheckedAppendCommaAndSpace();
+      }
+    }
+    public static int ascendingToString(byte[] arr,int begin,int end,char[] buffer,int bufferOffset)
+    {
+      for(;;++begin,++bufferOffset)
+      {
+        bufferOffset=ToStringUtil.getStringShort(arr[begin],buffer,bufferOffset);
+        if(begin==end)
+        {
+          return bufferOffset;
+        }
+        buffer[bufferOffset]=',';
+        buffer[++bufferOffset]=' ';
+      }
+    }
+    public static void descendingToString(byte[] arr,int begin,int end,ToStringUtil.OmniStringBuilder builder)
+    {
+      for(;;--end)
+      {
+        builder.uncheckedAppendShort(arr[end]);
+        if(begin==end)
+        {
+          return;
+        }
+        builder.uncheckedAppendCommaAndSpace();
+      }
+    }
+    public static int descendingToString(byte[] arr,int begin,int end,char[] buffer,int bufferOffset)
+    {
+      for(;;--end,++bufferOffset)
+      {
+        bufferOffset=ToStringUtil.getStringShort(arr[end],buffer,bufferOffset);
+        if(begin==end)
+        {
+          return bufferOffset;
+        }
+        buffer[bufferOffset]=',';
+        buffer[++bufferOffset]=' ';
+      }
+    }
     public static boolean uncheckedcontains (byte[] arr,int begin,int end
     ,int val
     )
@@ -365,6 +526,62 @@ public final class OmniArray
   {
     public static final char[] DEFAULT_ARR=new char[]{};
     public static final Character[] DEFAULT_BOXED_ARR=new Character[]{};
+    public static int ascendingSeqHashCode(char[] arr,int begin,int end)
+    {
+      for(int hash=31+
+        arr[begin]
+        ;;)
+      {
+        if(begin==end)
+        {
+          return hash;
+        }
+        hash=hash*31+(
+          arr[++begin]
+          );
+      }
+    }
+    public static int descendingSeqHashCode(char[] arr,int begin,int end)
+    {
+      for(int hash=31+
+        arr[end]
+        ;;)
+      {
+        if(begin==end)
+        {
+          return hash;
+        }
+        hash=hash*31+(
+          arr[--end]
+          );
+      }
+    }
+    public static void ascendingToString(char[] arr,int begin,int end,char[] buffer,int bufferOffset)
+    {
+      for(;;++bufferOffset,++begin)
+      {
+        buffer[bufferOffset]=arr[begin];
+        if(begin==end)
+        {
+          return;
+        }
+        buffer[++bufferOffset]=',';
+        buffer[++bufferOffset]=' ';
+      }
+    }
+    public static void descendingToString(char[] arr,int begin,int end,char[] buffer,int bufferOffset)
+    {
+      for(;;++bufferOffset,--end)
+      {
+        buffer[bufferOffset]=arr[end];
+        if(begin==end)
+        {
+          return;
+        }
+        buffer[++bufferOffset]=',';
+        buffer[++bufferOffset]=' ';
+      }
+    }
     public static boolean uncheckedcontains (char[] arr,int begin,int end
     ,int val
     )
@@ -508,6 +725,86 @@ public final class OmniArray
   {
     public static final short[] DEFAULT_ARR=new short[]{};
     public static final Short[] DEFAULT_BOXED_ARR=new Short[]{};
+    public static int ascendingSeqHashCode(short[] arr,int begin,int end)
+    {
+      for(int hash=31+
+        arr[begin]
+        ;;)
+      {
+        if(begin==end)
+        {
+          return hash;
+        }
+        hash=hash*31+(
+          arr[++begin]
+          );
+      }
+    }
+    public static int descendingSeqHashCode(short[] arr,int begin,int end)
+    {
+      for(int hash=31+
+        arr[end]
+        ;;)
+      {
+        if(begin==end)
+        {
+          return hash;
+        }
+        hash=hash*31+(
+          arr[--end]
+          );
+      }
+    }
+    public static void ascendingToString(short[] arr,int begin,int end,ToStringUtil.OmniStringBuilder builder)
+    {
+      for(;;++begin)
+      {
+        builder.uncheckedAppendShort(arr[begin]);
+        if(begin==end)
+        {
+          return;
+        }
+        builder.uncheckedAppendCommaAndSpace();
+      }
+    }
+    public static int ascendingToString(short[] arr,int begin,int end,char[] buffer,int bufferOffset)
+    {
+      for(;;++begin,++bufferOffset)
+      {
+        bufferOffset=ToStringUtil.getStringShort(arr[begin],buffer,bufferOffset);
+        if(begin==end)
+        {
+          return bufferOffset;
+        }
+        buffer[bufferOffset]=',';
+        buffer[++bufferOffset]=' ';
+      }
+    }
+    public static void descendingToString(short[] arr,int begin,int end,ToStringUtil.OmniStringBuilder builder)
+    {
+      for(;;--end)
+      {
+        builder.uncheckedAppendShort(arr[end]);
+        if(begin==end)
+        {
+          return;
+        }
+        builder.uncheckedAppendCommaAndSpace();
+      }
+    }
+    public static int descendingToString(short[] arr,int begin,int end,char[] buffer,int bufferOffset)
+    {
+      for(;;--end,++bufferOffset)
+      {
+        bufferOffset=ToStringUtil.getStringShort(arr[end],buffer,bufferOffset);
+        if(begin==end)
+        {
+          return bufferOffset;
+        }
+        buffer[bufferOffset]=',';
+        buffer[++bufferOffset]=' ';
+      }
+    }
     public static boolean uncheckedcontains (short[] arr,int begin,int end
     ,int val
     )
@@ -651,6 +948,86 @@ public final class OmniArray
   {
     public static final int[] DEFAULT_ARR=new int[]{};
     public static final Integer[] DEFAULT_BOXED_ARR=new Integer[]{};
+    public static int ascendingSeqHashCode(int[] arr,int begin,int end)
+    {
+      for(int hash=31+
+        arr[begin]
+        ;;)
+      {
+        if(begin==end)
+        {
+          return hash;
+        }
+        hash=hash*31+(
+          arr[++begin]
+          );
+      }
+    }
+    public static int descendingSeqHashCode(int[] arr,int begin,int end)
+    {
+      for(int hash=31+
+        arr[end]
+        ;;)
+      {
+        if(begin==end)
+        {
+          return hash;
+        }
+        hash=hash*31+(
+          arr[--end]
+          );
+      }
+    }
+    public static void ascendingToString(int[] arr,int begin,int end,ToStringUtil.OmniStringBuilder builder)
+    {
+      for(;;++begin)
+      {
+        builder.uncheckedAppendInt(arr[begin]);
+        if(begin==end)
+        {
+          return;
+        }
+        builder.uncheckedAppendCommaAndSpace();
+      }
+    }
+    public static int ascendingToString(int[] arr,int begin,int end,char[] buffer,int bufferOffset)
+    {
+      for(;;++begin,++bufferOffset)
+      {
+        bufferOffset=ToStringUtil.getStringInt(arr[begin],buffer,bufferOffset);
+        if(begin==end)
+        {
+          return bufferOffset;
+        }
+        buffer[bufferOffset]=',';
+        buffer[++bufferOffset]=' ';
+      }
+    }
+    public static void descendingToString(int[] arr,int begin,int end,ToStringUtil.OmniStringBuilder builder)
+    {
+      for(;;--end)
+      {
+        builder.uncheckedAppendInt(arr[end]);
+        if(begin==end)
+        {
+          return;
+        }
+        builder.uncheckedAppendCommaAndSpace();
+      }
+    }
+    public static int descendingToString(int[] arr,int begin,int end,char[] buffer,int bufferOffset)
+    {
+      for(;;--end,++bufferOffset)
+      {
+        bufferOffset=ToStringUtil.getStringInt(arr[end],buffer,bufferOffset);
+        if(begin==end)
+        {
+          return bufferOffset;
+        }
+        buffer[bufferOffset]=',';
+        buffer[++bufferOffset]=' ';
+      }
+    }
     public static boolean uncheckedcontains (int[] arr,int begin,int end
     ,int val
     )
@@ -794,6 +1171,86 @@ public final class OmniArray
   {
     public static final long[] DEFAULT_ARR=new long[]{};
     public static final Long[] DEFAULT_BOXED_ARR=new Long[]{};
+    public static int ascendingSeqHashCode(long[] arr,int begin,int end)
+    {
+      for(int hash=31+
+        Long.hashCode(arr[begin])
+        ;;)
+      {
+        if(begin==end)
+        {
+          return hash;
+        }
+        hash=hash*31+(
+          Long.hashCode(arr[++begin])
+          );
+      }
+    }
+    public static int descendingSeqHashCode(long[] arr,int begin,int end)
+    {
+      for(int hash=31+
+        Long.hashCode(arr[end])
+        ;;)
+      {
+        if(begin==end)
+        {
+          return hash;
+        }
+        hash=hash*31+(
+          Long.hashCode(arr[--end])
+          );
+      }
+    }
+    public static void ascendingToString(long[] arr,int begin,int end,ToStringUtil.OmniStringBuilder builder)
+    {
+      for(;;++begin)
+      {
+        builder.uncheckedAppendLong(arr[begin]);
+        if(begin==end)
+        {
+          return;
+        }
+        builder.uncheckedAppendCommaAndSpace();
+      }
+    }
+    public static int ascendingToString(long[] arr,int begin,int end,char[] buffer,int bufferOffset)
+    {
+      for(;;++begin,++bufferOffset)
+      {
+        bufferOffset=ToStringUtil.getStringLong(arr[begin],buffer,bufferOffset);
+        if(begin==end)
+        {
+          return bufferOffset;
+        }
+        buffer[bufferOffset]=',';
+        buffer[++bufferOffset]=' ';
+      }
+    }
+    public static void descendingToString(long[] arr,int begin,int end,ToStringUtil.OmniStringBuilder builder)
+    {
+      for(;;--end)
+      {
+        builder.uncheckedAppendLong(arr[end]);
+        if(begin==end)
+        {
+          return;
+        }
+        builder.uncheckedAppendCommaAndSpace();
+      }
+    }
+    public static int descendingToString(long[] arr,int begin,int end,char[] buffer,int bufferOffset)
+    {
+      for(;;--end,++bufferOffset)
+      {
+        bufferOffset=ToStringUtil.getStringLong(arr[end],buffer,bufferOffset);
+        if(begin==end)
+        {
+          return bufferOffset;
+        }
+        buffer[bufferOffset]=',';
+        buffer[++bufferOffset]=' ';
+      }
+    }
     public static boolean uncheckedcontains (long[] arr,int begin,int end
     ,long val
     )
@@ -937,6 +1394,86 @@ public final class OmniArray
   {
     public static final float[] DEFAULT_ARR=new float[]{};
     public static final Float[] DEFAULT_BOXED_ARR=new Float[]{};
+    public static int ascendingSeqHashCode(float[] arr,int begin,int end)
+    {
+      for(int hash=31+
+        HashUtil.hashFloat(arr[begin])
+        ;;)
+      {
+        if(begin==end)
+        {
+          return hash;
+        }
+        hash=hash*31+(
+          HashUtil.hashFloat(arr[++begin])
+          );
+      }
+    }
+    public static int descendingSeqHashCode(float[] arr,int begin,int end)
+    {
+      for(int hash=31+
+        HashUtil.hashFloat(arr[end])
+        ;;)
+      {
+        if(begin==end)
+        {
+          return hash;
+        }
+        hash=hash*31+(
+          HashUtil.hashFloat(arr[--end])
+          );
+      }
+    }
+    public static void ascendingToString(float[] arr,int begin,int end,ToStringUtil.OmniStringBuilder builder)
+    {
+      for(;;++begin)
+      {
+        builder.uncheckedAppendFloat(arr[begin]);
+        if(begin==end)
+        {
+          return;
+        }
+        builder.uncheckedAppendCommaAndSpace();
+      }
+    }
+    public static int ascendingToString(float[] arr,int begin,int end,char[] buffer,int bufferOffset)
+    {
+      for(;;++begin,++bufferOffset)
+      {
+        bufferOffset=ToStringUtil.getStringFloat(arr[begin],buffer,bufferOffset);
+        if(begin==end)
+        {
+          return bufferOffset;
+        }
+        buffer[bufferOffset]=',';
+        buffer[++bufferOffset]=' ';
+      }
+    }
+    public static void descendingToString(float[] arr,int begin,int end,ToStringUtil.OmniStringBuilder builder)
+    {
+      for(;;--end)
+      {
+        builder.uncheckedAppendFloat(arr[end]);
+        if(begin==end)
+        {
+          return;
+        }
+        builder.uncheckedAppendCommaAndSpace();
+      }
+    }
+    public static int descendingToString(float[] arr,int begin,int end,char[] buffer,int bufferOffset)
+    {
+      for(;;--end,++bufferOffset)
+      {
+        bufferOffset=ToStringUtil.getStringFloat(arr[end],buffer,bufferOffset);
+        if(begin==end)
+        {
+          return bufferOffset;
+        }
+        buffer[bufferOffset]=',';
+        buffer[++bufferOffset]=' ';
+      }
+    }
     public static boolean uncheckedcontains0(float[] arr,int begin,int end
     )
     {
@@ -1302,6 +1839,60 @@ public final class OmniArray
   {
     public static final double[] DEFAULT_ARR=new double[]{};
     public static final Double[] DEFAULT_BOXED_ARR=new Double[]{};
+    public static int ascendingSeqHashCode(double[] arr,int begin,int end)
+    {
+      for(int hash=31+
+        HashUtil.hashDouble(arr[begin])
+        ;;)
+      {
+        if(begin==end)
+        {
+          return hash;
+        }
+        hash=hash*31+(
+          HashUtil.hashDouble(arr[++begin])
+          );
+      }
+    }
+    public static int descendingSeqHashCode(double[] arr,int begin,int end)
+    {
+      for(int hash=31+
+        HashUtil.hashDouble(arr[end])
+        ;;)
+      {
+        if(begin==end)
+        {
+          return hash;
+        }
+        hash=hash*31+(
+          HashUtil.hashDouble(arr[--end])
+          );
+      }
+    }
+    public static void ascendingToString(double[] arr,int begin,int end,StringBuilder builder)
+    {
+      for(;;++begin)
+      {
+        builder.append(arr[begin]);
+        if(begin==end)
+        {
+          return;
+        }
+        builder.append(',').append(' ');
+      }
+    }
+    public static void descendingToString(double[] arr,int begin,int end,StringBuilder builder)
+    {
+      for(;;--end)
+      {
+        builder.append(arr[end]);
+        if(begin==end)
+        {
+          return;
+        }
+        builder.append(',').append(' ');
+      }
+    }
     public static boolean uncheckedcontains0(double[] arr,int begin,int end
     )
     {
@@ -1666,6 +2257,175 @@ public final class OmniArray
   public interface OfRef
   {
     public static final Object[] DEFAULT_ARR=new Object[]{};
+    public static int ascendingSeqHashCode(Object[] arr,int begin,int end)
+    {
+      for(int hash=31+
+        Objects.hashCode(arr[begin])
+        ;;)
+      {
+        if(begin==end)
+        {
+          return hash;
+        }
+        hash=hash*31+(
+          Objects.hashCode(arr[++begin])
+          );
+      }
+    }
+    public static int descendingSeqHashCode(Object[] arr,int begin,int end)
+    {
+      for(int hash=31+
+        Objects.hashCode(arr[end])
+        ;;)
+      {
+        if(begin==end)
+        {
+          return hash;
+        }
+        hash=hash*31+(
+          Objects.hashCode(arr[--end])
+          );
+      }
+    }
+    public static void ascendingToString(Object[] arr,int begin,int end,StringBuilder builder)
+    {
+      for(;;++begin)
+      {
+        builder.append(arr[begin]);
+        if(begin==end)
+        {
+          return;
+        }
+        builder.append(',').append(' ');
+      }
+    }
+    public static void descendingToString(Object[] arr,int begin,int end,StringBuilder builder)
+    {
+      for(;;--end)
+      {
+        builder.append(arr[end]);
+        if(begin==end)
+        {
+          return;
+        }
+        builder.append(',').append(' ');
+      }
+    }
+    public static boolean uncheckedcontains (Object[] arr,int begin,int end
+    ,Predicate<Object> pred
+    )
+    {
+      for(;;++begin)
+      {
+        if
+        (
+        pred.test(arr[begin])
+        )
+        {
+          return true;
+        }
+        if(begin==end)
+        {
+          return false;
+        }
+      }
+    }
+    public static int uncheckedindexOf (Object[] arr,int bound
+    ,Predicate<Object> pred
+    )
+    {
+      for(int offset=0;;)
+      {
+        if
+        (
+        pred.test(arr[offset])
+        )
+        {
+          return offset;
+        }
+        if(++offset==bound)
+        {
+          return -1;
+        }
+      }
+    }
+    public static int uncheckedlastIndexOf (Object[] arr,int bound
+    ,Predicate<Object> pred
+    )
+    {
+      for(;;)
+      {
+        if
+        (
+        pred.test(arr[--bound])
+        )
+        {
+          return bound;
+        }
+        if(bound==0)
+        {
+          return -1;
+        }
+      }
+    }
+    public static int uncheckedindexOf (Object[] arr,int offset,int length
+    ,Predicate<Object> pred
+    )
+    {
+      int i;
+      for(i=offset,length+=offset;;)
+      {
+        if
+        (
+        pred.test(arr[i])
+        )
+        {
+          return i-offset;
+        }
+        if(++i==length)
+        {
+          return -1;
+        }
+      }
+    }
+    public static int uncheckedlastIndexOf (Object[] arr,int offset,int length
+    ,Predicate<Object> pred
+    )
+    {
+      for(length+=(offset-1);;--length)
+      {
+        if
+        (
+        pred.test(arr[length])
+        )
+        {
+          return length-offset;
+        }
+        if(length==offset)
+        {
+          return -1;
+        }
+      }
+    }
+    public static int uncheckedsearch (Object[] arr,int bound
+    ,Predicate<Object> pred
+    )
+    {
+      for(int i=bound-1;;--i)
+      {
+        if
+        (
+        pred.test(arr[i])
+        )
+        {
+          return bound-i;
+        }
+        if(i==0)
+        {
+          return -1;
+        }
+      }
+    }
     public static boolean uncheckedcontainsNull(Object[] arr,int begin,int end
     )
     {
