@@ -5,9 +5,18 @@ import java.util.function.DoublePredicate;
 import java.util.function.IntPredicate;
 import java.util.function.LongPredicate;
 import java.util.function.Predicate;
+import java.util.function.DoubleConsumer;
+import java.util.function.IntConsumer;
+import java.util.function.LongConsumer;
+import java.util.function.Consumer;
 import omni.function.CharPredicate;
 import omni.function.FloatPredicate;
 import omni.function.ShortPredicate;
+import omni.function.CharConsumer;
+import omni.function.FloatConsumer;
+import omni.function.ShortConsumer;
+import omni.function.ByteConsumer;
+import omni.function.BooleanConsumer;
 public final class OmniArray
 {
   private OmniArray()
@@ -88,6 +97,28 @@ public final class OmniArray
   {
     public static final boolean[] DEFAULT_ARR=new boolean[]{};
     public static final Boolean[] DEFAULT_BOXED_ARR=new Boolean[]{};
+    public static   void ascendingForEach(boolean[] arr,int begin,int end,BooleanConsumer action)
+    {
+      for(;;++begin)
+      {
+        action.accept((boolean)arr[begin]);
+        if(begin==end)
+        {
+          return;
+        }
+      }
+    }
+    public static   void descendingForEach(boolean[] arr,int begin,int end,BooleanConsumer action)
+    {
+      for(;;--end)
+      {
+        action.accept((boolean)arr[end]);
+        if(begin==end)
+        {
+          return;
+        }
+      }
+    }
     public static int ascendingSeqHashCode(boolean[] arr,int begin,int end)
     {
       for(int hash=31+
@@ -307,6 +338,28 @@ public final class OmniArray
   {
     public static final byte[] DEFAULT_ARR=new byte[]{};
     public static final Byte[] DEFAULT_BOXED_ARR=new Byte[]{};
+    public static   void ascendingForEach(byte[] arr,int begin,int end,ByteConsumer action)
+    {
+      for(;;++begin)
+      {
+        action.accept((byte)arr[begin]);
+        if(begin==end)
+        {
+          return;
+        }
+      }
+    }
+    public static   void descendingForEach(byte[] arr,int begin,int end,ByteConsumer action)
+    {
+      for(;;--end)
+      {
+        action.accept((byte)arr[end]);
+        if(begin==end)
+        {
+          return;
+        }
+      }
+    }
     public static int ascendingSeqHashCode(byte[] arr,int begin,int end)
     {
       for(int hash=31+
@@ -526,6 +579,28 @@ public final class OmniArray
   {
     public static final char[] DEFAULT_ARR=new char[]{};
     public static final Character[] DEFAULT_BOXED_ARR=new Character[]{};
+    public static   void ascendingForEach(char[] arr,int begin,int end,CharConsumer action)
+    {
+      for(;;++begin)
+      {
+        action.accept((char)arr[begin]);
+        if(begin==end)
+        {
+          return;
+        }
+      }
+    }
+    public static   void descendingForEach(char[] arr,int begin,int end,CharConsumer action)
+    {
+      for(;;--end)
+      {
+        action.accept((char)arr[end]);
+        if(begin==end)
+        {
+          return;
+        }
+      }
+    }
     public static int ascendingSeqHashCode(char[] arr,int begin,int end)
     {
       for(int hash=31+
@@ -725,6 +800,28 @@ public final class OmniArray
   {
     public static final short[] DEFAULT_ARR=new short[]{};
     public static final Short[] DEFAULT_BOXED_ARR=new Short[]{};
+    public static   void ascendingForEach(short[] arr,int begin,int end,ShortConsumer action)
+    {
+      for(;;++begin)
+      {
+        action.accept((short)arr[begin]);
+        if(begin==end)
+        {
+          return;
+        }
+      }
+    }
+    public static   void descendingForEach(short[] arr,int begin,int end,ShortConsumer action)
+    {
+      for(;;--end)
+      {
+        action.accept((short)arr[end]);
+        if(begin==end)
+        {
+          return;
+        }
+      }
+    }
     public static int ascendingSeqHashCode(short[] arr,int begin,int end)
     {
       for(int hash=31+
@@ -948,6 +1045,28 @@ public final class OmniArray
   {
     public static final int[] DEFAULT_ARR=new int[]{};
     public static final Integer[] DEFAULT_BOXED_ARR=new Integer[]{};
+    public static   void ascendingForEach(int[] arr,int begin,int end,IntConsumer action)
+    {
+      for(;;++begin)
+      {
+        action.accept((int)arr[begin]);
+        if(begin==end)
+        {
+          return;
+        }
+      }
+    }
+    public static   void descendingForEach(int[] arr,int begin,int end,IntConsumer action)
+    {
+      for(;;--end)
+      {
+        action.accept((int)arr[end]);
+        if(begin==end)
+        {
+          return;
+        }
+      }
+    }
     public static int ascendingSeqHashCode(int[] arr,int begin,int end)
     {
       for(int hash=31+
@@ -1171,6 +1290,28 @@ public final class OmniArray
   {
     public static final long[] DEFAULT_ARR=new long[]{};
     public static final Long[] DEFAULT_BOXED_ARR=new Long[]{};
+    public static   void ascendingForEach(long[] arr,int begin,int end,LongConsumer action)
+    {
+      for(;;++begin)
+      {
+        action.accept((long)arr[begin]);
+        if(begin==end)
+        {
+          return;
+        }
+      }
+    }
+    public static   void descendingForEach(long[] arr,int begin,int end,LongConsumer action)
+    {
+      for(;;--end)
+      {
+        action.accept((long)arr[end]);
+        if(begin==end)
+        {
+          return;
+        }
+      }
+    }
     public static int ascendingSeqHashCode(long[] arr,int begin,int end)
     {
       for(int hash=31+
@@ -1394,6 +1535,28 @@ public final class OmniArray
   {
     public static final float[] DEFAULT_ARR=new float[]{};
     public static final Float[] DEFAULT_BOXED_ARR=new Float[]{};
+    public static   void ascendingForEach(float[] arr,int begin,int end,FloatConsumer action)
+    {
+      for(;;++begin)
+      {
+        action.accept((float)arr[begin]);
+        if(begin==end)
+        {
+          return;
+        }
+      }
+    }
+    public static   void descendingForEach(float[] arr,int begin,int end,FloatConsumer action)
+    {
+      for(;;--end)
+      {
+        action.accept((float)arr[end]);
+        if(begin==end)
+        {
+          return;
+        }
+      }
+    }
     public static int ascendingSeqHashCode(float[] arr,int begin,int end)
     {
       for(int hash=31+
@@ -1839,6 +2002,28 @@ public final class OmniArray
   {
     public static final double[] DEFAULT_ARR=new double[]{};
     public static final Double[] DEFAULT_BOXED_ARR=new Double[]{};
+    public static   void ascendingForEach(double[] arr,int begin,int end,DoubleConsumer action)
+    {
+      for(;;++begin)
+      {
+        action.accept((double)arr[begin]);
+        if(begin==end)
+        {
+          return;
+        }
+      }
+    }
+    public static   void descendingForEach(double[] arr,int begin,int end,DoubleConsumer action)
+    {
+      for(;;--end)
+      {
+        action.accept((double)arr[end]);
+        if(begin==end)
+        {
+          return;
+        }
+      }
+    }
     public static int ascendingSeqHashCode(double[] arr,int begin,int end)
     {
       for(int hash=31+
@@ -2257,6 +2442,30 @@ public final class OmniArray
   public interface OfRef
   {
     public static final Object[] DEFAULT_ARR=new Object[]{};
+    @SuppressWarnings("unchecked")
+    public static <E> void ascendingForEach(Object[] arr,int begin,int end,Consumer<? super E> action)
+    {
+      for(;;++begin)
+      {
+        action.accept((E)arr[begin]);
+        if(begin==end)
+        {
+          return;
+        }
+      }
+    }
+    @SuppressWarnings("unchecked")
+    public static <E> void descendingForEach(Object[] arr,int begin,int end,Consumer<? super E> action)
+    {
+      for(;;--end)
+      {
+        action.accept((E)arr[end]);
+        if(begin==end)
+        {
+          return;
+        }
+      }
+    }
     public static int ascendingSeqHashCode(Object[] arr,int begin,int end)
     {
       for(int hash=31+

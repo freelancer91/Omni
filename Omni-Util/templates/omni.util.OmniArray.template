@@ -6,9 +6,18 @@ import java.util.function.DoublePredicate;
 import java.util.function.IntPredicate;
 import java.util.function.LongPredicate;
 import java.util.function.Predicate;
+import java.util.function.DoubleConsumer;
+import java.util.function.IntConsumer;
+import java.util.function.LongConsumer;
+import java.util.function.Consumer;
 import omni.function.CharPredicate;
 import omni.function.FloatPredicate;
 import omni.function.ShortPredicate;
+import omni.function.CharConsumer;
+import omni.function.FloatConsumer;
+import omni.function.ShortConsumer;
+import omni.function.ByteConsumer;
+import omni.function.BooleanConsumer;
 
 public final class OmniArray
 {
@@ -86,15 +95,15 @@ public final class OmniArray
     }
     return arr;
   }
-  #MACRO SubInterface<Boolean,boolean,Boolean>()
-  #MACRO SubInterface<Byte,byte,Byte>()
-  #MACRO SubInterface<Char,char,Character>()
-  #MACRO SubInterface<Short,short,Short>()
-  #MACRO SubInterface<Int,int,Integer>()
-  #MACRO SubInterface<Long,long,Long>()
-  #MACRO SubInterface<Float,float,Float>()
-  #MACRO SubInterface<Double,double,Double>()
-  #MACRO SubInterface<Ref,Object,Object>()
+  #MACRO SubInterface<Boolean,boolean,Boolean,BooleanConsumer,boolean>( )
+  #MACRO SubInterface<Byte,byte,Byte,ByteConsumer,byte>( )
+  #MACRO SubInterface<Char,char,Character,CharConsumer,char>( )
+  #MACRO SubInterface<Short,short,Short,ShortConsumer,short>( )
+  #MACRO SubInterface<Int,int,Integer,IntConsumer,int>( )
+  #MACRO SubInterface<Long,long,Long,LongConsumer,long>( )
+  #MACRO SubInterface<Float,float,Float,FloatConsumer,float>( )
+  #MACRO SubInterface<Double,double,Double,DoubleConsumer,double>( )
+  #MACRO SubInterface<Ref,Object,Object,Consumer<? super E>,E>(<E>)
 }
 
 
@@ -267,13 +276,42 @@ Objects.hashCode(VAL)
 #ENDIF
 #ENDDEF
 
-#MACRODEF SubInterface<CLASSPREFIX,PRIMITIVETYPE,BOXEDTYPE>()
+#MACRODEF SubInterface<CLASSPREFIX,PRIMITIVETYPE,BOXEDTYPE,CONSUMER,EXPOSEDTYPE>(TYPEPARAMETER)
 public interface OfCLASSPREFIX
 {
   public static final PRIMITIVETYPE[] DEFAULT_ARR=new PRIMITIVETYPE[]{};
 #IFNOTSWITCH CLASSPREFIX==Ref
   public static final BOXEDTYPE[] DEFAULT_BOXED_ARR=new BOXEDTYPE[]{};
 #ENDIF
+
+#IFSWITCH CLASSPREFIX==Ref
+  @SuppressWarnings("unchecked")
+#ENDIF
+  public static TYPEPARAMETER void ascendingForEach(PRIMITIVETYPE[] arr,int begin,int end,CONSUMER action)
+  {
+    for(;;++begin)
+    {
+      action.accept((EXPOSEDTYPE)arr[begin]);
+      if(begin==end)
+      {
+        return;
+      }
+    }
+  }
+#IFSWITCH CLASSPREFIX==Ref
+  @SuppressWarnings("unchecked")
+#ENDIF
+  public static TYPEPARAMETER void descendingForEach(PRIMITIVETYPE[] arr,int begin,int end,CONSUMER action)
+  {
+    for(;;--end)
+    {
+      action.accept((EXPOSEDTYPE)arr[end]);
+      if(begin==end)
+      {
+        return;
+      }
+    }
+  }
 
   public static int ascendingSeqHashCode(PRIMITIVETYPE[] arr,int begin,int end)
   {
