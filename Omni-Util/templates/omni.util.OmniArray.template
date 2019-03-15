@@ -18,6 +18,15 @@ import omni.function.FloatConsumer;
 import omni.function.ShortConsumer;
 import omni.function.ByteConsumer;
 import omni.function.BooleanConsumer;
+import omni.function.BooleanPredicate;
+import omni.function.ByteUnaryOperator;
+import omni.function.CharUnaryOperator;
+import omni.function.ShortUnaryOperator;
+import java.util.function.IntUnaryOperator;
+import java.util.function.LongUnaryOperator;
+import omni.function.FloatUnaryOperator;
+import java.util.function.DoubleUnaryOperator;
+import java.util.function.UnaryOperator;
 
 public final class OmniArray
 {
@@ -95,15 +104,15 @@ public final class OmniArray
     }
     return arr;
   }
-  #MACRO SubInterface<Boolean,boolean,Boolean,BooleanConsumer,boolean>( )
-  #MACRO SubInterface<Byte,byte,Byte,ByteConsumer,byte>( )
-  #MACRO SubInterface<Char,char,Character,CharConsumer,char>( )
-  #MACRO SubInterface<Short,short,Short,ShortConsumer,short>( )
-  #MACRO SubInterface<Int,int,Integer,IntConsumer,int>( )
-  #MACRO SubInterface<Long,long,Long,LongConsumer,long>( )
-  #MACRO SubInterface<Float,float,Float,FloatConsumer,float>( )
-  #MACRO SubInterface<Double,double,Double,DoubleConsumer,double>( )
-  #MACRO SubInterface<Ref,Object,Object,Consumer<? super E>,E>(<E>)
+  #MACRO SubInterface<Boolean,boolean,Boolean,BooleanConsumer,boolean,BooleanPredicate,test>( )
+  #MACRO SubInterface<Byte,byte,Byte,ByteConsumer,byte,ByteUnaryOperator,applyAsByte>( )
+  #MACRO SubInterface<Char,char,Character,CharConsumer,char,CharUnaryOperator,applyAsChar>( )
+  #MACRO SubInterface<Short,short,Short,ShortConsumer,short,ShortUnaryOperator,applyAsShort>( )
+  #MACRO SubInterface<Int,int,Integer,IntConsumer,int,IntUnaryOperator,applyAsInt>( )
+  #MACRO SubInterface<Long,long,Long,LongConsumer,long,LongUnaryOperator,applyAsLong>( )
+  #MACRO SubInterface<Float,float,Float,FloatConsumer,float,FloatUnaryOperator,applyAsFloat>( )
+  #MACRO SubInterface<Double,double,Double,DoubleConsumer,double,DoubleUnaryOperator,applyAsDouble>( )
+  #MACRO SubInterface<Ref,Object,Object,Consumer<? super E>,E,UnaryOperator<E>,apply>(<E>)
 }
 
 
@@ -276,13 +285,29 @@ Objects.hashCode(VAL)
 #ENDIF
 #ENDDEF
 
-#MACRODEF SubInterface<CLASSPREFIX,PRIMITIVETYPE,BOXEDTYPE,CONSUMER,EXPOSEDTYPE>(TYPEPARAMETER)
+#MACRODEF SubInterface<CLASSPREFIX,PRIMITIVETYPE,BOXEDTYPE,CONSUMER,EXPOSEDTYPE,OPERATOR,APPLY>(TYPEPARAMETER)
 public interface OfCLASSPREFIX
 {
   public static final PRIMITIVETYPE[] DEFAULT_ARR=new PRIMITIVETYPE[]{};
 #IFNOTSWITCH CLASSPREFIX==Ref
   public static final BOXEDTYPE[] DEFAULT_BOXED_ARR=new BOXEDTYPE[]{};
 #ENDIF
+
+#IFSWITCH CLASSPREFIX==Ref
+  @SuppressWarnings("unchecked")
+#ENDIF
+  public static TYPEPARAMETER void uncheckedReplaceAll(PRIMITIVETYPE[] arr,int offset,int bound,OPERATOR operator)
+  {
+    for(;;)
+    {
+      arr[offset]=operator.APPLY((EXPOSEDTYPE)arr[offset]);
+      if(++offset==bound)
+      {
+        return;
+      }
+    }
+  }
+
 
 #IFSWITCH CLASSPREFIX==Ref
   @SuppressWarnings("unchecked")
@@ -485,9 +510,9 @@ public interface OfCLASSPREFIX
     arr[newBound]=null;
 #ENDIF
   }
-  public static int removeRangeAndPullDown(PRIMITIVETYPE[] arr,int index,int oldBound,int numRemoved)
+  public static int removeRangeAndPullDown(PRIMITIVETYPE[] arr,int rangeHi,int oldBound,int numRemoved)
   {
-    ArrCopy.semicheckedSelfCopy(arr,index,index+=numRemoved,oldBound-index);
+    ArrCopy.semicheckedSelfCopy(arr,rangeHi-numRemoved,rangeHi,oldBound-rangeHi);
 #IFSWITCH CLASSPREFIX==Ref
     nullifyRange(arr,oldBound-1,oldBound-=numRemoved);
     return oldBound;

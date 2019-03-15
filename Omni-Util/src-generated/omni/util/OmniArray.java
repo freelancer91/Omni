@@ -17,6 +17,15 @@ import omni.function.FloatConsumer;
 import omni.function.ShortConsumer;
 import omni.function.ByteConsumer;
 import omni.function.BooleanConsumer;
+import omni.function.BooleanPredicate;
+import omni.function.ByteUnaryOperator;
+import omni.function.CharUnaryOperator;
+import omni.function.ShortUnaryOperator;
+import java.util.function.IntUnaryOperator;
+import java.util.function.LongUnaryOperator;
+import omni.function.FloatUnaryOperator;
+import java.util.function.DoubleUnaryOperator;
+import java.util.function.UnaryOperator;
 public final class OmniArray
 {
   private OmniArray()
@@ -97,6 +106,17 @@ public final class OmniArray
   {
     public static final boolean[] DEFAULT_ARR=new boolean[]{};
     public static final Boolean[] DEFAULT_BOXED_ARR=new Boolean[]{};
+    public static   void uncheckedReplaceAll(boolean[] arr,int offset,int bound,BooleanPredicate operator)
+    {
+      for(;;)
+      {
+        arr[offset]=operator.test((boolean)arr[offset]);
+        if(++offset==bound)
+        {
+          return;
+        }
+      }
+    }
     public static   void ascendingForEach(boolean[] arr,int begin,int end,BooleanConsumer action)
     {
       for(;;++begin)
@@ -318,9 +338,9 @@ public final class OmniArray
     {
       ArrCopy.semicheckedSelfCopy(arr,index,index+1,newBound-index);
     }
-    public static int removeRangeAndPullDown(boolean[] arr,int index,int oldBound,int numRemoved)
+    public static int removeRangeAndPullDown(boolean[] arr,int rangeHi,int oldBound,int numRemoved)
     {
-      ArrCopy.semicheckedSelfCopy(arr,index,index+=numRemoved,oldBound-index);
+      ArrCopy.semicheckedSelfCopy(arr,rangeHi-numRemoved,rangeHi,oldBound-rangeHi);
       return oldBound-numRemoved;
     }
     public static void reverseRange(boolean[] arr,int begin,int end)
@@ -338,6 +358,17 @@ public final class OmniArray
   {
     public static final byte[] DEFAULT_ARR=new byte[]{};
     public static final Byte[] DEFAULT_BOXED_ARR=new Byte[]{};
+    public static   void uncheckedReplaceAll(byte[] arr,int offset,int bound,ByteUnaryOperator operator)
+    {
+      for(;;)
+      {
+        arr[offset]=operator.applyAsByte((byte)arr[offset]);
+        if(++offset==bound)
+        {
+          return;
+        }
+      }
+    }
     public static   void ascendingForEach(byte[] arr,int begin,int end,ByteConsumer action)
     {
       for(;;++begin)
@@ -559,9 +590,9 @@ public final class OmniArray
     {
       ArrCopy.semicheckedSelfCopy(arr,index,index+1,newBound-index);
     }
-    public static int removeRangeAndPullDown(byte[] arr,int index,int oldBound,int numRemoved)
+    public static int removeRangeAndPullDown(byte[] arr,int rangeHi,int oldBound,int numRemoved)
     {
-      ArrCopy.semicheckedSelfCopy(arr,index,index+=numRemoved,oldBound-index);
+      ArrCopy.semicheckedSelfCopy(arr,rangeHi-numRemoved,rangeHi,oldBound-rangeHi);
       return oldBound-numRemoved;
     }
     public static void reverseRange(byte[] arr,int begin,int end)
@@ -579,6 +610,17 @@ public final class OmniArray
   {
     public static final char[] DEFAULT_ARR=new char[]{};
     public static final Character[] DEFAULT_BOXED_ARR=new Character[]{};
+    public static   void uncheckedReplaceAll(char[] arr,int offset,int bound,CharUnaryOperator operator)
+    {
+      for(;;)
+      {
+        arr[offset]=operator.applyAsChar((char)arr[offset]);
+        if(++offset==bound)
+        {
+          return;
+        }
+      }
+    }
     public static   void ascendingForEach(char[] arr,int begin,int end,CharConsumer action)
     {
       for(;;++begin)
@@ -776,9 +818,9 @@ public final class OmniArray
     {
       ArrCopy.semicheckedSelfCopy(arr,index,index+1,newBound-index);
     }
-    public static int removeRangeAndPullDown(char[] arr,int index,int oldBound,int numRemoved)
+    public static int removeRangeAndPullDown(char[] arr,int rangeHi,int oldBound,int numRemoved)
     {
-      ArrCopy.semicheckedSelfCopy(arr,index,index+=numRemoved,oldBound-index);
+      ArrCopy.semicheckedSelfCopy(arr,rangeHi-numRemoved,rangeHi,oldBound-rangeHi);
       return oldBound-numRemoved;
     }
     public static void reverseRange(char[] arr,int begin,int end)
@@ -800,6 +842,17 @@ public final class OmniArray
   {
     public static final short[] DEFAULT_ARR=new short[]{};
     public static final Short[] DEFAULT_BOXED_ARR=new Short[]{};
+    public static   void uncheckedReplaceAll(short[] arr,int offset,int bound,ShortUnaryOperator operator)
+    {
+      for(;;)
+      {
+        arr[offset]=operator.applyAsShort((short)arr[offset]);
+        if(++offset==bound)
+        {
+          return;
+        }
+      }
+    }
     public static   void ascendingForEach(short[] arr,int begin,int end,ShortConsumer action)
     {
       for(;;++begin)
@@ -1021,9 +1074,9 @@ public final class OmniArray
     {
       ArrCopy.semicheckedSelfCopy(arr,index,index+1,newBound-index);
     }
-    public static int removeRangeAndPullDown(short[] arr,int index,int oldBound,int numRemoved)
+    public static int removeRangeAndPullDown(short[] arr,int rangeHi,int oldBound,int numRemoved)
     {
-      ArrCopy.semicheckedSelfCopy(arr,index,index+=numRemoved,oldBound-index);
+      ArrCopy.semicheckedSelfCopy(arr,rangeHi-numRemoved,rangeHi,oldBound-rangeHi);
       return oldBound-numRemoved;
     }
     public static void reverseRange(short[] arr,int begin,int end)
@@ -1045,6 +1098,17 @@ public final class OmniArray
   {
     public static final int[] DEFAULT_ARR=new int[]{};
     public static final Integer[] DEFAULT_BOXED_ARR=new Integer[]{};
+    public static   void uncheckedReplaceAll(int[] arr,int offset,int bound,IntUnaryOperator operator)
+    {
+      for(;;)
+      {
+        arr[offset]=operator.applyAsInt((int)arr[offset]);
+        if(++offset==bound)
+        {
+          return;
+        }
+      }
+    }
     public static   void ascendingForEach(int[] arr,int begin,int end,IntConsumer action)
     {
       for(;;++begin)
@@ -1266,9 +1330,9 @@ public final class OmniArray
     {
       ArrCopy.semicheckedSelfCopy(arr,index,index+1,newBound-index);
     }
-    public static int removeRangeAndPullDown(int[] arr,int index,int oldBound,int numRemoved)
+    public static int removeRangeAndPullDown(int[] arr,int rangeHi,int oldBound,int numRemoved)
     {
-      ArrCopy.semicheckedSelfCopy(arr,index,index+=numRemoved,oldBound-index);
+      ArrCopy.semicheckedSelfCopy(arr,rangeHi-numRemoved,rangeHi,oldBound-rangeHi);
       return oldBound-numRemoved;
     }
     public static void reverseRange(int[] arr,int begin,int end)
@@ -1290,6 +1354,17 @@ public final class OmniArray
   {
     public static final long[] DEFAULT_ARR=new long[]{};
     public static final Long[] DEFAULT_BOXED_ARR=new Long[]{};
+    public static   void uncheckedReplaceAll(long[] arr,int offset,int bound,LongUnaryOperator operator)
+    {
+      for(;;)
+      {
+        arr[offset]=operator.applyAsLong((long)arr[offset]);
+        if(++offset==bound)
+        {
+          return;
+        }
+      }
+    }
     public static   void ascendingForEach(long[] arr,int begin,int end,LongConsumer action)
     {
       for(;;++begin)
@@ -1511,9 +1586,9 @@ public final class OmniArray
     {
       ArrCopy.semicheckedSelfCopy(arr,index,index+1,newBound-index);
     }
-    public static int removeRangeAndPullDown(long[] arr,int index,int oldBound,int numRemoved)
+    public static int removeRangeAndPullDown(long[] arr,int rangeHi,int oldBound,int numRemoved)
     {
-      ArrCopy.semicheckedSelfCopy(arr,index,index+=numRemoved,oldBound-index);
+      ArrCopy.semicheckedSelfCopy(arr,rangeHi-numRemoved,rangeHi,oldBound-rangeHi);
       return oldBound-numRemoved;
     }
     public static void reverseRange(long[] arr,int begin,int end)
@@ -1535,6 +1610,17 @@ public final class OmniArray
   {
     public static final float[] DEFAULT_ARR=new float[]{};
     public static final Float[] DEFAULT_BOXED_ARR=new Float[]{};
+    public static   void uncheckedReplaceAll(float[] arr,int offset,int bound,FloatUnaryOperator operator)
+    {
+      for(;;)
+      {
+        arr[offset]=operator.applyAsFloat((float)arr[offset]);
+        if(++offset==bound)
+        {
+          return;
+        }
+      }
+    }
     public static   void ascendingForEach(float[] arr,int begin,int end,FloatConsumer action)
     {
       for(;;++begin)
@@ -1974,9 +2060,9 @@ public final class OmniArray
     {
       ArrCopy.semicheckedSelfCopy(arr,index,index+1,newBound-index);
     }
-    public static int removeRangeAndPullDown(float[] arr,int index,int oldBound,int numRemoved)
+    public static int removeRangeAndPullDown(float[] arr,int rangeHi,int oldBound,int numRemoved)
     {
-      ArrCopy.semicheckedSelfCopy(arr,index,index+=numRemoved,oldBound-index);
+      ArrCopy.semicheckedSelfCopy(arr,rangeHi-numRemoved,rangeHi,oldBound-rangeHi);
       return oldBound-numRemoved;
     }
     public static void reverseRange(float[] arr,int begin,int end)
@@ -2002,6 +2088,17 @@ public final class OmniArray
   {
     public static final double[] DEFAULT_ARR=new double[]{};
     public static final Double[] DEFAULT_BOXED_ARR=new Double[]{};
+    public static   void uncheckedReplaceAll(double[] arr,int offset,int bound,DoubleUnaryOperator operator)
+    {
+      for(;;)
+      {
+        arr[offset]=operator.applyAsDouble((double)arr[offset]);
+        if(++offset==bound)
+        {
+          return;
+        }
+      }
+    }
     public static   void ascendingForEach(double[] arr,int begin,int end,DoubleConsumer action)
     {
       for(;;++begin)
@@ -2415,9 +2512,9 @@ public final class OmniArray
     {
       ArrCopy.semicheckedSelfCopy(arr,index,index+1,newBound-index);
     }
-    public static int removeRangeAndPullDown(double[] arr,int index,int oldBound,int numRemoved)
+    public static int removeRangeAndPullDown(double[] arr,int rangeHi,int oldBound,int numRemoved)
     {
-      ArrCopy.semicheckedSelfCopy(arr,index,index+=numRemoved,oldBound-index);
+      ArrCopy.semicheckedSelfCopy(arr,rangeHi-numRemoved,rangeHi,oldBound-rangeHi);
       return oldBound-numRemoved;
     }
     public static void reverseRange(double[] arr,int begin,int end)
@@ -2442,6 +2539,18 @@ public final class OmniArray
   public interface OfRef
   {
     public static final Object[] DEFAULT_ARR=new Object[]{};
+    @SuppressWarnings("unchecked")
+    public static <E> void uncheckedReplaceAll(Object[] arr,int offset,int bound,UnaryOperator<E> operator)
+    {
+      for(;;)
+      {
+        arr[offset]=operator.apply((E)arr[offset]);
+        if(++offset==bound)
+        {
+          return;
+        }
+      }
+    }
     @SuppressWarnings("unchecked")
     public static <E> void ascendingForEach(Object[] arr,int begin,int end,Consumer<? super E> action)
     {
@@ -2864,9 +2973,9 @@ public final class OmniArray
       ArrCopy.semicheckedSelfCopy(arr,index,index+1,newBound-index);
       arr[newBound]=null;
     }
-    public static int removeRangeAndPullDown(Object[] arr,int index,int oldBound,int numRemoved)
+    public static int removeRangeAndPullDown(Object[] arr,int rangeHi,int oldBound,int numRemoved)
     {
-      ArrCopy.semicheckedSelfCopy(arr,index,index+=numRemoved,oldBound-index);
+      ArrCopy.semicheckedSelfCopy(arr,rangeHi-numRemoved,rangeHi,oldBound-rangeHi);
       nullifyRange(arr,oldBound-1,oldBound-=numRemoved);
       return oldBound;
     }

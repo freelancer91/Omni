@@ -22,18 +22,18 @@ public interface CheckedCollection{
         }
         return new ConcurrentModificationException(getCMEMessage(expectedModCount,actualModCount),e);
     }
-    //  static RuntimeException checkModCount(int expectedModCount,int actualModCount,RuntimeException e){
-    //    if(actualModCount==expectedModCount||e instanceof ConcurrentModificationException){ return e; }
-    //    return new ConcurrentModificationException(getCMEMessage(expectedModCount,actualModCount),e);
-    //  }
+
     static void checkReadHi(int index,int size) throws IndexOutOfBoundsException{
         if(index<size){ return; }
         throw new IndexOutOfBoundsException("Invalid read index : index = "+index+"; size = "+size);
     }
-    static void checkSubListRange(int fromIndex,int toIndex,int size){
-        if(fromIndex>=0&&toIndex<=size&&fromIndex<=toIndex){ return; }
-        throw new IndexOutOfBoundsException(
-                "Invalid sublist range : fromIndex = "+fromIndex+"; toIndex = "+toIndex+"; size = "+size);
+    static int checkSubListRange(int fromIndex,int toIndex,int size){
+        final int subListSize;
+        if((subListSize=toIndex - fromIndex) < 0 || fromIndex < 0 || size < toIndex){
+            throw new IndexOutOfBoundsException(
+                    "Invalid sublist range : fromIndex=" + fromIndex + "; toIndex=" + toIndex + "; size=" + size);
+        }
+        return subListSize;
     }
     static void checkWriteHi(int index,int size) throws IndexOutOfBoundsException{
         if(index<=size){ return; }

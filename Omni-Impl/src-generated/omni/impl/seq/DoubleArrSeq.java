@@ -20,7 +20,6 @@ import java.util.function.DoubleUnaryOperator;
 import omni.function.DoubleComparator;
 import java.util.function.DoublePredicate;
 import java.util.function.DoubleConsumer;
-import omni.util.HashUtil;
 import omni.util.BitSetUtil;
 import omni.impl.AbstractDoubleItr;
 public abstract class DoubleArrSeq implements OmniCollection.OfDouble
@@ -578,6 +577,131 @@ public abstract class DoubleArrSeq implements OmniCollection.OfDouble
     }
     return OmniArray.OfDouble.DEFAULT_BOXED_ARR;
   }
+  abstract boolean uncheckedRemoveIf(int size,DoublePredicate filter);
+  @Override
+  public boolean removeIf(DoublePredicate filter)
+  {
+    final int size;
+    return (size=this.size)!=0 && uncheckedRemoveIf(size,filter);
+  }
+  @Override
+  public boolean removeIf(Predicate<? super Double> filter)
+  {
+    final int size;
+    return (size=this.size)!=0 && uncheckedRemoveIf(size,filter::test);
+  }
+  private static  int pullSurvivorsDown(double[] arr,int srcOffset,int srcBound,int dstOffset,DoublePredicate filter)
+  {
+    while(++srcOffset!=srcBound)
+    {
+      final double v;
+      if(!filter.test((double)(v=arr[srcOffset])))
+      {
+        arr[dstOffset++]=v;
+      }
+    }
+    return srcBound-dstOffset;
+  }
+  private static  int uncheckedRemoveIfImpl(double[] arr,int srcOffset,int srcBound,DoublePredicate filter)
+  {
+    do{
+      if(filter.test((double)arr[srcOffset])){
+        return pullSurvivorsDown(arr,srcOffset,srcBound,srcOffset,filter);
+      }
+    }while(++srcOffset!=srcBound);
+    return 0;
+  }
+  private static  int uncheckedRemoveIfImpl(double[] arr,int srcOffset,int srcBound,DoublePredicate filter,CheckedCollection.AbstractModCountChecker modCountChecker)
+  {
+    do
+    {
+      if(filter.test((double)arr[srcOffset]))
+      {
+        int dstOffset=srcOffset;
+        outer:for(;;)
+        {
+          if(++srcOffset==srcBound)
+          {
+            modCountChecker.checkModCount();
+            break outer;
+          }
+          double before;
+          if(!filter.test((double)(before=arr[srcOffset])))
+          {
+            for(int i=srcBound-1;;--i)
+            {
+              if(i==srcOffset)
+              {
+                modCountChecker.checkModCount();
+                arr[dstOffset++]=before;
+                break outer;
+              }
+              double after;
+              if(!filter.test((double)(after=arr[i])))
+              {
+                int n;
+                if((n=i-(++srcOffset))!=0)
+                {
+                  if(n>64)
+                  {
+                    long[] survivorSet;
+                    int numSurvivors=BitSetUtil.markSurvivors(arr,srcOffset,i,filter,survivorSet=BitSetUtil.getBitSet(n));
+                    modCountChecker.checkModCount();
+                    if(numSurvivors!=0)
+                    {
+                      if(numSurvivors==n)
+                      {
+                        ArrCopy.uncheckedSelfCopy(arr,srcOffset-1,dstOffset,numSurvivors+=2);
+                        dstOffset+=numSurvivors;
+                      }
+                      else
+                      {
+                        arr[dstOffset]=before;
+                        BitSetUtil.pullSurvivorsDown(arr,srcOffset,++dstOffset,dstOffset+=numSurvivors,survivorSet);
+                        arr[dstOffset++]=after;
+                      }
+                      break outer;
+                    }
+                  }
+                  else
+                  {
+                    long survivorWord=BitSetUtil.markSurvivors(arr,srcOffset,i,filter);
+                    modCountChecker.checkModCount();
+                    int numSurvivors;
+                    if((numSurvivors=Long.bitCount(survivorWord))!=0)
+                    {
+                      if(numSurvivors==n)
+                      {
+                        ArrCopy.uncheckedSelfCopy(arr,srcOffset-1,dstOffset,numSurvivors+=2);
+                        dstOffset+=numSurvivors;
+                      }
+                      else
+                      {
+                        arr[dstOffset]=before;
+                        BitSetUtil.pullSurvivorsDown(arr,srcOffset,++dstOffset,dstOffset+=numSurvivors,survivorWord);
+                        arr[dstOffset++]=after;
+                      }
+                      break outer;
+                    }
+                  }
+                }
+                else
+                {
+                  modCountChecker.checkModCount();
+                }
+                arr[dstOffset++]=before;
+                arr[dstOffset++]=after;
+                break outer;
+              }
+            }
+          }
+        }
+        return srcBound-dstOffset;
+      }
+    }
+    while(++srcOffset!=srcBound);
+    return 0;
+  }
   public
     static class UncheckedStack
       extends DoubleArrSeq
@@ -884,6 +1008,59 @@ public abstract class DoubleArrSeq implements OmniCollection.OfDouble
     public double popDouble()
     {
       return (double)arr[--this.size];
+    }
+    @Override
+    public double pollDouble()
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        final var ret=(double)(arr[--size]);
+        this.size=size;
+        return ret;
+      }
+      return Double.NaN;
+    }
+    @Override
+    public double peekDouble()
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        return (double)(arr[size-1]);
+      }
+      return Double.NaN;
+    }
+    @Override
+    public Double poll()
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        final var ret=(Double)(arr[--size]);
+        this.size=size;
+        return ret;
+      }
+      return null;
+    }
+    @Override
+    public Double peek()
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        return (Double)(arr[size-1]);
+      }
+      return null;
+    }
+    @Override
+    boolean uncheckedRemoveIf(int size,DoublePredicate filter)
+    {
+      if(size!=(size-=uncheckedRemoveIfImpl(this.arr,0,size,filter))){
+        this.size=size;
+        return true;
+      }
+      return false;
     }
   }
   public
@@ -1374,7 +1551,7 @@ public abstract class DoubleArrSeq implements OmniCollection.OfDouble
     @Override
     public void add(int index,double val)
     {
-      int size;
+      final int size;
       if((size=this.size)!=0){
         ((DoubleArrSeq)this).uncheckedInsert(index,size,val);
       }else{
@@ -1415,6 +1592,107 @@ public abstract class DoubleArrSeq implements OmniCollection.OfDouble
       return ret;
     }
     @Override
+    public double removeDoubleAt(int index)
+    {
+      final double[] arr;
+      final var ret=(double)(arr=this.arr)[index];
+      OmniArray.OfDouble.removeIndexAndPullDown(arr,index,--size);
+      return ret;
+    }
+    @Override
+    boolean uncheckedRemoveIf(int size,DoublePredicate filter)
+    {
+      if(size!=(size-=uncheckedRemoveIfImpl(this.arr,0,size,filter))){
+        this.size=size;
+        return true;
+      }
+      return false;
+    }
+    @Override
+    public void replaceAll(DoubleUnaryOperator operator)
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        OmniArray.OfDouble.uncheckedReplaceAll(this.arr,0,size,operator);
+      }
+    }
+    @Override
+    public void sort(DoubleComparator sorter)
+    {
+      final int size;
+      if((size=this.size)>1)
+      {
+        if(sorter==null)
+        {
+          DoubleSortUtil.uncheckedAscendingSort(this.arr,0,size);
+        }
+        else
+        {
+          DoubleSortUtil.uncheckedStableSort(this.arr,0,size,sorter);
+        }
+      }
+    }
+    @Override
+    public void stableAscendingSort()
+    {
+      final int size;
+      if((size=this.size)>1)
+      {
+        DoubleSortUtil.uncheckedAscendingSort(this.arr,0,size);
+      }
+    }
+    @Override
+    public void stableDescendingSort()
+    {
+      final int size;
+      if((size=this.size)>1)
+      {
+        DoubleSortUtil.uncheckedDescendingSort(this.arr,0,size);
+      }
+    }
+    @Override
+    public void replaceAll(UnaryOperator<Double> operator)
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        OmniArray.OfDouble.uncheckedReplaceAll(this.arr,0,size,operator::apply);
+      }
+    }
+    @Override
+    public void sort(Comparator<? super Double> sorter)
+    {
+      final int size;
+      if((size=this.size)>1)
+      {
+        if(sorter==null)
+        {
+          DoubleSortUtil.uncheckedAscendingSort(this.arr,0,size);
+        }
+        else
+        {
+          DoubleSortUtil.uncheckedStableSort(this.arr,0,size,sorter::compare);
+        }
+      }
+    }
+    @Override
+    public void unstableSort(DoubleComparator sorter)
+    {
+      final int size;
+      if((size=this.size)>1)
+      {
+        if(sorter==null)
+        {
+          DoubleSortUtil.uncheckedAscendingSort(this.arr,0,size);
+        }
+        else
+        {
+          DoubleSortUtil.uncheckedUnstableSort(this.arr,0,size,sorter);
+        }
+      }
+    }
+    @Override
     public OmniList.OfDouble subList(int fromIndex,int toIndex)
     {
       return new UncheckedSubList(this,fromIndex,toIndex-fromIndex);
@@ -1422,7 +1700,7 @@ public abstract class DoubleArrSeq implements OmniCollection.OfDouble
   }
   public
     static class UncheckedSubList
-      implements DoubleListDefault,Cloneable
+      implements DoubleSubListDefault,Cloneable
   {
     transient final int rootOffset;
     transient int size;
@@ -1511,7 +1789,7 @@ public abstract class DoubleArrSeq implements OmniCollection.OfDouble
       {
         for(var curr=parent;curr!=null;curr.size-=size,curr=curr.parent){}
         final UncheckedList root;
-        (root=this.root).size=OmniArray.OfDouble.removeRangeAndPullDown(root.arr,this.rootOffset,root.size,size);
+        (root=this.root).size=OmniArray.OfDouble.removeRangeAndPullDown(root.arr,this.rootOffset+size,root.size,size);
         this.size=0;
       }
     }
@@ -2302,39 +2580,6 @@ public abstract class DoubleArrSeq implements OmniCollection.OfDouble
       return new ListItr(this,index+this.rootOffset);
     }
     @Override
-    public boolean add(Double val){
-      return add((double)val);
-    }
-    @Override
-    public boolean add(boolean val){
-      return add((double)TypeUtil.castToDouble(val));
-    }
-    @Override
-    public boolean add(int val)
-    {
-      return add((double)val);
-    }
-    @Override
-    public boolean add(char val)
-    {
-      return add((double)val);
-    }
-    @Override
-    public boolean add(short val)
-    {
-      return add((double)val);
-    }
-    @Override
-    public boolean add(long val)
-    {
-      return add((double)val);
-    }
-    @Override
-    public boolean add(float val)
-    {
-      return add((double)val);
-    }
-    @Override
     public boolean add(double val)
     {
       for(var curr=parent;curr!=null;++curr.size,curr=curr.parent){}
@@ -2430,6 +2675,150 @@ public abstract class DoubleArrSeq implements OmniCollection.OfDouble
       final var ret=(double)(arr=root.arr)[index+=this.rootOffset];
       arr[index]=val;
       return ret;
+    }
+    @Override
+    public double removeDoubleAt(int index)
+    {
+      final double[] arr;
+      for(var curr=parent;curr!=null;--curr.size,curr=curr.parent){}
+      final UncheckedList root;
+      final var ret=(double)(arr=(root=this.root).arr)[index+=this.rootOffset];
+      OmniArray.OfDouble.removeIndexAndPullDown(arr,index,--root.size);
+      this.size=size-1;
+      return ret;
+    }
+    @Override
+    public boolean removeIf(DoublePredicate filter)
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        {
+          final double[] arr;
+          final int numRemoved;
+          int rootOffset;
+          final UncheckedList root;
+          if((numRemoved=uncheckedRemoveIfImpl(arr=(root=this.root).arr,rootOffset=this.rootOffset,rootOffset+=size,filter))!=0){
+            for(var curr=parent;curr!=null;curr.size-=numRemoved,curr=curr.parent){}
+            root.size=OmniArray.OfDouble.removeRangeAndPullDown(arr,rootOffset,root.size,numRemoved);
+            this.size=size-numRemoved;
+            return true;
+          }
+        }
+      }
+      return false;
+    }
+    @Override
+    public boolean removeIf(Predicate<? super Double> filter)
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        {
+          final double[] arr;
+          final int numRemoved;
+          int rootOffset;
+          final UncheckedList root;
+          if((numRemoved=uncheckedRemoveIfImpl(arr=(root=this.root).arr,rootOffset=this.rootOffset,rootOffset+=size,filter::test))!=0){
+            for(var curr=parent;curr!=null;curr.size-=numRemoved,curr=curr.parent){}
+            root.size=OmniArray.OfDouble.removeRangeAndPullDown(arr,rootOffset,root.size,numRemoved);
+            this.size=size-numRemoved;
+            return true;
+          }
+        }
+      }
+      return false;
+    }
+    @Override
+    public void replaceAll(DoubleUnaryOperator operator)
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        final int rootOffset;
+        OmniArray.OfDouble.uncheckedReplaceAll(root.arr,rootOffset=this.rootOffset,rootOffset+size,operator);  
+      }
+    }
+    @Override
+    public void sort(DoubleComparator sorter)
+    {
+      final int size;
+      if((size=this.size)>1)
+      {
+        final int rootOffset;
+        if(sorter==null)
+        {
+          DoubleSortUtil.uncheckedAscendingSort(root.arr,rootOffset=this.rootOffset,rootOffset+size);
+        }
+        else
+        {
+          DoubleSortUtil.uncheckedStableSort(root.arr,rootOffset=this.rootOffset,rootOffset+size,sorter);
+        }
+      }
+    }
+    @Override
+    public void stableAscendingSort()
+    {
+      final int size;
+      if((size=this.size)>1)
+      {
+        final int rootOffset;
+        DoubleSortUtil.uncheckedAscendingSort(root.arr,rootOffset=this.rootOffset,rootOffset+size);
+      }
+    }
+    @Override
+    public void stableDescendingSort()
+    {
+      final int size;
+      if((size=this.size)>1)
+      {
+        final int rootOffset;
+        DoubleSortUtil.uncheckedDescendingSort(root.arr,rootOffset=this.rootOffset,rootOffset+size);
+      }
+    }
+    @Override
+    public void replaceAll(UnaryOperator<Double> operator)
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        final int rootOffset;
+        OmniArray.OfDouble.uncheckedReplaceAll(root.arr,rootOffset=this.rootOffset,rootOffset+size,operator::apply);  
+      }
+    }
+    @Override
+    public void sort(Comparator<? super Double> sorter)
+    {
+      final int size;
+      if((size=this.size)>1)
+      {
+        final int rootOffset;
+        if(sorter==null)
+        {
+          DoubleSortUtil.uncheckedAscendingSort(root.arr,rootOffset=this.rootOffset,rootOffset+size);
+        }
+        else
+        {
+          DoubleSortUtil.uncheckedStableSort(root.arr,rootOffset=this.rootOffset,rootOffset+size,sorter::compare);
+        }
+      }
+    }
+    @Override
+    public void unstableSort(DoubleComparator sorter)
+    {
+      final int size;
+      if((size=this.size)>1)
+      {
+        final int rootOffset;
+        if(sorter==null)
+        {
+          DoubleSortUtil.uncheckedAscendingSort(root.arr,rootOffset=this.rootOffset,rootOffset+size);
+        }
+        else
+        {
+          DoubleSortUtil.uncheckedUnstableSort(root.arr,rootOffset=this.rootOffset,rootOffset+size,sorter);
+        }
+      }
     }
     @Override
     public OmniList.OfDouble subList(int fromIndex,int toIndex)
@@ -2701,6 +3090,50 @@ public abstract class DoubleArrSeq implements OmniCollection.OfDouble
         return ret;
       }
       throw new NoSuchElementException();
+    }
+    @Override
+    public double pollDouble()
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        ++this.modCount;
+        final var ret=(double)(arr[--size]);
+        this.size=size;
+        return ret;
+      }
+      return Double.NaN;
+    }
+    @Override
+    public Double poll()
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        ++this.modCount;
+        final var ret=(Double)(arr[--size]);
+        this.size=size;
+        return ret;
+      }
+      return null;
+    }
+    @Override
+    boolean uncheckedRemoveIf(int size,DoublePredicate filter)
+    {
+      final int modCount;
+      if(size!=(size-=uncheckedRemoveIfImpl(this.arr
+        ,0,size,filter,new CheckedCollection.AbstractModCountChecker(modCount=this.modCount){
+          @Override protected int getActualModCount(){
+          return CheckedStack.this.modCount;
+          }
+        }))
+        ){
+        this.modCount=modCount+1;
+        this.size=size;
+        return true;
+      }
+      CheckedCollection.checkModCount(modCount,this.modCount);
+      return false;
     }
   }
   public
@@ -3014,10 +3447,8 @@ public abstract class DoubleArrSeq implements OmniCollection.OfDouble
     @Override
     public OmniListIterator.OfDouble listIterator(int index)
     {
-      if(index<0 || index>this.size)
-      {
-        throw new IndexOutOfBoundsException("index="+index+"; size="+this.size);
-      }
+      CheckedCollection.checkLo(index);
+      CheckedCollection.checkWriteHi(index,this.size);
       return new ListItr(this,index);
     }
     @Override
@@ -3029,10 +3460,9 @@ public abstract class DoubleArrSeq implements OmniCollection.OfDouble
     @Override
     public void add(int index,double val)
     {
-      int size;
-      if((size=this.size)<index || index<0){
-        throw new IndexOutOfBoundsException("index="+index+"; size="+size);
-      }
+      final int size;
+      CheckedCollection.checkLo(index);
+      CheckedCollection.checkWriteHi(index,size=this.size);
       ++this.modCount;
       if(size!=0){
         ((DoubleArrSeq)this).uncheckedInsert(index,size,val);
@@ -3058,47 +3488,201 @@ public abstract class DoubleArrSeq implements OmniCollection.OfDouble
     @Override
     public double getDouble(int index)
     {
-      if(index<0 || index>=this.size)
-      {
-        throw new IndexOutOfBoundsException("index="+index+"; size="+this.size);
-      }
+      CheckedCollection.checkLo(index);
+      CheckedCollection.checkReadHi(index,this.size);
       return (double)this.arr[index];
     }
     @Override
     public void put(int index,double val)
     {
-      if(index<0 || index>=this.size)
-      {
-        throw new IndexOutOfBoundsException("index="+index+"; size="+this.size);
-      }
+      CheckedCollection.checkLo(index);
+      CheckedCollection.checkReadHi(index,this.size);
       this.arr[index]=val;
     }
     @Override
     public double set(int index,double val)
     {
-      if(index<0 || index>=this.size)
-      {
-        throw new IndexOutOfBoundsException("index="+index+"; size="+this.size);
-      }
+      CheckedCollection.checkLo(index);
+      CheckedCollection.checkReadHi(index,this.size);
       final double[] arr;
       final var ret=(double)(arr=this.arr)[index];
       arr[index]=val;
       return ret;
     }
     @Override
+    public double removeDoubleAt(int index)
+    {
+      CheckedCollection.checkLo(index);
+      int size;
+      CheckedCollection.checkReadHi(index,size=this.size);
+      final double[] arr;
+      ++this.modCount;
+      final var ret=(double)(arr=this.arr)[index];
+      OmniArray.OfDouble.removeIndexAndPullDown(arr,index,--size);
+      this.size=size;
+      return ret;
+    }
+    @Override
+    boolean uncheckedRemoveIf(int size,DoublePredicate filter)
+    {
+      final int modCount;
+      if(size!=(size-=uncheckedRemoveIfImpl(this.arr
+        ,0,size,filter,new CheckedCollection.AbstractModCountChecker(modCount=this.modCount){
+          @Override protected int getActualModCount(){
+          return CheckedList.this.modCount;
+          }
+        }))
+        ){
+        this.modCount=modCount+1;
+        this.size=size;
+        return true;
+      }
+      CheckedCollection.checkModCount(modCount,this.modCount);
+      return false;
+    }
+    @Override
+    public void replaceAll(DoubleUnaryOperator operator)
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        int modCount=this.modCount;
+        try
+        {
+          OmniArray.OfDouble.uncheckedReplaceAll(this.arr,0,size,operator);
+        }
+        finally
+        {
+          CheckedCollection.checkModCount(modCount,this.modCount);
+        }
+        this.modCount=modCount+1;
+      }
+    }
+    @Override
+    public void sort(DoubleComparator sorter)
+    {
+      final int size;
+      if((size=this.size)>1)
+      {
+        if(sorter==null)
+        {
+          DoubleSortUtil.uncheckedAscendingSort(this.arr,0,size);
+          ++this.modCount;
+        }
+        else
+        {
+          final int modCount=this.modCount;
+          try
+          {
+            DoubleSortUtil.uncheckedStableSort(this.arr,0,size,sorter);
+          }
+          finally
+          {
+            CheckedCollection.checkModCount(modCount,this.modCount);
+          }
+          this.modCount=modCount+1;
+        }
+      }
+    }
+    @Override
+    public void stableAscendingSort()
+    {
+      final int size;
+      if((size=this.size)>1)
+      {
+        DoubleSortUtil.uncheckedAscendingSort(this.arr,0,size);
+        ++this.modCount;
+      }
+    }
+    @Override
+    public void stableDescendingSort()
+    {
+      final int size;
+      if((size=this.size)>1)
+      {
+        DoubleSortUtil.uncheckedDescendingSort(this.arr,0,size);
+        ++this.modCount;
+      }
+    }
+    @Override
+    public void replaceAll(UnaryOperator<Double> operator)
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        int modCount=this.modCount;
+        try
+        {
+          OmniArray.OfDouble.uncheckedReplaceAll(this.arr,0,size,operator::apply);
+        }
+        finally
+        {
+          CheckedCollection.checkModCount(modCount,this.modCount);
+        }
+        this.modCount=modCount+1;
+      }
+    }
+    @Override
+    public void sort(Comparator<? super Double> sorter)
+    {
+      final int size;
+      if((size=this.size)>1)
+      {
+        if(sorter==null)
+        {
+          DoubleSortUtil.uncheckedAscendingSort(this.arr,0,size);
+          ++this.modCount;
+        }
+        else
+        {
+          final int modCount=this.modCount;
+          try
+          {
+            DoubleSortUtil.uncheckedStableSort(this.arr,0,size,sorter::compare);
+          }
+          finally
+          {
+            CheckedCollection.checkModCount(modCount,this.modCount);
+          }
+          this.modCount=modCount+1;
+        }
+      }
+    }
+    @Override
+    public void unstableSort(DoubleComparator sorter)
+    {
+      final int size;
+      if((size=this.size)>1)
+      {
+        if(sorter==null)
+        {
+          DoubleSortUtil.uncheckedAscendingSort(this.arr,0,size);
+          ++this.modCount;
+        }
+        else
+        {
+          final int modCount=this.modCount;
+          try
+          {
+            DoubleSortUtil.uncheckedUnstableSort(this.arr,0,size,sorter);
+          }
+          finally
+          {
+            CheckedCollection.checkModCount(modCount,this.modCount);
+          }
+          this.modCount=modCount+1;
+        }
+      }
+    }
+    @Override
     public OmniList.OfDouble subList(int fromIndex,int toIndex)
     {
-      final int subListSize;
-      if((subListSize=toIndex-fromIndex)<0 || fromIndex<0 || this.size<toIndex)
-      {
-        throw new IndexOutOfBoundsException("fromIndex="+fromIndex+"; toIndex="+toIndex+"; size="+this.size);
-      }
-      return new CheckedSubList(this,fromIndex,subListSize);
+      return new CheckedSubList(this,fromIndex,CheckedCollection.checkSubListRange(fromIndex,toIndex,this.size));
     }
   }
   private
     static class CheckedSubList
-      implements DoubleListDefault,Cloneable
+      implements DoubleSubListDefault,Cloneable
   {
     transient int modCount;
     transient final int rootOffset;
@@ -3202,7 +3786,7 @@ public abstract class DoubleArrSeq implements OmniCollection.OfDouble
         root.modCount=++modCount;
         this.modCount=modCount;
         for(var curr=parent;curr!=null;curr.modCount=modCount,curr.size-=size,curr=curr.parent){}
-        root.size=OmniArray.OfDouble.removeRangeAndPullDown(root.arr,this.rootOffset,root.size,size);
+        root.size=OmniArray.OfDouble.removeRangeAndPullDown(root.arr,this.rootOffset+size,root.size,size);
         this.size=0;
       }
     }
@@ -4328,44 +4912,9 @@ public abstract class DoubleArrSeq implements OmniCollection.OfDouble
     public OmniListIterator.OfDouble listIterator(int index)
     {
       CheckedCollection.checkModCount(modCount,root.modCount);
-      if(index<0 || index>this.size)
-      {
-        throw new IndexOutOfBoundsException("index="+index+"; size="+this.size);
-      }
+      CheckedCollection.checkLo(index);
+      CheckedCollection.checkWriteHi(index,this.size);
       return new ListItr(this,index+this.rootOffset);
-    }
-    @Override
-    public boolean add(Double val){
-      return add((double)val);
-    }
-    @Override
-    public boolean add(boolean val){
-      return add((double)TypeUtil.castToDouble(val));
-    }
-    @Override
-    public boolean add(int val)
-    {
-      return add((double)val);
-    }
-    @Override
-    public boolean add(char val)
-    {
-      return add((double)val);
-    }
-    @Override
-    public boolean add(short val)
-    {
-      return add((double)val);
-    }
-    @Override
-    public boolean add(long val)
-    {
-      return add((double)val);
-    }
-    @Override
-    public boolean add(float val)
-    {
-      return add((double)val);
     }
     @Override
     public boolean add(double val)
@@ -4390,10 +4939,9 @@ public abstract class DoubleArrSeq implements OmniCollection.OfDouble
       final CheckedList root;
       int modCount;
       CheckedCollection.checkModCount(modCount=this.modCount,(root=this.root).modCount);
-      int size;
-      if((size=this.size)<index||index<0){
-        throw new IndexOutOfBoundsException("index="+index+"; size="+size);
-      }
+      CheckedCollection.checkLo(index);
+      final int size;
+      CheckedCollection.checkWriteHi(index,size=this.size);
       root.modCount=++modCount;
       this.modCount=modCount;
       for(var curr=parent;curr!=null;curr.modCount=modCount,++curr.size,curr=curr.parent){}
@@ -4474,10 +5022,8 @@ public abstract class DoubleArrSeq implements OmniCollection.OfDouble
     {
       final CheckedList root;
       CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
-      if(index<0 || index>=this.size)
-      {
-        throw new IndexOutOfBoundsException("index="+index+"; size="+this.size);
-      }
+      CheckedCollection.checkLo(index);
+      CheckedCollection.checkReadHi(index,this.size);
       return (double)root.arr[index+this.rootOffset];
     }
     @Override
@@ -4485,10 +5031,8 @@ public abstract class DoubleArrSeq implements OmniCollection.OfDouble
     {
       final CheckedList root;
       CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
-      if(index<0 || index>=this.size)
-      {
-        throw new IndexOutOfBoundsException("index="+index+"; size="+this.size);
-      }
+      CheckedCollection.checkLo(index);
+      CheckedCollection.checkReadHi(index,this.size);
       root.arr[index+this.rootOffset]=val;
     }
     @Override
@@ -4496,25 +5040,294 @@ public abstract class DoubleArrSeq implements OmniCollection.OfDouble
     {
       final CheckedList root;
       CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
-      if(index<0 || index>=this.size)
-      {
-        throw new IndexOutOfBoundsException("index="+index+"; size="+this.size);
-      }
+      CheckedCollection.checkLo(index);
+      CheckedCollection.checkReadHi(index,this.size);
       final double[] arr;
       final var ret=(double)(arr=root.arr)[index+=this.rootOffset];
       arr[index]=val;
       return ret;
     }
     @Override
+    public double removeDoubleAt(int index)
+    {
+      int modCount;
+      final CheckedList root;
+      CheckedCollection.checkModCount(modCount=this.modCount,(root=this.root).modCount);
+      CheckedCollection.checkLo(index);
+      int size;
+      CheckedCollection.checkReadHi(index,size=this.size);
+      final double[] arr;
+      root.modCount=++modCount;
+      this.modCount=modCount;
+      for(var curr=parent;curr!=null;curr.modCount=modCount,--curr.size,curr=curr.parent){}
+      final var ret=(double)(arr=root.arr)[index+=this.rootOffset];
+      OmniArray.OfDouble.removeIndexAndPullDown(arr,index,--root.size);
+      this.size=size-1;
+      return ret;
+    }
+    @Override
+    public boolean removeIf(DoublePredicate filter)
+    {
+      int modCount=this.modCount;
+      final var root=this.root;
+      final int size;
+      if((size=this.size)!=0)
+      {
+        try
+        {
+          final double[] arr;
+          final int numRemoved;
+          int rootOffset;
+          if((numRemoved=uncheckedRemoveIfImpl(arr=root.arr,rootOffset=this.rootOffset,rootOffset+=size,filter,new CheckedCollection.AbstractModCountChecker(modCount){
+            @Override protected int getActualModCount(){
+              return root.modCount;
+            }
+          }))!=0){
+            root.modCount=++modCount;
+            this.modCount=modCount;
+            for(var curr=parent;curr!=null;curr.modCount=modCount,curr.size-=numRemoved,curr=curr.parent){}
+            root.size=OmniArray.OfDouble.removeRangeAndPullDown(arr,rootOffset,root.size,numRemoved);
+            this.size=size-numRemoved;
+            return true;
+          }
+        }
+        catch(ConcurrentModificationException e)
+        {
+          throw e;
+        }
+        catch(RuntimeException e)
+        {
+          throw CheckedCollection.checkModCount(modCount,root.modCount,e);
+        }
+      }
+      CheckedCollection.checkModCount(modCount,root.modCount);
+      return false;
+    }
+    @Override
+    public boolean removeIf(Predicate<? super Double> filter)
+    {
+      int modCount=this.modCount;
+      final var root=this.root;
+      final int size;
+      if((size=this.size)!=0)
+      {
+        try
+        {
+          final double[] arr;
+          final int numRemoved;
+          int rootOffset;
+          if((numRemoved=uncheckedRemoveIfImpl(arr=root.arr,rootOffset=this.rootOffset,rootOffset+=size,filter::test,new CheckedCollection.AbstractModCountChecker(modCount){
+            @Override protected int getActualModCount(){
+              return root.modCount;
+            }
+          }))!=0){
+            root.modCount=++modCount;
+            this.modCount=modCount;
+            for(var curr=parent;curr!=null;curr.modCount=modCount,curr.size-=numRemoved,curr=curr.parent){}
+            root.size=OmniArray.OfDouble.removeRangeAndPullDown(arr,rootOffset,root.size,numRemoved);
+            this.size=size-numRemoved;
+            return true;
+          }
+        }
+        catch(ConcurrentModificationException e)
+        {
+          throw e;
+        }
+        catch(RuntimeException e)
+        {
+          throw CheckedCollection.checkModCount(modCount,root.modCount,e);
+        }
+      }
+      CheckedCollection.checkModCount(modCount,root.modCount);
+      return false;
+    }
+    @Override
+    public void replaceAll(DoubleUnaryOperator operator)
+    {
+      int modCount=this.modCount;
+      final var root=this.root;
+      try
+      {
+        final int size;
+        if((size=this.size)==0)
+        {
+          return;
+        }
+        final int rootOffset;
+        OmniArray.OfDouble.uncheckedReplaceAll(root.arr,rootOffset=this.rootOffset,rootOffset+size,operator);  
+      }
+      finally
+      {
+        CheckedCollection.checkModCount(modCount,root.modCount);
+      }
+      root.modCount=++modCount;
+      this.modCount=modCount;
+      for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}
+    }
+    @Override
+    public void sort(DoubleComparator sorter)
+    {
+      int modCount=this.modCount;
+      final var root=this.root;
+      try
+      {
+        final int size;
+        if((size=this.size)<2)
+        {
+          return;
+        }
+        final int rootOffset;
+        if(sorter==null)
+        {
+          DoubleSortUtil.uncheckedAscendingSort(root.arr,rootOffset=this.rootOffset,rootOffset+size);
+        }
+        else
+        {
+          DoubleSortUtil.uncheckedStableSort(root.arr,rootOffset=this.rootOffset,rootOffset+size,sorter);
+        }
+      }
+      finally
+      {
+        CheckedCollection.checkModCount(modCount,root.modCount);
+      }
+      root.modCount=++modCount;
+      this.modCount=modCount;
+      for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}
+    }
+    @Override
+    public void stableAscendingSort()
+    {
+      int modCount=this.modCount;
+      final var root=this.root;
+      try
+      {
+        final int size;
+        if((size=this.size)<2)
+        {
+          return;
+        }
+        final int rootOffset;
+        DoubleSortUtil.uncheckedAscendingSort(root.arr,rootOffset=this.rootOffset,rootOffset+size);
+      }
+      finally
+      {
+        CheckedCollection.checkModCount(modCount,root.modCount);
+      }
+      root.modCount=++modCount;
+      this.modCount=modCount;
+      for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}
+    }
+    @Override
+    public void stableDescendingSort()
+    {
+      int modCount=this.modCount;
+      final var root=this.root;
+      try
+      {
+        final int size;
+        if((size=this.size)<2)
+        {
+          return;
+        }
+        final int rootOffset;
+        DoubleSortUtil.uncheckedDescendingSort(root.arr,rootOffset=this.rootOffset,rootOffset+size);
+      }
+      finally
+      {
+        CheckedCollection.checkModCount(modCount,root.modCount);
+      }
+      root.modCount=++modCount;
+      this.modCount=modCount;
+      for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}
+    }
+    @Override
+    public void replaceAll(UnaryOperator<Double> operator)
+    {
+      int modCount=this.modCount;
+      final var root=this.root;
+      try
+      {
+        final int size;
+        if((size=this.size)==0)
+        {
+          return;
+        }
+        final int rootOffset;
+        OmniArray.OfDouble.uncheckedReplaceAll(root.arr,rootOffset=this.rootOffset,rootOffset+size,operator::apply);  
+      }
+      finally
+      {
+        CheckedCollection.checkModCount(modCount,root.modCount);
+      }
+      root.modCount=++modCount;
+      this.modCount=modCount;
+      for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}
+    }
+    @Override
+    public void sort(Comparator<? super Double> sorter)
+    {
+      int modCount=this.modCount;
+      final var root=this.root;
+      try
+      {
+        final int size;
+        if((size=this.size)<2)
+        {
+          return;
+        }
+        final int rootOffset;
+        if(sorter==null)
+        {
+          DoubleSortUtil.uncheckedAscendingSort(root.arr,rootOffset=this.rootOffset,rootOffset+size);
+        }
+        else
+        {
+          DoubleSortUtil.uncheckedStableSort(root.arr,rootOffset=this.rootOffset,rootOffset+size,sorter::compare);
+        }
+      }
+      finally
+      {
+        CheckedCollection.checkModCount(modCount,root.modCount);
+      }
+      root.modCount=++modCount;
+      this.modCount=modCount;
+      for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}
+    }
+    @Override
+    public void unstableSort(DoubleComparator sorter)
+    {
+      int modCount=this.modCount;
+      final var root=this.root;
+      try
+      {
+        final int size;
+        if((size=this.size)<2)
+        {
+          return;
+        }
+        final int rootOffset;
+        if(sorter==null)
+        {
+          DoubleSortUtil.uncheckedAscendingSort(root.arr,rootOffset=this.rootOffset,rootOffset+size);
+        }
+        else
+        {
+          DoubleSortUtil.uncheckedUnstableSort(root.arr,rootOffset=this.rootOffset,rootOffset+size,sorter);
+        }
+      }
+      finally
+      {
+        CheckedCollection.checkModCount(modCount,root.modCount);
+      }
+      root.modCount=++modCount;
+      this.modCount=modCount;
+      for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}
+    }
+    @Override
     public OmniList.OfDouble subList(int fromIndex,int toIndex)
     {
       CheckedCollection.checkModCount(modCount,root.modCount);
-      final int subListSize;
-      if((subListSize=toIndex-fromIndex)<0 || fromIndex<0 || this.size<toIndex)
-      {
-        throw new IndexOutOfBoundsException("fromIndex="+fromIndex+"; toIndex="+toIndex+"; size="+this.size);
-      }
-      return new CheckedSubList(this,this.rootOffset+fromIndex,subListSize);
+      return new CheckedSubList(this,this.rootOffset+fromIndex,CheckedCollection.checkSubListRange(fromIndex,toIndex,this.size));
     }
   }
 }

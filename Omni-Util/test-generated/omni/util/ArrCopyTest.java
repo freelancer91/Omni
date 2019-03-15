@@ -2886,7 +2886,7 @@ public class ArrCopyTest
         }
         boolean[] copy=new boolean[copyLength];
         ArrCopy.semicheckedCopy(src,srcOffset,copy,0,copyLength);
-        ArrCopy.semicheckedSelfCopy(src,srcOffset,dstOffset,copyLength);
+        ArrCopy.semicheckedSelfCopy(src,dstOffset,srcOffset,copyLength);
         if(copyLength!=0)
         {
           EqualityUtil.uncheckedassertarraysAreEqual(src,dstOffset,copy,0,copyLength);
@@ -2944,7 +2944,7 @@ public class ArrCopyTest
         }
         byte[] copy=new byte[copyLength];
         ArrCopy.semicheckedCopy(src,srcOffset,copy,0,copyLength);
-        ArrCopy.semicheckedSelfCopy(src,srcOffset,dstOffset,copyLength);
+        ArrCopy.semicheckedSelfCopy(src,dstOffset,srcOffset,copyLength);
         if(copyLength!=0)
         {
           EqualityUtil.uncheckedassertarraysAreEqual(src,dstOffset,copy,0,copyLength);
@@ -3002,7 +3002,7 @@ public class ArrCopyTest
         }
         char[] copy=new char[copyLength];
         ArrCopy.semicheckedCopy(src,srcOffset,copy,0,copyLength);
-        ArrCopy.semicheckedSelfCopy(src,srcOffset,dstOffset,copyLength);
+        ArrCopy.semicheckedSelfCopy(src,dstOffset,srcOffset,copyLength);
         if(copyLength!=0)
         {
           EqualityUtil.uncheckedassertarraysAreEqual(src,dstOffset,copy,0,copyLength);
@@ -3060,7 +3060,7 @@ public class ArrCopyTest
         }
         short[] copy=new short[copyLength];
         ArrCopy.semicheckedCopy(src,srcOffset,copy,0,copyLength);
-        ArrCopy.semicheckedSelfCopy(src,srcOffset,dstOffset,copyLength);
+        ArrCopy.semicheckedSelfCopy(src,dstOffset,srcOffset,copyLength);
         if(copyLength!=0)
         {
           EqualityUtil.uncheckedassertarraysAreEqual(src,dstOffset,copy,0,copyLength);
@@ -3118,7 +3118,7 @@ public class ArrCopyTest
         }
         int[] copy=new int[copyLength];
         ArrCopy.semicheckedCopy(src,srcOffset,copy,0,copyLength);
-        ArrCopy.semicheckedSelfCopy(src,srcOffset,dstOffset,copyLength);
+        ArrCopy.semicheckedSelfCopy(src,dstOffset,srcOffset,copyLength);
         if(copyLength!=0)
         {
           EqualityUtil.uncheckedassertarraysAreEqual(src,dstOffset,copy,0,copyLength);
@@ -3176,7 +3176,7 @@ public class ArrCopyTest
         }
         long[] copy=new long[copyLength];
         ArrCopy.semicheckedCopy(src,srcOffset,copy,0,copyLength);
-        ArrCopy.semicheckedSelfCopy(src,srcOffset,dstOffset,copyLength);
+        ArrCopy.semicheckedSelfCopy(src,dstOffset,srcOffset,copyLength);
         if(copyLength!=0)
         {
           EqualityUtil.uncheckedassertarraysAreEqual(src,dstOffset,copy,0,copyLength);
@@ -3234,7 +3234,7 @@ public class ArrCopyTest
         }
         float[] copy=new float[copyLength];
         ArrCopy.semicheckedCopy(src,srcOffset,copy,0,copyLength);
-        ArrCopy.semicheckedSelfCopy(src,srcOffset,dstOffset,copyLength);
+        ArrCopy.semicheckedSelfCopy(src,dstOffset,srcOffset,copyLength);
         if(copyLength!=0)
         {
           EqualityUtil.uncheckedassertarraysAreEqual(src,dstOffset,copy,0,copyLength);
@@ -3292,7 +3292,7 @@ public class ArrCopyTest
         }
         double[] copy=new double[copyLength];
         ArrCopy.semicheckedCopy(src,srcOffset,copy,0,copyLength);
-        ArrCopy.semicheckedSelfCopy(src,srcOffset,dstOffset,copyLength);
+        ArrCopy.semicheckedSelfCopy(src,dstOffset,srcOffset,copyLength);
         if(copyLength!=0)
         {
           EqualityUtil.uncheckedassertarraysAreEqual(src,dstOffset,copy,0,copyLength);
@@ -3350,7 +3350,7 @@ public class ArrCopyTest
         }
         String[] copy=new String[copyLength];
         ArrCopy.semicheckedCopy(src,srcOffset,copy,0,copyLength);
-        ArrCopy.semicheckedSelfCopy(src,srcOffset,dstOffset,copyLength);
+        ArrCopy.semicheckedSelfCopy(src,dstOffset,srcOffset,copyLength);
         if(copyLength!=0)
         {
           EqualityUtil.uncheckedassertarraysAreEqual(src,dstOffset,copy,0,copyLength);

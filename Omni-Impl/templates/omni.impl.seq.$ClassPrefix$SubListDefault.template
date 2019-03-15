@@ -1,0 +1,56 @@
+#TYPEDEF OfBoolean
+#TYPEDEF OfByte
+#TYPEDEF OfChar
+#TYPEDEF OfShort
+#TYPEDEF OfInt
+#TYPEDEF OfLong
+#TYPEDEF OfFloat
+#TYPEDEF OfDouble
+package omni.impl.seq;
+#IFNOT OfBoolean
+import omni.util.TypeUtil;
+#ENDIF
+abstract interface $TypeNameModifier$SubListDefault$<E>$ extends $TypeNameModifier$ListDefault$<E>$
+{
+  @Override
+  public default boolean add($BoxedType$ val){
+    return add(($exposedType$)val);
+  }
+#IFNOT OfBoolean
+  @Override
+  public default boolean add(boolean val){
+    return add(($exposedType$)$queryCastBoolean$(val));
+  }
+#ENDIF
+#IF OfDouble,OfFloat,OfLong
+  @Override
+  public default boolean add(int val)
+  {
+    return add(($exposedType$)val);
+  }
+  #IFNOT OfLong
+  @Override
+  public default boolean add(char val)
+  {
+    return add(($exposedType$)val);
+  }
+  @Override
+  public default boolean add(short val)
+  {
+    return add(($exposedType$)val);
+  }
+  @Override
+  public default boolean add(long val)
+  {
+    return add(($exposedType$)val);
+  }
+    #IFNOT OfFloat
+  @Override
+  public default boolean add(float val)
+  {
+    return add(($exposedType$)val);
+  }
+    #ENDIF
+  #ENDIF
+#ENDIF
+}

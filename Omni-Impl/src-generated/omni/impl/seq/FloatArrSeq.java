@@ -21,7 +21,6 @@ import omni.function.FloatComparator;
 import omni.function.FloatPredicate;
 import omni.function.FloatConsumer;
 import omni.util.ToStringUtil;
-import omni.util.HashUtil;
 import omni.util.BitSetUtil;
 import omni.impl.AbstractFloatItr;
 public abstract class FloatArrSeq implements OmniCollection.OfFloat
@@ -604,6 +603,131 @@ public abstract class FloatArrSeq implements OmniCollection.OfFloat
     }
     return OmniArray.OfDouble.DEFAULT_ARR;
   }
+  abstract boolean uncheckedRemoveIf(int size,FloatPredicate filter);
+  @Override
+  public boolean removeIf(FloatPredicate filter)
+  {
+    final int size;
+    return (size=this.size)!=0 && uncheckedRemoveIf(size,filter);
+  }
+  @Override
+  public boolean removeIf(Predicate<? super Float> filter)
+  {
+    final int size;
+    return (size=this.size)!=0 && uncheckedRemoveIf(size,filter::test);
+  }
+  private static  int pullSurvivorsDown(float[] arr,int srcOffset,int srcBound,int dstOffset,FloatPredicate filter)
+  {
+    while(++srcOffset!=srcBound)
+    {
+      final float v;
+      if(!filter.test((float)(v=arr[srcOffset])))
+      {
+        arr[dstOffset++]=v;
+      }
+    }
+    return srcBound-dstOffset;
+  }
+  private static  int uncheckedRemoveIfImpl(float[] arr,int srcOffset,int srcBound,FloatPredicate filter)
+  {
+    do{
+      if(filter.test((float)arr[srcOffset])){
+        return pullSurvivorsDown(arr,srcOffset,srcBound,srcOffset,filter);
+      }
+    }while(++srcOffset!=srcBound);
+    return 0;
+  }
+  private static  int uncheckedRemoveIfImpl(float[] arr,int srcOffset,int srcBound,FloatPredicate filter,CheckedCollection.AbstractModCountChecker modCountChecker)
+  {
+    do
+    {
+      if(filter.test((float)arr[srcOffset]))
+      {
+        int dstOffset=srcOffset;
+        outer:for(;;)
+        {
+          if(++srcOffset==srcBound)
+          {
+            modCountChecker.checkModCount();
+            break outer;
+          }
+          float before;
+          if(!filter.test((float)(before=arr[srcOffset])))
+          {
+            for(int i=srcBound-1;;--i)
+            {
+              if(i==srcOffset)
+              {
+                modCountChecker.checkModCount();
+                arr[dstOffset++]=before;
+                break outer;
+              }
+              float after;
+              if(!filter.test((float)(after=arr[i])))
+              {
+                int n;
+                if((n=i-(++srcOffset))!=0)
+                {
+                  if(n>64)
+                  {
+                    long[] survivorSet;
+                    int numSurvivors=BitSetUtil.markSurvivors(arr,srcOffset,i,filter,survivorSet=BitSetUtil.getBitSet(n));
+                    modCountChecker.checkModCount();
+                    if(numSurvivors!=0)
+                    {
+                      if(numSurvivors==n)
+                      {
+                        ArrCopy.uncheckedSelfCopy(arr,srcOffset-1,dstOffset,numSurvivors+=2);
+                        dstOffset+=numSurvivors;
+                      }
+                      else
+                      {
+                        arr[dstOffset]=before;
+                        BitSetUtil.pullSurvivorsDown(arr,srcOffset,++dstOffset,dstOffset+=numSurvivors,survivorSet);
+                        arr[dstOffset++]=after;
+                      }
+                      break outer;
+                    }
+                  }
+                  else
+                  {
+                    long survivorWord=BitSetUtil.markSurvivors(arr,srcOffset,i,filter);
+                    modCountChecker.checkModCount();
+                    int numSurvivors;
+                    if((numSurvivors=Long.bitCount(survivorWord))!=0)
+                    {
+                      if(numSurvivors==n)
+                      {
+                        ArrCopy.uncheckedSelfCopy(arr,srcOffset-1,dstOffset,numSurvivors+=2);
+                        dstOffset+=numSurvivors;
+                      }
+                      else
+                      {
+                        arr[dstOffset]=before;
+                        BitSetUtil.pullSurvivorsDown(arr,srcOffset,++dstOffset,dstOffset+=numSurvivors,survivorWord);
+                        arr[dstOffset++]=after;
+                      }
+                      break outer;
+                    }
+                  }
+                }
+                else
+                {
+                  modCountChecker.checkModCount();
+                }
+                arr[dstOffset++]=before;
+                arr[dstOffset++]=after;
+                break outer;
+              }
+            }
+          }
+        }
+        return srcBound-dstOffset;
+      }
+    }
+    while(++srcOffset!=srcBound);
+    return 0;
+  }
   public
     static class UncheckedStack
       extends FloatArrSeq
@@ -955,6 +1079,81 @@ public abstract class FloatArrSeq implements OmniCollection.OfFloat
     public float popFloat()
     {
       return (float)arr[--this.size];
+    }
+    @Override
+    public float pollFloat()
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        final var ret=(float)(arr[--size]);
+        this.size=size;
+        return ret;
+      }
+      return Float.NaN;
+    }
+    @Override
+    public float peekFloat()
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        return (float)(arr[size-1]);
+      }
+      return Float.NaN;
+    }
+    @Override
+    public Float poll()
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        final var ret=(Float)(arr[--size]);
+        this.size=size;
+        return ret;
+      }
+      return null;
+    }
+    @Override
+    public Float peek()
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        return (Float)(arr[size-1]);
+      }
+      return null;
+    }
+    @Override
+    public double pollDouble()
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        final var ret=(double)(arr[--size]);
+        this.size=size;
+        return ret;
+      }
+      return Double.NaN;
+    }
+    @Override
+    public double peekDouble()
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        return (double)(arr[size-1]);
+      }
+      return Double.NaN;
+    }
+    @Override
+    boolean uncheckedRemoveIf(int size,FloatPredicate filter)
+    {
+      if(size!=(size-=uncheckedRemoveIfImpl(this.arr,0,size,filter))){
+        this.size=size;
+        return true;
+      }
+      return false;
     }
   }
   public
@@ -1522,7 +1721,7 @@ public abstract class FloatArrSeq implements OmniCollection.OfFloat
     @Override
     public void add(int index,float val)
     {
-      int size;
+      final int size;
       if((size=this.size)!=0){
         ((FloatArrSeq)this).uncheckedInsert(index,size,val);
       }else{
@@ -1568,6 +1767,107 @@ public abstract class FloatArrSeq implements OmniCollection.OfFloat
       return ret;
     }
     @Override
+    public float removeFloatAt(int index)
+    {
+      final float[] arr;
+      final var ret=(float)(arr=this.arr)[index];
+      OmniArray.OfFloat.removeIndexAndPullDown(arr,index,--size);
+      return ret;
+    }
+    @Override
+    boolean uncheckedRemoveIf(int size,FloatPredicate filter)
+    {
+      if(size!=(size-=uncheckedRemoveIfImpl(this.arr,0,size,filter))){
+        this.size=size;
+        return true;
+      }
+      return false;
+    }
+    @Override
+    public void replaceAll(FloatUnaryOperator operator)
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        OmniArray.OfFloat.uncheckedReplaceAll(this.arr,0,size,operator);
+      }
+    }
+    @Override
+    public void sort(FloatComparator sorter)
+    {
+      final int size;
+      if((size=this.size)>1)
+      {
+        if(sorter==null)
+        {
+          FloatSortUtil.uncheckedAscendingSort(this.arr,0,size);
+        }
+        else
+        {
+          FloatSortUtil.uncheckedStableSort(this.arr,0,size,sorter);
+        }
+      }
+    }
+    @Override
+    public void stableAscendingSort()
+    {
+      final int size;
+      if((size=this.size)>1)
+      {
+        FloatSortUtil.uncheckedAscendingSort(this.arr,0,size);
+      }
+    }
+    @Override
+    public void stableDescendingSort()
+    {
+      final int size;
+      if((size=this.size)>1)
+      {
+        FloatSortUtil.uncheckedDescendingSort(this.arr,0,size);
+      }
+    }
+    @Override
+    public void replaceAll(UnaryOperator<Float> operator)
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        OmniArray.OfFloat.uncheckedReplaceAll(this.arr,0,size,operator::apply);
+      }
+    }
+    @Override
+    public void sort(Comparator<? super Float> sorter)
+    {
+      final int size;
+      if((size=this.size)>1)
+      {
+        if(sorter==null)
+        {
+          FloatSortUtil.uncheckedAscendingSort(this.arr,0,size);
+        }
+        else
+        {
+          FloatSortUtil.uncheckedStableSort(this.arr,0,size,sorter::compare);
+        }
+      }
+    }
+    @Override
+    public void unstableSort(FloatComparator sorter)
+    {
+      final int size;
+      if((size=this.size)>1)
+      {
+        if(sorter==null)
+        {
+          FloatSortUtil.uncheckedAscendingSort(this.arr,0,size);
+        }
+        else
+        {
+          FloatSortUtil.uncheckedUnstableSort(this.arr,0,size,sorter);
+        }
+      }
+    }
+    @Override
     public OmniList.OfFloat subList(int fromIndex,int toIndex)
     {
       return new UncheckedSubList(this,fromIndex,toIndex-fromIndex);
@@ -1575,7 +1875,7 @@ public abstract class FloatArrSeq implements OmniCollection.OfFloat
   }
   public
     static class UncheckedSubList
-      implements FloatListDefault,Cloneable
+      implements FloatSubListDefault,Cloneable
   {
     transient final int rootOffset;
     transient int size;
@@ -1671,7 +1971,7 @@ public abstract class FloatArrSeq implements OmniCollection.OfFloat
       {
         for(var curr=parent;curr!=null;curr.size-=size,curr=curr.parent){}
         final UncheckedList root;
-        (root=this.root).size=OmniArray.OfFloat.removeRangeAndPullDown(root.arr,this.rootOffset,root.size,size);
+        (root=this.root).size=OmniArray.OfFloat.removeRangeAndPullDown(root.arr,this.rootOffset+size,root.size,size);
         this.size=0;
       }
     }
@@ -2546,34 +2846,6 @@ public abstract class FloatArrSeq implements OmniCollection.OfFloat
       return new ListItr(this,index+this.rootOffset);
     }
     @Override
-    public boolean add(Float val){
-      return add((float)val);
-    }
-    @Override
-    public boolean add(boolean val){
-      return add((float)TypeUtil.castToFloat(val));
-    }
-    @Override
-    public boolean add(int val)
-    {
-      return add((float)val);
-    }
-    @Override
-    public boolean add(char val)
-    {
-      return add((float)val);
-    }
-    @Override
-    public boolean add(short val)
-    {
-      return add((float)val);
-    }
-    @Override
-    public boolean add(long val)
-    {
-      return add((float)val);
-    }
-    @Override
     public boolean add(float val)
     {
       for(var curr=parent;curr!=null;++curr.size,curr=curr.parent){}
@@ -2681,6 +2953,150 @@ public abstract class FloatArrSeq implements OmniCollection.OfFloat
       final var ret=(float)(arr=root.arr)[index+=this.rootOffset];
       arr[index]=val;
       return ret;
+    }
+    @Override
+    public float removeFloatAt(int index)
+    {
+      final float[] arr;
+      for(var curr=parent;curr!=null;--curr.size,curr=curr.parent){}
+      final UncheckedList root;
+      final var ret=(float)(arr=(root=this.root).arr)[index+=this.rootOffset];
+      OmniArray.OfFloat.removeIndexAndPullDown(arr,index,--root.size);
+      this.size=size-1;
+      return ret;
+    }
+    @Override
+    public boolean removeIf(FloatPredicate filter)
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        {
+          final float[] arr;
+          final int numRemoved;
+          int rootOffset;
+          final UncheckedList root;
+          if((numRemoved=uncheckedRemoveIfImpl(arr=(root=this.root).arr,rootOffset=this.rootOffset,rootOffset+=size,filter))!=0){
+            for(var curr=parent;curr!=null;curr.size-=numRemoved,curr=curr.parent){}
+            root.size=OmniArray.OfFloat.removeRangeAndPullDown(arr,rootOffset,root.size,numRemoved);
+            this.size=size-numRemoved;
+            return true;
+          }
+        }
+      }
+      return false;
+    }
+    @Override
+    public boolean removeIf(Predicate<? super Float> filter)
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        {
+          final float[] arr;
+          final int numRemoved;
+          int rootOffset;
+          final UncheckedList root;
+          if((numRemoved=uncheckedRemoveIfImpl(arr=(root=this.root).arr,rootOffset=this.rootOffset,rootOffset+=size,filter::test))!=0){
+            for(var curr=parent;curr!=null;curr.size-=numRemoved,curr=curr.parent){}
+            root.size=OmniArray.OfFloat.removeRangeAndPullDown(arr,rootOffset,root.size,numRemoved);
+            this.size=size-numRemoved;
+            return true;
+          }
+        }
+      }
+      return false;
+    }
+    @Override
+    public void replaceAll(FloatUnaryOperator operator)
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        final int rootOffset;
+        OmniArray.OfFloat.uncheckedReplaceAll(root.arr,rootOffset=this.rootOffset,rootOffset+size,operator);  
+      }
+    }
+    @Override
+    public void sort(FloatComparator sorter)
+    {
+      final int size;
+      if((size=this.size)>1)
+      {
+        final int rootOffset;
+        if(sorter==null)
+        {
+          FloatSortUtil.uncheckedAscendingSort(root.arr,rootOffset=this.rootOffset,rootOffset+size);
+        }
+        else
+        {
+          FloatSortUtil.uncheckedStableSort(root.arr,rootOffset=this.rootOffset,rootOffset+size,sorter);
+        }
+      }
+    }
+    @Override
+    public void stableAscendingSort()
+    {
+      final int size;
+      if((size=this.size)>1)
+      {
+        final int rootOffset;
+        FloatSortUtil.uncheckedAscendingSort(root.arr,rootOffset=this.rootOffset,rootOffset+size);
+      }
+    }
+    @Override
+    public void stableDescendingSort()
+    {
+      final int size;
+      if((size=this.size)>1)
+      {
+        final int rootOffset;
+        FloatSortUtil.uncheckedDescendingSort(root.arr,rootOffset=this.rootOffset,rootOffset+size);
+      }
+    }
+    @Override
+    public void replaceAll(UnaryOperator<Float> operator)
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        final int rootOffset;
+        OmniArray.OfFloat.uncheckedReplaceAll(root.arr,rootOffset=this.rootOffset,rootOffset+size,operator::apply);  
+      }
+    }
+    @Override
+    public void sort(Comparator<? super Float> sorter)
+    {
+      final int size;
+      if((size=this.size)>1)
+      {
+        final int rootOffset;
+        if(sorter==null)
+        {
+          FloatSortUtil.uncheckedAscendingSort(root.arr,rootOffset=this.rootOffset,rootOffset+size);
+        }
+        else
+        {
+          FloatSortUtil.uncheckedStableSort(root.arr,rootOffset=this.rootOffset,rootOffset+size,sorter::compare);
+        }
+      }
+    }
+    @Override
+    public void unstableSort(FloatComparator sorter)
+    {
+      final int size;
+      if((size=this.size)>1)
+      {
+        final int rootOffset;
+        if(sorter==null)
+        {
+          FloatSortUtil.uncheckedAscendingSort(root.arr,rootOffset=this.rootOffset,rootOffset+size);
+        }
+        else
+        {
+          FloatSortUtil.uncheckedUnstableSort(root.arr,rootOffset=this.rootOffset,rootOffset+size,sorter);
+        }
+      }
     }
     @Override
     public OmniList.OfFloat subList(int fromIndex,int toIndex)
@@ -2952,6 +3368,63 @@ public abstract class FloatArrSeq implements OmniCollection.OfFloat
         return ret;
       }
       throw new NoSuchElementException();
+    }
+    @Override
+    public float pollFloat()
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        ++this.modCount;
+        final var ret=(float)(arr[--size]);
+        this.size=size;
+        return ret;
+      }
+      return Float.NaN;
+    }
+    @Override
+    public Float poll()
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        ++this.modCount;
+        final var ret=(Float)(arr[--size]);
+        this.size=size;
+        return ret;
+      }
+      return null;
+    }
+    @Override
+    public double pollDouble()
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        ++this.modCount;
+        final var ret=(double)(arr[--size]);
+        this.size=size;
+        return ret;
+      }
+      return Double.NaN;
+    }
+    @Override
+    boolean uncheckedRemoveIf(int size,FloatPredicate filter)
+    {
+      final int modCount;
+      if(size!=(size-=uncheckedRemoveIfImpl(this.arr
+        ,0,size,filter,new CheckedCollection.AbstractModCountChecker(modCount=this.modCount){
+          @Override protected int getActualModCount(){
+          return CheckedStack.this.modCount;
+          }
+        }))
+        ){
+        this.modCount=modCount+1;
+        this.size=size;
+        return true;
+      }
+      CheckedCollection.checkModCount(modCount,this.modCount);
+      return false;
     }
   }
   public
@@ -3265,10 +3738,8 @@ public abstract class FloatArrSeq implements OmniCollection.OfFloat
     @Override
     public OmniListIterator.OfFloat listIterator(int index)
     {
-      if(index<0 || index>this.size)
-      {
-        throw new IndexOutOfBoundsException("index="+index+"; size="+this.size);
-      }
+      CheckedCollection.checkLo(index);
+      CheckedCollection.checkWriteHi(index,this.size);
       return new ListItr(this,index);
     }
     @Override
@@ -3280,10 +3751,9 @@ public abstract class FloatArrSeq implements OmniCollection.OfFloat
     @Override
     public void add(int index,float val)
     {
-      int size;
-      if((size=this.size)<index || index<0){
-        throw new IndexOutOfBoundsException("index="+index+"; size="+size);
-      }
+      final int size;
+      CheckedCollection.checkLo(index);
+      CheckedCollection.checkWriteHi(index,size=this.size);
       ++this.modCount;
       if(size!=0){
         ((FloatArrSeq)this).uncheckedInsert(index,size,val);
@@ -3309,47 +3779,201 @@ public abstract class FloatArrSeq implements OmniCollection.OfFloat
     @Override
     public float getFloat(int index)
     {
-      if(index<0 || index>=this.size)
-      {
-        throw new IndexOutOfBoundsException("index="+index+"; size="+this.size);
-      }
+      CheckedCollection.checkLo(index);
+      CheckedCollection.checkReadHi(index,this.size);
       return (float)this.arr[index];
     }
     @Override
     public void put(int index,float val)
     {
-      if(index<0 || index>=this.size)
-      {
-        throw new IndexOutOfBoundsException("index="+index+"; size="+this.size);
-      }
+      CheckedCollection.checkLo(index);
+      CheckedCollection.checkReadHi(index,this.size);
       this.arr[index]=val;
     }
     @Override
     public float set(int index,float val)
     {
-      if(index<0 || index>=this.size)
-      {
-        throw new IndexOutOfBoundsException("index="+index+"; size="+this.size);
-      }
+      CheckedCollection.checkLo(index);
+      CheckedCollection.checkReadHi(index,this.size);
       final float[] arr;
       final var ret=(float)(arr=this.arr)[index];
       arr[index]=val;
       return ret;
     }
     @Override
+    public float removeFloatAt(int index)
+    {
+      CheckedCollection.checkLo(index);
+      int size;
+      CheckedCollection.checkReadHi(index,size=this.size);
+      final float[] arr;
+      ++this.modCount;
+      final var ret=(float)(arr=this.arr)[index];
+      OmniArray.OfFloat.removeIndexAndPullDown(arr,index,--size);
+      this.size=size;
+      return ret;
+    }
+    @Override
+    boolean uncheckedRemoveIf(int size,FloatPredicate filter)
+    {
+      final int modCount;
+      if(size!=(size-=uncheckedRemoveIfImpl(this.arr
+        ,0,size,filter,new CheckedCollection.AbstractModCountChecker(modCount=this.modCount){
+          @Override protected int getActualModCount(){
+          return CheckedList.this.modCount;
+          }
+        }))
+        ){
+        this.modCount=modCount+1;
+        this.size=size;
+        return true;
+      }
+      CheckedCollection.checkModCount(modCount,this.modCount);
+      return false;
+    }
+    @Override
+    public void replaceAll(FloatUnaryOperator operator)
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        int modCount=this.modCount;
+        try
+        {
+          OmniArray.OfFloat.uncheckedReplaceAll(this.arr,0,size,operator);
+        }
+        finally
+        {
+          CheckedCollection.checkModCount(modCount,this.modCount);
+        }
+        this.modCount=modCount+1;
+      }
+    }
+    @Override
+    public void sort(FloatComparator sorter)
+    {
+      final int size;
+      if((size=this.size)>1)
+      {
+        if(sorter==null)
+        {
+          FloatSortUtil.uncheckedAscendingSort(this.arr,0,size);
+          ++this.modCount;
+        }
+        else
+        {
+          final int modCount=this.modCount;
+          try
+          {
+            FloatSortUtil.uncheckedStableSort(this.arr,0,size,sorter);
+          }
+          finally
+          {
+            CheckedCollection.checkModCount(modCount,this.modCount);
+          }
+          this.modCount=modCount+1;
+        }
+      }
+    }
+    @Override
+    public void stableAscendingSort()
+    {
+      final int size;
+      if((size=this.size)>1)
+      {
+        FloatSortUtil.uncheckedAscendingSort(this.arr,0,size);
+        ++this.modCount;
+      }
+    }
+    @Override
+    public void stableDescendingSort()
+    {
+      final int size;
+      if((size=this.size)>1)
+      {
+        FloatSortUtil.uncheckedDescendingSort(this.arr,0,size);
+        ++this.modCount;
+      }
+    }
+    @Override
+    public void replaceAll(UnaryOperator<Float> operator)
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        int modCount=this.modCount;
+        try
+        {
+          OmniArray.OfFloat.uncheckedReplaceAll(this.arr,0,size,operator::apply);
+        }
+        finally
+        {
+          CheckedCollection.checkModCount(modCount,this.modCount);
+        }
+        this.modCount=modCount+1;
+      }
+    }
+    @Override
+    public void sort(Comparator<? super Float> sorter)
+    {
+      final int size;
+      if((size=this.size)>1)
+      {
+        if(sorter==null)
+        {
+          FloatSortUtil.uncheckedAscendingSort(this.arr,0,size);
+          ++this.modCount;
+        }
+        else
+        {
+          final int modCount=this.modCount;
+          try
+          {
+            FloatSortUtil.uncheckedStableSort(this.arr,0,size,sorter::compare);
+          }
+          finally
+          {
+            CheckedCollection.checkModCount(modCount,this.modCount);
+          }
+          this.modCount=modCount+1;
+        }
+      }
+    }
+    @Override
+    public void unstableSort(FloatComparator sorter)
+    {
+      final int size;
+      if((size=this.size)>1)
+      {
+        if(sorter==null)
+        {
+          FloatSortUtil.uncheckedAscendingSort(this.arr,0,size);
+          ++this.modCount;
+        }
+        else
+        {
+          final int modCount=this.modCount;
+          try
+          {
+            FloatSortUtil.uncheckedUnstableSort(this.arr,0,size,sorter);
+          }
+          finally
+          {
+            CheckedCollection.checkModCount(modCount,this.modCount);
+          }
+          this.modCount=modCount+1;
+        }
+      }
+    }
+    @Override
     public OmniList.OfFloat subList(int fromIndex,int toIndex)
     {
-      final int subListSize;
-      if((subListSize=toIndex-fromIndex)<0 || fromIndex<0 || this.size<toIndex)
-      {
-        throw new IndexOutOfBoundsException("fromIndex="+fromIndex+"; toIndex="+toIndex+"; size="+this.size);
-      }
-      return new CheckedSubList(this,fromIndex,subListSize);
+      return new CheckedSubList(this,fromIndex,CheckedCollection.checkSubListRange(fromIndex,toIndex,this.size));
     }
   }
   private
     static class CheckedSubList
-      implements FloatListDefault,Cloneable
+      implements FloatSubListDefault,Cloneable
   {
     transient int modCount;
     transient final int rootOffset;
@@ -3460,7 +4084,7 @@ public abstract class FloatArrSeq implements OmniCollection.OfFloat
         root.modCount=++modCount;
         this.modCount=modCount;
         for(var curr=parent;curr!=null;curr.modCount=modCount,curr.size-=size,curr=curr.parent){}
-        root.size=OmniArray.OfFloat.removeRangeAndPullDown(root.arr,this.rootOffset,root.size,size);
+        root.size=OmniArray.OfFloat.removeRangeAndPullDown(root.arr,this.rootOffset+size,root.size,size);
         this.size=0;
       }
     }
@@ -4722,39 +5346,9 @@ public abstract class FloatArrSeq implements OmniCollection.OfFloat
     public OmniListIterator.OfFloat listIterator(int index)
     {
       CheckedCollection.checkModCount(modCount,root.modCount);
-      if(index<0 || index>this.size)
-      {
-        throw new IndexOutOfBoundsException("index="+index+"; size="+this.size);
-      }
+      CheckedCollection.checkLo(index);
+      CheckedCollection.checkWriteHi(index,this.size);
       return new ListItr(this,index+this.rootOffset);
-    }
-    @Override
-    public boolean add(Float val){
-      return add((float)val);
-    }
-    @Override
-    public boolean add(boolean val){
-      return add((float)TypeUtil.castToFloat(val));
-    }
-    @Override
-    public boolean add(int val)
-    {
-      return add((float)val);
-    }
-    @Override
-    public boolean add(char val)
-    {
-      return add((float)val);
-    }
-    @Override
-    public boolean add(short val)
-    {
-      return add((float)val);
-    }
-    @Override
-    public boolean add(long val)
-    {
-      return add((float)val);
     }
     @Override
     public boolean add(float val)
@@ -4779,10 +5373,9 @@ public abstract class FloatArrSeq implements OmniCollection.OfFloat
       final CheckedList root;
       int modCount;
       CheckedCollection.checkModCount(modCount=this.modCount,(root=this.root).modCount);
-      int size;
-      if((size=this.size)<index||index<0){
-        throw new IndexOutOfBoundsException("index="+index+"; size="+size);
-      }
+      CheckedCollection.checkLo(index);
+      final int size;
+      CheckedCollection.checkWriteHi(index,size=this.size);
       root.modCount=++modCount;
       this.modCount=modCount;
       for(var curr=parent;curr!=null;curr.modCount=modCount,++curr.size,curr=curr.parent){}
@@ -4877,10 +5470,8 @@ public abstract class FloatArrSeq implements OmniCollection.OfFloat
     {
       final CheckedList root;
       CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
-      if(index<0 || index>=this.size)
-      {
-        throw new IndexOutOfBoundsException("index="+index+"; size="+this.size);
-      }
+      CheckedCollection.checkLo(index);
+      CheckedCollection.checkReadHi(index,this.size);
       return (float)root.arr[index+this.rootOffset];
     }
     @Override
@@ -4888,10 +5479,8 @@ public abstract class FloatArrSeq implements OmniCollection.OfFloat
     {
       final CheckedList root;
       CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
-      if(index<0 || index>=this.size)
-      {
-        throw new IndexOutOfBoundsException("index="+index+"; size="+this.size);
-      }
+      CheckedCollection.checkLo(index);
+      CheckedCollection.checkReadHi(index,this.size);
       root.arr[index+this.rootOffset]=val;
     }
     @Override
@@ -4899,25 +5488,294 @@ public abstract class FloatArrSeq implements OmniCollection.OfFloat
     {
       final CheckedList root;
       CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
-      if(index<0 || index>=this.size)
-      {
-        throw new IndexOutOfBoundsException("index="+index+"; size="+this.size);
-      }
+      CheckedCollection.checkLo(index);
+      CheckedCollection.checkReadHi(index,this.size);
       final float[] arr;
       final var ret=(float)(arr=root.arr)[index+=this.rootOffset];
       arr[index]=val;
       return ret;
     }
     @Override
+    public float removeFloatAt(int index)
+    {
+      int modCount;
+      final CheckedList root;
+      CheckedCollection.checkModCount(modCount=this.modCount,(root=this.root).modCount);
+      CheckedCollection.checkLo(index);
+      int size;
+      CheckedCollection.checkReadHi(index,size=this.size);
+      final float[] arr;
+      root.modCount=++modCount;
+      this.modCount=modCount;
+      for(var curr=parent;curr!=null;curr.modCount=modCount,--curr.size,curr=curr.parent){}
+      final var ret=(float)(arr=root.arr)[index+=this.rootOffset];
+      OmniArray.OfFloat.removeIndexAndPullDown(arr,index,--root.size);
+      this.size=size-1;
+      return ret;
+    }
+    @Override
+    public boolean removeIf(FloatPredicate filter)
+    {
+      int modCount=this.modCount;
+      final var root=this.root;
+      final int size;
+      if((size=this.size)!=0)
+      {
+        try
+        {
+          final float[] arr;
+          final int numRemoved;
+          int rootOffset;
+          if((numRemoved=uncheckedRemoveIfImpl(arr=root.arr,rootOffset=this.rootOffset,rootOffset+=size,filter,new CheckedCollection.AbstractModCountChecker(modCount){
+            @Override protected int getActualModCount(){
+              return root.modCount;
+            }
+          }))!=0){
+            root.modCount=++modCount;
+            this.modCount=modCount;
+            for(var curr=parent;curr!=null;curr.modCount=modCount,curr.size-=numRemoved,curr=curr.parent){}
+            root.size=OmniArray.OfFloat.removeRangeAndPullDown(arr,rootOffset,root.size,numRemoved);
+            this.size=size-numRemoved;
+            return true;
+          }
+        }
+        catch(ConcurrentModificationException e)
+        {
+          throw e;
+        }
+        catch(RuntimeException e)
+        {
+          throw CheckedCollection.checkModCount(modCount,root.modCount,e);
+        }
+      }
+      CheckedCollection.checkModCount(modCount,root.modCount);
+      return false;
+    }
+    @Override
+    public boolean removeIf(Predicate<? super Float> filter)
+    {
+      int modCount=this.modCount;
+      final var root=this.root;
+      final int size;
+      if((size=this.size)!=0)
+      {
+        try
+        {
+          final float[] arr;
+          final int numRemoved;
+          int rootOffset;
+          if((numRemoved=uncheckedRemoveIfImpl(arr=root.arr,rootOffset=this.rootOffset,rootOffset+=size,filter::test,new CheckedCollection.AbstractModCountChecker(modCount){
+            @Override protected int getActualModCount(){
+              return root.modCount;
+            }
+          }))!=0){
+            root.modCount=++modCount;
+            this.modCount=modCount;
+            for(var curr=parent;curr!=null;curr.modCount=modCount,curr.size-=numRemoved,curr=curr.parent){}
+            root.size=OmniArray.OfFloat.removeRangeAndPullDown(arr,rootOffset,root.size,numRemoved);
+            this.size=size-numRemoved;
+            return true;
+          }
+        }
+        catch(ConcurrentModificationException e)
+        {
+          throw e;
+        }
+        catch(RuntimeException e)
+        {
+          throw CheckedCollection.checkModCount(modCount,root.modCount,e);
+        }
+      }
+      CheckedCollection.checkModCount(modCount,root.modCount);
+      return false;
+    }
+    @Override
+    public void replaceAll(FloatUnaryOperator operator)
+    {
+      int modCount=this.modCount;
+      final var root=this.root;
+      try
+      {
+        final int size;
+        if((size=this.size)==0)
+        {
+          return;
+        }
+        final int rootOffset;
+        OmniArray.OfFloat.uncheckedReplaceAll(root.arr,rootOffset=this.rootOffset,rootOffset+size,operator);  
+      }
+      finally
+      {
+        CheckedCollection.checkModCount(modCount,root.modCount);
+      }
+      root.modCount=++modCount;
+      this.modCount=modCount;
+      for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}
+    }
+    @Override
+    public void sort(FloatComparator sorter)
+    {
+      int modCount=this.modCount;
+      final var root=this.root;
+      try
+      {
+        final int size;
+        if((size=this.size)<2)
+        {
+          return;
+        }
+        final int rootOffset;
+        if(sorter==null)
+        {
+          FloatSortUtil.uncheckedAscendingSort(root.arr,rootOffset=this.rootOffset,rootOffset+size);
+        }
+        else
+        {
+          FloatSortUtil.uncheckedStableSort(root.arr,rootOffset=this.rootOffset,rootOffset+size,sorter);
+        }
+      }
+      finally
+      {
+        CheckedCollection.checkModCount(modCount,root.modCount);
+      }
+      root.modCount=++modCount;
+      this.modCount=modCount;
+      for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}
+    }
+    @Override
+    public void stableAscendingSort()
+    {
+      int modCount=this.modCount;
+      final var root=this.root;
+      try
+      {
+        final int size;
+        if((size=this.size)<2)
+        {
+          return;
+        }
+        final int rootOffset;
+        FloatSortUtil.uncheckedAscendingSort(root.arr,rootOffset=this.rootOffset,rootOffset+size);
+      }
+      finally
+      {
+        CheckedCollection.checkModCount(modCount,root.modCount);
+      }
+      root.modCount=++modCount;
+      this.modCount=modCount;
+      for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}
+    }
+    @Override
+    public void stableDescendingSort()
+    {
+      int modCount=this.modCount;
+      final var root=this.root;
+      try
+      {
+        final int size;
+        if((size=this.size)<2)
+        {
+          return;
+        }
+        final int rootOffset;
+        FloatSortUtil.uncheckedDescendingSort(root.arr,rootOffset=this.rootOffset,rootOffset+size);
+      }
+      finally
+      {
+        CheckedCollection.checkModCount(modCount,root.modCount);
+      }
+      root.modCount=++modCount;
+      this.modCount=modCount;
+      for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}
+    }
+    @Override
+    public void replaceAll(UnaryOperator<Float> operator)
+    {
+      int modCount=this.modCount;
+      final var root=this.root;
+      try
+      {
+        final int size;
+        if((size=this.size)==0)
+        {
+          return;
+        }
+        final int rootOffset;
+        OmniArray.OfFloat.uncheckedReplaceAll(root.arr,rootOffset=this.rootOffset,rootOffset+size,operator::apply);  
+      }
+      finally
+      {
+        CheckedCollection.checkModCount(modCount,root.modCount);
+      }
+      root.modCount=++modCount;
+      this.modCount=modCount;
+      for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}
+    }
+    @Override
+    public void sort(Comparator<? super Float> sorter)
+    {
+      int modCount=this.modCount;
+      final var root=this.root;
+      try
+      {
+        final int size;
+        if((size=this.size)<2)
+        {
+          return;
+        }
+        final int rootOffset;
+        if(sorter==null)
+        {
+          FloatSortUtil.uncheckedAscendingSort(root.arr,rootOffset=this.rootOffset,rootOffset+size);
+        }
+        else
+        {
+          FloatSortUtil.uncheckedStableSort(root.arr,rootOffset=this.rootOffset,rootOffset+size,sorter::compare);
+        }
+      }
+      finally
+      {
+        CheckedCollection.checkModCount(modCount,root.modCount);
+      }
+      root.modCount=++modCount;
+      this.modCount=modCount;
+      for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}
+    }
+    @Override
+    public void unstableSort(FloatComparator sorter)
+    {
+      int modCount=this.modCount;
+      final var root=this.root;
+      try
+      {
+        final int size;
+        if((size=this.size)<2)
+        {
+          return;
+        }
+        final int rootOffset;
+        if(sorter==null)
+        {
+          FloatSortUtil.uncheckedAscendingSort(root.arr,rootOffset=this.rootOffset,rootOffset+size);
+        }
+        else
+        {
+          FloatSortUtil.uncheckedUnstableSort(root.arr,rootOffset=this.rootOffset,rootOffset+size,sorter);
+        }
+      }
+      finally
+      {
+        CheckedCollection.checkModCount(modCount,root.modCount);
+      }
+      root.modCount=++modCount;
+      this.modCount=modCount;
+      for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}
+    }
+    @Override
     public OmniList.OfFloat subList(int fromIndex,int toIndex)
     {
       CheckedCollection.checkModCount(modCount,root.modCount);
-      final int subListSize;
-      if((subListSize=toIndex-fromIndex)<0 || fromIndex<0 || this.size<toIndex)
-      {
-        throw new IndexOutOfBoundsException("fromIndex="+fromIndex+"; toIndex="+toIndex+"; size="+this.size);
-      }
-      return new CheckedSubList(this,this.rootOffset+fromIndex,subListSize);
+      return new CheckedSubList(this,this.rootOffset+fromIndex,CheckedCollection.checkSubListRange(fromIndex,toIndex,this.size));
     }
   }
 }

@@ -335,97 +335,94 @@ public class ToStringUtil{
                 uncheckedAppendFalse();
             }
         }
-        public OmniStringBuilder uncheckedAppendChar(char val){
+        public void uncheckedAppendChar(char val){
             char[] buffer;
-            final int size;
-            if((size=this.size) == (buffer=this.buffer).length){
-                var newBuffer=new char[OmniArray.growBy100Pct(size)];
-                if(size != 0){
-                    ArrCopy.uncheckedCopy(buffer,0,newBuffer,0,size);
-                }
-                this.buffer=buffer=newBuffer;
+            final int currSize;
+            if((currSize=this.size) == (buffer=this.buffer).length){
+                ArrCopy.semicheckedCopy(buffer,0,buffer=new char[OmniArray.growBy100Pct(currSize)],0,currSize);
+                this.buffer=buffer;
             }
-            buffer[size]=val;
-            this.size=size + 1;
-            return this;
+            buffer[currSize]=val;
+            this.size=currSize + 1;
         }
         public void uncheckedAppendCommaAndSpace(){
-            int size;
+            final int currSize;
             final char[] buffer;
-            (buffer=growBuffer((size=this.size) + 2))[size]=',';
-            buffer[++size]=' ';
-            this.size=size + 1;
+            (buffer=growBuffer(currSize=this.size,currSize + 2))[currSize]=',';
+            buffer[currSize + 1]=' ';
         }
+        private char[] growBuffer(int currSize,int newSize){
+            final int capacity;
+            char[] buffer;
+            if(newSize - (capacity=(buffer=this.buffer).length) > 0){
+                ArrCopy.semicheckedCopy(buffer,0,buffer=new char[OmniArray.growBy100Pct(capacity,newSize)],0,currSize);
+                this.buffer=buffer;
+            }
+            this.size=newSize;
+            return buffer;
+        }
+
         public void uncheckedAppendFloat(float val){
             // TODO handle overflow better
-            final int currSize;
-            size=getStringFloat(val,growBuffer((currSize=size) + 15),currSize);
+            char[] buffer;
+            final int currSize,capacity,newSize;
+            if((newSize=(currSize=this.size) + 15) - (capacity=(buffer=this.buffer).length) > 0){
+                ArrCopy.semicheckedCopy(buffer,0,buffer=new char[OmniArray.growBy100Pct(capacity,newSize)],0,currSize);
+                this.buffer=buffer;
+            }
+            this.size=getStringFloat(val,buffer,currSize);
         }
         // TODO uncheckedAppendDouble
         public void uncheckedAppendInt(int val){
             final char[] buffer;
-            int newSize;
-            final int currSize=size;
+            final int newSize,currSize=this.size;
             if(val < 0){
                 if(val == Integer.MIN_VALUE){
                     uncheckedAppendIntMinVal(currSize);
                     return;
                 }
-                (buffer=growBuffer(newSize=currSize + 1 + getStringSize(val=-val)))[currSize]='-';
+                (buffer=growBuffer(currSize,newSize=currSize + 1 + getStringSize(val=-val)))[currSize]='-';
             }else{
-                buffer=growBuffer(newSize=currSize + getStringSize(val));
+                buffer=growBuffer(currSize,newSize=currSize + getStringSize(val));
             }
             mediumDigits(val,buffer,newSize);
-            size=newSize;
         }
         public void uncheckedAppendLong(long val){
             final char[] buffer;
-            int newSize;
-            final int currSize=size;
+            final int newSize,currSize=size;
             if(val < 0L){
                 if(val == Long.MIN_VALUE){
                     uncheckedAppendLongMinVal(currSize);
                     return;
                 }
-                (buffer=growBuffer(newSize=currSize + 1 + getStringSize(val=-val)))[currSize]='-';
+                (buffer=growBuffer(currSize,newSize=currSize + 1 + getStringSize(val=-val)))[currSize]='-';
             }else{
-                buffer=growBuffer(newSize=currSize + getStringSize(val));
+                buffer=growBuffer(currSize,newSize=currSize + getStringSize(val));
             }
             largeDigits(val,buffer,newSize);
-            size=newSize;
         }
         public void uncheckedAppendShort(int val){
             final char[] buffer;
             final int newSize,currSize=size;
             if(val < 0){
-                (buffer=growBuffer(newSize=currSize + 1 + getStringSize(val=-val)))[currSize]='-';
+                (buffer=growBuffer(currSize,newSize=currSize + 1 + getStringSize(val=-val)))[currSize]='-';
             }else{
-                buffer=growBuffer(newSize=currSize + getStringSize(val));
+                buffer=growBuffer(currSize,newSize=currSize + getStringSize(val));
             }
             smallDigits(val,buffer,newSize);
-            size=newSize;
-        }
-        private char[] growBuffer(int minCapacity){
-            char[] buffer;
-            int capacity;
-            if(minCapacity - (capacity=(buffer=this.buffer).length) > 0){
-                this.buffer=buffer=new char[OmniArray.growBy100Pct(capacity,minCapacity)];
-            }
-            return buffer;
         }
         private void uncheckedAppendFalse(){
-            int size;
             final char[] buffer;
-            (buffer=growBuffer((size=this.size) + 5))[size]='f';
-            buffer[++size]='a';
-            buffer[++size]='l';
-            buffer[++size]='s';
-            buffer[++size]='e';
-            this.size=size + 1;
+            final int currSize;
+            (buffer=growBuffer(currSize=this.size,currSize + 5))[currSize]='f';
+            buffer[currSize + 1]='a';
+            buffer[currSize + 2]='l';
+            buffer[currSize + 3]='s';
+            buffer[currSize + 4]='e';
         }
         private void uncheckedAppendIntMinVal(int currSize){
             final char[] buffer;
-            (buffer=growBuffer(currSize + 11))[currSize]='-';
+            (buffer=growBuffer(currSize=this.size,currSize + 11))[currSize]='-';
             buffer[++currSize]='2';
             buffer[++currSize]='1';
             buffer[++currSize]='4';
@@ -436,11 +433,10 @@ public class ToStringUtil{
             buffer[++currSize]='6';
             buffer[++currSize]='4';
             buffer[++currSize]='8';
-            size=currSize + 1;
         }
         private void uncheckedAppendLongMinVal(int currSize){
             final char[] buffer;
-            (buffer=growBuffer(currSize + 20))[currSize]='-';
+            (buffer=growBuffer(currSize=this.size,currSize + 20))[currSize]='-';
             buffer[++currSize]='9';
             buffer[++currSize]='2';
             buffer[++currSize]='2';
@@ -460,16 +456,14 @@ public class ToStringUtil{
             buffer[++currSize]='8';
             buffer[++currSize]='0';
             buffer[++currSize]='8';
-            size=currSize + 1;
         }
         private void uncheckedAppendTrue(){
-            int size;
             final char[] buffer;
-            (buffer=growBuffer((size=this.size) + 4))[size]='t';
-            buffer[++size]='r';
-            buffer[++size]='u';
-            buffer[++size]='e';
-            this.size=size + 1;
+            final int currSize;
+            (buffer=growBuffer(currSize=this.size,currSize + 4))[currSize]='t';
+            buffer[currSize + 1]='r';
+            buffer[currSize + 2]='u';
+            buffer[currSize + 3]='e';
         }
     }
     /** Insert 0's into a character buffer.

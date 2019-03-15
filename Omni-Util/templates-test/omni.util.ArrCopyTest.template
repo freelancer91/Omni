@@ -137,7 +137,7 @@ public void testsemicheckedSelfCopyARRTYPE()
     }
     ARRTYPE[] copy=new ARRTYPE[copyLength];
     ArrCopy.semicheckedCopy(src,srcOffset,copy,0,copyLength);
-    ArrCopy.semicheckedSelfCopy(src,srcOffset,dstOffset,copyLength);
+    ArrCopy.semicheckedSelfCopy(src,dstOffset,srcOffset,copyLength);
     if(copyLength!=0)
     {
       #IFSWITCH PARALLEL==true

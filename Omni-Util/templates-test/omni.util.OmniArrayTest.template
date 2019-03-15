@@ -10,7 +10,26 @@ import org.junit.jupiter.api.Test;
 import omni.function.CharPredicate;
 import omni.function.FloatPredicate;
 import omni.function.ShortPredicate;
+import omni.function.BooleanPredicate;
+import omni.function.ByteUnaryOperator;
+import omni.function.CharUnaryOperator;
+import omni.function.ShortUnaryOperator;
+import java.util.function.IntUnaryOperator;
+import java.util.function.LongUnaryOperator;
+import omni.function.FloatUnaryOperator;
+import java.util.function.DoubleUnaryOperator;
+import java.util.function.UnaryOperator;
 import java.util.Objects;
+import java.util.Arrays;
+import java.util.function.DoubleConsumer;
+import java.util.function.IntConsumer;
+import java.util.function.LongConsumer;
+import java.util.function.Consumer;
+import omni.function.CharConsumer;
+import omni.function.FloatConsumer;
+import omni.function.ShortConsumer;
+import omni.function.ByteConsumer;
+import omni.function.BooleanConsumer;
 public class OmniArrayTest
 {
   private void testGrowBy100PctHelper(int currCapacityBaseLine){
@@ -208,6 +227,354 @@ private static class CLASSPREFIXIndexPredicate implements PREDICATETYPE
 }
 #ENDDEF
 
+  #MACRO TestToString<boolean>(Boolean)
+  #MACRO TestToString<byte>(Byte)
+  #MACRO TestToString<char>(Char)
+  #MACRO TestToString<short>(Short)
+  #MACRO TestToString<int>(Int)
+  #MACRO TestToString<long>(Long)
+  #MACRO TestToString<float>(Float)
+  #MACRO TestToString<double>(Double)
+  #MACRO TestToString<Integer>(Ref)
+#MACRODEF TestToString<ARRTYPE>(CLASSPREFIX)
+#IFSWITCH ARRTYPE==Integer,double
+@Test
+public void testAscendingStringBuilderToStringARRTYPE()
+{
+  ARRTYPE[] arr=new ARRTYPE[10];
+  ARRTYPEArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
+  StringBuilder builder=new StringBuilder("[");
+  OmniArray.OfCLASSPREFIX.ascendingToString(arr,0,arr.length-1,builder);
+  builder.append(']');
+  String result=builder.toString();
+  String expected=Arrays.toString(arr);
+  Assertions.assertEquals(result,expected);
+}
+@Test
+public void testDescendingStringBuilderToStringARRTYPE()
+{
+  ARRTYPE[] arr=new ARRTYPE[10];
+  ARRTYPEArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
+  StringBuilder builder=new StringBuilder("[");
+  OmniArray.OfCLASSPREFIX.descendingToString(arr,0,arr.length-1,builder);
+  builder.append(']');
+  String result=builder.toString();
+  OmniArray.OfCLASSPREFIX.reverseRange(arr,0,arr.length-1);
+  String expected=Arrays.toString(arr);
+  Assertions.assertEquals(result,expected);
+}
+#ELSEIFSWITCH ARRTYPE==char
+@Test
+public void testAscendingFixedBufferToStringARRTYPE()
+{
+  ARRTYPE[] arr=new ARRTYPE[10];
+  ARRTYPEArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
+  char[] buffer=new char[arr.length*3];
+  buffer[0]='[';
+  buffer[buffer.length-1]=']';
+  OmniArray.OfCLASSPREFIX.ascendingToString(arr,0,arr.length-1,buffer,1);
+  String result=new String(buffer,0,buffer.length);
+  String expected=Arrays.toString(arr);
+  Assertions.assertEquals(result,expected);
+}
+@Test
+public void testDescendingFixedBufferToStringARRTYPE()
+{
+  ARRTYPE[] arr=new ARRTYPE[10];
+  ARRTYPEArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
+  char[] buffer=new char[arr.length*3];
+  buffer[0]='[';
+  buffer[buffer.length-1]=']';
+  OmniArray.OfCLASSPREFIX.descendingToString(arr,0,arr.length-1,buffer,1);
+  String result=new String(buffer,0,buffer.length);
+  OmniArray.OfCLASSPREFIX.reverseRange(arr,0,arr.length-1);
+  String expected=Arrays.toString(arr);
+  Assertions.assertEquals(result,expected);
+}
+#ELSE
+@Test
+public void testAscendingOmniStringBuilderToStringARRTYPE()
+{
+  ARRTYPE[] arr=new ARRTYPE[10];
+  ARRTYPEArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
+  char[] buffer=new char[]{'['};
+  ToStringUtil.OmniStringBuilder builder=new ToStringUtil.OmniStringBuilder(1,buffer);
+  OmniArray.OfCLASSPREFIX.ascendingToString(arr,0,arr.length-1,builder);
+  builder.uncheckedAppendChar(']');
+  String result=builder.toString();
+  String expected=Arrays.toString(arr);
+  Assertions.assertEquals(result,expected);
+}
+@Test
+public void testDescendingOmniStringBuilderToStringARRTYPE()
+{
+  ARRTYPE[] arr=new ARRTYPE[10];
+  ARRTYPEArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
+  char[] buffer=new char[]{'['};
+  ToStringUtil.OmniStringBuilder builder=new ToStringUtil.OmniStringBuilder(1,buffer);
+  OmniArray.OfCLASSPREFIX.descendingToString(arr,0,arr.length-1,builder);
+  builder.uncheckedAppendChar(']');
+  String result=builder.toString();
+  OmniArray.OfCLASSPREFIX.reverseRange(arr,0,arr.length-1);
+  String expected=Arrays.toString(arr);
+  Assertions.assertEquals(result,expected);
+}
+@Test
+public void testAscendingFixedBufferToStringARRTYPE()
+{
+  ARRTYPE[] arr=new ARRTYPE[10];
+  ARRTYPEArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
+  char[] buffer=new char[22*arr.length];
+  buffer[0]='[';
+  int bufferOffset=OmniArray.OfCLASSPREFIX.ascendingToString(arr,0,arr.length-1,buffer,1);
+  buffer[bufferOffset++]=']';
+  String result=new String(buffer,0,bufferOffset);
+  String expected=Arrays.toString(arr);
+  Assertions.assertEquals(result,expected);
+}
+@Test
+public void testDescendingFixedBufferToStringARRTYPE()
+{
+  ARRTYPE[] arr=new ARRTYPE[10];
+  ARRTYPEArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
+  char[] buffer=new char[22*arr.length];
+  buffer[0]='[';
+  int bufferOffset=OmniArray.OfCLASSPREFIX.descendingToString(arr,0,arr.length-1,buffer,1);
+  buffer[bufferOffset++]=']';
+  String result=new String(buffer,0,bufferOffset);
+  OmniArray.OfCLASSPREFIX.reverseRange(arr,0,arr.length-1);
+  String expected=Arrays.toString(arr);
+  Assertions.assertEquals(result,expected);
+}
+#ENDIF
+
+#ENDDEF
+  #MACRO TestRemoveRangeAndPullDown<boolean>(Boolean)
+  #MACRO TestRemoveRangeAndPullDown<byte>(Byte)
+  #MACRO TestRemoveRangeAndPullDown<char>(Char)
+  #MACRO TestRemoveRangeAndPullDown<short>(Short)
+  #MACRO TestRemoveRangeAndPullDown<int>(Int)
+  #MACRO TestRemoveRangeAndPullDown<long>(Long)
+  #MACRO TestRemoveRangeAndPullDown<float>(Float)
+  #MACRO TestRemoveRangeAndPullDown<double>(Double)
+  #MACRO TestRemoveRangeAndPullDown<Integer>(Ref)
+#MACRODEF TestRemoveRangeAndPullDown<ARRTYPE>(CLASSPREFIX)
+@Test
+public void testRemoveRangeAndPullDownARRTYPE()
+{
+  ARRTYPE[] arr=new ARRTYPE[1000];
+  ARRTYPEArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
+  ARRTYPE[] copy=new ARRTYPE[arr.length];
+  ArrCopy.uncheckedCopy(arr,0,copy,0,arr.length);
+  int index=arr.length/2;
+  int bound=OmniArray.OfCLASSPREFIX.removeRangeAndPullDown(arr,index+100,arr.length,100);
+  Assertions.assertEquals(bound,arr.length-100);
+  EqualityUtil.uncheckedparallelassertarraysAreEqual(arr,0,copy,0,index);
+  EqualityUtil.uncheckedparallelassertarraysAreEqual(arr,index,copy,index+100,bound-index);
+  #IFSWITCH ARRTYPE==Integer
+  for(int i=bound;i<arr.length;++i)
+  {
+    Assertions.assertNull(arr[i]);
+  }
+  #ENDIF
+}
+#ENDDEF
+
+  #MACRO TestRemoveIndexAndPullDown<boolean>(Boolean)
+  #MACRO TestRemoveIndexAndPullDown<byte>(Byte)
+  #MACRO TestRemoveIndexAndPullDown<char>(Char)
+  #MACRO TestRemoveIndexAndPullDown<short>(Short)
+  #MACRO TestRemoveIndexAndPullDown<int>(Int)
+  #MACRO TestRemoveIndexAndPullDown<long>(Long)
+  #MACRO TestRemoveIndexAndPullDown<float>(Float)
+  #MACRO TestRemoveIndexAndPullDown<double>(Double)
+  #MACRO TestRemoveIndexAndPullDown<Integer>(Ref)
+#MACRODEF TestRemoveIndexAndPullDown<ARRTYPE>(CLASSPREFIX)
+@Test
+public void testRemoveIndexAndPullDownARRTYPE()
+{
+  ARRTYPE[] arr=new ARRTYPE[1000];
+  ARRTYPEArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
+  ARRTYPE[] copy=new ARRTYPE[arr.length];
+  ArrCopy.uncheckedCopy(arr,0,copy,0,arr.length);
+  int index=arr.length/2;
+  OmniArray.OfCLASSPREFIX.removeIndexAndPullDown(arr,index,arr.length-1);
+
+  EqualityUtil.uncheckedparallelassertarraysAreEqual(arr,0,copy,0,index);
+  EqualityUtil.uncheckedparallelassertarraysAreEqual(arr,index,copy,index+1,arr.length-1-index);
+  #IFSWITCH ARRTYPE==Integer
+  Assertions.assertNull(arr[arr.length-1]);
+  #ENDIF
+}
+#ENDDEF
+
+  #MACRO TestSeqHashCode<boolean>(Boolean)
+  #MACRO TestSeqHashCode<byte>(Byte)
+  #MACRO TestSeqHashCode<char>(Char)
+  #MACRO TestSeqHashCode<short>(Short)
+  #MACRO TestSeqHashCode<int>(Int)
+  #MACRO TestSeqHashCode<long>(Long)
+  #MACRO TestSeqHashCode<float>(Float)
+  #MACRO TestSeqHashCode<double>(Double)
+  #MACRO TestSeqHashCode<Integer>(Ref)
+#MACRODEF TestSeqHashCode<ARRTYPE>(CLASSPREFIX)
+@Test
+public void testAscendingSeqHashCodeARRTYPE()
+{
+  ARRTYPE[] arr=new ARRTYPE[1000];
+  ARRTYPEArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
+  int hash=OmniArray.OfCLASSPREFIX.ascendingSeqHashCode(arr,0,arr.length-1);
+  int expectedHash=1;
+  for(int i=0;i<arr.length;++i)
+  {
+    expectedHash=expectedHash*31+(
+#IFSWITCH ARRTYPE==byte,char,short,int
+      arr[i]
+#ELSEIFSWITCH ARRTYPE==boolean,long,float,double
+      CLASSPREFIX.hashCode(arr[i])
+#ELSE
+      Objects.hashCode(arr[i])
+#ENDIF
+    );
+  }
+  Assertions.assertEquals(hash,expectedHash);
+#IFSWITCH ARRTYPE==boolean
+  OmniArray.OfCLASSPREFIX.uncheckedReplaceAll(arr,0,arr.length,val->!val);
+  hash=OmniArray.OfCLASSPREFIX.ascendingSeqHashCode(arr,0,arr.length-1);
+  expectedHash=1;
+  for(int i=0;i<arr.length;++i)
+  {
+    expectedHash=expectedHash*31+(CLASSPREFIX.hashCode(arr[i]));
+  }
+  Assertions.assertEquals(hash,expectedHash);
+#ENDIF
+  
+}
+@Test
+public void testDescendingSeqHashCodeARRTYPE()
+{
+  ARRTYPE[] arr=new ARRTYPE[1000];
+  ARRTYPEArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
+  int hash=OmniArray.OfCLASSPREFIX.descendingSeqHashCode(arr,0,arr.length-1);
+  int expectedHash=1;
+  for(int i=arr.length-1;i>=0;--i)
+  {
+    expectedHash=expectedHash*31+
+#IFSWITCH ARRTYPE==byte,char,short,int
+      arr[i];
+#ELSEIFSWITCH ARRTYPE==boolean,long,float,double
+      CLASSPREFIX.hashCode(arr[i]);
+#ELSE
+      Objects.hashCode(arr[i]);
+#ENDIF
+  }
+  Assertions.assertEquals(hash,expectedHash);
+#IFSWITCH ARRTYPE==boolean
+  OmniArray.OfCLASSPREFIX.uncheckedReplaceAll(arr,0,arr.length,val->!val);
+  hash=OmniArray.OfCLASSPREFIX.descendingSeqHashCode(arr,0,arr.length-1);
+  expectedHash=1;
+  for(int i=arr.length-1;i>=0;--i)
+  {
+    expectedHash=expectedHash*31+(CLASSPREFIX.hashCode(arr[i]));
+  }
+  Assertions.assertEquals(hash,expectedHash);
+#ENDIF
+}
+#ENDDEF
+  
+  #MACRO TestForEach<boolean>(BooleanConsumer,Boolean)
+  #MACRO TestForEach<byte>(ByteConsumer,Byte)
+  #MACRO TestForEach<char>(CharConsumer,Char)
+  #MACRO TestForEach<short>(ShortConsumer,Short)
+  #MACRO TestForEach<int>(IntConsumer,Int)
+  #MACRO TestForEach<long>(LongConsumer,Long)
+  #MACRO TestForEach<float>(FloatConsumer,Float)
+  #MACRO TestForEach<double>(DoubleConsumer,Double)
+  #MACRO TestForEach<Integer>(Consumer<Integer>,Ref)
+#MACRODEF TestForEach<ARRTYPE>(CONSUMER,CLASSPREFIX)
+@Test
+public void testascendingForEachARRTYPE()
+{
+  ARRTYPE[] arr=new ARRTYPE[1000];
+  ARRTYPEArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
+  ARRTYPE[] copy=new ARRTYPE[arr.length];
+  
+  var forwardCopier=new CONSUMER()
+  {
+    int currIndex=0;
+    public void accept(ARRTYPE val)
+    {
+      copy[currIndex++]=val;
+    };
+  };
+  OmniArray.OfCLASSPREFIX.ascendingForEach(arr,0,arr.length-1,forwardCopier);
+  
+  EqualityUtil.uncheckedparallelassertarraysAreEqual(arr,0,copy,0,arr.length);
+  
+}
+
+
+@Test
+public void testdescendingForEachARRTYPE()
+{
+  ARRTYPE[] arr=new ARRTYPE[1000];
+  ARRTYPEArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
+  ARRTYPE[] copy=new ARRTYPE[arr.length];
+  
+  var reverseCopier=new CONSUMER()
+  {
+    int currIndex=arr.length;
+    public void accept(ARRTYPE val)
+    {
+      copy[--currIndex]=val;
+    };
+  };
+  OmniArray.OfCLASSPREFIX.descendingForEach(arr,0,arr.length-1,reverseCopier);
+  
+  EqualityUtil.uncheckedparallelassertarraysAreEqual(arr,0,copy,0,arr.length);
+  
+}
+#ENDDEF
+  
+
+  #MACRO TestReplaceAll<boolean>(BooleanPredicate,Boolean,test)
+  #MACRO TestReplaceAll<byte>(ByteUnaryOperator,Byte,applyAsByte)
+  #MACRO TestReplaceAll<char>(CharUnaryOperator,Char,applyAsChar)
+  #MACRO TestReplaceAll<short>(ShortUnaryOperator,Short,applyAsShort)
+  #MACRO TestReplaceAll<int>(IntUnaryOperator,Int,applyAsInt)
+  #MACRO TestReplaceAll<long>(LongUnaryOperator,Long,applyAsLong)
+  #MACRO TestReplaceAll<float>(FloatUnaryOperator,Float,applyAsFloat)
+  #MACRO TestReplaceAll<double>(DoubleUnaryOperator,Double,applyAsDouble)
+  #MACRO TestReplaceAll<Integer>(UnaryOperator<Integer>,Ref,apply)
+#MACRODEF TestReplaceAll<ARRTYPE>(UNARYOPERATOR,CLASSPREFIX,APPLYMETHOD)
+@Test
+public void testUncheckedReplaceAllARRTYPE()
+{
+  ARRTYPE[] arr=new ARRTYPE[1000];
+  ARRTYPEArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
+  ARRTYPE[] copy=new ARRTYPE[arr.length];
+  ArrCopy.uncheckedCopy(arr,0,copy,0,arr.length);
+  
+  UNARYOPERATOR manipulator=val->
+  {
+#IFSWITCH ARRTYPE==boolean
+    return !val;
+#ELSEIFSWITCH ARRTYPE==Integer
+    int i=(int)val;
+    return (ARRTYPE)(i*i);
+#ELSE
+    return (ARRTYPE)(val*val);
+#ENDIF
+  };
+  OmniArray.OfCLASSPREFIX.uncheckedReplaceAll(arr,0,arr.length,manipulator);
+  
+  for(int i=0;i<arr.length;++i)
+  {
+    Assertions.assertTrue(EqualityUtil.isEqual(manipulator.APPLYMETHOD(copy[i]),arr[i]));
+  }
+}
+#ENDDEF
+
   #MACRO TestReverseRangeMethods<true>()
 #MACRODEF TestReverseRangeMethods<PARALLEL>()
   #MACRO TestReverseRange<boolean>(Boolean)
@@ -267,18 +634,18 @@ public void testReverseRangeARRTYPE()
       Assertions.assertTrue("g".equals(arr[6]));
   }
   
-  #MACRO TestUncheckedContains<boolean,Boolean>()
-  #MACRO TestUncheckedContains<byte,Byte>()
-  #MACRO TestUncheckedContains<char,Char>()
-  #MACRO TestUncheckedContains<short,Short>()
-  #MACRO TestUncheckedContains<int,Int>()
-  #MACRO TestUncheckedContains<long,Long>()
-  #MACRO TestUncheckedContains<float,Float>()
-  #MACRO TestUncheckedContains<double,Double>()
-  #MACRO TestUncheckedContains<Integer,Ref>()
-#MACRODEF TestUncheckedContains<ARRTYPE,CLASSPREFIX>()
+  #MACRO TestUncheckedQuery<boolean,Boolean>()
+  #MACRO TestUncheckedQuery<byte,Byte>()
+  #MACRO TestUncheckedQuery<char,Char>()
+  #MACRO TestUncheckedQuery<short,Short>()
+  #MACRO TestUncheckedQuery<int,Int>()
+  #MACRO TestUncheckedQuery<long,Long>()
+  #MACRO TestUncheckedQuery<float,Float>()
+  #MACRO TestUncheckedQuery<double,Double>()
+  #MACRO TestUncheckedQuery<Integer,Ref>()
+#MACRODEF TestUncheckedQuery<ARRTYPE,CLASSPREFIX>()
 @Test
-public void testUncheckedContainsARRTYPE()
+public void testUncheckedQueryARRTYPE()
 {
   Random rand=new Random(0);
   for(int i=0;i<100;++i)
@@ -293,12 +660,26 @@ public void testUncheckedContainsARRTYPE()
       int index=RandomUtil.randomIntBetween(0,arr.length-1,rand);
       ARRTYPE v=arr[index];
       Assertions.assertTrue(OmniArray.OfCLASSPREFIX.uncheckedcontains(arr,0,arr.length-1,v));
+      ARRTYPEArrayBuilder.AllEquals.buildUnchecked(arr,0,arr.length,rand,0);
+      v=arr[index];
+      arr[index]=!v;
+      Assertions.assertEquals(index,OmniArray.OfCLASSPREFIX.uncheckedindexOf(arr,arr.length,!v));
+      Assertions.assertEquals(index,OmniArray.OfCLASSPREFIX.uncheckedlastIndexOf(arr,arr.length,!v));
+      Assertions.assertEquals(index,OmniArray.OfCLASSPREFIX.uncheckedindexOf(arr,0,arr.length,!v));
+      Assertions.assertEquals(index,OmniArray.OfCLASSPREFIX.uncheckedlastIndexOf(arr,0,arr.length,!v));
+      Assertions.assertEquals(arr.length-index,OmniArray.OfCLASSPREFIX.uncheckedsearch(arr,arr.length,!v));
     }
     else
     {
       ARRTYPEArrayBuilder.AllEquals.buildUnchecked(arr,0,arr.length,rand,rand.nextInt());
       ARRTYPE v=arr[0];
       Assertions.assertFalse(OmniArray.OfCLASSPREFIX.uncheckedcontains(arr,0,arr.length-1,!v));
+      Assertions.assertEquals(-1,OmniArray.OfCLASSPREFIX.uncheckedindexOf(arr,arr.length,!v));
+      Assertions.assertEquals(-1,OmniArray.OfCLASSPREFIX.uncheckedlastIndexOf(arr,arr.length,!v));
+      Assertions.assertEquals(-1,OmniArray.OfCLASSPREFIX.uncheckedindexOf(arr,0,arr.length,!v));
+      Assertions.assertEquals(-1,OmniArray.OfCLASSPREFIX.uncheckedlastIndexOf(arr,0,arr.length,!v));
+      Assertions.assertEquals(-1,OmniArray.OfCLASSPREFIX.uncheckedsearch(arr,arr.length,!v));
+      
     }
 #ELSEIFSWITCH ARRTYPE==byte,char,short,int,long
     var arr=ARRTYPEArrayBuilder.buildRandomArray(1000,1,100,rand);
@@ -307,11 +688,24 @@ public void testUncheckedContainsARRTYPE()
       int index=RandomUtil.randomIntBetween(0,arr.length-1,rand);
       var v=arr[index];
       Assertions.assertTrue(OmniArray.OfCLASSPREFIX.uncheckedcontains(arr,0,arr.length-1,v));
+      
+      v=arr[index]=TypeConversionUtil.convertToARRTYPE(RandomUtil.randomIntBetween(101,120,rand));
+      Assertions.assertEquals(index,OmniArray.OfCLASSPREFIX.uncheckedindexOf(arr,arr.length,v));
+      Assertions.assertEquals(index,OmniArray.OfCLASSPREFIX.uncheckedlastIndexOf(arr,arr.length,v));
+      Assertions.assertEquals(index,OmniArray.OfCLASSPREFIX.uncheckedindexOf(arr,0,arr.length,v));
+      Assertions.assertEquals(index,OmniArray.OfCLASSPREFIX.uncheckedlastIndexOf(arr,0,arr.length,v));
+      Assertions.assertEquals(arr.length-index,OmniArray.OfCLASSPREFIX.uncheckedsearch(arr,arr.length,v));
+      
     }
     else
     {
       var v=TypeConversionUtil.convertToARRTYPE(RandomUtil.randomIntBetween(101,120,rand));
       Assertions.assertFalse(OmniArray.OfCLASSPREFIX.uncheckedcontains(arr,0,arr.length-1,v));
+      Assertions.assertEquals(-1,OmniArray.OfCLASSPREFIX.uncheckedindexOf(arr,arr.length,v));
+      Assertions.assertEquals(-1,OmniArray.OfCLASSPREFIX.uncheckedlastIndexOf(arr,arr.length,v));
+      Assertions.assertEquals(-1,OmniArray.OfCLASSPREFIX.uncheckedindexOf(arr,0,arr.length,v));
+      Assertions.assertEquals(-1,OmniArray.OfCLASSPREFIX.uncheckedlastIndexOf(arr,0,arr.length,v));
+      Assertions.assertEquals(-1,OmniArray.OfCLASSPREFIX.uncheckedsearch(arr,arr.length,v));
     }
 #ELSE
     var arr=ARRTYPEArrayBuilder.buildRandomArray(1000,1,100,rand);
@@ -331,6 +725,20 @@ public void testUncheckedContainsARRTYPE()
           var bits=Double.doubleToRawLongBits(v);
     #ENDIF
           Assertions.assertTrue(OmniArray.OfCLASSPREFIX.uncheckedcontainsBits(arr,0,arr.length-1,bits));
+          
+          v=arr[index]=TypeConversionUtil.convertToARRTYPE(RandomUtil.randomIntBetween(101,120,rand));
+          
+    #IFSWITCH ARRTYPE==float
+          bits=Float.floatToRawIntBits(v);
+    #ELSE
+          bits=Double.doubleToRawLongBits(v);
+    #ENDIF
+          
+          Assertions.assertEquals(index,OmniArray.OfCLASSPREFIX.uncheckedindexOfBits(arr,arr.length,bits));
+          Assertions.assertEquals(index,OmniArray.OfCLASSPREFIX.uncheckedlastIndexOfBits(arr,arr.length,bits));
+          Assertions.assertEquals(index,OmniArray.OfCLASSPREFIX.uncheckedindexOfBits(arr,0,arr.length,bits));
+          Assertions.assertEquals(index,OmniArray.OfCLASSPREFIX.uncheckedlastIndexOfBits(arr,0,arr.length,bits));
+          Assertions.assertEquals(arr.length-index,OmniArray.OfCLASSPREFIX.uncheckedsearchBits(arr,arr.length,bits));
         }
         else
         {
@@ -340,6 +748,12 @@ public void testUncheckedContainsARRTYPE()
           var bits=Double.doubleToRawLongBits(1000);
     #ENDIF
           Assertions.assertFalse(OmniArray.OfCLASSPREFIX.uncheckedcontainsBits(arr,0,arr.length-1,bits));
+          
+          Assertions.assertEquals(-1,OmniArray.OfCLASSPREFIX.uncheckedindexOfBits(arr,arr.length,bits));
+          Assertions.assertEquals(-1,OmniArray.OfCLASSPREFIX.uncheckedlastIndexOfBits(arr,arr.length,bits));
+          Assertions.assertEquals(-1,OmniArray.OfCLASSPREFIX.uncheckedindexOfBits(arr,0,arr.length,bits));
+          Assertions.assertEquals(-1,OmniArray.OfCLASSPREFIX.uncheckedlastIndexOfBits(arr,0,arr.length,bits));
+          Assertions.assertEquals(-1,OmniArray.OfCLASSPREFIX.uncheckedsearchBits(arr,arr.length,bits));
         }
   #ELSE
         //test non-null
@@ -348,10 +762,25 @@ public void testUncheckedContainsARRTYPE()
           int index=RandomUtil.randomIntBetween(0,arr.length-1,rand);
           var v=arr[index];
           Assertions.assertTrue(OmniArray.OfCLASSPREFIX.uncheckedcontainsNonNull(arr,0,arr.length-1,v));
+          
+          v=arr[index]=TypeConversionUtil.convertToARRTYPE(RandomUtil.randomIntBetween(101,120,rand));
+          Assertions.assertEquals(index,OmniArray.OfCLASSPREFIX.uncheckedindexOfNonNull(arr,arr.length,v));
+          Assertions.assertEquals(index,OmniArray.OfCLASSPREFIX.uncheckedlastIndexOfNonNull(arr,arr.length,v));
+          Assertions.assertEquals(index,OmniArray.OfCLASSPREFIX.uncheckedindexOfNonNull(arr,0,arr.length,v));
+          Assertions.assertEquals(index,OmniArray.OfCLASSPREFIX.uncheckedlastIndexOfNonNull(arr,0,arr.length,v));
+          Assertions.assertEquals(arr.length-index,OmniArray.OfCLASSPREFIX.uncheckedsearchNonNull(arr,arr.length,v));
+          
+          
         }
         else
         {
           Assertions.assertFalse(OmniArray.OfCLASSPREFIX.uncheckedcontainsNonNull(arr,0,arr.length-1,new Object()));
+          
+          Assertions.assertEquals(-1,OmniArray.OfCLASSPREFIX.uncheckedindexOfNonNull(arr,arr.length,new Object()));
+          Assertions.assertEquals(-1,OmniArray.OfCLASSPREFIX.uncheckedlastIndexOfNonNull(arr,arr.length,new Object()));
+          Assertions.assertEquals(-1,OmniArray.OfCLASSPREFIX.uncheckedindexOfNonNull(arr,0,arr.length,new Object()));
+          Assertions.assertEquals(-1,OmniArray.OfCLASSPREFIX.uncheckedlastIndexOfNonNull(arr,0,arr.length,new Object()));
+          Assertions.assertEquals(-1,OmniArray.OfCLASSPREFIX.uncheckedsearchNonNull(arr,arr.length,new Object()));
         }
   #ENDIF
         break;
@@ -365,10 +794,22 @@ public void testUncheckedContainsARRTYPE()
           int index=RandomUtil.randomIntBetween(0,arr.length-1,rand);
           arr[index]=CLASSPREFIX.NaN;
           Assertions.assertTrue(OmniArray.OfCLASSPREFIX.uncheckedcontainsNaN(arr,0,arr.length-1));
+          
+          Assertions.assertEquals(index,OmniArray.OfCLASSPREFIX.uncheckedindexOfNaN(arr,arr.length));
+          Assertions.assertEquals(index,OmniArray.OfCLASSPREFIX.uncheckedlastIndexOfNaN(arr,arr.length));
+          Assertions.assertEquals(index,OmniArray.OfCLASSPREFIX.uncheckedindexOfNaN(arr,0,arr.length));
+          Assertions.assertEquals(index,OmniArray.OfCLASSPREFIX.uncheckedlastIndexOfNaN(arr,0,arr.length));
+          Assertions.assertEquals(arr.length-index,OmniArray.OfCLASSPREFIX.uncheckedsearchNaN(arr,arr.length));
         }
         else
         {
           Assertions.assertFalse(OmniArray.OfCLASSPREFIX.uncheckedcontainsNaN(arr,0,arr.length-1));
+          
+          Assertions.assertEquals(-1,OmniArray.OfCLASSPREFIX.uncheckedindexOfNaN(arr,arr.length));
+          Assertions.assertEquals(-1,OmniArray.OfCLASSPREFIX.uncheckedlastIndexOfNaN(arr,arr.length));
+          Assertions.assertEquals(-1,OmniArray.OfCLASSPREFIX.uncheckedindexOfNaN(arr,0,arr.length));
+          Assertions.assertEquals(-1,OmniArray.OfCLASSPREFIX.uncheckedlastIndexOfNaN(arr,0,arr.length));
+          Assertions.assertEquals(-1,OmniArray.OfCLASSPREFIX.uncheckedsearchNaN(arr,arr.length));
         }
   #ELSE
         //test null
@@ -377,10 +818,22 @@ public void testUncheckedContainsARRTYPE()
           int index=RandomUtil.randomIntBetween(0,arr.length-1,rand);
           arr[index]=null;
           Assertions.assertTrue(OmniArray.OfCLASSPREFIX.uncheckedcontainsNull(arr,0,arr.length-1));
+          
+          Assertions.assertEquals(index,OmniArray.OfCLASSPREFIX.uncheckedindexOfNull(arr,arr.length));
+          Assertions.assertEquals(index,OmniArray.OfCLASSPREFIX.uncheckedlastIndexOfNull(arr,arr.length));
+          Assertions.assertEquals(index,OmniArray.OfCLASSPREFIX.uncheckedindexOfNull(arr,0,arr.length));
+          Assertions.assertEquals(index,OmniArray.OfCLASSPREFIX.uncheckedlastIndexOfNull(arr,0,arr.length));
+          Assertions.assertEquals(arr.length-index,OmniArray.OfCLASSPREFIX.uncheckedsearchNull(arr,arr.length));
         }
         else
         {
           Assertions.assertFalse(OmniArray.OfCLASSPREFIX.uncheckedcontainsNull(arr,0,arr.length-1));
+          
+          Assertions.assertEquals(-1,OmniArray.OfCLASSPREFIX.uncheckedindexOfNull(arr,arr.length));
+          Assertions.assertEquals(-1,OmniArray.OfCLASSPREFIX.uncheckedlastIndexOfNull(arr,arr.length));
+          Assertions.assertEquals(-1,OmniArray.OfCLASSPREFIX.uncheckedindexOfNull(arr,0,arr.length));
+          Assertions.assertEquals(-1,OmniArray.OfCLASSPREFIX.uncheckedlastIndexOfNull(arr,0,arr.length));
+          Assertions.assertEquals(-1,OmniArray.OfCLASSPREFIX.uncheckedsearchNull(arr,arr.length));
         }
   #ENDIF
         break;
@@ -394,10 +847,22 @@ public void testUncheckedContainsARRTYPE()
           int index=RandomUtil.randomIntBetween(0,arr.length-1,rand);
           arr[index]=0;
           Assertions.assertTrue(OmniArray.OfCLASSPREFIX.uncheckedcontains0(arr,0,arr.length-1));
+          
+          Assertions.assertEquals(index,OmniArray.OfCLASSPREFIX.uncheckedindexOf0(arr,arr.length));
+          Assertions.assertEquals(index,OmniArray.OfCLASSPREFIX.uncheckedlastIndexOf0(arr,arr.length));
+          Assertions.assertEquals(index,OmniArray.OfCLASSPREFIX.uncheckedindexOf0(arr,0,arr.length));
+          Assertions.assertEquals(index,OmniArray.OfCLASSPREFIX.uncheckedlastIndexOf0(arr,0,arr.length));
+          Assertions.assertEquals(arr.length-index,OmniArray.OfCLASSPREFIX.uncheckedsearch0(arr,arr.length));
         }
         else
         {
           Assertions.assertFalse(OmniArray.OfCLASSPREFIX.uncheckedcontains0(arr,0,arr.length-1));
+          
+          Assertions.assertEquals(-1,OmniArray.OfCLASSPREFIX.uncheckedindexOf0(arr,arr.length));
+          Assertions.assertEquals(-1,OmniArray.OfCLASSPREFIX.uncheckedlastIndexOf0(arr,arr.length));
+          Assertions.assertEquals(-1,OmniArray.OfCLASSPREFIX.uncheckedindexOf0(arr,0,arr.length));
+          Assertions.assertEquals(-1,OmniArray.OfCLASSPREFIX.uncheckedlastIndexOf0(arr,0,arr.length));
+          Assertions.assertEquals(-1,OmniArray.OfCLASSPREFIX.uncheckedsearch0(arr,arr.length));
         }
   #ELSE
         //test predicate
@@ -406,10 +871,25 @@ public void testUncheckedContainsARRTYPE()
           int index=RandomUtil.randomIntBetween(0,arr.length-1,rand);
           var v=arr[index];
           Assertions.assertTrue(OmniArray.OfCLASSPREFIX.uncheckedcontains(arr,0,arr.length-1,v::equals));
+          
+          v=arr[index]=TypeConversionUtil.convertToARRTYPE(RandomUtil.randomIntBetween(101,120,rand));
+          Assertions.assertEquals(index,OmniArray.OfCLASSPREFIX.uncheckedindexOf(arr,arr.length,v::equals));
+          Assertions.assertEquals(index,OmniArray.OfCLASSPREFIX.uncheckedlastIndexOf(arr,arr.length,v::equals));
+          Assertions.assertEquals(index,OmniArray.OfCLASSPREFIX.uncheckedindexOf(arr,0,arr.length,v::equals));
+          Assertions.assertEquals(index,OmniArray.OfCLASSPREFIX.uncheckedlastIndexOf(arr,0,arr.length,v::equals));
+          Assertions.assertEquals(arr.length-index,OmniArray.OfCLASSPREFIX.uncheckedsearch(arr,arr.length,v::equals));
+          
+          
         }
         else
         {
           Assertions.assertFalse(OmniArray.OfCLASSPREFIX.uncheckedcontains(arr,0,arr.length-1,Objects::isNull));
+          
+          Assertions.assertEquals(-1,OmniArray.OfCLASSPREFIX.uncheckedindexOf(arr,arr.length,Objects::isNull));
+          Assertions.assertEquals(-1,OmniArray.OfCLASSPREFIX.uncheckedlastIndexOf(arr,arr.length,Objects::isNull));
+          Assertions.assertEquals(-1,OmniArray.OfCLASSPREFIX.uncheckedindexOf(arr,0,arr.length,Objects::isNull));
+          Assertions.assertEquals(-1,OmniArray.OfCLASSPREFIX.uncheckedlastIndexOf(arr,0,arr.length,Objects::isNull));
+          Assertions.assertEquals(-1,OmniArray.OfCLASSPREFIX.uncheckedsearch(arr,arr.length,Objects::isNull));
         }
   #ENDIF
       }

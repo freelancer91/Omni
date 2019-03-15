@@ -482,6 +482,131 @@ public abstract class LongArrSeq implements OmniCollection.OfLong
     }
     return OmniArray.OfFloat.DEFAULT_ARR;
   }
+  abstract boolean uncheckedRemoveIf(int size,LongPredicate filter);
+  @Override
+  public boolean removeIf(LongPredicate filter)
+  {
+    final int size;
+    return (size=this.size)!=0 && uncheckedRemoveIf(size,filter);
+  }
+  @Override
+  public boolean removeIf(Predicate<? super Long> filter)
+  {
+    final int size;
+    return (size=this.size)!=0 && uncheckedRemoveIf(size,filter::test);
+  }
+  private static  int pullSurvivorsDown(long[] arr,int srcOffset,int srcBound,int dstOffset,LongPredicate filter)
+  {
+    while(++srcOffset!=srcBound)
+    {
+      final long v;
+      if(!filter.test((long)(v=arr[srcOffset])))
+      {
+        arr[dstOffset++]=v;
+      }
+    }
+    return srcBound-dstOffset;
+  }
+  private static  int uncheckedRemoveIfImpl(long[] arr,int srcOffset,int srcBound,LongPredicate filter)
+  {
+    do{
+      if(filter.test((long)arr[srcOffset])){
+        return pullSurvivorsDown(arr,srcOffset,srcBound,srcOffset,filter);
+      }
+    }while(++srcOffset!=srcBound);
+    return 0;
+  }
+  private static  int uncheckedRemoveIfImpl(long[] arr,int srcOffset,int srcBound,LongPredicate filter,CheckedCollection.AbstractModCountChecker modCountChecker)
+  {
+    do
+    {
+      if(filter.test((long)arr[srcOffset]))
+      {
+        int dstOffset=srcOffset;
+        outer:for(;;)
+        {
+          if(++srcOffset==srcBound)
+          {
+            modCountChecker.checkModCount();
+            break outer;
+          }
+          long before;
+          if(!filter.test((long)(before=arr[srcOffset])))
+          {
+            for(int i=srcBound-1;;--i)
+            {
+              if(i==srcOffset)
+              {
+                modCountChecker.checkModCount();
+                arr[dstOffset++]=before;
+                break outer;
+              }
+              long after;
+              if(!filter.test((long)(after=arr[i])))
+              {
+                int n;
+                if((n=i-(++srcOffset))!=0)
+                {
+                  if(n>64)
+                  {
+                    long[] survivorSet;
+                    int numSurvivors=BitSetUtil.markSurvivors(arr,srcOffset,i,filter,survivorSet=BitSetUtil.getBitSet(n));
+                    modCountChecker.checkModCount();
+                    if(numSurvivors!=0)
+                    {
+                      if(numSurvivors==n)
+                      {
+                        ArrCopy.uncheckedSelfCopy(arr,srcOffset-1,dstOffset,numSurvivors+=2);
+                        dstOffset+=numSurvivors;
+                      }
+                      else
+                      {
+                        arr[dstOffset]=before;
+                        BitSetUtil.pullSurvivorsDown(arr,srcOffset,++dstOffset,dstOffset+=numSurvivors,survivorSet);
+                        arr[dstOffset++]=after;
+                      }
+                      break outer;
+                    }
+                  }
+                  else
+                  {
+                    long survivorWord=BitSetUtil.markSurvivors(arr,srcOffset,i,filter);
+                    modCountChecker.checkModCount();
+                    int numSurvivors;
+                    if((numSurvivors=Long.bitCount(survivorWord))!=0)
+                    {
+                      if(numSurvivors==n)
+                      {
+                        ArrCopy.uncheckedSelfCopy(arr,srcOffset-1,dstOffset,numSurvivors+=2);
+                        dstOffset+=numSurvivors;
+                      }
+                      else
+                      {
+                        arr[dstOffset]=before;
+                        BitSetUtil.pullSurvivorsDown(arr,srcOffset,++dstOffset,dstOffset+=numSurvivors,survivorWord);
+                        arr[dstOffset++]=after;
+                      }
+                      break outer;
+                    }
+                  }
+                }
+                else
+                {
+                  modCountChecker.checkModCount();
+                }
+                arr[dstOffset++]=before;
+                arr[dstOffset++]=after;
+                break outer;
+              }
+            }
+          }
+        }
+        return srcBound-dstOffset;
+      }
+    }
+    while(++srcOffset!=srcBound);
+    return 0;
+  }
   public
     static class UncheckedStack
       extends LongArrSeq
@@ -731,6 +856,103 @@ public abstract class LongArrSeq implements OmniCollection.OfLong
     public long popLong()
     {
       return (long)arr[--this.size];
+    }
+    @Override
+    public long pollLong()
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        final var ret=(long)(arr[--size]);
+        this.size=size;
+        return ret;
+      }
+      return Long.MIN_VALUE;
+    }
+    @Override
+    public long peekLong()
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        return (long)(arr[size-1]);
+      }
+      return Long.MIN_VALUE;
+    }
+    @Override
+    public Long poll()
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        final var ret=(Long)(arr[--size]);
+        this.size=size;
+        return ret;
+      }
+      return null;
+    }
+    @Override
+    public Long peek()
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        return (Long)(arr[size-1]);
+      }
+      return null;
+    }
+    @Override
+    public double pollDouble()
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        final var ret=(double)(arr[--size]);
+        this.size=size;
+        return ret;
+      }
+      return Double.NaN;
+    }
+    @Override
+    public double peekDouble()
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        return (double)(arr[size-1]);
+      }
+      return Double.NaN;
+    }
+    @Override
+    public float pollFloat()
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        final var ret=(float)(arr[--size]);
+        this.size=size;
+        return ret;
+      }
+      return Float.NaN;
+    }
+    @Override
+    public float peekFloat()
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        return (float)(arr[size-1]);
+      }
+      return Float.NaN;
+    }
+    @Override
+    boolean uncheckedRemoveIf(int size,LongPredicate filter)
+    {
+      if(size!=(size-=uncheckedRemoveIfImpl(this.arr,0,size,filter))){
+        this.size=size;
+        return true;
+      }
+      return false;
     }
   }
   public
@@ -1126,7 +1348,7 @@ public abstract class LongArrSeq implements OmniCollection.OfLong
     @Override
     public void add(int index,long val)
     {
-      int size;
+      final int size;
       if((size=this.size)!=0){
         ((LongArrSeq)this).uncheckedInsert(index,size,val);
       }else{
@@ -1177,6 +1399,107 @@ public abstract class LongArrSeq implements OmniCollection.OfLong
       return ret;
     }
     @Override
+    public long removeLongAt(int index)
+    {
+      final long[] arr;
+      final var ret=(long)(arr=this.arr)[index];
+      OmniArray.OfLong.removeIndexAndPullDown(arr,index,--size);
+      return ret;
+    }
+    @Override
+    boolean uncheckedRemoveIf(int size,LongPredicate filter)
+    {
+      if(size!=(size-=uncheckedRemoveIfImpl(this.arr,0,size,filter))){
+        this.size=size;
+        return true;
+      }
+      return false;
+    }
+    @Override
+    public void replaceAll(LongUnaryOperator operator)
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        OmniArray.OfLong.uncheckedReplaceAll(this.arr,0,size,operator);
+      }
+    }
+    @Override
+    public void sort(LongComparator sorter)
+    {
+      final int size;
+      if((size=this.size)>1)
+      {
+        if(sorter==null)
+        {
+          LongSortUtil.uncheckedAscendingSort(this.arr,0,size);
+        }
+        else
+        {
+          LongSortUtil.uncheckedStableSort(this.arr,0,size,sorter);
+        }
+      }
+    }
+    @Override
+    public void stableAscendingSort()
+    {
+      final int size;
+      if((size=this.size)>1)
+      {
+        LongSortUtil.uncheckedAscendingSort(this.arr,0,size);
+      }
+    }
+    @Override
+    public void stableDescendingSort()
+    {
+      final int size;
+      if((size=this.size)>1)
+      {
+        LongSortUtil.uncheckedDescendingSort(this.arr,0,size);
+      }
+    }
+    @Override
+    public void replaceAll(UnaryOperator<Long> operator)
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        OmniArray.OfLong.uncheckedReplaceAll(this.arr,0,size,operator::apply);
+      }
+    }
+    @Override
+    public void sort(Comparator<? super Long> sorter)
+    {
+      final int size;
+      if((size=this.size)>1)
+      {
+        if(sorter==null)
+        {
+          LongSortUtil.uncheckedAscendingSort(this.arr,0,size);
+        }
+        else
+        {
+          LongSortUtil.uncheckedStableSort(this.arr,0,size,sorter::compare);
+        }
+      }
+    }
+    @Override
+    public void unstableSort(LongComparator sorter)
+    {
+      final int size;
+      if((size=this.size)>1)
+      {
+        if(sorter==null)
+        {
+          LongSortUtil.uncheckedAscendingSort(this.arr,0,size);
+        }
+        else
+        {
+          LongSortUtil.uncheckedUnstableSort(this.arr,0,size,sorter);
+        }
+      }
+    }
+    @Override
     public OmniList.OfLong subList(int fromIndex,int toIndex)
     {
       return new UncheckedSubList(this,fromIndex,toIndex-fromIndex);
@@ -1184,7 +1507,7 @@ public abstract class LongArrSeq implements OmniCollection.OfLong
   }
   public
     static class UncheckedSubList
-      implements LongListDefault,Cloneable
+      implements LongSubListDefault,Cloneable
   {
     transient final int rootOffset;
     transient int size;
@@ -1280,7 +1603,7 @@ public abstract class LongArrSeq implements OmniCollection.OfLong
       {
         for(var curr=parent;curr!=null;curr.size-=size,curr=curr.parent){}
         final UncheckedList root;
-        (root=this.root).size=OmniArray.OfLong.removeRangeAndPullDown(root.arr,this.rootOffset,root.size,size);
+        (root=this.root).size=OmniArray.OfLong.removeRangeAndPullDown(root.arr,this.rootOffset+size,root.size,size);
         this.size=0;
       }
     }
@@ -1857,19 +2180,6 @@ public abstract class LongArrSeq implements OmniCollection.OfLong
       return new ListItr(this,index+this.rootOffset);
     }
     @Override
-    public boolean add(Long val){
-      return add((long)val);
-    }
-    @Override
-    public boolean add(boolean val){
-      return add((long)TypeUtil.castToLong(val));
-    }
-    @Override
-    public boolean add(int val)
-    {
-      return add((long)val);
-    }
-    @Override
     public boolean add(long val)
     {
       for(var curr=parent;curr!=null;++curr.size,curr=curr.parent){}
@@ -1989,6 +2299,150 @@ public abstract class LongArrSeq implements OmniCollection.OfLong
       final var ret=(long)(arr=root.arr)[index+=this.rootOffset];
       arr[index]=val;
       return ret;
+    }
+    @Override
+    public long removeLongAt(int index)
+    {
+      final long[] arr;
+      for(var curr=parent;curr!=null;--curr.size,curr=curr.parent){}
+      final UncheckedList root;
+      final var ret=(long)(arr=(root=this.root).arr)[index+=this.rootOffset];
+      OmniArray.OfLong.removeIndexAndPullDown(arr,index,--root.size);
+      this.size=size-1;
+      return ret;
+    }
+    @Override
+    public boolean removeIf(LongPredicate filter)
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        {
+          final long[] arr;
+          final int numRemoved;
+          int rootOffset;
+          final UncheckedList root;
+          if((numRemoved=uncheckedRemoveIfImpl(arr=(root=this.root).arr,rootOffset=this.rootOffset,rootOffset+=size,filter))!=0){
+            for(var curr=parent;curr!=null;curr.size-=numRemoved,curr=curr.parent){}
+            root.size=OmniArray.OfLong.removeRangeAndPullDown(arr,rootOffset,root.size,numRemoved);
+            this.size=size-numRemoved;
+            return true;
+          }
+        }
+      }
+      return false;
+    }
+    @Override
+    public boolean removeIf(Predicate<? super Long> filter)
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        {
+          final long[] arr;
+          final int numRemoved;
+          int rootOffset;
+          final UncheckedList root;
+          if((numRemoved=uncheckedRemoveIfImpl(arr=(root=this.root).arr,rootOffset=this.rootOffset,rootOffset+=size,filter::test))!=0){
+            for(var curr=parent;curr!=null;curr.size-=numRemoved,curr=curr.parent){}
+            root.size=OmniArray.OfLong.removeRangeAndPullDown(arr,rootOffset,root.size,numRemoved);
+            this.size=size-numRemoved;
+            return true;
+          }
+        }
+      }
+      return false;
+    }
+    @Override
+    public void replaceAll(LongUnaryOperator operator)
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        final int rootOffset;
+        OmniArray.OfLong.uncheckedReplaceAll(root.arr,rootOffset=this.rootOffset,rootOffset+size,operator);  
+      }
+    }
+    @Override
+    public void sort(LongComparator sorter)
+    {
+      final int size;
+      if((size=this.size)>1)
+      {
+        final int rootOffset;
+        if(sorter==null)
+        {
+          LongSortUtil.uncheckedAscendingSort(root.arr,rootOffset=this.rootOffset,rootOffset+size);
+        }
+        else
+        {
+          LongSortUtil.uncheckedStableSort(root.arr,rootOffset=this.rootOffset,rootOffset+size,sorter);
+        }
+      }
+    }
+    @Override
+    public void stableAscendingSort()
+    {
+      final int size;
+      if((size=this.size)>1)
+      {
+        final int rootOffset;
+        LongSortUtil.uncheckedAscendingSort(root.arr,rootOffset=this.rootOffset,rootOffset+size);
+      }
+    }
+    @Override
+    public void stableDescendingSort()
+    {
+      final int size;
+      if((size=this.size)>1)
+      {
+        final int rootOffset;
+        LongSortUtil.uncheckedDescendingSort(root.arr,rootOffset=this.rootOffset,rootOffset+size);
+      }
+    }
+    @Override
+    public void replaceAll(UnaryOperator<Long> operator)
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        final int rootOffset;
+        OmniArray.OfLong.uncheckedReplaceAll(root.arr,rootOffset=this.rootOffset,rootOffset+size,operator::apply);  
+      }
+    }
+    @Override
+    public void sort(Comparator<? super Long> sorter)
+    {
+      final int size;
+      if((size=this.size)>1)
+      {
+        final int rootOffset;
+        if(sorter==null)
+        {
+          LongSortUtil.uncheckedAscendingSort(root.arr,rootOffset=this.rootOffset,rootOffset+size);
+        }
+        else
+        {
+          LongSortUtil.uncheckedStableSort(root.arr,rootOffset=this.rootOffset,rootOffset+size,sorter::compare);
+        }
+      }
+    }
+    @Override
+    public void unstableSort(LongComparator sorter)
+    {
+      final int size;
+      if((size=this.size)>1)
+      {
+        final int rootOffset;
+        if(sorter==null)
+        {
+          LongSortUtil.uncheckedAscendingSort(root.arr,rootOffset=this.rootOffset,rootOffset+size);
+        }
+        else
+        {
+          LongSortUtil.uncheckedUnstableSort(root.arr,rootOffset=this.rootOffset,rootOffset+size,sorter);
+        }
+      }
     }
     @Override
     public OmniList.OfLong subList(int fromIndex,int toIndex)
@@ -2216,6 +2670,76 @@ public abstract class LongArrSeq implements OmniCollection.OfLong
         return ret;
       }
       throw new NoSuchElementException();
+    }
+    @Override
+    public long pollLong()
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        ++this.modCount;
+        final var ret=(long)(arr[--size]);
+        this.size=size;
+        return ret;
+      }
+      return Long.MIN_VALUE;
+    }
+    @Override
+    public Long poll()
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        ++this.modCount;
+        final var ret=(Long)(arr[--size]);
+        this.size=size;
+        return ret;
+      }
+      return null;
+    }
+    @Override
+    public double pollDouble()
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        ++this.modCount;
+        final var ret=(double)(arr[--size]);
+        this.size=size;
+        return ret;
+      }
+      return Double.NaN;
+    }
+    @Override
+    public float pollFloat()
+    {
+      int size;
+      if((size=this.size)!=0)
+      {
+        ++this.modCount;
+        final var ret=(float)(arr[--size]);
+        this.size=size;
+        return ret;
+      }
+      return Float.NaN;
+    }
+    @Override
+    boolean uncheckedRemoveIf(int size,LongPredicate filter)
+    {
+      final int modCount;
+      if(size!=(size-=uncheckedRemoveIfImpl(this.arr
+        ,0,size,filter,new CheckedCollection.AbstractModCountChecker(modCount=this.modCount){
+          @Override protected int getActualModCount(){
+          return CheckedStack.this.modCount;
+          }
+        }))
+        ){
+        this.modCount=modCount+1;
+        this.size=size;
+        return true;
+      }
+      CheckedCollection.checkModCount(modCount,this.modCount);
+      return false;
     }
   }
   public
@@ -2487,10 +3011,8 @@ public abstract class LongArrSeq implements OmniCollection.OfLong
     @Override
     public OmniListIterator.OfLong listIterator(int index)
     {
-      if(index<0 || index>this.size)
-      {
-        throw new IndexOutOfBoundsException("index="+index+"; size="+this.size);
-      }
+      CheckedCollection.checkLo(index);
+      CheckedCollection.checkWriteHi(index,this.size);
       return new ListItr(this,index);
     }
     @Override
@@ -2502,10 +3024,9 @@ public abstract class LongArrSeq implements OmniCollection.OfLong
     @Override
     public void add(int index,long val)
     {
-      int size;
-      if((size=this.size)<index || index<0){
-        throw new IndexOutOfBoundsException("index="+index+"; size="+size);
-      }
+      final int size;
+      CheckedCollection.checkLo(index);
+      CheckedCollection.checkWriteHi(index,size=this.size);
       ++this.modCount;
       if(size!=0){
         ((LongArrSeq)this).uncheckedInsert(index,size,val);
@@ -2531,47 +3052,201 @@ public abstract class LongArrSeq implements OmniCollection.OfLong
     @Override
     public long getLong(int index)
     {
-      if(index<0 || index>=this.size)
-      {
-        throw new IndexOutOfBoundsException("index="+index+"; size="+this.size);
-      }
+      CheckedCollection.checkLo(index);
+      CheckedCollection.checkReadHi(index,this.size);
       return (long)this.arr[index];
     }
     @Override
     public void put(int index,long val)
     {
-      if(index<0 || index>=this.size)
-      {
-        throw new IndexOutOfBoundsException("index="+index+"; size="+this.size);
-      }
+      CheckedCollection.checkLo(index);
+      CheckedCollection.checkReadHi(index,this.size);
       this.arr[index]=val;
     }
     @Override
     public long set(int index,long val)
     {
-      if(index<0 || index>=this.size)
-      {
-        throw new IndexOutOfBoundsException("index="+index+"; size="+this.size);
-      }
+      CheckedCollection.checkLo(index);
+      CheckedCollection.checkReadHi(index,this.size);
       final long[] arr;
       final var ret=(long)(arr=this.arr)[index];
       arr[index]=val;
       return ret;
     }
     @Override
+    public long removeLongAt(int index)
+    {
+      CheckedCollection.checkLo(index);
+      int size;
+      CheckedCollection.checkReadHi(index,size=this.size);
+      final long[] arr;
+      ++this.modCount;
+      final var ret=(long)(arr=this.arr)[index];
+      OmniArray.OfLong.removeIndexAndPullDown(arr,index,--size);
+      this.size=size;
+      return ret;
+    }
+    @Override
+    boolean uncheckedRemoveIf(int size,LongPredicate filter)
+    {
+      final int modCount;
+      if(size!=(size-=uncheckedRemoveIfImpl(this.arr
+        ,0,size,filter,new CheckedCollection.AbstractModCountChecker(modCount=this.modCount){
+          @Override protected int getActualModCount(){
+          return CheckedList.this.modCount;
+          }
+        }))
+        ){
+        this.modCount=modCount+1;
+        this.size=size;
+        return true;
+      }
+      CheckedCollection.checkModCount(modCount,this.modCount);
+      return false;
+    }
+    @Override
+    public void replaceAll(LongUnaryOperator operator)
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        int modCount=this.modCount;
+        try
+        {
+          OmniArray.OfLong.uncheckedReplaceAll(this.arr,0,size,operator);
+        }
+        finally
+        {
+          CheckedCollection.checkModCount(modCount,this.modCount);
+        }
+        this.modCount=modCount+1;
+      }
+    }
+    @Override
+    public void sort(LongComparator sorter)
+    {
+      final int size;
+      if((size=this.size)>1)
+      {
+        if(sorter==null)
+        {
+          LongSortUtil.uncheckedAscendingSort(this.arr,0,size);
+          ++this.modCount;
+        }
+        else
+        {
+          final int modCount=this.modCount;
+          try
+          {
+            LongSortUtil.uncheckedStableSort(this.arr,0,size,sorter);
+          }
+          finally
+          {
+            CheckedCollection.checkModCount(modCount,this.modCount);
+          }
+          this.modCount=modCount+1;
+        }
+      }
+    }
+    @Override
+    public void stableAscendingSort()
+    {
+      final int size;
+      if((size=this.size)>1)
+      {
+        LongSortUtil.uncheckedAscendingSort(this.arr,0,size);
+        ++this.modCount;
+      }
+    }
+    @Override
+    public void stableDescendingSort()
+    {
+      final int size;
+      if((size=this.size)>1)
+      {
+        LongSortUtil.uncheckedDescendingSort(this.arr,0,size);
+        ++this.modCount;
+      }
+    }
+    @Override
+    public void replaceAll(UnaryOperator<Long> operator)
+    {
+      final int size;
+      if((size=this.size)!=0)
+      {
+        int modCount=this.modCount;
+        try
+        {
+          OmniArray.OfLong.uncheckedReplaceAll(this.arr,0,size,operator::apply);
+        }
+        finally
+        {
+          CheckedCollection.checkModCount(modCount,this.modCount);
+        }
+        this.modCount=modCount+1;
+      }
+    }
+    @Override
+    public void sort(Comparator<? super Long> sorter)
+    {
+      final int size;
+      if((size=this.size)>1)
+      {
+        if(sorter==null)
+        {
+          LongSortUtil.uncheckedAscendingSort(this.arr,0,size);
+          ++this.modCount;
+        }
+        else
+        {
+          final int modCount=this.modCount;
+          try
+          {
+            LongSortUtil.uncheckedStableSort(this.arr,0,size,sorter::compare);
+          }
+          finally
+          {
+            CheckedCollection.checkModCount(modCount,this.modCount);
+          }
+          this.modCount=modCount+1;
+        }
+      }
+    }
+    @Override
+    public void unstableSort(LongComparator sorter)
+    {
+      final int size;
+      if((size=this.size)>1)
+      {
+        if(sorter==null)
+        {
+          LongSortUtil.uncheckedAscendingSort(this.arr,0,size);
+          ++this.modCount;
+        }
+        else
+        {
+          final int modCount=this.modCount;
+          try
+          {
+            LongSortUtil.uncheckedUnstableSort(this.arr,0,size,sorter);
+          }
+          finally
+          {
+            CheckedCollection.checkModCount(modCount,this.modCount);
+          }
+          this.modCount=modCount+1;
+        }
+      }
+    }
+    @Override
     public OmniList.OfLong subList(int fromIndex,int toIndex)
     {
-      final int subListSize;
-      if((subListSize=toIndex-fromIndex)<0 || fromIndex<0 || this.size<toIndex)
-      {
-        throw new IndexOutOfBoundsException("fromIndex="+fromIndex+"; toIndex="+toIndex+"; size="+this.size);
-      }
-      return new CheckedSubList(this,fromIndex,subListSize);
+      return new CheckedSubList(this,fromIndex,CheckedCollection.checkSubListRange(fromIndex,toIndex,this.size));
     }
   }
   private
     static class CheckedSubList
-      implements LongListDefault,Cloneable
+      implements LongSubListDefault,Cloneable
   {
     transient int modCount;
     transient final int rootOffset;
@@ -2682,7 +3357,7 @@ public abstract class LongArrSeq implements OmniCollection.OfLong
         root.modCount=++modCount;
         this.modCount=modCount;
         for(var curr=parent;curr!=null;curr.modCount=modCount,curr.size-=size,curr=curr.parent){}
-        root.size=OmniArray.OfLong.removeRangeAndPullDown(root.arr,this.rootOffset,root.size,size);
+        root.size=OmniArray.OfLong.removeRangeAndPullDown(root.arr,this.rootOffset+size,root.size,size);
         this.size=0;
       }
     }
@@ -3452,24 +4127,9 @@ public abstract class LongArrSeq implements OmniCollection.OfLong
     public OmniListIterator.OfLong listIterator(int index)
     {
       CheckedCollection.checkModCount(modCount,root.modCount);
-      if(index<0 || index>this.size)
-      {
-        throw new IndexOutOfBoundsException("index="+index+"; size="+this.size);
-      }
+      CheckedCollection.checkLo(index);
+      CheckedCollection.checkWriteHi(index,this.size);
       return new ListItr(this,index+this.rootOffset);
-    }
-    @Override
-    public boolean add(Long val){
-      return add((long)val);
-    }
-    @Override
-    public boolean add(boolean val){
-      return add((long)TypeUtil.castToLong(val));
-    }
-    @Override
-    public boolean add(int val)
-    {
-      return add((long)val);
     }
     @Override
     public boolean add(long val)
@@ -3494,10 +4154,9 @@ public abstract class LongArrSeq implements OmniCollection.OfLong
       final CheckedList root;
       int modCount;
       CheckedCollection.checkModCount(modCount=this.modCount,(root=this.root).modCount);
-      int size;
-      if((size=this.size)<index||index<0){
-        throw new IndexOutOfBoundsException("index="+index+"; size="+size);
-      }
+      CheckedCollection.checkLo(index);
+      final int size;
+      CheckedCollection.checkWriteHi(index,size=this.size);
       root.modCount=++modCount;
       this.modCount=modCount;
       for(var curr=parent;curr!=null;curr.modCount=modCount,++curr.size,curr=curr.parent){}
@@ -3606,10 +4265,8 @@ public abstract class LongArrSeq implements OmniCollection.OfLong
     {
       final CheckedList root;
       CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
-      if(index<0 || index>=this.size)
-      {
-        throw new IndexOutOfBoundsException("index="+index+"; size="+this.size);
-      }
+      CheckedCollection.checkLo(index);
+      CheckedCollection.checkReadHi(index,this.size);
       return (long)root.arr[index+this.rootOffset];
     }
     @Override
@@ -3617,10 +4274,8 @@ public abstract class LongArrSeq implements OmniCollection.OfLong
     {
       final CheckedList root;
       CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
-      if(index<0 || index>=this.size)
-      {
-        throw new IndexOutOfBoundsException("index="+index+"; size="+this.size);
-      }
+      CheckedCollection.checkLo(index);
+      CheckedCollection.checkReadHi(index,this.size);
       root.arr[index+this.rootOffset]=val;
     }
     @Override
@@ -3628,25 +4283,294 @@ public abstract class LongArrSeq implements OmniCollection.OfLong
     {
       final CheckedList root;
       CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
-      if(index<0 || index>=this.size)
-      {
-        throw new IndexOutOfBoundsException("index="+index+"; size="+this.size);
-      }
+      CheckedCollection.checkLo(index);
+      CheckedCollection.checkReadHi(index,this.size);
       final long[] arr;
       final var ret=(long)(arr=root.arr)[index+=this.rootOffset];
       arr[index]=val;
       return ret;
     }
     @Override
+    public long removeLongAt(int index)
+    {
+      int modCount;
+      final CheckedList root;
+      CheckedCollection.checkModCount(modCount=this.modCount,(root=this.root).modCount);
+      CheckedCollection.checkLo(index);
+      int size;
+      CheckedCollection.checkReadHi(index,size=this.size);
+      final long[] arr;
+      root.modCount=++modCount;
+      this.modCount=modCount;
+      for(var curr=parent;curr!=null;curr.modCount=modCount,--curr.size,curr=curr.parent){}
+      final var ret=(long)(arr=root.arr)[index+=this.rootOffset];
+      OmniArray.OfLong.removeIndexAndPullDown(arr,index,--root.size);
+      this.size=size-1;
+      return ret;
+    }
+    @Override
+    public boolean removeIf(LongPredicate filter)
+    {
+      int modCount=this.modCount;
+      final var root=this.root;
+      final int size;
+      if((size=this.size)!=0)
+      {
+        try
+        {
+          final long[] arr;
+          final int numRemoved;
+          int rootOffset;
+          if((numRemoved=uncheckedRemoveIfImpl(arr=root.arr,rootOffset=this.rootOffset,rootOffset+=size,filter,new CheckedCollection.AbstractModCountChecker(modCount){
+            @Override protected int getActualModCount(){
+              return root.modCount;
+            }
+          }))!=0){
+            root.modCount=++modCount;
+            this.modCount=modCount;
+            for(var curr=parent;curr!=null;curr.modCount=modCount,curr.size-=numRemoved,curr=curr.parent){}
+            root.size=OmniArray.OfLong.removeRangeAndPullDown(arr,rootOffset,root.size,numRemoved);
+            this.size=size-numRemoved;
+            return true;
+          }
+        }
+        catch(ConcurrentModificationException e)
+        {
+          throw e;
+        }
+        catch(RuntimeException e)
+        {
+          throw CheckedCollection.checkModCount(modCount,root.modCount,e);
+        }
+      }
+      CheckedCollection.checkModCount(modCount,root.modCount);
+      return false;
+    }
+    @Override
+    public boolean removeIf(Predicate<? super Long> filter)
+    {
+      int modCount=this.modCount;
+      final var root=this.root;
+      final int size;
+      if((size=this.size)!=0)
+      {
+        try
+        {
+          final long[] arr;
+          final int numRemoved;
+          int rootOffset;
+          if((numRemoved=uncheckedRemoveIfImpl(arr=root.arr,rootOffset=this.rootOffset,rootOffset+=size,filter::test,new CheckedCollection.AbstractModCountChecker(modCount){
+            @Override protected int getActualModCount(){
+              return root.modCount;
+            }
+          }))!=0){
+            root.modCount=++modCount;
+            this.modCount=modCount;
+            for(var curr=parent;curr!=null;curr.modCount=modCount,curr.size-=numRemoved,curr=curr.parent){}
+            root.size=OmniArray.OfLong.removeRangeAndPullDown(arr,rootOffset,root.size,numRemoved);
+            this.size=size-numRemoved;
+            return true;
+          }
+        }
+        catch(ConcurrentModificationException e)
+        {
+          throw e;
+        }
+        catch(RuntimeException e)
+        {
+          throw CheckedCollection.checkModCount(modCount,root.modCount,e);
+        }
+      }
+      CheckedCollection.checkModCount(modCount,root.modCount);
+      return false;
+    }
+    @Override
+    public void replaceAll(LongUnaryOperator operator)
+    {
+      int modCount=this.modCount;
+      final var root=this.root;
+      try
+      {
+        final int size;
+        if((size=this.size)==0)
+        {
+          return;
+        }
+        final int rootOffset;
+        OmniArray.OfLong.uncheckedReplaceAll(root.arr,rootOffset=this.rootOffset,rootOffset+size,operator);  
+      }
+      finally
+      {
+        CheckedCollection.checkModCount(modCount,root.modCount);
+      }
+      root.modCount=++modCount;
+      this.modCount=modCount;
+      for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}
+    }
+    @Override
+    public void sort(LongComparator sorter)
+    {
+      int modCount=this.modCount;
+      final var root=this.root;
+      try
+      {
+        final int size;
+        if((size=this.size)<2)
+        {
+          return;
+        }
+        final int rootOffset;
+        if(sorter==null)
+        {
+          LongSortUtil.uncheckedAscendingSort(root.arr,rootOffset=this.rootOffset,rootOffset+size);
+        }
+        else
+        {
+          LongSortUtil.uncheckedStableSort(root.arr,rootOffset=this.rootOffset,rootOffset+size,sorter);
+        }
+      }
+      finally
+      {
+        CheckedCollection.checkModCount(modCount,root.modCount);
+      }
+      root.modCount=++modCount;
+      this.modCount=modCount;
+      for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}
+    }
+    @Override
+    public void stableAscendingSort()
+    {
+      int modCount=this.modCount;
+      final var root=this.root;
+      try
+      {
+        final int size;
+        if((size=this.size)<2)
+        {
+          return;
+        }
+        final int rootOffset;
+        LongSortUtil.uncheckedAscendingSort(root.arr,rootOffset=this.rootOffset,rootOffset+size);
+      }
+      finally
+      {
+        CheckedCollection.checkModCount(modCount,root.modCount);
+      }
+      root.modCount=++modCount;
+      this.modCount=modCount;
+      for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}
+    }
+    @Override
+    public void stableDescendingSort()
+    {
+      int modCount=this.modCount;
+      final var root=this.root;
+      try
+      {
+        final int size;
+        if((size=this.size)<2)
+        {
+          return;
+        }
+        final int rootOffset;
+        LongSortUtil.uncheckedDescendingSort(root.arr,rootOffset=this.rootOffset,rootOffset+size);
+      }
+      finally
+      {
+        CheckedCollection.checkModCount(modCount,root.modCount);
+      }
+      root.modCount=++modCount;
+      this.modCount=modCount;
+      for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}
+    }
+    @Override
+    public void replaceAll(UnaryOperator<Long> operator)
+    {
+      int modCount=this.modCount;
+      final var root=this.root;
+      try
+      {
+        final int size;
+        if((size=this.size)==0)
+        {
+          return;
+        }
+        final int rootOffset;
+        OmniArray.OfLong.uncheckedReplaceAll(root.arr,rootOffset=this.rootOffset,rootOffset+size,operator::apply);  
+      }
+      finally
+      {
+        CheckedCollection.checkModCount(modCount,root.modCount);
+      }
+      root.modCount=++modCount;
+      this.modCount=modCount;
+      for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}
+    }
+    @Override
+    public void sort(Comparator<? super Long> sorter)
+    {
+      int modCount=this.modCount;
+      final var root=this.root;
+      try
+      {
+        final int size;
+        if((size=this.size)<2)
+        {
+          return;
+        }
+        final int rootOffset;
+        if(sorter==null)
+        {
+          LongSortUtil.uncheckedAscendingSort(root.arr,rootOffset=this.rootOffset,rootOffset+size);
+        }
+        else
+        {
+          LongSortUtil.uncheckedStableSort(root.arr,rootOffset=this.rootOffset,rootOffset+size,sorter::compare);
+        }
+      }
+      finally
+      {
+        CheckedCollection.checkModCount(modCount,root.modCount);
+      }
+      root.modCount=++modCount;
+      this.modCount=modCount;
+      for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}
+    }
+    @Override
+    public void unstableSort(LongComparator sorter)
+    {
+      int modCount=this.modCount;
+      final var root=this.root;
+      try
+      {
+        final int size;
+        if((size=this.size)<2)
+        {
+          return;
+        }
+        final int rootOffset;
+        if(sorter==null)
+        {
+          LongSortUtil.uncheckedAscendingSort(root.arr,rootOffset=this.rootOffset,rootOffset+size);
+        }
+        else
+        {
+          LongSortUtil.uncheckedUnstableSort(root.arr,rootOffset=this.rootOffset,rootOffset+size,sorter);
+        }
+      }
+      finally
+      {
+        CheckedCollection.checkModCount(modCount,root.modCount);
+      }
+      root.modCount=++modCount;
+      this.modCount=modCount;
+      for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}
+    }
+    @Override
     public OmniList.OfLong subList(int fromIndex,int toIndex)
     {
       CheckedCollection.checkModCount(modCount,root.modCount);
-      final int subListSize;
-      if((subListSize=toIndex-fromIndex)<0 || fromIndex<0 || this.size<toIndex)
-      {
-        throw new IndexOutOfBoundsException("fromIndex="+fromIndex+"; toIndex="+toIndex+"; size="+this.size);
-      }
-      return new CheckedSubList(this,this.rootOffset+fromIndex,subListSize);
+      return new CheckedSubList(this,this.rootOffset+fromIndex,CheckedCollection.checkSubListRange(fromIndex,toIndex,this.size));
     }
   }
 }
