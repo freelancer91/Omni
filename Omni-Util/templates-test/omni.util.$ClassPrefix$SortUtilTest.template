@@ -8,15 +8,15 @@
 #TYPEDEF OfDouble
 #TYPEDEF OfRef
 package omni.util;
-#IFNOT OfBoolean
-import org.junit.jupiter.api.Assertions;
-#ENDIF
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 import org.junit.jupiter.api.Order;
+#IFNOT OfBoolean
+import org.junit.jupiter.api.Assertions;
+#ENDIF
 import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Random;
@@ -36,7 +36,7 @@ public class $ClassPrefix$SortUtilTest
   {
    if(LONGRUN)
     {
-      lengths=new int[]{2, 3, 5, 8, 13, 21, 34, 55, 100, 1000, 10000, 100000, 1000000};
+      lengths=new int[]{2, 3, 5, 8, 13, 21, 34, 46, 47, 55, 100, 286, 287, 1000, 10000, 100000, 1000000};
       randSeeds=new long[]{666L,0xC0FFEEL,999L};
     }
     else
@@ -51,7 +51,6 @@ public class $ClassPrefix$SortUtilTest
   {
     TIMER=System.currentTimeMillis();
   }
-
 #IF OfRef
   #MACRO JunitImpl<Integer,int>()
 #ELSEIF OfBoolean
@@ -106,9 +105,6 @@ public class $ClassPrefix$SortUtilTest
     builder.append(dur);
     System.out.println(builder);
   }
-  
-  
-
 #MACRODEF JunitImpl<CUSTOMARRTYPE,STOCKARRTYPE>()
 private static class TestData
 {
@@ -274,9 +270,6 @@ private static class TestData
     }
   }
 }
-
-
-
 #IF OfRef
 #MACRO TestStable<UnsortedComparator>()
 #MACRO TestStable<AscendingComparator>()
@@ -332,10 +325,6 @@ private static class TestData
 
 #ENDIF
 #ENDDEF
-
-
-  
-
 
 #MACRODEF BasicTestSuite<ARRAYBUILDER,SUITEORDER>()
 @Test
@@ -663,6 +652,8 @@ ERROR unknown stable flag STABLE
     }
   }
 #ENDIF
+
+
 
 #MACRODEF TestStable<COMPARATORTYPE>()
 @Test

@@ -29,6 +29,7 @@ public abstract class CharArrSeq implements OmniCollection.OfChar
   private CharArrSeq()
   {
     super();
+    this.arr=OmniArray.OfChar.DEFAULT_ARR;
   }
   private CharArrSeq(int initialCapacity)
   {
@@ -3481,10 +3482,11 @@ public abstract class CharArrSeq implements OmniCollection.OfChar
           {
             CharSortUtil.uncheckedStableSort(this.arr,0,size,sorter);
           }
-          finally
+          catch(ArrayIndexOutOfBoundsException e)
           {
-            CheckedCollection.checkModCount(modCount,this.modCount);
+            throw CheckedCollection.checkModCount(modCount,this.modCount,e);
           }
+          CheckedCollection.checkModCount(modCount,this.modCount);
           this.modCount=modCount+1;
         }
       }
@@ -3545,10 +3547,11 @@ public abstract class CharArrSeq implements OmniCollection.OfChar
           {
             CharSortUtil.uncheckedStableSort(this.arr,0,size,sorter::compare);
           }
-          finally
+          catch(ArrayIndexOutOfBoundsException e)
           {
-            CheckedCollection.checkModCount(modCount,this.modCount);
+            throw CheckedCollection.checkModCount(modCount,this.modCount,e);
           }
+          CheckedCollection.checkModCount(modCount,this.modCount);
           this.modCount=modCount+1;
         }
       }
@@ -3571,10 +3574,11 @@ public abstract class CharArrSeq implements OmniCollection.OfChar
           {
             CharSortUtil.uncheckedUnstableSort(this.arr,0,size,sorter);
           }
-          finally
+          catch(ArrayIndexOutOfBoundsException e)
           {
-            CheckedCollection.checkModCount(modCount,this.modCount);
+            throw CheckedCollection.checkModCount(modCount,this.modCount,e);
           }
+          CheckedCollection.checkModCount(modCount,this.modCount);
           this.modCount=modCount+1;
         }
       }
@@ -4925,7 +4929,14 @@ public abstract class CharArrSeq implements OmniCollection.OfChar
         }
         else
         {
-          CharSortUtil.uncheckedStableSort(root.arr,rootOffset=this.rootOffset,rootOffset+size,sorter);
+          try
+          {
+            CharSortUtil.uncheckedStableSort(root.arr,rootOffset=this.rootOffset,rootOffset+size,sorter);
+          }
+          catch(ArrayIndexOutOfBoundsException e)
+          {
+            throw new IllegalArgumentException("Comparison method violates its general contract!");
+          }
         }
       }
       finally
@@ -5024,7 +5035,14 @@ public abstract class CharArrSeq implements OmniCollection.OfChar
         }
         else
         {
-          CharSortUtil.uncheckedStableSort(root.arr,rootOffset=this.rootOffset,rootOffset+size,sorter::compare);
+          try
+          {
+            CharSortUtil.uncheckedStableSort(root.arr,rootOffset=this.rootOffset,rootOffset+size,sorter::compare);
+          }
+          catch(ArrayIndexOutOfBoundsException e)
+          {
+            throw new IllegalArgumentException("Comparison method violates its general contract!");
+          }
         }
       }
       finally
@@ -5054,7 +5072,14 @@ public abstract class CharArrSeq implements OmniCollection.OfChar
         }
         else
         {
-          CharSortUtil.uncheckedUnstableSort(root.arr,rootOffset=this.rootOffset,rootOffset+size,sorter);
+          try
+          {
+            CharSortUtil.uncheckedUnstableSort(root.arr,rootOffset=this.rootOffset,rootOffset+size,sorter);
+          }
+          catch(ArrayIndexOutOfBoundsException e)
+          {
+            throw new IllegalArgumentException("Comparison method violates its general contract!");
+          }
         }
       }
       finally

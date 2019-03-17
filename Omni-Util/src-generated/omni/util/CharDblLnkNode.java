@@ -27,7 +27,7 @@ public class CharDblLnkNode implements Comparable<CharDblLnkNode>
   @Override
   public String toString()
   {
-    return ToStringUtil.getString(val);
+    return Character.toString(val);
   }
   @Override
   public boolean equals(Object val)

@@ -41,7 +41,7 @@ public class $DNode$$<E>$ implements Comparable<$DNode$$<E>$>
   {
 #IF OfRef
     return Objects.toString(val);
-#ELSEIF OfDouble
+#ELSEIF OfDouble,OfChar
     return $BoxedType$.toString(val);
 #ELSE
     return ToStringUtil.getString(val);

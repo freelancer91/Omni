@@ -1,11 +1,11 @@
 package omni.util;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Assertions;
 import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Random;
@@ -21,7 +21,7 @@ public class ByteSortUtilTest
   {
    if(LONGRUN)
     {
-      lengths=new int[]{2, 3, 5, 8, 13, 21, 34, 55, 100, 1000, 10000, 100000, 1000000};
+      lengths=new int[]{2, 3, 5, 8, 13, 21, 34, 46, 47, 55, 100, 286, 287, 1000, 10000, 100000, 1000000};
       randSeeds=new long[]{666L,0xC0FFEEL,999L};
     }
     else

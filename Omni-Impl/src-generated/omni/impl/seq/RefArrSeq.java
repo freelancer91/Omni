@@ -24,6 +24,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>
   private RefArrSeq()
   {
     super();
+    this.arr=OmniArray.OfRef.DEFAULT_ARR;
   }
   private RefArrSeq(int initialCapacity)
   {
@@ -4343,10 +4344,11 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>
             RefSortUtil.uncheckedStableSort(this.arr,0,size,sorter);
           }
         }
-        finally
+        catch(ArrayIndexOutOfBoundsException e)
         {
-          CheckedCollection.checkModCount(modCount,this.modCount);
+          throw CheckedCollection.checkModCount(modCount,this.modCount,e);
         }
+        CheckedCollection.checkModCount(modCount,this.modCount);
         this.modCount=modCount+1;
       }
     }
@@ -4361,10 +4363,11 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>
         {
           RefSortUtil.uncheckedStableAscendingSort(this.arr,0,size);
         }
-        finally
+        catch(ArrayIndexOutOfBoundsException e)
         {
-          CheckedCollection.checkModCount(modCount,this.modCount);
+          throw CheckedCollection.checkModCount(modCount,this.modCount,e);
         }
+        CheckedCollection.checkModCount(modCount,this.modCount);
         this.modCount=modCount+1;
       }
     }
@@ -4379,10 +4382,11 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>
         {
           RefSortUtil.uncheckedStableDescendingSort(this.arr,0,size);
         }
-        finally
+        catch(ArrayIndexOutOfBoundsException e)
         {
-          CheckedCollection.checkModCount(modCount,this.modCount);
+          throw CheckedCollection.checkModCount(modCount,this.modCount,e);
         }
+        CheckedCollection.checkModCount(modCount,this.modCount);
         this.modCount=modCount+1;
       }
     }
@@ -4404,10 +4408,11 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>
             RefSortUtil.uncheckedUnstableSort(this.arr,0,size,sorter);
           }
         }
-        finally
+        catch(ArrayIndexOutOfBoundsException e)
         {
-          CheckedCollection.checkModCount(modCount,this.modCount);
+          throw CheckedCollection.checkModCount(modCount,this.modCount,e);
         }
+        CheckedCollection.checkModCount(modCount,this.modCount);
         this.modCount=modCount+1;
       }
     }
@@ -4422,10 +4427,11 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>
         {
           RefSortUtil.uncheckedUnstableAscendingSort(this.arr,0,size);
         }
-        finally
+        catch(ArrayIndexOutOfBoundsException e)
         {
-          CheckedCollection.checkModCount(modCount,this.modCount);
+          throw CheckedCollection.checkModCount(modCount,this.modCount,e);
         }
+        CheckedCollection.checkModCount(modCount,this.modCount);
         this.modCount=modCount+1;
       }
     }
@@ -4440,10 +4446,11 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>
         {
           RefSortUtil.uncheckedUnstableDescendingSort(this.arr,0,size);
         }
-        finally
+        catch(ArrayIndexOutOfBoundsException e)
         {
-          CheckedCollection.checkModCount(modCount,this.modCount);
+          throw CheckedCollection.checkModCount(modCount,this.modCount,e);
         }
+        CheckedCollection.checkModCount(modCount,this.modCount);
         this.modCount=modCount+1;
       }
     }
@@ -6509,7 +6516,14 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>
         }
         else
         {
-          RefSortUtil.uncheckedStableSort(root.arr,rootOffset=this.rootOffset,rootOffset+size,sorter);
+          try
+          {
+            RefSortUtil.uncheckedStableSort(root.arr,rootOffset=this.rootOffset,rootOffset+size,sorter);
+          }
+          catch(ArrayIndexOutOfBoundsException e)
+          {
+            throw new IllegalArgumentException("Comparison method violates its general contract!");
+          }
         }
       }
       finally
@@ -6535,10 +6549,11 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>
         final int rootOffset;
         RefSortUtil.uncheckedStableAscendingSort(root.arr,rootOffset=this.rootOffset,rootOffset+size);
       }
-      finally
+      catch(ArrayIndexOutOfBoundsException e)
       {
-        CheckedCollection.checkModCount(modCount,root.modCount);
+        throw CheckedCollection.checkModCount(modCount,root.modCount,e);
       }
+      CheckedCollection.checkModCount(modCount,root.modCount);
       root.modCount=++modCount;
       this.modCount=modCount;
       for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}
@@ -6558,10 +6573,11 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>
         final int rootOffset;
         RefSortUtil.uncheckedStableDescendingSort(root.arr,rootOffset=this.rootOffset,rootOffset+size);
       }
-      finally
+      catch(ArrayIndexOutOfBoundsException e)
       {
-        CheckedCollection.checkModCount(modCount,root.modCount);
+        throw CheckedCollection.checkModCount(modCount,root.modCount,e);
       }
+      CheckedCollection.checkModCount(modCount,root.modCount);
       root.modCount=++modCount;
       this.modCount=modCount;
       for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}
@@ -6585,7 +6601,14 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>
         }
         else
         {
-          RefSortUtil.uncheckedUnstableSort(root.arr,rootOffset=this.rootOffset,rootOffset+size,sorter);
+          try
+          {
+            RefSortUtil.uncheckedUnstableSort(root.arr,rootOffset=this.rootOffset,rootOffset+size,sorter);
+          }
+          catch(ArrayIndexOutOfBoundsException e)
+          {
+            throw new IllegalArgumentException("Comparison method violates its general contract!");
+          }
         }
       }
       finally
@@ -6611,10 +6634,11 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>
         final int rootOffset;
         RefSortUtil.uncheckedUnstableAscendingSort(root.arr,rootOffset=this.rootOffset,rootOffset+size);
       }
-      finally
+      catch(ArrayIndexOutOfBoundsException e)
       {
-        CheckedCollection.checkModCount(modCount,root.modCount);
+        throw CheckedCollection.checkModCount(modCount,root.modCount,e);
       }
+      CheckedCollection.checkModCount(modCount,root.modCount);
       root.modCount=++modCount;
       this.modCount=modCount;
       for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}
@@ -6634,10 +6658,11 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>
         final int rootOffset;
         RefSortUtil.uncheckedUnstableDescendingSort(root.arr,rootOffset=this.rootOffset,rootOffset+size);
       }
-      finally
+      catch(ArrayIndexOutOfBoundsException e)
       {
-        CheckedCollection.checkModCount(modCount,root.modCount);
+        throw CheckedCollection.checkModCount(modCount,root.modCount,e);
       }
+      CheckedCollection.checkModCount(modCount,root.modCount);
       root.modCount=++modCount;
       this.modCount=modCount;
       for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}

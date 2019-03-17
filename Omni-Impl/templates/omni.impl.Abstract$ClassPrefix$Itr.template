@@ -11,7 +11,7 @@ import omni.api.OmniIterator;
 #IF OfBoolean
 import omni.util.TypeUtil;
 #ENDIF
-public abstract class Abstract$TypeNameModifier$Itr implements OmniIterator.Of$TypeNameModifier$$<E>$
+public abstract class Abstract$ClassPrefix$Itr implements OmniIterator.Of$ClassPrefix$$<E>$
 {
 
   #MACRO NextImpl($BoxedType$,,($BoxedType$))

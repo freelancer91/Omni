@@ -30,6 +30,7 @@ public abstract class LongArrSeq implements OmniCollection.OfLong
   private LongArrSeq()
   {
     super();
+    this.arr=OmniArray.OfLong.DEFAULT_ARR;
   }
   private LongArrSeq(int initialCapacity)
   {
@@ -86,11 +87,11 @@ public abstract class LongArrSeq implements OmniCollection.OfLong
         throw new OutOfMemoryError();
       }
       final char[] buffer;
-      if(size<=(OmniArray.MAX_ARR_SIZE/22)){
-        (buffer=new char[size*22])[size=uncheckedToString(size,buffer)]=']';
+      if(size<=(OmniArray.MAX_ARR_SIZE/22)){(buffer=new char[size*22])
+        [size=uncheckedToString(size,buffer)]=']';
       }else{
         final ToStringUtil.OmniStringBuilder builder;
-        uncheckedToString(size,builder=new ToStringUtil.OmniStringBuilder(1,new char[size*13]));
+        uncheckedToString(size,builder=new ToStringUtil.OmniStringBuilder(1,new char[OmniArray.MAX_ARR_SIZE]));
         (buffer=builder.buffer)[size=builder.size]=']';
       }
       buffer[0]='[';
@@ -1562,11 +1563,11 @@ public abstract class LongArrSeq implements OmniCollection.OfLong
         }
           final int rootOffset;
           final char[] buffer;
-          if(size<=(OmniArray.MAX_ARR_SIZE/22)){
-             (buffer=new char[size*22])[size=OmniArray.OfLong.ascendingToString(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,buffer,1)]=']';
+          if(size<=(OmniArray.MAX_ARR_SIZE/22)){(buffer=new char[size*22])
+            [size=OmniArray.OfLong.ascendingToString(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,buffer,1)]=']';
           }else{
             final ToStringUtil.OmniStringBuilder builder;
-            OmniArray.OfLong.ascendingToString(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,builder=new ToStringUtil.OmniStringBuilder(1,new char[size*13]));
+            OmniArray.OfLong.ascendingToString(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,builder=new ToStringUtil.OmniStringBuilder(1,new char[OmniArray.MAX_ARR_SIZE]));
             (buffer=builder.buffer)[size=builder.size]=']';
           }
           buffer[0]='[';
@@ -3140,10 +3141,11 @@ public abstract class LongArrSeq implements OmniCollection.OfLong
           {
             LongSortUtil.uncheckedStableSort(this.arr,0,size,sorter);
           }
-          finally
+          catch(ArrayIndexOutOfBoundsException e)
           {
-            CheckedCollection.checkModCount(modCount,this.modCount);
+            throw CheckedCollection.checkModCount(modCount,this.modCount,e);
           }
+          CheckedCollection.checkModCount(modCount,this.modCount);
           this.modCount=modCount+1;
         }
       }
@@ -3204,10 +3206,11 @@ public abstract class LongArrSeq implements OmniCollection.OfLong
           {
             LongSortUtil.uncheckedStableSort(this.arr,0,size,sorter::compare);
           }
-          finally
+          catch(ArrayIndexOutOfBoundsException e)
           {
-            CheckedCollection.checkModCount(modCount,this.modCount);
+            throw CheckedCollection.checkModCount(modCount,this.modCount,e);
           }
+          CheckedCollection.checkModCount(modCount,this.modCount);
           this.modCount=modCount+1;
         }
       }
@@ -3230,10 +3233,11 @@ public abstract class LongArrSeq implements OmniCollection.OfLong
           {
             LongSortUtil.uncheckedUnstableSort(this.arr,0,size,sorter);
           }
-          finally
+          catch(ArrayIndexOutOfBoundsException e)
           {
-            CheckedCollection.checkModCount(modCount,this.modCount);
+            throw CheckedCollection.checkModCount(modCount,this.modCount,e);
           }
+          CheckedCollection.checkModCount(modCount,this.modCount);
           this.modCount=modCount+1;
         }
       }
@@ -3308,11 +3312,11 @@ public abstract class LongArrSeq implements OmniCollection.OfLong
         }
           final int rootOffset;
           final char[] buffer;
-          if(size<=(OmniArray.MAX_ARR_SIZE/22)){
-             (buffer=new char[size*22])[size=OmniArray.OfLong.ascendingToString(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,buffer,1)]=']';
+          if(size<=(OmniArray.MAX_ARR_SIZE/22)){(buffer=new char[size*22])
+            [size=OmniArray.OfLong.ascendingToString(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,buffer,1)]=']';
           }else{
             final ToStringUtil.OmniStringBuilder builder;
-            OmniArray.OfLong.ascendingToString(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,builder=new ToStringUtil.OmniStringBuilder(1,new char[size*13]));
+            OmniArray.OfLong.ascendingToString(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,builder=new ToStringUtil.OmniStringBuilder(1,new char[OmniArray.MAX_ARR_SIZE]));
             (buffer=builder.buffer)[size=builder.size]=']';
           }
           buffer[0]='[';
@@ -4426,7 +4430,14 @@ public abstract class LongArrSeq implements OmniCollection.OfLong
         }
         else
         {
-          LongSortUtil.uncheckedStableSort(root.arr,rootOffset=this.rootOffset,rootOffset+size,sorter);
+          try
+          {
+            LongSortUtil.uncheckedStableSort(root.arr,rootOffset=this.rootOffset,rootOffset+size,sorter);
+          }
+          catch(ArrayIndexOutOfBoundsException e)
+          {
+            throw new IllegalArgumentException("Comparison method violates its general contract!");
+          }
         }
       }
       finally
@@ -4525,7 +4536,14 @@ public abstract class LongArrSeq implements OmniCollection.OfLong
         }
         else
         {
-          LongSortUtil.uncheckedStableSort(root.arr,rootOffset=this.rootOffset,rootOffset+size,sorter::compare);
+          try
+          {
+            LongSortUtil.uncheckedStableSort(root.arr,rootOffset=this.rootOffset,rootOffset+size,sorter::compare);
+          }
+          catch(ArrayIndexOutOfBoundsException e)
+          {
+            throw new IllegalArgumentException("Comparison method violates its general contract!");
+          }
         }
       }
       finally
@@ -4555,7 +4573,14 @@ public abstract class LongArrSeq implements OmniCollection.OfLong
         }
         else
         {
-          LongSortUtil.uncheckedUnstableSort(root.arr,rootOffset=this.rootOffset,rootOffset+size,sorter);
+          try
+          {
+            LongSortUtil.uncheckedUnstableSort(root.arr,rootOffset=this.rootOffset,rootOffset+size,sorter);
+          }
+          catch(ArrayIndexOutOfBoundsException e)
+          {
+            throw new IllegalArgumentException("Comparison method violates its general contract!");
+          }
         }
       }
       finally

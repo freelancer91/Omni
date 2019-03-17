@@ -29,7 +29,7 @@ public class $SNode$$<E>$ implements Comparable<$SNode$$<E>$>
   {
 #IF OfRef
     return Objects.toString(val);
-#ELSEIF OfDouble
+#ELSEIF OfDouble,OfChar
     return $BoxedType$.toString(val);
 #ELSE
     return ToStringUtil.getString(val);

@@ -1,3 +1,4 @@
+#TYPEDEF OfGeneric
 package omni.util;
 import java.io.CharArrayWriter;
 import java.io.IOException;
@@ -6,6 +7,7 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.nio.CharBuffer;
 public class ToStringUtil{
+    private ToStringUtil(){}
     public static String getString(boolean b){
         if(b){
             return "true";
@@ -31,39 +33,39 @@ public class ToStringUtil{
         writer.write(b?"true":"false");
     }
     public static String getString(byte i){
-        char[] buffer;
-        return new String(buffer=getByteStrBuffer(),0,getStringShort(i,buffer,0));
+        byte[] buffer;
+        return new String(buffer=getByteByteBuffer(),0,getStringShort(i,buffer,0));
     }
     public static void getString(byte i,Appendable appendable) throws IOException{
         appendable.append(getString(i));
     }
     public static void getString(byte i,CharArrayWriter writer){
-        char[] arr;
-        writer.write(arr=getByteStrBuffer(),0,getStringShort(i,arr,0));
+        byte[] arr;
+        writer.write(arr=getByteByteBuffer(),0,getStringShort(i,arr,0));
     }
     public static void getString(byte i,CharBuffer buffer){
-        char[] arr;
-        buffer.put(arr=getByteStrBuffer(),0,getStringShort(i,arr,0));
+        byte[] arr;
+        buffer.put(arr=getByteByteBuffer(),0,getStringShort(i,arr,0));
     }
     public static void getString(byte i,PrintWriter writer){
-        char[] arr;
-        writer.write(arr=getByteStrBuffer(),0,getStringShort(i,arr,0));
+        byte[] arr;
+        writer.write(arr=getByteByteBuffer(),0,getStringShort(i,arr,0));
     }
     public static void getString(byte i,StringBuffer sBuffer){
-        char[] arr;
-        sBuffer.append(arr=getByteStrBuffer(),0,getStringShort(i,arr,0));
+        byte[] arr;
+        sBuffer.append(arr=getByteByteBuffer(),0,getStringShort(i,arr,0));
     }
     public static void getString(byte i,StringBuilder sBuilder){
-        char[] arr;
-        sBuilder.append(arr=getByteStrBuffer(),0,getStringShort(i,arr,0));
+        byte[] arr;
+        sBuilder.append(arr=getByteByteBuffer(),0,getStringShort(i,arr,0));
     }
     public static void getString(byte i,StringWriter writer){
-        char[] arr;
-        writer.write(arr=getByteStrBuffer(),0,getStringShort(i,arr,0));
+        byte[] arr;
+        writer.write(arr=getByteByteBuffer(),0,getStringShort(i,arr,0));
     }
     public static void getString(byte i,Writer writer) throws IOException{
-        char[] arr;
-        writer.write(arr=getByteStrBuffer(),0,getStringShort(i,arr,0));
+        byte[] arr;
+        writer.write(arr=getByteByteBuffer(),0,getStringShort(i,arr,0));
     }
     /** Return the string representation of the provided single-precision float value.
      *
@@ -71,23 +73,23 @@ public class ToStringUtil{
      *          The float value.
      * @return The string for that float value. */
     public static String getString(float f){
-        char[] buffer;
-        return new String(buffer=getFloatStrBuffer(),0,getStringFloat(f,buffer,0));
+        byte[] buffer;
+        return new String(buffer=getFloatByteBuffer(),0,getStringFloat(f,buffer,0));
     }
     public static void getString(float f,Appendable appendable) throws IOException{
         appendable.append(getString(f));
     }
     public static void getString(float f,CharArrayWriter writer){
-        char[] arr;
-        writer.write(arr=getFloatStrBuffer(),0,getStringFloat(f,arr,0));
+        byte[] arr;
+        writer.write(arr=getFloatByteBuffer(),0,getStringFloat(f,arr,0));
     }
     public static void getString(float f,CharBuffer buffer){
-        char[] arr;
-        buffer.put(arr=getFloatStrBuffer(),0,getStringFloat(f,arr,0));
+        byte[] arr;
+        buffer.put(arr=getFloatByteBuffer(),0,getStringFloat(f,arr,0));
     }
     public static void getString(float f,PrintWriter writer){
-        char[] arr;
-        writer.write(arr=getFloatStrBuffer(),0,getStringFloat(f,arr,0));
+        byte[] arr;
+        writer.write(arr=getFloatByteBuffer(),0,getStringFloat(f,arr,0));
     }
     /** Write a float string representation to a StringBuffer.
      *
@@ -95,391 +97,125 @@ public class ToStringUtil{
      * @param sBuffer
      */
     public static void getString(float f,StringBuffer sBuffer){
-        char[] arr;
-        sBuffer.append(arr=getFloatStrBuffer(),0,getStringFloat(f,arr,0));
+        byte[] arr;
+        sBuffer.append(arr=getFloatByteBuffer(),0,getStringFloat(f,arr,0));
     }
     public static void getString(float f,StringBuilder sBuilder){
-        char[] arr;
-        sBuilder.append(arr=getFloatStrBuffer(),0,getStringFloat(f,arr,0));
+        byte[] arr;
+        sBuilder.append(arr=getFloatByteBuffer(),0,getStringFloat(f,arr,0));
     }
     public static void getString(float f,StringWriter writer){
-        char[] arr;
-        writer.write(arr=getFloatStrBuffer(),0,getStringFloat(f,arr,0));
+        byte[] arr;
+        writer.write(arr=getFloatByteBuffer(),0,getStringFloat(f,arr,0));
     }
     public static void getString(float f,Writer writer) throws IOException{
-        char[] arr;
-        writer.write(arr=getFloatStrBuffer(),0,getStringFloat(f,arr,0));
+        byte[] arr;
+        writer.write(arr=getFloatByteBuffer(),0,getStringFloat(f,arr,0));
     }
     public static String getString(int i){
-        char[] buffer;
-        return new String(buffer=getIntStrBuffer(),0,getStringInt(i,buffer,0));
+        byte[] buffer;
+        return new String(buffer=getIntByteBuffer(),0,getStringInt(i,buffer,0));
     }
     public static void getString(int i,Appendable appendable) throws IOException{
         appendable.append(getString(i));
     }
     public static void getString(int i,CharArrayWriter writer){
-        char[] arr;
-        writer.write(arr=getIntStrBuffer(),0,getStringInt(i,arr,0));
+        byte[] arr;
+        writer.write(arr=getIntByteBuffer(),0,getStringInt(i,arr,0));
     }
     public static void getString(int i,CharBuffer buffer){
-        char[] arr;
-        buffer.put(arr=getIntStrBuffer(),0,getStringInt(i,arr,0));
+        byte[] arr;
+        buffer.put(arr=getIntByteBuffer(),0,getStringInt(i,arr,0));
     }
     public static void getString(int i,PrintWriter writer){
-        char[] arr;
-        writer.write(arr=getIntStrBuffer(),0,getStringInt(i,arr,0));
+        byte[] arr;
+        writer.write(arr=getIntByteBuffer(),0,getStringInt(i,arr,0));
     }
     public static void getString(int i,StringBuffer sBuffer){
-        char[] arr;
-        sBuffer.append(arr=getIntStrBuffer(),0,getStringInt(i,arr,0));
+        byte[] arr;
+        sBuffer.append(arr=getIntByteBuffer(),0,getStringInt(i,arr,0));
     }
     public static void getString(int i,StringBuilder sBuilder){
-        char[] arr;
-        sBuilder.append(arr=getIntStrBuffer(),0,getStringInt(i,arr,0));
+        byte[] arr;
+        sBuilder.append(arr=getIntByteBuffer(),0,getStringInt(i,arr,0));
     }
     public static void getString(int i,StringWriter writer){
-        char[] arr;
-        writer.write(arr=getIntStrBuffer(),0,getStringInt(i,arr,0));
+        byte[] arr;
+        writer.write(arr=getIntByteBuffer(),0,getStringInt(i,arr,0));
     }
     public static void getString(int i,Writer writer) throws IOException{
-        char[] arr;
-        writer.write(arr=getIntStrBuffer(),0,getStringInt(i,arr,0));
+        byte[] arr;
+        writer.write(arr=getIntByteBuffer(),0,getStringInt(i,arr,0));
     }
     public static String getString(long i){
-        char[] buffer;
-        return new String(buffer=getLongStrBuffer(),0,getStringLong(i,buffer,0));
+        byte[] buffer;
+        return new String(buffer=getLongByteBuffer(),0,getStringLong(i,buffer,0));
     }
     public static void getString(long i,Appendable appendable) throws IOException{
         appendable.append(getString(i));
     }
     public static void getString(long i,CharArrayWriter writer){
-        char[] arr;
-        writer.write(arr=getLongStrBuffer(),0,getStringLong(i,arr,0));
+        byte[] arr;
+        writer.write(arr=getLongByteBuffer(),0,getStringLong(i,arr,0));
     }
     public static void getString(long i,CharBuffer buffer){
-        char[] arr;
-        buffer.put(arr=getLongStrBuffer(),0,getStringLong(i,arr,0));
+        byte[] arr;
+        buffer.put(arr=getLongByteBuffer(),0,getStringLong(i,arr,0));
     }
     public static void getString(long i,PrintWriter writer){
-        char[] arr;
-        writer.write(arr=getLongStrBuffer(),0,getStringLong(i,arr,0));
+        byte[] arr;
+        writer.write(arr=getLongByteBuffer(),0,getStringLong(i,arr,0));
     }
     public static void getString(long i,StringBuffer sBuffer){
-        char[] arr;
-        sBuffer.append(arr=getLongStrBuffer(),0,getStringLong(i,arr,0));
+        byte[] arr;
+        sBuffer.append(arr=getLongByteBuffer(),0,getStringLong(i,arr,0));
     }
     public static void getString(long i,StringBuilder sBuilder){
-        char[] arr;
-        sBuilder.append(arr=getLongStrBuffer(),0,getStringLong(i,arr,0));
+        byte[] arr;
+        sBuilder.append(arr=getLongByteBuffer(),0,getStringLong(i,arr,0));
     }
     public static void getString(long i,StringWriter writer){
-        char[] arr;
-        writer.write(arr=getLongStrBuffer(),0,getStringLong(i,arr,0));
+        byte[] arr;
+        writer.write(arr=getLongByteBuffer(),0,getStringLong(i,arr,0));
     }
     public static void getString(long i,Writer writer) throws IOException{
-        char[] arr;
-        writer.write(arr=getLongStrBuffer(),0,getStringLong(i,arr,0));
+        byte[] arr;
+        writer.write(arr=getLongByteBuffer(),0,getStringLong(i,arr,0));
     }
     public static String getString(short i){
-        char[] buffer;
-        return new String(buffer=getShortStrBuffer(),0,getStringShort(i,buffer,0));
+        byte[] buffer;
+        return new String(buffer=getShortByteBuffer(),0,getStringShort(i,buffer,0));
     }
     public static void getString(short i,Appendable appendable) throws IOException{
         appendable.append(getString(i));
     }
     public static void getString(short i,CharArrayWriter writer){
-        char[] arr;
-        writer.write(arr=getShortStrBuffer(),0,getStringShort(i,arr,0));
+        byte[] arr;
+        writer.write(arr=getShortByteBuffer(),0,getStringShort(i,arr,0));
     }
     public static void getString(short i,CharBuffer buffer){
-        char[] arr;
-        buffer.put(arr=getShortStrBuffer(),0,getStringShort(i,arr,0));
+        byte[] arr;
+        buffer.put(arr=getShortByteBuffer(),0,getStringShort(i,arr,0));
     }
     public static void getString(short i,PrintWriter writer){
-        char[] arr;
-        writer.write(arr=getShortStrBuffer(),0,getStringShort(i,arr,0));
+        byte[] arr;
+        writer.write(arr=getShortByteBuffer(),0,getStringShort(i,arr,0));
     }
     public static void getString(short i,StringBuffer sBuffer){
-        char[] arr;
-        sBuffer.append(arr=getShortStrBuffer(),0,getStringShort(i,arr,0));
+        byte[] arr;
+        sBuffer.append(arr=getShortByteBuffer(),0,getStringShort(i,arr,0));
     }
     public static void getString(short i,StringBuilder sBuilder){
-        char[] arr;
-        sBuilder.append(arr=getShortStrBuffer(),0,getStringShort(i,arr,0));
+        byte[] arr;
+        sBuilder.append(arr=getShortByteBuffer(),0,getStringShort(i,arr,0));
     }
     public static void getString(short i,StringWriter writer){
-        char[] arr;
-        writer.write(arr=getShortStrBuffer(),0,getStringShort(i,arr,0));
+        byte[] arr;
+        writer.write(arr=getShortByteBuffer(),0,getStringShort(i,arr,0));
     }
     public static void getString(short i,Writer writer) throws IOException{
-        char[] arr;
-        writer.write(arr=getShortStrBuffer(),0,getStringShort(i,arr,0));
-    }
-    public static int getStringBoolean(boolean i,char[] buffer,int offset){
-        if(i){
-            buffer[offset]='t';
-            buffer[++offset]='r';
-            buffer[++offset]='u';
-        }else{
-            buffer[offset]='f';
-            buffer[++offset]='a';
-            buffer[++offset]='l';
-            buffer[++offset]='s';
-        }
-        buffer[++offset]='e';
-        return ++offset;
-    }
-    /** Place the string representation of the provided single-precision float value into the provided character buffer.
-     *
-     * @param f
-     *          The single-precision float value to get the string of.
-     * @param buffer
-     *          The character buffer.
-     * @param offset
-     *          The first index to begin inserting characters in the character buffer.
-     * @return The last index into which a character was inserted PLUS ONE. */
-    public static int getStringFloat(final float f,final char[] buffer,int offset){
-        final int rawBits;
-        final int binaryExponent=(((rawBits=Float.floatToRawIntBits(f))&0x7f800000)>>23)-127;
-        if(binaryExponent==128){ return infinityOrNaNToASCII(buffer,offset,rawBits); }
-        if((rawBits&Integer.MIN_VALUE)!=0){
-            buffer[offset++]='-';
-        }
-        final int fractBits=rawBits&0x7fffff;
-        if(binaryExponent==-127){
-            if(fractBits==0){
-                buffer[offset]='0';
-                buffer[++offset]='.';
-                buffer[++offset]='0';
-                return ++offset;
-            }
-            return FltDenorm.toASCII(fractBits,buffer,offset);
-        }
-        if(binaryExponent<0){ return FltLT1.toASCII(fractBits,binaryExponent,buffer,offset); }
-        return FltGTE1.toASCII(fractBits,binaryExponent,buffer,offset);
-    }
-    public static int getStringInt(int i,char[] buffer,int offset){
-        if(i<0){
-            buffer[offset++]='-';
-            if(i==Integer.MIN_VALUE){
-                buffer[offset]='2';
-                buffer[++offset]='1';
-                buffer[++offset]='4';
-                buffer[++offset]='7';
-                buffer[++offset]='4';
-                buffer[++offset]='8';
-                buffer[++offset]='3';
-                buffer[++offset]='6';
-                buffer[++offset]='4';
-                buffer[++offset]='8';
-                return ++offset;
-            }
-            i=-i;
-        }
-        mediumDigits(i,buffer,offset+=getStringSize(i));
-        return offset;
-    }
-    public static int getStringLong(long l,char[] buffer,int offset){
-        if(l<0L){
-            buffer[offset++]='-';
-            if(l==Long.MIN_VALUE){
-                buffer[offset]='9';
-                buffer[++offset]='2';
-                buffer[++offset]='2';
-                buffer[++offset]='3';
-                buffer[++offset]='3';
-                buffer[++offset]='7';
-                buffer[++offset]='2';
-                buffer[++offset]='0';
-                buffer[++offset]='3';
-                buffer[++offset]='6';
-                buffer[++offset]='8';
-                buffer[++offset]='5';
-                buffer[++offset]='4';
-                buffer[++offset]='7';
-                buffer[++offset]='7';
-                buffer[++offset]='5';
-                buffer[++offset]='8';
-                buffer[++offset]='0';
-                buffer[++offset]='8';
-                return ++offset;
-            }
-            l=-l;
-        }
-        largeDigits(l,buffer,offset+=getStringSize(l));
-        return offset;
-    }
-    public static int getStringShort(int i,char[] buffer,int offset){
-        if(i<0){
-            buffer[offset++]='-';
-            i=-i;
-        }
-        smallDigits(i,buffer,offset+=getStringSize(i));
-        return offset;
-    }
-    public static class OmniStringBuilder{
-        public transient char[] buffer;
-        public transient int size;
-        public OmniStringBuilder(int size,char[] buffer){
-            this.size=size;
-            this.buffer=buffer;
-        }
-        @Override
-        public String toString(){
-            return new String(buffer,0,size);
-        }
-        public void uncheckedAppendBoolean(boolean val){
-            if(val){
-                uncheckedAppendTrue();
-            }else{
-                uncheckedAppendFalse();
-            }
-        }
-        public void uncheckedAppendChar(char val){
-            char[] buffer;
-            final int currSize;
-            if((currSize=this.size) == (buffer=this.buffer).length){
-                ArrCopy.semicheckedCopy(buffer,0,buffer=new char[OmniArray.growBy100Pct(currSize)],0,currSize);
-                this.buffer=buffer;
-            }
-            buffer[currSize]=val;
-            this.size=currSize + 1;
-        }
-        public void uncheckedAppendCommaAndSpace(){
-            final int currSize;
-            final char[] buffer;
-            (buffer=growBuffer(currSize=this.size,currSize + 2))[currSize]=',';
-            buffer[currSize + 1]=' ';
-        }
-        private char[] growBuffer(int currSize,int newSize){
-            final int capacity;
-            char[] buffer;
-            if(newSize - (capacity=(buffer=this.buffer).length) > 0){
-                ArrCopy.semicheckedCopy(buffer,0,buffer=new char[OmniArray.growBy100Pct(capacity,newSize)],0,currSize);
-                this.buffer=buffer;
-            }
-            this.size=newSize;
-            return buffer;
-        }
-
-        public void uncheckedAppendFloat(float val){
-            // TODO handle overflow better
-            char[] buffer;
-            final int currSize,capacity,newSize;
-            if((newSize=(currSize=this.size) + 15) - (capacity=(buffer=this.buffer).length) > 0){
-                ArrCopy.semicheckedCopy(buffer,0,buffer=new char[OmniArray.growBy100Pct(capacity,newSize)],0,currSize);
-                this.buffer=buffer;
-            }
-            this.size=getStringFloat(val,buffer,currSize);
-        }
-        // TODO uncheckedAppendDouble
-        public void uncheckedAppendInt(int val){
-            final char[] buffer;
-            final int newSize,currSize=this.size;
-            if(val < 0){
-                if(val == Integer.MIN_VALUE){
-                    uncheckedAppendIntMinVal(currSize);
-                    return;
-                }
-                (buffer=growBuffer(currSize,newSize=currSize + 1 + getStringSize(val=-val)))[currSize]='-';
-            }else{
-                buffer=growBuffer(currSize,newSize=currSize + getStringSize(val));
-            }
-            mediumDigits(val,buffer,newSize);
-        }
-        public void uncheckedAppendLong(long val){
-            final char[] buffer;
-            final int newSize,currSize=size;
-            if(val < 0L){
-                if(val == Long.MIN_VALUE){
-                    uncheckedAppendLongMinVal(currSize);
-                    return;
-                }
-                (buffer=growBuffer(currSize,newSize=currSize + 1 + getStringSize(val=-val)))[currSize]='-';
-            }else{
-                buffer=growBuffer(currSize,newSize=currSize + getStringSize(val));
-            }
-            largeDigits(val,buffer,newSize);
-        }
-        public void uncheckedAppendShort(int val){
-            final char[] buffer;
-            final int newSize,currSize=size;
-            if(val < 0){
-                (buffer=growBuffer(currSize,newSize=currSize + 1 + getStringSize(val=-val)))[currSize]='-';
-            }else{
-                buffer=growBuffer(currSize,newSize=currSize + getStringSize(val));
-            }
-            smallDigits(val,buffer,newSize);
-        }
-        private void uncheckedAppendFalse(){
-            final char[] buffer;
-            final int currSize;
-            (buffer=growBuffer(currSize=this.size,currSize + 5))[currSize]='f';
-            buffer[currSize + 1]='a';
-            buffer[currSize + 2]='l';
-            buffer[currSize + 3]='s';
-            buffer[currSize + 4]='e';
-        }
-        private void uncheckedAppendIntMinVal(int currSize){
-            final char[] buffer;
-            (buffer=growBuffer(currSize=this.size,currSize + 11))[currSize]='-';
-            buffer[++currSize]='2';
-            buffer[++currSize]='1';
-            buffer[++currSize]='4';
-            buffer[++currSize]='7';
-            buffer[++currSize]='4';
-            buffer[++currSize]='8';
-            buffer[++currSize]='3';
-            buffer[++currSize]='6';
-            buffer[++currSize]='4';
-            buffer[++currSize]='8';
-        }
-        private void uncheckedAppendLongMinVal(int currSize){
-            final char[] buffer;
-            (buffer=growBuffer(currSize=this.size,currSize + 20))[currSize]='-';
-            buffer[++currSize]='9';
-            buffer[++currSize]='2';
-            buffer[++currSize]='2';
-            buffer[++currSize]='3';
-            buffer[++currSize]='3';
-            buffer[++currSize]='7';
-            buffer[++currSize]='2';
-            buffer[++currSize]='0';
-            buffer[++currSize]='3';
-            buffer[++currSize]='6';
-            buffer[++currSize]='8';
-            buffer[++currSize]='5';
-            buffer[++currSize]='4';
-            buffer[++currSize]='7';
-            buffer[++currSize]='7';
-            buffer[++currSize]='5';
-            buffer[++currSize]='8';
-            buffer[++currSize]='0';
-            buffer[++currSize]='8';
-        }
-        private void uncheckedAppendTrue(){
-            final char[] buffer;
-            final int currSize;
-            (buffer=growBuffer(currSize=this.size,currSize + 4))[currSize]='t';
-            buffer[currSize + 1]='r';
-            buffer[currSize + 2]='u';
-            buffer[currSize + 3]='e';
-        }
-    }
-    /** Insert 0's into a character buffer.
-     *
-     * @param offset
-     *          The index in the buffer to insert the first 0.
-     * @param buffer
-     *          The buffer to insert 0's into.
-     * @param bound
-     *          The last index into which a zero will be placed PLUS ONE.
-     * @return The {@code bound} parameter. */
-    private static int fillZeros(int offset,final char[] buffer,final int bound){
-        for(;;){
-            if(offset==bound){ return offset; }
-            buffer[++offset]='0';
-        }
+        byte[] arr;
+        writer.write(arr=getShortByteBuffer(),0,getStringShort(i,arr,0));
     }
     /** A streamlined method for getting the number of trailing 0 bits in the fraction of a single-precision
      * floating-point number
@@ -494,31 +230,28 @@ public class ToStringUtil{
             --shift;
         }
     }
-    private static char[] getByteStrBuffer(){
-        return new char[4];
-    }
-    private static char[] getFloatStrBuffer(){
-        // TODO see if this can/should be made thread-localized
-        // (preferably without using ThreadLocal, which is too slow).
-        return new char[15];
-    }
-    private static char[] getIntStrBuffer(){
-        // TODO see if this can/should be made thread-localized
-        // (preferably without using ThreadLocal, which is too slow).
-        return new char[11];
-    }
-    private static char[] getLongStrBuffer(){
-        return new char[20];
-    }
-    private static char[] getShortStrBuffer(){
-        return new char[6];
-    }
     // TODO benchmark
     // private static int div10(int val){
     // // TODO optimize the multiplication here
     // return val*52429>>>19;
     // // int tmp=((tmp=((tmp=(val<<3)+(val<<4))<<4)+tmp)<<8)+tmp+val>>>19;
     // // return tmp;
+    // }
+    // // TODO benchmark
+    // static int mult10(int val){
+    // return (val<<3)+(val<<1);
+    // }
+    // // TODO benchmark
+    // static long mult10(long val){
+    // return (val<<3)+(val<<1);
+    // }
+    // // TODO benchmark
+    // static int mult100(int val){
+    // return (val<<6)+(val<<5)+(val<<2);
+    // }
+    // // TODO benchmark
+    // static long mult100(long val){
+    // return (val<<6)+(val<<5)+(val<<2);
     // }
     private static int getStringSize(int val){
         final int[] sizeTable=INT_SIZE_TABLE;
@@ -539,36 +272,377 @@ public class ToStringUtil{
             if(++i==19){ return 19; }
         }
     }
+    
+    
+    #MACRO OmniStringBuilderImpl<byte,Byte>()
+    #MACRO OmniStringBuilderImpl<char,Char>()
+#MACRODEF OmniStringBuilderImpl<BUFFERTYPE,SUFFIX>()
+public static class OmniStringBuilderSUFFIX{
+    public transient BUFFERTYPE[] buffer;
+    public transient int size;
+    public OmniStringBuilder(int size,BUFFERTYPE[] buffer){
+        this.size=size;
+        this.buffer=buffer;
+    }
+    @Override
+    public String toString(){
+        return new String(buffer,0,size);
+    }
+    public void uncheckedAppendBoolean(boolean val){
+        if(val){
+            uncheckedAppendTrue();
+        }else{
+            uncheckedAppendFalse();
+        }
+    }
+    public void uncheckedAppendChar(BUFFERTYPE val){
+        BUFFERTYPE[] buffer;
+        final int currSize;
+        if((currSize=this.size) == (buffer=this.buffer).length){
+            ArrCopy.semicheckedCopy(buffer,0,buffer=new BUFFERTYPE[OmniArray.growBy100Pct(currSize)],0,currSize);
+            this.buffer=buffer;
+        }
+        buffer[currSize]=val;
+        this.size=currSize + 1;
+    }
+    public void uncheckedAppendCommaAndSpace(){
+        final int currSize;
+        final BUFFERTYPE[] buffer;
+        (buffer=growBuffer(currSize=this.size,currSize + 2))[currSize]=',';
+        buffer[currSize + 1]=(BUFFERTYPE)' ';
+    }
+    private BUFFERTYPE[] growBuffer(int currSize,int newSize){
+        final int capacity;
+        BUFFERTYPE[] buffer;
+        if(newSize - (capacity=(buffer=this.buffer).length) > 0){
+            ArrCopy.semicheckedCopy(buffer,0,buffer=new BUFFERTYPE[OmniArray.growBy100Pct(capacity,newSize)],0,currSize);
+            this.buffer=buffer;
+        }
+        this.size=newSize;
+        return buffer;
+    }
+
+    public void uncheckedAppendFloat(float val){
+        // TODO handle overflow better
+        BUFFERTYPE[] buffer;
+        final int currSize,capacity,newSize;
+        if((newSize=(currSize=this.size) + 15) - (capacity=(buffer=this.buffer).length) > 0){
+            ArrCopy.semicheckedCopy(buffer,0,buffer=new BUFFERTYPE[OmniArray.growBy100Pct(capacity,newSize)],0,currSize);
+            this.buffer=buffer;
+        }
+        this.size=getStringFloat(val,buffer,currSize);
+    }
+    // TODO uncheckedAppendDouble
+    public void uncheckedAppendInt(int val){
+        final BUFFERTYPE[] buffer;
+        final int newSize,currSize=this.size;
+        if(val < 0){
+            if(val == Integer.MIN_VALUE){
+                uncheckedAppendIntMinVal(currSize);
+                return;
+            }
+            (buffer=growBuffer(currSize,newSize=currSize + 1 + getStringSize(val=-val)))[currSize]='-';
+        }else{
+            buffer=growBuffer(currSize,newSize=currSize + getStringSize(val));
+        }
+        mediumDigits(val,buffer,newSize);
+    }
+    public void uncheckedAppendLong(long val){
+        final BUFFERTYPE[] buffer;
+        final int newSize,currSize=size;
+        if(val < 0L){
+            if(val == Long.MIN_VALUE){
+                uncheckedAppendLongMinVal(currSize);
+                return;
+            }
+            (buffer=growBuffer(currSize,newSize=currSize + 1 + getStringSize(val=-val)))[currSize]='-';
+        }else{
+            buffer=growBuffer(currSize,newSize=currSize + getStringSize(val));
+        }
+        largeDigits(val,buffer,newSize);
+    }
+    public void uncheckedAppendShort(int val){
+        final BUFFERTYPE[] buffer;
+        final int newSize,currSize=size;
+        if(val < 0){
+            (buffer=growBuffer(currSize,newSize=currSize + 1 + getStringSize(val=-val)))[currSize]='-';
+        }else{
+            buffer=growBuffer(currSize,newSize=currSize + getStringSize(val));
+        }
+        smallDigits(val,buffer,newSize);
+    }
+    private void uncheckedAppendFalse(){
+        final BUFFERTYPE[] buffer;
+        final int currSize;
+        (buffer=growBuffer(currSize=this.size,currSize + 5))[currSize]=(BUFFERTYPE)'f';
+        buffer[currSize + 1]=(BUFFERTYPE)'a';
+        buffer[currSize + 2]=(BUFFERTYPE)'l';
+        buffer[currSize + 3]=(BUFFERTYPE)'s';
+        buffer[currSize + 4]=(BUFFERTYPE)'e';
+    }
+    private void uncheckedAppendIntMinVal(int currSize){
+        final BUFFERTYPE[] buffer;
+        (buffer=growBuffer(currSize=this.size,currSize + 11))[currSize]=(BUFFERTYPE)'-';
+        buffer[++currSize]=(BUFFERTYPE)'2';
+        buffer[++currSize]=(BUFFERTYPE)'1';
+        buffer[++currSize]=(BUFFERTYPE)'4';
+        buffer[++currSize]=(BUFFERTYPE)'7';
+        buffer[++currSize]=(BUFFERTYPE)'4';
+        buffer[++currSize]=(BUFFERTYPE)'8';
+        buffer[++currSize]=(BUFFERTYPE)'3';
+        buffer[++currSize]=(BUFFERTYPE)'6';
+        buffer[++currSize]=(BUFFERTYPE)'4';
+        buffer[++currSize]=(BUFFERTYPE)'8';
+    }
+    private void uncheckedAppendLongMinVal(int currSize){
+        final BUFFERTYPE[] buffer;
+        (buffer=growBuffer(currSize=this.size,currSize + 20))[currSize]=(BUFFERTYPE)'-';
+        buffer[++currSize]=(BUFFERTYPE)'9';
+        buffer[++currSize]=(BUFFERTYPE)'2';
+        buffer[++currSize]=(BUFFERTYPE)'2';
+        buffer[++currSize]=(BUFFERTYPE)'3';
+        buffer[++currSize]=(BUFFERTYPE)'3';
+        buffer[++currSize]=(BUFFERTYPE)'7';
+        buffer[++currSize]=(BUFFERTYPE)'2';
+        buffer[++currSize]=(BUFFERTYPE)'0';
+        buffer[++currSize]=(BUFFERTYPE)'3';
+        buffer[++currSize]=(BUFFERTYPE)'6';
+        buffer[++currSize]=(BUFFERTYPE)'8';
+        buffer[++currSize]=(BUFFERTYPE)'5';
+        buffer[++currSize]=(BUFFERTYPE)'4';
+        buffer[++currSize]=(BUFFERTYPE)'7';
+        buffer[++currSize]=(BUFFERTYPE)'7';
+        buffer[++currSize]=(BUFFERTYPE)'5';
+        buffer[++currSize]=(BUFFERTYPE)'8';
+        buffer[++currSize]=(BUFFERTYPE)'0';
+        buffer[++currSize]=(BUFFERTYPE)'8';
+    }
+    private void uncheckedAppendTrue(){
+        final BUFFERTYPE[] buffer;
+        final int currSize;
+        (buffer=growBuffer(currSize=this.size,currSize + 4))[currSize]=(BUFFERTYPE)'t';
+        buffer[currSize + 1]=(BUFFERTYPE)'r';
+        buffer[currSize + 2]=(BUFFERTYPE)'u';
+        buffer[currSize + 3]=(BUFFERTYPE)'e';
+    }
+}
+#ENDDEF
+    
+    #MACRO GetStringImpls<char,Char>()
+    #MACRO GetStringImpls<byte,Byte>()
+#MACRODEF GetStringImpls<BUFFERTYPE,SUFFIX>()
+    private final static BUFFERTYPE[] DIGIT_TENSSUFFIX={(BUFFERTYPE)'0',(BUFFERTYPE)'0',(BUFFERTYPE)'0',(BUFFERTYPE)'0',(BUFFERTYPE)'0',(BUFFERTYPE)'0',(BUFFERTYPE)'0',(BUFFERTYPE)'0',(BUFFERTYPE)'0',(BUFFERTYPE)'0',(BUFFERTYPE)'1',(BUFFERTYPE)'1',(BUFFERTYPE)'1',(BUFFERTYPE)'1',(BUFFERTYPE)'1',(BUFFERTYPE)'1',(BUFFERTYPE)'1',(BUFFERTYPE)'1',(BUFFERTYPE)'1',
+            (BUFFERTYPE)'1',(BUFFERTYPE)'2',(BUFFERTYPE)'2',(BUFFERTYPE)'2',(BUFFERTYPE)'2',(BUFFERTYPE)'2',(BUFFERTYPE)'2',(BUFFERTYPE)'2',(BUFFERTYPE)'2',(BUFFERTYPE)'2',(BUFFERTYPE)'2',(BUFFERTYPE)'3',(BUFFERTYPE)'3',(BUFFERTYPE)'3',(BUFFERTYPE)'3',(BUFFERTYPE)'3',(BUFFERTYPE)'3',(BUFFERTYPE)'3',(BUFFERTYPE)'3',(BUFFERTYPE)'3',(BUFFERTYPE)'3',(BUFFERTYPE)'4',(BUFFERTYPE)'4',(BUFFERTYPE)'4',(BUFFERTYPE)'4',(BUFFERTYPE)'4',(BUFFERTYPE)'4',
+            (BUFFERTYPE)'4',(BUFFERTYPE)'4',(BUFFERTYPE)'4',(BUFFERTYPE)'4',(BUFFERTYPE)'5',(BUFFERTYPE)'5',(BUFFERTYPE)'5',(BUFFERTYPE)'5',(BUFFERTYPE)'5',(BUFFERTYPE)'5',(BUFFERTYPE)'5',(BUFFERTYPE)'5',(BUFFERTYPE)'5',(BUFFERTYPE)'5',(BUFFERTYPE)'6',(BUFFERTYPE)'6',(BUFFERTYPE)'6',(BUFFERTYPE)'6',(BUFFERTYPE)'6',(BUFFERTYPE)'6',(BUFFERTYPE)'6',(BUFFERTYPE)'6',(BUFFERTYPE)'6',(BUFFERTYPE)'6',(BUFFERTYPE)'7',(BUFFERTYPE)'7',(BUFFERTYPE)'7',
+            (BUFFERTYPE)'7',(BUFFERTYPE)'7',(BUFFERTYPE)'7',(BUFFERTYPE)'7',(BUFFERTYPE)'7',(BUFFERTYPE)'7',(BUFFERTYPE)'7',(BUFFERTYPE)'8',(BUFFERTYPE)'8',(BUFFERTYPE)'8',(BUFFERTYPE)'8',(BUFFERTYPE)'8',(BUFFERTYPE)'8',(BUFFERTYPE)'8',(BUFFERTYPE)'8',(BUFFERTYPE)'8',(BUFFERTYPE)'8',(BUFFERTYPE)'9',(BUFFERTYPE)'9',(BUFFERTYPE)'9',(BUFFERTYPE)'9',(BUFFERTYPE)'9',(BUFFERTYPE)'9',(BUFFERTYPE)'9',(BUFFERTYPE)'9',(BUFFERTYPE)'9',
+            (BUFFERTYPE)'9',};
+    private final static BUFFERTYPE[] DIGIT_ONESSUFFIX={(BUFFERTYPE)'0',(BUFFERTYPE)'1',(BUFFERTYPE)'2',(BUFFERTYPE)'3',(BUFFERTYPE)'4',(BUFFERTYPE)'5',(BUFFERTYPE)'6',(BUFFERTYPE)'7',(BUFFERTYPE)'8',(BUFFERTYPE)'9',(BUFFERTYPE)'0',(BUFFERTYPE)'1',(BUFFERTYPE)'2',(BUFFERTYPE)'3',(BUFFERTYPE)'4',(BUFFERTYPE)'5',(BUFFERTYPE)'6',(BUFFERTYPE)'7',(BUFFERTYPE)'8',
+            (BUFFERTYPE)'9',(BUFFERTYPE)'0',(BUFFERTYPE)'1',(BUFFERTYPE)'2',(BUFFERTYPE)'3',(BUFFERTYPE)'4',(BUFFERTYPE)'5',(BUFFERTYPE)'6',(BUFFERTYPE)'7',(BUFFERTYPE)'8',(BUFFERTYPE)'9',(BUFFERTYPE)'0',(BUFFERTYPE)'1',(BUFFERTYPE)'2',(BUFFERTYPE)'3',(BUFFERTYPE)'4',(BUFFERTYPE)'5',(BUFFERTYPE)'6',(BUFFERTYPE)'7',(BUFFERTYPE)'8',(BUFFERTYPE)'9',(BUFFERTYPE)'0',(BUFFERTYPE)'1',(BUFFERTYPE)'2',(BUFFERTYPE)'3',(BUFFERTYPE)'4',(BUFFERTYPE)'5',
+            (BUFFERTYPE)'6',(BUFFERTYPE)'7',(BUFFERTYPE)'8',(BUFFERTYPE)'9',(BUFFERTYPE)'0',(BUFFERTYPE)'1',(BUFFERTYPE)'2',(BUFFERTYPE)'3',(BUFFERTYPE)'4',(BUFFERTYPE)'5',(BUFFERTYPE)'6',(BUFFERTYPE)'7',(BUFFERTYPE)'8',(BUFFERTYPE)'9',(BUFFERTYPE)'0',(BUFFERTYPE)'1',(BUFFERTYPE)'2',(BUFFERTYPE)'3',(BUFFERTYPE)'4',(BUFFERTYPE)'5',(BUFFERTYPE)'6',(BUFFERTYPE)'7',(BUFFERTYPE)'8',(BUFFERTYPE)'9',(BUFFERTYPE)'0',(BUFFERTYPE)'1',(BUFFERTYPE)'2',
+            (BUFFERTYPE)'3',(BUFFERTYPE)'4',(BUFFERTYPE)'5',(BUFFERTYPE)'6',(BUFFERTYPE)'7',(BUFFERTYPE)'8',(BUFFERTYPE)'9',(BUFFERTYPE)'0',(BUFFERTYPE)'1',(BUFFERTYPE)'2',(BUFFERTYPE)'3',(BUFFERTYPE)'4',(BUFFERTYPE)'5',(BUFFERTYPE)'6',(BUFFERTYPE)'7',(BUFFERTYPE)'8',(BUFFERTYPE)'9',(BUFFERTYPE)'0',(BUFFERTYPE)'1',(BUFFERTYPE)'2',(BUFFERTYPE)'3',(BUFFERTYPE)'4',(BUFFERTYPE)'5',(BUFFERTYPE)'6',(BUFFERTYPE)'7',(BUFFERTYPE)'8',
+            (BUFFERTYPE)'9',};
+    /** Place the string representation of the provided boolean value into the provided BUFFERTYPE buffer.
+     *
+     * @param i
+     *          The boolean value to get the string of.
+     * @param buffer
+     *          The BUFFERTYPE buffer.
+     * @param offset
+     *          The first index to begin inserting BUFFERTYPEs in the BUFFERTYPE buffer.
+     * @return The last index into which a BUFFERTYPE was inserted PLUS ONE. */
+    public static int getStringBoolean(boolean i,BUFFERTYPE[] buffer,int offset){
+        if(i){
+            buffer[offset]=(BUFFERTYPE)'t';
+            buffer[++offset]=(BUFFERTYPE)'r';
+            buffer[++offset]=(BUFFERTYPE)'u';
+        }else{
+            buffer[offset]=(BUFFERTYPE)'f';
+            buffer[++offset]=(BUFFERTYPE)'a';
+            buffer[++offset]=(BUFFERTYPE)'l';
+            buffer[++offset]=(BUFFERTYPE)'s';
+        }
+        buffer[++offset]=(BUFFERTYPE)'e';
+        return ++offset;
+    }
+    /** Place the string representation of the provided single-precision float value into the provided BUFFERTYPE buffer.
+     *
+     * @param f
+     *          The single-precision float value to get the string of.
+     * @param buffer
+     *          The BUFFERTYPE buffer.
+     * @param offset
+     *          The first index to begin inserting BUFFERTYPEs in the BUFFERTYPE buffer.
+     * @return The last index into which a BUFFERTYPE was inserted PLUS ONE. */
+    public static int getStringFloat(final float f,final BUFFERTYPE[] buffer,int offset){
+        final int rawBits;
+        final int binaryExponent=(((rawBits=Float.floatToRawIntBits(f))&0x7f800000)>>23)-127;
+        if(binaryExponent==128){ return infinityOrNaNToASCII(buffer,offset,rawBits); }
+        if((rawBits&Integer.MIN_VALUE)!=0){
+            buffer[offset++]=(BUFFERTYPE)'-';
+        }
+        final int fractBits=rawBits&0x7fffff;
+        if(binaryExponent==-127){
+            if(fractBits==0){
+                buffer[offset]=(BUFFERTYPE)'0';
+                buffer[++offset]=(BUFFERTYPE)'.';
+                buffer[++offset]=(BUFFERTYPE)'0';
+                return ++offset;
+            }
+            return FltDenorm.toASCII(fractBits,buffer,offset);
+        }
+        if(binaryExponent<0){ return FltLT1.toASCII(fractBits,binaryExponent,buffer,offset); }
+        return FltGTE1.toASCII(fractBits,binaryExponent,buffer,offset);
+    }
+    /** Place the string representation of the provided int value into the provided BUFFERTYPE buffer.
+     *
+     * @param i
+     *          The int value to get the string of.
+     * @param buffer
+     *          The BUFFERTYPE buffer.
+     * @param offset
+     *          The first index to begin inserting BUFFERTYPEs in the BUFFERTYPE buffer.
+     * @return The last index into which a BUFFERTYPE was inserted PLUS ONE. */
+    public static int getStringInt(int i,BUFFERTYPE[] buffer,int offset){
+        if(i<0){
+            buffer[offset++]=(BUFFERTYPE)'-';
+            if(i==Integer.MIN_VALUE){
+                buffer[offset]=(BUFFERTYPE)'2';
+                buffer[++offset]=(BUFFERTYPE)'1';
+                buffer[++offset]=(BUFFERTYPE)'4';
+                buffer[++offset]=(BUFFERTYPE)'7';
+                buffer[++offset]=(BUFFERTYPE)'4';
+                buffer[++offset]=(BUFFERTYPE)'8';
+                buffer[++offset]=(BUFFERTYPE)'3';
+                buffer[++offset]=(BUFFERTYPE)'6';
+                buffer[++offset]=(BUFFERTYPE)'4';
+                buffer[++offset]=(BUFFERTYPE)'8';
+                return ++offset;
+            }
+            i=-i;
+        }
+        mediumDigits(i,buffer,offset+=getStringSize(i));
+        return offset;
+    }
+    /** Place the string representation of the provided long value into the provided BUFFERTYPE buffer.
+     *
+     * @param l
+     *          The long value to get the string of.
+     * @param buffer
+     *          The BUFFERTYPE buffer.
+     * @param offset
+     *          The first index to begin inserting BUFFERTYPEs in the BUFFERTYPE buffer.
+     * @return The last index into which a BUFFERTYPE was inserted PLUS ONE. */
+    public static int getStringLong(long l,BUFFERTYPE[] buffer,int offset){
+        if(l<0L){
+            buffer[offset++]=(BUFFERTYPE)'-';
+            if(l==Long.MIN_VALUE){
+                buffer[offset]=(BUFFERTYPE)'9';
+                buffer[++offset]=(BUFFERTYPE)'2';
+                buffer[++offset]=(BUFFERTYPE)'2';
+                buffer[++offset]=(BUFFERTYPE)'3';
+                buffer[++offset]=(BUFFERTYPE)'3';
+                buffer[++offset]=(BUFFERTYPE)'7';
+                buffer[++offset]=(BUFFERTYPE)'2';
+                buffer[++offset]=(BUFFERTYPE)'0';
+                buffer[++offset]=(BUFFERTYPE)'3';
+                buffer[++offset]=(BUFFERTYPE)'6';
+                buffer[++offset]=(BUFFERTYPE)'8';
+                buffer[++offset]=(BUFFERTYPE)'5';
+                buffer[++offset]=(BUFFERTYPE)'4';
+                buffer[++offset]=(BUFFERTYPE)'7';
+                buffer[++offset]=(BUFFERTYPE)'7';
+                buffer[++offset]=(BUFFERTYPE)'5';
+                buffer[++offset]=(BUFFERTYPE)'8';
+                buffer[++offset]=(BUFFERTYPE)'0';
+                buffer[++offset]=(BUFFERTYPE)'8';
+                return ++offset;
+            }
+            l=-l;
+        }
+        largeDigits(l,buffer,offset+=getStringSize(l));
+        return offset;
+    }
+    /** Place the string representation of the provided long value into the provided BUFFERTYPE buffer.
+     *
+     * @param l
+     *          The long value to get the string of.
+     * @param buffer
+     *          The BUFFERTYPE buffer.
+     * @param offset
+     *          The first index to begin inserting BUFFERTYPEs in the BUFFERTYPE buffer.
+     * @return The last index into which a BUFFERTYPE was inserted PLUS ONE. */
+    public static int getStringShort(int i,BUFFERTYPE[] buffer,int offset){
+        if(i<0){
+            buffer[offset++]=(BUFFERTYPE)'-';
+            i=-i;
+        }
+        smallDigits(i,buffer,offset+=getStringSize(i));
+        return offset;
+    }
+    /** Insert 0's into a BUFFERTYPE buffer.
+     *
+     * @param offset
+     *          The index in the buffer to insert the first 0.
+     * @param buffer
+     *          The buffer to insert 0's into.
+     * @param bound
+     *          The last index into which a zero will be placed PLUS ONE.
+     * @return The {@code bound} parameter. */
+    private static int fillZeros(int offset,final BUFFERTYPE[] buffer,final int bound){
+        for(;;){
+            if(offset==bound){ return offset; }
+            buffer[++offset]=(BUFFERTYPE)'0';
+        }
+    }
+    private static BUFFERTYPE[] getByteSUFFIXBuffer(){
+        return new BUFFERTYPE[4];
+    }
+    private static BUFFERTYPE[] getFloatSUFFIXBuffer(){
+        // TODO see if this can/should be made thread-localized
+        // (preferably without using ThreadLocal, which is too slow).
+        return new BUFFERTYPE[15];
+    }
+    private static BUFFERTYPE[] getIntSUFFIXBuffer(){
+        // TODO see if this can/should be made thread-localized
+        // (preferably without using ThreadLocal, which is too slow).
+        return new BUFFERTYPE[11];
+    }
+    private static BUFFERTYPE[] getLongSUFFIXBuffer(){
+        return new BUFFERTYPE[20];
+    }
+    private static BUFFERTYPE[] getShortSUFFIXBuffer(){
+        return new BUFFERTYPE[6];
+    }
     /** Print the characters for "Infinity" or "NaN" (positive or negative).
      *
      * @param buffer
-     *          The character buffer to point to.
+     *          The BUFFERTYPE buffer to point to.
      * @param offset
-     *          The first index to insert characters.
+     *          The first index to insert BUFFERTYPEs.
      * @param rawBits
      *          The raw bits provided by {@link Float#floatToRawIntBits(float)}
      * @return The offset in the buffer just after the index where the last character was inserted. */
-    private static int infinityOrNaNToASCII(final char[] buffer,int offset,final int rawBits){
+    private static int infinityOrNaNToASCII(final BUFFERTYPE[] buffer,int offset,final int rawBits){
         if((rawBits&0x7fffff)==0){
             if((rawBits&Integer.MIN_VALUE)!=0){
-                buffer[offset++]='-';
+                buffer[offset++]=(BUFFERTYPE)'-';
             }
-            buffer[offset]='I';
-            buffer[++offset]='n';
-            buffer[++offset]='f';
-            buffer[++offset]='i';
-            buffer[++offset]='n';
-            buffer[++offset]='i';
-            buffer[++offset]='t';
-            buffer[++offset]='y';
+            buffer[offset]=(BUFFERTYPE)'I';
+            buffer[++offset]=(BUFFERTYPE)'n';
+            buffer[++offset]=(BUFFERTYPE)'f';
+            buffer[++offset]=(BUFFERTYPE)'i';
+            buffer[++offset]=(BUFFERTYPE)'n';
+            buffer[++offset]=(BUFFERTYPE)'i';
+            buffer[++offset]=(BUFFERTYPE)'t';
+            buffer[++offset]=(BUFFERTYPE)'y';
         }else{
-            buffer[offset]='N';
-            buffer[++offset]='a';
-            buffer[++offset]='N';
+            buffer[offset]=(BUFFERTYPE)'N';
+            buffer[++offset]=(BUFFERTYPE)'a';
+            buffer[++offset]=(BUFFERTYPE)'N';
         }
         return ++offset;
     }
-    private static void largeDigits(long val,char[] buffer,int digitOffset){
+    private static void largeDigits(long val,BUFFERTYPE[] buffer,int digitOffset){
         for(;;){
             if(val<2147483648L){
                 mediumDigits((int)val,buffer,digitOffset);
@@ -581,12 +655,12 @@ public class ToStringUtil{
             // final int r=(int)(val-(tmp<<6)+(tmp<<5)+(tmp<<2));
             long tmp;
             int r;
-            buffer[--digitOffset]=DIGIT_ONES[r=(int)(val-(tmp=val/100)*100)];
-            buffer[--digitOffset]=DIGIT_TENS[r];
+            buffer[--digitOffset]=DIGIT_ONESSUFFIX[r=(int)(val-(tmp=val/100)*100)];
+            buffer[--digitOffset]=DIGIT_TENSSUFFIX[r];
             val=tmp;
         }
     }
-    private static void mediumDigits(int val,char[] buffer,int digitOffset){
+    private static void mediumDigits(int val,BUFFERTYPE[] buffer,int digitOffset){
         for(;;){
             // TODO the stock Integer class uses 66536 as the threshold, but values
             // should
@@ -606,48 +680,32 @@ public class ToStringUtil{
             // (valid for val < 4908534099L
             // final int tmp=(int)(((long)val*1374389535)>>>37);
             int tmp;
-            // buffer[--digitOffset]=DIGIT_ONES[val-=mult100(tmp=val/100)];
-            buffer[--digitOffset]=DIGIT_ONES[val-=(tmp=val/100)*100];
-            buffer[--digitOffset]=DIGIT_TENS[val];
+            // buffer[--digitOffset]=DIGIT_ONESSUFFIX[val-=mult100(tmp=val/100)];
+            buffer[--digitOffset]=DIGIT_ONESSUFFIX[val-=(tmp=val/100)*100];
+            buffer[--digitOffset]=DIGIT_TENSSUFFIX[val];
             val=tmp;
         }
     }
-    // // TODO benchmark
-    // static int mult10(int val){
-    // return (val<<3)+(val<<1);
-    // }
-    // // TODO benchmark
-    // static long mult10(long val){
-    // return (val<<3)+(val<<1);
-    // }
-    // // TODO benchmark
-    // static int mult100(int val){
-    // return (val<<6)+(val<<5)+(val<<2);
-    // }
-    // // TODO benchmark
-    // static long mult100(long val){
-    // return (val<<6)+(val<<5)+(val<<2);
-    // }
     /**
      * <p>
      * This shift-add technique was shamelessly ripped from {@link java.lang.Integer Integer}. It is equivalent to:
      *
      * <pre>
      * int tmp=(val*52429)>>>19;
-     * char c=(char)(((tmp<<3)+(q<<1))+'0');
+     * BUFFERTYPE c=(BUFFERTYPE)(((tmp<<3)+(q<<1))+'0');
      * </pre>
      *
      * This is as it appears in {@link java.lang.Integer Integer}. It is, in turn, equivalent to
      *
      * <pre>
      *   int tmp = val / 10;
-     *   char c  = (char)(( val - ( tmp * 10 ) + '0' );
+     *   BUFFERTYPE c  = (BUFFERTYPE)(( val - ( tmp * 10 ) + '0' );
      * </pre>
      *
      * which is in turn equivalent to
      *
      * <pre>
-     * char c=val%10;
+     * BUFFERTYPE c=val%10;
      * </pre>
      *
      * We want to avoid div and mod at all costs.
@@ -660,35 +718,25 @@ public class ToStringUtil{
      *          The index at which to place the character.
      * @param val
      *          The integer value from which to pull the lowest-order decimal digit. */
-    private static void smallDigits(int val,char[] buffer,int digitOffset){
+    private static void smallDigits(int val,BUFFERTYPE[] buffer,int digitOffset){
         for(;;){
             if(val<10){
-                buffer[--digitOffset]=(char)(val+'0');
+                buffer[--digitOffset]=(BUFFERTYPE)(val+'0');
                 return;
             }
-            buffer[--digitOffset]=(char)(val-(val=val*52429>>>19)*10+'0');
+            buffer[--digitOffset]=(BUFFERTYPE)(val-(val=val*52429>>>19)*10+'0');
         }
     }
-    private ToStringUtil(){}
+#ENDDEF
     private interface BigMathFltToASCII{
         int getChars(int decimalExponent,char[] buffer,int offset);
+        int getBytes(int decimalExponent,byte[] buffer,int offset);
     }
     /** This class is responsible for printing the digits of a single-precision floating point number when the floating
      * point number is de-normalized.
      *
      * @author lyonste */
     private static class FltDenorm{
-        static int toASCII(int fractBits,char[] buffer,int offset){
-            int lead0s;
-            final int decimalExponent=estimateDecimalExponent(fractBits);
-            BigMathFltToASCII bsm;
-            if(31-fpFractNumTrailing0s(fractBits)-(lead0s=fpFractLeading0s(fractBits))==0){
-                bsm=new BigMathDenorm32Bit(decimalExponent,lead0s);
-            }else{
-                bsm=new BigMathDenorm64Bit(fractBits,decimalExponent);
-            }
-            return bsm.getChars(decimalExponent,buffer,offset);
-        }
         private static int estimateDecimalExponent(final int fractBits){
             if(fractBits>7136237){ return 38; }
             if(fractBits>713623){ return 39; }
@@ -708,18 +756,34 @@ public class ToStringUtil{
                 mask>>>=1;
             }
         }
-        private static int printDenormalizedFltExponent(int estimatedDecimalExponent,final char[] buffer,int offset){
-            buffer[++offset]='E';
-            buffer[++offset]='-';
-            if(estimatedDecimalExponent<40){
-                buffer[++offset]='3';
-                estimatedDecimalExponent+=10;
-            }else{
-                buffer[++offset]='4';
-            }
-            buffer[++offset]=(char)(estimatedDecimalExponent+8);
-            return ++offset;
-        }
+        #MACRO FltDenormToASCII<char,Char>()
+        #MACRO FltDenormToASCII<byte,Byte>()
+#MACRODEF FltDenormToASCII<BUFFERTYPE,SUFFIX>()
+static int toASCII(int fractBits,BUFFERTYPE[] buffer,int offset){
+    int lead0s;
+    final int decimalExponent=estimateDecimalExponent(fractBits);
+    BigMathFltToASCII bsm;
+    if(31-fpFractNumTrailing0s(fractBits)-(lead0s=fpFractLeading0s(fractBits))==0){
+        bsm=new BigMathDenorm32Bit(decimalExponent,lead0s);
+    }else{
+        bsm=new BigMathDenorm64Bit(fractBits,decimalExponent);
+    }
+    return bsm.getSUFFIXs(decimalExponent,buffer,offset);
+}
+private static int printDenormalizedFltExponent(int estimatedDecimalExponent,final BUFFERTYPE[] buffer,int offset){
+    buffer[++offset]=(BUFFERTYPE)'E';
+    buffer[++offset]=(BUFFERTYPE)'-';
+    if(estimatedDecimalExponent<40){
+        buffer[++offset]=(BUFFERTYPE)'3';
+        estimatedDecimalExponent+=10;
+    }else{
+        buffer[++offset]=(BUFFERTYPE)'4';
+    }
+    buffer[++offset]=(BUFFERTYPE)(estimatedDecimalExponent+8);
+    return ++offset;
+}
+#ENDDEF
+        
         /** This class is used to perform the math necessary to produce the decimal digits for de-normalized numbers
          * whenever it is possible to do so with only 32 bits of resolution.
          *
@@ -733,36 +797,41 @@ public class ToStringUtil{
                 b=(int)((pow5Arr=POW_5_128)[index=(decimalExponent-26<<1)+1]<<5-lead0s+decimalExponent>>>32);
                 m=(int)(pow5Arr[index+2]>>>59-decimalExponent);
             }
-            @Override public int getChars(final int decimalExponent,final char[] buffer,int offset){
-                int b;
-                int c=(b=this.b)>>>27;
-                if(c==8){
-                    buffer[offset]='9';
-                    buffer[++offset]='.';
-                    buffer[++offset]='0';
-                }else{
-                    b&=(1<<27)-1;
-                    buffer[offset]=(char)(c+'0');
-                    buffer[++offset]='.';
-                    int m=this.m;
-                    for(;;){
-                        c=(b*=10)>>>27;
-                    if((b&=(1<<27)-1)+m>1<<27){
-                        if(b>1<<26){
-                            ++c;
-                        }
-                        break;
-                    }
-                    if(b<m){
-                        break;
-                    }
-                    m*=10;
-                    buffer[++offset]=(char)(c+'0');
-                    }
-                    buffer[++offset]=(char)(c+'0');
-                }
-                return printDenormalizedFltExponent(decimalExponent,buffer,offset);
+            #MACRO BigMathDenorm32Bit<byte,Byte>()
+            #MACRO BigMathDenorm32Bit<char,Char>()
+#MACRODEF BigMathDenorm32Bit<BUFFERTYPE,SUFFIX>()
+@Override public int getSUFFIXs(final int decimalExponent,final BUFFERTYPE[] buffer,int offset){
+    int b;
+    int c=(b=this.b)>>>27;
+    if(c==8){
+        buffer[offset]=(BUFFERTYPE)'9';
+        buffer[++offset]=(BUFFERTYPE)'.';
+        buffer[++offset]=(BUFFERTYPE)'0';
+    }else{
+        b&=(1<<27)-1;
+        buffer[offset]=(BUFFERTYPE)(c+'0');
+        buffer[++offset]=(BUFFERTYPE)'.';
+        int m=this.m;
+        for(;;){
+            c=(b*=10)>>>27;
+        if((b&=(1<<27)-1)+m>1<<27){
+            if(b>1<<26){
+                ++c;
             }
+            break;
+        }
+        if(b<m){
+            break;
+        }
+        m*=10;
+        buffer[++offset]=(BUFFERTYPE)(c+'0');
+        }
+        buffer[++offset]=(BUFFERTYPE)(c+'0');
+    }
+    return printDenormalizedFltExponent(decimalExponent,buffer,offset);
+}
+#ENDDEF
+            
         }
         /** This class is used to perform the math necessary to produce the decimal digits for de-normalized numbers
          * whenever 64 bits of resolution are required.
@@ -778,36 +847,41 @@ public class ToStringUtil{
                         +pow5Arr[++index]*fractBits<<decimalExponent;
                 m=pow5Arr[index+2]<<decimalExponent;
             }
-            @Override public int getChars(int decimalExponent,char[] buffer,int offset){
-                long b;
-                long m=this.m;
-                buffer[offset]=(char)((int)((b=this.b)>>>59)+'0');
-                buffer[++offset]='.';
-                b=(b&(1L<<59)-1)*10;
-                int c;
-                for(;;){
-                    c=(int)(b>>>59);
-                    if((b&=(1L<<59)-1)+m>1L<<59){
-                        if(b>1L<<58){
-                            if(c==9){
-                                c=0;
-                                ++buffer[offset-1];
-                            }else{
-                                ++c;
-                            }
-                        }
-                        break;
-                    }
-                    if(b<m){
-                        break;
-                    }
-                    buffer[++offset]=(char)(c+'0');
-                    b*=10;
-                    m*=10;
+            #MACRO BigMathDenorm64Bit<byte,Byte>()
+            #MACRO BigMathDenorm64Bit<char,Char>()
+#MACRODEF BigMathDenorm64Bit<BUFFERTYPE,SUFFIX>()
+@Override public int getSUFFIXs(int decimalExponent,BUFFERTYPE[] buffer,int offset){
+    long b;
+    long m=this.m;
+    buffer[offset]=(BUFFERTYPE)((int)((b=this.b)>>>59)+'0');
+    buffer[++offset]=(BUFFERTYPE)'.';
+    b=(b&(1L<<59)-1)*10;
+    int c;
+    for(;;){
+        c=(int)(b>>>59);
+        if((b&=(1L<<59)-1)+m>1L<<59){
+            if(b>1L<<58){
+                if(c==9){
+                    c=0;
+                    ++buffer[offset-1];
+                }else{
+                    ++c;
                 }
-                buffer[++offset]=(char)(c+'0');
-                return printDenormalizedFltExponent(decimalExponent,buffer,offset);
             }
+            break;
+        }
+        if(b<m){
+            break;
+        }
+        buffer[++offset]=(BUFFERTYPE)(c+'0');
+        b*=10;
+        m*=10;
+    }
+    buffer[++offset]=(BUFFERTYPE)(c+'0');
+    return printDenormalizedFltExponent(decimalExponent,buffer,offset);
+}
+#ENDDEF
+
         }
     }
     /** This class is responsible for printing the digits of a single-precision floating point number when the absolute
@@ -837,80 +911,102 @@ public class ToStringUtil{
                 37,37,37,37,// 123,124,125,126
                 38,// 127
         };
-        static int toASCII(int fractBits,final int binaryExponent,final char[] buffer,int offset){
-            if(fractBits==0){
-                if(binaryExponent>86){ return BigMathGTE1.toASCII(binaryExponent,buffer,offset); }
-                if(binaryExponent>62){ return LongMathGTE1.toASCII(binaryExponent,buffer,offset); }
-                if(binaryExponent>23){ return Pow2GTE1.toASCII(binaryExponent,buffer,offset); }
-                mediumDigits(fractBits=1<<binaryExponent,buffer,offset+=getStringSize(fractBits));
-                buffer[offset]='.';
-                buffer[++offset]='0';
-                return ++offset;
-            }else{
-                if(fpFractNumTrailing0s(fractBits|=0x800000)+binaryExponent>22
-                        &&binaryExponent<63){ return Pow2GTE1.toASCII(fractBits,binaryExponent,buffer,offset); }
-                if(binaryExponent>86||binaryExponent==86
-                        &&fractBits>10709187){ return BigMathGTE1.toASCII(fractBits,binaryExponent,buffer,offset); }
-                if(binaryExponent>22){ return LongMathGTE1.toASCII(fractBits,binaryExponent,buffer,offset); }
-                return IntMathGTE1.toASCII(fractBits,binaryExponent,buffer,offset);
-            }
-        }
+        #MACRO FltGTE1ToASCII<byte,Byte>()
+        #MACRO FltGTE1ToASCII<char,Char>()
+#MACRODEF FltGTE1ToASCII<BUFFERTYPE,SUFFIX>()
+static int toASCII(int fractBits,final int binaryExponent,final BUFFERTYPE[] buffer,int offset){
+    if(fractBits==0){
+        if(binaryExponent>86){ return BigMathGTE1.toASCII(binaryExponent,buffer,offset); }
+        if(binaryExponent>62){ return LongMathGTE1.toASCII(binaryExponent,buffer,offset); }
+        if(binaryExponent>23){ return Pow2GTE1.toASCII(binaryExponent,buffer,offset); }
+        mediumDigits(fractBits=1<<binaryExponent,buffer,offset+=getStringSize(fractBits));
+        buffer[offset]=(BUFFERTYPE)'.';
+        buffer[++offset]=(BUFFERTYPE)'0';
+        return ++offset;
+    }else{
+        if(fpFractNumTrailing0s(fractBits|=0x800000)+binaryExponent>22
+                &&binaryExponent<63){ return Pow2GTE1.toASCII(fractBits,binaryExponent,buffer,offset); }
+        if(binaryExponent>86||binaryExponent==86
+                &&fractBits>10709187){ return BigMathGTE1.toASCII(fractBits,binaryExponent,buffer,offset); }
+        if(binaryExponent>22){ return LongMathGTE1.toASCII(fractBits,binaryExponent,buffer,offset); }
+        return IntMathGTE1.toASCII(fractBits,binaryExponent,buffer,offset);
+    }
+}
+#ENDDEF
+        
         private static abstract class BigMathGTE1 implements BigMathFltToASCII{
             long b;
             long m;
             private static final byte[] SHIFT_BIAS=new byte[]{1,31,29,26,24,22,20,17,15,13,10,8,6,3};
-            static int toASCII(int binaryExponent,final char[] buffer,int offset){
-                final int decimalExponent=ESTIMATE_DECIMAL_EXPONENT[binaryExponent-63];
-                int c;
-                long b=1L<<binaryExponent-decimalExponent+(c=SHIFT_BIAS[decimalExponent-25])-32;
-                long m=5L<<binaryExponent-56-decimalExponent+c;
-                long[] pow5Arr;
-                final long s=(pow5Arr=POW_5_128)[binaryExponent=decimalExponent-26<<1]>>>32-c|pow5Arr[++binaryExponent]<<32+c;
-                long sShift;
-                b=(b-(c=(int)((b>>>32)/(sShift=s>>>32)))*s)*10;
-                buffer[offset]=(char)(c+'0');
-                buffer[++offset]='.';
-                for(;;){
-                    if((c=(int)((b>>>32)/sShift))!=0){
-                        b-=c*s;
-                    }
-                    if(b+m>s){
-                        if(b>s>>1){
-                            ++c;
-                        }
-                        break;
-                    }else if(b<m){
-                        break;
-                    }
-                    buffer[++offset]=(char)(c+'0');
-                    b*=10;
-                    m*=10;
-                }
-                buffer[++offset]=(char)(c+'0');
-                return printBigIntExponent(buffer,offset,decimalExponent);
+            #MACRO BigMathGTE1ToASCII<byte,Byte>()
+            #MACRO BigMathGTE1ToASCII<char,Char>()
+#MACRODEF BigMathGTE1ToASCII<BUFFERTYPE,SUFFIX>()
+static int toASCII(int binaryExponent,final BUFFERTYPE[] buffer,int offset){
+    final int decimalExponent=ESTIMATE_DECIMAL_EXPONENT[binaryExponent-63];
+    int c;
+    long b=1L<<binaryExponent-decimalExponent+(c=SHIFT_BIAS[decimalExponent-25])-32;
+    long m=5L<<binaryExponent-56-decimalExponent+c;
+    long[] pow5Arr;
+    final long s=(pow5Arr=POW_5_128)[binaryExponent=decimalExponent-26<<1]>>>32-c|pow5Arr[++binaryExponent]<<32+c;
+    long sShift;
+    b=(b-(c=(int)((b>>>32)/(sShift=s>>>32)))*s)*10;
+    buffer[offset]=(BUFFERTYPE)(c+'0');
+    buffer[++offset]=(BUFFERTYPE)'.';
+    for(;;){
+        if((c=(int)((b>>>32)/sShift))!=0){
+            b-=c*s;
+        }
+        if(b+m>s){
+            if(b>s>>1){
+                ++c;
             }
-            static int toASCII(final int fractBits,final int binaryExponent,final char[] buffer,final int offset){
-                int decimalExponent;
-                BigMathFltToASCII bsm;
-                switch(decimalExponent=estimateDecimalExponent(fractBits,binaryExponent)){
-                case 25:
-                    bsm=new BigMathGTE1DecExp25(fractBits);
-                    break;
-                case 26:
-                    bsm=new BigMathGTE1DecExp26(fractBits,binaryExponent+14);
-                    break;
-                case 31:
-                case 36:
-                case 37:
-                case 38:
-                    bsm=new BitMathGTE1EasyCase(fractBits,decimalExponent,binaryExponent);
-                    break;
-                default:
-                    bsm=new BigMathGTE1HardCase(fractBits,decimalExponent,binaryExponent);
-                    break;
-                }
-                return bsm.getChars(decimalExponent,buffer,offset);
-            }
+            break;
+        }else if(b<m){
+            break;
+        }
+        buffer[++offset]=(BUFFERTYPE)(c+'0');
+        b*=10;
+        m*=10;
+    }
+    buffer[++offset]=(BUFFERTYPE)(c+'0');
+    return printBigIntExponent(buffer,offset,decimalExponent);
+}
+static int toASCII(final int fractBits,final int binaryExponent,final BUFFERTYPE[] buffer,final int offset){
+    int decimalExponent;
+    BigMathFltToASCII bsm;
+    switch(decimalExponent=estimateDecimalExponent(fractBits,binaryExponent)){
+    case 25:
+        bsm=new BigMathGTE1DecExp25(fractBits);
+        break;
+    case 26:
+        bsm=new BigMathGTE1DecExp26(fractBits,binaryExponent+14);
+        break;
+    case 31:
+    case 36:
+    case 37:
+    case 38:
+        bsm=new BigMathGTE1EasyCase(fractBits,decimalExponent,binaryExponent);
+        break;
+    default:
+        bsm=new BigMathGTE1HardCase(fractBits,decimalExponent,binaryExponent);
+        break;
+    }
+    return bsm.getSUFFIXs(decimalExponent,buffer,offset);
+}
+private static int printBigIntExponent(final BUFFERTYPE[] buffer,int offset,int decimalExponent){
+    buffer[++offset]=(BUFFERTYPE)'E';
+    if(decimalExponent<30){
+        buffer[++offset]=(BUFFERTYPE)'2';
+        decimalExponent+=28;
+    }else{
+        buffer[++offset]=(BUFFERTYPE)'3';
+        decimalExponent+=18;
+    }
+    buffer[++offset]=(BUFFERTYPE)decimalExponent;
+    return ++offset;
+}
+#ENDDEF
+            
             private static int estimateDecimalExponent(final int fractBits,final int binaryExponent){
                 switch(binaryExponent){
                 case 86:
@@ -956,82 +1052,81 @@ public class ToStringUtil{
                 }
                 return ESTIMATE_DECIMAL_EXPONENT[binaryExponent-63];
             }
-            private static int printBigIntExponent(final char[] buffer,int offset,int decimalExponent){
-                buffer[++offset]='E';
-                if(decimalExponent<30){
-                    buffer[++offset]='2';
-                    decimalExponent+=28;
-                }else{
-                    buffer[++offset]='3';
-                    decimalExponent+=18;
-                }
-                buffer[++offset]=(char)decimalExponent;
-                return ++offset;
-            }
+
             private static class BigMathGTE1DecExp25 extends BigMathGTE1{
                 public BigMathGTE1DecExp25(final int fractBits){
                     b=(long)fractBits<<39;
                     m=5L<<39;
                 }
-                @Override public int getChars(final int decimalExponent,final char[] buffer,int offset){
-                    long b;
-                    int c;
-                    b=((b=this.b)-(c=(int)(b/596046447753906250L))*596046447753906250L)*10;
-                    long m=this.m;
-                    buffer[offset]=(char)(c+'0');
-                    buffer[++offset]='.';
-                    for(;;){
-                        if((b-=(c=(int)(b/596046447753906250L))*596046447753906250L)+m>596046447753906250L){
-                            if(b>298023223876953125L){
-                                ++c;
-                            }
-                            break;
-                        }
-                        if(b<m){
-                            break;
-                        }
-                        b*=10;
-                        m*=10;
-                        buffer[++offset]=(char)(c+'0');
-                    }
-                    buffer[++offset]=(char)(c+'0');
-                    return printBigIntExponent(buffer,offset,decimalExponent);
-                }
+                #MACRO BigMathGTE1DecExp25<byte,Byte>()
+                #MACRO BigMathGTE1DecExp25<char,Char>()
+#MACRODEF BigMathGTE1DecExp25<BUFFERTYPE,SUFFIX>()
+@Override public int getSUFFIXs(final int decimalExponent,final BUFFERTYPE[] buffer,int offset){
+    long b;
+    int c;
+    b=((b=this.b)-(c=(int)(b/596046447753906250L))*596046447753906250L)*10;
+    long m=this.m;
+    buffer[offset]=(BUFFERTYPE)(c+'0');
+    buffer[++offset]=(BUFFERTYPE)'.';
+    for(;;){
+        if((b-=(c=(int)(b/596046447753906250L))*596046447753906250L)+m>596046447753906250L){
+            if(b>298023223876953125L){
+                ++c;
+            }
+            break;
+        }
+        if(b<m){
+            break;
+        }
+        b*=10;
+        m*=10;
+        buffer[++offset]=(BUFFERTYPE)(c+'0');
+    }
+    buffer[++offset]=(BUFFERTYPE)(c+'0');
+    return printBigIntExponent(buffer,offset,decimalExponent);
+}
+#ENDDEF
+
             }
             private static class BigMathGTE1DecExp26 extends BigMathGTE1{
                 public BigMathGTE1DecExp26(final int fractBits,final int mShift){
                     b=(long)fractBits<<mShift;
                     m=5L<<mShift;
                 }
-                @Override public int getChars(final int decimalExponent,final char[] buffer,int offset){
-                    long b;
-                    long m;
-                    int c;
-                    if(0x6765C793FA10079DL<(b=((b=this.b)-(c=(int)(b/0xA56FA5B99019A5CL))*0xA56FA5B99019A5CL)*10)+(m=this.m)){
-                        buffer[offset]=(char)(c+'1');
-                        buffer[++offset]='.';
-                        buffer[++offset]='0';
-                    }else{
-                        buffer[offset]=(char)(c+'0');
-                        buffer[++offset]='.';
-                        for(;;){
-                            if(0xA56FA5B99019A5CL<(b-=(c=(int)(b/0xA56FA5B99019A5CL))*0xA56FA5B99019A5CL)+m){
-                                if(b>0x52B7D2DCC80CD2EL){
-                                    ++c;
-                                }
-                                break;
-                            }
-                            if(b<m){
-                                break;
-                            }
-                            b*=10;
-                            m*=10;
-                            buffer[++offset]=(char)(c+'0');
-                        }
-                        buffer[++offset]=(char)(c+'0');
-                    }
-                    return printBigIntExponent(buffer,offset,decimalExponent);
+                #MACRO BigMathGTE1DecExp26<byte,Byte>()
+                #MACRO BigMathGTE1DecExp26<char,Char>()
+#MACRODEF BigMathGTE1DecExp26<BUFFERTYPE,SUFFIX>()
+@Override public int getSUFFIXs(final int decimalExponent,final BUFFERTYPE[] buffer,int offset){
+    long b;
+    long m;
+    int c;
+    if(0x6765C793FA10079DL<(b=((b=this.b)-(c=(int)(b/0xA56FA5B99019A5CL))*0xA56FA5B99019A5CL)*10)+(m=this.m)){
+        buffer[offset]=(BUFFERTYPE)(c+'1');
+        buffer[++offset]=(BUFFERTYPE)'.';
+        buffer[++offset]=(BUFFERTYPE)'0';
+    }else{
+        buffer[offset]=(BUFFERTYPE)(c+'0');
+        buffer[++offset]=(BUFFERTYPE)'.';
+        for(;;){
+            if(0xA56FA5B99019A5CL<(b-=(c=(int)(b/0xA56FA5B99019A5CL))*0xA56FA5B99019A5CL)+m){
+                if(b>0x52B7D2DCC80CD2EL){
+                    ++c;
                 }
+                break;
+            }
+            if(b<m){
+                break;
+            }
+            b*=10;
+            m*=10;
+            buffer[++offset]=(BUFFERTYPE)(c+'0');
+        }
+        buffer[++offset]=(BUFFERTYPE)(c+'0');
+    }
+    return printBigIntExponent(buffer,offset,decimalExponent);
+}
+#ENDDEF
+
             }
             private abstract static class BigMathGTE1WithS extends BigMathGTE1{
                 final long s;
@@ -1045,108 +1140,118 @@ public class ToStringUtil{
                             |pow5Arr[decimalExponent+1]<<32+shiftBias;
                 }
             }
-            private static class BitMathGTE1EasyCase extends BigMathGTE1WithS{
-                public BitMathGTE1EasyCase(final int fractBits,final int decimalExponent,final int binaryExponent){
+            private static class BigMathGTE1EasyCase extends BigMathGTE1WithS{
+                public BigMathGTE1EasyCase(final int fractBits,final int decimalExponent,final int binaryExponent){
                     super(fractBits,decimalExponent,binaryExponent);
                 }
-                @Override public int getChars(final int decimalExponent,final char[] buffer,int offset){
-                    long b;
-                    long s;
-                    long hiS;
-                    int c;
-                    if((c=(int)(((b=this.b)>>>32)/(hiS=(s=this.s)>>>32)))==0){
-                        buffer[offset]='1';
-                        buffer[++offset]='.';
-                        buffer[++offset]='0';
-                    }else{
-                        long m;
-                        if(s<(b-=c*s)+(m=this.m)){
-                            buffer[offset]=(char)(c+'1');
-                            buffer[++offset]='.';
-                            buffer[++offset]='0';
-                        }else{
-                            buffer[offset]=(char)(c+'0');
-                            buffer[++offset]='.';
-                            for(;;){
-                                if(s<(b=(b*=10)-(c=(int)((b>>>32)/hiS))*s)+(m*=10)){
-                                    if(b<<1>s){
-                                        ++c;
-                                    }
-                                    break;
-                                }
-                                if(b<m){
-                                    break;
-                                }
-                                buffer[++offset]=(char)(c+'0');
-                            }
-                            buffer[++offset]=(char)(c+'0');
-                        }
+                #MACRO BigMathGTE1EasyCase<byte,Byte>()
+                #MACRO BigMathGTE1EasyCase<char,Char>()
+#MACRODEF BigMathGTE1EasyCase<BUFFERTYPE,SUFFIX>()
+@Override public int getSUFFIXs(final int decimalExponent,final BUFFERTYPE[] buffer,int offset){
+    long b;
+    long s;
+    long hiS;
+    int c;
+    if((c=(int)(((b=this.b)>>>32)/(hiS=(s=this.s)>>>32)))==0){
+        buffer[offset]=(BUFFERTYPE)'1';
+        buffer[++offset]=(BUFFERTYPE)'.';
+        buffer[++offset]=(BUFFERTYPE)'0';
+    }else{
+        long m;
+        if(s<(b-=c*s)+(m=this.m)){
+            buffer[offset]=(BUFFERTYPE)(c+'1');
+            buffer[++offset]=(BUFFERTYPE)'.';
+            buffer[++offset]=(BUFFERTYPE)'0';
+        }else{
+            buffer[offset]=(BUFFERTYPE)(c+'0');
+            buffer[++offset]=(BUFFERTYPE)'.';
+            for(;;){
+                if(s<(b=(b*=10)-(c=(int)((b>>>32)/hiS))*s)+(m*=10)){
+                    if(b<<1>s){
+                        ++c;
                     }
-                    return printBigIntExponent(buffer,offset,decimalExponent);
+                    break;
                 }
+                if(b<m){
+                    break;
+                }
+                buffer[++offset]=(BUFFERTYPE)(c+'0');
+            }
+            buffer[++offset]=(BUFFERTYPE)(c+'0');
+        }
+    }
+    return printBigIntExponent(buffer,offset,decimalExponent);
+}
+#ENDDEF
+
             }
             private static class BigMathGTE1HardCase extends BigMathGTE1WithS{
-                private static int fractionLoop(long b,long s,long m,final char[] buffer,int offset){
-                    int c;
-                    final long hiS=s>>>32;
-                                    final long loS=s&0xffffffffL;
-                                    for(;;){
-                                        long hiB;
-                                        if((c=(int)((hiB=(b*=10)>>>32)/hiS))!=0){
-                                            long carry;
-                                            if((b=((carry=(b&0xffffffffL)-c*loS)>>32)+hiB-c*hiS)>>32!=0){
-                                                break;
-                                            }
-                                            b=(b<<32)+(0xffffffffL&carry);
-                                        }
-                                        if(s<b+(m*=10)){
-                                            if(b<<1>s){
-                                                ++c;
-                                            }
-                                            break;
-                                        }
-                                        if(b<m){
-                                            break;
-                                        }
-                                        buffer[++offset]=(char)(c+'0');
-                                    }
-                                    buffer[++offset]=(char)(c+'0');
-                                    return offset;
-                }
                 public BigMathGTE1HardCase(final int fractBits,final int decimalExponent,final int binaryExponent){
                     super(fractBits,decimalExponent,binaryExponent);
                 }
-                @Override public int getChars(final int decimalExponent,final char[] buffer,int offset){
-                    long b;
-                    long s;
-                    long hiS;
-                    int c;
-                    long hiB;
-                    if((c=(int)((hiB=(b=this.b)>>>32)/(hiS=(s=this.s)>>>32)))==0){
-                        buffer[offset]='1';
-                        buffer[++offset]='.';
-                        buffer[++offset]='0';
-                    }else{
-                        long carry;
-                        if((b=((carry=(b&0xffffffffL)-c*(s&0xffffffffL))>>32)+hiB-c*hiS)>>32==0){
-                            long m;
-                            if(s<(b=(b<<32)+(0xffffffffL&carry))+(m=this.m)){
-                                buffer[offset]=(char)(c+'1');
-                                buffer[++offset]='.';
-                                buffer[++offset]='0';
-                            }else{
-                                buffer[offset]=(char)(c+'0');
-                                buffer[++offset]='.';
-                                offset=fractionLoop(b,s,m,buffer,offset);
-                            }
-                        }else{
-                            buffer[offset]=(char)(c+'0');
-                            buffer[++offset]='.';
-                            buffer[++offset]='0';
-                        }
-                    }
-                    return printBigIntExponent(buffer,offset,decimalExponent);
-                }
+                #MACRO BigMathGTE1HardCase<byte,Byte>()
+                #MACRO BigMathGTE1HardCase<char,Char>()
+#MACRODEF BigMathGTE1HardCase<BUFFERTYPE,SUFFIX>()
+private static int fractionLoop(long b,long s,long m,final BUFFERTYPE[] buffer,int offset){
+    int c;
+    final long hiS=s>>>32;
+    final long loS=s&0xffffffffL;
+    for(;;){
+        long hiB;
+        if((c=(int)((hiB=(b*=10)>>>32)/hiS))!=0){
+            long carry;
+            if((b=((carry=(b&0xffffffffL)-c*loS)>>32)+hiB-c*hiS)>>32!=0){
+                break;
+            }
+            b=(b<<32)+(0xffffffffL&carry);
+        }
+        if(s<b+(m*=10)){
+            if(b<<1>s){
+                ++c;
+            }
+            break;
+        }
+        if(b<m){
+            break;
+        }
+        buffer[++offset]=(BUFFERTYPE)(c+'0');
+    }
+    buffer[++offset]=(BUFFERTYPE)(c+'0');
+    return offset;
+}
+@Override public int getSUFFIXs(final int decimalExponent,final BUFFERTYPE[] buffer,int offset){
+    long b;
+    long s;
+    long hiS;
+    int c;
+    long hiB;
+    if((c=(int)((hiB=(b=this.b)>>>32)/(hiS=(s=this.s)>>>32)))==0){
+        buffer[offset]=(BUFFERTYPE)'1';
+        buffer[++offset]=(BUFFERTYPE)'.';
+        buffer[++offset]=(BUFFERTYPE)'0';
+    }else{
+        long carry;
+        if((b=((carry=(b&0xffffffffL)-c*(s&0xffffffffL))>>32)+hiB-c*hiS)>>32==0){
+            long m;
+            if(s<(b=(b<<32)+(0xffffffffL&carry))+(m=this.m)){
+                buffer[offset]=(BUFFERTYPE)(c+'1');
+                buffer[++offset]=(BUFFERTYPE)'.';
+                buffer[++offset]=(BUFFERTYPE)'0';
+            }else{
+                buffer[offset]=(BUFFERTYPE)(c+'0');
+                buffer[++offset]=(BUFFERTYPE)'.';
+                offset=fractionLoop(b,s,m,buffer,offset);
+            }
+        }else{
+            buffer[offset]=(BUFFERTYPE)(c+'0');
+            buffer[++offset]=(BUFFERTYPE)'.';
+            buffer[++offset]=(BUFFERTYPE)'0';
+        }
+    }
+    return printBigIntExponent(buffer,offset,decimalExponent);
+}
+#ENDDEF
+                
             }
         }
         private static class IntMathGTE1{
@@ -1172,38 +1277,43 @@ public class ToStringUtil{
                     // 17,17,17,//57,58,59,
                     // 18,18,18,//60,61,62
             };
-            static int toASCII(int fractBits,final int binaryExponent,final char[] buffer,int offset){
-                int decimalExponent;
-                int m;
-                final int s=(m=POW_5_32[decimalExponent=estimateDecimalExponent(fractBits,binaryExponent)]<<decimalExponent)<<24
-                        -binaryExponent;
-                int c;
-                buffer[offset]=(char)((c=(fractBits<<=1)/s)+'0');
-                fractBits-=c*s;
-                for(;;){
-                    if(decimalExponent--==0){
-                        buffer[++offset]='.';
-                        break;
-                    }
-                    buffer[++offset]=(char)((c=(fractBits*=10)/s)+'0');
-                    fractBits-=c*s;
-                }
-                for(;;){
-                    c=(fractBits*=10)/s;
-                    if((fractBits-=c*s)+(m*=10)>s){
-                        if(fractBits>=m||(decimalExponent=(fractBits<<1)-s)>0||decimalExponent==0&&c==7){
-                            ++c;
-                        }
-                        break;
-                    }
-                    if(fractBits<m){
-                        break;
-                    }
-                    buffer[++offset]=(char)(c+'0');
-                }
-                buffer[++offset]=(char)(c+'0');
-                return ++offset;
+            #MACRO IntMathGTE1ToASCII<byte,Byte>()
+            #MACRO IntMathGTE1ToASCII<char,Char>()
+#MACRODEF IntMathGTE1ToASCII<BUFFERTYPE,SUFFIX>()
+static int toASCII(int fractBits,final int binaryExponent,final BUFFERTYPE[] buffer,int offset){
+    int decimalExponent;
+    int m;
+    final int s=(m=POW_5_32[decimalExponent=estimateDecimalExponent(fractBits,binaryExponent)]<<decimalExponent)<<24
+            -binaryExponent;
+    int c;
+    buffer[offset]=(BUFFERTYPE)((c=(fractBits<<=1)/s)+'0');
+    fractBits-=c*s;
+    for(;;){
+        if(decimalExponent--==0){
+            buffer[++offset]=(BUFFERTYPE)'.';
+            break;
+        }
+        buffer[++offset]=(BUFFERTYPE)((c=(fractBits*=10)/s)+'0');
+        fractBits-=c*s;
+    }
+    for(;;){
+        c=(fractBits*=10)/s;
+        if((fractBits-=c*s)+(m*=10)>s){
+            if(fractBits>=m||(decimalExponent=(fractBits<<1)-s)>0||decimalExponent==0&&c==7){
+                ++c;
             }
+            break;
+        }
+        if(fractBits<m){
+            break;
+        }
+        buffer[++offset]=(BUFFERTYPE)(c+'0');
+    }
+    buffer[++offset]=(BUFFERTYPE)(c+'0');
+    return ++offset;
+}
+#ENDDEF
+
             private static int estimateDecimalExponent(final int fractBits,final int binaryExponent){
                 switch(binaryExponent){
                 case 3:
@@ -1230,90 +1340,106 @@ public class ToStringUtil{
             }
         }
         private static class LongMathGTE1{
-            static int toASCII(final int binaryExponent,final char[] buffer,int offset){
-                int decimalExponent;
-                long b;
-                long m;
-                final long s;
-                final long tenS=(s=POW_5_64[(decimalExponent=ESTIMATE_DECIMAL_EXPONENT[binaryExponent-63])-1])*10L;
-                int c=(int)((b=1L<<binaryExponent-decimalExponent)/s);
-                b=(b-c*s)*10L;
-                if(c==0){
-                    // TODO investigate how we can avoid adjusting the decimal exponent without
-                    // overflowing long
-                    b=(b-(c=(int)(b/s))*s)*10L;
-                    m=100L<<binaryExponent-25-decimalExponent--;
-                }else{
-                    m=10L<<binaryExponent-25-decimalExponent;
-                }
-                buffer[offset]=(char)(c+'0');
-                buffer[++offset]='.';
-                for(;;){
-                    if((b=(b-(c=(int)(b/s))*s)*10L)+(m*=10)>tenS){
-                        if(b<<1>tenS){
-                            ++c;
-                        }
-                        break;
-                    }
-                    if(b<m){
-                        break;
-                    }
-                    buffer[++offset]=(char)(c+'0');
-                }
-                buffer[++offset]=(char)(c+'0');
-                return printLongGTE1Exponent(buffer,offset,decimalExponent);
+          #MACRO LongMathGTE1<byte,Byte>()
+          #MACRO LongMathGTE1<char,Char>()
+#MACRODEF LongMathGTE1<BUFFERTYPE,SUFFIX>()
+static int toASCII(final int binaryExponent,final BUFFERTYPE[] buffer,int offset){
+    int decimalExponent;
+    long b;
+    long m;
+    final long s;
+    final long tenS=(s=POW_5_64[(decimalExponent=ESTIMATE_DECIMAL_EXPONENT[binaryExponent-63])-1])*10L;
+    int c=(int)((b=1L<<binaryExponent-decimalExponent)/s);
+    b=(b-c*s)*10L;
+    if(c==0){
+        // TODO investigate how we can avoid adjusting the decimal exponent without
+        // overflowing long
+        b=(b-(c=(int)(b/s))*s)*10L;
+        m=100L<<binaryExponent-25-decimalExponent--;
+    }else{
+        m=10L<<binaryExponent-25-decimalExponent;
+    }
+    buffer[offset]=(BUFFERTYPE)(c+'0');
+    buffer[++offset]=(BUFFERTYPE)'.';
+    for(;;){
+        if((b=(b-(c=(int)(b/s))*s)*10L)+(m*=10)>tenS){
+            if(b<<1>tenS){
+                ++c;
             }
-            static int toASCII(final int fractBits,final int binaryExponent,final char[] buffer,int offset){
-                int decimalExponent;
-                long b=(long)fractBits<<binaryExponent-23-(decimalExponent=estimateDecimalExponent(fractBits,binaryExponent));
-                long s;
-                long m;
-                int c;
-                if((b-=(c=(int)(b/(s=POW_5_64[decimalExponent-1])))*s)+(m=1L<<binaryExponent-24-decimalExponent)>s){
-                    buffer[offset]=(char)(c+'1');
-                    buffer[++offset]='.';
-                    buffer[++offset]='0';
-                }else{
-                    if(c==0){
-                        // TODO investigate how we can avoid adjusting the decimal exponent without
-                        // overflowing long
-                        --decimalExponent;
-                        m*=10;
-                        c=(int)((b*=10)/s);
-                        b-=c*s;
+            break;
+        }
+        if(b<m){
+            break;
+        }
+        buffer[++offset]=(BUFFERTYPE)(c+'0');
+    }
+    buffer[++offset]=(BUFFERTYPE)(c+'0');
+    return printLongGTE1Exponent(buffer,offset,decimalExponent);
+}
+static int toASCII(final int fractBits,final int binaryExponent,final BUFFERTYPE[] buffer,int offset){
+    int decimalExponent;
+    long b=(long)fractBits<<binaryExponent-23-(decimalExponent=estimateDecimalExponent(fractBits,binaryExponent));
+    long s;
+    long m;
+    int c;
+    if((b-=(c=(int)(b/(s=POW_5_64[decimalExponent-1])))*s)+(m=1L<<binaryExponent-24-decimalExponent)>s){
+        buffer[offset]=(BUFFERTYPE)(c+'1');
+        buffer[++offset]=(BUFFERTYPE)'.';
+        buffer[++offset]=(BUFFERTYPE)'0';
+    }else{
+        if(c==0){
+            // TODO investigate how we can avoid adjusting the decimal exponent without
+            // overflowing long
+            --decimalExponent;
+            m*=10;
+            c=(int)((b*=10)/s);
+            b-=c*s;
+        }
+        buffer[offset]=(BUFFERTYPE)(c+'0');
+        buffer[++offset]=(BUFFERTYPE)'.';
+        if(b<m){
+            buffer[++offset]=(BUFFERTYPE)'0';
+        }else{
+            b*=10;
+            m*=10;
+            final long tenS=s*10L;
+            for(;;){
+                b-=(c=(int)(b/s))*s;
+                if(m>922337203685477580L){
+                    if(b<<1>s){
+                        ++c;
                     }
-                    buffer[offset]=(char)(c+'0');
-                    buffer[++offset]='.';
-                    if(b<m){
-                        buffer[++offset]='0';
-                    }else{
-                        b*=10;
-                        m*=10;
-                        final long tenS=s*10L;
-                        for(;;){
-                            b-=(c=(int)(b/s))*s;
-                            if(m>922337203685477580L){
-                                if(b<<1>s){
-                                    ++c;
-                                }
-                                break;
-                            }
-                            if((b*=10)+(m*=10)>tenS){
-                                if(b<<1>tenS){
-                                    ++c;
-                                }
-                                break;
-                            }
-                            if(b<m){
-                                break;
-                            }
-                            buffer[++offset]=(char)(c+'0');
-                        }
-                        buffer[++offset]=(char)(c+'0');
-                    }
+                    break;
                 }
-                return printLongGTE1Exponent(buffer,offset,decimalExponent);
+                if((b*=10)+(m*=10)>tenS){
+                    if(b<<1>tenS){
+                        ++c;
+                    }
+                    break;
+                }
+                if(b<m){
+                    break;
+                }
+                buffer[++offset]=(BUFFERTYPE)(c+'0');
             }
+            buffer[++offset]=(BUFFERTYPE)(c+'0');
+        }
+    }
+    return printLongGTE1Exponent(buffer,offset,decimalExponent);
+}
+private static int printLongGTE1Exponent(final BUFFERTYPE[] buffer,int offset,int decimalExponent){
+    buffer[++offset]=(BUFFERTYPE)'E';
+    if(decimalExponent<20){
+        buffer[++offset]=(BUFFERTYPE)'1';
+        decimalExponent+=10;
+    }else{
+        buffer[++offset]=(BUFFERTYPE)'2';
+    }
+    buffer[++offset]=(BUFFERTYPE)(decimalExponent+28);
+    return ++offset;
+}
+#ENDDEF
+            
             private static int estimateDecimalExponent(final int fractBits,final int binaryExponent){
                 switch(binaryExponent){
                 case 63:
@@ -1347,139 +1473,133 @@ public class ToStringUtil{
                 }
                 return ESTIMATE_DECIMAL_EXPONENT[binaryExponent-63];
             }
-            private static int printLongGTE1Exponent(final char[] buffer,int offset,int decimalExponent){
-                buffer[++offset]='E';
-                if(decimalExponent<20){
-                    buffer[++offset]='1';
-                    decimalExponent+=10;
-                }else{
-                    buffer[++offset]='2';
-                }
-                buffer[++offset]=(char)(decimalExponent+28);
-                return ++offset;
-            }
         }
         private static class Pow2GTE1{
-            private static final byte[] INSIGNIFICANT_DIGITS=new byte[]{1,1,1,// 29,30,31
-                    2,2,2,// 32,33,34
-                    3,3,3,3,// 35,36,37,38
-                    4,4,4,// 39,40,41
-                    5,5,5,// 42,43,44
-                    6,6,6,6,// 45,46,47,48
-                    7,7,7,// 49,50,51
-                    8,8,8,// 52,53,54,
-                    9,9,9,9,// 55,56,57,58
-                    10,10,10,// 59,60,61
-                    11// 62
-            };
-            static int toASCII(final int binaryExponent,final char[] buffer,int offset){
-                // TODO maybe one day, write a more straight forward method than this
-                int decimalExponent;
-                int c;
-                int fractBits;
-                if(binaryExponent>28){
-                    decimalExponent=INSIGNIFICANT_DIGITS[binaryExponent-29];
-                    if(binaryExponent>30){
-                        long lFractBits,pow10;
-                        if((lFractBits=1L<<binaryExponent)
-                                -(lFractBits/=pow10=POW_5_64[decimalExponent-1]<<decimalExponent)*pow10>=pow10>>1){
-                            c=(fractBits=(int)lFractBits+1)-(fractBits/=10)*10;
-                        }
-                        else if((c=(fractBits=(int)lFractBits) - (fractBits/=10) * 10) == 0){
-                            ++decimalExponent;
-                            c=fractBits - (fractBits/=10) * 10;
-                        }
-                    }else{
-                        c=(fractBits=(1<<binaryExponent)/10)-(fractBits/=10)*10;
-                    }
-                }else{
-                    decimalExponent=0;
-                    c=(fractBits=1<<binaryExponent)-(fractBits/=10)*10;
-                }
-                int strSize;
-                decimalExponent+=strSize=getStringSize(fractBits);
-                eFormDigits(fractBits,buffer,offset+=strSize+1);
-                buffer[offset]=(char)(c+'0');
-                return printExponent(buffer,offset,decimalExponent);
+          private static final byte[] INSIGNIFICANT_DIGITS=new byte[]{1,1,1,// 29,30,31
+                  2,2,2,// 32,33,34
+                  3,3,3,3,// 35,36,37,38
+                  4,4,4,// 39,40,41
+                  5,5,5,// 42,43,44
+                  6,6,6,6,// 45,46,47,48
+                  7,7,7,// 49,50,51
+                  8,8,8,// 52,53,54,
+                  9,9,9,9,// 55,56,57,58
+                  10,10,10,// 59,60,61
+                  11// 62
+          };
+          #MACRO Pow2GTE1<byte,Byte>()
+          #MACRO Pow2GTE1<char,Char>()
+#MACRODEF Pow2GTE1<BUFFERTYPE,SUFFIX>()
+static int toASCII(final int binaryExponent,final BUFFERTYPE[] buffer,int offset){
+    // TODO maybe one day, write a more straight forward method than this
+    int decimalExponent;
+    int c;
+    int fractBits;
+    if(binaryExponent>28){
+        decimalExponent=INSIGNIFICANT_DIGITS[binaryExponent-29];
+        if(binaryExponent>30){
+            long lFractBits,pow10;
+            if((lFractBits=1L<<binaryExponent)
+                    -(lFractBits/=pow10=POW_5_64[decimalExponent-1]<<decimalExponent)*pow10>=pow10>>1){
+                c=(fractBits=(int)lFractBits+1)-(fractBits/=10)*10;
             }
-            static int toASCII(int fractBits,final int binaryExponent,final char[] buffer,int offset){
-                // TODO maybe one day, write a more straight forward method than this
-                int decimalExponent;
-                if(binaryExponent>28){
-                    final long pow10;
-                    long lFractBits;
-                    if((lFractBits=(long)fractBits<<binaryExponent-23)-(lFractBits=lFractBits
-                            /(pow10=POW_5_64[(decimalExponent=INSIGNIFICANT_DIGITS[binaryExponent-29])-1]<<decimalExponent))
-                            *pow10>=pow10>>1){
-                        ++lFractBits;
-                    }
-                    fractBits=(int)lFractBits;
-                }else{
-                    decimalExponent=0;
-                    if(binaryExponent>22){
-                        fractBits<<=binaryExponent-23;
-                    }else{
-                        fractBits>>>=23-binaryExponent;
-                    }
-                }
-                int c;
-                for(;;){
-                    if((c=fractBits-(fractBits/=10)*10)!=0||fractBits<10){
-                        break;
-                    }
-                    ++decimalExponent;
-                }
-                int strSize;
-                if((decimalExponent+=strSize=getStringSize(fractBits))<7){
-                    // F form
-                    if(fractBits!=0){
-                        mediumDigits(fractBits,buffer,offset+=strSize);
-                    }
-                    buffer[offset]=(char)(c+'0');
-                    offset=fillZeros(offset,buffer,offset+decimalExponent-strSize)+1;
-                    buffer[offset]='.';
-                    buffer[++offset]='0';
-                    return ++offset;
-                }
-                eFormDigits(fractBits,buffer,offset+=strSize+1);
-                buffer[offset]=(char)(c+'0');
-                return printExponent(buffer,offset,decimalExponent);
+            else if((c=(fractBits=(int)lFractBits) - (fractBits/=10) * 10) == 0){
+                ++decimalExponent;
+                c=fractBits - (fractBits/=10) * 10;
             }
-            private static void eFormDigits(int val,final char[] buffer,int digitOffset){
-                int tmp;
-                for(;;){
-                    if(val<81920){
-                        for(;;){
-                            if(val<10){
-                                buffer[--digitOffset]='.';
-                                buffer[--digitOffset]=(char)(val+'0');
-                                return;
-                            }
-                            buffer[--digitOffset]=(char)(val-(val=val*52429>>>19)*10+'0');
-                        }
-                    }
-                    // two digits per iteration
-                    // TODO Would it be faster to promote to long and use multiplication
-                    // to
-                    // divide?
-                    // TODO if this is okay, then perhaps consider the same multiplication
-                    // with the shift-add technique
-                    // (valid for val < 4908534099L
-                    // final int tmp=(int)(((long)val*1374389535)>>>37);
-                    buffer[--digitOffset]=DIGIT_ONES[val-=(tmp=val/100)*100];
-                    buffer[--digitOffset]=DIGIT_TENS[val];
-                    val=tmp;
+        }else{
+            c=(fractBits=(1<<binaryExponent)/10)-(fractBits/=10)*10;
+        }
+    }else{
+        decimalExponent=0;
+        c=(fractBits=1<<binaryExponent)-(fractBits/=10)*10;
+    }
+    int strSize;
+    decimalExponent+=strSize=getStringSize(fractBits);
+    eFormDigits(fractBits,buffer,offset+=strSize+1);
+    buffer[offset]=(BUFFERTYPE)(c+'0');
+    return printExponent(buffer,offset,decimalExponent);
+}
+static int toASCII(int fractBits,final int binaryExponent,final BUFFERTYPE[] buffer,int offset){
+    // TODO maybe one day, write a more straight forward method than this
+    int decimalExponent;
+    if(binaryExponent>28){
+        final long pow10;
+        long lFractBits;
+        if((lFractBits=(long)fractBits<<binaryExponent-23)-(lFractBits=lFractBits
+                /(pow10=POW_5_64[(decimalExponent=INSIGNIFICANT_DIGITS[binaryExponent-29])-1]<<decimalExponent))
+                *pow10>=pow10>>1){
+            ++lFractBits;
+        }
+        fractBits=(int)lFractBits;
+    }else{
+        decimalExponent=0;
+        if(binaryExponent>22){
+            fractBits<<=binaryExponent-23;
+        }else{
+            fractBits>>>=23-binaryExponent;
+        }
+    }
+    int c;
+    for(;;){
+        if((c=fractBits-(fractBits/=10)*10)!=0||fractBits<10){
+            break;
+        }
+        ++decimalExponent;
+    }
+    int strSize;
+    if((decimalExponent+=strSize=getStringSize(fractBits))<7){
+        // F form
+        if(fractBits!=0){
+            mediumDigits(fractBits,buffer,offset+=strSize);
+        }
+        buffer[offset]=(BUFFERTYPE)(c+'0');
+        offset=fillZeros(offset,buffer,offset+decimalExponent-strSize)+1;
+        buffer[offset]=(BUFFERTYPE)'.';
+        buffer[++offset]=(BUFFERTYPE)'0';
+        return ++offset;
+    }
+    eFormDigits(fractBits,buffer,offset+=strSize+1);
+    buffer[offset]=(BUFFERTYPE)(c+'0');
+    return printExponent(buffer,offset,decimalExponent);
+}
+private static void eFormDigits(int val,final BUFFERTYPE[] buffer,int digitOffset){
+    int tmp;
+    for(;;){
+        if(val<81920){
+            for(;;){
+                if(val<10){
+                    buffer[--digitOffset]=(BUFFERTYPE)'.';
+                    buffer[--digitOffset]=(BUFFERTYPE)(val+'0');
+                    return;
                 }
+                buffer[--digitOffset]=(BUFFERTYPE)(val-(val=val*52429>>>19)*10+'0');
             }
-            private static int printExponent(final char[] buffer,int offset,int decimalExponent){
-                buffer[++offset]='E';
-                if(decimalExponent>9){
-                    buffer[++offset]='1';
-                    decimalExponent-=10;
-                }
-                buffer[++offset]=(char)(decimalExponent+'0');
-                return ++offset;
-            }
+        }
+        // two digits per iteration
+        // TODO Would it be faster to promote to long and use multiplication
+        // to
+        // divide?
+        // TODO if this is okay, then perhaps consider the same multiplication
+        // with the shift-add technique
+        // (valid for val < 4908534099L
+        // final int tmp=(int)(((long)val*1374389535)>>>37);
+        buffer[--digitOffset]=DIGIT_ONESSUFFIX[val-=(tmp=val/100)*100];
+        buffer[--digitOffset]=DIGIT_TENSSUFFIX[val];
+        val=tmp;
+    }
+}
+private static int printExponent(final BUFFERTYPE[] buffer,int offset,int decimalExponent){
+    buffer[++offset]=(BUFFERTYPE)'E';
+    if(decimalExponent>9){
+        buffer[++offset]=(BUFFERTYPE)'1';
+        decimalExponent-=10;
+    }
+    buffer[++offset]=(BUFFERTYPE)(decimalExponent+'0');
+    return ++offset;
+}
+#ENDDEF
+
         }
     }
     /** This class is responsible for printing the digits of a single-precision floating point number when the absolute
@@ -1527,6 +1647,7 @@ public class ToStringUtil{
                 37,37,37,// -120
                 38,38,38,38, // -123
         };
+        //TODO convert to macro
         /** Print the characters of the floating point number into a character buffer.
          *
          * @param fractBits
@@ -2024,16 +2145,7 @@ public class ToStringUtil{
         }
     }
     private final static int[] INT_SIZE_TABLE={9,99,999,9999,99999,999999,9999999,99999999,999999999,Integer.MAX_VALUE};
-    private final static char[] DIGIT_TENS={'0','0','0','0','0','0','0','0','0','0','1','1','1','1','1','1','1','1','1',
-            '1','2','2','2','2','2','2','2','2','2','2','3','3','3','3','3','3','3','3','3','3','4','4','4','4','4','4',
-            '4','4','4','4','5','5','5','5','5','5','5','5','5','5','6','6','6','6','6','6','6','6','6','6','7','7','7',
-            '7','7','7','7','7','7','7','8','8','8','8','8','8','8','8','8','8','9','9','9','9','9','9','9','9','9',
-            '9',};
-    private final static char[] DIGIT_ONES={'0','1','2','3','4','5','6','7','8','9','0','1','2','3','4','5','6','7','8',
-            '9','0','1','2','3','4','5','6','7','8','9','0','1','2','3','4','5','6','7','8','9','0','1','2','3','4','5',
-            '6','7','8','9','0','1','2','3','4','5','6','7','8','9','0','1','2','3','4','5','6','7','8','9','0','1','2',
-            '3','4','5','6','7','8','9','0','1','2','3','4','5','6','7','8','9','0','1','2','3','4','5','6','7','8',
-            '9',};
+
     /** Powers of 5. */
     private static final int[] POW_5_32={1,// pow5=0;
             5,// pow5=1

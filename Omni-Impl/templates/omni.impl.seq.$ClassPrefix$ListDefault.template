@@ -8,7 +8,7 @@
 #TYPEDEF OfDouble
 package omni.impl.seq;
 import omni.api.OmniList;
-abstract interface $TypeNameModifier$ListDefault$<E>$ extends OmniList.Of$ClassPrefix$$<E>$
+abstract interface $ClassPrefix$ListDefault$<E>$ extends OmniList.Of$ClassPrefix$$<E>$
 {
   @Override
   public default void add(int index,$BoxedType$ val)

@@ -1,0 +1,132 @@
+#TYPEDEF OfBoolean
+#TYPEDEF OfByte
+#TYPEDEF OfChar
+#TYPEDEF OfShort
+#TYPEDEF OfInt
+#TYPEDEF OfLong
+#TYPEDEF OfFloat
+#TYPEDEF OfDouble
+#TYPEDEF OfRef
+package omni.util;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+public class $SNode$Test$<E>$
+{
+  @Test
+  public void testConstructors()
+  {
+#IF OfRef
+    var val1=TypeConversionUtil.convertToInteger(100);
+    var val2=TypeConversionUtil.convertToInteger(101);
+    var node1=new $SNode$<Integer>(val1);
+    var node2=new $SNode$<Integer>(val2,node1);
+#ELSE
+    $exposedType$ val1=TypeConversionUtil.convertTo$exposedType$(100);
+    $exposedType$ val2=TypeConversionUtil.convertTo$exposedType$(101);
+    var node1=new $SNode$(val1);
+    var node2=new $SNode$(val2,node1);
+#ENDIF
+    Assertions.assertTrue(node1.val==val1);
+    Assertions.assertTrue(node2.val==val2);
+    Assertions.assertTrue(node1.next==null);
+    Assertions.assertTrue(node2.next==node1);
+  }
+  @Test
+  public void testToString()
+  {
+#IF OfRef
+    var val=TypeConversionUtil.convertToInteger(100);
+    var expected=val.toString();
+    var node=new $SNode$<Integer>(val);
+#ELSE
+    $exposedType$ val=TypeConversionUtil.convertTo$exposedType$(100);
+    var expected=$BoxedType$.toString(val);
+    var node=new $SNode$(val);
+#ENDIF
+    Assertions.assertEquals(expected,node.toString());
+  }
+  @Test
+  public void testEquals()
+  {
+#IF OfRef
+    var val=TypeConversionUtil.convertToInteger(100);
+    var equalsVal=TypeConversionUtil.convertToInteger(100);
+    var notEqualsVal=TypeConversionUtil.convertToInteger(101);
+    var node=new $SNode$<Integer>(val);
+    var equalsNode=new $SNode$<Integer>(equalsVal);
+    var notEqualsNode=new $SNode$<Integer>(notEqualsVal);
+#ELSE
+    $exposedType$ val=TypeConversionUtil.convertTo$exposedType$(100);
+    $exposedType$ equalsVal=TypeConversionUtil.convertTo$exposedType$(100);
+    $exposedType$ notEqualsVal=TypeConversionUtil.convertTo$exposedType$(101);
+    var node=new $SNode$(val);
+    var equalsNode=new $SNode$(equalsVal);
+    var notEqualsNode=new $SNode$(notEqualsVal);
+#ENDIF
+    Assertions.assertTrue(node.equals(node));
+    Assertions.assertFalse(node.equals(null));
+    Assertions.assertFalse(node.equals(new Object()));
+    Assertions.assertTrue(node.equals(equalsNode));
+    Assertions.assertFalse(node.equals(notEqualsNode));
+  }
+  @Test
+  public void testHashCode()
+  {
+#IF OfRef
+    var val=TypeConversionUtil.convertToInteger(100);
+    var expected=val.hashCode();
+    var node=new $SNode$<Integer>(val);
+#ELSEIF OfBoolean
+    var val=true;
+    var expected=Boolean.hashCode(val);
+    var node=new $SNode$(val);
+#ELSE
+    $exposedType$ val=TypeConversionUtil.convertTo$exposedType$(100);
+    var expected=$BoxedType$.hashCode(val);
+    var node=new $SNode$(val);
+#ENDIF
+    Assertions.assertEquals(expected,node.hashCode());
+#IF OfBoolean
+    val=false;
+    expected=Boolean.hashCode(val);
+    node=new $SNode$(val);
+    Assertions.assertEquals(expected,node.hashCode());
+#ENDIF
+  }
+  @Test
+  public void testCompareTo()
+  {
+#IF OfRef
+    var lessVal=TypeConversionUtil.convertToInteger(100);
+    var lessEqualsVal=TypeConversionUtil.convertToInteger(100);
+    var greaterVal=TypeConversionUtil.convertToInteger(101);
+    var greaterEqualsVal=TypeConversionUtil.convertToInteger(101);
+    var lessNode=new $SNode$<Integer>(lessVal);
+    var lessEqualsNode=new $SNode$<Integer>(lessEqualsVal);
+    var greaterNode=new $SNode$<Integer>(greaterVal);
+    var greaterEqualsNode=new $SNode$<Integer>(greaterEqualsVal);
+#ELSE
+  #IF OfBoolean
+    var lessVal=false;
+    var lessEqualsVal=false;
+    var greaterVal=true;
+    var greaterEqualsVal=true;
+  #ELSE
+    $exposedType$ lessVal=0;
+    $exposedType$ lessEqualsVal=0;
+    $exposedType$ greaterVal=1;
+    $exposedType$ greaterEqualsVal=1;
+  #ENDIF
+    var lessNode=new $SNode$(lessVal);
+    var lessEqualsNode=new $SNode$(lessEqualsVal);
+    var greaterNode=new $SNode$(greaterVal);
+    var greaterEqualsNode=new $SNode$(greaterEqualsVal);
+#ENDIF
+    Assertions.assertEquals(0,lessNode.compareTo(lessNode));
+    Assertions.assertEquals(0,greaterNode.compareTo(greaterNode));
+    Assertions.assertEquals(0,lessNode.compareTo(lessEqualsNode));
+    Assertions.assertEquals(0,greaterNode.compareTo(greaterEqualsNode));
+    Assertions.assertEquals(-1,lessNode.compareTo(greaterNode));
+    Assertions.assertEquals(1,greaterNode.compareTo(lessNode));
+  }
+}

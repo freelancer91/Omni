@@ -20,7 +20,7 @@ public class BooleanSortUtilTest
   {
    if(LONGRUN)
     {
-      lengths=new int[]{2, 3, 5, 8, 13, 21, 34, 55, 100, 1000, 10000, 100000, 1000000};
+      lengths=new int[]{2, 3, 5, 8, 13, 21, 34, 46, 47, 55, 100, 286, 287, 1000, 10000, 100000, 1000000};
       randSeeds=new long[]{666L,0xC0FFEEL,999L};
     }
     else

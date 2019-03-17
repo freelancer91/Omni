@@ -30,6 +30,7 @@ public abstract class ShortArrSeq implements OmniCollection.OfShort
   private ShortArrSeq()
   {
     super();
+    this.arr=OmniArray.OfShort.DEFAULT_ARR;
   }
   private ShortArrSeq(int initialCapacity)
   {
@@ -86,11 +87,11 @@ public abstract class ShortArrSeq implements OmniCollection.OfShort
         throw new OutOfMemoryError();
       }
       final char[] buffer;
-      if(size<=(OmniArray.MAX_ARR_SIZE>>3)){
-        (buffer=new char[size<<3])[size=uncheckedToString(size,buffer)]=']';
+      if(size<=(OmniArray.MAX_ARR_SIZE>>3)){(buffer=new char[size<<3])
+        [size=uncheckedToString(size,buffer)]=']';
       }else{
         final ToStringUtil.OmniStringBuilder builder;
-        uncheckedToString(size,builder=new ToStringUtil.OmniStringBuilder(1,new char[size*6]));
+        uncheckedToString(size,builder=new ToStringUtil.OmniStringBuilder(1,new char[OmniArray.MAX_ARR_SIZE]));
         (buffer=builder.buffer)[size=builder.size]=']';
       }
       buffer[0]='[';
@@ -1772,11 +1773,11 @@ public abstract class ShortArrSeq implements OmniCollection.OfShort
         }
           final int rootOffset;
           final char[] buffer;
-          if(size<=(OmniArray.MAX_ARR_SIZE>>3)){
-            (buffer=new char[size<<3])[size=OmniArray.OfShort.ascendingToString(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,buffer,1)]=']';
+          if(size<=(OmniArray.MAX_ARR_SIZE>>3)){(buffer=new char[size<<3])
+            [size=OmniArray.OfShort.ascendingToString(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,buffer,1)]=']';
           }else{
             final ToStringUtil.OmniStringBuilder builder;
-            OmniArray.OfShort.ascendingToString(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,builder=new ToStringUtil.OmniStringBuilder(1,new char[size*6]));
+            OmniArray.OfShort.ascendingToString(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,builder=new ToStringUtil.OmniStringBuilder(1,new char[OmniArray.MAX_ARR_SIZE]));
             (buffer=builder.buffer)[size=builder.size]=']';
           }
           buffer[0]='[';
@@ -3497,10 +3498,11 @@ public abstract class ShortArrSeq implements OmniCollection.OfShort
           {
             ShortSortUtil.uncheckedStableSort(this.arr,0,size,sorter);
           }
-          finally
+          catch(ArrayIndexOutOfBoundsException e)
           {
-            CheckedCollection.checkModCount(modCount,this.modCount);
+            throw CheckedCollection.checkModCount(modCount,this.modCount,e);
           }
+          CheckedCollection.checkModCount(modCount,this.modCount);
           this.modCount=modCount+1;
         }
       }
@@ -3561,10 +3563,11 @@ public abstract class ShortArrSeq implements OmniCollection.OfShort
           {
             ShortSortUtil.uncheckedStableSort(this.arr,0,size,sorter::compare);
           }
-          finally
+          catch(ArrayIndexOutOfBoundsException e)
           {
-            CheckedCollection.checkModCount(modCount,this.modCount);
+            throw CheckedCollection.checkModCount(modCount,this.modCount,e);
           }
+          CheckedCollection.checkModCount(modCount,this.modCount);
           this.modCount=modCount+1;
         }
       }
@@ -3587,10 +3590,11 @@ public abstract class ShortArrSeq implements OmniCollection.OfShort
           {
             ShortSortUtil.uncheckedUnstableSort(this.arr,0,size,sorter);
           }
-          finally
+          catch(ArrayIndexOutOfBoundsException e)
           {
-            CheckedCollection.checkModCount(modCount,this.modCount);
+            throw CheckedCollection.checkModCount(modCount,this.modCount,e);
           }
+          CheckedCollection.checkModCount(modCount,this.modCount);
           this.modCount=modCount+1;
         }
       }
@@ -3665,11 +3669,11 @@ public abstract class ShortArrSeq implements OmniCollection.OfShort
         }
           final int rootOffset;
           final char[] buffer;
-          if(size<=(OmniArray.MAX_ARR_SIZE>>3)){
-            (buffer=new char[size<<3])[size=OmniArray.OfShort.ascendingToString(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,buffer,1)]=']';
+          if(size<=(OmniArray.MAX_ARR_SIZE>>3)){(buffer=new char[size<<3])
+            [size=OmniArray.OfShort.ascendingToString(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,buffer,1)]=']';
           }else{
             final ToStringUtil.OmniStringBuilder builder;
-            OmniArray.OfShort.ascendingToString(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,builder=new ToStringUtil.OmniStringBuilder(1,new char[size*6]));
+            OmniArray.OfShort.ascendingToString(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,builder=new ToStringUtil.OmniStringBuilder(1,new char[OmniArray.MAX_ARR_SIZE]));
             (buffer=builder.buffer)[size=builder.size]=']';
           }
           buffer[0]='[';
@@ -4944,7 +4948,14 @@ public abstract class ShortArrSeq implements OmniCollection.OfShort
         }
         else
         {
-          ShortSortUtil.uncheckedStableSort(root.arr,rootOffset=this.rootOffset,rootOffset+size,sorter);
+          try
+          {
+            ShortSortUtil.uncheckedStableSort(root.arr,rootOffset=this.rootOffset,rootOffset+size,sorter);
+          }
+          catch(ArrayIndexOutOfBoundsException e)
+          {
+            throw new IllegalArgumentException("Comparison method violates its general contract!");
+          }
         }
       }
       finally
@@ -5043,7 +5054,14 @@ public abstract class ShortArrSeq implements OmniCollection.OfShort
         }
         else
         {
-          ShortSortUtil.uncheckedStableSort(root.arr,rootOffset=this.rootOffset,rootOffset+size,sorter::compare);
+          try
+          {
+            ShortSortUtil.uncheckedStableSort(root.arr,rootOffset=this.rootOffset,rootOffset+size,sorter::compare);
+          }
+          catch(ArrayIndexOutOfBoundsException e)
+          {
+            throw new IllegalArgumentException("Comparison method violates its general contract!");
+          }
         }
       }
       finally
@@ -5073,7 +5091,14 @@ public abstract class ShortArrSeq implements OmniCollection.OfShort
         }
         else
         {
-          ShortSortUtil.uncheckedUnstableSort(root.arr,rootOffset=this.rootOffset,rootOffset+size,sorter);
+          try
+          {
+            ShortSortUtil.uncheckedUnstableSort(root.arr,rootOffset=this.rootOffset,rootOffset+size,sorter);
+          }
+          catch(ArrayIndexOutOfBoundsException e)
+          {
+            throw new IllegalArgumentException("Comparison method violates its general contract!");
+          }
         }
       }
       finally

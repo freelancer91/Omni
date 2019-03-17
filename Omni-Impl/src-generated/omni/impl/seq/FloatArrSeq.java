@@ -30,6 +30,7 @@ public abstract class FloatArrSeq implements OmniCollection.OfFloat
   private FloatArrSeq()
   {
     super();
+    this.arr=OmniArray.OfFloat.DEFAULT_ARR;
   }
   private FloatArrSeq(int initialCapacity)
   {
@@ -86,11 +87,11 @@ public abstract class FloatArrSeq implements OmniCollection.OfFloat
         throw new OutOfMemoryError();
       }
       final char[] buffer;
-      if(size<=(OmniArray.MAX_ARR_SIZE/17)){
-        (buffer=new char[size*17])[size=uncheckedToString(size,buffer)]=']';
+      if(size<=(OmniArray.MAX_ARR_SIZE/17)){(buffer=new char[size*17])
+        [size=uncheckedToString(size,buffer)]=']';
       }else{
         final ToStringUtil.OmniStringBuilder builder;
-        uncheckedToString(size,builder=new ToStringUtil.OmniStringBuilder(1,new char[size*10]));
+        uncheckedToString(size,builder=new ToStringUtil.OmniStringBuilder(1,new char[OmniArray.MAX_ARR_SIZE]));
         (buffer=builder.buffer)[size=builder.size]=']';
       }
       buffer[0]='[';
@@ -1930,11 +1931,11 @@ public abstract class FloatArrSeq implements OmniCollection.OfFloat
         }
           final int rootOffset;
           final char[] buffer;
-          if(size<=(OmniArray.MAX_ARR_SIZE/17)){
-             (buffer=new char[size*17])[size=OmniArray.OfFloat.ascendingToString(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,buffer,1)]=']';
+          if(size<=(OmniArray.MAX_ARR_SIZE/17)){(buffer=new char[size*17])
+            [size=OmniArray.OfFloat.ascendingToString(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,buffer,1)]=']';
           }else{
             final ToStringUtil.OmniStringBuilder builder;
-            OmniArray.OfFloat.ascendingToString(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,builder=new ToStringUtil.OmniStringBuilder(1,new char[size*10]));
+            OmniArray.OfFloat.ascendingToString(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,builder=new ToStringUtil.OmniStringBuilder(1,new char[OmniArray.MAX_ARR_SIZE]));
             (buffer=builder.buffer)[size=builder.size]=']';
           }
           buffer[0]='[';
@@ -3867,10 +3868,11 @@ public abstract class FloatArrSeq implements OmniCollection.OfFloat
           {
             FloatSortUtil.uncheckedStableSort(this.arr,0,size,sorter);
           }
-          finally
+          catch(ArrayIndexOutOfBoundsException e)
           {
-            CheckedCollection.checkModCount(modCount,this.modCount);
+            throw CheckedCollection.checkModCount(modCount,this.modCount,e);
           }
+          CheckedCollection.checkModCount(modCount,this.modCount);
           this.modCount=modCount+1;
         }
       }
@@ -3931,10 +3933,11 @@ public abstract class FloatArrSeq implements OmniCollection.OfFloat
           {
             FloatSortUtil.uncheckedStableSort(this.arr,0,size,sorter::compare);
           }
-          finally
+          catch(ArrayIndexOutOfBoundsException e)
           {
-            CheckedCollection.checkModCount(modCount,this.modCount);
+            throw CheckedCollection.checkModCount(modCount,this.modCount,e);
           }
+          CheckedCollection.checkModCount(modCount,this.modCount);
           this.modCount=modCount+1;
         }
       }
@@ -3957,10 +3960,11 @@ public abstract class FloatArrSeq implements OmniCollection.OfFloat
           {
             FloatSortUtil.uncheckedUnstableSort(this.arr,0,size,sorter);
           }
-          finally
+          catch(ArrayIndexOutOfBoundsException e)
           {
-            CheckedCollection.checkModCount(modCount,this.modCount);
+            throw CheckedCollection.checkModCount(modCount,this.modCount,e);
           }
+          CheckedCollection.checkModCount(modCount,this.modCount);
           this.modCount=modCount+1;
         }
       }
@@ -4035,11 +4039,11 @@ public abstract class FloatArrSeq implements OmniCollection.OfFloat
         }
           final int rootOffset;
           final char[] buffer;
-          if(size<=(OmniArray.MAX_ARR_SIZE/17)){
-             (buffer=new char[size*17])[size=OmniArray.OfFloat.ascendingToString(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,buffer,1)]=']';
+          if(size<=(OmniArray.MAX_ARR_SIZE/17)){(buffer=new char[size*17])
+            [size=OmniArray.OfFloat.ascendingToString(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,buffer,1)]=']';
           }else{
             final ToStringUtil.OmniStringBuilder builder;
-            OmniArray.OfFloat.ascendingToString(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,builder=new ToStringUtil.OmniStringBuilder(1,new char[size*10]));
+            OmniArray.OfFloat.ascendingToString(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,builder=new ToStringUtil.OmniStringBuilder(1,new char[OmniArray.MAX_ARR_SIZE]));
             (buffer=builder.buffer)[size=builder.size]=']';
           }
           buffer[0]='[';
@@ -5631,7 +5635,14 @@ public abstract class FloatArrSeq implements OmniCollection.OfFloat
         }
         else
         {
-          FloatSortUtil.uncheckedStableSort(root.arr,rootOffset=this.rootOffset,rootOffset+size,sorter);
+          try
+          {
+            FloatSortUtil.uncheckedStableSort(root.arr,rootOffset=this.rootOffset,rootOffset+size,sorter);
+          }
+          catch(ArrayIndexOutOfBoundsException e)
+          {
+            throw new IllegalArgumentException("Comparison method violates its general contract!");
+          }
         }
       }
       finally
@@ -5730,7 +5741,14 @@ public abstract class FloatArrSeq implements OmniCollection.OfFloat
         }
         else
         {
-          FloatSortUtil.uncheckedStableSort(root.arr,rootOffset=this.rootOffset,rootOffset+size,sorter::compare);
+          try
+          {
+            FloatSortUtil.uncheckedStableSort(root.arr,rootOffset=this.rootOffset,rootOffset+size,sorter::compare);
+          }
+          catch(ArrayIndexOutOfBoundsException e)
+          {
+            throw new IllegalArgumentException("Comparison method violates its general contract!");
+          }
         }
       }
       finally
@@ -5760,7 +5778,14 @@ public abstract class FloatArrSeq implements OmniCollection.OfFloat
         }
         else
         {
-          FloatSortUtil.uncheckedUnstableSort(root.arr,rootOffset=this.rootOffset,rootOffset+size,sorter);
+          try
+          {
+            FloatSortUtil.uncheckedUnstableSort(root.arr,rootOffset=this.rootOffset,rootOffset+size,sorter);
+          }
+          catch(ArrayIndexOutOfBoundsException e)
+          {
+            throw new IllegalArgumentException("Comparison method violates its general contract!");
+          }
         }
       }
       finally

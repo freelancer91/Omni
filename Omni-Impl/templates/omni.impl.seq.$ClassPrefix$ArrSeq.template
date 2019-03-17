@@ -63,6 +63,7 @@ public abstract class $ClassPrefix$ArrSeq$<E>$ implements OmniCollection.Of$Clas
   private $ClassPrefix$ArrSeq()
   {
     super();
+    this.arr=OmniArray.Of$ClassPrefix$.DEFAULT_ARR;
   }
   private $ClassPrefix$ArrSeq(int initialCapacity)
   {
@@ -149,42 +150,22 @@ public abstract class $ClassPrefix$ArrSeq$<E>$ implements OmniCollection.Of$Clas
       return new String(buffer,0,size);
   #ELSE
     #IF OfBoolean
-      if(size<=(OmniArray.MAX_ARR_SIZE/7)){
-        (buffer=new char[size*7])[size=uncheckedToString(size,buffer)]=']';
-      }else{
-        final ToStringUtil.OmniStringBuilder builder;
-        uncheckedToString(size,builder=new ToStringUtil.OmniStringBuilder(1,new char[(size>>=2)*21+(size*6)]));
+      if(size<=(OmniArray.MAX_ARR_SIZE/7)){(buffer=new char[size*7])
     #ELSEIF OfByte
-      if(size<=(OmniArray.MAX_ARR_SIZE/6)){
-        (buffer=new char[size*6])[size=uncheckedToString(size,buffer)]=']';
-      }else{
-        final ToStringUtil.OmniStringBuilder builder;
-        uncheckedToString(size,builder=new ToStringUtil.OmniStringBuilder(1,new char[size*5]));
+      if(size<=(OmniArray.MAX_ARR_SIZE/6)){(buffer=new char[size*6])
     #ELSEIF OfShort
-      if(size<=(OmniArray.MAX_ARR_SIZE>>3)){
-        (buffer=new char[size<<3])[size=uncheckedToString(size,buffer)]=']';
-      }else{
-        final ToStringUtil.OmniStringBuilder builder;
-        uncheckedToString(size,builder=new ToStringUtil.OmniStringBuilder(1,new char[size*6]));
+      if(size<=(OmniArray.MAX_ARR_SIZE>>3)){(buffer=new char[size<<3])
     #ELSEIF OfInt
-      if(size<=(OmniArray.MAX_ARR_SIZE/13)){
-        (buffer=new char[size*13])[size=uncheckedToString(size,buffer)]=']';
-      }else{
-        final ToStringUtil.OmniStringBuilder builder;
-        uncheckedToString(size,builder=new ToStringUtil.OmniStringBuilder(1,new char[size<<3]));
+      if(size<=(OmniArray.MAX_ARR_SIZE/13)){(buffer=new char[size*13])
     #ELSEIF OfLong
-      if(size<=(OmniArray.MAX_ARR_SIZE/22)){
-        (buffer=new char[size*22])[size=uncheckedToString(size,buffer)]=']';
-      }else{
-        final ToStringUtil.OmniStringBuilder builder;
-        uncheckedToString(size,builder=new ToStringUtil.OmniStringBuilder(1,new char[size*13]));
+      if(size<=(OmniArray.MAX_ARR_SIZE/22)){(buffer=new char[size*22])
     #ELSEIF OfFloat
-      if(size<=(OmniArray.MAX_ARR_SIZE/17)){
-        (buffer=new char[size*17])[size=uncheckedToString(size,buffer)]=']';
+      if(size<=(OmniArray.MAX_ARR_SIZE/17)){(buffer=new char[size*17])
+    #ENDIF
+        [size=uncheckedToString(size,buffer)]=']';
       }else{
         final ToStringUtil.OmniStringBuilder builder;
-        uncheckedToString(size,builder=new ToStringUtil.OmniStringBuilder(1,new char[size*10]));
-    #ENDIF
+        uncheckedToString(size,builder=new ToStringUtil.OmniStringBuilder(1,new char[OmniArray.MAX_ARR_SIZE]));
         (buffer=builder.buffer)[size=builder.size]=']';
       }
       buffer[0]='[';
@@ -951,10 +932,19 @@ public void unstableDIRECTIONSort()
     $ClassPrefix$SortUtil.uncheckedDIRECTIONSort(root.arr,rootOffset=this.rootOffset,rootOffset+size);
     #ENDIF
   }
+  #IF OfRef
+  catch(ArrayIndexOutOfBoundsException e)
+  {
+    throw CheckedCollection.checkModCount(modCount,root.modCount,e);
+  }
+  CheckedCollection.checkModCount(modCount,root.modCount);
+  #ELSE
   finally
   {
     CheckedCollection.checkModCount(modCount,root.modCount);
   }
+  #ENDIF
+  
   root.modCount=++modCount;
   this.modCount=modCount;
   for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}
@@ -969,10 +959,11 @@ public void unstableDIRECTIONSort()
     {
       $ClassPrefix$SortUtil.uncheckedSTABLEDIRECTIONSort(this.arr,0,size);
     }
-    finally
+    catch(ArrayIndexOutOfBoundsException e)
     {
-      CheckedCollection.checkModCount(modCount,this.modCount);
+      throw CheckedCollection.checkModCount(modCount,this.modCount,e);
     }
+    CheckedCollection.checkModCount(modCount,this.modCount);
     this.modCount=modCount+1;
       #ELSE
     $ClassPrefix$SortUtil.uncheckedDIRECTIONSort(this.arr,0,size);
@@ -1028,11 +1019,18 @@ public void unstableSort(COMPARATOR sorter)
     }
     else
     {
+      try
+      {
     #IF OfBoolean
-      $ClassPrefix$SortUtil.uncheckedSort(root.arr,rootOffset=this.rootOffset,rootOffset+size,COMPARE);
+        $ClassPrefix$SortUtil.uncheckedSort(root.arr,rootOffset=this.rootOffset,rootOffset+size,COMPARE);
     #ELSE
-      $ClassPrefix$SortUtil.uncheckedSTABLESort(root.arr,rootOffset=this.rootOffset,rootOffset+size,COMPARE);
+        $ClassPrefix$SortUtil.uncheckedSTABLESort(root.arr,rootOffset=this.rootOffset,rootOffset+size,COMPARE);
     #ENDIF
+      }
+      catch(ArrayIndexOutOfBoundsException e)
+      {
+        throw new IllegalArgumentException("Comparison method violates its general contract!");
+      }
     }
   }
   finally
@@ -1060,10 +1058,11 @@ public void unstableSort(COMPARATOR sorter)
         $ClassPrefix$SortUtil.uncheckedSTABLESort(this.arr,0,size,COMPARE);
       }
     }
-    finally
+    catch(ArrayIndexOutOfBoundsException e)
     {
-      CheckedCollection.checkModCount(modCount,this.modCount);
+      throw CheckedCollection.checkModCount(modCount,this.modCount,e);
     }
+    CheckedCollection.checkModCount(modCount,this.modCount);
     this.modCount=modCount+1;
       #ELSE
     if(sorter==null)
@@ -1082,10 +1081,11 @@ public void unstableSort(COMPARATOR sorter)
         $ClassPrefix$SortUtil.uncheckedSTABLESort(this.arr,0,size,COMPARE);
         #ENDIF
       }
-      finally
+      catch(ArrayIndexOutOfBoundsException e)
       {
-        CheckedCollection.checkModCount(modCount,this.modCount);
+        throw CheckedCollection.checkModCount(modCount,this.modCount,e);
       }
+      CheckedCollection.checkModCount(modCount,this.modCount);
       this.modCount=modCount+1;
     }
       #ENDIF
@@ -3780,42 +3780,22 @@ public String toString()
       return new String(buffer,0,size);
       #ELSE
         #IF OfBoolean
-      if(size<=(OmniArray.MAX_ARR_SIZE/7)){
-        (buffer=new char[size*7])[size=OmniArray.Of$ClassPrefix$.ascendingToString(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,buffer,1)]=']';
-      }else{
-        final ToStringUtil.OmniStringBuilder builder;
-        OmniArray.Of$ClassPrefix$.ascendingToString(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,builder=new ToStringUtil.OmniStringBuilder(1,new char[(size>>=2)*21+(size*6)]));
+      if(size<=(OmniArray.MAX_ARR_SIZE/7)){(buffer=new char[size*7])
         #ELSEIF OfByte
-      if(size<=(OmniArray.MAX_ARR_SIZE/6)){
-        (buffer=new char[size*6])[size=OmniArray.Of$ClassPrefix$.ascendingToString(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,buffer,1)]=']';
-      }else{
-        final ToStringUtil.OmniStringBuilder builder;
-        OmniArray.Of$ClassPrefix$.ascendingToString(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,builder=new ToStringUtil.OmniStringBuilder(1,new char[size*5]));
+      if(size<=(OmniArray.MAX_ARR_SIZE/6)){(buffer=new char[size*6])
         #ELSEIF OfShort
-      if(size<=(OmniArray.MAX_ARR_SIZE>>3)){
-        (buffer=new char[size<<3])[size=OmniArray.Of$ClassPrefix$.ascendingToString(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,buffer,1)]=']';
-      }else{
-        final ToStringUtil.OmniStringBuilder builder;
-        OmniArray.Of$ClassPrefix$.ascendingToString(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,builder=new ToStringUtil.OmniStringBuilder(1,new char[size*6]));
+      if(size<=(OmniArray.MAX_ARR_SIZE>>3)){(buffer=new char[size<<3])
         #ELSEIF OfInt
-      if(size<=(OmniArray.MAX_ARR_SIZE/13)){
-         (buffer=new char[size*13])[size=OmniArray.Of$ClassPrefix$.ascendingToString(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,buffer,1)]=']';
-      }else{
-        final ToStringUtil.OmniStringBuilder builder;
-        OmniArray.Of$ClassPrefix$.ascendingToString(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,builder=new ToStringUtil.OmniStringBuilder(1,new char[size<<3]));
+      if(size<=(OmniArray.MAX_ARR_SIZE/13)){(buffer=new char[size*13])
         #ELSEIF OfLong
-      if(size<=(OmniArray.MAX_ARR_SIZE/22)){
-         (buffer=new char[size*22])[size=OmniArray.Of$ClassPrefix$.ascendingToString(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,buffer,1)]=']';
-      }else{
-        final ToStringUtil.OmniStringBuilder builder;
-        OmniArray.Of$ClassPrefix$.ascendingToString(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,builder=new ToStringUtil.OmniStringBuilder(1,new char[size*13]));
+      if(size<=(OmniArray.MAX_ARR_SIZE/22)){(buffer=new char[size*22])
         #ELSEIF OfFloat
-      if(size<=(OmniArray.MAX_ARR_SIZE/17)){
-         (buffer=new char[size*17])[size=OmniArray.Of$ClassPrefix$.ascendingToString(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,buffer,1)]=']';
+      if(size<=(OmniArray.MAX_ARR_SIZE/17)){(buffer=new char[size*17])
+        #ENDIF
+        [size=OmniArray.Of$ClassPrefix$.ascendingToString(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,buffer,1)]=']';
       }else{
         final ToStringUtil.OmniStringBuilder builder;
-        OmniArray.Of$ClassPrefix$.ascendingToString(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,builder=new ToStringUtil.OmniStringBuilder(1,new char[size*10]));
-        #ENDIF
+        OmniArray.Of$ClassPrefix$.ascendingToString(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,builder=new ToStringUtil.OmniStringBuilder(1,new char[OmniArray.MAX_ARR_SIZE]));
         (buffer=builder.buffer)[size=builder.size]=']';
       }
       buffer[0]='[';

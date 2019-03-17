@@ -28,6 +28,7 @@ public abstract class BooleanArrSeq implements OmniCollection.OfBoolean
   private BooleanArrSeq()
   {
     super();
+    this.arr=OmniArray.OfBoolean.DEFAULT_ARR;
   }
   private BooleanArrSeq(int initialCapacity)
   {
@@ -84,11 +85,11 @@ public abstract class BooleanArrSeq implements OmniCollection.OfBoolean
         throw new OutOfMemoryError();
       }
       final char[] buffer;
-      if(size<=(OmniArray.MAX_ARR_SIZE/7)){
-        (buffer=new char[size*7])[size=uncheckedToString(size,buffer)]=']';
+      if(size<=(OmniArray.MAX_ARR_SIZE/7)){(buffer=new char[size*7])
+        [size=uncheckedToString(size,buffer)]=']';
       }else{
         final ToStringUtil.OmniStringBuilder builder;
-        uncheckedToString(size,builder=new ToStringUtil.OmniStringBuilder(1,new char[(size>>=2)*21+(size*6)]));
+        uncheckedToString(size,builder=new ToStringUtil.OmniStringBuilder(1,new char[OmniArray.MAX_ARR_SIZE]));
         (buffer=builder.buffer)[size=builder.size]=']';
       }
       buffer[0]='[';
@@ -1948,11 +1949,11 @@ public abstract class BooleanArrSeq implements OmniCollection.OfBoolean
         }
           final int rootOffset;
           final char[] buffer;
-          if(size<=(OmniArray.MAX_ARR_SIZE/7)){
-            (buffer=new char[size*7])[size=OmniArray.OfBoolean.ascendingToString(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,buffer,1)]=']';
+          if(size<=(OmniArray.MAX_ARR_SIZE/7)){(buffer=new char[size*7])
+            [size=OmniArray.OfBoolean.ascendingToString(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,buffer,1)]=']';
           }else{
             final ToStringUtil.OmniStringBuilder builder;
-            OmniArray.OfBoolean.ascendingToString(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,builder=new ToStringUtil.OmniStringBuilder(1,new char[(size>>=2)*21+(size*6)]));
+            OmniArray.OfBoolean.ascendingToString(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,builder=new ToStringUtil.OmniStringBuilder(1,new char[OmniArray.MAX_ARR_SIZE]));
             (buffer=builder.buffer)[size=builder.size]=']';
           }
           buffer[0]='[';
@@ -3796,10 +3797,11 @@ public abstract class BooleanArrSeq implements OmniCollection.OfBoolean
           {
             BooleanSortUtil.uncheckedSort(this.arr,0,size,sorter);
           }
-          finally
+          catch(ArrayIndexOutOfBoundsException e)
           {
-            CheckedCollection.checkModCount(modCount,this.modCount);
+            throw CheckedCollection.checkModCount(modCount,this.modCount,e);
           }
+          CheckedCollection.checkModCount(modCount,this.modCount);
           this.modCount=modCount+1;
         }
       }
@@ -3860,10 +3862,11 @@ public abstract class BooleanArrSeq implements OmniCollection.OfBoolean
           {
             BooleanSortUtil.uncheckedSort(this.arr,0,size,sorter::compare);
           }
-          finally
+          catch(ArrayIndexOutOfBoundsException e)
           {
-            CheckedCollection.checkModCount(modCount,this.modCount);
+            throw CheckedCollection.checkModCount(modCount,this.modCount,e);
           }
+          CheckedCollection.checkModCount(modCount,this.modCount);
           this.modCount=modCount+1;
         }
       }
@@ -3938,11 +3941,11 @@ public abstract class BooleanArrSeq implements OmniCollection.OfBoolean
         }
           final int rootOffset;
           final char[] buffer;
-          if(size<=(OmniArray.MAX_ARR_SIZE/7)){
-            (buffer=new char[size*7])[size=OmniArray.OfBoolean.ascendingToString(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,buffer,1)]=']';
+          if(size<=(OmniArray.MAX_ARR_SIZE/7)){(buffer=new char[size*7])
+            [size=OmniArray.OfBoolean.ascendingToString(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,buffer,1)]=']';
           }else{
             final ToStringUtil.OmniStringBuilder builder;
-            OmniArray.OfBoolean.ascendingToString(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,builder=new ToStringUtil.OmniStringBuilder(1,new char[(size>>=2)*21+(size*6)]));
+            OmniArray.OfBoolean.ascendingToString(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,builder=new ToStringUtil.OmniStringBuilder(1,new char[OmniArray.MAX_ARR_SIZE]));
             (buffer=builder.buffer)[size=builder.size]=']';
           }
           buffer[0]='[';
@@ -5272,7 +5275,14 @@ public abstract class BooleanArrSeq implements OmniCollection.OfBoolean
         }
         else
         {
-          BooleanSortUtil.uncheckedSort(root.arr,rootOffset=this.rootOffset,rootOffset+size,sorter);
+          try
+          {
+            BooleanSortUtil.uncheckedSort(root.arr,rootOffset=this.rootOffset,rootOffset+size,sorter);
+          }
+          catch(ArrayIndexOutOfBoundsException e)
+          {
+            throw new IllegalArgumentException("Comparison method violates its general contract!");
+          }
         }
       }
       finally
@@ -5371,7 +5381,14 @@ public abstract class BooleanArrSeq implements OmniCollection.OfBoolean
         }
         else
         {
-          BooleanSortUtil.uncheckedSort(root.arr,rootOffset=this.rootOffset,rootOffset+size,sorter::compare);
+          try
+          {
+            BooleanSortUtil.uncheckedSort(root.arr,rootOffset=this.rootOffset,rootOffset+size,sorter::compare);
+          }
+          catch(ArrayIndexOutOfBoundsException e)
+          {
+            throw new IllegalArgumentException("Comparison method violates its general contract!");
+          }
         }
       }
       finally
