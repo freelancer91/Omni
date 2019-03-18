@@ -126,13 +126,16 @@ public abstract class $ClassPrefix$ArrSeq$<E>$ implements OmniCollection.Of$Clas
     if((size=this.size)!=0)
     {
 #IF OfBoolean
-      if(size>(Integer.MAX_VALUE/6))
-#ELSEIF OfByte,OfChar,OfShort,OfInt,OfLong
-      if(size>(Integer.MAX_VALUE/3))
-#ELSEIF OfFloat,OfDouble
+      if(size>=(Integer.MAX_VALUE/6))
+#ELSEIF OfByte,OfChar,OfInt,OfLong,OfShort
+      if(size>=(Integer.MAX_VALUE/3))
+#ELSEIF OfFloat
+      //TODO handle overflow better
+      if(size>=(Integer.MAX_VALUE/5)-2)
+#ELSEIF OfDouble
       if(size>(Integer.MAX_VALUE/5))
 #ELSE
-      if(size>(Integer.MAX_VALUE>>1))
+      if(size>=(Integer.MAX_VALUE>>1))
 #ENDIF
       {
         throw new OutOfMemoryError();
@@ -142,34 +145,40 @@ public abstract class $ClassPrefix$ArrSeq$<E>$ implements OmniCollection.Of$Clas
       uncheckedToString(size,builder);
       return builder.append(']').toString();
 #ELSE
-      final char[] buffer;
+     
   #IF OfChar
+      final char[] buffer;
       uncheckedToString(size,buffer=new char[size*=3]);
       buffer[0]='[';
       buffer[size-1]=']';
       return new String(buffer,0,size);
   #ELSE
+      final byte[] buffer;
     #IF OfBoolean
-      if(size<=(OmniArray.MAX_ARR_SIZE/7)){(buffer=new char[size*7])
+      if(size<=(OmniArray.MAX_ARR_SIZE/7)){(buffer=new byte[size*7])
     #ELSEIF OfByte
-      if(size<=(OmniArray.MAX_ARR_SIZE/6)){(buffer=new char[size*6])
+      if(size<=(OmniArray.MAX_ARR_SIZE/6)){(buffer=new byte[size*6])
     #ELSEIF OfShort
-      if(size<=(OmniArray.MAX_ARR_SIZE>>3)){(buffer=new char[size<<3])
+      if(size<=(OmniArray.MAX_ARR_SIZE>>3)){(buffer=new byte[size<<3])
     #ELSEIF OfInt
-      if(size<=(OmniArray.MAX_ARR_SIZE/13)){(buffer=new char[size*13])
+      if(size<=(OmniArray.MAX_ARR_SIZE/13)){(buffer=new byte[size*13])
     #ELSEIF OfLong
-      if(size<=(OmniArray.MAX_ARR_SIZE/22)){(buffer=new char[size*22])
+      if(size<=(OmniArray.MAX_ARR_SIZE/22)){(buffer=new byte[size*22])
     #ELSEIF OfFloat
-      if(size<=(OmniArray.MAX_ARR_SIZE/17)){(buffer=new char[size*17])
+      if(size<=(OmniArray.MAX_ARR_SIZE/17)){(buffer=new byte[size*17])
     #ENDIF
-        [size=uncheckedToString(size,buffer)]=']';
+        [size=uncheckedToString(size,buffer)]=(byte)']';
+        buffer[0]=(byte)'[';
+        return new String(buffer,0,size+1,ToStringUtil.IOS8859CharSet);
       }else{
-        final ToStringUtil.OmniStringBuilder builder;
-        uncheckedToString(size,builder=new ToStringUtil.OmniStringBuilder(1,new char[OmniArray.MAX_ARR_SIZE]));
-        (buffer=builder.buffer)[size=builder.size]=']';
+        final ToStringUtil.OmniStringBuilderByte builder;
+        uncheckedToString(size,builder=new ToStringUtil.OmniStringBuilderByte(1,new byte[OmniArray.MAX_ARR_SIZE]));
+        builder.uncheckedAppendChar((byte)']');
+        buffer=builder.buffer;
+        buffer[0]=(byte)'[';
+        return new String(buffer,0,builder.size,ToStringUtil.IOS8859CharSet);
       }
-      buffer[0]='[';
-      return new String(buffer,0,size+1);
+      
   #ENDIF 
 #ENDIF
     }
@@ -181,8 +190,8 @@ public abstract class $ClassPrefix$ArrSeq$<E>$ implements OmniCollection.Of$Clas
 #ELSEIF OfChar
   abstract void uncheckedToString(int size,char[] buffer);
 #ELSE
-  abstract int uncheckedToString(int size,char[] buffer);
-  abstract void uncheckedToString(int size,ToStringUtil.OmniStringBuilder builder);
+  abstract int uncheckedToString(int size,byte[] buffer);
+  abstract void uncheckedToString(int size,ToStringUtil.OmniStringBuilderByte builder);
 #ENDIF
  
   #MACRO RootQueryMethods<Root,contains>()
@@ -717,7 +726,7 @@ public
   {
     super(initialCapacity);
   }
-  private STRUCTNAME(int size,$ArrayType$[] arr)
+  STRUCTNAME(int size,$ArrayType$[] arr)
   {
     super(size,arr);
   }
@@ -3700,7 +3709,7 @@ void uncheckedToString(int size,char[] buffer)
   #ENDIF
 }
   #ELSE
-int uncheckedToString(int size,char[] buffer)
+int uncheckedToString(int size,byte[] buffer)
 {
   #IFSWITCH STRUCTNAME==UncheckedList
   return OmniArray.Of$ClassPrefix$.ascendingToString(this.arr,0,size-1,buffer,1);
@@ -3708,7 +3717,7 @@ int uncheckedToString(int size,char[] buffer)
   return OmniArray.Of$ClassPrefix$.descendingToString(this.arr,0,size-1,buffer,1);
   #ENDIF
 }
-void uncheckedToString(int size,ToStringUtil.OmniStringBuilder builder)
+void uncheckedToString(int size,ToStringUtil.OmniStringBuilderByte builder)
 {
   #IFSWITCH STRUCTNAME==UncheckedList
   OmniArray.Of$ClassPrefix$.ascendingToString(this.arr,0,size-1,builder);
@@ -3731,7 +3740,7 @@ public String toString()
     final int size;
     if((size=this.size)!=0)
     {
-      if(size>(Integer.MAX_VALUE>>1))
+      if(size>=(Integer.MAX_VALUE>>1))
       {
         throw new OutOfMemoryError();
       }
@@ -3757,11 +3766,14 @@ public String toString()
   if((size=this.size)!=0)
   {
     #IF OfBoolean
-    if(size>(Integer.MAX_VALUE/6))
-    #ELSEIF OfByte,OfChar,OfShort,OfInt,OfLong
-    if(size>(Integer.MAX_VALUE/3))
-    #ELSE
-    if(size>(Integer.MAX_VALUE/5))
+    if(size>=(Integer.MAX_VALUE/6))
+    #ELSEIF OfByte,OfChar,OfInt,OfLong,OfShort
+    if(size>=(Integer.MAX_VALUE/3))
+    #ELSEIF OfFloat
+      //TODO handle overflow better
+      if(size>=(Integer.MAX_VALUE/5)-2)
+    #ELSEIF OfDouble
+      if(size>(Integer.MAX_VALUE/5))
     #ENDIF
     {
       throw new OutOfMemoryError();
@@ -3772,34 +3784,38 @@ public String toString()
       OmniArray.Of$ClassPrefix$.ascendingToString(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,builder=new StringBuilder("["));
       return builder.append(']').toString();
     #ELSE
-      final char[] buffer;
       #IF OfChar
+      final char[] buffer;
       OmniArray.Of$ClassPrefix$.ascendingToString(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,buffer=new char[size*=3],1);
       buffer[0]='[';
       buffer[size-1]=']';
       return new String(buffer,0,size);
       #ELSE
+      final byte[] buffer;
         #IF OfBoolean
-      if(size<=(OmniArray.MAX_ARR_SIZE/7)){(buffer=new char[size*7])
+      if(size<=(OmniArray.MAX_ARR_SIZE/7)){(buffer=new byte[size*7])
         #ELSEIF OfByte
-      if(size<=(OmniArray.MAX_ARR_SIZE/6)){(buffer=new char[size*6])
+      if(size<=(OmniArray.MAX_ARR_SIZE/6)){(buffer=new byte[size*6])
         #ELSEIF OfShort
-      if(size<=(OmniArray.MAX_ARR_SIZE>>3)){(buffer=new char[size<<3])
+      if(size<=(OmniArray.MAX_ARR_SIZE>>3)){(buffer=new byte[size<<3])
         #ELSEIF OfInt
-      if(size<=(OmniArray.MAX_ARR_SIZE/13)){(buffer=new char[size*13])
+      if(size<=(OmniArray.MAX_ARR_SIZE/13)){(buffer=new byte[size*13])
         #ELSEIF OfLong
-      if(size<=(OmniArray.MAX_ARR_SIZE/22)){(buffer=new char[size*22])
+      if(size<=(OmniArray.MAX_ARR_SIZE/22)){(buffer=new byte[size*22])
         #ELSEIF OfFloat
-      if(size<=(OmniArray.MAX_ARR_SIZE/17)){(buffer=new char[size*17])
+      if(size<=(OmniArray.MAX_ARR_SIZE/17)){(buffer=new byte[size*17])
         #ENDIF
-        [size=OmniArray.Of$ClassPrefix$.ascendingToString(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,buffer,1)]=']';
+        [size=OmniArray.Of$ClassPrefix$.ascendingToString(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,buffer,1)]=(byte)']';
+        buffer[0]=(byte)'[';
+        return new String(buffer,0,size+1,ToStringUtil.IOS8859CharSet);
       }else{
-        final ToStringUtil.OmniStringBuilder builder;
-        OmniArray.Of$ClassPrefix$.ascendingToString(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,builder=new ToStringUtil.OmniStringBuilder(1,new char[OmniArray.MAX_ARR_SIZE]));
-        (buffer=builder.buffer)[size=builder.size]=']';
+        final ToStringUtil.OmniStringBuilderByte builder;
+        OmniArray.Of$ClassPrefix$.ascendingToString(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,builder=new ToStringUtil.OmniStringBuilderByte(1,new byte[OmniArray.MAX_ARR_SIZE]));
+        builder.uncheckedAppendChar((byte)']');
+        (buffer=builder.buffer)[0]=(byte)'[';
+        return new String(buffer,0,size=builder.size,ToStringUtil.IOS8859CharSet);
       }
-      buffer[0]='[';
-      return new String(buffer,0,size+1);
+      
       #ENDIF 
     #ENDIF
   }

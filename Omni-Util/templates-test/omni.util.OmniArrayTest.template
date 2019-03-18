@@ -297,10 +297,10 @@ public void testAscendingOmniStringBuilderToStringARRTYPE()
 {
   ARRTYPE[] arr=new ARRTYPE[10];
   ARRTYPEArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
-  char[] buffer=new char[]{'['};
-  ToStringUtil.OmniStringBuilder builder=new ToStringUtil.OmniStringBuilder(1,buffer);
+  byte[] buffer=new byte[]{(byte)'['};
+  ToStringUtil.OmniStringBuilderByte builder=new ToStringUtil.OmniStringBuilderByte(1,buffer);
   OmniArray.OfCLASSPREFIX.ascendingToString(arr,0,arr.length-1,builder);
-  builder.uncheckedAppendChar(']');
+  builder.uncheckedAppendChar((byte)']');
   String result=builder.toString();
   String expected=Arrays.toString(arr);
   Assertions.assertEquals(result,expected);
@@ -310,10 +310,10 @@ public void testDescendingOmniStringBuilderToStringARRTYPE()
 {
   ARRTYPE[] arr=new ARRTYPE[10];
   ARRTYPEArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
-  char[] buffer=new char[]{'['};
-  ToStringUtil.OmniStringBuilder builder=new ToStringUtil.OmniStringBuilder(1,buffer);
+  byte[] buffer=new byte[]{(byte)'['};
+  ToStringUtil.OmniStringBuilderByte builder=new ToStringUtil.OmniStringBuilderByte(1,buffer);
   OmniArray.OfCLASSPREFIX.descendingToString(arr,0,arr.length-1,builder);
-  builder.uncheckedAppendChar(']');
+  builder.uncheckedAppendChar((byte)']');
   String result=builder.toString();
   OmniArray.OfCLASSPREFIX.reverseRange(arr,0,arr.length-1);
   String expected=Arrays.toString(arr);
@@ -324,10 +324,10 @@ public void testAscendingFixedBufferToStringARRTYPE()
 {
   ARRTYPE[] arr=new ARRTYPE[10];
   ARRTYPEArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
-  char[] buffer=new char[22*arr.length];
-  buffer[0]='[';
+  byte[] buffer=new byte[22*arr.length];
+  buffer[0]=(byte)'[';
   int bufferOffset=OmniArray.OfCLASSPREFIX.ascendingToString(arr,0,arr.length-1,buffer,1);
-  buffer[bufferOffset++]=']';
+  buffer[bufferOffset++]=(byte)']';
   String result=new String(buffer,0,bufferOffset);
   String expected=Arrays.toString(arr);
   Assertions.assertEquals(result,expected);
@@ -337,10 +337,10 @@ public void testDescendingFixedBufferToStringARRTYPE()
 {
   ARRTYPE[] arr=new ARRTYPE[10];
   ARRTYPEArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
-  char[] buffer=new char[22*arr.length];
-  buffer[0]='[';
+  byte[] buffer=new byte[22*arr.length];
+  buffer[0]=(byte)'[';
   int bufferOffset=OmniArray.OfCLASSPREFIX.descendingToString(arr,0,arr.length-1,buffer,1);
-  buffer[bufferOffset++]=']';
+  buffer[bufferOffset++]=(byte)']';
   String result=new String(buffer,0,bufferOffset);
   OmniArray.OfCLASSPREFIX.reverseRange(arr,0,arr.length-1);
   String expected=Arrays.toString(arr);

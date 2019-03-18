@@ -9,88 +9,23 @@
 #TYPEDEF OfRef
 package omni.impl.seq;
 import java.util.ArrayList;
-import omni.api.OmniCollection;
-import omni.util.OmniArray;
-import omni.api.OmniList;
-import omni.api.OmniStack;
-import java.util.function.Predicate;
-import java.util.function.Consumer;
-import java.util.Comparator;
-import omni.util.ArrCopy;
-import omni.util.$ClassPrefix$SortUtil;
-import omni.impl.CheckedCollection;
-import java.util.NoSuchElementException;
-import omni.api.OmniIterator;
-import omni.api.OmniListIterator;
-import java.util.function.IntFunction;
-import java.util.function.UnaryOperator;
-#IF OfRef,OfInt,OfLong,OfDouble,OfBoolean
-import java.util.function.$TypeNameModifier$Supplier;
-#ELSE
-import omni.function.$TypeNameModifier$Supplier;
-#ENDIF
-#IFNOT OfRef
-import omni.util.TypeUtil;
-#ENDIF
-import java.util.ConcurrentModificationException;
-#IF OfInt,OfLong,OfDouble
-import java.util.function.$UnaryOperator$;
-#ELSEIFNOT OfBoolean,OfRef
-import omni.function.$UnaryOperator$;
-#ENDIF
-#IF OfInt
-import java.util.function.$Comparator$;
-#ELSEIFNOT OfRef
-import omni.function.$Comparator$;
-#ENDIF
-#IF OfInt,OfLong,OfDouble
-import java.util.function.$TypeNameModifier$Predicate;
-import java.util.function.$TypeNameModifier$Consumer;
-#ELSEIFNOT OfRef
-import omni.function.$TypeNameModifier$Predicate;
-import omni.function.$TypeNameModifier$Consumer;
-#ENDIF
-#IFNOT OfDouble,OfChar,OfRef
-import omni.util.ToStringUtil;
-#ENDIF
-#IFNOT OfBoolean
-import omni.util.BitSetUtil;
-#ENDIF
-#IFNOT OfRef
-import omni.impl.Abstract$TypeNameModifier$Itr;
-#ENDIF
-#IF OfRef
-import omni.util.OmniPred;
-#ENDIF
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import omni.impl.seq.$ClassPrefix$ArrSeq.UncheckedStack;
 import omni.util.TypeConversionUtil;
+import omni.util.EqualityUtil;
+import omni.util.OmniArray;
+
+#IF OfBoolean,OfInt,OfLong,OfDouble,OfRef
+import java.util.function.$TypeNameModifier$Supplier;
+#ELSE
+import omni.function.$TypeNameModifier$Supplier;
+#ENDIF
+
+
 @SuppressWarnings({"rawtypes","unchecked"}) 
 public class $ClassPrefix$ArrSeqUncheckedStackTest
 {
-#IF OfRef
-  private static final $ArrayType$ MIN_LENGTH_STRING_VAL=new $ArrayType$(){@Override public String toString(){return "";}};
-#ELSEIF OfBoolean
-  private static final $ArrayType$ MIN_LENGTH_STRING_VAL=true;
-#ELSE
-  private static final $ArrayType$ MIN_LENGTH_STRING_VAL=0;
-#ENDIF
-  private static final int MIN_TOSTRING_LENGTH=String.valueOf(MIN_LENGTH_STRING_VAL).length();
-
-#IF OfBoolean
-  private static final int MAX_TOSTRING_LENGTH=5;
-#ELSEIF OfByte
-  private static final int MAX_TOSTRING_LENGTH=4;
-#ELSEIF OfShort
-  private static final int MAX_TOSTRING_LENGTH=6;
-#ELSEIF OfInt
-  private static final int MAX_TOSTRING_LENGTH=11;
-#ELSEIF OfLong
-  private static final int MAX_TOSTRING_LENGTH=20;
-#ELSEIF OfFloat
-  private static final int MAX_TOSTRING_LENGTH=15;
-#ENDIF
 
   @Test
   public void testConstructors()
@@ -173,25 +108,14 @@ public class $ClassPrefix$ArrSeqUncheckedStackTest
     clonedStack=(UncheckedStack)clonedObject;
     Assertions.assertTrue(clonedStack.arr!=stack.arr);
     Assertions.assertEquals(stack.size(),clonedStack.size());
-    for(int i=0;i<stack.size();++i)
-    {
-      Assertions.assertTrue(stack.arr[i]==clonedStack.arr[i]);
-    }
+    EqualityUtil.uncheckedparallelassertarraysAreEqual(stack.arr,0,clonedStack.arr,0,stack.size());
   }
   
-  @Test
-  public void testEmptyToString()
-  {
-    var stack=generateStack(0,null);
-    var arrayList=generateList(0,null);
-    Assertions.assertEquals(stack.toString(),arrayList.toString());
-  }
+ 
   @Test
   public void testEmptyHashCode()
   {
-    var stack=generateStack(0,null);
-    var arrayList=generateList(0,null);
-    Assertions.assertEquals(stack.hashCode(),arrayList.hashCode());
+    Assertions.assertEquals(generateList(0,null).hashCode(),generateList(0,null).hashCode());
   }
   @Test
   public void testHashCode()
@@ -227,104 +151,10 @@ public class $ClassPrefix$ArrSeqUncheckedStackTest
       }
 #ENDIF
     };
-    var stack=generateStack(length,stackGenerator);
-    var arrayList=generateList(length,listGenerator);
-    Assertions.assertEquals(stack.hashCode(),arrayList.hashCode());
+    Assertions.assertEquals(generateList(length,listGenerator).hashCode(),generateStack(length,stackGenerator).hashCode());
     
   }
-  @Test
-  public void testOOMToString()
-  {
-    int length=Integer.MAX_VALUE/(MIN_TOSTRING_LENGTH+2);
-    var stack=new UncheckedStack(length+1);
-    var arrayList=new ArrayList<>(length+1);
-    for(int i=0;i<length;++i)
-    {
-      stack.push(MIN_LENGTH_STRING_VAL);
-      arrayList.add(MIN_LENGTH_STRING_VAL);
-    }
-    Assertions.assertEquals(stack.toString(),arrayList.toString());
-    stack.push(MIN_LENGTH_STRING_VAL);
-    Assertions.assertThrows(OutOfMemoryError.class,()->stack.toString());
-  }
-  @Test
-  public void testSmallToString()
-  {
-    int length=100;
-    $TypeNameModifier$Supplier stackGenerator=new $TypeNameModifier$Supplier()
-    {
-      int index=0;
-#IF OfRef
-      public $ArrayType$ get()
-      {
-        return TypeConversionUtil.convertToInteger(index++);
-      } 
-#ELSE
-      public $ArrayType$ getAs$TypeNameModifier$()
-      {
-        return TypeConversionUtil.convertTo$exposedType$(index++);
-      }
-#ENDIF
-    };
-    $TypeNameModifier$Supplier listGenerator=new $TypeNameModifier$Supplier()
-    {
-      int index=length;
-#IF OfRef
-      public $ArrayType$ get()
-      {
-        return TypeConversionUtil.convertToInteger(--index);
-      } 
-#ELSE
-      public $ArrayType$ getAs$TypeNameModifier$()
-      {
-        return TypeConversionUtil.convertTo$exposedType$(--index);
-      }
-#ENDIF
-    };
-    var stack=generateStack(length,stackGenerator);
-    var arrayList=generateList(length,listGenerator);
-    Assertions.assertEquals(stack.toString(),arrayList.toString());
-  }
-#IF OfBoolean,OfByte,OfShort,OfInt,OfLong,OfFloat
-  @Test
-  public void testLargeToString()
-  {
-    
-    int length=(OmniArray.MAX_ARR_SIZE/(MAX_TOSTRING_LENGTH+2))+1;
-    $TypeNameModifier$Supplier stackGenerator=new $TypeNameModifier$Supplier()
-    {
-      int index=0;
-#IF OfRef
-      public $ArrayType$ get()
-      {
-        return TypeConversionUtil.convertToInteger(index++);
-      } 
-#ELSE
-      public $ArrayType$ getAs$TypeNameModifier$()
-      {
-        return TypeConversionUtil.convertTo$exposedType$(index++);
-      }
-#ENDIF
-    };
-    $TypeNameModifier$Supplier listGenerator=new $TypeNameModifier$Supplier()
-    {
-      int index=length;
-#IF OfRef
-      public $ArrayType$ get()
-      {
-        return TypeConversionUtil.convertToInteger(--index);
-      } 
-#ELSE
-      public $ArrayType$ getAs$TypeNameModifier$()
-      {
-        return TypeConversionUtil.convertTo$exposedType$(--index);
-      }
-#ENDIF
-    };
-    var stack=generateStack(length,stackGenerator);
-    var arrayList=generateList(length,listGenerator);
-    Assertions.assertEquals(stack.toString(),arrayList.toString());
-  }
-#ENDIF
   
+  
+
 }

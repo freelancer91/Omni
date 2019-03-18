@@ -3,7 +3,28 @@ package omni.impl;
 import java.util.ConcurrentModificationException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import omni.api.OmniCollection;
 public class CheckedCollectionTest{
+    @SuppressWarnings({"rawtypes","unchecked"})
+    public static Object createCollectionModifyingObject(OmniCollection.OfRef collection){
+        return new Object(){
+            @Override
+            public String toString(){
+                collection.add(new Object());
+                return super.toString();
+            }
+            @Override
+            public boolean equals(Object val){
+                collection.add(new Object());
+                return super.equals(val);
+            }
+            @Override
+            public int hashCode(){
+                collection.add(new Object());
+                return super.hashCode();
+            }
+        };
+    }
     @Test
     public void testCheckLo(){
         Assertions.assertDoesNotThrow(()->{

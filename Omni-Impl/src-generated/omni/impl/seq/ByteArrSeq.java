@@ -82,26 +82,29 @@ public abstract class ByteArrSeq implements OmniCollection.OfByte
     int size;
     if((size=this.size)!=0)
     {
-      if(size>(Integer.MAX_VALUE/3))
+      if(size>=(Integer.MAX_VALUE/3))
       {
         throw new OutOfMemoryError();
       }
-      final char[] buffer;
-      if(size<=(OmniArray.MAX_ARR_SIZE/6)){(buffer=new char[size*6])
-        [size=uncheckedToString(size,buffer)]=']';
+      final byte[] buffer;
+      if(size<=(OmniArray.MAX_ARR_SIZE/6)){(buffer=new byte[size*6])
+        [size=uncheckedToString(size,buffer)]=(byte)']';
+        buffer[0]=(byte)'[';
+        return new String(buffer,0,size+1,ToStringUtil.IOS8859CharSet);
       }else{
-        final ToStringUtil.OmniStringBuilder builder;
-        uncheckedToString(size,builder=new ToStringUtil.OmniStringBuilder(1,new char[OmniArray.MAX_ARR_SIZE]));
-        (buffer=builder.buffer)[size=builder.size]=']';
+        final ToStringUtil.OmniStringBuilderByte builder;
+        uncheckedToString(size,builder=new ToStringUtil.OmniStringBuilderByte(1,new byte[OmniArray.MAX_ARR_SIZE]));
+        builder.uncheckedAppendChar((byte)']');
+        buffer=builder.buffer;
+        buffer[0]=(byte)'[';
+        return new String(buffer,0,builder.size,ToStringUtil.IOS8859CharSet);
       }
-      buffer[0]='[';
-      return new String(buffer,0,size+1);
     }
     return "[]";
   }
   abstract int uncheckedHashCode(int size);
-  abstract int uncheckedToString(int size,char[] buffer);
-  abstract void uncheckedToString(int size,ToStringUtil.OmniStringBuilder builder);
+  abstract int uncheckedToString(int size,byte[] buffer);
+  abstract void uncheckedToString(int size,ToStringUtil.OmniStringBuilderByte builder);
   @Override
   public boolean contains(boolean val)
   {
@@ -666,7 +669,7 @@ public abstract class ByteArrSeq implements OmniCollection.OfByte
     {
       super(initialCapacity);
     }
-    private UncheckedStack(int size,byte[] arr)
+    UncheckedStack(int size,byte[] arr)
     {
       super(size,arr);
     }
@@ -691,11 +694,11 @@ public abstract class ByteArrSeq implements OmniCollection.OfByte
       }
       return new UncheckedStack(size,copy);
     }
-    int uncheckedToString(int size,char[] buffer)
+    int uncheckedToString(int size,byte[] buffer)
     {
       return OmniArray.OfByte.descendingToString(this.arr,0,size-1,buffer,1);
     }
-    void uncheckedToString(int size,ToStringUtil.OmniStringBuilder builder)
+    void uncheckedToString(int size,ToStringUtil.OmniStringBuilderByte builder)
     {
       OmniArray.OfByte.descendingToString(this.arr,0,size-1,builder);
     }
@@ -1125,7 +1128,7 @@ public abstract class ByteArrSeq implements OmniCollection.OfByte
     {
       super(initialCapacity);
     }
-    private UncheckedList(int size,byte[] arr)
+    UncheckedList(int size,byte[] arr)
     {
       super(size,arr);
     }
@@ -1150,11 +1153,11 @@ public abstract class ByteArrSeq implements OmniCollection.OfByte
       }
       return new UncheckedList(size,copy);
     }
-    int uncheckedToString(int size,char[] buffer)
+    int uncheckedToString(int size,byte[] buffer)
     {
       return OmniArray.OfByte.ascendingToString(this.arr,0,size-1,buffer,1);
     }
-    void uncheckedToString(int size,ToStringUtil.OmniStringBuilder builder)
+    void uncheckedToString(int size,ToStringUtil.OmniStringBuilderByte builder)
     {
       OmniArray.OfByte.ascendingToString(this.arr,0,size-1,builder);
     }
@@ -1788,21 +1791,23 @@ public abstract class ByteArrSeq implements OmniCollection.OfByte
       int size;
       if((size=this.size)!=0)
       {
-        if(size>(Integer.MAX_VALUE/3))
+        if(size>=(Integer.MAX_VALUE/3))
         {
           throw new OutOfMemoryError();
         }
           final int rootOffset;
-          final char[] buffer;
-          if(size<=(OmniArray.MAX_ARR_SIZE/6)){(buffer=new char[size*6])
-            [size=OmniArray.OfByte.ascendingToString(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,buffer,1)]=']';
+          final byte[] buffer;
+          if(size<=(OmniArray.MAX_ARR_SIZE/6)){(buffer=new byte[size*6])
+            [size=OmniArray.OfByte.ascendingToString(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,buffer,1)]=(byte)']';
+            buffer[0]=(byte)'[';
+            return new String(buffer,0,size+1,ToStringUtil.IOS8859CharSet);
           }else{
-            final ToStringUtil.OmniStringBuilder builder;
-            OmniArray.OfByte.ascendingToString(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,builder=new ToStringUtil.OmniStringBuilder(1,new char[OmniArray.MAX_ARR_SIZE]));
-            (buffer=builder.buffer)[size=builder.size]=']';
+            final ToStringUtil.OmniStringBuilderByte builder;
+            OmniArray.OfByte.ascendingToString(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,builder=new ToStringUtil.OmniStringBuilderByte(1,new byte[OmniArray.MAX_ARR_SIZE]));
+            builder.uncheckedAppendChar((byte)']');
+            (buffer=builder.buffer)[0]=(byte)'[';
+            return new String(buffer,0,size=builder.size,ToStringUtil.IOS8859CharSet);
           }
-          buffer[0]='[';
-          return new String(buffer,0,size+1);
       }
       return "[]";
     }
@@ -2803,7 +2808,7 @@ public abstract class ByteArrSeq implements OmniCollection.OfByte
     {
       super(initialCapacity);
     }
-    private CheckedStack(int size,byte[] arr)
+    CheckedStack(int size,byte[] arr)
     {
       super(size,arr);
     }
@@ -3134,7 +3139,7 @@ public abstract class ByteArrSeq implements OmniCollection.OfByte
     {
       super(initialCapacity);
     }
-    private CheckedList(int size,byte[] arr)
+    CheckedList(int size,byte[] arr)
     {
       super(size,arr);
     }
@@ -3684,21 +3689,23 @@ public abstract class ByteArrSeq implements OmniCollection.OfByte
       int size;
       if((size=this.size)!=0)
       {
-        if(size>(Integer.MAX_VALUE/3))
+        if(size>=(Integer.MAX_VALUE/3))
         {
           throw new OutOfMemoryError();
         }
           final int rootOffset;
-          final char[] buffer;
-          if(size<=(OmniArray.MAX_ARR_SIZE/6)){(buffer=new char[size*6])
-            [size=OmniArray.OfByte.ascendingToString(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,buffer,1)]=']';
+          final byte[] buffer;
+          if(size<=(OmniArray.MAX_ARR_SIZE/6)){(buffer=new byte[size*6])
+            [size=OmniArray.OfByte.ascendingToString(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,buffer,1)]=(byte)']';
+            buffer[0]=(byte)'[';
+            return new String(buffer,0,size+1,ToStringUtil.IOS8859CharSet);
           }else{
-            final ToStringUtil.OmniStringBuilder builder;
-            OmniArray.OfByte.ascendingToString(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,builder=new ToStringUtil.OmniStringBuilder(1,new char[OmniArray.MAX_ARR_SIZE]));
-            (buffer=builder.buffer)[size=builder.size]=']';
+            final ToStringUtil.OmniStringBuilderByte builder;
+            OmniArray.OfByte.ascendingToString(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,builder=new ToStringUtil.OmniStringBuilderByte(1,new byte[OmniArray.MAX_ARR_SIZE]));
+            builder.uncheckedAppendChar((byte)']');
+            (buffer=builder.buffer)[0]=(byte)'[';
+            return new String(buffer,0,size=builder.size,ToStringUtil.IOS8859CharSet);
           }
-          buffer[0]='[';
-          return new String(buffer,0,size+1);
       }
       return "[]";
     }

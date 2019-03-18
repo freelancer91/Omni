@@ -422,7 +422,7 @@ public interface OfCLASSPREFIX
     }
   }
 #ELSEIFSWITCH CLASSPREFIX==Boolean,Byte,Short,Int,Long,Float
-  public static void ascendingToString(PRIMITIVETYPE[] arr,int begin,int end,ToStringUtil.OmniStringBuilder builder)
+  public static void ascendingToString(PRIMITIVETYPE[] arr,int begin,int end,ToStringUtil.OmniStringBuilderByte builder)
   {
     for(;;++begin)
     {
@@ -438,7 +438,7 @@ public interface OfCLASSPREFIX
       builder.uncheckedAppendCommaAndSpace();
     }
   }
-  public static int ascendingToString(PRIMITIVETYPE[] arr,int begin,int end,char[] buffer,int bufferOffset)
+  public static int ascendingToString(PRIMITIVETYPE[] arr,int begin,int end,byte[] buffer,int bufferOffset)
   {
     for(;;++begin,++bufferOffset)
     {
@@ -451,11 +451,11 @@ public interface OfCLASSPREFIX
       {
         return bufferOffset;
       }
-      buffer[bufferOffset]=',';
-      buffer[++bufferOffset]=' ';
+      buffer[bufferOffset]=(byte)',';
+      buffer[++bufferOffset]=(byte)' ';
     }
   }
-  public static void descendingToString(PRIMITIVETYPE[] arr,int begin,int end,ToStringUtil.OmniStringBuilder builder)
+  public static void descendingToString(PRIMITIVETYPE[] arr,int begin,int end,ToStringUtil.OmniStringBuilderByte builder)
   {
     for(;;--end)
     {
@@ -471,7 +471,7 @@ public interface OfCLASSPREFIX
       builder.uncheckedAppendCommaAndSpace();
     }
   }
-  public static int descendingToString(PRIMITIVETYPE[] arr,int begin,int end,char[] buffer,int bufferOffset)
+  public static int descendingToString(PRIMITIVETYPE[] arr,int begin,int end,byte[] buffer,int bufferOffset)
   {
     for(;;--end,++bufferOffset)
     {
@@ -484,8 +484,8 @@ public interface OfCLASSPREFIX
       {
         return bufferOffset;
       }
-      buffer[bufferOffset]=',';
-      buffer[++bufferOffset]=' ';
+      buffer[bufferOffset]=(byte)',';
+      buffer[++bufferOffset]=(byte)' ';
     }
   }
 #ENDIF

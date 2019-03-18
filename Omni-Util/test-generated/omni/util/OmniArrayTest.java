@@ -323,10 +323,10 @@ public class OmniArrayTest
   {
     boolean[] arr=new boolean[10];
     booleanArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
-    char[] buffer=new char[]{'['};
-    ToStringUtil.OmniStringBuilder builder=new ToStringUtil.OmniStringBuilder(1,buffer);
+    byte[] buffer=new byte[]{(byte)'['};
+    ToStringUtil.OmniStringBuilderByte builder=new ToStringUtil.OmniStringBuilderByte(1,buffer);
     OmniArray.OfBoolean.ascendingToString(arr,0,arr.length-1,builder);
-    builder.uncheckedAppendChar(']');
+    builder.uncheckedAppendChar((byte)']');
     String result=builder.toString();
     String expected=Arrays.toString(arr);
     Assertions.assertEquals(result,expected);
@@ -336,10 +336,10 @@ public class OmniArrayTest
   {
     boolean[] arr=new boolean[10];
     booleanArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
-    char[] buffer=new char[]{'['};
-    ToStringUtil.OmniStringBuilder builder=new ToStringUtil.OmniStringBuilder(1,buffer);
+    byte[] buffer=new byte[]{(byte)'['};
+    ToStringUtil.OmniStringBuilderByte builder=new ToStringUtil.OmniStringBuilderByte(1,buffer);
     OmniArray.OfBoolean.descendingToString(arr,0,arr.length-1,builder);
-    builder.uncheckedAppendChar(']');
+    builder.uncheckedAppendChar((byte)']');
     String result=builder.toString();
     OmniArray.OfBoolean.reverseRange(arr,0,arr.length-1);
     String expected=Arrays.toString(arr);
@@ -350,10 +350,10 @@ public class OmniArrayTest
   {
     boolean[] arr=new boolean[10];
     booleanArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
-    char[] buffer=new char[22*arr.length];
-    buffer[0]='[';
+    byte[] buffer=new byte[22*arr.length];
+    buffer[0]=(byte)'[';
     int bufferOffset=OmniArray.OfBoolean.ascendingToString(arr,0,arr.length-1,buffer,1);
-    buffer[bufferOffset++]=']';
+    buffer[bufferOffset++]=(byte)']';
     String result=new String(buffer,0,bufferOffset);
     String expected=Arrays.toString(arr);
     Assertions.assertEquals(result,expected);
@@ -363,10 +363,10 @@ public class OmniArrayTest
   {
     boolean[] arr=new boolean[10];
     booleanArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
-    char[] buffer=new char[22*arr.length];
-    buffer[0]='[';
+    byte[] buffer=new byte[22*arr.length];
+    buffer[0]=(byte)'[';
     int bufferOffset=OmniArray.OfBoolean.descendingToString(arr,0,arr.length-1,buffer,1);
-    buffer[bufferOffset++]=']';
+    buffer[bufferOffset++]=(byte)']';
     String result=new String(buffer,0,bufferOffset);
     OmniArray.OfBoolean.reverseRange(arr,0,arr.length-1);
     String expected=Arrays.toString(arr);
@@ -377,10 +377,10 @@ public class OmniArrayTest
   {
     byte[] arr=new byte[10];
     byteArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
-    char[] buffer=new char[]{'['};
-    ToStringUtil.OmniStringBuilder builder=new ToStringUtil.OmniStringBuilder(1,buffer);
+    byte[] buffer=new byte[]{(byte)'['};
+    ToStringUtil.OmniStringBuilderByte builder=new ToStringUtil.OmniStringBuilderByte(1,buffer);
     OmniArray.OfByte.ascendingToString(arr,0,arr.length-1,builder);
-    builder.uncheckedAppendChar(']');
+    builder.uncheckedAppendChar((byte)']');
     String result=builder.toString();
     String expected=Arrays.toString(arr);
     Assertions.assertEquals(result,expected);
@@ -390,10 +390,10 @@ public class OmniArrayTest
   {
     byte[] arr=new byte[10];
     byteArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
-    char[] buffer=new char[]{'['};
-    ToStringUtil.OmniStringBuilder builder=new ToStringUtil.OmniStringBuilder(1,buffer);
+    byte[] buffer=new byte[]{(byte)'['};
+    ToStringUtil.OmniStringBuilderByte builder=new ToStringUtil.OmniStringBuilderByte(1,buffer);
     OmniArray.OfByte.descendingToString(arr,0,arr.length-1,builder);
-    builder.uncheckedAppendChar(']');
+    builder.uncheckedAppendChar((byte)']');
     String result=builder.toString();
     OmniArray.OfByte.reverseRange(arr,0,arr.length-1);
     String expected=Arrays.toString(arr);
@@ -404,10 +404,10 @@ public class OmniArrayTest
   {
     byte[] arr=new byte[10];
     byteArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
-    char[] buffer=new char[22*arr.length];
-    buffer[0]='[';
+    byte[] buffer=new byte[22*arr.length];
+    buffer[0]=(byte)'[';
     int bufferOffset=OmniArray.OfByte.ascendingToString(arr,0,arr.length-1,buffer,1);
-    buffer[bufferOffset++]=']';
+    buffer[bufferOffset++]=(byte)']';
     String result=new String(buffer,0,bufferOffset);
     String expected=Arrays.toString(arr);
     Assertions.assertEquals(result,expected);
@@ -417,10 +417,10 @@ public class OmniArrayTest
   {
     byte[] arr=new byte[10];
     byteArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
-    char[] buffer=new char[22*arr.length];
-    buffer[0]='[';
+    byte[] buffer=new byte[22*arr.length];
+    buffer[0]=(byte)'[';
     int bufferOffset=OmniArray.OfByte.descendingToString(arr,0,arr.length-1,buffer,1);
-    buffer[bufferOffset++]=']';
+    buffer[bufferOffset++]=(byte)']';
     String result=new String(buffer,0,bufferOffset);
     OmniArray.OfByte.reverseRange(arr,0,arr.length-1);
     String expected=Arrays.toString(arr);
@@ -458,10 +458,10 @@ public class OmniArrayTest
   {
     short[] arr=new short[10];
     shortArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
-    char[] buffer=new char[]{'['};
-    ToStringUtil.OmniStringBuilder builder=new ToStringUtil.OmniStringBuilder(1,buffer);
+    byte[] buffer=new byte[]{(byte)'['};
+    ToStringUtil.OmniStringBuilderByte builder=new ToStringUtil.OmniStringBuilderByte(1,buffer);
     OmniArray.OfShort.ascendingToString(arr,0,arr.length-1,builder);
-    builder.uncheckedAppendChar(']');
+    builder.uncheckedAppendChar((byte)']');
     String result=builder.toString();
     String expected=Arrays.toString(arr);
     Assertions.assertEquals(result,expected);
@@ -471,10 +471,10 @@ public class OmniArrayTest
   {
     short[] arr=new short[10];
     shortArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
-    char[] buffer=new char[]{'['};
-    ToStringUtil.OmniStringBuilder builder=new ToStringUtil.OmniStringBuilder(1,buffer);
+    byte[] buffer=new byte[]{(byte)'['};
+    ToStringUtil.OmniStringBuilderByte builder=new ToStringUtil.OmniStringBuilderByte(1,buffer);
     OmniArray.OfShort.descendingToString(arr,0,arr.length-1,builder);
-    builder.uncheckedAppendChar(']');
+    builder.uncheckedAppendChar((byte)']');
     String result=builder.toString();
     OmniArray.OfShort.reverseRange(arr,0,arr.length-1);
     String expected=Arrays.toString(arr);
@@ -485,10 +485,10 @@ public class OmniArrayTest
   {
     short[] arr=new short[10];
     shortArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
-    char[] buffer=new char[22*arr.length];
-    buffer[0]='[';
+    byte[] buffer=new byte[22*arr.length];
+    buffer[0]=(byte)'[';
     int bufferOffset=OmniArray.OfShort.ascendingToString(arr,0,arr.length-1,buffer,1);
-    buffer[bufferOffset++]=']';
+    buffer[bufferOffset++]=(byte)']';
     String result=new String(buffer,0,bufferOffset);
     String expected=Arrays.toString(arr);
     Assertions.assertEquals(result,expected);
@@ -498,10 +498,10 @@ public class OmniArrayTest
   {
     short[] arr=new short[10];
     shortArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
-    char[] buffer=new char[22*arr.length];
-    buffer[0]='[';
+    byte[] buffer=new byte[22*arr.length];
+    buffer[0]=(byte)'[';
     int bufferOffset=OmniArray.OfShort.descendingToString(arr,0,arr.length-1,buffer,1);
-    buffer[bufferOffset++]=']';
+    buffer[bufferOffset++]=(byte)']';
     String result=new String(buffer,0,bufferOffset);
     OmniArray.OfShort.reverseRange(arr,0,arr.length-1);
     String expected=Arrays.toString(arr);
@@ -512,10 +512,10 @@ public class OmniArrayTest
   {
     int[] arr=new int[10];
     intArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
-    char[] buffer=new char[]{'['};
-    ToStringUtil.OmniStringBuilder builder=new ToStringUtil.OmniStringBuilder(1,buffer);
+    byte[] buffer=new byte[]{(byte)'['};
+    ToStringUtil.OmniStringBuilderByte builder=new ToStringUtil.OmniStringBuilderByte(1,buffer);
     OmniArray.OfInt.ascendingToString(arr,0,arr.length-1,builder);
-    builder.uncheckedAppendChar(']');
+    builder.uncheckedAppendChar((byte)']');
     String result=builder.toString();
     String expected=Arrays.toString(arr);
     Assertions.assertEquals(result,expected);
@@ -525,10 +525,10 @@ public class OmniArrayTest
   {
     int[] arr=new int[10];
     intArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
-    char[] buffer=new char[]{'['};
-    ToStringUtil.OmniStringBuilder builder=new ToStringUtil.OmniStringBuilder(1,buffer);
+    byte[] buffer=new byte[]{(byte)'['};
+    ToStringUtil.OmniStringBuilderByte builder=new ToStringUtil.OmniStringBuilderByte(1,buffer);
     OmniArray.OfInt.descendingToString(arr,0,arr.length-1,builder);
-    builder.uncheckedAppendChar(']');
+    builder.uncheckedAppendChar((byte)']');
     String result=builder.toString();
     OmniArray.OfInt.reverseRange(arr,0,arr.length-1);
     String expected=Arrays.toString(arr);
@@ -539,10 +539,10 @@ public class OmniArrayTest
   {
     int[] arr=new int[10];
     intArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
-    char[] buffer=new char[22*arr.length];
-    buffer[0]='[';
+    byte[] buffer=new byte[22*arr.length];
+    buffer[0]=(byte)'[';
     int bufferOffset=OmniArray.OfInt.ascendingToString(arr,0,arr.length-1,buffer,1);
-    buffer[bufferOffset++]=']';
+    buffer[bufferOffset++]=(byte)']';
     String result=new String(buffer,0,bufferOffset);
     String expected=Arrays.toString(arr);
     Assertions.assertEquals(result,expected);
@@ -552,10 +552,10 @@ public class OmniArrayTest
   {
     int[] arr=new int[10];
     intArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
-    char[] buffer=new char[22*arr.length];
-    buffer[0]='[';
+    byte[] buffer=new byte[22*arr.length];
+    buffer[0]=(byte)'[';
     int bufferOffset=OmniArray.OfInt.descendingToString(arr,0,arr.length-1,buffer,1);
-    buffer[bufferOffset++]=']';
+    buffer[bufferOffset++]=(byte)']';
     String result=new String(buffer,0,bufferOffset);
     OmniArray.OfInt.reverseRange(arr,0,arr.length-1);
     String expected=Arrays.toString(arr);
@@ -566,10 +566,10 @@ public class OmniArrayTest
   {
     long[] arr=new long[10];
     longArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
-    char[] buffer=new char[]{'['};
-    ToStringUtil.OmniStringBuilder builder=new ToStringUtil.OmniStringBuilder(1,buffer);
+    byte[] buffer=new byte[]{(byte)'['};
+    ToStringUtil.OmniStringBuilderByte builder=new ToStringUtil.OmniStringBuilderByte(1,buffer);
     OmniArray.OfLong.ascendingToString(arr,0,arr.length-1,builder);
-    builder.uncheckedAppendChar(']');
+    builder.uncheckedAppendChar((byte)']');
     String result=builder.toString();
     String expected=Arrays.toString(arr);
     Assertions.assertEquals(result,expected);
@@ -579,10 +579,10 @@ public class OmniArrayTest
   {
     long[] arr=new long[10];
     longArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
-    char[] buffer=new char[]{'['};
-    ToStringUtil.OmniStringBuilder builder=new ToStringUtil.OmniStringBuilder(1,buffer);
+    byte[] buffer=new byte[]{(byte)'['};
+    ToStringUtil.OmniStringBuilderByte builder=new ToStringUtil.OmniStringBuilderByte(1,buffer);
     OmniArray.OfLong.descendingToString(arr,0,arr.length-1,builder);
-    builder.uncheckedAppendChar(']');
+    builder.uncheckedAppendChar((byte)']');
     String result=builder.toString();
     OmniArray.OfLong.reverseRange(arr,0,arr.length-1);
     String expected=Arrays.toString(arr);
@@ -593,10 +593,10 @@ public class OmniArrayTest
   {
     long[] arr=new long[10];
     longArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
-    char[] buffer=new char[22*arr.length];
-    buffer[0]='[';
+    byte[] buffer=new byte[22*arr.length];
+    buffer[0]=(byte)'[';
     int bufferOffset=OmniArray.OfLong.ascendingToString(arr,0,arr.length-1,buffer,1);
-    buffer[bufferOffset++]=']';
+    buffer[bufferOffset++]=(byte)']';
     String result=new String(buffer,0,bufferOffset);
     String expected=Arrays.toString(arr);
     Assertions.assertEquals(result,expected);
@@ -606,10 +606,10 @@ public class OmniArrayTest
   {
     long[] arr=new long[10];
     longArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
-    char[] buffer=new char[22*arr.length];
-    buffer[0]='[';
+    byte[] buffer=new byte[22*arr.length];
+    buffer[0]=(byte)'[';
     int bufferOffset=OmniArray.OfLong.descendingToString(arr,0,arr.length-1,buffer,1);
-    buffer[bufferOffset++]=']';
+    buffer[bufferOffset++]=(byte)']';
     String result=new String(buffer,0,bufferOffset);
     OmniArray.OfLong.reverseRange(arr,0,arr.length-1);
     String expected=Arrays.toString(arr);
@@ -620,10 +620,10 @@ public class OmniArrayTest
   {
     float[] arr=new float[10];
     floatArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
-    char[] buffer=new char[]{'['};
-    ToStringUtil.OmniStringBuilder builder=new ToStringUtil.OmniStringBuilder(1,buffer);
+    byte[] buffer=new byte[]{(byte)'['};
+    ToStringUtil.OmniStringBuilderByte builder=new ToStringUtil.OmniStringBuilderByte(1,buffer);
     OmniArray.OfFloat.ascendingToString(arr,0,arr.length-1,builder);
-    builder.uncheckedAppendChar(']');
+    builder.uncheckedAppendChar((byte)']');
     String result=builder.toString();
     String expected=Arrays.toString(arr);
     Assertions.assertEquals(result,expected);
@@ -633,10 +633,10 @@ public class OmniArrayTest
   {
     float[] arr=new float[10];
     floatArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
-    char[] buffer=new char[]{'['};
-    ToStringUtil.OmniStringBuilder builder=new ToStringUtil.OmniStringBuilder(1,buffer);
+    byte[] buffer=new byte[]{(byte)'['};
+    ToStringUtil.OmniStringBuilderByte builder=new ToStringUtil.OmniStringBuilderByte(1,buffer);
     OmniArray.OfFloat.descendingToString(arr,0,arr.length-1,builder);
-    builder.uncheckedAppendChar(']');
+    builder.uncheckedAppendChar((byte)']');
     String result=builder.toString();
     OmniArray.OfFloat.reverseRange(arr,0,arr.length-1);
     String expected=Arrays.toString(arr);
@@ -647,10 +647,10 @@ public class OmniArrayTest
   {
     float[] arr=new float[10];
     floatArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
-    char[] buffer=new char[22*arr.length];
-    buffer[0]='[';
+    byte[] buffer=new byte[22*arr.length];
+    buffer[0]=(byte)'[';
     int bufferOffset=OmniArray.OfFloat.ascendingToString(arr,0,arr.length-1,buffer,1);
-    buffer[bufferOffset++]=']';
+    buffer[bufferOffset++]=(byte)']';
     String result=new String(buffer,0,bufferOffset);
     String expected=Arrays.toString(arr);
     Assertions.assertEquals(result,expected);
@@ -660,10 +660,10 @@ public class OmniArrayTest
   {
     float[] arr=new float[10];
     floatArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
-    char[] buffer=new char[22*arr.length];
-    buffer[0]='[';
+    byte[] buffer=new byte[22*arr.length];
+    buffer[0]=(byte)'[';
     int bufferOffset=OmniArray.OfFloat.descendingToString(arr,0,arr.length-1,buffer,1);
-    buffer[bufferOffset++]=']';
+    buffer[bufferOffset++]=(byte)']';
     String result=new String(buffer,0,bufferOffset);
     OmniArray.OfFloat.reverseRange(arr,0,arr.length-1);
     String expected=Arrays.toString(arr);

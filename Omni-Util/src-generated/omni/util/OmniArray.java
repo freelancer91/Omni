@@ -169,7 +169,7 @@ public final class OmniArray
           );
       }
     }
-    public static void ascendingToString(boolean[] arr,int begin,int end,ToStringUtil.OmniStringBuilder builder)
+    public static void ascendingToString(boolean[] arr,int begin,int end,ToStringUtil.OmniStringBuilderByte builder)
     {
       for(;;++begin)
       {
@@ -181,7 +181,7 @@ public final class OmniArray
         builder.uncheckedAppendCommaAndSpace();
       }
     }
-    public static int ascendingToString(boolean[] arr,int begin,int end,char[] buffer,int bufferOffset)
+    public static int ascendingToString(boolean[] arr,int begin,int end,byte[] buffer,int bufferOffset)
     {
       for(;;++begin,++bufferOffset)
       {
@@ -190,11 +190,11 @@ public final class OmniArray
         {
           return bufferOffset;
         }
-        buffer[bufferOffset]=',';
-        buffer[++bufferOffset]=' ';
+        buffer[bufferOffset]=(byte)',';
+        buffer[++bufferOffset]=(byte)' ';
       }
     }
-    public static void descendingToString(boolean[] arr,int begin,int end,ToStringUtil.OmniStringBuilder builder)
+    public static void descendingToString(boolean[] arr,int begin,int end,ToStringUtil.OmniStringBuilderByte builder)
     {
       for(;;--end)
       {
@@ -206,7 +206,7 @@ public final class OmniArray
         builder.uncheckedAppendCommaAndSpace();
       }
     }
-    public static int descendingToString(boolean[] arr,int begin,int end,char[] buffer,int bufferOffset)
+    public static int descendingToString(boolean[] arr,int begin,int end,byte[] buffer,int bufferOffset)
     {
       for(;;--end,++bufferOffset)
       {
@@ -215,8 +215,8 @@ public final class OmniArray
         {
           return bufferOffset;
         }
-        buffer[bufferOffset]=',';
-        buffer[++bufferOffset]=' ';
+        buffer[bufferOffset]=(byte)',';
+        buffer[++bufferOffset]=(byte)' ';
       }
     }
     public static boolean uncheckedcontains (boolean[] arr,int begin,int end
@@ -421,7 +421,7 @@ public final class OmniArray
           );
       }
     }
-    public static void ascendingToString(byte[] arr,int begin,int end,ToStringUtil.OmniStringBuilder builder)
+    public static void ascendingToString(byte[] arr,int begin,int end,ToStringUtil.OmniStringBuilderByte builder)
     {
       for(;;++begin)
       {
@@ -433,7 +433,7 @@ public final class OmniArray
         builder.uncheckedAppendCommaAndSpace();
       }
     }
-    public static int ascendingToString(byte[] arr,int begin,int end,char[] buffer,int bufferOffset)
+    public static int ascendingToString(byte[] arr,int begin,int end,byte[] buffer,int bufferOffset)
     {
       for(;;++begin,++bufferOffset)
       {
@@ -442,11 +442,11 @@ public final class OmniArray
         {
           return bufferOffset;
         }
-        buffer[bufferOffset]=',';
-        buffer[++bufferOffset]=' ';
+        buffer[bufferOffset]=(byte)',';
+        buffer[++bufferOffset]=(byte)' ';
       }
     }
-    public static void descendingToString(byte[] arr,int begin,int end,ToStringUtil.OmniStringBuilder builder)
+    public static void descendingToString(byte[] arr,int begin,int end,ToStringUtil.OmniStringBuilderByte builder)
     {
       for(;;--end)
       {
@@ -458,7 +458,7 @@ public final class OmniArray
         builder.uncheckedAppendCommaAndSpace();
       }
     }
-    public static int descendingToString(byte[] arr,int begin,int end,char[] buffer,int bufferOffset)
+    public static int descendingToString(byte[] arr,int begin,int end,byte[] buffer,int bufferOffset)
     {
       for(;;--end,++bufferOffset)
       {
@@ -467,8 +467,8 @@ public final class OmniArray
         {
           return bufferOffset;
         }
-        buffer[bufferOffset]=',';
-        buffer[++bufferOffset]=' ';
+        buffer[bufferOffset]=(byte)',';
+        buffer[++bufferOffset]=(byte)' ';
       }
     }
     public static boolean uncheckedcontains (byte[] arr,int begin,int end
@@ -905,7 +905,7 @@ public final class OmniArray
           );
       }
     }
-    public static void ascendingToString(short[] arr,int begin,int end,ToStringUtil.OmniStringBuilder builder)
+    public static void ascendingToString(short[] arr,int begin,int end,ToStringUtil.OmniStringBuilderByte builder)
     {
       for(;;++begin)
       {
@@ -917,7 +917,7 @@ public final class OmniArray
         builder.uncheckedAppendCommaAndSpace();
       }
     }
-    public static int ascendingToString(short[] arr,int begin,int end,char[] buffer,int bufferOffset)
+    public static int ascendingToString(short[] arr,int begin,int end,byte[] buffer,int bufferOffset)
     {
       for(;;++begin,++bufferOffset)
       {
@@ -926,11 +926,11 @@ public final class OmniArray
         {
           return bufferOffset;
         }
-        buffer[bufferOffset]=',';
-        buffer[++bufferOffset]=' ';
+        buffer[bufferOffset]=(byte)',';
+        buffer[++bufferOffset]=(byte)' ';
       }
     }
-    public static void descendingToString(short[] arr,int begin,int end,ToStringUtil.OmniStringBuilder builder)
+    public static void descendingToString(short[] arr,int begin,int end,ToStringUtil.OmniStringBuilderByte builder)
     {
       for(;;--end)
       {
@@ -942,7 +942,7 @@ public final class OmniArray
         builder.uncheckedAppendCommaAndSpace();
       }
     }
-    public static int descendingToString(short[] arr,int begin,int end,char[] buffer,int bufferOffset)
+    public static int descendingToString(short[] arr,int begin,int end,byte[] buffer,int bufferOffset)
     {
       for(;;--end,++bufferOffset)
       {
@@ -951,8 +951,8 @@ public final class OmniArray
         {
           return bufferOffset;
         }
-        buffer[bufferOffset]=',';
-        buffer[++bufferOffset]=' ';
+        buffer[bufferOffset]=(byte)',';
+        buffer[++bufferOffset]=(byte)' ';
       }
     }
     public static boolean uncheckedcontains (short[] arr,int begin,int end
@@ -1161,7 +1161,7 @@ public final class OmniArray
           );
       }
     }
-    public static void ascendingToString(int[] arr,int begin,int end,ToStringUtil.OmniStringBuilder builder)
+    public static void ascendingToString(int[] arr,int begin,int end,ToStringUtil.OmniStringBuilderByte builder)
     {
       for(;;++begin)
       {
@@ -1173,7 +1173,7 @@ public final class OmniArray
         builder.uncheckedAppendCommaAndSpace();
       }
     }
-    public static int ascendingToString(int[] arr,int begin,int end,char[] buffer,int bufferOffset)
+    public static int ascendingToString(int[] arr,int begin,int end,byte[] buffer,int bufferOffset)
     {
       for(;;++begin,++bufferOffset)
       {
@@ -1182,11 +1182,11 @@ public final class OmniArray
         {
           return bufferOffset;
         }
-        buffer[bufferOffset]=',';
-        buffer[++bufferOffset]=' ';
+        buffer[bufferOffset]=(byte)',';
+        buffer[++bufferOffset]=(byte)' ';
       }
     }
-    public static void descendingToString(int[] arr,int begin,int end,ToStringUtil.OmniStringBuilder builder)
+    public static void descendingToString(int[] arr,int begin,int end,ToStringUtil.OmniStringBuilderByte builder)
     {
       for(;;--end)
       {
@@ -1198,7 +1198,7 @@ public final class OmniArray
         builder.uncheckedAppendCommaAndSpace();
       }
     }
-    public static int descendingToString(int[] arr,int begin,int end,char[] buffer,int bufferOffset)
+    public static int descendingToString(int[] arr,int begin,int end,byte[] buffer,int bufferOffset)
     {
       for(;;--end,++bufferOffset)
       {
@@ -1207,8 +1207,8 @@ public final class OmniArray
         {
           return bufferOffset;
         }
-        buffer[bufferOffset]=',';
-        buffer[++bufferOffset]=' ';
+        buffer[bufferOffset]=(byte)',';
+        buffer[++bufferOffset]=(byte)' ';
       }
     }
     public static boolean uncheckedcontains (int[] arr,int begin,int end
@@ -1417,7 +1417,7 @@ public final class OmniArray
           );
       }
     }
-    public static void ascendingToString(long[] arr,int begin,int end,ToStringUtil.OmniStringBuilder builder)
+    public static void ascendingToString(long[] arr,int begin,int end,ToStringUtil.OmniStringBuilderByte builder)
     {
       for(;;++begin)
       {
@@ -1429,7 +1429,7 @@ public final class OmniArray
         builder.uncheckedAppendCommaAndSpace();
       }
     }
-    public static int ascendingToString(long[] arr,int begin,int end,char[] buffer,int bufferOffset)
+    public static int ascendingToString(long[] arr,int begin,int end,byte[] buffer,int bufferOffset)
     {
       for(;;++begin,++bufferOffset)
       {
@@ -1438,11 +1438,11 @@ public final class OmniArray
         {
           return bufferOffset;
         }
-        buffer[bufferOffset]=',';
-        buffer[++bufferOffset]=' ';
+        buffer[bufferOffset]=(byte)',';
+        buffer[++bufferOffset]=(byte)' ';
       }
     }
-    public static void descendingToString(long[] arr,int begin,int end,ToStringUtil.OmniStringBuilder builder)
+    public static void descendingToString(long[] arr,int begin,int end,ToStringUtil.OmniStringBuilderByte builder)
     {
       for(;;--end)
       {
@@ -1454,7 +1454,7 @@ public final class OmniArray
         builder.uncheckedAppendCommaAndSpace();
       }
     }
-    public static int descendingToString(long[] arr,int begin,int end,char[] buffer,int bufferOffset)
+    public static int descendingToString(long[] arr,int begin,int end,byte[] buffer,int bufferOffset)
     {
       for(;;--end,++bufferOffset)
       {
@@ -1463,8 +1463,8 @@ public final class OmniArray
         {
           return bufferOffset;
         }
-        buffer[bufferOffset]=',';
-        buffer[++bufferOffset]=' ';
+        buffer[bufferOffset]=(byte)',';
+        buffer[++bufferOffset]=(byte)' ';
       }
     }
     public static boolean uncheckedcontains (long[] arr,int begin,int end
@@ -1673,7 +1673,7 @@ public final class OmniArray
           );
       }
     }
-    public static void ascendingToString(float[] arr,int begin,int end,ToStringUtil.OmniStringBuilder builder)
+    public static void ascendingToString(float[] arr,int begin,int end,ToStringUtil.OmniStringBuilderByte builder)
     {
       for(;;++begin)
       {
@@ -1685,7 +1685,7 @@ public final class OmniArray
         builder.uncheckedAppendCommaAndSpace();
       }
     }
-    public static int ascendingToString(float[] arr,int begin,int end,char[] buffer,int bufferOffset)
+    public static int ascendingToString(float[] arr,int begin,int end,byte[] buffer,int bufferOffset)
     {
       for(;;++begin,++bufferOffset)
       {
@@ -1694,11 +1694,11 @@ public final class OmniArray
         {
           return bufferOffset;
         }
-        buffer[bufferOffset]=',';
-        buffer[++bufferOffset]=' ';
+        buffer[bufferOffset]=(byte)',';
+        buffer[++bufferOffset]=(byte)' ';
       }
     }
-    public static void descendingToString(float[] arr,int begin,int end,ToStringUtil.OmniStringBuilder builder)
+    public static void descendingToString(float[] arr,int begin,int end,ToStringUtil.OmniStringBuilderByte builder)
     {
       for(;;--end)
       {
@@ -1710,7 +1710,7 @@ public final class OmniArray
         builder.uncheckedAppendCommaAndSpace();
       }
     }
-    public static int descendingToString(float[] arr,int begin,int end,char[] buffer,int bufferOffset)
+    public static int descendingToString(float[] arr,int begin,int end,byte[] buffer,int bufferOffset)
     {
       for(;;--end,++bufferOffset)
       {
@@ -1719,8 +1719,8 @@ public final class OmniArray
         {
           return bufferOffset;
         }
-        buffer[bufferOffset]=',';
-        buffer[++bufferOffset]=' ';
+        buffer[bufferOffset]=(byte)',';
+        buffer[++bufferOffset]=(byte)' ';
       }
     }
     public static boolean uncheckedcontains0(float[] arr,int begin,int end

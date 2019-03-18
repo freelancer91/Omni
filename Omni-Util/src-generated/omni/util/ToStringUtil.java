@@ -6,7 +6,9 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.nio.CharBuffer;
 import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
 public class ToStringUtil{
+    public static final Charset IOS8859CharSet=Charset.forName("ISO-8859-1");
     private ToStringUtil(){}
     public static String getString(boolean b){
         if(b){
@@ -23,8 +25,8 @@ public class ToStringUtil{
     public static void getString(boolean b,CharBuffer buffer){
         buffer.put(b?"true":"false");
     }
-    public static void getString(boolean b,ByteBuffer buffer) {
-      buffer.put
+    public static void getString(boolean b,ByteBuffer buffer){
+        buffer.put(b?new byte[]{(byte)'t',(byte)'r',(byte)'u',(byte)'e'}:new byte[]{(byte)'f',(byte)'a',(byte)'l',(byte)'s',(byte)'e'});
     }
     public static void getString(boolean b,PrintWriter writer){
         writer.write(b?"true":"false");
@@ -50,29 +52,29 @@ public class ToStringUtil{
         char[] arr;
         buffer.put(arr=getByteCharBuffer(),0,getStringShort(i,arr,0));
     }
-    public static void getString(byte i,CharBuffer buffer){
+    public static void getString(byte i,ByteBuffer buffer){
         byte[] arr;
         buffer.put(arr=getByteByteBuffer(),0,getStringShort(i,arr,0));
     }
     public static void getString(byte i,PrintWriter writer){
-        byte[] arr;
-        writer.write(arr=getByteByteBuffer(),0,getStringShort(i,arr,0));
+        char[] arr;
+        writer.write(arr=getByteCharBuffer(),0,getStringShort(i,arr,0));
     }
     public static void getString(byte i,StringBuffer sBuffer){
-        byte[] arr;
-        sBuffer.append(arr=getByteByteBuffer(),0,getStringShort(i,arr,0));
+        char[] arr;
+        sBuffer.append(arr=getByteCharBuffer(),0,getStringShort(i,arr,0));
     }
     public static void getString(byte i,StringBuilder sBuilder){
-        byte[] arr;
-        sBuilder.append(arr=getByteByteBuffer(),0,getStringShort(i,arr,0));
+        char[] arr;
+        sBuilder.append(arr=getByteCharBuffer(),0,getStringShort(i,arr,0));
     }
     public static void getString(byte i,StringWriter writer){
-        byte[] arr;
-        writer.write(arr=getByteByteBuffer(),0,getStringShort(i,arr,0));
+        char[] arr;
+        writer.write(arr=getByteCharBuffer(),0,getStringShort(i,arr,0));
     }
     public static void getString(byte i,Writer writer) throws IOException{
-        byte[] arr;
-        writer.write(arr=getByteByteBuffer(),0,getStringShort(i,arr,0));
+        char[] arr;
+        writer.write(arr=getByteCharBuffer(),0,getStringShort(i,arr,0));
     }
     /** Return the string representation of the provided single-precision float value.
      *
@@ -87,8 +89,8 @@ public class ToStringUtil{
         appendable.append(getString(f));
     }
     public static void getString(float f,CharArrayWriter writer){
-        byte[] arr;
-        writer.write(arr=getFloatByteBuffer(),0,getStringFloat(f,arr,0));
+        char[] arr;
+        writer.write(arr=getFloatCharBuffer(),0,getStringFloat(f,arr,0));
     }
     public static void getString(float f,CharBuffer buffer){
         char[] arr;
@@ -99,8 +101,8 @@ public class ToStringUtil{
         buffer.put(arr=getFloatByteBuffer(),0,getStringFloat(f,arr,0));
     }
     public static void getString(float f,PrintWriter writer){
-        byte[] arr;
-        writer.write(arr=getFloatByteBuffer(),0,getStringFloat(f,arr,0));
+        char[] arr;
+        writer.write(arr=getFloatCharBuffer(),0,getStringFloat(f,arr,0));
     }
     /** Write a float string representation to a StringBuffer.
      *
@@ -108,20 +110,20 @@ public class ToStringUtil{
      * @param sBuffer
      */
     public static void getString(float f,StringBuffer sBuffer){
-        byte[] arr;
-        sBuffer.append(arr=getFloatByteBuffer(),0,getStringFloat(f,arr,0));
+        char[] arr;
+        sBuffer.append(arr=getFloatCharBuffer(),0,getStringFloat(f,arr,0));
     }
     public static void getString(float f,StringBuilder sBuilder){
-        byte[] arr;
-        sBuilder.append(arr=getFloatByteBuffer(),0,getStringFloat(f,arr,0));
+        char[] arr;
+        sBuilder.append(arr=getFloatCharBuffer(),0,getStringFloat(f,arr,0));
     }
     public static void getString(float f,StringWriter writer){
-        byte[] arr;
-        writer.write(arr=getFloatByteBuffer(),0,getStringFloat(f,arr,0));
+        char[] arr;
+        writer.write(arr=getFloatCharBuffer(),0,getStringFloat(f,arr,0));
     }
     public static void getString(float f,Writer writer) throws IOException{
-        byte[] arr;
-        writer.write(arr=getFloatByteBuffer(),0,getStringFloat(f,arr,0));
+        char[] arr;
+        writer.write(arr=getFloatCharBuffer(),0,getStringFloat(f,arr,0));
     }
     public static String getString(int i){
         byte[] buffer;
@@ -131,8 +133,8 @@ public class ToStringUtil{
         appendable.append(getString(i));
     }
     public static void getString(int i,CharArrayWriter writer){
-        byte[] arr;
-        writer.write(arr=getIntByteBuffer(),0,getStringInt(i,arr,0));
+        char[] arr;
+        writer.write(arr=getIntCharBuffer(),0,getStringInt(i,arr,0));
     }
     public static void getString(int i,CharBuffer buffer){
         char[] arr;
@@ -143,24 +145,24 @@ public class ToStringUtil{
         buffer.put(arr=getIntByteBuffer(),0,getStringInt(i,arr,0));
     }
     public static void getString(int i,PrintWriter writer){
-        byte[] arr;
-        writer.write(arr=getIntByteBuffer(),0,getStringInt(i,arr,0));
+        char[] arr;
+        writer.write(arr=getIntCharBuffer(),0,getStringInt(i,arr,0));
     }
     public static void getString(int i,StringBuffer sBuffer){
-        byte[] arr;
-        sBuffer.append(arr=getIntByteBuffer(),0,getStringInt(i,arr,0));
+        char[] arr;
+        sBuffer.append(arr=getIntCharBuffer(),0,getStringInt(i,arr,0));
     }
     public static void getString(int i,StringBuilder sBuilder){
-        byte[] arr;
-        sBuilder.append(arr=getIntByteBuffer(),0,getStringInt(i,arr,0));
+        char[] arr;
+        sBuilder.append(arr=getIntCharBuffer(),0,getStringInt(i,arr,0));
     }
     public static void getString(int i,StringWriter writer){
-        byte[] arr;
-        writer.write(arr=getIntByteBuffer(),0,getStringInt(i,arr,0));
+        char[] arr;
+        writer.write(arr=getIntCharBuffer(),0,getStringInt(i,arr,0));
     }
     public static void getString(int i,Writer writer) throws IOException{
-        byte[] arr;
-        writer.write(arr=getIntByteBuffer(),0,getStringInt(i,arr,0));
+        char[] arr;
+        writer.write(arr=getIntCharBuffer(),0,getStringInt(i,arr,0));
     }
     public static String getString(long i){
         byte[] buffer;
@@ -170,8 +172,8 @@ public class ToStringUtil{
         appendable.append(getString(i));
     }
     public static void getString(long i,CharArrayWriter writer){
-        byte[] arr;
-        writer.write(arr=getLongByteBuffer(),0,getStringLong(i,arr,0));
+        char[] arr;
+        writer.write(arr=getLongCharBuffer(),0,getStringLong(i,arr,0));
     }
     public static void getString(long i,CharBuffer buffer){
         char[] arr;
@@ -182,24 +184,24 @@ public class ToStringUtil{
         buffer.put(arr=getLongByteBuffer(),0,getStringLong(i,arr,0));
     }
     public static void getString(long i,PrintWriter writer){
-        byte[] arr;
-        writer.write(arr=getLongByteBuffer(),0,getStringLong(i,arr,0));
+        char[] arr;
+        writer.write(arr=getLongCharBuffer(),0,getStringLong(i,arr,0));
     }
     public static void getString(long i,StringBuffer sBuffer){
-        byte[] arr;
-        sBuffer.append(arr=getLongByteBuffer(),0,getStringLong(i,arr,0));
+        char[] arr;
+        sBuffer.append(arr=getLongCharBuffer(),0,getStringLong(i,arr,0));
     }
     public static void getString(long i,StringBuilder sBuilder){
-        byte[] arr;
-        sBuilder.append(arr=getLongByteBuffer(),0,getStringLong(i,arr,0));
+        char[] arr;
+        sBuilder.append(arr=getLongCharBuffer(),0,getStringLong(i,arr,0));
     }
     public static void getString(long i,StringWriter writer){
-        byte[] arr;
-        writer.write(arr=getLongByteBuffer(),0,getStringLong(i,arr,0));
+        char[] arr;
+        writer.write(arr=getLongCharBuffer(),0,getStringLong(i,arr,0));
     }
     public static void getString(long i,Writer writer) throws IOException{
-        byte[] arr;
-        writer.write(arr=getLongByteBuffer(),0,getStringLong(i,arr,0));
+        char[] arr;
+        writer.write(arr=getLongCharBuffer(),0,getStringLong(i,arr,0));
     }
     public static String getString(short i){
         byte[] buffer;
@@ -209,8 +211,8 @@ public class ToStringUtil{
         appendable.append(getString(i));
     }
     public static void getString(short i,CharArrayWriter writer){
-        byte[] arr;
-        writer.write(arr=getShortByteBuffer(),0,getStringShort(i,arr,0));
+        char[] arr;
+        writer.write(arr=getShortCharBuffer(),0,getStringShort(i,arr,0));
     }
     public static void getString(short i,CharBuffer buffer){
         char[] arr;
@@ -221,24 +223,24 @@ public class ToStringUtil{
         buffer.put(arr=getShortByteBuffer(),0,getStringShort(i,arr,0));
     }
     public static void getString(short i,PrintWriter writer){
-        byte[] arr;
-        writer.write(arr=getShortByteBuffer(),0,getStringShort(i,arr,0));
+        char[] arr;
+        writer.write(arr=getShortCharBuffer(),0,getStringShort(i,arr,0));
     }
     public static void getString(short i,StringBuffer sBuffer){
-        byte[] arr;
-        sBuffer.append(arr=getShortByteBuffer(),0,getStringShort(i,arr,0));
+        char[] arr;
+        sBuffer.append(arr=getShortCharBuffer(),0,getStringShort(i,arr,0));
     }
     public static void getString(short i,StringBuilder sBuilder){
-        byte[] arr;
-        sBuilder.append(arr=getShortByteBuffer(),0,getStringShort(i,arr,0));
+        char[] arr;
+        sBuilder.append(arr=getShortCharBuffer(),0,getStringShort(i,arr,0));
     }
     public static void getString(short i,StringWriter writer){
-        byte[] arr;
-        writer.write(arr=getShortByteBuffer(),0,getStringShort(i,arr,0));
+        char[] arr;
+        writer.write(arr=getShortCharBuffer(),0,getStringShort(i,arr,0));
     }
     public static void getString(short i,Writer writer) throws IOException{
-        byte[] arr;
-        writer.write(arr=getShortByteBuffer(),0,getStringShort(i,arr,0));
+        char[] arr;
+        writer.write(arr=getShortCharBuffer(),0,getStringShort(i,arr,0));
     }
     /** A streamlined method for getting the number of trailing 0 bits in the fraction of a single-precision
      * floating-point number
@@ -298,7 +300,7 @@ public class ToStringUtil{
     public static class OmniStringBuilderByte{
         public transient byte[] buffer;
         public transient int size;
-        public OmniStringBuilder(int size,byte[] buffer){
+        public OmniStringBuilderByte(int size,byte[] buffer){
             this.size=size;
             this.buffer=buffer;
         }
@@ -446,7 +448,7 @@ public class ToStringUtil{
     public static class OmniStringBuilderChar{
         public transient char[] buffer;
         public transient int size;
-        public OmniStringBuilder(int size,char[] buffer){
+        public OmniStringBuilderChar(int size,char[] buffer){
             this.size=size;
             this.buffer=buffer;
         }
@@ -780,7 +782,7 @@ public class ToStringUtil{
          * @param offset
          *          The first index to insert chars.
          * @param rawBits
-         *          The raw bits provided by {@link Float#floatToRawIntBits(float)}
+         *          The raw bits provided by Float.floatToRawIntBits(float)
          * @return The offset in the buffer just after the index where the last character was inserted. */
         private static int infinityOrNaNToASCII(final char[] buffer,int offset,final int rawBits){
             if((rawBits&0x7fffff)==0){
@@ -1076,7 +1078,7 @@ public class ToStringUtil{
          * @param offset
          *          The first index to insert bytes.
          * @param rawBits
-         *          The raw bits provided by {@link Float#floatToRawIntBits(float)}
+         *          The raw bits provided by Float.floatToRawIntBits(float)
          * @return The offset in the buffer just after the index where the last character was inserted. */
         private static int infinityOrNaNToASCII(final byte[] buffer,int offset,final int rawBits){
             if((rawBits&0x7fffff)==0){

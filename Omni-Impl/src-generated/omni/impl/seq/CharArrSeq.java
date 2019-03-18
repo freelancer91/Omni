@@ -81,7 +81,7 @@ public abstract class CharArrSeq implements OmniCollection.OfChar
     int size;
     if((size=this.size)!=0)
     {
-      if(size>(Integer.MAX_VALUE/3))
+      if(size>=(Integer.MAX_VALUE/3))
       {
         throw new OutOfMemoryError();
       }
@@ -672,7 +672,7 @@ public abstract class CharArrSeq implements OmniCollection.OfChar
     {
       super(initialCapacity);
     }
-    private UncheckedStack(int size,char[] arr)
+    UncheckedStack(int size,char[] arr)
     {
       super(size,arr);
     }
@@ -1100,7 +1100,7 @@ public abstract class CharArrSeq implements OmniCollection.OfChar
     {
       super(initialCapacity);
     }
-    private UncheckedList(int size,char[] arr)
+    UncheckedList(int size,char[] arr)
     {
       super(size,arr);
     }
@@ -1754,7 +1754,7 @@ public abstract class CharArrSeq implements OmniCollection.OfChar
       int size;
       if((size=this.size)!=0)
       {
-        if(size>(Integer.MAX_VALUE/3))
+        if(size>=(Integer.MAX_VALUE/3))
         {
           throw new OutOfMemoryError();
         }
@@ -2779,7 +2779,7 @@ public abstract class CharArrSeq implements OmniCollection.OfChar
     {
       super(initialCapacity);
     }
-    private CheckedStack(int size,char[] arr)
+    CheckedStack(int size,char[] arr)
     {
       super(size,arr);
     }
@@ -3097,7 +3097,7 @@ public abstract class CharArrSeq implements OmniCollection.OfChar
     {
       super(initialCapacity);
     }
-    private CheckedList(int size,char[] arr)
+    CheckedList(int size,char[] arr)
     {
       super(size,arr);
     }
@@ -3647,7 +3647,7 @@ public abstract class CharArrSeq implements OmniCollection.OfChar
       int size;
       if((size=this.size)!=0)
       {
-        if(size>(Integer.MAX_VALUE/3))
+        if(size>=(Integer.MAX_VALUE/3))
         {
           throw new OutOfMemoryError();
         }

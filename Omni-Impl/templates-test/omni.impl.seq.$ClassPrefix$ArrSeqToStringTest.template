@@ -1,0 +1,228 @@
+#TYPEDEF OfBoolean
+#TYPEDEF OfByte
+#TYPEDEF OfChar
+#TYPEDEF OfShort
+#TYPEDEF OfInt
+#TYPEDEF OfLong
+#TYPEDEF OfFloat
+#TYPEDEF OfDouble
+#TYPEDEF OfRef
+package omni.impl.seq;
+import omni.util.EqualityUtil;
+import omni.util.TypeConversionUtil;
+#IF OfRef
+import omni.impl.CheckedCollectionTest;
+#ENDIF
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import java.util.ArrayList;
+import omni.impl.seq.$ClassPrefix$ArrSeq.UncheckedStack;
+import omni.impl.seq.$ClassPrefix$ArrSeq.CheckedStack;
+import omni.impl.seq.$ClassPrefix$ArrSeq.UncheckedList;
+import omni.impl.seq.$ClassPrefix$ArrSeq.CheckedList;
+import java.util.ConcurrentModificationException;
+import omni.api.OmniCollection;
+#IFNOT OfChar,OfDouble,OfRef
+import omni.util.OmniArray;
+#ENDIF
+
+@SuppressWarnings({"rawtypes","unchecked"}) 
+public class $ClassPrefix$ArrSeqToStringTest
+{
+#IF OfRef
+  private static final $ArrayType$ MIN_LENGTH_STRING_VAL=new $ArrayType$(){@Override public String toString(){return "";}};
+#ELSEIF OfBoolean
+  private static final $ArrayType$ MIN_LENGTH_STRING_VAL=true;
+#ELSE
+  private static final $ArrayType$ MIN_LENGTH_STRING_VAL=0;
+#ENDIF
+  private static final int MIN_TOSTRING_LENGTH=String.valueOf(MIN_LENGTH_STRING_VAL).length();
+
+#IF OfBoolean
+  private static final int MAX_TOSTRING_LENGTH=5;
+#ELSEIF OfByte
+  private static final int MAX_TOSTRING_LENGTH=4;
+#ELSEIF OfShort
+  private static final int MAX_TOSTRING_LENGTH=6;
+#ELSEIF OfInt
+  private static final int MAX_TOSTRING_LENGTH=11;
+#ELSEIF OfLong
+  private static final int MAX_TOSTRING_LENGTH=20;
+#ELSEIF OfFloat
+  private static final int MAX_TOSTRING_LENGTH=15;
+#ENDIF
+
+
+  #MACRO Impl<UncheckedStack>()
+  #MACRO Impl<UncheckedList>()
+  #MACRO Impl<CheckedStack>()
+  #MACRO Impl<CheckedList>()
+  #MACRO Impl<UncheckedSubList>()
+  #MACRO Impl<CheckedSubList>()
+}
+
+#MACRODEF Impl<STRUCTNAME>()
+@Test
+public void testEmptyToStringSTRUCTNAME()
+{
+  String expected=new ArrayList().toString();
+#IFSWITCH STRUCTNAME==CheckedSubList
+  CheckedList root=new CheckedList();
+  var subList=root.subList(0,0);
+  Assertions.assertEquals(expected,subList.toString());
+  root.add($defaultVal$);
+  Assertions.assertThrows(ConcurrentModificationException.class,()->subList.toString());
+#ELSEIFSWITCH STRUCTNAME==UncheckedSubList
+  Assertions.assertEquals(expected,new UncheckedList().subList(0,0).toString());
+#ELSE
+  Assertions.assertEquals(expected,new STRUCTNAME().toString());
+#ENDIF
+}
+
+
+
+
+@Test
+public void testOOMToStringSTRUCTNAME()
+{
+#IF OfBoolean,OfByte,OfChar,OfInt,OfLong,OfShort
+  int length=Integer.MAX_VALUE/(MIN_TOSTRING_LENGTH+2)-1;
+#ELSEIF OfFloat
+  int length=Integer.MAX_VALUE/(MIN_TOSTRING_LENGTH+2)-3;
+#ELSEIF OfRef
+  int length=Integer.MAX_VALUE/(MIN_TOSTRING_LENGTH+2)-1;
+#ELSE
+  int length=Integer.MAX_VALUE/(MIN_TOSTRING_LENGTH+2);
+#ENDIF
+  
+#IF OfBoolean,OfRef
+  #IFSWITCH STRUCTNAME==CheckedSubList,UncheckedSubList
+    #IFSWITCH STRUCTNAME==CheckedSubList
+  var root=new CheckedList(length+1);
+    #ELSE
+  var root=new UncheckedList(length+1);
+    #ENDIF
+  for(int i=0;i<length;++i)
+  {
+    root.add(MIN_LENGTH_STRING_VAL);
+  }
+  var seq=root.subList(0,root.size());
+  #ELSE
+  var seq=new STRUCTNAME(length+1);
+  for(int i=0;i<length;++i)
+  {
+    seq.add(MIN_LENGTH_STRING_VAL);
+  }
+  #ENDIF
+#ELSE
+  #IFSWITCH STRUCTNAME==CheckedSubList
+  var root=new CheckedList(length,new $ArrayType$[length+1]);
+  var seq=root.subList(0,length);
+  #ELSEIFSWITCH STRUCTNAME==UncheckedSubList
+  var root=new UncheckedList(length,new $ArrayType$[length+1]);
+  var seq=root.subList(0,length);
+  #ELSE
+  var seq=new STRUCTNAME(length,new $ArrayType$[length+1]);
+  #ENDIF
+#ENDIF
+  Assertions.assertDoesNotThrow(()->seq.toString());
+  seq.add(MIN_LENGTH_STRING_VAL);
+  Assertions.assertThrows(OutOfMemoryError.class,()->seq.toString());
+}
+
+private static Object[] createAscendingSequencePairSTRUCTNAME(int length)
+{
+#IFSWITCH STRUCTNAME==CheckedSubList
+  CheckedList root=new CheckedList(length);
+  OmniCollection.Of$ClassPrefix$ seq=root.subList(0,0);
+#ELSEIFSWITCH STRUCTNAME==UncheckedSubList
+  UncheckedList root=new UncheckedList(length);
+  OmniCollection.Of$ClassPrefix$ seq=root.subList(0,0);
+#ELSE
+  OmniCollection.Of$ClassPrefix$ seq=new STRUCTNAME(length);
+#ENDIF
+  ArrayList arrayList=new ArrayList(length);
+  for(int i=0;i<length;++i)
+  {
+#IF OfRef
+    var val=TypeConversionUtil.convertToInteger(i);
+#ELSE
+    $exposedType$ val=TypeConversionUtil.convertTo$exposedType$(i);
+#ENDIF
+    seq.add(val);
+#IFSWITCH STRUCTNAME==UncheckedStack,CheckedStack
+  #IF OfRef
+    var counterVal=TypeConversionUtil.convertToInteger(length-1-i);
+  #ELSE
+    $exposedType$ counterVal=TypeConversionUtil.convertTo$exposedType$(length-1-i);
+  #ENDIF
+    arrayList.add(counterVal);
+#ELSE
+    arrayList.add(val);
+#ENDIF
+  }
+  return new Object[]{arrayList,seq};
+}
+
+#IF OfBoolean,OfByte,OfShort,OfInt,OfLong,OfFloat
+@Test
+public void testLargeToStringSTRUCTNAME()
+{
+  int length=(OmniArray.MAX_ARR_SIZE/(MAX_TOSTRING_LENGTH+2))+1;
+  Object[] seqPair=createAscendingSequencePairSTRUCTNAME(length);
+  ArrayList arrayList=(ArrayList)seqPair[0];
+  OmniCollection.Of$ClassPrefix$ seq=(OmniCollection.Of$ClassPrefix$)seqPair[1];
+  EqualityUtil.parallelAssertStringsAreEqual(arrayList.toString(),seq.toString());
+}
+#ENDIF
+@Test
+public void testSmallToStringSTRUCTNAME()
+{
+  int length=100;
+  Object[] seqPair=createAscendingSequencePairSTRUCTNAME(length);
+  ArrayList arrayList=(ArrayList)seqPair[0];
+  OmniCollection.Of$ClassPrefix$ seq=(OmniCollection.Of$ClassPrefix$)seqPair[1];
+  EqualityUtil.parallelAssertStringsAreEqual(arrayList.toString(),seq.toString());
+}
+
+#IF OfRef
+  #IFSWITCH STRUCTNAME==CheckedList,CheckedStack,CheckedSubList
+@Test
+public void testModificationCheckSTRUCTNAME()
+{
+    #IFSWITCH STRUCTNAME==CheckedSubList
+  {
+    CheckedList root=new CheckedList();
+    var subList=root.subList(0,0);
+    Object rootModifyingObject=CheckedCollectionTest.createCollectionModifyingObject(root);
+    for(int i=0;i<10;++i)
+    {
+      subList.add(rootModifyingObject);
+    }
+    Assertions.assertThrows(ConcurrentModificationException.class,()->subList.toString());
+  }
+  {
+    CheckedList root=new CheckedList();
+    var subList=root.subList(0,0);
+    Object subListModifyingObject=CheckedCollectionTest.createCollectionModifyingObject(subList);
+    for(int i=0;i<10;++i)
+    {
+      subList.add(subListModifyingObject);
+    }
+    Assertions.assertThrows(ConcurrentModificationException.class,()->subList.toString());
+  }
+    #ELSE
+  STRUCTNAME seq=new STRUCTNAME();
+  Object seqModifyingObject=CheckedCollectionTest.createCollectionModifyingObject(seq);
+  for(int i=0;i<10;++i)
+  {
+    seq.add(seqModifyingObject);
+  }
+  Assertions.assertThrows(ConcurrentModificationException.class,()->seq.toString());
+    #ENDIF
+}
+  #ENDIF
+#ENDIF
+
+
+#ENDDEF

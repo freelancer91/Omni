@@ -81,7 +81,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>
     int size;
     if((size=this.size)!=0)
     {
-      if(size>(Integer.MAX_VALUE>>1))
+      if(size>=(Integer.MAX_VALUE>>1))
       {
         throw new OutOfMemoryError();
       }
@@ -778,7 +778,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>
     {
       super(initialCapacity);
     }
-    private UncheckedStack(int size,Object[] arr)
+    UncheckedStack(int size,Object[] arr)
     {
       super(size,arr);
     }
@@ -1211,7 +1211,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>
     {
       super(initialCapacity);
     }
-    private UncheckedList(int size,Object[] arr)
+    UncheckedList(int size,Object[] arr)
     {
       super(size,arr);
     }
@@ -2080,7 +2080,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>
         final int size;
         if((size=this.size)!=0)
         {
-          if(size>(Integer.MAX_VALUE>>1))
+          if(size>=(Integer.MAX_VALUE>>1))
           {
             throw new OutOfMemoryError();
           }
@@ -3468,7 +3468,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>
     {
       super(initialCapacity);
     }
-    private CheckedStack(int size,Object[] arr)
+    CheckedStack(int size,Object[] arr)
     {
       super(size,arr);
     }
@@ -3832,7 +3832,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>
     {
       super(initialCapacity);
     }
-    private CheckedList(int size,Object[] arr)
+    CheckedList(int size,Object[] arr)
     {
       super(size,arr);
     }
@@ -4520,7 +4520,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>
         final int size;
         if((size=this.size)!=0)
         {
-          if(size>(Integer.MAX_VALUE>>1))
+          if(size>=(Integer.MAX_VALUE>>1))
           {
             throw new OutOfMemoryError();
           }

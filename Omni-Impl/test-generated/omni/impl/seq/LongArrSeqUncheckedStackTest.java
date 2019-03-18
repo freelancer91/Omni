@@ -1,40 +1,15 @@
 package omni.impl.seq;
 import java.util.ArrayList;
-import omni.api.OmniCollection;
-import omni.util.OmniArray;
-import omni.api.OmniList;
-import omni.api.OmniStack;
-import java.util.function.Predicate;
-import java.util.function.Consumer;
-import java.util.Comparator;
-import omni.util.ArrCopy;
-import omni.util.LongSortUtil;
-import omni.impl.CheckedCollection;
-import java.util.NoSuchElementException;
-import omni.api.OmniIterator;
-import omni.api.OmniListIterator;
-import java.util.function.IntFunction;
-import java.util.function.UnaryOperator;
-import java.util.function.LongSupplier;
-import omni.util.TypeUtil;
-import java.util.ConcurrentModificationException;
-import java.util.function.LongUnaryOperator;
-import omni.function.LongComparator;
-import java.util.function.LongPredicate;
-import java.util.function.LongConsumer;
-import omni.util.ToStringUtil;
-import omni.util.BitSetUtil;
-import omni.impl.AbstractLongItr;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import omni.impl.seq.LongArrSeq.UncheckedStack;
 import omni.util.TypeConversionUtil;
+import omni.util.EqualityUtil;
+import omni.util.OmniArray;
+import java.util.function.LongSupplier;
 @SuppressWarnings({"rawtypes","unchecked"}) 
 public class LongArrSeqUncheckedStackTest
 {
-  private static final long MIN_LENGTH_STRING_VAL=0;
-  private static final int MIN_TOSTRING_LENGTH=String.valueOf(MIN_LENGTH_STRING_VAL).length();
-  private static final int MAX_TOSTRING_LENGTH=20;
   @Test
   public void testConstructors()
   {
@@ -99,24 +74,12 @@ public class LongArrSeqUncheckedStackTest
     clonedStack=(UncheckedStack)clonedObject;
     Assertions.assertTrue(clonedStack.arr!=stack.arr);
     Assertions.assertEquals(stack.size(),clonedStack.size());
-    for(int i=0;i<stack.size();++i)
-    {
-      Assertions.assertTrue(stack.arr[i]==clonedStack.arr[i]);
-    }
-  }
-  @Test
-  public void testEmptyToString()
-  {
-    var stack=generateStack(0,null);
-    var arrayList=generateList(0,null);
-    Assertions.assertEquals(stack.toString(),arrayList.toString());
+    EqualityUtil.uncheckedparallelassertarraysAreEqual(stack.arr,0,clonedStack.arr,0,stack.size());
   }
   @Test
   public void testEmptyHashCode()
   {
-    var stack=generateStack(0,null);
-    var arrayList=generateList(0,null);
-    Assertions.assertEquals(stack.hashCode(),arrayList.hashCode());
+    Assertions.assertEquals(generateList(0,null).hashCode(),generateList(0,null).hashCode());
   }
   @Test
   public void testHashCode()
@@ -138,71 +101,6 @@ public class LongArrSeqUncheckedStackTest
         return TypeConversionUtil.convertTolong(--index);
       }
     };
-    var stack=generateStack(length,stackGenerator);
-    var arrayList=generateList(length,listGenerator);
-    Assertions.assertEquals(stack.hashCode(),arrayList.hashCode());
-  }
-  @Test
-  public void testOOMToString()
-  {
-    int length=Integer.MAX_VALUE/(MIN_TOSTRING_LENGTH+2);
-    var stack=new UncheckedStack(length+1);
-    var arrayList=new ArrayList<>(length+1);
-    for(int i=0;i<length;++i)
-    {
-      stack.push(MIN_LENGTH_STRING_VAL);
-      arrayList.add(MIN_LENGTH_STRING_VAL);
-    }
-    Assertions.assertEquals(stack.toString(),arrayList.toString());
-    stack.push(MIN_LENGTH_STRING_VAL);
-    Assertions.assertThrows(OutOfMemoryError.class,()->stack.toString());
-  }
-  @Test
-  public void testSmallToString()
-  {
-    int length=100;
-    LongSupplier stackGenerator=new LongSupplier()
-    {
-      int index=0;
-      public long getAsLong()
-      {
-        return TypeConversionUtil.convertTolong(index++);
-      }
-    };
-    LongSupplier listGenerator=new LongSupplier()
-    {
-      int index=length;
-      public long getAsLong()
-      {
-        return TypeConversionUtil.convertTolong(--index);
-      }
-    };
-    var stack=generateStack(length,stackGenerator);
-    var arrayList=generateList(length,listGenerator);
-    Assertions.assertEquals(stack.toString(),arrayList.toString());
-  }
-  @Test
-  public void testLargeToString()
-  {
-    int length=(OmniArray.MAX_ARR_SIZE/(MAX_TOSTRING_LENGTH+2))+1;
-    LongSupplier stackGenerator=new LongSupplier()
-    {
-      int index=0;
-      public long getAsLong()
-      {
-        return TypeConversionUtil.convertTolong(index++);
-      }
-    };
-    LongSupplier listGenerator=new LongSupplier()
-    {
-      int index=length;
-      public long getAsLong()
-      {
-        return TypeConversionUtil.convertTolong(--index);
-      }
-    };
-    var stack=generateStack(length,stackGenerator);
-    var arrayList=generateList(length,listGenerator);
-    Assertions.assertEquals(stack.toString(),arrayList.toString());
+    Assertions.assertEquals(generateList(length,listGenerator).hashCode(),generateStack(length,stackGenerator).hashCode());
   }
 }

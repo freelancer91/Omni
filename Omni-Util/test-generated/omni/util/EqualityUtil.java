@@ -4,6 +4,84 @@ import java.util.stream.IntStream;
 import org.junit.jupiter.api.Assertions;
 public interface EqualityUtil
 {
+  public static void parallelAssertStringsAreEqual(String expected,char[] actualBuffer,int actualOffset,int actualLength)
+  {
+    Assertions.assertEquals(expected.length(),actualLength);
+    IntStream.range(0,actualLength).parallel().forEach(i->
+    {
+      final var ec=expected.charAt(i);
+      final var ac=actualBuffer[i+actualOffset];
+      if(ec!=ac)
+      {
+        Assertions.fail("expected["+i+"] = "+ec+"; actual["+i+"] = "+ac);
+      }
+    });
+  }
+  public static void assertStringsAreEqual(String expected,char[] actualBuffer,int actualOffset,int actualLength)
+  {
+    Assertions.assertEquals(expected.length(),actualLength);
+    for(int i=0;i<actualLength;++i)
+    {
+      final var ec=expected.charAt(i);
+      final var ac=actualBuffer[i+actualOffset];
+      if(ec!=ac)
+      {
+        Assertions.fail("expected["+i+"] = "+ec+"; actual["+i+"] = "+ac);
+      }
+    }
+  }
+  public static void parallelAssertStringsAreEqual(String expected,byte[] actualBuffer,int actualOffset,int actualLength)
+  {
+    Assertions.assertEquals(expected.length(),actualLength);
+    IntStream.range(0,actualLength).parallel().forEach(i->
+    {
+      final var ec=expected.charAt(i);
+      final var ac=actualBuffer[i+actualOffset];
+      if(ec!=ac)
+      {
+        Assertions.fail("expected["+i+"] = "+ec+"; actual["+i+"] = "+((char)ac));
+      }
+    });
+  }
+  public static void assertStringsAreEqual(String expected,byte[] actualBuffer,int actualOffset,int actualLength)
+  {
+    Assertions.assertEquals(expected.length(),actualLength);
+    for(int i=0;i<actualLength;++i)
+    {
+      final var ec=expected.charAt(i);
+      final var ac=actualBuffer[i+actualOffset];
+      if(ec!=ac)
+      {
+        Assertions.fail("expected["+i+"] = "+ec+"; actual["+i+"] = "+((char)ac));
+      }
+    }
+  }
+  public static void parallelAssertStringsAreEqual(String expected,String actual)  {
+    var length=expected.length();
+    Assertions.assertEquals(length,actual.length(),"string lengths not equal");
+    IntStream.range(0,length).parallel().forEach(i->
+    {
+      final var ec=expected.charAt(i);
+      final var ac=actual.charAt(i);
+      if(ec!=ac)
+      {
+        Assertions.fail("expected["+i+"] = "+ec+"; actual["+i+"] = "+ac);
+      }
+    });
+  }
+  public static void assertStringsAreEqual(String expected,String actual)  {
+    var length=expected.length();
+    Assertions.assertEquals(length,actual.length(),"string lengths not equal");
+    for(int i=0;i<length;++i)
+    {
+      final var ec=expected.charAt(i);
+      final var ac=actual.charAt(i);
+      if(ec!=ac)
+      {
+        Assertions.fail("expected["+i+"] = "+ec+"; actual["+i+"] = "+ac);
+      }
+    }
+  }
   public static boolean isEqual(boolean l,boolean r)
   {
         return l==r;
