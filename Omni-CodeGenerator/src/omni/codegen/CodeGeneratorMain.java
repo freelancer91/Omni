@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-public class Main{
+public class CodeGeneratorMain{
     private static final Pattern FQT_PATTERN
     =Pattern.compile("([\\p{L}_$][\\p{L}\\p{N}_$]*\\.)*[\\p{L}_$][\\p{L}\\p{N}_$]*");
     private static final Map<Path,Path> TEMPLATE_AND_SOURCE_FOLDERS=new HashMap<>();
@@ -30,7 +30,7 @@ public class Main{
         }
     }
     public static void main(String[] args) throws Exception{
-        TEMPLATE_AND_SOURCE_FOLDERS.forEach(Main::processTemplates);
+        TEMPLATE_AND_SOURCE_FOLDERS.forEach(CodeGeneratorMain::processTemplates);
     }
     private static void processTemplates(Path templateFolder,Path outputFolder){
         try{

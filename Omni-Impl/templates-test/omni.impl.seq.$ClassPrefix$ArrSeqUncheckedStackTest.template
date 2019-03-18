@@ -91,10 +91,6 @@ public class $ClassPrefix$ArrSeqUncheckedStackTest
 #ELSEIF OfFloat
   private static final int MAX_TOSTRING_LENGTH=15;
 #ENDIF
-  
-
-  
-  
 
   @Test
   public void testConstructors()

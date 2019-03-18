@@ -6,6 +6,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.nio.CharBuffer;
+import java.nio.ByteBuffer;
 public class ToStringUtil{
     private ToStringUtil(){}
     public static String getString(boolean b){
@@ -22,6 +23,9 @@ public class ToStringUtil{
     }
     public static void getString(boolean b,CharBuffer buffer){
         buffer.put(b?"true":"false");
+    }
+    public static void getString(boolean b,ByteBuffer buffer){
+        buffer.put(b?new byte[]{(byte)'t',(byte)'r',(byte)'u',(byte)'e'}:new byte[]{(byte)'f',(byte)'a',(byte)'l',(byte)'s',(byte)'e'});
     }
     public static void getString(boolean b,PrintWriter writer){
         writer.write(b?"true":"false");
@@ -40,8 +44,12 @@ public class ToStringUtil{
         appendable.append(getString(i));
     }
     public static void getString(byte i,CharArrayWriter writer){
-        byte[] arr;
-        writer.write(arr=getByteByteBuffer(),0,getStringShort(i,arr,0));
+        char[] arr;
+        writer.write(arr=getByteCharBuffer(),0,getStringShort(i,arr,0));
+    }
+    public static void getString(byte i,CharBuffer buffer){
+        char[] arr;
+        buffer.put(arr=getByteCharBuffer(),0,getStringShort(i,arr,0));
     }
     public static void getString(byte i,CharBuffer buffer){
         byte[] arr;
@@ -84,6 +92,10 @@ public class ToStringUtil{
         writer.write(arr=getFloatByteBuffer(),0,getStringFloat(f,arr,0));
     }
     public static void getString(float f,CharBuffer buffer){
+        char[] arr;
+        buffer.put(arr=getFloatCharBuffer(),0,getStringFloat(f,arr,0));
+    }
+    public static void getString(float f,ByteBuffer buffer){
         byte[] arr;
         buffer.put(arr=getFloatByteBuffer(),0,getStringFloat(f,arr,0));
     }
@@ -124,6 +136,10 @@ public class ToStringUtil{
         writer.write(arr=getIntByteBuffer(),0,getStringInt(i,arr,0));
     }
     public static void getString(int i,CharBuffer buffer){
+        char[] arr;
+        buffer.put(arr=getIntCharBuffer(),0,getStringInt(i,arr,0));
+    }
+    public static void getString(int i,ByteBuffer buffer){
         byte[] arr;
         buffer.put(arr=getIntByteBuffer(),0,getStringInt(i,arr,0));
     }
@@ -159,6 +175,10 @@ public class ToStringUtil{
         writer.write(arr=getLongByteBuffer(),0,getStringLong(i,arr,0));
     }
     public static void getString(long i,CharBuffer buffer){
+        char[] arr;
+        buffer.put(arr=getLongCharBuffer(),0,getStringLong(i,arr,0));
+    }
+    public static void getString(long i,ByteBuffer buffer){
         byte[] arr;
         buffer.put(arr=getLongByteBuffer(),0,getStringLong(i,arr,0));
     }
@@ -194,6 +214,10 @@ public class ToStringUtil{
         writer.write(arr=getShortByteBuffer(),0,getStringShort(i,arr,0));
     }
     public static void getString(short i,CharBuffer buffer){
+        char[] arr;
+        buffer.put(arr=getShortCharBuffer(),0,getStringShort(i,arr,0));
+    }
+    public static void getString(short i,ByteBuffer buffer){
         byte[] arr;
         buffer.put(arr=getShortByteBuffer(),0,getStringShort(i,arr,0));
     }
@@ -1647,120 +1671,173 @@ private static int printExponent(final BUFFERTYPE[] buffer,int offset,int decima
                 37,37,37,// -120
                 38,38,38,38, // -123
         };
-        //TODO convert to macro
-        /** Print the characters of the floating point number into a character buffer.
-         *
-         * @param fractBits
-         *          The fraction bits of the floating point number.
-         * @param binaryExponent
-         *          The biased binary exponent of the floating point number.
-         * @param buffer
-         *          The buffer to insert the characters into.
-         * @param offset
-         *          The first offset in the buffer to place characters at.
-         * @return The index in the buffer where the last character was placed PLUS ONE. */
-        static int toASCII(int fractBits,final int binaryExponent,final char[] buffer,final int offset){
-            if(fractBits==0){
-                if(binaryExponent<-50){ return BigMathLT1.toASCII(binaryExponent,buffer,offset); }
-                if(binaryExponent<-9){ return LongMathLT1.toASCIIEForm(binaryExponent,buffer,offset); }
-                return pow2FForm(binaryExponent,buffer,offset);
-            }
-            fractBits|=0x800000;
-            if(binaryExponent<-51){ return BigMathLT1.toASCII(fractBits,binaryExponent,buffer,offset); }
-            if(binaryExponent<-5){ return LongMathLT1.toASCII(fractBits,binaryExponent,buffer,offset); }
-            return IntMathLT1.toASCII(fractBits,binaryExponent,buffer,offset);
+        #MACRO FltLT1ToASCII<byte,Byte>()
+        #MACRO FltLT1ToASCII<char,Char>()
+#MACRODEF FltLT1ToASCII<BUFFERTYPE,SUFFIX>()
+/** Print the characters of the floating point number into a BUFFERTYPE buffer.
+ *
+ * @param fractBits
+ *          The fraction bits of the floating point number.
+ * @param binaryExponent
+ *          The biased binary exponent of the floating point number.
+ * @param buffer
+ *          The buffer to insert the characters into.
+ * @param offset
+ *          The first offset in the buffer to place characters at.
+ * @return The index in the buffer where the last character was placed PLUS ONE. */
+static int toASCII(int fractBits,final int binaryExponent,final BUFFERTYPE[] buffer,final int offset){
+    if(fractBits==0){
+        if(binaryExponent<-50){ return BigMathLT1.toASCII(binaryExponent,buffer,offset); }
+        if(binaryExponent<-9){ return LongMathLT1.toASCIIEForm(binaryExponent,buffer,offset); }
+        return pow2FForm(binaryExponent,buffer,offset);
+    }
+    fractBits|=0x800000;
+    if(binaryExponent<-51){ return BigMathLT1.toASCII(fractBits,binaryExponent,buffer,offset); }
+    if(binaryExponent<-5){ return LongMathLT1.toASCII(fractBits,binaryExponent,buffer,offset); }
+    return IntMathLT1.toASCII(fractBits,binaryExponent,buffer,offset);
+}
+/** A specialized case where the fraction bits normalized to 1.
+ *
+ * @param binaryExponent
+ *          The biased binary exponent of the floating point number.
+ * @param buffer
+ *          The buffer to insert the characters into.
+ * @param offset
+ *          The first offset in the buffer to place characters at.
+ * @return The index in the buffer where the last character was placed PLUS ONE. */
+private static int pow2FForm(final int binaryExponent,final BUFFERTYPE[] buffer,int offset){
+    buffer[offset]=(BUFFERTYPE)'0';
+    buffer[++offset]=(BUFFERTYPE)'.';
+    switch(binaryExponent){
+    case -1:
+        break;
+    case -7:
+    case -8:
+    case -9:
+        buffer[++offset]=(BUFFERTYPE)'0';
+    default:
+        buffer[++offset]=(BUFFERTYPE)'0';
+        switch(binaryExponent){
+        case -8:
+            buffer[++offset]=(BUFFERTYPE)'3';
+            buffer[++offset]=(BUFFERTYPE)'9';
+            buffer[++offset]=(BUFFERTYPE)'0';
+            buffer[++offset]=(BUFFERTYPE)'6';
+            break;
+        case -7:
+            buffer[++offset]=(BUFFERTYPE)'7';
+            buffer[++offset]=(BUFFERTYPE)'8';
+            buffer[++offset]=(BUFFERTYPE)'1';
+            break;
+        case -6:
+            buffer[++offset]=(BUFFERTYPE)'1';
+            buffer[++offset]=(BUFFERTYPE)'5';
+        case -4:
+            buffer[++offset]=(BUFFERTYPE)'6';
+            break;
+        case -9:
+            buffer[++offset]=(BUFFERTYPE)'1';
+            buffer[++offset]=(BUFFERTYPE)'9';
+            buffer[++offset]=(BUFFERTYPE)'5';
+        default:
+            buffer[++offset]=(BUFFERTYPE)'3';
+            buffer[++offset]=(BUFFERTYPE)'1';
         }
-        /** A specialized case where the fraction bits normalized to 1.
-         *
-         * @param binaryExponent
-         *          The biased binary exponent of the floating point number.
-         * @param buffer
-         *          The buffer to insert the characters into.
-         * @param offset
-         *          The first offset in the buffer to place characters at.
-         * @return The index in the buffer where the last character was placed PLUS ONE. */
-        private static int pow2FForm(final int binaryExponent,final char[] buffer,int offset){
-            buffer[offset]='0';
-            buffer[++offset]='.';
-            switch(binaryExponent){
-            case -1:
-                break;
-            case -7:
-            case -8:
-            case -9:
-                buffer[++offset]='0';
-            default:
-                buffer[++offset]='0';
-                switch(binaryExponent){
-                case -8:
-                    buffer[++offset]='3';
-                    buffer[++offset]='9';
-                    buffer[++offset]='0';
-                    buffer[++offset]='6';
-                    break;
-                case -7:
-                    buffer[++offset]='7';
-                    buffer[++offset]='8';
-                    buffer[++offset]='1';
-                    break;
-                case -6:
-                    buffer[++offset]='1';
-                    buffer[++offset]='5';
-                case -4:
-                    buffer[++offset]='6';
-                    break;
-                case -9:
-                    buffer[++offset]='1';
-                    buffer[++offset]='9';
-                    buffer[++offset]='5';
-                default:
-                    buffer[++offset]='3';
-                    buffer[++offset]='1';
-                }
-                buffer[++offset]='2';
-                break;
-            case -3:
-                buffer[++offset]='1';
-            case -2:
-                buffer[++offset]='2';
-            }
-            buffer[++offset]='5';
-            return ++offset;
-        }
+        buffer[++offset]=(BUFFERTYPE)'2';
+        break;
+    case -3:
+        buffer[++offset]=(BUFFERTYPE)'1';
+    case -2:
+        buffer[++offset]=(BUFFERTYPE)'2';
+    }
+    buffer[++offset]=(BUFFERTYPE)'5';
+    return ++offset;
+}
+#ENDDEF
+
         private static abstract class BigMathLT1 implements BigMathFltToASCII{
             long b;
             long m;
-            static int toASCII(int binaryExponent,final char[] buffer,int offset){
-                int decimalExponent;
-                int s=25-binaryExponent-(decimalExponent=ESTIMATE_DECIMAL_EXPONENT[-1-binaryExponent]);
-                long b,m;
-                long[] pow5Arr;
-                if(decimalExponent<27){
-                    b=(pow5Arr=POW_5_64)[decimalExponent-1]>>>(s-=60)<<24;
-            m=pow5Arr[decimalExponent]>>>s;
-                }else{
-                    b=(pow5Arr=POW_5_128)[binaryExponent=decimalExponent-26<<1]>>>s-84|pow5Arr[++binaryExponent]<<148-s;
-                    m=pow5Arr[binaryExponent+2]<<124-s;
-                }
-                s=(int)(b>>>59);
-                b=(b&(1L<<59)-1)*10;
-                buffer[offset]=(char)(s+'0');
-                buffer[++offset]='.';
-                return printBigIntLT1Exp(decimalExponent,buffer,fractionLoop(b,m,buffer,offset));
+            #MACRO BigMathLT1ToASCII<byte,Byte>()
+            #MACRO BigMathLT1ToASCII<char,Char>()
+#MACRODEF BigMathLT1ToASCII<BUFFERTYPE,SUFFIX>()
+static int toASCII(int binaryExponent,final BUFFERTYPE[] buffer,int offset){
+    int decimalExponent;
+    int s=25-binaryExponent-(decimalExponent=ESTIMATE_DECIMAL_EXPONENT[-1-binaryExponent]);
+    long b,m;
+    long[] pow5Arr;
+    if(decimalExponent<27){
+        b=(pow5Arr=POW_5_64)[decimalExponent-1]>>>(s-=60)<<24;
+        m=pow5Arr[decimalExponent]>>>s;
+    }else{
+        b=(pow5Arr=POW_5_128)[binaryExponent=decimalExponent-26<<1]>>>s-84|pow5Arr[++binaryExponent]<<148-s;
+        m=pow5Arr[binaryExponent+2]<<124-s;
+    }
+    s=(int)(b>>>59);
+    b=(b&(1L<<59)-1)*10;
+    buffer[offset]=(BUFFERTYPE)(s+'0');
+    buffer[++offset]=(BUFFERTYPE)'.';
+    return printBigIntLT1Exp(decimalExponent,buffer,fractionLoop(b,m,buffer,offset));
+}
+static int toASCII(final int fractBits,final int binaryExponent,final BUFFERTYPE[] buffer,final int offset){
+    int decimalExponent;
+    int shiftBias;
+    BigMathFltToASCII bsm;
+    if((shiftBias=24-binaryExponent-(decimalExponent=estimateDecimalExponent(fractBits,binaryExponent)))<92){
+        bsm=new BigMathLT1LowBias(fractBits,decimalExponent,92-shiftBias);
+    }else if(shiftBias==92){
+        bsm=new BigMathLT1Unbiased(fractBits,decimalExponent);
+    }else{
+        bsm=new BigMathLT1HighBias(fractBits,decimalExponent,124-shiftBias);
+    }
+    return bsm.getSUFFIXs(decimalExponent,buffer,offset);
+}
+private static int fractionLoop(long b,long m,final BUFFERTYPE[] buffer,int offset){
+    int c;
+    for(;;){
+        c=(int)(b>>>59);
+        if((b&=(1L<<59)-1)+m>1L<<59){
+            if(b>1L<<58){
+                ++c;
             }
-            static int toASCII(final int fractBits,final int binaryExponent,final char[] buffer,final int offset){
-                int decimalExponent;
-                int shiftBias;
-                BigMathFltToASCII bsm;
-                if((shiftBias=24-binaryExponent-(decimalExponent=estimateDecimalExponent(fractBits,binaryExponent)))<92){
-                    bsm=new BigMathLT1LowBias(fractBits,decimalExponent,92-shiftBias);
-                }else if(shiftBias==92){
-                    bsm=new BigMathLT1Unbiased(fractBits,decimalExponent);
-                }else{
-                    bsm=new BigMathLT1HighBias(fractBits,decimalExponent,124-shiftBias);
-                }
-                return bsm.getChars(decimalExponent,buffer,offset);
-            }
+            break;
+        }
+        if(b<m){
+            break;
+        }
+        buffer[++offset]=(BUFFERTYPE)(c+'0');
+        b*=10;
+        m*=10;
+    }
+    buffer[++offset]=(BUFFERTYPE)(c+'0');
+    return offset;
+}
+private static int printBigIntLT1Exp(int decimalExponent,final BUFFERTYPE[] buffer,int offset){
+    buffer[++offset]=(BUFFERTYPE)'E';
+    buffer[++offset]=(BUFFERTYPE)'-';
+    if(decimalExponent>29){
+        buffer[++offset]=(BUFFERTYPE)'3';
+        decimalExponent-=30;
+    }else if(decimalExponent>19){
+        buffer[++offset]=(BUFFERTYPE)'2';
+        decimalExponent-=20;
+    }else{
+        buffer[++offset]=(BUFFERTYPE)'1';
+        decimalExponent-=10;
+    }
+    buffer[++offset]=(BUFFERTYPE)(decimalExponent+'0');
+    return ++offset;
+}
+private static int printFraction(final long b,final long m,final BUFFERTYPE[] buffer,int offset){
+    buffer[++offset]=(BUFFERTYPE)'.';
+    if(b<m){
+        buffer[++offset]=(BUFFERTYPE)'0';
+    }else{
+        offset=fractionLoop(b,m,buffer,offset);
+    }
+    return offset;
+}
+#ENDDEF
             private static int estimateDecimalExponent(final int fractBits,final int binaryExponent){
                 // TODO this method is probably too big.
                 // consider refactoring
@@ -1835,51 +1912,6 @@ private static int printExponent(final BUFFERTYPE[] buffer,int offset,int decima
                 }
                 return ESTIMATE_DECIMAL_EXPONENT[-1-binaryExponent];
             }
-            private static int fractionLoop(long b,long m,final char[] buffer,int offset){
-                int c;
-                for(;;){
-                    c=(int)(b>>>59);
-                    if((b&=(1L<<59)-1)+m>1L<<59){
-                        if(b>1L<<58){
-                            ++c;
-                        }
-                        break;
-                    }
-                    if(b<m){
-                        break;
-                    }
-                    buffer[++offset]=(char)(c+'0');
-                    b*=10;
-                    m*=10;
-                }
-                buffer[++offset]=(char)(c+'0');
-                return offset;
-            }
-            private static int printBigIntLT1Exp(int decimalExponent,final char[] buffer,int offset){
-                buffer[++offset]='E';
-                buffer[++offset]='-';
-                if(decimalExponent>29){
-                    buffer[++offset]='3';
-                    decimalExponent-=30;
-                }else if(decimalExponent>19){
-                    buffer[++offset]='2';
-                    decimalExponent-=20;
-                }else{
-                    buffer[++offset]='1';
-                    decimalExponent-=10;
-                }
-                buffer[++offset]=(char)(decimalExponent+'0');
-                return ++offset;
-            }
-            private static int printFraction(final long b,final long m,final char[] buffer,int offset){
-                buffer[++offset]='.';
-                if(b<m){
-                    buffer[++offset]='0';
-                }else{
-                    offset=fractionLoop(b,m,buffer,offset);
-                }
-                return offset;
-            }
             private static class BigMathLT1HighBias extends BigMathLT1ShortCircuit{
                 public BigMathLT1HighBias(final int fractBits,int decimalExponent,final int shiftBias){
                     long[] pow5Arr;
@@ -1905,29 +1937,39 @@ private static int printExponent(final BUFFERTYPE[] buffer,int offset,int decima
                 }
             }
             private static class BigMathLT1NonShortCircuit extends BigMathLT1{
-                @Override public int getChars(final int decimalExponent,final char[] buffer,int offset){
-                    long b;
-                    final int c=(int)((b=this.b)>>>59);
-                    b=(b&(1L<<59)-1)*10;
-                    buffer[offset]=(char)(c+'0');
-                    offset=printFraction(b,m,buffer,offset);
-                    return printBigIntLT1Exp(decimalExponent,buffer,offset);
-                }
+              #MACRO BigMathLT1NonShortCircuit<byte,Byte>()
+              #MACRO BigMathLT1NonShortCircuit<char,Char>()
+#MACRODEF BigMathLT1NonShortCircuit<BUFFERTYPE,SUFFIX>()
+@Override public int getSUFFIXs(final int decimalExponent,final BUFFERTYPE[] buffer,int offset){
+    long b;
+    final int c=(int)((b=this.b)>>>59);
+    b=(b&(1L<<59)-1)*10;
+    buffer[offset]=(BUFFERTYPE)(c+'0');
+    offset=printFraction(b,m,buffer,offset);
+    return printBigIntLT1Exp(decimalExponent,buffer,offset);
+}
+#ENDDEF
+
             }
             private static class BigMathLT1ShortCircuit extends BigMathLT1{
-                @Override public int getChars(final int decimalExponent,final char[] buffer,int offset){
-                    long b,m;
-                    final int c=(int)((b=this.b)>>>59);
-                    if((b=(b&(1L<<59)-1)*10)+(m=this.m)>10L<<59){
-                        buffer[offset]=(char)(c+'1');
-                        buffer[++offset]='.';
-                        buffer[++offset]='0';
-                    }else{
-                        buffer[offset]=(char)(c+'0');
-                        offset=printFraction(b,m,buffer,offset);
-                    }
-                    return printBigIntLT1Exp(decimalExponent,buffer,offset);
-                }
+              #MACRO BigMathLT1ShortCircuit<byte,Byte>()
+              #MACRO BigMathLT1ShortCircuit<char,Char>()
+#MACRODEF BigMathLT1ShortCircuit<BUFFERTYPE,SUFFIX>()
+@Override public int getSUFFIXs(final int decimalExponent,final BUFFERTYPE[] buffer,int offset){
+    long b,m;
+    final int c=(int)((b=this.b)>>>59);
+    if((b=(b&(1L<<59)-1)*10)+(m=this.m)>10L<<59){
+        buffer[offset]=(BUFFERTYPE)(c+'1');
+        buffer[++offset]=(BUFFERTYPE)'.';
+        buffer[++offset]=(BUFFERTYPE)'0';
+    }else{
+        buffer[offset]=(BUFFERTYPE)(c+'0');
+        offset=printFraction(b,m,buffer,offset);
+    }
+    return printBigIntLT1Exp(decimalExponent,buffer,offset);
+}
+#ENDDEF
+
             }
             private static class BigMathLT1Unbiased extends BigMathLT1NonShortCircuit{
                 public BigMathLT1Unbiased(final int fractBits,int decimalExponent){
@@ -1940,79 +1982,170 @@ private static int printExponent(final BUFFERTYPE[] buffer,int offset,int decima
             }
         }
         private static class IntMathLT1{
-            static int toASCII(final int fractBits,final int binaryExponent,final char[] buffer,int offset){
-                final int decimalExponent;
-                int b,m;
-                final int sPow;
-                int c=(b=(m=POW_5_32[decimalExponent=estimateDecimalExponent(fractBits,binaryExponent)])*fractBits<<1)>>>(sPow
-                        =24-binaryExponent-decimalExponent);
-                int sModMask;
-                int s;
-                b&=sModMask=(s=1<<sPow)-1;
-                buffer[offset]='0';
-                buffer[++offset]='.';
-                offset=fillZeros(offset,buffer,offset+decimalExponent-1)+1;
-                if(b+m>s){
-                    buffer[offset]=(char)(c+'1');
-                }else{
-                    buffer[offset]=(char)(c+'0');
-                    if(b>=m){
-                        for(;;){
-                            c=(b*=10)>>>sPow;
-                            if((b&=sModMask)+(m*=10)>s){
-                                int lowDigitDif;
-                                if(b>=m||(lowDigitDif=(b<<1)-s)>0||lowDigitDif==0&&(c&1)!=0){
-                                    ++c;
-                                }
-                                break;
-                            }
-                            if(b<m){
-                                break;
-                            }
-                            buffer[++offset]=(char)(c+'0');
-                        }
-                        buffer[++offset]=(char)(c+'0');
+          #MACRO IntMathLT1<byte,Byte>()
+          #MACRO IntMathLT1<char,Char>()
+#MACRODEF IntMathLT1<BUFFERTYPE,SUFFIX>()
+static int toASCII(final int fractBits,final int binaryExponent,final BUFFERTYPE[] buffer,int offset){
+    final int decimalExponent;
+    int b,m;
+    final int sPow;
+    int c=(b=(m=POW_5_32[decimalExponent=estimateDecimalExponent(fractBits,binaryExponent)])*fractBits<<1)>>>(sPow
+            =24-binaryExponent-decimalExponent);
+    int sModMask;
+    int s;
+    b&=sModMask=(s=1<<sPow)-1;
+    buffer[offset]=(BUFFERTYPE)'0';
+    buffer[++offset]=(BUFFERTYPE)'.';
+    offset=fillZeros(offset,buffer,offset+decimalExponent-1)+1;
+    if(b+m>s){
+        buffer[offset]=(BUFFERTYPE)(c+'1');
+    }else{
+        buffer[offset]=(BUFFERTYPE)(c+'0');
+        if(b>=m){
+            for(;;){
+                c=(b*=10)>>>sPow;
+                if((b&=sModMask)+(m*=10)>s){
+                    int lowDigitDif;
+                    if(b>=m||(lowDigitDif=(b<<1)-s)>0||lowDigitDif==0&&(c&1)!=0){
+                        ++c;
                     }
+                    break;
                 }
-                return ++offset;
+                if(b<m){
+                    break;
+                }
+                buffer[++offset]=(BUFFERTYPE)(c+'0');
             }
+            buffer[++offset]=(BUFFERTYPE)(c+'0');
+        }
+    }
+    return ++offset;
+}
+#ENDDEF
+
             private static int estimateDecimalExponent(final int fractBits,final int binaryExponent){
                 if(binaryExponent==-4&&fractBits>13421772){ return 1; }
                 return ESTIMATE_DECIMAL_EXPONENT[-1-binaryExponent];
             }
         }
         private static class LongMathLT1{
-            static int toASCII(final int fractBits,final int binaryExponent,final char[] buffer,final int offset){
-                final int decimalExponent;
-                if((decimalExponent=estimateDecimalExponent(fractBits,binaryExponent))<4){ return toASCIIFForm(fractBits,binaryExponent,buffer,offset,decimalExponent); }
-                return toASCIIEForm(fractBits,binaryExponent,buffer,offset,decimalExponent);
+          #MACRO LongMathLT1<byte,Byte>()
+          #MACRO LongMathLT1<char,Char>()
+#MACRODEF LongMathLT1<BUFFERTYPE,SUFFIX>()
+static int toASCII(final int fractBits,final int binaryExponent,final BUFFERTYPE[] buffer,final int offset){
+    final int decimalExponent;
+    if((decimalExponent=estimateDecimalExponent(fractBits,binaryExponent))<4){ return toASCIIFForm(fractBits,binaryExponent,buffer,offset,decimalExponent); }
+    return toASCIIEForm(fractBits,binaryExponent,buffer,offset,decimalExponent);
+}
+static int toASCIIEForm(final int binaryExponent,final BUFFERTYPE[] buffer,int offset){
+    int decimalExponent;
+    long b,m,s,sModMask;
+    int sPow;
+    buffer[offset]
+            =(BUFFERTYPE)(((b=(m=POW_5_64[(decimalExponent=ESTIMATE_DECIMAL_EXPONENT[-1-binaryExponent])-1])<<25)>>>(sPow
+                    =25-binaryExponent-decimalExponent))+'0');
+    buffer[++offset]=(BUFFERTYPE)'.';
+    b&=sModMask=(s=1L<<sPow)-1L;
+    int c;
+    for(;;){
+        c=(int)((b*=10L)>>>sPow);
+        if((b&=sModMask)+(m*=10L)>s){
+            if(b<<1>s){
+                ++c;
             }
-            static int toASCIIEForm(final int binaryExponent,final char[] buffer,int offset){
-                int decimalExponent;
-                long b,m,s,sModMask;
-                int sPow;
-                buffer[offset]
-                        =(char)(((b=(m=POW_5_64[(decimalExponent=ESTIMATE_DECIMAL_EXPONENT[-1-binaryExponent])-1])<<25)>>>(sPow
-                                =25-binaryExponent-decimalExponent))+'0');
-                buffer[++offset]='.';
-                b&=sModMask=(s=1L<<sPow)-1L;
-                int c;
-                for(;;){
-                    c=(int)((b*=10L)>>>sPow);
-                    if((b&=sModMask)+(m*=10L)>s){
-                        if(b<<1>s){
-                            ++c;
-                        }
-                        break;
+            break;
+        }
+        if(b<m){
+            break;
+        }
+        buffer[++offset]=(BUFFERTYPE)(c+'0');
+    }
+    buffer[++offset]=(BUFFERTYPE)(c+'0');
+    return printLongLT1Exp(decimalExponent,buffer,offset);
+}
+private static int printLongLT1Exp(int decimalExponent,final BUFFERTYPE[] buffer,int offset){
+    buffer[++offset]=(BUFFERTYPE)'E';
+    buffer[++offset]=(BUFFERTYPE)'-';
+    if(decimalExponent>9){
+        buffer[++offset]=(BUFFERTYPE)'1';
+        decimalExponent-=10;
+    }
+    buffer[++offset]=(BUFFERTYPE)(decimalExponent+'0');
+    return ++offset;
+}
+private static int toASCIIEForm(final int fractBits,final int binaryExponent,final BUFFERTYPE[] buffer,int offset,
+        final int decimalExponent){
+    long m;
+    final int sPow;
+    long b;
+    int c=(int)((b=fractBits*(m=POW_5_64[decimalExponent-1])<<1)>>>(sPow=24-binaryExponent-decimalExponent));
+    long s;
+    long sModMask;
+    if((b&=sModMask=(s=1L<<sPow)-1L)+m>s){
+        buffer[offset]=(BUFFERTYPE)(c+'1');
+        buffer[++offset]=(BUFFERTYPE)'.';
+        buffer[++offset]=(BUFFERTYPE)'0';
+    }else{
+        buffer[offset]=(BUFFERTYPE)(c+'0');
+        buffer[++offset]=(BUFFERTYPE)'.';
+        if(b<m){
+            buffer[++offset]=(BUFFERTYPE)'0';
+        }else{
+            for(;;){
+                c=(int)((b*=10L)>>>sPow);
+                if((b&=sModMask)+(m*=10L)>s){
+                    if(b<<1>s){
+                        ++c;
                     }
-                    if(b<m){
-                        break;
-                    }
-                    buffer[++offset]=(char)(c+'0');
+                    break;
                 }
-                buffer[++offset]=(char)(c+'0');
-                return printLongLT1Exp(decimalExponent,buffer,offset);
+                if(b<m){
+                    break;
+                }
+                buffer[++offset]=(BUFFERTYPE)(c+'0');
             }
+            buffer[++offset]=(BUFFERTYPE)(c+'0');
+        }
+    }
+    return printLongLT1Exp(decimalExponent,buffer,offset);
+}
+private static int toASCIIFForm(final int fractBits,final int binaryExponent,final BUFFERTYPE[] buffer,int offset,
+        final int decimalExponent){
+    long m;
+    final int sPow;
+    long b;
+    final long s;
+    int c=(int)((b=fractBits*(m=POW_5_64[decimalExponent-1])<<1)>>>(sPow=24-binaryExponent-decimalExponent));
+    buffer[offset]=(BUFFERTYPE)'0';
+    buffer[++offset]=(BUFFERTYPE)'.';
+    offset=fillZeros(offset,buffer,offset+decimalExponent-1);
+    final long sModMask;
+    if((b&=sModMask=(s=1L<<sPow)-1)+m>s){
+        buffer[++offset]=(BUFFERTYPE)(c+'1');
+    }else{
+        buffer[++offset]=(BUFFERTYPE)(c+'0');
+        if(b>=m){
+            for(;;){
+                c=(int)((b*=10)>>>sPow);
+                if((b&=sModMask)+(m*=10)>s){
+                    int lowDigitDif;
+                    if(b>=m||(lowDigitDif=(int)((b<<1)-s))>0||lowDigitDif==0&&(c&1)!=0){
+                        ++c;
+                    }
+                    break;
+                }
+                if(b<m){
+                    break;
+                }
+                buffer[++offset]=(BUFFERTYPE)(c+'0');
+            }
+            buffer[++offset]=(BUFFERTYPE)(c+'0');
+        }
+    }
+    return ++offset;
+}
+#ENDDEF
+
             private static int estimateDecimalExponent(final int fractBits,final int binaryExponent){
                 switch(binaryExponent){
                 case -7:
@@ -2061,87 +2194,7 @@ private static int printExponent(final BUFFERTYPE[] buffer,int offset,int decima
                 }
                 return ESTIMATE_DECIMAL_EXPONENT[-1-binaryExponent];
             }
-            private static int printLongLT1Exp(int decimalExponent,final char[] buffer,int offset){
-                buffer[++offset]='E';
-                buffer[++offset]='-';
-                if(decimalExponent>9){
-                    buffer[++offset]='1';
-                    decimalExponent-=10;
-                }
-                buffer[++offset]=(char)(decimalExponent+'0');
-                return ++offset;
-            }
-            private static int toASCIIEForm(final int fractBits,final int binaryExponent,final char[] buffer,int offset,
-                    final int decimalExponent){
-                long m;
-                final int sPow;
-                long b;
-                int c=(int)((b=fractBits*(m=POW_5_64[decimalExponent-1])<<1)>>>(sPow=24-binaryExponent-decimalExponent));
-                long s;
-                long sModMask;
-                if((b&=sModMask=(s=1L<<sPow)-1L)+m>s){
-                    buffer[offset]=(char)(c+'1');
-                    buffer[++offset]='.';
-                    buffer[++offset]='0';
-                }else{
-                    buffer[offset]=(char)(c+'0');
-                    buffer[++offset]='.';
-                    if(b<m){
-                        buffer[++offset]='0';
-                    }else{
-                        for(;;){
-                            c=(int)((b*=10L)>>>sPow);
-                            if((b&=sModMask)+(m*=10L)>s){
-                                if(b<<1>s){
-                                    ++c;
-                                }
-                                break;
-                            }
-                            if(b<m){
-                                break;
-                            }
-                            buffer[++offset]=(char)(c+'0');
-                        }
-                        buffer[++offset]=(char)(c+'0');
-                    }
-                }
-                return printLongLT1Exp(decimalExponent,buffer,offset);
-            }
-            private static int toASCIIFForm(final int fractBits,final int binaryExponent,final char[] buffer,int offset,
-                    final int decimalExponent){
-                long m;
-                final int sPow;
-                long b;
-                final long s;
-                int c=(int)((b=fractBits*(m=POW_5_64[decimalExponent-1])<<1)>>>(sPow=24-binaryExponent-decimalExponent));
-                buffer[offset]='0';
-                buffer[++offset]='.';
-                offset=fillZeros(offset,buffer,offset+decimalExponent-1);
-                final long sModMask;
-                if((b&=sModMask=(s=1L<<sPow)-1)+m>s){
-                    buffer[++offset]=(char)(c+'1');
-                }else{
-                    buffer[++offset]=(char)(c+'0');
-                    if(b>=m){
-                        for(;;){
-                            c=(int)((b*=10)>>>sPow);
-                            if((b&=sModMask)+(m*=10)>s){
-                                int lowDigitDif;
-                                if(b>=m||(lowDigitDif=(int)((b<<1)-s))>0||lowDigitDif==0&&(c&1)!=0){
-                                    ++c;
-                                }
-                                break;
-                            }
-                            if(b<m){
-                                break;
-                            }
-                            buffer[++offset]=(char)(c+'0');
-                        }
-                        buffer[++offset]=(char)(c+'0');
-                    }
-                }
-                return ++offset;
-            }
+
         }
     }
     private final static int[] INT_SIZE_TABLE={9,99,999,9999,99999,999999,9999999,99999999,999999999,Integer.MAX_VALUE};
