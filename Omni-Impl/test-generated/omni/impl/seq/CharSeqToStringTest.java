@@ -4,36 +4,32 @@ import omni.util.TypeConversionUtil;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
-import omni.impl.seq.CharArrSeq.UncheckedStack;
-import omni.impl.seq.CharArrSeq.CheckedStack;
-import omni.impl.seq.CharArrSeq.UncheckedList;
-import omni.impl.seq.CharArrSeq.CheckedList;
 import java.util.ConcurrentModificationException;
 import omni.api.OmniCollection;
 @SuppressWarnings({"rawtypes","unchecked"}) 
-public class CharArrSeqToStringTest
+public class CharSeqToStringTest
 {
   private static final char MIN_LENGTH_STRING_VAL=0;
   private static final int MIN_TOSTRING_LENGTH=String.valueOf(MIN_LENGTH_STRING_VAL).length();
   @Test
-  public void testEmptyToStringUncheckedStack()
+  public void testEmptyToStringArrSeqUncheckedStack()
   {
-    String expected=new ArrayList().toString();
-    Assertions.assertEquals(expected,new UncheckedStack().toString());
+    var expected=new ArrayList().toString();
+    Assertions.assertEquals(expected,new CharArrSeq.UncheckedStack().toString());
   }
   @Test
-  public void testOOMToStringUncheckedStack()
+  public void testOOMToStringArrSeqUncheckedStack()
   {
     int length=Integer.MAX_VALUE/(MIN_TOSTRING_LENGTH+2)-1;
-    var seq=new UncheckedStack(length,new char[length+1]);
+    var seq=new CharArrSeq.UncheckedStack(length,new char[length+1]);
     Assertions.assertDoesNotThrow(()->seq.toString());
     seq.add(MIN_LENGTH_STRING_VAL);
     Assertions.assertThrows(OutOfMemoryError.class,()->seq.toString());
   }
-  private static Object[] createAscendingSequencePairUncheckedStack(int length)
+  private static Object[] createAscendingSequencePairArrSeqUncheckedStack(int length)
   {
-    OmniCollection.OfChar seq=new UncheckedStack(length);
-    ArrayList arrayList=new ArrayList(length);
+    var seq=new CharArrSeq.UncheckedStack(length);
+    var arrayList=new ArrayList(length);
     for(int i=0;i<length;++i)
     {
       char val=TypeConversionUtil.convertTochar(i);
@@ -47,30 +43,30 @@ public class CharArrSeqToStringTest
   public void testSmallToStringUncheckedStack()
   {
     int length=100;
-    Object[] seqPair=createAscendingSequencePairUncheckedStack(length);
-    ArrayList arrayList=(ArrayList)seqPair[0];
-    OmniCollection.OfChar seq=(OmniCollection.OfChar)seqPair[1];
+    var seqPair=createAscendingSequencePairArrSeqUncheckedStack(length);
+    var arrayList=(ArrayList)seqPair[0];
+    var seq=(OmniCollection.OfChar)seqPair[1];
     EqualityUtil.parallelAssertStringsAreEqual(arrayList.toString(),seq.toString());
   }
   @Test
-  public void testEmptyToStringUncheckedList()
+  public void testEmptyToStringArrSeqUncheckedList()
   {
-    String expected=new ArrayList().toString();
-    Assertions.assertEquals(expected,new UncheckedList().toString());
+    var expected=new ArrayList().toString();
+    Assertions.assertEquals(expected,new CharArrSeq.UncheckedList().toString());
   }
   @Test
-  public void testOOMToStringUncheckedList()
+  public void testOOMToStringArrSeqUncheckedList()
   {
     int length=Integer.MAX_VALUE/(MIN_TOSTRING_LENGTH+2)-1;
-    var seq=new UncheckedList(length,new char[length+1]);
+    var seq=new CharArrSeq.UncheckedList(length,new char[length+1]);
     Assertions.assertDoesNotThrow(()->seq.toString());
     seq.add(MIN_LENGTH_STRING_VAL);
     Assertions.assertThrows(OutOfMemoryError.class,()->seq.toString());
   }
-  private static Object[] createAscendingSequencePairUncheckedList(int length)
+  private static Object[] createAscendingSequencePairArrSeqUncheckedList(int length)
   {
-    OmniCollection.OfChar seq=new UncheckedList(length);
-    ArrayList arrayList=new ArrayList(length);
+    var seq=new CharArrSeq.UncheckedList(length);
+    var arrayList=new ArrayList(length);
     for(int i=0;i<length;++i)
     {
       char val=TypeConversionUtil.convertTochar(i);
@@ -83,30 +79,30 @@ public class CharArrSeqToStringTest
   public void testSmallToStringUncheckedList()
   {
     int length=100;
-    Object[] seqPair=createAscendingSequencePairUncheckedList(length);
-    ArrayList arrayList=(ArrayList)seqPair[0];
-    OmniCollection.OfChar seq=(OmniCollection.OfChar)seqPair[1];
+    var seqPair=createAscendingSequencePairArrSeqUncheckedList(length);
+    var arrayList=(ArrayList)seqPair[0];
+    var seq=(OmniCollection.OfChar)seqPair[1];
     EqualityUtil.parallelAssertStringsAreEqual(arrayList.toString(),seq.toString());
   }
   @Test
-  public void testEmptyToStringCheckedStack()
+  public void testEmptyToStringArrSeqCheckedStack()
   {
-    String expected=new ArrayList().toString();
-    Assertions.assertEquals(expected,new CheckedStack().toString());
+    var expected=new ArrayList().toString();
+    Assertions.assertEquals(expected,new CharArrSeq.CheckedStack().toString());
   }
   @Test
-  public void testOOMToStringCheckedStack()
+  public void testOOMToStringArrSeqCheckedStack()
   {
     int length=Integer.MAX_VALUE/(MIN_TOSTRING_LENGTH+2)-1;
-    var seq=new CheckedStack(length,new char[length+1]);
+    var seq=new CharArrSeq.CheckedStack(length,new char[length+1]);
     Assertions.assertDoesNotThrow(()->seq.toString());
     seq.add(MIN_LENGTH_STRING_VAL);
     Assertions.assertThrows(OutOfMemoryError.class,()->seq.toString());
   }
-  private static Object[] createAscendingSequencePairCheckedStack(int length)
+  private static Object[] createAscendingSequencePairArrSeqCheckedStack(int length)
   {
-    OmniCollection.OfChar seq=new CheckedStack(length);
-    ArrayList arrayList=new ArrayList(length);
+    var seq=new CharArrSeq.CheckedStack(length);
+    var arrayList=new ArrayList(length);
     for(int i=0;i<length;++i)
     {
       char val=TypeConversionUtil.convertTochar(i);
@@ -120,30 +116,30 @@ public class CharArrSeqToStringTest
   public void testSmallToStringCheckedStack()
   {
     int length=100;
-    Object[] seqPair=createAscendingSequencePairCheckedStack(length);
-    ArrayList arrayList=(ArrayList)seqPair[0];
-    OmniCollection.OfChar seq=(OmniCollection.OfChar)seqPair[1];
+    var seqPair=createAscendingSequencePairArrSeqCheckedStack(length);
+    var arrayList=(ArrayList)seqPair[0];
+    var seq=(OmniCollection.OfChar)seqPair[1];
     EqualityUtil.parallelAssertStringsAreEqual(arrayList.toString(),seq.toString());
   }
   @Test
-  public void testEmptyToStringCheckedList()
+  public void testEmptyToStringArrSeqCheckedList()
   {
-    String expected=new ArrayList().toString();
-    Assertions.assertEquals(expected,new CheckedList().toString());
+    var expected=new ArrayList().toString();
+    Assertions.assertEquals(expected,new CharArrSeq.CheckedList().toString());
   }
   @Test
-  public void testOOMToStringCheckedList()
+  public void testOOMToStringArrSeqCheckedList()
   {
     int length=Integer.MAX_VALUE/(MIN_TOSTRING_LENGTH+2)-1;
-    var seq=new CheckedList(length,new char[length+1]);
+    var seq=new CharArrSeq.CheckedList(length,new char[length+1]);
     Assertions.assertDoesNotThrow(()->seq.toString());
     seq.add(MIN_LENGTH_STRING_VAL);
     Assertions.assertThrows(OutOfMemoryError.class,()->seq.toString());
   }
-  private static Object[] createAscendingSequencePairCheckedList(int length)
+  private static Object[] createAscendingSequencePairArrSeqCheckedList(int length)
   {
-    OmniCollection.OfChar seq=new CheckedList(length);
-    ArrayList arrayList=new ArrayList(length);
+    var seq=new CharArrSeq.CheckedList(length);
+    var arrayList=new ArrayList(length);
     for(int i=0;i<length;++i)
     {
       char val=TypeConversionUtil.convertTochar(i);
@@ -156,32 +152,32 @@ public class CharArrSeqToStringTest
   public void testSmallToStringCheckedList()
   {
     int length=100;
-    Object[] seqPair=createAscendingSequencePairCheckedList(length);
-    ArrayList arrayList=(ArrayList)seqPair[0];
-    OmniCollection.OfChar seq=(OmniCollection.OfChar)seqPair[1];
+    var seqPair=createAscendingSequencePairArrSeqCheckedList(length);
+    var arrayList=(ArrayList)seqPair[0];
+    var seq=(OmniCollection.OfChar)seqPair[1];
     EqualityUtil.parallelAssertStringsAreEqual(arrayList.toString(),seq.toString());
   }
   @Test
-  public void testEmptyToStringUncheckedSubList()
+  public void testEmptyToStringArrSeqUncheckedSubList()
   {
-    String expected=new ArrayList().toString();
-    Assertions.assertEquals(expected,new UncheckedList().subList(0,0).toString());
+    var expected=new ArrayList().toString();
+    Assertions.assertEquals(expected,new CharArrSeq.UncheckedList().subList(0,0).toString());
   }
   @Test
-  public void testOOMToStringUncheckedSubList()
+  public void testOOMToStringArrSeqUncheckedSubList()
   {
     int length=Integer.MAX_VALUE/(MIN_TOSTRING_LENGTH+2)-1;
-    var root=new UncheckedList(length,new char[length+1]);
+    var root=new CharArrSeq.UncheckedList(length,new char[length+1]);
     var seq=root.subList(0,length);
     Assertions.assertDoesNotThrow(()->seq.toString());
     seq.add(MIN_LENGTH_STRING_VAL);
     Assertions.assertThrows(OutOfMemoryError.class,()->seq.toString());
   }
-  private static Object[] createAscendingSequencePairUncheckedSubList(int length)
+  private static Object[] createAscendingSequencePairArrSeqUncheckedSubList(int length)
   {
-    UncheckedList root=new UncheckedList(length);
-    OmniCollection.OfChar seq=root.subList(0,0);
-    ArrayList arrayList=new ArrayList(length);
+    var root=new CharArrSeq.UncheckedList(length);
+    var seq=root.subList(0,0);
+    var arrayList=new ArrayList(length);
     for(int i=0;i<length;++i)
     {
       char val=TypeConversionUtil.convertTochar(i);
@@ -194,36 +190,36 @@ public class CharArrSeqToStringTest
   public void testSmallToStringUncheckedSubList()
   {
     int length=100;
-    Object[] seqPair=createAscendingSequencePairUncheckedSubList(length);
-    ArrayList arrayList=(ArrayList)seqPair[0];
-    OmniCollection.OfChar seq=(OmniCollection.OfChar)seqPair[1];
+    var seqPair=createAscendingSequencePairArrSeqUncheckedSubList(length);
+    var arrayList=(ArrayList)seqPair[0];
+    var seq=(OmniCollection.OfChar)seqPair[1];
     EqualityUtil.parallelAssertStringsAreEqual(arrayList.toString(),seq.toString());
   }
   @Test
-  public void testEmptyToStringCheckedSubList()
+  public void testEmptyToStringArrSeqCheckedSubList()
   {
-    String expected=new ArrayList().toString();
-    CheckedList root=new CheckedList();
+    var expected=new ArrayList().toString();
+    var root=new CharArrSeq.CheckedList();
     var subList=root.subList(0,0);
     Assertions.assertEquals(expected,subList.toString());
     root.add(Character.MIN_VALUE);
     Assertions.assertThrows(ConcurrentModificationException.class,()->subList.toString());
   }
   @Test
-  public void testOOMToStringCheckedSubList()
+  public void testOOMToStringArrSeqCheckedSubList()
   {
     int length=Integer.MAX_VALUE/(MIN_TOSTRING_LENGTH+2)-1;
-    var root=new CheckedList(length,new char[length+1]);
+    var root=new CharArrSeq.CheckedList(length,new char[length+1]);
     var seq=root.subList(0,length);
     Assertions.assertDoesNotThrow(()->seq.toString());
     seq.add(MIN_LENGTH_STRING_VAL);
     Assertions.assertThrows(OutOfMemoryError.class,()->seq.toString());
   }
-  private static Object[] createAscendingSequencePairCheckedSubList(int length)
+  private static Object[] createAscendingSequencePairArrSeqCheckedSubList(int length)
   {
-    CheckedList root=new CheckedList(length);
-    OmniCollection.OfChar seq=root.subList(0,0);
-    ArrayList arrayList=new ArrayList(length);
+    var root=new CharArrSeq.CheckedList(length);
+    var seq=root.subList(0,0);
+    var arrayList=new ArrayList(length);
     for(int i=0;i<length;++i)
     {
       char val=TypeConversionUtil.convertTochar(i);
@@ -236,9 +232,9 @@ public class CharArrSeqToStringTest
   public void testSmallToStringCheckedSubList()
   {
     int length=100;
-    Object[] seqPair=createAscendingSequencePairCheckedSubList(length);
-    ArrayList arrayList=(ArrayList)seqPair[0];
-    OmniCollection.OfChar seq=(OmniCollection.OfChar)seqPair[1];
+    var seqPair=createAscendingSequencePairArrSeqCheckedSubList(length);
+    var arrayList=(ArrayList)seqPair[0];
+    var seq=(OmniCollection.OfChar)seqPair[1];
     EqualityUtil.parallelAssertStringsAreEqual(arrayList.toString(),seq.toString());
   }
 }

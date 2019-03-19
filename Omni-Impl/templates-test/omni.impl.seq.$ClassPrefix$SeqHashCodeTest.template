@@ -1,0 +1,128 @@
+#TYPEDEF OfBoolean
+#TYPEDEF OfByte
+#TYPEDEF OfChar
+#TYPEDEF OfShort
+#TYPEDEF OfInt
+#TYPEDEF OfLong
+#TYPEDEF OfFloat
+#TYPEDEF OfDouble
+#TYPEDEF OfRef
+package omni.impl.seq;
+import omni.util.TypeConversionUtil;
+#IF OfRef
+import omni.impl.CheckedCollectionTest;
+#ENDIF
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import java.util.ArrayList;
+import java.util.ConcurrentModificationException;
+import omni.api.OmniCollection;
+@SuppressWarnings({"rawtypes","unchecked"}) 
+public class $ClassPrefix$SeqHashCodeTest
+{
+  #MACRO ArrSeqImpl<UncheckedStack>()
+  #MACRO ArrSeqImpl<UncheckedList>()
+  #MACRO ArrSeqImpl<CheckedStack>()
+  #MACRO ArrSeqImpl<CheckedList>()
+  #MACRO ArrSeqImpl<UncheckedSubList>()
+  #MACRO ArrSeqImpl<CheckedSubList>()
+}
+#MACRODEF ArrSeqImpl<STRUCTNAME>()
+
+@Test
+public void testEmptyHashCodeArrSeqSTRUCTNAME()
+{
+  var expected=new ArrayList().hashCode();
+#IFSWITCH STRUCTNAME==CheckedSubList
+  var root=new $ClassPrefix$ArrSeq.CheckedList();
+  var subList=root.subList(0,0);
+  Assertions.assertEquals(expected,subList.hashCode());
+  root.add($defaultVal$);
+  Assertions.assertThrows(ConcurrentModificationException.class,()->subList.hashCode());
+#ELSEIFSWITCH STRUCTNAME==UncheckedSubList
+  Assertions.assertEquals(expected,new $ClassPrefix$ArrSeq.UncheckedList().subList(0,0).hashCode());
+#ELSE
+  Assertions.assertEquals(expected,new $ClassPrefix$ArrSeq.STRUCTNAME().hashCode());
+#ENDIF
+}
+@Test
+public void testHashCodeSTRUCTNAME()
+{
+  int length=100;
+  var seqPair=createAscendingSequencePairArrSeqSTRUCTNAME(length);
+  var arrayList=(ArrayList)seqPair[0];
+  var seq=(OmniCollection.Of$ClassPrefix$)seqPair[1];
+  Assertions.assertEquals(arrayList.hashCode(),seq.hashCode());
+}
+#IF OfRef
+  #IFSWITCH STRUCTNAME==CheckedList,CheckedStack,CheckedSubList
+@Test
+public void testModificationCheckSTRUCTNAME()
+{
+    #IFSWITCH STRUCTNAME==CheckedSubList
+  {
+    var root=new $ClassPrefix$ArrSeq.CheckedList();
+    var subList=root.subList(0,0);
+    var rootModifyingObject=CheckedCollectionTest.createCollectionModifyingObject(root);
+    for(int i=0;i<10;++i)
+    {
+      subList.add(rootModifyingObject);
+    }
+    Assertions.assertThrows(ConcurrentModificationException.class,()->subList.hashCode());
+  }
+  {
+    var root=new $ClassPrefix$ArrSeq.CheckedList();
+    var subList=root.subList(0,0);
+    var subListModifyingObject=CheckedCollectionTest.createCollectionModifyingObject(subList);
+    for(int i=0;i<10;++i)
+    {
+      subList.add(subListModifyingObject);
+    }
+    Assertions.assertThrows(ConcurrentModificationException.class,()->subList.hashCode());
+  }
+    #ELSE
+  var seq=new $ClassPrefix$ArrSeq.STRUCTNAME();
+  var seqModifyingObject=CheckedCollectionTest.createCollectionModifyingObject(seq);
+  for(int i=0;i<10;++i)
+  {
+    seq.add(seqModifyingObject);
+  }
+  Assertions.assertThrows(ConcurrentModificationException.class,()->seq.hashCode());
+    #ENDIF
+}
+  #ENDIF
+#ENDIF
+private static Object[] createAscendingSequencePairArrSeqSTRUCTNAME(int length)
+{
+#IFSWITCH STRUCTNAME==CheckedSubList
+  var root=new $ClassPrefix$ArrSeq.CheckedList(length);
+  var seq=root.subList(0,0);
+#ELSEIFSWITCH STRUCTNAME==UncheckedSubList
+  var root=new $ClassPrefix$ArrSeq.UncheckedList(length);
+  var seq=root.subList(0,0);
+#ELSE
+  var seq=new $ClassPrefix$ArrSeq.STRUCTNAME(length);
+#ENDIF
+  var arrayList=new ArrayList(length);
+  for(int i=0;i<length;++i)
+  {
+#IF OfRef
+    var val=TypeConversionUtil.convertToInteger(i);
+#ELSE
+    $exposedType$ val=TypeConversionUtil.convertTo$exposedType$(i);
+#ENDIF
+    seq.add(val);
+#IFSWITCH STRUCTNAME==UncheckedStack,CheckedStack
+  #IF OfRef
+    var counterVal=TypeConversionUtil.convertToInteger(length-1-i);
+  #ELSE
+    $exposedType$ counterVal=TypeConversionUtil.convertTo$exposedType$(length-1-i);
+  #ENDIF
+    arrayList.add(counterVal);
+#ELSE
+    arrayList.add(val);
+#ENDIF
+  }
+  return new Object[]{arrayList,seq};
+}
+#ENDDEF

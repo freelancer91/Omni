@@ -133,7 +133,7 @@ public abstract class $ClassPrefix$ArrSeq$<E>$ implements OmniCollection.Of$Clas
       //TODO handle overflow better
       if(size>=(Integer.MAX_VALUE/5)-2)
 #ELSEIF OfDouble
-      if(size>(Integer.MAX_VALUE/5))
+      if(size>=(Integer.MAX_VALUE/5))
 #ELSE
       if(size>=(Integer.MAX_VALUE>>1))
 #ENDIF
@@ -3773,7 +3773,7 @@ public String toString()
       //TODO handle overflow better
       if(size>=(Integer.MAX_VALUE/5)-2)
     #ELSEIF OfDouble
-      if(size>(Integer.MAX_VALUE/5))
+      if(size>=(Integer.MAX_VALUE/5))
     #ENDIF
     {
       throw new OutOfMemoryError();

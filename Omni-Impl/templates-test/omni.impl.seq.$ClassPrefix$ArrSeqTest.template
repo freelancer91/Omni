@@ -1,0 +1,264 @@
+#TYPEDEF OfBoolean
+#TYPEDEF OfByte
+#TYPEDEF OfChar
+#TYPEDEF OfShort
+#TYPEDEF OfInt
+#TYPEDEF OfLong
+#TYPEDEF OfFloat
+#TYPEDEF OfDouble
+#TYPEDEF OfRef
+package omni.impl.seq;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import omni.util.TypeConversionUtil;
+import omni.util.EqualityUtil;
+import omni.util.OmniArray;
+import omni.impl.seq.$ClassPrefix$ArrSeq.UncheckedList;
+import omni.impl.seq.$ClassPrefix$ArrSeq.CheckedList;
+import omni.impl.seq.$ClassPrefix$ArrSeq.UncheckedStack;
+import omni.impl.seq.$ClassPrefix$ArrSeq.CheckedStack;
+import java.util.ConcurrentModificationException;
+#IF OfRef
+@SuppressWarnings({"rawtypes","unchecked"}) 
+#ENDIF
+public class $ClassPrefix$ArrSeqTest
+{
+  #MACRO Impl<UncheckedStack>()
+  #MACRO Impl<UncheckedList>()
+  #MACRO Impl<CheckedStack>()
+  #MACRO Impl<CheckedList>()
+  #MACRO Impl<UncheckedSubList>()
+  #MACRO Impl<CheckedSubList>()
+}
+#MACRODEF Impl<STRUCTNAME>()
+@Test
+public void testCloneSTRUCTNAME()
+{
+#IFSWITCH STRUCTNAME==CheckedSubList
+  var seq=new CheckedList();
+  {
+    var subList=seq.subList(0,0);
+    var clonedObject=subList.clone();
+    Assertions.assertTrue(clonedObject instanceof CheckedList);
+    var clonedSubSeq=(CheckedList)clonedObject;
+    Assertions.assertTrue(clonedSubSeq.arr==seq.arr);
+    Assertions.assertEquals(clonedSubSeq.size(),subList.size());
+    Assertions.assertTrue(subList!=clonedSubSeq);
+  }
+  for(int i=0;i<100;++i)
+  {
+    #IF OfRef
+    var val=TypeConversionUtil.convertToInteger(i);
+    #ELSE
+    var val=TypeConversionUtil.convertTo$exposedType$(i);
+    #ENDIF
+    seq.push(val);
+  }
+  {
+    var subList=seq.subList(25,75);
+    Assertions.assertEquals(subList.size(),75-25);
+    var clonedObject=subList.clone();
+    Assertions.assertTrue(clonedObject instanceof CheckedList);
+    var clonedSeq=(CheckedList)clonedObject;
+    Assertions.assertTrue(clonedSeq.arr!=seq.arr);
+    Assertions.assertEquals(subList.size(),clonedSeq.size());
+    EqualityUtil.uncheckedparallelassertarraysAreEqual(seq.arr,25,clonedSeq.arr,0,subList.size());
+    seq.add($defaultVal$);
+    Assertions.assertThrows(ConcurrentModificationException.class,()->subList.clone());
+    
+  }
+#ELSEIFSWITCH STRUCTNAME==UncheckedSubList
+  var seq=new UncheckedList();
+  {
+    var subList=seq.subList(0,0);
+    var clonedObject=subList.clone();
+    Assertions.assertTrue(clonedObject instanceof UncheckedList);
+    var clonedSubSeq=(UncheckedList)clonedObject;
+    Assertions.assertTrue(clonedSubSeq.arr==seq.arr);
+    Assertions.assertEquals(clonedSubSeq.size(),subList.size());
+    Assertions.assertTrue(subList!=clonedSubSeq);
+  }
+  for(int i=0;i<100;++i)
+  {
+    #IF OfRef
+    var val=TypeConversionUtil.convertToInteger(i);
+    #ELSE
+    var val=TypeConversionUtil.convertTo$exposedType$(i);
+    #ENDIF
+    seq.push(val);
+  }
+  {
+    var subList=seq.subList(25,75);
+    Assertions.assertEquals(subList.size(),75-25);
+    var clonedObject=subList.clone();
+    Assertions.assertTrue(clonedObject instanceof UncheckedList);
+    var clonedSeq=(UncheckedList)clonedObject;
+    Assertions.assertTrue(clonedSeq.arr!=seq.arr);
+    Assertions.assertEquals(subList.size(),clonedSeq.size());
+    EqualityUtil.uncheckedparallelassertarraysAreEqual(seq.arr,25,clonedSeq.arr,0,subList.size());
+  }
+#ELSE
+  var seq=new STRUCTNAME();
+  Object clonedObject=seq.clone();
+  Assertions.assertTrue(clonedObject instanceof STRUCTNAME);
+  var clonedSeq=(STRUCTNAME)clonedObject;
+  Assertions.assertTrue(clonedSeq.arr==seq.arr);
+  Assertions.assertEquals(clonedSeq.size(),seq.size());
+  Assertions.assertTrue(seq!=clonedSeq);
+  for(int i=0;i<100;++i)
+  {
+    #IF OfRef
+    var val=TypeConversionUtil.convertToInteger(i);
+    #ELSE
+    var val=TypeConversionUtil.convertTo$exposedType$(i);
+    #ENDIF
+    seq.push(val);
+  }
+  Assertions.assertEquals(seq.size(),100);
+  clonedObject=seq.clone();
+  Assertions.assertTrue(clonedObject instanceof STRUCTNAME);
+  clonedSeq=(STRUCTNAME)clonedObject;
+  Assertions.assertTrue(clonedSeq.arr!=seq.arr);
+  Assertions.assertEquals(seq.size(),clonedSeq.size());
+  EqualityUtil.uncheckedparallelassertarraysAreEqual(seq.arr,0,clonedSeq.arr,0,seq.size());
+#ENDIF
+}
+
+
+@Test
+public void testConstructorsSTRUCTNAME()
+{
+
+#IFSWITCH STRUCTNAME==CheckedSubList
+  var root=new CheckedList();
+  {
+    var subList=root.subList(0,0);
+    Assertions.assertEquals(subList.size(),0);
+    Assertions.assertTrue(subList.isEmpty());
+    var subsubList=subList.subList(0,0);
+    Assertions.assertEquals(subsubList.size(),0);
+    Assertions.assertTrue(subsubList.isEmpty());
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->subList.subList(-1,0));
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->subList.subList(0,1));
+  }
+  for(int i=0;i<100;++i)
+  {
+    #IF OfRef
+    var val=TypeConversionUtil.convertToInteger(i);
+    #ELSE
+    var val=TypeConversionUtil.convertTo$exposedType$(i);
+    #ENDIF
+    root.add(val);
+  }
+  {
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->root.subList(-1,75));
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->root.subList(25,101));
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->root.subList(75,25));
+    var subList=root.subList(25,75);
+    Assertions.assertEquals(subList.size(),75-25);
+    Assertions.assertFalse(subList.isEmpty());
+    for(int i=25;i<75;++i)
+    {
+  #IF OfRef
+      var val=TypeConversionUtil.convertToInteger(i);
+  #ELSE
+      var val=TypeConversionUtil.convertTo$exposedType$(i);
+  #ENDIF
+      Assertions.assertEquals(val,subList.get$TypeNameModifier$(i-25));
+    }
+    {
+      Assertions.assertThrows(IndexOutOfBoundsException.class,()->subList.subList(-1,30));
+      Assertions.assertThrows(IndexOutOfBoundsException.class,()->subList.subList(0,51));
+      Assertions.assertThrows(IndexOutOfBoundsException.class,()->subList.subList(30,10));
+      var subsubList=subList.subList(10,30);
+      Assertions.assertEquals(subsubList.size(),30-10);
+      Assertions.assertFalse(subsubList.isEmpty());
+      for(int i=10;i<30;++i)
+      {
+  #IF OfRef
+        var val=TypeConversionUtil.convertToInteger(i+25);
+  #ELSE
+        var val=TypeConversionUtil.convertTo$exposedType$(i+25);
+  #ENDIF
+        Assertions.assertEquals(val,subsubList.get$TypeNameModifier$(i-10));
+      }
+    }
+    root.add($defaultVal$);
+    Assertions.assertThrows(ConcurrentModificationException.class,()->subList.subList(10,30));
+
+    
+  }
+
+
+#ELSEIFSWITCH STRUCTNAME==UncheckedSubList
+
+  var root=new UncheckedList();
+  {
+    var subList=root.subList(0,0);
+    Assertions.assertEquals(subList.size(),0);
+    Assertions.assertTrue(subList.isEmpty());
+    var subsubList=subList.subList(0,0);
+    Assertions.assertEquals(subsubList.size(),0);
+    Assertions.assertTrue(subsubList.isEmpty());
+  }
+  for(int i=0;i<100;++i)
+  {
+    #IF OfRef
+    var val=TypeConversionUtil.convertToInteger(i);
+    #ELSE
+    var val=TypeConversionUtil.convertTo$exposedType$(i);
+    #ENDIF
+    root.add(val);
+  }
+  {
+    var subList=root.subList(25,75);
+    Assertions.assertEquals(subList.size(),75-25);
+    for(int i=25;i<75;++i)
+    {
+  #IF OfRef
+      var val=TypeConversionUtil.convertToInteger(i);
+  #ELSE
+      var val=TypeConversionUtil.convertTo$exposedType$(i);
+  #ENDIF
+      Assertions.assertEquals(val,subList.get$TypeNameModifier$(i-25));
+    }
+    var subsubList=subList.subList(10,30);
+    Assertions.assertEquals(subsubList.size(),30-10);
+    Assertions.assertFalse(subsubList.isEmpty());
+    for(int i=10;i<30;++i)
+    {
+  #IF OfRef
+      var val=TypeConversionUtil.convertToInteger(i+25);
+  #ELSE
+      var val=TypeConversionUtil.convertTo$exposedType$(i+25);
+  #ENDIF
+      Assertions.assertEquals(val,subsubList.get$TypeNameModifier$(i-10));
+    }
+    
+  }
+
+#ELSE
+  var seq=new STRUCTNAME();
+  Assertions.assertEquals(seq.size(),0);
+  Assertions.assertTrue(seq.isEmpty());
+  Assertions.assertTrue(seq.arr==OmniArray.Of$ClassPrefix$.DEFAULT_ARR);
+  seq=new STRUCTNAME(0);
+  Assertions.assertEquals(seq.size(),0);
+  Assertions.assertTrue(seq.isEmpty());
+  Assertions.assertTrue(seq.arr==null);
+  seq=new STRUCTNAME(OmniArray.DEFAULT_ARR_SEQ_CAP);
+  Assertions.assertEquals(seq.size(),0);
+  Assertions.assertTrue(seq.isEmpty());
+  Assertions.assertTrue(seq.arr==OmniArray.Of$ClassPrefix$.DEFAULT_ARR);
+  for(int i=1;i<OmniArray.DEFAULT_ARR_SEQ_CAP;++i)
+  {
+    seq=new STRUCTNAME(i);
+    Assertions.assertEquals(seq.size(),0);
+    Assertions.assertTrue(seq.isEmpty());
+    Assertions.assertEquals(seq.arr.length,i);
+  }
+#ENDIF
+
+ 
+}
+#ENDDEF

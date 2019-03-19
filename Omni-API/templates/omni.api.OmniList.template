@@ -19,7 +19,7 @@ import omni.function.LongComparator;
 import omni.function.ShortComparator;
 import omni.function.ShortUnaryOperator;
 import omni.util.TypeUtil;
-public abstract interface OmniList extends OmniCollection
+public abstract interface OmniList extends OmniCollection,Cloneable
 {
   public abstract int indexOf(Object val);
   #MACRO PrimitiveMethods(IndexOfMethodDecl)
@@ -29,6 +29,7 @@ public abstract interface OmniList extends OmniCollection
   #MACRO BoxedMethods(LastIndexOfMethodDecl)
   public abstract void stableAscendingSort();
   public abstract void stableDescendingSort();
+  public Object clone();
   
   public abstract interface OfPrimitive extends OmniList,OmniCollection.OfPrimitive
   {

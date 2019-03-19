@@ -16,18 +16,13 @@ import omni.impl.CheckedCollectionTest;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
-import omni.impl.seq.$ClassPrefix$ArrSeq.UncheckedStack;
-import omni.impl.seq.$ClassPrefix$ArrSeq.CheckedStack;
-import omni.impl.seq.$ClassPrefix$ArrSeq.UncheckedList;
-import omni.impl.seq.$ClassPrefix$ArrSeq.CheckedList;
 import java.util.ConcurrentModificationException;
 import omni.api.OmniCollection;
 #IFNOT OfChar,OfDouble,OfRef
 import omni.util.OmniArray;
 #ENDIF
-
 @SuppressWarnings({"rawtypes","unchecked"}) 
-public class $ClassPrefix$ArrSeqToStringTest
+public class $ClassPrefix$SeqToStringTest
 {
 #IF OfRef
   private static final $ArrayType$ MIN_LENGTH_STRING_VAL=new $ArrayType$(){@Override public String toString(){return "";}};
@@ -53,29 +48,29 @@ public class $ClassPrefix$ArrSeqToStringTest
 #ENDIF
 
 
-  #MACRO Impl<UncheckedStack>()
-  #MACRO Impl<UncheckedList>()
-  #MACRO Impl<CheckedStack>()
-  #MACRO Impl<CheckedList>()
-  #MACRO Impl<UncheckedSubList>()
-  #MACRO Impl<CheckedSubList>()
+  #MACRO ArrSeqImpl<UncheckedStack>()
+  #MACRO ArrSeqImpl<UncheckedList>()
+  #MACRO ArrSeqImpl<CheckedStack>()
+  #MACRO ArrSeqImpl<CheckedList>()
+  #MACRO ArrSeqImpl<UncheckedSubList>()
+  #MACRO ArrSeqImpl<CheckedSubList>()
 }
 
-#MACRODEF Impl<STRUCTNAME>()
+#MACRODEF ArrSeqImpl<STRUCTNAME>()
 @Test
-public void testEmptyToStringSTRUCTNAME()
+public void testEmptyToStringArrSeqSTRUCTNAME()
 {
-  String expected=new ArrayList().toString();
+  var expected=new ArrayList().toString();
 #IFSWITCH STRUCTNAME==CheckedSubList
-  CheckedList root=new CheckedList();
+  var root=new $ClassPrefix$ArrSeq.CheckedList();
   var subList=root.subList(0,0);
   Assertions.assertEquals(expected,subList.toString());
   root.add($defaultVal$);
   Assertions.assertThrows(ConcurrentModificationException.class,()->subList.toString());
 #ELSEIFSWITCH STRUCTNAME==UncheckedSubList
-  Assertions.assertEquals(expected,new UncheckedList().subList(0,0).toString());
+  Assertions.assertEquals(expected,new $ClassPrefix$ArrSeq.UncheckedList().subList(0,0).toString());
 #ELSE
-  Assertions.assertEquals(expected,new STRUCTNAME().toString());
+  Assertions.assertEquals(expected,new $ClassPrefix$ArrSeq.STRUCTNAME().toString());
 #ENDIF
 }
 
@@ -83,7 +78,7 @@ public void testEmptyToStringSTRUCTNAME()
 
 
 @Test
-public void testOOMToStringSTRUCTNAME()
+public void testOOMToStringArrSeqSTRUCTNAME()
 {
 #IF OfBoolean,OfByte,OfChar,OfInt,OfLong,OfShort
   int length=Integer.MAX_VALUE/(MIN_TOSTRING_LENGTH+2)-1;
@@ -92,15 +87,15 @@ public void testOOMToStringSTRUCTNAME()
 #ELSEIF OfRef
   int length=Integer.MAX_VALUE/(MIN_TOSTRING_LENGTH+2)-1;
 #ELSE
-  int length=Integer.MAX_VALUE/(MIN_TOSTRING_LENGTH+2);
+  int length=Integer.MAX_VALUE/(MIN_TOSTRING_LENGTH+2)-1;
 #ENDIF
   
 #IF OfBoolean,OfRef
   #IFSWITCH STRUCTNAME==CheckedSubList,UncheckedSubList
     #IFSWITCH STRUCTNAME==CheckedSubList
-  var root=new CheckedList(length+1);
+  var root=new $ClassPrefix$ArrSeq.CheckedList(length+1);
     #ELSE
-  var root=new UncheckedList(length+1);
+  var root=new $ClassPrefix$ArrSeq.UncheckedList(length+1);
     #ENDIF
   for(int i=0;i<length;++i)
   {
@@ -108,7 +103,7 @@ public void testOOMToStringSTRUCTNAME()
   }
   var seq=root.subList(0,root.size());
   #ELSE
-  var seq=new STRUCTNAME(length+1);
+  var seq=new $ClassPrefix$ArrSeq.STRUCTNAME(length+1);
   for(int i=0;i<length;++i)
   {
     seq.add(MIN_LENGTH_STRING_VAL);
@@ -116,13 +111,13 @@ public void testOOMToStringSTRUCTNAME()
   #ENDIF
 #ELSE
   #IFSWITCH STRUCTNAME==CheckedSubList
-  var root=new CheckedList(length,new $ArrayType$[length+1]);
+  var root=new $ClassPrefix$ArrSeq.CheckedList(length,new $ArrayType$[length+1]);
   var seq=root.subList(0,length);
   #ELSEIFSWITCH STRUCTNAME==UncheckedSubList
-  var root=new UncheckedList(length,new $ArrayType$[length+1]);
+  var root=new $ClassPrefix$ArrSeq.UncheckedList(length,new $ArrayType$[length+1]);
   var seq=root.subList(0,length);
   #ELSE
-  var seq=new STRUCTNAME(length,new $ArrayType$[length+1]);
+  var seq=new $ClassPrefix$ArrSeq.STRUCTNAME(length,new $ArrayType$[length+1]);
   #ENDIF
 #ENDIF
   Assertions.assertDoesNotThrow(()->seq.toString());
@@ -130,18 +125,18 @@ public void testOOMToStringSTRUCTNAME()
   Assertions.assertThrows(OutOfMemoryError.class,()->seq.toString());
 }
 
-private static Object[] createAscendingSequencePairSTRUCTNAME(int length)
+private static Object[] createAscendingSequencePairArrSeqSTRUCTNAME(int length)
 {
 #IFSWITCH STRUCTNAME==CheckedSubList
-  CheckedList root=new CheckedList(length);
-  OmniCollection.Of$ClassPrefix$ seq=root.subList(0,0);
+  var root=new $ClassPrefix$ArrSeq.CheckedList(length);
+  var seq=root.subList(0,0);
 #ELSEIFSWITCH STRUCTNAME==UncheckedSubList
-  UncheckedList root=new UncheckedList(length);
-  OmniCollection.Of$ClassPrefix$ seq=root.subList(0,0);
+  var root=new $ClassPrefix$ArrSeq.UncheckedList(length);
+  var seq=root.subList(0,0);
 #ELSE
-  OmniCollection.Of$ClassPrefix$ seq=new STRUCTNAME(length);
+  var seq=new $ClassPrefix$ArrSeq.STRUCTNAME(length);
 #ENDIF
-  ArrayList arrayList=new ArrayList(length);
+  var arrayList=new ArrayList(length);
   for(int i=0;i<length;++i)
   {
 #IF OfRef
@@ -169,9 +164,9 @@ private static Object[] createAscendingSequencePairSTRUCTNAME(int length)
 public void testLargeToStringSTRUCTNAME()
 {
   int length=(OmniArray.MAX_ARR_SIZE/(MAX_TOSTRING_LENGTH+2))+1;
-  Object[] seqPair=createAscendingSequencePairSTRUCTNAME(length);
-  ArrayList arrayList=(ArrayList)seqPair[0];
-  OmniCollection.Of$ClassPrefix$ seq=(OmniCollection.Of$ClassPrefix$)seqPair[1];
+  var seqPair=createAscendingSequencePairArrSeqSTRUCTNAME(length);
+  var arrayList=(ArrayList)seqPair[0];
+  var seq=(OmniCollection.Of$ClassPrefix$)seqPair[1];
   EqualityUtil.parallelAssertStringsAreEqual(arrayList.toString(),seq.toString());
 }
 #ENDIF
@@ -179,9 +174,9 @@ public void testLargeToStringSTRUCTNAME()
 public void testSmallToStringSTRUCTNAME()
 {
   int length=100;
-  Object[] seqPair=createAscendingSequencePairSTRUCTNAME(length);
-  ArrayList arrayList=(ArrayList)seqPair[0];
-  OmniCollection.Of$ClassPrefix$ seq=(OmniCollection.Of$ClassPrefix$)seqPair[1];
+  var seqPair=createAscendingSequencePairArrSeqSTRUCTNAME(length);
+  var arrayList=(ArrayList)seqPair[0];
+  var seq=(OmniCollection.Of$ClassPrefix$)seqPair[1];
   EqualityUtil.parallelAssertStringsAreEqual(arrayList.toString(),seq.toString());
 }
 
@@ -192,9 +187,9 @@ public void testModificationCheckSTRUCTNAME()
 {
     #IFSWITCH STRUCTNAME==CheckedSubList
   {
-    CheckedList root=new CheckedList();
+    var root=new $ClassPrefix$ArrSeq.CheckedList();
     var subList=root.subList(0,0);
-    Object rootModifyingObject=CheckedCollectionTest.createCollectionModifyingObject(root);
+    var rootModifyingObject=CheckedCollectionTest.createCollectionModifyingObject(root);
     for(int i=0;i<10;++i)
     {
       subList.add(rootModifyingObject);
@@ -202,9 +197,9 @@ public void testModificationCheckSTRUCTNAME()
     Assertions.assertThrows(ConcurrentModificationException.class,()->subList.toString());
   }
   {
-    CheckedList root=new CheckedList();
+    var root=new $ClassPrefix$ArrSeq.CheckedList();
     var subList=root.subList(0,0);
-    Object subListModifyingObject=CheckedCollectionTest.createCollectionModifyingObject(subList);
+    var subListModifyingObject=CheckedCollectionTest.createCollectionModifyingObject(subList);
     for(int i=0;i<10;++i)
     {
       subList.add(subListModifyingObject);
@@ -212,8 +207,8 @@ public void testModificationCheckSTRUCTNAME()
     Assertions.assertThrows(ConcurrentModificationException.class,()->subList.toString());
   }
     #ELSE
-  STRUCTNAME seq=new STRUCTNAME();
-  Object seqModifyingObject=CheckedCollectionTest.createCollectionModifyingObject(seq);
+  var seq=new $ClassPrefix$ArrSeq.STRUCTNAME();
+  var seqModifyingObject=CheckedCollectionTest.createCollectionModifyingObject(seq);
   for(int i=0;i<10;++i)
   {
     seq.add(seqModifyingObject);

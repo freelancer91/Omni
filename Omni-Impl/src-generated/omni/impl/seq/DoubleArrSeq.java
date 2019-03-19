@@ -81,7 +81,7 @@ public abstract class DoubleArrSeq implements OmniCollection.OfDouble
     int size;
     if((size=this.size)!=0)
     {
-      if(size>(Integer.MAX_VALUE/5))
+      if(size>=(Integer.MAX_VALUE/5))
       {
         throw new OutOfMemoryError();
       }
@@ -1750,7 +1750,7 @@ public abstract class DoubleArrSeq implements OmniCollection.OfDouble
       int size;
       if((size=this.size)!=0)
       {
-          if(size>(Integer.MAX_VALUE/5))
+          if(size>=(Integer.MAX_VALUE/5))
         {
           throw new OutOfMemoryError();
         }
@@ -3742,7 +3742,7 @@ public abstract class DoubleArrSeq implements OmniCollection.OfDouble
       int size;
       if((size=this.size)!=0)
       {
-          if(size>(Integer.MAX_VALUE/5))
+          if(size>=(Integer.MAX_VALUE/5))
         {
           throw new OutOfMemoryError();
         }

@@ -5,28 +5,24 @@ import omni.impl.CheckedCollectionTest;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
-import omni.impl.seq.RefArrSeq.UncheckedStack;
-import omni.impl.seq.RefArrSeq.CheckedStack;
-import omni.impl.seq.RefArrSeq.UncheckedList;
-import omni.impl.seq.RefArrSeq.CheckedList;
 import java.util.ConcurrentModificationException;
 import omni.api.OmniCollection;
 @SuppressWarnings({"rawtypes","unchecked"}) 
-public class RefArrSeqToStringTest
+public class RefSeqToStringTest
 {
   private static final Object MIN_LENGTH_STRING_VAL=new Object(){@Override public String toString(){return "";}};
   private static final int MIN_TOSTRING_LENGTH=String.valueOf(MIN_LENGTH_STRING_VAL).length();
   @Test
-  public void testEmptyToStringUncheckedStack()
+  public void testEmptyToStringArrSeqUncheckedStack()
   {
-    String expected=new ArrayList().toString();
-    Assertions.assertEquals(expected,new UncheckedStack().toString());
+    var expected=new ArrayList().toString();
+    Assertions.assertEquals(expected,new RefArrSeq.UncheckedStack().toString());
   }
   @Test
-  public void testOOMToStringUncheckedStack()
+  public void testOOMToStringArrSeqUncheckedStack()
   {
     int length=Integer.MAX_VALUE/(MIN_TOSTRING_LENGTH+2)-1;
-    var seq=new UncheckedStack(length+1);
+    var seq=new RefArrSeq.UncheckedStack(length+1);
     for(int i=0;i<length;++i)
     {
       seq.add(MIN_LENGTH_STRING_VAL);
@@ -35,10 +31,10 @@ public class RefArrSeqToStringTest
     seq.add(MIN_LENGTH_STRING_VAL);
     Assertions.assertThrows(OutOfMemoryError.class,()->seq.toString());
   }
-  private static Object[] createAscendingSequencePairUncheckedStack(int length)
+  private static Object[] createAscendingSequencePairArrSeqUncheckedStack(int length)
   {
-    OmniCollection.OfRef seq=new UncheckedStack(length);
-    ArrayList arrayList=new ArrayList(length);
+    var seq=new RefArrSeq.UncheckedStack(length);
+    var arrayList=new ArrayList(length);
     for(int i=0;i<length;++i)
     {
       var val=TypeConversionUtil.convertToInteger(i);
@@ -52,22 +48,22 @@ public class RefArrSeqToStringTest
   public void testSmallToStringUncheckedStack()
   {
     int length=100;
-    Object[] seqPair=createAscendingSequencePairUncheckedStack(length);
-    ArrayList arrayList=(ArrayList)seqPair[0];
-    OmniCollection.OfRef seq=(OmniCollection.OfRef)seqPair[1];
+    var seqPair=createAscendingSequencePairArrSeqUncheckedStack(length);
+    var arrayList=(ArrayList)seqPair[0];
+    var seq=(OmniCollection.OfRef)seqPair[1];
     EqualityUtil.parallelAssertStringsAreEqual(arrayList.toString(),seq.toString());
   }
   @Test
-  public void testEmptyToStringUncheckedList()
+  public void testEmptyToStringArrSeqUncheckedList()
   {
-    String expected=new ArrayList().toString();
-    Assertions.assertEquals(expected,new UncheckedList().toString());
+    var expected=new ArrayList().toString();
+    Assertions.assertEquals(expected,new RefArrSeq.UncheckedList().toString());
   }
   @Test
-  public void testOOMToStringUncheckedList()
+  public void testOOMToStringArrSeqUncheckedList()
   {
     int length=Integer.MAX_VALUE/(MIN_TOSTRING_LENGTH+2)-1;
-    var seq=new UncheckedList(length+1);
+    var seq=new RefArrSeq.UncheckedList(length+1);
     for(int i=0;i<length;++i)
     {
       seq.add(MIN_LENGTH_STRING_VAL);
@@ -76,10 +72,10 @@ public class RefArrSeqToStringTest
     seq.add(MIN_LENGTH_STRING_VAL);
     Assertions.assertThrows(OutOfMemoryError.class,()->seq.toString());
   }
-  private static Object[] createAscendingSequencePairUncheckedList(int length)
+  private static Object[] createAscendingSequencePairArrSeqUncheckedList(int length)
   {
-    OmniCollection.OfRef seq=new UncheckedList(length);
-    ArrayList arrayList=new ArrayList(length);
+    var seq=new RefArrSeq.UncheckedList(length);
+    var arrayList=new ArrayList(length);
     for(int i=0;i<length;++i)
     {
       var val=TypeConversionUtil.convertToInteger(i);
@@ -92,22 +88,22 @@ public class RefArrSeqToStringTest
   public void testSmallToStringUncheckedList()
   {
     int length=100;
-    Object[] seqPair=createAscendingSequencePairUncheckedList(length);
-    ArrayList arrayList=(ArrayList)seqPair[0];
-    OmniCollection.OfRef seq=(OmniCollection.OfRef)seqPair[1];
+    var seqPair=createAscendingSequencePairArrSeqUncheckedList(length);
+    var arrayList=(ArrayList)seqPair[0];
+    var seq=(OmniCollection.OfRef)seqPair[1];
     EqualityUtil.parallelAssertStringsAreEqual(arrayList.toString(),seq.toString());
   }
   @Test
-  public void testEmptyToStringCheckedStack()
+  public void testEmptyToStringArrSeqCheckedStack()
   {
-    String expected=new ArrayList().toString();
-    Assertions.assertEquals(expected,new CheckedStack().toString());
+    var expected=new ArrayList().toString();
+    Assertions.assertEquals(expected,new RefArrSeq.CheckedStack().toString());
   }
   @Test
-  public void testOOMToStringCheckedStack()
+  public void testOOMToStringArrSeqCheckedStack()
   {
     int length=Integer.MAX_VALUE/(MIN_TOSTRING_LENGTH+2)-1;
-    var seq=new CheckedStack(length+1);
+    var seq=new RefArrSeq.CheckedStack(length+1);
     for(int i=0;i<length;++i)
     {
       seq.add(MIN_LENGTH_STRING_VAL);
@@ -116,10 +112,10 @@ public class RefArrSeqToStringTest
     seq.add(MIN_LENGTH_STRING_VAL);
     Assertions.assertThrows(OutOfMemoryError.class,()->seq.toString());
   }
-  private static Object[] createAscendingSequencePairCheckedStack(int length)
+  private static Object[] createAscendingSequencePairArrSeqCheckedStack(int length)
   {
-    OmniCollection.OfRef seq=new CheckedStack(length);
-    ArrayList arrayList=new ArrayList(length);
+    var seq=new RefArrSeq.CheckedStack(length);
+    var arrayList=new ArrayList(length);
     for(int i=0;i<length;++i)
     {
       var val=TypeConversionUtil.convertToInteger(i);
@@ -133,16 +129,16 @@ public class RefArrSeqToStringTest
   public void testSmallToStringCheckedStack()
   {
     int length=100;
-    Object[] seqPair=createAscendingSequencePairCheckedStack(length);
-    ArrayList arrayList=(ArrayList)seqPair[0];
-    OmniCollection.OfRef seq=(OmniCollection.OfRef)seqPair[1];
+    var seqPair=createAscendingSequencePairArrSeqCheckedStack(length);
+    var arrayList=(ArrayList)seqPair[0];
+    var seq=(OmniCollection.OfRef)seqPair[1];
     EqualityUtil.parallelAssertStringsAreEqual(arrayList.toString(),seq.toString());
   }
   @Test
   public void testModificationCheckCheckedStack()
   {
-    CheckedStack seq=new CheckedStack();
-    Object seqModifyingObject=CheckedCollectionTest.createCollectionModifyingObject(seq);
+    var seq=new RefArrSeq.CheckedStack();
+    var seqModifyingObject=CheckedCollectionTest.createCollectionModifyingObject(seq);
     for(int i=0;i<10;++i)
     {
       seq.add(seqModifyingObject);
@@ -150,16 +146,16 @@ public class RefArrSeqToStringTest
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.toString());
   }
   @Test
-  public void testEmptyToStringCheckedList()
+  public void testEmptyToStringArrSeqCheckedList()
   {
-    String expected=new ArrayList().toString();
-    Assertions.assertEquals(expected,new CheckedList().toString());
+    var expected=new ArrayList().toString();
+    Assertions.assertEquals(expected,new RefArrSeq.CheckedList().toString());
   }
   @Test
-  public void testOOMToStringCheckedList()
+  public void testOOMToStringArrSeqCheckedList()
   {
     int length=Integer.MAX_VALUE/(MIN_TOSTRING_LENGTH+2)-1;
-    var seq=new CheckedList(length+1);
+    var seq=new RefArrSeq.CheckedList(length+1);
     for(int i=0;i<length;++i)
     {
       seq.add(MIN_LENGTH_STRING_VAL);
@@ -168,10 +164,10 @@ public class RefArrSeqToStringTest
     seq.add(MIN_LENGTH_STRING_VAL);
     Assertions.assertThrows(OutOfMemoryError.class,()->seq.toString());
   }
-  private static Object[] createAscendingSequencePairCheckedList(int length)
+  private static Object[] createAscendingSequencePairArrSeqCheckedList(int length)
   {
-    OmniCollection.OfRef seq=new CheckedList(length);
-    ArrayList arrayList=new ArrayList(length);
+    var seq=new RefArrSeq.CheckedList(length);
+    var arrayList=new ArrayList(length);
     for(int i=0;i<length;++i)
     {
       var val=TypeConversionUtil.convertToInteger(i);
@@ -184,16 +180,16 @@ public class RefArrSeqToStringTest
   public void testSmallToStringCheckedList()
   {
     int length=100;
-    Object[] seqPair=createAscendingSequencePairCheckedList(length);
-    ArrayList arrayList=(ArrayList)seqPair[0];
-    OmniCollection.OfRef seq=(OmniCollection.OfRef)seqPair[1];
+    var seqPair=createAscendingSequencePairArrSeqCheckedList(length);
+    var arrayList=(ArrayList)seqPair[0];
+    var seq=(OmniCollection.OfRef)seqPair[1];
     EqualityUtil.parallelAssertStringsAreEqual(arrayList.toString(),seq.toString());
   }
   @Test
   public void testModificationCheckCheckedList()
   {
-    CheckedList seq=new CheckedList();
-    Object seqModifyingObject=CheckedCollectionTest.createCollectionModifyingObject(seq);
+    var seq=new RefArrSeq.CheckedList();
+    var seqModifyingObject=CheckedCollectionTest.createCollectionModifyingObject(seq);
     for(int i=0;i<10;++i)
     {
       seq.add(seqModifyingObject);
@@ -201,16 +197,16 @@ public class RefArrSeqToStringTest
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.toString());
   }
   @Test
-  public void testEmptyToStringUncheckedSubList()
+  public void testEmptyToStringArrSeqUncheckedSubList()
   {
-    String expected=new ArrayList().toString();
-    Assertions.assertEquals(expected,new UncheckedList().subList(0,0).toString());
+    var expected=new ArrayList().toString();
+    Assertions.assertEquals(expected,new RefArrSeq.UncheckedList().subList(0,0).toString());
   }
   @Test
-  public void testOOMToStringUncheckedSubList()
+  public void testOOMToStringArrSeqUncheckedSubList()
   {
     int length=Integer.MAX_VALUE/(MIN_TOSTRING_LENGTH+2)-1;
-    var root=new UncheckedList(length+1);
+    var root=new RefArrSeq.UncheckedList(length+1);
     for(int i=0;i<length;++i)
     {
       root.add(MIN_LENGTH_STRING_VAL);
@@ -220,11 +216,11 @@ public class RefArrSeqToStringTest
     seq.add(MIN_LENGTH_STRING_VAL);
     Assertions.assertThrows(OutOfMemoryError.class,()->seq.toString());
   }
-  private static Object[] createAscendingSequencePairUncheckedSubList(int length)
+  private static Object[] createAscendingSequencePairArrSeqUncheckedSubList(int length)
   {
-    UncheckedList root=new UncheckedList(length);
-    OmniCollection.OfRef seq=root.subList(0,0);
-    ArrayList arrayList=new ArrayList(length);
+    var root=new RefArrSeq.UncheckedList(length);
+    var seq=root.subList(0,0);
+    var arrayList=new ArrayList(length);
     for(int i=0;i<length;++i)
     {
       var val=TypeConversionUtil.convertToInteger(i);
@@ -237,26 +233,26 @@ public class RefArrSeqToStringTest
   public void testSmallToStringUncheckedSubList()
   {
     int length=100;
-    Object[] seqPair=createAscendingSequencePairUncheckedSubList(length);
-    ArrayList arrayList=(ArrayList)seqPair[0];
-    OmniCollection.OfRef seq=(OmniCollection.OfRef)seqPair[1];
+    var seqPair=createAscendingSequencePairArrSeqUncheckedSubList(length);
+    var arrayList=(ArrayList)seqPair[0];
+    var seq=(OmniCollection.OfRef)seqPair[1];
     EqualityUtil.parallelAssertStringsAreEqual(arrayList.toString(),seq.toString());
   }
   @Test
-  public void testEmptyToStringCheckedSubList()
+  public void testEmptyToStringArrSeqCheckedSubList()
   {
-    String expected=new ArrayList().toString();
-    CheckedList root=new CheckedList();
+    var expected=new ArrayList().toString();
+    var root=new RefArrSeq.CheckedList();
     var subList=root.subList(0,0);
     Assertions.assertEquals(expected,subList.toString());
     root.add(null);
     Assertions.assertThrows(ConcurrentModificationException.class,()->subList.toString());
   }
   @Test
-  public void testOOMToStringCheckedSubList()
+  public void testOOMToStringArrSeqCheckedSubList()
   {
     int length=Integer.MAX_VALUE/(MIN_TOSTRING_LENGTH+2)-1;
-    var root=new CheckedList(length+1);
+    var root=new RefArrSeq.CheckedList(length+1);
     for(int i=0;i<length;++i)
     {
       root.add(MIN_LENGTH_STRING_VAL);
@@ -266,11 +262,11 @@ public class RefArrSeqToStringTest
     seq.add(MIN_LENGTH_STRING_VAL);
     Assertions.assertThrows(OutOfMemoryError.class,()->seq.toString());
   }
-  private static Object[] createAscendingSequencePairCheckedSubList(int length)
+  private static Object[] createAscendingSequencePairArrSeqCheckedSubList(int length)
   {
-    CheckedList root=new CheckedList(length);
-    OmniCollection.OfRef seq=root.subList(0,0);
-    ArrayList arrayList=new ArrayList(length);
+    var root=new RefArrSeq.CheckedList(length);
+    var seq=root.subList(0,0);
+    var arrayList=new ArrayList(length);
     for(int i=0;i<length;++i)
     {
       var val=TypeConversionUtil.convertToInteger(i);
@@ -283,18 +279,18 @@ public class RefArrSeqToStringTest
   public void testSmallToStringCheckedSubList()
   {
     int length=100;
-    Object[] seqPair=createAscendingSequencePairCheckedSubList(length);
-    ArrayList arrayList=(ArrayList)seqPair[0];
-    OmniCollection.OfRef seq=(OmniCollection.OfRef)seqPair[1];
+    var seqPair=createAscendingSequencePairArrSeqCheckedSubList(length);
+    var arrayList=(ArrayList)seqPair[0];
+    var seq=(OmniCollection.OfRef)seqPair[1];
     EqualityUtil.parallelAssertStringsAreEqual(arrayList.toString(),seq.toString());
   }
   @Test
   public void testModificationCheckCheckedSubList()
   {
     {
-      CheckedList root=new CheckedList();
+      var root=new RefArrSeq.CheckedList();
       var subList=root.subList(0,0);
-      Object rootModifyingObject=CheckedCollectionTest.createCollectionModifyingObject(root);
+      var rootModifyingObject=CheckedCollectionTest.createCollectionModifyingObject(root);
       for(int i=0;i<10;++i)
       {
         subList.add(rootModifyingObject);
@@ -302,9 +298,9 @@ public class RefArrSeqToStringTest
       Assertions.assertThrows(ConcurrentModificationException.class,()->subList.toString());
     }
     {
-      CheckedList root=new CheckedList();
+      var root=new RefArrSeq.CheckedList();
       var subList=root.subList(0,0);
-      Object subListModifyingObject=CheckedCollectionTest.createCollectionModifyingObject(subList);
+      var subListModifyingObject=CheckedCollectionTest.createCollectionModifyingObject(subList);
       for(int i=0;i<10;++i)
       {
         subList.add(subListModifyingObject);

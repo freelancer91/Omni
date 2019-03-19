@@ -1,0 +1,216 @@
+#TYPEDEF OfBoolean
+#TYPEDEF OfByte
+#TYPEDEF OfChar
+#TYPEDEF OfShort
+#TYPEDEF OfInt
+#TYPEDEF OfLong
+#TYPEDEF OfFloat
+#TYPEDEF OfDouble
+#TYPEDEF OfRef
+package omni.impl.seq;
+import java.util.function.Predicate;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import omni.impl.seq.$ClassPrefix$ArrSeq.UncheckedList;
+import omni.impl.seq.$ClassPrefix$ArrSeq.CheckedList;
+import omni.impl.seq.$ClassPrefix$ArrSeq.UncheckedStack;
+import omni.impl.seq.$ClassPrefix$ArrSeq.CheckedStack;
+import java.util.ConcurrentModificationException;
+import omni.util.TypeConversionUtil;
+import omni.api.OmniList;
+import omni.api.OmniStack;
+#IF OfInt,OfLong,OfDouble
+import java.util.function.$TypeNameModifier$Predicate;
+#ELSEIFNOT OfRef
+import omni.function.$TypeNameModifier$Predicate;
+#ENDIF
+#IF OfRef
+@SuppressWarnings({"rawtypes","unchecked"}) 
+#ENDIF
+public class $ClassPrefix$SeqRemoveIfTest
+{
+  #MACRO ArrSeqImpl<UncheckedStack,OmniStack>()
+  #MACRO ArrSeqImpl<UncheckedList,OmniList>()
+  #MACRO ArrSeqImpl<CheckedStack,OmniStack>()
+  #MACRO ArrSeqImpl<CheckedList,OmniList>()
+  #MACRO ArrSeqImpl<UncheckedSubList,OmniList>()
+  #MACRO ArrSeqImpl<CheckedSubList,OmniList>()
+}
+#MACRODEF ArrSeqImpl<STRUCTNAME,INTERFACE>()
+@Test
+public void testEmptyRemoveIfArrSeqSTRUCTNAME()
+{
+  $TypeNameModifier$Predicate filter=(val)->true;
+  #IFSWITCH STRUCTNAME==UncheckedSubList
+  var root=new UncheckedList();
+  var seq=root.subList(0,0);
+  #ELSEIFSWITCH STRUCTNAME==CheckedSubList
+  var root=new CheckedList();
+  var seq=root.subList(0,0);
+  #ELSE
+  var seq=new STRUCTNAME();
+  #ENDIF
+  Assertions.assertFalse(seq.removeIf(filter));
+#IFNOT OfRef
+  Assertions.assertFalse(seq.removeIf((Predicate<$BoxedType$>)filter::test));
+#ENDIF
+}
+
+#IFSWITCH STRUCTNAME==CheckedList,CheckedStack,CheckedSubList
+@Test
+public void testRemoveIfModCheckArrSeqSTRUCTNAME()
+{
+  #IFSWITCH STRUCTNAME==UncheckedSubList
+  var root=new UncheckedList();
+  var seq=root.subList(0,0);
+  #ELSEIFSWITCH STRUCTNAME==CheckedSubList
+  var root=new CheckedList();
+  var seq=root.subList(0,0);
+  #ELSE
+  var seq=new STRUCTNAME();
+  #ENDIF
+  for(int i=0;i<100;++i)
+  {
+    #IF OfRef
+    var val=TypeConversionUtil.convertToInteger(i);
+    #ELSE
+    var val=TypeConversionUtil.convertTo$exposedType$(i);
+    #ENDIF
+    seq.add(val);
+  }
+  {
+  }
+  {
+    
+    var seqClone=(INTERFACE.Of$ClassPrefix$)seq.clone();
+    $TypeNameModifier$Predicate removingPredicateReturnFalse=(val)->
+    {
+      #IFSWITCH INTERFACE==OmniStack
+      seqClone.pop();
+      #ELSE
+      seqClone.remove(0);
+      #ENDIF
+      return false;
+    };
+    Assertions.assertThrows(ConcurrentModificationException.class,()->seqClone.removeIf(removingPredicateReturnFalse));
+  }
+#IFNOT OfRef
+  {
+    var seqClone=(INTERFACE.Of$ClassPrefix$)seq.clone();
+    $TypeNameModifier$Predicate removingPredicateReturnFalse=(val)->
+    {
+      #IFSWITCH INTERFACE==OmniStack
+      seqClone.pop();
+      #ELSE
+      seqClone.remove(0);
+      #ENDIF
+      return false;
+    };
+    Assertions.assertThrows(ConcurrentModificationException.class,()->seqClone.removeIf((Predicate<$BoxedType$>)removingPredicateReturnFalse::test));
+  }
+#ENDIF
+  {
+    var seqClone=(INTERFACE.Of$ClassPrefix$)seq.clone();
+    $TypeNameModifier$Predicate removingPredicateReturnTrue=(val)->
+    {
+      #IFSWITCH INTERFACE==OmniStack
+      seqClone.pop();
+      #ELSE
+      seqClone.remove(0);
+      #ENDIF
+      return true;
+    };
+    Assertions.assertThrows(ConcurrentModificationException.class,()->seqClone.removeIf(removingPredicateReturnTrue));
+  }
+#IFNOT OfRef
+  {
+    var seqClone=(INTERFACE.Of$ClassPrefix$)seq.clone();
+    $TypeNameModifier$Predicate removingPredicateReturnTrue=(val)->
+    {
+      #IFSWITCH INTERFACE==OmniStack
+      seqClone.pop();
+      #ELSE
+      seqClone.remove(0);
+      #ENDIF
+      
+      return true;
+    };
+    Assertions.assertThrows(ConcurrentModificationException.class,()->seqClone.removeIf((Predicate<$BoxedType$>)removingPredicateReturnTrue::test));
+  }
+#ENDIF
+  {
+    var seqClone=(INTERFACE.Of$ClassPrefix$)seq.clone();
+    $TypeNameModifier$Predicate addingPredicateReturnFalse=(val)->
+    {
+      seqClone.add($defaultVal$);
+      return false;
+    };
+    Assertions.assertThrows(ConcurrentModificationException.class,()->seqClone.removeIf(addingPredicateReturnFalse));
+  }
+#IFNOT OfRef
+  {
+    var seqClone=(INTERFACE.Of$ClassPrefix$)seq.clone();
+    $TypeNameModifier$Predicate addingPredicateReturnFalse=(val)->
+    {
+      seqClone.add($defaultVal$);
+      return false;
+    };
+    Assertions.assertThrows(ConcurrentModificationException.class,()->seqClone.removeIf((Predicate<$BoxedType$>)addingPredicateReturnFalse::test));
+  }
+#ENDIF
+  {
+    var seqClone=(INTERFACE.Of$ClassPrefix$)seq.clone();
+    $TypeNameModifier$Predicate addingPredicateReturnTrue=(val)->
+    {
+      seqClone.add($defaultVal$);
+      return true;
+    };
+    Assertions.assertThrows(ConcurrentModificationException.class,()->seqClone.removeIf(addingPredicateReturnTrue));
+  }
+#IFNOT OfRef
+  {
+    var seqClone=(INTERFACE.Of$ClassPrefix$)seq.clone();
+    $TypeNameModifier$Predicate addingPredicateReturnTrue=(val)->
+    {
+      seqClone.add($defaultVal$);
+      return true;
+    };
+    Assertions.assertThrows(ConcurrentModificationException.class,()->seqClone.removeIf((Predicate<$BoxedType$>)addingPredicateReturnTrue::test));
+  }
+#ENDIF
+}
+
+
+
+#ENDIF
+@Test
+public void testRemoveIfReturnFalseArrSeqSTRUCTNAME()
+{
+  $TypeNameModifier$Predicate filter=(val)->false;
+  #IFSWITCH STRUCTNAME==UncheckedSubList
+  var root=new UncheckedList();
+  var seq=root.subList(0,0);
+  #ELSEIFSWITCH STRUCTNAME==CheckedSubList
+  var root=new CheckedList();
+  var seq=root.subList(0,0);
+  #ELSE
+  var seq=new STRUCTNAME();
+  #ENDIF
+  for(int i=0;i<100;++i)
+  {
+    #IF OfRef
+    var val=TypeConversionUtil.convertToInteger(i);
+    #ELSE
+    var val=TypeConversionUtil.convertTo$exposedType$(i);
+    #ENDIF
+    seq.add(val);
+  }
+  {
+    Assertions.assertFalse(seq.removeIf(filter));
+#IFNOT OfRef
+    Assertions.assertFalse(seq.removeIf((Predicate<$BoxedType$>)filter::test));
+#ENDIF
+  }
+
+}
+#ENDDEF
