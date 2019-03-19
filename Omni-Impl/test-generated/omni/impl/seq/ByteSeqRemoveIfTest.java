@@ -2,410 +2,1662 @@ package omni.impl.seq;
 import java.util.function.Predicate;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import java.util.ArrayList;
+import omni.api.OmniIterator;
 import omni.impl.seq.ByteArrSeq.UncheckedList;
 import omni.impl.seq.ByteArrSeq.CheckedList;
 import omni.impl.seq.ByteArrSeq.UncheckedStack;
 import omni.impl.seq.ByteArrSeq.CheckedStack;
 import java.util.ConcurrentModificationException;
+import omni.impl.CheckedCollectionTest;
 import omni.util.TypeConversionUtil;
 import omni.api.OmniList;
 import omni.api.OmniStack;
+import omni.util.EqualityUtil;
+import java.util.Random;
+import omni.util.bytePredicates;
+import omni.util.byteArrayBuilder;
 import omni.function.BytePredicate;
+@SuppressWarnings({"rawtypes","unchecked"}) 
 public class ByteSeqRemoveIfTest
 {
   @Test
   public void testEmptyRemoveIfArrSeqUncheckedStack()
   {
-    BytePredicate filter=(val)->true;
+    BytePredicate filter=bytePredicates.MarkAll.getPred(null,0);
     var seq=new UncheckedStack();
     Assertions.assertFalse(seq.removeIf(filter));
     Assertions.assertFalse(seq.removeIf((Predicate<Byte>)filter::test));
   }
   @Test
-  public void testRemoveIfReturnFalseArrSeqUncheckedStack()
+  public void testRemoveIfUncheckedStack()
   {
-    BytePredicate filter=(val)->false;
-    var seq=new UncheckedStack();
-    for(int i=0;i<100;++i)
-    {
-      var val=TypeConversionUtil.convertTobyte(i);
-      seq.add(val);
-    }
-    {
-      Assertions.assertFalse(seq.removeIf(filter));
-      Assertions.assertFalse(seq.removeIf((Predicate<Byte>)filter::test));
-    }
+      {
+        var arr=new byte[10];
+        var seq=new UncheckedStack(10,arr);
+        BytePredicate pred=val->false;
+        Assertions.assertFalse(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),10);
+      }
+      {
+        var arr=new byte[10];
+        var seq=new UncheckedStack(10,arr);
+        Predicate<? super Byte> pred=val->false;
+        Assertions.assertFalse(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),10);
+      }
+      {
+        var arr=new byte[10];
+        var seq=new UncheckedStack(10,arr);
+        BytePredicate pred=val->true;
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertTrue(seq.isEmpty());
+      }
+      {
+        var arr=new byte[10];
+        var seq=new UncheckedStack(10,arr);
+        Predicate<? super Byte> pred=val->true;
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertTrue(seq.isEmpty());
+      }
+      {
+        int length=100;
+        BytePredicate pred=(val)->
+        {
+          return (EqualityUtil.isEqual(val,TypeConversionUtil.convertTobyte(0))
+            ||
+             EqualityUtil.isEqual(val,TypeConversionUtil.convertTobyte(2)));
+        };
+        var arr=new byte[length];
+        var seq=new UncheckedStack(length,arr);
+        for(int i=0;i<length;++i)
+        {
+          arr[i]=TypeConversionUtil.convertTobyte(i);
+        }
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),length-2);
+        for(int i=0,valIndex=0;i<length-2;++i,++valIndex)
+        {
+          if(i==0 || i==1)
+          {
+            ++valIndex;
+          }
+          Assertions.assertEquals(arr[i],TypeConversionUtil.convertTobyte(valIndex));
+        }
+      } 
+      {
+        int length=100;
+        Predicate<? super Byte> pred=(val)->
+        {
+          return (EqualityUtil.isEqual(val,TypeConversionUtil.convertTobyte(0))
+            ||
+             EqualityUtil.isEqual(val,TypeConversionUtil.convertTobyte(2)));
+        };
+        var arr=new byte[length];
+        var seq=new UncheckedStack(length,arr);
+        for(int i=0;i<length;++i)
+        {
+          arr[i]=TypeConversionUtil.convertTobyte(i);
+        }
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),length-2);
+        for(int i=0,valIndex=0;i<length-2;++i,++valIndex)
+        {
+          if(i==0 || i==1)
+          {
+            ++valIndex;
+          }
+          Assertions.assertEquals(arr[i],TypeConversionUtil.convertTobyte(valIndex));
+        }
+      } 
+      {
+        int length=100;
+        BytePredicate pred=(val)->
+        {
+          return !EqualityUtil.isEqual(val,TypeConversionUtil.convertTobyte(1));
+        };
+        var arr=new byte[length];
+        var seq=new UncheckedStack(length,arr);
+        for(int i=0;i<length;++i)
+        {
+          arr[i]=TypeConversionUtil.convertTobyte(i);
+        }
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),1);
+        Assertions.assertEquals(arr[0],TypeConversionUtil.convertTobyte(1));
+      } 
+      {
+        int length=100;
+        Predicate<? super Byte> pred=(val)->
+        {
+          return !EqualityUtil.isEqual(val,TypeConversionUtil.convertTobyte(1));
+        };
+        var arr=new byte[length];
+        var seq=new UncheckedStack(length,arr);
+        for(int i=0;i<length;++i)
+        {
+          arr[i]=TypeConversionUtil.convertTobyte(i);
+        }
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),1);
+        Assertions.assertEquals(arr[0],TypeConversionUtil.convertTobyte(1));
+      } 
   }
   @Test
   public void testEmptyRemoveIfArrSeqUncheckedList()
   {
-    BytePredicate filter=(val)->true;
+    BytePredicate filter=bytePredicates.MarkAll.getPred(null,0);
     var seq=new UncheckedList();
     Assertions.assertFalse(seq.removeIf(filter));
     Assertions.assertFalse(seq.removeIf((Predicate<Byte>)filter::test));
   }
   @Test
-  public void testRemoveIfReturnFalseArrSeqUncheckedList()
+  public void testRemoveIfUncheckedList()
   {
-    BytePredicate filter=(val)->false;
-    var seq=new UncheckedList();
-    for(int i=0;i<100;++i)
-    {
-      var val=TypeConversionUtil.convertTobyte(i);
-      seq.add(val);
-    }
-    {
-      Assertions.assertFalse(seq.removeIf(filter));
-      Assertions.assertFalse(seq.removeIf((Predicate<Byte>)filter::test));
-    }
+      {
+        var arr=new byte[10];
+        var seq=new UncheckedList(10,arr);
+        BytePredicate pred=val->false;
+        Assertions.assertFalse(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),10);
+      }
+      {
+        var arr=new byte[10];
+        var seq=new UncheckedList(10,arr);
+        Predicate<? super Byte> pred=val->false;
+        Assertions.assertFalse(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),10);
+      }
+      {
+        var arr=new byte[10];
+        var seq=new UncheckedList(10,arr);
+        BytePredicate pred=val->true;
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertTrue(seq.isEmpty());
+      }
+      {
+        var arr=new byte[10];
+        var seq=new UncheckedList(10,arr);
+        Predicate<? super Byte> pred=val->true;
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertTrue(seq.isEmpty());
+      }
+      {
+        int length=100;
+        BytePredicate pred=(val)->
+        {
+          return (EqualityUtil.isEqual(val,TypeConversionUtil.convertTobyte(0))
+            ||
+             EqualityUtil.isEqual(val,TypeConversionUtil.convertTobyte(2)));
+        };
+        var arr=new byte[length];
+        var seq=new UncheckedList(length,arr);
+        for(int i=0;i<length;++i)
+        {
+          arr[i]=TypeConversionUtil.convertTobyte(i);
+        }
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),length-2);
+        for(int i=0,valIndex=0;i<length-2;++i,++valIndex)
+        {
+          if(i==0 || i==1)
+          {
+            ++valIndex;
+          }
+          Assertions.assertEquals(arr[i],TypeConversionUtil.convertTobyte(valIndex));
+        }
+      } 
+      {
+        int length=100;
+        Predicate<? super Byte> pred=(val)->
+        {
+          return (EqualityUtil.isEqual(val,TypeConversionUtil.convertTobyte(0))
+            ||
+             EqualityUtil.isEqual(val,TypeConversionUtil.convertTobyte(2)));
+        };
+        var arr=new byte[length];
+        var seq=new UncheckedList(length,arr);
+        for(int i=0;i<length;++i)
+        {
+          arr[i]=TypeConversionUtil.convertTobyte(i);
+        }
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),length-2);
+        for(int i=0,valIndex=0;i<length-2;++i,++valIndex)
+        {
+          if(i==0 || i==1)
+          {
+            ++valIndex;
+          }
+          Assertions.assertEquals(arr[i],TypeConversionUtil.convertTobyte(valIndex));
+        }
+      } 
+      {
+        int length=100;
+        BytePredicate pred=(val)->
+        {
+          return !EqualityUtil.isEqual(val,TypeConversionUtil.convertTobyte(1));
+        };
+        var arr=new byte[length];
+        var seq=new UncheckedList(length,arr);
+        for(int i=0;i<length;++i)
+        {
+          arr[i]=TypeConversionUtil.convertTobyte(i);
+        }
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),1);
+        Assertions.assertEquals(arr[0],TypeConversionUtil.convertTobyte(1));
+      } 
+      {
+        int length=100;
+        Predicate<? super Byte> pred=(val)->
+        {
+          return !EqualityUtil.isEqual(val,TypeConversionUtil.convertTobyte(1));
+        };
+        var arr=new byte[length];
+        var seq=new UncheckedList(length,arr);
+        for(int i=0;i<length;++i)
+        {
+          arr[i]=TypeConversionUtil.convertTobyte(i);
+        }
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),1);
+        Assertions.assertEquals(arr[0],TypeConversionUtil.convertTobyte(1));
+      } 
   }
   @Test
   public void testEmptyRemoveIfArrSeqCheckedStack()
   {
-    BytePredicate filter=(val)->true;
+    BytePredicate filter=bytePredicates.MarkAll.getPred(null,0);
     var seq=new CheckedStack();
     Assertions.assertFalse(seq.removeIf(filter));
     Assertions.assertFalse(seq.removeIf((Predicate<Byte>)filter::test));
   }
+  @Test
+  public void testRemoveIfCheckedStack()
+  {
+      {
+        var arr=new byte[10];
+        var seq=new CheckedStack(10,arr);
+        BytePredicate pred=val->false;
+        Assertions.assertFalse(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),10);
+        Assertions.assertEquals(0,seq.modCount);
+      }
+      {
+        var arr=new byte[10];
+        var seq=new CheckedStack(10,arr);
+        Predicate<? super Byte> pred=val->false;
+        Assertions.assertFalse(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),10);
+        Assertions.assertEquals(0,seq.modCount);
+      }
+      {
+        var arr=new byte[10];
+        var seq=new CheckedStack(10,arr);
+        BytePredicate pred=val->false;
+        Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf(CheckedCollectionTest.getModifyingPred(pred,()->
+        {
+          var tmp=seq.popByte();
+          seq.push(tmp);
+        })));
+      }
+      {
+        var arr=new byte[10];
+        var seq=new CheckedStack(10,arr);
+        Predicate<? super Byte> pred=val->false;
+        Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf(CheckedCollectionTest.getModifyingPred(pred,()->
+        {
+          var tmp=seq.popByte();
+          seq.push(tmp);
+        })));
+      }
+      {
+        var arr=new byte[10];
+        var seq=new CheckedStack(10,arr);
+        Assertions.assertThrows(IndexOutOfBoundsException.class,()->
+        {
+          seq.removeIf((BytePredicate)(v)->
+          {
+            throw new IndexOutOfBoundsException();
+          });
+        });
+      }
+      {
+        var arr=new byte[10];
+        var seq=new CheckedStack(10,arr);
+        Assertions.assertThrows(IndexOutOfBoundsException.class,()->
+        {
+          seq.removeIf((Predicate<? super Byte>)(v)->
+          {
+            throw new IndexOutOfBoundsException();
+          });
+        });
+      }
+      {
+        var arr=new byte[10];
+        var seq=new CheckedStack(10,arr);
+        Assertions.assertThrows(ConcurrentModificationException.class,()->
+        {
+          seq.removeIf((BytePredicate)(v)->
+          {
+            var tmp=seq.popByte();
+            seq.push(tmp);
+            throw new IndexOutOfBoundsException();
+          });
+        });
+      }
+      {
+        var arr=new byte[10];
+        var seq=new CheckedStack(10,arr);
+        Assertions.assertThrows(ConcurrentModificationException.class,()->
+        {
+          seq.removeIf((Predicate<? super Byte>)(v)->
+          {
+            var tmp=seq.popByte();
+            seq.push(tmp);
+            throw new IndexOutOfBoundsException();
+          });
+        });
+      }
+      {
+        var arr=new byte[10];
+        var seq=new CheckedStack(10,arr);
+        BytePredicate pred=val->true;
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertTrue(seq.isEmpty());
+        Assertions.assertTrue(seq.modCount!=0);
+      }
+      {
+        var arr=new byte[10];
+        var seq=new CheckedStack(10,arr);
+        Predicate<? super Byte> pred=val->true;
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertTrue(seq.isEmpty());
+        Assertions.assertTrue(seq.modCount!=0);
+      }
+      {
+        var arr=new byte[10];
+        var seq=new CheckedStack(10,arr);
+        BytePredicate pred=val->true;
+        Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf(CheckedCollectionTest.getModifyingPred(pred,()->
+        {
+          var tmp=seq.popByte();
+          seq.push(tmp);
+        })));
+      }
+      {
+        var arr=new byte[10];
+        var seq=new CheckedStack(10,arr);
+        Predicate<? super Byte> pred=val->true;
+        Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf(CheckedCollectionTest.getModifyingPred(pred,()->
+        {
+          var tmp=seq.popByte();
+          seq.push(tmp);
+        })));
+      }
+      {
+        var arr=new byte[10];
+        var seq=new CheckedStack(10,arr);
+        Assertions.assertThrows(IndexOutOfBoundsException.class,()->
+        {
+          seq.removeIf((BytePredicate)(v)->
+          {
+            throw new IndexOutOfBoundsException();
+          });
+        });
+      }
+      {
+        var arr=new byte[10];
+        var seq=new CheckedStack(10,arr);
+        Assertions.assertThrows(IndexOutOfBoundsException.class,()->
+        {
+          seq.removeIf((Predicate<? super Byte>)(v)->
+          {
+            throw new IndexOutOfBoundsException();
+          });
+        });
+      }
+      {
+        var arr=new byte[10];
+        var seq=new CheckedStack(10,arr);
+        Assertions.assertThrows(ConcurrentModificationException.class,()->
+        {
+          seq.removeIf((BytePredicate)(v)->
+          {
+            var tmp=seq.popByte();
+            seq.push(tmp);
+            throw new IndexOutOfBoundsException();
+          });
+        });
+      }
+      {
+        var arr=new byte[10];
+        var seq=new CheckedStack(10,arr);
+        Assertions.assertThrows(ConcurrentModificationException.class,()->
+        {
+          seq.removeIf((Predicate<? super Byte>)(v)->
+          {
+            var tmp=seq.popByte();
+            seq.push(tmp);
+            throw new IndexOutOfBoundsException();
+          });
+        });
+      }
+      {
+        int length=100;
+        BytePredicate pred=(val)->
+        {
+          return (EqualityUtil.isEqual(val,TypeConversionUtil.convertTobyte(0))
+            ||
+             EqualityUtil.isEqual(val,TypeConversionUtil.convertTobyte(2)));
+        };
+        var arr=new byte[length];
+        var seq=new CheckedStack(length,arr);
+        for(int i=0;i<length;++i)
+        {
+          arr[i]=TypeConversionUtil.convertTobyte(i);
+        }
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),length-2);
+        for(int i=0,valIndex=0;i<length-2;++i,++valIndex)
+        {
+          if(i==0 || i==1)
+          {
+            ++valIndex;
+          }
+          Assertions.assertEquals(arr[i],TypeConversionUtil.convertTobyte(valIndex));
+        }
+        Assertions.assertTrue(seq.modCount!=0);
+      } 
+      {
+        int length=100;
+        Predicate<? super Byte> pred=(val)->
+        {
+          return (EqualityUtil.isEqual(val,TypeConversionUtil.convertTobyte(0))
+            ||
+             EqualityUtil.isEqual(val,TypeConversionUtil.convertTobyte(2)));
+        };
+        var arr=new byte[length];
+        var seq=new CheckedStack(length,arr);
+        for(int i=0;i<length;++i)
+        {
+          arr[i]=TypeConversionUtil.convertTobyte(i);
+        }
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),length-2);
+        for(int i=0,valIndex=0;i<length-2;++i,++valIndex)
+        {
+          if(i==0 || i==1)
+          {
+            ++valIndex;
+          }
+          Assertions.assertEquals(arr[i],TypeConversionUtil.convertTobyte(valIndex));
+        }
+        Assertions.assertTrue(seq.modCount!=0);
+      } 
+      {
+        int length=100;
+        BytePredicate pred=(val)->
+        {
+          return (EqualityUtil.isEqual(val,TypeConversionUtil.convertTobyte(0))
+            ||
+             EqualityUtil.isEqual(val,TypeConversionUtil.convertTobyte(2)));
+        };
+        var arr=new byte[length];
+        var seq=new CheckedStack(length,arr);
+        for(int i=0;i<length;++i)
+        {
+          arr[i]=TypeConversionUtil.convertTobyte(i);
+        }
+        Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf(CheckedCollectionTest.getModifyingPred(pred,()->
+        {
+          var tmp=seq.popByte();
+          seq.push(tmp);
+        })));
+      } 
+      {
+        int length=100;
+        Predicate<? super Byte> pred=(val)->
+        {
+          return (EqualityUtil.isEqual(val,TypeConversionUtil.convertTobyte(0))
+            ||
+             EqualityUtil.isEqual(val,TypeConversionUtil.convertTobyte(2)));
+        };
+        var arr=new byte[length];
+        var seq=new CheckedStack(length,arr);
+        for(int i=0;i<length;++i)
+        {
+          arr[i]=TypeConversionUtil.convertTobyte(i);
+        }
+        Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf(CheckedCollectionTest.getModifyingPred(pred,()->
+        {
+          var tmp=seq.popByte();
+          seq.push(tmp);
+        })));
+      } 
+      {
+        int length=100;
+        BytePredicate pred=(val)->
+        {
+          return !EqualityUtil.isEqual(val,TypeConversionUtil.convertTobyte(1));
+        };
+        var arr=new byte[length];
+        var seq=new CheckedStack(length,arr);
+        for(int i=0;i<length;++i)
+        {
+          arr[i]=TypeConversionUtil.convertTobyte(i);
+        }
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),1);
+        Assertions.assertEquals(arr[0],TypeConversionUtil.convertTobyte(1));
+        Assertions.assertTrue(seq.modCount!=0);
+      } 
+      {
+        int length=100;
+        Predicate<? super Byte> pred=(val)->
+        {
+          return !EqualityUtil.isEqual(val,TypeConversionUtil.convertTobyte(1));
+        };
+        var arr=new byte[length];
+        var seq=new CheckedStack(length,arr);
+        for(int i=0;i<length;++i)
+        {
+          arr[i]=TypeConversionUtil.convertTobyte(i);
+        }
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),1);
+        Assertions.assertEquals(arr[0],TypeConversionUtil.convertTobyte(1));
+        Assertions.assertTrue(seq.modCount!=0);
+      } 
+      {
+        int length=100;
+        BytePredicate pred=(val)->
+        {
+          return !EqualityUtil.isEqual(val,TypeConversionUtil.convertTobyte(1));
+        };
+        var arr=new byte[length];
+        var seq=new CheckedStack(length,arr);
+        for(int i=0;i<length;++i)
+        {
+          arr[i]=TypeConversionUtil.convertTobyte(i);
+        }
+        Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf(CheckedCollectionTest.getModifyingPred(pred,()->
+        {
+          var tmp=seq.popByte();
+          seq.push(tmp);
+        })));
+      } 
+      {
+        int length=100;
+        Predicate<? super Byte> pred=(val)->
+        {
+          return !EqualityUtil.isEqual(val,TypeConversionUtil.convertTobyte(1));
+        };
+        var arr=new byte[length];
+        var seq=new CheckedStack(length,arr);
+        for(int i=0;i<length;++i)
+        {
+          arr[i]=TypeConversionUtil.convertTobyte(i);
+        }
+        Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf(CheckedCollectionTest.getModifyingPred(pred,()->
+        {
+          var tmp=seq.popByte();
+          seq.push(tmp);
+        })));
+      } 
+  }
+  /*
   @Test
   public void testRemoveIfModCheckArrSeqCheckedStack()
   {
     var seq=new CheckedStack();
-    for(int i=0;i<100;++i)
+    for(int i=0;i<1000;++i)
     {
       var val=TypeConversionUtil.convertTobyte(i);
       seq.add(val);
     }
+    Random rand=new Random(0);
+    for(var predicateGenerator:bytePredicates.values())
     {
-    }
-    {
-      var seqClone=(OmniStack.OfByte)seq.clone();
-      BytePredicate removingPredicateReturnFalse=(val)->
+      for(int m=predicateGenerator.getMLo(),mHi=predicateGenerator.getMHi(),repsBound=predicateGenerator.getNumReps();m<=mHi;m=predicateGenerator.incrementM(m))
       {
-        seqClone.pop();
-        return false;
-      };
-      Assertions.assertThrows(ConcurrentModificationException.class,()->seqClone.removeIf(removingPredicateReturnFalse));
-    }
-    {
-      var seqClone=(OmniStack.OfByte)seq.clone();
-      BytePredicate removingPredicateReturnFalse=(val)->
-      {
-        seqClone.pop();
-        return false;
-      };
-      Assertions.assertThrows(ConcurrentModificationException.class,()->seqClone.removeIf((Predicate<Byte>)removingPredicateReturnFalse::test));
-    }
-    {
-      var seqClone=(OmniStack.OfByte)seq.clone();
-      BytePredicate removingPredicateReturnTrue=(val)->
-      {
-        seqClone.pop();
-        return true;
-      };
-      Assertions.assertThrows(ConcurrentModificationException.class,()->seqClone.removeIf(removingPredicateReturnTrue));
-    }
-    {
-      var seqClone=(OmniStack.OfByte)seq.clone();
-      BytePredicate removingPredicateReturnTrue=(val)->
-      {
-        seqClone.pop();
-        return true;
-      };
-      Assertions.assertThrows(ConcurrentModificationException.class,()->seqClone.removeIf((Predicate<Byte>)removingPredicateReturnTrue::test));
-    }
-    {
-      var seqClone=(OmniStack.OfByte)seq.clone();
-      BytePredicate addingPredicateReturnFalse=(val)->
-      {
-        seqClone.add(Byte.MIN_VALUE);
-        return false;
-      };
-      Assertions.assertThrows(ConcurrentModificationException.class,()->seqClone.removeIf(addingPredicateReturnFalse));
-    }
-    {
-      var seqClone=(OmniStack.OfByte)seq.clone();
-      BytePredicate addingPredicateReturnFalse=(val)->
-      {
-        seqClone.add(Byte.MIN_VALUE);
-        return false;
-      };
-      Assertions.assertThrows(ConcurrentModificationException.class,()->seqClone.removeIf((Predicate<Byte>)addingPredicateReturnFalse::test));
-    }
-    {
-      var seqClone=(OmniStack.OfByte)seq.clone();
-      BytePredicate addingPredicateReturnTrue=(val)->
-      {
-        seqClone.add(Byte.MIN_VALUE);
-        return true;
-      };
-      Assertions.assertThrows(ConcurrentModificationException.class,()->seqClone.removeIf(addingPredicateReturnTrue));
-    }
-    {
-      var seqClone=(OmniStack.OfByte)seq.clone();
-      BytePredicate addingPredicateReturnTrue=(val)->
-      {
-        seqClone.add(Byte.MIN_VALUE);
-        return true;
-      };
-      Assertions.assertThrows(ConcurrentModificationException.class,()->seqClone.removeIf((Predicate<Byte>)addingPredicateReturnTrue::test));
+        for(int reps=0;reps<repsBound;++reps)
+        {
+          {
+            var seqClone=(OmniStack.OfByte)seq.clone();
+            var pred=CheckedCollectionTest.getModifyingPred(predicateGenerator.getPred(rand,m),()->
+            {
+              if(!seqClone.isEmpty())
+              {
+                seqClone.pop();
+              }
+            });
+            Assertions.assertThrows(ConcurrentModificationException.class,()->seqClone.removeIf(pred));
+          }
+          {
+            var seqClone=(OmniStack.OfByte)seq.clone();
+            var pred=CheckedCollectionTest.getModifyingPred(predicateGenerator.getPred(rand,m),()->
+            {
+              seqClone.add(Byte.MIN_VALUE);
+            });
+            Assertions.assertThrows(ConcurrentModificationException.class,()->seqClone.removeIf(pred));
+          }
+          {
+            var seqClone=(OmniStack.OfByte)seq.clone();
+            var pred=CheckedCollectionTest.getModifyingPred(predicateGenerator.getPred(rand,m),()->
+            {
+              if(!seqClone.isEmpty())
+              {
+                seqClone.pop();
+              }
+            });
+            Assertions.assertThrows(ConcurrentModificationException.class,()->seqClone.removeIf((Predicate<Byte>)pred::test));
+          }
+          {
+            var seqClone=(OmniStack.OfByte)seq.clone();
+            var pred=CheckedCollectionTest.getModifyingPred(predicateGenerator.getPred(rand,m),()->
+            {
+              seqClone.add(Byte.MIN_VALUE);
+            });
+            Assertions.assertThrows(ConcurrentModificationException.class,()->seqClone.removeIf((Predicate<Byte>)pred::test));
+          }
+        }
+      }
     }
   }
-  @Test
-  public void testRemoveIfReturnFalseArrSeqCheckedStack()
-  {
-    BytePredicate filter=(val)->false;
-    var seq=new CheckedStack();
-    for(int i=0;i<100;++i)
-    {
-      var val=TypeConversionUtil.convertTobyte(i);
-      seq.add(val);
-    }
-    {
-      Assertions.assertFalse(seq.removeIf(filter));
-      Assertions.assertFalse(seq.removeIf((Predicate<Byte>)filter::test));
-    }
-  }
+  */
   @Test
   public void testEmptyRemoveIfArrSeqCheckedList()
   {
-    BytePredicate filter=(val)->true;
+    BytePredicate filter=bytePredicates.MarkAll.getPred(null,0);
     var seq=new CheckedList();
     Assertions.assertFalse(seq.removeIf(filter));
     Assertions.assertFalse(seq.removeIf((Predicate<Byte>)filter::test));
   }
+  @Test
+  public void testRemoveIfCheckedList()
+  {
+      {
+        var arr=new byte[10];
+        var seq=new CheckedList(10,arr);
+        BytePredicate pred=val->false;
+        Assertions.assertFalse(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),10);
+        Assertions.assertEquals(0,seq.modCount);
+      }
+      {
+        var arr=new byte[10];
+        var seq=new CheckedList(10,arr);
+        Predicate<? super Byte> pred=val->false;
+        Assertions.assertFalse(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),10);
+        Assertions.assertEquals(0,seq.modCount);
+      }
+      {
+        var arr=new byte[10];
+        var seq=new CheckedList(10,arr);
+        BytePredicate pred=val->false;
+        Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf(CheckedCollectionTest.getModifyingPred(pred,()->
+        {
+          var tmp=seq.removeByteAt(seq.size()-1);
+          seq.add(tmp);
+        })));
+      }
+      {
+        var arr=new byte[10];
+        var seq=new CheckedList(10,arr);
+        Predicate<? super Byte> pred=val->false;
+        Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf(CheckedCollectionTest.getModifyingPred(pred,()->
+        {
+          var tmp=seq.removeByteAt(seq.size()-1);
+          seq.add(tmp);
+        })));
+      }
+      {
+        var arr=new byte[10];
+        var seq=new CheckedList(10,arr);
+        Assertions.assertThrows(IndexOutOfBoundsException.class,()->
+        {
+          seq.removeIf((BytePredicate)(v)->
+          {
+            throw new IndexOutOfBoundsException();
+          });
+        });
+      }
+      {
+        var arr=new byte[10];
+        var seq=new CheckedList(10,arr);
+        Assertions.assertThrows(IndexOutOfBoundsException.class,()->
+        {
+          seq.removeIf((Predicate<? super Byte>)(v)->
+          {
+            throw new IndexOutOfBoundsException();
+          });
+        });
+      }
+      {
+        var arr=new byte[10];
+        var seq=new CheckedList(10,arr);
+        Assertions.assertThrows(ConcurrentModificationException.class,()->
+        {
+          seq.removeIf((BytePredicate)(v)->
+          {
+            var tmp=seq.removeByteAt(seq.size()-1);
+            seq.add(tmp);
+            throw new IndexOutOfBoundsException();
+          });
+        });
+      }
+      {
+        var arr=new byte[10];
+        var seq=new CheckedList(10,arr);
+        Assertions.assertThrows(ConcurrentModificationException.class,()->
+        {
+          seq.removeIf((Predicate<? super Byte>)(v)->
+          {
+            var tmp=seq.removeByteAt(seq.size()-1);
+            seq.add(tmp);
+            throw new IndexOutOfBoundsException();
+          });
+        });
+      }
+      {
+        var arr=new byte[10];
+        var seq=new CheckedList(10,arr);
+        BytePredicate pred=val->true;
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertTrue(seq.isEmpty());
+        Assertions.assertTrue(seq.modCount!=0);
+      }
+      {
+        var arr=new byte[10];
+        var seq=new CheckedList(10,arr);
+        Predicate<? super Byte> pred=val->true;
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertTrue(seq.isEmpty());
+        Assertions.assertTrue(seq.modCount!=0);
+      }
+      {
+        var arr=new byte[10];
+        var seq=new CheckedList(10,arr);
+        BytePredicate pred=val->true;
+        Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf(CheckedCollectionTest.getModifyingPred(pred,()->
+        {
+          var tmp=seq.removeByteAt(seq.size()-1);
+          seq.add(tmp);
+        })));
+      }
+      {
+        var arr=new byte[10];
+        var seq=new CheckedList(10,arr);
+        Predicate<? super Byte> pred=val->true;
+        Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf(CheckedCollectionTest.getModifyingPred(pred,()->
+        {
+          var tmp=seq.removeByteAt(seq.size()-1);
+          seq.add(tmp);
+        })));
+      }
+      {
+        var arr=new byte[10];
+        var seq=new CheckedList(10,arr);
+        Assertions.assertThrows(IndexOutOfBoundsException.class,()->
+        {
+          seq.removeIf((BytePredicate)(v)->
+          {
+            throw new IndexOutOfBoundsException();
+          });
+        });
+      }
+      {
+        var arr=new byte[10];
+        var seq=new CheckedList(10,arr);
+        Assertions.assertThrows(IndexOutOfBoundsException.class,()->
+        {
+          seq.removeIf((Predicate<? super Byte>)(v)->
+          {
+            throw new IndexOutOfBoundsException();
+          });
+        });
+      }
+      {
+        var arr=new byte[10];
+        var seq=new CheckedList(10,arr);
+        Assertions.assertThrows(ConcurrentModificationException.class,()->
+        {
+          seq.removeIf((BytePredicate)(v)->
+          {
+            var tmp=seq.getByte(seq.size()-1);
+            seq.add(tmp);
+            throw new IndexOutOfBoundsException();
+          });
+        });
+      }
+      {
+        var arr=new byte[10];
+        var seq=new CheckedList(10,arr);
+        Assertions.assertThrows(ConcurrentModificationException.class,()->
+        {
+          seq.removeIf((Predicate<? super Byte>)(v)->
+          {
+            var tmp=seq.getByte(seq.size()-1);
+            seq.add(tmp);
+            throw new IndexOutOfBoundsException();
+          });
+        });
+      }
+      {
+        int length=100;
+        BytePredicate pred=(val)->
+        {
+          return (EqualityUtil.isEqual(val,TypeConversionUtil.convertTobyte(0))
+            ||
+             EqualityUtil.isEqual(val,TypeConversionUtil.convertTobyte(2)));
+        };
+        var arr=new byte[length];
+        var seq=new CheckedList(length,arr);
+        for(int i=0;i<length;++i)
+        {
+          arr[i]=TypeConversionUtil.convertTobyte(i);
+        }
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),length-2);
+        for(int i=0,valIndex=0;i<length-2;++i,++valIndex)
+        {
+          if(i==0 || i==1)
+          {
+            ++valIndex;
+          }
+          Assertions.assertEquals(arr[i],TypeConversionUtil.convertTobyte(valIndex));
+        }
+        Assertions.assertTrue(seq.modCount!=0);
+      } 
+      {
+        int length=100;
+        Predicate<? super Byte> pred=(val)->
+        {
+          return (EqualityUtil.isEqual(val,TypeConversionUtil.convertTobyte(0))
+            ||
+             EqualityUtil.isEqual(val,TypeConversionUtil.convertTobyte(2)));
+        };
+        var arr=new byte[length];
+        var seq=new CheckedList(length,arr);
+        for(int i=0;i<length;++i)
+        {
+          arr[i]=TypeConversionUtil.convertTobyte(i);
+        }
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),length-2);
+        for(int i=0,valIndex=0;i<length-2;++i,++valIndex)
+        {
+          if(i==0 || i==1)
+          {
+            ++valIndex;
+          }
+          Assertions.assertEquals(arr[i],TypeConversionUtil.convertTobyte(valIndex));
+        }
+        Assertions.assertTrue(seq.modCount!=0);
+      } 
+      {
+        int length=100;
+        BytePredicate pred=(val)->
+        {
+          return (EqualityUtil.isEqual(val,TypeConversionUtil.convertTobyte(0))
+            ||
+             EqualityUtil.isEqual(val,TypeConversionUtil.convertTobyte(2)));
+        };
+        var arr=new byte[length];
+        var seq=new CheckedList(length,arr);
+        for(int i=0;i<length;++i)
+        {
+          arr[i]=TypeConversionUtil.convertTobyte(i);
+        }
+        Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf(CheckedCollectionTest.getModifyingPred(pred,()->
+        {
+          var tmp=seq.removeByteAt(seq.size()-1);
+          seq.add(tmp);
+        })));
+      } 
+      {
+        int length=100;
+        Predicate<? super Byte> pred=(val)->
+        {
+          return (EqualityUtil.isEqual(val,TypeConversionUtil.convertTobyte(0))
+            ||
+             EqualityUtil.isEqual(val,TypeConversionUtil.convertTobyte(2)));
+        };
+        var arr=new byte[length];
+        var seq=new CheckedList(length,arr);
+        for(int i=0;i<length;++i)
+        {
+          arr[i]=TypeConversionUtil.convertTobyte(i);
+        }
+        Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf(CheckedCollectionTest.getModifyingPred(pred,()->
+        {
+          var tmp=seq.removeByteAt(seq.size()-1);
+          seq.add(tmp);
+        })));
+      } 
+      {
+        int length=100;
+        BytePredicate pred=(val)->
+        {
+          return !EqualityUtil.isEqual(val,TypeConversionUtil.convertTobyte(1));
+        };
+        var arr=new byte[length];
+        var seq=new CheckedList(length,arr);
+        for(int i=0;i<length;++i)
+        {
+          arr[i]=TypeConversionUtil.convertTobyte(i);
+        }
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),1);
+        Assertions.assertEquals(arr[0],TypeConversionUtil.convertTobyte(1));
+        Assertions.assertTrue(seq.modCount!=0);
+      } 
+      {
+        int length=100;
+        Predicate<? super Byte> pred=(val)->
+        {
+          return !EqualityUtil.isEqual(val,TypeConversionUtil.convertTobyte(1));
+        };
+        var arr=new byte[length];
+        var seq=new CheckedList(length,arr);
+        for(int i=0;i<length;++i)
+        {
+          arr[i]=TypeConversionUtil.convertTobyte(i);
+        }
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),1);
+        Assertions.assertEquals(arr[0],TypeConversionUtil.convertTobyte(1));
+        Assertions.assertTrue(seq.modCount!=0);
+      } 
+      {
+        int length=100;
+        BytePredicate pred=(val)->
+        {
+          return !EqualityUtil.isEqual(val,TypeConversionUtil.convertTobyte(1));
+        };
+        var arr=new byte[length];
+        var seq=new CheckedList(length,arr);
+        for(int i=0;i<length;++i)
+        {
+          arr[i]=TypeConversionUtil.convertTobyte(i);
+        }
+        Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf(CheckedCollectionTest.getModifyingPred(pred,()->
+        {
+          var tmp=seq.removeByteAt(seq.size()-1);
+          seq.add(tmp);
+        })));
+      } 
+      {
+        int length=100;
+        Predicate<? super Byte> pred=(val)->
+        {
+          return !EqualityUtil.isEqual(val,TypeConversionUtil.convertTobyte(1));
+        };
+        var arr=new byte[length];
+        var seq=new CheckedList(length,arr);
+        for(int i=0;i<length;++i)
+        {
+          arr[i]=TypeConversionUtil.convertTobyte(i);
+        }
+        Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf(CheckedCollectionTest.getModifyingPred(pred,()->
+        {
+          var tmp=seq.removeByteAt(seq.size()-1);
+          seq.add(tmp);
+        })));
+      } 
+  }
+  /*
   @Test
   public void testRemoveIfModCheckArrSeqCheckedList()
   {
     var seq=new CheckedList();
-    for(int i=0;i<100;++i)
+    for(int i=0;i<1000;++i)
     {
       var val=TypeConversionUtil.convertTobyte(i);
       seq.add(val);
     }
+    Random rand=new Random(0);
+    for(var predicateGenerator:bytePredicates.values())
     {
-    }
-    {
-      var seqClone=(OmniList.OfByte)seq.clone();
-      BytePredicate removingPredicateReturnFalse=(val)->
+      for(int m=predicateGenerator.getMLo(),mHi=predicateGenerator.getMHi(),repsBound=predicateGenerator.getNumReps();m<=mHi;m=predicateGenerator.incrementM(m))
       {
-        seqClone.remove(0);
-        return false;
-      };
-      Assertions.assertThrows(ConcurrentModificationException.class,()->seqClone.removeIf(removingPredicateReturnFalse));
-    }
-    {
-      var seqClone=(OmniList.OfByte)seq.clone();
-      BytePredicate removingPredicateReturnFalse=(val)->
-      {
-        seqClone.remove(0);
-        return false;
-      };
-      Assertions.assertThrows(ConcurrentModificationException.class,()->seqClone.removeIf((Predicate<Byte>)removingPredicateReturnFalse::test));
-    }
-    {
-      var seqClone=(OmniList.OfByte)seq.clone();
-      BytePredicate removingPredicateReturnTrue=(val)->
-      {
-        seqClone.remove(0);
-        return true;
-      };
-      Assertions.assertThrows(ConcurrentModificationException.class,()->seqClone.removeIf(removingPredicateReturnTrue));
-    }
-    {
-      var seqClone=(OmniList.OfByte)seq.clone();
-      BytePredicate removingPredicateReturnTrue=(val)->
-      {
-        seqClone.remove(0);
-        return true;
-      };
-      Assertions.assertThrows(ConcurrentModificationException.class,()->seqClone.removeIf((Predicate<Byte>)removingPredicateReturnTrue::test));
-    }
-    {
-      var seqClone=(OmniList.OfByte)seq.clone();
-      BytePredicate addingPredicateReturnFalse=(val)->
-      {
-        seqClone.add(Byte.MIN_VALUE);
-        return false;
-      };
-      Assertions.assertThrows(ConcurrentModificationException.class,()->seqClone.removeIf(addingPredicateReturnFalse));
-    }
-    {
-      var seqClone=(OmniList.OfByte)seq.clone();
-      BytePredicate addingPredicateReturnFalse=(val)->
-      {
-        seqClone.add(Byte.MIN_VALUE);
-        return false;
-      };
-      Assertions.assertThrows(ConcurrentModificationException.class,()->seqClone.removeIf((Predicate<Byte>)addingPredicateReturnFalse::test));
-    }
-    {
-      var seqClone=(OmniList.OfByte)seq.clone();
-      BytePredicate addingPredicateReturnTrue=(val)->
-      {
-        seqClone.add(Byte.MIN_VALUE);
-        return true;
-      };
-      Assertions.assertThrows(ConcurrentModificationException.class,()->seqClone.removeIf(addingPredicateReturnTrue));
-    }
-    {
-      var seqClone=(OmniList.OfByte)seq.clone();
-      BytePredicate addingPredicateReturnTrue=(val)->
-      {
-        seqClone.add(Byte.MIN_VALUE);
-        return true;
-      };
-      Assertions.assertThrows(ConcurrentModificationException.class,()->seqClone.removeIf((Predicate<Byte>)addingPredicateReturnTrue::test));
+        for(int reps=0;reps<repsBound;++reps)
+        {
+          {
+            var seqClone=(OmniList.OfByte)seq.clone();
+            var pred=CheckedCollectionTest.getModifyingPred(predicateGenerator.getPred(rand,m),()->
+            {
+              if(!seqClone.isEmpty())
+              {
+                seqClone.remove(0);
+              }
+            });
+            Assertions.assertThrows(ConcurrentModificationException.class,()->seqClone.removeIf(pred));
+          }
+          {
+            var seqClone=(OmniList.OfByte)seq.clone();
+            var pred=CheckedCollectionTest.getModifyingPred(predicateGenerator.getPred(rand,m),()->
+            {
+              seqClone.add(Byte.MIN_VALUE);
+            });
+            Assertions.assertThrows(ConcurrentModificationException.class,()->seqClone.removeIf(pred));
+          }
+          {
+            var seqClone=(OmniList.OfByte)seq.clone();
+            var pred=CheckedCollectionTest.getModifyingPred(predicateGenerator.getPred(rand,m),()->
+            {
+              if(!seqClone.isEmpty())
+              {
+                seqClone.remove(0);
+              }
+            });
+            Assertions.assertThrows(ConcurrentModificationException.class,()->seqClone.removeIf((Predicate<Byte>)pred::test));
+          }
+          {
+            var seqClone=(OmniList.OfByte)seq.clone();
+            var pred=CheckedCollectionTest.getModifyingPred(predicateGenerator.getPred(rand,m),()->
+            {
+              seqClone.add(Byte.MIN_VALUE);
+            });
+            Assertions.assertThrows(ConcurrentModificationException.class,()->seqClone.removeIf((Predicate<Byte>)pred::test));
+          }
+        }
+      }
     }
   }
-  @Test
-  public void testRemoveIfReturnFalseArrSeqCheckedList()
-  {
-    BytePredicate filter=(val)->false;
-    var seq=new CheckedList();
-    for(int i=0;i<100;++i)
-    {
-      var val=TypeConversionUtil.convertTobyte(i);
-      seq.add(val);
-    }
-    {
-      Assertions.assertFalse(seq.removeIf(filter));
-      Assertions.assertFalse(seq.removeIf((Predicate<Byte>)filter::test));
-    }
-  }
+  */
   @Test
   public void testEmptyRemoveIfArrSeqUncheckedSubList()
   {
-    BytePredicate filter=(val)->true;
+    BytePredicate filter=bytePredicates.MarkAll.getPred(null,0);
     var root=new UncheckedList();
     var seq=root.subList(0,0);
     Assertions.assertFalse(seq.removeIf(filter));
     Assertions.assertFalse(seq.removeIf((Predicate<Byte>)filter::test));
   }
   @Test
-  public void testRemoveIfReturnFalseArrSeqUncheckedSubList()
+  public void testRemoveIfUncheckedSubList()
   {
-    BytePredicate filter=(val)->false;
-    var root=new UncheckedList();
-    var seq=root.subList(0,0);
-    for(int i=0;i<100;++i)
-    {
-      var val=TypeConversionUtil.convertTobyte(i);
-      seq.add(val);
-    }
-    {
-      Assertions.assertFalse(seq.removeIf(filter));
-      Assertions.assertFalse(seq.removeIf((Predicate<Byte>)filter::test));
-    }
+      {
+        var arr=new byte[10];
+        var root=new UncheckedList(10,arr);
+        var subList=root.subList(0,10);
+        var seq=subList.subList(0,10);
+        BytePredicate pred=val->false;
+        Assertions.assertFalse(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),10);
+      }
+      {
+        var arr=new byte[10];
+        var root=new UncheckedList(10,arr);
+        var subList=root.subList(0,10);
+        var seq=subList.subList(0,10);
+        Predicate<? super Byte> pred=val->false;
+        Assertions.assertFalse(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),10);
+      }
+      {
+        var arr=new byte[10];
+        var root=new UncheckedList(10,arr);
+        var subList=root.subList(0,10);
+        var seq=subList.subList(0,10);
+        BytePredicate pred=val->true;
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertTrue(seq.isEmpty());
+      }
+      {
+        var arr=new byte[10];
+        var root=new UncheckedList(10,arr);
+        var subList=root.subList(0,10);
+        var seq=subList.subList(0,10);
+        Predicate<? super Byte> pred=val->true;
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertTrue(seq.isEmpty());
+      }
+      {
+        int length=100;
+        BytePredicate pred=(val)->
+        {
+          return (EqualityUtil.isEqual(val,TypeConversionUtil.convertTobyte(0))
+            ||
+             EqualityUtil.isEqual(val,TypeConversionUtil.convertTobyte(2)));
+        };
+        var arr=new byte[length];
+        var root=new UncheckedList(length,arr);
+        var subList=root.subList(0,length);
+        var seq=subList.subList(0,length);
+        for(int i=0;i<length;++i)
+        {
+          arr[i]=TypeConversionUtil.convertTobyte(i);
+        }
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),length-2);
+        for(int i=0,valIndex=0;i<length-2;++i,++valIndex)
+        {
+          if(i==0 || i==1)
+          {
+            ++valIndex;
+          }
+          Assertions.assertEquals(arr[i],TypeConversionUtil.convertTobyte(valIndex));
+        }
+      } 
+      {
+        int length=100;
+        Predicate<? super Byte> pred=(val)->
+        {
+          return (EqualityUtil.isEqual(val,TypeConversionUtil.convertTobyte(0))
+            ||
+             EqualityUtil.isEqual(val,TypeConversionUtil.convertTobyte(2)));
+        };
+        var arr=new byte[length];
+        var root=new UncheckedList(length,arr);
+        var subList=root.subList(0,length);
+        var seq=subList.subList(0,length);
+        for(int i=0;i<length;++i)
+        {
+          arr[i]=TypeConversionUtil.convertTobyte(i);
+        }
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),length-2);
+        for(int i=0,valIndex=0;i<length-2;++i,++valIndex)
+        {
+          if(i==0 || i==1)
+          {
+            ++valIndex;
+          }
+          Assertions.assertEquals(arr[i],TypeConversionUtil.convertTobyte(valIndex));
+        }
+      } 
+      {
+        int length=100;
+        BytePredicate pred=(val)->
+        {
+          return !EqualityUtil.isEqual(val,TypeConversionUtil.convertTobyte(1));
+        };
+        var arr=new byte[length];
+        var root=new UncheckedList(length,arr);
+        var subList=root.subList(0,length);
+        var seq=subList.subList(0,length);
+        for(int i=0;i<length;++i)
+        {
+          arr[i]=TypeConversionUtil.convertTobyte(i);
+        }
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),1);
+        Assertions.assertEquals(arr[0],TypeConversionUtil.convertTobyte(1));
+      } 
+      {
+        int length=100;
+        Predicate<? super Byte> pred=(val)->
+        {
+          return !EqualityUtil.isEqual(val,TypeConversionUtil.convertTobyte(1));
+        };
+        var arr=new byte[length];
+        var root=new UncheckedList(length,arr);
+        var subList=root.subList(0,length);
+        var seq=subList.subList(0,length);
+        for(int i=0;i<length;++i)
+        {
+          arr[i]=TypeConversionUtil.convertTobyte(i);
+        }
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),1);
+        Assertions.assertEquals(arr[0],TypeConversionUtil.convertTobyte(1));
+      } 
   }
   @Test
   public void testEmptyRemoveIfArrSeqCheckedSubList()
   {
-    BytePredicate filter=(val)->true;
+    BytePredicate filter=bytePredicates.MarkAll.getPred(null,0);
     var root=new CheckedList();
     var seq=root.subList(0,0);
     Assertions.assertFalse(seq.removeIf(filter));
     Assertions.assertFalse(seq.removeIf((Predicate<Byte>)filter::test));
   }
+  @Test
+  public void testRemoveIfCheckedSubList()
+  {
+      {
+        var arr=new byte[10];
+        var root=new CheckedList(10,arr);
+        var subList=root.subList(0,10);
+        var seq=subList.subList(0,10);
+        BytePredicate pred=val->false;
+        Assertions.assertFalse(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),10);
+        Assertions.assertEquals(0,root.modCount);
+      }
+      {
+        var arr=new byte[10];
+        var root=new CheckedList(10,arr);
+        var subList=root.subList(0,10);
+        var seq=subList.subList(0,10);
+        Predicate<? super Byte> pred=val->false;
+        Assertions.assertFalse(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),10);
+        Assertions.assertEquals(0,root.modCount);
+      }
+      {
+        var arr=new byte[10];
+        var root=new CheckedList(10,arr);
+        var subList=root.subList(0,10);
+        var seq=subList.subList(0,10);
+        BytePredicate pred=val->false;
+        Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf(CheckedCollectionTest.getModifyingPred(pred,()->
+        {
+          var tmp=seq.removeByteAt(seq.size()-1);
+          seq.add(tmp);
+        })));
+      }
+      {
+        var arr=new byte[10];
+        var root=new CheckedList(10,arr);
+        var subList=root.subList(0,10);
+        var seq=subList.subList(0,10);
+        Predicate<? super Byte> pred=val->false;
+        Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf(CheckedCollectionTest.getModifyingPred(pred,()->
+        {
+          var tmp=seq.removeByteAt(seq.size()-1);
+          seq.add(tmp);
+        })));
+      }
+      {
+        var arr=new byte[10];
+        var root=new CheckedList(10,arr);
+        var subList=root.subList(0,10);
+        var seq=subList.subList(0,10);
+        Assertions.assertThrows(IndexOutOfBoundsException.class,()->
+        {
+          seq.removeIf((BytePredicate)(v)->
+          {
+            throw new IndexOutOfBoundsException();
+          });
+        });
+      }
+      {
+        var arr=new byte[10];
+        var root=new CheckedList(10,arr);
+        var subList=root.subList(0,10);
+        var seq=subList.subList(0,10);
+        Assertions.assertThrows(IndexOutOfBoundsException.class,()->
+        {
+          seq.removeIf((Predicate<? super Byte>)(v)->
+          {
+            throw new IndexOutOfBoundsException();
+          });
+        });
+      }
+      {
+        var arr=new byte[10];
+        var root=new CheckedList(10,arr);
+        var subList=root.subList(0,10);
+        var seq=subList.subList(0,10);
+        Assertions.assertThrows(ConcurrentModificationException.class,()->
+        {
+          seq.removeIf((BytePredicate)(v)->
+          {
+            var tmp=seq.removeByteAt(seq.size()-1);
+            seq.add(tmp);
+            throw new IndexOutOfBoundsException();
+          });
+        });
+      }
+      {
+        var arr=new byte[10];
+        var root=new CheckedList(10,arr);
+        var subList=root.subList(0,10);
+        var seq=subList.subList(0,10);
+        Assertions.assertThrows(ConcurrentModificationException.class,()->
+        {
+          seq.removeIf((Predicate<? super Byte>)(v)->
+          {
+            var tmp=seq.removeByteAt(seq.size()-1);
+            seq.add(tmp);
+            throw new IndexOutOfBoundsException();
+          });
+        });
+      }
+      {
+        var arr=new byte[10];
+        var root=new CheckedList(10,arr);
+        var subList=root.subList(0,10);
+        var seq=subList.subList(0,10);
+        BytePredicate pred=val->true;
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertTrue(seq.isEmpty());
+        Assertions.assertTrue(root.modCount!=0);
+      }
+      {
+        var arr=new byte[10];
+        var root=new CheckedList(10,arr);
+        var subList=root.subList(0,10);
+        var seq=subList.subList(0,10);
+        Predicate<? super Byte> pred=val->true;
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertTrue(seq.isEmpty());
+        Assertions.assertTrue(root.modCount!=0);
+      }
+      {
+        var arr=new byte[10];
+        var root=new CheckedList(10,arr);
+        var subList=root.subList(0,10);
+        var seq=subList.subList(0,10);
+        BytePredicate pred=val->true;
+        Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf(CheckedCollectionTest.getModifyingPred(pred,()->
+        {
+          var tmp=seq.removeByteAt(seq.size()-1);
+          seq.add(tmp);
+        })));
+      }
+      {
+        var arr=new byte[10];
+        var root=new CheckedList(10,arr);
+        var subList=root.subList(0,10);
+        var seq=subList.subList(0,10);
+        Predicate<? super Byte> pred=val->true;
+        Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf(CheckedCollectionTest.getModifyingPred(pred,()->
+        {
+          var tmp=seq.removeByteAt(seq.size()-1);
+          seq.add(tmp);
+        })));
+      }
+      {
+        var arr=new byte[10];
+        var root=new CheckedList(10,arr);
+        var subList=root.subList(0,10);
+        var seq=subList.subList(0,10);
+        Assertions.assertThrows(IndexOutOfBoundsException.class,()->
+        {
+          seq.removeIf((BytePredicate)(v)->
+          {
+            throw new IndexOutOfBoundsException();
+          });
+        });
+      }
+      {
+        var arr=new byte[10];
+        var root=new CheckedList(10,arr);
+        var subList=root.subList(0,10);
+        var seq=subList.subList(0,10);
+        Assertions.assertThrows(IndexOutOfBoundsException.class,()->
+        {
+          seq.removeIf((Predicate<? super Byte>)(v)->
+          {
+            throw new IndexOutOfBoundsException();
+          });
+        });
+      }
+      {
+        var arr=new byte[10];
+        var root=new CheckedList(10,arr);
+        var subList=root.subList(0,10);
+        var seq=subList.subList(0,10);
+        Assertions.assertThrows(ConcurrentModificationException.class,()->
+        {
+          seq.removeIf((BytePredicate)(v)->
+          {
+            var tmp=seq.getByte(seq.size()-1);
+            seq.add(tmp);
+            throw new IndexOutOfBoundsException();
+          });
+        });
+      }
+      {
+        var arr=new byte[10];
+        var root=new CheckedList(10,arr);
+        var subList=root.subList(0,10);
+        var seq=subList.subList(0,10);
+        Assertions.assertThrows(ConcurrentModificationException.class,()->
+        {
+          seq.removeIf((Predicate<? super Byte>)(v)->
+          {
+            var tmp=seq.getByte(seq.size()-1);
+            seq.add(tmp);
+            throw new IndexOutOfBoundsException();
+          });
+        });
+      }
+      {
+        int length=100;
+        BytePredicate pred=(val)->
+        {
+          return (EqualityUtil.isEqual(val,TypeConversionUtil.convertTobyte(0))
+            ||
+             EqualityUtil.isEqual(val,TypeConversionUtil.convertTobyte(2)));
+        };
+        var arr=new byte[length];
+        var root=new CheckedList(length,arr);
+        var subList=root.subList(0,length);
+        var seq=subList.subList(0,length);
+        for(int i=0;i<length;++i)
+        {
+          arr[i]=TypeConversionUtil.convertTobyte(i);
+        }
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),length-2);
+        for(int i=0,valIndex=0;i<length-2;++i,++valIndex)
+        {
+          if(i==0 || i==1)
+          {
+            ++valIndex;
+          }
+          Assertions.assertEquals(arr[i],TypeConversionUtil.convertTobyte(valIndex));
+        }
+        Assertions.assertTrue(root.modCount!=0);
+      } 
+      {
+        int length=100;
+        Predicate<? super Byte> pred=(val)->
+        {
+          return (EqualityUtil.isEqual(val,TypeConversionUtil.convertTobyte(0))
+            ||
+             EqualityUtil.isEqual(val,TypeConversionUtil.convertTobyte(2)));
+        };
+        var arr=new byte[length];
+        var root=new CheckedList(length,arr);
+        var subList=root.subList(0,length);
+        var seq=subList.subList(0,length);
+        for(int i=0;i<length;++i)
+        {
+          arr[i]=TypeConversionUtil.convertTobyte(i);
+        }
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),length-2);
+        for(int i=0,valIndex=0;i<length-2;++i,++valIndex)
+        {
+          if(i==0 || i==1)
+          {
+            ++valIndex;
+          }
+          Assertions.assertEquals(arr[i],TypeConversionUtil.convertTobyte(valIndex));
+        }
+        Assertions.assertTrue(root.modCount!=0);
+      } 
+      {
+        int length=100;
+        BytePredicate pred=(val)->
+        {
+          return (EqualityUtil.isEqual(val,TypeConversionUtil.convertTobyte(0))
+            ||
+             EqualityUtil.isEqual(val,TypeConversionUtil.convertTobyte(2)));
+        };
+        var arr=new byte[length];
+        var root=new CheckedList(length,arr);
+        var subList=root.subList(0,length);
+        var seq=subList.subList(0,length);
+        for(int i=0;i<length;++i)
+        {
+          arr[i]=TypeConversionUtil.convertTobyte(i);
+        }
+        Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf(CheckedCollectionTest.getModifyingPred(pred,()->
+        {
+          var tmp=seq.removeByteAt(seq.size()-1);
+          seq.add(tmp);
+        })));
+      } 
+      {
+        int length=100;
+        Predicate<? super Byte> pred=(val)->
+        {
+          return (EqualityUtil.isEqual(val,TypeConversionUtil.convertTobyte(0))
+            ||
+             EqualityUtil.isEqual(val,TypeConversionUtil.convertTobyte(2)));
+        };
+        var arr=new byte[length];
+        var root=new CheckedList(length,arr);
+        var subList=root.subList(0,length);
+        var seq=subList.subList(0,length);
+        for(int i=0;i<length;++i)
+        {
+          arr[i]=TypeConversionUtil.convertTobyte(i);
+        }
+        Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf(CheckedCollectionTest.getModifyingPred(pred,()->
+        {
+          var tmp=seq.removeByteAt(seq.size()-1);
+          seq.add(tmp);
+        })));
+      } 
+      {
+        int length=100;
+        BytePredicate pred=(val)->
+        {
+          return !EqualityUtil.isEqual(val,TypeConversionUtil.convertTobyte(1));
+        };
+        var arr=new byte[length];
+        var root=new CheckedList(length,arr);
+        var subList=root.subList(0,length);
+        var seq=subList.subList(0,length);
+        for(int i=0;i<length;++i)
+        {
+          arr[i]=TypeConversionUtil.convertTobyte(i);
+        }
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),1);
+        Assertions.assertEquals(arr[0],TypeConversionUtil.convertTobyte(1));
+        Assertions.assertTrue(root.modCount!=0);
+      } 
+      {
+        int length=100;
+        Predicate<? super Byte> pred=(val)->
+        {
+          return !EqualityUtil.isEqual(val,TypeConversionUtil.convertTobyte(1));
+        };
+        var arr=new byte[length];
+        var root=new CheckedList(length,arr);
+        var subList=root.subList(0,length);
+        var seq=subList.subList(0,length);
+        for(int i=0;i<length;++i)
+        {
+          arr[i]=TypeConversionUtil.convertTobyte(i);
+        }
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),1);
+        Assertions.assertEquals(arr[0],TypeConversionUtil.convertTobyte(1));
+        Assertions.assertTrue(root.modCount!=0);
+      } 
+      {
+        int length=100;
+        BytePredicate pred=(val)->
+        {
+          return !EqualityUtil.isEqual(val,TypeConversionUtil.convertTobyte(1));
+        };
+        var arr=new byte[length];
+        var root=new CheckedList(length,arr);
+        var subList=root.subList(0,length);
+        var seq=subList.subList(0,length);
+        for(int i=0;i<length;++i)
+        {
+          arr[i]=TypeConversionUtil.convertTobyte(i);
+        }
+        Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf(CheckedCollectionTest.getModifyingPred(pred,()->
+        {
+          var tmp=seq.removeByteAt(seq.size()-1);
+          seq.add(tmp);
+        })));
+      } 
+      {
+        int length=100;
+        Predicate<? super Byte> pred=(val)->
+        {
+          return !EqualityUtil.isEqual(val,TypeConversionUtil.convertTobyte(1));
+        };
+        var arr=new byte[length];
+        var root=new CheckedList(length,arr);
+        var subList=root.subList(0,length);
+        var seq=subList.subList(0,length);
+        for(int i=0;i<length;++i)
+        {
+          arr[i]=TypeConversionUtil.convertTobyte(i);
+        }
+        Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf(CheckedCollectionTest.getModifyingPred(pred,()->
+        {
+          var tmp=seq.removeByteAt(seq.size()-1);
+          seq.add(tmp);
+        })));
+      } 
+  }
+  /*
   @Test
   public void testRemoveIfModCheckArrSeqCheckedSubList()
   {
     var root=new CheckedList();
     var seq=root.subList(0,0);
-    for(int i=0;i<100;++i)
+    for(int i=0;i<1000;++i)
     {
       var val=TypeConversionUtil.convertTobyte(i);
       seq.add(val);
     }
+    Random rand=new Random(0);
+    for(var predicateGenerator:bytePredicates.values())
     {
-    }
-    {
-      var seqClone=(OmniList.OfByte)seq.clone();
-      BytePredicate removingPredicateReturnFalse=(val)->
+      for(int m=predicateGenerator.getMLo(),mHi=predicateGenerator.getMHi(),repsBound=predicateGenerator.getNumReps();m<=mHi;m=predicateGenerator.incrementM(m))
       {
-        seqClone.remove(0);
-        return false;
-      };
-      Assertions.assertThrows(ConcurrentModificationException.class,()->seqClone.removeIf(removingPredicateReturnFalse));
-    }
-    {
-      var seqClone=(OmniList.OfByte)seq.clone();
-      BytePredicate removingPredicateReturnFalse=(val)->
-      {
-        seqClone.remove(0);
-        return false;
-      };
-      Assertions.assertThrows(ConcurrentModificationException.class,()->seqClone.removeIf((Predicate<Byte>)removingPredicateReturnFalse::test));
-    }
-    {
-      var seqClone=(OmniList.OfByte)seq.clone();
-      BytePredicate removingPredicateReturnTrue=(val)->
-      {
-        seqClone.remove(0);
-        return true;
-      };
-      Assertions.assertThrows(ConcurrentModificationException.class,()->seqClone.removeIf(removingPredicateReturnTrue));
-    }
-    {
-      var seqClone=(OmniList.OfByte)seq.clone();
-      BytePredicate removingPredicateReturnTrue=(val)->
-      {
-        seqClone.remove(0);
-        return true;
-      };
-      Assertions.assertThrows(ConcurrentModificationException.class,()->seqClone.removeIf((Predicate<Byte>)removingPredicateReturnTrue::test));
-    }
-    {
-      var seqClone=(OmniList.OfByte)seq.clone();
-      BytePredicate addingPredicateReturnFalse=(val)->
-      {
-        seqClone.add(Byte.MIN_VALUE);
-        return false;
-      };
-      Assertions.assertThrows(ConcurrentModificationException.class,()->seqClone.removeIf(addingPredicateReturnFalse));
-    }
-    {
-      var seqClone=(OmniList.OfByte)seq.clone();
-      BytePredicate addingPredicateReturnFalse=(val)->
-      {
-        seqClone.add(Byte.MIN_VALUE);
-        return false;
-      };
-      Assertions.assertThrows(ConcurrentModificationException.class,()->seqClone.removeIf((Predicate<Byte>)addingPredicateReturnFalse::test));
-    }
-    {
-      var seqClone=(OmniList.OfByte)seq.clone();
-      BytePredicate addingPredicateReturnTrue=(val)->
-      {
-        seqClone.add(Byte.MIN_VALUE);
-        return true;
-      };
-      Assertions.assertThrows(ConcurrentModificationException.class,()->seqClone.removeIf(addingPredicateReturnTrue));
-    }
-    {
-      var seqClone=(OmniList.OfByte)seq.clone();
-      BytePredicate addingPredicateReturnTrue=(val)->
-      {
-        seqClone.add(Byte.MIN_VALUE);
-        return true;
-      };
-      Assertions.assertThrows(ConcurrentModificationException.class,()->seqClone.removeIf((Predicate<Byte>)addingPredicateReturnTrue::test));
+        for(int reps=0;reps<repsBound;++reps)
+        {
+          {
+            var seqClone=(OmniList.OfByte)seq.clone();
+            var pred=CheckedCollectionTest.getModifyingPred(predicateGenerator.getPred(rand,m),()->
+            {
+              if(!seqClone.isEmpty())
+              {
+                seqClone.remove(0);
+              }
+            });
+            Assertions.assertThrows(ConcurrentModificationException.class,()->seqClone.removeIf(pred));
+          }
+          {
+            var seqClone=(OmniList.OfByte)seq.clone();
+            var pred=CheckedCollectionTest.getModifyingPred(predicateGenerator.getPred(rand,m),()->
+            {
+              seqClone.add(Byte.MIN_VALUE);
+            });
+            Assertions.assertThrows(ConcurrentModificationException.class,()->seqClone.removeIf(pred));
+          }
+          {
+            var seqClone=(OmniList.OfByte)seq.clone();
+            var pred=CheckedCollectionTest.getModifyingPred(predicateGenerator.getPred(rand,m),()->
+            {
+              if(!seqClone.isEmpty())
+              {
+                seqClone.remove(0);
+              }
+            });
+            Assertions.assertThrows(ConcurrentModificationException.class,()->seqClone.removeIf((Predicate<Byte>)pred::test));
+          }
+          {
+            var seqClone=(OmniList.OfByte)seq.clone();
+            var pred=CheckedCollectionTest.getModifyingPred(predicateGenerator.getPred(rand,m),()->
+            {
+              seqClone.add(Byte.MIN_VALUE);
+            });
+            Assertions.assertThrows(ConcurrentModificationException.class,()->seqClone.removeIf((Predicate<Byte>)pred::test));
+          }
+        }
+      }
     }
   }
-  @Test
-  public void testRemoveIfReturnFalseArrSeqCheckedSubList()
-  {
-    BytePredicate filter=(val)->false;
-    var root=new CheckedList();
-    var seq=root.subList(0,0);
-    for(int i=0;i<100;++i)
-    {
-      var val=TypeConversionUtil.convertTobyte(i);
-      seq.add(val);
-    }
-    {
-      Assertions.assertFalse(seq.removeIf(filter));
-      Assertions.assertFalse(seq.removeIf((Predicate<Byte>)filter::test));
-    }
-  }
+  */
 }

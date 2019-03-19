@@ -578,7 +578,14 @@ public abstract class DoubleArrSeq implements OmniCollection.OfDouble
     }
     return OmniArray.OfDouble.DEFAULT_BOXED_ARR;
   }
-  abstract boolean uncheckedRemoveIf(int size,DoublePredicate filter);
+  boolean uncheckedRemoveIf(int size,DoublePredicate filter)
+  {
+    if(size!=(size-=uncheckedRemoveIfImpl(this.arr,0,size,filter))){
+      this.size=size;
+      return true;
+    }
+    return false;
+  }
   @Override
   public boolean removeIf(DoublePredicate filter)
   {
@@ -1053,15 +1060,6 @@ public abstract class DoubleArrSeq implements OmniCollection.OfDouble
         return (Double)(arr[size-1]);
       }
       return null;
-    }
-    @Override
-    boolean uncheckedRemoveIf(int size,DoublePredicate filter)
-    {
-      if(size!=(size-=uncheckedRemoveIfImpl(this.arr,0,size,filter))){
-        this.size=size;
-        return true;
-      }
-      return false;
     }
   }
   public
@@ -1599,15 +1597,6 @@ public abstract class DoubleArrSeq implements OmniCollection.OfDouble
       final var ret=(double)(arr=this.arr)[index];
       OmniArray.OfDouble.removeIndexAndPullDown(arr,index,--size);
       return ret;
-    }
-    @Override
-    boolean uncheckedRemoveIf(int size,DoublePredicate filter)
-    {
-      if(size!=(size-=uncheckedRemoveIfImpl(this.arr,0,size,filter))){
-        this.size=size;
-        return true;
-      }
-      return false;
     }
     @Override
     public void replaceAll(DoubleUnaryOperator operator)
@@ -3121,17 +3110,28 @@ public abstract class DoubleArrSeq implements OmniCollection.OfDouble
     @Override
     boolean uncheckedRemoveIf(int size,DoublePredicate filter)
     {
-      final int modCount;
-      if(size!=(size-=uncheckedRemoveIfImpl(this.arr
-        ,0,size,filter,new CheckedCollection.AbstractModCountChecker(modCount=this.modCount){
-          @Override protected int getActualModCount(){
-          return CheckedStack.this.modCount;
-          }
-        }))
-        ){
-        this.modCount=modCount+1;
-        this.size=size;
-        return true;
+      final int modCount=this.modCount;
+      try
+      {
+        if(size!=(size-=uncheckedRemoveIfImpl(this.arr
+          ,0,size,filter,new CheckedCollection.AbstractModCountChecker(modCount){
+            @Override protected int getActualModCount(){
+            return CheckedStack.this.modCount;
+            }
+          }))
+          ){
+          this.modCount=modCount+1;
+          this.size=size;
+          return true;
+        }
+      }
+      catch(ConcurrentModificationException e)
+      {
+        throw e;
+      }
+      catch(RuntimeException e)
+      {
+        throw CheckedCollection.checkModCount(modCount,this.modCount,e);
       }
       CheckedCollection.checkModCount(modCount,this.modCount);
       return false;
@@ -3526,17 +3526,28 @@ public abstract class DoubleArrSeq implements OmniCollection.OfDouble
     @Override
     boolean uncheckedRemoveIf(int size,DoublePredicate filter)
     {
-      final int modCount;
-      if(size!=(size-=uncheckedRemoveIfImpl(this.arr
-        ,0,size,filter,new CheckedCollection.AbstractModCountChecker(modCount=this.modCount){
-          @Override protected int getActualModCount(){
-          return CheckedList.this.modCount;
-          }
-        }))
-        ){
-        this.modCount=modCount+1;
-        this.size=size;
-        return true;
+      final int modCount=this.modCount;
+      try
+      {
+        if(size!=(size-=uncheckedRemoveIfImpl(this.arr
+          ,0,size,filter,new CheckedCollection.AbstractModCountChecker(modCount){
+            @Override protected int getActualModCount(){
+            return CheckedList.this.modCount;
+            }
+          }))
+          ){
+          this.modCount=modCount+1;
+          this.size=size;
+          return true;
+        }
+      }
+      catch(ConcurrentModificationException e)
+      {
+        throw e;
+      }
+      catch(RuntimeException e)
+      {
+        throw CheckedCollection.checkModCount(modCount,this.modCount,e);
       }
       CheckedCollection.checkModCount(modCount,this.modCount);
       return false;

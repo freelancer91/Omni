@@ -6,6 +6,16 @@ public enum byteArrayBuilder
   Randomized
   {
     @Override
+    public int getNumRemoveIfReps(int arrLength)
+    {
+      return 10;
+    }
+    @Override
+    public int getNumSortReps(int arrLength)
+    {
+      return 10;
+    }
+    @Override
     public boolean isRandomized()
     {
       return true;
@@ -512,6 +522,16 @@ public enum byteArrayBuilder
   Shuffle
   {
     @Override
+    public int getNumRemoveIfReps(int arrLength)
+    {
+      return 10;
+    }
+    @Override
+    public int getNumSortReps(int arrLength)
+    {
+      return 10;
+    }
+    @Override
     public boolean isRandomized()
     {
       return true;
@@ -548,12 +568,12 @@ public enum byteArrayBuilder
   {
     return 1;
   }
-  public int getNumReps(int arrLength)
+  public int getNumSortReps(int arrLength)
   {
-    if(isRandomized())
-    {
-      return 10;
-    }
+    return 1;
+  }
+  public int getNumRemoveIfReps(int arrLength)
+  {
     return 1;
   }
   public int incrementM(int m)
@@ -629,7 +649,7 @@ public enum byteArrayBuilder
   public void addArrays(long randSeed,int arrLength,Collection<byte[]> arrays)
   {
     Random rand=new Random(randSeed);
-    for(int m=getMLo(),mHi=getMHi(arrLength),numReps=getNumReps(arrLength);m<=mHi;m=incrementM(m))
+    for(int m=getMLo(),mHi=getMHi(arrLength),numReps=getNumSortReps(arrLength);m<=mHi;m=incrementM(m))
     {
       for(int i=0;i<numReps;++i)
       {

@@ -158,7 +158,7 @@ private static class TestData
   private static void initializeTestData(CUSTOMARRTYPEArrayBuilder builder,long randSeed,int arrLength,ArrayList<TestData> testDatas)
   {
     Random rand=new Random(randSeed);
-    for(int m=getMLo(builder),mHi=getMHi(arrLength,builder),numReps=getNumReps(arrLength,builder);m<=mHi;m=incrementM(m,builder))
+    for(int m=builder.getMLo(),mHi=builder.getMHi(arrLength),numReps=builder.getNumSortReps(arrLength);m<=mHi;m=builder.incrementM(m))
     {
       for(int i=0;i<numReps;++i)
       {
@@ -168,105 +168,6 @@ private static class TestData
           testDatas.add(td);
         }
       }
-    }
-  }
-  private static int getMLo(CUSTOMARRTYPEArrayBuilder builder)
-  {
-    switch(builder)
-    {
-    case AllEquals:
-      return 0;
-#IFNOT OfBoolean
-    case MergeAscending:
-    case MergeDescending:
-      return 65;
-#ENDIF
-    default:
-      return 1;
-    }
-  }
-  private static int getMHi(int arrLength,CUSTOMARRTYPEArrayBuilder builder)
-  {
-    switch(builder)
-    {
-#IFNOT OfBoolean
-    case Ascending:
-    case Descending:
-    case Saw:
-    case Repeated:
-    case Duplicated:
-    case OrganPipes:
-    case Stagger:
-    case Plateau:
-      return (arrLength<<1)-1;
-    case AllEquals:
-      return 0;
-    case MergeAscending:
-    case MergeDescending:
-      return 69;
-    case SortedRepeated:
-    case SortedOrganPipes:
-      return Math.min(arrLength,7);
-#ENDIF
-    default:
-      return 1;
-    }
-  }
-  private static int getNumReps(int arrLength,CUSTOMARRTYPEArrayBuilder builder)
-  {
-    switch(builder)
-    {
-    case Randomized:
-#IF OfChar,OfShort
-      if(arrLength<=3201 && arrLength>=287)
-      {
-        return 40;
-      }
-#ENDIF
-      return 10;
-#IFNOT OfBoolean
-    case Duplicated:
-  #IF OfChar,OfShort
-      if(arrLength<=3201 && arrLength>=287)
-      {
-        return 40;
-      }
-  #ENDIF
-      return 1;
-    case Shuffle:
-  #IF OfChar,OfShort
-      if(arrLength<=3201 && arrLength>=287)
-      {
-        return 40;
-      }
-  #ENDIF
-      return 10;
-  #IF OfFloat,OfDouble
-    case WithNaNsAndZeros:
-      return 20;
-  #ENDIF
-#ENDIF
-    default:
-      return 1;
-    }
-  }
-  private static int incrementM(int m,CUSTOMARRTYPEArrayBuilder builder)
-  {
-    switch(builder)
-    {
-#IFNOT OfBoolean
-    case Ascending:
-    case Descending:
-    case Saw:
-    case Repeated:
-    case Duplicated:
-    case OrganPipes:
-    case Stagger:
-    case Plateau:
-      return m<<1;
-#ENDIF
-    default:
-      return m+1;
     }
   }
 }

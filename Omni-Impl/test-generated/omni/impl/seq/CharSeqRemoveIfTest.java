@@ -2,410 +2,1662 @@ package omni.impl.seq;
 import java.util.function.Predicate;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import java.util.ArrayList;
+import omni.api.OmniIterator;
 import omni.impl.seq.CharArrSeq.UncheckedList;
 import omni.impl.seq.CharArrSeq.CheckedList;
 import omni.impl.seq.CharArrSeq.UncheckedStack;
 import omni.impl.seq.CharArrSeq.CheckedStack;
 import java.util.ConcurrentModificationException;
+import omni.impl.CheckedCollectionTest;
 import omni.util.TypeConversionUtil;
 import omni.api.OmniList;
 import omni.api.OmniStack;
+import omni.util.EqualityUtil;
+import java.util.Random;
+import omni.util.charPredicates;
+import omni.util.charArrayBuilder;
 import omni.function.CharPredicate;
+@SuppressWarnings({"rawtypes","unchecked"}) 
 public class CharSeqRemoveIfTest
 {
   @Test
   public void testEmptyRemoveIfArrSeqUncheckedStack()
   {
-    CharPredicate filter=(val)->true;
+    CharPredicate filter=charPredicates.MarkAll.getPred(null,0);
     var seq=new UncheckedStack();
     Assertions.assertFalse(seq.removeIf(filter));
     Assertions.assertFalse(seq.removeIf((Predicate<Character>)filter::test));
   }
   @Test
-  public void testRemoveIfReturnFalseArrSeqUncheckedStack()
+  public void testRemoveIfUncheckedStack()
   {
-    CharPredicate filter=(val)->false;
-    var seq=new UncheckedStack();
-    for(int i=0;i<100;++i)
-    {
-      var val=TypeConversionUtil.convertTochar(i);
-      seq.add(val);
-    }
-    {
-      Assertions.assertFalse(seq.removeIf(filter));
-      Assertions.assertFalse(seq.removeIf((Predicate<Character>)filter::test));
-    }
+      {
+        var arr=new char[10];
+        var seq=new UncheckedStack(10,arr);
+        CharPredicate pred=val->false;
+        Assertions.assertFalse(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),10);
+      }
+      {
+        var arr=new char[10];
+        var seq=new UncheckedStack(10,arr);
+        Predicate<? super Character> pred=val->false;
+        Assertions.assertFalse(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),10);
+      }
+      {
+        var arr=new char[10];
+        var seq=new UncheckedStack(10,arr);
+        CharPredicate pred=val->true;
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertTrue(seq.isEmpty());
+      }
+      {
+        var arr=new char[10];
+        var seq=new UncheckedStack(10,arr);
+        Predicate<? super Character> pred=val->true;
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertTrue(seq.isEmpty());
+      }
+      {
+        int length=100;
+        CharPredicate pred=(val)->
+        {
+          return (EqualityUtil.isEqual(val,TypeConversionUtil.convertTochar(0))
+            ||
+             EqualityUtil.isEqual(val,TypeConversionUtil.convertTochar(2)));
+        };
+        var arr=new char[length];
+        var seq=new UncheckedStack(length,arr);
+        for(int i=0;i<length;++i)
+        {
+          arr[i]=TypeConversionUtil.convertTochar(i);
+        }
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),length-2);
+        for(int i=0,valIndex=0;i<length-2;++i,++valIndex)
+        {
+          if(i==0 || i==1)
+          {
+            ++valIndex;
+          }
+          Assertions.assertEquals(arr[i],TypeConversionUtil.convertTochar(valIndex));
+        }
+      } 
+      {
+        int length=100;
+        Predicate<? super Character> pred=(val)->
+        {
+          return (EqualityUtil.isEqual(val,TypeConversionUtil.convertTochar(0))
+            ||
+             EqualityUtil.isEqual(val,TypeConversionUtil.convertTochar(2)));
+        };
+        var arr=new char[length];
+        var seq=new UncheckedStack(length,arr);
+        for(int i=0;i<length;++i)
+        {
+          arr[i]=TypeConversionUtil.convertTochar(i);
+        }
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),length-2);
+        for(int i=0,valIndex=0;i<length-2;++i,++valIndex)
+        {
+          if(i==0 || i==1)
+          {
+            ++valIndex;
+          }
+          Assertions.assertEquals(arr[i],TypeConversionUtil.convertTochar(valIndex));
+        }
+      } 
+      {
+        int length=100;
+        CharPredicate pred=(val)->
+        {
+          return !EqualityUtil.isEqual(val,TypeConversionUtil.convertTochar(1));
+        };
+        var arr=new char[length];
+        var seq=new UncheckedStack(length,arr);
+        for(int i=0;i<length;++i)
+        {
+          arr[i]=TypeConversionUtil.convertTochar(i);
+        }
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),1);
+        Assertions.assertEquals(arr[0],TypeConversionUtil.convertTochar(1));
+      } 
+      {
+        int length=100;
+        Predicate<? super Character> pred=(val)->
+        {
+          return !EqualityUtil.isEqual(val,TypeConversionUtil.convertTochar(1));
+        };
+        var arr=new char[length];
+        var seq=new UncheckedStack(length,arr);
+        for(int i=0;i<length;++i)
+        {
+          arr[i]=TypeConversionUtil.convertTochar(i);
+        }
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),1);
+        Assertions.assertEquals(arr[0],TypeConversionUtil.convertTochar(1));
+      } 
   }
   @Test
   public void testEmptyRemoveIfArrSeqUncheckedList()
   {
-    CharPredicate filter=(val)->true;
+    CharPredicate filter=charPredicates.MarkAll.getPred(null,0);
     var seq=new UncheckedList();
     Assertions.assertFalse(seq.removeIf(filter));
     Assertions.assertFalse(seq.removeIf((Predicate<Character>)filter::test));
   }
   @Test
-  public void testRemoveIfReturnFalseArrSeqUncheckedList()
+  public void testRemoveIfUncheckedList()
   {
-    CharPredicate filter=(val)->false;
-    var seq=new UncheckedList();
-    for(int i=0;i<100;++i)
-    {
-      var val=TypeConversionUtil.convertTochar(i);
-      seq.add(val);
-    }
-    {
-      Assertions.assertFalse(seq.removeIf(filter));
-      Assertions.assertFalse(seq.removeIf((Predicate<Character>)filter::test));
-    }
+      {
+        var arr=new char[10];
+        var seq=new UncheckedList(10,arr);
+        CharPredicate pred=val->false;
+        Assertions.assertFalse(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),10);
+      }
+      {
+        var arr=new char[10];
+        var seq=new UncheckedList(10,arr);
+        Predicate<? super Character> pred=val->false;
+        Assertions.assertFalse(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),10);
+      }
+      {
+        var arr=new char[10];
+        var seq=new UncheckedList(10,arr);
+        CharPredicate pred=val->true;
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertTrue(seq.isEmpty());
+      }
+      {
+        var arr=new char[10];
+        var seq=new UncheckedList(10,arr);
+        Predicate<? super Character> pred=val->true;
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertTrue(seq.isEmpty());
+      }
+      {
+        int length=100;
+        CharPredicate pred=(val)->
+        {
+          return (EqualityUtil.isEqual(val,TypeConversionUtil.convertTochar(0))
+            ||
+             EqualityUtil.isEqual(val,TypeConversionUtil.convertTochar(2)));
+        };
+        var arr=new char[length];
+        var seq=new UncheckedList(length,arr);
+        for(int i=0;i<length;++i)
+        {
+          arr[i]=TypeConversionUtil.convertTochar(i);
+        }
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),length-2);
+        for(int i=0,valIndex=0;i<length-2;++i,++valIndex)
+        {
+          if(i==0 || i==1)
+          {
+            ++valIndex;
+          }
+          Assertions.assertEquals(arr[i],TypeConversionUtil.convertTochar(valIndex));
+        }
+      } 
+      {
+        int length=100;
+        Predicate<? super Character> pred=(val)->
+        {
+          return (EqualityUtil.isEqual(val,TypeConversionUtil.convertTochar(0))
+            ||
+             EqualityUtil.isEqual(val,TypeConversionUtil.convertTochar(2)));
+        };
+        var arr=new char[length];
+        var seq=new UncheckedList(length,arr);
+        for(int i=0;i<length;++i)
+        {
+          arr[i]=TypeConversionUtil.convertTochar(i);
+        }
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),length-2);
+        for(int i=0,valIndex=0;i<length-2;++i,++valIndex)
+        {
+          if(i==0 || i==1)
+          {
+            ++valIndex;
+          }
+          Assertions.assertEquals(arr[i],TypeConversionUtil.convertTochar(valIndex));
+        }
+      } 
+      {
+        int length=100;
+        CharPredicate pred=(val)->
+        {
+          return !EqualityUtil.isEqual(val,TypeConversionUtil.convertTochar(1));
+        };
+        var arr=new char[length];
+        var seq=new UncheckedList(length,arr);
+        for(int i=0;i<length;++i)
+        {
+          arr[i]=TypeConversionUtil.convertTochar(i);
+        }
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),1);
+        Assertions.assertEquals(arr[0],TypeConversionUtil.convertTochar(1));
+      } 
+      {
+        int length=100;
+        Predicate<? super Character> pred=(val)->
+        {
+          return !EqualityUtil.isEqual(val,TypeConversionUtil.convertTochar(1));
+        };
+        var arr=new char[length];
+        var seq=new UncheckedList(length,arr);
+        for(int i=0;i<length;++i)
+        {
+          arr[i]=TypeConversionUtil.convertTochar(i);
+        }
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),1);
+        Assertions.assertEquals(arr[0],TypeConversionUtil.convertTochar(1));
+      } 
   }
   @Test
   public void testEmptyRemoveIfArrSeqCheckedStack()
   {
-    CharPredicate filter=(val)->true;
+    CharPredicate filter=charPredicates.MarkAll.getPred(null,0);
     var seq=new CheckedStack();
     Assertions.assertFalse(seq.removeIf(filter));
     Assertions.assertFalse(seq.removeIf((Predicate<Character>)filter::test));
   }
+  @Test
+  public void testRemoveIfCheckedStack()
+  {
+      {
+        var arr=new char[10];
+        var seq=new CheckedStack(10,arr);
+        CharPredicate pred=val->false;
+        Assertions.assertFalse(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),10);
+        Assertions.assertEquals(0,seq.modCount);
+      }
+      {
+        var arr=new char[10];
+        var seq=new CheckedStack(10,arr);
+        Predicate<? super Character> pred=val->false;
+        Assertions.assertFalse(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),10);
+        Assertions.assertEquals(0,seq.modCount);
+      }
+      {
+        var arr=new char[10];
+        var seq=new CheckedStack(10,arr);
+        CharPredicate pred=val->false;
+        Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf(CheckedCollectionTest.getModifyingPred(pred,()->
+        {
+          var tmp=seq.popChar();
+          seq.push(tmp);
+        })));
+      }
+      {
+        var arr=new char[10];
+        var seq=new CheckedStack(10,arr);
+        Predicate<? super Character> pred=val->false;
+        Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf(CheckedCollectionTest.getModifyingPred(pred,()->
+        {
+          var tmp=seq.popChar();
+          seq.push(tmp);
+        })));
+      }
+      {
+        var arr=new char[10];
+        var seq=new CheckedStack(10,arr);
+        Assertions.assertThrows(IndexOutOfBoundsException.class,()->
+        {
+          seq.removeIf((CharPredicate)(v)->
+          {
+            throw new IndexOutOfBoundsException();
+          });
+        });
+      }
+      {
+        var arr=new char[10];
+        var seq=new CheckedStack(10,arr);
+        Assertions.assertThrows(IndexOutOfBoundsException.class,()->
+        {
+          seq.removeIf((Predicate<? super Character>)(v)->
+          {
+            throw new IndexOutOfBoundsException();
+          });
+        });
+      }
+      {
+        var arr=new char[10];
+        var seq=new CheckedStack(10,arr);
+        Assertions.assertThrows(ConcurrentModificationException.class,()->
+        {
+          seq.removeIf((CharPredicate)(v)->
+          {
+            var tmp=seq.popChar();
+            seq.push(tmp);
+            throw new IndexOutOfBoundsException();
+          });
+        });
+      }
+      {
+        var arr=new char[10];
+        var seq=new CheckedStack(10,arr);
+        Assertions.assertThrows(ConcurrentModificationException.class,()->
+        {
+          seq.removeIf((Predicate<? super Character>)(v)->
+          {
+            var tmp=seq.popChar();
+            seq.push(tmp);
+            throw new IndexOutOfBoundsException();
+          });
+        });
+      }
+      {
+        var arr=new char[10];
+        var seq=new CheckedStack(10,arr);
+        CharPredicate pred=val->true;
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertTrue(seq.isEmpty());
+        Assertions.assertTrue(seq.modCount!=0);
+      }
+      {
+        var arr=new char[10];
+        var seq=new CheckedStack(10,arr);
+        Predicate<? super Character> pred=val->true;
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertTrue(seq.isEmpty());
+        Assertions.assertTrue(seq.modCount!=0);
+      }
+      {
+        var arr=new char[10];
+        var seq=new CheckedStack(10,arr);
+        CharPredicate pred=val->true;
+        Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf(CheckedCollectionTest.getModifyingPred(pred,()->
+        {
+          var tmp=seq.popChar();
+          seq.push(tmp);
+        })));
+      }
+      {
+        var arr=new char[10];
+        var seq=new CheckedStack(10,arr);
+        Predicate<? super Character> pred=val->true;
+        Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf(CheckedCollectionTest.getModifyingPred(pred,()->
+        {
+          var tmp=seq.popChar();
+          seq.push(tmp);
+        })));
+      }
+      {
+        var arr=new char[10];
+        var seq=new CheckedStack(10,arr);
+        Assertions.assertThrows(IndexOutOfBoundsException.class,()->
+        {
+          seq.removeIf((CharPredicate)(v)->
+          {
+            throw new IndexOutOfBoundsException();
+          });
+        });
+      }
+      {
+        var arr=new char[10];
+        var seq=new CheckedStack(10,arr);
+        Assertions.assertThrows(IndexOutOfBoundsException.class,()->
+        {
+          seq.removeIf((Predicate<? super Character>)(v)->
+          {
+            throw new IndexOutOfBoundsException();
+          });
+        });
+      }
+      {
+        var arr=new char[10];
+        var seq=new CheckedStack(10,arr);
+        Assertions.assertThrows(ConcurrentModificationException.class,()->
+        {
+          seq.removeIf((CharPredicate)(v)->
+          {
+            var tmp=seq.popChar();
+            seq.push(tmp);
+            throw new IndexOutOfBoundsException();
+          });
+        });
+      }
+      {
+        var arr=new char[10];
+        var seq=new CheckedStack(10,arr);
+        Assertions.assertThrows(ConcurrentModificationException.class,()->
+        {
+          seq.removeIf((Predicate<? super Character>)(v)->
+          {
+            var tmp=seq.popChar();
+            seq.push(tmp);
+            throw new IndexOutOfBoundsException();
+          });
+        });
+      }
+      {
+        int length=100;
+        CharPredicate pred=(val)->
+        {
+          return (EqualityUtil.isEqual(val,TypeConversionUtil.convertTochar(0))
+            ||
+             EqualityUtil.isEqual(val,TypeConversionUtil.convertTochar(2)));
+        };
+        var arr=new char[length];
+        var seq=new CheckedStack(length,arr);
+        for(int i=0;i<length;++i)
+        {
+          arr[i]=TypeConversionUtil.convertTochar(i);
+        }
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),length-2);
+        for(int i=0,valIndex=0;i<length-2;++i,++valIndex)
+        {
+          if(i==0 || i==1)
+          {
+            ++valIndex;
+          }
+          Assertions.assertEquals(arr[i],TypeConversionUtil.convertTochar(valIndex));
+        }
+        Assertions.assertTrue(seq.modCount!=0);
+      } 
+      {
+        int length=100;
+        Predicate<? super Character> pred=(val)->
+        {
+          return (EqualityUtil.isEqual(val,TypeConversionUtil.convertTochar(0))
+            ||
+             EqualityUtil.isEqual(val,TypeConversionUtil.convertTochar(2)));
+        };
+        var arr=new char[length];
+        var seq=new CheckedStack(length,arr);
+        for(int i=0;i<length;++i)
+        {
+          arr[i]=TypeConversionUtil.convertTochar(i);
+        }
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),length-2);
+        for(int i=0,valIndex=0;i<length-2;++i,++valIndex)
+        {
+          if(i==0 || i==1)
+          {
+            ++valIndex;
+          }
+          Assertions.assertEquals(arr[i],TypeConversionUtil.convertTochar(valIndex));
+        }
+        Assertions.assertTrue(seq.modCount!=0);
+      } 
+      {
+        int length=100;
+        CharPredicate pred=(val)->
+        {
+          return (EqualityUtil.isEqual(val,TypeConversionUtil.convertTochar(0))
+            ||
+             EqualityUtil.isEqual(val,TypeConversionUtil.convertTochar(2)));
+        };
+        var arr=new char[length];
+        var seq=new CheckedStack(length,arr);
+        for(int i=0;i<length;++i)
+        {
+          arr[i]=TypeConversionUtil.convertTochar(i);
+        }
+        Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf(CheckedCollectionTest.getModifyingPred(pred,()->
+        {
+          var tmp=seq.popChar();
+          seq.push(tmp);
+        })));
+      } 
+      {
+        int length=100;
+        Predicate<? super Character> pred=(val)->
+        {
+          return (EqualityUtil.isEqual(val,TypeConversionUtil.convertTochar(0))
+            ||
+             EqualityUtil.isEqual(val,TypeConversionUtil.convertTochar(2)));
+        };
+        var arr=new char[length];
+        var seq=new CheckedStack(length,arr);
+        for(int i=0;i<length;++i)
+        {
+          arr[i]=TypeConversionUtil.convertTochar(i);
+        }
+        Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf(CheckedCollectionTest.getModifyingPred(pred,()->
+        {
+          var tmp=seq.popChar();
+          seq.push(tmp);
+        })));
+      } 
+      {
+        int length=100;
+        CharPredicate pred=(val)->
+        {
+          return !EqualityUtil.isEqual(val,TypeConversionUtil.convertTochar(1));
+        };
+        var arr=new char[length];
+        var seq=new CheckedStack(length,arr);
+        for(int i=0;i<length;++i)
+        {
+          arr[i]=TypeConversionUtil.convertTochar(i);
+        }
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),1);
+        Assertions.assertEquals(arr[0],TypeConversionUtil.convertTochar(1));
+        Assertions.assertTrue(seq.modCount!=0);
+      } 
+      {
+        int length=100;
+        Predicate<? super Character> pred=(val)->
+        {
+          return !EqualityUtil.isEqual(val,TypeConversionUtil.convertTochar(1));
+        };
+        var arr=new char[length];
+        var seq=new CheckedStack(length,arr);
+        for(int i=0;i<length;++i)
+        {
+          arr[i]=TypeConversionUtil.convertTochar(i);
+        }
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),1);
+        Assertions.assertEquals(arr[0],TypeConversionUtil.convertTochar(1));
+        Assertions.assertTrue(seq.modCount!=0);
+      } 
+      {
+        int length=100;
+        CharPredicate pred=(val)->
+        {
+          return !EqualityUtil.isEqual(val,TypeConversionUtil.convertTochar(1));
+        };
+        var arr=new char[length];
+        var seq=new CheckedStack(length,arr);
+        for(int i=0;i<length;++i)
+        {
+          arr[i]=TypeConversionUtil.convertTochar(i);
+        }
+        Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf(CheckedCollectionTest.getModifyingPred(pred,()->
+        {
+          var tmp=seq.popChar();
+          seq.push(tmp);
+        })));
+      } 
+      {
+        int length=100;
+        Predicate<? super Character> pred=(val)->
+        {
+          return !EqualityUtil.isEqual(val,TypeConversionUtil.convertTochar(1));
+        };
+        var arr=new char[length];
+        var seq=new CheckedStack(length,arr);
+        for(int i=0;i<length;++i)
+        {
+          arr[i]=TypeConversionUtil.convertTochar(i);
+        }
+        Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf(CheckedCollectionTest.getModifyingPred(pred,()->
+        {
+          var tmp=seq.popChar();
+          seq.push(tmp);
+        })));
+      } 
+  }
+  /*
   @Test
   public void testRemoveIfModCheckArrSeqCheckedStack()
   {
     var seq=new CheckedStack();
-    for(int i=0;i<100;++i)
+    for(int i=0;i<1000;++i)
     {
       var val=TypeConversionUtil.convertTochar(i);
       seq.add(val);
     }
+    Random rand=new Random(0);
+    for(var predicateGenerator:charPredicates.values())
     {
-    }
-    {
-      var seqClone=(OmniStack.OfChar)seq.clone();
-      CharPredicate removingPredicateReturnFalse=(val)->
+      for(int m=predicateGenerator.getMLo(),mHi=predicateGenerator.getMHi(),repsBound=predicateGenerator.getNumReps();m<=mHi;m=predicateGenerator.incrementM(m))
       {
-        seqClone.pop();
-        return false;
-      };
-      Assertions.assertThrows(ConcurrentModificationException.class,()->seqClone.removeIf(removingPredicateReturnFalse));
-    }
-    {
-      var seqClone=(OmniStack.OfChar)seq.clone();
-      CharPredicate removingPredicateReturnFalse=(val)->
-      {
-        seqClone.pop();
-        return false;
-      };
-      Assertions.assertThrows(ConcurrentModificationException.class,()->seqClone.removeIf((Predicate<Character>)removingPredicateReturnFalse::test));
-    }
-    {
-      var seqClone=(OmniStack.OfChar)seq.clone();
-      CharPredicate removingPredicateReturnTrue=(val)->
-      {
-        seqClone.pop();
-        return true;
-      };
-      Assertions.assertThrows(ConcurrentModificationException.class,()->seqClone.removeIf(removingPredicateReturnTrue));
-    }
-    {
-      var seqClone=(OmniStack.OfChar)seq.clone();
-      CharPredicate removingPredicateReturnTrue=(val)->
-      {
-        seqClone.pop();
-        return true;
-      };
-      Assertions.assertThrows(ConcurrentModificationException.class,()->seqClone.removeIf((Predicate<Character>)removingPredicateReturnTrue::test));
-    }
-    {
-      var seqClone=(OmniStack.OfChar)seq.clone();
-      CharPredicate addingPredicateReturnFalse=(val)->
-      {
-        seqClone.add(Character.MIN_VALUE);
-        return false;
-      };
-      Assertions.assertThrows(ConcurrentModificationException.class,()->seqClone.removeIf(addingPredicateReturnFalse));
-    }
-    {
-      var seqClone=(OmniStack.OfChar)seq.clone();
-      CharPredicate addingPredicateReturnFalse=(val)->
-      {
-        seqClone.add(Character.MIN_VALUE);
-        return false;
-      };
-      Assertions.assertThrows(ConcurrentModificationException.class,()->seqClone.removeIf((Predicate<Character>)addingPredicateReturnFalse::test));
-    }
-    {
-      var seqClone=(OmniStack.OfChar)seq.clone();
-      CharPredicate addingPredicateReturnTrue=(val)->
-      {
-        seqClone.add(Character.MIN_VALUE);
-        return true;
-      };
-      Assertions.assertThrows(ConcurrentModificationException.class,()->seqClone.removeIf(addingPredicateReturnTrue));
-    }
-    {
-      var seqClone=(OmniStack.OfChar)seq.clone();
-      CharPredicate addingPredicateReturnTrue=(val)->
-      {
-        seqClone.add(Character.MIN_VALUE);
-        return true;
-      };
-      Assertions.assertThrows(ConcurrentModificationException.class,()->seqClone.removeIf((Predicate<Character>)addingPredicateReturnTrue::test));
+        for(int reps=0;reps<repsBound;++reps)
+        {
+          {
+            var seqClone=(OmniStack.OfChar)seq.clone();
+            var pred=CheckedCollectionTest.getModifyingPred(predicateGenerator.getPred(rand,m),()->
+            {
+              if(!seqClone.isEmpty())
+              {
+                seqClone.pop();
+              }
+            });
+            Assertions.assertThrows(ConcurrentModificationException.class,()->seqClone.removeIf(pred));
+          }
+          {
+            var seqClone=(OmniStack.OfChar)seq.clone();
+            var pred=CheckedCollectionTest.getModifyingPred(predicateGenerator.getPred(rand,m),()->
+            {
+              seqClone.add(Character.MIN_VALUE);
+            });
+            Assertions.assertThrows(ConcurrentModificationException.class,()->seqClone.removeIf(pred));
+          }
+          {
+            var seqClone=(OmniStack.OfChar)seq.clone();
+            var pred=CheckedCollectionTest.getModifyingPred(predicateGenerator.getPred(rand,m),()->
+            {
+              if(!seqClone.isEmpty())
+              {
+                seqClone.pop();
+              }
+            });
+            Assertions.assertThrows(ConcurrentModificationException.class,()->seqClone.removeIf((Predicate<Character>)pred::test));
+          }
+          {
+            var seqClone=(OmniStack.OfChar)seq.clone();
+            var pred=CheckedCollectionTest.getModifyingPred(predicateGenerator.getPred(rand,m),()->
+            {
+              seqClone.add(Character.MIN_VALUE);
+            });
+            Assertions.assertThrows(ConcurrentModificationException.class,()->seqClone.removeIf((Predicate<Character>)pred::test));
+          }
+        }
+      }
     }
   }
-  @Test
-  public void testRemoveIfReturnFalseArrSeqCheckedStack()
-  {
-    CharPredicate filter=(val)->false;
-    var seq=new CheckedStack();
-    for(int i=0;i<100;++i)
-    {
-      var val=TypeConversionUtil.convertTochar(i);
-      seq.add(val);
-    }
-    {
-      Assertions.assertFalse(seq.removeIf(filter));
-      Assertions.assertFalse(seq.removeIf((Predicate<Character>)filter::test));
-    }
-  }
+  */
   @Test
   public void testEmptyRemoveIfArrSeqCheckedList()
   {
-    CharPredicate filter=(val)->true;
+    CharPredicate filter=charPredicates.MarkAll.getPred(null,0);
     var seq=new CheckedList();
     Assertions.assertFalse(seq.removeIf(filter));
     Assertions.assertFalse(seq.removeIf((Predicate<Character>)filter::test));
   }
+  @Test
+  public void testRemoveIfCheckedList()
+  {
+      {
+        var arr=new char[10];
+        var seq=new CheckedList(10,arr);
+        CharPredicate pred=val->false;
+        Assertions.assertFalse(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),10);
+        Assertions.assertEquals(0,seq.modCount);
+      }
+      {
+        var arr=new char[10];
+        var seq=new CheckedList(10,arr);
+        Predicate<? super Character> pred=val->false;
+        Assertions.assertFalse(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),10);
+        Assertions.assertEquals(0,seq.modCount);
+      }
+      {
+        var arr=new char[10];
+        var seq=new CheckedList(10,arr);
+        CharPredicate pred=val->false;
+        Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf(CheckedCollectionTest.getModifyingPred(pred,()->
+        {
+          var tmp=seq.removeCharAt(seq.size()-1);
+          seq.add(tmp);
+        })));
+      }
+      {
+        var arr=new char[10];
+        var seq=new CheckedList(10,arr);
+        Predicate<? super Character> pred=val->false;
+        Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf(CheckedCollectionTest.getModifyingPred(pred,()->
+        {
+          var tmp=seq.removeCharAt(seq.size()-1);
+          seq.add(tmp);
+        })));
+      }
+      {
+        var arr=new char[10];
+        var seq=new CheckedList(10,arr);
+        Assertions.assertThrows(IndexOutOfBoundsException.class,()->
+        {
+          seq.removeIf((CharPredicate)(v)->
+          {
+            throw new IndexOutOfBoundsException();
+          });
+        });
+      }
+      {
+        var arr=new char[10];
+        var seq=new CheckedList(10,arr);
+        Assertions.assertThrows(IndexOutOfBoundsException.class,()->
+        {
+          seq.removeIf((Predicate<? super Character>)(v)->
+          {
+            throw new IndexOutOfBoundsException();
+          });
+        });
+      }
+      {
+        var arr=new char[10];
+        var seq=new CheckedList(10,arr);
+        Assertions.assertThrows(ConcurrentModificationException.class,()->
+        {
+          seq.removeIf((CharPredicate)(v)->
+          {
+            var tmp=seq.removeCharAt(seq.size()-1);
+            seq.add(tmp);
+            throw new IndexOutOfBoundsException();
+          });
+        });
+      }
+      {
+        var arr=new char[10];
+        var seq=new CheckedList(10,arr);
+        Assertions.assertThrows(ConcurrentModificationException.class,()->
+        {
+          seq.removeIf((Predicate<? super Character>)(v)->
+          {
+            var tmp=seq.removeCharAt(seq.size()-1);
+            seq.add(tmp);
+            throw new IndexOutOfBoundsException();
+          });
+        });
+      }
+      {
+        var arr=new char[10];
+        var seq=new CheckedList(10,arr);
+        CharPredicate pred=val->true;
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertTrue(seq.isEmpty());
+        Assertions.assertTrue(seq.modCount!=0);
+      }
+      {
+        var arr=new char[10];
+        var seq=new CheckedList(10,arr);
+        Predicate<? super Character> pred=val->true;
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertTrue(seq.isEmpty());
+        Assertions.assertTrue(seq.modCount!=0);
+      }
+      {
+        var arr=new char[10];
+        var seq=new CheckedList(10,arr);
+        CharPredicate pred=val->true;
+        Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf(CheckedCollectionTest.getModifyingPred(pred,()->
+        {
+          var tmp=seq.removeCharAt(seq.size()-1);
+          seq.add(tmp);
+        })));
+      }
+      {
+        var arr=new char[10];
+        var seq=new CheckedList(10,arr);
+        Predicate<? super Character> pred=val->true;
+        Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf(CheckedCollectionTest.getModifyingPred(pred,()->
+        {
+          var tmp=seq.removeCharAt(seq.size()-1);
+          seq.add(tmp);
+        })));
+      }
+      {
+        var arr=new char[10];
+        var seq=new CheckedList(10,arr);
+        Assertions.assertThrows(IndexOutOfBoundsException.class,()->
+        {
+          seq.removeIf((CharPredicate)(v)->
+          {
+            throw new IndexOutOfBoundsException();
+          });
+        });
+      }
+      {
+        var arr=new char[10];
+        var seq=new CheckedList(10,arr);
+        Assertions.assertThrows(IndexOutOfBoundsException.class,()->
+        {
+          seq.removeIf((Predicate<? super Character>)(v)->
+          {
+            throw new IndexOutOfBoundsException();
+          });
+        });
+      }
+      {
+        var arr=new char[10];
+        var seq=new CheckedList(10,arr);
+        Assertions.assertThrows(ConcurrentModificationException.class,()->
+        {
+          seq.removeIf((CharPredicate)(v)->
+          {
+            var tmp=seq.getChar(seq.size()-1);
+            seq.add(tmp);
+            throw new IndexOutOfBoundsException();
+          });
+        });
+      }
+      {
+        var arr=new char[10];
+        var seq=new CheckedList(10,arr);
+        Assertions.assertThrows(ConcurrentModificationException.class,()->
+        {
+          seq.removeIf((Predicate<? super Character>)(v)->
+          {
+            var tmp=seq.getChar(seq.size()-1);
+            seq.add(tmp);
+            throw new IndexOutOfBoundsException();
+          });
+        });
+      }
+      {
+        int length=100;
+        CharPredicate pred=(val)->
+        {
+          return (EqualityUtil.isEqual(val,TypeConversionUtil.convertTochar(0))
+            ||
+             EqualityUtil.isEqual(val,TypeConversionUtil.convertTochar(2)));
+        };
+        var arr=new char[length];
+        var seq=new CheckedList(length,arr);
+        for(int i=0;i<length;++i)
+        {
+          arr[i]=TypeConversionUtil.convertTochar(i);
+        }
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),length-2);
+        for(int i=0,valIndex=0;i<length-2;++i,++valIndex)
+        {
+          if(i==0 || i==1)
+          {
+            ++valIndex;
+          }
+          Assertions.assertEquals(arr[i],TypeConversionUtil.convertTochar(valIndex));
+        }
+        Assertions.assertTrue(seq.modCount!=0);
+      } 
+      {
+        int length=100;
+        Predicate<? super Character> pred=(val)->
+        {
+          return (EqualityUtil.isEqual(val,TypeConversionUtil.convertTochar(0))
+            ||
+             EqualityUtil.isEqual(val,TypeConversionUtil.convertTochar(2)));
+        };
+        var arr=new char[length];
+        var seq=new CheckedList(length,arr);
+        for(int i=0;i<length;++i)
+        {
+          arr[i]=TypeConversionUtil.convertTochar(i);
+        }
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),length-2);
+        for(int i=0,valIndex=0;i<length-2;++i,++valIndex)
+        {
+          if(i==0 || i==1)
+          {
+            ++valIndex;
+          }
+          Assertions.assertEquals(arr[i],TypeConversionUtil.convertTochar(valIndex));
+        }
+        Assertions.assertTrue(seq.modCount!=0);
+      } 
+      {
+        int length=100;
+        CharPredicate pred=(val)->
+        {
+          return (EqualityUtil.isEqual(val,TypeConversionUtil.convertTochar(0))
+            ||
+             EqualityUtil.isEqual(val,TypeConversionUtil.convertTochar(2)));
+        };
+        var arr=new char[length];
+        var seq=new CheckedList(length,arr);
+        for(int i=0;i<length;++i)
+        {
+          arr[i]=TypeConversionUtil.convertTochar(i);
+        }
+        Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf(CheckedCollectionTest.getModifyingPred(pred,()->
+        {
+          var tmp=seq.removeCharAt(seq.size()-1);
+          seq.add(tmp);
+        })));
+      } 
+      {
+        int length=100;
+        Predicate<? super Character> pred=(val)->
+        {
+          return (EqualityUtil.isEqual(val,TypeConversionUtil.convertTochar(0))
+            ||
+             EqualityUtil.isEqual(val,TypeConversionUtil.convertTochar(2)));
+        };
+        var arr=new char[length];
+        var seq=new CheckedList(length,arr);
+        for(int i=0;i<length;++i)
+        {
+          arr[i]=TypeConversionUtil.convertTochar(i);
+        }
+        Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf(CheckedCollectionTest.getModifyingPred(pred,()->
+        {
+          var tmp=seq.removeCharAt(seq.size()-1);
+          seq.add(tmp);
+        })));
+      } 
+      {
+        int length=100;
+        CharPredicate pred=(val)->
+        {
+          return !EqualityUtil.isEqual(val,TypeConversionUtil.convertTochar(1));
+        };
+        var arr=new char[length];
+        var seq=new CheckedList(length,arr);
+        for(int i=0;i<length;++i)
+        {
+          arr[i]=TypeConversionUtil.convertTochar(i);
+        }
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),1);
+        Assertions.assertEquals(arr[0],TypeConversionUtil.convertTochar(1));
+        Assertions.assertTrue(seq.modCount!=0);
+      } 
+      {
+        int length=100;
+        Predicate<? super Character> pred=(val)->
+        {
+          return !EqualityUtil.isEqual(val,TypeConversionUtil.convertTochar(1));
+        };
+        var arr=new char[length];
+        var seq=new CheckedList(length,arr);
+        for(int i=0;i<length;++i)
+        {
+          arr[i]=TypeConversionUtil.convertTochar(i);
+        }
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),1);
+        Assertions.assertEquals(arr[0],TypeConversionUtil.convertTochar(1));
+        Assertions.assertTrue(seq.modCount!=0);
+      } 
+      {
+        int length=100;
+        CharPredicate pred=(val)->
+        {
+          return !EqualityUtil.isEqual(val,TypeConversionUtil.convertTochar(1));
+        };
+        var arr=new char[length];
+        var seq=new CheckedList(length,arr);
+        for(int i=0;i<length;++i)
+        {
+          arr[i]=TypeConversionUtil.convertTochar(i);
+        }
+        Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf(CheckedCollectionTest.getModifyingPred(pred,()->
+        {
+          var tmp=seq.removeCharAt(seq.size()-1);
+          seq.add(tmp);
+        })));
+      } 
+      {
+        int length=100;
+        Predicate<? super Character> pred=(val)->
+        {
+          return !EqualityUtil.isEqual(val,TypeConversionUtil.convertTochar(1));
+        };
+        var arr=new char[length];
+        var seq=new CheckedList(length,arr);
+        for(int i=0;i<length;++i)
+        {
+          arr[i]=TypeConversionUtil.convertTochar(i);
+        }
+        Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf(CheckedCollectionTest.getModifyingPred(pred,()->
+        {
+          var tmp=seq.removeCharAt(seq.size()-1);
+          seq.add(tmp);
+        })));
+      } 
+  }
+  /*
   @Test
   public void testRemoveIfModCheckArrSeqCheckedList()
   {
     var seq=new CheckedList();
-    for(int i=0;i<100;++i)
+    for(int i=0;i<1000;++i)
     {
       var val=TypeConversionUtil.convertTochar(i);
       seq.add(val);
     }
+    Random rand=new Random(0);
+    for(var predicateGenerator:charPredicates.values())
     {
-    }
-    {
-      var seqClone=(OmniList.OfChar)seq.clone();
-      CharPredicate removingPredicateReturnFalse=(val)->
+      for(int m=predicateGenerator.getMLo(),mHi=predicateGenerator.getMHi(),repsBound=predicateGenerator.getNumReps();m<=mHi;m=predicateGenerator.incrementM(m))
       {
-        seqClone.remove(0);
-        return false;
-      };
-      Assertions.assertThrows(ConcurrentModificationException.class,()->seqClone.removeIf(removingPredicateReturnFalse));
-    }
-    {
-      var seqClone=(OmniList.OfChar)seq.clone();
-      CharPredicate removingPredicateReturnFalse=(val)->
-      {
-        seqClone.remove(0);
-        return false;
-      };
-      Assertions.assertThrows(ConcurrentModificationException.class,()->seqClone.removeIf((Predicate<Character>)removingPredicateReturnFalse::test));
-    }
-    {
-      var seqClone=(OmniList.OfChar)seq.clone();
-      CharPredicate removingPredicateReturnTrue=(val)->
-      {
-        seqClone.remove(0);
-        return true;
-      };
-      Assertions.assertThrows(ConcurrentModificationException.class,()->seqClone.removeIf(removingPredicateReturnTrue));
-    }
-    {
-      var seqClone=(OmniList.OfChar)seq.clone();
-      CharPredicate removingPredicateReturnTrue=(val)->
-      {
-        seqClone.remove(0);
-        return true;
-      };
-      Assertions.assertThrows(ConcurrentModificationException.class,()->seqClone.removeIf((Predicate<Character>)removingPredicateReturnTrue::test));
-    }
-    {
-      var seqClone=(OmniList.OfChar)seq.clone();
-      CharPredicate addingPredicateReturnFalse=(val)->
-      {
-        seqClone.add(Character.MIN_VALUE);
-        return false;
-      };
-      Assertions.assertThrows(ConcurrentModificationException.class,()->seqClone.removeIf(addingPredicateReturnFalse));
-    }
-    {
-      var seqClone=(OmniList.OfChar)seq.clone();
-      CharPredicate addingPredicateReturnFalse=(val)->
-      {
-        seqClone.add(Character.MIN_VALUE);
-        return false;
-      };
-      Assertions.assertThrows(ConcurrentModificationException.class,()->seqClone.removeIf((Predicate<Character>)addingPredicateReturnFalse::test));
-    }
-    {
-      var seqClone=(OmniList.OfChar)seq.clone();
-      CharPredicate addingPredicateReturnTrue=(val)->
-      {
-        seqClone.add(Character.MIN_VALUE);
-        return true;
-      };
-      Assertions.assertThrows(ConcurrentModificationException.class,()->seqClone.removeIf(addingPredicateReturnTrue));
-    }
-    {
-      var seqClone=(OmniList.OfChar)seq.clone();
-      CharPredicate addingPredicateReturnTrue=(val)->
-      {
-        seqClone.add(Character.MIN_VALUE);
-        return true;
-      };
-      Assertions.assertThrows(ConcurrentModificationException.class,()->seqClone.removeIf((Predicate<Character>)addingPredicateReturnTrue::test));
+        for(int reps=0;reps<repsBound;++reps)
+        {
+          {
+            var seqClone=(OmniList.OfChar)seq.clone();
+            var pred=CheckedCollectionTest.getModifyingPred(predicateGenerator.getPred(rand,m),()->
+            {
+              if(!seqClone.isEmpty())
+              {
+                seqClone.remove(0);
+              }
+            });
+            Assertions.assertThrows(ConcurrentModificationException.class,()->seqClone.removeIf(pred));
+          }
+          {
+            var seqClone=(OmniList.OfChar)seq.clone();
+            var pred=CheckedCollectionTest.getModifyingPred(predicateGenerator.getPred(rand,m),()->
+            {
+              seqClone.add(Character.MIN_VALUE);
+            });
+            Assertions.assertThrows(ConcurrentModificationException.class,()->seqClone.removeIf(pred));
+          }
+          {
+            var seqClone=(OmniList.OfChar)seq.clone();
+            var pred=CheckedCollectionTest.getModifyingPred(predicateGenerator.getPred(rand,m),()->
+            {
+              if(!seqClone.isEmpty())
+              {
+                seqClone.remove(0);
+              }
+            });
+            Assertions.assertThrows(ConcurrentModificationException.class,()->seqClone.removeIf((Predicate<Character>)pred::test));
+          }
+          {
+            var seqClone=(OmniList.OfChar)seq.clone();
+            var pred=CheckedCollectionTest.getModifyingPred(predicateGenerator.getPred(rand,m),()->
+            {
+              seqClone.add(Character.MIN_VALUE);
+            });
+            Assertions.assertThrows(ConcurrentModificationException.class,()->seqClone.removeIf((Predicate<Character>)pred::test));
+          }
+        }
+      }
     }
   }
-  @Test
-  public void testRemoveIfReturnFalseArrSeqCheckedList()
-  {
-    CharPredicate filter=(val)->false;
-    var seq=new CheckedList();
-    for(int i=0;i<100;++i)
-    {
-      var val=TypeConversionUtil.convertTochar(i);
-      seq.add(val);
-    }
-    {
-      Assertions.assertFalse(seq.removeIf(filter));
-      Assertions.assertFalse(seq.removeIf((Predicate<Character>)filter::test));
-    }
-  }
+  */
   @Test
   public void testEmptyRemoveIfArrSeqUncheckedSubList()
   {
-    CharPredicate filter=(val)->true;
+    CharPredicate filter=charPredicates.MarkAll.getPred(null,0);
     var root=new UncheckedList();
     var seq=root.subList(0,0);
     Assertions.assertFalse(seq.removeIf(filter));
     Assertions.assertFalse(seq.removeIf((Predicate<Character>)filter::test));
   }
   @Test
-  public void testRemoveIfReturnFalseArrSeqUncheckedSubList()
+  public void testRemoveIfUncheckedSubList()
   {
-    CharPredicate filter=(val)->false;
-    var root=new UncheckedList();
-    var seq=root.subList(0,0);
-    for(int i=0;i<100;++i)
-    {
-      var val=TypeConversionUtil.convertTochar(i);
-      seq.add(val);
-    }
-    {
-      Assertions.assertFalse(seq.removeIf(filter));
-      Assertions.assertFalse(seq.removeIf((Predicate<Character>)filter::test));
-    }
+      {
+        var arr=new char[10];
+        var root=new UncheckedList(10,arr);
+        var subList=root.subList(0,10);
+        var seq=subList.subList(0,10);
+        CharPredicate pred=val->false;
+        Assertions.assertFalse(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),10);
+      }
+      {
+        var arr=new char[10];
+        var root=new UncheckedList(10,arr);
+        var subList=root.subList(0,10);
+        var seq=subList.subList(0,10);
+        Predicate<? super Character> pred=val->false;
+        Assertions.assertFalse(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),10);
+      }
+      {
+        var arr=new char[10];
+        var root=new UncheckedList(10,arr);
+        var subList=root.subList(0,10);
+        var seq=subList.subList(0,10);
+        CharPredicate pred=val->true;
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertTrue(seq.isEmpty());
+      }
+      {
+        var arr=new char[10];
+        var root=new UncheckedList(10,arr);
+        var subList=root.subList(0,10);
+        var seq=subList.subList(0,10);
+        Predicate<? super Character> pred=val->true;
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertTrue(seq.isEmpty());
+      }
+      {
+        int length=100;
+        CharPredicate pred=(val)->
+        {
+          return (EqualityUtil.isEqual(val,TypeConversionUtil.convertTochar(0))
+            ||
+             EqualityUtil.isEqual(val,TypeConversionUtil.convertTochar(2)));
+        };
+        var arr=new char[length];
+        var root=new UncheckedList(length,arr);
+        var subList=root.subList(0,length);
+        var seq=subList.subList(0,length);
+        for(int i=0;i<length;++i)
+        {
+          arr[i]=TypeConversionUtil.convertTochar(i);
+        }
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),length-2);
+        for(int i=0,valIndex=0;i<length-2;++i,++valIndex)
+        {
+          if(i==0 || i==1)
+          {
+            ++valIndex;
+          }
+          Assertions.assertEquals(arr[i],TypeConversionUtil.convertTochar(valIndex));
+        }
+      } 
+      {
+        int length=100;
+        Predicate<? super Character> pred=(val)->
+        {
+          return (EqualityUtil.isEqual(val,TypeConversionUtil.convertTochar(0))
+            ||
+             EqualityUtil.isEqual(val,TypeConversionUtil.convertTochar(2)));
+        };
+        var arr=new char[length];
+        var root=new UncheckedList(length,arr);
+        var subList=root.subList(0,length);
+        var seq=subList.subList(0,length);
+        for(int i=0;i<length;++i)
+        {
+          arr[i]=TypeConversionUtil.convertTochar(i);
+        }
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),length-2);
+        for(int i=0,valIndex=0;i<length-2;++i,++valIndex)
+        {
+          if(i==0 || i==1)
+          {
+            ++valIndex;
+          }
+          Assertions.assertEquals(arr[i],TypeConversionUtil.convertTochar(valIndex));
+        }
+      } 
+      {
+        int length=100;
+        CharPredicate pred=(val)->
+        {
+          return !EqualityUtil.isEqual(val,TypeConversionUtil.convertTochar(1));
+        };
+        var arr=new char[length];
+        var root=new UncheckedList(length,arr);
+        var subList=root.subList(0,length);
+        var seq=subList.subList(0,length);
+        for(int i=0;i<length;++i)
+        {
+          arr[i]=TypeConversionUtil.convertTochar(i);
+        }
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),1);
+        Assertions.assertEquals(arr[0],TypeConversionUtil.convertTochar(1));
+      } 
+      {
+        int length=100;
+        Predicate<? super Character> pred=(val)->
+        {
+          return !EqualityUtil.isEqual(val,TypeConversionUtil.convertTochar(1));
+        };
+        var arr=new char[length];
+        var root=new UncheckedList(length,arr);
+        var subList=root.subList(0,length);
+        var seq=subList.subList(0,length);
+        for(int i=0;i<length;++i)
+        {
+          arr[i]=TypeConversionUtil.convertTochar(i);
+        }
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),1);
+        Assertions.assertEquals(arr[0],TypeConversionUtil.convertTochar(1));
+      } 
   }
   @Test
   public void testEmptyRemoveIfArrSeqCheckedSubList()
   {
-    CharPredicate filter=(val)->true;
+    CharPredicate filter=charPredicates.MarkAll.getPred(null,0);
     var root=new CheckedList();
     var seq=root.subList(0,0);
     Assertions.assertFalse(seq.removeIf(filter));
     Assertions.assertFalse(seq.removeIf((Predicate<Character>)filter::test));
   }
+  @Test
+  public void testRemoveIfCheckedSubList()
+  {
+      {
+        var arr=new char[10];
+        var root=new CheckedList(10,arr);
+        var subList=root.subList(0,10);
+        var seq=subList.subList(0,10);
+        CharPredicate pred=val->false;
+        Assertions.assertFalse(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),10);
+        Assertions.assertEquals(0,root.modCount);
+      }
+      {
+        var arr=new char[10];
+        var root=new CheckedList(10,arr);
+        var subList=root.subList(0,10);
+        var seq=subList.subList(0,10);
+        Predicate<? super Character> pred=val->false;
+        Assertions.assertFalse(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),10);
+        Assertions.assertEquals(0,root.modCount);
+      }
+      {
+        var arr=new char[10];
+        var root=new CheckedList(10,arr);
+        var subList=root.subList(0,10);
+        var seq=subList.subList(0,10);
+        CharPredicate pred=val->false;
+        Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf(CheckedCollectionTest.getModifyingPred(pred,()->
+        {
+          var tmp=seq.removeCharAt(seq.size()-1);
+          seq.add(tmp);
+        })));
+      }
+      {
+        var arr=new char[10];
+        var root=new CheckedList(10,arr);
+        var subList=root.subList(0,10);
+        var seq=subList.subList(0,10);
+        Predicate<? super Character> pred=val->false;
+        Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf(CheckedCollectionTest.getModifyingPred(pred,()->
+        {
+          var tmp=seq.removeCharAt(seq.size()-1);
+          seq.add(tmp);
+        })));
+      }
+      {
+        var arr=new char[10];
+        var root=new CheckedList(10,arr);
+        var subList=root.subList(0,10);
+        var seq=subList.subList(0,10);
+        Assertions.assertThrows(IndexOutOfBoundsException.class,()->
+        {
+          seq.removeIf((CharPredicate)(v)->
+          {
+            throw new IndexOutOfBoundsException();
+          });
+        });
+      }
+      {
+        var arr=new char[10];
+        var root=new CheckedList(10,arr);
+        var subList=root.subList(0,10);
+        var seq=subList.subList(0,10);
+        Assertions.assertThrows(IndexOutOfBoundsException.class,()->
+        {
+          seq.removeIf((Predicate<? super Character>)(v)->
+          {
+            throw new IndexOutOfBoundsException();
+          });
+        });
+      }
+      {
+        var arr=new char[10];
+        var root=new CheckedList(10,arr);
+        var subList=root.subList(0,10);
+        var seq=subList.subList(0,10);
+        Assertions.assertThrows(ConcurrentModificationException.class,()->
+        {
+          seq.removeIf((CharPredicate)(v)->
+          {
+            var tmp=seq.removeCharAt(seq.size()-1);
+            seq.add(tmp);
+            throw new IndexOutOfBoundsException();
+          });
+        });
+      }
+      {
+        var arr=new char[10];
+        var root=new CheckedList(10,arr);
+        var subList=root.subList(0,10);
+        var seq=subList.subList(0,10);
+        Assertions.assertThrows(ConcurrentModificationException.class,()->
+        {
+          seq.removeIf((Predicate<? super Character>)(v)->
+          {
+            var tmp=seq.removeCharAt(seq.size()-1);
+            seq.add(tmp);
+            throw new IndexOutOfBoundsException();
+          });
+        });
+      }
+      {
+        var arr=new char[10];
+        var root=new CheckedList(10,arr);
+        var subList=root.subList(0,10);
+        var seq=subList.subList(0,10);
+        CharPredicate pred=val->true;
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertTrue(seq.isEmpty());
+        Assertions.assertTrue(root.modCount!=0);
+      }
+      {
+        var arr=new char[10];
+        var root=new CheckedList(10,arr);
+        var subList=root.subList(0,10);
+        var seq=subList.subList(0,10);
+        Predicate<? super Character> pred=val->true;
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertTrue(seq.isEmpty());
+        Assertions.assertTrue(root.modCount!=0);
+      }
+      {
+        var arr=new char[10];
+        var root=new CheckedList(10,arr);
+        var subList=root.subList(0,10);
+        var seq=subList.subList(0,10);
+        CharPredicate pred=val->true;
+        Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf(CheckedCollectionTest.getModifyingPred(pred,()->
+        {
+          var tmp=seq.removeCharAt(seq.size()-1);
+          seq.add(tmp);
+        })));
+      }
+      {
+        var arr=new char[10];
+        var root=new CheckedList(10,arr);
+        var subList=root.subList(0,10);
+        var seq=subList.subList(0,10);
+        Predicate<? super Character> pred=val->true;
+        Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf(CheckedCollectionTest.getModifyingPred(pred,()->
+        {
+          var tmp=seq.removeCharAt(seq.size()-1);
+          seq.add(tmp);
+        })));
+      }
+      {
+        var arr=new char[10];
+        var root=new CheckedList(10,arr);
+        var subList=root.subList(0,10);
+        var seq=subList.subList(0,10);
+        Assertions.assertThrows(IndexOutOfBoundsException.class,()->
+        {
+          seq.removeIf((CharPredicate)(v)->
+          {
+            throw new IndexOutOfBoundsException();
+          });
+        });
+      }
+      {
+        var arr=new char[10];
+        var root=new CheckedList(10,arr);
+        var subList=root.subList(0,10);
+        var seq=subList.subList(0,10);
+        Assertions.assertThrows(IndexOutOfBoundsException.class,()->
+        {
+          seq.removeIf((Predicate<? super Character>)(v)->
+          {
+            throw new IndexOutOfBoundsException();
+          });
+        });
+      }
+      {
+        var arr=new char[10];
+        var root=new CheckedList(10,arr);
+        var subList=root.subList(0,10);
+        var seq=subList.subList(0,10);
+        Assertions.assertThrows(ConcurrentModificationException.class,()->
+        {
+          seq.removeIf((CharPredicate)(v)->
+          {
+            var tmp=seq.getChar(seq.size()-1);
+            seq.add(tmp);
+            throw new IndexOutOfBoundsException();
+          });
+        });
+      }
+      {
+        var arr=new char[10];
+        var root=new CheckedList(10,arr);
+        var subList=root.subList(0,10);
+        var seq=subList.subList(0,10);
+        Assertions.assertThrows(ConcurrentModificationException.class,()->
+        {
+          seq.removeIf((Predicate<? super Character>)(v)->
+          {
+            var tmp=seq.getChar(seq.size()-1);
+            seq.add(tmp);
+            throw new IndexOutOfBoundsException();
+          });
+        });
+      }
+      {
+        int length=100;
+        CharPredicate pred=(val)->
+        {
+          return (EqualityUtil.isEqual(val,TypeConversionUtil.convertTochar(0))
+            ||
+             EqualityUtil.isEqual(val,TypeConversionUtil.convertTochar(2)));
+        };
+        var arr=new char[length];
+        var root=new CheckedList(length,arr);
+        var subList=root.subList(0,length);
+        var seq=subList.subList(0,length);
+        for(int i=0;i<length;++i)
+        {
+          arr[i]=TypeConversionUtil.convertTochar(i);
+        }
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),length-2);
+        for(int i=0,valIndex=0;i<length-2;++i,++valIndex)
+        {
+          if(i==0 || i==1)
+          {
+            ++valIndex;
+          }
+          Assertions.assertEquals(arr[i],TypeConversionUtil.convertTochar(valIndex));
+        }
+        Assertions.assertTrue(root.modCount!=0);
+      } 
+      {
+        int length=100;
+        Predicate<? super Character> pred=(val)->
+        {
+          return (EqualityUtil.isEqual(val,TypeConversionUtil.convertTochar(0))
+            ||
+             EqualityUtil.isEqual(val,TypeConversionUtil.convertTochar(2)));
+        };
+        var arr=new char[length];
+        var root=new CheckedList(length,arr);
+        var subList=root.subList(0,length);
+        var seq=subList.subList(0,length);
+        for(int i=0;i<length;++i)
+        {
+          arr[i]=TypeConversionUtil.convertTochar(i);
+        }
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),length-2);
+        for(int i=0,valIndex=0;i<length-2;++i,++valIndex)
+        {
+          if(i==0 || i==1)
+          {
+            ++valIndex;
+          }
+          Assertions.assertEquals(arr[i],TypeConversionUtil.convertTochar(valIndex));
+        }
+        Assertions.assertTrue(root.modCount!=0);
+      } 
+      {
+        int length=100;
+        CharPredicate pred=(val)->
+        {
+          return (EqualityUtil.isEqual(val,TypeConversionUtil.convertTochar(0))
+            ||
+             EqualityUtil.isEqual(val,TypeConversionUtil.convertTochar(2)));
+        };
+        var arr=new char[length];
+        var root=new CheckedList(length,arr);
+        var subList=root.subList(0,length);
+        var seq=subList.subList(0,length);
+        for(int i=0;i<length;++i)
+        {
+          arr[i]=TypeConversionUtil.convertTochar(i);
+        }
+        Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf(CheckedCollectionTest.getModifyingPred(pred,()->
+        {
+          var tmp=seq.removeCharAt(seq.size()-1);
+          seq.add(tmp);
+        })));
+      } 
+      {
+        int length=100;
+        Predicate<? super Character> pred=(val)->
+        {
+          return (EqualityUtil.isEqual(val,TypeConversionUtil.convertTochar(0))
+            ||
+             EqualityUtil.isEqual(val,TypeConversionUtil.convertTochar(2)));
+        };
+        var arr=new char[length];
+        var root=new CheckedList(length,arr);
+        var subList=root.subList(0,length);
+        var seq=subList.subList(0,length);
+        for(int i=0;i<length;++i)
+        {
+          arr[i]=TypeConversionUtil.convertTochar(i);
+        }
+        Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf(CheckedCollectionTest.getModifyingPred(pred,()->
+        {
+          var tmp=seq.removeCharAt(seq.size()-1);
+          seq.add(tmp);
+        })));
+      } 
+      {
+        int length=100;
+        CharPredicate pred=(val)->
+        {
+          return !EqualityUtil.isEqual(val,TypeConversionUtil.convertTochar(1));
+        };
+        var arr=new char[length];
+        var root=new CheckedList(length,arr);
+        var subList=root.subList(0,length);
+        var seq=subList.subList(0,length);
+        for(int i=0;i<length;++i)
+        {
+          arr[i]=TypeConversionUtil.convertTochar(i);
+        }
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),1);
+        Assertions.assertEquals(arr[0],TypeConversionUtil.convertTochar(1));
+        Assertions.assertTrue(root.modCount!=0);
+      } 
+      {
+        int length=100;
+        Predicate<? super Character> pred=(val)->
+        {
+          return !EqualityUtil.isEqual(val,TypeConversionUtil.convertTochar(1));
+        };
+        var arr=new char[length];
+        var root=new CheckedList(length,arr);
+        var subList=root.subList(0,length);
+        var seq=subList.subList(0,length);
+        for(int i=0;i<length;++i)
+        {
+          arr[i]=TypeConversionUtil.convertTochar(i);
+        }
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),1);
+        Assertions.assertEquals(arr[0],TypeConversionUtil.convertTochar(1));
+        Assertions.assertTrue(root.modCount!=0);
+      } 
+      {
+        int length=100;
+        CharPredicate pred=(val)->
+        {
+          return !EqualityUtil.isEqual(val,TypeConversionUtil.convertTochar(1));
+        };
+        var arr=new char[length];
+        var root=new CheckedList(length,arr);
+        var subList=root.subList(0,length);
+        var seq=subList.subList(0,length);
+        for(int i=0;i<length;++i)
+        {
+          arr[i]=TypeConversionUtil.convertTochar(i);
+        }
+        Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf(CheckedCollectionTest.getModifyingPred(pred,()->
+        {
+          var tmp=seq.removeCharAt(seq.size()-1);
+          seq.add(tmp);
+        })));
+      } 
+      {
+        int length=100;
+        Predicate<? super Character> pred=(val)->
+        {
+          return !EqualityUtil.isEqual(val,TypeConversionUtil.convertTochar(1));
+        };
+        var arr=new char[length];
+        var root=new CheckedList(length,arr);
+        var subList=root.subList(0,length);
+        var seq=subList.subList(0,length);
+        for(int i=0;i<length;++i)
+        {
+          arr[i]=TypeConversionUtil.convertTochar(i);
+        }
+        Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf(CheckedCollectionTest.getModifyingPred(pred,()->
+        {
+          var tmp=seq.removeCharAt(seq.size()-1);
+          seq.add(tmp);
+        })));
+      } 
+  }
+  /*
   @Test
   public void testRemoveIfModCheckArrSeqCheckedSubList()
   {
     var root=new CheckedList();
     var seq=root.subList(0,0);
-    for(int i=0;i<100;++i)
+    for(int i=0;i<1000;++i)
     {
       var val=TypeConversionUtil.convertTochar(i);
       seq.add(val);
     }
+    Random rand=new Random(0);
+    for(var predicateGenerator:charPredicates.values())
     {
-    }
-    {
-      var seqClone=(OmniList.OfChar)seq.clone();
-      CharPredicate removingPredicateReturnFalse=(val)->
+      for(int m=predicateGenerator.getMLo(),mHi=predicateGenerator.getMHi(),repsBound=predicateGenerator.getNumReps();m<=mHi;m=predicateGenerator.incrementM(m))
       {
-        seqClone.remove(0);
-        return false;
-      };
-      Assertions.assertThrows(ConcurrentModificationException.class,()->seqClone.removeIf(removingPredicateReturnFalse));
-    }
-    {
-      var seqClone=(OmniList.OfChar)seq.clone();
-      CharPredicate removingPredicateReturnFalse=(val)->
-      {
-        seqClone.remove(0);
-        return false;
-      };
-      Assertions.assertThrows(ConcurrentModificationException.class,()->seqClone.removeIf((Predicate<Character>)removingPredicateReturnFalse::test));
-    }
-    {
-      var seqClone=(OmniList.OfChar)seq.clone();
-      CharPredicate removingPredicateReturnTrue=(val)->
-      {
-        seqClone.remove(0);
-        return true;
-      };
-      Assertions.assertThrows(ConcurrentModificationException.class,()->seqClone.removeIf(removingPredicateReturnTrue));
-    }
-    {
-      var seqClone=(OmniList.OfChar)seq.clone();
-      CharPredicate removingPredicateReturnTrue=(val)->
-      {
-        seqClone.remove(0);
-        return true;
-      };
-      Assertions.assertThrows(ConcurrentModificationException.class,()->seqClone.removeIf((Predicate<Character>)removingPredicateReturnTrue::test));
-    }
-    {
-      var seqClone=(OmniList.OfChar)seq.clone();
-      CharPredicate addingPredicateReturnFalse=(val)->
-      {
-        seqClone.add(Character.MIN_VALUE);
-        return false;
-      };
-      Assertions.assertThrows(ConcurrentModificationException.class,()->seqClone.removeIf(addingPredicateReturnFalse));
-    }
-    {
-      var seqClone=(OmniList.OfChar)seq.clone();
-      CharPredicate addingPredicateReturnFalse=(val)->
-      {
-        seqClone.add(Character.MIN_VALUE);
-        return false;
-      };
-      Assertions.assertThrows(ConcurrentModificationException.class,()->seqClone.removeIf((Predicate<Character>)addingPredicateReturnFalse::test));
-    }
-    {
-      var seqClone=(OmniList.OfChar)seq.clone();
-      CharPredicate addingPredicateReturnTrue=(val)->
-      {
-        seqClone.add(Character.MIN_VALUE);
-        return true;
-      };
-      Assertions.assertThrows(ConcurrentModificationException.class,()->seqClone.removeIf(addingPredicateReturnTrue));
-    }
-    {
-      var seqClone=(OmniList.OfChar)seq.clone();
-      CharPredicate addingPredicateReturnTrue=(val)->
-      {
-        seqClone.add(Character.MIN_VALUE);
-        return true;
-      };
-      Assertions.assertThrows(ConcurrentModificationException.class,()->seqClone.removeIf((Predicate<Character>)addingPredicateReturnTrue::test));
+        for(int reps=0;reps<repsBound;++reps)
+        {
+          {
+            var seqClone=(OmniList.OfChar)seq.clone();
+            var pred=CheckedCollectionTest.getModifyingPred(predicateGenerator.getPred(rand,m),()->
+            {
+              if(!seqClone.isEmpty())
+              {
+                seqClone.remove(0);
+              }
+            });
+            Assertions.assertThrows(ConcurrentModificationException.class,()->seqClone.removeIf(pred));
+          }
+          {
+            var seqClone=(OmniList.OfChar)seq.clone();
+            var pred=CheckedCollectionTest.getModifyingPred(predicateGenerator.getPred(rand,m),()->
+            {
+              seqClone.add(Character.MIN_VALUE);
+            });
+            Assertions.assertThrows(ConcurrentModificationException.class,()->seqClone.removeIf(pred));
+          }
+          {
+            var seqClone=(OmniList.OfChar)seq.clone();
+            var pred=CheckedCollectionTest.getModifyingPred(predicateGenerator.getPred(rand,m),()->
+            {
+              if(!seqClone.isEmpty())
+              {
+                seqClone.remove(0);
+              }
+            });
+            Assertions.assertThrows(ConcurrentModificationException.class,()->seqClone.removeIf((Predicate<Character>)pred::test));
+          }
+          {
+            var seqClone=(OmniList.OfChar)seq.clone();
+            var pred=CheckedCollectionTest.getModifyingPred(predicateGenerator.getPred(rand,m),()->
+            {
+              seqClone.add(Character.MIN_VALUE);
+            });
+            Assertions.assertThrows(ConcurrentModificationException.class,()->seqClone.removeIf((Predicate<Character>)pred::test));
+          }
+        }
+      }
     }
   }
-  @Test
-  public void testRemoveIfReturnFalseArrSeqCheckedSubList()
-  {
-    CharPredicate filter=(val)->false;
-    var root=new CheckedList();
-    var seq=root.subList(0,0);
-    for(int i=0;i<100;++i)
-    {
-      var val=TypeConversionUtil.convertTochar(i);
-      seq.add(val);
-    }
-    {
-      Assertions.assertFalse(seq.removeIf(filter));
-      Assertions.assertFalse(seq.removeIf((Predicate<Character>)filter::test));
-    }
-  }
+  */
 }

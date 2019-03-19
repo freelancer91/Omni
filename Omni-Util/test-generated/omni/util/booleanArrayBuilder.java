@@ -1,14 +1,33 @@
 package omni.util;
 import java.util.Collection;
 import java.util.Random;
+import java.util.function.BooleanSupplier;
 public enum booleanArrayBuilder
 {
   Randomized
   {
     @Override
+    public int getNumRemoveIfReps(int arrLength)
+    {
+      return 10;
+    }
+    @Override
+    public int getNumSortReps(int arrLength)
+    {
+      return 10;
+    }
+    @Override
     public boolean isRandomized()
     {
       return true;
+    }
+    @Override
+    public BooleanSupplier getSupplier(int length,Random rand, int m)
+    {
+      return ()->
+      {
+        return RandomUtil.getRandomboolean(rand);
+      };
     }
     @Override
     public void buildUnchecked(boolean[] arr,int offset,int length,Random rand,int m)
@@ -35,6 +54,24 @@ public enum booleanArrayBuilder
   Ascending
   {
     @Override
+    public BooleanSupplier getSupplier(int length,Random rand, int m)
+    {
+      return new BooleanSupplier()
+      {
+        int i=0;
+        final int middle=length/2;
+        public boolean getAsBoolean()
+        {
+          boolean ret=TypeConversionUtil.convertToboolean(i<middle?0:1);
+          if(++i==length)
+          {
+            i=0;
+          }
+          return ret;
+        }
+      };
+    }
+    @Override
     public void buildUnchecked(boolean[] arr,int offset,int length,Random rand,int m)
     {
       int i=0;
@@ -60,6 +97,24 @@ public enum booleanArrayBuilder
   ,
   Descending
   {
+    @Override
+    public BooleanSupplier getSupplier(int length,Random rand, int m)
+    {
+      return new BooleanSupplier()
+      {
+        int i=0;
+        final int middle=length/2;
+        public boolean getAsBoolean()
+        {
+          boolean ret=TypeConversionUtil.convertToboolean(i<middle?1:0);
+          if(++i==length)
+          {
+            i=0;
+          }
+          return ret;
+        }
+      };
+    }
     @Override
     public void buildUnchecked(boolean[] arr,int offset,int length,Random rand,int m)
     {
@@ -90,6 +145,14 @@ public enum booleanArrayBuilder
     public int getMLo()
     {
       return 0;
+    }
+    @Override
+    public BooleanSupplier getSupplier(int length,Random rand, int m)
+    {
+      return ()->
+      {
+        return TypeConversionUtil.convertToboolean(m);
+      };
     }
     @Override
     public void buildUnchecked(boolean[] arr,int offset,int length,Random rand,int m)
@@ -123,12 +186,12 @@ public enum booleanArrayBuilder
   {
     return 1;
   }
-  public int getNumReps(int arrLength)
+  public int getNumSortReps(int arrLength)
   {
-    if(isRandomized())
-    {
-      return 10;
-    }
+    return 1;
+  }
+  public int getNumRemoveIfReps(int arrLength)
+  {
     return 1;
   }
   public int incrementM(int m)
@@ -140,6 +203,7 @@ public enum booleanArrayBuilder
     //most sub-types are not randomized, so make that the default
     return false;
   }
+  public abstract BooleanSupplier getSupplier(int length,Random rand, int m);
   public abstract void buildUnchecked(boolean[] arr,int offset,int length,Random rand,int m);
   public void build(boolean[] arr,Random rand,int m)
   {
@@ -204,7 +268,7 @@ public enum booleanArrayBuilder
   public void addArrays(long randSeed,int arrLength,Collection<boolean[]> arrays)
   {
     Random rand=new Random(randSeed);
-    for(int m=getMLo(),mHi=getMHi(arrLength),numReps=getNumReps(arrLength);m<=mHi;m=incrementM(m))
+    for(int m=getMLo(),mHi=getMHi(arrLength),numReps=getNumSortReps(arrLength);m<=mHi;m=incrementM(m))
     {
       for(int i=0;i<numReps;++i)
       {

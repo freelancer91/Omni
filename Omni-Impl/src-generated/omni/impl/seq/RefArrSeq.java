@@ -643,7 +643,17 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>
     }
     return OmniArray.OfRef.DEFAULT_ARR;
   }
-  abstract boolean uncheckedRemoveIf(int size,Predicate<? super E> filter);
+  boolean uncheckedRemoveIf(int size,Predicate<? super E> filter)
+  {
+    final int numRemoved;
+    final Object[] arr;
+    if((numRemoved=uncheckedRemoveIfImpl(arr=this.arr,0,size,filter))!=0){
+      OmniArray.OfRef.nullifyRange(arr,size-1,size-=numRemoved);
+      this.size=size;
+      return true;
+    }
+    return false;
+  }
   @Override
   public boolean removeIf(Predicate<? super E> filter)
   {
@@ -1184,18 +1194,6 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>
         return (E)(arr[size-1]);
       }
       return null;
-    }
-    @Override
-    boolean uncheckedRemoveIf(int size,Predicate<? super E> filter)
-    {
-      final int numRemoved;
-      final Object[] arr;
-      if((numRemoved=uncheckedRemoveIfImpl(arr=this.arr,0,size,filter))!=0){
-        OmniArray.OfRef.nullifyRange(arr,size-1,size-=numRemoved);
-        this.size=size;
-        return true;
-      }
-      return false;
     }
   }
   public
@@ -1932,18 +1930,6 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>
       final var ret=(E)(arr=this.arr)[index];
       OmniArray.OfRef.removeIndexAndPullDown(arr,index,--size);
       return ret;
-    }
-    @Override
-    boolean uncheckedRemoveIf(int size,Predicate<? super E> filter)
-    {
-      final int numRemoved;
-      final Object[] arr;
-      if((numRemoved=uncheckedRemoveIfImpl(arr=this.arr,0,size,filter))!=0){
-        OmniArray.OfRef.nullifyRange(arr,size-1,size-=numRemoved);
-        this.size=size;
-        return true;
-      }
-      return false;
     }
     @Override
     public void replaceAll(UnaryOperator<E> operator)
@@ -3799,21 +3785,32 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>
     @Override
     boolean uncheckedRemoveIf(int size,Predicate<? super E> filter)
     {
-      final int modCount;
-      final int numRemoved;
-      final Object[] arr;
-      if((numRemoved=uncheckedRemoveIfImpl(arr=this.arr
-        ,0,size,filter,new CheckedCollection.AbstractModCountChecker(modCount=this.modCount){
-          @Override protected int getActualModCount(){
-          return CheckedStack.this.modCount;
-          }
-        }))
-        !=0
-        ){
-        this.modCount=modCount+1;
-        OmniArray.OfRef.nullifyRange(arr,size-1,size-=numRemoved);
-        this.size=size;
-        return true;
+      final int modCount=this.modCount;
+      try
+      {
+        final int numRemoved;
+        final Object[] arr;
+        if((numRemoved=uncheckedRemoveIfImpl(arr=this.arr
+          ,0,size,filter,new CheckedCollection.AbstractModCountChecker(modCount){
+            @Override protected int getActualModCount(){
+            return CheckedStack.this.modCount;
+            }
+          }))
+          !=0
+          ){
+          this.modCount=modCount+1;
+          OmniArray.OfRef.nullifyRange(arr,size-1,size-=numRemoved);
+          this.size=size;
+          return true;
+        }
+      }
+      catch(ConcurrentModificationException e)
+      {
+        throw e;
+      }
+      catch(RuntimeException e)
+      {
+        throw CheckedCollection.checkModCount(modCount,this.modCount,e);
       }
       CheckedCollection.checkModCount(modCount,this.modCount);
       return false;
@@ -4289,21 +4286,32 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>
     @Override
     boolean uncheckedRemoveIf(int size,Predicate<? super E> filter)
     {
-      final int modCount;
-      final int numRemoved;
-      final Object[] arr;
-      if((numRemoved=uncheckedRemoveIfImpl(arr=this.arr
-        ,0,size,filter,new CheckedCollection.AbstractModCountChecker(modCount=this.modCount){
-          @Override protected int getActualModCount(){
-          return CheckedList.this.modCount;
-          }
-        }))
-        !=0
-        ){
-        this.modCount=modCount+1;
-        OmniArray.OfRef.nullifyRange(arr,size-1,size-=numRemoved);
-        this.size=size;
-        return true;
+      final int modCount=this.modCount;
+      try
+      {
+        final int numRemoved;
+        final Object[] arr;
+        if((numRemoved=uncheckedRemoveIfImpl(arr=this.arr
+          ,0,size,filter,new CheckedCollection.AbstractModCountChecker(modCount){
+            @Override protected int getActualModCount(){
+            return CheckedList.this.modCount;
+            }
+          }))
+          !=0
+          ){
+          this.modCount=modCount+1;
+          OmniArray.OfRef.nullifyRange(arr,size-1,size-=numRemoved);
+          this.size=size;
+          return true;
+        }
+      }
+      catch(ConcurrentModificationException e)
+      {
+        throw e;
+      }
+      catch(RuntimeException e)
+      {
+        throw CheckedCollection.checkModCount(modCount,this.modCount,e);
       }
       CheckedCollection.checkModCount(modCount,this.modCount);
       return false;

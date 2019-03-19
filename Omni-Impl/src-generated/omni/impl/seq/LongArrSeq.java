@@ -486,7 +486,14 @@ public abstract class LongArrSeq implements OmniCollection.OfLong
     }
     return OmniArray.OfFloat.DEFAULT_ARR;
   }
-  abstract boolean uncheckedRemoveIf(int size,LongPredicate filter);
+  boolean uncheckedRemoveIf(int size,LongPredicate filter)
+  {
+    if(size!=(size-=uncheckedRemoveIfImpl(this.arr,0,size,filter))){
+      this.size=size;
+      return true;
+    }
+    return false;
+  }
   @Override
   public boolean removeIf(LongPredicate filter)
   {
@@ -949,15 +956,6 @@ public abstract class LongArrSeq implements OmniCollection.OfLong
       }
       return Float.NaN;
     }
-    @Override
-    boolean uncheckedRemoveIf(int size,LongPredicate filter)
-    {
-      if(size!=(size-=uncheckedRemoveIfImpl(this.arr,0,size,filter))){
-        this.size=size;
-        return true;
-      }
-      return false;
-    }
   }
   public
     static class UncheckedList
@@ -1409,15 +1407,6 @@ public abstract class LongArrSeq implements OmniCollection.OfLong
       final var ret=(long)(arr=this.arr)[index];
       OmniArray.OfLong.removeIndexAndPullDown(arr,index,--size);
       return ret;
-    }
-    @Override
-    boolean uncheckedRemoveIf(int size,LongPredicate filter)
-    {
-      if(size!=(size-=uncheckedRemoveIfImpl(this.arr,0,size,filter))){
-        this.size=size;
-        return true;
-      }
-      return false;
     }
     @Override
     public void replaceAll(LongUnaryOperator operator)
@@ -2732,17 +2721,28 @@ public abstract class LongArrSeq implements OmniCollection.OfLong
     @Override
     boolean uncheckedRemoveIf(int size,LongPredicate filter)
     {
-      final int modCount;
-      if(size!=(size-=uncheckedRemoveIfImpl(this.arr
-        ,0,size,filter,new CheckedCollection.AbstractModCountChecker(modCount=this.modCount){
-          @Override protected int getActualModCount(){
-          return CheckedStack.this.modCount;
-          }
-        }))
-        ){
-        this.modCount=modCount+1;
-        this.size=size;
-        return true;
+      final int modCount=this.modCount;
+      try
+      {
+        if(size!=(size-=uncheckedRemoveIfImpl(this.arr
+          ,0,size,filter,new CheckedCollection.AbstractModCountChecker(modCount){
+            @Override protected int getActualModCount(){
+            return CheckedStack.this.modCount;
+            }
+          }))
+          ){
+          this.modCount=modCount+1;
+          this.size=size;
+          return true;
+        }
+      }
+      catch(ConcurrentModificationException e)
+      {
+        throw e;
+      }
+      catch(RuntimeException e)
+      {
+        throw CheckedCollection.checkModCount(modCount,this.modCount,e);
       }
       CheckedCollection.checkModCount(modCount,this.modCount);
       return false;
@@ -3095,17 +3095,28 @@ public abstract class LongArrSeq implements OmniCollection.OfLong
     @Override
     boolean uncheckedRemoveIf(int size,LongPredicate filter)
     {
-      final int modCount;
-      if(size!=(size-=uncheckedRemoveIfImpl(this.arr
-        ,0,size,filter,new CheckedCollection.AbstractModCountChecker(modCount=this.modCount){
-          @Override protected int getActualModCount(){
-          return CheckedList.this.modCount;
-          }
-        }))
-        ){
-        this.modCount=modCount+1;
-        this.size=size;
-        return true;
+      final int modCount=this.modCount;
+      try
+      {
+        if(size!=(size-=uncheckedRemoveIfImpl(this.arr
+          ,0,size,filter,new CheckedCollection.AbstractModCountChecker(modCount){
+            @Override protected int getActualModCount(){
+            return CheckedList.this.modCount;
+            }
+          }))
+          ){
+          this.modCount=modCount+1;
+          this.size=size;
+          return true;
+        }
+      }
+      catch(ConcurrentModificationException e)
+      {
+        throw e;
+      }
+      catch(RuntimeException e)
+      {
+        throw CheckedCollection.checkModCount(modCount,this.modCount,e);
       }
       CheckedCollection.checkModCount(modCount,this.modCount);
       return false;

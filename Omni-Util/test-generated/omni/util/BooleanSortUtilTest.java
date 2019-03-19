@@ -81,7 +81,7 @@ public class BooleanSortUtilTest
     private static void initializeTestData(booleanArrayBuilder builder,long randSeed,int arrLength,ArrayList<TestData> testDatas)
     {
       Random rand=new Random(randSeed);
-      for(int m=getMLo(builder),mHi=getMHi(arrLength,builder),numReps=getNumReps(arrLength,builder);m<=mHi;m=incrementM(m,builder))
+      for(int m=builder.getMLo(),mHi=builder.getMHi(arrLength),numReps=builder.getNumSortReps(arrLength);m<=mHi;m=builder.incrementM(m))
       {
         for(int i=0;i<numReps;++i)
         {
@@ -91,42 +91,6 @@ public class BooleanSortUtilTest
             testDatas.add(td);
           }
         }
-      }
-    }
-    private static int getMLo(booleanArrayBuilder builder)
-    {
-      switch(builder)
-      {
-      case AllEquals:
-        return 0;
-      default:
-        return 1;
-      }
-    }
-    private static int getMHi(int arrLength,booleanArrayBuilder builder)
-    {
-      switch(builder)
-      {
-      default:
-        return 1;
-      }
-    }
-    private static int getNumReps(int arrLength,booleanArrayBuilder builder)
-    {
-      switch(builder)
-      {
-      case Randomized:
-        return 10;
-      default:
-        return 1;
-      }
-    }
-    private static int incrementM(int m,booleanArrayBuilder builder)
-    {
-      switch(builder)
-      {
-      default:
-        return m+1;
       }
     }
   }

@@ -5,8 +5,20 @@ public enum shortArrayBuilder
 {
   Randomized
   {
-  /*
-  */
+    @Override
+    public int getNumRemoveIfReps(int arrLength)
+    {
+      return 10;
+    }
+    @Override
+    public int getNumSortReps(int arrLength)
+    {
+      if(arrLength<=3201 && arrLength>=287)
+      {
+        return 40;
+      }  
+      return 10;
+    }
     @Override
     public boolean isRandomized()
     {
@@ -41,8 +53,6 @@ public enum shortArrayBuilder
     {
       return (arrLength<<1)-1;
     }
-  /*
-  */
     public int incrementM(int m)
     {
       return m<<1;
@@ -66,8 +76,6 @@ public enum shortArrayBuilder
     {
       return (arrLength<<1)-1;
     }
-  /*
-  */
     public int incrementM(int m)
     {
       return m<<1;
@@ -96,8 +104,6 @@ public enum shortArrayBuilder
     {
       return 0;
     }
-  /*
-  */
     @Override
     public void buildUnchecked(short[] arr,int offset,int length,Random rand,int m)
     {
@@ -134,8 +140,6 @@ public enum shortArrayBuilder
     {
       return 69;
     }
-  /*
-  */
     @Override
     public void buildUnchecked(short[] arr,int offset,int length,Random rand,int m)
     {
@@ -179,8 +183,6 @@ public enum shortArrayBuilder
     {
       return 69;
     }
-  /*
-  */
     @Override
     public void buildUnchecked(short[] arr,int offset,int length,Random rand,int m)
     {
@@ -219,8 +221,6 @@ public enum shortArrayBuilder
     {
       return (arrLength<<1)-1;
     }
-  /*
-  */
     public int incrementM(int m)
     {
       return m<<1;
@@ -278,8 +278,6 @@ public enum shortArrayBuilder
     {
       return Math.min(arrLength,7);
     }
-  /*
-  */
     @Override
     public void buildUnchecked(short[] arr,int offset,int length,Random rand,int m)
     {
@@ -325,8 +323,6 @@ public enum shortArrayBuilder
     {
       return (arrLength<<1)-1;
     }
-  /*
-  */
     public int incrementM(int m)
     {
       return m<<1;
@@ -360,17 +356,15 @@ public enum shortArrayBuilder
     {
       return (arrLength<<1)-1;
     }
-  /*
     @Override
-    public int getNumReps(int arrLength)
+    public int getNumSortReps(int arrLength)
     {
-      if(arrLength<=3201 && arrLength>=47)
+      if(arrLength<=3201 && arrLength>=287)
       {
-        return 9;
+        return 40;
       }
       return 1;
     }
-  */
     public int incrementM(int m)
     {
       return m<<1;
@@ -409,8 +403,6 @@ public enum shortArrayBuilder
     {
       return Math.min(arrLength,7);
     }
-  /*
-  */
     @Override
     public void buildUnchecked(short[] arr,int offset,int length,Random rand,int m)
     {
@@ -448,8 +440,6 @@ public enum shortArrayBuilder
     {
       return (arrLength<<1)-1;
     }
-  /*
-  */
     public int incrementM(int m)
     {
       return m<<1;
@@ -483,8 +473,6 @@ public enum shortArrayBuilder
     {
       return (arrLength<<1)-1;
     }
-  /*
-  */
     public int incrementM(int m)
     {
       return m<<1;
@@ -518,8 +506,6 @@ public enum shortArrayBuilder
     {
       return (arrLength<<1)-1;
     }
-  /*
-  */
     public int incrementM(int m)
     {
       return m<<1;
@@ -548,8 +534,20 @@ public enum shortArrayBuilder
   ,
   Shuffle
   {
-  /*
-  */
+    @Override
+    public int getNumRemoveIfReps(int arrLength)
+    {
+      return 10;
+    }
+    @Override
+    public int getNumSortReps(int arrLength)
+    {
+      if(arrLength<=3201 && arrLength>=287)
+      {
+        return 40;
+      }  
+      return 10;
+    }
     @Override
     public boolean isRandomized()
     {
@@ -587,12 +585,12 @@ public enum shortArrayBuilder
   {
     return 1;
   }
-  public int getNumReps(int arrLength)
+  public int getNumSortReps(int arrLength)
   {
-    if(isRandomized())
-    {
-      return 10;
-    }
+    return 1;
+  }
+  public int getNumRemoveIfReps(int arrLength)
+  {
     return 1;
   }
   public int incrementM(int m)
@@ -668,7 +666,7 @@ public enum shortArrayBuilder
   public void addArrays(long randSeed,int arrLength,Collection<short[]> arrays)
   {
     Random rand=new Random(randSeed);
-    for(int m=getMLo(),mHi=getMHi(arrLength),numReps=getNumReps(arrLength);m<=mHi;m=incrementM(m))
+    for(int m=getMLo(),mHi=getMHi(arrLength),numReps=getNumSortReps(arrLength);m<=mHi;m=incrementM(m))
     {
       for(int i=0;i<numReps;++i)
       {

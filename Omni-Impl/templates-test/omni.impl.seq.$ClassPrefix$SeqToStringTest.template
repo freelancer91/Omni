@@ -17,7 +17,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 import java.util.ConcurrentModificationException;
-import omni.api.OmniCollection;
 #IFNOT OfChar,OfDouble,OfRef
 import omni.util.OmniArray;
 #ENDIF
@@ -47,177 +46,175 @@ public class $ClassPrefix$SeqToStringTest
   private static final int MAX_TOSTRING_LENGTH=15;
 #ENDIF
 
-
-  #MACRO ArrSeqImpl<UncheckedStack>()
-  #MACRO ArrSeqImpl<UncheckedList>()
-  #MACRO ArrSeqImpl<CheckedStack>()
-  #MACRO ArrSeqImpl<CheckedList>()
-  #MACRO ArrSeqImpl<UncheckedSubList>()
-  #MACRO ArrSeqImpl<CheckedSubList>()
-}
-
-#MACRODEF ArrSeqImpl<STRUCTNAME>()
-@Test
-public void testEmptyToStringArrSeqSTRUCTNAME()
-{
-  var expected=new ArrayList().toString();
-#IFSWITCH STRUCTNAME==CheckedSubList
-  var root=new $ClassPrefix$ArrSeq.CheckedList();
-  var subList=root.subList(0,0);
-  Assertions.assertEquals(expected,subList.toString());
-  root.add($defaultVal$);
-  Assertions.assertThrows(ConcurrentModificationException.class,()->subList.toString());
-#ELSEIFSWITCH STRUCTNAME==UncheckedSubList
-  Assertions.assertEquals(expected,new $ClassPrefix$ArrSeq.UncheckedList().subList(0,0).toString());
-#ELSE
-  Assertions.assertEquals(expected,new $ClassPrefix$ArrSeq.STRUCTNAME().toString());
-#ENDIF
-}
-
-
-
-
-@Test
-public void testOOMToStringArrSeqSTRUCTNAME()
-{
-#IF OfBoolean,OfByte,OfChar,OfInt,OfLong,OfShort
-  int length=Integer.MAX_VALUE/(MIN_TOSTRING_LENGTH+2)-1;
-#ELSEIF OfFloat
-  int length=Integer.MAX_VALUE/(MIN_TOSTRING_LENGTH+2)-3;
-#ELSEIF OfRef
-  int length=Integer.MAX_VALUE/(MIN_TOSTRING_LENGTH+2)-1;
-#ELSE
-  int length=Integer.MAX_VALUE/(MIN_TOSTRING_LENGTH+2)-1;
-#ENDIF
-  
-#IF OfBoolean,OfRef
-  #IFSWITCH STRUCTNAME==CheckedSubList,UncheckedSubList
-    #IFSWITCH STRUCTNAME==CheckedSubList
-  var root=new $ClassPrefix$ArrSeq.CheckedList(length+1);
-    #ELSE
-  var root=new $ClassPrefix$ArrSeq.UncheckedList(length+1);
-    #ENDIF
-  for(int i=0;i<length;++i)
+  private static void testArrSeqToString(int length)
   {
-    root.add(MIN_LENGTH_STRING_VAL);
-  }
-  var seq=root.subList(0,root.size());
-  #ELSE
-  var seq=new $ClassPrefix$ArrSeq.STRUCTNAME(length+1);
-  for(int i=0;i<length;++i)
-  {
-    seq.add(MIN_LENGTH_STRING_VAL);
-  }
-  #ENDIF
-#ELSE
-  #IFSWITCH STRUCTNAME==CheckedSubList
-  var root=new $ClassPrefix$ArrSeq.CheckedList(length,new $ArrayType$[length+1]);
-  var seq=root.subList(0,length);
-  #ELSEIFSWITCH STRUCTNAME==UncheckedSubList
-  var root=new $ClassPrefix$ArrSeq.UncheckedList(length,new $ArrayType$[length+1]);
-  var seq=root.subList(0,length);
-  #ELSE
-  var seq=new $ClassPrefix$ArrSeq.STRUCTNAME(length,new $ArrayType$[length+1]);
-  #ENDIF
-#ENDIF
-  Assertions.assertDoesNotThrow(()->seq.toString());
-  seq.add(MIN_LENGTH_STRING_VAL);
-  Assertions.assertThrows(OutOfMemoryError.class,()->seq.toString());
-}
-
-private static Object[] createAscendingSequencePairArrSeqSTRUCTNAME(int length)
-{
-#IFSWITCH STRUCTNAME==CheckedSubList
-  var root=new $ClassPrefix$ArrSeq.CheckedList(length);
-  var seq=root.subList(0,0);
-#ELSEIFSWITCH STRUCTNAME==UncheckedSubList
-  var root=new $ClassPrefix$ArrSeq.UncheckedList(length);
-  var seq=root.subList(0,0);
-#ELSE
-  var seq=new $ClassPrefix$ArrSeq.STRUCTNAME(length);
-#ENDIF
-  var arrayList=new ArrayList(length);
-  for(int i=0;i<length;++i)
-  {
-#IF OfRef
-    var val=TypeConversionUtil.convertToInteger(i);
-#ELSE
-    $exposedType$ val=TypeConversionUtil.convertTo$exposedType$(i);
-#ENDIF
-    seq.add(val);
-#IFSWITCH STRUCTNAME==UncheckedStack,CheckedStack
+    final var arr=new $ArrayType$[length];
+    var arrayList=new ArrayList(length);
+    for(int i=0;i<length;++i)
+    {
   #IF OfRef
-    var counterVal=TypeConversionUtil.convertToInteger(length-1-i);
+      var val=TypeConversionUtil.convertToInteger(i);
   #ELSE
-    $exposedType$ counterVal=TypeConversionUtil.convertTo$exposedType$(length-1-i);
+      var val=TypeConversionUtil.convertTo$exposedType$(i);
   #ENDIF
-    arrayList.add(counterVal);
-#ELSE
-    arrayList.add(val);
-#ENDIF
+      arr[i]=val;
+      arrayList.add(val);
+    }
+    {
+      var expected=arrayList.toString();
+      {
+        var checkedList=new $ClassPrefix$ArrSeq.CheckedList(length,arr);
+        EqualityUtil.parallelAssertStringsAreEqual(expected,checkedList.toString());
+        EqualityUtil.parallelAssertStringsAreEqual(expected,checkedList.subList(0,length).toString());
+      }
+      {
+        var uncheckedList=new $ClassPrefix$ArrSeq.UncheckedList(length,arr);
+        EqualityUtil.parallelAssertStringsAreEqual(expected,uncheckedList.toString());
+        EqualityUtil.parallelAssertStringsAreEqual(expected,uncheckedList.subList(0,length).toString());
+      }
+    }
+    {
+      for(int l=0,r=length-1;l<r;++l,--r)
+      {
+        arrayList.set(r,arrayList.set(l,arrayList.get(r)));
+      }
+      var expected=arrayList.toString();
+      arrayList=null;
+      EqualityUtil.parallelAssertStringsAreEqual(expected,new $ClassPrefix$ArrSeq.CheckedStack(length,arr).toString());
+      EqualityUtil.parallelAssertStringsAreEqual(expected,new $ClassPrefix$ArrSeq.UncheckedStack(length,arr).toString());
+    }
   }
-  return new Object[]{arrayList,seq};
-}
+
+  @Test
+  public void testSmallArrSeqToString()
+  {
+    testArrSeqToString(100);
+  }
+  @Test
+  public void testEmptyArrSeqToString()
+  {
+    var expected=new ArrayList().toString();
+    {
+      var root=new $ClassPrefix$ArrSeq.CheckedList();
+      Assertions.assertEquals(expected,root.toString());
+      var subList=root.subList(0,0);
+      Assertions.assertEquals(expected,subList.toString());
+      root.add($defaultVal$);
+      Assertions.assertThrows(ConcurrentModificationException.class,()->subList.toString());
+    }
+    {
+      var root=new $ClassPrefix$ArrSeq.UncheckedList();
+      Assertions.assertEquals(expected,root.toString());
+      Assertions.assertEquals(expected,root.subList(0,0).toString());
+    }
+    Assertions.assertEquals(expected,new $ClassPrefix$ArrSeq.CheckedStack().toString());
+    Assertions.assertEquals(expected,new $ClassPrefix$ArrSeq.UncheckedStack().toString());
+  }
+  //@Test
+  public void testOOMArrSeqToString()
+  {
+#IF OfBoolean,OfByte,OfChar,OfInt,OfLong,OfShort
+    int length=Integer.MAX_VALUE/(MIN_TOSTRING_LENGTH+2)-1;
+#ELSEIF OfFloat
+    int length=Integer.MAX_VALUE/(MIN_TOSTRING_LENGTH+2)-3;
+#ELSEIF OfRef
+    int length=Integer.MAX_VALUE/(MIN_TOSTRING_LENGTH+2)-1;
+#ELSE
+    int length=Integer.MAX_VALUE/(MIN_TOSTRING_LENGTH+2)-1;
+#ENDIF
+    final $ArrayType$[] arr=new $ArrayType$[length+1];
+#IF OfBoolean,OfRef
+    for(int i=0;i<length;++i)
+    {
+      arr[i]=MIN_LENGTH_STRING_VAL;
+    }
+#ENDIF
+    {
+      var root=new $ClassPrefix$ArrSeq.CheckedList(length,arr);
+      Assertions.assertDoesNotThrow(()->root.toString());
+      ++root.size;
+      Assertions.assertThrows(OutOfMemoryError.class,()->root.toString());
+      --root.size;
+      var subList=root.subList(0,root.size);
+      Assertions.assertDoesNotThrow(()->subList.toString());
+      subList.add(MIN_LENGTH_STRING_VAL);
+      Assertions.assertThrows(OutOfMemoryError.class,()->subList.toString());
+    }
+    {
+      var root=new $ClassPrefix$ArrSeq.UncheckedList(length,arr);
+      Assertions.assertDoesNotThrow(()->root.toString());
+      ++root.size;
+      Assertions.assertThrows(OutOfMemoryError.class,()->root.toString());
+      --root.size;
+      var subList=root.subList(0,root.size);
+      Assertions.assertDoesNotThrow(()->subList.toString());
+      subList.add(MIN_LENGTH_STRING_VAL);
+      Assertions.assertThrows(OutOfMemoryError.class,()->subList.toString());
+    }
+    {
+      var root=new $ClassPrefix$ArrSeq.CheckedStack(length,arr);
+      Assertions.assertDoesNotThrow(()->root.toString());
+      ++root.size;
+      Assertions.assertThrows(OutOfMemoryError.class,()->root.toString());
+    }
+    {
+      var root=new $ClassPrefix$ArrSeq.UncheckedStack(length,arr);
+      Assertions.assertDoesNotThrow(()->root.toString());
+      ++root.size;
+      Assertions.assertThrows(OutOfMemoryError.class,()->root.toString());
+    }
+  }
 
 #IF OfBoolean,OfByte,OfShort,OfInt,OfLong,OfFloat
-@Test
-public void testLargeToStringSTRUCTNAME()
-{
-  int length=(OmniArray.MAX_ARR_SIZE/(MAX_TOSTRING_LENGTH+2))+1;
-  var seqPair=createAscendingSequencePairArrSeqSTRUCTNAME(length);
-  var arrayList=(ArrayList)seqPair[0];
-  var seq=(OmniCollection.Of$ClassPrefix$)seqPair[1];
-  EqualityUtil.parallelAssertStringsAreEqual(arrayList.toString(),seq.toString());
-}
+  //@Test
+  public void testLargeArrSeqToString()
+  {
+    testArrSeqToString((OmniArray.MAX_ARR_SIZE/(MAX_TOSTRING_LENGTH+2))+1);
+  }
 #ENDIF
-@Test
-public void testSmallToStringSTRUCTNAME()
-{
-  int length=100;
-  var seqPair=createAscendingSequencePairArrSeqSTRUCTNAME(length);
-  var arrayList=(ArrayList)seqPair[0];
-  var seq=(OmniCollection.Of$ClassPrefix$)seqPair[1];
-  EqualityUtil.parallelAssertStringsAreEqual(arrayList.toString(),seq.toString());
-}
 
 #IF OfRef
-  #IFSWITCH STRUCTNAME==CheckedList,CheckedStack,CheckedSubList
-@Test
-public void testModificationCheckSTRUCTNAME()
-{
-    #IFSWITCH STRUCTNAME==CheckedSubList
+  @Test
+  public void testArrSeqModificationCheck()
   {
-    var root=new $ClassPrefix$ArrSeq.CheckedList();
-    var subList=root.subList(0,0);
-    var rootModifyingObject=CheckedCollectionTest.createCollectionModifyingObject(root);
-    for(int i=0;i<10;++i)
     {
-      subList.add(rootModifyingObject);
+      var root=new $ClassPrefix$ArrSeq.CheckedList();
+      var subList=root.subList(0,0);
+      var rootModifyingObject=CheckedCollectionTest.createCollectionModifyingObject(root);
+      for(int i=0;i<10;++i)
+      {
+        subList.add(rootModifyingObject);
+      }
+      Assertions.assertThrows(ConcurrentModificationException.class,()->subList.toString());
     }
-    Assertions.assertThrows(ConcurrentModificationException.class,()->subList.toString());
-  }
-  {
-    var root=new $ClassPrefix$ArrSeq.CheckedList();
-    var subList=root.subList(0,0);
-    var subListModifyingObject=CheckedCollectionTest.createCollectionModifyingObject(subList);
-    for(int i=0;i<10;++i)
     {
-      subList.add(subListModifyingObject);
+      var root=new $ClassPrefix$ArrSeq.CheckedList();
+      var subList=root.subList(0,0);
+      var subListModifyingObject=CheckedCollectionTest.createCollectionModifyingObject(subList);
+      for(int i=0;i<10;++i)
+      {
+        subList.add(subListModifyingObject);
+      }
+      Assertions.assertThrows(ConcurrentModificationException.class,()->subList.toString());
     }
-    Assertions.assertThrows(ConcurrentModificationException.class,()->subList.toString());
+    {
+      var seq=new $ClassPrefix$ArrSeq.CheckedList();
+      var seqModifyingObject=CheckedCollectionTest.createCollectionModifyingObject(seq);
+      for(int i=0;i<10;++i)
+      {
+        seq.add(seqModifyingObject);
+      }
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.toString());
+    }
+    {
+      var seq=new $ClassPrefix$ArrSeq.CheckedStack();
+      var seqModifyingObject=CheckedCollectionTest.createCollectionModifyingObject(seq);
+      for(int i=0;i<10;++i)
+      {
+        seq.add(seqModifyingObject);
+      }
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.toString());
+    }
   }
-    #ELSE
-  var seq=new $ClassPrefix$ArrSeq.STRUCTNAME();
-  var seqModifyingObject=CheckedCollectionTest.createCollectionModifyingObject(seq);
-  for(int i=0;i<10;++i)
-  {
-    seq.add(seqModifyingObject);
-  }
-  Assertions.assertThrows(ConcurrentModificationException.class,()->seq.toString());
-    #ENDIF
-}
-  #ENDIF
 #ENDIF
-
-
-#ENDDEF
+}

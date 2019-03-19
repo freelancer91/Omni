@@ -531,7 +531,14 @@ public abstract class ByteArrSeq implements OmniCollection.OfByte
     }
     return OmniArray.OfShort.DEFAULT_ARR;
   }
-  abstract boolean uncheckedRemoveIf(int size,BytePredicate filter);
+  boolean uncheckedRemoveIf(int size,BytePredicate filter)
+  {
+    if(size!=(size-=uncheckedRemoveIfImpl(this.arr,0,size,filter))){
+      this.size=size;
+      return true;
+    }
+    return false;
+  }
   @Override
   public boolean removeIf(BytePredicate filter)
   {
@@ -1105,15 +1112,6 @@ public abstract class ByteArrSeq implements OmniCollection.OfByte
       }
       return Short.MIN_VALUE;
     }
-    @Override
-    boolean uncheckedRemoveIf(int size,BytePredicate filter)
-    {
-      if(size!=(size-=uncheckedRemoveIfImpl(this.arr,0,size,filter))){
-        this.size=size;
-        return true;
-      }
-      return false;
-    }
   }
   public
     static class UncheckedList
@@ -1640,15 +1638,6 @@ public abstract class ByteArrSeq implements OmniCollection.OfByte
       final var ret=(byte)(arr=this.arr)[index];
       OmniArray.OfByte.removeIndexAndPullDown(arr,index,--size);
       return ret;
-    }
-    @Override
-    boolean uncheckedRemoveIf(int size,BytePredicate filter)
-    {
-      if(size!=(size-=uncheckedRemoveIfImpl(this.arr,0,size,filter))){
-        this.size=size;
-        return true;
-      }
-      return false;
     }
     @Override
     public void replaceAll(ByteUnaryOperator operator)
@@ -3110,17 +3099,28 @@ public abstract class ByteArrSeq implements OmniCollection.OfByte
     @Override
     boolean uncheckedRemoveIf(int size,BytePredicate filter)
     {
-      final int modCount;
-      if(size!=(size-=uncheckedRemoveIfImpl(this.arr
-        ,0,size,filter,new CheckedCollection.AbstractModCountChecker(modCount=this.modCount){
-          @Override protected int getActualModCount(){
-          return CheckedStack.this.modCount;
-          }
-        }))
-        ){
-        this.modCount=modCount+1;
-        this.size=size;
-        return true;
+      final int modCount=this.modCount;
+      try
+      {
+        if(size!=(size-=uncheckedRemoveIfImpl(this.arr
+          ,0,size,filter,new CheckedCollection.AbstractModCountChecker(modCount){
+            @Override protected int getActualModCount(){
+            return CheckedStack.this.modCount;
+            }
+          }))
+          ){
+          this.modCount=modCount+1;
+          this.size=size;
+          return true;
+        }
+      }
+      catch(ConcurrentModificationException e)
+      {
+        throw e;
+      }
+      catch(RuntimeException e)
+      {
+        throw CheckedCollection.checkModCount(modCount,this.modCount,e);
       }
       CheckedCollection.checkModCount(modCount,this.modCount);
       return false;
@@ -3473,17 +3473,28 @@ public abstract class ByteArrSeq implements OmniCollection.OfByte
     @Override
     boolean uncheckedRemoveIf(int size,BytePredicate filter)
     {
-      final int modCount;
-      if(size!=(size-=uncheckedRemoveIfImpl(this.arr
-        ,0,size,filter,new CheckedCollection.AbstractModCountChecker(modCount=this.modCount){
-          @Override protected int getActualModCount(){
-          return CheckedList.this.modCount;
-          }
-        }))
-        ){
-        this.modCount=modCount+1;
-        this.size=size;
-        return true;
+      final int modCount=this.modCount;
+      try
+      {
+        if(size!=(size-=uncheckedRemoveIfImpl(this.arr
+          ,0,size,filter,new CheckedCollection.AbstractModCountChecker(modCount){
+            @Override protected int getActualModCount(){
+            return CheckedList.this.modCount;
+            }
+          }))
+          ){
+          this.modCount=modCount+1;
+          this.size=size;
+          return true;
+        }
+      }
+      catch(ConcurrentModificationException e)
+      {
+        throw e;
+      }
+      catch(RuntimeException e)
+      {
+        throw CheckedCollection.checkModCount(modCount,this.modCount,e);
       }
       CheckedCollection.checkModCount(modCount,this.modCount);
       return false;

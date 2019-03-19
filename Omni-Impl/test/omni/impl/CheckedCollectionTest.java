@@ -1,10 +1,74 @@
 package omni.impl;
 
 import java.util.ConcurrentModificationException;
+import java.util.function.DoublePredicate;
+import java.util.function.IntPredicate;
+import java.util.function.LongPredicate;
+import java.util.function.Predicate;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import omni.api.OmniCollection;
+import omni.function.BooleanPredicate;
+import omni.function.BytePredicate;
+import omni.function.CharPredicate;
+import omni.function.FloatPredicate;
+import omni.function.ShortPredicate;
 public class CheckedCollectionTest{
+
+    public static <E> Predicate<E> getModifyingPred(Predicate<E> pred,Runnable modOp){
+        return val->{
+            modOp.run();
+            return pred.test(val);
+        };
+    }
+    public static DoublePredicate getModifyingPred(DoublePredicate pred,Runnable modOp){
+        return val->{
+            modOp.run();
+            return pred.test(val);
+        };
+    }
+    public static FloatPredicate getModifyingPred(FloatPredicate pred,Runnable modOp){
+        return val->{
+            modOp.run();
+            return pred.test(val);
+        };
+    }
+    public static LongPredicate getModifyingPred(LongPredicate pred,Runnable modOp){
+        return val->{
+            modOp.run();
+            return pred.test(val);
+        };
+    }
+    public static IntPredicate getModifyingPred(IntPredicate pred,Runnable modOp){
+        return val->{
+            modOp.run();
+            return pred.test(val);
+        };
+    }
+    public static ShortPredicate getModifyingPred(ShortPredicate pred,Runnable modOp){
+        return val->{
+            modOp.run();
+            return pred.test(val);
+        };
+    }
+    public static CharPredicate getModifyingPred(CharPredicate pred,Runnable modOp){
+        return val->{
+            modOp.run();
+            return pred.test(val);
+        };
+    }
+    public static BytePredicate getModifyingPred(BytePredicate pred,Runnable modOp){
+        return val->{
+            modOp.run();
+            return pred.test(val);
+        };
+    }
+    public static BooleanPredicate getModifyingPred(BooleanPredicate pred,Runnable modOp){
+        return val->{
+            modOp.run();
+            return pred.test(val);
+        };
+    }
     @SuppressWarnings({"rawtypes","unchecked"})
     public static Object createCollectionModifyingObject(OmniCollection.OfRef collection){
         return new Object(){

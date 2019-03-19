@@ -5,8 +5,16 @@ public enum doubleArrayBuilder
 {
   Randomized
   {
-  /*
-  */
+    @Override
+    public int getNumRemoveIfReps(int arrLength)
+    {
+      return 10;
+    }
+    @Override
+    public int getNumSortReps(int arrLength)
+    {
+      return 10;
+    }
     @Override
     public boolean isRandomized()
     {
@@ -41,8 +49,6 @@ public enum doubleArrayBuilder
     {
       return (arrLength<<1)-1;
     }
-  /*
-  */
     public int incrementM(int m)
     {
       return m<<1;
@@ -66,8 +72,6 @@ public enum doubleArrayBuilder
     {
       return (arrLength<<1)-1;
     }
-  /*
-  */
     public int incrementM(int m)
     {
       return m<<1;
@@ -96,8 +100,6 @@ public enum doubleArrayBuilder
     {
       return 0;
     }
-  /*
-  */
     @Override
     public void buildUnchecked(double[] arr,int offset,int length,Random rand,int m)
     {
@@ -134,8 +136,6 @@ public enum doubleArrayBuilder
     {
       return 69;
     }
-  /*
-  */
     @Override
     public void buildUnchecked(double[] arr,int offset,int length,Random rand,int m)
     {
@@ -179,8 +179,6 @@ public enum doubleArrayBuilder
     {
       return 69;
     }
-  /*
-  */
     @Override
     public void buildUnchecked(double[] arr,int offset,int length,Random rand,int m)
     {
@@ -219,8 +217,6 @@ public enum doubleArrayBuilder
     {
       return (arrLength<<1)-1;
     }
-  /*
-  */
     public int incrementM(int m)
     {
       return m<<1;
@@ -278,8 +274,6 @@ public enum doubleArrayBuilder
     {
       return Math.min(arrLength,7);
     }
-  /*
-  */
     @Override
     public void buildUnchecked(double[] arr,int offset,int length,Random rand,int m)
     {
@@ -325,8 +319,6 @@ public enum doubleArrayBuilder
     {
       return (arrLength<<1)-1;
     }
-  /*
-  */
     public int incrementM(int m)
     {
       return m<<1;
@@ -360,8 +352,6 @@ public enum doubleArrayBuilder
     {
       return (arrLength<<1)-1;
     }
-  /*
-  */
     public int incrementM(int m)
     {
       return m<<1;
@@ -400,8 +390,6 @@ public enum doubleArrayBuilder
     {
       return Math.min(arrLength,7);
     }
-  /*
-  */
     @Override
     public void buildUnchecked(double[] arr,int offset,int length,Random rand,int m)
     {
@@ -439,8 +427,6 @@ public enum doubleArrayBuilder
     {
       return (arrLength<<1)-1;
     }
-  /*
-  */
     public int incrementM(int m)
     {
       return m<<1;
@@ -474,8 +460,6 @@ public enum doubleArrayBuilder
     {
       return (arrLength<<1)-1;
     }
-  /*
-  */
     public int incrementM(int m)
     {
       return m<<1;
@@ -509,8 +493,6 @@ public enum doubleArrayBuilder
     {
       return (arrLength<<1)-1;
     }
-  /*
-  */
     public int incrementM(int m)
     {
       return m<<1;
@@ -539,8 +521,16 @@ public enum doubleArrayBuilder
   ,
   Shuffle
   {
-  /*
-  */
+    @Override
+    public int getNumRemoveIfReps(int arrLength)
+    {
+      return 10;
+    }
+    @Override
+    public int getNumSortReps(int arrLength)
+    {
+      return 10;
+    }
     @Override
     public boolean isRandomized()
     {
@@ -572,13 +562,16 @@ public enum doubleArrayBuilder
   ,
   WithNaNsAndZeros
   {
-  /*
     @Override
-    public int getNumReps(int arrLength)
+    public int getNumRemoveIfReps(int arrLength)
     {
-      return 2;
+      return 10;
     }
-  */
+    @Override
+    public int getNumSortReps(int arrLength)
+    {
+      return 20;
+    }
     @Override
     public boolean isRandomized()
     {
@@ -638,12 +631,12 @@ public enum doubleArrayBuilder
   {
     return 1;
   }
-  public int getNumReps(int arrLength)
+  public int getNumSortReps(int arrLength)
   {
-    if(isRandomized())
-    {
-      return 10;
-    }
+    return 1;
+  }
+  public int getNumRemoveIfReps(int arrLength)
+  {
     return 1;
   }
   public int incrementM(int m)
@@ -719,7 +712,7 @@ public enum doubleArrayBuilder
   public void addArrays(long randSeed,int arrLength,Collection<double[]> arrays)
   {
     Random rand=new Random(randSeed);
-    for(int m=getMLo(),mHi=getMHi(arrLength),numReps=getNumReps(arrLength);m<=mHi;m=incrementM(m))
+    for(int m=getMLo(),mHi=getMHi(arrLength),numReps=getNumSortReps(arrLength);m<=mHi;m=incrementM(m))
     {
       for(int i=0;i<numReps;++i)
       {

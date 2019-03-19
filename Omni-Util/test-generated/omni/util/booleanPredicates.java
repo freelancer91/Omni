@@ -5,7 +5,12 @@ public enum booleanPredicates
 {
   MarkAll
   {
-    BooleanPredicate
+    @Override
+    public boolean isValueConsistent()
+    {
+      return true;
+    }
+    @Override public BooleanPredicate
     getPred(Random rand,int m)
     {
       return val->true;
@@ -13,7 +18,12 @@ public enum booleanPredicates
   },
   MarkNone
   {
-    BooleanPredicate
+    @Override
+    public boolean isValueConsistent()
+    {
+      return true;
+    }
+    @Override public BooleanPredicate
     getPred(Random rand,int m)
     {
       return val->false;
@@ -21,19 +31,49 @@ public enum booleanPredicates
   },
   MarkTrue
   {
-    BooleanPredicate getPred(Random rand,int m)
+    @Override
+    public boolean isValueConsistent()
+    {
+      return true;
+    }
+    @Override public BooleanPredicate getPred(Random rand,int m)
     {
       return val->val;
     }
   },
   MarkFalse
   {
-    BooleanPredicate getPred(Random rand,int m)
+    @Override
+    public boolean isValueConsistent()
+    {
+      return true;
+    }
+    @Override public BooleanPredicate getPred(Random rand,int m)
     {
       return val->!val;
     }
   }
   ;
-  abstract BooleanPredicate
+  public abstract BooleanPredicate
   getPred(Random rand,int m);
+  public int incrementM(int m)
+  {
+    return m+1;
+  }
+  public boolean isValueConsistent()
+  {
+    return false;
+  }
+  public int getMLo()
+  {
+    return 1;
+  }
+  public int getMHi()
+  {
+    return 1;
+  }
+  public int getNumReps()
+  {
+    return 1;
+  }
 }

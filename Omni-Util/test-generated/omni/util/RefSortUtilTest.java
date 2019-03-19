@@ -82,7 +82,7 @@ public class RefSortUtilTest
     private static void initializeTestData(IntegerArrayBuilder builder,long randSeed,int arrLength,ArrayList<TestData> testDatas)
     {
       Random rand=new Random(randSeed);
-      for(int m=getMLo(builder),mHi=getMHi(arrLength,builder),numReps=getNumReps(arrLength,builder);m<=mHi;m=incrementM(m,builder))
+      for(int m=builder.getMLo(),mHi=builder.getMHi(arrLength),numReps=builder.getNumSortReps(arrLength);m<=mHi;m=builder.incrementM(m))
       {
         for(int i=0;i<numReps;++i)
         {
@@ -92,75 +92,6 @@ public class RefSortUtilTest
             testDatas.add(td);
           }
         }
-      }
-    }
-    private static int getMLo(IntegerArrayBuilder builder)
-    {
-      switch(builder)
-      {
-      case AllEquals:
-        return 0;
-      case MergeAscending:
-      case MergeDescending:
-        return 65;
-      default:
-        return 1;
-      }
-    }
-    private static int getMHi(int arrLength,IntegerArrayBuilder builder)
-    {
-      switch(builder)
-      {
-      case Ascending:
-      case Descending:
-      case Saw:
-      case Repeated:
-      case Duplicated:
-      case OrganPipes:
-      case Stagger:
-      case Plateau:
-        return (arrLength<<1)-1;
-      case AllEquals:
-        return 0;
-      case MergeAscending:
-      case MergeDescending:
-        return 69;
-      case SortedRepeated:
-      case SortedOrganPipes:
-        return Math.min(arrLength,7);
-      default:
-        return 1;
-      }
-    }
-    private static int getNumReps(int arrLength,IntegerArrayBuilder builder)
-    {
-      switch(builder)
-      {
-      case Randomized:
-        return 10;
-      case Duplicated:
-        return 1;
-      case Shuffle:
-        return 10;
-      default:
-        return 1;
-      }
-    }
-    private static int incrementM(int m,IntegerArrayBuilder builder)
-    {
-      switch(builder)
-      {
-      case Ascending:
-      case Descending:
-      case Saw:
-      case Repeated:
-      case Duplicated:
-      case OrganPipes:
-      case Stagger:
-      case Plateau:
-        return m<<1;
-      default:
-        return m+1;
       }
     }
   }

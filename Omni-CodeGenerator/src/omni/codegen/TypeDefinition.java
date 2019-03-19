@@ -232,6 +232,7 @@ enum TypeDefinition{
         defVars.add(new DefVar("compareMethod","compare"));
         defVars.add(new DefVar("Comparator","Comparator"));
         defVars.add(new DefVar("TypeNameModifier",""));
+        defVars.add(new DefVar("defaultVal","null"));
         return defVars;
     }
     private static List<DefVar> getOfInteger(){
@@ -241,6 +242,7 @@ enum TypeDefinition{
         defVars.add(new DefVar("compareMethod","compare"));
         defVars.add(new DefVar("Comparator","Comparator"));
         defVars.add(new DefVar("TypeNameModifier",""));
+        defVars.add(new DefVar("defaultVal","null"));
         return defVars;
     }
     private static List<DefVar> getOfRef(){

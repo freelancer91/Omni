@@ -418,7 +418,21 @@ public abstract class $ClassPrefix$ArrSeq$<E>$ implements OmniCollection.Of$Clas
     #ENDIF
   #ENDIF
 #ENDIF
-  abstract boolean uncheckedRemoveIf(int size,$TypeNameModifier$Predicate$<? super E>$ filter);
+  boolean uncheckedRemoveIf(int size,$TypeNameModifier$Predicate$<? super E>$ filter)
+  {
+    #IF OfRef
+    final int numRemoved;
+    final $ArrayType$[] arr;
+    if((numRemoved=uncheckedRemoveIfImpl(arr=this.arr,0,size,filter))!=0){
+      OmniArray.Of$ClassPrefix$.nullifyRange(arr,size-1,size-=numRemoved);
+    #ELSE
+    if(size!=(size-=uncheckedRemoveIfImpl(this.arr,0,size,filter))){
+    #ENDIF
+      this.size=size;
+      return true;
+    }
+    return false;
+  }
   #MACRO RootRemoveIfImpl($TypeNameModifier$Predicate$<? super E>$,filter)
 #IFNOT OfRef
   #MACRO RootRemoveIfImpl(Predicate<? super $BoxedType$>,filter::test);
@@ -800,52 +814,51 @@ public boolean removeIf(PREDICATE filter)
 #ENDDEF
 
 #MACRODEF RemoveIfImpl()
-#IFSWITCH STRUCTNAME==CheckedList,CheckedStack,UncheckedList,UncheckedStack
+#IFSWITCH STRUCTNAME==CheckedList,CheckedStack
 @Override
 boolean uncheckedRemoveIf(int size,$TypeNameModifier$Predicate$<? super E>$ filter)
 {
-  #IFSWITCH STRUCTNAME==CheckedList,CheckedStack
-  final int modCount;
+  final int modCount=this.modCount;
+  try
+  {
     #IF OfRef
-  final int numRemoved;
-  final $ArrayType$[] arr;
-  if((numRemoved=uncheckedRemoveIfImpl(arr=this.arr
+    final int numRemoved;
+    final $ArrayType$[] arr;
+    if((numRemoved=uncheckedRemoveIfImpl(arr=this.arr
     #ELSE
-  if(size!=(size-=uncheckedRemoveIfImpl(this.arr
+    if(size!=(size-=uncheckedRemoveIfImpl(this.arr
     #ENDIF
-    ,0,size,filter,new CheckedCollection.AbstractModCountChecker(modCount=this.modCount){
-      @Override protected int getActualModCount(){
+      ,0,size,filter,new CheckedCollection.AbstractModCountChecker(modCount){
+        @Override protected int getActualModCount(){
     #IFSWITCH STRUCTNAME==CheckedList
-      return CheckedList.this.modCount;
+        return CheckedList.this.modCount;
     #ELSE
-      return CheckedStack.this.modCount;
+        return CheckedStack.this.modCount;
     #ENDIF
         
-      }
-    }))
+        }
+      }))
     #IF OfRef
-    !=0
+      !=0
     #ENDIF
-    ){
-    this.modCount=modCount+1;
-  #ELSE
-    #IF OfRef
-  final int numRemoved;
-  final $ArrayType$[] arr;
-  if((numRemoved=uncheckedRemoveIfImpl(arr=this.arr,0,size,filter))!=0){
-    #ELSE
-  if(size!=(size-=uncheckedRemoveIfImpl(this.arr,0,size,filter))){
-    #ENDIF
-  #ENDIF
+      ){
+      this.modCount=modCount+1;
   #IF OfRef
-    OmniArray.Of$ClassPrefix$.nullifyRange(arr,size-1,size-=numRemoved);
+      OmniArray.Of$ClassPrefix$.nullifyRange(arr,size-1,size-=numRemoved);
   #ENDIF
-    this.size=size;
-    return true;
+      this.size=size;
+      return true;
+    }
   }
-  #IFSWITCH STRUCTNAME==CheckedList,CheckedStack
+  catch(ConcurrentModificationException e)
+  {
+    throw e;
+  }
+  catch(RuntimeException e)
+  {
+    throw CheckedCollection.checkModCount(modCount,this.modCount,e);
+  }
   CheckedCollection.checkModCount(modCount,this.modCount);
-  #ENDIF
   return false;
 }
 #ENDIF

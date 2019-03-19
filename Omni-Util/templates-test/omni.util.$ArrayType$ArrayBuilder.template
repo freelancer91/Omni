@@ -11,6 +11,9 @@
 package omni.util;
 import java.util.Collection;
 import java.util.Random;
+#IF OfBoolean
+import java.util.function.$TypeNameModifier$Supplier;
+#ENDIF
 
 public enum $ArrayType$ArrayBuilder
 {
@@ -61,12 +64,12 @@ public enum $ArrayType$ArrayBuilder
   {
     return 1;
   }
-  public int getNumReps(int arrLength)
+  public int getNumSortReps(int arrLength)
   {
-    if(isRandomized())
-    {
-      return 10;
-    }
+    return 1;
+  }
+  public int getNumRemoveIfReps(int arrLength)
+  {
     return 1;
   }
   public int incrementM(int m)
@@ -78,6 +81,9 @@ public enum $ArrayType$ArrayBuilder
     //most sub-types are not randomized, so make that the default
     return false;
   }
+#IF OfBoolean
+  public abstract $TypeNameModifier$Supplier getSupplier(int length,Random rand, int m);
+#ENDIF
   public abstract void buildUnchecked($ArrayType$[] arr,int offset,int length,Random rand,int m);
   public void build($ArrayType$[] arr,Random rand,int m)
   {
@@ -144,7 +150,7 @@ public enum $ArrayType$ArrayBuilder
   public void addArrays(long randSeed,int arrLength,Collection<$ArrayType$[]> arrays)
   {
     Random rand=new Random(randSeed);
-    for(int m=getMLo(),mHi=getMHi(arrLength),numReps=getNumReps(arrLength);m<=mHi;m=incrementM(m))
+    for(int m=getMLo(),mHi=getMHi(arrLength),numReps=getNumSortReps(arrLength);m<=mHi;m=incrementM(m))
     {
       for(int i=0;i<numReps;++i)
       {
@@ -216,31 +222,43 @@ VALUENAME
   }
   #ENDIF
 #ENDIF
-#IF OfChar,OfShort
-/*
-  #IFSWITCH VALUENAME==Duplicated
+
+#IFSWITCH VALUENAME==Randomized,Shuffle,WithNaNsAndZeros
   @Override
-  public int getNumReps(int arrLength)
+  public int getNumRemoveIfReps(int arrLength)
   {
-    if(arrLength<=3201 && arrLength>=47)
+    return 10;
+  }
+
+  @Override
+  public int getNumSortReps(int arrLength)
+  {
+    #IF OfChar,OfShort
+    if(arrLength<=3201 && arrLength>=287)
     {
-      return 9;
+      return 40;
+    }  
+    #ENDIF
+    #IFSWITCH VALUENAME==WithNaNsAndZeros
+    return 20;
+    #ELSE
+    return 10;
+    #ENDIF
+  }
+#ELSEIFSWITCH VALUENAME==Duplicated
+  #IF OfChar,OfShort
+  @Override
+  public int getNumSortReps(int arrLength)
+  {
+    if(arrLength<=3201 && arrLength>=287)
+    {
+      return 40;
     }
     return 1;
   }
   #ENDIF
-*/
-#ELSEIF OfFloat,OfDouble
-/*
-  #IFSWITCH VALUENAME==WithNaNsAndZeros
-  @Override
-  public int getNumReps(int arrLength)
-  {
-    return 2;
-  }
-  #ENDIF
-*/
 #ENDIF
+
 #IFNOT OfBoolean
   #IFSWITCH VALUENAME==Ascending,Descending,Saw,Repeated,Duplicated,OrganPipes,Stagger,Plateau
   public int incrementM(int m)
@@ -256,6 +274,53 @@ VALUENAME
     return true;
   }
 #ENDIF
+#IF OfBoolean
+  @Override
+  public $TypeNameModifier$Supplier getSupplier(int length,Random rand, int m)
+  {
+#IFSWITCH VALUENAME==Randomized
+    return ()->
+    {
+      return RandomUtil.getRandom$ArrayType$(rand);
+    };
+#ELSEIFSWITCH VALUENAME==Ascending
+    return new BooleanSupplier()
+    {
+      int i=0;
+      final int middle=length/2;
+      public boolean getAsBoolean()
+      {
+        boolean ret=TypeConversionUtil.convertTo$ArrayType$(i<middle?0:1);
+        if(++i==length)
+        {
+          i=0;
+        }
+        return ret;
+      }
+    };
+#ELSEIFSWITCH VALUENAME==Descending
+    return new BooleanSupplier()
+    {
+      int i=0;
+      final int middle=length/2;
+      public boolean getAsBoolean()
+      {
+        boolean ret=TypeConversionUtil.convertTo$ArrayType$(i<middle?1:0);
+        if(++i==length)
+        {
+          i=0;
+        }
+        return ret;
+      }
+    };
+#ELSE
+    return ()->
+    {
+      return TypeConversionUtil.convertTo$ArrayType$(m);
+    };
+#ENDIF
+  }
+#ENDIF
 #IF OfString,OfInteger
   #MACRO VALUENAMEBuild<true>($ArrayType$)
 #ELSE
@@ -265,6 +330,9 @@ VALUENAME
 
 }
 #ENDDEF
+
+
+
 #MACRODEF RandomizedBuild<BOXED>(THETYPE)
 @Override
 public void buildUnchecked(THETYPE[] arr,int offset,int length,Random rand,int m)
@@ -277,6 +345,9 @@ public void buildUnchecked(THETYPE[] arr,int offset,int length,Random rand,int m
   while(++offset!=length);
 }
 #ENDDEF
+
+
+
 #MACRODEF AscendingBuild<BOXED>(THETYPE)
 @Override
 public void buildUnchecked(THETYPE[] arr,int offset,int length,Random rand,int m)
@@ -294,6 +365,9 @@ public void buildUnchecked(THETYPE[] arr,int offset,int length,Random rand,int m
 #ENDIF
 }
 #ENDDEF
+
+
+
 #MACRODEF DescendingBuild<BOXED>(THETYPE)
 @Override
 public void buildUnchecked(THETYPE[] arr,int offset,int length,Random rand,int m)
@@ -311,6 +385,8 @@ public void buildUnchecked(THETYPE[] arr,int offset,int length,Random rand,int m
 #ENDIF
 }
 #ENDDEF
+
+
 #MACRODEF AllEqualsBuild<BOXED>(THETYPE)
 @Override
 public void buildUnchecked(THETYPE[] arr,int offset,int length,Random rand,int m)
@@ -323,7 +399,8 @@ public void buildUnchecked(THETYPE[] arr,int offset,int length,Random rand,int m
   }
   while(++offset!=length);
 }
-#ENDDEF
+#ENDDEF 
+
 #MACRODEF MergeAscendingBuild<BOXED>(THETYPE)
 @Override
 public void buildUnchecked(THETYPE[] arr,int offset,int length,Random rand,int m)
