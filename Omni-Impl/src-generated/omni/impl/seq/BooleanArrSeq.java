@@ -80,10 +80,6 @@ public abstract class BooleanArrSeq implements OmniCollection.OfBoolean
     int size;
     if((size=this.size)!=0)
     {
-      if(size>=(Integer.MAX_VALUE/6))
-      {
-        throw new OutOfMemoryError();
-      }
       final byte[] buffer;
       if(size<=(OmniArray.MAX_ARR_SIZE/7)){(buffer=new byte[size*7])
         [size=uncheckedToString(size,buffer)]=(byte)']';
@@ -1935,10 +1931,6 @@ public abstract class BooleanArrSeq implements OmniCollection.OfBoolean
       int size;
       if((size=this.size)!=0)
       {
-        if(size>=(Integer.MAX_VALUE/6))
-        {
-          throw new OutOfMemoryError();
-        }
           final int rootOffset;
           final byte[] buffer;
           if(size<=(OmniArray.MAX_ARR_SIZE/7)){(buffer=new byte[size*7])
@@ -3951,10 +3943,6 @@ public abstract class BooleanArrSeq implements OmniCollection.OfBoolean
       int size;
       if((size=this.size)!=0)
       {
-        if(size>=(Integer.MAX_VALUE/6))
-        {
-          throw new OutOfMemoryError();
-        }
           final int rootOffset;
           final byte[] buffer;
           if(size<=(OmniArray.MAX_ARR_SIZE/7)){(buffer=new byte[size*7])

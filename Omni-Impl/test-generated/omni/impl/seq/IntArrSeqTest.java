@@ -57,6 +57,44 @@ public class IntArrSeqTest
       Assertions.assertEquals(seq.arr.length,i);
     }
   }
+    @Test
+    public void testListAddIntUncheckedList()
+    {
+      var seq=new UncheckedList();
+      for(int i=100;--i>=0;)
+      {
+        //test add at beginning
+        seq.add(0,(Integer)TypeConversionUtil.convertToint(i));
+      }
+      for(int i=0;i<100;++i)
+      {
+        Assertions.assertEquals((TypeConversionUtil.convertToint(i)),seq.getInt(i));
+      }
+      int currSize=seq.size();
+      Assertions.assertEquals(100,currSize);
+      for(int i=200;i<300;++i)
+      {
+        //add at end
+        seq.add(seq.size(),(Integer)TypeConversionUtil.convertToint(i));
+      }
+      for(int i=100;i<200;++i)
+      {
+        Assertions.assertEquals((TypeConversionUtil.convertToint(i+100)),seq.getInt(i));
+      }
+      currSize=seq.size();
+      Assertions.assertEquals(200,currSize);
+      for(int i=200;--i>=100;)
+      {
+        //add in middle
+        seq.add(100,(Integer)TypeConversionUtil.convertToint(i));
+      }
+      for(int i=100;i<200;++i)
+      {
+        Assertions.assertEquals((TypeConversionUtil.convertToint(i)),seq.getInt(i));
+      }
+      currSize=seq.size();
+      Assertions.assertEquals(300,currSize);
+    }
   @Test
   public void testCloneUncheckedList()
   {
@@ -149,6 +187,54 @@ public class IntArrSeqTest
       Assertions.assertEquals(seq.arr.length,i);
     }
   }
+    @Test
+    public void testListAddIntCheckedList()
+    {
+      var seq=new CheckedList();
+      for(int i=100;--i>=0;)
+      {
+        //test add at beginning
+        seq.add(0,(Integer)TypeConversionUtil.convertToint(i));
+      }
+      for(int i=0;i<100;++i)
+      {
+        Assertions.assertEquals((TypeConversionUtil.convertToint(i)),seq.getInt(i));
+      }
+      int currSize=seq.size();
+      Assertions.assertEquals(100,currSize);
+      int modCount=seq.modCount;
+      Assertions.assertEquals(modCount,100);
+      Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(-1,TypeConversionUtil.convertToint(0)));
+      Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(seq.size()+1,TypeConversionUtil.convertToint(0)));
+      Assertions.assertEquals(modCount,seq.modCount);
+      Assertions.assertEquals(currSize,seq.size());
+      for(int i=200;i<300;++i)
+      {
+        //add at end
+        seq.add(seq.size(),(Integer)TypeConversionUtil.convertToint(i));
+      }
+      for(int i=100;i<200;++i)
+      {
+        Assertions.assertEquals((TypeConversionUtil.convertToint(i+100)),seq.getInt(i));
+      }
+      currSize=seq.size();
+      Assertions.assertEquals(200,currSize);
+      modCount=seq.modCount;
+      Assertions.assertEquals(modCount,200);
+      for(int i=200;--i>=100;)
+      {
+        //add in middle
+        seq.add(100,(Integer)TypeConversionUtil.convertToint(i));
+      }
+      for(int i=100;i<200;++i)
+      {
+        Assertions.assertEquals((TypeConversionUtil.convertToint(i)),seq.getInt(i));
+      }
+      currSize=seq.size();
+      Assertions.assertEquals(300,currSize);
+      modCount=seq.modCount;
+      Assertions.assertEquals(modCount,300);
+    }
   @Test
   public void testCloneCheckedList()
   {
@@ -195,6 +281,52 @@ public class IntArrSeqTest
       Assertions.assertEquals(seq.arr.length,i);
     }
   }
+    @Test
+    public void testListAddIntUncheckedSubList()
+    {
+      var root=new UncheckedList();
+      var subList=root.subList(0,0);
+      var seq=subList.subList(0,0);
+      for(int i=100;--i>=0;)
+      {
+        //test add at beginning
+        seq.add(0,(Integer)TypeConversionUtil.convertToint(i));
+      }
+      for(int i=0;i<100;++i)
+      {
+        Assertions.assertEquals((TypeConversionUtil.convertToint(i)),seq.getInt(i));
+      }
+      int currSize=seq.size();
+      Assertions.assertEquals(subList.size(),currSize);
+      Assertions.assertEquals(root.size(),currSize);
+      Assertions.assertEquals(100,currSize);
+      for(int i=200;i<300;++i)
+      {
+        //add at end
+        seq.add(seq.size(),(Integer)TypeConversionUtil.convertToint(i));
+      }
+      for(int i=100;i<200;++i)
+      {
+        Assertions.assertEquals((TypeConversionUtil.convertToint(i+100)),seq.getInt(i));
+      }
+      currSize=seq.size();
+      Assertions.assertEquals(subList.size(),currSize);
+      Assertions.assertEquals(root.size(),currSize);
+      Assertions.assertEquals(200,currSize);
+      for(int i=200;--i>=100;)
+      {
+        //add in middle
+        seq.add(100,(Integer)TypeConversionUtil.convertToint(i));
+      }
+      for(int i=100;i<200;++i)
+      {
+        Assertions.assertEquals((TypeConversionUtil.convertToint(i)),seq.getInt(i));
+      }
+      currSize=seq.size();
+      Assertions.assertEquals(subList.size(),currSize);
+      Assertions.assertEquals(root.size(),currSize);
+      Assertions.assertEquals(300,currSize);
+    }
   @Test
   public void testCloneUncheckedSubList()
   {
@@ -259,6 +391,62 @@ public class IntArrSeqTest
       }
     }
   }
+    @Test
+    public void testListAddIntCheckedSubList()
+    {
+      var root=new CheckedList();
+      var subList=root.subList(0,0);
+      var seq=subList.subList(0,0);
+      for(int i=100;--i>=0;)
+      {
+        //test add at beginning
+        seq.add(0,(Integer)TypeConversionUtil.convertToint(i));
+      }
+      for(int i=0;i<100;++i)
+      {
+        Assertions.assertEquals((TypeConversionUtil.convertToint(i)),seq.getInt(i));
+      }
+      int currSize=seq.size();
+      Assertions.assertEquals(subList.size(),currSize);
+      Assertions.assertEquals(root.size(),currSize);
+      Assertions.assertEquals(100,currSize);
+      int modCount=root.modCount;
+      Assertions.assertEquals(modCount,100);
+      Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(-1,TypeConversionUtil.convertToint(0)));
+      Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(seq.size()+1,TypeConversionUtil.convertToint(0)));
+      Assertions.assertEquals(modCount,root.modCount);
+      Assertions.assertEquals(currSize,seq.size());
+      for(int i=200;i<300;++i)
+      {
+        //add at end
+        seq.add(seq.size(),(Integer)TypeConversionUtil.convertToint(i));
+      }
+      for(int i=100;i<200;++i)
+      {
+        Assertions.assertEquals((TypeConversionUtil.convertToint(i+100)),seq.getInt(i));
+      }
+      currSize=seq.size();
+      Assertions.assertEquals(subList.size(),currSize);
+      Assertions.assertEquals(root.size(),currSize);
+      Assertions.assertEquals(200,currSize);
+      modCount=root.modCount;
+      Assertions.assertEquals(modCount,200);
+      for(int i=200;--i>=100;)
+      {
+        //add in middle
+        seq.add(100,(Integer)TypeConversionUtil.convertToint(i));
+      }
+      for(int i=100;i<200;++i)
+      {
+        Assertions.assertEquals((TypeConversionUtil.convertToint(i)),seq.getInt(i));
+      }
+      currSize=seq.size();
+      Assertions.assertEquals(subList.size(),currSize);
+      Assertions.assertEquals(root.size(),currSize);
+      Assertions.assertEquals(300,currSize);
+      modCount=root.modCount;
+      Assertions.assertEquals(modCount,300);
+    }
   @Test
   public void testCloneCheckedSubList()
   {

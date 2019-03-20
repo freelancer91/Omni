@@ -33,50 +33,49 @@ public class ShortSeqRemoveIfTest
   public void testRemoveIfUncheckedStack()
   {
       {
-        var arr=new short[10];
-        var seq=new UncheckedStack(10,arr);
+        var arr=new short[100];
+        var seq=new UncheckedStack(100,arr);
         ShortPredicate pred=val->false;
         Assertions.assertFalse(seq.removeIf(pred));
-        Assertions.assertEquals(seq.size(),10);
+        Assertions.assertEquals(seq.size(),100);
       }
       {
-        var arr=new short[10];
-        var seq=new UncheckedStack(10,arr);
+        var arr=new short[100];
+        var seq=new UncheckedStack(100,arr);
         Predicate<? super Short> pred=val->false;
         Assertions.assertFalse(seq.removeIf(pred));
-        Assertions.assertEquals(seq.size(),10);
+        Assertions.assertEquals(seq.size(),100);
       }
       {
-        var arr=new short[10];
-        var seq=new UncheckedStack(10,arr);
+        var arr=new short[100];
+        var seq=new UncheckedStack(100,arr);
         ShortPredicate pred=val->true;
         Assertions.assertTrue(seq.removeIf(pred));
         Assertions.assertTrue(seq.isEmpty());
       }
       {
-        var arr=new short[10];
-        var seq=new UncheckedStack(10,arr);
+        var arr=new short[100];
+        var seq=new UncheckedStack(100,arr);
         Predicate<? super Short> pred=val->true;
         Assertions.assertTrue(seq.removeIf(pred));
         Assertions.assertTrue(seq.isEmpty());
       }
       {
-        int length=100;
         ShortPredicate pred=(val)->
         {
           return (EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(0))
             ||
              EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(2)));
         };
-        var arr=new short[length];
-        var seq=new UncheckedStack(length,arr);
-        for(int i=0;i<length;++i)
+        var arr=new short[100];
+        var seq=new UncheckedStack(100,arr);
+        for(int i=0;i<100;++i)
         {
           arr[i]=TypeConversionUtil.convertToshort(i);
         }
         Assertions.assertTrue(seq.removeIf(pred));
-        Assertions.assertEquals(seq.size(),length-2);
-        for(int i=0,valIndex=0;i<length-2;++i,++valIndex)
+        Assertions.assertEquals(seq.size(),100-2);
+        for(int i=0,valIndex=0;i<100-2;++i,++valIndex)
         {
           if(i==0 || i==1)
           {
@@ -86,22 +85,21 @@ public class ShortSeqRemoveIfTest
         }
       } 
       {
-        int length=100;
         Predicate<? super Short> pred=(val)->
         {
           return (EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(0))
             ||
              EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(2)));
         };
-        var arr=new short[length];
-        var seq=new UncheckedStack(length,arr);
-        for(int i=0;i<length;++i)
+        var arr=new short[100];
+        var seq=new UncheckedStack(100,arr);
+        for(int i=0;i<100;++i)
         {
           arr[i]=TypeConversionUtil.convertToshort(i);
         }
         Assertions.assertTrue(seq.removeIf(pred));
-        Assertions.assertEquals(seq.size(),length-2);
-        for(int i=0,valIndex=0;i<length-2;++i,++valIndex)
+        Assertions.assertEquals(seq.size(),100-2);
+        for(int i=0,valIndex=0;i<100-2;++i,++valIndex)
         {
           if(i==0 || i==1)
           {
@@ -111,14 +109,13 @@ public class ShortSeqRemoveIfTest
         }
       } 
       {
-        int length=100;
         ShortPredicate pred=(val)->
         {
           return !EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(1));
         };
-        var arr=new short[length];
-        var seq=new UncheckedStack(length,arr);
-        for(int i=0;i<length;++i)
+        var arr=new short[100];
+        var seq=new UncheckedStack(100,arr);
+        for(int i=0;i<100;++i)
         {
           arr[i]=TypeConversionUtil.convertToshort(i);
         }
@@ -127,20 +124,225 @@ public class ShortSeqRemoveIfTest
         Assertions.assertEquals(arr[0],TypeConversionUtil.convertToshort(1));
       } 
       {
-        int length=100;
         Predicate<? super Short> pred=(val)->
         {
           return !EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(1));
         };
-        var arr=new short[length];
-        var seq=new UncheckedStack(length,arr);
-        for(int i=0;i<length;++i)
+        var arr=new short[100];
+        var seq=new UncheckedStack(100,arr);
+        for(int i=0;i<100;++i)
         {
           arr[i]=TypeConversionUtil.convertToshort(i);
         }
         Assertions.assertTrue(seq.removeIf(pred));
         Assertions.assertEquals(seq.size(),1);
         Assertions.assertEquals(arr[0],TypeConversionUtil.convertToshort(1));
+      } 
+      {
+        ShortPredicate pred=(val)->
+        {
+          return !EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(1)) && !EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(100-1));
+        };
+        var arr=new short[100];
+        var seq=new UncheckedStack(100,arr);
+        for(int i=0;i<100;++i)
+        {
+          arr[i]=TypeConversionUtil.convertToshort(i);
+        }
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),2);
+        Assertions.assertEquals(arr[0],TypeConversionUtil.convertToshort(1));
+        Assertions.assertEquals(arr[1],TypeConversionUtil.convertToshort(100-1));
+      } 
+      {
+        Predicate<? super Short> pred=(val)->
+        {
+          return !EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(1)) && !EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(100-1));
+        };
+        var arr=new short[100];
+        var seq=new UncheckedStack(100,arr);
+        for(int i=0;i<100;++i)
+        {
+          arr[i]=TypeConversionUtil.convertToshort(i);
+        }
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),2);
+        Assertions.assertEquals(arr[0],TypeConversionUtil.convertToshort(1));
+        Assertions.assertEquals(arr[1],TypeConversionUtil.convertToshort(100-1));
+      } 
+      {
+        ShortPredicate pred=(val)->
+        {
+          return !EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(1)) && !EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(3-1));
+        };
+        var arr=new short[3];
+        var seq=new UncheckedStack(3,arr);
+        for(int i=0;i<3;++i)
+        {
+          arr[i]=TypeConversionUtil.convertToshort(i);
+        }
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),2);
+        Assertions.assertEquals(arr[0],TypeConversionUtil.convertToshort(1));
+        Assertions.assertEquals(arr[1],TypeConversionUtil.convertToshort(3-1));
+      } 
+      {
+        Predicate<? super Short> pred=(val)->
+        {
+          return !EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(1)) && !EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(3-1));
+        };
+        var arr=new short[3];
+        var seq=new UncheckedStack(3,arr);
+        for(int i=0;i<3;++i)
+        {
+          arr[i]=TypeConversionUtil.convertToshort(i);
+        }
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),2);
+        Assertions.assertEquals(arr[0],TypeConversionUtil.convertToshort(1));
+        Assertions.assertEquals(arr[1],TypeConversionUtil.convertToshort(3-1));
+      } 
+      {
+        ShortPredicate pred=(val)->
+        {
+          return !EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(1)) && !EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(50-1));
+        };
+        var arr=new short[50];
+        var seq=new UncheckedStack(50,arr);
+        for(int i=0;i<50;++i)
+        {
+          arr[i]=TypeConversionUtil.convertToshort(i);
+        }
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),2);
+        Assertions.assertEquals(arr[0],TypeConversionUtil.convertToshort(1));
+        Assertions.assertEquals(arr[1],TypeConversionUtil.convertToshort(50-1));
+      } 
+      {
+        Predicate<? super Short> pred=(val)->
+        {
+          return !EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(1)) && !EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(50-1));
+        };
+        var arr=new short[50];
+        var seq=new UncheckedStack(50,arr);
+        for(int i=0;i<50;++i)
+        {
+          arr[i]=TypeConversionUtil.convertToshort(i);
+        }
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),2);
+        Assertions.assertEquals(arr[0],TypeConversionUtil.convertToshort(1));
+        Assertions.assertEquals(arr[1],TypeConversionUtil.convertToshort(50-1));
+      } 
+      {
+        ShortPredicate pred=(val)->
+        {
+          return EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(0));
+        };
+        var arr=new short[100];
+        var seq=new UncheckedStack(100,arr);
+        for(int i=0;i<100;++i)
+        {
+          arr[i]=TypeConversionUtil.convertToshort(i);
+        }
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),100-1);
+        for(int i=0,valIndex=1;i<100-1;++i,++valIndex)
+        {
+          Assertions.assertEquals(arr[i],TypeConversionUtil.convertToshort(valIndex));
+        }
+      } 
+      {
+        Predicate<? super Short> pred=(val)->
+        {
+          return EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(0));
+        };
+        var arr=new short[100];
+        var seq=new UncheckedStack(100,arr);
+        for(int i=0;i<100;++i)
+        {
+          arr[i]=TypeConversionUtil.convertToshort(i);
+        }
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),100-1);
+        for(int i=0,valIndex=1;i<100-1;++i,++valIndex)
+        {
+          Assertions.assertEquals(arr[i],TypeConversionUtil.convertToshort(valIndex));
+        }
+      } 
+      {
+        ShortPredicate pred=(val)->
+        {
+          return EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(0));
+        };
+        var arr=new short[50];
+        var seq=new UncheckedStack(50,arr);
+        for(int i=0;i<50;++i)
+        {
+          arr[i]=TypeConversionUtil.convertToshort(i);
+        }
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),50-1);
+        for(int i=0,valIndex=1;i<50-1;++i,++valIndex)
+        {
+          Assertions.assertEquals(arr[i],TypeConversionUtil.convertToshort(valIndex));
+        }
+      } 
+      {
+        Predicate<? super Short> pred=(val)->
+        {
+          return EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(0));
+        };
+        var arr=new short[50];
+        var seq=new UncheckedStack(50,arr);
+        for(int i=0;i<50;++i)
+        {
+          arr[i]=TypeConversionUtil.convertToshort(i);
+        }
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),50-1);
+        for(int i=0,valIndex=1;i<50-1;++i,++valIndex)
+        {
+          Assertions.assertEquals(arr[i],TypeConversionUtil.convertToshort(valIndex));
+        }
+      } 
+      {
+        ShortPredicate pred=(val)->
+        {
+          return EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(0)) || EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(50-2));
+        };
+        var arr=new short[50];
+        var seq=new UncheckedStack(50,arr);
+        for(int i=0;i<50;++i)
+        {
+          arr[i]=TypeConversionUtil.convertToshort(i);
+        }
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),50-2);
+        for(int i=0,valIndex=1;i<50-3;++i,++valIndex)
+        {
+          Assertions.assertEquals(arr[i],TypeConversionUtil.convertToshort(valIndex));
+        }
+        Assertions.assertEquals(arr[50-3],TypeConversionUtil.convertToshort(50-1));
+      } 
+      {
+        Predicate<? super Short> pred=(val)->
+        {
+          return EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(0)) || EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(50-2));
+        };
+        var arr=new short[50];
+        var seq=new UncheckedStack(50,arr);
+        for(int i=0;i<50;++i)
+        {
+          arr[i]=TypeConversionUtil.convertToshort(i);
+        }
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),50-2);
+        for(int i=0,valIndex=1;i<50-3;++i,++valIndex)
+        {
+          Assertions.assertEquals(arr[i],TypeConversionUtil.convertToshort(valIndex));
+        }
+        Assertions.assertEquals(arr[50-3],TypeConversionUtil.convertToshort(50-1));
       } 
   }
   @Test
@@ -155,50 +357,49 @@ public class ShortSeqRemoveIfTest
   public void testRemoveIfUncheckedList()
   {
       {
-        var arr=new short[10];
-        var seq=new UncheckedList(10,arr);
+        var arr=new short[100];
+        var seq=new UncheckedList(100,arr);
         ShortPredicate pred=val->false;
         Assertions.assertFalse(seq.removeIf(pred));
-        Assertions.assertEquals(seq.size(),10);
+        Assertions.assertEquals(seq.size(),100);
       }
       {
-        var arr=new short[10];
-        var seq=new UncheckedList(10,arr);
+        var arr=new short[100];
+        var seq=new UncheckedList(100,arr);
         Predicate<? super Short> pred=val->false;
         Assertions.assertFalse(seq.removeIf(pred));
-        Assertions.assertEquals(seq.size(),10);
+        Assertions.assertEquals(seq.size(),100);
       }
       {
-        var arr=new short[10];
-        var seq=new UncheckedList(10,arr);
+        var arr=new short[100];
+        var seq=new UncheckedList(100,arr);
         ShortPredicate pred=val->true;
         Assertions.assertTrue(seq.removeIf(pred));
         Assertions.assertTrue(seq.isEmpty());
       }
       {
-        var arr=new short[10];
-        var seq=new UncheckedList(10,arr);
+        var arr=new short[100];
+        var seq=new UncheckedList(100,arr);
         Predicate<? super Short> pred=val->true;
         Assertions.assertTrue(seq.removeIf(pred));
         Assertions.assertTrue(seq.isEmpty());
       }
       {
-        int length=100;
         ShortPredicate pred=(val)->
         {
           return (EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(0))
             ||
              EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(2)));
         };
-        var arr=new short[length];
-        var seq=new UncheckedList(length,arr);
-        for(int i=0;i<length;++i)
+        var arr=new short[100];
+        var seq=new UncheckedList(100,arr);
+        for(int i=0;i<100;++i)
         {
           arr[i]=TypeConversionUtil.convertToshort(i);
         }
         Assertions.assertTrue(seq.removeIf(pred));
-        Assertions.assertEquals(seq.size(),length-2);
-        for(int i=0,valIndex=0;i<length-2;++i,++valIndex)
+        Assertions.assertEquals(seq.size(),100-2);
+        for(int i=0,valIndex=0;i<100-2;++i,++valIndex)
         {
           if(i==0 || i==1)
           {
@@ -208,22 +409,21 @@ public class ShortSeqRemoveIfTest
         }
       } 
       {
-        int length=100;
         Predicate<? super Short> pred=(val)->
         {
           return (EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(0))
             ||
              EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(2)));
         };
-        var arr=new short[length];
-        var seq=new UncheckedList(length,arr);
-        for(int i=0;i<length;++i)
+        var arr=new short[100];
+        var seq=new UncheckedList(100,arr);
+        for(int i=0;i<100;++i)
         {
           arr[i]=TypeConversionUtil.convertToshort(i);
         }
         Assertions.assertTrue(seq.removeIf(pred));
-        Assertions.assertEquals(seq.size(),length-2);
-        for(int i=0,valIndex=0;i<length-2;++i,++valIndex)
+        Assertions.assertEquals(seq.size(),100-2);
+        for(int i=0,valIndex=0;i<100-2;++i,++valIndex)
         {
           if(i==0 || i==1)
           {
@@ -233,14 +433,13 @@ public class ShortSeqRemoveIfTest
         }
       } 
       {
-        int length=100;
         ShortPredicate pred=(val)->
         {
           return !EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(1));
         };
-        var arr=new short[length];
-        var seq=new UncheckedList(length,arr);
-        for(int i=0;i<length;++i)
+        var arr=new short[100];
+        var seq=new UncheckedList(100,arr);
+        for(int i=0;i<100;++i)
         {
           arr[i]=TypeConversionUtil.convertToshort(i);
         }
@@ -249,20 +448,225 @@ public class ShortSeqRemoveIfTest
         Assertions.assertEquals(arr[0],TypeConversionUtil.convertToshort(1));
       } 
       {
-        int length=100;
         Predicate<? super Short> pred=(val)->
         {
           return !EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(1));
         };
-        var arr=new short[length];
-        var seq=new UncheckedList(length,arr);
-        for(int i=0;i<length;++i)
+        var arr=new short[100];
+        var seq=new UncheckedList(100,arr);
+        for(int i=0;i<100;++i)
         {
           arr[i]=TypeConversionUtil.convertToshort(i);
         }
         Assertions.assertTrue(seq.removeIf(pred));
         Assertions.assertEquals(seq.size(),1);
         Assertions.assertEquals(arr[0],TypeConversionUtil.convertToshort(1));
+      } 
+      {
+        ShortPredicate pred=(val)->
+        {
+          return !EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(1)) && !EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(100-1));
+        };
+        var arr=new short[100];
+        var seq=new UncheckedList(100,arr);
+        for(int i=0;i<100;++i)
+        {
+          arr[i]=TypeConversionUtil.convertToshort(i);
+        }
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),2);
+        Assertions.assertEquals(arr[0],TypeConversionUtil.convertToshort(1));
+        Assertions.assertEquals(arr[1],TypeConversionUtil.convertToshort(100-1));
+      } 
+      {
+        Predicate<? super Short> pred=(val)->
+        {
+          return !EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(1)) && !EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(100-1));
+        };
+        var arr=new short[100];
+        var seq=new UncheckedList(100,arr);
+        for(int i=0;i<100;++i)
+        {
+          arr[i]=TypeConversionUtil.convertToshort(i);
+        }
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),2);
+        Assertions.assertEquals(arr[0],TypeConversionUtil.convertToshort(1));
+        Assertions.assertEquals(arr[1],TypeConversionUtil.convertToshort(100-1));
+      } 
+      {
+        ShortPredicate pred=(val)->
+        {
+          return !EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(1)) && !EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(3-1));
+        };
+        var arr=new short[3];
+        var seq=new UncheckedList(3,arr);
+        for(int i=0;i<3;++i)
+        {
+          arr[i]=TypeConversionUtil.convertToshort(i);
+        }
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),2);
+        Assertions.assertEquals(arr[0],TypeConversionUtil.convertToshort(1));
+        Assertions.assertEquals(arr[1],TypeConversionUtil.convertToshort(3-1));
+      } 
+      {
+        Predicate<? super Short> pred=(val)->
+        {
+          return !EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(1)) && !EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(3-1));
+        };
+        var arr=new short[3];
+        var seq=new UncheckedList(3,arr);
+        for(int i=0;i<3;++i)
+        {
+          arr[i]=TypeConversionUtil.convertToshort(i);
+        }
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),2);
+        Assertions.assertEquals(arr[0],TypeConversionUtil.convertToshort(1));
+        Assertions.assertEquals(arr[1],TypeConversionUtil.convertToshort(3-1));
+      } 
+      {
+        ShortPredicate pred=(val)->
+        {
+          return !EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(1)) && !EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(50-1));
+        };
+        var arr=new short[50];
+        var seq=new UncheckedList(50,arr);
+        for(int i=0;i<50;++i)
+        {
+          arr[i]=TypeConversionUtil.convertToshort(i);
+        }
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),2);
+        Assertions.assertEquals(arr[0],TypeConversionUtil.convertToshort(1));
+        Assertions.assertEquals(arr[1],TypeConversionUtil.convertToshort(50-1));
+      } 
+      {
+        Predicate<? super Short> pred=(val)->
+        {
+          return !EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(1)) && !EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(50-1));
+        };
+        var arr=new short[50];
+        var seq=new UncheckedList(50,arr);
+        for(int i=0;i<50;++i)
+        {
+          arr[i]=TypeConversionUtil.convertToshort(i);
+        }
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),2);
+        Assertions.assertEquals(arr[0],TypeConversionUtil.convertToshort(1));
+        Assertions.assertEquals(arr[1],TypeConversionUtil.convertToshort(50-1));
+      } 
+      {
+        ShortPredicate pred=(val)->
+        {
+          return EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(0));
+        };
+        var arr=new short[100];
+        var seq=new UncheckedList(100,arr);
+        for(int i=0;i<100;++i)
+        {
+          arr[i]=TypeConversionUtil.convertToshort(i);
+        }
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),100-1);
+        for(int i=0,valIndex=1;i<100-1;++i,++valIndex)
+        {
+          Assertions.assertEquals(arr[i],TypeConversionUtil.convertToshort(valIndex));
+        }
+      } 
+      {
+        Predicate<? super Short> pred=(val)->
+        {
+          return EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(0));
+        };
+        var arr=new short[100];
+        var seq=new UncheckedList(100,arr);
+        for(int i=0;i<100;++i)
+        {
+          arr[i]=TypeConversionUtil.convertToshort(i);
+        }
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),100-1);
+        for(int i=0,valIndex=1;i<100-1;++i,++valIndex)
+        {
+          Assertions.assertEquals(arr[i],TypeConversionUtil.convertToshort(valIndex));
+        }
+      } 
+      {
+        ShortPredicate pred=(val)->
+        {
+          return EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(0));
+        };
+        var arr=new short[50];
+        var seq=new UncheckedList(50,arr);
+        for(int i=0;i<50;++i)
+        {
+          arr[i]=TypeConversionUtil.convertToshort(i);
+        }
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),50-1);
+        for(int i=0,valIndex=1;i<50-1;++i,++valIndex)
+        {
+          Assertions.assertEquals(arr[i],TypeConversionUtil.convertToshort(valIndex));
+        }
+      } 
+      {
+        Predicate<? super Short> pred=(val)->
+        {
+          return EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(0));
+        };
+        var arr=new short[50];
+        var seq=new UncheckedList(50,arr);
+        for(int i=0;i<50;++i)
+        {
+          arr[i]=TypeConversionUtil.convertToshort(i);
+        }
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),50-1);
+        for(int i=0,valIndex=1;i<50-1;++i,++valIndex)
+        {
+          Assertions.assertEquals(arr[i],TypeConversionUtil.convertToshort(valIndex));
+        }
+      } 
+      {
+        ShortPredicate pred=(val)->
+        {
+          return EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(0)) || EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(50-2));
+        };
+        var arr=new short[50];
+        var seq=new UncheckedList(50,arr);
+        for(int i=0;i<50;++i)
+        {
+          arr[i]=TypeConversionUtil.convertToshort(i);
+        }
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),50-2);
+        for(int i=0,valIndex=1;i<50-3;++i,++valIndex)
+        {
+          Assertions.assertEquals(arr[i],TypeConversionUtil.convertToshort(valIndex));
+        }
+        Assertions.assertEquals(arr[50-3],TypeConversionUtil.convertToshort(50-1));
+      } 
+      {
+        Predicate<? super Short> pred=(val)->
+        {
+          return EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(0)) || EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(50-2));
+        };
+        var arr=new short[50];
+        var seq=new UncheckedList(50,arr);
+        for(int i=0;i<50;++i)
+        {
+          arr[i]=TypeConversionUtil.convertToshort(i);
+        }
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),50-2);
+        for(int i=0,valIndex=1;i<50-3;++i,++valIndex)
+        {
+          Assertions.assertEquals(arr[i],TypeConversionUtil.convertToshort(valIndex));
+        }
+        Assertions.assertEquals(arr[50-3],TypeConversionUtil.convertToshort(50-1));
       } 
   }
   @Test
@@ -277,24 +681,24 @@ public class ShortSeqRemoveIfTest
   public void testRemoveIfCheckedStack()
   {
       {
-        var arr=new short[10];
-        var seq=new CheckedStack(10,arr);
+        var arr=new short[100];
+        var seq=new CheckedStack(100,arr);
         ShortPredicate pred=val->false;
         Assertions.assertFalse(seq.removeIf(pred));
-        Assertions.assertEquals(seq.size(),10);
+        Assertions.assertEquals(seq.size(),100);
         Assertions.assertEquals(0,seq.modCount);
       }
       {
-        var arr=new short[10];
-        var seq=new CheckedStack(10,arr);
+        var arr=new short[100];
+        var seq=new CheckedStack(100,arr);
         Predicate<? super Short> pred=val->false;
         Assertions.assertFalse(seq.removeIf(pred));
-        Assertions.assertEquals(seq.size(),10);
+        Assertions.assertEquals(seq.size(),100);
         Assertions.assertEquals(0,seq.modCount);
       }
       {
-        var arr=new short[10];
-        var seq=new CheckedStack(10,arr);
+        var arr=new short[100];
+        var seq=new CheckedStack(100,arr);
         ShortPredicate pred=val->false;
         Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf(CheckedCollectionTest.getModifyingPred(pred,()->
         {
@@ -303,8 +707,8 @@ public class ShortSeqRemoveIfTest
         })));
       }
       {
-        var arr=new short[10];
-        var seq=new CheckedStack(10,arr);
+        var arr=new short[100];
+        var seq=new CheckedStack(100,arr);
         Predicate<? super Short> pred=val->false;
         Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf(CheckedCollectionTest.getModifyingPred(pred,()->
         {
@@ -313,8 +717,8 @@ public class ShortSeqRemoveIfTest
         })));
       }
       {
-        var arr=new short[10];
-        var seq=new CheckedStack(10,arr);
+        var arr=new short[100];
+        var seq=new CheckedStack(100,arr);
         Assertions.assertThrows(IndexOutOfBoundsException.class,()->
         {
           seq.removeIf((ShortPredicate)(v)->
@@ -324,8 +728,8 @@ public class ShortSeqRemoveIfTest
         });
       }
       {
-        var arr=new short[10];
-        var seq=new CheckedStack(10,arr);
+        var arr=new short[100];
+        var seq=new CheckedStack(100,arr);
         Assertions.assertThrows(IndexOutOfBoundsException.class,()->
         {
           seq.removeIf((Predicate<? super Short>)(v)->
@@ -335,8 +739,8 @@ public class ShortSeqRemoveIfTest
         });
       }
       {
-        var arr=new short[10];
-        var seq=new CheckedStack(10,arr);
+        var arr=new short[100];
+        var seq=new CheckedStack(100,arr);
         Assertions.assertThrows(ConcurrentModificationException.class,()->
         {
           seq.removeIf((ShortPredicate)(v)->
@@ -348,8 +752,8 @@ public class ShortSeqRemoveIfTest
         });
       }
       {
-        var arr=new short[10];
-        var seq=new CheckedStack(10,arr);
+        var arr=new short[100];
+        var seq=new CheckedStack(100,arr);
         Assertions.assertThrows(ConcurrentModificationException.class,()->
         {
           seq.removeIf((Predicate<? super Short>)(v)->
@@ -361,24 +765,24 @@ public class ShortSeqRemoveIfTest
         });
       }
       {
-        var arr=new short[10];
-        var seq=new CheckedStack(10,arr);
+        var arr=new short[100];
+        var seq=new CheckedStack(100,arr);
         ShortPredicate pred=val->true;
         Assertions.assertTrue(seq.removeIf(pred));
         Assertions.assertTrue(seq.isEmpty());
         Assertions.assertTrue(seq.modCount!=0);
       }
       {
-        var arr=new short[10];
-        var seq=new CheckedStack(10,arr);
+        var arr=new short[100];
+        var seq=new CheckedStack(100,arr);
         Predicate<? super Short> pred=val->true;
         Assertions.assertTrue(seq.removeIf(pred));
         Assertions.assertTrue(seq.isEmpty());
         Assertions.assertTrue(seq.modCount!=0);
       }
       {
-        var arr=new short[10];
-        var seq=new CheckedStack(10,arr);
+        var arr=new short[100];
+        var seq=new CheckedStack(100,arr);
         ShortPredicate pred=val->true;
         Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf(CheckedCollectionTest.getModifyingPred(pred,()->
         {
@@ -387,8 +791,8 @@ public class ShortSeqRemoveIfTest
         })));
       }
       {
-        var arr=new short[10];
-        var seq=new CheckedStack(10,arr);
+        var arr=new short[100];
+        var seq=new CheckedStack(100,arr);
         Predicate<? super Short> pred=val->true;
         Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf(CheckedCollectionTest.getModifyingPred(pred,()->
         {
@@ -397,8 +801,8 @@ public class ShortSeqRemoveIfTest
         })));
       }
       {
-        var arr=new short[10];
-        var seq=new CheckedStack(10,arr);
+        var arr=new short[100];
+        var seq=new CheckedStack(100,arr);
         Assertions.assertThrows(IndexOutOfBoundsException.class,()->
         {
           seq.removeIf((ShortPredicate)(v)->
@@ -408,8 +812,8 @@ public class ShortSeqRemoveIfTest
         });
       }
       {
-        var arr=new short[10];
-        var seq=new CheckedStack(10,arr);
+        var arr=new short[100];
+        var seq=new CheckedStack(100,arr);
         Assertions.assertThrows(IndexOutOfBoundsException.class,()->
         {
           seq.removeIf((Predicate<? super Short>)(v)->
@@ -419,8 +823,8 @@ public class ShortSeqRemoveIfTest
         });
       }
       {
-        var arr=new short[10];
-        var seq=new CheckedStack(10,arr);
+        var arr=new short[100];
+        var seq=new CheckedStack(100,arr);
         Assertions.assertThrows(ConcurrentModificationException.class,()->
         {
           seq.removeIf((ShortPredicate)(v)->
@@ -432,8 +836,8 @@ public class ShortSeqRemoveIfTest
         });
       }
       {
-        var arr=new short[10];
-        var seq=new CheckedStack(10,arr);
+        var arr=new short[100];
+        var seq=new CheckedStack(100,arr);
         Assertions.assertThrows(ConcurrentModificationException.class,()->
         {
           seq.removeIf((Predicate<? super Short>)(v)->
@@ -445,22 +849,21 @@ public class ShortSeqRemoveIfTest
         });
       }
       {
-        int length=100;
         ShortPredicate pred=(val)->
         {
           return (EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(0))
             ||
              EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(2)));
         };
-        var arr=new short[length];
-        var seq=new CheckedStack(length,arr);
-        for(int i=0;i<length;++i)
+        var arr=new short[100];
+        var seq=new CheckedStack(100,arr);
+        for(int i=0;i<100;++i)
         {
           arr[i]=TypeConversionUtil.convertToshort(i);
         }
         Assertions.assertTrue(seq.removeIf(pred));
-        Assertions.assertEquals(seq.size(),length-2);
-        for(int i=0,valIndex=0;i<length-2;++i,++valIndex)
+        Assertions.assertEquals(seq.size(),100-2);
+        for(int i=0,valIndex=0;i<100-2;++i,++valIndex)
         {
           if(i==0 || i==1)
           {
@@ -471,22 +874,21 @@ public class ShortSeqRemoveIfTest
         Assertions.assertTrue(seq.modCount!=0);
       } 
       {
-        int length=100;
         Predicate<? super Short> pred=(val)->
         {
           return (EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(0))
             ||
              EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(2)));
         };
-        var arr=new short[length];
-        var seq=new CheckedStack(length,arr);
-        for(int i=0;i<length;++i)
+        var arr=new short[100];
+        var seq=new CheckedStack(100,arr);
+        for(int i=0;i<100;++i)
         {
           arr[i]=TypeConversionUtil.convertToshort(i);
         }
         Assertions.assertTrue(seq.removeIf(pred));
-        Assertions.assertEquals(seq.size(),length-2);
-        for(int i=0,valIndex=0;i<length-2;++i,++valIndex)
+        Assertions.assertEquals(seq.size(),100-2);
+        for(int i=0,valIndex=0;i<100-2;++i,++valIndex)
         {
           if(i==0 || i==1)
           {
@@ -497,16 +899,15 @@ public class ShortSeqRemoveIfTest
         Assertions.assertTrue(seq.modCount!=0);
       } 
       {
-        int length=100;
         ShortPredicate pred=(val)->
         {
           return (EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(0))
             ||
              EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(2)));
         };
-        var arr=new short[length];
-        var seq=new CheckedStack(length,arr);
-        for(int i=0;i<length;++i)
+        var arr=new short[100];
+        var seq=new CheckedStack(100,arr);
+        for(int i=0;i<100;++i)
         {
           arr[i]=TypeConversionUtil.convertToshort(i);
         }
@@ -517,16 +918,15 @@ public class ShortSeqRemoveIfTest
         })));
       } 
       {
-        int length=100;
         Predicate<? super Short> pred=(val)->
         {
           return (EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(0))
             ||
              EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(2)));
         };
-        var arr=new short[length];
-        var seq=new CheckedStack(length,arr);
-        for(int i=0;i<length;++i)
+        var arr=new short[100];
+        var seq=new CheckedStack(100,arr);
+        for(int i=0;i<100;++i)
         {
           arr[i]=TypeConversionUtil.convertToshort(i);
         }
@@ -537,14 +937,13 @@ public class ShortSeqRemoveIfTest
         })));
       } 
       {
-        int length=100;
         ShortPredicate pred=(val)->
         {
           return !EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(1));
         };
-        var arr=new short[length];
-        var seq=new CheckedStack(length,arr);
-        for(int i=0;i<length;++i)
+        var arr=new short[100];
+        var seq=new CheckedStack(100,arr);
+        for(int i=0;i<100;++i)
         {
           arr[i]=TypeConversionUtil.convertToshort(i);
         }
@@ -554,14 +953,13 @@ public class ShortSeqRemoveIfTest
         Assertions.assertTrue(seq.modCount!=0);
       } 
       {
-        int length=100;
         Predicate<? super Short> pred=(val)->
         {
           return !EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(1));
         };
-        var arr=new short[length];
-        var seq=new CheckedStack(length,arr);
-        for(int i=0;i<length;++i)
+        var arr=new short[100];
+        var seq=new CheckedStack(100,arr);
+        for(int i=0;i<100;++i)
         {
           arr[i]=TypeConversionUtil.convertToshort(i);
         }
@@ -571,14 +969,13 @@ public class ShortSeqRemoveIfTest
         Assertions.assertTrue(seq.modCount!=0);
       } 
       {
-        int length=100;
         ShortPredicate pred=(val)->
         {
           return !EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(1));
         };
-        var arr=new short[length];
-        var seq=new CheckedStack(length,arr);
-        for(int i=0;i<length;++i)
+        var arr=new short[100];
+        var seq=new CheckedStack(100,arr);
+        for(int i=0;i<100;++i)
         {
           arr[i]=TypeConversionUtil.convertToshort(i);
         }
@@ -589,14 +986,435 @@ public class ShortSeqRemoveIfTest
         })));
       } 
       {
-        int length=100;
         Predicate<? super Short> pred=(val)->
         {
           return !EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(1));
         };
-        var arr=new short[length];
-        var seq=new CheckedStack(length,arr);
-        for(int i=0;i<length;++i)
+        var arr=new short[100];
+        var seq=new CheckedStack(100,arr);
+        for(int i=0;i<100;++i)
+        {
+          arr[i]=TypeConversionUtil.convertToshort(i);
+        }
+        Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf(CheckedCollectionTest.getModifyingPred(pred,()->
+        {
+          var tmp=seq.popShort();
+          seq.push(tmp);
+        })));
+      } 
+      {
+        ShortPredicate pred=(val)->
+        {
+          return !EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(1)) && !EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(100-1));
+        };
+        var arr=new short[100];
+        var seq=new CheckedStack(100,arr);
+        for(int i=0;i<100;++i)
+        {
+          arr[i]=TypeConversionUtil.convertToshort(i);
+        }
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),2);
+        Assertions.assertEquals(arr[0],TypeConversionUtil.convertToshort(1));
+        Assertions.assertEquals(arr[1],TypeConversionUtil.convertToshort(100-1));
+        Assertions.assertTrue(seq.modCount!=0);
+      } 
+      {
+        Predicate<? super Short> pred=(val)->
+        {
+          return !EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(1)) && !EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(100-1));
+        };
+        var arr=new short[100];
+        var seq=new CheckedStack(100,arr);
+        for(int i=0;i<100;++i)
+        {
+          arr[i]=TypeConversionUtil.convertToshort(i);
+        }
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),2);
+        Assertions.assertEquals(arr[0],TypeConversionUtil.convertToshort(1));
+        Assertions.assertEquals(arr[1],TypeConversionUtil.convertToshort(100-1));
+        Assertions.assertTrue(seq.modCount!=0);
+      } 
+      {
+        ShortPredicate pred=(val)->
+        {
+          return !EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(1)) && !EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(100-1));
+        };
+        var arr=new short[100];
+        var seq=new CheckedStack(100,arr);
+        for(int i=0;i<100;++i)
+        {
+          arr[i]=TypeConversionUtil.convertToshort(i);
+        }
+        Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf(CheckedCollectionTest.getModifyingPred(pred,()->
+        {
+          var tmp=seq.popShort();
+          seq.push(tmp);
+        })));
+      } 
+      {
+        Predicate<? super Short> pred=(val)->
+        {
+          return !EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(1)) && !EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(100-1));
+        };
+        var arr=new short[100];
+        var seq=new CheckedStack(100,arr);
+        for(int i=0;i<100;++i)
+        {
+          arr[i]=TypeConversionUtil.convertToshort(i);
+        }
+        Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf(CheckedCollectionTest.getModifyingPred(pred,()->
+        {
+          var tmp=seq.popShort();
+          seq.push(tmp);
+        })));
+      } 
+      {
+        ShortPredicate pred=(val)->
+        {
+          return !EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(1)) && !EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(3-1));
+        };
+        var arr=new short[3];
+        var seq=new CheckedStack(3,arr);
+        for(int i=0;i<3;++i)
+        {
+          arr[i]=TypeConversionUtil.convertToshort(i);
+        }
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),2);
+        Assertions.assertEquals(arr[0],TypeConversionUtil.convertToshort(1));
+        Assertions.assertEquals(arr[1],TypeConversionUtil.convertToshort(3-1));
+        Assertions.assertTrue(seq.modCount!=0);
+      } 
+      {
+        Predicate<? super Short> pred=(val)->
+        {
+          return !EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(1)) && !EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(3-1));
+        };
+        var arr=new short[3];
+        var seq=new CheckedStack(3,arr);
+        for(int i=0;i<3;++i)
+        {
+          arr[i]=TypeConversionUtil.convertToshort(i);
+        }
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),2);
+        Assertions.assertEquals(arr[0],TypeConversionUtil.convertToshort(1));
+        Assertions.assertEquals(arr[1],TypeConversionUtil.convertToshort(3-1));
+        Assertions.assertTrue(seq.modCount!=0);
+      } 
+      {
+        ShortPredicate pred=(val)->
+        {
+          return !EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(1)) && !EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(3-1));
+        };
+        var arr=new short[3];
+        var seq=new CheckedStack(3,arr);
+        for(int i=0;i<3;++i)
+        {
+          arr[i]=TypeConversionUtil.convertToshort(i);
+        }
+        Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf(CheckedCollectionTest.getModifyingPred(pred,()->
+        {
+          var tmp=seq.popShort();
+          seq.push(tmp);
+        })));
+      } 
+      {
+        Predicate<? super Short> pred=(val)->
+        {
+          return !EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(1)) && !EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(3-1));
+        };
+        var arr=new short[3];
+        var seq=new CheckedStack(3,arr);
+        for(int i=0;i<3;++i)
+        {
+          arr[i]=TypeConversionUtil.convertToshort(i);
+        }
+        Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf(CheckedCollectionTest.getModifyingPred(pred,()->
+        {
+          var tmp=seq.popShort();
+          seq.push(tmp);
+        })));
+      } 
+      {
+        ShortPredicate pred=(val)->
+        {
+          return !EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(1)) && !EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(50-1));
+        };
+        var arr=new short[50];
+        var seq=new CheckedStack(50,arr);
+        for(int i=0;i<50;++i)
+        {
+          arr[i]=TypeConversionUtil.convertToshort(i);
+        }
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),2);
+        Assertions.assertEquals(arr[0],TypeConversionUtil.convertToshort(1));
+        Assertions.assertEquals(arr[1],TypeConversionUtil.convertToshort(50-1));
+        Assertions.assertTrue(seq.modCount!=0);
+      } 
+      {
+        Predicate<? super Short> pred=(val)->
+        {
+          return !EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(1)) && !EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(50-1));
+        };
+        var arr=new short[50];
+        var seq=new CheckedStack(50,arr);
+        for(int i=0;i<50;++i)
+        {
+          arr[i]=TypeConversionUtil.convertToshort(i);
+        }
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),2);
+        Assertions.assertEquals(arr[0],TypeConversionUtil.convertToshort(1));
+        Assertions.assertEquals(arr[1],TypeConversionUtil.convertToshort(50-1));
+        Assertions.assertTrue(seq.modCount!=0);
+      } 
+      {
+        ShortPredicate pred=(val)->
+        {
+          return !EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(1)) && !EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(50-1));
+        };
+        var arr=new short[50];
+        var seq=new CheckedStack(50,arr);
+        for(int i=0;i<50;++i)
+        {
+          arr[i]=TypeConversionUtil.convertToshort(i);
+        }
+        Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf(CheckedCollectionTest.getModifyingPred(pred,()->
+        {
+          var tmp=seq.popShort();
+          seq.push(tmp);
+        })));
+      } 
+      {
+        Predicate<? super Short> pred=(val)->
+        {
+          return !EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(1)) && !EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(50-1));
+        };
+        var arr=new short[50];
+        var seq=new CheckedStack(50,arr);
+        for(int i=0;i<50;++i)
+        {
+          arr[i]=TypeConversionUtil.convertToshort(i);
+        }
+        Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf(CheckedCollectionTest.getModifyingPred(pred,()->
+        {
+          var tmp=seq.popShort();
+          seq.push(tmp);
+        })));
+      } 
+      {
+        ShortPredicate pred=(val)->
+        {
+          return EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(0));
+        };
+        var arr=new short[100];
+        var seq=new CheckedStack(100,arr);
+        for(int i=0;i<100;++i)
+        {
+          arr[i]=TypeConversionUtil.convertToshort(i);
+        }
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),100-1);
+        for(int i=0,valIndex=1;i<100-1;++i,++valIndex)
+        {
+          Assertions.assertEquals(arr[i],TypeConversionUtil.convertToshort(valIndex));
+        }
+        Assertions.assertTrue(seq.modCount!=0);
+      } 
+      {
+        Predicate<? super Short> pred=(val)->
+        {
+          return EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(0));
+        };
+        var arr=new short[100];
+        var seq=new CheckedStack(100,arr);
+        for(int i=0;i<100;++i)
+        {
+          arr[i]=TypeConversionUtil.convertToshort(i);
+        }
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),100-1);
+        for(int i=0,valIndex=1;i<100-1;++i,++valIndex)
+        {
+          Assertions.assertEquals(arr[i],TypeConversionUtil.convertToshort(valIndex));
+        }
+        Assertions.assertTrue(seq.modCount!=0);
+      } 
+      {
+        ShortPredicate pred=(val)->
+        {
+          return EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(0));
+        };
+        var arr=new short[100];
+        var seq=new CheckedStack(100,arr);
+        for(int i=0;i<100;++i)
+        {
+          arr[i]=TypeConversionUtil.convertToshort(i);
+        }
+        Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf(CheckedCollectionTest.getModifyingPred(pred,()->
+        {
+          var tmp=seq.popShort();
+          seq.push(tmp);
+        })));
+      } 
+      {
+        Predicate<? super Short> pred=(val)->
+        {
+          return EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(0));
+        };
+        var arr=new short[100];
+        var seq=new CheckedStack(100,arr);
+        for(int i=0;i<100;++i)
+        {
+          arr[i]=TypeConversionUtil.convertToshort(i);
+        }
+        Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf(CheckedCollectionTest.getModifyingPred(pred,()->
+        {
+          var tmp=seq.popShort();
+          seq.push(tmp);
+        })));
+      } 
+      {
+        ShortPredicate pred=(val)->
+        {
+          return EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(0));
+        };
+        var arr=new short[50];
+        var seq=new CheckedStack(50,arr);
+        for(int i=0;i<50;++i)
+        {
+          arr[i]=TypeConversionUtil.convertToshort(i);
+        }
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),50-1);
+        for(int i=0,valIndex=1;i<50-1;++i,++valIndex)
+        {
+          Assertions.assertEquals(arr[i],TypeConversionUtil.convertToshort(valIndex));
+        }
+        Assertions.assertTrue(seq.modCount!=0);
+      } 
+      {
+        Predicate<? super Short> pred=(val)->
+        {
+          return EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(0));
+        };
+        var arr=new short[50];
+        var seq=new CheckedStack(50,arr);
+        for(int i=0;i<50;++i)
+        {
+          arr[i]=TypeConversionUtil.convertToshort(i);
+        }
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),50-1);
+        for(int i=0,valIndex=1;i<50-1;++i,++valIndex)
+        {
+          Assertions.assertEquals(arr[i],TypeConversionUtil.convertToshort(valIndex));
+        }
+        Assertions.assertTrue(seq.modCount!=0);
+      } 
+      {
+        ShortPredicate pred=(val)->
+        {
+          return EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(0));
+        };
+        var arr=new short[50];
+        var seq=new CheckedStack(50,arr);
+        for(int i=0;i<50;++i)
+        {
+          arr[i]=TypeConversionUtil.convertToshort(i);
+        }
+        Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf(CheckedCollectionTest.getModifyingPred(pred,()->
+        {
+          var tmp=seq.popShort();
+          seq.push(tmp);
+        })));
+      } 
+      {
+        Predicate<? super Short> pred=(val)->
+        {
+          return EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(0));
+        };
+        var arr=new short[50];
+        var seq=new CheckedStack(50,arr);
+        for(int i=0;i<50;++i)
+        {
+          arr[i]=TypeConversionUtil.convertToshort(i);
+        }
+        Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf(CheckedCollectionTest.getModifyingPred(pred,()->
+        {
+          var tmp=seq.popShort();
+          seq.push(tmp);
+        })));
+      } 
+      {
+        ShortPredicate pred=(val)->
+        {
+          return EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(0)) || EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(50-2));
+        };
+        var arr=new short[50];
+        var seq=new CheckedStack(50,arr);
+        for(int i=0;i<50;++i)
+        {
+          arr[i]=TypeConversionUtil.convertToshort(i);
+        }
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),50-2);
+        for(int i=0,valIndex=1;i<50-3;++i,++valIndex)
+        {
+          Assertions.assertEquals(arr[i],TypeConversionUtil.convertToshort(valIndex));
+        }
+        Assertions.assertEquals(arr[50-3],TypeConversionUtil.convertToshort(50-1));
+        Assertions.assertTrue(seq.modCount!=0);
+      } 
+      {
+        Predicate<? super Short> pred=(val)->
+        {
+          return EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(0)) || EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(50-2));
+        };
+        var arr=new short[50];
+        var seq=new CheckedStack(50,arr);
+        for(int i=0;i<50;++i)
+        {
+          arr[i]=TypeConversionUtil.convertToshort(i);
+        }
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),50-2);
+        for(int i=0,valIndex=1;i<50-3;++i,++valIndex)
+        {
+          Assertions.assertEquals(arr[i],TypeConversionUtil.convertToshort(valIndex));
+        }
+        Assertions.assertEquals(arr[50-3],TypeConversionUtil.convertToshort(50-1));
+        Assertions.assertTrue(seq.modCount!=0);
+      } 
+      {
+        ShortPredicate pred=(val)->
+        {
+          return EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(0)) || EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(50-2));
+        };
+        var arr=new short[50];
+        var seq=new CheckedStack(50,arr);
+        for(int i=0;i<50;++i)
+        {
+          arr[i]=TypeConversionUtil.convertToshort(i);
+        }
+        Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf(CheckedCollectionTest.getModifyingPred(pred,()->
+        {
+          var tmp=seq.popShort();
+          seq.push(tmp);
+        })));
+      } 
+      {
+        Predicate<? super Short> pred=(val)->
+        {
+          return EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(0)) || EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(50-2));
+        };
+        var arr=new short[50];
+        var seq=new CheckedStack(50,arr);
+        for(int i=0;i<50;++i)
         {
           arr[i]=TypeConversionUtil.convertToshort(i);
         }
@@ -679,24 +1497,24 @@ public class ShortSeqRemoveIfTest
   public void testRemoveIfCheckedList()
   {
       {
-        var arr=new short[10];
-        var seq=new CheckedList(10,arr);
+        var arr=new short[100];
+        var seq=new CheckedList(100,arr);
         ShortPredicate pred=val->false;
         Assertions.assertFalse(seq.removeIf(pred));
-        Assertions.assertEquals(seq.size(),10);
+        Assertions.assertEquals(seq.size(),100);
         Assertions.assertEquals(0,seq.modCount);
       }
       {
-        var arr=new short[10];
-        var seq=new CheckedList(10,arr);
+        var arr=new short[100];
+        var seq=new CheckedList(100,arr);
         Predicate<? super Short> pred=val->false;
         Assertions.assertFalse(seq.removeIf(pred));
-        Assertions.assertEquals(seq.size(),10);
+        Assertions.assertEquals(seq.size(),100);
         Assertions.assertEquals(0,seq.modCount);
       }
       {
-        var arr=new short[10];
-        var seq=new CheckedList(10,arr);
+        var arr=new short[100];
+        var seq=new CheckedList(100,arr);
         ShortPredicate pred=val->false;
         Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf(CheckedCollectionTest.getModifyingPred(pred,()->
         {
@@ -705,8 +1523,8 @@ public class ShortSeqRemoveIfTest
         })));
       }
       {
-        var arr=new short[10];
-        var seq=new CheckedList(10,arr);
+        var arr=new short[100];
+        var seq=new CheckedList(100,arr);
         Predicate<? super Short> pred=val->false;
         Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf(CheckedCollectionTest.getModifyingPred(pred,()->
         {
@@ -715,8 +1533,8 @@ public class ShortSeqRemoveIfTest
         })));
       }
       {
-        var arr=new short[10];
-        var seq=new CheckedList(10,arr);
+        var arr=new short[100];
+        var seq=new CheckedList(100,arr);
         Assertions.assertThrows(IndexOutOfBoundsException.class,()->
         {
           seq.removeIf((ShortPredicate)(v)->
@@ -726,8 +1544,8 @@ public class ShortSeqRemoveIfTest
         });
       }
       {
-        var arr=new short[10];
-        var seq=new CheckedList(10,arr);
+        var arr=new short[100];
+        var seq=new CheckedList(100,arr);
         Assertions.assertThrows(IndexOutOfBoundsException.class,()->
         {
           seq.removeIf((Predicate<? super Short>)(v)->
@@ -737,8 +1555,8 @@ public class ShortSeqRemoveIfTest
         });
       }
       {
-        var arr=new short[10];
-        var seq=new CheckedList(10,arr);
+        var arr=new short[100];
+        var seq=new CheckedList(100,arr);
         Assertions.assertThrows(ConcurrentModificationException.class,()->
         {
           seq.removeIf((ShortPredicate)(v)->
@@ -750,8 +1568,8 @@ public class ShortSeqRemoveIfTest
         });
       }
       {
-        var arr=new short[10];
-        var seq=new CheckedList(10,arr);
+        var arr=new short[100];
+        var seq=new CheckedList(100,arr);
         Assertions.assertThrows(ConcurrentModificationException.class,()->
         {
           seq.removeIf((Predicate<? super Short>)(v)->
@@ -763,24 +1581,24 @@ public class ShortSeqRemoveIfTest
         });
       }
       {
-        var arr=new short[10];
-        var seq=new CheckedList(10,arr);
+        var arr=new short[100];
+        var seq=new CheckedList(100,arr);
         ShortPredicate pred=val->true;
         Assertions.assertTrue(seq.removeIf(pred));
         Assertions.assertTrue(seq.isEmpty());
         Assertions.assertTrue(seq.modCount!=0);
       }
       {
-        var arr=new short[10];
-        var seq=new CheckedList(10,arr);
+        var arr=new short[100];
+        var seq=new CheckedList(100,arr);
         Predicate<? super Short> pred=val->true;
         Assertions.assertTrue(seq.removeIf(pred));
         Assertions.assertTrue(seq.isEmpty());
         Assertions.assertTrue(seq.modCount!=0);
       }
       {
-        var arr=new short[10];
-        var seq=new CheckedList(10,arr);
+        var arr=new short[100];
+        var seq=new CheckedList(100,arr);
         ShortPredicate pred=val->true;
         Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf(CheckedCollectionTest.getModifyingPred(pred,()->
         {
@@ -789,8 +1607,8 @@ public class ShortSeqRemoveIfTest
         })));
       }
       {
-        var arr=new short[10];
-        var seq=new CheckedList(10,arr);
+        var arr=new short[100];
+        var seq=new CheckedList(100,arr);
         Predicate<? super Short> pred=val->true;
         Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf(CheckedCollectionTest.getModifyingPred(pred,()->
         {
@@ -799,8 +1617,8 @@ public class ShortSeqRemoveIfTest
         })));
       }
       {
-        var arr=new short[10];
-        var seq=new CheckedList(10,arr);
+        var arr=new short[100];
+        var seq=new CheckedList(100,arr);
         Assertions.assertThrows(IndexOutOfBoundsException.class,()->
         {
           seq.removeIf((ShortPredicate)(v)->
@@ -810,8 +1628,8 @@ public class ShortSeqRemoveIfTest
         });
       }
       {
-        var arr=new short[10];
-        var seq=new CheckedList(10,arr);
+        var arr=new short[100];
+        var seq=new CheckedList(100,arr);
         Assertions.assertThrows(IndexOutOfBoundsException.class,()->
         {
           seq.removeIf((Predicate<? super Short>)(v)->
@@ -821,8 +1639,8 @@ public class ShortSeqRemoveIfTest
         });
       }
       {
-        var arr=new short[10];
-        var seq=new CheckedList(10,arr);
+        var arr=new short[100];
+        var seq=new CheckedList(100,arr);
         Assertions.assertThrows(ConcurrentModificationException.class,()->
         {
           seq.removeIf((ShortPredicate)(v)->
@@ -834,8 +1652,8 @@ public class ShortSeqRemoveIfTest
         });
       }
       {
-        var arr=new short[10];
-        var seq=new CheckedList(10,arr);
+        var arr=new short[100];
+        var seq=new CheckedList(100,arr);
         Assertions.assertThrows(ConcurrentModificationException.class,()->
         {
           seq.removeIf((Predicate<? super Short>)(v)->
@@ -847,22 +1665,21 @@ public class ShortSeqRemoveIfTest
         });
       }
       {
-        int length=100;
         ShortPredicate pred=(val)->
         {
           return (EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(0))
             ||
              EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(2)));
         };
-        var arr=new short[length];
-        var seq=new CheckedList(length,arr);
-        for(int i=0;i<length;++i)
+        var arr=new short[100];
+        var seq=new CheckedList(100,arr);
+        for(int i=0;i<100;++i)
         {
           arr[i]=TypeConversionUtil.convertToshort(i);
         }
         Assertions.assertTrue(seq.removeIf(pred));
-        Assertions.assertEquals(seq.size(),length-2);
-        for(int i=0,valIndex=0;i<length-2;++i,++valIndex)
+        Assertions.assertEquals(seq.size(),100-2);
+        for(int i=0,valIndex=0;i<100-2;++i,++valIndex)
         {
           if(i==0 || i==1)
           {
@@ -873,22 +1690,21 @@ public class ShortSeqRemoveIfTest
         Assertions.assertTrue(seq.modCount!=0);
       } 
       {
-        int length=100;
         Predicate<? super Short> pred=(val)->
         {
           return (EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(0))
             ||
              EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(2)));
         };
-        var arr=new short[length];
-        var seq=new CheckedList(length,arr);
-        for(int i=0;i<length;++i)
+        var arr=new short[100];
+        var seq=new CheckedList(100,arr);
+        for(int i=0;i<100;++i)
         {
           arr[i]=TypeConversionUtil.convertToshort(i);
         }
         Assertions.assertTrue(seq.removeIf(pred));
-        Assertions.assertEquals(seq.size(),length-2);
-        for(int i=0,valIndex=0;i<length-2;++i,++valIndex)
+        Assertions.assertEquals(seq.size(),100-2);
+        for(int i=0,valIndex=0;i<100-2;++i,++valIndex)
         {
           if(i==0 || i==1)
           {
@@ -899,16 +1715,15 @@ public class ShortSeqRemoveIfTest
         Assertions.assertTrue(seq.modCount!=0);
       } 
       {
-        int length=100;
         ShortPredicate pred=(val)->
         {
           return (EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(0))
             ||
              EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(2)));
         };
-        var arr=new short[length];
-        var seq=new CheckedList(length,arr);
-        for(int i=0;i<length;++i)
+        var arr=new short[100];
+        var seq=new CheckedList(100,arr);
+        for(int i=0;i<100;++i)
         {
           arr[i]=TypeConversionUtil.convertToshort(i);
         }
@@ -919,16 +1734,15 @@ public class ShortSeqRemoveIfTest
         })));
       } 
       {
-        int length=100;
         Predicate<? super Short> pred=(val)->
         {
           return (EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(0))
             ||
              EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(2)));
         };
-        var arr=new short[length];
-        var seq=new CheckedList(length,arr);
-        for(int i=0;i<length;++i)
+        var arr=new short[100];
+        var seq=new CheckedList(100,arr);
+        for(int i=0;i<100;++i)
         {
           arr[i]=TypeConversionUtil.convertToshort(i);
         }
@@ -939,14 +1753,13 @@ public class ShortSeqRemoveIfTest
         })));
       } 
       {
-        int length=100;
         ShortPredicate pred=(val)->
         {
           return !EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(1));
         };
-        var arr=new short[length];
-        var seq=new CheckedList(length,arr);
-        for(int i=0;i<length;++i)
+        var arr=new short[100];
+        var seq=new CheckedList(100,arr);
+        for(int i=0;i<100;++i)
         {
           arr[i]=TypeConversionUtil.convertToshort(i);
         }
@@ -956,14 +1769,13 @@ public class ShortSeqRemoveIfTest
         Assertions.assertTrue(seq.modCount!=0);
       } 
       {
-        int length=100;
         Predicate<? super Short> pred=(val)->
         {
           return !EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(1));
         };
-        var arr=new short[length];
-        var seq=new CheckedList(length,arr);
-        for(int i=0;i<length;++i)
+        var arr=new short[100];
+        var seq=new CheckedList(100,arr);
+        for(int i=0;i<100;++i)
         {
           arr[i]=TypeConversionUtil.convertToshort(i);
         }
@@ -973,14 +1785,13 @@ public class ShortSeqRemoveIfTest
         Assertions.assertTrue(seq.modCount!=0);
       } 
       {
-        int length=100;
         ShortPredicate pred=(val)->
         {
           return !EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(1));
         };
-        var arr=new short[length];
-        var seq=new CheckedList(length,arr);
-        for(int i=0;i<length;++i)
+        var arr=new short[100];
+        var seq=new CheckedList(100,arr);
+        for(int i=0;i<100;++i)
         {
           arr[i]=TypeConversionUtil.convertToshort(i);
         }
@@ -991,14 +1802,435 @@ public class ShortSeqRemoveIfTest
         })));
       } 
       {
-        int length=100;
         Predicate<? super Short> pred=(val)->
         {
           return !EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(1));
         };
-        var arr=new short[length];
-        var seq=new CheckedList(length,arr);
-        for(int i=0;i<length;++i)
+        var arr=new short[100];
+        var seq=new CheckedList(100,arr);
+        for(int i=0;i<100;++i)
+        {
+          arr[i]=TypeConversionUtil.convertToshort(i);
+        }
+        Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf(CheckedCollectionTest.getModifyingPred(pred,()->
+        {
+          var tmp=seq.removeShortAt(seq.size()-1);
+          seq.add(tmp);
+        })));
+      } 
+      {
+        ShortPredicate pred=(val)->
+        {
+          return !EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(1)) && !EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(100-1));
+        };
+        var arr=new short[100];
+        var seq=new CheckedList(100,arr);
+        for(int i=0;i<100;++i)
+        {
+          arr[i]=TypeConversionUtil.convertToshort(i);
+        }
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),2);
+        Assertions.assertEquals(arr[0],TypeConversionUtil.convertToshort(1));
+        Assertions.assertEquals(arr[1],TypeConversionUtil.convertToshort(100-1));
+        Assertions.assertTrue(seq.modCount!=0);
+      } 
+      {
+        Predicate<? super Short> pred=(val)->
+        {
+          return !EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(1)) && !EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(100-1));
+        };
+        var arr=new short[100];
+        var seq=new CheckedList(100,arr);
+        for(int i=0;i<100;++i)
+        {
+          arr[i]=TypeConversionUtil.convertToshort(i);
+        }
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),2);
+        Assertions.assertEquals(arr[0],TypeConversionUtil.convertToshort(1));
+        Assertions.assertEquals(arr[1],TypeConversionUtil.convertToshort(100-1));
+        Assertions.assertTrue(seq.modCount!=0);
+      } 
+      {
+        ShortPredicate pred=(val)->
+        {
+          return !EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(1)) && !EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(100-1));
+        };
+        var arr=new short[100];
+        var seq=new CheckedList(100,arr);
+        for(int i=0;i<100;++i)
+        {
+          arr[i]=TypeConversionUtil.convertToshort(i);
+        }
+        Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf(CheckedCollectionTest.getModifyingPred(pred,()->
+        {
+          var tmp=seq.removeShortAt(seq.size()-1);
+          seq.add(tmp);
+        })));
+      } 
+      {
+        Predicate<? super Short> pred=(val)->
+        {
+          return !EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(1)) && !EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(100-1));
+        };
+        var arr=new short[100];
+        var seq=new CheckedList(100,arr);
+        for(int i=0;i<100;++i)
+        {
+          arr[i]=TypeConversionUtil.convertToshort(i);
+        }
+        Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf(CheckedCollectionTest.getModifyingPred(pred,()->
+        {
+          var tmp=seq.removeShortAt(seq.size()-1);
+          seq.add(tmp);
+        })));
+      } 
+      {
+        ShortPredicate pred=(val)->
+        {
+          return !EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(1)) && !EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(3-1));
+        };
+        var arr=new short[3];
+        var seq=new CheckedList(3,arr);
+        for(int i=0;i<3;++i)
+        {
+          arr[i]=TypeConversionUtil.convertToshort(i);
+        }
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),2);
+        Assertions.assertEquals(arr[0],TypeConversionUtil.convertToshort(1));
+        Assertions.assertEquals(arr[1],TypeConversionUtil.convertToshort(3-1));
+        Assertions.assertTrue(seq.modCount!=0);
+      } 
+      {
+        Predicate<? super Short> pred=(val)->
+        {
+          return !EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(1)) && !EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(3-1));
+        };
+        var arr=new short[3];
+        var seq=new CheckedList(3,arr);
+        for(int i=0;i<3;++i)
+        {
+          arr[i]=TypeConversionUtil.convertToshort(i);
+        }
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),2);
+        Assertions.assertEquals(arr[0],TypeConversionUtil.convertToshort(1));
+        Assertions.assertEquals(arr[1],TypeConversionUtil.convertToshort(3-1));
+        Assertions.assertTrue(seq.modCount!=0);
+      } 
+      {
+        ShortPredicate pred=(val)->
+        {
+          return !EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(1)) && !EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(3-1));
+        };
+        var arr=new short[3];
+        var seq=new CheckedList(3,arr);
+        for(int i=0;i<3;++i)
+        {
+          arr[i]=TypeConversionUtil.convertToshort(i);
+        }
+        Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf(CheckedCollectionTest.getModifyingPred(pred,()->
+        {
+          var tmp=seq.removeShortAt(seq.size()-1);
+          seq.add(tmp);
+        })));
+      } 
+      {
+        Predicate<? super Short> pred=(val)->
+        {
+          return !EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(1)) && !EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(3-1));
+        };
+        var arr=new short[3];
+        var seq=new CheckedList(3,arr);
+        for(int i=0;i<3;++i)
+        {
+          arr[i]=TypeConversionUtil.convertToshort(i);
+        }
+        Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf(CheckedCollectionTest.getModifyingPred(pred,()->
+        {
+          var tmp=seq.removeShortAt(seq.size()-1);
+          seq.add(tmp);
+        })));
+      } 
+      {
+        ShortPredicate pred=(val)->
+        {
+          return !EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(1)) && !EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(50-1));
+        };
+        var arr=new short[50];
+        var seq=new CheckedList(50,arr);
+        for(int i=0;i<50;++i)
+        {
+          arr[i]=TypeConversionUtil.convertToshort(i);
+        }
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),2);
+        Assertions.assertEquals(arr[0],TypeConversionUtil.convertToshort(1));
+        Assertions.assertEquals(arr[1],TypeConversionUtil.convertToshort(50-1));
+        Assertions.assertTrue(seq.modCount!=0);
+      } 
+      {
+        Predicate<? super Short> pred=(val)->
+        {
+          return !EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(1)) && !EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(50-1));
+        };
+        var arr=new short[50];
+        var seq=new CheckedList(50,arr);
+        for(int i=0;i<50;++i)
+        {
+          arr[i]=TypeConversionUtil.convertToshort(i);
+        }
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),2);
+        Assertions.assertEquals(arr[0],TypeConversionUtil.convertToshort(1));
+        Assertions.assertEquals(arr[1],TypeConversionUtil.convertToshort(50-1));
+        Assertions.assertTrue(seq.modCount!=0);
+      } 
+      {
+        ShortPredicate pred=(val)->
+        {
+          return !EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(1)) && !EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(50-1));
+        };
+        var arr=new short[50];
+        var seq=new CheckedList(50,arr);
+        for(int i=0;i<50;++i)
+        {
+          arr[i]=TypeConversionUtil.convertToshort(i);
+        }
+        Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf(CheckedCollectionTest.getModifyingPred(pred,()->
+        {
+          var tmp=seq.removeShortAt(seq.size()-1);
+          seq.add(tmp);
+        })));
+      } 
+      {
+        Predicate<? super Short> pred=(val)->
+        {
+          return !EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(1)) && !EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(50-1));
+        };
+        var arr=new short[50];
+        var seq=new CheckedList(50,arr);
+        for(int i=0;i<50;++i)
+        {
+          arr[i]=TypeConversionUtil.convertToshort(i);
+        }
+        Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf(CheckedCollectionTest.getModifyingPred(pred,()->
+        {
+          var tmp=seq.removeShortAt(seq.size()-1);
+          seq.add(tmp);
+        })));
+      } 
+      {
+        ShortPredicate pred=(val)->
+        {
+          return EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(0));
+        };
+        var arr=new short[100];
+        var seq=new CheckedList(100,arr);
+        for(int i=0;i<100;++i)
+        {
+          arr[i]=TypeConversionUtil.convertToshort(i);
+        }
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),100-1);
+        for(int i=0,valIndex=1;i<100-1;++i,++valIndex)
+        {
+          Assertions.assertEquals(arr[i],TypeConversionUtil.convertToshort(valIndex));
+        }
+        Assertions.assertTrue(seq.modCount!=0);
+      } 
+      {
+        Predicate<? super Short> pred=(val)->
+        {
+          return EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(0));
+        };
+        var arr=new short[100];
+        var seq=new CheckedList(100,arr);
+        for(int i=0;i<100;++i)
+        {
+          arr[i]=TypeConversionUtil.convertToshort(i);
+        }
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),100-1);
+        for(int i=0,valIndex=1;i<100-1;++i,++valIndex)
+        {
+          Assertions.assertEquals(arr[i],TypeConversionUtil.convertToshort(valIndex));
+        }
+        Assertions.assertTrue(seq.modCount!=0);
+      } 
+      {
+        ShortPredicate pred=(val)->
+        {
+          return EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(0));
+        };
+        var arr=new short[100];
+        var seq=new CheckedList(100,arr);
+        for(int i=0;i<100;++i)
+        {
+          arr[i]=TypeConversionUtil.convertToshort(i);
+        }
+        Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf(CheckedCollectionTest.getModifyingPred(pred,()->
+        {
+          var tmp=seq.removeShortAt(seq.size()-1);
+          seq.add(tmp);
+        })));
+      } 
+      {
+        Predicate<? super Short> pred=(val)->
+        {
+          return EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(0));
+        };
+        var arr=new short[100];
+        var seq=new CheckedList(100,arr);
+        for(int i=0;i<100;++i)
+        {
+          arr[i]=TypeConversionUtil.convertToshort(i);
+        }
+        Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf(CheckedCollectionTest.getModifyingPred(pred,()->
+        {
+          var tmp=seq.removeShortAt(seq.size()-1);
+          seq.add(tmp);
+        })));
+      } 
+      {
+        ShortPredicate pred=(val)->
+        {
+          return EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(0));
+        };
+        var arr=new short[50];
+        var seq=new CheckedList(50,arr);
+        for(int i=0;i<50;++i)
+        {
+          arr[i]=TypeConversionUtil.convertToshort(i);
+        }
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),50-1);
+        for(int i=0,valIndex=1;i<50-1;++i,++valIndex)
+        {
+          Assertions.assertEquals(arr[i],TypeConversionUtil.convertToshort(valIndex));
+        }
+        Assertions.assertTrue(seq.modCount!=0);
+      } 
+      {
+        Predicate<? super Short> pred=(val)->
+        {
+          return EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(0));
+        };
+        var arr=new short[50];
+        var seq=new CheckedList(50,arr);
+        for(int i=0;i<50;++i)
+        {
+          arr[i]=TypeConversionUtil.convertToshort(i);
+        }
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),50-1);
+        for(int i=0,valIndex=1;i<50-1;++i,++valIndex)
+        {
+          Assertions.assertEquals(arr[i],TypeConversionUtil.convertToshort(valIndex));
+        }
+        Assertions.assertTrue(seq.modCount!=0);
+      } 
+      {
+        ShortPredicate pred=(val)->
+        {
+          return EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(0));
+        };
+        var arr=new short[50];
+        var seq=new CheckedList(50,arr);
+        for(int i=0;i<50;++i)
+        {
+          arr[i]=TypeConversionUtil.convertToshort(i);
+        }
+        Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf(CheckedCollectionTest.getModifyingPred(pred,()->
+        {
+          var tmp=seq.removeShortAt(seq.size()-1);
+          seq.add(tmp);
+        })));
+      } 
+      {
+        Predicate<? super Short> pred=(val)->
+        {
+          return EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(0));
+        };
+        var arr=new short[50];
+        var seq=new CheckedList(50,arr);
+        for(int i=0;i<50;++i)
+        {
+          arr[i]=TypeConversionUtil.convertToshort(i);
+        }
+        Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf(CheckedCollectionTest.getModifyingPred(pred,()->
+        {
+          var tmp=seq.removeShortAt(seq.size()-1);
+          seq.add(tmp);
+        })));
+      } 
+      {
+        ShortPredicate pred=(val)->
+        {
+          return EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(0)) || EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(50-2));
+        };
+        var arr=new short[50];
+        var seq=new CheckedList(50,arr);
+        for(int i=0;i<50;++i)
+        {
+          arr[i]=TypeConversionUtil.convertToshort(i);
+        }
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),50-2);
+        for(int i=0,valIndex=1;i<50-3;++i,++valIndex)
+        {
+          Assertions.assertEquals(arr[i],TypeConversionUtil.convertToshort(valIndex));
+        }
+        Assertions.assertEquals(arr[50-3],TypeConversionUtil.convertToshort(50-1));
+        Assertions.assertTrue(seq.modCount!=0);
+      } 
+      {
+        Predicate<? super Short> pred=(val)->
+        {
+          return EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(0)) || EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(50-2));
+        };
+        var arr=new short[50];
+        var seq=new CheckedList(50,arr);
+        for(int i=0;i<50;++i)
+        {
+          arr[i]=TypeConversionUtil.convertToshort(i);
+        }
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),50-2);
+        for(int i=0,valIndex=1;i<50-3;++i,++valIndex)
+        {
+          Assertions.assertEquals(arr[i],TypeConversionUtil.convertToshort(valIndex));
+        }
+        Assertions.assertEquals(arr[50-3],TypeConversionUtil.convertToshort(50-1));
+        Assertions.assertTrue(seq.modCount!=0);
+      } 
+      {
+        ShortPredicate pred=(val)->
+        {
+          return EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(0)) || EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(50-2));
+        };
+        var arr=new short[50];
+        var seq=new CheckedList(50,arr);
+        for(int i=0;i<50;++i)
+        {
+          arr[i]=TypeConversionUtil.convertToshort(i);
+        }
+        Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf(CheckedCollectionTest.getModifyingPred(pred,()->
+        {
+          var tmp=seq.removeShortAt(seq.size()-1);
+          seq.add(tmp);
+        })));
+      } 
+      {
+        Predicate<? super Short> pred=(val)->
+        {
+          return EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(0)) || EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(50-2));
+        };
+        var arr=new short[50];
+        var seq=new CheckedList(50,arr);
+        for(int i=0;i<50;++i)
         {
           arr[i]=TypeConversionUtil.convertToshort(i);
         }
@@ -1082,60 +2314,59 @@ public class ShortSeqRemoveIfTest
   public void testRemoveIfUncheckedSubList()
   {
       {
-        var arr=new short[10];
-        var root=new UncheckedList(10,arr);
-        var subList=root.subList(0,10);
-        var seq=subList.subList(0,10);
+        var arr=new short[100];
+        var root=new UncheckedList(100,arr);
+        var subList=root.subList(0,100);
+        var seq=subList.subList(0,100);
         ShortPredicate pred=val->false;
         Assertions.assertFalse(seq.removeIf(pred));
-        Assertions.assertEquals(seq.size(),10);
+        Assertions.assertEquals(seq.size(),100);
       }
       {
-        var arr=new short[10];
-        var root=new UncheckedList(10,arr);
-        var subList=root.subList(0,10);
-        var seq=subList.subList(0,10);
+        var arr=new short[100];
+        var root=new UncheckedList(100,arr);
+        var subList=root.subList(0,100);
+        var seq=subList.subList(0,100);
         Predicate<? super Short> pred=val->false;
         Assertions.assertFalse(seq.removeIf(pred));
-        Assertions.assertEquals(seq.size(),10);
+        Assertions.assertEquals(seq.size(),100);
       }
       {
-        var arr=new short[10];
-        var root=new UncheckedList(10,arr);
-        var subList=root.subList(0,10);
-        var seq=subList.subList(0,10);
+        var arr=new short[100];
+        var root=new UncheckedList(100,arr);
+        var subList=root.subList(0,100);
+        var seq=subList.subList(0,100);
         ShortPredicate pred=val->true;
         Assertions.assertTrue(seq.removeIf(pred));
         Assertions.assertTrue(seq.isEmpty());
       }
       {
-        var arr=new short[10];
-        var root=new UncheckedList(10,arr);
-        var subList=root.subList(0,10);
-        var seq=subList.subList(0,10);
+        var arr=new short[100];
+        var root=new UncheckedList(100,arr);
+        var subList=root.subList(0,100);
+        var seq=subList.subList(0,100);
         Predicate<? super Short> pred=val->true;
         Assertions.assertTrue(seq.removeIf(pred));
         Assertions.assertTrue(seq.isEmpty());
       }
       {
-        int length=100;
         ShortPredicate pred=(val)->
         {
           return (EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(0))
             ||
              EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(2)));
         };
-        var arr=new short[length];
-        var root=new UncheckedList(length,arr);
-        var subList=root.subList(0,length);
-        var seq=subList.subList(0,length);
-        for(int i=0;i<length;++i)
+        var arr=new short[100];
+        var root=new UncheckedList(100,arr);
+        var subList=root.subList(0,100);
+        var seq=subList.subList(0,100);
+        for(int i=0;i<100;++i)
         {
           arr[i]=TypeConversionUtil.convertToshort(i);
         }
         Assertions.assertTrue(seq.removeIf(pred));
-        Assertions.assertEquals(seq.size(),length-2);
-        for(int i=0,valIndex=0;i<length-2;++i,++valIndex)
+        Assertions.assertEquals(seq.size(),100-2);
+        for(int i=0,valIndex=0;i<100-2;++i,++valIndex)
         {
           if(i==0 || i==1)
           {
@@ -1145,24 +2376,23 @@ public class ShortSeqRemoveIfTest
         }
       } 
       {
-        int length=100;
         Predicate<? super Short> pred=(val)->
         {
           return (EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(0))
             ||
              EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(2)));
         };
-        var arr=new short[length];
-        var root=new UncheckedList(length,arr);
-        var subList=root.subList(0,length);
-        var seq=subList.subList(0,length);
-        for(int i=0;i<length;++i)
+        var arr=new short[100];
+        var root=new UncheckedList(100,arr);
+        var subList=root.subList(0,100);
+        var seq=subList.subList(0,100);
+        for(int i=0;i<100;++i)
         {
           arr[i]=TypeConversionUtil.convertToshort(i);
         }
         Assertions.assertTrue(seq.removeIf(pred));
-        Assertions.assertEquals(seq.size(),length-2);
-        for(int i=0,valIndex=0;i<length-2;++i,++valIndex)
+        Assertions.assertEquals(seq.size(),100-2);
+        for(int i=0,valIndex=0;i<100-2;++i,++valIndex)
         {
           if(i==0 || i==1)
           {
@@ -1172,16 +2402,15 @@ public class ShortSeqRemoveIfTest
         }
       } 
       {
-        int length=100;
         ShortPredicate pred=(val)->
         {
           return !EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(1));
         };
-        var arr=new short[length];
-        var root=new UncheckedList(length,arr);
-        var subList=root.subList(0,length);
-        var seq=subList.subList(0,length);
-        for(int i=0;i<length;++i)
+        var arr=new short[100];
+        var root=new UncheckedList(100,arr);
+        var subList=root.subList(0,100);
+        var seq=subList.subList(0,100);
+        for(int i=0;i<100;++i)
         {
           arr[i]=TypeConversionUtil.convertToshort(i);
         }
@@ -1190,22 +2419,251 @@ public class ShortSeqRemoveIfTest
         Assertions.assertEquals(arr[0],TypeConversionUtil.convertToshort(1));
       } 
       {
-        int length=100;
         Predicate<? super Short> pred=(val)->
         {
           return !EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(1));
         };
-        var arr=new short[length];
-        var root=new UncheckedList(length,arr);
-        var subList=root.subList(0,length);
-        var seq=subList.subList(0,length);
-        for(int i=0;i<length;++i)
+        var arr=new short[100];
+        var root=new UncheckedList(100,arr);
+        var subList=root.subList(0,100);
+        var seq=subList.subList(0,100);
+        for(int i=0;i<100;++i)
         {
           arr[i]=TypeConversionUtil.convertToshort(i);
         }
         Assertions.assertTrue(seq.removeIf(pred));
         Assertions.assertEquals(seq.size(),1);
         Assertions.assertEquals(arr[0],TypeConversionUtil.convertToshort(1));
+      } 
+      {
+        ShortPredicate pred=(val)->
+        {
+          return !EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(1)) && !EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(100-1));
+        };
+        var arr=new short[100];
+        var root=new UncheckedList(100,arr);
+        var subList=root.subList(0,100);
+        var seq=subList.subList(0,100);
+        for(int i=0;i<100;++i)
+        {
+          arr[i]=TypeConversionUtil.convertToshort(i);
+        }
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),2);
+        Assertions.assertEquals(arr[0],TypeConversionUtil.convertToshort(1));
+        Assertions.assertEquals(arr[1],TypeConversionUtil.convertToshort(100-1));
+      } 
+      {
+        Predicate<? super Short> pred=(val)->
+        {
+          return !EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(1)) && !EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(100-1));
+        };
+        var arr=new short[100];
+        var root=new UncheckedList(100,arr);
+        var subList=root.subList(0,100);
+        var seq=subList.subList(0,100);
+        for(int i=0;i<100;++i)
+        {
+          arr[i]=TypeConversionUtil.convertToshort(i);
+        }
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),2);
+        Assertions.assertEquals(arr[0],TypeConversionUtil.convertToshort(1));
+        Assertions.assertEquals(arr[1],TypeConversionUtil.convertToshort(100-1));
+      } 
+      {
+        ShortPredicate pred=(val)->
+        {
+          return !EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(1)) && !EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(3-1));
+        };
+        var arr=new short[3];
+        var root=new UncheckedList(3,arr);
+        var subList=root.subList(0,3);
+        var seq=subList.subList(0,3);
+        for(int i=0;i<3;++i)
+        {
+          arr[i]=TypeConversionUtil.convertToshort(i);
+        }
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),2);
+        Assertions.assertEquals(arr[0],TypeConversionUtil.convertToshort(1));
+        Assertions.assertEquals(arr[1],TypeConversionUtil.convertToshort(3-1));
+      } 
+      {
+        Predicate<? super Short> pred=(val)->
+        {
+          return !EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(1)) && !EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(3-1));
+        };
+        var arr=new short[3];
+        var root=new UncheckedList(3,arr);
+        var subList=root.subList(0,3);
+        var seq=subList.subList(0,3);
+        for(int i=0;i<3;++i)
+        {
+          arr[i]=TypeConversionUtil.convertToshort(i);
+        }
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),2);
+        Assertions.assertEquals(arr[0],TypeConversionUtil.convertToshort(1));
+        Assertions.assertEquals(arr[1],TypeConversionUtil.convertToshort(3-1));
+      } 
+      {
+        ShortPredicate pred=(val)->
+        {
+          return !EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(1)) && !EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(50-1));
+        };
+        var arr=new short[50];
+        var root=new UncheckedList(50,arr);
+        var subList=root.subList(0,50);
+        var seq=subList.subList(0,50);
+        for(int i=0;i<50;++i)
+        {
+          arr[i]=TypeConversionUtil.convertToshort(i);
+        }
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),2);
+        Assertions.assertEquals(arr[0],TypeConversionUtil.convertToshort(1));
+        Assertions.assertEquals(arr[1],TypeConversionUtil.convertToshort(50-1));
+      } 
+      {
+        Predicate<? super Short> pred=(val)->
+        {
+          return !EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(1)) && !EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(50-1));
+        };
+        var arr=new short[50];
+        var root=new UncheckedList(50,arr);
+        var subList=root.subList(0,50);
+        var seq=subList.subList(0,50);
+        for(int i=0;i<50;++i)
+        {
+          arr[i]=TypeConversionUtil.convertToshort(i);
+        }
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),2);
+        Assertions.assertEquals(arr[0],TypeConversionUtil.convertToshort(1));
+        Assertions.assertEquals(arr[1],TypeConversionUtil.convertToshort(50-1));
+      } 
+      {
+        ShortPredicate pred=(val)->
+        {
+          return EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(0));
+        };
+        var arr=new short[100];
+        var root=new UncheckedList(100,arr);
+        var subList=root.subList(0,100);
+        var seq=subList.subList(0,100);
+        for(int i=0;i<100;++i)
+        {
+          arr[i]=TypeConversionUtil.convertToshort(i);
+        }
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),100-1);
+        for(int i=0,valIndex=1;i<100-1;++i,++valIndex)
+        {
+          Assertions.assertEquals(arr[i],TypeConversionUtil.convertToshort(valIndex));
+        }
+      } 
+      {
+        Predicate<? super Short> pred=(val)->
+        {
+          return EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(0));
+        };
+        var arr=new short[100];
+        var root=new UncheckedList(100,arr);
+        var subList=root.subList(0,100);
+        var seq=subList.subList(0,100);
+        for(int i=0;i<100;++i)
+        {
+          arr[i]=TypeConversionUtil.convertToshort(i);
+        }
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),100-1);
+        for(int i=0,valIndex=1;i<100-1;++i,++valIndex)
+        {
+          Assertions.assertEquals(arr[i],TypeConversionUtil.convertToshort(valIndex));
+        }
+      } 
+      {
+        ShortPredicate pred=(val)->
+        {
+          return EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(0));
+        };
+        var arr=new short[50];
+        var root=new UncheckedList(50,arr);
+        var subList=root.subList(0,50);
+        var seq=subList.subList(0,50);
+        for(int i=0;i<50;++i)
+        {
+          arr[i]=TypeConversionUtil.convertToshort(i);
+        }
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),50-1);
+        for(int i=0,valIndex=1;i<50-1;++i,++valIndex)
+        {
+          Assertions.assertEquals(arr[i],TypeConversionUtil.convertToshort(valIndex));
+        }
+      } 
+      {
+        Predicate<? super Short> pred=(val)->
+        {
+          return EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(0));
+        };
+        var arr=new short[50];
+        var root=new UncheckedList(50,arr);
+        var subList=root.subList(0,50);
+        var seq=subList.subList(0,50);
+        for(int i=0;i<50;++i)
+        {
+          arr[i]=TypeConversionUtil.convertToshort(i);
+        }
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),50-1);
+        for(int i=0,valIndex=1;i<50-1;++i,++valIndex)
+        {
+          Assertions.assertEquals(arr[i],TypeConversionUtil.convertToshort(valIndex));
+        }
+      } 
+      {
+        ShortPredicate pred=(val)->
+        {
+          return EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(0)) || EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(50-2));
+        };
+        var arr=new short[50];
+        var root=new UncheckedList(50,arr);
+        var subList=root.subList(0,50);
+        var seq=subList.subList(0,50);
+        for(int i=0;i<50;++i)
+        {
+          arr[i]=TypeConversionUtil.convertToshort(i);
+        }
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),50-2);
+        for(int i=0,valIndex=1;i<50-3;++i,++valIndex)
+        {
+          Assertions.assertEquals(arr[i],TypeConversionUtil.convertToshort(valIndex));
+        }
+        Assertions.assertEquals(arr[50-3],TypeConversionUtil.convertToshort(50-1));
+      } 
+      {
+        Predicate<? super Short> pred=(val)->
+        {
+          return EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(0)) || EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(50-2));
+        };
+        var arr=new short[50];
+        var root=new UncheckedList(50,arr);
+        var subList=root.subList(0,50);
+        var seq=subList.subList(0,50);
+        for(int i=0;i<50;++i)
+        {
+          arr[i]=TypeConversionUtil.convertToshort(i);
+        }
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),50-2);
+        for(int i=0,valIndex=1;i<50-3;++i,++valIndex)
+        {
+          Assertions.assertEquals(arr[i],TypeConversionUtil.convertToshort(valIndex));
+        }
+        Assertions.assertEquals(arr[50-3],TypeConversionUtil.convertToshort(50-1));
       } 
   }
   @Test
@@ -1221,30 +2679,30 @@ public class ShortSeqRemoveIfTest
   public void testRemoveIfCheckedSubList()
   {
       {
-        var arr=new short[10];
-        var root=new CheckedList(10,arr);
-        var subList=root.subList(0,10);
-        var seq=subList.subList(0,10);
+        var arr=new short[100];
+        var root=new CheckedList(100,arr);
+        var subList=root.subList(0,100);
+        var seq=subList.subList(0,100);
         ShortPredicate pred=val->false;
         Assertions.assertFalse(seq.removeIf(pred));
-        Assertions.assertEquals(seq.size(),10);
+        Assertions.assertEquals(seq.size(),100);
         Assertions.assertEquals(0,root.modCount);
       }
       {
-        var arr=new short[10];
-        var root=new CheckedList(10,arr);
-        var subList=root.subList(0,10);
-        var seq=subList.subList(0,10);
+        var arr=new short[100];
+        var root=new CheckedList(100,arr);
+        var subList=root.subList(0,100);
+        var seq=subList.subList(0,100);
         Predicate<? super Short> pred=val->false;
         Assertions.assertFalse(seq.removeIf(pred));
-        Assertions.assertEquals(seq.size(),10);
+        Assertions.assertEquals(seq.size(),100);
         Assertions.assertEquals(0,root.modCount);
       }
       {
-        var arr=new short[10];
-        var root=new CheckedList(10,arr);
-        var subList=root.subList(0,10);
-        var seq=subList.subList(0,10);
+        var arr=new short[100];
+        var root=new CheckedList(100,arr);
+        var subList=root.subList(0,100);
+        var seq=subList.subList(0,100);
         ShortPredicate pred=val->false;
         Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf(CheckedCollectionTest.getModifyingPred(pred,()->
         {
@@ -1253,10 +2711,10 @@ public class ShortSeqRemoveIfTest
         })));
       }
       {
-        var arr=new short[10];
-        var root=new CheckedList(10,arr);
-        var subList=root.subList(0,10);
-        var seq=subList.subList(0,10);
+        var arr=new short[100];
+        var root=new CheckedList(100,arr);
+        var subList=root.subList(0,100);
+        var seq=subList.subList(0,100);
         Predicate<? super Short> pred=val->false;
         Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf(CheckedCollectionTest.getModifyingPred(pred,()->
         {
@@ -1265,10 +2723,10 @@ public class ShortSeqRemoveIfTest
         })));
       }
       {
-        var arr=new short[10];
-        var root=new CheckedList(10,arr);
-        var subList=root.subList(0,10);
-        var seq=subList.subList(0,10);
+        var arr=new short[100];
+        var root=new CheckedList(100,arr);
+        var subList=root.subList(0,100);
+        var seq=subList.subList(0,100);
         Assertions.assertThrows(IndexOutOfBoundsException.class,()->
         {
           seq.removeIf((ShortPredicate)(v)->
@@ -1278,10 +2736,10 @@ public class ShortSeqRemoveIfTest
         });
       }
       {
-        var arr=new short[10];
-        var root=new CheckedList(10,arr);
-        var subList=root.subList(0,10);
-        var seq=subList.subList(0,10);
+        var arr=new short[100];
+        var root=new CheckedList(100,arr);
+        var subList=root.subList(0,100);
+        var seq=subList.subList(0,100);
         Assertions.assertThrows(IndexOutOfBoundsException.class,()->
         {
           seq.removeIf((Predicate<? super Short>)(v)->
@@ -1291,10 +2749,10 @@ public class ShortSeqRemoveIfTest
         });
       }
       {
-        var arr=new short[10];
-        var root=new CheckedList(10,arr);
-        var subList=root.subList(0,10);
-        var seq=subList.subList(0,10);
+        var arr=new short[100];
+        var root=new CheckedList(100,arr);
+        var subList=root.subList(0,100);
+        var seq=subList.subList(0,100);
         Assertions.assertThrows(ConcurrentModificationException.class,()->
         {
           seq.removeIf((ShortPredicate)(v)->
@@ -1306,10 +2764,10 @@ public class ShortSeqRemoveIfTest
         });
       }
       {
-        var arr=new short[10];
-        var root=new CheckedList(10,arr);
-        var subList=root.subList(0,10);
-        var seq=subList.subList(0,10);
+        var arr=new short[100];
+        var root=new CheckedList(100,arr);
+        var subList=root.subList(0,100);
+        var seq=subList.subList(0,100);
         Assertions.assertThrows(ConcurrentModificationException.class,()->
         {
           seq.removeIf((Predicate<? super Short>)(v)->
@@ -1321,30 +2779,30 @@ public class ShortSeqRemoveIfTest
         });
       }
       {
-        var arr=new short[10];
-        var root=new CheckedList(10,arr);
-        var subList=root.subList(0,10);
-        var seq=subList.subList(0,10);
+        var arr=new short[100];
+        var root=new CheckedList(100,arr);
+        var subList=root.subList(0,100);
+        var seq=subList.subList(0,100);
         ShortPredicate pred=val->true;
         Assertions.assertTrue(seq.removeIf(pred));
         Assertions.assertTrue(seq.isEmpty());
         Assertions.assertTrue(root.modCount!=0);
       }
       {
-        var arr=new short[10];
-        var root=new CheckedList(10,arr);
-        var subList=root.subList(0,10);
-        var seq=subList.subList(0,10);
+        var arr=new short[100];
+        var root=new CheckedList(100,arr);
+        var subList=root.subList(0,100);
+        var seq=subList.subList(0,100);
         Predicate<? super Short> pred=val->true;
         Assertions.assertTrue(seq.removeIf(pred));
         Assertions.assertTrue(seq.isEmpty());
         Assertions.assertTrue(root.modCount!=0);
       }
       {
-        var arr=new short[10];
-        var root=new CheckedList(10,arr);
-        var subList=root.subList(0,10);
-        var seq=subList.subList(0,10);
+        var arr=new short[100];
+        var root=new CheckedList(100,arr);
+        var subList=root.subList(0,100);
+        var seq=subList.subList(0,100);
         ShortPredicate pred=val->true;
         Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf(CheckedCollectionTest.getModifyingPred(pred,()->
         {
@@ -1353,10 +2811,10 @@ public class ShortSeqRemoveIfTest
         })));
       }
       {
-        var arr=new short[10];
-        var root=new CheckedList(10,arr);
-        var subList=root.subList(0,10);
-        var seq=subList.subList(0,10);
+        var arr=new short[100];
+        var root=new CheckedList(100,arr);
+        var subList=root.subList(0,100);
+        var seq=subList.subList(0,100);
         Predicate<? super Short> pred=val->true;
         Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf(CheckedCollectionTest.getModifyingPred(pred,()->
         {
@@ -1365,10 +2823,10 @@ public class ShortSeqRemoveIfTest
         })));
       }
       {
-        var arr=new short[10];
-        var root=new CheckedList(10,arr);
-        var subList=root.subList(0,10);
-        var seq=subList.subList(0,10);
+        var arr=new short[100];
+        var root=new CheckedList(100,arr);
+        var subList=root.subList(0,100);
+        var seq=subList.subList(0,100);
         Assertions.assertThrows(IndexOutOfBoundsException.class,()->
         {
           seq.removeIf((ShortPredicate)(v)->
@@ -1378,10 +2836,10 @@ public class ShortSeqRemoveIfTest
         });
       }
       {
-        var arr=new short[10];
-        var root=new CheckedList(10,arr);
-        var subList=root.subList(0,10);
-        var seq=subList.subList(0,10);
+        var arr=new short[100];
+        var root=new CheckedList(100,arr);
+        var subList=root.subList(0,100);
+        var seq=subList.subList(0,100);
         Assertions.assertThrows(IndexOutOfBoundsException.class,()->
         {
           seq.removeIf((Predicate<? super Short>)(v)->
@@ -1391,10 +2849,10 @@ public class ShortSeqRemoveIfTest
         });
       }
       {
-        var arr=new short[10];
-        var root=new CheckedList(10,arr);
-        var subList=root.subList(0,10);
-        var seq=subList.subList(0,10);
+        var arr=new short[100];
+        var root=new CheckedList(100,arr);
+        var subList=root.subList(0,100);
+        var seq=subList.subList(0,100);
         Assertions.assertThrows(ConcurrentModificationException.class,()->
         {
           seq.removeIf((ShortPredicate)(v)->
@@ -1406,10 +2864,10 @@ public class ShortSeqRemoveIfTest
         });
       }
       {
-        var arr=new short[10];
-        var root=new CheckedList(10,arr);
-        var subList=root.subList(0,10);
-        var seq=subList.subList(0,10);
+        var arr=new short[100];
+        var root=new CheckedList(100,arr);
+        var subList=root.subList(0,100);
+        var seq=subList.subList(0,100);
         Assertions.assertThrows(ConcurrentModificationException.class,()->
         {
           seq.removeIf((Predicate<? super Short>)(v)->
@@ -1421,24 +2879,23 @@ public class ShortSeqRemoveIfTest
         });
       }
       {
-        int length=100;
         ShortPredicate pred=(val)->
         {
           return (EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(0))
             ||
              EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(2)));
         };
-        var arr=new short[length];
-        var root=new CheckedList(length,arr);
-        var subList=root.subList(0,length);
-        var seq=subList.subList(0,length);
-        for(int i=0;i<length;++i)
+        var arr=new short[100];
+        var root=new CheckedList(100,arr);
+        var subList=root.subList(0,100);
+        var seq=subList.subList(0,100);
+        for(int i=0;i<100;++i)
         {
           arr[i]=TypeConversionUtil.convertToshort(i);
         }
         Assertions.assertTrue(seq.removeIf(pred));
-        Assertions.assertEquals(seq.size(),length-2);
-        for(int i=0,valIndex=0;i<length-2;++i,++valIndex)
+        Assertions.assertEquals(seq.size(),100-2);
+        for(int i=0,valIndex=0;i<100-2;++i,++valIndex)
         {
           if(i==0 || i==1)
           {
@@ -1449,24 +2906,23 @@ public class ShortSeqRemoveIfTest
         Assertions.assertTrue(root.modCount!=0);
       } 
       {
-        int length=100;
         Predicate<? super Short> pred=(val)->
         {
           return (EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(0))
             ||
              EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(2)));
         };
-        var arr=new short[length];
-        var root=new CheckedList(length,arr);
-        var subList=root.subList(0,length);
-        var seq=subList.subList(0,length);
-        for(int i=0;i<length;++i)
+        var arr=new short[100];
+        var root=new CheckedList(100,arr);
+        var subList=root.subList(0,100);
+        var seq=subList.subList(0,100);
+        for(int i=0;i<100;++i)
         {
           arr[i]=TypeConversionUtil.convertToshort(i);
         }
         Assertions.assertTrue(seq.removeIf(pred));
-        Assertions.assertEquals(seq.size(),length-2);
-        for(int i=0,valIndex=0;i<length-2;++i,++valIndex)
+        Assertions.assertEquals(seq.size(),100-2);
+        for(int i=0,valIndex=0;i<100-2;++i,++valIndex)
         {
           if(i==0 || i==1)
           {
@@ -1477,18 +2933,17 @@ public class ShortSeqRemoveIfTest
         Assertions.assertTrue(root.modCount!=0);
       } 
       {
-        int length=100;
         ShortPredicate pred=(val)->
         {
           return (EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(0))
             ||
              EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(2)));
         };
-        var arr=new short[length];
-        var root=new CheckedList(length,arr);
-        var subList=root.subList(0,length);
-        var seq=subList.subList(0,length);
-        for(int i=0;i<length;++i)
+        var arr=new short[100];
+        var root=new CheckedList(100,arr);
+        var subList=root.subList(0,100);
+        var seq=subList.subList(0,100);
+        for(int i=0;i<100;++i)
         {
           arr[i]=TypeConversionUtil.convertToshort(i);
         }
@@ -1499,18 +2954,17 @@ public class ShortSeqRemoveIfTest
         })));
       } 
       {
-        int length=100;
         Predicate<? super Short> pred=(val)->
         {
           return (EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(0))
             ||
              EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(2)));
         };
-        var arr=new short[length];
-        var root=new CheckedList(length,arr);
-        var subList=root.subList(0,length);
-        var seq=subList.subList(0,length);
-        for(int i=0;i<length;++i)
+        var arr=new short[100];
+        var root=new CheckedList(100,arr);
+        var subList=root.subList(0,100);
+        var seq=subList.subList(0,100);
+        for(int i=0;i<100;++i)
         {
           arr[i]=TypeConversionUtil.convertToshort(i);
         }
@@ -1521,16 +2975,15 @@ public class ShortSeqRemoveIfTest
         })));
       } 
       {
-        int length=100;
         ShortPredicate pred=(val)->
         {
           return !EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(1));
         };
-        var arr=new short[length];
-        var root=new CheckedList(length,arr);
-        var subList=root.subList(0,length);
-        var seq=subList.subList(0,length);
-        for(int i=0;i<length;++i)
+        var arr=new short[100];
+        var root=new CheckedList(100,arr);
+        var subList=root.subList(0,100);
+        var seq=subList.subList(0,100);
+        for(int i=0;i<100;++i)
         {
           arr[i]=TypeConversionUtil.convertToshort(i);
         }
@@ -1540,16 +2993,15 @@ public class ShortSeqRemoveIfTest
         Assertions.assertTrue(root.modCount!=0);
       } 
       {
-        int length=100;
         Predicate<? super Short> pred=(val)->
         {
           return !EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(1));
         };
-        var arr=new short[length];
-        var root=new CheckedList(length,arr);
-        var subList=root.subList(0,length);
-        var seq=subList.subList(0,length);
-        for(int i=0;i<length;++i)
+        var arr=new short[100];
+        var root=new CheckedList(100,arr);
+        var subList=root.subList(0,100);
+        var seq=subList.subList(0,100);
+        for(int i=0;i<100;++i)
         {
           arr[i]=TypeConversionUtil.convertToshort(i);
         }
@@ -1559,16 +3011,15 @@ public class ShortSeqRemoveIfTest
         Assertions.assertTrue(root.modCount!=0);
       } 
       {
-        int length=100;
         ShortPredicate pred=(val)->
         {
           return !EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(1));
         };
-        var arr=new short[length];
-        var root=new CheckedList(length,arr);
-        var subList=root.subList(0,length);
-        var seq=subList.subList(0,length);
-        for(int i=0;i<length;++i)
+        var arr=new short[100];
+        var root=new CheckedList(100,arr);
+        var subList=root.subList(0,100);
+        var seq=subList.subList(0,100);
+        for(int i=0;i<100;++i)
         {
           arr[i]=TypeConversionUtil.convertToshort(i);
         }
@@ -1579,16 +3030,485 @@ public class ShortSeqRemoveIfTest
         })));
       } 
       {
-        int length=100;
         Predicate<? super Short> pred=(val)->
         {
           return !EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(1));
         };
-        var arr=new short[length];
-        var root=new CheckedList(length,arr);
-        var subList=root.subList(0,length);
-        var seq=subList.subList(0,length);
-        for(int i=0;i<length;++i)
+        var arr=new short[100];
+        var root=new CheckedList(100,arr);
+        var subList=root.subList(0,100);
+        var seq=subList.subList(0,100);
+        for(int i=0;i<100;++i)
+        {
+          arr[i]=TypeConversionUtil.convertToshort(i);
+        }
+        Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf(CheckedCollectionTest.getModifyingPred(pred,()->
+        {
+          var tmp=seq.removeShortAt(seq.size()-1);
+          seq.add(tmp);
+        })));
+      } 
+      {
+        ShortPredicate pred=(val)->
+        {
+          return !EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(1)) && !EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(100-1));
+        };
+        var arr=new short[100];
+        var root=new CheckedList(100,arr);
+        var subList=root.subList(0,100);
+        var seq=subList.subList(0,100);
+        for(int i=0;i<100;++i)
+        {
+          arr[i]=TypeConversionUtil.convertToshort(i);
+        }
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),2);
+        Assertions.assertEquals(arr[0],TypeConversionUtil.convertToshort(1));
+        Assertions.assertEquals(arr[1],TypeConversionUtil.convertToshort(100-1));
+        Assertions.assertTrue(root.modCount!=0);
+      } 
+      {
+        Predicate<? super Short> pred=(val)->
+        {
+          return !EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(1)) && !EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(100-1));
+        };
+        var arr=new short[100];
+        var root=new CheckedList(100,arr);
+        var subList=root.subList(0,100);
+        var seq=subList.subList(0,100);
+        for(int i=0;i<100;++i)
+        {
+          arr[i]=TypeConversionUtil.convertToshort(i);
+        }
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),2);
+        Assertions.assertEquals(arr[0],TypeConversionUtil.convertToshort(1));
+        Assertions.assertEquals(arr[1],TypeConversionUtil.convertToshort(100-1));
+        Assertions.assertTrue(root.modCount!=0);
+      } 
+      {
+        ShortPredicate pred=(val)->
+        {
+          return !EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(1)) && !EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(100-1));
+        };
+        var arr=new short[100];
+        var root=new CheckedList(100,arr);
+        var subList=root.subList(0,100);
+        var seq=subList.subList(0,100);
+        for(int i=0;i<100;++i)
+        {
+          arr[i]=TypeConversionUtil.convertToshort(i);
+        }
+        Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf(CheckedCollectionTest.getModifyingPred(pred,()->
+        {
+          var tmp=seq.removeShortAt(seq.size()-1);
+          seq.add(tmp);
+        })));
+      } 
+      {
+        Predicate<? super Short> pred=(val)->
+        {
+          return !EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(1)) && !EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(100-1));
+        };
+        var arr=new short[100];
+        var root=new CheckedList(100,arr);
+        var subList=root.subList(0,100);
+        var seq=subList.subList(0,100);
+        for(int i=0;i<100;++i)
+        {
+          arr[i]=TypeConversionUtil.convertToshort(i);
+        }
+        Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf(CheckedCollectionTest.getModifyingPred(pred,()->
+        {
+          var tmp=seq.removeShortAt(seq.size()-1);
+          seq.add(tmp);
+        })));
+      } 
+      {
+        ShortPredicate pred=(val)->
+        {
+          return !EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(1)) && !EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(3-1));
+        };
+        var arr=new short[3];
+        var root=new CheckedList(3,arr);
+        var subList=root.subList(0,3);
+        var seq=subList.subList(0,3);
+        for(int i=0;i<3;++i)
+        {
+          arr[i]=TypeConversionUtil.convertToshort(i);
+        }
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),2);
+        Assertions.assertEquals(arr[0],TypeConversionUtil.convertToshort(1));
+        Assertions.assertEquals(arr[1],TypeConversionUtil.convertToshort(3-1));
+        Assertions.assertTrue(root.modCount!=0);
+      } 
+      {
+        Predicate<? super Short> pred=(val)->
+        {
+          return !EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(1)) && !EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(3-1));
+        };
+        var arr=new short[3];
+        var root=new CheckedList(3,arr);
+        var subList=root.subList(0,3);
+        var seq=subList.subList(0,3);
+        for(int i=0;i<3;++i)
+        {
+          arr[i]=TypeConversionUtil.convertToshort(i);
+        }
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),2);
+        Assertions.assertEquals(arr[0],TypeConversionUtil.convertToshort(1));
+        Assertions.assertEquals(arr[1],TypeConversionUtil.convertToshort(3-1));
+        Assertions.assertTrue(root.modCount!=0);
+      } 
+      {
+        ShortPredicate pred=(val)->
+        {
+          return !EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(1)) && !EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(3-1));
+        };
+        var arr=new short[3];
+        var root=new CheckedList(3,arr);
+        var subList=root.subList(0,3);
+        var seq=subList.subList(0,3);
+        for(int i=0;i<3;++i)
+        {
+          arr[i]=TypeConversionUtil.convertToshort(i);
+        }
+        Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf(CheckedCollectionTest.getModifyingPred(pred,()->
+        {
+          var tmp=seq.removeShortAt(seq.size()-1);
+          seq.add(tmp);
+        })));
+      } 
+      {
+        Predicate<? super Short> pred=(val)->
+        {
+          return !EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(1)) && !EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(3-1));
+        };
+        var arr=new short[3];
+        var root=new CheckedList(3,arr);
+        var subList=root.subList(0,3);
+        var seq=subList.subList(0,3);
+        for(int i=0;i<3;++i)
+        {
+          arr[i]=TypeConversionUtil.convertToshort(i);
+        }
+        Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf(CheckedCollectionTest.getModifyingPred(pred,()->
+        {
+          var tmp=seq.removeShortAt(seq.size()-1);
+          seq.add(tmp);
+        })));
+      } 
+      {
+        ShortPredicate pred=(val)->
+        {
+          return !EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(1)) && !EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(50-1));
+        };
+        var arr=new short[50];
+        var root=new CheckedList(50,arr);
+        var subList=root.subList(0,50);
+        var seq=subList.subList(0,50);
+        for(int i=0;i<50;++i)
+        {
+          arr[i]=TypeConversionUtil.convertToshort(i);
+        }
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),2);
+        Assertions.assertEquals(arr[0],TypeConversionUtil.convertToshort(1));
+        Assertions.assertEquals(arr[1],TypeConversionUtil.convertToshort(50-1));
+        Assertions.assertTrue(root.modCount!=0);
+      } 
+      {
+        Predicate<? super Short> pred=(val)->
+        {
+          return !EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(1)) && !EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(50-1));
+        };
+        var arr=new short[50];
+        var root=new CheckedList(50,arr);
+        var subList=root.subList(0,50);
+        var seq=subList.subList(0,50);
+        for(int i=0;i<50;++i)
+        {
+          arr[i]=TypeConversionUtil.convertToshort(i);
+        }
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),2);
+        Assertions.assertEquals(arr[0],TypeConversionUtil.convertToshort(1));
+        Assertions.assertEquals(arr[1],TypeConversionUtil.convertToshort(50-1));
+        Assertions.assertTrue(root.modCount!=0);
+      } 
+      {
+        ShortPredicate pred=(val)->
+        {
+          return !EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(1)) && !EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(50-1));
+        };
+        var arr=new short[50];
+        var root=new CheckedList(50,arr);
+        var subList=root.subList(0,50);
+        var seq=subList.subList(0,50);
+        for(int i=0;i<50;++i)
+        {
+          arr[i]=TypeConversionUtil.convertToshort(i);
+        }
+        Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf(CheckedCollectionTest.getModifyingPred(pred,()->
+        {
+          var tmp=seq.removeShortAt(seq.size()-1);
+          seq.add(tmp);
+        })));
+      } 
+      {
+        Predicate<? super Short> pred=(val)->
+        {
+          return !EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(1)) && !EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(50-1));
+        };
+        var arr=new short[50];
+        var root=new CheckedList(50,arr);
+        var subList=root.subList(0,50);
+        var seq=subList.subList(0,50);
+        for(int i=0;i<50;++i)
+        {
+          arr[i]=TypeConversionUtil.convertToshort(i);
+        }
+        Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf(CheckedCollectionTest.getModifyingPred(pred,()->
+        {
+          var tmp=seq.removeShortAt(seq.size()-1);
+          seq.add(tmp);
+        })));
+      } 
+      {
+        ShortPredicate pred=(val)->
+        {
+          return EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(0));
+        };
+        var arr=new short[100];
+        var root=new CheckedList(100,arr);
+        var subList=root.subList(0,100);
+        var seq=subList.subList(0,100);
+        for(int i=0;i<100;++i)
+        {
+          arr[i]=TypeConversionUtil.convertToshort(i);
+        }
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),100-1);
+        for(int i=0,valIndex=1;i<100-1;++i,++valIndex)
+        {
+          Assertions.assertEquals(arr[i],TypeConversionUtil.convertToshort(valIndex));
+        }
+        Assertions.assertTrue(root.modCount!=0);
+      } 
+      {
+        Predicate<? super Short> pred=(val)->
+        {
+          return EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(0));
+        };
+        var arr=new short[100];
+        var root=new CheckedList(100,arr);
+        var subList=root.subList(0,100);
+        var seq=subList.subList(0,100);
+        for(int i=0;i<100;++i)
+        {
+          arr[i]=TypeConversionUtil.convertToshort(i);
+        }
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),100-1);
+        for(int i=0,valIndex=1;i<100-1;++i,++valIndex)
+        {
+          Assertions.assertEquals(arr[i],TypeConversionUtil.convertToshort(valIndex));
+        }
+        Assertions.assertTrue(root.modCount!=0);
+      } 
+      {
+        ShortPredicate pred=(val)->
+        {
+          return EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(0));
+        };
+        var arr=new short[100];
+        var root=new CheckedList(100,arr);
+        var subList=root.subList(0,100);
+        var seq=subList.subList(0,100);
+        for(int i=0;i<100;++i)
+        {
+          arr[i]=TypeConversionUtil.convertToshort(i);
+        }
+        Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf(CheckedCollectionTest.getModifyingPred(pred,()->
+        {
+          var tmp=seq.removeShortAt(seq.size()-1);
+          seq.add(tmp);
+        })));
+      } 
+      {
+        Predicate<? super Short> pred=(val)->
+        {
+          return EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(0));
+        };
+        var arr=new short[100];
+        var root=new CheckedList(100,arr);
+        var subList=root.subList(0,100);
+        var seq=subList.subList(0,100);
+        for(int i=0;i<100;++i)
+        {
+          arr[i]=TypeConversionUtil.convertToshort(i);
+        }
+        Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf(CheckedCollectionTest.getModifyingPred(pred,()->
+        {
+          var tmp=seq.removeShortAt(seq.size()-1);
+          seq.add(tmp);
+        })));
+      } 
+      {
+        ShortPredicate pred=(val)->
+        {
+          return EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(0));
+        };
+        var arr=new short[50];
+        var root=new CheckedList(50,arr);
+        var subList=root.subList(0,50);
+        var seq=subList.subList(0,50);
+        for(int i=0;i<50;++i)
+        {
+          arr[i]=TypeConversionUtil.convertToshort(i);
+        }
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),50-1);
+        for(int i=0,valIndex=1;i<50-1;++i,++valIndex)
+        {
+          Assertions.assertEquals(arr[i],TypeConversionUtil.convertToshort(valIndex));
+        }
+        Assertions.assertTrue(root.modCount!=0);
+      } 
+      {
+        Predicate<? super Short> pred=(val)->
+        {
+          return EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(0));
+        };
+        var arr=new short[50];
+        var root=new CheckedList(50,arr);
+        var subList=root.subList(0,50);
+        var seq=subList.subList(0,50);
+        for(int i=0;i<50;++i)
+        {
+          arr[i]=TypeConversionUtil.convertToshort(i);
+        }
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),50-1);
+        for(int i=0,valIndex=1;i<50-1;++i,++valIndex)
+        {
+          Assertions.assertEquals(arr[i],TypeConversionUtil.convertToshort(valIndex));
+        }
+        Assertions.assertTrue(root.modCount!=0);
+      } 
+      {
+        ShortPredicate pred=(val)->
+        {
+          return EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(0));
+        };
+        var arr=new short[50];
+        var root=new CheckedList(50,arr);
+        var subList=root.subList(0,50);
+        var seq=subList.subList(0,50);
+        for(int i=0;i<50;++i)
+        {
+          arr[i]=TypeConversionUtil.convertToshort(i);
+        }
+        Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf(CheckedCollectionTest.getModifyingPred(pred,()->
+        {
+          var tmp=seq.removeShortAt(seq.size()-1);
+          seq.add(tmp);
+        })));
+      } 
+      {
+        Predicate<? super Short> pred=(val)->
+        {
+          return EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(0));
+        };
+        var arr=new short[50];
+        var root=new CheckedList(50,arr);
+        var subList=root.subList(0,50);
+        var seq=subList.subList(0,50);
+        for(int i=0;i<50;++i)
+        {
+          arr[i]=TypeConversionUtil.convertToshort(i);
+        }
+        Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf(CheckedCollectionTest.getModifyingPred(pred,()->
+        {
+          var tmp=seq.removeShortAt(seq.size()-1);
+          seq.add(tmp);
+        })));
+      } 
+      {
+        ShortPredicate pred=(val)->
+        {
+          return EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(0)) || EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(50-2));
+        };
+        var arr=new short[50];
+        var root=new CheckedList(50,arr);
+        var subList=root.subList(0,50);
+        var seq=subList.subList(0,50);
+        for(int i=0;i<50;++i)
+        {
+          arr[i]=TypeConversionUtil.convertToshort(i);
+        }
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),50-2);
+        for(int i=0,valIndex=1;i<50-3;++i,++valIndex)
+        {
+          Assertions.assertEquals(arr[i],TypeConversionUtil.convertToshort(valIndex));
+        }
+        Assertions.assertEquals(arr[50-3],TypeConversionUtil.convertToshort(50-1));
+        Assertions.assertTrue(root.modCount!=0);
+      } 
+      {
+        Predicate<? super Short> pred=(val)->
+        {
+          return EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(0)) || EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(50-2));
+        };
+        var arr=new short[50];
+        var root=new CheckedList(50,arr);
+        var subList=root.subList(0,50);
+        var seq=subList.subList(0,50);
+        for(int i=0;i<50;++i)
+        {
+          arr[i]=TypeConversionUtil.convertToshort(i);
+        }
+        Assertions.assertTrue(seq.removeIf(pred));
+        Assertions.assertEquals(seq.size(),50-2);
+        for(int i=0,valIndex=1;i<50-3;++i,++valIndex)
+        {
+          Assertions.assertEquals(arr[i],TypeConversionUtil.convertToshort(valIndex));
+        }
+        Assertions.assertEquals(arr[50-3],TypeConversionUtil.convertToshort(50-1));
+        Assertions.assertTrue(root.modCount!=0);
+      } 
+      {
+        ShortPredicate pred=(val)->
+        {
+          return EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(0)) || EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(50-2));
+        };
+        var arr=new short[50];
+        var root=new CheckedList(50,arr);
+        var subList=root.subList(0,50);
+        var seq=subList.subList(0,50);
+        for(int i=0;i<50;++i)
+        {
+          arr[i]=TypeConversionUtil.convertToshort(i);
+        }
+        Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf(CheckedCollectionTest.getModifyingPred(pred,()->
+        {
+          var tmp=seq.removeShortAt(seq.size()-1);
+          seq.add(tmp);
+        })));
+      } 
+      {
+        Predicate<? super Short> pred=(val)->
+        {
+          return EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(0)) || EqualityUtil.isEqual(val,TypeConversionUtil.convertToshort(50-2));
+        };
+        var arr=new short[50];
+        var root=new CheckedList(50,arr);
+        var subList=root.subList(0,50);
+        var seq=subList.subList(0,50);
+        for(int i=0;i<50;++i)
         {
           arr[i]=TypeConversionUtil.convertToshort(i);
         }

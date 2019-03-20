@@ -81,10 +81,6 @@ public abstract class CharArrSeq implements OmniCollection.OfChar
     int size;
     if((size=this.size)!=0)
     {
-      if(size>=(Integer.MAX_VALUE/3))
-      {
-        throw new OutOfMemoryError();
-      }
       final char[] buffer;
       uncheckedToString(size,buffer=new char[size*=3]);
       buffer[0]='[';
@@ -615,7 +611,7 @@ public abstract class CharArrSeq implements OmniCollection.OfChar
                     {
                       if(numSurvivors==n)
                       {
-                        ArrCopy.uncheckedSelfCopy(arr,srcOffset-1,dstOffset,numSurvivors+=2);
+                        ArrCopy.uncheckedSelfCopy(arr,dstOffset,srcOffset-1,numSurvivors+=2);
                         dstOffset+=numSurvivors;
                       }
                       else
@@ -636,7 +632,7 @@ public abstract class CharArrSeq implements OmniCollection.OfChar
                     {
                       if(numSurvivors==n)
                       {
-                        ArrCopy.uncheckedSelfCopy(arr,srcOffset-1,dstOffset,numSurvivors+=2);
+                        ArrCopy.uncheckedSelfCopy(arr,dstOffset,srcOffset-1,numSurvivors+=2);
                         dstOffset+=numSurvivors;
                       }
                       else
@@ -1743,10 +1739,6 @@ public abstract class CharArrSeq implements OmniCollection.OfChar
       int size;
       if((size=this.size)!=0)
       {
-        if(size>=(Integer.MAX_VALUE/3))
-        {
-          throw new OutOfMemoryError();
-        }
           final int rootOffset;
           final char[] buffer;
           OmniArray.OfChar.ascendingToString(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,buffer=new char[size*=3],1);
@@ -3658,10 +3650,6 @@ public abstract class CharArrSeq implements OmniCollection.OfChar
       int size;
       if((size=this.size)!=0)
       {
-        if(size>=(Integer.MAX_VALUE/3))
-        {
-          throw new OutOfMemoryError();
-        }
           final int rootOffset;
           final char[] buffer;
           OmniArray.OfChar.ascendingToString(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,buffer=new char[size*=3],1);

@@ -125,27 +125,11 @@ public abstract class $ClassPrefix$ArrSeq$<E>$ implements OmniCollection.Of$Clas
     int size;
     if((size=this.size)!=0)
     {
-#IF OfBoolean
-      if(size>=(Integer.MAX_VALUE/6))
-#ELSEIF OfByte,OfChar,OfInt,OfLong,OfShort
-      if(size>=(Integer.MAX_VALUE/3))
-#ELSEIF OfFloat
-      //TODO handle overflow better
-      if(size>=(Integer.MAX_VALUE/5)-2)
-#ELSEIF OfDouble
-      if(size>=(Integer.MAX_VALUE/5))
-#ELSE
-      if(size>=(Integer.MAX_VALUE>>1))
-#ENDIF
-      {
-        throw new OutOfMemoryError();
-      }
 #IF OfDouble,OfRef
       final StringBuilder builder=new StringBuilder("[");
       uncheckedToString(size,builder);
       return builder.append(']').toString();
 #ELSE
-     
   #IF OfChar
       final char[] buffer;
       uncheckedToString(size,buffer=new char[size*=3]);
@@ -590,7 +574,7 @@ public abstract class $ClassPrefix$ArrSeq$<E>$ implements OmniCollection.Of$Clas
                     {
                       if(numSurvivors==n)
                       {
-                        ArrCopy.uncheckedSelfCopy(arr,srcOffset-1,dstOffset,numSurvivors+=2);
+                        ArrCopy.uncheckedSelfCopy(arr,dstOffset,srcOffset-1,numSurvivors+=2);
                         dstOffset+=numSurvivors;
                       }
                       else
@@ -611,7 +595,7 @@ public abstract class $ClassPrefix$ArrSeq$<E>$ implements OmniCollection.Of$Clas
                     {
                       if(numSurvivors==n)
                       {
-                        ArrCopy.uncheckedSelfCopy(arr,srcOffset-1,dstOffset,numSurvivors+=2);
+                        ArrCopy.uncheckedSelfCopy(arr,dstOffset,srcOffset-1,numSurvivors+=2);
                         dstOffset+=numSurvivors;
                       }
                       else
@@ -3753,10 +3737,6 @@ public String toString()
     final int size;
     if((size=this.size)!=0)
     {
-      if(size>=(Integer.MAX_VALUE>>1))
-      {
-        throw new OutOfMemoryError();
-      }
       final StringBuilder builder;
       final int rootOffset;
       OmniArray.Of$ClassPrefix$.ascendingToString(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,builder=new StringBuilder("["));
@@ -3778,19 +3758,6 @@ public String toString()
   int size;
   if((size=this.size)!=0)
   {
-    #IF OfBoolean
-    if(size>=(Integer.MAX_VALUE/6))
-    #ELSEIF OfByte,OfChar,OfInt,OfLong,OfShort
-    if(size>=(Integer.MAX_VALUE/3))
-    #ELSEIF OfFloat
-      //TODO handle overflow better
-      if(size>=(Integer.MAX_VALUE/5)-2)
-    #ELSEIF OfDouble
-      if(size>=(Integer.MAX_VALUE/5))
-    #ENDIF
-    {
-      throw new OutOfMemoryError();
-    }
       final int rootOffset;
     #IF OfDouble
       final StringBuilder builder;

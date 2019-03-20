@@ -81,10 +81,6 @@ public abstract class DoubleArrSeq implements OmniCollection.OfDouble
     int size;
     if((size=this.size)!=0)
     {
-      if(size>=(Integer.MAX_VALUE/5))
-      {
-        throw new OutOfMemoryError();
-      }
       final StringBuilder builder=new StringBuilder("[");
       uncheckedToString(size,builder);
       return builder.append(']').toString();
@@ -659,7 +655,7 @@ public abstract class DoubleArrSeq implements OmniCollection.OfDouble
                     {
                       if(numSurvivors==n)
                       {
-                        ArrCopy.uncheckedSelfCopy(arr,srcOffset-1,dstOffset,numSurvivors+=2);
+                        ArrCopy.uncheckedSelfCopy(arr,dstOffset,srcOffset-1,numSurvivors+=2);
                         dstOffset+=numSurvivors;
                       }
                       else
@@ -680,7 +676,7 @@ public abstract class DoubleArrSeq implements OmniCollection.OfDouble
                     {
                       if(numSurvivors==n)
                       {
-                        ArrCopy.uncheckedSelfCopy(arr,srcOffset-1,dstOffset,numSurvivors+=2);
+                        ArrCopy.uncheckedSelfCopy(arr,dstOffset,srcOffset-1,numSurvivors+=2);
                         dstOffset+=numSurvivors;
                       }
                       else
@@ -1739,10 +1735,6 @@ public abstract class DoubleArrSeq implements OmniCollection.OfDouble
       int size;
       if((size=this.size)!=0)
       {
-          if(size>=(Integer.MAX_VALUE/5))
-        {
-          throw new OutOfMemoryError();
-        }
           final int rootOffset;
           final StringBuilder builder;
           OmniArray.OfDouble.ascendingToString(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,builder=new StringBuilder("["));
@@ -3753,10 +3745,6 @@ public abstract class DoubleArrSeq implements OmniCollection.OfDouble
       int size;
       if((size=this.size)!=0)
       {
-          if(size>=(Integer.MAX_VALUE/5))
-        {
-          throw new OutOfMemoryError();
-        }
           final int rootOffset;
           final StringBuilder builder;
           OmniArray.OfDouble.ascendingToString(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,builder=new StringBuilder("["));

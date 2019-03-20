@@ -111,7 +111,7 @@ public class FloatSeqToStringTest
       Assertions.assertThrows(OutOfMemoryError.class,()->root.toString());
     }
   }
-  //@Test
+  @Test
   public void testLargeArrSeqToString()
   {
     testArrSeqToString((OmniArray.MAX_ARR_SIZE/(MAX_TOSTRING_LENGTH+2))+1);

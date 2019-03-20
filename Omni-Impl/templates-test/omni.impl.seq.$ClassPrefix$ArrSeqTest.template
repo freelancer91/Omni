@@ -30,7 +30,116 @@ public class $ClassPrefix$ArrSeqTest
   #MACRO Impl<UncheckedSubList>()
   #MACRO Impl<CheckedSubList>()
 }
+
+#MACRODEF TestAdd<CLASSPREFIX,ADDTYPE,GETCAST,CONVERTTYPE>()
+#IFSWITCH STRUCTNAME==CheckedList,UncheckedList,CheckedSubList,UncheckedSubList
+@Test
+public void testListAddCLASSPREFIXSTRUCTNAME()
+{
+  #IFSWITCH STRUCTNAME==CheckedSubList
+  var root=new CheckedList();
+  var subList=root.subList(0,0);
+  var seq=subList.subList(0,0);
+  #ELSEIFSWITCH STRUCTNAME==UncheckedSubList
+  var root=new UncheckedList();
+  var subList=root.subList(0,0);
+  var seq=subList.subList(0,0);
+  #ELSE
+  var seq=new STRUCTNAME();
+  #ENDIF
+  
+  for(int i=100;--i>=0;)
+  {
+    //test add at beginning
+    seq.add(0,(ADDTYPE)TypeConversionUtil.convertToCONVERTTYPE(i));
+  }
+  for(int i=0;i<100;++i)
+  {
+    Assertions.assertEquals(GETCAST(TypeConversionUtil.convertToCONVERTTYPE(i)),seq.getCLASSPREFIX(i));
+  }
+  int currSize=seq.size();
+  #IFSWITCH STRUCTNAME==CheckedSubList,UncheckedSubList
+  Assertions.assertEquals(subList.size(),currSize);
+  Assertions.assertEquals(root.size(),currSize);
+  #ENDIF
+  Assertions.assertEquals(100,currSize);
+  #IFSWITCH STRUCTNAME==CheckedList,CheckedSubList
+    #IFSWITCH STRUCTNAME==CheckedList
+  int modCount=seq.modCount;
+    #ELSE
+  int modCount=root.modCount;
+    #ENDIF
+  Assertions.assertEquals(modCount,100);
+  Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(-1,TypeConversionUtil.convertToCONVERTTYPE(0)));
+  Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(seq.size()+1,TypeConversionUtil.convertToCONVERTTYPE(0)));
+    #IFSWITCH STRUCTNAME==CheckedList
+  Assertions.assertEquals(modCount,seq.modCount);
+    #ELSE
+  Assertions.assertEquals(modCount,root.modCount);
+    #ENDIF
+  Assertions.assertEquals(currSize,seq.size());
+  #ENDIF
+  
+  for(int i=200;i<300;++i)
+  {
+    //add at end
+    seq.add(seq.size(),(ADDTYPE)TypeConversionUtil.convertToCONVERTTYPE(i));
+  }
+  for(int i=100;i<200;++i)
+  {
+    Assertions.assertEquals(GETCAST(TypeConversionUtil.convertToCONVERTTYPE(i+100)),seq.getCLASSPREFIX(i));
+  }
+  currSize=seq.size();
+  #IFSWITCH STRUCTNAME==CheckedSubList,UncheckedSubList
+  Assertions.assertEquals(subList.size(),currSize);
+  Assertions.assertEquals(root.size(),currSize);
+  #ENDIF
+  Assertions.assertEquals(200,currSize);
+  #IFSWITCH STRUCTNAME==CheckedList,CheckedSubList
+    #IFSWITCH STRUCTNAME==CheckedList
+  modCount=seq.modCount;
+    #ELSE
+  modCount=root.modCount;
+    #ENDIF
+  Assertions.assertEquals(modCount,200);
+  #ENDIF
+  for(int i=200;--i>=100;)
+  {
+    //add in middle
+    seq.add(100,(ADDTYPE)TypeConversionUtil.convertToCONVERTTYPE(i));
+  }
+  for(int i=100;i<200;++i)
+  {
+    Assertions.assertEquals(GETCAST(TypeConversionUtil.convertToCONVERTTYPE(i)),seq.getCLASSPREFIX(i));
+  }
+  currSize=seq.size();
+  #IFSWITCH STRUCTNAME==CheckedSubList,UncheckedSubList
+  Assertions.assertEquals(subList.size(),currSize);
+  Assertions.assertEquals(root.size(),currSize);
+  #ENDIF
+  Assertions.assertEquals(300,currSize);
+  #IFSWITCH STRUCTNAME==CheckedList,CheckedSubList
+    #IFSWITCH STRUCTNAME==CheckedList
+  modCount=seq.modCount;
+    #ELSE
+  modCount=root.modCount;
+    #ENDIF
+  Assertions.assertEquals(modCount,300);
+  #ENDIF
+  
+}
+#ENDIF
+#ENDDEF
+
+
 #MACRODEF Impl<STRUCTNAME>()
+
+#IF OfRef
+  #MACRO TestAdd<$TypeNameModifier$,Integer,,Integer>()
+#ELSE
+  #MACRO TestAdd<$TypeNameModifier$,$BoxedType$,,$exposedType$>()
+#ENDIF
+
 @Test
 public void testCloneSTRUCTNAME()
 {

@@ -82,11 +82,6 @@ public abstract class FloatArrSeq implements OmniCollection.OfFloat
     int size;
     if((size=this.size)!=0)
     {
-      //TODO handle overflow better
-      if(size>=(Integer.MAX_VALUE/5)-2)
-      {
-        throw new OutOfMemoryError();
-      }
       final byte[] buffer;
       if(size<=(OmniArray.MAX_ARR_SIZE/17)){(buffer=new byte[size*17])
         [size=uncheckedToString(size,buffer)]=(byte)']';
@@ -689,7 +684,7 @@ public abstract class FloatArrSeq implements OmniCollection.OfFloat
                     {
                       if(numSurvivors==n)
                       {
-                        ArrCopy.uncheckedSelfCopy(arr,srcOffset-1,dstOffset,numSurvivors+=2);
+                        ArrCopy.uncheckedSelfCopy(arr,dstOffset,srcOffset-1,numSurvivors+=2);
                         dstOffset+=numSurvivors;
                       }
                       else
@@ -710,7 +705,7 @@ public abstract class FloatArrSeq implements OmniCollection.OfFloat
                     {
                       if(numSurvivors==n)
                       {
-                        ArrCopy.uncheckedSelfCopy(arr,srcOffset-1,dstOffset,numSurvivors+=2);
+                        ArrCopy.uncheckedSelfCopy(arr,dstOffset,srcOffset-1,numSurvivors+=2);
                         dstOffset+=numSurvivors;
                       }
                       else
@@ -1918,11 +1913,6 @@ public abstract class FloatArrSeq implements OmniCollection.OfFloat
       int size;
       if((size=this.size)!=0)
       {
-          //TODO handle overflow better
-          if(size>=(Integer.MAX_VALUE/5)-2)
-        {
-          throw new OutOfMemoryError();
-        }
           final int rootOffset;
           final byte[] buffer;
           if(size<=(OmniArray.MAX_ARR_SIZE/17)){(buffer=new byte[size*17])
@@ -4051,11 +4041,6 @@ public abstract class FloatArrSeq implements OmniCollection.OfFloat
       int size;
       if((size=this.size)!=0)
       {
-          //TODO handle overflow better
-          if(size>=(Integer.MAX_VALUE/5)-2)
-        {
-          throw new OutOfMemoryError();
-        }
           final int rootOffset;
           final byte[] buffer;
           if(size<=(OmniArray.MAX_ARR_SIZE/17)){(buffer=new byte[size*17])

@@ -81,10 +81,6 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>
     int size;
     if((size=this.size)!=0)
     {
-      if(size>=(Integer.MAX_VALUE>>1))
-      {
-        throw new OutOfMemoryError();
-      }
       final StringBuilder builder=new StringBuilder("[");
       uncheckedToString(size,builder);
       return builder.append(']').toString();
@@ -724,7 +720,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>
                     {
                       if(numSurvivors==n)
                       {
-                        ArrCopy.uncheckedSelfCopy(arr,srcOffset-1,dstOffset,numSurvivors+=2);
+                        ArrCopy.uncheckedSelfCopy(arr,dstOffset,srcOffset-1,numSurvivors+=2);
                         dstOffset+=numSurvivors;
                       }
                       else
@@ -745,7 +741,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>
                     {
                       if(numSurvivors==n)
                       {
-                        ArrCopy.uncheckedSelfCopy(arr,srcOffset-1,dstOffset,numSurvivors+=2);
+                        ArrCopy.uncheckedSelfCopy(arr,dstOffset,srcOffset-1,numSurvivors+=2);
                         dstOffset+=numSurvivors;
                       }
                       else
@@ -2066,10 +2062,6 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>
         final int size;
         if((size=this.size)!=0)
         {
-          if(size>=(Integer.MAX_VALUE>>1))
-          {
-            throw new OutOfMemoryError();
-          }
           final StringBuilder builder;
           final int rootOffset;
           OmniArray.OfRef.ascendingToString(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,builder=new StringBuilder("["));
@@ -4528,10 +4520,6 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>
         final int size;
         if((size=this.size)!=0)
         {
-          if(size>=(Integer.MAX_VALUE>>1))
-          {
-            throw new OutOfMemoryError();
-          }
           final StringBuilder builder;
           final int rootOffset;
           OmniArray.OfRef.ascendingToString(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,builder=new StringBuilder("["));

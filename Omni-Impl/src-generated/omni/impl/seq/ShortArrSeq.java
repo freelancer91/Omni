@@ -82,10 +82,6 @@ public abstract class ShortArrSeq implements OmniCollection.OfShort
     int size;
     if((size=this.size)!=0)
     {
-      if(size>=(Integer.MAX_VALUE/3))
-      {
-        throw new OutOfMemoryError();
-      }
       final byte[] buffer;
       if(size<=(OmniArray.MAX_ARR_SIZE>>3)){(buffer=new byte[size<<3])
         [size=uncheckedToString(size,buffer)]=(byte)']';
@@ -623,7 +619,7 @@ public abstract class ShortArrSeq implements OmniCollection.OfShort
                     {
                       if(numSurvivors==n)
                       {
-                        ArrCopy.uncheckedSelfCopy(arr,srcOffset-1,dstOffset,numSurvivors+=2);
+                        ArrCopy.uncheckedSelfCopy(arr,dstOffset,srcOffset-1,numSurvivors+=2);
                         dstOffset+=numSurvivors;
                       }
                       else
@@ -644,7 +640,7 @@ public abstract class ShortArrSeq implements OmniCollection.OfShort
                     {
                       if(numSurvivors==n)
                       {
-                        ArrCopy.uncheckedSelfCopy(arr,srcOffset-1,dstOffset,numSurvivors+=2);
+                        ArrCopy.uncheckedSelfCopy(arr,dstOffset,srcOffset-1,numSurvivors+=2);
                         dstOffset+=numSurvivors;
                       }
                       else
@@ -1759,10 +1755,6 @@ public abstract class ShortArrSeq implements OmniCollection.OfShort
       int size;
       if((size=this.size)!=0)
       {
-        if(size>=(Integer.MAX_VALUE/3))
-        {
-          throw new OutOfMemoryError();
-        }
           final int rootOffset;
           final byte[] buffer;
           if(size<=(OmniArray.MAX_ARR_SIZE>>3)){(buffer=new byte[size<<3])
@@ -3679,10 +3671,6 @@ public abstract class ShortArrSeq implements OmniCollection.OfShort
       int size;
       if((size=this.size)!=0)
       {
-        if(size>=(Integer.MAX_VALUE/3))
-        {
-          throw new OutOfMemoryError();
-        }
           final int rootOffset;
           final byte[] buffer;
           if(size<=(OmniArray.MAX_ARR_SIZE>>3)){(buffer=new byte[size<<3])

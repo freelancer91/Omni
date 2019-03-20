@@ -24,10 +24,6 @@ import omni.api.OmniList;
 import omni.api.OmniStack;
 import omni.util.EqualityUtil;
 import java.util.Random;
-
-
-
-
 #IF OfRef
 import omni.util.IntegerPredicates;
 import omni.util.IntegerArrayBuilder;
@@ -43,11 +39,6 @@ import omni.function.$TypeNameModifier$Predicate;
 @SuppressWarnings({"rawtypes","unchecked"}) 
 public class $ClassPrefix$SeqRemoveIfTest
 {
-
-
- 
-
-
   #MACRO ArrSeqImpl<UncheckedStack,OmniStack>()
   #MACRO ArrSeqImpl<UncheckedList,OmniList>()
   #MACRO ArrSeqImpl<CheckedStack,OmniStack>()
@@ -70,12 +61,9 @@ var seq=subList.subList(0,length);
 var seq=new STRUCTNAME(length,arr);
 #ENDIF
 #ENDDEF
-
-
-
-#MACRODEF RemoveAllTestImpl<PREDICATETYPE,ConcurrentModificationBehavior>()
+#MACRODEF RemoveAllTestImpl<PREDICATETYPE,ConcurrentModificationBehavior>(length)
 {
-  #MACRO ConstructRawSeq(10)
+  #MACRO ConstructRawSeq(length)
 #IFSWITCH ConcurrentModificationBehavior==throwConcurrent
   PREDICATETYPE pred=val->true;
   Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf(CheckedCollectionTest.getModifyingPred(pred,()->
@@ -121,13 +109,10 @@ var seq=new STRUCTNAME(length,arr);
   Assertions.assertTrue(root.modCount!=0);
   #ENDIF
 #ENDIF
-  
 }
 #ENDDEF
-
-#MACRODEF RetainSecondImpl<PREDICATETYPE,ConcurrentModificationBehavior>()
+#MACRODEF RetainSecondImpl<PREDICATETYPE,ConcurrentModificationBehavior>(length)
 {
-  int length=100;
   PREDICATETYPE pred=(val)->
   {
 #IF OfRef
@@ -175,9 +160,59 @@ var seq=new STRUCTNAME(length,arr);
 } 
 #ENDDEF
 
-#MACRODEF RemoveFirstAndThirdImpl<PREDICATETYPE,ConcurrentModificationBehavior>()
+#MACRODEF RetainSecondAndLastImpl<PREDICATETYPE,ConcurrentModificationBehavior>(length)
 {
-  int length=100;
+  PREDICATETYPE pred=(val)->
+  {
+#IF OfRef
+    return !EqualityUtil.isEqual(val,TypeConversionUtil.convertToInteger(1)) && !EqualityUtil.isEqual(val,TypeConversionUtil.convertToInteger(length-1));
+#ELSE
+    return !EqualityUtil.isEqual(val,TypeConversionUtil.convertTo$ArrayType$(1)) && !EqualityUtil.isEqual(val,TypeConversionUtil.convertTo$ArrayType$(length-1));
+#ENDIF
+   
+  };
+  #MACRO ConstructRawSeq(length)
+  for(int i=0;i<length;++i)
+  {
+  #IF OfRef
+    arr[i]=TypeConversionUtil.convertToInteger(i);
+  #ELSE
+    arr[i]=TypeConversionUtil.convertTo$ArrayType$(i);
+  #ENDIF
+  }
+#IFSWITCH ConcurrentModificationBehavior==throwConcurrent
+  Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf(CheckedCollectionTest.getModifyingPred(pred,()->
+  {
+  #IFSWITCH STRUCTNAME==CheckedStack
+    var tmp=seq.pop$TypeNameModifier$();
+    seq.push(tmp);
+  #ELSE
+    var tmp=seq.$removeAtIndexMethod$(seq.size()-1);
+    seq.add(tmp);
+  #ENDIF
+  })));
+
+#ELSE
+  Assertions.assertTrue(seq.removeIf(pred));
+  Assertions.assertEquals(seq.size(),2);
+  #IF OfRef
+  Assertions.assertEquals(arr[0],TypeConversionUtil.convertToInteger(1));
+  Assertions.assertEquals(arr[1],TypeConversionUtil.convertToInteger(length-1));
+  #ELSE
+  Assertions.assertEquals(arr[0],TypeConversionUtil.convertTo$ArrayType$(1));
+  Assertions.assertEquals(arr[1],TypeConversionUtil.convertTo$ArrayType$(length-1));
+  #ENDIF
+  #IFSWITCH STRUCTNAME==CheckedList,CheckedStack
+  Assertions.assertTrue(seq.modCount!=0);
+  #ELSEIFSWITCH STRUCTNAME==CheckedSubList
+  Assertions.assertTrue(root.modCount!=0);
+  #ENDIF
+#ENDIF
+} 
+#ENDDEF
+
+#MACRODEF RemoveFirstAndThirdImpl<PREDICATETYPE,ConcurrentModificationBehavior>(length)
+{
   PREDICATETYPE pred=(val)->
   {
 #IF OfRef
@@ -238,10 +273,124 @@ var seq=new STRUCTNAME(length,arr);
 } 
 #ENDDEF
 
-#MACRODEF RemoveNoneTestImpl<PREDICATETYPE,ConcurrentModificationBehavior>()
+#MACRODEF RemoveFirstImpl<PREDICATETYPE,ConcurrentModificationBehavior>(length)
+{
+  PREDICATETYPE pred=(val)->
+  {
+#IF OfRef
+    return EqualityUtil.isEqual(val,TypeConversionUtil.convertToInteger(0));
+#ELSE
+    return EqualityUtil.isEqual(val,TypeConversionUtil.convertTo$ArrayType$(0));
+#ENDIF
+   
+  };
+  #MACRO ConstructRawSeq(length)
+  for(int i=0;i<length;++i)
+  {
+  #IF OfRef
+    arr[i]=TypeConversionUtil.convertToInteger(i);
+  #ELSE
+    arr[i]=TypeConversionUtil.convertTo$ArrayType$(i);
+  #ENDIF
+  }
+#IFSWITCH ConcurrentModificationBehavior==throwConcurrent
+  Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf(CheckedCollectionTest.getModifyingPred(pred,()->
+  {
+  #IFSWITCH STRUCTNAME==CheckedStack
+    var tmp=seq.pop$TypeNameModifier$();
+    seq.push(tmp);
+  #ELSE
+    var tmp=seq.$removeAtIndexMethod$(seq.size()-1);
+    seq.add(tmp);
+  #ENDIF
+  })));
+
+#ELSE
+  Assertions.assertTrue(seq.removeIf(pred));
+  Assertions.assertEquals(seq.size(),length-1);
+  
+  for(int i=0,valIndex=1;i<length-1;++i,++valIndex)
+  {
+  #IF OfRef
+    Assertions.assertEquals(arr[i],TypeConversionUtil.convertToInteger(valIndex));
+  #ELSE
+    Assertions.assertEquals(arr[i],TypeConversionUtil.convertTo$ArrayType$(valIndex));
+  #ENDIF
+    
+  }
+  #IFSWITCH STRUCTNAME==CheckedList,CheckedStack
+  Assertions.assertTrue(seq.modCount!=0);
+  #ELSEIFSWITCH STRUCTNAME==CheckedSubList
+  Assertions.assertTrue(root.modCount!=0);
+  #ENDIF
+#ENDIF
+} 
+#ENDDEF
+
+
+#MACRODEF RemoveFirstAndSecondToLastImpl<PREDICATETYPE,ConcurrentModificationBehavior>(length)
+{
+  PREDICATETYPE pred=(val)->
+  {
+#IF OfRef
+    return EqualityUtil.isEqual(val,TypeConversionUtil.convertToInteger(0)) || EqualityUtil.isEqual(val,TypeConversionUtil.convertToInteger(length-2));
+#ELSE
+    return EqualityUtil.isEqual(val,TypeConversionUtil.convertTo$ArrayType$(0)) || EqualityUtil.isEqual(val,TypeConversionUtil.convertTo$ArrayType$(length-2));
+#ENDIF
+   
+  };
+  #MACRO ConstructRawSeq(length)
+  for(int i=0;i<length;++i)
+  {
+  #IF OfRef
+    arr[i]=TypeConversionUtil.convertToInteger(i);
+  #ELSE
+    arr[i]=TypeConversionUtil.convertTo$ArrayType$(i);
+  #ENDIF
+  }
+#IFSWITCH ConcurrentModificationBehavior==throwConcurrent
+  Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf(CheckedCollectionTest.getModifyingPred(pred,()->
+  {
+  #IFSWITCH STRUCTNAME==CheckedStack
+    var tmp=seq.pop$TypeNameModifier$();
+    seq.push(tmp);
+  #ELSE
+    var tmp=seq.$removeAtIndexMethod$(seq.size()-1);
+    seq.add(tmp);
+  #ENDIF
+  })));
+
+#ELSE
+  Assertions.assertTrue(seq.removeIf(pred));
+  Assertions.assertEquals(seq.size(),length-2);
+  
+  for(int i=0,valIndex=1;i<length-3;++i,++valIndex)
+  {
+  #IF OfRef
+    Assertions.assertEquals(arr[i],TypeConversionUtil.convertToInteger(valIndex));
+  #ELSE
+    Assertions.assertEquals(arr[i],TypeConversionUtil.convertTo$ArrayType$(valIndex));
+  #ENDIF
+    
+  }
+  #IF OfRef
+  Assertions.assertEquals(arr[length-3],TypeConversionUtil.convertToInteger(length-1));
+  #ELSE
+  Assertions.assertEquals(arr[length-3],TypeConversionUtil.convertTo$ArrayType$(length-1));
+  #ENDIF
+  #IFSWITCH STRUCTNAME==CheckedList,CheckedStack
+  Assertions.assertTrue(seq.modCount!=0);
+  #ELSEIFSWITCH STRUCTNAME==CheckedSubList
+  Assertions.assertTrue(root.modCount!=0);
+  #ENDIF
+#ENDIF
+} 
+#ENDDEF
+
+#MACRODEF RemoveNoneTestImpl<PREDICATETYPE,ConcurrentModificationBehavior>(length)
 {
   
-  #MACRO ConstructRawSeq(10)
+  #MACRO ConstructRawSeq(length)
 #IFSWITCH ConcurrentModificationBehavior==throwConcurrent
   PREDICATETYPE pred=val->false;
   Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf(CheckedCollectionTest.getModifyingPred(pred,()->
@@ -280,7 +429,7 @@ var seq=new STRUCTNAME(length,arr);
 #ELSE
   PREDICATETYPE pred=val->false;
   Assertions.assertFalse(seq.removeIf(pred));
-  Assertions.assertEquals(seq.size(),10);
+  Assertions.assertEquals(seq.size(),length);
   #IFSWITCH STRUCTNAME==CheckedList,CheckedStack
   Assertions.assertEquals(0,seq.modCount);
   #ELSEIFSWITCH STRUCTNAME==CheckedSubList
@@ -428,14 +577,9 @@ var seq=new STRUCTNAME(length,arr);
   #ENDIF
 #ENDIF
 
-    
-    
-
   }
 }
 #ENDDEF
-
-
 
 #MACRODEF ArrSeqImpl<STRUCTNAME,INTERFACE>()
 @Test
@@ -513,95 +657,171 @@ public void testRemoveIfSTRUCTNAME()
   #MACRO BooleanTestImpl<true,RemoveFalse,Predicate<Boolean>,false>(10)
 #ELSE
   #IF OfRef
-    #MACRO RemoveNoneTestImpl<$TypeNameModifier$Predicate<? super Integer>,false>()
+    #MACRO RemoveNoneTestImpl<$TypeNameModifier$Predicate<? super Integer>,false>(100)
   #ELSE
-    #MACRO RemoveNoneTestImpl<$TypeNameModifier$Predicate,false>()
-    #MACRO RemoveNoneTestImpl<Predicate<? super $BoxedType$>,false>()
+    #MACRO RemoveNoneTestImpl<$TypeNameModifier$Predicate,false>(100)
+    #MACRO RemoveNoneTestImpl<Predicate<? super $BoxedType$>,false>(100)
   #ENDIF
   #IFSWITCH STRUCTNAME==CheckedSubList,CheckedList,CheckedStack
     #IF OfRef
-    #MACRO RemoveNoneTestImpl<$TypeNameModifier$Predicate<? super Integer>,throwConcurrent>()
+    #MACRO RemoveNoneTestImpl<$TypeNameModifier$Predicate<? super Integer>,throwConcurrent>(100)
     #ELSE
-    #MACRO RemoveNoneTestImpl<$TypeNameModifier$Predicate,throwConcurrent>()
-    #MACRO RemoveNoneTestImpl<Predicate<? super $BoxedType$>,throwConcurrent>()
+    #MACRO RemoveNoneTestImpl<$TypeNameModifier$Predicate,throwConcurrent>(100)
+    #MACRO RemoveNoneTestImpl<Predicate<? super $BoxedType$>,throwConcurrent>(100)
     #ENDIF
     #IF OfRef
-    #MACRO RemoveNoneTestImpl<$TypeNameModifier$Predicate<? super Integer>,throwRunTimeNoMod>()
+    #MACRO RemoveNoneTestImpl<$TypeNameModifier$Predicate<? super Integer>,throwRunTimeNoMod>(100)
     #ELSE
-    #MACRO RemoveNoneTestImpl<$TypeNameModifier$Predicate,throwRunTimeNoMod>()
-    #MACRO RemoveNoneTestImpl<Predicate<? super $BoxedType$>,throwRunTimeNoMod>()
+    #MACRO RemoveNoneTestImpl<$TypeNameModifier$Predicate,throwRunTimeNoMod>(100)
+    #MACRO RemoveNoneTestImpl<Predicate<? super $BoxedType$>,throwRunTimeNoMod>(100)
     #ENDIF
     #IF OfRef
-    #MACRO RemoveNoneTestImpl<$TypeNameModifier$Predicate<? super Integer>,throwRunTimeMod>()
+    #MACRO RemoveNoneTestImpl<$TypeNameModifier$Predicate<? super Integer>,throwRunTimeMod>(100)
     #ELSE
-    #MACRO RemoveNoneTestImpl<$TypeNameModifier$Predicate,throwRunTimeMod>()
-    #MACRO RemoveNoneTestImpl<Predicate<? super $BoxedType$>,throwRunTimeMod>()
+    #MACRO RemoveNoneTestImpl<$TypeNameModifier$Predicate,throwRunTimeMod>(100)
+    #MACRO RemoveNoneTestImpl<Predicate<? super $BoxedType$>,throwRunTimeMod>(100)
     #ENDIF
   #ENDIF
   
   
   #IF OfRef
-    #MACRO RemoveAllTestImpl<$TypeNameModifier$Predicate<? super Integer>,false>()
+    #MACRO RemoveAllTestImpl<$TypeNameModifier$Predicate<? super Integer>,false>(100)
   #ELSE
-    #MACRO RemoveAllTestImpl<$TypeNameModifier$Predicate,false>()
-    #MACRO RemoveAllTestImpl<Predicate<? super $BoxedType$>,false>()
+    #MACRO RemoveAllTestImpl<$TypeNameModifier$Predicate,false>(100)
+    #MACRO RemoveAllTestImpl<Predicate<? super $BoxedType$>,false>(100)
   #ENDIF
   #IFSWITCH STRUCTNAME==CheckedSubList,CheckedList,CheckedStack
     #IF OfRef
-    #MACRO RemoveAllTestImpl<$TypeNameModifier$Predicate<? super Integer>,throwConcurrent>()
+    #MACRO RemoveAllTestImpl<$TypeNameModifier$Predicate<? super Integer>,throwConcurrent>(100)
     #ELSE
-    #MACRO RemoveAllTestImpl<$TypeNameModifier$Predicate,throwConcurrent>()
-    #MACRO RemoveAllTestImpl<Predicate<? super $BoxedType$>,throwConcurrent>()
+    #MACRO RemoveAllTestImpl<$TypeNameModifier$Predicate,throwConcurrent>(100)
+    #MACRO RemoveAllTestImpl<Predicate<? super $BoxedType$>,throwConcurrent>(100)
     #ENDIF
     #IF OfRef
-    #MACRO RemoveAllTestImpl<$TypeNameModifier$Predicate<? super Integer>,throwRunTimeNoMod>()
+    #MACRO RemoveAllTestImpl<$TypeNameModifier$Predicate<? super Integer>,throwRunTimeNoMod>(100)
     #ELSE
-    #MACRO RemoveAllTestImpl<$TypeNameModifier$Predicate,throwRunTimeNoMod>()
-    #MACRO RemoveAllTestImpl<Predicate<? super $BoxedType$>,throwRunTimeNoMod>()
+    #MACRO RemoveAllTestImpl<$TypeNameModifier$Predicate,throwRunTimeNoMod>(100)
+    #MACRO RemoveAllTestImpl<Predicate<? super $BoxedType$>,throwRunTimeNoMod>(100)
     #ENDIF
     #IF OfRef
-    #MACRO RemoveAllTestImpl<$TypeNameModifier$Predicate<? super Integer>,throwRunTimeMod>()
+    #MACRO RemoveAllTestImpl<$TypeNameModifier$Predicate<? super Integer>,throwRunTimeMod>(100)
     #ELSE
-    #MACRO RemoveAllTestImpl<$TypeNameModifier$Predicate,throwRunTimeMod>()
-    #MACRO RemoveAllTestImpl<Predicate<? super $BoxedType$>,throwRunTimeMod>()
+    #MACRO RemoveAllTestImpl<$TypeNameModifier$Predicate,throwRunTimeMod>(100)
+    #MACRO RemoveAllTestImpl<Predicate<? super $BoxedType$>,throwRunTimeMod>(100)
     #ENDIF
   #ENDIF
-  
-  
-  
   #IF OfRef
-    #MACRO RemoveFirstAndThirdImpl<$TypeNameModifier$Predicate<? super Integer>,false>()
+    #MACRO RemoveFirstAndThirdImpl<$TypeNameModifier$Predicate<? super Integer>,false>(100)
   #ELSE
-    #MACRO RemoveFirstAndThirdImpl<$TypeNameModifier$Predicate,false>()
-    #MACRO RemoveFirstAndThirdImpl<Predicate<? super $BoxedType$>,false>()
+    #MACRO RemoveFirstAndThirdImpl<$TypeNameModifier$Predicate,false>(100)
+    #MACRO RemoveFirstAndThirdImpl<Predicate<? super $BoxedType$>,false>(100)
   #ENDIF
   #IFSWITCH STRUCTNAME==CheckedSubList,CheckedList,CheckedStack
     #IF OfRef
-    #MACRO RemoveFirstAndThirdImpl<$TypeNameModifier$Predicate<? super Integer>,throwConcurrent>()
+    #MACRO RemoveFirstAndThirdImpl<$TypeNameModifier$Predicate<? super Integer>,throwConcurrent>(100)
     #ELSE
-    #MACRO RemoveFirstAndThirdImpl<$TypeNameModifier$Predicate,throwConcurrent>()
-    #MACRO RemoveFirstAndThirdImpl<Predicate<? super $BoxedType$>,throwConcurrent>()
+    #MACRO RemoveFirstAndThirdImpl<$TypeNameModifier$Predicate,throwConcurrent>(100)
+    #MACRO RemoveFirstAndThirdImpl<Predicate<? super $BoxedType$>,throwConcurrent>(100)
     #ENDIF
   #ENDIF
-  
   #IF OfRef
-    #MACRO RetainSecondImpl<$TypeNameModifier$Predicate<? super Integer>,false>()
+    #MACRO RetainSecondImpl<$TypeNameModifier$Predicate<? super Integer>,false>(100)
   #ELSE
-    #MACRO RetainSecondImpl<$TypeNameModifier$Predicate,false>()
-    #MACRO RetainSecondImpl<Predicate<? super $BoxedType$>,false>()
+    #MACRO RetainSecondImpl<$TypeNameModifier$Predicate,false>(100)
+    #MACRO RetainSecondImpl<Predicate<? super $BoxedType$>,false>(100)
   #ENDIF
   #IFSWITCH STRUCTNAME==CheckedSubList,CheckedList,CheckedStack
     #IF OfRef
-    #MACRO RetainSecondImpl<$TypeNameModifier$Predicate<? super Integer>,throwConcurrent>()
+    #MACRO RetainSecondImpl<$TypeNameModifier$Predicate<? super Integer>,throwConcurrent>(100)
     #ELSE
-    #MACRO RetainSecondImpl<$TypeNameModifier$Predicate,throwConcurrent>()
-    #MACRO RetainSecondImpl<Predicate<? super $BoxedType$>,throwConcurrent>()
+    #MACRO RetainSecondImpl<$TypeNameModifier$Predicate,throwConcurrent>(100)
+    #MACRO RetainSecondImpl<Predicate<? super $BoxedType$>,throwConcurrent>(100)
     #ENDIF
   #ENDIF
-  
-
-
-
+  #IF OfRef
+    #MACRO RetainSecondAndLastImpl<$TypeNameModifier$Predicate<? super Integer>,false>(100)
+  #ELSE
+    #MACRO RetainSecondAndLastImpl<$TypeNameModifier$Predicate,false>(100)
+    #MACRO RetainSecondAndLastImpl<Predicate<? super $BoxedType$>,false>(100)
+  #ENDIF
+  #IFSWITCH STRUCTNAME==CheckedSubList,CheckedList,CheckedStack
+    #IF OfRef
+    #MACRO RetainSecondAndLastImpl<$TypeNameModifier$Predicate<? super Integer>,throwConcurrent>(100)
+    #ELSE
+    #MACRO RetainSecondAndLastImpl<$TypeNameModifier$Predicate,throwConcurrent>(100)
+    #MACRO RetainSecondAndLastImpl<Predicate<? super $BoxedType$>,throwConcurrent>(100)
+    #ENDIF
+  #ENDIF
+  #IF OfRef
+    #MACRO RetainSecondAndLastImpl<$TypeNameModifier$Predicate<? super Integer>,false>(3)
+  #ELSE
+    #MACRO RetainSecondAndLastImpl<$TypeNameModifier$Predicate,false>(3)
+    #MACRO RetainSecondAndLastImpl<Predicate<? super $BoxedType$>,false>(3)
+  #ENDIF
+  #IFSWITCH STRUCTNAME==CheckedSubList,CheckedList,CheckedStack
+    #IF OfRef
+    #MACRO RetainSecondAndLastImpl<$TypeNameModifier$Predicate<? super Integer>,throwConcurrent>(3)
+    #ELSE
+    #MACRO RetainSecondAndLastImpl<$TypeNameModifier$Predicate,throwConcurrent>(3)
+    #MACRO RetainSecondAndLastImpl<Predicate<? super $BoxedType$>,throwConcurrent>(3)
+    #ENDIF
+  #ENDIF
+  #IF OfRef
+    #MACRO RetainSecondAndLastImpl<$TypeNameModifier$Predicate<? super Integer>,false>(50)
+  #ELSE
+    #MACRO RetainSecondAndLastImpl<$TypeNameModifier$Predicate,false>(50)
+    #MACRO RetainSecondAndLastImpl<Predicate<? super $BoxedType$>,false>(50)
+  #ENDIF
+  #IFSWITCH STRUCTNAME==CheckedSubList,CheckedList,CheckedStack
+    #IF OfRef
+    #MACRO RetainSecondAndLastImpl<$TypeNameModifier$Predicate<? super Integer>,throwConcurrent>(50)
+    #ELSE
+    #MACRO RetainSecondAndLastImpl<$TypeNameModifier$Predicate,throwConcurrent>(50)
+    #MACRO RetainSecondAndLastImpl<Predicate<? super $BoxedType$>,throwConcurrent>(50)
+    #ENDIF
+  #ENDIF
+  #IF OfRef
+    #MACRO RemoveFirstImpl<$TypeNameModifier$Predicate<? super Integer>,false>(100)
+  #ELSE
+    #MACRO RemoveFirstImpl<$TypeNameModifier$Predicate,false>(100)
+    #MACRO RemoveFirstImpl<Predicate<? super $BoxedType$>,false>(100)
+  #ENDIF
+  #IFSWITCH STRUCTNAME==CheckedSubList,CheckedList,CheckedStack
+    #IF OfRef
+    #MACRO RemoveFirstImpl<$TypeNameModifier$Predicate<? super Integer>,throwConcurrent>(100)
+    #ELSE
+    #MACRO RemoveFirstImpl<$TypeNameModifier$Predicate,throwConcurrent>(100)
+    #MACRO RemoveFirstImpl<Predicate<? super $BoxedType$>,throwConcurrent>(100)
+    #ENDIF
+  #ENDIF
+  #IF OfRef
+    #MACRO RemoveFirstImpl<$TypeNameModifier$Predicate<? super Integer>,false>(50)
+  #ELSE
+    #MACRO RemoveFirstImpl<$TypeNameModifier$Predicate,false>(50)
+    #MACRO RemoveFirstImpl<Predicate<? super $BoxedType$>,false>(50)
+  #ENDIF
+  #IFSWITCH STRUCTNAME==CheckedSubList,CheckedList,CheckedStack
+    #IF OfRef
+    #MACRO RemoveFirstImpl<$TypeNameModifier$Predicate<? super Integer>,throwConcurrent>(50)
+    #ELSE
+    #MACRO RemoveFirstImpl<$TypeNameModifier$Predicate,throwConcurrent>(50)
+    #MACRO RemoveFirstImpl<Predicate<? super $BoxedType$>,throwConcurrent>(50)
+    #ENDIF
+  #ENDIF
+  #IF OfRef
+    #MACRO RemoveFirstAndSecondToLastImpl<$TypeNameModifier$Predicate<? super Integer>,false>(50)
+  #ELSE
+    #MACRO RemoveFirstAndSecondToLastImpl<$TypeNameModifier$Predicate,false>(50)
+    #MACRO RemoveFirstAndSecondToLastImpl<Predicate<? super $BoxedType$>,false>(50)
+  #ENDIF
+  #IFSWITCH STRUCTNAME==CheckedSubList,CheckedList,CheckedStack
+    #IF OfRef
+    #MACRO RemoveFirstAndSecondToLastImpl<$TypeNameModifier$Predicate<? super Integer>,throwConcurrent>(50)
+    #ELSE
+    #MACRO RemoveFirstAndSecondToLastImpl<$TypeNameModifier$Predicate,throwConcurrent>(50)
+    #MACRO RemoveFirstAndSecondToLastImpl<Predicate<? super $BoxedType$>,throwConcurrent>(50)
+    #ENDIF
+  #ENDIF
 #ENDIF
 }
 

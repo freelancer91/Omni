@@ -82,10 +82,6 @@ public abstract class IntArrSeq implements OmniCollection.OfInt
     int size;
     if((size=this.size)!=0)
     {
-      if(size>=(Integer.MAX_VALUE/3))
-      {
-        throw new OutOfMemoryError();
-      }
       final byte[] buffer;
       if(size<=(OmniArray.MAX_ARR_SIZE/13)){(buffer=new byte[size*13])
         [size=uncheckedToString(size,buffer)]=(byte)']';
@@ -582,7 +578,7 @@ public abstract class IntArrSeq implements OmniCollection.OfInt
                     {
                       if(numSurvivors==n)
                       {
-                        ArrCopy.uncheckedSelfCopy(arr,srcOffset-1,dstOffset,numSurvivors+=2);
+                        ArrCopy.uncheckedSelfCopy(arr,dstOffset,srcOffset-1,numSurvivors+=2);
                         dstOffset+=numSurvivors;
                       }
                       else
@@ -603,7 +599,7 @@ public abstract class IntArrSeq implements OmniCollection.OfInt
                     {
                       if(numSurvivors==n)
                       {
-                        ArrCopy.uncheckedSelfCopy(arr,srcOffset-1,dstOffset,numSurvivors+=2);
+                        ArrCopy.uncheckedSelfCopy(arr,dstOffset,srcOffset-1,numSurvivors+=2);
                         dstOffset+=numSurvivors;
                       }
                       else
@@ -1608,10 +1604,6 @@ public abstract class IntArrSeq implements OmniCollection.OfInt
       int size;
       if((size=this.size)!=0)
       {
-        if(size>=(Integer.MAX_VALUE/3))
-        {
-          throw new OutOfMemoryError();
-        }
           final int rootOffset;
           final byte[] buffer;
           if(size<=(OmniArray.MAX_ARR_SIZE/13)){(buffer=new byte[size*13])
@@ -3422,10 +3414,6 @@ public abstract class IntArrSeq implements OmniCollection.OfInt
       int size;
       if((size=this.size)!=0)
       {
-        if(size>=(Integer.MAX_VALUE/3))
-        {
-          throw new OutOfMemoryError();
-        }
           final int rootOffset;
           final byte[] buffer;
           if(size<=(OmniArray.MAX_ARR_SIZE/13)){(buffer=new byte[size*13])
