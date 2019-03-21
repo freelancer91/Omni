@@ -1,0 +1,1359 @@
+#TYPEDEF OfGeneric
+package omni.api;
+import org.junit.jupiter.api.Assertions;
+import omni.util.TypeUtil;
+import java.util.function.Supplier;
+public class QueryTestUtil
+{
+  #MACRO TestQueryLong<true,false,contains,OmniCollection>()
+  #MACRO TestQueryLong<true,false,removeVal,OmniCollection>()
+  #MACRO TestQueryInt<true,false,contains,OmniCollection>()
+  #MACRO TestQueryInt<true,false,removeVal,OmniCollection>()
+  #MACRO TestQueryShort<true,false,contains,OmniCollection>()
+  #MACRO TestQueryShort<true,false,removeVal,OmniCollection>()
+  #MACRO TestQueryChar<true,false,contains,OmniCollection>()
+  #MACRO TestQueryChar<true,false,removeVal,OmniCollection>()
+  #MACRO TestQueryByte<true,false,contains,OmniCollection>()
+  #MACRO TestQueryByte<true,false,removeVal,OmniCollection>()
+  #MACRO TestQueryBoolean<true,false,contains,OmniCollection>()
+  #MACRO TestQueryBoolean<true,false,removeVal,OmniCollection>()
+  #MACRO TestQueryNullReturnPositive<true,contains,OmniCollection>()
+  #MACRO TestQueryNullReturnPositive<true,removeVal,OmniCollection>()
+  #MACRO TestQueryNullReturnNegative<false,contains,OmniCollection>()
+  #MACRO TestQueryNullReturnNegative<false,removeVal,OmniCollection>()
+  #MACRO TestQueryEmpty<false,contains,OmniCollection>()
+  #MACRO TestQueryEmpty<false,removeVal,OmniCollection>()
+  
+}
+#MACRODEF TestQueryLong<POSITIVERETURN,NEGATIVERETURN,METHODNAME,COLLECTIONTYPE>()
+public static void testMETHODNAMELong(Supplier<COLLECTIONTYPE.OfDouble> collectionSupplier,double containsVal)
+{
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((long)TypeUtil.MIN_SAFE_INT-1));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((long)TypeUtil.MAX_SAFE_INT+1));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Long)(long)TypeUtil.MIN_SAFE_INT-1));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Long)(long)TypeUtil.MAX_SAFE_INT+1));
+#IFSWITCH METHODNAME==removeVal
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Long.valueOf((long)TypeUtil.MIN_SAFE_INT-1)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Long.valueOf((long)TypeUtil.MAX_SAFE_INT+1)));
+#ELSE
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Long.valueOf((long)TypeUtil.MIN_SAFE_INT-1)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Long.valueOf((long)TypeUtil.MAX_SAFE_INT+1)));
+#ENDIF
+  if(containsVal == 0){
+      Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((long)1));
+      Assertions.assertEquals(POSITIVERETURN,collectionSupplier.get().METHODNAME((long)containsVal));
+      Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Long.valueOf((long)1)));
+      Assertions.assertEquals(POSITIVERETURN,collectionSupplier.get().METHODNAME(Long.valueOf((long)containsVal)));
+#IFSWITCH METHODNAME==removeVal
+      Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Long.valueOf((long)1)));
+      Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Long.valueOf((long)containsVal)));
+#ELSE
+      Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Long.valueOf((long)1)));
+      Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Long.valueOf((long)containsVal)));
+#ENDIF
+  }else{
+      Assertions.assertEquals(POSITIVERETURN,collectionSupplier.get().METHODNAME((long)containsVal));
+      Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((long)0));
+      Assertions.assertEquals(POSITIVERETURN,collectionSupplier.get().METHODNAME(Long.valueOf((long)containsVal)));
+      Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Long.valueOf((long)0)));
+#IFSWITCH METHODNAME==removeVal
+      Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Long.valueOf((long)containsVal)));
+      Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Long.valueOf((long)0)));
+#ELSE
+      Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Long.valueOf((long)containsVal)));
+      Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Long.valueOf((long)0)));
+#ENDIF
+  }
+}
+public static void testMETHODNAMELong(Supplier<COLLECTIONTYPE.OfFloat> collectionSupplier,float containsVal)
+{
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((long)TypeUtil.MIN_SAFE_INT-1));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((long)TypeUtil.MAX_SAFE_INT+1));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Long)(long)TypeUtil.MIN_SAFE_INT-1));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Long)(long)TypeUtil.MAX_SAFE_INT+1));
+#IFSWITCH METHODNAME==removeVal
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Long.valueOf((long)TypeUtil.MIN_SAFE_INT-1)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Long.valueOf((long)TypeUtil.MAX_SAFE_INT+1)));
+#ELSE
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Long.valueOf((long)TypeUtil.MIN_SAFE_INT-1)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Long.valueOf((long)TypeUtil.MAX_SAFE_INT+1)));
+#ENDIF
+  if(containsVal == 0){
+      Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((long)1));
+      Assertions.assertEquals(POSITIVERETURN,collectionSupplier.get().METHODNAME((long)containsVal));
+      Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Long.valueOf((long)1)));
+      Assertions.assertEquals(POSITIVERETURN,collectionSupplier.get().METHODNAME(Long.valueOf((long)containsVal)));
+#IFSWITCH METHODNAME==removeVal
+      Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Long.valueOf((long)1)));
+      Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Long.valueOf((long)containsVal)));
+#ELSE
+      Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Long.valueOf((long)1)));
+      Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Long.valueOf((long)containsVal)));
+#ENDIF
+  }else{
+      Assertions.assertEquals(POSITIVERETURN,collectionSupplier.get().METHODNAME((long)containsVal));
+      Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((long)0));
+      Assertions.assertEquals(POSITIVERETURN,collectionSupplier.get().METHODNAME(Long.valueOf((long)containsVal)));
+      Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Long.valueOf((long)0)));
+#IFSWITCH METHODNAME==removeVal
+      Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Long.valueOf((long)containsVal)));
+      Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Long.valueOf((long)0)));
+#ELSE
+      Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Long.valueOf((long)containsVal)));
+      Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Long.valueOf((long)0)));
+#ENDIF
+  }
+}
+public static void testMETHODNAMELong(Supplier<COLLECTIONTYPE> collectionSupplier)
+{
+  COLLECTIONTYPE col;
+  if((col=collectionSupplier.get()) instanceof OmniCollection.OfByte || col instanceof OmniCollection.OfShort || col instanceof OmniCollection.OfChar || col instanceof OmniCollection.OfInt)
+  {
+#IFSWITCH METHODNAME==removeVal
+    Assertions.assertEquals(NEGATIVERETURN,col.remove((Object)(long)Long.MIN_VALUE));
+    Assertions.assertEquals(NEGATIVERETURN,col.remove((Object)(long)Long.MAX_VALUE));
+#ELSE
+    Assertions.assertEquals(NEGATIVERETURN,col.METHODNAME((Object)(long)Long.MIN_VALUE));
+    Assertions.assertEquals(NEGATIVERETURN,col.METHODNAME((Object)(long)Long.MAX_VALUE));
+#ENDIF
+    Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Long)(long)Long.MIN_VALUE));
+    Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((long)Long.MIN_VALUE));
+    Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Long)(long)Long.MAX_VALUE));
+    Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((long)Long.MAX_VALUE));
+  }
+  else if(col instanceof OmniCollection.OfRef||col instanceof OmniCollection.OfLong)
+  {
+#IFSWITCH METHODNAME==removeVal
+    Assertions.assertEquals(POSITIVERETURN,col.remove((Object)(long)0));
+#ELSE
+    Assertions.assertEquals(POSITIVERETURN,col.METHODNAME((Object)(long)0));
+#ENDIF
+  }
+  else
+  {
+#IFSWITCH METHODNAME==removeVal
+    Assertions.assertEquals(NEGATIVERETURN,col.remove((Object)(long)0));
+#ELSE
+    Assertions.assertEquals(NEGATIVERETURN,col.METHODNAME((Object)(long)0));
+#ENDIF
+  }
+#IFSWITCH METHODNAME==removeVal
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(long)1));
+#ELSE
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(long)1));
+#ENDIF
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Long)(long)1));
+  Assertions.assertEquals(POSITIVERETURN,collectionSupplier.get().METHODNAME((Long)(long)0));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((long)1));
+  Assertions.assertEquals(POSITIVERETURN,collectionSupplier.get().METHODNAME((long)0));
+}
+public static void testMETHODNAMELong(Supplier<COLLECTIONTYPE.OfBoolean> collectionSupplier,boolean containsVal)
+{
+#IFSWITCH METHODNAME==removeVal
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(long)2));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(long)TypeUtil.castToLong(!containsVal)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(long)TypeUtil.castToLong(containsVal)));
+#ELSE
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(long)2));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(long)TypeUtil.castToLong(!containsVal)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(long)TypeUtil.castToLong(containsVal)));
+#ENDIF
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((long)2));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((long)TypeUtil.castToLong(!containsVal)));
+  Assertions.assertEquals(POSITIVERETURN,collectionSupplier.get().METHODNAME((long)TypeUtil.castToLong(containsVal)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Long)(long)2));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Long)(long)TypeUtil.castToLong(!containsVal)));
+  Assertions.assertEquals(POSITIVERETURN,collectionSupplier.get().METHODNAME((Long)(long)TypeUtil.castToLong(containsVal)));
+}
+#ENDDEF
+#MACRODEF TestQueryInt<POSITIVERETURN,NEGATIVERETURN,METHODNAME,COLLECTIONTYPE>()
+public static void testMETHODNAMEInt(Supplier<COLLECTIONTYPE.OfDouble> collectionSupplier,double containsVal)
+{
+  if(containsVal == 0){
+      Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((int)1));
+      Assertions.assertEquals(POSITIVERETURN,collectionSupplier.get().METHODNAME((int)containsVal));
+      Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Integer.valueOf((int)1)));
+      Assertions.assertEquals(POSITIVERETURN,collectionSupplier.get().METHODNAME(Integer.valueOf((int)containsVal)));
+#IFSWITCH METHODNAME==removeVal
+      Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Integer.valueOf((int)1)));
+      Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Integer.valueOf((int)containsVal)));
+#ELSE
+      Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Integer.valueOf((int)1)));
+      Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Integer.valueOf((int)containsVal)));
+#ENDIF
+  }else{
+      Assertions.assertEquals(POSITIVERETURN,collectionSupplier.get().METHODNAME((int)containsVal));
+      Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((int)0));
+      Assertions.assertEquals(POSITIVERETURN,collectionSupplier.get().METHODNAME(Integer.valueOf((int)containsVal)));
+      Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Integer.valueOf((int)0)));
+#IFSWITCH METHODNAME==removeVal
+      Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Integer.valueOf((int)containsVal)));
+      Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Integer.valueOf((int)0)));
+#ELSE
+      Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Integer.valueOf((int)containsVal)));
+      Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Integer.valueOf((int)0)));
+#ENDIF
+  }
+}
+public static void testMETHODNAMEInt(Supplier<COLLECTIONTYPE.OfFloat> collectionSupplier,float containsVal)
+{
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((int)TypeUtil.MIN_SAFE_INT-1));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((int)TypeUtil.MAX_SAFE_INT+1));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Integer)(int)TypeUtil.MIN_SAFE_INT-1));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Integer)(int)TypeUtil.MAX_SAFE_INT+1));
+#IFSWITCH METHODNAME==removeVal
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Integer.valueOf((int)TypeUtil.MIN_SAFE_INT-1)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Integer.valueOf((int)TypeUtil.MAX_SAFE_INT+1)));
+#ELSE
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Integer.valueOf((int)TypeUtil.MIN_SAFE_INT-1)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Integer.valueOf((int)TypeUtil.MAX_SAFE_INT+1)));
+#ENDIF
+  if(containsVal == 0){
+      Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((int)1));
+      Assertions.assertEquals(POSITIVERETURN,collectionSupplier.get().METHODNAME((int)containsVal));
+      Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Integer.valueOf((int)1)));
+      Assertions.assertEquals(POSITIVERETURN,collectionSupplier.get().METHODNAME(Integer.valueOf((int)containsVal)));
+#IFSWITCH METHODNAME==removeVal
+      Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Integer.valueOf((int)1)));
+      Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Integer.valueOf((int)containsVal)));
+#ELSE
+      Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Integer.valueOf((int)1)));
+      Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Integer.valueOf((int)containsVal)));
+#ENDIF
+  }else{
+      Assertions.assertEquals(POSITIVERETURN,collectionSupplier.get().METHODNAME((int)containsVal));
+      Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((int)0));
+      Assertions.assertEquals(POSITIVERETURN,collectionSupplier.get().METHODNAME(Integer.valueOf((int)containsVal)));
+      Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Integer.valueOf((int)0)));
+#IFSWITCH METHODNAME==removeVal
+      Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Integer.valueOf((int)containsVal)));
+      Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Integer.valueOf((int)0)));
+#ELSE
+      Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Integer.valueOf((int)containsVal)));
+      Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Integer.valueOf((int)0)));
+#ENDIF
+  }
+}
+public static void testMETHODNAMEInt(Supplier<COLLECTIONTYPE> collectionSupplier)
+{
+  COLLECTIONTYPE col;
+  if((col=collectionSupplier.get()) instanceof OmniCollection.OfByte || col instanceof OmniCollection.OfShort || col instanceof OmniCollection.OfChar)
+  {
+#IFSWITCH METHODNAME==removeVal
+    Assertions.assertEquals(NEGATIVERETURN,col.remove((Object)(int)Integer.MIN_VALUE));
+    Assertions.assertEquals(NEGATIVERETURN,col.remove((Object)(int)Integer.MAX_VALUE));
+#ELSE
+    Assertions.assertEquals(NEGATIVERETURN,col.METHODNAME((Object)(int)Integer.MIN_VALUE));
+    Assertions.assertEquals(NEGATIVERETURN,col.METHODNAME((Object)(int)Integer.MAX_VALUE));
+#ENDIF
+    Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Integer)(int)Integer.MIN_VALUE));
+    Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((int)Integer.MIN_VALUE));
+    Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Integer)(int)Integer.MAX_VALUE));
+    Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((int)Integer.MAX_VALUE));
+  }
+  else if(col instanceof OmniCollection.OfRef||col instanceof OmniCollection.OfInt)
+  {
+#IFSWITCH METHODNAME==removeVal
+    Assertions.assertEquals(POSITIVERETURN,col.remove((Object)(int)0));
+#ELSE
+    Assertions.assertEquals(POSITIVERETURN,col.METHODNAME((Object)(int)0));
+#ENDIF
+  }
+  else
+  {
+#IFSWITCH METHODNAME==removeVal
+    Assertions.assertEquals(NEGATIVERETURN,col.remove((Object)(int)0));
+#ELSE
+    Assertions.assertEquals(NEGATIVERETURN,col.METHODNAME((Object)(int)0));
+#ENDIF
+  }
+#IFSWITCH METHODNAME==removeVal
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(int)1));
+#ELSE
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(int)1));
+#ENDIF
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Integer)(int)1));
+  Assertions.assertEquals(POSITIVERETURN,collectionSupplier.get().METHODNAME((Integer)(int)0));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((int)1));
+  Assertions.assertEquals(POSITIVERETURN,collectionSupplier.get().METHODNAME((int)0));
+}
+public static void testMETHODNAMEInt(Supplier<COLLECTIONTYPE.OfBoolean> collectionSupplier,boolean containsVal)
+{
+#IFSWITCH METHODNAME==removeVal
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(int)2));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(int)TypeUtil.castToByte(!containsVal)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(int)TypeUtil.castToByte(containsVal)));
+#ELSE
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(int)2));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(int)TypeUtil.castToByte(!containsVal)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(int)TypeUtil.castToByte(containsVal)));
+#ENDIF
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((int)2));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((int)TypeUtil.castToByte(!containsVal)));
+  Assertions.assertEquals(POSITIVERETURN,collectionSupplier.get().METHODNAME((int)TypeUtil.castToByte(containsVal)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Integer)(int)2));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Integer)(int)TypeUtil.castToByte(!containsVal)));
+  Assertions.assertEquals(POSITIVERETURN,collectionSupplier.get().METHODNAME((Integer)(int)TypeUtil.castToByte(containsVal)));
+}
+#ENDDEF
+#MACRODEF TestQueryShort<POSITIVERETURN,NEGATIVERETURN,METHODNAME,COLLECTIONTYPE>()
+public static void testMETHODNAMEShort(Supplier<COLLECTIONTYPE.OfDouble> collectionSupplier,double containsVal)
+{
+  if(containsVal == 0){
+      Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((short)1));
+      Assertions.assertEquals(POSITIVERETURN,collectionSupplier.get().METHODNAME((short)containsVal));
+      Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Short.valueOf((short)1)));
+      Assertions.assertEquals(POSITIVERETURN,collectionSupplier.get().METHODNAME(Short.valueOf((short)containsVal)));
+#IFSWITCH METHODNAME==removeVal
+      Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Short.valueOf((short)1)));
+      Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Short.valueOf((short)containsVal)));
+#ELSE
+      Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Short.valueOf((short)1)));
+      Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Short.valueOf((short)containsVal)));
+#ENDIF
+  }else{
+      Assertions.assertEquals(POSITIVERETURN,collectionSupplier.get().METHODNAME((short)containsVal));
+      Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((short)0));
+      Assertions.assertEquals(POSITIVERETURN,collectionSupplier.get().METHODNAME(Short.valueOf((short)containsVal)));
+      Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Short.valueOf((short)0)));
+#IFSWITCH METHODNAME==removeVal
+      Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Short.valueOf((short)containsVal)));
+      Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Short.valueOf((short)0)));
+#ELSE
+      Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Short.valueOf((short)containsVal)));
+      Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Short.valueOf((short)0)));
+#ENDIF
+  }
+}
+public static void testMETHODNAMEShort(Supplier<COLLECTIONTYPE.OfFloat> collectionSupplier,float containsVal)
+{
+  if(containsVal == 0){
+      Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((short)1));
+      Assertions.assertEquals(POSITIVERETURN,collectionSupplier.get().METHODNAME((short)containsVal));
+      Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Short.valueOf((short)1)));
+      Assertions.assertEquals(POSITIVERETURN,collectionSupplier.get().METHODNAME(Short.valueOf((short)containsVal)));
+#IFSWITCH METHODNAME==removeVal
+      Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Short.valueOf((short)1)));
+      Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Short.valueOf((short)containsVal)));
+#ELSE
+      Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Short.valueOf((short)1)));
+      Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Short.valueOf((short)containsVal)));
+#ENDIF
+  }else{
+      Assertions.assertEquals(POSITIVERETURN,collectionSupplier.get().METHODNAME((short)containsVal));
+      Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((short)0));
+      Assertions.assertEquals(POSITIVERETURN,collectionSupplier.get().METHODNAME(Short.valueOf((short)containsVal)));
+      Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Short.valueOf((short)0)));
+#IFSWITCH METHODNAME==removeVal
+      Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Short.valueOf((short)containsVal)));
+      Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Short.valueOf((short)0)));
+#ELSE
+      Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Short.valueOf((short)containsVal)));
+      Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Short.valueOf((short)0)));
+#ENDIF
+  }
+}
+public static void testMETHODNAMEShort(Supplier<COLLECTIONTYPE> collectionSupplier)
+{
+  COLLECTIONTYPE col;
+  if((col=collectionSupplier.get()) instanceof OmniCollection.OfChar)
+  {
+#IFSWITCH METHODNAME==removeVal
+    Assertions.assertEquals(NEGATIVERETURN,col.remove((Object)(short)-1));
+#ELSE
+    Assertions.assertEquals(NEGATIVERETURN,col.METHODNAME((Object)(short)-1));
+#ENDIF
+    Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Short)(short)-1));
+    Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((short)-1));
+  }
+  else if(col instanceof OmniCollection.OfByte)
+  {
+#IFSWITCH METHODNAME==removeVal
+    Assertions.assertEquals(NEGATIVERETURN,col.remove((Object)(short)Short.MIN_VALUE));
+    Assertions.assertEquals(NEGATIVERETURN,col.remove((Object)(short)Short.MAX_VALUE));
+#ELSE
+    Assertions.assertEquals(NEGATIVERETURN,col.METHODNAME((Object)(short)Short.MIN_VALUE));
+    Assertions.assertEquals(NEGATIVERETURN,col.METHODNAME((Object)(short)Short.MAX_VALUE));
+#ENDIF
+    Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Short)(short)Short.MIN_VALUE));
+    Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((short)Short.MIN_VALUE));
+    Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Short)(short)Short.MAX_VALUE));
+    Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((short)Short.MAX_VALUE));
+  }
+  else if(col instanceof OmniCollection.OfRef||col instanceof OmniCollection.OfShort)
+  {
+#IFSWITCH METHODNAME==removeVal
+    Assertions.assertEquals(POSITIVERETURN,col.remove((Object)(short)0));
+#ELSE
+    Assertions.assertEquals(POSITIVERETURN,col.METHODNAME((Object)(short)0));
+#ENDIF
+  }
+  else
+  {
+#IFSWITCH METHODNAME==removeVal
+    Assertions.assertEquals(NEGATIVERETURN,col.remove((Object)(short)0));
+#ELSE
+    Assertions.assertEquals(NEGATIVERETURN,col.METHODNAME((Object)(short)0));
+#ENDIF
+  }
+#IFSWITCH METHODNAME==removeVal
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(short)1));
+#ELSE
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(short)1));
+#ENDIF
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Short)(short)1));
+  Assertions.assertEquals(POSITIVERETURN,collectionSupplier.get().METHODNAME((Short)(short)0));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((short)1));
+  Assertions.assertEquals(POSITIVERETURN,collectionSupplier.get().METHODNAME((short)0));
+}
+public static void testMETHODNAMEShort(Supplier<COLLECTIONTYPE.OfBoolean> collectionSupplier,boolean containsVal)
+{
+#IFSWITCH METHODNAME==removeVal
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(short)2));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(short)TypeUtil.castToByte(!containsVal)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(short)TypeUtil.castToByte(containsVal)));
+#ELSE
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(short)2));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(short)TypeUtil.castToByte(!containsVal)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(short)TypeUtil.castToByte(containsVal)));
+#ENDIF
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((short)2));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((short)TypeUtil.castToByte(!containsVal)));
+  Assertions.assertEquals(POSITIVERETURN,collectionSupplier.get().METHODNAME((short)TypeUtil.castToByte(containsVal)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Short)(short)2));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Short)(short)TypeUtil.castToByte(!containsVal)));
+  Assertions.assertEquals(POSITIVERETURN,collectionSupplier.get().METHODNAME((Short)(short)TypeUtil.castToByte(containsVal)));
+}
+#ENDDEF
+#MACRODEF TestQueryChar<POSITIVERETURN,NEGATIVERETURN,METHODNAME,COLLECTIONTYPE>()
+public static void testMETHODNAMEChar(Supplier<COLLECTIONTYPE.OfDouble> collectionSupplier,double containsVal)
+{
+  if(containsVal == 0){
+      Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((char)1));
+      Assertions.assertEquals(POSITIVERETURN,collectionSupplier.get().METHODNAME((char)containsVal));
+      Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Character.valueOf((char)1)));
+      Assertions.assertEquals(POSITIVERETURN,collectionSupplier.get().METHODNAME(Character.valueOf((char)containsVal)));
+#IFSWITCH METHODNAME==removeVal
+      Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Character.valueOf((char)1)));
+      Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Character.valueOf((char)containsVal)));
+#ELSE
+      Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Character.valueOf((char)1)));
+      Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Character.valueOf((char)containsVal)));
+#ENDIF
+  }else{
+      Assertions.assertEquals(POSITIVERETURN,collectionSupplier.get().METHODNAME((char)containsVal));
+      Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((char)0));
+      Assertions.assertEquals(POSITIVERETURN,collectionSupplier.get().METHODNAME(Character.valueOf((char)containsVal)));
+      Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Character.valueOf((char)0)));
+#IFSWITCH METHODNAME==removeVal
+      Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Character.valueOf((char)containsVal)));
+      Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Character.valueOf((char)0)));
+#ELSE
+      Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Character.valueOf((char)containsVal)));
+      Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Character.valueOf((char)0)));
+#ENDIF
+  }
+}
+public static void testMETHODNAMEChar(Supplier<COLLECTIONTYPE.OfFloat> collectionSupplier,float containsVal)
+{
+  if(containsVal == 0){
+      Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((char)1));
+      Assertions.assertEquals(POSITIVERETURN,collectionSupplier.get().METHODNAME((char)containsVal));
+      Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Character.valueOf((char)1)));
+      Assertions.assertEquals(POSITIVERETURN,collectionSupplier.get().METHODNAME(Character.valueOf((char)containsVal)));
+#IFSWITCH METHODNAME==removeVal
+      Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Character.valueOf((char)1)));
+      Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Character.valueOf((char)containsVal)));
+#ELSE
+      Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Character.valueOf((char)1)));
+      Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Character.valueOf((char)containsVal)));
+#ENDIF
+  }else{
+      Assertions.assertEquals(POSITIVERETURN,collectionSupplier.get().METHODNAME((char)containsVal));
+      Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((char)0));
+      Assertions.assertEquals(POSITIVERETURN,collectionSupplier.get().METHODNAME(Character.valueOf((char)containsVal)));
+      Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Character.valueOf((char)0)));
+#IFSWITCH METHODNAME==removeVal
+      Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Character.valueOf((char)containsVal)));
+      Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Character.valueOf((char)0)));
+#ELSE
+      Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Character.valueOf((char)containsVal)));
+      Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Character.valueOf((char)0)));
+#ENDIF
+  }
+}
+public static void testMETHODNAMEChar(Supplier<COLLECTIONTYPE> collectionSupplier)
+{
+  COLLECTIONTYPE col;
+  if((col=collectionSupplier.get()) instanceof OmniCollection.OfShort || col instanceof OmniCollection.OfByte)
+  {
+#IFSWITCH METHODNAME==removeVal
+    Assertions.assertEquals(NEGATIVERETURN,col.remove((Object)(char)Character.MAX_VALUE));
+#ELSE
+    Assertions.assertEquals(NEGATIVERETURN,col.METHODNAME((Object)(char)Character.MAX_VALUE));
+#ENDIF
+    Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Character)(char)Character.MAX_VALUE));
+    Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((char)Character.MAX_VALUE));
+  }
+  else if(col instanceof OmniCollection.OfRef||col instanceof OmniCollection.OfChar)
+  {
+#IFSWITCH METHODNAME==removeVal
+    Assertions.assertEquals(POSITIVERETURN,col.remove((Object)(char)0));
+#ELSE
+    Assertions.assertEquals(POSITIVERETURN,col.METHODNAME((Object)(char)0));
+#ENDIF
+  }
+  else
+  {
+#IFSWITCH METHODNAME==removeVal
+    Assertions.assertEquals(NEGATIVERETURN,col.remove((Object)(char)0));
+#ELSE
+    Assertions.assertEquals(NEGATIVERETURN,col.METHODNAME((Object)(char)0));
+#ENDIF
+  }
+#IFSWITCH METHODNAME==removeVal
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(char)1));
+#ELSE
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(char)1));
+#ENDIF
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Character)(char)1));
+  Assertions.assertEquals(POSITIVERETURN,collectionSupplier.get().METHODNAME((Character)(char)0));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((char)1));
+  Assertions.assertEquals(POSITIVERETURN,collectionSupplier.get().METHODNAME((char)0));
+}
+public static void testMETHODNAMEChar(Supplier<COLLECTIONTYPE.OfBoolean> collectionSupplier,boolean containsVal)
+{
+#IFSWITCH METHODNAME==removeVal
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(char)2));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(char)TypeUtil.castToChar(!containsVal)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(char)TypeUtil.castToChar(containsVal)));
+#ELSE
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(char)2));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(char)TypeUtil.castToChar(!containsVal)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(char)TypeUtil.castToChar(containsVal)));
+#ENDIF
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((char)2));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((char)TypeUtil.castToChar(!containsVal)));
+  Assertions.assertEquals(POSITIVERETURN,collectionSupplier.get().METHODNAME((char)TypeUtil.castToChar(containsVal)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((char)(char)2));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((char)(char)TypeUtil.castToChar(!containsVal)));
+  Assertions.assertEquals(POSITIVERETURN,collectionSupplier.get().METHODNAME((char)(char)TypeUtil.castToChar(containsVal)));
+}
+#ENDDEF
+
+#MACRODEF TestQueryByte<POSITIVERETURN,NEGATIVERETURN,METHODNAME,COLLECTIONTYPE>()
+public static void testMETHODNAMEByte(Supplier<COLLECTIONTYPE.OfDouble> collectionSupplier,double containsVal)
+{
+  if(containsVal == 0){
+      Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((byte)1));
+      Assertions.assertEquals(POSITIVERETURN,collectionSupplier.get().METHODNAME((byte)containsVal));
+      Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Byte.valueOf((byte)1)));
+      Assertions.assertEquals(POSITIVERETURN,collectionSupplier.get().METHODNAME(Byte.valueOf((byte)containsVal)));
+#IFSWITCH METHODNAME==removeVal
+      Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Byte.valueOf((byte)1)));
+      Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Byte.valueOf((byte)containsVal)));
+#ELSE
+      Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Byte.valueOf((byte)1)));
+      Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Byte.valueOf((byte)containsVal)));
+#ENDIF
+  }else{
+      Assertions.assertEquals(POSITIVERETURN,collectionSupplier.get().METHODNAME((byte)containsVal));
+      Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((byte)0));
+      Assertions.assertEquals(POSITIVERETURN,collectionSupplier.get().METHODNAME(Byte.valueOf((byte)containsVal)));
+      Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Byte.valueOf((byte)0)));
+#IFSWITCH METHODNAME==removeVal
+      Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Byte.valueOf((byte)containsVal)));
+      Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Byte.valueOf((byte)0)));
+#ELSE
+      Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Byte.valueOf((byte)containsVal)));
+      Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Byte.valueOf((byte)0)));
+#ENDIF
+  }
+}
+public static void testMETHODNAMEByte(Supplier<COLLECTIONTYPE.OfFloat> collectionSupplier,float containsVal)
+{
+  if(containsVal == 0){
+      Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((byte)1));
+      Assertions.assertEquals(POSITIVERETURN,collectionSupplier.get().METHODNAME((byte)containsVal));
+      Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Byte.valueOf((byte)1)));
+      Assertions.assertEquals(POSITIVERETURN,collectionSupplier.get().METHODNAME(Byte.valueOf((byte)containsVal)));
+#IFSWITCH METHODNAME==removeVal
+      Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Byte.valueOf((byte)1)));
+      Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Byte.valueOf((byte)containsVal)));
+#ELSE
+      Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Byte.valueOf((byte)1)));
+      Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Byte.valueOf((byte)containsVal)));
+#ENDIF
+  }else{
+      Assertions.assertEquals(POSITIVERETURN,collectionSupplier.get().METHODNAME((byte)containsVal));
+      Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((byte)0));
+      Assertions.assertEquals(POSITIVERETURN,collectionSupplier.get().METHODNAME(Byte.valueOf((byte)containsVal)));
+      Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Byte.valueOf((byte)0)));
+#IFSWITCH METHODNAME==removeVal
+      Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Byte.valueOf((byte)containsVal)));
+      Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Byte.valueOf((byte)0)));
+#ELSE
+      Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Byte.valueOf((byte)containsVal)));
+      Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Byte.valueOf((byte)0)));
+#ENDIF
+  }
+}
+public static void testMETHODNAMEByte(Supplier<COLLECTIONTYPE> collectionSupplier)
+{
+  COLLECTIONTYPE col;
+  if((col=collectionSupplier.get()) instanceof OmniCollection.OfChar)
+  {
+#IFSWITCH METHODNAME==removeVal
+    Assertions.assertEquals(NEGATIVERETURN,col.remove((Object)(byte)-1));
+#ELSE
+    Assertions.assertEquals(NEGATIVERETURN,col.METHODNAME((Object)(byte)-1));
+#ENDIF
+    Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Byte)(byte)-1));
+    Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((byte)-1));
+  }
+  else if(col instanceof OmniCollection.OfRef||col instanceof OmniCollection.OfByte)
+  {
+#IFSWITCH METHODNAME==removeVal
+    Assertions.assertEquals(POSITIVERETURN,col.remove((Object)(byte)0));
+#ELSE
+    Assertions.assertEquals(POSITIVERETURN,col.METHODNAME((Object)(byte)0));
+#ENDIF
+  }
+  else
+  {
+#IFSWITCH METHODNAME==removeVal
+    Assertions.assertEquals(NEGATIVERETURN,col.remove((Object)(byte)0));
+#ELSE
+    Assertions.assertEquals(NEGATIVERETURN,col.METHODNAME((Object)(byte)0));
+#ENDIF
+  }
+#IFSWITCH METHODNAME==removeVal
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(byte)1));
+#ELSE
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(byte)1));
+#ENDIF
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Byte)(byte)1));
+  Assertions.assertEquals(POSITIVERETURN,collectionSupplier.get().METHODNAME((Byte)(byte)0));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((byte)1));
+  Assertions.assertEquals(POSITIVERETURN,collectionSupplier.get().METHODNAME((byte)0));
+}
+public static void testMETHODNAMEByte(Supplier<COLLECTIONTYPE.OfBoolean> collectionSupplier,boolean containsVal)
+{
+#IFSWITCH METHODNAME==removeVal
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(byte)2));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(byte)TypeUtil.castToByte(!containsVal)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(byte)TypeUtil.castToByte(containsVal)));
+#ELSE
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(byte)2));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(byte)TypeUtil.castToByte(!containsVal)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(byte)TypeUtil.castToByte(containsVal)));
+#ENDIF
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((byte)2));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((byte)TypeUtil.castToByte(!containsVal)));
+  Assertions.assertEquals(POSITIVERETURN,collectionSupplier.get().METHODNAME((byte)TypeUtil.castToByte(containsVal)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Byte)(byte)2));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Byte)(byte)TypeUtil.castToByte(!containsVal)));
+  Assertions.assertEquals(POSITIVERETURN,collectionSupplier.get().METHODNAME((Byte)(byte)TypeUtil.castToByte(containsVal)));
+}
+#ENDDEF
+
+#MACRODEF TestQueryBoolean<POSITIVERETURN,NEGATIVERETURN,METHODNAME,COLLECTIONTYPE>()
+public static void testMETHODNAMEBoolean(Supplier<COLLECTIONTYPE> collectionSupplier,boolean containsVal)
+{
+#IFSWITCH METHODNAME==removeVal
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)!containsVal));
+  COLLECTIONTYPE collection;
+  if((collection=collectionSupplier.get()) instanceof COLLECTIONTYPE.OfBoolean || collection instanceof COLLECTIONTYPE.OfRef)
+  {
+    Assertions.assertEquals(POSITIVERETURN,collection.remove((Object)containsVal));
+  }
+  else
+  {
+    Assertions.assertEquals(NEGATIVERETURN,collection.remove((Object)containsVal));
+  }
+#ELSE
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)!containsVal));
+  COLLECTIONTYPE collection;
+  if((collection=collectionSupplier.get()) instanceof COLLECTIONTYPE.OfBoolean || collection instanceof COLLECTIONTYPE.OfRef)
+  {
+    Assertions.assertEquals(POSITIVERETURN,collection.METHODNAME((Object)containsVal));
+  }
+  else
+  {
+    Assertions.assertEquals(NEGATIVERETURN,collection.METHODNAME((Object)containsVal));
+  }
+#ENDIF
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(!containsVal));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Boolean)!containsVal));
+  Assertions.assertEquals(POSITIVERETURN,collectionSupplier.get().METHODNAME(containsVal));
+  Assertions.assertEquals(POSITIVERETURN,collectionSupplier.get().METHODNAME((Boolean)containsVal));
+}
+#ENDDEF
+#MACRODEF TestQueryNullReturnPositive<POSITIVERETURN,METHODNAME,COLLECTIONTYPE>()
+public static <E> void testMETHODNAMENullReturnPositive(Supplier<COLLECTIONTYPE.OfRef<E>> collectionSupplier)
+{
+#IFSWITCH METHODNAME==removeVal
+  Assertions.assertEquals(POSITIVERETURN,collectionSupplier.get().remove((Object)null));
+#ELSE
+  Assertions.assertEquals(POSITIVERETURN,collectionSupplier.get().METHODNAME((Object)null));
+#ENDIF
+  Assertions.assertEquals(POSITIVERETURN,collectionSupplier.get().METHODNAME((Boolean)null));
+  Assertions.assertEquals(POSITIVERETURN,collectionSupplier.get().METHODNAME((Byte)null));
+  Assertions.assertEquals(POSITIVERETURN,collectionSupplier.get().METHODNAME((Character)null));
+  Assertions.assertEquals(POSITIVERETURN,collectionSupplier.get().METHODNAME((Short)null));
+  Assertions.assertEquals(POSITIVERETURN,collectionSupplier.get().METHODNAME((Integer)null));
+  Assertions.assertEquals(POSITIVERETURN,collectionSupplier.get().METHODNAME((Long)null));
+  Assertions.assertEquals(POSITIVERETURN,collectionSupplier.get().METHODNAME((Float)null));
+  Assertions.assertEquals(POSITIVERETURN,collectionSupplier.get().METHODNAME((Double)null));
+}
+#ENDDEF
+
+#MACRODEF TestQueryNullReturnNegative<NEGATIVERETURN,METHODNAME,COLLECTIONTYPE>()
+public static void testMETHODNAMENullReturnNegative(Supplier<COLLECTIONTYPE> collectionSupplier)
+{
+#IFSWITCH METHODNAME==removeVal
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)null));
+#ELSE
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)null));
+#ENDIF
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Boolean)null));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Byte)null));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Character)null));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Short)null));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Integer)null));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Long)null));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Float)null));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Double)null));
+}
+#ENDDEF
+#MACRODEF TestQueryEmpty<NEGATIVERETURN,METHODNAME,COLLECTIONTYPE>()
+public static void testEmptyMETHODNAME(Supplier<COLLECTIONTYPE> collectionSupplier)
+{
+#IFSWITCH METHODNAME==removeVal
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)null));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Boolean.TRUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Boolean.FALSE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Byte.valueOf(Byte.MIN_VALUE)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Byte.valueOf((byte)-2)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Byte.valueOf((byte)-1)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Byte.valueOf((byte)0)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Byte.valueOf((byte)1)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Byte.valueOf((byte)2)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Byte.valueOf(Byte.MAX_VALUE)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Character.valueOf((char)0)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Character.valueOf((char)1)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Character.valueOf((char)2)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Character.valueOf((char)Byte.MAX_VALUE)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Character.valueOf((char)Short.MAX_VALUE)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Character.valueOf(Character.MAX_VALUE)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Short.valueOf(Short.MIN_VALUE)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Short.valueOf(Byte.MIN_VALUE)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Short.valueOf((short)-2)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Short.valueOf((short)-1)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Short.valueOf((short)0)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Short.valueOf((short)1)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Short.valueOf((short)2)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Short.valueOf(Byte.MAX_VALUE)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Short.valueOf(Short.MAX_VALUE)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Integer.valueOf(Integer.MIN_VALUE)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Integer.valueOf(Short.MIN_VALUE)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Integer.valueOf(Byte.MIN_VALUE)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Integer.valueOf(-2)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Integer.valueOf(-1)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Integer.valueOf(0)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Integer.valueOf(1)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Integer.valueOf(2)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Integer.valueOf(Byte.MAX_VALUE)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Integer.valueOf(Short.MAX_VALUE)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Integer.valueOf(Character.MAX_VALUE)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Integer.valueOf(Integer.MAX_VALUE)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Long.valueOf(Long.MIN_VALUE)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Long.valueOf(Integer.MIN_VALUE)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Long.valueOf(Short.MIN_VALUE)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Long.valueOf(Byte.MIN_VALUE)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Long.valueOf(-2)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Long.valueOf(-1)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Long.valueOf(0)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Long.valueOf(1)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Long.valueOf(2)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Long.valueOf(Byte.MAX_VALUE)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Long.valueOf(Short.MAX_VALUE)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Long.valueOf(Character.MAX_VALUE)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Long.valueOf(Integer.MAX_VALUE)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Long.valueOf(Long.MAX_VALUE)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Float.valueOf(Float.NEGATIVE_INFINITY)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Float.valueOf(TypeUtil.MIN_SAFE_LONG - 1)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Float.valueOf(TypeUtil.MIN_SAFE_LONG)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Float.valueOf(TypeUtil.MIN_SAFE_INT - 1)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Float.valueOf(TypeUtil.MIN_SAFE_INT)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Float.valueOf(Long.MIN_VALUE)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Float.valueOf(Integer.MIN_VALUE)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Float.valueOf(Short.MIN_VALUE)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Float.valueOf(Byte.MIN_VALUE)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Float.valueOf(-2)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Float.valueOf(-1)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Float.valueOf((float)0.0)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Float.valueOf((float)-0.0)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Float.valueOf(1)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Float.valueOf(2)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Float.valueOf(Byte.MAX_VALUE)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Float.valueOf(Short.MAX_VALUE)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Float.valueOf(Character.MAX_VALUE)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Float.valueOf(Integer.MAX_VALUE)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Float.valueOf(Long.MAX_VALUE)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Float.valueOf(TypeUtil.MAX_SAFE_INT)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Float.valueOf(TypeUtil.MAX_SAFE_INT + 1)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Float.valueOf(TypeUtil.MAX_SAFE_LONG)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Float.valueOf(TypeUtil.MAX_SAFE_LONG + 1)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Float.valueOf(Float.POSITIVE_INFINITY)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Float.valueOf(Float.NaN)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Double.valueOf(Double.NEGATIVE_INFINITY)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Double.valueOf(TypeUtil.MIN_SAFE_LONG - 1)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Double.valueOf(TypeUtil.MIN_SAFE_LONG)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Double.valueOf(TypeUtil.MIN_SAFE_INT - 1)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Double.valueOf(TypeUtil.MIN_SAFE_INT)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Double.valueOf(Long.MIN_VALUE)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Double.valueOf(Integer.MIN_VALUE)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Double.valueOf(Short.MIN_VALUE)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Double.valueOf(Byte.MIN_VALUE)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Double.valueOf(-2)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Double.valueOf(-1)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Double.valueOf(0.0)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Double.valueOf(-0.0)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Double.valueOf(1)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Double.valueOf(2)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Double.valueOf(Byte.MAX_VALUE)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Double.valueOf(Short.MAX_VALUE)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Double.valueOf(Character.MAX_VALUE)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Double.valueOf(Integer.MAX_VALUE)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Double.valueOf(Long.MAX_VALUE)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Double.valueOf(TypeUtil.MAX_SAFE_INT)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Double.valueOf(TypeUtil.MAX_SAFE_INT + 1)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Double.valueOf(TypeUtil.MAX_SAFE_LONG)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Double.valueOf(TypeUtil.MAX_SAFE_LONG + 1)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Double.valueOf(Double.POSITIVE_INFINITY)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Double.valueOf(Double.NaN)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)true));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)false));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Byte.MIN_VALUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(byte)-2));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(byte)-1));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(byte)0));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(byte)1));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(byte)2));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Byte.MAX_VALUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(char)0));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(char)1));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(char)2));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(char)Byte.MAX_VALUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(char)Short.MAX_VALUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Character.MAX_VALUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Short.MIN_VALUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(short)Byte.MIN_VALUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(short)-2));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(short)-1));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(short)0));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(short)1));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(short)2));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(short)Byte.MAX_VALUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Short.MAX_VALUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Integer.MIN_VALUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(int)Short.MIN_VALUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(int)Byte.MIN_VALUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Integer.valueOf(-2)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Integer.valueOf(-1)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(int)0));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(int)1));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(int)2));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(int)Byte.MAX_VALUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(int)Short.MAX_VALUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(int)Character.MAX_VALUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Integer.MAX_VALUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Long.MIN_VALUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(long)Integer.MIN_VALUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(long)Short.MIN_VALUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(long)Byte.MIN_VALUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(long)-2));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(long)-1));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(long)0));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(long)1));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(long)2));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(long)Byte.MAX_VALUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(long)Short.MAX_VALUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(long)Character.MAX_VALUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(long)Integer.MAX_VALUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Long.MAX_VALUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Float.NEGATIVE_INFINITY));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(float)(TypeUtil.MIN_SAFE_LONG - 1)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(float)TypeUtil.MIN_SAFE_LONG));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(float)(TypeUtil.MIN_SAFE_INT - 1)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(float)TypeUtil.MIN_SAFE_INT));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(float)Long.MIN_VALUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(float)Integer.MIN_VALUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(float)Short.MIN_VALUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(float)Byte.MIN_VALUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(float)-2));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(float)-1));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(float)0.0));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(float)-0.0));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(float)1));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(float)2));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(float)Byte.MAX_VALUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(float)Short.MAX_VALUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(float)Character.MAX_VALUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(float)Integer.MAX_VALUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(float)Long.MAX_VALUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(float)TypeUtil.MAX_SAFE_INT));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(float)(TypeUtil.MAX_SAFE_INT + 1)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(float)TypeUtil.MAX_SAFE_LONG));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(float)(TypeUtil.MAX_SAFE_LONG + 1)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Float.POSITIVE_INFINITY));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Float.NaN));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Double.NEGATIVE_INFINITY));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(double)(TypeUtil.MIN_SAFE_LONG - 1)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(double)TypeUtil.MIN_SAFE_LONG));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(double)(TypeUtil.MIN_SAFE_INT - 1)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(double)TypeUtil.MIN_SAFE_INT));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(double)Long.MIN_VALUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(double)Integer.MIN_VALUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(double)Short.MIN_VALUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(double)Byte.MIN_VALUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(double)-2));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(double)-1));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(double)0.0));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Double.valueOf(-0.0)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(double)1));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(double)2));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(double)Byte.MAX_VALUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(double)Short.MAX_VALUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(double)Character.MAX_VALUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(double)Integer.MAX_VALUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(double)Long.MAX_VALUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(double)TypeUtil.MAX_SAFE_INT));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(double)(TypeUtil.MAX_SAFE_INT + 1)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(double)TypeUtil.MAX_SAFE_LONG));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(double)(TypeUtil.MAX_SAFE_LONG + 1)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Double.POSITIVE_INFINITY));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Double.NaN));
+#ELSE
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)null));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Boolean.TRUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Boolean.FALSE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Byte.valueOf(Byte.MIN_VALUE)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Byte.valueOf((byte)-2)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Byte.valueOf((byte)-1)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Byte.valueOf((byte)0)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Byte.valueOf((byte)1)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Byte.valueOf((byte)2)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Byte.valueOf(Byte.MAX_VALUE)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Character.valueOf((char)0)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Character.valueOf((char)1)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Character.valueOf((char)2)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Character.valueOf((char)Byte.MAX_VALUE)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Character.valueOf((char)Short.MAX_VALUE)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Character.valueOf(Character.MAX_VALUE)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Short.valueOf(Short.MIN_VALUE)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Short.valueOf(Byte.MIN_VALUE)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Short.valueOf((short)-2)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Short.valueOf((short)-1)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Short.valueOf((short)0)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Short.valueOf((short)1)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Short.valueOf((short)2)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Short.valueOf(Byte.MAX_VALUE)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Short.valueOf(Short.MAX_VALUE)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Integer.valueOf(Integer.MIN_VALUE)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Integer.valueOf(Short.MIN_VALUE)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Integer.valueOf(Byte.MIN_VALUE)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Integer.valueOf(-2)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Integer.valueOf(-1)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Integer.valueOf(0)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Integer.valueOf(1)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Integer.valueOf(2)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Integer.valueOf(Byte.MAX_VALUE)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Integer.valueOf(Short.MAX_VALUE)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Integer.valueOf(Character.MAX_VALUE)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Integer.valueOf(Integer.MAX_VALUE)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Long.valueOf(Long.MIN_VALUE)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Long.valueOf(Integer.MIN_VALUE)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Long.valueOf(Short.MIN_VALUE)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Long.valueOf(Byte.MIN_VALUE)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Long.valueOf(-2)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Long.valueOf(-1)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Long.valueOf(0)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Long.valueOf(1)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Long.valueOf(2)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Long.valueOf(Byte.MAX_VALUE)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Long.valueOf(Short.MAX_VALUE)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Long.valueOf(Character.MAX_VALUE)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Long.valueOf(Integer.MAX_VALUE)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Long.valueOf(Long.MAX_VALUE)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Float.valueOf(Float.NEGATIVE_INFINITY)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Float.valueOf(TypeUtil.MIN_SAFE_LONG - 1)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Float.valueOf(TypeUtil.MIN_SAFE_LONG)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Float.valueOf(TypeUtil.MIN_SAFE_INT - 1)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Float.valueOf(TypeUtil.MIN_SAFE_INT)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Float.valueOf(Long.MIN_VALUE)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Float.valueOf(Integer.MIN_VALUE)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Float.valueOf(Short.MIN_VALUE)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Float.valueOf(Byte.MIN_VALUE)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Float.valueOf(-2)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Float.valueOf(-1)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Float.valueOf((float)0.0)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Float.valueOf((float)-0.0)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Float.valueOf(1)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Float.valueOf(2)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Float.valueOf(Byte.MAX_VALUE)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Float.valueOf(Short.MAX_VALUE)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Float.valueOf(Character.MAX_VALUE)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Float.valueOf(Integer.MAX_VALUE)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Float.valueOf(Long.MAX_VALUE)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Float.valueOf(TypeUtil.MAX_SAFE_INT)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Float.valueOf(TypeUtil.MAX_SAFE_INT + 1)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Float.valueOf(TypeUtil.MAX_SAFE_LONG)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Float.valueOf(TypeUtil.MAX_SAFE_LONG + 1)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Float.valueOf(Float.POSITIVE_INFINITY)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Float.valueOf(Float.NaN)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Double.valueOf(Double.NEGATIVE_INFINITY)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Double.valueOf(TypeUtil.MIN_SAFE_LONG - 1)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Double.valueOf(TypeUtil.MIN_SAFE_LONG)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Double.valueOf(TypeUtil.MIN_SAFE_INT - 1)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Double.valueOf(TypeUtil.MIN_SAFE_INT)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Double.valueOf(Long.MIN_VALUE)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Double.valueOf(Integer.MIN_VALUE)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Double.valueOf(Short.MIN_VALUE)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Double.valueOf(Byte.MIN_VALUE)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Double.valueOf(-2)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Double.valueOf(-1)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Double.valueOf(0.0)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Double.valueOf(-0.0)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Double.valueOf(1)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Double.valueOf(2)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Double.valueOf(Byte.MAX_VALUE)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Double.valueOf(Short.MAX_VALUE)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Double.valueOf(Character.MAX_VALUE)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Double.valueOf(Integer.MAX_VALUE)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Double.valueOf(Long.MAX_VALUE)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Double.valueOf(TypeUtil.MAX_SAFE_INT)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Double.valueOf(TypeUtil.MAX_SAFE_INT + 1)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Double.valueOf(TypeUtil.MAX_SAFE_LONG)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Double.valueOf(TypeUtil.MAX_SAFE_LONG + 1)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Double.valueOf(Double.POSITIVE_INFINITY)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Double.valueOf(Double.NaN)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)true));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)false));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Byte.MIN_VALUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(byte)-2));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(byte)-1));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(byte)0));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(byte)1));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(byte)2));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Byte.MAX_VALUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(char)0));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(char)1));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(char)2));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(char)Byte.MAX_VALUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(char)Short.MAX_VALUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Character.MAX_VALUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Short.MIN_VALUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(short)Byte.MIN_VALUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(short)-2));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(short)-1));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(short)0));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(short)1));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(short)2));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(short)Byte.MAX_VALUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Short.MAX_VALUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Integer.MIN_VALUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(int)Short.MIN_VALUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(int)Byte.MIN_VALUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Integer.valueOf(-2)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Integer.valueOf(-1)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)0));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)1));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)2));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(int)Byte.MAX_VALUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(int)Short.MAX_VALUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(int)Character.MAX_VALUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Integer.MAX_VALUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Long.MIN_VALUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(long)Integer.MIN_VALUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(long)Short.MIN_VALUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(long)Byte.MIN_VALUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(long)-2));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(long)-1));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(long)0));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(long)1));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(long)2));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(long)Byte.MAX_VALUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(long)Short.MAX_VALUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(long)Character.MAX_VALUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(long)Integer.MAX_VALUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Long.MAX_VALUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Float.NEGATIVE_INFINITY));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(float)(TypeUtil.MIN_SAFE_LONG - 1)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(float)TypeUtil.MIN_SAFE_LONG));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(float)(TypeUtil.MIN_SAFE_INT - 1)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(float)TypeUtil.MIN_SAFE_INT));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(float)Long.MIN_VALUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(float)Integer.MIN_VALUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(float)Short.MIN_VALUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(float)Byte.MIN_VALUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(float)-2));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(float)-1));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(float)0.0));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(float)-0.0));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(float)1));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(float)2));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(float)Byte.MAX_VALUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(float)Short.MAX_VALUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(float)Character.MAX_VALUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(float)Integer.MAX_VALUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(float)Long.MAX_VALUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(float)TypeUtil.MAX_SAFE_INT));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(float)(TypeUtil.MAX_SAFE_INT + 1)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(float)TypeUtil.MAX_SAFE_LONG));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(float)(TypeUtil.MAX_SAFE_LONG + 1)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Float.POSITIVE_INFINITY));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Float.NaN));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Double.NEGATIVE_INFINITY));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(double)(TypeUtil.MIN_SAFE_LONG - 1)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(double)TypeUtil.MIN_SAFE_LONG));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(double)(TypeUtil.MIN_SAFE_INT - 1)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(double)TypeUtil.MIN_SAFE_INT));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(double)Long.MIN_VALUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(double)Integer.MIN_VALUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(double)Short.MIN_VALUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(double)Byte.MIN_VALUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(double)-2));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(double)-1));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)0.0));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Double.valueOf(-0.0)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(double)1));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(double)2));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(double)Byte.MAX_VALUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(double)Short.MAX_VALUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(double)Character.MAX_VALUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(double)Integer.MAX_VALUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(double)Long.MAX_VALUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(double)TypeUtil.MAX_SAFE_INT));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(double)(TypeUtil.MAX_SAFE_INT + 1)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(double)TypeUtil.MAX_SAFE_LONG));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(double)(TypeUtil.MAX_SAFE_LONG + 1)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Double.POSITIVE_INFINITY));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)Double.NaN));
+#ENDIF
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Boolean)null));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Byte)null));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Character)null));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Short)null));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Integer)null));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Long)null));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Float)null));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Double)null));
+
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Boolean.TRUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Boolean.FALSE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Byte.valueOf(Byte.MIN_VALUE)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Byte.valueOf((byte)-2)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Byte.valueOf((byte)-1)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Byte.valueOf((byte)0)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Byte.valueOf((byte)1)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Byte.valueOf((byte)2)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Byte.valueOf(Byte.MAX_VALUE)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Character.valueOf((char)0)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Character.valueOf((char)1)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Character.valueOf((char)2)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Character.valueOf((char)Byte.MAX_VALUE)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Character.valueOf((char)Short.MAX_VALUE)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Character.valueOf(Character.MAX_VALUE)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Short.valueOf(Short.MIN_VALUE)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Short.valueOf(Byte.MIN_VALUE)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Short.valueOf((short)-2)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Short.valueOf((short)-1)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Short.valueOf((short)0)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Short.valueOf((short)1)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Short.valueOf((short)2)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Short.valueOf(Byte.MAX_VALUE)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Short.valueOf(Short.MAX_VALUE)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Integer.valueOf(Integer.MIN_VALUE)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Integer.valueOf(Short.MIN_VALUE)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Integer.valueOf(Byte.MIN_VALUE)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Integer.valueOf(-2)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Integer.valueOf(-1)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Integer.valueOf(0)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Integer.valueOf(1)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Integer.valueOf(2)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Integer.valueOf(Byte.MAX_VALUE)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Integer.valueOf(Short.MAX_VALUE)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Integer.valueOf(Character.MAX_VALUE)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Integer.valueOf(Integer.MAX_VALUE)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Long.valueOf(Long.MIN_VALUE)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Long.valueOf(Integer.MIN_VALUE)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Long.valueOf(Short.MIN_VALUE)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Long.valueOf(Byte.MIN_VALUE)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Long.valueOf(-2)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Long.valueOf(-1)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Long.valueOf(0)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Long.valueOf(1)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Long.valueOf(2)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Long.valueOf(Byte.MAX_VALUE)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Long.valueOf(Short.MAX_VALUE)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Long.valueOf(Character.MAX_VALUE)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Long.valueOf(Integer.MAX_VALUE)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Long.valueOf(Long.MAX_VALUE)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Float.valueOf(Float.NEGATIVE_INFINITY)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Float.valueOf(TypeUtil.MIN_SAFE_LONG - 1)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Float.valueOf(TypeUtil.MIN_SAFE_LONG)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Float.valueOf(TypeUtil.MIN_SAFE_INT - 1)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Float.valueOf(TypeUtil.MIN_SAFE_INT)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Float.valueOf(Long.MIN_VALUE)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Float.valueOf(Integer.MIN_VALUE)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Float.valueOf(Short.MIN_VALUE)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Float.valueOf(Byte.MIN_VALUE)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Float.valueOf(-2)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Float.valueOf(-1)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Float.valueOf((float)0.0)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Float.valueOf((float)-0.0)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Float.valueOf(1)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Float.valueOf(2)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Float.valueOf(Byte.MAX_VALUE)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Float.valueOf(Short.MAX_VALUE)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Float.valueOf(Character.MAX_VALUE)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Float.valueOf(Integer.MAX_VALUE)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Float.valueOf(Long.MAX_VALUE)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Float.valueOf(TypeUtil.MAX_SAFE_INT)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Float.valueOf(TypeUtil.MAX_SAFE_INT + 1)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Float.valueOf(TypeUtil.MAX_SAFE_LONG)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Float.valueOf(TypeUtil.MAX_SAFE_LONG + 1)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Float.valueOf(Float.POSITIVE_INFINITY)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Float.valueOf(Float.NaN)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Double.valueOf(Double.NEGATIVE_INFINITY)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Double.valueOf(TypeUtil.MIN_SAFE_LONG - 1)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Double.valueOf(TypeUtil.MIN_SAFE_LONG)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Double.valueOf(TypeUtil.MIN_SAFE_INT - 1)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Double.valueOf(TypeUtil.MIN_SAFE_INT)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Double.valueOf(Long.MIN_VALUE)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Double.valueOf(Integer.MIN_VALUE)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Double.valueOf(Short.MIN_VALUE)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Double.valueOf(Byte.MIN_VALUE)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Double.valueOf(-2)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Double.valueOf(-1)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Double.valueOf(0.0)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Double.valueOf(-0.0)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Double.valueOf(1)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Double.valueOf(2)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Double.valueOf(Byte.MAX_VALUE)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Double.valueOf(Short.MAX_VALUE)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Double.valueOf(Character.MAX_VALUE)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Double.valueOf(Integer.MAX_VALUE)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Double.valueOf(Long.MAX_VALUE)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Double.valueOf(TypeUtil.MAX_SAFE_INT)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Double.valueOf(TypeUtil.MAX_SAFE_INT + 1)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Double.valueOf(TypeUtil.MAX_SAFE_LONG)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Double.valueOf(TypeUtil.MAX_SAFE_LONG + 1)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Double.valueOf(Double.POSITIVE_INFINITY)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Double.valueOf(Double.NaN)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(true));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(false));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Byte.MIN_VALUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((byte)-2));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((byte)-1));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((byte)0));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((byte)1));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((byte)2));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Byte.MAX_VALUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((char)0));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((char)1));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((char)2));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((char)Byte.MAX_VALUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((char)Short.MAX_VALUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Character.MAX_VALUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Short.MIN_VALUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((short)Byte.MIN_VALUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((short)-2));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((short)-1));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((short)0));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((short)1));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((short)2));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((short)Byte.MAX_VALUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Short.MAX_VALUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Integer.MIN_VALUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((int)Short.MIN_VALUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((int)Byte.MIN_VALUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(-2));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(-1));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(0));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(1));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(2));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((int)Byte.MAX_VALUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((int)Short.MAX_VALUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((int)Character.MAX_VALUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Integer.MAX_VALUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Long.MIN_VALUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((long)Integer.MIN_VALUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((long)Short.MIN_VALUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((long)Byte.MIN_VALUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((long)-2));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((long)-1));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((long)0));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((long)1));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((long)2));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((long)Byte.MAX_VALUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((long)Short.MAX_VALUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((long)Character.MAX_VALUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((long)Integer.MAX_VALUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Long.MAX_VALUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Float.NEGATIVE_INFINITY));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((float)(TypeUtil.MIN_SAFE_LONG - 1)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((float)TypeUtil.MIN_SAFE_LONG));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((float)(TypeUtil.MIN_SAFE_INT - 1)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((float)TypeUtil.MIN_SAFE_INT));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((float)Long.MIN_VALUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((float)Integer.MIN_VALUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((float)Short.MIN_VALUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((float)Byte.MIN_VALUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((float)-2));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((float)-1));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((float)0.0));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((float)-0.0));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((float)1));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((float)2));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((float)Byte.MAX_VALUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((float)Short.MAX_VALUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((float)Character.MAX_VALUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((float)Integer.MAX_VALUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((float)Long.MAX_VALUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((float)TypeUtil.MAX_SAFE_INT));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((float)(TypeUtil.MAX_SAFE_INT + 1)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((float)TypeUtil.MAX_SAFE_LONG));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((float)(TypeUtil.MAX_SAFE_LONG + 1)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Float.POSITIVE_INFINITY));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Float.NaN));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Double.NEGATIVE_INFINITY));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((double)(TypeUtil.MIN_SAFE_LONG - 1)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((double)TypeUtil.MIN_SAFE_LONG));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((double)(TypeUtil.MIN_SAFE_INT - 1)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((double)TypeUtil.MIN_SAFE_INT));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((double)Long.MIN_VALUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((double)Integer.MIN_VALUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((double)Short.MIN_VALUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((double)Byte.MIN_VALUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((double)-2));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((double)-1));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(0.0));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(-0.0));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((double)1));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((double)2));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((double)Byte.MAX_VALUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((double)Short.MAX_VALUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((double)Character.MAX_VALUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((double)Integer.MAX_VALUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((double)Long.MAX_VALUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((double)TypeUtil.MAX_SAFE_INT));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((double)(TypeUtil.MAX_SAFE_INT + 1)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((double)TypeUtil.MAX_SAFE_LONG));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((double)(TypeUtil.MAX_SAFE_LONG + 1)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Double.POSITIVE_INFINITY));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Double.NaN));
+}
+#ENDDEF

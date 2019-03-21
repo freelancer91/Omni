@@ -16,353 +16,353 @@ public class FloatArrSeqContainsTest
   public void testEmptyUncheckedListContains()
   {
     var seq=new UncheckedList();
-    QueryTestUtil.testEmptyContains(seq);
+    QueryTestUtil.testEmptycontains(()->seq);
   }
   @Test
   public void testUncheckedListContainsNull()
   {
     var seq=new UncheckedList();
     seq.add(TypeConversionUtil.convertTofloat(0));
-    QueryTestUtil.testContainsNullReturnFalse(seq);
+    QueryTestUtil.testcontainsNullReturnNegative(()->seq);
   }
   @Test
   public void testUncheckedListContainsBoolean()
   {
     var seq=new UncheckedList();
     seq.add(true);
-    QueryTestUtil.testContainsBoolean(seq,true);
+    QueryTestUtil.testcontainsBoolean(()->seq,true);
     seq.clear();
     seq.add(false);
-    QueryTestUtil.testContainsBoolean(seq,false);
+    QueryTestUtil.testcontainsBoolean(()->seq,false);
   }
   @Test
   public void testUncheckedListContainsByte()
   {
     var seq=new UncheckedList();
     seq.add((float)-0.0);
-    QueryTestUtil.testContainsByte(seq,(float)-0.0);
+    QueryTestUtil.testcontainsByte(()->seq,(float)-0.0);
     seq.clear();
     seq.add((float)0.0);
-    QueryTestUtil.testContainsByte(seq,(float)0.0);
+    QueryTestUtil.testcontainsByte(()->seq,(float)0.0);
     seq.clear();
     seq.add((float)1.0);
-    QueryTestUtil.testContainsByte(seq,(float)1.0);
+    QueryTestUtil.testcontainsByte(()->seq,(float)1.0);
   }
   @Test
   public void testUncheckedListContainsChar()
   {
     var seq=new UncheckedList();
     seq.add((float)-0.0);
-    QueryTestUtil.testContainsChar(seq,(float)-0.0);
+    QueryTestUtil.testcontainsChar(()->seq,(float)-0.0);
     seq.clear();
     seq.add((float)0.0);
-    QueryTestUtil.testContainsChar(seq,(float)0.0);
+    QueryTestUtil.testcontainsChar(()->seq,(float)0.0);
     seq.clear();
     seq.add((float)1.0);
-    QueryTestUtil.testContainsChar(seq,(float)1.0);
+    QueryTestUtil.testcontainsChar(()->seq,(float)1.0);
   }
   @Test
   public void testUncheckedListContainsShort()
   {
     var seq=new UncheckedList();
     seq.add((float)-0.0);
-    QueryTestUtil.testContainsShort(seq,(float)-0.0);
+    QueryTestUtil.testcontainsShort(()->seq,(float)-0.0);
     seq.clear();
     seq.add((float)0.0);
-    QueryTestUtil.testContainsShort(seq,(float)0.0);
+    QueryTestUtil.testcontainsShort(()->seq,(float)0.0);
     seq.clear();
     seq.add((float)1.0);
-    QueryTestUtil.testContainsShort(seq,(float)1.0);
+    QueryTestUtil.testcontainsShort(()->seq,(float)1.0);
   }
   @Test
   public void testUncheckedListContainsInt()
   {
     var seq=new UncheckedList();
     seq.add((float)-0.0);
-    QueryTestUtil.testContainsInt(seq,(float)-0.0);
+    QueryTestUtil.testcontainsInt(()->seq,(float)-0.0);
     seq.clear();
     seq.add((float)0.0);
-    QueryTestUtil.testContainsInt(seq,(float)0.0);
+    QueryTestUtil.testcontainsInt(()->seq,(float)0.0);
     seq.clear();
     seq.add((float)1.0);
-    QueryTestUtil.testContainsInt(seq,(float)1.0);
+    QueryTestUtil.testcontainsInt(()->seq,(float)1.0);
   }
   @Test
   public void testUncheckedListContainsLong()
   {
     var seq=new UncheckedList();
     seq.add((float)-0.0);
-    QueryTestUtil.testContainsLong(seq,(float)-0.0);
+    QueryTestUtil.testcontainsLong(()->seq,(float)-0.0);
     seq.clear();
     seq.add((float)0.0);
-    QueryTestUtil.testContainsLong(seq,(float)0.0);
+    QueryTestUtil.testcontainsLong(()->seq,(float)0.0);
     seq.clear();
     seq.add((float)1.0);
-    QueryTestUtil.testContainsLong(seq,(float)1.0);
+    QueryTestUtil.testcontainsLong(()->seq,(float)1.0);
   }
   @Test
   public void testEmptyUncheckedStackContains()
   {
     var seq=new UncheckedStack();
-    QueryTestUtil.testEmptyContains(seq);
+    QueryTestUtil.testEmptycontains(()->seq);
   }
   @Test
   public void testUncheckedStackContainsNull()
   {
     var seq=new UncheckedStack();
     seq.add(TypeConversionUtil.convertTofloat(0));
-    QueryTestUtil.testContainsNullReturnFalse(seq);
+    QueryTestUtil.testcontainsNullReturnNegative(()->seq);
   }
   @Test
   public void testUncheckedStackContainsBoolean()
   {
     var seq=new UncheckedStack();
     seq.add(true);
-    QueryTestUtil.testContainsBoolean(seq,true);
+    QueryTestUtil.testcontainsBoolean(()->seq,true);
     seq.clear();
     seq.add(false);
-    QueryTestUtil.testContainsBoolean(seq,false);
+    QueryTestUtil.testcontainsBoolean(()->seq,false);
   }
   @Test
   public void testUncheckedStackContainsByte()
   {
     var seq=new UncheckedStack();
     seq.add((float)-0.0);
-    QueryTestUtil.testContainsByte(seq,(float)-0.0);
+    QueryTestUtil.testcontainsByte(()->seq,(float)-0.0);
     seq.clear();
     seq.add((float)0.0);
-    QueryTestUtil.testContainsByte(seq,(float)0.0);
+    QueryTestUtil.testcontainsByte(()->seq,(float)0.0);
     seq.clear();
     seq.add((float)1.0);
-    QueryTestUtil.testContainsByte(seq,(float)1.0);
+    QueryTestUtil.testcontainsByte(()->seq,(float)1.0);
   }
   @Test
   public void testUncheckedStackContainsChar()
   {
     var seq=new UncheckedStack();
     seq.add((float)-0.0);
-    QueryTestUtil.testContainsChar(seq,(float)-0.0);
+    QueryTestUtil.testcontainsChar(()->seq,(float)-0.0);
     seq.clear();
     seq.add((float)0.0);
-    QueryTestUtil.testContainsChar(seq,(float)0.0);
+    QueryTestUtil.testcontainsChar(()->seq,(float)0.0);
     seq.clear();
     seq.add((float)1.0);
-    QueryTestUtil.testContainsChar(seq,(float)1.0);
+    QueryTestUtil.testcontainsChar(()->seq,(float)1.0);
   }
   @Test
   public void testUncheckedStackContainsShort()
   {
     var seq=new UncheckedStack();
     seq.add((float)-0.0);
-    QueryTestUtil.testContainsShort(seq,(float)-0.0);
+    QueryTestUtil.testcontainsShort(()->seq,(float)-0.0);
     seq.clear();
     seq.add((float)0.0);
-    QueryTestUtil.testContainsShort(seq,(float)0.0);
+    QueryTestUtil.testcontainsShort(()->seq,(float)0.0);
     seq.clear();
     seq.add((float)1.0);
-    QueryTestUtil.testContainsShort(seq,(float)1.0);
+    QueryTestUtil.testcontainsShort(()->seq,(float)1.0);
   }
   @Test
   public void testUncheckedStackContainsInt()
   {
     var seq=new UncheckedStack();
     seq.add((float)-0.0);
-    QueryTestUtil.testContainsInt(seq,(float)-0.0);
+    QueryTestUtil.testcontainsInt(()->seq,(float)-0.0);
     seq.clear();
     seq.add((float)0.0);
-    QueryTestUtil.testContainsInt(seq,(float)0.0);
+    QueryTestUtil.testcontainsInt(()->seq,(float)0.0);
     seq.clear();
     seq.add((float)1.0);
-    QueryTestUtil.testContainsInt(seq,(float)1.0);
+    QueryTestUtil.testcontainsInt(()->seq,(float)1.0);
   }
   @Test
   public void testUncheckedStackContainsLong()
   {
     var seq=new UncheckedStack();
     seq.add((float)-0.0);
-    QueryTestUtil.testContainsLong(seq,(float)-0.0);
+    QueryTestUtil.testcontainsLong(()->seq,(float)-0.0);
     seq.clear();
     seq.add((float)0.0);
-    QueryTestUtil.testContainsLong(seq,(float)0.0);
+    QueryTestUtil.testcontainsLong(()->seq,(float)0.0);
     seq.clear();
     seq.add((float)1.0);
-    QueryTestUtil.testContainsLong(seq,(float)1.0);
+    QueryTestUtil.testcontainsLong(()->seq,(float)1.0);
   }
   @Test
   public void testEmptyCheckedListContains()
   {
     var seq=new CheckedList();
-    QueryTestUtil.testEmptyContains(seq);
+    QueryTestUtil.testEmptycontains(()->seq);
   }
   @Test
   public void testCheckedListContainsNull()
   {
     var seq=new CheckedList();
     seq.add(TypeConversionUtil.convertTofloat(0));
-    QueryTestUtil.testContainsNullReturnFalse(seq);
+    QueryTestUtil.testcontainsNullReturnNegative(()->seq);
   }
   @Test
   public void testCheckedListContainsBoolean()
   {
     var seq=new CheckedList();
     seq.add(true);
-    QueryTestUtil.testContainsBoolean(seq,true);
+    QueryTestUtil.testcontainsBoolean(()->seq,true);
     seq.clear();
     seq.add(false);
-    QueryTestUtil.testContainsBoolean(seq,false);
+    QueryTestUtil.testcontainsBoolean(()->seq,false);
   }
   @Test
   public void testCheckedListContainsByte()
   {
     var seq=new CheckedList();
     seq.add((float)-0.0);
-    QueryTestUtil.testContainsByte(seq,(float)-0.0);
+    QueryTestUtil.testcontainsByte(()->seq,(float)-0.0);
     seq.clear();
     seq.add((float)0.0);
-    QueryTestUtil.testContainsByte(seq,(float)0.0);
+    QueryTestUtil.testcontainsByte(()->seq,(float)0.0);
     seq.clear();
     seq.add((float)1.0);
-    QueryTestUtil.testContainsByte(seq,(float)1.0);
+    QueryTestUtil.testcontainsByte(()->seq,(float)1.0);
   }
   @Test
   public void testCheckedListContainsChar()
   {
     var seq=new CheckedList();
     seq.add((float)-0.0);
-    QueryTestUtil.testContainsChar(seq,(float)-0.0);
+    QueryTestUtil.testcontainsChar(()->seq,(float)-0.0);
     seq.clear();
     seq.add((float)0.0);
-    QueryTestUtil.testContainsChar(seq,(float)0.0);
+    QueryTestUtil.testcontainsChar(()->seq,(float)0.0);
     seq.clear();
     seq.add((float)1.0);
-    QueryTestUtil.testContainsChar(seq,(float)1.0);
+    QueryTestUtil.testcontainsChar(()->seq,(float)1.0);
   }
   @Test
   public void testCheckedListContainsShort()
   {
     var seq=new CheckedList();
     seq.add((float)-0.0);
-    QueryTestUtil.testContainsShort(seq,(float)-0.0);
+    QueryTestUtil.testcontainsShort(()->seq,(float)-0.0);
     seq.clear();
     seq.add((float)0.0);
-    QueryTestUtil.testContainsShort(seq,(float)0.0);
+    QueryTestUtil.testcontainsShort(()->seq,(float)0.0);
     seq.clear();
     seq.add((float)1.0);
-    QueryTestUtil.testContainsShort(seq,(float)1.0);
+    QueryTestUtil.testcontainsShort(()->seq,(float)1.0);
   }
   @Test
   public void testCheckedListContainsInt()
   {
     var seq=new CheckedList();
     seq.add((float)-0.0);
-    QueryTestUtil.testContainsInt(seq,(float)-0.0);
+    QueryTestUtil.testcontainsInt(()->seq,(float)-0.0);
     seq.clear();
     seq.add((float)0.0);
-    QueryTestUtil.testContainsInt(seq,(float)0.0);
+    QueryTestUtil.testcontainsInt(()->seq,(float)0.0);
     seq.clear();
     seq.add((float)1.0);
-    QueryTestUtil.testContainsInt(seq,(float)1.0);
+    QueryTestUtil.testcontainsInt(()->seq,(float)1.0);
   }
   @Test
   public void testCheckedListContainsLong()
   {
     var seq=new CheckedList();
     seq.add((float)-0.0);
-    QueryTestUtil.testContainsLong(seq,(float)-0.0);
+    QueryTestUtil.testcontainsLong(()->seq,(float)-0.0);
     seq.clear();
     seq.add((float)0.0);
-    QueryTestUtil.testContainsLong(seq,(float)0.0);
+    QueryTestUtil.testcontainsLong(()->seq,(float)0.0);
     seq.clear();
     seq.add((float)1.0);
-    QueryTestUtil.testContainsLong(seq,(float)1.0);
+    QueryTestUtil.testcontainsLong(()->seq,(float)1.0);
   }
   @Test
   public void testEmptyCheckedStackContains()
   {
     var seq=new CheckedStack();
-    QueryTestUtil.testEmptyContains(seq);
+    QueryTestUtil.testEmptycontains(()->seq);
   }
   @Test
   public void testCheckedStackContainsNull()
   {
     var seq=new CheckedStack();
     seq.add(TypeConversionUtil.convertTofloat(0));
-    QueryTestUtil.testContainsNullReturnFalse(seq);
+    QueryTestUtil.testcontainsNullReturnNegative(()->seq);
   }
   @Test
   public void testCheckedStackContainsBoolean()
   {
     var seq=new CheckedStack();
     seq.add(true);
-    QueryTestUtil.testContainsBoolean(seq,true);
+    QueryTestUtil.testcontainsBoolean(()->seq,true);
     seq.clear();
     seq.add(false);
-    QueryTestUtil.testContainsBoolean(seq,false);
+    QueryTestUtil.testcontainsBoolean(()->seq,false);
   }
   @Test
   public void testCheckedStackContainsByte()
   {
     var seq=new CheckedStack();
     seq.add((float)-0.0);
-    QueryTestUtil.testContainsByte(seq,(float)-0.0);
+    QueryTestUtil.testcontainsByte(()->seq,(float)-0.0);
     seq.clear();
     seq.add((float)0.0);
-    QueryTestUtil.testContainsByte(seq,(float)0.0);
+    QueryTestUtil.testcontainsByte(()->seq,(float)0.0);
     seq.clear();
     seq.add((float)1.0);
-    QueryTestUtil.testContainsByte(seq,(float)1.0);
+    QueryTestUtil.testcontainsByte(()->seq,(float)1.0);
   }
   @Test
   public void testCheckedStackContainsChar()
   {
     var seq=new CheckedStack();
     seq.add((float)-0.0);
-    QueryTestUtil.testContainsChar(seq,(float)-0.0);
+    QueryTestUtil.testcontainsChar(()->seq,(float)-0.0);
     seq.clear();
     seq.add((float)0.0);
-    QueryTestUtil.testContainsChar(seq,(float)0.0);
+    QueryTestUtil.testcontainsChar(()->seq,(float)0.0);
     seq.clear();
     seq.add((float)1.0);
-    QueryTestUtil.testContainsChar(seq,(float)1.0);
+    QueryTestUtil.testcontainsChar(()->seq,(float)1.0);
   }
   @Test
   public void testCheckedStackContainsShort()
   {
     var seq=new CheckedStack();
     seq.add((float)-0.0);
-    QueryTestUtil.testContainsShort(seq,(float)-0.0);
+    QueryTestUtil.testcontainsShort(()->seq,(float)-0.0);
     seq.clear();
     seq.add((float)0.0);
-    QueryTestUtil.testContainsShort(seq,(float)0.0);
+    QueryTestUtil.testcontainsShort(()->seq,(float)0.0);
     seq.clear();
     seq.add((float)1.0);
-    QueryTestUtil.testContainsShort(seq,(float)1.0);
+    QueryTestUtil.testcontainsShort(()->seq,(float)1.0);
   }
   @Test
   public void testCheckedStackContainsInt()
   {
     var seq=new CheckedStack();
     seq.add((float)-0.0);
-    QueryTestUtil.testContainsInt(seq,(float)-0.0);
+    QueryTestUtil.testcontainsInt(()->seq,(float)-0.0);
     seq.clear();
     seq.add((float)0.0);
-    QueryTestUtil.testContainsInt(seq,(float)0.0);
+    QueryTestUtil.testcontainsInt(()->seq,(float)0.0);
     seq.clear();
     seq.add((float)1.0);
-    QueryTestUtil.testContainsInt(seq,(float)1.0);
+    QueryTestUtil.testcontainsInt(()->seq,(float)1.0);
   }
   @Test
   public void testCheckedStackContainsLong()
   {
     var seq=new CheckedStack();
     seq.add((float)-0.0);
-    QueryTestUtil.testContainsLong(seq,(float)-0.0);
+    QueryTestUtil.testcontainsLong(()->seq,(float)-0.0);
     seq.clear();
     seq.add((float)0.0);
-    QueryTestUtil.testContainsLong(seq,(float)0.0);
+    QueryTestUtil.testcontainsLong(()->seq,(float)0.0);
     seq.clear();
     seq.add((float)1.0);
-    QueryTestUtil.testContainsLong(seq,(float)1.0);
+    QueryTestUtil.testcontainsLong(()->seq,(float)1.0);
   }
   @Test
   public void testEmptyCheckedSubListContains()
@@ -370,7 +370,7 @@ public class FloatArrSeqContainsTest
     var root=new CheckedList();
     var subList=root.subList(0,0);
     var seq=subList.subList(0,0);
-    QueryTestUtil.testEmptyContains(seq);
+    QueryTestUtil.testEmptycontains(()->seq);
   }
   @Test
   public void testCheckedSubListContainsNull()
@@ -379,7 +379,7 @@ public class FloatArrSeqContainsTest
     var subList=root.subList(0,0);
     var seq=subList.subList(0,0);
     seq.add(TypeConversionUtil.convertTofloat(0));
-    QueryTestUtil.testContainsNullReturnFalse(seq);
+    QueryTestUtil.testcontainsNullReturnNegative(()->seq);
   }
   @Test
   public void testCheckedSubListContainsBoolean()
@@ -388,10 +388,10 @@ public class FloatArrSeqContainsTest
     var subList=root.subList(0,0);
     var seq=subList.subList(0,0);
     seq.add(true);
-    QueryTestUtil.testContainsBoolean(seq,true);
+    QueryTestUtil.testcontainsBoolean(()->seq,true);
     seq.clear();
     seq.add(false);
-    QueryTestUtil.testContainsBoolean(seq,false);
+    QueryTestUtil.testcontainsBoolean(()->seq,false);
   }
   @Test
   public void testCheckedSubListContainsByte()
@@ -400,13 +400,13 @@ public class FloatArrSeqContainsTest
     var subList=root.subList(0,0);
     var seq=subList.subList(0,0);
     seq.add((float)-0.0);
-    QueryTestUtil.testContainsByte(seq,(float)-0.0);
+    QueryTestUtil.testcontainsByte(()->seq,(float)-0.0);
     seq.clear();
     seq.add((float)0.0);
-    QueryTestUtil.testContainsByte(seq,(float)0.0);
+    QueryTestUtil.testcontainsByte(()->seq,(float)0.0);
     seq.clear();
     seq.add((float)1.0);
-    QueryTestUtil.testContainsByte(seq,(float)1.0);
+    QueryTestUtil.testcontainsByte(()->seq,(float)1.0);
   }
   @Test
   public void testCheckedSubListContainsChar()
@@ -415,13 +415,13 @@ public class FloatArrSeqContainsTest
     var subList=root.subList(0,0);
     var seq=subList.subList(0,0);
     seq.add((float)-0.0);
-    QueryTestUtil.testContainsChar(seq,(float)-0.0);
+    QueryTestUtil.testcontainsChar(()->seq,(float)-0.0);
     seq.clear();
     seq.add((float)0.0);
-    QueryTestUtil.testContainsChar(seq,(float)0.0);
+    QueryTestUtil.testcontainsChar(()->seq,(float)0.0);
     seq.clear();
     seq.add((float)1.0);
-    QueryTestUtil.testContainsChar(seq,(float)1.0);
+    QueryTestUtil.testcontainsChar(()->seq,(float)1.0);
   }
   @Test
   public void testCheckedSubListContainsShort()
@@ -430,13 +430,13 @@ public class FloatArrSeqContainsTest
     var subList=root.subList(0,0);
     var seq=subList.subList(0,0);
     seq.add((float)-0.0);
-    QueryTestUtil.testContainsShort(seq,(float)-0.0);
+    QueryTestUtil.testcontainsShort(()->seq,(float)-0.0);
     seq.clear();
     seq.add((float)0.0);
-    QueryTestUtil.testContainsShort(seq,(float)0.0);
+    QueryTestUtil.testcontainsShort(()->seq,(float)0.0);
     seq.clear();
     seq.add((float)1.0);
-    QueryTestUtil.testContainsShort(seq,(float)1.0);
+    QueryTestUtil.testcontainsShort(()->seq,(float)1.0);
   }
   @Test
   public void testCheckedSubListContainsInt()
@@ -445,13 +445,13 @@ public class FloatArrSeqContainsTest
     var subList=root.subList(0,0);
     var seq=subList.subList(0,0);
     seq.add((float)-0.0);
-    QueryTestUtil.testContainsInt(seq,(float)-0.0);
+    QueryTestUtil.testcontainsInt(()->seq,(float)-0.0);
     seq.clear();
     seq.add((float)0.0);
-    QueryTestUtil.testContainsInt(seq,(float)0.0);
+    QueryTestUtil.testcontainsInt(()->seq,(float)0.0);
     seq.clear();
     seq.add((float)1.0);
-    QueryTestUtil.testContainsInt(seq,(float)1.0);
+    QueryTestUtil.testcontainsInt(()->seq,(float)1.0);
   }
   @Test
   public void testCheckedSubListContainsLong()
@@ -460,13 +460,13 @@ public class FloatArrSeqContainsTest
     var subList=root.subList(0,0);
     var seq=subList.subList(0,0);
     seq.add((float)-0.0);
-    QueryTestUtil.testContainsLong(seq,(float)-0.0);
+    QueryTestUtil.testcontainsLong(()->seq,(float)-0.0);
     seq.clear();
     seq.add((float)0.0);
-    QueryTestUtil.testContainsLong(seq,(float)0.0);
+    QueryTestUtil.testcontainsLong(()->seq,(float)0.0);
     seq.clear();
     seq.add((float)1.0);
-    QueryTestUtil.testContainsLong(seq,(float)1.0);
+    QueryTestUtil.testcontainsLong(()->seq,(float)1.0);
   }
   @Test
   public void testEmptyUncheckedSubListContains()
@@ -474,7 +474,7 @@ public class FloatArrSeqContainsTest
     var root=new UncheckedList();
     var subList=root.subList(0,0);
     var seq=subList.subList(0,0);
-    QueryTestUtil.testEmptyContains(seq);
+    QueryTestUtil.testEmptycontains(()->seq);
   }
   @Test
   public void testUncheckedSubListContainsNull()
@@ -483,7 +483,7 @@ public class FloatArrSeqContainsTest
     var subList=root.subList(0,0);
     var seq=subList.subList(0,0);
     seq.add(TypeConversionUtil.convertTofloat(0));
-    QueryTestUtil.testContainsNullReturnFalse(seq);
+    QueryTestUtil.testcontainsNullReturnNegative(()->seq);
   }
   @Test
   public void testUncheckedSubListContainsBoolean()
@@ -492,10 +492,10 @@ public class FloatArrSeqContainsTest
     var subList=root.subList(0,0);
     var seq=subList.subList(0,0);
     seq.add(true);
-    QueryTestUtil.testContainsBoolean(seq,true);
+    QueryTestUtil.testcontainsBoolean(()->seq,true);
     seq.clear();
     seq.add(false);
-    QueryTestUtil.testContainsBoolean(seq,false);
+    QueryTestUtil.testcontainsBoolean(()->seq,false);
   }
   @Test
   public void testUncheckedSubListContainsByte()
@@ -504,13 +504,13 @@ public class FloatArrSeqContainsTest
     var subList=root.subList(0,0);
     var seq=subList.subList(0,0);
     seq.add((float)-0.0);
-    QueryTestUtil.testContainsByte(seq,(float)-0.0);
+    QueryTestUtil.testcontainsByte(()->seq,(float)-0.0);
     seq.clear();
     seq.add((float)0.0);
-    QueryTestUtil.testContainsByte(seq,(float)0.0);
+    QueryTestUtil.testcontainsByte(()->seq,(float)0.0);
     seq.clear();
     seq.add((float)1.0);
-    QueryTestUtil.testContainsByte(seq,(float)1.0);
+    QueryTestUtil.testcontainsByte(()->seq,(float)1.0);
   }
   @Test
   public void testUncheckedSubListContainsChar()
@@ -519,13 +519,13 @@ public class FloatArrSeqContainsTest
     var subList=root.subList(0,0);
     var seq=subList.subList(0,0);
     seq.add((float)-0.0);
-    QueryTestUtil.testContainsChar(seq,(float)-0.0);
+    QueryTestUtil.testcontainsChar(()->seq,(float)-0.0);
     seq.clear();
     seq.add((float)0.0);
-    QueryTestUtil.testContainsChar(seq,(float)0.0);
+    QueryTestUtil.testcontainsChar(()->seq,(float)0.0);
     seq.clear();
     seq.add((float)1.0);
-    QueryTestUtil.testContainsChar(seq,(float)1.0);
+    QueryTestUtil.testcontainsChar(()->seq,(float)1.0);
   }
   @Test
   public void testUncheckedSubListContainsShort()
@@ -534,13 +534,13 @@ public class FloatArrSeqContainsTest
     var subList=root.subList(0,0);
     var seq=subList.subList(0,0);
     seq.add((float)-0.0);
-    QueryTestUtil.testContainsShort(seq,(float)-0.0);
+    QueryTestUtil.testcontainsShort(()->seq,(float)-0.0);
     seq.clear();
     seq.add((float)0.0);
-    QueryTestUtil.testContainsShort(seq,(float)0.0);
+    QueryTestUtil.testcontainsShort(()->seq,(float)0.0);
     seq.clear();
     seq.add((float)1.0);
-    QueryTestUtil.testContainsShort(seq,(float)1.0);
+    QueryTestUtil.testcontainsShort(()->seq,(float)1.0);
   }
   @Test
   public void testUncheckedSubListContainsInt()
@@ -549,13 +549,13 @@ public class FloatArrSeqContainsTest
     var subList=root.subList(0,0);
     var seq=subList.subList(0,0);
     seq.add((float)-0.0);
-    QueryTestUtil.testContainsInt(seq,(float)-0.0);
+    QueryTestUtil.testcontainsInt(()->seq,(float)-0.0);
     seq.clear();
     seq.add((float)0.0);
-    QueryTestUtil.testContainsInt(seq,(float)0.0);
+    QueryTestUtil.testcontainsInt(()->seq,(float)0.0);
     seq.clear();
     seq.add((float)1.0);
-    QueryTestUtil.testContainsInt(seq,(float)1.0);
+    QueryTestUtil.testcontainsInt(()->seq,(float)1.0);
   }
   @Test
   public void testUncheckedSubListContainsLong()
@@ -564,12 +564,12 @@ public class FloatArrSeqContainsTest
     var subList=root.subList(0,0);
     var seq=subList.subList(0,0);
     seq.add((float)-0.0);
-    QueryTestUtil.testContainsLong(seq,(float)-0.0);
+    QueryTestUtil.testcontainsLong(()->seq,(float)-0.0);
     seq.clear();
     seq.add((float)0.0);
-    QueryTestUtil.testContainsLong(seq,(float)0.0);
+    QueryTestUtil.testcontainsLong(()->seq,(float)0.0);
     seq.clear();
     seq.add((float)1.0);
-    QueryTestUtil.testContainsLong(seq,(float)1.0);
+    QueryTestUtil.testcontainsLong(()->seq,(float)1.0);
   }
 }

@@ -16,293 +16,293 @@ public class BooleanArrSeqContainsTest
   public void testEmptyUncheckedListContains()
   {
     var seq=new UncheckedList();
-    QueryTestUtil.testEmptyContains(seq);
+    QueryTestUtil.testEmptycontains(()->seq);
   }
   @Test
   public void testUncheckedListContainsNull()
   {
     var seq=new UncheckedList();
     seq.add(TypeConversionUtil.convertToboolean(0));
-    QueryTestUtil.testContainsNullReturnFalse(seq);
+    QueryTestUtil.testcontainsNullReturnNegative(()->seq);
   }
   @Test
   public void testUncheckedListContainsBoolean()
   {
     var seq=new UncheckedList();
     seq.add(true);
-    QueryTestUtil.testContainsBoolean(seq,true);
+    QueryTestUtil.testcontainsBoolean(()->seq,true);
     seq.clear();
     seq.add(false);
-    QueryTestUtil.testContainsBoolean(seq,false);
+    QueryTestUtil.testcontainsBoolean(()->seq,false);
   }
   @Test
   public void testUncheckedListContainsByte()
   {
     var seq=new UncheckedList();
     seq.add(false);
-    QueryTestUtil.testContainsByte(seq,false);
+    QueryTestUtil.testcontainsByte(()->seq,false);
     seq.clear();
     seq.add(true);
-    QueryTestUtil.testContainsByte(seq,true);
+    QueryTestUtil.testcontainsByte(()->seq,true);
   }
   @Test
   public void testUncheckedListContainsChar()
   {
     var seq=new UncheckedList();
     seq.add(false);
-    QueryTestUtil.testContainsChar(seq,false);
+    QueryTestUtil.testcontainsChar(()->seq,false);
     seq.clear();
     seq.add(true);
-    QueryTestUtil.testContainsChar(seq,true);
+    QueryTestUtil.testcontainsChar(()->seq,true);
   }
   @Test
   public void testUncheckedListContainsShort()
   {
     var seq=new UncheckedList();
     seq.add(false);
-    QueryTestUtil.testContainsShort(seq,false);
+    QueryTestUtil.testcontainsShort(()->seq,false);
     seq.clear();
     seq.add(true);
-    QueryTestUtil.testContainsShort(seq,true);
+    QueryTestUtil.testcontainsShort(()->seq,true);
   }
   @Test
   public void testUncheckedListContainsInt()
   {
     var seq=new UncheckedList();
     seq.add(false);
-    QueryTestUtil.testContainsInt(seq,false);
+    QueryTestUtil.testcontainsInt(()->seq,false);
     seq.clear();
     seq.add(true);
-    QueryTestUtil.testContainsInt(seq,true);
+    QueryTestUtil.testcontainsInt(()->seq,true);
   }
   @Test
   public void testUncheckedListContainsLong()
   {
     var seq=new UncheckedList();
     seq.add(false);
-    QueryTestUtil.testContainsLong(seq,false);
+    QueryTestUtil.testcontainsLong(()->seq,false);
     seq.clear();
     seq.add(true);
-    QueryTestUtil.testContainsLong(seq,true);
+    QueryTestUtil.testcontainsLong(()->seq,true);
   }
   @Test
   public void testEmptyUncheckedStackContains()
   {
     var seq=new UncheckedStack();
-    QueryTestUtil.testEmptyContains(seq);
+    QueryTestUtil.testEmptycontains(()->seq);
   }
   @Test
   public void testUncheckedStackContainsNull()
   {
     var seq=new UncheckedStack();
     seq.add(TypeConversionUtil.convertToboolean(0));
-    QueryTestUtil.testContainsNullReturnFalse(seq);
+    QueryTestUtil.testcontainsNullReturnNegative(()->seq);
   }
   @Test
   public void testUncheckedStackContainsBoolean()
   {
     var seq=new UncheckedStack();
     seq.add(true);
-    QueryTestUtil.testContainsBoolean(seq,true);
+    QueryTestUtil.testcontainsBoolean(()->seq,true);
     seq.clear();
     seq.add(false);
-    QueryTestUtil.testContainsBoolean(seq,false);
+    QueryTestUtil.testcontainsBoolean(()->seq,false);
   }
   @Test
   public void testUncheckedStackContainsByte()
   {
     var seq=new UncheckedStack();
     seq.add(false);
-    QueryTestUtil.testContainsByte(seq,false);
+    QueryTestUtil.testcontainsByte(()->seq,false);
     seq.clear();
     seq.add(true);
-    QueryTestUtil.testContainsByte(seq,true);
+    QueryTestUtil.testcontainsByte(()->seq,true);
   }
   @Test
   public void testUncheckedStackContainsChar()
   {
     var seq=new UncheckedStack();
     seq.add(false);
-    QueryTestUtil.testContainsChar(seq,false);
+    QueryTestUtil.testcontainsChar(()->seq,false);
     seq.clear();
     seq.add(true);
-    QueryTestUtil.testContainsChar(seq,true);
+    QueryTestUtil.testcontainsChar(()->seq,true);
   }
   @Test
   public void testUncheckedStackContainsShort()
   {
     var seq=new UncheckedStack();
     seq.add(false);
-    QueryTestUtil.testContainsShort(seq,false);
+    QueryTestUtil.testcontainsShort(()->seq,false);
     seq.clear();
     seq.add(true);
-    QueryTestUtil.testContainsShort(seq,true);
+    QueryTestUtil.testcontainsShort(()->seq,true);
   }
   @Test
   public void testUncheckedStackContainsInt()
   {
     var seq=new UncheckedStack();
     seq.add(false);
-    QueryTestUtil.testContainsInt(seq,false);
+    QueryTestUtil.testcontainsInt(()->seq,false);
     seq.clear();
     seq.add(true);
-    QueryTestUtil.testContainsInt(seq,true);
+    QueryTestUtil.testcontainsInt(()->seq,true);
   }
   @Test
   public void testUncheckedStackContainsLong()
   {
     var seq=new UncheckedStack();
     seq.add(false);
-    QueryTestUtil.testContainsLong(seq,false);
+    QueryTestUtil.testcontainsLong(()->seq,false);
     seq.clear();
     seq.add(true);
-    QueryTestUtil.testContainsLong(seq,true);
+    QueryTestUtil.testcontainsLong(()->seq,true);
   }
   @Test
   public void testEmptyCheckedListContains()
   {
     var seq=new CheckedList();
-    QueryTestUtil.testEmptyContains(seq);
+    QueryTestUtil.testEmptycontains(()->seq);
   }
   @Test
   public void testCheckedListContainsNull()
   {
     var seq=new CheckedList();
     seq.add(TypeConversionUtil.convertToboolean(0));
-    QueryTestUtil.testContainsNullReturnFalse(seq);
+    QueryTestUtil.testcontainsNullReturnNegative(()->seq);
   }
   @Test
   public void testCheckedListContainsBoolean()
   {
     var seq=new CheckedList();
     seq.add(true);
-    QueryTestUtil.testContainsBoolean(seq,true);
+    QueryTestUtil.testcontainsBoolean(()->seq,true);
     seq.clear();
     seq.add(false);
-    QueryTestUtil.testContainsBoolean(seq,false);
+    QueryTestUtil.testcontainsBoolean(()->seq,false);
   }
   @Test
   public void testCheckedListContainsByte()
   {
     var seq=new CheckedList();
     seq.add(false);
-    QueryTestUtil.testContainsByte(seq,false);
+    QueryTestUtil.testcontainsByte(()->seq,false);
     seq.clear();
     seq.add(true);
-    QueryTestUtil.testContainsByte(seq,true);
+    QueryTestUtil.testcontainsByte(()->seq,true);
   }
   @Test
   public void testCheckedListContainsChar()
   {
     var seq=new CheckedList();
     seq.add(false);
-    QueryTestUtil.testContainsChar(seq,false);
+    QueryTestUtil.testcontainsChar(()->seq,false);
     seq.clear();
     seq.add(true);
-    QueryTestUtil.testContainsChar(seq,true);
+    QueryTestUtil.testcontainsChar(()->seq,true);
   }
   @Test
   public void testCheckedListContainsShort()
   {
     var seq=new CheckedList();
     seq.add(false);
-    QueryTestUtil.testContainsShort(seq,false);
+    QueryTestUtil.testcontainsShort(()->seq,false);
     seq.clear();
     seq.add(true);
-    QueryTestUtil.testContainsShort(seq,true);
+    QueryTestUtil.testcontainsShort(()->seq,true);
   }
   @Test
   public void testCheckedListContainsInt()
   {
     var seq=new CheckedList();
     seq.add(false);
-    QueryTestUtil.testContainsInt(seq,false);
+    QueryTestUtil.testcontainsInt(()->seq,false);
     seq.clear();
     seq.add(true);
-    QueryTestUtil.testContainsInt(seq,true);
+    QueryTestUtil.testcontainsInt(()->seq,true);
   }
   @Test
   public void testCheckedListContainsLong()
   {
     var seq=new CheckedList();
     seq.add(false);
-    QueryTestUtil.testContainsLong(seq,false);
+    QueryTestUtil.testcontainsLong(()->seq,false);
     seq.clear();
     seq.add(true);
-    QueryTestUtil.testContainsLong(seq,true);
+    QueryTestUtil.testcontainsLong(()->seq,true);
   }
   @Test
   public void testEmptyCheckedStackContains()
   {
     var seq=new CheckedStack();
-    QueryTestUtil.testEmptyContains(seq);
+    QueryTestUtil.testEmptycontains(()->seq);
   }
   @Test
   public void testCheckedStackContainsNull()
   {
     var seq=new CheckedStack();
     seq.add(TypeConversionUtil.convertToboolean(0));
-    QueryTestUtil.testContainsNullReturnFalse(seq);
+    QueryTestUtil.testcontainsNullReturnNegative(()->seq);
   }
   @Test
   public void testCheckedStackContainsBoolean()
   {
     var seq=new CheckedStack();
     seq.add(true);
-    QueryTestUtil.testContainsBoolean(seq,true);
+    QueryTestUtil.testcontainsBoolean(()->seq,true);
     seq.clear();
     seq.add(false);
-    QueryTestUtil.testContainsBoolean(seq,false);
+    QueryTestUtil.testcontainsBoolean(()->seq,false);
   }
   @Test
   public void testCheckedStackContainsByte()
   {
     var seq=new CheckedStack();
     seq.add(false);
-    QueryTestUtil.testContainsByte(seq,false);
+    QueryTestUtil.testcontainsByte(()->seq,false);
     seq.clear();
     seq.add(true);
-    QueryTestUtil.testContainsByte(seq,true);
+    QueryTestUtil.testcontainsByte(()->seq,true);
   }
   @Test
   public void testCheckedStackContainsChar()
   {
     var seq=new CheckedStack();
     seq.add(false);
-    QueryTestUtil.testContainsChar(seq,false);
+    QueryTestUtil.testcontainsChar(()->seq,false);
     seq.clear();
     seq.add(true);
-    QueryTestUtil.testContainsChar(seq,true);
+    QueryTestUtil.testcontainsChar(()->seq,true);
   }
   @Test
   public void testCheckedStackContainsShort()
   {
     var seq=new CheckedStack();
     seq.add(false);
-    QueryTestUtil.testContainsShort(seq,false);
+    QueryTestUtil.testcontainsShort(()->seq,false);
     seq.clear();
     seq.add(true);
-    QueryTestUtil.testContainsShort(seq,true);
+    QueryTestUtil.testcontainsShort(()->seq,true);
   }
   @Test
   public void testCheckedStackContainsInt()
   {
     var seq=new CheckedStack();
     seq.add(false);
-    QueryTestUtil.testContainsInt(seq,false);
+    QueryTestUtil.testcontainsInt(()->seq,false);
     seq.clear();
     seq.add(true);
-    QueryTestUtil.testContainsInt(seq,true);
+    QueryTestUtil.testcontainsInt(()->seq,true);
   }
   @Test
   public void testCheckedStackContainsLong()
   {
     var seq=new CheckedStack();
     seq.add(false);
-    QueryTestUtil.testContainsLong(seq,false);
+    QueryTestUtil.testcontainsLong(()->seq,false);
     seq.clear();
     seq.add(true);
-    QueryTestUtil.testContainsLong(seq,true);
+    QueryTestUtil.testcontainsLong(()->seq,true);
   }
   @Test
   public void testEmptyCheckedSubListContains()
@@ -310,7 +310,7 @@ public class BooleanArrSeqContainsTest
     var root=new CheckedList();
     var subList=root.subList(0,0);
     var seq=subList.subList(0,0);
-    QueryTestUtil.testEmptyContains(seq);
+    QueryTestUtil.testEmptycontains(()->seq);
   }
   @Test
   public void testCheckedSubListContainsNull()
@@ -319,7 +319,7 @@ public class BooleanArrSeqContainsTest
     var subList=root.subList(0,0);
     var seq=subList.subList(0,0);
     seq.add(TypeConversionUtil.convertToboolean(0));
-    QueryTestUtil.testContainsNullReturnFalse(seq);
+    QueryTestUtil.testcontainsNullReturnNegative(()->seq);
   }
   @Test
   public void testCheckedSubListContainsBoolean()
@@ -328,10 +328,10 @@ public class BooleanArrSeqContainsTest
     var subList=root.subList(0,0);
     var seq=subList.subList(0,0);
     seq.add(true);
-    QueryTestUtil.testContainsBoolean(seq,true);
+    QueryTestUtil.testcontainsBoolean(()->seq,true);
     seq.clear();
     seq.add(false);
-    QueryTestUtil.testContainsBoolean(seq,false);
+    QueryTestUtil.testcontainsBoolean(()->seq,false);
   }
   @Test
   public void testCheckedSubListContainsByte()
@@ -340,10 +340,10 @@ public class BooleanArrSeqContainsTest
     var subList=root.subList(0,0);
     var seq=subList.subList(0,0);
     seq.add(false);
-    QueryTestUtil.testContainsByte(seq,false);
+    QueryTestUtil.testcontainsByte(()->seq,false);
     seq.clear();
     seq.add(true);
-    QueryTestUtil.testContainsByte(seq,true);
+    QueryTestUtil.testcontainsByte(()->seq,true);
   }
   @Test
   public void testCheckedSubListContainsChar()
@@ -352,10 +352,10 @@ public class BooleanArrSeqContainsTest
     var subList=root.subList(0,0);
     var seq=subList.subList(0,0);
     seq.add(false);
-    QueryTestUtil.testContainsChar(seq,false);
+    QueryTestUtil.testcontainsChar(()->seq,false);
     seq.clear();
     seq.add(true);
-    QueryTestUtil.testContainsChar(seq,true);
+    QueryTestUtil.testcontainsChar(()->seq,true);
   }
   @Test
   public void testCheckedSubListContainsShort()
@@ -364,10 +364,10 @@ public class BooleanArrSeqContainsTest
     var subList=root.subList(0,0);
     var seq=subList.subList(0,0);
     seq.add(false);
-    QueryTestUtil.testContainsShort(seq,false);
+    QueryTestUtil.testcontainsShort(()->seq,false);
     seq.clear();
     seq.add(true);
-    QueryTestUtil.testContainsShort(seq,true);
+    QueryTestUtil.testcontainsShort(()->seq,true);
   }
   @Test
   public void testCheckedSubListContainsInt()
@@ -376,10 +376,10 @@ public class BooleanArrSeqContainsTest
     var subList=root.subList(0,0);
     var seq=subList.subList(0,0);
     seq.add(false);
-    QueryTestUtil.testContainsInt(seq,false);
+    QueryTestUtil.testcontainsInt(()->seq,false);
     seq.clear();
     seq.add(true);
-    QueryTestUtil.testContainsInt(seq,true);
+    QueryTestUtil.testcontainsInt(()->seq,true);
   }
   @Test
   public void testCheckedSubListContainsLong()
@@ -388,10 +388,10 @@ public class BooleanArrSeqContainsTest
     var subList=root.subList(0,0);
     var seq=subList.subList(0,0);
     seq.add(false);
-    QueryTestUtil.testContainsLong(seq,false);
+    QueryTestUtil.testcontainsLong(()->seq,false);
     seq.clear();
     seq.add(true);
-    QueryTestUtil.testContainsLong(seq,true);
+    QueryTestUtil.testcontainsLong(()->seq,true);
   }
   @Test
   public void testEmptyUncheckedSubListContains()
@@ -399,7 +399,7 @@ public class BooleanArrSeqContainsTest
     var root=new UncheckedList();
     var subList=root.subList(0,0);
     var seq=subList.subList(0,0);
-    QueryTestUtil.testEmptyContains(seq);
+    QueryTestUtil.testEmptycontains(()->seq);
   }
   @Test
   public void testUncheckedSubListContainsNull()
@@ -408,7 +408,7 @@ public class BooleanArrSeqContainsTest
     var subList=root.subList(0,0);
     var seq=subList.subList(0,0);
     seq.add(TypeConversionUtil.convertToboolean(0));
-    QueryTestUtil.testContainsNullReturnFalse(seq);
+    QueryTestUtil.testcontainsNullReturnNegative(()->seq);
   }
   @Test
   public void testUncheckedSubListContainsBoolean()
@@ -417,10 +417,10 @@ public class BooleanArrSeqContainsTest
     var subList=root.subList(0,0);
     var seq=subList.subList(0,0);
     seq.add(true);
-    QueryTestUtil.testContainsBoolean(seq,true);
+    QueryTestUtil.testcontainsBoolean(()->seq,true);
     seq.clear();
     seq.add(false);
-    QueryTestUtil.testContainsBoolean(seq,false);
+    QueryTestUtil.testcontainsBoolean(()->seq,false);
   }
   @Test
   public void testUncheckedSubListContainsByte()
@@ -429,10 +429,10 @@ public class BooleanArrSeqContainsTest
     var subList=root.subList(0,0);
     var seq=subList.subList(0,0);
     seq.add(false);
-    QueryTestUtil.testContainsByte(seq,false);
+    QueryTestUtil.testcontainsByte(()->seq,false);
     seq.clear();
     seq.add(true);
-    QueryTestUtil.testContainsByte(seq,true);
+    QueryTestUtil.testcontainsByte(()->seq,true);
   }
   @Test
   public void testUncheckedSubListContainsChar()
@@ -441,10 +441,10 @@ public class BooleanArrSeqContainsTest
     var subList=root.subList(0,0);
     var seq=subList.subList(0,0);
     seq.add(false);
-    QueryTestUtil.testContainsChar(seq,false);
+    QueryTestUtil.testcontainsChar(()->seq,false);
     seq.clear();
     seq.add(true);
-    QueryTestUtil.testContainsChar(seq,true);
+    QueryTestUtil.testcontainsChar(()->seq,true);
   }
   @Test
   public void testUncheckedSubListContainsShort()
@@ -453,10 +453,10 @@ public class BooleanArrSeqContainsTest
     var subList=root.subList(0,0);
     var seq=subList.subList(0,0);
     seq.add(false);
-    QueryTestUtil.testContainsShort(seq,false);
+    QueryTestUtil.testcontainsShort(()->seq,false);
     seq.clear();
     seq.add(true);
-    QueryTestUtil.testContainsShort(seq,true);
+    QueryTestUtil.testcontainsShort(()->seq,true);
   }
   @Test
   public void testUncheckedSubListContainsInt()
@@ -465,10 +465,10 @@ public class BooleanArrSeqContainsTest
     var subList=root.subList(0,0);
     var seq=subList.subList(0,0);
     seq.add(false);
-    QueryTestUtil.testContainsInt(seq,false);
+    QueryTestUtil.testcontainsInt(()->seq,false);
     seq.clear();
     seq.add(true);
-    QueryTestUtil.testContainsInt(seq,true);
+    QueryTestUtil.testcontainsInt(()->seq,true);
   }
   @Test
   public void testUncheckedSubListContainsLong()
@@ -477,9 +477,9 @@ public class BooleanArrSeqContainsTest
     var subList=root.subList(0,0);
     var seq=subList.subList(0,0);
     seq.add(false);
-    QueryTestUtil.testContainsLong(seq,false);
+    QueryTestUtil.testcontainsLong(()->seq,false);
     seq.clear();
     seq.add(true);
-    QueryTestUtil.testContainsLong(seq,true);
+    QueryTestUtil.testcontainsLong(()->seq,true);
   }
 }
