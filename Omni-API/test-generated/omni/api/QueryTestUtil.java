@@ -2,9 +2,482 @@ package omni.api;
 import org.junit.jupiter.api.Assertions;
 import omni.util.TypeUtil;
 import java.util.function.Supplier;
-public class QueryTestUtil
+public final class QueryTestUtil
 {
-  public static void testcontainsLong(Supplier<OmniCollection.OfDouble> collectionSupplier,double containsVal)
+  private QueryTestUtil()
+  {
+    super();
+  }
+  public static void testcontainsDouble(Supplier<? extends OmniCollection> collectionSupplier,double containsVal
+  )
+  {
+    OmniCollection col;
+    Assertions.assertTrue((col=collectionSupplier.get()) instanceof OmniCollection.OfDouble || col instanceof OmniCollection.OfRef);
+    Assertions.assertEquals(false,col.contains((double)1.0));
+    Assertions.assertEquals(false,collectionSupplier.get().contains((double)-0.0));
+    Assertions.assertEquals(false,collectionSupplier.get().contains((double)Double.MAX_VALUE));
+    Assertions.assertEquals(false,collectionSupplier.get().contains((double)Double.MIN_VALUE));
+    Assertions.assertEquals(false,collectionSupplier.get().contains((Double)(double)1.0));
+    Assertions.assertEquals(false,collectionSupplier.get().contains((Double)(double)-0.0));
+    Assertions.assertEquals(false,collectionSupplier.get().contains((Object)(double)1.0));
+    Assertions.assertEquals(false,collectionSupplier.get().contains((Object)(double)-0.0));
+    if(containsVal==containsVal)
+    {
+      Assertions.assertEquals(true,collectionSupplier.get().contains((double)containsVal));
+      Assertions.assertEquals(false,collectionSupplier.get().contains((double)Double.NaN));
+      Assertions.assertEquals(true,collectionSupplier.get().contains((Double)(double)containsVal));
+      Assertions.assertEquals(false,collectionSupplier.get().contains((Double)(double)Double.NaN));
+      Assertions.assertEquals(true,collectionSupplier.get().contains((Object)(double)containsVal));
+      Assertions.assertEquals(false,collectionSupplier.get().contains((Object)(double)Double.NaN));
+    }
+    else
+    {
+      Assertions.assertEquals(true,collectionSupplier.get().contains((double)containsVal));
+      Assertions.assertEquals(false,collectionSupplier.get().contains((double)0.0));
+      Assertions.assertEquals(true,collectionSupplier.get().contains((Double)(double)containsVal));
+      Assertions.assertEquals(false,collectionSupplier.get().contains((Double)(double)0.0));
+      Assertions.assertEquals(true,collectionSupplier.get().contains((Object)(double)containsVal));
+      Assertions.assertEquals(false,collectionSupplier.get().contains((Object)(double)0.0));
+    }
+  }
+  public static void testcontainsDouble(Supplier<? extends OmniCollection.OfFloat> collectionSupplier,float containsVal
+  )
+  {
+    Assertions.assertEquals(false,collectionSupplier.get().contains((double)1.0));
+    Assertions.assertEquals(false,collectionSupplier.get().contains((double)-0.0));
+    Assertions.assertEquals(false,collectionSupplier.get().contains((double)Double.MAX_VALUE));
+    Assertions.assertEquals(false,collectionSupplier.get().contains((double)Double.MIN_VALUE));
+    Assertions.assertEquals(false,collectionSupplier.get().contains(Double.valueOf(1.0)));
+    Assertions.assertEquals(false,collectionSupplier.get().contains(Double.valueOf(-0.0)));
+    Assertions.assertEquals(false,collectionSupplier.get().contains((Double)(double)Double.MAX_VALUE));
+    Assertions.assertEquals(false,collectionSupplier.get().contains((Double)(double)Double.MIN_VALUE));
+    Assertions.assertEquals(false,collectionSupplier.get().contains((Object)(double)1.0));
+    Assertions.assertEquals(false,collectionSupplier.get().contains((Object)(double)-0.0));
+    Assertions.assertEquals(false,collectionSupplier.get().contains((Object)(double)Double.MAX_VALUE));
+    Assertions.assertEquals(false,collectionSupplier.get().contains((Object)(double)Double.MIN_VALUE));
+    if(containsVal==containsVal)
+    {
+      Assertions.assertEquals(true,collectionSupplier.get().contains((double)containsVal));
+      Assertions.assertEquals(false,collectionSupplier.get().contains((double)Double.NaN));
+      Assertions.assertEquals(true,collectionSupplier.get().contains((Double)(double)containsVal));
+      Assertions.assertEquals(false,collectionSupplier.get().contains((Double)(double)Double.NaN));
+      Assertions.assertEquals(false,collectionSupplier.get().contains((Object)(double)containsVal));
+      Assertions.assertEquals(false,collectionSupplier.get().contains((Object)(double)Double.NaN));
+    }
+    else
+    {
+      Assertions.assertEquals(true,collectionSupplier.get().contains((double)containsVal));
+      Assertions.assertEquals(false,collectionSupplier.get().contains((double)0.0));
+      Assertions.assertEquals(true,collectionSupplier.get().contains((Double)(double)containsVal));
+      Assertions.assertEquals(false,collectionSupplier.get().contains((Double)(double)0.0));
+      Assertions.assertEquals(false,collectionSupplier.get().contains((Object)(double)containsVal));
+      Assertions.assertEquals(false,collectionSupplier.get().contains((Object)(double)0.0));
+    }
+  }
+  public static void testcontainsDouble(Supplier<? extends OmniCollection> collectionSupplier
+  )
+  {
+    OmniCollection col;
+    Assertions.assertTrue((col=collectionSupplier.get()) instanceof OmniCollection.OfByte||col instanceof OmniCollection.OfChar||col instanceof OmniCollection.OfShort||col instanceof OmniCollection.OfInt || col instanceof OmniCollection.OfLong);
+    Assertions.assertEquals(false,col.contains((double)1.0));
+    Assertions.assertEquals(true,collectionSupplier.get().contains((double)0.0));
+    Assertions.assertEquals(true,collectionSupplier.get().contains((double)-0.0));
+    Assertions.assertEquals(false,collectionSupplier.get().contains((Double)(double)1.0));
+    Assertions.assertEquals(true,collectionSupplier.get().contains((Double)(double)0.0));
+    Assertions.assertEquals(true,collectionSupplier.get().contains((Double)(double)-0.0));
+    Assertions.assertEquals(false,collectionSupplier.get().contains((Object)(double)1.0));
+    Assertions.assertEquals(false,collectionSupplier.get().contains((Object)(double)0.0));
+    Assertions.assertEquals(false,collectionSupplier.get().contains((Object)(double)-0.0));
+    Assertions.assertEquals(false,collectionSupplier.get().contains((double)(TypeUtil.MAX_SAFE_LONG+1)));
+    Assertions.assertEquals(false,collectionSupplier.get().contains((double)(TypeUtil.MIN_SAFE_LONG-1)));
+    Assertions.assertEquals(false,collectionSupplier.get().contains((Double)(double)(TypeUtil.MAX_SAFE_LONG+1)));
+    Assertions.assertEquals(false,collectionSupplier.get().contains((Double)(double)(TypeUtil.MIN_SAFE_LONG-1)));
+    Assertions.assertEquals(false,collectionSupplier.get().contains((Object)(double)(TypeUtil.MAX_SAFE_LONG+1)));
+    Assertions.assertEquals(false,collectionSupplier.get().contains((Object)(double)(TypeUtil.MIN_SAFE_LONG-1)));
+  }
+  public static void testcontainsDouble(Supplier<? extends OmniCollection.OfBoolean> collectionSupplier,boolean containsVal
+  )
+  {
+    Assertions.assertEquals(false,collectionSupplier.get().contains((double)2.0));
+    Assertions.assertEquals(false,collectionSupplier.get().contains((Double)(double)2.0));
+    Assertions.assertEquals(false,collectionSupplier.get().contains((Object)(double)2.0));
+    Assertions.assertEquals(false,collectionSupplier.get().contains((Object)(double)0.0));
+    Assertions.assertEquals(false,collectionSupplier.get().contains((Object)(double)-0.0));
+    Assertions.assertEquals(false,collectionSupplier.get().contains((Object)(double)1.0));
+    if(containsVal)
+    {
+      Assertions.assertEquals(false,collectionSupplier.get().contains((float)0.0));
+      Assertions.assertEquals(false,collectionSupplier.get().contains((float)-0.0));
+      Assertions.assertEquals(true,collectionSupplier.get().contains((float)1.0));
+      Assertions.assertEquals(false,collectionSupplier.get().contains((Double)(double)0.0));
+      Assertions.assertEquals(false,collectionSupplier.get().contains((Double)(double)-0.0));
+      Assertions.assertEquals(true,collectionSupplier.get().contains((Double)(double)1.0));
+    }
+    else
+    {
+      Assertions.assertEquals(true,collectionSupplier.get().contains((double)0.0));
+      Assertions.assertEquals(true,collectionSupplier.get().contains((double)-0.0));
+      Assertions.assertEquals(false,collectionSupplier.get().contains((double)1.0));
+      Assertions.assertEquals(true,collectionSupplier.get().contains((Double)(double)0.0));
+      Assertions.assertEquals(true,collectionSupplier.get().contains((Double)(double)-0.0));
+      Assertions.assertEquals(false,collectionSupplier.get().contains((Double)(double)1.0));
+    }
+  }
+  public static void testremoveValDouble(Supplier<? extends OmniCollection> collectionSupplier,double containsVal
+  )
+  {
+    OmniCollection col;
+    Assertions.assertTrue((col=collectionSupplier.get()) instanceof OmniCollection.OfDouble || col instanceof OmniCollection.OfRef);
+    Assertions.assertEquals(false,col.removeVal((double)1.0));
+    Assertions.assertEquals(false,collectionSupplier.get().removeVal((double)-0.0));
+    Assertions.assertEquals(false,collectionSupplier.get().removeVal((double)Double.MAX_VALUE));
+    Assertions.assertEquals(false,collectionSupplier.get().removeVal((double)Double.MIN_VALUE));
+    Assertions.assertEquals(false,collectionSupplier.get().removeVal((Double)(double)1.0));
+    Assertions.assertEquals(false,collectionSupplier.get().removeVal((Double)(double)-0.0));
+    Assertions.assertEquals(false,collectionSupplier.get().remove((Object)Double.valueOf(1.0)));
+    Assertions.assertEquals(false,collectionSupplier.get().remove((Object)Double.valueOf(-0.0)));
+    if(containsVal==containsVal)
+    {
+      Assertions.assertEquals(true,collectionSupplier.get().removeVal((double)containsVal));
+      Assertions.assertEquals(false,collectionSupplier.get().removeVal((double)Double.NaN));
+      Assertions.assertEquals(true,collectionSupplier.get().removeVal((Double)(double)containsVal));
+      Assertions.assertEquals(false,collectionSupplier.get().removeVal((Double)(double)Double.NaN));
+      Assertions.assertEquals(true,collectionSupplier.get().remove((Object)(double)containsVal));
+      Assertions.assertEquals(false,collectionSupplier.get().remove((Object)(double)Double.NaN));
+    }
+    else
+    {
+      Assertions.assertEquals(true,collectionSupplier.get().removeVal((double)containsVal));
+      Assertions.assertEquals(false,collectionSupplier.get().removeVal((double)0.0));
+      Assertions.assertEquals(true,collectionSupplier.get().removeVal((Double)(double)containsVal));
+      Assertions.assertEquals(false,collectionSupplier.get().removeVal((Double)(double)0.0));
+      Assertions.assertEquals(true,collectionSupplier.get().remove((Object)(double)containsVal));
+      Assertions.assertEquals(false,collectionSupplier.get().remove((Object)(double)0.0));
+    }
+  }
+  public static void testremoveValDouble(Supplier<? extends OmniCollection.OfFloat> collectionSupplier,float containsVal
+  )
+  {
+    Assertions.assertEquals(false,collectionSupplier.get().removeVal((double)1.0));
+    Assertions.assertEquals(false,collectionSupplier.get().removeVal((double)-0.0));
+    Assertions.assertEquals(false,collectionSupplier.get().removeVal((double)Double.MAX_VALUE));
+    Assertions.assertEquals(false,collectionSupplier.get().removeVal((double)Double.MIN_VALUE));
+    Assertions.assertEquals(false,collectionSupplier.get().removeVal(Double.valueOf(1.0)));
+    Assertions.assertEquals(false,collectionSupplier.get().removeVal(Double.valueOf(-0.0)));
+    Assertions.assertEquals(false,collectionSupplier.get().removeVal((Double)(double)Double.MAX_VALUE));
+    Assertions.assertEquals(false,collectionSupplier.get().removeVal((Double)(double)Double.MIN_VALUE));
+    Assertions.assertEquals(false,collectionSupplier.get().remove((Object)Double.valueOf(1.0)));
+    Assertions.assertEquals(false,collectionSupplier.get().remove((Object)Double.valueOf(-0.0)));
+    Assertions.assertEquals(false,collectionSupplier.get().remove((Object)(double)Double.MAX_VALUE));
+    Assertions.assertEquals(false,collectionSupplier.get().remove((Object)(double)Double.MIN_VALUE));
+    if(containsVal==containsVal)
+    {
+      Assertions.assertEquals(true,collectionSupplier.get().removeVal((double)containsVal));
+      Assertions.assertEquals(false,collectionSupplier.get().removeVal((double)Double.NaN));
+      Assertions.assertEquals(true,collectionSupplier.get().removeVal((Double)(double)containsVal));
+      Assertions.assertEquals(false,collectionSupplier.get().removeVal((Double)(double)Double.NaN));
+      Assertions.assertEquals(false,collectionSupplier.get().remove((Object)(double)containsVal));
+      Assertions.assertEquals(false,collectionSupplier.get().remove((Object)(double)Double.NaN));
+    }
+    else
+    {
+      Assertions.assertEquals(true,collectionSupplier.get().removeVal((double)containsVal));
+      Assertions.assertEquals(false,collectionSupplier.get().removeVal((double)0.0));
+      Assertions.assertEquals(true,collectionSupplier.get().removeVal((Double)(double)containsVal));
+      Assertions.assertEquals(false,collectionSupplier.get().removeVal((Double)(double)0.0));
+      Assertions.assertEquals(false,collectionSupplier.get().remove((Object)(double)containsVal));
+      Assertions.assertEquals(false,collectionSupplier.get().remove((Object)(double)0.0));
+    }
+  }
+  public static void testremoveValDouble(Supplier<? extends OmniCollection> collectionSupplier
+  )
+  {
+    OmniCollection col;
+    Assertions.assertTrue((col=collectionSupplier.get()) instanceof OmniCollection.OfByte||col instanceof OmniCollection.OfChar||col instanceof OmniCollection.OfShort||col instanceof OmniCollection.OfInt || col instanceof OmniCollection.OfLong);
+    Assertions.assertEquals(false,col.removeVal((double)1.0));
+    Assertions.assertEquals(true,collectionSupplier.get().removeVal((double)0.0));
+    Assertions.assertEquals(true,collectionSupplier.get().removeVal((double)-0.0));
+    Assertions.assertEquals(false,collectionSupplier.get().removeVal((Double)(double)1.0));
+    Assertions.assertEquals(true,collectionSupplier.get().removeVal((Double)(double)0.0));
+    Assertions.assertEquals(true,collectionSupplier.get().removeVal((Double)(double)-0.0));
+    Assertions.assertEquals(false,collectionSupplier.get().remove((Object)(double)1.0));
+    Assertions.assertEquals(false,collectionSupplier.get().remove((Object)(double)0.0));
+    Assertions.assertEquals(false,collectionSupplier.get().remove((Object)(double)-0.0));
+    Assertions.assertEquals(false,collectionSupplier.get().removeVal((double)(TypeUtil.MAX_SAFE_LONG+1)));
+    Assertions.assertEquals(false,collectionSupplier.get().removeVal((double)(TypeUtil.MIN_SAFE_LONG-1)));
+    Assertions.assertEquals(false,collectionSupplier.get().removeVal((Double)(double)(TypeUtil.MAX_SAFE_LONG+1)));
+    Assertions.assertEquals(false,collectionSupplier.get().removeVal((Double)(double)(TypeUtil.MIN_SAFE_LONG-1)));
+    Assertions.assertEquals(false,collectionSupplier.get().remove((Object)(double)(TypeUtil.MAX_SAFE_LONG+1)));
+    Assertions.assertEquals(false,collectionSupplier.get().remove((Object)(double)(TypeUtil.MIN_SAFE_LONG-1)));
+  }
+  public static void testremoveValDouble(Supplier<? extends OmniCollection.OfBoolean> collectionSupplier,boolean containsVal
+  )
+  {
+    Assertions.assertEquals(false,collectionSupplier.get().removeVal((double)2.0));
+    Assertions.assertEquals(false,collectionSupplier.get().removeVal((Double)(double)2.0));
+    Assertions.assertEquals(false,collectionSupplier.get().remove((Object)(double)2.0));
+    Assertions.assertEquals(false,collectionSupplier.get().remove((Object)(double)0.0));
+    Assertions.assertEquals(false,collectionSupplier.get().remove((Object)(double)-0.0));
+    Assertions.assertEquals(false,collectionSupplier.get().remove((Object)(double)1.0));
+    if(containsVal)
+    {
+      Assertions.assertEquals(false,collectionSupplier.get().removeVal((float)0.0));
+      Assertions.assertEquals(false,collectionSupplier.get().removeVal((float)-0.0));
+      Assertions.assertEquals(true,collectionSupplier.get().removeVal((float)1.0));
+      Assertions.assertEquals(false,collectionSupplier.get().removeVal((Double)(double)0.0));
+      Assertions.assertEquals(false,collectionSupplier.get().removeVal((Double)(double)-0.0));
+      Assertions.assertEquals(true,collectionSupplier.get().removeVal((Double)(double)1.0));
+    }
+    else
+    {
+      Assertions.assertEquals(true,collectionSupplier.get().removeVal((double)0.0));
+      Assertions.assertEquals(true,collectionSupplier.get().removeVal((double)-0.0));
+      Assertions.assertEquals(false,collectionSupplier.get().removeVal((double)1.0));
+      Assertions.assertEquals(true,collectionSupplier.get().removeVal((Double)(double)0.0));
+      Assertions.assertEquals(true,collectionSupplier.get().removeVal((Double)(double)-0.0));
+      Assertions.assertEquals(false,collectionSupplier.get().removeVal((Double)(double)1.0));
+    }
+  }
+  public static void testcontainsFloat(Supplier<? extends OmniCollection.OfDouble> collectionSupplier,double containsVal
+  )
+  {
+    Assertions.assertEquals(false,collectionSupplier.get().contains((float)1.0));
+    Assertions.assertEquals(false,collectionSupplier.get().contains((float)-0.0));
+    Assertions.assertEquals(false,collectionSupplier.get().contains((Float)(float)1.0));
+    Assertions.assertEquals(false,collectionSupplier.get().contains((Float)(float)-0.0));
+    Assertions.assertEquals(false,collectionSupplier.get().contains((Object)(float)1.0));
+    Assertions.assertEquals(false,collectionSupplier.get().contains((Object)(float)-0.0));
+    if(containsVal==containsVal)
+    {
+      Assertions.assertEquals(true,collectionSupplier.get().contains((float)containsVal));
+      Assertions.assertEquals(false,collectionSupplier.get().contains((float)Float.NaN));
+      Assertions.assertEquals(true,collectionSupplier.get().contains((Float)(float)containsVal));
+      Assertions.assertEquals(false,collectionSupplier.get().contains((Float)(float)Float.NaN));
+      Assertions.assertEquals(false,collectionSupplier.get().contains((Object)(float)containsVal));
+      Assertions.assertEquals(false,collectionSupplier.get().contains((Object)(float)Float.NaN));
+    }
+    else
+    {
+      Assertions.assertEquals(true,collectionSupplier.get().contains((float)containsVal));
+      Assertions.assertEquals(false,collectionSupplier.get().contains((float)0.0));
+      Assertions.assertEquals(true,collectionSupplier.get().contains((Float)(float)containsVal));
+      Assertions.assertEquals(false,collectionSupplier.get().contains((Float)(float)0.0));
+      Assertions.assertEquals(false,collectionSupplier.get().contains((Object)(float)containsVal));
+      Assertions.assertEquals(false,collectionSupplier.get().contains((Object)(float)0.0));
+    }
+  }
+  public static void testcontainsFloat(Supplier<? extends OmniCollection> collectionSupplier,float containsVal
+  )
+  {
+    OmniCollection col;
+    Assertions.assertTrue((col=collectionSupplier.get()) instanceof OmniCollection.OfFloat || col instanceof OmniCollection.OfRef);
+    Assertions.assertEquals(false,col.contains((float)1.0));
+    Assertions.assertEquals(false,collectionSupplier.get().contains((float)-0.0));
+    Assertions.assertEquals(false,collectionSupplier.get().contains((Float)(float)1.0));
+    Assertions.assertEquals(false,collectionSupplier.get().contains((Float)(float)-0.0));
+    Assertions.assertEquals(false,collectionSupplier.get().contains((Object)(float)1.0));
+    Assertions.assertEquals(false,collectionSupplier.get().contains((Object)(float)-0.0));
+    if(containsVal==containsVal)
+    {
+      Assertions.assertEquals(true,collectionSupplier.get().contains((float)containsVal));
+      Assertions.assertEquals(false,collectionSupplier.get().contains((float)Float.NaN));
+      Assertions.assertEquals(true,collectionSupplier.get().contains((Float)(float)containsVal));
+      Assertions.assertEquals(false,collectionSupplier.get().contains((Float)(float)Float.NaN));
+      Assertions.assertEquals(true,collectionSupplier.get().contains((Object)(float)containsVal));
+      Assertions.assertEquals(false,collectionSupplier.get().contains((Object)(float)Float.NaN));
+    }
+    else
+    {
+      Assertions.assertEquals(true,collectionSupplier.get().contains((float)containsVal));
+      Assertions.assertEquals(false,collectionSupplier.get().contains((float)0.0));
+      Assertions.assertEquals(true,collectionSupplier.get().contains((Float)(float)containsVal));
+      Assertions.assertEquals(false,collectionSupplier.get().contains((Float)(float)0.0));
+      Assertions.assertEquals(true,collectionSupplier.get().contains((Object)(float)containsVal));
+      Assertions.assertEquals(false,collectionSupplier.get().contains((Object)(float)0.0));
+    }
+  }
+  public static void testcontainsFloat(Supplier<? extends OmniCollection> collectionSupplier
+  )
+  {
+    OmniCollection col;
+    if((col=collectionSupplier.get()) instanceof OmniCollection.OfByte||col instanceof OmniCollection.OfChar||col instanceof OmniCollection.OfShort||col instanceof OmniCollection.OfInt)
+    {
+      Assertions.assertEquals(false,col.contains((float)(TypeUtil.MAX_SAFE_INT+1)));
+      Assertions.assertEquals(false,collectionSupplier.get().contains((float)(TypeUtil.MIN_SAFE_INT-1)));
+      Assertions.assertEquals(false,collectionSupplier.get().contains((Float)(float)(TypeUtil.MAX_SAFE_INT+1)));
+      Assertions.assertEquals(false,collectionSupplier.get().contains((Float)(float)(TypeUtil.MIN_SAFE_INT-1)));
+      Assertions.assertEquals(false,collectionSupplier.get().contains((Object)(float)(TypeUtil.MAX_SAFE_INT+1)));
+      Assertions.assertEquals(false,collectionSupplier.get().contains((Object)(float)(TypeUtil.MIN_SAFE_INT-1)));
+    }
+    else
+    {
+      Assertions.assertTrue(col instanceof OmniCollection.OfLong);
+      Assertions.assertEquals(false,col.contains((float)(TypeUtil.MAX_SAFE_LONG+1)));
+      Assertions.assertEquals(false,collectionSupplier.get().contains((float)(TypeUtil.MIN_SAFE_LONG-1)));
+      Assertions.assertEquals(false,collectionSupplier.get().contains((Float)(float)(TypeUtil.MAX_SAFE_LONG+1)));
+      Assertions.assertEquals(false,collectionSupplier.get().contains((Float)(float)(TypeUtil.MIN_SAFE_LONG-1)));
+      Assertions.assertEquals(false,collectionSupplier.get().contains((Object)(float)(TypeUtil.MAX_SAFE_LONG+1)));
+      Assertions.assertEquals(false,collectionSupplier.get().contains((Object)(float)(TypeUtil.MIN_SAFE_LONG-1)));
+    }
+    Assertions.assertEquals(false,collectionSupplier.get().contains((float)1.0));
+    Assertions.assertEquals(true,collectionSupplier.get().contains((float)0.0));
+    Assertions.assertEquals(true,collectionSupplier.get().contains((float)-0.0));
+    Assertions.assertEquals(false,collectionSupplier.get().contains((Float)(float)1.0));
+    Assertions.assertEquals(true,collectionSupplier.get().contains((Float)(float)0.0));
+    Assertions.assertEquals(true,collectionSupplier.get().contains((Float)(float)-0.0));
+    Assertions.assertEquals(false,collectionSupplier.get().contains((Object)(float)1.0));
+    Assertions.assertEquals(false,collectionSupplier.get().contains((Object)(float)0.0));
+    Assertions.assertEquals(false,collectionSupplier.get().contains((Object)(float)-0.0));
+  }
+  public static void testcontainsFloat(Supplier<? extends OmniCollection.OfBoolean> collectionSupplier,boolean containsVal
+  )
+  {
+    Assertions.assertEquals(false,collectionSupplier.get().contains((float)2.0));
+    Assertions.assertEquals(false,collectionSupplier.get().contains((Float)(float)2.0));
+    Assertions.assertEquals(false,collectionSupplier.get().contains((Object)(float)2.0));
+    Assertions.assertEquals(false,collectionSupplier.get().contains((Object)(float)0.0));
+    Assertions.assertEquals(false,collectionSupplier.get().contains((Object)(float)-0.0));
+    Assertions.assertEquals(false,collectionSupplier.get().contains((Object)(float)1.0));
+    if(containsVal)
+    {
+      Assertions.assertEquals(false,collectionSupplier.get().contains((float)0.0));
+      Assertions.assertEquals(false,collectionSupplier.get().contains((float)-0.0));
+      Assertions.assertEquals(true,collectionSupplier.get().contains((float)1.0));
+      Assertions.assertEquals(false,collectionSupplier.get().contains((Float)(float)0.0));
+      Assertions.assertEquals(false,collectionSupplier.get().contains((Float)(float)-0.0));
+      Assertions.assertEquals(true,collectionSupplier.get().contains((Float)(float)1.0));
+    }
+    else
+    {
+      Assertions.assertEquals(true,collectionSupplier.get().contains((float)0.0));
+      Assertions.assertEquals(true,collectionSupplier.get().contains((float)-0.0));
+      Assertions.assertEquals(false,collectionSupplier.get().contains((float)1.0));
+      Assertions.assertEquals(true,collectionSupplier.get().contains((Float)(float)0.0));
+      Assertions.assertEquals(true,collectionSupplier.get().contains((Float)(float)-0.0));
+      Assertions.assertEquals(false,collectionSupplier.get().contains((Float)(float)1.0));
+    }
+  }
+  public static void testremoveValFloat(Supplier<? extends OmniCollection.OfDouble> collectionSupplier,double containsVal
+  )
+  {
+    Assertions.assertEquals(false,collectionSupplier.get().removeVal((float)1.0));
+    Assertions.assertEquals(false,collectionSupplier.get().removeVal((float)-0.0));
+    Assertions.assertEquals(false,collectionSupplier.get().removeVal((Float)(float)1.0));
+    Assertions.assertEquals(false,collectionSupplier.get().removeVal((Float)(float)-0.0));
+    Assertions.assertEquals(false,collectionSupplier.get().remove((Object)(float)1.0));
+    Assertions.assertEquals(false,collectionSupplier.get().remove((Object)(float)-0.0));
+    if(containsVal==containsVal)
+    {
+      Assertions.assertEquals(true,collectionSupplier.get().removeVal((float)containsVal));
+      Assertions.assertEquals(false,collectionSupplier.get().removeVal((float)Float.NaN));
+      Assertions.assertEquals(true,collectionSupplier.get().removeVal((Float)(float)containsVal));
+      Assertions.assertEquals(false,collectionSupplier.get().removeVal((Float)(float)Float.NaN));
+      Assertions.assertEquals(false,collectionSupplier.get().remove((Object)(float)containsVal));
+      Assertions.assertEquals(false,collectionSupplier.get().remove((Object)(float)Float.NaN));
+    }
+    else
+    {
+      Assertions.assertEquals(true,collectionSupplier.get().removeVal((float)containsVal));
+      Assertions.assertEquals(false,collectionSupplier.get().removeVal((float)0.0));
+      Assertions.assertEquals(true,collectionSupplier.get().removeVal((Float)(float)containsVal));
+      Assertions.assertEquals(false,collectionSupplier.get().removeVal((Float)(float)0.0));
+      Assertions.assertEquals(false,collectionSupplier.get().remove((Object)(float)containsVal));
+      Assertions.assertEquals(false,collectionSupplier.get().remove((Object)(float)0.0));
+    }
+  }
+  public static void testremoveValFloat(Supplier<? extends OmniCollection> collectionSupplier,float containsVal
+  )
+  {
+    OmniCollection col;
+    Assertions.assertTrue((col=collectionSupplier.get()) instanceof OmniCollection.OfFloat || col instanceof OmniCollection.OfRef);
+    Assertions.assertEquals(false,col.removeVal((float)1.0));
+    Assertions.assertEquals(false,collectionSupplier.get().removeVal((float)-0.0));
+    Assertions.assertEquals(false,collectionSupplier.get().removeVal((Float)(float)1.0));
+    Assertions.assertEquals(false,collectionSupplier.get().removeVal((Float)(float)-0.0));
+    Assertions.assertEquals(false,collectionSupplier.get().remove((Object)(float)1.0));
+    Assertions.assertEquals(false,collectionSupplier.get().remove((Object)(float)-0.0));
+    if(containsVal==containsVal)
+    {
+      Assertions.assertEquals(true,collectionSupplier.get().removeVal((float)containsVal));
+      Assertions.assertEquals(false,collectionSupplier.get().removeVal((float)Float.NaN));
+      Assertions.assertEquals(true,collectionSupplier.get().removeVal((Float)(float)containsVal));
+      Assertions.assertEquals(false,collectionSupplier.get().removeVal((Float)(float)Float.NaN));
+      Assertions.assertEquals(true,collectionSupplier.get().remove((Object)(float)containsVal));
+      Assertions.assertEquals(false,collectionSupplier.get().remove((Object)(float)Float.NaN));
+    }
+    else
+    {
+      Assertions.assertEquals(true,collectionSupplier.get().removeVal((float)containsVal));
+      Assertions.assertEquals(false,collectionSupplier.get().removeVal((float)0.0));
+      Assertions.assertEquals(true,collectionSupplier.get().removeVal((Float)(float)containsVal));
+      Assertions.assertEquals(false,collectionSupplier.get().removeVal((Float)(float)0.0));
+      Assertions.assertEquals(true,collectionSupplier.get().remove((Object)(float)containsVal));
+      Assertions.assertEquals(false,collectionSupplier.get().remove((Object)(float)0.0));
+    }
+  }
+  public static void testremoveValFloat(Supplier<? extends OmniCollection> collectionSupplier
+  )
+  {
+    OmniCollection col;
+    if((col=collectionSupplier.get()) instanceof OmniCollection.OfByte||col instanceof OmniCollection.OfChar||col instanceof OmniCollection.OfShort||col instanceof OmniCollection.OfInt)
+    {
+      Assertions.assertEquals(false,col.removeVal((float)(TypeUtil.MAX_SAFE_INT+1)));
+      Assertions.assertEquals(false,collectionSupplier.get().removeVal((float)(TypeUtil.MIN_SAFE_INT-1)));
+      Assertions.assertEquals(false,collectionSupplier.get().removeVal((Float)(float)(TypeUtil.MAX_SAFE_INT+1)));
+      Assertions.assertEquals(false,collectionSupplier.get().removeVal((Float)(float)(TypeUtil.MIN_SAFE_INT-1)));
+      Assertions.assertEquals(false,collectionSupplier.get().remove((Object)(float)(TypeUtil.MAX_SAFE_INT+1)));
+      Assertions.assertEquals(false,collectionSupplier.get().remove((Object)(float)(TypeUtil.MIN_SAFE_INT-1)));
+    }
+    else
+    {
+      Assertions.assertTrue(col instanceof OmniCollection.OfLong);
+      Assertions.assertEquals(false,col.removeVal((float)(TypeUtil.MAX_SAFE_LONG+1)));
+      Assertions.assertEquals(false,collectionSupplier.get().removeVal((float)(TypeUtil.MIN_SAFE_LONG-1)));
+      Assertions.assertEquals(false,collectionSupplier.get().removeVal((Float)(float)(TypeUtil.MAX_SAFE_LONG+1)));
+      Assertions.assertEquals(false,collectionSupplier.get().removeVal((Float)(float)(TypeUtil.MIN_SAFE_LONG-1)));
+      Assertions.assertEquals(false,collectionSupplier.get().remove((Object)(float)(TypeUtil.MAX_SAFE_LONG+1)));
+      Assertions.assertEquals(false,collectionSupplier.get().remove((Object)(float)(TypeUtil.MIN_SAFE_LONG-1)));
+    }
+    Assertions.assertEquals(false,collectionSupplier.get().removeVal((float)1.0));
+    Assertions.assertEquals(true,collectionSupplier.get().removeVal((float)0.0));
+    Assertions.assertEquals(true,collectionSupplier.get().removeVal((float)-0.0));
+    Assertions.assertEquals(false,collectionSupplier.get().removeVal((Float)(float)1.0));
+    Assertions.assertEquals(true,collectionSupplier.get().removeVal((Float)(float)0.0));
+    Assertions.assertEquals(true,collectionSupplier.get().removeVal((Float)(float)-0.0));
+    Assertions.assertEquals(false,collectionSupplier.get().remove((Object)(float)1.0));
+    Assertions.assertEquals(false,collectionSupplier.get().remove((Object)(float)0.0));
+    Assertions.assertEquals(false,collectionSupplier.get().remove((Object)(float)-0.0));
+  }
+  public static void testremoveValFloat(Supplier<? extends OmniCollection.OfBoolean> collectionSupplier,boolean containsVal
+  )
+  {
+    Assertions.assertEquals(false,collectionSupplier.get().removeVal((float)2.0));
+    Assertions.assertEquals(false,collectionSupplier.get().removeVal((Float)(float)2.0));
+    Assertions.assertEquals(false,collectionSupplier.get().remove((Object)(float)2.0));
+    Assertions.assertEquals(false,collectionSupplier.get().remove((Object)(float)0.0));
+    Assertions.assertEquals(false,collectionSupplier.get().remove((Object)(float)-0.0));
+    Assertions.assertEquals(false,collectionSupplier.get().remove((Object)(float)1.0));
+    if(containsVal)
+    {
+      Assertions.assertEquals(false,collectionSupplier.get().removeVal((float)0.0));
+      Assertions.assertEquals(false,collectionSupplier.get().removeVal((float)-0.0));
+      Assertions.assertEquals(true,collectionSupplier.get().removeVal((float)1.0));
+      Assertions.assertEquals(false,collectionSupplier.get().removeVal((Float)(float)0.0));
+      Assertions.assertEquals(false,collectionSupplier.get().removeVal((Float)(float)-0.0));
+      Assertions.assertEquals(true,collectionSupplier.get().removeVal((Float)(float)1.0));
+    }
+    else
+    {
+      Assertions.assertEquals(true,collectionSupplier.get().removeVal((float)0.0));
+      Assertions.assertEquals(true,collectionSupplier.get().removeVal((float)-0.0));
+      Assertions.assertEquals(false,collectionSupplier.get().removeVal((float)1.0));
+      Assertions.assertEquals(true,collectionSupplier.get().removeVal((Float)(float)0.0));
+      Assertions.assertEquals(true,collectionSupplier.get().removeVal((Float)(float)-0.0));
+      Assertions.assertEquals(false,collectionSupplier.get().removeVal((Float)(float)1.0));
+    }
+  }
+  public static void testcontainsLong(Supplier<? extends OmniCollection.OfDouble> collectionSupplier,double containsVal
+  )
   {
     Assertions.assertEquals(false,collectionSupplier.get().contains((long)TypeUtil.MIN_SAFE_INT-1));
     Assertions.assertEquals(false,collectionSupplier.get().contains((long)TypeUtil.MAX_SAFE_INT+1));
@@ -28,7 +501,8 @@ public class QueryTestUtil
         Assertions.assertEquals(false,collectionSupplier.get().contains((Object)Long.valueOf((long)0)));
     }
   }
-  public static void testcontainsLong(Supplier<OmniCollection.OfFloat> collectionSupplier,float containsVal)
+  public static void testcontainsLong(Supplier<? extends OmniCollection.OfFloat> collectionSupplier,float containsVal
+  )
   {
     Assertions.assertEquals(false,collectionSupplier.get().contains((long)TypeUtil.MIN_SAFE_INT-1));
     Assertions.assertEquals(false,collectionSupplier.get().contains((long)TypeUtil.MAX_SAFE_INT+1));
@@ -52,25 +526,24 @@ public class QueryTestUtil
         Assertions.assertEquals(false,collectionSupplier.get().contains((Object)Long.valueOf((long)0)));
     }
   }
-  public static void testcontainsLong(Supplier<OmniCollection> collectionSupplier)
+  public static void testcontainsLong(Supplier<? extends OmniCollection> collectionSupplier
+  )
   {
     OmniCollection col;
     if((col=collectionSupplier.get()) instanceof OmniCollection.OfByte || col instanceof OmniCollection.OfShort || col instanceof OmniCollection.OfChar || col instanceof OmniCollection.OfInt)
     {
       Assertions.assertEquals(false,col.contains((Object)(long)Long.MIN_VALUE));
-      Assertions.assertEquals(false,col.contains((Object)(long)Long.MAX_VALUE));
+      Assertions.assertEquals(false,collectionSupplier.get().contains((Object)(long)Long.MAX_VALUE));
+      Assertions.assertEquals(false,collectionSupplier.get().contains((Object)(long)0));
       Assertions.assertEquals(false,collectionSupplier.get().contains((Long)(long)Long.MIN_VALUE));
       Assertions.assertEquals(false,collectionSupplier.get().contains((long)Long.MIN_VALUE));
       Assertions.assertEquals(false,collectionSupplier.get().contains((Long)(long)Long.MAX_VALUE));
       Assertions.assertEquals(false,collectionSupplier.get().contains((long)Long.MAX_VALUE));
     }
-    else if(col instanceof OmniCollection.OfRef||col instanceof OmniCollection.OfLong)
-    {
-      Assertions.assertEquals(true,col.contains((Object)(long)0));
-    }
     else
     {
-      Assertions.assertEquals(false,col.contains((Object)(long)0));
+      Assertions.assertTrue(col instanceof OmniCollection.OfLong || col instanceof OmniCollection.OfRef);
+      Assertions.assertEquals(true,col.contains((Object)(long)0));
     }
     Assertions.assertEquals(false,collectionSupplier.get().contains((Object)(long)1));
     Assertions.assertEquals(false,collectionSupplier.get().contains((Long)(long)1));
@@ -78,7 +551,8 @@ public class QueryTestUtil
     Assertions.assertEquals(false,collectionSupplier.get().contains((long)1));
     Assertions.assertEquals(true,collectionSupplier.get().contains((long)0));
   }
-  public static void testcontainsLong(Supplier<OmniCollection.OfBoolean> collectionSupplier,boolean containsVal)
+  public static void testcontainsLong(Supplier<? extends OmniCollection.OfBoolean> collectionSupplier,boolean containsVal
+  )
   {
     Assertions.assertEquals(false,collectionSupplier.get().contains((Object)(long)2));
     Assertions.assertEquals(false,collectionSupplier.get().contains((Object)(long)TypeUtil.castToLong(!containsVal)));
@@ -90,7 +564,8 @@ public class QueryTestUtil
     Assertions.assertEquals(false,collectionSupplier.get().contains((Long)(long)TypeUtil.castToLong(!containsVal)));
     Assertions.assertEquals(true,collectionSupplier.get().contains((Long)(long)TypeUtil.castToLong(containsVal)));
   }
-  public static void testremoveValLong(Supplier<OmniCollection.OfDouble> collectionSupplier,double containsVal)
+  public static void testremoveValLong(Supplier<? extends OmniCollection.OfDouble> collectionSupplier,double containsVal
+  )
   {
     Assertions.assertEquals(false,collectionSupplier.get().removeVal((long)TypeUtil.MIN_SAFE_INT-1));
     Assertions.assertEquals(false,collectionSupplier.get().removeVal((long)TypeUtil.MAX_SAFE_INT+1));
@@ -114,7 +589,8 @@ public class QueryTestUtil
         Assertions.assertEquals(false,collectionSupplier.get().remove((Object)Long.valueOf((long)0)));
     }
   }
-  public static void testremoveValLong(Supplier<OmniCollection.OfFloat> collectionSupplier,float containsVal)
+  public static void testremoveValLong(Supplier<? extends OmniCollection.OfFloat> collectionSupplier,float containsVal
+  )
   {
     Assertions.assertEquals(false,collectionSupplier.get().removeVal((long)TypeUtil.MIN_SAFE_INT-1));
     Assertions.assertEquals(false,collectionSupplier.get().removeVal((long)TypeUtil.MAX_SAFE_INT+1));
@@ -138,25 +614,24 @@ public class QueryTestUtil
         Assertions.assertEquals(false,collectionSupplier.get().remove((Object)Long.valueOf((long)0)));
     }
   }
-  public static void testremoveValLong(Supplier<OmniCollection> collectionSupplier)
+  public static void testremoveValLong(Supplier<? extends OmniCollection> collectionSupplier
+  )
   {
     OmniCollection col;
     if((col=collectionSupplier.get()) instanceof OmniCollection.OfByte || col instanceof OmniCollection.OfShort || col instanceof OmniCollection.OfChar || col instanceof OmniCollection.OfInt)
     {
       Assertions.assertEquals(false,col.remove((Object)(long)Long.MIN_VALUE));
-      Assertions.assertEquals(false,col.remove((Object)(long)Long.MAX_VALUE));
+      Assertions.assertEquals(false,collectionSupplier.get().remove((Object)(long)Long.MAX_VALUE));
+      Assertions.assertEquals(false,collectionSupplier.get().remove((Object)(long)0));
       Assertions.assertEquals(false,collectionSupplier.get().removeVal((Long)(long)Long.MIN_VALUE));
       Assertions.assertEquals(false,collectionSupplier.get().removeVal((long)Long.MIN_VALUE));
       Assertions.assertEquals(false,collectionSupplier.get().removeVal((Long)(long)Long.MAX_VALUE));
       Assertions.assertEquals(false,collectionSupplier.get().removeVal((long)Long.MAX_VALUE));
     }
-    else if(col instanceof OmniCollection.OfRef||col instanceof OmniCollection.OfLong)
-    {
-      Assertions.assertEquals(true,col.remove((Object)(long)0));
-    }
     else
     {
-      Assertions.assertEquals(false,col.remove((Object)(long)0));
+      Assertions.assertTrue(col instanceof OmniCollection.OfLong || col instanceof OmniCollection.OfRef);
+      Assertions.assertEquals(true,col.remove((Object)(long)0));
     }
     Assertions.assertEquals(false,collectionSupplier.get().remove((Object)(long)1));
     Assertions.assertEquals(false,collectionSupplier.get().removeVal((Long)(long)1));
@@ -164,7 +639,8 @@ public class QueryTestUtil
     Assertions.assertEquals(false,collectionSupplier.get().removeVal((long)1));
     Assertions.assertEquals(true,collectionSupplier.get().removeVal((long)0));
   }
-  public static void testremoveValLong(Supplier<OmniCollection.OfBoolean> collectionSupplier,boolean containsVal)
+  public static void testremoveValLong(Supplier<? extends OmniCollection.OfBoolean> collectionSupplier,boolean containsVal
+  )
   {
     Assertions.assertEquals(false,collectionSupplier.get().remove((Object)(long)2));
     Assertions.assertEquals(false,collectionSupplier.get().remove((Object)(long)TypeUtil.castToLong(!containsVal)));
@@ -176,7 +652,8 @@ public class QueryTestUtil
     Assertions.assertEquals(false,collectionSupplier.get().removeVal((Long)(long)TypeUtil.castToLong(!containsVal)));
     Assertions.assertEquals(true,collectionSupplier.get().removeVal((Long)(long)TypeUtil.castToLong(containsVal)));
   }
-  public static void testcontainsInt(Supplier<OmniCollection.OfDouble> collectionSupplier,double containsVal)
+  public static void testcontainsInt(Supplier<? extends OmniCollection.OfDouble> collectionSupplier,double containsVal
+  )
   {
     if(containsVal == 0){
         Assertions.assertEquals(false,collectionSupplier.get().contains((int)1));
@@ -194,7 +671,8 @@ public class QueryTestUtil
         Assertions.assertEquals(false,collectionSupplier.get().contains((Object)Integer.valueOf((int)0)));
     }
   }
-  public static void testcontainsInt(Supplier<OmniCollection.OfFloat> collectionSupplier,float containsVal)
+  public static void testcontainsInt(Supplier<? extends OmniCollection.OfFloat> collectionSupplier,float containsVal
+  )
   {
     Assertions.assertEquals(false,collectionSupplier.get().contains((int)TypeUtil.MIN_SAFE_INT-1));
     Assertions.assertEquals(false,collectionSupplier.get().contains((int)TypeUtil.MAX_SAFE_INT+1));
@@ -218,13 +696,14 @@ public class QueryTestUtil
         Assertions.assertEquals(false,collectionSupplier.get().contains((Object)Integer.valueOf((int)0)));
     }
   }
-  public static void testcontainsInt(Supplier<OmniCollection> collectionSupplier)
+  public static void testcontainsInt(Supplier<? extends OmniCollection> collectionSupplier
+  )
   {
     OmniCollection col;
     if((col=collectionSupplier.get()) instanceof OmniCollection.OfByte || col instanceof OmniCollection.OfShort || col instanceof OmniCollection.OfChar)
     {
       Assertions.assertEquals(false,col.contains((Object)(int)Integer.MIN_VALUE));
-      Assertions.assertEquals(false,col.contains((Object)(int)Integer.MAX_VALUE));
+      Assertions.assertEquals(false,collectionSupplier.get().contains((Object)(int)Integer.MAX_VALUE));
       Assertions.assertEquals(false,collectionSupplier.get().contains((Integer)(int)Integer.MIN_VALUE));
       Assertions.assertEquals(false,collectionSupplier.get().contains((int)Integer.MIN_VALUE));
       Assertions.assertEquals(false,collectionSupplier.get().contains((Integer)(int)Integer.MAX_VALUE));
@@ -236,6 +715,7 @@ public class QueryTestUtil
     }
     else
     {
+      Assertions.assertTrue(col instanceof OmniCollection.OfLong);
       Assertions.assertEquals(false,col.contains((Object)(int)0));
     }
     Assertions.assertEquals(false,collectionSupplier.get().contains((Object)(int)1));
@@ -244,7 +724,8 @@ public class QueryTestUtil
     Assertions.assertEquals(false,collectionSupplier.get().contains((int)1));
     Assertions.assertEquals(true,collectionSupplier.get().contains((int)0));
   }
-  public static void testcontainsInt(Supplier<OmniCollection.OfBoolean> collectionSupplier,boolean containsVal)
+  public static void testcontainsInt(Supplier<? extends OmniCollection.OfBoolean> collectionSupplier,boolean containsVal
+  )
   {
     Assertions.assertEquals(false,collectionSupplier.get().contains((Object)(int)2));
     Assertions.assertEquals(false,collectionSupplier.get().contains((Object)(int)TypeUtil.castToByte(!containsVal)));
@@ -256,7 +737,8 @@ public class QueryTestUtil
     Assertions.assertEquals(false,collectionSupplier.get().contains((Integer)(int)TypeUtil.castToByte(!containsVal)));
     Assertions.assertEquals(true,collectionSupplier.get().contains((Integer)(int)TypeUtil.castToByte(containsVal)));
   }
-  public static void testremoveValInt(Supplier<OmniCollection.OfDouble> collectionSupplier,double containsVal)
+  public static void testremoveValInt(Supplier<? extends OmniCollection.OfDouble> collectionSupplier,double containsVal
+  )
   {
     if(containsVal == 0){
         Assertions.assertEquals(false,collectionSupplier.get().removeVal((int)1));
@@ -274,7 +756,8 @@ public class QueryTestUtil
         Assertions.assertEquals(false,collectionSupplier.get().remove((Object)Integer.valueOf((int)0)));
     }
   }
-  public static void testremoveValInt(Supplier<OmniCollection.OfFloat> collectionSupplier,float containsVal)
+  public static void testremoveValInt(Supplier<? extends OmniCollection.OfFloat> collectionSupplier,float containsVal
+  )
   {
     Assertions.assertEquals(false,collectionSupplier.get().removeVal((int)TypeUtil.MIN_SAFE_INT-1));
     Assertions.assertEquals(false,collectionSupplier.get().removeVal((int)TypeUtil.MAX_SAFE_INT+1));
@@ -298,13 +781,14 @@ public class QueryTestUtil
         Assertions.assertEquals(false,collectionSupplier.get().remove((Object)Integer.valueOf((int)0)));
     }
   }
-  public static void testremoveValInt(Supplier<OmniCollection> collectionSupplier)
+  public static void testremoveValInt(Supplier<? extends OmniCollection> collectionSupplier
+  )
   {
     OmniCollection col;
     if((col=collectionSupplier.get()) instanceof OmniCollection.OfByte || col instanceof OmniCollection.OfShort || col instanceof OmniCollection.OfChar)
     {
       Assertions.assertEquals(false,col.remove((Object)(int)Integer.MIN_VALUE));
-      Assertions.assertEquals(false,col.remove((Object)(int)Integer.MAX_VALUE));
+      Assertions.assertEquals(false,collectionSupplier.get().remove((Object)(int)Integer.MAX_VALUE));
       Assertions.assertEquals(false,collectionSupplier.get().removeVal((Integer)(int)Integer.MIN_VALUE));
       Assertions.assertEquals(false,collectionSupplier.get().removeVal((int)Integer.MIN_VALUE));
       Assertions.assertEquals(false,collectionSupplier.get().removeVal((Integer)(int)Integer.MAX_VALUE));
@@ -316,6 +800,7 @@ public class QueryTestUtil
     }
     else
     {
+      Assertions.assertTrue(col instanceof OmniCollection.OfLong);
       Assertions.assertEquals(false,col.remove((Object)(int)0));
     }
     Assertions.assertEquals(false,collectionSupplier.get().remove((Object)(int)1));
@@ -324,7 +809,8 @@ public class QueryTestUtil
     Assertions.assertEquals(false,collectionSupplier.get().removeVal((int)1));
     Assertions.assertEquals(true,collectionSupplier.get().removeVal((int)0));
   }
-  public static void testremoveValInt(Supplier<OmniCollection.OfBoolean> collectionSupplier,boolean containsVal)
+  public static void testremoveValInt(Supplier<? extends OmniCollection.OfBoolean> collectionSupplier,boolean containsVal
+  )
   {
     Assertions.assertEquals(false,collectionSupplier.get().remove((Object)(int)2));
     Assertions.assertEquals(false,collectionSupplier.get().remove((Object)(int)TypeUtil.castToByte(!containsVal)));
@@ -336,7 +822,8 @@ public class QueryTestUtil
     Assertions.assertEquals(false,collectionSupplier.get().removeVal((Integer)(int)TypeUtil.castToByte(!containsVal)));
     Assertions.assertEquals(true,collectionSupplier.get().removeVal((Integer)(int)TypeUtil.castToByte(containsVal)));
   }
-  public static void testcontainsShort(Supplier<OmniCollection.OfDouble> collectionSupplier,double containsVal)
+  public static void testcontainsShort(Supplier<? extends OmniCollection.OfDouble> collectionSupplier,double containsVal
+  )
   {
     if(containsVal == 0){
         Assertions.assertEquals(false,collectionSupplier.get().contains((short)1));
@@ -354,7 +841,8 @@ public class QueryTestUtil
         Assertions.assertEquals(false,collectionSupplier.get().contains((Object)Short.valueOf((short)0)));
     }
   }
-  public static void testcontainsShort(Supplier<OmniCollection.OfFloat> collectionSupplier,float containsVal)
+  public static void testcontainsShort(Supplier<? extends OmniCollection.OfFloat> collectionSupplier,float containsVal
+  )
   {
     if(containsVal == 0){
         Assertions.assertEquals(false,collectionSupplier.get().contains((short)1));
@@ -372,7 +860,8 @@ public class QueryTestUtil
         Assertions.assertEquals(false,collectionSupplier.get().contains((Object)Short.valueOf((short)0)));
     }
   }
-  public static void testcontainsShort(Supplier<OmniCollection> collectionSupplier)
+  public static void testcontainsShort(Supplier<? extends OmniCollection> collectionSupplier
+  )
   {
     OmniCollection col;
     if((col=collectionSupplier.get()) instanceof OmniCollection.OfChar)
@@ -384,7 +873,7 @@ public class QueryTestUtil
     else if(col instanceof OmniCollection.OfByte)
     {
       Assertions.assertEquals(false,col.contains((Object)(short)Short.MIN_VALUE));
-      Assertions.assertEquals(false,col.contains((Object)(short)Short.MAX_VALUE));
+      Assertions.assertEquals(false,collectionSupplier.get().contains((Object)(short)Short.MAX_VALUE));
       Assertions.assertEquals(false,collectionSupplier.get().contains((Short)(short)Short.MIN_VALUE));
       Assertions.assertEquals(false,collectionSupplier.get().contains((short)Short.MIN_VALUE));
       Assertions.assertEquals(false,collectionSupplier.get().contains((Short)(short)Short.MAX_VALUE));
@@ -396,6 +885,7 @@ public class QueryTestUtil
     }
     else
     {
+      Assertions.assertTrue(col instanceof OmniCollection.OfInt || col instanceof OmniCollection.OfLong);
       Assertions.assertEquals(false,col.contains((Object)(short)0));
     }
     Assertions.assertEquals(false,collectionSupplier.get().contains((Object)(short)1));
@@ -404,7 +894,8 @@ public class QueryTestUtil
     Assertions.assertEquals(false,collectionSupplier.get().contains((short)1));
     Assertions.assertEquals(true,collectionSupplier.get().contains((short)0));
   }
-  public static void testcontainsShort(Supplier<OmniCollection.OfBoolean> collectionSupplier,boolean containsVal)
+  public static void testcontainsShort(Supplier<? extends OmniCollection.OfBoolean> collectionSupplier,boolean containsVal
+  )
   {
     Assertions.assertEquals(false,collectionSupplier.get().contains((Object)(short)2));
     Assertions.assertEquals(false,collectionSupplier.get().contains((Object)(short)TypeUtil.castToByte(!containsVal)));
@@ -416,7 +907,8 @@ public class QueryTestUtil
     Assertions.assertEquals(false,collectionSupplier.get().contains((Short)(short)TypeUtil.castToByte(!containsVal)));
     Assertions.assertEquals(true,collectionSupplier.get().contains((Short)(short)TypeUtil.castToByte(containsVal)));
   }
-  public static void testremoveValShort(Supplier<OmniCollection.OfDouble> collectionSupplier,double containsVal)
+  public static void testremoveValShort(Supplier<? extends OmniCollection.OfDouble> collectionSupplier,double containsVal
+  )
   {
     if(containsVal == 0){
         Assertions.assertEquals(false,collectionSupplier.get().removeVal((short)1));
@@ -434,7 +926,8 @@ public class QueryTestUtil
         Assertions.assertEquals(false,collectionSupplier.get().remove((Object)Short.valueOf((short)0)));
     }
   }
-  public static void testremoveValShort(Supplier<OmniCollection.OfFloat> collectionSupplier,float containsVal)
+  public static void testremoveValShort(Supplier<? extends OmniCollection.OfFloat> collectionSupplier,float containsVal
+  )
   {
     if(containsVal == 0){
         Assertions.assertEquals(false,collectionSupplier.get().removeVal((short)1));
@@ -452,7 +945,8 @@ public class QueryTestUtil
         Assertions.assertEquals(false,collectionSupplier.get().remove((Object)Short.valueOf((short)0)));
     }
   }
-  public static void testremoveValShort(Supplier<OmniCollection> collectionSupplier)
+  public static void testremoveValShort(Supplier<? extends OmniCollection> collectionSupplier
+  )
   {
     OmniCollection col;
     if((col=collectionSupplier.get()) instanceof OmniCollection.OfChar)
@@ -464,7 +958,7 @@ public class QueryTestUtil
     else if(col instanceof OmniCollection.OfByte)
     {
       Assertions.assertEquals(false,col.remove((Object)(short)Short.MIN_VALUE));
-      Assertions.assertEquals(false,col.remove((Object)(short)Short.MAX_VALUE));
+      Assertions.assertEquals(false,collectionSupplier.get().remove((Object)(short)Short.MAX_VALUE));
       Assertions.assertEquals(false,collectionSupplier.get().removeVal((Short)(short)Short.MIN_VALUE));
       Assertions.assertEquals(false,collectionSupplier.get().removeVal((short)Short.MIN_VALUE));
       Assertions.assertEquals(false,collectionSupplier.get().removeVal((Short)(short)Short.MAX_VALUE));
@@ -476,6 +970,7 @@ public class QueryTestUtil
     }
     else
     {
+      Assertions.assertTrue(col instanceof OmniCollection.OfInt || col instanceof OmniCollection.OfLong);
       Assertions.assertEquals(false,col.remove((Object)(short)0));
     }
     Assertions.assertEquals(false,collectionSupplier.get().remove((Object)(short)1));
@@ -484,7 +979,8 @@ public class QueryTestUtil
     Assertions.assertEquals(false,collectionSupplier.get().removeVal((short)1));
     Assertions.assertEquals(true,collectionSupplier.get().removeVal((short)0));
   }
-  public static void testremoveValShort(Supplier<OmniCollection.OfBoolean> collectionSupplier,boolean containsVal)
+  public static void testremoveValShort(Supplier<? extends OmniCollection.OfBoolean> collectionSupplier,boolean containsVal
+  )
   {
     Assertions.assertEquals(false,collectionSupplier.get().remove((Object)(short)2));
     Assertions.assertEquals(false,collectionSupplier.get().remove((Object)(short)TypeUtil.castToByte(!containsVal)));
@@ -496,7 +992,8 @@ public class QueryTestUtil
     Assertions.assertEquals(false,collectionSupplier.get().removeVal((Short)(short)TypeUtil.castToByte(!containsVal)));
     Assertions.assertEquals(true,collectionSupplier.get().removeVal((Short)(short)TypeUtil.castToByte(containsVal)));
   }
-  public static void testcontainsChar(Supplier<OmniCollection.OfDouble> collectionSupplier,double containsVal)
+  public static void testcontainsChar(Supplier<? extends OmniCollection.OfDouble> collectionSupplier,double containsVal
+  )
   {
     if(containsVal == 0){
         Assertions.assertEquals(false,collectionSupplier.get().contains((char)1));
@@ -514,7 +1011,8 @@ public class QueryTestUtil
         Assertions.assertEquals(false,collectionSupplier.get().contains((Object)Character.valueOf((char)0)));
     }
   }
-  public static void testcontainsChar(Supplier<OmniCollection.OfFloat> collectionSupplier,float containsVal)
+  public static void testcontainsChar(Supplier<? extends OmniCollection.OfFloat> collectionSupplier,float containsVal
+  )
   {
     if(containsVal == 0){
         Assertions.assertEquals(false,collectionSupplier.get().contains((char)1));
@@ -532,7 +1030,8 @@ public class QueryTestUtil
         Assertions.assertEquals(false,collectionSupplier.get().contains((Object)Character.valueOf((char)0)));
     }
   }
-  public static void testcontainsChar(Supplier<OmniCollection> collectionSupplier)
+  public static void testcontainsChar(Supplier<? extends OmniCollection> collectionSupplier
+  )
   {
     OmniCollection col;
     if((col=collectionSupplier.get()) instanceof OmniCollection.OfShort || col instanceof OmniCollection.OfByte)
@@ -547,6 +1046,7 @@ public class QueryTestUtil
     }
     else
     {
+      Assertions.assertTrue(col instanceof OmniCollection.OfInt || col instanceof OmniCollection.OfLong);
       Assertions.assertEquals(false,col.contains((Object)(char)0));
     }
     Assertions.assertEquals(false,collectionSupplier.get().contains((Object)(char)1));
@@ -555,7 +1055,8 @@ public class QueryTestUtil
     Assertions.assertEquals(false,collectionSupplier.get().contains((char)1));
     Assertions.assertEquals(true,collectionSupplier.get().contains((char)0));
   }
-  public static void testcontainsChar(Supplier<OmniCollection.OfBoolean> collectionSupplier,boolean containsVal)
+  public static void testcontainsChar(Supplier<? extends OmniCollection.OfBoolean> collectionSupplier,boolean containsVal
+  )
   {
     Assertions.assertEquals(false,collectionSupplier.get().contains((Object)(char)2));
     Assertions.assertEquals(false,collectionSupplier.get().contains((Object)(char)TypeUtil.castToChar(!containsVal)));
@@ -567,7 +1068,8 @@ public class QueryTestUtil
     Assertions.assertEquals(false,collectionSupplier.get().contains((char)(char)TypeUtil.castToChar(!containsVal)));
     Assertions.assertEquals(true,collectionSupplier.get().contains((char)(char)TypeUtil.castToChar(containsVal)));
   }
-  public static void testremoveValChar(Supplier<OmniCollection.OfDouble> collectionSupplier,double containsVal)
+  public static void testremoveValChar(Supplier<? extends OmniCollection.OfDouble> collectionSupplier,double containsVal
+  )
   {
     if(containsVal == 0){
         Assertions.assertEquals(false,collectionSupplier.get().removeVal((char)1));
@@ -585,7 +1087,8 @@ public class QueryTestUtil
         Assertions.assertEquals(false,collectionSupplier.get().remove((Object)Character.valueOf((char)0)));
     }
   }
-  public static void testremoveValChar(Supplier<OmniCollection.OfFloat> collectionSupplier,float containsVal)
+  public static void testremoveValChar(Supplier<? extends OmniCollection.OfFloat> collectionSupplier,float containsVal
+  )
   {
     if(containsVal == 0){
         Assertions.assertEquals(false,collectionSupplier.get().removeVal((char)1));
@@ -603,7 +1106,8 @@ public class QueryTestUtil
         Assertions.assertEquals(false,collectionSupplier.get().remove((Object)Character.valueOf((char)0)));
     }
   }
-  public static void testremoveValChar(Supplier<OmniCollection> collectionSupplier)
+  public static void testremoveValChar(Supplier<? extends OmniCollection> collectionSupplier
+  )
   {
     OmniCollection col;
     if((col=collectionSupplier.get()) instanceof OmniCollection.OfShort || col instanceof OmniCollection.OfByte)
@@ -618,6 +1122,7 @@ public class QueryTestUtil
     }
     else
     {
+      Assertions.assertTrue(col instanceof OmniCollection.OfInt || col instanceof OmniCollection.OfLong);
       Assertions.assertEquals(false,col.remove((Object)(char)0));
     }
     Assertions.assertEquals(false,collectionSupplier.get().remove((Object)(char)1));
@@ -626,7 +1131,8 @@ public class QueryTestUtil
     Assertions.assertEquals(false,collectionSupplier.get().removeVal((char)1));
     Assertions.assertEquals(true,collectionSupplier.get().removeVal((char)0));
   }
-  public static void testremoveValChar(Supplier<OmniCollection.OfBoolean> collectionSupplier,boolean containsVal)
+  public static void testremoveValChar(Supplier<? extends OmniCollection.OfBoolean> collectionSupplier,boolean containsVal
+  )
   {
     Assertions.assertEquals(false,collectionSupplier.get().remove((Object)(char)2));
     Assertions.assertEquals(false,collectionSupplier.get().remove((Object)(char)TypeUtil.castToChar(!containsVal)));
@@ -638,7 +1144,8 @@ public class QueryTestUtil
     Assertions.assertEquals(false,collectionSupplier.get().removeVal((char)(char)TypeUtil.castToChar(!containsVal)));
     Assertions.assertEquals(true,collectionSupplier.get().removeVal((char)(char)TypeUtil.castToChar(containsVal)));
   }
-  public static void testcontainsByte(Supplier<OmniCollection.OfDouble> collectionSupplier,double containsVal)
+  public static void testcontainsByte(Supplier<? extends OmniCollection.OfDouble> collectionSupplier,double containsVal
+  )
   {
     if(containsVal == 0){
         Assertions.assertEquals(false,collectionSupplier.get().contains((byte)1));
@@ -656,7 +1163,8 @@ public class QueryTestUtil
         Assertions.assertEquals(false,collectionSupplier.get().contains((Object)Byte.valueOf((byte)0)));
     }
   }
-  public static void testcontainsByte(Supplier<OmniCollection.OfFloat> collectionSupplier,float containsVal)
+  public static void testcontainsByte(Supplier<? extends OmniCollection.OfFloat> collectionSupplier,float containsVal
+  )
   {
     if(containsVal == 0){
         Assertions.assertEquals(false,collectionSupplier.get().contains((byte)1));
@@ -674,7 +1182,8 @@ public class QueryTestUtil
         Assertions.assertEquals(false,collectionSupplier.get().contains((Object)Byte.valueOf((byte)0)));
     }
   }
-  public static void testcontainsByte(Supplier<OmniCollection> collectionSupplier)
+  public static void testcontainsByte(Supplier<? extends OmniCollection> collectionSupplier
+  )
   {
     OmniCollection col;
     if((col=collectionSupplier.get()) instanceof OmniCollection.OfChar)
@@ -689,6 +1198,7 @@ public class QueryTestUtil
     }
     else
     {
+      Assertions.assertTrue(col instanceof OmniCollection.OfShort || col instanceof OmniCollection.OfInt || col instanceof OmniCollection.OfLong);
       Assertions.assertEquals(false,col.contains((Object)(byte)0));
     }
     Assertions.assertEquals(false,collectionSupplier.get().contains((Object)(byte)1));
@@ -697,7 +1207,8 @@ public class QueryTestUtil
     Assertions.assertEquals(false,collectionSupplier.get().contains((byte)1));
     Assertions.assertEquals(true,collectionSupplier.get().contains((byte)0));
   }
-  public static void testcontainsByte(Supplier<OmniCollection.OfBoolean> collectionSupplier,boolean containsVal)
+  public static void testcontainsByte(Supplier<? extends OmniCollection.OfBoolean> collectionSupplier,boolean containsVal
+  )
   {
     Assertions.assertEquals(false,collectionSupplier.get().contains((Object)(byte)2));
     Assertions.assertEquals(false,collectionSupplier.get().contains((Object)(byte)TypeUtil.castToByte(!containsVal)));
@@ -709,7 +1220,8 @@ public class QueryTestUtil
     Assertions.assertEquals(false,collectionSupplier.get().contains((Byte)(byte)TypeUtil.castToByte(!containsVal)));
     Assertions.assertEquals(true,collectionSupplier.get().contains((Byte)(byte)TypeUtil.castToByte(containsVal)));
   }
-  public static void testremoveValByte(Supplier<OmniCollection.OfDouble> collectionSupplier,double containsVal)
+  public static void testremoveValByte(Supplier<? extends OmniCollection.OfDouble> collectionSupplier,double containsVal
+  )
   {
     if(containsVal == 0){
         Assertions.assertEquals(false,collectionSupplier.get().removeVal((byte)1));
@@ -727,7 +1239,8 @@ public class QueryTestUtil
         Assertions.assertEquals(false,collectionSupplier.get().remove((Object)Byte.valueOf((byte)0)));
     }
   }
-  public static void testremoveValByte(Supplier<OmniCollection.OfFloat> collectionSupplier,float containsVal)
+  public static void testremoveValByte(Supplier<? extends OmniCollection.OfFloat> collectionSupplier,float containsVal
+  )
   {
     if(containsVal == 0){
         Assertions.assertEquals(false,collectionSupplier.get().removeVal((byte)1));
@@ -745,7 +1258,8 @@ public class QueryTestUtil
         Assertions.assertEquals(false,collectionSupplier.get().remove((Object)Byte.valueOf((byte)0)));
     }
   }
-  public static void testremoveValByte(Supplier<OmniCollection> collectionSupplier)
+  public static void testremoveValByte(Supplier<? extends OmniCollection> collectionSupplier
+  )
   {
     OmniCollection col;
     if((col=collectionSupplier.get()) instanceof OmniCollection.OfChar)
@@ -760,6 +1274,7 @@ public class QueryTestUtil
     }
     else
     {
+      Assertions.assertTrue(col instanceof OmniCollection.OfShort || col instanceof OmniCollection.OfInt || col instanceof OmniCollection.OfLong);
       Assertions.assertEquals(false,col.remove((Object)(byte)0));
     }
     Assertions.assertEquals(false,collectionSupplier.get().remove((Object)(byte)1));
@@ -768,7 +1283,8 @@ public class QueryTestUtil
     Assertions.assertEquals(false,collectionSupplier.get().removeVal((byte)1));
     Assertions.assertEquals(true,collectionSupplier.get().removeVal((byte)0));
   }
-  public static void testremoveValByte(Supplier<OmniCollection.OfBoolean> collectionSupplier,boolean containsVal)
+  public static void testremoveValByte(Supplier<? extends OmniCollection.OfBoolean> collectionSupplier,boolean containsVal
+  )
   {
     Assertions.assertEquals(false,collectionSupplier.get().remove((Object)(byte)2));
     Assertions.assertEquals(false,collectionSupplier.get().remove((Object)(byte)TypeUtil.castToByte(!containsVal)));
@@ -780,7 +1296,8 @@ public class QueryTestUtil
     Assertions.assertEquals(false,collectionSupplier.get().removeVal((Byte)(byte)TypeUtil.castToByte(!containsVal)));
     Assertions.assertEquals(true,collectionSupplier.get().removeVal((Byte)(byte)TypeUtil.castToByte(containsVal)));
   }
-  public static void testcontainsBoolean(Supplier<OmniCollection> collectionSupplier,boolean containsVal)
+  public static void testcontainsBoolean(Supplier<? extends OmniCollection> collectionSupplier,boolean containsVal
+  )
   {
     Assertions.assertEquals(false,collectionSupplier.get().contains((Object)!containsVal));
     OmniCollection collection;
@@ -797,7 +1314,8 @@ public class QueryTestUtil
     Assertions.assertEquals(true,collectionSupplier.get().contains(containsVal));
     Assertions.assertEquals(true,collectionSupplier.get().contains((Boolean)containsVal));
   }
-  public static void testremoveValBoolean(Supplier<OmniCollection> collectionSupplier,boolean containsVal)
+  public static void testremoveValBoolean(Supplier<? extends OmniCollection> collectionSupplier,boolean containsVal
+  )
   {
     Assertions.assertEquals(false,collectionSupplier.get().remove((Object)!containsVal));
     OmniCollection collection;
@@ -814,7 +1332,8 @@ public class QueryTestUtil
     Assertions.assertEquals(true,collectionSupplier.get().removeVal(containsVal));
     Assertions.assertEquals(true,collectionSupplier.get().removeVal((Boolean)containsVal));
   }
-  public static <E> void testcontainsNullReturnPositive(Supplier<OmniCollection.OfRef<E>> collectionSupplier)
+  public static <E> void testcontainsNullReturnPositive(Supplier<? extends OmniCollection.OfRef<E>> collectionSupplier
+  )
   {
     Assertions.assertEquals(true,collectionSupplier.get().contains((Object)null));
     Assertions.assertEquals(true,collectionSupplier.get().contains((Boolean)null));
@@ -826,7 +1345,8 @@ public class QueryTestUtil
     Assertions.assertEquals(true,collectionSupplier.get().contains((Float)null));
     Assertions.assertEquals(true,collectionSupplier.get().contains((Double)null));
   }
-  public static <E> void testremoveValNullReturnPositive(Supplier<OmniCollection.OfRef<E>> collectionSupplier)
+  public static <E> void testremoveValNullReturnPositive(Supplier<? extends OmniCollection.OfRef<E>> collectionSupplier
+  )
   {
     Assertions.assertEquals(true,collectionSupplier.get().remove((Object)null));
     Assertions.assertEquals(true,collectionSupplier.get().removeVal((Boolean)null));
@@ -838,7 +1358,7 @@ public class QueryTestUtil
     Assertions.assertEquals(true,collectionSupplier.get().removeVal((Float)null));
     Assertions.assertEquals(true,collectionSupplier.get().removeVal((Double)null));
   }
-  public static void testcontainsNullReturnNegative(Supplier<OmniCollection> collectionSupplier)
+  public static void testcontainsNullReturnNegative(Supplier<? extends OmniCollection> collectionSupplier)
   {
     Assertions.assertEquals(false,collectionSupplier.get().contains((Object)null));
     Assertions.assertEquals(false,collectionSupplier.get().contains((Boolean)null));
@@ -850,7 +1370,7 @@ public class QueryTestUtil
     Assertions.assertEquals(false,collectionSupplier.get().contains((Float)null));
     Assertions.assertEquals(false,collectionSupplier.get().contains((Double)null));
   }
-  public static void testremoveValNullReturnNegative(Supplier<OmniCollection> collectionSupplier)
+  public static void testremoveValNullReturnNegative(Supplier<? extends OmniCollection> collectionSupplier)
   {
     Assertions.assertEquals(false,collectionSupplier.get().remove((Object)null));
     Assertions.assertEquals(false,collectionSupplier.get().removeVal((Boolean)null));
@@ -862,7 +1382,7 @@ public class QueryTestUtil
     Assertions.assertEquals(false,collectionSupplier.get().removeVal((Float)null));
     Assertions.assertEquals(false,collectionSupplier.get().removeVal((Double)null));
   }
-  public static void testEmptycontains(Supplier<OmniCollection> collectionSupplier)
+  public static void testEmptycontains(Supplier<? extends OmniCollection> collectionSupplier)
   {
     Assertions.assertEquals(false,collectionSupplier.get().contains((Object)null));
     Assertions.assertEquals(false,collectionSupplier.get().contains((Object)Boolean.TRUE));
@@ -1282,7 +1802,7 @@ public class QueryTestUtil
     Assertions.assertEquals(false,collectionSupplier.get().contains(Double.POSITIVE_INFINITY));
     Assertions.assertEquals(false,collectionSupplier.get().contains(Double.NaN));
   }
-  public static void testEmptyremoveVal(Supplier<OmniCollection> collectionSupplier)
+  public static void testEmptyremoveVal(Supplier<? extends OmniCollection> collectionSupplier)
   {
     Assertions.assertEquals(false,collectionSupplier.get().remove((Object)null));
     Assertions.assertEquals(false,collectionSupplier.get().remove((Object)Boolean.TRUE));
@@ -1703,3 +2223,4 @@ public class QueryTestUtil
     Assertions.assertEquals(false,collectionSupplier.get().removeVal(Double.NaN));
   }
 }
+//TODO add sanity checks (mod checks, empty/not empty) to the tests

@@ -8,9 +8,76 @@ import omni.impl.seq.ShortArrSeq.UncheckedList;
 import omni.impl.seq.ShortArrSeq.CheckedList;
 import omni.impl.seq.ShortArrSeq.UncheckedStack;
 import omni.impl.seq.ShortArrSeq.CheckedStack;
+import java.util.ArrayList;
 import java.util.ConcurrentModificationException;
+import java.util.function.Consumer;
+import omni.function.ShortConsumer;
 public class ShortArrSeqTest
 {
+//TODO place sanity checks for checked sequence modification behavior
+  @Test
+  public void testToArrayUncheckedStack()
+  {
+    var seq=new UncheckedStack();
+    var shortArr=seq.toShortArray();
+    Assertions.assertTrue(shortArr==OmniArray.OfShort.DEFAULT_ARR);
+    var ShortArr=seq.toArray();
+    Assertions.assertTrue(ShortArr==OmniArray.OfShort.DEFAULT_BOXED_ARR);
+    var doubleArr=seq.toDoubleArray();
+    Assertions.assertTrue(doubleArr==OmniArray.OfDouble.DEFAULT_ARR);
+    var floatArr=seq.toFloatArray();
+    Assertions.assertTrue(floatArr==OmniArray.OfFloat.DEFAULT_ARR);
+    var longArr=seq.toLongArray();
+    Assertions.assertTrue(longArr==OmniArray.OfLong.DEFAULT_ARR);
+    var intArr=seq.toIntArray();
+    Assertions.assertTrue(intArr==OmniArray.OfInt.DEFAULT_ARR);
+    for(int i=0;i<10;++i)
+    {
+      seq.add(TypeConversionUtil.convertToshort(i));
+    }
+    shortArr=seq.toShortArray();
+    Assertions.assertEquals(shortArr.length,seq.size());
+    var seqItr=seq.iterator();
+    for(int i=0;i<seq.size();++i)
+    {
+      Assertions.assertEquals(seqItr.nextShort(),shortArr[i]);
+    }
+    ShortArr=seq.toArray();
+    Assertions.assertEquals(ShortArr.length,seq.size());
+    seqItr=seq.iterator();
+    for(int i=0;i<seq.size();++i)
+    {
+      Assertions.assertEquals(seqItr.next(),ShortArr[i]);
+    }
+    doubleArr=seq.toDoubleArray();
+    Assertions.assertEquals(doubleArr.length,seq.size());
+    seqItr=seq.iterator();
+    for(int i=0;i<seq.size();++i)
+    {
+      Assertions.assertEquals(seqItr.nextDouble(),doubleArr[i]);
+    }
+    floatArr=seq.toFloatArray();
+    Assertions.assertEquals(floatArr.length,seq.size());
+    seqItr=seq.iterator();
+    for(int i=0;i<seq.size();++i)
+    {
+      Assertions.assertEquals(seqItr.nextFloat(),floatArr[i]);
+    }
+    longArr=seq.toLongArray();
+    Assertions.assertEquals(longArr.length,seq.size());
+    seqItr=seq.iterator();
+    for(int i=0;i<seq.size();++i)
+    {
+      Assertions.assertEquals(seqItr.nextLong(),longArr[i]);
+    }
+    intArr=seq.toIntArray();
+    Assertions.assertEquals(intArr.length,seq.size());
+    seqItr=seq.iterator();
+    for(int i=0;i<seq.size();++i)
+    {
+      Assertions.assertEquals(seqItr.nextInt(),intArr[i]);
+    }
+  }
   @Test
   public void testClearUncheckedStack()
   {
@@ -74,14 +141,118 @@ public class ShortArrSeqTest
     }
   }
   @Test
+  public void testToArrayIntFunctionParamUncheckedStack()
+  {
+    var seq=new UncheckedStack();
+    Object[] result=seq.toArray(Object[]::new);
+    Assertions.assertEquals(result.length,0);
+    for(int i=0;i<10;++i)
+    {
+      seq.add(TypeConversionUtil.convertToshort(i));
+    }
+    result=seq.toArray(Object[]::new);
+    Assertions.assertEquals(result.length,seq.size());
+    var itr=seq.iterator();
+    for(int i=0;i<10;++i)
+    {
+      Assertions.assertEquals(itr.next(),result[i]);
+    }
+  }
+  @Test
+  public void testForEachUncheckedStack()
+  {
+    {
+      var seq=new UncheckedStack();
+      ArrayList<Object> arrayList=new ArrayList<>();
+      seq.forEach((ShortConsumer)arrayList::add);
+      Assertions.assertTrue(arrayList.isEmpty());
+      for(int i=0;i<10;++i)
+      {
+        seq.add(TypeConversionUtil.convertToshort(i));
+      }
+      seq.forEach((ShortConsumer)arrayList::add);
+      Assertions.assertEquals(arrayList.size(),10);
+      var seqItr=seq.iterator();
+      for(var v:arrayList)
+      {
+        Assertions.assertEquals(v,seqItr.next());
+      }
+      seq.clear();
+      arrayList.clear();
+      seq.forEach((Consumer<Short>)arrayList::add);
+      Assertions.assertTrue(arrayList.isEmpty());
+      for(int i=0;i<10;++i)
+      {
+        seq.add(TypeConversionUtil.convertToshort(i));
+      }
+      seq.forEach((Consumer<Short>)arrayList::add);
+      Assertions.assertEquals(arrayList.size(),10);
+      seqItr=seq.iterator();
+      for(var v:arrayList)
+      {
+        Assertions.assertEquals(v,seqItr.next());
+      }
+    }
+  }
+  @Test
+  public void testToArrayArrayParamUncheckedStack()
+  {
+    var seq=new UncheckedStack();
+    //Test empty exact capacity
+    Object[] param=new Object[0];
+    Object[] result=seq.toArray(param);
+    Assertions.assertTrue(param==result);
+    param=new Object[10];
+    for(int i=0;i<10;++i)
+    {
+      param[i]=Integer.valueOf(1);
+    }
+    result=seq.toArray(param);
+    Assertions.assertTrue(param==result);
+    Assertions.assertNull(result[0]);
+    for(int i=1;i<10;++i)
+    {
+      Assertions.assertEquals(result[i],Integer.valueOf(1));
+    }
+    param=new Object[0];
+    seq.add(TypeConversionUtil.convertToshort(0));
+    result=seq.toArray(param);
+    Assertions.assertTrue(param!=result);
+    Assertions.assertEquals(result.length,seq.size());
+    Assertions.assertEquals(TypeConversionUtil.convertToShort(0),result[0]);
+    param=new Object[10];
+    for(int i=0;i<10;++i)
+    {
+      param[i]=Integer.valueOf(1);
+    }
+    result=seq.toArray(param);
+    Assertions.assertTrue(param==result);
+    Assertions.assertEquals(TypeConversionUtil.convertToShort(0),result[0]);
+    Assertions.assertNull(result[1]);
+    for(int i=2;i<10;++i)
+    {
+      Assertions.assertEquals(result[i],Integer.valueOf(1));
+    }
+    for(int i=1;i<10;++i)
+    {
+      seq.add(TypeConversionUtil.convertToshort(i));
+    }
+    result=seq.toArray(param);
+    Assertions.assertTrue(param==result);
+    var itr=seq.iterator();
+    for(int i=0;i<10;++i)
+    {
+      Assertions.assertEquals(itr.next(),result[i]);
+    }
+  }
+  @Test
   public void testAddUncheckedStack()
   {
     {
-      //test with default array
       var seq=new UncheckedStack();
       for(int i=0;i<100;++i)
       {
-        seq.add(TypeConversionUtil.convertToshort(i));
+        Assertions.assertTrue(seq.add(TypeConversionUtil.convertToshort(i)));
       }
       Assertions.assertEquals(seq.size(),100);
       var itr=seq.iterator();
@@ -92,11 +263,10 @@ public class ShortArrSeqTest
       Assertions.assertFalse(itr.hasNext());
     }
     {
-      //test with null array
       var seq=new UncheckedStack(0,null);
       for(int i=0;i<100;++i)
       {
-        seq.add(TypeConversionUtil.convertToshort(i));
+        Assertions.assertTrue(seq.add(TypeConversionUtil.convertToshort(i)));
       }
       Assertions.assertEquals(seq.size(),100);
       var itr=seq.iterator();
@@ -107,11 +277,10 @@ public class ShortArrSeqTest
       Assertions.assertFalse(itr.hasNext());
     }
      {
-      //test with preallocated array
-      var seq=new UncheckedStack(20);
+      var seq=new UncheckedStack(50);
       for(int i=0;i<100;++i)
       {
-        seq.add(TypeConversionUtil.convertToshort(i));
+        Assertions.assertTrue(seq.add(TypeConversionUtil.convertToshort(i)));
       }
       Assertions.assertEquals(seq.size(),100);
       var itr=seq.iterator();
@@ -122,29 +291,51 @@ public class ShortArrSeqTest
       Assertions.assertFalse(itr.hasNext());
     }
   }
-  private static void testPushHelper(UncheckedStack seq)
-  {
-    for(int i=0;i<100;++i)
-    {
-      seq.push(TypeConversionUtil.convertToshort(i));
-    }
-    Assertions.assertEquals(100,seq.size());
-    var itr=seq.iterator();
-    for(int i=100;--i>=0;)
-    {
-      Assertions.assertEquals(TypeConversionUtil.convertToshort(i),itr.nextShort());
-    }
-    Assertions.assertFalse(itr.hasNext());
-  }
   @Test
   public void testPushUncheckedStack()
   {
-    //with default array
-    testPushHelper(new UncheckedStack());
-    //with null array
-    testPushHelper(new UncheckedStack(0,null));
-    //with pre-allocated capacity
-    testPushHelper(new UncheckedStack(50));
+    {
+      var seq=new UncheckedStack();
+      for(int i=0;i<100;++i)
+      {
+        seq.push(TypeConversionUtil.convertToshort(i));
+      }
+      Assertions.assertEquals(100,seq.size());
+      var itr=seq.iterator();
+      for(int i=100;--i>=0;)
+      {
+        Assertions.assertEquals(TypeConversionUtil.convertToshort(i),itr.nextShort());
+      }
+      Assertions.assertFalse(itr.hasNext());
+    }
+    {
+      var seq=new UncheckedStack(0,null);
+      for(int i=0;i<100;++i)
+      {
+        seq.push(TypeConversionUtil.convertToshort(i));
+      }
+      Assertions.assertEquals(100,seq.size());
+      var itr=seq.iterator();
+      for(int i=100;--i>=0;)
+      {
+        Assertions.assertEquals(TypeConversionUtil.convertToshort(i),itr.nextShort());
+      }
+      Assertions.assertFalse(itr.hasNext());
+    }
+     {
+      var seq=new UncheckedStack(50);
+      for(int i=0;i<100;++i)
+      {
+        seq.push(TypeConversionUtil.convertToshort(i));
+      }
+      Assertions.assertEquals(100,seq.size());
+      var itr=seq.iterator();
+      for(int i=100;--i>=0;)
+      {
+        Assertions.assertEquals(TypeConversionUtil.convertToshort(i),itr.nextShort());
+      }
+      Assertions.assertFalse(itr.hasNext());
+    }
   }
   @Test
   public void testCloneUncheckedStack()
@@ -190,6 +381,69 @@ public class ShortArrSeqTest
       Assertions.assertEquals(seq.size(),0);
       Assertions.assertTrue(seq.isEmpty());
       Assertions.assertEquals(seq.arr.length,i);
+    }
+  }
+  @Test
+  public void testToArrayUncheckedList()
+  {
+    var seq=new UncheckedList();
+    var shortArr=seq.toShortArray();
+    Assertions.assertTrue(shortArr==OmniArray.OfShort.DEFAULT_ARR);
+    var ShortArr=seq.toArray();
+    Assertions.assertTrue(ShortArr==OmniArray.OfShort.DEFAULT_BOXED_ARR);
+    var doubleArr=seq.toDoubleArray();
+    Assertions.assertTrue(doubleArr==OmniArray.OfDouble.DEFAULT_ARR);
+    var floatArr=seq.toFloatArray();
+    Assertions.assertTrue(floatArr==OmniArray.OfFloat.DEFAULT_ARR);
+    var longArr=seq.toLongArray();
+    Assertions.assertTrue(longArr==OmniArray.OfLong.DEFAULT_ARR);
+    var intArr=seq.toIntArray();
+    Assertions.assertTrue(intArr==OmniArray.OfInt.DEFAULT_ARR);
+    for(int i=0;i<10;++i)
+    {
+      seq.add(TypeConversionUtil.convertToshort(i));
+    }
+    shortArr=seq.toShortArray();
+    Assertions.assertEquals(shortArr.length,seq.size());
+    var seqItr=seq.iterator();
+    for(int i=0;i<seq.size();++i)
+    {
+      Assertions.assertEquals(seqItr.nextShort(),shortArr[i]);
+    }
+    ShortArr=seq.toArray();
+    Assertions.assertEquals(ShortArr.length,seq.size());
+    seqItr=seq.iterator();
+    for(int i=0;i<seq.size();++i)
+    {
+      Assertions.assertEquals(seqItr.next(),ShortArr[i]);
+    }
+    doubleArr=seq.toDoubleArray();
+    Assertions.assertEquals(doubleArr.length,seq.size());
+    seqItr=seq.iterator();
+    for(int i=0;i<seq.size();++i)
+    {
+      Assertions.assertEquals(seqItr.nextDouble(),doubleArr[i]);
+    }
+    floatArr=seq.toFloatArray();
+    Assertions.assertEquals(floatArr.length,seq.size());
+    seqItr=seq.iterator();
+    for(int i=0;i<seq.size();++i)
+    {
+      Assertions.assertEquals(seqItr.nextFloat(),floatArr[i]);
+    }
+    longArr=seq.toLongArray();
+    Assertions.assertEquals(longArr.length,seq.size());
+    seqItr=seq.iterator();
+    for(int i=0;i<seq.size();++i)
+    {
+      Assertions.assertEquals(seqItr.nextLong(),longArr[i]);
+    }
+    intArr=seq.toIntArray();
+    Assertions.assertEquals(intArr.length,seq.size());
+    seqItr=seq.iterator();
+    for(int i=0;i<seq.size();++i)
+    {
+      Assertions.assertEquals(seqItr.nextInt(),intArr[i]);
     }
   }
   @Test
@@ -255,14 +509,118 @@ public class ShortArrSeqTest
     }
   }
   @Test
+  public void testToArrayIntFunctionParamUncheckedList()
+  {
+    var seq=new UncheckedList();
+    Object[] result=seq.toArray(Object[]::new);
+    Assertions.assertEquals(result.length,0);
+    for(int i=0;i<10;++i)
+    {
+      seq.add(TypeConversionUtil.convertToshort(i));
+    }
+    result=seq.toArray(Object[]::new);
+    Assertions.assertEquals(result.length,seq.size());
+    var itr=seq.iterator();
+    for(int i=0;i<10;++i)
+    {
+      Assertions.assertEquals(itr.next(),result[i]);
+    }
+  }
+  @Test
+  public void testForEachUncheckedList()
+  {
+    {
+      var seq=new UncheckedList();
+      ArrayList<Object> arrayList=new ArrayList<>();
+      seq.forEach((ShortConsumer)arrayList::add);
+      Assertions.assertTrue(arrayList.isEmpty());
+      for(int i=0;i<10;++i)
+      {
+        seq.add(TypeConversionUtil.convertToshort(i));
+      }
+      seq.forEach((ShortConsumer)arrayList::add);
+      Assertions.assertEquals(arrayList.size(),10);
+      var seqItr=seq.iterator();
+      for(var v:arrayList)
+      {
+        Assertions.assertEquals(v,seqItr.next());
+      }
+      seq.clear();
+      arrayList.clear();
+      seq.forEach((Consumer<Short>)arrayList::add);
+      Assertions.assertTrue(arrayList.isEmpty());
+      for(int i=0;i<10;++i)
+      {
+        seq.add(TypeConversionUtil.convertToshort(i));
+      }
+      seq.forEach((Consumer<Short>)arrayList::add);
+      Assertions.assertEquals(arrayList.size(),10);
+      seqItr=seq.iterator();
+      for(var v:arrayList)
+      {
+        Assertions.assertEquals(v,seqItr.next());
+      }
+    }
+  }
+  @Test
+  public void testToArrayArrayParamUncheckedList()
+  {
+    var seq=new UncheckedList();
+    //Test empty exact capacity
+    Object[] param=new Object[0];
+    Object[] result=seq.toArray(param);
+    Assertions.assertTrue(param==result);
+    param=new Object[10];
+    for(int i=0;i<10;++i)
+    {
+      param[i]=Integer.valueOf(1);
+    }
+    result=seq.toArray(param);
+    Assertions.assertTrue(param==result);
+    Assertions.assertNull(result[0]);
+    for(int i=1;i<10;++i)
+    {
+      Assertions.assertEquals(result[i],Integer.valueOf(1));
+    }
+    param=new Object[0];
+    seq.add(TypeConversionUtil.convertToshort(0));
+    result=seq.toArray(param);
+    Assertions.assertTrue(param!=result);
+    Assertions.assertEquals(result.length,seq.size());
+    Assertions.assertEquals(TypeConversionUtil.convertToShort(0),result[0]);
+    param=new Object[10];
+    for(int i=0;i<10;++i)
+    {
+      param[i]=Integer.valueOf(1);
+    }
+    result=seq.toArray(param);
+    Assertions.assertTrue(param==result);
+    Assertions.assertEquals(TypeConversionUtil.convertToShort(0),result[0]);
+    Assertions.assertNull(result[1]);
+    for(int i=2;i<10;++i)
+    {
+      Assertions.assertEquals(result[i],Integer.valueOf(1));
+    }
+    for(int i=1;i<10;++i)
+    {
+      seq.add(TypeConversionUtil.convertToshort(i));
+    }
+    result=seq.toArray(param);
+    Assertions.assertTrue(param==result);
+    var itr=seq.iterator();
+    for(int i=0;i<10;++i)
+    {
+      Assertions.assertEquals(itr.next(),result[i]);
+    }
+  }
+  @Test
   public void testAddUncheckedList()
   {
     {
-      //test with default array
       var seq=new UncheckedList();
       for(int i=0;i<100;++i)
       {
-        seq.add(TypeConversionUtil.convertToshort(i));
+        Assertions.assertTrue(seq.add(TypeConversionUtil.convertToshort(i)));
       }
       Assertions.assertEquals(seq.size(),100);
       var itr=seq.iterator();
@@ -273,11 +631,10 @@ public class ShortArrSeqTest
       Assertions.assertFalse(itr.hasNext());
     }
     {
-      //test with null array
       var seq=new UncheckedList(0,null);
       for(int i=0;i<100;++i)
       {
-        seq.add(TypeConversionUtil.convertToshort(i));
+        Assertions.assertTrue(seq.add(TypeConversionUtil.convertToshort(i)));
       }
       Assertions.assertEquals(seq.size(),100);
       var itr=seq.iterator();
@@ -288,11 +645,10 @@ public class ShortArrSeqTest
       Assertions.assertFalse(itr.hasNext());
     }
      {
-      //test with preallocated array
-      var seq=new UncheckedList(20);
+      var seq=new UncheckedList(50);
       for(int i=0;i<100;++i)
       {
-        seq.add(TypeConversionUtil.convertToshort(i));
+        Assertions.assertTrue(seq.add(TypeConversionUtil.convertToshort(i)));
       }
       Assertions.assertEquals(seq.size(),100);
       var itr=seq.iterator();
@@ -347,6 +703,69 @@ public class ShortArrSeqTest
       Assertions.assertEquals(seq.size(),0);
       Assertions.assertTrue(seq.isEmpty());
       Assertions.assertEquals(seq.arr.length,i);
+    }
+  }
+  @Test
+  public void testToArrayCheckedStack()
+  {
+    var seq=new CheckedStack();
+    var shortArr=seq.toShortArray();
+    Assertions.assertTrue(shortArr==OmniArray.OfShort.DEFAULT_ARR);
+    var ShortArr=seq.toArray();
+    Assertions.assertTrue(ShortArr==OmniArray.OfShort.DEFAULT_BOXED_ARR);
+    var doubleArr=seq.toDoubleArray();
+    Assertions.assertTrue(doubleArr==OmniArray.OfDouble.DEFAULT_ARR);
+    var floatArr=seq.toFloatArray();
+    Assertions.assertTrue(floatArr==OmniArray.OfFloat.DEFAULT_ARR);
+    var longArr=seq.toLongArray();
+    Assertions.assertTrue(longArr==OmniArray.OfLong.DEFAULT_ARR);
+    var intArr=seq.toIntArray();
+    Assertions.assertTrue(intArr==OmniArray.OfInt.DEFAULT_ARR);
+    for(int i=0;i<10;++i)
+    {
+      seq.add(TypeConversionUtil.convertToshort(i));
+    }
+    shortArr=seq.toShortArray();
+    Assertions.assertEquals(shortArr.length,seq.size());
+    var seqItr=seq.iterator();
+    for(int i=0;i<seq.size();++i)
+    {
+      Assertions.assertEquals(seqItr.nextShort(),shortArr[i]);
+    }
+    ShortArr=seq.toArray();
+    Assertions.assertEquals(ShortArr.length,seq.size());
+    seqItr=seq.iterator();
+    for(int i=0;i<seq.size();++i)
+    {
+      Assertions.assertEquals(seqItr.next(),ShortArr[i]);
+    }
+    doubleArr=seq.toDoubleArray();
+    Assertions.assertEquals(doubleArr.length,seq.size());
+    seqItr=seq.iterator();
+    for(int i=0;i<seq.size();++i)
+    {
+      Assertions.assertEquals(seqItr.nextDouble(),doubleArr[i]);
+    }
+    floatArr=seq.toFloatArray();
+    Assertions.assertEquals(floatArr.length,seq.size());
+    seqItr=seq.iterator();
+    for(int i=0;i<seq.size();++i)
+    {
+      Assertions.assertEquals(seqItr.nextFloat(),floatArr[i]);
+    }
+    longArr=seq.toLongArray();
+    Assertions.assertEquals(longArr.length,seq.size());
+    seqItr=seq.iterator();
+    for(int i=0;i<seq.size();++i)
+    {
+      Assertions.assertEquals(seqItr.nextLong(),longArr[i]);
+    }
+    intArr=seq.toIntArray();
+    Assertions.assertEquals(intArr.length,seq.size());
+    seqItr=seq.iterator();
+    for(int i=0;i<seq.size();++i)
+    {
+      Assertions.assertEquals(seqItr.nextInt(),intArr[i]);
     }
   }
   @Test
@@ -415,14 +834,149 @@ public class ShortArrSeqTest
     }
   }
   @Test
+  public void testToArrayIntFunctionParamCheckedStack()
+  {
+    var seq=new CheckedStack();
+    Object[] result=seq.toArray(Object[]::new);
+    Assertions.assertEquals(result.length,0);
+    for(int i=0;i<10;++i)
+    {
+      seq.add(TypeConversionUtil.convertToshort(i));
+    }
+    result=seq.toArray(Object[]::new);
+    Assertions.assertEquals(result.length,seq.size());
+    var itr=seq.iterator();
+    for(int i=0;i<10;++i)
+    {
+      Assertions.assertEquals(itr.next(),result[i]);
+    }
+    Assertions.assertThrows(ConcurrentModificationException.class,()->seq.toArray((arrSize)->
+    {
+      seq.add(TypeConversionUtil.convertToshort(arrSize));
+      return new Object[arrSize];
+    }));
+  }
+  @Test
+  public void testForEachCheckedStack()
+  {
+    {
+      var seq=new CheckedStack();
+      ArrayList<Object> arrayList=new ArrayList<>();
+      seq.forEach((ShortConsumer)arrayList::add);
+      Assertions.assertTrue(arrayList.isEmpty());
+      for(int i=0;i<10;++i)
+      {
+        seq.add(TypeConversionUtil.convertToshort(i));
+      }
+      seq.forEach((ShortConsumer)arrayList::add);
+      Assertions.assertEquals(arrayList.size(),10);
+      var seqItr=seq.iterator();
+      for(var v:arrayList)
+      {
+        Assertions.assertEquals(v,seqItr.next());
+      }
+      seq.clear();
+      arrayList.clear();
+      seq.forEach((Consumer<Short>)arrayList::add);
+      Assertions.assertTrue(arrayList.isEmpty());
+      for(int i=0;i<10;++i)
+      {
+        seq.add(TypeConversionUtil.convertToshort(i));
+      }
+      seq.forEach((Consumer<Short>)arrayList::add);
+      Assertions.assertEquals(arrayList.size(),10);
+      seqItr=seq.iterator();
+      for(var v:arrayList)
+      {
+        Assertions.assertEquals(v,seqItr.next());
+      }
+    }
+    {
+      var seq=new CheckedStack();
+      seq.forEach((ShortConsumer)((val)->seq.add(val)));
+      Assertions.assertTrue(seq.isEmpty());
+      for(int i=0;i<10;++i)
+      {
+        seq.add(TypeConversionUtil.convertToshort(i));
+      }
+      Assertions.assertThrows(ConcurrentModificationException.class,()->
+      {
+        seq.forEach((ShortConsumer)((val)->seq.add(val)));
+      });
+    }
+    {
+      var seq=new CheckedStack();
+      seq.forEach((Consumer<Short>)((val)->seq.add(val)));
+      Assertions.assertTrue(seq.isEmpty());
+      for(int i=0;i<10;++i)
+      {
+        seq.add(TypeConversionUtil.convertToshort(i));
+      }
+      Assertions.assertThrows(ConcurrentModificationException.class,()->
+      {
+        seq.forEach((Consumer<Short>)((val)->seq.add(val)));
+      });
+    }
+  }
+  @Test
+  public void testToArrayArrayParamCheckedStack()
+  {
+    var seq=new CheckedStack();
+    //Test empty exact capacity
+    Object[] param=new Object[0];
+    Object[] result=seq.toArray(param);
+    Assertions.assertTrue(param==result);
+    param=new Object[10];
+    for(int i=0;i<10;++i)
+    {
+      param[i]=Integer.valueOf(1);
+    }
+    result=seq.toArray(param);
+    Assertions.assertTrue(param==result);
+    Assertions.assertNull(result[0]);
+    for(int i=1;i<10;++i)
+    {
+      Assertions.assertEquals(result[i],Integer.valueOf(1));
+    }
+    param=new Object[0];
+    seq.add(TypeConversionUtil.convertToshort(0));
+    result=seq.toArray(param);
+    Assertions.assertTrue(param!=result);
+    Assertions.assertEquals(result.length,seq.size());
+    Assertions.assertEquals(TypeConversionUtil.convertToShort(0),result[0]);
+    param=new Object[10];
+    for(int i=0;i<10;++i)
+    {
+      param[i]=Integer.valueOf(1);
+    }
+    result=seq.toArray(param);
+    Assertions.assertTrue(param==result);
+    Assertions.assertEquals(TypeConversionUtil.convertToShort(0),result[0]);
+    Assertions.assertNull(result[1]);
+    for(int i=2;i<10;++i)
+    {
+      Assertions.assertEquals(result[i],Integer.valueOf(1));
+    }
+    for(int i=1;i<10;++i)
+    {
+      seq.add(TypeConversionUtil.convertToshort(i));
+    }
+    result=seq.toArray(param);
+    Assertions.assertTrue(param==result);
+    var itr=seq.iterator();
+    for(int i=0;i<10;++i)
+    {
+      Assertions.assertEquals(itr.next(),result[i]);
+    }
+  }
+  @Test
   public void testAddCheckedStack()
   {
     {
-      //test with default array
       var seq=new CheckedStack();
       for(int i=0;i<100;++i)
       {
-        seq.add(TypeConversionUtil.convertToshort(i));
+        Assertions.assertTrue(seq.add(TypeConversionUtil.convertToshort(i)));
       }
       Assertions.assertEquals(seq.size(),100);
       Assertions.assertEquals(100,seq.modCount);
@@ -434,11 +988,10 @@ public class ShortArrSeqTest
       Assertions.assertFalse(itr.hasNext());
     }
     {
-      //test with null array
       var seq=new CheckedStack(0,null);
       for(int i=0;i<100;++i)
       {
-        seq.add(TypeConversionUtil.convertToshort(i));
+        Assertions.assertTrue(seq.add(TypeConversionUtil.convertToshort(i)));
       }
       Assertions.assertEquals(seq.size(),100);
       Assertions.assertEquals(100,seq.modCount);
@@ -450,11 +1003,10 @@ public class ShortArrSeqTest
       Assertions.assertFalse(itr.hasNext());
     }
      {
-      //test with preallocated array
-      var seq=new CheckedStack(20);
+      var seq=new CheckedStack(50);
       for(int i=0;i<100;++i)
       {
-        seq.add(TypeConversionUtil.convertToshort(i));
+        Assertions.assertTrue(seq.add(TypeConversionUtil.convertToshort(i)));
       }
       Assertions.assertEquals(seq.size(),100);
       Assertions.assertEquals(100,seq.modCount);
@@ -466,30 +1018,54 @@ public class ShortArrSeqTest
       Assertions.assertFalse(itr.hasNext());
     }
   }
-  private static void testPushHelper(CheckedStack seq)
-  {
-    for(int i=0;i<100;++i)
-    {
-      seq.push(TypeConversionUtil.convertToshort(i));
-    }
-    Assertions.assertEquals(100,seq.modCount);
-    Assertions.assertEquals(100,seq.size());
-    var itr=seq.iterator();
-    for(int i=100;--i>=0;)
-    {
-      Assertions.assertEquals(TypeConversionUtil.convertToshort(i),itr.nextShort());
-    }
-    Assertions.assertFalse(itr.hasNext());
-  }
   @Test
   public void testPushCheckedStack()
   {
-    //with default array
-    testPushHelper(new CheckedStack());
-    //with null array
-    testPushHelper(new CheckedStack(0,null));
-    //with pre-allocated capacity
-    testPushHelper(new CheckedStack(50));
+    {
+      var seq=new CheckedStack();
+      for(int i=0;i<100;++i)
+      {
+        seq.push(TypeConversionUtil.convertToshort(i));
+      }
+      Assertions.assertEquals(100,seq.modCount);
+      Assertions.assertEquals(100,seq.size());
+      var itr=seq.iterator();
+      for(int i=100;--i>=0;)
+      {
+        Assertions.assertEquals(TypeConversionUtil.convertToshort(i),itr.nextShort());
+      }
+      Assertions.assertFalse(itr.hasNext());
+    }
+    {
+      var seq=new CheckedStack(0,null);
+      for(int i=0;i<100;++i)
+      {
+        seq.push(TypeConversionUtil.convertToshort(i));
+      }
+      Assertions.assertEquals(100,seq.modCount);
+      Assertions.assertEquals(100,seq.size());
+      var itr=seq.iterator();
+      for(int i=100;--i>=0;)
+      {
+        Assertions.assertEquals(TypeConversionUtil.convertToshort(i),itr.nextShort());
+      }
+      Assertions.assertFalse(itr.hasNext());
+    }
+     {
+      var seq=new CheckedStack(50);
+      for(int i=0;i<100;++i)
+      {
+        seq.push(TypeConversionUtil.convertToshort(i));
+      }
+      Assertions.assertEquals(100,seq.modCount);
+      Assertions.assertEquals(100,seq.size());
+      var itr=seq.iterator();
+      for(int i=100;--i>=0;)
+      {
+        Assertions.assertEquals(TypeConversionUtil.convertToshort(i),itr.nextShort());
+      }
+      Assertions.assertFalse(itr.hasNext());
+    }
   }
   @Test
   public void testCloneCheckedStack()
@@ -535,6 +1111,69 @@ public class ShortArrSeqTest
       Assertions.assertEquals(seq.size(),0);
       Assertions.assertTrue(seq.isEmpty());
       Assertions.assertEquals(seq.arr.length,i);
+    }
+  }
+  @Test
+  public void testToArrayCheckedList()
+  {
+    var seq=new CheckedList();
+    var shortArr=seq.toShortArray();
+    Assertions.assertTrue(shortArr==OmniArray.OfShort.DEFAULT_ARR);
+    var ShortArr=seq.toArray();
+    Assertions.assertTrue(ShortArr==OmniArray.OfShort.DEFAULT_BOXED_ARR);
+    var doubleArr=seq.toDoubleArray();
+    Assertions.assertTrue(doubleArr==OmniArray.OfDouble.DEFAULT_ARR);
+    var floatArr=seq.toFloatArray();
+    Assertions.assertTrue(floatArr==OmniArray.OfFloat.DEFAULT_ARR);
+    var longArr=seq.toLongArray();
+    Assertions.assertTrue(longArr==OmniArray.OfLong.DEFAULT_ARR);
+    var intArr=seq.toIntArray();
+    Assertions.assertTrue(intArr==OmniArray.OfInt.DEFAULT_ARR);
+    for(int i=0;i<10;++i)
+    {
+      seq.add(TypeConversionUtil.convertToshort(i));
+    }
+    shortArr=seq.toShortArray();
+    Assertions.assertEquals(shortArr.length,seq.size());
+    var seqItr=seq.iterator();
+    for(int i=0;i<seq.size();++i)
+    {
+      Assertions.assertEquals(seqItr.nextShort(),shortArr[i]);
+    }
+    ShortArr=seq.toArray();
+    Assertions.assertEquals(ShortArr.length,seq.size());
+    seqItr=seq.iterator();
+    for(int i=0;i<seq.size();++i)
+    {
+      Assertions.assertEquals(seqItr.next(),ShortArr[i]);
+    }
+    doubleArr=seq.toDoubleArray();
+    Assertions.assertEquals(doubleArr.length,seq.size());
+    seqItr=seq.iterator();
+    for(int i=0;i<seq.size();++i)
+    {
+      Assertions.assertEquals(seqItr.nextDouble(),doubleArr[i]);
+    }
+    floatArr=seq.toFloatArray();
+    Assertions.assertEquals(floatArr.length,seq.size());
+    seqItr=seq.iterator();
+    for(int i=0;i<seq.size();++i)
+    {
+      Assertions.assertEquals(seqItr.nextFloat(),floatArr[i]);
+    }
+    longArr=seq.toLongArray();
+    Assertions.assertEquals(longArr.length,seq.size());
+    seqItr=seq.iterator();
+    for(int i=0;i<seq.size();++i)
+    {
+      Assertions.assertEquals(seqItr.nextLong(),longArr[i]);
+    }
+    intArr=seq.toIntArray();
+    Assertions.assertEquals(intArr.length,seq.size());
+    seqItr=seq.iterator();
+    for(int i=0;i<seq.size();++i)
+    {
+      Assertions.assertEquals(seqItr.nextInt(),intArr[i]);
     }
   }
   @Test
@@ -603,14 +1242,149 @@ public class ShortArrSeqTest
     }
   }
   @Test
+  public void testToArrayIntFunctionParamCheckedList()
+  {
+    var seq=new CheckedList();
+    Object[] result=seq.toArray(Object[]::new);
+    Assertions.assertEquals(result.length,0);
+    for(int i=0;i<10;++i)
+    {
+      seq.add(TypeConversionUtil.convertToshort(i));
+    }
+    result=seq.toArray(Object[]::new);
+    Assertions.assertEquals(result.length,seq.size());
+    var itr=seq.iterator();
+    for(int i=0;i<10;++i)
+    {
+      Assertions.assertEquals(itr.next(),result[i]);
+    }
+    Assertions.assertThrows(ConcurrentModificationException.class,()->seq.toArray((arrSize)->
+    {
+      seq.add(TypeConversionUtil.convertToshort(arrSize));
+      return new Object[arrSize];
+    }));
+  }
+  @Test
+  public void testForEachCheckedList()
+  {
+    {
+      var seq=new CheckedList();
+      ArrayList<Object> arrayList=new ArrayList<>();
+      seq.forEach((ShortConsumer)arrayList::add);
+      Assertions.assertTrue(arrayList.isEmpty());
+      for(int i=0;i<10;++i)
+      {
+        seq.add(TypeConversionUtil.convertToshort(i));
+      }
+      seq.forEach((ShortConsumer)arrayList::add);
+      Assertions.assertEquals(arrayList.size(),10);
+      var seqItr=seq.iterator();
+      for(var v:arrayList)
+      {
+        Assertions.assertEquals(v,seqItr.next());
+      }
+      seq.clear();
+      arrayList.clear();
+      seq.forEach((Consumer<Short>)arrayList::add);
+      Assertions.assertTrue(arrayList.isEmpty());
+      for(int i=0;i<10;++i)
+      {
+        seq.add(TypeConversionUtil.convertToshort(i));
+      }
+      seq.forEach((Consumer<Short>)arrayList::add);
+      Assertions.assertEquals(arrayList.size(),10);
+      seqItr=seq.iterator();
+      for(var v:arrayList)
+      {
+        Assertions.assertEquals(v,seqItr.next());
+      }
+    }
+    {
+      var seq=new CheckedList();
+      seq.forEach((ShortConsumer)((val)->seq.add(val)));
+      Assertions.assertTrue(seq.isEmpty());
+      for(int i=0;i<10;++i)
+      {
+        seq.add(TypeConversionUtil.convertToshort(i));
+      }
+      Assertions.assertThrows(ConcurrentModificationException.class,()->
+      {
+        seq.forEach((ShortConsumer)((val)->seq.add(val)));
+      });
+    }
+    {
+      var seq=new CheckedList();
+      seq.forEach((Consumer<Short>)((val)->seq.add(val)));
+      Assertions.assertTrue(seq.isEmpty());
+      for(int i=0;i<10;++i)
+      {
+        seq.add(TypeConversionUtil.convertToshort(i));
+      }
+      Assertions.assertThrows(ConcurrentModificationException.class,()->
+      {
+        seq.forEach((Consumer<Short>)((val)->seq.add(val)));
+      });
+    }
+  }
+  @Test
+  public void testToArrayArrayParamCheckedList()
+  {
+    var seq=new CheckedList();
+    //Test empty exact capacity
+    Object[] param=new Object[0];
+    Object[] result=seq.toArray(param);
+    Assertions.assertTrue(param==result);
+    param=new Object[10];
+    for(int i=0;i<10;++i)
+    {
+      param[i]=Integer.valueOf(1);
+    }
+    result=seq.toArray(param);
+    Assertions.assertTrue(param==result);
+    Assertions.assertNull(result[0]);
+    for(int i=1;i<10;++i)
+    {
+      Assertions.assertEquals(result[i],Integer.valueOf(1));
+    }
+    param=new Object[0];
+    seq.add(TypeConversionUtil.convertToshort(0));
+    result=seq.toArray(param);
+    Assertions.assertTrue(param!=result);
+    Assertions.assertEquals(result.length,seq.size());
+    Assertions.assertEquals(TypeConversionUtil.convertToShort(0),result[0]);
+    param=new Object[10];
+    for(int i=0;i<10;++i)
+    {
+      param[i]=Integer.valueOf(1);
+    }
+    result=seq.toArray(param);
+    Assertions.assertTrue(param==result);
+    Assertions.assertEquals(TypeConversionUtil.convertToShort(0),result[0]);
+    Assertions.assertNull(result[1]);
+    for(int i=2;i<10;++i)
+    {
+      Assertions.assertEquals(result[i],Integer.valueOf(1));
+    }
+    for(int i=1;i<10;++i)
+    {
+      seq.add(TypeConversionUtil.convertToshort(i));
+    }
+    result=seq.toArray(param);
+    Assertions.assertTrue(param==result);
+    var itr=seq.iterator();
+    for(int i=0;i<10;++i)
+    {
+      Assertions.assertEquals(itr.next(),result[i]);
+    }
+  }
+  @Test
   public void testAddCheckedList()
   {
     {
-      //test with default array
       var seq=new CheckedList();
       for(int i=0;i<100;++i)
       {
-        seq.add(TypeConversionUtil.convertToshort(i));
+        Assertions.assertTrue(seq.add(TypeConversionUtil.convertToshort(i)));
       }
       Assertions.assertEquals(seq.size(),100);
       Assertions.assertEquals(100,seq.modCount);
@@ -622,11 +1396,10 @@ public class ShortArrSeqTest
       Assertions.assertFalse(itr.hasNext());
     }
     {
-      //test with null array
       var seq=new CheckedList(0,null);
       for(int i=0;i<100;++i)
       {
-        seq.add(TypeConversionUtil.convertToshort(i));
+        Assertions.assertTrue(seq.add(TypeConversionUtil.convertToshort(i)));
       }
       Assertions.assertEquals(seq.size(),100);
       Assertions.assertEquals(100,seq.modCount);
@@ -638,11 +1411,10 @@ public class ShortArrSeqTest
       Assertions.assertFalse(itr.hasNext());
     }
      {
-      //test with preallocated array
-      var seq=new CheckedList(20);
+      var seq=new CheckedList(50);
       for(int i=0;i<100;++i)
       {
-        seq.add(TypeConversionUtil.convertToshort(i));
+        Assertions.assertTrue(seq.add(TypeConversionUtil.convertToshort(i)));
       }
       Assertions.assertEquals(seq.size(),100);
       Assertions.assertEquals(100,seq.modCount);
@@ -698,6 +1470,71 @@ public class ShortArrSeqTest
       Assertions.assertEquals(seq.size(),0);
       Assertions.assertTrue(seq.isEmpty());
       Assertions.assertEquals(seq.arr.length,i);
+    }
+  }
+  @Test
+  public void testToArrayUncheckedSubList()
+  {
+    var root=new UncheckedList();
+    var subList=root.subList(0,0);
+    var seq=subList.subList(0,0);
+    var shortArr=seq.toShortArray();
+    Assertions.assertTrue(shortArr==OmniArray.OfShort.DEFAULT_ARR);
+    var ShortArr=seq.toArray();
+    Assertions.assertTrue(ShortArr==OmniArray.OfShort.DEFAULT_BOXED_ARR);
+    var doubleArr=seq.toDoubleArray();
+    Assertions.assertTrue(doubleArr==OmniArray.OfDouble.DEFAULT_ARR);
+    var floatArr=seq.toFloatArray();
+    Assertions.assertTrue(floatArr==OmniArray.OfFloat.DEFAULT_ARR);
+    var longArr=seq.toLongArray();
+    Assertions.assertTrue(longArr==OmniArray.OfLong.DEFAULT_ARR);
+    var intArr=seq.toIntArray();
+    Assertions.assertTrue(intArr==OmniArray.OfInt.DEFAULT_ARR);
+    for(int i=0;i<10;++i)
+    {
+      seq.add(TypeConversionUtil.convertToshort(i));
+    }
+    shortArr=seq.toShortArray();
+    Assertions.assertEquals(shortArr.length,seq.size());
+    var seqItr=seq.iterator();
+    for(int i=0;i<seq.size();++i)
+    {
+      Assertions.assertEquals(seqItr.nextShort(),shortArr[i]);
+    }
+    ShortArr=seq.toArray();
+    Assertions.assertEquals(ShortArr.length,seq.size());
+    seqItr=seq.iterator();
+    for(int i=0;i<seq.size();++i)
+    {
+      Assertions.assertEquals(seqItr.next(),ShortArr[i]);
+    }
+    doubleArr=seq.toDoubleArray();
+    Assertions.assertEquals(doubleArr.length,seq.size());
+    seqItr=seq.iterator();
+    for(int i=0;i<seq.size();++i)
+    {
+      Assertions.assertEquals(seqItr.nextDouble(),doubleArr[i]);
+    }
+    floatArr=seq.toFloatArray();
+    Assertions.assertEquals(floatArr.length,seq.size());
+    seqItr=seq.iterator();
+    for(int i=0;i<seq.size();++i)
+    {
+      Assertions.assertEquals(seqItr.nextFloat(),floatArr[i]);
+    }
+    longArr=seq.toLongArray();
+    Assertions.assertEquals(longArr.length,seq.size());
+    seqItr=seq.iterator();
+    for(int i=0;i<seq.size();++i)
+    {
+      Assertions.assertEquals(seqItr.nextLong(),longArr[i]);
+    }
+    intArr=seq.toIntArray();
+    Assertions.assertEquals(intArr.length,seq.size());
+    seqItr=seq.iterator();
+    for(int i=0;i<seq.size();++i)
+    {
+      Assertions.assertEquals(seqItr.nextInt(),intArr[i]);
     }
   }
   @Test
@@ -791,16 +1628,126 @@ public class ShortArrSeqTest
     }
   }
   @Test
+  public void testToArrayIntFunctionParamUncheckedSubList()
+  {
+    var root=new UncheckedList();
+    var subList=root.subList(0,0);
+    var seq=subList.subList(0,0);
+    Object[] result=seq.toArray(Object[]::new);
+    Assertions.assertEquals(result.length,0);
+    for(int i=0;i<10;++i)
+    {
+      seq.add(TypeConversionUtil.convertToshort(i));
+    }
+    result=seq.toArray(Object[]::new);
+    Assertions.assertEquals(result.length,seq.size());
+    var itr=seq.iterator();
+    for(int i=0;i<10;++i)
+    {
+      Assertions.assertEquals(itr.next(),result[i]);
+    }
+  }
+  @Test
+  public void testForEachUncheckedSubList()
+  {
+    {
+      var root=new UncheckedList();
+      var subList=root.subList(0,0);
+      var seq=subList.subList(0,0);
+      ArrayList<Object> arrayList=new ArrayList<>();
+      seq.forEach((ShortConsumer)arrayList::add);
+      Assertions.assertTrue(arrayList.isEmpty());
+      for(int i=0;i<10;++i)
+      {
+        seq.add(TypeConversionUtil.convertToshort(i));
+      }
+      seq.forEach((ShortConsumer)arrayList::add);
+      Assertions.assertEquals(arrayList.size(),10);
+      var seqItr=seq.iterator();
+      for(var v:arrayList)
+      {
+        Assertions.assertEquals(v,seqItr.next());
+      }
+      seq.clear();
+      arrayList.clear();
+      seq.forEach((Consumer<Short>)arrayList::add);
+      Assertions.assertTrue(arrayList.isEmpty());
+      for(int i=0;i<10;++i)
+      {
+        seq.add(TypeConversionUtil.convertToshort(i));
+      }
+      seq.forEach((Consumer<Short>)arrayList::add);
+      Assertions.assertEquals(arrayList.size(),10);
+      seqItr=seq.iterator();
+      for(var v:arrayList)
+      {
+        Assertions.assertEquals(v,seqItr.next());
+      }
+    }
+  }
+  @Test
+  public void testToArrayArrayParamUncheckedSubList()
+  {
+    var root=new UncheckedList();
+    var subList=root.subList(0,0);
+    var seq=subList.subList(0,0);
+    //Test empty exact capacity
+    Object[] param=new Object[0];
+    Object[] result=seq.toArray(param);
+    Assertions.assertTrue(param==result);
+    param=new Object[10];
+    for(int i=0;i<10;++i)
+    {
+      param[i]=Integer.valueOf(1);
+    }
+    result=seq.toArray(param);
+    Assertions.assertTrue(param==result);
+    Assertions.assertNull(result[0]);
+    for(int i=1;i<10;++i)
+    {
+      Assertions.assertEquals(result[i],Integer.valueOf(1));
+    }
+    param=new Object[0];
+    seq.add(TypeConversionUtil.convertToshort(0));
+    result=seq.toArray(param);
+    Assertions.assertTrue(param!=result);
+    Assertions.assertEquals(result.length,seq.size());
+    Assertions.assertEquals(TypeConversionUtil.convertToShort(0),result[0]);
+    param=new Object[10];
+    for(int i=0;i<10;++i)
+    {
+      param[i]=Integer.valueOf(1);
+    }
+    result=seq.toArray(param);
+    Assertions.assertTrue(param==result);
+    Assertions.assertEquals(TypeConversionUtil.convertToShort(0),result[0]);
+    Assertions.assertNull(result[1]);
+    for(int i=2;i<10;++i)
+    {
+      Assertions.assertEquals(result[i],Integer.valueOf(1));
+    }
+    for(int i=1;i<10;++i)
+    {
+      seq.add(TypeConversionUtil.convertToshort(i));
+    }
+    result=seq.toArray(param);
+    Assertions.assertTrue(param==result);
+    var itr=seq.iterator();
+    for(int i=0;i<10;++i)
+    {
+      Assertions.assertEquals(itr.next(),result[i]);
+    }
+  }
+  @Test
   public void testAddUncheckedSubList()
   {
     {
-      //test with default array
       var root=new UncheckedList();
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
       for(int i=0;i<100;++i)
       {
-        seq.add(TypeConversionUtil.convertToshort(i));
+        Assertions.assertTrue(seq.add(TypeConversionUtil.convertToshort(i)));
       }
       Assertions.assertEquals(seq.size(),100);
       Assertions.assertEquals(subList.size(),100);
@@ -813,13 +1760,12 @@ public class ShortArrSeqTest
       Assertions.assertFalse(itr.hasNext());
     }
     {
-      //test with null array
       var root=new UncheckedList(0,null);
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
       for(int i=0;i<100;++i)
       {
-        seq.add(TypeConversionUtil.convertToshort(i));
+        Assertions.assertTrue(seq.add(TypeConversionUtil.convertToshort(i)));
       }
       Assertions.assertEquals(seq.size(),100);
       Assertions.assertEquals(subList.size(),100);
@@ -832,13 +1778,12 @@ public class ShortArrSeqTest
       Assertions.assertFalse(itr.hasNext());
     }
      {
-      //test with preallocated array
-      var root=new UncheckedList(20);
+      var root=new UncheckedList(50);
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
       for(int i=0;i<100;++i)
       {
-        seq.add(TypeConversionUtil.convertToshort(i));
+        Assertions.assertTrue(seq.add(TypeConversionUtil.convertToshort(i)));
       }
       Assertions.assertEquals(seq.size(),100);
       Assertions.assertEquals(subList.size(),100);
@@ -916,8 +1861,92 @@ public class ShortArrSeqTest
     }
   }
   @Test
+  public void testToArrayCheckedSubList()
+  {
+    {
+      var root=new CheckedList();
+      var subList=root.subList(0,0);
+      var seq=subList.subList(0,0);
+      subList.add(Short.MIN_VALUE);
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.toShortArray());
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.toArray());
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.toDoubleArray());
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.toFloatArray());
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.toLongArray());
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.toIntArray());
+    }
+    var root=new CheckedList();
+    var subList=root.subList(0,0);
+    var seq=subList.subList(0,0);
+    var shortArr=seq.toShortArray();
+    Assertions.assertTrue(shortArr==OmniArray.OfShort.DEFAULT_ARR);
+    var ShortArr=seq.toArray();
+    Assertions.assertTrue(ShortArr==OmniArray.OfShort.DEFAULT_BOXED_ARR);
+    var doubleArr=seq.toDoubleArray();
+    Assertions.assertTrue(doubleArr==OmniArray.OfDouble.DEFAULT_ARR);
+    var floatArr=seq.toFloatArray();
+    Assertions.assertTrue(floatArr==OmniArray.OfFloat.DEFAULT_ARR);
+    var longArr=seq.toLongArray();
+    Assertions.assertTrue(longArr==OmniArray.OfLong.DEFAULT_ARR);
+    var intArr=seq.toIntArray();
+    Assertions.assertTrue(intArr==OmniArray.OfInt.DEFAULT_ARR);
+    for(int i=0;i<10;++i)
+    {
+      seq.add(TypeConversionUtil.convertToshort(i));
+    }
+    shortArr=seq.toShortArray();
+    Assertions.assertEquals(shortArr.length,seq.size());
+    var seqItr=seq.iterator();
+    for(int i=0;i<seq.size();++i)
+    {
+      Assertions.assertEquals(seqItr.nextShort(),shortArr[i]);
+    }
+    ShortArr=seq.toArray();
+    Assertions.assertEquals(ShortArr.length,seq.size());
+    seqItr=seq.iterator();
+    for(int i=0;i<seq.size();++i)
+    {
+      Assertions.assertEquals(seqItr.next(),ShortArr[i]);
+    }
+    doubleArr=seq.toDoubleArray();
+    Assertions.assertEquals(doubleArr.length,seq.size());
+    seqItr=seq.iterator();
+    for(int i=0;i<seq.size();++i)
+    {
+      Assertions.assertEquals(seqItr.nextDouble(),doubleArr[i]);
+    }
+    floatArr=seq.toFloatArray();
+    Assertions.assertEquals(floatArr.length,seq.size());
+    seqItr=seq.iterator();
+    for(int i=0;i<seq.size();++i)
+    {
+      Assertions.assertEquals(seqItr.nextFloat(),floatArr[i]);
+    }
+    longArr=seq.toLongArray();
+    Assertions.assertEquals(longArr.length,seq.size());
+    seqItr=seq.iterator();
+    for(int i=0;i<seq.size();++i)
+    {
+      Assertions.assertEquals(seqItr.nextLong(),longArr[i]);
+    }
+    intArr=seq.toIntArray();
+    Assertions.assertEquals(intArr.length,seq.size());
+    seqItr=seq.iterator();
+    for(int i=0;i<seq.size();++i)
+    {
+      Assertions.assertEquals(seqItr.nextInt(),intArr[i]);
+    }
+  }
+  @Test
   public void testClearCheckedSubList()
   {
+    {
+      var root=new CheckedList();
+      var subList=root.subList(0,0);
+      var seq=subList.subList(0,0);
+      subList.add(Short.MIN_VALUE);
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.clear());
+    }
     var root=new CheckedList();
     for(int i=0;i<100;++i)
     {
@@ -969,6 +1998,13 @@ public class ShortArrSeqTest
   @Test
   public void testSizeCheckedSubList()
   {
+    {
+      var root=new CheckedList();
+      var subList=root.subList(0,0);
+      var seq=subList.subList(0,0);
+      subList.add(Short.MIN_VALUE);
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.size());
+    }
     var root=new CheckedList();
     var subList=root.subList(0,0);
     var seq=subList.subList(0,0);
@@ -999,6 +2035,13 @@ public class ShortArrSeqTest
   @Test
   public void testIsEmptyCheckedSubList()
   {
+    {
+      var root=new CheckedList();
+      var subList=root.subList(0,0);
+      var seq=subList.subList(0,0);
+      subList.add(Short.MIN_VALUE);
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.isEmpty());
+    }
     var root=new CheckedList();
     var subList=root.subList(0,0);
     var seq=subList.subList(0,0);
@@ -1028,16 +2071,210 @@ public class ShortArrSeqTest
     });
   }
   @Test
+  public void testToArrayIntFunctionParamCheckedSubList()
+  {
+    {
+      var root=new CheckedList();
+      var subList=root.subList(0,0);
+      var seq=subList.subList(0,0);
+      subList.add(Short.MIN_VALUE);
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.toArray(Object[]::new));
+    }
+    var root=new CheckedList();
+    var subList=root.subList(0,0);
+    var seq=subList.subList(0,0);
+    Object[] result=seq.toArray(Object[]::new);
+    Assertions.assertEquals(result.length,0);
+    for(int i=0;i<10;++i)
+    {
+      seq.add(TypeConversionUtil.convertToshort(i));
+    }
+    result=seq.toArray(Object[]::new);
+    Assertions.assertEquals(result.length,seq.size());
+    var itr=seq.iterator();
+    for(int i=0;i<10;++i)
+    {
+      Assertions.assertEquals(itr.next(),result[i]);
+    }
+    Assertions.assertThrows(ConcurrentModificationException.class,()->seq.toArray((arrSize)->
+    {
+      seq.add(TypeConversionUtil.convertToshort(arrSize));
+      return new Object[arrSize];
+    }));
+  }
+  @Test
+  public void testForEachCheckedSubList()
+  {
+    {
+      var root=new CheckedList();
+      var subList=root.subList(0,0);
+      var seq=subList.subList(0,0);
+      subList.add(Short.MIN_VALUE);
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.forEach((Consumer<Short>)((v)->{return;})));
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.forEach((ShortConsumer)((v)->{return;})));
+    }
+    {
+      var root=new CheckedList();
+      var subList=root.subList(0,0);
+      var seq=subList.subList(0,0);
+      ArrayList<Object> arrayList=new ArrayList<>();
+      seq.forEach((ShortConsumer)arrayList::add);
+      Assertions.assertTrue(arrayList.isEmpty());
+      for(int i=0;i<10;++i)
+      {
+        seq.add(TypeConversionUtil.convertToshort(i));
+      }
+      seq.forEach((ShortConsumer)arrayList::add);
+      Assertions.assertEquals(arrayList.size(),10);
+      var seqItr=seq.iterator();
+      for(var v:arrayList)
+      {
+        Assertions.assertEquals(v,seqItr.next());
+      }
+      seq.clear();
+      arrayList.clear();
+      seq.forEach((Consumer<Short>)arrayList::add);
+      Assertions.assertTrue(arrayList.isEmpty());
+      for(int i=0;i<10;++i)
+      {
+        seq.add(TypeConversionUtil.convertToshort(i));
+      }
+      seq.forEach((Consumer<Short>)arrayList::add);
+      Assertions.assertEquals(arrayList.size(),10);
+      seqItr=seq.iterator();
+      for(var v:arrayList)
+      {
+        Assertions.assertEquals(v,seqItr.next());
+      }
+    }
+    {
+      var root=new CheckedList();
+      var subList=root.subList(0,0);
+      var seq=subList.subList(0,0);
+      seq.forEach((ShortConsumer)((val)->seq.add(val)));
+      Assertions.assertTrue(seq.isEmpty());
+      for(int i=0;i<10;++i)
+      {
+        seq.add(TypeConversionUtil.convertToshort(i));
+      }
+      Assertions.assertThrows(ConcurrentModificationException.class,()->
+      {
+        seq.forEach((ShortConsumer)((val)->seq.add(val)));
+      });
+    }
+    {
+      var root=new CheckedList();
+      var subList=root.subList(0,0);
+      var seq=subList.subList(0,0);
+      seq.forEach((Consumer<Short>)((val)->seq.add(val)));
+      Assertions.assertTrue(seq.isEmpty());
+      for(int i=0;i<10;++i)
+      {
+        seq.add(TypeConversionUtil.convertToshort(i));
+      }
+      Assertions.assertThrows(ConcurrentModificationException.class,()->
+      {
+        seq.forEach((Consumer<Short>)((val)->seq.add(val)));
+      });
+    }
+    {
+      var root=new CheckedList();
+      var subList=root.subList(0,0);
+      var seq=subList.subList(0,0);
+      subList.add(TypeConversionUtil.convertToshort(1));
+      Assertions.assertThrows(ConcurrentModificationException.class,()->
+      {
+        seq.forEach((ShortConsumer)((v)->{return;}));
+      });
+    }
+    {
+      var root=new CheckedList();
+      var subList=root.subList(0,0);
+      var seq=subList.subList(0,0);
+      subList.add(TypeConversionUtil.convertToshort(1));
+      Assertions.assertThrows(ConcurrentModificationException.class,()->
+      {
+        seq.forEach((Consumer<Short>)((v)->{return;}));
+      });
+    }
+  }
+  @Test
+  public void testToArrayArrayParamCheckedSubList()
+  {
+    {
+      var root=new CheckedList();
+      var subList=root.subList(0,0);
+      var seq=subList.subList(0,0);
+      subList.add(Short.MIN_VALUE);
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.toArray(new Object[0]));
+    }
+    var root=new CheckedList();
+    var subList=root.subList(0,0);
+    var seq=subList.subList(0,0);
+    //Test empty exact capacity
+    Object[] param=new Object[0];
+    Object[] result=seq.toArray(param);
+    Assertions.assertTrue(param==result);
+    param=new Object[10];
+    for(int i=0;i<10;++i)
+    {
+      param[i]=Integer.valueOf(1);
+    }
+    result=seq.toArray(param);
+    Assertions.assertTrue(param==result);
+    Assertions.assertNull(result[0]);
+    for(int i=1;i<10;++i)
+    {
+      Assertions.assertEquals(result[i],Integer.valueOf(1));
+    }
+    param=new Object[0];
+    seq.add(TypeConversionUtil.convertToshort(0));
+    result=seq.toArray(param);
+    Assertions.assertTrue(param!=result);
+    Assertions.assertEquals(result.length,seq.size());
+    Assertions.assertEquals(TypeConversionUtil.convertToShort(0),result[0]);
+    param=new Object[10];
+    for(int i=0;i<10;++i)
+    {
+      param[i]=Integer.valueOf(1);
+    }
+    result=seq.toArray(param);
+    Assertions.assertTrue(param==result);
+    Assertions.assertEquals(TypeConversionUtil.convertToShort(0),result[0]);
+    Assertions.assertNull(result[1]);
+    for(int i=2;i<10;++i)
+    {
+      Assertions.assertEquals(result[i],Integer.valueOf(1));
+    }
+    for(int i=1;i<10;++i)
+    {
+      seq.add(TypeConversionUtil.convertToshort(i));
+    }
+    result=seq.toArray(param);
+    Assertions.assertTrue(param==result);
+    var itr=seq.iterator();
+    for(int i=0;i<10;++i)
+    {
+      Assertions.assertEquals(itr.next(),result[i]);
+    }
+  }
+  @Test
   public void testAddCheckedSubList()
   {
     {
-      //test with default array
+        {
+          var root=new CheckedList();
+          var subList=root.subList(0,0);
+          var seq=subList.subList(0,0);
+          subList.add(Short.MIN_VALUE);
+          Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(Short.MIN_VALUE));
+        }
       var root=new CheckedList();
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
       for(int i=0;i<100;++i)
       {
-        seq.add(TypeConversionUtil.convertToshort(i));
+        Assertions.assertTrue(seq.add(TypeConversionUtil.convertToshort(i)));
       }
       Assertions.assertEquals(seq.size(),100);
       Assertions.assertEquals(subList.size(),100);
@@ -1051,13 +2288,19 @@ public class ShortArrSeqTest
       Assertions.assertFalse(itr.hasNext());
     }
     {
-      //test with null array
+        {
+          var root=new CheckedList(0,null);
+          var subList=root.subList(0,0);
+          var seq=subList.subList(0,0);
+          subList.add(Short.MIN_VALUE);
+          Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(Short.MIN_VALUE));
+        }
       var root=new CheckedList(0,null);
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
       for(int i=0;i<100;++i)
       {
-        seq.add(TypeConversionUtil.convertToshort(i));
+        Assertions.assertTrue(seq.add(TypeConversionUtil.convertToshort(i)));
       }
       Assertions.assertEquals(seq.size(),100);
       Assertions.assertEquals(subList.size(),100);
@@ -1071,13 +2314,19 @@ public class ShortArrSeqTest
       Assertions.assertFalse(itr.hasNext());
     }
      {
-      //test with preallocated array
-      var root=new CheckedList(20);
+        {
+          var root=new CheckedList(50);
+          var subList=root.subList(0,0);
+          var seq=subList.subList(0,0);
+          subList.add(Short.MIN_VALUE);
+          Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(Short.MIN_VALUE));
+        }
+      var root=new CheckedList(50);
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
       for(int i=0;i<100;++i)
       {
-        seq.add(TypeConversionUtil.convertToshort(i));
+        Assertions.assertTrue(seq.add(TypeConversionUtil.convertToshort(i)));
       }
       Assertions.assertEquals(seq.size(),100);
       Assertions.assertEquals(subList.size(),100);
@@ -1094,6 +2343,13 @@ public class ShortArrSeqTest
   @Test
   public void testCloneCheckedSubList()
   {
+    {
+      var root=new CheckedList();
+      var subList=root.subList(0,0);
+      var seq=subList.subList(0,0);
+      subList.add(Short.MIN_VALUE);
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.clone());
+    }
     var seq=new CheckedList();
     {
       var subList=seq.subList(0,0);

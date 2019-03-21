@@ -2,8 +2,6 @@ package omni.impl.seq;
 import java.util.function.Predicate;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import java.util.ArrayList;
-import omni.api.OmniIterator;
 import omni.impl.seq.ByteArrSeq.UncheckedList;
 import omni.impl.seq.ByteArrSeq.CheckedList;
 import omni.impl.seq.ByteArrSeq.UncheckedStack;
@@ -11,16 +9,12 @@ import omni.impl.seq.ByteArrSeq.CheckedStack;
 import java.util.ConcurrentModificationException;
 import omni.impl.CheckedCollectionTest;
 import omni.util.TypeConversionUtil;
-import omni.api.OmniList;
-import omni.api.OmniStack;
 import omni.util.EqualityUtil;
-import java.util.Random;
 import omni.util.bytePredicates;
-import omni.util.byteArrayBuilder;
 import omni.function.BytePredicate;
-@SuppressWarnings({"rawtypes","unchecked"}) 
 public class ByteArrSeqRemoveIfTest
 {
+//TODO place sanity checks for checked sequence modification behavior
   @Test
   public void testEmptyRemoveIfArrSeqUncheckedStack()
   {

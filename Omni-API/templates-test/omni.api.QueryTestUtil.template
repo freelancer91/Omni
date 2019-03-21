@@ -3,8 +3,16 @@ package omni.api;
 import org.junit.jupiter.api.Assertions;
 import omni.util.TypeUtil;
 import java.util.function.Supplier;
-public class QueryTestUtil
+public final class QueryTestUtil
 {
+  private QueryTestUtil()
+  {
+    super();
+  }
+  #MACRO TestQueryDouble<true,false,contains,OmniCollection>()
+  #MACRO TestQueryDouble<true,false,removeVal,OmniCollection>()
+  #MACRO TestQueryFloat<true,false,contains,OmniCollection>()
+  #MACRO TestQueryFloat<true,false,removeVal,OmniCollection>()
   #MACRO TestQueryLong<true,false,contains,OmniCollection>()
   #MACRO TestQueryLong<true,false,removeVal,OmniCollection>()
   #MACRO TestQueryInt<true,false,contains,OmniCollection>()
@@ -24,9 +32,390 @@ public class QueryTestUtil
   #MACRO TestQueryEmpty<false,contains,OmniCollection>()
   #MACRO TestQueryEmpty<false,removeVal,OmniCollection>()
   
+  
+  
+  
 }
+
+//TODO add sanity checks (mod checks, empty/not empty) to the tests
+
+
+#MACRODEF TestQueryDouble<POSITIVERETURN,NEGATIVERETURN,METHODNAME,COLLECTIONTYPE>()
+public static void testMETHODNAMEDouble(Supplier<? extends COLLECTIONTYPE> collectionSupplier,double containsVal
+#IFSWITCH POSITIVERETURN==expectedIndex
+,int expectedIndex
+#ENDIF
+)
+{
+  COLLECTIONTYPE col;
+  Assertions.assertTrue((col=collectionSupplier.get()) instanceof OmniCollection.OfDouble || col instanceof OmniCollection.OfRef);
+  Assertions.assertEquals(NEGATIVERETURN,col.METHODNAME((double)1.0));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((double)-0.0));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((double)Double.MAX_VALUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((double)Double.MIN_VALUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Double)(double)1.0));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Double)(double)-0.0));
+#IFSWITCH METHODNAME==removeVal
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Double.valueOf(1.0)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Double.valueOf(-0.0)));
+#ELSE
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(double)1.0));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(double)-0.0));
+  
+#ENDIF
+  if(containsVal==containsVal)
+  {
+    Assertions.assertEquals(POSITIVERETURN,collectionSupplier.get().METHODNAME((double)containsVal));
+    Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((double)Double.NaN));
+    Assertions.assertEquals(POSITIVERETURN,collectionSupplier.get().METHODNAME((Double)(double)containsVal));
+    Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Double)(double)Double.NaN));
+#IFSWITCH METHODNAME==removeVal
+    Assertions.assertEquals(POSITIVERETURN,collectionSupplier.get().remove((Object)(double)containsVal));
+    Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(double)Double.NaN));
+#ELSE
+    Assertions.assertEquals(POSITIVERETURN,collectionSupplier.get().METHODNAME((Object)(double)containsVal));
+    Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(double)Double.NaN));
+#ENDIF
+  }
+  else
+  {
+    Assertions.assertEquals(POSITIVERETURN,collectionSupplier.get().METHODNAME((double)containsVal));
+    Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((double)0.0));
+    Assertions.assertEquals(POSITIVERETURN,collectionSupplier.get().METHODNAME((Double)(double)containsVal));
+    Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Double)(double)0.0));
+#IFSWITCH METHODNAME==removeVal
+    Assertions.assertEquals(POSITIVERETURN,collectionSupplier.get().remove((Object)(double)containsVal));
+    Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(double)0.0));
+#ELSE
+    Assertions.assertEquals(POSITIVERETURN,collectionSupplier.get().METHODNAME((Object)(double)containsVal));
+    Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(double)0.0));
+#ENDIF
+  }
+}
+public static void testMETHODNAMEDouble(Supplier<? extends COLLECTIONTYPE.OfFloat> collectionSupplier,float containsVal
+#IFSWITCH POSITIVERETURN==expectedIndex
+,int expectedIndex
+#ENDIF
+)
+{
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((double)1.0));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((double)-0.0));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((double)Double.MAX_VALUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((double)Double.MIN_VALUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Double.valueOf(1.0)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(Double.valueOf(-0.0)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Double)(double)Double.MAX_VALUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Double)(double)Double.MIN_VALUE));
+#IFSWITCH METHODNAME==removeVal
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Double.valueOf(1.0)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)Double.valueOf(-0.0)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(double)Double.MAX_VALUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(double)Double.MIN_VALUE));
+#ELSE
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(double)1.0));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(double)-0.0));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(double)Double.MAX_VALUE));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(double)Double.MIN_VALUE));
+  
+#ENDIF
+  if(containsVal==containsVal)
+  {
+    Assertions.assertEquals(POSITIVERETURN,collectionSupplier.get().METHODNAME((double)containsVal));
+    Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((double)Double.NaN));
+    Assertions.assertEquals(POSITIVERETURN,collectionSupplier.get().METHODNAME((Double)(double)containsVal));
+    Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Double)(double)Double.NaN));
+#IFSWITCH METHODNAME==removeVal
+    Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(double)containsVal));
+    Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(double)Double.NaN));
+#ELSE
+    Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(double)containsVal));
+    Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(double)Double.NaN));
+#ENDIF
+  }
+  else
+  {
+    Assertions.assertEquals(POSITIVERETURN,collectionSupplier.get().METHODNAME((double)containsVal));
+    Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((double)0.0));
+    Assertions.assertEquals(POSITIVERETURN,collectionSupplier.get().METHODNAME((Double)(double)containsVal));
+    Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Double)(double)0.0));
+#IFSWITCH METHODNAME==removeVal
+    Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(double)containsVal));
+    Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(double)0.0));
+#ELSE
+    Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(double)containsVal));
+    Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(double)0.0));
+#ENDIF
+  }
+}
+public static void testMETHODNAMEDouble(Supplier<? extends COLLECTIONTYPE> collectionSupplier
+#IFSWITCH POSITIVERETURN==expectedIndex
+,int expectedIndex
+#ENDIF
+)
+{
+  COLLECTIONTYPE col;
+  Assertions.assertTrue((col=collectionSupplier.get()) instanceof OmniCollection.OfByte||col instanceof OmniCollection.OfChar||col instanceof OmniCollection.OfShort||col instanceof OmniCollection.OfInt || col instanceof OmniCollection.OfLong);
+  Assertions.assertEquals(NEGATIVERETURN,col.METHODNAME((double)1.0));
+  Assertions.assertEquals(POSITIVERETURN,collectionSupplier.get().METHODNAME((double)0.0));
+  Assertions.assertEquals(POSITIVERETURN,collectionSupplier.get().METHODNAME((double)-0.0));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Double)(double)1.0));
+  Assertions.assertEquals(POSITIVERETURN,collectionSupplier.get().METHODNAME((Double)(double)0.0));
+  Assertions.assertEquals(POSITIVERETURN,collectionSupplier.get().METHODNAME((Double)(double)-0.0));
+#IFSWITCH METHODNAME==removeVal
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(double)1.0));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(double)0.0));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(double)-0.0));
+#ELSE
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(double)1.0));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(double)0.0));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(double)-0.0));
+#ENDIF
+  
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((double)(TypeUtil.MAX_SAFE_LONG+1)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((double)(TypeUtil.MIN_SAFE_LONG-1)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Double)(double)(TypeUtil.MAX_SAFE_LONG+1)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Double)(double)(TypeUtil.MIN_SAFE_LONG-1)));
+#IFSWITCH METHODNAME==removeVal
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(double)(TypeUtil.MAX_SAFE_LONG+1)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(double)(TypeUtil.MIN_SAFE_LONG-1)));
+#ELSE
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(double)(TypeUtil.MAX_SAFE_LONG+1)));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(double)(TypeUtil.MIN_SAFE_LONG-1)));
+#ENDIF
+}
+public static void testMETHODNAMEDouble(Supplier<? extends COLLECTIONTYPE.OfBoolean> collectionSupplier,boolean containsVal
+#IFSWITCH POSITIVERETURN==expectedIndex
+,int expectedIndex
+#ENDIF
+)
+{
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((double)2.0));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Double)(double)2.0));
+  #IFSWITCH METHODNAME==removeVal
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(double)2.0));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(double)0.0));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(double)-0.0));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(double)1.0));
+  #ELSE
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(double)2.0));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(double)0.0));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(double)-0.0));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(double)1.0));
+  #ENDIF
+  if(containsVal)
+  {
+    Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((float)0.0));
+    Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((float)-0.0));
+    Assertions.assertEquals(POSITIVERETURN,collectionSupplier.get().METHODNAME((float)1.0));
+    Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Double)(double)0.0));
+    Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Double)(double)-0.0));
+    Assertions.assertEquals(POSITIVERETURN,collectionSupplier.get().METHODNAME((Double)(double)1.0));
+  }
+  else
+  {
+    Assertions.assertEquals(POSITIVERETURN,collectionSupplier.get().METHODNAME((double)0.0));
+    Assertions.assertEquals(POSITIVERETURN,collectionSupplier.get().METHODNAME((double)-0.0));
+    Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((double)1.0));
+    Assertions.assertEquals(POSITIVERETURN,collectionSupplier.get().METHODNAME((Double)(double)0.0));
+    Assertions.assertEquals(POSITIVERETURN,collectionSupplier.get().METHODNAME((Double)(double)-0.0));
+    Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Double)(double)1.0));
+  }
+}
+#ENDDEF
+
+#MACRODEF TestQueryFloat<POSITIVERETURN,NEGATIVERETURN,METHODNAME,COLLECTIONTYPE>()
+public static void testMETHODNAMEFloat(Supplier<? extends COLLECTIONTYPE.OfDouble> collectionSupplier,double containsVal
+#IFSWITCH POSITIVERETURN==expectedIndex
+,int expectedIndex
+#ENDIF
+)
+{
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((float)1.0));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((float)-0.0));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Float)(float)1.0));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Float)(float)-0.0));
+#IFSWITCH METHODNAME==removeVal
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(float)1.0));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(float)-0.0));
+#ELSE
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(float)1.0));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(float)-0.0));
+#ENDIF
+  if(containsVal==containsVal)
+  {
+    Assertions.assertEquals(POSITIVERETURN,collectionSupplier.get().METHODNAME((float)containsVal));
+    Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((float)Float.NaN));
+    Assertions.assertEquals(POSITIVERETURN,collectionSupplier.get().METHODNAME((Float)(float)containsVal));
+    Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Float)(float)Float.NaN));
+#IFSWITCH METHODNAME==removeVal
+    Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(float)containsVal));
+    Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(float)Float.NaN));
+#ELSE
+    Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(float)containsVal));
+    Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(float)Float.NaN));
+#ENDIF
+  }
+  else
+  {
+    Assertions.assertEquals(POSITIVERETURN,collectionSupplier.get().METHODNAME((float)containsVal));
+    Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((float)0.0));
+    Assertions.assertEquals(POSITIVERETURN,collectionSupplier.get().METHODNAME((Float)(float)containsVal));
+    Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Float)(float)0.0));
+#IFSWITCH METHODNAME==removeVal
+    Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(float)containsVal));
+    Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(float)0.0));
+#ELSE
+    Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(float)containsVal));
+    Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(float)0.0));
+#ENDIF
+  }
+}
+public static void testMETHODNAMEFloat(Supplier<? extends COLLECTIONTYPE> collectionSupplier,float containsVal
+#IFSWITCH POSITIVERETURN==expectedIndex
+,int expectedIndex
+#ENDIF
+)
+{
+  COLLECTIONTYPE col;
+  Assertions.assertTrue((col=collectionSupplier.get()) instanceof OmniCollection.OfFloat || col instanceof OmniCollection.OfRef);
+  Assertions.assertEquals(NEGATIVERETURN,col.METHODNAME((float)1.0));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((float)-0.0));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Float)(float)1.0));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Float)(float)-0.0));
+#IFSWITCH METHODNAME==removeVal
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(float)1.0));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(float)-0.0));
+#ELSE
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(float)1.0));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(float)-0.0));
+#ENDIF
+  if(containsVal==containsVal)
+  {
+    Assertions.assertEquals(POSITIVERETURN,collectionSupplier.get().METHODNAME((float)containsVal));
+    Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((float)Float.NaN));
+    Assertions.assertEquals(POSITIVERETURN,collectionSupplier.get().METHODNAME((Float)(float)containsVal));
+    Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Float)(float)Float.NaN));
+#IFSWITCH METHODNAME==removeVal
+    Assertions.assertEquals(POSITIVERETURN,collectionSupplier.get().remove((Object)(float)containsVal));
+    Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(float)Float.NaN));
+#ELSE
+    Assertions.assertEquals(POSITIVERETURN,collectionSupplier.get().METHODNAME((Object)(float)containsVal));
+    Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(float)Float.NaN));
+#ENDIF
+  }
+  else
+  {
+    Assertions.assertEquals(POSITIVERETURN,collectionSupplier.get().METHODNAME((float)containsVal));
+    Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((float)0.0));
+    Assertions.assertEquals(POSITIVERETURN,collectionSupplier.get().METHODNAME((Float)(float)containsVal));
+    Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Float)(float)0.0));
+#IFSWITCH METHODNAME==removeVal
+    Assertions.assertEquals(POSITIVERETURN,collectionSupplier.get().remove((Object)(float)containsVal));
+    Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(float)0.0));
+#ELSE
+    Assertions.assertEquals(POSITIVERETURN,collectionSupplier.get().METHODNAME((Object)(float)containsVal));
+    Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(float)0.0));
+#ENDIF
+  }
+}
+public static void testMETHODNAMEFloat(Supplier<? extends COLLECTIONTYPE> collectionSupplier
+#IFSWITCH POSITIVERETURN==expectedIndex
+,int expectedIndex
+#ENDIF
+)
+{
+  COLLECTIONTYPE col;
+  if((col=collectionSupplier.get()) instanceof OmniCollection.OfByte||col instanceof OmniCollection.OfChar||col instanceof OmniCollection.OfShort||col instanceof OmniCollection.OfInt)
+  {
+    Assertions.assertEquals(NEGATIVERETURN,col.METHODNAME((float)(TypeUtil.MAX_SAFE_INT+1)));
+    Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((float)(TypeUtil.MIN_SAFE_INT-1)));
+    Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Float)(float)(TypeUtil.MAX_SAFE_INT+1)));
+    Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Float)(float)(TypeUtil.MIN_SAFE_INT-1)));
+#IFSWITCH METHODNAME==removeVal
+    Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(float)(TypeUtil.MAX_SAFE_INT+1)));
+    Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(float)(TypeUtil.MIN_SAFE_INT-1)));
+#ELSE
+    Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(float)(TypeUtil.MAX_SAFE_INT+1)));
+    Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(float)(TypeUtil.MIN_SAFE_INT-1)));
+#ENDIF
+  }
+  else
+  {
+    Assertions.assertTrue(col instanceof OmniCollection.OfLong);
+    Assertions.assertEquals(NEGATIVERETURN,col.METHODNAME((float)(TypeUtil.MAX_SAFE_LONG+1)));
+    Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((float)(TypeUtil.MIN_SAFE_LONG-1)));
+    Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Float)(float)(TypeUtil.MAX_SAFE_LONG+1)));
+    Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Float)(float)(TypeUtil.MIN_SAFE_LONG-1)));
+#IFSWITCH METHODNAME==removeVal
+    Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(float)(TypeUtil.MAX_SAFE_LONG+1)));
+    Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(float)(TypeUtil.MIN_SAFE_LONG-1)));
+#ELSE
+    Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(float)(TypeUtil.MAX_SAFE_LONG+1)));
+    Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(float)(TypeUtil.MIN_SAFE_LONG-1)));
+#ENDIF
+  }
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((float)1.0));
+  Assertions.assertEquals(POSITIVERETURN,collectionSupplier.get().METHODNAME((float)0.0));
+  Assertions.assertEquals(POSITIVERETURN,collectionSupplier.get().METHODNAME((float)-0.0));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Float)(float)1.0));
+  Assertions.assertEquals(POSITIVERETURN,collectionSupplier.get().METHODNAME((Float)(float)0.0));
+  Assertions.assertEquals(POSITIVERETURN,collectionSupplier.get().METHODNAME((Float)(float)-0.0));
+#IFSWITCH METHODNAME==removeVal
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(float)1.0));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(float)0.0));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(float)-0.0));
+#ELSE
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(float)1.0));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(float)0.0));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(float)-0.0));
+#ENDIF
+
+}
+public static void testMETHODNAMEFloat(Supplier<? extends COLLECTIONTYPE.OfBoolean> collectionSupplier,boolean containsVal
+#IFSWITCH POSITIVERETURN==expectedIndex
+,int expectedIndex
+#ENDIF
+)
+{
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((float)2.0));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Float)(float)2.0));
+#IFSWITCH METHODNAME==removeVal
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(float)2.0));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(float)0.0));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(float)-0.0));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(float)1.0));
+#ELSE
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(float)2.0));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(float)0.0));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(float)-0.0));
+  Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(float)1.0));
+#ENDIF
+  if(containsVal)
+  {
+    Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((float)0.0));
+    Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((float)-0.0));
+    Assertions.assertEquals(POSITIVERETURN,collectionSupplier.get().METHODNAME((float)1.0));
+    Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Float)(float)0.0));
+    Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Float)(float)-0.0));
+    Assertions.assertEquals(POSITIVERETURN,collectionSupplier.get().METHODNAME((Float)(float)1.0));
+  }
+  else
+  {
+    Assertions.assertEquals(POSITIVERETURN,collectionSupplier.get().METHODNAME((float)0.0));
+    Assertions.assertEquals(POSITIVERETURN,collectionSupplier.get().METHODNAME((float)-0.0));
+    Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((float)1.0));
+    Assertions.assertEquals(POSITIVERETURN,collectionSupplier.get().METHODNAME((Float)(float)0.0));
+    Assertions.assertEquals(POSITIVERETURN,collectionSupplier.get().METHODNAME((Float)(float)-0.0));
+    Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Float)(float)1.0));
+  }
+}
+#ENDDEF
 #MACRODEF TestQueryLong<POSITIVERETURN,NEGATIVERETURN,METHODNAME,COLLECTIONTYPE>()
-public static void testMETHODNAMELong(Supplier<COLLECTIONTYPE.OfDouble> collectionSupplier,double containsVal)
+public static void testMETHODNAMELong(Supplier<? extends COLLECTIONTYPE.OfDouble> collectionSupplier,double containsVal
+#IFSWITCH POSITIVERETURN==expectedIndex
+,int expectedIndex
+#ENDIF
+)
 {
   Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((long)TypeUtil.MIN_SAFE_INT-1));
   Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((long)TypeUtil.MAX_SAFE_INT+1));
@@ -65,7 +454,11 @@ public static void testMETHODNAMELong(Supplier<COLLECTIONTYPE.OfDouble> collecti
 #ENDIF
   }
 }
-public static void testMETHODNAMELong(Supplier<COLLECTIONTYPE.OfFloat> collectionSupplier,float containsVal)
+public static void testMETHODNAMELong(Supplier<? extends COLLECTIONTYPE.OfFloat> collectionSupplier,float containsVal
+#IFSWITCH POSITIVERETURN==expectedIndex
+,int expectedIndex
+#ENDIF
+)
 {
   Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((long)TypeUtil.MIN_SAFE_INT-1));
   Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((long)TypeUtil.MAX_SAFE_INT+1));
@@ -104,37 +497,36 @@ public static void testMETHODNAMELong(Supplier<COLLECTIONTYPE.OfFloat> collectio
 #ENDIF
   }
 }
-public static void testMETHODNAMELong(Supplier<COLLECTIONTYPE> collectionSupplier)
+public static void testMETHODNAMELong(Supplier<? extends COLLECTIONTYPE> collectionSupplier
+#IFSWITCH POSITIVERETURN==expectedIndex
+,int expectedIndex
+#ENDIF
+)
 {
   COLLECTIONTYPE col;
   if((col=collectionSupplier.get()) instanceof OmniCollection.OfByte || col instanceof OmniCollection.OfShort || col instanceof OmniCollection.OfChar || col instanceof OmniCollection.OfInt)
   {
 #IFSWITCH METHODNAME==removeVal
     Assertions.assertEquals(NEGATIVERETURN,col.remove((Object)(long)Long.MIN_VALUE));
-    Assertions.assertEquals(NEGATIVERETURN,col.remove((Object)(long)Long.MAX_VALUE));
+    Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(long)Long.MAX_VALUE));
+    Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(long)0));
 #ELSE
     Assertions.assertEquals(NEGATIVERETURN,col.METHODNAME((Object)(long)Long.MIN_VALUE));
-    Assertions.assertEquals(NEGATIVERETURN,col.METHODNAME((Object)(long)Long.MAX_VALUE));
+    Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(long)Long.MAX_VALUE));
+    Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(long)0));
 #ENDIF
     Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Long)(long)Long.MIN_VALUE));
     Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((long)Long.MIN_VALUE));
     Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Long)(long)Long.MAX_VALUE));
     Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((long)Long.MAX_VALUE));
   }
-  else if(col instanceof OmniCollection.OfRef||col instanceof OmniCollection.OfLong)
+  else
   {
+    Assertions.assertTrue(col instanceof OmniCollection.OfLong || col instanceof OmniCollection.OfRef);
 #IFSWITCH METHODNAME==removeVal
     Assertions.assertEquals(POSITIVERETURN,col.remove((Object)(long)0));
 #ELSE
     Assertions.assertEquals(POSITIVERETURN,col.METHODNAME((Object)(long)0));
-#ENDIF
-  }
-  else
-  {
-#IFSWITCH METHODNAME==removeVal
-    Assertions.assertEquals(NEGATIVERETURN,col.remove((Object)(long)0));
-#ELSE
-    Assertions.assertEquals(NEGATIVERETURN,col.METHODNAME((Object)(long)0));
 #ENDIF
   }
 #IFSWITCH METHODNAME==removeVal
@@ -147,7 +539,12 @@ public static void testMETHODNAMELong(Supplier<COLLECTIONTYPE> collectionSupplie
   Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((long)1));
   Assertions.assertEquals(POSITIVERETURN,collectionSupplier.get().METHODNAME((long)0));
 }
-public static void testMETHODNAMELong(Supplier<COLLECTIONTYPE.OfBoolean> collectionSupplier,boolean containsVal)
+
+public static void testMETHODNAMELong(Supplier<? extends COLLECTIONTYPE.OfBoolean> collectionSupplier,boolean containsVal
+#IFSWITCH POSITIVERETURN==expectedIndex
+,int expectedIndex
+#ENDIF
+)
 {
 #IFSWITCH METHODNAME==removeVal
   Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(long)2));
@@ -167,7 +564,11 @@ public static void testMETHODNAMELong(Supplier<COLLECTIONTYPE.OfBoolean> collect
 }
 #ENDDEF
 #MACRODEF TestQueryInt<POSITIVERETURN,NEGATIVERETURN,METHODNAME,COLLECTIONTYPE>()
-public static void testMETHODNAMEInt(Supplier<COLLECTIONTYPE.OfDouble> collectionSupplier,double containsVal)
+public static void testMETHODNAMEInt(Supplier<? extends COLLECTIONTYPE.OfDouble> collectionSupplier,double containsVal
+#IFSWITCH POSITIVERETURN==expectedIndex
+,int expectedIndex
+#ENDIF
+)
 {
   if(containsVal == 0){
       Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((int)1));
@@ -195,7 +596,11 @@ public static void testMETHODNAMEInt(Supplier<COLLECTIONTYPE.OfDouble> collectio
 #ENDIF
   }
 }
-public static void testMETHODNAMEInt(Supplier<COLLECTIONTYPE.OfFloat> collectionSupplier,float containsVal)
+public static void testMETHODNAMEInt(Supplier<? extends COLLECTIONTYPE.OfFloat> collectionSupplier,float containsVal
+#IFSWITCH POSITIVERETURN==expectedIndex
+,int expectedIndex
+#ENDIF
+)
 {
   Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((int)TypeUtil.MIN_SAFE_INT-1));
   Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((int)TypeUtil.MAX_SAFE_INT+1));
@@ -234,17 +639,21 @@ public static void testMETHODNAMEInt(Supplier<COLLECTIONTYPE.OfFloat> collection
 #ENDIF
   }
 }
-public static void testMETHODNAMEInt(Supplier<COLLECTIONTYPE> collectionSupplier)
+public static void testMETHODNAMEInt(Supplier<? extends COLLECTIONTYPE> collectionSupplier
+#IFSWITCH POSITIVERETURN==expectedIndex
+,int expectedIndex
+#ENDIF
+)
 {
   COLLECTIONTYPE col;
   if((col=collectionSupplier.get()) instanceof OmniCollection.OfByte || col instanceof OmniCollection.OfShort || col instanceof OmniCollection.OfChar)
   {
 #IFSWITCH METHODNAME==removeVal
     Assertions.assertEquals(NEGATIVERETURN,col.remove((Object)(int)Integer.MIN_VALUE));
-    Assertions.assertEquals(NEGATIVERETURN,col.remove((Object)(int)Integer.MAX_VALUE));
+    Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(int)Integer.MAX_VALUE));
 #ELSE
     Assertions.assertEquals(NEGATIVERETURN,col.METHODNAME((Object)(int)Integer.MIN_VALUE));
-    Assertions.assertEquals(NEGATIVERETURN,col.METHODNAME((Object)(int)Integer.MAX_VALUE));
+    Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(int)Integer.MAX_VALUE));
 #ENDIF
     Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Integer)(int)Integer.MIN_VALUE));
     Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((int)Integer.MIN_VALUE));
@@ -261,6 +670,7 @@ public static void testMETHODNAMEInt(Supplier<COLLECTIONTYPE> collectionSupplier
   }
   else
   {
+    Assertions.assertTrue(col instanceof OmniCollection.OfLong);
 #IFSWITCH METHODNAME==removeVal
     Assertions.assertEquals(NEGATIVERETURN,col.remove((Object)(int)0));
 #ELSE
@@ -277,7 +687,11 @@ public static void testMETHODNAMEInt(Supplier<COLLECTIONTYPE> collectionSupplier
   Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((int)1));
   Assertions.assertEquals(POSITIVERETURN,collectionSupplier.get().METHODNAME((int)0));
 }
-public static void testMETHODNAMEInt(Supplier<COLLECTIONTYPE.OfBoolean> collectionSupplier,boolean containsVal)
+public static void testMETHODNAMEInt(Supplier<? extends COLLECTIONTYPE.OfBoolean> collectionSupplier,boolean containsVal
+#IFSWITCH POSITIVERETURN==expectedIndex
+,int expectedIndex
+#ENDIF
+)
 {
 #IFSWITCH METHODNAME==removeVal
   Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(int)2));
@@ -297,7 +711,11 @@ public static void testMETHODNAMEInt(Supplier<COLLECTIONTYPE.OfBoolean> collecti
 }
 #ENDDEF
 #MACRODEF TestQueryShort<POSITIVERETURN,NEGATIVERETURN,METHODNAME,COLLECTIONTYPE>()
-public static void testMETHODNAMEShort(Supplier<COLLECTIONTYPE.OfDouble> collectionSupplier,double containsVal)
+public static void testMETHODNAMEShort(Supplier<? extends COLLECTIONTYPE.OfDouble> collectionSupplier,double containsVal
+#IFSWITCH POSITIVERETURN==expectedIndex
+,int expectedIndex
+#ENDIF
+)
 {
   if(containsVal == 0){
       Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((short)1));
@@ -325,7 +743,11 @@ public static void testMETHODNAMEShort(Supplier<COLLECTIONTYPE.OfDouble> collect
 #ENDIF
   }
 }
-public static void testMETHODNAMEShort(Supplier<COLLECTIONTYPE.OfFloat> collectionSupplier,float containsVal)
+public static void testMETHODNAMEShort(Supplier<? extends COLLECTIONTYPE.OfFloat> collectionSupplier,float containsVal
+#IFSWITCH POSITIVERETURN==expectedIndex
+,int expectedIndex
+#ENDIF
+)
 {
   if(containsVal == 0){
       Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((short)1));
@@ -353,7 +775,11 @@ public static void testMETHODNAMEShort(Supplier<COLLECTIONTYPE.OfFloat> collecti
 #ENDIF
   }
 }
-public static void testMETHODNAMEShort(Supplier<COLLECTIONTYPE> collectionSupplier)
+public static void testMETHODNAMEShort(Supplier<? extends COLLECTIONTYPE> collectionSupplier
+#IFSWITCH POSITIVERETURN==expectedIndex
+,int expectedIndex
+#ENDIF
+)
 {
   COLLECTIONTYPE col;
   if((col=collectionSupplier.get()) instanceof OmniCollection.OfChar)
@@ -370,10 +796,10 @@ public static void testMETHODNAMEShort(Supplier<COLLECTIONTYPE> collectionSuppli
   {
 #IFSWITCH METHODNAME==removeVal
     Assertions.assertEquals(NEGATIVERETURN,col.remove((Object)(short)Short.MIN_VALUE));
-    Assertions.assertEquals(NEGATIVERETURN,col.remove((Object)(short)Short.MAX_VALUE));
+    Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(short)Short.MAX_VALUE));
 #ELSE
     Assertions.assertEquals(NEGATIVERETURN,col.METHODNAME((Object)(short)Short.MIN_VALUE));
-    Assertions.assertEquals(NEGATIVERETURN,col.METHODNAME((Object)(short)Short.MAX_VALUE));
+    Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)(short)Short.MAX_VALUE));
 #ENDIF
     Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Short)(short)Short.MIN_VALUE));
     Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((short)Short.MIN_VALUE));
@@ -390,6 +816,7 @@ public static void testMETHODNAMEShort(Supplier<COLLECTIONTYPE> collectionSuppli
   }
   else
   {
+    Assertions.assertTrue(col instanceof OmniCollection.OfInt || col instanceof OmniCollection.OfLong);
 #IFSWITCH METHODNAME==removeVal
     Assertions.assertEquals(NEGATIVERETURN,col.remove((Object)(short)0));
 #ELSE
@@ -406,7 +833,11 @@ public static void testMETHODNAMEShort(Supplier<COLLECTIONTYPE> collectionSuppli
   Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((short)1));
   Assertions.assertEquals(POSITIVERETURN,collectionSupplier.get().METHODNAME((short)0));
 }
-public static void testMETHODNAMEShort(Supplier<COLLECTIONTYPE.OfBoolean> collectionSupplier,boolean containsVal)
+public static void testMETHODNAMEShort(Supplier<? extends COLLECTIONTYPE.OfBoolean> collectionSupplier,boolean containsVal
+#IFSWITCH POSITIVERETURN==expectedIndex
+,int expectedIndex
+#ENDIF
+)
 {
 #IFSWITCH METHODNAME==removeVal
   Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(short)2));
@@ -426,7 +857,11 @@ public static void testMETHODNAMEShort(Supplier<COLLECTIONTYPE.OfBoolean> collec
 }
 #ENDDEF
 #MACRODEF TestQueryChar<POSITIVERETURN,NEGATIVERETURN,METHODNAME,COLLECTIONTYPE>()
-public static void testMETHODNAMEChar(Supplier<COLLECTIONTYPE.OfDouble> collectionSupplier,double containsVal)
+public static void testMETHODNAMEChar(Supplier<? extends COLLECTIONTYPE.OfDouble> collectionSupplier,double containsVal
+#IFSWITCH POSITIVERETURN==expectedIndex
+,int expectedIndex
+#ENDIF
+)
 {
   if(containsVal == 0){
       Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((char)1));
@@ -454,7 +889,11 @@ public static void testMETHODNAMEChar(Supplier<COLLECTIONTYPE.OfDouble> collecti
 #ENDIF
   }
 }
-public static void testMETHODNAMEChar(Supplier<COLLECTIONTYPE.OfFloat> collectionSupplier,float containsVal)
+public static void testMETHODNAMEChar(Supplier<? extends COLLECTIONTYPE.OfFloat> collectionSupplier,float containsVal
+#IFSWITCH POSITIVERETURN==expectedIndex
+,int expectedIndex
+#ENDIF
+)
 {
   if(containsVal == 0){
       Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((char)1));
@@ -482,7 +921,11 @@ public static void testMETHODNAMEChar(Supplier<COLLECTIONTYPE.OfFloat> collectio
 #ENDIF
   }
 }
-public static void testMETHODNAMEChar(Supplier<COLLECTIONTYPE> collectionSupplier)
+public static void testMETHODNAMEChar(Supplier<? extends COLLECTIONTYPE> collectionSupplier
+#IFSWITCH POSITIVERETURN==expectedIndex
+,int expectedIndex
+#ENDIF
+)
 {
   COLLECTIONTYPE col;
   if((col=collectionSupplier.get()) instanceof OmniCollection.OfShort || col instanceof OmniCollection.OfByte)
@@ -505,6 +948,7 @@ public static void testMETHODNAMEChar(Supplier<COLLECTIONTYPE> collectionSupplie
   }
   else
   {
+    Assertions.assertTrue(col instanceof OmniCollection.OfInt || col instanceof OmniCollection.OfLong);
 #IFSWITCH METHODNAME==removeVal
     Assertions.assertEquals(NEGATIVERETURN,col.remove((Object)(char)0));
 #ELSE
@@ -521,7 +965,11 @@ public static void testMETHODNAMEChar(Supplier<COLLECTIONTYPE> collectionSupplie
   Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((char)1));
   Assertions.assertEquals(POSITIVERETURN,collectionSupplier.get().METHODNAME((char)0));
 }
-public static void testMETHODNAMEChar(Supplier<COLLECTIONTYPE.OfBoolean> collectionSupplier,boolean containsVal)
+public static void testMETHODNAMEChar(Supplier<? extends COLLECTIONTYPE.OfBoolean> collectionSupplier,boolean containsVal
+#IFSWITCH POSITIVERETURN==expectedIndex
+,int expectedIndex
+#ENDIF
+)
 {
 #IFSWITCH METHODNAME==removeVal
   Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(char)2));
@@ -542,7 +990,11 @@ public static void testMETHODNAMEChar(Supplier<COLLECTIONTYPE.OfBoolean> collect
 #ENDDEF
 
 #MACRODEF TestQueryByte<POSITIVERETURN,NEGATIVERETURN,METHODNAME,COLLECTIONTYPE>()
-public static void testMETHODNAMEByte(Supplier<COLLECTIONTYPE.OfDouble> collectionSupplier,double containsVal)
+public static void testMETHODNAMEByte(Supplier<? extends COLLECTIONTYPE.OfDouble> collectionSupplier,double containsVal
+#IFSWITCH POSITIVERETURN==expectedIndex
+,int expectedIndex
+#ENDIF
+)
 {
   if(containsVal == 0){
       Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((byte)1));
@@ -570,7 +1022,11 @@ public static void testMETHODNAMEByte(Supplier<COLLECTIONTYPE.OfDouble> collecti
 #ENDIF
   }
 }
-public static void testMETHODNAMEByte(Supplier<COLLECTIONTYPE.OfFloat> collectionSupplier,float containsVal)
+public static void testMETHODNAMEByte(Supplier<? extends COLLECTIONTYPE.OfFloat> collectionSupplier,float containsVal
+#IFSWITCH POSITIVERETURN==expectedIndex
+,int expectedIndex
+#ENDIF
+)
 {
   if(containsVal == 0){
       Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((byte)1));
@@ -598,7 +1054,11 @@ public static void testMETHODNAMEByte(Supplier<COLLECTIONTYPE.OfFloat> collectio
 #ENDIF
   }
 }
-public static void testMETHODNAMEByte(Supplier<COLLECTIONTYPE> collectionSupplier)
+public static void testMETHODNAMEByte(Supplier<? extends COLLECTIONTYPE> collectionSupplier
+#IFSWITCH POSITIVERETURN==expectedIndex
+,int expectedIndex
+#ENDIF
+)
 {
   COLLECTIONTYPE col;
   if((col=collectionSupplier.get()) instanceof OmniCollection.OfChar)
@@ -621,6 +1081,7 @@ public static void testMETHODNAMEByte(Supplier<COLLECTIONTYPE> collectionSupplie
   }
   else
   {
+    Assertions.assertTrue(col instanceof OmniCollection.OfShort || col instanceof OmniCollection.OfInt || col instanceof OmniCollection.OfLong);
 #IFSWITCH METHODNAME==removeVal
     Assertions.assertEquals(NEGATIVERETURN,col.remove((Object)(byte)0));
 #ELSE
@@ -637,7 +1098,11 @@ public static void testMETHODNAMEByte(Supplier<COLLECTIONTYPE> collectionSupplie
   Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((byte)1));
   Assertions.assertEquals(POSITIVERETURN,collectionSupplier.get().METHODNAME((byte)0));
 }
-public static void testMETHODNAMEByte(Supplier<COLLECTIONTYPE.OfBoolean> collectionSupplier,boolean containsVal)
+public static void testMETHODNAMEByte(Supplier<? extends COLLECTIONTYPE.OfBoolean> collectionSupplier,boolean containsVal
+#IFSWITCH POSITIVERETURN==expectedIndex
+,int expectedIndex
+#ENDIF
+)
 {
 #IFSWITCH METHODNAME==removeVal
   Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)(byte)2));
@@ -658,7 +1123,11 @@ public static void testMETHODNAMEByte(Supplier<COLLECTIONTYPE.OfBoolean> collect
 #ENDDEF
 
 #MACRODEF TestQueryBoolean<POSITIVERETURN,NEGATIVERETURN,METHODNAME,COLLECTIONTYPE>()
-public static void testMETHODNAMEBoolean(Supplier<COLLECTIONTYPE> collectionSupplier,boolean containsVal)
+public static void testMETHODNAMEBoolean(Supplier<? extends COLLECTIONTYPE> collectionSupplier,boolean containsVal
+#IFSWITCH POSITIVERETURN==expectedIndex
+,int expectedIndex
+#ENDIF
+)
 {
 #IFSWITCH METHODNAME==removeVal
   Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)!containsVal));
@@ -690,7 +1159,11 @@ public static void testMETHODNAMEBoolean(Supplier<COLLECTIONTYPE> collectionSupp
 }
 #ENDDEF
 #MACRODEF TestQueryNullReturnPositive<POSITIVERETURN,METHODNAME,COLLECTIONTYPE>()
-public static <E> void testMETHODNAMENullReturnPositive(Supplier<COLLECTIONTYPE.OfRef<E>> collectionSupplier)
+public static <E> void testMETHODNAMENullReturnPositive(Supplier<? extends COLLECTIONTYPE.OfRef<E>> collectionSupplier
+#IFSWITCH POSITIVERETURN==expectedIndex
+,int expectedIndex
+#ENDIF
+)
 {
 #IFSWITCH METHODNAME==removeVal
   Assertions.assertEquals(POSITIVERETURN,collectionSupplier.get().remove((Object)null));
@@ -709,7 +1182,7 @@ public static <E> void testMETHODNAMENullReturnPositive(Supplier<COLLECTIONTYPE.
 #ENDDEF
 
 #MACRODEF TestQueryNullReturnNegative<NEGATIVERETURN,METHODNAME,COLLECTIONTYPE>()
-public static void testMETHODNAMENullReturnNegative(Supplier<COLLECTIONTYPE> collectionSupplier)
+public static void testMETHODNAMENullReturnNegative(Supplier<? extends COLLECTIONTYPE> collectionSupplier)
 {
 #IFSWITCH METHODNAME==removeVal
   Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)null));
@@ -727,7 +1200,7 @@ public static void testMETHODNAMENullReturnNegative(Supplier<COLLECTIONTYPE> col
 }
 #ENDDEF
 #MACRODEF TestQueryEmpty<NEGATIVERETURN,METHODNAME,COLLECTIONTYPE>()
-public static void testEmptyMETHODNAME(Supplier<COLLECTIONTYPE> collectionSupplier)
+public static void testEmptyMETHODNAME(Supplier<? extends COLLECTIONTYPE> collectionSupplier)
 {
 #IFSWITCH METHODNAME==removeVal
   Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)null));

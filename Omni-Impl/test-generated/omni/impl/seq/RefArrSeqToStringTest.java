@@ -1,6 +1,4 @@
 package omni.impl.seq;
-import omni.util.EqualityUtil;
-import omni.util.TypeConversionUtil;
 import omni.impl.CheckedCollectionTest;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -26,13 +24,13 @@ public class RefArrSeqToStringTest
       var expected=arrayList.toString();
       {
         var checkedList=new RefArrSeq.CheckedList(length,arr);
-        EqualityUtil.parallelAssertStringsAreEqual(expected,checkedList.toString());
-        EqualityUtil.parallelAssertStringsAreEqual(expected,checkedList.subList(0,length).toString());
+        Assertions.assertEquals(expected,checkedList.toString());
+        Assertions.assertEquals(expected,checkedList.subList(0,length).toString());
       }
       {
         var uncheckedList=new RefArrSeq.UncheckedList(length,arr);
-        EqualityUtil.parallelAssertStringsAreEqual(expected,uncheckedList.toString());
-        EqualityUtil.parallelAssertStringsAreEqual(expected,uncheckedList.subList(0,length).toString());
+        Assertions.assertEquals(expected,uncheckedList.toString());
+        Assertions.assertEquals(expected,uncheckedList.subList(0,length).toString());
       }
     }
     {
@@ -42,8 +40,8 @@ public class RefArrSeqToStringTest
       }
       var expected=arrayList.toString();
       arrayList=null;
-      EqualityUtil.parallelAssertStringsAreEqual(expected,new RefArrSeq.CheckedStack(length,arr).toString());
-      EqualityUtil.parallelAssertStringsAreEqual(expected,new RefArrSeq.UncheckedStack(length,arr).toString());
+      Assertions.assertEquals(expected,new RefArrSeq.CheckedStack(length,arr).toString());
+      Assertions.assertEquals(expected,new RefArrSeq.UncheckedStack(length,arr).toString());
     }
   }
   @Test

@@ -8,6 +8,7 @@ import omni.api.OmniCollection;
 @SuppressWarnings({"rawtypes","unchecked"}) 
 public class DoubleArrSeqHashCodeTest
 {
+//TODO place sanity checks for checked sequence modification behavior
   @Test
   public void testEmptyHashCodeArrSeqUncheckedStack()
   {

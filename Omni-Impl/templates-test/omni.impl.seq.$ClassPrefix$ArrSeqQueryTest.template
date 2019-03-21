@@ -1,0 +1,513 @@
+#TYPEDEF OfBoolean
+#TYPEDEF OfByte
+#TYPEDEF OfChar
+#TYPEDEF OfShort
+#TYPEDEF OfInt
+#TYPEDEF OfLong
+#TYPEDEF OfFloat
+#TYPEDEF OfDouble
+#TYPEDEF OfRef
+package omni.impl.seq;
+import org.junit.jupiter.api.Test;
+import omni.util.TypeConversionUtil;
+import omni.impl.seq.$ClassPrefix$ArrSeq.UncheckedList;
+import omni.impl.seq.$ClassPrefix$ArrSeq.CheckedList;
+import omni.impl.seq.$ClassPrefix$ArrSeq.UncheckedStack;
+import omni.impl.seq.$ClassPrefix$ArrSeq.CheckedStack;
+import omni.api.QueryTestUtil;
+#IF OfRef
+@SuppressWarnings({"rawtypes","unchecked"}) 
+#ENDIF
+public class $ClassPrefix$ArrSeqQueryTest
+{
+  //TODO place sanity checks for checked sequence modification behavior
+  #MACRO Impl<UncheckedList,removeVal>()
+  #MACRO Impl<UncheckedStack,removeVal>()
+  #MACRO Impl<CheckedList,removeVal>()
+  #MACRO Impl<CheckedStack,removeVal>()
+  #MACRO Impl<CheckedSubList,removeVal>()
+  #MACRO Impl<UncheckedSubList,removeVal>()
+  
+  
+  #MACRO Impl<UncheckedList,contains>()
+  #MACRO Impl<UncheckedStack,contains>()
+  #MACRO Impl<CheckedList,contains>()
+  #MACRO Impl<CheckedStack,contains>()
+  #MACRO Impl<CheckedSubList,contains>()
+  #MACRO Impl<UncheckedSubList,contains>()
+
+}
+
+#MACRODEF ConstructSeq()
+#IFSWITCH STRUCTNAME==CheckedSubList,UncheckedSubList
+  #IFSWITCH STRUCTNAME==CheckedSubList
+var root=new CheckedList();
+  #ELSE
+var root=new UncheckedList();
+  #ENDIF
+var subList=root.subList(0,0);
+var seq=subList.subList(0,0);
+#ELSE
+var seq=new STRUCTNAME();
+#ENDIF
+#ENDDEF
+
+
+
+
+
+
+#MACRODEF Impl<STRUCTNAME,METHODNAME>()
+@Test
+public void testSTRUCTNAMEMETHODNAMEDouble()
+{
+#IF OfRef
+  QueryTestUtil.testMETHODNAMEDouble(()->
+  {
+    #MACRO ConstructSeq()
+    seq.add(Double.valueOf((double)0));
+    return seq;
+  },(double)0);
+  QueryTestUtil.testMETHODNAMEDouble(()->
+  {
+    #MACRO ConstructSeq()
+    seq.add(Double.valueOf(Double.NaN));
+    return seq;
+  },(double)Double.NaN);
+#ELSEIF OfBoolean
+  QueryTestUtil.testMETHODNAMEDouble(()->
+  {
+    #MACRO ConstructSeq()
+    seq.add(false);
+    return seq;
+  },false);
+  QueryTestUtil.testMETHODNAMEDouble(()->
+  {
+    #MACRO ConstructSeq()
+    seq.add(true);
+    return seq;
+  },true);
+#ELSEIF OfByte,OfChar,OfShort,OfInt,OfLong
+  QueryTestUtil.testMETHODNAMEDouble(()->
+  {
+    #MACRO ConstructSeq()
+    seq.add(($exposedType$)0);
+    return seq;
+  });
+#ELSEIF OfFloat
+  QueryTestUtil.testMETHODNAMEDouble(()->
+  {
+    #MACRO ConstructSeq()
+    seq.add((float)0);
+    return seq;
+  },(float)0);
+  QueryTestUtil.testMETHODNAMEDouble(()->
+  {
+    #MACRO ConstructSeq()
+    seq.add((float)Float.NaN);
+    return seq;
+  },(float)Float.NaN);
+#ELSE
+  QueryTestUtil.testMETHODNAMEDouble(()->
+  {
+    #MACRO ConstructSeq()
+    seq.add((double)0);
+    return seq;
+  },(double)0);
+  QueryTestUtil.testMETHODNAMEDouble(()->
+  {
+    #MACRO ConstructSeq()
+    seq.add((double)Double.NaN);
+    return seq;
+  },(double)Double.NaN);
+#ENDIF
+}
+@Test
+public void testSTRUCTNAMEMETHODNAMEFloat()
+{
+#IF OfRef
+  QueryTestUtil.testMETHODNAMEFloat(()->
+  {
+    #MACRO ConstructSeq()
+    seq.add(Float.valueOf((float)0));
+    return seq;
+  },(float)0);
+  QueryTestUtil.testMETHODNAMEFloat(()->
+  {
+    #MACRO ConstructSeq()
+    seq.add(Float.valueOf(Float.NaN));
+    return seq;
+  },(float)Float.NaN);
+#ELSEIF OfBoolean
+  QueryTestUtil.testMETHODNAMEFloat(()->
+  {
+    #MACRO ConstructSeq()
+    seq.add(false);
+    return seq;
+  },false);
+  QueryTestUtil.testMETHODNAMEFloat(()->
+  {
+    #MACRO ConstructSeq()
+    seq.add(true);
+    return seq;
+  },true);
+#ELSEIF OfByte,OfChar,OfShort,OfInt,OfLong
+  QueryTestUtil.testMETHODNAMEFloat(()->
+  {
+    #MACRO ConstructSeq()
+    seq.add(($exposedType$)0);
+    return seq;
+  });
+#ELSEIF OfFloat
+  QueryTestUtil.testMETHODNAMEFloat(()->
+  {
+    #MACRO ConstructSeq()
+    seq.add((float)0);
+    return seq;
+  },(float)0);
+  QueryTestUtil.testMETHODNAMEFloat(()->
+  {
+    #MACRO ConstructSeq()
+    seq.add((float)Float.NaN);
+    return seq;
+  },(float)Float.NaN);
+#ELSEIF
+  QueryTestUtil.testMETHODNAMEFloat(()->
+  {
+    #MACRO ConstructSeq()
+    seq.add((double)0);
+    return seq;
+  },(double)0);
+  QueryTestUtil.testMETHODNAMEFloat(()->
+  {
+    #MACRO ConstructSeq()
+    seq.add((double)Double.NaN);
+    return seq;
+  },(double)Double.NaN);
+#ENDIF
+}
+@Test
+public void testSTRUCTNAMEMETHODNAMELong()
+{
+#IF OfRef
+  QueryTestUtil.testMETHODNAMELong(()->
+  {
+    #MACRO ConstructSeq()
+    seq.add(Long.valueOf((long)0));
+    return seq;
+  });
+#ELSEIF OfBoolean
+  QueryTestUtil.testMETHODNAMELong(()->
+  {
+    #MACRO ConstructSeq()
+    seq.add(false);
+    return seq;
+  },false);
+  QueryTestUtil.testMETHODNAMELong(()->
+  {
+    #MACRO ConstructSeq()
+    seq.add(true);
+    return seq;
+  },true);
+#ELSEIF OfByte,OfShort,OfInt,OfLong,OfChar
+  QueryTestUtil.testMETHODNAMELong(()->
+  {
+    #MACRO ConstructSeq()
+    seq.add(($exposedType$)0);
+    return seq;
+  });
+#ELSE
+  QueryTestUtil.testMETHODNAMELong(()->
+  {
+    #MACRO ConstructSeq()
+    seq.add(($exposedType$)-0.0);
+    return seq;
+  },($exposedType$)-0.0);
+  QueryTestUtil.testMETHODNAMELong(()->
+  {
+    #MACRO ConstructSeq()
+    seq.add(($exposedType$)0.0);
+    return seq;
+  },($exposedType$)0.0);
+  QueryTestUtil.testMETHODNAMELong(()->
+  {
+    #MACRO ConstructSeq()
+    seq.add(($exposedType$)1.0);
+    return seq;
+  },($exposedType$)1.0);
+#ENDIF
+}
+@Test
+public void testSTRUCTNAMEMETHODNAMEInt()
+{
+#IF OfRef
+  QueryTestUtil.testMETHODNAMEInt(()->
+  {
+    #MACRO ConstructSeq()
+    seq.add(Integer.valueOf((int)0));
+    return seq;
+  });
+#ELSEIF OfBoolean
+  QueryTestUtil.testMETHODNAMEInt(()->
+  {
+    #MACRO ConstructSeq()
+    seq.add(false);
+    return seq;
+  },false);
+  QueryTestUtil.testMETHODNAMEInt(()->
+  {
+    #MACRO ConstructSeq()
+    seq.add(true);
+    return seq;
+  },true);
+#ELSEIF OfByte,OfShort,OfInt,OfLong,OfChar
+  QueryTestUtil.testMETHODNAMEInt(()->
+  {
+    #MACRO ConstructSeq()
+    seq.add(($exposedType$)0);
+    return seq;
+  });
+#ELSE
+  QueryTestUtil.testMETHODNAMEInt(()->
+  {
+    #MACRO ConstructSeq()
+    seq.add(($exposedType$)-0.0);
+    return seq;
+  },($exposedType$)-0.0);
+  QueryTestUtil.testMETHODNAMEInt(()->
+  {
+    #MACRO ConstructSeq()
+    seq.add(($exposedType$)0.0);
+    return seq;
+  },($exposedType$)0.0);
+  QueryTestUtil.testMETHODNAMEInt(()->
+  {
+    #MACRO ConstructSeq()
+    seq.add(($exposedType$)1.0);
+    return seq;
+  },($exposedType$)1.0);
+#ENDIF
+}
+@Test
+public void testSTRUCTNAMEMETHODNAMEShort()
+{
+#IF OfRef
+  QueryTestUtil.testMETHODNAMEShort(()->
+  {
+    #MACRO ConstructSeq()
+    seq.add(Short.valueOf((short)0));
+    return seq;
+  });
+#ELSEIF OfBoolean
+  QueryTestUtil.testMETHODNAMEShort(()->
+  {
+    #MACRO ConstructSeq()
+    seq.add(false);
+    return seq;
+  },false);
+  QueryTestUtil.testMETHODNAMEShort(()->
+  {
+    #MACRO ConstructSeq()
+    seq.add(true);
+    return seq;
+  },true);
+#ELSEIF OfByte,OfShort,OfInt,OfLong,OfChar
+  QueryTestUtil.testMETHODNAMEShort(()->
+  {
+    #MACRO ConstructSeq()
+    seq.add(($exposedType$)0);
+    return seq;
+  });
+#ELSE
+  QueryTestUtil.testMETHODNAMEShort(()->
+  {
+    #MACRO ConstructSeq()
+    seq.add(($exposedType$)-0.0);
+    return seq;
+  },($exposedType$)-0.0);
+  QueryTestUtil.testMETHODNAMEShort(()->
+  {
+    #MACRO ConstructSeq()
+    seq.add(($exposedType$)0.0);
+    return seq;
+  },($exposedType$)0.0);
+  QueryTestUtil.testMETHODNAMEShort(()->
+  {
+    #MACRO ConstructSeq()
+    seq.add(($exposedType$)1.0);
+    return seq;
+  },($exposedType$)1.0);
+#ENDIF
+}
+@Test
+public void testSTRUCTNAMEMETHODNAMEChar()
+{
+#IF OfRef
+  QueryTestUtil.testMETHODNAMEChar(()->
+  {
+    #MACRO ConstructSeq()
+    seq.add(Character.valueOf((char)0));
+    return seq;
+  });
+#ELSEIF OfBoolean
+  QueryTestUtil.testMETHODNAMEChar(()->
+  {
+    #MACRO ConstructSeq()
+    seq.add(false);
+    return seq;
+  },false);
+  QueryTestUtil.testMETHODNAMEChar(()->
+  {
+    #MACRO ConstructSeq()
+    seq.add(true);
+    return seq;
+  },true);
+#ELSEIF OfByte,OfShort,OfInt,OfLong,OfChar
+  QueryTestUtil.testMETHODNAMEChar(()->
+  {
+    #MACRO ConstructSeq()
+    seq.add(($exposedType$)0);
+    return seq;
+  });
+#ELSE
+  QueryTestUtil.testMETHODNAMEChar(()->
+  {
+    #MACRO ConstructSeq()
+    seq.add(($exposedType$)-0.0);
+    return seq;
+  },($exposedType$)-0.0);
+  QueryTestUtil.testMETHODNAMEChar(()->
+  {
+    #MACRO ConstructSeq()
+    seq.add(($exposedType$)0.0);
+    return seq;
+  },($exposedType$)0.0);
+  QueryTestUtil.testMETHODNAMEChar(()->
+  {
+    #MACRO ConstructSeq()
+    seq.add(($exposedType$)1.0);
+    return seq;
+  },($exposedType$)1.0);
+#ENDIF
+}
+@Test
+public void testSTRUCTNAMEMETHODNAMEByte()
+{
+#IF OfRef
+  
+  QueryTestUtil.testMETHODNAMEByte(()->
+  {
+    #MACRO ConstructSeq()
+    seq.add(Byte.valueOf((byte)0));
+    return seq;
+  });
+#ELSEIF OfBoolean
+  
+  QueryTestUtil.testMETHODNAMEByte(()->
+  {
+    #MACRO ConstructSeq()
+    seq.add(false);
+    return seq;
+  },false);
+  QueryTestUtil.testMETHODNAMEByte(()->
+  {
+    #MACRO ConstructSeq()
+    seq.add(true);
+    return seq;
+  },true);
+#ELSEIF OfByte,OfShort,OfInt,OfLong,OfChar
+  QueryTestUtil.testMETHODNAMEByte(()->
+  {
+    #MACRO ConstructSeq()
+    seq.add(($exposedType$)0);
+    return seq;
+  });
+#ELSE
+  QueryTestUtil.testMETHODNAMEByte(()->
+  {
+    #MACRO ConstructSeq()
+    seq.add(($exposedType$)-0.0);
+    return seq;
+  },($exposedType$)-0.0);
+  QueryTestUtil.testMETHODNAMEByte(()->
+  {
+    #MACRO ConstructSeq()
+    seq.add(($exposedType$)0.0);
+    return seq;
+  },($exposedType$)0.0);
+  QueryTestUtil.testMETHODNAMEByte(()->
+  {
+    #MACRO ConstructSeq()
+    seq.add(($exposedType$)1.0);
+    return seq;
+  },($exposedType$)1.0);
+#ENDIF
+}
+@Test
+public void testSTRUCTNAMEMETHODNAMEBoolean()
+{
+
+  QueryTestUtil.testMETHODNAMEBoolean(()->
+  {
+    #MACRO ConstructSeq()
+    #IF OfRef
+    seq.add(Boolean.TRUE);
+    #ELSE
+    seq.add(true);
+    #ENDIF
+    return seq;
+  },true);
+  
+
+  QueryTestUtil.testMETHODNAMEBoolean(()->
+  {
+    #MACRO ConstructSeq()
+    #IF OfRef
+    seq.add(Boolean.FALSE);
+    #ELSE
+    seq.add(false);
+    #ENDIF
+    return seq;
+  },false);
+  
+  
+}
+@Test
+public void testSTRUCTNAMEMETHODNAMENull()
+{
+  
+  QueryTestUtil.testMETHODNAMENullReturnNegative(()->
+  {
+    #MACRO ConstructSeq()
+    #IF OfRef
+    seq.add(TypeConversionUtil.convertToInteger(0));
+    #ELSE
+    seq.add(TypeConversionUtil.convertTo$ArrayType$(0));
+    #ENDIF
+    return seq;
+  });
+  
+#IF OfRef
+  QueryTestUtil.testMETHODNAMENullReturnPositive(()->
+  {
+    #MACRO ConstructSeq()
+    seq.add(TypeConversionUtil.convertToInteger(0));
+    seq.add((Integer)null);
+    return seq;
+  });
+#ENDIF
+}
+@Test
+public void testEmptySTRUCTNAMEMETHODNAME()
+{
+  
+  
+  QueryTestUtil.testEmptyMETHODNAME(()->
+  {
+    #MACRO ConstructSeq()
+    return seq;
+  });
+  
+  
+}
+#ENDDEF

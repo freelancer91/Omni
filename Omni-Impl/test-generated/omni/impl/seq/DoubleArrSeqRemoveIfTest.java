@@ -2,8 +2,6 @@ package omni.impl.seq;
 import java.util.function.Predicate;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import java.util.ArrayList;
-import omni.api.OmniIterator;
 import omni.impl.seq.DoubleArrSeq.UncheckedList;
 import omni.impl.seq.DoubleArrSeq.CheckedList;
 import omni.impl.seq.DoubleArrSeq.UncheckedStack;
@@ -11,16 +9,12 @@ import omni.impl.seq.DoubleArrSeq.CheckedStack;
 import java.util.ConcurrentModificationException;
 import omni.impl.CheckedCollectionTest;
 import omni.util.TypeConversionUtil;
-import omni.api.OmniList;
-import omni.api.OmniStack;
 import omni.util.EqualityUtil;
-import java.util.Random;
 import omni.util.doublePredicates;
-import omni.util.doubleArrayBuilder;
 import java.util.function.DoublePredicate;
-@SuppressWarnings({"rawtypes","unchecked"}) 
 public class DoubleArrSeqRemoveIfTest
 {
+//TODO place sanity checks for checked sequence modification behavior
   @Test
   public void testEmptyRemoveIfArrSeqUncheckedStack()
   {

@@ -2,25 +2,17 @@ package omni.impl.seq;
 import java.util.function.Predicate;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import java.util.ArrayList;
-import omni.api.OmniIterator;
 import omni.impl.seq.BooleanArrSeq.UncheckedList;
 import omni.impl.seq.BooleanArrSeq.CheckedList;
 import omni.impl.seq.BooleanArrSeq.UncheckedStack;
 import omni.impl.seq.BooleanArrSeq.CheckedStack;
 import java.util.ConcurrentModificationException;
 import omni.impl.CheckedCollectionTest;
-import omni.util.TypeConversionUtil;
-import omni.api.OmniList;
-import omni.api.OmniStack;
-import omni.util.EqualityUtil;
-import java.util.Random;
 import omni.util.booleanPredicates;
-import omni.util.booleanArrayBuilder;
 import omni.function.BooleanPredicate;
-@SuppressWarnings({"rawtypes","unchecked"}) 
 public class BooleanArrSeqRemoveIfTest
 {
+//TODO place sanity checks for checked sequence modification behavior
   @Test
   public void testEmptyRemoveIfArrSeqUncheckedStack()
   {
@@ -1255,8 +1247,6 @@ public class BooleanArrSeqRemoveIfTest
           }
         }
         //alternating begin false
-        BooleanPredicate pred=val->true;
-        //remove all
         Assertions.assertThrows(ConcurrentModificationException.class,()->
         {
           seq.removeIf((BooleanPredicate)(v)->
@@ -1283,8 +1273,6 @@ public class BooleanArrSeqRemoveIfTest
           }
         }
         //alternating begin false
-        Predicate<Boolean> pred=val->true;
-        //remove all
         Assertions.assertThrows(ConcurrentModificationException.class,()->
         {
           seq.removeIf((Predicate<Boolean>)(v)->
@@ -1311,8 +1299,6 @@ public class BooleanArrSeqRemoveIfTest
           }
         }
         //alternating begin true
-        BooleanPredicate pred=val->true;
-        //remove all
         Assertions.assertThrows(ConcurrentModificationException.class,()->
         {
           seq.removeIf((BooleanPredicate)(v)->
@@ -1339,8 +1325,6 @@ public class BooleanArrSeqRemoveIfTest
           }
         }
         //alternating begin true
-        Predicate<Boolean> pred=val->true;
-        //remove all
         Assertions.assertThrows(ConcurrentModificationException.class,()->
         {
           seq.removeIf((Predicate<Boolean>)(v)->
@@ -2343,8 +2327,6 @@ public class BooleanArrSeqRemoveIfTest
           }
         }
         //alternating begin false
-        BooleanPredicate pred=val->true;
-        //remove all
         Assertions.assertThrows(ConcurrentModificationException.class,()->
         {
           seq.removeIf((BooleanPredicate)(v)->
@@ -2371,8 +2353,6 @@ public class BooleanArrSeqRemoveIfTest
           }
         }
         //alternating begin false
-        Predicate<Boolean> pred=val->true;
-        //remove all
         Assertions.assertThrows(ConcurrentModificationException.class,()->
         {
           seq.removeIf((Predicate<Boolean>)(v)->
@@ -2399,8 +2379,6 @@ public class BooleanArrSeqRemoveIfTest
           }
         }
         //alternating begin true
-        BooleanPredicate pred=val->true;
-        //remove all
         Assertions.assertThrows(ConcurrentModificationException.class,()->
         {
           seq.removeIf((BooleanPredicate)(v)->
@@ -2427,8 +2405,6 @@ public class BooleanArrSeqRemoveIfTest
           }
         }
         //alternating begin true
-        Predicate<Boolean> pred=val->true;
-        //remove all
         Assertions.assertThrows(ConcurrentModificationException.class,()->
         {
           seq.removeIf((Predicate<Boolean>)(v)->
@@ -3871,8 +3847,6 @@ public class BooleanArrSeqRemoveIfTest
           }
         }
         //alternating begin false
-        BooleanPredicate pred=val->true;
-        //remove all
         Assertions.assertThrows(ConcurrentModificationException.class,()->
         {
           seq.removeIf((BooleanPredicate)(v)->
@@ -3901,8 +3875,6 @@ public class BooleanArrSeqRemoveIfTest
           }
         }
         //alternating begin false
-        Predicate<Boolean> pred=val->true;
-        //remove all
         Assertions.assertThrows(ConcurrentModificationException.class,()->
         {
           seq.removeIf((Predicate<Boolean>)(v)->
@@ -3931,8 +3903,6 @@ public class BooleanArrSeqRemoveIfTest
           }
         }
         //alternating begin true
-        BooleanPredicate pred=val->true;
-        //remove all
         Assertions.assertThrows(ConcurrentModificationException.class,()->
         {
           seq.removeIf((BooleanPredicate)(v)->
@@ -3961,8 +3931,6 @@ public class BooleanArrSeqRemoveIfTest
           }
         }
         //alternating begin true
-        Predicate<Boolean> pred=val->true;
-        //remove all
         Assertions.assertThrows(ConcurrentModificationException.class,()->
         {
           seq.removeIf((Predicate<Boolean>)(v)->

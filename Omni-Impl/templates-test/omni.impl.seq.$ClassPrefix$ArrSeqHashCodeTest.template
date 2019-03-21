@@ -20,6 +20,7 @@ import omni.api.OmniCollection;
 @SuppressWarnings({"rawtypes","unchecked"}) 
 public class $ClassPrefix$ArrSeqHashCodeTest
 {
+//TODO place sanity checks for checked sequence modification behavior
   #MACRO ArrSeqImpl<UncheckedStack>()
   #MACRO ArrSeqImpl<UncheckedList>()
   #MACRO ArrSeqImpl<CheckedStack>()

@@ -1,6 +1,4 @@
 package omni.impl.seq;
-import omni.util.EqualityUtil;
-import omni.util.TypeConversionUtil;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
@@ -27,13 +25,13 @@ public class ShortArrSeqToStringTest
       var expected=arrayList.toString();
       {
         var checkedList=new ShortArrSeq.CheckedList(length,arr);
-        EqualityUtil.parallelAssertStringsAreEqual(expected,checkedList.toString());
-        EqualityUtil.parallelAssertStringsAreEqual(expected,checkedList.subList(0,length).toString());
+        Assertions.assertEquals(expected,checkedList.toString());
+        Assertions.assertEquals(expected,checkedList.subList(0,length).toString());
       }
       {
         var uncheckedList=new ShortArrSeq.UncheckedList(length,arr);
-        EqualityUtil.parallelAssertStringsAreEqual(expected,uncheckedList.toString());
-        EqualityUtil.parallelAssertStringsAreEqual(expected,uncheckedList.subList(0,length).toString());
+        Assertions.assertEquals(expected,uncheckedList.toString());
+        Assertions.assertEquals(expected,uncheckedList.subList(0,length).toString());
       }
     }
     {
@@ -43,8 +41,8 @@ public class ShortArrSeqToStringTest
       }
       var expected=arrayList.toString();
       arrayList=null;
-      EqualityUtil.parallelAssertStringsAreEqual(expected,new ShortArrSeq.CheckedStack(length,arr).toString());
-      EqualityUtil.parallelAssertStringsAreEqual(expected,new ShortArrSeq.UncheckedStack(length,arr).toString());
+      Assertions.assertEquals(expected,new ShortArrSeq.CheckedStack(length,arr).toString());
+      Assertions.assertEquals(expected,new ShortArrSeq.UncheckedStack(length,arr).toString());
     }
   }
   @Test
@@ -112,7 +110,8 @@ public class ShortArrSeqToStringTest
       Assertions.assertThrows(OutOfMemoryError.class,()->root.toString());
     }
   }
-  @Test
+  //TODO make this faster or place is switch to disable it as desired
+  //@Test
   public void testLargeArrSeqToString()
   {
     testArrSeqToString((OmniArray.MAX_ARR_SIZE/(MAX_TOSTRING_LENGTH+2))+1);

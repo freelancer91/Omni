@@ -11,34 +11,32 @@ package omni.impl.seq;
 import java.util.function.Predicate;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import java.util.ArrayList;
-import omni.api.OmniIterator;
 import omni.impl.seq.$ClassPrefix$ArrSeq.UncheckedList;
 import omni.impl.seq.$ClassPrefix$ArrSeq.CheckedList;
 import omni.impl.seq.$ClassPrefix$ArrSeq.UncheckedStack;
 import omni.impl.seq.$ClassPrefix$ArrSeq.CheckedStack;
 import java.util.ConcurrentModificationException;
 import omni.impl.CheckedCollectionTest;
+#IFNOT OfBoolean
 import omni.util.TypeConversionUtil;
-import omni.api.OmniList;
-import omni.api.OmniStack;
 import omni.util.EqualityUtil;
-import java.util.Random;
+#ENDIF
 #IF OfRef
 import omni.util.IntegerPredicates;
-import omni.util.IntegerArrayBuilder;
 #ELSE
 import omni.util.$ArrayType$Predicates;
-import omni.util.$ArrayType$ArrayBuilder;
 #ENDIF
 #IF OfInt,OfLong,OfDouble
 import java.util.function.$TypeNameModifier$Predicate;
 #ELSEIFNOT OfRef
 import omni.function.$TypeNameModifier$Predicate;
 #ENDIF
+#IF OfRef
 @SuppressWarnings({"rawtypes","unchecked"}) 
+#ENDIF
 public class $ClassPrefix$ArrSeqRemoveIfTest
 {
+//TODO place sanity checks for checked sequence modification behavior
   #MACRO ArrSeqImpl<UncheckedStack,OmniStack>()
   #MACRO ArrSeqImpl<UncheckedList,OmniList>()
   #MACRO ArrSeqImpl<CheckedStack,OmniStack>()
@@ -455,7 +453,7 @@ var seq=new STRUCTNAME(length,arr);
       }
     }
     //alternating begin initialVal
-#IFNOTSWITCH ConcurrentModificationBehavior==throwRunTimeNoMod,throwRunTimeNoMod
+#IFNOTSWITCH ConcurrentModificationBehavior==throwRunTimeNoMod,throwRunTimeMod
   #IFSWITCH REMOVEBEHAVIOR==RemoveNone
     PREDICATETYPE pred=val->false;
     //remove none
