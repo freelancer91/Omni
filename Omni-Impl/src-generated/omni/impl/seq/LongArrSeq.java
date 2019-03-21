@@ -775,7 +775,7 @@ public abstract class LongArrSeq implements OmniCollection.OfLong
       private Itr(UncheckedStack parent)
       {
         this.parent=parent;
-        this.cursor=parent.size-1;
+        this.cursor=parent.size;
       }
       private Itr(UncheckedStack parent,int cursor)
       {
@@ -785,12 +785,12 @@ public abstract class LongArrSeq implements OmniCollection.OfLong
       @Override
       public boolean hasNext()
       {
-        return this.cursor>=0;
+        return this.cursor>0;
       }
       @Override
       public long nextLong()
       {
-        return (long)parent.arr[cursor--];
+        return (long)parent.arr[--cursor];
       }
       @Override
       public void remove()
@@ -802,20 +802,20 @@ public abstract class LongArrSeq implements OmniCollection.OfLong
       public void forEachRemaining(LongConsumer action)
       {
         final int cursor;
-        if((cursor=this.cursor)>=0)
+        if((cursor=this.cursor)>0)
         {
-          OmniArray.OfLong.descendingForEach(parent.arr,0,cursor,action);
-          this.cursor=-1;
+          OmniArray.OfLong.descendingForEach(parent.arr,0,cursor-1,action);
+          this.cursor=0;
         }
       }
       @Override
       public void forEachRemaining(Consumer<? super Long> action)
       {
         final int cursor;
-        if((cursor=this.cursor)>=0)
+        if((cursor=this.cursor)>0)
         {
-          OmniArray.OfLong.descendingForEach(parent.arr,0,cursor,action::accept);
-          this.cursor=-1;
+          OmniArray.OfLong.descendingForEach(parent.arr,0,cursor-1,action::accept);
+          this.cursor=0;
         }
       }
     }
@@ -2530,7 +2530,7 @@ public abstract class LongArrSeq implements OmniCollection.OfLong
       private Itr(CheckedStack parent)
       {
         this.parent=parent;
-        this.cursor=parent.size-1;
+        this.cursor=parent.size;
         this.modCount=parent.modCount;
         this.lastRet=-1;
       }
@@ -2544,18 +2544,18 @@ public abstract class LongArrSeq implements OmniCollection.OfLong
       @Override
       public boolean hasNext()
       {
-        return this.cursor>=0;
+        return this.cursor>0;
       }
       @Override
       public long nextLong()
       {
         final CheckedStack root;
         CheckedCollection.checkModCount(modCount,(root=this.parent).modCount);
-        final int cursor;
-        if((cursor=this.cursor)>=0)
+        int cursor;
+        if((cursor=this.cursor)>0)
         {
-          this.lastRet=cursor;
-          this.cursor=cursor-1;
+          this.lastRet=--cursor;
+          this.cursor=cursor;
             return (long)root.arr[cursor];
         }
         throw new NoSuchElementException();
@@ -2582,19 +2582,19 @@ public abstract class LongArrSeq implements OmniCollection.OfLong
       public void forEachRemaining(LongConsumer action)
       {
         final int cursor;
-        if((cursor=this.cursor)>=0)
+        if((cursor=this.cursor)>0)
         {
           final int modCount=this.modCount;
           final var parent=this.parent;
           try
           {
-            OmniArray.OfLong.descendingForEach(parent.arr,0,cursor,action);
+            OmniArray.OfLong.descendingForEach(parent.arr,0,cursor-1,action);
           }
           finally
           {
             CheckedCollection.checkModCount(modCount,parent.modCount);
           }
-          this.cursor=-1;
+          this.cursor=0;
           this.lastRet=0;
         }
       }
@@ -2602,19 +2602,19 @@ public abstract class LongArrSeq implements OmniCollection.OfLong
       public void forEachRemaining(Consumer<? super Long> action)
       {
         final int cursor;
-        if((cursor=this.cursor)>=0)
+        if((cursor=this.cursor)>0)
         {
           final int modCount=this.modCount;
           final var parent=this.parent;
           try
           {
-            OmniArray.OfLong.descendingForEach(parent.arr,0,cursor,action::accept);
+            OmniArray.OfLong.descendingForEach(parent.arr,0,cursor-1,action::accept);
           }
           finally
           {
             CheckedCollection.checkModCount(modCount,parent.modCount);
           }
-          this.cursor=-1;
+          this.cursor=0;
           this.lastRet=0;
         }
       }

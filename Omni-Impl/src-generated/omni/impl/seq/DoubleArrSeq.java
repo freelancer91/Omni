@@ -934,7 +934,7 @@ public abstract class DoubleArrSeq implements OmniCollection.OfDouble
       private Itr(UncheckedStack parent)
       {
         this.parent=parent;
-        this.cursor=parent.size-1;
+        this.cursor=parent.size;
       }
       private Itr(UncheckedStack parent,int cursor)
       {
@@ -944,12 +944,12 @@ public abstract class DoubleArrSeq implements OmniCollection.OfDouble
       @Override
       public boolean hasNext()
       {
-        return this.cursor>=0;
+        return this.cursor>0;
       }
       @Override
       public double nextDouble()
       {
-        return (double)parent.arr[cursor--];
+        return (double)parent.arr[--cursor];
       }
       @Override
       public void remove()
@@ -961,20 +961,20 @@ public abstract class DoubleArrSeq implements OmniCollection.OfDouble
       public void forEachRemaining(DoubleConsumer action)
       {
         final int cursor;
-        if((cursor=this.cursor)>=0)
+        if((cursor=this.cursor)>0)
         {
-          OmniArray.OfDouble.descendingForEach(parent.arr,0,cursor,action);
-          this.cursor=-1;
+          OmniArray.OfDouble.descendingForEach(parent.arr,0,cursor-1,action);
+          this.cursor=0;
         }
       }
       @Override
       public void forEachRemaining(Consumer<? super Double> action)
       {
         final int cursor;
-        if((cursor=this.cursor)>=0)
+        if((cursor=this.cursor)>0)
         {
-          OmniArray.OfDouble.descendingForEach(parent.arr,0,cursor,action::accept);
-          this.cursor=-1;
+          OmniArray.OfDouble.descendingForEach(parent.arr,0,cursor-1,action::accept);
+          this.cursor=0;
         }
       }
     }
@@ -2945,7 +2945,7 @@ public abstract class DoubleArrSeq implements OmniCollection.OfDouble
       private Itr(CheckedStack parent)
       {
         this.parent=parent;
-        this.cursor=parent.size-1;
+        this.cursor=parent.size;
         this.modCount=parent.modCount;
         this.lastRet=-1;
       }
@@ -2959,18 +2959,18 @@ public abstract class DoubleArrSeq implements OmniCollection.OfDouble
       @Override
       public boolean hasNext()
       {
-        return this.cursor>=0;
+        return this.cursor>0;
       }
       @Override
       public double nextDouble()
       {
         final CheckedStack root;
         CheckedCollection.checkModCount(modCount,(root=this.parent).modCount);
-        final int cursor;
-        if((cursor=this.cursor)>=0)
+        int cursor;
+        if((cursor=this.cursor)>0)
         {
-          this.lastRet=cursor;
-          this.cursor=cursor-1;
+          this.lastRet=--cursor;
+          this.cursor=cursor;
             return (double)root.arr[cursor];
         }
         throw new NoSuchElementException();
@@ -2997,19 +2997,19 @@ public abstract class DoubleArrSeq implements OmniCollection.OfDouble
       public void forEachRemaining(DoubleConsumer action)
       {
         final int cursor;
-        if((cursor=this.cursor)>=0)
+        if((cursor=this.cursor)>0)
         {
           final int modCount=this.modCount;
           final var parent=this.parent;
           try
           {
-            OmniArray.OfDouble.descendingForEach(parent.arr,0,cursor,action);
+            OmniArray.OfDouble.descendingForEach(parent.arr,0,cursor-1,action);
           }
           finally
           {
             CheckedCollection.checkModCount(modCount,parent.modCount);
           }
-          this.cursor=-1;
+          this.cursor=0;
           this.lastRet=0;
         }
       }
@@ -3017,19 +3017,19 @@ public abstract class DoubleArrSeq implements OmniCollection.OfDouble
       public void forEachRemaining(Consumer<? super Double> action)
       {
         final int cursor;
-        if((cursor=this.cursor)>=0)
+        if((cursor=this.cursor)>0)
         {
           final int modCount=this.modCount;
           final var parent=this.parent;
           try
           {
-            OmniArray.OfDouble.descendingForEach(parent.arr,0,cursor,action::accept);
+            OmniArray.OfDouble.descendingForEach(parent.arr,0,cursor-1,action::accept);
           }
           finally
           {
             CheckedCollection.checkModCount(modCount,parent.modCount);
           }
-          this.cursor=-1;
+          this.cursor=0;
           this.lastRet=0;
         }
       }

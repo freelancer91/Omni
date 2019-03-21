@@ -2698,19 +2698,19 @@ public void forEachRemaining(CONSUMER action)
   }
 #ELSEIFSWITCH STRUCTNAME==CheckedStack
   final int cursor;
-  if((cursor=this.cursor)>=0)
+  if((cursor=this.cursor)>0)
   {
     final int modCount=this.modCount;
     final var parent=this.parent;
     try
     {
-      OmniArray.Of$ClassPrefix$.descendingForEach(parent.arr,0,cursor,ACTION);
+      OmniArray.Of$ClassPrefix$.descendingForEach(parent.arr,0,cursor-1,ACTION);
     }
     finally
     {
       CheckedCollection.checkModCount(modCount,parent.modCount);
     }
-    this.cursor=-1;
+    this.cursor=0;
     this.lastRet=0;
   }
 #ELSEIFSWITCH STRUCTNAME==UncheckedSubList
@@ -2751,10 +2751,10 @@ public void forEachRemaining(CONSUMER action)
   }
 #ELSE
   final int cursor;
-  if((cursor=this.cursor)>=0)
+  if((cursor=this.cursor)>0)
   {
-    OmniArray.Of$ClassPrefix$.descendingForEach(parent.arr,0,cursor,ACTION);
-    this.cursor=-1;
+    OmniArray.Of$ClassPrefix$.descendingForEach(parent.arr,0,cursor-1,ACTION);
+    this.cursor=0;
   }
 #ENDIF
 }
@@ -2775,19 +2775,22 @@ public $exposedType$ next$TypeNameModifier$()
   #ELSE
   final STRUCTNAME$<E>$ root;
   CheckedCollection.checkModCount(modCount,(root=this.parent).modCount);
-  final int cursor;
     #IFSWITCH STRUCTNAME==CheckedList
+  final int cursor;
   if((cursor=this.cursor)<root.size)
     #ELSE
-  if((cursor=this.cursor)>=0)
+  int cursor;
+  if((cursor=this.cursor)>0)
     #ENDIF
   #ENDIF
   {
-    this.lastRet=cursor;
+    
   #IFSWITCH STRUCTNAME==CheckedList,CheckedSubList
+    this.lastRet=cursor;
     this.cursor=cursor+1;
   #ELSE
-    this.cursor=cursor-1;
+    this.lastRet=--cursor;
+    this.cursor=cursor;
   #ENDIF
       return ($exposedType$)root.arr[cursor];
   }
@@ -2809,7 +2812,7 @@ public $exposedType$ next$TypeNameModifier$()
   return ($exposedType$)parent.arr[cursor++];
   #ENDIF
 #ELSE
-  return ($exposedType$)parent.arr[cursor--];
+  return ($exposedType$)parent.arr[--cursor];
 #ENDIF
 }
 #ENDDEF
@@ -2894,7 +2897,7 @@ private static class Itr$<E>$
 #IFSWITCH STRUCTNAME==CheckedList,UncheckedList
     this.cursor=0;
 #ELSEIFSWITCH STRUCTNAME==CheckedStack,UncheckedStack
-    this.cursor=parent.size-1;
+    this.cursor=parent.size;
 #ELSE
     this.cursor=parent.rootOffset;
 #ENDIF
@@ -2918,7 +2921,7 @@ private static class Itr$<E>$
 #IFSWITCH STRUCTNAME==CheckedList,UncheckedList
     return this.cursor<parent.size;
 #ELSEIFSWITCH STRUCTNAME==CheckedStack,UncheckedStack
-    return this.cursor>=0;
+    return this.cursor>0;
 #ELSE
     final STRUCTNAME$<E>$ parent;
     return this.cursor<(parent=this.parent).rootOffset+parent.size;

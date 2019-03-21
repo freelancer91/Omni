@@ -849,7 +849,7 @@ public abstract class CharArrSeq implements OmniCollection.OfChar
       private Itr(UncheckedStack parent)
       {
         this.parent=parent;
-        this.cursor=parent.size-1;
+        this.cursor=parent.size;
       }
       private Itr(UncheckedStack parent,int cursor)
       {
@@ -859,12 +859,12 @@ public abstract class CharArrSeq implements OmniCollection.OfChar
       @Override
       public boolean hasNext()
       {
-        return this.cursor>=0;
+        return this.cursor>0;
       }
       @Override
       public char nextChar()
       {
-        return (char)parent.arr[cursor--];
+        return (char)parent.arr[--cursor];
       }
       @Override
       public void remove()
@@ -876,20 +876,20 @@ public abstract class CharArrSeq implements OmniCollection.OfChar
       public void forEachRemaining(CharConsumer action)
       {
         final int cursor;
-        if((cursor=this.cursor)>=0)
+        if((cursor=this.cursor)>0)
         {
-          OmniArray.OfChar.descendingForEach(parent.arr,0,cursor,action);
-          this.cursor=-1;
+          OmniArray.OfChar.descendingForEach(parent.arr,0,cursor-1,action);
+          this.cursor=0;
         }
       }
       @Override
       public void forEachRemaining(Consumer<? super Character> action)
       {
         final int cursor;
-        if((cursor=this.cursor)>=0)
+        if((cursor=this.cursor)>0)
         {
-          OmniArray.OfChar.descendingForEach(parent.arr,0,cursor,action::accept);
-          this.cursor=-1;
+          OmniArray.OfChar.descendingForEach(parent.arr,0,cursor-1,action::accept);
+          this.cursor=0;
         }
       }
     }
@@ -2840,7 +2840,7 @@ public abstract class CharArrSeq implements OmniCollection.OfChar
       private Itr(CheckedStack parent)
       {
         this.parent=parent;
-        this.cursor=parent.size-1;
+        this.cursor=parent.size;
         this.modCount=parent.modCount;
         this.lastRet=-1;
       }
@@ -2854,18 +2854,18 @@ public abstract class CharArrSeq implements OmniCollection.OfChar
       @Override
       public boolean hasNext()
       {
-        return this.cursor>=0;
+        return this.cursor>0;
       }
       @Override
       public char nextChar()
       {
         final CheckedStack root;
         CheckedCollection.checkModCount(modCount,(root=this.parent).modCount);
-        final int cursor;
-        if((cursor=this.cursor)>=0)
+        int cursor;
+        if((cursor=this.cursor)>0)
         {
-          this.lastRet=cursor;
-          this.cursor=cursor-1;
+          this.lastRet=--cursor;
+          this.cursor=cursor;
             return (char)root.arr[cursor];
         }
         throw new NoSuchElementException();
@@ -2892,19 +2892,19 @@ public abstract class CharArrSeq implements OmniCollection.OfChar
       public void forEachRemaining(CharConsumer action)
       {
         final int cursor;
-        if((cursor=this.cursor)>=0)
+        if((cursor=this.cursor)>0)
         {
           final int modCount=this.modCount;
           final var parent=this.parent;
           try
           {
-            OmniArray.OfChar.descendingForEach(parent.arr,0,cursor,action);
+            OmniArray.OfChar.descendingForEach(parent.arr,0,cursor-1,action);
           }
           finally
           {
             CheckedCollection.checkModCount(modCount,parent.modCount);
           }
-          this.cursor=-1;
+          this.cursor=0;
           this.lastRet=0;
         }
       }
@@ -2912,19 +2912,19 @@ public abstract class CharArrSeq implements OmniCollection.OfChar
       public void forEachRemaining(Consumer<? super Character> action)
       {
         final int cursor;
-        if((cursor=this.cursor)>=0)
+        if((cursor=this.cursor)>0)
         {
           final int modCount=this.modCount;
           final var parent=this.parent;
           try
           {
-            OmniArray.OfChar.descendingForEach(parent.arr,0,cursor,action::accept);
+            OmniArray.OfChar.descendingForEach(parent.arr,0,cursor-1,action::accept);
           }
           finally
           {
             CheckedCollection.checkModCount(modCount,parent.modCount);
           }
-          this.cursor=-1;
+          this.cursor=0;
           this.lastRet=0;
         }
       }

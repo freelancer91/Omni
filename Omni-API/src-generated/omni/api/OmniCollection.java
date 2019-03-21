@@ -66,112 +66,112 @@ public abstract interface OmniCollection
     @Override
     public default boolean contains(Boolean val)
     {
-      return contains(val.
+      return val!=null && contains(val.
         booleanValue
           ());
     }
     @Override
     public default boolean contains(Byte val)
     {
-      return contains(val.
+      return val!=null && contains(val.
         byteValue
           ());
     }
     @Override
     public default boolean contains(Character val)
     {
-      return contains(val.
+      return val!=null && contains(val.
         charValue
           ());
     }
     @Override
     public default boolean contains(Short val)
     {
-      return contains(val.
+      return val!=null && contains(val.
         shortValue
           ());
     }
     @Override
     public default boolean contains(Integer val)
     {
-      return contains(val.
+      return val!=null && contains(val.
         intValue
           ());
     }
     @Override
     public default boolean contains(Long val)
     {
-      return contains(val.
+      return val!=null && contains(val.
         longValue
           ());
     }
     @Override
     public default boolean contains(Float val)
     {
-      return contains(val.
+      return val!=null && contains(val.
         floatValue
           ());
     }
     @Override
     public default boolean contains(Double val)
     {
-      return contains(val.
+      return val!=null && contains(val.
         doubleValue
           ());
     }
     @Override
     public default boolean removeVal(Boolean val)
     {
-      return removeVal(val.
+      return val!=null && removeVal(val.
         booleanValue
           ());
     }
     @Override
     public default boolean removeVal(Byte val)
     {
-      return removeVal(val.
+      return val!=null && removeVal(val.
         byteValue
           ());
     }
     @Override
     public default boolean removeVal(Character val)
     {
-      return removeVal(val.
+      return val!=null && removeVal(val.
         charValue
           ());
     }
     @Override
     public default boolean removeVal(Short val)
     {
-      return removeVal(val.
+      return val!=null && removeVal(val.
         shortValue
           ());
     }
     @Override
     public default boolean removeVal(Integer val)
     {
-      return removeVal(val.
+      return val!=null && removeVal(val.
         intValue
           ());
     }
     @Override
     public default boolean removeVal(Long val)
     {
-      return removeVal(val.
+      return val!=null && removeVal(val.
         longValue
           ());
     }
     @Override
     public default boolean removeVal(Float val)
     {
-      return removeVal(val.
+      return val!=null && removeVal(val.
         floatValue
           ());
     }
     @Override
     public default boolean removeVal(Double val)
     {
-      return removeVal(val.
+      return val!=null && removeVal(val.
         doubleValue
           ());
     }

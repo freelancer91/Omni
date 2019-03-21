@@ -1,0 +1,268 @@
+#TYPEDEF OfBoolean
+#TYPEDEF OfByte
+#TYPEDEF OfChar
+#TYPEDEF OfShort
+#TYPEDEF OfInt
+#TYPEDEF OfLong
+#TYPEDEF OfFloat
+#TYPEDEF OfDouble
+#TYPEDEF OfRef
+package omni.impl.seq;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import omni.util.TypeConversionUtil;
+import omni.util.EqualityUtil;
+import omni.impl.seq.$ClassPrefix$ArrSeq.UncheckedList;
+import omni.impl.seq.$ClassPrefix$ArrSeq.CheckedList;
+import omni.impl.seq.$ClassPrefix$ArrSeq.UncheckedStack;
+import omni.impl.seq.$ClassPrefix$ArrSeq.CheckedStack;
+import java.util.ConcurrentModificationException;
+import omni.util.TypeUtil;
+import omni.api.QueryTestUtil;
+#IF OfRef
+@SuppressWarnings({"rawtypes","unchecked"}) 
+#ENDIF
+public class $ClassPrefix$ArrSeqContainsTest
+{
+
+  #MACRO Impl<UncheckedList>()
+  #MACRO Impl<UncheckedStack>()
+  #MACRO Impl<CheckedList>()
+  #MACRO Impl<CheckedStack>()
+  #MACRO Impl<CheckedSubList>()
+  #MACRO Impl<UncheckedSubList>()
+
+}
+
+#MACRODEF ConstructSeq()
+#IFSWITCH STRUCTNAME==CheckedSubList,UncheckedSubList
+  #IFSWITCH STRUCTNAME==CheckedSubList
+var root=new CheckedList();
+  #ELSE
+var root=new UncheckedList();
+  #ENDIF
+var subList=root.subList(0,0);
+var seq=subList.subList(0,0);
+#ELSE
+var seq=new STRUCTNAME();
+#ENDIF
+#ENDDEF
+
+#MACRODEF TestContainsLong()
+@Test
+public void testSTRUCTNAMEContainsLong()
+{
+  #MACRO ConstructSeq()
+#IF OfRef
+  seq.add(Long.valueOf((long)0));
+  QueryTestUtil.testContainsLong(seq);
+#ELSEIF OfBoolean
+  seq.add(false);
+  QueryTestUtil.testContainsLong(seq,false);
+  seq.clear();
+  seq.add(true);
+  QueryTestUtil.testContainsLong(seq,true);
+#ELSEIF OfByte,OfShort,OfInt,OfLong,OfChar
+  seq.add(($exposedType$)0);
+  QueryTestUtil.testContainsLong(seq);
+#ELSE
+  seq.add(($exposedType$)-0.0);
+  QueryTestUtil.testContainsLong(seq,($exposedType$)-0.0);
+  seq.clear();
+  seq.add(($exposedType$)0.0);
+  QueryTestUtil.testContainsLong(seq,($exposedType$)0.0);
+  seq.clear();
+  seq.add(($exposedType$)1.0);
+  QueryTestUtil.testContainsLong(seq,($exposedType$)1.0);
+#ENDIF
+}
+#ENDDEF
+
+#MACRODEF TestContainsInt()
+@Test
+public void testSTRUCTNAMEContainsInt()
+{
+  #MACRO ConstructSeq()
+#IF OfRef
+  seq.add(Integer.valueOf((int)0));
+  QueryTestUtil.testContainsInt(seq);
+#ELSEIF OfBoolean
+  seq.add(false);
+  QueryTestUtil.testContainsInt(seq,false);
+  seq.clear();
+  seq.add(true);
+  QueryTestUtil.testContainsInt(seq,true);
+#ELSEIF OfByte,OfShort,OfInt,OfLong,OfChar
+  seq.add(($exposedType$)0);
+  QueryTestUtil.testContainsInt(seq);
+#ELSE
+  seq.add(($exposedType$)-0.0);
+  QueryTestUtil.testContainsInt(seq,($exposedType$)-0.0);
+  seq.clear();
+  seq.add(($exposedType$)0.0);
+  QueryTestUtil.testContainsInt(seq,($exposedType$)0.0);
+  seq.clear();
+  seq.add(($exposedType$)1.0);
+  QueryTestUtil.testContainsInt(seq,($exposedType$)1.0);
+#ENDIF
+}
+#ENDDEF
+
+#MACRODEF TestContainsShort()
+@Test
+public void testSTRUCTNAMEContainsShort()
+{
+  #MACRO ConstructSeq()
+#IF OfRef
+  seq.add(Short.valueOf((short)0));
+  QueryTestUtil.testContainsShort(seq);
+#ELSEIF OfBoolean
+  seq.add(false);
+  QueryTestUtil.testContainsShort(seq,false);
+  seq.clear();
+  seq.add(true);
+  QueryTestUtil.testContainsShort(seq,true);
+#ELSEIF OfByte,OfShort,OfInt,OfLong,OfChar
+  seq.add(($exposedType$)0);
+  QueryTestUtil.testContainsShort(seq);
+#ELSE
+  seq.add(($exposedType$)-0.0);
+  QueryTestUtil.testContainsShort(seq,($exposedType$)-0.0);
+  seq.clear();
+  seq.add(($exposedType$)0.0);
+  QueryTestUtil.testContainsShort(seq,($exposedType$)0.0);
+  seq.clear();
+  seq.add(($exposedType$)1.0);
+  QueryTestUtil.testContainsShort(seq,($exposedType$)1.0);
+#ENDIF
+}
+#ENDDEF
+
+#MACRODEF TestContainsChar()
+@Test
+public void testSTRUCTNAMEContainsChar()
+{
+  #MACRO ConstructSeq()
+#IF OfRef
+  seq.add(Character.valueOf((char)0));
+  QueryTestUtil.testContainsChar(seq);
+#ELSEIF OfBoolean
+  seq.add(false);
+  QueryTestUtil.testContainsChar(seq,false);
+  seq.clear();
+  seq.add(true);
+  QueryTestUtil.testContainsChar(seq,true);
+#ELSEIF OfByte,OfShort,OfInt,OfLong,OfChar
+  seq.add(($exposedType$)0);
+  QueryTestUtil.testContainsChar(seq);
+#ELSE
+  seq.add(($exposedType$)-0.0);
+  QueryTestUtil.testContainsChar(seq,($exposedType$)-0.0);
+  seq.clear();
+  seq.add(($exposedType$)0.0);
+  QueryTestUtil.testContainsChar(seq,($exposedType$)0.0);
+  seq.clear();
+  seq.add(($exposedType$)1.0);
+  QueryTestUtil.testContainsChar(seq,($exposedType$)1.0);
+#ENDIF
+}
+#ENDDEF
+#MACRODEF TestContainsByte()
+@Test
+public void testSTRUCTNAMEContainsByte()
+{
+  #MACRO ConstructSeq()
+#IF OfRef
+  seq.add(Byte.valueOf((byte)0));
+  QueryTestUtil.testContainsByte(seq);
+#ELSEIF OfBoolean
+  seq.add(false);
+  QueryTestUtil.testContainsByte(seq,false);
+  seq.clear();
+  seq.add(true);
+  QueryTestUtil.testContainsByte(seq,true);
+#ELSEIF OfByte,OfShort,OfInt,OfLong,OfChar
+  seq.add(($exposedType$)0);
+  QueryTestUtil.testContainsByte(seq);
+#ELSE
+  seq.add(($exposedType$)-0.0);
+  QueryTestUtil.testContainsByte(seq,($exposedType$)-0.0);
+  seq.clear();
+  seq.add(($exposedType$)0.0);
+  QueryTestUtil.testContainsByte(seq,($exposedType$)0.0);
+  seq.clear();
+  seq.add(($exposedType$)1.0);
+  QueryTestUtil.testContainsByte(seq,($exposedType$)1.0);
+#ENDIF
+}
+#ENDDEF
+
+
+#MACRODEF TestContainsBoolean()
+@Test
+public void testSTRUCTNAMEContainsBoolean()
+{
+  #MACRO ConstructSeq()
+  #IF OfRef
+  seq.add(Boolean.TRUE);
+  #ELSE
+  seq.add(true);
+  #ENDIF
+  
+  QueryTestUtil.testContainsBoolean(seq,true);
+  
+  seq.clear();
+  
+  #IF OfRef
+  seq.add(Boolean.FALSE);
+  #ELSE
+  seq.add(false);
+  #ENDIF
+  
+  QueryTestUtil.testContainsBoolean(seq,false);
+  
+  
+}
+#ENDDEF
+
+#MACRODEF TestContainsNull()
+@Test
+public void testSTRUCTNAMEContainsNull()
+{
+  #MACRO ConstructSeq()
+  #IF OfRef
+  seq.add(TypeConversionUtil.convertToInteger(0));
+  #ELSE
+  seq.add(TypeConversionUtil.convertTo$ArrayType$(0));
+  #ENDIF
+  QueryTestUtil.testContainsNullReturnFalse(seq);
+  
+#IF OfRef
+  seq.add((Integer)null);
+  QueryTestUtil.testContainsNullReturnTrue(seq);
+#ENDIF
+}
+#ENDDEF
+
+#MACRODEF TestEmptyContains()
+@Test
+public void testEmptySTRUCTNAMEContains()
+{
+  #MACRO ConstructSeq()
+  
+  QueryTestUtil.testEmptyContains(seq);
+  
+}
+#ENDDEF
+
+
+#MACRODEF Impl<STRUCTNAME>()
+#MACRO TestEmptyContains()
+#MACRO TestContainsNull()
+#MACRO TestContainsBoolean()
+#MACRO TestContainsByte()
+#MACRO TestContainsChar()
+#MACRO TestContainsShort()
+#MACRO TestContainsInt()
+#MACRO TestContainsLong()
+#ENDDEF

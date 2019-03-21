@@ -12,6 +12,141 @@ import java.util.ConcurrentModificationException;
 public class FloatArrSeqTest
 {
   @Test
+  public void testClearUncheckedStack()
+  {
+    var seq=new UncheckedStack();
+    seq.clear();
+    Assertions.assertEquals(0,seq.size());
+    for(int i=0;i<100;++i)
+    {
+      seq.add(TypeConversionUtil.convertTofloat(i));
+    }
+    Assertions.assertEquals(100,seq.size());
+    seq.clear();
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertTrue(seq.arr.length>=100);
+  }
+  @Test
+  public void testSizeUncheckedStack()
+  {
+    var seq=new UncheckedStack();
+    int i=0;
+    for(;i<100;++i)
+    {
+      Assertions.assertEquals(i,seq.size());
+      seq.add(Float.NaN);
+    }
+    Assertions.assertEquals(i,seq.size());
+    var itr=seq.iterator();
+    for(;;)
+    {
+      itr.next();
+      itr.remove();
+      Assertions.assertEquals(--i,seq.size());
+      if(i==0)
+      {
+        break;
+      }
+    }
+  }
+  @Test
+  public void testIsEmptyUncheckedStack()
+  {
+    var seq=new UncheckedStack();
+    Assertions.assertTrue(seq.isEmpty());
+    int i=0;
+    for(;i<100;++i)
+    {
+      seq.add(Float.NaN);
+      Assertions.assertFalse(seq.isEmpty());
+    }
+    var itr=seq.iterator();
+    for(;;)
+    {
+      itr.next();
+      itr.remove();
+      if(--i==0)
+      {
+        Assertions.assertTrue(seq.isEmpty());
+        break;
+      }
+      Assertions.assertFalse(seq.isEmpty());
+    }
+  }
+  @Test
+  public void testAddUncheckedStack()
+  {
+    {
+      //test with default array
+      var seq=new UncheckedStack();
+      for(int i=0;i<100;++i)
+      {
+        seq.add(TypeConversionUtil.convertTofloat(i));
+      }
+      Assertions.assertEquals(seq.size(),100);
+      var itr=seq.iterator();
+      for(int i=100;--i>=0;)
+      {
+        Assertions.assertEquals(itr.nextFloat(),TypeConversionUtil.convertTofloat(i));
+      }
+      Assertions.assertFalse(itr.hasNext());
+    }
+    {
+      //test with null array
+      var seq=new UncheckedStack(0,null);
+      for(int i=0;i<100;++i)
+      {
+        seq.add(TypeConversionUtil.convertTofloat(i));
+      }
+      Assertions.assertEquals(seq.size(),100);
+      var itr=seq.iterator();
+      for(int i=100;--i>=0;)
+      {
+        Assertions.assertEquals(itr.nextFloat(),TypeConversionUtil.convertTofloat(i));
+      }
+      Assertions.assertFalse(itr.hasNext());
+    }
+     {
+      //test with preallocated array
+      var seq=new UncheckedStack(20);
+      for(int i=0;i<100;++i)
+      {
+        seq.add(TypeConversionUtil.convertTofloat(i));
+      }
+      Assertions.assertEquals(seq.size(),100);
+      var itr=seq.iterator();
+      for(int i=100;--i>=0;)
+      {
+        Assertions.assertEquals(itr.nextFloat(),TypeConversionUtil.convertTofloat(i));
+      }
+      Assertions.assertFalse(itr.hasNext());
+    }
+  }
+  private static void testPushHelper(UncheckedStack seq)
+  {
+    for(int i=0;i<100;++i)
+    {
+      seq.push(TypeConversionUtil.convertTofloat(i));
+    }
+    Assertions.assertEquals(100,seq.size());
+    var itr=seq.iterator();
+    for(int i=100;--i>=0;)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTofloat(i),itr.nextFloat());
+    }
+    Assertions.assertFalse(itr.hasNext());
+  }
+  @Test
+  public void testPushUncheckedStack()
+  {
+    //with default array
+    testPushHelper(new UncheckedStack());
+    //with null array
+    testPushHelper(new UncheckedStack(0,null));
+    //with pre-allocated capacity
+    testPushHelper(new UncheckedStack(50));
+  }
+  @Test
   public void testCloneUncheckedStack()
   {
     var seq=new UncheckedStack();
@@ -57,44 +192,117 @@ public class FloatArrSeqTest
       Assertions.assertEquals(seq.arr.length,i);
     }
   }
-    @Test
-    public void testListAddFloatUncheckedList()
+  @Test
+  public void testClearUncheckedList()
+  {
+    var seq=new UncheckedList();
+    seq.clear();
+    Assertions.assertEquals(0,seq.size());
+    for(int i=0;i<100;++i)
     {
-      var seq=new UncheckedList();
-      for(int i=100;--i>=0;)
+      seq.add(TypeConversionUtil.convertTofloat(i));
+    }
+    Assertions.assertEquals(100,seq.size());
+    seq.clear();
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertTrue(seq.arr.length>=100);
+  }
+  @Test
+  public void testSizeUncheckedList()
+  {
+    var seq=new UncheckedList();
+    int i=0;
+    for(;i<100;++i)
+    {
+      Assertions.assertEquals(i,seq.size());
+      seq.add(Float.NaN);
+    }
+    Assertions.assertEquals(i,seq.size());
+    var itr=seq.iterator();
+    for(;;)
+    {
+      itr.next();
+      itr.remove();
+      Assertions.assertEquals(--i,seq.size());
+      if(i==0)
       {
-        //test add at beginning
-        seq.add(0,(Float)TypeConversionUtil.convertTofloat(i));
+        break;
       }
+    }
+  }
+  @Test
+  public void testIsEmptyUncheckedList()
+  {
+    var seq=new UncheckedList();
+    Assertions.assertTrue(seq.isEmpty());
+    int i=0;
+    for(;i<100;++i)
+    {
+      seq.add(Float.NaN);
+      Assertions.assertFalse(seq.isEmpty());
+    }
+    var itr=seq.iterator();
+    for(;;)
+    {
+      itr.next();
+      itr.remove();
+      if(--i==0)
+      {
+        Assertions.assertTrue(seq.isEmpty());
+        break;
+      }
+      Assertions.assertFalse(seq.isEmpty());
+    }
+  }
+  @Test
+  public void testAddUncheckedList()
+  {
+    {
+      //test with default array
+      var seq=new UncheckedList();
       for(int i=0;i<100;++i)
       {
-        Assertions.assertEquals((TypeConversionUtil.convertTofloat(i)),seq.getFloat(i));
+        seq.add(TypeConversionUtil.convertTofloat(i));
       }
-      int currSize=seq.size();
-      Assertions.assertEquals(100,currSize);
-      for(int i=200;i<300;++i)
+      Assertions.assertEquals(seq.size(),100);
+      var itr=seq.iterator();
+      for(int i=0;i<100;++i)
       {
-        //add at end
-        seq.add(seq.size(),(Float)TypeConversionUtil.convertTofloat(i));
+        Assertions.assertEquals(itr.nextFloat(),TypeConversionUtil.convertTofloat(i));
       }
-      for(int i=100;i<200;++i)
-      {
-        Assertions.assertEquals((TypeConversionUtil.convertTofloat(i+100)),seq.getFloat(i));
-      }
-      currSize=seq.size();
-      Assertions.assertEquals(200,currSize);
-      for(int i=200;--i>=100;)
-      {
-        //add in middle
-        seq.add(100,(Float)TypeConversionUtil.convertTofloat(i));
-      }
-      for(int i=100;i<200;++i)
-      {
-        Assertions.assertEquals((TypeConversionUtil.convertTofloat(i)),seq.getFloat(i));
-      }
-      currSize=seq.size();
-      Assertions.assertEquals(300,currSize);
+      Assertions.assertFalse(itr.hasNext());
     }
+    {
+      //test with null array
+      var seq=new UncheckedList(0,null);
+      for(int i=0;i<100;++i)
+      {
+        seq.add(TypeConversionUtil.convertTofloat(i));
+      }
+      Assertions.assertEquals(seq.size(),100);
+      var itr=seq.iterator();
+      for(int i=0;i<100;++i)
+      {
+        Assertions.assertEquals(itr.nextFloat(),TypeConversionUtil.convertTofloat(i));
+      }
+      Assertions.assertFalse(itr.hasNext());
+    }
+     {
+      //test with preallocated array
+      var seq=new UncheckedList(20);
+      for(int i=0;i<100;++i)
+      {
+        seq.add(TypeConversionUtil.convertTofloat(i));
+      }
+      Assertions.assertEquals(seq.size(),100);
+      var itr=seq.iterator();
+      for(int i=0;i<100;++i)
+      {
+        Assertions.assertEquals(itr.nextFloat(),TypeConversionUtil.convertTofloat(i));
+      }
+      Assertions.assertFalse(itr.hasNext());
+    }
+  }
   @Test
   public void testCloneUncheckedList()
   {
@@ -142,6 +350,148 @@ public class FloatArrSeqTest
     }
   }
   @Test
+  public void testClearCheckedStack()
+  {
+    var seq=new CheckedStack();
+    seq.clear();
+    Assertions.assertEquals(0,seq.modCount);
+    Assertions.assertEquals(0,seq.size());
+    for(int i=0;i<100;++i)
+    {
+      seq.add(TypeConversionUtil.convertTofloat(i));
+    }
+    Assertions.assertEquals(100,seq.size());
+    Assertions.assertEquals(100,seq.modCount);
+    seq.clear();
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertNotEquals(100,seq.modCount);
+    Assertions.assertTrue(seq.arr.length>=100);
+  }
+  @Test
+  public void testSizeCheckedStack()
+  {
+    var seq=new CheckedStack();
+    int i=0;
+    for(;i<100;++i)
+    {
+      Assertions.assertEquals(i,seq.size());
+      seq.add(Float.NaN);
+    }
+    Assertions.assertEquals(i,seq.size());
+    var itr=seq.iterator();
+    for(;;)
+    {
+      itr.next();
+      itr.remove();
+      Assertions.assertEquals(--i,seq.size());
+      if(i==0)
+      {
+        break;
+      }
+    }
+  }
+  @Test
+  public void testIsEmptyCheckedStack()
+  {
+    var seq=new CheckedStack();
+    Assertions.assertTrue(seq.isEmpty());
+    int i=0;
+    for(;i<100;++i)
+    {
+      seq.add(Float.NaN);
+      Assertions.assertFalse(seq.isEmpty());
+    }
+    var itr=seq.iterator();
+    for(;;)
+    {
+      itr.next();
+      itr.remove();
+      if(--i==0)
+      {
+        Assertions.assertTrue(seq.isEmpty());
+        break;
+      }
+      Assertions.assertFalse(seq.isEmpty());
+    }
+  }
+  @Test
+  public void testAddCheckedStack()
+  {
+    {
+      //test with default array
+      var seq=new CheckedStack();
+      for(int i=0;i<100;++i)
+      {
+        seq.add(TypeConversionUtil.convertTofloat(i));
+      }
+      Assertions.assertEquals(seq.size(),100);
+      Assertions.assertEquals(100,seq.modCount);
+      var itr=seq.iterator();
+      for(int i=100;--i>=0;)
+      {
+        Assertions.assertEquals(itr.nextFloat(),TypeConversionUtil.convertTofloat(i));
+      }
+      Assertions.assertFalse(itr.hasNext());
+    }
+    {
+      //test with null array
+      var seq=new CheckedStack(0,null);
+      for(int i=0;i<100;++i)
+      {
+        seq.add(TypeConversionUtil.convertTofloat(i));
+      }
+      Assertions.assertEquals(seq.size(),100);
+      Assertions.assertEquals(100,seq.modCount);
+      var itr=seq.iterator();
+      for(int i=100;--i>=0;)
+      {
+        Assertions.assertEquals(itr.nextFloat(),TypeConversionUtil.convertTofloat(i));
+      }
+      Assertions.assertFalse(itr.hasNext());
+    }
+     {
+      //test with preallocated array
+      var seq=new CheckedStack(20);
+      for(int i=0;i<100;++i)
+      {
+        seq.add(TypeConversionUtil.convertTofloat(i));
+      }
+      Assertions.assertEquals(seq.size(),100);
+      Assertions.assertEquals(100,seq.modCount);
+      var itr=seq.iterator();
+      for(int i=100;--i>=0;)
+      {
+        Assertions.assertEquals(itr.nextFloat(),TypeConversionUtil.convertTofloat(i));
+      }
+      Assertions.assertFalse(itr.hasNext());
+    }
+  }
+  private static void testPushHelper(CheckedStack seq)
+  {
+    for(int i=0;i<100;++i)
+    {
+      seq.push(TypeConversionUtil.convertTofloat(i));
+    }
+    Assertions.assertEquals(100,seq.modCount);
+    Assertions.assertEquals(100,seq.size());
+    var itr=seq.iterator();
+    for(int i=100;--i>=0;)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTofloat(i),itr.nextFloat());
+    }
+    Assertions.assertFalse(itr.hasNext());
+  }
+  @Test
+  public void testPushCheckedStack()
+  {
+    //with default array
+    testPushHelper(new CheckedStack());
+    //with null array
+    testPushHelper(new CheckedStack(0,null));
+    //with pre-allocated capacity
+    testPushHelper(new CheckedStack(50));
+  }
+  @Test
   public void testCloneCheckedStack()
   {
     var seq=new CheckedStack();
@@ -187,54 +537,123 @@ public class FloatArrSeqTest
       Assertions.assertEquals(seq.arr.length,i);
     }
   }
-    @Test
-    public void testListAddFloatCheckedList()
+  @Test
+  public void testClearCheckedList()
+  {
+    var seq=new CheckedList();
+    seq.clear();
+    Assertions.assertEquals(0,seq.modCount);
+    Assertions.assertEquals(0,seq.size());
+    for(int i=0;i<100;++i)
     {
-      var seq=new CheckedList();
-      for(int i=100;--i>=0;)
+      seq.add(TypeConversionUtil.convertTofloat(i));
+    }
+    Assertions.assertEquals(100,seq.size());
+    Assertions.assertEquals(100,seq.modCount);
+    seq.clear();
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertNotEquals(100,seq.modCount);
+    Assertions.assertTrue(seq.arr.length>=100);
+  }
+  @Test
+  public void testSizeCheckedList()
+  {
+    var seq=new CheckedList();
+    int i=0;
+    for(;i<100;++i)
+    {
+      Assertions.assertEquals(i,seq.size());
+      seq.add(Float.NaN);
+    }
+    Assertions.assertEquals(i,seq.size());
+    var itr=seq.iterator();
+    for(;;)
+    {
+      itr.next();
+      itr.remove();
+      Assertions.assertEquals(--i,seq.size());
+      if(i==0)
       {
-        //test add at beginning
-        seq.add(0,(Float)TypeConversionUtil.convertTofloat(i));
+        break;
       }
+    }
+  }
+  @Test
+  public void testIsEmptyCheckedList()
+  {
+    var seq=new CheckedList();
+    Assertions.assertTrue(seq.isEmpty());
+    int i=0;
+    for(;i<100;++i)
+    {
+      seq.add(Float.NaN);
+      Assertions.assertFalse(seq.isEmpty());
+    }
+    var itr=seq.iterator();
+    for(;;)
+    {
+      itr.next();
+      itr.remove();
+      if(--i==0)
+      {
+        Assertions.assertTrue(seq.isEmpty());
+        break;
+      }
+      Assertions.assertFalse(seq.isEmpty());
+    }
+  }
+  @Test
+  public void testAddCheckedList()
+  {
+    {
+      //test with default array
+      var seq=new CheckedList();
       for(int i=0;i<100;++i)
       {
-        Assertions.assertEquals((TypeConversionUtil.convertTofloat(i)),seq.getFloat(i));
+        seq.add(TypeConversionUtil.convertTofloat(i));
       }
-      int currSize=seq.size();
-      Assertions.assertEquals(100,currSize);
-      int modCount=seq.modCount;
-      Assertions.assertEquals(modCount,100);
-      Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(-1,TypeConversionUtil.convertTofloat(0)));
-      Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(seq.size()+1,TypeConversionUtil.convertTofloat(0)));
-      Assertions.assertEquals(modCount,seq.modCount);
-      Assertions.assertEquals(currSize,seq.size());
-      for(int i=200;i<300;++i)
+      Assertions.assertEquals(seq.size(),100);
+      Assertions.assertEquals(100,seq.modCount);
+      var itr=seq.iterator();
+      for(int i=0;i<100;++i)
       {
-        //add at end
-        seq.add(seq.size(),(Float)TypeConversionUtil.convertTofloat(i));
+        Assertions.assertEquals(itr.nextFloat(),TypeConversionUtil.convertTofloat(i));
       }
-      for(int i=100;i<200;++i)
-      {
-        Assertions.assertEquals((TypeConversionUtil.convertTofloat(i+100)),seq.getFloat(i));
-      }
-      currSize=seq.size();
-      Assertions.assertEquals(200,currSize);
-      modCount=seq.modCount;
-      Assertions.assertEquals(modCount,200);
-      for(int i=200;--i>=100;)
-      {
-        //add in middle
-        seq.add(100,(Float)TypeConversionUtil.convertTofloat(i));
-      }
-      for(int i=100;i<200;++i)
-      {
-        Assertions.assertEquals((TypeConversionUtil.convertTofloat(i)),seq.getFloat(i));
-      }
-      currSize=seq.size();
-      Assertions.assertEquals(300,currSize);
-      modCount=seq.modCount;
-      Assertions.assertEquals(modCount,300);
+      Assertions.assertFalse(itr.hasNext());
     }
+    {
+      //test with null array
+      var seq=new CheckedList(0,null);
+      for(int i=0;i<100;++i)
+      {
+        seq.add(TypeConversionUtil.convertTofloat(i));
+      }
+      Assertions.assertEquals(seq.size(),100);
+      Assertions.assertEquals(100,seq.modCount);
+      var itr=seq.iterator();
+      for(int i=0;i<100;++i)
+      {
+        Assertions.assertEquals(itr.nextFloat(),TypeConversionUtil.convertTofloat(i));
+      }
+      Assertions.assertFalse(itr.hasNext());
+    }
+     {
+      //test with preallocated array
+      var seq=new CheckedList(20);
+      for(int i=0;i<100;++i)
+      {
+        seq.add(TypeConversionUtil.convertTofloat(i));
+      }
+      Assertions.assertEquals(seq.size(),100);
+      Assertions.assertEquals(100,seq.modCount);
+      var itr=seq.iterator();
+      for(int i=0;i<100;++i)
+      {
+        Assertions.assertEquals(itr.nextFloat(),TypeConversionUtil.convertTofloat(i));
+      }
+      Assertions.assertFalse(itr.hasNext());
+    }
+  }
   @Test
   public void testCloneCheckedList()
   {
@@ -281,52 +700,157 @@ public class FloatArrSeqTest
       Assertions.assertEquals(seq.arr.length,i);
     }
   }
-    @Test
-    public void testListAddFloatUncheckedSubList()
+  @Test
+  public void testClearUncheckedSubList()
+  {
+    var root=new UncheckedList();
+    for(int i=0;i<100;++i)
     {
+      root.add(TypeConversionUtil.convertTofloat(i));
+    }
+    var emptySubList=root.subList(50,50);
+    emptySubList.clear();
+    Assertions.assertEquals(0,emptySubList.size());
+    Assertions.assertEquals(100,root.size());
+    var nonEmptySubList=root.subList(10,90);
+    var nonEmptySubSubList=nonEmptySubList.subList(15,65);
+    nonEmptySubSubList.clear();
+    Assertions.assertEquals(0,nonEmptySubSubList.size());
+    Assertions.assertEquals(50,root.size());
+    Assertions.assertEquals(30,nonEmptySubList.size());
+    for(int i=0;i<25;++i)
+    {
+      Assertions.assertEquals(root.getFloat(i),TypeConversionUtil.convertTofloat(i));
+    }
+    for(int i=25;i<50;++i)
+    {
+      Assertions.assertEquals(root.getFloat(i),TypeConversionUtil.convertTofloat(i+50));
+    }
+    nonEmptySubList.clear();
+    Assertions.assertEquals(20,root.size());
+    Assertions.assertEquals(0,nonEmptySubList.size());
+    for(int i=0;i<10;++i)
+    {
+      Assertions.assertEquals(root.getFloat(i),TypeConversionUtil.convertTofloat(i));
+    }
+    for(int i=10;i<20;++i)
+    {
+      Assertions.assertEquals(root.getFloat(i),TypeConversionUtil.convertTofloat(i+80));
+    }
+    Assertions.assertTrue(root.arr.length>=100);
+  }
+  @Test
+  public void testSizeUncheckedSubList()
+  {
+    var root=new UncheckedList();
+    var subList=root.subList(0,0);
+    var seq=subList.subList(0,0);
+    int i=0;
+    for(;i<100;++i)
+    {
+      Assertions.assertEquals(i,seq.size());
+      seq.add(Float.NaN);
+    }
+    Assertions.assertEquals(i,seq.size());
+    var itr=seq.iterator();
+    for(;;)
+    {
+      itr.next();
+      itr.remove();
+      Assertions.assertEquals(--i,seq.size());
+      if(i==0)
+      {
+        break;
+      }
+    }
+  }
+  @Test
+  public void testIsEmptyUncheckedSubList()
+  {
+    var root=new UncheckedList();
+    var subList=root.subList(0,0);
+    var seq=subList.subList(0,0);
+    Assertions.assertTrue(seq.isEmpty());
+    int i=0;
+    for(;i<100;++i)
+    {
+      seq.add(Float.NaN);
+      Assertions.assertFalse(seq.isEmpty());
+    }
+    var itr=seq.iterator();
+    for(;;)
+    {
+      itr.next();
+      itr.remove();
+      if(--i==0)
+      {
+        Assertions.assertTrue(seq.isEmpty());
+        break;
+      }
+      Assertions.assertFalse(seq.isEmpty());
+    }
+  }
+  @Test
+  public void testAddUncheckedSubList()
+  {
+    {
+      //test with default array
       var root=new UncheckedList();
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
-      for(int i=100;--i>=0;)
-      {
-        //test add at beginning
-        seq.add(0,(Float)TypeConversionUtil.convertTofloat(i));
-      }
       for(int i=0;i<100;++i)
       {
-        Assertions.assertEquals((TypeConversionUtil.convertTofloat(i)),seq.getFloat(i));
+        seq.add(TypeConversionUtil.convertTofloat(i));
       }
-      int currSize=seq.size();
-      Assertions.assertEquals(subList.size(),currSize);
-      Assertions.assertEquals(root.size(),currSize);
-      Assertions.assertEquals(100,currSize);
-      for(int i=200;i<300;++i)
+      Assertions.assertEquals(seq.size(),100);
+      Assertions.assertEquals(subList.size(),100);
+      Assertions.assertEquals(root.size(),100);
+      var itr=seq.iterator();
+      for(int i=0;i<100;++i)
       {
-        //add at end
-        seq.add(seq.size(),(Float)TypeConversionUtil.convertTofloat(i));
+        Assertions.assertEquals(itr.nextFloat(),TypeConversionUtil.convertTofloat(i));
       }
-      for(int i=100;i<200;++i)
-      {
-        Assertions.assertEquals((TypeConversionUtil.convertTofloat(i+100)),seq.getFloat(i));
-      }
-      currSize=seq.size();
-      Assertions.assertEquals(subList.size(),currSize);
-      Assertions.assertEquals(root.size(),currSize);
-      Assertions.assertEquals(200,currSize);
-      for(int i=200;--i>=100;)
-      {
-        //add in middle
-        seq.add(100,(Float)TypeConversionUtil.convertTofloat(i));
-      }
-      for(int i=100;i<200;++i)
-      {
-        Assertions.assertEquals((TypeConversionUtil.convertTofloat(i)),seq.getFloat(i));
-      }
-      currSize=seq.size();
-      Assertions.assertEquals(subList.size(),currSize);
-      Assertions.assertEquals(root.size(),currSize);
-      Assertions.assertEquals(300,currSize);
+      Assertions.assertFalse(itr.hasNext());
     }
+    {
+      //test with null array
+      var root=new UncheckedList(0,null);
+      var subList=root.subList(0,0);
+      var seq=subList.subList(0,0);
+      for(int i=0;i<100;++i)
+      {
+        seq.add(TypeConversionUtil.convertTofloat(i));
+      }
+      Assertions.assertEquals(seq.size(),100);
+      Assertions.assertEquals(subList.size(),100);
+      Assertions.assertEquals(root.size(),100);
+      var itr=seq.iterator();
+      for(int i=0;i<100;++i)
+      {
+        Assertions.assertEquals(itr.nextFloat(),TypeConversionUtil.convertTofloat(i));
+      }
+      Assertions.assertFalse(itr.hasNext());
+    }
+     {
+      //test with preallocated array
+      var root=new UncheckedList(20);
+      var subList=root.subList(0,0);
+      var seq=subList.subList(0,0);
+      for(int i=0;i<100;++i)
+      {
+        seq.add(TypeConversionUtil.convertTofloat(i));
+      }
+      Assertions.assertEquals(seq.size(),100);
+      Assertions.assertEquals(subList.size(),100);
+      Assertions.assertEquals(root.size(),100);
+      var itr=seq.iterator();
+      for(int i=0;i<100;++i)
+      {
+        Assertions.assertEquals(itr.nextFloat(),TypeConversionUtil.convertTofloat(i));
+      }
+      Assertions.assertFalse(itr.hasNext());
+    }
+  }
   @Test
   public void testCloneUncheckedSubList()
   {
@@ -391,62 +915,182 @@ public class FloatArrSeqTest
       }
     }
   }
-    @Test
-    public void testListAddFloatCheckedSubList()
+  @Test
+  public void testClearCheckedSubList()
+  {
+    var root=new CheckedList();
+    for(int i=0;i<100;++i)
     {
+      root.add(TypeConversionUtil.convertTofloat(i));
+    }
+    var emptySubList=root.subList(50,50);
+    int modCount=root.modCount;
+    emptySubList.clear();
+    Assertions.assertEquals(0,emptySubList.size());
+    Assertions.assertEquals(100,root.size());
+    Assertions.assertEquals(modCount,root.modCount);
+    var nonEmptySubList=root.subList(10,90);
+    var nonEmptySubSubList=nonEmptySubList.subList(15,65);
+    nonEmptySubSubList.clear();
+    Assertions.assertEquals(0,nonEmptySubSubList.size());
+    Assertions.assertEquals(50,root.size());
+    Assertions.assertEquals(30,nonEmptySubList.size());
+    Assertions.assertNotEquals(modCount,root.modCount);
+    for(int i=0;i<25;++i)
+    {
+      Assertions.assertEquals(root.getFloat(i),TypeConversionUtil.convertTofloat(i));
+    }
+    for(int i=25;i<50;++i)
+    {
+      Assertions.assertEquals(root.getFloat(i),TypeConversionUtil.convertTofloat(i+50));
+    }
+    modCount=root.modCount;
+    nonEmptySubList.clear();
+    Assertions.assertNotEquals(modCount,root.modCount);
+    modCount=root.modCount;
+    Assertions.assertThrows(ConcurrentModificationException.class,()->nonEmptySubSubList.clear());
+    Assertions.assertEquals(modCount,root.modCount);
+    Assertions.assertEquals(20,root.size());
+    Assertions.assertEquals(0,nonEmptySubList.size());
+    for(int i=0;i<10;++i)
+    {
+      Assertions.assertEquals(root.getFloat(i),TypeConversionUtil.convertTofloat(i));
+    }
+    for(int i=10;i<20;++i)
+    {
+      Assertions.assertEquals(root.getFloat(i),TypeConversionUtil.convertTofloat(i+80));
+    }
+    Assertions.assertTrue(root.arr.length>=100);
+    root.add(Float.NaN);
+    modCount=root.modCount;
+    Assertions.assertThrows(ConcurrentModificationException.class,()->nonEmptySubList.clear());
+    Assertions.assertEquals(modCount,root.modCount);
+  }
+  @Test
+  public void testSizeCheckedSubList()
+  {
+    var root=new CheckedList();
+    var subList=root.subList(0,0);
+    var seq=subList.subList(0,0);
+    int i=0;
+    for(;i<100;++i)
+    {
+      Assertions.assertEquals(i,seq.size());
+      seq.add(Float.NaN);
+    }
+    Assertions.assertEquals(i,seq.size());
+    var itr=seq.iterator();
+    for(;;)
+    {
+      itr.next();
+      itr.remove();
+      Assertions.assertEquals(--i,seq.size());
+      if(i==0)
+      {
+        break;
+      }
+    }
+    root.add(Float.NaN);
+    Assertions.assertThrows(ConcurrentModificationException.class,()->
+    {
+      seq.size();
+    });
+  }
+  @Test
+  public void testIsEmptyCheckedSubList()
+  {
+    var root=new CheckedList();
+    var subList=root.subList(0,0);
+    var seq=subList.subList(0,0);
+    Assertions.assertTrue(seq.isEmpty());
+    int i=0;
+    for(;i<100;++i)
+    {
+      seq.add(Float.NaN);
+      Assertions.assertFalse(seq.isEmpty());
+    }
+    var itr=seq.iterator();
+    for(;;)
+    {
+      itr.next();
+      itr.remove();
+      if(--i==0)
+      {
+        Assertions.assertTrue(seq.isEmpty());
+        break;
+      }
+      Assertions.assertFalse(seq.isEmpty());
+    }
+    root.add(Float.NaN);
+    Assertions.assertThrows(ConcurrentModificationException.class,()->
+    {
+      seq.isEmpty();
+    });
+  }
+  @Test
+  public void testAddCheckedSubList()
+  {
+    {
+      //test with default array
       var root=new CheckedList();
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
-      for(int i=100;--i>=0;)
-      {
-        //test add at beginning
-        seq.add(0,(Float)TypeConversionUtil.convertTofloat(i));
-      }
       for(int i=0;i<100;++i)
       {
-        Assertions.assertEquals((TypeConversionUtil.convertTofloat(i)),seq.getFloat(i));
+        seq.add(TypeConversionUtil.convertTofloat(i));
       }
-      int currSize=seq.size();
-      Assertions.assertEquals(subList.size(),currSize);
-      Assertions.assertEquals(root.size(),currSize);
-      Assertions.assertEquals(100,currSize);
-      int modCount=root.modCount;
-      Assertions.assertEquals(modCount,100);
-      Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(-1,TypeConversionUtil.convertTofloat(0)));
-      Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(seq.size()+1,TypeConversionUtil.convertTofloat(0)));
-      Assertions.assertEquals(modCount,root.modCount);
-      Assertions.assertEquals(currSize,seq.size());
-      for(int i=200;i<300;++i)
+      Assertions.assertEquals(seq.size(),100);
+      Assertions.assertEquals(subList.size(),100);
+      Assertions.assertEquals(root.size(),100);
+      Assertions.assertEquals(100,root.modCount);
+      var itr=seq.iterator();
+      for(int i=0;i<100;++i)
       {
-        //add at end
-        seq.add(seq.size(),(Float)TypeConversionUtil.convertTofloat(i));
+        Assertions.assertEquals(itr.nextFloat(),TypeConversionUtil.convertTofloat(i));
       }
-      for(int i=100;i<200;++i)
-      {
-        Assertions.assertEquals((TypeConversionUtil.convertTofloat(i+100)),seq.getFloat(i));
-      }
-      currSize=seq.size();
-      Assertions.assertEquals(subList.size(),currSize);
-      Assertions.assertEquals(root.size(),currSize);
-      Assertions.assertEquals(200,currSize);
-      modCount=root.modCount;
-      Assertions.assertEquals(modCount,200);
-      for(int i=200;--i>=100;)
-      {
-        //add in middle
-        seq.add(100,(Float)TypeConversionUtil.convertTofloat(i));
-      }
-      for(int i=100;i<200;++i)
-      {
-        Assertions.assertEquals((TypeConversionUtil.convertTofloat(i)),seq.getFloat(i));
-      }
-      currSize=seq.size();
-      Assertions.assertEquals(subList.size(),currSize);
-      Assertions.assertEquals(root.size(),currSize);
-      Assertions.assertEquals(300,currSize);
-      modCount=root.modCount;
-      Assertions.assertEquals(modCount,300);
+      Assertions.assertFalse(itr.hasNext());
     }
+    {
+      //test with null array
+      var root=new CheckedList(0,null);
+      var subList=root.subList(0,0);
+      var seq=subList.subList(0,0);
+      for(int i=0;i<100;++i)
+      {
+        seq.add(TypeConversionUtil.convertTofloat(i));
+      }
+      Assertions.assertEquals(seq.size(),100);
+      Assertions.assertEquals(subList.size(),100);
+      Assertions.assertEquals(root.size(),100);
+      Assertions.assertEquals(100,root.modCount);
+      var itr=seq.iterator();
+      for(int i=0;i<100;++i)
+      {
+        Assertions.assertEquals(itr.nextFloat(),TypeConversionUtil.convertTofloat(i));
+      }
+      Assertions.assertFalse(itr.hasNext());
+    }
+     {
+      //test with preallocated array
+      var root=new CheckedList(20);
+      var subList=root.subList(0,0);
+      var seq=subList.subList(0,0);
+      for(int i=0;i<100;++i)
+      {
+        seq.add(TypeConversionUtil.convertTofloat(i));
+      }
+      Assertions.assertEquals(seq.size(),100);
+      Assertions.assertEquals(subList.size(),100);
+      Assertions.assertEquals(root.size(),100);
+      Assertions.assertEquals(100,root.modCount);
+      var itr=seq.iterator();
+      for(int i=0;i<100;++i)
+      {
+        Assertions.assertEquals(itr.nextFloat(),TypeConversionUtil.convertTofloat(i));
+      }
+      Assertions.assertFalse(itr.hasNext());
+    }
+  }
   @Test
   public void testCloneCheckedSubList()
   {

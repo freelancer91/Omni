@@ -911,7 +911,7 @@ public abstract class BooleanArrSeq implements OmniCollection.OfBoolean
       private Itr(UncheckedStack parent)
       {
         this.parent=parent;
-        this.cursor=parent.size-1;
+        this.cursor=parent.size;
       }
       private Itr(UncheckedStack parent,int cursor)
       {
@@ -921,12 +921,12 @@ public abstract class BooleanArrSeq implements OmniCollection.OfBoolean
       @Override
       public boolean hasNext()
       {
-        return this.cursor>=0;
+        return this.cursor>0;
       }
       @Override
       public boolean nextBoolean()
       {
-        return (boolean)parent.arr[cursor--];
+        return (boolean)parent.arr[--cursor];
       }
       @Override
       public void remove()
@@ -938,20 +938,20 @@ public abstract class BooleanArrSeq implements OmniCollection.OfBoolean
       public void forEachRemaining(BooleanConsumer action)
       {
         final int cursor;
-        if((cursor=this.cursor)>=0)
+        if((cursor=this.cursor)>0)
         {
-          OmniArray.OfBoolean.descendingForEach(parent.arr,0,cursor,action);
-          this.cursor=-1;
+          OmniArray.OfBoolean.descendingForEach(parent.arr,0,cursor-1,action);
+          this.cursor=0;
         }
       }
       @Override
       public void forEachRemaining(Consumer<? super Boolean> action)
       {
         final int cursor;
-        if((cursor=this.cursor)>=0)
+        if((cursor=this.cursor)>0)
         {
-          OmniArray.OfBoolean.descendingForEach(parent.arr,0,cursor,action::accept);
-          this.cursor=-1;
+          OmniArray.OfBoolean.descendingForEach(parent.arr,0,cursor-1,action::accept);
+          this.cursor=0;
         }
       }
     }
@@ -3121,7 +3121,7 @@ public abstract class BooleanArrSeq implements OmniCollection.OfBoolean
       private Itr(CheckedStack parent)
       {
         this.parent=parent;
-        this.cursor=parent.size-1;
+        this.cursor=parent.size;
         this.modCount=parent.modCount;
         this.lastRet=-1;
       }
@@ -3135,18 +3135,18 @@ public abstract class BooleanArrSeq implements OmniCollection.OfBoolean
       @Override
       public boolean hasNext()
       {
-        return this.cursor>=0;
+        return this.cursor>0;
       }
       @Override
       public boolean nextBoolean()
       {
         final CheckedStack root;
         CheckedCollection.checkModCount(modCount,(root=this.parent).modCount);
-        final int cursor;
-        if((cursor=this.cursor)>=0)
+        int cursor;
+        if((cursor=this.cursor)>0)
         {
-          this.lastRet=cursor;
-          this.cursor=cursor-1;
+          this.lastRet=--cursor;
+          this.cursor=cursor;
             return (boolean)root.arr[cursor];
         }
         throw new NoSuchElementException();
@@ -3173,19 +3173,19 @@ public abstract class BooleanArrSeq implements OmniCollection.OfBoolean
       public void forEachRemaining(BooleanConsumer action)
       {
         final int cursor;
-        if((cursor=this.cursor)>=0)
+        if((cursor=this.cursor)>0)
         {
           final int modCount=this.modCount;
           final var parent=this.parent;
           try
           {
-            OmniArray.OfBoolean.descendingForEach(parent.arr,0,cursor,action);
+            OmniArray.OfBoolean.descendingForEach(parent.arr,0,cursor-1,action);
           }
           finally
           {
             CheckedCollection.checkModCount(modCount,parent.modCount);
           }
-          this.cursor=-1;
+          this.cursor=0;
           this.lastRet=0;
         }
       }
@@ -3193,19 +3193,19 @@ public abstract class BooleanArrSeq implements OmniCollection.OfBoolean
       public void forEachRemaining(Consumer<? super Boolean> action)
       {
         final int cursor;
-        if((cursor=this.cursor)>=0)
+        if((cursor=this.cursor)>0)
         {
           final int modCount=this.modCount;
           final var parent=this.parent;
           try
           {
-            OmniArray.OfBoolean.descendingForEach(parent.arr,0,cursor,action::accept);
+            OmniArray.OfBoolean.descendingForEach(parent.arr,0,cursor-1,action::accept);
           }
           finally
           {
             CheckedCollection.checkModCount(modCount,parent.modCount);
           }
-          this.cursor=-1;
+          this.cursor=0;
           this.lastRet=0;
         }
       }

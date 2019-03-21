@@ -1111,7 +1111,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>
       private Itr(UncheckedStack<E> parent)
       {
         this.parent=parent;
-        this.cursor=parent.size-1;
+        this.cursor=parent.size;
       }
       private Itr(UncheckedStack<E> parent,int cursor)
       {
@@ -1121,13 +1121,13 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>
       @Override
       public boolean hasNext()
       {
-        return this.cursor>=0;
+        return this.cursor>0;
       }
       @SuppressWarnings("unchecked")
       @Override
       public E next()
       {
-        return (E)parent.arr[cursor--];
+        return (E)parent.arr[--cursor];
       }
       @Override
       public void remove()
@@ -1139,10 +1139,10 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>
       public void forEachRemaining(Consumer<? super E> action)
       {
         final int cursor;
-        if((cursor=this.cursor)>=0)
+        if((cursor=this.cursor)>0)
         {
-          OmniArray.OfRef.descendingForEach(parent.arr,0,cursor,action);
-          this.cursor=-1;
+          OmniArray.OfRef.descendingForEach(parent.arr,0,cursor-1,action);
+          this.cursor=0;
         }
       }
     }
@@ -3647,7 +3647,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>
       private Itr(CheckedStack<E> parent)
       {
         this.parent=parent;
-        this.cursor=parent.size-1;
+        this.cursor=parent.size;
         this.modCount=parent.modCount;
         this.lastRet=-1;
       }
@@ -3661,7 +3661,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>
       @Override
       public boolean hasNext()
       {
-        return this.cursor>=0;
+        return this.cursor>0;
       }
       @SuppressWarnings("unchecked")
       @Override
@@ -3669,11 +3669,11 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>
       {
         final CheckedStack<E> root;
         CheckedCollection.checkModCount(modCount,(root=this.parent).modCount);
-        final int cursor;
-        if((cursor=this.cursor)>=0)
+        int cursor;
+        if((cursor=this.cursor)>0)
         {
-          this.lastRet=cursor;
-          this.cursor=cursor-1;
+          this.lastRet=--cursor;
+          this.cursor=cursor;
             return (E)root.arr[cursor];
         }
         throw new NoSuchElementException();
@@ -3700,19 +3700,19 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>
       public void forEachRemaining(Consumer<? super E> action)
       {
         final int cursor;
-        if((cursor=this.cursor)>=0)
+        if((cursor=this.cursor)>0)
         {
           final int modCount=this.modCount;
           final var parent=this.parent;
           try
           {
-            OmniArray.OfRef.descendingForEach(parent.arr,0,cursor,action);
+            OmniArray.OfRef.descendingForEach(parent.arr,0,cursor-1,action);
           }
           finally
           {
             CheckedCollection.checkModCount(modCount,parent.modCount);
           }
-          this.cursor=-1;
+          this.cursor=0;
           this.lastRet=0;
         }
       }

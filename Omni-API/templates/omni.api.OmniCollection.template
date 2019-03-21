@@ -220,7 +220,7 @@ public abstract interface OfCLASSPREFIX extends OfPrimitive
 @Override
 public default boolean contains(INPUTTYPE val)
 {
-  return contains(val.
+  return val!=null && contains(val.
   #IFSWITCH INPUTTYPE==Boolean
     booleanValue
   #ELSEIFSWITCH INPUTTYPE==Byte
@@ -248,7 +248,7 @@ public default boolean contains(INPUTTYPE val)
 @Override
 public default boolean removeVal(INPUTTYPE val)
 {
-  return removeVal(val.
+  return val!=null && removeVal(val.
   #IFSWITCH INPUTTYPE==Boolean
     booleanValue
   #ELSEIFSWITCH INPUTTYPE==Byte
