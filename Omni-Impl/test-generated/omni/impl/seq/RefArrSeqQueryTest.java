@@ -16,12 +16,14 @@ public class RefArrSeqQueryTest
     QueryTestUtil.testremoveValDouble(()->
     {
       var seq=new UncheckedList();
+      seq.add(Double.valueOf((double)3));
       seq.add(Double.valueOf((double)0));
       return seq;
     },(double)0);
     QueryTestUtil.testremoveValDouble(()->
     {
       var seq=new UncheckedList();
+      seq.add(Double.valueOf((double)3));
       seq.add(Double.valueOf(Double.NaN));
       return seq;
     },(double)Double.NaN);
@@ -32,12 +34,14 @@ public class RefArrSeqQueryTest
     QueryTestUtil.testremoveValFloat(()->
     {
       var seq=new UncheckedList();
+      seq.add((float)3);
       seq.add(Float.valueOf((float)0));
       return seq;
     },(float)0);
     QueryTestUtil.testremoveValFloat(()->
     {
       var seq=new UncheckedList();
+      seq.add((float)3);
       seq.add(Float.valueOf(Float.NaN));
       return seq;
     },(float)Float.NaN);
@@ -48,6 +52,7 @@ public class RefArrSeqQueryTest
     QueryTestUtil.testremoveValLong(()->
     {
       var seq=new UncheckedList();
+      seq.add((long)3);
       seq.add(Long.valueOf((long)0));
       return seq;
     });
@@ -58,6 +63,7 @@ public class RefArrSeqQueryTest
     QueryTestUtil.testremoveValInt(()->
     {
       var seq=new UncheckedList();
+      seq.add((int)3);
       seq.add(Integer.valueOf((int)0));
       return seq;
     });
@@ -68,6 +74,7 @@ public class RefArrSeqQueryTest
     QueryTestUtil.testremoveValShort(()->
     {
       var seq=new UncheckedList();
+      seq.add((short)3);
       seq.add(Short.valueOf((short)0));
       return seq;
     });
@@ -78,6 +85,7 @@ public class RefArrSeqQueryTest
     QueryTestUtil.testremoveValChar(()->
     {
       var seq=new UncheckedList();
+      seq.add((char)3);
       seq.add(Character.valueOf((char)0));
       return seq;
     });
@@ -88,6 +96,7 @@ public class RefArrSeqQueryTest
     QueryTestUtil.testremoveValByte(()->
     {
       var seq=new UncheckedList();
+      seq.add((byte)3);
       seq.add(Byte.valueOf((byte)0));
       return seq;
     });
@@ -98,12 +107,14 @@ public class RefArrSeqQueryTest
     QueryTestUtil.testremoveValBoolean(()->
     {
       var seq=new UncheckedList();
+      seq.add(Integer.valueOf(3));
       seq.add(Boolean.TRUE);
       return seq;
     },true);
     QueryTestUtil.testremoveValBoolean(()->
     {
       var seq=new UncheckedList();
+      seq.add(Integer.valueOf(3));
       seq.add(Boolean.FALSE);
       return seq;
     },false);
@@ -140,12 +151,14 @@ public class RefArrSeqQueryTest
     QueryTestUtil.testremoveValDouble(()->
     {
       var seq=new UncheckedStack();
+      seq.add(Double.valueOf((double)3));
       seq.add(Double.valueOf((double)0));
       return seq;
     },(double)0);
     QueryTestUtil.testremoveValDouble(()->
     {
       var seq=new UncheckedStack();
+      seq.add(Double.valueOf((double)3));
       seq.add(Double.valueOf(Double.NaN));
       return seq;
     },(double)Double.NaN);
@@ -156,12 +169,14 @@ public class RefArrSeqQueryTest
     QueryTestUtil.testremoveValFloat(()->
     {
       var seq=new UncheckedStack();
+      seq.add((float)3);
       seq.add(Float.valueOf((float)0));
       return seq;
     },(float)0);
     QueryTestUtil.testremoveValFloat(()->
     {
       var seq=new UncheckedStack();
+      seq.add((float)3);
       seq.add(Float.valueOf(Float.NaN));
       return seq;
     },(float)Float.NaN);
@@ -172,6 +187,7 @@ public class RefArrSeqQueryTest
     QueryTestUtil.testremoveValLong(()->
     {
       var seq=new UncheckedStack();
+      seq.add((long)3);
       seq.add(Long.valueOf((long)0));
       return seq;
     });
@@ -182,6 +198,7 @@ public class RefArrSeqQueryTest
     QueryTestUtil.testremoveValInt(()->
     {
       var seq=new UncheckedStack();
+      seq.add((int)3);
       seq.add(Integer.valueOf((int)0));
       return seq;
     });
@@ -192,6 +209,7 @@ public class RefArrSeqQueryTest
     QueryTestUtil.testremoveValShort(()->
     {
       var seq=new UncheckedStack();
+      seq.add((short)3);
       seq.add(Short.valueOf((short)0));
       return seq;
     });
@@ -202,6 +220,7 @@ public class RefArrSeqQueryTest
     QueryTestUtil.testremoveValChar(()->
     {
       var seq=new UncheckedStack();
+      seq.add((char)3);
       seq.add(Character.valueOf((char)0));
       return seq;
     });
@@ -212,6 +231,7 @@ public class RefArrSeqQueryTest
     QueryTestUtil.testremoveValByte(()->
     {
       var seq=new UncheckedStack();
+      seq.add((byte)3);
       seq.add(Byte.valueOf((byte)0));
       return seq;
     });
@@ -222,12 +242,14 @@ public class RefArrSeqQueryTest
     QueryTestUtil.testremoveValBoolean(()->
     {
       var seq=new UncheckedStack();
+      seq.add(Integer.valueOf(3));
       seq.add(Boolean.TRUE);
       return seq;
     },true);
     QueryTestUtil.testremoveValBoolean(()->
     {
       var seq=new UncheckedStack();
+      seq.add(Integer.valueOf(3));
       seq.add(Boolean.FALSE);
       return seq;
     },false);
@@ -264,12 +286,14 @@ public class RefArrSeqQueryTest
     QueryTestUtil.testremoveValDouble(()->
     {
       var seq=new CheckedList();
+      seq.add(Double.valueOf((double)3));
       seq.add(Double.valueOf((double)0));
       return seq;
     },(double)0);
     QueryTestUtil.testremoveValDouble(()->
     {
       var seq=new CheckedList();
+      seq.add(Double.valueOf((double)3));
       seq.add(Double.valueOf(Double.NaN));
       return seq;
     },(double)Double.NaN);
@@ -280,12 +304,14 @@ public class RefArrSeqQueryTest
     QueryTestUtil.testremoveValFloat(()->
     {
       var seq=new CheckedList();
+      seq.add((float)3);
       seq.add(Float.valueOf((float)0));
       return seq;
     },(float)0);
     QueryTestUtil.testremoveValFloat(()->
     {
       var seq=new CheckedList();
+      seq.add((float)3);
       seq.add(Float.valueOf(Float.NaN));
       return seq;
     },(float)Float.NaN);
@@ -296,6 +322,7 @@ public class RefArrSeqQueryTest
     QueryTestUtil.testremoveValLong(()->
     {
       var seq=new CheckedList();
+      seq.add((long)3);
       seq.add(Long.valueOf((long)0));
       return seq;
     });
@@ -306,6 +333,7 @@ public class RefArrSeqQueryTest
     QueryTestUtil.testremoveValInt(()->
     {
       var seq=new CheckedList();
+      seq.add((int)3);
       seq.add(Integer.valueOf((int)0));
       return seq;
     });
@@ -316,6 +344,7 @@ public class RefArrSeqQueryTest
     QueryTestUtil.testremoveValShort(()->
     {
       var seq=new CheckedList();
+      seq.add((short)3);
       seq.add(Short.valueOf((short)0));
       return seq;
     });
@@ -326,6 +355,7 @@ public class RefArrSeqQueryTest
     QueryTestUtil.testremoveValChar(()->
     {
       var seq=new CheckedList();
+      seq.add((char)3);
       seq.add(Character.valueOf((char)0));
       return seq;
     });
@@ -336,6 +366,7 @@ public class RefArrSeqQueryTest
     QueryTestUtil.testremoveValByte(()->
     {
       var seq=new CheckedList();
+      seq.add((byte)3);
       seq.add(Byte.valueOf((byte)0));
       return seq;
     });
@@ -346,12 +377,14 @@ public class RefArrSeqQueryTest
     QueryTestUtil.testremoveValBoolean(()->
     {
       var seq=new CheckedList();
+      seq.add(Integer.valueOf(3));
       seq.add(Boolean.TRUE);
       return seq;
     },true);
     QueryTestUtil.testremoveValBoolean(()->
     {
       var seq=new CheckedList();
+      seq.add(Integer.valueOf(3));
       seq.add(Boolean.FALSE);
       return seq;
     },false);
@@ -388,12 +421,14 @@ public class RefArrSeqQueryTest
     QueryTestUtil.testremoveValDouble(()->
     {
       var seq=new CheckedStack();
+      seq.add(Double.valueOf((double)3));
       seq.add(Double.valueOf((double)0));
       return seq;
     },(double)0);
     QueryTestUtil.testremoveValDouble(()->
     {
       var seq=new CheckedStack();
+      seq.add(Double.valueOf((double)3));
       seq.add(Double.valueOf(Double.NaN));
       return seq;
     },(double)Double.NaN);
@@ -404,12 +439,14 @@ public class RefArrSeqQueryTest
     QueryTestUtil.testremoveValFloat(()->
     {
       var seq=new CheckedStack();
+      seq.add((float)3);
       seq.add(Float.valueOf((float)0));
       return seq;
     },(float)0);
     QueryTestUtil.testremoveValFloat(()->
     {
       var seq=new CheckedStack();
+      seq.add((float)3);
       seq.add(Float.valueOf(Float.NaN));
       return seq;
     },(float)Float.NaN);
@@ -420,6 +457,7 @@ public class RefArrSeqQueryTest
     QueryTestUtil.testremoveValLong(()->
     {
       var seq=new CheckedStack();
+      seq.add((long)3);
       seq.add(Long.valueOf((long)0));
       return seq;
     });
@@ -430,6 +468,7 @@ public class RefArrSeqQueryTest
     QueryTestUtil.testremoveValInt(()->
     {
       var seq=new CheckedStack();
+      seq.add((int)3);
       seq.add(Integer.valueOf((int)0));
       return seq;
     });
@@ -440,6 +479,7 @@ public class RefArrSeqQueryTest
     QueryTestUtil.testremoveValShort(()->
     {
       var seq=new CheckedStack();
+      seq.add((short)3);
       seq.add(Short.valueOf((short)0));
       return seq;
     });
@@ -450,6 +490,7 @@ public class RefArrSeqQueryTest
     QueryTestUtil.testremoveValChar(()->
     {
       var seq=new CheckedStack();
+      seq.add((char)3);
       seq.add(Character.valueOf((char)0));
       return seq;
     });
@@ -460,6 +501,7 @@ public class RefArrSeqQueryTest
     QueryTestUtil.testremoveValByte(()->
     {
       var seq=new CheckedStack();
+      seq.add((byte)3);
       seq.add(Byte.valueOf((byte)0));
       return seq;
     });
@@ -470,12 +512,14 @@ public class RefArrSeqQueryTest
     QueryTestUtil.testremoveValBoolean(()->
     {
       var seq=new CheckedStack();
+      seq.add(Integer.valueOf(3));
       seq.add(Boolean.TRUE);
       return seq;
     },true);
     QueryTestUtil.testremoveValBoolean(()->
     {
       var seq=new CheckedStack();
+      seq.add(Integer.valueOf(3));
       seq.add(Boolean.FALSE);
       return seq;
     },false);
@@ -514,6 +558,7 @@ public class RefArrSeqQueryTest
       var root=new CheckedList();
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
+      seq.add(Double.valueOf((double)3));
       seq.add(Double.valueOf((double)0));
       return seq;
     },(double)0);
@@ -522,6 +567,7 @@ public class RefArrSeqQueryTest
       var root=new CheckedList();
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
+      seq.add(Double.valueOf((double)3));
       seq.add(Double.valueOf(Double.NaN));
       return seq;
     },(double)Double.NaN);
@@ -534,6 +580,7 @@ public class RefArrSeqQueryTest
       var root=new CheckedList();
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
+      seq.add((float)3);
       seq.add(Float.valueOf((float)0));
       return seq;
     },(float)0);
@@ -542,6 +589,7 @@ public class RefArrSeqQueryTest
       var root=new CheckedList();
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
+      seq.add((float)3);
       seq.add(Float.valueOf(Float.NaN));
       return seq;
     },(float)Float.NaN);
@@ -554,6 +602,7 @@ public class RefArrSeqQueryTest
       var root=new CheckedList();
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
+      seq.add((long)3);
       seq.add(Long.valueOf((long)0));
       return seq;
     });
@@ -566,6 +615,7 @@ public class RefArrSeqQueryTest
       var root=new CheckedList();
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
+      seq.add((int)3);
       seq.add(Integer.valueOf((int)0));
       return seq;
     });
@@ -578,6 +628,7 @@ public class RefArrSeqQueryTest
       var root=new CheckedList();
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
+      seq.add((short)3);
       seq.add(Short.valueOf((short)0));
       return seq;
     });
@@ -590,6 +641,7 @@ public class RefArrSeqQueryTest
       var root=new CheckedList();
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
+      seq.add((char)3);
       seq.add(Character.valueOf((char)0));
       return seq;
     });
@@ -602,6 +654,7 @@ public class RefArrSeqQueryTest
       var root=new CheckedList();
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
+      seq.add((byte)3);
       seq.add(Byte.valueOf((byte)0));
       return seq;
     });
@@ -614,6 +667,7 @@ public class RefArrSeqQueryTest
       var root=new CheckedList();
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
+      seq.add(Integer.valueOf(3));
       seq.add(Boolean.TRUE);
       return seq;
     },true);
@@ -622,6 +676,7 @@ public class RefArrSeqQueryTest
       var root=new CheckedList();
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
+      seq.add(Integer.valueOf(3));
       seq.add(Boolean.FALSE);
       return seq;
     },false);
@@ -666,6 +721,7 @@ public class RefArrSeqQueryTest
       var root=new UncheckedList();
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
+      seq.add(Double.valueOf((double)3));
       seq.add(Double.valueOf((double)0));
       return seq;
     },(double)0);
@@ -674,6 +730,7 @@ public class RefArrSeqQueryTest
       var root=new UncheckedList();
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
+      seq.add(Double.valueOf((double)3));
       seq.add(Double.valueOf(Double.NaN));
       return seq;
     },(double)Double.NaN);
@@ -686,6 +743,7 @@ public class RefArrSeqQueryTest
       var root=new UncheckedList();
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
+      seq.add((float)3);
       seq.add(Float.valueOf((float)0));
       return seq;
     },(float)0);
@@ -694,6 +752,7 @@ public class RefArrSeqQueryTest
       var root=new UncheckedList();
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
+      seq.add((float)3);
       seq.add(Float.valueOf(Float.NaN));
       return seq;
     },(float)Float.NaN);
@@ -706,6 +765,7 @@ public class RefArrSeqQueryTest
       var root=new UncheckedList();
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
+      seq.add((long)3);
       seq.add(Long.valueOf((long)0));
       return seq;
     });
@@ -718,6 +778,7 @@ public class RefArrSeqQueryTest
       var root=new UncheckedList();
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
+      seq.add((int)3);
       seq.add(Integer.valueOf((int)0));
       return seq;
     });
@@ -730,6 +791,7 @@ public class RefArrSeqQueryTest
       var root=new UncheckedList();
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
+      seq.add((short)3);
       seq.add(Short.valueOf((short)0));
       return seq;
     });
@@ -742,6 +804,7 @@ public class RefArrSeqQueryTest
       var root=new UncheckedList();
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
+      seq.add((char)3);
       seq.add(Character.valueOf((char)0));
       return seq;
     });
@@ -754,6 +817,7 @@ public class RefArrSeqQueryTest
       var root=new UncheckedList();
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
+      seq.add((byte)3);
       seq.add(Byte.valueOf((byte)0));
       return seq;
     });
@@ -766,6 +830,7 @@ public class RefArrSeqQueryTest
       var root=new UncheckedList();
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
+      seq.add(Integer.valueOf(3));
       seq.add(Boolean.TRUE);
       return seq;
     },true);
@@ -774,6 +839,7 @@ public class RefArrSeqQueryTest
       var root=new UncheckedList();
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
+      seq.add(Integer.valueOf(3));
       seq.add(Boolean.FALSE);
       return seq;
     },false);
@@ -816,12 +882,14 @@ public class RefArrSeqQueryTest
     QueryTestUtil.testcontainsDouble(()->
     {
       var seq=new UncheckedList();
+      seq.add(Double.valueOf((double)3));
       seq.add(Double.valueOf((double)0));
       return seq;
     },(double)0);
     QueryTestUtil.testcontainsDouble(()->
     {
       var seq=new UncheckedList();
+      seq.add(Double.valueOf((double)3));
       seq.add(Double.valueOf(Double.NaN));
       return seq;
     },(double)Double.NaN);
@@ -832,12 +900,14 @@ public class RefArrSeqQueryTest
     QueryTestUtil.testcontainsFloat(()->
     {
       var seq=new UncheckedList();
+      seq.add((float)3);
       seq.add(Float.valueOf((float)0));
       return seq;
     },(float)0);
     QueryTestUtil.testcontainsFloat(()->
     {
       var seq=new UncheckedList();
+      seq.add((float)3);
       seq.add(Float.valueOf(Float.NaN));
       return seq;
     },(float)Float.NaN);
@@ -848,6 +918,7 @@ public class RefArrSeqQueryTest
     QueryTestUtil.testcontainsLong(()->
     {
       var seq=new UncheckedList();
+      seq.add((long)3);
       seq.add(Long.valueOf((long)0));
       return seq;
     });
@@ -858,6 +929,7 @@ public class RefArrSeqQueryTest
     QueryTestUtil.testcontainsInt(()->
     {
       var seq=new UncheckedList();
+      seq.add((int)3);
       seq.add(Integer.valueOf((int)0));
       return seq;
     });
@@ -868,6 +940,7 @@ public class RefArrSeqQueryTest
     QueryTestUtil.testcontainsShort(()->
     {
       var seq=new UncheckedList();
+      seq.add((short)3);
       seq.add(Short.valueOf((short)0));
       return seq;
     });
@@ -878,6 +951,7 @@ public class RefArrSeqQueryTest
     QueryTestUtil.testcontainsChar(()->
     {
       var seq=new UncheckedList();
+      seq.add((char)3);
       seq.add(Character.valueOf((char)0));
       return seq;
     });
@@ -888,6 +962,7 @@ public class RefArrSeqQueryTest
     QueryTestUtil.testcontainsByte(()->
     {
       var seq=new UncheckedList();
+      seq.add((byte)3);
       seq.add(Byte.valueOf((byte)0));
       return seq;
     });
@@ -898,12 +973,14 @@ public class RefArrSeqQueryTest
     QueryTestUtil.testcontainsBoolean(()->
     {
       var seq=new UncheckedList();
+      seq.add(Integer.valueOf(3));
       seq.add(Boolean.TRUE);
       return seq;
     },true);
     QueryTestUtil.testcontainsBoolean(()->
     {
       var seq=new UncheckedList();
+      seq.add(Integer.valueOf(3));
       seq.add(Boolean.FALSE);
       return seq;
     },false);
@@ -940,12 +1017,14 @@ public class RefArrSeqQueryTest
     QueryTestUtil.testcontainsDouble(()->
     {
       var seq=new UncheckedStack();
+      seq.add(Double.valueOf((double)3));
       seq.add(Double.valueOf((double)0));
       return seq;
     },(double)0);
     QueryTestUtil.testcontainsDouble(()->
     {
       var seq=new UncheckedStack();
+      seq.add(Double.valueOf((double)3));
       seq.add(Double.valueOf(Double.NaN));
       return seq;
     },(double)Double.NaN);
@@ -956,12 +1035,14 @@ public class RefArrSeqQueryTest
     QueryTestUtil.testcontainsFloat(()->
     {
       var seq=new UncheckedStack();
+      seq.add((float)3);
       seq.add(Float.valueOf((float)0));
       return seq;
     },(float)0);
     QueryTestUtil.testcontainsFloat(()->
     {
       var seq=new UncheckedStack();
+      seq.add((float)3);
       seq.add(Float.valueOf(Float.NaN));
       return seq;
     },(float)Float.NaN);
@@ -972,6 +1053,7 @@ public class RefArrSeqQueryTest
     QueryTestUtil.testcontainsLong(()->
     {
       var seq=new UncheckedStack();
+      seq.add((long)3);
       seq.add(Long.valueOf((long)0));
       return seq;
     });
@@ -982,6 +1064,7 @@ public class RefArrSeqQueryTest
     QueryTestUtil.testcontainsInt(()->
     {
       var seq=new UncheckedStack();
+      seq.add((int)3);
       seq.add(Integer.valueOf((int)0));
       return seq;
     });
@@ -992,6 +1075,7 @@ public class RefArrSeqQueryTest
     QueryTestUtil.testcontainsShort(()->
     {
       var seq=new UncheckedStack();
+      seq.add((short)3);
       seq.add(Short.valueOf((short)0));
       return seq;
     });
@@ -1002,6 +1086,7 @@ public class RefArrSeqQueryTest
     QueryTestUtil.testcontainsChar(()->
     {
       var seq=new UncheckedStack();
+      seq.add((char)3);
       seq.add(Character.valueOf((char)0));
       return seq;
     });
@@ -1012,6 +1097,7 @@ public class RefArrSeqQueryTest
     QueryTestUtil.testcontainsByte(()->
     {
       var seq=new UncheckedStack();
+      seq.add((byte)3);
       seq.add(Byte.valueOf((byte)0));
       return seq;
     });
@@ -1022,12 +1108,14 @@ public class RefArrSeqQueryTest
     QueryTestUtil.testcontainsBoolean(()->
     {
       var seq=new UncheckedStack();
+      seq.add(Integer.valueOf(3));
       seq.add(Boolean.TRUE);
       return seq;
     },true);
     QueryTestUtil.testcontainsBoolean(()->
     {
       var seq=new UncheckedStack();
+      seq.add(Integer.valueOf(3));
       seq.add(Boolean.FALSE);
       return seq;
     },false);
@@ -1064,12 +1152,14 @@ public class RefArrSeqQueryTest
     QueryTestUtil.testcontainsDouble(()->
     {
       var seq=new CheckedList();
+      seq.add(Double.valueOf((double)3));
       seq.add(Double.valueOf((double)0));
       return seq;
     },(double)0);
     QueryTestUtil.testcontainsDouble(()->
     {
       var seq=new CheckedList();
+      seq.add(Double.valueOf((double)3));
       seq.add(Double.valueOf(Double.NaN));
       return seq;
     },(double)Double.NaN);
@@ -1080,12 +1170,14 @@ public class RefArrSeqQueryTest
     QueryTestUtil.testcontainsFloat(()->
     {
       var seq=new CheckedList();
+      seq.add((float)3);
       seq.add(Float.valueOf((float)0));
       return seq;
     },(float)0);
     QueryTestUtil.testcontainsFloat(()->
     {
       var seq=new CheckedList();
+      seq.add((float)3);
       seq.add(Float.valueOf(Float.NaN));
       return seq;
     },(float)Float.NaN);
@@ -1096,6 +1188,7 @@ public class RefArrSeqQueryTest
     QueryTestUtil.testcontainsLong(()->
     {
       var seq=new CheckedList();
+      seq.add((long)3);
       seq.add(Long.valueOf((long)0));
       return seq;
     });
@@ -1106,6 +1199,7 @@ public class RefArrSeqQueryTest
     QueryTestUtil.testcontainsInt(()->
     {
       var seq=new CheckedList();
+      seq.add((int)3);
       seq.add(Integer.valueOf((int)0));
       return seq;
     });
@@ -1116,6 +1210,7 @@ public class RefArrSeqQueryTest
     QueryTestUtil.testcontainsShort(()->
     {
       var seq=new CheckedList();
+      seq.add((short)3);
       seq.add(Short.valueOf((short)0));
       return seq;
     });
@@ -1126,6 +1221,7 @@ public class RefArrSeqQueryTest
     QueryTestUtil.testcontainsChar(()->
     {
       var seq=new CheckedList();
+      seq.add((char)3);
       seq.add(Character.valueOf((char)0));
       return seq;
     });
@@ -1136,6 +1232,7 @@ public class RefArrSeqQueryTest
     QueryTestUtil.testcontainsByte(()->
     {
       var seq=new CheckedList();
+      seq.add((byte)3);
       seq.add(Byte.valueOf((byte)0));
       return seq;
     });
@@ -1146,12 +1243,14 @@ public class RefArrSeqQueryTest
     QueryTestUtil.testcontainsBoolean(()->
     {
       var seq=new CheckedList();
+      seq.add(Integer.valueOf(3));
       seq.add(Boolean.TRUE);
       return seq;
     },true);
     QueryTestUtil.testcontainsBoolean(()->
     {
       var seq=new CheckedList();
+      seq.add(Integer.valueOf(3));
       seq.add(Boolean.FALSE);
       return seq;
     },false);
@@ -1188,12 +1287,14 @@ public class RefArrSeqQueryTest
     QueryTestUtil.testcontainsDouble(()->
     {
       var seq=new CheckedStack();
+      seq.add(Double.valueOf((double)3));
       seq.add(Double.valueOf((double)0));
       return seq;
     },(double)0);
     QueryTestUtil.testcontainsDouble(()->
     {
       var seq=new CheckedStack();
+      seq.add(Double.valueOf((double)3));
       seq.add(Double.valueOf(Double.NaN));
       return seq;
     },(double)Double.NaN);
@@ -1204,12 +1305,14 @@ public class RefArrSeqQueryTest
     QueryTestUtil.testcontainsFloat(()->
     {
       var seq=new CheckedStack();
+      seq.add((float)3);
       seq.add(Float.valueOf((float)0));
       return seq;
     },(float)0);
     QueryTestUtil.testcontainsFloat(()->
     {
       var seq=new CheckedStack();
+      seq.add((float)3);
       seq.add(Float.valueOf(Float.NaN));
       return seq;
     },(float)Float.NaN);
@@ -1220,6 +1323,7 @@ public class RefArrSeqQueryTest
     QueryTestUtil.testcontainsLong(()->
     {
       var seq=new CheckedStack();
+      seq.add((long)3);
       seq.add(Long.valueOf((long)0));
       return seq;
     });
@@ -1230,6 +1334,7 @@ public class RefArrSeqQueryTest
     QueryTestUtil.testcontainsInt(()->
     {
       var seq=new CheckedStack();
+      seq.add((int)3);
       seq.add(Integer.valueOf((int)0));
       return seq;
     });
@@ -1240,6 +1345,7 @@ public class RefArrSeqQueryTest
     QueryTestUtil.testcontainsShort(()->
     {
       var seq=new CheckedStack();
+      seq.add((short)3);
       seq.add(Short.valueOf((short)0));
       return seq;
     });
@@ -1250,6 +1356,7 @@ public class RefArrSeqQueryTest
     QueryTestUtil.testcontainsChar(()->
     {
       var seq=new CheckedStack();
+      seq.add((char)3);
       seq.add(Character.valueOf((char)0));
       return seq;
     });
@@ -1260,6 +1367,7 @@ public class RefArrSeqQueryTest
     QueryTestUtil.testcontainsByte(()->
     {
       var seq=new CheckedStack();
+      seq.add((byte)3);
       seq.add(Byte.valueOf((byte)0));
       return seq;
     });
@@ -1270,12 +1378,14 @@ public class RefArrSeqQueryTest
     QueryTestUtil.testcontainsBoolean(()->
     {
       var seq=new CheckedStack();
+      seq.add(Integer.valueOf(3));
       seq.add(Boolean.TRUE);
       return seq;
     },true);
     QueryTestUtil.testcontainsBoolean(()->
     {
       var seq=new CheckedStack();
+      seq.add(Integer.valueOf(3));
       seq.add(Boolean.FALSE);
       return seq;
     },false);
@@ -1314,6 +1424,7 @@ public class RefArrSeqQueryTest
       var root=new CheckedList();
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
+      seq.add(Double.valueOf((double)3));
       seq.add(Double.valueOf((double)0));
       return seq;
     },(double)0);
@@ -1322,6 +1433,7 @@ public class RefArrSeqQueryTest
       var root=new CheckedList();
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
+      seq.add(Double.valueOf((double)3));
       seq.add(Double.valueOf(Double.NaN));
       return seq;
     },(double)Double.NaN);
@@ -1334,6 +1446,7 @@ public class RefArrSeqQueryTest
       var root=new CheckedList();
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
+      seq.add((float)3);
       seq.add(Float.valueOf((float)0));
       return seq;
     },(float)0);
@@ -1342,6 +1455,7 @@ public class RefArrSeqQueryTest
       var root=new CheckedList();
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
+      seq.add((float)3);
       seq.add(Float.valueOf(Float.NaN));
       return seq;
     },(float)Float.NaN);
@@ -1354,6 +1468,7 @@ public class RefArrSeqQueryTest
       var root=new CheckedList();
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
+      seq.add((long)3);
       seq.add(Long.valueOf((long)0));
       return seq;
     });
@@ -1366,6 +1481,7 @@ public class RefArrSeqQueryTest
       var root=new CheckedList();
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
+      seq.add((int)3);
       seq.add(Integer.valueOf((int)0));
       return seq;
     });
@@ -1378,6 +1494,7 @@ public class RefArrSeqQueryTest
       var root=new CheckedList();
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
+      seq.add((short)3);
       seq.add(Short.valueOf((short)0));
       return seq;
     });
@@ -1390,6 +1507,7 @@ public class RefArrSeqQueryTest
       var root=new CheckedList();
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
+      seq.add((char)3);
       seq.add(Character.valueOf((char)0));
       return seq;
     });
@@ -1402,6 +1520,7 @@ public class RefArrSeqQueryTest
       var root=new CheckedList();
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
+      seq.add((byte)3);
       seq.add(Byte.valueOf((byte)0));
       return seq;
     });
@@ -1414,6 +1533,7 @@ public class RefArrSeqQueryTest
       var root=new CheckedList();
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
+      seq.add(Integer.valueOf(3));
       seq.add(Boolean.TRUE);
       return seq;
     },true);
@@ -1422,6 +1542,7 @@ public class RefArrSeqQueryTest
       var root=new CheckedList();
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
+      seq.add(Integer.valueOf(3));
       seq.add(Boolean.FALSE);
       return seq;
     },false);
@@ -1466,6 +1587,7 @@ public class RefArrSeqQueryTest
       var root=new UncheckedList();
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
+      seq.add(Double.valueOf((double)3));
       seq.add(Double.valueOf((double)0));
       return seq;
     },(double)0);
@@ -1474,6 +1596,7 @@ public class RefArrSeqQueryTest
       var root=new UncheckedList();
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
+      seq.add(Double.valueOf((double)3));
       seq.add(Double.valueOf(Double.NaN));
       return seq;
     },(double)Double.NaN);
@@ -1486,6 +1609,7 @@ public class RefArrSeqQueryTest
       var root=new UncheckedList();
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
+      seq.add((float)3);
       seq.add(Float.valueOf((float)0));
       return seq;
     },(float)0);
@@ -1494,6 +1618,7 @@ public class RefArrSeqQueryTest
       var root=new UncheckedList();
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
+      seq.add((float)3);
       seq.add(Float.valueOf(Float.NaN));
       return seq;
     },(float)Float.NaN);
@@ -1506,6 +1631,7 @@ public class RefArrSeqQueryTest
       var root=new UncheckedList();
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
+      seq.add((long)3);
       seq.add(Long.valueOf((long)0));
       return seq;
     });
@@ -1518,6 +1644,7 @@ public class RefArrSeqQueryTest
       var root=new UncheckedList();
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
+      seq.add((int)3);
       seq.add(Integer.valueOf((int)0));
       return seq;
     });
@@ -1530,6 +1657,7 @@ public class RefArrSeqQueryTest
       var root=new UncheckedList();
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
+      seq.add((short)3);
       seq.add(Short.valueOf((short)0));
       return seq;
     });
@@ -1542,6 +1670,7 @@ public class RefArrSeqQueryTest
       var root=new UncheckedList();
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
+      seq.add((char)3);
       seq.add(Character.valueOf((char)0));
       return seq;
     });
@@ -1554,6 +1683,7 @@ public class RefArrSeqQueryTest
       var root=new UncheckedList();
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
+      seq.add((byte)3);
       seq.add(Byte.valueOf((byte)0));
       return seq;
     });
@@ -1566,6 +1696,7 @@ public class RefArrSeqQueryTest
       var root=new UncheckedList();
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
+      seq.add(Integer.valueOf(3));
       seq.add(Boolean.TRUE);
       return seq;
     },true);
@@ -1574,6 +1705,7 @@ public class RefArrSeqQueryTest
       var root=new UncheckedList();
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
+      seq.add(Integer.valueOf(3));
       seq.add(Boolean.FALSE);
       return seq;
     },false);

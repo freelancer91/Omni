@@ -10,8 +10,11 @@ import omni.impl.seq.BooleanArrSeq.UncheckedStack;
 import omni.impl.seq.BooleanArrSeq.CheckedStack;
 import java.util.ArrayList;
 import java.util.ConcurrentModificationException;
+import java.util.Comparator;
+import omni.function.BooleanComparator;
 import java.util.function.Consumer;
 import omni.function.BooleanConsumer;
+@SuppressWarnings({"rawtypes","unchecked"}) 
 public class BooleanArrSeqTest
 {
 //TODO place sanity checks for checked sequence modification behavior
@@ -408,6 +411,77 @@ public class BooleanArrSeqTest
       Assertions.assertEquals(seq.size(),0);
       Assertions.assertTrue(seq.isEmpty());
       Assertions.assertEquals(seq.arr.length,i);
+    }
+  }
+  @Test
+  public void testComparatorsortUncheckedList()
+  {
+    //#IFSWITCH UncheckedList==CheckedList,CheckedSubList
+    {
+      var seq=new UncheckedList();
+      //test empty
+      seq.sort((Comparator)null);
+      seq.add(true);
+      seq.add(false);
+      seq.sort((Comparator)((v1,v2)->{return Boolean.compare((Boolean)v1,(Boolean)v2);}));
+      Assertions.assertEquals(false,seq.getBoolean(0));
+      Assertions.assertEquals(true,seq.getBoolean(1));
+      seq.clear();
+      seq.add(true);
+      seq.add(false);
+      seq.sort((Comparator)null);
+      Assertions.assertEquals(false,seq.getBoolean(0));
+      Assertions.assertEquals(true,seq.getBoolean(1));
+      //TODO other cases
+    }
+    //#ENDIF
+  }
+  @Test
+  public void testBooleanComparatorsortUncheckedList()
+  {
+    //#IFSWITCH UncheckedList==CheckedList,CheckedSubList
+    {
+      var seq=new UncheckedList();
+      //test empty
+      seq.sort((BooleanComparator)null);
+      seq.add(true);
+      seq.add(false);
+      seq.sort((BooleanComparator)((v1,v2)->{return Boolean.compare((Boolean)v1,(Boolean)v2);}));
+      Assertions.assertEquals(false,seq.getBoolean(0));
+      Assertions.assertEquals(true,seq.getBoolean(1));
+      seq.clear();
+      seq.add(true);
+      seq.add(false);
+      seq.sort((BooleanComparator)null);
+      Assertions.assertEquals(false,seq.getBoolean(0));
+      Assertions.assertEquals(true,seq.getBoolean(1));
+      //TODO other cases
+    }
+    //#ENDIF
+  }
+  @Test
+  public void testRemoveAtIndexUncheckedList()
+  {
+    {
+      var seq=new UncheckedList();
+      for(int i=0;i<100;++i)
+      {
+        seq.add(TypeConversionUtil.convertToboolean(i));
+      }
+      int seqSize=seq.size();
+      Assertions.assertEquals(TypeConversionUtil.convertToboolean(0),seq.removeBooleanAt(0));
+      Assertions.assertEquals(TypeConversionUtil.convertToboolean(seqSize-50),seq.removeBooleanAt(seqSize-51));
+      Assertions.assertEquals(TypeConversionUtil.convertToboolean(seqSize-1),seq.removeBooleanAt(seqSize-3));
+      Assertions.assertEquals(seqSize-3,seq.size());
+      var seqItr=seq.iterator();
+      for(int i=0;i<seqSize;++i)
+      {
+        if(i==0 || i == seqSize-50 || i==seqSize-1)
+        {
+          continue;
+        }
+        Assertions.assertEquals(seqItr.nextBoolean(),TypeConversionUtil.convertToboolean(i));
+      }
     }
   }
   @Test
@@ -1195,6 +1269,117 @@ public class BooleanArrSeqTest
     }
   }
   @Test
+  public void testComparatorsortCheckedList()
+  {
+    //#IFSWITCH CheckedList==CheckedList,CheckedSubList
+    {
+      var seq=new CheckedList();
+      //test empty
+      seq.sort((Comparator)null);
+      seq.add(true);
+      seq.add(false);
+      seq.sort((Comparator)((v1,v2)->{return Boolean.compare((Boolean)v1,(Boolean)v2);}));
+      Assertions.assertEquals(false,seq.getBoolean(0));
+      Assertions.assertEquals(true,seq.getBoolean(1));
+      seq.clear();
+      seq.add(true);
+      seq.add(false);
+      seq.sort((Comparator)null);
+      Assertions.assertEquals(false,seq.getBoolean(0));
+      Assertions.assertEquals(true,seq.getBoolean(1));
+      Assertions.assertThrows(IllegalArgumentException.class,()->{
+        seq.sort((Comparator)(v1,v2)->{throw new ArrayIndexOutOfBoundsException();});
+      });
+      Assertions.assertThrows(ConcurrentModificationException.class,()->{
+        seq.sort((Comparator)(v1,v2)->{
+        seq.add(false);
+        throw new ArrayIndexOutOfBoundsException();
+        });
+      });
+      Assertions.assertThrows(IndexOutOfBoundsException.class,()->{
+        seq.sort((Comparator)(v1,v2)->{throw new IndexOutOfBoundsException();});
+      });
+      Assertions.assertThrows(ConcurrentModificationException.class,()->{
+        seq.sort((Comparator)(v1,v2)->{
+        seq.add(false);
+        throw new IndexOutOfBoundsException();
+        });
+      });
+      //TODO other cases
+    }
+    //#ENDIF
+  }
+  @Test
+  public void testBooleanComparatorsortCheckedList()
+  {
+    //#IFSWITCH CheckedList==CheckedList,CheckedSubList
+    {
+      var seq=new CheckedList();
+      //test empty
+      seq.sort((BooleanComparator)null);
+      seq.add(true);
+      seq.add(false);
+      seq.sort((BooleanComparator)((v1,v2)->{return Boolean.compare((Boolean)v1,(Boolean)v2);}));
+      Assertions.assertEquals(false,seq.getBoolean(0));
+      Assertions.assertEquals(true,seq.getBoolean(1));
+      seq.clear();
+      seq.add(true);
+      seq.add(false);
+      seq.sort((BooleanComparator)null);
+      Assertions.assertEquals(false,seq.getBoolean(0));
+      Assertions.assertEquals(true,seq.getBoolean(1));
+      Assertions.assertThrows(IllegalArgumentException.class,()->{
+        seq.sort((BooleanComparator)(v1,v2)->{throw new ArrayIndexOutOfBoundsException();});
+      });
+      Assertions.assertThrows(ConcurrentModificationException.class,()->{
+        seq.sort((BooleanComparator)(v1,v2)->{
+        seq.add(false);
+        throw new ArrayIndexOutOfBoundsException();
+        });
+      });
+      Assertions.assertThrows(IndexOutOfBoundsException.class,()->{
+        seq.sort((BooleanComparator)(v1,v2)->{throw new IndexOutOfBoundsException();});
+      });
+      Assertions.assertThrows(ConcurrentModificationException.class,()->{
+        seq.sort((BooleanComparator)(v1,v2)->{
+        seq.add(false);
+        throw new IndexOutOfBoundsException();
+        });
+      });
+      //TODO other cases
+    }
+    //#ENDIF
+  }
+  @Test
+  public void testRemoveAtIndexCheckedList()
+  {
+    {
+      var seq=new CheckedList();
+      for(int i=0;i<100;++i)
+      {
+        seq.add(TypeConversionUtil.convertToboolean(i));
+      }
+      int seqSize=seq.size();
+      int modCount=seq.modCount;
+      Assertions.assertEquals(TypeConversionUtil.convertToboolean(0),seq.removeBooleanAt(0));
+      Assertions.assertEquals(TypeConversionUtil.convertToboolean(seqSize-50),seq.removeBooleanAt(seqSize-51));
+      Assertions.assertEquals(TypeConversionUtil.convertToboolean(seqSize-1),seq.removeBooleanAt(seqSize-3));
+      Assertions.assertEquals(seqSize-3,seq.size());
+      var seqItr=seq.iterator();
+      for(int i=0;i<seqSize;++i)
+      {
+        if(i==0 || i == seqSize-50 || i==seqSize-1)
+        {
+          continue;
+        }
+        Assertions.assertEquals(seqItr.nextBoolean(),TypeConversionUtil.convertToboolean(i));
+      }
+      Assertions.assertEquals(seq.modCount,modCount+3);
+      Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.removeBooleanAt(-1));
+      Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.removeBooleanAt(seq.size()));
+    }
+  }
+  @Test
   public void testToArrayCheckedList()
   {
     var seq=new CheckedList();
@@ -1578,6 +1763,85 @@ public class BooleanArrSeqTest
       Assertions.assertEquals(seq.size(),0);
       Assertions.assertTrue(seq.isEmpty());
       Assertions.assertEquals(seq.arr.length,i);
+    }
+  }
+  @Test
+  public void testComparatorsortUncheckedSubList()
+  {
+    //#IFSWITCH UncheckedSubList==CheckedList,CheckedSubList
+    {
+      var root=new UncheckedList();
+      var subList=root.subList(0,0);
+      var seq=subList.subList(0,0);
+      //test empty
+      seq.sort((Comparator)null);
+      seq.add(true);
+      seq.add(false);
+      seq.sort((Comparator)((v1,v2)->{return Boolean.compare((Boolean)v1,(Boolean)v2);}));
+      Assertions.assertEquals(false,seq.getBoolean(0));
+      Assertions.assertEquals(true,seq.getBoolean(1));
+      seq.clear();
+      seq.add(true);
+      seq.add(false);
+      seq.sort((Comparator)null);
+      Assertions.assertEquals(false,seq.getBoolean(0));
+      Assertions.assertEquals(true,seq.getBoolean(1));
+      //TODO other cases
+    }
+    //#ENDIF
+  }
+  @Test
+  public void testBooleanComparatorsortUncheckedSubList()
+  {
+    //#IFSWITCH UncheckedSubList==CheckedList,CheckedSubList
+    {
+      var root=new UncheckedList();
+      var subList=root.subList(0,0);
+      var seq=subList.subList(0,0);
+      //test empty
+      seq.sort((BooleanComparator)null);
+      seq.add(true);
+      seq.add(false);
+      seq.sort((BooleanComparator)((v1,v2)->{return Boolean.compare((Boolean)v1,(Boolean)v2);}));
+      Assertions.assertEquals(false,seq.getBoolean(0));
+      Assertions.assertEquals(true,seq.getBoolean(1));
+      seq.clear();
+      seq.add(true);
+      seq.add(false);
+      seq.sort((BooleanComparator)null);
+      Assertions.assertEquals(false,seq.getBoolean(0));
+      Assertions.assertEquals(true,seq.getBoolean(1));
+      //TODO other cases
+    }
+    //#ENDIF
+  }
+  @Test
+  public void testRemoveAtIndexUncheckedSubList()
+  {
+    {
+      var root=new UncheckedList();
+      var subList=root.subList(0,0);
+      var seq=subList.subList(0,0);
+      for(int i=0;i<100;++i)
+      {
+        seq.add(TypeConversionUtil.convertToboolean(i));
+      }
+      int seqSize=seq.size();
+      Assertions.assertEquals(TypeConversionUtil.convertToboolean(0),seq.removeBooleanAt(0));
+      Assertions.assertEquals(TypeConversionUtil.convertToboolean(seqSize-50),seq.removeBooleanAt(seqSize-51));
+      Assertions.assertEquals(TypeConversionUtil.convertToboolean(seqSize-1),seq.removeBooleanAt(seqSize-3));
+      Assertions.assertEquals(seqSize-3,seq.size());
+      var seqItr=seq.iterator();
+      for(int i=0;i<seqSize;++i)
+      {
+        if(i==0 || i == seqSize-50 || i==seqSize-1)
+        {
+          continue;
+        }
+        Assertions.assertEquals(seqItr.nextBoolean(),TypeConversionUtil.convertToboolean(i));
+      }
+      Assertions.assertEquals(seqSize-3,subList.size());
+      Assertions.assertEquals(seqSize-3,root.size());
     }
   }
   @Test
@@ -1993,6 +2257,152 @@ public class BooleanArrSeqTest
         var val=TypeConversionUtil.convertToboolean(i+25);
         Assertions.assertEquals(val,subsubList.getBoolean(i-10));
       }
+    }
+  }
+  @Test
+  public void testComparatorsortCheckedSubList()
+  {
+    {
+      var root=new CheckedList();
+      var subList=root.subList(0,0);
+      var seq=subList.subList(0,0);
+      subList.add(false);
+      Assertions.assertThrows(ConcurrentModificationException.class,()->{
+        seq.sort((Comparator)null);
+      });
+    }
+    //#IFSWITCH CheckedSubList==CheckedList,CheckedSubList
+    {
+      var root=new CheckedList();
+      var subList=root.subList(0,0);
+      var seq=subList.subList(0,0);
+      //test empty
+      seq.sort((Comparator)null);
+      seq.add(true);
+      seq.add(false);
+      seq.sort((Comparator)((v1,v2)->{return Boolean.compare((Boolean)v1,(Boolean)v2);}));
+      Assertions.assertEquals(false,seq.getBoolean(0));
+      Assertions.assertEquals(true,seq.getBoolean(1));
+      seq.clear();
+      seq.add(true);
+      seq.add(false);
+      seq.sort((Comparator)null);
+      Assertions.assertEquals(false,seq.getBoolean(0));
+      Assertions.assertEquals(true,seq.getBoolean(1));
+      Assertions.assertThrows(IllegalArgumentException.class,()->{
+        seq.sort((Comparator)(v1,v2)->{throw new ArrayIndexOutOfBoundsException();});
+      });
+      Assertions.assertThrows(ConcurrentModificationException.class,()->{
+        seq.sort((Comparator)(v1,v2)->{
+        seq.add(false);
+        throw new ArrayIndexOutOfBoundsException();
+        });
+      });
+      Assertions.assertThrows(IndexOutOfBoundsException.class,()->{
+        seq.sort((Comparator)(v1,v2)->{throw new IndexOutOfBoundsException();});
+      });
+      Assertions.assertThrows(ConcurrentModificationException.class,()->{
+        seq.sort((Comparator)(v1,v2)->{
+        seq.add(false);
+        throw new IndexOutOfBoundsException();
+        });
+      });
+      //TODO other cases
+    }
+    //#ENDIF
+  }
+  @Test
+  public void testBooleanComparatorsortCheckedSubList()
+  {
+    {
+      var root=new CheckedList();
+      var subList=root.subList(0,0);
+      var seq=subList.subList(0,0);
+      subList.add(false);
+      Assertions.assertThrows(ConcurrentModificationException.class,()->{
+        seq.sort((BooleanComparator)null);
+      });
+    }
+    //#IFSWITCH CheckedSubList==CheckedList,CheckedSubList
+    {
+      var root=new CheckedList();
+      var subList=root.subList(0,0);
+      var seq=subList.subList(0,0);
+      //test empty
+      seq.sort((BooleanComparator)null);
+      seq.add(true);
+      seq.add(false);
+      seq.sort((BooleanComparator)((v1,v2)->{return Boolean.compare((Boolean)v1,(Boolean)v2);}));
+      Assertions.assertEquals(false,seq.getBoolean(0));
+      Assertions.assertEquals(true,seq.getBoolean(1));
+      seq.clear();
+      seq.add(true);
+      seq.add(false);
+      seq.sort((BooleanComparator)null);
+      Assertions.assertEquals(false,seq.getBoolean(0));
+      Assertions.assertEquals(true,seq.getBoolean(1));
+      Assertions.assertThrows(IllegalArgumentException.class,()->{
+        seq.sort((BooleanComparator)(v1,v2)->{throw new ArrayIndexOutOfBoundsException();});
+      });
+      Assertions.assertThrows(ConcurrentModificationException.class,()->{
+        seq.sort((BooleanComparator)(v1,v2)->{
+        seq.add(false);
+        throw new ArrayIndexOutOfBoundsException();
+        });
+      });
+      Assertions.assertThrows(IndexOutOfBoundsException.class,()->{
+        seq.sort((BooleanComparator)(v1,v2)->{throw new IndexOutOfBoundsException();});
+      });
+      Assertions.assertThrows(ConcurrentModificationException.class,()->{
+        seq.sort((BooleanComparator)(v1,v2)->{
+        seq.add(false);
+        throw new IndexOutOfBoundsException();
+        });
+      });
+      //TODO other cases
+    }
+    //#ENDIF
+  }
+  @Test
+  public void testRemoveAtIndexCheckedSubList()
+  {
+    {
+      var root=new CheckedList();
+      var subList=root.subList(0,0);
+      var seq=subList.subList(0,0);
+      subList.add(false);
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeBooleanAt(0));
+      subList.removeBooleanAt(0);
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeBooleanAt(0));
+    }
+    {
+      var root=new CheckedList();
+      var subList=root.subList(0,0);
+      var seq=subList.subList(0,0);
+      for(int i=0;i<100;++i)
+      {
+        seq.add(TypeConversionUtil.convertToboolean(i));
+      }
+      int seqSize=seq.size();
+      int modCount=root.modCount;
+      Assertions.assertEquals(TypeConversionUtil.convertToboolean(0),seq.removeBooleanAt(0));
+      Assertions.assertEquals(TypeConversionUtil.convertToboolean(seqSize-50),seq.removeBooleanAt(seqSize-51));
+      Assertions.assertEquals(TypeConversionUtil.convertToboolean(seqSize-1),seq.removeBooleanAt(seqSize-3));
+      Assertions.assertEquals(seqSize-3,seq.size());
+      var seqItr=seq.iterator();
+      for(int i=0;i<seqSize;++i)
+      {
+        if(i==0 || i == seqSize-50 || i==seqSize-1)
+        {
+          continue;
+        }
+        Assertions.assertEquals(seqItr.nextBoolean(),TypeConversionUtil.convertToboolean(i));
+      }
+      Assertions.assertEquals(seqSize-3,subList.size());
+      Assertions.assertEquals(seqSize-3,root.size());
+      Assertions.assertEquals(root.modCount,modCount+3);
+      Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.removeBooleanAt(-1));
+      Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.removeBooleanAt(seq.size()));
     }
   }
   @Test

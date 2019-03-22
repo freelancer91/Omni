@@ -10,8 +10,11 @@ import omni.impl.seq.FloatArrSeq.UncheckedStack;
 import omni.impl.seq.FloatArrSeq.CheckedStack;
 import java.util.ArrayList;
 import java.util.ConcurrentModificationException;
+import java.util.Comparator;
+import omni.function.FloatComparator;
 import java.util.function.Consumer;
 import omni.function.FloatConsumer;
+@SuppressWarnings({"rawtypes","unchecked"}) 
 public class FloatArrSeqTest
 {
 //TODO place sanity checks for checked sequence modification behavior
@@ -354,6 +357,100 @@ public class FloatArrSeqTest
       Assertions.assertEquals(seq.size(),0);
       Assertions.assertTrue(seq.isEmpty());
       Assertions.assertEquals(seq.arr.length,i);
+    }
+  }
+  @Test
+  public void testComparatorsortUncheckedList()
+  {
+    //#IFSWITCH UncheckedList==CheckedList,CheckedSubList
+    {
+      var seq=new UncheckedList();
+      //test empty
+      seq.sort((Comparator)null);
+      seq.add(TypeConversionUtil.convertTofloat(2));
+      seq.add(TypeConversionUtil.convertTofloat(1));
+      seq.sort((Comparator)((v1,v2)->{return Float.compare((Float)v1,(Float)v2);}));
+      Assertions.assertEquals(TypeConversionUtil.convertTofloat(1),seq.getFloat(0));
+      Assertions.assertEquals(TypeConversionUtil.convertTofloat(2),seq.getFloat(1));
+      seq.clear();
+      seq.add(TypeConversionUtil.convertTofloat(2));
+      seq.add(TypeConversionUtil.convertTofloat(1));
+      seq.sort((Comparator)null);
+      Assertions.assertEquals(TypeConversionUtil.convertTofloat(1),seq.getFloat(0));
+      Assertions.assertEquals(TypeConversionUtil.convertTofloat(2),seq.getFloat(1));
+      //TODO other cases
+    }
+    //#ENDIF
+  }
+  @Test
+  public void testFloatComparatorsortUncheckedList()
+  {
+    //#IFSWITCH UncheckedList==CheckedList,CheckedSubList
+    {
+      var seq=new UncheckedList();
+      //test empty
+      seq.sort((FloatComparator)null);
+      seq.add(TypeConversionUtil.convertTofloat(2));
+      seq.add(TypeConversionUtil.convertTofloat(1));
+      seq.sort((FloatComparator)((v1,v2)->{return Float.compare((Float)v1,(Float)v2);}));
+      Assertions.assertEquals(TypeConversionUtil.convertTofloat(1),seq.getFloat(0));
+      Assertions.assertEquals(TypeConversionUtil.convertTofloat(2),seq.getFloat(1));
+      seq.clear();
+      seq.add(TypeConversionUtil.convertTofloat(2));
+      seq.add(TypeConversionUtil.convertTofloat(1));
+      seq.sort((FloatComparator)null);
+      Assertions.assertEquals(TypeConversionUtil.convertTofloat(1),seq.getFloat(0));
+      Assertions.assertEquals(TypeConversionUtil.convertTofloat(2),seq.getFloat(1));
+      //TODO other cases
+    }
+    //#ENDIF
+  }
+  @Test
+  public void testFloatComparatorunstableSortUncheckedList()
+  {
+    //#IFSWITCH UncheckedList==CheckedList,CheckedSubList
+    {
+      var seq=new UncheckedList();
+      //test empty
+      seq.unstableSort((FloatComparator)null);
+      seq.add(TypeConversionUtil.convertTofloat(2));
+      seq.add(TypeConversionUtil.convertTofloat(1));
+      seq.unstableSort((FloatComparator)((v1,v2)->{return Float.compare((Float)v1,(Float)v2);}));
+      Assertions.assertEquals(TypeConversionUtil.convertTofloat(1),seq.getFloat(0));
+      Assertions.assertEquals(TypeConversionUtil.convertTofloat(2),seq.getFloat(1));
+      seq.clear();
+      seq.add(TypeConversionUtil.convertTofloat(2));
+      seq.add(TypeConversionUtil.convertTofloat(1));
+      seq.unstableSort((FloatComparator)null);
+      Assertions.assertEquals(TypeConversionUtil.convertTofloat(1),seq.getFloat(0));
+      Assertions.assertEquals(TypeConversionUtil.convertTofloat(2),seq.getFloat(1));
+      //TODO other cases
+    }
+    //#ENDIF
+  }
+  @Test
+  public void testRemoveAtIndexUncheckedList()
+  {
+    {
+      var seq=new UncheckedList();
+      for(int i=0;i<100;++i)
+      {
+        seq.add(TypeConversionUtil.convertTofloat(i));
+      }
+      int seqSize=seq.size();
+      Assertions.assertEquals(TypeConversionUtil.convertTofloat(0),seq.removeFloatAt(0));
+      Assertions.assertEquals(TypeConversionUtil.convertTofloat(seqSize-50),seq.removeFloatAt(seqSize-51));
+      Assertions.assertEquals(TypeConversionUtil.convertTofloat(seqSize-1),seq.removeFloatAt(seqSize-3));
+      Assertions.assertEquals(seqSize-3,seq.size());
+      var seqItr=seq.iterator();
+      for(int i=0;i<seqSize;++i)
+      {
+        if(i==0 || i == seqSize-50 || i==seqSize-1)
+        {
+          continue;
+        }
+        Assertions.assertEquals(seqItr.nextFloat(),TypeConversionUtil.convertTofloat(i));
+      }
     }
   }
   @Test
@@ -1033,6 +1130,158 @@ public class FloatArrSeqTest
     }
   }
   @Test
+  public void testComparatorsortCheckedList()
+  {
+    //#IFSWITCH CheckedList==CheckedList,CheckedSubList
+    {
+      var seq=new CheckedList();
+      //test empty
+      seq.sort((Comparator)null);
+      seq.add(TypeConversionUtil.convertTofloat(2));
+      seq.add(TypeConversionUtil.convertTofloat(1));
+      seq.sort((Comparator)((v1,v2)->{return Float.compare((Float)v1,(Float)v2);}));
+      Assertions.assertEquals(TypeConversionUtil.convertTofloat(1),seq.getFloat(0));
+      Assertions.assertEquals(TypeConversionUtil.convertTofloat(2),seq.getFloat(1));
+      seq.clear();
+      seq.add(TypeConversionUtil.convertTofloat(2));
+      seq.add(TypeConversionUtil.convertTofloat(1));
+      seq.sort((Comparator)null);
+      Assertions.assertEquals(TypeConversionUtil.convertTofloat(1),seq.getFloat(0));
+      Assertions.assertEquals(TypeConversionUtil.convertTofloat(2),seq.getFloat(1));
+      Assertions.assertThrows(IllegalArgumentException.class,()->{
+        seq.sort((Comparator)(v1,v2)->{throw new ArrayIndexOutOfBoundsException();});
+      });
+      Assertions.assertThrows(ConcurrentModificationException.class,()->{
+        seq.sort((Comparator)(v1,v2)->{
+        seq.add(Float.NaN);
+        throw new ArrayIndexOutOfBoundsException();
+        });
+      });
+      Assertions.assertThrows(IndexOutOfBoundsException.class,()->{
+        seq.sort((Comparator)(v1,v2)->{throw new IndexOutOfBoundsException();});
+      });
+      Assertions.assertThrows(ConcurrentModificationException.class,()->{
+        seq.sort((Comparator)(v1,v2)->{
+        seq.add(Float.NaN);
+        throw new IndexOutOfBoundsException();
+        });
+      });
+      //TODO other cases
+    }
+    //#ENDIF
+  }
+  @Test
+  public void testFloatComparatorsortCheckedList()
+  {
+    //#IFSWITCH CheckedList==CheckedList,CheckedSubList
+    {
+      var seq=new CheckedList();
+      //test empty
+      seq.sort((FloatComparator)null);
+      seq.add(TypeConversionUtil.convertTofloat(2));
+      seq.add(TypeConversionUtil.convertTofloat(1));
+      seq.sort((FloatComparator)((v1,v2)->{return Float.compare((Float)v1,(Float)v2);}));
+      Assertions.assertEquals(TypeConversionUtil.convertTofloat(1),seq.getFloat(0));
+      Assertions.assertEquals(TypeConversionUtil.convertTofloat(2),seq.getFloat(1));
+      seq.clear();
+      seq.add(TypeConversionUtil.convertTofloat(2));
+      seq.add(TypeConversionUtil.convertTofloat(1));
+      seq.sort((FloatComparator)null);
+      Assertions.assertEquals(TypeConversionUtil.convertTofloat(1),seq.getFloat(0));
+      Assertions.assertEquals(TypeConversionUtil.convertTofloat(2),seq.getFloat(1));
+      Assertions.assertThrows(IllegalArgumentException.class,()->{
+        seq.sort((FloatComparator)(v1,v2)->{throw new ArrayIndexOutOfBoundsException();});
+      });
+      Assertions.assertThrows(ConcurrentModificationException.class,()->{
+        seq.sort((FloatComparator)(v1,v2)->{
+        seq.add(Float.NaN);
+        throw new ArrayIndexOutOfBoundsException();
+        });
+      });
+      Assertions.assertThrows(IndexOutOfBoundsException.class,()->{
+        seq.sort((FloatComparator)(v1,v2)->{throw new IndexOutOfBoundsException();});
+      });
+      Assertions.assertThrows(ConcurrentModificationException.class,()->{
+        seq.sort((FloatComparator)(v1,v2)->{
+        seq.add(Float.NaN);
+        throw new IndexOutOfBoundsException();
+        });
+      });
+      //TODO other cases
+    }
+    //#ENDIF
+  }
+  @Test
+  public void testFloatComparatorunstableSortCheckedList()
+  {
+    //#IFSWITCH CheckedList==CheckedList,CheckedSubList
+    {
+      var seq=new CheckedList();
+      //test empty
+      seq.unstableSort((FloatComparator)null);
+      seq.add(TypeConversionUtil.convertTofloat(2));
+      seq.add(TypeConversionUtil.convertTofloat(1));
+      seq.unstableSort((FloatComparator)((v1,v2)->{return Float.compare((Float)v1,(Float)v2);}));
+      Assertions.assertEquals(TypeConversionUtil.convertTofloat(1),seq.getFloat(0));
+      Assertions.assertEquals(TypeConversionUtil.convertTofloat(2),seq.getFloat(1));
+      seq.clear();
+      seq.add(TypeConversionUtil.convertTofloat(2));
+      seq.add(TypeConversionUtil.convertTofloat(1));
+      seq.unstableSort((FloatComparator)null);
+      Assertions.assertEquals(TypeConversionUtil.convertTofloat(1),seq.getFloat(0));
+      Assertions.assertEquals(TypeConversionUtil.convertTofloat(2),seq.getFloat(1));
+      Assertions.assertThrows(IllegalArgumentException.class,()->{
+        seq.unstableSort((FloatComparator)(v1,v2)->{throw new ArrayIndexOutOfBoundsException();});
+      });
+      Assertions.assertThrows(ConcurrentModificationException.class,()->{
+        seq.unstableSort((FloatComparator)(v1,v2)->{
+        seq.add(Float.NaN);
+        throw new ArrayIndexOutOfBoundsException();
+        });
+      });
+      Assertions.assertThrows(IndexOutOfBoundsException.class,()->{
+        seq.unstableSort((FloatComparator)(v1,v2)->{throw new IndexOutOfBoundsException();});
+      });
+      Assertions.assertThrows(ConcurrentModificationException.class,()->{
+        seq.unstableSort((FloatComparator)(v1,v2)->{
+        seq.add(Float.NaN);
+        throw new IndexOutOfBoundsException();
+        });
+      });
+      //TODO other cases
+    }
+    //#ENDIF
+  }
+  @Test
+  public void testRemoveAtIndexCheckedList()
+  {
+    {
+      var seq=new CheckedList();
+      for(int i=0;i<100;++i)
+      {
+        seq.add(TypeConversionUtil.convertTofloat(i));
+      }
+      int seqSize=seq.size();
+      int modCount=seq.modCount;
+      Assertions.assertEquals(TypeConversionUtil.convertTofloat(0),seq.removeFloatAt(0));
+      Assertions.assertEquals(TypeConversionUtil.convertTofloat(seqSize-50),seq.removeFloatAt(seqSize-51));
+      Assertions.assertEquals(TypeConversionUtil.convertTofloat(seqSize-1),seq.removeFloatAt(seqSize-3));
+      Assertions.assertEquals(seqSize-3,seq.size());
+      var seqItr=seq.iterator();
+      for(int i=0;i<seqSize;++i)
+      {
+        if(i==0 || i == seqSize-50 || i==seqSize-1)
+        {
+          continue;
+        }
+        Assertions.assertEquals(seqItr.nextFloat(),TypeConversionUtil.convertTofloat(i));
+      }
+      Assertions.assertEquals(seq.modCount,modCount+3);
+      Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.removeFloatAt(-1));
+      Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.removeFloatAt(seq.size()));
+    }
+  }
+  @Test
   public void testToArrayCheckedList()
   {
     var seq=new CheckedList();
@@ -1362,6 +1611,110 @@ public class FloatArrSeqTest
       Assertions.assertEquals(seq.size(),0);
       Assertions.assertTrue(seq.isEmpty());
       Assertions.assertEquals(seq.arr.length,i);
+    }
+  }
+  @Test
+  public void testComparatorsortUncheckedSubList()
+  {
+    //#IFSWITCH UncheckedSubList==CheckedList,CheckedSubList
+    {
+      var root=new UncheckedList();
+      var subList=root.subList(0,0);
+      var seq=subList.subList(0,0);
+      //test empty
+      seq.sort((Comparator)null);
+      seq.add(TypeConversionUtil.convertTofloat(2));
+      seq.add(TypeConversionUtil.convertTofloat(1));
+      seq.sort((Comparator)((v1,v2)->{return Float.compare((Float)v1,(Float)v2);}));
+      Assertions.assertEquals(TypeConversionUtil.convertTofloat(1),seq.getFloat(0));
+      Assertions.assertEquals(TypeConversionUtil.convertTofloat(2),seq.getFloat(1));
+      seq.clear();
+      seq.add(TypeConversionUtil.convertTofloat(2));
+      seq.add(TypeConversionUtil.convertTofloat(1));
+      seq.sort((Comparator)null);
+      Assertions.assertEquals(TypeConversionUtil.convertTofloat(1),seq.getFloat(0));
+      Assertions.assertEquals(TypeConversionUtil.convertTofloat(2),seq.getFloat(1));
+      //TODO other cases
+    }
+    //#ENDIF
+  }
+  @Test
+  public void testFloatComparatorsortUncheckedSubList()
+  {
+    //#IFSWITCH UncheckedSubList==CheckedList,CheckedSubList
+    {
+      var root=new UncheckedList();
+      var subList=root.subList(0,0);
+      var seq=subList.subList(0,0);
+      //test empty
+      seq.sort((FloatComparator)null);
+      seq.add(TypeConversionUtil.convertTofloat(2));
+      seq.add(TypeConversionUtil.convertTofloat(1));
+      seq.sort((FloatComparator)((v1,v2)->{return Float.compare((Float)v1,(Float)v2);}));
+      Assertions.assertEquals(TypeConversionUtil.convertTofloat(1),seq.getFloat(0));
+      Assertions.assertEquals(TypeConversionUtil.convertTofloat(2),seq.getFloat(1));
+      seq.clear();
+      seq.add(TypeConversionUtil.convertTofloat(2));
+      seq.add(TypeConversionUtil.convertTofloat(1));
+      seq.sort((FloatComparator)null);
+      Assertions.assertEquals(TypeConversionUtil.convertTofloat(1),seq.getFloat(0));
+      Assertions.assertEquals(TypeConversionUtil.convertTofloat(2),seq.getFloat(1));
+      //TODO other cases
+    }
+    //#ENDIF
+  }
+  @Test
+  public void testFloatComparatorunstableSortUncheckedSubList()
+  {
+    //#IFSWITCH UncheckedSubList==CheckedList,CheckedSubList
+    {
+      var root=new UncheckedList();
+      var subList=root.subList(0,0);
+      var seq=subList.subList(0,0);
+      //test empty
+      seq.unstableSort((FloatComparator)null);
+      seq.add(TypeConversionUtil.convertTofloat(2));
+      seq.add(TypeConversionUtil.convertTofloat(1));
+      seq.unstableSort((FloatComparator)((v1,v2)->{return Float.compare((Float)v1,(Float)v2);}));
+      Assertions.assertEquals(TypeConversionUtil.convertTofloat(1),seq.getFloat(0));
+      Assertions.assertEquals(TypeConversionUtil.convertTofloat(2),seq.getFloat(1));
+      seq.clear();
+      seq.add(TypeConversionUtil.convertTofloat(2));
+      seq.add(TypeConversionUtil.convertTofloat(1));
+      seq.unstableSort((FloatComparator)null);
+      Assertions.assertEquals(TypeConversionUtil.convertTofloat(1),seq.getFloat(0));
+      Assertions.assertEquals(TypeConversionUtil.convertTofloat(2),seq.getFloat(1));
+      //TODO other cases
+    }
+    //#ENDIF
+  }
+  @Test
+  public void testRemoveAtIndexUncheckedSubList()
+  {
+    {
+      var root=new UncheckedList();
+      var subList=root.subList(0,0);
+      var seq=subList.subList(0,0);
+      for(int i=0;i<100;++i)
+      {
+        seq.add(TypeConversionUtil.convertTofloat(i));
+      }
+      int seqSize=seq.size();
+      Assertions.assertEquals(TypeConversionUtil.convertTofloat(0),seq.removeFloatAt(0));
+      Assertions.assertEquals(TypeConversionUtil.convertTofloat(seqSize-50),seq.removeFloatAt(seqSize-51));
+      Assertions.assertEquals(TypeConversionUtil.convertTofloat(seqSize-1),seq.removeFloatAt(seqSize-3));
+      Assertions.assertEquals(seqSize-3,seq.size());
+      var seqItr=seq.iterator();
+      for(int i=0;i<seqSize;++i)
+      {
+        if(i==0 || i == seqSize-50 || i==seqSize-1)
+        {
+          continue;
+        }
+        Assertions.assertEquals(seqItr.nextFloat(),TypeConversionUtil.convertTofloat(i));
+      }
+      Assertions.assertEquals(seqSize-3,subList.size());
+      Assertions.assertEquals(seqSize-3,root.size());
     }
   }
   @Test
@@ -1723,6 +2076,204 @@ public class FloatArrSeqTest
         var val=TypeConversionUtil.convertTofloat(i+25);
         Assertions.assertEquals(val,subsubList.getFloat(i-10));
       }
+    }
+  }
+  @Test
+  public void testComparatorsortCheckedSubList()
+  {
+    {
+      var root=new CheckedList();
+      var subList=root.subList(0,0);
+      var seq=subList.subList(0,0);
+      subList.add(Float.NaN);
+      Assertions.assertThrows(ConcurrentModificationException.class,()->{
+        seq.sort((Comparator)null);
+      });
+    }
+    //#IFSWITCH CheckedSubList==CheckedList,CheckedSubList
+    {
+      var root=new CheckedList();
+      var subList=root.subList(0,0);
+      var seq=subList.subList(0,0);
+      //test empty
+      seq.sort((Comparator)null);
+      seq.add(TypeConversionUtil.convertTofloat(2));
+      seq.add(TypeConversionUtil.convertTofloat(1));
+      seq.sort((Comparator)((v1,v2)->{return Float.compare((Float)v1,(Float)v2);}));
+      Assertions.assertEquals(TypeConversionUtil.convertTofloat(1),seq.getFloat(0));
+      Assertions.assertEquals(TypeConversionUtil.convertTofloat(2),seq.getFloat(1));
+      seq.clear();
+      seq.add(TypeConversionUtil.convertTofloat(2));
+      seq.add(TypeConversionUtil.convertTofloat(1));
+      seq.sort((Comparator)null);
+      Assertions.assertEquals(TypeConversionUtil.convertTofloat(1),seq.getFloat(0));
+      Assertions.assertEquals(TypeConversionUtil.convertTofloat(2),seq.getFloat(1));
+      Assertions.assertThrows(IllegalArgumentException.class,()->{
+        seq.sort((Comparator)(v1,v2)->{throw new ArrayIndexOutOfBoundsException();});
+      });
+      Assertions.assertThrows(ConcurrentModificationException.class,()->{
+        seq.sort((Comparator)(v1,v2)->{
+        seq.add(Float.NaN);
+        throw new ArrayIndexOutOfBoundsException();
+        });
+      });
+      Assertions.assertThrows(IndexOutOfBoundsException.class,()->{
+        seq.sort((Comparator)(v1,v2)->{throw new IndexOutOfBoundsException();});
+      });
+      Assertions.assertThrows(ConcurrentModificationException.class,()->{
+        seq.sort((Comparator)(v1,v2)->{
+        seq.add(Float.NaN);
+        throw new IndexOutOfBoundsException();
+        });
+      });
+      //TODO other cases
+    }
+    //#ENDIF
+  }
+  @Test
+  public void testFloatComparatorsortCheckedSubList()
+  {
+    {
+      var root=new CheckedList();
+      var subList=root.subList(0,0);
+      var seq=subList.subList(0,0);
+      subList.add(Float.NaN);
+      Assertions.assertThrows(ConcurrentModificationException.class,()->{
+        seq.sort((FloatComparator)null);
+      });
+    }
+    //#IFSWITCH CheckedSubList==CheckedList,CheckedSubList
+    {
+      var root=new CheckedList();
+      var subList=root.subList(0,0);
+      var seq=subList.subList(0,0);
+      //test empty
+      seq.sort((FloatComparator)null);
+      seq.add(TypeConversionUtil.convertTofloat(2));
+      seq.add(TypeConversionUtil.convertTofloat(1));
+      seq.sort((FloatComparator)((v1,v2)->{return Float.compare((Float)v1,(Float)v2);}));
+      Assertions.assertEquals(TypeConversionUtil.convertTofloat(1),seq.getFloat(0));
+      Assertions.assertEquals(TypeConversionUtil.convertTofloat(2),seq.getFloat(1));
+      seq.clear();
+      seq.add(TypeConversionUtil.convertTofloat(2));
+      seq.add(TypeConversionUtil.convertTofloat(1));
+      seq.sort((FloatComparator)null);
+      Assertions.assertEquals(TypeConversionUtil.convertTofloat(1),seq.getFloat(0));
+      Assertions.assertEquals(TypeConversionUtil.convertTofloat(2),seq.getFloat(1));
+      Assertions.assertThrows(IllegalArgumentException.class,()->{
+        seq.sort((FloatComparator)(v1,v2)->{throw new ArrayIndexOutOfBoundsException();});
+      });
+      Assertions.assertThrows(ConcurrentModificationException.class,()->{
+        seq.sort((FloatComparator)(v1,v2)->{
+        seq.add(Float.NaN);
+        throw new ArrayIndexOutOfBoundsException();
+        });
+      });
+      Assertions.assertThrows(IndexOutOfBoundsException.class,()->{
+        seq.sort((FloatComparator)(v1,v2)->{throw new IndexOutOfBoundsException();});
+      });
+      Assertions.assertThrows(ConcurrentModificationException.class,()->{
+        seq.sort((FloatComparator)(v1,v2)->{
+        seq.add(Float.NaN);
+        throw new IndexOutOfBoundsException();
+        });
+      });
+      //TODO other cases
+    }
+    //#ENDIF
+  }
+  @Test
+  public void testFloatComparatorunstableSortCheckedSubList()
+  {
+    {
+      var root=new CheckedList();
+      var subList=root.subList(0,0);
+      var seq=subList.subList(0,0);
+      subList.add(Float.NaN);
+      Assertions.assertThrows(ConcurrentModificationException.class,()->{
+        seq.unstableSort((FloatComparator)null);
+      });
+    }
+    //#IFSWITCH CheckedSubList==CheckedList,CheckedSubList
+    {
+      var root=new CheckedList();
+      var subList=root.subList(0,0);
+      var seq=subList.subList(0,0);
+      //test empty
+      seq.unstableSort((FloatComparator)null);
+      seq.add(TypeConversionUtil.convertTofloat(2));
+      seq.add(TypeConversionUtil.convertTofloat(1));
+      seq.unstableSort((FloatComparator)((v1,v2)->{return Float.compare((Float)v1,(Float)v2);}));
+      Assertions.assertEquals(TypeConversionUtil.convertTofloat(1),seq.getFloat(0));
+      Assertions.assertEquals(TypeConversionUtil.convertTofloat(2),seq.getFloat(1));
+      seq.clear();
+      seq.add(TypeConversionUtil.convertTofloat(2));
+      seq.add(TypeConversionUtil.convertTofloat(1));
+      seq.unstableSort((FloatComparator)null);
+      Assertions.assertEquals(TypeConversionUtil.convertTofloat(1),seq.getFloat(0));
+      Assertions.assertEquals(TypeConversionUtil.convertTofloat(2),seq.getFloat(1));
+      Assertions.assertThrows(IllegalArgumentException.class,()->{
+        seq.unstableSort((FloatComparator)(v1,v2)->{throw new ArrayIndexOutOfBoundsException();});
+      });
+      Assertions.assertThrows(ConcurrentModificationException.class,()->{
+        seq.unstableSort((FloatComparator)(v1,v2)->{
+        seq.add(Float.NaN);
+        throw new ArrayIndexOutOfBoundsException();
+        });
+      });
+      Assertions.assertThrows(IndexOutOfBoundsException.class,()->{
+        seq.unstableSort((FloatComparator)(v1,v2)->{throw new IndexOutOfBoundsException();});
+      });
+      Assertions.assertThrows(ConcurrentModificationException.class,()->{
+        seq.unstableSort((FloatComparator)(v1,v2)->{
+        seq.add(Float.NaN);
+        throw new IndexOutOfBoundsException();
+        });
+      });
+      //TODO other cases
+    }
+    //#ENDIF
+  }
+  @Test
+  public void testRemoveAtIndexCheckedSubList()
+  {
+    {
+      var root=new CheckedList();
+      var subList=root.subList(0,0);
+      var seq=subList.subList(0,0);
+      subList.add(Float.NaN);
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeFloatAt(0));
+      subList.removeFloatAt(0);
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeFloatAt(0));
+    }
+    {
+      var root=new CheckedList();
+      var subList=root.subList(0,0);
+      var seq=subList.subList(0,0);
+      for(int i=0;i<100;++i)
+      {
+        seq.add(TypeConversionUtil.convertTofloat(i));
+      }
+      int seqSize=seq.size();
+      int modCount=root.modCount;
+      Assertions.assertEquals(TypeConversionUtil.convertTofloat(0),seq.removeFloatAt(0));
+      Assertions.assertEquals(TypeConversionUtil.convertTofloat(seqSize-50),seq.removeFloatAt(seqSize-51));
+      Assertions.assertEquals(TypeConversionUtil.convertTofloat(seqSize-1),seq.removeFloatAt(seqSize-3));
+      Assertions.assertEquals(seqSize-3,seq.size());
+      var seqItr=seq.iterator();
+      for(int i=0;i<seqSize;++i)
+      {
+        if(i==0 || i == seqSize-50 || i==seqSize-1)
+        {
+          continue;
+        }
+        Assertions.assertEquals(seqItr.nextFloat(),TypeConversionUtil.convertTofloat(i));
+      }
+      Assertions.assertEquals(seqSize-3,subList.size());
+      Assertions.assertEquals(seqSize-3,root.size());
+      Assertions.assertEquals(root.modCount,modCount+3);
+      Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.removeFloatAt(-1));
+      Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.removeFloatAt(seq.size()));
     }
   }
   @Test

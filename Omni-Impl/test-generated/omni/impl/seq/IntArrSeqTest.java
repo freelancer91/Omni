@@ -10,8 +10,11 @@ import omni.impl.seq.IntArrSeq.UncheckedStack;
 import omni.impl.seq.IntArrSeq.CheckedStack;
 import java.util.ArrayList;
 import java.util.ConcurrentModificationException;
+import java.util.Comparator;
+import java.util.function.IntBinaryOperator;
 import java.util.function.Consumer;
 import java.util.function.IntConsumer;
+@SuppressWarnings({"rawtypes","unchecked"}) 
 public class IntArrSeqTest
 {
 //TODO place sanity checks for checked sequence modification behavior
@@ -372,6 +375,100 @@ public class IntArrSeqTest
       Assertions.assertEquals(seq.size(),0);
       Assertions.assertTrue(seq.isEmpty());
       Assertions.assertEquals(seq.arr.length,i);
+    }
+  }
+  @Test
+  public void testComparatorsortUncheckedList()
+  {
+    //#IFSWITCH UncheckedList==CheckedList,CheckedSubList
+    {
+      var seq=new UncheckedList();
+      //test empty
+      seq.sort((Comparator)null);
+      seq.add(TypeConversionUtil.convertToint(2));
+      seq.add(TypeConversionUtil.convertToint(1));
+      seq.sort((Comparator)((v1,v2)->{return Integer.compare((Integer)v1,(Integer)v2);}));
+      Assertions.assertEquals(TypeConversionUtil.convertToint(1),seq.getInt(0));
+      Assertions.assertEquals(TypeConversionUtil.convertToint(2),seq.getInt(1));
+      seq.clear();
+      seq.add(TypeConversionUtil.convertToint(2));
+      seq.add(TypeConversionUtil.convertToint(1));
+      seq.sort((Comparator)null);
+      Assertions.assertEquals(TypeConversionUtil.convertToint(1),seq.getInt(0));
+      Assertions.assertEquals(TypeConversionUtil.convertToint(2),seq.getInt(1));
+      //TODO other cases
+    }
+    //#ENDIF
+  }
+  @Test
+  public void testIntBinaryOperatorsortUncheckedList()
+  {
+    //#IFSWITCH UncheckedList==CheckedList,CheckedSubList
+    {
+      var seq=new UncheckedList();
+      //test empty
+      seq.sort((IntBinaryOperator)null);
+      seq.add(TypeConversionUtil.convertToint(2));
+      seq.add(TypeConversionUtil.convertToint(1));
+      seq.sort((IntBinaryOperator)((v1,v2)->{return Integer.compare((Integer)v1,(Integer)v2);}));
+      Assertions.assertEquals(TypeConversionUtil.convertToint(1),seq.getInt(0));
+      Assertions.assertEquals(TypeConversionUtil.convertToint(2),seq.getInt(1));
+      seq.clear();
+      seq.add(TypeConversionUtil.convertToint(2));
+      seq.add(TypeConversionUtil.convertToint(1));
+      seq.sort((IntBinaryOperator)null);
+      Assertions.assertEquals(TypeConversionUtil.convertToint(1),seq.getInt(0));
+      Assertions.assertEquals(TypeConversionUtil.convertToint(2),seq.getInt(1));
+      //TODO other cases
+    }
+    //#ENDIF
+  }
+  @Test
+  public void testIntBinaryOperatorunstableSortUncheckedList()
+  {
+    //#IFSWITCH UncheckedList==CheckedList,CheckedSubList
+    {
+      var seq=new UncheckedList();
+      //test empty
+      seq.unstableSort((IntBinaryOperator)null);
+      seq.add(TypeConversionUtil.convertToint(2));
+      seq.add(TypeConversionUtil.convertToint(1));
+      seq.unstableSort((IntBinaryOperator)((v1,v2)->{return Integer.compare((Integer)v1,(Integer)v2);}));
+      Assertions.assertEquals(TypeConversionUtil.convertToint(1),seq.getInt(0));
+      Assertions.assertEquals(TypeConversionUtil.convertToint(2),seq.getInt(1));
+      seq.clear();
+      seq.add(TypeConversionUtil.convertToint(2));
+      seq.add(TypeConversionUtil.convertToint(1));
+      seq.unstableSort((IntBinaryOperator)null);
+      Assertions.assertEquals(TypeConversionUtil.convertToint(1),seq.getInt(0));
+      Assertions.assertEquals(TypeConversionUtil.convertToint(2),seq.getInt(1));
+      //TODO other cases
+    }
+    //#ENDIF
+  }
+  @Test
+  public void testRemoveAtIndexUncheckedList()
+  {
+    {
+      var seq=new UncheckedList();
+      for(int i=0;i<100;++i)
+      {
+        seq.add(TypeConversionUtil.convertToint(i));
+      }
+      int seqSize=seq.size();
+      Assertions.assertEquals(TypeConversionUtil.convertToint(0),seq.removeIntAt(0));
+      Assertions.assertEquals(TypeConversionUtil.convertToint(seqSize-50),seq.removeIntAt(seqSize-51));
+      Assertions.assertEquals(TypeConversionUtil.convertToint(seqSize-1),seq.removeIntAt(seqSize-3));
+      Assertions.assertEquals(seqSize-3,seq.size());
+      var seqItr=seq.iterator();
+      for(int i=0;i<seqSize;++i)
+      {
+        if(i==0 || i == seqSize-50 || i==seqSize-1)
+        {
+          continue;
+        }
+        Assertions.assertEquals(seqItr.nextInt(),TypeConversionUtil.convertToint(i));
+      }
     }
   }
   @Test
@@ -1087,6 +1184,158 @@ public class IntArrSeqTest
     }
   }
   @Test
+  public void testComparatorsortCheckedList()
+  {
+    //#IFSWITCH CheckedList==CheckedList,CheckedSubList
+    {
+      var seq=new CheckedList();
+      //test empty
+      seq.sort((Comparator)null);
+      seq.add(TypeConversionUtil.convertToint(2));
+      seq.add(TypeConversionUtil.convertToint(1));
+      seq.sort((Comparator)((v1,v2)->{return Integer.compare((Integer)v1,(Integer)v2);}));
+      Assertions.assertEquals(TypeConversionUtil.convertToint(1),seq.getInt(0));
+      Assertions.assertEquals(TypeConversionUtil.convertToint(2),seq.getInt(1));
+      seq.clear();
+      seq.add(TypeConversionUtil.convertToint(2));
+      seq.add(TypeConversionUtil.convertToint(1));
+      seq.sort((Comparator)null);
+      Assertions.assertEquals(TypeConversionUtil.convertToint(1),seq.getInt(0));
+      Assertions.assertEquals(TypeConversionUtil.convertToint(2),seq.getInt(1));
+      Assertions.assertThrows(IllegalArgumentException.class,()->{
+        seq.sort((Comparator)(v1,v2)->{throw new ArrayIndexOutOfBoundsException();});
+      });
+      Assertions.assertThrows(ConcurrentModificationException.class,()->{
+        seq.sort((Comparator)(v1,v2)->{
+        seq.add(Integer.MIN_VALUE);
+        throw new ArrayIndexOutOfBoundsException();
+        });
+      });
+      Assertions.assertThrows(IndexOutOfBoundsException.class,()->{
+        seq.sort((Comparator)(v1,v2)->{throw new IndexOutOfBoundsException();});
+      });
+      Assertions.assertThrows(ConcurrentModificationException.class,()->{
+        seq.sort((Comparator)(v1,v2)->{
+        seq.add(Integer.MIN_VALUE);
+        throw new IndexOutOfBoundsException();
+        });
+      });
+      //TODO other cases
+    }
+    //#ENDIF
+  }
+  @Test
+  public void testIntBinaryOperatorsortCheckedList()
+  {
+    //#IFSWITCH CheckedList==CheckedList,CheckedSubList
+    {
+      var seq=new CheckedList();
+      //test empty
+      seq.sort((IntBinaryOperator)null);
+      seq.add(TypeConversionUtil.convertToint(2));
+      seq.add(TypeConversionUtil.convertToint(1));
+      seq.sort((IntBinaryOperator)((v1,v2)->{return Integer.compare((Integer)v1,(Integer)v2);}));
+      Assertions.assertEquals(TypeConversionUtil.convertToint(1),seq.getInt(0));
+      Assertions.assertEquals(TypeConversionUtil.convertToint(2),seq.getInt(1));
+      seq.clear();
+      seq.add(TypeConversionUtil.convertToint(2));
+      seq.add(TypeConversionUtil.convertToint(1));
+      seq.sort((IntBinaryOperator)null);
+      Assertions.assertEquals(TypeConversionUtil.convertToint(1),seq.getInt(0));
+      Assertions.assertEquals(TypeConversionUtil.convertToint(2),seq.getInt(1));
+      Assertions.assertThrows(IllegalArgumentException.class,()->{
+        seq.sort((IntBinaryOperator)(v1,v2)->{throw new ArrayIndexOutOfBoundsException();});
+      });
+      Assertions.assertThrows(ConcurrentModificationException.class,()->{
+        seq.sort((IntBinaryOperator)(v1,v2)->{
+        seq.add(Integer.MIN_VALUE);
+        throw new ArrayIndexOutOfBoundsException();
+        });
+      });
+      Assertions.assertThrows(IndexOutOfBoundsException.class,()->{
+        seq.sort((IntBinaryOperator)(v1,v2)->{throw new IndexOutOfBoundsException();});
+      });
+      Assertions.assertThrows(ConcurrentModificationException.class,()->{
+        seq.sort((IntBinaryOperator)(v1,v2)->{
+        seq.add(Integer.MIN_VALUE);
+        throw new IndexOutOfBoundsException();
+        });
+      });
+      //TODO other cases
+    }
+    //#ENDIF
+  }
+  @Test
+  public void testIntBinaryOperatorunstableSortCheckedList()
+  {
+    //#IFSWITCH CheckedList==CheckedList,CheckedSubList
+    {
+      var seq=new CheckedList();
+      //test empty
+      seq.unstableSort((IntBinaryOperator)null);
+      seq.add(TypeConversionUtil.convertToint(2));
+      seq.add(TypeConversionUtil.convertToint(1));
+      seq.unstableSort((IntBinaryOperator)((v1,v2)->{return Integer.compare((Integer)v1,(Integer)v2);}));
+      Assertions.assertEquals(TypeConversionUtil.convertToint(1),seq.getInt(0));
+      Assertions.assertEquals(TypeConversionUtil.convertToint(2),seq.getInt(1));
+      seq.clear();
+      seq.add(TypeConversionUtil.convertToint(2));
+      seq.add(TypeConversionUtil.convertToint(1));
+      seq.unstableSort((IntBinaryOperator)null);
+      Assertions.assertEquals(TypeConversionUtil.convertToint(1),seq.getInt(0));
+      Assertions.assertEquals(TypeConversionUtil.convertToint(2),seq.getInt(1));
+      Assertions.assertThrows(IllegalArgumentException.class,()->{
+        seq.unstableSort((IntBinaryOperator)(v1,v2)->{throw new ArrayIndexOutOfBoundsException();});
+      });
+      Assertions.assertThrows(ConcurrentModificationException.class,()->{
+        seq.unstableSort((IntBinaryOperator)(v1,v2)->{
+        seq.add(Integer.MIN_VALUE);
+        throw new ArrayIndexOutOfBoundsException();
+        });
+      });
+      Assertions.assertThrows(IndexOutOfBoundsException.class,()->{
+        seq.unstableSort((IntBinaryOperator)(v1,v2)->{throw new IndexOutOfBoundsException();});
+      });
+      Assertions.assertThrows(ConcurrentModificationException.class,()->{
+        seq.unstableSort((IntBinaryOperator)(v1,v2)->{
+        seq.add(Integer.MIN_VALUE);
+        throw new IndexOutOfBoundsException();
+        });
+      });
+      //TODO other cases
+    }
+    //#ENDIF
+  }
+  @Test
+  public void testRemoveAtIndexCheckedList()
+  {
+    {
+      var seq=new CheckedList();
+      for(int i=0;i<100;++i)
+      {
+        seq.add(TypeConversionUtil.convertToint(i));
+      }
+      int seqSize=seq.size();
+      int modCount=seq.modCount;
+      Assertions.assertEquals(TypeConversionUtil.convertToint(0),seq.removeIntAt(0));
+      Assertions.assertEquals(TypeConversionUtil.convertToint(seqSize-50),seq.removeIntAt(seqSize-51));
+      Assertions.assertEquals(TypeConversionUtil.convertToint(seqSize-1),seq.removeIntAt(seqSize-3));
+      Assertions.assertEquals(seqSize-3,seq.size());
+      var seqItr=seq.iterator();
+      for(int i=0;i<seqSize;++i)
+      {
+        if(i==0 || i == seqSize-50 || i==seqSize-1)
+        {
+          continue;
+        }
+        Assertions.assertEquals(seqItr.nextInt(),TypeConversionUtil.convertToint(i));
+      }
+      Assertions.assertEquals(seq.modCount,modCount+3);
+      Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.removeIntAt(-1));
+      Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.removeIntAt(seq.size()));
+    }
+  }
+  @Test
   public void testToArrayCheckedList()
   {
     var seq=new CheckedList();
@@ -1434,6 +1683,110 @@ public class IntArrSeqTest
       Assertions.assertEquals(seq.size(),0);
       Assertions.assertTrue(seq.isEmpty());
       Assertions.assertEquals(seq.arr.length,i);
+    }
+  }
+  @Test
+  public void testComparatorsortUncheckedSubList()
+  {
+    //#IFSWITCH UncheckedSubList==CheckedList,CheckedSubList
+    {
+      var root=new UncheckedList();
+      var subList=root.subList(0,0);
+      var seq=subList.subList(0,0);
+      //test empty
+      seq.sort((Comparator)null);
+      seq.add(TypeConversionUtil.convertToint(2));
+      seq.add(TypeConversionUtil.convertToint(1));
+      seq.sort((Comparator)((v1,v2)->{return Integer.compare((Integer)v1,(Integer)v2);}));
+      Assertions.assertEquals(TypeConversionUtil.convertToint(1),seq.getInt(0));
+      Assertions.assertEquals(TypeConversionUtil.convertToint(2),seq.getInt(1));
+      seq.clear();
+      seq.add(TypeConversionUtil.convertToint(2));
+      seq.add(TypeConversionUtil.convertToint(1));
+      seq.sort((Comparator)null);
+      Assertions.assertEquals(TypeConversionUtil.convertToint(1),seq.getInt(0));
+      Assertions.assertEquals(TypeConversionUtil.convertToint(2),seq.getInt(1));
+      //TODO other cases
+    }
+    //#ENDIF
+  }
+  @Test
+  public void testIntBinaryOperatorsortUncheckedSubList()
+  {
+    //#IFSWITCH UncheckedSubList==CheckedList,CheckedSubList
+    {
+      var root=new UncheckedList();
+      var subList=root.subList(0,0);
+      var seq=subList.subList(0,0);
+      //test empty
+      seq.sort((IntBinaryOperator)null);
+      seq.add(TypeConversionUtil.convertToint(2));
+      seq.add(TypeConversionUtil.convertToint(1));
+      seq.sort((IntBinaryOperator)((v1,v2)->{return Integer.compare((Integer)v1,(Integer)v2);}));
+      Assertions.assertEquals(TypeConversionUtil.convertToint(1),seq.getInt(0));
+      Assertions.assertEquals(TypeConversionUtil.convertToint(2),seq.getInt(1));
+      seq.clear();
+      seq.add(TypeConversionUtil.convertToint(2));
+      seq.add(TypeConversionUtil.convertToint(1));
+      seq.sort((IntBinaryOperator)null);
+      Assertions.assertEquals(TypeConversionUtil.convertToint(1),seq.getInt(0));
+      Assertions.assertEquals(TypeConversionUtil.convertToint(2),seq.getInt(1));
+      //TODO other cases
+    }
+    //#ENDIF
+  }
+  @Test
+  public void testIntBinaryOperatorunstableSortUncheckedSubList()
+  {
+    //#IFSWITCH UncheckedSubList==CheckedList,CheckedSubList
+    {
+      var root=new UncheckedList();
+      var subList=root.subList(0,0);
+      var seq=subList.subList(0,0);
+      //test empty
+      seq.unstableSort((IntBinaryOperator)null);
+      seq.add(TypeConversionUtil.convertToint(2));
+      seq.add(TypeConversionUtil.convertToint(1));
+      seq.unstableSort((IntBinaryOperator)((v1,v2)->{return Integer.compare((Integer)v1,(Integer)v2);}));
+      Assertions.assertEquals(TypeConversionUtil.convertToint(1),seq.getInt(0));
+      Assertions.assertEquals(TypeConversionUtil.convertToint(2),seq.getInt(1));
+      seq.clear();
+      seq.add(TypeConversionUtil.convertToint(2));
+      seq.add(TypeConversionUtil.convertToint(1));
+      seq.unstableSort((IntBinaryOperator)null);
+      Assertions.assertEquals(TypeConversionUtil.convertToint(1),seq.getInt(0));
+      Assertions.assertEquals(TypeConversionUtil.convertToint(2),seq.getInt(1));
+      //TODO other cases
+    }
+    //#ENDIF
+  }
+  @Test
+  public void testRemoveAtIndexUncheckedSubList()
+  {
+    {
+      var root=new UncheckedList();
+      var subList=root.subList(0,0);
+      var seq=subList.subList(0,0);
+      for(int i=0;i<100;++i)
+      {
+        seq.add(TypeConversionUtil.convertToint(i));
+      }
+      int seqSize=seq.size();
+      Assertions.assertEquals(TypeConversionUtil.convertToint(0),seq.removeIntAt(0));
+      Assertions.assertEquals(TypeConversionUtil.convertToint(seqSize-50),seq.removeIntAt(seqSize-51));
+      Assertions.assertEquals(TypeConversionUtil.convertToint(seqSize-1),seq.removeIntAt(seqSize-3));
+      Assertions.assertEquals(seqSize-3,seq.size());
+      var seqItr=seq.iterator();
+      for(int i=0;i<seqSize;++i)
+      {
+        if(i==0 || i == seqSize-50 || i==seqSize-1)
+        {
+          continue;
+        }
+        Assertions.assertEquals(seqItr.nextInt(),TypeConversionUtil.convertToint(i));
+      }
+      Assertions.assertEquals(seqSize-3,subList.size());
+      Assertions.assertEquals(seqSize-3,root.size());
     }
   }
   @Test
@@ -1813,6 +2166,204 @@ public class IntArrSeqTest
         var val=TypeConversionUtil.convertToint(i+25);
         Assertions.assertEquals(val,subsubList.getInt(i-10));
       }
+    }
+  }
+  @Test
+  public void testComparatorsortCheckedSubList()
+  {
+    {
+      var root=new CheckedList();
+      var subList=root.subList(0,0);
+      var seq=subList.subList(0,0);
+      subList.add(Integer.MIN_VALUE);
+      Assertions.assertThrows(ConcurrentModificationException.class,()->{
+        seq.sort((Comparator)null);
+      });
+    }
+    //#IFSWITCH CheckedSubList==CheckedList,CheckedSubList
+    {
+      var root=new CheckedList();
+      var subList=root.subList(0,0);
+      var seq=subList.subList(0,0);
+      //test empty
+      seq.sort((Comparator)null);
+      seq.add(TypeConversionUtil.convertToint(2));
+      seq.add(TypeConversionUtil.convertToint(1));
+      seq.sort((Comparator)((v1,v2)->{return Integer.compare((Integer)v1,(Integer)v2);}));
+      Assertions.assertEquals(TypeConversionUtil.convertToint(1),seq.getInt(0));
+      Assertions.assertEquals(TypeConversionUtil.convertToint(2),seq.getInt(1));
+      seq.clear();
+      seq.add(TypeConversionUtil.convertToint(2));
+      seq.add(TypeConversionUtil.convertToint(1));
+      seq.sort((Comparator)null);
+      Assertions.assertEquals(TypeConversionUtil.convertToint(1),seq.getInt(0));
+      Assertions.assertEquals(TypeConversionUtil.convertToint(2),seq.getInt(1));
+      Assertions.assertThrows(IllegalArgumentException.class,()->{
+        seq.sort((Comparator)(v1,v2)->{throw new ArrayIndexOutOfBoundsException();});
+      });
+      Assertions.assertThrows(ConcurrentModificationException.class,()->{
+        seq.sort((Comparator)(v1,v2)->{
+        seq.add(Integer.MIN_VALUE);
+        throw new ArrayIndexOutOfBoundsException();
+        });
+      });
+      Assertions.assertThrows(IndexOutOfBoundsException.class,()->{
+        seq.sort((Comparator)(v1,v2)->{throw new IndexOutOfBoundsException();});
+      });
+      Assertions.assertThrows(ConcurrentModificationException.class,()->{
+        seq.sort((Comparator)(v1,v2)->{
+        seq.add(Integer.MIN_VALUE);
+        throw new IndexOutOfBoundsException();
+        });
+      });
+      //TODO other cases
+    }
+    //#ENDIF
+  }
+  @Test
+  public void testIntBinaryOperatorsortCheckedSubList()
+  {
+    {
+      var root=new CheckedList();
+      var subList=root.subList(0,0);
+      var seq=subList.subList(0,0);
+      subList.add(Integer.MIN_VALUE);
+      Assertions.assertThrows(ConcurrentModificationException.class,()->{
+        seq.sort((IntBinaryOperator)null);
+      });
+    }
+    //#IFSWITCH CheckedSubList==CheckedList,CheckedSubList
+    {
+      var root=new CheckedList();
+      var subList=root.subList(0,0);
+      var seq=subList.subList(0,0);
+      //test empty
+      seq.sort((IntBinaryOperator)null);
+      seq.add(TypeConversionUtil.convertToint(2));
+      seq.add(TypeConversionUtil.convertToint(1));
+      seq.sort((IntBinaryOperator)((v1,v2)->{return Integer.compare((Integer)v1,(Integer)v2);}));
+      Assertions.assertEquals(TypeConversionUtil.convertToint(1),seq.getInt(0));
+      Assertions.assertEquals(TypeConversionUtil.convertToint(2),seq.getInt(1));
+      seq.clear();
+      seq.add(TypeConversionUtil.convertToint(2));
+      seq.add(TypeConversionUtil.convertToint(1));
+      seq.sort((IntBinaryOperator)null);
+      Assertions.assertEquals(TypeConversionUtil.convertToint(1),seq.getInt(0));
+      Assertions.assertEquals(TypeConversionUtil.convertToint(2),seq.getInt(1));
+      Assertions.assertThrows(IllegalArgumentException.class,()->{
+        seq.sort((IntBinaryOperator)(v1,v2)->{throw new ArrayIndexOutOfBoundsException();});
+      });
+      Assertions.assertThrows(ConcurrentModificationException.class,()->{
+        seq.sort((IntBinaryOperator)(v1,v2)->{
+        seq.add(Integer.MIN_VALUE);
+        throw new ArrayIndexOutOfBoundsException();
+        });
+      });
+      Assertions.assertThrows(IndexOutOfBoundsException.class,()->{
+        seq.sort((IntBinaryOperator)(v1,v2)->{throw new IndexOutOfBoundsException();});
+      });
+      Assertions.assertThrows(ConcurrentModificationException.class,()->{
+        seq.sort((IntBinaryOperator)(v1,v2)->{
+        seq.add(Integer.MIN_VALUE);
+        throw new IndexOutOfBoundsException();
+        });
+      });
+      //TODO other cases
+    }
+    //#ENDIF
+  }
+  @Test
+  public void testIntBinaryOperatorunstableSortCheckedSubList()
+  {
+    {
+      var root=new CheckedList();
+      var subList=root.subList(0,0);
+      var seq=subList.subList(0,0);
+      subList.add(Integer.MIN_VALUE);
+      Assertions.assertThrows(ConcurrentModificationException.class,()->{
+        seq.unstableSort((IntBinaryOperator)null);
+      });
+    }
+    //#IFSWITCH CheckedSubList==CheckedList,CheckedSubList
+    {
+      var root=new CheckedList();
+      var subList=root.subList(0,0);
+      var seq=subList.subList(0,0);
+      //test empty
+      seq.unstableSort((IntBinaryOperator)null);
+      seq.add(TypeConversionUtil.convertToint(2));
+      seq.add(TypeConversionUtil.convertToint(1));
+      seq.unstableSort((IntBinaryOperator)((v1,v2)->{return Integer.compare((Integer)v1,(Integer)v2);}));
+      Assertions.assertEquals(TypeConversionUtil.convertToint(1),seq.getInt(0));
+      Assertions.assertEquals(TypeConversionUtil.convertToint(2),seq.getInt(1));
+      seq.clear();
+      seq.add(TypeConversionUtil.convertToint(2));
+      seq.add(TypeConversionUtil.convertToint(1));
+      seq.unstableSort((IntBinaryOperator)null);
+      Assertions.assertEquals(TypeConversionUtil.convertToint(1),seq.getInt(0));
+      Assertions.assertEquals(TypeConversionUtil.convertToint(2),seq.getInt(1));
+      Assertions.assertThrows(IllegalArgumentException.class,()->{
+        seq.unstableSort((IntBinaryOperator)(v1,v2)->{throw new ArrayIndexOutOfBoundsException();});
+      });
+      Assertions.assertThrows(ConcurrentModificationException.class,()->{
+        seq.unstableSort((IntBinaryOperator)(v1,v2)->{
+        seq.add(Integer.MIN_VALUE);
+        throw new ArrayIndexOutOfBoundsException();
+        });
+      });
+      Assertions.assertThrows(IndexOutOfBoundsException.class,()->{
+        seq.unstableSort((IntBinaryOperator)(v1,v2)->{throw new IndexOutOfBoundsException();});
+      });
+      Assertions.assertThrows(ConcurrentModificationException.class,()->{
+        seq.unstableSort((IntBinaryOperator)(v1,v2)->{
+        seq.add(Integer.MIN_VALUE);
+        throw new IndexOutOfBoundsException();
+        });
+      });
+      //TODO other cases
+    }
+    //#ENDIF
+  }
+  @Test
+  public void testRemoveAtIndexCheckedSubList()
+  {
+    {
+      var root=new CheckedList();
+      var subList=root.subList(0,0);
+      var seq=subList.subList(0,0);
+      subList.add(Integer.MIN_VALUE);
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIntAt(0));
+      subList.removeIntAt(0);
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIntAt(0));
+    }
+    {
+      var root=new CheckedList();
+      var subList=root.subList(0,0);
+      var seq=subList.subList(0,0);
+      for(int i=0;i<100;++i)
+      {
+        seq.add(TypeConversionUtil.convertToint(i));
+      }
+      int seqSize=seq.size();
+      int modCount=root.modCount;
+      Assertions.assertEquals(TypeConversionUtil.convertToint(0),seq.removeIntAt(0));
+      Assertions.assertEquals(TypeConversionUtil.convertToint(seqSize-50),seq.removeIntAt(seqSize-51));
+      Assertions.assertEquals(TypeConversionUtil.convertToint(seqSize-1),seq.removeIntAt(seqSize-3));
+      Assertions.assertEquals(seqSize-3,seq.size());
+      var seqItr=seq.iterator();
+      for(int i=0;i<seqSize;++i)
+      {
+        if(i==0 || i == seqSize-50 || i==seqSize-1)
+        {
+          continue;
+        }
+        Assertions.assertEquals(seqItr.nextInt(),TypeConversionUtil.convertToint(i));
+      }
+      Assertions.assertEquals(seqSize-3,subList.size());
+      Assertions.assertEquals(seqSize-3,root.size());
+      Assertions.assertEquals(root.modCount,modCount+3);
+      Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.removeIntAt(-1));
+      Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.removeIntAt(seq.size()));
     }
   }
   @Test

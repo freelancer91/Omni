@@ -15,12 +15,14 @@ public class FloatArrSeqQueryTest
     QueryTestUtil.testremoveValDouble(()->
     {
       var seq=new UncheckedList();
+      seq.add((float)3);
       seq.add((float)0);
       return seq;
     },(float)0);
     QueryTestUtil.testremoveValDouble(()->
     {
       var seq=new UncheckedList();
+      seq.add((float)3);
       seq.add((float)Float.NaN);
       return seq;
     },(float)Float.NaN);
@@ -31,12 +33,14 @@ public class FloatArrSeqQueryTest
     QueryTestUtil.testremoveValFloat(()->
     {
       var seq=new UncheckedList();
+      seq.add((float)3);
       seq.add((float)0);
       return seq;
     },(float)0);
     QueryTestUtil.testremoveValFloat(()->
     {
       var seq=new UncheckedList();
+      seq.add((float)3);
       seq.add((float)Float.NaN);
       return seq;
     },(float)Float.NaN);
@@ -47,18 +51,21 @@ public class FloatArrSeqQueryTest
     QueryTestUtil.testremoveValLong(()->
     {
       var seq=new UncheckedList();
+      seq.add((float)3);
       seq.add((float)-0.0);
       return seq;
     },(float)-0.0);
     QueryTestUtil.testremoveValLong(()->
     {
       var seq=new UncheckedList();
+      seq.add((float)3);
       seq.add((float)0.0);
       return seq;
     },(float)0.0);
     QueryTestUtil.testremoveValLong(()->
     {
       var seq=new UncheckedList();
+      seq.add((float)3);
       seq.add((float)1.0);
       return seq;
     },(float)1.0);
@@ -69,18 +76,21 @@ public class FloatArrSeqQueryTest
     QueryTestUtil.testremoveValInt(()->
     {
       var seq=new UncheckedList();
+      seq.add((float)3);
       seq.add((float)-0.0);
       return seq;
     },(float)-0.0);
     QueryTestUtil.testremoveValInt(()->
     {
       var seq=new UncheckedList();
+      seq.add((float)3);
       seq.add((float)0.0);
       return seq;
     },(float)0.0);
     QueryTestUtil.testremoveValInt(()->
     {
       var seq=new UncheckedList();
+      seq.add((float)3);
       seq.add((float)1.0);
       return seq;
     },(float)1.0);
@@ -91,18 +101,21 @@ public class FloatArrSeqQueryTest
     QueryTestUtil.testremoveValShort(()->
     {
       var seq=new UncheckedList();
+      seq.add((float)3);
       seq.add((float)-0.0);
       return seq;
     },(float)-0.0);
     QueryTestUtil.testremoveValShort(()->
     {
       var seq=new UncheckedList();
+      seq.add((float)3);
       seq.add((float)0.0);
       return seq;
     },(float)0.0);
     QueryTestUtil.testremoveValShort(()->
     {
       var seq=new UncheckedList();
+      seq.add((float)3);
       seq.add((float)1.0);
       return seq;
     },(float)1.0);
@@ -113,18 +126,21 @@ public class FloatArrSeqQueryTest
     QueryTestUtil.testremoveValChar(()->
     {
       var seq=new UncheckedList();
+      seq.add((float)3);
       seq.add((float)-0.0);
       return seq;
     },(float)-0.0);
     QueryTestUtil.testremoveValChar(()->
     {
       var seq=new UncheckedList();
+      seq.add((float)3);
       seq.add((float)0.0);
       return seq;
     },(float)0.0);
     QueryTestUtil.testremoveValChar(()->
     {
       var seq=new UncheckedList();
+      seq.add((float)3);
       seq.add((float)1.0);
       return seq;
     },(float)1.0);
@@ -135,18 +151,21 @@ public class FloatArrSeqQueryTest
     QueryTestUtil.testremoveValByte(()->
     {
       var seq=new UncheckedList();
+      seq.add((float)3);
       seq.add((float)-0.0);
       return seq;
     },(float)-0.0);
     QueryTestUtil.testremoveValByte(()->
     {
       var seq=new UncheckedList();
+      seq.add((float)3);
       seq.add((float)0.0);
       return seq;
     },(float)0.0);
     QueryTestUtil.testremoveValByte(()->
     {
       var seq=new UncheckedList();
+      seq.add((float)3);
       seq.add((float)1.0);
       return seq;
     },(float)1.0);
@@ -157,12 +176,14 @@ public class FloatArrSeqQueryTest
     QueryTestUtil.testremoveValBoolean(()->
     {
       var seq=new UncheckedList();
+      seq.add((float)3);
       seq.add(true);
       return seq;
     },true);
     QueryTestUtil.testremoveValBoolean(()->
     {
       var seq=new UncheckedList();
+      seq.add((float)3);
       seq.add(false);
       return seq;
     },false);
@@ -192,12 +213,14 @@ public class FloatArrSeqQueryTest
     QueryTestUtil.testremoveValDouble(()->
     {
       var seq=new UncheckedStack();
+      seq.add((float)3);
       seq.add((float)0);
       return seq;
     },(float)0);
     QueryTestUtil.testremoveValDouble(()->
     {
       var seq=new UncheckedStack();
+      seq.add((float)3);
       seq.add((float)Float.NaN);
       return seq;
     },(float)Float.NaN);
@@ -208,12 +231,14 @@ public class FloatArrSeqQueryTest
     QueryTestUtil.testremoveValFloat(()->
     {
       var seq=new UncheckedStack();
+      seq.add((float)3);
       seq.add((float)0);
       return seq;
     },(float)0);
     QueryTestUtil.testremoveValFloat(()->
     {
       var seq=new UncheckedStack();
+      seq.add((float)3);
       seq.add((float)Float.NaN);
       return seq;
     },(float)Float.NaN);
@@ -224,18 +249,21 @@ public class FloatArrSeqQueryTest
     QueryTestUtil.testremoveValLong(()->
     {
       var seq=new UncheckedStack();
+      seq.add((float)3);
       seq.add((float)-0.0);
       return seq;
     },(float)-0.0);
     QueryTestUtil.testremoveValLong(()->
     {
       var seq=new UncheckedStack();
+      seq.add((float)3);
       seq.add((float)0.0);
       return seq;
     },(float)0.0);
     QueryTestUtil.testremoveValLong(()->
     {
       var seq=new UncheckedStack();
+      seq.add((float)3);
       seq.add((float)1.0);
       return seq;
     },(float)1.0);
@@ -246,18 +274,21 @@ public class FloatArrSeqQueryTest
     QueryTestUtil.testremoveValInt(()->
     {
       var seq=new UncheckedStack();
+      seq.add((float)3);
       seq.add((float)-0.0);
       return seq;
     },(float)-0.0);
     QueryTestUtil.testremoveValInt(()->
     {
       var seq=new UncheckedStack();
+      seq.add((float)3);
       seq.add((float)0.0);
       return seq;
     },(float)0.0);
     QueryTestUtil.testremoveValInt(()->
     {
       var seq=new UncheckedStack();
+      seq.add((float)3);
       seq.add((float)1.0);
       return seq;
     },(float)1.0);
@@ -268,18 +299,21 @@ public class FloatArrSeqQueryTest
     QueryTestUtil.testremoveValShort(()->
     {
       var seq=new UncheckedStack();
+      seq.add((float)3);
       seq.add((float)-0.0);
       return seq;
     },(float)-0.0);
     QueryTestUtil.testremoveValShort(()->
     {
       var seq=new UncheckedStack();
+      seq.add((float)3);
       seq.add((float)0.0);
       return seq;
     },(float)0.0);
     QueryTestUtil.testremoveValShort(()->
     {
       var seq=new UncheckedStack();
+      seq.add((float)3);
       seq.add((float)1.0);
       return seq;
     },(float)1.0);
@@ -290,18 +324,21 @@ public class FloatArrSeqQueryTest
     QueryTestUtil.testremoveValChar(()->
     {
       var seq=new UncheckedStack();
+      seq.add((float)3);
       seq.add((float)-0.0);
       return seq;
     },(float)-0.0);
     QueryTestUtil.testremoveValChar(()->
     {
       var seq=new UncheckedStack();
+      seq.add((float)3);
       seq.add((float)0.0);
       return seq;
     },(float)0.0);
     QueryTestUtil.testremoveValChar(()->
     {
       var seq=new UncheckedStack();
+      seq.add((float)3);
       seq.add((float)1.0);
       return seq;
     },(float)1.0);
@@ -312,18 +349,21 @@ public class FloatArrSeqQueryTest
     QueryTestUtil.testremoveValByte(()->
     {
       var seq=new UncheckedStack();
+      seq.add((float)3);
       seq.add((float)-0.0);
       return seq;
     },(float)-0.0);
     QueryTestUtil.testremoveValByte(()->
     {
       var seq=new UncheckedStack();
+      seq.add((float)3);
       seq.add((float)0.0);
       return seq;
     },(float)0.0);
     QueryTestUtil.testremoveValByte(()->
     {
       var seq=new UncheckedStack();
+      seq.add((float)3);
       seq.add((float)1.0);
       return seq;
     },(float)1.0);
@@ -334,12 +374,14 @@ public class FloatArrSeqQueryTest
     QueryTestUtil.testremoveValBoolean(()->
     {
       var seq=new UncheckedStack();
+      seq.add((float)3);
       seq.add(true);
       return seq;
     },true);
     QueryTestUtil.testremoveValBoolean(()->
     {
       var seq=new UncheckedStack();
+      seq.add((float)3);
       seq.add(false);
       return seq;
     },false);
@@ -369,12 +411,14 @@ public class FloatArrSeqQueryTest
     QueryTestUtil.testremoveValDouble(()->
     {
       var seq=new CheckedList();
+      seq.add((float)3);
       seq.add((float)0);
       return seq;
     },(float)0);
     QueryTestUtil.testremoveValDouble(()->
     {
       var seq=new CheckedList();
+      seq.add((float)3);
       seq.add((float)Float.NaN);
       return seq;
     },(float)Float.NaN);
@@ -385,12 +429,14 @@ public class FloatArrSeqQueryTest
     QueryTestUtil.testremoveValFloat(()->
     {
       var seq=new CheckedList();
+      seq.add((float)3);
       seq.add((float)0);
       return seq;
     },(float)0);
     QueryTestUtil.testremoveValFloat(()->
     {
       var seq=new CheckedList();
+      seq.add((float)3);
       seq.add((float)Float.NaN);
       return seq;
     },(float)Float.NaN);
@@ -401,18 +447,21 @@ public class FloatArrSeqQueryTest
     QueryTestUtil.testremoveValLong(()->
     {
       var seq=new CheckedList();
+      seq.add((float)3);
       seq.add((float)-0.0);
       return seq;
     },(float)-0.0);
     QueryTestUtil.testremoveValLong(()->
     {
       var seq=new CheckedList();
+      seq.add((float)3);
       seq.add((float)0.0);
       return seq;
     },(float)0.0);
     QueryTestUtil.testremoveValLong(()->
     {
       var seq=new CheckedList();
+      seq.add((float)3);
       seq.add((float)1.0);
       return seq;
     },(float)1.0);
@@ -423,18 +472,21 @@ public class FloatArrSeqQueryTest
     QueryTestUtil.testremoveValInt(()->
     {
       var seq=new CheckedList();
+      seq.add((float)3);
       seq.add((float)-0.0);
       return seq;
     },(float)-0.0);
     QueryTestUtil.testremoveValInt(()->
     {
       var seq=new CheckedList();
+      seq.add((float)3);
       seq.add((float)0.0);
       return seq;
     },(float)0.0);
     QueryTestUtil.testremoveValInt(()->
     {
       var seq=new CheckedList();
+      seq.add((float)3);
       seq.add((float)1.0);
       return seq;
     },(float)1.0);
@@ -445,18 +497,21 @@ public class FloatArrSeqQueryTest
     QueryTestUtil.testremoveValShort(()->
     {
       var seq=new CheckedList();
+      seq.add((float)3);
       seq.add((float)-0.0);
       return seq;
     },(float)-0.0);
     QueryTestUtil.testremoveValShort(()->
     {
       var seq=new CheckedList();
+      seq.add((float)3);
       seq.add((float)0.0);
       return seq;
     },(float)0.0);
     QueryTestUtil.testremoveValShort(()->
     {
       var seq=new CheckedList();
+      seq.add((float)3);
       seq.add((float)1.0);
       return seq;
     },(float)1.0);
@@ -467,18 +522,21 @@ public class FloatArrSeqQueryTest
     QueryTestUtil.testremoveValChar(()->
     {
       var seq=new CheckedList();
+      seq.add((float)3);
       seq.add((float)-0.0);
       return seq;
     },(float)-0.0);
     QueryTestUtil.testremoveValChar(()->
     {
       var seq=new CheckedList();
+      seq.add((float)3);
       seq.add((float)0.0);
       return seq;
     },(float)0.0);
     QueryTestUtil.testremoveValChar(()->
     {
       var seq=new CheckedList();
+      seq.add((float)3);
       seq.add((float)1.0);
       return seq;
     },(float)1.0);
@@ -489,18 +547,21 @@ public class FloatArrSeqQueryTest
     QueryTestUtil.testremoveValByte(()->
     {
       var seq=new CheckedList();
+      seq.add((float)3);
       seq.add((float)-0.0);
       return seq;
     },(float)-0.0);
     QueryTestUtil.testremoveValByte(()->
     {
       var seq=new CheckedList();
+      seq.add((float)3);
       seq.add((float)0.0);
       return seq;
     },(float)0.0);
     QueryTestUtil.testremoveValByte(()->
     {
       var seq=new CheckedList();
+      seq.add((float)3);
       seq.add((float)1.0);
       return seq;
     },(float)1.0);
@@ -511,12 +572,14 @@ public class FloatArrSeqQueryTest
     QueryTestUtil.testremoveValBoolean(()->
     {
       var seq=new CheckedList();
+      seq.add((float)3);
       seq.add(true);
       return seq;
     },true);
     QueryTestUtil.testremoveValBoolean(()->
     {
       var seq=new CheckedList();
+      seq.add((float)3);
       seq.add(false);
       return seq;
     },false);
@@ -546,12 +609,14 @@ public class FloatArrSeqQueryTest
     QueryTestUtil.testremoveValDouble(()->
     {
       var seq=new CheckedStack();
+      seq.add((float)3);
       seq.add((float)0);
       return seq;
     },(float)0);
     QueryTestUtil.testremoveValDouble(()->
     {
       var seq=new CheckedStack();
+      seq.add((float)3);
       seq.add((float)Float.NaN);
       return seq;
     },(float)Float.NaN);
@@ -562,12 +627,14 @@ public class FloatArrSeqQueryTest
     QueryTestUtil.testremoveValFloat(()->
     {
       var seq=new CheckedStack();
+      seq.add((float)3);
       seq.add((float)0);
       return seq;
     },(float)0);
     QueryTestUtil.testremoveValFloat(()->
     {
       var seq=new CheckedStack();
+      seq.add((float)3);
       seq.add((float)Float.NaN);
       return seq;
     },(float)Float.NaN);
@@ -578,18 +645,21 @@ public class FloatArrSeqQueryTest
     QueryTestUtil.testremoveValLong(()->
     {
       var seq=new CheckedStack();
+      seq.add((float)3);
       seq.add((float)-0.0);
       return seq;
     },(float)-0.0);
     QueryTestUtil.testremoveValLong(()->
     {
       var seq=new CheckedStack();
+      seq.add((float)3);
       seq.add((float)0.0);
       return seq;
     },(float)0.0);
     QueryTestUtil.testremoveValLong(()->
     {
       var seq=new CheckedStack();
+      seq.add((float)3);
       seq.add((float)1.0);
       return seq;
     },(float)1.0);
@@ -600,18 +670,21 @@ public class FloatArrSeqQueryTest
     QueryTestUtil.testremoveValInt(()->
     {
       var seq=new CheckedStack();
+      seq.add((float)3);
       seq.add((float)-0.0);
       return seq;
     },(float)-0.0);
     QueryTestUtil.testremoveValInt(()->
     {
       var seq=new CheckedStack();
+      seq.add((float)3);
       seq.add((float)0.0);
       return seq;
     },(float)0.0);
     QueryTestUtil.testremoveValInt(()->
     {
       var seq=new CheckedStack();
+      seq.add((float)3);
       seq.add((float)1.0);
       return seq;
     },(float)1.0);
@@ -622,18 +695,21 @@ public class FloatArrSeqQueryTest
     QueryTestUtil.testremoveValShort(()->
     {
       var seq=new CheckedStack();
+      seq.add((float)3);
       seq.add((float)-0.0);
       return seq;
     },(float)-0.0);
     QueryTestUtil.testremoveValShort(()->
     {
       var seq=new CheckedStack();
+      seq.add((float)3);
       seq.add((float)0.0);
       return seq;
     },(float)0.0);
     QueryTestUtil.testremoveValShort(()->
     {
       var seq=new CheckedStack();
+      seq.add((float)3);
       seq.add((float)1.0);
       return seq;
     },(float)1.0);
@@ -644,18 +720,21 @@ public class FloatArrSeqQueryTest
     QueryTestUtil.testremoveValChar(()->
     {
       var seq=new CheckedStack();
+      seq.add((float)3);
       seq.add((float)-0.0);
       return seq;
     },(float)-0.0);
     QueryTestUtil.testremoveValChar(()->
     {
       var seq=new CheckedStack();
+      seq.add((float)3);
       seq.add((float)0.0);
       return seq;
     },(float)0.0);
     QueryTestUtil.testremoveValChar(()->
     {
       var seq=new CheckedStack();
+      seq.add((float)3);
       seq.add((float)1.0);
       return seq;
     },(float)1.0);
@@ -666,18 +745,21 @@ public class FloatArrSeqQueryTest
     QueryTestUtil.testremoveValByte(()->
     {
       var seq=new CheckedStack();
+      seq.add((float)3);
       seq.add((float)-0.0);
       return seq;
     },(float)-0.0);
     QueryTestUtil.testremoveValByte(()->
     {
       var seq=new CheckedStack();
+      seq.add((float)3);
       seq.add((float)0.0);
       return seq;
     },(float)0.0);
     QueryTestUtil.testremoveValByte(()->
     {
       var seq=new CheckedStack();
+      seq.add((float)3);
       seq.add((float)1.0);
       return seq;
     },(float)1.0);
@@ -688,12 +770,14 @@ public class FloatArrSeqQueryTest
     QueryTestUtil.testremoveValBoolean(()->
     {
       var seq=new CheckedStack();
+      seq.add((float)3);
       seq.add(true);
       return seq;
     },true);
     QueryTestUtil.testremoveValBoolean(()->
     {
       var seq=new CheckedStack();
+      seq.add((float)3);
       seq.add(false);
       return seq;
     },false);
@@ -725,6 +809,7 @@ public class FloatArrSeqQueryTest
       var root=new CheckedList();
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
+      seq.add((float)3);
       seq.add((float)0);
       return seq;
     },(float)0);
@@ -733,6 +818,7 @@ public class FloatArrSeqQueryTest
       var root=new CheckedList();
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
+      seq.add((float)3);
       seq.add((float)Float.NaN);
       return seq;
     },(float)Float.NaN);
@@ -745,6 +831,7 @@ public class FloatArrSeqQueryTest
       var root=new CheckedList();
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
+      seq.add((float)3);
       seq.add((float)0);
       return seq;
     },(float)0);
@@ -753,6 +840,7 @@ public class FloatArrSeqQueryTest
       var root=new CheckedList();
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
+      seq.add((float)3);
       seq.add((float)Float.NaN);
       return seq;
     },(float)Float.NaN);
@@ -765,6 +853,7 @@ public class FloatArrSeqQueryTest
       var root=new CheckedList();
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
+      seq.add((float)3);
       seq.add((float)-0.0);
       return seq;
     },(float)-0.0);
@@ -773,6 +862,7 @@ public class FloatArrSeqQueryTest
       var root=new CheckedList();
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
+      seq.add((float)3);
       seq.add((float)0.0);
       return seq;
     },(float)0.0);
@@ -781,6 +871,7 @@ public class FloatArrSeqQueryTest
       var root=new CheckedList();
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
+      seq.add((float)3);
       seq.add((float)1.0);
       return seq;
     },(float)1.0);
@@ -793,6 +884,7 @@ public class FloatArrSeqQueryTest
       var root=new CheckedList();
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
+      seq.add((float)3);
       seq.add((float)-0.0);
       return seq;
     },(float)-0.0);
@@ -801,6 +893,7 @@ public class FloatArrSeqQueryTest
       var root=new CheckedList();
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
+      seq.add((float)3);
       seq.add((float)0.0);
       return seq;
     },(float)0.0);
@@ -809,6 +902,7 @@ public class FloatArrSeqQueryTest
       var root=new CheckedList();
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
+      seq.add((float)3);
       seq.add((float)1.0);
       return seq;
     },(float)1.0);
@@ -821,6 +915,7 @@ public class FloatArrSeqQueryTest
       var root=new CheckedList();
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
+      seq.add((float)3);
       seq.add((float)-0.0);
       return seq;
     },(float)-0.0);
@@ -829,6 +924,7 @@ public class FloatArrSeqQueryTest
       var root=new CheckedList();
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
+      seq.add((float)3);
       seq.add((float)0.0);
       return seq;
     },(float)0.0);
@@ -837,6 +933,7 @@ public class FloatArrSeqQueryTest
       var root=new CheckedList();
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
+      seq.add((float)3);
       seq.add((float)1.0);
       return seq;
     },(float)1.0);
@@ -849,6 +946,7 @@ public class FloatArrSeqQueryTest
       var root=new CheckedList();
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
+      seq.add((float)3);
       seq.add((float)-0.0);
       return seq;
     },(float)-0.0);
@@ -857,6 +955,7 @@ public class FloatArrSeqQueryTest
       var root=new CheckedList();
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
+      seq.add((float)3);
       seq.add((float)0.0);
       return seq;
     },(float)0.0);
@@ -865,6 +964,7 @@ public class FloatArrSeqQueryTest
       var root=new CheckedList();
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
+      seq.add((float)3);
       seq.add((float)1.0);
       return seq;
     },(float)1.0);
@@ -877,6 +977,7 @@ public class FloatArrSeqQueryTest
       var root=new CheckedList();
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
+      seq.add((float)3);
       seq.add((float)-0.0);
       return seq;
     },(float)-0.0);
@@ -885,6 +986,7 @@ public class FloatArrSeqQueryTest
       var root=new CheckedList();
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
+      seq.add((float)3);
       seq.add((float)0.0);
       return seq;
     },(float)0.0);
@@ -893,6 +995,7 @@ public class FloatArrSeqQueryTest
       var root=new CheckedList();
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
+      seq.add((float)3);
       seq.add((float)1.0);
       return seq;
     },(float)1.0);
@@ -905,6 +1008,7 @@ public class FloatArrSeqQueryTest
       var root=new CheckedList();
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
+      seq.add((float)3);
       seq.add(true);
       return seq;
     },true);
@@ -913,6 +1017,7 @@ public class FloatArrSeqQueryTest
       var root=new CheckedList();
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
+      seq.add((float)3);
       seq.add(false);
       return seq;
     },false);
@@ -948,6 +1053,7 @@ public class FloatArrSeqQueryTest
       var root=new UncheckedList();
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
+      seq.add((float)3);
       seq.add((float)0);
       return seq;
     },(float)0);
@@ -956,6 +1062,7 @@ public class FloatArrSeqQueryTest
       var root=new UncheckedList();
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
+      seq.add((float)3);
       seq.add((float)Float.NaN);
       return seq;
     },(float)Float.NaN);
@@ -968,6 +1075,7 @@ public class FloatArrSeqQueryTest
       var root=new UncheckedList();
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
+      seq.add((float)3);
       seq.add((float)0);
       return seq;
     },(float)0);
@@ -976,6 +1084,7 @@ public class FloatArrSeqQueryTest
       var root=new UncheckedList();
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
+      seq.add((float)3);
       seq.add((float)Float.NaN);
       return seq;
     },(float)Float.NaN);
@@ -988,6 +1097,7 @@ public class FloatArrSeqQueryTest
       var root=new UncheckedList();
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
+      seq.add((float)3);
       seq.add((float)-0.0);
       return seq;
     },(float)-0.0);
@@ -996,6 +1106,7 @@ public class FloatArrSeqQueryTest
       var root=new UncheckedList();
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
+      seq.add((float)3);
       seq.add((float)0.0);
       return seq;
     },(float)0.0);
@@ -1004,6 +1115,7 @@ public class FloatArrSeqQueryTest
       var root=new UncheckedList();
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
+      seq.add((float)3);
       seq.add((float)1.0);
       return seq;
     },(float)1.0);
@@ -1016,6 +1128,7 @@ public class FloatArrSeqQueryTest
       var root=new UncheckedList();
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
+      seq.add((float)3);
       seq.add((float)-0.0);
       return seq;
     },(float)-0.0);
@@ -1024,6 +1137,7 @@ public class FloatArrSeqQueryTest
       var root=new UncheckedList();
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
+      seq.add((float)3);
       seq.add((float)0.0);
       return seq;
     },(float)0.0);
@@ -1032,6 +1146,7 @@ public class FloatArrSeqQueryTest
       var root=new UncheckedList();
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
+      seq.add((float)3);
       seq.add((float)1.0);
       return seq;
     },(float)1.0);
@@ -1044,6 +1159,7 @@ public class FloatArrSeqQueryTest
       var root=new UncheckedList();
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
+      seq.add((float)3);
       seq.add((float)-0.0);
       return seq;
     },(float)-0.0);
@@ -1052,6 +1168,7 @@ public class FloatArrSeqQueryTest
       var root=new UncheckedList();
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
+      seq.add((float)3);
       seq.add((float)0.0);
       return seq;
     },(float)0.0);
@@ -1060,6 +1177,7 @@ public class FloatArrSeqQueryTest
       var root=new UncheckedList();
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
+      seq.add((float)3);
       seq.add((float)1.0);
       return seq;
     },(float)1.0);
@@ -1072,6 +1190,7 @@ public class FloatArrSeqQueryTest
       var root=new UncheckedList();
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
+      seq.add((float)3);
       seq.add((float)-0.0);
       return seq;
     },(float)-0.0);
@@ -1080,6 +1199,7 @@ public class FloatArrSeqQueryTest
       var root=new UncheckedList();
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
+      seq.add((float)3);
       seq.add((float)0.0);
       return seq;
     },(float)0.0);
@@ -1088,6 +1208,7 @@ public class FloatArrSeqQueryTest
       var root=new UncheckedList();
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
+      seq.add((float)3);
       seq.add((float)1.0);
       return seq;
     },(float)1.0);
@@ -1100,6 +1221,7 @@ public class FloatArrSeqQueryTest
       var root=new UncheckedList();
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
+      seq.add((float)3);
       seq.add((float)-0.0);
       return seq;
     },(float)-0.0);
@@ -1108,6 +1230,7 @@ public class FloatArrSeqQueryTest
       var root=new UncheckedList();
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
+      seq.add((float)3);
       seq.add((float)0.0);
       return seq;
     },(float)0.0);
@@ -1116,6 +1239,7 @@ public class FloatArrSeqQueryTest
       var root=new UncheckedList();
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
+      seq.add((float)3);
       seq.add((float)1.0);
       return seq;
     },(float)1.0);
@@ -1128,6 +1252,7 @@ public class FloatArrSeqQueryTest
       var root=new UncheckedList();
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
+      seq.add((float)3);
       seq.add(true);
       return seq;
     },true);
@@ -1136,6 +1261,7 @@ public class FloatArrSeqQueryTest
       var root=new UncheckedList();
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
+      seq.add((float)3);
       seq.add(false);
       return seq;
     },false);
@@ -1169,12 +1295,14 @@ public class FloatArrSeqQueryTest
     QueryTestUtil.testcontainsDouble(()->
     {
       var seq=new UncheckedList();
+      seq.add((float)3);
       seq.add((float)0);
       return seq;
     },(float)0);
     QueryTestUtil.testcontainsDouble(()->
     {
       var seq=new UncheckedList();
+      seq.add((float)3);
       seq.add((float)Float.NaN);
       return seq;
     },(float)Float.NaN);
@@ -1185,12 +1313,14 @@ public class FloatArrSeqQueryTest
     QueryTestUtil.testcontainsFloat(()->
     {
       var seq=new UncheckedList();
+      seq.add((float)3);
       seq.add((float)0);
       return seq;
     },(float)0);
     QueryTestUtil.testcontainsFloat(()->
     {
       var seq=new UncheckedList();
+      seq.add((float)3);
       seq.add((float)Float.NaN);
       return seq;
     },(float)Float.NaN);
@@ -1201,18 +1331,21 @@ public class FloatArrSeqQueryTest
     QueryTestUtil.testcontainsLong(()->
     {
       var seq=new UncheckedList();
+      seq.add((float)3);
       seq.add((float)-0.0);
       return seq;
     },(float)-0.0);
     QueryTestUtil.testcontainsLong(()->
     {
       var seq=new UncheckedList();
+      seq.add((float)3);
       seq.add((float)0.0);
       return seq;
     },(float)0.0);
     QueryTestUtil.testcontainsLong(()->
     {
       var seq=new UncheckedList();
+      seq.add((float)3);
       seq.add((float)1.0);
       return seq;
     },(float)1.0);
@@ -1223,18 +1356,21 @@ public class FloatArrSeqQueryTest
     QueryTestUtil.testcontainsInt(()->
     {
       var seq=new UncheckedList();
+      seq.add((float)3);
       seq.add((float)-0.0);
       return seq;
     },(float)-0.0);
     QueryTestUtil.testcontainsInt(()->
     {
       var seq=new UncheckedList();
+      seq.add((float)3);
       seq.add((float)0.0);
       return seq;
     },(float)0.0);
     QueryTestUtil.testcontainsInt(()->
     {
       var seq=new UncheckedList();
+      seq.add((float)3);
       seq.add((float)1.0);
       return seq;
     },(float)1.0);
@@ -1245,18 +1381,21 @@ public class FloatArrSeqQueryTest
     QueryTestUtil.testcontainsShort(()->
     {
       var seq=new UncheckedList();
+      seq.add((float)3);
       seq.add((float)-0.0);
       return seq;
     },(float)-0.0);
     QueryTestUtil.testcontainsShort(()->
     {
       var seq=new UncheckedList();
+      seq.add((float)3);
       seq.add((float)0.0);
       return seq;
     },(float)0.0);
     QueryTestUtil.testcontainsShort(()->
     {
       var seq=new UncheckedList();
+      seq.add((float)3);
       seq.add((float)1.0);
       return seq;
     },(float)1.0);
@@ -1267,18 +1406,21 @@ public class FloatArrSeqQueryTest
     QueryTestUtil.testcontainsChar(()->
     {
       var seq=new UncheckedList();
+      seq.add((float)3);
       seq.add((float)-0.0);
       return seq;
     },(float)-0.0);
     QueryTestUtil.testcontainsChar(()->
     {
       var seq=new UncheckedList();
+      seq.add((float)3);
       seq.add((float)0.0);
       return seq;
     },(float)0.0);
     QueryTestUtil.testcontainsChar(()->
     {
       var seq=new UncheckedList();
+      seq.add((float)3);
       seq.add((float)1.0);
       return seq;
     },(float)1.0);
@@ -1289,18 +1431,21 @@ public class FloatArrSeqQueryTest
     QueryTestUtil.testcontainsByte(()->
     {
       var seq=new UncheckedList();
+      seq.add((float)3);
       seq.add((float)-0.0);
       return seq;
     },(float)-0.0);
     QueryTestUtil.testcontainsByte(()->
     {
       var seq=new UncheckedList();
+      seq.add((float)3);
       seq.add((float)0.0);
       return seq;
     },(float)0.0);
     QueryTestUtil.testcontainsByte(()->
     {
       var seq=new UncheckedList();
+      seq.add((float)3);
       seq.add((float)1.0);
       return seq;
     },(float)1.0);
@@ -1311,12 +1456,14 @@ public class FloatArrSeqQueryTest
     QueryTestUtil.testcontainsBoolean(()->
     {
       var seq=new UncheckedList();
+      seq.add((float)3);
       seq.add(true);
       return seq;
     },true);
     QueryTestUtil.testcontainsBoolean(()->
     {
       var seq=new UncheckedList();
+      seq.add((float)3);
       seq.add(false);
       return seq;
     },false);
@@ -1346,12 +1493,14 @@ public class FloatArrSeqQueryTest
     QueryTestUtil.testcontainsDouble(()->
     {
       var seq=new UncheckedStack();
+      seq.add((float)3);
       seq.add((float)0);
       return seq;
     },(float)0);
     QueryTestUtil.testcontainsDouble(()->
     {
       var seq=new UncheckedStack();
+      seq.add((float)3);
       seq.add((float)Float.NaN);
       return seq;
     },(float)Float.NaN);
@@ -1362,12 +1511,14 @@ public class FloatArrSeqQueryTest
     QueryTestUtil.testcontainsFloat(()->
     {
       var seq=new UncheckedStack();
+      seq.add((float)3);
       seq.add((float)0);
       return seq;
     },(float)0);
     QueryTestUtil.testcontainsFloat(()->
     {
       var seq=new UncheckedStack();
+      seq.add((float)3);
       seq.add((float)Float.NaN);
       return seq;
     },(float)Float.NaN);
@@ -1378,18 +1529,21 @@ public class FloatArrSeqQueryTest
     QueryTestUtil.testcontainsLong(()->
     {
       var seq=new UncheckedStack();
+      seq.add((float)3);
       seq.add((float)-0.0);
       return seq;
     },(float)-0.0);
     QueryTestUtil.testcontainsLong(()->
     {
       var seq=new UncheckedStack();
+      seq.add((float)3);
       seq.add((float)0.0);
       return seq;
     },(float)0.0);
     QueryTestUtil.testcontainsLong(()->
     {
       var seq=new UncheckedStack();
+      seq.add((float)3);
       seq.add((float)1.0);
       return seq;
     },(float)1.0);
@@ -1400,18 +1554,21 @@ public class FloatArrSeqQueryTest
     QueryTestUtil.testcontainsInt(()->
     {
       var seq=new UncheckedStack();
+      seq.add((float)3);
       seq.add((float)-0.0);
       return seq;
     },(float)-0.0);
     QueryTestUtil.testcontainsInt(()->
     {
       var seq=new UncheckedStack();
+      seq.add((float)3);
       seq.add((float)0.0);
       return seq;
     },(float)0.0);
     QueryTestUtil.testcontainsInt(()->
     {
       var seq=new UncheckedStack();
+      seq.add((float)3);
       seq.add((float)1.0);
       return seq;
     },(float)1.0);
@@ -1422,18 +1579,21 @@ public class FloatArrSeqQueryTest
     QueryTestUtil.testcontainsShort(()->
     {
       var seq=new UncheckedStack();
+      seq.add((float)3);
       seq.add((float)-0.0);
       return seq;
     },(float)-0.0);
     QueryTestUtil.testcontainsShort(()->
     {
       var seq=new UncheckedStack();
+      seq.add((float)3);
       seq.add((float)0.0);
       return seq;
     },(float)0.0);
     QueryTestUtil.testcontainsShort(()->
     {
       var seq=new UncheckedStack();
+      seq.add((float)3);
       seq.add((float)1.0);
       return seq;
     },(float)1.0);
@@ -1444,18 +1604,21 @@ public class FloatArrSeqQueryTest
     QueryTestUtil.testcontainsChar(()->
     {
       var seq=new UncheckedStack();
+      seq.add((float)3);
       seq.add((float)-0.0);
       return seq;
     },(float)-0.0);
     QueryTestUtil.testcontainsChar(()->
     {
       var seq=new UncheckedStack();
+      seq.add((float)3);
       seq.add((float)0.0);
       return seq;
     },(float)0.0);
     QueryTestUtil.testcontainsChar(()->
     {
       var seq=new UncheckedStack();
+      seq.add((float)3);
       seq.add((float)1.0);
       return seq;
     },(float)1.0);
@@ -1466,18 +1629,21 @@ public class FloatArrSeqQueryTest
     QueryTestUtil.testcontainsByte(()->
     {
       var seq=new UncheckedStack();
+      seq.add((float)3);
       seq.add((float)-0.0);
       return seq;
     },(float)-0.0);
     QueryTestUtil.testcontainsByte(()->
     {
       var seq=new UncheckedStack();
+      seq.add((float)3);
       seq.add((float)0.0);
       return seq;
     },(float)0.0);
     QueryTestUtil.testcontainsByte(()->
     {
       var seq=new UncheckedStack();
+      seq.add((float)3);
       seq.add((float)1.0);
       return seq;
     },(float)1.0);
@@ -1488,12 +1654,14 @@ public class FloatArrSeqQueryTest
     QueryTestUtil.testcontainsBoolean(()->
     {
       var seq=new UncheckedStack();
+      seq.add((float)3);
       seq.add(true);
       return seq;
     },true);
     QueryTestUtil.testcontainsBoolean(()->
     {
       var seq=new UncheckedStack();
+      seq.add((float)3);
       seq.add(false);
       return seq;
     },false);
@@ -1523,12 +1691,14 @@ public class FloatArrSeqQueryTest
     QueryTestUtil.testcontainsDouble(()->
     {
       var seq=new CheckedList();
+      seq.add((float)3);
       seq.add((float)0);
       return seq;
     },(float)0);
     QueryTestUtil.testcontainsDouble(()->
     {
       var seq=new CheckedList();
+      seq.add((float)3);
       seq.add((float)Float.NaN);
       return seq;
     },(float)Float.NaN);
@@ -1539,12 +1709,14 @@ public class FloatArrSeqQueryTest
     QueryTestUtil.testcontainsFloat(()->
     {
       var seq=new CheckedList();
+      seq.add((float)3);
       seq.add((float)0);
       return seq;
     },(float)0);
     QueryTestUtil.testcontainsFloat(()->
     {
       var seq=new CheckedList();
+      seq.add((float)3);
       seq.add((float)Float.NaN);
       return seq;
     },(float)Float.NaN);
@@ -1555,18 +1727,21 @@ public class FloatArrSeqQueryTest
     QueryTestUtil.testcontainsLong(()->
     {
       var seq=new CheckedList();
+      seq.add((float)3);
       seq.add((float)-0.0);
       return seq;
     },(float)-0.0);
     QueryTestUtil.testcontainsLong(()->
     {
       var seq=new CheckedList();
+      seq.add((float)3);
       seq.add((float)0.0);
       return seq;
     },(float)0.0);
     QueryTestUtil.testcontainsLong(()->
     {
       var seq=new CheckedList();
+      seq.add((float)3);
       seq.add((float)1.0);
       return seq;
     },(float)1.0);
@@ -1577,18 +1752,21 @@ public class FloatArrSeqQueryTest
     QueryTestUtil.testcontainsInt(()->
     {
       var seq=new CheckedList();
+      seq.add((float)3);
       seq.add((float)-0.0);
       return seq;
     },(float)-0.0);
     QueryTestUtil.testcontainsInt(()->
     {
       var seq=new CheckedList();
+      seq.add((float)3);
       seq.add((float)0.0);
       return seq;
     },(float)0.0);
     QueryTestUtil.testcontainsInt(()->
     {
       var seq=new CheckedList();
+      seq.add((float)3);
       seq.add((float)1.0);
       return seq;
     },(float)1.0);
@@ -1599,18 +1777,21 @@ public class FloatArrSeqQueryTest
     QueryTestUtil.testcontainsShort(()->
     {
       var seq=new CheckedList();
+      seq.add((float)3);
       seq.add((float)-0.0);
       return seq;
     },(float)-0.0);
     QueryTestUtil.testcontainsShort(()->
     {
       var seq=new CheckedList();
+      seq.add((float)3);
       seq.add((float)0.0);
       return seq;
     },(float)0.0);
     QueryTestUtil.testcontainsShort(()->
     {
       var seq=new CheckedList();
+      seq.add((float)3);
       seq.add((float)1.0);
       return seq;
     },(float)1.0);
@@ -1621,18 +1802,21 @@ public class FloatArrSeqQueryTest
     QueryTestUtil.testcontainsChar(()->
     {
       var seq=new CheckedList();
+      seq.add((float)3);
       seq.add((float)-0.0);
       return seq;
     },(float)-0.0);
     QueryTestUtil.testcontainsChar(()->
     {
       var seq=new CheckedList();
+      seq.add((float)3);
       seq.add((float)0.0);
       return seq;
     },(float)0.0);
     QueryTestUtil.testcontainsChar(()->
     {
       var seq=new CheckedList();
+      seq.add((float)3);
       seq.add((float)1.0);
       return seq;
     },(float)1.0);
@@ -1643,18 +1827,21 @@ public class FloatArrSeqQueryTest
     QueryTestUtil.testcontainsByte(()->
     {
       var seq=new CheckedList();
+      seq.add((float)3);
       seq.add((float)-0.0);
       return seq;
     },(float)-0.0);
     QueryTestUtil.testcontainsByte(()->
     {
       var seq=new CheckedList();
+      seq.add((float)3);
       seq.add((float)0.0);
       return seq;
     },(float)0.0);
     QueryTestUtil.testcontainsByte(()->
     {
       var seq=new CheckedList();
+      seq.add((float)3);
       seq.add((float)1.0);
       return seq;
     },(float)1.0);
@@ -1665,12 +1852,14 @@ public class FloatArrSeqQueryTest
     QueryTestUtil.testcontainsBoolean(()->
     {
       var seq=new CheckedList();
+      seq.add((float)3);
       seq.add(true);
       return seq;
     },true);
     QueryTestUtil.testcontainsBoolean(()->
     {
       var seq=new CheckedList();
+      seq.add((float)3);
       seq.add(false);
       return seq;
     },false);
@@ -1700,12 +1889,14 @@ public class FloatArrSeqQueryTest
     QueryTestUtil.testcontainsDouble(()->
     {
       var seq=new CheckedStack();
+      seq.add((float)3);
       seq.add((float)0);
       return seq;
     },(float)0);
     QueryTestUtil.testcontainsDouble(()->
     {
       var seq=new CheckedStack();
+      seq.add((float)3);
       seq.add((float)Float.NaN);
       return seq;
     },(float)Float.NaN);
@@ -1716,12 +1907,14 @@ public class FloatArrSeqQueryTest
     QueryTestUtil.testcontainsFloat(()->
     {
       var seq=new CheckedStack();
+      seq.add((float)3);
       seq.add((float)0);
       return seq;
     },(float)0);
     QueryTestUtil.testcontainsFloat(()->
     {
       var seq=new CheckedStack();
+      seq.add((float)3);
       seq.add((float)Float.NaN);
       return seq;
     },(float)Float.NaN);
@@ -1732,18 +1925,21 @@ public class FloatArrSeqQueryTest
     QueryTestUtil.testcontainsLong(()->
     {
       var seq=new CheckedStack();
+      seq.add((float)3);
       seq.add((float)-0.0);
       return seq;
     },(float)-0.0);
     QueryTestUtil.testcontainsLong(()->
     {
       var seq=new CheckedStack();
+      seq.add((float)3);
       seq.add((float)0.0);
       return seq;
     },(float)0.0);
     QueryTestUtil.testcontainsLong(()->
     {
       var seq=new CheckedStack();
+      seq.add((float)3);
       seq.add((float)1.0);
       return seq;
     },(float)1.0);
@@ -1754,18 +1950,21 @@ public class FloatArrSeqQueryTest
     QueryTestUtil.testcontainsInt(()->
     {
       var seq=new CheckedStack();
+      seq.add((float)3);
       seq.add((float)-0.0);
       return seq;
     },(float)-0.0);
     QueryTestUtil.testcontainsInt(()->
     {
       var seq=new CheckedStack();
+      seq.add((float)3);
       seq.add((float)0.0);
       return seq;
     },(float)0.0);
     QueryTestUtil.testcontainsInt(()->
     {
       var seq=new CheckedStack();
+      seq.add((float)3);
       seq.add((float)1.0);
       return seq;
     },(float)1.0);
@@ -1776,18 +1975,21 @@ public class FloatArrSeqQueryTest
     QueryTestUtil.testcontainsShort(()->
     {
       var seq=new CheckedStack();
+      seq.add((float)3);
       seq.add((float)-0.0);
       return seq;
     },(float)-0.0);
     QueryTestUtil.testcontainsShort(()->
     {
       var seq=new CheckedStack();
+      seq.add((float)3);
       seq.add((float)0.0);
       return seq;
     },(float)0.0);
     QueryTestUtil.testcontainsShort(()->
     {
       var seq=new CheckedStack();
+      seq.add((float)3);
       seq.add((float)1.0);
       return seq;
     },(float)1.0);
@@ -1798,18 +2000,21 @@ public class FloatArrSeqQueryTest
     QueryTestUtil.testcontainsChar(()->
     {
       var seq=new CheckedStack();
+      seq.add((float)3);
       seq.add((float)-0.0);
       return seq;
     },(float)-0.0);
     QueryTestUtil.testcontainsChar(()->
     {
       var seq=new CheckedStack();
+      seq.add((float)3);
       seq.add((float)0.0);
       return seq;
     },(float)0.0);
     QueryTestUtil.testcontainsChar(()->
     {
       var seq=new CheckedStack();
+      seq.add((float)3);
       seq.add((float)1.0);
       return seq;
     },(float)1.0);
@@ -1820,18 +2025,21 @@ public class FloatArrSeqQueryTest
     QueryTestUtil.testcontainsByte(()->
     {
       var seq=new CheckedStack();
+      seq.add((float)3);
       seq.add((float)-0.0);
       return seq;
     },(float)-0.0);
     QueryTestUtil.testcontainsByte(()->
     {
       var seq=new CheckedStack();
+      seq.add((float)3);
       seq.add((float)0.0);
       return seq;
     },(float)0.0);
     QueryTestUtil.testcontainsByte(()->
     {
       var seq=new CheckedStack();
+      seq.add((float)3);
       seq.add((float)1.0);
       return seq;
     },(float)1.0);
@@ -1842,12 +2050,14 @@ public class FloatArrSeqQueryTest
     QueryTestUtil.testcontainsBoolean(()->
     {
       var seq=new CheckedStack();
+      seq.add((float)3);
       seq.add(true);
       return seq;
     },true);
     QueryTestUtil.testcontainsBoolean(()->
     {
       var seq=new CheckedStack();
+      seq.add((float)3);
       seq.add(false);
       return seq;
     },false);
@@ -1879,6 +2089,7 @@ public class FloatArrSeqQueryTest
       var root=new CheckedList();
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
+      seq.add((float)3);
       seq.add((float)0);
       return seq;
     },(float)0);
@@ -1887,6 +2098,7 @@ public class FloatArrSeqQueryTest
       var root=new CheckedList();
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
+      seq.add((float)3);
       seq.add((float)Float.NaN);
       return seq;
     },(float)Float.NaN);
@@ -1899,6 +2111,7 @@ public class FloatArrSeqQueryTest
       var root=new CheckedList();
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
+      seq.add((float)3);
       seq.add((float)0);
       return seq;
     },(float)0);
@@ -1907,6 +2120,7 @@ public class FloatArrSeqQueryTest
       var root=new CheckedList();
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
+      seq.add((float)3);
       seq.add((float)Float.NaN);
       return seq;
     },(float)Float.NaN);
@@ -1919,6 +2133,7 @@ public class FloatArrSeqQueryTest
       var root=new CheckedList();
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
+      seq.add((float)3);
       seq.add((float)-0.0);
       return seq;
     },(float)-0.0);
@@ -1927,6 +2142,7 @@ public class FloatArrSeqQueryTest
       var root=new CheckedList();
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
+      seq.add((float)3);
       seq.add((float)0.0);
       return seq;
     },(float)0.0);
@@ -1935,6 +2151,7 @@ public class FloatArrSeqQueryTest
       var root=new CheckedList();
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
+      seq.add((float)3);
       seq.add((float)1.0);
       return seq;
     },(float)1.0);
@@ -1947,6 +2164,7 @@ public class FloatArrSeqQueryTest
       var root=new CheckedList();
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
+      seq.add((float)3);
       seq.add((float)-0.0);
       return seq;
     },(float)-0.0);
@@ -1955,6 +2173,7 @@ public class FloatArrSeqQueryTest
       var root=new CheckedList();
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
+      seq.add((float)3);
       seq.add((float)0.0);
       return seq;
     },(float)0.0);
@@ -1963,6 +2182,7 @@ public class FloatArrSeqQueryTest
       var root=new CheckedList();
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
+      seq.add((float)3);
       seq.add((float)1.0);
       return seq;
     },(float)1.0);
@@ -1975,6 +2195,7 @@ public class FloatArrSeqQueryTest
       var root=new CheckedList();
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
+      seq.add((float)3);
       seq.add((float)-0.0);
       return seq;
     },(float)-0.0);
@@ -1983,6 +2204,7 @@ public class FloatArrSeqQueryTest
       var root=new CheckedList();
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
+      seq.add((float)3);
       seq.add((float)0.0);
       return seq;
     },(float)0.0);
@@ -1991,6 +2213,7 @@ public class FloatArrSeqQueryTest
       var root=new CheckedList();
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
+      seq.add((float)3);
       seq.add((float)1.0);
       return seq;
     },(float)1.0);
@@ -2003,6 +2226,7 @@ public class FloatArrSeqQueryTest
       var root=new CheckedList();
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
+      seq.add((float)3);
       seq.add((float)-0.0);
       return seq;
     },(float)-0.0);
@@ -2011,6 +2235,7 @@ public class FloatArrSeqQueryTest
       var root=new CheckedList();
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
+      seq.add((float)3);
       seq.add((float)0.0);
       return seq;
     },(float)0.0);
@@ -2019,6 +2244,7 @@ public class FloatArrSeqQueryTest
       var root=new CheckedList();
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
+      seq.add((float)3);
       seq.add((float)1.0);
       return seq;
     },(float)1.0);
@@ -2031,6 +2257,7 @@ public class FloatArrSeqQueryTest
       var root=new CheckedList();
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
+      seq.add((float)3);
       seq.add((float)-0.0);
       return seq;
     },(float)-0.0);
@@ -2039,6 +2266,7 @@ public class FloatArrSeqQueryTest
       var root=new CheckedList();
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
+      seq.add((float)3);
       seq.add((float)0.0);
       return seq;
     },(float)0.0);
@@ -2047,6 +2275,7 @@ public class FloatArrSeqQueryTest
       var root=new CheckedList();
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
+      seq.add((float)3);
       seq.add((float)1.0);
       return seq;
     },(float)1.0);
@@ -2059,6 +2288,7 @@ public class FloatArrSeqQueryTest
       var root=new CheckedList();
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
+      seq.add((float)3);
       seq.add(true);
       return seq;
     },true);
@@ -2067,6 +2297,7 @@ public class FloatArrSeqQueryTest
       var root=new CheckedList();
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
+      seq.add((float)3);
       seq.add(false);
       return seq;
     },false);
@@ -2102,6 +2333,7 @@ public class FloatArrSeqQueryTest
       var root=new UncheckedList();
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
+      seq.add((float)3);
       seq.add((float)0);
       return seq;
     },(float)0);
@@ -2110,6 +2342,7 @@ public class FloatArrSeqQueryTest
       var root=new UncheckedList();
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
+      seq.add((float)3);
       seq.add((float)Float.NaN);
       return seq;
     },(float)Float.NaN);
@@ -2122,6 +2355,7 @@ public class FloatArrSeqQueryTest
       var root=new UncheckedList();
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
+      seq.add((float)3);
       seq.add((float)0);
       return seq;
     },(float)0);
@@ -2130,6 +2364,7 @@ public class FloatArrSeqQueryTest
       var root=new UncheckedList();
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
+      seq.add((float)3);
       seq.add((float)Float.NaN);
       return seq;
     },(float)Float.NaN);
@@ -2142,6 +2377,7 @@ public class FloatArrSeqQueryTest
       var root=new UncheckedList();
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
+      seq.add((float)3);
       seq.add((float)-0.0);
       return seq;
     },(float)-0.0);
@@ -2150,6 +2386,7 @@ public class FloatArrSeqQueryTest
       var root=new UncheckedList();
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
+      seq.add((float)3);
       seq.add((float)0.0);
       return seq;
     },(float)0.0);
@@ -2158,6 +2395,7 @@ public class FloatArrSeqQueryTest
       var root=new UncheckedList();
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
+      seq.add((float)3);
       seq.add((float)1.0);
       return seq;
     },(float)1.0);
@@ -2170,6 +2408,7 @@ public class FloatArrSeqQueryTest
       var root=new UncheckedList();
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
+      seq.add((float)3);
       seq.add((float)-0.0);
       return seq;
     },(float)-0.0);
@@ -2178,6 +2417,7 @@ public class FloatArrSeqQueryTest
       var root=new UncheckedList();
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
+      seq.add((float)3);
       seq.add((float)0.0);
       return seq;
     },(float)0.0);
@@ -2186,6 +2426,7 @@ public class FloatArrSeqQueryTest
       var root=new UncheckedList();
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
+      seq.add((float)3);
       seq.add((float)1.0);
       return seq;
     },(float)1.0);
@@ -2198,6 +2439,7 @@ public class FloatArrSeqQueryTest
       var root=new UncheckedList();
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
+      seq.add((float)3);
       seq.add((float)-0.0);
       return seq;
     },(float)-0.0);
@@ -2206,6 +2448,7 @@ public class FloatArrSeqQueryTest
       var root=new UncheckedList();
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
+      seq.add((float)3);
       seq.add((float)0.0);
       return seq;
     },(float)0.0);
@@ -2214,6 +2457,7 @@ public class FloatArrSeqQueryTest
       var root=new UncheckedList();
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
+      seq.add((float)3);
       seq.add((float)1.0);
       return seq;
     },(float)1.0);
@@ -2226,6 +2470,7 @@ public class FloatArrSeqQueryTest
       var root=new UncheckedList();
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
+      seq.add((float)3);
       seq.add((float)-0.0);
       return seq;
     },(float)-0.0);
@@ -2234,6 +2479,7 @@ public class FloatArrSeqQueryTest
       var root=new UncheckedList();
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
+      seq.add((float)3);
       seq.add((float)0.0);
       return seq;
     },(float)0.0);
@@ -2242,6 +2488,7 @@ public class FloatArrSeqQueryTest
       var root=new UncheckedList();
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
+      seq.add((float)3);
       seq.add((float)1.0);
       return seq;
     },(float)1.0);
@@ -2254,6 +2501,7 @@ public class FloatArrSeqQueryTest
       var root=new UncheckedList();
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
+      seq.add((float)3);
       seq.add((float)-0.0);
       return seq;
     },(float)-0.0);
@@ -2262,6 +2510,7 @@ public class FloatArrSeqQueryTest
       var root=new UncheckedList();
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
+      seq.add((float)3);
       seq.add((float)0.0);
       return seq;
     },(float)0.0);
@@ -2270,6 +2519,7 @@ public class FloatArrSeqQueryTest
       var root=new UncheckedList();
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
+      seq.add((float)3);
       seq.add((float)1.0);
       return seq;
     },(float)1.0);
@@ -2282,6 +2532,7 @@ public class FloatArrSeqQueryTest
       var root=new UncheckedList();
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
+      seq.add((float)3);
       seq.add(true);
       return seq;
     },true);
@@ -2290,6 +2541,7 @@ public class FloatArrSeqQueryTest
       var root=new UncheckedList();
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
+      seq.add((float)3);
       seq.add(false);
       return seq;
     },false);

@@ -10,6 +10,7 @@ import omni.impl.seq.RefArrSeq.UncheckedStack;
 import omni.impl.seq.RefArrSeq.CheckedStack;
 import java.util.ArrayList;
 import java.util.ConcurrentModificationException;
+import java.util.Comparator;
 @SuppressWarnings({"rawtypes","unchecked"}) 
 public class RefArrSeqTest
 {
@@ -327,6 +328,81 @@ public class RefArrSeqTest
     }
   }
   @Test
+  public void testComparatorsortUncheckedList()
+  {
+    //#IFSWITCH UncheckedList==CheckedList,CheckedSubList
+    {
+      var seq=new UncheckedList();
+      //test empty
+      seq.sort((Comparator)null);
+      seq.add(Integer.valueOf(2));
+      seq.add(Integer.valueOf(1));
+      seq.sort((Comparator)((v1,v2)->{return Integer.compare((Integer)v1,(Integer)v2);}));
+      Assertions.assertEquals(Integer.valueOf(1),seq.get(0));
+      Assertions.assertEquals(Integer.valueOf(2),seq.get(1));
+      seq.clear();
+      seq.add(Integer.valueOf(2));
+      seq.add(Integer.valueOf(1));
+      seq.sort((Comparator)null);
+      Assertions.assertEquals(Integer.valueOf(1),seq.get(0));
+      Assertions.assertEquals(Integer.valueOf(2),seq.get(1));
+      //TODO other cases
+    }
+    //#ENDIF
+  }
+  @Test
+  public void testComparatorunstableSortUncheckedList()
+  {
+    //#IFSWITCH UncheckedList==CheckedList,CheckedSubList
+    {
+      var seq=new UncheckedList();
+      //test empty
+      seq.unstableSort((Comparator)null);
+      seq.add(Integer.valueOf(2));
+      seq.add(Integer.valueOf(1));
+      seq.unstableSort((Comparator)((v1,v2)->{return Integer.compare((Integer)v1,(Integer)v2);}));
+      Assertions.assertEquals(Integer.valueOf(1),seq.get(0));
+      Assertions.assertEquals(Integer.valueOf(2),seq.get(1));
+      seq.clear();
+      seq.add(Integer.valueOf(2));
+      seq.add(Integer.valueOf(1));
+      seq.unstableSort((Comparator)null);
+      Assertions.assertEquals(Integer.valueOf(1),seq.get(0));
+      Assertions.assertEquals(Integer.valueOf(2),seq.get(1));
+      //TODO other cases
+    }
+    //#ENDIF
+  }
+  @Test
+  public void testRemoveAtIndexUncheckedList()
+  {
+    {
+      var seq=new UncheckedList();
+      for(int i=0;i<100;++i)
+      {
+        seq.add(Integer.valueOf(i));
+      }
+      int seqSize=seq.size();
+      Assertions.assertEquals(Integer.valueOf(0),seq.remove(0));
+      Assertions.assertEquals(Integer.valueOf(seqSize-50),seq.remove(seqSize-51));
+      Assertions.assertEquals(Integer.valueOf(seqSize-1),seq.remove(seqSize-3));
+      Assertions.assertEquals(seqSize-3,seq.size());
+      var seqItr=seq.iterator();
+      for(int i=0;i<seqSize;++i)
+      {
+        if(i==0 || i == seqSize-50 || i==seqSize-1)
+        {
+          continue;
+        }
+        Assertions.assertEquals(seqItr.next(),Integer.valueOf(i));
+      }
+      for(int i=seqSize-3;i<seqSize;++i)
+      {
+        Assertions.assertNull(seq.arr[i]);
+      }
+    }
+  }
+  @Test
   public void testToArrayUncheckedList()
   {
     var seq=new UncheckedList();
@@ -590,6 +666,123 @@ public class RefArrSeqTest
       Assertions.assertEquals(seq.size(),0);
       Assertions.assertTrue(seq.isEmpty());
       Assertions.assertEquals(seq.arr.length,i);
+    }
+  }
+  @Test
+  public void testRemoveValNonNullModCheckCheckedStack()
+  {
+    {
+      var seq=new CheckedStack();
+      Object modifyingObject=new Object(){
+        @Override public boolean equals(Object val){
+          var tmp=seq.pop();
+          seq.push(tmp);
+          return val==this;
+        }
+      };
+      for(int i=0;i<50;++i)
+      {
+        seq.add(new Object());
+      }
+      Assertions.assertThrows(ConcurrentModificationException.class,()->{
+        seq.remove(modifyingObject);
+      });
+    }
+    {
+      var seq=new CheckedStack();
+      Object modifyingObject=new Object(){
+        @Override public boolean equals(Object val){
+          var tmp=seq.pop();
+          seq.push(tmp);
+          return val==this;
+        }
+      };
+      for(int i=0;i<50;++i)
+      {
+        seq.add(new Object());
+      }
+      seq.add(modifyingObject);
+      for(int i=0;i<50;++i)
+      {
+        seq.add(new Object());
+      }
+      Assertions.assertThrows(ConcurrentModificationException.class,()->{
+        seq.remove(modifyingObject);
+      });
+    }
+    {
+      var seq=new CheckedStack();
+      Object modifyingObject=new Object(){
+        @Override public boolean equals(Object val){
+          throw new IndexOutOfBoundsException();
+        }
+      };
+      for(int i=0;i<50;++i)
+      {
+        seq.add(new Object());
+      }
+      Assertions.assertThrows(IndexOutOfBoundsException.class,()->{
+        seq.remove(modifyingObject);
+      });
+    }
+    {
+      var seq=new CheckedStack();
+      Object modifyingObject=new Object(){
+        @Override public boolean equals(Object val){
+          throw new IndexOutOfBoundsException();
+        }
+      };
+      for(int i=0;i<50;++i)
+      {
+        seq.add(new Object());
+      }
+      seq.add(modifyingObject);
+      for(int i=0;i<50;++i)
+      {
+        seq.add(new Object());
+      }
+      Assertions.assertThrows(IndexOutOfBoundsException.class,()->{
+        seq.remove(modifyingObject);
+      });
+    }
+    {
+      var seq=new CheckedStack();
+      Object modifyingObject=new Object(){
+        @Override public boolean equals(Object val){
+          var tmp=seq.pop();
+          seq.push(tmp);
+          throw new IndexOutOfBoundsException();
+        }
+      };
+      for(int i=0;i<50;++i)
+      {
+        seq.add(new Object());
+      }
+      Assertions.assertThrows(ConcurrentModificationException.class,()->{
+        seq.remove(modifyingObject);
+      });
+    }
+    {
+      var seq=new CheckedStack();
+      Object modifyingObject=new Object(){
+        @Override public boolean equals(Object val){
+          var tmp=seq.pop();
+          seq.push(tmp);
+          throw new IndexOutOfBoundsException();
+        }
+      };
+      for(int i=0;i<50;++i)
+      {
+        seq.add(new Object());
+      }
+      seq.add(modifyingObject);
+      for(int i=0;i<50;++i)
+      {
+        seq.add(new Object());
+      }
+      Assertions.assertThrows(ConcurrentModificationException.class,()->{
+        seq.remove(modifyingObject);
+      });
     }
   }
   @Test
@@ -932,6 +1125,330 @@ public class RefArrSeqTest
     }
   }
   @Test
+  public void testComparatorsortCheckedList()
+  {
+    //#IFSWITCH CheckedList==CheckedList,CheckedSubList
+    {
+      var seq=new CheckedList();
+      //test empty
+      seq.sort((Comparator)null);
+      seq.add(Integer.valueOf(2));
+      seq.add(Integer.valueOf(1));
+      seq.sort((Comparator)((v1,v2)->{return Integer.compare((Integer)v1,(Integer)v2);}));
+      Assertions.assertEquals(Integer.valueOf(1),seq.get(0));
+      Assertions.assertEquals(Integer.valueOf(2),seq.get(1));
+      seq.clear();
+      seq.add(Integer.valueOf(2));
+      seq.add(Integer.valueOf(1));
+      seq.sort((Comparator)null);
+      Assertions.assertEquals(Integer.valueOf(1),seq.get(0));
+      Assertions.assertEquals(Integer.valueOf(2),seq.get(1));
+      Assertions.assertThrows(IllegalArgumentException.class,()->{
+        seq.sort((Comparator)(v1,v2)->{throw new ArrayIndexOutOfBoundsException();});
+      });
+      Assertions.assertThrows(ConcurrentModificationException.class,()->{
+        seq.sort((Comparator)(v1,v2)->{
+        seq.add(null);
+        throw new ArrayIndexOutOfBoundsException();
+        });
+      });
+      Assertions.assertThrows(IndexOutOfBoundsException.class,()->{
+        seq.sort((Comparator)(v1,v2)->{throw new IndexOutOfBoundsException();});
+      });
+      Assertions.assertThrows(ConcurrentModificationException.class,()->{
+        seq.sort((Comparator)(v1,v2)->{
+        seq.add(null);
+        throw new IndexOutOfBoundsException();
+        });
+      });
+      seq.clear();
+      Comparable<Object> aiobObject=new Comparable<Object>(){
+        @Override public int compareTo(Object obj){
+          throw new ArrayIndexOutOfBoundsException();
+        }
+      };
+      seq.add(aiobObject);
+      seq.add(aiobObject);
+      Assertions.assertThrows(IllegalArgumentException.class,()->{
+        seq.sort((Comparator)null);
+      });
+      seq.clear();
+      Comparable<Object> modifyingAIOBObject=new Comparable<Object>(){
+        @Override public int compareTo(Object obj){
+          seq.add(null);
+          throw new ArrayIndexOutOfBoundsException();
+        }
+      };
+      seq.add(modifyingAIOBObject);
+      seq.add(modifyingAIOBObject);
+      Assertions.assertThrows(ConcurrentModificationException.class,()->{
+        seq.sort((Comparator)null);
+      });
+      seq.clear();
+      Comparable<Object> iobObject=new Comparable<Object>(){
+        @Override public int compareTo(Object obj){
+          throw new IndexOutOfBoundsException();
+        }
+      };
+      seq.add(iobObject);
+      seq.add(iobObject);
+      Assertions.assertThrows(IndexOutOfBoundsException.class,()->{
+        seq.sort((Comparator)null);
+      });
+      seq.clear();
+      Comparable<Object> modifyingIOBObject=new Comparable<Object>(){
+        @Override public int compareTo(Object obj){
+          seq.add(null);
+          throw new IndexOutOfBoundsException();
+        }
+      };
+      seq.add(modifyingIOBObject);
+      seq.add(modifyingIOBObject);
+      Assertions.assertThrows(ConcurrentModificationException.class,()->{
+        seq.sort((Comparator)null);
+      });
+      //TODO other cases
+    }
+    //#ENDIF
+  }
+  @Test
+  public void testComparatorunstableSortCheckedList()
+  {
+    //#IFSWITCH CheckedList==CheckedList,CheckedSubList
+    {
+      var seq=new CheckedList();
+      //test empty
+      seq.unstableSort((Comparator)null);
+      seq.add(Integer.valueOf(2));
+      seq.add(Integer.valueOf(1));
+      seq.unstableSort((Comparator)((v1,v2)->{return Integer.compare((Integer)v1,(Integer)v2);}));
+      Assertions.assertEquals(Integer.valueOf(1),seq.get(0));
+      Assertions.assertEquals(Integer.valueOf(2),seq.get(1));
+      seq.clear();
+      seq.add(Integer.valueOf(2));
+      seq.add(Integer.valueOf(1));
+      seq.unstableSort((Comparator)null);
+      Assertions.assertEquals(Integer.valueOf(1),seq.get(0));
+      Assertions.assertEquals(Integer.valueOf(2),seq.get(1));
+      Assertions.assertThrows(IllegalArgumentException.class,()->{
+        seq.unstableSort((Comparator)(v1,v2)->{throw new ArrayIndexOutOfBoundsException();});
+      });
+      Assertions.assertThrows(ConcurrentModificationException.class,()->{
+        seq.unstableSort((Comparator)(v1,v2)->{
+        seq.add(null);
+        throw new ArrayIndexOutOfBoundsException();
+        });
+      });
+      Assertions.assertThrows(IndexOutOfBoundsException.class,()->{
+        seq.unstableSort((Comparator)(v1,v2)->{throw new IndexOutOfBoundsException();});
+      });
+      Assertions.assertThrows(ConcurrentModificationException.class,()->{
+        seq.unstableSort((Comparator)(v1,v2)->{
+        seq.add(null);
+        throw new IndexOutOfBoundsException();
+        });
+      });
+      seq.clear();
+      Comparable<Object> aiobObject=new Comparable<Object>(){
+        @Override public int compareTo(Object obj){
+          throw new ArrayIndexOutOfBoundsException();
+        }
+      };
+      seq.add(aiobObject);
+      seq.add(aiobObject);
+      Assertions.assertThrows(IllegalArgumentException.class,()->{
+        seq.unstableSort((Comparator)null);
+      });
+      seq.clear();
+      Comparable<Object> modifyingAIOBObject=new Comparable<Object>(){
+        @Override public int compareTo(Object obj){
+          seq.add(null);
+          throw new ArrayIndexOutOfBoundsException();
+        }
+      };
+      seq.add(modifyingAIOBObject);
+      seq.add(modifyingAIOBObject);
+      Assertions.assertThrows(ConcurrentModificationException.class,()->{
+        seq.unstableSort((Comparator)null);
+      });
+      seq.clear();
+      Comparable<Object> iobObject=new Comparable<Object>(){
+        @Override public int compareTo(Object obj){
+          throw new IndexOutOfBoundsException();
+        }
+      };
+      seq.add(iobObject);
+      seq.add(iobObject);
+      Assertions.assertThrows(IndexOutOfBoundsException.class,()->{
+        seq.unstableSort((Comparator)null);
+      });
+      seq.clear();
+      Comparable<Object> modifyingIOBObject=new Comparable<Object>(){
+        @Override public int compareTo(Object obj){
+          seq.add(null);
+          throw new IndexOutOfBoundsException();
+        }
+      };
+      seq.add(modifyingIOBObject);
+      seq.add(modifyingIOBObject);
+      Assertions.assertThrows(ConcurrentModificationException.class,()->{
+        seq.unstableSort((Comparator)null);
+      });
+      //TODO other cases
+    }
+    //#ENDIF
+  }
+  @Test
+  public void testRemoveValNonNullModCheckCheckedList()
+  {
+    {
+      var seq=new CheckedList();
+      Object modifyingObject=new Object(){
+        @Override public boolean equals(Object val){
+          var tmp=seq.remove(seq.size()-1);
+          seq.add(tmp);
+          return val==this;
+        }
+      };
+      for(int i=0;i<50;++i)
+      {
+        seq.add(new Object());
+      }
+      Assertions.assertThrows(ConcurrentModificationException.class,()->{
+        seq.remove(modifyingObject);
+      });
+    }
+    {
+      var seq=new CheckedList();
+      Object modifyingObject=new Object(){
+        @Override public boolean equals(Object val){
+          var tmp=seq.remove(seq.size()-1);
+          seq.add(tmp);
+          return val==this;
+        }
+      };
+      for(int i=0;i<50;++i)
+      {
+        seq.add(new Object());
+      }
+      seq.add(modifyingObject);
+      for(int i=0;i<50;++i)
+      {
+        seq.add(new Object());
+      }
+      Assertions.assertThrows(ConcurrentModificationException.class,()->{
+        seq.remove(modifyingObject);
+      });
+    }
+    {
+      var seq=new CheckedList();
+      Object modifyingObject=new Object(){
+        @Override public boolean equals(Object val){
+          throw new IndexOutOfBoundsException();
+        }
+      };
+      for(int i=0;i<50;++i)
+      {
+        seq.add(new Object());
+      }
+      Assertions.assertThrows(IndexOutOfBoundsException.class,()->{
+        seq.remove(modifyingObject);
+      });
+    }
+    {
+      var seq=new CheckedList();
+      Object modifyingObject=new Object(){
+        @Override public boolean equals(Object val){
+          throw new IndexOutOfBoundsException();
+        }
+      };
+      for(int i=0;i<50;++i)
+      {
+        seq.add(new Object());
+      }
+      seq.add(modifyingObject);
+      for(int i=0;i<50;++i)
+      {
+        seq.add(new Object());
+      }
+      Assertions.assertThrows(IndexOutOfBoundsException.class,()->{
+        seq.remove(modifyingObject);
+      });
+    }
+    {
+      var seq=new CheckedList();
+      Object modifyingObject=new Object(){
+        @Override public boolean equals(Object val){
+          var tmp=seq.remove(seq.size()-1);
+          seq.add(tmp);
+          throw new IndexOutOfBoundsException();
+        }
+      };
+      for(int i=0;i<50;++i)
+      {
+        seq.add(new Object());
+      }
+      Assertions.assertThrows(ConcurrentModificationException.class,()->{
+        seq.remove(modifyingObject);
+      });
+    }
+    {
+      var seq=new CheckedList();
+      Object modifyingObject=new Object(){
+        @Override public boolean equals(Object val){
+          var tmp=seq.remove(seq.size()-1);
+          seq.add(tmp);
+          throw new IndexOutOfBoundsException();
+        }
+      };
+      for(int i=0;i<50;++i)
+      {
+        seq.add(new Object());
+      }
+      seq.add(modifyingObject);
+      for(int i=0;i<50;++i)
+      {
+        seq.add(new Object());
+      }
+      Assertions.assertThrows(ConcurrentModificationException.class,()->{
+        seq.remove(modifyingObject);
+      });
+    }
+  }
+  @Test
+  public void testRemoveAtIndexCheckedList()
+  {
+    {
+      var seq=new CheckedList();
+      for(int i=0;i<100;++i)
+      {
+        seq.add(Integer.valueOf(i));
+      }
+      int seqSize=seq.size();
+      int modCount=seq.modCount;
+      Assertions.assertEquals(Integer.valueOf(0),seq.remove(0));
+      Assertions.assertEquals(Integer.valueOf(seqSize-50),seq.remove(seqSize-51));
+      Assertions.assertEquals(Integer.valueOf(seqSize-1),seq.remove(seqSize-3));
+      Assertions.assertEquals(seqSize-3,seq.size());
+      var seqItr=seq.iterator();
+      for(int i=0;i<seqSize;++i)
+      {
+        if(i==0 || i == seqSize-50 || i==seqSize-1)
+        {
+          continue;
+        }
+        Assertions.assertEquals(seqItr.next(),Integer.valueOf(i));
+      }
+      Assertions.assertEquals(seq.modCount,modCount+3);
+      for(int i=seqSize-3;i<seqSize;++i)
+      {
+        Assertions.assertNull(seq.arr[i]);
+      }
+      Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.remove(-1));
+      Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.remove(seq.size()));
+    }
+  }
+  @Test
   public void testToArrayCheckedList()
   {
     var seq=new CheckedList();
@@ -1219,6 +1736,89 @@ public class RefArrSeqTest
       Assertions.assertEquals(seq.size(),0);
       Assertions.assertTrue(seq.isEmpty());
       Assertions.assertEquals(seq.arr.length,i);
+    }
+  }
+  @Test
+  public void testComparatorsortUncheckedSubList()
+  {
+    //#IFSWITCH UncheckedSubList==CheckedList,CheckedSubList
+    {
+      var root=new UncheckedList();
+      var subList=root.subList(0,0);
+      var seq=subList.subList(0,0);
+      //test empty
+      seq.sort((Comparator)null);
+      seq.add(Integer.valueOf(2));
+      seq.add(Integer.valueOf(1));
+      seq.sort((Comparator)((v1,v2)->{return Integer.compare((Integer)v1,(Integer)v2);}));
+      Assertions.assertEquals(Integer.valueOf(1),seq.get(0));
+      Assertions.assertEquals(Integer.valueOf(2),seq.get(1));
+      seq.clear();
+      seq.add(Integer.valueOf(2));
+      seq.add(Integer.valueOf(1));
+      seq.sort((Comparator)null);
+      Assertions.assertEquals(Integer.valueOf(1),seq.get(0));
+      Assertions.assertEquals(Integer.valueOf(2),seq.get(1));
+      //TODO other cases
+    }
+    //#ENDIF
+  }
+  @Test
+  public void testComparatorunstableSortUncheckedSubList()
+  {
+    //#IFSWITCH UncheckedSubList==CheckedList,CheckedSubList
+    {
+      var root=new UncheckedList();
+      var subList=root.subList(0,0);
+      var seq=subList.subList(0,0);
+      //test empty
+      seq.unstableSort((Comparator)null);
+      seq.add(Integer.valueOf(2));
+      seq.add(Integer.valueOf(1));
+      seq.unstableSort((Comparator)((v1,v2)->{return Integer.compare((Integer)v1,(Integer)v2);}));
+      Assertions.assertEquals(Integer.valueOf(1),seq.get(0));
+      Assertions.assertEquals(Integer.valueOf(2),seq.get(1));
+      seq.clear();
+      seq.add(Integer.valueOf(2));
+      seq.add(Integer.valueOf(1));
+      seq.unstableSort((Comparator)null);
+      Assertions.assertEquals(Integer.valueOf(1),seq.get(0));
+      Assertions.assertEquals(Integer.valueOf(2),seq.get(1));
+      //TODO other cases
+    }
+    //#ENDIF
+  }
+  @Test
+  public void testRemoveAtIndexUncheckedSubList()
+  {
+    {
+      var root=new UncheckedList();
+      var subList=root.subList(0,0);
+      var seq=subList.subList(0,0);
+      for(int i=0;i<100;++i)
+      {
+        seq.add(Integer.valueOf(i));
+      }
+      int seqSize=seq.size();
+      Assertions.assertEquals(Integer.valueOf(0),seq.remove(0));
+      Assertions.assertEquals(Integer.valueOf(seqSize-50),seq.remove(seqSize-51));
+      Assertions.assertEquals(Integer.valueOf(seqSize-1),seq.remove(seqSize-3));
+      Assertions.assertEquals(seqSize-3,seq.size());
+      var seqItr=seq.iterator();
+      for(int i=0;i<seqSize;++i)
+      {
+        if(i==0 || i == seqSize-50 || i==seqSize-1)
+        {
+          continue;
+        }
+        Assertions.assertEquals(seqItr.next(),Integer.valueOf(i));
+      }
+      Assertions.assertEquals(seqSize-3,subList.size());
+      Assertions.assertEquals(seqSize-3,root.size());
+      for(int i=seqSize-3;i<seqSize;++i)
+      {
+        Assertions.assertNull(root.arr[i]);
+      }
     }
   }
   @Test
@@ -1555,6 +2155,377 @@ public class RefArrSeqTest
         var val=TypeConversionUtil.convertToInteger(i+25);
         Assertions.assertEquals(val,subsubList.get(i-10));
       }
+    }
+  }
+  @Test
+  public void testComparatorsortCheckedSubList()
+  {
+    {
+      var root=new CheckedList();
+      var subList=root.subList(0,0);
+      var seq=subList.subList(0,0);
+      subList.add(null);
+      Assertions.assertThrows(ConcurrentModificationException.class,()->{
+        seq.sort((Comparator)null);
+      });
+    }
+    //#IFSWITCH CheckedSubList==CheckedList,CheckedSubList
+    {
+      var root=new CheckedList();
+      var subList=root.subList(0,0);
+      var seq=subList.subList(0,0);
+      //test empty
+      seq.sort((Comparator)null);
+      seq.add(Integer.valueOf(2));
+      seq.add(Integer.valueOf(1));
+      seq.sort((Comparator)((v1,v2)->{return Integer.compare((Integer)v1,(Integer)v2);}));
+      Assertions.assertEquals(Integer.valueOf(1),seq.get(0));
+      Assertions.assertEquals(Integer.valueOf(2),seq.get(1));
+      seq.clear();
+      seq.add(Integer.valueOf(2));
+      seq.add(Integer.valueOf(1));
+      seq.sort((Comparator)null);
+      Assertions.assertEquals(Integer.valueOf(1),seq.get(0));
+      Assertions.assertEquals(Integer.valueOf(2),seq.get(1));
+      Assertions.assertThrows(IllegalArgumentException.class,()->{
+        seq.sort((Comparator)(v1,v2)->{throw new ArrayIndexOutOfBoundsException();});
+      });
+      Assertions.assertThrows(ConcurrentModificationException.class,()->{
+        seq.sort((Comparator)(v1,v2)->{
+        seq.add(null);
+        throw new ArrayIndexOutOfBoundsException();
+        });
+      });
+      Assertions.assertThrows(IndexOutOfBoundsException.class,()->{
+        seq.sort((Comparator)(v1,v2)->{throw new IndexOutOfBoundsException();});
+      });
+      Assertions.assertThrows(ConcurrentModificationException.class,()->{
+        seq.sort((Comparator)(v1,v2)->{
+        seq.add(null);
+        throw new IndexOutOfBoundsException();
+        });
+      });
+      seq.clear();
+      Comparable<Object> aiobObject=new Comparable<Object>(){
+        @Override public int compareTo(Object obj){
+          throw new ArrayIndexOutOfBoundsException();
+        }
+      };
+      seq.add(aiobObject);
+      seq.add(aiobObject);
+      Assertions.assertThrows(IllegalArgumentException.class,()->{
+        seq.sort((Comparator)null);
+      });
+      seq.clear();
+      Comparable<Object> modifyingAIOBObject=new Comparable<Object>(){
+        @Override public int compareTo(Object obj){
+          seq.add(null);
+          throw new ArrayIndexOutOfBoundsException();
+        }
+      };
+      seq.add(modifyingAIOBObject);
+      seq.add(modifyingAIOBObject);
+      Assertions.assertThrows(ConcurrentModificationException.class,()->{
+        seq.sort((Comparator)null);
+      });
+      seq.clear();
+      Comparable<Object> iobObject=new Comparable<Object>(){
+        @Override public int compareTo(Object obj){
+          throw new IndexOutOfBoundsException();
+        }
+      };
+      seq.add(iobObject);
+      seq.add(iobObject);
+      Assertions.assertThrows(IndexOutOfBoundsException.class,()->{
+        seq.sort((Comparator)null);
+      });
+      seq.clear();
+      Comparable<Object> modifyingIOBObject=new Comparable<Object>(){
+        @Override public int compareTo(Object obj){
+          seq.add(null);
+          throw new IndexOutOfBoundsException();
+        }
+      };
+      seq.add(modifyingIOBObject);
+      seq.add(modifyingIOBObject);
+      Assertions.assertThrows(ConcurrentModificationException.class,()->{
+        seq.sort((Comparator)null);
+      });
+      //TODO other cases
+    }
+    //#ENDIF
+  }
+  @Test
+  public void testComparatorunstableSortCheckedSubList()
+  {
+    {
+      var root=new CheckedList();
+      var subList=root.subList(0,0);
+      var seq=subList.subList(0,0);
+      subList.add(null);
+      Assertions.assertThrows(ConcurrentModificationException.class,()->{
+        seq.unstableSort((Comparator)null);
+      });
+    }
+    //#IFSWITCH CheckedSubList==CheckedList,CheckedSubList
+    {
+      var root=new CheckedList();
+      var subList=root.subList(0,0);
+      var seq=subList.subList(0,0);
+      //test empty
+      seq.unstableSort((Comparator)null);
+      seq.add(Integer.valueOf(2));
+      seq.add(Integer.valueOf(1));
+      seq.unstableSort((Comparator)((v1,v2)->{return Integer.compare((Integer)v1,(Integer)v2);}));
+      Assertions.assertEquals(Integer.valueOf(1),seq.get(0));
+      Assertions.assertEquals(Integer.valueOf(2),seq.get(1));
+      seq.clear();
+      seq.add(Integer.valueOf(2));
+      seq.add(Integer.valueOf(1));
+      seq.unstableSort((Comparator)null);
+      Assertions.assertEquals(Integer.valueOf(1),seq.get(0));
+      Assertions.assertEquals(Integer.valueOf(2),seq.get(1));
+      Assertions.assertThrows(IllegalArgumentException.class,()->{
+        seq.unstableSort((Comparator)(v1,v2)->{throw new ArrayIndexOutOfBoundsException();});
+      });
+      Assertions.assertThrows(ConcurrentModificationException.class,()->{
+        seq.unstableSort((Comparator)(v1,v2)->{
+        seq.add(null);
+        throw new ArrayIndexOutOfBoundsException();
+        });
+      });
+      Assertions.assertThrows(IndexOutOfBoundsException.class,()->{
+        seq.unstableSort((Comparator)(v1,v2)->{throw new IndexOutOfBoundsException();});
+      });
+      Assertions.assertThrows(ConcurrentModificationException.class,()->{
+        seq.unstableSort((Comparator)(v1,v2)->{
+        seq.add(null);
+        throw new IndexOutOfBoundsException();
+        });
+      });
+      seq.clear();
+      Comparable<Object> aiobObject=new Comparable<Object>(){
+        @Override public int compareTo(Object obj){
+          throw new ArrayIndexOutOfBoundsException();
+        }
+      };
+      seq.add(aiobObject);
+      seq.add(aiobObject);
+      Assertions.assertThrows(IllegalArgumentException.class,()->{
+        seq.unstableSort((Comparator)null);
+      });
+      seq.clear();
+      Comparable<Object> modifyingAIOBObject=new Comparable<Object>(){
+        @Override public int compareTo(Object obj){
+          seq.add(null);
+          throw new ArrayIndexOutOfBoundsException();
+        }
+      };
+      seq.add(modifyingAIOBObject);
+      seq.add(modifyingAIOBObject);
+      Assertions.assertThrows(ConcurrentModificationException.class,()->{
+        seq.unstableSort((Comparator)null);
+      });
+      seq.clear();
+      Comparable<Object> iobObject=new Comparable<Object>(){
+        @Override public int compareTo(Object obj){
+          throw new IndexOutOfBoundsException();
+        }
+      };
+      seq.add(iobObject);
+      seq.add(iobObject);
+      Assertions.assertThrows(IndexOutOfBoundsException.class,()->{
+        seq.unstableSort((Comparator)null);
+      });
+      seq.clear();
+      Comparable<Object> modifyingIOBObject=new Comparable<Object>(){
+        @Override public int compareTo(Object obj){
+          seq.add(null);
+          throw new IndexOutOfBoundsException();
+        }
+      };
+      seq.add(modifyingIOBObject);
+      seq.add(modifyingIOBObject);
+      Assertions.assertThrows(ConcurrentModificationException.class,()->{
+        seq.unstableSort((Comparator)null);
+      });
+      //TODO other cases
+    }
+    //#ENDIF
+  }
+  @Test
+  public void testRemoveValNonNullModCheckCheckedSubList()
+  {
+    {
+      var root=new CheckedList();
+      var subList=root.subList(0,0);
+      var seq=subList.subList(0,0);
+      Object modifyingObject=new Object(){
+        @Override public boolean equals(Object val){
+          var tmp=seq.remove(seq.size()-1);
+          seq.add(tmp);
+          return val==this;
+        }
+      };
+      for(int i=0;i<50;++i)
+      {
+        seq.add(new Object());
+      }
+      Assertions.assertThrows(ConcurrentModificationException.class,()->{
+        seq.remove(modifyingObject);
+      });
+    }
+    {
+      var root=new CheckedList();
+      var subList=root.subList(0,0);
+      var seq=subList.subList(0,0);
+      Object modifyingObject=new Object(){
+        @Override public boolean equals(Object val){
+          var tmp=seq.remove(seq.size()-1);
+          seq.add(tmp);
+          return val==this;
+        }
+      };
+      for(int i=0;i<50;++i)
+      {
+        seq.add(new Object());
+      }
+      seq.add(modifyingObject);
+      for(int i=0;i<50;++i)
+      {
+        seq.add(new Object());
+      }
+      Assertions.assertThrows(ConcurrentModificationException.class,()->{
+        seq.remove(modifyingObject);
+      });
+    }
+    {
+      var root=new CheckedList();
+      var subList=root.subList(0,0);
+      var seq=subList.subList(0,0);
+      Object modifyingObject=new Object(){
+        @Override public boolean equals(Object val){
+          throw new IndexOutOfBoundsException();
+        }
+      };
+      for(int i=0;i<50;++i)
+      {
+        seq.add(new Object());
+      }
+      Assertions.assertThrows(IndexOutOfBoundsException.class,()->{
+        seq.remove(modifyingObject);
+      });
+    }
+    {
+      var root=new CheckedList();
+      var subList=root.subList(0,0);
+      var seq=subList.subList(0,0);
+      Object modifyingObject=new Object(){
+        @Override public boolean equals(Object val){
+          throw new IndexOutOfBoundsException();
+        }
+      };
+      for(int i=0;i<50;++i)
+      {
+        seq.add(new Object());
+      }
+      seq.add(modifyingObject);
+      for(int i=0;i<50;++i)
+      {
+        seq.add(new Object());
+      }
+      Assertions.assertThrows(IndexOutOfBoundsException.class,()->{
+        seq.remove(modifyingObject);
+      });
+    }
+    {
+      var root=new CheckedList();
+      var subList=root.subList(0,0);
+      var seq=subList.subList(0,0);
+      Object modifyingObject=new Object(){
+        @Override public boolean equals(Object val){
+          var tmp=seq.remove(seq.size()-1);
+          seq.add(tmp);
+          throw new IndexOutOfBoundsException();
+        }
+      };
+      for(int i=0;i<50;++i)
+      {
+        seq.add(new Object());
+      }
+      Assertions.assertThrows(ConcurrentModificationException.class,()->{
+        seq.remove(modifyingObject);
+      });
+    }
+    {
+      var root=new CheckedList();
+      var subList=root.subList(0,0);
+      var seq=subList.subList(0,0);
+      Object modifyingObject=new Object(){
+        @Override public boolean equals(Object val){
+          var tmp=seq.remove(seq.size()-1);
+          seq.add(tmp);
+          throw new IndexOutOfBoundsException();
+        }
+      };
+      for(int i=0;i<50;++i)
+      {
+        seq.add(new Object());
+      }
+      seq.add(modifyingObject);
+      for(int i=0;i<50;++i)
+      {
+        seq.add(new Object());
+      }
+      Assertions.assertThrows(ConcurrentModificationException.class,()->{
+        seq.remove(modifyingObject);
+      });
+    }
+  }
+  @Test
+  public void testRemoveAtIndexCheckedSubList()
+  {
+    {
+      var root=new CheckedList();
+      var subList=root.subList(0,0);
+      var seq=subList.subList(0,0);
+      subList.add(null);
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.remove(0));
+      subList.remove(0);
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.remove(0));
+    }
+    {
+      var root=new CheckedList();
+      var subList=root.subList(0,0);
+      var seq=subList.subList(0,0);
+      for(int i=0;i<100;++i)
+      {
+        seq.add(Integer.valueOf(i));
+      }
+      int seqSize=seq.size();
+      int modCount=root.modCount;
+      Assertions.assertEquals(Integer.valueOf(0),seq.remove(0));
+      Assertions.assertEquals(Integer.valueOf(seqSize-50),seq.remove(seqSize-51));
+      Assertions.assertEquals(Integer.valueOf(seqSize-1),seq.remove(seqSize-3));
+      Assertions.assertEquals(seqSize-3,seq.size());
+      var seqItr=seq.iterator();
+      for(int i=0;i<seqSize;++i)
+      {
+        if(i==0 || i == seqSize-50 || i==seqSize-1)
+        {
+          continue;
+        }
+        Assertions.assertEquals(seqItr.next(),Integer.valueOf(i));
+      }
+      Assertions.assertEquals(seqSize-3,subList.size());
+      Assertions.assertEquals(seqSize-3,root.size());
+      Assertions.assertEquals(root.modCount,modCount+3);
+      for(int i=seqSize-3;i<seqSize;++i)
+      {
+        Assertions.assertNull(root.arr[i]);
+      }
+      Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.remove(-1));
+      Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.remove(seq.size()));
     }
   }
   @Test

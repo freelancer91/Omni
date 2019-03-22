@@ -1956,8 +1956,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>
     public void stableAscendingSort()
     {
       final int size;
-      if((size=this.size)>1)
-      {
+      if((size=this.size)>1){
         RefSortUtil.uncheckedStableAscendingSort(this.arr,0,size);
       }
     }
@@ -1965,8 +1964,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>
     public void stableDescendingSort()
     {
       final int size;
-      if((size=this.size)>1)
-      {
+      if((size=this.size)>1){
         RefSortUtil.uncheckedStableDescendingSort(this.arr,0,size);
       }
     }
@@ -1990,8 +1988,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>
     public void unstableAscendingSort()
     {
       final int size;
-      if((size=this.size)>1)
-      {
+      if((size=this.size)>1){
         RefSortUtil.uncheckedUnstableAscendingSort(this.arr,0,size);
       }
     }
@@ -1999,8 +1996,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>
     public void unstableDescendingSort()
     {
       final int size;
-      if((size=this.size)>1)
-      {
+      if((size=this.size)>1){
         RefSortUtil.uncheckedUnstableDescendingSort(this.arr,0,size);
       }
     }
@@ -3374,8 +3370,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>
     public void stableAscendingSort()
     {
       final int size;
-      if((size=this.size)>1)
-      {
+      if((size=this.size)>1){
         final int rootOffset;
         RefSortUtil.uncheckedStableAscendingSort(root.arr,rootOffset=this.rootOffset,rootOffset+size);
       }
@@ -3384,8 +3379,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>
     public void stableDescendingSort()
     {
       final int size;
-      if((size=this.size)>1)
-      {
+      if((size=this.size)>1){
         final int rootOffset;
         RefSortUtil.uncheckedStableDescendingSort(root.arr,rootOffset=this.rootOffset,rootOffset+size);
       }
@@ -3411,8 +3405,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>
     public void unstableAscendingSort()
     {
       final int size;
-      if((size=this.size)>1)
-      {
+      if((size=this.size)>1){
         final int rootOffset;
         RefSortUtil.uncheckedUnstableAscendingSort(root.arr,rootOffset=this.rootOffset,rootOffset+size);
       }
@@ -3421,8 +3414,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>
     public void unstableDescendingSort()
     {
       final int size;
-      if((size=this.size)>1)
-      {
+      if((size=this.size)>1){
         final int rootOffset;
         RefSortUtil.uncheckedUnstableDescendingSort(root.arr,rootOffset=this.rootOffset,rootOffset+size);
       }
@@ -4346,6 +4338,10 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>
         }
         catch(ArrayIndexOutOfBoundsException e)
         {
+          throw CheckedCollection.checkModCount(modCount,this.modCount,new IllegalArgumentException("Comparison method violates its general contract!",e));
+        }
+        catch(RuntimeException e)
+        {
           throw CheckedCollection.checkModCount(modCount,this.modCount,e);
         }
         CheckedCollection.checkModCount(modCount,this.modCount);
@@ -4356,15 +4352,15 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>
     public void stableAscendingSort()
     {
       final int size;
-      if((size=this.size)>1)
-      {
+      if((size=this.size)>1){
         final int modCount=this.modCount;
         try
         {
           RefSortUtil.uncheckedStableAscendingSort(this.arr,0,size);
         }
-        catch(ArrayIndexOutOfBoundsException e)
-        {
+        catch(ArrayIndexOutOfBoundsException e){
+          throw CheckedCollection.checkModCount(modCount,this.modCount,new IllegalArgumentException("Comparison method violates its general contract!",e));
+        }catch(RuntimeException e){
           throw CheckedCollection.checkModCount(modCount,this.modCount,e);
         }
         CheckedCollection.checkModCount(modCount,this.modCount);
@@ -4375,15 +4371,15 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>
     public void stableDescendingSort()
     {
       final int size;
-      if((size=this.size)>1)
-      {
+      if((size=this.size)>1){
         final int modCount=this.modCount;
         try
         {
           RefSortUtil.uncheckedStableDescendingSort(this.arr,0,size);
         }
-        catch(ArrayIndexOutOfBoundsException e)
-        {
+        catch(ArrayIndexOutOfBoundsException e){
+          throw CheckedCollection.checkModCount(modCount,this.modCount,new IllegalArgumentException("Comparison method violates its general contract!",e));
+        }catch(RuntimeException e){
           throw CheckedCollection.checkModCount(modCount,this.modCount,e);
         }
         CheckedCollection.checkModCount(modCount,this.modCount);
@@ -4410,6 +4406,10 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>
         }
         catch(ArrayIndexOutOfBoundsException e)
         {
+          throw CheckedCollection.checkModCount(modCount,this.modCount,new IllegalArgumentException("Comparison method violates its general contract!",e));
+        }
+        catch(RuntimeException e)
+        {
           throw CheckedCollection.checkModCount(modCount,this.modCount,e);
         }
         CheckedCollection.checkModCount(modCount,this.modCount);
@@ -4420,15 +4420,15 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>
     public void unstableAscendingSort()
     {
       final int size;
-      if((size=this.size)>1)
-      {
+      if((size=this.size)>1){
         final int modCount=this.modCount;
         try
         {
           RefSortUtil.uncheckedUnstableAscendingSort(this.arr,0,size);
         }
-        catch(ArrayIndexOutOfBoundsException e)
-        {
+        catch(ArrayIndexOutOfBoundsException e){
+          throw CheckedCollection.checkModCount(modCount,this.modCount,new IllegalArgumentException("Comparison method violates its general contract!",e));
+        }catch(RuntimeException e){
           throw CheckedCollection.checkModCount(modCount,this.modCount,e);
         }
         CheckedCollection.checkModCount(modCount,this.modCount);
@@ -4439,15 +4439,15 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>
     public void unstableDescendingSort()
     {
       final int size;
-      if((size=this.size)>1)
-      {
+      if((size=this.size)>1){
         final int modCount=this.modCount;
         try
         {
           RefSortUtil.uncheckedUnstableDescendingSort(this.arr,0,size);
         }
-        catch(ArrayIndexOutOfBoundsException e)
-        {
+        catch(ArrayIndexOutOfBoundsException e){
+          throw CheckedCollection.checkModCount(modCount,this.modCount,new IllegalArgumentException("Comparison method violates its general contract!",e));
+        }catch(RuntimeException e){
           throw CheckedCollection.checkModCount(modCount,this.modCount,e);
         }
         CheckedCollection.checkModCount(modCount,this.modCount);
@@ -6505,21 +6505,23 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>
         {
           return;
         }
-        final int rootOffset;
-        if(sorter==null)
+        try
         {
-          RefSortUtil.uncheckedStableAscendingSort(root.arr,rootOffset=this.rootOffset,rootOffset+size);
+          final int rootOffset;
+          if(sorter==null)
+          {
+            RefSortUtil.uncheckedStableAscendingSort(root.arr,rootOffset=this.rootOffset,rootOffset+size);
+          }
+          else
+          {
+            {
+              RefSortUtil.uncheckedStableSort(root.arr,rootOffset=this.rootOffset,rootOffset+size,sorter);
+            }
+          }
         }
-        else
+        catch(ArrayIndexOutOfBoundsException e)
         {
-          try
-          {
-            RefSortUtil.uncheckedStableSort(root.arr,rootOffset=this.rootOffset,rootOffset+size,sorter);
-          }
-          catch(ArrayIndexOutOfBoundsException e)
-          {
-            throw new IllegalArgumentException("Comparison method violates its general contract!");
-          }
+          throw new IllegalArgumentException("Comparison method violates its general contract!",e);
         }
       }
       finally
@@ -6535,48 +6537,48 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>
     {
       int modCount=this.modCount;
       final var root=this.root;
-      try
-      {
+      try{
         final int size;
-        if((size=this.size)<2)
-        {
+        if((size=this.size)<2){
           return;
         }
-        final int rootOffset;
-        RefSortUtil.uncheckedStableAscendingSort(root.arr,rootOffset=this.rootOffset,rootOffset+size);
+        try{
+          final int rootOffset;
+          RefSortUtil.uncheckedStableAscendingSort(root.arr,rootOffset=this.rootOffset,rootOffset+size);
+        }catch(ArrayIndexOutOfBoundsException e){
+          throw CheckedCollection.checkModCount(modCount,root.modCount,new IllegalArgumentException("Comparison method violates its general contract!",e));
+        }
       }
-      catch(ArrayIndexOutOfBoundsException e)
-      {
-        throw CheckedCollection.checkModCount(modCount,root.modCount,e);
+      finally{
+        CheckedCollection.checkModCount(modCount,root.modCount);
       }
-      CheckedCollection.checkModCount(modCount,root.modCount);
       root.modCount=++modCount;
       this.modCount=modCount;
-      for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}
+      for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}  
     }
     @Override
     public void stableDescendingSort()
     {
       int modCount=this.modCount;
       final var root=this.root;
-      try
-      {
+      try{
         final int size;
-        if((size=this.size)<2)
-        {
+        if((size=this.size)<2){
           return;
         }
-        final int rootOffset;
-        RefSortUtil.uncheckedStableDescendingSort(root.arr,rootOffset=this.rootOffset,rootOffset+size);
+        try{
+          final int rootOffset;
+          RefSortUtil.uncheckedStableDescendingSort(root.arr,rootOffset=this.rootOffset,rootOffset+size);
+        }catch(ArrayIndexOutOfBoundsException e){
+          throw CheckedCollection.checkModCount(modCount,root.modCount,new IllegalArgumentException("Comparison method violates its general contract!",e));
+        }
       }
-      catch(ArrayIndexOutOfBoundsException e)
-      {
-        throw CheckedCollection.checkModCount(modCount,root.modCount,e);
+      finally{
+        CheckedCollection.checkModCount(modCount,root.modCount);
       }
-      CheckedCollection.checkModCount(modCount,root.modCount);
       root.modCount=++modCount;
       this.modCount=modCount;
-      for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}
+      for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}  
     }
     @Override
     public void unstableSort(Comparator<? super E> sorter)
@@ -6590,21 +6592,23 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>
         {
           return;
         }
-        final int rootOffset;
-        if(sorter==null)
+        try
         {
-          RefSortUtil.uncheckedUnstableAscendingSort(root.arr,rootOffset=this.rootOffset,rootOffset+size);
+          final int rootOffset;
+          if(sorter==null)
+          {
+            RefSortUtil.uncheckedUnstableAscendingSort(root.arr,rootOffset=this.rootOffset,rootOffset+size);
+          }
+          else
+          {
+            {
+              RefSortUtil.uncheckedUnstableSort(root.arr,rootOffset=this.rootOffset,rootOffset+size,sorter);
+            }
+          }
         }
-        else
+        catch(ArrayIndexOutOfBoundsException e)
         {
-          try
-          {
-            RefSortUtil.uncheckedUnstableSort(root.arr,rootOffset=this.rootOffset,rootOffset+size,sorter);
-          }
-          catch(ArrayIndexOutOfBoundsException e)
-          {
-            throw new IllegalArgumentException("Comparison method violates its general contract!");
-          }
+          throw new IllegalArgumentException("Comparison method violates its general contract!",e);
         }
       }
       finally
@@ -6620,48 +6624,48 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>
     {
       int modCount=this.modCount;
       final var root=this.root;
-      try
-      {
+      try{
         final int size;
-        if((size=this.size)<2)
-        {
+        if((size=this.size)<2){
           return;
         }
-        final int rootOffset;
-        RefSortUtil.uncheckedUnstableAscendingSort(root.arr,rootOffset=this.rootOffset,rootOffset+size);
+        try{
+          final int rootOffset;
+          RefSortUtil.uncheckedUnstableAscendingSort(root.arr,rootOffset=this.rootOffset,rootOffset+size);
+        }catch(ArrayIndexOutOfBoundsException e){
+          throw CheckedCollection.checkModCount(modCount,root.modCount,new IllegalArgumentException("Comparison method violates its general contract!",e));
+        }
       }
-      catch(ArrayIndexOutOfBoundsException e)
-      {
-        throw CheckedCollection.checkModCount(modCount,root.modCount,e);
+      finally{
+        CheckedCollection.checkModCount(modCount,root.modCount);
       }
-      CheckedCollection.checkModCount(modCount,root.modCount);
       root.modCount=++modCount;
       this.modCount=modCount;
-      for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}
+      for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}  
     }
     @Override
     public void unstableDescendingSort()
     {
       int modCount=this.modCount;
       final var root=this.root;
-      try
-      {
+      try{
         final int size;
-        if((size=this.size)<2)
-        {
+        if((size=this.size)<2){
           return;
         }
-        final int rootOffset;
-        RefSortUtil.uncheckedUnstableDescendingSort(root.arr,rootOffset=this.rootOffset,rootOffset+size);
+        try{
+          final int rootOffset;
+          RefSortUtil.uncheckedUnstableDescendingSort(root.arr,rootOffset=this.rootOffset,rootOffset+size);
+        }catch(ArrayIndexOutOfBoundsException e){
+          throw CheckedCollection.checkModCount(modCount,root.modCount,new IllegalArgumentException("Comparison method violates its general contract!",e));
+        }
       }
-      catch(ArrayIndexOutOfBoundsException e)
-      {
-        throw CheckedCollection.checkModCount(modCount,root.modCount,e);
+      finally{
+        CheckedCollection.checkModCount(modCount,root.modCount);
       }
-      CheckedCollection.checkModCount(modCount,root.modCount);
       root.modCount=++modCount;
       this.modCount=modCount;
-      for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}
+      for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}  
     }
     @Override
     public OmniList.OfRef<E> subList(int fromIndex,int toIndex)

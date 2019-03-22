@@ -915,78 +915,74 @@ public boolean removeIf(PREDICATE filter)
 #MACRODEF NonComparatorSortImpl<STABLE,DIRECTION>()
 #IFSWITCH STRUCTNAME==UncheckedList,CheckedList,UncheckedSubList,CheckedSubList
 @Override
-#IFSWITCH STABLE==Stable
+  #IFSWITCH STABLE==Stable
 public void stableDIRECTIONSort()
-#ELSE
+  #ELSE
 public void unstableDIRECTIONSort()
-#ENDIF
+  #ENDIF
 {
   #IFSWITCH STRUCTNAME==CheckedSubList
   int modCount=this.modCount;
   final var root=this.root;
-  try
-  {
+  try{
     final int size;
-    if((size=this.size)<2)
-    {
+    if((size=this.size)<2){
       return;
     }
-    final int rootOffset;
     #IF OfRef
-    $ClassPrefix$SortUtil.uncheckedSTABLEDIRECTIONSort(root.arr,rootOffset=this.rootOffset,rootOffset+size);
+    try{
+      final int rootOffset;
+      $ClassPrefix$SortUtil.uncheckedSTABLEDIRECTIONSort(root.arr,rootOffset=this.rootOffset,rootOffset+size);
+    }catch(ArrayIndexOutOfBoundsException e){
+      throw CheckedCollection.checkModCount(modCount,root.modCount,new IllegalArgumentException("Comparison method violates its general contract!",e));
+    }
     #ELSE
+    final int rootOffset;
     $ClassPrefix$SortUtil.uncheckedDIRECTIONSort(root.arr,rootOffset=this.rootOffset,rootOffset+size);
     #ENDIF
   }
-  #IF OfRef
-  catch(ArrayIndexOutOfBoundsException e)
-  {
-    throw CheckedCollection.checkModCount(modCount,root.modCount,e);
-  }
-  CheckedCollection.checkModCount(modCount,root.modCount);
-  #ELSE
-  finally
-  {
+  finally{
     CheckedCollection.checkModCount(modCount,root.modCount);
   }
-  #ENDIF
-  
   root.modCount=++modCount;
   this.modCount=modCount;
-  for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}
+  for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}  
   #ELSE
   final int size;
-  if((size=this.size)>1)
-  {
+  if((size=this.size)>1){
     #IFSWITCH STRUCTNAME==CheckedList
+    
+    
       #IF OfRef
     final int modCount=this.modCount;
     try
     {
       $ClassPrefix$SortUtil.uncheckedSTABLEDIRECTIONSort(this.arr,0,size);
     }
-    catch(ArrayIndexOutOfBoundsException e)
-    {
+    catch(ArrayIndexOutOfBoundsException e){
+      throw CheckedCollection.checkModCount(modCount,this.modCount,new IllegalArgumentException("Comparison method violates its general contract!",e));
+    }catch(RuntimeException e){
       throw CheckedCollection.checkModCount(modCount,this.modCount,e);
     }
     CheckedCollection.checkModCount(modCount,this.modCount);
+      #ELSE
+    $ClassPrefix$SortUtil.uncheckedDIRECTIONSort(this.arr,0,size);
+      #ENDIF
     this.modCount=modCount+1;
-      #ELSE
-    $ClassPrefix$SortUtil.uncheckedDIRECTIONSort(this.arr,0,size);
-    ++this.modCount;
-      #ENDIF
-    #ELSEIFSWITCH STRUCTNAME==UncheckedSubList
-    final int rootOffset;
-      #IF OfRef
-    $ClassPrefix$SortUtil.uncheckedSTABLEDIRECTIONSort(root.arr,rootOffset=this.rootOffset,rootOffset+size);
-      #ELSE
-    $ClassPrefix$SortUtil.uncheckedDIRECTIONSort(root.arr,rootOffset=this.rootOffset,rootOffset+size);
-      #ENDIF
     #ELSE
-      #IF OfRef
-    $ClassPrefix$SortUtil.uncheckedSTABLEDIRECTIONSort(this.arr,0,size);
+      #IFSWITCH STRUCTNAME==UncheckedSubList
+    final int rootOffset;
+        #IF OfRef
+    $ClassPrefix$SortUtil.uncheckedSTABLEDIRECTIONSort(root.arr,rootOffset=this.rootOffset,rootOffset+size);
+        #ELSE
+    $ClassPrefix$SortUtil.uncheckedDIRECTIONSort(root.arr,rootOffset=this.rootOffset,rootOffset+size);
+        #ENDIF
       #ELSE
+        #IF OfRef
+    $ClassPrefix$SortUtil.uncheckedSTABLEDIRECTIONSort(this.arr,0,size);
+        #ELSE
     $ClassPrefix$SortUtil.uncheckedDIRECTIONSort(this.arr,0,size);
+        #ENDIF
       #ENDIF
     #ENDIF
   }
@@ -1014,30 +1010,45 @@ public void unstableSort(COMPARATOR sorter)
     {
       return;
     }
-    final int rootOffset;
-    if(sorter==null)
-    {
     #IF OfRef
-      $ClassPrefix$SortUtil.uncheckedSTABLEAscendingSort(root.arr,rootOffset=this.rootOffset,rootOffset+size);
-    #ELSE
-      $ClassPrefix$SortUtil.uncheckedAscendingSort(root.arr,rootOffset=this.rootOffset,rootOffset+size);
+    try
     #ENDIF
-    }
-    else
     {
-      try
+      final int rootOffset;
+      if(sorter==null)
       {
-    #IF OfBoolean
-        $ClassPrefix$SortUtil.uncheckedSort(root.arr,rootOffset=this.rootOffset,rootOffset+size,COMPARE);
+    #IF OfRef
+        $ClassPrefix$SortUtil.uncheckedSTABLEAscendingSort(root.arr,rootOffset=this.rootOffset,rootOffset+size);
     #ELSE
-        $ClassPrefix$SortUtil.uncheckedSTABLESort(root.arr,rootOffset=this.rootOffset,rootOffset+size,COMPARE);
+        $ClassPrefix$SortUtil.uncheckedAscendingSort(root.arr,rootOffset=this.rootOffset,rootOffset+size);
     #ENDIF
       }
-      catch(ArrayIndexOutOfBoundsException e)
+      else
       {
-        throw new IllegalArgumentException("Comparison method violates its general contract!");
+      #IFNOT OfRef
+        try
+      #ENDIF
+        {
+    #IF OfBoolean
+          $ClassPrefix$SortUtil.uncheckedSort(root.arr,rootOffset=this.rootOffset,rootOffset+size,COMPARE);
+    #ELSE
+          $ClassPrefix$SortUtil.uncheckedSTABLESort(root.arr,rootOffset=this.rootOffset,rootOffset+size,COMPARE);
+    #ENDIF
+        }
+      #IFNOT OfRef
+        catch(ArrayIndexOutOfBoundsException e)
+        {
+          throw new IllegalArgumentException("Comparison method violates its general contract!",e);
+        }
+      #ENDIF
       }
     }
+    #IF OfRef
+    catch(ArrayIndexOutOfBoundsException e)
+    {
+      throw new IllegalArgumentException("Comparison method violates its general contract!",e);
+    }
+    #ENDIF
   }
   finally
   {
@@ -1066,6 +1077,10 @@ public void unstableSort(COMPARATOR sorter)
     }
     catch(ArrayIndexOutOfBoundsException e)
     {
+      throw CheckedCollection.checkModCount(modCount,this.modCount,new IllegalArgumentException("Comparison method violates its general contract!",e));
+    }
+    catch(RuntimeException e)
+    {
       throw CheckedCollection.checkModCount(modCount,this.modCount,e);
     }
     CheckedCollection.checkModCount(modCount,this.modCount);
@@ -1088,6 +1103,10 @@ public void unstableSort(COMPARATOR sorter)
         #ENDIF
       }
       catch(ArrayIndexOutOfBoundsException e)
+      {
+        throw CheckedCollection.checkModCount(modCount,this.modCount,new IllegalArgumentException("Comparison method violates its general contract!",e));
+      }
+      catch(RuntimeException e)
       {
         throw CheckedCollection.checkModCount(modCount,this.modCount,e);
       }

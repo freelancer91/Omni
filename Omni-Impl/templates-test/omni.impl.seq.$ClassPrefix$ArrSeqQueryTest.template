@@ -65,12 +65,14 @@ public void testSTRUCTNAMEMETHODNAMEDouble()
   QueryTestUtil.testMETHODNAMEDouble(()->
   {
     #MACRO ConstructSeq()
+    seq.add(Double.valueOf((double)3));
     seq.add(Double.valueOf((double)0));
     return seq;
   },(double)0);
   QueryTestUtil.testMETHODNAMEDouble(()->
   {
     #MACRO ConstructSeq()
+    seq.add(Double.valueOf((double)3));
     seq.add(Double.valueOf(Double.NaN));
     return seq;
   },(double)Double.NaN);
@@ -91,6 +93,7 @@ public void testSTRUCTNAMEMETHODNAMEDouble()
   QueryTestUtil.testMETHODNAMEDouble(()->
   {
     #MACRO ConstructSeq()
+    seq.add(($exposedType$)3);
     seq.add(($exposedType$)0);
     return seq;
   });
@@ -98,12 +101,14 @@ public void testSTRUCTNAMEMETHODNAMEDouble()
   QueryTestUtil.testMETHODNAMEDouble(()->
   {
     #MACRO ConstructSeq()
-    seq.add((float)0);
+    seq.add(($exposedType$)3);
+    seq.add(($exposedType$)0);
     return seq;
   },(float)0);
   QueryTestUtil.testMETHODNAMEDouble(()->
   {
     #MACRO ConstructSeq()
+    seq.add(($exposedType$)3);
     seq.add((float)Float.NaN);
     return seq;
   },(float)Float.NaN);
@@ -111,13 +116,15 @@ public void testSTRUCTNAMEMETHODNAMEDouble()
   QueryTestUtil.testMETHODNAMEDouble(()->
   {
     #MACRO ConstructSeq()
-    seq.add((double)0);
+    seq.add(($exposedType$)3);
+    seq.add(($exposedType$)0);
     return seq;
   },(double)0);
   QueryTestUtil.testMETHODNAMEDouble(()->
   {
     #MACRO ConstructSeq()
-    seq.add((double)Double.NaN);
+    seq.add(($exposedType$)3);
+    seq.add(($exposedType$)Double.NaN);
     return seq;
   },(double)Double.NaN);
 #ENDIF
@@ -129,12 +136,14 @@ public void testSTRUCTNAMEMETHODNAMEFloat()
   QueryTestUtil.testMETHODNAMEFloat(()->
   {
     #MACRO ConstructSeq()
+    seq.add((float)3);
     seq.add(Float.valueOf((float)0));
     return seq;
   },(float)0);
   QueryTestUtil.testMETHODNAMEFloat(()->
   {
     #MACRO ConstructSeq()
+    seq.add((float)3);
     seq.add(Float.valueOf(Float.NaN));
     return seq;
   },(float)Float.NaN);
@@ -155,6 +164,7 @@ public void testSTRUCTNAMEMETHODNAMEFloat()
   QueryTestUtil.testMETHODNAMEFloat(()->
   {
     #MACRO ConstructSeq()
+    seq.add(($exposedType$)3);
     seq.add(($exposedType$)0);
     return seq;
   });
@@ -162,28 +172,32 @@ public void testSTRUCTNAMEMETHODNAMEFloat()
   QueryTestUtil.testMETHODNAMEFloat(()->
   {
     #MACRO ConstructSeq()
-    seq.add((float)0);
+    seq.add(($exposedType$)3);
+    seq.add(($exposedType$)0);
     return seq;
   },(float)0);
   QueryTestUtil.testMETHODNAMEFloat(()->
   {
     #MACRO ConstructSeq()
-    seq.add((float)Float.NaN);
+    seq.add(($exposedType$)3);
+    seq.add(($exposedType$)Float.NaN);
     return seq;
-  },(float)Float.NaN);
+  },($exposedType$)Float.NaN);
 #ELSEIF
   QueryTestUtil.testMETHODNAMEFloat(()->
   {
     #MACRO ConstructSeq()
-    seq.add((double)0);
+    seq.add(($exposedType$)3);
+    seq.add(($exposedType$)0);
     return seq;
-  },(double)0);
+  },($exposedType$)0);
   QueryTestUtil.testMETHODNAMEFloat(()->
   {
     #MACRO ConstructSeq()
-    seq.add((double)Double.NaN);
+    seq.add(($exposedType$)3);
+    seq.add(($exposedType$)Double.NaN);
     return seq;
-  },(double)Double.NaN);
+  },($exposedType$)Double.NaN);
 #ENDIF
 }
 @Test
@@ -193,6 +207,7 @@ public void testSTRUCTNAMEMETHODNAMELong()
   QueryTestUtil.testMETHODNAMELong(()->
   {
     #MACRO ConstructSeq()
+    seq.add((long)3);
     seq.add(Long.valueOf((long)0));
     return seq;
   });
@@ -213,6 +228,7 @@ public void testSTRUCTNAMEMETHODNAMELong()
   QueryTestUtil.testMETHODNAMELong(()->
   {
     #MACRO ConstructSeq()
+    seq.add(($exposedType$)3);
     seq.add(($exposedType$)0);
     return seq;
   });
@@ -220,18 +236,21 @@ public void testSTRUCTNAMEMETHODNAMELong()
   QueryTestUtil.testMETHODNAMELong(()->
   {
     #MACRO ConstructSeq()
+    seq.add(($exposedType$)3);
     seq.add(($exposedType$)-0.0);
     return seq;
   },($exposedType$)-0.0);
   QueryTestUtil.testMETHODNAMELong(()->
   {
     #MACRO ConstructSeq()
+    seq.add(($exposedType$)3);
     seq.add(($exposedType$)0.0);
     return seq;
   },($exposedType$)0.0);
   QueryTestUtil.testMETHODNAMELong(()->
   {
     #MACRO ConstructSeq()
+    seq.add(($exposedType$)3);
     seq.add(($exposedType$)1.0);
     return seq;
   },($exposedType$)1.0);
@@ -244,6 +263,7 @@ public void testSTRUCTNAMEMETHODNAMEInt()
   QueryTestUtil.testMETHODNAMEInt(()->
   {
     #MACRO ConstructSeq()
+    seq.add((int)3);
     seq.add(Integer.valueOf((int)0));
     return seq;
   });
@@ -264,6 +284,7 @@ public void testSTRUCTNAMEMETHODNAMEInt()
   QueryTestUtil.testMETHODNAMEInt(()->
   {
     #MACRO ConstructSeq()
+    seq.add(($exposedType$)3);
     seq.add(($exposedType$)0);
     return seq;
   });
@@ -271,18 +292,21 @@ public void testSTRUCTNAMEMETHODNAMEInt()
   QueryTestUtil.testMETHODNAMEInt(()->
   {
     #MACRO ConstructSeq()
+    seq.add(($exposedType$)3);
     seq.add(($exposedType$)-0.0);
     return seq;
   },($exposedType$)-0.0);
   QueryTestUtil.testMETHODNAMEInt(()->
   {
     #MACRO ConstructSeq()
+    seq.add(($exposedType$)3);
     seq.add(($exposedType$)0.0);
     return seq;
   },($exposedType$)0.0);
   QueryTestUtil.testMETHODNAMEInt(()->
   {
     #MACRO ConstructSeq()
+    seq.add(($exposedType$)3);
     seq.add(($exposedType$)1.0);
     return seq;
   },($exposedType$)1.0);
@@ -295,6 +319,7 @@ public void testSTRUCTNAMEMETHODNAMEShort()
   QueryTestUtil.testMETHODNAMEShort(()->
   {
     #MACRO ConstructSeq()
+    seq.add((short)3);
     seq.add(Short.valueOf((short)0));
     return seq;
   });
@@ -315,6 +340,7 @@ public void testSTRUCTNAMEMETHODNAMEShort()
   QueryTestUtil.testMETHODNAMEShort(()->
   {
     #MACRO ConstructSeq()
+    seq.add(($exposedType$)3);
     seq.add(($exposedType$)0);
     return seq;
   });
@@ -322,18 +348,21 @@ public void testSTRUCTNAMEMETHODNAMEShort()
   QueryTestUtil.testMETHODNAMEShort(()->
   {
     #MACRO ConstructSeq()
+    seq.add(($exposedType$)3);
     seq.add(($exposedType$)-0.0);
     return seq;
   },($exposedType$)-0.0);
   QueryTestUtil.testMETHODNAMEShort(()->
   {
     #MACRO ConstructSeq()
+    seq.add(($exposedType$)3);
     seq.add(($exposedType$)0.0);
     return seq;
   },($exposedType$)0.0);
   QueryTestUtil.testMETHODNAMEShort(()->
   {
     #MACRO ConstructSeq()
+    seq.add(($exposedType$)3);
     seq.add(($exposedType$)1.0);
     return seq;
   },($exposedType$)1.0);
@@ -346,6 +375,7 @@ public void testSTRUCTNAMEMETHODNAMEChar()
   QueryTestUtil.testMETHODNAMEChar(()->
   {
     #MACRO ConstructSeq()
+    seq.add((char)3);
     seq.add(Character.valueOf((char)0));
     return seq;
   });
@@ -366,6 +396,7 @@ public void testSTRUCTNAMEMETHODNAMEChar()
   QueryTestUtil.testMETHODNAMEChar(()->
   {
     #MACRO ConstructSeq()
+    seq.add(($exposedType$)3);
     seq.add(($exposedType$)0);
     return seq;
   });
@@ -373,18 +404,21 @@ public void testSTRUCTNAMEMETHODNAMEChar()
   QueryTestUtil.testMETHODNAMEChar(()->
   {
     #MACRO ConstructSeq()
+    seq.add(($exposedType$)3);
     seq.add(($exposedType$)-0.0);
     return seq;
   },($exposedType$)-0.0);
   QueryTestUtil.testMETHODNAMEChar(()->
   {
     #MACRO ConstructSeq()
+    seq.add(($exposedType$)3);
     seq.add(($exposedType$)0.0);
     return seq;
   },($exposedType$)0.0);
   QueryTestUtil.testMETHODNAMEChar(()->
   {
     #MACRO ConstructSeq()
+    seq.add(($exposedType$)3);
     seq.add(($exposedType$)1.0);
     return seq;
   },($exposedType$)1.0);
@@ -398,6 +432,7 @@ public void testSTRUCTNAMEMETHODNAMEByte()
   QueryTestUtil.testMETHODNAMEByte(()->
   {
     #MACRO ConstructSeq()
+    seq.add((byte)3);
     seq.add(Byte.valueOf((byte)0));
     return seq;
   });
@@ -419,6 +454,7 @@ public void testSTRUCTNAMEMETHODNAMEByte()
   QueryTestUtil.testMETHODNAMEByte(()->
   {
     #MACRO ConstructSeq()
+    seq.add(($exposedType$)3);
     seq.add(($exposedType$)0);
     return seq;
   });
@@ -426,18 +462,21 @@ public void testSTRUCTNAMEMETHODNAMEByte()
   QueryTestUtil.testMETHODNAMEByte(()->
   {
     #MACRO ConstructSeq()
+    seq.add(($exposedType$)3);
     seq.add(($exposedType$)-0.0);
     return seq;
   },($exposedType$)-0.0);
   QueryTestUtil.testMETHODNAMEByte(()->
   {
     #MACRO ConstructSeq()
+    seq.add(($exposedType$)3);
     seq.add(($exposedType$)0.0);
     return seq;
   },($exposedType$)0.0);
   QueryTestUtil.testMETHODNAMEByte(()->
   {
     #MACRO ConstructSeq()
+    seq.add(($exposedType$)3);
     seq.add(($exposedType$)1.0);
     return seq;
   },($exposedType$)1.0);
@@ -451,8 +490,12 @@ public void testSTRUCTNAMEMETHODNAMEBoolean()
   {
     #MACRO ConstructSeq()
     #IF OfRef
+    seq.add(Integer.valueOf(3));
     seq.add(Boolean.TRUE);
     #ELSE
+      #IFNOT OfBoolean
+    seq.add(($exposedType$)3);
+      #ENDIF
     seq.add(true);
     #ENDIF
     return seq;
@@ -463,8 +506,12 @@ public void testSTRUCTNAMEMETHODNAMEBoolean()
   {
     #MACRO ConstructSeq()
     #IF OfRef
+    seq.add(Integer.valueOf(3));
     seq.add(Boolean.FALSE);
     #ELSE
+      #IFNOT OfBoolean
+    seq.add(($exposedType$)3);
+      #ENDIF
     seq.add(false);
     #ENDIF
     return seq;

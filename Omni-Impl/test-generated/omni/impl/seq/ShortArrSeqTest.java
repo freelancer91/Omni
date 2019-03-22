@@ -10,8 +10,11 @@ import omni.impl.seq.ShortArrSeq.UncheckedStack;
 import omni.impl.seq.ShortArrSeq.CheckedStack;
 import java.util.ArrayList;
 import java.util.ConcurrentModificationException;
+import java.util.Comparator;
+import omni.function.ShortComparator;
 import java.util.function.Consumer;
 import omni.function.ShortConsumer;
+@SuppressWarnings({"rawtypes","unchecked"}) 
 public class ShortArrSeqTest
 {
 //TODO place sanity checks for checked sequence modification behavior
@@ -381,6 +384,100 @@ public class ShortArrSeqTest
       Assertions.assertEquals(seq.size(),0);
       Assertions.assertTrue(seq.isEmpty());
       Assertions.assertEquals(seq.arr.length,i);
+    }
+  }
+  @Test
+  public void testComparatorsortUncheckedList()
+  {
+    //#IFSWITCH UncheckedList==CheckedList,CheckedSubList
+    {
+      var seq=new UncheckedList();
+      //test empty
+      seq.sort((Comparator)null);
+      seq.add(TypeConversionUtil.convertToshort(2));
+      seq.add(TypeConversionUtil.convertToshort(1));
+      seq.sort((Comparator)((v1,v2)->{return Short.compare((Short)v1,(Short)v2);}));
+      Assertions.assertEquals(TypeConversionUtil.convertToshort(1),seq.getShort(0));
+      Assertions.assertEquals(TypeConversionUtil.convertToshort(2),seq.getShort(1));
+      seq.clear();
+      seq.add(TypeConversionUtil.convertToshort(2));
+      seq.add(TypeConversionUtil.convertToshort(1));
+      seq.sort((Comparator)null);
+      Assertions.assertEquals(TypeConversionUtil.convertToshort(1),seq.getShort(0));
+      Assertions.assertEquals(TypeConversionUtil.convertToshort(2),seq.getShort(1));
+      //TODO other cases
+    }
+    //#ENDIF
+  }
+  @Test
+  public void testShortComparatorsortUncheckedList()
+  {
+    //#IFSWITCH UncheckedList==CheckedList,CheckedSubList
+    {
+      var seq=new UncheckedList();
+      //test empty
+      seq.sort((ShortComparator)null);
+      seq.add(TypeConversionUtil.convertToshort(2));
+      seq.add(TypeConversionUtil.convertToshort(1));
+      seq.sort((ShortComparator)((v1,v2)->{return Short.compare((Short)v1,(Short)v2);}));
+      Assertions.assertEquals(TypeConversionUtil.convertToshort(1),seq.getShort(0));
+      Assertions.assertEquals(TypeConversionUtil.convertToshort(2),seq.getShort(1));
+      seq.clear();
+      seq.add(TypeConversionUtil.convertToshort(2));
+      seq.add(TypeConversionUtil.convertToshort(1));
+      seq.sort((ShortComparator)null);
+      Assertions.assertEquals(TypeConversionUtil.convertToshort(1),seq.getShort(0));
+      Assertions.assertEquals(TypeConversionUtil.convertToshort(2),seq.getShort(1));
+      //TODO other cases
+    }
+    //#ENDIF
+  }
+  @Test
+  public void testShortComparatorunstableSortUncheckedList()
+  {
+    //#IFSWITCH UncheckedList==CheckedList,CheckedSubList
+    {
+      var seq=new UncheckedList();
+      //test empty
+      seq.unstableSort((ShortComparator)null);
+      seq.add(TypeConversionUtil.convertToshort(2));
+      seq.add(TypeConversionUtil.convertToshort(1));
+      seq.unstableSort((ShortComparator)((v1,v2)->{return Short.compare((Short)v1,(Short)v2);}));
+      Assertions.assertEquals(TypeConversionUtil.convertToshort(1),seq.getShort(0));
+      Assertions.assertEquals(TypeConversionUtil.convertToshort(2),seq.getShort(1));
+      seq.clear();
+      seq.add(TypeConversionUtil.convertToshort(2));
+      seq.add(TypeConversionUtil.convertToshort(1));
+      seq.unstableSort((ShortComparator)null);
+      Assertions.assertEquals(TypeConversionUtil.convertToshort(1),seq.getShort(0));
+      Assertions.assertEquals(TypeConversionUtil.convertToshort(2),seq.getShort(1));
+      //TODO other cases
+    }
+    //#ENDIF
+  }
+  @Test
+  public void testRemoveAtIndexUncheckedList()
+  {
+    {
+      var seq=new UncheckedList();
+      for(int i=0;i<100;++i)
+      {
+        seq.add(TypeConversionUtil.convertToshort(i));
+      }
+      int seqSize=seq.size();
+      Assertions.assertEquals(TypeConversionUtil.convertToshort(0),seq.removeShortAt(0));
+      Assertions.assertEquals(TypeConversionUtil.convertToshort(seqSize-50),seq.removeShortAt(seqSize-51));
+      Assertions.assertEquals(TypeConversionUtil.convertToshort(seqSize-1),seq.removeShortAt(seqSize-3));
+      Assertions.assertEquals(seqSize-3,seq.size());
+      var seqItr=seq.iterator();
+      for(int i=0;i<seqSize;++i)
+      {
+        if(i==0 || i == seqSize-50 || i==seqSize-1)
+        {
+          continue;
+        }
+        Assertions.assertEquals(seqItr.nextShort(),TypeConversionUtil.convertToshort(i));
+      }
     }
   }
   @Test
@@ -1114,6 +1211,158 @@ public class ShortArrSeqTest
     }
   }
   @Test
+  public void testComparatorsortCheckedList()
+  {
+    //#IFSWITCH CheckedList==CheckedList,CheckedSubList
+    {
+      var seq=new CheckedList();
+      //test empty
+      seq.sort((Comparator)null);
+      seq.add(TypeConversionUtil.convertToshort(2));
+      seq.add(TypeConversionUtil.convertToshort(1));
+      seq.sort((Comparator)((v1,v2)->{return Short.compare((Short)v1,(Short)v2);}));
+      Assertions.assertEquals(TypeConversionUtil.convertToshort(1),seq.getShort(0));
+      Assertions.assertEquals(TypeConversionUtil.convertToshort(2),seq.getShort(1));
+      seq.clear();
+      seq.add(TypeConversionUtil.convertToshort(2));
+      seq.add(TypeConversionUtil.convertToshort(1));
+      seq.sort((Comparator)null);
+      Assertions.assertEquals(TypeConversionUtil.convertToshort(1),seq.getShort(0));
+      Assertions.assertEquals(TypeConversionUtil.convertToshort(2),seq.getShort(1));
+      Assertions.assertThrows(IllegalArgumentException.class,()->{
+        seq.sort((Comparator)(v1,v2)->{throw new ArrayIndexOutOfBoundsException();});
+      });
+      Assertions.assertThrows(ConcurrentModificationException.class,()->{
+        seq.sort((Comparator)(v1,v2)->{
+        seq.add(Short.MIN_VALUE);
+        throw new ArrayIndexOutOfBoundsException();
+        });
+      });
+      Assertions.assertThrows(IndexOutOfBoundsException.class,()->{
+        seq.sort((Comparator)(v1,v2)->{throw new IndexOutOfBoundsException();});
+      });
+      Assertions.assertThrows(ConcurrentModificationException.class,()->{
+        seq.sort((Comparator)(v1,v2)->{
+        seq.add(Short.MIN_VALUE);
+        throw new IndexOutOfBoundsException();
+        });
+      });
+      //TODO other cases
+    }
+    //#ENDIF
+  }
+  @Test
+  public void testShortComparatorsortCheckedList()
+  {
+    //#IFSWITCH CheckedList==CheckedList,CheckedSubList
+    {
+      var seq=new CheckedList();
+      //test empty
+      seq.sort((ShortComparator)null);
+      seq.add(TypeConversionUtil.convertToshort(2));
+      seq.add(TypeConversionUtil.convertToshort(1));
+      seq.sort((ShortComparator)((v1,v2)->{return Short.compare((Short)v1,(Short)v2);}));
+      Assertions.assertEquals(TypeConversionUtil.convertToshort(1),seq.getShort(0));
+      Assertions.assertEquals(TypeConversionUtil.convertToshort(2),seq.getShort(1));
+      seq.clear();
+      seq.add(TypeConversionUtil.convertToshort(2));
+      seq.add(TypeConversionUtil.convertToshort(1));
+      seq.sort((ShortComparator)null);
+      Assertions.assertEquals(TypeConversionUtil.convertToshort(1),seq.getShort(0));
+      Assertions.assertEquals(TypeConversionUtil.convertToshort(2),seq.getShort(1));
+      Assertions.assertThrows(IllegalArgumentException.class,()->{
+        seq.sort((ShortComparator)(v1,v2)->{throw new ArrayIndexOutOfBoundsException();});
+      });
+      Assertions.assertThrows(ConcurrentModificationException.class,()->{
+        seq.sort((ShortComparator)(v1,v2)->{
+        seq.add(Short.MIN_VALUE);
+        throw new ArrayIndexOutOfBoundsException();
+        });
+      });
+      Assertions.assertThrows(IndexOutOfBoundsException.class,()->{
+        seq.sort((ShortComparator)(v1,v2)->{throw new IndexOutOfBoundsException();});
+      });
+      Assertions.assertThrows(ConcurrentModificationException.class,()->{
+        seq.sort((ShortComparator)(v1,v2)->{
+        seq.add(Short.MIN_VALUE);
+        throw new IndexOutOfBoundsException();
+        });
+      });
+      //TODO other cases
+    }
+    //#ENDIF
+  }
+  @Test
+  public void testShortComparatorunstableSortCheckedList()
+  {
+    //#IFSWITCH CheckedList==CheckedList,CheckedSubList
+    {
+      var seq=new CheckedList();
+      //test empty
+      seq.unstableSort((ShortComparator)null);
+      seq.add(TypeConversionUtil.convertToshort(2));
+      seq.add(TypeConversionUtil.convertToshort(1));
+      seq.unstableSort((ShortComparator)((v1,v2)->{return Short.compare((Short)v1,(Short)v2);}));
+      Assertions.assertEquals(TypeConversionUtil.convertToshort(1),seq.getShort(0));
+      Assertions.assertEquals(TypeConversionUtil.convertToshort(2),seq.getShort(1));
+      seq.clear();
+      seq.add(TypeConversionUtil.convertToshort(2));
+      seq.add(TypeConversionUtil.convertToshort(1));
+      seq.unstableSort((ShortComparator)null);
+      Assertions.assertEquals(TypeConversionUtil.convertToshort(1),seq.getShort(0));
+      Assertions.assertEquals(TypeConversionUtil.convertToshort(2),seq.getShort(1));
+      Assertions.assertThrows(IllegalArgumentException.class,()->{
+        seq.unstableSort((ShortComparator)(v1,v2)->{throw new ArrayIndexOutOfBoundsException();});
+      });
+      Assertions.assertThrows(ConcurrentModificationException.class,()->{
+        seq.unstableSort((ShortComparator)(v1,v2)->{
+        seq.add(Short.MIN_VALUE);
+        throw new ArrayIndexOutOfBoundsException();
+        });
+      });
+      Assertions.assertThrows(IndexOutOfBoundsException.class,()->{
+        seq.unstableSort((ShortComparator)(v1,v2)->{throw new IndexOutOfBoundsException();});
+      });
+      Assertions.assertThrows(ConcurrentModificationException.class,()->{
+        seq.unstableSort((ShortComparator)(v1,v2)->{
+        seq.add(Short.MIN_VALUE);
+        throw new IndexOutOfBoundsException();
+        });
+      });
+      //TODO other cases
+    }
+    //#ENDIF
+  }
+  @Test
+  public void testRemoveAtIndexCheckedList()
+  {
+    {
+      var seq=new CheckedList();
+      for(int i=0;i<100;++i)
+      {
+        seq.add(TypeConversionUtil.convertToshort(i));
+      }
+      int seqSize=seq.size();
+      int modCount=seq.modCount;
+      Assertions.assertEquals(TypeConversionUtil.convertToshort(0),seq.removeShortAt(0));
+      Assertions.assertEquals(TypeConversionUtil.convertToshort(seqSize-50),seq.removeShortAt(seqSize-51));
+      Assertions.assertEquals(TypeConversionUtil.convertToshort(seqSize-1),seq.removeShortAt(seqSize-3));
+      Assertions.assertEquals(seqSize-3,seq.size());
+      var seqItr=seq.iterator();
+      for(int i=0;i<seqSize;++i)
+      {
+        if(i==0 || i == seqSize-50 || i==seqSize-1)
+        {
+          continue;
+        }
+        Assertions.assertEquals(seqItr.nextShort(),TypeConversionUtil.convertToshort(i));
+      }
+      Assertions.assertEquals(seq.modCount,modCount+3);
+      Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.removeShortAt(-1));
+      Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.removeShortAt(seq.size()));
+    }
+  }
+  @Test
   public void testToArrayCheckedList()
   {
     var seq=new CheckedList();
@@ -1470,6 +1719,110 @@ public class ShortArrSeqTest
       Assertions.assertEquals(seq.size(),0);
       Assertions.assertTrue(seq.isEmpty());
       Assertions.assertEquals(seq.arr.length,i);
+    }
+  }
+  @Test
+  public void testComparatorsortUncheckedSubList()
+  {
+    //#IFSWITCH UncheckedSubList==CheckedList,CheckedSubList
+    {
+      var root=new UncheckedList();
+      var subList=root.subList(0,0);
+      var seq=subList.subList(0,0);
+      //test empty
+      seq.sort((Comparator)null);
+      seq.add(TypeConversionUtil.convertToshort(2));
+      seq.add(TypeConversionUtil.convertToshort(1));
+      seq.sort((Comparator)((v1,v2)->{return Short.compare((Short)v1,(Short)v2);}));
+      Assertions.assertEquals(TypeConversionUtil.convertToshort(1),seq.getShort(0));
+      Assertions.assertEquals(TypeConversionUtil.convertToshort(2),seq.getShort(1));
+      seq.clear();
+      seq.add(TypeConversionUtil.convertToshort(2));
+      seq.add(TypeConversionUtil.convertToshort(1));
+      seq.sort((Comparator)null);
+      Assertions.assertEquals(TypeConversionUtil.convertToshort(1),seq.getShort(0));
+      Assertions.assertEquals(TypeConversionUtil.convertToshort(2),seq.getShort(1));
+      //TODO other cases
+    }
+    //#ENDIF
+  }
+  @Test
+  public void testShortComparatorsortUncheckedSubList()
+  {
+    //#IFSWITCH UncheckedSubList==CheckedList,CheckedSubList
+    {
+      var root=new UncheckedList();
+      var subList=root.subList(0,0);
+      var seq=subList.subList(0,0);
+      //test empty
+      seq.sort((ShortComparator)null);
+      seq.add(TypeConversionUtil.convertToshort(2));
+      seq.add(TypeConversionUtil.convertToshort(1));
+      seq.sort((ShortComparator)((v1,v2)->{return Short.compare((Short)v1,(Short)v2);}));
+      Assertions.assertEquals(TypeConversionUtil.convertToshort(1),seq.getShort(0));
+      Assertions.assertEquals(TypeConversionUtil.convertToshort(2),seq.getShort(1));
+      seq.clear();
+      seq.add(TypeConversionUtil.convertToshort(2));
+      seq.add(TypeConversionUtil.convertToshort(1));
+      seq.sort((ShortComparator)null);
+      Assertions.assertEquals(TypeConversionUtil.convertToshort(1),seq.getShort(0));
+      Assertions.assertEquals(TypeConversionUtil.convertToshort(2),seq.getShort(1));
+      //TODO other cases
+    }
+    //#ENDIF
+  }
+  @Test
+  public void testShortComparatorunstableSortUncheckedSubList()
+  {
+    //#IFSWITCH UncheckedSubList==CheckedList,CheckedSubList
+    {
+      var root=new UncheckedList();
+      var subList=root.subList(0,0);
+      var seq=subList.subList(0,0);
+      //test empty
+      seq.unstableSort((ShortComparator)null);
+      seq.add(TypeConversionUtil.convertToshort(2));
+      seq.add(TypeConversionUtil.convertToshort(1));
+      seq.unstableSort((ShortComparator)((v1,v2)->{return Short.compare((Short)v1,(Short)v2);}));
+      Assertions.assertEquals(TypeConversionUtil.convertToshort(1),seq.getShort(0));
+      Assertions.assertEquals(TypeConversionUtil.convertToshort(2),seq.getShort(1));
+      seq.clear();
+      seq.add(TypeConversionUtil.convertToshort(2));
+      seq.add(TypeConversionUtil.convertToshort(1));
+      seq.unstableSort((ShortComparator)null);
+      Assertions.assertEquals(TypeConversionUtil.convertToshort(1),seq.getShort(0));
+      Assertions.assertEquals(TypeConversionUtil.convertToshort(2),seq.getShort(1));
+      //TODO other cases
+    }
+    //#ENDIF
+  }
+  @Test
+  public void testRemoveAtIndexUncheckedSubList()
+  {
+    {
+      var root=new UncheckedList();
+      var subList=root.subList(0,0);
+      var seq=subList.subList(0,0);
+      for(int i=0;i<100;++i)
+      {
+        seq.add(TypeConversionUtil.convertToshort(i));
+      }
+      int seqSize=seq.size();
+      Assertions.assertEquals(TypeConversionUtil.convertToshort(0),seq.removeShortAt(0));
+      Assertions.assertEquals(TypeConversionUtil.convertToshort(seqSize-50),seq.removeShortAt(seqSize-51));
+      Assertions.assertEquals(TypeConversionUtil.convertToshort(seqSize-1),seq.removeShortAt(seqSize-3));
+      Assertions.assertEquals(seqSize-3,seq.size());
+      var seqItr=seq.iterator();
+      for(int i=0;i<seqSize;++i)
+      {
+        if(i==0 || i == seqSize-50 || i==seqSize-1)
+        {
+          continue;
+        }
+        Assertions.assertEquals(seqItr.nextShort(),TypeConversionUtil.convertToshort(i));
+      }
+      Assertions.assertEquals(seqSize-3,subList.size());
+      Assertions.assertEquals(seqSize-3,root.size());
     }
   }
   @Test
@@ -1858,6 +2211,204 @@ public class ShortArrSeqTest
         var val=TypeConversionUtil.convertToshort(i+25);
         Assertions.assertEquals(val,subsubList.getShort(i-10));
       }
+    }
+  }
+  @Test
+  public void testComparatorsortCheckedSubList()
+  {
+    {
+      var root=new CheckedList();
+      var subList=root.subList(0,0);
+      var seq=subList.subList(0,0);
+      subList.add(Short.MIN_VALUE);
+      Assertions.assertThrows(ConcurrentModificationException.class,()->{
+        seq.sort((Comparator)null);
+      });
+    }
+    //#IFSWITCH CheckedSubList==CheckedList,CheckedSubList
+    {
+      var root=new CheckedList();
+      var subList=root.subList(0,0);
+      var seq=subList.subList(0,0);
+      //test empty
+      seq.sort((Comparator)null);
+      seq.add(TypeConversionUtil.convertToshort(2));
+      seq.add(TypeConversionUtil.convertToshort(1));
+      seq.sort((Comparator)((v1,v2)->{return Short.compare((Short)v1,(Short)v2);}));
+      Assertions.assertEquals(TypeConversionUtil.convertToshort(1),seq.getShort(0));
+      Assertions.assertEquals(TypeConversionUtil.convertToshort(2),seq.getShort(1));
+      seq.clear();
+      seq.add(TypeConversionUtil.convertToshort(2));
+      seq.add(TypeConversionUtil.convertToshort(1));
+      seq.sort((Comparator)null);
+      Assertions.assertEquals(TypeConversionUtil.convertToshort(1),seq.getShort(0));
+      Assertions.assertEquals(TypeConversionUtil.convertToshort(2),seq.getShort(1));
+      Assertions.assertThrows(IllegalArgumentException.class,()->{
+        seq.sort((Comparator)(v1,v2)->{throw new ArrayIndexOutOfBoundsException();});
+      });
+      Assertions.assertThrows(ConcurrentModificationException.class,()->{
+        seq.sort((Comparator)(v1,v2)->{
+        seq.add(Short.MIN_VALUE);
+        throw new ArrayIndexOutOfBoundsException();
+        });
+      });
+      Assertions.assertThrows(IndexOutOfBoundsException.class,()->{
+        seq.sort((Comparator)(v1,v2)->{throw new IndexOutOfBoundsException();});
+      });
+      Assertions.assertThrows(ConcurrentModificationException.class,()->{
+        seq.sort((Comparator)(v1,v2)->{
+        seq.add(Short.MIN_VALUE);
+        throw new IndexOutOfBoundsException();
+        });
+      });
+      //TODO other cases
+    }
+    //#ENDIF
+  }
+  @Test
+  public void testShortComparatorsortCheckedSubList()
+  {
+    {
+      var root=new CheckedList();
+      var subList=root.subList(0,0);
+      var seq=subList.subList(0,0);
+      subList.add(Short.MIN_VALUE);
+      Assertions.assertThrows(ConcurrentModificationException.class,()->{
+        seq.sort((ShortComparator)null);
+      });
+    }
+    //#IFSWITCH CheckedSubList==CheckedList,CheckedSubList
+    {
+      var root=new CheckedList();
+      var subList=root.subList(0,0);
+      var seq=subList.subList(0,0);
+      //test empty
+      seq.sort((ShortComparator)null);
+      seq.add(TypeConversionUtil.convertToshort(2));
+      seq.add(TypeConversionUtil.convertToshort(1));
+      seq.sort((ShortComparator)((v1,v2)->{return Short.compare((Short)v1,(Short)v2);}));
+      Assertions.assertEquals(TypeConversionUtil.convertToshort(1),seq.getShort(0));
+      Assertions.assertEquals(TypeConversionUtil.convertToshort(2),seq.getShort(1));
+      seq.clear();
+      seq.add(TypeConversionUtil.convertToshort(2));
+      seq.add(TypeConversionUtil.convertToshort(1));
+      seq.sort((ShortComparator)null);
+      Assertions.assertEquals(TypeConversionUtil.convertToshort(1),seq.getShort(0));
+      Assertions.assertEquals(TypeConversionUtil.convertToshort(2),seq.getShort(1));
+      Assertions.assertThrows(IllegalArgumentException.class,()->{
+        seq.sort((ShortComparator)(v1,v2)->{throw new ArrayIndexOutOfBoundsException();});
+      });
+      Assertions.assertThrows(ConcurrentModificationException.class,()->{
+        seq.sort((ShortComparator)(v1,v2)->{
+        seq.add(Short.MIN_VALUE);
+        throw new ArrayIndexOutOfBoundsException();
+        });
+      });
+      Assertions.assertThrows(IndexOutOfBoundsException.class,()->{
+        seq.sort((ShortComparator)(v1,v2)->{throw new IndexOutOfBoundsException();});
+      });
+      Assertions.assertThrows(ConcurrentModificationException.class,()->{
+        seq.sort((ShortComparator)(v1,v2)->{
+        seq.add(Short.MIN_VALUE);
+        throw new IndexOutOfBoundsException();
+        });
+      });
+      //TODO other cases
+    }
+    //#ENDIF
+  }
+  @Test
+  public void testShortComparatorunstableSortCheckedSubList()
+  {
+    {
+      var root=new CheckedList();
+      var subList=root.subList(0,0);
+      var seq=subList.subList(0,0);
+      subList.add(Short.MIN_VALUE);
+      Assertions.assertThrows(ConcurrentModificationException.class,()->{
+        seq.unstableSort((ShortComparator)null);
+      });
+    }
+    //#IFSWITCH CheckedSubList==CheckedList,CheckedSubList
+    {
+      var root=new CheckedList();
+      var subList=root.subList(0,0);
+      var seq=subList.subList(0,0);
+      //test empty
+      seq.unstableSort((ShortComparator)null);
+      seq.add(TypeConversionUtil.convertToshort(2));
+      seq.add(TypeConversionUtil.convertToshort(1));
+      seq.unstableSort((ShortComparator)((v1,v2)->{return Short.compare((Short)v1,(Short)v2);}));
+      Assertions.assertEquals(TypeConversionUtil.convertToshort(1),seq.getShort(0));
+      Assertions.assertEquals(TypeConversionUtil.convertToshort(2),seq.getShort(1));
+      seq.clear();
+      seq.add(TypeConversionUtil.convertToshort(2));
+      seq.add(TypeConversionUtil.convertToshort(1));
+      seq.unstableSort((ShortComparator)null);
+      Assertions.assertEquals(TypeConversionUtil.convertToshort(1),seq.getShort(0));
+      Assertions.assertEquals(TypeConversionUtil.convertToshort(2),seq.getShort(1));
+      Assertions.assertThrows(IllegalArgumentException.class,()->{
+        seq.unstableSort((ShortComparator)(v1,v2)->{throw new ArrayIndexOutOfBoundsException();});
+      });
+      Assertions.assertThrows(ConcurrentModificationException.class,()->{
+        seq.unstableSort((ShortComparator)(v1,v2)->{
+        seq.add(Short.MIN_VALUE);
+        throw new ArrayIndexOutOfBoundsException();
+        });
+      });
+      Assertions.assertThrows(IndexOutOfBoundsException.class,()->{
+        seq.unstableSort((ShortComparator)(v1,v2)->{throw new IndexOutOfBoundsException();});
+      });
+      Assertions.assertThrows(ConcurrentModificationException.class,()->{
+        seq.unstableSort((ShortComparator)(v1,v2)->{
+        seq.add(Short.MIN_VALUE);
+        throw new IndexOutOfBoundsException();
+        });
+      });
+      //TODO other cases
+    }
+    //#ENDIF
+  }
+  @Test
+  public void testRemoveAtIndexCheckedSubList()
+  {
+    {
+      var root=new CheckedList();
+      var subList=root.subList(0,0);
+      var seq=subList.subList(0,0);
+      subList.add(Short.MIN_VALUE);
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeShortAt(0));
+      subList.removeShortAt(0);
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeShortAt(0));
+    }
+    {
+      var root=new CheckedList();
+      var subList=root.subList(0,0);
+      var seq=subList.subList(0,0);
+      for(int i=0;i<100;++i)
+      {
+        seq.add(TypeConversionUtil.convertToshort(i));
+      }
+      int seqSize=seq.size();
+      int modCount=root.modCount;
+      Assertions.assertEquals(TypeConversionUtil.convertToshort(0),seq.removeShortAt(0));
+      Assertions.assertEquals(TypeConversionUtil.convertToshort(seqSize-50),seq.removeShortAt(seqSize-51));
+      Assertions.assertEquals(TypeConversionUtil.convertToshort(seqSize-1),seq.removeShortAt(seqSize-3));
+      Assertions.assertEquals(seqSize-3,seq.size());
+      var seqItr=seq.iterator();
+      for(int i=0;i<seqSize;++i)
+      {
+        if(i==0 || i == seqSize-50 || i==seqSize-1)
+        {
+          continue;
+        }
+        Assertions.assertEquals(seqItr.nextShort(),TypeConversionUtil.convertToshort(i));
+      }
+      Assertions.assertEquals(seqSize-3,subList.size());
+      Assertions.assertEquals(seqSize-3,root.size());
+      Assertions.assertEquals(root.modCount,modCount+3);
+      Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.removeShortAt(-1));
+      Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.removeShortAt(seq.size()));
     }
   }
   @Test

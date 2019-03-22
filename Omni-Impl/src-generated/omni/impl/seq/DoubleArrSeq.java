@@ -1623,8 +1623,7 @@ public abstract class DoubleArrSeq implements OmniCollection.OfDouble
     public void stableAscendingSort()
     {
       final int size;
-      if((size=this.size)>1)
-      {
+      if((size=this.size)>1){
         DoubleSortUtil.uncheckedAscendingSort(this.arr,0,size);
       }
     }
@@ -1632,8 +1631,7 @@ public abstract class DoubleArrSeq implements OmniCollection.OfDouble
     public void stableDescendingSort()
     {
       final int size;
-      if((size=this.size)>1)
-      {
+      if((size=this.size)>1){
         DoubleSortUtil.uncheckedDescendingSort(this.arr,0,size);
       }
     }
@@ -2742,8 +2740,7 @@ public abstract class DoubleArrSeq implements OmniCollection.OfDouble
     public void stableAscendingSort()
     {
       final int size;
-      if((size=this.size)>1)
-      {
+      if((size=this.size)>1){
         final int rootOffset;
         DoubleSortUtil.uncheckedAscendingSort(root.arr,rootOffset=this.rootOffset,rootOffset+size);
       }
@@ -2752,8 +2749,7 @@ public abstract class DoubleArrSeq implements OmniCollection.OfDouble
     public void stableDescendingSort()
     {
       final int size;
-      if((size=this.size)>1)
-      {
+      if((size=this.size)>1){
         final int rootOffset;
         DoubleSortUtil.uncheckedDescendingSort(root.arr,rootOffset=this.rootOffset,rootOffset+size);
       }
@@ -3582,6 +3578,10 @@ public abstract class DoubleArrSeq implements OmniCollection.OfDouble
           }
           catch(ArrayIndexOutOfBoundsException e)
           {
+            throw CheckedCollection.checkModCount(modCount,this.modCount,new IllegalArgumentException("Comparison method violates its general contract!",e));
+          }
+          catch(RuntimeException e)
+          {
             throw CheckedCollection.checkModCount(modCount,this.modCount,e);
           }
           CheckedCollection.checkModCount(modCount,this.modCount);
@@ -3593,20 +3593,18 @@ public abstract class DoubleArrSeq implements OmniCollection.OfDouble
     public void stableAscendingSort()
     {
       final int size;
-      if((size=this.size)>1)
-      {
+      if((size=this.size)>1){
         DoubleSortUtil.uncheckedAscendingSort(this.arr,0,size);
-        ++this.modCount;
+        this.modCount=modCount+1;
       }
     }
     @Override
     public void stableDescendingSort()
     {
       final int size;
-      if((size=this.size)>1)
-      {
+      if((size=this.size)>1){
         DoubleSortUtil.uncheckedDescendingSort(this.arr,0,size);
-        ++this.modCount;
+        this.modCount=modCount+1;
       }
     }
     @Override
@@ -3647,6 +3645,10 @@ public abstract class DoubleArrSeq implements OmniCollection.OfDouble
           }
           catch(ArrayIndexOutOfBoundsException e)
           {
+            throw CheckedCollection.checkModCount(modCount,this.modCount,new IllegalArgumentException("Comparison method violates its general contract!",e));
+          }
+          catch(RuntimeException e)
+          {
             throw CheckedCollection.checkModCount(modCount,this.modCount,e);
           }
           CheckedCollection.checkModCount(modCount,this.modCount);
@@ -3673,6 +3675,10 @@ public abstract class DoubleArrSeq implements OmniCollection.OfDouble
             DoubleSortUtil.uncheckedUnstableSort(this.arr,0,size,sorter);
           }
           catch(ArrayIndexOutOfBoundsException e)
+          {
+            throw CheckedCollection.checkModCount(modCount,this.modCount,new IllegalArgumentException("Comparison method violates its general contract!",e));
+          }
+          catch(RuntimeException e)
           {
             throw CheckedCollection.checkModCount(modCount,this.modCount,e);
           }
@@ -5179,20 +5185,22 @@ public abstract class DoubleArrSeq implements OmniCollection.OfDouble
         {
           return;
         }
-        final int rootOffset;
-        if(sorter==null)
         {
-          DoubleSortUtil.uncheckedAscendingSort(root.arr,rootOffset=this.rootOffset,rootOffset+size);
-        }
-        else
-        {
-          try
+          final int rootOffset;
+          if(sorter==null)
           {
-            DoubleSortUtil.uncheckedStableSort(root.arr,rootOffset=this.rootOffset,rootOffset+size,sorter);
+            DoubleSortUtil.uncheckedAscendingSort(root.arr,rootOffset=this.rootOffset,rootOffset+size);
           }
-          catch(ArrayIndexOutOfBoundsException e)
+          else
           {
-            throw new IllegalArgumentException("Comparison method violates its general contract!");
+            try
+            {
+              DoubleSortUtil.uncheckedStableSort(root.arr,rootOffset=this.rootOffset,rootOffset+size,sorter);
+            }
+            catch(ArrayIndexOutOfBoundsException e)
+            {
+              throw new IllegalArgumentException("Comparison method violates its general contract!",e);
+            }
           }
         }
       }
@@ -5209,46 +5217,40 @@ public abstract class DoubleArrSeq implements OmniCollection.OfDouble
     {
       int modCount=this.modCount;
       final var root=this.root;
-      try
-      {
+      try{
         final int size;
-        if((size=this.size)<2)
-        {
+        if((size=this.size)<2){
           return;
         }
         final int rootOffset;
         DoubleSortUtil.uncheckedAscendingSort(root.arr,rootOffset=this.rootOffset,rootOffset+size);
       }
-      finally
-      {
+      finally{
         CheckedCollection.checkModCount(modCount,root.modCount);
       }
       root.modCount=++modCount;
       this.modCount=modCount;
-      for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}
+      for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}  
     }
     @Override
     public void stableDescendingSort()
     {
       int modCount=this.modCount;
       final var root=this.root;
-      try
-      {
+      try{
         final int size;
-        if((size=this.size)<2)
-        {
+        if((size=this.size)<2){
           return;
         }
         final int rootOffset;
         DoubleSortUtil.uncheckedDescendingSort(root.arr,rootOffset=this.rootOffset,rootOffset+size);
       }
-      finally
-      {
+      finally{
         CheckedCollection.checkModCount(modCount,root.modCount);
       }
       root.modCount=++modCount;
       this.modCount=modCount;
-      for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}
+      for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}  
     }
     @Override
     public void replaceAll(UnaryOperator<Double> operator)
@@ -5285,20 +5287,22 @@ public abstract class DoubleArrSeq implements OmniCollection.OfDouble
         {
           return;
         }
-        final int rootOffset;
-        if(sorter==null)
         {
-          DoubleSortUtil.uncheckedAscendingSort(root.arr,rootOffset=this.rootOffset,rootOffset+size);
-        }
-        else
-        {
-          try
+          final int rootOffset;
+          if(sorter==null)
           {
-            DoubleSortUtil.uncheckedStableSort(root.arr,rootOffset=this.rootOffset,rootOffset+size,sorter::compare);
+            DoubleSortUtil.uncheckedAscendingSort(root.arr,rootOffset=this.rootOffset,rootOffset+size);
           }
-          catch(ArrayIndexOutOfBoundsException e)
+          else
           {
-            throw new IllegalArgumentException("Comparison method violates its general contract!");
+            try
+            {
+              DoubleSortUtil.uncheckedStableSort(root.arr,rootOffset=this.rootOffset,rootOffset+size,sorter::compare);
+            }
+            catch(ArrayIndexOutOfBoundsException e)
+            {
+              throw new IllegalArgumentException("Comparison method violates its general contract!",e);
+            }
           }
         }
       }
@@ -5322,20 +5326,22 @@ public abstract class DoubleArrSeq implements OmniCollection.OfDouble
         {
           return;
         }
-        final int rootOffset;
-        if(sorter==null)
         {
-          DoubleSortUtil.uncheckedAscendingSort(root.arr,rootOffset=this.rootOffset,rootOffset+size);
-        }
-        else
-        {
-          try
+          final int rootOffset;
+          if(sorter==null)
           {
-            DoubleSortUtil.uncheckedUnstableSort(root.arr,rootOffset=this.rootOffset,rootOffset+size,sorter);
+            DoubleSortUtil.uncheckedAscendingSort(root.arr,rootOffset=this.rootOffset,rootOffset+size);
           }
-          catch(ArrayIndexOutOfBoundsException e)
+          else
           {
-            throw new IllegalArgumentException("Comparison method violates its general contract!");
+            try
+            {
+              DoubleSortUtil.uncheckedUnstableSort(root.arr,rootOffset=this.rootOffset,rootOffset+size,sorter);
+            }
+            catch(ArrayIndexOutOfBoundsException e)
+            {
+              throw new IllegalArgumentException("Comparison method violates its general contract!",e);
+            }
           }
         }
       }

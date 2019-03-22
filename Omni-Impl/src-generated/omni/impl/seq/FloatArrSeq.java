@@ -1801,8 +1801,7 @@ public abstract class FloatArrSeq implements OmniCollection.OfFloat
     public void stableAscendingSort()
     {
       final int size;
-      if((size=this.size)>1)
-      {
+      if((size=this.size)>1){
         FloatSortUtil.uncheckedAscendingSort(this.arr,0,size);
       }
     }
@@ -1810,8 +1809,7 @@ public abstract class FloatArrSeq implements OmniCollection.OfFloat
     public void stableDescendingSort()
     {
       final int size;
-      if((size=this.size)>1)
-      {
+      if((size=this.size)>1){
         FloatSortUtil.uncheckedDescendingSort(this.arr,0,size);
       }
     }
@@ -3025,8 +3023,7 @@ public abstract class FloatArrSeq implements OmniCollection.OfFloat
     public void stableAscendingSort()
     {
       final int size;
-      if((size=this.size)>1)
-      {
+      if((size=this.size)>1){
         final int rootOffset;
         FloatSortUtil.uncheckedAscendingSort(root.arr,rootOffset=this.rootOffset,rootOffset+size);
       }
@@ -3035,8 +3032,7 @@ public abstract class FloatArrSeq implements OmniCollection.OfFloat
     public void stableDescendingSort()
     {
       final int size;
-      if((size=this.size)>1)
-      {
+      if((size=this.size)>1){
         final int rootOffset;
         FloatSortUtil.uncheckedDescendingSort(root.arr,rootOffset=this.rootOffset,rootOffset+size);
       }
@@ -3878,6 +3874,10 @@ public abstract class FloatArrSeq implements OmniCollection.OfFloat
           }
           catch(ArrayIndexOutOfBoundsException e)
           {
+            throw CheckedCollection.checkModCount(modCount,this.modCount,new IllegalArgumentException("Comparison method violates its general contract!",e));
+          }
+          catch(RuntimeException e)
+          {
             throw CheckedCollection.checkModCount(modCount,this.modCount,e);
           }
           CheckedCollection.checkModCount(modCount,this.modCount);
@@ -3889,20 +3889,18 @@ public abstract class FloatArrSeq implements OmniCollection.OfFloat
     public void stableAscendingSort()
     {
       final int size;
-      if((size=this.size)>1)
-      {
+      if((size=this.size)>1){
         FloatSortUtil.uncheckedAscendingSort(this.arr,0,size);
-        ++this.modCount;
+        this.modCount=modCount+1;
       }
     }
     @Override
     public void stableDescendingSort()
     {
       final int size;
-      if((size=this.size)>1)
-      {
+      if((size=this.size)>1){
         FloatSortUtil.uncheckedDescendingSort(this.arr,0,size);
-        ++this.modCount;
+        this.modCount=modCount+1;
       }
     }
     @Override
@@ -3943,6 +3941,10 @@ public abstract class FloatArrSeq implements OmniCollection.OfFloat
           }
           catch(ArrayIndexOutOfBoundsException e)
           {
+            throw CheckedCollection.checkModCount(modCount,this.modCount,new IllegalArgumentException("Comparison method violates its general contract!",e));
+          }
+          catch(RuntimeException e)
+          {
             throw CheckedCollection.checkModCount(modCount,this.modCount,e);
           }
           CheckedCollection.checkModCount(modCount,this.modCount);
@@ -3969,6 +3971,10 @@ public abstract class FloatArrSeq implements OmniCollection.OfFloat
             FloatSortUtil.uncheckedUnstableSort(this.arr,0,size,sorter);
           }
           catch(ArrayIndexOutOfBoundsException e)
+          {
+            throw CheckedCollection.checkModCount(modCount,this.modCount,new IllegalArgumentException("Comparison method violates its general contract!",e));
+          }
+          catch(RuntimeException e)
           {
             throw CheckedCollection.checkModCount(modCount,this.modCount,e);
           }
@@ -5634,20 +5640,22 @@ public abstract class FloatArrSeq implements OmniCollection.OfFloat
         {
           return;
         }
-        final int rootOffset;
-        if(sorter==null)
         {
-          FloatSortUtil.uncheckedAscendingSort(root.arr,rootOffset=this.rootOffset,rootOffset+size);
-        }
-        else
-        {
-          try
+          final int rootOffset;
+          if(sorter==null)
           {
-            FloatSortUtil.uncheckedStableSort(root.arr,rootOffset=this.rootOffset,rootOffset+size,sorter);
+            FloatSortUtil.uncheckedAscendingSort(root.arr,rootOffset=this.rootOffset,rootOffset+size);
           }
-          catch(ArrayIndexOutOfBoundsException e)
+          else
           {
-            throw new IllegalArgumentException("Comparison method violates its general contract!");
+            try
+            {
+              FloatSortUtil.uncheckedStableSort(root.arr,rootOffset=this.rootOffset,rootOffset+size,sorter);
+            }
+            catch(ArrayIndexOutOfBoundsException e)
+            {
+              throw new IllegalArgumentException("Comparison method violates its general contract!",e);
+            }
           }
         }
       }
@@ -5664,46 +5672,40 @@ public abstract class FloatArrSeq implements OmniCollection.OfFloat
     {
       int modCount=this.modCount;
       final var root=this.root;
-      try
-      {
+      try{
         final int size;
-        if((size=this.size)<2)
-        {
+        if((size=this.size)<2){
           return;
         }
         final int rootOffset;
         FloatSortUtil.uncheckedAscendingSort(root.arr,rootOffset=this.rootOffset,rootOffset+size);
       }
-      finally
-      {
+      finally{
         CheckedCollection.checkModCount(modCount,root.modCount);
       }
       root.modCount=++modCount;
       this.modCount=modCount;
-      for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}
+      for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}  
     }
     @Override
     public void stableDescendingSort()
     {
       int modCount=this.modCount;
       final var root=this.root;
-      try
-      {
+      try{
         final int size;
-        if((size=this.size)<2)
-        {
+        if((size=this.size)<2){
           return;
         }
         final int rootOffset;
         FloatSortUtil.uncheckedDescendingSort(root.arr,rootOffset=this.rootOffset,rootOffset+size);
       }
-      finally
-      {
+      finally{
         CheckedCollection.checkModCount(modCount,root.modCount);
       }
       root.modCount=++modCount;
       this.modCount=modCount;
-      for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}
+      for(var curr=parent;curr!=null;curr.modCount=modCount,curr=curr.parent){}  
     }
     @Override
     public void replaceAll(UnaryOperator<Float> operator)
@@ -5740,20 +5742,22 @@ public abstract class FloatArrSeq implements OmniCollection.OfFloat
         {
           return;
         }
-        final int rootOffset;
-        if(sorter==null)
         {
-          FloatSortUtil.uncheckedAscendingSort(root.arr,rootOffset=this.rootOffset,rootOffset+size);
-        }
-        else
-        {
-          try
+          final int rootOffset;
+          if(sorter==null)
           {
-            FloatSortUtil.uncheckedStableSort(root.arr,rootOffset=this.rootOffset,rootOffset+size,sorter::compare);
+            FloatSortUtil.uncheckedAscendingSort(root.arr,rootOffset=this.rootOffset,rootOffset+size);
           }
-          catch(ArrayIndexOutOfBoundsException e)
+          else
           {
-            throw new IllegalArgumentException("Comparison method violates its general contract!");
+            try
+            {
+              FloatSortUtil.uncheckedStableSort(root.arr,rootOffset=this.rootOffset,rootOffset+size,sorter::compare);
+            }
+            catch(ArrayIndexOutOfBoundsException e)
+            {
+              throw new IllegalArgumentException("Comparison method violates its general contract!",e);
+            }
           }
         }
       }
@@ -5777,20 +5781,22 @@ public abstract class FloatArrSeq implements OmniCollection.OfFloat
         {
           return;
         }
-        final int rootOffset;
-        if(sorter==null)
         {
-          FloatSortUtil.uncheckedAscendingSort(root.arr,rootOffset=this.rootOffset,rootOffset+size);
-        }
-        else
-        {
-          try
+          final int rootOffset;
+          if(sorter==null)
           {
-            FloatSortUtil.uncheckedUnstableSort(root.arr,rootOffset=this.rootOffset,rootOffset+size,sorter);
+            FloatSortUtil.uncheckedAscendingSort(root.arr,rootOffset=this.rootOffset,rootOffset+size);
           }
-          catch(ArrayIndexOutOfBoundsException e)
+          else
           {
-            throw new IllegalArgumentException("Comparison method violates its general contract!");
+            try
+            {
+              FloatSortUtil.uncheckedUnstableSort(root.arr,rootOffset=this.rootOffset,rootOffset+size,sorter);
+            }
+            catch(ArrayIndexOutOfBoundsException e)
+            {
+              throw new IllegalArgumentException("Comparison method violates its general contract!",e);
+            }
           }
         }
       }

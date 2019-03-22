@@ -10,8 +10,11 @@ import omni.impl.seq.ByteArrSeq.UncheckedStack;
 import omni.impl.seq.ByteArrSeq.CheckedStack;
 import java.util.ArrayList;
 import java.util.ConcurrentModificationException;
+import java.util.Comparator;
+import omni.function.ByteComparator;
 import java.util.function.Consumer;
 import omni.function.ByteConsumer;
+@SuppressWarnings({"rawtypes","unchecked"}) 
 public class ByteArrSeqTest
 {
 //TODO place sanity checks for checked sequence modification behavior
@@ -390,6 +393,100 @@ public class ByteArrSeqTest
       Assertions.assertEquals(seq.size(),0);
       Assertions.assertTrue(seq.isEmpty());
       Assertions.assertEquals(seq.arr.length,i);
+    }
+  }
+  @Test
+  public void testComparatorsortUncheckedList()
+  {
+    //#IFSWITCH UncheckedList==CheckedList,CheckedSubList
+    {
+      var seq=new UncheckedList();
+      //test empty
+      seq.sort((Comparator)null);
+      seq.add(TypeConversionUtil.convertTobyte(2));
+      seq.add(TypeConversionUtil.convertTobyte(1));
+      seq.sort((Comparator)((v1,v2)->{return Byte.compare((Byte)v1,(Byte)v2);}));
+      Assertions.assertEquals(TypeConversionUtil.convertTobyte(1),seq.getByte(0));
+      Assertions.assertEquals(TypeConversionUtil.convertTobyte(2),seq.getByte(1));
+      seq.clear();
+      seq.add(TypeConversionUtil.convertTobyte(2));
+      seq.add(TypeConversionUtil.convertTobyte(1));
+      seq.sort((Comparator)null);
+      Assertions.assertEquals(TypeConversionUtil.convertTobyte(1),seq.getByte(0));
+      Assertions.assertEquals(TypeConversionUtil.convertTobyte(2),seq.getByte(1));
+      //TODO other cases
+    }
+    //#ENDIF
+  }
+  @Test
+  public void testByteComparatorsortUncheckedList()
+  {
+    //#IFSWITCH UncheckedList==CheckedList,CheckedSubList
+    {
+      var seq=new UncheckedList();
+      //test empty
+      seq.sort((ByteComparator)null);
+      seq.add(TypeConversionUtil.convertTobyte(2));
+      seq.add(TypeConversionUtil.convertTobyte(1));
+      seq.sort((ByteComparator)((v1,v2)->{return Byte.compare((Byte)v1,(Byte)v2);}));
+      Assertions.assertEquals(TypeConversionUtil.convertTobyte(1),seq.getByte(0));
+      Assertions.assertEquals(TypeConversionUtil.convertTobyte(2),seq.getByte(1));
+      seq.clear();
+      seq.add(TypeConversionUtil.convertTobyte(2));
+      seq.add(TypeConversionUtil.convertTobyte(1));
+      seq.sort((ByteComparator)null);
+      Assertions.assertEquals(TypeConversionUtil.convertTobyte(1),seq.getByte(0));
+      Assertions.assertEquals(TypeConversionUtil.convertTobyte(2),seq.getByte(1));
+      //TODO other cases
+    }
+    //#ENDIF
+  }
+  @Test
+  public void testByteComparatorunstableSortUncheckedList()
+  {
+    //#IFSWITCH UncheckedList==CheckedList,CheckedSubList
+    {
+      var seq=new UncheckedList();
+      //test empty
+      seq.unstableSort((ByteComparator)null);
+      seq.add(TypeConversionUtil.convertTobyte(2));
+      seq.add(TypeConversionUtil.convertTobyte(1));
+      seq.unstableSort((ByteComparator)((v1,v2)->{return Byte.compare((Byte)v1,(Byte)v2);}));
+      Assertions.assertEquals(TypeConversionUtil.convertTobyte(1),seq.getByte(0));
+      Assertions.assertEquals(TypeConversionUtil.convertTobyte(2),seq.getByte(1));
+      seq.clear();
+      seq.add(TypeConversionUtil.convertTobyte(2));
+      seq.add(TypeConversionUtil.convertTobyte(1));
+      seq.unstableSort((ByteComparator)null);
+      Assertions.assertEquals(TypeConversionUtil.convertTobyte(1),seq.getByte(0));
+      Assertions.assertEquals(TypeConversionUtil.convertTobyte(2),seq.getByte(1));
+      //TODO other cases
+    }
+    //#ENDIF
+  }
+  @Test
+  public void testRemoveAtIndexUncheckedList()
+  {
+    {
+      var seq=new UncheckedList();
+      for(int i=0;i<100;++i)
+      {
+        seq.add(TypeConversionUtil.convertTobyte(i));
+      }
+      int seqSize=seq.size();
+      Assertions.assertEquals(TypeConversionUtil.convertTobyte(0),seq.removeByteAt(0));
+      Assertions.assertEquals(TypeConversionUtil.convertTobyte(seqSize-50),seq.removeByteAt(seqSize-51));
+      Assertions.assertEquals(TypeConversionUtil.convertTobyte(seqSize-1),seq.removeByteAt(seqSize-3));
+      Assertions.assertEquals(seqSize-3,seq.size());
+      var seqItr=seq.iterator();
+      for(int i=0;i<seqSize;++i)
+      {
+        if(i==0 || i == seqSize-50 || i==seqSize-1)
+        {
+          continue;
+        }
+        Assertions.assertEquals(seqItr.nextByte(),TypeConversionUtil.convertTobyte(i));
+      }
     }
   }
   @Test
@@ -1141,6 +1238,158 @@ public class ByteArrSeqTest
     }
   }
   @Test
+  public void testComparatorsortCheckedList()
+  {
+    //#IFSWITCH CheckedList==CheckedList,CheckedSubList
+    {
+      var seq=new CheckedList();
+      //test empty
+      seq.sort((Comparator)null);
+      seq.add(TypeConversionUtil.convertTobyte(2));
+      seq.add(TypeConversionUtil.convertTobyte(1));
+      seq.sort((Comparator)((v1,v2)->{return Byte.compare((Byte)v1,(Byte)v2);}));
+      Assertions.assertEquals(TypeConversionUtil.convertTobyte(1),seq.getByte(0));
+      Assertions.assertEquals(TypeConversionUtil.convertTobyte(2),seq.getByte(1));
+      seq.clear();
+      seq.add(TypeConversionUtil.convertTobyte(2));
+      seq.add(TypeConversionUtil.convertTobyte(1));
+      seq.sort((Comparator)null);
+      Assertions.assertEquals(TypeConversionUtil.convertTobyte(1),seq.getByte(0));
+      Assertions.assertEquals(TypeConversionUtil.convertTobyte(2),seq.getByte(1));
+      Assertions.assertThrows(IllegalArgumentException.class,()->{
+        seq.sort((Comparator)(v1,v2)->{throw new ArrayIndexOutOfBoundsException();});
+      });
+      Assertions.assertThrows(ConcurrentModificationException.class,()->{
+        seq.sort((Comparator)(v1,v2)->{
+        seq.add(Byte.MIN_VALUE);
+        throw new ArrayIndexOutOfBoundsException();
+        });
+      });
+      Assertions.assertThrows(IndexOutOfBoundsException.class,()->{
+        seq.sort((Comparator)(v1,v2)->{throw new IndexOutOfBoundsException();});
+      });
+      Assertions.assertThrows(ConcurrentModificationException.class,()->{
+        seq.sort((Comparator)(v1,v2)->{
+        seq.add(Byte.MIN_VALUE);
+        throw new IndexOutOfBoundsException();
+        });
+      });
+      //TODO other cases
+    }
+    //#ENDIF
+  }
+  @Test
+  public void testByteComparatorsortCheckedList()
+  {
+    //#IFSWITCH CheckedList==CheckedList,CheckedSubList
+    {
+      var seq=new CheckedList();
+      //test empty
+      seq.sort((ByteComparator)null);
+      seq.add(TypeConversionUtil.convertTobyte(2));
+      seq.add(TypeConversionUtil.convertTobyte(1));
+      seq.sort((ByteComparator)((v1,v2)->{return Byte.compare((Byte)v1,(Byte)v2);}));
+      Assertions.assertEquals(TypeConversionUtil.convertTobyte(1),seq.getByte(0));
+      Assertions.assertEquals(TypeConversionUtil.convertTobyte(2),seq.getByte(1));
+      seq.clear();
+      seq.add(TypeConversionUtil.convertTobyte(2));
+      seq.add(TypeConversionUtil.convertTobyte(1));
+      seq.sort((ByteComparator)null);
+      Assertions.assertEquals(TypeConversionUtil.convertTobyte(1),seq.getByte(0));
+      Assertions.assertEquals(TypeConversionUtil.convertTobyte(2),seq.getByte(1));
+      Assertions.assertThrows(IllegalArgumentException.class,()->{
+        seq.sort((ByteComparator)(v1,v2)->{throw new ArrayIndexOutOfBoundsException();});
+      });
+      Assertions.assertThrows(ConcurrentModificationException.class,()->{
+        seq.sort((ByteComparator)(v1,v2)->{
+        seq.add(Byte.MIN_VALUE);
+        throw new ArrayIndexOutOfBoundsException();
+        });
+      });
+      Assertions.assertThrows(IndexOutOfBoundsException.class,()->{
+        seq.sort((ByteComparator)(v1,v2)->{throw new IndexOutOfBoundsException();});
+      });
+      Assertions.assertThrows(ConcurrentModificationException.class,()->{
+        seq.sort((ByteComparator)(v1,v2)->{
+        seq.add(Byte.MIN_VALUE);
+        throw new IndexOutOfBoundsException();
+        });
+      });
+      //TODO other cases
+    }
+    //#ENDIF
+  }
+  @Test
+  public void testByteComparatorunstableSortCheckedList()
+  {
+    //#IFSWITCH CheckedList==CheckedList,CheckedSubList
+    {
+      var seq=new CheckedList();
+      //test empty
+      seq.unstableSort((ByteComparator)null);
+      seq.add(TypeConversionUtil.convertTobyte(2));
+      seq.add(TypeConversionUtil.convertTobyte(1));
+      seq.unstableSort((ByteComparator)((v1,v2)->{return Byte.compare((Byte)v1,(Byte)v2);}));
+      Assertions.assertEquals(TypeConversionUtil.convertTobyte(1),seq.getByte(0));
+      Assertions.assertEquals(TypeConversionUtil.convertTobyte(2),seq.getByte(1));
+      seq.clear();
+      seq.add(TypeConversionUtil.convertTobyte(2));
+      seq.add(TypeConversionUtil.convertTobyte(1));
+      seq.unstableSort((ByteComparator)null);
+      Assertions.assertEquals(TypeConversionUtil.convertTobyte(1),seq.getByte(0));
+      Assertions.assertEquals(TypeConversionUtil.convertTobyte(2),seq.getByte(1));
+      Assertions.assertThrows(IllegalArgumentException.class,()->{
+        seq.unstableSort((ByteComparator)(v1,v2)->{throw new ArrayIndexOutOfBoundsException();});
+      });
+      Assertions.assertThrows(ConcurrentModificationException.class,()->{
+        seq.unstableSort((ByteComparator)(v1,v2)->{
+        seq.add(Byte.MIN_VALUE);
+        throw new ArrayIndexOutOfBoundsException();
+        });
+      });
+      Assertions.assertThrows(IndexOutOfBoundsException.class,()->{
+        seq.unstableSort((ByteComparator)(v1,v2)->{throw new IndexOutOfBoundsException();});
+      });
+      Assertions.assertThrows(ConcurrentModificationException.class,()->{
+        seq.unstableSort((ByteComparator)(v1,v2)->{
+        seq.add(Byte.MIN_VALUE);
+        throw new IndexOutOfBoundsException();
+        });
+      });
+      //TODO other cases
+    }
+    //#ENDIF
+  }
+  @Test
+  public void testRemoveAtIndexCheckedList()
+  {
+    {
+      var seq=new CheckedList();
+      for(int i=0;i<100;++i)
+      {
+        seq.add(TypeConversionUtil.convertTobyte(i));
+      }
+      int seqSize=seq.size();
+      int modCount=seq.modCount;
+      Assertions.assertEquals(TypeConversionUtil.convertTobyte(0),seq.removeByteAt(0));
+      Assertions.assertEquals(TypeConversionUtil.convertTobyte(seqSize-50),seq.removeByteAt(seqSize-51));
+      Assertions.assertEquals(TypeConversionUtil.convertTobyte(seqSize-1),seq.removeByteAt(seqSize-3));
+      Assertions.assertEquals(seqSize-3,seq.size());
+      var seqItr=seq.iterator();
+      for(int i=0;i<seqSize;++i)
+      {
+        if(i==0 || i == seqSize-50 || i==seqSize-1)
+        {
+          continue;
+        }
+        Assertions.assertEquals(seqItr.nextByte(),TypeConversionUtil.convertTobyte(i));
+      }
+      Assertions.assertEquals(seq.modCount,modCount+3);
+      Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.removeByteAt(-1));
+      Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.removeByteAt(seq.size()));
+    }
+  }
+  @Test
   public void testToArrayCheckedList()
   {
     var seq=new CheckedList();
@@ -1506,6 +1755,110 @@ public class ByteArrSeqTest
       Assertions.assertEquals(seq.size(),0);
       Assertions.assertTrue(seq.isEmpty());
       Assertions.assertEquals(seq.arr.length,i);
+    }
+  }
+  @Test
+  public void testComparatorsortUncheckedSubList()
+  {
+    //#IFSWITCH UncheckedSubList==CheckedList,CheckedSubList
+    {
+      var root=new UncheckedList();
+      var subList=root.subList(0,0);
+      var seq=subList.subList(0,0);
+      //test empty
+      seq.sort((Comparator)null);
+      seq.add(TypeConversionUtil.convertTobyte(2));
+      seq.add(TypeConversionUtil.convertTobyte(1));
+      seq.sort((Comparator)((v1,v2)->{return Byte.compare((Byte)v1,(Byte)v2);}));
+      Assertions.assertEquals(TypeConversionUtil.convertTobyte(1),seq.getByte(0));
+      Assertions.assertEquals(TypeConversionUtil.convertTobyte(2),seq.getByte(1));
+      seq.clear();
+      seq.add(TypeConversionUtil.convertTobyte(2));
+      seq.add(TypeConversionUtil.convertTobyte(1));
+      seq.sort((Comparator)null);
+      Assertions.assertEquals(TypeConversionUtil.convertTobyte(1),seq.getByte(0));
+      Assertions.assertEquals(TypeConversionUtil.convertTobyte(2),seq.getByte(1));
+      //TODO other cases
+    }
+    //#ENDIF
+  }
+  @Test
+  public void testByteComparatorsortUncheckedSubList()
+  {
+    //#IFSWITCH UncheckedSubList==CheckedList,CheckedSubList
+    {
+      var root=new UncheckedList();
+      var subList=root.subList(0,0);
+      var seq=subList.subList(0,0);
+      //test empty
+      seq.sort((ByteComparator)null);
+      seq.add(TypeConversionUtil.convertTobyte(2));
+      seq.add(TypeConversionUtil.convertTobyte(1));
+      seq.sort((ByteComparator)((v1,v2)->{return Byte.compare((Byte)v1,(Byte)v2);}));
+      Assertions.assertEquals(TypeConversionUtil.convertTobyte(1),seq.getByte(0));
+      Assertions.assertEquals(TypeConversionUtil.convertTobyte(2),seq.getByte(1));
+      seq.clear();
+      seq.add(TypeConversionUtil.convertTobyte(2));
+      seq.add(TypeConversionUtil.convertTobyte(1));
+      seq.sort((ByteComparator)null);
+      Assertions.assertEquals(TypeConversionUtil.convertTobyte(1),seq.getByte(0));
+      Assertions.assertEquals(TypeConversionUtil.convertTobyte(2),seq.getByte(1));
+      //TODO other cases
+    }
+    //#ENDIF
+  }
+  @Test
+  public void testByteComparatorunstableSortUncheckedSubList()
+  {
+    //#IFSWITCH UncheckedSubList==CheckedList,CheckedSubList
+    {
+      var root=new UncheckedList();
+      var subList=root.subList(0,0);
+      var seq=subList.subList(0,0);
+      //test empty
+      seq.unstableSort((ByteComparator)null);
+      seq.add(TypeConversionUtil.convertTobyte(2));
+      seq.add(TypeConversionUtil.convertTobyte(1));
+      seq.unstableSort((ByteComparator)((v1,v2)->{return Byte.compare((Byte)v1,(Byte)v2);}));
+      Assertions.assertEquals(TypeConversionUtil.convertTobyte(1),seq.getByte(0));
+      Assertions.assertEquals(TypeConversionUtil.convertTobyte(2),seq.getByte(1));
+      seq.clear();
+      seq.add(TypeConversionUtil.convertTobyte(2));
+      seq.add(TypeConversionUtil.convertTobyte(1));
+      seq.unstableSort((ByteComparator)null);
+      Assertions.assertEquals(TypeConversionUtil.convertTobyte(1),seq.getByte(0));
+      Assertions.assertEquals(TypeConversionUtil.convertTobyte(2),seq.getByte(1));
+      //TODO other cases
+    }
+    //#ENDIF
+  }
+  @Test
+  public void testRemoveAtIndexUncheckedSubList()
+  {
+    {
+      var root=new UncheckedList();
+      var subList=root.subList(0,0);
+      var seq=subList.subList(0,0);
+      for(int i=0;i<100;++i)
+      {
+        seq.add(TypeConversionUtil.convertTobyte(i));
+      }
+      int seqSize=seq.size();
+      Assertions.assertEquals(TypeConversionUtil.convertTobyte(0),seq.removeByteAt(0));
+      Assertions.assertEquals(TypeConversionUtil.convertTobyte(seqSize-50),seq.removeByteAt(seqSize-51));
+      Assertions.assertEquals(TypeConversionUtil.convertTobyte(seqSize-1),seq.removeByteAt(seqSize-3));
+      Assertions.assertEquals(seqSize-3,seq.size());
+      var seqItr=seq.iterator();
+      for(int i=0;i<seqSize;++i)
+      {
+        if(i==0 || i == seqSize-50 || i==seqSize-1)
+        {
+          continue;
+        }
+        Assertions.assertEquals(seqItr.nextByte(),TypeConversionUtil.convertTobyte(i));
+      }
+      Assertions.assertEquals(seqSize-3,subList.size());
+      Assertions.assertEquals(seqSize-3,root.size());
     }
   }
   @Test
@@ -1903,6 +2256,204 @@ public class ByteArrSeqTest
         var val=TypeConversionUtil.convertTobyte(i+25);
         Assertions.assertEquals(val,subsubList.getByte(i-10));
       }
+    }
+  }
+  @Test
+  public void testComparatorsortCheckedSubList()
+  {
+    {
+      var root=new CheckedList();
+      var subList=root.subList(0,0);
+      var seq=subList.subList(0,0);
+      subList.add(Byte.MIN_VALUE);
+      Assertions.assertThrows(ConcurrentModificationException.class,()->{
+        seq.sort((Comparator)null);
+      });
+    }
+    //#IFSWITCH CheckedSubList==CheckedList,CheckedSubList
+    {
+      var root=new CheckedList();
+      var subList=root.subList(0,0);
+      var seq=subList.subList(0,0);
+      //test empty
+      seq.sort((Comparator)null);
+      seq.add(TypeConversionUtil.convertTobyte(2));
+      seq.add(TypeConversionUtil.convertTobyte(1));
+      seq.sort((Comparator)((v1,v2)->{return Byte.compare((Byte)v1,(Byte)v2);}));
+      Assertions.assertEquals(TypeConversionUtil.convertTobyte(1),seq.getByte(0));
+      Assertions.assertEquals(TypeConversionUtil.convertTobyte(2),seq.getByte(1));
+      seq.clear();
+      seq.add(TypeConversionUtil.convertTobyte(2));
+      seq.add(TypeConversionUtil.convertTobyte(1));
+      seq.sort((Comparator)null);
+      Assertions.assertEquals(TypeConversionUtil.convertTobyte(1),seq.getByte(0));
+      Assertions.assertEquals(TypeConversionUtil.convertTobyte(2),seq.getByte(1));
+      Assertions.assertThrows(IllegalArgumentException.class,()->{
+        seq.sort((Comparator)(v1,v2)->{throw new ArrayIndexOutOfBoundsException();});
+      });
+      Assertions.assertThrows(ConcurrentModificationException.class,()->{
+        seq.sort((Comparator)(v1,v2)->{
+        seq.add(Byte.MIN_VALUE);
+        throw new ArrayIndexOutOfBoundsException();
+        });
+      });
+      Assertions.assertThrows(IndexOutOfBoundsException.class,()->{
+        seq.sort((Comparator)(v1,v2)->{throw new IndexOutOfBoundsException();});
+      });
+      Assertions.assertThrows(ConcurrentModificationException.class,()->{
+        seq.sort((Comparator)(v1,v2)->{
+        seq.add(Byte.MIN_VALUE);
+        throw new IndexOutOfBoundsException();
+        });
+      });
+      //TODO other cases
+    }
+    //#ENDIF
+  }
+  @Test
+  public void testByteComparatorsortCheckedSubList()
+  {
+    {
+      var root=new CheckedList();
+      var subList=root.subList(0,0);
+      var seq=subList.subList(0,0);
+      subList.add(Byte.MIN_VALUE);
+      Assertions.assertThrows(ConcurrentModificationException.class,()->{
+        seq.sort((ByteComparator)null);
+      });
+    }
+    //#IFSWITCH CheckedSubList==CheckedList,CheckedSubList
+    {
+      var root=new CheckedList();
+      var subList=root.subList(0,0);
+      var seq=subList.subList(0,0);
+      //test empty
+      seq.sort((ByteComparator)null);
+      seq.add(TypeConversionUtil.convertTobyte(2));
+      seq.add(TypeConversionUtil.convertTobyte(1));
+      seq.sort((ByteComparator)((v1,v2)->{return Byte.compare((Byte)v1,(Byte)v2);}));
+      Assertions.assertEquals(TypeConversionUtil.convertTobyte(1),seq.getByte(0));
+      Assertions.assertEquals(TypeConversionUtil.convertTobyte(2),seq.getByte(1));
+      seq.clear();
+      seq.add(TypeConversionUtil.convertTobyte(2));
+      seq.add(TypeConversionUtil.convertTobyte(1));
+      seq.sort((ByteComparator)null);
+      Assertions.assertEquals(TypeConversionUtil.convertTobyte(1),seq.getByte(0));
+      Assertions.assertEquals(TypeConversionUtil.convertTobyte(2),seq.getByte(1));
+      Assertions.assertThrows(IllegalArgumentException.class,()->{
+        seq.sort((ByteComparator)(v1,v2)->{throw new ArrayIndexOutOfBoundsException();});
+      });
+      Assertions.assertThrows(ConcurrentModificationException.class,()->{
+        seq.sort((ByteComparator)(v1,v2)->{
+        seq.add(Byte.MIN_VALUE);
+        throw new ArrayIndexOutOfBoundsException();
+        });
+      });
+      Assertions.assertThrows(IndexOutOfBoundsException.class,()->{
+        seq.sort((ByteComparator)(v1,v2)->{throw new IndexOutOfBoundsException();});
+      });
+      Assertions.assertThrows(ConcurrentModificationException.class,()->{
+        seq.sort((ByteComparator)(v1,v2)->{
+        seq.add(Byte.MIN_VALUE);
+        throw new IndexOutOfBoundsException();
+        });
+      });
+      //TODO other cases
+    }
+    //#ENDIF
+  }
+  @Test
+  public void testByteComparatorunstableSortCheckedSubList()
+  {
+    {
+      var root=new CheckedList();
+      var subList=root.subList(0,0);
+      var seq=subList.subList(0,0);
+      subList.add(Byte.MIN_VALUE);
+      Assertions.assertThrows(ConcurrentModificationException.class,()->{
+        seq.unstableSort((ByteComparator)null);
+      });
+    }
+    //#IFSWITCH CheckedSubList==CheckedList,CheckedSubList
+    {
+      var root=new CheckedList();
+      var subList=root.subList(0,0);
+      var seq=subList.subList(0,0);
+      //test empty
+      seq.unstableSort((ByteComparator)null);
+      seq.add(TypeConversionUtil.convertTobyte(2));
+      seq.add(TypeConversionUtil.convertTobyte(1));
+      seq.unstableSort((ByteComparator)((v1,v2)->{return Byte.compare((Byte)v1,(Byte)v2);}));
+      Assertions.assertEquals(TypeConversionUtil.convertTobyte(1),seq.getByte(0));
+      Assertions.assertEquals(TypeConversionUtil.convertTobyte(2),seq.getByte(1));
+      seq.clear();
+      seq.add(TypeConversionUtil.convertTobyte(2));
+      seq.add(TypeConversionUtil.convertTobyte(1));
+      seq.unstableSort((ByteComparator)null);
+      Assertions.assertEquals(TypeConversionUtil.convertTobyte(1),seq.getByte(0));
+      Assertions.assertEquals(TypeConversionUtil.convertTobyte(2),seq.getByte(1));
+      Assertions.assertThrows(IllegalArgumentException.class,()->{
+        seq.unstableSort((ByteComparator)(v1,v2)->{throw new ArrayIndexOutOfBoundsException();});
+      });
+      Assertions.assertThrows(ConcurrentModificationException.class,()->{
+        seq.unstableSort((ByteComparator)(v1,v2)->{
+        seq.add(Byte.MIN_VALUE);
+        throw new ArrayIndexOutOfBoundsException();
+        });
+      });
+      Assertions.assertThrows(IndexOutOfBoundsException.class,()->{
+        seq.unstableSort((ByteComparator)(v1,v2)->{throw new IndexOutOfBoundsException();});
+      });
+      Assertions.assertThrows(ConcurrentModificationException.class,()->{
+        seq.unstableSort((ByteComparator)(v1,v2)->{
+        seq.add(Byte.MIN_VALUE);
+        throw new IndexOutOfBoundsException();
+        });
+      });
+      //TODO other cases
+    }
+    //#ENDIF
+  }
+  @Test
+  public void testRemoveAtIndexCheckedSubList()
+  {
+    {
+      var root=new CheckedList();
+      var subList=root.subList(0,0);
+      var seq=subList.subList(0,0);
+      subList.add(Byte.MIN_VALUE);
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeByteAt(0));
+      subList.removeByteAt(0);
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeByteAt(0));
+    }
+    {
+      var root=new CheckedList();
+      var subList=root.subList(0,0);
+      var seq=subList.subList(0,0);
+      for(int i=0;i<100;++i)
+      {
+        seq.add(TypeConversionUtil.convertTobyte(i));
+      }
+      int seqSize=seq.size();
+      int modCount=root.modCount;
+      Assertions.assertEquals(TypeConversionUtil.convertTobyte(0),seq.removeByteAt(0));
+      Assertions.assertEquals(TypeConversionUtil.convertTobyte(seqSize-50),seq.removeByteAt(seqSize-51));
+      Assertions.assertEquals(TypeConversionUtil.convertTobyte(seqSize-1),seq.removeByteAt(seqSize-3));
+      Assertions.assertEquals(seqSize-3,seq.size());
+      var seqItr=seq.iterator();
+      for(int i=0;i<seqSize;++i)
+      {
+        if(i==0 || i == seqSize-50 || i==seqSize-1)
+        {
+          continue;
+        }
+        Assertions.assertEquals(seqItr.nextByte(),TypeConversionUtil.convertTobyte(i));
+      }
+      Assertions.assertEquals(seqSize-3,subList.size());
+      Assertions.assertEquals(seqSize-3,root.size());
+      Assertions.assertEquals(root.modCount,modCount+3);
+      Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.removeByteAt(-1));
+      Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.removeByteAt(seq.size()));
     }
   }
   @Test

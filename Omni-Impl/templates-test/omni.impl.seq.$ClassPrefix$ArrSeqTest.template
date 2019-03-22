@@ -19,6 +19,12 @@ import omni.impl.seq.$ClassPrefix$ArrSeq.UncheckedStack;
 import omni.impl.seq.$ClassPrefix$ArrSeq.CheckedStack;
 import java.util.ArrayList;
 import java.util.ConcurrentModificationException;
+import java.util.Comparator;
+#IF OfInt
+import java.util.function.$Comparator$;
+#ELSEIFNOT OfRef
+import omni.function.$Comparator$;
+#ENDIF
 #IFNOT OfRef
 import java.util.function.Consumer;
   #IF OfBoolean,OfByte,OfChar,OfShort,OfFloat
@@ -28,9 +34,7 @@ import java.util.function.$TypeNameModifier$Consumer;
   #ENDIF
 #ENDIF
 
-#IF OfRef
 @SuppressWarnings({"rawtypes","unchecked"}) 
-#ENDIF
 public class $ClassPrefix$ArrSeqTest
 {
 //TODO place sanity checks for checked sequence modification behavior
@@ -74,10 +78,338 @@ var seq=new STRUCTNAME(INITIALCAPACITY);
 #ENDIF
 #ENDDEF
 
-
-
+#MACRODEF TestComparatorSort<METHODNAME>(COMPARATORTYPE)
+@Test
+public void testCOMPARATORTYPEMETHODNAMESTRUCTNAME()
+{
+  #IFSWITCH STRUCTNAME==CheckedSubList
+  {
+    #MACRO ConstructSeq<DEFAULT>()
+    subList.add($defaultVal$);
+    Assertions.assertThrows(ConcurrentModificationException.class,()->{
+      seq.METHODNAME((COMPARATORTYPE)null);
+    });
+  }
+  #ENDIF
+  //#IFSWITCH STRUCTNAME==CheckedList,CheckedSubList
+  {
+    #MACRO ConstructSeq<DEFAULT>()
+    //test empty
+    seq.METHODNAME((COMPARATORTYPE)null);
+    
+    #IF OfRef
+    seq.add(Integer.valueOf(2));
+    seq.add(Integer.valueOf(1));
+    seq.METHODNAME((COMPARATORTYPE)((v1,v2)->{return Integer.compare((Integer)v1,(Integer)v2);}));
+    Assertions.assertEquals(Integer.valueOf(1),seq.get(0));
+    Assertions.assertEquals(Integer.valueOf(2),seq.get(1));
+    seq.clear();
+    seq.add(Integer.valueOf(2));
+    seq.add(Integer.valueOf(1));
+    seq.METHODNAME((Comparator)null);
+    Assertions.assertEquals(Integer.valueOf(1),seq.get(0));
+    Assertions.assertEquals(Integer.valueOf(2),seq.get(1));
+      #IFSWITCH STRUCTNAME==CheckedList,CheckedSubList
+    Assertions.assertThrows(IllegalArgumentException.class,()->{
+      seq.METHODNAME((COMPARATORTYPE)(v1,v2)->{throw new ArrayIndexOutOfBoundsException();});
+    });
+    Assertions.assertThrows(ConcurrentModificationException.class,()->{
+      seq.METHODNAME((COMPARATORTYPE)(v1,v2)->{
+      seq.add($defaultVal$);
+      throw new ArrayIndexOutOfBoundsException();
+      });
+    });
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->{
+      seq.METHODNAME((COMPARATORTYPE)(v1,v2)->{throw new IndexOutOfBoundsException();});
+    });
+    Assertions.assertThrows(ConcurrentModificationException.class,()->{
+      seq.METHODNAME((COMPARATORTYPE)(v1,v2)->{
+      seq.add($defaultVal$);
+      throw new IndexOutOfBoundsException();
+      });
+    });
+    seq.clear();
+    Comparable<Object> aiobObject=new Comparable<Object>(){
+      @Override public int compareTo(Object obj){
+        throw new ArrayIndexOutOfBoundsException();
+      }
+    };
+    seq.add(aiobObject);
+    seq.add(aiobObject);
+    Assertions.assertThrows(IllegalArgumentException.class,()->{
+      seq.METHODNAME((COMPARATORTYPE)null);
+    });
+    seq.clear();
+    Comparable<Object> modifyingAIOBObject=new Comparable<Object>(){
+      @Override public int compareTo(Object obj){
+        seq.add($defaultVal$);
+        throw new ArrayIndexOutOfBoundsException();
+      }
+    };
+    seq.add(modifyingAIOBObject);
+    seq.add(modifyingAIOBObject);
+    Assertions.assertThrows(ConcurrentModificationException.class,()->{
+      seq.METHODNAME((COMPARATORTYPE)null);
+    });
+    seq.clear();
+    
+    
+    Comparable<Object> iobObject=new Comparable<Object>(){
+      @Override public int compareTo(Object obj){
+        throw new IndexOutOfBoundsException();
+      }
+    };
+    seq.add(iobObject);
+    seq.add(iobObject);
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->{
+      seq.METHODNAME((COMPARATORTYPE)null);
+    });
+    seq.clear();
+    Comparable<Object> modifyingIOBObject=new Comparable<Object>(){
+      @Override public int compareTo(Object obj){
+        seq.add($defaultVal$);
+        throw new IndexOutOfBoundsException();
+      }
+    };
+    seq.add(modifyingIOBObject);
+    seq.add(modifyingIOBObject);
+    Assertions.assertThrows(ConcurrentModificationException.class,()->{
+      seq.METHODNAME((COMPARATORTYPE)null);
+    });
+      #ENDIF
+    #ELSEIF OfBoolean
+    seq.add(true);
+    seq.add(false);
+    seq.METHODNAME((COMPARATORTYPE)((v1,v2)->{return Boolean.compare((Boolean)v1,(Boolean)v2);}));
+    Assertions.assertEquals(false,seq.getBoolean(0));
+    Assertions.assertEquals(true,seq.getBoolean(1));
+    seq.clear();
+    seq.add(true);
+    seq.add(false);
+    seq.METHODNAME((COMPARATORTYPE)null);
+    Assertions.assertEquals(false,seq.getBoolean(0));
+    Assertions.assertEquals(true,seq.getBoolean(1));
+      #IFSWITCH STRUCTNAME==CheckedList,CheckedSubList
+    Assertions.assertThrows(IllegalArgumentException.class,()->{
+      seq.METHODNAME((COMPARATORTYPE)(v1,v2)->{throw new ArrayIndexOutOfBoundsException();});
+    });
+    Assertions.assertThrows(ConcurrentModificationException.class,()->{
+      seq.METHODNAME((COMPARATORTYPE)(v1,v2)->{
+      seq.add($defaultVal$);
+      throw new ArrayIndexOutOfBoundsException();
+      });
+    });
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->{
+      seq.METHODNAME((COMPARATORTYPE)(v1,v2)->{throw new IndexOutOfBoundsException();});
+    });
+    Assertions.assertThrows(ConcurrentModificationException.class,()->{
+      seq.METHODNAME((COMPARATORTYPE)(v1,v2)->{
+      seq.add($defaultVal$);
+      throw new IndexOutOfBoundsException();
+      });
+    });
+      #ENDIF
+    #ELSE
+    seq.add(TypeConversionUtil.convertTo$ArrayType$(2));
+    seq.add(TypeConversionUtil.convertTo$ArrayType$(1));
+    seq.METHODNAME((COMPARATORTYPE)((v1,v2)->{return $BoxedType$.compare(($BoxedType$)v1,($BoxedType$)v2);}));
+    Assertions.assertEquals(TypeConversionUtil.convertTo$ArrayType$(1),seq.get$TypeNameModifier$(0));
+    Assertions.assertEquals(TypeConversionUtil.convertTo$ArrayType$(2),seq.get$TypeNameModifier$(1));
+    seq.clear();
+    seq.add(TypeConversionUtil.convertTo$ArrayType$(2));
+    seq.add(TypeConversionUtil.convertTo$ArrayType$(1));
+    seq.METHODNAME((COMPARATORTYPE)null);
+    Assertions.assertEquals(TypeConversionUtil.convertTo$ArrayType$(1),seq.get$TypeNameModifier$(0));
+    Assertions.assertEquals(TypeConversionUtil.convertTo$ArrayType$(2),seq.get$TypeNameModifier$(1));
+      #IFSWITCH STRUCTNAME==CheckedList,CheckedSubList
+    Assertions.assertThrows(IllegalArgumentException.class,()->{
+      seq.METHODNAME((COMPARATORTYPE)(v1,v2)->{throw new ArrayIndexOutOfBoundsException();});
+    });
+    Assertions.assertThrows(ConcurrentModificationException.class,()->{
+      seq.METHODNAME((COMPARATORTYPE)(v1,v2)->{
+      seq.add($defaultVal$);
+      throw new ArrayIndexOutOfBoundsException();
+      });
+    });
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->{
+      seq.METHODNAME((COMPARATORTYPE)(v1,v2)->{throw new IndexOutOfBoundsException();});
+    });
+    Assertions.assertThrows(ConcurrentModificationException.class,()->{
+      seq.METHODNAME((COMPARATORTYPE)(v1,v2)->{
+      seq.add($defaultVal$);
+      throw new IndexOutOfBoundsException();
+      });
+    });
+      #ENDIF
+    #ENDIF
+    //TODO other cases
+  }
+  //#ENDIF
+}
+#ENDDEF
 
 #MACRODEF Impl<STRUCTNAME>()
+
+#IFSWITCH STRUCTNAME==CheckedList,UncheckedList,CheckedSubList,UncheckedSubList
+#MACRO TestComparatorSort<sort>(Comparator)
+#IFNOT OfRef
+#MACRO TestComparatorSort<sort>($Comparator$)
+#ENDIF
+#IFNOT OfBoolean
+#MACRO TestComparatorSort<unstableSort>($Comparator$)
+#ENDIF
+#ENDIF
+
+
+#IFSWITCH STRUCTNAME==CheckedList,CheckedStack,CheckedSubList
+  #IF OfRef
+@Test
+public void testRemoveValNonNullModCheckSTRUCTNAME()
+{
+  {
+    #MACRO ConstructSeq<DEFAULT>()
+    Object modifyingObject=new Object(){
+      @Override public boolean equals(Object val){
+        #IFSWITCH STRUCTNAME==CheckedStack
+        var tmp=seq.pop();
+        seq.push(tmp);
+        #ELSE
+        var tmp=seq.remove(seq.size()-1);
+        seq.add(tmp);
+        #ENDIF
+        return val==this;
+      }
+    };
+    for(int i=0;i<50;++i)
+    {
+      seq.add(new Object());
+    }
+    Assertions.assertThrows(ConcurrentModificationException.class,()->{
+      seq.remove(modifyingObject);
+    });
+    
+  }
+  {
+    #MACRO ConstructSeq<DEFAULT>()
+    Object modifyingObject=new Object(){
+      @Override public boolean equals(Object val){
+        #IFSWITCH STRUCTNAME==CheckedStack
+        var tmp=seq.pop();
+        seq.push(tmp);
+        #ELSE
+        var tmp=seq.remove(seq.size()-1);
+        seq.add(tmp);
+        #ENDIF
+        return val==this;
+      }
+    };
+    for(int i=0;i<50;++i)
+    {
+      seq.add(new Object());
+    }
+    seq.add(modifyingObject);
+    for(int i=0;i<50;++i)
+    {
+      seq.add(new Object());
+    }
+    
+    Assertions.assertThrows(ConcurrentModificationException.class,()->{
+      seq.remove(modifyingObject);
+    });
+  }
+  
+  
+  
+  
+  {
+    #MACRO ConstructSeq<DEFAULT>()
+    Object modifyingObject=new Object(){
+      @Override public boolean equals(Object val){
+        throw new IndexOutOfBoundsException();
+      }
+    };
+    for(int i=0;i<50;++i)
+    {
+      seq.add(new Object());
+    }
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->{
+      seq.remove(modifyingObject);
+    });
+  }
+  {
+    #MACRO ConstructSeq<DEFAULT>()
+    Object modifyingObject=new Object(){
+      @Override public boolean equals(Object val){
+        throw new IndexOutOfBoundsException();
+      }
+    };
+    for(int i=0;i<50;++i)
+    {
+      seq.add(new Object());
+    }
+    seq.add(modifyingObject);
+    for(int i=0;i<50;++i)
+    {
+      seq.add(new Object());
+    }
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->{
+      seq.remove(modifyingObject);
+    });
+  }
+  {
+    #MACRO ConstructSeq<DEFAULT>()
+    Object modifyingObject=new Object(){
+      @Override public boolean equals(Object val){
+        #IFSWITCH STRUCTNAME==CheckedStack
+        var tmp=seq.pop();
+        seq.push(tmp);
+        #ELSE
+        var tmp=seq.remove(seq.size()-1);
+        seq.add(tmp);
+        #ENDIF
+        throw new IndexOutOfBoundsException();
+      }
+    };
+    for(int i=0;i<50;++i)
+    {
+      seq.add(new Object());
+    }
+    Assertions.assertThrows(ConcurrentModificationException.class,()->{
+      seq.remove(modifyingObject);
+    });
+  }
+  {
+    #MACRO ConstructSeq<DEFAULT>()
+    Object modifyingObject=new Object(){
+      @Override public boolean equals(Object val){
+        #IFSWITCH STRUCTNAME==CheckedStack
+        var tmp=seq.pop();
+        seq.push(tmp);
+        #ELSE
+        var tmp=seq.remove(seq.size()-1);
+        seq.add(tmp);
+        #ENDIF
+        throw new IndexOutOfBoundsException();
+      }
+    };
+    for(int i=0;i<50;++i)
+    {
+      seq.add(new Object());
+    }
+    seq.add(modifyingObject);
+    for(int i=0;i<50;++i)
+    {
+      seq.add(new Object());
+    }
+    Assertions.assertThrows(ConcurrentModificationException.class,()->{
+      seq.remove(modifyingObject);
+    });
+  }
+}
+  #ENDIF
+#ENDIF
+
+
 #IFSWITCH STRUCTNAME==CheckedList,UncheckedList,CheckedSubList,UncheckedSubList
 @Test
 public void testRemoveAtIndexSTRUCTNAME()
@@ -109,30 +441,30 @@ public void testRemoveAtIndexSTRUCTNAME()
     #ENDIF
     #IF OfRef
     Assertions.assertEquals(Integer.valueOf(0),seq.$removeAtIndexMethod$(0));
-    Assertions.assertEquals(Integer.valueOf(51),seq.$removeAtIndexMethod$(50));
-    Assertions.assertEquals(Integer.valueOf(99),seq.$removeAtIndexMethod$(97));
+    Assertions.assertEquals(Integer.valueOf(seqSize-50),seq.$removeAtIndexMethod$(seqSize-51));
+    Assertions.assertEquals(Integer.valueOf(seqSize-1),seq.$removeAtIndexMethod$(seqSize-3));
     #ELSE
     Assertions.assertEquals(TypeConversionUtil.convertTo$ArrayType$(0),seq.$removeAtIndexMethod$(0));
-    Assertions.assertEquals(TypeConversionUtil.convertTo$ArrayType$(51),seq.$removeAtIndexMethod$(50));
-    Assertions.assertEquals(TypeConversionUtil.convertTo$ArrayType$(99),seq.$removeAtIndexMethod$(97));
+    Assertions.assertEquals(TypeConversionUtil.convertTo$ArrayType$(seqSize-50),seq.$removeAtIndexMethod$(seqSize-51));
+    Assertions.assertEquals(TypeConversionUtil.convertTo$ArrayType$(seqSize-1),seq.$removeAtIndexMethod$(seqSize-3));
     #ENDIF
-    Assertions.assertEquals(98,seq.size());
+    Assertions.assertEquals(seqSize-3,seq.size());
     var seqItr=seq.iterator();
-    for(int i=0,offset=0;i<98;++i)
+    for(int i=0;i<seqSize;++i)
     {
-      if(i==0 || i==50 || i==97)
+      if(i==0 || i == seqSize-50 || i==seqSize-1)
       {
-        ++offset;
+        continue;
       }
       #IF OfRef
-      Assertions.assertEquals(seqItr.next$TypeNameModifier$(),Integer.valueOf(i+offset));
+      Assertions.assertEquals(seqItr.next$TypeNameModifier$(),Integer.valueOf(i));
       #ELSE
-      Assertions.assertEquals(seqItr.next$TypeNameModifier$(),TypeConversionUtil.convertTo$ArrayType$(i+offset));
+      Assertions.assertEquals(seqItr.next$TypeNameModifier$(),TypeConversionUtil.convertTo$ArrayType$(i));
       #ENDIF
     }
     #IFSWITCH STRUCTNAME==CheckedSubList,UncheckedSubList
-    Assertions.assertEquals(98,subList.size());
-    Assertions.assertEquals(98,root.size());
+    Assertions.assertEquals(seqSize-3,subList.size());
+    Assertions.assertEquals(seqSize-3,root.size());
     #ENDIF
     #IFSWITCH STRUCTNAME==CheckedSubList
     Assertions.assertEquals(root.modCount,modCount+3);
@@ -140,7 +472,21 @@ public void testRemoveAtIndexSTRUCTNAME()
     Assertions.assertEquals(seq.modCount,modCount+3);
     #ENDIF
     #IF OfRef
-    #IFS
+      #IFSWITCH STRUCTNAME==CheckedList,UncheckedList
+    for(int i=seqSize-3;i<seqSize;++i)
+    {
+      Assertions.assertNull(seq.arr[i]);
+    }
+      #ELSE
+    for(int i=seqSize-3;i<seqSize;++i)
+    {
+      Assertions.assertNull(root.arr[i]);
+    }
+      #ENDIF
+    #ENDIF
+    #IFSWITCH STRUCTNAME==CheckedList,CheckedSubList
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.$removeAtIndexMethod$(-1));
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.$removeAtIndexMethod$(seq.size()));
     #ENDIF
   }
   
