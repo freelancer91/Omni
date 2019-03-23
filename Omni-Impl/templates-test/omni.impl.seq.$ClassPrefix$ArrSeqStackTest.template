@@ -1,0 +1,129 @@
+#TYPEDEF OfBoolean
+#TYPEDEF OfByte
+#TYPEDEF OfChar
+#TYPEDEF OfShort
+#TYPEDEF OfInt
+#TYPEDEF OfLong
+#TYPEDEF OfFloat
+#TYPEDEF OfDouble
+#TYPEDEF OfRef
+package omni.impl.seq;
+/*
+import omni.impl.seq.$ClassPrefix$ArrSeq.UncheckedStack;
+import omni.impl.seq.$ClassPrefix$ArrSeq.CheckedStack;
+import omni.util.TypeConversionUtil;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+@SuppressWarnings({"rawtypes","unchecked"}) 
+*/
+public class $ClassPrefix$ArrSeqStackTest
+{
+/*
+  #MACRO StructImpl<UncheckedStack>()
+  #MACRO StructImpl<CheckedStack>()
+*/
+}
+
+
+#MACRODEF StructImpl<STRUCTNAME>()
+#MACRO TestInputMethods<DEFAULT>($ArrayType$,$ArrayType$)
+#MACRO TestInputMethods<NULL>($ArrayType$,$ArrayType$)
+#MACRO TestInputMethods<50>($ArrayType$,$ArrayType$)
+#IFNOT OfRef
+#MACRO TestInputMethods<DEFAULT>($BoxedType$,$ArrayType$)
+#MACRO TestInputMethods<NULL>($BoxedType$,$ArrayType$)
+#MACRO TestInputMethods<50>($BoxedType$,$ArrayType$)
+  #IFNOT OfBoolean
+#MACRO TestInputMethods<DEFAULT>(boolean,$ArrayType$boolean)
+#MACRO TestInputMethods<NULL>(boolean,$ArrayType$boolean)
+#MACRO TestInputMethods<50>(boolean,$ArrayType$boolean)
+#MACRO TestInputMethods<DEFAULT>(Boolean,$ArrayType$boolean)
+#MACRO TestInputMethods<NULL>(Boolean,$ArrayType$boolean)
+#MACRO TestInputMethods<50>(Boolean,$ArrayType$boolean)
+    #IFNOT OfByte,OfChar
+#MACRO TestInputMethods<DEFAULT>(byte,$ArrayType$)
+#MACRO TestInputMethods<NULL>(byte,$ArrayType$)
+#MACRO TestInputMethods<50>(byte,$ArrayType$)
+#MACRO TestInputMethods<DEFAULT>(Byte,$ArrayType$)
+#MACRO TestInputMethods<NULL>(Byte,$ArrayType$)
+#MACRO TestInputMethods<50>(Byte,$ArrayType$)
+      #IFNOT OfShort
+#MACRO TestInputMethods<DEFAULT>(char,$ArrayType$)
+#MACRO TestInputMethods<NULL>(char,$ArrayType$)
+#MACRO TestInputMethods<50>(char,$ArrayType$)
+#MACRO TestInputMethods<DEFAULT>(Character,$ArrayType$)
+#MACRO TestInputMethods<NULL>(Character,$ArrayType$)
+#MACRO TestInputMethods<50>(Character,$ArrayType$)
+#MACRO TestInputMethods<DEFAULT>(short,$ArrayType$)
+#MACRO TestInputMethods<NULL>(short,$ArrayType$)
+#MACRO TestInputMethods<50>(short,$ArrayType$)
+#MACRO TestInputMethods<DEFAULT>(Short,$ArrayType$)
+#MACRO TestInputMethods<NULL>(Short,$ArrayType$)
+#MACRO TestInputMethods<50>(Short,$ArrayType$)
+        #IFNOT OfInt
+#MACRO TestInputMethods<DEFAULT>(int,$ArrayType$)
+#MACRO TestInputMethods<NULL>(int,$ArrayType$)
+#MACRO TestInputMethods<50>(int,$ArrayType$)
+#MACRO TestInputMethods<DEFAULT>(Integer,$ArrayType$)
+#MACRO TestInputMethods<NULL>(Integer,$ArrayType$)
+#MACRO TestInputMethods<50>(Integer,$ArrayType$)
+          #IFNOT OfLong
+#MACRO TestInputMethods<DEFAULT>(long,$ArrayType$)
+#MACRO TestInputMethods<NULL>(long,$ArrayType$)
+#MACRO TestInputMethods<50>(long,$ArrayType$)
+#MACRO TestInputMethods<DEFAULT>(Long,$ArrayType$)
+#MACRO TestInputMethods<NULL>(Long,$ArrayType$)
+#MACRO TestInputMethods<50>(Long,$ArrayType$)
+            #IFNOT OfFloat
+#MACRO TestInputMethods<DEFAULT>(float,$ArrayType$)
+#MACRO TestInputMethods<NULL>(float,$ArrayType$)
+#MACRO TestInputMethods<50>(float,$ArrayType$)
+#MACRO TestInputMethods<DEFAULT>(Float,$ArrayType$)
+#MACRO TestInputMethods<NULL>(Float,$ArrayType$)
+#MACRO TestInputMethods<50>(Float,$ArrayType$)
+            #ENDIF
+          #ENDIF
+        #ENDIF
+      #ENDIF
+    #ENDIF
+  #ENDIF
+#ENDIF
+#ENDDEF
+
+#MACRODEF TestInputMethods<INITIALCAPACITY>(INPUTTYPE,OUTPUTTYPE)
+@Test
+public void testSTRUCTNAMEpush_INPUTTYPE_initialCapacityINITIALCAPACITY()
+{
+  #MACRO ConstructionRoutine()
+  #MACRO PushAscending(100,INPUTTYPE)
+  Assertions.assertEquals(100,seq.size);
+  Assertions.assertNotNull(seq.arr);
+  #IFSWITCH STRUCTNAME==CheckedStack
+  Assertions.assertEquals(100,seq.modCount);
+  #ENDIF
+  for(int i=0;i<seq.size;++i)
+  {
+    Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPE(i),seq.arr[i]);
+  }
+}
+#ENDDEF
+
+
+
+
+#MACRODEF ConstructionRoutine()
+#IFSWITCH INITIALCAPACITY==DEFAULT
+STRUCTNAME seq=new STRUCTNAME();
+#ELSEIFSWITCH INITIALCAPACITY==NULL
+STRUCTNAME seq=new STRUCTNAME(0,null);
+#ELSE
+STRUCTNAME seq=new STRUCTNAME(INITIALCAPACITY);
+#ENDIF
+#ENDDEF
+
+#MACRODEF PushAscending(NUM_TO_PUSH,INPUTTYPE)
+for(int i=0;i<NUM_TO_PUSH;++i)
+{
+  seq.push(TypeConversionUtil.convertToINPUTTYPE(i));
+}
+#ENDDEF

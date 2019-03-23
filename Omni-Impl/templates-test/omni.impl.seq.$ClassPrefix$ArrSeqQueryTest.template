@@ -35,6 +35,19 @@ public class $ClassPrefix$ArrSeqQueryTest
   #MACRO Impl<CheckedStack,contains>()
   #MACRO Impl<CheckedSubList,contains>()
   #MACRO Impl<UncheckedSubList,contains>()
+  
+  #MACRO Impl<UncheckedList,indexOf>()
+  #MACRO Impl<CheckedList,indexOf>()
+  #MACRO Impl<CheckedSubList,indexOf>()
+  #MACRO Impl<UncheckedSubList,indexOf>()
+  
+  #MACRO Impl<UncheckedList,lastIndexOf>()
+  #MACRO Impl<CheckedList,lastIndexOf>()
+  #MACRO Impl<CheckedSubList,lastIndexOf>()
+  #MACRO Impl<UncheckedSubList,lastIndexOf>()
+  
+  #MACRO Impl<UncheckedStack,search>()
+  #MACRO Impl<CheckedStack,search>()
 
 }
 
@@ -52,11 +65,6 @@ var seq=new STRUCTNAME();
 #ENDIF
 #ENDDEF
 
-
-
-
-
-
 #MACRODEF Impl<STRUCTNAME,METHODNAME>()
 @Test
 public void testSTRUCTNAMEMETHODNAMEDouble()
@@ -65,68 +73,175 @@ public void testSTRUCTNAMEMETHODNAMEDouble()
   QueryTestUtil.testMETHODNAMEDouble(()->
   {
     #MACRO ConstructSeq()
+  #IFSWITCH METHODNAME==removeVal,contains,indexOf
     seq.add(Double.valueOf((double)3));
     seq.add(Double.valueOf((double)0));
+  #ELSE
+    seq.add(Double.valueOf((double)0));
+    seq.add(Double.valueOf((double)3));
+  #ENDIF
     return seq;
-  },(double)0);
+  },(double)0
+  #IFSWITCH METHODNAME==indexOf
+  ,1
+  #ELSEIFSWITCH METHODNAME==lastIndexOf
+  ,0
+  #ELSEIFSWITCH METHODNAME==search
+  ,2
+  #ENDIF
+  );
   QueryTestUtil.testMETHODNAMEDouble(()->
   {
     #MACRO ConstructSeq()
+  #IFSWITCH METHODNAME==removeVal,contains,indexOf
     seq.add(Double.valueOf((double)3));
     seq.add(Double.valueOf(Double.NaN));
+  #ELSE
+    seq.add(Double.valueOf(Double.NaN));
+    seq.add(Double.valueOf((double)3));
+  #ENDIF
     return seq;
-  },(double)Double.NaN);
+  },(double)Double.NaN
+  #IFSWITCH METHODNAME==indexOf
+  ,1
+  #ELSEIFSWITCH METHODNAME==lastIndexOf
+  ,0
+  #ELSEIFSWITCH METHODNAME==search
+  ,2
+  #ENDIF
+  );
 #ELSEIF OfBoolean
   QueryTestUtil.testMETHODNAMEDouble(()->
   {
     #MACRO ConstructSeq()
     seq.add(false);
     return seq;
-  },false);
+  },false
+  #IFSWITCH METHODNAME==indexOf
+  ,0
+  #ELSEIFSWITCH METHODNAME==lastIndexOf
+  ,0
+  #ELSEIFSWITCH METHODNAME==search
+  ,1
+  #ENDIF
+  );
   QueryTestUtil.testMETHODNAMEDouble(()->
   {
     #MACRO ConstructSeq()
     seq.add(true);
     return seq;
-  },true);
+  },true
+  #IFSWITCH METHODNAME==indexOf
+  ,0
+  #ELSEIFSWITCH METHODNAME==lastIndexOf
+  ,0
+  #ELSEIFSWITCH METHODNAME==search
+  ,1
+  #ENDIF
+  );
 #ELSEIF OfByte,OfChar,OfShort,OfInt,OfLong
   QueryTestUtil.testMETHODNAMEDouble(()->
   {
     #MACRO ConstructSeq()
+  #IFSWITCH METHODNAME==removeVal,contains,indexOf
     seq.add(($exposedType$)3);
     seq.add(($exposedType$)0);
+  #ELSE
+    seq.add(($exposedType$)0);
+    seq.add(($exposedType$)3);
+  #ENDIF
     return seq;
-  });
+  }
+  #IFSWITCH METHODNAME==indexOf
+  ,1
+  #ELSEIFSWITCH METHODNAME==lastIndexOf
+  ,0
+  #ELSEIFSWITCH METHODNAME==search
+  ,2
+  #ENDIF
+  );
 #ELSEIF OfFloat
   QueryTestUtil.testMETHODNAMEDouble(()->
   {
     #MACRO ConstructSeq()
+  #IFSWITCH METHODNAME==removeVal,contains,indexOf
     seq.add(($exposedType$)3);
     seq.add(($exposedType$)0);
+  #ELSE
+    seq.add(($exposedType$)0);
+    seq.add(($exposedType$)3);
+  #ENDIF
     return seq;
-  },(float)0);
+  },(float)0
+  #IFSWITCH METHODNAME==indexOf
+  ,1
+  #ELSEIFSWITCH METHODNAME==lastIndexOf
+  ,0
+  #ELSEIFSWITCH METHODNAME==search
+  ,2
+  #ENDIF
+  );
   QueryTestUtil.testMETHODNAMEDouble(()->
   {
     #MACRO ConstructSeq()
+  #IFSWITCH METHODNAME==removeVal,contains,indexOf
     seq.add(($exposedType$)3);
     seq.add((float)Float.NaN);
+  #ELSE
+    seq.add((float)Float.NaN);
+    seq.add(($exposedType$)3);
+  #ENDIF
     return seq;
-  },(float)Float.NaN);
+  },(float)Float.NaN
+  #IFSWITCH METHODNAME==indexOf
+  ,1
+  #ELSEIFSWITCH METHODNAME==lastIndexOf
+  ,0
+  #ELSEIFSWITCH METHODNAME==search
+  ,2
+  #ENDIF
+  );
 #ELSE
   QueryTestUtil.testMETHODNAMEDouble(()->
   {
     #MACRO ConstructSeq()
+#IFSWITCH METHODNAME==removeVal,contains,indexOf
     seq.add(($exposedType$)3);
     seq.add(($exposedType$)0);
+#ELSE
+    seq.add(($exposedType$)0);
+    seq.add(($exposedType$)3);
+#ENDIF
     return seq;
-  },(double)0);
+  },(double)0
+  #IFSWITCH METHODNAME==indexOf
+  ,1
+  #ELSEIFSWITCH METHODNAME==lastIndexOf
+  ,0
+  #ELSEIFSWITCH METHODNAME==search
+  ,2
+  #ENDIF
+  );
   QueryTestUtil.testMETHODNAMEDouble(()->
   {
     #MACRO ConstructSeq()
+#IFSWITCH METHODNAME==removeVal,contains,indexOf
     seq.add(($exposedType$)3);
     seq.add(($exposedType$)Double.NaN);
+#ELSE
+    seq.add(($exposedType$)Double.NaN);
+    seq.add(($exposedType$)3);
+#ENDIF
     return seq;
-  },(double)Double.NaN);
+  },(double)Double.NaN
+  #IFSWITCH METHODNAME==indexOf
+  ,1
+  #ELSEIFSWITCH METHODNAME==lastIndexOf
+  ,0
+  #ELSEIFSWITCH METHODNAME==search
+  ,2
+  #ENDIF
+  );
 #ENDIF
 }
 @Test
@@ -136,68 +251,176 @@ public void testSTRUCTNAMEMETHODNAMEFloat()
   QueryTestUtil.testMETHODNAMEFloat(()->
   {
     #MACRO ConstructSeq()
-    seq.add((float)3);
+  #IFSWITCH METHODNAME==removeVal,contains,indexOf
+    seq.add(Float.valueOf((float)3));
     seq.add(Float.valueOf((float)0));
+  #ELSE
+    seq.add(Float.valueOf((float)0));
+    seq.add(Float.valueOf((float)3));
+  #ENDIF
     return seq;
-  },(float)0);
+  },(float)0
+  #IFSWITCH METHODNAME==indexOf
+  ,1
+  #ELSEIFSWITCH METHODNAME==lastIndexOf
+  ,0
+  #ELSEIFSWITCH METHODNAME==search
+  ,2
+  #ENDIF
+  );
   QueryTestUtil.testMETHODNAMEFloat(()->
   {
     #MACRO ConstructSeq()
+    
+  #IFSWITCH METHODNAME==removeVal,contains,indexOf
     seq.add((float)3);
-    seq.add(Float.valueOf(Float.NaN));
+    seq.add((float)Float.NaN);
+  #ELSE
+    seq.add((float)Float.NaN);
+    seq.add((float)3);
+  #ENDIF
     return seq;
-  },(float)Float.NaN);
+  },(float)Float.NaN
+  #IFSWITCH METHODNAME==indexOf
+  ,1
+  #ELSEIFSWITCH METHODNAME==lastIndexOf
+  ,0
+  #ELSEIFSWITCH METHODNAME==search
+  ,2
+  #ENDIF
+  );
 #ELSEIF OfBoolean
   QueryTestUtil.testMETHODNAMEFloat(()->
   {
     #MACRO ConstructSeq()
     seq.add(false);
     return seq;
-  },false);
+  },false
+  #IFSWITCH METHODNAME==indexOf
+  ,0
+  #ELSEIFSWITCH METHODNAME==lastIndexOf
+  ,0
+  #ELSEIFSWITCH METHODNAME==search
+  ,1
+  #ENDIF
+  );
   QueryTestUtil.testMETHODNAMEFloat(()->
   {
     #MACRO ConstructSeq()
     seq.add(true);
     return seq;
-  },true);
+  },true
+  #IFSWITCH METHODNAME==indexOf
+  ,0
+  #ELSEIFSWITCH METHODNAME==lastIndexOf
+  ,0
+  #ELSEIFSWITCH METHODNAME==search
+  ,1
+  #ENDIF
+  );
 #ELSEIF OfByte,OfChar,OfShort,OfInt,OfLong
   QueryTestUtil.testMETHODNAMEFloat(()->
   {
     #MACRO ConstructSeq()
+  #IFSWITCH METHODNAME==removeVal,contains,indexOf
     seq.add(($exposedType$)3);
     seq.add(($exposedType$)0);
+  #ELSE
+    seq.add(($exposedType$)0);
+    seq.add(($exposedType$)3);
+  #ENDIF
     return seq;
-  });
+  }
+  #IFSWITCH METHODNAME==indexOf
+  ,1
+  #ELSEIFSWITCH METHODNAME==lastIndexOf
+  ,0
+  #ELSEIFSWITCH METHODNAME==search
+  ,2
+  #ENDIF
+  );
 #ELSEIF OfFloat
   QueryTestUtil.testMETHODNAMEFloat(()->
   {
     #MACRO ConstructSeq()
+  #IFSWITCH METHODNAME==removeVal,contains,indexOf
     seq.add(($exposedType$)3);
     seq.add(($exposedType$)0);
+  #ELSE
+    seq.add(($exposedType$)0);
+    seq.add(($exposedType$)3);
+  #ENDIF
     return seq;
-  },(float)0);
+  },(float)0
+  #IFSWITCH METHODNAME==indexOf
+  ,1
+  #ELSEIFSWITCH METHODNAME==lastIndexOf
+  ,0
+  #ELSEIFSWITCH METHODNAME==search
+  ,2
+  #ENDIF
+  );
   QueryTestUtil.testMETHODNAMEFloat(()->
   {
     #MACRO ConstructSeq()
+  #IFSWITCH METHODNAME==removeVal,contains,indexOf
     seq.add(($exposedType$)3);
     seq.add(($exposedType$)Float.NaN);
+  #ELSE
+    seq.add(($exposedType$)Float.NaN);
+    seq.add(($exposedType$)3);
+  #ENDIF
     return seq;
-  },($exposedType$)Float.NaN);
-#ELSEIF
+  },($exposedType$)Float.NaN
+  #IFSWITCH METHODNAME==indexOf
+  ,1
+  #ELSEIFSWITCH METHODNAME==lastIndexOf
+  ,0
+  #ELSEIFSWITCH METHODNAME==search
+  ,2
+  #ENDIF
+  );
+#ELSE
   QueryTestUtil.testMETHODNAMEFloat(()->
   {
     #MACRO ConstructSeq()
+  #IFSWITCH METHODNAME==removeVal,contains,indexOf
     seq.add(($exposedType$)3);
     seq.add(($exposedType$)0);
+  #ELSE
+    seq.add(($exposedType$)0);
+    seq.add(($exposedType$)3);
+  #ENDIF
     return seq;
-  },($exposedType$)0);
+  },($exposedType$)0
+  #IFSWITCH METHODNAME==indexOf
+  ,1
+  #ELSEIFSWITCH METHODNAME==lastIndexOf
+  ,0
+  #ELSEIFSWITCH METHODNAME==search
+  ,2
+  #ENDIF
+  );
   QueryTestUtil.testMETHODNAMEFloat(()->
   {
     #MACRO ConstructSeq()
+  #IFSWITCH METHODNAME==removeVal,contains,indexOf
     seq.add(($exposedType$)3);
     seq.add(($exposedType$)Double.NaN);
+  #ELSE
+    seq.add(($exposedType$)Double.NaN);
+    seq.add(($exposedType$)3);
+  #ENDIF
     return seq;
-  },($exposedType$)Double.NaN);
+  },($exposedType$)Double.NaN
+  #IFSWITCH METHODNAME==indexOf
+  ,1
+  #ELSEIFSWITCH METHODNAME==lastIndexOf
+  ,0
+  #ELSEIFSWITCH METHODNAME==search
+  ,2
+  #ENDIF
+  );
 #ENDIF
 }
 @Test
@@ -207,53 +430,134 @@ public void testSTRUCTNAMEMETHODNAMELong()
   QueryTestUtil.testMETHODNAMELong(()->
   {
     #MACRO ConstructSeq()
-    seq.add((long)3);
+#IFSWITCH METHODNAME==removeVal,contains,indexOf
+    seq.add(Long.valueOf((long)3));
     seq.add(Long.valueOf((long)0));
+#ELSE
+    seq.add(Long.valueOf((long)0));
+    seq.add(Long.valueOf((long)3));
+#ENDIF
     return seq;
-  });
+  }
+  #IFSWITCH METHODNAME==indexOf
+  ,1
+  #ELSEIFSWITCH METHODNAME==lastIndexOf
+  ,0
+  #ELSEIFSWITCH METHODNAME==search
+  ,2
+  #ENDIF
+  );
 #ELSEIF OfBoolean
   QueryTestUtil.testMETHODNAMELong(()->
   {
     #MACRO ConstructSeq()
     seq.add(false);
     return seq;
-  },false);
+  },false
+  #IFSWITCH METHODNAME==indexOf
+  ,0
+  #ELSEIFSWITCH METHODNAME==lastIndexOf
+  ,0
+  #ELSEIFSWITCH METHODNAME==search
+  ,1
+  #ENDIF
+  );
   QueryTestUtil.testMETHODNAMELong(()->
   {
     #MACRO ConstructSeq()
     seq.add(true);
     return seq;
-  },true);
+  },true
+  #IFSWITCH METHODNAME==indexOf
+  ,0
+  #ELSEIFSWITCH METHODNAME==lastIndexOf
+  ,0
+  #ELSEIFSWITCH METHODNAME==search
+  ,1
+  #ENDIF
+  );
 #ELSEIF OfByte,OfShort,OfInt,OfLong,OfChar
   QueryTestUtil.testMETHODNAMELong(()->
   {
     #MACRO ConstructSeq()
+#IFSWITCH METHODNAME==removeVal,contains,indexOf
     seq.add(($exposedType$)3);
     seq.add(($exposedType$)0);
+#ELSE
+    seq.add(($exposedType$)0);
+    seq.add(($exposedType$)3);
+#ENDIF
     return seq;
-  });
+  }
+  #IFSWITCH METHODNAME==indexOf
+  ,1
+  #ELSEIFSWITCH METHODNAME==lastIndexOf
+  ,0
+  #ELSEIFSWITCH METHODNAME==search
+  ,2
+  #ENDIF
+  );
 #ELSE
   QueryTestUtil.testMETHODNAMELong(()->
   {
     #MACRO ConstructSeq()
+#IFSWITCH METHODNAME==removeVal,contains,indexOf
     seq.add(($exposedType$)3);
     seq.add(($exposedType$)-0.0);
+#ELSE
+    seq.add(($exposedType$)-0.0);
+    seq.add(($exposedType$)3);
+#ENDIF
     return seq;
-  },($exposedType$)-0.0);
+  },($exposedType$)-0.0
+  #IFSWITCH METHODNAME==indexOf
+  ,1
+  #ELSEIFSWITCH METHODNAME==lastIndexOf
+  ,0
+  #ELSEIFSWITCH METHODNAME==search
+  ,2
+  #ENDIF
+  );
   QueryTestUtil.testMETHODNAMELong(()->
   {
     #MACRO ConstructSeq()
+#IFSWITCH METHODNAME==removeVal,contains,indexOf
     seq.add(($exposedType$)3);
     seq.add(($exposedType$)0.0);
+#ELSE
+    seq.add(($exposedType$)0.0);
+    seq.add(($exposedType$)3);
+#ENDIF
     return seq;
-  },($exposedType$)0.0);
+  },($exposedType$)0.0
+  #IFSWITCH METHODNAME==indexOf
+  ,1
+  #ELSEIFSWITCH METHODNAME==lastIndexOf
+  ,0
+  #ELSEIFSWITCH METHODNAME==search
+  ,2
+  #ENDIF
+  );
   QueryTestUtil.testMETHODNAMELong(()->
   {
     #MACRO ConstructSeq()
+#IFSWITCH METHODNAME==removeVal,contains,indexOf
     seq.add(($exposedType$)3);
     seq.add(($exposedType$)1.0);
+#ELSE
+    seq.add(($exposedType$)1.0);
+    seq.add(($exposedType$)3);
+#ENDIF
     return seq;
-  },($exposedType$)1.0);
+  },($exposedType$)1.0
+  #IFSWITCH METHODNAME==indexOf
+  ,1
+  #ELSEIFSWITCH METHODNAME==lastIndexOf
+  ,0
+  #ELSEIFSWITCH METHODNAME==search
+  ,2
+  #ENDIF
+  );
 #ENDIF
 }
 @Test
@@ -263,53 +567,134 @@ public void testSTRUCTNAMEMETHODNAMEInt()
   QueryTestUtil.testMETHODNAMEInt(()->
   {
     #MACRO ConstructSeq()
-    seq.add((int)3);
+#IFSWITCH METHODNAME==removeVal,contains,indexOf
+    seq.add(Integer.valueOf((int)3));
     seq.add(Integer.valueOf((int)0));
+#ELSE
+    seq.add(Integer.valueOf((int)0));
+    seq.add(Integer.valueOf((int)3));
+#ENDIF
     return seq;
-  });
+  }
+  #IFSWITCH METHODNAME==indexOf
+  ,1
+  #ELSEIFSWITCH METHODNAME==lastIndexOf
+  ,0
+  #ELSEIFSWITCH METHODNAME==search
+  ,2
+  #ENDIF
+  );
 #ELSEIF OfBoolean
   QueryTestUtil.testMETHODNAMEInt(()->
   {
     #MACRO ConstructSeq()
     seq.add(false);
     return seq;
-  },false);
+  },false
+  #IFSWITCH METHODNAME==indexOf
+  ,0
+  #ELSEIFSWITCH METHODNAME==lastIndexOf
+  ,0
+  #ELSEIFSWITCH METHODNAME==search
+  ,1
+  #ENDIF
+  );
   QueryTestUtil.testMETHODNAMEInt(()->
   {
     #MACRO ConstructSeq()
     seq.add(true);
     return seq;
-  },true);
+  },true
+  #IFSWITCH METHODNAME==indexOf
+  ,0
+  #ELSEIFSWITCH METHODNAME==lastIndexOf
+  ,0
+  #ELSEIFSWITCH METHODNAME==search
+  ,1
+  #ENDIF
+  );
 #ELSEIF OfByte,OfShort,OfInt,OfLong,OfChar
   QueryTestUtil.testMETHODNAMEInt(()->
   {
     #MACRO ConstructSeq()
+#IFSWITCH METHODNAME==removeVal,contains,indexOf
     seq.add(($exposedType$)3);
     seq.add(($exposedType$)0);
+#ELSE
+    seq.add(($exposedType$)0);
+    seq.add(($exposedType$)3);
+#ENDIF
     return seq;
-  });
+  }
+  #IFSWITCH METHODNAME==indexOf
+  ,1
+  #ELSEIFSWITCH METHODNAME==lastIndexOf
+  ,0
+  #ELSEIFSWITCH METHODNAME==search
+  ,2
+  #ENDIF
+  );
 #ELSE
   QueryTestUtil.testMETHODNAMEInt(()->
   {
     #MACRO ConstructSeq()
+#IFSWITCH METHODNAME==removeVal,contains,indexOf
     seq.add(($exposedType$)3);
     seq.add(($exposedType$)-0.0);
+#ELSE
+    seq.add(($exposedType$)-0.0);
+    seq.add(($exposedType$)3);
+#ENDIF
     return seq;
-  },($exposedType$)-0.0);
+  },($exposedType$)-0.0
+  #IFSWITCH METHODNAME==indexOf
+  ,1
+  #ELSEIFSWITCH METHODNAME==lastIndexOf
+  ,0
+  #ELSEIFSWITCH METHODNAME==search
+  ,2
+  #ENDIF
+  );
   QueryTestUtil.testMETHODNAMEInt(()->
   {
     #MACRO ConstructSeq()
+#IFSWITCH METHODNAME==removeVal,contains,indexOf
     seq.add(($exposedType$)3);
     seq.add(($exposedType$)0.0);
+#ELSE
+    seq.add(($exposedType$)0.0);
+    seq.add(($exposedType$)3);
+#ENDIF
     return seq;
-  },($exposedType$)0.0);
+  },($exposedType$)0.0
+  #IFSWITCH METHODNAME==indexOf
+  ,1
+  #ELSEIFSWITCH METHODNAME==lastIndexOf
+  ,0
+  #ELSEIFSWITCH METHODNAME==search
+  ,2
+  #ENDIF
+  );
   QueryTestUtil.testMETHODNAMEInt(()->
   {
     #MACRO ConstructSeq()
+#IFSWITCH METHODNAME==removeVal,contains,indexOf
     seq.add(($exposedType$)3);
     seq.add(($exposedType$)1.0);
+#ELSE
+    seq.add(($exposedType$)1.0);
+    seq.add(($exposedType$)3);
+#ENDIF
     return seq;
-  },($exposedType$)1.0);
+  },($exposedType$)1.0
+  #IFSWITCH METHODNAME==indexOf
+  ,1
+  #ELSEIFSWITCH METHODNAME==lastIndexOf
+  ,0
+  #ELSEIFSWITCH METHODNAME==search
+  ,2
+  #ENDIF
+  );
 #ENDIF
 }
 @Test
@@ -319,53 +704,134 @@ public void testSTRUCTNAMEMETHODNAMEShort()
   QueryTestUtil.testMETHODNAMEShort(()->
   {
     #MACRO ConstructSeq()
-    seq.add((short)3);
+  #IFSWITCH METHODNAME==removeVal,contains,indexOf
+    seq.add(Short.valueOf((short)3));
     seq.add(Short.valueOf((short)0));
+  #ELSE
+    seq.add(Short.valueOf((short)0));
+    seq.add(Short.valueOf((short)3));
+  #ENDIF
     return seq;
-  });
+  }
+  #IFSWITCH METHODNAME==indexOf
+  ,1
+  #ELSEIFSWITCH METHODNAME==lastIndexOf
+  ,0
+  #ELSEIFSWITCH METHODNAME==search
+  ,2
+  #ENDIF
+  );
 #ELSEIF OfBoolean
   QueryTestUtil.testMETHODNAMEShort(()->
   {
     #MACRO ConstructSeq()
     seq.add(false);
     return seq;
-  },false);
+  },false
+  #IFSWITCH METHODNAME==indexOf
+  ,0
+  #ELSEIFSWITCH METHODNAME==lastIndexOf
+  ,0
+  #ELSEIFSWITCH METHODNAME==search
+  ,1
+  #ENDIF
+  );
   QueryTestUtil.testMETHODNAMEShort(()->
   {
     #MACRO ConstructSeq()
     seq.add(true);
     return seq;
-  },true);
+  },true
+  #IFSWITCH METHODNAME==indexOf
+  ,0
+  #ELSEIFSWITCH METHODNAME==lastIndexOf
+  ,0
+  #ELSEIFSWITCH METHODNAME==search
+  ,1
+  #ENDIF
+  );
 #ELSEIF OfByte,OfShort,OfInt,OfLong,OfChar
   QueryTestUtil.testMETHODNAMEShort(()->
   {
     #MACRO ConstructSeq()
+  #IFSWITCH METHODNAME==removeVal,contains,indexOf
     seq.add(($exposedType$)3);
     seq.add(($exposedType$)0);
+  #ELSE
+    seq.add(($exposedType$)0);
+    seq.add(($exposedType$)3);
+  #ENDIF
     return seq;
-  });
+  }
+  #IFSWITCH METHODNAME==indexOf
+  ,1
+  #ELSEIFSWITCH METHODNAME==lastIndexOf
+  ,0
+  #ELSEIFSWITCH METHODNAME==search
+  ,2
+  #ENDIF
+  );
 #ELSE
   QueryTestUtil.testMETHODNAMEShort(()->
   {
     #MACRO ConstructSeq()
+  #IFSWITCH METHODNAME==removeVal,contains,indexOf
     seq.add(($exposedType$)3);
     seq.add(($exposedType$)-0.0);
+  #ELSE
+    seq.add(($exposedType$)-0.0);
+    seq.add(($exposedType$)3);
+  #ENDIF
     return seq;
-  },($exposedType$)-0.0);
+  },($exposedType$)-0.0
+  #IFSWITCH METHODNAME==indexOf
+  ,1
+  #ELSEIFSWITCH METHODNAME==lastIndexOf
+  ,0
+  #ELSEIFSWITCH METHODNAME==search
+  ,2
+  #ENDIF
+  );
   QueryTestUtil.testMETHODNAMEShort(()->
   {
     #MACRO ConstructSeq()
+  #IFSWITCH METHODNAME==removeVal,contains,indexOf
     seq.add(($exposedType$)3);
     seq.add(($exposedType$)0.0);
+  #ELSE
+    seq.add(($exposedType$)0.0);
+    seq.add(($exposedType$)3);
+  #ENDIF
     return seq;
-  },($exposedType$)0.0);
+  },($exposedType$)0.0
+  #IFSWITCH METHODNAME==indexOf
+  ,1
+  #ELSEIFSWITCH METHODNAME==lastIndexOf
+  ,0
+  #ELSEIFSWITCH METHODNAME==search
+  ,2
+  #ENDIF
+  );
   QueryTestUtil.testMETHODNAMEShort(()->
   {
     #MACRO ConstructSeq()
+  #IFSWITCH METHODNAME==removeVal,contains,indexOf
     seq.add(($exposedType$)3);
     seq.add(($exposedType$)1.0);
+  #ELSE
+    seq.add(($exposedType$)1.0);
+    seq.add(($exposedType$)3);
+  #ENDIF
     return seq;
-  },($exposedType$)1.0);
+  },($exposedType$)1.0
+  #IFSWITCH METHODNAME==indexOf
+  ,1
+  #ELSEIFSWITCH METHODNAME==lastIndexOf
+  ,0
+  #ELSEIFSWITCH METHODNAME==search
+  ,2
+  #ENDIF
+  );
 #ENDIF
 }
 @Test
@@ -375,53 +841,134 @@ public void testSTRUCTNAMEMETHODNAMEChar()
   QueryTestUtil.testMETHODNAMEChar(()->
   {
     #MACRO ConstructSeq()
-    seq.add((char)3);
+  #IFSWITCH METHODNAME==removeVal,contains,indexOf
+    seq.add(Character.valueOf((char)3));
     seq.add(Character.valueOf((char)0));
+  #ELSE
+    seq.add(Character.valueOf((char)0));
+    seq.add(Character.valueOf((char)3));
+  #ENDIF
     return seq;
-  });
+  }
+  #IFSWITCH METHODNAME==indexOf
+  ,1
+  #ELSEIFSWITCH METHODNAME==lastIndexOf
+  ,0
+  #ELSEIFSWITCH METHODNAME==search
+  ,2
+  #ENDIF
+  );
 #ELSEIF OfBoolean
   QueryTestUtil.testMETHODNAMEChar(()->
   {
     #MACRO ConstructSeq()
     seq.add(false);
     return seq;
-  },false);
+  },false
+  #IFSWITCH METHODNAME==indexOf
+  ,0
+  #ELSEIFSWITCH METHODNAME==lastIndexOf
+  ,0
+  #ELSEIFSWITCH METHODNAME==search
+  ,1
+  #ENDIF
+  );
   QueryTestUtil.testMETHODNAMEChar(()->
   {
     #MACRO ConstructSeq()
     seq.add(true);
     return seq;
-  },true);
+  },true
+  #IFSWITCH METHODNAME==indexOf
+  ,0
+  #ELSEIFSWITCH METHODNAME==lastIndexOf
+  ,0
+  #ELSEIFSWITCH METHODNAME==search
+  ,1
+  #ENDIF
+  );
 #ELSEIF OfByte,OfShort,OfInt,OfLong,OfChar
   QueryTestUtil.testMETHODNAMEChar(()->
   {
     #MACRO ConstructSeq()
+  #IFSWITCH METHODNAME==removeVal,contains,indexOf
     seq.add(($exposedType$)3);
     seq.add(($exposedType$)0);
+  #ELSE
+    seq.add(($exposedType$)0);
+    seq.add(($exposedType$)3);
+  #ENDIF
     return seq;
-  });
+  }
+  #IFSWITCH METHODNAME==indexOf
+  ,1
+  #ELSEIFSWITCH METHODNAME==lastIndexOf
+  ,0
+  #ELSEIFSWITCH METHODNAME==search
+  ,2
+  #ENDIF
+  );
 #ELSE
   QueryTestUtil.testMETHODNAMEChar(()->
   {
     #MACRO ConstructSeq()
+  #IFSWITCH METHODNAME==removeVal,contains,indexOf
     seq.add(($exposedType$)3);
     seq.add(($exposedType$)-0.0);
+  #ELSE
+    seq.add(($exposedType$)-0.0);
+    seq.add(($exposedType$)3);
+  #ENDIF
     return seq;
-  },($exposedType$)-0.0);
+  },($exposedType$)-0.0
+  #IFSWITCH METHODNAME==indexOf
+  ,1
+  #ELSEIFSWITCH METHODNAME==lastIndexOf
+  ,0
+  #ELSEIFSWITCH METHODNAME==search
+  ,2
+  #ENDIF
+  );
   QueryTestUtil.testMETHODNAMEChar(()->
   {
     #MACRO ConstructSeq()
+  #IFSWITCH METHODNAME==removeVal,contains,indexOf
     seq.add(($exposedType$)3);
     seq.add(($exposedType$)0.0);
+  #ELSE
+    seq.add(($exposedType$)0.0);
+    seq.add(($exposedType$)3);
+  #ENDIF
     return seq;
-  },($exposedType$)0.0);
+  },($exposedType$)0.0
+  #IFSWITCH METHODNAME==indexOf
+  ,1
+  #ELSEIFSWITCH METHODNAME==lastIndexOf
+  ,0
+  #ELSEIFSWITCH METHODNAME==search
+  ,2
+  #ENDIF
+  );
   QueryTestUtil.testMETHODNAMEChar(()->
   {
     #MACRO ConstructSeq()
+  #IFSWITCH METHODNAME==removeVal,contains,indexOf
     seq.add(($exposedType$)3);
     seq.add(($exposedType$)1.0);
+  #ELSE
+    seq.add(($exposedType$)1.0);
+    seq.add(($exposedType$)3);
+  #ENDIF
     return seq;
-  },($exposedType$)1.0);
+  },($exposedType$)1.0
+  #IFSWITCH METHODNAME==indexOf
+  ,1
+  #ELSEIFSWITCH METHODNAME==lastIndexOf
+  ,0
+  #ELSEIFSWITCH METHODNAME==search
+  ,2
+  #ENDIF
+  );
 #ENDIF
 }
 @Test
@@ -432,10 +979,23 @@ public void testSTRUCTNAMEMETHODNAMEByte()
   QueryTestUtil.testMETHODNAMEByte(()->
   {
     #MACRO ConstructSeq()
-    seq.add((byte)3);
+  #IFSWITCH METHODNAME==removeVal,contains,indexOf
+    seq.add(Byte.valueOf((byte)3));
     seq.add(Byte.valueOf((byte)0));
+  #ELSE
+    seq.add(Byte.valueOf((byte)0));
+    seq.add(Byte.valueOf((byte)3));
+  #ENDIF
     return seq;
-  });
+  }
+  #IFSWITCH METHODNAME==indexOf
+  ,1
+  #ELSEIFSWITCH METHODNAME==lastIndexOf
+  ,0
+  #ELSEIFSWITCH METHODNAME==search
+  ,2
+  #ENDIF
+  );
 #ELSEIF OfBoolean
   
   QueryTestUtil.testMETHODNAMEByte(()->
@@ -443,43 +1003,111 @@ public void testSTRUCTNAMEMETHODNAMEByte()
     #MACRO ConstructSeq()
     seq.add(false);
     return seq;
-  },false);
+  },false
+  #IFSWITCH METHODNAME==indexOf
+  ,0
+  #ELSEIFSWITCH METHODNAME==lastIndexOf
+  ,0
+  #ELSEIFSWITCH METHODNAME==search
+  ,1
+  #ENDIF
+  );
   QueryTestUtil.testMETHODNAMEByte(()->
   {
     #MACRO ConstructSeq()
     seq.add(true);
     return seq;
-  },true);
+  },true
+  #IFSWITCH METHODNAME==indexOf
+  ,0
+  #ELSEIFSWITCH METHODNAME==lastIndexOf
+  ,0
+  #ELSEIFSWITCH METHODNAME==search
+  ,1
+  #ENDIF
+  );
 #ELSEIF OfByte,OfShort,OfInt,OfLong,OfChar
   QueryTestUtil.testMETHODNAMEByte(()->
   {
     #MACRO ConstructSeq()
+  #IFSWITCH METHODNAME==removeVal,contains,indexOf
     seq.add(($exposedType$)3);
     seq.add(($exposedType$)0);
+  #ELSE
+    seq.add(($exposedType$)0);
+    seq.add(($exposedType$)3);
+  #ENDIF
     return seq;
-  });
+  }
+  #IFSWITCH METHODNAME==indexOf
+  ,1
+  #ELSEIFSWITCH METHODNAME==lastIndexOf
+  ,0
+  #ELSEIFSWITCH METHODNAME==search
+  ,2
+  #ENDIF
+  );
 #ELSE
   QueryTestUtil.testMETHODNAMEByte(()->
   {
     #MACRO ConstructSeq()
+  #IFSWITCH METHODNAME==removeVal,contains,indexOf
     seq.add(($exposedType$)3);
     seq.add(($exposedType$)-0.0);
+  #ELSE
+    seq.add(($exposedType$)-0.0);
+    seq.add(($exposedType$)3);
+  #ENDIF
     return seq;
-  },($exposedType$)-0.0);
+  },($exposedType$)-0.0
+  #IFSWITCH METHODNAME==indexOf
+  ,1
+  #ELSEIFSWITCH METHODNAME==lastIndexOf
+  ,0
+  #ELSEIFSWITCH METHODNAME==search
+  ,2
+  #ENDIF
+  );
   QueryTestUtil.testMETHODNAMEByte(()->
   {
     #MACRO ConstructSeq()
+  #IFSWITCH METHODNAME==removeVal,contains,indexOf
     seq.add(($exposedType$)3);
     seq.add(($exposedType$)0.0);
+  #ELSE
+    seq.add(($exposedType$)0.0);
+    seq.add(($exposedType$)3);
+  #ENDIF
     return seq;
-  },($exposedType$)0.0);
+  },($exposedType$)0.0
+  #IFSWITCH METHODNAME==indexOf
+  ,1
+  #ELSEIFSWITCH METHODNAME==lastIndexOf
+  ,0
+  #ELSEIFSWITCH METHODNAME==search
+  ,2
+  #ENDIF
+  );
   QueryTestUtil.testMETHODNAMEByte(()->
   {
     #MACRO ConstructSeq()
+  #IFSWITCH METHODNAME==removeVal,contains,indexOf
     seq.add(($exposedType$)3);
     seq.add(($exposedType$)1.0);
+  #ELSE
+    seq.add(($exposedType$)1.0);
+    seq.add(($exposedType$)3);
+  #ENDIF
     return seq;
-  },($exposedType$)1.0);
+  },($exposedType$)1.0
+  #IFSWITCH METHODNAME==indexOf
+  ,1
+  #ELSEIFSWITCH METHODNAME==lastIndexOf
+  ,0
+  #ELSEIFSWITCH METHODNAME==search
+  ,2
+  #ENDIF
+  );
 #ENDIF
 }
 @Test
@@ -489,35 +1117,89 @@ public void testSTRUCTNAMEMETHODNAMEBoolean()
   QueryTestUtil.testMETHODNAMEBoolean(()->
   {
     #MACRO ConstructSeq()
-    #IF OfRef
+#IFSWITCH METHODNAME==removeVal,contains,indexOf
+  #IF OfRef
     seq.add(Integer.valueOf(3));
     seq.add(Boolean.TRUE);
-    #ELSE
-      #IFNOT OfBoolean
+  #ELSE
+    #IFNOT OfBoolean
     seq.add(($exposedType$)3);
-      #ENDIF
-    seq.add(true);
     #ENDIF
+    seq.add(true);
+  #ENDIF
+#ELSE
+  #IF OfRef
+    seq.add(Boolean.TRUE);
+    seq.add(Integer.valueOf(3));
+  #ELSE
+    seq.add(true);
+    #IFNOT OfBoolean
+    seq.add(($exposedType$)3);
+    #ENDIF
+  #ENDIF
+#ENDIF
     return seq;
-  },true);
+  },true
+#IFSWITCH METHODNAME==indexOf
+  #IF OfBoolean
+  ,0
+  #ELSE
+  ,1
+  #ENDIF
+#ELSEIFSWITCH METHODNAME==lastIndexOf
+  ,0
+#ELSEIFSWITCH METHODNAME==search
+  #IF OfBoolean
+  ,1
+  #ELSE
+  ,2
+  #ENDIF
+#ENDIF
+  );
   
 
   QueryTestUtil.testMETHODNAMEBoolean(()->
   {
     #MACRO ConstructSeq()
-    #IF OfRef
+#IFSWITCH METHODNAME==removeVal,contains,indexOf
+  #IF OfRef
     seq.add(Integer.valueOf(3));
     seq.add(Boolean.FALSE);
-    #ELSE
-      #IFNOT OfBoolean
+  #ELSE
+    #IFNOT OfBoolean
     seq.add(($exposedType$)3);
-      #ENDIF
-    seq.add(false);
     #ENDIF
+    seq.add(false);
+  #ENDIF
+#ELSE
+  #IF OfRef
+    seq.add(Boolean.FALSE);
+    seq.add(Integer.valueOf(3));
+  #ELSE
+    seq.add(false);
+    #IFNOT OfBoolean
+    seq.add(($exposedType$)3);
+    #ENDIF
+  #ENDIF
+#ENDIF
     return seq;
-  },false);
-  
-  
+  },false
+#IFSWITCH METHODNAME==indexOf
+  #IF OfBoolean
+  ,0
+  #ELSE
+  ,1
+  #ENDIF
+#ELSEIFSWITCH METHODNAME==lastIndexOf
+  ,0
+#ELSEIFSWITCH METHODNAME==search
+  #IF OfBoolean
+  ,1
+  #ELSE
+  ,2
+  #ENDIF
+#ENDIF
+  );  
 }
 @Test
 public void testSTRUCTNAMEMETHODNAMENull()
@@ -526,11 +1208,7 @@ public void testSTRUCTNAMEMETHODNAMENull()
   QueryTestUtil.testMETHODNAMENullReturnNegative(()->
   {
     #MACRO ConstructSeq()
-    #IF OfRef
-    seq.add(TypeConversionUtil.convertToInteger(0));
-    #ELSE
     seq.add(TypeConversionUtil.convertTo$ArrayType$(0));
-    #ENDIF
     return seq;
   });
   
@@ -538,10 +1216,23 @@ public void testSTRUCTNAMEMETHODNAMENull()
   QueryTestUtil.testMETHODNAMENullReturnPositive(()->
   {
     #MACRO ConstructSeq()
-    seq.add(TypeConversionUtil.convertToInteger(0));
+  #IFSWITCH METHODNAME==removeVal,contains,indexOf
+    seq.add(TypeConversionUtil.convertTo$ArrayType$(0));
     seq.add((Integer)null);
+  #ELSE
+    seq.add((Integer)null);
+    seq.add(TypeConversionUtil.convertTo$ArrayType$(0));
+  #ENDIF
     return seq;
-  });
+  }
+  #IFSWITCH METHODNAME==indexOf
+  ,1
+  #ELSEIFSWITCH METHODNAME==lastIndexOf
+  ,0
+  #ELSEIFSWITCH METHODNAME==search
+  ,2
+  #ENDIF
+  );
 #ENDIF
 }
 @Test

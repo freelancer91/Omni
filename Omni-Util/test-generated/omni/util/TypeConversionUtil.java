@@ -88,4 +88,38 @@ public final class TypeConversionUtil
   {
     return Integer.toString(val);
   }
+  //Ignore deprecation because we need would like to be able to use identity equality on the newly created boxed types
+  @SuppressWarnings("deprecation")
+  public static Integer convertToObject(int val)
+  {
+    return new Integer(val);
+  }
+  public static double convertTodoubleboolean(int val)
+  {
+    return TypeUtil.castToDouble(convertToboolean(val));
+  }
+  public static float convertTofloatboolean(int val)
+  {
+    return TypeUtil.castToFloat(convertToboolean(val));
+  }
+  public static long convertTolongboolean(int val)
+  {
+    return TypeUtil.castToLong(convertToboolean(val));
+  }
+  public static int convertTointboolean(int val)
+  {
+    return TypeUtil.castToByte(convertToboolean(val));
+  }
+  public static short convertToshortboolean(int val)
+  {
+    return TypeUtil.castToByte(convertToboolean(val));
+  }
+  public static char convertTocharboolean(int val)
+  {
+    return TypeUtil.castToChar(convertToboolean(val));
+  }
+  public static byte convertTobyteboolean(int val)
+  {
+    return TypeUtil.castToByte(convertToboolean(val));
+  }
 }
