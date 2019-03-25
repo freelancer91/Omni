@@ -7,8 +7,6 @@ import omni.util.OmniArray;
 @SuppressWarnings({"rawtypes","unchecked"}) 
 public class FloatArrSeqToStringTest
 {
-  private static final float MIN_LENGTH_STRING_VAL=0;
-  private static final int MIN_TOSTRING_LENGTH=String.valueOf(MIN_LENGTH_STRING_VAL).length();
   private static final int MAX_TOSTRING_LENGTH=15;
   private static void testArrSeqToString(int length)
   {
@@ -70,48 +68,8 @@ public class FloatArrSeqToStringTest
     Assertions.assertEquals(expected,new FloatArrSeq.CheckedStack().toString());
     Assertions.assertEquals(expected,new FloatArrSeq.UncheckedStack().toString());
   }
-  //@Test
-  public void testOOMArrSeqToString()
-  {
-    int length=Integer.MAX_VALUE/(MIN_TOSTRING_LENGTH+2)-3;
-    final float[] arr=new float[length+1];
-    {
-      var root=new FloatArrSeq.CheckedList(length,arr);
-      Assertions.assertDoesNotThrow(()->root.toString());
-      ++root.size;
-      Assertions.assertThrows(OutOfMemoryError.class,()->root.toString());
-      --root.size;
-      var subList=root.subList(0,root.size);
-      Assertions.assertDoesNotThrow(()->subList.toString());
-      subList.add(MIN_LENGTH_STRING_VAL);
-      Assertions.assertThrows(OutOfMemoryError.class,()->subList.toString());
-    }
-    {
-      var root=new FloatArrSeq.UncheckedList(length,arr);
-      Assertions.assertDoesNotThrow(()->root.toString());
-      ++root.size;
-      Assertions.assertThrows(OutOfMemoryError.class,()->root.toString());
-      --root.size;
-      var subList=root.subList(0,root.size);
-      Assertions.assertDoesNotThrow(()->subList.toString());
-      subList.add(MIN_LENGTH_STRING_VAL);
-      Assertions.assertThrows(OutOfMemoryError.class,()->subList.toString());
-    }
-    {
-      var root=new FloatArrSeq.CheckedStack(length,arr);
-      Assertions.assertDoesNotThrow(()->root.toString());
-      ++root.size;
-      Assertions.assertThrows(OutOfMemoryError.class,()->root.toString());
-    }
-    {
-      var root=new FloatArrSeq.UncheckedStack(length,arr);
-      Assertions.assertDoesNotThrow(()->root.toString());
-      ++root.size;
-      Assertions.assertThrows(OutOfMemoryError.class,()->root.toString());
-    }
-  }
   //TODO make this faster or place is switch to disable it as desired
-  //@Test
+  @Test
   public void testLargeArrSeqToString()
   {
     testArrSeqToString((OmniArray.MAX_ARR_SIZE/(MAX_TOSTRING_LENGTH+2))+1);

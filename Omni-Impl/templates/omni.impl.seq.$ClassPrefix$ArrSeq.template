@@ -244,34 +244,6 @@ public abstract class $ClassPrefix$ArrSeq$<E>$ implements OmniCollection.Of$Clas
     }
     this.size=1;
   }
-  
-  private void uncheckedInsert(int index,int size,$exposedType$ val)
-  {
-    final int tailDist;
-    if((tailDist=size-index)==0)
-    {
-      uncheckedAppend(size,val);
-    }
-    else
-    {
-      $ArrayType$[] arr;
-      if((arr=this.arr).length==size)
-      {
-        final $ArrayType$[] tmp;
-        ArrCopy.semicheckedCopy(arr,0,tmp=new $ArrayType$[OmniArray.growBy50Pct(size)],0,index);
-        ArrCopy.uncheckedCopy(arr,index,tmp,index+1,tailDist);
-        this.arr=arr=tmp;
-      }
-      else
-      {
-        ArrCopy.uncheckedCopy(arr,index,arr,index+1,tailDist);
-      }
-      arr[index]=val;
-      this.size=size+1;
-    }
-  }
-  
-  
   public void push($exposedType$ val)
   {
     final int size;
@@ -1609,6 +1581,35 @@ public RETTYPE[] toCLASSPREFIXArray()
 }
 #ENDDEF
 #MACRODEF AddMethods()
+#IFSWITCH STRUCTNAME==UncheckedList
+  private void uncheckedInsert(int index,int size,$exposedType$ val)
+  {
+    final int tailDist;
+    if((tailDist=size-index)==0)
+    {
+      super.uncheckedAppend(size,val);
+    }
+    else
+    {
+      $ArrayType$[] arr;
+      if((arr=this.arr).length==size)
+      {
+        final $ArrayType$[] tmp;
+        ArrCopy.semicheckedCopy(arr,0,tmp=new $ArrayType$[OmniArray.growBy50Pct(size)],0,index);
+        ArrCopy.uncheckedCopy(arr,index,tmp,index+1,tailDist);
+        this.arr=arr=tmp;
+      }
+      else
+      {
+        ArrCopy.uncheckedCopy(arr,index,arr,index+1,tailDist);
+      }
+      arr[index]=val;
+      this.size=size+1;
+    }
+  }
+#ENDIF
+
+
 #IFSWITCH STRUCTNAME==UncheckedStack
   #IFNOT OfRef
 @Override
@@ -1639,7 +1640,7 @@ public void add(int index,$exposedType$ val)
   #ELSE
   if((size=this.size)!=0){
   #ENDIF
-    (($ClassPrefix$ArrSeq$<E>$)this).uncheckedInsert(index,size,val);
+    ((UncheckedList$<E>$)this).uncheckedInsert(index,size,val);
   }else{
     (($ClassPrefix$ArrSeq$<E>$)this).uncheckedInit(val);
   }
@@ -1657,13 +1658,13 @@ public boolean add($exposedType$ val)
   this.modCount=modCount;
   for(var curr=parent;curr!=null;curr.modCount=modCount,++curr.size,curr=curr.parent){}
   if((modCount=root.size)!=0){
-    (($ClassPrefix$ArrSeq$<E>$)root).uncheckedInsert(this.rootOffset+(this.size++),modCount,val);
+    ((UncheckedList$<E>$)root).uncheckedInsert(this.rootOffset+(this.size++),modCount,val);
   #ELSE
   for(var curr=parent;curr!=null;++curr.size,curr=curr.parent){}
   final UncheckedList$<E>$ root;
   final int rootSize;
   if((rootSize=(root=this.root).size)!=0){
-    (($ClassPrefix$ArrSeq$<E>$)root).uncheckedInsert(this.rootOffset+(this.size++),rootSize,val);
+    ((UncheckedList$<E>$)root).uncheckedInsert(this.rootOffset+(this.size++),rootSize,val);
   #ENDIF
   }else{
     (($ClassPrefix$ArrSeq$<E>$)root).uncheckedInit(val);
@@ -1686,14 +1687,14 @@ public void add(int index,$exposedType$ val)
   for(var curr=parent;curr!=null;curr.modCount=modCount,++curr.size,curr=curr.parent){}
   this.size=size+1;
   if((modCount=root.size)!=0){
-    (($ClassPrefix$ArrSeq$<E>$)root).uncheckedInsert(this.rootOffset+index,modCount,val);
+    ((UncheckedList$<E>$)root).uncheckedInsert(this.rootOffset+index,modCount,val);
   #ELSE
   for(var curr=parent;curr!=null;++curr.size,curr=curr.parent){}
   ++this.size;
   final UncheckedList$<E>$ root;
   final int rootSize;
   if((rootSize=(root=this.root).size)!=0){
-    (($ClassPrefix$ArrSeq$<E>$)root).uncheckedInsert(this.rootOffset+index,rootSize,val);
+    ((UncheckedList$<E>$)root).uncheckedInsert(this.rootOffset+index,rootSize,val);
   #ENDIF
   }else{
     (($ClassPrefix$ArrSeq$<E>$)root).uncheckedInit(val);
@@ -3104,7 +3105,7 @@ private static class ListItr$<E>$ extends Itr$<E>$ implements OmniListIterator.O
     #ENDIF
   #ENDIF
     {
-      (($ClassPrefix$ArrSeq$<E>$)root).uncheckedInsert(this.cursor++,rootSize,val);
+      ((UncheckedList$<E>$)root).uncheckedInsert(this.cursor++,rootSize,val);
     }
     else
     {

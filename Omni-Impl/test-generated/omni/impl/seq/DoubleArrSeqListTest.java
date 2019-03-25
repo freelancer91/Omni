@@ -1,5 +1,4 @@
 package omni.impl.seq;
-/*
 import java.util.ArrayList;
 import omni.impl.seq.DoubleArrSeq.UncheckedList;
 import omni.impl.seq.DoubleArrSeq.CheckedList;
@@ -7,10 +6,25 @@ import omni.util.TypeConversionUtil;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 @SuppressWarnings({"rawtypes","unchecked"}) 
-*/
 public class DoubleArrSeqListTest
 {
-/*
+  @Test
+  public void testUncheckedListput_intdouble_initialCapacityDEFAULT_NonThrowingIndex()
+  {
+    UncheckedList seq=new UncheckedList();
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertTodouble(i));
+    }
+    for(int i=0;i<100;++i)
+    {
+      var putVal=TypeConversionUtil.convertTodouble(100-i-1);
+      seq.put(i,putVal);
+      var expectedVal=TypeConversionUtil.convertTodouble(100-i-1);
+      Assertions.assertEquals(expectedVal,seq.arr[i]);
+      Assertions.assertEquals(100,seq.size());
+    }
+  }
   @Test
   public void testUncheckedListadd_intdouble_initialCapacityDEFAULT_InsertBegin()
   {
@@ -19,9 +33,10 @@ public class DoubleArrSeqListTest
     {
       seq.add(0,TypeConversionUtil.convertTodouble(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[seq.size-i-1]);
     }
@@ -34,9 +49,10 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size,TypeConversionUtil.convertTodouble(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
     }
@@ -49,16 +65,37 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size/2,TypeConversionUtil.convertTodouble(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    ArrayList arrList=new ArrayList();
-    for(int i=0;i<seq.size;++i)
+    ArrayList arrayList=new ArrayList();
+    for(int i=0;i<seqSize;++i)
     {
-      seq.add(TypeConversionUtil.convertTodouble(i));
+      arrayList.add(arrayList.size()/2,TypeConversionUtil.convertTodouble(i));
     }
-    for(int i=0;i<seq.size;++i)
+    System.out.println("BEGIN testUncheckedListadd_intdouble_initialCapacityDEFAULT_InsertMidPoint");
+    for(int i=0;i<seqSize;++i)
     {
-      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]));
+      System.out.println(arrayList.get(i));
+      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]);
+    }
+    System.out.println("END testUncheckedListadd_intdouble_initialCapacityDEFAULT_InsertMidPoint");
+  }
+  @Test
+  public void testUncheckedListput_intdouble_initialCapacityNULL_NonThrowingIndex()
+  {
+    UncheckedList seq=new UncheckedList(0,null);
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertTodouble(i));
+    }
+    for(int i=0;i<100;++i)
+    {
+      var putVal=TypeConversionUtil.convertTodouble(100-i-1);
+      seq.put(i,putVal);
+      var expectedVal=TypeConversionUtil.convertTodouble(100-i-1);
+      Assertions.assertEquals(expectedVal,seq.arr[i]);
+      Assertions.assertEquals(100,seq.size());
     }
   }
   @Test
@@ -69,9 +106,10 @@ public class DoubleArrSeqListTest
     {
       seq.add(0,TypeConversionUtil.convertTodouble(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[seq.size-i-1]);
     }
@@ -84,9 +122,10 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size,TypeConversionUtil.convertTodouble(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
     }
@@ -99,16 +138,37 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size/2,TypeConversionUtil.convertTodouble(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    ArrayList arrList=new ArrayList();
-    for(int i=0;i<seq.size;++i)
+    ArrayList arrayList=new ArrayList();
+    for(int i=0;i<seqSize;++i)
     {
-      seq.add(TypeConversionUtil.convertTodouble(i));
+      arrayList.add(arrayList.size()/2,TypeConversionUtil.convertTodouble(i));
     }
-    for(int i=0;i<seq.size;++i)
+    System.out.println("BEGIN testUncheckedListadd_intdouble_initialCapacityNULL_InsertMidPoint");
+    for(int i=0;i<seqSize;++i)
     {
-      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]));
+      System.out.println(arrayList.get(i));
+      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]);
+    }
+    System.out.println("END testUncheckedListadd_intdouble_initialCapacityNULL_InsertMidPoint");
+  }
+  @Test
+  public void testUncheckedListput_intdouble_initialCapacity50_NonThrowingIndex()
+  {
+    UncheckedList seq=new UncheckedList(50);
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertTodouble(i));
+    }
+    for(int i=0;i<100;++i)
+    {
+      var putVal=TypeConversionUtil.convertTodouble(100-i-1);
+      seq.put(i,putVal);
+      var expectedVal=TypeConversionUtil.convertTodouble(100-i-1);
+      Assertions.assertEquals(expectedVal,seq.arr[i]);
+      Assertions.assertEquals(100,seq.size());
     }
   }
   @Test
@@ -119,9 +179,10 @@ public class DoubleArrSeqListTest
     {
       seq.add(0,TypeConversionUtil.convertTodouble(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[seq.size-i-1]);
     }
@@ -134,9 +195,10 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size,TypeConversionUtil.convertTodouble(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
     }
@@ -149,16 +211,37 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size/2,TypeConversionUtil.convertTodouble(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    ArrayList arrList=new ArrayList();
-    for(int i=0;i<seq.size;++i)
+    ArrayList arrayList=new ArrayList();
+    for(int i=0;i<seqSize;++i)
     {
-      seq.add(TypeConversionUtil.convertTodouble(i));
+      arrayList.add(arrayList.size()/2,TypeConversionUtil.convertTodouble(i));
     }
-    for(int i=0;i<seq.size;++i)
+    System.out.println("BEGIN testUncheckedListadd_intdouble_initialCapacity50_InsertMidPoint");
+    for(int i=0;i<seqSize;++i)
     {
-      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]));
+      System.out.println(arrayList.get(i));
+      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]);
+    }
+    System.out.println("END testUncheckedListadd_intdouble_initialCapacity50_InsertMidPoint");
+  }
+  @Test
+  public void testUncheckedListput_intDouble_initialCapacityDEFAULT_NonThrowingIndex()
+  {
+    UncheckedList seq=new UncheckedList();
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertToDouble(i));
+    }
+    for(int i=0;i<100;++i)
+    {
+      var putVal=TypeConversionUtil.convertToDouble(100-i-1);
+      seq.put(i,putVal);
+      var expectedVal=TypeConversionUtil.convertTodouble(100-i-1);
+      Assertions.assertEquals(expectedVal,seq.arr[i]);
+      Assertions.assertEquals(100,seq.size());
     }
   }
   @Test
@@ -169,9 +252,10 @@ public class DoubleArrSeqListTest
     {
       seq.add(0,TypeConversionUtil.convertToDouble(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[seq.size-i-1]);
     }
@@ -184,9 +268,10 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size,TypeConversionUtil.convertToDouble(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
     }
@@ -199,16 +284,37 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size/2,TypeConversionUtil.convertToDouble(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    ArrayList arrList=new ArrayList();
-    for(int i=0;i<seq.size;++i)
+    ArrayList arrayList=new ArrayList();
+    for(int i=0;i<seqSize;++i)
     {
-      seq.add(TypeConversionUtil.convertToDouble(i));
+      arrayList.add(arrayList.size()/2,TypeConversionUtil.convertTodouble(i));
     }
-    for(int i=0;i<seq.size;++i)
+    System.out.println("BEGIN testUncheckedListadd_intDouble_initialCapacityDEFAULT_InsertMidPoint");
+    for(int i=0;i<seqSize;++i)
     {
-      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]));
+      System.out.println(arrayList.get(i));
+      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]);
+    }
+    System.out.println("END testUncheckedListadd_intDouble_initialCapacityDEFAULT_InsertMidPoint");
+  }
+  @Test
+  public void testUncheckedListput_intDouble_initialCapacityNULL_NonThrowingIndex()
+  {
+    UncheckedList seq=new UncheckedList(0,null);
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertToDouble(i));
+    }
+    for(int i=0;i<100;++i)
+    {
+      var putVal=TypeConversionUtil.convertToDouble(100-i-1);
+      seq.put(i,putVal);
+      var expectedVal=TypeConversionUtil.convertTodouble(100-i-1);
+      Assertions.assertEquals(expectedVal,seq.arr[i]);
+      Assertions.assertEquals(100,seq.size());
     }
   }
   @Test
@@ -219,9 +325,10 @@ public class DoubleArrSeqListTest
     {
       seq.add(0,TypeConversionUtil.convertToDouble(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[seq.size-i-1]);
     }
@@ -234,9 +341,10 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size,TypeConversionUtil.convertToDouble(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
     }
@@ -249,16 +357,37 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size/2,TypeConversionUtil.convertToDouble(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    ArrayList arrList=new ArrayList();
-    for(int i=0;i<seq.size;++i)
+    ArrayList arrayList=new ArrayList();
+    for(int i=0;i<seqSize;++i)
     {
-      seq.add(TypeConversionUtil.convertToDouble(i));
+      arrayList.add(arrayList.size()/2,TypeConversionUtil.convertTodouble(i));
     }
-    for(int i=0;i<seq.size;++i)
+    System.out.println("BEGIN testUncheckedListadd_intDouble_initialCapacityNULL_InsertMidPoint");
+    for(int i=0;i<seqSize;++i)
     {
-      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]));
+      System.out.println(arrayList.get(i));
+      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]);
+    }
+    System.out.println("END testUncheckedListadd_intDouble_initialCapacityNULL_InsertMidPoint");
+  }
+  @Test
+  public void testUncheckedListput_intDouble_initialCapacity50_NonThrowingIndex()
+  {
+    UncheckedList seq=new UncheckedList(50);
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertToDouble(i));
+    }
+    for(int i=0;i<100;++i)
+    {
+      var putVal=TypeConversionUtil.convertToDouble(100-i-1);
+      seq.put(i,putVal);
+      var expectedVal=TypeConversionUtil.convertTodouble(100-i-1);
+      Assertions.assertEquals(expectedVal,seq.arr[i]);
+      Assertions.assertEquals(100,seq.size());
     }
   }
   @Test
@@ -269,9 +398,10 @@ public class DoubleArrSeqListTest
     {
       seq.add(0,TypeConversionUtil.convertToDouble(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[seq.size-i-1]);
     }
@@ -284,9 +414,10 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size,TypeConversionUtil.convertToDouble(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
     }
@@ -299,16 +430,37 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size/2,TypeConversionUtil.convertToDouble(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    ArrayList arrList=new ArrayList();
-    for(int i=0;i<seq.size;++i)
+    ArrayList arrayList=new ArrayList();
+    for(int i=0;i<seqSize;++i)
     {
-      seq.add(TypeConversionUtil.convertToDouble(i));
+      arrayList.add(arrayList.size()/2,TypeConversionUtil.convertTodouble(i));
     }
-    for(int i=0;i<seq.size;++i)
+    System.out.println("BEGIN testUncheckedListadd_intDouble_initialCapacity50_InsertMidPoint");
+    for(int i=0;i<seqSize;++i)
     {
-      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]));
+      System.out.println(arrayList.get(i));
+      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]);
+    }
+    System.out.println("END testUncheckedListadd_intDouble_initialCapacity50_InsertMidPoint");
+  }
+  @Test
+  public void testUncheckedListput_intboolean_initialCapacityDEFAULT_NonThrowingIndex()
+  {
+    UncheckedList seq=new UncheckedList();
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertToboolean(i));
+    }
+    for(int i=0;i<100;++i)
+    {
+      var putVal=TypeConversionUtil.convertToboolean(100-i-1);
+      seq.put(i,putVal);
+      var expectedVal=TypeConversionUtil.convertTodoubleboolean(100-i-1);
+      Assertions.assertEquals(expectedVal,seq.arr[i]);
+      Assertions.assertEquals(100,seq.size());
     }
   }
   @Test
@@ -319,9 +471,10 @@ public class DoubleArrSeqListTest
     {
       seq.add(0,TypeConversionUtil.convertToboolean(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodoubleboolean(i),seq.arr[seq.size-i-1]);
     }
@@ -334,9 +487,10 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size,TypeConversionUtil.convertToboolean(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodoubleboolean(i),seq.arr[i]);
     }
@@ -349,16 +503,37 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size/2,TypeConversionUtil.convertToboolean(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    ArrayList arrList=new ArrayList();
-    for(int i=0;i<seq.size;++i)
+    ArrayList arrayList=new ArrayList();
+    for(int i=0;i<seqSize;++i)
     {
-      seq.add(TypeConversionUtil.convertToboolean(i));
+      arrayList.add(arrayList.size()/2,TypeConversionUtil.convertTodoubleboolean(i));
     }
-    for(int i=0;i<seq.size;++i)
+    System.out.println("BEGIN testUncheckedListadd_intboolean_initialCapacityDEFAULT_InsertMidPoint");
+    for(int i=0;i<seqSize;++i)
     {
-      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]));
+      System.out.println(arrayList.get(i));
+      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]);
+    }
+    System.out.println("END testUncheckedListadd_intboolean_initialCapacityDEFAULT_InsertMidPoint");
+  }
+  @Test
+  public void testUncheckedListput_intboolean_initialCapacityNULL_NonThrowingIndex()
+  {
+    UncheckedList seq=new UncheckedList(0,null);
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertToboolean(i));
+    }
+    for(int i=0;i<100;++i)
+    {
+      var putVal=TypeConversionUtil.convertToboolean(100-i-1);
+      seq.put(i,putVal);
+      var expectedVal=TypeConversionUtil.convertTodoubleboolean(100-i-1);
+      Assertions.assertEquals(expectedVal,seq.arr[i]);
+      Assertions.assertEquals(100,seq.size());
     }
   }
   @Test
@@ -369,9 +544,10 @@ public class DoubleArrSeqListTest
     {
       seq.add(0,TypeConversionUtil.convertToboolean(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodoubleboolean(i),seq.arr[seq.size-i-1]);
     }
@@ -384,9 +560,10 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size,TypeConversionUtil.convertToboolean(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodoubleboolean(i),seq.arr[i]);
     }
@@ -399,16 +576,37 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size/2,TypeConversionUtil.convertToboolean(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    ArrayList arrList=new ArrayList();
-    for(int i=0;i<seq.size;++i)
+    ArrayList arrayList=new ArrayList();
+    for(int i=0;i<seqSize;++i)
     {
-      seq.add(TypeConversionUtil.convertToboolean(i));
+      arrayList.add(arrayList.size()/2,TypeConversionUtil.convertTodoubleboolean(i));
     }
-    for(int i=0;i<seq.size;++i)
+    System.out.println("BEGIN testUncheckedListadd_intboolean_initialCapacityNULL_InsertMidPoint");
+    for(int i=0;i<seqSize;++i)
     {
-      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]));
+      System.out.println(arrayList.get(i));
+      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]);
+    }
+    System.out.println("END testUncheckedListadd_intboolean_initialCapacityNULL_InsertMidPoint");
+  }
+  @Test
+  public void testUncheckedListput_intboolean_initialCapacity50_NonThrowingIndex()
+  {
+    UncheckedList seq=new UncheckedList(50);
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertToboolean(i));
+    }
+    for(int i=0;i<100;++i)
+    {
+      var putVal=TypeConversionUtil.convertToboolean(100-i-1);
+      seq.put(i,putVal);
+      var expectedVal=TypeConversionUtil.convertTodoubleboolean(100-i-1);
+      Assertions.assertEquals(expectedVal,seq.arr[i]);
+      Assertions.assertEquals(100,seq.size());
     }
   }
   @Test
@@ -419,9 +617,10 @@ public class DoubleArrSeqListTest
     {
       seq.add(0,TypeConversionUtil.convertToboolean(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodoubleboolean(i),seq.arr[seq.size-i-1]);
     }
@@ -434,9 +633,10 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size,TypeConversionUtil.convertToboolean(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodoubleboolean(i),seq.arr[i]);
     }
@@ -449,16 +649,37 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size/2,TypeConversionUtil.convertToboolean(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    ArrayList arrList=new ArrayList();
-    for(int i=0;i<seq.size;++i)
+    ArrayList arrayList=new ArrayList();
+    for(int i=0;i<seqSize;++i)
     {
-      seq.add(TypeConversionUtil.convertToboolean(i));
+      arrayList.add(arrayList.size()/2,TypeConversionUtil.convertTodoubleboolean(i));
     }
-    for(int i=0;i<seq.size;++i)
+    System.out.println("BEGIN testUncheckedListadd_intboolean_initialCapacity50_InsertMidPoint");
+    for(int i=0;i<seqSize;++i)
     {
-      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]));
+      System.out.println(arrayList.get(i));
+      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]);
+    }
+    System.out.println("END testUncheckedListadd_intboolean_initialCapacity50_InsertMidPoint");
+  }
+  @Test
+  public void testUncheckedListput_intBoolean_initialCapacityDEFAULT_NonThrowingIndex()
+  {
+    UncheckedList seq=new UncheckedList();
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertToBoolean(i));
+    }
+    for(int i=0;i<100;++i)
+    {
+      var putVal=TypeConversionUtil.convertToBoolean(100-i-1);
+      seq.put(i,putVal);
+      var expectedVal=TypeConversionUtil.convertTodoubleboolean(100-i-1);
+      Assertions.assertEquals(expectedVal,seq.arr[i]);
+      Assertions.assertEquals(100,seq.size());
     }
   }
   @Test
@@ -469,9 +690,10 @@ public class DoubleArrSeqListTest
     {
       seq.add(0,TypeConversionUtil.convertToBoolean(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodoubleboolean(i),seq.arr[seq.size-i-1]);
     }
@@ -484,9 +706,10 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size,TypeConversionUtil.convertToBoolean(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodoubleboolean(i),seq.arr[i]);
     }
@@ -499,16 +722,37 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size/2,TypeConversionUtil.convertToBoolean(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    ArrayList arrList=new ArrayList();
-    for(int i=0;i<seq.size;++i)
+    ArrayList arrayList=new ArrayList();
+    for(int i=0;i<seqSize;++i)
     {
-      seq.add(TypeConversionUtil.convertToBoolean(i));
+      arrayList.add(arrayList.size()/2,TypeConversionUtil.convertTodoubleboolean(i));
     }
-    for(int i=0;i<seq.size;++i)
+    System.out.println("BEGIN testUncheckedListadd_intBoolean_initialCapacityDEFAULT_InsertMidPoint");
+    for(int i=0;i<seqSize;++i)
     {
-      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]));
+      System.out.println(arrayList.get(i));
+      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]);
+    }
+    System.out.println("END testUncheckedListadd_intBoolean_initialCapacityDEFAULT_InsertMidPoint");
+  }
+  @Test
+  public void testUncheckedListput_intBoolean_initialCapacityNULL_NonThrowingIndex()
+  {
+    UncheckedList seq=new UncheckedList(0,null);
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertToBoolean(i));
+    }
+    for(int i=0;i<100;++i)
+    {
+      var putVal=TypeConversionUtil.convertToBoolean(100-i-1);
+      seq.put(i,putVal);
+      var expectedVal=TypeConversionUtil.convertTodoubleboolean(100-i-1);
+      Assertions.assertEquals(expectedVal,seq.arr[i]);
+      Assertions.assertEquals(100,seq.size());
     }
   }
   @Test
@@ -519,9 +763,10 @@ public class DoubleArrSeqListTest
     {
       seq.add(0,TypeConversionUtil.convertToBoolean(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodoubleboolean(i),seq.arr[seq.size-i-1]);
     }
@@ -534,9 +779,10 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size,TypeConversionUtil.convertToBoolean(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodoubleboolean(i),seq.arr[i]);
     }
@@ -549,16 +795,37 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size/2,TypeConversionUtil.convertToBoolean(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    ArrayList arrList=new ArrayList();
-    for(int i=0;i<seq.size;++i)
+    ArrayList arrayList=new ArrayList();
+    for(int i=0;i<seqSize;++i)
     {
-      seq.add(TypeConversionUtil.convertToBoolean(i));
+      arrayList.add(arrayList.size()/2,TypeConversionUtil.convertTodoubleboolean(i));
     }
-    for(int i=0;i<seq.size;++i)
+    System.out.println("BEGIN testUncheckedListadd_intBoolean_initialCapacityNULL_InsertMidPoint");
+    for(int i=0;i<seqSize;++i)
     {
-      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]));
+      System.out.println(arrayList.get(i));
+      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]);
+    }
+    System.out.println("END testUncheckedListadd_intBoolean_initialCapacityNULL_InsertMidPoint");
+  }
+  @Test
+  public void testUncheckedListput_intBoolean_initialCapacity50_NonThrowingIndex()
+  {
+    UncheckedList seq=new UncheckedList(50);
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertToBoolean(i));
+    }
+    for(int i=0;i<100;++i)
+    {
+      var putVal=TypeConversionUtil.convertToBoolean(100-i-1);
+      seq.put(i,putVal);
+      var expectedVal=TypeConversionUtil.convertTodoubleboolean(100-i-1);
+      Assertions.assertEquals(expectedVal,seq.arr[i]);
+      Assertions.assertEquals(100,seq.size());
     }
   }
   @Test
@@ -569,9 +836,10 @@ public class DoubleArrSeqListTest
     {
       seq.add(0,TypeConversionUtil.convertToBoolean(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodoubleboolean(i),seq.arr[seq.size-i-1]);
     }
@@ -584,9 +852,10 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size,TypeConversionUtil.convertToBoolean(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodoubleboolean(i),seq.arr[i]);
     }
@@ -599,16 +868,37 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size/2,TypeConversionUtil.convertToBoolean(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    ArrayList arrList=new ArrayList();
-    for(int i=0;i<seq.size;++i)
+    ArrayList arrayList=new ArrayList();
+    for(int i=0;i<seqSize;++i)
     {
-      seq.add(TypeConversionUtil.convertToBoolean(i));
+      arrayList.add(arrayList.size()/2,TypeConversionUtil.convertTodoubleboolean(i));
     }
-    for(int i=0;i<seq.size;++i)
+    System.out.println("BEGIN testUncheckedListadd_intBoolean_initialCapacity50_InsertMidPoint");
+    for(int i=0;i<seqSize;++i)
     {
-      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]));
+      System.out.println(arrayList.get(i));
+      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]);
+    }
+    System.out.println("END testUncheckedListadd_intBoolean_initialCapacity50_InsertMidPoint");
+  }
+  @Test
+  public void testUncheckedListput_intbyte_initialCapacityDEFAULT_NonThrowingIndex()
+  {
+    UncheckedList seq=new UncheckedList();
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertTobyte(i));
+    }
+    for(int i=0;i<100;++i)
+    {
+      var putVal=TypeConversionUtil.convertTobyte(100-i-1);
+      seq.put(i,putVal);
+      var expectedVal=TypeConversionUtil.convertTodouble(100-i-1);
+      Assertions.assertEquals(expectedVal,seq.arr[i]);
+      Assertions.assertEquals(100,seq.size());
     }
   }
   @Test
@@ -619,9 +909,10 @@ public class DoubleArrSeqListTest
     {
       seq.add(0,TypeConversionUtil.convertTobyte(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[seq.size-i-1]);
     }
@@ -634,9 +925,10 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size,TypeConversionUtil.convertTobyte(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
     }
@@ -649,16 +941,37 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size/2,TypeConversionUtil.convertTobyte(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    ArrayList arrList=new ArrayList();
-    for(int i=0;i<seq.size;++i)
+    ArrayList arrayList=new ArrayList();
+    for(int i=0;i<seqSize;++i)
     {
-      seq.add(TypeConversionUtil.convertTobyte(i));
+      arrayList.add(arrayList.size()/2,TypeConversionUtil.convertTodouble(i));
     }
-    for(int i=0;i<seq.size;++i)
+    System.out.println("BEGIN testUncheckedListadd_intbyte_initialCapacityDEFAULT_InsertMidPoint");
+    for(int i=0;i<seqSize;++i)
     {
-      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]));
+      System.out.println(arrayList.get(i));
+      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]);
+    }
+    System.out.println("END testUncheckedListadd_intbyte_initialCapacityDEFAULT_InsertMidPoint");
+  }
+  @Test
+  public void testUncheckedListput_intbyte_initialCapacityNULL_NonThrowingIndex()
+  {
+    UncheckedList seq=new UncheckedList(0,null);
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertTobyte(i));
+    }
+    for(int i=0;i<100;++i)
+    {
+      var putVal=TypeConversionUtil.convertTobyte(100-i-1);
+      seq.put(i,putVal);
+      var expectedVal=TypeConversionUtil.convertTodouble(100-i-1);
+      Assertions.assertEquals(expectedVal,seq.arr[i]);
+      Assertions.assertEquals(100,seq.size());
     }
   }
   @Test
@@ -669,9 +982,10 @@ public class DoubleArrSeqListTest
     {
       seq.add(0,TypeConversionUtil.convertTobyte(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[seq.size-i-1]);
     }
@@ -684,9 +998,10 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size,TypeConversionUtil.convertTobyte(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
     }
@@ -699,16 +1014,37 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size/2,TypeConversionUtil.convertTobyte(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    ArrayList arrList=new ArrayList();
-    for(int i=0;i<seq.size;++i)
+    ArrayList arrayList=new ArrayList();
+    for(int i=0;i<seqSize;++i)
     {
-      seq.add(TypeConversionUtil.convertTobyte(i));
+      arrayList.add(arrayList.size()/2,TypeConversionUtil.convertTodouble(i));
     }
-    for(int i=0;i<seq.size;++i)
+    System.out.println("BEGIN testUncheckedListadd_intbyte_initialCapacityNULL_InsertMidPoint");
+    for(int i=0;i<seqSize;++i)
     {
-      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]));
+      System.out.println(arrayList.get(i));
+      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]);
+    }
+    System.out.println("END testUncheckedListadd_intbyte_initialCapacityNULL_InsertMidPoint");
+  }
+  @Test
+  public void testUncheckedListput_intbyte_initialCapacity50_NonThrowingIndex()
+  {
+    UncheckedList seq=new UncheckedList(50);
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertTobyte(i));
+    }
+    for(int i=0;i<100;++i)
+    {
+      var putVal=TypeConversionUtil.convertTobyte(100-i-1);
+      seq.put(i,putVal);
+      var expectedVal=TypeConversionUtil.convertTodouble(100-i-1);
+      Assertions.assertEquals(expectedVal,seq.arr[i]);
+      Assertions.assertEquals(100,seq.size());
     }
   }
   @Test
@@ -719,9 +1055,10 @@ public class DoubleArrSeqListTest
     {
       seq.add(0,TypeConversionUtil.convertTobyte(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[seq.size-i-1]);
     }
@@ -734,9 +1071,10 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size,TypeConversionUtil.convertTobyte(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
     }
@@ -749,16 +1087,37 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size/2,TypeConversionUtil.convertTobyte(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    ArrayList arrList=new ArrayList();
-    for(int i=0;i<seq.size;++i)
+    ArrayList arrayList=new ArrayList();
+    for(int i=0;i<seqSize;++i)
     {
-      seq.add(TypeConversionUtil.convertTobyte(i));
+      arrayList.add(arrayList.size()/2,TypeConversionUtil.convertTodouble(i));
     }
-    for(int i=0;i<seq.size;++i)
+    System.out.println("BEGIN testUncheckedListadd_intbyte_initialCapacity50_InsertMidPoint");
+    for(int i=0;i<seqSize;++i)
     {
-      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]));
+      System.out.println(arrayList.get(i));
+      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]);
+    }
+    System.out.println("END testUncheckedListadd_intbyte_initialCapacity50_InsertMidPoint");
+  }
+  @Test
+  public void testUncheckedListput_intByte_initialCapacityDEFAULT_NonThrowingIndex()
+  {
+    UncheckedList seq=new UncheckedList();
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertToByte(i));
+    }
+    for(int i=0;i<100;++i)
+    {
+      var putVal=TypeConversionUtil.convertToByte(100-i-1);
+      seq.put(i,putVal);
+      var expectedVal=TypeConversionUtil.convertTodouble(100-i-1);
+      Assertions.assertEquals(expectedVal,seq.arr[i]);
+      Assertions.assertEquals(100,seq.size());
     }
   }
   @Test
@@ -769,9 +1128,10 @@ public class DoubleArrSeqListTest
     {
       seq.add(0,TypeConversionUtil.convertToByte(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[seq.size-i-1]);
     }
@@ -784,9 +1144,10 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size,TypeConversionUtil.convertToByte(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
     }
@@ -799,16 +1160,37 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size/2,TypeConversionUtil.convertToByte(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    ArrayList arrList=new ArrayList();
-    for(int i=0;i<seq.size;++i)
+    ArrayList arrayList=new ArrayList();
+    for(int i=0;i<seqSize;++i)
     {
-      seq.add(TypeConversionUtil.convertToByte(i));
+      arrayList.add(arrayList.size()/2,TypeConversionUtil.convertTodouble(i));
     }
-    for(int i=0;i<seq.size;++i)
+    System.out.println("BEGIN testUncheckedListadd_intByte_initialCapacityDEFAULT_InsertMidPoint");
+    for(int i=0;i<seqSize;++i)
     {
-      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]));
+      System.out.println(arrayList.get(i));
+      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]);
+    }
+    System.out.println("END testUncheckedListadd_intByte_initialCapacityDEFAULT_InsertMidPoint");
+  }
+  @Test
+  public void testUncheckedListput_intByte_initialCapacityNULL_NonThrowingIndex()
+  {
+    UncheckedList seq=new UncheckedList(0,null);
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertToByte(i));
+    }
+    for(int i=0;i<100;++i)
+    {
+      var putVal=TypeConversionUtil.convertToByte(100-i-1);
+      seq.put(i,putVal);
+      var expectedVal=TypeConversionUtil.convertTodouble(100-i-1);
+      Assertions.assertEquals(expectedVal,seq.arr[i]);
+      Assertions.assertEquals(100,seq.size());
     }
   }
   @Test
@@ -819,9 +1201,10 @@ public class DoubleArrSeqListTest
     {
       seq.add(0,TypeConversionUtil.convertToByte(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[seq.size-i-1]);
     }
@@ -834,9 +1217,10 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size,TypeConversionUtil.convertToByte(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
     }
@@ -849,16 +1233,37 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size/2,TypeConversionUtil.convertToByte(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    ArrayList arrList=new ArrayList();
-    for(int i=0;i<seq.size;++i)
+    ArrayList arrayList=new ArrayList();
+    for(int i=0;i<seqSize;++i)
     {
-      seq.add(TypeConversionUtil.convertToByte(i));
+      arrayList.add(arrayList.size()/2,TypeConversionUtil.convertTodouble(i));
     }
-    for(int i=0;i<seq.size;++i)
+    System.out.println("BEGIN testUncheckedListadd_intByte_initialCapacityNULL_InsertMidPoint");
+    for(int i=0;i<seqSize;++i)
     {
-      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]));
+      System.out.println(arrayList.get(i));
+      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]);
+    }
+    System.out.println("END testUncheckedListadd_intByte_initialCapacityNULL_InsertMidPoint");
+  }
+  @Test
+  public void testUncheckedListput_intByte_initialCapacity50_NonThrowingIndex()
+  {
+    UncheckedList seq=new UncheckedList(50);
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertToByte(i));
+    }
+    for(int i=0;i<100;++i)
+    {
+      var putVal=TypeConversionUtil.convertToByte(100-i-1);
+      seq.put(i,putVal);
+      var expectedVal=TypeConversionUtil.convertTodouble(100-i-1);
+      Assertions.assertEquals(expectedVal,seq.arr[i]);
+      Assertions.assertEquals(100,seq.size());
     }
   }
   @Test
@@ -869,9 +1274,10 @@ public class DoubleArrSeqListTest
     {
       seq.add(0,TypeConversionUtil.convertToByte(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[seq.size-i-1]);
     }
@@ -884,9 +1290,10 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size,TypeConversionUtil.convertToByte(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
     }
@@ -899,16 +1306,37 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size/2,TypeConversionUtil.convertToByte(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    ArrayList arrList=new ArrayList();
-    for(int i=0;i<seq.size;++i)
+    ArrayList arrayList=new ArrayList();
+    for(int i=0;i<seqSize;++i)
     {
-      seq.add(TypeConversionUtil.convertToByte(i));
+      arrayList.add(arrayList.size()/2,TypeConversionUtil.convertTodouble(i));
     }
-    for(int i=0;i<seq.size;++i)
+    System.out.println("BEGIN testUncheckedListadd_intByte_initialCapacity50_InsertMidPoint");
+    for(int i=0;i<seqSize;++i)
     {
-      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]));
+      System.out.println(arrayList.get(i));
+      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]);
+    }
+    System.out.println("END testUncheckedListadd_intByte_initialCapacity50_InsertMidPoint");
+  }
+  @Test
+  public void testUncheckedListput_intchar_initialCapacityDEFAULT_NonThrowingIndex()
+  {
+    UncheckedList seq=new UncheckedList();
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertTochar(i));
+    }
+    for(int i=0;i<100;++i)
+    {
+      var putVal=TypeConversionUtil.convertTochar(100-i-1);
+      seq.put(i,putVal);
+      var expectedVal=TypeConversionUtil.convertTodouble(100-i-1);
+      Assertions.assertEquals(expectedVal,seq.arr[i]);
+      Assertions.assertEquals(100,seq.size());
     }
   }
   @Test
@@ -919,9 +1347,10 @@ public class DoubleArrSeqListTest
     {
       seq.add(0,TypeConversionUtil.convertTochar(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[seq.size-i-1]);
     }
@@ -934,9 +1363,10 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size,TypeConversionUtil.convertTochar(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
     }
@@ -949,16 +1379,37 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size/2,TypeConversionUtil.convertTochar(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    ArrayList arrList=new ArrayList();
-    for(int i=0;i<seq.size;++i)
+    ArrayList arrayList=new ArrayList();
+    for(int i=0;i<seqSize;++i)
     {
-      seq.add(TypeConversionUtil.convertTochar(i));
+      arrayList.add(arrayList.size()/2,TypeConversionUtil.convertTodouble(i));
     }
-    for(int i=0;i<seq.size;++i)
+    System.out.println("BEGIN testUncheckedListadd_intchar_initialCapacityDEFAULT_InsertMidPoint");
+    for(int i=0;i<seqSize;++i)
     {
-      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]));
+      System.out.println(arrayList.get(i));
+      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]);
+    }
+    System.out.println("END testUncheckedListadd_intchar_initialCapacityDEFAULT_InsertMidPoint");
+  }
+  @Test
+  public void testUncheckedListput_intchar_initialCapacityNULL_NonThrowingIndex()
+  {
+    UncheckedList seq=new UncheckedList(0,null);
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertTochar(i));
+    }
+    for(int i=0;i<100;++i)
+    {
+      var putVal=TypeConversionUtil.convertTochar(100-i-1);
+      seq.put(i,putVal);
+      var expectedVal=TypeConversionUtil.convertTodouble(100-i-1);
+      Assertions.assertEquals(expectedVal,seq.arr[i]);
+      Assertions.assertEquals(100,seq.size());
     }
   }
   @Test
@@ -969,9 +1420,10 @@ public class DoubleArrSeqListTest
     {
       seq.add(0,TypeConversionUtil.convertTochar(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[seq.size-i-1]);
     }
@@ -984,9 +1436,10 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size,TypeConversionUtil.convertTochar(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
     }
@@ -999,16 +1452,37 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size/2,TypeConversionUtil.convertTochar(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    ArrayList arrList=new ArrayList();
-    for(int i=0;i<seq.size;++i)
+    ArrayList arrayList=new ArrayList();
+    for(int i=0;i<seqSize;++i)
     {
-      seq.add(TypeConversionUtil.convertTochar(i));
+      arrayList.add(arrayList.size()/2,TypeConversionUtil.convertTodouble(i));
     }
-    for(int i=0;i<seq.size;++i)
+    System.out.println("BEGIN testUncheckedListadd_intchar_initialCapacityNULL_InsertMidPoint");
+    for(int i=0;i<seqSize;++i)
     {
-      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]));
+      System.out.println(arrayList.get(i));
+      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]);
+    }
+    System.out.println("END testUncheckedListadd_intchar_initialCapacityNULL_InsertMidPoint");
+  }
+  @Test
+  public void testUncheckedListput_intchar_initialCapacity50_NonThrowingIndex()
+  {
+    UncheckedList seq=new UncheckedList(50);
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertTochar(i));
+    }
+    for(int i=0;i<100;++i)
+    {
+      var putVal=TypeConversionUtil.convertTochar(100-i-1);
+      seq.put(i,putVal);
+      var expectedVal=TypeConversionUtil.convertTodouble(100-i-1);
+      Assertions.assertEquals(expectedVal,seq.arr[i]);
+      Assertions.assertEquals(100,seq.size());
     }
   }
   @Test
@@ -1019,9 +1493,10 @@ public class DoubleArrSeqListTest
     {
       seq.add(0,TypeConversionUtil.convertTochar(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[seq.size-i-1]);
     }
@@ -1034,9 +1509,10 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size,TypeConversionUtil.convertTochar(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
     }
@@ -1049,16 +1525,37 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size/2,TypeConversionUtil.convertTochar(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    ArrayList arrList=new ArrayList();
-    for(int i=0;i<seq.size;++i)
+    ArrayList arrayList=new ArrayList();
+    for(int i=0;i<seqSize;++i)
     {
-      seq.add(TypeConversionUtil.convertTochar(i));
+      arrayList.add(arrayList.size()/2,TypeConversionUtil.convertTodouble(i));
     }
-    for(int i=0;i<seq.size;++i)
+    System.out.println("BEGIN testUncheckedListadd_intchar_initialCapacity50_InsertMidPoint");
+    for(int i=0;i<seqSize;++i)
     {
-      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]));
+      System.out.println(arrayList.get(i));
+      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]);
+    }
+    System.out.println("END testUncheckedListadd_intchar_initialCapacity50_InsertMidPoint");
+  }
+  @Test
+  public void testUncheckedListput_intCharacter_initialCapacityDEFAULT_NonThrowingIndex()
+  {
+    UncheckedList seq=new UncheckedList();
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertToCharacter(i));
+    }
+    for(int i=0;i<100;++i)
+    {
+      var putVal=TypeConversionUtil.convertToCharacter(100-i-1);
+      seq.put(i,putVal);
+      var expectedVal=TypeConversionUtil.convertTodouble(100-i-1);
+      Assertions.assertEquals(expectedVal,seq.arr[i]);
+      Assertions.assertEquals(100,seq.size());
     }
   }
   @Test
@@ -1069,9 +1566,10 @@ public class DoubleArrSeqListTest
     {
       seq.add(0,TypeConversionUtil.convertToCharacter(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[seq.size-i-1]);
     }
@@ -1084,9 +1582,10 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size,TypeConversionUtil.convertToCharacter(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
     }
@@ -1099,16 +1598,37 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size/2,TypeConversionUtil.convertToCharacter(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    ArrayList arrList=new ArrayList();
-    for(int i=0;i<seq.size;++i)
+    ArrayList arrayList=new ArrayList();
+    for(int i=0;i<seqSize;++i)
     {
-      seq.add(TypeConversionUtil.convertToCharacter(i));
+      arrayList.add(arrayList.size()/2,TypeConversionUtil.convertTodouble(i));
     }
-    for(int i=0;i<seq.size;++i)
+    System.out.println("BEGIN testUncheckedListadd_intCharacter_initialCapacityDEFAULT_InsertMidPoint");
+    for(int i=0;i<seqSize;++i)
     {
-      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]));
+      System.out.println(arrayList.get(i));
+      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]);
+    }
+    System.out.println("END testUncheckedListadd_intCharacter_initialCapacityDEFAULT_InsertMidPoint");
+  }
+  @Test
+  public void testUncheckedListput_intCharacter_initialCapacityNULL_NonThrowingIndex()
+  {
+    UncheckedList seq=new UncheckedList(0,null);
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertToCharacter(i));
+    }
+    for(int i=0;i<100;++i)
+    {
+      var putVal=TypeConversionUtil.convertToCharacter(100-i-1);
+      seq.put(i,putVal);
+      var expectedVal=TypeConversionUtil.convertTodouble(100-i-1);
+      Assertions.assertEquals(expectedVal,seq.arr[i]);
+      Assertions.assertEquals(100,seq.size());
     }
   }
   @Test
@@ -1119,9 +1639,10 @@ public class DoubleArrSeqListTest
     {
       seq.add(0,TypeConversionUtil.convertToCharacter(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[seq.size-i-1]);
     }
@@ -1134,9 +1655,10 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size,TypeConversionUtil.convertToCharacter(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
     }
@@ -1149,16 +1671,37 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size/2,TypeConversionUtil.convertToCharacter(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    ArrayList arrList=new ArrayList();
-    for(int i=0;i<seq.size;++i)
+    ArrayList arrayList=new ArrayList();
+    for(int i=0;i<seqSize;++i)
     {
-      seq.add(TypeConversionUtil.convertToCharacter(i));
+      arrayList.add(arrayList.size()/2,TypeConversionUtil.convertTodouble(i));
     }
-    for(int i=0;i<seq.size;++i)
+    System.out.println("BEGIN testUncheckedListadd_intCharacter_initialCapacityNULL_InsertMidPoint");
+    for(int i=0;i<seqSize;++i)
     {
-      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]));
+      System.out.println(arrayList.get(i));
+      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]);
+    }
+    System.out.println("END testUncheckedListadd_intCharacter_initialCapacityNULL_InsertMidPoint");
+  }
+  @Test
+  public void testUncheckedListput_intCharacter_initialCapacity50_NonThrowingIndex()
+  {
+    UncheckedList seq=new UncheckedList(50);
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertToCharacter(i));
+    }
+    for(int i=0;i<100;++i)
+    {
+      var putVal=TypeConversionUtil.convertToCharacter(100-i-1);
+      seq.put(i,putVal);
+      var expectedVal=TypeConversionUtil.convertTodouble(100-i-1);
+      Assertions.assertEquals(expectedVal,seq.arr[i]);
+      Assertions.assertEquals(100,seq.size());
     }
   }
   @Test
@@ -1169,9 +1712,10 @@ public class DoubleArrSeqListTest
     {
       seq.add(0,TypeConversionUtil.convertToCharacter(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[seq.size-i-1]);
     }
@@ -1184,9 +1728,10 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size,TypeConversionUtil.convertToCharacter(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
     }
@@ -1199,16 +1744,37 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size/2,TypeConversionUtil.convertToCharacter(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    ArrayList arrList=new ArrayList();
-    for(int i=0;i<seq.size;++i)
+    ArrayList arrayList=new ArrayList();
+    for(int i=0;i<seqSize;++i)
     {
-      seq.add(TypeConversionUtil.convertToCharacter(i));
+      arrayList.add(arrayList.size()/2,TypeConversionUtil.convertTodouble(i));
     }
-    for(int i=0;i<seq.size;++i)
+    System.out.println("BEGIN testUncheckedListadd_intCharacter_initialCapacity50_InsertMidPoint");
+    for(int i=0;i<seqSize;++i)
     {
-      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]));
+      System.out.println(arrayList.get(i));
+      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]);
+    }
+    System.out.println("END testUncheckedListadd_intCharacter_initialCapacity50_InsertMidPoint");
+  }
+  @Test
+  public void testUncheckedListput_intshort_initialCapacityDEFAULT_NonThrowingIndex()
+  {
+    UncheckedList seq=new UncheckedList();
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertToshort(i));
+    }
+    for(int i=0;i<100;++i)
+    {
+      var putVal=TypeConversionUtil.convertToshort(100-i-1);
+      seq.put(i,putVal);
+      var expectedVal=TypeConversionUtil.convertTodouble(100-i-1);
+      Assertions.assertEquals(expectedVal,seq.arr[i]);
+      Assertions.assertEquals(100,seq.size());
     }
   }
   @Test
@@ -1219,9 +1785,10 @@ public class DoubleArrSeqListTest
     {
       seq.add(0,TypeConversionUtil.convertToshort(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[seq.size-i-1]);
     }
@@ -1234,9 +1801,10 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size,TypeConversionUtil.convertToshort(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
     }
@@ -1249,16 +1817,37 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size/2,TypeConversionUtil.convertToshort(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    ArrayList arrList=new ArrayList();
-    for(int i=0;i<seq.size;++i)
+    ArrayList arrayList=new ArrayList();
+    for(int i=0;i<seqSize;++i)
     {
-      seq.add(TypeConversionUtil.convertToshort(i));
+      arrayList.add(arrayList.size()/2,TypeConversionUtil.convertTodouble(i));
     }
-    for(int i=0;i<seq.size;++i)
+    System.out.println("BEGIN testUncheckedListadd_intshort_initialCapacityDEFAULT_InsertMidPoint");
+    for(int i=0;i<seqSize;++i)
     {
-      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]));
+      System.out.println(arrayList.get(i));
+      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]);
+    }
+    System.out.println("END testUncheckedListadd_intshort_initialCapacityDEFAULT_InsertMidPoint");
+  }
+  @Test
+  public void testUncheckedListput_intshort_initialCapacityNULL_NonThrowingIndex()
+  {
+    UncheckedList seq=new UncheckedList(0,null);
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertToshort(i));
+    }
+    for(int i=0;i<100;++i)
+    {
+      var putVal=TypeConversionUtil.convertToshort(100-i-1);
+      seq.put(i,putVal);
+      var expectedVal=TypeConversionUtil.convertTodouble(100-i-1);
+      Assertions.assertEquals(expectedVal,seq.arr[i]);
+      Assertions.assertEquals(100,seq.size());
     }
   }
   @Test
@@ -1269,9 +1858,10 @@ public class DoubleArrSeqListTest
     {
       seq.add(0,TypeConversionUtil.convertToshort(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[seq.size-i-1]);
     }
@@ -1284,9 +1874,10 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size,TypeConversionUtil.convertToshort(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
     }
@@ -1299,16 +1890,37 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size/2,TypeConversionUtil.convertToshort(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    ArrayList arrList=new ArrayList();
-    for(int i=0;i<seq.size;++i)
+    ArrayList arrayList=new ArrayList();
+    for(int i=0;i<seqSize;++i)
     {
-      seq.add(TypeConversionUtil.convertToshort(i));
+      arrayList.add(arrayList.size()/2,TypeConversionUtil.convertTodouble(i));
     }
-    for(int i=0;i<seq.size;++i)
+    System.out.println("BEGIN testUncheckedListadd_intshort_initialCapacityNULL_InsertMidPoint");
+    for(int i=0;i<seqSize;++i)
     {
-      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]));
+      System.out.println(arrayList.get(i));
+      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]);
+    }
+    System.out.println("END testUncheckedListadd_intshort_initialCapacityNULL_InsertMidPoint");
+  }
+  @Test
+  public void testUncheckedListput_intshort_initialCapacity50_NonThrowingIndex()
+  {
+    UncheckedList seq=new UncheckedList(50);
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertToshort(i));
+    }
+    for(int i=0;i<100;++i)
+    {
+      var putVal=TypeConversionUtil.convertToshort(100-i-1);
+      seq.put(i,putVal);
+      var expectedVal=TypeConversionUtil.convertTodouble(100-i-1);
+      Assertions.assertEquals(expectedVal,seq.arr[i]);
+      Assertions.assertEquals(100,seq.size());
     }
   }
   @Test
@@ -1319,9 +1931,10 @@ public class DoubleArrSeqListTest
     {
       seq.add(0,TypeConversionUtil.convertToshort(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[seq.size-i-1]);
     }
@@ -1334,9 +1947,10 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size,TypeConversionUtil.convertToshort(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
     }
@@ -1349,16 +1963,37 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size/2,TypeConversionUtil.convertToshort(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    ArrayList arrList=new ArrayList();
-    for(int i=0;i<seq.size;++i)
+    ArrayList arrayList=new ArrayList();
+    for(int i=0;i<seqSize;++i)
     {
-      seq.add(TypeConversionUtil.convertToshort(i));
+      arrayList.add(arrayList.size()/2,TypeConversionUtil.convertTodouble(i));
     }
-    for(int i=0;i<seq.size;++i)
+    System.out.println("BEGIN testUncheckedListadd_intshort_initialCapacity50_InsertMidPoint");
+    for(int i=0;i<seqSize;++i)
     {
-      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]));
+      System.out.println(arrayList.get(i));
+      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]);
+    }
+    System.out.println("END testUncheckedListadd_intshort_initialCapacity50_InsertMidPoint");
+  }
+  @Test
+  public void testUncheckedListput_intShort_initialCapacityDEFAULT_NonThrowingIndex()
+  {
+    UncheckedList seq=new UncheckedList();
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertToShort(i));
+    }
+    for(int i=0;i<100;++i)
+    {
+      var putVal=TypeConversionUtil.convertToShort(100-i-1);
+      seq.put(i,putVal);
+      var expectedVal=TypeConversionUtil.convertTodouble(100-i-1);
+      Assertions.assertEquals(expectedVal,seq.arr[i]);
+      Assertions.assertEquals(100,seq.size());
     }
   }
   @Test
@@ -1369,9 +2004,10 @@ public class DoubleArrSeqListTest
     {
       seq.add(0,TypeConversionUtil.convertToShort(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[seq.size-i-1]);
     }
@@ -1384,9 +2020,10 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size,TypeConversionUtil.convertToShort(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
     }
@@ -1399,16 +2036,37 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size/2,TypeConversionUtil.convertToShort(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    ArrayList arrList=new ArrayList();
-    for(int i=0;i<seq.size;++i)
+    ArrayList arrayList=new ArrayList();
+    for(int i=0;i<seqSize;++i)
     {
-      seq.add(TypeConversionUtil.convertToShort(i));
+      arrayList.add(arrayList.size()/2,TypeConversionUtil.convertTodouble(i));
     }
-    for(int i=0;i<seq.size;++i)
+    System.out.println("BEGIN testUncheckedListadd_intShort_initialCapacityDEFAULT_InsertMidPoint");
+    for(int i=0;i<seqSize;++i)
     {
-      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]));
+      System.out.println(arrayList.get(i));
+      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]);
+    }
+    System.out.println("END testUncheckedListadd_intShort_initialCapacityDEFAULT_InsertMidPoint");
+  }
+  @Test
+  public void testUncheckedListput_intShort_initialCapacityNULL_NonThrowingIndex()
+  {
+    UncheckedList seq=new UncheckedList(0,null);
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertToShort(i));
+    }
+    for(int i=0;i<100;++i)
+    {
+      var putVal=TypeConversionUtil.convertToShort(100-i-1);
+      seq.put(i,putVal);
+      var expectedVal=TypeConversionUtil.convertTodouble(100-i-1);
+      Assertions.assertEquals(expectedVal,seq.arr[i]);
+      Assertions.assertEquals(100,seq.size());
     }
   }
   @Test
@@ -1419,9 +2077,10 @@ public class DoubleArrSeqListTest
     {
       seq.add(0,TypeConversionUtil.convertToShort(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[seq.size-i-1]);
     }
@@ -1434,9 +2093,10 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size,TypeConversionUtil.convertToShort(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
     }
@@ -1449,16 +2109,37 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size/2,TypeConversionUtil.convertToShort(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    ArrayList arrList=new ArrayList();
-    for(int i=0;i<seq.size;++i)
+    ArrayList arrayList=new ArrayList();
+    for(int i=0;i<seqSize;++i)
     {
-      seq.add(TypeConversionUtil.convertToShort(i));
+      arrayList.add(arrayList.size()/2,TypeConversionUtil.convertTodouble(i));
     }
-    for(int i=0;i<seq.size;++i)
+    System.out.println("BEGIN testUncheckedListadd_intShort_initialCapacityNULL_InsertMidPoint");
+    for(int i=0;i<seqSize;++i)
     {
-      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]));
+      System.out.println(arrayList.get(i));
+      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]);
+    }
+    System.out.println("END testUncheckedListadd_intShort_initialCapacityNULL_InsertMidPoint");
+  }
+  @Test
+  public void testUncheckedListput_intShort_initialCapacity50_NonThrowingIndex()
+  {
+    UncheckedList seq=new UncheckedList(50);
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertToShort(i));
+    }
+    for(int i=0;i<100;++i)
+    {
+      var putVal=TypeConversionUtil.convertToShort(100-i-1);
+      seq.put(i,putVal);
+      var expectedVal=TypeConversionUtil.convertTodouble(100-i-1);
+      Assertions.assertEquals(expectedVal,seq.arr[i]);
+      Assertions.assertEquals(100,seq.size());
     }
   }
   @Test
@@ -1469,9 +2150,10 @@ public class DoubleArrSeqListTest
     {
       seq.add(0,TypeConversionUtil.convertToShort(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[seq.size-i-1]);
     }
@@ -1484,9 +2166,10 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size,TypeConversionUtil.convertToShort(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
     }
@@ -1499,16 +2182,37 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size/2,TypeConversionUtil.convertToShort(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    ArrayList arrList=new ArrayList();
-    for(int i=0;i<seq.size;++i)
+    ArrayList arrayList=new ArrayList();
+    for(int i=0;i<seqSize;++i)
     {
-      seq.add(TypeConversionUtil.convertToShort(i));
+      arrayList.add(arrayList.size()/2,TypeConversionUtil.convertTodouble(i));
     }
-    for(int i=0;i<seq.size;++i)
+    System.out.println("BEGIN testUncheckedListadd_intShort_initialCapacity50_InsertMidPoint");
+    for(int i=0;i<seqSize;++i)
     {
-      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]));
+      System.out.println(arrayList.get(i));
+      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]);
+    }
+    System.out.println("END testUncheckedListadd_intShort_initialCapacity50_InsertMidPoint");
+  }
+  @Test
+  public void testUncheckedListput_intint_initialCapacityDEFAULT_NonThrowingIndex()
+  {
+    UncheckedList seq=new UncheckedList();
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertToint(i));
+    }
+    for(int i=0;i<100;++i)
+    {
+      var putVal=TypeConversionUtil.convertToint(100-i-1);
+      seq.put(i,putVal);
+      var expectedVal=TypeConversionUtil.convertTodouble(100-i-1);
+      Assertions.assertEquals(expectedVal,seq.arr[i]);
+      Assertions.assertEquals(100,seq.size());
     }
   }
   @Test
@@ -1519,9 +2223,10 @@ public class DoubleArrSeqListTest
     {
       seq.add(0,TypeConversionUtil.convertToint(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[seq.size-i-1]);
     }
@@ -1534,9 +2239,10 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size,TypeConversionUtil.convertToint(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
     }
@@ -1549,16 +2255,37 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size/2,TypeConversionUtil.convertToint(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    ArrayList arrList=new ArrayList();
-    for(int i=0;i<seq.size;++i)
+    ArrayList arrayList=new ArrayList();
+    for(int i=0;i<seqSize;++i)
     {
-      seq.add(TypeConversionUtil.convertToint(i));
+      arrayList.add(arrayList.size()/2,TypeConversionUtil.convertTodouble(i));
     }
-    for(int i=0;i<seq.size;++i)
+    System.out.println("BEGIN testUncheckedListadd_intint_initialCapacityDEFAULT_InsertMidPoint");
+    for(int i=0;i<seqSize;++i)
     {
-      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]));
+      System.out.println(arrayList.get(i));
+      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]);
+    }
+    System.out.println("END testUncheckedListadd_intint_initialCapacityDEFAULT_InsertMidPoint");
+  }
+  @Test
+  public void testUncheckedListput_intint_initialCapacityNULL_NonThrowingIndex()
+  {
+    UncheckedList seq=new UncheckedList(0,null);
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertToint(i));
+    }
+    for(int i=0;i<100;++i)
+    {
+      var putVal=TypeConversionUtil.convertToint(100-i-1);
+      seq.put(i,putVal);
+      var expectedVal=TypeConversionUtil.convertTodouble(100-i-1);
+      Assertions.assertEquals(expectedVal,seq.arr[i]);
+      Assertions.assertEquals(100,seq.size());
     }
   }
   @Test
@@ -1569,9 +2296,10 @@ public class DoubleArrSeqListTest
     {
       seq.add(0,TypeConversionUtil.convertToint(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[seq.size-i-1]);
     }
@@ -1584,9 +2312,10 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size,TypeConversionUtil.convertToint(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
     }
@@ -1599,16 +2328,37 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size/2,TypeConversionUtil.convertToint(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    ArrayList arrList=new ArrayList();
-    for(int i=0;i<seq.size;++i)
+    ArrayList arrayList=new ArrayList();
+    for(int i=0;i<seqSize;++i)
     {
-      seq.add(TypeConversionUtil.convertToint(i));
+      arrayList.add(arrayList.size()/2,TypeConversionUtil.convertTodouble(i));
     }
-    for(int i=0;i<seq.size;++i)
+    System.out.println("BEGIN testUncheckedListadd_intint_initialCapacityNULL_InsertMidPoint");
+    for(int i=0;i<seqSize;++i)
     {
-      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]));
+      System.out.println(arrayList.get(i));
+      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]);
+    }
+    System.out.println("END testUncheckedListadd_intint_initialCapacityNULL_InsertMidPoint");
+  }
+  @Test
+  public void testUncheckedListput_intint_initialCapacity50_NonThrowingIndex()
+  {
+    UncheckedList seq=new UncheckedList(50);
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertToint(i));
+    }
+    for(int i=0;i<100;++i)
+    {
+      var putVal=TypeConversionUtil.convertToint(100-i-1);
+      seq.put(i,putVal);
+      var expectedVal=TypeConversionUtil.convertTodouble(100-i-1);
+      Assertions.assertEquals(expectedVal,seq.arr[i]);
+      Assertions.assertEquals(100,seq.size());
     }
   }
   @Test
@@ -1619,9 +2369,10 @@ public class DoubleArrSeqListTest
     {
       seq.add(0,TypeConversionUtil.convertToint(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[seq.size-i-1]);
     }
@@ -1634,9 +2385,10 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size,TypeConversionUtil.convertToint(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
     }
@@ -1649,16 +2401,37 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size/2,TypeConversionUtil.convertToint(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    ArrayList arrList=new ArrayList();
-    for(int i=0;i<seq.size;++i)
+    ArrayList arrayList=new ArrayList();
+    for(int i=0;i<seqSize;++i)
     {
-      seq.add(TypeConversionUtil.convertToint(i));
+      arrayList.add(arrayList.size()/2,TypeConversionUtil.convertTodouble(i));
     }
-    for(int i=0;i<seq.size;++i)
+    System.out.println("BEGIN testUncheckedListadd_intint_initialCapacity50_InsertMidPoint");
+    for(int i=0;i<seqSize;++i)
     {
-      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]));
+      System.out.println(arrayList.get(i));
+      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]);
+    }
+    System.out.println("END testUncheckedListadd_intint_initialCapacity50_InsertMidPoint");
+  }
+  @Test
+  public void testUncheckedListput_intInteger_initialCapacityDEFAULT_NonThrowingIndex()
+  {
+    UncheckedList seq=new UncheckedList();
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertToInteger(i));
+    }
+    for(int i=0;i<100;++i)
+    {
+      var putVal=TypeConversionUtil.convertToInteger(100-i-1);
+      seq.put(i,putVal);
+      var expectedVal=TypeConversionUtil.convertTodouble(100-i-1);
+      Assertions.assertEquals(expectedVal,seq.arr[i]);
+      Assertions.assertEquals(100,seq.size());
     }
   }
   @Test
@@ -1669,9 +2442,10 @@ public class DoubleArrSeqListTest
     {
       seq.add(0,TypeConversionUtil.convertToInteger(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[seq.size-i-1]);
     }
@@ -1684,9 +2458,10 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size,TypeConversionUtil.convertToInteger(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
     }
@@ -1699,16 +2474,37 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size/2,TypeConversionUtil.convertToInteger(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    ArrayList arrList=new ArrayList();
-    for(int i=0;i<seq.size;++i)
+    ArrayList arrayList=new ArrayList();
+    for(int i=0;i<seqSize;++i)
     {
-      seq.add(TypeConversionUtil.convertToInteger(i));
+      arrayList.add(arrayList.size()/2,TypeConversionUtil.convertTodouble(i));
     }
-    for(int i=0;i<seq.size;++i)
+    System.out.println("BEGIN testUncheckedListadd_intInteger_initialCapacityDEFAULT_InsertMidPoint");
+    for(int i=0;i<seqSize;++i)
     {
-      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]));
+      System.out.println(arrayList.get(i));
+      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]);
+    }
+    System.out.println("END testUncheckedListadd_intInteger_initialCapacityDEFAULT_InsertMidPoint");
+  }
+  @Test
+  public void testUncheckedListput_intInteger_initialCapacityNULL_NonThrowingIndex()
+  {
+    UncheckedList seq=new UncheckedList(0,null);
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertToInteger(i));
+    }
+    for(int i=0;i<100;++i)
+    {
+      var putVal=TypeConversionUtil.convertToInteger(100-i-1);
+      seq.put(i,putVal);
+      var expectedVal=TypeConversionUtil.convertTodouble(100-i-1);
+      Assertions.assertEquals(expectedVal,seq.arr[i]);
+      Assertions.assertEquals(100,seq.size());
     }
   }
   @Test
@@ -1719,9 +2515,10 @@ public class DoubleArrSeqListTest
     {
       seq.add(0,TypeConversionUtil.convertToInteger(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[seq.size-i-1]);
     }
@@ -1734,9 +2531,10 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size,TypeConversionUtil.convertToInteger(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
     }
@@ -1749,16 +2547,37 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size/2,TypeConversionUtil.convertToInteger(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    ArrayList arrList=new ArrayList();
-    for(int i=0;i<seq.size;++i)
+    ArrayList arrayList=new ArrayList();
+    for(int i=0;i<seqSize;++i)
     {
-      seq.add(TypeConversionUtil.convertToInteger(i));
+      arrayList.add(arrayList.size()/2,TypeConversionUtil.convertTodouble(i));
     }
-    for(int i=0;i<seq.size;++i)
+    System.out.println("BEGIN testUncheckedListadd_intInteger_initialCapacityNULL_InsertMidPoint");
+    for(int i=0;i<seqSize;++i)
     {
-      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]));
+      System.out.println(arrayList.get(i));
+      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]);
+    }
+    System.out.println("END testUncheckedListadd_intInteger_initialCapacityNULL_InsertMidPoint");
+  }
+  @Test
+  public void testUncheckedListput_intInteger_initialCapacity50_NonThrowingIndex()
+  {
+    UncheckedList seq=new UncheckedList(50);
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertToInteger(i));
+    }
+    for(int i=0;i<100;++i)
+    {
+      var putVal=TypeConversionUtil.convertToInteger(100-i-1);
+      seq.put(i,putVal);
+      var expectedVal=TypeConversionUtil.convertTodouble(100-i-1);
+      Assertions.assertEquals(expectedVal,seq.arr[i]);
+      Assertions.assertEquals(100,seq.size());
     }
   }
   @Test
@@ -1769,9 +2588,10 @@ public class DoubleArrSeqListTest
     {
       seq.add(0,TypeConversionUtil.convertToInteger(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[seq.size-i-1]);
     }
@@ -1784,9 +2604,10 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size,TypeConversionUtil.convertToInteger(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
     }
@@ -1799,16 +2620,37 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size/2,TypeConversionUtil.convertToInteger(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    ArrayList arrList=new ArrayList();
-    for(int i=0;i<seq.size;++i)
+    ArrayList arrayList=new ArrayList();
+    for(int i=0;i<seqSize;++i)
     {
-      seq.add(TypeConversionUtil.convertToInteger(i));
+      arrayList.add(arrayList.size()/2,TypeConversionUtil.convertTodouble(i));
     }
-    for(int i=0;i<seq.size;++i)
+    System.out.println("BEGIN testUncheckedListadd_intInteger_initialCapacity50_InsertMidPoint");
+    for(int i=0;i<seqSize;++i)
     {
-      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]));
+      System.out.println(arrayList.get(i));
+      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]);
+    }
+    System.out.println("END testUncheckedListadd_intInteger_initialCapacity50_InsertMidPoint");
+  }
+  @Test
+  public void testUncheckedListput_intlong_initialCapacityDEFAULT_NonThrowingIndex()
+  {
+    UncheckedList seq=new UncheckedList();
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertTolong(i));
+    }
+    for(int i=0;i<100;++i)
+    {
+      var putVal=TypeConversionUtil.convertTolong(100-i-1);
+      seq.put(i,putVal);
+      var expectedVal=TypeConversionUtil.convertTodouble(100-i-1);
+      Assertions.assertEquals(expectedVal,seq.arr[i]);
+      Assertions.assertEquals(100,seq.size());
     }
   }
   @Test
@@ -1819,9 +2661,10 @@ public class DoubleArrSeqListTest
     {
       seq.add(0,TypeConversionUtil.convertTolong(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[seq.size-i-1]);
     }
@@ -1834,9 +2677,10 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size,TypeConversionUtil.convertTolong(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
     }
@@ -1849,16 +2693,37 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size/2,TypeConversionUtil.convertTolong(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    ArrayList arrList=new ArrayList();
-    for(int i=0;i<seq.size;++i)
+    ArrayList arrayList=new ArrayList();
+    for(int i=0;i<seqSize;++i)
     {
-      seq.add(TypeConversionUtil.convertTolong(i));
+      arrayList.add(arrayList.size()/2,TypeConversionUtil.convertTodouble(i));
     }
-    for(int i=0;i<seq.size;++i)
+    System.out.println("BEGIN testUncheckedListadd_intlong_initialCapacityDEFAULT_InsertMidPoint");
+    for(int i=0;i<seqSize;++i)
     {
-      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]));
+      System.out.println(arrayList.get(i));
+      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]);
+    }
+    System.out.println("END testUncheckedListadd_intlong_initialCapacityDEFAULT_InsertMidPoint");
+  }
+  @Test
+  public void testUncheckedListput_intlong_initialCapacityNULL_NonThrowingIndex()
+  {
+    UncheckedList seq=new UncheckedList(0,null);
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertTolong(i));
+    }
+    for(int i=0;i<100;++i)
+    {
+      var putVal=TypeConversionUtil.convertTolong(100-i-1);
+      seq.put(i,putVal);
+      var expectedVal=TypeConversionUtil.convertTodouble(100-i-1);
+      Assertions.assertEquals(expectedVal,seq.arr[i]);
+      Assertions.assertEquals(100,seq.size());
     }
   }
   @Test
@@ -1869,9 +2734,10 @@ public class DoubleArrSeqListTest
     {
       seq.add(0,TypeConversionUtil.convertTolong(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[seq.size-i-1]);
     }
@@ -1884,9 +2750,10 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size,TypeConversionUtil.convertTolong(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
     }
@@ -1899,16 +2766,37 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size/2,TypeConversionUtil.convertTolong(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    ArrayList arrList=new ArrayList();
-    for(int i=0;i<seq.size;++i)
+    ArrayList arrayList=new ArrayList();
+    for(int i=0;i<seqSize;++i)
     {
-      seq.add(TypeConversionUtil.convertTolong(i));
+      arrayList.add(arrayList.size()/2,TypeConversionUtil.convertTodouble(i));
     }
-    for(int i=0;i<seq.size;++i)
+    System.out.println("BEGIN testUncheckedListadd_intlong_initialCapacityNULL_InsertMidPoint");
+    for(int i=0;i<seqSize;++i)
     {
-      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]));
+      System.out.println(arrayList.get(i));
+      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]);
+    }
+    System.out.println("END testUncheckedListadd_intlong_initialCapacityNULL_InsertMidPoint");
+  }
+  @Test
+  public void testUncheckedListput_intlong_initialCapacity50_NonThrowingIndex()
+  {
+    UncheckedList seq=new UncheckedList(50);
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertTolong(i));
+    }
+    for(int i=0;i<100;++i)
+    {
+      var putVal=TypeConversionUtil.convertTolong(100-i-1);
+      seq.put(i,putVal);
+      var expectedVal=TypeConversionUtil.convertTodouble(100-i-1);
+      Assertions.assertEquals(expectedVal,seq.arr[i]);
+      Assertions.assertEquals(100,seq.size());
     }
   }
   @Test
@@ -1919,9 +2807,10 @@ public class DoubleArrSeqListTest
     {
       seq.add(0,TypeConversionUtil.convertTolong(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[seq.size-i-1]);
     }
@@ -1934,9 +2823,10 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size,TypeConversionUtil.convertTolong(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
     }
@@ -1949,16 +2839,37 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size/2,TypeConversionUtil.convertTolong(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    ArrayList arrList=new ArrayList();
-    for(int i=0;i<seq.size;++i)
+    ArrayList arrayList=new ArrayList();
+    for(int i=0;i<seqSize;++i)
     {
-      seq.add(TypeConversionUtil.convertTolong(i));
+      arrayList.add(arrayList.size()/2,TypeConversionUtil.convertTodouble(i));
     }
-    for(int i=0;i<seq.size;++i)
+    System.out.println("BEGIN testUncheckedListadd_intlong_initialCapacity50_InsertMidPoint");
+    for(int i=0;i<seqSize;++i)
     {
-      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]));
+      System.out.println(arrayList.get(i));
+      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]);
+    }
+    System.out.println("END testUncheckedListadd_intlong_initialCapacity50_InsertMidPoint");
+  }
+  @Test
+  public void testUncheckedListput_intLong_initialCapacityDEFAULT_NonThrowingIndex()
+  {
+    UncheckedList seq=new UncheckedList();
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertToLong(i));
+    }
+    for(int i=0;i<100;++i)
+    {
+      var putVal=TypeConversionUtil.convertToLong(100-i-1);
+      seq.put(i,putVal);
+      var expectedVal=TypeConversionUtil.convertTodouble(100-i-1);
+      Assertions.assertEquals(expectedVal,seq.arr[i]);
+      Assertions.assertEquals(100,seq.size());
     }
   }
   @Test
@@ -1969,9 +2880,10 @@ public class DoubleArrSeqListTest
     {
       seq.add(0,TypeConversionUtil.convertToLong(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[seq.size-i-1]);
     }
@@ -1984,9 +2896,10 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size,TypeConversionUtil.convertToLong(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
     }
@@ -1999,16 +2912,37 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size/2,TypeConversionUtil.convertToLong(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    ArrayList arrList=new ArrayList();
-    for(int i=0;i<seq.size;++i)
+    ArrayList arrayList=new ArrayList();
+    for(int i=0;i<seqSize;++i)
     {
-      seq.add(TypeConversionUtil.convertToLong(i));
+      arrayList.add(arrayList.size()/2,TypeConversionUtil.convertTodouble(i));
     }
-    for(int i=0;i<seq.size;++i)
+    System.out.println("BEGIN testUncheckedListadd_intLong_initialCapacityDEFAULT_InsertMidPoint");
+    for(int i=0;i<seqSize;++i)
     {
-      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]));
+      System.out.println(arrayList.get(i));
+      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]);
+    }
+    System.out.println("END testUncheckedListadd_intLong_initialCapacityDEFAULT_InsertMidPoint");
+  }
+  @Test
+  public void testUncheckedListput_intLong_initialCapacityNULL_NonThrowingIndex()
+  {
+    UncheckedList seq=new UncheckedList(0,null);
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertToLong(i));
+    }
+    for(int i=0;i<100;++i)
+    {
+      var putVal=TypeConversionUtil.convertToLong(100-i-1);
+      seq.put(i,putVal);
+      var expectedVal=TypeConversionUtil.convertTodouble(100-i-1);
+      Assertions.assertEquals(expectedVal,seq.arr[i]);
+      Assertions.assertEquals(100,seq.size());
     }
   }
   @Test
@@ -2019,9 +2953,10 @@ public class DoubleArrSeqListTest
     {
       seq.add(0,TypeConversionUtil.convertToLong(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[seq.size-i-1]);
     }
@@ -2034,9 +2969,10 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size,TypeConversionUtil.convertToLong(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
     }
@@ -2049,16 +2985,37 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size/2,TypeConversionUtil.convertToLong(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    ArrayList arrList=new ArrayList();
-    for(int i=0;i<seq.size;++i)
+    ArrayList arrayList=new ArrayList();
+    for(int i=0;i<seqSize;++i)
     {
-      seq.add(TypeConversionUtil.convertToLong(i));
+      arrayList.add(arrayList.size()/2,TypeConversionUtil.convertTodouble(i));
     }
-    for(int i=0;i<seq.size;++i)
+    System.out.println("BEGIN testUncheckedListadd_intLong_initialCapacityNULL_InsertMidPoint");
+    for(int i=0;i<seqSize;++i)
     {
-      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]));
+      System.out.println(arrayList.get(i));
+      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]);
+    }
+    System.out.println("END testUncheckedListadd_intLong_initialCapacityNULL_InsertMidPoint");
+  }
+  @Test
+  public void testUncheckedListput_intLong_initialCapacity50_NonThrowingIndex()
+  {
+    UncheckedList seq=new UncheckedList(50);
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertToLong(i));
+    }
+    for(int i=0;i<100;++i)
+    {
+      var putVal=TypeConversionUtil.convertToLong(100-i-1);
+      seq.put(i,putVal);
+      var expectedVal=TypeConversionUtil.convertTodouble(100-i-1);
+      Assertions.assertEquals(expectedVal,seq.arr[i]);
+      Assertions.assertEquals(100,seq.size());
     }
   }
   @Test
@@ -2069,9 +3026,10 @@ public class DoubleArrSeqListTest
     {
       seq.add(0,TypeConversionUtil.convertToLong(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[seq.size-i-1]);
     }
@@ -2084,9 +3042,10 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size,TypeConversionUtil.convertToLong(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
     }
@@ -2099,16 +3058,37 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size/2,TypeConversionUtil.convertToLong(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    ArrayList arrList=new ArrayList();
-    for(int i=0;i<seq.size;++i)
+    ArrayList arrayList=new ArrayList();
+    for(int i=0;i<seqSize;++i)
     {
-      seq.add(TypeConversionUtil.convertToLong(i));
+      arrayList.add(arrayList.size()/2,TypeConversionUtil.convertTodouble(i));
     }
-    for(int i=0;i<seq.size;++i)
+    System.out.println("BEGIN testUncheckedListadd_intLong_initialCapacity50_InsertMidPoint");
+    for(int i=0;i<seqSize;++i)
     {
-      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]));
+      System.out.println(arrayList.get(i));
+      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]);
+    }
+    System.out.println("END testUncheckedListadd_intLong_initialCapacity50_InsertMidPoint");
+  }
+  @Test
+  public void testUncheckedListput_intfloat_initialCapacityDEFAULT_NonThrowingIndex()
+  {
+    UncheckedList seq=new UncheckedList();
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertTofloat(i));
+    }
+    for(int i=0;i<100;++i)
+    {
+      var putVal=TypeConversionUtil.convertTofloat(100-i-1);
+      seq.put(i,putVal);
+      var expectedVal=TypeConversionUtil.convertTodouble(100-i-1);
+      Assertions.assertEquals(expectedVal,seq.arr[i]);
+      Assertions.assertEquals(100,seq.size());
     }
   }
   @Test
@@ -2119,9 +3099,10 @@ public class DoubleArrSeqListTest
     {
       seq.add(0,TypeConversionUtil.convertTofloat(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[seq.size-i-1]);
     }
@@ -2134,9 +3115,10 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size,TypeConversionUtil.convertTofloat(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
     }
@@ -2149,16 +3131,37 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size/2,TypeConversionUtil.convertTofloat(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    ArrayList arrList=new ArrayList();
-    for(int i=0;i<seq.size;++i)
+    ArrayList arrayList=new ArrayList();
+    for(int i=0;i<seqSize;++i)
     {
-      seq.add(TypeConversionUtil.convertTofloat(i));
+      arrayList.add(arrayList.size()/2,TypeConversionUtil.convertTodouble(i));
     }
-    for(int i=0;i<seq.size;++i)
+    System.out.println("BEGIN testUncheckedListadd_intfloat_initialCapacityDEFAULT_InsertMidPoint");
+    for(int i=0;i<seqSize;++i)
     {
-      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]));
+      System.out.println(arrayList.get(i));
+      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]);
+    }
+    System.out.println("END testUncheckedListadd_intfloat_initialCapacityDEFAULT_InsertMidPoint");
+  }
+  @Test
+  public void testUncheckedListput_intfloat_initialCapacityNULL_NonThrowingIndex()
+  {
+    UncheckedList seq=new UncheckedList(0,null);
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertTofloat(i));
+    }
+    for(int i=0;i<100;++i)
+    {
+      var putVal=TypeConversionUtil.convertTofloat(100-i-1);
+      seq.put(i,putVal);
+      var expectedVal=TypeConversionUtil.convertTodouble(100-i-1);
+      Assertions.assertEquals(expectedVal,seq.arr[i]);
+      Assertions.assertEquals(100,seq.size());
     }
   }
   @Test
@@ -2169,9 +3172,10 @@ public class DoubleArrSeqListTest
     {
       seq.add(0,TypeConversionUtil.convertTofloat(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[seq.size-i-1]);
     }
@@ -2184,9 +3188,10 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size,TypeConversionUtil.convertTofloat(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
     }
@@ -2199,16 +3204,37 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size/2,TypeConversionUtil.convertTofloat(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    ArrayList arrList=new ArrayList();
-    for(int i=0;i<seq.size;++i)
+    ArrayList arrayList=new ArrayList();
+    for(int i=0;i<seqSize;++i)
     {
-      seq.add(TypeConversionUtil.convertTofloat(i));
+      arrayList.add(arrayList.size()/2,TypeConversionUtil.convertTodouble(i));
     }
-    for(int i=0;i<seq.size;++i)
+    System.out.println("BEGIN testUncheckedListadd_intfloat_initialCapacityNULL_InsertMidPoint");
+    for(int i=0;i<seqSize;++i)
     {
-      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]));
+      System.out.println(arrayList.get(i));
+      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]);
+    }
+    System.out.println("END testUncheckedListadd_intfloat_initialCapacityNULL_InsertMidPoint");
+  }
+  @Test
+  public void testUncheckedListput_intfloat_initialCapacity50_NonThrowingIndex()
+  {
+    UncheckedList seq=new UncheckedList(50);
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertTofloat(i));
+    }
+    for(int i=0;i<100;++i)
+    {
+      var putVal=TypeConversionUtil.convertTofloat(100-i-1);
+      seq.put(i,putVal);
+      var expectedVal=TypeConversionUtil.convertTodouble(100-i-1);
+      Assertions.assertEquals(expectedVal,seq.arr[i]);
+      Assertions.assertEquals(100,seq.size());
     }
   }
   @Test
@@ -2219,9 +3245,10 @@ public class DoubleArrSeqListTest
     {
       seq.add(0,TypeConversionUtil.convertTofloat(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[seq.size-i-1]);
     }
@@ -2234,9 +3261,10 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size,TypeConversionUtil.convertTofloat(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
     }
@@ -2249,16 +3277,37 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size/2,TypeConversionUtil.convertTofloat(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    ArrayList arrList=new ArrayList();
-    for(int i=0;i<seq.size;++i)
+    ArrayList arrayList=new ArrayList();
+    for(int i=0;i<seqSize;++i)
     {
-      seq.add(TypeConversionUtil.convertTofloat(i));
+      arrayList.add(arrayList.size()/2,TypeConversionUtil.convertTodouble(i));
     }
-    for(int i=0;i<seq.size;++i)
+    System.out.println("BEGIN testUncheckedListadd_intfloat_initialCapacity50_InsertMidPoint");
+    for(int i=0;i<seqSize;++i)
     {
-      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]));
+      System.out.println(arrayList.get(i));
+      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]);
+    }
+    System.out.println("END testUncheckedListadd_intfloat_initialCapacity50_InsertMidPoint");
+  }
+  @Test
+  public void testUncheckedListput_intFloat_initialCapacityDEFAULT_NonThrowingIndex()
+  {
+    UncheckedList seq=new UncheckedList();
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertToFloat(i));
+    }
+    for(int i=0;i<100;++i)
+    {
+      var putVal=TypeConversionUtil.convertToFloat(100-i-1);
+      seq.put(i,putVal);
+      var expectedVal=TypeConversionUtil.convertTodouble(100-i-1);
+      Assertions.assertEquals(expectedVal,seq.arr[i]);
+      Assertions.assertEquals(100,seq.size());
     }
   }
   @Test
@@ -2269,9 +3318,10 @@ public class DoubleArrSeqListTest
     {
       seq.add(0,TypeConversionUtil.convertToFloat(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[seq.size-i-1]);
     }
@@ -2284,9 +3334,10 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size,TypeConversionUtil.convertToFloat(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
     }
@@ -2299,16 +3350,37 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size/2,TypeConversionUtil.convertToFloat(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    ArrayList arrList=new ArrayList();
-    for(int i=0;i<seq.size;++i)
+    ArrayList arrayList=new ArrayList();
+    for(int i=0;i<seqSize;++i)
     {
-      seq.add(TypeConversionUtil.convertToFloat(i));
+      arrayList.add(arrayList.size()/2,TypeConversionUtil.convertTodouble(i));
     }
-    for(int i=0;i<seq.size;++i)
+    System.out.println("BEGIN testUncheckedListadd_intFloat_initialCapacityDEFAULT_InsertMidPoint");
+    for(int i=0;i<seqSize;++i)
     {
-      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]));
+      System.out.println(arrayList.get(i));
+      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]);
+    }
+    System.out.println("END testUncheckedListadd_intFloat_initialCapacityDEFAULT_InsertMidPoint");
+  }
+  @Test
+  public void testUncheckedListput_intFloat_initialCapacityNULL_NonThrowingIndex()
+  {
+    UncheckedList seq=new UncheckedList(0,null);
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertToFloat(i));
+    }
+    for(int i=0;i<100;++i)
+    {
+      var putVal=TypeConversionUtil.convertToFloat(100-i-1);
+      seq.put(i,putVal);
+      var expectedVal=TypeConversionUtil.convertTodouble(100-i-1);
+      Assertions.assertEquals(expectedVal,seq.arr[i]);
+      Assertions.assertEquals(100,seq.size());
     }
   }
   @Test
@@ -2319,9 +3391,10 @@ public class DoubleArrSeqListTest
     {
       seq.add(0,TypeConversionUtil.convertToFloat(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[seq.size-i-1]);
     }
@@ -2334,9 +3407,10 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size,TypeConversionUtil.convertToFloat(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
     }
@@ -2349,16 +3423,37 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size/2,TypeConversionUtil.convertToFloat(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    ArrayList arrList=new ArrayList();
-    for(int i=0;i<seq.size;++i)
+    ArrayList arrayList=new ArrayList();
+    for(int i=0;i<seqSize;++i)
     {
-      seq.add(TypeConversionUtil.convertToFloat(i));
+      arrayList.add(arrayList.size()/2,TypeConversionUtil.convertTodouble(i));
     }
-    for(int i=0;i<seq.size;++i)
+    System.out.println("BEGIN testUncheckedListadd_intFloat_initialCapacityNULL_InsertMidPoint");
+    for(int i=0;i<seqSize;++i)
     {
-      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]));
+      System.out.println(arrayList.get(i));
+      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]);
+    }
+    System.out.println("END testUncheckedListadd_intFloat_initialCapacityNULL_InsertMidPoint");
+  }
+  @Test
+  public void testUncheckedListput_intFloat_initialCapacity50_NonThrowingIndex()
+  {
+    UncheckedList seq=new UncheckedList(50);
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertToFloat(i));
+    }
+    for(int i=0;i<100;++i)
+    {
+      var putVal=TypeConversionUtil.convertToFloat(100-i-1);
+      seq.put(i,putVal);
+      var expectedVal=TypeConversionUtil.convertTodouble(100-i-1);
+      Assertions.assertEquals(expectedVal,seq.arr[i]);
+      Assertions.assertEquals(100,seq.size());
     }
   }
   @Test
@@ -2369,9 +3464,10 @@ public class DoubleArrSeqListTest
     {
       seq.add(0,TypeConversionUtil.convertToFloat(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[seq.size-i-1]);
     }
@@ -2384,9 +3480,10 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size,TypeConversionUtil.convertToFloat(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
     }
@@ -2399,16 +3496,200 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size/2,TypeConversionUtil.convertToFloat(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
-    ArrayList arrList=new ArrayList();
-    for(int i=0;i<seq.size;++i)
+    ArrayList arrayList=new ArrayList();
+    for(int i=0;i<seqSize;++i)
     {
-      seq.add(TypeConversionUtil.convertToFloat(i));
+      arrayList.add(arrayList.size()/2,TypeConversionUtil.convertTodouble(i));
     }
-    for(int i=0;i<seq.size;++i)
+    System.out.println("BEGIN testUncheckedListadd_intFloat_initialCapacity50_InsertMidPoint");
+    for(int i=0;i<seqSize;++i)
     {
-      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]));
+      System.out.println(arrayList.get(i));
+      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]);
+    }
+    System.out.println("END testUncheckedListadd_intFloat_initialCapacity50_InsertMidPoint");
+  }
+  @Test
+  public void testUncheckedListremoveDoubleAt_seqIsNotEmpty_removeAtEnd()
+  {
+    UncheckedList seq=new UncheckedList();
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertTodouble(i));
+    }
+    for(int i=0;i<100;++i)
+    {
+      int removeIndex=seq.size()-1;
+      Assertions.assertEquals(TypeConversionUtil.convertTodouble(seq.size()-1),seq.removeDoubleAt(removeIndex));
+      Assertions.assertEquals(100-i-1,seq.size());
+    }
+  }
+  @Test
+  public void testUncheckedListremoveDoubleAt_seqIsNotEmpty_removeAtBegin()
+  {
+    UncheckedList seq=new UncheckedList();
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertTodouble(i));
+    }
+    for(int i=0;i<100;++i)
+    {
+      int removeIndex=0;
+      Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.removeDoubleAt(removeIndex));
+      Assertions.assertEquals(100-i-1,seq.size());
+    }
+  }
+  @Test
+  public void testUncheckedListremoveDoubleAt_seqIsNotEmpty_removeAtMidPoint()
+  {
+    UncheckedList seq=new UncheckedList();
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertTodouble(i));
+    }
+    ArrayList arrayList=new ArrayList();
+    for(int i=0;i<100;++i)
+    {
+      arrayList.add(TypeConversionUtil.convertTodouble(i));
+    }
+    for(int i=0;i<100;++i)
+    {
+      int removeIndex=seq.size()/2;
+      Assertions.assertEquals(arrayList.remove(removeIndex),(Object)seq.removeDoubleAt(removeIndex));
+      Assertions.assertEquals(100-i-1,seq.size());
+    }
+  }
+  @Test
+  public void testUncheckedListgetDouble_seqIsNotEmpty_NonThrowingIndex()
+  {
+    UncheckedList seq=new UncheckedList();
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertTodouble(i));
+    }
+    for(int i=0;i<100;++i)
+    {
+      var expectedVal=TypeConversionUtil.convertTodouble(i);
+      Assertions.assertEquals(expectedVal,seq.getDouble(i));
+      Assertions.assertEquals(100,seq.size());
+    }
+  }
+  @Test
+  public void testUncheckedListremove_seqIsNotEmpty_removeAtEnd()
+  {
+    UncheckedList seq=new UncheckedList();
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertTodouble(i));
+    }
+    for(int i=0;i<100;++i)
+    {
+      int removeIndex=seq.size()-1;
+      Assertions.assertEquals(TypeConversionUtil.convertToDouble(seq.size()-1),seq.remove(removeIndex));
+      Assertions.assertEquals(100-i-1,seq.size());
+    }
+  }
+  @Test
+  public void testUncheckedListremove_seqIsNotEmpty_removeAtBegin()
+  {
+    UncheckedList seq=new UncheckedList();
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertTodouble(i));
+    }
+    for(int i=0;i<100;++i)
+    {
+      int removeIndex=0;
+      Assertions.assertEquals(TypeConversionUtil.convertToDouble(i),seq.remove(removeIndex));
+      Assertions.assertEquals(100-i-1,seq.size());
+    }
+  }
+  @Test
+  public void testUncheckedListremove_seqIsNotEmpty_removeAtMidPoint()
+  {
+    UncheckedList seq=new UncheckedList();
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertTodouble(i));
+    }
+    ArrayList arrayList=new ArrayList();
+    for(int i=0;i<100;++i)
+    {
+      arrayList.add(TypeConversionUtil.convertToDouble(i));
+    }
+    for(int i=0;i<100;++i)
+    {
+      int removeIndex=seq.size()/2;
+      Assertions.assertEquals(arrayList.remove(removeIndex),(Object)seq.remove(removeIndex));
+      Assertions.assertEquals(100-i-1,seq.size());
+    }
+  }
+  @Test
+  public void testUncheckedListget_seqIsNotEmpty_NonThrowingIndex()
+  {
+    UncheckedList seq=new UncheckedList();
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertTodouble(i));
+    }
+    for(int i=0;i<100;++i)
+    {
+      var expectedVal=TypeConversionUtil.convertToDouble(i);
+      Assertions.assertEquals(expectedVal,seq.get(i));
+      Assertions.assertEquals(100,seq.size());
+    }
+  }
+  @Test
+  public void testUncheckedListset_intdouble_seqIsNotEmpty_NonThrowingIndex()
+  {
+    UncheckedList seq=new UncheckedList();
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertTodouble(i));
+    }
+    for(int i=0;i<100;++i)
+    {
+      var inputVal=TypeConversionUtil.convertTodouble(100-i-1);
+      Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.set(i,inputVal));
+      Assertions.assertEquals(inputVal,(double)seq.arr[i]);
+      Assertions.assertEquals(100,seq.size());
+    }
+  }
+  @Test
+  public void testUncheckedListset_intDouble_seqIsNotEmpty_NonThrowingIndex()
+  {
+    UncheckedList seq=new UncheckedList();
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertToDouble(i));
+    }
+    for(int i=0;i<100;++i)
+    {
+      var inputVal=TypeConversionUtil.convertToDouble(100-i-1);
+      Assertions.assertEquals(TypeConversionUtil.convertToDouble(i),seq.set(i,inputVal));
+      Assertions.assertEquals(inputVal,(Double)seq.arr[i]);
+      Assertions.assertEquals(100,seq.size());
+    }
+  }
+  @Test
+  public void testCheckedListput_intdouble_initialCapacityDEFAULT_NonThrowingIndex()
+  {
+    CheckedList seq=new CheckedList();
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertTodouble(i));
+    }
+    for(int i=0;i<100;++i)
+    {
+      var putVal=TypeConversionUtil.convertTodouble(100-i-1);
+      seq.put(i,putVal);
+      var expectedVal=TypeConversionUtil.convertTodouble(100-i-1);
+      Assertions.assertEquals(expectedVal,seq.arr[i]);
+      Assertions.assertEquals(100,seq.size());
+      Assertions.assertEquals(100,seq.modCount);
     }
   }
   @Test
@@ -2419,10 +3700,11 @@ public class DoubleArrSeqListTest
     {
       seq.add(0,TypeConversionUtil.convertTodouble(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[seq.size-i-1]);
     }
@@ -2435,10 +3717,11 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size,TypeConversionUtil.convertTodouble(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
     }
@@ -2451,37 +3734,89 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size/2,TypeConversionUtil.convertTodouble(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    ArrayList arrList=new ArrayList();
-    for(int i=0;i<seq.size;++i)
+    ArrayList arrayList=new ArrayList();
+    for(int i=0;i<seqSize;++i)
     {
-      seq.add(TypeConversionUtil.convertTodouble(i));
+      arrayList.add(arrayList.size()/2,TypeConversionUtil.convertTodouble(i));
     }
-    for(int i=0;i<seq.size;++i)
+    System.out.println("BEGIN testCheckedListadd_intdouble_initialCapacityDEFAULT_InsertMidPoint");
+    for(int i=0;i<seqSize;++i)
     {
-      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]));
+      System.out.println(arrayList.get(i));
+      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]);
+    }
+    System.out.println("END testCheckedListadd_intdouble_initialCapacityDEFAULT_InsertMidPoint");
+  }
+  @Test
+  public void testCheckedListput_intdouble_initialCapacityDEFAULT_seqIsEmpty_hiIndex()
+  {
+    CheckedList seq=new CheckedList();
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(0,TypeConversionUtil.convertTodouble(5)));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intdouble_initialCapacityDEFAULT_seqIsEmpty_negativeIndex()
+  {
+    CheckedList seq=new CheckedList();
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(-1,TypeConversionUtil.convertTodouble(5)));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intdouble_initialCapacityDEFAULT_seqIsNotEmpty_hiIndex()
+  {
+    CheckedList seq=new CheckedList();
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertTodouble(i));
+    }
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(seq.size(),TypeConversionUtil.convertTodouble(5)));
+    Assertions.assertEquals(100,seq.size());
+    Assertions.assertEquals(100,seq.modCount);
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
     }
   }
   @Test
-  public void testCheckedListadd_intdouble_initialCapacityDEFAULT_emptyInsertOOBLo()
+  public void testCheckedListput_intdouble_initialCapacityDEFAULT_seqIsNotEmpty_negativeIndex()
+  {
+    CheckedList seq=new CheckedList();
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertTodouble(i));
+    }
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(-1,TypeConversionUtil.convertTodouble(5)));
+    Assertions.assertEquals(100,seq.size());
+    Assertions.assertEquals(100,seq.modCount);
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
+    }
+  }
+  @Test
+  public void testCheckedListadd_intdouble_initialCapacityDEFAULT_seqIsEmpty_negativeIndex()
   {
     CheckedList seq=new CheckedList();
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(-1,TypeConversionUtil.convertTodouble(5)));
-    Assertions.assertEquals(0,seq.size);
+    Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intdouble_initialCapacityDEFAULT_emptyInsertOOBHi()
+  public void testCheckedListadd_intdouble_initialCapacityDEFAULT_seqIsEmpty_hiIndex()
   {
     CheckedList seq=new CheckedList();
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(seq.size+1,TypeConversionUtil.convertTodouble(5)));
-    Assertions.assertEquals(0,seq.size);
+    Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intdouble_initialCapacityDEFAULT_NotEmptyInsertOOBLo()
+  public void testCheckedListadd_intdouble_initialCapacityDEFAULT_seqIsNotEmpty_negativeIndex()
   {
     CheckedList seq=new CheckedList();
     for(int i=0;i<100;++i)
@@ -2489,11 +3824,11 @@ public class DoubleArrSeqListTest
       seq.add(seq.size,TypeConversionUtil.convertTodouble(i));
     }
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(-1,TypeConversionUtil.convertTodouble(5)));
-    Assertions.assertEquals(100,seq.size);
+    Assertions.assertEquals(100,seq.size());
     Assertions.assertEquals(100,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intdouble_initialCapacityDEFAULT_NotEmptyInsertOOBHi()
+  public void testCheckedListadd_intdouble_initialCapacityDEFAULT_seqIsNotEmpty_hiIndex()
   {
     CheckedList seq=new CheckedList();
     for(int i=0;i<100;++i)
@@ -2501,8 +3836,26 @@ public class DoubleArrSeqListTest
       seq.add(seq.size,TypeConversionUtil.convertTodouble(i));
     }
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(seq.size+1,TypeConversionUtil.convertTodouble(5)));
-    Assertions.assertEquals(100,seq.size);
+    Assertions.assertEquals(100,seq.size());
     Assertions.assertEquals(100,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intdouble_initialCapacityNULL_NonThrowingIndex()
+  {
+    CheckedList seq=new CheckedList(0,null);
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertTodouble(i));
+    }
+    for(int i=0;i<100;++i)
+    {
+      var putVal=TypeConversionUtil.convertTodouble(100-i-1);
+      seq.put(i,putVal);
+      var expectedVal=TypeConversionUtil.convertTodouble(100-i-1);
+      Assertions.assertEquals(expectedVal,seq.arr[i]);
+      Assertions.assertEquals(100,seq.size());
+      Assertions.assertEquals(100,seq.modCount);
+    }
   }
   @Test
   public void testCheckedListadd_intdouble_initialCapacityNULL_InsertBegin()
@@ -2512,10 +3865,11 @@ public class DoubleArrSeqListTest
     {
       seq.add(0,TypeConversionUtil.convertTodouble(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[seq.size-i-1]);
     }
@@ -2528,10 +3882,11 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size,TypeConversionUtil.convertTodouble(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
     }
@@ -2544,37 +3899,89 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size/2,TypeConversionUtil.convertTodouble(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    ArrayList arrList=new ArrayList();
-    for(int i=0;i<seq.size;++i)
+    ArrayList arrayList=new ArrayList();
+    for(int i=0;i<seqSize;++i)
     {
-      seq.add(TypeConversionUtil.convertTodouble(i));
+      arrayList.add(arrayList.size()/2,TypeConversionUtil.convertTodouble(i));
     }
-    for(int i=0;i<seq.size;++i)
+    System.out.println("BEGIN testCheckedListadd_intdouble_initialCapacityNULL_InsertMidPoint");
+    for(int i=0;i<seqSize;++i)
     {
-      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]));
+      System.out.println(arrayList.get(i));
+      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]);
+    }
+    System.out.println("END testCheckedListadd_intdouble_initialCapacityNULL_InsertMidPoint");
+  }
+  @Test
+  public void testCheckedListput_intdouble_initialCapacityNULL_seqIsEmpty_hiIndex()
+  {
+    CheckedList seq=new CheckedList(0,null);
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(0,TypeConversionUtil.convertTodouble(5)));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intdouble_initialCapacityNULL_seqIsEmpty_negativeIndex()
+  {
+    CheckedList seq=new CheckedList(0,null);
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(-1,TypeConversionUtil.convertTodouble(5)));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intdouble_initialCapacityNULL_seqIsNotEmpty_hiIndex()
+  {
+    CheckedList seq=new CheckedList(0,null);
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertTodouble(i));
+    }
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(seq.size(),TypeConversionUtil.convertTodouble(5)));
+    Assertions.assertEquals(100,seq.size());
+    Assertions.assertEquals(100,seq.modCount);
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
     }
   }
   @Test
-  public void testCheckedListadd_intdouble_initialCapacityNULL_emptyInsertOOBLo()
+  public void testCheckedListput_intdouble_initialCapacityNULL_seqIsNotEmpty_negativeIndex()
+  {
+    CheckedList seq=new CheckedList(0,null);
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertTodouble(i));
+    }
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(-1,TypeConversionUtil.convertTodouble(5)));
+    Assertions.assertEquals(100,seq.size());
+    Assertions.assertEquals(100,seq.modCount);
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
+    }
+  }
+  @Test
+  public void testCheckedListadd_intdouble_initialCapacityNULL_seqIsEmpty_negativeIndex()
   {
     CheckedList seq=new CheckedList(0,null);
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(-1,TypeConversionUtil.convertTodouble(5)));
-    Assertions.assertEquals(0,seq.size);
+    Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intdouble_initialCapacityNULL_emptyInsertOOBHi()
+  public void testCheckedListadd_intdouble_initialCapacityNULL_seqIsEmpty_hiIndex()
   {
     CheckedList seq=new CheckedList(0,null);
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(seq.size+1,TypeConversionUtil.convertTodouble(5)));
-    Assertions.assertEquals(0,seq.size);
+    Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intdouble_initialCapacityNULL_NotEmptyInsertOOBLo()
+  public void testCheckedListadd_intdouble_initialCapacityNULL_seqIsNotEmpty_negativeIndex()
   {
     CheckedList seq=new CheckedList(0,null);
     for(int i=0;i<100;++i)
@@ -2582,11 +3989,11 @@ public class DoubleArrSeqListTest
       seq.add(seq.size,TypeConversionUtil.convertTodouble(i));
     }
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(-1,TypeConversionUtil.convertTodouble(5)));
-    Assertions.assertEquals(100,seq.size);
+    Assertions.assertEquals(100,seq.size());
     Assertions.assertEquals(100,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intdouble_initialCapacityNULL_NotEmptyInsertOOBHi()
+  public void testCheckedListadd_intdouble_initialCapacityNULL_seqIsNotEmpty_hiIndex()
   {
     CheckedList seq=new CheckedList(0,null);
     for(int i=0;i<100;++i)
@@ -2594,8 +4001,26 @@ public class DoubleArrSeqListTest
       seq.add(seq.size,TypeConversionUtil.convertTodouble(i));
     }
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(seq.size+1,TypeConversionUtil.convertTodouble(5)));
-    Assertions.assertEquals(100,seq.size);
+    Assertions.assertEquals(100,seq.size());
     Assertions.assertEquals(100,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intdouble_initialCapacity50_NonThrowingIndex()
+  {
+    CheckedList seq=new CheckedList(50);
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertTodouble(i));
+    }
+    for(int i=0;i<100;++i)
+    {
+      var putVal=TypeConversionUtil.convertTodouble(100-i-1);
+      seq.put(i,putVal);
+      var expectedVal=TypeConversionUtil.convertTodouble(100-i-1);
+      Assertions.assertEquals(expectedVal,seq.arr[i]);
+      Assertions.assertEquals(100,seq.size());
+      Assertions.assertEquals(100,seq.modCount);
+    }
   }
   @Test
   public void testCheckedListadd_intdouble_initialCapacity50_InsertBegin()
@@ -2605,10 +4030,11 @@ public class DoubleArrSeqListTest
     {
       seq.add(0,TypeConversionUtil.convertTodouble(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[seq.size-i-1]);
     }
@@ -2621,10 +4047,11 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size,TypeConversionUtil.convertTodouble(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
     }
@@ -2637,37 +4064,89 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size/2,TypeConversionUtil.convertTodouble(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    ArrayList arrList=new ArrayList();
-    for(int i=0;i<seq.size;++i)
+    ArrayList arrayList=new ArrayList();
+    for(int i=0;i<seqSize;++i)
     {
-      seq.add(TypeConversionUtil.convertTodouble(i));
+      arrayList.add(arrayList.size()/2,TypeConversionUtil.convertTodouble(i));
     }
-    for(int i=0;i<seq.size;++i)
+    System.out.println("BEGIN testCheckedListadd_intdouble_initialCapacity50_InsertMidPoint");
+    for(int i=0;i<seqSize;++i)
     {
-      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]));
+      System.out.println(arrayList.get(i));
+      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]);
+    }
+    System.out.println("END testCheckedListadd_intdouble_initialCapacity50_InsertMidPoint");
+  }
+  @Test
+  public void testCheckedListput_intdouble_initialCapacity50_seqIsEmpty_hiIndex()
+  {
+    CheckedList seq=new CheckedList(50);
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(0,TypeConversionUtil.convertTodouble(5)));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intdouble_initialCapacity50_seqIsEmpty_negativeIndex()
+  {
+    CheckedList seq=new CheckedList(50);
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(-1,TypeConversionUtil.convertTodouble(5)));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intdouble_initialCapacity50_seqIsNotEmpty_hiIndex()
+  {
+    CheckedList seq=new CheckedList(50);
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertTodouble(i));
+    }
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(seq.size(),TypeConversionUtil.convertTodouble(5)));
+    Assertions.assertEquals(100,seq.size());
+    Assertions.assertEquals(100,seq.modCount);
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
     }
   }
   @Test
-  public void testCheckedListadd_intdouble_initialCapacity50_emptyInsertOOBLo()
+  public void testCheckedListput_intdouble_initialCapacity50_seqIsNotEmpty_negativeIndex()
+  {
+    CheckedList seq=new CheckedList(50);
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertTodouble(i));
+    }
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(-1,TypeConversionUtil.convertTodouble(5)));
+    Assertions.assertEquals(100,seq.size());
+    Assertions.assertEquals(100,seq.modCount);
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
+    }
+  }
+  @Test
+  public void testCheckedListadd_intdouble_initialCapacity50_seqIsEmpty_negativeIndex()
   {
     CheckedList seq=new CheckedList(50);
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(-1,TypeConversionUtil.convertTodouble(5)));
-    Assertions.assertEquals(0,seq.size);
+    Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intdouble_initialCapacity50_emptyInsertOOBHi()
+  public void testCheckedListadd_intdouble_initialCapacity50_seqIsEmpty_hiIndex()
   {
     CheckedList seq=new CheckedList(50);
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(seq.size+1,TypeConversionUtil.convertTodouble(5)));
-    Assertions.assertEquals(0,seq.size);
+    Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intdouble_initialCapacity50_NotEmptyInsertOOBLo()
+  public void testCheckedListadd_intdouble_initialCapacity50_seqIsNotEmpty_negativeIndex()
   {
     CheckedList seq=new CheckedList(50);
     for(int i=0;i<100;++i)
@@ -2675,11 +4154,11 @@ public class DoubleArrSeqListTest
       seq.add(seq.size,TypeConversionUtil.convertTodouble(i));
     }
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(-1,TypeConversionUtil.convertTodouble(5)));
-    Assertions.assertEquals(100,seq.size);
+    Assertions.assertEquals(100,seq.size());
     Assertions.assertEquals(100,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intdouble_initialCapacity50_NotEmptyInsertOOBHi()
+  public void testCheckedListadd_intdouble_initialCapacity50_seqIsNotEmpty_hiIndex()
   {
     CheckedList seq=new CheckedList(50);
     for(int i=0;i<100;++i)
@@ -2687,8 +4166,26 @@ public class DoubleArrSeqListTest
       seq.add(seq.size,TypeConversionUtil.convertTodouble(i));
     }
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(seq.size+1,TypeConversionUtil.convertTodouble(5)));
-    Assertions.assertEquals(100,seq.size);
+    Assertions.assertEquals(100,seq.size());
     Assertions.assertEquals(100,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intDouble_initialCapacityDEFAULT_NonThrowingIndex()
+  {
+    CheckedList seq=new CheckedList();
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertToDouble(i));
+    }
+    for(int i=0;i<100;++i)
+    {
+      var putVal=TypeConversionUtil.convertToDouble(100-i-1);
+      seq.put(i,putVal);
+      var expectedVal=TypeConversionUtil.convertTodouble(100-i-1);
+      Assertions.assertEquals(expectedVal,seq.arr[i]);
+      Assertions.assertEquals(100,seq.size());
+      Assertions.assertEquals(100,seq.modCount);
+    }
   }
   @Test
   public void testCheckedListadd_intDouble_initialCapacityDEFAULT_InsertBegin()
@@ -2698,10 +4195,11 @@ public class DoubleArrSeqListTest
     {
       seq.add(0,TypeConversionUtil.convertToDouble(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[seq.size-i-1]);
     }
@@ -2714,10 +4212,11 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size,TypeConversionUtil.convertToDouble(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
     }
@@ -2730,37 +4229,89 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size/2,TypeConversionUtil.convertToDouble(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    ArrayList arrList=new ArrayList();
-    for(int i=0;i<seq.size;++i)
+    ArrayList arrayList=new ArrayList();
+    for(int i=0;i<seqSize;++i)
     {
-      seq.add(TypeConversionUtil.convertToDouble(i));
+      arrayList.add(arrayList.size()/2,TypeConversionUtil.convertTodouble(i));
     }
-    for(int i=0;i<seq.size;++i)
+    System.out.println("BEGIN testCheckedListadd_intDouble_initialCapacityDEFAULT_InsertMidPoint");
+    for(int i=0;i<seqSize;++i)
     {
-      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]));
+      System.out.println(arrayList.get(i));
+      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]);
+    }
+    System.out.println("END testCheckedListadd_intDouble_initialCapacityDEFAULT_InsertMidPoint");
+  }
+  @Test
+  public void testCheckedListput_intDouble_initialCapacityDEFAULT_seqIsEmpty_hiIndex()
+  {
+    CheckedList seq=new CheckedList();
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(0,TypeConversionUtil.convertToDouble(5)));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intDouble_initialCapacityDEFAULT_seqIsEmpty_negativeIndex()
+  {
+    CheckedList seq=new CheckedList();
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(-1,TypeConversionUtil.convertToDouble(5)));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intDouble_initialCapacityDEFAULT_seqIsNotEmpty_hiIndex()
+  {
+    CheckedList seq=new CheckedList();
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertToDouble(i));
+    }
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(seq.size(),TypeConversionUtil.convertToDouble(5)));
+    Assertions.assertEquals(100,seq.size());
+    Assertions.assertEquals(100,seq.modCount);
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
     }
   }
   @Test
-  public void testCheckedListadd_intDouble_initialCapacityDEFAULT_emptyInsertOOBLo()
+  public void testCheckedListput_intDouble_initialCapacityDEFAULT_seqIsNotEmpty_negativeIndex()
+  {
+    CheckedList seq=new CheckedList();
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertToDouble(i));
+    }
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(-1,TypeConversionUtil.convertToDouble(5)));
+    Assertions.assertEquals(100,seq.size());
+    Assertions.assertEquals(100,seq.modCount);
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
+    }
+  }
+  @Test
+  public void testCheckedListadd_intDouble_initialCapacityDEFAULT_seqIsEmpty_negativeIndex()
   {
     CheckedList seq=new CheckedList();
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(-1,TypeConversionUtil.convertToDouble(5)));
-    Assertions.assertEquals(0,seq.size);
+    Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intDouble_initialCapacityDEFAULT_emptyInsertOOBHi()
+  public void testCheckedListadd_intDouble_initialCapacityDEFAULT_seqIsEmpty_hiIndex()
   {
     CheckedList seq=new CheckedList();
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(seq.size+1,TypeConversionUtil.convertToDouble(5)));
-    Assertions.assertEquals(0,seq.size);
+    Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intDouble_initialCapacityDEFAULT_NotEmptyInsertOOBLo()
+  public void testCheckedListadd_intDouble_initialCapacityDEFAULT_seqIsNotEmpty_negativeIndex()
   {
     CheckedList seq=new CheckedList();
     for(int i=0;i<100;++i)
@@ -2768,11 +4319,11 @@ public class DoubleArrSeqListTest
       seq.add(seq.size,TypeConversionUtil.convertToDouble(i));
     }
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(-1,TypeConversionUtil.convertToDouble(5)));
-    Assertions.assertEquals(100,seq.size);
+    Assertions.assertEquals(100,seq.size());
     Assertions.assertEquals(100,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intDouble_initialCapacityDEFAULT_NotEmptyInsertOOBHi()
+  public void testCheckedListadd_intDouble_initialCapacityDEFAULT_seqIsNotEmpty_hiIndex()
   {
     CheckedList seq=new CheckedList();
     for(int i=0;i<100;++i)
@@ -2780,8 +4331,26 @@ public class DoubleArrSeqListTest
       seq.add(seq.size,TypeConversionUtil.convertToDouble(i));
     }
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(seq.size+1,TypeConversionUtil.convertToDouble(5)));
-    Assertions.assertEquals(100,seq.size);
+    Assertions.assertEquals(100,seq.size());
     Assertions.assertEquals(100,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intDouble_initialCapacityNULL_NonThrowingIndex()
+  {
+    CheckedList seq=new CheckedList(0,null);
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertToDouble(i));
+    }
+    for(int i=0;i<100;++i)
+    {
+      var putVal=TypeConversionUtil.convertToDouble(100-i-1);
+      seq.put(i,putVal);
+      var expectedVal=TypeConversionUtil.convertTodouble(100-i-1);
+      Assertions.assertEquals(expectedVal,seq.arr[i]);
+      Assertions.assertEquals(100,seq.size());
+      Assertions.assertEquals(100,seq.modCount);
+    }
   }
   @Test
   public void testCheckedListadd_intDouble_initialCapacityNULL_InsertBegin()
@@ -2791,10 +4360,11 @@ public class DoubleArrSeqListTest
     {
       seq.add(0,TypeConversionUtil.convertToDouble(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[seq.size-i-1]);
     }
@@ -2807,10 +4377,11 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size,TypeConversionUtil.convertToDouble(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
     }
@@ -2823,37 +4394,89 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size/2,TypeConversionUtil.convertToDouble(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    ArrayList arrList=new ArrayList();
-    for(int i=0;i<seq.size;++i)
+    ArrayList arrayList=new ArrayList();
+    for(int i=0;i<seqSize;++i)
     {
-      seq.add(TypeConversionUtil.convertToDouble(i));
+      arrayList.add(arrayList.size()/2,TypeConversionUtil.convertTodouble(i));
     }
-    for(int i=0;i<seq.size;++i)
+    System.out.println("BEGIN testCheckedListadd_intDouble_initialCapacityNULL_InsertMidPoint");
+    for(int i=0;i<seqSize;++i)
     {
-      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]));
+      System.out.println(arrayList.get(i));
+      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]);
+    }
+    System.out.println("END testCheckedListadd_intDouble_initialCapacityNULL_InsertMidPoint");
+  }
+  @Test
+  public void testCheckedListput_intDouble_initialCapacityNULL_seqIsEmpty_hiIndex()
+  {
+    CheckedList seq=new CheckedList(0,null);
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(0,TypeConversionUtil.convertToDouble(5)));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intDouble_initialCapacityNULL_seqIsEmpty_negativeIndex()
+  {
+    CheckedList seq=new CheckedList(0,null);
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(-1,TypeConversionUtil.convertToDouble(5)));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intDouble_initialCapacityNULL_seqIsNotEmpty_hiIndex()
+  {
+    CheckedList seq=new CheckedList(0,null);
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertToDouble(i));
+    }
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(seq.size(),TypeConversionUtil.convertToDouble(5)));
+    Assertions.assertEquals(100,seq.size());
+    Assertions.assertEquals(100,seq.modCount);
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
     }
   }
   @Test
-  public void testCheckedListadd_intDouble_initialCapacityNULL_emptyInsertOOBLo()
+  public void testCheckedListput_intDouble_initialCapacityNULL_seqIsNotEmpty_negativeIndex()
+  {
+    CheckedList seq=new CheckedList(0,null);
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertToDouble(i));
+    }
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(-1,TypeConversionUtil.convertToDouble(5)));
+    Assertions.assertEquals(100,seq.size());
+    Assertions.assertEquals(100,seq.modCount);
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
+    }
+  }
+  @Test
+  public void testCheckedListadd_intDouble_initialCapacityNULL_seqIsEmpty_negativeIndex()
   {
     CheckedList seq=new CheckedList(0,null);
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(-1,TypeConversionUtil.convertToDouble(5)));
-    Assertions.assertEquals(0,seq.size);
+    Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intDouble_initialCapacityNULL_emptyInsertOOBHi()
+  public void testCheckedListadd_intDouble_initialCapacityNULL_seqIsEmpty_hiIndex()
   {
     CheckedList seq=new CheckedList(0,null);
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(seq.size+1,TypeConversionUtil.convertToDouble(5)));
-    Assertions.assertEquals(0,seq.size);
+    Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intDouble_initialCapacityNULL_NotEmptyInsertOOBLo()
+  public void testCheckedListadd_intDouble_initialCapacityNULL_seqIsNotEmpty_negativeIndex()
   {
     CheckedList seq=new CheckedList(0,null);
     for(int i=0;i<100;++i)
@@ -2861,11 +4484,11 @@ public class DoubleArrSeqListTest
       seq.add(seq.size,TypeConversionUtil.convertToDouble(i));
     }
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(-1,TypeConversionUtil.convertToDouble(5)));
-    Assertions.assertEquals(100,seq.size);
+    Assertions.assertEquals(100,seq.size());
     Assertions.assertEquals(100,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intDouble_initialCapacityNULL_NotEmptyInsertOOBHi()
+  public void testCheckedListadd_intDouble_initialCapacityNULL_seqIsNotEmpty_hiIndex()
   {
     CheckedList seq=new CheckedList(0,null);
     for(int i=0;i<100;++i)
@@ -2873,8 +4496,26 @@ public class DoubleArrSeqListTest
       seq.add(seq.size,TypeConversionUtil.convertToDouble(i));
     }
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(seq.size+1,TypeConversionUtil.convertToDouble(5)));
-    Assertions.assertEquals(100,seq.size);
+    Assertions.assertEquals(100,seq.size());
     Assertions.assertEquals(100,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intDouble_initialCapacity50_NonThrowingIndex()
+  {
+    CheckedList seq=new CheckedList(50);
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertToDouble(i));
+    }
+    for(int i=0;i<100;++i)
+    {
+      var putVal=TypeConversionUtil.convertToDouble(100-i-1);
+      seq.put(i,putVal);
+      var expectedVal=TypeConversionUtil.convertTodouble(100-i-1);
+      Assertions.assertEquals(expectedVal,seq.arr[i]);
+      Assertions.assertEquals(100,seq.size());
+      Assertions.assertEquals(100,seq.modCount);
+    }
   }
   @Test
   public void testCheckedListadd_intDouble_initialCapacity50_InsertBegin()
@@ -2884,10 +4525,11 @@ public class DoubleArrSeqListTest
     {
       seq.add(0,TypeConversionUtil.convertToDouble(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[seq.size-i-1]);
     }
@@ -2900,10 +4542,11 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size,TypeConversionUtil.convertToDouble(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
     }
@@ -2916,37 +4559,89 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size/2,TypeConversionUtil.convertToDouble(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    ArrayList arrList=new ArrayList();
-    for(int i=0;i<seq.size;++i)
+    ArrayList arrayList=new ArrayList();
+    for(int i=0;i<seqSize;++i)
     {
-      seq.add(TypeConversionUtil.convertToDouble(i));
+      arrayList.add(arrayList.size()/2,TypeConversionUtil.convertTodouble(i));
     }
-    for(int i=0;i<seq.size;++i)
+    System.out.println("BEGIN testCheckedListadd_intDouble_initialCapacity50_InsertMidPoint");
+    for(int i=0;i<seqSize;++i)
     {
-      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]));
+      System.out.println(arrayList.get(i));
+      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]);
+    }
+    System.out.println("END testCheckedListadd_intDouble_initialCapacity50_InsertMidPoint");
+  }
+  @Test
+  public void testCheckedListput_intDouble_initialCapacity50_seqIsEmpty_hiIndex()
+  {
+    CheckedList seq=new CheckedList(50);
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(0,TypeConversionUtil.convertToDouble(5)));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intDouble_initialCapacity50_seqIsEmpty_negativeIndex()
+  {
+    CheckedList seq=new CheckedList(50);
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(-1,TypeConversionUtil.convertToDouble(5)));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intDouble_initialCapacity50_seqIsNotEmpty_hiIndex()
+  {
+    CheckedList seq=new CheckedList(50);
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertToDouble(i));
+    }
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(seq.size(),TypeConversionUtil.convertToDouble(5)));
+    Assertions.assertEquals(100,seq.size());
+    Assertions.assertEquals(100,seq.modCount);
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
     }
   }
   @Test
-  public void testCheckedListadd_intDouble_initialCapacity50_emptyInsertOOBLo()
+  public void testCheckedListput_intDouble_initialCapacity50_seqIsNotEmpty_negativeIndex()
+  {
+    CheckedList seq=new CheckedList(50);
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertToDouble(i));
+    }
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(-1,TypeConversionUtil.convertToDouble(5)));
+    Assertions.assertEquals(100,seq.size());
+    Assertions.assertEquals(100,seq.modCount);
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
+    }
+  }
+  @Test
+  public void testCheckedListadd_intDouble_initialCapacity50_seqIsEmpty_negativeIndex()
   {
     CheckedList seq=new CheckedList(50);
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(-1,TypeConversionUtil.convertToDouble(5)));
-    Assertions.assertEquals(0,seq.size);
+    Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intDouble_initialCapacity50_emptyInsertOOBHi()
+  public void testCheckedListadd_intDouble_initialCapacity50_seqIsEmpty_hiIndex()
   {
     CheckedList seq=new CheckedList(50);
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(seq.size+1,TypeConversionUtil.convertToDouble(5)));
-    Assertions.assertEquals(0,seq.size);
+    Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intDouble_initialCapacity50_NotEmptyInsertOOBLo()
+  public void testCheckedListadd_intDouble_initialCapacity50_seqIsNotEmpty_negativeIndex()
   {
     CheckedList seq=new CheckedList(50);
     for(int i=0;i<100;++i)
@@ -2954,11 +4649,11 @@ public class DoubleArrSeqListTest
       seq.add(seq.size,TypeConversionUtil.convertToDouble(i));
     }
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(-1,TypeConversionUtil.convertToDouble(5)));
-    Assertions.assertEquals(100,seq.size);
+    Assertions.assertEquals(100,seq.size());
     Assertions.assertEquals(100,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intDouble_initialCapacity50_NotEmptyInsertOOBHi()
+  public void testCheckedListadd_intDouble_initialCapacity50_seqIsNotEmpty_hiIndex()
   {
     CheckedList seq=new CheckedList(50);
     for(int i=0;i<100;++i)
@@ -2966,8 +4661,26 @@ public class DoubleArrSeqListTest
       seq.add(seq.size,TypeConversionUtil.convertToDouble(i));
     }
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(seq.size+1,TypeConversionUtil.convertToDouble(5)));
-    Assertions.assertEquals(100,seq.size);
+    Assertions.assertEquals(100,seq.size());
     Assertions.assertEquals(100,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intboolean_initialCapacityDEFAULT_NonThrowingIndex()
+  {
+    CheckedList seq=new CheckedList();
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertToboolean(i));
+    }
+    for(int i=0;i<100;++i)
+    {
+      var putVal=TypeConversionUtil.convertToboolean(100-i-1);
+      seq.put(i,putVal);
+      var expectedVal=TypeConversionUtil.convertTodoubleboolean(100-i-1);
+      Assertions.assertEquals(expectedVal,seq.arr[i]);
+      Assertions.assertEquals(100,seq.size());
+      Assertions.assertEquals(100,seq.modCount);
+    }
   }
   @Test
   public void testCheckedListadd_intboolean_initialCapacityDEFAULT_InsertBegin()
@@ -2977,10 +4690,11 @@ public class DoubleArrSeqListTest
     {
       seq.add(0,TypeConversionUtil.convertToboolean(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodoubleboolean(i),seq.arr[seq.size-i-1]);
     }
@@ -2993,10 +4707,11 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size,TypeConversionUtil.convertToboolean(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodoubleboolean(i),seq.arr[i]);
     }
@@ -3009,37 +4724,89 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size/2,TypeConversionUtil.convertToboolean(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    ArrayList arrList=new ArrayList();
-    for(int i=0;i<seq.size;++i)
+    ArrayList arrayList=new ArrayList();
+    for(int i=0;i<seqSize;++i)
     {
-      seq.add(TypeConversionUtil.convertToboolean(i));
+      arrayList.add(arrayList.size()/2,TypeConversionUtil.convertTodoubleboolean(i));
     }
-    for(int i=0;i<seq.size;++i)
+    System.out.println("BEGIN testCheckedListadd_intboolean_initialCapacityDEFAULT_InsertMidPoint");
+    for(int i=0;i<seqSize;++i)
     {
-      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]));
+      System.out.println(arrayList.get(i));
+      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]);
+    }
+    System.out.println("END testCheckedListadd_intboolean_initialCapacityDEFAULT_InsertMidPoint");
+  }
+  @Test
+  public void testCheckedListput_intboolean_initialCapacityDEFAULT_seqIsEmpty_hiIndex()
+  {
+    CheckedList seq=new CheckedList();
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(0,TypeConversionUtil.convertToboolean(5)));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intboolean_initialCapacityDEFAULT_seqIsEmpty_negativeIndex()
+  {
+    CheckedList seq=new CheckedList();
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(-1,TypeConversionUtil.convertToboolean(5)));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intboolean_initialCapacityDEFAULT_seqIsNotEmpty_hiIndex()
+  {
+    CheckedList seq=new CheckedList();
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertToboolean(i));
+    }
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(seq.size(),TypeConversionUtil.convertToboolean(5)));
+    Assertions.assertEquals(100,seq.size());
+    Assertions.assertEquals(100,seq.modCount);
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTodoubleboolean(i),seq.arr[i]);
     }
   }
   @Test
-  public void testCheckedListadd_intboolean_initialCapacityDEFAULT_emptyInsertOOBLo()
+  public void testCheckedListput_intboolean_initialCapacityDEFAULT_seqIsNotEmpty_negativeIndex()
+  {
+    CheckedList seq=new CheckedList();
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertToboolean(i));
+    }
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(-1,TypeConversionUtil.convertToboolean(5)));
+    Assertions.assertEquals(100,seq.size());
+    Assertions.assertEquals(100,seq.modCount);
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTodoubleboolean(i),seq.arr[i]);
+    }
+  }
+  @Test
+  public void testCheckedListadd_intboolean_initialCapacityDEFAULT_seqIsEmpty_negativeIndex()
   {
     CheckedList seq=new CheckedList();
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(-1,TypeConversionUtil.convertToboolean(5)));
-    Assertions.assertEquals(0,seq.size);
+    Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intboolean_initialCapacityDEFAULT_emptyInsertOOBHi()
+  public void testCheckedListadd_intboolean_initialCapacityDEFAULT_seqIsEmpty_hiIndex()
   {
     CheckedList seq=new CheckedList();
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(seq.size+1,TypeConversionUtil.convertToboolean(5)));
-    Assertions.assertEquals(0,seq.size);
+    Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intboolean_initialCapacityDEFAULT_NotEmptyInsertOOBLo()
+  public void testCheckedListadd_intboolean_initialCapacityDEFAULT_seqIsNotEmpty_negativeIndex()
   {
     CheckedList seq=new CheckedList();
     for(int i=0;i<100;++i)
@@ -3047,11 +4814,11 @@ public class DoubleArrSeqListTest
       seq.add(seq.size,TypeConversionUtil.convertToboolean(i));
     }
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(-1,TypeConversionUtil.convertToboolean(5)));
-    Assertions.assertEquals(100,seq.size);
+    Assertions.assertEquals(100,seq.size());
     Assertions.assertEquals(100,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intboolean_initialCapacityDEFAULT_NotEmptyInsertOOBHi()
+  public void testCheckedListadd_intboolean_initialCapacityDEFAULT_seqIsNotEmpty_hiIndex()
   {
     CheckedList seq=new CheckedList();
     for(int i=0;i<100;++i)
@@ -3059,8 +4826,26 @@ public class DoubleArrSeqListTest
       seq.add(seq.size,TypeConversionUtil.convertToboolean(i));
     }
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(seq.size+1,TypeConversionUtil.convertToboolean(5)));
-    Assertions.assertEquals(100,seq.size);
+    Assertions.assertEquals(100,seq.size());
     Assertions.assertEquals(100,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intboolean_initialCapacityNULL_NonThrowingIndex()
+  {
+    CheckedList seq=new CheckedList(0,null);
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertToboolean(i));
+    }
+    for(int i=0;i<100;++i)
+    {
+      var putVal=TypeConversionUtil.convertToboolean(100-i-1);
+      seq.put(i,putVal);
+      var expectedVal=TypeConversionUtil.convertTodoubleboolean(100-i-1);
+      Assertions.assertEquals(expectedVal,seq.arr[i]);
+      Assertions.assertEquals(100,seq.size());
+      Assertions.assertEquals(100,seq.modCount);
+    }
   }
   @Test
   public void testCheckedListadd_intboolean_initialCapacityNULL_InsertBegin()
@@ -3070,10 +4855,11 @@ public class DoubleArrSeqListTest
     {
       seq.add(0,TypeConversionUtil.convertToboolean(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodoubleboolean(i),seq.arr[seq.size-i-1]);
     }
@@ -3086,10 +4872,11 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size,TypeConversionUtil.convertToboolean(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodoubleboolean(i),seq.arr[i]);
     }
@@ -3102,37 +4889,89 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size/2,TypeConversionUtil.convertToboolean(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    ArrayList arrList=new ArrayList();
-    for(int i=0;i<seq.size;++i)
+    ArrayList arrayList=new ArrayList();
+    for(int i=0;i<seqSize;++i)
     {
-      seq.add(TypeConversionUtil.convertToboolean(i));
+      arrayList.add(arrayList.size()/2,TypeConversionUtil.convertTodoubleboolean(i));
     }
-    for(int i=0;i<seq.size;++i)
+    System.out.println("BEGIN testCheckedListadd_intboolean_initialCapacityNULL_InsertMidPoint");
+    for(int i=0;i<seqSize;++i)
     {
-      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]));
+      System.out.println(arrayList.get(i));
+      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]);
+    }
+    System.out.println("END testCheckedListadd_intboolean_initialCapacityNULL_InsertMidPoint");
+  }
+  @Test
+  public void testCheckedListput_intboolean_initialCapacityNULL_seqIsEmpty_hiIndex()
+  {
+    CheckedList seq=new CheckedList(0,null);
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(0,TypeConversionUtil.convertToboolean(5)));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intboolean_initialCapacityNULL_seqIsEmpty_negativeIndex()
+  {
+    CheckedList seq=new CheckedList(0,null);
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(-1,TypeConversionUtil.convertToboolean(5)));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intboolean_initialCapacityNULL_seqIsNotEmpty_hiIndex()
+  {
+    CheckedList seq=new CheckedList(0,null);
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertToboolean(i));
+    }
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(seq.size(),TypeConversionUtil.convertToboolean(5)));
+    Assertions.assertEquals(100,seq.size());
+    Assertions.assertEquals(100,seq.modCount);
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTodoubleboolean(i),seq.arr[i]);
     }
   }
   @Test
-  public void testCheckedListadd_intboolean_initialCapacityNULL_emptyInsertOOBLo()
+  public void testCheckedListput_intboolean_initialCapacityNULL_seqIsNotEmpty_negativeIndex()
+  {
+    CheckedList seq=new CheckedList(0,null);
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertToboolean(i));
+    }
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(-1,TypeConversionUtil.convertToboolean(5)));
+    Assertions.assertEquals(100,seq.size());
+    Assertions.assertEquals(100,seq.modCount);
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTodoubleboolean(i),seq.arr[i]);
+    }
+  }
+  @Test
+  public void testCheckedListadd_intboolean_initialCapacityNULL_seqIsEmpty_negativeIndex()
   {
     CheckedList seq=new CheckedList(0,null);
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(-1,TypeConversionUtil.convertToboolean(5)));
-    Assertions.assertEquals(0,seq.size);
+    Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intboolean_initialCapacityNULL_emptyInsertOOBHi()
+  public void testCheckedListadd_intboolean_initialCapacityNULL_seqIsEmpty_hiIndex()
   {
     CheckedList seq=new CheckedList(0,null);
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(seq.size+1,TypeConversionUtil.convertToboolean(5)));
-    Assertions.assertEquals(0,seq.size);
+    Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intboolean_initialCapacityNULL_NotEmptyInsertOOBLo()
+  public void testCheckedListadd_intboolean_initialCapacityNULL_seqIsNotEmpty_negativeIndex()
   {
     CheckedList seq=new CheckedList(0,null);
     for(int i=0;i<100;++i)
@@ -3140,11 +4979,11 @@ public class DoubleArrSeqListTest
       seq.add(seq.size,TypeConversionUtil.convertToboolean(i));
     }
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(-1,TypeConversionUtil.convertToboolean(5)));
-    Assertions.assertEquals(100,seq.size);
+    Assertions.assertEquals(100,seq.size());
     Assertions.assertEquals(100,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intboolean_initialCapacityNULL_NotEmptyInsertOOBHi()
+  public void testCheckedListadd_intboolean_initialCapacityNULL_seqIsNotEmpty_hiIndex()
   {
     CheckedList seq=new CheckedList(0,null);
     for(int i=0;i<100;++i)
@@ -3152,8 +4991,26 @@ public class DoubleArrSeqListTest
       seq.add(seq.size,TypeConversionUtil.convertToboolean(i));
     }
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(seq.size+1,TypeConversionUtil.convertToboolean(5)));
-    Assertions.assertEquals(100,seq.size);
+    Assertions.assertEquals(100,seq.size());
     Assertions.assertEquals(100,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intboolean_initialCapacity50_NonThrowingIndex()
+  {
+    CheckedList seq=new CheckedList(50);
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertToboolean(i));
+    }
+    for(int i=0;i<100;++i)
+    {
+      var putVal=TypeConversionUtil.convertToboolean(100-i-1);
+      seq.put(i,putVal);
+      var expectedVal=TypeConversionUtil.convertTodoubleboolean(100-i-1);
+      Assertions.assertEquals(expectedVal,seq.arr[i]);
+      Assertions.assertEquals(100,seq.size());
+      Assertions.assertEquals(100,seq.modCount);
+    }
   }
   @Test
   public void testCheckedListadd_intboolean_initialCapacity50_InsertBegin()
@@ -3163,10 +5020,11 @@ public class DoubleArrSeqListTest
     {
       seq.add(0,TypeConversionUtil.convertToboolean(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodoubleboolean(i),seq.arr[seq.size-i-1]);
     }
@@ -3179,10 +5037,11 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size,TypeConversionUtil.convertToboolean(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodoubleboolean(i),seq.arr[i]);
     }
@@ -3195,37 +5054,89 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size/2,TypeConversionUtil.convertToboolean(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    ArrayList arrList=new ArrayList();
-    for(int i=0;i<seq.size;++i)
+    ArrayList arrayList=new ArrayList();
+    for(int i=0;i<seqSize;++i)
     {
-      seq.add(TypeConversionUtil.convertToboolean(i));
+      arrayList.add(arrayList.size()/2,TypeConversionUtil.convertTodoubleboolean(i));
     }
-    for(int i=0;i<seq.size;++i)
+    System.out.println("BEGIN testCheckedListadd_intboolean_initialCapacity50_InsertMidPoint");
+    for(int i=0;i<seqSize;++i)
     {
-      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]));
+      System.out.println(arrayList.get(i));
+      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]);
+    }
+    System.out.println("END testCheckedListadd_intboolean_initialCapacity50_InsertMidPoint");
+  }
+  @Test
+  public void testCheckedListput_intboolean_initialCapacity50_seqIsEmpty_hiIndex()
+  {
+    CheckedList seq=new CheckedList(50);
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(0,TypeConversionUtil.convertToboolean(5)));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intboolean_initialCapacity50_seqIsEmpty_negativeIndex()
+  {
+    CheckedList seq=new CheckedList(50);
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(-1,TypeConversionUtil.convertToboolean(5)));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intboolean_initialCapacity50_seqIsNotEmpty_hiIndex()
+  {
+    CheckedList seq=new CheckedList(50);
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertToboolean(i));
+    }
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(seq.size(),TypeConversionUtil.convertToboolean(5)));
+    Assertions.assertEquals(100,seq.size());
+    Assertions.assertEquals(100,seq.modCount);
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTodoubleboolean(i),seq.arr[i]);
     }
   }
   @Test
-  public void testCheckedListadd_intboolean_initialCapacity50_emptyInsertOOBLo()
+  public void testCheckedListput_intboolean_initialCapacity50_seqIsNotEmpty_negativeIndex()
+  {
+    CheckedList seq=new CheckedList(50);
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertToboolean(i));
+    }
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(-1,TypeConversionUtil.convertToboolean(5)));
+    Assertions.assertEquals(100,seq.size());
+    Assertions.assertEquals(100,seq.modCount);
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTodoubleboolean(i),seq.arr[i]);
+    }
+  }
+  @Test
+  public void testCheckedListadd_intboolean_initialCapacity50_seqIsEmpty_negativeIndex()
   {
     CheckedList seq=new CheckedList(50);
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(-1,TypeConversionUtil.convertToboolean(5)));
-    Assertions.assertEquals(0,seq.size);
+    Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intboolean_initialCapacity50_emptyInsertOOBHi()
+  public void testCheckedListadd_intboolean_initialCapacity50_seqIsEmpty_hiIndex()
   {
     CheckedList seq=new CheckedList(50);
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(seq.size+1,TypeConversionUtil.convertToboolean(5)));
-    Assertions.assertEquals(0,seq.size);
+    Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intboolean_initialCapacity50_NotEmptyInsertOOBLo()
+  public void testCheckedListadd_intboolean_initialCapacity50_seqIsNotEmpty_negativeIndex()
   {
     CheckedList seq=new CheckedList(50);
     for(int i=0;i<100;++i)
@@ -3233,11 +5144,11 @@ public class DoubleArrSeqListTest
       seq.add(seq.size,TypeConversionUtil.convertToboolean(i));
     }
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(-1,TypeConversionUtil.convertToboolean(5)));
-    Assertions.assertEquals(100,seq.size);
+    Assertions.assertEquals(100,seq.size());
     Assertions.assertEquals(100,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intboolean_initialCapacity50_NotEmptyInsertOOBHi()
+  public void testCheckedListadd_intboolean_initialCapacity50_seqIsNotEmpty_hiIndex()
   {
     CheckedList seq=new CheckedList(50);
     for(int i=0;i<100;++i)
@@ -3245,8 +5156,26 @@ public class DoubleArrSeqListTest
       seq.add(seq.size,TypeConversionUtil.convertToboolean(i));
     }
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(seq.size+1,TypeConversionUtil.convertToboolean(5)));
-    Assertions.assertEquals(100,seq.size);
+    Assertions.assertEquals(100,seq.size());
     Assertions.assertEquals(100,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intBoolean_initialCapacityDEFAULT_NonThrowingIndex()
+  {
+    CheckedList seq=new CheckedList();
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertToBoolean(i));
+    }
+    for(int i=0;i<100;++i)
+    {
+      var putVal=TypeConversionUtil.convertToBoolean(100-i-1);
+      seq.put(i,putVal);
+      var expectedVal=TypeConversionUtil.convertTodoubleboolean(100-i-1);
+      Assertions.assertEquals(expectedVal,seq.arr[i]);
+      Assertions.assertEquals(100,seq.size());
+      Assertions.assertEquals(100,seq.modCount);
+    }
   }
   @Test
   public void testCheckedListadd_intBoolean_initialCapacityDEFAULT_InsertBegin()
@@ -3256,10 +5185,11 @@ public class DoubleArrSeqListTest
     {
       seq.add(0,TypeConversionUtil.convertToBoolean(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodoubleboolean(i),seq.arr[seq.size-i-1]);
     }
@@ -3272,10 +5202,11 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size,TypeConversionUtil.convertToBoolean(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodoubleboolean(i),seq.arr[i]);
     }
@@ -3288,37 +5219,89 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size/2,TypeConversionUtil.convertToBoolean(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    ArrayList arrList=new ArrayList();
-    for(int i=0;i<seq.size;++i)
+    ArrayList arrayList=new ArrayList();
+    for(int i=0;i<seqSize;++i)
     {
-      seq.add(TypeConversionUtil.convertToBoolean(i));
+      arrayList.add(arrayList.size()/2,TypeConversionUtil.convertTodoubleboolean(i));
     }
-    for(int i=0;i<seq.size;++i)
+    System.out.println("BEGIN testCheckedListadd_intBoolean_initialCapacityDEFAULT_InsertMidPoint");
+    for(int i=0;i<seqSize;++i)
     {
-      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]));
+      System.out.println(arrayList.get(i));
+      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]);
+    }
+    System.out.println("END testCheckedListadd_intBoolean_initialCapacityDEFAULT_InsertMidPoint");
+  }
+  @Test
+  public void testCheckedListput_intBoolean_initialCapacityDEFAULT_seqIsEmpty_hiIndex()
+  {
+    CheckedList seq=new CheckedList();
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(0,TypeConversionUtil.convertToBoolean(5)));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intBoolean_initialCapacityDEFAULT_seqIsEmpty_negativeIndex()
+  {
+    CheckedList seq=new CheckedList();
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(-1,TypeConversionUtil.convertToBoolean(5)));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intBoolean_initialCapacityDEFAULT_seqIsNotEmpty_hiIndex()
+  {
+    CheckedList seq=new CheckedList();
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertToBoolean(i));
+    }
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(seq.size(),TypeConversionUtil.convertToBoolean(5)));
+    Assertions.assertEquals(100,seq.size());
+    Assertions.assertEquals(100,seq.modCount);
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTodoubleboolean(i),seq.arr[i]);
     }
   }
   @Test
-  public void testCheckedListadd_intBoolean_initialCapacityDEFAULT_emptyInsertOOBLo()
+  public void testCheckedListput_intBoolean_initialCapacityDEFAULT_seqIsNotEmpty_negativeIndex()
+  {
+    CheckedList seq=new CheckedList();
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertToBoolean(i));
+    }
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(-1,TypeConversionUtil.convertToBoolean(5)));
+    Assertions.assertEquals(100,seq.size());
+    Assertions.assertEquals(100,seq.modCount);
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTodoubleboolean(i),seq.arr[i]);
+    }
+  }
+  @Test
+  public void testCheckedListadd_intBoolean_initialCapacityDEFAULT_seqIsEmpty_negativeIndex()
   {
     CheckedList seq=new CheckedList();
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(-1,TypeConversionUtil.convertToBoolean(5)));
-    Assertions.assertEquals(0,seq.size);
+    Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intBoolean_initialCapacityDEFAULT_emptyInsertOOBHi()
+  public void testCheckedListadd_intBoolean_initialCapacityDEFAULT_seqIsEmpty_hiIndex()
   {
     CheckedList seq=new CheckedList();
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(seq.size+1,TypeConversionUtil.convertToBoolean(5)));
-    Assertions.assertEquals(0,seq.size);
+    Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intBoolean_initialCapacityDEFAULT_NotEmptyInsertOOBLo()
+  public void testCheckedListadd_intBoolean_initialCapacityDEFAULT_seqIsNotEmpty_negativeIndex()
   {
     CheckedList seq=new CheckedList();
     for(int i=0;i<100;++i)
@@ -3326,11 +5309,11 @@ public class DoubleArrSeqListTest
       seq.add(seq.size,TypeConversionUtil.convertToBoolean(i));
     }
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(-1,TypeConversionUtil.convertToBoolean(5)));
-    Assertions.assertEquals(100,seq.size);
+    Assertions.assertEquals(100,seq.size());
     Assertions.assertEquals(100,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intBoolean_initialCapacityDEFAULT_NotEmptyInsertOOBHi()
+  public void testCheckedListadd_intBoolean_initialCapacityDEFAULT_seqIsNotEmpty_hiIndex()
   {
     CheckedList seq=new CheckedList();
     for(int i=0;i<100;++i)
@@ -3338,8 +5321,26 @@ public class DoubleArrSeqListTest
       seq.add(seq.size,TypeConversionUtil.convertToBoolean(i));
     }
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(seq.size+1,TypeConversionUtil.convertToBoolean(5)));
-    Assertions.assertEquals(100,seq.size);
+    Assertions.assertEquals(100,seq.size());
     Assertions.assertEquals(100,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intBoolean_initialCapacityNULL_NonThrowingIndex()
+  {
+    CheckedList seq=new CheckedList(0,null);
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertToBoolean(i));
+    }
+    for(int i=0;i<100;++i)
+    {
+      var putVal=TypeConversionUtil.convertToBoolean(100-i-1);
+      seq.put(i,putVal);
+      var expectedVal=TypeConversionUtil.convertTodoubleboolean(100-i-1);
+      Assertions.assertEquals(expectedVal,seq.arr[i]);
+      Assertions.assertEquals(100,seq.size());
+      Assertions.assertEquals(100,seq.modCount);
+    }
   }
   @Test
   public void testCheckedListadd_intBoolean_initialCapacityNULL_InsertBegin()
@@ -3349,10 +5350,11 @@ public class DoubleArrSeqListTest
     {
       seq.add(0,TypeConversionUtil.convertToBoolean(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodoubleboolean(i),seq.arr[seq.size-i-1]);
     }
@@ -3365,10 +5367,11 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size,TypeConversionUtil.convertToBoolean(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodoubleboolean(i),seq.arr[i]);
     }
@@ -3381,37 +5384,89 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size/2,TypeConversionUtil.convertToBoolean(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    ArrayList arrList=new ArrayList();
-    for(int i=0;i<seq.size;++i)
+    ArrayList arrayList=new ArrayList();
+    for(int i=0;i<seqSize;++i)
     {
-      seq.add(TypeConversionUtil.convertToBoolean(i));
+      arrayList.add(arrayList.size()/2,TypeConversionUtil.convertTodoubleboolean(i));
     }
-    for(int i=0;i<seq.size;++i)
+    System.out.println("BEGIN testCheckedListadd_intBoolean_initialCapacityNULL_InsertMidPoint");
+    for(int i=0;i<seqSize;++i)
     {
-      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]));
+      System.out.println(arrayList.get(i));
+      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]);
+    }
+    System.out.println("END testCheckedListadd_intBoolean_initialCapacityNULL_InsertMidPoint");
+  }
+  @Test
+  public void testCheckedListput_intBoolean_initialCapacityNULL_seqIsEmpty_hiIndex()
+  {
+    CheckedList seq=new CheckedList(0,null);
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(0,TypeConversionUtil.convertToBoolean(5)));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intBoolean_initialCapacityNULL_seqIsEmpty_negativeIndex()
+  {
+    CheckedList seq=new CheckedList(0,null);
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(-1,TypeConversionUtil.convertToBoolean(5)));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intBoolean_initialCapacityNULL_seqIsNotEmpty_hiIndex()
+  {
+    CheckedList seq=new CheckedList(0,null);
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertToBoolean(i));
+    }
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(seq.size(),TypeConversionUtil.convertToBoolean(5)));
+    Assertions.assertEquals(100,seq.size());
+    Assertions.assertEquals(100,seq.modCount);
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTodoubleboolean(i),seq.arr[i]);
     }
   }
   @Test
-  public void testCheckedListadd_intBoolean_initialCapacityNULL_emptyInsertOOBLo()
+  public void testCheckedListput_intBoolean_initialCapacityNULL_seqIsNotEmpty_negativeIndex()
+  {
+    CheckedList seq=new CheckedList(0,null);
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertToBoolean(i));
+    }
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(-1,TypeConversionUtil.convertToBoolean(5)));
+    Assertions.assertEquals(100,seq.size());
+    Assertions.assertEquals(100,seq.modCount);
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTodoubleboolean(i),seq.arr[i]);
+    }
+  }
+  @Test
+  public void testCheckedListadd_intBoolean_initialCapacityNULL_seqIsEmpty_negativeIndex()
   {
     CheckedList seq=new CheckedList(0,null);
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(-1,TypeConversionUtil.convertToBoolean(5)));
-    Assertions.assertEquals(0,seq.size);
+    Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intBoolean_initialCapacityNULL_emptyInsertOOBHi()
+  public void testCheckedListadd_intBoolean_initialCapacityNULL_seqIsEmpty_hiIndex()
   {
     CheckedList seq=new CheckedList(0,null);
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(seq.size+1,TypeConversionUtil.convertToBoolean(5)));
-    Assertions.assertEquals(0,seq.size);
+    Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intBoolean_initialCapacityNULL_NotEmptyInsertOOBLo()
+  public void testCheckedListadd_intBoolean_initialCapacityNULL_seqIsNotEmpty_negativeIndex()
   {
     CheckedList seq=new CheckedList(0,null);
     for(int i=0;i<100;++i)
@@ -3419,11 +5474,11 @@ public class DoubleArrSeqListTest
       seq.add(seq.size,TypeConversionUtil.convertToBoolean(i));
     }
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(-1,TypeConversionUtil.convertToBoolean(5)));
-    Assertions.assertEquals(100,seq.size);
+    Assertions.assertEquals(100,seq.size());
     Assertions.assertEquals(100,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intBoolean_initialCapacityNULL_NotEmptyInsertOOBHi()
+  public void testCheckedListadd_intBoolean_initialCapacityNULL_seqIsNotEmpty_hiIndex()
   {
     CheckedList seq=new CheckedList(0,null);
     for(int i=0;i<100;++i)
@@ -3431,8 +5486,26 @@ public class DoubleArrSeqListTest
       seq.add(seq.size,TypeConversionUtil.convertToBoolean(i));
     }
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(seq.size+1,TypeConversionUtil.convertToBoolean(5)));
-    Assertions.assertEquals(100,seq.size);
+    Assertions.assertEquals(100,seq.size());
     Assertions.assertEquals(100,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intBoolean_initialCapacity50_NonThrowingIndex()
+  {
+    CheckedList seq=new CheckedList(50);
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertToBoolean(i));
+    }
+    for(int i=0;i<100;++i)
+    {
+      var putVal=TypeConversionUtil.convertToBoolean(100-i-1);
+      seq.put(i,putVal);
+      var expectedVal=TypeConversionUtil.convertTodoubleboolean(100-i-1);
+      Assertions.assertEquals(expectedVal,seq.arr[i]);
+      Assertions.assertEquals(100,seq.size());
+      Assertions.assertEquals(100,seq.modCount);
+    }
   }
   @Test
   public void testCheckedListadd_intBoolean_initialCapacity50_InsertBegin()
@@ -3442,10 +5515,11 @@ public class DoubleArrSeqListTest
     {
       seq.add(0,TypeConversionUtil.convertToBoolean(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodoubleboolean(i),seq.arr[seq.size-i-1]);
     }
@@ -3458,10 +5532,11 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size,TypeConversionUtil.convertToBoolean(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodoubleboolean(i),seq.arr[i]);
     }
@@ -3474,37 +5549,89 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size/2,TypeConversionUtil.convertToBoolean(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    ArrayList arrList=new ArrayList();
-    for(int i=0;i<seq.size;++i)
+    ArrayList arrayList=new ArrayList();
+    for(int i=0;i<seqSize;++i)
     {
-      seq.add(TypeConversionUtil.convertToBoolean(i));
+      arrayList.add(arrayList.size()/2,TypeConversionUtil.convertTodoubleboolean(i));
     }
-    for(int i=0;i<seq.size;++i)
+    System.out.println("BEGIN testCheckedListadd_intBoolean_initialCapacity50_InsertMidPoint");
+    for(int i=0;i<seqSize;++i)
     {
-      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]));
+      System.out.println(arrayList.get(i));
+      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]);
+    }
+    System.out.println("END testCheckedListadd_intBoolean_initialCapacity50_InsertMidPoint");
+  }
+  @Test
+  public void testCheckedListput_intBoolean_initialCapacity50_seqIsEmpty_hiIndex()
+  {
+    CheckedList seq=new CheckedList(50);
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(0,TypeConversionUtil.convertToBoolean(5)));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intBoolean_initialCapacity50_seqIsEmpty_negativeIndex()
+  {
+    CheckedList seq=new CheckedList(50);
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(-1,TypeConversionUtil.convertToBoolean(5)));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intBoolean_initialCapacity50_seqIsNotEmpty_hiIndex()
+  {
+    CheckedList seq=new CheckedList(50);
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertToBoolean(i));
+    }
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(seq.size(),TypeConversionUtil.convertToBoolean(5)));
+    Assertions.assertEquals(100,seq.size());
+    Assertions.assertEquals(100,seq.modCount);
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTodoubleboolean(i),seq.arr[i]);
     }
   }
   @Test
-  public void testCheckedListadd_intBoolean_initialCapacity50_emptyInsertOOBLo()
+  public void testCheckedListput_intBoolean_initialCapacity50_seqIsNotEmpty_negativeIndex()
+  {
+    CheckedList seq=new CheckedList(50);
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertToBoolean(i));
+    }
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(-1,TypeConversionUtil.convertToBoolean(5)));
+    Assertions.assertEquals(100,seq.size());
+    Assertions.assertEquals(100,seq.modCount);
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTodoubleboolean(i),seq.arr[i]);
+    }
+  }
+  @Test
+  public void testCheckedListadd_intBoolean_initialCapacity50_seqIsEmpty_negativeIndex()
   {
     CheckedList seq=new CheckedList(50);
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(-1,TypeConversionUtil.convertToBoolean(5)));
-    Assertions.assertEquals(0,seq.size);
+    Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intBoolean_initialCapacity50_emptyInsertOOBHi()
+  public void testCheckedListadd_intBoolean_initialCapacity50_seqIsEmpty_hiIndex()
   {
     CheckedList seq=new CheckedList(50);
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(seq.size+1,TypeConversionUtil.convertToBoolean(5)));
-    Assertions.assertEquals(0,seq.size);
+    Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intBoolean_initialCapacity50_NotEmptyInsertOOBLo()
+  public void testCheckedListadd_intBoolean_initialCapacity50_seqIsNotEmpty_negativeIndex()
   {
     CheckedList seq=new CheckedList(50);
     for(int i=0;i<100;++i)
@@ -3512,11 +5639,11 @@ public class DoubleArrSeqListTest
       seq.add(seq.size,TypeConversionUtil.convertToBoolean(i));
     }
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(-1,TypeConversionUtil.convertToBoolean(5)));
-    Assertions.assertEquals(100,seq.size);
+    Assertions.assertEquals(100,seq.size());
     Assertions.assertEquals(100,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intBoolean_initialCapacity50_NotEmptyInsertOOBHi()
+  public void testCheckedListadd_intBoolean_initialCapacity50_seqIsNotEmpty_hiIndex()
   {
     CheckedList seq=new CheckedList(50);
     for(int i=0;i<100;++i)
@@ -3524,8 +5651,26 @@ public class DoubleArrSeqListTest
       seq.add(seq.size,TypeConversionUtil.convertToBoolean(i));
     }
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(seq.size+1,TypeConversionUtil.convertToBoolean(5)));
-    Assertions.assertEquals(100,seq.size);
+    Assertions.assertEquals(100,seq.size());
     Assertions.assertEquals(100,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intbyte_initialCapacityDEFAULT_NonThrowingIndex()
+  {
+    CheckedList seq=new CheckedList();
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertTobyte(i));
+    }
+    for(int i=0;i<100;++i)
+    {
+      var putVal=TypeConversionUtil.convertTobyte(100-i-1);
+      seq.put(i,putVal);
+      var expectedVal=TypeConversionUtil.convertTodouble(100-i-1);
+      Assertions.assertEquals(expectedVal,seq.arr[i]);
+      Assertions.assertEquals(100,seq.size());
+      Assertions.assertEquals(100,seq.modCount);
+    }
   }
   @Test
   public void testCheckedListadd_intbyte_initialCapacityDEFAULT_InsertBegin()
@@ -3535,10 +5680,11 @@ public class DoubleArrSeqListTest
     {
       seq.add(0,TypeConversionUtil.convertTobyte(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[seq.size-i-1]);
     }
@@ -3551,10 +5697,11 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size,TypeConversionUtil.convertTobyte(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
     }
@@ -3567,37 +5714,89 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size/2,TypeConversionUtil.convertTobyte(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    ArrayList arrList=new ArrayList();
-    for(int i=0;i<seq.size;++i)
+    ArrayList arrayList=new ArrayList();
+    for(int i=0;i<seqSize;++i)
     {
-      seq.add(TypeConversionUtil.convertTobyte(i));
+      arrayList.add(arrayList.size()/2,TypeConversionUtil.convertTodouble(i));
     }
-    for(int i=0;i<seq.size;++i)
+    System.out.println("BEGIN testCheckedListadd_intbyte_initialCapacityDEFAULT_InsertMidPoint");
+    for(int i=0;i<seqSize;++i)
     {
-      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]));
+      System.out.println(arrayList.get(i));
+      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]);
+    }
+    System.out.println("END testCheckedListadd_intbyte_initialCapacityDEFAULT_InsertMidPoint");
+  }
+  @Test
+  public void testCheckedListput_intbyte_initialCapacityDEFAULT_seqIsEmpty_hiIndex()
+  {
+    CheckedList seq=new CheckedList();
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(0,TypeConversionUtil.convertTobyte(5)));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intbyte_initialCapacityDEFAULT_seqIsEmpty_negativeIndex()
+  {
+    CheckedList seq=new CheckedList();
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(-1,TypeConversionUtil.convertTobyte(5)));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intbyte_initialCapacityDEFAULT_seqIsNotEmpty_hiIndex()
+  {
+    CheckedList seq=new CheckedList();
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertTobyte(i));
+    }
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(seq.size(),TypeConversionUtil.convertTobyte(5)));
+    Assertions.assertEquals(100,seq.size());
+    Assertions.assertEquals(100,seq.modCount);
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
     }
   }
   @Test
-  public void testCheckedListadd_intbyte_initialCapacityDEFAULT_emptyInsertOOBLo()
+  public void testCheckedListput_intbyte_initialCapacityDEFAULT_seqIsNotEmpty_negativeIndex()
+  {
+    CheckedList seq=new CheckedList();
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertTobyte(i));
+    }
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(-1,TypeConversionUtil.convertTobyte(5)));
+    Assertions.assertEquals(100,seq.size());
+    Assertions.assertEquals(100,seq.modCount);
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
+    }
+  }
+  @Test
+  public void testCheckedListadd_intbyte_initialCapacityDEFAULT_seqIsEmpty_negativeIndex()
   {
     CheckedList seq=new CheckedList();
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(-1,TypeConversionUtil.convertTobyte(5)));
-    Assertions.assertEquals(0,seq.size);
+    Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intbyte_initialCapacityDEFAULT_emptyInsertOOBHi()
+  public void testCheckedListadd_intbyte_initialCapacityDEFAULT_seqIsEmpty_hiIndex()
   {
     CheckedList seq=new CheckedList();
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(seq.size+1,TypeConversionUtil.convertTobyte(5)));
-    Assertions.assertEquals(0,seq.size);
+    Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intbyte_initialCapacityDEFAULT_NotEmptyInsertOOBLo()
+  public void testCheckedListadd_intbyte_initialCapacityDEFAULT_seqIsNotEmpty_negativeIndex()
   {
     CheckedList seq=new CheckedList();
     for(int i=0;i<100;++i)
@@ -3605,11 +5804,11 @@ public class DoubleArrSeqListTest
       seq.add(seq.size,TypeConversionUtil.convertTobyte(i));
     }
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(-1,TypeConversionUtil.convertTobyte(5)));
-    Assertions.assertEquals(100,seq.size);
+    Assertions.assertEquals(100,seq.size());
     Assertions.assertEquals(100,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intbyte_initialCapacityDEFAULT_NotEmptyInsertOOBHi()
+  public void testCheckedListadd_intbyte_initialCapacityDEFAULT_seqIsNotEmpty_hiIndex()
   {
     CheckedList seq=new CheckedList();
     for(int i=0;i<100;++i)
@@ -3617,8 +5816,26 @@ public class DoubleArrSeqListTest
       seq.add(seq.size,TypeConversionUtil.convertTobyte(i));
     }
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(seq.size+1,TypeConversionUtil.convertTobyte(5)));
-    Assertions.assertEquals(100,seq.size);
+    Assertions.assertEquals(100,seq.size());
     Assertions.assertEquals(100,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intbyte_initialCapacityNULL_NonThrowingIndex()
+  {
+    CheckedList seq=new CheckedList(0,null);
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertTobyte(i));
+    }
+    for(int i=0;i<100;++i)
+    {
+      var putVal=TypeConversionUtil.convertTobyte(100-i-1);
+      seq.put(i,putVal);
+      var expectedVal=TypeConversionUtil.convertTodouble(100-i-1);
+      Assertions.assertEquals(expectedVal,seq.arr[i]);
+      Assertions.assertEquals(100,seq.size());
+      Assertions.assertEquals(100,seq.modCount);
+    }
   }
   @Test
   public void testCheckedListadd_intbyte_initialCapacityNULL_InsertBegin()
@@ -3628,10 +5845,11 @@ public class DoubleArrSeqListTest
     {
       seq.add(0,TypeConversionUtil.convertTobyte(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[seq.size-i-1]);
     }
@@ -3644,10 +5862,11 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size,TypeConversionUtil.convertTobyte(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
     }
@@ -3660,37 +5879,89 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size/2,TypeConversionUtil.convertTobyte(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    ArrayList arrList=new ArrayList();
-    for(int i=0;i<seq.size;++i)
+    ArrayList arrayList=new ArrayList();
+    for(int i=0;i<seqSize;++i)
     {
-      seq.add(TypeConversionUtil.convertTobyte(i));
+      arrayList.add(arrayList.size()/2,TypeConversionUtil.convertTodouble(i));
     }
-    for(int i=0;i<seq.size;++i)
+    System.out.println("BEGIN testCheckedListadd_intbyte_initialCapacityNULL_InsertMidPoint");
+    for(int i=0;i<seqSize;++i)
     {
-      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]));
+      System.out.println(arrayList.get(i));
+      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]);
+    }
+    System.out.println("END testCheckedListadd_intbyte_initialCapacityNULL_InsertMidPoint");
+  }
+  @Test
+  public void testCheckedListput_intbyte_initialCapacityNULL_seqIsEmpty_hiIndex()
+  {
+    CheckedList seq=new CheckedList(0,null);
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(0,TypeConversionUtil.convertTobyte(5)));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intbyte_initialCapacityNULL_seqIsEmpty_negativeIndex()
+  {
+    CheckedList seq=new CheckedList(0,null);
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(-1,TypeConversionUtil.convertTobyte(5)));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intbyte_initialCapacityNULL_seqIsNotEmpty_hiIndex()
+  {
+    CheckedList seq=new CheckedList(0,null);
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertTobyte(i));
+    }
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(seq.size(),TypeConversionUtil.convertTobyte(5)));
+    Assertions.assertEquals(100,seq.size());
+    Assertions.assertEquals(100,seq.modCount);
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
     }
   }
   @Test
-  public void testCheckedListadd_intbyte_initialCapacityNULL_emptyInsertOOBLo()
+  public void testCheckedListput_intbyte_initialCapacityNULL_seqIsNotEmpty_negativeIndex()
+  {
+    CheckedList seq=new CheckedList(0,null);
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertTobyte(i));
+    }
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(-1,TypeConversionUtil.convertTobyte(5)));
+    Assertions.assertEquals(100,seq.size());
+    Assertions.assertEquals(100,seq.modCount);
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
+    }
+  }
+  @Test
+  public void testCheckedListadd_intbyte_initialCapacityNULL_seqIsEmpty_negativeIndex()
   {
     CheckedList seq=new CheckedList(0,null);
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(-1,TypeConversionUtil.convertTobyte(5)));
-    Assertions.assertEquals(0,seq.size);
+    Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intbyte_initialCapacityNULL_emptyInsertOOBHi()
+  public void testCheckedListadd_intbyte_initialCapacityNULL_seqIsEmpty_hiIndex()
   {
     CheckedList seq=new CheckedList(0,null);
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(seq.size+1,TypeConversionUtil.convertTobyte(5)));
-    Assertions.assertEquals(0,seq.size);
+    Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intbyte_initialCapacityNULL_NotEmptyInsertOOBLo()
+  public void testCheckedListadd_intbyte_initialCapacityNULL_seqIsNotEmpty_negativeIndex()
   {
     CheckedList seq=new CheckedList(0,null);
     for(int i=0;i<100;++i)
@@ -3698,11 +5969,11 @@ public class DoubleArrSeqListTest
       seq.add(seq.size,TypeConversionUtil.convertTobyte(i));
     }
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(-1,TypeConversionUtil.convertTobyte(5)));
-    Assertions.assertEquals(100,seq.size);
+    Assertions.assertEquals(100,seq.size());
     Assertions.assertEquals(100,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intbyte_initialCapacityNULL_NotEmptyInsertOOBHi()
+  public void testCheckedListadd_intbyte_initialCapacityNULL_seqIsNotEmpty_hiIndex()
   {
     CheckedList seq=new CheckedList(0,null);
     for(int i=0;i<100;++i)
@@ -3710,8 +5981,26 @@ public class DoubleArrSeqListTest
       seq.add(seq.size,TypeConversionUtil.convertTobyte(i));
     }
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(seq.size+1,TypeConversionUtil.convertTobyte(5)));
-    Assertions.assertEquals(100,seq.size);
+    Assertions.assertEquals(100,seq.size());
     Assertions.assertEquals(100,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intbyte_initialCapacity50_NonThrowingIndex()
+  {
+    CheckedList seq=new CheckedList(50);
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertTobyte(i));
+    }
+    for(int i=0;i<100;++i)
+    {
+      var putVal=TypeConversionUtil.convertTobyte(100-i-1);
+      seq.put(i,putVal);
+      var expectedVal=TypeConversionUtil.convertTodouble(100-i-1);
+      Assertions.assertEquals(expectedVal,seq.arr[i]);
+      Assertions.assertEquals(100,seq.size());
+      Assertions.assertEquals(100,seq.modCount);
+    }
   }
   @Test
   public void testCheckedListadd_intbyte_initialCapacity50_InsertBegin()
@@ -3721,10 +6010,11 @@ public class DoubleArrSeqListTest
     {
       seq.add(0,TypeConversionUtil.convertTobyte(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[seq.size-i-1]);
     }
@@ -3737,10 +6027,11 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size,TypeConversionUtil.convertTobyte(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
     }
@@ -3753,37 +6044,89 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size/2,TypeConversionUtil.convertTobyte(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    ArrayList arrList=new ArrayList();
-    for(int i=0;i<seq.size;++i)
+    ArrayList arrayList=new ArrayList();
+    for(int i=0;i<seqSize;++i)
     {
-      seq.add(TypeConversionUtil.convertTobyte(i));
+      arrayList.add(arrayList.size()/2,TypeConversionUtil.convertTodouble(i));
     }
-    for(int i=0;i<seq.size;++i)
+    System.out.println("BEGIN testCheckedListadd_intbyte_initialCapacity50_InsertMidPoint");
+    for(int i=0;i<seqSize;++i)
     {
-      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]));
+      System.out.println(arrayList.get(i));
+      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]);
+    }
+    System.out.println("END testCheckedListadd_intbyte_initialCapacity50_InsertMidPoint");
+  }
+  @Test
+  public void testCheckedListput_intbyte_initialCapacity50_seqIsEmpty_hiIndex()
+  {
+    CheckedList seq=new CheckedList(50);
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(0,TypeConversionUtil.convertTobyte(5)));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intbyte_initialCapacity50_seqIsEmpty_negativeIndex()
+  {
+    CheckedList seq=new CheckedList(50);
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(-1,TypeConversionUtil.convertTobyte(5)));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intbyte_initialCapacity50_seqIsNotEmpty_hiIndex()
+  {
+    CheckedList seq=new CheckedList(50);
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertTobyte(i));
+    }
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(seq.size(),TypeConversionUtil.convertTobyte(5)));
+    Assertions.assertEquals(100,seq.size());
+    Assertions.assertEquals(100,seq.modCount);
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
     }
   }
   @Test
-  public void testCheckedListadd_intbyte_initialCapacity50_emptyInsertOOBLo()
+  public void testCheckedListput_intbyte_initialCapacity50_seqIsNotEmpty_negativeIndex()
+  {
+    CheckedList seq=new CheckedList(50);
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertTobyte(i));
+    }
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(-1,TypeConversionUtil.convertTobyte(5)));
+    Assertions.assertEquals(100,seq.size());
+    Assertions.assertEquals(100,seq.modCount);
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
+    }
+  }
+  @Test
+  public void testCheckedListadd_intbyte_initialCapacity50_seqIsEmpty_negativeIndex()
   {
     CheckedList seq=new CheckedList(50);
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(-1,TypeConversionUtil.convertTobyte(5)));
-    Assertions.assertEquals(0,seq.size);
+    Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intbyte_initialCapacity50_emptyInsertOOBHi()
+  public void testCheckedListadd_intbyte_initialCapacity50_seqIsEmpty_hiIndex()
   {
     CheckedList seq=new CheckedList(50);
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(seq.size+1,TypeConversionUtil.convertTobyte(5)));
-    Assertions.assertEquals(0,seq.size);
+    Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intbyte_initialCapacity50_NotEmptyInsertOOBLo()
+  public void testCheckedListadd_intbyte_initialCapacity50_seqIsNotEmpty_negativeIndex()
   {
     CheckedList seq=new CheckedList(50);
     for(int i=0;i<100;++i)
@@ -3791,11 +6134,11 @@ public class DoubleArrSeqListTest
       seq.add(seq.size,TypeConversionUtil.convertTobyte(i));
     }
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(-1,TypeConversionUtil.convertTobyte(5)));
-    Assertions.assertEquals(100,seq.size);
+    Assertions.assertEquals(100,seq.size());
     Assertions.assertEquals(100,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intbyte_initialCapacity50_NotEmptyInsertOOBHi()
+  public void testCheckedListadd_intbyte_initialCapacity50_seqIsNotEmpty_hiIndex()
   {
     CheckedList seq=new CheckedList(50);
     for(int i=0;i<100;++i)
@@ -3803,8 +6146,26 @@ public class DoubleArrSeqListTest
       seq.add(seq.size,TypeConversionUtil.convertTobyte(i));
     }
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(seq.size+1,TypeConversionUtil.convertTobyte(5)));
-    Assertions.assertEquals(100,seq.size);
+    Assertions.assertEquals(100,seq.size());
     Assertions.assertEquals(100,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intByte_initialCapacityDEFAULT_NonThrowingIndex()
+  {
+    CheckedList seq=new CheckedList();
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertToByte(i));
+    }
+    for(int i=0;i<100;++i)
+    {
+      var putVal=TypeConversionUtil.convertToByte(100-i-1);
+      seq.put(i,putVal);
+      var expectedVal=TypeConversionUtil.convertTodouble(100-i-1);
+      Assertions.assertEquals(expectedVal,seq.arr[i]);
+      Assertions.assertEquals(100,seq.size());
+      Assertions.assertEquals(100,seq.modCount);
+    }
   }
   @Test
   public void testCheckedListadd_intByte_initialCapacityDEFAULT_InsertBegin()
@@ -3814,10 +6175,11 @@ public class DoubleArrSeqListTest
     {
       seq.add(0,TypeConversionUtil.convertToByte(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[seq.size-i-1]);
     }
@@ -3830,10 +6192,11 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size,TypeConversionUtil.convertToByte(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
     }
@@ -3846,37 +6209,89 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size/2,TypeConversionUtil.convertToByte(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    ArrayList arrList=new ArrayList();
-    for(int i=0;i<seq.size;++i)
+    ArrayList arrayList=new ArrayList();
+    for(int i=0;i<seqSize;++i)
     {
-      seq.add(TypeConversionUtil.convertToByte(i));
+      arrayList.add(arrayList.size()/2,TypeConversionUtil.convertTodouble(i));
     }
-    for(int i=0;i<seq.size;++i)
+    System.out.println("BEGIN testCheckedListadd_intByte_initialCapacityDEFAULT_InsertMidPoint");
+    for(int i=0;i<seqSize;++i)
     {
-      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]));
+      System.out.println(arrayList.get(i));
+      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]);
+    }
+    System.out.println("END testCheckedListadd_intByte_initialCapacityDEFAULT_InsertMidPoint");
+  }
+  @Test
+  public void testCheckedListput_intByte_initialCapacityDEFAULT_seqIsEmpty_hiIndex()
+  {
+    CheckedList seq=new CheckedList();
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(0,TypeConversionUtil.convertToByte(5)));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intByte_initialCapacityDEFAULT_seqIsEmpty_negativeIndex()
+  {
+    CheckedList seq=new CheckedList();
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(-1,TypeConversionUtil.convertToByte(5)));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intByte_initialCapacityDEFAULT_seqIsNotEmpty_hiIndex()
+  {
+    CheckedList seq=new CheckedList();
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertToByte(i));
+    }
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(seq.size(),TypeConversionUtil.convertToByte(5)));
+    Assertions.assertEquals(100,seq.size());
+    Assertions.assertEquals(100,seq.modCount);
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
     }
   }
   @Test
-  public void testCheckedListadd_intByte_initialCapacityDEFAULT_emptyInsertOOBLo()
+  public void testCheckedListput_intByte_initialCapacityDEFAULT_seqIsNotEmpty_negativeIndex()
+  {
+    CheckedList seq=new CheckedList();
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertToByte(i));
+    }
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(-1,TypeConversionUtil.convertToByte(5)));
+    Assertions.assertEquals(100,seq.size());
+    Assertions.assertEquals(100,seq.modCount);
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
+    }
+  }
+  @Test
+  public void testCheckedListadd_intByte_initialCapacityDEFAULT_seqIsEmpty_negativeIndex()
   {
     CheckedList seq=new CheckedList();
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(-1,TypeConversionUtil.convertToByte(5)));
-    Assertions.assertEquals(0,seq.size);
+    Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intByte_initialCapacityDEFAULT_emptyInsertOOBHi()
+  public void testCheckedListadd_intByte_initialCapacityDEFAULT_seqIsEmpty_hiIndex()
   {
     CheckedList seq=new CheckedList();
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(seq.size+1,TypeConversionUtil.convertToByte(5)));
-    Assertions.assertEquals(0,seq.size);
+    Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intByte_initialCapacityDEFAULT_NotEmptyInsertOOBLo()
+  public void testCheckedListadd_intByte_initialCapacityDEFAULT_seqIsNotEmpty_negativeIndex()
   {
     CheckedList seq=new CheckedList();
     for(int i=0;i<100;++i)
@@ -3884,11 +6299,11 @@ public class DoubleArrSeqListTest
       seq.add(seq.size,TypeConversionUtil.convertToByte(i));
     }
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(-1,TypeConversionUtil.convertToByte(5)));
-    Assertions.assertEquals(100,seq.size);
+    Assertions.assertEquals(100,seq.size());
     Assertions.assertEquals(100,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intByte_initialCapacityDEFAULT_NotEmptyInsertOOBHi()
+  public void testCheckedListadd_intByte_initialCapacityDEFAULT_seqIsNotEmpty_hiIndex()
   {
     CheckedList seq=new CheckedList();
     for(int i=0;i<100;++i)
@@ -3896,8 +6311,26 @@ public class DoubleArrSeqListTest
       seq.add(seq.size,TypeConversionUtil.convertToByte(i));
     }
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(seq.size+1,TypeConversionUtil.convertToByte(5)));
-    Assertions.assertEquals(100,seq.size);
+    Assertions.assertEquals(100,seq.size());
     Assertions.assertEquals(100,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intByte_initialCapacityNULL_NonThrowingIndex()
+  {
+    CheckedList seq=new CheckedList(0,null);
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertToByte(i));
+    }
+    for(int i=0;i<100;++i)
+    {
+      var putVal=TypeConversionUtil.convertToByte(100-i-1);
+      seq.put(i,putVal);
+      var expectedVal=TypeConversionUtil.convertTodouble(100-i-1);
+      Assertions.assertEquals(expectedVal,seq.arr[i]);
+      Assertions.assertEquals(100,seq.size());
+      Assertions.assertEquals(100,seq.modCount);
+    }
   }
   @Test
   public void testCheckedListadd_intByte_initialCapacityNULL_InsertBegin()
@@ -3907,10 +6340,11 @@ public class DoubleArrSeqListTest
     {
       seq.add(0,TypeConversionUtil.convertToByte(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[seq.size-i-1]);
     }
@@ -3923,10 +6357,11 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size,TypeConversionUtil.convertToByte(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
     }
@@ -3939,37 +6374,89 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size/2,TypeConversionUtil.convertToByte(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    ArrayList arrList=new ArrayList();
-    for(int i=0;i<seq.size;++i)
+    ArrayList arrayList=new ArrayList();
+    for(int i=0;i<seqSize;++i)
     {
-      seq.add(TypeConversionUtil.convertToByte(i));
+      arrayList.add(arrayList.size()/2,TypeConversionUtil.convertTodouble(i));
     }
-    for(int i=0;i<seq.size;++i)
+    System.out.println("BEGIN testCheckedListadd_intByte_initialCapacityNULL_InsertMidPoint");
+    for(int i=0;i<seqSize;++i)
     {
-      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]));
+      System.out.println(arrayList.get(i));
+      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]);
+    }
+    System.out.println("END testCheckedListadd_intByte_initialCapacityNULL_InsertMidPoint");
+  }
+  @Test
+  public void testCheckedListput_intByte_initialCapacityNULL_seqIsEmpty_hiIndex()
+  {
+    CheckedList seq=new CheckedList(0,null);
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(0,TypeConversionUtil.convertToByte(5)));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intByte_initialCapacityNULL_seqIsEmpty_negativeIndex()
+  {
+    CheckedList seq=new CheckedList(0,null);
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(-1,TypeConversionUtil.convertToByte(5)));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intByte_initialCapacityNULL_seqIsNotEmpty_hiIndex()
+  {
+    CheckedList seq=new CheckedList(0,null);
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertToByte(i));
+    }
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(seq.size(),TypeConversionUtil.convertToByte(5)));
+    Assertions.assertEquals(100,seq.size());
+    Assertions.assertEquals(100,seq.modCount);
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
     }
   }
   @Test
-  public void testCheckedListadd_intByte_initialCapacityNULL_emptyInsertOOBLo()
+  public void testCheckedListput_intByte_initialCapacityNULL_seqIsNotEmpty_negativeIndex()
+  {
+    CheckedList seq=new CheckedList(0,null);
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertToByte(i));
+    }
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(-1,TypeConversionUtil.convertToByte(5)));
+    Assertions.assertEquals(100,seq.size());
+    Assertions.assertEquals(100,seq.modCount);
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
+    }
+  }
+  @Test
+  public void testCheckedListadd_intByte_initialCapacityNULL_seqIsEmpty_negativeIndex()
   {
     CheckedList seq=new CheckedList(0,null);
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(-1,TypeConversionUtil.convertToByte(5)));
-    Assertions.assertEquals(0,seq.size);
+    Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intByte_initialCapacityNULL_emptyInsertOOBHi()
+  public void testCheckedListadd_intByte_initialCapacityNULL_seqIsEmpty_hiIndex()
   {
     CheckedList seq=new CheckedList(0,null);
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(seq.size+1,TypeConversionUtil.convertToByte(5)));
-    Assertions.assertEquals(0,seq.size);
+    Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intByte_initialCapacityNULL_NotEmptyInsertOOBLo()
+  public void testCheckedListadd_intByte_initialCapacityNULL_seqIsNotEmpty_negativeIndex()
   {
     CheckedList seq=new CheckedList(0,null);
     for(int i=0;i<100;++i)
@@ -3977,11 +6464,11 @@ public class DoubleArrSeqListTest
       seq.add(seq.size,TypeConversionUtil.convertToByte(i));
     }
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(-1,TypeConversionUtil.convertToByte(5)));
-    Assertions.assertEquals(100,seq.size);
+    Assertions.assertEquals(100,seq.size());
     Assertions.assertEquals(100,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intByte_initialCapacityNULL_NotEmptyInsertOOBHi()
+  public void testCheckedListadd_intByte_initialCapacityNULL_seqIsNotEmpty_hiIndex()
   {
     CheckedList seq=new CheckedList(0,null);
     for(int i=0;i<100;++i)
@@ -3989,8 +6476,26 @@ public class DoubleArrSeqListTest
       seq.add(seq.size,TypeConversionUtil.convertToByte(i));
     }
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(seq.size+1,TypeConversionUtil.convertToByte(5)));
-    Assertions.assertEquals(100,seq.size);
+    Assertions.assertEquals(100,seq.size());
     Assertions.assertEquals(100,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intByte_initialCapacity50_NonThrowingIndex()
+  {
+    CheckedList seq=new CheckedList(50);
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertToByte(i));
+    }
+    for(int i=0;i<100;++i)
+    {
+      var putVal=TypeConversionUtil.convertToByte(100-i-1);
+      seq.put(i,putVal);
+      var expectedVal=TypeConversionUtil.convertTodouble(100-i-1);
+      Assertions.assertEquals(expectedVal,seq.arr[i]);
+      Assertions.assertEquals(100,seq.size());
+      Assertions.assertEquals(100,seq.modCount);
+    }
   }
   @Test
   public void testCheckedListadd_intByte_initialCapacity50_InsertBegin()
@@ -4000,10 +6505,11 @@ public class DoubleArrSeqListTest
     {
       seq.add(0,TypeConversionUtil.convertToByte(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[seq.size-i-1]);
     }
@@ -4016,10 +6522,11 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size,TypeConversionUtil.convertToByte(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
     }
@@ -4032,37 +6539,89 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size/2,TypeConversionUtil.convertToByte(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    ArrayList arrList=new ArrayList();
-    for(int i=0;i<seq.size;++i)
+    ArrayList arrayList=new ArrayList();
+    for(int i=0;i<seqSize;++i)
     {
-      seq.add(TypeConversionUtil.convertToByte(i));
+      arrayList.add(arrayList.size()/2,TypeConversionUtil.convertTodouble(i));
     }
-    for(int i=0;i<seq.size;++i)
+    System.out.println("BEGIN testCheckedListadd_intByte_initialCapacity50_InsertMidPoint");
+    for(int i=0;i<seqSize;++i)
     {
-      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]));
+      System.out.println(arrayList.get(i));
+      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]);
+    }
+    System.out.println("END testCheckedListadd_intByte_initialCapacity50_InsertMidPoint");
+  }
+  @Test
+  public void testCheckedListput_intByte_initialCapacity50_seqIsEmpty_hiIndex()
+  {
+    CheckedList seq=new CheckedList(50);
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(0,TypeConversionUtil.convertToByte(5)));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intByte_initialCapacity50_seqIsEmpty_negativeIndex()
+  {
+    CheckedList seq=new CheckedList(50);
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(-1,TypeConversionUtil.convertToByte(5)));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intByte_initialCapacity50_seqIsNotEmpty_hiIndex()
+  {
+    CheckedList seq=new CheckedList(50);
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertToByte(i));
+    }
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(seq.size(),TypeConversionUtil.convertToByte(5)));
+    Assertions.assertEquals(100,seq.size());
+    Assertions.assertEquals(100,seq.modCount);
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
     }
   }
   @Test
-  public void testCheckedListadd_intByte_initialCapacity50_emptyInsertOOBLo()
+  public void testCheckedListput_intByte_initialCapacity50_seqIsNotEmpty_negativeIndex()
+  {
+    CheckedList seq=new CheckedList(50);
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertToByte(i));
+    }
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(-1,TypeConversionUtil.convertToByte(5)));
+    Assertions.assertEquals(100,seq.size());
+    Assertions.assertEquals(100,seq.modCount);
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
+    }
+  }
+  @Test
+  public void testCheckedListadd_intByte_initialCapacity50_seqIsEmpty_negativeIndex()
   {
     CheckedList seq=new CheckedList(50);
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(-1,TypeConversionUtil.convertToByte(5)));
-    Assertions.assertEquals(0,seq.size);
+    Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intByte_initialCapacity50_emptyInsertOOBHi()
+  public void testCheckedListadd_intByte_initialCapacity50_seqIsEmpty_hiIndex()
   {
     CheckedList seq=new CheckedList(50);
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(seq.size+1,TypeConversionUtil.convertToByte(5)));
-    Assertions.assertEquals(0,seq.size);
+    Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intByte_initialCapacity50_NotEmptyInsertOOBLo()
+  public void testCheckedListadd_intByte_initialCapacity50_seqIsNotEmpty_negativeIndex()
   {
     CheckedList seq=new CheckedList(50);
     for(int i=0;i<100;++i)
@@ -4070,11 +6629,11 @@ public class DoubleArrSeqListTest
       seq.add(seq.size,TypeConversionUtil.convertToByte(i));
     }
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(-1,TypeConversionUtil.convertToByte(5)));
-    Assertions.assertEquals(100,seq.size);
+    Assertions.assertEquals(100,seq.size());
     Assertions.assertEquals(100,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intByte_initialCapacity50_NotEmptyInsertOOBHi()
+  public void testCheckedListadd_intByte_initialCapacity50_seqIsNotEmpty_hiIndex()
   {
     CheckedList seq=new CheckedList(50);
     for(int i=0;i<100;++i)
@@ -4082,8 +6641,26 @@ public class DoubleArrSeqListTest
       seq.add(seq.size,TypeConversionUtil.convertToByte(i));
     }
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(seq.size+1,TypeConversionUtil.convertToByte(5)));
-    Assertions.assertEquals(100,seq.size);
+    Assertions.assertEquals(100,seq.size());
     Assertions.assertEquals(100,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intchar_initialCapacityDEFAULT_NonThrowingIndex()
+  {
+    CheckedList seq=new CheckedList();
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertTochar(i));
+    }
+    for(int i=0;i<100;++i)
+    {
+      var putVal=TypeConversionUtil.convertTochar(100-i-1);
+      seq.put(i,putVal);
+      var expectedVal=TypeConversionUtil.convertTodouble(100-i-1);
+      Assertions.assertEquals(expectedVal,seq.arr[i]);
+      Assertions.assertEquals(100,seq.size());
+      Assertions.assertEquals(100,seq.modCount);
+    }
   }
   @Test
   public void testCheckedListadd_intchar_initialCapacityDEFAULT_InsertBegin()
@@ -4093,10 +6670,11 @@ public class DoubleArrSeqListTest
     {
       seq.add(0,TypeConversionUtil.convertTochar(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[seq.size-i-1]);
     }
@@ -4109,10 +6687,11 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size,TypeConversionUtil.convertTochar(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
     }
@@ -4125,37 +6704,89 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size/2,TypeConversionUtil.convertTochar(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    ArrayList arrList=new ArrayList();
-    for(int i=0;i<seq.size;++i)
+    ArrayList arrayList=new ArrayList();
+    for(int i=0;i<seqSize;++i)
     {
-      seq.add(TypeConversionUtil.convertTochar(i));
+      arrayList.add(arrayList.size()/2,TypeConversionUtil.convertTodouble(i));
     }
-    for(int i=0;i<seq.size;++i)
+    System.out.println("BEGIN testCheckedListadd_intchar_initialCapacityDEFAULT_InsertMidPoint");
+    for(int i=0;i<seqSize;++i)
     {
-      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]));
+      System.out.println(arrayList.get(i));
+      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]);
+    }
+    System.out.println("END testCheckedListadd_intchar_initialCapacityDEFAULT_InsertMidPoint");
+  }
+  @Test
+  public void testCheckedListput_intchar_initialCapacityDEFAULT_seqIsEmpty_hiIndex()
+  {
+    CheckedList seq=new CheckedList();
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(0,TypeConversionUtil.convertTochar(5)));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intchar_initialCapacityDEFAULT_seqIsEmpty_negativeIndex()
+  {
+    CheckedList seq=new CheckedList();
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(-1,TypeConversionUtil.convertTochar(5)));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intchar_initialCapacityDEFAULT_seqIsNotEmpty_hiIndex()
+  {
+    CheckedList seq=new CheckedList();
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertTochar(i));
+    }
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(seq.size(),TypeConversionUtil.convertTochar(5)));
+    Assertions.assertEquals(100,seq.size());
+    Assertions.assertEquals(100,seq.modCount);
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
     }
   }
   @Test
-  public void testCheckedListadd_intchar_initialCapacityDEFAULT_emptyInsertOOBLo()
+  public void testCheckedListput_intchar_initialCapacityDEFAULT_seqIsNotEmpty_negativeIndex()
+  {
+    CheckedList seq=new CheckedList();
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertTochar(i));
+    }
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(-1,TypeConversionUtil.convertTochar(5)));
+    Assertions.assertEquals(100,seq.size());
+    Assertions.assertEquals(100,seq.modCount);
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
+    }
+  }
+  @Test
+  public void testCheckedListadd_intchar_initialCapacityDEFAULT_seqIsEmpty_negativeIndex()
   {
     CheckedList seq=new CheckedList();
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(-1,TypeConversionUtil.convertTochar(5)));
-    Assertions.assertEquals(0,seq.size);
+    Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intchar_initialCapacityDEFAULT_emptyInsertOOBHi()
+  public void testCheckedListadd_intchar_initialCapacityDEFAULT_seqIsEmpty_hiIndex()
   {
     CheckedList seq=new CheckedList();
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(seq.size+1,TypeConversionUtil.convertTochar(5)));
-    Assertions.assertEquals(0,seq.size);
+    Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intchar_initialCapacityDEFAULT_NotEmptyInsertOOBLo()
+  public void testCheckedListadd_intchar_initialCapacityDEFAULT_seqIsNotEmpty_negativeIndex()
   {
     CheckedList seq=new CheckedList();
     for(int i=0;i<100;++i)
@@ -4163,11 +6794,11 @@ public class DoubleArrSeqListTest
       seq.add(seq.size,TypeConversionUtil.convertTochar(i));
     }
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(-1,TypeConversionUtil.convertTochar(5)));
-    Assertions.assertEquals(100,seq.size);
+    Assertions.assertEquals(100,seq.size());
     Assertions.assertEquals(100,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intchar_initialCapacityDEFAULT_NotEmptyInsertOOBHi()
+  public void testCheckedListadd_intchar_initialCapacityDEFAULT_seqIsNotEmpty_hiIndex()
   {
     CheckedList seq=new CheckedList();
     for(int i=0;i<100;++i)
@@ -4175,8 +6806,26 @@ public class DoubleArrSeqListTest
       seq.add(seq.size,TypeConversionUtil.convertTochar(i));
     }
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(seq.size+1,TypeConversionUtil.convertTochar(5)));
-    Assertions.assertEquals(100,seq.size);
+    Assertions.assertEquals(100,seq.size());
     Assertions.assertEquals(100,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intchar_initialCapacityNULL_NonThrowingIndex()
+  {
+    CheckedList seq=new CheckedList(0,null);
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertTochar(i));
+    }
+    for(int i=0;i<100;++i)
+    {
+      var putVal=TypeConversionUtil.convertTochar(100-i-1);
+      seq.put(i,putVal);
+      var expectedVal=TypeConversionUtil.convertTodouble(100-i-1);
+      Assertions.assertEquals(expectedVal,seq.arr[i]);
+      Assertions.assertEquals(100,seq.size());
+      Assertions.assertEquals(100,seq.modCount);
+    }
   }
   @Test
   public void testCheckedListadd_intchar_initialCapacityNULL_InsertBegin()
@@ -4186,10 +6835,11 @@ public class DoubleArrSeqListTest
     {
       seq.add(0,TypeConversionUtil.convertTochar(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[seq.size-i-1]);
     }
@@ -4202,10 +6852,11 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size,TypeConversionUtil.convertTochar(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
     }
@@ -4218,37 +6869,89 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size/2,TypeConversionUtil.convertTochar(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    ArrayList arrList=new ArrayList();
-    for(int i=0;i<seq.size;++i)
+    ArrayList arrayList=new ArrayList();
+    for(int i=0;i<seqSize;++i)
     {
-      seq.add(TypeConversionUtil.convertTochar(i));
+      arrayList.add(arrayList.size()/2,TypeConversionUtil.convertTodouble(i));
     }
-    for(int i=0;i<seq.size;++i)
+    System.out.println("BEGIN testCheckedListadd_intchar_initialCapacityNULL_InsertMidPoint");
+    for(int i=0;i<seqSize;++i)
     {
-      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]));
+      System.out.println(arrayList.get(i));
+      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]);
+    }
+    System.out.println("END testCheckedListadd_intchar_initialCapacityNULL_InsertMidPoint");
+  }
+  @Test
+  public void testCheckedListput_intchar_initialCapacityNULL_seqIsEmpty_hiIndex()
+  {
+    CheckedList seq=new CheckedList(0,null);
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(0,TypeConversionUtil.convertTochar(5)));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intchar_initialCapacityNULL_seqIsEmpty_negativeIndex()
+  {
+    CheckedList seq=new CheckedList(0,null);
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(-1,TypeConversionUtil.convertTochar(5)));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intchar_initialCapacityNULL_seqIsNotEmpty_hiIndex()
+  {
+    CheckedList seq=new CheckedList(0,null);
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertTochar(i));
+    }
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(seq.size(),TypeConversionUtil.convertTochar(5)));
+    Assertions.assertEquals(100,seq.size());
+    Assertions.assertEquals(100,seq.modCount);
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
     }
   }
   @Test
-  public void testCheckedListadd_intchar_initialCapacityNULL_emptyInsertOOBLo()
+  public void testCheckedListput_intchar_initialCapacityNULL_seqIsNotEmpty_negativeIndex()
+  {
+    CheckedList seq=new CheckedList(0,null);
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertTochar(i));
+    }
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(-1,TypeConversionUtil.convertTochar(5)));
+    Assertions.assertEquals(100,seq.size());
+    Assertions.assertEquals(100,seq.modCount);
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
+    }
+  }
+  @Test
+  public void testCheckedListadd_intchar_initialCapacityNULL_seqIsEmpty_negativeIndex()
   {
     CheckedList seq=new CheckedList(0,null);
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(-1,TypeConversionUtil.convertTochar(5)));
-    Assertions.assertEquals(0,seq.size);
+    Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intchar_initialCapacityNULL_emptyInsertOOBHi()
+  public void testCheckedListadd_intchar_initialCapacityNULL_seqIsEmpty_hiIndex()
   {
     CheckedList seq=new CheckedList(0,null);
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(seq.size+1,TypeConversionUtil.convertTochar(5)));
-    Assertions.assertEquals(0,seq.size);
+    Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intchar_initialCapacityNULL_NotEmptyInsertOOBLo()
+  public void testCheckedListadd_intchar_initialCapacityNULL_seqIsNotEmpty_negativeIndex()
   {
     CheckedList seq=new CheckedList(0,null);
     for(int i=0;i<100;++i)
@@ -4256,11 +6959,11 @@ public class DoubleArrSeqListTest
       seq.add(seq.size,TypeConversionUtil.convertTochar(i));
     }
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(-1,TypeConversionUtil.convertTochar(5)));
-    Assertions.assertEquals(100,seq.size);
+    Assertions.assertEquals(100,seq.size());
     Assertions.assertEquals(100,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intchar_initialCapacityNULL_NotEmptyInsertOOBHi()
+  public void testCheckedListadd_intchar_initialCapacityNULL_seqIsNotEmpty_hiIndex()
   {
     CheckedList seq=new CheckedList(0,null);
     for(int i=0;i<100;++i)
@@ -4268,8 +6971,26 @@ public class DoubleArrSeqListTest
       seq.add(seq.size,TypeConversionUtil.convertTochar(i));
     }
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(seq.size+1,TypeConversionUtil.convertTochar(5)));
-    Assertions.assertEquals(100,seq.size);
+    Assertions.assertEquals(100,seq.size());
     Assertions.assertEquals(100,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intchar_initialCapacity50_NonThrowingIndex()
+  {
+    CheckedList seq=new CheckedList(50);
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertTochar(i));
+    }
+    for(int i=0;i<100;++i)
+    {
+      var putVal=TypeConversionUtil.convertTochar(100-i-1);
+      seq.put(i,putVal);
+      var expectedVal=TypeConversionUtil.convertTodouble(100-i-1);
+      Assertions.assertEquals(expectedVal,seq.arr[i]);
+      Assertions.assertEquals(100,seq.size());
+      Assertions.assertEquals(100,seq.modCount);
+    }
   }
   @Test
   public void testCheckedListadd_intchar_initialCapacity50_InsertBegin()
@@ -4279,10 +7000,11 @@ public class DoubleArrSeqListTest
     {
       seq.add(0,TypeConversionUtil.convertTochar(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[seq.size-i-1]);
     }
@@ -4295,10 +7017,11 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size,TypeConversionUtil.convertTochar(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
     }
@@ -4311,37 +7034,89 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size/2,TypeConversionUtil.convertTochar(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    ArrayList arrList=new ArrayList();
-    for(int i=0;i<seq.size;++i)
+    ArrayList arrayList=new ArrayList();
+    for(int i=0;i<seqSize;++i)
     {
-      seq.add(TypeConversionUtil.convertTochar(i));
+      arrayList.add(arrayList.size()/2,TypeConversionUtil.convertTodouble(i));
     }
-    for(int i=0;i<seq.size;++i)
+    System.out.println("BEGIN testCheckedListadd_intchar_initialCapacity50_InsertMidPoint");
+    for(int i=0;i<seqSize;++i)
     {
-      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]));
+      System.out.println(arrayList.get(i));
+      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]);
+    }
+    System.out.println("END testCheckedListadd_intchar_initialCapacity50_InsertMidPoint");
+  }
+  @Test
+  public void testCheckedListput_intchar_initialCapacity50_seqIsEmpty_hiIndex()
+  {
+    CheckedList seq=new CheckedList(50);
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(0,TypeConversionUtil.convertTochar(5)));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intchar_initialCapacity50_seqIsEmpty_negativeIndex()
+  {
+    CheckedList seq=new CheckedList(50);
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(-1,TypeConversionUtil.convertTochar(5)));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intchar_initialCapacity50_seqIsNotEmpty_hiIndex()
+  {
+    CheckedList seq=new CheckedList(50);
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertTochar(i));
+    }
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(seq.size(),TypeConversionUtil.convertTochar(5)));
+    Assertions.assertEquals(100,seq.size());
+    Assertions.assertEquals(100,seq.modCount);
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
     }
   }
   @Test
-  public void testCheckedListadd_intchar_initialCapacity50_emptyInsertOOBLo()
+  public void testCheckedListput_intchar_initialCapacity50_seqIsNotEmpty_negativeIndex()
+  {
+    CheckedList seq=new CheckedList(50);
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertTochar(i));
+    }
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(-1,TypeConversionUtil.convertTochar(5)));
+    Assertions.assertEquals(100,seq.size());
+    Assertions.assertEquals(100,seq.modCount);
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
+    }
+  }
+  @Test
+  public void testCheckedListadd_intchar_initialCapacity50_seqIsEmpty_negativeIndex()
   {
     CheckedList seq=new CheckedList(50);
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(-1,TypeConversionUtil.convertTochar(5)));
-    Assertions.assertEquals(0,seq.size);
+    Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intchar_initialCapacity50_emptyInsertOOBHi()
+  public void testCheckedListadd_intchar_initialCapacity50_seqIsEmpty_hiIndex()
   {
     CheckedList seq=new CheckedList(50);
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(seq.size+1,TypeConversionUtil.convertTochar(5)));
-    Assertions.assertEquals(0,seq.size);
+    Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intchar_initialCapacity50_NotEmptyInsertOOBLo()
+  public void testCheckedListadd_intchar_initialCapacity50_seqIsNotEmpty_negativeIndex()
   {
     CheckedList seq=new CheckedList(50);
     for(int i=0;i<100;++i)
@@ -4349,11 +7124,11 @@ public class DoubleArrSeqListTest
       seq.add(seq.size,TypeConversionUtil.convertTochar(i));
     }
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(-1,TypeConversionUtil.convertTochar(5)));
-    Assertions.assertEquals(100,seq.size);
+    Assertions.assertEquals(100,seq.size());
     Assertions.assertEquals(100,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intchar_initialCapacity50_NotEmptyInsertOOBHi()
+  public void testCheckedListadd_intchar_initialCapacity50_seqIsNotEmpty_hiIndex()
   {
     CheckedList seq=new CheckedList(50);
     for(int i=0;i<100;++i)
@@ -4361,8 +7136,26 @@ public class DoubleArrSeqListTest
       seq.add(seq.size,TypeConversionUtil.convertTochar(i));
     }
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(seq.size+1,TypeConversionUtil.convertTochar(5)));
-    Assertions.assertEquals(100,seq.size);
+    Assertions.assertEquals(100,seq.size());
     Assertions.assertEquals(100,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intCharacter_initialCapacityDEFAULT_NonThrowingIndex()
+  {
+    CheckedList seq=new CheckedList();
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertToCharacter(i));
+    }
+    for(int i=0;i<100;++i)
+    {
+      var putVal=TypeConversionUtil.convertToCharacter(100-i-1);
+      seq.put(i,putVal);
+      var expectedVal=TypeConversionUtil.convertTodouble(100-i-1);
+      Assertions.assertEquals(expectedVal,seq.arr[i]);
+      Assertions.assertEquals(100,seq.size());
+      Assertions.assertEquals(100,seq.modCount);
+    }
   }
   @Test
   public void testCheckedListadd_intCharacter_initialCapacityDEFAULT_InsertBegin()
@@ -4372,10 +7165,11 @@ public class DoubleArrSeqListTest
     {
       seq.add(0,TypeConversionUtil.convertToCharacter(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[seq.size-i-1]);
     }
@@ -4388,10 +7182,11 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size,TypeConversionUtil.convertToCharacter(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
     }
@@ -4404,37 +7199,89 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size/2,TypeConversionUtil.convertToCharacter(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    ArrayList arrList=new ArrayList();
-    for(int i=0;i<seq.size;++i)
+    ArrayList arrayList=new ArrayList();
+    for(int i=0;i<seqSize;++i)
     {
-      seq.add(TypeConversionUtil.convertToCharacter(i));
+      arrayList.add(arrayList.size()/2,TypeConversionUtil.convertTodouble(i));
     }
-    for(int i=0;i<seq.size;++i)
+    System.out.println("BEGIN testCheckedListadd_intCharacter_initialCapacityDEFAULT_InsertMidPoint");
+    for(int i=0;i<seqSize;++i)
     {
-      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]));
+      System.out.println(arrayList.get(i));
+      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]);
+    }
+    System.out.println("END testCheckedListadd_intCharacter_initialCapacityDEFAULT_InsertMidPoint");
+  }
+  @Test
+  public void testCheckedListput_intCharacter_initialCapacityDEFAULT_seqIsEmpty_hiIndex()
+  {
+    CheckedList seq=new CheckedList();
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(0,TypeConversionUtil.convertToCharacter(5)));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intCharacter_initialCapacityDEFAULT_seqIsEmpty_negativeIndex()
+  {
+    CheckedList seq=new CheckedList();
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(-1,TypeConversionUtil.convertToCharacter(5)));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intCharacter_initialCapacityDEFAULT_seqIsNotEmpty_hiIndex()
+  {
+    CheckedList seq=new CheckedList();
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertToCharacter(i));
+    }
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(seq.size(),TypeConversionUtil.convertToCharacter(5)));
+    Assertions.assertEquals(100,seq.size());
+    Assertions.assertEquals(100,seq.modCount);
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
     }
   }
   @Test
-  public void testCheckedListadd_intCharacter_initialCapacityDEFAULT_emptyInsertOOBLo()
+  public void testCheckedListput_intCharacter_initialCapacityDEFAULT_seqIsNotEmpty_negativeIndex()
+  {
+    CheckedList seq=new CheckedList();
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertToCharacter(i));
+    }
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(-1,TypeConversionUtil.convertToCharacter(5)));
+    Assertions.assertEquals(100,seq.size());
+    Assertions.assertEquals(100,seq.modCount);
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
+    }
+  }
+  @Test
+  public void testCheckedListadd_intCharacter_initialCapacityDEFAULT_seqIsEmpty_negativeIndex()
   {
     CheckedList seq=new CheckedList();
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(-1,TypeConversionUtil.convertToCharacter(5)));
-    Assertions.assertEquals(0,seq.size);
+    Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intCharacter_initialCapacityDEFAULT_emptyInsertOOBHi()
+  public void testCheckedListadd_intCharacter_initialCapacityDEFAULT_seqIsEmpty_hiIndex()
   {
     CheckedList seq=new CheckedList();
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(seq.size+1,TypeConversionUtil.convertToCharacter(5)));
-    Assertions.assertEquals(0,seq.size);
+    Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intCharacter_initialCapacityDEFAULT_NotEmptyInsertOOBLo()
+  public void testCheckedListadd_intCharacter_initialCapacityDEFAULT_seqIsNotEmpty_negativeIndex()
   {
     CheckedList seq=new CheckedList();
     for(int i=0;i<100;++i)
@@ -4442,11 +7289,11 @@ public class DoubleArrSeqListTest
       seq.add(seq.size,TypeConversionUtil.convertToCharacter(i));
     }
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(-1,TypeConversionUtil.convertToCharacter(5)));
-    Assertions.assertEquals(100,seq.size);
+    Assertions.assertEquals(100,seq.size());
     Assertions.assertEquals(100,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intCharacter_initialCapacityDEFAULT_NotEmptyInsertOOBHi()
+  public void testCheckedListadd_intCharacter_initialCapacityDEFAULT_seqIsNotEmpty_hiIndex()
   {
     CheckedList seq=new CheckedList();
     for(int i=0;i<100;++i)
@@ -4454,8 +7301,26 @@ public class DoubleArrSeqListTest
       seq.add(seq.size,TypeConversionUtil.convertToCharacter(i));
     }
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(seq.size+1,TypeConversionUtil.convertToCharacter(5)));
-    Assertions.assertEquals(100,seq.size);
+    Assertions.assertEquals(100,seq.size());
     Assertions.assertEquals(100,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intCharacter_initialCapacityNULL_NonThrowingIndex()
+  {
+    CheckedList seq=new CheckedList(0,null);
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertToCharacter(i));
+    }
+    for(int i=0;i<100;++i)
+    {
+      var putVal=TypeConversionUtil.convertToCharacter(100-i-1);
+      seq.put(i,putVal);
+      var expectedVal=TypeConversionUtil.convertTodouble(100-i-1);
+      Assertions.assertEquals(expectedVal,seq.arr[i]);
+      Assertions.assertEquals(100,seq.size());
+      Assertions.assertEquals(100,seq.modCount);
+    }
   }
   @Test
   public void testCheckedListadd_intCharacter_initialCapacityNULL_InsertBegin()
@@ -4465,10 +7330,11 @@ public class DoubleArrSeqListTest
     {
       seq.add(0,TypeConversionUtil.convertToCharacter(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[seq.size-i-1]);
     }
@@ -4481,10 +7347,11 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size,TypeConversionUtil.convertToCharacter(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
     }
@@ -4497,37 +7364,89 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size/2,TypeConversionUtil.convertToCharacter(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    ArrayList arrList=new ArrayList();
-    for(int i=0;i<seq.size;++i)
+    ArrayList arrayList=new ArrayList();
+    for(int i=0;i<seqSize;++i)
     {
-      seq.add(TypeConversionUtil.convertToCharacter(i));
+      arrayList.add(arrayList.size()/2,TypeConversionUtil.convertTodouble(i));
     }
-    for(int i=0;i<seq.size;++i)
+    System.out.println("BEGIN testCheckedListadd_intCharacter_initialCapacityNULL_InsertMidPoint");
+    for(int i=0;i<seqSize;++i)
     {
-      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]));
+      System.out.println(arrayList.get(i));
+      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]);
+    }
+    System.out.println("END testCheckedListadd_intCharacter_initialCapacityNULL_InsertMidPoint");
+  }
+  @Test
+  public void testCheckedListput_intCharacter_initialCapacityNULL_seqIsEmpty_hiIndex()
+  {
+    CheckedList seq=new CheckedList(0,null);
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(0,TypeConversionUtil.convertToCharacter(5)));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intCharacter_initialCapacityNULL_seqIsEmpty_negativeIndex()
+  {
+    CheckedList seq=new CheckedList(0,null);
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(-1,TypeConversionUtil.convertToCharacter(5)));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intCharacter_initialCapacityNULL_seqIsNotEmpty_hiIndex()
+  {
+    CheckedList seq=new CheckedList(0,null);
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertToCharacter(i));
+    }
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(seq.size(),TypeConversionUtil.convertToCharacter(5)));
+    Assertions.assertEquals(100,seq.size());
+    Assertions.assertEquals(100,seq.modCount);
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
     }
   }
   @Test
-  public void testCheckedListadd_intCharacter_initialCapacityNULL_emptyInsertOOBLo()
+  public void testCheckedListput_intCharacter_initialCapacityNULL_seqIsNotEmpty_negativeIndex()
+  {
+    CheckedList seq=new CheckedList(0,null);
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertToCharacter(i));
+    }
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(-1,TypeConversionUtil.convertToCharacter(5)));
+    Assertions.assertEquals(100,seq.size());
+    Assertions.assertEquals(100,seq.modCount);
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
+    }
+  }
+  @Test
+  public void testCheckedListadd_intCharacter_initialCapacityNULL_seqIsEmpty_negativeIndex()
   {
     CheckedList seq=new CheckedList(0,null);
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(-1,TypeConversionUtil.convertToCharacter(5)));
-    Assertions.assertEquals(0,seq.size);
+    Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intCharacter_initialCapacityNULL_emptyInsertOOBHi()
+  public void testCheckedListadd_intCharacter_initialCapacityNULL_seqIsEmpty_hiIndex()
   {
     CheckedList seq=new CheckedList(0,null);
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(seq.size+1,TypeConversionUtil.convertToCharacter(5)));
-    Assertions.assertEquals(0,seq.size);
+    Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intCharacter_initialCapacityNULL_NotEmptyInsertOOBLo()
+  public void testCheckedListadd_intCharacter_initialCapacityNULL_seqIsNotEmpty_negativeIndex()
   {
     CheckedList seq=new CheckedList(0,null);
     for(int i=0;i<100;++i)
@@ -4535,11 +7454,11 @@ public class DoubleArrSeqListTest
       seq.add(seq.size,TypeConversionUtil.convertToCharacter(i));
     }
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(-1,TypeConversionUtil.convertToCharacter(5)));
-    Assertions.assertEquals(100,seq.size);
+    Assertions.assertEquals(100,seq.size());
     Assertions.assertEquals(100,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intCharacter_initialCapacityNULL_NotEmptyInsertOOBHi()
+  public void testCheckedListadd_intCharacter_initialCapacityNULL_seqIsNotEmpty_hiIndex()
   {
     CheckedList seq=new CheckedList(0,null);
     for(int i=0;i<100;++i)
@@ -4547,8 +7466,26 @@ public class DoubleArrSeqListTest
       seq.add(seq.size,TypeConversionUtil.convertToCharacter(i));
     }
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(seq.size+1,TypeConversionUtil.convertToCharacter(5)));
-    Assertions.assertEquals(100,seq.size);
+    Assertions.assertEquals(100,seq.size());
     Assertions.assertEquals(100,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intCharacter_initialCapacity50_NonThrowingIndex()
+  {
+    CheckedList seq=new CheckedList(50);
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertToCharacter(i));
+    }
+    for(int i=0;i<100;++i)
+    {
+      var putVal=TypeConversionUtil.convertToCharacter(100-i-1);
+      seq.put(i,putVal);
+      var expectedVal=TypeConversionUtil.convertTodouble(100-i-1);
+      Assertions.assertEquals(expectedVal,seq.arr[i]);
+      Assertions.assertEquals(100,seq.size());
+      Assertions.assertEquals(100,seq.modCount);
+    }
   }
   @Test
   public void testCheckedListadd_intCharacter_initialCapacity50_InsertBegin()
@@ -4558,10 +7495,11 @@ public class DoubleArrSeqListTest
     {
       seq.add(0,TypeConversionUtil.convertToCharacter(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[seq.size-i-1]);
     }
@@ -4574,10 +7512,11 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size,TypeConversionUtil.convertToCharacter(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
     }
@@ -4590,37 +7529,89 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size/2,TypeConversionUtil.convertToCharacter(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    ArrayList arrList=new ArrayList();
-    for(int i=0;i<seq.size;++i)
+    ArrayList arrayList=new ArrayList();
+    for(int i=0;i<seqSize;++i)
     {
-      seq.add(TypeConversionUtil.convertToCharacter(i));
+      arrayList.add(arrayList.size()/2,TypeConversionUtil.convertTodouble(i));
     }
-    for(int i=0;i<seq.size;++i)
+    System.out.println("BEGIN testCheckedListadd_intCharacter_initialCapacity50_InsertMidPoint");
+    for(int i=0;i<seqSize;++i)
     {
-      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]));
+      System.out.println(arrayList.get(i));
+      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]);
+    }
+    System.out.println("END testCheckedListadd_intCharacter_initialCapacity50_InsertMidPoint");
+  }
+  @Test
+  public void testCheckedListput_intCharacter_initialCapacity50_seqIsEmpty_hiIndex()
+  {
+    CheckedList seq=new CheckedList(50);
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(0,TypeConversionUtil.convertToCharacter(5)));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intCharacter_initialCapacity50_seqIsEmpty_negativeIndex()
+  {
+    CheckedList seq=new CheckedList(50);
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(-1,TypeConversionUtil.convertToCharacter(5)));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intCharacter_initialCapacity50_seqIsNotEmpty_hiIndex()
+  {
+    CheckedList seq=new CheckedList(50);
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertToCharacter(i));
+    }
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(seq.size(),TypeConversionUtil.convertToCharacter(5)));
+    Assertions.assertEquals(100,seq.size());
+    Assertions.assertEquals(100,seq.modCount);
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
     }
   }
   @Test
-  public void testCheckedListadd_intCharacter_initialCapacity50_emptyInsertOOBLo()
+  public void testCheckedListput_intCharacter_initialCapacity50_seqIsNotEmpty_negativeIndex()
+  {
+    CheckedList seq=new CheckedList(50);
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertToCharacter(i));
+    }
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(-1,TypeConversionUtil.convertToCharacter(5)));
+    Assertions.assertEquals(100,seq.size());
+    Assertions.assertEquals(100,seq.modCount);
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
+    }
+  }
+  @Test
+  public void testCheckedListadd_intCharacter_initialCapacity50_seqIsEmpty_negativeIndex()
   {
     CheckedList seq=new CheckedList(50);
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(-1,TypeConversionUtil.convertToCharacter(5)));
-    Assertions.assertEquals(0,seq.size);
+    Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intCharacter_initialCapacity50_emptyInsertOOBHi()
+  public void testCheckedListadd_intCharacter_initialCapacity50_seqIsEmpty_hiIndex()
   {
     CheckedList seq=new CheckedList(50);
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(seq.size+1,TypeConversionUtil.convertToCharacter(5)));
-    Assertions.assertEquals(0,seq.size);
+    Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intCharacter_initialCapacity50_NotEmptyInsertOOBLo()
+  public void testCheckedListadd_intCharacter_initialCapacity50_seqIsNotEmpty_negativeIndex()
   {
     CheckedList seq=new CheckedList(50);
     for(int i=0;i<100;++i)
@@ -4628,11 +7619,11 @@ public class DoubleArrSeqListTest
       seq.add(seq.size,TypeConversionUtil.convertToCharacter(i));
     }
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(-1,TypeConversionUtil.convertToCharacter(5)));
-    Assertions.assertEquals(100,seq.size);
+    Assertions.assertEquals(100,seq.size());
     Assertions.assertEquals(100,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intCharacter_initialCapacity50_NotEmptyInsertOOBHi()
+  public void testCheckedListadd_intCharacter_initialCapacity50_seqIsNotEmpty_hiIndex()
   {
     CheckedList seq=new CheckedList(50);
     for(int i=0;i<100;++i)
@@ -4640,8 +7631,26 @@ public class DoubleArrSeqListTest
       seq.add(seq.size,TypeConversionUtil.convertToCharacter(i));
     }
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(seq.size+1,TypeConversionUtil.convertToCharacter(5)));
-    Assertions.assertEquals(100,seq.size);
+    Assertions.assertEquals(100,seq.size());
     Assertions.assertEquals(100,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intshort_initialCapacityDEFAULT_NonThrowingIndex()
+  {
+    CheckedList seq=new CheckedList();
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertToshort(i));
+    }
+    for(int i=0;i<100;++i)
+    {
+      var putVal=TypeConversionUtil.convertToshort(100-i-1);
+      seq.put(i,putVal);
+      var expectedVal=TypeConversionUtil.convertTodouble(100-i-1);
+      Assertions.assertEquals(expectedVal,seq.arr[i]);
+      Assertions.assertEquals(100,seq.size());
+      Assertions.assertEquals(100,seq.modCount);
+    }
   }
   @Test
   public void testCheckedListadd_intshort_initialCapacityDEFAULT_InsertBegin()
@@ -4651,10 +7660,11 @@ public class DoubleArrSeqListTest
     {
       seq.add(0,TypeConversionUtil.convertToshort(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[seq.size-i-1]);
     }
@@ -4667,10 +7677,11 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size,TypeConversionUtil.convertToshort(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
     }
@@ -4683,37 +7694,89 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size/2,TypeConversionUtil.convertToshort(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    ArrayList arrList=new ArrayList();
-    for(int i=0;i<seq.size;++i)
+    ArrayList arrayList=new ArrayList();
+    for(int i=0;i<seqSize;++i)
     {
-      seq.add(TypeConversionUtil.convertToshort(i));
+      arrayList.add(arrayList.size()/2,TypeConversionUtil.convertTodouble(i));
     }
-    for(int i=0;i<seq.size;++i)
+    System.out.println("BEGIN testCheckedListadd_intshort_initialCapacityDEFAULT_InsertMidPoint");
+    for(int i=0;i<seqSize;++i)
     {
-      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]));
+      System.out.println(arrayList.get(i));
+      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]);
+    }
+    System.out.println("END testCheckedListadd_intshort_initialCapacityDEFAULT_InsertMidPoint");
+  }
+  @Test
+  public void testCheckedListput_intshort_initialCapacityDEFAULT_seqIsEmpty_hiIndex()
+  {
+    CheckedList seq=new CheckedList();
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(0,TypeConversionUtil.convertToshort(5)));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intshort_initialCapacityDEFAULT_seqIsEmpty_negativeIndex()
+  {
+    CheckedList seq=new CheckedList();
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(-1,TypeConversionUtil.convertToshort(5)));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intshort_initialCapacityDEFAULT_seqIsNotEmpty_hiIndex()
+  {
+    CheckedList seq=new CheckedList();
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertToshort(i));
+    }
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(seq.size(),TypeConversionUtil.convertToshort(5)));
+    Assertions.assertEquals(100,seq.size());
+    Assertions.assertEquals(100,seq.modCount);
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
     }
   }
   @Test
-  public void testCheckedListadd_intshort_initialCapacityDEFAULT_emptyInsertOOBLo()
+  public void testCheckedListput_intshort_initialCapacityDEFAULT_seqIsNotEmpty_negativeIndex()
+  {
+    CheckedList seq=new CheckedList();
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertToshort(i));
+    }
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(-1,TypeConversionUtil.convertToshort(5)));
+    Assertions.assertEquals(100,seq.size());
+    Assertions.assertEquals(100,seq.modCount);
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
+    }
+  }
+  @Test
+  public void testCheckedListadd_intshort_initialCapacityDEFAULT_seqIsEmpty_negativeIndex()
   {
     CheckedList seq=new CheckedList();
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(-1,TypeConversionUtil.convertToshort(5)));
-    Assertions.assertEquals(0,seq.size);
+    Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intshort_initialCapacityDEFAULT_emptyInsertOOBHi()
+  public void testCheckedListadd_intshort_initialCapacityDEFAULT_seqIsEmpty_hiIndex()
   {
     CheckedList seq=new CheckedList();
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(seq.size+1,TypeConversionUtil.convertToshort(5)));
-    Assertions.assertEquals(0,seq.size);
+    Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intshort_initialCapacityDEFAULT_NotEmptyInsertOOBLo()
+  public void testCheckedListadd_intshort_initialCapacityDEFAULT_seqIsNotEmpty_negativeIndex()
   {
     CheckedList seq=new CheckedList();
     for(int i=0;i<100;++i)
@@ -4721,11 +7784,11 @@ public class DoubleArrSeqListTest
       seq.add(seq.size,TypeConversionUtil.convertToshort(i));
     }
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(-1,TypeConversionUtil.convertToshort(5)));
-    Assertions.assertEquals(100,seq.size);
+    Assertions.assertEquals(100,seq.size());
     Assertions.assertEquals(100,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intshort_initialCapacityDEFAULT_NotEmptyInsertOOBHi()
+  public void testCheckedListadd_intshort_initialCapacityDEFAULT_seqIsNotEmpty_hiIndex()
   {
     CheckedList seq=new CheckedList();
     for(int i=0;i<100;++i)
@@ -4733,8 +7796,26 @@ public class DoubleArrSeqListTest
       seq.add(seq.size,TypeConversionUtil.convertToshort(i));
     }
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(seq.size+1,TypeConversionUtil.convertToshort(5)));
-    Assertions.assertEquals(100,seq.size);
+    Assertions.assertEquals(100,seq.size());
     Assertions.assertEquals(100,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intshort_initialCapacityNULL_NonThrowingIndex()
+  {
+    CheckedList seq=new CheckedList(0,null);
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertToshort(i));
+    }
+    for(int i=0;i<100;++i)
+    {
+      var putVal=TypeConversionUtil.convertToshort(100-i-1);
+      seq.put(i,putVal);
+      var expectedVal=TypeConversionUtil.convertTodouble(100-i-1);
+      Assertions.assertEquals(expectedVal,seq.arr[i]);
+      Assertions.assertEquals(100,seq.size());
+      Assertions.assertEquals(100,seq.modCount);
+    }
   }
   @Test
   public void testCheckedListadd_intshort_initialCapacityNULL_InsertBegin()
@@ -4744,10 +7825,11 @@ public class DoubleArrSeqListTest
     {
       seq.add(0,TypeConversionUtil.convertToshort(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[seq.size-i-1]);
     }
@@ -4760,10 +7842,11 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size,TypeConversionUtil.convertToshort(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
     }
@@ -4776,37 +7859,89 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size/2,TypeConversionUtil.convertToshort(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    ArrayList arrList=new ArrayList();
-    for(int i=0;i<seq.size;++i)
+    ArrayList arrayList=new ArrayList();
+    for(int i=0;i<seqSize;++i)
     {
-      seq.add(TypeConversionUtil.convertToshort(i));
+      arrayList.add(arrayList.size()/2,TypeConversionUtil.convertTodouble(i));
     }
-    for(int i=0;i<seq.size;++i)
+    System.out.println("BEGIN testCheckedListadd_intshort_initialCapacityNULL_InsertMidPoint");
+    for(int i=0;i<seqSize;++i)
     {
-      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]));
+      System.out.println(arrayList.get(i));
+      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]);
+    }
+    System.out.println("END testCheckedListadd_intshort_initialCapacityNULL_InsertMidPoint");
+  }
+  @Test
+  public void testCheckedListput_intshort_initialCapacityNULL_seqIsEmpty_hiIndex()
+  {
+    CheckedList seq=new CheckedList(0,null);
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(0,TypeConversionUtil.convertToshort(5)));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intshort_initialCapacityNULL_seqIsEmpty_negativeIndex()
+  {
+    CheckedList seq=new CheckedList(0,null);
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(-1,TypeConversionUtil.convertToshort(5)));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intshort_initialCapacityNULL_seqIsNotEmpty_hiIndex()
+  {
+    CheckedList seq=new CheckedList(0,null);
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertToshort(i));
+    }
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(seq.size(),TypeConversionUtil.convertToshort(5)));
+    Assertions.assertEquals(100,seq.size());
+    Assertions.assertEquals(100,seq.modCount);
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
     }
   }
   @Test
-  public void testCheckedListadd_intshort_initialCapacityNULL_emptyInsertOOBLo()
+  public void testCheckedListput_intshort_initialCapacityNULL_seqIsNotEmpty_negativeIndex()
+  {
+    CheckedList seq=new CheckedList(0,null);
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertToshort(i));
+    }
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(-1,TypeConversionUtil.convertToshort(5)));
+    Assertions.assertEquals(100,seq.size());
+    Assertions.assertEquals(100,seq.modCount);
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
+    }
+  }
+  @Test
+  public void testCheckedListadd_intshort_initialCapacityNULL_seqIsEmpty_negativeIndex()
   {
     CheckedList seq=new CheckedList(0,null);
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(-1,TypeConversionUtil.convertToshort(5)));
-    Assertions.assertEquals(0,seq.size);
+    Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intshort_initialCapacityNULL_emptyInsertOOBHi()
+  public void testCheckedListadd_intshort_initialCapacityNULL_seqIsEmpty_hiIndex()
   {
     CheckedList seq=new CheckedList(0,null);
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(seq.size+1,TypeConversionUtil.convertToshort(5)));
-    Assertions.assertEquals(0,seq.size);
+    Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intshort_initialCapacityNULL_NotEmptyInsertOOBLo()
+  public void testCheckedListadd_intshort_initialCapacityNULL_seqIsNotEmpty_negativeIndex()
   {
     CheckedList seq=new CheckedList(0,null);
     for(int i=0;i<100;++i)
@@ -4814,11 +7949,11 @@ public class DoubleArrSeqListTest
       seq.add(seq.size,TypeConversionUtil.convertToshort(i));
     }
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(-1,TypeConversionUtil.convertToshort(5)));
-    Assertions.assertEquals(100,seq.size);
+    Assertions.assertEquals(100,seq.size());
     Assertions.assertEquals(100,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intshort_initialCapacityNULL_NotEmptyInsertOOBHi()
+  public void testCheckedListadd_intshort_initialCapacityNULL_seqIsNotEmpty_hiIndex()
   {
     CheckedList seq=new CheckedList(0,null);
     for(int i=0;i<100;++i)
@@ -4826,8 +7961,26 @@ public class DoubleArrSeqListTest
       seq.add(seq.size,TypeConversionUtil.convertToshort(i));
     }
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(seq.size+1,TypeConversionUtil.convertToshort(5)));
-    Assertions.assertEquals(100,seq.size);
+    Assertions.assertEquals(100,seq.size());
     Assertions.assertEquals(100,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intshort_initialCapacity50_NonThrowingIndex()
+  {
+    CheckedList seq=new CheckedList(50);
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertToshort(i));
+    }
+    for(int i=0;i<100;++i)
+    {
+      var putVal=TypeConversionUtil.convertToshort(100-i-1);
+      seq.put(i,putVal);
+      var expectedVal=TypeConversionUtil.convertTodouble(100-i-1);
+      Assertions.assertEquals(expectedVal,seq.arr[i]);
+      Assertions.assertEquals(100,seq.size());
+      Assertions.assertEquals(100,seq.modCount);
+    }
   }
   @Test
   public void testCheckedListadd_intshort_initialCapacity50_InsertBegin()
@@ -4837,10 +7990,11 @@ public class DoubleArrSeqListTest
     {
       seq.add(0,TypeConversionUtil.convertToshort(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[seq.size-i-1]);
     }
@@ -4853,10 +8007,11 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size,TypeConversionUtil.convertToshort(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
     }
@@ -4869,37 +8024,89 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size/2,TypeConversionUtil.convertToshort(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    ArrayList arrList=new ArrayList();
-    for(int i=0;i<seq.size;++i)
+    ArrayList arrayList=new ArrayList();
+    for(int i=0;i<seqSize;++i)
     {
-      seq.add(TypeConversionUtil.convertToshort(i));
+      arrayList.add(arrayList.size()/2,TypeConversionUtil.convertTodouble(i));
     }
-    for(int i=0;i<seq.size;++i)
+    System.out.println("BEGIN testCheckedListadd_intshort_initialCapacity50_InsertMidPoint");
+    for(int i=0;i<seqSize;++i)
     {
-      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]));
+      System.out.println(arrayList.get(i));
+      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]);
+    }
+    System.out.println("END testCheckedListadd_intshort_initialCapacity50_InsertMidPoint");
+  }
+  @Test
+  public void testCheckedListput_intshort_initialCapacity50_seqIsEmpty_hiIndex()
+  {
+    CheckedList seq=new CheckedList(50);
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(0,TypeConversionUtil.convertToshort(5)));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intshort_initialCapacity50_seqIsEmpty_negativeIndex()
+  {
+    CheckedList seq=new CheckedList(50);
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(-1,TypeConversionUtil.convertToshort(5)));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intshort_initialCapacity50_seqIsNotEmpty_hiIndex()
+  {
+    CheckedList seq=new CheckedList(50);
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertToshort(i));
+    }
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(seq.size(),TypeConversionUtil.convertToshort(5)));
+    Assertions.assertEquals(100,seq.size());
+    Assertions.assertEquals(100,seq.modCount);
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
     }
   }
   @Test
-  public void testCheckedListadd_intshort_initialCapacity50_emptyInsertOOBLo()
+  public void testCheckedListput_intshort_initialCapacity50_seqIsNotEmpty_negativeIndex()
+  {
+    CheckedList seq=new CheckedList(50);
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertToshort(i));
+    }
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(-1,TypeConversionUtil.convertToshort(5)));
+    Assertions.assertEquals(100,seq.size());
+    Assertions.assertEquals(100,seq.modCount);
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
+    }
+  }
+  @Test
+  public void testCheckedListadd_intshort_initialCapacity50_seqIsEmpty_negativeIndex()
   {
     CheckedList seq=new CheckedList(50);
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(-1,TypeConversionUtil.convertToshort(5)));
-    Assertions.assertEquals(0,seq.size);
+    Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intshort_initialCapacity50_emptyInsertOOBHi()
+  public void testCheckedListadd_intshort_initialCapacity50_seqIsEmpty_hiIndex()
   {
     CheckedList seq=new CheckedList(50);
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(seq.size+1,TypeConversionUtil.convertToshort(5)));
-    Assertions.assertEquals(0,seq.size);
+    Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intshort_initialCapacity50_NotEmptyInsertOOBLo()
+  public void testCheckedListadd_intshort_initialCapacity50_seqIsNotEmpty_negativeIndex()
   {
     CheckedList seq=new CheckedList(50);
     for(int i=0;i<100;++i)
@@ -4907,11 +8114,11 @@ public class DoubleArrSeqListTest
       seq.add(seq.size,TypeConversionUtil.convertToshort(i));
     }
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(-1,TypeConversionUtil.convertToshort(5)));
-    Assertions.assertEquals(100,seq.size);
+    Assertions.assertEquals(100,seq.size());
     Assertions.assertEquals(100,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intshort_initialCapacity50_NotEmptyInsertOOBHi()
+  public void testCheckedListadd_intshort_initialCapacity50_seqIsNotEmpty_hiIndex()
   {
     CheckedList seq=new CheckedList(50);
     for(int i=0;i<100;++i)
@@ -4919,8 +8126,26 @@ public class DoubleArrSeqListTest
       seq.add(seq.size,TypeConversionUtil.convertToshort(i));
     }
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(seq.size+1,TypeConversionUtil.convertToshort(5)));
-    Assertions.assertEquals(100,seq.size);
+    Assertions.assertEquals(100,seq.size());
     Assertions.assertEquals(100,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intShort_initialCapacityDEFAULT_NonThrowingIndex()
+  {
+    CheckedList seq=new CheckedList();
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertToShort(i));
+    }
+    for(int i=0;i<100;++i)
+    {
+      var putVal=TypeConversionUtil.convertToShort(100-i-1);
+      seq.put(i,putVal);
+      var expectedVal=TypeConversionUtil.convertTodouble(100-i-1);
+      Assertions.assertEquals(expectedVal,seq.arr[i]);
+      Assertions.assertEquals(100,seq.size());
+      Assertions.assertEquals(100,seq.modCount);
+    }
   }
   @Test
   public void testCheckedListadd_intShort_initialCapacityDEFAULT_InsertBegin()
@@ -4930,10 +8155,11 @@ public class DoubleArrSeqListTest
     {
       seq.add(0,TypeConversionUtil.convertToShort(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[seq.size-i-1]);
     }
@@ -4946,10 +8172,11 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size,TypeConversionUtil.convertToShort(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
     }
@@ -4962,37 +8189,89 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size/2,TypeConversionUtil.convertToShort(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    ArrayList arrList=new ArrayList();
-    for(int i=0;i<seq.size;++i)
+    ArrayList arrayList=new ArrayList();
+    for(int i=0;i<seqSize;++i)
     {
-      seq.add(TypeConversionUtil.convertToShort(i));
+      arrayList.add(arrayList.size()/2,TypeConversionUtil.convertTodouble(i));
     }
-    for(int i=0;i<seq.size;++i)
+    System.out.println("BEGIN testCheckedListadd_intShort_initialCapacityDEFAULT_InsertMidPoint");
+    for(int i=0;i<seqSize;++i)
     {
-      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]));
+      System.out.println(arrayList.get(i));
+      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]);
+    }
+    System.out.println("END testCheckedListadd_intShort_initialCapacityDEFAULT_InsertMidPoint");
+  }
+  @Test
+  public void testCheckedListput_intShort_initialCapacityDEFAULT_seqIsEmpty_hiIndex()
+  {
+    CheckedList seq=new CheckedList();
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(0,TypeConversionUtil.convertToShort(5)));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intShort_initialCapacityDEFAULT_seqIsEmpty_negativeIndex()
+  {
+    CheckedList seq=new CheckedList();
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(-1,TypeConversionUtil.convertToShort(5)));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intShort_initialCapacityDEFAULT_seqIsNotEmpty_hiIndex()
+  {
+    CheckedList seq=new CheckedList();
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertToShort(i));
+    }
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(seq.size(),TypeConversionUtil.convertToShort(5)));
+    Assertions.assertEquals(100,seq.size());
+    Assertions.assertEquals(100,seq.modCount);
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
     }
   }
   @Test
-  public void testCheckedListadd_intShort_initialCapacityDEFAULT_emptyInsertOOBLo()
+  public void testCheckedListput_intShort_initialCapacityDEFAULT_seqIsNotEmpty_negativeIndex()
+  {
+    CheckedList seq=new CheckedList();
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertToShort(i));
+    }
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(-1,TypeConversionUtil.convertToShort(5)));
+    Assertions.assertEquals(100,seq.size());
+    Assertions.assertEquals(100,seq.modCount);
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
+    }
+  }
+  @Test
+  public void testCheckedListadd_intShort_initialCapacityDEFAULT_seqIsEmpty_negativeIndex()
   {
     CheckedList seq=new CheckedList();
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(-1,TypeConversionUtil.convertToShort(5)));
-    Assertions.assertEquals(0,seq.size);
+    Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intShort_initialCapacityDEFAULT_emptyInsertOOBHi()
+  public void testCheckedListadd_intShort_initialCapacityDEFAULT_seqIsEmpty_hiIndex()
   {
     CheckedList seq=new CheckedList();
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(seq.size+1,TypeConversionUtil.convertToShort(5)));
-    Assertions.assertEquals(0,seq.size);
+    Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intShort_initialCapacityDEFAULT_NotEmptyInsertOOBLo()
+  public void testCheckedListadd_intShort_initialCapacityDEFAULT_seqIsNotEmpty_negativeIndex()
   {
     CheckedList seq=new CheckedList();
     for(int i=0;i<100;++i)
@@ -5000,11 +8279,11 @@ public class DoubleArrSeqListTest
       seq.add(seq.size,TypeConversionUtil.convertToShort(i));
     }
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(-1,TypeConversionUtil.convertToShort(5)));
-    Assertions.assertEquals(100,seq.size);
+    Assertions.assertEquals(100,seq.size());
     Assertions.assertEquals(100,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intShort_initialCapacityDEFAULT_NotEmptyInsertOOBHi()
+  public void testCheckedListadd_intShort_initialCapacityDEFAULT_seqIsNotEmpty_hiIndex()
   {
     CheckedList seq=new CheckedList();
     for(int i=0;i<100;++i)
@@ -5012,8 +8291,26 @@ public class DoubleArrSeqListTest
       seq.add(seq.size,TypeConversionUtil.convertToShort(i));
     }
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(seq.size+1,TypeConversionUtil.convertToShort(5)));
-    Assertions.assertEquals(100,seq.size);
+    Assertions.assertEquals(100,seq.size());
     Assertions.assertEquals(100,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intShort_initialCapacityNULL_NonThrowingIndex()
+  {
+    CheckedList seq=new CheckedList(0,null);
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertToShort(i));
+    }
+    for(int i=0;i<100;++i)
+    {
+      var putVal=TypeConversionUtil.convertToShort(100-i-1);
+      seq.put(i,putVal);
+      var expectedVal=TypeConversionUtil.convertTodouble(100-i-1);
+      Assertions.assertEquals(expectedVal,seq.arr[i]);
+      Assertions.assertEquals(100,seq.size());
+      Assertions.assertEquals(100,seq.modCount);
+    }
   }
   @Test
   public void testCheckedListadd_intShort_initialCapacityNULL_InsertBegin()
@@ -5023,10 +8320,11 @@ public class DoubleArrSeqListTest
     {
       seq.add(0,TypeConversionUtil.convertToShort(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[seq.size-i-1]);
     }
@@ -5039,10 +8337,11 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size,TypeConversionUtil.convertToShort(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
     }
@@ -5055,37 +8354,89 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size/2,TypeConversionUtil.convertToShort(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    ArrayList arrList=new ArrayList();
-    for(int i=0;i<seq.size;++i)
+    ArrayList arrayList=new ArrayList();
+    for(int i=0;i<seqSize;++i)
     {
-      seq.add(TypeConversionUtil.convertToShort(i));
+      arrayList.add(arrayList.size()/2,TypeConversionUtil.convertTodouble(i));
     }
-    for(int i=0;i<seq.size;++i)
+    System.out.println("BEGIN testCheckedListadd_intShort_initialCapacityNULL_InsertMidPoint");
+    for(int i=0;i<seqSize;++i)
     {
-      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]));
+      System.out.println(arrayList.get(i));
+      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]);
+    }
+    System.out.println("END testCheckedListadd_intShort_initialCapacityNULL_InsertMidPoint");
+  }
+  @Test
+  public void testCheckedListput_intShort_initialCapacityNULL_seqIsEmpty_hiIndex()
+  {
+    CheckedList seq=new CheckedList(0,null);
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(0,TypeConversionUtil.convertToShort(5)));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intShort_initialCapacityNULL_seqIsEmpty_negativeIndex()
+  {
+    CheckedList seq=new CheckedList(0,null);
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(-1,TypeConversionUtil.convertToShort(5)));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intShort_initialCapacityNULL_seqIsNotEmpty_hiIndex()
+  {
+    CheckedList seq=new CheckedList(0,null);
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertToShort(i));
+    }
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(seq.size(),TypeConversionUtil.convertToShort(5)));
+    Assertions.assertEquals(100,seq.size());
+    Assertions.assertEquals(100,seq.modCount);
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
     }
   }
   @Test
-  public void testCheckedListadd_intShort_initialCapacityNULL_emptyInsertOOBLo()
+  public void testCheckedListput_intShort_initialCapacityNULL_seqIsNotEmpty_negativeIndex()
+  {
+    CheckedList seq=new CheckedList(0,null);
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertToShort(i));
+    }
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(-1,TypeConversionUtil.convertToShort(5)));
+    Assertions.assertEquals(100,seq.size());
+    Assertions.assertEquals(100,seq.modCount);
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
+    }
+  }
+  @Test
+  public void testCheckedListadd_intShort_initialCapacityNULL_seqIsEmpty_negativeIndex()
   {
     CheckedList seq=new CheckedList(0,null);
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(-1,TypeConversionUtil.convertToShort(5)));
-    Assertions.assertEquals(0,seq.size);
+    Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intShort_initialCapacityNULL_emptyInsertOOBHi()
+  public void testCheckedListadd_intShort_initialCapacityNULL_seqIsEmpty_hiIndex()
   {
     CheckedList seq=new CheckedList(0,null);
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(seq.size+1,TypeConversionUtil.convertToShort(5)));
-    Assertions.assertEquals(0,seq.size);
+    Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intShort_initialCapacityNULL_NotEmptyInsertOOBLo()
+  public void testCheckedListadd_intShort_initialCapacityNULL_seqIsNotEmpty_negativeIndex()
   {
     CheckedList seq=new CheckedList(0,null);
     for(int i=0;i<100;++i)
@@ -5093,11 +8444,11 @@ public class DoubleArrSeqListTest
       seq.add(seq.size,TypeConversionUtil.convertToShort(i));
     }
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(-1,TypeConversionUtil.convertToShort(5)));
-    Assertions.assertEquals(100,seq.size);
+    Assertions.assertEquals(100,seq.size());
     Assertions.assertEquals(100,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intShort_initialCapacityNULL_NotEmptyInsertOOBHi()
+  public void testCheckedListadd_intShort_initialCapacityNULL_seqIsNotEmpty_hiIndex()
   {
     CheckedList seq=new CheckedList(0,null);
     for(int i=0;i<100;++i)
@@ -5105,8 +8456,26 @@ public class DoubleArrSeqListTest
       seq.add(seq.size,TypeConversionUtil.convertToShort(i));
     }
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(seq.size+1,TypeConversionUtil.convertToShort(5)));
-    Assertions.assertEquals(100,seq.size);
+    Assertions.assertEquals(100,seq.size());
     Assertions.assertEquals(100,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intShort_initialCapacity50_NonThrowingIndex()
+  {
+    CheckedList seq=new CheckedList(50);
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertToShort(i));
+    }
+    for(int i=0;i<100;++i)
+    {
+      var putVal=TypeConversionUtil.convertToShort(100-i-1);
+      seq.put(i,putVal);
+      var expectedVal=TypeConversionUtil.convertTodouble(100-i-1);
+      Assertions.assertEquals(expectedVal,seq.arr[i]);
+      Assertions.assertEquals(100,seq.size());
+      Assertions.assertEquals(100,seq.modCount);
+    }
   }
   @Test
   public void testCheckedListadd_intShort_initialCapacity50_InsertBegin()
@@ -5116,10 +8485,11 @@ public class DoubleArrSeqListTest
     {
       seq.add(0,TypeConversionUtil.convertToShort(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[seq.size-i-1]);
     }
@@ -5132,10 +8502,11 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size,TypeConversionUtil.convertToShort(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
     }
@@ -5148,37 +8519,89 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size/2,TypeConversionUtil.convertToShort(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    ArrayList arrList=new ArrayList();
-    for(int i=0;i<seq.size;++i)
+    ArrayList arrayList=new ArrayList();
+    for(int i=0;i<seqSize;++i)
     {
-      seq.add(TypeConversionUtil.convertToShort(i));
+      arrayList.add(arrayList.size()/2,TypeConversionUtil.convertTodouble(i));
     }
-    for(int i=0;i<seq.size;++i)
+    System.out.println("BEGIN testCheckedListadd_intShort_initialCapacity50_InsertMidPoint");
+    for(int i=0;i<seqSize;++i)
     {
-      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]));
+      System.out.println(arrayList.get(i));
+      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]);
+    }
+    System.out.println("END testCheckedListadd_intShort_initialCapacity50_InsertMidPoint");
+  }
+  @Test
+  public void testCheckedListput_intShort_initialCapacity50_seqIsEmpty_hiIndex()
+  {
+    CheckedList seq=new CheckedList(50);
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(0,TypeConversionUtil.convertToShort(5)));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intShort_initialCapacity50_seqIsEmpty_negativeIndex()
+  {
+    CheckedList seq=new CheckedList(50);
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(-1,TypeConversionUtil.convertToShort(5)));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intShort_initialCapacity50_seqIsNotEmpty_hiIndex()
+  {
+    CheckedList seq=new CheckedList(50);
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertToShort(i));
+    }
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(seq.size(),TypeConversionUtil.convertToShort(5)));
+    Assertions.assertEquals(100,seq.size());
+    Assertions.assertEquals(100,seq.modCount);
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
     }
   }
   @Test
-  public void testCheckedListadd_intShort_initialCapacity50_emptyInsertOOBLo()
+  public void testCheckedListput_intShort_initialCapacity50_seqIsNotEmpty_negativeIndex()
+  {
+    CheckedList seq=new CheckedList(50);
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertToShort(i));
+    }
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(-1,TypeConversionUtil.convertToShort(5)));
+    Assertions.assertEquals(100,seq.size());
+    Assertions.assertEquals(100,seq.modCount);
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
+    }
+  }
+  @Test
+  public void testCheckedListadd_intShort_initialCapacity50_seqIsEmpty_negativeIndex()
   {
     CheckedList seq=new CheckedList(50);
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(-1,TypeConversionUtil.convertToShort(5)));
-    Assertions.assertEquals(0,seq.size);
+    Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intShort_initialCapacity50_emptyInsertOOBHi()
+  public void testCheckedListadd_intShort_initialCapacity50_seqIsEmpty_hiIndex()
   {
     CheckedList seq=new CheckedList(50);
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(seq.size+1,TypeConversionUtil.convertToShort(5)));
-    Assertions.assertEquals(0,seq.size);
+    Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intShort_initialCapacity50_NotEmptyInsertOOBLo()
+  public void testCheckedListadd_intShort_initialCapacity50_seqIsNotEmpty_negativeIndex()
   {
     CheckedList seq=new CheckedList(50);
     for(int i=0;i<100;++i)
@@ -5186,11 +8609,11 @@ public class DoubleArrSeqListTest
       seq.add(seq.size,TypeConversionUtil.convertToShort(i));
     }
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(-1,TypeConversionUtil.convertToShort(5)));
-    Assertions.assertEquals(100,seq.size);
+    Assertions.assertEquals(100,seq.size());
     Assertions.assertEquals(100,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intShort_initialCapacity50_NotEmptyInsertOOBHi()
+  public void testCheckedListadd_intShort_initialCapacity50_seqIsNotEmpty_hiIndex()
   {
     CheckedList seq=new CheckedList(50);
     for(int i=0;i<100;++i)
@@ -5198,8 +8621,26 @@ public class DoubleArrSeqListTest
       seq.add(seq.size,TypeConversionUtil.convertToShort(i));
     }
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(seq.size+1,TypeConversionUtil.convertToShort(5)));
-    Assertions.assertEquals(100,seq.size);
+    Assertions.assertEquals(100,seq.size());
     Assertions.assertEquals(100,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intint_initialCapacityDEFAULT_NonThrowingIndex()
+  {
+    CheckedList seq=new CheckedList();
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertToint(i));
+    }
+    for(int i=0;i<100;++i)
+    {
+      var putVal=TypeConversionUtil.convertToint(100-i-1);
+      seq.put(i,putVal);
+      var expectedVal=TypeConversionUtil.convertTodouble(100-i-1);
+      Assertions.assertEquals(expectedVal,seq.arr[i]);
+      Assertions.assertEquals(100,seq.size());
+      Assertions.assertEquals(100,seq.modCount);
+    }
   }
   @Test
   public void testCheckedListadd_intint_initialCapacityDEFAULT_InsertBegin()
@@ -5209,10 +8650,11 @@ public class DoubleArrSeqListTest
     {
       seq.add(0,TypeConversionUtil.convertToint(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[seq.size-i-1]);
     }
@@ -5225,10 +8667,11 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size,TypeConversionUtil.convertToint(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
     }
@@ -5241,37 +8684,89 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size/2,TypeConversionUtil.convertToint(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    ArrayList arrList=new ArrayList();
-    for(int i=0;i<seq.size;++i)
+    ArrayList arrayList=new ArrayList();
+    for(int i=0;i<seqSize;++i)
     {
-      seq.add(TypeConversionUtil.convertToint(i));
+      arrayList.add(arrayList.size()/2,TypeConversionUtil.convertTodouble(i));
     }
-    for(int i=0;i<seq.size;++i)
+    System.out.println("BEGIN testCheckedListadd_intint_initialCapacityDEFAULT_InsertMidPoint");
+    for(int i=0;i<seqSize;++i)
     {
-      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]));
+      System.out.println(arrayList.get(i));
+      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]);
+    }
+    System.out.println("END testCheckedListadd_intint_initialCapacityDEFAULT_InsertMidPoint");
+  }
+  @Test
+  public void testCheckedListput_intint_initialCapacityDEFAULT_seqIsEmpty_hiIndex()
+  {
+    CheckedList seq=new CheckedList();
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(0,TypeConversionUtil.convertToint(5)));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intint_initialCapacityDEFAULT_seqIsEmpty_negativeIndex()
+  {
+    CheckedList seq=new CheckedList();
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(-1,TypeConversionUtil.convertToint(5)));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intint_initialCapacityDEFAULT_seqIsNotEmpty_hiIndex()
+  {
+    CheckedList seq=new CheckedList();
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertToint(i));
+    }
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(seq.size(),TypeConversionUtil.convertToint(5)));
+    Assertions.assertEquals(100,seq.size());
+    Assertions.assertEquals(100,seq.modCount);
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
     }
   }
   @Test
-  public void testCheckedListadd_intint_initialCapacityDEFAULT_emptyInsertOOBLo()
+  public void testCheckedListput_intint_initialCapacityDEFAULT_seqIsNotEmpty_negativeIndex()
+  {
+    CheckedList seq=new CheckedList();
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertToint(i));
+    }
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(-1,TypeConversionUtil.convertToint(5)));
+    Assertions.assertEquals(100,seq.size());
+    Assertions.assertEquals(100,seq.modCount);
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
+    }
+  }
+  @Test
+  public void testCheckedListadd_intint_initialCapacityDEFAULT_seqIsEmpty_negativeIndex()
   {
     CheckedList seq=new CheckedList();
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(-1,TypeConversionUtil.convertToint(5)));
-    Assertions.assertEquals(0,seq.size);
+    Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intint_initialCapacityDEFAULT_emptyInsertOOBHi()
+  public void testCheckedListadd_intint_initialCapacityDEFAULT_seqIsEmpty_hiIndex()
   {
     CheckedList seq=new CheckedList();
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(seq.size+1,TypeConversionUtil.convertToint(5)));
-    Assertions.assertEquals(0,seq.size);
+    Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intint_initialCapacityDEFAULT_NotEmptyInsertOOBLo()
+  public void testCheckedListadd_intint_initialCapacityDEFAULT_seqIsNotEmpty_negativeIndex()
   {
     CheckedList seq=new CheckedList();
     for(int i=0;i<100;++i)
@@ -5279,11 +8774,11 @@ public class DoubleArrSeqListTest
       seq.add(seq.size,TypeConversionUtil.convertToint(i));
     }
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(-1,TypeConversionUtil.convertToint(5)));
-    Assertions.assertEquals(100,seq.size);
+    Assertions.assertEquals(100,seq.size());
     Assertions.assertEquals(100,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intint_initialCapacityDEFAULT_NotEmptyInsertOOBHi()
+  public void testCheckedListadd_intint_initialCapacityDEFAULT_seqIsNotEmpty_hiIndex()
   {
     CheckedList seq=new CheckedList();
     for(int i=0;i<100;++i)
@@ -5291,8 +8786,26 @@ public class DoubleArrSeqListTest
       seq.add(seq.size,TypeConversionUtil.convertToint(i));
     }
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(seq.size+1,TypeConversionUtil.convertToint(5)));
-    Assertions.assertEquals(100,seq.size);
+    Assertions.assertEquals(100,seq.size());
     Assertions.assertEquals(100,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intint_initialCapacityNULL_NonThrowingIndex()
+  {
+    CheckedList seq=new CheckedList(0,null);
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertToint(i));
+    }
+    for(int i=0;i<100;++i)
+    {
+      var putVal=TypeConversionUtil.convertToint(100-i-1);
+      seq.put(i,putVal);
+      var expectedVal=TypeConversionUtil.convertTodouble(100-i-1);
+      Assertions.assertEquals(expectedVal,seq.arr[i]);
+      Assertions.assertEquals(100,seq.size());
+      Assertions.assertEquals(100,seq.modCount);
+    }
   }
   @Test
   public void testCheckedListadd_intint_initialCapacityNULL_InsertBegin()
@@ -5302,10 +8815,11 @@ public class DoubleArrSeqListTest
     {
       seq.add(0,TypeConversionUtil.convertToint(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[seq.size-i-1]);
     }
@@ -5318,10 +8832,11 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size,TypeConversionUtil.convertToint(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
     }
@@ -5334,37 +8849,89 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size/2,TypeConversionUtil.convertToint(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    ArrayList arrList=new ArrayList();
-    for(int i=0;i<seq.size;++i)
+    ArrayList arrayList=new ArrayList();
+    for(int i=0;i<seqSize;++i)
     {
-      seq.add(TypeConversionUtil.convertToint(i));
+      arrayList.add(arrayList.size()/2,TypeConversionUtil.convertTodouble(i));
     }
-    for(int i=0;i<seq.size;++i)
+    System.out.println("BEGIN testCheckedListadd_intint_initialCapacityNULL_InsertMidPoint");
+    for(int i=0;i<seqSize;++i)
     {
-      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]));
+      System.out.println(arrayList.get(i));
+      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]);
+    }
+    System.out.println("END testCheckedListadd_intint_initialCapacityNULL_InsertMidPoint");
+  }
+  @Test
+  public void testCheckedListput_intint_initialCapacityNULL_seqIsEmpty_hiIndex()
+  {
+    CheckedList seq=new CheckedList(0,null);
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(0,TypeConversionUtil.convertToint(5)));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intint_initialCapacityNULL_seqIsEmpty_negativeIndex()
+  {
+    CheckedList seq=new CheckedList(0,null);
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(-1,TypeConversionUtil.convertToint(5)));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intint_initialCapacityNULL_seqIsNotEmpty_hiIndex()
+  {
+    CheckedList seq=new CheckedList(0,null);
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertToint(i));
+    }
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(seq.size(),TypeConversionUtil.convertToint(5)));
+    Assertions.assertEquals(100,seq.size());
+    Assertions.assertEquals(100,seq.modCount);
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
     }
   }
   @Test
-  public void testCheckedListadd_intint_initialCapacityNULL_emptyInsertOOBLo()
+  public void testCheckedListput_intint_initialCapacityNULL_seqIsNotEmpty_negativeIndex()
+  {
+    CheckedList seq=new CheckedList(0,null);
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertToint(i));
+    }
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(-1,TypeConversionUtil.convertToint(5)));
+    Assertions.assertEquals(100,seq.size());
+    Assertions.assertEquals(100,seq.modCount);
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
+    }
+  }
+  @Test
+  public void testCheckedListadd_intint_initialCapacityNULL_seqIsEmpty_negativeIndex()
   {
     CheckedList seq=new CheckedList(0,null);
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(-1,TypeConversionUtil.convertToint(5)));
-    Assertions.assertEquals(0,seq.size);
+    Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intint_initialCapacityNULL_emptyInsertOOBHi()
+  public void testCheckedListadd_intint_initialCapacityNULL_seqIsEmpty_hiIndex()
   {
     CheckedList seq=new CheckedList(0,null);
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(seq.size+1,TypeConversionUtil.convertToint(5)));
-    Assertions.assertEquals(0,seq.size);
+    Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intint_initialCapacityNULL_NotEmptyInsertOOBLo()
+  public void testCheckedListadd_intint_initialCapacityNULL_seqIsNotEmpty_negativeIndex()
   {
     CheckedList seq=new CheckedList(0,null);
     for(int i=0;i<100;++i)
@@ -5372,11 +8939,11 @@ public class DoubleArrSeqListTest
       seq.add(seq.size,TypeConversionUtil.convertToint(i));
     }
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(-1,TypeConversionUtil.convertToint(5)));
-    Assertions.assertEquals(100,seq.size);
+    Assertions.assertEquals(100,seq.size());
     Assertions.assertEquals(100,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intint_initialCapacityNULL_NotEmptyInsertOOBHi()
+  public void testCheckedListadd_intint_initialCapacityNULL_seqIsNotEmpty_hiIndex()
   {
     CheckedList seq=new CheckedList(0,null);
     for(int i=0;i<100;++i)
@@ -5384,8 +8951,26 @@ public class DoubleArrSeqListTest
       seq.add(seq.size,TypeConversionUtil.convertToint(i));
     }
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(seq.size+1,TypeConversionUtil.convertToint(5)));
-    Assertions.assertEquals(100,seq.size);
+    Assertions.assertEquals(100,seq.size());
     Assertions.assertEquals(100,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intint_initialCapacity50_NonThrowingIndex()
+  {
+    CheckedList seq=new CheckedList(50);
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertToint(i));
+    }
+    for(int i=0;i<100;++i)
+    {
+      var putVal=TypeConversionUtil.convertToint(100-i-1);
+      seq.put(i,putVal);
+      var expectedVal=TypeConversionUtil.convertTodouble(100-i-1);
+      Assertions.assertEquals(expectedVal,seq.arr[i]);
+      Assertions.assertEquals(100,seq.size());
+      Assertions.assertEquals(100,seq.modCount);
+    }
   }
   @Test
   public void testCheckedListadd_intint_initialCapacity50_InsertBegin()
@@ -5395,10 +8980,11 @@ public class DoubleArrSeqListTest
     {
       seq.add(0,TypeConversionUtil.convertToint(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[seq.size-i-1]);
     }
@@ -5411,10 +8997,11 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size,TypeConversionUtil.convertToint(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
     }
@@ -5427,37 +9014,89 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size/2,TypeConversionUtil.convertToint(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    ArrayList arrList=new ArrayList();
-    for(int i=0;i<seq.size;++i)
+    ArrayList arrayList=new ArrayList();
+    for(int i=0;i<seqSize;++i)
     {
-      seq.add(TypeConversionUtil.convertToint(i));
+      arrayList.add(arrayList.size()/2,TypeConversionUtil.convertTodouble(i));
     }
-    for(int i=0;i<seq.size;++i)
+    System.out.println("BEGIN testCheckedListadd_intint_initialCapacity50_InsertMidPoint");
+    for(int i=0;i<seqSize;++i)
     {
-      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]));
+      System.out.println(arrayList.get(i));
+      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]);
+    }
+    System.out.println("END testCheckedListadd_intint_initialCapacity50_InsertMidPoint");
+  }
+  @Test
+  public void testCheckedListput_intint_initialCapacity50_seqIsEmpty_hiIndex()
+  {
+    CheckedList seq=new CheckedList(50);
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(0,TypeConversionUtil.convertToint(5)));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intint_initialCapacity50_seqIsEmpty_negativeIndex()
+  {
+    CheckedList seq=new CheckedList(50);
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(-1,TypeConversionUtil.convertToint(5)));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intint_initialCapacity50_seqIsNotEmpty_hiIndex()
+  {
+    CheckedList seq=new CheckedList(50);
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertToint(i));
+    }
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(seq.size(),TypeConversionUtil.convertToint(5)));
+    Assertions.assertEquals(100,seq.size());
+    Assertions.assertEquals(100,seq.modCount);
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
     }
   }
   @Test
-  public void testCheckedListadd_intint_initialCapacity50_emptyInsertOOBLo()
+  public void testCheckedListput_intint_initialCapacity50_seqIsNotEmpty_negativeIndex()
+  {
+    CheckedList seq=new CheckedList(50);
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertToint(i));
+    }
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(-1,TypeConversionUtil.convertToint(5)));
+    Assertions.assertEquals(100,seq.size());
+    Assertions.assertEquals(100,seq.modCount);
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
+    }
+  }
+  @Test
+  public void testCheckedListadd_intint_initialCapacity50_seqIsEmpty_negativeIndex()
   {
     CheckedList seq=new CheckedList(50);
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(-1,TypeConversionUtil.convertToint(5)));
-    Assertions.assertEquals(0,seq.size);
+    Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intint_initialCapacity50_emptyInsertOOBHi()
+  public void testCheckedListadd_intint_initialCapacity50_seqIsEmpty_hiIndex()
   {
     CheckedList seq=new CheckedList(50);
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(seq.size+1,TypeConversionUtil.convertToint(5)));
-    Assertions.assertEquals(0,seq.size);
+    Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intint_initialCapacity50_NotEmptyInsertOOBLo()
+  public void testCheckedListadd_intint_initialCapacity50_seqIsNotEmpty_negativeIndex()
   {
     CheckedList seq=new CheckedList(50);
     for(int i=0;i<100;++i)
@@ -5465,11 +9104,11 @@ public class DoubleArrSeqListTest
       seq.add(seq.size,TypeConversionUtil.convertToint(i));
     }
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(-1,TypeConversionUtil.convertToint(5)));
-    Assertions.assertEquals(100,seq.size);
+    Assertions.assertEquals(100,seq.size());
     Assertions.assertEquals(100,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intint_initialCapacity50_NotEmptyInsertOOBHi()
+  public void testCheckedListadd_intint_initialCapacity50_seqIsNotEmpty_hiIndex()
   {
     CheckedList seq=new CheckedList(50);
     for(int i=0;i<100;++i)
@@ -5477,8 +9116,26 @@ public class DoubleArrSeqListTest
       seq.add(seq.size,TypeConversionUtil.convertToint(i));
     }
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(seq.size+1,TypeConversionUtil.convertToint(5)));
-    Assertions.assertEquals(100,seq.size);
+    Assertions.assertEquals(100,seq.size());
     Assertions.assertEquals(100,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intInteger_initialCapacityDEFAULT_NonThrowingIndex()
+  {
+    CheckedList seq=new CheckedList();
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertToInteger(i));
+    }
+    for(int i=0;i<100;++i)
+    {
+      var putVal=TypeConversionUtil.convertToInteger(100-i-1);
+      seq.put(i,putVal);
+      var expectedVal=TypeConversionUtil.convertTodouble(100-i-1);
+      Assertions.assertEquals(expectedVal,seq.arr[i]);
+      Assertions.assertEquals(100,seq.size());
+      Assertions.assertEquals(100,seq.modCount);
+    }
   }
   @Test
   public void testCheckedListadd_intInteger_initialCapacityDEFAULT_InsertBegin()
@@ -5488,10 +9145,11 @@ public class DoubleArrSeqListTest
     {
       seq.add(0,TypeConversionUtil.convertToInteger(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[seq.size-i-1]);
     }
@@ -5504,10 +9162,11 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size,TypeConversionUtil.convertToInteger(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
     }
@@ -5520,37 +9179,89 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size/2,TypeConversionUtil.convertToInteger(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    ArrayList arrList=new ArrayList();
-    for(int i=0;i<seq.size;++i)
+    ArrayList arrayList=new ArrayList();
+    for(int i=0;i<seqSize;++i)
     {
-      seq.add(TypeConversionUtil.convertToInteger(i));
+      arrayList.add(arrayList.size()/2,TypeConversionUtil.convertTodouble(i));
     }
-    for(int i=0;i<seq.size;++i)
+    System.out.println("BEGIN testCheckedListadd_intInteger_initialCapacityDEFAULT_InsertMidPoint");
+    for(int i=0;i<seqSize;++i)
     {
-      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]));
+      System.out.println(arrayList.get(i));
+      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]);
+    }
+    System.out.println("END testCheckedListadd_intInteger_initialCapacityDEFAULT_InsertMidPoint");
+  }
+  @Test
+  public void testCheckedListput_intInteger_initialCapacityDEFAULT_seqIsEmpty_hiIndex()
+  {
+    CheckedList seq=new CheckedList();
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(0,TypeConversionUtil.convertToInteger(5)));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intInteger_initialCapacityDEFAULT_seqIsEmpty_negativeIndex()
+  {
+    CheckedList seq=new CheckedList();
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(-1,TypeConversionUtil.convertToInteger(5)));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intInteger_initialCapacityDEFAULT_seqIsNotEmpty_hiIndex()
+  {
+    CheckedList seq=new CheckedList();
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertToInteger(i));
+    }
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(seq.size(),TypeConversionUtil.convertToInteger(5)));
+    Assertions.assertEquals(100,seq.size());
+    Assertions.assertEquals(100,seq.modCount);
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
     }
   }
   @Test
-  public void testCheckedListadd_intInteger_initialCapacityDEFAULT_emptyInsertOOBLo()
+  public void testCheckedListput_intInteger_initialCapacityDEFAULT_seqIsNotEmpty_negativeIndex()
+  {
+    CheckedList seq=new CheckedList();
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertToInteger(i));
+    }
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(-1,TypeConversionUtil.convertToInteger(5)));
+    Assertions.assertEquals(100,seq.size());
+    Assertions.assertEquals(100,seq.modCount);
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
+    }
+  }
+  @Test
+  public void testCheckedListadd_intInteger_initialCapacityDEFAULT_seqIsEmpty_negativeIndex()
   {
     CheckedList seq=new CheckedList();
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(-1,TypeConversionUtil.convertToInteger(5)));
-    Assertions.assertEquals(0,seq.size);
+    Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intInteger_initialCapacityDEFAULT_emptyInsertOOBHi()
+  public void testCheckedListadd_intInteger_initialCapacityDEFAULT_seqIsEmpty_hiIndex()
   {
     CheckedList seq=new CheckedList();
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(seq.size+1,TypeConversionUtil.convertToInteger(5)));
-    Assertions.assertEquals(0,seq.size);
+    Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intInteger_initialCapacityDEFAULT_NotEmptyInsertOOBLo()
+  public void testCheckedListadd_intInteger_initialCapacityDEFAULT_seqIsNotEmpty_negativeIndex()
   {
     CheckedList seq=new CheckedList();
     for(int i=0;i<100;++i)
@@ -5558,11 +9269,11 @@ public class DoubleArrSeqListTest
       seq.add(seq.size,TypeConversionUtil.convertToInteger(i));
     }
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(-1,TypeConversionUtil.convertToInteger(5)));
-    Assertions.assertEquals(100,seq.size);
+    Assertions.assertEquals(100,seq.size());
     Assertions.assertEquals(100,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intInteger_initialCapacityDEFAULT_NotEmptyInsertOOBHi()
+  public void testCheckedListadd_intInteger_initialCapacityDEFAULT_seqIsNotEmpty_hiIndex()
   {
     CheckedList seq=new CheckedList();
     for(int i=0;i<100;++i)
@@ -5570,8 +9281,26 @@ public class DoubleArrSeqListTest
       seq.add(seq.size,TypeConversionUtil.convertToInteger(i));
     }
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(seq.size+1,TypeConversionUtil.convertToInteger(5)));
-    Assertions.assertEquals(100,seq.size);
+    Assertions.assertEquals(100,seq.size());
     Assertions.assertEquals(100,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intInteger_initialCapacityNULL_NonThrowingIndex()
+  {
+    CheckedList seq=new CheckedList(0,null);
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertToInteger(i));
+    }
+    for(int i=0;i<100;++i)
+    {
+      var putVal=TypeConversionUtil.convertToInteger(100-i-1);
+      seq.put(i,putVal);
+      var expectedVal=TypeConversionUtil.convertTodouble(100-i-1);
+      Assertions.assertEquals(expectedVal,seq.arr[i]);
+      Assertions.assertEquals(100,seq.size());
+      Assertions.assertEquals(100,seq.modCount);
+    }
   }
   @Test
   public void testCheckedListadd_intInteger_initialCapacityNULL_InsertBegin()
@@ -5581,10 +9310,11 @@ public class DoubleArrSeqListTest
     {
       seq.add(0,TypeConversionUtil.convertToInteger(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[seq.size-i-1]);
     }
@@ -5597,10 +9327,11 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size,TypeConversionUtil.convertToInteger(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
     }
@@ -5613,37 +9344,89 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size/2,TypeConversionUtil.convertToInteger(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    ArrayList arrList=new ArrayList();
-    for(int i=0;i<seq.size;++i)
+    ArrayList arrayList=new ArrayList();
+    for(int i=0;i<seqSize;++i)
     {
-      seq.add(TypeConversionUtil.convertToInteger(i));
+      arrayList.add(arrayList.size()/2,TypeConversionUtil.convertTodouble(i));
     }
-    for(int i=0;i<seq.size;++i)
+    System.out.println("BEGIN testCheckedListadd_intInteger_initialCapacityNULL_InsertMidPoint");
+    for(int i=0;i<seqSize;++i)
     {
-      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]));
+      System.out.println(arrayList.get(i));
+      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]);
+    }
+    System.out.println("END testCheckedListadd_intInteger_initialCapacityNULL_InsertMidPoint");
+  }
+  @Test
+  public void testCheckedListput_intInteger_initialCapacityNULL_seqIsEmpty_hiIndex()
+  {
+    CheckedList seq=new CheckedList(0,null);
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(0,TypeConversionUtil.convertToInteger(5)));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intInteger_initialCapacityNULL_seqIsEmpty_negativeIndex()
+  {
+    CheckedList seq=new CheckedList(0,null);
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(-1,TypeConversionUtil.convertToInteger(5)));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intInteger_initialCapacityNULL_seqIsNotEmpty_hiIndex()
+  {
+    CheckedList seq=new CheckedList(0,null);
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertToInteger(i));
+    }
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(seq.size(),TypeConversionUtil.convertToInteger(5)));
+    Assertions.assertEquals(100,seq.size());
+    Assertions.assertEquals(100,seq.modCount);
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
     }
   }
   @Test
-  public void testCheckedListadd_intInteger_initialCapacityNULL_emptyInsertOOBLo()
+  public void testCheckedListput_intInteger_initialCapacityNULL_seqIsNotEmpty_negativeIndex()
+  {
+    CheckedList seq=new CheckedList(0,null);
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertToInteger(i));
+    }
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(-1,TypeConversionUtil.convertToInteger(5)));
+    Assertions.assertEquals(100,seq.size());
+    Assertions.assertEquals(100,seq.modCount);
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
+    }
+  }
+  @Test
+  public void testCheckedListadd_intInteger_initialCapacityNULL_seqIsEmpty_negativeIndex()
   {
     CheckedList seq=new CheckedList(0,null);
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(-1,TypeConversionUtil.convertToInteger(5)));
-    Assertions.assertEquals(0,seq.size);
+    Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intInteger_initialCapacityNULL_emptyInsertOOBHi()
+  public void testCheckedListadd_intInteger_initialCapacityNULL_seqIsEmpty_hiIndex()
   {
     CheckedList seq=new CheckedList(0,null);
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(seq.size+1,TypeConversionUtil.convertToInteger(5)));
-    Assertions.assertEquals(0,seq.size);
+    Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intInteger_initialCapacityNULL_NotEmptyInsertOOBLo()
+  public void testCheckedListadd_intInteger_initialCapacityNULL_seqIsNotEmpty_negativeIndex()
   {
     CheckedList seq=new CheckedList(0,null);
     for(int i=0;i<100;++i)
@@ -5651,11 +9434,11 @@ public class DoubleArrSeqListTest
       seq.add(seq.size,TypeConversionUtil.convertToInteger(i));
     }
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(-1,TypeConversionUtil.convertToInteger(5)));
-    Assertions.assertEquals(100,seq.size);
+    Assertions.assertEquals(100,seq.size());
     Assertions.assertEquals(100,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intInteger_initialCapacityNULL_NotEmptyInsertOOBHi()
+  public void testCheckedListadd_intInteger_initialCapacityNULL_seqIsNotEmpty_hiIndex()
   {
     CheckedList seq=new CheckedList(0,null);
     for(int i=0;i<100;++i)
@@ -5663,8 +9446,26 @@ public class DoubleArrSeqListTest
       seq.add(seq.size,TypeConversionUtil.convertToInteger(i));
     }
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(seq.size+1,TypeConversionUtil.convertToInteger(5)));
-    Assertions.assertEquals(100,seq.size);
+    Assertions.assertEquals(100,seq.size());
     Assertions.assertEquals(100,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intInteger_initialCapacity50_NonThrowingIndex()
+  {
+    CheckedList seq=new CheckedList(50);
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertToInteger(i));
+    }
+    for(int i=0;i<100;++i)
+    {
+      var putVal=TypeConversionUtil.convertToInteger(100-i-1);
+      seq.put(i,putVal);
+      var expectedVal=TypeConversionUtil.convertTodouble(100-i-1);
+      Assertions.assertEquals(expectedVal,seq.arr[i]);
+      Assertions.assertEquals(100,seq.size());
+      Assertions.assertEquals(100,seq.modCount);
+    }
   }
   @Test
   public void testCheckedListadd_intInteger_initialCapacity50_InsertBegin()
@@ -5674,10 +9475,11 @@ public class DoubleArrSeqListTest
     {
       seq.add(0,TypeConversionUtil.convertToInteger(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[seq.size-i-1]);
     }
@@ -5690,10 +9492,11 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size,TypeConversionUtil.convertToInteger(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
     }
@@ -5706,37 +9509,89 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size/2,TypeConversionUtil.convertToInteger(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    ArrayList arrList=new ArrayList();
-    for(int i=0;i<seq.size;++i)
+    ArrayList arrayList=new ArrayList();
+    for(int i=0;i<seqSize;++i)
     {
-      seq.add(TypeConversionUtil.convertToInteger(i));
+      arrayList.add(arrayList.size()/2,TypeConversionUtil.convertTodouble(i));
     }
-    for(int i=0;i<seq.size;++i)
+    System.out.println("BEGIN testCheckedListadd_intInteger_initialCapacity50_InsertMidPoint");
+    for(int i=0;i<seqSize;++i)
     {
-      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]));
+      System.out.println(arrayList.get(i));
+      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]);
+    }
+    System.out.println("END testCheckedListadd_intInteger_initialCapacity50_InsertMidPoint");
+  }
+  @Test
+  public void testCheckedListput_intInteger_initialCapacity50_seqIsEmpty_hiIndex()
+  {
+    CheckedList seq=new CheckedList(50);
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(0,TypeConversionUtil.convertToInteger(5)));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intInteger_initialCapacity50_seqIsEmpty_negativeIndex()
+  {
+    CheckedList seq=new CheckedList(50);
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(-1,TypeConversionUtil.convertToInteger(5)));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intInteger_initialCapacity50_seqIsNotEmpty_hiIndex()
+  {
+    CheckedList seq=new CheckedList(50);
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertToInteger(i));
+    }
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(seq.size(),TypeConversionUtil.convertToInteger(5)));
+    Assertions.assertEquals(100,seq.size());
+    Assertions.assertEquals(100,seq.modCount);
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
     }
   }
   @Test
-  public void testCheckedListadd_intInteger_initialCapacity50_emptyInsertOOBLo()
+  public void testCheckedListput_intInteger_initialCapacity50_seqIsNotEmpty_negativeIndex()
+  {
+    CheckedList seq=new CheckedList(50);
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertToInteger(i));
+    }
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(-1,TypeConversionUtil.convertToInteger(5)));
+    Assertions.assertEquals(100,seq.size());
+    Assertions.assertEquals(100,seq.modCount);
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
+    }
+  }
+  @Test
+  public void testCheckedListadd_intInteger_initialCapacity50_seqIsEmpty_negativeIndex()
   {
     CheckedList seq=new CheckedList(50);
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(-1,TypeConversionUtil.convertToInteger(5)));
-    Assertions.assertEquals(0,seq.size);
+    Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intInteger_initialCapacity50_emptyInsertOOBHi()
+  public void testCheckedListadd_intInteger_initialCapacity50_seqIsEmpty_hiIndex()
   {
     CheckedList seq=new CheckedList(50);
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(seq.size+1,TypeConversionUtil.convertToInteger(5)));
-    Assertions.assertEquals(0,seq.size);
+    Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intInteger_initialCapacity50_NotEmptyInsertOOBLo()
+  public void testCheckedListadd_intInteger_initialCapacity50_seqIsNotEmpty_negativeIndex()
   {
     CheckedList seq=new CheckedList(50);
     for(int i=0;i<100;++i)
@@ -5744,11 +9599,11 @@ public class DoubleArrSeqListTest
       seq.add(seq.size,TypeConversionUtil.convertToInteger(i));
     }
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(-1,TypeConversionUtil.convertToInteger(5)));
-    Assertions.assertEquals(100,seq.size);
+    Assertions.assertEquals(100,seq.size());
     Assertions.assertEquals(100,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intInteger_initialCapacity50_NotEmptyInsertOOBHi()
+  public void testCheckedListadd_intInteger_initialCapacity50_seqIsNotEmpty_hiIndex()
   {
     CheckedList seq=new CheckedList(50);
     for(int i=0;i<100;++i)
@@ -5756,8 +9611,26 @@ public class DoubleArrSeqListTest
       seq.add(seq.size,TypeConversionUtil.convertToInteger(i));
     }
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(seq.size+1,TypeConversionUtil.convertToInteger(5)));
-    Assertions.assertEquals(100,seq.size);
+    Assertions.assertEquals(100,seq.size());
     Assertions.assertEquals(100,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intlong_initialCapacityDEFAULT_NonThrowingIndex()
+  {
+    CheckedList seq=new CheckedList();
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertTolong(i));
+    }
+    for(int i=0;i<100;++i)
+    {
+      var putVal=TypeConversionUtil.convertTolong(100-i-1);
+      seq.put(i,putVal);
+      var expectedVal=TypeConversionUtil.convertTodouble(100-i-1);
+      Assertions.assertEquals(expectedVal,seq.arr[i]);
+      Assertions.assertEquals(100,seq.size());
+      Assertions.assertEquals(100,seq.modCount);
+    }
   }
   @Test
   public void testCheckedListadd_intlong_initialCapacityDEFAULT_InsertBegin()
@@ -5767,10 +9640,11 @@ public class DoubleArrSeqListTest
     {
       seq.add(0,TypeConversionUtil.convertTolong(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[seq.size-i-1]);
     }
@@ -5783,10 +9657,11 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size,TypeConversionUtil.convertTolong(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
     }
@@ -5799,37 +9674,89 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size/2,TypeConversionUtil.convertTolong(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    ArrayList arrList=new ArrayList();
-    for(int i=0;i<seq.size;++i)
+    ArrayList arrayList=new ArrayList();
+    for(int i=0;i<seqSize;++i)
     {
-      seq.add(TypeConversionUtil.convertTolong(i));
+      arrayList.add(arrayList.size()/2,TypeConversionUtil.convertTodouble(i));
     }
-    for(int i=0;i<seq.size;++i)
+    System.out.println("BEGIN testCheckedListadd_intlong_initialCapacityDEFAULT_InsertMidPoint");
+    for(int i=0;i<seqSize;++i)
     {
-      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]));
+      System.out.println(arrayList.get(i));
+      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]);
+    }
+    System.out.println("END testCheckedListadd_intlong_initialCapacityDEFAULT_InsertMidPoint");
+  }
+  @Test
+  public void testCheckedListput_intlong_initialCapacityDEFAULT_seqIsEmpty_hiIndex()
+  {
+    CheckedList seq=new CheckedList();
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(0,TypeConversionUtil.convertTolong(5)));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intlong_initialCapacityDEFAULT_seqIsEmpty_negativeIndex()
+  {
+    CheckedList seq=new CheckedList();
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(-1,TypeConversionUtil.convertTolong(5)));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intlong_initialCapacityDEFAULT_seqIsNotEmpty_hiIndex()
+  {
+    CheckedList seq=new CheckedList();
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertTolong(i));
+    }
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(seq.size(),TypeConversionUtil.convertTolong(5)));
+    Assertions.assertEquals(100,seq.size());
+    Assertions.assertEquals(100,seq.modCount);
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
     }
   }
   @Test
-  public void testCheckedListadd_intlong_initialCapacityDEFAULT_emptyInsertOOBLo()
+  public void testCheckedListput_intlong_initialCapacityDEFAULT_seqIsNotEmpty_negativeIndex()
+  {
+    CheckedList seq=new CheckedList();
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertTolong(i));
+    }
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(-1,TypeConversionUtil.convertTolong(5)));
+    Assertions.assertEquals(100,seq.size());
+    Assertions.assertEquals(100,seq.modCount);
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
+    }
+  }
+  @Test
+  public void testCheckedListadd_intlong_initialCapacityDEFAULT_seqIsEmpty_negativeIndex()
   {
     CheckedList seq=new CheckedList();
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(-1,TypeConversionUtil.convertTolong(5)));
-    Assertions.assertEquals(0,seq.size);
+    Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intlong_initialCapacityDEFAULT_emptyInsertOOBHi()
+  public void testCheckedListadd_intlong_initialCapacityDEFAULT_seqIsEmpty_hiIndex()
   {
     CheckedList seq=new CheckedList();
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(seq.size+1,TypeConversionUtil.convertTolong(5)));
-    Assertions.assertEquals(0,seq.size);
+    Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intlong_initialCapacityDEFAULT_NotEmptyInsertOOBLo()
+  public void testCheckedListadd_intlong_initialCapacityDEFAULT_seqIsNotEmpty_negativeIndex()
   {
     CheckedList seq=new CheckedList();
     for(int i=0;i<100;++i)
@@ -5837,11 +9764,11 @@ public class DoubleArrSeqListTest
       seq.add(seq.size,TypeConversionUtil.convertTolong(i));
     }
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(-1,TypeConversionUtil.convertTolong(5)));
-    Assertions.assertEquals(100,seq.size);
+    Assertions.assertEquals(100,seq.size());
     Assertions.assertEquals(100,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intlong_initialCapacityDEFAULT_NotEmptyInsertOOBHi()
+  public void testCheckedListadd_intlong_initialCapacityDEFAULT_seqIsNotEmpty_hiIndex()
   {
     CheckedList seq=new CheckedList();
     for(int i=0;i<100;++i)
@@ -5849,8 +9776,26 @@ public class DoubleArrSeqListTest
       seq.add(seq.size,TypeConversionUtil.convertTolong(i));
     }
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(seq.size+1,TypeConversionUtil.convertTolong(5)));
-    Assertions.assertEquals(100,seq.size);
+    Assertions.assertEquals(100,seq.size());
     Assertions.assertEquals(100,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intlong_initialCapacityNULL_NonThrowingIndex()
+  {
+    CheckedList seq=new CheckedList(0,null);
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertTolong(i));
+    }
+    for(int i=0;i<100;++i)
+    {
+      var putVal=TypeConversionUtil.convertTolong(100-i-1);
+      seq.put(i,putVal);
+      var expectedVal=TypeConversionUtil.convertTodouble(100-i-1);
+      Assertions.assertEquals(expectedVal,seq.arr[i]);
+      Assertions.assertEquals(100,seq.size());
+      Assertions.assertEquals(100,seq.modCount);
+    }
   }
   @Test
   public void testCheckedListadd_intlong_initialCapacityNULL_InsertBegin()
@@ -5860,10 +9805,11 @@ public class DoubleArrSeqListTest
     {
       seq.add(0,TypeConversionUtil.convertTolong(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[seq.size-i-1]);
     }
@@ -5876,10 +9822,11 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size,TypeConversionUtil.convertTolong(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
     }
@@ -5892,37 +9839,89 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size/2,TypeConversionUtil.convertTolong(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    ArrayList arrList=new ArrayList();
-    for(int i=0;i<seq.size;++i)
+    ArrayList arrayList=new ArrayList();
+    for(int i=0;i<seqSize;++i)
     {
-      seq.add(TypeConversionUtil.convertTolong(i));
+      arrayList.add(arrayList.size()/2,TypeConversionUtil.convertTodouble(i));
     }
-    for(int i=0;i<seq.size;++i)
+    System.out.println("BEGIN testCheckedListadd_intlong_initialCapacityNULL_InsertMidPoint");
+    for(int i=0;i<seqSize;++i)
     {
-      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]));
+      System.out.println(arrayList.get(i));
+      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]);
+    }
+    System.out.println("END testCheckedListadd_intlong_initialCapacityNULL_InsertMidPoint");
+  }
+  @Test
+  public void testCheckedListput_intlong_initialCapacityNULL_seqIsEmpty_hiIndex()
+  {
+    CheckedList seq=new CheckedList(0,null);
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(0,TypeConversionUtil.convertTolong(5)));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intlong_initialCapacityNULL_seqIsEmpty_negativeIndex()
+  {
+    CheckedList seq=new CheckedList(0,null);
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(-1,TypeConversionUtil.convertTolong(5)));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intlong_initialCapacityNULL_seqIsNotEmpty_hiIndex()
+  {
+    CheckedList seq=new CheckedList(0,null);
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertTolong(i));
+    }
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(seq.size(),TypeConversionUtil.convertTolong(5)));
+    Assertions.assertEquals(100,seq.size());
+    Assertions.assertEquals(100,seq.modCount);
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
     }
   }
   @Test
-  public void testCheckedListadd_intlong_initialCapacityNULL_emptyInsertOOBLo()
+  public void testCheckedListput_intlong_initialCapacityNULL_seqIsNotEmpty_negativeIndex()
+  {
+    CheckedList seq=new CheckedList(0,null);
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertTolong(i));
+    }
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(-1,TypeConversionUtil.convertTolong(5)));
+    Assertions.assertEquals(100,seq.size());
+    Assertions.assertEquals(100,seq.modCount);
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
+    }
+  }
+  @Test
+  public void testCheckedListadd_intlong_initialCapacityNULL_seqIsEmpty_negativeIndex()
   {
     CheckedList seq=new CheckedList(0,null);
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(-1,TypeConversionUtil.convertTolong(5)));
-    Assertions.assertEquals(0,seq.size);
+    Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intlong_initialCapacityNULL_emptyInsertOOBHi()
+  public void testCheckedListadd_intlong_initialCapacityNULL_seqIsEmpty_hiIndex()
   {
     CheckedList seq=new CheckedList(0,null);
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(seq.size+1,TypeConversionUtil.convertTolong(5)));
-    Assertions.assertEquals(0,seq.size);
+    Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intlong_initialCapacityNULL_NotEmptyInsertOOBLo()
+  public void testCheckedListadd_intlong_initialCapacityNULL_seqIsNotEmpty_negativeIndex()
   {
     CheckedList seq=new CheckedList(0,null);
     for(int i=0;i<100;++i)
@@ -5930,11 +9929,11 @@ public class DoubleArrSeqListTest
       seq.add(seq.size,TypeConversionUtil.convertTolong(i));
     }
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(-1,TypeConversionUtil.convertTolong(5)));
-    Assertions.assertEquals(100,seq.size);
+    Assertions.assertEquals(100,seq.size());
     Assertions.assertEquals(100,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intlong_initialCapacityNULL_NotEmptyInsertOOBHi()
+  public void testCheckedListadd_intlong_initialCapacityNULL_seqIsNotEmpty_hiIndex()
   {
     CheckedList seq=new CheckedList(0,null);
     for(int i=0;i<100;++i)
@@ -5942,8 +9941,26 @@ public class DoubleArrSeqListTest
       seq.add(seq.size,TypeConversionUtil.convertTolong(i));
     }
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(seq.size+1,TypeConversionUtil.convertTolong(5)));
-    Assertions.assertEquals(100,seq.size);
+    Assertions.assertEquals(100,seq.size());
     Assertions.assertEquals(100,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intlong_initialCapacity50_NonThrowingIndex()
+  {
+    CheckedList seq=new CheckedList(50);
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertTolong(i));
+    }
+    for(int i=0;i<100;++i)
+    {
+      var putVal=TypeConversionUtil.convertTolong(100-i-1);
+      seq.put(i,putVal);
+      var expectedVal=TypeConversionUtil.convertTodouble(100-i-1);
+      Assertions.assertEquals(expectedVal,seq.arr[i]);
+      Assertions.assertEquals(100,seq.size());
+      Assertions.assertEquals(100,seq.modCount);
+    }
   }
   @Test
   public void testCheckedListadd_intlong_initialCapacity50_InsertBegin()
@@ -5953,10 +9970,11 @@ public class DoubleArrSeqListTest
     {
       seq.add(0,TypeConversionUtil.convertTolong(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[seq.size-i-1]);
     }
@@ -5969,10 +9987,11 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size,TypeConversionUtil.convertTolong(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
     }
@@ -5985,37 +10004,89 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size/2,TypeConversionUtil.convertTolong(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    ArrayList arrList=new ArrayList();
-    for(int i=0;i<seq.size;++i)
+    ArrayList arrayList=new ArrayList();
+    for(int i=0;i<seqSize;++i)
     {
-      seq.add(TypeConversionUtil.convertTolong(i));
+      arrayList.add(arrayList.size()/2,TypeConversionUtil.convertTodouble(i));
     }
-    for(int i=0;i<seq.size;++i)
+    System.out.println("BEGIN testCheckedListadd_intlong_initialCapacity50_InsertMidPoint");
+    for(int i=0;i<seqSize;++i)
     {
-      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]));
+      System.out.println(arrayList.get(i));
+      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]);
+    }
+    System.out.println("END testCheckedListadd_intlong_initialCapacity50_InsertMidPoint");
+  }
+  @Test
+  public void testCheckedListput_intlong_initialCapacity50_seqIsEmpty_hiIndex()
+  {
+    CheckedList seq=new CheckedList(50);
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(0,TypeConversionUtil.convertTolong(5)));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intlong_initialCapacity50_seqIsEmpty_negativeIndex()
+  {
+    CheckedList seq=new CheckedList(50);
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(-1,TypeConversionUtil.convertTolong(5)));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intlong_initialCapacity50_seqIsNotEmpty_hiIndex()
+  {
+    CheckedList seq=new CheckedList(50);
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertTolong(i));
+    }
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(seq.size(),TypeConversionUtil.convertTolong(5)));
+    Assertions.assertEquals(100,seq.size());
+    Assertions.assertEquals(100,seq.modCount);
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
     }
   }
   @Test
-  public void testCheckedListadd_intlong_initialCapacity50_emptyInsertOOBLo()
+  public void testCheckedListput_intlong_initialCapacity50_seqIsNotEmpty_negativeIndex()
+  {
+    CheckedList seq=new CheckedList(50);
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertTolong(i));
+    }
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(-1,TypeConversionUtil.convertTolong(5)));
+    Assertions.assertEquals(100,seq.size());
+    Assertions.assertEquals(100,seq.modCount);
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
+    }
+  }
+  @Test
+  public void testCheckedListadd_intlong_initialCapacity50_seqIsEmpty_negativeIndex()
   {
     CheckedList seq=new CheckedList(50);
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(-1,TypeConversionUtil.convertTolong(5)));
-    Assertions.assertEquals(0,seq.size);
+    Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intlong_initialCapacity50_emptyInsertOOBHi()
+  public void testCheckedListadd_intlong_initialCapacity50_seqIsEmpty_hiIndex()
   {
     CheckedList seq=new CheckedList(50);
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(seq.size+1,TypeConversionUtil.convertTolong(5)));
-    Assertions.assertEquals(0,seq.size);
+    Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intlong_initialCapacity50_NotEmptyInsertOOBLo()
+  public void testCheckedListadd_intlong_initialCapacity50_seqIsNotEmpty_negativeIndex()
   {
     CheckedList seq=new CheckedList(50);
     for(int i=0;i<100;++i)
@@ -6023,11 +10094,11 @@ public class DoubleArrSeqListTest
       seq.add(seq.size,TypeConversionUtil.convertTolong(i));
     }
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(-1,TypeConversionUtil.convertTolong(5)));
-    Assertions.assertEquals(100,seq.size);
+    Assertions.assertEquals(100,seq.size());
     Assertions.assertEquals(100,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intlong_initialCapacity50_NotEmptyInsertOOBHi()
+  public void testCheckedListadd_intlong_initialCapacity50_seqIsNotEmpty_hiIndex()
   {
     CheckedList seq=new CheckedList(50);
     for(int i=0;i<100;++i)
@@ -6035,8 +10106,26 @@ public class DoubleArrSeqListTest
       seq.add(seq.size,TypeConversionUtil.convertTolong(i));
     }
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(seq.size+1,TypeConversionUtil.convertTolong(5)));
-    Assertions.assertEquals(100,seq.size);
+    Assertions.assertEquals(100,seq.size());
     Assertions.assertEquals(100,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intLong_initialCapacityDEFAULT_NonThrowingIndex()
+  {
+    CheckedList seq=new CheckedList();
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertToLong(i));
+    }
+    for(int i=0;i<100;++i)
+    {
+      var putVal=TypeConversionUtil.convertToLong(100-i-1);
+      seq.put(i,putVal);
+      var expectedVal=TypeConversionUtil.convertTodouble(100-i-1);
+      Assertions.assertEquals(expectedVal,seq.arr[i]);
+      Assertions.assertEquals(100,seq.size());
+      Assertions.assertEquals(100,seq.modCount);
+    }
   }
   @Test
   public void testCheckedListadd_intLong_initialCapacityDEFAULT_InsertBegin()
@@ -6046,10 +10135,11 @@ public class DoubleArrSeqListTest
     {
       seq.add(0,TypeConversionUtil.convertToLong(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[seq.size-i-1]);
     }
@@ -6062,10 +10152,11 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size,TypeConversionUtil.convertToLong(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
     }
@@ -6078,37 +10169,89 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size/2,TypeConversionUtil.convertToLong(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    ArrayList arrList=new ArrayList();
-    for(int i=0;i<seq.size;++i)
+    ArrayList arrayList=new ArrayList();
+    for(int i=0;i<seqSize;++i)
     {
-      seq.add(TypeConversionUtil.convertToLong(i));
+      arrayList.add(arrayList.size()/2,TypeConversionUtil.convertTodouble(i));
     }
-    for(int i=0;i<seq.size;++i)
+    System.out.println("BEGIN testCheckedListadd_intLong_initialCapacityDEFAULT_InsertMidPoint");
+    for(int i=0;i<seqSize;++i)
     {
-      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]));
+      System.out.println(arrayList.get(i));
+      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]);
+    }
+    System.out.println("END testCheckedListadd_intLong_initialCapacityDEFAULT_InsertMidPoint");
+  }
+  @Test
+  public void testCheckedListput_intLong_initialCapacityDEFAULT_seqIsEmpty_hiIndex()
+  {
+    CheckedList seq=new CheckedList();
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(0,TypeConversionUtil.convertToLong(5)));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intLong_initialCapacityDEFAULT_seqIsEmpty_negativeIndex()
+  {
+    CheckedList seq=new CheckedList();
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(-1,TypeConversionUtil.convertToLong(5)));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intLong_initialCapacityDEFAULT_seqIsNotEmpty_hiIndex()
+  {
+    CheckedList seq=new CheckedList();
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertToLong(i));
+    }
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(seq.size(),TypeConversionUtil.convertToLong(5)));
+    Assertions.assertEquals(100,seq.size());
+    Assertions.assertEquals(100,seq.modCount);
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
     }
   }
   @Test
-  public void testCheckedListadd_intLong_initialCapacityDEFAULT_emptyInsertOOBLo()
+  public void testCheckedListput_intLong_initialCapacityDEFAULT_seqIsNotEmpty_negativeIndex()
+  {
+    CheckedList seq=new CheckedList();
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertToLong(i));
+    }
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(-1,TypeConversionUtil.convertToLong(5)));
+    Assertions.assertEquals(100,seq.size());
+    Assertions.assertEquals(100,seq.modCount);
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
+    }
+  }
+  @Test
+  public void testCheckedListadd_intLong_initialCapacityDEFAULT_seqIsEmpty_negativeIndex()
   {
     CheckedList seq=new CheckedList();
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(-1,TypeConversionUtil.convertToLong(5)));
-    Assertions.assertEquals(0,seq.size);
+    Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intLong_initialCapacityDEFAULT_emptyInsertOOBHi()
+  public void testCheckedListadd_intLong_initialCapacityDEFAULT_seqIsEmpty_hiIndex()
   {
     CheckedList seq=new CheckedList();
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(seq.size+1,TypeConversionUtil.convertToLong(5)));
-    Assertions.assertEquals(0,seq.size);
+    Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intLong_initialCapacityDEFAULT_NotEmptyInsertOOBLo()
+  public void testCheckedListadd_intLong_initialCapacityDEFAULT_seqIsNotEmpty_negativeIndex()
   {
     CheckedList seq=new CheckedList();
     for(int i=0;i<100;++i)
@@ -6116,11 +10259,11 @@ public class DoubleArrSeqListTest
       seq.add(seq.size,TypeConversionUtil.convertToLong(i));
     }
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(-1,TypeConversionUtil.convertToLong(5)));
-    Assertions.assertEquals(100,seq.size);
+    Assertions.assertEquals(100,seq.size());
     Assertions.assertEquals(100,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intLong_initialCapacityDEFAULT_NotEmptyInsertOOBHi()
+  public void testCheckedListadd_intLong_initialCapacityDEFAULT_seqIsNotEmpty_hiIndex()
   {
     CheckedList seq=new CheckedList();
     for(int i=0;i<100;++i)
@@ -6128,8 +10271,26 @@ public class DoubleArrSeqListTest
       seq.add(seq.size,TypeConversionUtil.convertToLong(i));
     }
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(seq.size+1,TypeConversionUtil.convertToLong(5)));
-    Assertions.assertEquals(100,seq.size);
+    Assertions.assertEquals(100,seq.size());
     Assertions.assertEquals(100,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intLong_initialCapacityNULL_NonThrowingIndex()
+  {
+    CheckedList seq=new CheckedList(0,null);
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertToLong(i));
+    }
+    for(int i=0;i<100;++i)
+    {
+      var putVal=TypeConversionUtil.convertToLong(100-i-1);
+      seq.put(i,putVal);
+      var expectedVal=TypeConversionUtil.convertTodouble(100-i-1);
+      Assertions.assertEquals(expectedVal,seq.arr[i]);
+      Assertions.assertEquals(100,seq.size());
+      Assertions.assertEquals(100,seq.modCount);
+    }
   }
   @Test
   public void testCheckedListadd_intLong_initialCapacityNULL_InsertBegin()
@@ -6139,10 +10300,11 @@ public class DoubleArrSeqListTest
     {
       seq.add(0,TypeConversionUtil.convertToLong(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[seq.size-i-1]);
     }
@@ -6155,10 +10317,11 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size,TypeConversionUtil.convertToLong(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
     }
@@ -6171,37 +10334,89 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size/2,TypeConversionUtil.convertToLong(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    ArrayList arrList=new ArrayList();
-    for(int i=0;i<seq.size;++i)
+    ArrayList arrayList=new ArrayList();
+    for(int i=0;i<seqSize;++i)
     {
-      seq.add(TypeConversionUtil.convertToLong(i));
+      arrayList.add(arrayList.size()/2,TypeConversionUtil.convertTodouble(i));
     }
-    for(int i=0;i<seq.size;++i)
+    System.out.println("BEGIN testCheckedListadd_intLong_initialCapacityNULL_InsertMidPoint");
+    for(int i=0;i<seqSize;++i)
     {
-      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]));
+      System.out.println(arrayList.get(i));
+      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]);
+    }
+    System.out.println("END testCheckedListadd_intLong_initialCapacityNULL_InsertMidPoint");
+  }
+  @Test
+  public void testCheckedListput_intLong_initialCapacityNULL_seqIsEmpty_hiIndex()
+  {
+    CheckedList seq=new CheckedList(0,null);
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(0,TypeConversionUtil.convertToLong(5)));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intLong_initialCapacityNULL_seqIsEmpty_negativeIndex()
+  {
+    CheckedList seq=new CheckedList(0,null);
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(-1,TypeConversionUtil.convertToLong(5)));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intLong_initialCapacityNULL_seqIsNotEmpty_hiIndex()
+  {
+    CheckedList seq=new CheckedList(0,null);
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertToLong(i));
+    }
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(seq.size(),TypeConversionUtil.convertToLong(5)));
+    Assertions.assertEquals(100,seq.size());
+    Assertions.assertEquals(100,seq.modCount);
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
     }
   }
   @Test
-  public void testCheckedListadd_intLong_initialCapacityNULL_emptyInsertOOBLo()
+  public void testCheckedListput_intLong_initialCapacityNULL_seqIsNotEmpty_negativeIndex()
+  {
+    CheckedList seq=new CheckedList(0,null);
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertToLong(i));
+    }
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(-1,TypeConversionUtil.convertToLong(5)));
+    Assertions.assertEquals(100,seq.size());
+    Assertions.assertEquals(100,seq.modCount);
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
+    }
+  }
+  @Test
+  public void testCheckedListadd_intLong_initialCapacityNULL_seqIsEmpty_negativeIndex()
   {
     CheckedList seq=new CheckedList(0,null);
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(-1,TypeConversionUtil.convertToLong(5)));
-    Assertions.assertEquals(0,seq.size);
+    Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intLong_initialCapacityNULL_emptyInsertOOBHi()
+  public void testCheckedListadd_intLong_initialCapacityNULL_seqIsEmpty_hiIndex()
   {
     CheckedList seq=new CheckedList(0,null);
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(seq.size+1,TypeConversionUtil.convertToLong(5)));
-    Assertions.assertEquals(0,seq.size);
+    Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intLong_initialCapacityNULL_NotEmptyInsertOOBLo()
+  public void testCheckedListadd_intLong_initialCapacityNULL_seqIsNotEmpty_negativeIndex()
   {
     CheckedList seq=new CheckedList(0,null);
     for(int i=0;i<100;++i)
@@ -6209,11 +10424,11 @@ public class DoubleArrSeqListTest
       seq.add(seq.size,TypeConversionUtil.convertToLong(i));
     }
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(-1,TypeConversionUtil.convertToLong(5)));
-    Assertions.assertEquals(100,seq.size);
+    Assertions.assertEquals(100,seq.size());
     Assertions.assertEquals(100,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intLong_initialCapacityNULL_NotEmptyInsertOOBHi()
+  public void testCheckedListadd_intLong_initialCapacityNULL_seqIsNotEmpty_hiIndex()
   {
     CheckedList seq=new CheckedList(0,null);
     for(int i=0;i<100;++i)
@@ -6221,8 +10436,26 @@ public class DoubleArrSeqListTest
       seq.add(seq.size,TypeConversionUtil.convertToLong(i));
     }
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(seq.size+1,TypeConversionUtil.convertToLong(5)));
-    Assertions.assertEquals(100,seq.size);
+    Assertions.assertEquals(100,seq.size());
     Assertions.assertEquals(100,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intLong_initialCapacity50_NonThrowingIndex()
+  {
+    CheckedList seq=new CheckedList(50);
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertToLong(i));
+    }
+    for(int i=0;i<100;++i)
+    {
+      var putVal=TypeConversionUtil.convertToLong(100-i-1);
+      seq.put(i,putVal);
+      var expectedVal=TypeConversionUtil.convertTodouble(100-i-1);
+      Assertions.assertEquals(expectedVal,seq.arr[i]);
+      Assertions.assertEquals(100,seq.size());
+      Assertions.assertEquals(100,seq.modCount);
+    }
   }
   @Test
   public void testCheckedListadd_intLong_initialCapacity50_InsertBegin()
@@ -6232,10 +10465,11 @@ public class DoubleArrSeqListTest
     {
       seq.add(0,TypeConversionUtil.convertToLong(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[seq.size-i-1]);
     }
@@ -6248,10 +10482,11 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size,TypeConversionUtil.convertToLong(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
     }
@@ -6264,37 +10499,89 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size/2,TypeConversionUtil.convertToLong(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    ArrayList arrList=new ArrayList();
-    for(int i=0;i<seq.size;++i)
+    ArrayList arrayList=new ArrayList();
+    for(int i=0;i<seqSize;++i)
     {
-      seq.add(TypeConversionUtil.convertToLong(i));
+      arrayList.add(arrayList.size()/2,TypeConversionUtil.convertTodouble(i));
     }
-    for(int i=0;i<seq.size;++i)
+    System.out.println("BEGIN testCheckedListadd_intLong_initialCapacity50_InsertMidPoint");
+    for(int i=0;i<seqSize;++i)
     {
-      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]));
+      System.out.println(arrayList.get(i));
+      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]);
+    }
+    System.out.println("END testCheckedListadd_intLong_initialCapacity50_InsertMidPoint");
+  }
+  @Test
+  public void testCheckedListput_intLong_initialCapacity50_seqIsEmpty_hiIndex()
+  {
+    CheckedList seq=new CheckedList(50);
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(0,TypeConversionUtil.convertToLong(5)));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intLong_initialCapacity50_seqIsEmpty_negativeIndex()
+  {
+    CheckedList seq=new CheckedList(50);
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(-1,TypeConversionUtil.convertToLong(5)));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intLong_initialCapacity50_seqIsNotEmpty_hiIndex()
+  {
+    CheckedList seq=new CheckedList(50);
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertToLong(i));
+    }
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(seq.size(),TypeConversionUtil.convertToLong(5)));
+    Assertions.assertEquals(100,seq.size());
+    Assertions.assertEquals(100,seq.modCount);
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
     }
   }
   @Test
-  public void testCheckedListadd_intLong_initialCapacity50_emptyInsertOOBLo()
+  public void testCheckedListput_intLong_initialCapacity50_seqIsNotEmpty_negativeIndex()
+  {
+    CheckedList seq=new CheckedList(50);
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertToLong(i));
+    }
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(-1,TypeConversionUtil.convertToLong(5)));
+    Assertions.assertEquals(100,seq.size());
+    Assertions.assertEquals(100,seq.modCount);
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
+    }
+  }
+  @Test
+  public void testCheckedListadd_intLong_initialCapacity50_seqIsEmpty_negativeIndex()
   {
     CheckedList seq=new CheckedList(50);
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(-1,TypeConversionUtil.convertToLong(5)));
-    Assertions.assertEquals(0,seq.size);
+    Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intLong_initialCapacity50_emptyInsertOOBHi()
+  public void testCheckedListadd_intLong_initialCapacity50_seqIsEmpty_hiIndex()
   {
     CheckedList seq=new CheckedList(50);
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(seq.size+1,TypeConversionUtil.convertToLong(5)));
-    Assertions.assertEquals(0,seq.size);
+    Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intLong_initialCapacity50_NotEmptyInsertOOBLo()
+  public void testCheckedListadd_intLong_initialCapacity50_seqIsNotEmpty_negativeIndex()
   {
     CheckedList seq=new CheckedList(50);
     for(int i=0;i<100;++i)
@@ -6302,11 +10589,11 @@ public class DoubleArrSeqListTest
       seq.add(seq.size,TypeConversionUtil.convertToLong(i));
     }
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(-1,TypeConversionUtil.convertToLong(5)));
-    Assertions.assertEquals(100,seq.size);
+    Assertions.assertEquals(100,seq.size());
     Assertions.assertEquals(100,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intLong_initialCapacity50_NotEmptyInsertOOBHi()
+  public void testCheckedListadd_intLong_initialCapacity50_seqIsNotEmpty_hiIndex()
   {
     CheckedList seq=new CheckedList(50);
     for(int i=0;i<100;++i)
@@ -6314,8 +10601,26 @@ public class DoubleArrSeqListTest
       seq.add(seq.size,TypeConversionUtil.convertToLong(i));
     }
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(seq.size+1,TypeConversionUtil.convertToLong(5)));
-    Assertions.assertEquals(100,seq.size);
+    Assertions.assertEquals(100,seq.size());
     Assertions.assertEquals(100,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intfloat_initialCapacityDEFAULT_NonThrowingIndex()
+  {
+    CheckedList seq=new CheckedList();
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertTofloat(i));
+    }
+    for(int i=0;i<100;++i)
+    {
+      var putVal=TypeConversionUtil.convertTofloat(100-i-1);
+      seq.put(i,putVal);
+      var expectedVal=TypeConversionUtil.convertTodouble(100-i-1);
+      Assertions.assertEquals(expectedVal,seq.arr[i]);
+      Assertions.assertEquals(100,seq.size());
+      Assertions.assertEquals(100,seq.modCount);
+    }
   }
   @Test
   public void testCheckedListadd_intfloat_initialCapacityDEFAULT_InsertBegin()
@@ -6325,10 +10630,11 @@ public class DoubleArrSeqListTest
     {
       seq.add(0,TypeConversionUtil.convertTofloat(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[seq.size-i-1]);
     }
@@ -6341,10 +10647,11 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size,TypeConversionUtil.convertTofloat(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
     }
@@ -6357,37 +10664,89 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size/2,TypeConversionUtil.convertTofloat(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    ArrayList arrList=new ArrayList();
-    for(int i=0;i<seq.size;++i)
+    ArrayList arrayList=new ArrayList();
+    for(int i=0;i<seqSize;++i)
     {
-      seq.add(TypeConversionUtil.convertTofloat(i));
+      arrayList.add(arrayList.size()/2,TypeConversionUtil.convertTodouble(i));
     }
-    for(int i=0;i<seq.size;++i)
+    System.out.println("BEGIN testCheckedListadd_intfloat_initialCapacityDEFAULT_InsertMidPoint");
+    for(int i=0;i<seqSize;++i)
     {
-      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]));
+      System.out.println(arrayList.get(i));
+      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]);
+    }
+    System.out.println("END testCheckedListadd_intfloat_initialCapacityDEFAULT_InsertMidPoint");
+  }
+  @Test
+  public void testCheckedListput_intfloat_initialCapacityDEFAULT_seqIsEmpty_hiIndex()
+  {
+    CheckedList seq=new CheckedList();
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(0,TypeConversionUtil.convertTofloat(5)));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intfloat_initialCapacityDEFAULT_seqIsEmpty_negativeIndex()
+  {
+    CheckedList seq=new CheckedList();
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(-1,TypeConversionUtil.convertTofloat(5)));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intfloat_initialCapacityDEFAULT_seqIsNotEmpty_hiIndex()
+  {
+    CheckedList seq=new CheckedList();
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertTofloat(i));
+    }
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(seq.size(),TypeConversionUtil.convertTofloat(5)));
+    Assertions.assertEquals(100,seq.size());
+    Assertions.assertEquals(100,seq.modCount);
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
     }
   }
   @Test
-  public void testCheckedListadd_intfloat_initialCapacityDEFAULT_emptyInsertOOBLo()
+  public void testCheckedListput_intfloat_initialCapacityDEFAULT_seqIsNotEmpty_negativeIndex()
+  {
+    CheckedList seq=new CheckedList();
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertTofloat(i));
+    }
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(-1,TypeConversionUtil.convertTofloat(5)));
+    Assertions.assertEquals(100,seq.size());
+    Assertions.assertEquals(100,seq.modCount);
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
+    }
+  }
+  @Test
+  public void testCheckedListadd_intfloat_initialCapacityDEFAULT_seqIsEmpty_negativeIndex()
   {
     CheckedList seq=new CheckedList();
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(-1,TypeConversionUtil.convertTofloat(5)));
-    Assertions.assertEquals(0,seq.size);
+    Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intfloat_initialCapacityDEFAULT_emptyInsertOOBHi()
+  public void testCheckedListadd_intfloat_initialCapacityDEFAULT_seqIsEmpty_hiIndex()
   {
     CheckedList seq=new CheckedList();
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(seq.size+1,TypeConversionUtil.convertTofloat(5)));
-    Assertions.assertEquals(0,seq.size);
+    Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intfloat_initialCapacityDEFAULT_NotEmptyInsertOOBLo()
+  public void testCheckedListadd_intfloat_initialCapacityDEFAULT_seqIsNotEmpty_negativeIndex()
   {
     CheckedList seq=new CheckedList();
     for(int i=0;i<100;++i)
@@ -6395,11 +10754,11 @@ public class DoubleArrSeqListTest
       seq.add(seq.size,TypeConversionUtil.convertTofloat(i));
     }
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(-1,TypeConversionUtil.convertTofloat(5)));
-    Assertions.assertEquals(100,seq.size);
+    Assertions.assertEquals(100,seq.size());
     Assertions.assertEquals(100,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intfloat_initialCapacityDEFAULT_NotEmptyInsertOOBHi()
+  public void testCheckedListadd_intfloat_initialCapacityDEFAULT_seqIsNotEmpty_hiIndex()
   {
     CheckedList seq=new CheckedList();
     for(int i=0;i<100;++i)
@@ -6407,8 +10766,26 @@ public class DoubleArrSeqListTest
       seq.add(seq.size,TypeConversionUtil.convertTofloat(i));
     }
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(seq.size+1,TypeConversionUtil.convertTofloat(5)));
-    Assertions.assertEquals(100,seq.size);
+    Assertions.assertEquals(100,seq.size());
     Assertions.assertEquals(100,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intfloat_initialCapacityNULL_NonThrowingIndex()
+  {
+    CheckedList seq=new CheckedList(0,null);
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertTofloat(i));
+    }
+    for(int i=0;i<100;++i)
+    {
+      var putVal=TypeConversionUtil.convertTofloat(100-i-1);
+      seq.put(i,putVal);
+      var expectedVal=TypeConversionUtil.convertTodouble(100-i-1);
+      Assertions.assertEquals(expectedVal,seq.arr[i]);
+      Assertions.assertEquals(100,seq.size());
+      Assertions.assertEquals(100,seq.modCount);
+    }
   }
   @Test
   public void testCheckedListadd_intfloat_initialCapacityNULL_InsertBegin()
@@ -6418,10 +10795,11 @@ public class DoubleArrSeqListTest
     {
       seq.add(0,TypeConversionUtil.convertTofloat(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[seq.size-i-1]);
     }
@@ -6434,10 +10812,11 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size,TypeConversionUtil.convertTofloat(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
     }
@@ -6450,37 +10829,89 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size/2,TypeConversionUtil.convertTofloat(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    ArrayList arrList=new ArrayList();
-    for(int i=0;i<seq.size;++i)
+    ArrayList arrayList=new ArrayList();
+    for(int i=0;i<seqSize;++i)
     {
-      seq.add(TypeConversionUtil.convertTofloat(i));
+      arrayList.add(arrayList.size()/2,TypeConversionUtil.convertTodouble(i));
     }
-    for(int i=0;i<seq.size;++i)
+    System.out.println("BEGIN testCheckedListadd_intfloat_initialCapacityNULL_InsertMidPoint");
+    for(int i=0;i<seqSize;++i)
     {
-      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]));
+      System.out.println(arrayList.get(i));
+      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]);
+    }
+    System.out.println("END testCheckedListadd_intfloat_initialCapacityNULL_InsertMidPoint");
+  }
+  @Test
+  public void testCheckedListput_intfloat_initialCapacityNULL_seqIsEmpty_hiIndex()
+  {
+    CheckedList seq=new CheckedList(0,null);
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(0,TypeConversionUtil.convertTofloat(5)));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intfloat_initialCapacityNULL_seqIsEmpty_negativeIndex()
+  {
+    CheckedList seq=new CheckedList(0,null);
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(-1,TypeConversionUtil.convertTofloat(5)));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intfloat_initialCapacityNULL_seqIsNotEmpty_hiIndex()
+  {
+    CheckedList seq=new CheckedList(0,null);
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertTofloat(i));
+    }
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(seq.size(),TypeConversionUtil.convertTofloat(5)));
+    Assertions.assertEquals(100,seq.size());
+    Assertions.assertEquals(100,seq.modCount);
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
     }
   }
   @Test
-  public void testCheckedListadd_intfloat_initialCapacityNULL_emptyInsertOOBLo()
+  public void testCheckedListput_intfloat_initialCapacityNULL_seqIsNotEmpty_negativeIndex()
+  {
+    CheckedList seq=new CheckedList(0,null);
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertTofloat(i));
+    }
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(-1,TypeConversionUtil.convertTofloat(5)));
+    Assertions.assertEquals(100,seq.size());
+    Assertions.assertEquals(100,seq.modCount);
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
+    }
+  }
+  @Test
+  public void testCheckedListadd_intfloat_initialCapacityNULL_seqIsEmpty_negativeIndex()
   {
     CheckedList seq=new CheckedList(0,null);
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(-1,TypeConversionUtil.convertTofloat(5)));
-    Assertions.assertEquals(0,seq.size);
+    Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intfloat_initialCapacityNULL_emptyInsertOOBHi()
+  public void testCheckedListadd_intfloat_initialCapacityNULL_seqIsEmpty_hiIndex()
   {
     CheckedList seq=new CheckedList(0,null);
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(seq.size+1,TypeConversionUtil.convertTofloat(5)));
-    Assertions.assertEquals(0,seq.size);
+    Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intfloat_initialCapacityNULL_NotEmptyInsertOOBLo()
+  public void testCheckedListadd_intfloat_initialCapacityNULL_seqIsNotEmpty_negativeIndex()
   {
     CheckedList seq=new CheckedList(0,null);
     for(int i=0;i<100;++i)
@@ -6488,11 +10919,11 @@ public class DoubleArrSeqListTest
       seq.add(seq.size,TypeConversionUtil.convertTofloat(i));
     }
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(-1,TypeConversionUtil.convertTofloat(5)));
-    Assertions.assertEquals(100,seq.size);
+    Assertions.assertEquals(100,seq.size());
     Assertions.assertEquals(100,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intfloat_initialCapacityNULL_NotEmptyInsertOOBHi()
+  public void testCheckedListadd_intfloat_initialCapacityNULL_seqIsNotEmpty_hiIndex()
   {
     CheckedList seq=new CheckedList(0,null);
     for(int i=0;i<100;++i)
@@ -6500,8 +10931,26 @@ public class DoubleArrSeqListTest
       seq.add(seq.size,TypeConversionUtil.convertTofloat(i));
     }
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(seq.size+1,TypeConversionUtil.convertTofloat(5)));
-    Assertions.assertEquals(100,seq.size);
+    Assertions.assertEquals(100,seq.size());
     Assertions.assertEquals(100,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intfloat_initialCapacity50_NonThrowingIndex()
+  {
+    CheckedList seq=new CheckedList(50);
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertTofloat(i));
+    }
+    for(int i=0;i<100;++i)
+    {
+      var putVal=TypeConversionUtil.convertTofloat(100-i-1);
+      seq.put(i,putVal);
+      var expectedVal=TypeConversionUtil.convertTodouble(100-i-1);
+      Assertions.assertEquals(expectedVal,seq.arr[i]);
+      Assertions.assertEquals(100,seq.size());
+      Assertions.assertEquals(100,seq.modCount);
+    }
   }
   @Test
   public void testCheckedListadd_intfloat_initialCapacity50_InsertBegin()
@@ -6511,10 +10960,11 @@ public class DoubleArrSeqListTest
     {
       seq.add(0,TypeConversionUtil.convertTofloat(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[seq.size-i-1]);
     }
@@ -6527,10 +10977,11 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size,TypeConversionUtil.convertTofloat(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
     }
@@ -6543,37 +10994,89 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size/2,TypeConversionUtil.convertTofloat(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    ArrayList arrList=new ArrayList();
-    for(int i=0;i<seq.size;++i)
+    ArrayList arrayList=new ArrayList();
+    for(int i=0;i<seqSize;++i)
     {
-      seq.add(TypeConversionUtil.convertTofloat(i));
+      arrayList.add(arrayList.size()/2,TypeConversionUtil.convertTodouble(i));
     }
-    for(int i=0;i<seq.size;++i)
+    System.out.println("BEGIN testCheckedListadd_intfloat_initialCapacity50_InsertMidPoint");
+    for(int i=0;i<seqSize;++i)
     {
-      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]));
+      System.out.println(arrayList.get(i));
+      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]);
+    }
+    System.out.println("END testCheckedListadd_intfloat_initialCapacity50_InsertMidPoint");
+  }
+  @Test
+  public void testCheckedListput_intfloat_initialCapacity50_seqIsEmpty_hiIndex()
+  {
+    CheckedList seq=new CheckedList(50);
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(0,TypeConversionUtil.convertTofloat(5)));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intfloat_initialCapacity50_seqIsEmpty_negativeIndex()
+  {
+    CheckedList seq=new CheckedList(50);
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(-1,TypeConversionUtil.convertTofloat(5)));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intfloat_initialCapacity50_seqIsNotEmpty_hiIndex()
+  {
+    CheckedList seq=new CheckedList(50);
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertTofloat(i));
+    }
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(seq.size(),TypeConversionUtil.convertTofloat(5)));
+    Assertions.assertEquals(100,seq.size());
+    Assertions.assertEquals(100,seq.modCount);
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
     }
   }
   @Test
-  public void testCheckedListadd_intfloat_initialCapacity50_emptyInsertOOBLo()
+  public void testCheckedListput_intfloat_initialCapacity50_seqIsNotEmpty_negativeIndex()
+  {
+    CheckedList seq=new CheckedList(50);
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertTofloat(i));
+    }
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(-1,TypeConversionUtil.convertTofloat(5)));
+    Assertions.assertEquals(100,seq.size());
+    Assertions.assertEquals(100,seq.modCount);
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
+    }
+  }
+  @Test
+  public void testCheckedListadd_intfloat_initialCapacity50_seqIsEmpty_negativeIndex()
   {
     CheckedList seq=new CheckedList(50);
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(-1,TypeConversionUtil.convertTofloat(5)));
-    Assertions.assertEquals(0,seq.size);
+    Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intfloat_initialCapacity50_emptyInsertOOBHi()
+  public void testCheckedListadd_intfloat_initialCapacity50_seqIsEmpty_hiIndex()
   {
     CheckedList seq=new CheckedList(50);
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(seq.size+1,TypeConversionUtil.convertTofloat(5)));
-    Assertions.assertEquals(0,seq.size);
+    Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intfloat_initialCapacity50_NotEmptyInsertOOBLo()
+  public void testCheckedListadd_intfloat_initialCapacity50_seqIsNotEmpty_negativeIndex()
   {
     CheckedList seq=new CheckedList(50);
     for(int i=0;i<100;++i)
@@ -6581,11 +11084,11 @@ public class DoubleArrSeqListTest
       seq.add(seq.size,TypeConversionUtil.convertTofloat(i));
     }
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(-1,TypeConversionUtil.convertTofloat(5)));
-    Assertions.assertEquals(100,seq.size);
+    Assertions.assertEquals(100,seq.size());
     Assertions.assertEquals(100,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intfloat_initialCapacity50_NotEmptyInsertOOBHi()
+  public void testCheckedListadd_intfloat_initialCapacity50_seqIsNotEmpty_hiIndex()
   {
     CheckedList seq=new CheckedList(50);
     for(int i=0;i<100;++i)
@@ -6593,8 +11096,26 @@ public class DoubleArrSeqListTest
       seq.add(seq.size,TypeConversionUtil.convertTofloat(i));
     }
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(seq.size+1,TypeConversionUtil.convertTofloat(5)));
-    Assertions.assertEquals(100,seq.size);
+    Assertions.assertEquals(100,seq.size());
     Assertions.assertEquals(100,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intFloat_initialCapacityDEFAULT_NonThrowingIndex()
+  {
+    CheckedList seq=new CheckedList();
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertToFloat(i));
+    }
+    for(int i=0;i<100;++i)
+    {
+      var putVal=TypeConversionUtil.convertToFloat(100-i-1);
+      seq.put(i,putVal);
+      var expectedVal=TypeConversionUtil.convertTodouble(100-i-1);
+      Assertions.assertEquals(expectedVal,seq.arr[i]);
+      Assertions.assertEquals(100,seq.size());
+      Assertions.assertEquals(100,seq.modCount);
+    }
   }
   @Test
   public void testCheckedListadd_intFloat_initialCapacityDEFAULT_InsertBegin()
@@ -6604,10 +11125,11 @@ public class DoubleArrSeqListTest
     {
       seq.add(0,TypeConversionUtil.convertToFloat(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[seq.size-i-1]);
     }
@@ -6620,10 +11142,11 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size,TypeConversionUtil.convertToFloat(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
     }
@@ -6636,37 +11159,89 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size/2,TypeConversionUtil.convertToFloat(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    ArrayList arrList=new ArrayList();
-    for(int i=0;i<seq.size;++i)
+    ArrayList arrayList=new ArrayList();
+    for(int i=0;i<seqSize;++i)
     {
-      seq.add(TypeConversionUtil.convertToFloat(i));
+      arrayList.add(arrayList.size()/2,TypeConversionUtil.convertTodouble(i));
     }
-    for(int i=0;i<seq.size;++i)
+    System.out.println("BEGIN testCheckedListadd_intFloat_initialCapacityDEFAULT_InsertMidPoint");
+    for(int i=0;i<seqSize;++i)
     {
-      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]));
+      System.out.println(arrayList.get(i));
+      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]);
+    }
+    System.out.println("END testCheckedListadd_intFloat_initialCapacityDEFAULT_InsertMidPoint");
+  }
+  @Test
+  public void testCheckedListput_intFloat_initialCapacityDEFAULT_seqIsEmpty_hiIndex()
+  {
+    CheckedList seq=new CheckedList();
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(0,TypeConversionUtil.convertToFloat(5)));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intFloat_initialCapacityDEFAULT_seqIsEmpty_negativeIndex()
+  {
+    CheckedList seq=new CheckedList();
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(-1,TypeConversionUtil.convertToFloat(5)));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intFloat_initialCapacityDEFAULT_seqIsNotEmpty_hiIndex()
+  {
+    CheckedList seq=new CheckedList();
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertToFloat(i));
+    }
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(seq.size(),TypeConversionUtil.convertToFloat(5)));
+    Assertions.assertEquals(100,seq.size());
+    Assertions.assertEquals(100,seq.modCount);
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
     }
   }
   @Test
-  public void testCheckedListadd_intFloat_initialCapacityDEFAULT_emptyInsertOOBLo()
+  public void testCheckedListput_intFloat_initialCapacityDEFAULT_seqIsNotEmpty_negativeIndex()
+  {
+    CheckedList seq=new CheckedList();
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertToFloat(i));
+    }
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(-1,TypeConversionUtil.convertToFloat(5)));
+    Assertions.assertEquals(100,seq.size());
+    Assertions.assertEquals(100,seq.modCount);
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
+    }
+  }
+  @Test
+  public void testCheckedListadd_intFloat_initialCapacityDEFAULT_seqIsEmpty_negativeIndex()
   {
     CheckedList seq=new CheckedList();
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(-1,TypeConversionUtil.convertToFloat(5)));
-    Assertions.assertEquals(0,seq.size);
+    Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intFloat_initialCapacityDEFAULT_emptyInsertOOBHi()
+  public void testCheckedListadd_intFloat_initialCapacityDEFAULT_seqIsEmpty_hiIndex()
   {
     CheckedList seq=new CheckedList();
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(seq.size+1,TypeConversionUtil.convertToFloat(5)));
-    Assertions.assertEquals(0,seq.size);
+    Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intFloat_initialCapacityDEFAULT_NotEmptyInsertOOBLo()
+  public void testCheckedListadd_intFloat_initialCapacityDEFAULT_seqIsNotEmpty_negativeIndex()
   {
     CheckedList seq=new CheckedList();
     for(int i=0;i<100;++i)
@@ -6674,11 +11249,11 @@ public class DoubleArrSeqListTest
       seq.add(seq.size,TypeConversionUtil.convertToFloat(i));
     }
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(-1,TypeConversionUtil.convertToFloat(5)));
-    Assertions.assertEquals(100,seq.size);
+    Assertions.assertEquals(100,seq.size());
     Assertions.assertEquals(100,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intFloat_initialCapacityDEFAULT_NotEmptyInsertOOBHi()
+  public void testCheckedListadd_intFloat_initialCapacityDEFAULT_seqIsNotEmpty_hiIndex()
   {
     CheckedList seq=new CheckedList();
     for(int i=0;i<100;++i)
@@ -6686,8 +11261,26 @@ public class DoubleArrSeqListTest
       seq.add(seq.size,TypeConversionUtil.convertToFloat(i));
     }
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(seq.size+1,TypeConversionUtil.convertToFloat(5)));
-    Assertions.assertEquals(100,seq.size);
+    Assertions.assertEquals(100,seq.size());
     Assertions.assertEquals(100,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intFloat_initialCapacityNULL_NonThrowingIndex()
+  {
+    CheckedList seq=new CheckedList(0,null);
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertToFloat(i));
+    }
+    for(int i=0;i<100;++i)
+    {
+      var putVal=TypeConversionUtil.convertToFloat(100-i-1);
+      seq.put(i,putVal);
+      var expectedVal=TypeConversionUtil.convertTodouble(100-i-1);
+      Assertions.assertEquals(expectedVal,seq.arr[i]);
+      Assertions.assertEquals(100,seq.size());
+      Assertions.assertEquals(100,seq.modCount);
+    }
   }
   @Test
   public void testCheckedListadd_intFloat_initialCapacityNULL_InsertBegin()
@@ -6697,10 +11290,11 @@ public class DoubleArrSeqListTest
     {
       seq.add(0,TypeConversionUtil.convertToFloat(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[seq.size-i-1]);
     }
@@ -6713,10 +11307,11 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size,TypeConversionUtil.convertToFloat(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
     }
@@ -6729,37 +11324,89 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size/2,TypeConversionUtil.convertToFloat(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    ArrayList arrList=new ArrayList();
-    for(int i=0;i<seq.size;++i)
+    ArrayList arrayList=new ArrayList();
+    for(int i=0;i<seqSize;++i)
     {
-      seq.add(TypeConversionUtil.convertToFloat(i));
+      arrayList.add(arrayList.size()/2,TypeConversionUtil.convertTodouble(i));
     }
-    for(int i=0;i<seq.size;++i)
+    System.out.println("BEGIN testCheckedListadd_intFloat_initialCapacityNULL_InsertMidPoint");
+    for(int i=0;i<seqSize;++i)
     {
-      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]));
+      System.out.println(arrayList.get(i));
+      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]);
+    }
+    System.out.println("END testCheckedListadd_intFloat_initialCapacityNULL_InsertMidPoint");
+  }
+  @Test
+  public void testCheckedListput_intFloat_initialCapacityNULL_seqIsEmpty_hiIndex()
+  {
+    CheckedList seq=new CheckedList(0,null);
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(0,TypeConversionUtil.convertToFloat(5)));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intFloat_initialCapacityNULL_seqIsEmpty_negativeIndex()
+  {
+    CheckedList seq=new CheckedList(0,null);
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(-1,TypeConversionUtil.convertToFloat(5)));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intFloat_initialCapacityNULL_seqIsNotEmpty_hiIndex()
+  {
+    CheckedList seq=new CheckedList(0,null);
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertToFloat(i));
+    }
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(seq.size(),TypeConversionUtil.convertToFloat(5)));
+    Assertions.assertEquals(100,seq.size());
+    Assertions.assertEquals(100,seq.modCount);
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
     }
   }
   @Test
-  public void testCheckedListadd_intFloat_initialCapacityNULL_emptyInsertOOBLo()
+  public void testCheckedListput_intFloat_initialCapacityNULL_seqIsNotEmpty_negativeIndex()
+  {
+    CheckedList seq=new CheckedList(0,null);
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertToFloat(i));
+    }
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(-1,TypeConversionUtil.convertToFloat(5)));
+    Assertions.assertEquals(100,seq.size());
+    Assertions.assertEquals(100,seq.modCount);
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
+    }
+  }
+  @Test
+  public void testCheckedListadd_intFloat_initialCapacityNULL_seqIsEmpty_negativeIndex()
   {
     CheckedList seq=new CheckedList(0,null);
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(-1,TypeConversionUtil.convertToFloat(5)));
-    Assertions.assertEquals(0,seq.size);
+    Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intFloat_initialCapacityNULL_emptyInsertOOBHi()
+  public void testCheckedListadd_intFloat_initialCapacityNULL_seqIsEmpty_hiIndex()
   {
     CheckedList seq=new CheckedList(0,null);
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(seq.size+1,TypeConversionUtil.convertToFloat(5)));
-    Assertions.assertEquals(0,seq.size);
+    Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intFloat_initialCapacityNULL_NotEmptyInsertOOBLo()
+  public void testCheckedListadd_intFloat_initialCapacityNULL_seqIsNotEmpty_negativeIndex()
   {
     CheckedList seq=new CheckedList(0,null);
     for(int i=0;i<100;++i)
@@ -6767,11 +11414,11 @@ public class DoubleArrSeqListTest
       seq.add(seq.size,TypeConversionUtil.convertToFloat(i));
     }
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(-1,TypeConversionUtil.convertToFloat(5)));
-    Assertions.assertEquals(100,seq.size);
+    Assertions.assertEquals(100,seq.size());
     Assertions.assertEquals(100,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intFloat_initialCapacityNULL_NotEmptyInsertOOBHi()
+  public void testCheckedListadd_intFloat_initialCapacityNULL_seqIsNotEmpty_hiIndex()
   {
     CheckedList seq=new CheckedList(0,null);
     for(int i=0;i<100;++i)
@@ -6779,8 +11426,26 @@ public class DoubleArrSeqListTest
       seq.add(seq.size,TypeConversionUtil.convertToFloat(i));
     }
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(seq.size+1,TypeConversionUtil.convertToFloat(5)));
-    Assertions.assertEquals(100,seq.size);
+    Assertions.assertEquals(100,seq.size());
     Assertions.assertEquals(100,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intFloat_initialCapacity50_NonThrowingIndex()
+  {
+    CheckedList seq=new CheckedList(50);
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertToFloat(i));
+    }
+    for(int i=0;i<100;++i)
+    {
+      var putVal=TypeConversionUtil.convertToFloat(100-i-1);
+      seq.put(i,putVal);
+      var expectedVal=TypeConversionUtil.convertTodouble(100-i-1);
+      Assertions.assertEquals(expectedVal,seq.arr[i]);
+      Assertions.assertEquals(100,seq.size());
+      Assertions.assertEquals(100,seq.modCount);
+    }
   }
   @Test
   public void testCheckedListadd_intFloat_initialCapacity50_InsertBegin()
@@ -6790,10 +11455,11 @@ public class DoubleArrSeqListTest
     {
       seq.add(0,TypeConversionUtil.convertToFloat(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[seq.size-i-1]);
     }
@@ -6806,10 +11472,11 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size,TypeConversionUtil.convertToFloat(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i)
+    for(int i=0;i<seqSize;++i)
     {
       Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
     }
@@ -6822,37 +11489,89 @@ public class DoubleArrSeqListTest
     {
       seq.add(seq.size/2,TypeConversionUtil.convertToFloat(i));
     }
-    Assertions.assertEquals(100,seq.size);
+    int seqSize=seq.size();
+    Assertions.assertEquals(100,seqSize);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    ArrayList arrList=new ArrayList();
-    for(int i=0;i<seq.size;++i)
+    ArrayList arrayList=new ArrayList();
+    for(int i=0;i<seqSize;++i)
     {
-      seq.add(TypeConversionUtil.convertToFloat(i));
+      arrayList.add(arrayList.size()/2,TypeConversionUtil.convertTodouble(i));
     }
-    for(int i=0;i<seq.size;++i)
+    System.out.println("BEGIN testCheckedListadd_intFloat_initialCapacity50_InsertMidPoint");
+    for(int i=0;i<seqSize;++i)
     {
-      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]));
+      System.out.println(arrayList.get(i));
+      Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]);
+    }
+    System.out.println("END testCheckedListadd_intFloat_initialCapacity50_InsertMidPoint");
+  }
+  @Test
+  public void testCheckedListput_intFloat_initialCapacity50_seqIsEmpty_hiIndex()
+  {
+    CheckedList seq=new CheckedList(50);
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(0,TypeConversionUtil.convertToFloat(5)));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intFloat_initialCapacity50_seqIsEmpty_negativeIndex()
+  {
+    CheckedList seq=new CheckedList(50);
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(-1,TypeConversionUtil.convertToFloat(5)));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedListput_intFloat_initialCapacity50_seqIsNotEmpty_hiIndex()
+  {
+    CheckedList seq=new CheckedList(50);
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertToFloat(i));
+    }
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(seq.size(),TypeConversionUtil.convertToFloat(5)));
+    Assertions.assertEquals(100,seq.size());
+    Assertions.assertEquals(100,seq.modCount);
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
     }
   }
   @Test
-  public void testCheckedListadd_intFloat_initialCapacity50_emptyInsertOOBLo()
+  public void testCheckedListput_intFloat_initialCapacity50_seqIsNotEmpty_negativeIndex()
+  {
+    CheckedList seq=new CheckedList(50);
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertToFloat(i));
+    }
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(-1,TypeConversionUtil.convertToFloat(5)));
+    Assertions.assertEquals(100,seq.size());
+    Assertions.assertEquals(100,seq.modCount);
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.arr[i]);
+    }
+  }
+  @Test
+  public void testCheckedListadd_intFloat_initialCapacity50_seqIsEmpty_negativeIndex()
   {
     CheckedList seq=new CheckedList(50);
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(-1,TypeConversionUtil.convertToFloat(5)));
-    Assertions.assertEquals(0,seq.size);
+    Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intFloat_initialCapacity50_emptyInsertOOBHi()
+  public void testCheckedListadd_intFloat_initialCapacity50_seqIsEmpty_hiIndex()
   {
     CheckedList seq=new CheckedList(50);
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(seq.size+1,TypeConversionUtil.convertToFloat(5)));
-    Assertions.assertEquals(0,seq.size);
+    Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intFloat_initialCapacity50_NotEmptyInsertOOBLo()
+  public void testCheckedListadd_intFloat_initialCapacity50_seqIsNotEmpty_negativeIndex()
   {
     CheckedList seq=new CheckedList(50);
     for(int i=0;i<100;++i)
@@ -6860,11 +11579,11 @@ public class DoubleArrSeqListTest
       seq.add(seq.size,TypeConversionUtil.convertToFloat(i));
     }
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(-1,TypeConversionUtil.convertToFloat(5)));
-    Assertions.assertEquals(100,seq.size);
+    Assertions.assertEquals(100,seq.size());
     Assertions.assertEquals(100,seq.modCount);
   }
   @Test
-  public void testCheckedListadd_intFloat_initialCapacity50_NotEmptyInsertOOBHi()
+  public void testCheckedListadd_intFloat_initialCapacity50_seqIsNotEmpty_hiIndex()
   {
     CheckedList seq=new CheckedList(50);
     for(int i=0;i<100;++i)
@@ -6872,8 +11591,419 @@ public class DoubleArrSeqListTest
       seq.add(seq.size,TypeConversionUtil.convertToFloat(i));
     }
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(seq.size+1,TypeConversionUtil.convertToFloat(5)));
-    Assertions.assertEquals(100,seq.size);
+    Assertions.assertEquals(100,seq.size());
     Assertions.assertEquals(100,seq.modCount);
   }
-*/
+  @Test
+  public void testCheckedListremoveDoubleAt_seqIsEmpty_hiIndex()
+  {
+    CheckedList seq=new CheckedList();
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.removeDoubleAt(0));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedListremoveDoubleAt_seqIsEmpty_NegativeIndex()
+  {
+    CheckedList seq=new CheckedList();
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.removeDoubleAt(-1));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedListgetDouble_seqIsEmpty_hiIndex()
+  {
+    CheckedList seq=new CheckedList();
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.getDouble(0));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedListgetDouble_seqIsEmpty_NegativeIndex()
+  {
+    CheckedList seq=new CheckedList();
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.getDouble(-1));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedListremoveDoubleAt_seqIsNotEmpty_hiIndex()
+  {
+    CheckedList seq=new CheckedList();
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertTodouble(i));
+    }
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.removeDoubleAt(seq.size()));
+    Assertions.assertEquals(100,seq.size());
+    Assertions.assertEquals(100,seq.modCount);
+  }
+  @Test
+  public void testCheckedListremoveDoubleAt_seqIsNotEmpty_NegativeIndex()
+  {
+    CheckedList seq=new CheckedList();
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertTodouble(i));
+    }
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.removeDoubleAt(-1));
+    Assertions.assertEquals(100,seq.size());
+    Assertions.assertEquals(100,seq.modCount);
+  }
+  @Test
+  public void testCheckedListgetDouble_seqIsNotEmpty_hiIndex()
+  {
+    CheckedList seq=new CheckedList();
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertTodouble(i));
+    }
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.getDouble(seq.size()));
+    Assertions.assertEquals(100,seq.size());
+    Assertions.assertEquals(100,seq.modCount);
+  }
+  @Test
+  public void testCheckedListgetDouble_seqIsNotEmpty_NegativeIndex()
+  {
+    CheckedList seq=new CheckedList();
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertTodouble(i));
+    }
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.getDouble(-1));
+    Assertions.assertEquals(100,seq.size());
+    Assertions.assertEquals(100,seq.modCount);
+  }
+  @Test
+  public void testCheckedListremoveDoubleAt_seqIsNotEmpty_removeAtEnd()
+  {
+    CheckedList seq=new CheckedList();
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertTodouble(i));
+    }
+    for(int i=0;i<100;++i)
+    {
+      int removeIndex=seq.size()-1;
+      Assertions.assertEquals(TypeConversionUtil.convertTodouble(seq.size()-1),seq.removeDoubleAt(removeIndex));
+      Assertions.assertEquals(100-i-1,seq.size());
+      Assertions.assertEquals(100+i+1,seq.modCount);
+    }
+  }
+  @Test
+  public void testCheckedListremoveDoubleAt_seqIsNotEmpty_removeAtBegin()
+  {
+    CheckedList seq=new CheckedList();
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertTodouble(i));
+    }
+    for(int i=0;i<100;++i)
+    {
+      int removeIndex=0;
+      Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.removeDoubleAt(removeIndex));
+      Assertions.assertEquals(100-i-1,seq.size());
+      Assertions.assertEquals(100+i+1,seq.modCount);
+    }
+  }
+  @Test
+  public void testCheckedListremoveDoubleAt_seqIsNotEmpty_removeAtMidPoint()
+  {
+    CheckedList seq=new CheckedList();
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertTodouble(i));
+    }
+    ArrayList arrayList=new ArrayList();
+    for(int i=0;i<100;++i)
+    {
+      arrayList.add(TypeConversionUtil.convertTodouble(i));
+    }
+    for(int i=0;i<100;++i)
+    {
+      int removeIndex=seq.size()/2;
+      Assertions.assertEquals(arrayList.remove(removeIndex),(Object)seq.removeDoubleAt(removeIndex));
+      Assertions.assertEquals(100-i-1,seq.size());
+      Assertions.assertEquals(100+i+1,seq.modCount);
+    }
+  }
+  @Test
+  public void testCheckedListgetDouble_seqIsNotEmpty_NonThrowingIndex()
+  {
+    CheckedList seq=new CheckedList();
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertTodouble(i));
+    }
+    for(int i=0;i<100;++i)
+    {
+      var expectedVal=TypeConversionUtil.convertTodouble(i);
+      Assertions.assertEquals(expectedVal,seq.getDouble(i));
+      Assertions.assertEquals(100,seq.size());
+      Assertions.assertEquals(100,seq.modCount);
+    }
+  }
+  @Test
+  public void testCheckedListremove_seqIsEmpty_hiIndex()
+  {
+    CheckedList seq=new CheckedList();
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.remove(0));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedListremove_seqIsEmpty_NegativeIndex()
+  {
+    CheckedList seq=new CheckedList();
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.remove(-1));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedListget_seqIsEmpty_hiIndex()
+  {
+    CheckedList seq=new CheckedList();
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.get(0));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedListget_seqIsEmpty_NegativeIndex()
+  {
+    CheckedList seq=new CheckedList();
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.get(-1));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedListremove_seqIsNotEmpty_hiIndex()
+  {
+    CheckedList seq=new CheckedList();
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertTodouble(i));
+    }
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.remove(seq.size()));
+    Assertions.assertEquals(100,seq.size());
+    Assertions.assertEquals(100,seq.modCount);
+  }
+  @Test
+  public void testCheckedListremove_seqIsNotEmpty_NegativeIndex()
+  {
+    CheckedList seq=new CheckedList();
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertTodouble(i));
+    }
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.remove(-1));
+    Assertions.assertEquals(100,seq.size());
+    Assertions.assertEquals(100,seq.modCount);
+  }
+  @Test
+  public void testCheckedListget_seqIsNotEmpty_hiIndex()
+  {
+    CheckedList seq=new CheckedList();
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertTodouble(i));
+    }
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.get(seq.size()));
+    Assertions.assertEquals(100,seq.size());
+    Assertions.assertEquals(100,seq.modCount);
+  }
+  @Test
+  public void testCheckedListget_seqIsNotEmpty_NegativeIndex()
+  {
+    CheckedList seq=new CheckedList();
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertTodouble(i));
+    }
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.get(-1));
+    Assertions.assertEquals(100,seq.size());
+    Assertions.assertEquals(100,seq.modCount);
+  }
+  @Test
+  public void testCheckedListremove_seqIsNotEmpty_removeAtEnd()
+  {
+    CheckedList seq=new CheckedList();
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertTodouble(i));
+    }
+    for(int i=0;i<100;++i)
+    {
+      int removeIndex=seq.size()-1;
+      Assertions.assertEquals(TypeConversionUtil.convertToDouble(seq.size()-1),seq.remove(removeIndex));
+      Assertions.assertEquals(100-i-1,seq.size());
+      Assertions.assertEquals(100+i+1,seq.modCount);
+    }
+  }
+  @Test
+  public void testCheckedListremove_seqIsNotEmpty_removeAtBegin()
+  {
+    CheckedList seq=new CheckedList();
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertTodouble(i));
+    }
+    for(int i=0;i<100;++i)
+    {
+      int removeIndex=0;
+      Assertions.assertEquals(TypeConversionUtil.convertToDouble(i),seq.remove(removeIndex));
+      Assertions.assertEquals(100-i-1,seq.size());
+      Assertions.assertEquals(100+i+1,seq.modCount);
+    }
+  }
+  @Test
+  public void testCheckedListremove_seqIsNotEmpty_removeAtMidPoint()
+  {
+    CheckedList seq=new CheckedList();
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertTodouble(i));
+    }
+    ArrayList arrayList=new ArrayList();
+    for(int i=0;i<100;++i)
+    {
+      arrayList.add(TypeConversionUtil.convertToDouble(i));
+    }
+    for(int i=0;i<100;++i)
+    {
+      int removeIndex=seq.size()/2;
+      Assertions.assertEquals(arrayList.remove(removeIndex),(Object)seq.remove(removeIndex));
+      Assertions.assertEquals(100-i-1,seq.size());
+      Assertions.assertEquals(100+i+1,seq.modCount);
+    }
+  }
+  @Test
+  public void testCheckedListget_seqIsNotEmpty_NonThrowingIndex()
+  {
+    CheckedList seq=new CheckedList();
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertTodouble(i));
+    }
+    for(int i=0;i<100;++i)
+    {
+      var expectedVal=TypeConversionUtil.convertToDouble(i);
+      Assertions.assertEquals(expectedVal,seq.get(i));
+      Assertions.assertEquals(100,seq.size());
+      Assertions.assertEquals(100,seq.modCount);
+    }
+  }
+  @Test
+  public void testCheckedListset_intdouble_seqIsNotEmpty_NonThrowingIndex()
+  {
+    CheckedList seq=new CheckedList();
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertTodouble(i));
+    }
+    for(int i=0;i<100;++i)
+    {
+      var inputVal=TypeConversionUtil.convertTodouble(100-i-1);
+      Assertions.assertEquals(TypeConversionUtil.convertTodouble(i),seq.set(i,inputVal));
+      Assertions.assertEquals(inputVal,(double)seq.arr[i]);
+      Assertions.assertEquals(100,seq.size());
+      Assertions.assertEquals(100,seq.modCount);
+    }
+  }
+  @Test
+  public void testCheckedListset_intdouble_seqIsEmpty_negativeIndex()
+  {
+    CheckedList seq=new CheckedList();
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.set(-1,TypeConversionUtil.convertTodouble(5)));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedListset_intdouble_seqIsEmpty_hiIndex()
+  {
+    CheckedList seq=new CheckedList();
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.set(0,TypeConversionUtil.convertTodouble(5)));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedListset_intdouble_seqIsNotEmpty_negativeIndex()
+  {
+    CheckedList seq=new CheckedList();
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertTodouble(i));
+    }
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.set(-1,TypeConversionUtil.convertTodouble(5)));
+    Assertions.assertEquals(100,seq.size());
+    Assertions.assertEquals(100,seq.modCount);
+  }
+  @Test
+  public void testCheckedListset_intdouble_seqIsNotEmpty_hiIndex()
+  {
+    CheckedList seq=new CheckedList();
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertTodouble(i));
+    }
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.set(seq.size(),TypeConversionUtil.convertTodouble(5)));
+    Assertions.assertEquals(100,seq.size());
+    Assertions.assertEquals(100,seq.modCount);
+  }
+  @Test
+  public void testCheckedListset_intDouble_seqIsNotEmpty_NonThrowingIndex()
+  {
+    CheckedList seq=new CheckedList();
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertToDouble(i));
+    }
+    for(int i=0;i<100;++i)
+    {
+      var inputVal=TypeConversionUtil.convertToDouble(100-i-1);
+      Assertions.assertEquals(TypeConversionUtil.convertToDouble(i),seq.set(i,inputVal));
+      Assertions.assertEquals(inputVal,(Double)seq.arr[i]);
+      Assertions.assertEquals(100,seq.size());
+      Assertions.assertEquals(100,seq.modCount);
+    }
+  }
+  @Test
+  public void testCheckedListset_intDouble_seqIsEmpty_negativeIndex()
+  {
+    CheckedList seq=new CheckedList();
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.set(-1,TypeConversionUtil.convertToDouble(5)));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedListset_intDouble_seqIsEmpty_hiIndex()
+  {
+    CheckedList seq=new CheckedList();
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.set(0,TypeConversionUtil.convertToDouble(5)));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedListset_intDouble_seqIsNotEmpty_negativeIndex()
+  {
+    CheckedList seq=new CheckedList();
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertToDouble(i));
+    }
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.set(-1,TypeConversionUtil.convertToDouble(5)));
+    Assertions.assertEquals(100,seq.size());
+    Assertions.assertEquals(100,seq.modCount);
+  }
+  @Test
+  public void testCheckedListset_intDouble_seqIsNotEmpty_hiIndex()
+  {
+    CheckedList seq=new CheckedList();
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size,TypeConversionUtil.convertToDouble(i));
+    }
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.set(seq.size(),TypeConversionUtil.convertToDouble(5)));
+    Assertions.assertEquals(100,seq.size());
+    Assertions.assertEquals(100,seq.modCount);
+  }
 }

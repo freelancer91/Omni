@@ -1,0 +1,70 @@
+#TYPEDEF OfBoolean
+#TYPEDEF OfByte
+#TYPEDEF OfChar
+#TYPEDEF OfShort
+#TYPEDEF OfInt
+#TYPEDEF OfLong
+#TYPEDEF OfFloat
+#TYPEDEF OfDouble
+#TYPEDEF OfRef
+package omni.impl.seq;
+import java.util.ArrayList;
+import java.util.function.Consumer;
+#IF OfInt,OfLong,OfDouble
+import java.util.function.$TypeNameModifier$Consumer;
+#ELSEIFNOT OfRef
+import omni.function.$TypeNameModifier$Consumer;
+#ENDIF
+#IF OfRef
+@SuppressWarnings({"rawtypes"}) 
+class $ClassPrefix$MonitoredConsumer extends ArrayList<Object> implements $TypeNameModifier$Consumer<Object>
+#ELSE
+class $ClassPrefix$MonitoredConsumer extends ArrayList<Object> implements $TypeNameModifier$Consumer,Consumer<Object>
+#ENDIF
+#IFNOT OfRef
+    
+#ENDIF
+{
+  private static final long serialVersionUID=1L;
+  @Override public void accept($ArrayType$ val){
+    super.add(val);
+  }
+#IFNOT OfRef
+  @Override public void accept(Object val){
+    accept(($ArrayType$)val);
+  }
+#ENDIF
+  static class Throwing extends $ClassPrefix$MonitoredConsumer
+  {
+    private static final long serialVersionUID=1L;
+    @Override public void accept($ArrayType$ val){
+      super.accept(($ArrayType$)val);
+      throw new IndexOutOfBoundsException();
+    }
+  }
+  #MACRO StructImpl<ArrSeq,CheckedStack>()
+  #MACRO StructImpl<ArrSeq,CheckedList>()
+}
+#MACRODEF StructImpl<ROOTIMPL,STRUCTNAME>()
+static class ModifyingROOTIMPLSTRUCTNAMEConsumer extends $ClassPrefix$MonitoredConsumer{
+  private static final long serialVersionUID=1L;
+  $ClassPrefix$ROOTIMPL.STRUCTNAME seq;
+  public ModifyingROOTIMPLSTRUCTNAMEConsumer($ClassPrefix$ROOTIMPL.STRUCTNAME seq){
+    this.seq=seq;
+  }
+  @Override public void accept($ArrayType$ val){
+    seq.modCount+=2;
+    super.accept(($ArrayType$)val);
+  }
+}
+static class ModifyingROOTIMPLSTRUCTNAMEAndThrowingConsumer extends ModifyingROOTIMPLSTRUCTNAMEConsumer{
+  private static final long serialVersionUID=1L;
+  public ModifyingROOTIMPLSTRUCTNAMEAndThrowingConsumer($ClassPrefix$ROOTIMPL.STRUCTNAME seq){
+    super(seq);
+  }
+  @Override public void accept($ArrayType$ val){
+    super.accept(($ArrayType$)val);
+    throw new IndexOutOfBoundsException();
+  }
+}
+#ENDDEF

@@ -8,7 +8,6 @@
 #TYPEDEF OfDouble
 #TYPEDEF OfRef
 package omni.impl.seq;
-/*
 import java.util.ArrayList;
 import omni.impl.seq.$ClassPrefix$ArrSeq.UncheckedList;
 import omni.impl.seq.$ClassPrefix$ArrSeq.CheckedList;
@@ -16,13 +15,12 @@ import omni.util.TypeConversionUtil;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 @SuppressWarnings({"rawtypes","unchecked"}) 
-*/
 public class $ClassPrefix$ArrSeqListTest
 {
-/*
+
   #MACRO StructImpl<UncheckedList>()
   #MACRO StructImpl<CheckedList>()
-*/
+
 }
 
 
@@ -89,6 +87,40 @@ public class $ClassPrefix$ArrSeqListTest
     #ENDIF
   #ENDIF
 #ENDIF
+
+#MACRO TestOutputMethods<DEFAULT>($ArrayType$,$TypeNameModifier$,$defaultVal$,OmniArray.Of$ClassPrefix$.DEFAULT_ARR,$removeAtIndexMethod$)
+#IFNOT OfRef
+#MACRO TestOutputMethods<DEFAULT>($BoxedType$,,null,OmniArray.Of$ClassPrefix$.DEFAULT_BOXED_ARR,remove)
+  #IF OfBoolean
+#MACRO TestOutputMethods<DEFAULT>(double$ArrayType$,Double,Double.NaN,OmniArray.OfDouble.DEFAULT_ARR,removeDoubleAt)
+#MACRO TestOutputMethods<DEFAULT>(float$ArrayType$,Float,Float.NaN,OmniArray.OfFloat.DEFAULT_ARR,removeFloatAt)
+#MACRO TestOutputMethods<DEFAULT>(long$ArrayType$,Long,Long.MIN_VALUE,OmniArray.OfLong.DEFAULT_ARR,removeLongAt)
+#MACRO TestOutputMethods<DEFAULT>(int$ArrayType$,Int,Integer.MIN_VALUE,OmniArray.OfInt.DEFAULT_ARR,removeIntAt)
+#MACRO TestOutputMethods<DEFAULT>(short$ArrayType$,Short,Short.MIN_VALUE,OmniArray.OfShort.DEFAULT_ARR,removeShortAt)
+#MACRO TestOutputMethods<DEFAULT>(char$ArrayType$,Char,Character.MIN_VALUE,OmniArray.OfChar.DEFAULT_ARR,removeCharAt)
+#MACRO TestOutputMethods<DEFAULT>(byte$ArrayType$,Byte,Byte.MIN_VALUE,OmniArray.OfByte.DEFAULT_ARR,removeByteAt)
+  #ELSEIFNOT OfDouble
+#MACRO TestOutputMethods<DEFAULT>(double,Double,Double.NaN,OmniArray.OfDouble.DEFAULT_ARR,removeDoubleAt)
+    #IFNOT OfFloat
+#MACRO TestOutputMethods<DEFAULT>(float,Float,Float.NaN,OmniArray.OfFloat.DEFAULT_ARR,removeFloatAt)
+      #IFNOT OfLong
+#MACRO TestOutputMethods<DEFAULT>(long,Long,Long.MIN_VALUE,OmniArray.OfLong.DEFAULT_ARR,removeLongAt)
+        #IFNOT OfInt
+#MACRO TestOutputMethods<DEFAULT>(int,Int,Integer.MIN_VALUE,OmniArray.OfInt.DEFAULT_ARR,removeIntAt)
+          #IFNOT OfShort,OfChar
+#MACRO TestOutputMethods<DEFAULT>(short,Short,Short.MIN_VALUE,OmniArray.OfShort.DEFAULT_ARR,removeShortAt)
+          #ENDIF
+        #ENDIF
+      #ENDIF
+    #ENDIF
+  #ENDIF
+#ENDIF  
+
+#MACRO SetMethodTests<DEFAULT>($ArrayType$,$ArrayType$)
+#IFNOT OfRef
+#MACRO SetMethodTests<DEFAULT>($BoxedType$,$BoxedType$)
+#ENDIF
+
 #ENDDEF
 
 #MACRODEF ConstructionRoutine()
@@ -98,6 +130,384 @@ STRUCTNAME seq=new STRUCTNAME();
 STRUCTNAME seq=new STRUCTNAME(0,null);
 #ELSE
 STRUCTNAME seq=new STRUCTNAME(INITIALCAPACITY);
+#ENDIF
+#ENDDEF
+
+
+
+#MACRODEF SetMethodTests<INITIALCAPACITY>(INPUTTYPE,OUTPUTTYPE)
+@Test
+public void testSTRUCTNAMEset_intINPUTTYPE_seqIsNotEmpty_NonThrowingIndex()
+{
+  #MACRO ConstructionRoutine()
+  #MACRO InsertEndAscending(100,INPUTTYPE)
+  for(int i=0;i<100;++i)
+  {
+    var inputVal=TypeConversionUtil.convertToINPUTTYPE(100-i-1);
+    Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPE(i),seq.set(i,inputVal));
+#IF OfRef
+    Assertions.assertSame(inputVal,seq.arr[i]);
+#ELSE
+    Assertions.assertEquals(inputVal,(INPUTTYPE)seq.arr[i]);
+#ENDIF
+    Assertions.assertEquals(100,seq.size());
+#IFSWITCH STRUCTNAME==CheckedList
+    Assertions.assertEquals(100,seq.modCount);
+#ENDIF
+  }
+}
+#IFSWITCH STRUCTNAME==CheckedList
+@Test
+public void testSTRUCTNAMEset_intINPUTTYPE_seqIsEmpty_negativeIndex()
+{
+  #MACRO ConstructionRoutine()
+  Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.set(-1,TypeConversionUtil.convertToINPUTTYPE(5)));
+  Assertions.assertEquals(0,seq.size());
+  Assertions.assertEquals(0,seq.modCount);
+}
+@Test
+public void testSTRUCTNAMEset_intINPUTTYPE_seqIsEmpty_hiIndex()
+{
+  #MACRO ConstructionRoutine()
+  Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.set(0,TypeConversionUtil.convertToINPUTTYPE(5)));
+  Assertions.assertEquals(0,seq.size());
+  Assertions.assertEquals(0,seq.modCount);
+}
+@Test
+public void testSTRUCTNAMEset_intINPUTTYPE_seqIsNotEmpty_negativeIndex()
+{
+  #MACRO ConstructionRoutine()
+  #MACRO InsertEndAscending(100,INPUTTYPE)
+  Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.set(-1,TypeConversionUtil.convertToINPUTTYPE(5)));
+  Assertions.assertEquals(100,seq.size());
+  Assertions.assertEquals(100,seq.modCount);
+}
+@Test
+public void testSTRUCTNAMEset_intINPUTTYPE_seqIsNotEmpty_hiIndex()
+{
+  #MACRO ConstructionRoutine()
+  #MACRO InsertEndAscending(100,INPUTTYPE)
+  Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.set(seq.size(),TypeConversionUtil.convertToINPUTTYPE(5)));
+  Assertions.assertEquals(100,seq.size());
+  Assertions.assertEquals(100,seq.modCount);
+}
+#ENDIF
+#ENDDEF
+
+#MACRODEF TestOutputMethods<INITIALCAPACITY>(OUTPUTTYPE,OUTPUTMODIFIER,DEFAULTVAL,DEFAULTARR,REMOVEMETHOD)
+#IFSWITCH STRUCTNAME==CheckedList
+@Test
+public void testSTRUCTNAMEREMOVEMETHOD_seqIsEmpty_hiIndex()
+{
+  #MACRO ConstructionRoutine()
+  Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.REMOVEMETHOD(0));
+  Assertions.assertEquals(0,seq.size());
+  Assertions.assertEquals(0,seq.modCount);
+}
+@Test
+public void testSTRUCTNAMEREMOVEMETHOD_seqIsEmpty_NegativeIndex()
+{
+  #MACRO ConstructionRoutine()
+  Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.REMOVEMETHOD(-1));
+  Assertions.assertEquals(0,seq.size());
+  Assertions.assertEquals(0,seq.modCount);
+}
+@Test
+public void testSTRUCTNAMEgetOUTPUTMODIFIER_seqIsEmpty_hiIndex()
+{
+  #MACRO ConstructionRoutine()
+  Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.getOUTPUTMODIFIER(0));
+  Assertions.assertEquals(0,seq.size());
+  Assertions.assertEquals(0,seq.modCount);
+}
+@Test
+public void testSTRUCTNAMEgetOUTPUTMODIFIER_seqIsEmpty_NegativeIndex()
+{
+  #MACRO ConstructionRoutine()
+  Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.getOUTPUTMODIFIER(-1));
+  Assertions.assertEquals(0,seq.size());
+  Assertions.assertEquals(0,seq.modCount);
+}
+@Test
+public void testSTRUCTNAMEREMOVEMETHOD_seqIsNotEmpty_hiIndex()
+{
+  #MACRO ConstructionRoutine()
+  #MACRO InsertEndAscending(100,$ArrayType$)
+  Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.REMOVEMETHOD(seq.size()));
+  Assertions.assertEquals(100,seq.size());
+  Assertions.assertEquals(100,seq.modCount);
+}
+@Test
+public void testSTRUCTNAMEREMOVEMETHOD_seqIsNotEmpty_NegativeIndex()
+{
+  #MACRO ConstructionRoutine()
+  #MACRO InsertEndAscending(100,$ArrayType$)
+  Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.REMOVEMETHOD(-1));
+  Assertions.assertEquals(100,seq.size());
+  Assertions.assertEquals(100,seq.modCount);
+}
+@Test
+public void testSTRUCTNAMEgetOUTPUTMODIFIER_seqIsNotEmpty_hiIndex()
+{
+  #MACRO ConstructionRoutine()
+  #MACRO InsertEndAscending(100,$ArrayType$)
+  Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.getOUTPUTMODIFIER(seq.size()));
+  Assertions.assertEquals(100,seq.size());
+  Assertions.assertEquals(100,seq.modCount);
+}
+@Test
+public void testSTRUCTNAMEgetOUTPUTMODIFIER_seqIsNotEmpty_NegativeIndex()
+{
+  #MACRO ConstructionRoutine()
+  #MACRO InsertEndAscending(100,$ArrayType$)
+  Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.getOUTPUTMODIFIER(-1));
+  Assertions.assertEquals(100,seq.size());
+  Assertions.assertEquals(100,seq.modCount);
+}
+#ENDIF
+@Test
+public void testSTRUCTNAMEREMOVEMETHOD_seqIsNotEmpty_removeAtEnd()
+{
+  #MACRO ConstructionRoutine()
+  #MACRO InsertEndAscending(100,$ArrayType$)
+  for(int i=0;i<100;++i)
+  {
+    int removeIndex=seq.size()-1;
+#IF OfRef
+    Assertions.assertSame(seq.arr[removeIndex],seq.REMOVEMETHOD(removeIndex));
+    Assertions.assertNull(seq.arr[seq.size()]);
+#ELSE
+    Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPE(seq.size()-1),seq.REMOVEMETHOD(removeIndex));
+#ENDIF
+    Assertions.assertEquals(100-i-1,seq.size());
+#IFSWITCH STRUCTNAME==CheckedList
+    Assertions.assertEquals(100+i+1,seq.modCount);
+#ENDIF
+  }
+}
+@Test
+public void testSTRUCTNAMEREMOVEMETHOD_seqIsNotEmpty_removeAtBegin()
+{
+  #MACRO ConstructionRoutine()
+  #MACRO InsertEndAscending(100,$ArrayType$)
+  for(int i=0;i<100;++i)
+  {
+    int removeIndex=0;
+#IF OfRef
+    Assertions.assertSame(seq.arr[removeIndex],seq.REMOVEMETHOD(removeIndex));
+    Assertions.assertNull(seq.arr[seq.size()]);
+#ELSE
+    Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPE(i),seq.REMOVEMETHOD(removeIndex));
+#ENDIF
+    Assertions.assertEquals(100-i-1,seq.size());
+#IFSWITCH STRUCTNAME==CheckedList
+    Assertions.assertEquals(100+i+1,seq.modCount);
+#ENDIF
+  }
+}
+@Test
+public void testSTRUCTNAMEREMOVEMETHOD_seqIsNotEmpty_removeAtMidPoint()
+{
+  #MACRO ConstructionRoutine()
+  #MACRO InsertEndAscending(100,$ArrayType$)
+#IFNOT OfRef
+  ArrayList arrayList=new ArrayList();
+  for(int i=0;i<100;++i)
+  {
+    arrayList.add(TypeConversionUtil.convertToOUTPUTTYPE(i));
+  }
+#ENDIF
+  for(int i=0;i<100;++i)
+  {
+    int removeIndex=seq.size()/2;
+#IF OfRef
+    Assertions.assertSame(seq.arr[removeIndex],seq.REMOVEMETHOD(removeIndex));
+    Assertions.assertNull(seq.arr[seq.size()]);
+#ELSE
+    Assertions.assertEquals(arrayList.remove(removeIndex),(Object)seq.REMOVEMETHOD(removeIndex));
+#ENDIF
+    Assertions.assertEquals(100-i-1,seq.size());
+#IFSWITCH STRUCTNAME==CheckedList
+    Assertions.assertEquals(100+i+1,seq.modCount);
+#ENDIF
+  }
+}
+@Test
+public void testSTRUCTNAMEgetOUTPUTMODIFIER_seqIsNotEmpty_NonThrowingIndex()
+{
+  #MACRO ConstructionRoutine()
+  #MACRO InsertEndAscending(100,$ArrayType$)
+  for(int i=0;i<100;++i)
+  {
+#IF OfRef
+    Assertions.assertSame(seq.arr[i],seq.getOUTPUTMODIFIER(i));
+#ELSE
+    var expectedVal=TypeConversionUtil.convertToOUTPUTTYPE(i);
+    Assertions.assertEquals(expectedVal,seq.getOUTPUTMODIFIER(i));
+#ENDIF
+    Assertions.assertEquals(100,seq.size());
+#IFSWITCH STRUCTNAME==CheckedList
+    Assertions.assertEquals(100,seq.modCount);
+#ENDIF
+  }
+}
+#ENDDEF
+#MACRODEF TestInputMethods<INITIALCAPACITY>(INPUTTYPE,OUTPUTTYPE)
+@Test
+public void testSTRUCTNAMEput_intINPUTTYPE_initialCapacityINITIALCAPACITY_NonThrowingIndex()
+{
+  #MACRO ConstructionRoutine()
+  #MACRO InsertEndAscending(100,INPUTTYPE)
+  for(int i=0;i<100;++i)
+  {
+    var putVal=TypeConversionUtil.convertToINPUTTYPE(100-i-1);
+    seq.put(i,putVal);
+    
+#IF OfRef
+    Assertions.assertSame(putVal,seq.arr[i]);
+#ELSE
+    var expectedVal=TypeConversionUtil.convertToOUTPUTTYPE(100-i-1);
+    Assertions.assertEquals(expectedVal,seq.arr[i]);
+#ENDIF
+    Assertions.assertEquals(100,seq.size());
+#IFSWITCH STRUCTNAME==CheckedList
+    Assertions.assertEquals(100,seq.modCount);
+#ENDIF
+  }
+}
+@Test
+public void testSTRUCTNAMEadd_intINPUTTYPE_initialCapacityINITIALCAPACITY_InsertBegin()
+{
+  #MACRO ConstructionRoutine()
+  #MACRO InsertBeginAscending(100,INPUTTYPE)
+  int seqSize=seq.size();
+  Assertions.assertEquals(100,seqSize);
+  Assertions.assertNotNull(seq.arr);
+  #IFSWITCH STRUCTNAME==CheckedList
+  Assertions.assertEquals(100,seq.modCount);
+  #ENDIF
+  for(int i=0;i<seqSize;++i)
+  {
+    Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPE(i),seq.arr[seq.size-i-1]);
+  }
+}
+@Test
+public void testSTRUCTNAMEadd_intINPUTTYPE_initialCapacityINITIALCAPACITY_InsertEnd()
+{
+  #MACRO ConstructionRoutine()
+  #MACRO InsertEndAscending(100,INPUTTYPE)
+  int seqSize=seq.size();
+  Assertions.assertEquals(100,seqSize);
+  Assertions.assertNotNull(seq.arr);
+  #IFSWITCH STRUCTNAME==CheckedList
+  Assertions.assertEquals(100,seq.modCount);
+  #ENDIF
+  for(int i=0;i<seqSize;++i)
+  {
+    Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPE(i),seq.arr[i]);
+  }
+}
+@Test
+public void testSTRUCTNAMEadd_intINPUTTYPE_initialCapacityINITIALCAPACITY_InsertMidPoint()
+{
+  #MACRO ConstructionRoutine()
+  #MACRO InsertMidPointAscending(100,INPUTTYPE)
+  int seqSize=seq.size();
+  Assertions.assertEquals(100,seqSize);
+  Assertions.assertNotNull(seq.arr);
+  #IFSWITCH STRUCTNAME==CheckedList
+  Assertions.assertEquals(100,seq.modCount);
+  #ENDIF
+  ArrayList arrayList=new ArrayList();
+  for(int i=0;i<seqSize;++i)
+  {
+    arrayList.add(arrayList.size()/2,TypeConversionUtil.convertToOUTPUTTYPE(i));
+  }
+  System.out.println("BEGIN testSTRUCTNAMEadd_intINPUTTYPE_initialCapacityINITIALCAPACITY_InsertMidPoint");
+  for(int i=0;i<seqSize;++i)
+  {
+    System.out.println(arrayList.get(i));
+    Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]);
+  }
+  System.out.println("END testSTRUCTNAMEadd_intINPUTTYPE_initialCapacityINITIALCAPACITY_InsertMidPoint");
+}
+#IFSWITCH STRUCTNAME==CheckedList
+@Test
+public void testSTRUCTNAMEput_intINPUTTYPE_initialCapacityINITIALCAPACITY_seqIsEmpty_hiIndex()
+{
+  #MACRO ConstructionRoutine()
+  Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(0,TypeConversionUtil.convertToINPUTTYPE(5)));
+  Assertions.assertEquals(0,seq.size());
+  Assertions.assertEquals(0,seq.modCount);
+}
+@Test
+public void testSTRUCTNAMEput_intINPUTTYPE_initialCapacityINITIALCAPACITY_seqIsEmpty_negativeIndex()
+{
+  #MACRO ConstructionRoutine()
+  Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(-1,TypeConversionUtil.convertToINPUTTYPE(5)));
+  Assertions.assertEquals(0,seq.size());
+  Assertions.assertEquals(0,seq.modCount);
+}
+@Test
+public void testSTRUCTNAMEput_intINPUTTYPE_initialCapacityINITIALCAPACITY_seqIsNotEmpty_hiIndex()
+{
+  #MACRO ConstructionRoutine()
+  #MACRO InsertEndAscending(100,INPUTTYPE)
+  Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(seq.size(),TypeConversionUtil.convertToINPUTTYPE(5)));
+  Assertions.assertEquals(100,seq.size());
+  Assertions.assertEquals(100,seq.modCount);
+  for(int i=0;i<100;++i)
+  {
+    Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPE(i),seq.arr[i]);
+  }
+}
+@Test
+public void testSTRUCTNAMEput_intINPUTTYPE_initialCapacityINITIALCAPACITY_seqIsNotEmpty_negativeIndex()
+{
+  #MACRO ConstructionRoutine()
+  #MACRO InsertEndAscending(100,INPUTTYPE)
+  Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.put(-1,TypeConversionUtil.convertToINPUTTYPE(5)));
+  Assertions.assertEquals(100,seq.size());
+  Assertions.assertEquals(100,seq.modCount);
+  for(int i=0;i<100;++i)
+  {
+    Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPE(i),seq.arr[i]);
+  }
+}
+@Test
+public void testSTRUCTNAMEadd_intINPUTTYPE_initialCapacityINITIALCAPACITY_seqIsEmpty_negativeIndex()
+{
+  #MACRO ConstructionRoutine();
+  Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(-1,TypeConversionUtil.convertToINPUTTYPE(5)));
+  Assertions.assertEquals(0,seq.size());
+  Assertions.assertEquals(0,seq.modCount);
+}
+@Test
+public void testSTRUCTNAMEadd_intINPUTTYPE_initialCapacityINITIALCAPACITY_seqIsEmpty_hiIndex()
+{
+  #MACRO ConstructionRoutine();
+  Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(seq.size+1,TypeConversionUtil.convertToINPUTTYPE(5)));
+  Assertions.assertEquals(0,seq.size());
+  Assertions.assertEquals(0,seq.modCount);
+}
+@Test
+public void testSTRUCTNAMEadd_intINPUTTYPE_initialCapacityINITIALCAPACITY_seqIsNotEmpty_negativeIndex()
+{
+  #MACRO ConstructionRoutine();
+  #MACRO InsertEndAscending(100,INPUTTYPE)
+  Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(-1,TypeConversionUtil.convertToINPUTTYPE(5)));
+  Assertions.assertEquals(100,seq.size());
+  Assertions.assertEquals(100,seq.modCount);
+}
+@Test
+public void testSTRUCTNAMEadd_intINPUTTYPE_initialCapacityINITIALCAPACITY_seqIsNotEmpty_hiIndex()
+{
+  #MACRO ConstructionRoutine();
+  #MACRO InsertEndAscending(100,INPUTTYPE)
+  Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(seq.size+1,TypeConversionUtil.convertToINPUTTYPE(5)));
+  Assertions.assertEquals(100,seq.size());
+  Assertions.assertEquals(100,seq.modCount);
+}
 #ENDIF
 #ENDDEF
 
@@ -120,91 +530,3 @@ for(int i=0;i<NUM_TO_INSERT;++i)
 }
 #ENDDEF
 
-#MACRODEF TestInputMethods<INITIALCAPACITY>(INPUTTYPE,OUTPUTTYPE)
-@Test
-public void testSTRUCTNAMEadd_intINPUTTYPE_initialCapacityINITIALCAPACITY_InsertBegin()
-{
-  #MACRO ConstructionRoutine()
-  #MACRO InsertBeginAscending(100,INPUTTYPE)
-  Assertions.assertEquals(100,seq.size);
-  Assertions.assertNotNull(seq.arr);
-  #IFSWITCH STRUCTNAME==CheckedList
-  Assertions.assertEquals(100,seq.modCount);
-  #ENDIF
-  for(int i=0;i<seq.size;++i)
-  {
-    Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPE(i),seq.arr[seq.size-i-1]);
-  }
-}
-@Test
-public void testSTRUCTNAMEadd_intINPUTTYPE_initialCapacityINITIALCAPACITY_InsertEnd()
-{
-  #MACRO ConstructionRoutine()
-  #MACRO InsertEndAscending(100,INPUTTYPE)
-  Assertions.assertEquals(100,seq.size);
-  Assertions.assertNotNull(seq.arr);
-  #IFSWITCH STRUCTNAME==CheckedList
-  Assertions.assertEquals(100,seq.modCount);
-  #ENDIF
-  for(int i=0;i<seq.size;++i)
-  {
-    Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPE(i),seq.arr[i]);
-  }
-}
-@Test
-public void testSTRUCTNAMEadd_intINPUTTYPE_initialCapacityINITIALCAPACITY_InsertMidPoint()
-{
-  #MACRO ConstructionRoutine()
-  #MACRO InsertMidPointAscending(100,INPUTTYPE)
-  Assertions.assertEquals(100,seq.size);
-  Assertions.assertNotNull(seq.arr);
-  #IFSWITCH STRUCTNAME==CheckedList
-  Assertions.assertEquals(100,seq.modCount);
-  #ENDIF
-  ArrayList arrList=new ArrayList();
-  for(int i=0;i<seq.size;++i)
-  {
-    seq.add(TypeConversionUtil.convertToINPUTTYPE(i));
-  }
-  for(int i=0;i<seq.size;++i)
-  {
-    Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]));
-  }
-}
-#IFSWITCH STRUCTNAME==CheckedList
-@Test
-public void testSTRUCTNAMEadd_intINPUTTYPE_initialCapacityINITIALCAPACITY_emptyInsertOOBLo()
-{
-  #MACRO ConstructionRoutine();
-  Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(-1,TypeConversionUtil.convertToINPUTTYPE(5)));
-  Assertions.assertEquals(0,seq.size);
-  Assertions.assertEquals(0,seq.modCount);
-}
-@Test
-public void testSTRUCTNAMEadd_intINPUTTYPE_initialCapacityINITIALCAPACITY_emptyInsertOOBHi()
-{
-  #MACRO ConstructionRoutine();
-  Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(seq.size+1,TypeConversionUtil.convertToINPUTTYPE(5)));
-  Assertions.assertEquals(0,seq.size);
-  Assertions.assertEquals(0,seq.modCount);
-}
-@Test
-public void testSTRUCTNAMEadd_intINPUTTYPE_initialCapacityINITIALCAPACITY_NotEmptyInsertOOBLo()
-{
-  #MACRO ConstructionRoutine();
-  #MACRO InsertEndAscending(100,INPUTTYPE)
-  Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(-1,TypeConversionUtil.convertToINPUTTYPE(5)));
-  Assertions.assertEquals(100,seq.size);
-  Assertions.assertEquals(100,seq.modCount);
-}
-@Test
-public void testSTRUCTNAMEadd_intINPUTTYPE_initialCapacityINITIALCAPACITY_NotEmptyInsertOOBHi()
-{
-  #MACRO ConstructionRoutine();
-  #MACRO InsertEndAscending(100,INPUTTYPE)
-  Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(seq.size+1,TypeConversionUtil.convertToINPUTTYPE(5)));
-  Assertions.assertEquals(100,seq.size);
-  Assertions.assertEquals(100,seq.modCount);
-}
-#ENDIF
-#ENDDEF

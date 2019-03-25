@@ -7,8 +7,6 @@ import java.util.ConcurrentModificationException;
 @SuppressWarnings({"rawtypes","unchecked"}) 
 public class RefArrSeqToStringTest
 {
-  private static final Object MIN_LENGTH_STRING_VAL=new Object(){@Override public String toString(){return "";}};
-  private static final int MIN_TOSTRING_LENGTH=String.valueOf(MIN_LENGTH_STRING_VAL).length();
   private static void testArrSeqToString(int length)
   {
     final var arr=new Object[length];
@@ -68,50 +66,6 @@ public class RefArrSeqToStringTest
     }
     Assertions.assertEquals(expected,new RefArrSeq.CheckedStack().toString());
     Assertions.assertEquals(expected,new RefArrSeq.UncheckedStack().toString());
-  }
-  //@Test
-  public void testOOMArrSeqToString()
-  {
-    int length=Integer.MAX_VALUE/(MIN_TOSTRING_LENGTH+2)-1;
-    final Object[] arr=new Object[length+1];
-    for(int i=0;i<length;++i)
-    {
-      arr[i]=MIN_LENGTH_STRING_VAL;
-    }
-    {
-      var root=new RefArrSeq.CheckedList(length,arr);
-      Assertions.assertDoesNotThrow(()->root.toString());
-      ++root.size;
-      Assertions.assertThrows(OutOfMemoryError.class,()->root.toString());
-      --root.size;
-      var subList=root.subList(0,root.size);
-      Assertions.assertDoesNotThrow(()->subList.toString());
-      subList.add(MIN_LENGTH_STRING_VAL);
-      Assertions.assertThrows(OutOfMemoryError.class,()->subList.toString());
-    }
-    {
-      var root=new RefArrSeq.UncheckedList(length,arr);
-      Assertions.assertDoesNotThrow(()->root.toString());
-      ++root.size;
-      Assertions.assertThrows(OutOfMemoryError.class,()->root.toString());
-      --root.size;
-      var subList=root.subList(0,root.size);
-      Assertions.assertDoesNotThrow(()->subList.toString());
-      subList.add(MIN_LENGTH_STRING_VAL);
-      Assertions.assertThrows(OutOfMemoryError.class,()->subList.toString());
-    }
-    {
-      var root=new RefArrSeq.CheckedStack(length,arr);
-      Assertions.assertDoesNotThrow(()->root.toString());
-      ++root.size;
-      Assertions.assertThrows(OutOfMemoryError.class,()->root.toString());
-    }
-    {
-      var root=new RefArrSeq.UncheckedStack(length,arr);
-      Assertions.assertDoesNotThrow(()->root.toString());
-      ++root.size;
-      Assertions.assertThrows(OutOfMemoryError.class,()->root.toString());
-    }
   }
   @Test
   public void testArrSeqModificationCheck()

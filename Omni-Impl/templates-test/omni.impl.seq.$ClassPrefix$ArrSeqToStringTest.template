@@ -21,14 +21,7 @@ import omni.util.OmniArray;
 @SuppressWarnings({"rawtypes","unchecked"}) 
 public class $ClassPrefix$ArrSeqToStringTest
 {
-#IF OfRef
-  private static final $ArrayType$ MIN_LENGTH_STRING_VAL=new $ArrayType$(){@Override public String toString(){return "";}};
-#ELSEIF OfBoolean
-  private static final $ArrayType$ MIN_LENGTH_STRING_VAL=true;
-#ELSE
-  private static final $ArrayType$ MIN_LENGTH_STRING_VAL=0;
-#ENDIF
-  private static final int MIN_TOSTRING_LENGTH=String.valueOf(MIN_LENGTH_STRING_VAL).length();
+
 
 #IF OfBoolean
   private static final int MAX_TOSTRING_LENGTH=5;
@@ -113,64 +106,11 @@ public class $ClassPrefix$ArrSeqToStringTest
     Assertions.assertEquals(expected,new $ClassPrefix$ArrSeq.CheckedStack().toString());
     Assertions.assertEquals(expected,new $ClassPrefix$ArrSeq.UncheckedStack().toString());
   }
-  //@Test
-  public void testOOMArrSeqToString()
-  {
-#IF OfBoolean,OfByte,OfChar,OfInt,OfLong,OfShort
-    int length=Integer.MAX_VALUE/(MIN_TOSTRING_LENGTH+2)-1;
-#ELSEIF OfFloat
-    int length=Integer.MAX_VALUE/(MIN_TOSTRING_LENGTH+2)-3;
-#ELSEIF OfRef
-    int length=Integer.MAX_VALUE/(MIN_TOSTRING_LENGTH+2)-1;
-#ELSE
-    int length=Integer.MAX_VALUE/(MIN_TOSTRING_LENGTH+2)-1;
-#ENDIF
-    final $ArrayType$[] arr=new $ArrayType$[length+1];
-#IF OfBoolean,OfRef
-    for(int i=0;i<length;++i)
-    {
-      arr[i]=MIN_LENGTH_STRING_VAL;
-    }
-#ENDIF
-    {
-      var root=new $ClassPrefix$ArrSeq.CheckedList(length,arr);
-      Assertions.assertDoesNotThrow(()->root.toString());
-      ++root.size;
-      Assertions.assertThrows(OutOfMemoryError.class,()->root.toString());
-      --root.size;
-      var subList=root.subList(0,root.size);
-      Assertions.assertDoesNotThrow(()->subList.toString());
-      subList.add(MIN_LENGTH_STRING_VAL);
-      Assertions.assertThrows(OutOfMemoryError.class,()->subList.toString());
-    }
-    {
-      var root=new $ClassPrefix$ArrSeq.UncheckedList(length,arr);
-      Assertions.assertDoesNotThrow(()->root.toString());
-      ++root.size;
-      Assertions.assertThrows(OutOfMemoryError.class,()->root.toString());
-      --root.size;
-      var subList=root.subList(0,root.size);
-      Assertions.assertDoesNotThrow(()->subList.toString());
-      subList.add(MIN_LENGTH_STRING_VAL);
-      Assertions.assertThrows(OutOfMemoryError.class,()->subList.toString());
-    }
-    {
-      var root=new $ClassPrefix$ArrSeq.CheckedStack(length,arr);
-      Assertions.assertDoesNotThrow(()->root.toString());
-      ++root.size;
-      Assertions.assertThrows(OutOfMemoryError.class,()->root.toString());
-    }
-    {
-      var root=new $ClassPrefix$ArrSeq.UncheckedStack(length,arr);
-      Assertions.assertDoesNotThrow(()->root.toString());
-      ++root.size;
-      Assertions.assertThrows(OutOfMemoryError.class,()->root.toString());
-    }
-  }
+ 
 
 #IF OfBoolean,OfByte,OfShort,OfInt,OfLong,OfFloat
   //TODO make this faster or place is switch to disable it as desired
-  //@Test
+  @Test
   public void testLargeArrSeqToString()
   {
     testArrSeqToString((OmniArray.MAX_ARR_SIZE/(MAX_TOSTRING_LENGTH+2))+1);

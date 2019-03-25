@@ -1113,8 +1113,7 @@ public void testSTRUCTNAMEMETHODNAMEByte()
 @Test
 public void testSTRUCTNAMEMETHODNAMEBoolean()
 {
-
-  QueryTestUtil.testMETHODNAMEBoolean(()->
+  QueryTestUtil.testMETHODNAMEBooleanReturnPositive(()->
   {
     #MACRO ConstructSeq()
 #IFSWITCH METHODNAME==removeVal,contains,indexOf
@@ -1124,6 +1123,7 @@ public void testSTRUCTNAMEMETHODNAMEBoolean()
   #ELSE
     #IFNOT OfBoolean
     seq.add(($exposedType$)3);
+    
     #ENDIF
     seq.add(true);
   #ENDIF
@@ -1134,6 +1134,7 @@ public void testSTRUCTNAMEMETHODNAMEBoolean()
   #ELSE
     seq.add(true);
     #IFNOT OfBoolean
+    
     seq.add(($exposedType$)3);
     #ENDIF
   #ENDIF
@@ -1158,7 +1159,7 @@ public void testSTRUCTNAMEMETHODNAMEBoolean()
   );
   
 
-  QueryTestUtil.testMETHODNAMEBoolean(()->
+  QueryTestUtil.testMETHODNAMEBooleanReturnPositive(()->
   {
     #MACRO ConstructSeq()
 #IFSWITCH METHODNAME==removeVal,contains,indexOf
@@ -1168,6 +1169,7 @@ public void testSTRUCTNAMEMETHODNAMEBoolean()
   #ELSE
     #IFNOT OfBoolean
     seq.add(($exposedType$)3);
+    
     #ENDIF
     seq.add(false);
   #ENDIF
@@ -1178,6 +1180,7 @@ public void testSTRUCTNAMEMETHODNAMEBoolean()
   #ELSE
     seq.add(false);
     #IFNOT OfBoolean
+    
     seq.add(($exposedType$)3);
     #ENDIF
   #ENDIF
@@ -1199,7 +1202,67 @@ public void testSTRUCTNAMEMETHODNAMEBoolean()
   ,2
   #ENDIF
 #ENDIF
-  );  
+  );
+ 
+  QueryTestUtil.testMETHODNAMEBooleanReturnNegative(()->
+  {
+    #MACRO ConstructSeq()
+#IFSWITCH METHODNAME==removeVal,contains,indexOf
+  #IF OfRef
+    seq.add(Integer.valueOf(3));
+    seq.add(Boolean.FALSE);
+  #ELSEIF OfBoolean
+    seq.add(false);
+    seq.add(false);
+  #ELSE
+    seq.add(($exposedType$)3);
+    seq.add(false);
+  #ENDIF
+#ELSE
+  #IF OfRef
+    seq.add(Boolean.FALSE);
+    seq.add(Integer.valueOf(3));
+  #ELSEIF OfBoolean
+    seq.add(false);
+    seq.add(false);
+  #ELSE
+    seq.add(false);
+    seq.add(($exposedType$)3);
+  #ENDIF
+#ENDIF
+    return seq;
+  },false);
+  
+
+  QueryTestUtil.testMETHODNAMEBooleanReturnNegative(()->
+  {
+    #MACRO ConstructSeq()
+#IFSWITCH METHODNAME==removeVal,contains,indexOf
+  #IF OfRef
+    seq.add(Integer.valueOf(3));
+    seq.add(Boolean.TRUE);
+  #ELSEIF OfBoolean
+    seq.add(true);
+    seq.add(true);
+  #ELSE
+    seq.add(($exposedType$)3);
+    seq.add(true);
+  #ENDIF
+#ELSE
+  #IF OfRef
+    seq.add(Boolean.TRUE);
+    seq.add(Integer.valueOf(3));
+  #ELSEIF OfBoolean
+    seq.add(true);
+    seq.add(true);
+  #ELSE
+    seq.add(true);
+    seq.add(($exposedType$)3);
+  #ENDIF
+#ENDIF
+    return seq;
+  },true);
+ 
 }
 @Test
 public void testSTRUCTNAMEMETHODNAMENull()

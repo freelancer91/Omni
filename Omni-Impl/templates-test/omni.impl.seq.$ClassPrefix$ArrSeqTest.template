@@ -8,11 +8,10 @@
 #TYPEDEF OfDouble
 #TYPEDEF OfRef
 package omni.impl.seq;
-import java.util.ArrayList;
-import omni.impl.seq.$ClassPrefix$ArrSeq.UncheckedList;
-import omni.impl.seq.$ClassPrefix$ArrSeq.CheckedList;
-import omni.impl.seq.$ClassPrefix$ArrSeq.UncheckedStack;
-import omni.impl.seq.$ClassPrefix$ArrSeq.CheckedStack;
+//import omni.impl.seq.$ClassPrefix$ArrSeq.UncheckedList;
+//import omni.impl.seq.$ClassPrefix$ArrSeq.CheckedList;
+//import omni.impl.seq.$ClassPrefix$ArrSeq.UncheckedStack;
+//import omni.impl.seq.$ClassPrefix$ArrSeq.CheckedStack;
 import omni.util.TypeConversionUtil;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -27,360 +26,150 @@ import omni.function.$TypeNameModifier$Consumer;
 import omni.function.$TypeNameModifier$Predicate;
 #ENDIF
 import java.util.ConcurrentModificationException;
-#IFNOT OfBoolean
-import omni.util.EqualityUtil;
-#ENDIF
 import omni.util.OmniArray;
 @SuppressWarnings({"rawtypes","unchecked"}) 
-public class $ClassPrefix$ArrSeqTest
-{
+public class $ClassPrefix$ArrSeqTest{
   #MACRO StructImpl<UncheckedStack>()
   #MACRO StructImpl<UncheckedList>()
   #MACRO StructImpl<CheckedStack>()
   #MACRO StructImpl<CheckedList>()
   
-  static class MonitoredConsumer extends ArrayList implements $TypeNameModifier$Consumer
-#IFNOT OfRef
-    ,Consumer<Object>
-#ENDIF
- 
-  {
-    private static final long serialVersionUID=1L;
-    @Override public void accept($ArrayType$ val)
-    {
-      super.add(val);
-    }
-#IFNOT OfRef
-    @Override public void accept(Object val)
-    {
-      accept(($ArrayType$)val);
-    }
-#ENDIF
-  }
-  static class ThrowingConsumer extends MonitoredConsumer
-  {
-    private static final long serialVersionUID=1L;
-    @Override public void accept($ArrayType$ val)
-    {
-      super.accept(($ArrayType$)val);
-      throw new IndexOutOfBoundsException();
-    }
-  }
-  private static abstract class AbstractMonitoredPredicate implements $TypeNameModifier$Predicate
-#IFNOT OfRef
-    ,Predicate<Object>
-#ENDIF
-  {
-    int callCounter;
-    abstract boolean testImpl($ArrayType$ val);
-    @Override public boolean test($ArrayType$ val)
-    {
-      ++callCounter;
-      return testImpl(($ArrayType$)val);
-    }
-    public AbstractMonitoredPredicate negate()
-    {
-      //don't care
-      return null;
-    }
-    
-    
-#IFNOT OfRef
-    @Override public boolean test(Object val)
-    {
-      return test(($ArrayType$)val);
-    }
-#ENDIF
-  }
+  #MACRO SubListImpl<0,0,0,0,Checked>()
+  #MACRO SubListImpl<0,0,0,0,Unchecked>()
   
-  static class RemoveAllPredicate extends AbstractMonitoredPredicate
-  {
-    boolean testImpl($ArrayType$ val)
-    {
-      return true;
-    }
-  }
-  static class RemoveNonePredicate extends AbstractMonitoredPredicate
-  {
-    boolean testImpl($ArrayType$ val)
-    {
-      return false;
-    }
-  }
+  #MACRO SubListImpl<0,0,0,10,Checked>()
+  #MACRO SubListImpl<0,0,0,10,Unchecked>()
   
-  static class ThrowingPredicate extends AbstractMonitoredPredicate
-  {
-    @Override boolean testImpl($ArrayType$ val)
-    {
-      throw new IndexOutOfBoundsException();
-    }
-  }
-#IF OfBoolean
-  static class RemoveTruePredicate extends AbstractMonitoredPredicate
-  {
-    boolean testImpl($ArrayType$ val)
-    {
-      return val;
-    }
-  }
-  static class RemoveFalsePredicate extends AbstractMonitoredPredicate
-  {
-    boolean testImpl($ArrayType$ val)
-    {
-      return !val;
-    }
-  }
-#ELSE
-  static class RetainSecondPredicate extends AbstractMonitoredPredicate
-  {
-    boolean testImpl($ArrayType$ val)
-    {
-      return !EqualityUtil.isEqual(val,TypeConversionUtil.convertTo$ArrayType$(1));
-    }
-  }
-  static class RetainSecondAndLastPredicate extends AbstractMonitoredPredicate
-  {
-    int seqLength;
-    RetainSecondAndLastPredicate(int seqLength)
-    {
-      this.seqLength=seqLength;
-    }
-    boolean testImpl($ArrayType$ val)
-    {
-      return !EqualityUtil.isEqual(val,TypeConversionUtil.convertTo$ArrayType$(1)) && !EqualityUtil.isEqual(val,TypeConversionUtil.convertTo$ArrayType$(seqLength-1));
-    }
-  }
-  static class RemoveFirstAndThirdPredicate extends AbstractMonitoredPredicate
-  {
-    boolean testImpl($ArrayType$ val)
-    {
-      return EqualityUtil.isEqual(val,TypeConversionUtil.convertTo$ArrayType$(0)) || EqualityUtil.isEqual(val,TypeConversionUtil.convertTo$ArrayType$(2));
-    }
-  }
-  static class RemoveFirstPredicate  extends AbstractMonitoredPredicate
-  {
-    boolean testImpl($ArrayType$ val)
-    {
-      return EqualityUtil.isEqual(val,TypeConversionUtil.convertTo$ArrayType$(0));
-    }
-  }
-  static class RemoveFirstAndSecondToLastPredicate extends AbstractMonitoredPredicate
-  {
-    int seqLength;
-    RemoveFirstAndSecondToLastPredicate(int seqLength)
-    {
-      this.seqLength=seqLength;
-    }
-    boolean testImpl($ArrayType$ val)
-    {
-      return EqualityUtil.isEqual(val,TypeConversionUtil.convertTo$ArrayType$(0)) || EqualityUtil.isEqual(val,TypeConversionUtil.convertTo$ArrayType$(seqLength-2));
-    }
-  }
-#ENDIF
+  #MACRO SubListImpl<0,0,10,0,Checked>()
+  #MACRO SubListImpl<0,0,10,0,Unchecked>()
   
-}
+  #MACRO SubListImpl<0,0,10,10,Checked>()
+  #MACRO SubListImpl<0,0,10,10,Unchecked>()
+  
+  #MACRO SubListImpl<0,10,0,0,Checked>()
+  #MACRO SubListImpl<0,10,0,0,Unchecked>()
+  
+  #MACRO SubListImpl<0,10,0,10,Checked>()
+  #MACRO SubListImpl<0,10,0,10,Unchecked>()
+  
+  #MACRO SubListImpl<0,10,10,0,Checked>()
+  #MACRO SubListImpl<0,10,10,0,Unchecked>()
+  
+  #MACRO SubListImpl<0,10,10,10,Checked>()
+  #MACRO SubListImpl<0,10,10,10,Unchecked>()
+  
+  #MACRO SubListImpl<10,0,0,0,Checked>()
+  #MACRO SubListImpl<10,0,0,0,Unchecked>()
+  
+  #MACRO SubListImpl<10,0,0,10,Checked>()
+  #MACRO SubListImpl<10,0,0,10,Unchecked>()
+  
+  #MACRO SubListImpl<10,0,10,0,Checked>()
+  #MACRO SubListImpl<10,0,10,0,Unchecked>()
+  
+  #MACRO SubListImpl<10,0,10,10,Checked>()
+  #MACRO SubListImpl<10,0,10,10,Unchecked>()
+  
+  #MACRO SubListImpl<10,10,0,0,Checked>()
+  #MACRO SubListImpl<10,10,0,0,Unchecked>()
+  
+  #MACRO SubListImpl<10,10,0,10,Checked>()
+  #MACRO SubListImpl<10,10,0,10,Unchecked>()
+  
+  #MACRO SubListImpl<10,10,10,0,Checked>()
+  #MACRO SubListImpl<10,10,10,0,Unchecked>()
+  
+  #MACRO SubListImpl<10,10,10,10,Checked>()
+  #MACRO SubListImpl<10,10,10,10,Unchecked>()
+  
+  private static int getPrivateIntField(Object obj,String fieldName)
+  {
+    try
+    {
+      var field=obj.getClass().getDeclaredField(fieldName);
+      field.setAccessible(true);
+      return field.getInt(obj);
+    }
+    catch(Exception e)
+    {
+      throw new RuntimeException(e);
+    }
+  }
+  private static Object getPrivateRefField(Object obj,String fieldName)
+  {
+    try
+    {
+      var field=obj.getClass().getDeclaredField(fieldName);
+      field.setAccessible(true);
+      return field.get(obj);
+    }
+    catch(Exception e)
+    {
+      throw new RuntimeException(e);
+    }
+  }
 
+
+#MACRODEF SubListImpl<ROOTPREALLOC,SUBLISTPREALLOC,SUBLISTPOSTALLOC,ROOTPOSTALLOC,CHECKED>()
+
+
+
+@Test
+public void testCHECKEDListsubList_intint()
+{
+  #MACRO ConstructSubList
+}
+#ENDDEF
+#MACRODEF ConstructSubList()
+var root=new CHECKEDList();
+for(int i=0;i<ROOTPREALLOC;++i)
+{
+  root.add(TypeConversionUtil.convertTo$ArrayType$(i));
+}
+for(int i=0;i<ROOTPOSTALLOC;++i)
+{
+  root.add(TypeConversionUtil.convertTo$ArrayType$(ROOTPREALLOC+SUBLISTPREALLOC+SUBLISTPOSTALLOC+i));
+}
+var subList=root.subList(ROOTPREALLOC,ROOTPREALLOC);
+for(int i=0;i<SUBLISTPREALLOC+SUBLISTPOSTALLOC;++i)
+{
+  root.add(TypeConversionUtil.convertTo$ArrayType$(ROOTPREALLOC+i));
+}
+var seq=subList.subList(SUBLISTPREALLOC,SUBLISTPREALLOC);
+Class<?> subListClass=seq.getClass();
+Field subListrootOffsetField=subListClass.getDeclaredField("rootOffset");
+subListrootOffsetField.setAccessible(true);
+Field subListsizeField=subListClass.getDeclaredField("size");
+subListsizeField.setAccessible(true);
+Field subListparentField=subListClass.getDeclaredField("parent");
+subListparentField.setAccessible(true);
+Field subListrootField=subListClass.getDeclaredField("root");
+subListrootField.setAccessible(true);
+#IFSWITCH CHECKED==Checked
+Field subListmodCountField=subListClass.getDeclaredField("modCount");
+subListmodCountField.setAccessible(true);
+#ENDIF
+#ENDDEF
+  
+  
 #MACRODEF StructImpl<STRUCTNAME>()
-#IFSWITCH STRUCTNAME==CheckedList,CheckedStack
-static class ModifyingSTRUCTNAMEConsumer extends MonitoredConsumer
-{
-  private static final long serialVersionUID=1L;
-  STRUCTNAME seq;
-  public ModifyingSTRUCTNAMEConsumer(STRUCTNAME seq)
-  {
-    this.seq=seq;
-  }
-  @Override public void accept($ArrayType$ val)
-  {
-    seq.modCount+=2;
-    super.accept(($ArrayType$)val);
-  }
-}
-static class ModifiyingSTRUCTNAMEAndThrowingConsumer extends ModifyingSTRUCTNAMEConsumer
-{
-  private static final long serialVersionUID=1L;
-  public ModifiyingSTRUCTNAMEAndThrowingConsumer(STRUCTNAME seq)
-  {
-    super(seq);
-  }
-  @Override public void accept($ArrayType$ val)
-  {
-    super.accept(($ArrayType$)val);
-    throw new IndexOutOfBoundsException();
-  }
-}
-
-static class ModifyingAndThrowingSTRUCTNAMEPredicate extends ThrowingPredicate
-{
-    STRUCTNAME seq;
-    public ModifyingAndThrowingSTRUCTNAMEPredicate(STRUCTNAME seq)
-    {
-      this.seq=seq;
-    }
-    @Override boolean testImpl($ArrayType$ val)
-    {
-      seq.add(val);
-      throw new IndexOutOfBoundsException();
-    }
-}
-
-static class RemoveAllSTRUCTNAMEModifyingPredicate extends RemoveAllPredicate
-{
-    STRUCTNAME seq;
-    RemoveAllSTRUCTNAMEModifyingPredicate(STRUCTNAME seq)
-    {
-      this.seq=seq;
-    }
-    @Override
-    public boolean test($ArrayType$ val)
-    {
-      seq.modCount+=2;
-      return super.test(val);
-    }
-}
-static class RemoveNoneSTRUCTNAMEModifyingPredicate extends RemoveNonePredicate
-{
-    STRUCTNAME seq;
-    RemoveNoneSTRUCTNAMEModifyingPredicate(STRUCTNAME seq)
-    {
-      this.seq=seq;
-    }
-    @Override
-    public boolean test($ArrayType$ val)
-    {
-      seq.modCount+=2;
-      return super.test(val);
-    }
-}
-
-#IF OfBoolean
-  static class RemoveTrueSTRUCTNAMEModifyingPredicate extends RemoveTruePredicate
-  {
-    STRUCTNAME seq;
-    RemoveTrueSTRUCTNAMEModifyingPredicate(STRUCTNAME seq)
-    {
-      this.seq=seq;
-    }
-    @Override
-    public boolean test($ArrayType$ val)
-    {
-      seq.modCount+=2;
-      return super.test(val);
-    }
-  }
-  static class RemoveFalseSTRUCTNAMEModifyingPredicate extends RemoveFalsePredicate
-  {
-    STRUCTNAME seq;
-    RemoveFalseSTRUCTNAMEModifyingPredicate(STRUCTNAME seq)
-    {
-      this.seq=seq;
-    }
-    @Override
-    public boolean test($ArrayType$ val)
-    {
-      seq.modCount+=2;
-      return super.test(val);
-    }
-  }
-#ELSE
-  static class RetainSecondSTRUCTNAMEModifyingPredicate extends RetainSecondPredicate
-  {
-    STRUCTNAME seq;
-    RetainSecondSTRUCTNAMEModifyingPredicate(STRUCTNAME seq)
-    {
-      this.seq=seq;
-    }
-    @Override
-    public boolean test($ArrayType$ val)
-    {
-      seq.modCount+=2;
-      return super.test(val);
-    }
-  }
-  static class RetainSecondAndLastSTRUCTNAMEModifyingPredicate extends RetainSecondAndLastPredicate
-  {
-    STRUCTNAME seq;
-    RetainSecondAndLastSTRUCTNAMEModifyingPredicate(STRUCTNAME seq)
-    {
-      super(seq.size);
-      this.seq=seq;
-    }
-    @Override
-    public boolean test($ArrayType$ val)
-    {
-      seq.modCount+=2;
-      return super.test(val);
-    }
-  }
-  static class RemoveFirstAndThirdSTRUCTNAMEModifyingPredicate extends RemoveFirstAndThirdPredicate
-  {
-    STRUCTNAME seq;
-    RemoveFirstAndThirdSTRUCTNAMEModifyingPredicate(STRUCTNAME seq)
-    {
-      this.seq=seq;
-    }
-    @Override
-    public boolean test($ArrayType$ val)
-    {
-      seq.modCount+=2;
-      return super.test(val);
-    }
-  }
-  static class RemoveFirstSTRUCTNAMEModifyingPredicate  extends RemoveFirstPredicate
-  {
-    STRUCTNAME seq;
-    RemoveFirstSTRUCTNAMEModifyingPredicate(STRUCTNAME seq)
-    {
-      this.seq=seq;
-    }
-    @Override
-    public boolean test($ArrayType$ val)
-    {
-      seq.modCount+=2;
-      return super.test(val);
-    }
-  }
-  static class RemoveFirstAndSecondToLastSTRUCTNAMEModifyingPredicate extends RemoveFirstAndSecondToLastPredicate
-  {
-    STRUCTNAME seq;
-    RemoveFirstAndSecondToLastSTRUCTNAMEModifyingPredicate(STRUCTNAME seq)
-    {
-      super(seq.size);
-      this.seq=seq;
-    }
-    @Override
-    public boolean test($ArrayType$ val)
-    {
-      seq.modCount+=2;
-      return super.test(val);
-    }
-  }
-#ENDIF
-
-
-
-
-#ENDIF
 #MACRO TestConstructor<DEFAULT>()
 #MACRO TestConstructor<NULL>()
 #MACRO TestConstructor<50>()
 #MACRO TestConstructor<0>()
 #MACRO TestConstructor<10>()
-
+#MACRO TestClone<DEFAULT>()
+#MACRO TestClone<NULL>()
+#MACRO TestClone<50>()
+#MACRO TestClone<0>()
+#MACRO TestClone<10>()
 #MACRO TestMiscMethods<DEFAULT>()
-
-
 #MACRO TestForEachMethods<DEFAULT>(,)
-#MACRO TestRemoveIfMethods<DEFAULT>(,)
-#MACRO TestRemoveIfMethods<NULL>(,)
-#MACRO TestRemoveIfMethods<50>(,)
+#MACRO TestRemoveIfMethods<DEFAULT,>()
 #IFNOT OfRef
 #MACRO TestForEachMethods<DEFAULT>($TypeNameModifier$,)
-#MACRO TestRemoveIfMethods<DEFAULT>($TypeNameModifier$,)
-#MACRO TestRemoveIfMethods<NULL>($TypeNameModifier$,)
-#MACRO TestRemoveIfMethods<50>($TypeNameModifier$,)
+#MACRO TestRemoveIfMethods<DEFAULT,$TypeNameModifier$>()
 #ENDIF
-
 #MACRO TestInputMethods<DEFAULT>($ArrayType$,$ArrayType$)
 #MACRO TestInputMethods<NULL>($ArrayType$,$ArrayType$)
 #MACRO TestInputMethods<50>($ArrayType$,$ArrayType$)
@@ -467,18 +256,407 @@ static class RemoveNoneSTRUCTNAMEModifyingPredicate extends RemoveNonePredicate
     #ENDIF
   #ENDIF
 #ENDIF
-
 #ENDDEF
-#MACRODEF TestRemoveIfMethods<INITIALCAPACITY>(OUTPUTMODIFIER,dummy)
-//TODO TestRemoveIfMethods<INITIALCAPACITY>(OUTPUTMODIFIER,dummy)
+}
+#MACRODEF VerifyBooleanRemoveIfNonModHelper(INITVAL,LENGTH)
+currVal=INITVAL;
+trueCount=0;
+falseCount=0;
+for(int i=0;;){
+  Assertions.assertEquals(currVal,seq.arr[i]);
+  if(currVal){
+    ++trueCount;
+  }else{
+    ++falseCount;
+  }
+  if((trueCount+falseCount)==LENGTH){
+    break;
+  }
+  if(((++i)%period)==0){
+    currVal=!currVal;
+  }
+}
 #ENDDEF
-
+#MACRODEF VerifyBooleanRemoveIfNonMod(INITVAL,LENGTH)
+Assertions.assertEquals(LENGTH,seq.size());
+#MACRO VerifyBooleanRemoveIfNonModHelper(INITVAL,LENGTH)
+if(falseCount!=LENGTH && trueCount!=LENGTH){
+  Assertions.assertEquals(LENGTH+4,seq.modCount);
+  Assertions.assertEquals(2,filter.callCount);
+}else{
+  Assertions.assertEquals(LENGTH+2,seq.modCount);
+  Assertions.assertEquals(1,filter.callCount);
+}
+#ENDDEF
+#MACRODEF InitNonBooleanRemoveIf(LENGTH)
+#MACRO ConstructionRoutine()
+for(int i=0;i<LENGTH;++i){
+  seq.add(TypeConversionUtil.convertTo$ArrayType$(i));
+}
+#ENDDEF
+#MACRODEF InitBooleanRemoveIf(INITVAL,LENGTH)
+#MACRO ConstructionRoutine()
+boolean currVal=INITVAL;
+int trueCount=0;
+int falseCount=0;
+for(int i=0;;){
+  seq.add(currVal);
+  if(currVal){
+    ++trueCount;
+  }else{
+    ++falseCount;
+  }
+  if((trueCount+falseCount)==LENGTH){
+    break;
+  }
+  if(((++i)%period)==0){
+    currVal=!currVal;
+  }
+}
+#ENDDEF
+#MACRODEF BooleanRemoveIfNonEmptyRemoveTrue(FIRSTVAL)
+@Test
+public void testSTRUCTNAMEremoveIf_OUTPUTMODIFIERPredicate_FirstValFIRSTVAL_RemoveTrue(){
+  for(int period=1;period<=10;++period){
+    #MACRO InitBooleanRemoveIf(FIRSTVAL,10)
+    var filter=new $ClassPrefix$MonitoredPredicate.RemoveTruePredicate();
+    Assertions.assertEquals(trueCount!=0,seq.removeIf((OUTPUTMODIFIERPredicate)filter));
+    Assertions.assertEquals(falseCount,seq.size());
+    for(int i=0;i<falseCount;++i){
+      Assertions.assertFalse(seq.arr[i]);
+    }
+    Assertions.assertEquals(falseCount==0||trueCount==0?1:2,filter.callCount);
+#IFSWITCH STRUCTNAME==CheckedList,CheckedStack
+    Assertions.assertEquals(trueCount==0?10:11,seq.modCount);
+#ENDIF
+  }
+}
+#ENDDEF
+#MACRODEF BooleanRemoveIfNonEmptyRemoveFalse(FIRSTVAL)
+@Test
+public void testSTRUCTNAMEremoveIf_OUTPUTMODIFIERPredicate_FirstValFIRSTVAL_RemoveFalse(){
+  for(int period=1;period<=10;++period){
+    #MACRO InitBooleanRemoveIf(FIRSTVAL,10)
+    var filter=new $ClassPrefix$MonitoredPredicate.RemoveFalsePredicate();
+    Assertions.assertEquals(falseCount!=0,seq.removeIf((OUTPUTMODIFIERPredicate)filter));
+    Assertions.assertEquals(trueCount,seq.size());
+    for(int i=0;i<trueCount;++i){
+      Assertions.assertTrue(seq.arr[i]);
+    }
+    Assertions.assertEquals(falseCount==0||trueCount==0?1:2,filter.callCount);
+#IFSWITCH STRUCTNAME==CheckedList,CheckedStack
+    Assertions.assertEquals(falseCount==0?10:11,seq.modCount);
+#ENDIF
+  }
+}
+#ENDDEF
+#MACRODEF BooleanRemoveIfNonEmptyRemoveAll(FIRSTVAL)
+@Test
+public void testSTRUCTNAMEremoveIf_OUTPUTMODIFIERPredicate_FirstValFIRSTVAL_RemoveAll(){
+  for(int period=1;period<=10;++period){
+    #MACRO InitBooleanRemoveIf(FIRSTVAL,10)
+    var filter=new $ClassPrefix$MonitoredPredicate.RemoveAllPredicate();
+    Assertions.assertTrue(seq.removeIf((OUTPUTMODIFIERPredicate)filter));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(falseCount==0||trueCount==0?1:2,filter.callCount);
+#IFSWITCH STRUCTNAME==CheckedList,CheckedStack
+    Assertions.assertEquals(11,seq.modCount);
+#ENDIF
+  }
+}
+#ENDDEF
+#MACRODEF BooleanRemoveIfNonEmptyRemoveNone(FIRSTVAL)
+@Test
+public void testSTRUCTNAMEremoveIf_OUTPUTMODIFIERPredicate_FirstValFIRSTVAL_RemoveNone(){
+  for(int period=1;period<=10;++period){
+    #MACRO InitBooleanRemoveIf(FIRSTVAL,10)
+    var filter=new $ClassPrefix$MonitoredPredicate.RemoveNonePredicate();
+    Assertions.assertFalse(seq.removeIf((OUTPUTMODIFIERPredicate)filter));
+    Assertions.assertEquals(10,seq.size());
+    Assertions.assertEquals(falseCount==0||trueCount==0?1:2,filter.callCount);
+    #MACRO VerifyBooleanRemoveIfNonModHelper(FIRSTVAL,10)
+#IFSWITCH STRUCTNAME==CheckedList,CheckedStack
+    Assertions.assertEquals(10,seq.modCount);
+#ENDIF
+  }
+}
+#ENDDEF
+#MACRODEF TestRemoveIfMethods<INITIALCAPACITY,OUTPUTMODIFIER>()
+#IF OfBoolean
+#MACRO EmptyRemoveIfTest<false>(RemoveTruePredicate)
+#MACRO EmptyRemoveIfTest<false>(RemoveFalsePredicate)
+#MACRO BooleanRemoveIfNonEmptyRemoveTrue(true)
+#MACRO BooleanRemoveIfNonEmptyRemoveTrue(false)
+#MACRO BooleanRemoveIfNonEmptyRemoveFalse(true)
+#MACRO BooleanRemoveIfNonEmptyRemoveFalse(false)
+#MACRO BooleanRemoveIfNonEmptyRemoveAll(true)
+#MACRO BooleanRemoveIfNonEmptyRemoveAll(false)
+#MACRO BooleanRemoveIfNonEmptyRemoveNone(true)
+#MACRO BooleanRemoveIfNonEmptyRemoveNone(false)
+  #IFSWITCH STRUCTNAME==CheckedList,CheckedStack
+#MACRO TestRemoveIfBooleanNonEmptyModding(true,RemoveTrueArrSeqSTRUCTNAMEModifyingPredicate)
+#MACRO TestRemoveIfBooleanNonEmptyModding(true,RemoveFalseArrSeqSTRUCTNAMEModifyingPredicate)
+#MACRO TestRemoveIfBooleanNonEmptyModding(false,RemoveTrueArrSeqSTRUCTNAMEModifyingPredicate)
+#MACRO TestRemoveIfBooleanNonEmptyModding(false,RemoveFalseArrSeqSTRUCTNAMEModifyingPredicate)
+#MACRO TestRemoveIfBooleanNonEmptyModding(true,RemoveNoneArrSeqSTRUCTNAMEModifyingPredicate)
+#MACRO TestRemoveIfBooleanNonEmptyModding(true,RemoveAllArrSeqSTRUCTNAMEModifyingPredicate)
+#MACRO TestRemoveIfBooleanNonEmptyModding(false,RemoveNoneArrSeqSTRUCTNAMEModifyingPredicate)
+#MACRO TestRemoveIfBooleanNonEmptyModding(false,RemoveAllArrSeqSTRUCTNAMEModifyingPredicate)
+#MACRO TestRemoveIfBooleanNonEmptyThrowing(true)
+#MACRO TestRemoveIfBooleanNonEmptyThrowing(false)
+#MACRO TestRemoveIfBooleanNonEmptyThrowAndMod(false)
+#MACRO TestRemoveIfBooleanNonEmptyThrowAndMod(true)
+#MACRO EmptyRemoveIfTest<false>(RemoveTrueArrSeqSTRUCTNAMEModifyingPredicate)
+#MACRO EmptyRemoveIfTest<false>(RemoveFalseArrSeqSTRUCTNAMEModifyingPredicate)
+  #ENDIF
+#ELSE
+  #IFSWITCH STRUCTNAME==CheckedList,CheckedStack
+#MACRO EmptyRemoveIfTest<false>(RetainSecondArrSeqSTRUCTNAMEModifyingPredicate)
+#MACRO EmptyRemoveIfTest<false>(RetainSecondAndLastArrSeqSTRUCTNAMEModifyingPredicate)
+#MACRO EmptyRemoveIfTest<false>(RemoveFirstAndThirdArrSeqSTRUCTNAMEModifyingPredicate)
+#MACRO EmptyRemoveIfTest<false>(RemoveFirstArrSeqSTRUCTNAMEModifyingPredicate)
+#MACRO EmptyRemoveIfTest<false>(RemoveFirstAndSecondToLastArrSeqSTRUCTNAMEModifyingPredicate)
+#MACRO CheckedModdingNonEmptyNonBooleanRemoveIfTests(3)
+#MACRO CheckedModdingNonEmptyNonBooleanRemoveIfTests(50)
+#MACRO CheckedModdingNonEmptyNonBooleanRemoveIfTests(100)
+  #ENDIF
+#MACRO EmptyRemoveIfTest<false>(RetainSecondPredicate)
+#MACRO EmptyRemoveIfTest<true>(RetainSecondAndLastPredicate)
+#MACRO EmptyRemoveIfTest<false>(RemoveFirstAndThirdPredicate)
+#MACRO EmptyRemoveIfTest<false>(RemoveFirstPredicate)
+#MACRO EmptyRemoveIfTest<true>(RemoveFirstAndSecondToLastPredicate)  
+#MACRO NonCheckedNonEmptyNonBooleanRemoveIfTests(3)
+#MACRO NonCheckedNonEmptyNonBooleanRemoveIfTests(50)
+#MACRO NonCheckedNonEmptyNonBooleanRemoveIfTests(100)
+#ENDIF
+#MACRO EmptyRemoveIfTest<false>(RemoveAllPredicate)
+#MACRO EmptyRemoveIfTest<false>(RemoveNonePredicate)
+#IFSWITCH STRUCTNAME==CheckedList,CheckedStack
+#MACRO EmptyRemoveIfTest<false>(RemoveAllArrSeqSTRUCTNAMEModifyingPredicate)
+#MACRO EmptyRemoveIfTest<false>(RemoveNoneArrSeqSTRUCTNAMEModifyingPredicate)
+#MACRO EmptyRemoveIfTest<false>(ThrowingPredicate)
+#MACRO EmptyRemoveIfTest<false>(ModifyingArrSeqSTRUCTNAMEAndThrowingPredicate)
+#ENDIF
+#ENDDEF
+#MACRODEF TestRemoveIfBooleanNonEmptyThrowing(FIRSTVAL)
+@Test
+public void testSTRUCTNAMEremoveIf_OUTPUTMODIFIERPredicate_FirstValFIRSTVAL_Throwing(){
+  for(int period=1;period<=10;++period){
+    #MACRO InitBooleanRemoveIf(FIRSTVAL,10)
+    var filter=new $ClassPrefix$MonitoredPredicate.ThrowingPredicate();
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.removeIf((OUTPUTMODIFIERPredicate)filter));
+    Assertions.assertEquals(10,seq.size());
+    #MACRO VerifyBooleanRemoveIfNonModHelper(FIRSTVAL,10)
+    Assertions.assertEquals(10,seq.modCount);
+    Assertions.assertEquals(1,filter.callCount);
+  }
+}
+#ENDDEF
+#MACRODEF TestRemoveIfBooleanNonEmptyThrowAndMod(FIRSTVAL)
+@Test
+public void testSTRUCTNAMEremoveIf_OUTPUTMODIFIERPredicate_FirstValFIRSTVAL_ThrowAndMod(){
+  for(int period=1;period<=10;++period){
+    #MACRO InitBooleanRemoveIf(FIRSTVAL,10)
+    var filter=new $ClassPrefix$MonitoredPredicate.ModifyingArrSeqSTRUCTNAMEAndThrowingPredicate(seq);
+    Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((OUTPUTMODIFIERPredicate)filter));
+    Assertions.assertEquals(11,seq.size());
+    #MACRO VerifyBooleanRemoveIfNonModHelper(FIRSTVAL,10)
+    Assertions.assertEquals(FIRSTVAL,seq.arr[10]);
+    Assertions.assertEquals(10+1,seq.modCount);
+    Assertions.assertEquals(1,filter.callCount);
+  }
+}
+#ENDDEF
+#MACRODEF TestRemoveIfBooleanNonEmptyModding(FIRSTVAL,PREDICATETYPE)
+@Test
+public void testSTRUCTNAMEremoveIf_OUTPUTMODIFIERPredicate_FirstValFIRSTVAL_PREDICATETYPE(){
+  for(int period=1;period<=10;++period){
+    #MACRO InitBooleanRemoveIf(FIRSTVAL,10)
+    var filter=new $ClassPrefix$MonitoredPredicate.PREDICATETYPE(seq);
+    Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((OUTPUTMODIFIERPredicate)filter));
+    #MACRO VerifyBooleanRemoveIfNonMod(FIRSTVAL,10)
+  }
+}
+#ENDDEF
+#MACRODEF EmptyRemoveIfTest<USESIZEPARAMETER>(PREDICATETYPE)
+@Test
+public void testSTRUCTNAMEremoveIf_OUTPUTMODIFIERPredicate_SeqIsEmpty_PREDICATETYPE()
+{
+  #MACRO InitNonBooleanRemoveIf(0)
+#IFSWITCH USESIZEPARAMETER==true
+  var filter=new $ClassPrefix$MonitoredPredicate.PREDICATETYPE(seq.size);
+#ELSE
+  var filter=new $ClassPrefix$MonitoredPredicate.PREDICATETYPE(seq);
+#ENDIF
+  Assertions.assertFalse(seq.removeIf((OUTPUTMODIFIERPredicate)filter));
+  Assertions.assertEquals(0,seq.size());
+  Assertions.assertEquals(0,filter.callCount);
+#IFSWITCH STRUCTNAME==CheckedList,CheckedStack
+  Assertions.assertEquals(0,seq.modCount);
+#ENDIF
+}
+#ENDDEF
+#MACRODEF NonCheckedNonEmptyNonBooleanRemoveIfTests(LENGTH)
+@Test
+public void testSTRUCTNAMEremoveIf_OUTPUTMODIFIERPredicate_SeqSizeLENGTH_RemoveAll(){
+  #MACRO InitNonBooleanRemoveIf(LENGTH)
+  var filter=new $ClassPrefix$MonitoredPredicate.RemoveAllPredicate();
+  Assertions.assertTrue(seq.removeIf((OUTPUTMODIFIERPredicate)filter));
+  Assertions.assertEquals(0,seq.size());
+  filter.verifyArray(seq.arr,0,LENGTH);
+  Assertions.assertEquals(LENGTH,filter.callCount);
+}
+@Test
+public void testSTRUCTNAMEremoveIf_OUTPUTMODIFIERPredicate_SeqSizeLENGTH_RemoveNone(){
+  #MACRO InitNonBooleanRemoveIf(LENGTH)
+  var filter=new $ClassPrefix$MonitoredPredicate.RemoveNonePredicate();
+  Assertions.assertFalse(seq.removeIf((OUTPUTMODIFIERPredicate)filter));
+  Assertions.assertEquals(LENGTH,seq.size());
+  filter.verifyArray(seq.arr,0,LENGTH);
+  Assertions.assertEquals(LENGTH,filter.callCount);
+}
+@Test
+public void testSTRUCTNAMEremoveIf_OUTPUTMODIFIERPredicate_SeqSizeLENGTH_RetainSecond(){
+  #MACRO InitNonBooleanRemoveIf(LENGTH)
+  var filter=new $ClassPrefix$MonitoredPredicate.RetainSecondPredicate();
+  Assertions.assertTrue(seq.removeIf((OUTPUTMODIFIERPredicate)filter));
+  Assertions.assertEquals(1,seq.size());
+  filter.verifyArray(seq.arr,0,LENGTH);
+  Assertions.assertEquals(LENGTH,filter.callCount);
+}
+@Test
+public void testSTRUCTNAMEremoveIf_OUTPUTMODIFIERPredicate_SeqSizeLENGTH_RetainSecondAndLast(){
+  #MACRO InitNonBooleanRemoveIf(LENGTH)
+  var filter=new $ClassPrefix$MonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+  Assertions.assertTrue(seq.removeIf((OUTPUTMODIFIERPredicate)filter));
+  Assertions.assertEquals(2,seq.size());
+  filter.verifyArray(seq.arr,0,LENGTH);
+  Assertions.assertEquals(LENGTH,filter.callCount);
+}
+@Test
+public void testSTRUCTNAMEremoveIf_OUTPUTMODIFIERPredicate_SeqSizeLENGTH_RemoveFirstAndThird(){
+  #MACRO InitNonBooleanRemoveIf(LENGTH)
+  var filter=new $ClassPrefix$MonitoredPredicate.RemoveFirstAndThirdPredicate();
+  Assertions.assertTrue(seq.removeIf((OUTPUTMODIFIERPredicate)filter));
+  Assertions.assertEquals(LENGTH-2,seq.size());
+  filter.verifyArray(seq.arr,0,LENGTH);
+  Assertions.assertEquals(LENGTH,filter.callCount);
+}
+@Test
+public void testSTRUCTNAMEremoveIf_OUTPUTMODIFIERPredicate_SeqSizeLENGTH_RemoveFirst(){
+  #MACRO InitNonBooleanRemoveIf(LENGTH)
+  var filter=new $ClassPrefix$MonitoredPredicate.RemoveFirstPredicate();
+  Assertions.assertTrue(seq.removeIf((OUTPUTMODIFIERPredicate)filter));
+  Assertions.assertEquals(LENGTH-1,seq.size());
+  filter.verifyArray(seq.arr,0,LENGTH);
+  Assertions.assertEquals(LENGTH,filter.callCount);
+}
+@Test
+public void testSTRUCTNAMEremoveIf_OUTPUTMODIFIERPredicate_SeqSizeLENGTH_RemoveFirstAndSecondToLast(){
+  #MACRO InitNonBooleanRemoveIf(LENGTH)
+  var filter=new $ClassPrefix$MonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+  Assertions.assertTrue(seq.removeIf((OUTPUTMODIFIERPredicate)filter));
+  Assertions.assertEquals(LENGTH-2,seq.size());
+  filter.verifyArray(seq.arr,0,LENGTH);
+  Assertions.assertEquals(LENGTH,filter.callCount);
+}
+#ENDDEF
+#MACRODEF CheckedModdingNonEmptyNonBooleanRemoveIfTests(LENGTH)
+public void testSTRUCTNAMEremoveIf_OUTPUTMODIFIERPredicate_SeqSizeLENGTH_ThrowAndMod(){
+  #MACRO InitNonBooleanRemoveIf(LENGTH)
+  var filter=new $ClassPrefix$MonitoredPredicate.ModifyingArrSeqSTRUCTNAMEAndThrowingPredicate(seq);
+  Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((OUTPUTMODIFIERPredicate)filter));
+  Assertions.assertEquals(LENGTH+1,seq.size());
+  filter.verifyArray(seq.arr,0,LENGTH);
+  Assertions.assertEquals(1,filter.callCount);
+  Assertions.assertEquals(LENGTH+1,seq.modCount);
+}
+@Test
+public void testSTRUCTNAMEremoveIf_OUTPUTMODIFIERPredicate_SeqSizeLENGTH_Throwing(){
+  #MACRO InitNonBooleanRemoveIf(LENGTH)
+  var filter=new $ClassPrefix$MonitoredPredicate.ThrowingPredicate();
+  Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.removeIf((OUTPUTMODIFIERPredicate)filter));
+  Assertions.assertEquals(LENGTH,seq.size());
+  filter.verifyArray(seq.arr,0,LENGTH);
+  Assertions.assertEquals(1,filter.callCount);
+  Assertions.assertEquals(LENGTH,seq.modCount);
+}
+@Test
+public void testSTRUCTNAMEremoveIf_OUTPUTMODIFIERPredicate_SeqSizeLENGTH_RemoveAllMod(){
+  #MACRO InitNonBooleanRemoveIf(LENGTH)
+  var filter=new $ClassPrefix$MonitoredPredicate.RemoveAllArrSeqSTRUCTNAMEModifyingPredicate(seq);
+  Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((OUTPUTMODIFIERPredicate)filter));
+  Assertions.assertEquals(LENGTH,seq.size());
+  filter.verifyArray(seq.arr,0,LENGTH);
+  Assertions.assertEquals(LENGTH,filter.callCount);
+  Assertions.assertEquals(LENGTH*3,seq.modCount);
+}
+@Test
+public void testSTRUCTNAMEremoveIf_OUTPUTMODIFIERPredicate_SeqSizeLENGTH_RemoveNoneMod(){
+  #MACRO InitNonBooleanRemoveIf(LENGTH)
+  var filter=new $ClassPrefix$MonitoredPredicate.RemoveNoneArrSeqSTRUCTNAMEModifyingPredicate(seq);
+  Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((OUTPUTMODIFIERPredicate)filter));
+  Assertions.assertEquals(LENGTH,seq.size());
+  filter.verifyArray(seq.arr,0,LENGTH);
+  Assertions.assertEquals(LENGTH,filter.callCount);
+  Assertions.assertEquals(LENGTH*3,seq.modCount);
+}
+@Test
+public void testSTRUCTNAMEremoveIf_OUTPUTMODIFIERPredicate_SeqSizeLENGTH_RetainSecondMod(){
+  #MACRO InitNonBooleanRemoveIf(LENGTH)
+  var filter=new $ClassPrefix$MonitoredPredicate.RetainSecondArrSeqSTRUCTNAMEModifyingPredicate(seq);
+  Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((OUTPUTMODIFIERPredicate)filter));
+  Assertions.assertEquals(LENGTH,seq.size());
+  filter.verifyArray(seq.arr,0,LENGTH);
+  Assertions.assertEquals(LENGTH,filter.callCount);
+  Assertions.assertEquals(LENGTH*3,seq.modCount);
+}
+@Test
+public void testSTRUCTNAMEremoveIf_OUTPUTMODIFIERPredicate_SeqSizeLENGTH_RetainSecondAndLastMod(){
+  #MACRO InitNonBooleanRemoveIf(LENGTH)
+  var filter=new $ClassPrefix$MonitoredPredicate.RetainSecondAndLastArrSeqSTRUCTNAMEModifyingPredicate(seq);
+  Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((OUTPUTMODIFIERPredicate)filter));
+  Assertions.assertEquals(LENGTH,seq.size());
+  filter.verifyArray(seq.arr,0,LENGTH);
+  Assertions.assertEquals(LENGTH,filter.callCount);
+  Assertions.assertEquals(LENGTH*3,seq.modCount);
+}
+@Test
+public void testSTRUCTNAMEremoveIf_OUTPUTMODIFIERPredicate_SeqSizeLENGTH_RemoveFirstAndThirdMod(){
+  #MACRO InitNonBooleanRemoveIf(LENGTH)
+  var filter=new $ClassPrefix$MonitoredPredicate.RemoveFirstAndThirdArrSeqSTRUCTNAMEModifyingPredicate(seq);
+  Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((OUTPUTMODIFIERPredicate)filter));
+  Assertions.assertEquals(LENGTH,seq.size());
+  filter.verifyArray(seq.arr,0,LENGTH);
+  Assertions.assertEquals(LENGTH,filter.callCount);
+  Assertions.assertEquals(LENGTH*3,seq.modCount);
+}
+@Test
+public void testSTRUCTNAMEremoveIf_OUTPUTMODIFIERPredicate_SeqSizeLENGTH_RemoveFirstMod(){
+  #MACRO InitNonBooleanRemoveIf(LENGTH)
+  var filter=new $ClassPrefix$MonitoredPredicate.RemoveFirstArrSeqSTRUCTNAMEModifyingPredicate(seq);
+  Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((OUTPUTMODIFIERPredicate)filter));
+  Assertions.assertEquals(LENGTH,seq.size());
+  filter.verifyArray(seq.arr,0,LENGTH);
+  Assertions.assertEquals(LENGTH,filter.callCount);
+  Assertions.assertEquals(LENGTH*3,seq.modCount);
+}
+@Test
+public void testSTRUCTNAMEremoveIf_OUTPUTMODIFIERPredicate_SeqSizeLENGTH_RemoveFirstAndSecondToLastMod(){
+  #MACRO InitNonBooleanRemoveIf(LENGTH)
+  var filter=new $ClassPrefix$MonitoredPredicate.RemoveFirstAndSecondToLastArrSeqSTRUCTNAMEModifyingPredicate(seq);
+  Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((OUTPUTMODIFIERPredicate)filter));
+  Assertions.assertEquals(LENGTH,seq.size());
+  filter.verifyArray(seq.arr,0,LENGTH);
+  Assertions.assertEquals(LENGTH,filter.callCount);
+  Assertions.assertEquals(LENGTH*3,seq.modCount);
+}
+#ENDDEF
 #MACRODEF TestForEachMethods<INITIALCAPACITY>(OUTPUTMODIFIER,dummy)
 @Test
-public void testSTRUCTNAMEforEach_OUTPUTMODIFIERConsumer_SeqIsEmpty_NoMod()
-{
+public void testSTRUCTNAMEforEach_OUTPUTMODIFIERConsumer_SeqIsEmpty_NoMod(){
   #MACRO ConstructionRoutine()
-  MonitoredConsumer consumer=new MonitoredConsumer();
+  var consumer=new $ClassPrefix$MonitoredConsumer();
   seq.forEach((OUTPUTMODIFIERConsumer)consumer);
   Assertions.assertEquals(0,seq.size());
 #IFSWITCH STRUCTNAME==CheckedList,CheckedStack
@@ -487,11 +665,10 @@ public void testSTRUCTNAMEforEach_OUTPUTMODIFIERConsumer_SeqIsEmpty_NoMod()
   Assertions.assertTrue(consumer.isEmpty());
 }
 @Test
-public void testSTRUCTNAMEforEach_OUTPUTMODIFIERConsumer_SeqIsNotEmpty_NoMod()
-{
+public void testSTRUCTNAMEforEach_OUTPUTMODIFIERConsumer_SeqIsNotEmpty_NoMod(){
   #MACRO ConstructionRoutine()
   #MACRO AddAscending(100,$ArrayType$)
-  MonitoredConsumer consumer=new MonitoredConsumer();
+  var consumer=new $ClassPrefix$MonitoredConsumer();
   seq.forEach((OUTPUTMODIFIERConsumer)consumer);
   Assertions.assertEquals(100,seq.size());
 #IFSWITCH STRUCTNAME==CheckedList,CheckedStack
@@ -511,29 +688,26 @@ public void testSTRUCTNAMEforEach_OUTPUTMODIFIERConsumer_SeqIsNotEmpty_NoMod()
 }
 #IFSWITCH STRUCTNAME==CheckedList,CheckedStack
 @Test
-public void testSTRUCTNAMEforEach_OUTPUTMODIFIERConsumer_SeqIsEmpty_ModdingConsumer()
-{
+public void testSTRUCTNAMEforEach_OUTPUTMODIFIERConsumer_SeqIsEmpty_ModdingConsumer(){
   #MACRO ConstructionRoutine()
-  ModifyingSTRUCTNAMEConsumer consumer=new ModifyingSTRUCTNAMEConsumer(seq);
+  var consumer=new $ClassPrefix$MonitoredConsumer.ModifyingArrSeqSTRUCTNAMEConsumer(seq);
   seq.forEach((OUTPUTMODIFIERConsumer)consumer);
   Assertions.assertEquals(0,seq.size());
   Assertions.assertEquals(0,seq.modCount);
   Assertions.assertTrue(consumer.isEmpty());
 }
 @Test
-public void testSTRUCTNAMEforEach_OUTPUTMODIFIERConsumer_SeqIsNotEmpty_ModdingConsumer()
-{
+public void testSTRUCTNAMEforEach_OUTPUTMODIFIERConsumer_SeqIsNotEmpty_ModdingConsumer(){
   #MACRO ConstructionRoutine()
   #MACRO AddAscending(100,$ArrayType$)
-  ModifyingSTRUCTNAMEConsumer consumer=new ModifyingSTRUCTNAMEConsumer(seq);
+  var consumer=new $ClassPrefix$MonitoredConsumer.ModifyingArrSeqSTRUCTNAMEConsumer(seq);
   Assertions.assertThrows(ConcurrentModificationException.class,()->seq.forEach((OUTPUTMODIFIERConsumer)consumer));
   Assertions.assertEquals(100,seq.size());
   Assertions.assertEquals(300,seq.modCount);
   Assertions.assertEquals(100,consumer.size());
   var seqIterator=seq.iterator();
   var consumerIterator=consumer.iterator();
-  for(int i=0;i<100;++i)
-  {
+  for(int i=0;i<100;++i){
 #IF OfRef
     Assertions.assertSame(consumerIterator.next(),seqIterator.next());
 #ELSE
@@ -542,29 +716,26 @@ public void testSTRUCTNAMEforEach_OUTPUTMODIFIERConsumer_SeqIsNotEmpty_ModdingCo
   }
 }
 @Test
-public void testSTRUCTNAMEforEach_OUTPUTMODIFIERConsumer_SeqIsEmpty_ThrowingConsumer()
-{
+public void testSTRUCTNAMEforEach_OUTPUTMODIFIERConsumer_SeqIsEmpty_ThrowingConsumer(){
   #MACRO ConstructionRoutine()
-  ThrowingConsumer consumer=new ThrowingConsumer();
+  var consumer=new $ClassPrefix$MonitoredConsumer.Throwing();
   seq.forEach((OUTPUTMODIFIERConsumer)consumer);
   Assertions.assertEquals(0,seq.size());
   Assertions.assertEquals(0,seq.modCount);
   Assertions.assertTrue(consumer.isEmpty());
 }
 @Test
-public void testSTRUCTNAMEforEach_OUTPUTMODIFIERConsumer_SeqIsNotEmpty_ThrowingConsumer()
-{
+public void testSTRUCTNAMEforEach_OUTPUTMODIFIERConsumer_SeqIsNotEmpty_ThrowingConsumer(){
   #MACRO ConstructionRoutine()
   #MACRO AddAscending(100,$ArrayType$)
-  ThrowingConsumer consumer=new ThrowingConsumer();
+  var consumer=new $ClassPrefix$MonitoredConsumer.Throwing();
   Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.forEach((OUTPUTMODIFIERConsumer)consumer));
   Assertions.assertEquals(100,seq.size());
   Assertions.assertEquals(100,seq.modCount);
   Assertions.assertEquals(1,consumer.size());
   var seqIterator=seq.iterator();
   var consumerIterator=consumer.iterator();
-  for(int i=0;i<1;++i)
-  {
+  for(int i=0;i<1;++i){
 #IF OfRef
     Assertions.assertSame(consumerIterator.next(),seqIterator.next());
 #ELSE
@@ -573,35 +744,29 @@ public void testSTRUCTNAMEforEach_OUTPUTMODIFIERConsumer_SeqIsNotEmpty_ThrowingC
   }
 }
 @Test
-public void testSTRUCTNAMEforEach_OUTPUTMODIFIERConsumer_SeqIsEmpty_ThrowingAndModdingConsumer()
-{
+public void testSTRUCTNAMEforEach_OUTPUTMODIFIERConsumer_SeqIsEmpty_ThrowingAndModdingConsumer(){
   #MACRO ConstructionRoutine()
-  ModifiyingSTRUCTNAMEAndThrowingConsumer consumer=new ModifiyingSTRUCTNAMEAndThrowingConsumer(seq);
+  var consumer=new $ClassPrefix$MonitoredConsumer.ModifyingArrSeqSTRUCTNAMEAndThrowingConsumer(seq);
   seq.forEach((OUTPUTMODIFIERConsumer)consumer);
   Assertions.assertEquals(0,seq.size());
   Assertions.assertEquals(0,seq.modCount);
   Assertions.assertTrue(consumer.isEmpty());
 }
 @Test
-public void testSTRUCTNAMEforEach_OUTPUTMODIFIERConsumer_SeqIsNotEmpty_ThrowingAndModdingConsumer()
-{
+public void testSTRUCTNAMEforEach_OUTPUTMODIFIERConsumer_SeqIsNotEmpty_ThrowingAndModdingConsumer(){
   #MACRO ConstructionRoutine()
   #MACRO AddAscending(100,$ArrayType$)
-  ModifiyingSTRUCTNAMEAndThrowingConsumer consumer=new ModifiyingSTRUCTNAMEAndThrowingConsumer(seq);
+  var consumer=new $ClassPrefix$MonitoredConsumer.ModifyingArrSeqSTRUCTNAMEAndThrowingConsumer(seq);
   Assertions.assertThrows(ConcurrentModificationException.class,()->seq.forEach((OUTPUTMODIFIERConsumer)consumer));
   Assertions.assertEquals(100,seq.size());
   Assertions.assertEquals(102,seq.modCount);
   Assertions.assertEquals(1,consumer.size());
-
 }
 #ENDIF
 #ENDDEF
-
 #MACRODEF TestMiscMethods<INITIALCAPACITY>()
-
 @Test
-public void testSTRUCTNAMEtoArray_ObjectArray_zeroLengthArrayAndSequenceIsEmpty()
-{
+public void testSTRUCTNAMEtoArray_ObjectArray_zeroLengthArrayAndSequenceIsEmpty(){
   #MACRO ConstructionRoutine()
 #IF OfRef
   Integer[] paramArr=new Integer[0];
@@ -618,8 +783,7 @@ public void testSTRUCTNAMEtoArray_ObjectArray_zeroLengthArrayAndSequenceIsEmpty(
   Assertions.assertSame(paramArr,result);
 }
 @Test
-public void testSTRUCTNAMEtoArray_ObjectArray_zeroLengthArrayAndSequenceNotEmpty()
-{
+public void testSTRUCTNAMEtoArray_ObjectArray_zeroLengthArrayAndSequenceNotEmpty(){
   #MACRO ConstructionRoutine()
   #MACRO AddAscending(100,$ArrayType$)
 #IF OfRef
@@ -636,8 +800,7 @@ public void testSTRUCTNAMEtoArray_ObjectArray_zeroLengthArrayAndSequenceNotEmpty
   Assertions.assertNotSame(seq.arr,result);
   Assertions.assertNotSame(paramArr,result);
   var itr=seq.iterator();
-  for(int i=0;i<100;++i)
-  {
+  for(int i=0;i<100;++i){
 #IF OfRef
     Assertions.assertSame(itr.next(),result[i]);
 #ELSE
@@ -646,16 +809,14 @@ public void testSTRUCTNAMEtoArray_ObjectArray_zeroLengthArrayAndSequenceNotEmpty
   }
 }
 @Test
-public void testSTRUCTNAMEtoArray_ObjectArray_nonzeroLengthArrayAndSequenceIsEmpty()
-{
+public void testSTRUCTNAMEtoArray_ObjectArray_nonzeroLengthArrayAndSequenceIsEmpty(){
   #MACRO ConstructionRoutine()
 #IF OfRef
   Integer[] paramArr=new Integer[5];
 #ELSE
   $BoxedType$[] paramArr=new $BoxedType$[5];
 #ENDIF
-  for(int i=0;i<paramArr.length;++i)
-  {
+  for(int i=0;i<paramArr.length;++i){
     paramArr[i]=TypeConversionUtil.convertTo$ArrayType$(paramArr.length);
   }
   var result=seq.toArray(paramArr);
@@ -667,23 +828,19 @@ public void testSTRUCTNAMEtoArray_ObjectArray_nonzeroLengthArrayAndSequenceIsEmp
   Assertions.assertNotSame(seq.arr,result);
   Assertions.assertSame(paramArr,result);
   Assertions.assertNull(result[0]);
-  for(int i=1;i<result.length;++i)
-  {
+  for(int i=1;i<result.length;++i){
     Assertions.assertEquals((Object)TypeConversionUtil.convertTo$ArrayType$(paramArr.length),result[i]);
   }
 }
-
 @Test
-public void testSTRUCTNAMEtoArray_ObjectArray_overSizedArray()
-{
+public void testSTRUCTNAMEtoArray_ObjectArray_overSizedArray(){
   #MACRO ConstructionRoutine()
 #IF OfRef
   Integer[] paramArr=new Integer[10];
 #ELSE
   $BoxedType$[] paramArr=new $BoxedType$[10];
 #ENDIF
-  for(int i=0;i<paramArr.length;++i)
-  {
+  for(int i=0;i<paramArr.length;++i){
     paramArr[i]=TypeConversionUtil.convertTo$ArrayType$(paramArr.length);
   }
   #MACRO AddAscending(5,$ArrayType$)
@@ -696,8 +853,7 @@ public void testSTRUCTNAMEtoArray_ObjectArray_overSizedArray()
   Assertions.assertNotSame(seq.arr,result);
   Assertions.assertSame(paramArr,result);
   var itr=seq.iterator();
-  for(int i=0;i<5;++i)
-  {
+  for(int i=0;i<5;++i){
 #IF OfRef
     Assertions.assertSame(itr.next(),result[i]);
 #ELSE
@@ -705,22 +861,19 @@ public void testSTRUCTNAMEtoArray_ObjectArray_overSizedArray()
 #ENDIF
   }
   Assertions.assertNull(result[5]);
-  for(int i=6;i<result.length;++i)
-  {
+  for(int i=6;i<result.length;++i){
     Assertions.assertEquals((Object)TypeConversionUtil.convertTo$ArrayType$(paramArr.length),result[i]);
   }
 }
 @Test
-public void testSTRUCTNAMEtoArray_ObjectArray_undersizedArray()
-{
+public void testSTRUCTNAMEtoArray_ObjectArray_undersizedArray(){
   #MACRO ConstructionRoutine()
 #IF OfRef
   Integer[] paramArr=new Integer[5];
 #ELSE
   $BoxedType$[] paramArr=new $BoxedType$[5];
 #ENDIF
-  for(int i=0;i<paramArr.length;++i)
-  {
+  for(int i=0;i<paramArr.length;++i){
     paramArr[i]=TypeConversionUtil.convertTo$ArrayType$(10);
   }
   #MACRO AddAscending(10,$ArrayType$)
@@ -733,8 +886,7 @@ public void testSTRUCTNAMEtoArray_ObjectArray_undersizedArray()
   Assertions.assertNotSame(seq.arr,result);
   Assertions.assertNotSame(paramArr,result);
   var itr=seq.iterator();
-  for(int i=0;i<10;++i)
-  {
+  for(int i=0;i<10;++i){
 #IF OfRef
     Assertions.assertSame(itr.next(),result[i]);
 #ELSE
@@ -743,16 +895,14 @@ public void testSTRUCTNAMEtoArray_ObjectArray_undersizedArray()
   }
 }
 @Test
-public void testSTRUCTNAMEtoArray_ObjectArray_exactSizeArray()
-{
+public void testSTRUCTNAMEtoArray_ObjectArray_exactSizeArray(){
   #MACRO ConstructionRoutine()
 #IF OfRef
   Integer[] paramArr=new Integer[5];
 #ELSE
   $BoxedType$[] paramArr=new $BoxedType$[5];
 #ENDIF
-  for(int i=0;i<paramArr.length;++i)
-  {
+  for(int i=0;i<paramArr.length;++i){
     paramArr[i]=TypeConversionUtil.convertTo$ArrayType$(5);
   }
   #MACRO AddAscending(5,$ArrayType$)
@@ -765,8 +915,7 @@ public void testSTRUCTNAMEtoArray_ObjectArray_exactSizeArray()
   Assertions.assertNotSame(seq.arr,result);
   Assertions.assertSame(paramArr,result);
   var itr=seq.iterator();
-  for(int i=0;i<5;++i)
-  {
+  for(int i=0;i<5;++i){
 #IF OfRef
     Assertions.assertSame(itr.next(),result[i]);
 #ELSE
@@ -775,8 +924,7 @@ public void testSTRUCTNAMEtoArray_ObjectArray_exactSizeArray()
   }
 }
 @Test
-public void testSTRUCTNAMEtoArray_IntFunction_seqIsEmpty_nonMod()
-{
+public void testSTRUCTNAMEtoArray_IntFunction_seqIsEmpty_nonMod(){
   #MACRO ConstructionRoutine()
 #IF OfRef
   IntFunction<Integer[]> arrConstructor=Integer[]::new;
@@ -792,8 +940,7 @@ public void testSTRUCTNAMEtoArray_IntFunction_seqIsEmpty_nonMod()
   Assertions.assertEquals(0,result.length);
 }
 @Test
-public void testSTRUCTNAMEtoArray_IntFunction_seqIsNotEmpty_nonMod()
-{
+public void testSTRUCTNAMEtoArray_IntFunction_seqIsNotEmpty_nonMod(){
   #MACRO ConstructionRoutine()
   #MACRO AddAscending(100,$ArrayType$)
 #IF OfRef
@@ -809,8 +956,7 @@ public void testSTRUCTNAMEtoArray_IntFunction_seqIsNotEmpty_nonMod()
 #ENDIF
   Assertions.assertEquals(100,result.length);
   var itr=seq.iterator();
-  for(int i=0;i<100;++i)
-  {
+  for(int i=0;i<100;++i){
 #IF OfRef
     Assertions.assertSame(itr.next(),result[i]);
 #ELSE
@@ -820,18 +966,15 @@ public void testSTRUCTNAMEtoArray_IntFunction_seqIsNotEmpty_nonMod()
 }
 #IFSWITCH STRUCTNAME==CheckedList,CheckedStack
 @Test
-public void testSTRUCTNAMEtoArray_IntFunction_seqIsEmpty_moddingArrayConstructor()
-{
+public void testSTRUCTNAMEtoArray_IntFunction_seqIsEmpty_moddingArrayConstructor(){
   #MACRO ConstructionRoutine()
   #IF OfRef
-  IntFunction<Integer[]> arrConstructor=(int arrSize)->
-  {
+  IntFunction<Integer[]> arrConstructor=(int arrSize)->{
     seq.add(TypeConversionUtil.convertTo$ArrayType$(arrSize));
     return new Integer[arrSize];
   };
   #ELSE
-  IntFunction<$BoxedType$[]> arrConstructor=(int arrSize)->
-  {
+  IntFunction<$BoxedType$[]> arrConstructor=(int arrSize)->{
     seq.add(TypeConversionUtil.convertTo$ArrayType$(arrSize));
     return new $BoxedType$[arrSize];
   };
@@ -844,19 +987,16 @@ public void testSTRUCTNAMEtoArray_IntFunction_seqIsEmpty_moddingArrayConstructor
   #ENDIF
 }
 @Test
-public void testSTRUCTNAMEtoArray_IntFunction_seqIsNotEmpty_moddingArrayConstructor()
-{
+public void testSTRUCTNAMEtoArray_IntFunction_seqIsNotEmpty_moddingArrayConstructor(){
   #MACRO ConstructionRoutine()
   #MACRO AddAscending(100,$ArrayType$)
   #IF OfRef
-  IntFunction<Integer[]> arrConstructor=(int arrSize)->
-  {
+  IntFunction<Integer[]> arrConstructor=(int arrSize)->{
     seq.add(TypeConversionUtil.convertTo$ArrayType$(arrSize));
     return new Integer[arrSize];
   };
   #ELSE
-  IntFunction<$BoxedType$[]> arrConstructor=(int arrSize)->
-  {
+  IntFunction<$BoxedType$[]> arrConstructor=(int arrSize)->{
     seq.add(TypeConversionUtil.convertTo$ArrayType$(arrSize));
     return new $BoxedType$[arrSize];
   };
@@ -869,17 +1009,14 @@ public void testSTRUCTNAMEtoArray_IntFunction_seqIsNotEmpty_moddingArrayConstruc
   #ENDIF
 }
 @Test
-public void testSTRUCTNAMEtoArray_IntFunction_seqIsEmpty_throwingArrayConstructor()
-{
+public void testSTRUCTNAMEtoArray_IntFunction_seqIsEmpty_throwingArrayConstructor(){
   #MACRO ConstructionRoutine()
 #IF OfRef
-  IntFunction<Integer[]> arrConstructor=(int arrSize)->
-  {
+  IntFunction<Integer[]> arrConstructor=(int arrSize)->{
     throw new IndexOutOfBoundsException();
   };
 #ELSE
-  IntFunction<$BoxedType$[]> arrConstructor=(int arrSize)->
-  {
+  IntFunction<$BoxedType$[]> arrConstructor=(int arrSize)->{
     throw new IndexOutOfBoundsException();
   };
 #ENDIF
@@ -890,18 +1027,15 @@ public void testSTRUCTNAMEtoArray_IntFunction_seqIsEmpty_throwingArrayConstructo
 #ENDIF
 }
 @Test
-public void testSTRUCTNAMEtoArray_IntFunction_seqIsNotEmpty_throwingArrayConstructor()
-{
+public void testSTRUCTNAMEtoArray_IntFunction_seqIsNotEmpty_throwingArrayConstructor(){
   #MACRO ConstructionRoutine()
   #MACRO AddAscending(100,$ArrayType$)
 #IF OfRef
-  IntFunction<Integer[]> arrConstructor=(int arrSize)->
-  {
+  IntFunction<Integer[]> arrConstructor=(int arrSize)->{
     throw new IndexOutOfBoundsException();
   };
 #ELSE
-  IntFunction<$BoxedType$[]> arrConstructor=(int arrSize)->
-  {
+  IntFunction<$BoxedType$[]> arrConstructor=(int arrSize)->{
     throw new IndexOutOfBoundsException();
   };
 #ENDIF
@@ -912,18 +1046,15 @@ public void testSTRUCTNAMEtoArray_IntFunction_seqIsNotEmpty_throwingArrayConstru
 #ENDIF
 }
 @Test
-public void testSTRUCTNAMEtoArray_IntFunction_seqIsEmpty_throwingAndModdingArrConstructor()
-{
+public void testSTRUCTNAMEtoArray_IntFunction_seqIsEmpty_throwingAndModdingArrConstructor(){
   #MACRO ConstructionRoutine()
   #IF OfRef
-  IntFunction<Integer[]> arrConstructor=(int arrSize)->
-  {
+  IntFunction<Integer[]> arrConstructor=(int arrSize)->{
     seq.add(TypeConversionUtil.convertTo$ArrayType$(arrSize));
     throw new IndexOutOfBoundsException();
   };
   #ELSE
-  IntFunction<$BoxedType$[]> arrConstructor=(int arrSize)->
-  {
+  IntFunction<$BoxedType$[]> arrConstructor=(int arrSize)->{
     seq.add(TypeConversionUtil.convertTo$ArrayType$(arrSize));
     throw new IndexOutOfBoundsException();
   };
@@ -936,19 +1067,16 @@ public void testSTRUCTNAMEtoArray_IntFunction_seqIsEmpty_throwingAndModdingArrCo
   #ENDIF
 }
 @Test
-public void testSTRUCTNAMEtoArray_IntFunction_seqIsNotEmpty_throwingAndModdingArrConstructor()
-{
+public void testSTRUCTNAMEtoArray_IntFunction_seqIsNotEmpty_throwingAndModdingArrConstructor(){
   #MACRO ConstructionRoutine()
   #MACRO AddAscending(100,$ArrayType$)
   #IF OfRef
-  IntFunction<Integer[]> arrConstructor=(int arrSize)->
-  {
+  IntFunction<Integer[]> arrConstructor=(int arrSize)->{
     seq.add(TypeConversionUtil.convertTo$ArrayType$(arrSize));
     throw new IndexOutOfBoundsException();
   };
   #ELSE
-  IntFunction<$BoxedType$[]> arrConstructor=(int arrSize)->
-  {
+  IntFunction<$BoxedType$[]> arrConstructor=(int arrSize)->{
     seq.add(TypeConversionUtil.convertTo$ArrayType$(arrSize));
     throw new IndexOutOfBoundsException();
   };
@@ -962,8 +1090,7 @@ public void testSTRUCTNAMEtoArray_IntFunction_seqIsNotEmpty_throwingAndModdingAr
 }
 #ENDIF
 @Test
-public void testSTRUCTNAMEclear_void_seqIsEmpty()
-{
+public void testSTRUCTNAMEclear_void_seqIsEmpty(){
   #MACRO ConstructionRoutine()
   seq.clear();
   Assertions.assertTrue(seq.isEmpty());
@@ -972,14 +1099,12 @@ public void testSTRUCTNAMEclear_void_seqIsEmpty()
 #ENDIF
 }
 @Test
-public void testSTRUCTNAMEclear_void_seqIsNotEmpty()
-{
+public void testSTRUCTNAMEclear_void_seqIsNotEmpty(){
   #MACRO ConstructionRoutine()
   #MACRO AddAscending(100,$ArrayType$)
   seq.clear();
   Assertions.assertTrue(seq.isEmpty());
-  for(int i=0;i<100;++i)
-  {
+  for(int i=0;i<100;++i){
 #IF OfRef
     Assertions.assertNull(seq.arr[i]);
 #ELSE
@@ -990,10 +1115,8 @@ public void testSTRUCTNAMEclear_void_seqIsNotEmpty()
   Assertions.assertEquals(101,seq.modCount);
 #ENDIF
 }
-
 @Test
-public void testSTRUCTNAMEisEmpty_void_seqIsEmpty()
-{
+public void testSTRUCTNAMEisEmpty_void_seqIsEmpty(){
   #MACRO ConstructionRoutine()
   Assertions.assertTrue(seq.isEmpty());
 #IFSWITCH STRUCTNAME==CheckedList,CheckedStack
@@ -1001,8 +1124,7 @@ public void testSTRUCTNAMEisEmpty_void_seqIsEmpty()
 #ENDIF
 }
 @Test
-public void testSTRUCTNAMEisEmpty_void_seqIsNotEmpty()
-{
+public void testSTRUCTNAMEisEmpty_void_seqIsNotEmpty(){
   #MACRO ConstructionRoutine()
   #MACRO AddAscending(100,$ArrayType$)
   Assertions.assertFalse(seq.isEmpty());
@@ -1011,13 +1133,11 @@ public void testSTRUCTNAMEisEmpty_void_seqIsNotEmpty()
 #ENDIF
 }
 @Test
-public void testSTRUCTNAMEisEmpty_void_seqIsBeingCleared()
-{
+public void testSTRUCTNAMEisEmpty_void_seqIsBeingCleared(){
   #MACRO ConstructionRoutine()
   #MACRO AddAscending(100,$ArrayType$)
   var itr=seq.iterator();
-  for(int i=100;--i>=0;)
-  {
+  for(int i=100;--i>=0;){
     Assertions.assertFalse(seq.isEmpty());
     itr.next$TypeNameModifier$();
     itr.remove();
@@ -1027,10 +1147,8 @@ public void testSTRUCTNAMEisEmpty_void_seqIsBeingCleared()
   }
   Assertions.assertTrue(seq.isEmpty());
 }
-
 @Test
-public void testSTRUCTNAMEsize_void_seqIsEmpty()
-{
+public void testSTRUCTNAMEsize_void_seqIsEmpty(){
   #MACRO ConstructionRoutine()
   Assertions.assertEquals(0,seq.size);
   Assertions.assertEquals(seq.size,seq.size());
@@ -1039,8 +1157,7 @@ public void testSTRUCTNAMEsize_void_seqIsEmpty()
 #ENDIF
 }
 @Test
-public void testSTRUCTNAMEsize_void_seqIsNotEmpty()
-{
+public void testSTRUCTNAMEsize_void_seqIsNotEmpty(){
   #MACRO ConstructionRoutine()
   #MACRO AddAscending(100,$ArrayType$)
   Assertions.assertEquals(100,seq.size);
@@ -1050,13 +1167,11 @@ public void testSTRUCTNAMEsize_void_seqIsNotEmpty()
 #ENDIF
 }
 @Test
-public void testSTRUCTNAMEsize_void_seqIsBeingCleared()
-{
+public void testSTRUCTNAMEsize_void_seqIsBeingCleared(){
   #MACRO ConstructionRoutine()
   #MACRO AddAscending(100,$ArrayType$)
   var itr=seq.iterator();
-  for(int i=100;--i>=0;)
-  {
+  for(int i=100;--i>=0;){
     itr.next$TypeNameModifier$();
     itr.remove();
     Assertions.assertEquals(i,seq.size());
@@ -1067,16 +1182,53 @@ public void testSTRUCTNAMEsize_void_seqIsBeingCleared()
 }
 #ENDDEF
 
+#MACRODEF TestClone<INITIALCAPACITY>()
+@Test
+public void testSTRUCTNAMEClone_initialCapacityINITIALCAPACITY_seqIsEmpty()
+{
+  #MACRO ConstructionRoutine()
+  var clone=($ClassPrefix$ArrSeq.STRUCTNAME)seq.clone();
+  Assertions.assertEquals(0,clone.size());
+  Assertions.assertEquals(0,seq.size());
+  Assertions.assertSame(clone.arr,OmniArray.Of$ClassPrefix$.DEFAULT_ARR);
+#IFSWITCH STRUCTNAME==CheckedList,CheckedStack
+  Assertions.assertEquals(0,clone.modCount);
+  Assertions.assertEquals(0,seq.modCount);
+#ENDIF
+}
+
+@Test
+public void testSTRUCTNAMEClone_initialCapacityINITIALCAPACITY_seqIsNotEmpty()
+{
+  #MACRO ConstructionRoutine()
+  #MACRO AddAscending(100,$ArrayType$)
+  var clone=($ClassPrefix$ArrSeq.STRUCTNAME)seq.clone();
+  Assertions.assertEquals(100,clone.size());
+  Assertions.assertEquals(100,seq.size());
+  Assertions.assertNotSame(seq.arr,clone.arr);
+  for(int i=0;i<100;++i)
+  {
+    Assertions.assertEquals(TypeConversionUtil.convertTo$ArrayType$(i),clone.arr[i]);
+#IF OfRef
+    Assertions.assertSame(seq.arr[i],clone.arr[i]);
+#ENDIF
+  }
+#IFSWITCH STRUCTNAME==CheckedList,CheckedStack
+  Assertions.assertEquals(0,clone.modCount);
+  Assertions.assertEquals(100,seq.modCount);
+#ENDIF
+}
+#ENDDEF
+
 #MACRODEF TestConstructor<INITIALCAPACITY>()
 @Test
 #IFSWITCH INITIALCAPACITY==DEFAULT
-public void testSTRUCTNAMEconstructor_void_initialCapacityINITIALCAPACITY()
+public void testSTRUCTNAMEconstructor_void_initialCapacityINITIALCAPACITY(){
 #ELSEIFSWITCH INITIALCAPACITY==NULL
-public void testSTRUCTNAMEconstructor_int$ArrayType$_initialCapacityINITIALCAPACITY()
+public void testSTRUCTNAMEconstructor_int$ArrayType$_initialCapacityINITIALCAPACITY(){
 #ELSE
-public void testSTRUCTNAMEconstructor_int_initialCapacityINITIALCAPACITY()
+public void testSTRUCTNAMEconstructor_int_initialCapacityINITIALCAPACITY(){
 #ENDIF
-{
   #MACRO ConstructionRoutine()
   Assertions.assertEquals(0,seq.size);
 #IFSWITCH INITIALCAPACITY==DEFAULT
@@ -1084,8 +1236,7 @@ public void testSTRUCTNAMEconstructor_int_initialCapacityINITIALCAPACITY()
 #ELSEIFSWITCH INITIALCAPACITY==NULL
   Assertions.assertNull(seq.arr);
 #ELSE
-  switch(INITIALCAPACITY)
-  {
+  switch(INITIALCAPACITY){
   case 0:
     Assertions.assertNull(seq.arr);
     break;
@@ -1096,8 +1247,7 @@ public void testSTRUCTNAMEconstructor_int_initialCapacityINITIALCAPACITY()
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(INITIALCAPACITY,seq.arr.length);
   #IF OfRef
-    for(int i=0;i<INITIALCAPACITY;++i)
-    {
+    for(int i=0;i<INITIALCAPACITY;++i){
       Assertions.assertNull(seq.arr[i]);
     }
   #ENDIF
@@ -1108,11 +1258,9 @@ public void testSTRUCTNAMEconstructor_int_initialCapacityINITIALCAPACITY()
 #ENDIF
 }
 #ENDDEF
-
 #MACRODEF TestOutputMethods<INITIALCAPACITY>(OUTPUTTYPE,OUTPUTMODIFIER,DEFAULTVAL,DEFAULTARR)
 @Test
-public void testSTRUCTNAMEtoOUTPUTMODIFIERArray_void_seqIsEmpty()
-{
+public void testSTRUCTNAMEtoOUTPUTMODIFIERArray_void_seqIsEmpty(){
   #MACRO ConstructionRoutine()
   Assertions.assertSame(DEFAULTARR,seq.toOUTPUTMODIFIERArray());
   Assertions.assertEquals(0,seq.size());
@@ -1121,8 +1269,7 @@ public void testSTRUCTNAMEtoOUTPUTMODIFIERArray_void_seqIsEmpty()
 #ENDIF
 }
 @Test
-public void testSTRUCTNAMEtoOUTPUTMODIFIERArray_void_seqIsNotEmpty()
-{
+public void testSTRUCTNAMEtoOUTPUTMODIFIERArray_void_seqIsNotEmpty(){
   #MACRO ConstructionRoutine()
   #MACRO AddAscending(100,$ArrayType$)
   var result=seq.toOUTPUTMODIFIERArray();
@@ -1132,8 +1279,7 @@ public void testSTRUCTNAMEtoOUTPUTMODIFIERArray_void_seqIsNotEmpty()
 #ENDIF
   Assertions.assertEquals(100,result.length);
   var itr=seq.iterator();
-  for(int i=0;i<100;++i)
-  {
+  for(int i=0;i<100;++i){
 #IF OfRef
     Assertions.assertSame(itr.nextOUTPUTMODIFIER(),result[i]);
 #ELSE
@@ -1143,11 +1289,9 @@ public void testSTRUCTNAMEtoOUTPUTMODIFIERArray_void_seqIsNotEmpty()
   Assertions.assertNotSame(seq.arr,result);
 }
 #ENDDEF
-
 #MACRODEF TestInputMethods<INITIALCAPACITY>(INPUTTYPE,OUTPUTTYPE)
 @Test
-public void testSTRUCTNAMEadd_INPUTTYPE_initialCapacityINITIALCAPACITY()
-{
+public void testSTRUCTNAMEadd_INPUTTYPE_initialCapacityINITIALCAPACITY(){
   #MACRO ConstructionRoutine()
   #MACRO AddAscending(100,INPUTTYPE)
   Assertions.assertEquals(100,seq.size);
@@ -1155,31 +1299,22 @@ public void testSTRUCTNAMEadd_INPUTTYPE_initialCapacityINITIALCAPACITY()
   #IFSWITCH STRUCTNAME==CheckedList,CheckedStack
   Assertions.assertEquals(100,seq.modCount);
   #ENDIF
-  for(int i=0;i<seq.size;++i)
-  {
+  for(int i=0;i<seq.size;++i){
     Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPE(i),seq.arr[i]);
   }
 }
 #ENDDEF
-
-
 #MACRODEF ConstructionRoutine()
 #IFSWITCH INITIALCAPACITY==DEFAULT
-STRUCTNAME seq=new STRUCTNAME();
+var seq=new $ClassPrefix$ArrSeq.STRUCTNAME();
 #ELSEIFSWITCH INITIALCAPACITY==NULL
-STRUCTNAME seq=new STRUCTNAME(0,null);
+var seq=new $ClassPrefix$ArrSeq.STRUCTNAME(0,null);
 #ELSE
-STRUCTNAME seq=new STRUCTNAME(INITIALCAPACITY);
+var seq=new $ClassPrefix$ArrSeq.STRUCTNAME(INITIALCAPACITY);
 #ENDIF
 #ENDDEF
-
-
 #MACRODEF AddAscending(NUM_TO_ADD,INPUTTYPE)
-for(int i=0;i<NUM_TO_ADD;++i)
-{
+for(int i=0;i<NUM_TO_ADD;++i){
   Assertions.assertTrue(seq.add(TypeConversionUtil.convertToINPUTTYPE(i)));
 }
 #ENDDEF
-
-
-

@@ -305,11 +305,11 @@ public interface BitSetUtil
         survivorSet[wordOffset++]=word;
       }
     }
-  private static int pullWordDown(byte[] arr,int srcOffset,int dstOffset,long word)
-  {
-    for(int numTail0s;(numTail0s=Long.numberOfTrailingZeros(word))!=64;ArrCopy.uncheckedSelfCopy(arr,dstOffset,srcOffset+=numTail0s,numTail0s=Long.numberOfTrailingZeros(~(word>>>=numTail0s))),srcOffset+=numTail0s,dstOffset+=numTail0s,word>>>=numTail0s){}
-    return dstOffset;
-  }
+  //private static int pullWordDown(byte[] arr,int srcOffset,int dstOffset,long word)
+  //{
+  //  for(int numTail0s;(numTail0s=Long.numberOfTrailingZeros(word))!=64;ArrCopy.uncheckedSelfCopy(arr,dstOffset,srcOffset+=numTail0s,numTail0s=Long.numberOfTrailingZeros(~(word>>>=numTail0s))),srcOffset+=numTail0s,dstOffset+=numTail0s,word>>>=numTail0s){}
+  //  return dstOffset;
+  //}
   public static void pullSurvivorsDown(byte[] arr,int srcOffset,int dstOffset,int dstBound,long word)
   {
     int numTail0s=Long.numberOfTrailingZeros(word);
@@ -321,13 +321,42 @@ public interface BitSetUtil
   }
   public static void pullSurvivorsDown(byte[] arr,int srcOffset,int dstOffset,int dstBound,long[] survivorSet)
   {
-    for(int wordOffset=0;(dstOffset=pullWordDown(arr,srcOffset,dstOffset,survivorSet[wordOffset]))!=dstBound;++wordOffset,srcOffset+=64){}
+    for(int wordOffset=0;;)
+    {
+      long word=survivorSet[wordOffset];
+      for(int s=srcOffset;;)
+      {
+        int numTail0s;
+        if((numTail0s=Long.numberOfTrailingZeros(word))==64)
+        {
+          break;
+        }
+        ArrCopy.uncheckedSelfCopy(arr,dstOffset,s+=numTail0s,numTail0s=Long.numberOfTrailingZeros(~(word>>>=numTail0s)));
+        dstOffset+=numTail0s;
+        if(numTail0s==64)
+        {
+          break;
+        }
+        if(dstOffset>=dstBound)
+        {
+          return;
+        }
+        s+=numTail0s;
+        word>>>=numTail0s;
+      }
+      ++wordOffset;
+      srcOffset+=64;
+    }
   }
-  private static int pullWordDown(char[] arr,int srcOffset,int dstOffset,long word)
-  {
-    for(int numTail0s;(numTail0s=Long.numberOfTrailingZeros(word))!=64;ArrCopy.uncheckedSelfCopy(arr,dstOffset,srcOffset+=numTail0s,numTail0s=Long.numberOfTrailingZeros(~(word>>>=numTail0s))),srcOffset+=numTail0s,dstOffset+=numTail0s,word>>>=numTail0s){}
-    return dstOffset;
-  }
+  //public static void pullSurvivorsDown(byte[] arr,int srcOffset,int dstOffset,int dstBound,long[] survivorSet)
+  //{
+  //  for(int wordOffset=0;(dstOffset=pullWordDown(arr,srcOffset,dstOffset,survivorSet[wordOffset]))!=dstBound;++wordOffset,srcOffset+=64){}
+  //}
+  //private static int pullWordDown(char[] arr,int srcOffset,int dstOffset,long word)
+  //{
+  //  for(int numTail0s;(numTail0s=Long.numberOfTrailingZeros(word))!=64;ArrCopy.uncheckedSelfCopy(arr,dstOffset,srcOffset+=numTail0s,numTail0s=Long.numberOfTrailingZeros(~(word>>>=numTail0s))),srcOffset+=numTail0s,dstOffset+=numTail0s,word>>>=numTail0s){}
+  //  return dstOffset;
+  //}
   public static void pullSurvivorsDown(char[] arr,int srcOffset,int dstOffset,int dstBound,long word)
   {
     int numTail0s=Long.numberOfTrailingZeros(word);
@@ -339,13 +368,42 @@ public interface BitSetUtil
   }
   public static void pullSurvivorsDown(char[] arr,int srcOffset,int dstOffset,int dstBound,long[] survivorSet)
   {
-    for(int wordOffset=0;(dstOffset=pullWordDown(arr,srcOffset,dstOffset,survivorSet[wordOffset]))!=dstBound;++wordOffset,srcOffset+=64){}
+    for(int wordOffset=0;;)
+    {
+      long word=survivorSet[wordOffset];
+      for(int s=srcOffset;;)
+      {
+        int numTail0s;
+        if((numTail0s=Long.numberOfTrailingZeros(word))==64)
+        {
+          break;
+        }
+        ArrCopy.uncheckedSelfCopy(arr,dstOffset,s+=numTail0s,numTail0s=Long.numberOfTrailingZeros(~(word>>>=numTail0s)));
+        dstOffset+=numTail0s;
+        if(numTail0s==64)
+        {
+          break;
+        }
+        if(dstOffset>=dstBound)
+        {
+          return;
+        }
+        s+=numTail0s;
+        word>>>=numTail0s;
+      }
+      ++wordOffset;
+      srcOffset+=64;
+    }
   }
-  private static int pullWordDown(short[] arr,int srcOffset,int dstOffset,long word)
-  {
-    for(int numTail0s;(numTail0s=Long.numberOfTrailingZeros(word))!=64;ArrCopy.uncheckedSelfCopy(arr,dstOffset,srcOffset+=numTail0s,numTail0s=Long.numberOfTrailingZeros(~(word>>>=numTail0s))),srcOffset+=numTail0s,dstOffset+=numTail0s,word>>>=numTail0s){}
-    return dstOffset;
-  }
+  //public static void pullSurvivorsDown(char[] arr,int srcOffset,int dstOffset,int dstBound,long[] survivorSet)
+  //{
+  //  for(int wordOffset=0;(dstOffset=pullWordDown(arr,srcOffset,dstOffset,survivorSet[wordOffset]))!=dstBound;++wordOffset,srcOffset+=64){}
+  //}
+  //private static int pullWordDown(short[] arr,int srcOffset,int dstOffset,long word)
+  //{
+  //  for(int numTail0s;(numTail0s=Long.numberOfTrailingZeros(word))!=64;ArrCopy.uncheckedSelfCopy(arr,dstOffset,srcOffset+=numTail0s,numTail0s=Long.numberOfTrailingZeros(~(word>>>=numTail0s))),srcOffset+=numTail0s,dstOffset+=numTail0s,word>>>=numTail0s){}
+  //  return dstOffset;
+  //}
   public static void pullSurvivorsDown(short[] arr,int srcOffset,int dstOffset,int dstBound,long word)
   {
     int numTail0s=Long.numberOfTrailingZeros(word);
@@ -357,13 +415,42 @@ public interface BitSetUtil
   }
   public static void pullSurvivorsDown(short[] arr,int srcOffset,int dstOffset,int dstBound,long[] survivorSet)
   {
-    for(int wordOffset=0;(dstOffset=pullWordDown(arr,srcOffset,dstOffset,survivorSet[wordOffset]))!=dstBound;++wordOffset,srcOffset+=64){}
+    for(int wordOffset=0;;)
+    {
+      long word=survivorSet[wordOffset];
+      for(int s=srcOffset;;)
+      {
+        int numTail0s;
+        if((numTail0s=Long.numberOfTrailingZeros(word))==64)
+        {
+          break;
+        }
+        ArrCopy.uncheckedSelfCopy(arr,dstOffset,s+=numTail0s,numTail0s=Long.numberOfTrailingZeros(~(word>>>=numTail0s)));
+        dstOffset+=numTail0s;
+        if(numTail0s==64)
+        {
+          break;
+        }
+        if(dstOffset>=dstBound)
+        {
+          return;
+        }
+        s+=numTail0s;
+        word>>>=numTail0s;
+      }
+      ++wordOffset;
+      srcOffset+=64;
+    }
   }
-  private static int pullWordDown(int[] arr,int srcOffset,int dstOffset,long word)
-  {
-    for(int numTail0s;(numTail0s=Long.numberOfTrailingZeros(word))!=64;ArrCopy.uncheckedSelfCopy(arr,dstOffset,srcOffset+=numTail0s,numTail0s=Long.numberOfTrailingZeros(~(word>>>=numTail0s))),srcOffset+=numTail0s,dstOffset+=numTail0s,word>>>=numTail0s){}
-    return dstOffset;
-  }
+  //public static void pullSurvivorsDown(short[] arr,int srcOffset,int dstOffset,int dstBound,long[] survivorSet)
+  //{
+  //  for(int wordOffset=0;(dstOffset=pullWordDown(arr,srcOffset,dstOffset,survivorSet[wordOffset]))!=dstBound;++wordOffset,srcOffset+=64){}
+  //}
+  //private static int pullWordDown(int[] arr,int srcOffset,int dstOffset,long word)
+  //{
+  //  for(int numTail0s;(numTail0s=Long.numberOfTrailingZeros(word))!=64;ArrCopy.uncheckedSelfCopy(arr,dstOffset,srcOffset+=numTail0s,numTail0s=Long.numberOfTrailingZeros(~(word>>>=numTail0s))),srcOffset+=numTail0s,dstOffset+=numTail0s,word>>>=numTail0s){}
+  //  return dstOffset;
+  //}
   public static void pullSurvivorsDown(int[] arr,int srcOffset,int dstOffset,int dstBound,long word)
   {
     int numTail0s=Long.numberOfTrailingZeros(word);
@@ -375,13 +462,42 @@ public interface BitSetUtil
   }
   public static void pullSurvivorsDown(int[] arr,int srcOffset,int dstOffset,int dstBound,long[] survivorSet)
   {
-    for(int wordOffset=0;(dstOffset=pullWordDown(arr,srcOffset,dstOffset,survivorSet[wordOffset]))!=dstBound;++wordOffset,srcOffset+=64){}
+    for(int wordOffset=0;;)
+    {
+      long word=survivorSet[wordOffset];
+      for(int s=srcOffset;;)
+      {
+        int numTail0s;
+        if((numTail0s=Long.numberOfTrailingZeros(word))==64)
+        {
+          break;
+        }
+        ArrCopy.uncheckedSelfCopy(arr,dstOffset,s+=numTail0s,numTail0s=Long.numberOfTrailingZeros(~(word>>>=numTail0s)));
+        dstOffset+=numTail0s;
+        if(numTail0s==64)
+        {
+          break;
+        }
+        if(dstOffset>=dstBound)
+        {
+          return;
+        }
+        s+=numTail0s;
+        word>>>=numTail0s;
+      }
+      ++wordOffset;
+      srcOffset+=64;
+    }
   }
-  private static int pullWordDown(long[] arr,int srcOffset,int dstOffset,long word)
-  {
-    for(int numTail0s;(numTail0s=Long.numberOfTrailingZeros(word))!=64;ArrCopy.uncheckedSelfCopy(arr,dstOffset,srcOffset+=numTail0s,numTail0s=Long.numberOfTrailingZeros(~(word>>>=numTail0s))),srcOffset+=numTail0s,dstOffset+=numTail0s,word>>>=numTail0s){}
-    return dstOffset;
-  }
+  //public static void pullSurvivorsDown(int[] arr,int srcOffset,int dstOffset,int dstBound,long[] survivorSet)
+  //{
+  //  for(int wordOffset=0;(dstOffset=pullWordDown(arr,srcOffset,dstOffset,survivorSet[wordOffset]))!=dstBound;++wordOffset,srcOffset+=64){}
+  //}
+  //private static int pullWordDown(long[] arr,int srcOffset,int dstOffset,long word)
+  //{
+  //  for(int numTail0s;(numTail0s=Long.numberOfTrailingZeros(word))!=64;ArrCopy.uncheckedSelfCopy(arr,dstOffset,srcOffset+=numTail0s,numTail0s=Long.numberOfTrailingZeros(~(word>>>=numTail0s))),srcOffset+=numTail0s,dstOffset+=numTail0s,word>>>=numTail0s){}
+  //  return dstOffset;
+  //}
   public static void pullSurvivorsDown(long[] arr,int srcOffset,int dstOffset,int dstBound,long word)
   {
     int numTail0s=Long.numberOfTrailingZeros(word);
@@ -393,13 +509,42 @@ public interface BitSetUtil
   }
   public static void pullSurvivorsDown(long[] arr,int srcOffset,int dstOffset,int dstBound,long[] survivorSet)
   {
-    for(int wordOffset=0;(dstOffset=pullWordDown(arr,srcOffset,dstOffset,survivorSet[wordOffset]))!=dstBound;++wordOffset,srcOffset+=64){}
+    for(int wordOffset=0;;)
+    {
+      long word=survivorSet[wordOffset];
+      for(int s=srcOffset;;)
+      {
+        int numTail0s;
+        if((numTail0s=Long.numberOfTrailingZeros(word))==64)
+        {
+          break;
+        }
+        ArrCopy.uncheckedSelfCopy(arr,dstOffset,s+=numTail0s,numTail0s=Long.numberOfTrailingZeros(~(word>>>=numTail0s)));
+        dstOffset+=numTail0s;
+        if(numTail0s==64)
+        {
+          break;
+        }
+        if(dstOffset>=dstBound)
+        {
+          return;
+        }
+        s+=numTail0s;
+        word>>>=numTail0s;
+      }
+      ++wordOffset;
+      srcOffset+=64;
+    }
   }
-  private static int pullWordDown(float[] arr,int srcOffset,int dstOffset,long word)
-  {
-    for(int numTail0s;(numTail0s=Long.numberOfTrailingZeros(word))!=64;ArrCopy.uncheckedSelfCopy(arr,dstOffset,srcOffset+=numTail0s,numTail0s=Long.numberOfTrailingZeros(~(word>>>=numTail0s))),srcOffset+=numTail0s,dstOffset+=numTail0s,word>>>=numTail0s){}
-    return dstOffset;
-  }
+  //public static void pullSurvivorsDown(long[] arr,int srcOffset,int dstOffset,int dstBound,long[] survivorSet)
+  //{
+  //  for(int wordOffset=0;(dstOffset=pullWordDown(arr,srcOffset,dstOffset,survivorSet[wordOffset]))!=dstBound;++wordOffset,srcOffset+=64){}
+  //}
+  //private static int pullWordDown(float[] arr,int srcOffset,int dstOffset,long word)
+  //{
+  //  for(int numTail0s;(numTail0s=Long.numberOfTrailingZeros(word))!=64;ArrCopy.uncheckedSelfCopy(arr,dstOffset,srcOffset+=numTail0s,numTail0s=Long.numberOfTrailingZeros(~(word>>>=numTail0s))),srcOffset+=numTail0s,dstOffset+=numTail0s,word>>>=numTail0s){}
+  //  return dstOffset;
+  //}
   public static void pullSurvivorsDown(float[] arr,int srcOffset,int dstOffset,int dstBound,long word)
   {
     int numTail0s=Long.numberOfTrailingZeros(word);
@@ -411,13 +556,42 @@ public interface BitSetUtil
   }
   public static void pullSurvivorsDown(float[] arr,int srcOffset,int dstOffset,int dstBound,long[] survivorSet)
   {
-    for(int wordOffset=0;(dstOffset=pullWordDown(arr,srcOffset,dstOffset,survivorSet[wordOffset]))!=dstBound;++wordOffset,srcOffset+=64){}
+    for(int wordOffset=0;;)
+    {
+      long word=survivorSet[wordOffset];
+      for(int s=srcOffset;;)
+      {
+        int numTail0s;
+        if((numTail0s=Long.numberOfTrailingZeros(word))==64)
+        {
+          break;
+        }
+        ArrCopy.uncheckedSelfCopy(arr,dstOffset,s+=numTail0s,numTail0s=Long.numberOfTrailingZeros(~(word>>>=numTail0s)));
+        dstOffset+=numTail0s;
+        if(numTail0s==64)
+        {
+          break;
+        }
+        if(dstOffset>=dstBound)
+        {
+          return;
+        }
+        s+=numTail0s;
+        word>>>=numTail0s;
+      }
+      ++wordOffset;
+      srcOffset+=64;
+    }
   }
-  private static int pullWordDown(double[] arr,int srcOffset,int dstOffset,long word)
-  {
-    for(int numTail0s;(numTail0s=Long.numberOfTrailingZeros(word))!=64;ArrCopy.uncheckedSelfCopy(arr,dstOffset,srcOffset+=numTail0s,numTail0s=Long.numberOfTrailingZeros(~(word>>>=numTail0s))),srcOffset+=numTail0s,dstOffset+=numTail0s,word>>>=numTail0s){}
-    return dstOffset;
-  }
+  //public static void pullSurvivorsDown(float[] arr,int srcOffset,int dstOffset,int dstBound,long[] survivorSet)
+  //{
+  //  for(int wordOffset=0;(dstOffset=pullWordDown(arr,srcOffset,dstOffset,survivorSet[wordOffset]))!=dstBound;++wordOffset,srcOffset+=64){}
+  //}
+  //private static int pullWordDown(double[] arr,int srcOffset,int dstOffset,long word)
+  //{
+  //  for(int numTail0s;(numTail0s=Long.numberOfTrailingZeros(word))!=64;ArrCopy.uncheckedSelfCopy(arr,dstOffset,srcOffset+=numTail0s,numTail0s=Long.numberOfTrailingZeros(~(word>>>=numTail0s))),srcOffset+=numTail0s,dstOffset+=numTail0s,word>>>=numTail0s){}
+  //  return dstOffset;
+  //}
   public static void pullSurvivorsDown(double[] arr,int srcOffset,int dstOffset,int dstBound,long word)
   {
     int numTail0s=Long.numberOfTrailingZeros(word);
@@ -429,13 +603,42 @@ public interface BitSetUtil
   }
   public static void pullSurvivorsDown(double[] arr,int srcOffset,int dstOffset,int dstBound,long[] survivorSet)
   {
-    for(int wordOffset=0;(dstOffset=pullWordDown(arr,srcOffset,dstOffset,survivorSet[wordOffset]))!=dstBound;++wordOffset,srcOffset+=64){}
+    for(int wordOffset=0;;)
+    {
+      long word=survivorSet[wordOffset];
+      for(int s=srcOffset;;)
+      {
+        int numTail0s;
+        if((numTail0s=Long.numberOfTrailingZeros(word))==64)
+        {
+          break;
+        }
+        ArrCopy.uncheckedSelfCopy(arr,dstOffset,s+=numTail0s,numTail0s=Long.numberOfTrailingZeros(~(word>>>=numTail0s)));
+        dstOffset+=numTail0s;
+        if(numTail0s==64)
+        {
+          break;
+        }
+        if(dstOffset>=dstBound)
+        {
+          return;
+        }
+        s+=numTail0s;
+        word>>>=numTail0s;
+      }
+      ++wordOffset;
+      srcOffset+=64;
+    }
   }
-  private static int pullWordDown(Object[] arr,int srcOffset,int dstOffset,long word)
-  {
-    for(int numTail0s;(numTail0s=Long.numberOfTrailingZeros(word))!=64;ArrCopy.uncheckedSelfCopy(arr,dstOffset,srcOffset+=numTail0s,numTail0s=Long.numberOfTrailingZeros(~(word>>>=numTail0s))),srcOffset+=numTail0s,dstOffset+=numTail0s,word>>>=numTail0s){}
-    return dstOffset;
-  }
+  //public static void pullSurvivorsDown(double[] arr,int srcOffset,int dstOffset,int dstBound,long[] survivorSet)
+  //{
+  //  for(int wordOffset=0;(dstOffset=pullWordDown(arr,srcOffset,dstOffset,survivorSet[wordOffset]))!=dstBound;++wordOffset,srcOffset+=64){}
+  //}
+  //private static int pullWordDown(Object[] arr,int srcOffset,int dstOffset,long word)
+  //{
+  //  for(int numTail0s;(numTail0s=Long.numberOfTrailingZeros(word))!=64;ArrCopy.uncheckedSelfCopy(arr,dstOffset,srcOffset+=numTail0s,numTail0s=Long.numberOfTrailingZeros(~(word>>>=numTail0s))),srcOffset+=numTail0s,dstOffset+=numTail0s,word>>>=numTail0s){}
+  //  return dstOffset;
+  //}
   public static void pullSurvivorsDown(Object[] arr,int srcOffset,int dstOffset,int dstBound,long word)
   {
     int numTail0s=Long.numberOfTrailingZeros(word);
@@ -447,6 +650,35 @@ public interface BitSetUtil
   }
   public static void pullSurvivorsDown(Object[] arr,int srcOffset,int dstOffset,int dstBound,long[] survivorSet)
   {
-    for(int wordOffset=0;(dstOffset=pullWordDown(arr,srcOffset,dstOffset,survivorSet[wordOffset]))!=dstBound;++wordOffset,srcOffset+=64){}
+    for(int wordOffset=0;;)
+    {
+      long word=survivorSet[wordOffset];
+      for(int s=srcOffset;;)
+      {
+        int numTail0s;
+        if((numTail0s=Long.numberOfTrailingZeros(word))==64)
+        {
+          break;
+        }
+        ArrCopy.uncheckedSelfCopy(arr,dstOffset,s+=numTail0s,numTail0s=Long.numberOfTrailingZeros(~(word>>>=numTail0s)));
+        dstOffset+=numTail0s;
+        if(numTail0s==64)
+        {
+          break;
+        }
+        if(dstOffset>=dstBound)
+        {
+          return;
+        }
+        s+=numTail0s;
+        word>>>=numTail0s;
+      }
+      ++wordOffset;
+      srcOffset+=64;
+    }
   }
+  //public static void pullSurvivorsDown(Object[] arr,int srcOffset,int dstOffset,int dstBound,long[] survivorSet)
+  //{
+  //  for(int wordOffset=0;(dstOffset=pullWordDown(arr,srcOffset,dstOffset,survivorSet[wordOffset]))!=dstBound;++wordOffset,srcOffset+=64){}
+  //}
 }

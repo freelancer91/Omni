@@ -192,7 +192,7 @@ public class FloatArrSeqQueryTest
   @Test
   public void testUncheckedListremoveValBoolean()
   {
-    QueryTestUtil.testremoveValBoolean(()->
+    QueryTestUtil.testremoveValBooleanReturnPositive(()->
     {
       var seq=new UncheckedList();
       seq.add((float)3);
@@ -200,14 +200,28 @@ public class FloatArrSeqQueryTest
       return seq;
     },true
     );
-    QueryTestUtil.testremoveValBoolean(()->
+    QueryTestUtil.testremoveValBooleanReturnPositive(()->
     {
       var seq=new UncheckedList();
       seq.add((float)3);
       seq.add(false);
       return seq;
     },false
-    );  
+    );
+    QueryTestUtil.testremoveValBooleanReturnNegative(()->
+    {
+      var seq=new UncheckedList();
+      seq.add((float)3);
+      seq.add(false);
+      return seq;
+    },false);
+    QueryTestUtil.testremoveValBooleanReturnNegative(()->
+    {
+      var seq=new UncheckedList();
+      seq.add((float)3);
+      seq.add(true);
+      return seq;
+    },true);
   }
   @Test
   public void testUncheckedListremoveValNull()
@@ -411,7 +425,7 @@ public class FloatArrSeqQueryTest
   @Test
   public void testUncheckedStackremoveValBoolean()
   {
-    QueryTestUtil.testremoveValBoolean(()->
+    QueryTestUtil.testremoveValBooleanReturnPositive(()->
     {
       var seq=new UncheckedStack();
       seq.add((float)3);
@@ -419,14 +433,28 @@ public class FloatArrSeqQueryTest
       return seq;
     },true
     );
-    QueryTestUtil.testremoveValBoolean(()->
+    QueryTestUtil.testremoveValBooleanReturnPositive(()->
     {
       var seq=new UncheckedStack();
       seq.add((float)3);
       seq.add(false);
       return seq;
     },false
-    );  
+    );
+    QueryTestUtil.testremoveValBooleanReturnNegative(()->
+    {
+      var seq=new UncheckedStack();
+      seq.add((float)3);
+      seq.add(false);
+      return seq;
+    },false);
+    QueryTestUtil.testremoveValBooleanReturnNegative(()->
+    {
+      var seq=new UncheckedStack();
+      seq.add((float)3);
+      seq.add(true);
+      return seq;
+    },true);
   }
   @Test
   public void testUncheckedStackremoveValNull()
@@ -630,7 +658,7 @@ public class FloatArrSeqQueryTest
   @Test
   public void testCheckedListremoveValBoolean()
   {
-    QueryTestUtil.testremoveValBoolean(()->
+    QueryTestUtil.testremoveValBooleanReturnPositive(()->
     {
       var seq=new CheckedList();
       seq.add((float)3);
@@ -638,14 +666,28 @@ public class FloatArrSeqQueryTest
       return seq;
     },true
     );
-    QueryTestUtil.testremoveValBoolean(()->
+    QueryTestUtil.testremoveValBooleanReturnPositive(()->
     {
       var seq=new CheckedList();
       seq.add((float)3);
       seq.add(false);
       return seq;
     },false
-    );  
+    );
+    QueryTestUtil.testremoveValBooleanReturnNegative(()->
+    {
+      var seq=new CheckedList();
+      seq.add((float)3);
+      seq.add(false);
+      return seq;
+    },false);
+    QueryTestUtil.testremoveValBooleanReturnNegative(()->
+    {
+      var seq=new CheckedList();
+      seq.add((float)3);
+      seq.add(true);
+      return seq;
+    },true);
   }
   @Test
   public void testCheckedListremoveValNull()
@@ -849,7 +891,7 @@ public class FloatArrSeqQueryTest
   @Test
   public void testCheckedStackremoveValBoolean()
   {
-    QueryTestUtil.testremoveValBoolean(()->
+    QueryTestUtil.testremoveValBooleanReturnPositive(()->
     {
       var seq=new CheckedStack();
       seq.add((float)3);
@@ -857,14 +899,28 @@ public class FloatArrSeqQueryTest
       return seq;
     },true
     );
-    QueryTestUtil.testremoveValBoolean(()->
+    QueryTestUtil.testremoveValBooleanReturnPositive(()->
     {
       var seq=new CheckedStack();
       seq.add((float)3);
       seq.add(false);
       return seq;
     },false
-    );  
+    );
+    QueryTestUtil.testremoveValBooleanReturnNegative(()->
+    {
+      var seq=new CheckedStack();
+      seq.add((float)3);
+      seq.add(false);
+      return seq;
+    },false);
+    QueryTestUtil.testremoveValBooleanReturnNegative(()->
+    {
+      var seq=new CheckedStack();
+      seq.add((float)3);
+      seq.add(true);
+      return seq;
+    },true);
   }
   @Test
   public void testCheckedStackremoveValNull()
@@ -1106,7 +1162,7 @@ public class FloatArrSeqQueryTest
   @Test
   public void testCheckedSubListremoveValBoolean()
   {
-    QueryTestUtil.testremoveValBoolean(()->
+    QueryTestUtil.testremoveValBooleanReturnPositive(()->
     {
       var root=new CheckedList();
       var subList=root.subList(0,0);
@@ -1116,7 +1172,7 @@ public class FloatArrSeqQueryTest
       return seq;
     },true
     );
-    QueryTestUtil.testremoveValBoolean(()->
+    QueryTestUtil.testremoveValBooleanReturnPositive(()->
     {
       var root=new CheckedList();
       var subList=root.subList(0,0);
@@ -1125,7 +1181,25 @@ public class FloatArrSeqQueryTest
       seq.add(false);
       return seq;
     },false
-    );  
+    );
+    QueryTestUtil.testremoveValBooleanReturnNegative(()->
+    {
+      var root=new CheckedList();
+      var subList=root.subList(0,0);
+      var seq=subList.subList(0,0);
+      seq.add((float)3);
+      seq.add(false);
+      return seq;
+    },false);
+    QueryTestUtil.testremoveValBooleanReturnNegative(()->
+    {
+      var root=new CheckedList();
+      var subList=root.subList(0,0);
+      var seq=subList.subList(0,0);
+      seq.add((float)3);
+      seq.add(true);
+      return seq;
+    },true);
   }
   @Test
   public void testCheckedSubListremoveValNull()
@@ -1371,7 +1445,7 @@ public class FloatArrSeqQueryTest
   @Test
   public void testUncheckedSubListremoveValBoolean()
   {
-    QueryTestUtil.testremoveValBoolean(()->
+    QueryTestUtil.testremoveValBooleanReturnPositive(()->
     {
       var root=new UncheckedList();
       var subList=root.subList(0,0);
@@ -1381,7 +1455,7 @@ public class FloatArrSeqQueryTest
       return seq;
     },true
     );
-    QueryTestUtil.testremoveValBoolean(()->
+    QueryTestUtil.testremoveValBooleanReturnPositive(()->
     {
       var root=new UncheckedList();
       var subList=root.subList(0,0);
@@ -1390,7 +1464,25 @@ public class FloatArrSeqQueryTest
       seq.add(false);
       return seq;
     },false
-    );  
+    );
+    QueryTestUtil.testremoveValBooleanReturnNegative(()->
+    {
+      var root=new UncheckedList();
+      var subList=root.subList(0,0);
+      var seq=subList.subList(0,0);
+      seq.add((float)3);
+      seq.add(false);
+      return seq;
+    },false);
+    QueryTestUtil.testremoveValBooleanReturnNegative(()->
+    {
+      var root=new UncheckedList();
+      var subList=root.subList(0,0);
+      var seq=subList.subList(0,0);
+      seq.add((float)3);
+      seq.add(true);
+      return seq;
+    },true);
   }
   @Test
   public void testUncheckedSubListremoveValNull()
@@ -1598,7 +1690,7 @@ public class FloatArrSeqQueryTest
   @Test
   public void testUncheckedListcontainsBoolean()
   {
-    QueryTestUtil.testcontainsBoolean(()->
+    QueryTestUtil.testcontainsBooleanReturnPositive(()->
     {
       var seq=new UncheckedList();
       seq.add((float)3);
@@ -1606,14 +1698,28 @@ public class FloatArrSeqQueryTest
       return seq;
     },true
     );
-    QueryTestUtil.testcontainsBoolean(()->
+    QueryTestUtil.testcontainsBooleanReturnPositive(()->
     {
       var seq=new UncheckedList();
       seq.add((float)3);
       seq.add(false);
       return seq;
     },false
-    );  
+    );
+    QueryTestUtil.testcontainsBooleanReturnNegative(()->
+    {
+      var seq=new UncheckedList();
+      seq.add((float)3);
+      seq.add(false);
+      return seq;
+    },false);
+    QueryTestUtil.testcontainsBooleanReturnNegative(()->
+    {
+      var seq=new UncheckedList();
+      seq.add((float)3);
+      seq.add(true);
+      return seq;
+    },true);
   }
   @Test
   public void testUncheckedListcontainsNull()
@@ -1817,7 +1923,7 @@ public class FloatArrSeqQueryTest
   @Test
   public void testUncheckedStackcontainsBoolean()
   {
-    QueryTestUtil.testcontainsBoolean(()->
+    QueryTestUtil.testcontainsBooleanReturnPositive(()->
     {
       var seq=new UncheckedStack();
       seq.add((float)3);
@@ -1825,14 +1931,28 @@ public class FloatArrSeqQueryTest
       return seq;
     },true
     );
-    QueryTestUtil.testcontainsBoolean(()->
+    QueryTestUtil.testcontainsBooleanReturnPositive(()->
     {
       var seq=new UncheckedStack();
       seq.add((float)3);
       seq.add(false);
       return seq;
     },false
-    );  
+    );
+    QueryTestUtil.testcontainsBooleanReturnNegative(()->
+    {
+      var seq=new UncheckedStack();
+      seq.add((float)3);
+      seq.add(false);
+      return seq;
+    },false);
+    QueryTestUtil.testcontainsBooleanReturnNegative(()->
+    {
+      var seq=new UncheckedStack();
+      seq.add((float)3);
+      seq.add(true);
+      return seq;
+    },true);
   }
   @Test
   public void testUncheckedStackcontainsNull()
@@ -2036,7 +2156,7 @@ public class FloatArrSeqQueryTest
   @Test
   public void testCheckedListcontainsBoolean()
   {
-    QueryTestUtil.testcontainsBoolean(()->
+    QueryTestUtil.testcontainsBooleanReturnPositive(()->
     {
       var seq=new CheckedList();
       seq.add((float)3);
@@ -2044,14 +2164,28 @@ public class FloatArrSeqQueryTest
       return seq;
     },true
     );
-    QueryTestUtil.testcontainsBoolean(()->
+    QueryTestUtil.testcontainsBooleanReturnPositive(()->
     {
       var seq=new CheckedList();
       seq.add((float)3);
       seq.add(false);
       return seq;
     },false
-    );  
+    );
+    QueryTestUtil.testcontainsBooleanReturnNegative(()->
+    {
+      var seq=new CheckedList();
+      seq.add((float)3);
+      seq.add(false);
+      return seq;
+    },false);
+    QueryTestUtil.testcontainsBooleanReturnNegative(()->
+    {
+      var seq=new CheckedList();
+      seq.add((float)3);
+      seq.add(true);
+      return seq;
+    },true);
   }
   @Test
   public void testCheckedListcontainsNull()
@@ -2255,7 +2389,7 @@ public class FloatArrSeqQueryTest
   @Test
   public void testCheckedStackcontainsBoolean()
   {
-    QueryTestUtil.testcontainsBoolean(()->
+    QueryTestUtil.testcontainsBooleanReturnPositive(()->
     {
       var seq=new CheckedStack();
       seq.add((float)3);
@@ -2263,14 +2397,28 @@ public class FloatArrSeqQueryTest
       return seq;
     },true
     );
-    QueryTestUtil.testcontainsBoolean(()->
+    QueryTestUtil.testcontainsBooleanReturnPositive(()->
     {
       var seq=new CheckedStack();
       seq.add((float)3);
       seq.add(false);
       return seq;
     },false
-    );  
+    );
+    QueryTestUtil.testcontainsBooleanReturnNegative(()->
+    {
+      var seq=new CheckedStack();
+      seq.add((float)3);
+      seq.add(false);
+      return seq;
+    },false);
+    QueryTestUtil.testcontainsBooleanReturnNegative(()->
+    {
+      var seq=new CheckedStack();
+      seq.add((float)3);
+      seq.add(true);
+      return seq;
+    },true);
   }
   @Test
   public void testCheckedStackcontainsNull()
@@ -2512,7 +2660,7 @@ public class FloatArrSeqQueryTest
   @Test
   public void testCheckedSubListcontainsBoolean()
   {
-    QueryTestUtil.testcontainsBoolean(()->
+    QueryTestUtil.testcontainsBooleanReturnPositive(()->
     {
       var root=new CheckedList();
       var subList=root.subList(0,0);
@@ -2522,7 +2670,7 @@ public class FloatArrSeqQueryTest
       return seq;
     },true
     );
-    QueryTestUtil.testcontainsBoolean(()->
+    QueryTestUtil.testcontainsBooleanReturnPositive(()->
     {
       var root=new CheckedList();
       var subList=root.subList(0,0);
@@ -2531,7 +2679,25 @@ public class FloatArrSeqQueryTest
       seq.add(false);
       return seq;
     },false
-    );  
+    );
+    QueryTestUtil.testcontainsBooleanReturnNegative(()->
+    {
+      var root=new CheckedList();
+      var subList=root.subList(0,0);
+      var seq=subList.subList(0,0);
+      seq.add((float)3);
+      seq.add(false);
+      return seq;
+    },false);
+    QueryTestUtil.testcontainsBooleanReturnNegative(()->
+    {
+      var root=new CheckedList();
+      var subList=root.subList(0,0);
+      var seq=subList.subList(0,0);
+      seq.add((float)3);
+      seq.add(true);
+      return seq;
+    },true);
   }
   @Test
   public void testCheckedSubListcontainsNull()
@@ -2777,7 +2943,7 @@ public class FloatArrSeqQueryTest
   @Test
   public void testUncheckedSubListcontainsBoolean()
   {
-    QueryTestUtil.testcontainsBoolean(()->
+    QueryTestUtil.testcontainsBooleanReturnPositive(()->
     {
       var root=new UncheckedList();
       var subList=root.subList(0,0);
@@ -2787,7 +2953,7 @@ public class FloatArrSeqQueryTest
       return seq;
     },true
     );
-    QueryTestUtil.testcontainsBoolean(()->
+    QueryTestUtil.testcontainsBooleanReturnPositive(()->
     {
       var root=new UncheckedList();
       var subList=root.subList(0,0);
@@ -2796,7 +2962,25 @@ public class FloatArrSeqQueryTest
       seq.add(false);
       return seq;
     },false
-    );  
+    );
+    QueryTestUtil.testcontainsBooleanReturnNegative(()->
+    {
+      var root=new UncheckedList();
+      var subList=root.subList(0,0);
+      var seq=subList.subList(0,0);
+      seq.add((float)3);
+      seq.add(false);
+      return seq;
+    },false);
+    QueryTestUtil.testcontainsBooleanReturnNegative(()->
+    {
+      var root=new UncheckedList();
+      var subList=root.subList(0,0);
+      var seq=subList.subList(0,0);
+      seq.add((float)3);
+      seq.add(true);
+      return seq;
+    },true);
   }
   @Test
   public void testUncheckedSubListcontainsNull()
@@ -3023,7 +3207,7 @@ public class FloatArrSeqQueryTest
   @Test
   public void testUncheckedListindexOfBoolean()
   {
-    QueryTestUtil.testindexOfBoolean(()->
+    QueryTestUtil.testindexOfBooleanReturnPositive(()->
     {
       var seq=new UncheckedList();
       seq.add((float)3);
@@ -3032,7 +3216,7 @@ public class FloatArrSeqQueryTest
     },true
     ,1
     );
-    QueryTestUtil.testindexOfBoolean(()->
+    QueryTestUtil.testindexOfBooleanReturnPositive(()->
     {
       var seq=new UncheckedList();
       seq.add((float)3);
@@ -3040,7 +3224,21 @@ public class FloatArrSeqQueryTest
       return seq;
     },false
     ,1
-    );  
+    );
+    QueryTestUtil.testindexOfBooleanReturnNegative(()->
+    {
+      var seq=new UncheckedList();
+      seq.add((float)3);
+      seq.add(false);
+      return seq;
+    },false);
+    QueryTestUtil.testindexOfBooleanReturnNegative(()->
+    {
+      var seq=new UncheckedList();
+      seq.add((float)3);
+      seq.add(true);
+      return seq;
+    },true);
   }
   @Test
   public void testUncheckedListindexOfNull()
@@ -3263,7 +3461,7 @@ public class FloatArrSeqQueryTest
   @Test
   public void testCheckedListindexOfBoolean()
   {
-    QueryTestUtil.testindexOfBoolean(()->
+    QueryTestUtil.testindexOfBooleanReturnPositive(()->
     {
       var seq=new CheckedList();
       seq.add((float)3);
@@ -3272,7 +3470,7 @@ public class FloatArrSeqQueryTest
     },true
     ,1
     );
-    QueryTestUtil.testindexOfBoolean(()->
+    QueryTestUtil.testindexOfBooleanReturnPositive(()->
     {
       var seq=new CheckedList();
       seq.add((float)3);
@@ -3280,7 +3478,21 @@ public class FloatArrSeqQueryTest
       return seq;
     },false
     ,1
-    );  
+    );
+    QueryTestUtil.testindexOfBooleanReturnNegative(()->
+    {
+      var seq=new CheckedList();
+      seq.add((float)3);
+      seq.add(false);
+      return seq;
+    },false);
+    QueryTestUtil.testindexOfBooleanReturnNegative(()->
+    {
+      var seq=new CheckedList();
+      seq.add((float)3);
+      seq.add(true);
+      return seq;
+    },true);
   }
   @Test
   public void testCheckedListindexOfNull()
@@ -3541,7 +3753,7 @@ public class FloatArrSeqQueryTest
   @Test
   public void testCheckedSubListindexOfBoolean()
   {
-    QueryTestUtil.testindexOfBoolean(()->
+    QueryTestUtil.testindexOfBooleanReturnPositive(()->
     {
       var root=new CheckedList();
       var subList=root.subList(0,0);
@@ -3552,7 +3764,7 @@ public class FloatArrSeqQueryTest
     },true
     ,1
     );
-    QueryTestUtil.testindexOfBoolean(()->
+    QueryTestUtil.testindexOfBooleanReturnPositive(()->
     {
       var root=new CheckedList();
       var subList=root.subList(0,0);
@@ -3562,7 +3774,25 @@ public class FloatArrSeqQueryTest
       return seq;
     },false
     ,1
-    );  
+    );
+    QueryTestUtil.testindexOfBooleanReturnNegative(()->
+    {
+      var root=new CheckedList();
+      var subList=root.subList(0,0);
+      var seq=subList.subList(0,0);
+      seq.add((float)3);
+      seq.add(false);
+      return seq;
+    },false);
+    QueryTestUtil.testindexOfBooleanReturnNegative(()->
+    {
+      var root=new CheckedList();
+      var subList=root.subList(0,0);
+      var seq=subList.subList(0,0);
+      seq.add((float)3);
+      seq.add(true);
+      return seq;
+    },true);
   }
   @Test
   public void testCheckedSubListindexOfNull()
@@ -3827,7 +4057,7 @@ public class FloatArrSeqQueryTest
   @Test
   public void testUncheckedSubListindexOfBoolean()
   {
-    QueryTestUtil.testindexOfBoolean(()->
+    QueryTestUtil.testindexOfBooleanReturnPositive(()->
     {
       var root=new UncheckedList();
       var subList=root.subList(0,0);
@@ -3838,7 +4068,7 @@ public class FloatArrSeqQueryTest
     },true
     ,1
     );
-    QueryTestUtil.testindexOfBoolean(()->
+    QueryTestUtil.testindexOfBooleanReturnPositive(()->
     {
       var root=new UncheckedList();
       var subList=root.subList(0,0);
@@ -3848,7 +4078,25 @@ public class FloatArrSeqQueryTest
       return seq;
     },false
     ,1
-    );  
+    );
+    QueryTestUtil.testindexOfBooleanReturnNegative(()->
+    {
+      var root=new UncheckedList();
+      var subList=root.subList(0,0);
+      var seq=subList.subList(0,0);
+      seq.add((float)3);
+      seq.add(false);
+      return seq;
+    },false);
+    QueryTestUtil.testindexOfBooleanReturnNegative(()->
+    {
+      var root=new UncheckedList();
+      var subList=root.subList(0,0);
+      var seq=subList.subList(0,0);
+      seq.add((float)3);
+      seq.add(true);
+      return seq;
+    },true);
   }
   @Test
   public void testUncheckedSubListindexOfNull()
@@ -4075,7 +4323,7 @@ public class FloatArrSeqQueryTest
   @Test
   public void testUncheckedListlastIndexOfBoolean()
   {
-    QueryTestUtil.testlastIndexOfBoolean(()->
+    QueryTestUtil.testlastIndexOfBooleanReturnPositive(()->
     {
       var seq=new UncheckedList();
       seq.add(true);
@@ -4084,7 +4332,7 @@ public class FloatArrSeqQueryTest
     },true
     ,0
     );
-    QueryTestUtil.testlastIndexOfBoolean(()->
+    QueryTestUtil.testlastIndexOfBooleanReturnPositive(()->
     {
       var seq=new UncheckedList();
       seq.add(false);
@@ -4092,7 +4340,21 @@ public class FloatArrSeqQueryTest
       return seq;
     },false
     ,0
-    );  
+    );
+    QueryTestUtil.testlastIndexOfBooleanReturnNegative(()->
+    {
+      var seq=new UncheckedList();
+      seq.add(false);
+      seq.add((float)3);
+      return seq;
+    },false);
+    QueryTestUtil.testlastIndexOfBooleanReturnNegative(()->
+    {
+      var seq=new UncheckedList();
+      seq.add(true);
+      seq.add((float)3);
+      return seq;
+    },true);
   }
   @Test
   public void testUncheckedListlastIndexOfNull()
@@ -4315,7 +4577,7 @@ public class FloatArrSeqQueryTest
   @Test
   public void testCheckedListlastIndexOfBoolean()
   {
-    QueryTestUtil.testlastIndexOfBoolean(()->
+    QueryTestUtil.testlastIndexOfBooleanReturnPositive(()->
     {
       var seq=new CheckedList();
       seq.add(true);
@@ -4324,7 +4586,7 @@ public class FloatArrSeqQueryTest
     },true
     ,0
     );
-    QueryTestUtil.testlastIndexOfBoolean(()->
+    QueryTestUtil.testlastIndexOfBooleanReturnPositive(()->
     {
       var seq=new CheckedList();
       seq.add(false);
@@ -4332,7 +4594,21 @@ public class FloatArrSeqQueryTest
       return seq;
     },false
     ,0
-    );  
+    );
+    QueryTestUtil.testlastIndexOfBooleanReturnNegative(()->
+    {
+      var seq=new CheckedList();
+      seq.add(false);
+      seq.add((float)3);
+      return seq;
+    },false);
+    QueryTestUtil.testlastIndexOfBooleanReturnNegative(()->
+    {
+      var seq=new CheckedList();
+      seq.add(true);
+      seq.add((float)3);
+      return seq;
+    },true);
   }
   @Test
   public void testCheckedListlastIndexOfNull()
@@ -4593,7 +4869,7 @@ public class FloatArrSeqQueryTest
   @Test
   public void testCheckedSubListlastIndexOfBoolean()
   {
-    QueryTestUtil.testlastIndexOfBoolean(()->
+    QueryTestUtil.testlastIndexOfBooleanReturnPositive(()->
     {
       var root=new CheckedList();
       var subList=root.subList(0,0);
@@ -4604,7 +4880,7 @@ public class FloatArrSeqQueryTest
     },true
     ,0
     );
-    QueryTestUtil.testlastIndexOfBoolean(()->
+    QueryTestUtil.testlastIndexOfBooleanReturnPositive(()->
     {
       var root=new CheckedList();
       var subList=root.subList(0,0);
@@ -4614,7 +4890,25 @@ public class FloatArrSeqQueryTest
       return seq;
     },false
     ,0
-    );  
+    );
+    QueryTestUtil.testlastIndexOfBooleanReturnNegative(()->
+    {
+      var root=new CheckedList();
+      var subList=root.subList(0,0);
+      var seq=subList.subList(0,0);
+      seq.add(false);
+      seq.add((float)3);
+      return seq;
+    },false);
+    QueryTestUtil.testlastIndexOfBooleanReturnNegative(()->
+    {
+      var root=new CheckedList();
+      var subList=root.subList(0,0);
+      var seq=subList.subList(0,0);
+      seq.add(true);
+      seq.add((float)3);
+      return seq;
+    },true);
   }
   @Test
   public void testCheckedSubListlastIndexOfNull()
@@ -4879,7 +5173,7 @@ public class FloatArrSeqQueryTest
   @Test
   public void testUncheckedSubListlastIndexOfBoolean()
   {
-    QueryTestUtil.testlastIndexOfBoolean(()->
+    QueryTestUtil.testlastIndexOfBooleanReturnPositive(()->
     {
       var root=new UncheckedList();
       var subList=root.subList(0,0);
@@ -4890,7 +5184,7 @@ public class FloatArrSeqQueryTest
     },true
     ,0
     );
-    QueryTestUtil.testlastIndexOfBoolean(()->
+    QueryTestUtil.testlastIndexOfBooleanReturnPositive(()->
     {
       var root=new UncheckedList();
       var subList=root.subList(0,0);
@@ -4900,7 +5194,25 @@ public class FloatArrSeqQueryTest
       return seq;
     },false
     ,0
-    );  
+    );
+    QueryTestUtil.testlastIndexOfBooleanReturnNegative(()->
+    {
+      var root=new UncheckedList();
+      var subList=root.subList(0,0);
+      var seq=subList.subList(0,0);
+      seq.add(false);
+      seq.add((float)3);
+      return seq;
+    },false);
+    QueryTestUtil.testlastIndexOfBooleanReturnNegative(()->
+    {
+      var root=new UncheckedList();
+      var subList=root.subList(0,0);
+      var seq=subList.subList(0,0);
+      seq.add(true);
+      seq.add((float)3);
+      return seq;
+    },true);
   }
   @Test
   public void testUncheckedSubListlastIndexOfNull()
@@ -5127,7 +5439,7 @@ public class FloatArrSeqQueryTest
   @Test
   public void testUncheckedStacksearchBoolean()
   {
-    QueryTestUtil.testsearchBoolean(()->
+    QueryTestUtil.testsearchBooleanReturnPositive(()->
     {
       var seq=new UncheckedStack();
       seq.add(true);
@@ -5136,7 +5448,7 @@ public class FloatArrSeqQueryTest
     },true
     ,2
     );
-    QueryTestUtil.testsearchBoolean(()->
+    QueryTestUtil.testsearchBooleanReturnPositive(()->
     {
       var seq=new UncheckedStack();
       seq.add(false);
@@ -5144,7 +5456,21 @@ public class FloatArrSeqQueryTest
       return seq;
     },false
     ,2
-    );  
+    );
+    QueryTestUtil.testsearchBooleanReturnNegative(()->
+    {
+      var seq=new UncheckedStack();
+      seq.add(false);
+      seq.add((float)3);
+      return seq;
+    },false);
+    QueryTestUtil.testsearchBooleanReturnNegative(()->
+    {
+      var seq=new UncheckedStack();
+      seq.add(true);
+      seq.add((float)3);
+      return seq;
+    },true);
   }
   @Test
   public void testUncheckedStacksearchNull()
@@ -5367,7 +5693,7 @@ public class FloatArrSeqQueryTest
   @Test
   public void testCheckedStacksearchBoolean()
   {
-    QueryTestUtil.testsearchBoolean(()->
+    QueryTestUtil.testsearchBooleanReturnPositive(()->
     {
       var seq=new CheckedStack();
       seq.add(true);
@@ -5376,7 +5702,7 @@ public class FloatArrSeqQueryTest
     },true
     ,2
     );
-    QueryTestUtil.testsearchBoolean(()->
+    QueryTestUtil.testsearchBooleanReturnPositive(()->
     {
       var seq=new CheckedStack();
       seq.add(false);
@@ -5384,7 +5710,21 @@ public class FloatArrSeqQueryTest
       return seq;
     },false
     ,2
-    );  
+    );
+    QueryTestUtil.testsearchBooleanReturnNegative(()->
+    {
+      var seq=new CheckedStack();
+      seq.add(false);
+      seq.add((float)3);
+      return seq;
+    },false);
+    QueryTestUtil.testsearchBooleanReturnNegative(()->
+    {
+      var seq=new CheckedStack();
+      seq.add(true);
+      seq.add((float)3);
+      return seq;
+    },true);
   }
   @Test
   public void testCheckedStacksearchNull()

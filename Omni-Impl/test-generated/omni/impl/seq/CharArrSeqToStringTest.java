@@ -6,8 +6,6 @@ import java.util.ConcurrentModificationException;
 @SuppressWarnings({"rawtypes","unchecked"}) 
 public class CharArrSeqToStringTest
 {
-  private static final char MIN_LENGTH_STRING_VAL=0;
-  private static final int MIN_TOSTRING_LENGTH=String.valueOf(MIN_LENGTH_STRING_VAL).length();
   private static void testArrSeqToString(int length)
   {
     final var arr=new char[length];
@@ -67,45 +65,5 @@ public class CharArrSeqToStringTest
     }
     Assertions.assertEquals(expected,new CharArrSeq.CheckedStack().toString());
     Assertions.assertEquals(expected,new CharArrSeq.UncheckedStack().toString());
-  }
-  //@Test
-  public void testOOMArrSeqToString()
-  {
-    int length=Integer.MAX_VALUE/(MIN_TOSTRING_LENGTH+2)-1;
-    final char[] arr=new char[length+1];
-    {
-      var root=new CharArrSeq.CheckedList(length,arr);
-      Assertions.assertDoesNotThrow(()->root.toString());
-      ++root.size;
-      Assertions.assertThrows(OutOfMemoryError.class,()->root.toString());
-      --root.size;
-      var subList=root.subList(0,root.size);
-      Assertions.assertDoesNotThrow(()->subList.toString());
-      subList.add(MIN_LENGTH_STRING_VAL);
-      Assertions.assertThrows(OutOfMemoryError.class,()->subList.toString());
-    }
-    {
-      var root=new CharArrSeq.UncheckedList(length,arr);
-      Assertions.assertDoesNotThrow(()->root.toString());
-      ++root.size;
-      Assertions.assertThrows(OutOfMemoryError.class,()->root.toString());
-      --root.size;
-      var subList=root.subList(0,root.size);
-      Assertions.assertDoesNotThrow(()->subList.toString());
-      subList.add(MIN_LENGTH_STRING_VAL);
-      Assertions.assertThrows(OutOfMemoryError.class,()->subList.toString());
-    }
-    {
-      var root=new CharArrSeq.CheckedStack(length,arr);
-      Assertions.assertDoesNotThrow(()->root.toString());
-      ++root.size;
-      Assertions.assertThrows(OutOfMemoryError.class,()->root.toString());
-    }
-    {
-      var root=new CharArrSeq.UncheckedStack(length,arr);
-      Assertions.assertDoesNotThrow(()->root.toString());
-      ++root.size;
-      Assertions.assertThrows(OutOfMemoryError.class,()->root.toString());
-    }
   }
 }

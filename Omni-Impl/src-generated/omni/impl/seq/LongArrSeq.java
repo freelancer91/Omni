@@ -343,6 +343,7 @@ public abstract class LongArrSeq implements OmniCollection.OfLong
     }
     this.size=1;
   }
+/*
   private void uncheckedInsert(int index,int size,long val)
   {
     final int tailDist;
@@ -368,6 +369,7 @@ public abstract class LongArrSeq implements OmniCollection.OfLong
       this.size=size+1;
     }
   }
+*/  
   public void push(long val)
   {
     final int size;
@@ -1324,7 +1326,7 @@ public abstract class LongArrSeq implements OmniCollection.OfLong
         final int rootSize;
         if((rootSize=(root=this.parent).size)!=0)
         {
-          ((LongArrSeq)root).uncheckedInsert(this.cursor++,rootSize,val);
+          ((UncheckedList)root).uncheckedInsert(this.cursor++,rootSize,val);
         }
         else
         {
@@ -1343,12 +1345,37 @@ public abstract class LongArrSeq implements OmniCollection.OfLong
     {
       return new ListItr(this,index);
     }
+      private void uncheckedInsert(int index,int size,long val)
+      {
+        final int tailDist;
+        if((tailDist=size-index)==0)
+        {
+          super.uncheckedAppend(size,val);
+        }
+        else
+        {
+          long[] arr;
+          if((arr=this.arr).length==size)
+          {
+            final long[] tmp;
+            ArrCopy.semicheckedCopy(arr,0,tmp=new long[OmniArray.growBy50Pct(size)],0,index);
+            ArrCopy.uncheckedCopy(arr,index,tmp,index+1,tailDist);
+            this.arr=arr=tmp;
+          }
+          else
+          {
+            ArrCopy.uncheckedCopy(arr,index,arr,index+1,tailDist);
+          }
+          arr[index]=val;
+          this.size=size+1;
+        }
+      }
     @Override
     public void add(int index,long val)
     {
       final int size;
       if((size=this.size)!=0){
-        ((LongArrSeq)this).uncheckedInsert(index,size,val);
+        ((UncheckedList)this).uncheckedInsert(index,size,val);
       }else{
         ((LongArrSeq)this).uncheckedInit(val);
       }
@@ -2142,7 +2169,7 @@ public abstract class LongArrSeq implements OmniCollection.OfLong
         UncheckedSubList parent;
         if((rootSize=(root=(parent=this.parent).root).size)!=0)
         {
-          ((LongArrSeq)root).uncheckedInsert(this.cursor++,rootSize,val);
+          ((UncheckedList)root).uncheckedInsert(this.cursor++,rootSize,val);
         }
         else
         {
@@ -2171,7 +2198,7 @@ public abstract class LongArrSeq implements OmniCollection.OfLong
       final UncheckedList root;
       final int rootSize;
       if((rootSize=(root=this.root).size)!=0){
-        ((LongArrSeq)root).uncheckedInsert(this.rootOffset+(this.size++),rootSize,val);
+        ((UncheckedList)root).uncheckedInsert(this.rootOffset+(this.size++),rootSize,val);
       }else{
         ((LongArrSeq)root).uncheckedInit(val);
         ++this.size;
@@ -2186,7 +2213,7 @@ public abstract class LongArrSeq implements OmniCollection.OfLong
       final UncheckedList root;
       final int rootSize;
       if((rootSize=(root=this.root).size)!=0){
-        ((LongArrSeq)root).uncheckedInsert(this.rootOffset+index,rootSize,val);
+        ((UncheckedList)root).uncheckedInsert(this.rootOffset+index,rootSize,val);
       }else{
         ((LongArrSeq)root).uncheckedInit(val);
       }
@@ -2988,7 +3015,7 @@ public abstract class LongArrSeq implements OmniCollection.OfLong
         final int rootSize;
         if((rootSize=root.size)!=0)
         {
-          ((LongArrSeq)root).uncheckedInsert(this.cursor++,rootSize,val);
+          ((UncheckedList)root).uncheckedInsert(this.cursor++,rootSize,val);
         }
         else
         {
@@ -3023,7 +3050,7 @@ public abstract class LongArrSeq implements OmniCollection.OfLong
       CheckedCollection.checkWriteHi(index,size=this.size);
       ++this.modCount;
       if(size!=0){
-        ((LongArrSeq)this).uncheckedInsert(index,size,val);
+        ((UncheckedList)this).uncheckedInsert(index,size,val);
       }else{
         ((LongArrSeq)this).uncheckedInit(val);
       }
@@ -3262,7 +3289,7 @@ public abstract class LongArrSeq implements OmniCollection.OfLong
       return new CheckedSubList(this,fromIndex,CheckedCollection.checkSubListRange(fromIndex,toIndex,this.size));
     }
   }
-  private
+  //private
     static class CheckedSubList
       implements LongSubListDefault,Cloneable
   {
@@ -4124,7 +4151,7 @@ public abstract class LongArrSeq implements OmniCollection.OfLong
         final int rootSize;
         if((rootSize=root.size)!=0)
         {
-          ((LongArrSeq)root).uncheckedInsert(this.cursor++,rootSize,val);
+          ((UncheckedList)root).uncheckedInsert(this.cursor++,rootSize,val);
         }
         else
         {
@@ -4157,7 +4184,7 @@ public abstract class LongArrSeq implements OmniCollection.OfLong
       this.modCount=modCount;
       for(var curr=parent;curr!=null;curr.modCount=modCount,++curr.size,curr=curr.parent){}
       if((modCount=root.size)!=0){
-        ((LongArrSeq)root).uncheckedInsert(this.rootOffset+(this.size++),modCount,val);
+        ((UncheckedList)root).uncheckedInsert(this.rootOffset+(this.size++),modCount,val);
       }else{
         ((LongArrSeq)root).uncheckedInit(val);
         ++this.size;
@@ -4178,7 +4205,7 @@ public abstract class LongArrSeq implements OmniCollection.OfLong
       for(var curr=parent;curr!=null;curr.modCount=modCount,++curr.size,curr=curr.parent){}
       this.size=size+1;
       if((modCount=root.size)!=0){
-        ((LongArrSeq)root).uncheckedInsert(this.rootOffset+index,modCount,val);
+        ((UncheckedList)root).uncheckedInsert(this.rootOffset+index,modCount,val);
       }else{
         ((LongArrSeq)root).uncheckedInit(val);
       }

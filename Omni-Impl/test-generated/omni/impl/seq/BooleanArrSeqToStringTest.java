@@ -7,8 +7,6 @@ import omni.util.OmniArray;
 @SuppressWarnings({"rawtypes","unchecked"}) 
 public class BooleanArrSeqToStringTest
 {
-  private static final boolean MIN_LENGTH_STRING_VAL=true;
-  private static final int MIN_TOSTRING_LENGTH=String.valueOf(MIN_LENGTH_STRING_VAL).length();
   private static final int MAX_TOSTRING_LENGTH=5;
   private static void testArrSeqToString(int length)
   {
@@ -70,52 +68,8 @@ public class BooleanArrSeqToStringTest
     Assertions.assertEquals(expected,new BooleanArrSeq.CheckedStack().toString());
     Assertions.assertEquals(expected,new BooleanArrSeq.UncheckedStack().toString());
   }
-  //@Test
-  public void testOOMArrSeqToString()
-  {
-    int length=Integer.MAX_VALUE/(MIN_TOSTRING_LENGTH+2)-1;
-    final boolean[] arr=new boolean[length+1];
-    for(int i=0;i<length;++i)
-    {
-      arr[i]=MIN_LENGTH_STRING_VAL;
-    }
-    {
-      var root=new BooleanArrSeq.CheckedList(length,arr);
-      Assertions.assertDoesNotThrow(()->root.toString());
-      ++root.size;
-      Assertions.assertThrows(OutOfMemoryError.class,()->root.toString());
-      --root.size;
-      var subList=root.subList(0,root.size);
-      Assertions.assertDoesNotThrow(()->subList.toString());
-      subList.add(MIN_LENGTH_STRING_VAL);
-      Assertions.assertThrows(OutOfMemoryError.class,()->subList.toString());
-    }
-    {
-      var root=new BooleanArrSeq.UncheckedList(length,arr);
-      Assertions.assertDoesNotThrow(()->root.toString());
-      ++root.size;
-      Assertions.assertThrows(OutOfMemoryError.class,()->root.toString());
-      --root.size;
-      var subList=root.subList(0,root.size);
-      Assertions.assertDoesNotThrow(()->subList.toString());
-      subList.add(MIN_LENGTH_STRING_VAL);
-      Assertions.assertThrows(OutOfMemoryError.class,()->subList.toString());
-    }
-    {
-      var root=new BooleanArrSeq.CheckedStack(length,arr);
-      Assertions.assertDoesNotThrow(()->root.toString());
-      ++root.size;
-      Assertions.assertThrows(OutOfMemoryError.class,()->root.toString());
-    }
-    {
-      var root=new BooleanArrSeq.UncheckedStack(length,arr);
-      Assertions.assertDoesNotThrow(()->root.toString());
-      ++root.size;
-      Assertions.assertThrows(OutOfMemoryError.class,()->root.toString());
-    }
-  }
   //TODO make this faster or place is switch to disable it as desired
-  //@Test
+  @Test
   public void testLargeArrSeqToString()
   {
     testArrSeqToString((OmniArray.MAX_ARR_SIZE/(MAX_TOSTRING_LENGTH+2))+1);

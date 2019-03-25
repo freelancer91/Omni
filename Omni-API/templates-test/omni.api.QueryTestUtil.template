@@ -23,8 +23,10 @@ public final class QueryTestUtil
   #MACRO TestQueryChar<true,false,removeVal,OmniCollection>()
   #MACRO TestQueryByte<true,false,contains,OmniCollection>()
   #MACRO TestQueryByte<true,false,removeVal,OmniCollection>()
-  #MACRO TestQueryBoolean<true,false,contains,OmniCollection>()
-  #MACRO TestQueryBoolean<true,false,removeVal,OmniCollection>()
+  #MACRO TestQueryBooleanReturnPositive<true,contains,OmniCollection>()
+  #MACRO TestQueryBooleanReturnPositive<true,removeVal,OmniCollection>()
+  #MACRO TestQueryBooleanReturnNegative<false,contains,OmniCollection>()
+  #MACRO TestQueryBooleanReturnNegative<false,removeVal,OmniCollection>()
   #MACRO TestQueryNullReturnPositive<true,contains,OmniCollection>()
   #MACRO TestQueryNullReturnPositive<true,removeVal,OmniCollection>()
   #MACRO TestQueryNullReturnNegative<false,contains,OmniCollection>()
@@ -46,8 +48,10 @@ public final class QueryTestUtil
   #MACRO TestQueryChar<true,false,removeLastOccurrence,OmniDeque>()
   #MACRO TestQueryByte<true,false,removeFirstOccurrence,OmniDeque>()
   #MACRO TestQueryByte<true,false,removeLastOccurrence,OmniDeque>()
-  #MACRO TestQueryBoolean<true,false,removeFirstOccurrence,OmniDeque>()
-  #MACRO TestQueryBoolean<true,false,removeLastOccurrence,OmniDeque>()
+  #MACRO TestQueryBooleanReturnPositive<true,removeFirstOccurrence,OmniDeque>()
+  #MACRO TestQueryBooleanReturnPositive<true,removeLastOccurrence,OmniDeque>()
+  #MACRO TestQueryBooleanReturnNegative<false,removeFirstOccurrence,OmniDeque>()
+  #MACRO TestQueryBooleanReturnNegative<false,removeLastOccurrence,OmniDeque>()
   #MACRO TestQueryNullReturnPositive<true,removeFirstOccurrence,OmniDeque>()
   #MACRO TestQueryNullReturnPositive<true,removeLastOccurrence,OmniDeque>()
   #MACRO TestQueryNullReturnNegative<false,removeFirstOccurrence,OmniDeque>()
@@ -69,8 +73,10 @@ public final class QueryTestUtil
   #MACRO TestQueryChar<expectedIndex,-1,lastIndexOf,OmniList>()
   #MACRO TestQueryByte<expectedIndex,-1,indexOf,OmniList>()
   #MACRO TestQueryByte<expectedIndex,-1,lastIndexOf,OmniList>()
-  #MACRO TestQueryBoolean<expectedIndex,-1,indexOf,OmniList>()
-  #MACRO TestQueryBoolean<expectedIndex,-1,lastIndexOf,OmniList>()
+  #MACRO TestQueryBooleanReturnPositive<expectedIndex,indexOf,OmniList>()
+  #MACRO TestQueryBooleanReturnPositive<expectedIndex,lastIndexOf,OmniList>()
+  #MACRO TestQueryBooleanReturnNegative<-1,indexOf,OmniList>()
+  #MACRO TestQueryBooleanReturnNegative<-1,lastIndexOf,OmniList>()
   #MACRO TestQueryNullReturnPositive<expectedIndex,indexOf,OmniList>()
   #MACRO TestQueryNullReturnPositive<expectedIndex,lastIndexOf,OmniList>()
   #MACRO TestQueryNullReturnNegative<-1,indexOf,OmniList>()
@@ -86,7 +92,8 @@ public final class QueryTestUtil
   #MACRO TestQueryShort<expectedIndex,-1,search,OmniStack>()
   #MACRO TestQueryChar<expectedIndex,-1,search,OmniStack>()
   #MACRO TestQueryByte<expectedIndex,-1,search,OmniStack>()
-  #MACRO TestQueryBoolean<expectedIndex,-1,search,OmniStack>()
+  #MACRO TestQueryBooleanReturnPositive<expectedIndex,search,OmniStack>()
+  #MACRO TestQueryBooleanReturnNegative<-1,search,OmniStack>()
   #MACRO TestQueryNullReturnPositive<expectedIndex,search,OmniStack>()
   #MACRO TestQueryNullReturnNegative<-1,search,OmniStack>()
   #MACRO TestQueryEmpty<-1,search,OmniStack>()
@@ -263,9 +270,9 @@ public static void testMETHODNAMEDouble(Supplier<? extends COLLECTIONTYPE.OfBool
   #ENDIF
   if(containsVal)
   {
-    Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((float)0.0));
-    Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((float)-0.0));
-    Assertions.assertEquals(POSITIVERETURN,collectionSupplier.get().METHODNAME((float)1.0));
+    Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((double)0.0));
+    Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((double)-0.0));
+    Assertions.assertEquals(POSITIVERETURN,collectionSupplier.get().METHODNAME((double)1.0));
     Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Double)(double)0.0));
     Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Double)(double)-0.0));
     Assertions.assertEquals(POSITIVERETURN,collectionSupplier.get().METHODNAME((Double)(double)1.0));
@@ -1181,38 +1188,50 @@ public static void testMETHODNAMEByte(Supplier<? extends COLLECTIONTYPE.OfBoolea
 }
 #ENDDEF
 
-#MACRODEF TestQueryBoolean<POSITIVERETURN,NEGATIVERETURN,METHODNAME,COLLECTIONTYPE>()
-public static void testMETHODNAMEBoolean(Supplier<? extends COLLECTIONTYPE> collectionSupplier,boolean containsVal
-#IFSWITCH POSITIVERETURN==expectedIndex
-,int expectedIndex
-#ENDIF
-)
+#MACRODEF TestQueryBooleanReturnNegative<NEGATIVERETURN,METHODNAME,COLLECTIONTYPE>()
+public static void testMETHODNAMEBooleanReturnNegative(Supplier<? extends COLLECTIONTYPE> collectionSupplier,boolean containsVal)
 {
 #IFSWITCH METHODNAME==removeVal
   Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().remove((Object)!containsVal));
   COLLECTIONTYPE collection;
-  if((collection=collectionSupplier.get()) instanceof COLLECTIONTYPE.OfBoolean || collection instanceof COLLECTIONTYPE.OfRef)
-  {
-    Assertions.assertEquals(POSITIVERETURN,collection.remove((Object)containsVal));
-  }
-  else
+  if(!((collection=collectionSupplier.get()) instanceof COLLECTIONTYPE.OfBoolean || collection instanceof COLLECTIONTYPE.OfRef))
   {
     Assertions.assertEquals(NEGATIVERETURN,collection.remove((Object)containsVal));
   }
 #ELSE
   Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Object)!containsVal));
   COLLECTIONTYPE collection;
-  if((collection=collectionSupplier.get()) instanceof COLLECTIONTYPE.OfBoolean || collection instanceof COLLECTIONTYPE.OfRef)
-  {
-    Assertions.assertEquals(POSITIVERETURN,collection.METHODNAME((Object)containsVal));
-  }
-  else
+  if(!((collection=collectionSupplier.get()) instanceof COLLECTIONTYPE.OfBoolean || collection instanceof COLLECTIONTYPE.OfRef))
   {
     Assertions.assertEquals(NEGATIVERETURN,collection.METHODNAME((Object)containsVal));
   }
 #ENDIF
   Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME(!containsVal));
   Assertions.assertEquals(NEGATIVERETURN,collectionSupplier.get().METHODNAME((Boolean)!containsVal));
+}
+#ENDDEF
+
+#MACRODEF TestQueryBooleanReturnPositive<POSITIVERETURN,METHODNAME,COLLECTIONTYPE>()
+public static void testMETHODNAMEBooleanReturnPositive(Supplier<? extends COLLECTIONTYPE> collectionSupplier,boolean containsVal
+#IFSWITCH POSITIVERETURN==expectedIndex
+,int expectedIndex
+#ENDIF
+)
+{
+#IFSWITCH METHODNAME==removeVal
+  COLLECTIONTYPE collection;
+  if((collection=collectionSupplier.get()) instanceof COLLECTIONTYPE.OfBoolean || collection instanceof COLLECTIONTYPE.OfRef)
+  {
+    Assertions.assertEquals(POSITIVERETURN,collection.remove((Object)containsVal));
+  }
+#ELSE
+  
+  COLLECTIONTYPE collection;
+  if((collection=collectionSupplier.get()) instanceof COLLECTIONTYPE.OfBoolean || collection instanceof COLLECTIONTYPE.OfRef)
+  {
+    Assertions.assertEquals(POSITIVERETURN,collection.METHODNAME((Object)containsVal));
+  }
+#ENDIF
   Assertions.assertEquals(POSITIVERETURN,collectionSupplier.get().METHODNAME(containsVal));
   Assertions.assertEquals(POSITIVERETURN,collectionSupplier.get().METHODNAME((Boolean)containsVal));
 }

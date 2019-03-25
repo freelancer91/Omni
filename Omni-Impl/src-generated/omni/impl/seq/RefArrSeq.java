@@ -558,6 +558,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>
     }
     this.size=1;
   }
+/*
   private void uncheckedInsert(int index,int size,E val)
   {
     final int tailDist;
@@ -583,6 +584,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>
       this.size=size+1;
     }
   }
+*/  
   public void push(E val)
   {
     final int size;
@@ -1864,7 +1866,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>
         final int rootSize;
         if((rootSize=(root=this.parent).size)!=0)
         {
-          ((RefArrSeq<E>)root).uncheckedInsert(this.cursor++,rootSize,val);
+          ((UncheckedList<E>)root).uncheckedInsert(this.cursor++,rootSize,val);
         }
         else
         {
@@ -1883,12 +1885,37 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>
     {
       return new ListItr<E>(this,index);
     }
+      private void uncheckedInsert(int index,int size,E val)
+      {
+        final int tailDist;
+        if((tailDist=size-index)==0)
+        {
+          super.uncheckedAppend(size,val);
+        }
+        else
+        {
+          Object[] arr;
+          if((arr=this.arr).length==size)
+          {
+            final Object[] tmp;
+            ArrCopy.semicheckedCopy(arr,0,tmp=new Object[OmniArray.growBy50Pct(size)],0,index);
+            ArrCopy.uncheckedCopy(arr,index,tmp,index+1,tailDist);
+            this.arr=arr=tmp;
+          }
+          else
+          {
+            ArrCopy.uncheckedCopy(arr,index,arr,index+1,tailDist);
+          }
+          arr[index]=val;
+          this.size=size+1;
+        }
+      }
     @Override
     public void add(int index,E val)
     {
       final int size;
       if((size=this.size)!=0){
-        ((RefArrSeq<E>)this).uncheckedInsert(index,size,val);
+        ((UncheckedList<E>)this).uncheckedInsert(index,size,val);
       }else{
         ((RefArrSeq<E>)this).uncheckedInit(val);
       }
@@ -3197,7 +3224,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>
         UncheckedSubList<E> parent;
         if((rootSize=(root=(parent=this.parent).root).size)!=0)
         {
-          ((RefArrSeq<E>)root).uncheckedInsert(this.cursor++,rootSize,val);
+          ((UncheckedList<E>)root).uncheckedInsert(this.cursor++,rootSize,val);
         }
         else
         {
@@ -3226,7 +3253,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>
       final UncheckedList<E> root;
       final int rootSize;
       if((rootSize=(root=this.root).size)!=0){
-        ((RefArrSeq<E>)root).uncheckedInsert(this.rootOffset+(this.size++),rootSize,val);
+        ((UncheckedList<E>)root).uncheckedInsert(this.rootOffset+(this.size++),rootSize,val);
       }else{
         ((RefArrSeq<E>)root).uncheckedInit(val);
         ++this.size;
@@ -3241,7 +3268,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>
       final UncheckedList<E> root;
       final int rootSize;
       if((rootSize=(root=this.root).size)!=0){
-        ((RefArrSeq<E>)root).uncheckedInsert(this.rootOffset+index,rootSize,val);
+        ((UncheckedList<E>)root).uncheckedInsert(this.rootOffset+index,rootSize,val);
       }else{
         ((RefArrSeq<E>)root).uncheckedInit(val);
       }
@@ -4172,7 +4199,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>
         final int rootSize;
         if((rootSize=root.size)!=0)
         {
-          ((RefArrSeq<E>)root).uncheckedInsert(this.cursor++,rootSize,val);
+          ((UncheckedList<E>)root).uncheckedInsert(this.cursor++,rootSize,val);
         }
         else
         {
@@ -4207,7 +4234,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>
       CheckedCollection.checkWriteHi(index,size=this.size);
       ++this.modCount;
       if(size!=0){
-        ((RefArrSeq<E>)this).uncheckedInsert(index,size,val);
+        ((UncheckedList<E>)this).uncheckedInsert(index,size,val);
       }else{
         ((RefArrSeq<E>)this).uncheckedInit(val);
       }
@@ -4460,7 +4487,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>
       return new CheckedSubList<E>(this,fromIndex,CheckedCollection.checkSubListRange(fromIndex,toIndex,this.size));
     }
   }
-  private
+  //private
     static class CheckedSubList<E>
       implements OmniList.OfRef<E>,Cloneable
   {
@@ -6271,7 +6298,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>
         final int rootSize;
         if((rootSize=root.size)!=0)
         {
-          ((RefArrSeq<E>)root).uncheckedInsert(this.cursor++,rootSize,val);
+          ((UncheckedList<E>)root).uncheckedInsert(this.cursor++,rootSize,val);
         }
         else
         {
@@ -6304,7 +6331,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>
       this.modCount=modCount;
       for(var curr=parent;curr!=null;curr.modCount=modCount,++curr.size,curr=curr.parent){}
       if((modCount=root.size)!=0){
-        ((RefArrSeq<E>)root).uncheckedInsert(this.rootOffset+(this.size++),modCount,val);
+        ((UncheckedList<E>)root).uncheckedInsert(this.rootOffset+(this.size++),modCount,val);
       }else{
         ((RefArrSeq<E>)root).uncheckedInit(val);
         ++this.size;
@@ -6325,7 +6352,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>
       for(var curr=parent;curr!=null;curr.modCount=modCount,++curr.size,curr=curr.parent){}
       this.size=size+1;
       if((modCount=root.size)!=0){
-        ((RefArrSeq<E>)root).uncheckedInsert(this.rootOffset+index,modCount,val);
+        ((UncheckedList<E>)root).uncheckedInsert(this.rootOffset+index,modCount,val);
       }else{
         ((RefArrSeq<E>)root).uncheckedInit(val);
       }

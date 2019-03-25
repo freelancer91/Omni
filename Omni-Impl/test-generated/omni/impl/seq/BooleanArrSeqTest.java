@@ -1,9 +1,8 @@
 package omni.impl.seq;
-import java.util.ArrayList;
-import omni.impl.seq.BooleanArrSeq.UncheckedList;
-import omni.impl.seq.BooleanArrSeq.CheckedList;
-import omni.impl.seq.BooleanArrSeq.UncheckedStack;
-import omni.impl.seq.BooleanArrSeq.CheckedStack;
+//import omni.impl.seq.BooleanArrSeq.UncheckedList;
+//import omni.impl.seq.BooleanArrSeq.CheckedList;
+//import omni.impl.seq.BooleanArrSeq.UncheckedStack;
+//import omni.impl.seq.BooleanArrSeq.CheckedStack;
 import omni.util.TypeConversionUtil;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -15,29 +14,24 @@ import omni.function.BooleanPredicate;
 import java.util.ConcurrentModificationException;
 import omni.util.OmniArray;
 @SuppressWarnings({"rawtypes","unchecked"}) 
-public class BooleanArrSeqTest
-{
+public class BooleanArrSeqTest{
   @Test
-  public void testUncheckedStackconstructor_void_initialCapacityDEFAULT()
-  {
-    UncheckedStack seq=new UncheckedStack();
+  public void testUncheckedStackconstructor_void_initialCapacityDEFAULT(){
+    var seq=new BooleanArrSeq.UncheckedStack();
     Assertions.assertEquals(0,seq.size);
     Assertions.assertSame(OmniArray.OfBoolean.DEFAULT_ARR,seq.arr);
   }
   @Test
-  public void testUncheckedStackconstructor_intboolean_initialCapacityNULL()
-  {
-    UncheckedStack seq=new UncheckedStack(0,null);
+  public void testUncheckedStackconstructor_intboolean_initialCapacityNULL(){
+    var seq=new BooleanArrSeq.UncheckedStack(0,null);
     Assertions.assertEquals(0,seq.size);
     Assertions.assertNull(seq.arr);
   }
   @Test
-  public void testUncheckedStackconstructor_int_initialCapacity50()
-  {
-    UncheckedStack seq=new UncheckedStack(50);
+  public void testUncheckedStackconstructor_int_initialCapacity50(){
+    var seq=new BooleanArrSeq.UncheckedStack(50);
     Assertions.assertEquals(0,seq.size);
-    switch(50)
-    {
+    switch(50){
     case 0:
       Assertions.assertNull(seq.arr);
       break;
@@ -50,12 +44,10 @@ public class BooleanArrSeqTest
     }
   }
   @Test
-  public void testUncheckedStackconstructor_int_initialCapacity0()
-  {
-    UncheckedStack seq=new UncheckedStack(0);
+  public void testUncheckedStackconstructor_int_initialCapacity0(){
+    var seq=new BooleanArrSeq.UncheckedStack(0);
     Assertions.assertEquals(0,seq.size);
-    switch(0)
-    {
+    switch(0){
     case 0:
       Assertions.assertNull(seq.arr);
       break;
@@ -68,12 +60,10 @@ public class BooleanArrSeqTest
     }
   }
   @Test
-  public void testUncheckedStackconstructor_int_initialCapacity10()
-  {
-    UncheckedStack seq=new UncheckedStack(10);
+  public void testUncheckedStackconstructor_int_initialCapacity10(){
+    var seq=new BooleanArrSeq.UncheckedStack(10);
     Assertions.assertEquals(0,seq.size);
-    switch(10)
-    {
+    switch(10){
     case 0:
       Assertions.assertNull(seq.arr);
       break;
@@ -86,9 +76,133 @@ public class BooleanArrSeqTest
     }
   }
   @Test
-  public void testUncheckedStacktoArray_ObjectArray_zeroLengthArrayAndSequenceIsEmpty()
+  public void testUncheckedStackClone_initialCapacityDEFAULT_seqIsEmpty()
   {
-    UncheckedStack seq=new UncheckedStack();
+    var seq=new BooleanArrSeq.UncheckedStack();
+    var clone=(BooleanArrSeq.UncheckedStack)seq.clone();
+    Assertions.assertEquals(0,clone.size());
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertSame(clone.arr,OmniArray.OfBoolean.DEFAULT_ARR);
+  }
+  @Test
+  public void testUncheckedStackClone_initialCapacityDEFAULT_seqIsNotEmpty()
+  {
+    var seq=new BooleanArrSeq.UncheckedStack();
+    for(int i=0;i<100;++i){
+      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
+    }
+    var clone=(BooleanArrSeq.UncheckedStack)seq.clone();
+    Assertions.assertEquals(100,clone.size());
+    Assertions.assertEquals(100,seq.size());
+    Assertions.assertNotSame(seq.arr,clone.arr);
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertToboolean(i),clone.arr[i]);
+    }
+  }
+  @Test
+  public void testUncheckedStackClone_initialCapacityNULL_seqIsEmpty()
+  {
+    var seq=new BooleanArrSeq.UncheckedStack(0,null);
+    var clone=(BooleanArrSeq.UncheckedStack)seq.clone();
+    Assertions.assertEquals(0,clone.size());
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertSame(clone.arr,OmniArray.OfBoolean.DEFAULT_ARR);
+  }
+  @Test
+  public void testUncheckedStackClone_initialCapacityNULL_seqIsNotEmpty()
+  {
+    var seq=new BooleanArrSeq.UncheckedStack(0,null);
+    for(int i=0;i<100;++i){
+      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
+    }
+    var clone=(BooleanArrSeq.UncheckedStack)seq.clone();
+    Assertions.assertEquals(100,clone.size());
+    Assertions.assertEquals(100,seq.size());
+    Assertions.assertNotSame(seq.arr,clone.arr);
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertToboolean(i),clone.arr[i]);
+    }
+  }
+  @Test
+  public void testUncheckedStackClone_initialCapacity50_seqIsEmpty()
+  {
+    var seq=new BooleanArrSeq.UncheckedStack(50);
+    var clone=(BooleanArrSeq.UncheckedStack)seq.clone();
+    Assertions.assertEquals(0,clone.size());
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertSame(clone.arr,OmniArray.OfBoolean.DEFAULT_ARR);
+  }
+  @Test
+  public void testUncheckedStackClone_initialCapacity50_seqIsNotEmpty()
+  {
+    var seq=new BooleanArrSeq.UncheckedStack(50);
+    for(int i=0;i<100;++i){
+      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
+    }
+    var clone=(BooleanArrSeq.UncheckedStack)seq.clone();
+    Assertions.assertEquals(100,clone.size());
+    Assertions.assertEquals(100,seq.size());
+    Assertions.assertNotSame(seq.arr,clone.arr);
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertToboolean(i),clone.arr[i]);
+    }
+  }
+  @Test
+  public void testUncheckedStackClone_initialCapacity0_seqIsEmpty()
+  {
+    var seq=new BooleanArrSeq.UncheckedStack(0);
+    var clone=(BooleanArrSeq.UncheckedStack)seq.clone();
+    Assertions.assertEquals(0,clone.size());
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertSame(clone.arr,OmniArray.OfBoolean.DEFAULT_ARR);
+  }
+  @Test
+  public void testUncheckedStackClone_initialCapacity0_seqIsNotEmpty()
+  {
+    var seq=new BooleanArrSeq.UncheckedStack(0);
+    for(int i=0;i<100;++i){
+      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
+    }
+    var clone=(BooleanArrSeq.UncheckedStack)seq.clone();
+    Assertions.assertEquals(100,clone.size());
+    Assertions.assertEquals(100,seq.size());
+    Assertions.assertNotSame(seq.arr,clone.arr);
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertToboolean(i),clone.arr[i]);
+    }
+  }
+  @Test
+  public void testUncheckedStackClone_initialCapacity10_seqIsEmpty()
+  {
+    var seq=new BooleanArrSeq.UncheckedStack(10);
+    var clone=(BooleanArrSeq.UncheckedStack)seq.clone();
+    Assertions.assertEquals(0,clone.size());
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertSame(clone.arr,OmniArray.OfBoolean.DEFAULT_ARR);
+  }
+  @Test
+  public void testUncheckedStackClone_initialCapacity10_seqIsNotEmpty()
+  {
+    var seq=new BooleanArrSeq.UncheckedStack(10);
+    for(int i=0;i<100;++i){
+      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
+    }
+    var clone=(BooleanArrSeq.UncheckedStack)seq.clone();
+    Assertions.assertEquals(100,clone.size());
+    Assertions.assertEquals(100,seq.size());
+    Assertions.assertNotSame(seq.arr,clone.arr);
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertToboolean(i),clone.arr[i]);
+    }
+  }
+  @Test
+  public void testUncheckedStacktoArray_ObjectArray_zeroLengthArrayAndSequenceIsEmpty(){
+    var seq=new BooleanArrSeq.UncheckedStack();
     Boolean[] paramArr=new Boolean[0];
     var result=seq.toArray(paramArr);
     Assertions.assertEquals(0,seq.size());
@@ -97,11 +211,9 @@ public class BooleanArrSeqTest
     Assertions.assertSame(paramArr,result);
   }
   @Test
-  public void testUncheckedStacktoArray_ObjectArray_zeroLengthArrayAndSequenceNotEmpty()
-  {
-    UncheckedStack seq=new UncheckedStack();
-    for(int i=0;i<100;++i)
-    {
+  public void testUncheckedStacktoArray_ObjectArray_zeroLengthArrayAndSequenceNotEmpty(){
+    var seq=new BooleanArrSeq.UncheckedStack();
+    for(int i=0;i<100;++i){
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
     }
     Boolean[] paramArr=new Boolean[0];
@@ -111,18 +223,15 @@ public class BooleanArrSeqTest
     Assertions.assertNotSame(seq.arr,result);
     Assertions.assertNotSame(paramArr,result);
     var itr=seq.iterator();
-    for(int i=0;i<100;++i)
-    {
+    for(int i=0;i<100;++i){
       Assertions.assertEquals(itr.next(),result[i]);
     }
   }
   @Test
-  public void testUncheckedStacktoArray_ObjectArray_nonzeroLengthArrayAndSequenceIsEmpty()
-  {
-    UncheckedStack seq=new UncheckedStack();
+  public void testUncheckedStacktoArray_ObjectArray_nonzeroLengthArrayAndSequenceIsEmpty(){
+    var seq=new BooleanArrSeq.UncheckedStack();
     Boolean[] paramArr=new Boolean[5];
-    for(int i=0;i<paramArr.length;++i)
-    {
+    for(int i=0;i<paramArr.length;++i){
       paramArr[i]=TypeConversionUtil.convertToboolean(paramArr.length);
     }
     var result=seq.toArray(paramArr);
@@ -131,22 +240,18 @@ public class BooleanArrSeqTest
     Assertions.assertNotSame(seq.arr,result);
     Assertions.assertSame(paramArr,result);
     Assertions.assertNull(result[0]);
-    for(int i=1;i<result.length;++i)
-    {
+    for(int i=1;i<result.length;++i){
       Assertions.assertEquals((Object)TypeConversionUtil.convertToboolean(paramArr.length),result[i]);
     }
   }
   @Test
-  public void testUncheckedStacktoArray_ObjectArray_overSizedArray()
-  {
-    UncheckedStack seq=new UncheckedStack();
+  public void testUncheckedStacktoArray_ObjectArray_overSizedArray(){
+    var seq=new BooleanArrSeq.UncheckedStack();
     Boolean[] paramArr=new Boolean[10];
-    for(int i=0;i<paramArr.length;++i)
-    {
+    for(int i=0;i<paramArr.length;++i){
       paramArr[i]=TypeConversionUtil.convertToboolean(paramArr.length);
     }
-    for(int i=0;i<5;++i)
-    {
+    for(int i=0;i<5;++i){
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
     }
     var result=seq.toArray(paramArr);
@@ -155,27 +260,22 @@ public class BooleanArrSeqTest
     Assertions.assertNotSame(seq.arr,result);
     Assertions.assertSame(paramArr,result);
     var itr=seq.iterator();
-    for(int i=0;i<5;++i)
-    {
+    for(int i=0;i<5;++i){
       Assertions.assertEquals(itr.next(),result[i]);
     }
     Assertions.assertNull(result[5]);
-    for(int i=6;i<result.length;++i)
-    {
+    for(int i=6;i<result.length;++i){
       Assertions.assertEquals((Object)TypeConversionUtil.convertToboolean(paramArr.length),result[i]);
     }
   }
   @Test
-  public void testUncheckedStacktoArray_ObjectArray_undersizedArray()
-  {
-    UncheckedStack seq=new UncheckedStack();
+  public void testUncheckedStacktoArray_ObjectArray_undersizedArray(){
+    var seq=new BooleanArrSeq.UncheckedStack();
     Boolean[] paramArr=new Boolean[5];
-    for(int i=0;i<paramArr.length;++i)
-    {
+    for(int i=0;i<paramArr.length;++i){
       paramArr[i]=TypeConversionUtil.convertToboolean(10);
     }
-    for(int i=0;i<10;++i)
-    {
+    for(int i=0;i<10;++i){
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
     }
     var result=seq.toArray(paramArr);
@@ -184,22 +284,18 @@ public class BooleanArrSeqTest
     Assertions.assertNotSame(seq.arr,result);
     Assertions.assertNotSame(paramArr,result);
     var itr=seq.iterator();
-    for(int i=0;i<10;++i)
-    {
+    for(int i=0;i<10;++i){
       Assertions.assertEquals(itr.next(),result[i]);
     }
   }
   @Test
-  public void testUncheckedStacktoArray_ObjectArray_exactSizeArray()
-  {
-    UncheckedStack seq=new UncheckedStack();
+  public void testUncheckedStacktoArray_ObjectArray_exactSizeArray(){
+    var seq=new BooleanArrSeq.UncheckedStack();
     Boolean[] paramArr=new Boolean[5];
-    for(int i=0;i<paramArr.length;++i)
-    {
+    for(int i=0;i<paramArr.length;++i){
       paramArr[i]=TypeConversionUtil.convertToboolean(5);
     }
-    for(int i=0;i<5;++i)
-    {
+    for(int i=0;i<5;++i){
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
     }
     var result=seq.toArray(paramArr);
@@ -208,15 +304,13 @@ public class BooleanArrSeqTest
     Assertions.assertNotSame(seq.arr,result);
     Assertions.assertSame(paramArr,result);
     var itr=seq.iterator();
-    for(int i=0;i<5;++i)
-    {
+    for(int i=0;i<5;++i){
       Assertions.assertEquals(itr.next(),result[i]);
     }
   }
   @Test
-  public void testUncheckedStacktoArray_IntFunction_seqIsEmpty_nonMod()
-  {
-    UncheckedStack seq=new UncheckedStack();
+  public void testUncheckedStacktoArray_IntFunction_seqIsEmpty_nonMod(){
+    var seq=new BooleanArrSeq.UncheckedStack();
     IntFunction<Boolean[]> arrConstructor=Boolean[]::new;
     var result=seq.toArray(arrConstructor);
     Assertions.assertEquals(0,seq.size());
@@ -224,11 +318,9 @@ public class BooleanArrSeqTest
     Assertions.assertEquals(0,result.length);
   }
   @Test
-  public void testUncheckedStacktoArray_IntFunction_seqIsNotEmpty_nonMod()
-  {
-    UncheckedStack seq=new UncheckedStack();
-    for(int i=0;i<100;++i)
-    {
+  public void testUncheckedStacktoArray_IntFunction_seqIsNotEmpty_nonMod(){
+    var seq=new BooleanArrSeq.UncheckedStack();
+    for(int i=0;i<100;++i){
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
     }
     IntFunction<Boolean[]> arrConstructor=Boolean[]::new;
@@ -237,60 +329,49 @@ public class BooleanArrSeqTest
     Assertions.assertNotSame(seq.arr,result);
     Assertions.assertEquals(100,result.length);
     var itr=seq.iterator();
-    for(int i=0;i<100;++i)
-    {
+    for(int i=0;i<100;++i){
       Assertions.assertEquals(itr.next(),result[i]);
     }
   }
   @Test
-  public void testUncheckedStackclear_void_seqIsEmpty()
-  {
-    UncheckedStack seq=new UncheckedStack();
+  public void testUncheckedStackclear_void_seqIsEmpty(){
+    var seq=new BooleanArrSeq.UncheckedStack();
     seq.clear();
     Assertions.assertTrue(seq.isEmpty());
   }
   @Test
-  public void testUncheckedStackclear_void_seqIsNotEmpty()
-  {
-    UncheckedStack seq=new UncheckedStack();
-    for(int i=0;i<100;++i)
-    {
+  public void testUncheckedStackclear_void_seqIsNotEmpty(){
+    var seq=new BooleanArrSeq.UncheckedStack();
+    for(int i=0;i<100;++i){
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
     }
     seq.clear();
     Assertions.assertTrue(seq.isEmpty());
-    for(int i=0;i<100;++i)
-    {
+    for(int i=0;i<100;++i){
       Assertions.assertEquals(TypeConversionUtil.convertToboolean(i),seq.arr[i]);
     }
   }
   @Test
-  public void testUncheckedStackisEmpty_void_seqIsEmpty()
-  {
-    UncheckedStack seq=new UncheckedStack();
+  public void testUncheckedStackisEmpty_void_seqIsEmpty(){
+    var seq=new BooleanArrSeq.UncheckedStack();
     Assertions.assertTrue(seq.isEmpty());
   }
   @Test
-  public void testUncheckedStackisEmpty_void_seqIsNotEmpty()
-  {
-    UncheckedStack seq=new UncheckedStack();
-    for(int i=0;i<100;++i)
-    {
+  public void testUncheckedStackisEmpty_void_seqIsNotEmpty(){
+    var seq=new BooleanArrSeq.UncheckedStack();
+    for(int i=0;i<100;++i){
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
     }
     Assertions.assertFalse(seq.isEmpty());
   }
   @Test
-  public void testUncheckedStackisEmpty_void_seqIsBeingCleared()
-  {
-    UncheckedStack seq=new UncheckedStack();
-    for(int i=0;i<100;++i)
-    {
+  public void testUncheckedStackisEmpty_void_seqIsBeingCleared(){
+    var seq=new BooleanArrSeq.UncheckedStack();
+    for(int i=0;i<100;++i){
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
     }
     var itr=seq.iterator();
-    for(int i=100;--i>=0;)
-    {
+    for(int i=100;--i>=0;){
       Assertions.assertFalse(seq.isEmpty());
       itr.nextBoolean();
       itr.remove();
@@ -298,57 +379,48 @@ public class BooleanArrSeqTest
     Assertions.assertTrue(seq.isEmpty());
   }
   @Test
-  public void testUncheckedStacksize_void_seqIsEmpty()
-  {
-    UncheckedStack seq=new UncheckedStack();
+  public void testUncheckedStacksize_void_seqIsEmpty(){
+    var seq=new BooleanArrSeq.UncheckedStack();
     Assertions.assertEquals(0,seq.size);
     Assertions.assertEquals(seq.size,seq.size());
   }
   @Test
-  public void testUncheckedStacksize_void_seqIsNotEmpty()
-  {
-    UncheckedStack seq=new UncheckedStack();
-    for(int i=0;i<100;++i)
-    {
+  public void testUncheckedStacksize_void_seqIsNotEmpty(){
+    var seq=new BooleanArrSeq.UncheckedStack();
+    for(int i=0;i<100;++i){
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
     }
     Assertions.assertEquals(100,seq.size);
     Assertions.assertEquals(seq.size,seq.size());
   }
   @Test
-  public void testUncheckedStacksize_void_seqIsBeingCleared()
-  {
-    UncheckedStack seq=new UncheckedStack();
-    for(int i=0;i<100;++i)
-    {
+  public void testUncheckedStacksize_void_seqIsBeingCleared(){
+    var seq=new BooleanArrSeq.UncheckedStack();
+    for(int i=0;i<100;++i){
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
     }
     var itr=seq.iterator();
-    for(int i=100;--i>=0;)
-    {
+    for(int i=100;--i>=0;){
       itr.nextBoolean();
       itr.remove();
       Assertions.assertEquals(i,seq.size());
     }
   }
   @Test
-  public void testUncheckedStackforEach_Consumer_SeqIsEmpty_NoMod()
-  {
-    UncheckedStack seq=new UncheckedStack();
-    MonitoredConsumer consumer=new MonitoredConsumer();
+  public void testUncheckedStackforEach_Consumer_SeqIsEmpty_NoMod(){
+    var seq=new BooleanArrSeq.UncheckedStack();
+    var consumer=new BooleanMonitoredConsumer();
     seq.forEach((Consumer)consumer);
     Assertions.assertEquals(0,seq.size());
     Assertions.assertTrue(consumer.isEmpty());
   }
   @Test
-  public void testUncheckedStackforEach_Consumer_SeqIsNotEmpty_NoMod()
-  {
-    UncheckedStack seq=new UncheckedStack();
-    for(int i=0;i<100;++i)
-    {
+  public void testUncheckedStackforEach_Consumer_SeqIsNotEmpty_NoMod(){
+    var seq=new BooleanArrSeq.UncheckedStack();
+    for(int i=0;i<100;++i){
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
     }
-    MonitoredConsumer consumer=new MonitoredConsumer();
+    var consumer=new BooleanMonitoredConsumer();
     seq.forEach((Consumer)consumer);
     Assertions.assertEquals(100,seq.size());
     Assertions.assertEquals(100,consumer.size());
@@ -359,27 +431,331 @@ public class BooleanArrSeqTest
       Assertions.assertEquals(consumerIterator.next(),seqIterator.next());
     }
   }
-  //TODO TestRemoveIfMethods<DEFAULT>(,)
-  //TODO TestRemoveIfMethods<NULL>(,)
-  //TODO TestRemoveIfMethods<50>(,)
   @Test
-  public void testUncheckedStackforEach_BooleanConsumer_SeqIsEmpty_NoMod()
+  public void testUncheckedStackremoveIf_Predicate_SeqIsEmpty_RemoveTruePredicate()
   {
-    UncheckedStack seq=new UncheckedStack();
-    MonitoredConsumer consumer=new MonitoredConsumer();
+    var seq=new BooleanArrSeq.UncheckedStack();
+    for(int i=0;i<0;++i){
+      seq.add(TypeConversionUtil.convertToboolean(i));
+    }
+    var filter=new BooleanMonitoredPredicate.RemoveTruePredicate(seq);
+    Assertions.assertFalse(seq.removeIf((Predicate)filter));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,filter.callCount);
+  }
+  @Test
+  public void testUncheckedStackremoveIf_Predicate_SeqIsEmpty_RemoveFalsePredicate()
+  {
+    var seq=new BooleanArrSeq.UncheckedStack();
+    for(int i=0;i<0;++i){
+      seq.add(TypeConversionUtil.convertToboolean(i));
+    }
+    var filter=new BooleanMonitoredPredicate.RemoveFalsePredicate(seq);
+    Assertions.assertFalse(seq.removeIf((Predicate)filter));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,filter.callCount);
+  }
+  @Test
+  public void testUncheckedStackremoveIf_Predicate_FirstValtrue_RemoveTrue(){
+    for(int period=1;period<=10;++period){
+      var seq=new BooleanArrSeq.UncheckedStack();
+      boolean currVal=true;
+      int trueCount=0;
+      int falseCount=0;
+      for(int i=0;;){
+        seq.add(currVal);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      var filter=new BooleanMonitoredPredicate.RemoveTruePredicate();
+      Assertions.assertEquals(trueCount!=0,seq.removeIf((Predicate)filter));
+      Assertions.assertEquals(falseCount,seq.size());
+      for(int i=0;i<falseCount;++i){
+        Assertions.assertFalse(seq.arr[i]);
+      }
+      Assertions.assertEquals(falseCount==0||trueCount==0?1:2,filter.callCount);
+    }
+  }
+  @Test
+  public void testUncheckedStackremoveIf_Predicate_FirstValfalse_RemoveTrue(){
+    for(int period=1;period<=10;++period){
+      var seq=new BooleanArrSeq.UncheckedStack();
+      boolean currVal=false;
+      int trueCount=0;
+      int falseCount=0;
+      for(int i=0;;){
+        seq.add(currVal);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      var filter=new BooleanMonitoredPredicate.RemoveTruePredicate();
+      Assertions.assertEquals(trueCount!=0,seq.removeIf((Predicate)filter));
+      Assertions.assertEquals(falseCount,seq.size());
+      for(int i=0;i<falseCount;++i){
+        Assertions.assertFalse(seq.arr[i]);
+      }
+      Assertions.assertEquals(falseCount==0||trueCount==0?1:2,filter.callCount);
+    }
+  }
+  @Test
+  public void testUncheckedStackremoveIf_Predicate_FirstValtrue_RemoveFalse(){
+    for(int period=1;period<=10;++period){
+      var seq=new BooleanArrSeq.UncheckedStack();
+      boolean currVal=true;
+      int trueCount=0;
+      int falseCount=0;
+      for(int i=0;;){
+        seq.add(currVal);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      var filter=new BooleanMonitoredPredicate.RemoveFalsePredicate();
+      Assertions.assertEquals(falseCount!=0,seq.removeIf((Predicate)filter));
+      Assertions.assertEquals(trueCount,seq.size());
+      for(int i=0;i<trueCount;++i){
+        Assertions.assertTrue(seq.arr[i]);
+      }
+      Assertions.assertEquals(falseCount==0||trueCount==0?1:2,filter.callCount);
+    }
+  }
+  @Test
+  public void testUncheckedStackremoveIf_Predicate_FirstValfalse_RemoveFalse(){
+    for(int period=1;period<=10;++period){
+      var seq=new BooleanArrSeq.UncheckedStack();
+      boolean currVal=false;
+      int trueCount=0;
+      int falseCount=0;
+      for(int i=0;;){
+        seq.add(currVal);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      var filter=new BooleanMonitoredPredicate.RemoveFalsePredicate();
+      Assertions.assertEquals(falseCount!=0,seq.removeIf((Predicate)filter));
+      Assertions.assertEquals(trueCount,seq.size());
+      for(int i=0;i<trueCount;++i){
+        Assertions.assertTrue(seq.arr[i]);
+      }
+      Assertions.assertEquals(falseCount==0||trueCount==0?1:2,filter.callCount);
+    }
+  }
+  @Test
+  public void testUncheckedStackremoveIf_Predicate_FirstValtrue_RemoveAll(){
+    for(int period=1;period<=10;++period){
+      var seq=new BooleanArrSeq.UncheckedStack();
+      boolean currVal=true;
+      int trueCount=0;
+      int falseCount=0;
+      for(int i=0;;){
+        seq.add(currVal);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      var filter=new BooleanMonitoredPredicate.RemoveAllPredicate();
+      Assertions.assertTrue(seq.removeIf((Predicate)filter));
+      Assertions.assertEquals(0,seq.size());
+      Assertions.assertEquals(falseCount==0||trueCount==0?1:2,filter.callCount);
+    }
+  }
+  @Test
+  public void testUncheckedStackremoveIf_Predicate_FirstValfalse_RemoveAll(){
+    for(int period=1;period<=10;++period){
+      var seq=new BooleanArrSeq.UncheckedStack();
+      boolean currVal=false;
+      int trueCount=0;
+      int falseCount=0;
+      for(int i=0;;){
+        seq.add(currVal);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      var filter=new BooleanMonitoredPredicate.RemoveAllPredicate();
+      Assertions.assertTrue(seq.removeIf((Predicate)filter));
+      Assertions.assertEquals(0,seq.size());
+      Assertions.assertEquals(falseCount==0||trueCount==0?1:2,filter.callCount);
+    }
+  }
+  @Test
+  public void testUncheckedStackremoveIf_Predicate_FirstValtrue_RemoveNone(){
+    for(int period=1;period<=10;++period){
+      var seq=new BooleanArrSeq.UncheckedStack();
+      boolean currVal=true;
+      int trueCount=0;
+      int falseCount=0;
+      for(int i=0;;){
+        seq.add(currVal);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      var filter=new BooleanMonitoredPredicate.RemoveNonePredicate();
+      Assertions.assertFalse(seq.removeIf((Predicate)filter));
+      Assertions.assertEquals(10,seq.size());
+      Assertions.assertEquals(falseCount==0||trueCount==0?1:2,filter.callCount);
+      currVal=true;
+      trueCount=0;
+      falseCount=0;
+      for(int i=0;;){
+        Assertions.assertEquals(currVal,seq.arr[i]);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+    }
+  }
+  @Test
+  public void testUncheckedStackremoveIf_Predicate_FirstValfalse_RemoveNone(){
+    for(int period=1;period<=10;++period){
+      var seq=new BooleanArrSeq.UncheckedStack();
+      boolean currVal=false;
+      int trueCount=0;
+      int falseCount=0;
+      for(int i=0;;){
+        seq.add(currVal);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      var filter=new BooleanMonitoredPredicate.RemoveNonePredicate();
+      Assertions.assertFalse(seq.removeIf((Predicate)filter));
+      Assertions.assertEquals(10,seq.size());
+      Assertions.assertEquals(falseCount==0||trueCount==0?1:2,filter.callCount);
+      currVal=false;
+      trueCount=0;
+      falseCount=0;
+      for(int i=0;;){
+        Assertions.assertEquals(currVal,seq.arr[i]);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+    }
+  }
+  @Test
+  public void testUncheckedStackremoveIf_Predicate_SeqIsEmpty_RemoveAllPredicate()
+  {
+    var seq=new BooleanArrSeq.UncheckedStack();
+    for(int i=0;i<0;++i){
+      seq.add(TypeConversionUtil.convertToboolean(i));
+    }
+    var filter=new BooleanMonitoredPredicate.RemoveAllPredicate(seq);
+    Assertions.assertFalse(seq.removeIf((Predicate)filter));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,filter.callCount);
+  }
+  @Test
+  public void testUncheckedStackremoveIf_Predicate_SeqIsEmpty_RemoveNonePredicate()
+  {
+    var seq=new BooleanArrSeq.UncheckedStack();
+    for(int i=0;i<0;++i){
+      seq.add(TypeConversionUtil.convertToboolean(i));
+    }
+    var filter=new BooleanMonitoredPredicate.RemoveNonePredicate(seq);
+    Assertions.assertFalse(seq.removeIf((Predicate)filter));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,filter.callCount);
+  }
+  @Test
+  public void testUncheckedStackforEach_BooleanConsumer_SeqIsEmpty_NoMod(){
+    var seq=new BooleanArrSeq.UncheckedStack();
+    var consumer=new BooleanMonitoredConsumer();
     seq.forEach((BooleanConsumer)consumer);
     Assertions.assertEquals(0,seq.size());
     Assertions.assertTrue(consumer.isEmpty());
   }
   @Test
-  public void testUncheckedStackforEach_BooleanConsumer_SeqIsNotEmpty_NoMod()
-  {
-    UncheckedStack seq=new UncheckedStack();
-    for(int i=0;i<100;++i)
-    {
+  public void testUncheckedStackforEach_BooleanConsumer_SeqIsNotEmpty_NoMod(){
+    var seq=new BooleanArrSeq.UncheckedStack();
+    for(int i=0;i<100;++i){
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
     }
-    MonitoredConsumer consumer=new MonitoredConsumer();
+    var consumer=new BooleanMonitoredConsumer();
     seq.forEach((BooleanConsumer)consumer);
     Assertions.assertEquals(100,seq.size());
     Assertions.assertEquals(100,consumer.size());
@@ -390,345 +766,594 @@ public class BooleanArrSeqTest
       Assertions.assertEquals(consumerIterator.next(),seqIterator.next());
     }
   }
-  //TODO TestRemoveIfMethods<DEFAULT>(Boolean,)
-  //TODO TestRemoveIfMethods<NULL>(Boolean,)
-  //TODO TestRemoveIfMethods<50>(Boolean,)
   @Test
-  public void testUncheckedStackadd_boolean_initialCapacityDEFAULT()
+  public void testUncheckedStackremoveIf_BooleanPredicate_SeqIsEmpty_RemoveTruePredicate()
   {
-    UncheckedStack seq=new UncheckedStack();
-    for(int i=0;i<100;++i)
-    {
+    var seq=new BooleanArrSeq.UncheckedStack();
+    for(int i=0;i<0;++i){
+      seq.add(TypeConversionUtil.convertToboolean(i));
+    }
+    var filter=new BooleanMonitoredPredicate.RemoveTruePredicate(seq);
+    Assertions.assertFalse(seq.removeIf((BooleanPredicate)filter));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,filter.callCount);
+  }
+  @Test
+  public void testUncheckedStackremoveIf_BooleanPredicate_SeqIsEmpty_RemoveFalsePredicate()
+  {
+    var seq=new BooleanArrSeq.UncheckedStack();
+    for(int i=0;i<0;++i){
+      seq.add(TypeConversionUtil.convertToboolean(i));
+    }
+    var filter=new BooleanMonitoredPredicate.RemoveFalsePredicate(seq);
+    Assertions.assertFalse(seq.removeIf((BooleanPredicate)filter));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,filter.callCount);
+  }
+  @Test
+  public void testUncheckedStackremoveIf_BooleanPredicate_FirstValtrue_RemoveTrue(){
+    for(int period=1;period<=10;++period){
+      var seq=new BooleanArrSeq.UncheckedStack();
+      boolean currVal=true;
+      int trueCount=0;
+      int falseCount=0;
+      for(int i=0;;){
+        seq.add(currVal);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      var filter=new BooleanMonitoredPredicate.RemoveTruePredicate();
+      Assertions.assertEquals(trueCount!=0,seq.removeIf((BooleanPredicate)filter));
+      Assertions.assertEquals(falseCount,seq.size());
+      for(int i=0;i<falseCount;++i){
+        Assertions.assertFalse(seq.arr[i]);
+      }
+      Assertions.assertEquals(falseCount==0||trueCount==0?1:2,filter.callCount);
+    }
+  }
+  @Test
+  public void testUncheckedStackremoveIf_BooleanPredicate_FirstValfalse_RemoveTrue(){
+    for(int period=1;period<=10;++period){
+      var seq=new BooleanArrSeq.UncheckedStack();
+      boolean currVal=false;
+      int trueCount=0;
+      int falseCount=0;
+      for(int i=0;;){
+        seq.add(currVal);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      var filter=new BooleanMonitoredPredicate.RemoveTruePredicate();
+      Assertions.assertEquals(trueCount!=0,seq.removeIf((BooleanPredicate)filter));
+      Assertions.assertEquals(falseCount,seq.size());
+      for(int i=0;i<falseCount;++i){
+        Assertions.assertFalse(seq.arr[i]);
+      }
+      Assertions.assertEquals(falseCount==0||trueCount==0?1:2,filter.callCount);
+    }
+  }
+  @Test
+  public void testUncheckedStackremoveIf_BooleanPredicate_FirstValtrue_RemoveFalse(){
+    for(int period=1;period<=10;++period){
+      var seq=new BooleanArrSeq.UncheckedStack();
+      boolean currVal=true;
+      int trueCount=0;
+      int falseCount=0;
+      for(int i=0;;){
+        seq.add(currVal);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      var filter=new BooleanMonitoredPredicate.RemoveFalsePredicate();
+      Assertions.assertEquals(falseCount!=0,seq.removeIf((BooleanPredicate)filter));
+      Assertions.assertEquals(trueCount,seq.size());
+      for(int i=0;i<trueCount;++i){
+        Assertions.assertTrue(seq.arr[i]);
+      }
+      Assertions.assertEquals(falseCount==0||trueCount==0?1:2,filter.callCount);
+    }
+  }
+  @Test
+  public void testUncheckedStackremoveIf_BooleanPredicate_FirstValfalse_RemoveFalse(){
+    for(int period=1;period<=10;++period){
+      var seq=new BooleanArrSeq.UncheckedStack();
+      boolean currVal=false;
+      int trueCount=0;
+      int falseCount=0;
+      for(int i=0;;){
+        seq.add(currVal);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      var filter=new BooleanMonitoredPredicate.RemoveFalsePredicate();
+      Assertions.assertEquals(falseCount!=0,seq.removeIf((BooleanPredicate)filter));
+      Assertions.assertEquals(trueCount,seq.size());
+      for(int i=0;i<trueCount;++i){
+        Assertions.assertTrue(seq.arr[i]);
+      }
+      Assertions.assertEquals(falseCount==0||trueCount==0?1:2,filter.callCount);
+    }
+  }
+  @Test
+  public void testUncheckedStackremoveIf_BooleanPredicate_FirstValtrue_RemoveAll(){
+    for(int period=1;period<=10;++period){
+      var seq=new BooleanArrSeq.UncheckedStack();
+      boolean currVal=true;
+      int trueCount=0;
+      int falseCount=0;
+      for(int i=0;;){
+        seq.add(currVal);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      var filter=new BooleanMonitoredPredicate.RemoveAllPredicate();
+      Assertions.assertTrue(seq.removeIf((BooleanPredicate)filter));
+      Assertions.assertEquals(0,seq.size());
+      Assertions.assertEquals(falseCount==0||trueCount==0?1:2,filter.callCount);
+    }
+  }
+  @Test
+  public void testUncheckedStackremoveIf_BooleanPredicate_FirstValfalse_RemoveAll(){
+    for(int period=1;period<=10;++period){
+      var seq=new BooleanArrSeq.UncheckedStack();
+      boolean currVal=false;
+      int trueCount=0;
+      int falseCount=0;
+      for(int i=0;;){
+        seq.add(currVal);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      var filter=new BooleanMonitoredPredicate.RemoveAllPredicate();
+      Assertions.assertTrue(seq.removeIf((BooleanPredicate)filter));
+      Assertions.assertEquals(0,seq.size());
+      Assertions.assertEquals(falseCount==0||trueCount==0?1:2,filter.callCount);
+    }
+  }
+  @Test
+  public void testUncheckedStackremoveIf_BooleanPredicate_FirstValtrue_RemoveNone(){
+    for(int period=1;period<=10;++period){
+      var seq=new BooleanArrSeq.UncheckedStack();
+      boolean currVal=true;
+      int trueCount=0;
+      int falseCount=0;
+      for(int i=0;;){
+        seq.add(currVal);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      var filter=new BooleanMonitoredPredicate.RemoveNonePredicate();
+      Assertions.assertFalse(seq.removeIf((BooleanPredicate)filter));
+      Assertions.assertEquals(10,seq.size());
+      Assertions.assertEquals(falseCount==0||trueCount==0?1:2,filter.callCount);
+      currVal=true;
+      trueCount=0;
+      falseCount=0;
+      for(int i=0;;){
+        Assertions.assertEquals(currVal,seq.arr[i]);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+    }
+  }
+  @Test
+  public void testUncheckedStackremoveIf_BooleanPredicate_FirstValfalse_RemoveNone(){
+    for(int period=1;period<=10;++period){
+      var seq=new BooleanArrSeq.UncheckedStack();
+      boolean currVal=false;
+      int trueCount=0;
+      int falseCount=0;
+      for(int i=0;;){
+        seq.add(currVal);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      var filter=new BooleanMonitoredPredicate.RemoveNonePredicate();
+      Assertions.assertFalse(seq.removeIf((BooleanPredicate)filter));
+      Assertions.assertEquals(10,seq.size());
+      Assertions.assertEquals(falseCount==0||trueCount==0?1:2,filter.callCount);
+      currVal=false;
+      trueCount=0;
+      falseCount=0;
+      for(int i=0;;){
+        Assertions.assertEquals(currVal,seq.arr[i]);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+    }
+  }
+  @Test
+  public void testUncheckedStackremoveIf_BooleanPredicate_SeqIsEmpty_RemoveAllPredicate()
+  {
+    var seq=new BooleanArrSeq.UncheckedStack();
+    for(int i=0;i<0;++i){
+      seq.add(TypeConversionUtil.convertToboolean(i));
+    }
+    var filter=new BooleanMonitoredPredicate.RemoveAllPredicate(seq);
+    Assertions.assertFalse(seq.removeIf((BooleanPredicate)filter));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,filter.callCount);
+  }
+  @Test
+  public void testUncheckedStackremoveIf_BooleanPredicate_SeqIsEmpty_RemoveNonePredicate()
+  {
+    var seq=new BooleanArrSeq.UncheckedStack();
+    for(int i=0;i<0;++i){
+      seq.add(TypeConversionUtil.convertToboolean(i));
+    }
+    var filter=new BooleanMonitoredPredicate.RemoveNonePredicate(seq);
+    Assertions.assertFalse(seq.removeIf((BooleanPredicate)filter));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,filter.callCount);
+  }
+  @Test
+  public void testUncheckedStackadd_boolean_initialCapacityDEFAULT(){
+    var seq=new BooleanArrSeq.UncheckedStack();
+    for(int i=0;i<100;++i){
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
     }
     Assertions.assertEquals(100,seq.size);
     Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i)
-    {
+    for(int i=0;i<seq.size;++i){
       Assertions.assertEquals(TypeConversionUtil.convertToboolean(i),seq.arr[i]);
     }
   }
   @Test
-  public void testUncheckedStackadd_boolean_initialCapacityNULL()
-  {
-    UncheckedStack seq=new UncheckedStack(0,null);
-    for(int i=0;i<100;++i)
-    {
+  public void testUncheckedStackadd_boolean_initialCapacityNULL(){
+    var seq=new BooleanArrSeq.UncheckedStack(0,null);
+    for(int i=0;i<100;++i){
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
     }
     Assertions.assertEquals(100,seq.size);
     Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i)
-    {
+    for(int i=0;i<seq.size;++i){
       Assertions.assertEquals(TypeConversionUtil.convertToboolean(i),seq.arr[i]);
     }
   }
   @Test
-  public void testUncheckedStackadd_boolean_initialCapacity50()
-  {
-    UncheckedStack seq=new UncheckedStack(50);
-    for(int i=0;i<100;++i)
-    {
+  public void testUncheckedStackadd_boolean_initialCapacity50(){
+    var seq=new BooleanArrSeq.UncheckedStack(50);
+    for(int i=0;i<100;++i){
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
     }
     Assertions.assertEquals(100,seq.size);
     Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i)
-    {
+    for(int i=0;i<seq.size;++i){
       Assertions.assertEquals(TypeConversionUtil.convertToboolean(i),seq.arr[i]);
     }
   }
   @Test
-  public void testUncheckedStackadd_Boolean_initialCapacityDEFAULT()
-  {
-    UncheckedStack seq=new UncheckedStack();
-    for(int i=0;i<100;++i)
-    {
+  public void testUncheckedStackadd_Boolean_initialCapacityDEFAULT(){
+    var seq=new BooleanArrSeq.UncheckedStack();
+    for(int i=0;i<100;++i){
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToBoolean(i)));
     }
     Assertions.assertEquals(100,seq.size);
     Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i)
-    {
+    for(int i=0;i<seq.size;++i){
       Assertions.assertEquals(TypeConversionUtil.convertToboolean(i),seq.arr[i]);
     }
   }
   @Test
-  public void testUncheckedStackadd_Boolean_initialCapacityNULL()
-  {
-    UncheckedStack seq=new UncheckedStack(0,null);
-    for(int i=0;i<100;++i)
-    {
+  public void testUncheckedStackadd_Boolean_initialCapacityNULL(){
+    var seq=new BooleanArrSeq.UncheckedStack(0,null);
+    for(int i=0;i<100;++i){
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToBoolean(i)));
     }
     Assertions.assertEquals(100,seq.size);
     Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i)
-    {
+    for(int i=0;i<seq.size;++i){
       Assertions.assertEquals(TypeConversionUtil.convertToboolean(i),seq.arr[i]);
     }
   }
   @Test
-  public void testUncheckedStackadd_Boolean_initialCapacity50()
-  {
-    UncheckedStack seq=new UncheckedStack(50);
-    for(int i=0;i<100;++i)
-    {
+  public void testUncheckedStackadd_Boolean_initialCapacity50(){
+    var seq=new BooleanArrSeq.UncheckedStack(50);
+    for(int i=0;i<100;++i){
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToBoolean(i)));
     }
     Assertions.assertEquals(100,seq.size);
     Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i)
-    {
+    for(int i=0;i<seq.size;++i){
       Assertions.assertEquals(TypeConversionUtil.convertToboolean(i),seq.arr[i]);
     }
   }
   @Test
-  public void testUncheckedStacktoBooleanArray_void_seqIsEmpty()
-  {
-    UncheckedStack seq=new UncheckedStack();
+  public void testUncheckedStacktoBooleanArray_void_seqIsEmpty(){
+    var seq=new BooleanArrSeq.UncheckedStack();
     Assertions.assertSame(OmniArray.OfBoolean.DEFAULT_ARR,seq.toBooleanArray());
     Assertions.assertEquals(0,seq.size());
   }
   @Test
-  public void testUncheckedStacktoBooleanArray_void_seqIsNotEmpty()
-  {
-    UncheckedStack seq=new UncheckedStack();
-    for(int i=0;i<100;++i)
-    {
+  public void testUncheckedStacktoBooleanArray_void_seqIsNotEmpty(){
+    var seq=new BooleanArrSeq.UncheckedStack();
+    for(int i=0;i<100;++i){
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
     }
     var result=seq.toBooleanArray();
     Assertions.assertEquals(100,seq.size());
     Assertions.assertEquals(100,result.length);
     var itr=seq.iterator();
-    for(int i=0;i<100;++i)
-    {
+    for(int i=0;i<100;++i){
       Assertions.assertEquals(itr.nextBoolean(),result[i]);
     }
     Assertions.assertNotSame(seq.arr,result);
   }
   @Test
-  public void testUncheckedStacktoArray_void_seqIsEmpty()
-  {
-    UncheckedStack seq=new UncheckedStack();
+  public void testUncheckedStacktoArray_void_seqIsEmpty(){
+    var seq=new BooleanArrSeq.UncheckedStack();
     Assertions.assertSame(OmniArray.OfBoolean.DEFAULT_BOXED_ARR,seq.toArray());
     Assertions.assertEquals(0,seq.size());
   }
   @Test
-  public void testUncheckedStacktoArray_void_seqIsNotEmpty()
-  {
-    UncheckedStack seq=new UncheckedStack();
-    for(int i=0;i<100;++i)
-    {
+  public void testUncheckedStacktoArray_void_seqIsNotEmpty(){
+    var seq=new BooleanArrSeq.UncheckedStack();
+    for(int i=0;i<100;++i){
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
     }
     var result=seq.toArray();
     Assertions.assertEquals(100,seq.size());
     Assertions.assertEquals(100,result.length);
     var itr=seq.iterator();
-    for(int i=0;i<100;++i)
-    {
+    for(int i=0;i<100;++i){
       Assertions.assertEquals(itr.next(),result[i]);
     }
     Assertions.assertNotSame(seq.arr,result);
   }
   @Test
-  public void testUncheckedStacktoDoubleArray_void_seqIsEmpty()
-  {
-    UncheckedStack seq=new UncheckedStack();
+  public void testUncheckedStacktoDoubleArray_void_seqIsEmpty(){
+    var seq=new BooleanArrSeq.UncheckedStack();
     Assertions.assertSame(OmniArray.OfDouble.DEFAULT_ARR,seq.toDoubleArray());
     Assertions.assertEquals(0,seq.size());
   }
   @Test
-  public void testUncheckedStacktoDoubleArray_void_seqIsNotEmpty()
-  {
-    UncheckedStack seq=new UncheckedStack();
-    for(int i=0;i<100;++i)
-    {
+  public void testUncheckedStacktoDoubleArray_void_seqIsNotEmpty(){
+    var seq=new BooleanArrSeq.UncheckedStack();
+    for(int i=0;i<100;++i){
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
     }
     var result=seq.toDoubleArray();
     Assertions.assertEquals(100,seq.size());
     Assertions.assertEquals(100,result.length);
     var itr=seq.iterator();
-    for(int i=0;i<100;++i)
-    {
+    for(int i=0;i<100;++i){
       Assertions.assertEquals(itr.nextDouble(),result[i]);
     }
     Assertions.assertNotSame(seq.arr,result);
   }
   @Test
-  public void testUncheckedStacktoFloatArray_void_seqIsEmpty()
-  {
-    UncheckedStack seq=new UncheckedStack();
+  public void testUncheckedStacktoFloatArray_void_seqIsEmpty(){
+    var seq=new BooleanArrSeq.UncheckedStack();
     Assertions.assertSame(OmniArray.OfFloat.DEFAULT_ARR,seq.toFloatArray());
     Assertions.assertEquals(0,seq.size());
   }
   @Test
-  public void testUncheckedStacktoFloatArray_void_seqIsNotEmpty()
-  {
-    UncheckedStack seq=new UncheckedStack();
-    for(int i=0;i<100;++i)
-    {
+  public void testUncheckedStacktoFloatArray_void_seqIsNotEmpty(){
+    var seq=new BooleanArrSeq.UncheckedStack();
+    for(int i=0;i<100;++i){
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
     }
     var result=seq.toFloatArray();
     Assertions.assertEquals(100,seq.size());
     Assertions.assertEquals(100,result.length);
     var itr=seq.iterator();
-    for(int i=0;i<100;++i)
-    {
+    for(int i=0;i<100;++i){
       Assertions.assertEquals(itr.nextFloat(),result[i]);
     }
     Assertions.assertNotSame(seq.arr,result);
   }
   @Test
-  public void testUncheckedStacktoLongArray_void_seqIsEmpty()
-  {
-    UncheckedStack seq=new UncheckedStack();
+  public void testUncheckedStacktoLongArray_void_seqIsEmpty(){
+    var seq=new BooleanArrSeq.UncheckedStack();
     Assertions.assertSame(OmniArray.OfLong.DEFAULT_ARR,seq.toLongArray());
     Assertions.assertEquals(0,seq.size());
   }
   @Test
-  public void testUncheckedStacktoLongArray_void_seqIsNotEmpty()
-  {
-    UncheckedStack seq=new UncheckedStack();
-    for(int i=0;i<100;++i)
-    {
+  public void testUncheckedStacktoLongArray_void_seqIsNotEmpty(){
+    var seq=new BooleanArrSeq.UncheckedStack();
+    for(int i=0;i<100;++i){
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
     }
     var result=seq.toLongArray();
     Assertions.assertEquals(100,seq.size());
     Assertions.assertEquals(100,result.length);
     var itr=seq.iterator();
-    for(int i=0;i<100;++i)
-    {
+    for(int i=0;i<100;++i){
       Assertions.assertEquals(itr.nextLong(),result[i]);
     }
     Assertions.assertNotSame(seq.arr,result);
   }
   @Test
-  public void testUncheckedStacktoIntArray_void_seqIsEmpty()
-  {
-    UncheckedStack seq=new UncheckedStack();
+  public void testUncheckedStacktoIntArray_void_seqIsEmpty(){
+    var seq=new BooleanArrSeq.UncheckedStack();
     Assertions.assertSame(OmniArray.OfInt.DEFAULT_ARR,seq.toIntArray());
     Assertions.assertEquals(0,seq.size());
   }
   @Test
-  public void testUncheckedStacktoIntArray_void_seqIsNotEmpty()
-  {
-    UncheckedStack seq=new UncheckedStack();
-    for(int i=0;i<100;++i)
-    {
+  public void testUncheckedStacktoIntArray_void_seqIsNotEmpty(){
+    var seq=new BooleanArrSeq.UncheckedStack();
+    for(int i=0;i<100;++i){
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
     }
     var result=seq.toIntArray();
     Assertions.assertEquals(100,seq.size());
     Assertions.assertEquals(100,result.length);
     var itr=seq.iterator();
-    for(int i=0;i<100;++i)
-    {
+    for(int i=0;i<100;++i){
       Assertions.assertEquals(itr.nextInt(),result[i]);
     }
     Assertions.assertNotSame(seq.arr,result);
   }
   @Test
-  public void testUncheckedStacktoShortArray_void_seqIsEmpty()
-  {
-    UncheckedStack seq=new UncheckedStack();
+  public void testUncheckedStacktoShortArray_void_seqIsEmpty(){
+    var seq=new BooleanArrSeq.UncheckedStack();
     Assertions.assertSame(OmniArray.OfShort.DEFAULT_ARR,seq.toShortArray());
     Assertions.assertEquals(0,seq.size());
   }
   @Test
-  public void testUncheckedStacktoShortArray_void_seqIsNotEmpty()
-  {
-    UncheckedStack seq=new UncheckedStack();
-    for(int i=0;i<100;++i)
-    {
+  public void testUncheckedStacktoShortArray_void_seqIsNotEmpty(){
+    var seq=new BooleanArrSeq.UncheckedStack();
+    for(int i=0;i<100;++i){
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
     }
     var result=seq.toShortArray();
     Assertions.assertEquals(100,seq.size());
     Assertions.assertEquals(100,result.length);
     var itr=seq.iterator();
-    for(int i=0;i<100;++i)
-    {
+    for(int i=0;i<100;++i){
       Assertions.assertEquals(itr.nextShort(),result[i]);
     }
     Assertions.assertNotSame(seq.arr,result);
   }
   @Test
-  public void testUncheckedStacktoCharArray_void_seqIsEmpty()
-  {
-    UncheckedStack seq=new UncheckedStack();
+  public void testUncheckedStacktoCharArray_void_seqIsEmpty(){
+    var seq=new BooleanArrSeq.UncheckedStack();
     Assertions.assertSame(OmniArray.OfChar.DEFAULT_ARR,seq.toCharArray());
     Assertions.assertEquals(0,seq.size());
   }
   @Test
-  public void testUncheckedStacktoCharArray_void_seqIsNotEmpty()
-  {
-    UncheckedStack seq=new UncheckedStack();
-    for(int i=0;i<100;++i)
-    {
+  public void testUncheckedStacktoCharArray_void_seqIsNotEmpty(){
+    var seq=new BooleanArrSeq.UncheckedStack();
+    for(int i=0;i<100;++i){
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
     }
     var result=seq.toCharArray();
     Assertions.assertEquals(100,seq.size());
     Assertions.assertEquals(100,result.length);
     var itr=seq.iterator();
-    for(int i=0;i<100;++i)
-    {
+    for(int i=0;i<100;++i){
       Assertions.assertEquals(itr.nextChar(),result[i]);
     }
     Assertions.assertNotSame(seq.arr,result);
   }
   @Test
-  public void testUncheckedStacktoByteArray_void_seqIsEmpty()
-  {
-    UncheckedStack seq=new UncheckedStack();
+  public void testUncheckedStacktoByteArray_void_seqIsEmpty(){
+    var seq=new BooleanArrSeq.UncheckedStack();
     Assertions.assertSame(OmniArray.OfByte.DEFAULT_ARR,seq.toByteArray());
     Assertions.assertEquals(0,seq.size());
   }
   @Test
-  public void testUncheckedStacktoByteArray_void_seqIsNotEmpty()
-  {
-    UncheckedStack seq=new UncheckedStack();
-    for(int i=0;i<100;++i)
-    {
+  public void testUncheckedStacktoByteArray_void_seqIsNotEmpty(){
+    var seq=new BooleanArrSeq.UncheckedStack();
+    for(int i=0;i<100;++i){
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
     }
     var result=seq.toByteArray();
     Assertions.assertEquals(100,seq.size());
     Assertions.assertEquals(100,result.length);
     var itr=seq.iterator();
-    for(int i=0;i<100;++i)
-    {
+    for(int i=0;i<100;++i){
       Assertions.assertEquals(itr.nextByte(),result[i]);
     }
     Assertions.assertNotSame(seq.arr,result);
   }
   @Test
-  public void testUncheckedListconstructor_void_initialCapacityDEFAULT()
-  {
-    UncheckedList seq=new UncheckedList();
+  public void testUncheckedListconstructor_void_initialCapacityDEFAULT(){
+    var seq=new BooleanArrSeq.UncheckedList();
     Assertions.assertEquals(0,seq.size);
     Assertions.assertSame(OmniArray.OfBoolean.DEFAULT_ARR,seq.arr);
   }
   @Test
-  public void testUncheckedListconstructor_intboolean_initialCapacityNULL()
-  {
-    UncheckedList seq=new UncheckedList(0,null);
+  public void testUncheckedListconstructor_intboolean_initialCapacityNULL(){
+    var seq=new BooleanArrSeq.UncheckedList(0,null);
     Assertions.assertEquals(0,seq.size);
     Assertions.assertNull(seq.arr);
   }
   @Test
-  public void testUncheckedListconstructor_int_initialCapacity50()
-  {
-    UncheckedList seq=new UncheckedList(50);
+  public void testUncheckedListconstructor_int_initialCapacity50(){
+    var seq=new BooleanArrSeq.UncheckedList(50);
     Assertions.assertEquals(0,seq.size);
-    switch(50)
-    {
+    switch(50){
     case 0:
       Assertions.assertNull(seq.arr);
       break;
@@ -741,12 +1366,10 @@ public class BooleanArrSeqTest
     }
   }
   @Test
-  public void testUncheckedListconstructor_int_initialCapacity0()
-  {
-    UncheckedList seq=new UncheckedList(0);
+  public void testUncheckedListconstructor_int_initialCapacity0(){
+    var seq=new BooleanArrSeq.UncheckedList(0);
     Assertions.assertEquals(0,seq.size);
-    switch(0)
-    {
+    switch(0){
     case 0:
       Assertions.assertNull(seq.arr);
       break;
@@ -759,12 +1382,10 @@ public class BooleanArrSeqTest
     }
   }
   @Test
-  public void testUncheckedListconstructor_int_initialCapacity10()
-  {
-    UncheckedList seq=new UncheckedList(10);
+  public void testUncheckedListconstructor_int_initialCapacity10(){
+    var seq=new BooleanArrSeq.UncheckedList(10);
     Assertions.assertEquals(0,seq.size);
-    switch(10)
-    {
+    switch(10){
     case 0:
       Assertions.assertNull(seq.arr);
       break;
@@ -777,9 +1398,133 @@ public class BooleanArrSeqTest
     }
   }
   @Test
-  public void testUncheckedListtoArray_ObjectArray_zeroLengthArrayAndSequenceIsEmpty()
+  public void testUncheckedListClone_initialCapacityDEFAULT_seqIsEmpty()
   {
-    UncheckedList seq=new UncheckedList();
+    var seq=new BooleanArrSeq.UncheckedList();
+    var clone=(BooleanArrSeq.UncheckedList)seq.clone();
+    Assertions.assertEquals(0,clone.size());
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertSame(clone.arr,OmniArray.OfBoolean.DEFAULT_ARR);
+  }
+  @Test
+  public void testUncheckedListClone_initialCapacityDEFAULT_seqIsNotEmpty()
+  {
+    var seq=new BooleanArrSeq.UncheckedList();
+    for(int i=0;i<100;++i){
+      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
+    }
+    var clone=(BooleanArrSeq.UncheckedList)seq.clone();
+    Assertions.assertEquals(100,clone.size());
+    Assertions.assertEquals(100,seq.size());
+    Assertions.assertNotSame(seq.arr,clone.arr);
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertToboolean(i),clone.arr[i]);
+    }
+  }
+  @Test
+  public void testUncheckedListClone_initialCapacityNULL_seqIsEmpty()
+  {
+    var seq=new BooleanArrSeq.UncheckedList(0,null);
+    var clone=(BooleanArrSeq.UncheckedList)seq.clone();
+    Assertions.assertEquals(0,clone.size());
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertSame(clone.arr,OmniArray.OfBoolean.DEFAULT_ARR);
+  }
+  @Test
+  public void testUncheckedListClone_initialCapacityNULL_seqIsNotEmpty()
+  {
+    var seq=new BooleanArrSeq.UncheckedList(0,null);
+    for(int i=0;i<100;++i){
+      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
+    }
+    var clone=(BooleanArrSeq.UncheckedList)seq.clone();
+    Assertions.assertEquals(100,clone.size());
+    Assertions.assertEquals(100,seq.size());
+    Assertions.assertNotSame(seq.arr,clone.arr);
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertToboolean(i),clone.arr[i]);
+    }
+  }
+  @Test
+  public void testUncheckedListClone_initialCapacity50_seqIsEmpty()
+  {
+    var seq=new BooleanArrSeq.UncheckedList(50);
+    var clone=(BooleanArrSeq.UncheckedList)seq.clone();
+    Assertions.assertEquals(0,clone.size());
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertSame(clone.arr,OmniArray.OfBoolean.DEFAULT_ARR);
+  }
+  @Test
+  public void testUncheckedListClone_initialCapacity50_seqIsNotEmpty()
+  {
+    var seq=new BooleanArrSeq.UncheckedList(50);
+    for(int i=0;i<100;++i){
+      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
+    }
+    var clone=(BooleanArrSeq.UncheckedList)seq.clone();
+    Assertions.assertEquals(100,clone.size());
+    Assertions.assertEquals(100,seq.size());
+    Assertions.assertNotSame(seq.arr,clone.arr);
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertToboolean(i),clone.arr[i]);
+    }
+  }
+  @Test
+  public void testUncheckedListClone_initialCapacity0_seqIsEmpty()
+  {
+    var seq=new BooleanArrSeq.UncheckedList(0);
+    var clone=(BooleanArrSeq.UncheckedList)seq.clone();
+    Assertions.assertEquals(0,clone.size());
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertSame(clone.arr,OmniArray.OfBoolean.DEFAULT_ARR);
+  }
+  @Test
+  public void testUncheckedListClone_initialCapacity0_seqIsNotEmpty()
+  {
+    var seq=new BooleanArrSeq.UncheckedList(0);
+    for(int i=0;i<100;++i){
+      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
+    }
+    var clone=(BooleanArrSeq.UncheckedList)seq.clone();
+    Assertions.assertEquals(100,clone.size());
+    Assertions.assertEquals(100,seq.size());
+    Assertions.assertNotSame(seq.arr,clone.arr);
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertToboolean(i),clone.arr[i]);
+    }
+  }
+  @Test
+  public void testUncheckedListClone_initialCapacity10_seqIsEmpty()
+  {
+    var seq=new BooleanArrSeq.UncheckedList(10);
+    var clone=(BooleanArrSeq.UncheckedList)seq.clone();
+    Assertions.assertEquals(0,clone.size());
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertSame(clone.arr,OmniArray.OfBoolean.DEFAULT_ARR);
+  }
+  @Test
+  public void testUncheckedListClone_initialCapacity10_seqIsNotEmpty()
+  {
+    var seq=new BooleanArrSeq.UncheckedList(10);
+    for(int i=0;i<100;++i){
+      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
+    }
+    var clone=(BooleanArrSeq.UncheckedList)seq.clone();
+    Assertions.assertEquals(100,clone.size());
+    Assertions.assertEquals(100,seq.size());
+    Assertions.assertNotSame(seq.arr,clone.arr);
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertToboolean(i),clone.arr[i]);
+    }
+  }
+  @Test
+  public void testUncheckedListtoArray_ObjectArray_zeroLengthArrayAndSequenceIsEmpty(){
+    var seq=new BooleanArrSeq.UncheckedList();
     Boolean[] paramArr=new Boolean[0];
     var result=seq.toArray(paramArr);
     Assertions.assertEquals(0,seq.size());
@@ -788,11 +1533,9 @@ public class BooleanArrSeqTest
     Assertions.assertSame(paramArr,result);
   }
   @Test
-  public void testUncheckedListtoArray_ObjectArray_zeroLengthArrayAndSequenceNotEmpty()
-  {
-    UncheckedList seq=new UncheckedList();
-    for(int i=0;i<100;++i)
-    {
+  public void testUncheckedListtoArray_ObjectArray_zeroLengthArrayAndSequenceNotEmpty(){
+    var seq=new BooleanArrSeq.UncheckedList();
+    for(int i=0;i<100;++i){
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
     }
     Boolean[] paramArr=new Boolean[0];
@@ -802,18 +1545,15 @@ public class BooleanArrSeqTest
     Assertions.assertNotSame(seq.arr,result);
     Assertions.assertNotSame(paramArr,result);
     var itr=seq.iterator();
-    for(int i=0;i<100;++i)
-    {
+    for(int i=0;i<100;++i){
       Assertions.assertEquals(itr.next(),result[i]);
     }
   }
   @Test
-  public void testUncheckedListtoArray_ObjectArray_nonzeroLengthArrayAndSequenceIsEmpty()
-  {
-    UncheckedList seq=new UncheckedList();
+  public void testUncheckedListtoArray_ObjectArray_nonzeroLengthArrayAndSequenceIsEmpty(){
+    var seq=new BooleanArrSeq.UncheckedList();
     Boolean[] paramArr=new Boolean[5];
-    for(int i=0;i<paramArr.length;++i)
-    {
+    for(int i=0;i<paramArr.length;++i){
       paramArr[i]=TypeConversionUtil.convertToboolean(paramArr.length);
     }
     var result=seq.toArray(paramArr);
@@ -822,22 +1562,18 @@ public class BooleanArrSeqTest
     Assertions.assertNotSame(seq.arr,result);
     Assertions.assertSame(paramArr,result);
     Assertions.assertNull(result[0]);
-    for(int i=1;i<result.length;++i)
-    {
+    for(int i=1;i<result.length;++i){
       Assertions.assertEquals((Object)TypeConversionUtil.convertToboolean(paramArr.length),result[i]);
     }
   }
   @Test
-  public void testUncheckedListtoArray_ObjectArray_overSizedArray()
-  {
-    UncheckedList seq=new UncheckedList();
+  public void testUncheckedListtoArray_ObjectArray_overSizedArray(){
+    var seq=new BooleanArrSeq.UncheckedList();
     Boolean[] paramArr=new Boolean[10];
-    for(int i=0;i<paramArr.length;++i)
-    {
+    for(int i=0;i<paramArr.length;++i){
       paramArr[i]=TypeConversionUtil.convertToboolean(paramArr.length);
     }
-    for(int i=0;i<5;++i)
-    {
+    for(int i=0;i<5;++i){
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
     }
     var result=seq.toArray(paramArr);
@@ -846,27 +1582,22 @@ public class BooleanArrSeqTest
     Assertions.assertNotSame(seq.arr,result);
     Assertions.assertSame(paramArr,result);
     var itr=seq.iterator();
-    for(int i=0;i<5;++i)
-    {
+    for(int i=0;i<5;++i){
       Assertions.assertEquals(itr.next(),result[i]);
     }
     Assertions.assertNull(result[5]);
-    for(int i=6;i<result.length;++i)
-    {
+    for(int i=6;i<result.length;++i){
       Assertions.assertEquals((Object)TypeConversionUtil.convertToboolean(paramArr.length),result[i]);
     }
   }
   @Test
-  public void testUncheckedListtoArray_ObjectArray_undersizedArray()
-  {
-    UncheckedList seq=new UncheckedList();
+  public void testUncheckedListtoArray_ObjectArray_undersizedArray(){
+    var seq=new BooleanArrSeq.UncheckedList();
     Boolean[] paramArr=new Boolean[5];
-    for(int i=0;i<paramArr.length;++i)
-    {
+    for(int i=0;i<paramArr.length;++i){
       paramArr[i]=TypeConversionUtil.convertToboolean(10);
     }
-    for(int i=0;i<10;++i)
-    {
+    for(int i=0;i<10;++i){
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
     }
     var result=seq.toArray(paramArr);
@@ -875,22 +1606,18 @@ public class BooleanArrSeqTest
     Assertions.assertNotSame(seq.arr,result);
     Assertions.assertNotSame(paramArr,result);
     var itr=seq.iterator();
-    for(int i=0;i<10;++i)
-    {
+    for(int i=0;i<10;++i){
       Assertions.assertEquals(itr.next(),result[i]);
     }
   }
   @Test
-  public void testUncheckedListtoArray_ObjectArray_exactSizeArray()
-  {
-    UncheckedList seq=new UncheckedList();
+  public void testUncheckedListtoArray_ObjectArray_exactSizeArray(){
+    var seq=new BooleanArrSeq.UncheckedList();
     Boolean[] paramArr=new Boolean[5];
-    for(int i=0;i<paramArr.length;++i)
-    {
+    for(int i=0;i<paramArr.length;++i){
       paramArr[i]=TypeConversionUtil.convertToboolean(5);
     }
-    for(int i=0;i<5;++i)
-    {
+    for(int i=0;i<5;++i){
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
     }
     var result=seq.toArray(paramArr);
@@ -899,15 +1626,13 @@ public class BooleanArrSeqTest
     Assertions.assertNotSame(seq.arr,result);
     Assertions.assertSame(paramArr,result);
     var itr=seq.iterator();
-    for(int i=0;i<5;++i)
-    {
+    for(int i=0;i<5;++i){
       Assertions.assertEquals(itr.next(),result[i]);
     }
   }
   @Test
-  public void testUncheckedListtoArray_IntFunction_seqIsEmpty_nonMod()
-  {
-    UncheckedList seq=new UncheckedList();
+  public void testUncheckedListtoArray_IntFunction_seqIsEmpty_nonMod(){
+    var seq=new BooleanArrSeq.UncheckedList();
     IntFunction<Boolean[]> arrConstructor=Boolean[]::new;
     var result=seq.toArray(arrConstructor);
     Assertions.assertEquals(0,seq.size());
@@ -915,11 +1640,9 @@ public class BooleanArrSeqTest
     Assertions.assertEquals(0,result.length);
   }
   @Test
-  public void testUncheckedListtoArray_IntFunction_seqIsNotEmpty_nonMod()
-  {
-    UncheckedList seq=new UncheckedList();
-    for(int i=0;i<100;++i)
-    {
+  public void testUncheckedListtoArray_IntFunction_seqIsNotEmpty_nonMod(){
+    var seq=new BooleanArrSeq.UncheckedList();
+    for(int i=0;i<100;++i){
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
     }
     IntFunction<Boolean[]> arrConstructor=Boolean[]::new;
@@ -928,60 +1651,49 @@ public class BooleanArrSeqTest
     Assertions.assertNotSame(seq.arr,result);
     Assertions.assertEquals(100,result.length);
     var itr=seq.iterator();
-    for(int i=0;i<100;++i)
-    {
+    for(int i=0;i<100;++i){
       Assertions.assertEquals(itr.next(),result[i]);
     }
   }
   @Test
-  public void testUncheckedListclear_void_seqIsEmpty()
-  {
-    UncheckedList seq=new UncheckedList();
+  public void testUncheckedListclear_void_seqIsEmpty(){
+    var seq=new BooleanArrSeq.UncheckedList();
     seq.clear();
     Assertions.assertTrue(seq.isEmpty());
   }
   @Test
-  public void testUncheckedListclear_void_seqIsNotEmpty()
-  {
-    UncheckedList seq=new UncheckedList();
-    for(int i=0;i<100;++i)
-    {
+  public void testUncheckedListclear_void_seqIsNotEmpty(){
+    var seq=new BooleanArrSeq.UncheckedList();
+    for(int i=0;i<100;++i){
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
     }
     seq.clear();
     Assertions.assertTrue(seq.isEmpty());
-    for(int i=0;i<100;++i)
-    {
+    for(int i=0;i<100;++i){
       Assertions.assertEquals(TypeConversionUtil.convertToboolean(i),seq.arr[i]);
     }
   }
   @Test
-  public void testUncheckedListisEmpty_void_seqIsEmpty()
-  {
-    UncheckedList seq=new UncheckedList();
+  public void testUncheckedListisEmpty_void_seqIsEmpty(){
+    var seq=new BooleanArrSeq.UncheckedList();
     Assertions.assertTrue(seq.isEmpty());
   }
   @Test
-  public void testUncheckedListisEmpty_void_seqIsNotEmpty()
-  {
-    UncheckedList seq=new UncheckedList();
-    for(int i=0;i<100;++i)
-    {
+  public void testUncheckedListisEmpty_void_seqIsNotEmpty(){
+    var seq=new BooleanArrSeq.UncheckedList();
+    for(int i=0;i<100;++i){
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
     }
     Assertions.assertFalse(seq.isEmpty());
   }
   @Test
-  public void testUncheckedListisEmpty_void_seqIsBeingCleared()
-  {
-    UncheckedList seq=new UncheckedList();
-    for(int i=0;i<100;++i)
-    {
+  public void testUncheckedListisEmpty_void_seqIsBeingCleared(){
+    var seq=new BooleanArrSeq.UncheckedList();
+    for(int i=0;i<100;++i){
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
     }
     var itr=seq.iterator();
-    for(int i=100;--i>=0;)
-    {
+    for(int i=100;--i>=0;){
       Assertions.assertFalse(seq.isEmpty());
       itr.nextBoolean();
       itr.remove();
@@ -989,57 +1701,48 @@ public class BooleanArrSeqTest
     Assertions.assertTrue(seq.isEmpty());
   }
   @Test
-  public void testUncheckedListsize_void_seqIsEmpty()
-  {
-    UncheckedList seq=new UncheckedList();
+  public void testUncheckedListsize_void_seqIsEmpty(){
+    var seq=new BooleanArrSeq.UncheckedList();
     Assertions.assertEquals(0,seq.size);
     Assertions.assertEquals(seq.size,seq.size());
   }
   @Test
-  public void testUncheckedListsize_void_seqIsNotEmpty()
-  {
-    UncheckedList seq=new UncheckedList();
-    for(int i=0;i<100;++i)
-    {
+  public void testUncheckedListsize_void_seqIsNotEmpty(){
+    var seq=new BooleanArrSeq.UncheckedList();
+    for(int i=0;i<100;++i){
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
     }
     Assertions.assertEquals(100,seq.size);
     Assertions.assertEquals(seq.size,seq.size());
   }
   @Test
-  public void testUncheckedListsize_void_seqIsBeingCleared()
-  {
-    UncheckedList seq=new UncheckedList();
-    for(int i=0;i<100;++i)
-    {
+  public void testUncheckedListsize_void_seqIsBeingCleared(){
+    var seq=new BooleanArrSeq.UncheckedList();
+    for(int i=0;i<100;++i){
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
     }
     var itr=seq.iterator();
-    for(int i=100;--i>=0;)
-    {
+    for(int i=100;--i>=0;){
       itr.nextBoolean();
       itr.remove();
       Assertions.assertEquals(i,seq.size());
     }
   }
   @Test
-  public void testUncheckedListforEach_Consumer_SeqIsEmpty_NoMod()
-  {
-    UncheckedList seq=new UncheckedList();
-    MonitoredConsumer consumer=new MonitoredConsumer();
+  public void testUncheckedListforEach_Consumer_SeqIsEmpty_NoMod(){
+    var seq=new BooleanArrSeq.UncheckedList();
+    var consumer=new BooleanMonitoredConsumer();
     seq.forEach((Consumer)consumer);
     Assertions.assertEquals(0,seq.size());
     Assertions.assertTrue(consumer.isEmpty());
   }
   @Test
-  public void testUncheckedListforEach_Consumer_SeqIsNotEmpty_NoMod()
-  {
-    UncheckedList seq=new UncheckedList();
-    for(int i=0;i<100;++i)
-    {
+  public void testUncheckedListforEach_Consumer_SeqIsNotEmpty_NoMod(){
+    var seq=new BooleanArrSeq.UncheckedList();
+    for(int i=0;i<100;++i){
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
     }
-    MonitoredConsumer consumer=new MonitoredConsumer();
+    var consumer=new BooleanMonitoredConsumer();
     seq.forEach((Consumer)consumer);
     Assertions.assertEquals(100,seq.size());
     Assertions.assertEquals(100,consumer.size());
@@ -1050,27 +1753,331 @@ public class BooleanArrSeqTest
       Assertions.assertEquals(consumerIterator.next(),seqIterator.next());
     }
   }
-  //TODO TestRemoveIfMethods<DEFAULT>(,)
-  //TODO TestRemoveIfMethods<NULL>(,)
-  //TODO TestRemoveIfMethods<50>(,)
   @Test
-  public void testUncheckedListforEach_BooleanConsumer_SeqIsEmpty_NoMod()
+  public void testUncheckedListremoveIf_Predicate_SeqIsEmpty_RemoveTruePredicate()
   {
-    UncheckedList seq=new UncheckedList();
-    MonitoredConsumer consumer=new MonitoredConsumer();
+    var seq=new BooleanArrSeq.UncheckedList();
+    for(int i=0;i<0;++i){
+      seq.add(TypeConversionUtil.convertToboolean(i));
+    }
+    var filter=new BooleanMonitoredPredicate.RemoveTruePredicate(seq);
+    Assertions.assertFalse(seq.removeIf((Predicate)filter));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,filter.callCount);
+  }
+  @Test
+  public void testUncheckedListremoveIf_Predicate_SeqIsEmpty_RemoveFalsePredicate()
+  {
+    var seq=new BooleanArrSeq.UncheckedList();
+    for(int i=0;i<0;++i){
+      seq.add(TypeConversionUtil.convertToboolean(i));
+    }
+    var filter=new BooleanMonitoredPredicate.RemoveFalsePredicate(seq);
+    Assertions.assertFalse(seq.removeIf((Predicate)filter));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,filter.callCount);
+  }
+  @Test
+  public void testUncheckedListremoveIf_Predicate_FirstValtrue_RemoveTrue(){
+    for(int period=1;period<=10;++period){
+      var seq=new BooleanArrSeq.UncheckedList();
+      boolean currVal=true;
+      int trueCount=0;
+      int falseCount=0;
+      for(int i=0;;){
+        seq.add(currVal);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      var filter=new BooleanMonitoredPredicate.RemoveTruePredicate();
+      Assertions.assertEquals(trueCount!=0,seq.removeIf((Predicate)filter));
+      Assertions.assertEquals(falseCount,seq.size());
+      for(int i=0;i<falseCount;++i){
+        Assertions.assertFalse(seq.arr[i]);
+      }
+      Assertions.assertEquals(falseCount==0||trueCount==0?1:2,filter.callCount);
+    }
+  }
+  @Test
+  public void testUncheckedListremoveIf_Predicate_FirstValfalse_RemoveTrue(){
+    for(int period=1;period<=10;++period){
+      var seq=new BooleanArrSeq.UncheckedList();
+      boolean currVal=false;
+      int trueCount=0;
+      int falseCount=0;
+      for(int i=0;;){
+        seq.add(currVal);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      var filter=new BooleanMonitoredPredicate.RemoveTruePredicate();
+      Assertions.assertEquals(trueCount!=0,seq.removeIf((Predicate)filter));
+      Assertions.assertEquals(falseCount,seq.size());
+      for(int i=0;i<falseCount;++i){
+        Assertions.assertFalse(seq.arr[i]);
+      }
+      Assertions.assertEquals(falseCount==0||trueCount==0?1:2,filter.callCount);
+    }
+  }
+  @Test
+  public void testUncheckedListremoveIf_Predicate_FirstValtrue_RemoveFalse(){
+    for(int period=1;period<=10;++period){
+      var seq=new BooleanArrSeq.UncheckedList();
+      boolean currVal=true;
+      int trueCount=0;
+      int falseCount=0;
+      for(int i=0;;){
+        seq.add(currVal);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      var filter=new BooleanMonitoredPredicate.RemoveFalsePredicate();
+      Assertions.assertEquals(falseCount!=0,seq.removeIf((Predicate)filter));
+      Assertions.assertEquals(trueCount,seq.size());
+      for(int i=0;i<trueCount;++i){
+        Assertions.assertTrue(seq.arr[i]);
+      }
+      Assertions.assertEquals(falseCount==0||trueCount==0?1:2,filter.callCount);
+    }
+  }
+  @Test
+  public void testUncheckedListremoveIf_Predicate_FirstValfalse_RemoveFalse(){
+    for(int period=1;period<=10;++period){
+      var seq=new BooleanArrSeq.UncheckedList();
+      boolean currVal=false;
+      int trueCount=0;
+      int falseCount=0;
+      for(int i=0;;){
+        seq.add(currVal);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      var filter=new BooleanMonitoredPredicate.RemoveFalsePredicate();
+      Assertions.assertEquals(falseCount!=0,seq.removeIf((Predicate)filter));
+      Assertions.assertEquals(trueCount,seq.size());
+      for(int i=0;i<trueCount;++i){
+        Assertions.assertTrue(seq.arr[i]);
+      }
+      Assertions.assertEquals(falseCount==0||trueCount==0?1:2,filter.callCount);
+    }
+  }
+  @Test
+  public void testUncheckedListremoveIf_Predicate_FirstValtrue_RemoveAll(){
+    for(int period=1;period<=10;++period){
+      var seq=new BooleanArrSeq.UncheckedList();
+      boolean currVal=true;
+      int trueCount=0;
+      int falseCount=0;
+      for(int i=0;;){
+        seq.add(currVal);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      var filter=new BooleanMonitoredPredicate.RemoveAllPredicate();
+      Assertions.assertTrue(seq.removeIf((Predicate)filter));
+      Assertions.assertEquals(0,seq.size());
+      Assertions.assertEquals(falseCount==0||trueCount==0?1:2,filter.callCount);
+    }
+  }
+  @Test
+  public void testUncheckedListremoveIf_Predicate_FirstValfalse_RemoveAll(){
+    for(int period=1;period<=10;++period){
+      var seq=new BooleanArrSeq.UncheckedList();
+      boolean currVal=false;
+      int trueCount=0;
+      int falseCount=0;
+      for(int i=0;;){
+        seq.add(currVal);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      var filter=new BooleanMonitoredPredicate.RemoveAllPredicate();
+      Assertions.assertTrue(seq.removeIf((Predicate)filter));
+      Assertions.assertEquals(0,seq.size());
+      Assertions.assertEquals(falseCount==0||trueCount==0?1:2,filter.callCount);
+    }
+  }
+  @Test
+  public void testUncheckedListremoveIf_Predicate_FirstValtrue_RemoveNone(){
+    for(int period=1;period<=10;++period){
+      var seq=new BooleanArrSeq.UncheckedList();
+      boolean currVal=true;
+      int trueCount=0;
+      int falseCount=0;
+      for(int i=0;;){
+        seq.add(currVal);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      var filter=new BooleanMonitoredPredicate.RemoveNonePredicate();
+      Assertions.assertFalse(seq.removeIf((Predicate)filter));
+      Assertions.assertEquals(10,seq.size());
+      Assertions.assertEquals(falseCount==0||trueCount==0?1:2,filter.callCount);
+      currVal=true;
+      trueCount=0;
+      falseCount=0;
+      for(int i=0;;){
+        Assertions.assertEquals(currVal,seq.arr[i]);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+    }
+  }
+  @Test
+  public void testUncheckedListremoveIf_Predicate_FirstValfalse_RemoveNone(){
+    for(int period=1;period<=10;++period){
+      var seq=new BooleanArrSeq.UncheckedList();
+      boolean currVal=false;
+      int trueCount=0;
+      int falseCount=0;
+      for(int i=0;;){
+        seq.add(currVal);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      var filter=new BooleanMonitoredPredicate.RemoveNonePredicate();
+      Assertions.assertFalse(seq.removeIf((Predicate)filter));
+      Assertions.assertEquals(10,seq.size());
+      Assertions.assertEquals(falseCount==0||trueCount==0?1:2,filter.callCount);
+      currVal=false;
+      trueCount=0;
+      falseCount=0;
+      for(int i=0;;){
+        Assertions.assertEquals(currVal,seq.arr[i]);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+    }
+  }
+  @Test
+  public void testUncheckedListremoveIf_Predicate_SeqIsEmpty_RemoveAllPredicate()
+  {
+    var seq=new BooleanArrSeq.UncheckedList();
+    for(int i=0;i<0;++i){
+      seq.add(TypeConversionUtil.convertToboolean(i));
+    }
+    var filter=new BooleanMonitoredPredicate.RemoveAllPredicate(seq);
+    Assertions.assertFalse(seq.removeIf((Predicate)filter));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,filter.callCount);
+  }
+  @Test
+  public void testUncheckedListremoveIf_Predicate_SeqIsEmpty_RemoveNonePredicate()
+  {
+    var seq=new BooleanArrSeq.UncheckedList();
+    for(int i=0;i<0;++i){
+      seq.add(TypeConversionUtil.convertToboolean(i));
+    }
+    var filter=new BooleanMonitoredPredicate.RemoveNonePredicate(seq);
+    Assertions.assertFalse(seq.removeIf((Predicate)filter));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,filter.callCount);
+  }
+  @Test
+  public void testUncheckedListforEach_BooleanConsumer_SeqIsEmpty_NoMod(){
+    var seq=new BooleanArrSeq.UncheckedList();
+    var consumer=new BooleanMonitoredConsumer();
     seq.forEach((BooleanConsumer)consumer);
     Assertions.assertEquals(0,seq.size());
     Assertions.assertTrue(consumer.isEmpty());
   }
   @Test
-  public void testUncheckedListforEach_BooleanConsumer_SeqIsNotEmpty_NoMod()
-  {
-    UncheckedList seq=new UncheckedList();
-    for(int i=0;i<100;++i)
-    {
+  public void testUncheckedListforEach_BooleanConsumer_SeqIsNotEmpty_NoMod(){
+    var seq=new BooleanArrSeq.UncheckedList();
+    for(int i=0;i<100;++i){
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
     }
-    MonitoredConsumer consumer=new MonitoredConsumer();
+    var consumer=new BooleanMonitoredConsumer();
     seq.forEach((BooleanConsumer)consumer);
     Assertions.assertEquals(100,seq.size());
     Assertions.assertEquals(100,consumer.size());
@@ -1081,443 +2088,596 @@ public class BooleanArrSeqTest
       Assertions.assertEquals(consumerIterator.next(),seqIterator.next());
     }
   }
-  //TODO TestRemoveIfMethods<DEFAULT>(Boolean,)
-  //TODO TestRemoveIfMethods<NULL>(Boolean,)
-  //TODO TestRemoveIfMethods<50>(Boolean,)
   @Test
-  public void testUncheckedListadd_boolean_initialCapacityDEFAULT()
+  public void testUncheckedListremoveIf_BooleanPredicate_SeqIsEmpty_RemoveTruePredicate()
   {
-    UncheckedList seq=new UncheckedList();
-    for(int i=0;i<100;++i)
-    {
+    var seq=new BooleanArrSeq.UncheckedList();
+    for(int i=0;i<0;++i){
+      seq.add(TypeConversionUtil.convertToboolean(i));
+    }
+    var filter=new BooleanMonitoredPredicate.RemoveTruePredicate(seq);
+    Assertions.assertFalse(seq.removeIf((BooleanPredicate)filter));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,filter.callCount);
+  }
+  @Test
+  public void testUncheckedListremoveIf_BooleanPredicate_SeqIsEmpty_RemoveFalsePredicate()
+  {
+    var seq=new BooleanArrSeq.UncheckedList();
+    for(int i=0;i<0;++i){
+      seq.add(TypeConversionUtil.convertToboolean(i));
+    }
+    var filter=new BooleanMonitoredPredicate.RemoveFalsePredicate(seq);
+    Assertions.assertFalse(seq.removeIf((BooleanPredicate)filter));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,filter.callCount);
+  }
+  @Test
+  public void testUncheckedListremoveIf_BooleanPredicate_FirstValtrue_RemoveTrue(){
+    for(int period=1;period<=10;++period){
+      var seq=new BooleanArrSeq.UncheckedList();
+      boolean currVal=true;
+      int trueCount=0;
+      int falseCount=0;
+      for(int i=0;;){
+        seq.add(currVal);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      var filter=new BooleanMonitoredPredicate.RemoveTruePredicate();
+      Assertions.assertEquals(trueCount!=0,seq.removeIf((BooleanPredicate)filter));
+      Assertions.assertEquals(falseCount,seq.size());
+      for(int i=0;i<falseCount;++i){
+        Assertions.assertFalse(seq.arr[i]);
+      }
+      Assertions.assertEquals(falseCount==0||trueCount==0?1:2,filter.callCount);
+    }
+  }
+  @Test
+  public void testUncheckedListremoveIf_BooleanPredicate_FirstValfalse_RemoveTrue(){
+    for(int period=1;period<=10;++period){
+      var seq=new BooleanArrSeq.UncheckedList();
+      boolean currVal=false;
+      int trueCount=0;
+      int falseCount=0;
+      for(int i=0;;){
+        seq.add(currVal);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      var filter=new BooleanMonitoredPredicate.RemoveTruePredicate();
+      Assertions.assertEquals(trueCount!=0,seq.removeIf((BooleanPredicate)filter));
+      Assertions.assertEquals(falseCount,seq.size());
+      for(int i=0;i<falseCount;++i){
+        Assertions.assertFalse(seq.arr[i]);
+      }
+      Assertions.assertEquals(falseCount==0||trueCount==0?1:2,filter.callCount);
+    }
+  }
+  @Test
+  public void testUncheckedListremoveIf_BooleanPredicate_FirstValtrue_RemoveFalse(){
+    for(int period=1;period<=10;++period){
+      var seq=new BooleanArrSeq.UncheckedList();
+      boolean currVal=true;
+      int trueCount=0;
+      int falseCount=0;
+      for(int i=0;;){
+        seq.add(currVal);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      var filter=new BooleanMonitoredPredicate.RemoveFalsePredicate();
+      Assertions.assertEquals(falseCount!=0,seq.removeIf((BooleanPredicate)filter));
+      Assertions.assertEquals(trueCount,seq.size());
+      for(int i=0;i<trueCount;++i){
+        Assertions.assertTrue(seq.arr[i]);
+      }
+      Assertions.assertEquals(falseCount==0||trueCount==0?1:2,filter.callCount);
+    }
+  }
+  @Test
+  public void testUncheckedListremoveIf_BooleanPredicate_FirstValfalse_RemoveFalse(){
+    for(int period=1;period<=10;++period){
+      var seq=new BooleanArrSeq.UncheckedList();
+      boolean currVal=false;
+      int trueCount=0;
+      int falseCount=0;
+      for(int i=0;;){
+        seq.add(currVal);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      var filter=new BooleanMonitoredPredicate.RemoveFalsePredicate();
+      Assertions.assertEquals(falseCount!=0,seq.removeIf((BooleanPredicate)filter));
+      Assertions.assertEquals(trueCount,seq.size());
+      for(int i=0;i<trueCount;++i){
+        Assertions.assertTrue(seq.arr[i]);
+      }
+      Assertions.assertEquals(falseCount==0||trueCount==0?1:2,filter.callCount);
+    }
+  }
+  @Test
+  public void testUncheckedListremoveIf_BooleanPredicate_FirstValtrue_RemoveAll(){
+    for(int period=1;period<=10;++period){
+      var seq=new BooleanArrSeq.UncheckedList();
+      boolean currVal=true;
+      int trueCount=0;
+      int falseCount=0;
+      for(int i=0;;){
+        seq.add(currVal);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      var filter=new BooleanMonitoredPredicate.RemoveAllPredicate();
+      Assertions.assertTrue(seq.removeIf((BooleanPredicate)filter));
+      Assertions.assertEquals(0,seq.size());
+      Assertions.assertEquals(falseCount==0||trueCount==0?1:2,filter.callCount);
+    }
+  }
+  @Test
+  public void testUncheckedListremoveIf_BooleanPredicate_FirstValfalse_RemoveAll(){
+    for(int period=1;period<=10;++period){
+      var seq=new BooleanArrSeq.UncheckedList();
+      boolean currVal=false;
+      int trueCount=0;
+      int falseCount=0;
+      for(int i=0;;){
+        seq.add(currVal);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      var filter=new BooleanMonitoredPredicate.RemoveAllPredicate();
+      Assertions.assertTrue(seq.removeIf((BooleanPredicate)filter));
+      Assertions.assertEquals(0,seq.size());
+      Assertions.assertEquals(falseCount==0||trueCount==0?1:2,filter.callCount);
+    }
+  }
+  @Test
+  public void testUncheckedListremoveIf_BooleanPredicate_FirstValtrue_RemoveNone(){
+    for(int period=1;period<=10;++period){
+      var seq=new BooleanArrSeq.UncheckedList();
+      boolean currVal=true;
+      int trueCount=0;
+      int falseCount=0;
+      for(int i=0;;){
+        seq.add(currVal);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      var filter=new BooleanMonitoredPredicate.RemoveNonePredicate();
+      Assertions.assertFalse(seq.removeIf((BooleanPredicate)filter));
+      Assertions.assertEquals(10,seq.size());
+      Assertions.assertEquals(falseCount==0||trueCount==0?1:2,filter.callCount);
+      currVal=true;
+      trueCount=0;
+      falseCount=0;
+      for(int i=0;;){
+        Assertions.assertEquals(currVal,seq.arr[i]);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+    }
+  }
+  @Test
+  public void testUncheckedListremoveIf_BooleanPredicate_FirstValfalse_RemoveNone(){
+    for(int period=1;period<=10;++period){
+      var seq=new BooleanArrSeq.UncheckedList();
+      boolean currVal=false;
+      int trueCount=0;
+      int falseCount=0;
+      for(int i=0;;){
+        seq.add(currVal);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      var filter=new BooleanMonitoredPredicate.RemoveNonePredicate();
+      Assertions.assertFalse(seq.removeIf((BooleanPredicate)filter));
+      Assertions.assertEquals(10,seq.size());
+      Assertions.assertEquals(falseCount==0||trueCount==0?1:2,filter.callCount);
+      currVal=false;
+      trueCount=0;
+      falseCount=0;
+      for(int i=0;;){
+        Assertions.assertEquals(currVal,seq.arr[i]);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+    }
+  }
+  @Test
+  public void testUncheckedListremoveIf_BooleanPredicate_SeqIsEmpty_RemoveAllPredicate()
+  {
+    var seq=new BooleanArrSeq.UncheckedList();
+    for(int i=0;i<0;++i){
+      seq.add(TypeConversionUtil.convertToboolean(i));
+    }
+    var filter=new BooleanMonitoredPredicate.RemoveAllPredicate(seq);
+    Assertions.assertFalse(seq.removeIf((BooleanPredicate)filter));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,filter.callCount);
+  }
+  @Test
+  public void testUncheckedListremoveIf_BooleanPredicate_SeqIsEmpty_RemoveNonePredicate()
+  {
+    var seq=new BooleanArrSeq.UncheckedList();
+    for(int i=0;i<0;++i){
+      seq.add(TypeConversionUtil.convertToboolean(i));
+    }
+    var filter=new BooleanMonitoredPredicate.RemoveNonePredicate(seq);
+    Assertions.assertFalse(seq.removeIf((BooleanPredicate)filter));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,filter.callCount);
+  }
+  @Test
+  public void testUncheckedListadd_boolean_initialCapacityDEFAULT(){
+    var seq=new BooleanArrSeq.UncheckedList();
+    for(int i=0;i<100;++i){
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
     }
     Assertions.assertEquals(100,seq.size);
     Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i)
-    {
+    for(int i=0;i<seq.size;++i){
       Assertions.assertEquals(TypeConversionUtil.convertToboolean(i),seq.arr[i]);
     }
   }
   @Test
-  public void testUncheckedListadd_boolean_initialCapacityNULL()
-  {
-    UncheckedList seq=new UncheckedList(0,null);
-    for(int i=0;i<100;++i)
-    {
+  public void testUncheckedListadd_boolean_initialCapacityNULL(){
+    var seq=new BooleanArrSeq.UncheckedList(0,null);
+    for(int i=0;i<100;++i){
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
     }
     Assertions.assertEquals(100,seq.size);
     Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i)
-    {
+    for(int i=0;i<seq.size;++i){
       Assertions.assertEquals(TypeConversionUtil.convertToboolean(i),seq.arr[i]);
     }
   }
   @Test
-  public void testUncheckedListadd_boolean_initialCapacity50()
-  {
-    UncheckedList seq=new UncheckedList(50);
-    for(int i=0;i<100;++i)
-    {
+  public void testUncheckedListadd_boolean_initialCapacity50(){
+    var seq=new BooleanArrSeq.UncheckedList(50);
+    for(int i=0;i<100;++i){
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
     }
     Assertions.assertEquals(100,seq.size);
     Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i)
-    {
+    for(int i=0;i<seq.size;++i){
       Assertions.assertEquals(TypeConversionUtil.convertToboolean(i),seq.arr[i]);
     }
   }
   @Test
-  public void testUncheckedListadd_Boolean_initialCapacityDEFAULT()
-  {
-    UncheckedList seq=new UncheckedList();
-    for(int i=0;i<100;++i)
-    {
+  public void testUncheckedListadd_Boolean_initialCapacityDEFAULT(){
+    var seq=new BooleanArrSeq.UncheckedList();
+    for(int i=0;i<100;++i){
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToBoolean(i)));
     }
     Assertions.assertEquals(100,seq.size);
     Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i)
-    {
+    for(int i=0;i<seq.size;++i){
       Assertions.assertEquals(TypeConversionUtil.convertToboolean(i),seq.arr[i]);
     }
   }
   @Test
-  public void testUncheckedListadd_Boolean_initialCapacityNULL()
-  {
-    UncheckedList seq=new UncheckedList(0,null);
-    for(int i=0;i<100;++i)
-    {
+  public void testUncheckedListadd_Boolean_initialCapacityNULL(){
+    var seq=new BooleanArrSeq.UncheckedList(0,null);
+    for(int i=0;i<100;++i){
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToBoolean(i)));
     }
     Assertions.assertEquals(100,seq.size);
     Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i)
-    {
+    for(int i=0;i<seq.size;++i){
       Assertions.assertEquals(TypeConversionUtil.convertToboolean(i),seq.arr[i]);
     }
   }
   @Test
-  public void testUncheckedListadd_Boolean_initialCapacity50()
-  {
-    UncheckedList seq=new UncheckedList(50);
-    for(int i=0;i<100;++i)
-    {
+  public void testUncheckedListadd_Boolean_initialCapacity50(){
+    var seq=new BooleanArrSeq.UncheckedList(50);
+    for(int i=0;i<100;++i){
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToBoolean(i)));
     }
     Assertions.assertEquals(100,seq.size);
     Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i)
-    {
+    for(int i=0;i<seq.size;++i){
       Assertions.assertEquals(TypeConversionUtil.convertToboolean(i),seq.arr[i]);
     }
   }
   @Test
-  public void testUncheckedListtoBooleanArray_void_seqIsEmpty()
-  {
-    UncheckedList seq=new UncheckedList();
+  public void testUncheckedListtoBooleanArray_void_seqIsEmpty(){
+    var seq=new BooleanArrSeq.UncheckedList();
     Assertions.assertSame(OmniArray.OfBoolean.DEFAULT_ARR,seq.toBooleanArray());
     Assertions.assertEquals(0,seq.size());
   }
   @Test
-  public void testUncheckedListtoBooleanArray_void_seqIsNotEmpty()
-  {
-    UncheckedList seq=new UncheckedList();
-    for(int i=0;i<100;++i)
-    {
+  public void testUncheckedListtoBooleanArray_void_seqIsNotEmpty(){
+    var seq=new BooleanArrSeq.UncheckedList();
+    for(int i=0;i<100;++i){
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
     }
     var result=seq.toBooleanArray();
     Assertions.assertEquals(100,seq.size());
     Assertions.assertEquals(100,result.length);
     var itr=seq.iterator();
-    for(int i=0;i<100;++i)
-    {
+    for(int i=0;i<100;++i){
       Assertions.assertEquals(itr.nextBoolean(),result[i]);
     }
     Assertions.assertNotSame(seq.arr,result);
   }
   @Test
-  public void testUncheckedListtoArray_void_seqIsEmpty()
-  {
-    UncheckedList seq=new UncheckedList();
+  public void testUncheckedListtoArray_void_seqIsEmpty(){
+    var seq=new BooleanArrSeq.UncheckedList();
     Assertions.assertSame(OmniArray.OfBoolean.DEFAULT_BOXED_ARR,seq.toArray());
     Assertions.assertEquals(0,seq.size());
   }
   @Test
-  public void testUncheckedListtoArray_void_seqIsNotEmpty()
-  {
-    UncheckedList seq=new UncheckedList();
-    for(int i=0;i<100;++i)
-    {
+  public void testUncheckedListtoArray_void_seqIsNotEmpty(){
+    var seq=new BooleanArrSeq.UncheckedList();
+    for(int i=0;i<100;++i){
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
     }
     var result=seq.toArray();
     Assertions.assertEquals(100,seq.size());
     Assertions.assertEquals(100,result.length);
     var itr=seq.iterator();
-    for(int i=0;i<100;++i)
-    {
+    for(int i=0;i<100;++i){
       Assertions.assertEquals(itr.next(),result[i]);
     }
     Assertions.assertNotSame(seq.arr,result);
   }
   @Test
-  public void testUncheckedListtoDoubleArray_void_seqIsEmpty()
-  {
-    UncheckedList seq=new UncheckedList();
+  public void testUncheckedListtoDoubleArray_void_seqIsEmpty(){
+    var seq=new BooleanArrSeq.UncheckedList();
     Assertions.assertSame(OmniArray.OfDouble.DEFAULT_ARR,seq.toDoubleArray());
     Assertions.assertEquals(0,seq.size());
   }
   @Test
-  public void testUncheckedListtoDoubleArray_void_seqIsNotEmpty()
-  {
-    UncheckedList seq=new UncheckedList();
-    for(int i=0;i<100;++i)
-    {
+  public void testUncheckedListtoDoubleArray_void_seqIsNotEmpty(){
+    var seq=new BooleanArrSeq.UncheckedList();
+    for(int i=0;i<100;++i){
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
     }
     var result=seq.toDoubleArray();
     Assertions.assertEquals(100,seq.size());
     Assertions.assertEquals(100,result.length);
     var itr=seq.iterator();
-    for(int i=0;i<100;++i)
-    {
+    for(int i=0;i<100;++i){
       Assertions.assertEquals(itr.nextDouble(),result[i]);
     }
     Assertions.assertNotSame(seq.arr,result);
   }
   @Test
-  public void testUncheckedListtoFloatArray_void_seqIsEmpty()
-  {
-    UncheckedList seq=new UncheckedList();
+  public void testUncheckedListtoFloatArray_void_seqIsEmpty(){
+    var seq=new BooleanArrSeq.UncheckedList();
     Assertions.assertSame(OmniArray.OfFloat.DEFAULT_ARR,seq.toFloatArray());
     Assertions.assertEquals(0,seq.size());
   }
   @Test
-  public void testUncheckedListtoFloatArray_void_seqIsNotEmpty()
-  {
-    UncheckedList seq=new UncheckedList();
-    for(int i=0;i<100;++i)
-    {
+  public void testUncheckedListtoFloatArray_void_seqIsNotEmpty(){
+    var seq=new BooleanArrSeq.UncheckedList();
+    for(int i=0;i<100;++i){
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
     }
     var result=seq.toFloatArray();
     Assertions.assertEquals(100,seq.size());
     Assertions.assertEquals(100,result.length);
     var itr=seq.iterator();
-    for(int i=0;i<100;++i)
-    {
+    for(int i=0;i<100;++i){
       Assertions.assertEquals(itr.nextFloat(),result[i]);
     }
     Assertions.assertNotSame(seq.arr,result);
   }
   @Test
-  public void testUncheckedListtoLongArray_void_seqIsEmpty()
-  {
-    UncheckedList seq=new UncheckedList();
+  public void testUncheckedListtoLongArray_void_seqIsEmpty(){
+    var seq=new BooleanArrSeq.UncheckedList();
     Assertions.assertSame(OmniArray.OfLong.DEFAULT_ARR,seq.toLongArray());
     Assertions.assertEquals(0,seq.size());
   }
   @Test
-  public void testUncheckedListtoLongArray_void_seqIsNotEmpty()
-  {
-    UncheckedList seq=new UncheckedList();
-    for(int i=0;i<100;++i)
-    {
+  public void testUncheckedListtoLongArray_void_seqIsNotEmpty(){
+    var seq=new BooleanArrSeq.UncheckedList();
+    for(int i=0;i<100;++i){
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
     }
     var result=seq.toLongArray();
     Assertions.assertEquals(100,seq.size());
     Assertions.assertEquals(100,result.length);
     var itr=seq.iterator();
-    for(int i=0;i<100;++i)
-    {
+    for(int i=0;i<100;++i){
       Assertions.assertEquals(itr.nextLong(),result[i]);
     }
     Assertions.assertNotSame(seq.arr,result);
   }
   @Test
-  public void testUncheckedListtoIntArray_void_seqIsEmpty()
-  {
-    UncheckedList seq=new UncheckedList();
+  public void testUncheckedListtoIntArray_void_seqIsEmpty(){
+    var seq=new BooleanArrSeq.UncheckedList();
     Assertions.assertSame(OmniArray.OfInt.DEFAULT_ARR,seq.toIntArray());
     Assertions.assertEquals(0,seq.size());
   }
   @Test
-  public void testUncheckedListtoIntArray_void_seqIsNotEmpty()
-  {
-    UncheckedList seq=new UncheckedList();
-    for(int i=0;i<100;++i)
-    {
+  public void testUncheckedListtoIntArray_void_seqIsNotEmpty(){
+    var seq=new BooleanArrSeq.UncheckedList();
+    for(int i=0;i<100;++i){
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
     }
     var result=seq.toIntArray();
     Assertions.assertEquals(100,seq.size());
     Assertions.assertEquals(100,result.length);
     var itr=seq.iterator();
-    for(int i=0;i<100;++i)
-    {
+    for(int i=0;i<100;++i){
       Assertions.assertEquals(itr.nextInt(),result[i]);
     }
     Assertions.assertNotSame(seq.arr,result);
   }
   @Test
-  public void testUncheckedListtoShortArray_void_seqIsEmpty()
-  {
-    UncheckedList seq=new UncheckedList();
+  public void testUncheckedListtoShortArray_void_seqIsEmpty(){
+    var seq=new BooleanArrSeq.UncheckedList();
     Assertions.assertSame(OmniArray.OfShort.DEFAULT_ARR,seq.toShortArray());
     Assertions.assertEquals(0,seq.size());
   }
   @Test
-  public void testUncheckedListtoShortArray_void_seqIsNotEmpty()
-  {
-    UncheckedList seq=new UncheckedList();
-    for(int i=0;i<100;++i)
-    {
+  public void testUncheckedListtoShortArray_void_seqIsNotEmpty(){
+    var seq=new BooleanArrSeq.UncheckedList();
+    for(int i=0;i<100;++i){
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
     }
     var result=seq.toShortArray();
     Assertions.assertEquals(100,seq.size());
     Assertions.assertEquals(100,result.length);
     var itr=seq.iterator();
-    for(int i=0;i<100;++i)
-    {
+    for(int i=0;i<100;++i){
       Assertions.assertEquals(itr.nextShort(),result[i]);
     }
     Assertions.assertNotSame(seq.arr,result);
   }
   @Test
-  public void testUncheckedListtoCharArray_void_seqIsEmpty()
-  {
-    UncheckedList seq=new UncheckedList();
+  public void testUncheckedListtoCharArray_void_seqIsEmpty(){
+    var seq=new BooleanArrSeq.UncheckedList();
     Assertions.assertSame(OmniArray.OfChar.DEFAULT_ARR,seq.toCharArray());
     Assertions.assertEquals(0,seq.size());
   }
   @Test
-  public void testUncheckedListtoCharArray_void_seqIsNotEmpty()
-  {
-    UncheckedList seq=new UncheckedList();
-    for(int i=0;i<100;++i)
-    {
+  public void testUncheckedListtoCharArray_void_seqIsNotEmpty(){
+    var seq=new BooleanArrSeq.UncheckedList();
+    for(int i=0;i<100;++i){
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
     }
     var result=seq.toCharArray();
     Assertions.assertEquals(100,seq.size());
     Assertions.assertEquals(100,result.length);
     var itr=seq.iterator();
-    for(int i=0;i<100;++i)
-    {
+    for(int i=0;i<100;++i){
       Assertions.assertEquals(itr.nextChar(),result[i]);
     }
     Assertions.assertNotSame(seq.arr,result);
   }
   @Test
-  public void testUncheckedListtoByteArray_void_seqIsEmpty()
-  {
-    UncheckedList seq=new UncheckedList();
+  public void testUncheckedListtoByteArray_void_seqIsEmpty(){
+    var seq=new BooleanArrSeq.UncheckedList();
     Assertions.assertSame(OmniArray.OfByte.DEFAULT_ARR,seq.toByteArray());
     Assertions.assertEquals(0,seq.size());
   }
   @Test
-  public void testUncheckedListtoByteArray_void_seqIsNotEmpty()
-  {
-    UncheckedList seq=new UncheckedList();
-    for(int i=0;i<100;++i)
-    {
+  public void testUncheckedListtoByteArray_void_seqIsNotEmpty(){
+    var seq=new BooleanArrSeq.UncheckedList();
+    for(int i=0;i<100;++i){
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
     }
     var result=seq.toByteArray();
     Assertions.assertEquals(100,seq.size());
     Assertions.assertEquals(100,result.length);
     var itr=seq.iterator();
-    for(int i=0;i<100;++i)
-    {
+    for(int i=0;i<100;++i){
       Assertions.assertEquals(itr.nextByte(),result[i]);
     }
     Assertions.assertNotSame(seq.arr,result);
   }
-  static class ModifyingCheckedStackConsumer extends MonitoredConsumer
-  {
-    private static final long serialVersionUID=1L;
-    CheckedStack seq;
-    public ModifyingCheckedStackConsumer(CheckedStack seq)
-    {
-      this.seq=seq;
-    }
-    @Override public void accept(boolean val)
-    {
-      seq.modCount+=2;
-      super.accept((boolean)val);
-    }
-  }
-  static class ModifiyingCheckedStackAndThrowingConsumer extends ModifyingCheckedStackConsumer
-  {
-    private static final long serialVersionUID=1L;
-    public ModifiyingCheckedStackAndThrowingConsumer(CheckedStack seq)
-    {
-      super(seq);
-    }
-    @Override public void accept(boolean val)
-    {
-      super.accept((boolean)val);
-      throw new IndexOutOfBoundsException();
-    }
-  }
-  static class ModifyingAndThrowingCheckedStackPredicate extends ThrowingPredicate
-  {
-      CheckedStack seq;
-      public ModifyingAndThrowingCheckedStackPredicate(CheckedStack seq)
-      {
-        this.seq=seq;
-      }
-      @Override boolean testImpl(boolean val)
-      {
-        seq.add(val);
-        throw new IndexOutOfBoundsException();
-      }
-  }
-  static class RemoveAllCheckedStackModifyingPredicate extends RemoveAllPredicate
-  {
-      CheckedStack seq;
-      RemoveAllCheckedStackModifyingPredicate(CheckedStack seq)
-      {
-        this.seq=seq;
-      }
-      @Override
-      public boolean test(boolean val)
-      {
-        seq.modCount+=2;
-        return super.test(val);
-      }
-  }
-  static class RemoveNoneCheckedStackModifyingPredicate extends RemoveNonePredicate
-  {
-      CheckedStack seq;
-      RemoveNoneCheckedStackModifyingPredicate(CheckedStack seq)
-      {
-        this.seq=seq;
-      }
-      @Override
-      public boolean test(boolean val)
-      {
-        seq.modCount+=2;
-        return super.test(val);
-      }
-  }
-    static class RemoveTrueCheckedStackModifyingPredicate extends RemoveTruePredicate
-    {
-      CheckedStack seq;
-      RemoveTrueCheckedStackModifyingPredicate(CheckedStack seq)
-      {
-        this.seq=seq;
-      }
-      @Override
-      public boolean test(boolean val)
-      {
-        seq.modCount+=2;
-        return super.test(val);
-      }
-    }
-    static class RemoveFalseCheckedStackModifyingPredicate extends RemoveFalsePredicate
-    {
-      CheckedStack seq;
-      RemoveFalseCheckedStackModifyingPredicate(CheckedStack seq)
-      {
-        this.seq=seq;
-      }
-      @Override
-      public boolean test(boolean val)
-      {
-        seq.modCount+=2;
-        return super.test(val);
-      }
-    }
   @Test
-  public void testCheckedStackconstructor_void_initialCapacityDEFAULT()
-  {
-    CheckedStack seq=new CheckedStack();
+  public void testCheckedStackconstructor_void_initialCapacityDEFAULT(){
+    var seq=new BooleanArrSeq.CheckedStack();
     Assertions.assertEquals(0,seq.size);
     Assertions.assertSame(OmniArray.OfBoolean.DEFAULT_ARR,seq.arr);
     Assertions.assertEquals(0,seq.modCount);
   }
   @Test
-  public void testCheckedStackconstructor_intboolean_initialCapacityNULL()
-  {
-    CheckedStack seq=new CheckedStack(0,null);
+  public void testCheckedStackconstructor_intboolean_initialCapacityNULL(){
+    var seq=new BooleanArrSeq.CheckedStack(0,null);
     Assertions.assertEquals(0,seq.size);
     Assertions.assertNull(seq.arr);
     Assertions.assertEquals(0,seq.modCount);
   }
   @Test
-  public void testCheckedStackconstructor_int_initialCapacity50()
-  {
-    CheckedStack seq=new CheckedStack(50);
+  public void testCheckedStackconstructor_int_initialCapacity50(){
+    var seq=new BooleanArrSeq.CheckedStack(50);
     Assertions.assertEquals(0,seq.size);
-    switch(50)
-    {
+    switch(50){
     case 0:
       Assertions.assertNull(seq.arr);
       break;
@@ -1531,12 +2691,10 @@ public class BooleanArrSeqTest
     Assertions.assertEquals(0,seq.modCount);
   }
   @Test
-  public void testCheckedStackconstructor_int_initialCapacity0()
-  {
-    CheckedStack seq=new CheckedStack(0);
+  public void testCheckedStackconstructor_int_initialCapacity0(){
+    var seq=new BooleanArrSeq.CheckedStack(0);
     Assertions.assertEquals(0,seq.size);
-    switch(0)
-    {
+    switch(0){
     case 0:
       Assertions.assertNull(seq.arr);
       break;
@@ -1550,12 +2708,10 @@ public class BooleanArrSeqTest
     Assertions.assertEquals(0,seq.modCount);
   }
   @Test
-  public void testCheckedStackconstructor_int_initialCapacity10()
-  {
-    CheckedStack seq=new CheckedStack(10);
+  public void testCheckedStackconstructor_int_initialCapacity10(){
+    var seq=new BooleanArrSeq.CheckedStack(10);
     Assertions.assertEquals(0,seq.size);
-    switch(10)
-    {
+    switch(10){
     case 0:
       Assertions.assertNull(seq.arr);
       break;
@@ -1569,9 +2725,153 @@ public class BooleanArrSeqTest
     Assertions.assertEquals(0,seq.modCount);
   }
   @Test
-  public void testCheckedStacktoArray_ObjectArray_zeroLengthArrayAndSequenceIsEmpty()
+  public void testCheckedStackClone_initialCapacityDEFAULT_seqIsEmpty()
   {
-    CheckedStack seq=new CheckedStack();
+    var seq=new BooleanArrSeq.CheckedStack();
+    var clone=(BooleanArrSeq.CheckedStack)seq.clone();
+    Assertions.assertEquals(0,clone.size());
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertSame(clone.arr,OmniArray.OfBoolean.DEFAULT_ARR);
+    Assertions.assertEquals(0,clone.modCount);
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedStackClone_initialCapacityDEFAULT_seqIsNotEmpty()
+  {
+    var seq=new BooleanArrSeq.CheckedStack();
+    for(int i=0;i<100;++i){
+      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
+    }
+    var clone=(BooleanArrSeq.CheckedStack)seq.clone();
+    Assertions.assertEquals(100,clone.size());
+    Assertions.assertEquals(100,seq.size());
+    Assertions.assertNotSame(seq.arr,clone.arr);
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertToboolean(i),clone.arr[i]);
+    }
+    Assertions.assertEquals(0,clone.modCount);
+    Assertions.assertEquals(100,seq.modCount);
+  }
+  @Test
+  public void testCheckedStackClone_initialCapacityNULL_seqIsEmpty()
+  {
+    var seq=new BooleanArrSeq.CheckedStack(0,null);
+    var clone=(BooleanArrSeq.CheckedStack)seq.clone();
+    Assertions.assertEquals(0,clone.size());
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertSame(clone.arr,OmniArray.OfBoolean.DEFAULT_ARR);
+    Assertions.assertEquals(0,clone.modCount);
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedStackClone_initialCapacityNULL_seqIsNotEmpty()
+  {
+    var seq=new BooleanArrSeq.CheckedStack(0,null);
+    for(int i=0;i<100;++i){
+      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
+    }
+    var clone=(BooleanArrSeq.CheckedStack)seq.clone();
+    Assertions.assertEquals(100,clone.size());
+    Assertions.assertEquals(100,seq.size());
+    Assertions.assertNotSame(seq.arr,clone.arr);
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertToboolean(i),clone.arr[i]);
+    }
+    Assertions.assertEquals(0,clone.modCount);
+    Assertions.assertEquals(100,seq.modCount);
+  }
+  @Test
+  public void testCheckedStackClone_initialCapacity50_seqIsEmpty()
+  {
+    var seq=new BooleanArrSeq.CheckedStack(50);
+    var clone=(BooleanArrSeq.CheckedStack)seq.clone();
+    Assertions.assertEquals(0,clone.size());
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertSame(clone.arr,OmniArray.OfBoolean.DEFAULT_ARR);
+    Assertions.assertEquals(0,clone.modCount);
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedStackClone_initialCapacity50_seqIsNotEmpty()
+  {
+    var seq=new BooleanArrSeq.CheckedStack(50);
+    for(int i=0;i<100;++i){
+      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
+    }
+    var clone=(BooleanArrSeq.CheckedStack)seq.clone();
+    Assertions.assertEquals(100,clone.size());
+    Assertions.assertEquals(100,seq.size());
+    Assertions.assertNotSame(seq.arr,clone.arr);
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertToboolean(i),clone.arr[i]);
+    }
+    Assertions.assertEquals(0,clone.modCount);
+    Assertions.assertEquals(100,seq.modCount);
+  }
+  @Test
+  public void testCheckedStackClone_initialCapacity0_seqIsEmpty()
+  {
+    var seq=new BooleanArrSeq.CheckedStack(0);
+    var clone=(BooleanArrSeq.CheckedStack)seq.clone();
+    Assertions.assertEquals(0,clone.size());
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertSame(clone.arr,OmniArray.OfBoolean.DEFAULT_ARR);
+    Assertions.assertEquals(0,clone.modCount);
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedStackClone_initialCapacity0_seqIsNotEmpty()
+  {
+    var seq=new BooleanArrSeq.CheckedStack(0);
+    for(int i=0;i<100;++i){
+      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
+    }
+    var clone=(BooleanArrSeq.CheckedStack)seq.clone();
+    Assertions.assertEquals(100,clone.size());
+    Assertions.assertEquals(100,seq.size());
+    Assertions.assertNotSame(seq.arr,clone.arr);
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertToboolean(i),clone.arr[i]);
+    }
+    Assertions.assertEquals(0,clone.modCount);
+    Assertions.assertEquals(100,seq.modCount);
+  }
+  @Test
+  public void testCheckedStackClone_initialCapacity10_seqIsEmpty()
+  {
+    var seq=new BooleanArrSeq.CheckedStack(10);
+    var clone=(BooleanArrSeq.CheckedStack)seq.clone();
+    Assertions.assertEquals(0,clone.size());
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertSame(clone.arr,OmniArray.OfBoolean.DEFAULT_ARR);
+    Assertions.assertEquals(0,clone.modCount);
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedStackClone_initialCapacity10_seqIsNotEmpty()
+  {
+    var seq=new BooleanArrSeq.CheckedStack(10);
+    for(int i=0;i<100;++i){
+      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
+    }
+    var clone=(BooleanArrSeq.CheckedStack)seq.clone();
+    Assertions.assertEquals(100,clone.size());
+    Assertions.assertEquals(100,seq.size());
+    Assertions.assertNotSame(seq.arr,clone.arr);
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertToboolean(i),clone.arr[i]);
+    }
+    Assertions.assertEquals(0,clone.modCount);
+    Assertions.assertEquals(100,seq.modCount);
+  }
+  @Test
+  public void testCheckedStacktoArray_ObjectArray_zeroLengthArrayAndSequenceIsEmpty(){
+    var seq=new BooleanArrSeq.CheckedStack();
     Boolean[] paramArr=new Boolean[0];
     var result=seq.toArray(paramArr);
     Assertions.assertEquals(0,seq.size());
@@ -1581,11 +2881,9 @@ public class BooleanArrSeqTest
     Assertions.assertSame(paramArr,result);
   }
   @Test
-  public void testCheckedStacktoArray_ObjectArray_zeroLengthArrayAndSequenceNotEmpty()
-  {
-    CheckedStack seq=new CheckedStack();
-    for(int i=0;i<100;++i)
-    {
+  public void testCheckedStacktoArray_ObjectArray_zeroLengthArrayAndSequenceNotEmpty(){
+    var seq=new BooleanArrSeq.CheckedStack();
+    for(int i=0;i<100;++i){
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
     }
     Boolean[] paramArr=new Boolean[0];
@@ -1596,18 +2894,15 @@ public class BooleanArrSeqTest
     Assertions.assertNotSame(seq.arr,result);
     Assertions.assertNotSame(paramArr,result);
     var itr=seq.iterator();
-    for(int i=0;i<100;++i)
-    {
+    for(int i=0;i<100;++i){
       Assertions.assertEquals(itr.next(),result[i]);
     }
   }
   @Test
-  public void testCheckedStacktoArray_ObjectArray_nonzeroLengthArrayAndSequenceIsEmpty()
-  {
-    CheckedStack seq=new CheckedStack();
+  public void testCheckedStacktoArray_ObjectArray_nonzeroLengthArrayAndSequenceIsEmpty(){
+    var seq=new BooleanArrSeq.CheckedStack();
     Boolean[] paramArr=new Boolean[5];
-    for(int i=0;i<paramArr.length;++i)
-    {
+    for(int i=0;i<paramArr.length;++i){
       paramArr[i]=TypeConversionUtil.convertToboolean(paramArr.length);
     }
     var result=seq.toArray(paramArr);
@@ -1617,22 +2912,18 @@ public class BooleanArrSeqTest
     Assertions.assertNotSame(seq.arr,result);
     Assertions.assertSame(paramArr,result);
     Assertions.assertNull(result[0]);
-    for(int i=1;i<result.length;++i)
-    {
+    for(int i=1;i<result.length;++i){
       Assertions.assertEquals((Object)TypeConversionUtil.convertToboolean(paramArr.length),result[i]);
     }
   }
   @Test
-  public void testCheckedStacktoArray_ObjectArray_overSizedArray()
-  {
-    CheckedStack seq=new CheckedStack();
+  public void testCheckedStacktoArray_ObjectArray_overSizedArray(){
+    var seq=new BooleanArrSeq.CheckedStack();
     Boolean[] paramArr=new Boolean[10];
-    for(int i=0;i<paramArr.length;++i)
-    {
+    for(int i=0;i<paramArr.length;++i){
       paramArr[i]=TypeConversionUtil.convertToboolean(paramArr.length);
     }
-    for(int i=0;i<5;++i)
-    {
+    for(int i=0;i<5;++i){
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
     }
     var result=seq.toArray(paramArr);
@@ -1642,27 +2933,22 @@ public class BooleanArrSeqTest
     Assertions.assertNotSame(seq.arr,result);
     Assertions.assertSame(paramArr,result);
     var itr=seq.iterator();
-    for(int i=0;i<5;++i)
-    {
+    for(int i=0;i<5;++i){
       Assertions.assertEquals(itr.next(),result[i]);
     }
     Assertions.assertNull(result[5]);
-    for(int i=6;i<result.length;++i)
-    {
+    for(int i=6;i<result.length;++i){
       Assertions.assertEquals((Object)TypeConversionUtil.convertToboolean(paramArr.length),result[i]);
     }
   }
   @Test
-  public void testCheckedStacktoArray_ObjectArray_undersizedArray()
-  {
-    CheckedStack seq=new CheckedStack();
+  public void testCheckedStacktoArray_ObjectArray_undersizedArray(){
+    var seq=new BooleanArrSeq.CheckedStack();
     Boolean[] paramArr=new Boolean[5];
-    for(int i=0;i<paramArr.length;++i)
-    {
+    for(int i=0;i<paramArr.length;++i){
       paramArr[i]=TypeConversionUtil.convertToboolean(10);
     }
-    for(int i=0;i<10;++i)
-    {
+    for(int i=0;i<10;++i){
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
     }
     var result=seq.toArray(paramArr);
@@ -1672,22 +2958,18 @@ public class BooleanArrSeqTest
     Assertions.assertNotSame(seq.arr,result);
     Assertions.assertNotSame(paramArr,result);
     var itr=seq.iterator();
-    for(int i=0;i<10;++i)
-    {
+    for(int i=0;i<10;++i){
       Assertions.assertEquals(itr.next(),result[i]);
     }
   }
   @Test
-  public void testCheckedStacktoArray_ObjectArray_exactSizeArray()
-  {
-    CheckedStack seq=new CheckedStack();
+  public void testCheckedStacktoArray_ObjectArray_exactSizeArray(){
+    var seq=new BooleanArrSeq.CheckedStack();
     Boolean[] paramArr=new Boolean[5];
-    for(int i=0;i<paramArr.length;++i)
-    {
+    for(int i=0;i<paramArr.length;++i){
       paramArr[i]=TypeConversionUtil.convertToboolean(5);
     }
-    for(int i=0;i<5;++i)
-    {
+    for(int i=0;i<5;++i){
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
     }
     var result=seq.toArray(paramArr);
@@ -1697,15 +2979,13 @@ public class BooleanArrSeqTest
     Assertions.assertNotSame(seq.arr,result);
     Assertions.assertSame(paramArr,result);
     var itr=seq.iterator();
-    for(int i=0;i<5;++i)
-    {
+    for(int i=0;i<5;++i){
       Assertions.assertEquals(itr.next(),result[i]);
     }
   }
   @Test
-  public void testCheckedStacktoArray_IntFunction_seqIsEmpty_nonMod()
-  {
-    CheckedStack seq=new CheckedStack();
+  public void testCheckedStacktoArray_IntFunction_seqIsEmpty_nonMod(){
+    var seq=new BooleanArrSeq.CheckedStack();
     IntFunction<Boolean[]> arrConstructor=Boolean[]::new;
     var result=seq.toArray(arrConstructor);
     Assertions.assertEquals(0,seq.size());
@@ -1714,11 +2994,9 @@ public class BooleanArrSeqTest
     Assertions.assertEquals(0,result.length);
   }
   @Test
-  public void testCheckedStacktoArray_IntFunction_seqIsNotEmpty_nonMod()
-  {
-    CheckedStack seq=new CheckedStack();
-    for(int i=0;i<100;++i)
-    {
+  public void testCheckedStacktoArray_IntFunction_seqIsNotEmpty_nonMod(){
+    var seq=new BooleanArrSeq.CheckedStack();
+    for(int i=0;i<100;++i){
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
     }
     IntFunction<Boolean[]> arrConstructor=Boolean[]::new;
@@ -1728,17 +3006,14 @@ public class BooleanArrSeqTest
     Assertions.assertEquals(100,seq.modCount);
     Assertions.assertEquals(100,result.length);
     var itr=seq.iterator();
-    for(int i=0;i<100;++i)
-    {
+    for(int i=0;i<100;++i){
       Assertions.assertEquals(itr.next(),result[i]);
     }
   }
   @Test
-  public void testCheckedStacktoArray_IntFunction_seqIsEmpty_moddingArrayConstructor()
-  {
-    CheckedStack seq=new CheckedStack();
-    IntFunction<Boolean[]> arrConstructor=(int arrSize)->
-    {
+  public void testCheckedStacktoArray_IntFunction_seqIsEmpty_moddingArrayConstructor(){
+    var seq=new BooleanArrSeq.CheckedStack();
+    IntFunction<Boolean[]> arrConstructor=(int arrSize)->{
       seq.add(TypeConversionUtil.convertToboolean(arrSize));
       return new Boolean[arrSize];
     };
@@ -1748,15 +3023,12 @@ public class BooleanArrSeqTest
     Assertions.assertEquals(1,seq.modCount);
   }
   @Test
-  public void testCheckedStacktoArray_IntFunction_seqIsNotEmpty_moddingArrayConstructor()
-  {
-    CheckedStack seq=new CheckedStack();
-    for(int i=0;i<100;++i)
-    {
+  public void testCheckedStacktoArray_IntFunction_seqIsNotEmpty_moddingArrayConstructor(){
+    var seq=new BooleanArrSeq.CheckedStack();
+    for(int i=0;i<100;++i){
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
     }
-    IntFunction<Boolean[]> arrConstructor=(int arrSize)->
-    {
+    IntFunction<Boolean[]> arrConstructor=(int arrSize)->{
       seq.add(TypeConversionUtil.convertToboolean(arrSize));
       return new Boolean[arrSize];
     };
@@ -1766,11 +3038,9 @@ public class BooleanArrSeqTest
     Assertions.assertEquals(101,seq.modCount);
   }
   @Test
-  public void testCheckedStacktoArray_IntFunction_seqIsEmpty_throwingArrayConstructor()
-  {
-    CheckedStack seq=new CheckedStack();
-    IntFunction<Boolean[]> arrConstructor=(int arrSize)->
-    {
+  public void testCheckedStacktoArray_IntFunction_seqIsEmpty_throwingArrayConstructor(){
+    var seq=new BooleanArrSeq.CheckedStack();
+    IntFunction<Boolean[]> arrConstructor=(int arrSize)->{
       throw new IndexOutOfBoundsException();
     };
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.toArray(arrConstructor));
@@ -1778,15 +3048,12 @@ public class BooleanArrSeqTest
     Assertions.assertEquals(0,seq.modCount);
   }
   @Test
-  public void testCheckedStacktoArray_IntFunction_seqIsNotEmpty_throwingArrayConstructor()
-  {
-    CheckedStack seq=new CheckedStack();
-    for(int i=0;i<100;++i)
-    {
+  public void testCheckedStacktoArray_IntFunction_seqIsNotEmpty_throwingArrayConstructor(){
+    var seq=new BooleanArrSeq.CheckedStack();
+    for(int i=0;i<100;++i){
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
     }
-    IntFunction<Boolean[]> arrConstructor=(int arrSize)->
-    {
+    IntFunction<Boolean[]> arrConstructor=(int arrSize)->{
       throw new IndexOutOfBoundsException();
     };
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.toArray(arrConstructor));
@@ -1794,11 +3061,9 @@ public class BooleanArrSeqTest
     Assertions.assertEquals(100,seq.modCount);
   }
   @Test
-  public void testCheckedStacktoArray_IntFunction_seqIsEmpty_throwingAndModdingArrConstructor()
-  {
-    CheckedStack seq=new CheckedStack();
-    IntFunction<Boolean[]> arrConstructor=(int arrSize)->
-    {
+  public void testCheckedStacktoArray_IntFunction_seqIsEmpty_throwingAndModdingArrConstructor(){
+    var seq=new BooleanArrSeq.CheckedStack();
+    IntFunction<Boolean[]> arrConstructor=(int arrSize)->{
       seq.add(TypeConversionUtil.convertToboolean(arrSize));
       throw new IndexOutOfBoundsException();
     };
@@ -1808,15 +3073,12 @@ public class BooleanArrSeqTest
     Assertions.assertEquals(1,seq.modCount);
   }
   @Test
-  public void testCheckedStacktoArray_IntFunction_seqIsNotEmpty_throwingAndModdingArrConstructor()
-  {
-    CheckedStack seq=new CheckedStack();
-    for(int i=0;i<100;++i)
-    {
+  public void testCheckedStacktoArray_IntFunction_seqIsNotEmpty_throwingAndModdingArrConstructor(){
+    var seq=new BooleanArrSeq.CheckedStack();
+    for(int i=0;i<100;++i){
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
     }
-    IntFunction<Boolean[]> arrConstructor=(int arrSize)->
-    {
+    IntFunction<Boolean[]> arrConstructor=(int arrSize)->{
       seq.add(TypeConversionUtil.convertToboolean(arrSize));
       throw new IndexOutOfBoundsException();
     };
@@ -1826,58 +3088,48 @@ public class BooleanArrSeqTest
     Assertions.assertEquals(101,seq.modCount);
   }
   @Test
-  public void testCheckedStackclear_void_seqIsEmpty()
-  {
-    CheckedStack seq=new CheckedStack();
+  public void testCheckedStackclear_void_seqIsEmpty(){
+    var seq=new BooleanArrSeq.CheckedStack();
     seq.clear();
     Assertions.assertTrue(seq.isEmpty());
     Assertions.assertEquals(0,seq.modCount);
   }
   @Test
-  public void testCheckedStackclear_void_seqIsNotEmpty()
-  {
-    CheckedStack seq=new CheckedStack();
-    for(int i=0;i<100;++i)
-    {
+  public void testCheckedStackclear_void_seqIsNotEmpty(){
+    var seq=new BooleanArrSeq.CheckedStack();
+    for(int i=0;i<100;++i){
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
     }
     seq.clear();
     Assertions.assertTrue(seq.isEmpty());
-    for(int i=0;i<100;++i)
-    {
+    for(int i=0;i<100;++i){
       Assertions.assertEquals(TypeConversionUtil.convertToboolean(i),seq.arr[i]);
     }
     Assertions.assertEquals(101,seq.modCount);
   }
   @Test
-  public void testCheckedStackisEmpty_void_seqIsEmpty()
-  {
-    CheckedStack seq=new CheckedStack();
+  public void testCheckedStackisEmpty_void_seqIsEmpty(){
+    var seq=new BooleanArrSeq.CheckedStack();
     Assertions.assertTrue(seq.isEmpty());
     Assertions.assertEquals(0,seq.modCount);
   }
   @Test
-  public void testCheckedStackisEmpty_void_seqIsNotEmpty()
-  {
-    CheckedStack seq=new CheckedStack();
-    for(int i=0;i<100;++i)
-    {
+  public void testCheckedStackisEmpty_void_seqIsNotEmpty(){
+    var seq=new BooleanArrSeq.CheckedStack();
+    for(int i=0;i<100;++i){
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
     }
     Assertions.assertFalse(seq.isEmpty());
     Assertions.assertEquals(100,seq.modCount);
   }
   @Test
-  public void testCheckedStackisEmpty_void_seqIsBeingCleared()
-  {
-    CheckedStack seq=new CheckedStack();
-    for(int i=0;i<100;++i)
-    {
+  public void testCheckedStackisEmpty_void_seqIsBeingCleared(){
+    var seq=new BooleanArrSeq.CheckedStack();
+    for(int i=0;i<100;++i){
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
     }
     var itr=seq.iterator();
-    for(int i=100;--i>=0;)
-    {
+    for(int i=100;--i>=0;){
       Assertions.assertFalse(seq.isEmpty());
       itr.nextBoolean();
       itr.remove();
@@ -1886,19 +3138,16 @@ public class BooleanArrSeqTest
     Assertions.assertTrue(seq.isEmpty());
   }
   @Test
-  public void testCheckedStacksize_void_seqIsEmpty()
-  {
-    CheckedStack seq=new CheckedStack();
+  public void testCheckedStacksize_void_seqIsEmpty(){
+    var seq=new BooleanArrSeq.CheckedStack();
     Assertions.assertEquals(0,seq.size);
     Assertions.assertEquals(seq.size,seq.size());
     Assertions.assertEquals(0,seq.modCount);
   }
   @Test
-  public void testCheckedStacksize_void_seqIsNotEmpty()
-  {
-    CheckedStack seq=new CheckedStack();
-    for(int i=0;i<100;++i)
-    {
+  public void testCheckedStacksize_void_seqIsNotEmpty(){
+    var seq=new BooleanArrSeq.CheckedStack();
+    for(int i=0;i<100;++i){
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
     }
     Assertions.assertEquals(100,seq.size);
@@ -1906,16 +3155,13 @@ public class BooleanArrSeqTest
     Assertions.assertEquals(100,seq.modCount);
   }
   @Test
-  public void testCheckedStacksize_void_seqIsBeingCleared()
-  {
-    CheckedStack seq=new CheckedStack();
-    for(int i=0;i<100;++i)
-    {
+  public void testCheckedStacksize_void_seqIsBeingCleared(){
+    var seq=new BooleanArrSeq.CheckedStack();
+    for(int i=0;i<100;++i){
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
     }
     var itr=seq.iterator();
-    for(int i=100;--i>=0;)
-    {
+    for(int i=100;--i>=0;){
       itr.nextBoolean();
       itr.remove();
       Assertions.assertEquals(i,seq.size());
@@ -1923,24 +3169,21 @@ public class BooleanArrSeqTest
     }
   }
   @Test
-  public void testCheckedStackforEach_Consumer_SeqIsEmpty_NoMod()
-  {
-    CheckedStack seq=new CheckedStack();
-    MonitoredConsumer consumer=new MonitoredConsumer();
+  public void testCheckedStackforEach_Consumer_SeqIsEmpty_NoMod(){
+    var seq=new BooleanArrSeq.CheckedStack();
+    var consumer=new BooleanMonitoredConsumer();
     seq.forEach((Consumer)consumer);
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,seq.modCount);
     Assertions.assertTrue(consumer.isEmpty());
   }
   @Test
-  public void testCheckedStackforEach_Consumer_SeqIsNotEmpty_NoMod()
-  {
-    CheckedStack seq=new CheckedStack();
-    for(int i=0;i<100;++i)
-    {
+  public void testCheckedStackforEach_Consumer_SeqIsNotEmpty_NoMod(){
+    var seq=new BooleanArrSeq.CheckedStack();
+    for(int i=0;i<100;++i){
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
     }
-    MonitoredConsumer consumer=new MonitoredConsumer();
+    var consumer=new BooleanMonitoredConsumer();
     seq.forEach((Consumer)consumer);
     Assertions.assertEquals(100,seq.size());
     Assertions.assertEquals(100,seq.modCount);
@@ -1953,111 +3196,1076 @@ public class BooleanArrSeqTest
     }
   }
   @Test
-  public void testCheckedStackforEach_Consumer_SeqIsEmpty_ModdingConsumer()
-  {
-    CheckedStack seq=new CheckedStack();
-    ModifyingCheckedStackConsumer consumer=new ModifyingCheckedStackConsumer(seq);
+  public void testCheckedStackforEach_Consumer_SeqIsEmpty_ModdingConsumer(){
+    var seq=new BooleanArrSeq.CheckedStack();
+    var consumer=new BooleanMonitoredConsumer.ModifyingArrSeqCheckedStackConsumer(seq);
     seq.forEach((Consumer)consumer);
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,seq.modCount);
     Assertions.assertTrue(consumer.isEmpty());
   }
   @Test
-  public void testCheckedStackforEach_Consumer_SeqIsNotEmpty_ModdingConsumer()
-  {
-    CheckedStack seq=new CheckedStack();
-    for(int i=0;i<100;++i)
-    {
+  public void testCheckedStackforEach_Consumer_SeqIsNotEmpty_ModdingConsumer(){
+    var seq=new BooleanArrSeq.CheckedStack();
+    for(int i=0;i<100;++i){
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
     }
-    ModifyingCheckedStackConsumer consumer=new ModifyingCheckedStackConsumer(seq);
+    var consumer=new BooleanMonitoredConsumer.ModifyingArrSeqCheckedStackConsumer(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.forEach((Consumer)consumer));
     Assertions.assertEquals(100,seq.size());
     Assertions.assertEquals(300,seq.modCount);
     Assertions.assertEquals(100,consumer.size());
     var seqIterator=seq.iterator();
     var consumerIterator=consumer.iterator();
-    for(int i=0;i<100;++i)
-    {
+    for(int i=0;i<100;++i){
       Assertions.assertEquals(consumerIterator.next(),seqIterator.next());
     }
   }
   @Test
-  public void testCheckedStackforEach_Consumer_SeqIsEmpty_ThrowingConsumer()
-  {
-    CheckedStack seq=new CheckedStack();
-    ThrowingConsumer consumer=new ThrowingConsumer();
+  public void testCheckedStackforEach_Consumer_SeqIsEmpty_ThrowingConsumer(){
+    var seq=new BooleanArrSeq.CheckedStack();
+    var consumer=new BooleanMonitoredConsumer.Throwing();
     seq.forEach((Consumer)consumer);
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,seq.modCount);
     Assertions.assertTrue(consumer.isEmpty());
   }
   @Test
-  public void testCheckedStackforEach_Consumer_SeqIsNotEmpty_ThrowingConsumer()
-  {
-    CheckedStack seq=new CheckedStack();
-    for(int i=0;i<100;++i)
-    {
+  public void testCheckedStackforEach_Consumer_SeqIsNotEmpty_ThrowingConsumer(){
+    var seq=new BooleanArrSeq.CheckedStack();
+    for(int i=0;i<100;++i){
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
     }
-    ThrowingConsumer consumer=new ThrowingConsumer();
+    var consumer=new BooleanMonitoredConsumer.Throwing();
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.forEach((Consumer)consumer));
     Assertions.assertEquals(100,seq.size());
     Assertions.assertEquals(100,seq.modCount);
     Assertions.assertEquals(1,consumer.size());
     var seqIterator=seq.iterator();
     var consumerIterator=consumer.iterator();
-    for(int i=0;i<1;++i)
-    {
+    for(int i=0;i<1;++i){
       Assertions.assertEquals(consumerIterator.next(),seqIterator.next());
     }
   }
   @Test
-  public void testCheckedStackforEach_Consumer_SeqIsEmpty_ThrowingAndModdingConsumer()
-  {
-    CheckedStack seq=new CheckedStack();
-    ModifiyingCheckedStackAndThrowingConsumer consumer=new ModifiyingCheckedStackAndThrowingConsumer(seq);
+  public void testCheckedStackforEach_Consumer_SeqIsEmpty_ThrowingAndModdingConsumer(){
+    var seq=new BooleanArrSeq.CheckedStack();
+    var consumer=new BooleanMonitoredConsumer.ModifyingArrSeqCheckedStackAndThrowingConsumer(seq);
     seq.forEach((Consumer)consumer);
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,seq.modCount);
     Assertions.assertTrue(consumer.isEmpty());
   }
   @Test
-  public void testCheckedStackforEach_Consumer_SeqIsNotEmpty_ThrowingAndModdingConsumer()
-  {
-    CheckedStack seq=new CheckedStack();
-    for(int i=0;i<100;++i)
-    {
+  public void testCheckedStackforEach_Consumer_SeqIsNotEmpty_ThrowingAndModdingConsumer(){
+    var seq=new BooleanArrSeq.CheckedStack();
+    for(int i=0;i<100;++i){
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
     }
-    ModifiyingCheckedStackAndThrowingConsumer consumer=new ModifiyingCheckedStackAndThrowingConsumer(seq);
+    var consumer=new BooleanMonitoredConsumer.ModifyingArrSeqCheckedStackAndThrowingConsumer(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.forEach((Consumer)consumer));
     Assertions.assertEquals(100,seq.size());
     Assertions.assertEquals(102,seq.modCount);
     Assertions.assertEquals(1,consumer.size());
   }
-  //TODO TestRemoveIfMethods<DEFAULT>(,)
-  //TODO TestRemoveIfMethods<NULL>(,)
-  //TODO TestRemoveIfMethods<50>(,)
   @Test
-  public void testCheckedStackforEach_BooleanConsumer_SeqIsEmpty_NoMod()
+  public void testCheckedStackremoveIf_Predicate_SeqIsEmpty_RemoveTruePredicate()
   {
-    CheckedStack seq=new CheckedStack();
-    MonitoredConsumer consumer=new MonitoredConsumer();
+    var seq=new BooleanArrSeq.CheckedStack();
+    for(int i=0;i<0;++i){
+      seq.add(TypeConversionUtil.convertToboolean(i));
+    }
+    var filter=new BooleanMonitoredPredicate.RemoveTruePredicate(seq);
+    Assertions.assertFalse(seq.removeIf((Predicate)filter));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,filter.callCount);
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedStackremoveIf_Predicate_SeqIsEmpty_RemoveFalsePredicate()
+  {
+    var seq=new BooleanArrSeq.CheckedStack();
+    for(int i=0;i<0;++i){
+      seq.add(TypeConversionUtil.convertToboolean(i));
+    }
+    var filter=new BooleanMonitoredPredicate.RemoveFalsePredicate(seq);
+    Assertions.assertFalse(seq.removeIf((Predicate)filter));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,filter.callCount);
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedStackremoveIf_Predicate_FirstValtrue_RemoveTrue(){
+    for(int period=1;period<=10;++period){
+      var seq=new BooleanArrSeq.CheckedStack();
+      boolean currVal=true;
+      int trueCount=0;
+      int falseCount=0;
+      for(int i=0;;){
+        seq.add(currVal);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      var filter=new BooleanMonitoredPredicate.RemoveTruePredicate();
+      Assertions.assertEquals(trueCount!=0,seq.removeIf((Predicate)filter));
+      Assertions.assertEquals(falseCount,seq.size());
+      for(int i=0;i<falseCount;++i){
+        Assertions.assertFalse(seq.arr[i]);
+      }
+      Assertions.assertEquals(falseCount==0||trueCount==0?1:2,filter.callCount);
+      Assertions.assertEquals(trueCount==0?10:11,seq.modCount);
+    }
+  }
+  @Test
+  public void testCheckedStackremoveIf_Predicate_FirstValfalse_RemoveTrue(){
+    for(int period=1;period<=10;++period){
+      var seq=new BooleanArrSeq.CheckedStack();
+      boolean currVal=false;
+      int trueCount=0;
+      int falseCount=0;
+      for(int i=0;;){
+        seq.add(currVal);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      var filter=new BooleanMonitoredPredicate.RemoveTruePredicate();
+      Assertions.assertEquals(trueCount!=0,seq.removeIf((Predicate)filter));
+      Assertions.assertEquals(falseCount,seq.size());
+      for(int i=0;i<falseCount;++i){
+        Assertions.assertFalse(seq.arr[i]);
+      }
+      Assertions.assertEquals(falseCount==0||trueCount==0?1:2,filter.callCount);
+      Assertions.assertEquals(trueCount==0?10:11,seq.modCount);
+    }
+  }
+  @Test
+  public void testCheckedStackremoveIf_Predicate_FirstValtrue_RemoveFalse(){
+    for(int period=1;period<=10;++period){
+      var seq=new BooleanArrSeq.CheckedStack();
+      boolean currVal=true;
+      int trueCount=0;
+      int falseCount=0;
+      for(int i=0;;){
+        seq.add(currVal);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      var filter=new BooleanMonitoredPredicate.RemoveFalsePredicate();
+      Assertions.assertEquals(falseCount!=0,seq.removeIf((Predicate)filter));
+      Assertions.assertEquals(trueCount,seq.size());
+      for(int i=0;i<trueCount;++i){
+        Assertions.assertTrue(seq.arr[i]);
+      }
+      Assertions.assertEquals(falseCount==0||trueCount==0?1:2,filter.callCount);
+      Assertions.assertEquals(falseCount==0?10:11,seq.modCount);
+    }
+  }
+  @Test
+  public void testCheckedStackremoveIf_Predicate_FirstValfalse_RemoveFalse(){
+    for(int period=1;period<=10;++period){
+      var seq=new BooleanArrSeq.CheckedStack();
+      boolean currVal=false;
+      int trueCount=0;
+      int falseCount=0;
+      for(int i=0;;){
+        seq.add(currVal);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      var filter=new BooleanMonitoredPredicate.RemoveFalsePredicate();
+      Assertions.assertEquals(falseCount!=0,seq.removeIf((Predicate)filter));
+      Assertions.assertEquals(trueCount,seq.size());
+      for(int i=0;i<trueCount;++i){
+        Assertions.assertTrue(seq.arr[i]);
+      }
+      Assertions.assertEquals(falseCount==0||trueCount==0?1:2,filter.callCount);
+      Assertions.assertEquals(falseCount==0?10:11,seq.modCount);
+    }
+  }
+  @Test
+  public void testCheckedStackremoveIf_Predicate_FirstValtrue_RemoveAll(){
+    for(int period=1;period<=10;++period){
+      var seq=new BooleanArrSeq.CheckedStack();
+      boolean currVal=true;
+      int trueCount=0;
+      int falseCount=0;
+      for(int i=0;;){
+        seq.add(currVal);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      var filter=new BooleanMonitoredPredicate.RemoveAllPredicate();
+      Assertions.assertTrue(seq.removeIf((Predicate)filter));
+      Assertions.assertEquals(0,seq.size());
+      Assertions.assertEquals(falseCount==0||trueCount==0?1:2,filter.callCount);
+      Assertions.assertEquals(11,seq.modCount);
+    }
+  }
+  @Test
+  public void testCheckedStackremoveIf_Predicate_FirstValfalse_RemoveAll(){
+    for(int period=1;period<=10;++period){
+      var seq=new BooleanArrSeq.CheckedStack();
+      boolean currVal=false;
+      int trueCount=0;
+      int falseCount=0;
+      for(int i=0;;){
+        seq.add(currVal);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      var filter=new BooleanMonitoredPredicate.RemoveAllPredicate();
+      Assertions.assertTrue(seq.removeIf((Predicate)filter));
+      Assertions.assertEquals(0,seq.size());
+      Assertions.assertEquals(falseCount==0||trueCount==0?1:2,filter.callCount);
+      Assertions.assertEquals(11,seq.modCount);
+    }
+  }
+  @Test
+  public void testCheckedStackremoveIf_Predicate_FirstValtrue_RemoveNone(){
+    for(int period=1;period<=10;++period){
+      var seq=new BooleanArrSeq.CheckedStack();
+      boolean currVal=true;
+      int trueCount=0;
+      int falseCount=0;
+      for(int i=0;;){
+        seq.add(currVal);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      var filter=new BooleanMonitoredPredicate.RemoveNonePredicate();
+      Assertions.assertFalse(seq.removeIf((Predicate)filter));
+      Assertions.assertEquals(10,seq.size());
+      Assertions.assertEquals(falseCount==0||trueCount==0?1:2,filter.callCount);
+      currVal=true;
+      trueCount=0;
+      falseCount=0;
+      for(int i=0;;){
+        Assertions.assertEquals(currVal,seq.arr[i]);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      Assertions.assertEquals(10,seq.modCount);
+    }
+  }
+  @Test
+  public void testCheckedStackremoveIf_Predicate_FirstValfalse_RemoveNone(){
+    for(int period=1;period<=10;++period){
+      var seq=new BooleanArrSeq.CheckedStack();
+      boolean currVal=false;
+      int trueCount=0;
+      int falseCount=0;
+      for(int i=0;;){
+        seq.add(currVal);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      var filter=new BooleanMonitoredPredicate.RemoveNonePredicate();
+      Assertions.assertFalse(seq.removeIf((Predicate)filter));
+      Assertions.assertEquals(10,seq.size());
+      Assertions.assertEquals(falseCount==0||trueCount==0?1:2,filter.callCount);
+      currVal=false;
+      trueCount=0;
+      falseCount=0;
+      for(int i=0;;){
+        Assertions.assertEquals(currVal,seq.arr[i]);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      Assertions.assertEquals(10,seq.modCount);
+    }
+  }
+  @Test
+  public void testCheckedStackremoveIf_Predicate_FirstValtrue_RemoveTrueArrSeqCheckedStackModifyingPredicate(){
+    for(int period=1;period<=10;++period){
+      var seq=new BooleanArrSeq.CheckedStack();
+      boolean currVal=true;
+      int trueCount=0;
+      int falseCount=0;
+      for(int i=0;;){
+        seq.add(currVal);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      var filter=new BooleanMonitoredPredicate.RemoveTrueArrSeqCheckedStackModifyingPredicate(seq);
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
+      Assertions.assertEquals(10,seq.size());
+      currVal=true;
+      trueCount=0;
+      falseCount=0;
+      for(int i=0;;){
+        Assertions.assertEquals(currVal,seq.arr[i]);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      if(falseCount!=10 && trueCount!=10){
+        Assertions.assertEquals(10+4,seq.modCount);
+        Assertions.assertEquals(2,filter.callCount);
+      }else{
+        Assertions.assertEquals(10+2,seq.modCount);
+        Assertions.assertEquals(1,filter.callCount);
+      }
+    }
+  }
+  @Test
+  public void testCheckedStackremoveIf_Predicate_FirstValtrue_RemoveFalseArrSeqCheckedStackModifyingPredicate(){
+    for(int period=1;period<=10;++period){
+      var seq=new BooleanArrSeq.CheckedStack();
+      boolean currVal=true;
+      int trueCount=0;
+      int falseCount=0;
+      for(int i=0;;){
+        seq.add(currVal);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      var filter=new BooleanMonitoredPredicate.RemoveFalseArrSeqCheckedStackModifyingPredicate(seq);
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
+      Assertions.assertEquals(10,seq.size());
+      currVal=true;
+      trueCount=0;
+      falseCount=0;
+      for(int i=0;;){
+        Assertions.assertEquals(currVal,seq.arr[i]);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      if(falseCount!=10 && trueCount!=10){
+        Assertions.assertEquals(10+4,seq.modCount);
+        Assertions.assertEquals(2,filter.callCount);
+      }else{
+        Assertions.assertEquals(10+2,seq.modCount);
+        Assertions.assertEquals(1,filter.callCount);
+      }
+    }
+  }
+  @Test
+  public void testCheckedStackremoveIf_Predicate_FirstValfalse_RemoveTrueArrSeqCheckedStackModifyingPredicate(){
+    for(int period=1;period<=10;++period){
+      var seq=new BooleanArrSeq.CheckedStack();
+      boolean currVal=false;
+      int trueCount=0;
+      int falseCount=0;
+      for(int i=0;;){
+        seq.add(currVal);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      var filter=new BooleanMonitoredPredicate.RemoveTrueArrSeqCheckedStackModifyingPredicate(seq);
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
+      Assertions.assertEquals(10,seq.size());
+      currVal=false;
+      trueCount=0;
+      falseCount=0;
+      for(int i=0;;){
+        Assertions.assertEquals(currVal,seq.arr[i]);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      if(falseCount!=10 && trueCount!=10){
+        Assertions.assertEquals(10+4,seq.modCount);
+        Assertions.assertEquals(2,filter.callCount);
+      }else{
+        Assertions.assertEquals(10+2,seq.modCount);
+        Assertions.assertEquals(1,filter.callCount);
+      }
+    }
+  }
+  @Test
+  public void testCheckedStackremoveIf_Predicate_FirstValfalse_RemoveFalseArrSeqCheckedStackModifyingPredicate(){
+    for(int period=1;period<=10;++period){
+      var seq=new BooleanArrSeq.CheckedStack();
+      boolean currVal=false;
+      int trueCount=0;
+      int falseCount=0;
+      for(int i=0;;){
+        seq.add(currVal);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      var filter=new BooleanMonitoredPredicate.RemoveFalseArrSeqCheckedStackModifyingPredicate(seq);
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
+      Assertions.assertEquals(10,seq.size());
+      currVal=false;
+      trueCount=0;
+      falseCount=0;
+      for(int i=0;;){
+        Assertions.assertEquals(currVal,seq.arr[i]);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      if(falseCount!=10 && trueCount!=10){
+        Assertions.assertEquals(10+4,seq.modCount);
+        Assertions.assertEquals(2,filter.callCount);
+      }else{
+        Assertions.assertEquals(10+2,seq.modCount);
+        Assertions.assertEquals(1,filter.callCount);
+      }
+    }
+  }
+  @Test
+  public void testCheckedStackremoveIf_Predicate_FirstValtrue_RemoveNoneArrSeqCheckedStackModifyingPredicate(){
+    for(int period=1;period<=10;++period){
+      var seq=new BooleanArrSeq.CheckedStack();
+      boolean currVal=true;
+      int trueCount=0;
+      int falseCount=0;
+      for(int i=0;;){
+        seq.add(currVal);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      var filter=new BooleanMonitoredPredicate.RemoveNoneArrSeqCheckedStackModifyingPredicate(seq);
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
+      Assertions.assertEquals(10,seq.size());
+      currVal=true;
+      trueCount=0;
+      falseCount=0;
+      for(int i=0;;){
+        Assertions.assertEquals(currVal,seq.arr[i]);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      if(falseCount!=10 && trueCount!=10){
+        Assertions.assertEquals(10+4,seq.modCount);
+        Assertions.assertEquals(2,filter.callCount);
+      }else{
+        Assertions.assertEquals(10+2,seq.modCount);
+        Assertions.assertEquals(1,filter.callCount);
+      }
+    }
+  }
+  @Test
+  public void testCheckedStackremoveIf_Predicate_FirstValtrue_RemoveAllArrSeqCheckedStackModifyingPredicate(){
+    for(int period=1;period<=10;++period){
+      var seq=new BooleanArrSeq.CheckedStack();
+      boolean currVal=true;
+      int trueCount=0;
+      int falseCount=0;
+      for(int i=0;;){
+        seq.add(currVal);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      var filter=new BooleanMonitoredPredicate.RemoveAllArrSeqCheckedStackModifyingPredicate(seq);
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
+      Assertions.assertEquals(10,seq.size());
+      currVal=true;
+      trueCount=0;
+      falseCount=0;
+      for(int i=0;;){
+        Assertions.assertEquals(currVal,seq.arr[i]);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      if(falseCount!=10 && trueCount!=10){
+        Assertions.assertEquals(10+4,seq.modCount);
+        Assertions.assertEquals(2,filter.callCount);
+      }else{
+        Assertions.assertEquals(10+2,seq.modCount);
+        Assertions.assertEquals(1,filter.callCount);
+      }
+    }
+  }
+  @Test
+  public void testCheckedStackremoveIf_Predicate_FirstValfalse_RemoveNoneArrSeqCheckedStackModifyingPredicate(){
+    for(int period=1;period<=10;++period){
+      var seq=new BooleanArrSeq.CheckedStack();
+      boolean currVal=false;
+      int trueCount=0;
+      int falseCount=0;
+      for(int i=0;;){
+        seq.add(currVal);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      var filter=new BooleanMonitoredPredicate.RemoveNoneArrSeqCheckedStackModifyingPredicate(seq);
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
+      Assertions.assertEquals(10,seq.size());
+      currVal=false;
+      trueCount=0;
+      falseCount=0;
+      for(int i=0;;){
+        Assertions.assertEquals(currVal,seq.arr[i]);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      if(falseCount!=10 && trueCount!=10){
+        Assertions.assertEquals(10+4,seq.modCount);
+        Assertions.assertEquals(2,filter.callCount);
+      }else{
+        Assertions.assertEquals(10+2,seq.modCount);
+        Assertions.assertEquals(1,filter.callCount);
+      }
+    }
+  }
+  @Test
+  public void testCheckedStackremoveIf_Predicate_FirstValfalse_RemoveAllArrSeqCheckedStackModifyingPredicate(){
+    for(int period=1;period<=10;++period){
+      var seq=new BooleanArrSeq.CheckedStack();
+      boolean currVal=false;
+      int trueCount=0;
+      int falseCount=0;
+      for(int i=0;;){
+        seq.add(currVal);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      var filter=new BooleanMonitoredPredicate.RemoveAllArrSeqCheckedStackModifyingPredicate(seq);
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
+      Assertions.assertEquals(10,seq.size());
+      currVal=false;
+      trueCount=0;
+      falseCount=0;
+      for(int i=0;;){
+        Assertions.assertEquals(currVal,seq.arr[i]);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      if(falseCount!=10 && trueCount!=10){
+        Assertions.assertEquals(10+4,seq.modCount);
+        Assertions.assertEquals(2,filter.callCount);
+      }else{
+        Assertions.assertEquals(10+2,seq.modCount);
+        Assertions.assertEquals(1,filter.callCount);
+      }
+    }
+  }
+  @Test
+  public void testCheckedStackremoveIf_Predicate_FirstValtrue_Throwing(){
+    for(int period=1;period<=10;++period){
+      var seq=new BooleanArrSeq.CheckedStack();
+      boolean currVal=true;
+      int trueCount=0;
+      int falseCount=0;
+      for(int i=0;;){
+        seq.add(currVal);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      var filter=new BooleanMonitoredPredicate.ThrowingPredicate();
+      Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.removeIf((Predicate)filter));
+      Assertions.assertEquals(10,seq.size());
+      currVal=true;
+      trueCount=0;
+      falseCount=0;
+      for(int i=0;;){
+        Assertions.assertEquals(currVal,seq.arr[i]);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      Assertions.assertEquals(10,seq.modCount);
+      Assertions.assertEquals(1,filter.callCount);
+    }
+  }
+  @Test
+  public void testCheckedStackremoveIf_Predicate_FirstValfalse_Throwing(){
+    for(int period=1;period<=10;++period){
+      var seq=new BooleanArrSeq.CheckedStack();
+      boolean currVal=false;
+      int trueCount=0;
+      int falseCount=0;
+      for(int i=0;;){
+        seq.add(currVal);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      var filter=new BooleanMonitoredPredicate.ThrowingPredicate();
+      Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.removeIf((Predicate)filter));
+      Assertions.assertEquals(10,seq.size());
+      currVal=false;
+      trueCount=0;
+      falseCount=0;
+      for(int i=0;;){
+        Assertions.assertEquals(currVal,seq.arr[i]);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      Assertions.assertEquals(10,seq.modCount);
+      Assertions.assertEquals(1,filter.callCount);
+    }
+  }
+  @Test
+  public void testCheckedStackremoveIf_Predicate_FirstValfalse_ThrowAndMod(){
+    for(int period=1;period<=10;++period){
+      var seq=new BooleanArrSeq.CheckedStack();
+      boolean currVal=false;
+      int trueCount=0;
+      int falseCount=0;
+      for(int i=0;;){
+        seq.add(currVal);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      var filter=new BooleanMonitoredPredicate.ModifyingArrSeqCheckedStackAndThrowingPredicate(seq);
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
+      Assertions.assertEquals(11,seq.size());
+      currVal=false;
+      trueCount=0;
+      falseCount=0;
+      for(int i=0;;){
+        Assertions.assertEquals(currVal,seq.arr[i]);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      Assertions.assertEquals(false,seq.arr[10]);
+      Assertions.assertEquals(10+1,seq.modCount);
+      Assertions.assertEquals(1,filter.callCount);
+    }
+  }
+  @Test
+  public void testCheckedStackremoveIf_Predicate_FirstValtrue_ThrowAndMod(){
+    for(int period=1;period<=10;++period){
+      var seq=new BooleanArrSeq.CheckedStack();
+      boolean currVal=true;
+      int trueCount=0;
+      int falseCount=0;
+      for(int i=0;;){
+        seq.add(currVal);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      var filter=new BooleanMonitoredPredicate.ModifyingArrSeqCheckedStackAndThrowingPredicate(seq);
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
+      Assertions.assertEquals(11,seq.size());
+      currVal=true;
+      trueCount=0;
+      falseCount=0;
+      for(int i=0;;){
+        Assertions.assertEquals(currVal,seq.arr[i]);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      Assertions.assertEquals(true,seq.arr[10]);
+      Assertions.assertEquals(10+1,seq.modCount);
+      Assertions.assertEquals(1,filter.callCount);
+    }
+  }
+  @Test
+  public void testCheckedStackremoveIf_Predicate_SeqIsEmpty_RemoveTrueArrSeqCheckedStackModifyingPredicate()
+  {
+    var seq=new BooleanArrSeq.CheckedStack();
+    for(int i=0;i<0;++i){
+      seq.add(TypeConversionUtil.convertToboolean(i));
+    }
+    var filter=new BooleanMonitoredPredicate.RemoveTrueArrSeqCheckedStackModifyingPredicate(seq);
+    Assertions.assertFalse(seq.removeIf((Predicate)filter));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,filter.callCount);
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedStackremoveIf_Predicate_SeqIsEmpty_RemoveFalseArrSeqCheckedStackModifyingPredicate()
+  {
+    var seq=new BooleanArrSeq.CheckedStack();
+    for(int i=0;i<0;++i){
+      seq.add(TypeConversionUtil.convertToboolean(i));
+    }
+    var filter=new BooleanMonitoredPredicate.RemoveFalseArrSeqCheckedStackModifyingPredicate(seq);
+    Assertions.assertFalse(seq.removeIf((Predicate)filter));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,filter.callCount);
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedStackremoveIf_Predicate_SeqIsEmpty_RemoveAllPredicate()
+  {
+    var seq=new BooleanArrSeq.CheckedStack();
+    for(int i=0;i<0;++i){
+      seq.add(TypeConversionUtil.convertToboolean(i));
+    }
+    var filter=new BooleanMonitoredPredicate.RemoveAllPredicate(seq);
+    Assertions.assertFalse(seq.removeIf((Predicate)filter));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,filter.callCount);
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedStackremoveIf_Predicate_SeqIsEmpty_RemoveNonePredicate()
+  {
+    var seq=new BooleanArrSeq.CheckedStack();
+    for(int i=0;i<0;++i){
+      seq.add(TypeConversionUtil.convertToboolean(i));
+    }
+    var filter=new BooleanMonitoredPredicate.RemoveNonePredicate(seq);
+    Assertions.assertFalse(seq.removeIf((Predicate)filter));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,filter.callCount);
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedStackremoveIf_Predicate_SeqIsEmpty_RemoveAllArrSeqCheckedStackModifyingPredicate()
+  {
+    var seq=new BooleanArrSeq.CheckedStack();
+    for(int i=0;i<0;++i){
+      seq.add(TypeConversionUtil.convertToboolean(i));
+    }
+    var filter=new BooleanMonitoredPredicate.RemoveAllArrSeqCheckedStackModifyingPredicate(seq);
+    Assertions.assertFalse(seq.removeIf((Predicate)filter));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,filter.callCount);
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedStackremoveIf_Predicate_SeqIsEmpty_RemoveNoneArrSeqCheckedStackModifyingPredicate()
+  {
+    var seq=new BooleanArrSeq.CheckedStack();
+    for(int i=0;i<0;++i){
+      seq.add(TypeConversionUtil.convertToboolean(i));
+    }
+    var filter=new BooleanMonitoredPredicate.RemoveNoneArrSeqCheckedStackModifyingPredicate(seq);
+    Assertions.assertFalse(seq.removeIf((Predicate)filter));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,filter.callCount);
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedStackremoveIf_Predicate_SeqIsEmpty_ThrowingPredicate()
+  {
+    var seq=new BooleanArrSeq.CheckedStack();
+    for(int i=0;i<0;++i){
+      seq.add(TypeConversionUtil.convertToboolean(i));
+    }
+    var filter=new BooleanMonitoredPredicate.ThrowingPredicate(seq);
+    Assertions.assertFalse(seq.removeIf((Predicate)filter));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,filter.callCount);
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedStackremoveIf_Predicate_SeqIsEmpty_ModifyingArrSeqCheckedStackAndThrowingPredicate()
+  {
+    var seq=new BooleanArrSeq.CheckedStack();
+    for(int i=0;i<0;++i){
+      seq.add(TypeConversionUtil.convertToboolean(i));
+    }
+    var filter=new BooleanMonitoredPredicate.ModifyingArrSeqCheckedStackAndThrowingPredicate(seq);
+    Assertions.assertFalse(seq.removeIf((Predicate)filter));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,filter.callCount);
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedStackforEach_BooleanConsumer_SeqIsEmpty_NoMod(){
+    var seq=new BooleanArrSeq.CheckedStack();
+    var consumer=new BooleanMonitoredConsumer();
     seq.forEach((BooleanConsumer)consumer);
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,seq.modCount);
     Assertions.assertTrue(consumer.isEmpty());
   }
   @Test
-  public void testCheckedStackforEach_BooleanConsumer_SeqIsNotEmpty_NoMod()
-  {
-    CheckedStack seq=new CheckedStack();
-    for(int i=0;i<100;++i)
-    {
+  public void testCheckedStackforEach_BooleanConsumer_SeqIsNotEmpty_NoMod(){
+    var seq=new BooleanArrSeq.CheckedStack();
+    for(int i=0;i<100;++i){
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
     }
-    MonitoredConsumer consumer=new MonitoredConsumer();
+    var consumer=new BooleanMonitoredConsumer();
     seq.forEach((BooleanConsumer)consumer);
     Assertions.assertEquals(100,seq.size());
     Assertions.assertEquals(100,seq.modCount);
@@ -2070,202 +4278,1149 @@ public class BooleanArrSeqTest
     }
   }
   @Test
-  public void testCheckedStackforEach_BooleanConsumer_SeqIsEmpty_ModdingConsumer()
-  {
-    CheckedStack seq=new CheckedStack();
-    ModifyingCheckedStackConsumer consumer=new ModifyingCheckedStackConsumer(seq);
+  public void testCheckedStackforEach_BooleanConsumer_SeqIsEmpty_ModdingConsumer(){
+    var seq=new BooleanArrSeq.CheckedStack();
+    var consumer=new BooleanMonitoredConsumer.ModifyingArrSeqCheckedStackConsumer(seq);
     seq.forEach((BooleanConsumer)consumer);
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,seq.modCount);
     Assertions.assertTrue(consumer.isEmpty());
   }
   @Test
-  public void testCheckedStackforEach_BooleanConsumer_SeqIsNotEmpty_ModdingConsumer()
-  {
-    CheckedStack seq=new CheckedStack();
-    for(int i=0;i<100;++i)
-    {
+  public void testCheckedStackforEach_BooleanConsumer_SeqIsNotEmpty_ModdingConsumer(){
+    var seq=new BooleanArrSeq.CheckedStack();
+    for(int i=0;i<100;++i){
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
     }
-    ModifyingCheckedStackConsumer consumer=new ModifyingCheckedStackConsumer(seq);
+    var consumer=new BooleanMonitoredConsumer.ModifyingArrSeqCheckedStackConsumer(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.forEach((BooleanConsumer)consumer));
     Assertions.assertEquals(100,seq.size());
     Assertions.assertEquals(300,seq.modCount);
     Assertions.assertEquals(100,consumer.size());
     var seqIterator=seq.iterator();
     var consumerIterator=consumer.iterator();
-    for(int i=0;i<100;++i)
-    {
+    for(int i=0;i<100;++i){
       Assertions.assertEquals(consumerIterator.next(),seqIterator.next());
     }
   }
   @Test
-  public void testCheckedStackforEach_BooleanConsumer_SeqIsEmpty_ThrowingConsumer()
-  {
-    CheckedStack seq=new CheckedStack();
-    ThrowingConsumer consumer=new ThrowingConsumer();
+  public void testCheckedStackforEach_BooleanConsumer_SeqIsEmpty_ThrowingConsumer(){
+    var seq=new BooleanArrSeq.CheckedStack();
+    var consumer=new BooleanMonitoredConsumer.Throwing();
     seq.forEach((BooleanConsumer)consumer);
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,seq.modCount);
     Assertions.assertTrue(consumer.isEmpty());
   }
   @Test
-  public void testCheckedStackforEach_BooleanConsumer_SeqIsNotEmpty_ThrowingConsumer()
-  {
-    CheckedStack seq=new CheckedStack();
-    for(int i=0;i<100;++i)
-    {
+  public void testCheckedStackforEach_BooleanConsumer_SeqIsNotEmpty_ThrowingConsumer(){
+    var seq=new BooleanArrSeq.CheckedStack();
+    for(int i=0;i<100;++i){
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
     }
-    ThrowingConsumer consumer=new ThrowingConsumer();
+    var consumer=new BooleanMonitoredConsumer.Throwing();
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.forEach((BooleanConsumer)consumer));
     Assertions.assertEquals(100,seq.size());
     Assertions.assertEquals(100,seq.modCount);
     Assertions.assertEquals(1,consumer.size());
     var seqIterator=seq.iterator();
     var consumerIterator=consumer.iterator();
-    for(int i=0;i<1;++i)
-    {
+    for(int i=0;i<1;++i){
       Assertions.assertEquals(consumerIterator.next(),seqIterator.next());
     }
   }
   @Test
-  public void testCheckedStackforEach_BooleanConsumer_SeqIsEmpty_ThrowingAndModdingConsumer()
-  {
-    CheckedStack seq=new CheckedStack();
-    ModifiyingCheckedStackAndThrowingConsumer consumer=new ModifiyingCheckedStackAndThrowingConsumer(seq);
+  public void testCheckedStackforEach_BooleanConsumer_SeqIsEmpty_ThrowingAndModdingConsumer(){
+    var seq=new BooleanArrSeq.CheckedStack();
+    var consumer=new BooleanMonitoredConsumer.ModifyingArrSeqCheckedStackAndThrowingConsumer(seq);
     seq.forEach((BooleanConsumer)consumer);
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,seq.modCount);
     Assertions.assertTrue(consumer.isEmpty());
   }
   @Test
-  public void testCheckedStackforEach_BooleanConsumer_SeqIsNotEmpty_ThrowingAndModdingConsumer()
-  {
-    CheckedStack seq=new CheckedStack();
-    for(int i=0;i<100;++i)
-    {
+  public void testCheckedStackforEach_BooleanConsumer_SeqIsNotEmpty_ThrowingAndModdingConsumer(){
+    var seq=new BooleanArrSeq.CheckedStack();
+    for(int i=0;i<100;++i){
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
     }
-    ModifiyingCheckedStackAndThrowingConsumer consumer=new ModifiyingCheckedStackAndThrowingConsumer(seq);
+    var consumer=new BooleanMonitoredConsumer.ModifyingArrSeqCheckedStackAndThrowingConsumer(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.forEach((BooleanConsumer)consumer));
     Assertions.assertEquals(100,seq.size());
     Assertions.assertEquals(102,seq.modCount);
     Assertions.assertEquals(1,consumer.size());
   }
-  //TODO TestRemoveIfMethods<DEFAULT>(Boolean,)
-  //TODO TestRemoveIfMethods<NULL>(Boolean,)
-  //TODO TestRemoveIfMethods<50>(Boolean,)
   @Test
-  public void testCheckedStackadd_boolean_initialCapacityDEFAULT()
+  public void testCheckedStackremoveIf_BooleanPredicate_SeqIsEmpty_RemoveTruePredicate()
   {
-    CheckedStack seq=new CheckedStack();
-    for(int i=0;i<100;++i)
-    {
+    var seq=new BooleanArrSeq.CheckedStack();
+    for(int i=0;i<0;++i){
+      seq.add(TypeConversionUtil.convertToboolean(i));
+    }
+    var filter=new BooleanMonitoredPredicate.RemoveTruePredicate(seq);
+    Assertions.assertFalse(seq.removeIf((BooleanPredicate)filter));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,filter.callCount);
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedStackremoveIf_BooleanPredicate_SeqIsEmpty_RemoveFalsePredicate()
+  {
+    var seq=new BooleanArrSeq.CheckedStack();
+    for(int i=0;i<0;++i){
+      seq.add(TypeConversionUtil.convertToboolean(i));
+    }
+    var filter=new BooleanMonitoredPredicate.RemoveFalsePredicate(seq);
+    Assertions.assertFalse(seq.removeIf((BooleanPredicate)filter));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,filter.callCount);
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedStackremoveIf_BooleanPredicate_FirstValtrue_RemoveTrue(){
+    for(int period=1;period<=10;++period){
+      var seq=new BooleanArrSeq.CheckedStack();
+      boolean currVal=true;
+      int trueCount=0;
+      int falseCount=0;
+      for(int i=0;;){
+        seq.add(currVal);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      var filter=new BooleanMonitoredPredicate.RemoveTruePredicate();
+      Assertions.assertEquals(trueCount!=0,seq.removeIf((BooleanPredicate)filter));
+      Assertions.assertEquals(falseCount,seq.size());
+      for(int i=0;i<falseCount;++i){
+        Assertions.assertFalse(seq.arr[i]);
+      }
+      Assertions.assertEquals(falseCount==0||trueCount==0?1:2,filter.callCount);
+      Assertions.assertEquals(trueCount==0?10:11,seq.modCount);
+    }
+  }
+  @Test
+  public void testCheckedStackremoveIf_BooleanPredicate_FirstValfalse_RemoveTrue(){
+    for(int period=1;period<=10;++period){
+      var seq=new BooleanArrSeq.CheckedStack();
+      boolean currVal=false;
+      int trueCount=0;
+      int falseCount=0;
+      for(int i=0;;){
+        seq.add(currVal);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      var filter=new BooleanMonitoredPredicate.RemoveTruePredicate();
+      Assertions.assertEquals(trueCount!=0,seq.removeIf((BooleanPredicate)filter));
+      Assertions.assertEquals(falseCount,seq.size());
+      for(int i=0;i<falseCount;++i){
+        Assertions.assertFalse(seq.arr[i]);
+      }
+      Assertions.assertEquals(falseCount==0||trueCount==0?1:2,filter.callCount);
+      Assertions.assertEquals(trueCount==0?10:11,seq.modCount);
+    }
+  }
+  @Test
+  public void testCheckedStackremoveIf_BooleanPredicate_FirstValtrue_RemoveFalse(){
+    for(int period=1;period<=10;++period){
+      var seq=new BooleanArrSeq.CheckedStack();
+      boolean currVal=true;
+      int trueCount=0;
+      int falseCount=0;
+      for(int i=0;;){
+        seq.add(currVal);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      var filter=new BooleanMonitoredPredicate.RemoveFalsePredicate();
+      Assertions.assertEquals(falseCount!=0,seq.removeIf((BooleanPredicate)filter));
+      Assertions.assertEquals(trueCount,seq.size());
+      for(int i=0;i<trueCount;++i){
+        Assertions.assertTrue(seq.arr[i]);
+      }
+      Assertions.assertEquals(falseCount==0||trueCount==0?1:2,filter.callCount);
+      Assertions.assertEquals(falseCount==0?10:11,seq.modCount);
+    }
+  }
+  @Test
+  public void testCheckedStackremoveIf_BooleanPredicate_FirstValfalse_RemoveFalse(){
+    for(int period=1;period<=10;++period){
+      var seq=new BooleanArrSeq.CheckedStack();
+      boolean currVal=false;
+      int trueCount=0;
+      int falseCount=0;
+      for(int i=0;;){
+        seq.add(currVal);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      var filter=new BooleanMonitoredPredicate.RemoveFalsePredicate();
+      Assertions.assertEquals(falseCount!=0,seq.removeIf((BooleanPredicate)filter));
+      Assertions.assertEquals(trueCount,seq.size());
+      for(int i=0;i<trueCount;++i){
+        Assertions.assertTrue(seq.arr[i]);
+      }
+      Assertions.assertEquals(falseCount==0||trueCount==0?1:2,filter.callCount);
+      Assertions.assertEquals(falseCount==0?10:11,seq.modCount);
+    }
+  }
+  @Test
+  public void testCheckedStackremoveIf_BooleanPredicate_FirstValtrue_RemoveAll(){
+    for(int period=1;period<=10;++period){
+      var seq=new BooleanArrSeq.CheckedStack();
+      boolean currVal=true;
+      int trueCount=0;
+      int falseCount=0;
+      for(int i=0;;){
+        seq.add(currVal);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      var filter=new BooleanMonitoredPredicate.RemoveAllPredicate();
+      Assertions.assertTrue(seq.removeIf((BooleanPredicate)filter));
+      Assertions.assertEquals(0,seq.size());
+      Assertions.assertEquals(falseCount==0||trueCount==0?1:2,filter.callCount);
+      Assertions.assertEquals(11,seq.modCount);
+    }
+  }
+  @Test
+  public void testCheckedStackremoveIf_BooleanPredicate_FirstValfalse_RemoveAll(){
+    for(int period=1;period<=10;++period){
+      var seq=new BooleanArrSeq.CheckedStack();
+      boolean currVal=false;
+      int trueCount=0;
+      int falseCount=0;
+      for(int i=0;;){
+        seq.add(currVal);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      var filter=new BooleanMonitoredPredicate.RemoveAllPredicate();
+      Assertions.assertTrue(seq.removeIf((BooleanPredicate)filter));
+      Assertions.assertEquals(0,seq.size());
+      Assertions.assertEquals(falseCount==0||trueCount==0?1:2,filter.callCount);
+      Assertions.assertEquals(11,seq.modCount);
+    }
+  }
+  @Test
+  public void testCheckedStackremoveIf_BooleanPredicate_FirstValtrue_RemoveNone(){
+    for(int period=1;period<=10;++period){
+      var seq=new BooleanArrSeq.CheckedStack();
+      boolean currVal=true;
+      int trueCount=0;
+      int falseCount=0;
+      for(int i=0;;){
+        seq.add(currVal);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      var filter=new BooleanMonitoredPredicate.RemoveNonePredicate();
+      Assertions.assertFalse(seq.removeIf((BooleanPredicate)filter));
+      Assertions.assertEquals(10,seq.size());
+      Assertions.assertEquals(falseCount==0||trueCount==0?1:2,filter.callCount);
+      currVal=true;
+      trueCount=0;
+      falseCount=0;
+      for(int i=0;;){
+        Assertions.assertEquals(currVal,seq.arr[i]);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      Assertions.assertEquals(10,seq.modCount);
+    }
+  }
+  @Test
+  public void testCheckedStackremoveIf_BooleanPredicate_FirstValfalse_RemoveNone(){
+    for(int period=1;period<=10;++period){
+      var seq=new BooleanArrSeq.CheckedStack();
+      boolean currVal=false;
+      int trueCount=0;
+      int falseCount=0;
+      for(int i=0;;){
+        seq.add(currVal);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      var filter=new BooleanMonitoredPredicate.RemoveNonePredicate();
+      Assertions.assertFalse(seq.removeIf((BooleanPredicate)filter));
+      Assertions.assertEquals(10,seq.size());
+      Assertions.assertEquals(falseCount==0||trueCount==0?1:2,filter.callCount);
+      currVal=false;
+      trueCount=0;
+      falseCount=0;
+      for(int i=0;;){
+        Assertions.assertEquals(currVal,seq.arr[i]);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      Assertions.assertEquals(10,seq.modCount);
+    }
+  }
+  @Test
+  public void testCheckedStackremoveIf_BooleanPredicate_FirstValtrue_RemoveTrueArrSeqCheckedStackModifyingPredicate(){
+    for(int period=1;period<=10;++period){
+      var seq=new BooleanArrSeq.CheckedStack();
+      boolean currVal=true;
+      int trueCount=0;
+      int falseCount=0;
+      for(int i=0;;){
+        seq.add(currVal);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      var filter=new BooleanMonitoredPredicate.RemoveTrueArrSeqCheckedStackModifyingPredicate(seq);
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((BooleanPredicate)filter));
+      Assertions.assertEquals(10,seq.size());
+      currVal=true;
+      trueCount=0;
+      falseCount=0;
+      for(int i=0;;){
+        Assertions.assertEquals(currVal,seq.arr[i]);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      if(falseCount!=10 && trueCount!=10){
+        Assertions.assertEquals(10+4,seq.modCount);
+        Assertions.assertEquals(2,filter.callCount);
+      }else{
+        Assertions.assertEquals(10+2,seq.modCount);
+        Assertions.assertEquals(1,filter.callCount);
+      }
+    }
+  }
+  @Test
+  public void testCheckedStackremoveIf_BooleanPredicate_FirstValtrue_RemoveFalseArrSeqCheckedStackModifyingPredicate(){
+    for(int period=1;period<=10;++period){
+      var seq=new BooleanArrSeq.CheckedStack();
+      boolean currVal=true;
+      int trueCount=0;
+      int falseCount=0;
+      for(int i=0;;){
+        seq.add(currVal);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      var filter=new BooleanMonitoredPredicate.RemoveFalseArrSeqCheckedStackModifyingPredicate(seq);
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((BooleanPredicate)filter));
+      Assertions.assertEquals(10,seq.size());
+      currVal=true;
+      trueCount=0;
+      falseCount=0;
+      for(int i=0;;){
+        Assertions.assertEquals(currVal,seq.arr[i]);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      if(falseCount!=10 && trueCount!=10){
+        Assertions.assertEquals(10+4,seq.modCount);
+        Assertions.assertEquals(2,filter.callCount);
+      }else{
+        Assertions.assertEquals(10+2,seq.modCount);
+        Assertions.assertEquals(1,filter.callCount);
+      }
+    }
+  }
+  @Test
+  public void testCheckedStackremoveIf_BooleanPredicate_FirstValfalse_RemoveTrueArrSeqCheckedStackModifyingPredicate(){
+    for(int period=1;period<=10;++period){
+      var seq=new BooleanArrSeq.CheckedStack();
+      boolean currVal=false;
+      int trueCount=0;
+      int falseCount=0;
+      for(int i=0;;){
+        seq.add(currVal);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      var filter=new BooleanMonitoredPredicate.RemoveTrueArrSeqCheckedStackModifyingPredicate(seq);
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((BooleanPredicate)filter));
+      Assertions.assertEquals(10,seq.size());
+      currVal=false;
+      trueCount=0;
+      falseCount=0;
+      for(int i=0;;){
+        Assertions.assertEquals(currVal,seq.arr[i]);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      if(falseCount!=10 && trueCount!=10){
+        Assertions.assertEquals(10+4,seq.modCount);
+        Assertions.assertEquals(2,filter.callCount);
+      }else{
+        Assertions.assertEquals(10+2,seq.modCount);
+        Assertions.assertEquals(1,filter.callCount);
+      }
+    }
+  }
+  @Test
+  public void testCheckedStackremoveIf_BooleanPredicate_FirstValfalse_RemoveFalseArrSeqCheckedStackModifyingPredicate(){
+    for(int period=1;period<=10;++period){
+      var seq=new BooleanArrSeq.CheckedStack();
+      boolean currVal=false;
+      int trueCount=0;
+      int falseCount=0;
+      for(int i=0;;){
+        seq.add(currVal);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      var filter=new BooleanMonitoredPredicate.RemoveFalseArrSeqCheckedStackModifyingPredicate(seq);
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((BooleanPredicate)filter));
+      Assertions.assertEquals(10,seq.size());
+      currVal=false;
+      trueCount=0;
+      falseCount=0;
+      for(int i=0;;){
+        Assertions.assertEquals(currVal,seq.arr[i]);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      if(falseCount!=10 && trueCount!=10){
+        Assertions.assertEquals(10+4,seq.modCount);
+        Assertions.assertEquals(2,filter.callCount);
+      }else{
+        Assertions.assertEquals(10+2,seq.modCount);
+        Assertions.assertEquals(1,filter.callCount);
+      }
+    }
+  }
+  @Test
+  public void testCheckedStackremoveIf_BooleanPredicate_FirstValtrue_RemoveNoneArrSeqCheckedStackModifyingPredicate(){
+    for(int period=1;period<=10;++period){
+      var seq=new BooleanArrSeq.CheckedStack();
+      boolean currVal=true;
+      int trueCount=0;
+      int falseCount=0;
+      for(int i=0;;){
+        seq.add(currVal);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      var filter=new BooleanMonitoredPredicate.RemoveNoneArrSeqCheckedStackModifyingPredicate(seq);
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((BooleanPredicate)filter));
+      Assertions.assertEquals(10,seq.size());
+      currVal=true;
+      trueCount=0;
+      falseCount=0;
+      for(int i=0;;){
+        Assertions.assertEquals(currVal,seq.arr[i]);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      if(falseCount!=10 && trueCount!=10){
+        Assertions.assertEquals(10+4,seq.modCount);
+        Assertions.assertEquals(2,filter.callCount);
+      }else{
+        Assertions.assertEquals(10+2,seq.modCount);
+        Assertions.assertEquals(1,filter.callCount);
+      }
+    }
+  }
+  @Test
+  public void testCheckedStackremoveIf_BooleanPredicate_FirstValtrue_RemoveAllArrSeqCheckedStackModifyingPredicate(){
+    for(int period=1;period<=10;++period){
+      var seq=new BooleanArrSeq.CheckedStack();
+      boolean currVal=true;
+      int trueCount=0;
+      int falseCount=0;
+      for(int i=0;;){
+        seq.add(currVal);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      var filter=new BooleanMonitoredPredicate.RemoveAllArrSeqCheckedStackModifyingPredicate(seq);
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((BooleanPredicate)filter));
+      Assertions.assertEquals(10,seq.size());
+      currVal=true;
+      trueCount=0;
+      falseCount=0;
+      for(int i=0;;){
+        Assertions.assertEquals(currVal,seq.arr[i]);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      if(falseCount!=10 && trueCount!=10){
+        Assertions.assertEquals(10+4,seq.modCount);
+        Assertions.assertEquals(2,filter.callCount);
+      }else{
+        Assertions.assertEquals(10+2,seq.modCount);
+        Assertions.assertEquals(1,filter.callCount);
+      }
+    }
+  }
+  @Test
+  public void testCheckedStackremoveIf_BooleanPredicate_FirstValfalse_RemoveNoneArrSeqCheckedStackModifyingPredicate(){
+    for(int period=1;period<=10;++period){
+      var seq=new BooleanArrSeq.CheckedStack();
+      boolean currVal=false;
+      int trueCount=0;
+      int falseCount=0;
+      for(int i=0;;){
+        seq.add(currVal);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      var filter=new BooleanMonitoredPredicate.RemoveNoneArrSeqCheckedStackModifyingPredicate(seq);
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((BooleanPredicate)filter));
+      Assertions.assertEquals(10,seq.size());
+      currVal=false;
+      trueCount=0;
+      falseCount=0;
+      for(int i=0;;){
+        Assertions.assertEquals(currVal,seq.arr[i]);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      if(falseCount!=10 && trueCount!=10){
+        Assertions.assertEquals(10+4,seq.modCount);
+        Assertions.assertEquals(2,filter.callCount);
+      }else{
+        Assertions.assertEquals(10+2,seq.modCount);
+        Assertions.assertEquals(1,filter.callCount);
+      }
+    }
+  }
+  @Test
+  public void testCheckedStackremoveIf_BooleanPredicate_FirstValfalse_RemoveAllArrSeqCheckedStackModifyingPredicate(){
+    for(int period=1;period<=10;++period){
+      var seq=new BooleanArrSeq.CheckedStack();
+      boolean currVal=false;
+      int trueCount=0;
+      int falseCount=0;
+      for(int i=0;;){
+        seq.add(currVal);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      var filter=new BooleanMonitoredPredicate.RemoveAllArrSeqCheckedStackModifyingPredicate(seq);
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((BooleanPredicate)filter));
+      Assertions.assertEquals(10,seq.size());
+      currVal=false;
+      trueCount=0;
+      falseCount=0;
+      for(int i=0;;){
+        Assertions.assertEquals(currVal,seq.arr[i]);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      if(falseCount!=10 && trueCount!=10){
+        Assertions.assertEquals(10+4,seq.modCount);
+        Assertions.assertEquals(2,filter.callCount);
+      }else{
+        Assertions.assertEquals(10+2,seq.modCount);
+        Assertions.assertEquals(1,filter.callCount);
+      }
+    }
+  }
+  @Test
+  public void testCheckedStackremoveIf_BooleanPredicate_FirstValtrue_Throwing(){
+    for(int period=1;period<=10;++period){
+      var seq=new BooleanArrSeq.CheckedStack();
+      boolean currVal=true;
+      int trueCount=0;
+      int falseCount=0;
+      for(int i=0;;){
+        seq.add(currVal);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      var filter=new BooleanMonitoredPredicate.ThrowingPredicate();
+      Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.removeIf((BooleanPredicate)filter));
+      Assertions.assertEquals(10,seq.size());
+      currVal=true;
+      trueCount=0;
+      falseCount=0;
+      for(int i=0;;){
+        Assertions.assertEquals(currVal,seq.arr[i]);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      Assertions.assertEquals(10,seq.modCount);
+      Assertions.assertEquals(1,filter.callCount);
+    }
+  }
+  @Test
+  public void testCheckedStackremoveIf_BooleanPredicate_FirstValfalse_Throwing(){
+    for(int period=1;period<=10;++period){
+      var seq=new BooleanArrSeq.CheckedStack();
+      boolean currVal=false;
+      int trueCount=0;
+      int falseCount=0;
+      for(int i=0;;){
+        seq.add(currVal);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      var filter=new BooleanMonitoredPredicate.ThrowingPredicate();
+      Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.removeIf((BooleanPredicate)filter));
+      Assertions.assertEquals(10,seq.size());
+      currVal=false;
+      trueCount=0;
+      falseCount=0;
+      for(int i=0;;){
+        Assertions.assertEquals(currVal,seq.arr[i]);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      Assertions.assertEquals(10,seq.modCount);
+      Assertions.assertEquals(1,filter.callCount);
+    }
+  }
+  @Test
+  public void testCheckedStackremoveIf_BooleanPredicate_FirstValfalse_ThrowAndMod(){
+    for(int period=1;period<=10;++period){
+      var seq=new BooleanArrSeq.CheckedStack();
+      boolean currVal=false;
+      int trueCount=0;
+      int falseCount=0;
+      for(int i=0;;){
+        seq.add(currVal);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      var filter=new BooleanMonitoredPredicate.ModifyingArrSeqCheckedStackAndThrowingPredicate(seq);
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((BooleanPredicate)filter));
+      Assertions.assertEquals(11,seq.size());
+      currVal=false;
+      trueCount=0;
+      falseCount=0;
+      for(int i=0;;){
+        Assertions.assertEquals(currVal,seq.arr[i]);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      Assertions.assertEquals(false,seq.arr[10]);
+      Assertions.assertEquals(10+1,seq.modCount);
+      Assertions.assertEquals(1,filter.callCount);
+    }
+  }
+  @Test
+  public void testCheckedStackremoveIf_BooleanPredicate_FirstValtrue_ThrowAndMod(){
+    for(int period=1;period<=10;++period){
+      var seq=new BooleanArrSeq.CheckedStack();
+      boolean currVal=true;
+      int trueCount=0;
+      int falseCount=0;
+      for(int i=0;;){
+        seq.add(currVal);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      var filter=new BooleanMonitoredPredicate.ModifyingArrSeqCheckedStackAndThrowingPredicate(seq);
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((BooleanPredicate)filter));
+      Assertions.assertEquals(11,seq.size());
+      currVal=true;
+      trueCount=0;
+      falseCount=0;
+      for(int i=0;;){
+        Assertions.assertEquals(currVal,seq.arr[i]);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      Assertions.assertEquals(true,seq.arr[10]);
+      Assertions.assertEquals(10+1,seq.modCount);
+      Assertions.assertEquals(1,filter.callCount);
+    }
+  }
+  @Test
+  public void testCheckedStackremoveIf_BooleanPredicate_SeqIsEmpty_RemoveTrueArrSeqCheckedStackModifyingPredicate()
+  {
+    var seq=new BooleanArrSeq.CheckedStack();
+    for(int i=0;i<0;++i){
+      seq.add(TypeConversionUtil.convertToboolean(i));
+    }
+    var filter=new BooleanMonitoredPredicate.RemoveTrueArrSeqCheckedStackModifyingPredicate(seq);
+    Assertions.assertFalse(seq.removeIf((BooleanPredicate)filter));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,filter.callCount);
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedStackremoveIf_BooleanPredicate_SeqIsEmpty_RemoveFalseArrSeqCheckedStackModifyingPredicate()
+  {
+    var seq=new BooleanArrSeq.CheckedStack();
+    for(int i=0;i<0;++i){
+      seq.add(TypeConversionUtil.convertToboolean(i));
+    }
+    var filter=new BooleanMonitoredPredicate.RemoveFalseArrSeqCheckedStackModifyingPredicate(seq);
+    Assertions.assertFalse(seq.removeIf((BooleanPredicate)filter));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,filter.callCount);
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedStackremoveIf_BooleanPredicate_SeqIsEmpty_RemoveAllPredicate()
+  {
+    var seq=new BooleanArrSeq.CheckedStack();
+    for(int i=0;i<0;++i){
+      seq.add(TypeConversionUtil.convertToboolean(i));
+    }
+    var filter=new BooleanMonitoredPredicate.RemoveAllPredicate(seq);
+    Assertions.assertFalse(seq.removeIf((BooleanPredicate)filter));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,filter.callCount);
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedStackremoveIf_BooleanPredicate_SeqIsEmpty_RemoveNonePredicate()
+  {
+    var seq=new BooleanArrSeq.CheckedStack();
+    for(int i=0;i<0;++i){
+      seq.add(TypeConversionUtil.convertToboolean(i));
+    }
+    var filter=new BooleanMonitoredPredicate.RemoveNonePredicate(seq);
+    Assertions.assertFalse(seq.removeIf((BooleanPredicate)filter));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,filter.callCount);
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedStackremoveIf_BooleanPredicate_SeqIsEmpty_RemoveAllArrSeqCheckedStackModifyingPredicate()
+  {
+    var seq=new BooleanArrSeq.CheckedStack();
+    for(int i=0;i<0;++i){
+      seq.add(TypeConversionUtil.convertToboolean(i));
+    }
+    var filter=new BooleanMonitoredPredicate.RemoveAllArrSeqCheckedStackModifyingPredicate(seq);
+    Assertions.assertFalse(seq.removeIf((BooleanPredicate)filter));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,filter.callCount);
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedStackremoveIf_BooleanPredicate_SeqIsEmpty_RemoveNoneArrSeqCheckedStackModifyingPredicate()
+  {
+    var seq=new BooleanArrSeq.CheckedStack();
+    for(int i=0;i<0;++i){
+      seq.add(TypeConversionUtil.convertToboolean(i));
+    }
+    var filter=new BooleanMonitoredPredicate.RemoveNoneArrSeqCheckedStackModifyingPredicate(seq);
+    Assertions.assertFalse(seq.removeIf((BooleanPredicate)filter));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,filter.callCount);
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedStackremoveIf_BooleanPredicate_SeqIsEmpty_ThrowingPredicate()
+  {
+    var seq=new BooleanArrSeq.CheckedStack();
+    for(int i=0;i<0;++i){
+      seq.add(TypeConversionUtil.convertToboolean(i));
+    }
+    var filter=new BooleanMonitoredPredicate.ThrowingPredicate(seq);
+    Assertions.assertFalse(seq.removeIf((BooleanPredicate)filter));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,filter.callCount);
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedStackremoveIf_BooleanPredicate_SeqIsEmpty_ModifyingArrSeqCheckedStackAndThrowingPredicate()
+  {
+    var seq=new BooleanArrSeq.CheckedStack();
+    for(int i=0;i<0;++i){
+      seq.add(TypeConversionUtil.convertToboolean(i));
+    }
+    var filter=new BooleanMonitoredPredicate.ModifyingArrSeqCheckedStackAndThrowingPredicate(seq);
+    Assertions.assertFalse(seq.removeIf((BooleanPredicate)filter));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,filter.callCount);
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedStackadd_boolean_initialCapacityDEFAULT(){
+    var seq=new BooleanArrSeq.CheckedStack();
+    for(int i=0;i<100;++i){
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
     }
     Assertions.assertEquals(100,seq.size);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i)
-    {
+    for(int i=0;i<seq.size;++i){
       Assertions.assertEquals(TypeConversionUtil.convertToboolean(i),seq.arr[i]);
     }
   }
   @Test
-  public void testCheckedStackadd_boolean_initialCapacityNULL()
-  {
-    CheckedStack seq=new CheckedStack(0,null);
-    for(int i=0;i<100;++i)
-    {
+  public void testCheckedStackadd_boolean_initialCapacityNULL(){
+    var seq=new BooleanArrSeq.CheckedStack(0,null);
+    for(int i=0;i<100;++i){
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
     }
     Assertions.assertEquals(100,seq.size);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i)
-    {
+    for(int i=0;i<seq.size;++i){
       Assertions.assertEquals(TypeConversionUtil.convertToboolean(i),seq.arr[i]);
     }
   }
   @Test
-  public void testCheckedStackadd_boolean_initialCapacity50()
-  {
-    CheckedStack seq=new CheckedStack(50);
-    for(int i=0;i<100;++i)
-    {
+  public void testCheckedStackadd_boolean_initialCapacity50(){
+    var seq=new BooleanArrSeq.CheckedStack(50);
+    for(int i=0;i<100;++i){
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
     }
     Assertions.assertEquals(100,seq.size);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i)
-    {
+    for(int i=0;i<seq.size;++i){
       Assertions.assertEquals(TypeConversionUtil.convertToboolean(i),seq.arr[i]);
     }
   }
   @Test
-  public void testCheckedStackadd_Boolean_initialCapacityDEFAULT()
-  {
-    CheckedStack seq=new CheckedStack();
-    for(int i=0;i<100;++i)
-    {
+  public void testCheckedStackadd_Boolean_initialCapacityDEFAULT(){
+    var seq=new BooleanArrSeq.CheckedStack();
+    for(int i=0;i<100;++i){
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToBoolean(i)));
     }
     Assertions.assertEquals(100,seq.size);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i)
-    {
+    for(int i=0;i<seq.size;++i){
       Assertions.assertEquals(TypeConversionUtil.convertToboolean(i),seq.arr[i]);
     }
   }
   @Test
-  public void testCheckedStackadd_Boolean_initialCapacityNULL()
-  {
-    CheckedStack seq=new CheckedStack(0,null);
-    for(int i=0;i<100;++i)
-    {
+  public void testCheckedStackadd_Boolean_initialCapacityNULL(){
+    var seq=new BooleanArrSeq.CheckedStack(0,null);
+    for(int i=0;i<100;++i){
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToBoolean(i)));
     }
     Assertions.assertEquals(100,seq.size);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i)
-    {
+    for(int i=0;i<seq.size;++i){
       Assertions.assertEquals(TypeConversionUtil.convertToboolean(i),seq.arr[i]);
     }
   }
   @Test
-  public void testCheckedStackadd_Boolean_initialCapacity50()
-  {
-    CheckedStack seq=new CheckedStack(50);
-    for(int i=0;i<100;++i)
-    {
+  public void testCheckedStackadd_Boolean_initialCapacity50(){
+    var seq=new BooleanArrSeq.CheckedStack(50);
+    for(int i=0;i<100;++i){
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToBoolean(i)));
     }
     Assertions.assertEquals(100,seq.size);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i)
-    {
+    for(int i=0;i<seq.size;++i){
       Assertions.assertEquals(TypeConversionUtil.convertToboolean(i),seq.arr[i]);
     }
   }
   @Test
-  public void testCheckedStacktoBooleanArray_void_seqIsEmpty()
-  {
-    CheckedStack seq=new CheckedStack();
+  public void testCheckedStacktoBooleanArray_void_seqIsEmpty(){
+    var seq=new BooleanArrSeq.CheckedStack();
     Assertions.assertSame(OmniArray.OfBoolean.DEFAULT_ARR,seq.toBooleanArray());
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,seq.modCount);
   }
   @Test
-  public void testCheckedStacktoBooleanArray_void_seqIsNotEmpty()
-  {
-    CheckedStack seq=new CheckedStack();
-    for(int i=0;i<100;++i)
-    {
+  public void testCheckedStacktoBooleanArray_void_seqIsNotEmpty(){
+    var seq=new BooleanArrSeq.CheckedStack();
+    for(int i=0;i<100;++i){
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
     }
     var result=seq.toBooleanArray();
@@ -2273,26 +5428,22 @@ public class BooleanArrSeqTest
     Assertions.assertEquals(100,seq.modCount);
     Assertions.assertEquals(100,result.length);
     var itr=seq.iterator();
-    for(int i=0;i<100;++i)
-    {
+    for(int i=0;i<100;++i){
       Assertions.assertEquals(itr.nextBoolean(),result[i]);
     }
     Assertions.assertNotSame(seq.arr,result);
   }
   @Test
-  public void testCheckedStacktoArray_void_seqIsEmpty()
-  {
-    CheckedStack seq=new CheckedStack();
+  public void testCheckedStacktoArray_void_seqIsEmpty(){
+    var seq=new BooleanArrSeq.CheckedStack();
     Assertions.assertSame(OmniArray.OfBoolean.DEFAULT_BOXED_ARR,seq.toArray());
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,seq.modCount);
   }
   @Test
-  public void testCheckedStacktoArray_void_seqIsNotEmpty()
-  {
-    CheckedStack seq=new CheckedStack();
-    for(int i=0;i<100;++i)
-    {
+  public void testCheckedStacktoArray_void_seqIsNotEmpty(){
+    var seq=new BooleanArrSeq.CheckedStack();
+    for(int i=0;i<100;++i){
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
     }
     var result=seq.toArray();
@@ -2300,26 +5451,22 @@ public class BooleanArrSeqTest
     Assertions.assertEquals(100,seq.modCount);
     Assertions.assertEquals(100,result.length);
     var itr=seq.iterator();
-    for(int i=0;i<100;++i)
-    {
+    for(int i=0;i<100;++i){
       Assertions.assertEquals(itr.next(),result[i]);
     }
     Assertions.assertNotSame(seq.arr,result);
   }
   @Test
-  public void testCheckedStacktoDoubleArray_void_seqIsEmpty()
-  {
-    CheckedStack seq=new CheckedStack();
+  public void testCheckedStacktoDoubleArray_void_seqIsEmpty(){
+    var seq=new BooleanArrSeq.CheckedStack();
     Assertions.assertSame(OmniArray.OfDouble.DEFAULT_ARR,seq.toDoubleArray());
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,seq.modCount);
   }
   @Test
-  public void testCheckedStacktoDoubleArray_void_seqIsNotEmpty()
-  {
-    CheckedStack seq=new CheckedStack();
-    for(int i=0;i<100;++i)
-    {
+  public void testCheckedStacktoDoubleArray_void_seqIsNotEmpty(){
+    var seq=new BooleanArrSeq.CheckedStack();
+    for(int i=0;i<100;++i){
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
     }
     var result=seq.toDoubleArray();
@@ -2327,26 +5474,22 @@ public class BooleanArrSeqTest
     Assertions.assertEquals(100,seq.modCount);
     Assertions.assertEquals(100,result.length);
     var itr=seq.iterator();
-    for(int i=0;i<100;++i)
-    {
+    for(int i=0;i<100;++i){
       Assertions.assertEquals(itr.nextDouble(),result[i]);
     }
     Assertions.assertNotSame(seq.arr,result);
   }
   @Test
-  public void testCheckedStacktoFloatArray_void_seqIsEmpty()
-  {
-    CheckedStack seq=new CheckedStack();
+  public void testCheckedStacktoFloatArray_void_seqIsEmpty(){
+    var seq=new BooleanArrSeq.CheckedStack();
     Assertions.assertSame(OmniArray.OfFloat.DEFAULT_ARR,seq.toFloatArray());
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,seq.modCount);
   }
   @Test
-  public void testCheckedStacktoFloatArray_void_seqIsNotEmpty()
-  {
-    CheckedStack seq=new CheckedStack();
-    for(int i=0;i<100;++i)
-    {
+  public void testCheckedStacktoFloatArray_void_seqIsNotEmpty(){
+    var seq=new BooleanArrSeq.CheckedStack();
+    for(int i=0;i<100;++i){
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
     }
     var result=seq.toFloatArray();
@@ -2354,26 +5497,22 @@ public class BooleanArrSeqTest
     Assertions.assertEquals(100,seq.modCount);
     Assertions.assertEquals(100,result.length);
     var itr=seq.iterator();
-    for(int i=0;i<100;++i)
-    {
+    for(int i=0;i<100;++i){
       Assertions.assertEquals(itr.nextFloat(),result[i]);
     }
     Assertions.assertNotSame(seq.arr,result);
   }
   @Test
-  public void testCheckedStacktoLongArray_void_seqIsEmpty()
-  {
-    CheckedStack seq=new CheckedStack();
+  public void testCheckedStacktoLongArray_void_seqIsEmpty(){
+    var seq=new BooleanArrSeq.CheckedStack();
     Assertions.assertSame(OmniArray.OfLong.DEFAULT_ARR,seq.toLongArray());
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,seq.modCount);
   }
   @Test
-  public void testCheckedStacktoLongArray_void_seqIsNotEmpty()
-  {
-    CheckedStack seq=new CheckedStack();
-    for(int i=0;i<100;++i)
-    {
+  public void testCheckedStacktoLongArray_void_seqIsNotEmpty(){
+    var seq=new BooleanArrSeq.CheckedStack();
+    for(int i=0;i<100;++i){
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
     }
     var result=seq.toLongArray();
@@ -2381,26 +5520,22 @@ public class BooleanArrSeqTest
     Assertions.assertEquals(100,seq.modCount);
     Assertions.assertEquals(100,result.length);
     var itr=seq.iterator();
-    for(int i=0;i<100;++i)
-    {
+    for(int i=0;i<100;++i){
       Assertions.assertEquals(itr.nextLong(),result[i]);
     }
     Assertions.assertNotSame(seq.arr,result);
   }
   @Test
-  public void testCheckedStacktoIntArray_void_seqIsEmpty()
-  {
-    CheckedStack seq=new CheckedStack();
+  public void testCheckedStacktoIntArray_void_seqIsEmpty(){
+    var seq=new BooleanArrSeq.CheckedStack();
     Assertions.assertSame(OmniArray.OfInt.DEFAULT_ARR,seq.toIntArray());
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,seq.modCount);
   }
   @Test
-  public void testCheckedStacktoIntArray_void_seqIsNotEmpty()
-  {
-    CheckedStack seq=new CheckedStack();
-    for(int i=0;i<100;++i)
-    {
+  public void testCheckedStacktoIntArray_void_seqIsNotEmpty(){
+    var seq=new BooleanArrSeq.CheckedStack();
+    for(int i=0;i<100;++i){
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
     }
     var result=seq.toIntArray();
@@ -2408,26 +5543,22 @@ public class BooleanArrSeqTest
     Assertions.assertEquals(100,seq.modCount);
     Assertions.assertEquals(100,result.length);
     var itr=seq.iterator();
-    for(int i=0;i<100;++i)
-    {
+    for(int i=0;i<100;++i){
       Assertions.assertEquals(itr.nextInt(),result[i]);
     }
     Assertions.assertNotSame(seq.arr,result);
   }
   @Test
-  public void testCheckedStacktoShortArray_void_seqIsEmpty()
-  {
-    CheckedStack seq=new CheckedStack();
+  public void testCheckedStacktoShortArray_void_seqIsEmpty(){
+    var seq=new BooleanArrSeq.CheckedStack();
     Assertions.assertSame(OmniArray.OfShort.DEFAULT_ARR,seq.toShortArray());
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,seq.modCount);
   }
   @Test
-  public void testCheckedStacktoShortArray_void_seqIsNotEmpty()
-  {
-    CheckedStack seq=new CheckedStack();
-    for(int i=0;i<100;++i)
-    {
+  public void testCheckedStacktoShortArray_void_seqIsNotEmpty(){
+    var seq=new BooleanArrSeq.CheckedStack();
+    for(int i=0;i<100;++i){
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
     }
     var result=seq.toShortArray();
@@ -2435,26 +5566,22 @@ public class BooleanArrSeqTest
     Assertions.assertEquals(100,seq.modCount);
     Assertions.assertEquals(100,result.length);
     var itr=seq.iterator();
-    for(int i=0;i<100;++i)
-    {
+    for(int i=0;i<100;++i){
       Assertions.assertEquals(itr.nextShort(),result[i]);
     }
     Assertions.assertNotSame(seq.arr,result);
   }
   @Test
-  public void testCheckedStacktoCharArray_void_seqIsEmpty()
-  {
-    CheckedStack seq=new CheckedStack();
+  public void testCheckedStacktoCharArray_void_seqIsEmpty(){
+    var seq=new BooleanArrSeq.CheckedStack();
     Assertions.assertSame(OmniArray.OfChar.DEFAULT_ARR,seq.toCharArray());
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,seq.modCount);
   }
   @Test
-  public void testCheckedStacktoCharArray_void_seqIsNotEmpty()
-  {
-    CheckedStack seq=new CheckedStack();
-    for(int i=0;i<100;++i)
-    {
+  public void testCheckedStacktoCharArray_void_seqIsNotEmpty(){
+    var seq=new BooleanArrSeq.CheckedStack();
+    for(int i=0;i<100;++i){
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
     }
     var result=seq.toCharArray();
@@ -2462,26 +5589,22 @@ public class BooleanArrSeqTest
     Assertions.assertEquals(100,seq.modCount);
     Assertions.assertEquals(100,result.length);
     var itr=seq.iterator();
-    for(int i=0;i<100;++i)
-    {
+    for(int i=0;i<100;++i){
       Assertions.assertEquals(itr.nextChar(),result[i]);
     }
     Assertions.assertNotSame(seq.arr,result);
   }
   @Test
-  public void testCheckedStacktoByteArray_void_seqIsEmpty()
-  {
-    CheckedStack seq=new CheckedStack();
+  public void testCheckedStacktoByteArray_void_seqIsEmpty(){
+    var seq=new BooleanArrSeq.CheckedStack();
     Assertions.assertSame(OmniArray.OfByte.DEFAULT_ARR,seq.toByteArray());
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,seq.modCount);
   }
   @Test
-  public void testCheckedStacktoByteArray_void_seqIsNotEmpty()
-  {
-    CheckedStack seq=new CheckedStack();
-    for(int i=0;i<100;++i)
-    {
+  public void testCheckedStacktoByteArray_void_seqIsNotEmpty(){
+    var seq=new BooleanArrSeq.CheckedStack();
+    for(int i=0;i<100;++i){
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
     }
     var result=seq.toByteArray();
@@ -2489,131 +5612,30 @@ public class BooleanArrSeqTest
     Assertions.assertEquals(100,seq.modCount);
     Assertions.assertEquals(100,result.length);
     var itr=seq.iterator();
-    for(int i=0;i<100;++i)
-    {
+    for(int i=0;i<100;++i){
       Assertions.assertEquals(itr.nextByte(),result[i]);
     }
     Assertions.assertNotSame(seq.arr,result);
   }
-  static class ModifyingCheckedListConsumer extends MonitoredConsumer
-  {
-    private static final long serialVersionUID=1L;
-    CheckedList seq;
-    public ModifyingCheckedListConsumer(CheckedList seq)
-    {
-      this.seq=seq;
-    }
-    @Override public void accept(boolean val)
-    {
-      seq.modCount+=2;
-      super.accept((boolean)val);
-    }
-  }
-  static class ModifiyingCheckedListAndThrowingConsumer extends ModifyingCheckedListConsumer
-  {
-    private static final long serialVersionUID=1L;
-    public ModifiyingCheckedListAndThrowingConsumer(CheckedList seq)
-    {
-      super(seq);
-    }
-    @Override public void accept(boolean val)
-    {
-      super.accept((boolean)val);
-      throw new IndexOutOfBoundsException();
-    }
-  }
-  static class ModifyingAndThrowingCheckedListPredicate extends ThrowingPredicate
-  {
-      CheckedList seq;
-      public ModifyingAndThrowingCheckedListPredicate(CheckedList seq)
-      {
-        this.seq=seq;
-      }
-      @Override boolean testImpl(boolean val)
-      {
-        seq.add(val);
-        throw new IndexOutOfBoundsException();
-      }
-  }
-  static class RemoveAllCheckedListModifyingPredicate extends RemoveAllPredicate
-  {
-      CheckedList seq;
-      RemoveAllCheckedListModifyingPredicate(CheckedList seq)
-      {
-        this.seq=seq;
-      }
-      @Override
-      public boolean test(boolean val)
-      {
-        seq.modCount+=2;
-        return super.test(val);
-      }
-  }
-  static class RemoveNoneCheckedListModifyingPredicate extends RemoveNonePredicate
-  {
-      CheckedList seq;
-      RemoveNoneCheckedListModifyingPredicate(CheckedList seq)
-      {
-        this.seq=seq;
-      }
-      @Override
-      public boolean test(boolean val)
-      {
-        seq.modCount+=2;
-        return super.test(val);
-      }
-  }
-    static class RemoveTrueCheckedListModifyingPredicate extends RemoveTruePredicate
-    {
-      CheckedList seq;
-      RemoveTrueCheckedListModifyingPredicate(CheckedList seq)
-      {
-        this.seq=seq;
-      }
-      @Override
-      public boolean test(boolean val)
-      {
-        seq.modCount+=2;
-        return super.test(val);
-      }
-    }
-    static class RemoveFalseCheckedListModifyingPredicate extends RemoveFalsePredicate
-    {
-      CheckedList seq;
-      RemoveFalseCheckedListModifyingPredicate(CheckedList seq)
-      {
-        this.seq=seq;
-      }
-      @Override
-      public boolean test(boolean val)
-      {
-        seq.modCount+=2;
-        return super.test(val);
-      }
-    }
   @Test
-  public void testCheckedListconstructor_void_initialCapacityDEFAULT()
-  {
-    CheckedList seq=new CheckedList();
+  public void testCheckedListconstructor_void_initialCapacityDEFAULT(){
+    var seq=new BooleanArrSeq.CheckedList();
     Assertions.assertEquals(0,seq.size);
     Assertions.assertSame(OmniArray.OfBoolean.DEFAULT_ARR,seq.arr);
     Assertions.assertEquals(0,seq.modCount);
   }
   @Test
-  public void testCheckedListconstructor_intboolean_initialCapacityNULL()
-  {
-    CheckedList seq=new CheckedList(0,null);
+  public void testCheckedListconstructor_intboolean_initialCapacityNULL(){
+    var seq=new BooleanArrSeq.CheckedList(0,null);
     Assertions.assertEquals(0,seq.size);
     Assertions.assertNull(seq.arr);
     Assertions.assertEquals(0,seq.modCount);
   }
   @Test
-  public void testCheckedListconstructor_int_initialCapacity50()
-  {
-    CheckedList seq=new CheckedList(50);
+  public void testCheckedListconstructor_int_initialCapacity50(){
+    var seq=new BooleanArrSeq.CheckedList(50);
     Assertions.assertEquals(0,seq.size);
-    switch(50)
-    {
+    switch(50){
     case 0:
       Assertions.assertNull(seq.arr);
       break;
@@ -2627,12 +5649,10 @@ public class BooleanArrSeqTest
     Assertions.assertEquals(0,seq.modCount);
   }
   @Test
-  public void testCheckedListconstructor_int_initialCapacity0()
-  {
-    CheckedList seq=new CheckedList(0);
+  public void testCheckedListconstructor_int_initialCapacity0(){
+    var seq=new BooleanArrSeq.CheckedList(0);
     Assertions.assertEquals(0,seq.size);
-    switch(0)
-    {
+    switch(0){
     case 0:
       Assertions.assertNull(seq.arr);
       break;
@@ -2646,12 +5666,10 @@ public class BooleanArrSeqTest
     Assertions.assertEquals(0,seq.modCount);
   }
   @Test
-  public void testCheckedListconstructor_int_initialCapacity10()
-  {
-    CheckedList seq=new CheckedList(10);
+  public void testCheckedListconstructor_int_initialCapacity10(){
+    var seq=new BooleanArrSeq.CheckedList(10);
     Assertions.assertEquals(0,seq.size);
-    switch(10)
-    {
+    switch(10){
     case 0:
       Assertions.assertNull(seq.arr);
       break;
@@ -2665,9 +5683,153 @@ public class BooleanArrSeqTest
     Assertions.assertEquals(0,seq.modCount);
   }
   @Test
-  public void testCheckedListtoArray_ObjectArray_zeroLengthArrayAndSequenceIsEmpty()
+  public void testCheckedListClone_initialCapacityDEFAULT_seqIsEmpty()
   {
-    CheckedList seq=new CheckedList();
+    var seq=new BooleanArrSeq.CheckedList();
+    var clone=(BooleanArrSeq.CheckedList)seq.clone();
+    Assertions.assertEquals(0,clone.size());
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertSame(clone.arr,OmniArray.OfBoolean.DEFAULT_ARR);
+    Assertions.assertEquals(0,clone.modCount);
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedListClone_initialCapacityDEFAULT_seqIsNotEmpty()
+  {
+    var seq=new BooleanArrSeq.CheckedList();
+    for(int i=0;i<100;++i){
+      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
+    }
+    var clone=(BooleanArrSeq.CheckedList)seq.clone();
+    Assertions.assertEquals(100,clone.size());
+    Assertions.assertEquals(100,seq.size());
+    Assertions.assertNotSame(seq.arr,clone.arr);
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertToboolean(i),clone.arr[i]);
+    }
+    Assertions.assertEquals(0,clone.modCount);
+    Assertions.assertEquals(100,seq.modCount);
+  }
+  @Test
+  public void testCheckedListClone_initialCapacityNULL_seqIsEmpty()
+  {
+    var seq=new BooleanArrSeq.CheckedList(0,null);
+    var clone=(BooleanArrSeq.CheckedList)seq.clone();
+    Assertions.assertEquals(0,clone.size());
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertSame(clone.arr,OmniArray.OfBoolean.DEFAULT_ARR);
+    Assertions.assertEquals(0,clone.modCount);
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedListClone_initialCapacityNULL_seqIsNotEmpty()
+  {
+    var seq=new BooleanArrSeq.CheckedList(0,null);
+    for(int i=0;i<100;++i){
+      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
+    }
+    var clone=(BooleanArrSeq.CheckedList)seq.clone();
+    Assertions.assertEquals(100,clone.size());
+    Assertions.assertEquals(100,seq.size());
+    Assertions.assertNotSame(seq.arr,clone.arr);
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertToboolean(i),clone.arr[i]);
+    }
+    Assertions.assertEquals(0,clone.modCount);
+    Assertions.assertEquals(100,seq.modCount);
+  }
+  @Test
+  public void testCheckedListClone_initialCapacity50_seqIsEmpty()
+  {
+    var seq=new BooleanArrSeq.CheckedList(50);
+    var clone=(BooleanArrSeq.CheckedList)seq.clone();
+    Assertions.assertEquals(0,clone.size());
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertSame(clone.arr,OmniArray.OfBoolean.DEFAULT_ARR);
+    Assertions.assertEquals(0,clone.modCount);
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedListClone_initialCapacity50_seqIsNotEmpty()
+  {
+    var seq=new BooleanArrSeq.CheckedList(50);
+    for(int i=0;i<100;++i){
+      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
+    }
+    var clone=(BooleanArrSeq.CheckedList)seq.clone();
+    Assertions.assertEquals(100,clone.size());
+    Assertions.assertEquals(100,seq.size());
+    Assertions.assertNotSame(seq.arr,clone.arr);
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertToboolean(i),clone.arr[i]);
+    }
+    Assertions.assertEquals(0,clone.modCount);
+    Assertions.assertEquals(100,seq.modCount);
+  }
+  @Test
+  public void testCheckedListClone_initialCapacity0_seqIsEmpty()
+  {
+    var seq=new BooleanArrSeq.CheckedList(0);
+    var clone=(BooleanArrSeq.CheckedList)seq.clone();
+    Assertions.assertEquals(0,clone.size());
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertSame(clone.arr,OmniArray.OfBoolean.DEFAULT_ARR);
+    Assertions.assertEquals(0,clone.modCount);
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedListClone_initialCapacity0_seqIsNotEmpty()
+  {
+    var seq=new BooleanArrSeq.CheckedList(0);
+    for(int i=0;i<100;++i){
+      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
+    }
+    var clone=(BooleanArrSeq.CheckedList)seq.clone();
+    Assertions.assertEquals(100,clone.size());
+    Assertions.assertEquals(100,seq.size());
+    Assertions.assertNotSame(seq.arr,clone.arr);
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertToboolean(i),clone.arr[i]);
+    }
+    Assertions.assertEquals(0,clone.modCount);
+    Assertions.assertEquals(100,seq.modCount);
+  }
+  @Test
+  public void testCheckedListClone_initialCapacity10_seqIsEmpty()
+  {
+    var seq=new BooleanArrSeq.CheckedList(10);
+    var clone=(BooleanArrSeq.CheckedList)seq.clone();
+    Assertions.assertEquals(0,clone.size());
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertSame(clone.arr,OmniArray.OfBoolean.DEFAULT_ARR);
+    Assertions.assertEquals(0,clone.modCount);
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedListClone_initialCapacity10_seqIsNotEmpty()
+  {
+    var seq=new BooleanArrSeq.CheckedList(10);
+    for(int i=0;i<100;++i){
+      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
+    }
+    var clone=(BooleanArrSeq.CheckedList)seq.clone();
+    Assertions.assertEquals(100,clone.size());
+    Assertions.assertEquals(100,seq.size());
+    Assertions.assertNotSame(seq.arr,clone.arr);
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertToboolean(i),clone.arr[i]);
+    }
+    Assertions.assertEquals(0,clone.modCount);
+    Assertions.assertEquals(100,seq.modCount);
+  }
+  @Test
+  public void testCheckedListtoArray_ObjectArray_zeroLengthArrayAndSequenceIsEmpty(){
+    var seq=new BooleanArrSeq.CheckedList();
     Boolean[] paramArr=new Boolean[0];
     var result=seq.toArray(paramArr);
     Assertions.assertEquals(0,seq.size());
@@ -2677,11 +5839,9 @@ public class BooleanArrSeqTest
     Assertions.assertSame(paramArr,result);
   }
   @Test
-  public void testCheckedListtoArray_ObjectArray_zeroLengthArrayAndSequenceNotEmpty()
-  {
-    CheckedList seq=new CheckedList();
-    for(int i=0;i<100;++i)
-    {
+  public void testCheckedListtoArray_ObjectArray_zeroLengthArrayAndSequenceNotEmpty(){
+    var seq=new BooleanArrSeq.CheckedList();
+    for(int i=0;i<100;++i){
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
     }
     Boolean[] paramArr=new Boolean[0];
@@ -2692,18 +5852,15 @@ public class BooleanArrSeqTest
     Assertions.assertNotSame(seq.arr,result);
     Assertions.assertNotSame(paramArr,result);
     var itr=seq.iterator();
-    for(int i=0;i<100;++i)
-    {
+    for(int i=0;i<100;++i){
       Assertions.assertEquals(itr.next(),result[i]);
     }
   }
   @Test
-  public void testCheckedListtoArray_ObjectArray_nonzeroLengthArrayAndSequenceIsEmpty()
-  {
-    CheckedList seq=new CheckedList();
+  public void testCheckedListtoArray_ObjectArray_nonzeroLengthArrayAndSequenceIsEmpty(){
+    var seq=new BooleanArrSeq.CheckedList();
     Boolean[] paramArr=new Boolean[5];
-    for(int i=0;i<paramArr.length;++i)
-    {
+    for(int i=0;i<paramArr.length;++i){
       paramArr[i]=TypeConversionUtil.convertToboolean(paramArr.length);
     }
     var result=seq.toArray(paramArr);
@@ -2713,22 +5870,18 @@ public class BooleanArrSeqTest
     Assertions.assertNotSame(seq.arr,result);
     Assertions.assertSame(paramArr,result);
     Assertions.assertNull(result[0]);
-    for(int i=1;i<result.length;++i)
-    {
+    for(int i=1;i<result.length;++i){
       Assertions.assertEquals((Object)TypeConversionUtil.convertToboolean(paramArr.length),result[i]);
     }
   }
   @Test
-  public void testCheckedListtoArray_ObjectArray_overSizedArray()
-  {
-    CheckedList seq=new CheckedList();
+  public void testCheckedListtoArray_ObjectArray_overSizedArray(){
+    var seq=new BooleanArrSeq.CheckedList();
     Boolean[] paramArr=new Boolean[10];
-    for(int i=0;i<paramArr.length;++i)
-    {
+    for(int i=0;i<paramArr.length;++i){
       paramArr[i]=TypeConversionUtil.convertToboolean(paramArr.length);
     }
-    for(int i=0;i<5;++i)
-    {
+    for(int i=0;i<5;++i){
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
     }
     var result=seq.toArray(paramArr);
@@ -2738,27 +5891,22 @@ public class BooleanArrSeqTest
     Assertions.assertNotSame(seq.arr,result);
     Assertions.assertSame(paramArr,result);
     var itr=seq.iterator();
-    for(int i=0;i<5;++i)
-    {
+    for(int i=0;i<5;++i){
       Assertions.assertEquals(itr.next(),result[i]);
     }
     Assertions.assertNull(result[5]);
-    for(int i=6;i<result.length;++i)
-    {
+    for(int i=6;i<result.length;++i){
       Assertions.assertEquals((Object)TypeConversionUtil.convertToboolean(paramArr.length),result[i]);
     }
   }
   @Test
-  public void testCheckedListtoArray_ObjectArray_undersizedArray()
-  {
-    CheckedList seq=new CheckedList();
+  public void testCheckedListtoArray_ObjectArray_undersizedArray(){
+    var seq=new BooleanArrSeq.CheckedList();
     Boolean[] paramArr=new Boolean[5];
-    for(int i=0;i<paramArr.length;++i)
-    {
+    for(int i=0;i<paramArr.length;++i){
       paramArr[i]=TypeConversionUtil.convertToboolean(10);
     }
-    for(int i=0;i<10;++i)
-    {
+    for(int i=0;i<10;++i){
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
     }
     var result=seq.toArray(paramArr);
@@ -2768,22 +5916,18 @@ public class BooleanArrSeqTest
     Assertions.assertNotSame(seq.arr,result);
     Assertions.assertNotSame(paramArr,result);
     var itr=seq.iterator();
-    for(int i=0;i<10;++i)
-    {
+    for(int i=0;i<10;++i){
       Assertions.assertEquals(itr.next(),result[i]);
     }
   }
   @Test
-  public void testCheckedListtoArray_ObjectArray_exactSizeArray()
-  {
-    CheckedList seq=new CheckedList();
+  public void testCheckedListtoArray_ObjectArray_exactSizeArray(){
+    var seq=new BooleanArrSeq.CheckedList();
     Boolean[] paramArr=new Boolean[5];
-    for(int i=0;i<paramArr.length;++i)
-    {
+    for(int i=0;i<paramArr.length;++i){
       paramArr[i]=TypeConversionUtil.convertToboolean(5);
     }
-    for(int i=0;i<5;++i)
-    {
+    for(int i=0;i<5;++i){
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
     }
     var result=seq.toArray(paramArr);
@@ -2793,15 +5937,13 @@ public class BooleanArrSeqTest
     Assertions.assertNotSame(seq.arr,result);
     Assertions.assertSame(paramArr,result);
     var itr=seq.iterator();
-    for(int i=0;i<5;++i)
-    {
+    for(int i=0;i<5;++i){
       Assertions.assertEquals(itr.next(),result[i]);
     }
   }
   @Test
-  public void testCheckedListtoArray_IntFunction_seqIsEmpty_nonMod()
-  {
-    CheckedList seq=new CheckedList();
+  public void testCheckedListtoArray_IntFunction_seqIsEmpty_nonMod(){
+    var seq=new BooleanArrSeq.CheckedList();
     IntFunction<Boolean[]> arrConstructor=Boolean[]::new;
     var result=seq.toArray(arrConstructor);
     Assertions.assertEquals(0,seq.size());
@@ -2810,11 +5952,9 @@ public class BooleanArrSeqTest
     Assertions.assertEquals(0,result.length);
   }
   @Test
-  public void testCheckedListtoArray_IntFunction_seqIsNotEmpty_nonMod()
-  {
-    CheckedList seq=new CheckedList();
-    for(int i=0;i<100;++i)
-    {
+  public void testCheckedListtoArray_IntFunction_seqIsNotEmpty_nonMod(){
+    var seq=new BooleanArrSeq.CheckedList();
+    for(int i=0;i<100;++i){
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
     }
     IntFunction<Boolean[]> arrConstructor=Boolean[]::new;
@@ -2824,17 +5964,14 @@ public class BooleanArrSeqTest
     Assertions.assertEquals(100,seq.modCount);
     Assertions.assertEquals(100,result.length);
     var itr=seq.iterator();
-    for(int i=0;i<100;++i)
-    {
+    for(int i=0;i<100;++i){
       Assertions.assertEquals(itr.next(),result[i]);
     }
   }
   @Test
-  public void testCheckedListtoArray_IntFunction_seqIsEmpty_moddingArrayConstructor()
-  {
-    CheckedList seq=new CheckedList();
-    IntFunction<Boolean[]> arrConstructor=(int arrSize)->
-    {
+  public void testCheckedListtoArray_IntFunction_seqIsEmpty_moddingArrayConstructor(){
+    var seq=new BooleanArrSeq.CheckedList();
+    IntFunction<Boolean[]> arrConstructor=(int arrSize)->{
       seq.add(TypeConversionUtil.convertToboolean(arrSize));
       return new Boolean[arrSize];
     };
@@ -2844,15 +5981,12 @@ public class BooleanArrSeqTest
     Assertions.assertEquals(1,seq.modCount);
   }
   @Test
-  public void testCheckedListtoArray_IntFunction_seqIsNotEmpty_moddingArrayConstructor()
-  {
-    CheckedList seq=new CheckedList();
-    for(int i=0;i<100;++i)
-    {
+  public void testCheckedListtoArray_IntFunction_seqIsNotEmpty_moddingArrayConstructor(){
+    var seq=new BooleanArrSeq.CheckedList();
+    for(int i=0;i<100;++i){
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
     }
-    IntFunction<Boolean[]> arrConstructor=(int arrSize)->
-    {
+    IntFunction<Boolean[]> arrConstructor=(int arrSize)->{
       seq.add(TypeConversionUtil.convertToboolean(arrSize));
       return new Boolean[arrSize];
     };
@@ -2862,11 +5996,9 @@ public class BooleanArrSeqTest
     Assertions.assertEquals(101,seq.modCount);
   }
   @Test
-  public void testCheckedListtoArray_IntFunction_seqIsEmpty_throwingArrayConstructor()
-  {
-    CheckedList seq=new CheckedList();
-    IntFunction<Boolean[]> arrConstructor=(int arrSize)->
-    {
+  public void testCheckedListtoArray_IntFunction_seqIsEmpty_throwingArrayConstructor(){
+    var seq=new BooleanArrSeq.CheckedList();
+    IntFunction<Boolean[]> arrConstructor=(int arrSize)->{
       throw new IndexOutOfBoundsException();
     };
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.toArray(arrConstructor));
@@ -2874,15 +6006,12 @@ public class BooleanArrSeqTest
     Assertions.assertEquals(0,seq.modCount);
   }
   @Test
-  public void testCheckedListtoArray_IntFunction_seqIsNotEmpty_throwingArrayConstructor()
-  {
-    CheckedList seq=new CheckedList();
-    for(int i=0;i<100;++i)
-    {
+  public void testCheckedListtoArray_IntFunction_seqIsNotEmpty_throwingArrayConstructor(){
+    var seq=new BooleanArrSeq.CheckedList();
+    for(int i=0;i<100;++i){
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
     }
-    IntFunction<Boolean[]> arrConstructor=(int arrSize)->
-    {
+    IntFunction<Boolean[]> arrConstructor=(int arrSize)->{
       throw new IndexOutOfBoundsException();
     };
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.toArray(arrConstructor));
@@ -2890,11 +6019,9 @@ public class BooleanArrSeqTest
     Assertions.assertEquals(100,seq.modCount);
   }
   @Test
-  public void testCheckedListtoArray_IntFunction_seqIsEmpty_throwingAndModdingArrConstructor()
-  {
-    CheckedList seq=new CheckedList();
-    IntFunction<Boolean[]> arrConstructor=(int arrSize)->
-    {
+  public void testCheckedListtoArray_IntFunction_seqIsEmpty_throwingAndModdingArrConstructor(){
+    var seq=new BooleanArrSeq.CheckedList();
+    IntFunction<Boolean[]> arrConstructor=(int arrSize)->{
       seq.add(TypeConversionUtil.convertToboolean(arrSize));
       throw new IndexOutOfBoundsException();
     };
@@ -2904,15 +6031,12 @@ public class BooleanArrSeqTest
     Assertions.assertEquals(1,seq.modCount);
   }
   @Test
-  public void testCheckedListtoArray_IntFunction_seqIsNotEmpty_throwingAndModdingArrConstructor()
-  {
-    CheckedList seq=new CheckedList();
-    for(int i=0;i<100;++i)
-    {
+  public void testCheckedListtoArray_IntFunction_seqIsNotEmpty_throwingAndModdingArrConstructor(){
+    var seq=new BooleanArrSeq.CheckedList();
+    for(int i=0;i<100;++i){
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
     }
-    IntFunction<Boolean[]> arrConstructor=(int arrSize)->
-    {
+    IntFunction<Boolean[]> arrConstructor=(int arrSize)->{
       seq.add(TypeConversionUtil.convertToboolean(arrSize));
       throw new IndexOutOfBoundsException();
     };
@@ -2922,58 +6046,48 @@ public class BooleanArrSeqTest
     Assertions.assertEquals(101,seq.modCount);
   }
   @Test
-  public void testCheckedListclear_void_seqIsEmpty()
-  {
-    CheckedList seq=new CheckedList();
+  public void testCheckedListclear_void_seqIsEmpty(){
+    var seq=new BooleanArrSeq.CheckedList();
     seq.clear();
     Assertions.assertTrue(seq.isEmpty());
     Assertions.assertEquals(0,seq.modCount);
   }
   @Test
-  public void testCheckedListclear_void_seqIsNotEmpty()
-  {
-    CheckedList seq=new CheckedList();
-    for(int i=0;i<100;++i)
-    {
+  public void testCheckedListclear_void_seqIsNotEmpty(){
+    var seq=new BooleanArrSeq.CheckedList();
+    for(int i=0;i<100;++i){
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
     }
     seq.clear();
     Assertions.assertTrue(seq.isEmpty());
-    for(int i=0;i<100;++i)
-    {
+    for(int i=0;i<100;++i){
       Assertions.assertEquals(TypeConversionUtil.convertToboolean(i),seq.arr[i]);
     }
     Assertions.assertEquals(101,seq.modCount);
   }
   @Test
-  public void testCheckedListisEmpty_void_seqIsEmpty()
-  {
-    CheckedList seq=new CheckedList();
+  public void testCheckedListisEmpty_void_seqIsEmpty(){
+    var seq=new BooleanArrSeq.CheckedList();
     Assertions.assertTrue(seq.isEmpty());
     Assertions.assertEquals(0,seq.modCount);
   }
   @Test
-  public void testCheckedListisEmpty_void_seqIsNotEmpty()
-  {
-    CheckedList seq=new CheckedList();
-    for(int i=0;i<100;++i)
-    {
+  public void testCheckedListisEmpty_void_seqIsNotEmpty(){
+    var seq=new BooleanArrSeq.CheckedList();
+    for(int i=0;i<100;++i){
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
     }
     Assertions.assertFalse(seq.isEmpty());
     Assertions.assertEquals(100,seq.modCount);
   }
   @Test
-  public void testCheckedListisEmpty_void_seqIsBeingCleared()
-  {
-    CheckedList seq=new CheckedList();
-    for(int i=0;i<100;++i)
-    {
+  public void testCheckedListisEmpty_void_seqIsBeingCleared(){
+    var seq=new BooleanArrSeq.CheckedList();
+    for(int i=0;i<100;++i){
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
     }
     var itr=seq.iterator();
-    for(int i=100;--i>=0;)
-    {
+    for(int i=100;--i>=0;){
       Assertions.assertFalse(seq.isEmpty());
       itr.nextBoolean();
       itr.remove();
@@ -2982,19 +6096,16 @@ public class BooleanArrSeqTest
     Assertions.assertTrue(seq.isEmpty());
   }
   @Test
-  public void testCheckedListsize_void_seqIsEmpty()
-  {
-    CheckedList seq=new CheckedList();
+  public void testCheckedListsize_void_seqIsEmpty(){
+    var seq=new BooleanArrSeq.CheckedList();
     Assertions.assertEquals(0,seq.size);
     Assertions.assertEquals(seq.size,seq.size());
     Assertions.assertEquals(0,seq.modCount);
   }
   @Test
-  public void testCheckedListsize_void_seqIsNotEmpty()
-  {
-    CheckedList seq=new CheckedList();
-    for(int i=0;i<100;++i)
-    {
+  public void testCheckedListsize_void_seqIsNotEmpty(){
+    var seq=new BooleanArrSeq.CheckedList();
+    for(int i=0;i<100;++i){
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
     }
     Assertions.assertEquals(100,seq.size);
@@ -3002,16 +6113,13 @@ public class BooleanArrSeqTest
     Assertions.assertEquals(100,seq.modCount);
   }
   @Test
-  public void testCheckedListsize_void_seqIsBeingCleared()
-  {
-    CheckedList seq=new CheckedList();
-    for(int i=0;i<100;++i)
-    {
+  public void testCheckedListsize_void_seqIsBeingCleared(){
+    var seq=new BooleanArrSeq.CheckedList();
+    for(int i=0;i<100;++i){
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
     }
     var itr=seq.iterator();
-    for(int i=100;--i>=0;)
-    {
+    for(int i=100;--i>=0;){
       itr.nextBoolean();
       itr.remove();
       Assertions.assertEquals(i,seq.size());
@@ -3019,24 +6127,21 @@ public class BooleanArrSeqTest
     }
   }
   @Test
-  public void testCheckedListforEach_Consumer_SeqIsEmpty_NoMod()
-  {
-    CheckedList seq=new CheckedList();
-    MonitoredConsumer consumer=new MonitoredConsumer();
+  public void testCheckedListforEach_Consumer_SeqIsEmpty_NoMod(){
+    var seq=new BooleanArrSeq.CheckedList();
+    var consumer=new BooleanMonitoredConsumer();
     seq.forEach((Consumer)consumer);
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,seq.modCount);
     Assertions.assertTrue(consumer.isEmpty());
   }
   @Test
-  public void testCheckedListforEach_Consumer_SeqIsNotEmpty_NoMod()
-  {
-    CheckedList seq=new CheckedList();
-    for(int i=0;i<100;++i)
-    {
+  public void testCheckedListforEach_Consumer_SeqIsNotEmpty_NoMod(){
+    var seq=new BooleanArrSeq.CheckedList();
+    for(int i=0;i<100;++i){
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
     }
-    MonitoredConsumer consumer=new MonitoredConsumer();
+    var consumer=new BooleanMonitoredConsumer();
     seq.forEach((Consumer)consumer);
     Assertions.assertEquals(100,seq.size());
     Assertions.assertEquals(100,seq.modCount);
@@ -3049,111 +6154,1076 @@ public class BooleanArrSeqTest
     }
   }
   @Test
-  public void testCheckedListforEach_Consumer_SeqIsEmpty_ModdingConsumer()
-  {
-    CheckedList seq=new CheckedList();
-    ModifyingCheckedListConsumer consumer=new ModifyingCheckedListConsumer(seq);
+  public void testCheckedListforEach_Consumer_SeqIsEmpty_ModdingConsumer(){
+    var seq=new BooleanArrSeq.CheckedList();
+    var consumer=new BooleanMonitoredConsumer.ModifyingArrSeqCheckedListConsumer(seq);
     seq.forEach((Consumer)consumer);
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,seq.modCount);
     Assertions.assertTrue(consumer.isEmpty());
   }
   @Test
-  public void testCheckedListforEach_Consumer_SeqIsNotEmpty_ModdingConsumer()
-  {
-    CheckedList seq=new CheckedList();
-    for(int i=0;i<100;++i)
-    {
+  public void testCheckedListforEach_Consumer_SeqIsNotEmpty_ModdingConsumer(){
+    var seq=new BooleanArrSeq.CheckedList();
+    for(int i=0;i<100;++i){
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
     }
-    ModifyingCheckedListConsumer consumer=new ModifyingCheckedListConsumer(seq);
+    var consumer=new BooleanMonitoredConsumer.ModifyingArrSeqCheckedListConsumer(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.forEach((Consumer)consumer));
     Assertions.assertEquals(100,seq.size());
     Assertions.assertEquals(300,seq.modCount);
     Assertions.assertEquals(100,consumer.size());
     var seqIterator=seq.iterator();
     var consumerIterator=consumer.iterator();
-    for(int i=0;i<100;++i)
-    {
+    for(int i=0;i<100;++i){
       Assertions.assertEquals(consumerIterator.next(),seqIterator.next());
     }
   }
   @Test
-  public void testCheckedListforEach_Consumer_SeqIsEmpty_ThrowingConsumer()
-  {
-    CheckedList seq=new CheckedList();
-    ThrowingConsumer consumer=new ThrowingConsumer();
+  public void testCheckedListforEach_Consumer_SeqIsEmpty_ThrowingConsumer(){
+    var seq=new BooleanArrSeq.CheckedList();
+    var consumer=new BooleanMonitoredConsumer.Throwing();
     seq.forEach((Consumer)consumer);
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,seq.modCount);
     Assertions.assertTrue(consumer.isEmpty());
   }
   @Test
-  public void testCheckedListforEach_Consumer_SeqIsNotEmpty_ThrowingConsumer()
-  {
-    CheckedList seq=new CheckedList();
-    for(int i=0;i<100;++i)
-    {
+  public void testCheckedListforEach_Consumer_SeqIsNotEmpty_ThrowingConsumer(){
+    var seq=new BooleanArrSeq.CheckedList();
+    for(int i=0;i<100;++i){
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
     }
-    ThrowingConsumer consumer=new ThrowingConsumer();
+    var consumer=new BooleanMonitoredConsumer.Throwing();
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.forEach((Consumer)consumer));
     Assertions.assertEquals(100,seq.size());
     Assertions.assertEquals(100,seq.modCount);
     Assertions.assertEquals(1,consumer.size());
     var seqIterator=seq.iterator();
     var consumerIterator=consumer.iterator();
-    for(int i=0;i<1;++i)
-    {
+    for(int i=0;i<1;++i){
       Assertions.assertEquals(consumerIterator.next(),seqIterator.next());
     }
   }
   @Test
-  public void testCheckedListforEach_Consumer_SeqIsEmpty_ThrowingAndModdingConsumer()
-  {
-    CheckedList seq=new CheckedList();
-    ModifiyingCheckedListAndThrowingConsumer consumer=new ModifiyingCheckedListAndThrowingConsumer(seq);
+  public void testCheckedListforEach_Consumer_SeqIsEmpty_ThrowingAndModdingConsumer(){
+    var seq=new BooleanArrSeq.CheckedList();
+    var consumer=new BooleanMonitoredConsumer.ModifyingArrSeqCheckedListAndThrowingConsumer(seq);
     seq.forEach((Consumer)consumer);
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,seq.modCount);
     Assertions.assertTrue(consumer.isEmpty());
   }
   @Test
-  public void testCheckedListforEach_Consumer_SeqIsNotEmpty_ThrowingAndModdingConsumer()
-  {
-    CheckedList seq=new CheckedList();
-    for(int i=0;i<100;++i)
-    {
+  public void testCheckedListforEach_Consumer_SeqIsNotEmpty_ThrowingAndModdingConsumer(){
+    var seq=new BooleanArrSeq.CheckedList();
+    for(int i=0;i<100;++i){
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
     }
-    ModifiyingCheckedListAndThrowingConsumer consumer=new ModifiyingCheckedListAndThrowingConsumer(seq);
+    var consumer=new BooleanMonitoredConsumer.ModifyingArrSeqCheckedListAndThrowingConsumer(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.forEach((Consumer)consumer));
     Assertions.assertEquals(100,seq.size());
     Assertions.assertEquals(102,seq.modCount);
     Assertions.assertEquals(1,consumer.size());
   }
-  //TODO TestRemoveIfMethods<DEFAULT>(,)
-  //TODO TestRemoveIfMethods<NULL>(,)
-  //TODO TestRemoveIfMethods<50>(,)
   @Test
-  public void testCheckedListforEach_BooleanConsumer_SeqIsEmpty_NoMod()
+  public void testCheckedListremoveIf_Predicate_SeqIsEmpty_RemoveTruePredicate()
   {
-    CheckedList seq=new CheckedList();
-    MonitoredConsumer consumer=new MonitoredConsumer();
+    var seq=new BooleanArrSeq.CheckedList();
+    for(int i=0;i<0;++i){
+      seq.add(TypeConversionUtil.convertToboolean(i));
+    }
+    var filter=new BooleanMonitoredPredicate.RemoveTruePredicate(seq);
+    Assertions.assertFalse(seq.removeIf((Predicate)filter));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,filter.callCount);
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedListremoveIf_Predicate_SeqIsEmpty_RemoveFalsePredicate()
+  {
+    var seq=new BooleanArrSeq.CheckedList();
+    for(int i=0;i<0;++i){
+      seq.add(TypeConversionUtil.convertToboolean(i));
+    }
+    var filter=new BooleanMonitoredPredicate.RemoveFalsePredicate(seq);
+    Assertions.assertFalse(seq.removeIf((Predicate)filter));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,filter.callCount);
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedListremoveIf_Predicate_FirstValtrue_RemoveTrue(){
+    for(int period=1;period<=10;++period){
+      var seq=new BooleanArrSeq.CheckedList();
+      boolean currVal=true;
+      int trueCount=0;
+      int falseCount=0;
+      for(int i=0;;){
+        seq.add(currVal);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      var filter=new BooleanMonitoredPredicate.RemoveTruePredicate();
+      Assertions.assertEquals(trueCount!=0,seq.removeIf((Predicate)filter));
+      Assertions.assertEquals(falseCount,seq.size());
+      for(int i=0;i<falseCount;++i){
+        Assertions.assertFalse(seq.arr[i]);
+      }
+      Assertions.assertEquals(falseCount==0||trueCount==0?1:2,filter.callCount);
+      Assertions.assertEquals(trueCount==0?10:11,seq.modCount);
+    }
+  }
+  @Test
+  public void testCheckedListremoveIf_Predicate_FirstValfalse_RemoveTrue(){
+    for(int period=1;period<=10;++period){
+      var seq=new BooleanArrSeq.CheckedList();
+      boolean currVal=false;
+      int trueCount=0;
+      int falseCount=0;
+      for(int i=0;;){
+        seq.add(currVal);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      var filter=new BooleanMonitoredPredicate.RemoveTruePredicate();
+      Assertions.assertEquals(trueCount!=0,seq.removeIf((Predicate)filter));
+      Assertions.assertEquals(falseCount,seq.size());
+      for(int i=0;i<falseCount;++i){
+        Assertions.assertFalse(seq.arr[i]);
+      }
+      Assertions.assertEquals(falseCount==0||trueCount==0?1:2,filter.callCount);
+      Assertions.assertEquals(trueCount==0?10:11,seq.modCount);
+    }
+  }
+  @Test
+  public void testCheckedListremoveIf_Predicate_FirstValtrue_RemoveFalse(){
+    for(int period=1;period<=10;++period){
+      var seq=new BooleanArrSeq.CheckedList();
+      boolean currVal=true;
+      int trueCount=0;
+      int falseCount=0;
+      for(int i=0;;){
+        seq.add(currVal);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      var filter=new BooleanMonitoredPredicate.RemoveFalsePredicate();
+      Assertions.assertEquals(falseCount!=0,seq.removeIf((Predicate)filter));
+      Assertions.assertEquals(trueCount,seq.size());
+      for(int i=0;i<trueCount;++i){
+        Assertions.assertTrue(seq.arr[i]);
+      }
+      Assertions.assertEquals(falseCount==0||trueCount==0?1:2,filter.callCount);
+      Assertions.assertEquals(falseCount==0?10:11,seq.modCount);
+    }
+  }
+  @Test
+  public void testCheckedListremoveIf_Predicate_FirstValfalse_RemoveFalse(){
+    for(int period=1;period<=10;++period){
+      var seq=new BooleanArrSeq.CheckedList();
+      boolean currVal=false;
+      int trueCount=0;
+      int falseCount=0;
+      for(int i=0;;){
+        seq.add(currVal);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      var filter=new BooleanMonitoredPredicate.RemoveFalsePredicate();
+      Assertions.assertEquals(falseCount!=0,seq.removeIf((Predicate)filter));
+      Assertions.assertEquals(trueCount,seq.size());
+      for(int i=0;i<trueCount;++i){
+        Assertions.assertTrue(seq.arr[i]);
+      }
+      Assertions.assertEquals(falseCount==0||trueCount==0?1:2,filter.callCount);
+      Assertions.assertEquals(falseCount==0?10:11,seq.modCount);
+    }
+  }
+  @Test
+  public void testCheckedListremoveIf_Predicate_FirstValtrue_RemoveAll(){
+    for(int period=1;period<=10;++period){
+      var seq=new BooleanArrSeq.CheckedList();
+      boolean currVal=true;
+      int trueCount=0;
+      int falseCount=0;
+      for(int i=0;;){
+        seq.add(currVal);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      var filter=new BooleanMonitoredPredicate.RemoveAllPredicate();
+      Assertions.assertTrue(seq.removeIf((Predicate)filter));
+      Assertions.assertEquals(0,seq.size());
+      Assertions.assertEquals(falseCount==0||trueCount==0?1:2,filter.callCount);
+      Assertions.assertEquals(11,seq.modCount);
+    }
+  }
+  @Test
+  public void testCheckedListremoveIf_Predicate_FirstValfalse_RemoveAll(){
+    for(int period=1;period<=10;++period){
+      var seq=new BooleanArrSeq.CheckedList();
+      boolean currVal=false;
+      int trueCount=0;
+      int falseCount=0;
+      for(int i=0;;){
+        seq.add(currVal);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      var filter=new BooleanMonitoredPredicate.RemoveAllPredicate();
+      Assertions.assertTrue(seq.removeIf((Predicate)filter));
+      Assertions.assertEquals(0,seq.size());
+      Assertions.assertEquals(falseCount==0||trueCount==0?1:2,filter.callCount);
+      Assertions.assertEquals(11,seq.modCount);
+    }
+  }
+  @Test
+  public void testCheckedListremoveIf_Predicate_FirstValtrue_RemoveNone(){
+    for(int period=1;period<=10;++period){
+      var seq=new BooleanArrSeq.CheckedList();
+      boolean currVal=true;
+      int trueCount=0;
+      int falseCount=0;
+      for(int i=0;;){
+        seq.add(currVal);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      var filter=new BooleanMonitoredPredicate.RemoveNonePredicate();
+      Assertions.assertFalse(seq.removeIf((Predicate)filter));
+      Assertions.assertEquals(10,seq.size());
+      Assertions.assertEquals(falseCount==0||trueCount==0?1:2,filter.callCount);
+      currVal=true;
+      trueCount=0;
+      falseCount=0;
+      for(int i=0;;){
+        Assertions.assertEquals(currVal,seq.arr[i]);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      Assertions.assertEquals(10,seq.modCount);
+    }
+  }
+  @Test
+  public void testCheckedListremoveIf_Predicate_FirstValfalse_RemoveNone(){
+    for(int period=1;period<=10;++period){
+      var seq=new BooleanArrSeq.CheckedList();
+      boolean currVal=false;
+      int trueCount=0;
+      int falseCount=0;
+      for(int i=0;;){
+        seq.add(currVal);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      var filter=new BooleanMonitoredPredicate.RemoveNonePredicate();
+      Assertions.assertFalse(seq.removeIf((Predicate)filter));
+      Assertions.assertEquals(10,seq.size());
+      Assertions.assertEquals(falseCount==0||trueCount==0?1:2,filter.callCount);
+      currVal=false;
+      trueCount=0;
+      falseCount=0;
+      for(int i=0;;){
+        Assertions.assertEquals(currVal,seq.arr[i]);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      Assertions.assertEquals(10,seq.modCount);
+    }
+  }
+  @Test
+  public void testCheckedListremoveIf_Predicate_FirstValtrue_RemoveTrueArrSeqCheckedListModifyingPredicate(){
+    for(int period=1;period<=10;++period){
+      var seq=new BooleanArrSeq.CheckedList();
+      boolean currVal=true;
+      int trueCount=0;
+      int falseCount=0;
+      for(int i=0;;){
+        seq.add(currVal);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      var filter=new BooleanMonitoredPredicate.RemoveTrueArrSeqCheckedListModifyingPredicate(seq);
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
+      Assertions.assertEquals(10,seq.size());
+      currVal=true;
+      trueCount=0;
+      falseCount=0;
+      for(int i=0;;){
+        Assertions.assertEquals(currVal,seq.arr[i]);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      if(falseCount!=10 && trueCount!=10){
+        Assertions.assertEquals(10+4,seq.modCount);
+        Assertions.assertEquals(2,filter.callCount);
+      }else{
+        Assertions.assertEquals(10+2,seq.modCount);
+        Assertions.assertEquals(1,filter.callCount);
+      }
+    }
+  }
+  @Test
+  public void testCheckedListremoveIf_Predicate_FirstValtrue_RemoveFalseArrSeqCheckedListModifyingPredicate(){
+    for(int period=1;period<=10;++period){
+      var seq=new BooleanArrSeq.CheckedList();
+      boolean currVal=true;
+      int trueCount=0;
+      int falseCount=0;
+      for(int i=0;;){
+        seq.add(currVal);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      var filter=new BooleanMonitoredPredicate.RemoveFalseArrSeqCheckedListModifyingPredicate(seq);
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
+      Assertions.assertEquals(10,seq.size());
+      currVal=true;
+      trueCount=0;
+      falseCount=0;
+      for(int i=0;;){
+        Assertions.assertEquals(currVal,seq.arr[i]);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      if(falseCount!=10 && trueCount!=10){
+        Assertions.assertEquals(10+4,seq.modCount);
+        Assertions.assertEquals(2,filter.callCount);
+      }else{
+        Assertions.assertEquals(10+2,seq.modCount);
+        Assertions.assertEquals(1,filter.callCount);
+      }
+    }
+  }
+  @Test
+  public void testCheckedListremoveIf_Predicate_FirstValfalse_RemoveTrueArrSeqCheckedListModifyingPredicate(){
+    for(int period=1;period<=10;++period){
+      var seq=new BooleanArrSeq.CheckedList();
+      boolean currVal=false;
+      int trueCount=0;
+      int falseCount=0;
+      for(int i=0;;){
+        seq.add(currVal);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      var filter=new BooleanMonitoredPredicate.RemoveTrueArrSeqCheckedListModifyingPredicate(seq);
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
+      Assertions.assertEquals(10,seq.size());
+      currVal=false;
+      trueCount=0;
+      falseCount=0;
+      for(int i=0;;){
+        Assertions.assertEquals(currVal,seq.arr[i]);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      if(falseCount!=10 && trueCount!=10){
+        Assertions.assertEquals(10+4,seq.modCount);
+        Assertions.assertEquals(2,filter.callCount);
+      }else{
+        Assertions.assertEquals(10+2,seq.modCount);
+        Assertions.assertEquals(1,filter.callCount);
+      }
+    }
+  }
+  @Test
+  public void testCheckedListremoveIf_Predicate_FirstValfalse_RemoveFalseArrSeqCheckedListModifyingPredicate(){
+    for(int period=1;period<=10;++period){
+      var seq=new BooleanArrSeq.CheckedList();
+      boolean currVal=false;
+      int trueCount=0;
+      int falseCount=0;
+      for(int i=0;;){
+        seq.add(currVal);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      var filter=new BooleanMonitoredPredicate.RemoveFalseArrSeqCheckedListModifyingPredicate(seq);
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
+      Assertions.assertEquals(10,seq.size());
+      currVal=false;
+      trueCount=0;
+      falseCount=0;
+      for(int i=0;;){
+        Assertions.assertEquals(currVal,seq.arr[i]);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      if(falseCount!=10 && trueCount!=10){
+        Assertions.assertEquals(10+4,seq.modCount);
+        Assertions.assertEquals(2,filter.callCount);
+      }else{
+        Assertions.assertEquals(10+2,seq.modCount);
+        Assertions.assertEquals(1,filter.callCount);
+      }
+    }
+  }
+  @Test
+  public void testCheckedListremoveIf_Predicate_FirstValtrue_RemoveNoneArrSeqCheckedListModifyingPredicate(){
+    for(int period=1;period<=10;++period){
+      var seq=new BooleanArrSeq.CheckedList();
+      boolean currVal=true;
+      int trueCount=0;
+      int falseCount=0;
+      for(int i=0;;){
+        seq.add(currVal);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      var filter=new BooleanMonitoredPredicate.RemoveNoneArrSeqCheckedListModifyingPredicate(seq);
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
+      Assertions.assertEquals(10,seq.size());
+      currVal=true;
+      trueCount=0;
+      falseCount=0;
+      for(int i=0;;){
+        Assertions.assertEquals(currVal,seq.arr[i]);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      if(falseCount!=10 && trueCount!=10){
+        Assertions.assertEquals(10+4,seq.modCount);
+        Assertions.assertEquals(2,filter.callCount);
+      }else{
+        Assertions.assertEquals(10+2,seq.modCount);
+        Assertions.assertEquals(1,filter.callCount);
+      }
+    }
+  }
+  @Test
+  public void testCheckedListremoveIf_Predicate_FirstValtrue_RemoveAllArrSeqCheckedListModifyingPredicate(){
+    for(int period=1;period<=10;++period){
+      var seq=new BooleanArrSeq.CheckedList();
+      boolean currVal=true;
+      int trueCount=0;
+      int falseCount=0;
+      for(int i=0;;){
+        seq.add(currVal);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      var filter=new BooleanMonitoredPredicate.RemoveAllArrSeqCheckedListModifyingPredicate(seq);
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
+      Assertions.assertEquals(10,seq.size());
+      currVal=true;
+      trueCount=0;
+      falseCount=0;
+      for(int i=0;;){
+        Assertions.assertEquals(currVal,seq.arr[i]);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      if(falseCount!=10 && trueCount!=10){
+        Assertions.assertEquals(10+4,seq.modCount);
+        Assertions.assertEquals(2,filter.callCount);
+      }else{
+        Assertions.assertEquals(10+2,seq.modCount);
+        Assertions.assertEquals(1,filter.callCount);
+      }
+    }
+  }
+  @Test
+  public void testCheckedListremoveIf_Predicate_FirstValfalse_RemoveNoneArrSeqCheckedListModifyingPredicate(){
+    for(int period=1;period<=10;++period){
+      var seq=new BooleanArrSeq.CheckedList();
+      boolean currVal=false;
+      int trueCount=0;
+      int falseCount=0;
+      for(int i=0;;){
+        seq.add(currVal);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      var filter=new BooleanMonitoredPredicate.RemoveNoneArrSeqCheckedListModifyingPredicate(seq);
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
+      Assertions.assertEquals(10,seq.size());
+      currVal=false;
+      trueCount=0;
+      falseCount=0;
+      for(int i=0;;){
+        Assertions.assertEquals(currVal,seq.arr[i]);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      if(falseCount!=10 && trueCount!=10){
+        Assertions.assertEquals(10+4,seq.modCount);
+        Assertions.assertEquals(2,filter.callCount);
+      }else{
+        Assertions.assertEquals(10+2,seq.modCount);
+        Assertions.assertEquals(1,filter.callCount);
+      }
+    }
+  }
+  @Test
+  public void testCheckedListremoveIf_Predicate_FirstValfalse_RemoveAllArrSeqCheckedListModifyingPredicate(){
+    for(int period=1;period<=10;++period){
+      var seq=new BooleanArrSeq.CheckedList();
+      boolean currVal=false;
+      int trueCount=0;
+      int falseCount=0;
+      for(int i=0;;){
+        seq.add(currVal);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      var filter=new BooleanMonitoredPredicate.RemoveAllArrSeqCheckedListModifyingPredicate(seq);
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
+      Assertions.assertEquals(10,seq.size());
+      currVal=false;
+      trueCount=0;
+      falseCount=0;
+      for(int i=0;;){
+        Assertions.assertEquals(currVal,seq.arr[i]);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      if(falseCount!=10 && trueCount!=10){
+        Assertions.assertEquals(10+4,seq.modCount);
+        Assertions.assertEquals(2,filter.callCount);
+      }else{
+        Assertions.assertEquals(10+2,seq.modCount);
+        Assertions.assertEquals(1,filter.callCount);
+      }
+    }
+  }
+  @Test
+  public void testCheckedListremoveIf_Predicate_FirstValtrue_Throwing(){
+    for(int period=1;period<=10;++period){
+      var seq=new BooleanArrSeq.CheckedList();
+      boolean currVal=true;
+      int trueCount=0;
+      int falseCount=0;
+      for(int i=0;;){
+        seq.add(currVal);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      var filter=new BooleanMonitoredPredicate.ThrowingPredicate();
+      Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.removeIf((Predicate)filter));
+      Assertions.assertEquals(10,seq.size());
+      currVal=true;
+      trueCount=0;
+      falseCount=0;
+      for(int i=0;;){
+        Assertions.assertEquals(currVal,seq.arr[i]);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      Assertions.assertEquals(10,seq.modCount);
+      Assertions.assertEquals(1,filter.callCount);
+    }
+  }
+  @Test
+  public void testCheckedListremoveIf_Predicate_FirstValfalse_Throwing(){
+    for(int period=1;period<=10;++period){
+      var seq=new BooleanArrSeq.CheckedList();
+      boolean currVal=false;
+      int trueCount=0;
+      int falseCount=0;
+      for(int i=0;;){
+        seq.add(currVal);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      var filter=new BooleanMonitoredPredicate.ThrowingPredicate();
+      Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.removeIf((Predicate)filter));
+      Assertions.assertEquals(10,seq.size());
+      currVal=false;
+      trueCount=0;
+      falseCount=0;
+      for(int i=0;;){
+        Assertions.assertEquals(currVal,seq.arr[i]);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      Assertions.assertEquals(10,seq.modCount);
+      Assertions.assertEquals(1,filter.callCount);
+    }
+  }
+  @Test
+  public void testCheckedListremoveIf_Predicate_FirstValfalse_ThrowAndMod(){
+    for(int period=1;period<=10;++period){
+      var seq=new BooleanArrSeq.CheckedList();
+      boolean currVal=false;
+      int trueCount=0;
+      int falseCount=0;
+      for(int i=0;;){
+        seq.add(currVal);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      var filter=new BooleanMonitoredPredicate.ModifyingArrSeqCheckedListAndThrowingPredicate(seq);
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
+      Assertions.assertEquals(11,seq.size());
+      currVal=false;
+      trueCount=0;
+      falseCount=0;
+      for(int i=0;;){
+        Assertions.assertEquals(currVal,seq.arr[i]);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      Assertions.assertEquals(false,seq.arr[10]);
+      Assertions.assertEquals(10+1,seq.modCount);
+      Assertions.assertEquals(1,filter.callCount);
+    }
+  }
+  @Test
+  public void testCheckedListremoveIf_Predicate_FirstValtrue_ThrowAndMod(){
+    for(int period=1;period<=10;++period){
+      var seq=new BooleanArrSeq.CheckedList();
+      boolean currVal=true;
+      int trueCount=0;
+      int falseCount=0;
+      for(int i=0;;){
+        seq.add(currVal);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      var filter=new BooleanMonitoredPredicate.ModifyingArrSeqCheckedListAndThrowingPredicate(seq);
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
+      Assertions.assertEquals(11,seq.size());
+      currVal=true;
+      trueCount=0;
+      falseCount=0;
+      for(int i=0;;){
+        Assertions.assertEquals(currVal,seq.arr[i]);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      Assertions.assertEquals(true,seq.arr[10]);
+      Assertions.assertEquals(10+1,seq.modCount);
+      Assertions.assertEquals(1,filter.callCount);
+    }
+  }
+  @Test
+  public void testCheckedListremoveIf_Predicate_SeqIsEmpty_RemoveTrueArrSeqCheckedListModifyingPredicate()
+  {
+    var seq=new BooleanArrSeq.CheckedList();
+    for(int i=0;i<0;++i){
+      seq.add(TypeConversionUtil.convertToboolean(i));
+    }
+    var filter=new BooleanMonitoredPredicate.RemoveTrueArrSeqCheckedListModifyingPredicate(seq);
+    Assertions.assertFalse(seq.removeIf((Predicate)filter));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,filter.callCount);
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedListremoveIf_Predicate_SeqIsEmpty_RemoveFalseArrSeqCheckedListModifyingPredicate()
+  {
+    var seq=new BooleanArrSeq.CheckedList();
+    for(int i=0;i<0;++i){
+      seq.add(TypeConversionUtil.convertToboolean(i));
+    }
+    var filter=new BooleanMonitoredPredicate.RemoveFalseArrSeqCheckedListModifyingPredicate(seq);
+    Assertions.assertFalse(seq.removeIf((Predicate)filter));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,filter.callCount);
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedListremoveIf_Predicate_SeqIsEmpty_RemoveAllPredicate()
+  {
+    var seq=new BooleanArrSeq.CheckedList();
+    for(int i=0;i<0;++i){
+      seq.add(TypeConversionUtil.convertToboolean(i));
+    }
+    var filter=new BooleanMonitoredPredicate.RemoveAllPredicate(seq);
+    Assertions.assertFalse(seq.removeIf((Predicate)filter));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,filter.callCount);
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedListremoveIf_Predicate_SeqIsEmpty_RemoveNonePredicate()
+  {
+    var seq=new BooleanArrSeq.CheckedList();
+    for(int i=0;i<0;++i){
+      seq.add(TypeConversionUtil.convertToboolean(i));
+    }
+    var filter=new BooleanMonitoredPredicate.RemoveNonePredicate(seq);
+    Assertions.assertFalse(seq.removeIf((Predicate)filter));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,filter.callCount);
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedListremoveIf_Predicate_SeqIsEmpty_RemoveAllArrSeqCheckedListModifyingPredicate()
+  {
+    var seq=new BooleanArrSeq.CheckedList();
+    for(int i=0;i<0;++i){
+      seq.add(TypeConversionUtil.convertToboolean(i));
+    }
+    var filter=new BooleanMonitoredPredicate.RemoveAllArrSeqCheckedListModifyingPredicate(seq);
+    Assertions.assertFalse(seq.removeIf((Predicate)filter));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,filter.callCount);
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedListremoveIf_Predicate_SeqIsEmpty_RemoveNoneArrSeqCheckedListModifyingPredicate()
+  {
+    var seq=new BooleanArrSeq.CheckedList();
+    for(int i=0;i<0;++i){
+      seq.add(TypeConversionUtil.convertToboolean(i));
+    }
+    var filter=new BooleanMonitoredPredicate.RemoveNoneArrSeqCheckedListModifyingPredicate(seq);
+    Assertions.assertFalse(seq.removeIf((Predicate)filter));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,filter.callCount);
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedListremoveIf_Predicate_SeqIsEmpty_ThrowingPredicate()
+  {
+    var seq=new BooleanArrSeq.CheckedList();
+    for(int i=0;i<0;++i){
+      seq.add(TypeConversionUtil.convertToboolean(i));
+    }
+    var filter=new BooleanMonitoredPredicate.ThrowingPredicate(seq);
+    Assertions.assertFalse(seq.removeIf((Predicate)filter));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,filter.callCount);
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedListremoveIf_Predicate_SeqIsEmpty_ModifyingArrSeqCheckedListAndThrowingPredicate()
+  {
+    var seq=new BooleanArrSeq.CheckedList();
+    for(int i=0;i<0;++i){
+      seq.add(TypeConversionUtil.convertToboolean(i));
+    }
+    var filter=new BooleanMonitoredPredicate.ModifyingArrSeqCheckedListAndThrowingPredicate(seq);
+    Assertions.assertFalse(seq.removeIf((Predicate)filter));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,filter.callCount);
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedListforEach_BooleanConsumer_SeqIsEmpty_NoMod(){
+    var seq=new BooleanArrSeq.CheckedList();
+    var consumer=new BooleanMonitoredConsumer();
     seq.forEach((BooleanConsumer)consumer);
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,seq.modCount);
     Assertions.assertTrue(consumer.isEmpty());
   }
   @Test
-  public void testCheckedListforEach_BooleanConsumer_SeqIsNotEmpty_NoMod()
-  {
-    CheckedList seq=new CheckedList();
-    for(int i=0;i<100;++i)
-    {
+  public void testCheckedListforEach_BooleanConsumer_SeqIsNotEmpty_NoMod(){
+    var seq=new BooleanArrSeq.CheckedList();
+    for(int i=0;i<100;++i){
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
     }
-    MonitoredConsumer consumer=new MonitoredConsumer();
+    var consumer=new BooleanMonitoredConsumer();
     seq.forEach((BooleanConsumer)consumer);
     Assertions.assertEquals(100,seq.size());
     Assertions.assertEquals(100,seq.modCount);
@@ -3166,202 +7236,1149 @@ public class BooleanArrSeqTest
     }
   }
   @Test
-  public void testCheckedListforEach_BooleanConsumer_SeqIsEmpty_ModdingConsumer()
-  {
-    CheckedList seq=new CheckedList();
-    ModifyingCheckedListConsumer consumer=new ModifyingCheckedListConsumer(seq);
+  public void testCheckedListforEach_BooleanConsumer_SeqIsEmpty_ModdingConsumer(){
+    var seq=new BooleanArrSeq.CheckedList();
+    var consumer=new BooleanMonitoredConsumer.ModifyingArrSeqCheckedListConsumer(seq);
     seq.forEach((BooleanConsumer)consumer);
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,seq.modCount);
     Assertions.assertTrue(consumer.isEmpty());
   }
   @Test
-  public void testCheckedListforEach_BooleanConsumer_SeqIsNotEmpty_ModdingConsumer()
-  {
-    CheckedList seq=new CheckedList();
-    for(int i=0;i<100;++i)
-    {
+  public void testCheckedListforEach_BooleanConsumer_SeqIsNotEmpty_ModdingConsumer(){
+    var seq=new BooleanArrSeq.CheckedList();
+    for(int i=0;i<100;++i){
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
     }
-    ModifyingCheckedListConsumer consumer=new ModifyingCheckedListConsumer(seq);
+    var consumer=new BooleanMonitoredConsumer.ModifyingArrSeqCheckedListConsumer(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.forEach((BooleanConsumer)consumer));
     Assertions.assertEquals(100,seq.size());
     Assertions.assertEquals(300,seq.modCount);
     Assertions.assertEquals(100,consumer.size());
     var seqIterator=seq.iterator();
     var consumerIterator=consumer.iterator();
-    for(int i=0;i<100;++i)
-    {
+    for(int i=0;i<100;++i){
       Assertions.assertEquals(consumerIterator.next(),seqIterator.next());
     }
   }
   @Test
-  public void testCheckedListforEach_BooleanConsumer_SeqIsEmpty_ThrowingConsumer()
-  {
-    CheckedList seq=new CheckedList();
-    ThrowingConsumer consumer=new ThrowingConsumer();
+  public void testCheckedListforEach_BooleanConsumer_SeqIsEmpty_ThrowingConsumer(){
+    var seq=new BooleanArrSeq.CheckedList();
+    var consumer=new BooleanMonitoredConsumer.Throwing();
     seq.forEach((BooleanConsumer)consumer);
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,seq.modCount);
     Assertions.assertTrue(consumer.isEmpty());
   }
   @Test
-  public void testCheckedListforEach_BooleanConsumer_SeqIsNotEmpty_ThrowingConsumer()
-  {
-    CheckedList seq=new CheckedList();
-    for(int i=0;i<100;++i)
-    {
+  public void testCheckedListforEach_BooleanConsumer_SeqIsNotEmpty_ThrowingConsumer(){
+    var seq=new BooleanArrSeq.CheckedList();
+    for(int i=0;i<100;++i){
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
     }
-    ThrowingConsumer consumer=new ThrowingConsumer();
+    var consumer=new BooleanMonitoredConsumer.Throwing();
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.forEach((BooleanConsumer)consumer));
     Assertions.assertEquals(100,seq.size());
     Assertions.assertEquals(100,seq.modCount);
     Assertions.assertEquals(1,consumer.size());
     var seqIterator=seq.iterator();
     var consumerIterator=consumer.iterator();
-    for(int i=0;i<1;++i)
-    {
+    for(int i=0;i<1;++i){
       Assertions.assertEquals(consumerIterator.next(),seqIterator.next());
     }
   }
   @Test
-  public void testCheckedListforEach_BooleanConsumer_SeqIsEmpty_ThrowingAndModdingConsumer()
-  {
-    CheckedList seq=new CheckedList();
-    ModifiyingCheckedListAndThrowingConsumer consumer=new ModifiyingCheckedListAndThrowingConsumer(seq);
+  public void testCheckedListforEach_BooleanConsumer_SeqIsEmpty_ThrowingAndModdingConsumer(){
+    var seq=new BooleanArrSeq.CheckedList();
+    var consumer=new BooleanMonitoredConsumer.ModifyingArrSeqCheckedListAndThrowingConsumer(seq);
     seq.forEach((BooleanConsumer)consumer);
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,seq.modCount);
     Assertions.assertTrue(consumer.isEmpty());
   }
   @Test
-  public void testCheckedListforEach_BooleanConsumer_SeqIsNotEmpty_ThrowingAndModdingConsumer()
-  {
-    CheckedList seq=new CheckedList();
-    for(int i=0;i<100;++i)
-    {
+  public void testCheckedListforEach_BooleanConsumer_SeqIsNotEmpty_ThrowingAndModdingConsumer(){
+    var seq=new BooleanArrSeq.CheckedList();
+    for(int i=0;i<100;++i){
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
     }
-    ModifiyingCheckedListAndThrowingConsumer consumer=new ModifiyingCheckedListAndThrowingConsumer(seq);
+    var consumer=new BooleanMonitoredConsumer.ModifyingArrSeqCheckedListAndThrowingConsumer(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.forEach((BooleanConsumer)consumer));
     Assertions.assertEquals(100,seq.size());
     Assertions.assertEquals(102,seq.modCount);
     Assertions.assertEquals(1,consumer.size());
   }
-  //TODO TestRemoveIfMethods<DEFAULT>(Boolean,)
-  //TODO TestRemoveIfMethods<NULL>(Boolean,)
-  //TODO TestRemoveIfMethods<50>(Boolean,)
   @Test
-  public void testCheckedListadd_boolean_initialCapacityDEFAULT()
+  public void testCheckedListremoveIf_BooleanPredicate_SeqIsEmpty_RemoveTruePredicate()
   {
-    CheckedList seq=new CheckedList();
-    for(int i=0;i<100;++i)
-    {
+    var seq=new BooleanArrSeq.CheckedList();
+    for(int i=0;i<0;++i){
+      seq.add(TypeConversionUtil.convertToboolean(i));
+    }
+    var filter=new BooleanMonitoredPredicate.RemoveTruePredicate(seq);
+    Assertions.assertFalse(seq.removeIf((BooleanPredicate)filter));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,filter.callCount);
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedListremoveIf_BooleanPredicate_SeqIsEmpty_RemoveFalsePredicate()
+  {
+    var seq=new BooleanArrSeq.CheckedList();
+    for(int i=0;i<0;++i){
+      seq.add(TypeConversionUtil.convertToboolean(i));
+    }
+    var filter=new BooleanMonitoredPredicate.RemoveFalsePredicate(seq);
+    Assertions.assertFalse(seq.removeIf((BooleanPredicate)filter));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,filter.callCount);
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedListremoveIf_BooleanPredicate_FirstValtrue_RemoveTrue(){
+    for(int period=1;period<=10;++period){
+      var seq=new BooleanArrSeq.CheckedList();
+      boolean currVal=true;
+      int trueCount=0;
+      int falseCount=0;
+      for(int i=0;;){
+        seq.add(currVal);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      var filter=new BooleanMonitoredPredicate.RemoveTruePredicate();
+      Assertions.assertEquals(trueCount!=0,seq.removeIf((BooleanPredicate)filter));
+      Assertions.assertEquals(falseCount,seq.size());
+      for(int i=0;i<falseCount;++i){
+        Assertions.assertFalse(seq.arr[i]);
+      }
+      Assertions.assertEquals(falseCount==0||trueCount==0?1:2,filter.callCount);
+      Assertions.assertEquals(trueCount==0?10:11,seq.modCount);
+    }
+  }
+  @Test
+  public void testCheckedListremoveIf_BooleanPredicate_FirstValfalse_RemoveTrue(){
+    for(int period=1;period<=10;++period){
+      var seq=new BooleanArrSeq.CheckedList();
+      boolean currVal=false;
+      int trueCount=0;
+      int falseCount=0;
+      for(int i=0;;){
+        seq.add(currVal);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      var filter=new BooleanMonitoredPredicate.RemoveTruePredicate();
+      Assertions.assertEquals(trueCount!=0,seq.removeIf((BooleanPredicate)filter));
+      Assertions.assertEquals(falseCount,seq.size());
+      for(int i=0;i<falseCount;++i){
+        Assertions.assertFalse(seq.arr[i]);
+      }
+      Assertions.assertEquals(falseCount==0||trueCount==0?1:2,filter.callCount);
+      Assertions.assertEquals(trueCount==0?10:11,seq.modCount);
+    }
+  }
+  @Test
+  public void testCheckedListremoveIf_BooleanPredicate_FirstValtrue_RemoveFalse(){
+    for(int period=1;period<=10;++period){
+      var seq=new BooleanArrSeq.CheckedList();
+      boolean currVal=true;
+      int trueCount=0;
+      int falseCount=0;
+      for(int i=0;;){
+        seq.add(currVal);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      var filter=new BooleanMonitoredPredicate.RemoveFalsePredicate();
+      Assertions.assertEquals(falseCount!=0,seq.removeIf((BooleanPredicate)filter));
+      Assertions.assertEquals(trueCount,seq.size());
+      for(int i=0;i<trueCount;++i){
+        Assertions.assertTrue(seq.arr[i]);
+      }
+      Assertions.assertEquals(falseCount==0||trueCount==0?1:2,filter.callCount);
+      Assertions.assertEquals(falseCount==0?10:11,seq.modCount);
+    }
+  }
+  @Test
+  public void testCheckedListremoveIf_BooleanPredicate_FirstValfalse_RemoveFalse(){
+    for(int period=1;period<=10;++period){
+      var seq=new BooleanArrSeq.CheckedList();
+      boolean currVal=false;
+      int trueCount=0;
+      int falseCount=0;
+      for(int i=0;;){
+        seq.add(currVal);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      var filter=new BooleanMonitoredPredicate.RemoveFalsePredicate();
+      Assertions.assertEquals(falseCount!=0,seq.removeIf((BooleanPredicate)filter));
+      Assertions.assertEquals(trueCount,seq.size());
+      for(int i=0;i<trueCount;++i){
+        Assertions.assertTrue(seq.arr[i]);
+      }
+      Assertions.assertEquals(falseCount==0||trueCount==0?1:2,filter.callCount);
+      Assertions.assertEquals(falseCount==0?10:11,seq.modCount);
+    }
+  }
+  @Test
+  public void testCheckedListremoveIf_BooleanPredicate_FirstValtrue_RemoveAll(){
+    for(int period=1;period<=10;++period){
+      var seq=new BooleanArrSeq.CheckedList();
+      boolean currVal=true;
+      int trueCount=0;
+      int falseCount=0;
+      for(int i=0;;){
+        seq.add(currVal);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      var filter=new BooleanMonitoredPredicate.RemoveAllPredicate();
+      Assertions.assertTrue(seq.removeIf((BooleanPredicate)filter));
+      Assertions.assertEquals(0,seq.size());
+      Assertions.assertEquals(falseCount==0||trueCount==0?1:2,filter.callCount);
+      Assertions.assertEquals(11,seq.modCount);
+    }
+  }
+  @Test
+  public void testCheckedListremoveIf_BooleanPredicate_FirstValfalse_RemoveAll(){
+    for(int period=1;period<=10;++period){
+      var seq=new BooleanArrSeq.CheckedList();
+      boolean currVal=false;
+      int trueCount=0;
+      int falseCount=0;
+      for(int i=0;;){
+        seq.add(currVal);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      var filter=new BooleanMonitoredPredicate.RemoveAllPredicate();
+      Assertions.assertTrue(seq.removeIf((BooleanPredicate)filter));
+      Assertions.assertEquals(0,seq.size());
+      Assertions.assertEquals(falseCount==0||trueCount==0?1:2,filter.callCount);
+      Assertions.assertEquals(11,seq.modCount);
+    }
+  }
+  @Test
+  public void testCheckedListremoveIf_BooleanPredicate_FirstValtrue_RemoveNone(){
+    for(int period=1;period<=10;++period){
+      var seq=new BooleanArrSeq.CheckedList();
+      boolean currVal=true;
+      int trueCount=0;
+      int falseCount=0;
+      for(int i=0;;){
+        seq.add(currVal);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      var filter=new BooleanMonitoredPredicate.RemoveNonePredicate();
+      Assertions.assertFalse(seq.removeIf((BooleanPredicate)filter));
+      Assertions.assertEquals(10,seq.size());
+      Assertions.assertEquals(falseCount==0||trueCount==0?1:2,filter.callCount);
+      currVal=true;
+      trueCount=0;
+      falseCount=0;
+      for(int i=0;;){
+        Assertions.assertEquals(currVal,seq.arr[i]);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      Assertions.assertEquals(10,seq.modCount);
+    }
+  }
+  @Test
+  public void testCheckedListremoveIf_BooleanPredicate_FirstValfalse_RemoveNone(){
+    for(int period=1;period<=10;++period){
+      var seq=new BooleanArrSeq.CheckedList();
+      boolean currVal=false;
+      int trueCount=0;
+      int falseCount=0;
+      for(int i=0;;){
+        seq.add(currVal);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      var filter=new BooleanMonitoredPredicate.RemoveNonePredicate();
+      Assertions.assertFalse(seq.removeIf((BooleanPredicate)filter));
+      Assertions.assertEquals(10,seq.size());
+      Assertions.assertEquals(falseCount==0||trueCount==0?1:2,filter.callCount);
+      currVal=false;
+      trueCount=0;
+      falseCount=0;
+      for(int i=0;;){
+        Assertions.assertEquals(currVal,seq.arr[i]);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      Assertions.assertEquals(10,seq.modCount);
+    }
+  }
+  @Test
+  public void testCheckedListremoveIf_BooleanPredicate_FirstValtrue_RemoveTrueArrSeqCheckedListModifyingPredicate(){
+    for(int period=1;period<=10;++period){
+      var seq=new BooleanArrSeq.CheckedList();
+      boolean currVal=true;
+      int trueCount=0;
+      int falseCount=0;
+      for(int i=0;;){
+        seq.add(currVal);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      var filter=new BooleanMonitoredPredicate.RemoveTrueArrSeqCheckedListModifyingPredicate(seq);
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((BooleanPredicate)filter));
+      Assertions.assertEquals(10,seq.size());
+      currVal=true;
+      trueCount=0;
+      falseCount=0;
+      for(int i=0;;){
+        Assertions.assertEquals(currVal,seq.arr[i]);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      if(falseCount!=10 && trueCount!=10){
+        Assertions.assertEquals(10+4,seq.modCount);
+        Assertions.assertEquals(2,filter.callCount);
+      }else{
+        Assertions.assertEquals(10+2,seq.modCount);
+        Assertions.assertEquals(1,filter.callCount);
+      }
+    }
+  }
+  @Test
+  public void testCheckedListremoveIf_BooleanPredicate_FirstValtrue_RemoveFalseArrSeqCheckedListModifyingPredicate(){
+    for(int period=1;period<=10;++period){
+      var seq=new BooleanArrSeq.CheckedList();
+      boolean currVal=true;
+      int trueCount=0;
+      int falseCount=0;
+      for(int i=0;;){
+        seq.add(currVal);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      var filter=new BooleanMonitoredPredicate.RemoveFalseArrSeqCheckedListModifyingPredicate(seq);
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((BooleanPredicate)filter));
+      Assertions.assertEquals(10,seq.size());
+      currVal=true;
+      trueCount=0;
+      falseCount=0;
+      for(int i=0;;){
+        Assertions.assertEquals(currVal,seq.arr[i]);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      if(falseCount!=10 && trueCount!=10){
+        Assertions.assertEquals(10+4,seq.modCount);
+        Assertions.assertEquals(2,filter.callCount);
+      }else{
+        Assertions.assertEquals(10+2,seq.modCount);
+        Assertions.assertEquals(1,filter.callCount);
+      }
+    }
+  }
+  @Test
+  public void testCheckedListremoveIf_BooleanPredicate_FirstValfalse_RemoveTrueArrSeqCheckedListModifyingPredicate(){
+    for(int period=1;period<=10;++period){
+      var seq=new BooleanArrSeq.CheckedList();
+      boolean currVal=false;
+      int trueCount=0;
+      int falseCount=0;
+      for(int i=0;;){
+        seq.add(currVal);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      var filter=new BooleanMonitoredPredicate.RemoveTrueArrSeqCheckedListModifyingPredicate(seq);
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((BooleanPredicate)filter));
+      Assertions.assertEquals(10,seq.size());
+      currVal=false;
+      trueCount=0;
+      falseCount=0;
+      for(int i=0;;){
+        Assertions.assertEquals(currVal,seq.arr[i]);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      if(falseCount!=10 && trueCount!=10){
+        Assertions.assertEquals(10+4,seq.modCount);
+        Assertions.assertEquals(2,filter.callCount);
+      }else{
+        Assertions.assertEquals(10+2,seq.modCount);
+        Assertions.assertEquals(1,filter.callCount);
+      }
+    }
+  }
+  @Test
+  public void testCheckedListremoveIf_BooleanPredicate_FirstValfalse_RemoveFalseArrSeqCheckedListModifyingPredicate(){
+    for(int period=1;period<=10;++period){
+      var seq=new BooleanArrSeq.CheckedList();
+      boolean currVal=false;
+      int trueCount=0;
+      int falseCount=0;
+      for(int i=0;;){
+        seq.add(currVal);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      var filter=new BooleanMonitoredPredicate.RemoveFalseArrSeqCheckedListModifyingPredicate(seq);
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((BooleanPredicate)filter));
+      Assertions.assertEquals(10,seq.size());
+      currVal=false;
+      trueCount=0;
+      falseCount=0;
+      for(int i=0;;){
+        Assertions.assertEquals(currVal,seq.arr[i]);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      if(falseCount!=10 && trueCount!=10){
+        Assertions.assertEquals(10+4,seq.modCount);
+        Assertions.assertEquals(2,filter.callCount);
+      }else{
+        Assertions.assertEquals(10+2,seq.modCount);
+        Assertions.assertEquals(1,filter.callCount);
+      }
+    }
+  }
+  @Test
+  public void testCheckedListremoveIf_BooleanPredicate_FirstValtrue_RemoveNoneArrSeqCheckedListModifyingPredicate(){
+    for(int period=1;period<=10;++period){
+      var seq=new BooleanArrSeq.CheckedList();
+      boolean currVal=true;
+      int trueCount=0;
+      int falseCount=0;
+      for(int i=0;;){
+        seq.add(currVal);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      var filter=new BooleanMonitoredPredicate.RemoveNoneArrSeqCheckedListModifyingPredicate(seq);
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((BooleanPredicate)filter));
+      Assertions.assertEquals(10,seq.size());
+      currVal=true;
+      trueCount=0;
+      falseCount=0;
+      for(int i=0;;){
+        Assertions.assertEquals(currVal,seq.arr[i]);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      if(falseCount!=10 && trueCount!=10){
+        Assertions.assertEquals(10+4,seq.modCount);
+        Assertions.assertEquals(2,filter.callCount);
+      }else{
+        Assertions.assertEquals(10+2,seq.modCount);
+        Assertions.assertEquals(1,filter.callCount);
+      }
+    }
+  }
+  @Test
+  public void testCheckedListremoveIf_BooleanPredicate_FirstValtrue_RemoveAllArrSeqCheckedListModifyingPredicate(){
+    for(int period=1;period<=10;++period){
+      var seq=new BooleanArrSeq.CheckedList();
+      boolean currVal=true;
+      int trueCount=0;
+      int falseCount=0;
+      for(int i=0;;){
+        seq.add(currVal);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      var filter=new BooleanMonitoredPredicate.RemoveAllArrSeqCheckedListModifyingPredicate(seq);
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((BooleanPredicate)filter));
+      Assertions.assertEquals(10,seq.size());
+      currVal=true;
+      trueCount=0;
+      falseCount=0;
+      for(int i=0;;){
+        Assertions.assertEquals(currVal,seq.arr[i]);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      if(falseCount!=10 && trueCount!=10){
+        Assertions.assertEquals(10+4,seq.modCount);
+        Assertions.assertEquals(2,filter.callCount);
+      }else{
+        Assertions.assertEquals(10+2,seq.modCount);
+        Assertions.assertEquals(1,filter.callCount);
+      }
+    }
+  }
+  @Test
+  public void testCheckedListremoveIf_BooleanPredicate_FirstValfalse_RemoveNoneArrSeqCheckedListModifyingPredicate(){
+    for(int period=1;period<=10;++period){
+      var seq=new BooleanArrSeq.CheckedList();
+      boolean currVal=false;
+      int trueCount=0;
+      int falseCount=0;
+      for(int i=0;;){
+        seq.add(currVal);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      var filter=new BooleanMonitoredPredicate.RemoveNoneArrSeqCheckedListModifyingPredicate(seq);
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((BooleanPredicate)filter));
+      Assertions.assertEquals(10,seq.size());
+      currVal=false;
+      trueCount=0;
+      falseCount=0;
+      for(int i=0;;){
+        Assertions.assertEquals(currVal,seq.arr[i]);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      if(falseCount!=10 && trueCount!=10){
+        Assertions.assertEquals(10+4,seq.modCount);
+        Assertions.assertEquals(2,filter.callCount);
+      }else{
+        Assertions.assertEquals(10+2,seq.modCount);
+        Assertions.assertEquals(1,filter.callCount);
+      }
+    }
+  }
+  @Test
+  public void testCheckedListremoveIf_BooleanPredicate_FirstValfalse_RemoveAllArrSeqCheckedListModifyingPredicate(){
+    for(int period=1;period<=10;++period){
+      var seq=new BooleanArrSeq.CheckedList();
+      boolean currVal=false;
+      int trueCount=0;
+      int falseCount=0;
+      for(int i=0;;){
+        seq.add(currVal);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      var filter=new BooleanMonitoredPredicate.RemoveAllArrSeqCheckedListModifyingPredicate(seq);
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((BooleanPredicate)filter));
+      Assertions.assertEquals(10,seq.size());
+      currVal=false;
+      trueCount=0;
+      falseCount=0;
+      for(int i=0;;){
+        Assertions.assertEquals(currVal,seq.arr[i]);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      if(falseCount!=10 && trueCount!=10){
+        Assertions.assertEquals(10+4,seq.modCount);
+        Assertions.assertEquals(2,filter.callCount);
+      }else{
+        Assertions.assertEquals(10+2,seq.modCount);
+        Assertions.assertEquals(1,filter.callCount);
+      }
+    }
+  }
+  @Test
+  public void testCheckedListremoveIf_BooleanPredicate_FirstValtrue_Throwing(){
+    for(int period=1;period<=10;++period){
+      var seq=new BooleanArrSeq.CheckedList();
+      boolean currVal=true;
+      int trueCount=0;
+      int falseCount=0;
+      for(int i=0;;){
+        seq.add(currVal);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      var filter=new BooleanMonitoredPredicate.ThrowingPredicate();
+      Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.removeIf((BooleanPredicate)filter));
+      Assertions.assertEquals(10,seq.size());
+      currVal=true;
+      trueCount=0;
+      falseCount=0;
+      for(int i=0;;){
+        Assertions.assertEquals(currVal,seq.arr[i]);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      Assertions.assertEquals(10,seq.modCount);
+      Assertions.assertEquals(1,filter.callCount);
+    }
+  }
+  @Test
+  public void testCheckedListremoveIf_BooleanPredicate_FirstValfalse_Throwing(){
+    for(int period=1;period<=10;++period){
+      var seq=new BooleanArrSeq.CheckedList();
+      boolean currVal=false;
+      int trueCount=0;
+      int falseCount=0;
+      for(int i=0;;){
+        seq.add(currVal);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      var filter=new BooleanMonitoredPredicate.ThrowingPredicate();
+      Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.removeIf((BooleanPredicate)filter));
+      Assertions.assertEquals(10,seq.size());
+      currVal=false;
+      trueCount=0;
+      falseCount=0;
+      for(int i=0;;){
+        Assertions.assertEquals(currVal,seq.arr[i]);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      Assertions.assertEquals(10,seq.modCount);
+      Assertions.assertEquals(1,filter.callCount);
+    }
+  }
+  @Test
+  public void testCheckedListremoveIf_BooleanPredicate_FirstValfalse_ThrowAndMod(){
+    for(int period=1;period<=10;++period){
+      var seq=new BooleanArrSeq.CheckedList();
+      boolean currVal=false;
+      int trueCount=0;
+      int falseCount=0;
+      for(int i=0;;){
+        seq.add(currVal);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      var filter=new BooleanMonitoredPredicate.ModifyingArrSeqCheckedListAndThrowingPredicate(seq);
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((BooleanPredicate)filter));
+      Assertions.assertEquals(11,seq.size());
+      currVal=false;
+      trueCount=0;
+      falseCount=0;
+      for(int i=0;;){
+        Assertions.assertEquals(currVal,seq.arr[i]);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      Assertions.assertEquals(false,seq.arr[10]);
+      Assertions.assertEquals(10+1,seq.modCount);
+      Assertions.assertEquals(1,filter.callCount);
+    }
+  }
+  @Test
+  public void testCheckedListremoveIf_BooleanPredicate_FirstValtrue_ThrowAndMod(){
+    for(int period=1;period<=10;++period){
+      var seq=new BooleanArrSeq.CheckedList();
+      boolean currVal=true;
+      int trueCount=0;
+      int falseCount=0;
+      for(int i=0;;){
+        seq.add(currVal);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      var filter=new BooleanMonitoredPredicate.ModifyingArrSeqCheckedListAndThrowingPredicate(seq);
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((BooleanPredicate)filter));
+      Assertions.assertEquals(11,seq.size());
+      currVal=true;
+      trueCount=0;
+      falseCount=0;
+      for(int i=0;;){
+        Assertions.assertEquals(currVal,seq.arr[i]);
+        if(currVal){
+          ++trueCount;
+        }else{
+          ++falseCount;
+        }
+        if((trueCount+falseCount)==10){
+          break;
+        }
+        if(((++i)%period)==0){
+          currVal=!currVal;
+        }
+      }
+      Assertions.assertEquals(true,seq.arr[10]);
+      Assertions.assertEquals(10+1,seq.modCount);
+      Assertions.assertEquals(1,filter.callCount);
+    }
+  }
+  @Test
+  public void testCheckedListremoveIf_BooleanPredicate_SeqIsEmpty_RemoveTrueArrSeqCheckedListModifyingPredicate()
+  {
+    var seq=new BooleanArrSeq.CheckedList();
+    for(int i=0;i<0;++i){
+      seq.add(TypeConversionUtil.convertToboolean(i));
+    }
+    var filter=new BooleanMonitoredPredicate.RemoveTrueArrSeqCheckedListModifyingPredicate(seq);
+    Assertions.assertFalse(seq.removeIf((BooleanPredicate)filter));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,filter.callCount);
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedListremoveIf_BooleanPredicate_SeqIsEmpty_RemoveFalseArrSeqCheckedListModifyingPredicate()
+  {
+    var seq=new BooleanArrSeq.CheckedList();
+    for(int i=0;i<0;++i){
+      seq.add(TypeConversionUtil.convertToboolean(i));
+    }
+    var filter=new BooleanMonitoredPredicate.RemoveFalseArrSeqCheckedListModifyingPredicate(seq);
+    Assertions.assertFalse(seq.removeIf((BooleanPredicate)filter));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,filter.callCount);
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedListremoveIf_BooleanPredicate_SeqIsEmpty_RemoveAllPredicate()
+  {
+    var seq=new BooleanArrSeq.CheckedList();
+    for(int i=0;i<0;++i){
+      seq.add(TypeConversionUtil.convertToboolean(i));
+    }
+    var filter=new BooleanMonitoredPredicate.RemoveAllPredicate(seq);
+    Assertions.assertFalse(seq.removeIf((BooleanPredicate)filter));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,filter.callCount);
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedListremoveIf_BooleanPredicate_SeqIsEmpty_RemoveNonePredicate()
+  {
+    var seq=new BooleanArrSeq.CheckedList();
+    for(int i=0;i<0;++i){
+      seq.add(TypeConversionUtil.convertToboolean(i));
+    }
+    var filter=new BooleanMonitoredPredicate.RemoveNonePredicate(seq);
+    Assertions.assertFalse(seq.removeIf((BooleanPredicate)filter));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,filter.callCount);
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedListremoveIf_BooleanPredicate_SeqIsEmpty_RemoveAllArrSeqCheckedListModifyingPredicate()
+  {
+    var seq=new BooleanArrSeq.CheckedList();
+    for(int i=0;i<0;++i){
+      seq.add(TypeConversionUtil.convertToboolean(i));
+    }
+    var filter=new BooleanMonitoredPredicate.RemoveAllArrSeqCheckedListModifyingPredicate(seq);
+    Assertions.assertFalse(seq.removeIf((BooleanPredicate)filter));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,filter.callCount);
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedListremoveIf_BooleanPredicate_SeqIsEmpty_RemoveNoneArrSeqCheckedListModifyingPredicate()
+  {
+    var seq=new BooleanArrSeq.CheckedList();
+    for(int i=0;i<0;++i){
+      seq.add(TypeConversionUtil.convertToboolean(i));
+    }
+    var filter=new BooleanMonitoredPredicate.RemoveNoneArrSeqCheckedListModifyingPredicate(seq);
+    Assertions.assertFalse(seq.removeIf((BooleanPredicate)filter));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,filter.callCount);
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedListremoveIf_BooleanPredicate_SeqIsEmpty_ThrowingPredicate()
+  {
+    var seq=new BooleanArrSeq.CheckedList();
+    for(int i=0;i<0;++i){
+      seq.add(TypeConversionUtil.convertToboolean(i));
+    }
+    var filter=new BooleanMonitoredPredicate.ThrowingPredicate(seq);
+    Assertions.assertFalse(seq.removeIf((BooleanPredicate)filter));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,filter.callCount);
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedListremoveIf_BooleanPredicate_SeqIsEmpty_ModifyingArrSeqCheckedListAndThrowingPredicate()
+  {
+    var seq=new BooleanArrSeq.CheckedList();
+    for(int i=0;i<0;++i){
+      seq.add(TypeConversionUtil.convertToboolean(i));
+    }
+    var filter=new BooleanMonitoredPredicate.ModifyingArrSeqCheckedListAndThrowingPredicate(seq);
+    Assertions.assertFalse(seq.removeIf((BooleanPredicate)filter));
+    Assertions.assertEquals(0,seq.size());
+    Assertions.assertEquals(0,filter.callCount);
+    Assertions.assertEquals(0,seq.modCount);
+  }
+  @Test
+  public void testCheckedListadd_boolean_initialCapacityDEFAULT(){
+    var seq=new BooleanArrSeq.CheckedList();
+    for(int i=0;i<100;++i){
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
     }
     Assertions.assertEquals(100,seq.size);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i)
-    {
+    for(int i=0;i<seq.size;++i){
       Assertions.assertEquals(TypeConversionUtil.convertToboolean(i),seq.arr[i]);
     }
   }
   @Test
-  public void testCheckedListadd_boolean_initialCapacityNULL()
-  {
-    CheckedList seq=new CheckedList(0,null);
-    for(int i=0;i<100;++i)
-    {
+  public void testCheckedListadd_boolean_initialCapacityNULL(){
+    var seq=new BooleanArrSeq.CheckedList(0,null);
+    for(int i=0;i<100;++i){
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
     }
     Assertions.assertEquals(100,seq.size);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i)
-    {
+    for(int i=0;i<seq.size;++i){
       Assertions.assertEquals(TypeConversionUtil.convertToboolean(i),seq.arr[i]);
     }
   }
   @Test
-  public void testCheckedListadd_boolean_initialCapacity50()
-  {
-    CheckedList seq=new CheckedList(50);
-    for(int i=0;i<100;++i)
-    {
+  public void testCheckedListadd_boolean_initialCapacity50(){
+    var seq=new BooleanArrSeq.CheckedList(50);
+    for(int i=0;i<100;++i){
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
     }
     Assertions.assertEquals(100,seq.size);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i)
-    {
+    for(int i=0;i<seq.size;++i){
       Assertions.assertEquals(TypeConversionUtil.convertToboolean(i),seq.arr[i]);
     }
   }
   @Test
-  public void testCheckedListadd_Boolean_initialCapacityDEFAULT()
-  {
-    CheckedList seq=new CheckedList();
-    for(int i=0;i<100;++i)
-    {
+  public void testCheckedListadd_Boolean_initialCapacityDEFAULT(){
+    var seq=new BooleanArrSeq.CheckedList();
+    for(int i=0;i<100;++i){
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToBoolean(i)));
     }
     Assertions.assertEquals(100,seq.size);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i)
-    {
+    for(int i=0;i<seq.size;++i){
       Assertions.assertEquals(TypeConversionUtil.convertToboolean(i),seq.arr[i]);
     }
   }
   @Test
-  public void testCheckedListadd_Boolean_initialCapacityNULL()
-  {
-    CheckedList seq=new CheckedList(0,null);
-    for(int i=0;i<100;++i)
-    {
+  public void testCheckedListadd_Boolean_initialCapacityNULL(){
+    var seq=new BooleanArrSeq.CheckedList(0,null);
+    for(int i=0;i<100;++i){
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToBoolean(i)));
     }
     Assertions.assertEquals(100,seq.size);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i)
-    {
+    for(int i=0;i<seq.size;++i){
       Assertions.assertEquals(TypeConversionUtil.convertToboolean(i),seq.arr[i]);
     }
   }
   @Test
-  public void testCheckedListadd_Boolean_initialCapacity50()
-  {
-    CheckedList seq=new CheckedList(50);
-    for(int i=0;i<100;++i)
-    {
+  public void testCheckedListadd_Boolean_initialCapacity50(){
+    var seq=new BooleanArrSeq.CheckedList(50);
+    for(int i=0;i<100;++i){
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToBoolean(i)));
     }
     Assertions.assertEquals(100,seq.size);
     Assertions.assertNotNull(seq.arr);
     Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i)
-    {
+    for(int i=0;i<seq.size;++i){
       Assertions.assertEquals(TypeConversionUtil.convertToboolean(i),seq.arr[i]);
     }
   }
   @Test
-  public void testCheckedListtoBooleanArray_void_seqIsEmpty()
-  {
-    CheckedList seq=new CheckedList();
+  public void testCheckedListtoBooleanArray_void_seqIsEmpty(){
+    var seq=new BooleanArrSeq.CheckedList();
     Assertions.assertSame(OmniArray.OfBoolean.DEFAULT_ARR,seq.toBooleanArray());
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,seq.modCount);
   }
   @Test
-  public void testCheckedListtoBooleanArray_void_seqIsNotEmpty()
-  {
-    CheckedList seq=new CheckedList();
-    for(int i=0;i<100;++i)
-    {
+  public void testCheckedListtoBooleanArray_void_seqIsNotEmpty(){
+    var seq=new BooleanArrSeq.CheckedList();
+    for(int i=0;i<100;++i){
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
     }
     var result=seq.toBooleanArray();
@@ -3369,26 +8386,22 @@ public class BooleanArrSeqTest
     Assertions.assertEquals(100,seq.modCount);
     Assertions.assertEquals(100,result.length);
     var itr=seq.iterator();
-    for(int i=0;i<100;++i)
-    {
+    for(int i=0;i<100;++i){
       Assertions.assertEquals(itr.nextBoolean(),result[i]);
     }
     Assertions.assertNotSame(seq.arr,result);
   }
   @Test
-  public void testCheckedListtoArray_void_seqIsEmpty()
-  {
-    CheckedList seq=new CheckedList();
+  public void testCheckedListtoArray_void_seqIsEmpty(){
+    var seq=new BooleanArrSeq.CheckedList();
     Assertions.assertSame(OmniArray.OfBoolean.DEFAULT_BOXED_ARR,seq.toArray());
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,seq.modCount);
   }
   @Test
-  public void testCheckedListtoArray_void_seqIsNotEmpty()
-  {
-    CheckedList seq=new CheckedList();
-    for(int i=0;i<100;++i)
-    {
+  public void testCheckedListtoArray_void_seqIsNotEmpty(){
+    var seq=new BooleanArrSeq.CheckedList();
+    for(int i=0;i<100;++i){
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
     }
     var result=seq.toArray();
@@ -3396,26 +8409,22 @@ public class BooleanArrSeqTest
     Assertions.assertEquals(100,seq.modCount);
     Assertions.assertEquals(100,result.length);
     var itr=seq.iterator();
-    for(int i=0;i<100;++i)
-    {
+    for(int i=0;i<100;++i){
       Assertions.assertEquals(itr.next(),result[i]);
     }
     Assertions.assertNotSame(seq.arr,result);
   }
   @Test
-  public void testCheckedListtoDoubleArray_void_seqIsEmpty()
-  {
-    CheckedList seq=new CheckedList();
+  public void testCheckedListtoDoubleArray_void_seqIsEmpty(){
+    var seq=new BooleanArrSeq.CheckedList();
     Assertions.assertSame(OmniArray.OfDouble.DEFAULT_ARR,seq.toDoubleArray());
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,seq.modCount);
   }
   @Test
-  public void testCheckedListtoDoubleArray_void_seqIsNotEmpty()
-  {
-    CheckedList seq=new CheckedList();
-    for(int i=0;i<100;++i)
-    {
+  public void testCheckedListtoDoubleArray_void_seqIsNotEmpty(){
+    var seq=new BooleanArrSeq.CheckedList();
+    for(int i=0;i<100;++i){
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
     }
     var result=seq.toDoubleArray();
@@ -3423,26 +8432,22 @@ public class BooleanArrSeqTest
     Assertions.assertEquals(100,seq.modCount);
     Assertions.assertEquals(100,result.length);
     var itr=seq.iterator();
-    for(int i=0;i<100;++i)
-    {
+    for(int i=0;i<100;++i){
       Assertions.assertEquals(itr.nextDouble(),result[i]);
     }
     Assertions.assertNotSame(seq.arr,result);
   }
   @Test
-  public void testCheckedListtoFloatArray_void_seqIsEmpty()
-  {
-    CheckedList seq=new CheckedList();
+  public void testCheckedListtoFloatArray_void_seqIsEmpty(){
+    var seq=new BooleanArrSeq.CheckedList();
     Assertions.assertSame(OmniArray.OfFloat.DEFAULT_ARR,seq.toFloatArray());
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,seq.modCount);
   }
   @Test
-  public void testCheckedListtoFloatArray_void_seqIsNotEmpty()
-  {
-    CheckedList seq=new CheckedList();
-    for(int i=0;i<100;++i)
-    {
+  public void testCheckedListtoFloatArray_void_seqIsNotEmpty(){
+    var seq=new BooleanArrSeq.CheckedList();
+    for(int i=0;i<100;++i){
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
     }
     var result=seq.toFloatArray();
@@ -3450,26 +8455,22 @@ public class BooleanArrSeqTest
     Assertions.assertEquals(100,seq.modCount);
     Assertions.assertEquals(100,result.length);
     var itr=seq.iterator();
-    for(int i=0;i<100;++i)
-    {
+    for(int i=0;i<100;++i){
       Assertions.assertEquals(itr.nextFloat(),result[i]);
     }
     Assertions.assertNotSame(seq.arr,result);
   }
   @Test
-  public void testCheckedListtoLongArray_void_seqIsEmpty()
-  {
-    CheckedList seq=new CheckedList();
+  public void testCheckedListtoLongArray_void_seqIsEmpty(){
+    var seq=new BooleanArrSeq.CheckedList();
     Assertions.assertSame(OmniArray.OfLong.DEFAULT_ARR,seq.toLongArray());
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,seq.modCount);
   }
   @Test
-  public void testCheckedListtoLongArray_void_seqIsNotEmpty()
-  {
-    CheckedList seq=new CheckedList();
-    for(int i=0;i<100;++i)
-    {
+  public void testCheckedListtoLongArray_void_seqIsNotEmpty(){
+    var seq=new BooleanArrSeq.CheckedList();
+    for(int i=0;i<100;++i){
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
     }
     var result=seq.toLongArray();
@@ -3477,26 +8478,22 @@ public class BooleanArrSeqTest
     Assertions.assertEquals(100,seq.modCount);
     Assertions.assertEquals(100,result.length);
     var itr=seq.iterator();
-    for(int i=0;i<100;++i)
-    {
+    for(int i=0;i<100;++i){
       Assertions.assertEquals(itr.nextLong(),result[i]);
     }
     Assertions.assertNotSame(seq.arr,result);
   }
   @Test
-  public void testCheckedListtoIntArray_void_seqIsEmpty()
-  {
-    CheckedList seq=new CheckedList();
+  public void testCheckedListtoIntArray_void_seqIsEmpty(){
+    var seq=new BooleanArrSeq.CheckedList();
     Assertions.assertSame(OmniArray.OfInt.DEFAULT_ARR,seq.toIntArray());
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,seq.modCount);
   }
   @Test
-  public void testCheckedListtoIntArray_void_seqIsNotEmpty()
-  {
-    CheckedList seq=new CheckedList();
-    for(int i=0;i<100;++i)
-    {
+  public void testCheckedListtoIntArray_void_seqIsNotEmpty(){
+    var seq=new BooleanArrSeq.CheckedList();
+    for(int i=0;i<100;++i){
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
     }
     var result=seq.toIntArray();
@@ -3504,26 +8501,22 @@ public class BooleanArrSeqTest
     Assertions.assertEquals(100,seq.modCount);
     Assertions.assertEquals(100,result.length);
     var itr=seq.iterator();
-    for(int i=0;i<100;++i)
-    {
+    for(int i=0;i<100;++i){
       Assertions.assertEquals(itr.nextInt(),result[i]);
     }
     Assertions.assertNotSame(seq.arr,result);
   }
   @Test
-  public void testCheckedListtoShortArray_void_seqIsEmpty()
-  {
-    CheckedList seq=new CheckedList();
+  public void testCheckedListtoShortArray_void_seqIsEmpty(){
+    var seq=new BooleanArrSeq.CheckedList();
     Assertions.assertSame(OmniArray.OfShort.DEFAULT_ARR,seq.toShortArray());
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,seq.modCount);
   }
   @Test
-  public void testCheckedListtoShortArray_void_seqIsNotEmpty()
-  {
-    CheckedList seq=new CheckedList();
-    for(int i=0;i<100;++i)
-    {
+  public void testCheckedListtoShortArray_void_seqIsNotEmpty(){
+    var seq=new BooleanArrSeq.CheckedList();
+    for(int i=0;i<100;++i){
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
     }
     var result=seq.toShortArray();
@@ -3531,26 +8524,22 @@ public class BooleanArrSeqTest
     Assertions.assertEquals(100,seq.modCount);
     Assertions.assertEquals(100,result.length);
     var itr=seq.iterator();
-    for(int i=0;i<100;++i)
-    {
+    for(int i=0;i<100;++i){
       Assertions.assertEquals(itr.nextShort(),result[i]);
     }
     Assertions.assertNotSame(seq.arr,result);
   }
   @Test
-  public void testCheckedListtoCharArray_void_seqIsEmpty()
-  {
-    CheckedList seq=new CheckedList();
+  public void testCheckedListtoCharArray_void_seqIsEmpty(){
+    var seq=new BooleanArrSeq.CheckedList();
     Assertions.assertSame(OmniArray.OfChar.DEFAULT_ARR,seq.toCharArray());
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,seq.modCount);
   }
   @Test
-  public void testCheckedListtoCharArray_void_seqIsNotEmpty()
-  {
-    CheckedList seq=new CheckedList();
-    for(int i=0;i<100;++i)
-    {
+  public void testCheckedListtoCharArray_void_seqIsNotEmpty(){
+    var seq=new BooleanArrSeq.CheckedList();
+    for(int i=0;i<100;++i){
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
     }
     var result=seq.toCharArray();
@@ -3558,26 +8547,22 @@ public class BooleanArrSeqTest
     Assertions.assertEquals(100,seq.modCount);
     Assertions.assertEquals(100,result.length);
     var itr=seq.iterator();
-    for(int i=0;i<100;++i)
-    {
+    for(int i=0;i<100;++i){
       Assertions.assertEquals(itr.nextChar(),result[i]);
     }
     Assertions.assertNotSame(seq.arr,result);
   }
   @Test
-  public void testCheckedListtoByteArray_void_seqIsEmpty()
-  {
-    CheckedList seq=new CheckedList();
+  public void testCheckedListtoByteArray_void_seqIsEmpty(){
+    var seq=new BooleanArrSeq.CheckedList();
     Assertions.assertSame(OmniArray.OfByte.DEFAULT_ARR,seq.toByteArray());
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,seq.modCount);
   }
   @Test
-  public void testCheckedListtoByteArray_void_seqIsNotEmpty()
-  {
-    CheckedList seq=new CheckedList();
-    for(int i=0;i<100;++i)
-    {
+  public void testCheckedListtoByteArray_void_seqIsNotEmpty(){
+    var seq=new BooleanArrSeq.CheckedList();
+    for(int i=0;i<100;++i){
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
     }
     var result=seq.toByteArray();
@@ -3585,87 +8570,9 @@ public class BooleanArrSeqTest
     Assertions.assertEquals(100,seq.modCount);
     Assertions.assertEquals(100,result.length);
     var itr=seq.iterator();
-    for(int i=0;i<100;++i)
-    {
+    for(int i=0;i<100;++i){
       Assertions.assertEquals(itr.nextByte(),result[i]);
     }
     Assertions.assertNotSame(seq.arr,result);
-  }
-  static class MonitoredConsumer extends ArrayList implements BooleanConsumer
-    ,Consumer<Object>
-  {
-    private static final long serialVersionUID=1L;
-    @Override public void accept(boolean val)
-    {
-      super.add(val);
-    }
-    @Override public void accept(Object val)
-    {
-      accept((boolean)val);
-    }
-  }
-  static class ThrowingConsumer extends MonitoredConsumer
-  {
-    private static final long serialVersionUID=1L;
-    @Override public void accept(boolean val)
-    {
-      super.accept((boolean)val);
-      throw new IndexOutOfBoundsException();
-    }
-  }
-  private static abstract class AbstractMonitoredPredicate implements BooleanPredicate
-    ,Predicate<Object>
-  {
-    int callCounter;
-    abstract boolean testImpl(boolean val);
-    @Override public boolean test(boolean val)
-    {
-      ++callCounter;
-      return testImpl((boolean)val);
-    }
-    public AbstractMonitoredPredicate negate()
-    {
-      //don't care
-      return null;
-    }
-    @Override public boolean test(Object val)
-    {
-      return test((boolean)val);
-    }
-  }
-  static class RemoveAllPredicate extends AbstractMonitoredPredicate
-  {
-    boolean testImpl(boolean val)
-    {
-      return true;
-    }
-  }
-  static class RemoveNonePredicate extends AbstractMonitoredPredicate
-  {
-    boolean testImpl(boolean val)
-    {
-      return false;
-    }
-  }
-  static class ThrowingPredicate extends AbstractMonitoredPredicate
-  {
-    @Override boolean testImpl(boolean val)
-    {
-      throw new IndexOutOfBoundsException();
-    }
-  }
-  static class RemoveTruePredicate extends AbstractMonitoredPredicate
-  {
-    boolean testImpl(boolean val)
-    {
-      return val;
-    }
-  }
-  static class RemoveFalsePredicate extends AbstractMonitoredPredicate
-  {
-    boolean testImpl(boolean val)
-    {
-      return !val;
-    }
   }
 }

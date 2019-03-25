@@ -18,9 +18,6 @@ public class BitSetUtilTest{
             Assertions.assertTrue(BitSetUtil.containsword(word,i+1));
         }
     }
-    
-    
-    
     #MACRO TestMarkAndPullSurvivors<byte>()
     #MACRO TestMarkAndPullSurvivors<char>()
     #MACRO TestMarkAndPullSurvivors<short>()
@@ -29,8 +26,6 @@ public class BitSetUtilTest{
     #MACRO TestMarkAndPullSurvivors<float>()
     #MACRO TestMarkAndPullSurvivors<double>()
     #MACRO TestMarkAndPullSurvivors<Integer>()
-    
-    
 }
 
  
