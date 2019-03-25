@@ -438,7 +438,7 @@ public class LongArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RetainSecondPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RetainSecondPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -450,7 +450,7 @@ public class LongArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new LongMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -462,7 +462,7 @@ public class LongArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstAndThirdPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RemoveFirstAndThirdPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -474,7 +474,7 @@ public class LongArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RemoveFirstPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -486,7 +486,7 @@ public class LongArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new LongMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -497,7 +497,7 @@ public class LongArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveAllPredicate();
+    var filter=new LongMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -509,7 +509,7 @@ public class LongArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveNonePredicate();
+    var filter=new LongMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -521,7 +521,7 @@ public class LongArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RetainSecondPredicate();
+    var filter=new LongMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -533,7 +533,7 @@ public class LongArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new LongMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -545,7 +545,7 @@ public class LongArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new LongMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3-2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -557,7 +557,7 @@ public class LongArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new LongMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3-1,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -569,7 +569,7 @@ public class LongArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new LongMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3-2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -581,7 +581,7 @@ public class LongArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveAllPredicate();
+    var filter=new LongMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -593,7 +593,7 @@ public class LongArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveNonePredicate();
+    var filter=new LongMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -605,7 +605,7 @@ public class LongArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RetainSecondPredicate();
+    var filter=new LongMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -617,7 +617,7 @@ public class LongArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new LongMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -629,7 +629,7 @@ public class LongArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new LongMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50-2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -641,7 +641,7 @@ public class LongArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new LongMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50-1,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -653,7 +653,7 @@ public class LongArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new LongMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50-2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -665,7 +665,7 @@ public class LongArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveAllPredicate();
+    var filter=new LongMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -677,7 +677,7 @@ public class LongArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveNonePredicate();
+    var filter=new LongMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -689,7 +689,7 @@ public class LongArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RetainSecondPredicate();
+    var filter=new LongMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -701,7 +701,7 @@ public class LongArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new LongMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -713,7 +713,7 @@ public class LongArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new LongMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100-2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -725,7 +725,7 @@ public class LongArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new LongMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100-1,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -737,7 +737,7 @@ public class LongArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new LongMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100-2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -750,7 +750,7 @@ public class LongArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveAllPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RemoveAllPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -762,7 +762,7 @@ public class LongArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveNonePredicate(seq);
+    var filter=new LongMonitoredPredicate2.RemoveNonePredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -799,7 +799,7 @@ public class LongArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RetainSecondPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RetainSecondPredicate(seq);
     Assertions.assertFalse(seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -811,7 +811,7 @@ public class LongArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new LongMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertFalse(seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -823,7 +823,7 @@ public class LongArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstAndThirdPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RemoveFirstAndThirdPredicate(seq);
     Assertions.assertFalse(seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -835,7 +835,7 @@ public class LongArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RemoveFirstPredicate(seq);
     Assertions.assertFalse(seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -847,7 +847,7 @@ public class LongArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new LongMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertFalse(seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -858,7 +858,7 @@ public class LongArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveAllPredicate();
+    var filter=new LongMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -870,7 +870,7 @@ public class LongArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveNonePredicate();
+    var filter=new LongMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -882,7 +882,7 @@ public class LongArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RetainSecondPredicate();
+    var filter=new LongMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -894,7 +894,7 @@ public class LongArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new LongMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -906,7 +906,7 @@ public class LongArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new LongMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(3-2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -918,7 +918,7 @@ public class LongArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new LongMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(3-1,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -930,7 +930,7 @@ public class LongArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new LongMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(3-2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -942,7 +942,7 @@ public class LongArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveAllPredicate();
+    var filter=new LongMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -954,7 +954,7 @@ public class LongArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveNonePredicate();
+    var filter=new LongMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -966,7 +966,7 @@ public class LongArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RetainSecondPredicate();
+    var filter=new LongMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -978,7 +978,7 @@ public class LongArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new LongMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -990,7 +990,7 @@ public class LongArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new LongMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(50-2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -1002,7 +1002,7 @@ public class LongArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new LongMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(50-1,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -1014,7 +1014,7 @@ public class LongArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new LongMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(50-2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -1026,7 +1026,7 @@ public class LongArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveAllPredicate();
+    var filter=new LongMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -1038,7 +1038,7 @@ public class LongArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveNonePredicate();
+    var filter=new LongMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -1050,7 +1050,7 @@ public class LongArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RetainSecondPredicate();
+    var filter=new LongMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -1062,7 +1062,7 @@ public class LongArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new LongMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -1074,7 +1074,7 @@ public class LongArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new LongMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(100-2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -1086,7 +1086,7 @@ public class LongArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new LongMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(100-1,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -1098,7 +1098,7 @@ public class LongArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new LongMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(100-2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -1111,7 +1111,7 @@ public class LongArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveAllPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RemoveAllPredicate(seq);
     Assertions.assertFalse(seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -1123,7 +1123,7 @@ public class LongArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveNonePredicate(seq);
+    var filter=new LongMonitoredPredicate2.RemoveNonePredicate(seq);
     Assertions.assertFalse(seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -2067,7 +2067,7 @@ public class LongArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RetainSecondPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RetainSecondPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -2079,7 +2079,7 @@ public class LongArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new LongMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -2091,7 +2091,7 @@ public class LongArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstAndThirdPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RemoveFirstAndThirdPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -2103,7 +2103,7 @@ public class LongArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RemoveFirstPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -2115,7 +2115,7 @@ public class LongArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new LongMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -2126,7 +2126,7 @@ public class LongArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveAllPredicate();
+    var filter=new LongMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -2138,7 +2138,7 @@ public class LongArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveNonePredicate();
+    var filter=new LongMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -2150,7 +2150,7 @@ public class LongArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RetainSecondPredicate();
+    var filter=new LongMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -2162,7 +2162,7 @@ public class LongArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new LongMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -2174,7 +2174,7 @@ public class LongArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new LongMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3-2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -2186,7 +2186,7 @@ public class LongArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new LongMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3-1,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -2198,7 +2198,7 @@ public class LongArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new LongMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3-2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -2210,7 +2210,7 @@ public class LongArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveAllPredicate();
+    var filter=new LongMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -2222,7 +2222,7 @@ public class LongArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveNonePredicate();
+    var filter=new LongMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -2234,7 +2234,7 @@ public class LongArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RetainSecondPredicate();
+    var filter=new LongMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -2246,7 +2246,7 @@ public class LongArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new LongMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -2258,7 +2258,7 @@ public class LongArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new LongMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50-2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -2270,7 +2270,7 @@ public class LongArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new LongMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50-1,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -2282,7 +2282,7 @@ public class LongArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new LongMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50-2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -2294,7 +2294,7 @@ public class LongArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveAllPredicate();
+    var filter=new LongMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -2306,7 +2306,7 @@ public class LongArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveNonePredicate();
+    var filter=new LongMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -2318,7 +2318,7 @@ public class LongArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RetainSecondPredicate();
+    var filter=new LongMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -2330,7 +2330,7 @@ public class LongArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new LongMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -2342,7 +2342,7 @@ public class LongArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new LongMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100-2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -2354,7 +2354,7 @@ public class LongArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new LongMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100-1,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -2366,7 +2366,7 @@ public class LongArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new LongMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100-2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -2379,7 +2379,7 @@ public class LongArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveAllPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RemoveAllPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -2391,7 +2391,7 @@ public class LongArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveNonePredicate(seq);
+    var filter=new LongMonitoredPredicate2.RemoveNonePredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -2428,7 +2428,7 @@ public class LongArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RetainSecondPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RetainSecondPredicate(seq);
     Assertions.assertFalse(seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -2440,7 +2440,7 @@ public class LongArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new LongMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertFalse(seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -2452,7 +2452,7 @@ public class LongArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstAndThirdPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RemoveFirstAndThirdPredicate(seq);
     Assertions.assertFalse(seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -2464,7 +2464,7 @@ public class LongArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RemoveFirstPredicate(seq);
     Assertions.assertFalse(seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -2476,7 +2476,7 @@ public class LongArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new LongMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertFalse(seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -2487,7 +2487,7 @@ public class LongArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveAllPredicate();
+    var filter=new LongMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -2499,7 +2499,7 @@ public class LongArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveNonePredicate();
+    var filter=new LongMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -2511,7 +2511,7 @@ public class LongArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RetainSecondPredicate();
+    var filter=new LongMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -2523,7 +2523,7 @@ public class LongArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new LongMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -2535,7 +2535,7 @@ public class LongArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new LongMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(3-2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -2547,7 +2547,7 @@ public class LongArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new LongMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(3-1,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -2559,7 +2559,7 @@ public class LongArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new LongMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(3-2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -2571,7 +2571,7 @@ public class LongArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveAllPredicate();
+    var filter=new LongMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -2583,7 +2583,7 @@ public class LongArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveNonePredicate();
+    var filter=new LongMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -2595,7 +2595,7 @@ public class LongArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RetainSecondPredicate();
+    var filter=new LongMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -2607,7 +2607,7 @@ public class LongArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new LongMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -2619,7 +2619,7 @@ public class LongArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new LongMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(50-2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -2631,7 +2631,7 @@ public class LongArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new LongMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(50-1,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -2643,7 +2643,7 @@ public class LongArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new LongMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(50-2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -2655,7 +2655,7 @@ public class LongArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveAllPredicate();
+    var filter=new LongMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -2667,7 +2667,7 @@ public class LongArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveNonePredicate();
+    var filter=new LongMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -2679,7 +2679,7 @@ public class LongArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RetainSecondPredicate();
+    var filter=new LongMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -2691,7 +2691,7 @@ public class LongArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new LongMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -2703,7 +2703,7 @@ public class LongArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new LongMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(100-2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -2715,7 +2715,7 @@ public class LongArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new LongMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(100-1,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -2727,7 +2727,7 @@ public class LongArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new LongMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(100-2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -2740,7 +2740,7 @@ public class LongArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveAllPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RemoveAllPredicate(seq);
     Assertions.assertFalse(seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -2752,7 +2752,7 @@ public class LongArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveNonePredicate(seq);
+    var filter=new LongMonitoredPredicate2.RemoveNonePredicate(seq);
     Assertions.assertFalse(seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -3889,7 +3889,7 @@ public class LongArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RetainSecondArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RetainSecondArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -3902,7 +3902,7 @@ public class LongArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RetainSecondAndLastArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RetainSecondAndLastArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -3915,7 +3915,7 @@ public class LongArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstAndThirdArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RemoveFirstAndThirdArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -3928,7 +3928,7 @@ public class LongArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RemoveFirstArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -3941,7 +3941,7 @@ public class LongArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstAndSecondToLastArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RemoveFirstAndSecondToLastArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -3952,7 +3952,7 @@ public class LongArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.ModifyingArrSeqCheckedStackAndThrowingPredicate(seq);
+    var filter=new LongMonitoredPredicate2.ModifyingArrSeqCheckedStackAndThrowingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3+1,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -3965,7 +3965,7 @@ public class LongArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.ThrowingPredicate();
+    var filter=new LongMonitoredPredicate2.ThrowingPredicate();
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -3978,7 +3978,7 @@ public class LongArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveAllArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RemoveAllArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -3991,7 +3991,7 @@ public class LongArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveNoneArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RemoveNoneArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -4004,7 +4004,7 @@ public class LongArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RetainSecondArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RetainSecondArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -4017,7 +4017,7 @@ public class LongArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RetainSecondAndLastArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RetainSecondAndLastArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -4030,7 +4030,7 @@ public class LongArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstAndThirdArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RemoveFirstAndThirdArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -4043,7 +4043,7 @@ public class LongArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RemoveFirstArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -4056,7 +4056,7 @@ public class LongArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstAndSecondToLastArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RemoveFirstAndSecondToLastArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -4068,7 +4068,7 @@ public class LongArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.ModifyingArrSeqCheckedStackAndThrowingPredicate(seq);
+    var filter=new LongMonitoredPredicate2.ModifyingArrSeqCheckedStackAndThrowingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50+1,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -4081,7 +4081,7 @@ public class LongArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.ThrowingPredicate();
+    var filter=new LongMonitoredPredicate2.ThrowingPredicate();
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -4094,7 +4094,7 @@ public class LongArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveAllArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RemoveAllArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -4107,7 +4107,7 @@ public class LongArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveNoneArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RemoveNoneArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -4120,7 +4120,7 @@ public class LongArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RetainSecondArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RetainSecondArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -4133,7 +4133,7 @@ public class LongArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RetainSecondAndLastArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RetainSecondAndLastArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -4146,7 +4146,7 @@ public class LongArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstAndThirdArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RemoveFirstAndThirdArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -4159,7 +4159,7 @@ public class LongArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RemoveFirstArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -4172,7 +4172,7 @@ public class LongArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstAndSecondToLastArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RemoveFirstAndSecondToLastArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -4184,7 +4184,7 @@ public class LongArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.ModifyingArrSeqCheckedStackAndThrowingPredicate(seq);
+    var filter=new LongMonitoredPredicate2.ModifyingArrSeqCheckedStackAndThrowingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100+1,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -4197,7 +4197,7 @@ public class LongArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.ThrowingPredicate();
+    var filter=new LongMonitoredPredicate2.ThrowingPredicate();
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -4210,7 +4210,7 @@ public class LongArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveAllArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RemoveAllArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -4223,7 +4223,7 @@ public class LongArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveNoneArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RemoveNoneArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -4236,7 +4236,7 @@ public class LongArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RetainSecondArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RetainSecondArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -4249,7 +4249,7 @@ public class LongArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RetainSecondAndLastArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RetainSecondAndLastArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -4262,7 +4262,7 @@ public class LongArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstAndThirdArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RemoveFirstAndThirdArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -4275,7 +4275,7 @@ public class LongArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RemoveFirstArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -4288,7 +4288,7 @@ public class LongArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstAndSecondToLastArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RemoveFirstAndSecondToLastArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -4302,7 +4302,7 @@ public class LongArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RetainSecondPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RetainSecondPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -4315,7 +4315,7 @@ public class LongArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new LongMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -4328,7 +4328,7 @@ public class LongArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstAndThirdPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RemoveFirstAndThirdPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -4341,7 +4341,7 @@ public class LongArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RemoveFirstPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -4354,7 +4354,7 @@ public class LongArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new LongMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -4366,7 +4366,7 @@ public class LongArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveAllPredicate();
+    var filter=new LongMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -4378,7 +4378,7 @@ public class LongArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveNonePredicate();
+    var filter=new LongMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -4390,7 +4390,7 @@ public class LongArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RetainSecondPredicate();
+    var filter=new LongMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -4402,7 +4402,7 @@ public class LongArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new LongMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -4414,7 +4414,7 @@ public class LongArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new LongMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3-2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -4426,7 +4426,7 @@ public class LongArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new LongMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3-1,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -4438,7 +4438,7 @@ public class LongArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new LongMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3-2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -4450,7 +4450,7 @@ public class LongArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveAllPredicate();
+    var filter=new LongMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -4462,7 +4462,7 @@ public class LongArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveNonePredicate();
+    var filter=new LongMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -4474,7 +4474,7 @@ public class LongArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RetainSecondPredicate();
+    var filter=new LongMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -4486,7 +4486,7 @@ public class LongArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new LongMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -4498,7 +4498,7 @@ public class LongArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new LongMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50-2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -4510,7 +4510,7 @@ public class LongArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new LongMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50-1,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -4522,7 +4522,7 @@ public class LongArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new LongMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50-2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -4534,7 +4534,7 @@ public class LongArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveAllPredicate();
+    var filter=new LongMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -4546,7 +4546,7 @@ public class LongArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveNonePredicate();
+    var filter=new LongMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -4558,7 +4558,7 @@ public class LongArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RetainSecondPredicate();
+    var filter=new LongMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -4570,7 +4570,7 @@ public class LongArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new LongMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -4582,7 +4582,7 @@ public class LongArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new LongMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100-2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -4594,7 +4594,7 @@ public class LongArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new LongMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100-1,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -4606,7 +4606,7 @@ public class LongArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new LongMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100-2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -4619,7 +4619,7 @@ public class LongArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveAllPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RemoveAllPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -4632,7 +4632,7 @@ public class LongArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveNonePredicate(seq);
+    var filter=new LongMonitoredPredicate2.RemoveNonePredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -4645,7 +4645,7 @@ public class LongArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveAllArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RemoveAllArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -4658,7 +4658,7 @@ public class LongArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveNoneArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RemoveNoneArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -4671,7 +4671,7 @@ public class LongArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.ThrowingPredicate(seq);
+    var filter=new LongMonitoredPredicate2.ThrowingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -4684,7 +4684,7 @@ public class LongArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.ModifyingArrSeqCheckedStackAndThrowingPredicate(seq);
+    var filter=new LongMonitoredPredicate2.ModifyingArrSeqCheckedStackAndThrowingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -4797,7 +4797,7 @@ public class LongArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RetainSecondArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RetainSecondArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -4810,7 +4810,7 @@ public class LongArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RetainSecondAndLastArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RetainSecondAndLastArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -4823,7 +4823,7 @@ public class LongArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstAndThirdArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RemoveFirstAndThirdArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -4836,7 +4836,7 @@ public class LongArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RemoveFirstArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -4849,7 +4849,7 @@ public class LongArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstAndSecondToLastArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RemoveFirstAndSecondToLastArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -4860,7 +4860,7 @@ public class LongArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.ModifyingArrSeqCheckedStackAndThrowingPredicate(seq);
+    var filter=new LongMonitoredPredicate2.ModifyingArrSeqCheckedStackAndThrowingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(3+1,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -4873,7 +4873,7 @@ public class LongArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.ThrowingPredicate();
+    var filter=new LongMonitoredPredicate2.ThrowingPredicate();
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -4886,7 +4886,7 @@ public class LongArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveAllArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RemoveAllArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -4899,7 +4899,7 @@ public class LongArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveNoneArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RemoveNoneArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -4912,7 +4912,7 @@ public class LongArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RetainSecondArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RetainSecondArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -4925,7 +4925,7 @@ public class LongArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RetainSecondAndLastArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RetainSecondAndLastArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -4938,7 +4938,7 @@ public class LongArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstAndThirdArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RemoveFirstAndThirdArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -4951,7 +4951,7 @@ public class LongArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RemoveFirstArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -4964,7 +4964,7 @@ public class LongArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstAndSecondToLastArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RemoveFirstAndSecondToLastArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -4976,7 +4976,7 @@ public class LongArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.ModifyingArrSeqCheckedStackAndThrowingPredicate(seq);
+    var filter=new LongMonitoredPredicate2.ModifyingArrSeqCheckedStackAndThrowingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(50+1,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -4989,7 +4989,7 @@ public class LongArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.ThrowingPredicate();
+    var filter=new LongMonitoredPredicate2.ThrowingPredicate();
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -5002,7 +5002,7 @@ public class LongArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveAllArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RemoveAllArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -5015,7 +5015,7 @@ public class LongArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveNoneArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RemoveNoneArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -5028,7 +5028,7 @@ public class LongArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RetainSecondArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RetainSecondArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -5041,7 +5041,7 @@ public class LongArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RetainSecondAndLastArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RetainSecondAndLastArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -5054,7 +5054,7 @@ public class LongArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstAndThirdArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RemoveFirstAndThirdArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -5067,7 +5067,7 @@ public class LongArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RemoveFirstArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -5080,7 +5080,7 @@ public class LongArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstAndSecondToLastArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RemoveFirstAndSecondToLastArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -5092,7 +5092,7 @@ public class LongArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.ModifyingArrSeqCheckedStackAndThrowingPredicate(seq);
+    var filter=new LongMonitoredPredicate2.ModifyingArrSeqCheckedStackAndThrowingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(100+1,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -5105,7 +5105,7 @@ public class LongArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.ThrowingPredicate();
+    var filter=new LongMonitoredPredicate2.ThrowingPredicate();
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -5118,7 +5118,7 @@ public class LongArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveAllArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RemoveAllArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -5131,7 +5131,7 @@ public class LongArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveNoneArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RemoveNoneArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -5144,7 +5144,7 @@ public class LongArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RetainSecondArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RetainSecondArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -5157,7 +5157,7 @@ public class LongArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RetainSecondAndLastArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RetainSecondAndLastArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -5170,7 +5170,7 @@ public class LongArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstAndThirdArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RemoveFirstAndThirdArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -5183,7 +5183,7 @@ public class LongArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RemoveFirstArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -5196,7 +5196,7 @@ public class LongArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstAndSecondToLastArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RemoveFirstAndSecondToLastArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -5210,7 +5210,7 @@ public class LongArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RetainSecondPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RetainSecondPredicate(seq);
     Assertions.assertFalse(seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -5223,7 +5223,7 @@ public class LongArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new LongMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertFalse(seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -5236,7 +5236,7 @@ public class LongArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstAndThirdPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RemoveFirstAndThirdPredicate(seq);
     Assertions.assertFalse(seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -5249,7 +5249,7 @@ public class LongArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RemoveFirstPredicate(seq);
     Assertions.assertFalse(seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -5262,7 +5262,7 @@ public class LongArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new LongMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertFalse(seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -5274,7 +5274,7 @@ public class LongArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveAllPredicate();
+    var filter=new LongMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -5286,7 +5286,7 @@ public class LongArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveNonePredicate();
+    var filter=new LongMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -5298,7 +5298,7 @@ public class LongArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RetainSecondPredicate();
+    var filter=new LongMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -5310,7 +5310,7 @@ public class LongArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new LongMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -5322,7 +5322,7 @@ public class LongArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new LongMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(3-2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -5334,7 +5334,7 @@ public class LongArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new LongMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(3-1,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -5346,7 +5346,7 @@ public class LongArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new LongMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(3-2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -5358,7 +5358,7 @@ public class LongArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveAllPredicate();
+    var filter=new LongMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -5370,7 +5370,7 @@ public class LongArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveNonePredicate();
+    var filter=new LongMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -5382,7 +5382,7 @@ public class LongArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RetainSecondPredicate();
+    var filter=new LongMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -5394,7 +5394,7 @@ public class LongArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new LongMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -5406,7 +5406,7 @@ public class LongArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new LongMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(50-2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -5418,7 +5418,7 @@ public class LongArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new LongMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(50-1,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -5430,7 +5430,7 @@ public class LongArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new LongMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(50-2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -5442,7 +5442,7 @@ public class LongArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveAllPredicate();
+    var filter=new LongMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -5454,7 +5454,7 @@ public class LongArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveNonePredicate();
+    var filter=new LongMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -5466,7 +5466,7 @@ public class LongArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RetainSecondPredicate();
+    var filter=new LongMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -5478,7 +5478,7 @@ public class LongArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new LongMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -5490,7 +5490,7 @@ public class LongArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new LongMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(100-2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -5502,7 +5502,7 @@ public class LongArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new LongMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(100-1,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -5514,7 +5514,7 @@ public class LongArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new LongMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(100-2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -5527,7 +5527,7 @@ public class LongArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveAllPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RemoveAllPredicate(seq);
     Assertions.assertFalse(seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -5540,7 +5540,7 @@ public class LongArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveNonePredicate(seq);
+    var filter=new LongMonitoredPredicate2.RemoveNonePredicate(seq);
     Assertions.assertFalse(seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -5553,7 +5553,7 @@ public class LongArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveAllArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RemoveAllArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -5566,7 +5566,7 @@ public class LongArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveNoneArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RemoveNoneArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -5579,7 +5579,7 @@ public class LongArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.ThrowingPredicate(seq);
+    var filter=new LongMonitoredPredicate2.ThrowingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -5592,7 +5592,7 @@ public class LongArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.ModifyingArrSeqCheckedStackAndThrowingPredicate(seq);
+    var filter=new LongMonitoredPredicate2.ModifyingArrSeqCheckedStackAndThrowingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -6774,7 +6774,7 @@ public class LongArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RetainSecondArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RetainSecondArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -6787,7 +6787,7 @@ public class LongArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RetainSecondAndLastArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RetainSecondAndLastArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -6800,7 +6800,7 @@ public class LongArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstAndThirdArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RemoveFirstAndThirdArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -6813,7 +6813,7 @@ public class LongArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RemoveFirstArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -6826,7 +6826,7 @@ public class LongArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstAndSecondToLastArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RemoveFirstAndSecondToLastArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -6837,7 +6837,7 @@ public class LongArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.ModifyingArrSeqCheckedListAndThrowingPredicate(seq);
+    var filter=new LongMonitoredPredicate2.ModifyingArrSeqCheckedListAndThrowingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3+1,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -6850,7 +6850,7 @@ public class LongArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.ThrowingPredicate();
+    var filter=new LongMonitoredPredicate2.ThrowingPredicate();
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -6863,7 +6863,7 @@ public class LongArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveAllArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RemoveAllArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -6876,7 +6876,7 @@ public class LongArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveNoneArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RemoveNoneArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -6889,7 +6889,7 @@ public class LongArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RetainSecondArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RetainSecondArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -6902,7 +6902,7 @@ public class LongArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RetainSecondAndLastArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RetainSecondAndLastArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -6915,7 +6915,7 @@ public class LongArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstAndThirdArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RemoveFirstAndThirdArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -6928,7 +6928,7 @@ public class LongArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RemoveFirstArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -6941,7 +6941,7 @@ public class LongArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstAndSecondToLastArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RemoveFirstAndSecondToLastArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -6953,7 +6953,7 @@ public class LongArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.ModifyingArrSeqCheckedListAndThrowingPredicate(seq);
+    var filter=new LongMonitoredPredicate2.ModifyingArrSeqCheckedListAndThrowingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50+1,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -6966,7 +6966,7 @@ public class LongArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.ThrowingPredicate();
+    var filter=new LongMonitoredPredicate2.ThrowingPredicate();
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -6979,7 +6979,7 @@ public class LongArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveAllArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RemoveAllArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -6992,7 +6992,7 @@ public class LongArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveNoneArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RemoveNoneArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -7005,7 +7005,7 @@ public class LongArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RetainSecondArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RetainSecondArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -7018,7 +7018,7 @@ public class LongArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RetainSecondAndLastArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RetainSecondAndLastArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -7031,7 +7031,7 @@ public class LongArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstAndThirdArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RemoveFirstAndThirdArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -7044,7 +7044,7 @@ public class LongArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RemoveFirstArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -7057,7 +7057,7 @@ public class LongArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstAndSecondToLastArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RemoveFirstAndSecondToLastArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -7069,7 +7069,7 @@ public class LongArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.ModifyingArrSeqCheckedListAndThrowingPredicate(seq);
+    var filter=new LongMonitoredPredicate2.ModifyingArrSeqCheckedListAndThrowingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100+1,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -7082,7 +7082,7 @@ public class LongArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.ThrowingPredicate();
+    var filter=new LongMonitoredPredicate2.ThrowingPredicate();
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -7095,7 +7095,7 @@ public class LongArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveAllArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RemoveAllArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -7108,7 +7108,7 @@ public class LongArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveNoneArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RemoveNoneArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -7121,7 +7121,7 @@ public class LongArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RetainSecondArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RetainSecondArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -7134,7 +7134,7 @@ public class LongArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RetainSecondAndLastArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RetainSecondAndLastArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -7147,7 +7147,7 @@ public class LongArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstAndThirdArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RemoveFirstAndThirdArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -7160,7 +7160,7 @@ public class LongArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RemoveFirstArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -7173,7 +7173,7 @@ public class LongArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstAndSecondToLastArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RemoveFirstAndSecondToLastArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -7187,7 +7187,7 @@ public class LongArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RetainSecondPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RetainSecondPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -7200,7 +7200,7 @@ public class LongArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new LongMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -7213,7 +7213,7 @@ public class LongArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstAndThirdPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RemoveFirstAndThirdPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -7226,7 +7226,7 @@ public class LongArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RemoveFirstPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -7239,7 +7239,7 @@ public class LongArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new LongMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -7251,7 +7251,7 @@ public class LongArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveAllPredicate();
+    var filter=new LongMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -7263,7 +7263,7 @@ public class LongArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveNonePredicate();
+    var filter=new LongMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -7275,7 +7275,7 @@ public class LongArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RetainSecondPredicate();
+    var filter=new LongMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -7287,7 +7287,7 @@ public class LongArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new LongMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -7299,7 +7299,7 @@ public class LongArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new LongMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3-2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -7311,7 +7311,7 @@ public class LongArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new LongMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3-1,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -7323,7 +7323,7 @@ public class LongArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new LongMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3-2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -7335,7 +7335,7 @@ public class LongArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveAllPredicate();
+    var filter=new LongMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -7347,7 +7347,7 @@ public class LongArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveNonePredicate();
+    var filter=new LongMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -7359,7 +7359,7 @@ public class LongArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RetainSecondPredicate();
+    var filter=new LongMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -7371,7 +7371,7 @@ public class LongArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new LongMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -7383,7 +7383,7 @@ public class LongArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new LongMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50-2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -7395,7 +7395,7 @@ public class LongArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new LongMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50-1,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -7407,7 +7407,7 @@ public class LongArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new LongMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50-2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -7419,7 +7419,7 @@ public class LongArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveAllPredicate();
+    var filter=new LongMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -7431,7 +7431,7 @@ public class LongArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveNonePredicate();
+    var filter=new LongMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -7443,7 +7443,7 @@ public class LongArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RetainSecondPredicate();
+    var filter=new LongMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -7455,7 +7455,7 @@ public class LongArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new LongMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -7467,7 +7467,7 @@ public class LongArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new LongMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100-2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -7479,7 +7479,7 @@ public class LongArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new LongMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100-1,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -7491,7 +7491,7 @@ public class LongArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new LongMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100-2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -7504,7 +7504,7 @@ public class LongArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveAllPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RemoveAllPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -7517,7 +7517,7 @@ public class LongArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveNonePredicate(seq);
+    var filter=new LongMonitoredPredicate2.RemoveNonePredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -7530,7 +7530,7 @@ public class LongArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveAllArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RemoveAllArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -7543,7 +7543,7 @@ public class LongArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveNoneArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RemoveNoneArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -7556,7 +7556,7 @@ public class LongArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.ThrowingPredicate(seq);
+    var filter=new LongMonitoredPredicate2.ThrowingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -7569,7 +7569,7 @@ public class LongArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.ModifyingArrSeqCheckedListAndThrowingPredicate(seq);
+    var filter=new LongMonitoredPredicate2.ModifyingArrSeqCheckedListAndThrowingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -7682,7 +7682,7 @@ public class LongArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RetainSecondArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RetainSecondArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -7695,7 +7695,7 @@ public class LongArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RetainSecondAndLastArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RetainSecondAndLastArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -7708,7 +7708,7 @@ public class LongArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstAndThirdArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RemoveFirstAndThirdArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -7721,7 +7721,7 @@ public class LongArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RemoveFirstArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -7734,7 +7734,7 @@ public class LongArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstAndSecondToLastArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RemoveFirstAndSecondToLastArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -7745,7 +7745,7 @@ public class LongArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.ModifyingArrSeqCheckedListAndThrowingPredicate(seq);
+    var filter=new LongMonitoredPredicate2.ModifyingArrSeqCheckedListAndThrowingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(3+1,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -7758,7 +7758,7 @@ public class LongArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.ThrowingPredicate();
+    var filter=new LongMonitoredPredicate2.ThrowingPredicate();
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -7771,7 +7771,7 @@ public class LongArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveAllArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RemoveAllArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -7784,7 +7784,7 @@ public class LongArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveNoneArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RemoveNoneArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -7797,7 +7797,7 @@ public class LongArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RetainSecondArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RetainSecondArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -7810,7 +7810,7 @@ public class LongArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RetainSecondAndLastArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RetainSecondAndLastArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -7823,7 +7823,7 @@ public class LongArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstAndThirdArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RemoveFirstAndThirdArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -7836,7 +7836,7 @@ public class LongArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RemoveFirstArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -7849,7 +7849,7 @@ public class LongArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstAndSecondToLastArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RemoveFirstAndSecondToLastArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -7861,7 +7861,7 @@ public class LongArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.ModifyingArrSeqCheckedListAndThrowingPredicate(seq);
+    var filter=new LongMonitoredPredicate2.ModifyingArrSeqCheckedListAndThrowingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(50+1,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -7874,7 +7874,7 @@ public class LongArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.ThrowingPredicate();
+    var filter=new LongMonitoredPredicate2.ThrowingPredicate();
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -7887,7 +7887,7 @@ public class LongArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveAllArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RemoveAllArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -7900,7 +7900,7 @@ public class LongArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveNoneArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RemoveNoneArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -7913,7 +7913,7 @@ public class LongArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RetainSecondArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RetainSecondArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -7926,7 +7926,7 @@ public class LongArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RetainSecondAndLastArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RetainSecondAndLastArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -7939,7 +7939,7 @@ public class LongArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstAndThirdArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RemoveFirstAndThirdArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -7952,7 +7952,7 @@ public class LongArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RemoveFirstArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -7965,7 +7965,7 @@ public class LongArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstAndSecondToLastArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RemoveFirstAndSecondToLastArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -7977,7 +7977,7 @@ public class LongArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.ModifyingArrSeqCheckedListAndThrowingPredicate(seq);
+    var filter=new LongMonitoredPredicate2.ModifyingArrSeqCheckedListAndThrowingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(100+1,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -7990,7 +7990,7 @@ public class LongArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.ThrowingPredicate();
+    var filter=new LongMonitoredPredicate2.ThrowingPredicate();
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -8003,7 +8003,7 @@ public class LongArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveAllArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RemoveAllArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -8016,7 +8016,7 @@ public class LongArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveNoneArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RemoveNoneArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -8029,7 +8029,7 @@ public class LongArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RetainSecondArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RetainSecondArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -8042,7 +8042,7 @@ public class LongArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RetainSecondAndLastArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RetainSecondAndLastArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -8055,7 +8055,7 @@ public class LongArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstAndThirdArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RemoveFirstAndThirdArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -8068,7 +8068,7 @@ public class LongArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RemoveFirstArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -8081,7 +8081,7 @@ public class LongArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstAndSecondToLastArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RemoveFirstAndSecondToLastArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -8095,7 +8095,7 @@ public class LongArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RetainSecondPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RetainSecondPredicate(seq);
     Assertions.assertFalse(seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -8108,7 +8108,7 @@ public class LongArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new LongMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertFalse(seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -8121,7 +8121,7 @@ public class LongArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstAndThirdPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RemoveFirstAndThirdPredicate(seq);
     Assertions.assertFalse(seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -8134,7 +8134,7 @@ public class LongArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RemoveFirstPredicate(seq);
     Assertions.assertFalse(seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -8147,7 +8147,7 @@ public class LongArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new LongMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertFalse(seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -8159,7 +8159,7 @@ public class LongArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveAllPredicate();
+    var filter=new LongMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -8171,7 +8171,7 @@ public class LongArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveNonePredicate();
+    var filter=new LongMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -8183,7 +8183,7 @@ public class LongArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RetainSecondPredicate();
+    var filter=new LongMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -8195,7 +8195,7 @@ public class LongArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new LongMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -8207,7 +8207,7 @@ public class LongArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new LongMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(3-2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -8219,7 +8219,7 @@ public class LongArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new LongMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(3-1,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -8231,7 +8231,7 @@ public class LongArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new LongMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(3-2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -8243,7 +8243,7 @@ public class LongArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveAllPredicate();
+    var filter=new LongMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -8255,7 +8255,7 @@ public class LongArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveNonePredicate();
+    var filter=new LongMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -8267,7 +8267,7 @@ public class LongArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RetainSecondPredicate();
+    var filter=new LongMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -8279,7 +8279,7 @@ public class LongArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new LongMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -8291,7 +8291,7 @@ public class LongArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new LongMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(50-2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -8303,7 +8303,7 @@ public class LongArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new LongMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(50-1,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -8315,7 +8315,7 @@ public class LongArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new LongMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(50-2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -8327,7 +8327,7 @@ public class LongArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveAllPredicate();
+    var filter=new LongMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -8339,7 +8339,7 @@ public class LongArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveNonePredicate();
+    var filter=new LongMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -8351,7 +8351,7 @@ public class LongArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RetainSecondPredicate();
+    var filter=new LongMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -8363,7 +8363,7 @@ public class LongArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new LongMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -8375,7 +8375,7 @@ public class LongArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new LongMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(100-2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -8387,7 +8387,7 @@ public class LongArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new LongMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(100-1,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -8399,7 +8399,7 @@ public class LongArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new LongMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(100-2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -8412,7 +8412,7 @@ public class LongArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveAllPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RemoveAllPredicate(seq);
     Assertions.assertFalse(seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -8425,7 +8425,7 @@ public class LongArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveNonePredicate(seq);
+    var filter=new LongMonitoredPredicate2.RemoveNonePredicate(seq);
     Assertions.assertFalse(seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -8438,7 +8438,7 @@ public class LongArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveAllArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RemoveAllArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -8451,7 +8451,7 @@ public class LongArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.RemoveNoneArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new LongMonitoredPredicate2.RemoveNoneArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -8464,7 +8464,7 @@ public class LongArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.ThrowingPredicate(seq);
+    var filter=new LongMonitoredPredicate2.ThrowingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -8477,7 +8477,7 @@ public class LongArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTolong(i));
     }
-    var filter=new LongMonitoredPredicate.ModifyingArrSeqCheckedListAndThrowingPredicate(seq);
+    var filter=new LongMonitoredPredicate2.ModifyingArrSeqCheckedListAndThrowingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((LongPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);

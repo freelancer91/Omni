@@ -450,7 +450,7 @@ public class RefArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RetainSecondPredicate(seq);
+    var filter=new RefMonitoredPredicate2.RetainSecondPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -462,7 +462,7 @@ public class RefArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new RefMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -474,7 +474,7 @@ public class RefArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RemoveFirstAndThirdPredicate(seq);
+    var filter=new RefMonitoredPredicate2.RemoveFirstAndThirdPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -486,7 +486,7 @@ public class RefArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RemoveFirstPredicate(seq);
+    var filter=new RefMonitoredPredicate2.RemoveFirstPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -498,7 +498,7 @@ public class RefArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new RefMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -509,7 +509,7 @@ public class RefArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RemoveAllPredicate();
+    var filter=new RefMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -521,7 +521,7 @@ public class RefArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RemoveNonePredicate();
+    var filter=new RefMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -533,7 +533,7 @@ public class RefArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RetainSecondPredicate();
+    var filter=new RefMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -545,7 +545,7 @@ public class RefArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new RefMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -557,7 +557,7 @@ public class RefArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new RefMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3-2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -569,7 +569,7 @@ public class RefArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new RefMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3-1,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -581,7 +581,7 @@ public class RefArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new RefMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3-2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -593,7 +593,7 @@ public class RefArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RemoveAllPredicate();
+    var filter=new RefMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -605,7 +605,7 @@ public class RefArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RemoveNonePredicate();
+    var filter=new RefMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -617,7 +617,7 @@ public class RefArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RetainSecondPredicate();
+    var filter=new RefMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -629,7 +629,7 @@ public class RefArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new RefMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -641,7 +641,7 @@ public class RefArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new RefMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50-2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -653,7 +653,7 @@ public class RefArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new RefMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50-1,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -665,7 +665,7 @@ public class RefArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new RefMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50-2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -677,7 +677,7 @@ public class RefArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RemoveAllPredicate();
+    var filter=new RefMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -689,7 +689,7 @@ public class RefArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RemoveNonePredicate();
+    var filter=new RefMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -701,7 +701,7 @@ public class RefArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RetainSecondPredicate();
+    var filter=new RefMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -713,7 +713,7 @@ public class RefArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new RefMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -725,7 +725,7 @@ public class RefArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new RefMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100-2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -737,7 +737,7 @@ public class RefArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new RefMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100-1,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -749,7 +749,7 @@ public class RefArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new RefMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100-2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -762,7 +762,7 @@ public class RefArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RemoveAllPredicate(seq);
+    var filter=new RefMonitoredPredicate2.RemoveAllPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -774,7 +774,7 @@ public class RefArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RemoveNonePredicate(seq);
+    var filter=new RefMonitoredPredicate2.RemoveNonePredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -1273,7 +1273,7 @@ public class RefArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RetainSecondPredicate(seq);
+    var filter=new RefMonitoredPredicate2.RetainSecondPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -1285,7 +1285,7 @@ public class RefArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new RefMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -1297,7 +1297,7 @@ public class RefArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RemoveFirstAndThirdPredicate(seq);
+    var filter=new RefMonitoredPredicate2.RemoveFirstAndThirdPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -1309,7 +1309,7 @@ public class RefArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RemoveFirstPredicate(seq);
+    var filter=new RefMonitoredPredicate2.RemoveFirstPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -1321,7 +1321,7 @@ public class RefArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new RefMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -1332,7 +1332,7 @@ public class RefArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RemoveAllPredicate();
+    var filter=new RefMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -1344,7 +1344,7 @@ public class RefArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RemoveNonePredicate();
+    var filter=new RefMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -1356,7 +1356,7 @@ public class RefArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RetainSecondPredicate();
+    var filter=new RefMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -1368,7 +1368,7 @@ public class RefArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new RefMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -1380,7 +1380,7 @@ public class RefArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new RefMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3-2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -1392,7 +1392,7 @@ public class RefArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new RefMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3-1,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -1404,7 +1404,7 @@ public class RefArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new RefMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3-2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -1416,7 +1416,7 @@ public class RefArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RemoveAllPredicate();
+    var filter=new RefMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -1428,7 +1428,7 @@ public class RefArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RemoveNonePredicate();
+    var filter=new RefMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -1440,7 +1440,7 @@ public class RefArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RetainSecondPredicate();
+    var filter=new RefMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -1452,7 +1452,7 @@ public class RefArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new RefMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -1464,7 +1464,7 @@ public class RefArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new RefMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50-2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -1476,7 +1476,7 @@ public class RefArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new RefMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50-1,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -1488,7 +1488,7 @@ public class RefArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new RefMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50-2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -1500,7 +1500,7 @@ public class RefArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RemoveAllPredicate();
+    var filter=new RefMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -1512,7 +1512,7 @@ public class RefArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RemoveNonePredicate();
+    var filter=new RefMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -1524,7 +1524,7 @@ public class RefArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RetainSecondPredicate();
+    var filter=new RefMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -1536,7 +1536,7 @@ public class RefArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new RefMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -1548,7 +1548,7 @@ public class RefArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new RefMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100-2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -1560,7 +1560,7 @@ public class RefArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new RefMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100-1,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -1572,7 +1572,7 @@ public class RefArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new RefMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100-2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -1585,7 +1585,7 @@ public class RefArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RemoveAllPredicate(seq);
+    var filter=new RefMonitoredPredicate2.RemoveAllPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -1597,7 +1597,7 @@ public class RefArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RemoveNonePredicate(seq);
+    var filter=new RefMonitoredPredicate2.RemoveNonePredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -2289,7 +2289,7 @@ public class RefArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RetainSecondArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new RefMonitoredPredicate2.RetainSecondArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -2302,7 +2302,7 @@ public class RefArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RetainSecondAndLastArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new RefMonitoredPredicate2.RetainSecondAndLastArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -2315,7 +2315,7 @@ public class RefArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RemoveFirstAndThirdArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new RefMonitoredPredicate2.RemoveFirstAndThirdArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -2328,7 +2328,7 @@ public class RefArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RemoveFirstArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new RefMonitoredPredicate2.RemoveFirstArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -2341,7 +2341,7 @@ public class RefArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RemoveFirstAndSecondToLastArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new RefMonitoredPredicate2.RemoveFirstAndSecondToLastArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -2352,7 +2352,7 @@ public class RefArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.ModifyingArrSeqCheckedStackAndThrowingPredicate(seq);
+    var filter=new RefMonitoredPredicate2.ModifyingArrSeqCheckedStackAndThrowingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3+1,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -2365,7 +2365,7 @@ public class RefArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.ThrowingPredicate();
+    var filter=new RefMonitoredPredicate2.ThrowingPredicate();
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -2378,7 +2378,7 @@ public class RefArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RemoveAllArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new RefMonitoredPredicate2.RemoveAllArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -2391,7 +2391,7 @@ public class RefArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RemoveNoneArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new RefMonitoredPredicate2.RemoveNoneArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -2404,7 +2404,7 @@ public class RefArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RetainSecondArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new RefMonitoredPredicate2.RetainSecondArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -2417,7 +2417,7 @@ public class RefArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RetainSecondAndLastArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new RefMonitoredPredicate2.RetainSecondAndLastArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -2430,7 +2430,7 @@ public class RefArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RemoveFirstAndThirdArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new RefMonitoredPredicate2.RemoveFirstAndThirdArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -2443,7 +2443,7 @@ public class RefArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RemoveFirstArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new RefMonitoredPredicate2.RemoveFirstArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -2456,7 +2456,7 @@ public class RefArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RemoveFirstAndSecondToLastArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new RefMonitoredPredicate2.RemoveFirstAndSecondToLastArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -2468,7 +2468,7 @@ public class RefArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.ModifyingArrSeqCheckedStackAndThrowingPredicate(seq);
+    var filter=new RefMonitoredPredicate2.ModifyingArrSeqCheckedStackAndThrowingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50+1,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -2481,7 +2481,7 @@ public class RefArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.ThrowingPredicate();
+    var filter=new RefMonitoredPredicate2.ThrowingPredicate();
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -2494,7 +2494,7 @@ public class RefArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RemoveAllArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new RefMonitoredPredicate2.RemoveAllArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -2507,7 +2507,7 @@ public class RefArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RemoveNoneArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new RefMonitoredPredicate2.RemoveNoneArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -2520,7 +2520,7 @@ public class RefArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RetainSecondArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new RefMonitoredPredicate2.RetainSecondArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -2533,7 +2533,7 @@ public class RefArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RetainSecondAndLastArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new RefMonitoredPredicate2.RetainSecondAndLastArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -2546,7 +2546,7 @@ public class RefArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RemoveFirstAndThirdArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new RefMonitoredPredicate2.RemoveFirstAndThirdArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -2559,7 +2559,7 @@ public class RefArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RemoveFirstArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new RefMonitoredPredicate2.RemoveFirstArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -2572,7 +2572,7 @@ public class RefArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RemoveFirstAndSecondToLastArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new RefMonitoredPredicate2.RemoveFirstAndSecondToLastArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -2584,7 +2584,7 @@ public class RefArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.ModifyingArrSeqCheckedStackAndThrowingPredicate(seq);
+    var filter=new RefMonitoredPredicate2.ModifyingArrSeqCheckedStackAndThrowingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100+1,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -2597,7 +2597,7 @@ public class RefArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.ThrowingPredicate();
+    var filter=new RefMonitoredPredicate2.ThrowingPredicate();
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -2610,7 +2610,7 @@ public class RefArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RemoveAllArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new RefMonitoredPredicate2.RemoveAllArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -2623,7 +2623,7 @@ public class RefArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RemoveNoneArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new RefMonitoredPredicate2.RemoveNoneArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -2636,7 +2636,7 @@ public class RefArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RetainSecondArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new RefMonitoredPredicate2.RetainSecondArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -2649,7 +2649,7 @@ public class RefArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RetainSecondAndLastArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new RefMonitoredPredicate2.RetainSecondAndLastArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -2662,7 +2662,7 @@ public class RefArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RemoveFirstAndThirdArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new RefMonitoredPredicate2.RemoveFirstAndThirdArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -2675,7 +2675,7 @@ public class RefArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RemoveFirstArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new RefMonitoredPredicate2.RemoveFirstArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -2688,7 +2688,7 @@ public class RefArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RemoveFirstAndSecondToLastArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new RefMonitoredPredicate2.RemoveFirstAndSecondToLastArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -2702,7 +2702,7 @@ public class RefArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RetainSecondPredicate(seq);
+    var filter=new RefMonitoredPredicate2.RetainSecondPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -2715,7 +2715,7 @@ public class RefArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new RefMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -2728,7 +2728,7 @@ public class RefArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RemoveFirstAndThirdPredicate(seq);
+    var filter=new RefMonitoredPredicate2.RemoveFirstAndThirdPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -2741,7 +2741,7 @@ public class RefArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RemoveFirstPredicate(seq);
+    var filter=new RefMonitoredPredicate2.RemoveFirstPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -2754,7 +2754,7 @@ public class RefArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new RefMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -2766,7 +2766,7 @@ public class RefArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RemoveAllPredicate();
+    var filter=new RefMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -2778,7 +2778,7 @@ public class RefArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RemoveNonePredicate();
+    var filter=new RefMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -2790,7 +2790,7 @@ public class RefArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RetainSecondPredicate();
+    var filter=new RefMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -2802,7 +2802,7 @@ public class RefArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new RefMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -2814,7 +2814,7 @@ public class RefArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new RefMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3-2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -2826,7 +2826,7 @@ public class RefArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new RefMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3-1,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -2838,7 +2838,7 @@ public class RefArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new RefMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3-2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -2850,7 +2850,7 @@ public class RefArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RemoveAllPredicate();
+    var filter=new RefMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -2862,7 +2862,7 @@ public class RefArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RemoveNonePredicate();
+    var filter=new RefMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -2874,7 +2874,7 @@ public class RefArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RetainSecondPredicate();
+    var filter=new RefMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -2886,7 +2886,7 @@ public class RefArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new RefMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -2898,7 +2898,7 @@ public class RefArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new RefMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50-2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -2910,7 +2910,7 @@ public class RefArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new RefMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50-1,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -2922,7 +2922,7 @@ public class RefArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new RefMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50-2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -2934,7 +2934,7 @@ public class RefArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RemoveAllPredicate();
+    var filter=new RefMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -2946,7 +2946,7 @@ public class RefArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RemoveNonePredicate();
+    var filter=new RefMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -2958,7 +2958,7 @@ public class RefArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RetainSecondPredicate();
+    var filter=new RefMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -2970,7 +2970,7 @@ public class RefArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new RefMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -2982,7 +2982,7 @@ public class RefArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new RefMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100-2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -2994,7 +2994,7 @@ public class RefArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new RefMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100-1,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -3006,7 +3006,7 @@ public class RefArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new RefMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100-2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -3019,7 +3019,7 @@ public class RefArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RemoveAllPredicate(seq);
+    var filter=new RefMonitoredPredicate2.RemoveAllPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -3032,7 +3032,7 @@ public class RefArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RemoveNonePredicate(seq);
+    var filter=new RefMonitoredPredicate2.RemoveNonePredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -3045,7 +3045,7 @@ public class RefArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RemoveAllArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new RefMonitoredPredicate2.RemoveAllArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -3058,7 +3058,7 @@ public class RefArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RemoveNoneArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new RefMonitoredPredicate2.RemoveNoneArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -3071,7 +3071,7 @@ public class RefArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.ThrowingPredicate(seq);
+    var filter=new RefMonitoredPredicate2.ThrowingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -3084,7 +3084,7 @@ public class RefArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.ModifyingArrSeqCheckedStackAndThrowingPredicate(seq);
+    var filter=new RefMonitoredPredicate2.ModifyingArrSeqCheckedStackAndThrowingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -3782,7 +3782,7 @@ public class RefArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RetainSecondArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new RefMonitoredPredicate2.RetainSecondArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -3795,7 +3795,7 @@ public class RefArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RetainSecondAndLastArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new RefMonitoredPredicate2.RetainSecondAndLastArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -3808,7 +3808,7 @@ public class RefArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RemoveFirstAndThirdArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new RefMonitoredPredicate2.RemoveFirstAndThirdArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -3821,7 +3821,7 @@ public class RefArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RemoveFirstArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new RefMonitoredPredicate2.RemoveFirstArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -3834,7 +3834,7 @@ public class RefArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RemoveFirstAndSecondToLastArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new RefMonitoredPredicate2.RemoveFirstAndSecondToLastArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -3845,7 +3845,7 @@ public class RefArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.ModifyingArrSeqCheckedListAndThrowingPredicate(seq);
+    var filter=new RefMonitoredPredicate2.ModifyingArrSeqCheckedListAndThrowingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3+1,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -3858,7 +3858,7 @@ public class RefArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.ThrowingPredicate();
+    var filter=new RefMonitoredPredicate2.ThrowingPredicate();
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -3871,7 +3871,7 @@ public class RefArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RemoveAllArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new RefMonitoredPredicate2.RemoveAllArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -3884,7 +3884,7 @@ public class RefArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RemoveNoneArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new RefMonitoredPredicate2.RemoveNoneArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -3897,7 +3897,7 @@ public class RefArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RetainSecondArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new RefMonitoredPredicate2.RetainSecondArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -3910,7 +3910,7 @@ public class RefArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RetainSecondAndLastArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new RefMonitoredPredicate2.RetainSecondAndLastArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -3923,7 +3923,7 @@ public class RefArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RemoveFirstAndThirdArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new RefMonitoredPredicate2.RemoveFirstAndThirdArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -3936,7 +3936,7 @@ public class RefArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RemoveFirstArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new RefMonitoredPredicate2.RemoveFirstArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -3949,7 +3949,7 @@ public class RefArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RemoveFirstAndSecondToLastArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new RefMonitoredPredicate2.RemoveFirstAndSecondToLastArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -3961,7 +3961,7 @@ public class RefArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.ModifyingArrSeqCheckedListAndThrowingPredicate(seq);
+    var filter=new RefMonitoredPredicate2.ModifyingArrSeqCheckedListAndThrowingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50+1,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -3974,7 +3974,7 @@ public class RefArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.ThrowingPredicate();
+    var filter=new RefMonitoredPredicate2.ThrowingPredicate();
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -3987,7 +3987,7 @@ public class RefArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RemoveAllArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new RefMonitoredPredicate2.RemoveAllArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -4000,7 +4000,7 @@ public class RefArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RemoveNoneArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new RefMonitoredPredicate2.RemoveNoneArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -4013,7 +4013,7 @@ public class RefArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RetainSecondArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new RefMonitoredPredicate2.RetainSecondArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -4026,7 +4026,7 @@ public class RefArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RetainSecondAndLastArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new RefMonitoredPredicate2.RetainSecondAndLastArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -4039,7 +4039,7 @@ public class RefArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RemoveFirstAndThirdArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new RefMonitoredPredicate2.RemoveFirstAndThirdArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -4052,7 +4052,7 @@ public class RefArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RemoveFirstArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new RefMonitoredPredicate2.RemoveFirstArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -4065,7 +4065,7 @@ public class RefArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RemoveFirstAndSecondToLastArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new RefMonitoredPredicate2.RemoveFirstAndSecondToLastArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -4077,7 +4077,7 @@ public class RefArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.ModifyingArrSeqCheckedListAndThrowingPredicate(seq);
+    var filter=new RefMonitoredPredicate2.ModifyingArrSeqCheckedListAndThrowingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100+1,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -4090,7 +4090,7 @@ public class RefArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.ThrowingPredicate();
+    var filter=new RefMonitoredPredicate2.ThrowingPredicate();
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -4103,7 +4103,7 @@ public class RefArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RemoveAllArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new RefMonitoredPredicate2.RemoveAllArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -4116,7 +4116,7 @@ public class RefArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RemoveNoneArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new RefMonitoredPredicate2.RemoveNoneArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -4129,7 +4129,7 @@ public class RefArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RetainSecondArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new RefMonitoredPredicate2.RetainSecondArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -4142,7 +4142,7 @@ public class RefArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RetainSecondAndLastArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new RefMonitoredPredicate2.RetainSecondAndLastArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -4155,7 +4155,7 @@ public class RefArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RemoveFirstAndThirdArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new RefMonitoredPredicate2.RemoveFirstAndThirdArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -4168,7 +4168,7 @@ public class RefArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RemoveFirstArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new RefMonitoredPredicate2.RemoveFirstArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -4181,7 +4181,7 @@ public class RefArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RemoveFirstAndSecondToLastArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new RefMonitoredPredicate2.RemoveFirstAndSecondToLastArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -4195,7 +4195,7 @@ public class RefArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RetainSecondPredicate(seq);
+    var filter=new RefMonitoredPredicate2.RetainSecondPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -4208,7 +4208,7 @@ public class RefArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new RefMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -4221,7 +4221,7 @@ public class RefArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RemoveFirstAndThirdPredicate(seq);
+    var filter=new RefMonitoredPredicate2.RemoveFirstAndThirdPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -4234,7 +4234,7 @@ public class RefArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RemoveFirstPredicate(seq);
+    var filter=new RefMonitoredPredicate2.RemoveFirstPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -4247,7 +4247,7 @@ public class RefArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new RefMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -4259,7 +4259,7 @@ public class RefArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RemoveAllPredicate();
+    var filter=new RefMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -4271,7 +4271,7 @@ public class RefArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RemoveNonePredicate();
+    var filter=new RefMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -4283,7 +4283,7 @@ public class RefArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RetainSecondPredicate();
+    var filter=new RefMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -4295,7 +4295,7 @@ public class RefArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new RefMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -4307,7 +4307,7 @@ public class RefArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new RefMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3-2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -4319,7 +4319,7 @@ public class RefArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new RefMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3-1,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -4331,7 +4331,7 @@ public class RefArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new RefMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3-2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -4343,7 +4343,7 @@ public class RefArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RemoveAllPredicate();
+    var filter=new RefMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -4355,7 +4355,7 @@ public class RefArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RemoveNonePredicate();
+    var filter=new RefMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -4367,7 +4367,7 @@ public class RefArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RetainSecondPredicate();
+    var filter=new RefMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -4379,7 +4379,7 @@ public class RefArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new RefMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -4391,7 +4391,7 @@ public class RefArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new RefMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50-2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -4403,7 +4403,7 @@ public class RefArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new RefMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50-1,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -4415,7 +4415,7 @@ public class RefArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new RefMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50-2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -4427,7 +4427,7 @@ public class RefArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RemoveAllPredicate();
+    var filter=new RefMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -4439,7 +4439,7 @@ public class RefArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RemoveNonePredicate();
+    var filter=new RefMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -4451,7 +4451,7 @@ public class RefArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RetainSecondPredicate();
+    var filter=new RefMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -4463,7 +4463,7 @@ public class RefArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new RefMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -4475,7 +4475,7 @@ public class RefArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new RefMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100-2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -4487,7 +4487,7 @@ public class RefArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new RefMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100-1,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -4499,7 +4499,7 @@ public class RefArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new RefMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100-2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -4512,7 +4512,7 @@ public class RefArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RemoveAllPredicate(seq);
+    var filter=new RefMonitoredPredicate2.RemoveAllPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -4525,7 +4525,7 @@ public class RefArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RemoveNonePredicate(seq);
+    var filter=new RefMonitoredPredicate2.RemoveNonePredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -4538,7 +4538,7 @@ public class RefArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RemoveAllArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new RefMonitoredPredicate2.RemoveAllArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -4551,7 +4551,7 @@ public class RefArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.RemoveNoneArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new RefMonitoredPredicate2.RemoveNoneArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -4564,7 +4564,7 @@ public class RefArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.ThrowingPredicate(seq);
+    var filter=new RefMonitoredPredicate2.ThrowingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -4577,7 +4577,7 @@ public class RefArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToObject(i));
     }
-    var filter=new RefMonitoredPredicate.ModifyingArrSeqCheckedListAndThrowingPredicate(seq);
+    var filter=new RefMonitoredPredicate2.ModifyingArrSeqCheckedListAndThrowingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);

@@ -438,7 +438,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RetainSecondPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RetainSecondPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -450,7 +450,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new ByteMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -462,7 +462,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstAndThirdPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RemoveFirstAndThirdPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -474,7 +474,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RemoveFirstPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -486,7 +486,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new ByteMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -497,7 +497,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveAllPredicate();
+    var filter=new ByteMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -509,7 +509,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveNonePredicate();
+    var filter=new ByteMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -521,7 +521,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RetainSecondPredicate();
+    var filter=new ByteMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -533,7 +533,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new ByteMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -545,7 +545,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new ByteMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3-2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -557,7 +557,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new ByteMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3-1,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -569,7 +569,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new ByteMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3-2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -581,7 +581,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveAllPredicate();
+    var filter=new ByteMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -593,7 +593,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveNonePredicate();
+    var filter=new ByteMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -605,7 +605,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RetainSecondPredicate();
+    var filter=new ByteMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -617,7 +617,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new ByteMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -629,7 +629,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new ByteMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50-2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -641,7 +641,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new ByteMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50-1,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -653,7 +653,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new ByteMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50-2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -665,7 +665,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveAllPredicate();
+    var filter=new ByteMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -677,7 +677,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveNonePredicate();
+    var filter=new ByteMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -689,7 +689,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RetainSecondPredicate();
+    var filter=new ByteMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -701,7 +701,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new ByteMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -713,7 +713,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new ByteMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100-2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -725,7 +725,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new ByteMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100-1,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -737,7 +737,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new ByteMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100-2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -750,7 +750,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveAllPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RemoveAllPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -762,7 +762,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveNonePredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RemoveNonePredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -799,7 +799,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RetainSecondPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RetainSecondPredicate(seq);
     Assertions.assertFalse(seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -811,7 +811,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new ByteMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertFalse(seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -823,7 +823,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstAndThirdPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RemoveFirstAndThirdPredicate(seq);
     Assertions.assertFalse(seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -835,7 +835,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RemoveFirstPredicate(seq);
     Assertions.assertFalse(seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -847,7 +847,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new ByteMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertFalse(seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -858,7 +858,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveAllPredicate();
+    var filter=new ByteMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -870,7 +870,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveNonePredicate();
+    var filter=new ByteMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -882,7 +882,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RetainSecondPredicate();
+    var filter=new ByteMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -894,7 +894,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new ByteMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -906,7 +906,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new ByteMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(3-2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -918,7 +918,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new ByteMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(3-1,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -930,7 +930,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new ByteMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(3-2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -942,7 +942,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveAllPredicate();
+    var filter=new ByteMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -954,7 +954,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveNonePredicate();
+    var filter=new ByteMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -966,7 +966,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RetainSecondPredicate();
+    var filter=new ByteMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -978,7 +978,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new ByteMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -990,7 +990,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new ByteMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(50-2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -1002,7 +1002,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new ByteMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(50-1,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -1014,7 +1014,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new ByteMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(50-2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -1026,7 +1026,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveAllPredicate();
+    var filter=new ByteMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -1038,7 +1038,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveNonePredicate();
+    var filter=new ByteMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -1050,7 +1050,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RetainSecondPredicate();
+    var filter=new ByteMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -1062,7 +1062,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new ByteMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -1074,7 +1074,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new ByteMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(100-2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -1086,7 +1086,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new ByteMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(100-1,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -1098,7 +1098,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new ByteMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(100-2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -1111,7 +1111,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveAllPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RemoveAllPredicate(seq);
     Assertions.assertFalse(seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -1123,7 +1123,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveNonePredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RemoveNonePredicate(seq);
     Assertions.assertFalse(seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -1842,7 +1842,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RetainSecondPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RetainSecondPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -1854,7 +1854,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new ByteMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -1866,7 +1866,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstAndThirdPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RemoveFirstAndThirdPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -1878,7 +1878,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RemoveFirstPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -1890,7 +1890,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new ByteMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -1901,7 +1901,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveAllPredicate();
+    var filter=new ByteMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -1913,7 +1913,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveNonePredicate();
+    var filter=new ByteMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -1925,7 +1925,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RetainSecondPredicate();
+    var filter=new ByteMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -1937,7 +1937,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new ByteMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -1949,7 +1949,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new ByteMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3-2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -1961,7 +1961,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new ByteMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3-1,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -1973,7 +1973,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new ByteMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3-2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -1985,7 +1985,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveAllPredicate();
+    var filter=new ByteMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -1997,7 +1997,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveNonePredicate();
+    var filter=new ByteMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -2009,7 +2009,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RetainSecondPredicate();
+    var filter=new ByteMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -2021,7 +2021,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new ByteMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -2033,7 +2033,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new ByteMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50-2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -2045,7 +2045,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new ByteMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50-1,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -2057,7 +2057,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new ByteMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50-2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -2069,7 +2069,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveAllPredicate();
+    var filter=new ByteMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -2081,7 +2081,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveNonePredicate();
+    var filter=new ByteMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -2093,7 +2093,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RetainSecondPredicate();
+    var filter=new ByteMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -2105,7 +2105,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new ByteMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -2117,7 +2117,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new ByteMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100-2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -2129,7 +2129,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new ByteMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100-1,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -2141,7 +2141,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new ByteMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100-2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -2154,7 +2154,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveAllPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RemoveAllPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -2166,7 +2166,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveNonePredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RemoveNonePredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -2203,7 +2203,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RetainSecondPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RetainSecondPredicate(seq);
     Assertions.assertFalse(seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -2215,7 +2215,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new ByteMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertFalse(seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -2227,7 +2227,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstAndThirdPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RemoveFirstAndThirdPredicate(seq);
     Assertions.assertFalse(seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -2239,7 +2239,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RemoveFirstPredicate(seq);
     Assertions.assertFalse(seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -2251,7 +2251,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new ByteMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertFalse(seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -2262,7 +2262,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveAllPredicate();
+    var filter=new ByteMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -2274,7 +2274,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveNonePredicate();
+    var filter=new ByteMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -2286,7 +2286,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RetainSecondPredicate();
+    var filter=new ByteMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -2298,7 +2298,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new ByteMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -2310,7 +2310,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new ByteMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(3-2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -2322,7 +2322,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new ByteMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(3-1,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -2334,7 +2334,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new ByteMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(3-2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -2346,7 +2346,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveAllPredicate();
+    var filter=new ByteMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -2358,7 +2358,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveNonePredicate();
+    var filter=new ByteMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -2370,7 +2370,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RetainSecondPredicate();
+    var filter=new ByteMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -2382,7 +2382,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new ByteMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -2394,7 +2394,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new ByteMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(50-2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -2406,7 +2406,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new ByteMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(50-1,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -2418,7 +2418,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new ByteMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(50-2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -2430,7 +2430,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveAllPredicate();
+    var filter=new ByteMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -2442,7 +2442,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveNonePredicate();
+    var filter=new ByteMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -2454,7 +2454,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RetainSecondPredicate();
+    var filter=new ByteMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -2466,7 +2466,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new ByteMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -2478,7 +2478,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new ByteMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(100-2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -2490,7 +2490,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new ByteMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(100-1,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -2502,7 +2502,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new ByteMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(100-2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -2515,7 +2515,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveAllPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RemoveAllPredicate(seq);
     Assertions.assertFalse(seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -2527,7 +2527,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveNonePredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RemoveNonePredicate(seq);
     Assertions.assertFalse(seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -3439,7 +3439,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RetainSecondArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RetainSecondArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -3452,7 +3452,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RetainSecondAndLastArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RetainSecondAndLastArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -3465,7 +3465,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstAndThirdArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RemoveFirstAndThirdArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -3478,7 +3478,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RemoveFirstArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -3491,7 +3491,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstAndSecondToLastArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RemoveFirstAndSecondToLastArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -3502,7 +3502,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.ModifyingArrSeqCheckedStackAndThrowingPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.ModifyingArrSeqCheckedStackAndThrowingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3+1,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -3515,7 +3515,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.ThrowingPredicate();
+    var filter=new ByteMonitoredPredicate2.ThrowingPredicate();
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -3528,7 +3528,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveAllArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RemoveAllArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -3541,7 +3541,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveNoneArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RemoveNoneArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -3554,7 +3554,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RetainSecondArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RetainSecondArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -3567,7 +3567,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RetainSecondAndLastArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RetainSecondAndLastArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -3580,7 +3580,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstAndThirdArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RemoveFirstAndThirdArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -3593,7 +3593,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RemoveFirstArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -3606,7 +3606,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstAndSecondToLastArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RemoveFirstAndSecondToLastArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -3618,7 +3618,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.ModifyingArrSeqCheckedStackAndThrowingPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.ModifyingArrSeqCheckedStackAndThrowingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50+1,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -3631,7 +3631,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.ThrowingPredicate();
+    var filter=new ByteMonitoredPredicate2.ThrowingPredicate();
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -3644,7 +3644,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveAllArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RemoveAllArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -3657,7 +3657,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveNoneArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RemoveNoneArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -3670,7 +3670,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RetainSecondArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RetainSecondArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -3683,7 +3683,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RetainSecondAndLastArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RetainSecondAndLastArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -3696,7 +3696,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstAndThirdArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RemoveFirstAndThirdArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -3709,7 +3709,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RemoveFirstArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -3722,7 +3722,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstAndSecondToLastArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RemoveFirstAndSecondToLastArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -3734,7 +3734,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.ModifyingArrSeqCheckedStackAndThrowingPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.ModifyingArrSeqCheckedStackAndThrowingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100+1,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -3747,7 +3747,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.ThrowingPredicate();
+    var filter=new ByteMonitoredPredicate2.ThrowingPredicate();
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -3760,7 +3760,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveAllArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RemoveAllArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -3773,7 +3773,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveNoneArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RemoveNoneArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -3786,7 +3786,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RetainSecondArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RetainSecondArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -3799,7 +3799,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RetainSecondAndLastArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RetainSecondAndLastArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -3812,7 +3812,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstAndThirdArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RemoveFirstAndThirdArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -3825,7 +3825,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RemoveFirstArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -3838,7 +3838,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstAndSecondToLastArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RemoveFirstAndSecondToLastArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -3852,7 +3852,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RetainSecondPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RetainSecondPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -3865,7 +3865,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new ByteMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -3878,7 +3878,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstAndThirdPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RemoveFirstAndThirdPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -3891,7 +3891,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RemoveFirstPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -3904,7 +3904,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new ByteMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -3916,7 +3916,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveAllPredicate();
+    var filter=new ByteMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -3928,7 +3928,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveNonePredicate();
+    var filter=new ByteMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -3940,7 +3940,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RetainSecondPredicate();
+    var filter=new ByteMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -3952,7 +3952,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new ByteMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -3964,7 +3964,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new ByteMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3-2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -3976,7 +3976,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new ByteMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3-1,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -3988,7 +3988,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new ByteMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3-2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -4000,7 +4000,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveAllPredicate();
+    var filter=new ByteMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -4012,7 +4012,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveNonePredicate();
+    var filter=new ByteMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -4024,7 +4024,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RetainSecondPredicate();
+    var filter=new ByteMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -4036,7 +4036,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new ByteMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -4048,7 +4048,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new ByteMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50-2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -4060,7 +4060,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new ByteMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50-1,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -4072,7 +4072,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new ByteMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50-2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -4084,7 +4084,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveAllPredicate();
+    var filter=new ByteMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -4096,7 +4096,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveNonePredicate();
+    var filter=new ByteMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -4108,7 +4108,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RetainSecondPredicate();
+    var filter=new ByteMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -4120,7 +4120,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new ByteMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -4132,7 +4132,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new ByteMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100-2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -4144,7 +4144,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new ByteMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100-1,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -4156,7 +4156,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new ByteMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100-2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -4169,7 +4169,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveAllPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RemoveAllPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -4182,7 +4182,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveNonePredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RemoveNonePredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -4195,7 +4195,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveAllArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RemoveAllArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -4208,7 +4208,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveNoneArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RemoveNoneArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -4221,7 +4221,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.ThrowingPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.ThrowingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -4234,7 +4234,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.ModifyingArrSeqCheckedStackAndThrowingPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.ModifyingArrSeqCheckedStackAndThrowingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -4347,7 +4347,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RetainSecondArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RetainSecondArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -4360,7 +4360,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RetainSecondAndLastArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RetainSecondAndLastArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -4373,7 +4373,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstAndThirdArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RemoveFirstAndThirdArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -4386,7 +4386,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RemoveFirstArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -4399,7 +4399,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstAndSecondToLastArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RemoveFirstAndSecondToLastArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -4410,7 +4410,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.ModifyingArrSeqCheckedStackAndThrowingPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.ModifyingArrSeqCheckedStackAndThrowingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(3+1,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -4423,7 +4423,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.ThrowingPredicate();
+    var filter=new ByteMonitoredPredicate2.ThrowingPredicate();
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -4436,7 +4436,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveAllArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RemoveAllArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -4449,7 +4449,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveNoneArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RemoveNoneArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -4462,7 +4462,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RetainSecondArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RetainSecondArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -4475,7 +4475,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RetainSecondAndLastArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RetainSecondAndLastArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -4488,7 +4488,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstAndThirdArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RemoveFirstAndThirdArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -4501,7 +4501,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RemoveFirstArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -4514,7 +4514,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstAndSecondToLastArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RemoveFirstAndSecondToLastArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -4526,7 +4526,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.ModifyingArrSeqCheckedStackAndThrowingPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.ModifyingArrSeqCheckedStackAndThrowingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(50+1,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -4539,7 +4539,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.ThrowingPredicate();
+    var filter=new ByteMonitoredPredicate2.ThrowingPredicate();
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -4552,7 +4552,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveAllArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RemoveAllArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -4565,7 +4565,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveNoneArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RemoveNoneArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -4578,7 +4578,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RetainSecondArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RetainSecondArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -4591,7 +4591,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RetainSecondAndLastArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RetainSecondAndLastArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -4604,7 +4604,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstAndThirdArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RemoveFirstAndThirdArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -4617,7 +4617,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RemoveFirstArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -4630,7 +4630,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstAndSecondToLastArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RemoveFirstAndSecondToLastArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -4642,7 +4642,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.ModifyingArrSeqCheckedStackAndThrowingPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.ModifyingArrSeqCheckedStackAndThrowingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(100+1,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -4655,7 +4655,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.ThrowingPredicate();
+    var filter=new ByteMonitoredPredicate2.ThrowingPredicate();
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -4668,7 +4668,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveAllArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RemoveAllArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -4681,7 +4681,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveNoneArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RemoveNoneArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -4694,7 +4694,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RetainSecondArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RetainSecondArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -4707,7 +4707,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RetainSecondAndLastArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RetainSecondAndLastArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -4720,7 +4720,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstAndThirdArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RemoveFirstAndThirdArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -4733,7 +4733,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RemoveFirstArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -4746,7 +4746,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstAndSecondToLastArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RemoveFirstAndSecondToLastArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -4760,7 +4760,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RetainSecondPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RetainSecondPredicate(seq);
     Assertions.assertFalse(seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -4773,7 +4773,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new ByteMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertFalse(seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -4786,7 +4786,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstAndThirdPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RemoveFirstAndThirdPredicate(seq);
     Assertions.assertFalse(seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -4799,7 +4799,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RemoveFirstPredicate(seq);
     Assertions.assertFalse(seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -4812,7 +4812,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new ByteMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertFalse(seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -4824,7 +4824,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveAllPredicate();
+    var filter=new ByteMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -4836,7 +4836,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveNonePredicate();
+    var filter=new ByteMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -4848,7 +4848,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RetainSecondPredicate();
+    var filter=new ByteMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -4860,7 +4860,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new ByteMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -4872,7 +4872,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new ByteMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(3-2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -4884,7 +4884,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new ByteMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(3-1,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -4896,7 +4896,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new ByteMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(3-2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -4908,7 +4908,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveAllPredicate();
+    var filter=new ByteMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -4920,7 +4920,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveNonePredicate();
+    var filter=new ByteMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -4932,7 +4932,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RetainSecondPredicate();
+    var filter=new ByteMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -4944,7 +4944,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new ByteMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -4956,7 +4956,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new ByteMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(50-2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -4968,7 +4968,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new ByteMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(50-1,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -4980,7 +4980,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new ByteMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(50-2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -4992,7 +4992,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveAllPredicate();
+    var filter=new ByteMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -5004,7 +5004,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveNonePredicate();
+    var filter=new ByteMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -5016,7 +5016,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RetainSecondPredicate();
+    var filter=new ByteMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -5028,7 +5028,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new ByteMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -5040,7 +5040,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new ByteMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(100-2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -5052,7 +5052,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new ByteMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(100-1,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -5064,7 +5064,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new ByteMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(100-2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -5077,7 +5077,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveAllPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RemoveAllPredicate(seq);
     Assertions.assertFalse(seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -5090,7 +5090,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveNonePredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RemoveNonePredicate(seq);
     Assertions.assertFalse(seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -5103,7 +5103,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveAllArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RemoveAllArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -5116,7 +5116,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveNoneArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RemoveNoneArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -5129,7 +5129,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.ThrowingPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.ThrowingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -5142,7 +5142,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.ModifyingArrSeqCheckedStackAndThrowingPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.ModifyingArrSeqCheckedStackAndThrowingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -6081,7 +6081,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RetainSecondArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RetainSecondArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -6094,7 +6094,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RetainSecondAndLastArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RetainSecondAndLastArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -6107,7 +6107,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstAndThirdArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RemoveFirstAndThirdArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -6120,7 +6120,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RemoveFirstArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -6133,7 +6133,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstAndSecondToLastArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RemoveFirstAndSecondToLastArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -6144,7 +6144,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.ModifyingArrSeqCheckedListAndThrowingPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.ModifyingArrSeqCheckedListAndThrowingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3+1,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -6157,7 +6157,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.ThrowingPredicate();
+    var filter=new ByteMonitoredPredicate2.ThrowingPredicate();
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -6170,7 +6170,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveAllArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RemoveAllArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -6183,7 +6183,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveNoneArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RemoveNoneArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -6196,7 +6196,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RetainSecondArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RetainSecondArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -6209,7 +6209,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RetainSecondAndLastArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RetainSecondAndLastArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -6222,7 +6222,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstAndThirdArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RemoveFirstAndThirdArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -6235,7 +6235,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RemoveFirstArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -6248,7 +6248,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstAndSecondToLastArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RemoveFirstAndSecondToLastArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -6260,7 +6260,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.ModifyingArrSeqCheckedListAndThrowingPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.ModifyingArrSeqCheckedListAndThrowingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50+1,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -6273,7 +6273,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.ThrowingPredicate();
+    var filter=new ByteMonitoredPredicate2.ThrowingPredicate();
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -6286,7 +6286,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveAllArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RemoveAllArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -6299,7 +6299,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveNoneArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RemoveNoneArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -6312,7 +6312,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RetainSecondArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RetainSecondArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -6325,7 +6325,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RetainSecondAndLastArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RetainSecondAndLastArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -6338,7 +6338,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstAndThirdArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RemoveFirstAndThirdArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -6351,7 +6351,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RemoveFirstArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -6364,7 +6364,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstAndSecondToLastArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RemoveFirstAndSecondToLastArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -6376,7 +6376,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.ModifyingArrSeqCheckedListAndThrowingPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.ModifyingArrSeqCheckedListAndThrowingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100+1,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -6389,7 +6389,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.ThrowingPredicate();
+    var filter=new ByteMonitoredPredicate2.ThrowingPredicate();
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -6402,7 +6402,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveAllArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RemoveAllArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -6415,7 +6415,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveNoneArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RemoveNoneArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -6428,7 +6428,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RetainSecondArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RetainSecondArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -6441,7 +6441,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RetainSecondAndLastArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RetainSecondAndLastArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -6454,7 +6454,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstAndThirdArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RemoveFirstAndThirdArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -6467,7 +6467,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RemoveFirstArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -6480,7 +6480,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstAndSecondToLastArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RemoveFirstAndSecondToLastArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -6494,7 +6494,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RetainSecondPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RetainSecondPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -6507,7 +6507,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new ByteMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -6520,7 +6520,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstAndThirdPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RemoveFirstAndThirdPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -6533,7 +6533,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RemoveFirstPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -6546,7 +6546,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new ByteMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -6558,7 +6558,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveAllPredicate();
+    var filter=new ByteMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -6570,7 +6570,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveNonePredicate();
+    var filter=new ByteMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -6582,7 +6582,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RetainSecondPredicate();
+    var filter=new ByteMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -6594,7 +6594,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new ByteMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -6606,7 +6606,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new ByteMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3-2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -6618,7 +6618,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new ByteMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3-1,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -6630,7 +6630,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new ByteMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3-2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -6642,7 +6642,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveAllPredicate();
+    var filter=new ByteMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -6654,7 +6654,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveNonePredicate();
+    var filter=new ByteMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -6666,7 +6666,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RetainSecondPredicate();
+    var filter=new ByteMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -6678,7 +6678,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new ByteMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -6690,7 +6690,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new ByteMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50-2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -6702,7 +6702,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new ByteMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50-1,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -6714,7 +6714,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new ByteMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50-2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -6726,7 +6726,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveAllPredicate();
+    var filter=new ByteMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -6738,7 +6738,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveNonePredicate();
+    var filter=new ByteMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -6750,7 +6750,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RetainSecondPredicate();
+    var filter=new ByteMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -6762,7 +6762,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new ByteMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -6774,7 +6774,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new ByteMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100-2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -6786,7 +6786,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new ByteMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100-1,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -6798,7 +6798,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new ByteMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100-2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -6811,7 +6811,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveAllPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RemoveAllPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -6824,7 +6824,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveNonePredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RemoveNonePredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -6837,7 +6837,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveAllArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RemoveAllArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -6850,7 +6850,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveNoneArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RemoveNoneArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -6863,7 +6863,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.ThrowingPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.ThrowingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -6876,7 +6876,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.ModifyingArrSeqCheckedListAndThrowingPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.ModifyingArrSeqCheckedListAndThrowingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -6989,7 +6989,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RetainSecondArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RetainSecondArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -7002,7 +7002,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RetainSecondAndLastArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RetainSecondAndLastArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -7015,7 +7015,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstAndThirdArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RemoveFirstAndThirdArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -7028,7 +7028,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RemoveFirstArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -7041,7 +7041,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstAndSecondToLastArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RemoveFirstAndSecondToLastArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -7052,7 +7052,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.ModifyingArrSeqCheckedListAndThrowingPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.ModifyingArrSeqCheckedListAndThrowingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(3+1,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -7065,7 +7065,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.ThrowingPredicate();
+    var filter=new ByteMonitoredPredicate2.ThrowingPredicate();
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -7078,7 +7078,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveAllArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RemoveAllArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -7091,7 +7091,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveNoneArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RemoveNoneArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -7104,7 +7104,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RetainSecondArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RetainSecondArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -7117,7 +7117,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RetainSecondAndLastArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RetainSecondAndLastArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -7130,7 +7130,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstAndThirdArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RemoveFirstAndThirdArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -7143,7 +7143,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RemoveFirstArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -7156,7 +7156,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstAndSecondToLastArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RemoveFirstAndSecondToLastArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -7168,7 +7168,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.ModifyingArrSeqCheckedListAndThrowingPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.ModifyingArrSeqCheckedListAndThrowingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(50+1,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -7181,7 +7181,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.ThrowingPredicate();
+    var filter=new ByteMonitoredPredicate2.ThrowingPredicate();
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -7194,7 +7194,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveAllArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RemoveAllArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -7207,7 +7207,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveNoneArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RemoveNoneArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -7220,7 +7220,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RetainSecondArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RetainSecondArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -7233,7 +7233,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RetainSecondAndLastArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RetainSecondAndLastArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -7246,7 +7246,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstAndThirdArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RemoveFirstAndThirdArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -7259,7 +7259,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RemoveFirstArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -7272,7 +7272,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstAndSecondToLastArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RemoveFirstAndSecondToLastArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -7284,7 +7284,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.ModifyingArrSeqCheckedListAndThrowingPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.ModifyingArrSeqCheckedListAndThrowingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(100+1,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -7297,7 +7297,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.ThrowingPredicate();
+    var filter=new ByteMonitoredPredicate2.ThrowingPredicate();
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -7310,7 +7310,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveAllArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RemoveAllArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -7323,7 +7323,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveNoneArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RemoveNoneArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -7336,7 +7336,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RetainSecondArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RetainSecondArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -7349,7 +7349,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RetainSecondAndLastArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RetainSecondAndLastArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -7362,7 +7362,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstAndThirdArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RemoveFirstAndThirdArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -7375,7 +7375,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RemoveFirstArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -7388,7 +7388,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstAndSecondToLastArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RemoveFirstAndSecondToLastArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -7402,7 +7402,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RetainSecondPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RetainSecondPredicate(seq);
     Assertions.assertFalse(seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -7415,7 +7415,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new ByteMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertFalse(seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -7428,7 +7428,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstAndThirdPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RemoveFirstAndThirdPredicate(seq);
     Assertions.assertFalse(seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -7441,7 +7441,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RemoveFirstPredicate(seq);
     Assertions.assertFalse(seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -7454,7 +7454,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new ByteMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertFalse(seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -7466,7 +7466,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveAllPredicate();
+    var filter=new ByteMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -7478,7 +7478,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveNonePredicate();
+    var filter=new ByteMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -7490,7 +7490,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RetainSecondPredicate();
+    var filter=new ByteMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -7502,7 +7502,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new ByteMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -7514,7 +7514,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new ByteMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(3-2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -7526,7 +7526,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new ByteMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(3-1,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -7538,7 +7538,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new ByteMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(3-2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -7550,7 +7550,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveAllPredicate();
+    var filter=new ByteMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -7562,7 +7562,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveNonePredicate();
+    var filter=new ByteMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -7574,7 +7574,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RetainSecondPredicate();
+    var filter=new ByteMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -7586,7 +7586,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new ByteMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -7598,7 +7598,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new ByteMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(50-2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -7610,7 +7610,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new ByteMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(50-1,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -7622,7 +7622,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new ByteMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(50-2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -7634,7 +7634,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveAllPredicate();
+    var filter=new ByteMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -7646,7 +7646,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveNonePredicate();
+    var filter=new ByteMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -7658,7 +7658,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RetainSecondPredicate();
+    var filter=new ByteMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -7670,7 +7670,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new ByteMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -7682,7 +7682,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new ByteMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(100-2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -7694,7 +7694,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new ByteMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(100-1,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -7706,7 +7706,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new ByteMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(100-2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -7719,7 +7719,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveAllPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RemoveAllPredicate(seq);
     Assertions.assertFalse(seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -7732,7 +7732,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveNonePredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RemoveNonePredicate(seq);
     Assertions.assertFalse(seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -7745,7 +7745,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveAllArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RemoveAllArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -7758,7 +7758,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.RemoveNoneArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.RemoveNoneArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -7771,7 +7771,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.ThrowingPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.ThrowingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -7784,7 +7784,7 @@ public class ByteArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTobyte(i));
     }
-    var filter=new ByteMonitoredPredicate.ModifyingArrSeqCheckedListAndThrowingPredicate(seq);
+    var filter=new ByteMonitoredPredicate2.ModifyingArrSeqCheckedListAndThrowingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((BytePredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);

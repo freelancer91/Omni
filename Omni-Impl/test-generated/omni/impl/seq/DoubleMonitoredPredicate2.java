@@ -4,7 +4,7 @@ import java.util.function.DoublePredicate;
 import org.junit.jupiter.api.Assertions;
 import omni.util.TypeConversionUtil;
 import omni.util.EqualityUtil;
-abstract class DoubleMonitoredPredicate implements DoublePredicate,Predicate<Object>
+abstract class DoubleMonitoredPredicate2 implements DoublePredicate,Predicate<Object>
 {
   int callCount;
   abstract boolean testImpl(double val);
@@ -12,14 +12,14 @@ abstract class DoubleMonitoredPredicate implements DoublePredicate,Predicate<Obj
     ++callCount;
     return testImpl((double)val);
   }
-  public DoubleMonitoredPredicate negate(){
+  public DoubleMonitoredPredicate2 negate(){
     //don't care
     return null;
   }
   @Override public boolean test(Object val){
     return test((double)val);
   }
-  static class RemoveAllPredicate extends DoubleMonitoredPredicate{
+  static class RemoveAllPredicate extends DoubleMonitoredPredicate2{
     RemoveAllPredicate(){}
     RemoveAllPredicate(Object dummy){}
     boolean testImpl(double val){
@@ -28,7 +28,7 @@ abstract class DoubleMonitoredPredicate implements DoublePredicate,Predicate<Obj
     void verifyArray(double[] arr,int offset,int originalLength){
     }
   }
-  static class RemoveNonePredicate extends DoubleMonitoredPredicate{
+  static class RemoveNonePredicate extends DoubleMonitoredPredicate2{
     RemoveNonePredicate(){}
     RemoveNonePredicate(Object dummy){}
     boolean testImpl(double val){
@@ -41,7 +41,7 @@ abstract class DoubleMonitoredPredicate implements DoublePredicate,Predicate<Obj
       }
     }
   }
-  static class ThrowingPredicate extends DoubleMonitoredPredicate{
+  static class ThrowingPredicate extends DoubleMonitoredPredicate2{
     ThrowingPredicate(){}
     ThrowingPredicate(Object dummy){}
     @Override boolean testImpl(double val){
@@ -54,7 +54,7 @@ abstract class DoubleMonitoredPredicate implements DoublePredicate,Predicate<Obj
       }
     }
   }
-  static class RetainSecondPredicate extends DoubleMonitoredPredicate{
+  static class RetainSecondPredicate extends DoubleMonitoredPredicate2{
     RetainSecondPredicate(){}
     RetainSecondPredicate(Object dummy){}
     boolean testImpl(double val){
@@ -70,7 +70,7 @@ abstract class DoubleMonitoredPredicate implements DoublePredicate,Predicate<Obj
       }
     }
   }
-  static class RetainSecondAndLastPredicate extends DoubleMonitoredPredicate{
+  static class RetainSecondAndLastPredicate extends DoubleMonitoredPredicate2{
     int seqLength;
     RetainSecondAndLastPredicate(int seqLength){
       this.seqLength=seqLength;
@@ -88,7 +88,7 @@ abstract class DoubleMonitoredPredicate implements DoublePredicate,Predicate<Obj
       }
     }
   }
-  static class RemoveFirstAndThirdPredicate extends DoubleMonitoredPredicate{
+  static class RemoveFirstAndThirdPredicate extends DoubleMonitoredPredicate2{
     RemoveFirstAndThirdPredicate(){}
     RemoveFirstAndThirdPredicate(Object dummy){}
     boolean testImpl(double val){
@@ -104,7 +104,7 @@ abstract class DoubleMonitoredPredicate implements DoublePredicate,Predicate<Obj
       }
     }
   }
-  static class RemoveFirstPredicate  extends DoubleMonitoredPredicate{
+  static class RemoveFirstPredicate  extends DoubleMonitoredPredicate2{
     RemoveFirstPredicate(){}
     RemoveFirstPredicate(Object dummy){}
     boolean testImpl(double val){
@@ -120,7 +120,7 @@ abstract class DoubleMonitoredPredicate implements DoublePredicate,Predicate<Obj
       }
     }
   }
-  static class RemoveFirstAndSecondToLastPredicate extends DoubleMonitoredPredicate{
+  static class RemoveFirstAndSecondToLastPredicate extends DoubleMonitoredPredicate2{
     int seqLength;
     RemoveFirstAndSecondToLastPredicate(int seqLength){
       this.seqLength=seqLength;

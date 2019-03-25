@@ -558,33 +558,6 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>
     }
     this.size=1;
   }
-/*
-  private void uncheckedInsert(int index,int size,E val)
-  {
-    final int tailDist;
-    if((tailDist=size-index)==0)
-    {
-      uncheckedAppend(size,val);
-    }
-    else
-    {
-      Object[] arr;
-      if((arr=this.arr).length==size)
-      {
-        final Object[] tmp;
-        ArrCopy.semicheckedCopy(arr,0,tmp=new Object[OmniArray.growBy50Pct(size)],0,index);
-        ArrCopy.uncheckedCopy(arr,index,tmp,index+1,tailDist);
-        this.arr=arr=tmp;
-      }
-      else
-      {
-        ArrCopy.uncheckedCopy(arr,index,arr,index+1,tailDist);
-      }
-      arr[index]=val;
-      this.size=size+1;
-    }
-  }
-*/  
   public void push(E val)
   {
     final int size;
@@ -4487,7 +4460,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>
       return new CheckedSubList<E>(this,fromIndex,CheckedCollection.checkSubListRange(fromIndex,toIndex,this.size));
     }
   }
-  //private
+  private
     static class CheckedSubList<E>
       implements OmniList.OfRef<E>,Cloneable
   {

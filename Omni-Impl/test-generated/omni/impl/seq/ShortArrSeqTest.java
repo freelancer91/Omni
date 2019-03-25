@@ -438,7 +438,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RetainSecondPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RetainSecondPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -450,7 +450,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new ShortMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -462,7 +462,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstAndThirdPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RemoveFirstAndThirdPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -474,7 +474,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RemoveFirstPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -486,7 +486,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new ShortMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -497,7 +497,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveAllPredicate();
+    var filter=new ShortMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -509,7 +509,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveNonePredicate();
+    var filter=new ShortMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -521,7 +521,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RetainSecondPredicate();
+    var filter=new ShortMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -533,7 +533,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new ShortMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -545,7 +545,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new ShortMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3-2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -557,7 +557,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new ShortMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3-1,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -569,7 +569,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new ShortMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3-2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -581,7 +581,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveAllPredicate();
+    var filter=new ShortMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -593,7 +593,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveNonePredicate();
+    var filter=new ShortMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -605,7 +605,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RetainSecondPredicate();
+    var filter=new ShortMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -617,7 +617,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new ShortMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -629,7 +629,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new ShortMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50-2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -641,7 +641,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new ShortMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50-1,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -653,7 +653,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new ShortMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50-2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -665,7 +665,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveAllPredicate();
+    var filter=new ShortMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -677,7 +677,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveNonePredicate();
+    var filter=new ShortMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -689,7 +689,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RetainSecondPredicate();
+    var filter=new ShortMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -701,7 +701,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new ShortMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -713,7 +713,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new ShortMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100-2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -725,7 +725,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new ShortMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100-1,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -737,7 +737,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new ShortMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100-2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -750,7 +750,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveAllPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RemoveAllPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -762,7 +762,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveNonePredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RemoveNonePredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -799,7 +799,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RetainSecondPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RetainSecondPredicate(seq);
     Assertions.assertFalse(seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -811,7 +811,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new ShortMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertFalse(seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -823,7 +823,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstAndThirdPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RemoveFirstAndThirdPredicate(seq);
     Assertions.assertFalse(seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -835,7 +835,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RemoveFirstPredicate(seq);
     Assertions.assertFalse(seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -847,7 +847,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new ShortMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertFalse(seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -858,7 +858,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveAllPredicate();
+    var filter=new ShortMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -870,7 +870,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveNonePredicate();
+    var filter=new ShortMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -882,7 +882,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RetainSecondPredicate();
+    var filter=new ShortMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -894,7 +894,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new ShortMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -906,7 +906,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new ShortMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(3-2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -918,7 +918,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new ShortMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(3-1,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -930,7 +930,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new ShortMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(3-2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -942,7 +942,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveAllPredicate();
+    var filter=new ShortMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -954,7 +954,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveNonePredicate();
+    var filter=new ShortMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -966,7 +966,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RetainSecondPredicate();
+    var filter=new ShortMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -978,7 +978,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new ShortMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -990,7 +990,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new ShortMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(50-2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -1002,7 +1002,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new ShortMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(50-1,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -1014,7 +1014,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new ShortMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(50-2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -1026,7 +1026,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveAllPredicate();
+    var filter=new ShortMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -1038,7 +1038,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveNonePredicate();
+    var filter=new ShortMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -1050,7 +1050,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RetainSecondPredicate();
+    var filter=new ShortMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -1062,7 +1062,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new ShortMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -1074,7 +1074,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new ShortMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(100-2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -1086,7 +1086,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new ShortMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(100-1,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -1098,7 +1098,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new ShortMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(100-2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -1111,7 +1111,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveAllPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RemoveAllPredicate(seq);
     Assertions.assertFalse(seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -1123,7 +1123,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveNonePredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RemoveNonePredicate(seq);
     Assertions.assertFalse(seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -1893,7 +1893,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RetainSecondPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RetainSecondPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -1905,7 +1905,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new ShortMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -1917,7 +1917,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstAndThirdPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RemoveFirstAndThirdPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -1929,7 +1929,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RemoveFirstPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -1941,7 +1941,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new ShortMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -1952,7 +1952,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveAllPredicate();
+    var filter=new ShortMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -1964,7 +1964,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveNonePredicate();
+    var filter=new ShortMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -1976,7 +1976,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RetainSecondPredicate();
+    var filter=new ShortMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -1988,7 +1988,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new ShortMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -2000,7 +2000,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new ShortMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3-2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -2012,7 +2012,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new ShortMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3-1,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -2024,7 +2024,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new ShortMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3-2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -2036,7 +2036,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveAllPredicate();
+    var filter=new ShortMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -2048,7 +2048,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveNonePredicate();
+    var filter=new ShortMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -2060,7 +2060,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RetainSecondPredicate();
+    var filter=new ShortMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -2072,7 +2072,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new ShortMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -2084,7 +2084,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new ShortMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50-2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -2096,7 +2096,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new ShortMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50-1,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -2108,7 +2108,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new ShortMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50-2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -2120,7 +2120,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveAllPredicate();
+    var filter=new ShortMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -2132,7 +2132,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveNonePredicate();
+    var filter=new ShortMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -2144,7 +2144,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RetainSecondPredicate();
+    var filter=new ShortMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -2156,7 +2156,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new ShortMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -2168,7 +2168,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new ShortMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100-2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -2180,7 +2180,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new ShortMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100-1,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -2192,7 +2192,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new ShortMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100-2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -2205,7 +2205,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveAllPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RemoveAllPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -2217,7 +2217,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveNonePredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RemoveNonePredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -2254,7 +2254,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RetainSecondPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RetainSecondPredicate(seq);
     Assertions.assertFalse(seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -2266,7 +2266,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new ShortMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertFalse(seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -2278,7 +2278,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstAndThirdPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RemoveFirstAndThirdPredicate(seq);
     Assertions.assertFalse(seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -2290,7 +2290,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RemoveFirstPredicate(seq);
     Assertions.assertFalse(seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -2302,7 +2302,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new ShortMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertFalse(seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -2313,7 +2313,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveAllPredicate();
+    var filter=new ShortMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -2325,7 +2325,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveNonePredicate();
+    var filter=new ShortMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -2337,7 +2337,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RetainSecondPredicate();
+    var filter=new ShortMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -2349,7 +2349,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new ShortMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -2361,7 +2361,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new ShortMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(3-2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -2373,7 +2373,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new ShortMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(3-1,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -2385,7 +2385,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new ShortMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(3-2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -2397,7 +2397,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveAllPredicate();
+    var filter=new ShortMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -2409,7 +2409,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveNonePredicate();
+    var filter=new ShortMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -2421,7 +2421,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RetainSecondPredicate();
+    var filter=new ShortMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -2433,7 +2433,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new ShortMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -2445,7 +2445,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new ShortMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(50-2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -2457,7 +2457,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new ShortMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(50-1,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -2469,7 +2469,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new ShortMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(50-2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -2481,7 +2481,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveAllPredicate();
+    var filter=new ShortMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -2493,7 +2493,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveNonePredicate();
+    var filter=new ShortMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -2505,7 +2505,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RetainSecondPredicate();
+    var filter=new ShortMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -2517,7 +2517,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new ShortMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -2529,7 +2529,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new ShortMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(100-2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -2541,7 +2541,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new ShortMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(100-1,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -2553,7 +2553,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new ShortMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(100-2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -2566,7 +2566,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveAllPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RemoveAllPredicate(seq);
     Assertions.assertFalse(seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -2578,7 +2578,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveNonePredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RemoveNonePredicate(seq);
     Assertions.assertFalse(seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -3541,7 +3541,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RetainSecondArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RetainSecondArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -3554,7 +3554,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RetainSecondAndLastArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RetainSecondAndLastArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -3567,7 +3567,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstAndThirdArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RemoveFirstAndThirdArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -3580,7 +3580,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RemoveFirstArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -3593,7 +3593,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstAndSecondToLastArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RemoveFirstAndSecondToLastArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -3604,7 +3604,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.ModifyingArrSeqCheckedStackAndThrowingPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.ModifyingArrSeqCheckedStackAndThrowingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3+1,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -3617,7 +3617,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.ThrowingPredicate();
+    var filter=new ShortMonitoredPredicate2.ThrowingPredicate();
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -3630,7 +3630,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveAllArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RemoveAllArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -3643,7 +3643,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveNoneArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RemoveNoneArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -3656,7 +3656,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RetainSecondArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RetainSecondArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -3669,7 +3669,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RetainSecondAndLastArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RetainSecondAndLastArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -3682,7 +3682,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstAndThirdArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RemoveFirstAndThirdArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -3695,7 +3695,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RemoveFirstArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -3708,7 +3708,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstAndSecondToLastArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RemoveFirstAndSecondToLastArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -3720,7 +3720,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.ModifyingArrSeqCheckedStackAndThrowingPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.ModifyingArrSeqCheckedStackAndThrowingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50+1,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -3733,7 +3733,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.ThrowingPredicate();
+    var filter=new ShortMonitoredPredicate2.ThrowingPredicate();
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -3746,7 +3746,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveAllArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RemoveAllArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -3759,7 +3759,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveNoneArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RemoveNoneArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -3772,7 +3772,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RetainSecondArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RetainSecondArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -3785,7 +3785,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RetainSecondAndLastArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RetainSecondAndLastArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -3798,7 +3798,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstAndThirdArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RemoveFirstAndThirdArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -3811,7 +3811,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RemoveFirstArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -3824,7 +3824,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstAndSecondToLastArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RemoveFirstAndSecondToLastArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -3836,7 +3836,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.ModifyingArrSeqCheckedStackAndThrowingPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.ModifyingArrSeqCheckedStackAndThrowingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100+1,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -3849,7 +3849,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.ThrowingPredicate();
+    var filter=new ShortMonitoredPredicate2.ThrowingPredicate();
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -3862,7 +3862,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveAllArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RemoveAllArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -3875,7 +3875,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveNoneArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RemoveNoneArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -3888,7 +3888,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RetainSecondArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RetainSecondArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -3901,7 +3901,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RetainSecondAndLastArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RetainSecondAndLastArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -3914,7 +3914,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstAndThirdArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RemoveFirstAndThirdArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -3927,7 +3927,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RemoveFirstArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -3940,7 +3940,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstAndSecondToLastArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RemoveFirstAndSecondToLastArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -3954,7 +3954,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RetainSecondPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RetainSecondPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -3967,7 +3967,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new ShortMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -3980,7 +3980,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstAndThirdPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RemoveFirstAndThirdPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -3993,7 +3993,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RemoveFirstPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -4006,7 +4006,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new ShortMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -4018,7 +4018,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveAllPredicate();
+    var filter=new ShortMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -4030,7 +4030,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveNonePredicate();
+    var filter=new ShortMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -4042,7 +4042,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RetainSecondPredicate();
+    var filter=new ShortMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -4054,7 +4054,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new ShortMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -4066,7 +4066,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new ShortMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3-2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -4078,7 +4078,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new ShortMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3-1,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -4090,7 +4090,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new ShortMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3-2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -4102,7 +4102,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveAllPredicate();
+    var filter=new ShortMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -4114,7 +4114,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveNonePredicate();
+    var filter=new ShortMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -4126,7 +4126,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RetainSecondPredicate();
+    var filter=new ShortMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -4138,7 +4138,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new ShortMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -4150,7 +4150,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new ShortMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50-2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -4162,7 +4162,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new ShortMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50-1,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -4174,7 +4174,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new ShortMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50-2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -4186,7 +4186,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveAllPredicate();
+    var filter=new ShortMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -4198,7 +4198,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveNonePredicate();
+    var filter=new ShortMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -4210,7 +4210,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RetainSecondPredicate();
+    var filter=new ShortMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -4222,7 +4222,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new ShortMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -4234,7 +4234,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new ShortMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100-2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -4246,7 +4246,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new ShortMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100-1,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -4258,7 +4258,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new ShortMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100-2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -4271,7 +4271,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveAllPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RemoveAllPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -4284,7 +4284,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveNonePredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RemoveNonePredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -4297,7 +4297,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveAllArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RemoveAllArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -4310,7 +4310,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveNoneArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RemoveNoneArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -4323,7 +4323,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.ThrowingPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.ThrowingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -4336,7 +4336,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.ModifyingArrSeqCheckedStackAndThrowingPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.ModifyingArrSeqCheckedStackAndThrowingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -4449,7 +4449,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RetainSecondArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RetainSecondArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -4462,7 +4462,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RetainSecondAndLastArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RetainSecondAndLastArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -4475,7 +4475,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstAndThirdArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RemoveFirstAndThirdArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -4488,7 +4488,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RemoveFirstArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -4501,7 +4501,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstAndSecondToLastArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RemoveFirstAndSecondToLastArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -4512,7 +4512,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.ModifyingArrSeqCheckedStackAndThrowingPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.ModifyingArrSeqCheckedStackAndThrowingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(3+1,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -4525,7 +4525,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.ThrowingPredicate();
+    var filter=new ShortMonitoredPredicate2.ThrowingPredicate();
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -4538,7 +4538,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveAllArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RemoveAllArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -4551,7 +4551,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveNoneArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RemoveNoneArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -4564,7 +4564,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RetainSecondArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RetainSecondArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -4577,7 +4577,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RetainSecondAndLastArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RetainSecondAndLastArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -4590,7 +4590,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstAndThirdArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RemoveFirstAndThirdArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -4603,7 +4603,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RemoveFirstArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -4616,7 +4616,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstAndSecondToLastArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RemoveFirstAndSecondToLastArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -4628,7 +4628,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.ModifyingArrSeqCheckedStackAndThrowingPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.ModifyingArrSeqCheckedStackAndThrowingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(50+1,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -4641,7 +4641,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.ThrowingPredicate();
+    var filter=new ShortMonitoredPredicate2.ThrowingPredicate();
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -4654,7 +4654,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveAllArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RemoveAllArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -4667,7 +4667,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveNoneArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RemoveNoneArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -4680,7 +4680,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RetainSecondArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RetainSecondArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -4693,7 +4693,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RetainSecondAndLastArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RetainSecondAndLastArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -4706,7 +4706,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstAndThirdArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RemoveFirstAndThirdArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -4719,7 +4719,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RemoveFirstArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -4732,7 +4732,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstAndSecondToLastArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RemoveFirstAndSecondToLastArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -4744,7 +4744,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.ModifyingArrSeqCheckedStackAndThrowingPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.ModifyingArrSeqCheckedStackAndThrowingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(100+1,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -4757,7 +4757,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.ThrowingPredicate();
+    var filter=new ShortMonitoredPredicate2.ThrowingPredicate();
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -4770,7 +4770,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveAllArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RemoveAllArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -4783,7 +4783,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveNoneArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RemoveNoneArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -4796,7 +4796,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RetainSecondArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RetainSecondArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -4809,7 +4809,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RetainSecondAndLastArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RetainSecondAndLastArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -4822,7 +4822,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstAndThirdArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RemoveFirstAndThirdArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -4835,7 +4835,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RemoveFirstArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -4848,7 +4848,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstAndSecondToLastArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RemoveFirstAndSecondToLastArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -4862,7 +4862,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RetainSecondPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RetainSecondPredicate(seq);
     Assertions.assertFalse(seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -4875,7 +4875,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new ShortMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertFalse(seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -4888,7 +4888,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstAndThirdPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RemoveFirstAndThirdPredicate(seq);
     Assertions.assertFalse(seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -4901,7 +4901,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RemoveFirstPredicate(seq);
     Assertions.assertFalse(seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -4914,7 +4914,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new ShortMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertFalse(seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -4926,7 +4926,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveAllPredicate();
+    var filter=new ShortMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -4938,7 +4938,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveNonePredicate();
+    var filter=new ShortMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -4950,7 +4950,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RetainSecondPredicate();
+    var filter=new ShortMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -4962,7 +4962,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new ShortMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -4974,7 +4974,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new ShortMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(3-2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -4986,7 +4986,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new ShortMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(3-1,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -4998,7 +4998,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new ShortMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(3-2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -5010,7 +5010,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveAllPredicate();
+    var filter=new ShortMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -5022,7 +5022,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveNonePredicate();
+    var filter=new ShortMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -5034,7 +5034,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RetainSecondPredicate();
+    var filter=new ShortMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -5046,7 +5046,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new ShortMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -5058,7 +5058,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new ShortMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(50-2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -5070,7 +5070,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new ShortMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(50-1,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -5082,7 +5082,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new ShortMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(50-2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -5094,7 +5094,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveAllPredicate();
+    var filter=new ShortMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -5106,7 +5106,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveNonePredicate();
+    var filter=new ShortMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -5118,7 +5118,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RetainSecondPredicate();
+    var filter=new ShortMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -5130,7 +5130,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new ShortMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -5142,7 +5142,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new ShortMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(100-2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -5154,7 +5154,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new ShortMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(100-1,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -5166,7 +5166,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new ShortMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(100-2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -5179,7 +5179,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveAllPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RemoveAllPredicate(seq);
     Assertions.assertFalse(seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -5192,7 +5192,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveNonePredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RemoveNonePredicate(seq);
     Assertions.assertFalse(seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -5205,7 +5205,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveAllArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RemoveAllArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -5218,7 +5218,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveNoneArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RemoveNoneArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -5231,7 +5231,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.ThrowingPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.ThrowingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -5244,7 +5244,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.ModifyingArrSeqCheckedStackAndThrowingPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.ModifyingArrSeqCheckedStackAndThrowingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -6238,7 +6238,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RetainSecondArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RetainSecondArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -6251,7 +6251,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RetainSecondAndLastArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RetainSecondAndLastArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -6264,7 +6264,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstAndThirdArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RemoveFirstAndThirdArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -6277,7 +6277,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RemoveFirstArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -6290,7 +6290,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstAndSecondToLastArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RemoveFirstAndSecondToLastArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -6301,7 +6301,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.ModifyingArrSeqCheckedListAndThrowingPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.ModifyingArrSeqCheckedListAndThrowingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3+1,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -6314,7 +6314,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.ThrowingPredicate();
+    var filter=new ShortMonitoredPredicate2.ThrowingPredicate();
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -6327,7 +6327,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveAllArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RemoveAllArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -6340,7 +6340,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveNoneArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RemoveNoneArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -6353,7 +6353,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RetainSecondArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RetainSecondArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -6366,7 +6366,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RetainSecondAndLastArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RetainSecondAndLastArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -6379,7 +6379,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstAndThirdArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RemoveFirstAndThirdArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -6392,7 +6392,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RemoveFirstArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -6405,7 +6405,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstAndSecondToLastArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RemoveFirstAndSecondToLastArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -6417,7 +6417,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.ModifyingArrSeqCheckedListAndThrowingPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.ModifyingArrSeqCheckedListAndThrowingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50+1,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -6430,7 +6430,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.ThrowingPredicate();
+    var filter=new ShortMonitoredPredicate2.ThrowingPredicate();
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -6443,7 +6443,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveAllArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RemoveAllArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -6456,7 +6456,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveNoneArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RemoveNoneArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -6469,7 +6469,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RetainSecondArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RetainSecondArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -6482,7 +6482,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RetainSecondAndLastArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RetainSecondAndLastArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -6495,7 +6495,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstAndThirdArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RemoveFirstAndThirdArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -6508,7 +6508,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RemoveFirstArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -6521,7 +6521,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstAndSecondToLastArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RemoveFirstAndSecondToLastArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -6533,7 +6533,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.ModifyingArrSeqCheckedListAndThrowingPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.ModifyingArrSeqCheckedListAndThrowingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100+1,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -6546,7 +6546,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.ThrowingPredicate();
+    var filter=new ShortMonitoredPredicate2.ThrowingPredicate();
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -6559,7 +6559,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveAllArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RemoveAllArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -6572,7 +6572,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveNoneArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RemoveNoneArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -6585,7 +6585,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RetainSecondArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RetainSecondArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -6598,7 +6598,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RetainSecondAndLastArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RetainSecondAndLastArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -6611,7 +6611,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstAndThirdArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RemoveFirstAndThirdArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -6624,7 +6624,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RemoveFirstArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -6637,7 +6637,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstAndSecondToLastArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RemoveFirstAndSecondToLastArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -6651,7 +6651,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RetainSecondPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RetainSecondPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -6664,7 +6664,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new ShortMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -6677,7 +6677,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstAndThirdPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RemoveFirstAndThirdPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -6690,7 +6690,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RemoveFirstPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -6703,7 +6703,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new ShortMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -6715,7 +6715,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveAllPredicate();
+    var filter=new ShortMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -6727,7 +6727,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveNonePredicate();
+    var filter=new ShortMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -6739,7 +6739,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RetainSecondPredicate();
+    var filter=new ShortMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -6751,7 +6751,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new ShortMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -6763,7 +6763,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new ShortMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3-2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -6775,7 +6775,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new ShortMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3-1,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -6787,7 +6787,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new ShortMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3-2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -6799,7 +6799,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveAllPredicate();
+    var filter=new ShortMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -6811,7 +6811,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveNonePredicate();
+    var filter=new ShortMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -6823,7 +6823,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RetainSecondPredicate();
+    var filter=new ShortMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -6835,7 +6835,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new ShortMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -6847,7 +6847,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new ShortMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50-2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -6859,7 +6859,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new ShortMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50-1,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -6871,7 +6871,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new ShortMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50-2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -6883,7 +6883,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveAllPredicate();
+    var filter=new ShortMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -6895,7 +6895,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveNonePredicate();
+    var filter=new ShortMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -6907,7 +6907,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RetainSecondPredicate();
+    var filter=new ShortMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -6919,7 +6919,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new ShortMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -6931,7 +6931,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new ShortMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100-2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -6943,7 +6943,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new ShortMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100-1,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -6955,7 +6955,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new ShortMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100-2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -6968,7 +6968,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveAllPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RemoveAllPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -6981,7 +6981,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveNonePredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RemoveNonePredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -6994,7 +6994,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveAllArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RemoveAllArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -7007,7 +7007,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveNoneArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RemoveNoneArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -7020,7 +7020,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.ThrowingPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.ThrowingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -7033,7 +7033,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.ModifyingArrSeqCheckedListAndThrowingPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.ModifyingArrSeqCheckedListAndThrowingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -7146,7 +7146,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RetainSecondArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RetainSecondArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -7159,7 +7159,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RetainSecondAndLastArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RetainSecondAndLastArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -7172,7 +7172,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstAndThirdArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RemoveFirstAndThirdArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -7185,7 +7185,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RemoveFirstArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -7198,7 +7198,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstAndSecondToLastArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RemoveFirstAndSecondToLastArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -7209,7 +7209,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.ModifyingArrSeqCheckedListAndThrowingPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.ModifyingArrSeqCheckedListAndThrowingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(3+1,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -7222,7 +7222,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.ThrowingPredicate();
+    var filter=new ShortMonitoredPredicate2.ThrowingPredicate();
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -7235,7 +7235,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveAllArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RemoveAllArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -7248,7 +7248,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveNoneArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RemoveNoneArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -7261,7 +7261,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RetainSecondArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RetainSecondArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -7274,7 +7274,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RetainSecondAndLastArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RetainSecondAndLastArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -7287,7 +7287,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstAndThirdArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RemoveFirstAndThirdArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -7300,7 +7300,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RemoveFirstArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -7313,7 +7313,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstAndSecondToLastArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RemoveFirstAndSecondToLastArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -7325,7 +7325,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.ModifyingArrSeqCheckedListAndThrowingPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.ModifyingArrSeqCheckedListAndThrowingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(50+1,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -7338,7 +7338,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.ThrowingPredicate();
+    var filter=new ShortMonitoredPredicate2.ThrowingPredicate();
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -7351,7 +7351,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveAllArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RemoveAllArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -7364,7 +7364,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveNoneArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RemoveNoneArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -7377,7 +7377,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RetainSecondArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RetainSecondArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -7390,7 +7390,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RetainSecondAndLastArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RetainSecondAndLastArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -7403,7 +7403,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstAndThirdArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RemoveFirstAndThirdArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -7416,7 +7416,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RemoveFirstArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -7429,7 +7429,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstAndSecondToLastArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RemoveFirstAndSecondToLastArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -7441,7 +7441,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.ModifyingArrSeqCheckedListAndThrowingPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.ModifyingArrSeqCheckedListAndThrowingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(100+1,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -7454,7 +7454,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.ThrowingPredicate();
+    var filter=new ShortMonitoredPredicate2.ThrowingPredicate();
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -7467,7 +7467,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveAllArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RemoveAllArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -7480,7 +7480,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveNoneArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RemoveNoneArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -7493,7 +7493,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RetainSecondArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RetainSecondArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -7506,7 +7506,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RetainSecondAndLastArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RetainSecondAndLastArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -7519,7 +7519,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstAndThirdArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RemoveFirstAndThirdArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -7532,7 +7532,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RemoveFirstArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -7545,7 +7545,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstAndSecondToLastArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RemoveFirstAndSecondToLastArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -7559,7 +7559,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RetainSecondPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RetainSecondPredicate(seq);
     Assertions.assertFalse(seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -7572,7 +7572,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new ShortMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertFalse(seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -7585,7 +7585,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstAndThirdPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RemoveFirstAndThirdPredicate(seq);
     Assertions.assertFalse(seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -7598,7 +7598,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RemoveFirstPredicate(seq);
     Assertions.assertFalse(seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -7611,7 +7611,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new ShortMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertFalse(seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -7623,7 +7623,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveAllPredicate();
+    var filter=new ShortMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -7635,7 +7635,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveNonePredicate();
+    var filter=new ShortMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -7647,7 +7647,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RetainSecondPredicate();
+    var filter=new ShortMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -7659,7 +7659,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new ShortMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -7671,7 +7671,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new ShortMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(3-2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -7683,7 +7683,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new ShortMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(3-1,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -7695,7 +7695,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new ShortMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(3-2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -7707,7 +7707,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveAllPredicate();
+    var filter=new ShortMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -7719,7 +7719,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveNonePredicate();
+    var filter=new ShortMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -7731,7 +7731,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RetainSecondPredicate();
+    var filter=new ShortMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -7743,7 +7743,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new ShortMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -7755,7 +7755,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new ShortMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(50-2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -7767,7 +7767,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new ShortMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(50-1,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -7779,7 +7779,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new ShortMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(50-2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -7791,7 +7791,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveAllPredicate();
+    var filter=new ShortMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -7803,7 +7803,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveNonePredicate();
+    var filter=new ShortMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -7815,7 +7815,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RetainSecondPredicate();
+    var filter=new ShortMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -7827,7 +7827,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new ShortMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -7839,7 +7839,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new ShortMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(100-2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -7851,7 +7851,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new ShortMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(100-1,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -7863,7 +7863,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new ShortMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(100-2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -7876,7 +7876,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveAllPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RemoveAllPredicate(seq);
     Assertions.assertFalse(seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -7889,7 +7889,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveNonePredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RemoveNonePredicate(seq);
     Assertions.assertFalse(seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -7902,7 +7902,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveAllArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RemoveAllArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -7915,7 +7915,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.RemoveNoneArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.RemoveNoneArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -7928,7 +7928,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.ThrowingPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.ThrowingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -7941,7 +7941,7 @@ public class ShortArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToshort(i));
     }
-    var filter=new ShortMonitoredPredicate.ModifyingArrSeqCheckedListAndThrowingPredicate(seq);
+    var filter=new ShortMonitoredPredicate2.ModifyingArrSeqCheckedListAndThrowingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((ShortPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);

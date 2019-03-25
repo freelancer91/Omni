@@ -1,7 +1,7 @@
 package omni.impl.seq;
 import java.util.function.Predicate;
 import omni.function.BooleanPredicate;
-abstract class BooleanMonitoredPredicate implements BooleanPredicate,Predicate<Object>
+abstract class BooleanMonitoredPredicate2 implements BooleanPredicate,Predicate<Object>
 {
   int callCount;
   abstract boolean testImpl(boolean val);
@@ -9,42 +9,42 @@ abstract class BooleanMonitoredPredicate implements BooleanPredicate,Predicate<O
     ++callCount;
     return testImpl((boolean)val);
   }
-  public BooleanMonitoredPredicate negate(){
+  public BooleanMonitoredPredicate2 negate(){
     //don't care
     return null;
   }
   @Override public boolean test(Object val){
     return test((boolean)val);
   }
-  static class RemoveAllPredicate extends BooleanMonitoredPredicate{
+  static class RemoveAllPredicate extends BooleanMonitoredPredicate2{
     RemoveAllPredicate(){}
     RemoveAllPredicate(Object dummy){}
     boolean testImpl(boolean val){
       return true;
     }
   }
-  static class RemoveNonePredicate extends BooleanMonitoredPredicate{
+  static class RemoveNonePredicate extends BooleanMonitoredPredicate2{
     RemoveNonePredicate(){}
     RemoveNonePredicate(Object dummy){}
     boolean testImpl(boolean val){
       return false;
     }
   }
-  static class ThrowingPredicate extends BooleanMonitoredPredicate{
+  static class ThrowingPredicate extends BooleanMonitoredPredicate2{
     ThrowingPredicate(){}
     ThrowingPredicate(Object dummy){}
     @Override boolean testImpl(boolean val){
       throw new IndexOutOfBoundsException();
     }
   }
-  static class RemoveTruePredicate extends BooleanMonitoredPredicate{
+  static class RemoveTruePredicate extends BooleanMonitoredPredicate2{
     RemoveTruePredicate(){}
     RemoveTruePredicate(Object dummy){}
     boolean testImpl(boolean val){
       return val;
     }
   }
-  static class RemoveFalsePredicate extends BooleanMonitoredPredicate{
+  static class RemoveFalsePredicate extends BooleanMonitoredPredicate2{
     RemoveFalsePredicate(){}
     RemoveFalsePredicate(Object dummy){}
     boolean testImpl(boolean val){

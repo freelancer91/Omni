@@ -4,7 +4,7 @@ import omni.function.BytePredicate;
 import org.junit.jupiter.api.Assertions;
 import omni.util.TypeConversionUtil;
 import omni.util.EqualityUtil;
-abstract class ByteMonitoredPredicate implements BytePredicate,Predicate<Object>
+abstract class ByteMonitoredPredicate2 implements BytePredicate,Predicate<Object>
 {
   int callCount;
   abstract boolean testImpl(byte val);
@@ -12,14 +12,14 @@ abstract class ByteMonitoredPredicate implements BytePredicate,Predicate<Object>
     ++callCount;
     return testImpl((byte)val);
   }
-  public ByteMonitoredPredicate negate(){
+  public ByteMonitoredPredicate2 negate(){
     //don't care
     return null;
   }
   @Override public boolean test(Object val){
     return test((byte)val);
   }
-  static class RemoveAllPredicate extends ByteMonitoredPredicate{
+  static class RemoveAllPredicate extends ByteMonitoredPredicate2{
     RemoveAllPredicate(){}
     RemoveAllPredicate(Object dummy){}
     boolean testImpl(byte val){
@@ -28,7 +28,7 @@ abstract class ByteMonitoredPredicate implements BytePredicate,Predicate<Object>
     void verifyArray(byte[] arr,int offset,int originalLength){
     }
   }
-  static class RemoveNonePredicate extends ByteMonitoredPredicate{
+  static class RemoveNonePredicate extends ByteMonitoredPredicate2{
     RemoveNonePredicate(){}
     RemoveNonePredicate(Object dummy){}
     boolean testImpl(byte val){
@@ -41,7 +41,7 @@ abstract class ByteMonitoredPredicate implements BytePredicate,Predicate<Object>
       }
     }
   }
-  static class ThrowingPredicate extends ByteMonitoredPredicate{
+  static class ThrowingPredicate extends ByteMonitoredPredicate2{
     ThrowingPredicate(){}
     ThrowingPredicate(Object dummy){}
     @Override boolean testImpl(byte val){
@@ -54,7 +54,7 @@ abstract class ByteMonitoredPredicate implements BytePredicate,Predicate<Object>
       }
     }
   }
-  static class RetainSecondPredicate extends ByteMonitoredPredicate{
+  static class RetainSecondPredicate extends ByteMonitoredPredicate2{
     RetainSecondPredicate(){}
     RetainSecondPredicate(Object dummy){}
     boolean testImpl(byte val){
@@ -70,7 +70,7 @@ abstract class ByteMonitoredPredicate implements BytePredicate,Predicate<Object>
       }
     }
   }
-  static class RetainSecondAndLastPredicate extends ByteMonitoredPredicate{
+  static class RetainSecondAndLastPredicate extends ByteMonitoredPredicate2{
     int seqLength;
     RetainSecondAndLastPredicate(int seqLength){
       this.seqLength=seqLength;
@@ -88,7 +88,7 @@ abstract class ByteMonitoredPredicate implements BytePredicate,Predicate<Object>
       }
     }
   }
-  static class RemoveFirstAndThirdPredicate extends ByteMonitoredPredicate{
+  static class RemoveFirstAndThirdPredicate extends ByteMonitoredPredicate2{
     RemoveFirstAndThirdPredicate(){}
     RemoveFirstAndThirdPredicate(Object dummy){}
     boolean testImpl(byte val){
@@ -104,7 +104,7 @@ abstract class ByteMonitoredPredicate implements BytePredicate,Predicate<Object>
       }
     }
   }
-  static class RemoveFirstPredicate  extends ByteMonitoredPredicate{
+  static class RemoveFirstPredicate  extends ByteMonitoredPredicate2{
     RemoveFirstPredicate(){}
     RemoveFirstPredicate(Object dummy){}
     boolean testImpl(byte val){
@@ -120,7 +120,7 @@ abstract class ByteMonitoredPredicate implements BytePredicate,Predicate<Object>
       }
     }
   }
-  static class RemoveFirstAndSecondToLastPredicate extends ByteMonitoredPredicate{
+  static class RemoveFirstAndSecondToLastPredicate extends ByteMonitoredPredicate2{
     int seqLength;
     RemoveFirstAndSecondToLastPredicate(int seqLength){
       this.seqLength=seqLength;

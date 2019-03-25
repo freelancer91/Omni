@@ -4,7 +4,7 @@ import omni.function.ShortPredicate;
 import org.junit.jupiter.api.Assertions;
 import omni.util.TypeConversionUtil;
 import omni.util.EqualityUtil;
-abstract class ShortMonitoredPredicate implements ShortPredicate,Predicate<Object>
+abstract class ShortMonitoredPredicate2 implements ShortPredicate,Predicate<Object>
 {
   int callCount;
   abstract boolean testImpl(short val);
@@ -12,14 +12,14 @@ abstract class ShortMonitoredPredicate implements ShortPredicate,Predicate<Objec
     ++callCount;
     return testImpl((short)val);
   }
-  public ShortMonitoredPredicate negate(){
+  public ShortMonitoredPredicate2 negate(){
     //don't care
     return null;
   }
   @Override public boolean test(Object val){
     return test((short)val);
   }
-  static class RemoveAllPredicate extends ShortMonitoredPredicate{
+  static class RemoveAllPredicate extends ShortMonitoredPredicate2{
     RemoveAllPredicate(){}
     RemoveAllPredicate(Object dummy){}
     boolean testImpl(short val){
@@ -28,7 +28,7 @@ abstract class ShortMonitoredPredicate implements ShortPredicate,Predicate<Objec
     void verifyArray(short[] arr,int offset,int originalLength){
     }
   }
-  static class RemoveNonePredicate extends ShortMonitoredPredicate{
+  static class RemoveNonePredicate extends ShortMonitoredPredicate2{
     RemoveNonePredicate(){}
     RemoveNonePredicate(Object dummy){}
     boolean testImpl(short val){
@@ -41,7 +41,7 @@ abstract class ShortMonitoredPredicate implements ShortPredicate,Predicate<Objec
       }
     }
   }
-  static class ThrowingPredicate extends ShortMonitoredPredicate{
+  static class ThrowingPredicate extends ShortMonitoredPredicate2{
     ThrowingPredicate(){}
     ThrowingPredicate(Object dummy){}
     @Override boolean testImpl(short val){
@@ -54,7 +54,7 @@ abstract class ShortMonitoredPredicate implements ShortPredicate,Predicate<Objec
       }
     }
   }
-  static class RetainSecondPredicate extends ShortMonitoredPredicate{
+  static class RetainSecondPredicate extends ShortMonitoredPredicate2{
     RetainSecondPredicate(){}
     RetainSecondPredicate(Object dummy){}
     boolean testImpl(short val){
@@ -70,7 +70,7 @@ abstract class ShortMonitoredPredicate implements ShortPredicate,Predicate<Objec
       }
     }
   }
-  static class RetainSecondAndLastPredicate extends ShortMonitoredPredicate{
+  static class RetainSecondAndLastPredicate extends ShortMonitoredPredicate2{
     int seqLength;
     RetainSecondAndLastPredicate(int seqLength){
       this.seqLength=seqLength;
@@ -88,7 +88,7 @@ abstract class ShortMonitoredPredicate implements ShortPredicate,Predicate<Objec
       }
     }
   }
-  static class RemoveFirstAndThirdPredicate extends ShortMonitoredPredicate{
+  static class RemoveFirstAndThirdPredicate extends ShortMonitoredPredicate2{
     RemoveFirstAndThirdPredicate(){}
     RemoveFirstAndThirdPredicate(Object dummy){}
     boolean testImpl(short val){
@@ -104,7 +104,7 @@ abstract class ShortMonitoredPredicate implements ShortPredicate,Predicate<Objec
       }
     }
   }
-  static class RemoveFirstPredicate  extends ShortMonitoredPredicate{
+  static class RemoveFirstPredicate  extends ShortMonitoredPredicate2{
     RemoveFirstPredicate(){}
     RemoveFirstPredicate(Object dummy){}
     boolean testImpl(short val){
@@ -120,7 +120,7 @@ abstract class ShortMonitoredPredicate implements ShortPredicate,Predicate<Objec
       }
     }
   }
-  static class RemoveFirstAndSecondToLastPredicate extends ShortMonitoredPredicate{
+  static class RemoveFirstAndSecondToLastPredicate extends ShortMonitoredPredicate2{
     int seqLength;
     RemoveFirstAndSecondToLastPredicate(int seqLength){
       this.seqLength=seqLength;

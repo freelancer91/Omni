@@ -438,7 +438,7 @@ public class CharArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RetainSecondPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RetainSecondPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -450,7 +450,7 @@ public class CharArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new CharMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -462,7 +462,7 @@ public class CharArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstAndThirdPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RemoveFirstAndThirdPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -474,7 +474,7 @@ public class CharArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RemoveFirstPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -486,7 +486,7 @@ public class CharArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new CharMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -497,7 +497,7 @@ public class CharArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveAllPredicate();
+    var filter=new CharMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -509,7 +509,7 @@ public class CharArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveNonePredicate();
+    var filter=new CharMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -521,7 +521,7 @@ public class CharArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RetainSecondPredicate();
+    var filter=new CharMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -533,7 +533,7 @@ public class CharArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new CharMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -545,7 +545,7 @@ public class CharArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new CharMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3-2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -557,7 +557,7 @@ public class CharArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new CharMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3-1,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -569,7 +569,7 @@ public class CharArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new CharMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3-2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -581,7 +581,7 @@ public class CharArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveAllPredicate();
+    var filter=new CharMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -593,7 +593,7 @@ public class CharArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveNonePredicate();
+    var filter=new CharMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -605,7 +605,7 @@ public class CharArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RetainSecondPredicate();
+    var filter=new CharMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -617,7 +617,7 @@ public class CharArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new CharMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -629,7 +629,7 @@ public class CharArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new CharMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50-2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -641,7 +641,7 @@ public class CharArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new CharMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50-1,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -653,7 +653,7 @@ public class CharArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new CharMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50-2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -665,7 +665,7 @@ public class CharArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveAllPredicate();
+    var filter=new CharMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -677,7 +677,7 @@ public class CharArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveNonePredicate();
+    var filter=new CharMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -689,7 +689,7 @@ public class CharArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RetainSecondPredicate();
+    var filter=new CharMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -701,7 +701,7 @@ public class CharArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new CharMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -713,7 +713,7 @@ public class CharArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new CharMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100-2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -725,7 +725,7 @@ public class CharArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new CharMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100-1,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -737,7 +737,7 @@ public class CharArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new CharMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100-2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -750,7 +750,7 @@ public class CharArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveAllPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RemoveAllPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -762,7 +762,7 @@ public class CharArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveNonePredicate(seq);
+    var filter=new CharMonitoredPredicate2.RemoveNonePredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -799,7 +799,7 @@ public class CharArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RetainSecondPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RetainSecondPredicate(seq);
     Assertions.assertFalse(seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -811,7 +811,7 @@ public class CharArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new CharMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertFalse(seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -823,7 +823,7 @@ public class CharArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstAndThirdPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RemoveFirstAndThirdPredicate(seq);
     Assertions.assertFalse(seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -835,7 +835,7 @@ public class CharArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RemoveFirstPredicate(seq);
     Assertions.assertFalse(seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -847,7 +847,7 @@ public class CharArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new CharMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertFalse(seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -858,7 +858,7 @@ public class CharArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveAllPredicate();
+    var filter=new CharMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -870,7 +870,7 @@ public class CharArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveNonePredicate();
+    var filter=new CharMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -882,7 +882,7 @@ public class CharArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RetainSecondPredicate();
+    var filter=new CharMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -894,7 +894,7 @@ public class CharArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new CharMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -906,7 +906,7 @@ public class CharArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new CharMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(3-2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -918,7 +918,7 @@ public class CharArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new CharMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(3-1,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -930,7 +930,7 @@ public class CharArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new CharMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(3-2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -942,7 +942,7 @@ public class CharArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveAllPredicate();
+    var filter=new CharMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -954,7 +954,7 @@ public class CharArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveNonePredicate();
+    var filter=new CharMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -966,7 +966,7 @@ public class CharArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RetainSecondPredicate();
+    var filter=new CharMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -978,7 +978,7 @@ public class CharArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new CharMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -990,7 +990,7 @@ public class CharArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new CharMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(50-2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -1002,7 +1002,7 @@ public class CharArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new CharMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(50-1,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -1014,7 +1014,7 @@ public class CharArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new CharMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(50-2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -1026,7 +1026,7 @@ public class CharArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveAllPredicate();
+    var filter=new CharMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -1038,7 +1038,7 @@ public class CharArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveNonePredicate();
+    var filter=new CharMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -1050,7 +1050,7 @@ public class CharArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RetainSecondPredicate();
+    var filter=new CharMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -1062,7 +1062,7 @@ public class CharArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new CharMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -1074,7 +1074,7 @@ public class CharArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new CharMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(100-2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -1086,7 +1086,7 @@ public class CharArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new CharMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(100-1,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -1098,7 +1098,7 @@ public class CharArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new CharMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(100-2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -1111,7 +1111,7 @@ public class CharArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveAllPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RemoveAllPredicate(seq);
     Assertions.assertFalse(seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -1123,7 +1123,7 @@ public class CharArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveNonePredicate(seq);
+    var filter=new CharMonitoredPredicate2.RemoveNonePredicate(seq);
     Assertions.assertFalse(seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -1821,7 +1821,7 @@ public class CharArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RetainSecondPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RetainSecondPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -1833,7 +1833,7 @@ public class CharArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new CharMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -1845,7 +1845,7 @@ public class CharArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstAndThirdPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RemoveFirstAndThirdPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -1857,7 +1857,7 @@ public class CharArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RemoveFirstPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -1869,7 +1869,7 @@ public class CharArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new CharMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -1880,7 +1880,7 @@ public class CharArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveAllPredicate();
+    var filter=new CharMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -1892,7 +1892,7 @@ public class CharArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveNonePredicate();
+    var filter=new CharMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -1904,7 +1904,7 @@ public class CharArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RetainSecondPredicate();
+    var filter=new CharMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -1916,7 +1916,7 @@ public class CharArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new CharMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -1928,7 +1928,7 @@ public class CharArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new CharMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3-2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -1940,7 +1940,7 @@ public class CharArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new CharMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3-1,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -1952,7 +1952,7 @@ public class CharArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new CharMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3-2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -1964,7 +1964,7 @@ public class CharArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveAllPredicate();
+    var filter=new CharMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -1976,7 +1976,7 @@ public class CharArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveNonePredicate();
+    var filter=new CharMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -1988,7 +1988,7 @@ public class CharArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RetainSecondPredicate();
+    var filter=new CharMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -2000,7 +2000,7 @@ public class CharArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new CharMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -2012,7 +2012,7 @@ public class CharArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new CharMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50-2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -2024,7 +2024,7 @@ public class CharArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new CharMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50-1,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -2036,7 +2036,7 @@ public class CharArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new CharMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50-2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -2048,7 +2048,7 @@ public class CharArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveAllPredicate();
+    var filter=new CharMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -2060,7 +2060,7 @@ public class CharArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveNonePredicate();
+    var filter=new CharMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -2072,7 +2072,7 @@ public class CharArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RetainSecondPredicate();
+    var filter=new CharMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -2084,7 +2084,7 @@ public class CharArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new CharMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -2096,7 +2096,7 @@ public class CharArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new CharMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100-2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -2108,7 +2108,7 @@ public class CharArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new CharMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100-1,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -2120,7 +2120,7 @@ public class CharArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new CharMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100-2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -2133,7 +2133,7 @@ public class CharArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveAllPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RemoveAllPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -2145,7 +2145,7 @@ public class CharArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveNonePredicate(seq);
+    var filter=new CharMonitoredPredicate2.RemoveNonePredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -2182,7 +2182,7 @@ public class CharArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RetainSecondPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RetainSecondPredicate(seq);
     Assertions.assertFalse(seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -2194,7 +2194,7 @@ public class CharArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new CharMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertFalse(seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -2206,7 +2206,7 @@ public class CharArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstAndThirdPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RemoveFirstAndThirdPredicate(seq);
     Assertions.assertFalse(seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -2218,7 +2218,7 @@ public class CharArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RemoveFirstPredicate(seq);
     Assertions.assertFalse(seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -2230,7 +2230,7 @@ public class CharArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new CharMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertFalse(seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -2241,7 +2241,7 @@ public class CharArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveAllPredicate();
+    var filter=new CharMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -2253,7 +2253,7 @@ public class CharArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveNonePredicate();
+    var filter=new CharMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -2265,7 +2265,7 @@ public class CharArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RetainSecondPredicate();
+    var filter=new CharMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -2277,7 +2277,7 @@ public class CharArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new CharMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -2289,7 +2289,7 @@ public class CharArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new CharMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(3-2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -2301,7 +2301,7 @@ public class CharArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new CharMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(3-1,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -2313,7 +2313,7 @@ public class CharArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new CharMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(3-2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -2325,7 +2325,7 @@ public class CharArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveAllPredicate();
+    var filter=new CharMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -2337,7 +2337,7 @@ public class CharArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveNonePredicate();
+    var filter=new CharMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -2349,7 +2349,7 @@ public class CharArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RetainSecondPredicate();
+    var filter=new CharMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -2361,7 +2361,7 @@ public class CharArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new CharMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -2373,7 +2373,7 @@ public class CharArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new CharMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(50-2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -2385,7 +2385,7 @@ public class CharArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new CharMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(50-1,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -2397,7 +2397,7 @@ public class CharArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new CharMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(50-2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -2409,7 +2409,7 @@ public class CharArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveAllPredicate();
+    var filter=new CharMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -2421,7 +2421,7 @@ public class CharArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveNonePredicate();
+    var filter=new CharMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -2433,7 +2433,7 @@ public class CharArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RetainSecondPredicate();
+    var filter=new CharMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -2445,7 +2445,7 @@ public class CharArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new CharMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -2457,7 +2457,7 @@ public class CharArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new CharMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(100-2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -2469,7 +2469,7 @@ public class CharArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new CharMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(100-1,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -2481,7 +2481,7 @@ public class CharArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new CharMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(100-2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -2494,7 +2494,7 @@ public class CharArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveAllPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RemoveAllPredicate(seq);
     Assertions.assertFalse(seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -2506,7 +2506,7 @@ public class CharArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveNonePredicate(seq);
+    var filter=new CharMonitoredPredicate2.RemoveNonePredicate(seq);
     Assertions.assertFalse(seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -3397,7 +3397,7 @@ public class CharArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RetainSecondArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RetainSecondArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -3410,7 +3410,7 @@ public class CharArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RetainSecondAndLastArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RetainSecondAndLastArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -3423,7 +3423,7 @@ public class CharArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstAndThirdArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RemoveFirstAndThirdArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -3436,7 +3436,7 @@ public class CharArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RemoveFirstArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -3449,7 +3449,7 @@ public class CharArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstAndSecondToLastArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RemoveFirstAndSecondToLastArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -3460,7 +3460,7 @@ public class CharArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.ModifyingArrSeqCheckedStackAndThrowingPredicate(seq);
+    var filter=new CharMonitoredPredicate2.ModifyingArrSeqCheckedStackAndThrowingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3+1,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -3473,7 +3473,7 @@ public class CharArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.ThrowingPredicate();
+    var filter=new CharMonitoredPredicate2.ThrowingPredicate();
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -3486,7 +3486,7 @@ public class CharArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveAllArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RemoveAllArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -3499,7 +3499,7 @@ public class CharArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveNoneArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RemoveNoneArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -3512,7 +3512,7 @@ public class CharArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RetainSecondArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RetainSecondArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -3525,7 +3525,7 @@ public class CharArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RetainSecondAndLastArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RetainSecondAndLastArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -3538,7 +3538,7 @@ public class CharArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstAndThirdArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RemoveFirstAndThirdArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -3551,7 +3551,7 @@ public class CharArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RemoveFirstArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -3564,7 +3564,7 @@ public class CharArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstAndSecondToLastArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RemoveFirstAndSecondToLastArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -3576,7 +3576,7 @@ public class CharArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.ModifyingArrSeqCheckedStackAndThrowingPredicate(seq);
+    var filter=new CharMonitoredPredicate2.ModifyingArrSeqCheckedStackAndThrowingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50+1,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -3589,7 +3589,7 @@ public class CharArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.ThrowingPredicate();
+    var filter=new CharMonitoredPredicate2.ThrowingPredicate();
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -3602,7 +3602,7 @@ public class CharArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveAllArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RemoveAllArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -3615,7 +3615,7 @@ public class CharArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveNoneArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RemoveNoneArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -3628,7 +3628,7 @@ public class CharArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RetainSecondArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RetainSecondArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -3641,7 +3641,7 @@ public class CharArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RetainSecondAndLastArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RetainSecondAndLastArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -3654,7 +3654,7 @@ public class CharArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstAndThirdArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RemoveFirstAndThirdArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -3667,7 +3667,7 @@ public class CharArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RemoveFirstArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -3680,7 +3680,7 @@ public class CharArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstAndSecondToLastArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RemoveFirstAndSecondToLastArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -3692,7 +3692,7 @@ public class CharArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.ModifyingArrSeqCheckedStackAndThrowingPredicate(seq);
+    var filter=new CharMonitoredPredicate2.ModifyingArrSeqCheckedStackAndThrowingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100+1,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -3705,7 +3705,7 @@ public class CharArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.ThrowingPredicate();
+    var filter=new CharMonitoredPredicate2.ThrowingPredicate();
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -3718,7 +3718,7 @@ public class CharArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveAllArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RemoveAllArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -3731,7 +3731,7 @@ public class CharArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveNoneArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RemoveNoneArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -3744,7 +3744,7 @@ public class CharArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RetainSecondArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RetainSecondArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -3757,7 +3757,7 @@ public class CharArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RetainSecondAndLastArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RetainSecondAndLastArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -3770,7 +3770,7 @@ public class CharArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstAndThirdArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RemoveFirstAndThirdArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -3783,7 +3783,7 @@ public class CharArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RemoveFirstArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -3796,7 +3796,7 @@ public class CharArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstAndSecondToLastArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RemoveFirstAndSecondToLastArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -3810,7 +3810,7 @@ public class CharArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RetainSecondPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RetainSecondPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -3823,7 +3823,7 @@ public class CharArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new CharMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -3836,7 +3836,7 @@ public class CharArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstAndThirdPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RemoveFirstAndThirdPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -3849,7 +3849,7 @@ public class CharArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RemoveFirstPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -3862,7 +3862,7 @@ public class CharArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new CharMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -3874,7 +3874,7 @@ public class CharArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveAllPredicate();
+    var filter=new CharMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -3886,7 +3886,7 @@ public class CharArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveNonePredicate();
+    var filter=new CharMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -3898,7 +3898,7 @@ public class CharArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RetainSecondPredicate();
+    var filter=new CharMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -3910,7 +3910,7 @@ public class CharArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new CharMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -3922,7 +3922,7 @@ public class CharArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new CharMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3-2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -3934,7 +3934,7 @@ public class CharArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new CharMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3-1,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -3946,7 +3946,7 @@ public class CharArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new CharMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3-2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -3958,7 +3958,7 @@ public class CharArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveAllPredicate();
+    var filter=new CharMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -3970,7 +3970,7 @@ public class CharArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveNonePredicate();
+    var filter=new CharMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -3982,7 +3982,7 @@ public class CharArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RetainSecondPredicate();
+    var filter=new CharMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -3994,7 +3994,7 @@ public class CharArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new CharMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -4006,7 +4006,7 @@ public class CharArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new CharMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50-2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -4018,7 +4018,7 @@ public class CharArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new CharMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50-1,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -4030,7 +4030,7 @@ public class CharArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new CharMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50-2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -4042,7 +4042,7 @@ public class CharArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveAllPredicate();
+    var filter=new CharMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -4054,7 +4054,7 @@ public class CharArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveNonePredicate();
+    var filter=new CharMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -4066,7 +4066,7 @@ public class CharArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RetainSecondPredicate();
+    var filter=new CharMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -4078,7 +4078,7 @@ public class CharArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new CharMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -4090,7 +4090,7 @@ public class CharArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new CharMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100-2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -4102,7 +4102,7 @@ public class CharArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new CharMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100-1,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -4114,7 +4114,7 @@ public class CharArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new CharMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100-2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -4127,7 +4127,7 @@ public class CharArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveAllPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RemoveAllPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -4140,7 +4140,7 @@ public class CharArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveNonePredicate(seq);
+    var filter=new CharMonitoredPredicate2.RemoveNonePredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -4153,7 +4153,7 @@ public class CharArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveAllArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RemoveAllArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -4166,7 +4166,7 @@ public class CharArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveNoneArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RemoveNoneArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -4179,7 +4179,7 @@ public class CharArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.ThrowingPredicate(seq);
+    var filter=new CharMonitoredPredicate2.ThrowingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -4192,7 +4192,7 @@ public class CharArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.ModifyingArrSeqCheckedStackAndThrowingPredicate(seq);
+    var filter=new CharMonitoredPredicate2.ModifyingArrSeqCheckedStackAndThrowingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -4305,7 +4305,7 @@ public class CharArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RetainSecondArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RetainSecondArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -4318,7 +4318,7 @@ public class CharArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RetainSecondAndLastArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RetainSecondAndLastArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -4331,7 +4331,7 @@ public class CharArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstAndThirdArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RemoveFirstAndThirdArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -4344,7 +4344,7 @@ public class CharArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RemoveFirstArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -4357,7 +4357,7 @@ public class CharArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstAndSecondToLastArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RemoveFirstAndSecondToLastArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -4368,7 +4368,7 @@ public class CharArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.ModifyingArrSeqCheckedStackAndThrowingPredicate(seq);
+    var filter=new CharMonitoredPredicate2.ModifyingArrSeqCheckedStackAndThrowingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(3+1,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -4381,7 +4381,7 @@ public class CharArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.ThrowingPredicate();
+    var filter=new CharMonitoredPredicate2.ThrowingPredicate();
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -4394,7 +4394,7 @@ public class CharArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveAllArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RemoveAllArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -4407,7 +4407,7 @@ public class CharArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveNoneArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RemoveNoneArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -4420,7 +4420,7 @@ public class CharArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RetainSecondArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RetainSecondArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -4433,7 +4433,7 @@ public class CharArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RetainSecondAndLastArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RetainSecondAndLastArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -4446,7 +4446,7 @@ public class CharArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstAndThirdArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RemoveFirstAndThirdArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -4459,7 +4459,7 @@ public class CharArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RemoveFirstArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -4472,7 +4472,7 @@ public class CharArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstAndSecondToLastArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RemoveFirstAndSecondToLastArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -4484,7 +4484,7 @@ public class CharArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.ModifyingArrSeqCheckedStackAndThrowingPredicate(seq);
+    var filter=new CharMonitoredPredicate2.ModifyingArrSeqCheckedStackAndThrowingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(50+1,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -4497,7 +4497,7 @@ public class CharArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.ThrowingPredicate();
+    var filter=new CharMonitoredPredicate2.ThrowingPredicate();
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -4510,7 +4510,7 @@ public class CharArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveAllArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RemoveAllArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -4523,7 +4523,7 @@ public class CharArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveNoneArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RemoveNoneArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -4536,7 +4536,7 @@ public class CharArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RetainSecondArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RetainSecondArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -4549,7 +4549,7 @@ public class CharArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RetainSecondAndLastArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RetainSecondAndLastArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -4562,7 +4562,7 @@ public class CharArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstAndThirdArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RemoveFirstAndThirdArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -4575,7 +4575,7 @@ public class CharArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RemoveFirstArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -4588,7 +4588,7 @@ public class CharArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstAndSecondToLastArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RemoveFirstAndSecondToLastArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -4600,7 +4600,7 @@ public class CharArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.ModifyingArrSeqCheckedStackAndThrowingPredicate(seq);
+    var filter=new CharMonitoredPredicate2.ModifyingArrSeqCheckedStackAndThrowingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(100+1,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -4613,7 +4613,7 @@ public class CharArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.ThrowingPredicate();
+    var filter=new CharMonitoredPredicate2.ThrowingPredicate();
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -4626,7 +4626,7 @@ public class CharArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveAllArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RemoveAllArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -4639,7 +4639,7 @@ public class CharArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveNoneArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RemoveNoneArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -4652,7 +4652,7 @@ public class CharArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RetainSecondArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RetainSecondArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -4665,7 +4665,7 @@ public class CharArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RetainSecondAndLastArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RetainSecondAndLastArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -4678,7 +4678,7 @@ public class CharArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstAndThirdArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RemoveFirstAndThirdArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -4691,7 +4691,7 @@ public class CharArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RemoveFirstArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -4704,7 +4704,7 @@ public class CharArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstAndSecondToLastArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RemoveFirstAndSecondToLastArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -4718,7 +4718,7 @@ public class CharArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RetainSecondPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RetainSecondPredicate(seq);
     Assertions.assertFalse(seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -4731,7 +4731,7 @@ public class CharArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new CharMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertFalse(seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -4744,7 +4744,7 @@ public class CharArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstAndThirdPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RemoveFirstAndThirdPredicate(seq);
     Assertions.assertFalse(seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -4757,7 +4757,7 @@ public class CharArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RemoveFirstPredicate(seq);
     Assertions.assertFalse(seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -4770,7 +4770,7 @@ public class CharArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new CharMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertFalse(seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -4782,7 +4782,7 @@ public class CharArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveAllPredicate();
+    var filter=new CharMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -4794,7 +4794,7 @@ public class CharArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveNonePredicate();
+    var filter=new CharMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -4806,7 +4806,7 @@ public class CharArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RetainSecondPredicate();
+    var filter=new CharMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -4818,7 +4818,7 @@ public class CharArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new CharMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -4830,7 +4830,7 @@ public class CharArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new CharMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(3-2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -4842,7 +4842,7 @@ public class CharArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new CharMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(3-1,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -4854,7 +4854,7 @@ public class CharArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new CharMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(3-2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -4866,7 +4866,7 @@ public class CharArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveAllPredicate();
+    var filter=new CharMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -4878,7 +4878,7 @@ public class CharArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveNonePredicate();
+    var filter=new CharMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -4890,7 +4890,7 @@ public class CharArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RetainSecondPredicate();
+    var filter=new CharMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -4902,7 +4902,7 @@ public class CharArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new CharMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -4914,7 +4914,7 @@ public class CharArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new CharMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(50-2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -4926,7 +4926,7 @@ public class CharArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new CharMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(50-1,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -4938,7 +4938,7 @@ public class CharArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new CharMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(50-2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -4950,7 +4950,7 @@ public class CharArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveAllPredicate();
+    var filter=new CharMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -4962,7 +4962,7 @@ public class CharArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveNonePredicate();
+    var filter=new CharMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -4974,7 +4974,7 @@ public class CharArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RetainSecondPredicate();
+    var filter=new CharMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -4986,7 +4986,7 @@ public class CharArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new CharMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -4998,7 +4998,7 @@ public class CharArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new CharMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(100-2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -5010,7 +5010,7 @@ public class CharArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new CharMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(100-1,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -5022,7 +5022,7 @@ public class CharArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new CharMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(100-2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -5035,7 +5035,7 @@ public class CharArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveAllPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RemoveAllPredicate(seq);
     Assertions.assertFalse(seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -5048,7 +5048,7 @@ public class CharArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveNonePredicate(seq);
+    var filter=new CharMonitoredPredicate2.RemoveNonePredicate(seq);
     Assertions.assertFalse(seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -5061,7 +5061,7 @@ public class CharArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveAllArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RemoveAllArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -5074,7 +5074,7 @@ public class CharArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveNoneArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RemoveNoneArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -5087,7 +5087,7 @@ public class CharArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.ThrowingPredicate(seq);
+    var filter=new CharMonitoredPredicate2.ThrowingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -5100,7 +5100,7 @@ public class CharArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.ModifyingArrSeqCheckedStackAndThrowingPredicate(seq);
+    var filter=new CharMonitoredPredicate2.ModifyingArrSeqCheckedStackAndThrowingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -6016,7 +6016,7 @@ public class CharArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RetainSecondArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RetainSecondArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -6029,7 +6029,7 @@ public class CharArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RetainSecondAndLastArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RetainSecondAndLastArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -6042,7 +6042,7 @@ public class CharArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstAndThirdArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RemoveFirstAndThirdArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -6055,7 +6055,7 @@ public class CharArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RemoveFirstArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -6068,7 +6068,7 @@ public class CharArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstAndSecondToLastArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RemoveFirstAndSecondToLastArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -6079,7 +6079,7 @@ public class CharArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.ModifyingArrSeqCheckedListAndThrowingPredicate(seq);
+    var filter=new CharMonitoredPredicate2.ModifyingArrSeqCheckedListAndThrowingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3+1,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -6092,7 +6092,7 @@ public class CharArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.ThrowingPredicate();
+    var filter=new CharMonitoredPredicate2.ThrowingPredicate();
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -6105,7 +6105,7 @@ public class CharArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveAllArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RemoveAllArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -6118,7 +6118,7 @@ public class CharArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveNoneArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RemoveNoneArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -6131,7 +6131,7 @@ public class CharArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RetainSecondArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RetainSecondArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -6144,7 +6144,7 @@ public class CharArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RetainSecondAndLastArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RetainSecondAndLastArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -6157,7 +6157,7 @@ public class CharArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstAndThirdArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RemoveFirstAndThirdArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -6170,7 +6170,7 @@ public class CharArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RemoveFirstArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -6183,7 +6183,7 @@ public class CharArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstAndSecondToLastArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RemoveFirstAndSecondToLastArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -6195,7 +6195,7 @@ public class CharArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.ModifyingArrSeqCheckedListAndThrowingPredicate(seq);
+    var filter=new CharMonitoredPredicate2.ModifyingArrSeqCheckedListAndThrowingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50+1,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -6208,7 +6208,7 @@ public class CharArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.ThrowingPredicate();
+    var filter=new CharMonitoredPredicate2.ThrowingPredicate();
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -6221,7 +6221,7 @@ public class CharArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveAllArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RemoveAllArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -6234,7 +6234,7 @@ public class CharArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveNoneArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RemoveNoneArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -6247,7 +6247,7 @@ public class CharArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RetainSecondArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RetainSecondArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -6260,7 +6260,7 @@ public class CharArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RetainSecondAndLastArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RetainSecondAndLastArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -6273,7 +6273,7 @@ public class CharArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstAndThirdArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RemoveFirstAndThirdArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -6286,7 +6286,7 @@ public class CharArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RemoveFirstArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -6299,7 +6299,7 @@ public class CharArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstAndSecondToLastArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RemoveFirstAndSecondToLastArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -6311,7 +6311,7 @@ public class CharArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.ModifyingArrSeqCheckedListAndThrowingPredicate(seq);
+    var filter=new CharMonitoredPredicate2.ModifyingArrSeqCheckedListAndThrowingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100+1,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -6324,7 +6324,7 @@ public class CharArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.ThrowingPredicate();
+    var filter=new CharMonitoredPredicate2.ThrowingPredicate();
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -6337,7 +6337,7 @@ public class CharArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveAllArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RemoveAllArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -6350,7 +6350,7 @@ public class CharArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveNoneArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RemoveNoneArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -6363,7 +6363,7 @@ public class CharArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RetainSecondArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RetainSecondArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -6376,7 +6376,7 @@ public class CharArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RetainSecondAndLastArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RetainSecondAndLastArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -6389,7 +6389,7 @@ public class CharArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstAndThirdArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RemoveFirstAndThirdArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -6402,7 +6402,7 @@ public class CharArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RemoveFirstArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -6415,7 +6415,7 @@ public class CharArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstAndSecondToLastArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RemoveFirstAndSecondToLastArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -6429,7 +6429,7 @@ public class CharArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RetainSecondPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RetainSecondPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -6442,7 +6442,7 @@ public class CharArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new CharMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -6455,7 +6455,7 @@ public class CharArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstAndThirdPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RemoveFirstAndThirdPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -6468,7 +6468,7 @@ public class CharArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RemoveFirstPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -6481,7 +6481,7 @@ public class CharArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new CharMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -6493,7 +6493,7 @@ public class CharArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveAllPredicate();
+    var filter=new CharMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -6505,7 +6505,7 @@ public class CharArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveNonePredicate();
+    var filter=new CharMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -6517,7 +6517,7 @@ public class CharArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RetainSecondPredicate();
+    var filter=new CharMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -6529,7 +6529,7 @@ public class CharArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new CharMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -6541,7 +6541,7 @@ public class CharArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new CharMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3-2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -6553,7 +6553,7 @@ public class CharArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new CharMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3-1,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -6565,7 +6565,7 @@ public class CharArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new CharMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3-2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -6577,7 +6577,7 @@ public class CharArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveAllPredicate();
+    var filter=new CharMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -6589,7 +6589,7 @@ public class CharArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveNonePredicate();
+    var filter=new CharMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -6601,7 +6601,7 @@ public class CharArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RetainSecondPredicate();
+    var filter=new CharMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -6613,7 +6613,7 @@ public class CharArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new CharMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -6625,7 +6625,7 @@ public class CharArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new CharMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50-2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -6637,7 +6637,7 @@ public class CharArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new CharMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50-1,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -6649,7 +6649,7 @@ public class CharArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new CharMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50-2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -6661,7 +6661,7 @@ public class CharArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveAllPredicate();
+    var filter=new CharMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -6673,7 +6673,7 @@ public class CharArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveNonePredicate();
+    var filter=new CharMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -6685,7 +6685,7 @@ public class CharArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RetainSecondPredicate();
+    var filter=new CharMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -6697,7 +6697,7 @@ public class CharArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new CharMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -6709,7 +6709,7 @@ public class CharArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new CharMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100-2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -6721,7 +6721,7 @@ public class CharArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new CharMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100-1,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -6733,7 +6733,7 @@ public class CharArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new CharMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100-2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -6746,7 +6746,7 @@ public class CharArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveAllPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RemoveAllPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -6759,7 +6759,7 @@ public class CharArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveNonePredicate(seq);
+    var filter=new CharMonitoredPredicate2.RemoveNonePredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -6772,7 +6772,7 @@ public class CharArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveAllArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RemoveAllArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -6785,7 +6785,7 @@ public class CharArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveNoneArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RemoveNoneArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -6798,7 +6798,7 @@ public class CharArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.ThrowingPredicate(seq);
+    var filter=new CharMonitoredPredicate2.ThrowingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -6811,7 +6811,7 @@ public class CharArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.ModifyingArrSeqCheckedListAndThrowingPredicate(seq);
+    var filter=new CharMonitoredPredicate2.ModifyingArrSeqCheckedListAndThrowingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -6924,7 +6924,7 @@ public class CharArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RetainSecondArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RetainSecondArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -6937,7 +6937,7 @@ public class CharArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RetainSecondAndLastArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RetainSecondAndLastArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -6950,7 +6950,7 @@ public class CharArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstAndThirdArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RemoveFirstAndThirdArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -6963,7 +6963,7 @@ public class CharArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RemoveFirstArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -6976,7 +6976,7 @@ public class CharArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstAndSecondToLastArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RemoveFirstAndSecondToLastArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -6987,7 +6987,7 @@ public class CharArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.ModifyingArrSeqCheckedListAndThrowingPredicate(seq);
+    var filter=new CharMonitoredPredicate2.ModifyingArrSeqCheckedListAndThrowingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(3+1,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -7000,7 +7000,7 @@ public class CharArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.ThrowingPredicate();
+    var filter=new CharMonitoredPredicate2.ThrowingPredicate();
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -7013,7 +7013,7 @@ public class CharArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveAllArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RemoveAllArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -7026,7 +7026,7 @@ public class CharArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveNoneArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RemoveNoneArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -7039,7 +7039,7 @@ public class CharArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RetainSecondArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RetainSecondArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -7052,7 +7052,7 @@ public class CharArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RetainSecondAndLastArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RetainSecondAndLastArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -7065,7 +7065,7 @@ public class CharArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstAndThirdArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RemoveFirstAndThirdArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -7078,7 +7078,7 @@ public class CharArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RemoveFirstArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -7091,7 +7091,7 @@ public class CharArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstAndSecondToLastArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RemoveFirstAndSecondToLastArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -7103,7 +7103,7 @@ public class CharArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.ModifyingArrSeqCheckedListAndThrowingPredicate(seq);
+    var filter=new CharMonitoredPredicate2.ModifyingArrSeqCheckedListAndThrowingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(50+1,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -7116,7 +7116,7 @@ public class CharArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.ThrowingPredicate();
+    var filter=new CharMonitoredPredicate2.ThrowingPredicate();
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -7129,7 +7129,7 @@ public class CharArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveAllArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RemoveAllArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -7142,7 +7142,7 @@ public class CharArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveNoneArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RemoveNoneArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -7155,7 +7155,7 @@ public class CharArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RetainSecondArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RetainSecondArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -7168,7 +7168,7 @@ public class CharArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RetainSecondAndLastArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RetainSecondAndLastArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -7181,7 +7181,7 @@ public class CharArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstAndThirdArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RemoveFirstAndThirdArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -7194,7 +7194,7 @@ public class CharArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RemoveFirstArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -7207,7 +7207,7 @@ public class CharArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstAndSecondToLastArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RemoveFirstAndSecondToLastArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -7219,7 +7219,7 @@ public class CharArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.ModifyingArrSeqCheckedListAndThrowingPredicate(seq);
+    var filter=new CharMonitoredPredicate2.ModifyingArrSeqCheckedListAndThrowingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(100+1,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -7232,7 +7232,7 @@ public class CharArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.ThrowingPredicate();
+    var filter=new CharMonitoredPredicate2.ThrowingPredicate();
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -7245,7 +7245,7 @@ public class CharArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveAllArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RemoveAllArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -7258,7 +7258,7 @@ public class CharArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveNoneArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RemoveNoneArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -7271,7 +7271,7 @@ public class CharArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RetainSecondArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RetainSecondArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -7284,7 +7284,7 @@ public class CharArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RetainSecondAndLastArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RetainSecondAndLastArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -7297,7 +7297,7 @@ public class CharArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstAndThirdArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RemoveFirstAndThirdArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -7310,7 +7310,7 @@ public class CharArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RemoveFirstArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -7323,7 +7323,7 @@ public class CharArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstAndSecondToLastArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RemoveFirstAndSecondToLastArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -7337,7 +7337,7 @@ public class CharArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RetainSecondPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RetainSecondPredicate(seq);
     Assertions.assertFalse(seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -7350,7 +7350,7 @@ public class CharArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new CharMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertFalse(seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -7363,7 +7363,7 @@ public class CharArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstAndThirdPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RemoveFirstAndThirdPredicate(seq);
     Assertions.assertFalse(seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -7376,7 +7376,7 @@ public class CharArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RemoveFirstPredicate(seq);
     Assertions.assertFalse(seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -7389,7 +7389,7 @@ public class CharArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new CharMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertFalse(seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -7401,7 +7401,7 @@ public class CharArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveAllPredicate();
+    var filter=new CharMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -7413,7 +7413,7 @@ public class CharArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveNonePredicate();
+    var filter=new CharMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -7425,7 +7425,7 @@ public class CharArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RetainSecondPredicate();
+    var filter=new CharMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -7437,7 +7437,7 @@ public class CharArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new CharMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -7449,7 +7449,7 @@ public class CharArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new CharMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(3-2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -7461,7 +7461,7 @@ public class CharArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new CharMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(3-1,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -7473,7 +7473,7 @@ public class CharArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new CharMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(3-2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -7485,7 +7485,7 @@ public class CharArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveAllPredicate();
+    var filter=new CharMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -7497,7 +7497,7 @@ public class CharArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveNonePredicate();
+    var filter=new CharMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -7509,7 +7509,7 @@ public class CharArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RetainSecondPredicate();
+    var filter=new CharMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -7521,7 +7521,7 @@ public class CharArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new CharMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -7533,7 +7533,7 @@ public class CharArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new CharMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(50-2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -7545,7 +7545,7 @@ public class CharArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new CharMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(50-1,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -7557,7 +7557,7 @@ public class CharArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new CharMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(50-2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -7569,7 +7569,7 @@ public class CharArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveAllPredicate();
+    var filter=new CharMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -7581,7 +7581,7 @@ public class CharArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveNonePredicate();
+    var filter=new CharMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -7593,7 +7593,7 @@ public class CharArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RetainSecondPredicate();
+    var filter=new CharMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -7605,7 +7605,7 @@ public class CharArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new CharMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -7617,7 +7617,7 @@ public class CharArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new CharMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(100-2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -7629,7 +7629,7 @@ public class CharArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new CharMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(100-1,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -7641,7 +7641,7 @@ public class CharArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new CharMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(100-2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -7654,7 +7654,7 @@ public class CharArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveAllPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RemoveAllPredicate(seq);
     Assertions.assertFalse(seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -7667,7 +7667,7 @@ public class CharArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveNonePredicate(seq);
+    var filter=new CharMonitoredPredicate2.RemoveNonePredicate(seq);
     Assertions.assertFalse(seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -7680,7 +7680,7 @@ public class CharArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveAllArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RemoveAllArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -7693,7 +7693,7 @@ public class CharArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.RemoveNoneArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new CharMonitoredPredicate2.RemoveNoneArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -7706,7 +7706,7 @@ public class CharArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.ThrowingPredicate(seq);
+    var filter=new CharMonitoredPredicate2.ThrowingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -7719,7 +7719,7 @@ public class CharArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTochar(i));
     }
-    var filter=new CharMonitoredPredicate.ModifyingArrSeqCheckedListAndThrowingPredicate(seq);
+    var filter=new CharMonitoredPredicate2.ModifyingArrSeqCheckedListAndThrowingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((CharPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);

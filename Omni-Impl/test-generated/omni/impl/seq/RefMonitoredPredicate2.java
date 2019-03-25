@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Assertions;
 import omni.util.TypeConversionUtil;
 import omni.util.EqualityUtil;
 @SuppressWarnings({"rawtypes","unchecked"}) 
-abstract class RefMonitoredPredicate implements Predicate<Object>
+abstract class RefMonitoredPredicate2 implements Predicate<Object>
 {
   int callCount;
   abstract boolean testImpl(Object val);
@@ -12,11 +12,11 @@ abstract class RefMonitoredPredicate implements Predicate<Object>
     ++callCount;
     return testImpl((Object)val);
   }
-  public RefMonitoredPredicate negate(){
+  public RefMonitoredPredicate2 negate(){
     //don't care
     return null;
   }
-  static class RemoveAllPredicate extends RefMonitoredPredicate{
+  static class RemoveAllPredicate extends RefMonitoredPredicate2{
     RemoveAllPredicate(){}
     RemoveAllPredicate(Object dummy){}
     boolean testImpl(Object val){
@@ -28,7 +28,7 @@ abstract class RefMonitoredPredicate implements Predicate<Object>
       }
     }
   }
-  static class RemoveNonePredicate extends RefMonitoredPredicate{
+  static class RemoveNonePredicate extends RefMonitoredPredicate2{
     RemoveNonePredicate(){}
     RemoveNonePredicate(Object dummy){}
     boolean testImpl(Object val){
@@ -41,7 +41,7 @@ abstract class RefMonitoredPredicate implements Predicate<Object>
       }
     }
   }
-  static class ThrowingPredicate extends RefMonitoredPredicate{
+  static class ThrowingPredicate extends RefMonitoredPredicate2{
     ThrowingPredicate(){}
     ThrowingPredicate(Object dummy){}
     @Override boolean testImpl(Object val){
@@ -54,7 +54,7 @@ abstract class RefMonitoredPredicate implements Predicate<Object>
       }
     }
   }
-  static class RetainSecondPredicate extends RefMonitoredPredicate{
+  static class RetainSecondPredicate extends RefMonitoredPredicate2{
     RetainSecondPredicate(){}
     RetainSecondPredicate(Object dummy){}
     boolean testImpl(Object val){
@@ -73,7 +73,7 @@ abstract class RefMonitoredPredicate implements Predicate<Object>
       }
     }
   }
-  static class RetainSecondAndLastPredicate extends RefMonitoredPredicate{
+  static class RetainSecondAndLastPredicate extends RefMonitoredPredicate2{
     int seqLength;
     RetainSecondAndLastPredicate(int seqLength){
       this.seqLength=seqLength;
@@ -94,7 +94,7 @@ abstract class RefMonitoredPredicate implements Predicate<Object>
       }
     }
   }
-  static class RemoveFirstAndThirdPredicate extends RefMonitoredPredicate{
+  static class RemoveFirstAndThirdPredicate extends RefMonitoredPredicate2{
     RemoveFirstAndThirdPredicate(){}
     RemoveFirstAndThirdPredicate(Object dummy){}
     boolean testImpl(Object val){
@@ -113,7 +113,7 @@ abstract class RefMonitoredPredicate implements Predicate<Object>
       }
     }
   }
-  static class RemoveFirstPredicate  extends RefMonitoredPredicate{
+  static class RemoveFirstPredicate  extends RefMonitoredPredicate2{
     RemoveFirstPredicate(){}
     RemoveFirstPredicate(Object dummy){}
     boolean testImpl(Object val){
@@ -132,7 +132,7 @@ abstract class RefMonitoredPredicate implements Predicate<Object>
       }
     }
   }
-  static class RemoveFirstAndSecondToLastPredicate extends RefMonitoredPredicate{
+  static class RemoveFirstAndSecondToLastPredicate extends RefMonitoredPredicate2{
     int seqLength;
     RemoveFirstAndSecondToLastPredicate(int seqLength){
       this.seqLength=seqLength;

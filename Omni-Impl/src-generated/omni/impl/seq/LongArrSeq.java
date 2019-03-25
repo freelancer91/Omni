@@ -343,33 +343,6 @@ public abstract class LongArrSeq implements OmniCollection.OfLong
     }
     this.size=1;
   }
-/*
-  private void uncheckedInsert(int index,int size,long val)
-  {
-    final int tailDist;
-    if((tailDist=size-index)==0)
-    {
-      uncheckedAppend(size,val);
-    }
-    else
-    {
-      long[] arr;
-      if((arr=this.arr).length==size)
-      {
-        final long[] tmp;
-        ArrCopy.semicheckedCopy(arr,0,tmp=new long[OmniArray.growBy50Pct(size)],0,index);
-        ArrCopy.uncheckedCopy(arr,index,tmp,index+1,tailDist);
-        this.arr=arr=tmp;
-      }
-      else
-      {
-        ArrCopy.uncheckedCopy(arr,index,arr,index+1,tailDist);
-      }
-      arr[index]=val;
-      this.size=size+1;
-    }
-  }
-*/  
   public void push(long val)
   {
     final int size;
@@ -3289,7 +3262,7 @@ public abstract class LongArrSeq implements OmniCollection.OfLong
       return new CheckedSubList(this,fromIndex,CheckedCollection.checkSubListRange(fromIndex,toIndex,this.size));
     }
   }
-  //private
+  private
     static class CheckedSubList
       implements LongSubListDefault,Cloneable
   {
