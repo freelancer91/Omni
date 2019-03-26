@@ -22,9 +22,9 @@ import omni.util.EqualityUtil;
 #ENDIF
 #IF OfRef
 @SuppressWarnings({"rawtypes","unchecked"}) 
-abstract class $ClassPrefix$MonitoredPredicate implements $TypeNameModifier$Predicate<Object>
+abstract class $ClassPrefix$MonitoredPredicate2 implements $TypeNameModifier$Predicate<Object>
 #ELSE
-abstract class $ClassPrefix$MonitoredPredicate implements $TypeNameModifier$Predicate,Predicate<Object>
+abstract class $ClassPrefix$MonitoredPredicate2 implements $TypeNameModifier$Predicate,Predicate<Object>
 #ENDIF
 {
   int callCount;
@@ -33,7 +33,7 @@ abstract class $ClassPrefix$MonitoredPredicate implements $TypeNameModifier$Pred
     ++callCount;
     return testImpl(($ArrayType$)val);
   }
-  public $ClassPrefix$MonitoredPredicate negate(){
+  public $ClassPrefix$MonitoredPredicate2 negate(){
     //don't care
     return null;
   }
@@ -43,7 +43,7 @@ abstract class $ClassPrefix$MonitoredPredicate implements $TypeNameModifier$Pred
   }
 #ENDIF
   
-  static class RemoveAllPredicate extends $ClassPrefix$MonitoredPredicate{
+  static class RemoveAllPredicate extends $ClassPrefix$MonitoredPredicate2{
     RemoveAllPredicate(){}
     RemoveAllPredicate(Object dummy){}
     boolean testImpl($ArrayType$ val){
@@ -59,7 +59,7 @@ abstract class $ClassPrefix$MonitoredPredicate implements $TypeNameModifier$Pred
     }
 #ENDIF
   }
-  static class RemoveNonePredicate extends $ClassPrefix$MonitoredPredicate{
+  static class RemoveNonePredicate extends $ClassPrefix$MonitoredPredicate2{
     RemoveNonePredicate(){}
     RemoveNonePredicate(Object dummy){}
     boolean testImpl($ArrayType$ val){
@@ -74,7 +74,7 @@ abstract class $ClassPrefix$MonitoredPredicate implements $TypeNameModifier$Pred
     }
 #ENDIF
   }
-  static class ThrowingPredicate extends $ClassPrefix$MonitoredPredicate{
+  static class ThrowingPredicate extends $ClassPrefix$MonitoredPredicate2{
     ThrowingPredicate(){}
     ThrowingPredicate(Object dummy){}
     @Override boolean testImpl($ArrayType$ val){
@@ -90,14 +90,14 @@ abstract class $ClassPrefix$MonitoredPredicate implements $TypeNameModifier$Pred
 #ENDIF
   }
 #IF OfBoolean
-  static class RemoveTruePredicate extends $ClassPrefix$MonitoredPredicate{
+  static class RemoveTruePredicate extends $ClassPrefix$MonitoredPredicate2{
     RemoveTruePredicate(){}
     RemoveTruePredicate(Object dummy){}
     boolean testImpl($ArrayType$ val){
       return val;
     }
   }
-  static class RemoveFalsePredicate extends $ClassPrefix$MonitoredPredicate{
+  static class RemoveFalsePredicate extends $ClassPrefix$MonitoredPredicate2{
     RemoveFalsePredicate(){}
     RemoveFalsePredicate(Object dummy){}
     boolean testImpl($ArrayType$ val){
@@ -105,7 +105,7 @@ abstract class $ClassPrefix$MonitoredPredicate implements $TypeNameModifier$Pred
     }
   }
 #ELSE
-  static class RetainSecondPredicate extends $ClassPrefix$MonitoredPredicate{
+  static class RetainSecondPredicate extends $ClassPrefix$MonitoredPredicate2{
     RetainSecondPredicate(){}
     RetainSecondPredicate(Object dummy){}
     boolean testImpl($ArrayType$ val){
@@ -126,7 +126,7 @@ abstract class $ClassPrefix$MonitoredPredicate implements $TypeNameModifier$Pred
   #ENDIF
     }
   }
-  static class RetainSecondAndLastPredicate extends $ClassPrefix$MonitoredPredicate{
+  static class RetainSecondAndLastPredicate extends $ClassPrefix$MonitoredPredicate2{
     int seqLength;
     RetainSecondAndLastPredicate(int seqLength){
       this.seqLength=seqLength;
@@ -149,7 +149,7 @@ abstract class $ClassPrefix$MonitoredPredicate implements $TypeNameModifier$Pred
   #ENDIF
     }
   }
-  static class RemoveFirstAndThirdPredicate extends $ClassPrefix$MonitoredPredicate{
+  static class RemoveFirstAndThirdPredicate extends $ClassPrefix$MonitoredPredicate2{
     RemoveFirstAndThirdPredicate(){}
     RemoveFirstAndThirdPredicate(Object dummy){}
     boolean testImpl($ArrayType$ val){
@@ -170,7 +170,7 @@ abstract class $ClassPrefix$MonitoredPredicate implements $TypeNameModifier$Pred
   #ENDIF
     }
   }
-  static class RemoveFirstPredicate  extends $ClassPrefix$MonitoredPredicate{
+  static class RemoveFirstPredicate  extends $ClassPrefix$MonitoredPredicate2{
     RemoveFirstPredicate(){}
     RemoveFirstPredicate(Object dummy){}
     boolean testImpl($ArrayType$ val){
@@ -191,7 +191,7 @@ abstract class $ClassPrefix$MonitoredPredicate implements $TypeNameModifier$Pred
   #ENDIF
     }
   }
-  static class RemoveFirstAndSecondToLastPredicate extends $ClassPrefix$MonitoredPredicate{
+  static class RemoveFirstAndSecondToLastPredicate extends $ClassPrefix$MonitoredPredicate2{
     int seqLength;
     RemoveFirstAndSecondToLastPredicate(int seqLength){
       this.seqLength=seqLength;

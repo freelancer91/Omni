@@ -438,7 +438,7 @@ public class BooleanArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToboolean(i));
     }
-    var filter=new BooleanMonitoredPredicate.RemoveTruePredicate(seq);
+    var filter=new BooleanMonitoredPredicate2.RemoveTruePredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -450,7 +450,7 @@ public class BooleanArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToboolean(i));
     }
-    var filter=new BooleanMonitoredPredicate.RemoveFalsePredicate(seq);
+    var filter=new BooleanMonitoredPredicate2.RemoveFalsePredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -476,7 +476,7 @@ public class BooleanArrSeqTest{
           currVal=!currVal;
         }
       }
-      var filter=new BooleanMonitoredPredicate.RemoveTruePredicate();
+      var filter=new BooleanMonitoredPredicate2.RemoveTruePredicate();
       Assertions.assertEquals(trueCount!=0,seq.removeIf((Predicate)filter));
       Assertions.assertEquals(falseCount,seq.size());
       for(int i=0;i<falseCount;++i){
@@ -506,7 +506,7 @@ public class BooleanArrSeqTest{
           currVal=!currVal;
         }
       }
-      var filter=new BooleanMonitoredPredicate.RemoveTruePredicate();
+      var filter=new BooleanMonitoredPredicate2.RemoveTruePredicate();
       Assertions.assertEquals(trueCount!=0,seq.removeIf((Predicate)filter));
       Assertions.assertEquals(falseCount,seq.size());
       for(int i=0;i<falseCount;++i){
@@ -536,7 +536,7 @@ public class BooleanArrSeqTest{
           currVal=!currVal;
         }
       }
-      var filter=new BooleanMonitoredPredicate.RemoveFalsePredicate();
+      var filter=new BooleanMonitoredPredicate2.RemoveFalsePredicate();
       Assertions.assertEquals(falseCount!=0,seq.removeIf((Predicate)filter));
       Assertions.assertEquals(trueCount,seq.size());
       for(int i=0;i<trueCount;++i){
@@ -566,7 +566,7 @@ public class BooleanArrSeqTest{
           currVal=!currVal;
         }
       }
-      var filter=new BooleanMonitoredPredicate.RemoveFalsePredicate();
+      var filter=new BooleanMonitoredPredicate2.RemoveFalsePredicate();
       Assertions.assertEquals(falseCount!=0,seq.removeIf((Predicate)filter));
       Assertions.assertEquals(trueCount,seq.size());
       for(int i=0;i<trueCount;++i){
@@ -596,7 +596,7 @@ public class BooleanArrSeqTest{
           currVal=!currVal;
         }
       }
-      var filter=new BooleanMonitoredPredicate.RemoveAllPredicate();
+      var filter=new BooleanMonitoredPredicate2.RemoveAllPredicate();
       Assertions.assertTrue(seq.removeIf((Predicate)filter));
       Assertions.assertEquals(0,seq.size());
       Assertions.assertEquals(falseCount==0||trueCount==0?1:2,filter.callCount);
@@ -623,7 +623,7 @@ public class BooleanArrSeqTest{
           currVal=!currVal;
         }
       }
-      var filter=new BooleanMonitoredPredicate.RemoveAllPredicate();
+      var filter=new BooleanMonitoredPredicate2.RemoveAllPredicate();
       Assertions.assertTrue(seq.removeIf((Predicate)filter));
       Assertions.assertEquals(0,seq.size());
       Assertions.assertEquals(falseCount==0||trueCount==0?1:2,filter.callCount);
@@ -650,7 +650,7 @@ public class BooleanArrSeqTest{
           currVal=!currVal;
         }
       }
-      var filter=new BooleanMonitoredPredicate.RemoveNonePredicate();
+      var filter=new BooleanMonitoredPredicate2.RemoveNonePredicate();
       Assertions.assertFalse(seq.removeIf((Predicate)filter));
       Assertions.assertEquals(10,seq.size());
       Assertions.assertEquals(falseCount==0||trueCount==0?1:2,filter.callCount);
@@ -694,7 +694,7 @@ public class BooleanArrSeqTest{
           currVal=!currVal;
         }
       }
-      var filter=new BooleanMonitoredPredicate.RemoveNonePredicate();
+      var filter=new BooleanMonitoredPredicate2.RemoveNonePredicate();
       Assertions.assertFalse(seq.removeIf((Predicate)filter));
       Assertions.assertEquals(10,seq.size());
       Assertions.assertEquals(falseCount==0||trueCount==0?1:2,filter.callCount);
@@ -724,7 +724,7 @@ public class BooleanArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToboolean(i));
     }
-    var filter=new BooleanMonitoredPredicate.RemoveAllPredicate(seq);
+    var filter=new BooleanMonitoredPredicate2.RemoveAllPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -736,7 +736,7 @@ public class BooleanArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToboolean(i));
     }
-    var filter=new BooleanMonitoredPredicate.RemoveNonePredicate(seq);
+    var filter=new BooleanMonitoredPredicate2.RemoveNonePredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -773,7 +773,7 @@ public class BooleanArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToboolean(i));
     }
-    var filter=new BooleanMonitoredPredicate.RemoveTruePredicate(seq);
+    var filter=new BooleanMonitoredPredicate2.RemoveTruePredicate(seq);
     Assertions.assertFalse(seq.removeIf((BooleanPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -785,7 +785,7 @@ public class BooleanArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToboolean(i));
     }
-    var filter=new BooleanMonitoredPredicate.RemoveFalsePredicate(seq);
+    var filter=new BooleanMonitoredPredicate2.RemoveFalsePredicate(seq);
     Assertions.assertFalse(seq.removeIf((BooleanPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -811,7 +811,7 @@ public class BooleanArrSeqTest{
           currVal=!currVal;
         }
       }
-      var filter=new BooleanMonitoredPredicate.RemoveTruePredicate();
+      var filter=new BooleanMonitoredPredicate2.RemoveTruePredicate();
       Assertions.assertEquals(trueCount!=0,seq.removeIf((BooleanPredicate)filter));
       Assertions.assertEquals(falseCount,seq.size());
       for(int i=0;i<falseCount;++i){
@@ -841,7 +841,7 @@ public class BooleanArrSeqTest{
           currVal=!currVal;
         }
       }
-      var filter=new BooleanMonitoredPredicate.RemoveTruePredicate();
+      var filter=new BooleanMonitoredPredicate2.RemoveTruePredicate();
       Assertions.assertEquals(trueCount!=0,seq.removeIf((BooleanPredicate)filter));
       Assertions.assertEquals(falseCount,seq.size());
       for(int i=0;i<falseCount;++i){
@@ -871,7 +871,7 @@ public class BooleanArrSeqTest{
           currVal=!currVal;
         }
       }
-      var filter=new BooleanMonitoredPredicate.RemoveFalsePredicate();
+      var filter=new BooleanMonitoredPredicate2.RemoveFalsePredicate();
       Assertions.assertEquals(falseCount!=0,seq.removeIf((BooleanPredicate)filter));
       Assertions.assertEquals(trueCount,seq.size());
       for(int i=0;i<trueCount;++i){
@@ -901,7 +901,7 @@ public class BooleanArrSeqTest{
           currVal=!currVal;
         }
       }
-      var filter=new BooleanMonitoredPredicate.RemoveFalsePredicate();
+      var filter=new BooleanMonitoredPredicate2.RemoveFalsePredicate();
       Assertions.assertEquals(falseCount!=0,seq.removeIf((BooleanPredicate)filter));
       Assertions.assertEquals(trueCount,seq.size());
       for(int i=0;i<trueCount;++i){
@@ -931,7 +931,7 @@ public class BooleanArrSeqTest{
           currVal=!currVal;
         }
       }
-      var filter=new BooleanMonitoredPredicate.RemoveAllPredicate();
+      var filter=new BooleanMonitoredPredicate2.RemoveAllPredicate();
       Assertions.assertTrue(seq.removeIf((BooleanPredicate)filter));
       Assertions.assertEquals(0,seq.size());
       Assertions.assertEquals(falseCount==0||trueCount==0?1:2,filter.callCount);
@@ -958,7 +958,7 @@ public class BooleanArrSeqTest{
           currVal=!currVal;
         }
       }
-      var filter=new BooleanMonitoredPredicate.RemoveAllPredicate();
+      var filter=new BooleanMonitoredPredicate2.RemoveAllPredicate();
       Assertions.assertTrue(seq.removeIf((BooleanPredicate)filter));
       Assertions.assertEquals(0,seq.size());
       Assertions.assertEquals(falseCount==0||trueCount==0?1:2,filter.callCount);
@@ -985,7 +985,7 @@ public class BooleanArrSeqTest{
           currVal=!currVal;
         }
       }
-      var filter=new BooleanMonitoredPredicate.RemoveNonePredicate();
+      var filter=new BooleanMonitoredPredicate2.RemoveNonePredicate();
       Assertions.assertFalse(seq.removeIf((BooleanPredicate)filter));
       Assertions.assertEquals(10,seq.size());
       Assertions.assertEquals(falseCount==0||trueCount==0?1:2,filter.callCount);
@@ -1029,7 +1029,7 @@ public class BooleanArrSeqTest{
           currVal=!currVal;
         }
       }
-      var filter=new BooleanMonitoredPredicate.RemoveNonePredicate();
+      var filter=new BooleanMonitoredPredicate2.RemoveNonePredicate();
       Assertions.assertFalse(seq.removeIf((BooleanPredicate)filter));
       Assertions.assertEquals(10,seq.size());
       Assertions.assertEquals(falseCount==0||trueCount==0?1:2,filter.callCount);
@@ -1059,7 +1059,7 @@ public class BooleanArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToboolean(i));
     }
-    var filter=new BooleanMonitoredPredicate.RemoveAllPredicate(seq);
+    var filter=new BooleanMonitoredPredicate2.RemoveAllPredicate(seq);
     Assertions.assertFalse(seq.removeIf((BooleanPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -1071,7 +1071,7 @@ public class BooleanArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToboolean(i));
     }
-    var filter=new BooleanMonitoredPredicate.RemoveNonePredicate(seq);
+    var filter=new BooleanMonitoredPredicate2.RemoveNonePredicate(seq);
     Assertions.assertFalse(seq.removeIf((BooleanPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -1760,7 +1760,7 @@ public class BooleanArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToboolean(i));
     }
-    var filter=new BooleanMonitoredPredicate.RemoveTruePredicate(seq);
+    var filter=new BooleanMonitoredPredicate2.RemoveTruePredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -1772,7 +1772,7 @@ public class BooleanArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToboolean(i));
     }
-    var filter=new BooleanMonitoredPredicate.RemoveFalsePredicate(seq);
+    var filter=new BooleanMonitoredPredicate2.RemoveFalsePredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -1798,7 +1798,7 @@ public class BooleanArrSeqTest{
           currVal=!currVal;
         }
       }
-      var filter=new BooleanMonitoredPredicate.RemoveTruePredicate();
+      var filter=new BooleanMonitoredPredicate2.RemoveTruePredicate();
       Assertions.assertEquals(trueCount!=0,seq.removeIf((Predicate)filter));
       Assertions.assertEquals(falseCount,seq.size());
       for(int i=0;i<falseCount;++i){
@@ -1828,7 +1828,7 @@ public class BooleanArrSeqTest{
           currVal=!currVal;
         }
       }
-      var filter=new BooleanMonitoredPredicate.RemoveTruePredicate();
+      var filter=new BooleanMonitoredPredicate2.RemoveTruePredicate();
       Assertions.assertEquals(trueCount!=0,seq.removeIf((Predicate)filter));
       Assertions.assertEquals(falseCount,seq.size());
       for(int i=0;i<falseCount;++i){
@@ -1858,7 +1858,7 @@ public class BooleanArrSeqTest{
           currVal=!currVal;
         }
       }
-      var filter=new BooleanMonitoredPredicate.RemoveFalsePredicate();
+      var filter=new BooleanMonitoredPredicate2.RemoveFalsePredicate();
       Assertions.assertEquals(falseCount!=0,seq.removeIf((Predicate)filter));
       Assertions.assertEquals(trueCount,seq.size());
       for(int i=0;i<trueCount;++i){
@@ -1888,7 +1888,7 @@ public class BooleanArrSeqTest{
           currVal=!currVal;
         }
       }
-      var filter=new BooleanMonitoredPredicate.RemoveFalsePredicate();
+      var filter=new BooleanMonitoredPredicate2.RemoveFalsePredicate();
       Assertions.assertEquals(falseCount!=0,seq.removeIf((Predicate)filter));
       Assertions.assertEquals(trueCount,seq.size());
       for(int i=0;i<trueCount;++i){
@@ -1918,7 +1918,7 @@ public class BooleanArrSeqTest{
           currVal=!currVal;
         }
       }
-      var filter=new BooleanMonitoredPredicate.RemoveAllPredicate();
+      var filter=new BooleanMonitoredPredicate2.RemoveAllPredicate();
       Assertions.assertTrue(seq.removeIf((Predicate)filter));
       Assertions.assertEquals(0,seq.size());
       Assertions.assertEquals(falseCount==0||trueCount==0?1:2,filter.callCount);
@@ -1945,7 +1945,7 @@ public class BooleanArrSeqTest{
           currVal=!currVal;
         }
       }
-      var filter=new BooleanMonitoredPredicate.RemoveAllPredicate();
+      var filter=new BooleanMonitoredPredicate2.RemoveAllPredicate();
       Assertions.assertTrue(seq.removeIf((Predicate)filter));
       Assertions.assertEquals(0,seq.size());
       Assertions.assertEquals(falseCount==0||trueCount==0?1:2,filter.callCount);
@@ -1972,7 +1972,7 @@ public class BooleanArrSeqTest{
           currVal=!currVal;
         }
       }
-      var filter=new BooleanMonitoredPredicate.RemoveNonePredicate();
+      var filter=new BooleanMonitoredPredicate2.RemoveNonePredicate();
       Assertions.assertFalse(seq.removeIf((Predicate)filter));
       Assertions.assertEquals(10,seq.size());
       Assertions.assertEquals(falseCount==0||trueCount==0?1:2,filter.callCount);
@@ -2016,7 +2016,7 @@ public class BooleanArrSeqTest{
           currVal=!currVal;
         }
       }
-      var filter=new BooleanMonitoredPredicate.RemoveNonePredicate();
+      var filter=new BooleanMonitoredPredicate2.RemoveNonePredicate();
       Assertions.assertFalse(seq.removeIf((Predicate)filter));
       Assertions.assertEquals(10,seq.size());
       Assertions.assertEquals(falseCount==0||trueCount==0?1:2,filter.callCount);
@@ -2046,7 +2046,7 @@ public class BooleanArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToboolean(i));
     }
-    var filter=new BooleanMonitoredPredicate.RemoveAllPredicate(seq);
+    var filter=new BooleanMonitoredPredicate2.RemoveAllPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -2058,7 +2058,7 @@ public class BooleanArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToboolean(i));
     }
-    var filter=new BooleanMonitoredPredicate.RemoveNonePredicate(seq);
+    var filter=new BooleanMonitoredPredicate2.RemoveNonePredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -2095,7 +2095,7 @@ public class BooleanArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToboolean(i));
     }
-    var filter=new BooleanMonitoredPredicate.RemoveTruePredicate(seq);
+    var filter=new BooleanMonitoredPredicate2.RemoveTruePredicate(seq);
     Assertions.assertFalse(seq.removeIf((BooleanPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -2107,7 +2107,7 @@ public class BooleanArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToboolean(i));
     }
-    var filter=new BooleanMonitoredPredicate.RemoveFalsePredicate(seq);
+    var filter=new BooleanMonitoredPredicate2.RemoveFalsePredicate(seq);
     Assertions.assertFalse(seq.removeIf((BooleanPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -2133,7 +2133,7 @@ public class BooleanArrSeqTest{
           currVal=!currVal;
         }
       }
-      var filter=new BooleanMonitoredPredicate.RemoveTruePredicate();
+      var filter=new BooleanMonitoredPredicate2.RemoveTruePredicate();
       Assertions.assertEquals(trueCount!=0,seq.removeIf((BooleanPredicate)filter));
       Assertions.assertEquals(falseCount,seq.size());
       for(int i=0;i<falseCount;++i){
@@ -2163,7 +2163,7 @@ public class BooleanArrSeqTest{
           currVal=!currVal;
         }
       }
-      var filter=new BooleanMonitoredPredicate.RemoveTruePredicate();
+      var filter=new BooleanMonitoredPredicate2.RemoveTruePredicate();
       Assertions.assertEquals(trueCount!=0,seq.removeIf((BooleanPredicate)filter));
       Assertions.assertEquals(falseCount,seq.size());
       for(int i=0;i<falseCount;++i){
@@ -2193,7 +2193,7 @@ public class BooleanArrSeqTest{
           currVal=!currVal;
         }
       }
-      var filter=new BooleanMonitoredPredicate.RemoveFalsePredicate();
+      var filter=new BooleanMonitoredPredicate2.RemoveFalsePredicate();
       Assertions.assertEquals(falseCount!=0,seq.removeIf((BooleanPredicate)filter));
       Assertions.assertEquals(trueCount,seq.size());
       for(int i=0;i<trueCount;++i){
@@ -2223,7 +2223,7 @@ public class BooleanArrSeqTest{
           currVal=!currVal;
         }
       }
-      var filter=new BooleanMonitoredPredicate.RemoveFalsePredicate();
+      var filter=new BooleanMonitoredPredicate2.RemoveFalsePredicate();
       Assertions.assertEquals(falseCount!=0,seq.removeIf((BooleanPredicate)filter));
       Assertions.assertEquals(trueCount,seq.size());
       for(int i=0;i<trueCount;++i){
@@ -2253,7 +2253,7 @@ public class BooleanArrSeqTest{
           currVal=!currVal;
         }
       }
-      var filter=new BooleanMonitoredPredicate.RemoveAllPredicate();
+      var filter=new BooleanMonitoredPredicate2.RemoveAllPredicate();
       Assertions.assertTrue(seq.removeIf((BooleanPredicate)filter));
       Assertions.assertEquals(0,seq.size());
       Assertions.assertEquals(falseCount==0||trueCount==0?1:2,filter.callCount);
@@ -2280,7 +2280,7 @@ public class BooleanArrSeqTest{
           currVal=!currVal;
         }
       }
-      var filter=new BooleanMonitoredPredicate.RemoveAllPredicate();
+      var filter=new BooleanMonitoredPredicate2.RemoveAllPredicate();
       Assertions.assertTrue(seq.removeIf((BooleanPredicate)filter));
       Assertions.assertEquals(0,seq.size());
       Assertions.assertEquals(falseCount==0||trueCount==0?1:2,filter.callCount);
@@ -2307,7 +2307,7 @@ public class BooleanArrSeqTest{
           currVal=!currVal;
         }
       }
-      var filter=new BooleanMonitoredPredicate.RemoveNonePredicate();
+      var filter=new BooleanMonitoredPredicate2.RemoveNonePredicate();
       Assertions.assertFalse(seq.removeIf((BooleanPredicate)filter));
       Assertions.assertEquals(10,seq.size());
       Assertions.assertEquals(falseCount==0||trueCount==0?1:2,filter.callCount);
@@ -2351,7 +2351,7 @@ public class BooleanArrSeqTest{
           currVal=!currVal;
         }
       }
-      var filter=new BooleanMonitoredPredicate.RemoveNonePredicate();
+      var filter=new BooleanMonitoredPredicate2.RemoveNonePredicate();
       Assertions.assertFalse(seq.removeIf((BooleanPredicate)filter));
       Assertions.assertEquals(10,seq.size());
       Assertions.assertEquals(falseCount==0||trueCount==0?1:2,filter.callCount);
@@ -2381,7 +2381,7 @@ public class BooleanArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToboolean(i));
     }
-    var filter=new BooleanMonitoredPredicate.RemoveAllPredicate(seq);
+    var filter=new BooleanMonitoredPredicate2.RemoveAllPredicate(seq);
     Assertions.assertFalse(seq.removeIf((BooleanPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -2393,7 +2393,7 @@ public class BooleanArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToboolean(i));
     }
-    var filter=new BooleanMonitoredPredicate.RemoveNonePredicate(seq);
+    var filter=new BooleanMonitoredPredicate2.RemoveNonePredicate(seq);
     Assertions.assertFalse(seq.removeIf((BooleanPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -3275,7 +3275,7 @@ public class BooleanArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToboolean(i));
     }
-    var filter=new BooleanMonitoredPredicate.RemoveTruePredicate(seq);
+    var filter=new BooleanMonitoredPredicate2.RemoveTruePredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -3288,7 +3288,7 @@ public class BooleanArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToboolean(i));
     }
-    var filter=new BooleanMonitoredPredicate.RemoveFalsePredicate(seq);
+    var filter=new BooleanMonitoredPredicate2.RemoveFalsePredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -3315,7 +3315,7 @@ public class BooleanArrSeqTest{
           currVal=!currVal;
         }
       }
-      var filter=new BooleanMonitoredPredicate.RemoveTruePredicate();
+      var filter=new BooleanMonitoredPredicate2.RemoveTruePredicate();
       Assertions.assertEquals(trueCount!=0,seq.removeIf((Predicate)filter));
       Assertions.assertEquals(falseCount,seq.size());
       for(int i=0;i<falseCount;++i){
@@ -3346,7 +3346,7 @@ public class BooleanArrSeqTest{
           currVal=!currVal;
         }
       }
-      var filter=new BooleanMonitoredPredicate.RemoveTruePredicate();
+      var filter=new BooleanMonitoredPredicate2.RemoveTruePredicate();
       Assertions.assertEquals(trueCount!=0,seq.removeIf((Predicate)filter));
       Assertions.assertEquals(falseCount,seq.size());
       for(int i=0;i<falseCount;++i){
@@ -3377,7 +3377,7 @@ public class BooleanArrSeqTest{
           currVal=!currVal;
         }
       }
-      var filter=new BooleanMonitoredPredicate.RemoveFalsePredicate();
+      var filter=new BooleanMonitoredPredicate2.RemoveFalsePredicate();
       Assertions.assertEquals(falseCount!=0,seq.removeIf((Predicate)filter));
       Assertions.assertEquals(trueCount,seq.size());
       for(int i=0;i<trueCount;++i){
@@ -3408,7 +3408,7 @@ public class BooleanArrSeqTest{
           currVal=!currVal;
         }
       }
-      var filter=new BooleanMonitoredPredicate.RemoveFalsePredicate();
+      var filter=new BooleanMonitoredPredicate2.RemoveFalsePredicate();
       Assertions.assertEquals(falseCount!=0,seq.removeIf((Predicate)filter));
       Assertions.assertEquals(trueCount,seq.size());
       for(int i=0;i<trueCount;++i){
@@ -3439,7 +3439,7 @@ public class BooleanArrSeqTest{
           currVal=!currVal;
         }
       }
-      var filter=new BooleanMonitoredPredicate.RemoveAllPredicate();
+      var filter=new BooleanMonitoredPredicate2.RemoveAllPredicate();
       Assertions.assertTrue(seq.removeIf((Predicate)filter));
       Assertions.assertEquals(0,seq.size());
       Assertions.assertEquals(falseCount==0||trueCount==0?1:2,filter.callCount);
@@ -3467,7 +3467,7 @@ public class BooleanArrSeqTest{
           currVal=!currVal;
         }
       }
-      var filter=new BooleanMonitoredPredicate.RemoveAllPredicate();
+      var filter=new BooleanMonitoredPredicate2.RemoveAllPredicate();
       Assertions.assertTrue(seq.removeIf((Predicate)filter));
       Assertions.assertEquals(0,seq.size());
       Assertions.assertEquals(falseCount==0||trueCount==0?1:2,filter.callCount);
@@ -3495,7 +3495,7 @@ public class BooleanArrSeqTest{
           currVal=!currVal;
         }
       }
-      var filter=new BooleanMonitoredPredicate.RemoveNonePredicate();
+      var filter=new BooleanMonitoredPredicate2.RemoveNonePredicate();
       Assertions.assertFalse(seq.removeIf((Predicate)filter));
       Assertions.assertEquals(10,seq.size());
       Assertions.assertEquals(falseCount==0||trueCount==0?1:2,filter.callCount);
@@ -3540,7 +3540,7 @@ public class BooleanArrSeqTest{
           currVal=!currVal;
         }
       }
-      var filter=new BooleanMonitoredPredicate.RemoveNonePredicate();
+      var filter=new BooleanMonitoredPredicate2.RemoveNonePredicate();
       Assertions.assertFalse(seq.removeIf((Predicate)filter));
       Assertions.assertEquals(10,seq.size());
       Assertions.assertEquals(falseCount==0||trueCount==0?1:2,filter.callCount);
@@ -3585,7 +3585,7 @@ public class BooleanArrSeqTest{
           currVal=!currVal;
         }
       }
-      var filter=new BooleanMonitoredPredicate.RemoveTrueArrSeqCheckedStackModifyingPredicate(seq);
+      var filter=new BooleanMonitoredPredicate2.RemoveTrueArrSeqCheckedStackModifyingPredicate(seq);
       Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
       Assertions.assertEquals(10,seq.size());
       currVal=true;
@@ -3635,7 +3635,7 @@ public class BooleanArrSeqTest{
           currVal=!currVal;
         }
       }
-      var filter=new BooleanMonitoredPredicate.RemoveFalseArrSeqCheckedStackModifyingPredicate(seq);
+      var filter=new BooleanMonitoredPredicate2.RemoveFalseArrSeqCheckedStackModifyingPredicate(seq);
       Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
       Assertions.assertEquals(10,seq.size());
       currVal=true;
@@ -3685,7 +3685,7 @@ public class BooleanArrSeqTest{
           currVal=!currVal;
         }
       }
-      var filter=new BooleanMonitoredPredicate.RemoveTrueArrSeqCheckedStackModifyingPredicate(seq);
+      var filter=new BooleanMonitoredPredicate2.RemoveTrueArrSeqCheckedStackModifyingPredicate(seq);
       Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
       Assertions.assertEquals(10,seq.size());
       currVal=false;
@@ -3735,7 +3735,7 @@ public class BooleanArrSeqTest{
           currVal=!currVal;
         }
       }
-      var filter=new BooleanMonitoredPredicate.RemoveFalseArrSeqCheckedStackModifyingPredicate(seq);
+      var filter=new BooleanMonitoredPredicate2.RemoveFalseArrSeqCheckedStackModifyingPredicate(seq);
       Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
       Assertions.assertEquals(10,seq.size());
       currVal=false;
@@ -3785,7 +3785,7 @@ public class BooleanArrSeqTest{
           currVal=!currVal;
         }
       }
-      var filter=new BooleanMonitoredPredicate.RemoveNoneArrSeqCheckedStackModifyingPredicate(seq);
+      var filter=new BooleanMonitoredPredicate2.RemoveNoneArrSeqCheckedStackModifyingPredicate(seq);
       Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
       Assertions.assertEquals(10,seq.size());
       currVal=true;
@@ -3835,7 +3835,7 @@ public class BooleanArrSeqTest{
           currVal=!currVal;
         }
       }
-      var filter=new BooleanMonitoredPredicate.RemoveAllArrSeqCheckedStackModifyingPredicate(seq);
+      var filter=new BooleanMonitoredPredicate2.RemoveAllArrSeqCheckedStackModifyingPredicate(seq);
       Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
       Assertions.assertEquals(10,seq.size());
       currVal=true;
@@ -3885,7 +3885,7 @@ public class BooleanArrSeqTest{
           currVal=!currVal;
         }
       }
-      var filter=new BooleanMonitoredPredicate.RemoveNoneArrSeqCheckedStackModifyingPredicate(seq);
+      var filter=new BooleanMonitoredPredicate2.RemoveNoneArrSeqCheckedStackModifyingPredicate(seq);
       Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
       Assertions.assertEquals(10,seq.size());
       currVal=false;
@@ -3935,7 +3935,7 @@ public class BooleanArrSeqTest{
           currVal=!currVal;
         }
       }
-      var filter=new BooleanMonitoredPredicate.RemoveAllArrSeqCheckedStackModifyingPredicate(seq);
+      var filter=new BooleanMonitoredPredicate2.RemoveAllArrSeqCheckedStackModifyingPredicate(seq);
       Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
       Assertions.assertEquals(10,seq.size());
       currVal=false;
@@ -3985,7 +3985,7 @@ public class BooleanArrSeqTest{
           currVal=!currVal;
         }
       }
-      var filter=new BooleanMonitoredPredicate.ThrowingPredicate();
+      var filter=new BooleanMonitoredPredicate2.ThrowingPredicate();
       Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.removeIf((Predicate)filter));
       Assertions.assertEquals(10,seq.size());
       currVal=true;
@@ -4030,7 +4030,7 @@ public class BooleanArrSeqTest{
           currVal=!currVal;
         }
       }
-      var filter=new BooleanMonitoredPredicate.ThrowingPredicate();
+      var filter=new BooleanMonitoredPredicate2.ThrowingPredicate();
       Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.removeIf((Predicate)filter));
       Assertions.assertEquals(10,seq.size());
       currVal=false;
@@ -4075,7 +4075,7 @@ public class BooleanArrSeqTest{
           currVal=!currVal;
         }
       }
-      var filter=new BooleanMonitoredPredicate.ModifyingArrSeqCheckedStackAndThrowingPredicate(seq);
+      var filter=new BooleanMonitoredPredicate2.ModifyingArrSeqCheckedStackAndThrowingPredicate(seq);
       Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
       Assertions.assertEquals(11,seq.size());
       currVal=false;
@@ -4121,7 +4121,7 @@ public class BooleanArrSeqTest{
           currVal=!currVal;
         }
       }
-      var filter=new BooleanMonitoredPredicate.ModifyingArrSeqCheckedStackAndThrowingPredicate(seq);
+      var filter=new BooleanMonitoredPredicate2.ModifyingArrSeqCheckedStackAndThrowingPredicate(seq);
       Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
       Assertions.assertEquals(11,seq.size());
       currVal=true;
@@ -4153,7 +4153,7 @@ public class BooleanArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToboolean(i));
     }
-    var filter=new BooleanMonitoredPredicate.RemoveTrueArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new BooleanMonitoredPredicate2.RemoveTrueArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -4166,7 +4166,7 @@ public class BooleanArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToboolean(i));
     }
-    var filter=new BooleanMonitoredPredicate.RemoveFalseArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new BooleanMonitoredPredicate2.RemoveFalseArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -4179,7 +4179,7 @@ public class BooleanArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToboolean(i));
     }
-    var filter=new BooleanMonitoredPredicate.RemoveAllPredicate(seq);
+    var filter=new BooleanMonitoredPredicate2.RemoveAllPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -4192,7 +4192,7 @@ public class BooleanArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToboolean(i));
     }
-    var filter=new BooleanMonitoredPredicate.RemoveNonePredicate(seq);
+    var filter=new BooleanMonitoredPredicate2.RemoveNonePredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -4205,7 +4205,7 @@ public class BooleanArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToboolean(i));
     }
-    var filter=new BooleanMonitoredPredicate.RemoveAllArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new BooleanMonitoredPredicate2.RemoveAllArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -4218,7 +4218,7 @@ public class BooleanArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToboolean(i));
     }
-    var filter=new BooleanMonitoredPredicate.RemoveNoneArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new BooleanMonitoredPredicate2.RemoveNoneArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -4231,7 +4231,7 @@ public class BooleanArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToboolean(i));
     }
-    var filter=new BooleanMonitoredPredicate.ThrowingPredicate(seq);
+    var filter=new BooleanMonitoredPredicate2.ThrowingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -4244,7 +4244,7 @@ public class BooleanArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToboolean(i));
     }
-    var filter=new BooleanMonitoredPredicate.ModifyingArrSeqCheckedStackAndThrowingPredicate(seq);
+    var filter=new BooleanMonitoredPredicate2.ModifyingArrSeqCheckedStackAndThrowingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -4357,7 +4357,7 @@ public class BooleanArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToboolean(i));
     }
-    var filter=new BooleanMonitoredPredicate.RemoveTruePredicate(seq);
+    var filter=new BooleanMonitoredPredicate2.RemoveTruePredicate(seq);
     Assertions.assertFalse(seq.removeIf((BooleanPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -4370,7 +4370,7 @@ public class BooleanArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToboolean(i));
     }
-    var filter=new BooleanMonitoredPredicate.RemoveFalsePredicate(seq);
+    var filter=new BooleanMonitoredPredicate2.RemoveFalsePredicate(seq);
     Assertions.assertFalse(seq.removeIf((BooleanPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -4397,7 +4397,7 @@ public class BooleanArrSeqTest{
           currVal=!currVal;
         }
       }
-      var filter=new BooleanMonitoredPredicate.RemoveTruePredicate();
+      var filter=new BooleanMonitoredPredicate2.RemoveTruePredicate();
       Assertions.assertEquals(trueCount!=0,seq.removeIf((BooleanPredicate)filter));
       Assertions.assertEquals(falseCount,seq.size());
       for(int i=0;i<falseCount;++i){
@@ -4428,7 +4428,7 @@ public class BooleanArrSeqTest{
           currVal=!currVal;
         }
       }
-      var filter=new BooleanMonitoredPredicate.RemoveTruePredicate();
+      var filter=new BooleanMonitoredPredicate2.RemoveTruePredicate();
       Assertions.assertEquals(trueCount!=0,seq.removeIf((BooleanPredicate)filter));
       Assertions.assertEquals(falseCount,seq.size());
       for(int i=0;i<falseCount;++i){
@@ -4459,7 +4459,7 @@ public class BooleanArrSeqTest{
           currVal=!currVal;
         }
       }
-      var filter=new BooleanMonitoredPredicate.RemoveFalsePredicate();
+      var filter=new BooleanMonitoredPredicate2.RemoveFalsePredicate();
       Assertions.assertEquals(falseCount!=0,seq.removeIf((BooleanPredicate)filter));
       Assertions.assertEquals(trueCount,seq.size());
       for(int i=0;i<trueCount;++i){
@@ -4490,7 +4490,7 @@ public class BooleanArrSeqTest{
           currVal=!currVal;
         }
       }
-      var filter=new BooleanMonitoredPredicate.RemoveFalsePredicate();
+      var filter=new BooleanMonitoredPredicate2.RemoveFalsePredicate();
       Assertions.assertEquals(falseCount!=0,seq.removeIf((BooleanPredicate)filter));
       Assertions.assertEquals(trueCount,seq.size());
       for(int i=0;i<trueCount;++i){
@@ -4521,7 +4521,7 @@ public class BooleanArrSeqTest{
           currVal=!currVal;
         }
       }
-      var filter=new BooleanMonitoredPredicate.RemoveAllPredicate();
+      var filter=new BooleanMonitoredPredicate2.RemoveAllPredicate();
       Assertions.assertTrue(seq.removeIf((BooleanPredicate)filter));
       Assertions.assertEquals(0,seq.size());
       Assertions.assertEquals(falseCount==0||trueCount==0?1:2,filter.callCount);
@@ -4549,7 +4549,7 @@ public class BooleanArrSeqTest{
           currVal=!currVal;
         }
       }
-      var filter=new BooleanMonitoredPredicate.RemoveAllPredicate();
+      var filter=new BooleanMonitoredPredicate2.RemoveAllPredicate();
       Assertions.assertTrue(seq.removeIf((BooleanPredicate)filter));
       Assertions.assertEquals(0,seq.size());
       Assertions.assertEquals(falseCount==0||trueCount==0?1:2,filter.callCount);
@@ -4577,7 +4577,7 @@ public class BooleanArrSeqTest{
           currVal=!currVal;
         }
       }
-      var filter=new BooleanMonitoredPredicate.RemoveNonePredicate();
+      var filter=new BooleanMonitoredPredicate2.RemoveNonePredicate();
       Assertions.assertFalse(seq.removeIf((BooleanPredicate)filter));
       Assertions.assertEquals(10,seq.size());
       Assertions.assertEquals(falseCount==0||trueCount==0?1:2,filter.callCount);
@@ -4622,7 +4622,7 @@ public class BooleanArrSeqTest{
           currVal=!currVal;
         }
       }
-      var filter=new BooleanMonitoredPredicate.RemoveNonePredicate();
+      var filter=new BooleanMonitoredPredicate2.RemoveNonePredicate();
       Assertions.assertFalse(seq.removeIf((BooleanPredicate)filter));
       Assertions.assertEquals(10,seq.size());
       Assertions.assertEquals(falseCount==0||trueCount==0?1:2,filter.callCount);
@@ -4667,7 +4667,7 @@ public class BooleanArrSeqTest{
           currVal=!currVal;
         }
       }
-      var filter=new BooleanMonitoredPredicate.RemoveTrueArrSeqCheckedStackModifyingPredicate(seq);
+      var filter=new BooleanMonitoredPredicate2.RemoveTrueArrSeqCheckedStackModifyingPredicate(seq);
       Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((BooleanPredicate)filter));
       Assertions.assertEquals(10,seq.size());
       currVal=true;
@@ -4717,7 +4717,7 @@ public class BooleanArrSeqTest{
           currVal=!currVal;
         }
       }
-      var filter=new BooleanMonitoredPredicate.RemoveFalseArrSeqCheckedStackModifyingPredicate(seq);
+      var filter=new BooleanMonitoredPredicate2.RemoveFalseArrSeqCheckedStackModifyingPredicate(seq);
       Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((BooleanPredicate)filter));
       Assertions.assertEquals(10,seq.size());
       currVal=true;
@@ -4767,7 +4767,7 @@ public class BooleanArrSeqTest{
           currVal=!currVal;
         }
       }
-      var filter=new BooleanMonitoredPredicate.RemoveTrueArrSeqCheckedStackModifyingPredicate(seq);
+      var filter=new BooleanMonitoredPredicate2.RemoveTrueArrSeqCheckedStackModifyingPredicate(seq);
       Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((BooleanPredicate)filter));
       Assertions.assertEquals(10,seq.size());
       currVal=false;
@@ -4817,7 +4817,7 @@ public class BooleanArrSeqTest{
           currVal=!currVal;
         }
       }
-      var filter=new BooleanMonitoredPredicate.RemoveFalseArrSeqCheckedStackModifyingPredicate(seq);
+      var filter=new BooleanMonitoredPredicate2.RemoveFalseArrSeqCheckedStackModifyingPredicate(seq);
       Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((BooleanPredicate)filter));
       Assertions.assertEquals(10,seq.size());
       currVal=false;
@@ -4867,7 +4867,7 @@ public class BooleanArrSeqTest{
           currVal=!currVal;
         }
       }
-      var filter=new BooleanMonitoredPredicate.RemoveNoneArrSeqCheckedStackModifyingPredicate(seq);
+      var filter=new BooleanMonitoredPredicate2.RemoveNoneArrSeqCheckedStackModifyingPredicate(seq);
       Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((BooleanPredicate)filter));
       Assertions.assertEquals(10,seq.size());
       currVal=true;
@@ -4917,7 +4917,7 @@ public class BooleanArrSeqTest{
           currVal=!currVal;
         }
       }
-      var filter=new BooleanMonitoredPredicate.RemoveAllArrSeqCheckedStackModifyingPredicate(seq);
+      var filter=new BooleanMonitoredPredicate2.RemoveAllArrSeqCheckedStackModifyingPredicate(seq);
       Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((BooleanPredicate)filter));
       Assertions.assertEquals(10,seq.size());
       currVal=true;
@@ -4967,7 +4967,7 @@ public class BooleanArrSeqTest{
           currVal=!currVal;
         }
       }
-      var filter=new BooleanMonitoredPredicate.RemoveNoneArrSeqCheckedStackModifyingPredicate(seq);
+      var filter=new BooleanMonitoredPredicate2.RemoveNoneArrSeqCheckedStackModifyingPredicate(seq);
       Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((BooleanPredicate)filter));
       Assertions.assertEquals(10,seq.size());
       currVal=false;
@@ -5017,7 +5017,7 @@ public class BooleanArrSeqTest{
           currVal=!currVal;
         }
       }
-      var filter=new BooleanMonitoredPredicate.RemoveAllArrSeqCheckedStackModifyingPredicate(seq);
+      var filter=new BooleanMonitoredPredicate2.RemoveAllArrSeqCheckedStackModifyingPredicate(seq);
       Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((BooleanPredicate)filter));
       Assertions.assertEquals(10,seq.size());
       currVal=false;
@@ -5067,7 +5067,7 @@ public class BooleanArrSeqTest{
           currVal=!currVal;
         }
       }
-      var filter=new BooleanMonitoredPredicate.ThrowingPredicate();
+      var filter=new BooleanMonitoredPredicate2.ThrowingPredicate();
       Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.removeIf((BooleanPredicate)filter));
       Assertions.assertEquals(10,seq.size());
       currVal=true;
@@ -5112,7 +5112,7 @@ public class BooleanArrSeqTest{
           currVal=!currVal;
         }
       }
-      var filter=new BooleanMonitoredPredicate.ThrowingPredicate();
+      var filter=new BooleanMonitoredPredicate2.ThrowingPredicate();
       Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.removeIf((BooleanPredicate)filter));
       Assertions.assertEquals(10,seq.size());
       currVal=false;
@@ -5157,7 +5157,7 @@ public class BooleanArrSeqTest{
           currVal=!currVal;
         }
       }
-      var filter=new BooleanMonitoredPredicate.ModifyingArrSeqCheckedStackAndThrowingPredicate(seq);
+      var filter=new BooleanMonitoredPredicate2.ModifyingArrSeqCheckedStackAndThrowingPredicate(seq);
       Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((BooleanPredicate)filter));
       Assertions.assertEquals(11,seq.size());
       currVal=false;
@@ -5203,7 +5203,7 @@ public class BooleanArrSeqTest{
           currVal=!currVal;
         }
       }
-      var filter=new BooleanMonitoredPredicate.ModifyingArrSeqCheckedStackAndThrowingPredicate(seq);
+      var filter=new BooleanMonitoredPredicate2.ModifyingArrSeqCheckedStackAndThrowingPredicate(seq);
       Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((BooleanPredicate)filter));
       Assertions.assertEquals(11,seq.size());
       currVal=true;
@@ -5235,7 +5235,7 @@ public class BooleanArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToboolean(i));
     }
-    var filter=new BooleanMonitoredPredicate.RemoveTrueArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new BooleanMonitoredPredicate2.RemoveTrueArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((BooleanPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -5248,7 +5248,7 @@ public class BooleanArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToboolean(i));
     }
-    var filter=new BooleanMonitoredPredicate.RemoveFalseArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new BooleanMonitoredPredicate2.RemoveFalseArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((BooleanPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -5261,7 +5261,7 @@ public class BooleanArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToboolean(i));
     }
-    var filter=new BooleanMonitoredPredicate.RemoveAllPredicate(seq);
+    var filter=new BooleanMonitoredPredicate2.RemoveAllPredicate(seq);
     Assertions.assertFalse(seq.removeIf((BooleanPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -5274,7 +5274,7 @@ public class BooleanArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToboolean(i));
     }
-    var filter=new BooleanMonitoredPredicate.RemoveNonePredicate(seq);
+    var filter=new BooleanMonitoredPredicate2.RemoveNonePredicate(seq);
     Assertions.assertFalse(seq.removeIf((BooleanPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -5287,7 +5287,7 @@ public class BooleanArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToboolean(i));
     }
-    var filter=new BooleanMonitoredPredicate.RemoveAllArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new BooleanMonitoredPredicate2.RemoveAllArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((BooleanPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -5300,7 +5300,7 @@ public class BooleanArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToboolean(i));
     }
-    var filter=new BooleanMonitoredPredicate.RemoveNoneArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new BooleanMonitoredPredicate2.RemoveNoneArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((BooleanPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -5313,7 +5313,7 @@ public class BooleanArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToboolean(i));
     }
-    var filter=new BooleanMonitoredPredicate.ThrowingPredicate(seq);
+    var filter=new BooleanMonitoredPredicate2.ThrowingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((BooleanPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -5326,7 +5326,7 @@ public class BooleanArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToboolean(i));
     }
-    var filter=new BooleanMonitoredPredicate.ModifyingArrSeqCheckedStackAndThrowingPredicate(seq);
+    var filter=new BooleanMonitoredPredicate2.ModifyingArrSeqCheckedStackAndThrowingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((BooleanPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -6233,7 +6233,7 @@ public class BooleanArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToboolean(i));
     }
-    var filter=new BooleanMonitoredPredicate.RemoveTruePredicate(seq);
+    var filter=new BooleanMonitoredPredicate2.RemoveTruePredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -6246,7 +6246,7 @@ public class BooleanArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToboolean(i));
     }
-    var filter=new BooleanMonitoredPredicate.RemoveFalsePredicate(seq);
+    var filter=new BooleanMonitoredPredicate2.RemoveFalsePredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -6273,7 +6273,7 @@ public class BooleanArrSeqTest{
           currVal=!currVal;
         }
       }
-      var filter=new BooleanMonitoredPredicate.RemoveTruePredicate();
+      var filter=new BooleanMonitoredPredicate2.RemoveTruePredicate();
       Assertions.assertEquals(trueCount!=0,seq.removeIf((Predicate)filter));
       Assertions.assertEquals(falseCount,seq.size());
       for(int i=0;i<falseCount;++i){
@@ -6304,7 +6304,7 @@ public class BooleanArrSeqTest{
           currVal=!currVal;
         }
       }
-      var filter=new BooleanMonitoredPredicate.RemoveTruePredicate();
+      var filter=new BooleanMonitoredPredicate2.RemoveTruePredicate();
       Assertions.assertEquals(trueCount!=0,seq.removeIf((Predicate)filter));
       Assertions.assertEquals(falseCount,seq.size());
       for(int i=0;i<falseCount;++i){
@@ -6335,7 +6335,7 @@ public class BooleanArrSeqTest{
           currVal=!currVal;
         }
       }
-      var filter=new BooleanMonitoredPredicate.RemoveFalsePredicate();
+      var filter=new BooleanMonitoredPredicate2.RemoveFalsePredicate();
       Assertions.assertEquals(falseCount!=0,seq.removeIf((Predicate)filter));
       Assertions.assertEquals(trueCount,seq.size());
       for(int i=0;i<trueCount;++i){
@@ -6366,7 +6366,7 @@ public class BooleanArrSeqTest{
           currVal=!currVal;
         }
       }
-      var filter=new BooleanMonitoredPredicate.RemoveFalsePredicate();
+      var filter=new BooleanMonitoredPredicate2.RemoveFalsePredicate();
       Assertions.assertEquals(falseCount!=0,seq.removeIf((Predicate)filter));
       Assertions.assertEquals(trueCount,seq.size());
       for(int i=0;i<trueCount;++i){
@@ -6397,7 +6397,7 @@ public class BooleanArrSeqTest{
           currVal=!currVal;
         }
       }
-      var filter=new BooleanMonitoredPredicate.RemoveAllPredicate();
+      var filter=new BooleanMonitoredPredicate2.RemoveAllPredicate();
       Assertions.assertTrue(seq.removeIf((Predicate)filter));
       Assertions.assertEquals(0,seq.size());
       Assertions.assertEquals(falseCount==0||trueCount==0?1:2,filter.callCount);
@@ -6425,7 +6425,7 @@ public class BooleanArrSeqTest{
           currVal=!currVal;
         }
       }
-      var filter=new BooleanMonitoredPredicate.RemoveAllPredicate();
+      var filter=new BooleanMonitoredPredicate2.RemoveAllPredicate();
       Assertions.assertTrue(seq.removeIf((Predicate)filter));
       Assertions.assertEquals(0,seq.size());
       Assertions.assertEquals(falseCount==0||trueCount==0?1:2,filter.callCount);
@@ -6453,7 +6453,7 @@ public class BooleanArrSeqTest{
           currVal=!currVal;
         }
       }
-      var filter=new BooleanMonitoredPredicate.RemoveNonePredicate();
+      var filter=new BooleanMonitoredPredicate2.RemoveNonePredicate();
       Assertions.assertFalse(seq.removeIf((Predicate)filter));
       Assertions.assertEquals(10,seq.size());
       Assertions.assertEquals(falseCount==0||trueCount==0?1:2,filter.callCount);
@@ -6498,7 +6498,7 @@ public class BooleanArrSeqTest{
           currVal=!currVal;
         }
       }
-      var filter=new BooleanMonitoredPredicate.RemoveNonePredicate();
+      var filter=new BooleanMonitoredPredicate2.RemoveNonePredicate();
       Assertions.assertFalse(seq.removeIf((Predicate)filter));
       Assertions.assertEquals(10,seq.size());
       Assertions.assertEquals(falseCount==0||trueCount==0?1:2,filter.callCount);
@@ -6543,7 +6543,7 @@ public class BooleanArrSeqTest{
           currVal=!currVal;
         }
       }
-      var filter=new BooleanMonitoredPredicate.RemoveTrueArrSeqCheckedListModifyingPredicate(seq);
+      var filter=new BooleanMonitoredPredicate2.RemoveTrueArrSeqCheckedListModifyingPredicate(seq);
       Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
       Assertions.assertEquals(10,seq.size());
       currVal=true;
@@ -6593,7 +6593,7 @@ public class BooleanArrSeqTest{
           currVal=!currVal;
         }
       }
-      var filter=new BooleanMonitoredPredicate.RemoveFalseArrSeqCheckedListModifyingPredicate(seq);
+      var filter=new BooleanMonitoredPredicate2.RemoveFalseArrSeqCheckedListModifyingPredicate(seq);
       Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
       Assertions.assertEquals(10,seq.size());
       currVal=true;
@@ -6643,7 +6643,7 @@ public class BooleanArrSeqTest{
           currVal=!currVal;
         }
       }
-      var filter=new BooleanMonitoredPredicate.RemoveTrueArrSeqCheckedListModifyingPredicate(seq);
+      var filter=new BooleanMonitoredPredicate2.RemoveTrueArrSeqCheckedListModifyingPredicate(seq);
       Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
       Assertions.assertEquals(10,seq.size());
       currVal=false;
@@ -6693,7 +6693,7 @@ public class BooleanArrSeqTest{
           currVal=!currVal;
         }
       }
-      var filter=new BooleanMonitoredPredicate.RemoveFalseArrSeqCheckedListModifyingPredicate(seq);
+      var filter=new BooleanMonitoredPredicate2.RemoveFalseArrSeqCheckedListModifyingPredicate(seq);
       Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
       Assertions.assertEquals(10,seq.size());
       currVal=false;
@@ -6743,7 +6743,7 @@ public class BooleanArrSeqTest{
           currVal=!currVal;
         }
       }
-      var filter=new BooleanMonitoredPredicate.RemoveNoneArrSeqCheckedListModifyingPredicate(seq);
+      var filter=new BooleanMonitoredPredicate2.RemoveNoneArrSeqCheckedListModifyingPredicate(seq);
       Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
       Assertions.assertEquals(10,seq.size());
       currVal=true;
@@ -6793,7 +6793,7 @@ public class BooleanArrSeqTest{
           currVal=!currVal;
         }
       }
-      var filter=new BooleanMonitoredPredicate.RemoveAllArrSeqCheckedListModifyingPredicate(seq);
+      var filter=new BooleanMonitoredPredicate2.RemoveAllArrSeqCheckedListModifyingPredicate(seq);
       Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
       Assertions.assertEquals(10,seq.size());
       currVal=true;
@@ -6843,7 +6843,7 @@ public class BooleanArrSeqTest{
           currVal=!currVal;
         }
       }
-      var filter=new BooleanMonitoredPredicate.RemoveNoneArrSeqCheckedListModifyingPredicate(seq);
+      var filter=new BooleanMonitoredPredicate2.RemoveNoneArrSeqCheckedListModifyingPredicate(seq);
       Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
       Assertions.assertEquals(10,seq.size());
       currVal=false;
@@ -6893,7 +6893,7 @@ public class BooleanArrSeqTest{
           currVal=!currVal;
         }
       }
-      var filter=new BooleanMonitoredPredicate.RemoveAllArrSeqCheckedListModifyingPredicate(seq);
+      var filter=new BooleanMonitoredPredicate2.RemoveAllArrSeqCheckedListModifyingPredicate(seq);
       Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
       Assertions.assertEquals(10,seq.size());
       currVal=false;
@@ -6943,7 +6943,7 @@ public class BooleanArrSeqTest{
           currVal=!currVal;
         }
       }
-      var filter=new BooleanMonitoredPredicate.ThrowingPredicate();
+      var filter=new BooleanMonitoredPredicate2.ThrowingPredicate();
       Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.removeIf((Predicate)filter));
       Assertions.assertEquals(10,seq.size());
       currVal=true;
@@ -6988,7 +6988,7 @@ public class BooleanArrSeqTest{
           currVal=!currVal;
         }
       }
-      var filter=new BooleanMonitoredPredicate.ThrowingPredicate();
+      var filter=new BooleanMonitoredPredicate2.ThrowingPredicate();
       Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.removeIf((Predicate)filter));
       Assertions.assertEquals(10,seq.size());
       currVal=false;
@@ -7033,7 +7033,7 @@ public class BooleanArrSeqTest{
           currVal=!currVal;
         }
       }
-      var filter=new BooleanMonitoredPredicate.ModifyingArrSeqCheckedListAndThrowingPredicate(seq);
+      var filter=new BooleanMonitoredPredicate2.ModifyingArrSeqCheckedListAndThrowingPredicate(seq);
       Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
       Assertions.assertEquals(11,seq.size());
       currVal=false;
@@ -7079,7 +7079,7 @@ public class BooleanArrSeqTest{
           currVal=!currVal;
         }
       }
-      var filter=new BooleanMonitoredPredicate.ModifyingArrSeqCheckedListAndThrowingPredicate(seq);
+      var filter=new BooleanMonitoredPredicate2.ModifyingArrSeqCheckedListAndThrowingPredicate(seq);
       Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
       Assertions.assertEquals(11,seq.size());
       currVal=true;
@@ -7111,7 +7111,7 @@ public class BooleanArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToboolean(i));
     }
-    var filter=new BooleanMonitoredPredicate.RemoveTrueArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new BooleanMonitoredPredicate2.RemoveTrueArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -7124,7 +7124,7 @@ public class BooleanArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToboolean(i));
     }
-    var filter=new BooleanMonitoredPredicate.RemoveFalseArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new BooleanMonitoredPredicate2.RemoveFalseArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -7137,7 +7137,7 @@ public class BooleanArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToboolean(i));
     }
-    var filter=new BooleanMonitoredPredicate.RemoveAllPredicate(seq);
+    var filter=new BooleanMonitoredPredicate2.RemoveAllPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -7150,7 +7150,7 @@ public class BooleanArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToboolean(i));
     }
-    var filter=new BooleanMonitoredPredicate.RemoveNonePredicate(seq);
+    var filter=new BooleanMonitoredPredicate2.RemoveNonePredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -7163,7 +7163,7 @@ public class BooleanArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToboolean(i));
     }
-    var filter=new BooleanMonitoredPredicate.RemoveAllArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new BooleanMonitoredPredicate2.RemoveAllArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -7176,7 +7176,7 @@ public class BooleanArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToboolean(i));
     }
-    var filter=new BooleanMonitoredPredicate.RemoveNoneArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new BooleanMonitoredPredicate2.RemoveNoneArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -7189,7 +7189,7 @@ public class BooleanArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToboolean(i));
     }
-    var filter=new BooleanMonitoredPredicate.ThrowingPredicate(seq);
+    var filter=new BooleanMonitoredPredicate2.ThrowingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -7202,7 +7202,7 @@ public class BooleanArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToboolean(i));
     }
-    var filter=new BooleanMonitoredPredicate.ModifyingArrSeqCheckedListAndThrowingPredicate(seq);
+    var filter=new BooleanMonitoredPredicate2.ModifyingArrSeqCheckedListAndThrowingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -7315,7 +7315,7 @@ public class BooleanArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToboolean(i));
     }
-    var filter=new BooleanMonitoredPredicate.RemoveTruePredicate(seq);
+    var filter=new BooleanMonitoredPredicate2.RemoveTruePredicate(seq);
     Assertions.assertFalse(seq.removeIf((BooleanPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -7328,7 +7328,7 @@ public class BooleanArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToboolean(i));
     }
-    var filter=new BooleanMonitoredPredicate.RemoveFalsePredicate(seq);
+    var filter=new BooleanMonitoredPredicate2.RemoveFalsePredicate(seq);
     Assertions.assertFalse(seq.removeIf((BooleanPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -7355,7 +7355,7 @@ public class BooleanArrSeqTest{
           currVal=!currVal;
         }
       }
-      var filter=new BooleanMonitoredPredicate.RemoveTruePredicate();
+      var filter=new BooleanMonitoredPredicate2.RemoveTruePredicate();
       Assertions.assertEquals(trueCount!=0,seq.removeIf((BooleanPredicate)filter));
       Assertions.assertEquals(falseCount,seq.size());
       for(int i=0;i<falseCount;++i){
@@ -7386,7 +7386,7 @@ public class BooleanArrSeqTest{
           currVal=!currVal;
         }
       }
-      var filter=new BooleanMonitoredPredicate.RemoveTruePredicate();
+      var filter=new BooleanMonitoredPredicate2.RemoveTruePredicate();
       Assertions.assertEquals(trueCount!=0,seq.removeIf((BooleanPredicate)filter));
       Assertions.assertEquals(falseCount,seq.size());
       for(int i=0;i<falseCount;++i){
@@ -7417,7 +7417,7 @@ public class BooleanArrSeqTest{
           currVal=!currVal;
         }
       }
-      var filter=new BooleanMonitoredPredicate.RemoveFalsePredicate();
+      var filter=new BooleanMonitoredPredicate2.RemoveFalsePredicate();
       Assertions.assertEquals(falseCount!=0,seq.removeIf((BooleanPredicate)filter));
       Assertions.assertEquals(trueCount,seq.size());
       for(int i=0;i<trueCount;++i){
@@ -7448,7 +7448,7 @@ public class BooleanArrSeqTest{
           currVal=!currVal;
         }
       }
-      var filter=new BooleanMonitoredPredicate.RemoveFalsePredicate();
+      var filter=new BooleanMonitoredPredicate2.RemoveFalsePredicate();
       Assertions.assertEquals(falseCount!=0,seq.removeIf((BooleanPredicate)filter));
       Assertions.assertEquals(trueCount,seq.size());
       for(int i=0;i<trueCount;++i){
@@ -7479,7 +7479,7 @@ public class BooleanArrSeqTest{
           currVal=!currVal;
         }
       }
-      var filter=new BooleanMonitoredPredicate.RemoveAllPredicate();
+      var filter=new BooleanMonitoredPredicate2.RemoveAllPredicate();
       Assertions.assertTrue(seq.removeIf((BooleanPredicate)filter));
       Assertions.assertEquals(0,seq.size());
       Assertions.assertEquals(falseCount==0||trueCount==0?1:2,filter.callCount);
@@ -7507,7 +7507,7 @@ public class BooleanArrSeqTest{
           currVal=!currVal;
         }
       }
-      var filter=new BooleanMonitoredPredicate.RemoveAllPredicate();
+      var filter=new BooleanMonitoredPredicate2.RemoveAllPredicate();
       Assertions.assertTrue(seq.removeIf((BooleanPredicate)filter));
       Assertions.assertEquals(0,seq.size());
       Assertions.assertEquals(falseCount==0||trueCount==0?1:2,filter.callCount);
@@ -7535,7 +7535,7 @@ public class BooleanArrSeqTest{
           currVal=!currVal;
         }
       }
-      var filter=new BooleanMonitoredPredicate.RemoveNonePredicate();
+      var filter=new BooleanMonitoredPredicate2.RemoveNonePredicate();
       Assertions.assertFalse(seq.removeIf((BooleanPredicate)filter));
       Assertions.assertEquals(10,seq.size());
       Assertions.assertEquals(falseCount==0||trueCount==0?1:2,filter.callCount);
@@ -7580,7 +7580,7 @@ public class BooleanArrSeqTest{
           currVal=!currVal;
         }
       }
-      var filter=new BooleanMonitoredPredicate.RemoveNonePredicate();
+      var filter=new BooleanMonitoredPredicate2.RemoveNonePredicate();
       Assertions.assertFalse(seq.removeIf((BooleanPredicate)filter));
       Assertions.assertEquals(10,seq.size());
       Assertions.assertEquals(falseCount==0||trueCount==0?1:2,filter.callCount);
@@ -7625,7 +7625,7 @@ public class BooleanArrSeqTest{
           currVal=!currVal;
         }
       }
-      var filter=new BooleanMonitoredPredicate.RemoveTrueArrSeqCheckedListModifyingPredicate(seq);
+      var filter=new BooleanMonitoredPredicate2.RemoveTrueArrSeqCheckedListModifyingPredicate(seq);
       Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((BooleanPredicate)filter));
       Assertions.assertEquals(10,seq.size());
       currVal=true;
@@ -7675,7 +7675,7 @@ public class BooleanArrSeqTest{
           currVal=!currVal;
         }
       }
-      var filter=new BooleanMonitoredPredicate.RemoveFalseArrSeqCheckedListModifyingPredicate(seq);
+      var filter=new BooleanMonitoredPredicate2.RemoveFalseArrSeqCheckedListModifyingPredicate(seq);
       Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((BooleanPredicate)filter));
       Assertions.assertEquals(10,seq.size());
       currVal=true;
@@ -7725,7 +7725,7 @@ public class BooleanArrSeqTest{
           currVal=!currVal;
         }
       }
-      var filter=new BooleanMonitoredPredicate.RemoveTrueArrSeqCheckedListModifyingPredicate(seq);
+      var filter=new BooleanMonitoredPredicate2.RemoveTrueArrSeqCheckedListModifyingPredicate(seq);
       Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((BooleanPredicate)filter));
       Assertions.assertEquals(10,seq.size());
       currVal=false;
@@ -7775,7 +7775,7 @@ public class BooleanArrSeqTest{
           currVal=!currVal;
         }
       }
-      var filter=new BooleanMonitoredPredicate.RemoveFalseArrSeqCheckedListModifyingPredicate(seq);
+      var filter=new BooleanMonitoredPredicate2.RemoveFalseArrSeqCheckedListModifyingPredicate(seq);
       Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((BooleanPredicate)filter));
       Assertions.assertEquals(10,seq.size());
       currVal=false;
@@ -7825,7 +7825,7 @@ public class BooleanArrSeqTest{
           currVal=!currVal;
         }
       }
-      var filter=new BooleanMonitoredPredicate.RemoveNoneArrSeqCheckedListModifyingPredicate(seq);
+      var filter=new BooleanMonitoredPredicate2.RemoveNoneArrSeqCheckedListModifyingPredicate(seq);
       Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((BooleanPredicate)filter));
       Assertions.assertEquals(10,seq.size());
       currVal=true;
@@ -7875,7 +7875,7 @@ public class BooleanArrSeqTest{
           currVal=!currVal;
         }
       }
-      var filter=new BooleanMonitoredPredicate.RemoveAllArrSeqCheckedListModifyingPredicate(seq);
+      var filter=new BooleanMonitoredPredicate2.RemoveAllArrSeqCheckedListModifyingPredicate(seq);
       Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((BooleanPredicate)filter));
       Assertions.assertEquals(10,seq.size());
       currVal=true;
@@ -7925,7 +7925,7 @@ public class BooleanArrSeqTest{
           currVal=!currVal;
         }
       }
-      var filter=new BooleanMonitoredPredicate.RemoveNoneArrSeqCheckedListModifyingPredicate(seq);
+      var filter=new BooleanMonitoredPredicate2.RemoveNoneArrSeqCheckedListModifyingPredicate(seq);
       Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((BooleanPredicate)filter));
       Assertions.assertEquals(10,seq.size());
       currVal=false;
@@ -7975,7 +7975,7 @@ public class BooleanArrSeqTest{
           currVal=!currVal;
         }
       }
-      var filter=new BooleanMonitoredPredicate.RemoveAllArrSeqCheckedListModifyingPredicate(seq);
+      var filter=new BooleanMonitoredPredicate2.RemoveAllArrSeqCheckedListModifyingPredicate(seq);
       Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((BooleanPredicate)filter));
       Assertions.assertEquals(10,seq.size());
       currVal=false;
@@ -8025,7 +8025,7 @@ public class BooleanArrSeqTest{
           currVal=!currVal;
         }
       }
-      var filter=new BooleanMonitoredPredicate.ThrowingPredicate();
+      var filter=new BooleanMonitoredPredicate2.ThrowingPredicate();
       Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.removeIf((BooleanPredicate)filter));
       Assertions.assertEquals(10,seq.size());
       currVal=true;
@@ -8070,7 +8070,7 @@ public class BooleanArrSeqTest{
           currVal=!currVal;
         }
       }
-      var filter=new BooleanMonitoredPredicate.ThrowingPredicate();
+      var filter=new BooleanMonitoredPredicate2.ThrowingPredicate();
       Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.removeIf((BooleanPredicate)filter));
       Assertions.assertEquals(10,seq.size());
       currVal=false;
@@ -8115,7 +8115,7 @@ public class BooleanArrSeqTest{
           currVal=!currVal;
         }
       }
-      var filter=new BooleanMonitoredPredicate.ModifyingArrSeqCheckedListAndThrowingPredicate(seq);
+      var filter=new BooleanMonitoredPredicate2.ModifyingArrSeqCheckedListAndThrowingPredicate(seq);
       Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((BooleanPredicate)filter));
       Assertions.assertEquals(11,seq.size());
       currVal=false;
@@ -8161,7 +8161,7 @@ public class BooleanArrSeqTest{
           currVal=!currVal;
         }
       }
-      var filter=new BooleanMonitoredPredicate.ModifyingArrSeqCheckedListAndThrowingPredicate(seq);
+      var filter=new BooleanMonitoredPredicate2.ModifyingArrSeqCheckedListAndThrowingPredicate(seq);
       Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((BooleanPredicate)filter));
       Assertions.assertEquals(11,seq.size());
       currVal=true;
@@ -8193,7 +8193,7 @@ public class BooleanArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToboolean(i));
     }
-    var filter=new BooleanMonitoredPredicate.RemoveTrueArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new BooleanMonitoredPredicate2.RemoveTrueArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((BooleanPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -8206,7 +8206,7 @@ public class BooleanArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToboolean(i));
     }
-    var filter=new BooleanMonitoredPredicate.RemoveFalseArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new BooleanMonitoredPredicate2.RemoveFalseArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((BooleanPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -8219,7 +8219,7 @@ public class BooleanArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToboolean(i));
     }
-    var filter=new BooleanMonitoredPredicate.RemoveAllPredicate(seq);
+    var filter=new BooleanMonitoredPredicate2.RemoveAllPredicate(seq);
     Assertions.assertFalse(seq.removeIf((BooleanPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -8232,7 +8232,7 @@ public class BooleanArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToboolean(i));
     }
-    var filter=new BooleanMonitoredPredicate.RemoveNonePredicate(seq);
+    var filter=new BooleanMonitoredPredicate2.RemoveNonePredicate(seq);
     Assertions.assertFalse(seq.removeIf((BooleanPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -8245,7 +8245,7 @@ public class BooleanArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToboolean(i));
     }
-    var filter=new BooleanMonitoredPredicate.RemoveAllArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new BooleanMonitoredPredicate2.RemoveAllArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((BooleanPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -8258,7 +8258,7 @@ public class BooleanArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToboolean(i));
     }
-    var filter=new BooleanMonitoredPredicate.RemoveNoneArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new BooleanMonitoredPredicate2.RemoveNoneArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((BooleanPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -8271,7 +8271,7 @@ public class BooleanArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToboolean(i));
     }
-    var filter=new BooleanMonitoredPredicate.ThrowingPredicate(seq);
+    var filter=new BooleanMonitoredPredicate2.ThrowingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((BooleanPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -8284,7 +8284,7 @@ public class BooleanArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertToboolean(i));
     }
-    var filter=new BooleanMonitoredPredicate.ModifyingArrSeqCheckedListAndThrowingPredicate(seq);
+    var filter=new BooleanMonitoredPredicate2.ModifyingArrSeqCheckedListAndThrowingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((BooleanPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);

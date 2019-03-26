@@ -438,7 +438,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RetainSecondPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RetainSecondPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -450,7 +450,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new DoubleMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -462,7 +462,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstAndThirdPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstAndThirdPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -474,7 +474,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -486,7 +486,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -497,7 +497,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveAllPredicate();
+    var filter=new DoubleMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -509,7 +509,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveNonePredicate();
+    var filter=new DoubleMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -521,7 +521,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RetainSecondPredicate();
+    var filter=new DoubleMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -533,7 +533,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new DoubleMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -545,7 +545,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3-2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -557,7 +557,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3-1,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -569,7 +569,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3-2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -581,7 +581,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveAllPredicate();
+    var filter=new DoubleMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -593,7 +593,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveNonePredicate();
+    var filter=new DoubleMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -605,7 +605,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RetainSecondPredicate();
+    var filter=new DoubleMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -617,7 +617,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new DoubleMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -629,7 +629,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50-2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -641,7 +641,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50-1,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -653,7 +653,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50-2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -665,7 +665,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveAllPredicate();
+    var filter=new DoubleMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -677,7 +677,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveNonePredicate();
+    var filter=new DoubleMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -689,7 +689,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RetainSecondPredicate();
+    var filter=new DoubleMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -701,7 +701,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new DoubleMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -713,7 +713,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100-2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -725,7 +725,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100-1,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -737,7 +737,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100-2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -750,7 +750,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveAllPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RemoveAllPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -762,7 +762,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveNonePredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RemoveNonePredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -799,7 +799,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RetainSecondPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RetainSecondPredicate(seq);
     Assertions.assertFalse(seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -811,7 +811,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new DoubleMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertFalse(seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -823,7 +823,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstAndThirdPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstAndThirdPredicate(seq);
     Assertions.assertFalse(seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -835,7 +835,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstPredicate(seq);
     Assertions.assertFalse(seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -847,7 +847,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertFalse(seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -858,7 +858,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveAllPredicate();
+    var filter=new DoubleMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -870,7 +870,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveNonePredicate();
+    var filter=new DoubleMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -882,7 +882,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RetainSecondPredicate();
+    var filter=new DoubleMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -894,7 +894,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new DoubleMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -906,7 +906,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(3-2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -918,7 +918,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(3-1,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -930,7 +930,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(3-2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -942,7 +942,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveAllPredicate();
+    var filter=new DoubleMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -954,7 +954,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveNonePredicate();
+    var filter=new DoubleMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -966,7 +966,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RetainSecondPredicate();
+    var filter=new DoubleMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -978,7 +978,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new DoubleMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -990,7 +990,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(50-2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -1002,7 +1002,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(50-1,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -1014,7 +1014,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(50-2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -1026,7 +1026,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveAllPredicate();
+    var filter=new DoubleMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -1038,7 +1038,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveNonePredicate();
+    var filter=new DoubleMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -1050,7 +1050,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RetainSecondPredicate();
+    var filter=new DoubleMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -1062,7 +1062,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new DoubleMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -1074,7 +1074,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(100-2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -1086,7 +1086,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(100-1,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -1098,7 +1098,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(100-2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -1111,7 +1111,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveAllPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RemoveAllPredicate(seq);
     Assertions.assertFalse(seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -1123,7 +1123,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveNonePredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RemoveNonePredicate(seq);
     Assertions.assertFalse(seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -2169,7 +2169,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RetainSecondPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RetainSecondPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -2181,7 +2181,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new DoubleMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -2193,7 +2193,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstAndThirdPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstAndThirdPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -2205,7 +2205,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -2217,7 +2217,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -2228,7 +2228,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveAllPredicate();
+    var filter=new DoubleMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -2240,7 +2240,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveNonePredicate();
+    var filter=new DoubleMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -2252,7 +2252,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RetainSecondPredicate();
+    var filter=new DoubleMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -2264,7 +2264,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new DoubleMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -2276,7 +2276,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3-2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -2288,7 +2288,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3-1,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -2300,7 +2300,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3-2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -2312,7 +2312,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveAllPredicate();
+    var filter=new DoubleMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -2324,7 +2324,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveNonePredicate();
+    var filter=new DoubleMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -2336,7 +2336,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RetainSecondPredicate();
+    var filter=new DoubleMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -2348,7 +2348,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new DoubleMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -2360,7 +2360,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50-2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -2372,7 +2372,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50-1,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -2384,7 +2384,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50-2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -2396,7 +2396,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveAllPredicate();
+    var filter=new DoubleMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -2408,7 +2408,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveNonePredicate();
+    var filter=new DoubleMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -2420,7 +2420,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RetainSecondPredicate();
+    var filter=new DoubleMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -2432,7 +2432,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new DoubleMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -2444,7 +2444,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100-2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -2456,7 +2456,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100-1,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -2468,7 +2468,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100-2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -2481,7 +2481,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveAllPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RemoveAllPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -2493,7 +2493,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveNonePredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RemoveNonePredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -2530,7 +2530,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RetainSecondPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RetainSecondPredicate(seq);
     Assertions.assertFalse(seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -2542,7 +2542,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new DoubleMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertFalse(seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -2554,7 +2554,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstAndThirdPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstAndThirdPredicate(seq);
     Assertions.assertFalse(seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -2566,7 +2566,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstPredicate(seq);
     Assertions.assertFalse(seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -2578,7 +2578,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertFalse(seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -2589,7 +2589,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveAllPredicate();
+    var filter=new DoubleMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -2601,7 +2601,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveNonePredicate();
+    var filter=new DoubleMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -2613,7 +2613,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RetainSecondPredicate();
+    var filter=new DoubleMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -2625,7 +2625,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new DoubleMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -2637,7 +2637,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(3-2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -2649,7 +2649,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(3-1,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -2661,7 +2661,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(3-2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -2673,7 +2673,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveAllPredicate();
+    var filter=new DoubleMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -2685,7 +2685,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveNonePredicate();
+    var filter=new DoubleMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -2697,7 +2697,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RetainSecondPredicate();
+    var filter=new DoubleMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -2709,7 +2709,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new DoubleMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -2721,7 +2721,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(50-2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -2733,7 +2733,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(50-1,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -2745,7 +2745,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(50-2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -2757,7 +2757,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveAllPredicate();
+    var filter=new DoubleMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -2769,7 +2769,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveNonePredicate();
+    var filter=new DoubleMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -2781,7 +2781,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RetainSecondPredicate();
+    var filter=new DoubleMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -2793,7 +2793,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new DoubleMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -2805,7 +2805,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(100-2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -2817,7 +2817,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(100-1,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -2829,7 +2829,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(100-2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -2842,7 +2842,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveAllPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RemoveAllPredicate(seq);
     Assertions.assertFalse(seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -2854,7 +2854,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveNonePredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RemoveNonePredicate(seq);
     Assertions.assertFalse(seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -4093,7 +4093,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RetainSecondArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RetainSecondArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -4106,7 +4106,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RetainSecondAndLastArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RetainSecondAndLastArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -4119,7 +4119,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstAndThirdArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstAndThirdArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -4132,7 +4132,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -4145,7 +4145,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstAndSecondToLastArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstAndSecondToLastArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -4156,7 +4156,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.ModifyingArrSeqCheckedStackAndThrowingPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.ModifyingArrSeqCheckedStackAndThrowingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3+1,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -4169,7 +4169,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.ThrowingPredicate();
+    var filter=new DoubleMonitoredPredicate2.ThrowingPredicate();
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -4182,7 +4182,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveAllArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RemoveAllArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -4195,7 +4195,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveNoneArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RemoveNoneArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -4208,7 +4208,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RetainSecondArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RetainSecondArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -4221,7 +4221,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RetainSecondAndLastArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RetainSecondAndLastArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -4234,7 +4234,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstAndThirdArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstAndThirdArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -4247,7 +4247,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -4260,7 +4260,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstAndSecondToLastArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstAndSecondToLastArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -4272,7 +4272,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.ModifyingArrSeqCheckedStackAndThrowingPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.ModifyingArrSeqCheckedStackAndThrowingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50+1,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -4285,7 +4285,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.ThrowingPredicate();
+    var filter=new DoubleMonitoredPredicate2.ThrowingPredicate();
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -4298,7 +4298,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveAllArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RemoveAllArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -4311,7 +4311,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveNoneArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RemoveNoneArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -4324,7 +4324,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RetainSecondArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RetainSecondArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -4337,7 +4337,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RetainSecondAndLastArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RetainSecondAndLastArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -4350,7 +4350,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstAndThirdArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstAndThirdArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -4363,7 +4363,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -4376,7 +4376,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstAndSecondToLastArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstAndSecondToLastArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -4388,7 +4388,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.ModifyingArrSeqCheckedStackAndThrowingPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.ModifyingArrSeqCheckedStackAndThrowingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100+1,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -4401,7 +4401,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.ThrowingPredicate();
+    var filter=new DoubleMonitoredPredicate2.ThrowingPredicate();
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -4414,7 +4414,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveAllArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RemoveAllArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -4427,7 +4427,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveNoneArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RemoveNoneArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -4440,7 +4440,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RetainSecondArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RetainSecondArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -4453,7 +4453,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RetainSecondAndLastArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RetainSecondAndLastArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -4466,7 +4466,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstAndThirdArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstAndThirdArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -4479,7 +4479,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -4492,7 +4492,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstAndSecondToLastArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstAndSecondToLastArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -4506,7 +4506,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RetainSecondPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RetainSecondPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -4519,7 +4519,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new DoubleMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -4532,7 +4532,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstAndThirdPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstAndThirdPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -4545,7 +4545,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -4558,7 +4558,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -4570,7 +4570,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveAllPredicate();
+    var filter=new DoubleMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -4582,7 +4582,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveNonePredicate();
+    var filter=new DoubleMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -4594,7 +4594,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RetainSecondPredicate();
+    var filter=new DoubleMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -4606,7 +4606,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new DoubleMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -4618,7 +4618,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3-2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -4630,7 +4630,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3-1,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -4642,7 +4642,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3-2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -4654,7 +4654,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveAllPredicate();
+    var filter=new DoubleMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -4666,7 +4666,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveNonePredicate();
+    var filter=new DoubleMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -4678,7 +4678,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RetainSecondPredicate();
+    var filter=new DoubleMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -4690,7 +4690,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new DoubleMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -4702,7 +4702,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50-2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -4714,7 +4714,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50-1,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -4726,7 +4726,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50-2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -4738,7 +4738,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveAllPredicate();
+    var filter=new DoubleMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -4750,7 +4750,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveNonePredicate();
+    var filter=new DoubleMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -4762,7 +4762,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RetainSecondPredicate();
+    var filter=new DoubleMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -4774,7 +4774,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new DoubleMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -4786,7 +4786,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100-2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -4798,7 +4798,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100-1,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -4810,7 +4810,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100-2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -4823,7 +4823,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveAllPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RemoveAllPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -4836,7 +4836,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveNonePredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RemoveNonePredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -4849,7 +4849,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveAllArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RemoveAllArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -4862,7 +4862,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveNoneArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RemoveNoneArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -4875,7 +4875,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.ThrowingPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.ThrowingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -4888,7 +4888,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.ModifyingArrSeqCheckedStackAndThrowingPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.ModifyingArrSeqCheckedStackAndThrowingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -5001,7 +5001,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RetainSecondArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RetainSecondArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -5014,7 +5014,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RetainSecondAndLastArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RetainSecondAndLastArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -5027,7 +5027,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstAndThirdArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstAndThirdArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -5040,7 +5040,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -5053,7 +5053,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstAndSecondToLastArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstAndSecondToLastArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -5064,7 +5064,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.ModifyingArrSeqCheckedStackAndThrowingPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.ModifyingArrSeqCheckedStackAndThrowingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(3+1,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -5077,7 +5077,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.ThrowingPredicate();
+    var filter=new DoubleMonitoredPredicate2.ThrowingPredicate();
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -5090,7 +5090,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveAllArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RemoveAllArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -5103,7 +5103,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveNoneArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RemoveNoneArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -5116,7 +5116,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RetainSecondArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RetainSecondArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -5129,7 +5129,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RetainSecondAndLastArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RetainSecondAndLastArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -5142,7 +5142,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstAndThirdArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstAndThirdArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -5155,7 +5155,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -5168,7 +5168,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstAndSecondToLastArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstAndSecondToLastArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -5180,7 +5180,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.ModifyingArrSeqCheckedStackAndThrowingPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.ModifyingArrSeqCheckedStackAndThrowingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(50+1,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -5193,7 +5193,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.ThrowingPredicate();
+    var filter=new DoubleMonitoredPredicate2.ThrowingPredicate();
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -5206,7 +5206,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveAllArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RemoveAllArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -5219,7 +5219,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveNoneArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RemoveNoneArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -5232,7 +5232,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RetainSecondArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RetainSecondArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -5245,7 +5245,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RetainSecondAndLastArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RetainSecondAndLastArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -5258,7 +5258,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstAndThirdArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstAndThirdArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -5271,7 +5271,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -5284,7 +5284,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstAndSecondToLastArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstAndSecondToLastArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -5296,7 +5296,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.ModifyingArrSeqCheckedStackAndThrowingPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.ModifyingArrSeqCheckedStackAndThrowingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(100+1,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -5309,7 +5309,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.ThrowingPredicate();
+    var filter=new DoubleMonitoredPredicate2.ThrowingPredicate();
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -5322,7 +5322,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveAllArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RemoveAllArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -5335,7 +5335,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveNoneArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RemoveNoneArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -5348,7 +5348,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RetainSecondArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RetainSecondArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -5361,7 +5361,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RetainSecondAndLastArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RetainSecondAndLastArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -5374,7 +5374,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstAndThirdArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstAndThirdArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -5387,7 +5387,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -5400,7 +5400,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstAndSecondToLastArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstAndSecondToLastArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -5414,7 +5414,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RetainSecondPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RetainSecondPredicate(seq);
     Assertions.assertFalse(seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -5427,7 +5427,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new DoubleMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertFalse(seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -5440,7 +5440,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstAndThirdPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstAndThirdPredicate(seq);
     Assertions.assertFalse(seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -5453,7 +5453,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstPredicate(seq);
     Assertions.assertFalse(seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -5466,7 +5466,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertFalse(seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -5478,7 +5478,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveAllPredicate();
+    var filter=new DoubleMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -5490,7 +5490,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveNonePredicate();
+    var filter=new DoubleMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -5502,7 +5502,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RetainSecondPredicate();
+    var filter=new DoubleMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -5514,7 +5514,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new DoubleMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -5526,7 +5526,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(3-2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -5538,7 +5538,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(3-1,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -5550,7 +5550,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(3-2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -5562,7 +5562,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveAllPredicate();
+    var filter=new DoubleMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -5574,7 +5574,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveNonePredicate();
+    var filter=new DoubleMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -5586,7 +5586,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RetainSecondPredicate();
+    var filter=new DoubleMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -5598,7 +5598,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new DoubleMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -5610,7 +5610,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(50-2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -5622,7 +5622,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(50-1,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -5634,7 +5634,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(50-2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -5646,7 +5646,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveAllPredicate();
+    var filter=new DoubleMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -5658,7 +5658,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveNonePredicate();
+    var filter=new DoubleMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -5670,7 +5670,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RetainSecondPredicate();
+    var filter=new DoubleMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -5682,7 +5682,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new DoubleMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -5694,7 +5694,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(100-2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -5706,7 +5706,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(100-1,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -5718,7 +5718,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(100-2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -5731,7 +5731,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveAllPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RemoveAllPredicate(seq);
     Assertions.assertFalse(seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -5744,7 +5744,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveNonePredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RemoveNonePredicate(seq);
     Assertions.assertFalse(seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -5757,7 +5757,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveAllArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RemoveAllArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -5770,7 +5770,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveNoneArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RemoveNoneArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -5783,7 +5783,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.ThrowingPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.ThrowingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -5796,7 +5796,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.ModifyingArrSeqCheckedStackAndThrowingPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.ModifyingArrSeqCheckedStackAndThrowingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -7088,7 +7088,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RetainSecondArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RetainSecondArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -7101,7 +7101,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RetainSecondAndLastArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RetainSecondAndLastArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -7114,7 +7114,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstAndThirdArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstAndThirdArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -7127,7 +7127,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -7140,7 +7140,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstAndSecondToLastArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstAndSecondToLastArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -7151,7 +7151,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.ModifyingArrSeqCheckedListAndThrowingPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.ModifyingArrSeqCheckedListAndThrowingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3+1,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -7164,7 +7164,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.ThrowingPredicate();
+    var filter=new DoubleMonitoredPredicate2.ThrowingPredicate();
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -7177,7 +7177,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveAllArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RemoveAllArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -7190,7 +7190,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveNoneArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RemoveNoneArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -7203,7 +7203,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RetainSecondArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RetainSecondArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -7216,7 +7216,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RetainSecondAndLastArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RetainSecondAndLastArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -7229,7 +7229,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstAndThirdArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstAndThirdArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -7242,7 +7242,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -7255,7 +7255,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstAndSecondToLastArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstAndSecondToLastArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -7267,7 +7267,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.ModifyingArrSeqCheckedListAndThrowingPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.ModifyingArrSeqCheckedListAndThrowingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50+1,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -7280,7 +7280,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.ThrowingPredicate();
+    var filter=new DoubleMonitoredPredicate2.ThrowingPredicate();
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -7293,7 +7293,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveAllArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RemoveAllArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -7306,7 +7306,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveNoneArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RemoveNoneArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -7319,7 +7319,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RetainSecondArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RetainSecondArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -7332,7 +7332,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RetainSecondAndLastArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RetainSecondAndLastArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -7345,7 +7345,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstAndThirdArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstAndThirdArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -7358,7 +7358,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -7371,7 +7371,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstAndSecondToLastArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstAndSecondToLastArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -7383,7 +7383,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.ModifyingArrSeqCheckedListAndThrowingPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.ModifyingArrSeqCheckedListAndThrowingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100+1,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -7396,7 +7396,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.ThrowingPredicate();
+    var filter=new DoubleMonitoredPredicate2.ThrowingPredicate();
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -7409,7 +7409,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveAllArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RemoveAllArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -7422,7 +7422,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveNoneArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RemoveNoneArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -7435,7 +7435,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RetainSecondArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RetainSecondArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -7448,7 +7448,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RetainSecondAndLastArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RetainSecondAndLastArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -7461,7 +7461,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstAndThirdArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstAndThirdArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -7474,7 +7474,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -7487,7 +7487,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstAndSecondToLastArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstAndSecondToLastArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -7501,7 +7501,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RetainSecondPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RetainSecondPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -7514,7 +7514,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new DoubleMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -7527,7 +7527,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstAndThirdPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstAndThirdPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -7540,7 +7540,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -7553,7 +7553,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -7565,7 +7565,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveAllPredicate();
+    var filter=new DoubleMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -7577,7 +7577,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveNonePredicate();
+    var filter=new DoubleMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -7589,7 +7589,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RetainSecondPredicate();
+    var filter=new DoubleMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -7601,7 +7601,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new DoubleMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -7613,7 +7613,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3-2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -7625,7 +7625,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3-1,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -7637,7 +7637,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3-2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -7649,7 +7649,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveAllPredicate();
+    var filter=new DoubleMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -7661,7 +7661,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveNonePredicate();
+    var filter=new DoubleMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -7673,7 +7673,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RetainSecondPredicate();
+    var filter=new DoubleMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -7685,7 +7685,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new DoubleMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -7697,7 +7697,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50-2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -7709,7 +7709,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50-1,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -7721,7 +7721,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50-2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -7733,7 +7733,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveAllPredicate();
+    var filter=new DoubleMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -7745,7 +7745,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveNonePredicate();
+    var filter=new DoubleMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -7757,7 +7757,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RetainSecondPredicate();
+    var filter=new DoubleMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -7769,7 +7769,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new DoubleMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -7781,7 +7781,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100-2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -7793,7 +7793,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100-1,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -7805,7 +7805,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100-2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -7818,7 +7818,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveAllPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RemoveAllPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -7831,7 +7831,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveNonePredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RemoveNonePredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -7844,7 +7844,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveAllArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RemoveAllArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -7857,7 +7857,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveNoneArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RemoveNoneArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -7870,7 +7870,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.ThrowingPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.ThrowingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -7883,7 +7883,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.ModifyingArrSeqCheckedListAndThrowingPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.ModifyingArrSeqCheckedListAndThrowingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -7996,7 +7996,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RetainSecondArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RetainSecondArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -8009,7 +8009,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RetainSecondAndLastArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RetainSecondAndLastArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -8022,7 +8022,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstAndThirdArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstAndThirdArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -8035,7 +8035,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -8048,7 +8048,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstAndSecondToLastArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstAndSecondToLastArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -8059,7 +8059,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.ModifyingArrSeqCheckedListAndThrowingPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.ModifyingArrSeqCheckedListAndThrowingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(3+1,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -8072,7 +8072,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.ThrowingPredicate();
+    var filter=new DoubleMonitoredPredicate2.ThrowingPredicate();
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -8085,7 +8085,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveAllArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RemoveAllArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -8098,7 +8098,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveNoneArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RemoveNoneArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -8111,7 +8111,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RetainSecondArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RetainSecondArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -8124,7 +8124,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RetainSecondAndLastArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RetainSecondAndLastArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -8137,7 +8137,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstAndThirdArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstAndThirdArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -8150,7 +8150,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -8163,7 +8163,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstAndSecondToLastArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstAndSecondToLastArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -8175,7 +8175,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.ModifyingArrSeqCheckedListAndThrowingPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.ModifyingArrSeqCheckedListAndThrowingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(50+1,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -8188,7 +8188,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.ThrowingPredicate();
+    var filter=new DoubleMonitoredPredicate2.ThrowingPredicate();
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -8201,7 +8201,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveAllArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RemoveAllArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -8214,7 +8214,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveNoneArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RemoveNoneArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -8227,7 +8227,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RetainSecondArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RetainSecondArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -8240,7 +8240,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RetainSecondAndLastArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RetainSecondAndLastArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -8253,7 +8253,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstAndThirdArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstAndThirdArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -8266,7 +8266,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -8279,7 +8279,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstAndSecondToLastArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstAndSecondToLastArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -8291,7 +8291,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.ModifyingArrSeqCheckedListAndThrowingPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.ModifyingArrSeqCheckedListAndThrowingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(100+1,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -8304,7 +8304,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.ThrowingPredicate();
+    var filter=new DoubleMonitoredPredicate2.ThrowingPredicate();
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -8317,7 +8317,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveAllArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RemoveAllArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -8330,7 +8330,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveNoneArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RemoveNoneArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -8343,7 +8343,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RetainSecondArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RetainSecondArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -8356,7 +8356,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RetainSecondAndLastArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RetainSecondAndLastArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -8369,7 +8369,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstAndThirdArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstAndThirdArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -8382,7 +8382,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -8395,7 +8395,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstAndSecondToLastArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstAndSecondToLastArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -8409,7 +8409,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RetainSecondPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RetainSecondPredicate(seq);
     Assertions.assertFalse(seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -8422,7 +8422,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new DoubleMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertFalse(seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -8435,7 +8435,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstAndThirdPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstAndThirdPredicate(seq);
     Assertions.assertFalse(seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -8448,7 +8448,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstPredicate(seq);
     Assertions.assertFalse(seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -8461,7 +8461,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertFalse(seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -8473,7 +8473,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveAllPredicate();
+    var filter=new DoubleMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -8485,7 +8485,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveNonePredicate();
+    var filter=new DoubleMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -8497,7 +8497,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RetainSecondPredicate();
+    var filter=new DoubleMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -8509,7 +8509,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new DoubleMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -8521,7 +8521,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(3-2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -8533,7 +8533,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(3-1,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -8545,7 +8545,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(3-2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -8557,7 +8557,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveAllPredicate();
+    var filter=new DoubleMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -8569,7 +8569,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveNonePredicate();
+    var filter=new DoubleMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -8581,7 +8581,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RetainSecondPredicate();
+    var filter=new DoubleMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -8593,7 +8593,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new DoubleMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -8605,7 +8605,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(50-2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -8617,7 +8617,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(50-1,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -8629,7 +8629,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(50-2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -8641,7 +8641,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveAllPredicate();
+    var filter=new DoubleMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -8653,7 +8653,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveNonePredicate();
+    var filter=new DoubleMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -8665,7 +8665,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RetainSecondPredicate();
+    var filter=new DoubleMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -8677,7 +8677,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new DoubleMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -8689,7 +8689,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(100-2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -8701,7 +8701,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(100-1,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -8713,7 +8713,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new DoubleMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(100-2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -8726,7 +8726,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveAllPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RemoveAllPredicate(seq);
     Assertions.assertFalse(seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -8739,7 +8739,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveNonePredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RemoveNonePredicate(seq);
     Assertions.assertFalse(seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -8752,7 +8752,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveAllArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RemoveAllArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -8765,7 +8765,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.RemoveNoneArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.RemoveNoneArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -8778,7 +8778,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.ThrowingPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.ThrowingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -8791,7 +8791,7 @@ public class DoubleArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTodouble(i));
     }
-    var filter=new DoubleMonitoredPredicate.ModifyingArrSeqCheckedListAndThrowingPredicate(seq);
+    var filter=new DoubleMonitoredPredicate2.ModifyingArrSeqCheckedListAndThrowingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((DoublePredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);

@@ -4,7 +4,7 @@ import omni.function.CharPredicate;
 import org.junit.jupiter.api.Assertions;
 import omni.util.TypeConversionUtil;
 import omni.util.EqualityUtil;
-abstract class CharMonitoredPredicate implements CharPredicate,Predicate<Object>
+abstract class CharMonitoredPredicate2 implements CharPredicate,Predicate<Object>
 {
   int callCount;
   abstract boolean testImpl(char val);
@@ -12,14 +12,14 @@ abstract class CharMonitoredPredicate implements CharPredicate,Predicate<Object>
     ++callCount;
     return testImpl((char)val);
   }
-  public CharMonitoredPredicate negate(){
+  public CharMonitoredPredicate2 negate(){
     //don't care
     return null;
   }
   @Override public boolean test(Object val){
     return test((char)val);
   }
-  static class RemoveAllPredicate extends CharMonitoredPredicate{
+  static class RemoveAllPredicate extends CharMonitoredPredicate2{
     RemoveAllPredicate(){}
     RemoveAllPredicate(Object dummy){}
     boolean testImpl(char val){
@@ -28,7 +28,7 @@ abstract class CharMonitoredPredicate implements CharPredicate,Predicate<Object>
     void verifyArray(char[] arr,int offset,int originalLength){
     }
   }
-  static class RemoveNonePredicate extends CharMonitoredPredicate{
+  static class RemoveNonePredicate extends CharMonitoredPredicate2{
     RemoveNonePredicate(){}
     RemoveNonePredicate(Object dummy){}
     boolean testImpl(char val){
@@ -41,7 +41,7 @@ abstract class CharMonitoredPredicate implements CharPredicate,Predicate<Object>
       }
     }
   }
-  static class ThrowingPredicate extends CharMonitoredPredicate{
+  static class ThrowingPredicate extends CharMonitoredPredicate2{
     ThrowingPredicate(){}
     ThrowingPredicate(Object dummy){}
     @Override boolean testImpl(char val){
@@ -54,7 +54,7 @@ abstract class CharMonitoredPredicate implements CharPredicate,Predicate<Object>
       }
     }
   }
-  static class RetainSecondPredicate extends CharMonitoredPredicate{
+  static class RetainSecondPredicate extends CharMonitoredPredicate2{
     RetainSecondPredicate(){}
     RetainSecondPredicate(Object dummy){}
     boolean testImpl(char val){
@@ -70,7 +70,7 @@ abstract class CharMonitoredPredicate implements CharPredicate,Predicate<Object>
       }
     }
   }
-  static class RetainSecondAndLastPredicate extends CharMonitoredPredicate{
+  static class RetainSecondAndLastPredicate extends CharMonitoredPredicate2{
     int seqLength;
     RetainSecondAndLastPredicate(int seqLength){
       this.seqLength=seqLength;
@@ -88,7 +88,7 @@ abstract class CharMonitoredPredicate implements CharPredicate,Predicate<Object>
       }
     }
   }
-  static class RemoveFirstAndThirdPredicate extends CharMonitoredPredicate{
+  static class RemoveFirstAndThirdPredicate extends CharMonitoredPredicate2{
     RemoveFirstAndThirdPredicate(){}
     RemoveFirstAndThirdPredicate(Object dummy){}
     boolean testImpl(char val){
@@ -104,7 +104,7 @@ abstract class CharMonitoredPredicate implements CharPredicate,Predicate<Object>
       }
     }
   }
-  static class RemoveFirstPredicate  extends CharMonitoredPredicate{
+  static class RemoveFirstPredicate  extends CharMonitoredPredicate2{
     RemoveFirstPredicate(){}
     RemoveFirstPredicate(Object dummy){}
     boolean testImpl(char val){
@@ -120,7 +120,7 @@ abstract class CharMonitoredPredicate implements CharPredicate,Predicate<Object>
       }
     }
   }
-  static class RemoveFirstAndSecondToLastPredicate extends CharMonitoredPredicate{
+  static class RemoveFirstAndSecondToLastPredicate extends CharMonitoredPredicate2{
     int seqLength;
     RemoveFirstAndSecondToLastPredicate(int seqLength){
       this.seqLength=seqLength;

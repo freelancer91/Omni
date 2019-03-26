@@ -4,7 +4,7 @@ import omni.function.FloatPredicate;
 import org.junit.jupiter.api.Assertions;
 import omni.util.TypeConversionUtil;
 import omni.util.EqualityUtil;
-abstract class FloatMonitoredPredicate implements FloatPredicate,Predicate<Object>
+abstract class FloatMonitoredPredicate2 implements FloatPredicate,Predicate<Object>
 {
   int callCount;
   abstract boolean testImpl(float val);
@@ -12,14 +12,14 @@ abstract class FloatMonitoredPredicate implements FloatPredicate,Predicate<Objec
     ++callCount;
     return testImpl((float)val);
   }
-  public FloatMonitoredPredicate negate(){
+  public FloatMonitoredPredicate2 negate(){
     //don't care
     return null;
   }
   @Override public boolean test(Object val){
     return test((float)val);
   }
-  static class RemoveAllPredicate extends FloatMonitoredPredicate{
+  static class RemoveAllPredicate extends FloatMonitoredPredicate2{
     RemoveAllPredicate(){}
     RemoveAllPredicate(Object dummy){}
     boolean testImpl(float val){
@@ -28,7 +28,7 @@ abstract class FloatMonitoredPredicate implements FloatPredicate,Predicate<Objec
     void verifyArray(float[] arr,int offset,int originalLength){
     }
   }
-  static class RemoveNonePredicate extends FloatMonitoredPredicate{
+  static class RemoveNonePredicate extends FloatMonitoredPredicate2{
     RemoveNonePredicate(){}
     RemoveNonePredicate(Object dummy){}
     boolean testImpl(float val){
@@ -41,7 +41,7 @@ abstract class FloatMonitoredPredicate implements FloatPredicate,Predicate<Objec
       }
     }
   }
-  static class ThrowingPredicate extends FloatMonitoredPredicate{
+  static class ThrowingPredicate extends FloatMonitoredPredicate2{
     ThrowingPredicate(){}
     ThrowingPredicate(Object dummy){}
     @Override boolean testImpl(float val){
@@ -54,7 +54,7 @@ abstract class FloatMonitoredPredicate implements FloatPredicate,Predicate<Objec
       }
     }
   }
-  static class RetainSecondPredicate extends FloatMonitoredPredicate{
+  static class RetainSecondPredicate extends FloatMonitoredPredicate2{
     RetainSecondPredicate(){}
     RetainSecondPredicate(Object dummy){}
     boolean testImpl(float val){
@@ -70,7 +70,7 @@ abstract class FloatMonitoredPredicate implements FloatPredicate,Predicate<Objec
       }
     }
   }
-  static class RetainSecondAndLastPredicate extends FloatMonitoredPredicate{
+  static class RetainSecondAndLastPredicate extends FloatMonitoredPredicate2{
     int seqLength;
     RetainSecondAndLastPredicate(int seqLength){
       this.seqLength=seqLength;
@@ -88,7 +88,7 @@ abstract class FloatMonitoredPredicate implements FloatPredicate,Predicate<Objec
       }
     }
   }
-  static class RemoveFirstAndThirdPredicate extends FloatMonitoredPredicate{
+  static class RemoveFirstAndThirdPredicate extends FloatMonitoredPredicate2{
     RemoveFirstAndThirdPredicate(){}
     RemoveFirstAndThirdPredicate(Object dummy){}
     boolean testImpl(float val){
@@ -104,7 +104,7 @@ abstract class FloatMonitoredPredicate implements FloatPredicate,Predicate<Objec
       }
     }
   }
-  static class RemoveFirstPredicate  extends FloatMonitoredPredicate{
+  static class RemoveFirstPredicate  extends FloatMonitoredPredicate2{
     RemoveFirstPredicate(){}
     RemoveFirstPredicate(Object dummy){}
     boolean testImpl(float val){
@@ -120,7 +120,7 @@ abstract class FloatMonitoredPredicate implements FloatPredicate,Predicate<Objec
       }
     }
   }
-  static class RemoveFirstAndSecondToLastPredicate extends FloatMonitoredPredicate{
+  static class RemoveFirstAndSecondToLastPredicate extends FloatMonitoredPredicate2{
     int seqLength;
     RemoveFirstAndSecondToLastPredicate(int seqLength){
       this.seqLength=seqLength;

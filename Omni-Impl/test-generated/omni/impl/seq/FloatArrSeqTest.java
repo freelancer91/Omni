@@ -438,7 +438,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RetainSecondPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RetainSecondPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -450,7 +450,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new FloatMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -462,7 +462,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstAndThirdPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RemoveFirstAndThirdPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -474,7 +474,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RemoveFirstPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -486,7 +486,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new FloatMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -497,7 +497,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveAllPredicate();
+    var filter=new FloatMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -509,7 +509,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveNonePredicate();
+    var filter=new FloatMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -521,7 +521,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RetainSecondPredicate();
+    var filter=new FloatMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -533,7 +533,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new FloatMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -545,7 +545,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new FloatMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3-2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -557,7 +557,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new FloatMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3-1,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -569,7 +569,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new FloatMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3-2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -581,7 +581,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveAllPredicate();
+    var filter=new FloatMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -593,7 +593,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveNonePredicate();
+    var filter=new FloatMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -605,7 +605,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RetainSecondPredicate();
+    var filter=new FloatMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -617,7 +617,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new FloatMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -629,7 +629,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new FloatMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50-2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -641,7 +641,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new FloatMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50-1,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -653,7 +653,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new FloatMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50-2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -665,7 +665,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveAllPredicate();
+    var filter=new FloatMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -677,7 +677,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveNonePredicate();
+    var filter=new FloatMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -689,7 +689,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RetainSecondPredicate();
+    var filter=new FloatMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -701,7 +701,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new FloatMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -713,7 +713,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new FloatMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100-2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -725,7 +725,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new FloatMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100-1,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -737,7 +737,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new FloatMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100-2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -750,7 +750,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveAllPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RemoveAllPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -762,7 +762,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveNonePredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RemoveNonePredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -799,7 +799,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RetainSecondPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RetainSecondPredicate(seq);
     Assertions.assertFalse(seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -811,7 +811,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new FloatMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertFalse(seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -823,7 +823,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstAndThirdPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RemoveFirstAndThirdPredicate(seq);
     Assertions.assertFalse(seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -835,7 +835,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RemoveFirstPredicate(seq);
     Assertions.assertFalse(seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -847,7 +847,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new FloatMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertFalse(seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -858,7 +858,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveAllPredicate();
+    var filter=new FloatMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -870,7 +870,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveNonePredicate();
+    var filter=new FloatMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -882,7 +882,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RetainSecondPredicate();
+    var filter=new FloatMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -894,7 +894,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new FloatMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -906,7 +906,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new FloatMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(3-2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -918,7 +918,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new FloatMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(3-1,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -930,7 +930,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new FloatMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(3-2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -942,7 +942,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveAllPredicate();
+    var filter=new FloatMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -954,7 +954,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveNonePredicate();
+    var filter=new FloatMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -966,7 +966,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RetainSecondPredicate();
+    var filter=new FloatMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -978,7 +978,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new FloatMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -990,7 +990,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new FloatMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(50-2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -1002,7 +1002,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new FloatMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(50-1,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -1014,7 +1014,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new FloatMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(50-2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -1026,7 +1026,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveAllPredicate();
+    var filter=new FloatMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -1038,7 +1038,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveNonePredicate();
+    var filter=new FloatMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -1050,7 +1050,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RetainSecondPredicate();
+    var filter=new FloatMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -1062,7 +1062,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new FloatMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -1074,7 +1074,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new FloatMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(100-2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -1086,7 +1086,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new FloatMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(100-1,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -1098,7 +1098,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new FloatMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(100-2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -1111,7 +1111,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveAllPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RemoveAllPredicate(seq);
     Assertions.assertFalse(seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -1123,7 +1123,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveNonePredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RemoveNonePredicate(seq);
     Assertions.assertFalse(seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -2118,7 +2118,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RetainSecondPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RetainSecondPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -2130,7 +2130,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new FloatMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -2142,7 +2142,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstAndThirdPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RemoveFirstAndThirdPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -2154,7 +2154,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RemoveFirstPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -2166,7 +2166,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new FloatMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -2177,7 +2177,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveAllPredicate();
+    var filter=new FloatMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -2189,7 +2189,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveNonePredicate();
+    var filter=new FloatMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -2201,7 +2201,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RetainSecondPredicate();
+    var filter=new FloatMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -2213,7 +2213,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new FloatMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -2225,7 +2225,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new FloatMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3-2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -2237,7 +2237,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new FloatMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3-1,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -2249,7 +2249,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new FloatMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3-2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -2261,7 +2261,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveAllPredicate();
+    var filter=new FloatMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -2273,7 +2273,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveNonePredicate();
+    var filter=new FloatMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -2285,7 +2285,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RetainSecondPredicate();
+    var filter=new FloatMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -2297,7 +2297,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new FloatMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -2309,7 +2309,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new FloatMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50-2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -2321,7 +2321,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new FloatMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50-1,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -2333,7 +2333,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new FloatMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50-2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -2345,7 +2345,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveAllPredicate();
+    var filter=new FloatMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -2357,7 +2357,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveNonePredicate();
+    var filter=new FloatMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -2369,7 +2369,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RetainSecondPredicate();
+    var filter=new FloatMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -2381,7 +2381,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new FloatMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -2393,7 +2393,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new FloatMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100-2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -2405,7 +2405,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new FloatMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100-1,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -2417,7 +2417,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new FloatMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100-2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -2430,7 +2430,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveAllPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RemoveAllPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -2442,7 +2442,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveNonePredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RemoveNonePredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -2479,7 +2479,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RetainSecondPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RetainSecondPredicate(seq);
     Assertions.assertFalse(seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -2491,7 +2491,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new FloatMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertFalse(seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -2503,7 +2503,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstAndThirdPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RemoveFirstAndThirdPredicate(seq);
     Assertions.assertFalse(seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -2515,7 +2515,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RemoveFirstPredicate(seq);
     Assertions.assertFalse(seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -2527,7 +2527,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new FloatMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertFalse(seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -2538,7 +2538,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveAllPredicate();
+    var filter=new FloatMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -2550,7 +2550,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveNonePredicate();
+    var filter=new FloatMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -2562,7 +2562,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RetainSecondPredicate();
+    var filter=new FloatMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -2574,7 +2574,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new FloatMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -2586,7 +2586,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new FloatMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(3-2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -2598,7 +2598,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new FloatMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(3-1,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -2610,7 +2610,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new FloatMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(3-2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -2622,7 +2622,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveAllPredicate();
+    var filter=new FloatMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -2634,7 +2634,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveNonePredicate();
+    var filter=new FloatMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -2646,7 +2646,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RetainSecondPredicate();
+    var filter=new FloatMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -2658,7 +2658,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new FloatMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -2670,7 +2670,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new FloatMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(50-2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -2682,7 +2682,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new FloatMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(50-1,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -2694,7 +2694,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new FloatMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(50-2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -2706,7 +2706,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveAllPredicate();
+    var filter=new FloatMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -2718,7 +2718,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveNonePredicate();
+    var filter=new FloatMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -2730,7 +2730,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RetainSecondPredicate();
+    var filter=new FloatMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -2742,7 +2742,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new FloatMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -2754,7 +2754,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new FloatMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(100-2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -2766,7 +2766,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new FloatMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(100-1,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -2778,7 +2778,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new FloatMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(100-2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -2791,7 +2791,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveAllPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RemoveAllPredicate(seq);
     Assertions.assertFalse(seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -2803,7 +2803,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveNonePredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RemoveNonePredicate(seq);
     Assertions.assertFalse(seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -3991,7 +3991,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RetainSecondArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RetainSecondArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -4004,7 +4004,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RetainSecondAndLastArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RetainSecondAndLastArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -4017,7 +4017,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstAndThirdArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RemoveFirstAndThirdArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -4030,7 +4030,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RemoveFirstArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -4043,7 +4043,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstAndSecondToLastArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RemoveFirstAndSecondToLastArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -4054,7 +4054,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.ModifyingArrSeqCheckedStackAndThrowingPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.ModifyingArrSeqCheckedStackAndThrowingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3+1,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -4067,7 +4067,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.ThrowingPredicate();
+    var filter=new FloatMonitoredPredicate2.ThrowingPredicate();
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -4080,7 +4080,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveAllArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RemoveAllArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -4093,7 +4093,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveNoneArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RemoveNoneArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -4106,7 +4106,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RetainSecondArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RetainSecondArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -4119,7 +4119,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RetainSecondAndLastArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RetainSecondAndLastArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -4132,7 +4132,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstAndThirdArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RemoveFirstAndThirdArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -4145,7 +4145,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RemoveFirstArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -4158,7 +4158,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstAndSecondToLastArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RemoveFirstAndSecondToLastArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -4170,7 +4170,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.ModifyingArrSeqCheckedStackAndThrowingPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.ModifyingArrSeqCheckedStackAndThrowingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50+1,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -4183,7 +4183,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.ThrowingPredicate();
+    var filter=new FloatMonitoredPredicate2.ThrowingPredicate();
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -4196,7 +4196,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveAllArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RemoveAllArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -4209,7 +4209,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveNoneArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RemoveNoneArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -4222,7 +4222,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RetainSecondArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RetainSecondArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -4235,7 +4235,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RetainSecondAndLastArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RetainSecondAndLastArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -4248,7 +4248,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstAndThirdArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RemoveFirstAndThirdArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -4261,7 +4261,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RemoveFirstArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -4274,7 +4274,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstAndSecondToLastArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RemoveFirstAndSecondToLastArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -4286,7 +4286,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.ModifyingArrSeqCheckedStackAndThrowingPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.ModifyingArrSeqCheckedStackAndThrowingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100+1,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -4299,7 +4299,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.ThrowingPredicate();
+    var filter=new FloatMonitoredPredicate2.ThrowingPredicate();
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -4312,7 +4312,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveAllArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RemoveAllArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -4325,7 +4325,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveNoneArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RemoveNoneArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -4338,7 +4338,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RetainSecondArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RetainSecondArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -4351,7 +4351,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RetainSecondAndLastArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RetainSecondAndLastArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -4364,7 +4364,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstAndThirdArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RemoveFirstAndThirdArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -4377,7 +4377,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RemoveFirstArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -4390,7 +4390,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstAndSecondToLastArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RemoveFirstAndSecondToLastArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -4404,7 +4404,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RetainSecondPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RetainSecondPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -4417,7 +4417,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new FloatMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -4430,7 +4430,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstAndThirdPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RemoveFirstAndThirdPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -4443,7 +4443,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RemoveFirstPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -4456,7 +4456,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new FloatMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -4468,7 +4468,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveAllPredicate();
+    var filter=new FloatMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -4480,7 +4480,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveNonePredicate();
+    var filter=new FloatMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -4492,7 +4492,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RetainSecondPredicate();
+    var filter=new FloatMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -4504,7 +4504,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new FloatMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -4516,7 +4516,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new FloatMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3-2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -4528,7 +4528,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new FloatMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3-1,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -4540,7 +4540,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new FloatMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3-2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -4552,7 +4552,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveAllPredicate();
+    var filter=new FloatMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -4564,7 +4564,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveNonePredicate();
+    var filter=new FloatMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -4576,7 +4576,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RetainSecondPredicate();
+    var filter=new FloatMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -4588,7 +4588,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new FloatMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -4600,7 +4600,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new FloatMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50-2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -4612,7 +4612,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new FloatMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50-1,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -4624,7 +4624,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new FloatMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50-2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -4636,7 +4636,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveAllPredicate();
+    var filter=new FloatMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -4648,7 +4648,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveNonePredicate();
+    var filter=new FloatMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -4660,7 +4660,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RetainSecondPredicate();
+    var filter=new FloatMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -4672,7 +4672,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new FloatMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -4684,7 +4684,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new FloatMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100-2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -4696,7 +4696,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new FloatMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100-1,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -4708,7 +4708,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new FloatMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100-2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -4721,7 +4721,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveAllPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RemoveAllPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -4734,7 +4734,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveNonePredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RemoveNonePredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -4747,7 +4747,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveAllArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RemoveAllArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -4760,7 +4760,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveNoneArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RemoveNoneArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -4773,7 +4773,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.ThrowingPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.ThrowingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -4786,7 +4786,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.ModifyingArrSeqCheckedStackAndThrowingPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.ModifyingArrSeqCheckedStackAndThrowingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -4899,7 +4899,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RetainSecondArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RetainSecondArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -4912,7 +4912,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RetainSecondAndLastArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RetainSecondAndLastArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -4925,7 +4925,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstAndThirdArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RemoveFirstAndThirdArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -4938,7 +4938,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RemoveFirstArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -4951,7 +4951,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstAndSecondToLastArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RemoveFirstAndSecondToLastArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -4962,7 +4962,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.ModifyingArrSeqCheckedStackAndThrowingPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.ModifyingArrSeqCheckedStackAndThrowingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(3+1,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -4975,7 +4975,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.ThrowingPredicate();
+    var filter=new FloatMonitoredPredicate2.ThrowingPredicate();
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -4988,7 +4988,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveAllArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RemoveAllArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -5001,7 +5001,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveNoneArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RemoveNoneArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -5014,7 +5014,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RetainSecondArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RetainSecondArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -5027,7 +5027,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RetainSecondAndLastArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RetainSecondAndLastArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -5040,7 +5040,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstAndThirdArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RemoveFirstAndThirdArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -5053,7 +5053,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RemoveFirstArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -5066,7 +5066,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstAndSecondToLastArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RemoveFirstAndSecondToLastArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -5078,7 +5078,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.ModifyingArrSeqCheckedStackAndThrowingPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.ModifyingArrSeqCheckedStackAndThrowingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(50+1,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -5091,7 +5091,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.ThrowingPredicate();
+    var filter=new FloatMonitoredPredicate2.ThrowingPredicate();
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -5104,7 +5104,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveAllArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RemoveAllArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -5117,7 +5117,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveNoneArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RemoveNoneArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -5130,7 +5130,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RetainSecondArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RetainSecondArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -5143,7 +5143,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RetainSecondAndLastArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RetainSecondAndLastArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -5156,7 +5156,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstAndThirdArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RemoveFirstAndThirdArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -5169,7 +5169,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RemoveFirstArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -5182,7 +5182,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstAndSecondToLastArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RemoveFirstAndSecondToLastArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -5194,7 +5194,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.ModifyingArrSeqCheckedStackAndThrowingPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.ModifyingArrSeqCheckedStackAndThrowingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(100+1,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -5207,7 +5207,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.ThrowingPredicate();
+    var filter=new FloatMonitoredPredicate2.ThrowingPredicate();
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -5220,7 +5220,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveAllArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RemoveAllArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -5233,7 +5233,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveNoneArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RemoveNoneArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -5246,7 +5246,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RetainSecondArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RetainSecondArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -5259,7 +5259,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RetainSecondAndLastArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RetainSecondAndLastArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -5272,7 +5272,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstAndThirdArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RemoveFirstAndThirdArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -5285,7 +5285,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RemoveFirstArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -5298,7 +5298,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstAndSecondToLastArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RemoveFirstAndSecondToLastArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -5312,7 +5312,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RetainSecondPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RetainSecondPredicate(seq);
     Assertions.assertFalse(seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -5325,7 +5325,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new FloatMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertFalse(seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -5338,7 +5338,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstAndThirdPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RemoveFirstAndThirdPredicate(seq);
     Assertions.assertFalse(seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -5351,7 +5351,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RemoveFirstPredicate(seq);
     Assertions.assertFalse(seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -5364,7 +5364,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new FloatMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertFalse(seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -5376,7 +5376,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveAllPredicate();
+    var filter=new FloatMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -5388,7 +5388,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveNonePredicate();
+    var filter=new FloatMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -5400,7 +5400,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RetainSecondPredicate();
+    var filter=new FloatMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -5412,7 +5412,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new FloatMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -5424,7 +5424,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new FloatMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(3-2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -5436,7 +5436,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new FloatMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(3-1,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -5448,7 +5448,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new FloatMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(3-2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -5460,7 +5460,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveAllPredicate();
+    var filter=new FloatMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -5472,7 +5472,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveNonePredicate();
+    var filter=new FloatMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -5484,7 +5484,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RetainSecondPredicate();
+    var filter=new FloatMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -5496,7 +5496,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new FloatMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -5508,7 +5508,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new FloatMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(50-2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -5520,7 +5520,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new FloatMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(50-1,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -5532,7 +5532,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new FloatMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(50-2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -5544,7 +5544,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveAllPredicate();
+    var filter=new FloatMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -5556,7 +5556,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveNonePredicate();
+    var filter=new FloatMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -5568,7 +5568,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RetainSecondPredicate();
+    var filter=new FloatMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -5580,7 +5580,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new FloatMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -5592,7 +5592,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new FloatMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(100-2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -5604,7 +5604,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new FloatMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(100-1,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -5616,7 +5616,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new FloatMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(100-2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -5629,7 +5629,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveAllPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RemoveAllPredicate(seq);
     Assertions.assertFalse(seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -5642,7 +5642,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveNonePredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RemoveNonePredicate(seq);
     Assertions.assertFalse(seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -5655,7 +5655,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveAllArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RemoveAllArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -5668,7 +5668,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveNoneArrSeqCheckedStackModifyingPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RemoveNoneArrSeqCheckedStackModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -5681,7 +5681,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.ThrowingPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.ThrowingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -5694,7 +5694,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.ModifyingArrSeqCheckedStackAndThrowingPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.ModifyingArrSeqCheckedStackAndThrowingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -6931,7 +6931,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RetainSecondArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RetainSecondArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -6944,7 +6944,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RetainSecondAndLastArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RetainSecondAndLastArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -6957,7 +6957,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstAndThirdArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RemoveFirstAndThirdArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -6970,7 +6970,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RemoveFirstArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -6983,7 +6983,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstAndSecondToLastArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RemoveFirstAndSecondToLastArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -6994,7 +6994,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.ModifyingArrSeqCheckedListAndThrowingPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.ModifyingArrSeqCheckedListAndThrowingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3+1,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -7007,7 +7007,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.ThrowingPredicate();
+    var filter=new FloatMonitoredPredicate2.ThrowingPredicate();
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -7020,7 +7020,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveAllArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RemoveAllArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -7033,7 +7033,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveNoneArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RemoveNoneArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -7046,7 +7046,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RetainSecondArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RetainSecondArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -7059,7 +7059,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RetainSecondAndLastArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RetainSecondAndLastArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -7072,7 +7072,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstAndThirdArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RemoveFirstAndThirdArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -7085,7 +7085,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RemoveFirstArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -7098,7 +7098,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstAndSecondToLastArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RemoveFirstAndSecondToLastArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -7110,7 +7110,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.ModifyingArrSeqCheckedListAndThrowingPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.ModifyingArrSeqCheckedListAndThrowingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50+1,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -7123,7 +7123,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.ThrowingPredicate();
+    var filter=new FloatMonitoredPredicate2.ThrowingPredicate();
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -7136,7 +7136,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveAllArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RemoveAllArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -7149,7 +7149,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveNoneArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RemoveNoneArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -7162,7 +7162,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RetainSecondArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RetainSecondArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -7175,7 +7175,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RetainSecondAndLastArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RetainSecondAndLastArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -7188,7 +7188,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstAndThirdArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RemoveFirstAndThirdArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -7201,7 +7201,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RemoveFirstArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -7214,7 +7214,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstAndSecondToLastArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RemoveFirstAndSecondToLastArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -7226,7 +7226,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.ModifyingArrSeqCheckedListAndThrowingPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.ModifyingArrSeqCheckedListAndThrowingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100+1,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -7239,7 +7239,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.ThrowingPredicate();
+    var filter=new FloatMonitoredPredicate2.ThrowingPredicate();
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -7252,7 +7252,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveAllArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RemoveAllArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -7265,7 +7265,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveNoneArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RemoveNoneArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -7278,7 +7278,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RetainSecondArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RetainSecondArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -7291,7 +7291,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RetainSecondAndLastArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RetainSecondAndLastArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -7304,7 +7304,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstAndThirdArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RemoveFirstAndThirdArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -7317,7 +7317,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RemoveFirstArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -7330,7 +7330,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstAndSecondToLastArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RemoveFirstAndSecondToLastArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -7344,7 +7344,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RetainSecondPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RetainSecondPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -7357,7 +7357,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new FloatMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -7370,7 +7370,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstAndThirdPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RemoveFirstAndThirdPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -7383,7 +7383,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RemoveFirstPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -7396,7 +7396,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new FloatMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -7408,7 +7408,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveAllPredicate();
+    var filter=new FloatMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -7420,7 +7420,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveNonePredicate();
+    var filter=new FloatMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -7432,7 +7432,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RetainSecondPredicate();
+    var filter=new FloatMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -7444,7 +7444,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new FloatMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -7456,7 +7456,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new FloatMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3-2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -7468,7 +7468,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new FloatMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3-1,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -7480,7 +7480,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new FloatMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(3-2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -7492,7 +7492,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveAllPredicate();
+    var filter=new FloatMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -7504,7 +7504,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveNonePredicate();
+    var filter=new FloatMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -7516,7 +7516,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RetainSecondPredicate();
+    var filter=new FloatMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -7528,7 +7528,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new FloatMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -7540,7 +7540,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new FloatMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50-2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -7552,7 +7552,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new FloatMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50-1,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -7564,7 +7564,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new FloatMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(50-2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -7576,7 +7576,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveAllPredicate();
+    var filter=new FloatMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -7588,7 +7588,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveNonePredicate();
+    var filter=new FloatMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -7600,7 +7600,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RetainSecondPredicate();
+    var filter=new FloatMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -7612,7 +7612,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new FloatMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -7624,7 +7624,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new FloatMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100-2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -7636,7 +7636,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new FloatMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100-1,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -7648,7 +7648,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new FloatMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(100-2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -7661,7 +7661,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveAllPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RemoveAllPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -7674,7 +7674,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveNonePredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RemoveNonePredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -7687,7 +7687,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveAllArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RemoveAllArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -7700,7 +7700,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveNoneArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RemoveNoneArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -7713,7 +7713,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.ThrowingPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.ThrowingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -7726,7 +7726,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.ModifyingArrSeqCheckedListAndThrowingPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.ModifyingArrSeqCheckedListAndThrowingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((Predicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -7839,7 +7839,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RetainSecondArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RetainSecondArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -7852,7 +7852,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RetainSecondAndLastArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RetainSecondAndLastArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -7865,7 +7865,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstAndThirdArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RemoveFirstAndThirdArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -7878,7 +7878,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RemoveFirstArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -7891,7 +7891,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstAndSecondToLastArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RemoveFirstAndSecondToLastArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -7902,7 +7902,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.ModifyingArrSeqCheckedListAndThrowingPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.ModifyingArrSeqCheckedListAndThrowingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(3+1,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -7915,7 +7915,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.ThrowingPredicate();
+    var filter=new FloatMonitoredPredicate2.ThrowingPredicate();
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -7928,7 +7928,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveAllArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RemoveAllArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -7941,7 +7941,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveNoneArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RemoveNoneArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -7954,7 +7954,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RetainSecondArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RetainSecondArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -7967,7 +7967,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RetainSecondAndLastArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RetainSecondAndLastArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -7980,7 +7980,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstAndThirdArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RemoveFirstAndThirdArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -7993,7 +7993,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RemoveFirstArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -8006,7 +8006,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstAndSecondToLastArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RemoveFirstAndSecondToLastArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -8018,7 +8018,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.ModifyingArrSeqCheckedListAndThrowingPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.ModifyingArrSeqCheckedListAndThrowingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(50+1,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -8031,7 +8031,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.ThrowingPredicate();
+    var filter=new FloatMonitoredPredicate2.ThrowingPredicate();
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -8044,7 +8044,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveAllArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RemoveAllArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -8057,7 +8057,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveNoneArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RemoveNoneArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -8070,7 +8070,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RetainSecondArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RetainSecondArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -8083,7 +8083,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RetainSecondAndLastArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RetainSecondAndLastArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -8096,7 +8096,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstAndThirdArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RemoveFirstAndThirdArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -8109,7 +8109,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RemoveFirstArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -8122,7 +8122,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstAndSecondToLastArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RemoveFirstAndSecondToLastArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -8134,7 +8134,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.ModifyingArrSeqCheckedListAndThrowingPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.ModifyingArrSeqCheckedListAndThrowingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(100+1,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -8147,7 +8147,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.ThrowingPredicate();
+    var filter=new FloatMonitoredPredicate2.ThrowingPredicate();
     Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -8160,7 +8160,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveAllArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RemoveAllArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -8173,7 +8173,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveNoneArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RemoveNoneArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -8186,7 +8186,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RetainSecondArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RetainSecondArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -8199,7 +8199,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RetainSecondAndLastArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RetainSecondAndLastArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -8212,7 +8212,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstAndThirdArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RemoveFirstAndThirdArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -8225,7 +8225,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RemoveFirstArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -8238,7 +8238,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstAndSecondToLastArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RemoveFirstAndSecondToLastArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -8252,7 +8252,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RetainSecondPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RetainSecondPredicate(seq);
     Assertions.assertFalse(seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -8265,7 +8265,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new FloatMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertFalse(seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -8278,7 +8278,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstAndThirdPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RemoveFirstAndThirdPredicate(seq);
     Assertions.assertFalse(seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -8291,7 +8291,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RemoveFirstPredicate(seq);
     Assertions.assertFalse(seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -8304,7 +8304,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new FloatMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertFalse(seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -8316,7 +8316,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveAllPredicate();
+    var filter=new FloatMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -8328,7 +8328,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveNonePredicate();
+    var filter=new FloatMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(3,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -8340,7 +8340,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RetainSecondPredicate();
+    var filter=new FloatMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -8352,7 +8352,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new FloatMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -8364,7 +8364,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new FloatMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(3-2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -8376,7 +8376,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new FloatMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(3-1,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -8388,7 +8388,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<3;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new FloatMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(3-2,seq.size());
     filter.verifyArray(seq.arr,0,3);
@@ -8400,7 +8400,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveAllPredicate();
+    var filter=new FloatMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -8412,7 +8412,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveNonePredicate();
+    var filter=new FloatMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(50,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -8424,7 +8424,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RetainSecondPredicate();
+    var filter=new FloatMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -8436,7 +8436,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new FloatMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -8448,7 +8448,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new FloatMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(50-2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -8460,7 +8460,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new FloatMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(50-1,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -8472,7 +8472,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<50;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new FloatMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(50-2,seq.size());
     filter.verifyArray(seq.arr,0,50);
@@ -8484,7 +8484,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveAllPredicate();
+    var filter=new FloatMonitoredPredicate2.RemoveAllPredicate();
     Assertions.assertTrue(seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -8496,7 +8496,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveNonePredicate();
+    var filter=new FloatMonitoredPredicate2.RemoveNonePredicate();
     Assertions.assertFalse(seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(100,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -8508,7 +8508,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RetainSecondPredicate();
+    var filter=new FloatMonitoredPredicate2.RetainSecondPredicate();
     Assertions.assertTrue(seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(1,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -8520,7 +8520,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RetainSecondAndLastPredicate(seq.size);
+    var filter=new FloatMonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -8532,7 +8532,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstAndThirdPredicate();
+    var filter=new FloatMonitoredPredicate2.RemoveFirstAndThirdPredicate();
     Assertions.assertTrue(seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(100-2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -8544,7 +8544,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstPredicate();
+    var filter=new FloatMonitoredPredicate2.RemoveFirstPredicate();
     Assertions.assertTrue(seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(100-1,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -8556,7 +8556,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<100;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveFirstAndSecondToLastPredicate(seq.size);
+    var filter=new FloatMonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
     Assertions.assertTrue(seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(100-2,seq.size());
     filter.verifyArray(seq.arr,0,100);
@@ -8569,7 +8569,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveAllPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RemoveAllPredicate(seq);
     Assertions.assertFalse(seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -8582,7 +8582,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveNonePredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RemoveNonePredicate(seq);
     Assertions.assertFalse(seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -8595,7 +8595,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveAllArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RemoveAllArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -8608,7 +8608,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.RemoveNoneArrSeqCheckedListModifyingPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.RemoveNoneArrSeqCheckedListModifyingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -8621,7 +8621,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.ThrowingPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.ThrowingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
@@ -8634,7 +8634,7 @@ public class FloatArrSeqTest{
     for(int i=0;i<0;++i){
       seq.add(TypeConversionUtil.convertTofloat(i));
     }
-    var filter=new FloatMonitoredPredicate.ModifyingArrSeqCheckedListAndThrowingPredicate(seq);
+    var filter=new FloatMonitoredPredicate2.ModifyingArrSeqCheckedListAndThrowingPredicate(seq);
     Assertions.assertFalse(seq.removeIf((FloatPredicate)filter));
     Assertions.assertEquals(0,seq.size());
     Assertions.assertEquals(0,filter.callCount);
