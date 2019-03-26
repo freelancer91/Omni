@@ -6,6 +6,8 @@ import omni.impl.seq.RefArrSeq.CheckedList;
 import omni.impl.seq.RefArrSeq.UncheckedStack;
 import omni.impl.seq.RefArrSeq.CheckedStack;
 import omni.api.QueryTestUtil;
+import java.util.ConcurrentModificationException;
+import org.junit.jupiter.api.Assertions;
 @SuppressWarnings({"rawtypes","unchecked"}) 
 public class RefArrSeqQueryTest
 {
@@ -151,6 +153,7 @@ public class RefArrSeqQueryTest
     {
       var seq=new UncheckedList();
       seq.add(TypeConversionUtil.convertToObject(0));
+      seq.add(TypeConversionUtil.convertToObject(1));
       return seq;
     });
     QueryTestUtil.testremoveValNullReturnPositive(()->
@@ -312,6 +315,7 @@ public class RefArrSeqQueryTest
     {
       var seq=new UncheckedStack();
       seq.add(TypeConversionUtil.convertToObject(0));
+      seq.add(TypeConversionUtil.convertToObject(1));
       return seq;
     });
     QueryTestUtil.testremoveValNullReturnPositive(()->
@@ -331,6 +335,39 @@ public class RefArrSeqQueryTest
       var seq=new UncheckedStack();
       return seq;
     });
+  }
+  @Test
+  public void testCheckedListremoveValObjectNonNull()
+  {
+    var seq=new CheckedList();
+    Object throwingObj=new Object(){
+      @Override public boolean equals(Object val){
+        throw new IndexOutOfBoundsException();
+      }
+    };
+    Object moddingObj=new Object(){
+      @Override public boolean equals(Object val){
+        seq.add(TypeConversionUtil.convertToObject(5));
+        return false;
+      }
+    };
+    Object moddingThrowingObj=new Object(){
+      @Override public boolean equals(Object val){
+        seq.add(TypeConversionUtil.convertToObject(5));
+        throw new IndexOutOfBoundsException();
+      }
+    };
+    Assertions.assertFalse(seq.remove(throwingObj));
+    Assertions.assertFalse(seq.remove(moddingObj));
+    Assertions.assertFalse(seq.remove(moddingThrowingObj));
+    seq.add(new Object());
+    seq.add(new Object());
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.remove(throwingObj));
+    Assertions.assertThrows(ConcurrentModificationException.class,()->seq.remove(moddingObj));
+    Assertions.assertThrows(ConcurrentModificationException.class,()->seq.remove(moddingThrowingObj));
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.remove(throwingObj));
+    Assertions.assertThrows(ConcurrentModificationException.class,()->seq.remove(moddingObj));
+    Assertions.assertThrows(ConcurrentModificationException.class,()->seq.remove(moddingThrowingObj));
   }
   @Test
   public void testCheckedListremoveValDouble()
@@ -473,6 +510,7 @@ public class RefArrSeqQueryTest
     {
       var seq=new CheckedList();
       seq.add(TypeConversionUtil.convertToObject(0));
+      seq.add(TypeConversionUtil.convertToObject(1));
       return seq;
     });
     QueryTestUtil.testremoveValNullReturnPositive(()->
@@ -492,6 +530,39 @@ public class RefArrSeqQueryTest
       var seq=new CheckedList();
       return seq;
     });
+  }
+  @Test
+  public void testCheckedStackremoveValObjectNonNull()
+  {
+    var seq=new CheckedStack();
+    Object throwingObj=new Object(){
+      @Override public boolean equals(Object val){
+        throw new IndexOutOfBoundsException();
+      }
+    };
+    Object moddingObj=new Object(){
+      @Override public boolean equals(Object val){
+        seq.add(TypeConversionUtil.convertToObject(5));
+        return false;
+      }
+    };
+    Object moddingThrowingObj=new Object(){
+      @Override public boolean equals(Object val){
+        seq.add(TypeConversionUtil.convertToObject(5));
+        throw new IndexOutOfBoundsException();
+      }
+    };
+    Assertions.assertFalse(seq.remove(throwingObj));
+    Assertions.assertFalse(seq.remove(moddingObj));
+    Assertions.assertFalse(seq.remove(moddingThrowingObj));
+    seq.add(new Object());
+    seq.add(new Object());
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.remove(throwingObj));
+    Assertions.assertThrows(ConcurrentModificationException.class,()->seq.remove(moddingObj));
+    Assertions.assertThrows(ConcurrentModificationException.class,()->seq.remove(moddingThrowingObj));
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.remove(throwingObj));
+    Assertions.assertThrows(ConcurrentModificationException.class,()->seq.remove(moddingObj));
+    Assertions.assertThrows(ConcurrentModificationException.class,()->seq.remove(moddingThrowingObj));
   }
   @Test
   public void testCheckedStackremoveValDouble()
@@ -634,6 +705,7 @@ public class RefArrSeqQueryTest
     {
       var seq=new CheckedStack();
       seq.add(TypeConversionUtil.convertToObject(0));
+      seq.add(TypeConversionUtil.convertToObject(1));
       return seq;
     });
     QueryTestUtil.testremoveValNullReturnPositive(()->
@@ -653,6 +725,41 @@ public class RefArrSeqQueryTest
       var seq=new CheckedStack();
       return seq;
     });
+  }
+  @Test
+  public void testCheckedSubListremoveValObjectNonNull()
+  {
+    var root=new CheckedList();
+    var subList=root.subList(0,0);
+    var seq=subList.subList(0,0);
+    Object throwingObj=new Object(){
+      @Override public boolean equals(Object val){
+        throw new IndexOutOfBoundsException();
+      }
+    };
+    Object moddingObj=new Object(){
+      @Override public boolean equals(Object val){
+        seq.add(TypeConversionUtil.convertToObject(5));
+        return false;
+      }
+    };
+    Object moddingThrowingObj=new Object(){
+      @Override public boolean equals(Object val){
+        seq.add(TypeConversionUtil.convertToObject(5));
+        throw new IndexOutOfBoundsException();
+      }
+    };
+    Assertions.assertFalse(seq.remove(throwingObj));
+    Assertions.assertFalse(seq.remove(moddingObj));
+    Assertions.assertFalse(seq.remove(moddingThrowingObj));
+    seq.add(new Object());
+    seq.add(new Object());
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.remove(throwingObj));
+    Assertions.assertThrows(ConcurrentModificationException.class,()->seq.remove(moddingObj));
+    Assertions.assertThrows(ConcurrentModificationException.class,()->seq.remove(moddingThrowingObj));
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.remove(throwingObj));
+    Assertions.assertThrows(ConcurrentModificationException.class,()->seq.remove(moddingObj));
+    Assertions.assertThrows(ConcurrentModificationException.class,()->seq.remove(moddingThrowingObj));
   }
   @Test
   public void testCheckedSubListremoveValDouble()
@@ -823,6 +930,7 @@ public class RefArrSeqQueryTest
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
       seq.add(TypeConversionUtil.convertToObject(0));
+      seq.add(TypeConversionUtil.convertToObject(1));
       return seq;
     });
     QueryTestUtil.testremoveValNullReturnPositive(()->
@@ -1016,6 +1124,7 @@ public class RefArrSeqQueryTest
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
       seq.add(TypeConversionUtil.convertToObject(0));
+      seq.add(TypeConversionUtil.convertToObject(1));
       return seq;
     });
     QueryTestUtil.testremoveValNullReturnPositive(()->
@@ -1181,6 +1290,7 @@ public class RefArrSeqQueryTest
     {
       var seq=new UncheckedList();
       seq.add(TypeConversionUtil.convertToObject(0));
+      seq.add(TypeConversionUtil.convertToObject(1));
       return seq;
     });
     QueryTestUtil.testcontainsNullReturnPositive(()->
@@ -1342,6 +1452,7 @@ public class RefArrSeqQueryTest
     {
       var seq=new UncheckedStack();
       seq.add(TypeConversionUtil.convertToObject(0));
+      seq.add(TypeConversionUtil.convertToObject(1));
       return seq;
     });
     QueryTestUtil.testcontainsNullReturnPositive(()->
@@ -1361,6 +1472,39 @@ public class RefArrSeqQueryTest
       var seq=new UncheckedStack();
       return seq;
     });
+  }
+  @Test
+  public void testCheckedListcontainsObjectNonNull()
+  {
+    var seq=new CheckedList();
+    Object throwingObj=new Object(){
+      @Override public boolean equals(Object val){
+        throw new IndexOutOfBoundsException();
+      }
+    };
+    Object moddingObj=new Object(){
+      @Override public boolean equals(Object val){
+        seq.add(TypeConversionUtil.convertToObject(5));
+        return false;
+      }
+    };
+    Object moddingThrowingObj=new Object(){
+      @Override public boolean equals(Object val){
+        seq.add(TypeConversionUtil.convertToObject(5));
+        throw new IndexOutOfBoundsException();
+      }
+    };
+    Assertions.assertFalse(seq.contains(throwingObj));
+    Assertions.assertFalse(seq.contains(moddingObj));
+    Assertions.assertFalse(seq.contains(moddingThrowingObj));
+    seq.add(new Object());
+    seq.add(new Object());
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.remove(throwingObj));
+    Assertions.assertThrows(ConcurrentModificationException.class,()->seq.remove(moddingObj));
+    Assertions.assertThrows(ConcurrentModificationException.class,()->seq.remove(moddingThrowingObj));
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.contains(throwingObj));
+    Assertions.assertThrows(ConcurrentModificationException.class,()->seq.contains(moddingObj));
+    Assertions.assertThrows(ConcurrentModificationException.class,()->seq.contains(moddingThrowingObj));
   }
   @Test
   public void testCheckedListcontainsDouble()
@@ -1503,6 +1647,7 @@ public class RefArrSeqQueryTest
     {
       var seq=new CheckedList();
       seq.add(TypeConversionUtil.convertToObject(0));
+      seq.add(TypeConversionUtil.convertToObject(1));
       return seq;
     });
     QueryTestUtil.testcontainsNullReturnPositive(()->
@@ -1522,6 +1667,39 @@ public class RefArrSeqQueryTest
       var seq=new CheckedList();
       return seq;
     });
+  }
+  @Test
+  public void testCheckedStackcontainsObjectNonNull()
+  {
+    var seq=new CheckedStack();
+    Object throwingObj=new Object(){
+      @Override public boolean equals(Object val){
+        throw new IndexOutOfBoundsException();
+      }
+    };
+    Object moddingObj=new Object(){
+      @Override public boolean equals(Object val){
+        seq.add(TypeConversionUtil.convertToObject(5));
+        return false;
+      }
+    };
+    Object moddingThrowingObj=new Object(){
+      @Override public boolean equals(Object val){
+        seq.add(TypeConversionUtil.convertToObject(5));
+        throw new IndexOutOfBoundsException();
+      }
+    };
+    Assertions.assertFalse(seq.contains(throwingObj));
+    Assertions.assertFalse(seq.contains(moddingObj));
+    Assertions.assertFalse(seq.contains(moddingThrowingObj));
+    seq.add(new Object());
+    seq.add(new Object());
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.remove(throwingObj));
+    Assertions.assertThrows(ConcurrentModificationException.class,()->seq.remove(moddingObj));
+    Assertions.assertThrows(ConcurrentModificationException.class,()->seq.remove(moddingThrowingObj));
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.contains(throwingObj));
+    Assertions.assertThrows(ConcurrentModificationException.class,()->seq.contains(moddingObj));
+    Assertions.assertThrows(ConcurrentModificationException.class,()->seq.contains(moddingThrowingObj));
   }
   @Test
   public void testCheckedStackcontainsDouble()
@@ -1664,6 +1842,7 @@ public class RefArrSeqQueryTest
     {
       var seq=new CheckedStack();
       seq.add(TypeConversionUtil.convertToObject(0));
+      seq.add(TypeConversionUtil.convertToObject(1));
       return seq;
     });
     QueryTestUtil.testcontainsNullReturnPositive(()->
@@ -1683,6 +1862,41 @@ public class RefArrSeqQueryTest
       var seq=new CheckedStack();
       return seq;
     });
+  }
+  @Test
+  public void testCheckedSubListcontainsObjectNonNull()
+  {
+    var root=new CheckedList();
+    var subList=root.subList(0,0);
+    var seq=subList.subList(0,0);
+    Object throwingObj=new Object(){
+      @Override public boolean equals(Object val){
+        throw new IndexOutOfBoundsException();
+      }
+    };
+    Object moddingObj=new Object(){
+      @Override public boolean equals(Object val){
+        seq.add(TypeConversionUtil.convertToObject(5));
+        return false;
+      }
+    };
+    Object moddingThrowingObj=new Object(){
+      @Override public boolean equals(Object val){
+        seq.add(TypeConversionUtil.convertToObject(5));
+        throw new IndexOutOfBoundsException();
+      }
+    };
+    Assertions.assertFalse(seq.contains(throwingObj));
+    Assertions.assertFalse(seq.contains(moddingObj));
+    Assertions.assertFalse(seq.contains(moddingThrowingObj));
+    seq.add(new Object());
+    seq.add(new Object());
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.remove(throwingObj));
+    Assertions.assertThrows(ConcurrentModificationException.class,()->seq.remove(moddingObj));
+    Assertions.assertThrows(ConcurrentModificationException.class,()->seq.remove(moddingThrowingObj));
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.contains(throwingObj));
+    Assertions.assertThrows(ConcurrentModificationException.class,()->seq.contains(moddingObj));
+    Assertions.assertThrows(ConcurrentModificationException.class,()->seq.contains(moddingThrowingObj));
   }
   @Test
   public void testCheckedSubListcontainsDouble()
@@ -1853,6 +2067,7 @@ public class RefArrSeqQueryTest
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
       seq.add(TypeConversionUtil.convertToObject(0));
+      seq.add(TypeConversionUtil.convertToObject(1));
       return seq;
     });
     QueryTestUtil.testcontainsNullReturnPositive(()->
@@ -2046,6 +2261,7 @@ public class RefArrSeqQueryTest
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
       seq.add(TypeConversionUtil.convertToObject(0));
+      seq.add(TypeConversionUtil.convertToObject(1));
       return seq;
     });
     QueryTestUtil.testcontainsNullReturnPositive(()->
@@ -2222,6 +2438,7 @@ public class RefArrSeqQueryTest
     {
       var seq=new UncheckedList();
       seq.add(TypeConversionUtil.convertToObject(0));
+      seq.add(TypeConversionUtil.convertToObject(1));
       return seq;
     });
     QueryTestUtil.testindexOfNullReturnPositive(()->
@@ -2242,6 +2459,39 @@ public class RefArrSeqQueryTest
       var seq=new UncheckedList();
       return seq;
     });
+  }
+  @Test
+  public void testCheckedListindexOfObjectNonNull()
+  {
+    var seq=new CheckedList();
+    Object throwingObj=new Object(){
+      @Override public boolean equals(Object val){
+        throw new IndexOutOfBoundsException();
+      }
+    };
+    Object moddingObj=new Object(){
+      @Override public boolean equals(Object val){
+        seq.add(TypeConversionUtil.convertToObject(5));
+        return false;
+      }
+    };
+    Object moddingThrowingObj=new Object(){
+      @Override public boolean equals(Object val){
+        seq.add(TypeConversionUtil.convertToObject(5));
+        throw new IndexOutOfBoundsException();
+      }
+    };
+    Assertions.assertEquals(-1,seq.indexOf(throwingObj));
+    Assertions.assertEquals(-1,seq.indexOf(moddingObj));
+    Assertions.assertEquals(-1,seq.indexOf(moddingThrowingObj));
+    seq.add(new Object());
+    seq.add(new Object());
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.remove(throwingObj));
+    Assertions.assertThrows(ConcurrentModificationException.class,()->seq.remove(moddingObj));
+    Assertions.assertThrows(ConcurrentModificationException.class,()->seq.remove(moddingThrowingObj));
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.indexOf(throwingObj));
+    Assertions.assertThrows(ConcurrentModificationException.class,()->seq.indexOf(moddingObj));
+    Assertions.assertThrows(ConcurrentModificationException.class,()->seq.indexOf(moddingThrowingObj));
   }
   @Test
   public void testCheckedListindexOfDouble()
@@ -2395,6 +2645,7 @@ public class RefArrSeqQueryTest
     {
       var seq=new CheckedList();
       seq.add(TypeConversionUtil.convertToObject(0));
+      seq.add(TypeConversionUtil.convertToObject(1));
       return seq;
     });
     QueryTestUtil.testindexOfNullReturnPositive(()->
@@ -2415,6 +2666,41 @@ public class RefArrSeqQueryTest
       var seq=new CheckedList();
       return seq;
     });
+  }
+  @Test
+  public void testCheckedSubListindexOfObjectNonNull()
+  {
+    var root=new CheckedList();
+    var subList=root.subList(0,0);
+    var seq=subList.subList(0,0);
+    Object throwingObj=new Object(){
+      @Override public boolean equals(Object val){
+        throw new IndexOutOfBoundsException();
+      }
+    };
+    Object moddingObj=new Object(){
+      @Override public boolean equals(Object val){
+        seq.add(TypeConversionUtil.convertToObject(5));
+        return false;
+      }
+    };
+    Object moddingThrowingObj=new Object(){
+      @Override public boolean equals(Object val){
+        seq.add(TypeConversionUtil.convertToObject(5));
+        throw new IndexOutOfBoundsException();
+      }
+    };
+    Assertions.assertEquals(-1,seq.indexOf(throwingObj));
+    Assertions.assertEquals(-1,seq.indexOf(moddingObj));
+    Assertions.assertEquals(-1,seq.indexOf(moddingThrowingObj));
+    seq.add(new Object());
+    seq.add(new Object());
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.remove(throwingObj));
+    Assertions.assertThrows(ConcurrentModificationException.class,()->seq.remove(moddingObj));
+    Assertions.assertThrows(ConcurrentModificationException.class,()->seq.remove(moddingThrowingObj));
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.indexOf(throwingObj));
+    Assertions.assertThrows(ConcurrentModificationException.class,()->seq.indexOf(moddingObj));
+    Assertions.assertThrows(ConcurrentModificationException.class,()->seq.indexOf(moddingThrowingObj));
   }
   @Test
   public void testCheckedSubListindexOfDouble()
@@ -2596,6 +2882,7 @@ public class RefArrSeqQueryTest
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
       seq.add(TypeConversionUtil.convertToObject(0));
+      seq.add(TypeConversionUtil.convertToObject(1));
       return seq;
     });
     QueryTestUtil.testindexOfNullReturnPositive(()->
@@ -2801,6 +3088,7 @@ public class RefArrSeqQueryTest
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
       seq.add(TypeConversionUtil.convertToObject(0));
+      seq.add(TypeConversionUtil.convertToObject(1));
       return seq;
     });
     QueryTestUtil.testindexOfNullReturnPositive(()->
@@ -2978,6 +3266,7 @@ public class RefArrSeqQueryTest
     {
       var seq=new UncheckedList();
       seq.add(TypeConversionUtil.convertToObject(0));
+      seq.add(TypeConversionUtil.convertToObject(1));
       return seq;
     });
     QueryTestUtil.testlastIndexOfNullReturnPositive(()->
@@ -2998,6 +3287,39 @@ public class RefArrSeqQueryTest
       var seq=new UncheckedList();
       return seq;
     });
+  }
+  @Test
+  public void testCheckedListlastIndexOfObjectNonNull()
+  {
+    var seq=new CheckedList();
+    Object throwingObj=new Object(){
+      @Override public boolean equals(Object val){
+        throw new IndexOutOfBoundsException();
+      }
+    };
+    Object moddingObj=new Object(){
+      @Override public boolean equals(Object val){
+        seq.add(TypeConversionUtil.convertToObject(5));
+        return false;
+      }
+    };
+    Object moddingThrowingObj=new Object(){
+      @Override public boolean equals(Object val){
+        seq.add(TypeConversionUtil.convertToObject(5));
+        throw new IndexOutOfBoundsException();
+      }
+    };
+    Assertions.assertEquals(-1,seq.lastIndexOf(throwingObj));
+    Assertions.assertEquals(-1,seq.lastIndexOf(moddingObj));
+    Assertions.assertEquals(-1,seq.lastIndexOf(moddingThrowingObj));
+    seq.add(new Object());
+    seq.add(new Object());
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.remove(throwingObj));
+    Assertions.assertThrows(ConcurrentModificationException.class,()->seq.remove(moddingObj));
+    Assertions.assertThrows(ConcurrentModificationException.class,()->seq.remove(moddingThrowingObj));
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.lastIndexOf(throwingObj));
+    Assertions.assertThrows(ConcurrentModificationException.class,()->seq.lastIndexOf(moddingObj));
+    Assertions.assertThrows(ConcurrentModificationException.class,()->seq.lastIndexOf(moddingThrowingObj));
   }
   @Test
   public void testCheckedListlastIndexOfDouble()
@@ -3151,6 +3473,7 @@ public class RefArrSeqQueryTest
     {
       var seq=new CheckedList();
       seq.add(TypeConversionUtil.convertToObject(0));
+      seq.add(TypeConversionUtil.convertToObject(1));
       return seq;
     });
     QueryTestUtil.testlastIndexOfNullReturnPositive(()->
@@ -3171,6 +3494,41 @@ public class RefArrSeqQueryTest
       var seq=new CheckedList();
       return seq;
     });
+  }
+  @Test
+  public void testCheckedSubListlastIndexOfObjectNonNull()
+  {
+    var root=new CheckedList();
+    var subList=root.subList(0,0);
+    var seq=subList.subList(0,0);
+    Object throwingObj=new Object(){
+      @Override public boolean equals(Object val){
+        throw new IndexOutOfBoundsException();
+      }
+    };
+    Object moddingObj=new Object(){
+      @Override public boolean equals(Object val){
+        seq.add(TypeConversionUtil.convertToObject(5));
+        return false;
+      }
+    };
+    Object moddingThrowingObj=new Object(){
+      @Override public boolean equals(Object val){
+        seq.add(TypeConversionUtil.convertToObject(5));
+        throw new IndexOutOfBoundsException();
+      }
+    };
+    Assertions.assertEquals(-1,seq.lastIndexOf(throwingObj));
+    Assertions.assertEquals(-1,seq.lastIndexOf(moddingObj));
+    Assertions.assertEquals(-1,seq.lastIndexOf(moddingThrowingObj));
+    seq.add(new Object());
+    seq.add(new Object());
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.remove(throwingObj));
+    Assertions.assertThrows(ConcurrentModificationException.class,()->seq.remove(moddingObj));
+    Assertions.assertThrows(ConcurrentModificationException.class,()->seq.remove(moddingThrowingObj));
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.lastIndexOf(throwingObj));
+    Assertions.assertThrows(ConcurrentModificationException.class,()->seq.lastIndexOf(moddingObj));
+    Assertions.assertThrows(ConcurrentModificationException.class,()->seq.lastIndexOf(moddingThrowingObj));
   }
   @Test
   public void testCheckedSubListlastIndexOfDouble()
@@ -3352,6 +3710,7 @@ public class RefArrSeqQueryTest
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
       seq.add(TypeConversionUtil.convertToObject(0));
+      seq.add(TypeConversionUtil.convertToObject(1));
       return seq;
     });
     QueryTestUtil.testlastIndexOfNullReturnPositive(()->
@@ -3557,6 +3916,7 @@ public class RefArrSeqQueryTest
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
       seq.add(TypeConversionUtil.convertToObject(0));
+      seq.add(TypeConversionUtil.convertToObject(1));
       return seq;
     });
     QueryTestUtil.testlastIndexOfNullReturnPositive(()->
@@ -3734,6 +4094,7 @@ public class RefArrSeqQueryTest
     {
       var seq=new UncheckedStack();
       seq.add(TypeConversionUtil.convertToObject(0));
+      seq.add(TypeConversionUtil.convertToObject(1));
       return seq;
     });
     QueryTestUtil.testsearchNullReturnPositive(()->
@@ -3754,6 +4115,39 @@ public class RefArrSeqQueryTest
       var seq=new UncheckedStack();
       return seq;
     });
+  }
+  @Test
+  public void testCheckedStacksearchObjectNonNull()
+  {
+    var seq=new CheckedStack();
+    Object throwingObj=new Object(){
+      @Override public boolean equals(Object val){
+        throw new IndexOutOfBoundsException();
+      }
+    };
+    Object moddingObj=new Object(){
+      @Override public boolean equals(Object val){
+        seq.add(TypeConversionUtil.convertToObject(5));
+        return false;
+      }
+    };
+    Object moddingThrowingObj=new Object(){
+      @Override public boolean equals(Object val){
+        seq.add(TypeConversionUtil.convertToObject(5));
+        throw new IndexOutOfBoundsException();
+      }
+    };
+    Assertions.assertEquals(-1,seq.search(throwingObj));
+    Assertions.assertEquals(-1,seq.search(moddingObj));
+    Assertions.assertEquals(-1,seq.search(moddingThrowingObj));
+    seq.add(new Object());
+    seq.add(new Object());
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.remove(throwingObj));
+    Assertions.assertThrows(ConcurrentModificationException.class,()->seq.remove(moddingObj));
+    Assertions.assertThrows(ConcurrentModificationException.class,()->seq.remove(moddingThrowingObj));
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.search(throwingObj));
+    Assertions.assertThrows(ConcurrentModificationException.class,()->seq.search(moddingObj));
+    Assertions.assertThrows(ConcurrentModificationException.class,()->seq.search(moddingThrowingObj));
   }
   @Test
   public void testCheckedStacksearchDouble()
@@ -3907,6 +4301,7 @@ public class RefArrSeqQueryTest
     {
       var seq=new CheckedStack();
       seq.add(TypeConversionUtil.convertToObject(0));
+      seq.add(TypeConversionUtil.convertToObject(1));
       return seq;
     });
     QueryTestUtil.testsearchNullReturnPositive(()->

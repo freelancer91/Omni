@@ -351,33 +351,6 @@ public abstract class IntArrSeq implements OmniCollection.OfInt
     }
     this.size=1;
   }
-/*
-  private void uncheckedInsert(int index,int size,int val)
-  {
-    final int tailDist;
-    if((tailDist=size-index)==0)
-    {
-      uncheckedAppend(size,val);
-    }
-    else
-    {
-      int[] arr;
-      if((arr=this.arr).length==size)
-      {
-        final int[] tmp;
-        ArrCopy.semicheckedCopy(arr,0,tmp=new int[OmniArray.growBy50Pct(size)],0,index);
-        ArrCopy.uncheckedCopy(arr,index,tmp,index+1,tailDist);
-        this.arr=arr=tmp;
-      }
-      else
-      {
-        ArrCopy.uncheckedCopy(arr,index,arr,index+1,tailDist);
-      }
-      arr[index]=val;
-      this.size=size+1;
-    }
-  }
-*/  
   public void push(int val)
   {
     final int size;
@@ -3389,7 +3362,7 @@ public abstract class IntArrSeq implements OmniCollection.OfInt
       return new CheckedSubList(this,fromIndex,CheckedCollection.checkSubListRange(fromIndex,toIndex,this.size));
     }
   }
-  //private
+  private
     static class CheckedSubList
       implements IntSubListDefault,Cloneable
   {

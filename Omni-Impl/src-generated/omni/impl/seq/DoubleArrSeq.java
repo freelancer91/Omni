@@ -437,33 +437,6 @@ public abstract class DoubleArrSeq implements OmniCollection.OfDouble
     }
     this.size=1;
   }
-/*
-  private void uncheckedInsert(int index,int size,double val)
-  {
-    final int tailDist;
-    if((tailDist=size-index)==0)
-    {
-      uncheckedAppend(size,val);
-    }
-    else
-    {
-      double[] arr;
-      if((arr=this.arr).length==size)
-      {
-        final double[] tmp;
-        ArrCopy.semicheckedCopy(arr,0,tmp=new double[OmniArray.growBy50Pct(size)],0,index);
-        ArrCopy.uncheckedCopy(arr,index,tmp,index+1,tailDist);
-        this.arr=arr=tmp;
-      }
-      else
-      {
-        ArrCopy.uncheckedCopy(arr,index,arr,index+1,tailDist);
-      }
-      arr[index]=val;
-      this.size=size+1;
-    }
-  }
-*/  
   public void push(double val)
   {
     final int size;
@@ -3720,7 +3693,7 @@ public abstract class DoubleArrSeq implements OmniCollection.OfDouble
       return new CheckedSubList(this,fromIndex,CheckedCollection.checkSubListRange(fromIndex,toIndex,this.size));
     }
   }
-  //private
+  private
     static class CheckedSubList
       implements DoubleSubListDefault,Cloneable
   {

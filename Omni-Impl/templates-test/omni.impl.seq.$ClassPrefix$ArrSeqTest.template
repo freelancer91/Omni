@@ -29,127 +29,70 @@ import java.util.ConcurrentModificationException;
 import omni.util.OmniArray;
 @SuppressWarnings({"rawtypes","unchecked"}) 
 public class $ClassPrefix$ArrSeqTest{
+
+
+ 
+
+
   #MACRO StructImpl<UncheckedStack>()
   #MACRO StructImpl<UncheckedList>()
   #MACRO StructImpl<CheckedStack>()
   #MACRO StructImpl<CheckedList>()
   
-  #MACRO SubListImpl<0,0,0,0,Checked>()
-  #MACRO SubListImpl<0,0,0,0,Unchecked>()
-  
-  #MACRO SubListImpl<0,0,0,10,Checked>()
-  #MACRO SubListImpl<0,0,0,10,Unchecked>()
-  
-  #MACRO SubListImpl<0,0,10,0,Checked>()
-  #MACRO SubListImpl<0,0,10,0,Unchecked>()
-  
-  #MACRO SubListImpl<0,0,10,10,Checked>()
-  #MACRO SubListImpl<0,0,10,10,Unchecked>()
-  
-  #MACRO SubListImpl<0,10,0,0,Checked>()
-  #MACRO SubListImpl<0,10,0,0,Unchecked>()
-  
-  #MACRO SubListImpl<0,10,0,10,Checked>()
-  #MACRO SubListImpl<0,10,0,10,Unchecked>()
-  
-  #MACRO SubListImpl<0,10,10,0,Checked>()
-  #MACRO SubListImpl<0,10,10,0,Unchecked>()
-  
-  #MACRO SubListImpl<0,10,10,10,Checked>()
-  #MACRO SubListImpl<0,10,10,10,Unchecked>()
-  
-  #MACRO SubListImpl<10,0,0,0,Checked>()
-  #MACRO SubListImpl<10,0,0,0,Unchecked>()
-  
-  #MACRO SubListImpl<10,0,0,10,Checked>()
-  #MACRO SubListImpl<10,0,0,10,Unchecked>()
-  
-  #MACRO SubListImpl<10,0,10,0,Checked>()
-  #MACRO SubListImpl<10,0,10,0,Unchecked>()
-  
-  #MACRO SubListImpl<10,0,10,10,Checked>()
-  #MACRO SubListImpl<10,0,10,10,Unchecked>()
-  
-  #MACRO SubListImpl<10,10,0,0,Checked>()
-  #MACRO SubListImpl<10,10,0,0,Unchecked>()
-  
-  #MACRO SubListImpl<10,10,0,10,Checked>()
-  #MACRO SubListImpl<10,10,0,10,Unchecked>()
-  
-  #MACRO SubListImpl<10,10,10,0,Checked>()
-  #MACRO SubListImpl<10,10,10,0,Unchecked>()
-  
-  #MACRO SubListImpl<10,10,10,10,Checked>()
-  #MACRO SubListImpl<10,10,10,10,Unchecked>()
-  
-  private static int getPrivateIntField(Object obj,String fieldName)
-  {
-    try
-    {
-      var field=obj.getClass().getDeclaredField(fieldName);
-      field.setAccessible(true);
-      return field.getInt(obj);
-    }
-    catch(Exception e)
-    {
-      throw new RuntimeException(e);
-    }
-  }
-  private static Object getPrivateRefField(Object obj,String fieldName)
-  {
-    try
-    {
-      var field=obj.getClass().getDeclaredField(fieldName);
-      field.setAccessible(true);
-      return field.get(obj);
-    }
-    catch(Exception e)
-    {
-      throw new RuntimeException(e);
-    }
-  }
-
-
-#MACRODEF SubListImpl<ROOTPREALLOC,SUBLISTPREALLOC,SUBLISTPOSTALLOC,ROOTPOSTALLOC,CHECKED>()
+ 
+  #MACRO SubListImpl<Checked>()
+  #MACRO SubListImpl<Unchecked>()
 
 
 
+#MACRODEF SubListImpl<CHECKED>()
 @Test
-public void testCHECKEDListsubList_intint()
-{
-  #MACRO ConstructSubList
-}
-#ENDDEF
-#MACRODEF ConstructSubList()
-var root=new CHECKEDList();
-for(int i=0;i<ROOTPREALLOC;++i)
-{
-  root.add(TypeConversionUtil.convertTo$ArrayType$(i));
-}
-for(int i=0;i<ROOTPOSTALLOC;++i)
-{
-  root.add(TypeConversionUtil.convertTo$ArrayType$(ROOTPREALLOC+SUBLISTPREALLOC+SUBLISTPOSTALLOC+i));
-}
-var subList=root.subList(ROOTPREALLOC,ROOTPREALLOC);
-for(int i=0;i<SUBLISTPREALLOC+SUBLISTPOSTALLOC;++i)
-{
-  root.add(TypeConversionUtil.convertTo$ArrayType$(ROOTPREALLOC+i));
-}
-var seq=subList.subList(SUBLISTPREALLOC,SUBLISTPREALLOC);
-Class<?> subListClass=seq.getClass();
-Field subListrootOffsetField=subListClass.getDeclaredField("rootOffset");
-subListrootOffsetField.setAccessible(true);
-Field subListsizeField=subListClass.getDeclaredField("size");
-subListsizeField.setAccessible(true);
-Field subListparentField=subListClass.getDeclaredField("parent");
-subListparentField.setAccessible(true);
-Field subListrootField=subListClass.getDeclaredField("root");
-subListrootField.setAccessible(true);
-#IFSWITCH CHECKED==Checked
-Field subListmodCountField=subListClass.getDeclaredField("modCount");
-subListmodCountField.setAccessible(true);
+public void testCHECKEDSubListsize(){
+  var root=new CHECKEDList();
+  var parent=root.subList(0,0);
+  var seq=parent.subList(0,0);
+  Assertions.assertEquals(0,seq.size());
+  for(int i=0;i<100;++i)
+  {
+    seq.add(TypeConversionUtil.convertTo$ArrayType$(i));
+    Assertions.assertEquals(i+1,seq.size());
+  }
+#IFSWTICH CHECKED==Checked
+  parent.add(TypeConversionUtil.convertTo$ArrayType$(0));
+  Assertions.assertThrows(ConcurrentModificationException.class,seq::size);
+  root.add(TypeConversionUtil.convertTo$ArrayType$(0));
+  Assertions.assertThrows(ConcurrentModificationException.class,parent::size);
 #ENDIF
+}
+@Test
+public void testCHECKEDSubListisEmpty(){
+  var root=new CHECKEDList();
+  var parent=root.subList(0,0);
+  var seq=parent.subList(0,0);
+  Assertions.assertTrue(seq.isEmpty());
+  for(int i=0;i<100;++i)
+  {
+    seq.add(TypeConversionUtil.convertTo$ArrayType$(i));
+    Assertions.assertFalse(seq.isEmpty());
+  }
+  var seqItr=seq.iterator();
+  for(int i=0;i<100;++i)
+  {
+    Assertions.assertFalse(seq.isEmpty());
+    seqItr.next();
+    seqItr.remove();
+  }
+  Assertions.assertTrue(seq.isEmpty());
+#IFSWTICH CHECKED==Checked
+  parent.add(TypeConversionUtil.convertTo$ArrayType$(0));
+  Assertions.assertThrows(ConcurrentModificationException.class,seq::isEmpty);
+  root.add(TypeConversionUtil.convertTo$ArrayType$(0));
+  Assertions.assertThrows(ConcurrentModificationException.class,parent::isEmpty);
+#ENDIF
+}
+
 #ENDDEF
+
   
   
 #MACRODEF StructImpl<STRUCTNAME>()

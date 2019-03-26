@@ -7,4 +7,5 @@ module omni.impl{
     requires transitive omni.api;
     requires omni.function;
     requires org.junit.jupiter.api;
+    requires org.junit.jupiter.params;
 }

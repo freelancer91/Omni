@@ -1,0 +1,162 @@
+#TYPEDEF OfBoolean
+#TYPEDEF OfByte
+#TYPEDEF OfChar
+#TYPEDEF OfShort
+#TYPEDEF OfInt
+#TYPEDEF OfLong
+#TYPEDEF OfFloat
+#TYPEDEF OfDouble
+#TYPEDEF OfRef
+package omni.impl.seq;
+
+public class $ClassPrefix$UncheckedArrSeq
+{
+  #MACRO TestImpl<Stack>()
+  #MACRO TestImpl<List>()
+}
+#MACRODEF TestImpl<STRUCT>()
+@Test
+public void testUncheckedSTRUCTremoveIf()
+{
+  var seq=new UncheckedSTRUCT();
+  
+}
+@Test
+public void testUncheckedSTRUCTclone()
+{
+  var seq=new UncheckedSTRUCT();
+  {
+    var clone=(UncheckedSTRUCT)seq.clone();
+    Assertions.assertNotSame(seq,clone);
+    Assertions.assertEquals(0,clone.size);
+    Assertions.assertEquals(OmniArray.Of$ClassPrefix$.DEFAULT_ARR,seq.arr);
+  }
+  for(int i=0;i<100;++i)
+  {
+    seq.add(TypeConversionUtil.convertTo$ArrayType$(i));
+  }
+  {
+    var clone=(UncheckedSTRUCT)seq.clone();
+    Assertions.assertNotSame(seq,clone);
+    Assertions.assertEquals(100,clone.size);
+    Assertions.assertNotSame(seq.arr,clone.arr);
+    for(int i=0;i<100;++i)
+    {
+#IF OfRef
+      Assertions.assertSame(seq.arr[i],clone.arr[i]);
+#ELSE
+      Assertions.assertEquals(seq.arr[i],clone.arr[i]);
+#ENDIF
+    }
+  }
+}
+@Test
+public void testUncheckedSTRUCTclear()
+{
+  var seq=new UncheckedSTRUCT();
+  seq.clear();
+  Assertions.assertEquals(0,seq.size);
+  Assertions.assertSame(OmniArray.Of$ClassPrefix$.DEFAULT_ARR,seq.arr);
+  for(int i=0;i<100;++i)
+  {
+    seq.add(TypeConversionUtil.convertTo$ArrayType$(i));
+  }
+  seq.clear()
+  Assertions.assertEquals(0,seq.size);
+  #IF OfRef
+  for(int i=0;i<100;++i)
+  {
+    Assertions.assertNull(seq.arr[i]);
+  }
+  #ENDIF
+}
+@Test
+public void testUncheckedSTRUCTisEmpty()
+{
+  var seq=new UncheckedSTRUCT();
+  Assertions.assertTrue(seq.isEmpty());
+  for(int i=0;i<100;++i)
+  {
+    seq.add(TypeConversionUtil.convertTo$ArrayType$(i));
+    Assertions.assertFalse(seq.isEmpty());
+  }
+  var itr=seq.iterator();
+  for(int i=0;i<100;++i)
+  {
+    Assertions.assertFalse(seq.isEmpty());
+    itr.next$TypeNameModifier$();
+    itr.remove();
+  }
+  Assertions.assertTrue(seq.isEmpty());
+}
+@Test
+public void testUncheckedSTRUCTsize()
+{
+  var seq=new UncheckedSTRUCT();
+  for(int i=0;i<100;++i)
+  {
+    Assertion.assertEquals(i,seq.size());
+    seq.add(TypeConversionUtil.convertTo$ArrayType$(i));
+  }
+  var itr=seq.iterator();
+  for(int i=0;i<100;++i)
+  {
+    Assertions.assertEquals(100-i,seq.size());
+    itr.next$TypeNameModifier$();
+    itr.remove();
+  }
+  Assertions.assertEquals(0,seq.size());
+}
+@Test
+public void testUncheckedSTRUCTConstructor()
+{
+  {
+    //default constructor
+    var seq=new UncheckedSTRUCT();
+    Assertions.assertEquals(0,seq.size);
+    Assertions.assertSame(OmniArray.Of$ClassPrefix$.DEFAULT_ARR,seq.arr);
+  }
+  {
+    //piece-wise constructor
+    var arr=new $ArrayList$[5];
+    int size=5;
+    var seq=new UncheckedSTRUCT(size,arr);
+    Assertions.assertEquals(size,seq.size);
+    Assertions.assertSame(arr,seq.arr);
+  }
+  {
+    //capacity constructor 0
+    var seq=new UncheckedSTRUCT(0);
+    Assertions.assertEquals(0,seq.size);
+    Assertions.assertNull(seq.arr);
+  }
+  {
+    //capacity constructor default-capacity
+    var seq=new UncheckedSTRUCT(OmniArray.DEFAULT_ARR_SEQ_CAP);
+    Assertions.assertEquals(0,seq.size);
+    Assertions.assertSame(OmniArray.Of$ClassPrefix$.DEFAULT_ARR,seq.arr);
+  }
+  {
+    //capacity constructor 20
+    var seq=new UncheckedSTRUCT(20);
+    Assertions.assertEquals(0,seq.size);
+    Assertions.assertEquals(20,seq.arr.length);
+    for(int i=0;i<20;++i)
+    {
+#IF OfRef
+      Assertions.assertNull(seq.arr[i]);
+#ELSE
+      Assertions.assertEquals(TypeConversionUtil.convertTo$ArrayType$(0),seq.arr[i]);
+#ENDIF
+    }
+
+  }
+
+  
+}
+#ENDDEF
+
+
+
+
+

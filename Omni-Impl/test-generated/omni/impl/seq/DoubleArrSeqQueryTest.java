@@ -230,6 +230,7 @@ public class DoubleArrSeqQueryTest
     {
       var seq=new UncheckedList();
       seq.add(TypeConversionUtil.convertTodouble(0));
+      seq.add(TypeConversionUtil.convertTodouble(1));
       return seq;
     });
   }
@@ -463,6 +464,7 @@ public class DoubleArrSeqQueryTest
     {
       var seq=new UncheckedStack();
       seq.add(TypeConversionUtil.convertTodouble(0));
+      seq.add(TypeConversionUtil.convertTodouble(1));
       return seq;
     });
   }
@@ -696,6 +698,7 @@ public class DoubleArrSeqQueryTest
     {
       var seq=new CheckedList();
       seq.add(TypeConversionUtil.convertTodouble(0));
+      seq.add(TypeConversionUtil.convertTodouble(1));
       return seq;
     });
   }
@@ -929,6 +932,7 @@ public class DoubleArrSeqQueryTest
     {
       var seq=new CheckedStack();
       seq.add(TypeConversionUtil.convertTodouble(0));
+      seq.add(TypeConversionUtil.convertTodouble(1));
       return seq;
     });
   }
@@ -1210,6 +1214,7 @@ public class DoubleArrSeqQueryTest
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
       seq.add(TypeConversionUtil.convertTodouble(0));
+      seq.add(TypeConversionUtil.convertTodouble(1));
       return seq;
     });
   }
@@ -1493,6 +1498,7 @@ public class DoubleArrSeqQueryTest
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
       seq.add(TypeConversionUtil.convertTodouble(0));
+      seq.add(TypeConversionUtil.convertTodouble(1));
       return seq;
     });
   }
@@ -1728,6 +1734,7 @@ public class DoubleArrSeqQueryTest
     {
       var seq=new UncheckedList();
       seq.add(TypeConversionUtil.convertTodouble(0));
+      seq.add(TypeConversionUtil.convertTodouble(1));
       return seq;
     });
   }
@@ -1961,6 +1968,7 @@ public class DoubleArrSeqQueryTest
     {
       var seq=new UncheckedStack();
       seq.add(TypeConversionUtil.convertTodouble(0));
+      seq.add(TypeConversionUtil.convertTodouble(1));
       return seq;
     });
   }
@@ -2194,6 +2202,7 @@ public class DoubleArrSeqQueryTest
     {
       var seq=new CheckedList();
       seq.add(TypeConversionUtil.convertTodouble(0));
+      seq.add(TypeConversionUtil.convertTodouble(1));
       return seq;
     });
   }
@@ -2427,6 +2436,7 @@ public class DoubleArrSeqQueryTest
     {
       var seq=new CheckedStack();
       seq.add(TypeConversionUtil.convertTodouble(0));
+      seq.add(TypeConversionUtil.convertTodouble(1));
       return seq;
     });
   }
@@ -2708,6 +2718,7 @@ public class DoubleArrSeqQueryTest
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
       seq.add(TypeConversionUtil.convertTodouble(0));
+      seq.add(TypeConversionUtil.convertTodouble(1));
       return seq;
     });
   }
@@ -2991,6 +3002,7 @@ public class DoubleArrSeqQueryTest
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
       seq.add(TypeConversionUtil.convertTodouble(0));
+      seq.add(TypeConversionUtil.convertTodouble(1));
       return seq;
     });
   }
@@ -3247,6 +3259,7 @@ public class DoubleArrSeqQueryTest
     {
       var seq=new UncheckedList();
       seq.add(TypeConversionUtil.convertTodouble(0));
+      seq.add(TypeConversionUtil.convertTodouble(1));
       return seq;
     });
   }
@@ -3501,6 +3514,7 @@ public class DoubleArrSeqQueryTest
     {
       var seq=new CheckedList();
       seq.add(TypeConversionUtil.convertTodouble(0));
+      seq.add(TypeConversionUtil.convertTodouble(1));
       return seq;
     });
   }
@@ -3803,6 +3817,7 @@ public class DoubleArrSeqQueryTest
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
       seq.add(TypeConversionUtil.convertTodouble(0));
+      seq.add(TypeConversionUtil.convertTodouble(1));
       return seq;
     });
   }
@@ -4107,6 +4122,7 @@ public class DoubleArrSeqQueryTest
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
       seq.add(TypeConversionUtil.convertTodouble(0));
+      seq.add(TypeConversionUtil.convertTodouble(1));
       return seq;
     });
   }
@@ -4363,6 +4379,7 @@ public class DoubleArrSeqQueryTest
     {
       var seq=new UncheckedList();
       seq.add(TypeConversionUtil.convertTodouble(0));
+      seq.add(TypeConversionUtil.convertTodouble(1));
       return seq;
     });
   }
@@ -4617,6 +4634,7 @@ public class DoubleArrSeqQueryTest
     {
       var seq=new CheckedList();
       seq.add(TypeConversionUtil.convertTodouble(0));
+      seq.add(TypeConversionUtil.convertTodouble(1));
       return seq;
     });
   }
@@ -4919,6 +4937,7 @@ public class DoubleArrSeqQueryTest
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
       seq.add(TypeConversionUtil.convertTodouble(0));
+      seq.add(TypeConversionUtil.convertTodouble(1));
       return seq;
     });
   }
@@ -5223,6 +5242,7 @@ public class DoubleArrSeqQueryTest
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
       seq.add(TypeConversionUtil.convertTodouble(0));
+      seq.add(TypeConversionUtil.convertTodouble(1));
       return seq;
     });
   }
@@ -5479,6 +5499,7 @@ public class DoubleArrSeqQueryTest
     {
       var seq=new UncheckedStack();
       seq.add(TypeConversionUtil.convertTodouble(0));
+      seq.add(TypeConversionUtil.convertTodouble(1));
       return seq;
     });
   }
@@ -5733,6 +5754,7 @@ public class DoubleArrSeqQueryTest
     {
       var seq=new CheckedStack();
       seq.add(TypeConversionUtil.convertTodouble(0));
+      seq.add(TypeConversionUtil.convertTodouble(1));
       return seq;
     });
   }

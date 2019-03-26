@@ -134,6 +134,7 @@ public class CharArrSeqQueryTest
     {
       var seq=new UncheckedList();
       seq.add(TypeConversionUtil.convertTochar(0));
+      seq.add(TypeConversionUtil.convertTochar(1));
       return seq;
     });
   }
@@ -271,6 +272,7 @@ public class CharArrSeqQueryTest
     {
       var seq=new UncheckedStack();
       seq.add(TypeConversionUtil.convertTochar(0));
+      seq.add(TypeConversionUtil.convertTochar(1));
       return seq;
     });
   }
@@ -408,6 +410,7 @@ public class CharArrSeqQueryTest
     {
       var seq=new CheckedList();
       seq.add(TypeConversionUtil.convertTochar(0));
+      seq.add(TypeConversionUtil.convertTochar(1));
       return seq;
     });
   }
@@ -545,6 +548,7 @@ public class CharArrSeqQueryTest
     {
       var seq=new CheckedStack();
       seq.add(TypeConversionUtil.convertTochar(0));
+      seq.add(TypeConversionUtil.convertTochar(1));
       return seq;
     });
   }
@@ -706,6 +710,7 @@ public class CharArrSeqQueryTest
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
       seq.add(TypeConversionUtil.convertTochar(0));
+      seq.add(TypeConversionUtil.convertTochar(1));
       return seq;
     });
   }
@@ -869,6 +874,7 @@ public class CharArrSeqQueryTest
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
       seq.add(TypeConversionUtil.convertTochar(0));
+      seq.add(TypeConversionUtil.convertTochar(1));
       return seq;
     });
   }
@@ -1008,6 +1014,7 @@ public class CharArrSeqQueryTest
     {
       var seq=new UncheckedList();
       seq.add(TypeConversionUtil.convertTochar(0));
+      seq.add(TypeConversionUtil.convertTochar(1));
       return seq;
     });
   }
@@ -1145,6 +1152,7 @@ public class CharArrSeqQueryTest
     {
       var seq=new UncheckedStack();
       seq.add(TypeConversionUtil.convertTochar(0));
+      seq.add(TypeConversionUtil.convertTochar(1));
       return seq;
     });
   }
@@ -1282,6 +1290,7 @@ public class CharArrSeqQueryTest
     {
       var seq=new CheckedList();
       seq.add(TypeConversionUtil.convertTochar(0));
+      seq.add(TypeConversionUtil.convertTochar(1));
       return seq;
     });
   }
@@ -1419,6 +1428,7 @@ public class CharArrSeqQueryTest
     {
       var seq=new CheckedStack();
       seq.add(TypeConversionUtil.convertTochar(0));
+      seq.add(TypeConversionUtil.convertTochar(1));
       return seq;
     });
   }
@@ -1580,6 +1590,7 @@ public class CharArrSeqQueryTest
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
       seq.add(TypeConversionUtil.convertTochar(0));
+      seq.add(TypeConversionUtil.convertTochar(1));
       return seq;
     });
   }
@@ -1743,6 +1754,7 @@ public class CharArrSeqQueryTest
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
       seq.add(TypeConversionUtil.convertTochar(0));
+      seq.add(TypeConversionUtil.convertTochar(1));
       return seq;
     });
   }
@@ -1891,6 +1903,7 @@ public class CharArrSeqQueryTest
     {
       var seq=new UncheckedList();
       seq.add(TypeConversionUtil.convertTochar(0));
+      seq.add(TypeConversionUtil.convertTochar(1));
       return seq;
     });
   }
@@ -2037,6 +2050,7 @@ public class CharArrSeqQueryTest
     {
       var seq=new CheckedList();
       seq.add(TypeConversionUtil.convertTochar(0));
+      seq.add(TypeConversionUtil.convertTochar(1));
       return seq;
     });
   }
@@ -2207,6 +2221,7 @@ public class CharArrSeqQueryTest
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
       seq.add(TypeConversionUtil.convertTochar(0));
+      seq.add(TypeConversionUtil.convertTochar(1));
       return seq;
     });
   }
@@ -2379,6 +2394,7 @@ public class CharArrSeqQueryTest
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
       seq.add(TypeConversionUtil.convertTochar(0));
+      seq.add(TypeConversionUtil.convertTochar(1));
       return seq;
     });
   }
@@ -2527,6 +2543,7 @@ public class CharArrSeqQueryTest
     {
       var seq=new UncheckedList();
       seq.add(TypeConversionUtil.convertTochar(0));
+      seq.add(TypeConversionUtil.convertTochar(1));
       return seq;
     });
   }
@@ -2673,6 +2690,7 @@ public class CharArrSeqQueryTest
     {
       var seq=new CheckedList();
       seq.add(TypeConversionUtil.convertTochar(0));
+      seq.add(TypeConversionUtil.convertTochar(1));
       return seq;
     });
   }
@@ -2843,6 +2861,7 @@ public class CharArrSeqQueryTest
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
       seq.add(TypeConversionUtil.convertTochar(0));
+      seq.add(TypeConversionUtil.convertTochar(1));
       return seq;
     });
   }
@@ -3015,6 +3034,7 @@ public class CharArrSeqQueryTest
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
       seq.add(TypeConversionUtil.convertTochar(0));
+      seq.add(TypeConversionUtil.convertTochar(1));
       return seq;
     });
   }
@@ -3163,6 +3183,7 @@ public class CharArrSeqQueryTest
     {
       var seq=new UncheckedStack();
       seq.add(TypeConversionUtil.convertTochar(0));
+      seq.add(TypeConversionUtil.convertTochar(1));
       return seq;
     });
   }
@@ -3309,6 +3330,7 @@ public class CharArrSeqQueryTest
     {
       var seq=new CheckedStack();
       seq.add(TypeConversionUtil.convertTochar(0));
+      seq.add(TypeConversionUtil.convertTochar(1));
       return seq;
     });
   }

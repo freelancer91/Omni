@@ -16,6 +16,8 @@ import omni.impl.seq.$ClassPrefix$ArrSeq.UncheckedStack;
 import omni.impl.seq.$ClassPrefix$ArrSeq.CheckedStack;
 import omni.api.QueryTestUtil;
 #IF OfRef
+import java.util.ConcurrentModificationException;
+import org.junit.jupiter.api.Assertions;
 @SuppressWarnings({"rawtypes","unchecked"}) 
 #ENDIF
 public class $ClassPrefix$ArrSeqQueryTest
@@ -49,6 +51,9 @@ public class $ClassPrefix$ArrSeqQueryTest
   #MACRO Impl<UncheckedStack,search>()
   #MACRO Impl<CheckedStack,search>()
 
+
+
+
 }
 
 #MACRODEF ConstructSeq()
@@ -66,6 +71,63 @@ var seq=new STRUCTNAME();
 #ENDDEF
 
 #MACRODEF Impl<STRUCTNAME,METHODNAME>()
+
+#IFSWITCH STRUCTNAME==CheckedList,CheckedStack,CheckedSubList
+  #IF OfRef
+@Test
+public void testSTRUCTNAMEMETHODNAMEObjectNonNull()
+{
+  #MACRO ConstructSeq()
+  Object throwingObj=new Object(){
+    @Override public boolean equals(Object val){
+      throw new IndexOutOfBoundsException();
+    }
+  };
+  Object moddingObj=new Object(){
+    @Override public boolean equals(Object val){
+      seq.add(TypeConversionUtil.convertTo$ArrayType$(5));
+      return false;
+    }
+  };
+  Object moddingThrowingObj=new Object(){
+    @Override public boolean equals(Object val){
+      seq.add(TypeConversionUtil.convertTo$ArrayType$(5));
+      throw new IndexOutOfBoundsException();
+    }
+  };
+    #IFSWITCH METHODNAME==removeVal
+  Assertions.assertFalse(seq.remove(throwingObj));
+  Assertions.assertFalse(seq.remove(moddingObj));
+  Assertions.assertFalse(seq.remove(moddingThrowingObj));
+    #ELSEIFSWITCH METHODNAME==contains,removeFirstOccurrence,removeLastOccurrence
+  Assertions.assertFalse(seq.METHODNAME(throwingObj));
+  Assertions.assertFalse(seq.METHODNAME(moddingObj));
+  Assertions.assertFalse(seq.METHODNAME(moddingThrowingObj));
+    #ELSE
+  Assertions.assertEquals(-1,seq.METHODNAME(throwingObj));
+  Assertions.assertEquals(-1,seq.METHODNAME(moddingObj));
+  Assertions.assertEquals(-1,seq.METHODNAME(moddingThrowingObj));
+    #ENDIF
+  seq.add(new Object());
+  seq.add(new Object());
+  Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.remove(throwingObj));
+  Assertions.assertThrows(ConcurrentModificationException.class,()->seq.remove(moddingObj));
+  Assertions.assertThrows(ConcurrentModificationException.class,()->seq.remove(moddingThrowingObj));
+    #IFSWITCH METHODNAME==removeVal
+  Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.remove(throwingObj));
+  Assertions.assertThrows(ConcurrentModificationException.class,()->seq.remove(moddingObj));
+  Assertions.assertThrows(ConcurrentModificationException.class,()->seq.remove(moddingThrowingObj));
+    #ELSE
+  Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.METHODNAME(throwingObj));
+  Assertions.assertThrows(ConcurrentModificationException.class,()->seq.METHODNAME(moddingObj));
+  Assertions.assertThrows(ConcurrentModificationException.class,()->seq.METHODNAME(moddingThrowingObj));
+    #ENDIF
+  
+  
+}
+  #ENDIF
+#ENDIF
+
 @Test
 public void testSTRUCTNAMEMETHODNAMEDouble()
 {
@@ -1272,6 +1334,7 @@ public void testSTRUCTNAMEMETHODNAMENull()
   {
     #MACRO ConstructSeq()
     seq.add(TypeConversionUtil.convertTo$ArrayType$(0));
+    seq.add(TypeConversionUtil.convertTo$ArrayType$(1));
     return seq;
   });
   

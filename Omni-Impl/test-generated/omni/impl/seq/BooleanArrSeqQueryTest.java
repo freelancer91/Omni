@@ -174,6 +174,7 @@ public class BooleanArrSeqQueryTest
     {
       var seq=new UncheckedList();
       seq.add(TypeConversionUtil.convertToboolean(0));
+      seq.add(TypeConversionUtil.convertToboolean(1));
       return seq;
     });
   }
@@ -351,6 +352,7 @@ public class BooleanArrSeqQueryTest
     {
       var seq=new UncheckedStack();
       seq.add(TypeConversionUtil.convertToboolean(0));
+      seq.add(TypeConversionUtil.convertToboolean(1));
       return seq;
     });
   }
@@ -528,6 +530,7 @@ public class BooleanArrSeqQueryTest
     {
       var seq=new CheckedList();
       seq.add(TypeConversionUtil.convertToboolean(0));
+      seq.add(TypeConversionUtil.convertToboolean(1));
       return seq;
     });
   }
@@ -705,6 +708,7 @@ public class BooleanArrSeqQueryTest
     {
       var seq=new CheckedStack();
       seq.add(TypeConversionUtil.convertToboolean(0));
+      seq.add(TypeConversionUtil.convertToboolean(1));
       return seq;
     });
   }
@@ -920,6 +924,7 @@ public class BooleanArrSeqQueryTest
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
       seq.add(TypeConversionUtil.convertToboolean(0));
+      seq.add(TypeConversionUtil.convertToboolean(1));
       return seq;
     });
   }
@@ -1137,6 +1142,7 @@ public class BooleanArrSeqQueryTest
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
       seq.add(TypeConversionUtil.convertToboolean(0));
+      seq.add(TypeConversionUtil.convertToboolean(1));
       return seq;
     });
   }
@@ -1316,6 +1322,7 @@ public class BooleanArrSeqQueryTest
     {
       var seq=new UncheckedList();
       seq.add(TypeConversionUtil.convertToboolean(0));
+      seq.add(TypeConversionUtil.convertToboolean(1));
       return seq;
     });
   }
@@ -1493,6 +1500,7 @@ public class BooleanArrSeqQueryTest
     {
       var seq=new UncheckedStack();
       seq.add(TypeConversionUtil.convertToboolean(0));
+      seq.add(TypeConversionUtil.convertToboolean(1));
       return seq;
     });
   }
@@ -1670,6 +1678,7 @@ public class BooleanArrSeqQueryTest
     {
       var seq=new CheckedList();
       seq.add(TypeConversionUtil.convertToboolean(0));
+      seq.add(TypeConversionUtil.convertToboolean(1));
       return seq;
     });
   }
@@ -1847,6 +1856,7 @@ public class BooleanArrSeqQueryTest
     {
       var seq=new CheckedStack();
       seq.add(TypeConversionUtil.convertToboolean(0));
+      seq.add(TypeConversionUtil.convertToboolean(1));
       return seq;
     });
   }
@@ -2062,6 +2072,7 @@ public class BooleanArrSeqQueryTest
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
       seq.add(TypeConversionUtil.convertToboolean(0));
+      seq.add(TypeConversionUtil.convertToboolean(1));
       return seq;
     });
   }
@@ -2279,6 +2290,7 @@ public class BooleanArrSeqQueryTest
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
       seq.add(TypeConversionUtil.convertToboolean(0));
+      seq.add(TypeConversionUtil.convertToboolean(1));
       return seq;
     });
   }
@@ -2474,6 +2486,7 @@ public class BooleanArrSeqQueryTest
     {
       var seq=new UncheckedList();
       seq.add(TypeConversionUtil.convertToboolean(0));
+      seq.add(TypeConversionUtil.convertToboolean(1));
       return seq;
     });
   }
@@ -2667,6 +2680,7 @@ public class BooleanArrSeqQueryTest
     {
       var seq=new CheckedList();
       seq.add(TypeConversionUtil.convertToboolean(0));
+      seq.add(TypeConversionUtil.convertToboolean(1));
       return seq;
     });
   }
@@ -2898,6 +2912,7 @@ public class BooleanArrSeqQueryTest
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
       seq.add(TypeConversionUtil.convertToboolean(0));
+      seq.add(TypeConversionUtil.convertToboolean(1));
       return seq;
     });
   }
@@ -3131,6 +3146,7 @@ public class BooleanArrSeqQueryTest
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
       seq.add(TypeConversionUtil.convertToboolean(0));
+      seq.add(TypeConversionUtil.convertToboolean(1));
       return seq;
     });
   }
@@ -3326,6 +3342,7 @@ public class BooleanArrSeqQueryTest
     {
       var seq=new UncheckedList();
       seq.add(TypeConversionUtil.convertToboolean(0));
+      seq.add(TypeConversionUtil.convertToboolean(1));
       return seq;
     });
   }
@@ -3519,6 +3536,7 @@ public class BooleanArrSeqQueryTest
     {
       var seq=new CheckedList();
       seq.add(TypeConversionUtil.convertToboolean(0));
+      seq.add(TypeConversionUtil.convertToboolean(1));
       return seq;
     });
   }
@@ -3750,6 +3768,7 @@ public class BooleanArrSeqQueryTest
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
       seq.add(TypeConversionUtil.convertToboolean(0));
+      seq.add(TypeConversionUtil.convertToboolean(1));
       return seq;
     });
   }
@@ -3983,6 +4002,7 @@ public class BooleanArrSeqQueryTest
       var subList=root.subList(0,0);
       var seq=subList.subList(0,0);
       seq.add(TypeConversionUtil.convertToboolean(0));
+      seq.add(TypeConversionUtil.convertToboolean(1));
       return seq;
     });
   }
@@ -4178,6 +4198,7 @@ public class BooleanArrSeqQueryTest
     {
       var seq=new UncheckedStack();
       seq.add(TypeConversionUtil.convertToboolean(0));
+      seq.add(TypeConversionUtil.convertToboolean(1));
       return seq;
     });
   }
@@ -4371,6 +4392,7 @@ public class BooleanArrSeqQueryTest
     {
       var seq=new CheckedStack();
       seq.add(TypeConversionUtil.convertToboolean(0));
+      seq.add(TypeConversionUtil.convertToboolean(1));
       return seq;
     });
   }
