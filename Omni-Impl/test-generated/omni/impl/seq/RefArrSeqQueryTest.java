@@ -5,7 +5,7 @@ import omni.impl.seq.RefArrSeq.UncheckedList;
 import omni.impl.seq.RefArrSeq.CheckedList;
 import omni.impl.seq.RefArrSeq.UncheckedStack;
 import omni.impl.seq.RefArrSeq.CheckedStack;
-import omni.api.QueryTestUtil;
+import omni.impl.QueryTestUtil;
 import java.util.ConcurrentModificationException;
 import org.junit.jupiter.api.Assertions;
 @SuppressWarnings({"rawtypes","unchecked"}) 

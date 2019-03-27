@@ -3446,7 +3446,7 @@ boolean uncheckedremoveValSUFFIX(int size
   {
     #MACRO IfClause(IndexEquals,arr[index])
     {
-#IFSWITCH STRUCTNAME==CheckedStack
+#IFSWITCH STRUCTNAME==CheckedList
       ++this.modCount;
 #ENDIF
       OmniArray.Of$ClassPrefix$.removeIndexAndPullDown(arr,index,--size);

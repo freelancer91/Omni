@@ -50,7 +50,7 @@ public abstract interface OmniCollection
   #MACRO PrimitiveSubInterface<double,Double,Double>()
   
 #MACRODEF PrimitiveSubInterface<ARRTYPE,CLASSPREFIX,BOXEDTYPE>()
-public abstract interface OfCLASSPREFIX extends OfPrimitive
+public abstract interface OfCLASSPREFIX extends OfPrimitive,Iterable<BOXEDTYPE>
 {
   public abstract boolean add(boolean val);
   public abstract boolean add(BOXEDTYPE val);
@@ -205,7 +205,7 @@ public abstract interface OfCLASSPREFIX extends OfPrimitive
 }
 #ENDDEF
   
-  public abstract interface OfRef<E> extends OmniCollection
+  public abstract interface OfRef<E> extends OmniCollection,Iterable<E>
   {
     public abstract boolean add(E val);
     public abstract void forEach(Consumer<? super E> action);

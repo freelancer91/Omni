@@ -96,7 +96,7 @@ public void testsemicheckedSelfCopyARRTYPE()
     ARRTYPE[] src=new ARRTYPE[srcLength];
     if(srcLength!=0)
     {
-      ARRTYPEArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+      ARRTYPETestDataBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
     }
     int copyLength,srcOffset,dstOffset;
     if(srcLength>5)
@@ -163,7 +163,7 @@ public void testSemiCheckedCopySRCDST()
     SRC[] src=new SRC[srcLength];
     if(srcLength!=0)
     {
-      PRIMITIVEArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+      PRIMITIVETestDataBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
     }
     int dstLength=RandomUtil.randomIntBetween(srcLength,srcLength+1000,rand);
     DST[] dst=new DST[dstLength];
@@ -193,7 +193,7 @@ public void testSemiCheckedReverseCopySRCDST()
     SRC[] src=new SRC[srcLength];
     if(srcLength!=0)
     {
-      PRIMITIVEArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+      PRIMITIVETestDataBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
     }
     int dstLength=RandomUtil.randomIntBetween(srcLength,srcLength+1000,rand);
     DST[] dst=new DST[dstLength];

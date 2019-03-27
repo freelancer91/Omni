@@ -5,7 +5,7 @@ import omni.impl.seq.BooleanArrSeq.UncheckedList;
 import omni.impl.seq.BooleanArrSeq.CheckedList;
 import omni.impl.seq.BooleanArrSeq.UncheckedStack;
 import omni.impl.seq.BooleanArrSeq.CheckedStack;
-import omni.api.QueryTestUtil;
+import omni.impl.QueryTestUtil;
 public class BooleanArrSeqQueryTest
 {
   //TODO place sanity checks for checked sequence modification behavior

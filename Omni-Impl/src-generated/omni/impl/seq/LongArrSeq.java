@@ -2795,6 +2795,7 @@ public abstract class LongArrSeq implements OmniCollection.OfLong
         val==arr[index]
         )
         {
+          ++this.modCount;
           OmniArray.OfLong.removeIndexAndPullDown(arr,index,--size);
           this.size=size;
           return true;

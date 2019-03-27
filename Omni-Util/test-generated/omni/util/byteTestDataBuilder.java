@@ -1,7 +1,7 @@
 package omni.util;
 import java.util.Collection;
 import java.util.Random;
-public enum byteArrayBuilder
+public enum byteTestDataBuilder
 {
   Randomized
   {
@@ -644,7 +644,7 @@ public enum byteArrayBuilder
   @Override
   public String toString()
   {
-    return "byteArrayBuilder."+this.name();
+    return "byteTestDataBuilder."+this.name();
   }
   public void addArrays(long randSeed,int arrLength,Collection<byte[]> arrays)
   {

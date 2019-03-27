@@ -5,7 +5,7 @@ import omni.impl.seq.DoubleArrSeq.UncheckedList;
 import omni.impl.seq.DoubleArrSeq.CheckedList;
 import omni.impl.seq.DoubleArrSeq.UncheckedStack;
 import omni.impl.seq.DoubleArrSeq.CheckedStack;
-import omni.api.QueryTestUtil;
+import omni.impl.QueryTestUtil;
 public class DoubleArrSeqQueryTest
 {
   //TODO place sanity checks for checked sequence modification behavior

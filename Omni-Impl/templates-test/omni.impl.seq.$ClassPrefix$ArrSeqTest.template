@@ -17,13 +17,10 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import java.util.function.IntFunction;
 import java.util.function.Consumer;
-import java.util.function.Predicate;
 #IF OfInt,OfLong,OfDouble
 import java.util.function.$TypeNameModifier$Consumer;
-import java.util.function.$TypeNameModifier$Predicate;
 #ELSEIFNOT OfRef
 import omni.function.$TypeNameModifier$Consumer;
-import omni.function.$TypeNameModifier$Predicate;
 #ENDIF
 import java.util.ConcurrentModificationException;
 import omni.util.OmniArray;
@@ -40,7 +37,6 @@ public class $ClassPrefix$ArrSeqTest{
   #MACRO StructImpl<CheckedList>()
   
  
-<<<<<<< HEAD
   #MACRO SubListImpl<Checked>()
   #MACRO SubListImpl<Unchecked>()
 
@@ -49,7 +45,7 @@ public class $ClassPrefix$ArrSeqTest{
 #MACRODEF SubListImpl<CHECKED>()
 @Test
 public void testCHECKEDSubListsize(){
-  var root=new CHECKEDList();
+  var root=new $ClassPrefix$ArrSeq.CHECKEDList();
   var parent=root.subList(0,0);
   var seq=parent.subList(0,0);
   Assertions.assertEquals(0,seq.size());
@@ -58,7 +54,7 @@ public void testCHECKEDSubListsize(){
     seq.add(TypeConversionUtil.convertTo$ArrayType$(i));
     Assertions.assertEquals(i+1,seq.size());
   }
-#IFSWTICH CHECKED==Checked
+#IFSWITCH CHECKED==Checked
   parent.add(TypeConversionUtil.convertTo$ArrayType$(0));
   Assertions.assertThrows(ConcurrentModificationException.class,seq::size);
   root.add(TypeConversionUtil.convertTo$ArrayType$(0));
@@ -67,7 +63,7 @@ public void testCHECKEDSubListsize(){
 }
 @Test
 public void testCHECKEDSubListisEmpty(){
-  var root=new CHECKEDList();
+  var root=new $ClassPrefix$ArrSeq.CHECKEDList();
   var parent=root.subList(0,0);
   var seq=parent.subList(0,0);
   Assertions.assertTrue(seq.isEmpty());
@@ -84,7 +80,7 @@ public void testCHECKEDSubListisEmpty(){
     seqItr.remove();
   }
   Assertions.assertTrue(seq.isEmpty());
-#IFSWTICH CHECKED==Checked
+#IFSWITCH CHECKED==Checked
   parent.add(TypeConversionUtil.convertTo$ArrayType$(0));
   Assertions.assertThrows(ConcurrentModificationException.class,seq::isEmpty);
   root.add(TypeConversionUtil.convertTo$ArrayType$(0));
@@ -94,12 +90,7 @@ public void testCHECKEDSubListisEmpty(){
 
 #ENDDEF
 
-  
-=======
 
-
->>>>>>> branch 'master' of https://github.com/freelancer91/Omni.git
-  
 #MACRODEF StructImpl<STRUCTNAME>()
 #MACRO TestConstructor<DEFAULT>()
 #MACRO TestConstructor<NULL>()
@@ -113,10 +104,8 @@ public void testCHECKEDSubListisEmpty(){
 #MACRO TestClone<10>()
 #MACRO TestMiscMethods<DEFAULT>()
 #MACRO TestForEachMethods<DEFAULT>(,)
-#MACRO TestRemoveIfMethods<DEFAULT,>()
 #IFNOT OfRef
 #MACRO TestForEachMethods<DEFAULT>($TypeNameModifier$,)
-#MACRO TestRemoveIfMethods<DEFAULT,$TypeNameModifier$>()
 #ENDIF
 #MACRO TestInputMethods<DEFAULT>($ArrayType$,$ArrayType$)
 #MACRO TestInputMethods<NULL>($ArrayType$,$ArrayType$)
@@ -206,400 +195,8 @@ public void testCHECKEDSubListisEmpty(){
 #ENDIF
 #ENDDEF
 }
-#MACRODEF VerifyBooleanRemoveIfNonModHelper(INITVAL,LENGTH)
-currVal=INITVAL;
-trueCount=0;
-falseCount=0;
-for(int i=0;;){
-  Assertions.assertEquals(currVal,seq.arr[i]);
-  if(currVal){
-    ++trueCount;
-  }else{
-    ++falseCount;
-  }
-  if((trueCount+falseCount)==LENGTH){
-    break;
-  }
-  if(((++i)%period)==0){
-    currVal=!currVal;
-  }
-}
-#ENDDEF
-#MACRODEF VerifyBooleanRemoveIfNonMod(INITVAL,LENGTH)
-Assertions.assertEquals(LENGTH,seq.size());
-#MACRO VerifyBooleanRemoveIfNonModHelper(INITVAL,LENGTH)
-if(falseCount!=LENGTH && trueCount!=LENGTH){
-  Assertions.assertEquals(LENGTH+4,seq.modCount);
-  Assertions.assertEquals(2,filter.callCount);
-}else{
-  Assertions.assertEquals(LENGTH+2,seq.modCount);
-  Assertions.assertEquals(1,filter.callCount);
-}
-#ENDDEF
-#MACRODEF InitNonBooleanRemoveIf(LENGTH)
-#MACRO ConstructionRoutine()
-for(int i=0;i<LENGTH;++i){
-  seq.add(TypeConversionUtil.convertTo$ArrayType$(i));
-}
-#ENDDEF
-#MACRODEF InitBooleanRemoveIf(INITVAL,LENGTH)
-#MACRO ConstructionRoutine()
-boolean currVal=INITVAL;
-int trueCount=0;
-int falseCount=0;
-for(int i=0;;){
-  seq.add(currVal);
-  if(currVal){
-    ++trueCount;
-  }else{
-    ++falseCount;
-  }
-  if((trueCount+falseCount)==LENGTH){
-    break;
-  }
-  if(((++i)%period)==0){
-    currVal=!currVal;
-  }
-}
-#ENDDEF
-#MACRODEF BooleanRemoveIfNonEmptyRemoveTrue(FIRSTVAL)
-@Test
-public void testSTRUCTNAMEremoveIf_OUTPUTMODIFIERPredicate_FirstValFIRSTVAL_RemoveTrue(){
-  for(int period=1;period<=10;++period){
-    #MACRO InitBooleanRemoveIf(FIRSTVAL,10)
-    var filter=new $ClassPrefix$MonitoredPredicate2.RemoveTruePredicate();
-    Assertions.assertEquals(trueCount!=0,seq.removeIf((OUTPUTMODIFIERPredicate)filter));
-    Assertions.assertEquals(falseCount,seq.size());
-    for(int i=0;i<falseCount;++i){
-      Assertions.assertFalse(seq.arr[i]);
-    }
-    Assertions.assertEquals(falseCount==0||trueCount==0?1:2,filter.callCount);
-#IFSWITCH STRUCTNAME==CheckedList,CheckedStack
-    Assertions.assertEquals(trueCount==0?10:11,seq.modCount);
-#ENDIF
-  }
-}
-#ENDDEF
-#MACRODEF BooleanRemoveIfNonEmptyRemoveFalse(FIRSTVAL)
-@Test
-public void testSTRUCTNAMEremoveIf_OUTPUTMODIFIERPredicate_FirstValFIRSTVAL_RemoveFalse(){
-  for(int period=1;period<=10;++period){
-    #MACRO InitBooleanRemoveIf(FIRSTVAL,10)
-    var filter=new $ClassPrefix$MonitoredPredicate2.RemoveFalsePredicate();
-    Assertions.assertEquals(falseCount!=0,seq.removeIf((OUTPUTMODIFIERPredicate)filter));
-    Assertions.assertEquals(trueCount,seq.size());
-    for(int i=0;i<trueCount;++i){
-      Assertions.assertTrue(seq.arr[i]);
-    }
-    Assertions.assertEquals(falseCount==0||trueCount==0?1:2,filter.callCount);
-#IFSWITCH STRUCTNAME==CheckedList,CheckedStack
-    Assertions.assertEquals(falseCount==0?10:11,seq.modCount);
-#ENDIF
-  }
-}
-#ENDDEF
-#MACRODEF BooleanRemoveIfNonEmptyRemoveAll(FIRSTVAL)
-@Test
-public void testSTRUCTNAMEremoveIf_OUTPUTMODIFIERPredicate_FirstValFIRSTVAL_RemoveAll(){
-  for(int period=1;period<=10;++period){
-    #MACRO InitBooleanRemoveIf(FIRSTVAL,10)
-    var filter=new $ClassPrefix$MonitoredPredicate2.RemoveAllPredicate();
-    Assertions.assertTrue(seq.removeIf((OUTPUTMODIFIERPredicate)filter));
-    Assertions.assertEquals(0,seq.size());
-    Assertions.assertEquals(falseCount==0||trueCount==0?1:2,filter.callCount);
-#IFSWITCH STRUCTNAME==CheckedList,CheckedStack
-    Assertions.assertEquals(11,seq.modCount);
-#ENDIF
-  }
-}
-#ENDDEF
-#MACRODEF BooleanRemoveIfNonEmptyRemoveNone(FIRSTVAL)
-@Test
-public void testSTRUCTNAMEremoveIf_OUTPUTMODIFIERPredicate_FirstValFIRSTVAL_RemoveNone(){
-  for(int period=1;period<=10;++period){
-    #MACRO InitBooleanRemoveIf(FIRSTVAL,10)
-    var filter=new $ClassPrefix$MonitoredPredicate2.RemoveNonePredicate();
-    Assertions.assertFalse(seq.removeIf((OUTPUTMODIFIERPredicate)filter));
-    Assertions.assertEquals(10,seq.size());
-    Assertions.assertEquals(falseCount==0||trueCount==0?1:2,filter.callCount);
-    #MACRO VerifyBooleanRemoveIfNonModHelper(FIRSTVAL,10)
-#IFSWITCH STRUCTNAME==CheckedList,CheckedStack
-    Assertions.assertEquals(10,seq.modCount);
-#ENDIF
-  }
-}
-#ENDDEF
-#MACRODEF TestRemoveIfMethods<INITIALCAPACITY,OUTPUTMODIFIER>()
-#IF OfBoolean
-#MACRO EmptyRemoveIfTest<false>(RemoveTruePredicate)
-#MACRO EmptyRemoveIfTest<false>(RemoveFalsePredicate)
-#MACRO BooleanRemoveIfNonEmptyRemoveTrue(true)
-#MACRO BooleanRemoveIfNonEmptyRemoveTrue(false)
-#MACRO BooleanRemoveIfNonEmptyRemoveFalse(true)
-#MACRO BooleanRemoveIfNonEmptyRemoveFalse(false)
-#MACRO BooleanRemoveIfNonEmptyRemoveAll(true)
-#MACRO BooleanRemoveIfNonEmptyRemoveAll(false)
-#MACRO BooleanRemoveIfNonEmptyRemoveNone(true)
-#MACRO BooleanRemoveIfNonEmptyRemoveNone(false)
-  #IFSWITCH STRUCTNAME==CheckedList,CheckedStack
-#MACRO TestRemoveIfBooleanNonEmptyModding(true,RemoveTrueArrSeqSTRUCTNAMEModifyingPredicate)
-#MACRO TestRemoveIfBooleanNonEmptyModding(true,RemoveFalseArrSeqSTRUCTNAMEModifyingPredicate)
-#MACRO TestRemoveIfBooleanNonEmptyModding(false,RemoveTrueArrSeqSTRUCTNAMEModifyingPredicate)
-#MACRO TestRemoveIfBooleanNonEmptyModding(false,RemoveFalseArrSeqSTRUCTNAMEModifyingPredicate)
-#MACRO TestRemoveIfBooleanNonEmptyModding(true,RemoveNoneArrSeqSTRUCTNAMEModifyingPredicate)
-#MACRO TestRemoveIfBooleanNonEmptyModding(true,RemoveAllArrSeqSTRUCTNAMEModifyingPredicate)
-#MACRO TestRemoveIfBooleanNonEmptyModding(false,RemoveNoneArrSeqSTRUCTNAMEModifyingPredicate)
-#MACRO TestRemoveIfBooleanNonEmptyModding(false,RemoveAllArrSeqSTRUCTNAMEModifyingPredicate)
-#MACRO TestRemoveIfBooleanNonEmptyThrowing(true)
-#MACRO TestRemoveIfBooleanNonEmptyThrowing(false)
-#MACRO TestRemoveIfBooleanNonEmptyThrowAndMod(false)
-#MACRO TestRemoveIfBooleanNonEmptyThrowAndMod(true)
-#MACRO EmptyRemoveIfTest<false>(RemoveTrueArrSeqSTRUCTNAMEModifyingPredicate)
-#MACRO EmptyRemoveIfTest<false>(RemoveFalseArrSeqSTRUCTNAMEModifyingPredicate)
-  #ENDIF
-#ELSE
-  #IFSWITCH STRUCTNAME==CheckedList,CheckedStack
-#MACRO EmptyRemoveIfTest<false>(RetainSecondArrSeqSTRUCTNAMEModifyingPredicate)
-#MACRO EmptyRemoveIfTest<false>(RetainSecondAndLastArrSeqSTRUCTNAMEModifyingPredicate)
-#MACRO EmptyRemoveIfTest<false>(RemoveFirstAndThirdArrSeqSTRUCTNAMEModifyingPredicate)
-#MACRO EmptyRemoveIfTest<false>(RemoveFirstArrSeqSTRUCTNAMEModifyingPredicate)
-#MACRO EmptyRemoveIfTest<false>(RemoveFirstAndSecondToLastArrSeqSTRUCTNAMEModifyingPredicate)
-#MACRO CheckedModdingNonEmptyNonBooleanRemoveIfTests(3)
-#MACRO CheckedModdingNonEmptyNonBooleanRemoveIfTests(50)
-#MACRO CheckedModdingNonEmptyNonBooleanRemoveIfTests(100)
-  #ENDIF
-#MACRO EmptyRemoveIfTest<false>(RetainSecondPredicate)
-#MACRO EmptyRemoveIfTest<true>(RetainSecondAndLastPredicate)
-#MACRO EmptyRemoveIfTest<false>(RemoveFirstAndThirdPredicate)
-#MACRO EmptyRemoveIfTest<false>(RemoveFirstPredicate)
-#MACRO EmptyRemoveIfTest<true>(RemoveFirstAndSecondToLastPredicate)  
-#MACRO NonCheckedNonEmptyNonBooleanRemoveIfTests(3)
-#MACRO NonCheckedNonEmptyNonBooleanRemoveIfTests(50)
-#MACRO NonCheckedNonEmptyNonBooleanRemoveIfTests(100)
-#ENDIF
-#MACRO EmptyRemoveIfTest<false>(RemoveAllPredicate)
-#MACRO EmptyRemoveIfTest<false>(RemoveNonePredicate)
-#IFSWITCH STRUCTNAME==CheckedList,CheckedStack
-#MACRO EmptyRemoveIfTest<false>(RemoveAllArrSeqSTRUCTNAMEModifyingPredicate)
-#MACRO EmptyRemoveIfTest<false>(RemoveNoneArrSeqSTRUCTNAMEModifyingPredicate)
-#MACRO EmptyRemoveIfTest<false>(ThrowingPredicate)
-#MACRO EmptyRemoveIfTest<false>(ModifyingArrSeqSTRUCTNAMEAndThrowingPredicate)
-#ENDIF
-#ENDDEF
-#MACRODEF TestRemoveIfBooleanNonEmptyThrowing(FIRSTVAL)
-@Test
-public void testSTRUCTNAMEremoveIf_OUTPUTMODIFIERPredicate_FirstValFIRSTVAL_Throwing(){
-  for(int period=1;period<=10;++period){
-    #MACRO InitBooleanRemoveIf(FIRSTVAL,10)
-    var filter=new $ClassPrefix$MonitoredPredicate2.ThrowingPredicate();
-    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.removeIf((OUTPUTMODIFIERPredicate)filter));
-    Assertions.assertEquals(10,seq.size());
-    #MACRO VerifyBooleanRemoveIfNonModHelper(FIRSTVAL,10)
-    Assertions.assertEquals(10,seq.modCount);
-    Assertions.assertEquals(1,filter.callCount);
-  }
-}
-#ENDDEF
-#MACRODEF TestRemoveIfBooleanNonEmptyThrowAndMod(FIRSTVAL)
-@Test
-public void testSTRUCTNAMEremoveIf_OUTPUTMODIFIERPredicate_FirstValFIRSTVAL_ThrowAndMod(){
-  for(int period=1;period<=10;++period){
-    #MACRO InitBooleanRemoveIf(FIRSTVAL,10)
-    var filter=new $ClassPrefix$MonitoredPredicate2.ModifyingArrSeqSTRUCTNAMEAndThrowingPredicate(seq);
-    Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((OUTPUTMODIFIERPredicate)filter));
-    Assertions.assertEquals(11,seq.size());
-    #MACRO VerifyBooleanRemoveIfNonModHelper(FIRSTVAL,10)
-    Assertions.assertEquals(FIRSTVAL,seq.arr[10]);
-    Assertions.assertEquals(10+1,seq.modCount);
-    Assertions.assertEquals(1,filter.callCount);
-  }
-}
-#ENDDEF
-#MACRODEF TestRemoveIfBooleanNonEmptyModding(FIRSTVAL,PREDICATETYPE)
-@Test
-public void testSTRUCTNAMEremoveIf_OUTPUTMODIFIERPredicate_FirstValFIRSTVAL_PREDICATETYPE(){
-  for(int period=1;period<=10;++period){
-    #MACRO InitBooleanRemoveIf(FIRSTVAL,10)
-    var filter=new $ClassPrefix$MonitoredPredicate2.PREDICATETYPE(seq);
-    Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((OUTPUTMODIFIERPredicate)filter));
-    #MACRO VerifyBooleanRemoveIfNonMod(FIRSTVAL,10)
-  }
-}
-#ENDDEF
-#MACRODEF EmptyRemoveIfTest<USESIZEPARAMETER>(PREDICATETYPE)
-@Test
-public void testSTRUCTNAMEremoveIf_OUTPUTMODIFIERPredicate_SeqIsEmpty_PREDICATETYPE()
-{
-  #MACRO InitNonBooleanRemoveIf(0)
-#IFSWITCH USESIZEPARAMETER==true
-  var filter=new $ClassPrefix$MonitoredPredicate2.PREDICATETYPE(seq.size);
-#ELSE
-  var filter=new $ClassPrefix$MonitoredPredicate2.PREDICATETYPE(seq);
-#ENDIF
-  Assertions.assertFalse(seq.removeIf((OUTPUTMODIFIERPredicate)filter));
-  Assertions.assertEquals(0,seq.size());
-  Assertions.assertEquals(0,filter.callCount);
-#IFSWITCH STRUCTNAME==CheckedList,CheckedStack
-  Assertions.assertEquals(0,seq.modCount);
-#ENDIF
-}
-#ENDDEF
-#MACRODEF NonCheckedNonEmptyNonBooleanRemoveIfTests(LENGTH)
-@Test
-public void testSTRUCTNAMEremoveIf_OUTPUTMODIFIERPredicate_SeqSizeLENGTH_RemoveAll(){
-  #MACRO InitNonBooleanRemoveIf(LENGTH)
-  var filter=new $ClassPrefix$MonitoredPredicate2.RemoveAllPredicate();
-  Assertions.assertTrue(seq.removeIf((OUTPUTMODIFIERPredicate)filter));
-  Assertions.assertEquals(0,seq.size());
-  filter.verifyArray(seq.arr,0,LENGTH);
-  Assertions.assertEquals(LENGTH,filter.callCount);
-}
-@Test
-public void testSTRUCTNAMEremoveIf_OUTPUTMODIFIERPredicate_SeqSizeLENGTH_RemoveNone(){
-  #MACRO InitNonBooleanRemoveIf(LENGTH)
-  var filter=new $ClassPrefix$MonitoredPredicate2.RemoveNonePredicate();
-  Assertions.assertFalse(seq.removeIf((OUTPUTMODIFIERPredicate)filter));
-  Assertions.assertEquals(LENGTH,seq.size());
-  filter.verifyArray(seq.arr,0,LENGTH);
-  Assertions.assertEquals(LENGTH,filter.callCount);
-}
-@Test
-public void testSTRUCTNAMEremoveIf_OUTPUTMODIFIERPredicate_SeqSizeLENGTH_RetainSecond(){
-  #MACRO InitNonBooleanRemoveIf(LENGTH)
-  var filter=new $ClassPrefix$MonitoredPredicate2.RetainSecondPredicate();
-  Assertions.assertTrue(seq.removeIf((OUTPUTMODIFIERPredicate)filter));
-  Assertions.assertEquals(1,seq.size());
-  filter.verifyArray(seq.arr,0,LENGTH);
-  Assertions.assertEquals(LENGTH,filter.callCount);
-}
-@Test
-public void testSTRUCTNAMEremoveIf_OUTPUTMODIFIERPredicate_SeqSizeLENGTH_RetainSecondAndLast(){
-  #MACRO InitNonBooleanRemoveIf(LENGTH)
-  var filter=new $ClassPrefix$MonitoredPredicate2.RetainSecondAndLastPredicate(seq.size);
-  Assertions.assertTrue(seq.removeIf((OUTPUTMODIFIERPredicate)filter));
-  Assertions.assertEquals(2,seq.size());
-  filter.verifyArray(seq.arr,0,LENGTH);
-  Assertions.assertEquals(LENGTH,filter.callCount);
-}
-@Test
-public void testSTRUCTNAMEremoveIf_OUTPUTMODIFIERPredicate_SeqSizeLENGTH_RemoveFirstAndThird(){
-  #MACRO InitNonBooleanRemoveIf(LENGTH)
-  var filter=new $ClassPrefix$MonitoredPredicate2.RemoveFirstAndThirdPredicate();
-  Assertions.assertTrue(seq.removeIf((OUTPUTMODIFIERPredicate)filter));
-  Assertions.assertEquals(LENGTH-2,seq.size());
-  filter.verifyArray(seq.arr,0,LENGTH);
-  Assertions.assertEquals(LENGTH,filter.callCount);
-}
-@Test
-public void testSTRUCTNAMEremoveIf_OUTPUTMODIFIERPredicate_SeqSizeLENGTH_RemoveFirst(){
-  #MACRO InitNonBooleanRemoveIf(LENGTH)
-  var filter=new $ClassPrefix$MonitoredPredicate2.RemoveFirstPredicate();
-  Assertions.assertTrue(seq.removeIf((OUTPUTMODIFIERPredicate)filter));
-  Assertions.assertEquals(LENGTH-1,seq.size());
-  filter.verifyArray(seq.arr,0,LENGTH);
-  Assertions.assertEquals(LENGTH,filter.callCount);
-}
-@Test
-public void testSTRUCTNAMEremoveIf_OUTPUTMODIFIERPredicate_SeqSizeLENGTH_RemoveFirstAndSecondToLast(){
-  #MACRO InitNonBooleanRemoveIf(LENGTH)
-  var filter=new $ClassPrefix$MonitoredPredicate2.RemoveFirstAndSecondToLastPredicate(seq.size);
-  Assertions.assertTrue(seq.removeIf((OUTPUTMODIFIERPredicate)filter));
-  Assertions.assertEquals(LENGTH-2,seq.size());
-  filter.verifyArray(seq.arr,0,LENGTH);
-  Assertions.assertEquals(LENGTH,filter.callCount);
-}
-#ENDDEF
-#MACRODEF CheckedModdingNonEmptyNonBooleanRemoveIfTests(LENGTH)
-public void testSTRUCTNAMEremoveIf_OUTPUTMODIFIERPredicate_SeqSizeLENGTH_ThrowAndMod(){
-  #MACRO InitNonBooleanRemoveIf(LENGTH)
-  var filter=new $ClassPrefix$MonitoredPredicate2.ModifyingArrSeqSTRUCTNAMEAndThrowingPredicate(seq);
-  Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((OUTPUTMODIFIERPredicate)filter));
-  Assertions.assertEquals(LENGTH+1,seq.size());
-  filter.verifyArray(seq.arr,0,LENGTH);
-  Assertions.assertEquals(1,filter.callCount);
-  Assertions.assertEquals(LENGTH+1,seq.modCount);
-}
-@Test
-public void testSTRUCTNAMEremoveIf_OUTPUTMODIFIERPredicate_SeqSizeLENGTH_Throwing(){
-  #MACRO InitNonBooleanRemoveIf(LENGTH)
-  var filter=new $ClassPrefix$MonitoredPredicate2.ThrowingPredicate();
-  Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.removeIf((OUTPUTMODIFIERPredicate)filter));
-  Assertions.assertEquals(LENGTH,seq.size());
-  filter.verifyArray(seq.arr,0,LENGTH);
-  Assertions.assertEquals(1,filter.callCount);
-  Assertions.assertEquals(LENGTH,seq.modCount);
-}
-@Test
-public void testSTRUCTNAMEremoveIf_OUTPUTMODIFIERPredicate_SeqSizeLENGTH_RemoveAllMod(){
-  #MACRO InitNonBooleanRemoveIf(LENGTH)
-  var filter=new $ClassPrefix$MonitoredPredicate2.RemoveAllArrSeqSTRUCTNAMEModifyingPredicate(seq);
-  Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((OUTPUTMODIFIERPredicate)filter));
-  Assertions.assertEquals(LENGTH,seq.size());
-  filter.verifyArray(seq.arr,0,LENGTH);
-  Assertions.assertEquals(LENGTH,filter.callCount);
-  Assertions.assertEquals(LENGTH*3,seq.modCount);
-}
-@Test
-public void testSTRUCTNAMEremoveIf_OUTPUTMODIFIERPredicate_SeqSizeLENGTH_RemoveNoneMod(){
-  #MACRO InitNonBooleanRemoveIf(LENGTH)
-  var filter=new $ClassPrefix$MonitoredPredicate2.RemoveNoneArrSeqSTRUCTNAMEModifyingPredicate(seq);
-  Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((OUTPUTMODIFIERPredicate)filter));
-  Assertions.assertEquals(LENGTH,seq.size());
-  filter.verifyArray(seq.arr,0,LENGTH);
-  Assertions.assertEquals(LENGTH,filter.callCount);
-  Assertions.assertEquals(LENGTH*3,seq.modCount);
-}
-@Test
-public void testSTRUCTNAMEremoveIf_OUTPUTMODIFIERPredicate_SeqSizeLENGTH_RetainSecondMod(){
-  #MACRO InitNonBooleanRemoveIf(LENGTH)
-  var filter=new $ClassPrefix$MonitoredPredicate2.RetainSecondArrSeqSTRUCTNAMEModifyingPredicate(seq);
-  Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((OUTPUTMODIFIERPredicate)filter));
-  Assertions.assertEquals(LENGTH,seq.size());
-  filter.verifyArray(seq.arr,0,LENGTH);
-  Assertions.assertEquals(LENGTH,filter.callCount);
-  Assertions.assertEquals(LENGTH*3,seq.modCount);
-}
-@Test
-public void testSTRUCTNAMEremoveIf_OUTPUTMODIFIERPredicate_SeqSizeLENGTH_RetainSecondAndLastMod(){
-  #MACRO InitNonBooleanRemoveIf(LENGTH)
-  var filter=new $ClassPrefix$MonitoredPredicate2.RetainSecondAndLastArrSeqSTRUCTNAMEModifyingPredicate(seq);
-  Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((OUTPUTMODIFIERPredicate)filter));
-  Assertions.assertEquals(LENGTH,seq.size());
-  filter.verifyArray(seq.arr,0,LENGTH);
-  Assertions.assertEquals(LENGTH,filter.callCount);
-  Assertions.assertEquals(LENGTH*3,seq.modCount);
-}
-@Test
-public void testSTRUCTNAMEremoveIf_OUTPUTMODIFIERPredicate_SeqSizeLENGTH_RemoveFirstAndThirdMod(){
-  #MACRO InitNonBooleanRemoveIf(LENGTH)
-  var filter=new $ClassPrefix$MonitoredPredicate2.RemoveFirstAndThirdArrSeqSTRUCTNAMEModifyingPredicate(seq);
-  Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((OUTPUTMODIFIERPredicate)filter));
-  Assertions.assertEquals(LENGTH,seq.size());
-  filter.verifyArray(seq.arr,0,LENGTH);
-  Assertions.assertEquals(LENGTH,filter.callCount);
-  Assertions.assertEquals(LENGTH*3,seq.modCount);
-}
-@Test
-public void testSTRUCTNAMEremoveIf_OUTPUTMODIFIERPredicate_SeqSizeLENGTH_RemoveFirstMod(){
-  #MACRO InitNonBooleanRemoveIf(LENGTH)
-  var filter=new $ClassPrefix$MonitoredPredicate2.RemoveFirstArrSeqSTRUCTNAMEModifyingPredicate(seq);
-  Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((OUTPUTMODIFIERPredicate)filter));
-  Assertions.assertEquals(LENGTH,seq.size());
-  filter.verifyArray(seq.arr,0,LENGTH);
-  Assertions.assertEquals(LENGTH,filter.callCount);
-  Assertions.assertEquals(LENGTH*3,seq.modCount);
-}
-@Test
-public void testSTRUCTNAMEremoveIf_OUTPUTMODIFIERPredicate_SeqSizeLENGTH_RemoveFirstAndSecondToLastMod(){
-  #MACRO InitNonBooleanRemoveIf(LENGTH)
-  var filter=new $ClassPrefix$MonitoredPredicate2.RemoveFirstAndSecondToLastArrSeqSTRUCTNAMEModifyingPredicate(seq);
-  Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf((OUTPUTMODIFIERPredicate)filter));
-  Assertions.assertEquals(LENGTH,seq.size());
-  filter.verifyArray(seq.arr,0,LENGTH);
-  Assertions.assertEquals(LENGTH,filter.callCount);
-  Assertions.assertEquals(LENGTH*3,seq.modCount);
-}
-#ENDDEF
+
+
 #MACRODEF TestForEachMethods<INITIALCAPACITY>(OUTPUTMODIFIER,dummy)
 @Test
 public void testSTRUCTNAMEforEach_OUTPUTMODIFIERConsumer_SeqIsEmpty_NoMod(){

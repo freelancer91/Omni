@@ -13,7 +13,7 @@ public class ArrCopyTest
         boolean[] src=new boolean[srcLength];
         if(srcLength!=0)
         {
-          booleanArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+          booleanTestDataBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
         }
         int dstLength=RandomUtil.randomIntBetween(srcLength,srcLength+1000,rand);
         Boolean[] dst=new Boolean[dstLength];
@@ -37,7 +37,7 @@ public class ArrCopyTest
         boolean[] src=new boolean[srcLength];
         if(srcLength!=0)
         {
-          booleanArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+          booleanTestDataBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
         }
         int dstLength=RandomUtil.randomIntBetween(srcLength,srcLength+1000,rand);
         Boolean[] dst=new Boolean[dstLength];
@@ -61,7 +61,7 @@ public class ArrCopyTest
         byte[] src=new byte[srcLength];
         if(srcLength!=0)
         {
-          byteArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+          byteTestDataBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
         }
         int dstLength=RandomUtil.randomIntBetween(srcLength,srcLength+1000,rand);
         Byte[] dst=new Byte[dstLength];
@@ -85,7 +85,7 @@ public class ArrCopyTest
         byte[] src=new byte[srcLength];
         if(srcLength!=0)
         {
-          byteArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+          byteTestDataBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
         }
         int dstLength=RandomUtil.randomIntBetween(srcLength,srcLength+1000,rand);
         Byte[] dst=new Byte[dstLength];
@@ -109,7 +109,7 @@ public class ArrCopyTest
         char[] src=new char[srcLength];
         if(srcLength!=0)
         {
-          charArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+          charTestDataBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
         }
         int dstLength=RandomUtil.randomIntBetween(srcLength,srcLength+1000,rand);
         Character[] dst=new Character[dstLength];
@@ -133,7 +133,7 @@ public class ArrCopyTest
         char[] src=new char[srcLength];
         if(srcLength!=0)
         {
-          charArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+          charTestDataBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
         }
         int dstLength=RandomUtil.randomIntBetween(srcLength,srcLength+1000,rand);
         Character[] dst=new Character[dstLength];
@@ -157,7 +157,7 @@ public class ArrCopyTest
         short[] src=new short[srcLength];
         if(srcLength!=0)
         {
-          shortArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+          shortTestDataBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
         }
         int dstLength=RandomUtil.randomIntBetween(srcLength,srcLength+1000,rand);
         Short[] dst=new Short[dstLength];
@@ -181,7 +181,7 @@ public class ArrCopyTest
         short[] src=new short[srcLength];
         if(srcLength!=0)
         {
-          shortArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+          shortTestDataBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
         }
         int dstLength=RandomUtil.randomIntBetween(srcLength,srcLength+1000,rand);
         Short[] dst=new Short[dstLength];
@@ -205,7 +205,7 @@ public class ArrCopyTest
         int[] src=new int[srcLength];
         if(srcLength!=0)
         {
-          intArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+          intTestDataBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
         }
         int dstLength=RandomUtil.randomIntBetween(srcLength,srcLength+1000,rand);
         Integer[] dst=new Integer[dstLength];
@@ -229,7 +229,7 @@ public class ArrCopyTest
         int[] src=new int[srcLength];
         if(srcLength!=0)
         {
-          intArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+          intTestDataBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
         }
         int dstLength=RandomUtil.randomIntBetween(srcLength,srcLength+1000,rand);
         Integer[] dst=new Integer[dstLength];
@@ -253,7 +253,7 @@ public class ArrCopyTest
         long[] src=new long[srcLength];
         if(srcLength!=0)
         {
-          longArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+          longTestDataBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
         }
         int dstLength=RandomUtil.randomIntBetween(srcLength,srcLength+1000,rand);
         Long[] dst=new Long[dstLength];
@@ -277,7 +277,7 @@ public class ArrCopyTest
         long[] src=new long[srcLength];
         if(srcLength!=0)
         {
-          longArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+          longTestDataBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
         }
         int dstLength=RandomUtil.randomIntBetween(srcLength,srcLength+1000,rand);
         Long[] dst=new Long[dstLength];
@@ -301,7 +301,7 @@ public class ArrCopyTest
         float[] src=new float[srcLength];
         if(srcLength!=0)
         {
-          floatArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+          floatTestDataBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
         }
         int dstLength=RandomUtil.randomIntBetween(srcLength,srcLength+1000,rand);
         Float[] dst=new Float[dstLength];
@@ -325,7 +325,7 @@ public class ArrCopyTest
         float[] src=new float[srcLength];
         if(srcLength!=0)
         {
-          floatArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+          floatTestDataBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
         }
         int dstLength=RandomUtil.randomIntBetween(srcLength,srcLength+1000,rand);
         Float[] dst=new Float[dstLength];
@@ -349,7 +349,7 @@ public class ArrCopyTest
         double[] src=new double[srcLength];
         if(srcLength!=0)
         {
-          doubleArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+          doubleTestDataBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
         }
         int dstLength=RandomUtil.randomIntBetween(srcLength,srcLength+1000,rand);
         Double[] dst=new Double[dstLength];
@@ -373,7 +373,7 @@ public class ArrCopyTest
         double[] src=new double[srcLength];
         if(srcLength!=0)
         {
-          doubleArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+          doubleTestDataBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
         }
         int dstLength=RandomUtil.randomIntBetween(srcLength,srcLength+1000,rand);
         Double[] dst=new Double[dstLength];
@@ -397,7 +397,7 @@ public class ArrCopyTest
         boolean[] src=new boolean[srcLength];
         if(srcLength!=0)
         {
-          booleanArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+          booleanTestDataBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
         }
         int dstLength=RandomUtil.randomIntBetween(srcLength,srcLength+1000,rand);
         Object[] dst=new Object[dstLength];
@@ -421,7 +421,7 @@ public class ArrCopyTest
         boolean[] src=new boolean[srcLength];
         if(srcLength!=0)
         {
-          booleanArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+          booleanTestDataBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
         }
         int dstLength=RandomUtil.randomIntBetween(srcLength,srcLength+1000,rand);
         Object[] dst=new Object[dstLength];
@@ -445,7 +445,7 @@ public class ArrCopyTest
         byte[] src=new byte[srcLength];
         if(srcLength!=0)
         {
-          byteArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+          byteTestDataBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
         }
         int dstLength=RandomUtil.randomIntBetween(srcLength,srcLength+1000,rand);
         Object[] dst=new Object[dstLength];
@@ -469,7 +469,7 @@ public class ArrCopyTest
         byte[] src=new byte[srcLength];
         if(srcLength!=0)
         {
-          byteArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+          byteTestDataBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
         }
         int dstLength=RandomUtil.randomIntBetween(srcLength,srcLength+1000,rand);
         Object[] dst=new Object[dstLength];
@@ -493,7 +493,7 @@ public class ArrCopyTest
         char[] src=new char[srcLength];
         if(srcLength!=0)
         {
-          charArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+          charTestDataBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
         }
         int dstLength=RandomUtil.randomIntBetween(srcLength,srcLength+1000,rand);
         Object[] dst=new Object[dstLength];
@@ -517,7 +517,7 @@ public class ArrCopyTest
         char[] src=new char[srcLength];
         if(srcLength!=0)
         {
-          charArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+          charTestDataBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
         }
         int dstLength=RandomUtil.randomIntBetween(srcLength,srcLength+1000,rand);
         Object[] dst=new Object[dstLength];
@@ -541,7 +541,7 @@ public class ArrCopyTest
         short[] src=new short[srcLength];
         if(srcLength!=0)
         {
-          shortArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+          shortTestDataBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
         }
         int dstLength=RandomUtil.randomIntBetween(srcLength,srcLength+1000,rand);
         Object[] dst=new Object[dstLength];
@@ -565,7 +565,7 @@ public class ArrCopyTest
         short[] src=new short[srcLength];
         if(srcLength!=0)
         {
-          shortArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+          shortTestDataBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
         }
         int dstLength=RandomUtil.randomIntBetween(srcLength,srcLength+1000,rand);
         Object[] dst=new Object[dstLength];
@@ -589,7 +589,7 @@ public class ArrCopyTest
         int[] src=new int[srcLength];
         if(srcLength!=0)
         {
-          intArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+          intTestDataBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
         }
         int dstLength=RandomUtil.randomIntBetween(srcLength,srcLength+1000,rand);
         Object[] dst=new Object[dstLength];
@@ -613,7 +613,7 @@ public class ArrCopyTest
         int[] src=new int[srcLength];
         if(srcLength!=0)
         {
-          intArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+          intTestDataBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
         }
         int dstLength=RandomUtil.randomIntBetween(srcLength,srcLength+1000,rand);
         Object[] dst=new Object[dstLength];
@@ -637,7 +637,7 @@ public class ArrCopyTest
         long[] src=new long[srcLength];
         if(srcLength!=0)
         {
-          longArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+          longTestDataBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
         }
         int dstLength=RandomUtil.randomIntBetween(srcLength,srcLength+1000,rand);
         Object[] dst=new Object[dstLength];
@@ -661,7 +661,7 @@ public class ArrCopyTest
         long[] src=new long[srcLength];
         if(srcLength!=0)
         {
-          longArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+          longTestDataBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
         }
         int dstLength=RandomUtil.randomIntBetween(srcLength,srcLength+1000,rand);
         Object[] dst=new Object[dstLength];
@@ -685,7 +685,7 @@ public class ArrCopyTest
         float[] src=new float[srcLength];
         if(srcLength!=0)
         {
-          floatArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+          floatTestDataBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
         }
         int dstLength=RandomUtil.randomIntBetween(srcLength,srcLength+1000,rand);
         Object[] dst=new Object[dstLength];
@@ -709,7 +709,7 @@ public class ArrCopyTest
         float[] src=new float[srcLength];
         if(srcLength!=0)
         {
-          floatArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+          floatTestDataBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
         }
         int dstLength=RandomUtil.randomIntBetween(srcLength,srcLength+1000,rand);
         Object[] dst=new Object[dstLength];
@@ -733,7 +733,7 @@ public class ArrCopyTest
         double[] src=new double[srcLength];
         if(srcLength!=0)
         {
-          doubleArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+          doubleTestDataBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
         }
         int dstLength=RandomUtil.randomIntBetween(srcLength,srcLength+1000,rand);
         Object[] dst=new Object[dstLength];
@@ -757,7 +757,7 @@ public class ArrCopyTest
         double[] src=new double[srcLength];
         if(srcLength!=0)
         {
-          doubleArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+          doubleTestDataBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
         }
         int dstLength=RandomUtil.randomIntBetween(srcLength,srcLength+1000,rand);
         Object[] dst=new Object[dstLength];
@@ -781,7 +781,7 @@ public class ArrCopyTest
         Boolean[] src=new Boolean[srcLength];
         if(srcLength!=0)
         {
-          booleanArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+          booleanTestDataBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
         }
         int dstLength=RandomUtil.randomIntBetween(srcLength,srcLength+1000,rand);
         boolean[] dst=new boolean[dstLength];
@@ -805,7 +805,7 @@ public class ArrCopyTest
         Boolean[] src=new Boolean[srcLength];
         if(srcLength!=0)
         {
-          booleanArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+          booleanTestDataBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
         }
         int dstLength=RandomUtil.randomIntBetween(srcLength,srcLength+1000,rand);
         boolean[] dst=new boolean[dstLength];
@@ -829,7 +829,7 @@ public class ArrCopyTest
         Byte[] src=new Byte[srcLength];
         if(srcLength!=0)
         {
-          byteArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+          byteTestDataBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
         }
         int dstLength=RandomUtil.randomIntBetween(srcLength,srcLength+1000,rand);
         byte[] dst=new byte[dstLength];
@@ -853,7 +853,7 @@ public class ArrCopyTest
         Byte[] src=new Byte[srcLength];
         if(srcLength!=0)
         {
-          byteArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+          byteTestDataBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
         }
         int dstLength=RandomUtil.randomIntBetween(srcLength,srcLength+1000,rand);
         byte[] dst=new byte[dstLength];
@@ -877,7 +877,7 @@ public class ArrCopyTest
         Character[] src=new Character[srcLength];
         if(srcLength!=0)
         {
-          charArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+          charTestDataBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
         }
         int dstLength=RandomUtil.randomIntBetween(srcLength,srcLength+1000,rand);
         char[] dst=new char[dstLength];
@@ -901,7 +901,7 @@ public class ArrCopyTest
         Character[] src=new Character[srcLength];
         if(srcLength!=0)
         {
-          charArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+          charTestDataBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
         }
         int dstLength=RandomUtil.randomIntBetween(srcLength,srcLength+1000,rand);
         char[] dst=new char[dstLength];
@@ -925,7 +925,7 @@ public class ArrCopyTest
         Short[] src=new Short[srcLength];
         if(srcLength!=0)
         {
-          shortArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+          shortTestDataBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
         }
         int dstLength=RandomUtil.randomIntBetween(srcLength,srcLength+1000,rand);
         short[] dst=new short[dstLength];
@@ -949,7 +949,7 @@ public class ArrCopyTest
         Short[] src=new Short[srcLength];
         if(srcLength!=0)
         {
-          shortArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+          shortTestDataBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
         }
         int dstLength=RandomUtil.randomIntBetween(srcLength,srcLength+1000,rand);
         short[] dst=new short[dstLength];
@@ -973,7 +973,7 @@ public class ArrCopyTest
         Integer[] src=new Integer[srcLength];
         if(srcLength!=0)
         {
-          intArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+          intTestDataBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
         }
         int dstLength=RandomUtil.randomIntBetween(srcLength,srcLength+1000,rand);
         int[] dst=new int[dstLength];
@@ -997,7 +997,7 @@ public class ArrCopyTest
         Integer[] src=new Integer[srcLength];
         if(srcLength!=0)
         {
-          intArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+          intTestDataBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
         }
         int dstLength=RandomUtil.randomIntBetween(srcLength,srcLength+1000,rand);
         int[] dst=new int[dstLength];
@@ -1021,7 +1021,7 @@ public class ArrCopyTest
         Long[] src=new Long[srcLength];
         if(srcLength!=0)
         {
-          longArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+          longTestDataBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
         }
         int dstLength=RandomUtil.randomIntBetween(srcLength,srcLength+1000,rand);
         long[] dst=new long[dstLength];
@@ -1045,7 +1045,7 @@ public class ArrCopyTest
         Long[] src=new Long[srcLength];
         if(srcLength!=0)
         {
-          longArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+          longTestDataBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
         }
         int dstLength=RandomUtil.randomIntBetween(srcLength,srcLength+1000,rand);
         long[] dst=new long[dstLength];
@@ -1069,7 +1069,7 @@ public class ArrCopyTest
         Float[] src=new Float[srcLength];
         if(srcLength!=0)
         {
-          floatArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+          floatTestDataBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
         }
         int dstLength=RandomUtil.randomIntBetween(srcLength,srcLength+1000,rand);
         float[] dst=new float[dstLength];
@@ -1093,7 +1093,7 @@ public class ArrCopyTest
         Float[] src=new Float[srcLength];
         if(srcLength!=0)
         {
-          floatArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+          floatTestDataBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
         }
         int dstLength=RandomUtil.randomIntBetween(srcLength,srcLength+1000,rand);
         float[] dst=new float[dstLength];
@@ -1117,7 +1117,7 @@ public class ArrCopyTest
         Double[] src=new Double[srcLength];
         if(srcLength!=0)
         {
-          doubleArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+          doubleTestDataBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
         }
         int dstLength=RandomUtil.randomIntBetween(srcLength,srcLength+1000,rand);
         double[] dst=new double[dstLength];
@@ -1141,7 +1141,7 @@ public class ArrCopyTest
         Double[] src=new Double[srcLength];
         if(srcLength!=0)
         {
-          doubleArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+          doubleTestDataBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
         }
         int dstLength=RandomUtil.randomIntBetween(srcLength,srcLength+1000,rand);
         double[] dst=new double[dstLength];
@@ -1165,7 +1165,7 @@ public class ArrCopyTest
         boolean[] src=new boolean[srcLength];
         if(srcLength!=0)
         {
-          booleanArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+          booleanTestDataBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
         }
         int dstLength=RandomUtil.randomIntBetween(srcLength,srcLength+1000,rand);
         boolean[] dst=new boolean[dstLength];
@@ -1189,7 +1189,7 @@ public class ArrCopyTest
         boolean[] src=new boolean[srcLength];
         if(srcLength!=0)
         {
-          booleanArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+          booleanTestDataBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
         }
         int dstLength=RandomUtil.randomIntBetween(srcLength,srcLength+1000,rand);
         boolean[] dst=new boolean[dstLength];
@@ -1213,7 +1213,7 @@ public class ArrCopyTest
         boolean[] src=new boolean[srcLength];
         if(srcLength!=0)
         {
-          booleanArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+          booleanTestDataBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
         }
         int dstLength=RandomUtil.randomIntBetween(srcLength,srcLength+1000,rand);
         byte[] dst=new byte[dstLength];
@@ -1237,7 +1237,7 @@ public class ArrCopyTest
         boolean[] src=new boolean[srcLength];
         if(srcLength!=0)
         {
-          booleanArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+          booleanTestDataBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
         }
         int dstLength=RandomUtil.randomIntBetween(srcLength,srcLength+1000,rand);
         byte[] dst=new byte[dstLength];
@@ -1261,7 +1261,7 @@ public class ArrCopyTest
         boolean[] src=new boolean[srcLength];
         if(srcLength!=0)
         {
-          booleanArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+          booleanTestDataBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
         }
         int dstLength=RandomUtil.randomIntBetween(srcLength,srcLength+1000,rand);
         char[] dst=new char[dstLength];
@@ -1285,7 +1285,7 @@ public class ArrCopyTest
         boolean[] src=new boolean[srcLength];
         if(srcLength!=0)
         {
-          booleanArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+          booleanTestDataBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
         }
         int dstLength=RandomUtil.randomIntBetween(srcLength,srcLength+1000,rand);
         char[] dst=new char[dstLength];
@@ -1309,7 +1309,7 @@ public class ArrCopyTest
         boolean[] src=new boolean[srcLength];
         if(srcLength!=0)
         {
-          booleanArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+          booleanTestDataBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
         }
         int dstLength=RandomUtil.randomIntBetween(srcLength,srcLength+1000,rand);
         short[] dst=new short[dstLength];
@@ -1333,7 +1333,7 @@ public class ArrCopyTest
         boolean[] src=new boolean[srcLength];
         if(srcLength!=0)
         {
-          booleanArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+          booleanTestDataBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
         }
         int dstLength=RandomUtil.randomIntBetween(srcLength,srcLength+1000,rand);
         short[] dst=new short[dstLength];
@@ -1357,7 +1357,7 @@ public class ArrCopyTest
         boolean[] src=new boolean[srcLength];
         if(srcLength!=0)
         {
-          booleanArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+          booleanTestDataBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
         }
         int dstLength=RandomUtil.randomIntBetween(srcLength,srcLength+1000,rand);
         int[] dst=new int[dstLength];
@@ -1381,7 +1381,7 @@ public class ArrCopyTest
         boolean[] src=new boolean[srcLength];
         if(srcLength!=0)
         {
-          booleanArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+          booleanTestDataBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
         }
         int dstLength=RandomUtil.randomIntBetween(srcLength,srcLength+1000,rand);
         int[] dst=new int[dstLength];
@@ -1405,7 +1405,7 @@ public class ArrCopyTest
         boolean[] src=new boolean[srcLength];
         if(srcLength!=0)
         {
-          booleanArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+          booleanTestDataBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
         }
         int dstLength=RandomUtil.randomIntBetween(srcLength,srcLength+1000,rand);
         long[] dst=new long[dstLength];
@@ -1429,7 +1429,7 @@ public class ArrCopyTest
         boolean[] src=new boolean[srcLength];
         if(srcLength!=0)
         {
-          booleanArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+          booleanTestDataBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
         }
         int dstLength=RandomUtil.randomIntBetween(srcLength,srcLength+1000,rand);
         long[] dst=new long[dstLength];
@@ -1453,7 +1453,7 @@ public class ArrCopyTest
         boolean[] src=new boolean[srcLength];
         if(srcLength!=0)
         {
-          booleanArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+          booleanTestDataBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
         }
         int dstLength=RandomUtil.randomIntBetween(srcLength,srcLength+1000,rand);
         float[] dst=new float[dstLength];
@@ -1477,7 +1477,7 @@ public class ArrCopyTest
         boolean[] src=new boolean[srcLength];
         if(srcLength!=0)
         {
-          booleanArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+          booleanTestDataBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
         }
         int dstLength=RandomUtil.randomIntBetween(srcLength,srcLength+1000,rand);
         float[] dst=new float[dstLength];
@@ -1501,7 +1501,7 @@ public class ArrCopyTest
         boolean[] src=new boolean[srcLength];
         if(srcLength!=0)
         {
-          booleanArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+          booleanTestDataBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
         }
         int dstLength=RandomUtil.randomIntBetween(srcLength,srcLength+1000,rand);
         double[] dst=new double[dstLength];
@@ -1525,7 +1525,7 @@ public class ArrCopyTest
         boolean[] src=new boolean[srcLength];
         if(srcLength!=0)
         {
-          booleanArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+          booleanTestDataBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
         }
         int dstLength=RandomUtil.randomIntBetween(srcLength,srcLength+1000,rand);
         double[] dst=new double[dstLength];
@@ -1549,7 +1549,7 @@ public class ArrCopyTest
         byte[] src=new byte[srcLength];
         if(srcLength!=0)
         {
-          byteArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+          byteTestDataBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
         }
         int dstLength=RandomUtil.randomIntBetween(srcLength,srcLength+1000,rand);
         byte[] dst=new byte[dstLength];
@@ -1573,7 +1573,7 @@ public class ArrCopyTest
         byte[] src=new byte[srcLength];
         if(srcLength!=0)
         {
-          byteArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+          byteTestDataBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
         }
         int dstLength=RandomUtil.randomIntBetween(srcLength,srcLength+1000,rand);
         byte[] dst=new byte[dstLength];
@@ -1597,7 +1597,7 @@ public class ArrCopyTest
         byte[] src=new byte[srcLength];
         if(srcLength!=0)
         {
-          byteArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+          byteTestDataBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
         }
         int dstLength=RandomUtil.randomIntBetween(srcLength,srcLength+1000,rand);
         short[] dst=new short[dstLength];
@@ -1621,7 +1621,7 @@ public class ArrCopyTest
         byte[] src=new byte[srcLength];
         if(srcLength!=0)
         {
-          byteArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+          byteTestDataBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
         }
         int dstLength=RandomUtil.randomIntBetween(srcLength,srcLength+1000,rand);
         short[] dst=new short[dstLength];
@@ -1645,7 +1645,7 @@ public class ArrCopyTest
         byte[] src=new byte[srcLength];
         if(srcLength!=0)
         {
-          byteArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+          byteTestDataBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
         }
         int dstLength=RandomUtil.randomIntBetween(srcLength,srcLength+1000,rand);
         int[] dst=new int[dstLength];
@@ -1669,7 +1669,7 @@ public class ArrCopyTest
         byte[] src=new byte[srcLength];
         if(srcLength!=0)
         {
-          byteArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+          byteTestDataBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
         }
         int dstLength=RandomUtil.randomIntBetween(srcLength,srcLength+1000,rand);
         int[] dst=new int[dstLength];
@@ -1693,7 +1693,7 @@ public class ArrCopyTest
         byte[] src=new byte[srcLength];
         if(srcLength!=0)
         {
-          byteArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+          byteTestDataBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
         }
         int dstLength=RandomUtil.randomIntBetween(srcLength,srcLength+1000,rand);
         long[] dst=new long[dstLength];
@@ -1717,7 +1717,7 @@ public class ArrCopyTest
         byte[] src=new byte[srcLength];
         if(srcLength!=0)
         {
-          byteArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+          byteTestDataBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
         }
         int dstLength=RandomUtil.randomIntBetween(srcLength,srcLength+1000,rand);
         long[] dst=new long[dstLength];
@@ -1741,7 +1741,7 @@ public class ArrCopyTest
         byte[] src=new byte[srcLength];
         if(srcLength!=0)
         {
-          byteArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+          byteTestDataBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
         }
         int dstLength=RandomUtil.randomIntBetween(srcLength,srcLength+1000,rand);
         float[] dst=new float[dstLength];
@@ -1765,7 +1765,7 @@ public class ArrCopyTest
         byte[] src=new byte[srcLength];
         if(srcLength!=0)
         {
-          byteArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+          byteTestDataBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
         }
         int dstLength=RandomUtil.randomIntBetween(srcLength,srcLength+1000,rand);
         float[] dst=new float[dstLength];
@@ -1789,7 +1789,7 @@ public class ArrCopyTest
         byte[] src=new byte[srcLength];
         if(srcLength!=0)
         {
-          byteArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+          byteTestDataBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
         }
         int dstLength=RandomUtil.randomIntBetween(srcLength,srcLength+1000,rand);
         double[] dst=new double[dstLength];
@@ -1813,7 +1813,7 @@ public class ArrCopyTest
         byte[] src=new byte[srcLength];
         if(srcLength!=0)
         {
-          byteArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+          byteTestDataBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
         }
         int dstLength=RandomUtil.randomIntBetween(srcLength,srcLength+1000,rand);
         double[] dst=new double[dstLength];
@@ -1837,7 +1837,7 @@ public class ArrCopyTest
         char[] src=new char[srcLength];
         if(srcLength!=0)
         {
-          charArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+          charTestDataBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
         }
         int dstLength=RandomUtil.randomIntBetween(srcLength,srcLength+1000,rand);
         char[] dst=new char[dstLength];
@@ -1861,7 +1861,7 @@ public class ArrCopyTest
         char[] src=new char[srcLength];
         if(srcLength!=0)
         {
-          charArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+          charTestDataBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
         }
         int dstLength=RandomUtil.randomIntBetween(srcLength,srcLength+1000,rand);
         char[] dst=new char[dstLength];
@@ -1885,7 +1885,7 @@ public class ArrCopyTest
         char[] src=new char[srcLength];
         if(srcLength!=0)
         {
-          charArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+          charTestDataBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
         }
         int dstLength=RandomUtil.randomIntBetween(srcLength,srcLength+1000,rand);
         int[] dst=new int[dstLength];
@@ -1909,7 +1909,7 @@ public class ArrCopyTest
         char[] src=new char[srcLength];
         if(srcLength!=0)
         {
-          charArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+          charTestDataBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
         }
         int dstLength=RandomUtil.randomIntBetween(srcLength,srcLength+1000,rand);
         int[] dst=new int[dstLength];
@@ -1933,7 +1933,7 @@ public class ArrCopyTest
         char[] src=new char[srcLength];
         if(srcLength!=0)
         {
-          charArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+          charTestDataBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
         }
         int dstLength=RandomUtil.randomIntBetween(srcLength,srcLength+1000,rand);
         long[] dst=new long[dstLength];
@@ -1957,7 +1957,7 @@ public class ArrCopyTest
         char[] src=new char[srcLength];
         if(srcLength!=0)
         {
-          charArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+          charTestDataBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
         }
         int dstLength=RandomUtil.randomIntBetween(srcLength,srcLength+1000,rand);
         long[] dst=new long[dstLength];
@@ -1981,7 +1981,7 @@ public class ArrCopyTest
         char[] src=new char[srcLength];
         if(srcLength!=0)
         {
-          charArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+          charTestDataBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
         }
         int dstLength=RandomUtil.randomIntBetween(srcLength,srcLength+1000,rand);
         float[] dst=new float[dstLength];
@@ -2005,7 +2005,7 @@ public class ArrCopyTest
         char[] src=new char[srcLength];
         if(srcLength!=0)
         {
-          charArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+          charTestDataBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
         }
         int dstLength=RandomUtil.randomIntBetween(srcLength,srcLength+1000,rand);
         float[] dst=new float[dstLength];
@@ -2029,7 +2029,7 @@ public class ArrCopyTest
         char[] src=new char[srcLength];
         if(srcLength!=0)
         {
-          charArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+          charTestDataBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
         }
         int dstLength=RandomUtil.randomIntBetween(srcLength,srcLength+1000,rand);
         double[] dst=new double[dstLength];
@@ -2053,7 +2053,7 @@ public class ArrCopyTest
         char[] src=new char[srcLength];
         if(srcLength!=0)
         {
-          charArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+          charTestDataBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
         }
         int dstLength=RandomUtil.randomIntBetween(srcLength,srcLength+1000,rand);
         double[] dst=new double[dstLength];
@@ -2077,7 +2077,7 @@ public class ArrCopyTest
         short[] src=new short[srcLength];
         if(srcLength!=0)
         {
-          shortArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+          shortTestDataBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
         }
         int dstLength=RandomUtil.randomIntBetween(srcLength,srcLength+1000,rand);
         short[] dst=new short[dstLength];
@@ -2101,7 +2101,7 @@ public class ArrCopyTest
         short[] src=new short[srcLength];
         if(srcLength!=0)
         {
-          shortArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+          shortTestDataBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
         }
         int dstLength=RandomUtil.randomIntBetween(srcLength,srcLength+1000,rand);
         short[] dst=new short[dstLength];
@@ -2125,7 +2125,7 @@ public class ArrCopyTest
         short[] src=new short[srcLength];
         if(srcLength!=0)
         {
-          shortArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+          shortTestDataBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
         }
         int dstLength=RandomUtil.randomIntBetween(srcLength,srcLength+1000,rand);
         int[] dst=new int[dstLength];
@@ -2149,7 +2149,7 @@ public class ArrCopyTest
         short[] src=new short[srcLength];
         if(srcLength!=0)
         {
-          shortArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+          shortTestDataBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
         }
         int dstLength=RandomUtil.randomIntBetween(srcLength,srcLength+1000,rand);
         int[] dst=new int[dstLength];
@@ -2173,7 +2173,7 @@ public class ArrCopyTest
         short[] src=new short[srcLength];
         if(srcLength!=0)
         {
-          shortArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+          shortTestDataBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
         }
         int dstLength=RandomUtil.randomIntBetween(srcLength,srcLength+1000,rand);
         long[] dst=new long[dstLength];
@@ -2197,7 +2197,7 @@ public class ArrCopyTest
         short[] src=new short[srcLength];
         if(srcLength!=0)
         {
-          shortArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+          shortTestDataBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
         }
         int dstLength=RandomUtil.randomIntBetween(srcLength,srcLength+1000,rand);
         long[] dst=new long[dstLength];
@@ -2221,7 +2221,7 @@ public class ArrCopyTest
         short[] src=new short[srcLength];
         if(srcLength!=0)
         {
-          shortArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+          shortTestDataBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
         }
         int dstLength=RandomUtil.randomIntBetween(srcLength,srcLength+1000,rand);
         float[] dst=new float[dstLength];
@@ -2245,7 +2245,7 @@ public class ArrCopyTest
         short[] src=new short[srcLength];
         if(srcLength!=0)
         {
-          shortArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+          shortTestDataBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
         }
         int dstLength=RandomUtil.randomIntBetween(srcLength,srcLength+1000,rand);
         float[] dst=new float[dstLength];
@@ -2269,7 +2269,7 @@ public class ArrCopyTest
         short[] src=new short[srcLength];
         if(srcLength!=0)
         {
-          shortArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+          shortTestDataBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
         }
         int dstLength=RandomUtil.randomIntBetween(srcLength,srcLength+1000,rand);
         double[] dst=new double[dstLength];
@@ -2293,7 +2293,7 @@ public class ArrCopyTest
         short[] src=new short[srcLength];
         if(srcLength!=0)
         {
-          shortArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+          shortTestDataBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
         }
         int dstLength=RandomUtil.randomIntBetween(srcLength,srcLength+1000,rand);
         double[] dst=new double[dstLength];
@@ -2317,7 +2317,7 @@ public class ArrCopyTest
         int[] src=new int[srcLength];
         if(srcLength!=0)
         {
-          intArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+          intTestDataBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
         }
         int dstLength=RandomUtil.randomIntBetween(srcLength,srcLength+1000,rand);
         int[] dst=new int[dstLength];
@@ -2341,7 +2341,7 @@ public class ArrCopyTest
         int[] src=new int[srcLength];
         if(srcLength!=0)
         {
-          intArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+          intTestDataBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
         }
         int dstLength=RandomUtil.randomIntBetween(srcLength,srcLength+1000,rand);
         int[] dst=new int[dstLength];
@@ -2365,7 +2365,7 @@ public class ArrCopyTest
         int[] src=new int[srcLength];
         if(srcLength!=0)
         {
-          intArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+          intTestDataBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
         }
         int dstLength=RandomUtil.randomIntBetween(srcLength,srcLength+1000,rand);
         long[] dst=new long[dstLength];
@@ -2389,7 +2389,7 @@ public class ArrCopyTest
         int[] src=new int[srcLength];
         if(srcLength!=0)
         {
-          intArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+          intTestDataBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
         }
         int dstLength=RandomUtil.randomIntBetween(srcLength,srcLength+1000,rand);
         long[] dst=new long[dstLength];
@@ -2413,7 +2413,7 @@ public class ArrCopyTest
         int[] src=new int[srcLength];
         if(srcLength!=0)
         {
-          intArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+          intTestDataBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
         }
         int dstLength=RandomUtil.randomIntBetween(srcLength,srcLength+1000,rand);
         float[] dst=new float[dstLength];
@@ -2437,7 +2437,7 @@ public class ArrCopyTest
         int[] src=new int[srcLength];
         if(srcLength!=0)
         {
-          intArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+          intTestDataBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
         }
         int dstLength=RandomUtil.randomIntBetween(srcLength,srcLength+1000,rand);
         float[] dst=new float[dstLength];
@@ -2461,7 +2461,7 @@ public class ArrCopyTest
         int[] src=new int[srcLength];
         if(srcLength!=0)
         {
-          intArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+          intTestDataBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
         }
         int dstLength=RandomUtil.randomIntBetween(srcLength,srcLength+1000,rand);
         double[] dst=new double[dstLength];
@@ -2485,7 +2485,7 @@ public class ArrCopyTest
         int[] src=new int[srcLength];
         if(srcLength!=0)
         {
-          intArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+          intTestDataBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
         }
         int dstLength=RandomUtil.randomIntBetween(srcLength,srcLength+1000,rand);
         double[] dst=new double[dstLength];
@@ -2509,7 +2509,7 @@ public class ArrCopyTest
         long[] src=new long[srcLength];
         if(srcLength!=0)
         {
-          longArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+          longTestDataBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
         }
         int dstLength=RandomUtil.randomIntBetween(srcLength,srcLength+1000,rand);
         long[] dst=new long[dstLength];
@@ -2533,7 +2533,7 @@ public class ArrCopyTest
         long[] src=new long[srcLength];
         if(srcLength!=0)
         {
-          longArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+          longTestDataBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
         }
         int dstLength=RandomUtil.randomIntBetween(srcLength,srcLength+1000,rand);
         long[] dst=new long[dstLength];
@@ -2557,7 +2557,7 @@ public class ArrCopyTest
         long[] src=new long[srcLength];
         if(srcLength!=0)
         {
-          longArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+          longTestDataBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
         }
         int dstLength=RandomUtil.randomIntBetween(srcLength,srcLength+1000,rand);
         float[] dst=new float[dstLength];
@@ -2581,7 +2581,7 @@ public class ArrCopyTest
         long[] src=new long[srcLength];
         if(srcLength!=0)
         {
-          longArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+          longTestDataBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
         }
         int dstLength=RandomUtil.randomIntBetween(srcLength,srcLength+1000,rand);
         float[] dst=new float[dstLength];
@@ -2605,7 +2605,7 @@ public class ArrCopyTest
         long[] src=new long[srcLength];
         if(srcLength!=0)
         {
-          longArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+          longTestDataBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
         }
         int dstLength=RandomUtil.randomIntBetween(srcLength,srcLength+1000,rand);
         double[] dst=new double[dstLength];
@@ -2629,7 +2629,7 @@ public class ArrCopyTest
         long[] src=new long[srcLength];
         if(srcLength!=0)
         {
-          longArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+          longTestDataBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
         }
         int dstLength=RandomUtil.randomIntBetween(srcLength,srcLength+1000,rand);
         double[] dst=new double[dstLength];
@@ -2653,7 +2653,7 @@ public class ArrCopyTest
         float[] src=new float[srcLength];
         if(srcLength!=0)
         {
-          floatArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+          floatTestDataBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
         }
         int dstLength=RandomUtil.randomIntBetween(srcLength,srcLength+1000,rand);
         float[] dst=new float[dstLength];
@@ -2677,7 +2677,7 @@ public class ArrCopyTest
         float[] src=new float[srcLength];
         if(srcLength!=0)
         {
-          floatArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+          floatTestDataBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
         }
         int dstLength=RandomUtil.randomIntBetween(srcLength,srcLength+1000,rand);
         float[] dst=new float[dstLength];
@@ -2701,7 +2701,7 @@ public class ArrCopyTest
         float[] src=new float[srcLength];
         if(srcLength!=0)
         {
-          floatArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+          floatTestDataBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
         }
         int dstLength=RandomUtil.randomIntBetween(srcLength,srcLength+1000,rand);
         double[] dst=new double[dstLength];
@@ -2725,7 +2725,7 @@ public class ArrCopyTest
         float[] src=new float[srcLength];
         if(srcLength!=0)
         {
-          floatArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+          floatTestDataBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
         }
         int dstLength=RandomUtil.randomIntBetween(srcLength,srcLength+1000,rand);
         double[] dst=new double[dstLength];
@@ -2749,7 +2749,7 @@ public class ArrCopyTest
         double[] src=new double[srcLength];
         if(srcLength!=0)
         {
-          doubleArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+          doubleTestDataBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
         }
         int dstLength=RandomUtil.randomIntBetween(srcLength,srcLength+1000,rand);
         double[] dst=new double[dstLength];
@@ -2773,7 +2773,7 @@ public class ArrCopyTest
         double[] src=new double[srcLength];
         if(srcLength!=0)
         {
-          doubleArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+          doubleTestDataBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
         }
         int dstLength=RandomUtil.randomIntBetween(srcLength,srcLength+1000,rand);
         double[] dst=new double[dstLength];
@@ -2797,7 +2797,7 @@ public class ArrCopyTest
         String[] src=new String[srcLength];
         if(srcLength!=0)
         {
-          StringArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+          StringTestDataBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
         }
         int dstLength=RandomUtil.randomIntBetween(srcLength,srcLength+1000,rand);
         String[] dst=new String[dstLength];
@@ -2821,7 +2821,7 @@ public class ArrCopyTest
         String[] src=new String[srcLength];
         if(srcLength!=0)
         {
-          StringArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+          StringTestDataBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
         }
         int dstLength=RandomUtil.randomIntBetween(srcLength,srcLength+1000,rand);
         String[] dst=new String[dstLength];
@@ -2845,7 +2845,7 @@ public class ArrCopyTest
         boolean[] src=new boolean[srcLength];
         if(srcLength!=0)
         {
-          booleanArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+          booleanTestDataBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
         }
         int copyLength,srcOffset,dstOffset;
         if(srcLength>5)
@@ -2903,7 +2903,7 @@ public class ArrCopyTest
         byte[] src=new byte[srcLength];
         if(srcLength!=0)
         {
-          byteArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+          byteTestDataBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
         }
         int copyLength,srcOffset,dstOffset;
         if(srcLength>5)
@@ -2961,7 +2961,7 @@ public class ArrCopyTest
         char[] src=new char[srcLength];
         if(srcLength!=0)
         {
-          charArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+          charTestDataBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
         }
         int copyLength,srcOffset,dstOffset;
         if(srcLength>5)
@@ -3019,7 +3019,7 @@ public class ArrCopyTest
         short[] src=new short[srcLength];
         if(srcLength!=0)
         {
-          shortArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+          shortTestDataBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
         }
         int copyLength,srcOffset,dstOffset;
         if(srcLength>5)
@@ -3077,7 +3077,7 @@ public class ArrCopyTest
         int[] src=new int[srcLength];
         if(srcLength!=0)
         {
-          intArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+          intTestDataBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
         }
         int copyLength,srcOffset,dstOffset;
         if(srcLength>5)
@@ -3135,7 +3135,7 @@ public class ArrCopyTest
         long[] src=new long[srcLength];
         if(srcLength!=0)
         {
-          longArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+          longTestDataBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
         }
         int copyLength,srcOffset,dstOffset;
         if(srcLength>5)
@@ -3193,7 +3193,7 @@ public class ArrCopyTest
         float[] src=new float[srcLength];
         if(srcLength!=0)
         {
-          floatArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+          floatTestDataBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
         }
         int copyLength,srcOffset,dstOffset;
         if(srcLength>5)
@@ -3251,7 +3251,7 @@ public class ArrCopyTest
         double[] src=new double[srcLength];
         if(srcLength!=0)
         {
-          doubleArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+          doubleTestDataBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
         }
         int copyLength,srcOffset,dstOffset;
         if(srcLength>5)
@@ -3309,7 +3309,7 @@ public class ArrCopyTest
         String[] src=new String[srcLength];
         if(srcLength!=0)
         {
-          StringArrayBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
+          StringTestDataBuilder.Randomized.buildUnchecked(src,0,srcLength,rand,0);
         }
         int copyLength,srcOffset,dstOffset;
         if(srcLength>5)

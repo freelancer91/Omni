@@ -462,7 +462,7 @@ public class TemplateProcessor2{
         }
         private void processSourceLine(String line) throws Exception{
             if(!line.isBlank()){
-                final String trimmedLine=line.trim();
+                String trimmedLine=line.trim();
                 final var tagMatcher=TAG_PATTERN.matcher(trimmedLine);
                 if(tagMatcher.find()){
                     final String tag=tagMatcher.group();
@@ -475,6 +475,8 @@ public class TemplateProcessor2{
                     case "#MACRO":
                         final int rawIndent=line.indexOf(tag);
                         currIndent+=rawIndent;
+                        // String tmp=" ".repeat(currIndent) + "//" + trimmedLine;
+                        // output.add(tmp);
                         processMacro(trimmedLine,tagEnd);
                         currIndent-=rawIndent;
                         break;
@@ -483,18 +485,26 @@ public class TemplateProcessor2{
                     case "#IF":
                     case "#IFNOT":
                         processIf(trimmedLine,tagEnd,!tag.contains("NOT"),tag.contains("SWITCH"));
+                        // tmp=" ".repeat(currIndent) + "//" + trimmedLine;
+                        // output.add(tmp);
                         break;
                     case "#ELSEIFSWITCH":
                     case "#ELSEIFNOTSWITCH":
                     case "#ELSEIF":
                     case "#ELSEIFNOT":
                         processElseIf(trimmedLine,tagEnd,!tag.contains("NOT"),tag.contains("SWITCH"));
+                        // tmp=" ".repeat(currIndent) + "//" + trimmedLine;
+                        // output.add(tmp);
                         break;
                     case "#ELSE":
                         processElse(trimmedLine,tagEnd);
+                        // tmp=" ".repeat(currIndent) + "//" + trimmedLine;
+                        // output.add(tmp);
                         break;
                     case "#ENDIF":
                         processEndIf(trimmedLine,tagEnd);
+                        // tmp=" ".repeat(currIndent) + "//" + trimmedLine;
+                        // output.add(tmp);
                         break;
                     default:
                         trouble=true;
@@ -566,10 +576,14 @@ public class TemplateProcessor2{
                 if(line.startsWith("//")){
                     continue;
                 }
-                if(line.indexOf('#')>=0||line.indexOf('$')>=0){
+                int poundIndex=line.indexOf('#');
+                int dollarIndex=line.indexOf('$');
+                if(poundIndex >= 0 || dollarIndex >= 0){
                     trouble=true;
                     System.err.println("WARNING: output line "+srcItr.nextIndex()+" for definition "+typeDef.name()
                     +" may contain illegal characters");
+                    System.err.println(line);
+                    System.err.println(" ".repeat(Math.max(poundIndex,dollarIndex)) + '^');
                 }
             }
         }

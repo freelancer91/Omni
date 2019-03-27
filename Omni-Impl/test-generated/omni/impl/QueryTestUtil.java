@@ -1,4 +1,8 @@
-package omni.api;
+package omni.impl;
+import omni.api.OmniCollection;
+import omni.api.OmniDeque;
+import omni.api.OmniList;
+import omni.api.OmniStack;
 import org.junit.jupiter.api.Assertions;
 import omni.util.TypeUtil;
 import java.util.function.Supplier;

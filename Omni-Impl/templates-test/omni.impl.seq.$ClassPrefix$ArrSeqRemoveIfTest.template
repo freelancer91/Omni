@@ -1,3 +1,4 @@
+#TYPEDEF OfBoolean
 #TYPEDEF OfByte
 #TYPEDEF OfChar
 #TYPEDEF OfShort
@@ -9,38 +10,897 @@
 package omni.impl.seq;
 import java.util.function.Predicate;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-import omni.impl.seq.$ClassPrefix$ArrSeq.UncheckedList;
-import omni.impl.seq.$ClassPrefix$ArrSeq.CheckedList;
-import omni.impl.seq.$ClassPrefix$ArrSeq.UncheckedStack;
-import omni.impl.seq.$ClassPrefix$ArrSeq.CheckedStack;
 import java.util.ConcurrentModificationException;
-import omni.impl.CheckedCollectionTest;
+#IFNOT OfBoolean
 import omni.util.TypeConversionUtil;
-import omni.util.EqualityUtil;
-#IF OfRef
-import omni.util.IntegerPredicates;
-#ELSE
-import omni.util.$ArrayType$Predicates;
 #ENDIF
+import omni.util.OmniArray;
+import java.util.Random;
+import org.junit.jupiter.api.Test;
+import omni.impl.$ClassPrefix$MonitoredPredicate;
+import java.util.stream.Stream;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.Arguments;
 #IF OfInt,OfLong,OfDouble
 import java.util.function.$TypeNameModifier$Predicate;
 #ELSEIFNOT OfRef
 import omni.function.$TypeNameModifier$Predicate;
 #ENDIF
-#IF OfRef
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import omni.api.OmniList;
 @SuppressWarnings({"rawtypes","unchecked"}) 
-#ENDIF
 public class $ClassPrefix$ArrSeqRemoveIfTest
 {
 //TODO place sanity checks for checked sequence modification behavior
-  #MACRO ArrSeqImpl<UncheckedStack,OmniStack>()
-  #MACRO ArrSeqImpl<UncheckedList,OmniList>()
-  #MACRO ArrSeqImpl<CheckedStack,OmniStack>()
-  #MACRO ArrSeqImpl<CheckedList,OmniList>()
-  #MACRO ArrSeqImpl<UncheckedSubList,OmniList>()
-  #MACRO ArrSeqImpl<CheckedSubList,OmniList>()
+  
+  private static final Field CheckedSubListmodCount;
+  private static final Field CheckedSubListparent;
+  private static final Field CheckedSubListroot;
+  private static final Field CheckedSubListsize;
+  
+  private static final Field UncheckedSubListparent;
+  private static final Field UncheckedSubListroot;
+  private static final Field UncheckedSubListsize;
+  
+  static
+  {
+    try
+    {
+      Field modifiersField=Field.class.getDeclaredField("modifiers");
+      modifiersField.setAccessible(true);
+      
+    
+      {
+        Class<?> clazz=new $ClassPrefix$ArrSeq.CheckedList().subList(0,0).getClass();
+        (CheckedSubListmodCount=clazz.getDeclaredField("modCount")).setAccessible(true);
+        (CheckedSubListparent=clazz.getDeclaredField("parent")).setAccessible(true);
+        modifiersField.setInt(CheckedSubListparent,CheckedSubListparent.getModifiers()&~Modifier.FINAL);
+        (CheckedSubListroot=clazz.getDeclaredField("root")).setAccessible(true);
+        modifiersField.setInt(CheckedSubListroot,CheckedSubListroot.getModifiers()&~Modifier.FINAL);
+        (CheckedSubListsize=clazz.getDeclaredField("size")).setAccessible(true);
+      }
+      {
+        Class<?> clazz=new $ClassPrefix$ArrSeq.UncheckedList().subList(0,0).getClass();
+        (UncheckedSubListparent=clazz.getDeclaredField("parent")).setAccessible(true);
+        modifiersField.setInt(UncheckedSubListparent,UncheckedSubListparent.getModifiers()&~Modifier.FINAL);
+        (UncheckedSubListroot=clazz.getDeclaredField("root")).setAccessible(true);
+        modifiersField.setInt(UncheckedSubListroot,UncheckedSubListroot.getModifiers()&~Modifier.FINAL);
+        (UncheckedSubListsize=clazz.getDeclaredField("size")).setAccessible(true);
+      }
+    }
+    catch(Exception e)
+    {
+      throw new ExceptionInInitializerError(e);
+    }
+  }
+  
+  private static $ClassPrefix$ArrSeq.CheckedList getRoot(Object seq)
+  {
+    try
+    {
+      return ($ClassPrefix$ArrSeq.CheckedList)CheckedSubListroot.get(seq);
+    }
+    catch(Exception e)
+    {
+      throw new RuntimeException(e);
+    }
+  }
+  private static OmniList.Of$ClassPrefix$ getParent(Object seq)
+  {
+    try
+    {
+      return (OmniList.Of$ClassPrefix$)CheckedSubListparent.get(seq);
+    }
+    catch(Exception e)
+    {
+      throw new RuntimeException(e);
+    }
+  }
+  
+  private static $ClassPrefix$ArrSeq.UncheckedList assertUncheckedSubListIntegrity(int expectedModCount,int expectedParentSize,Object obj)
+  {
+    if(!(obj instanceof $ClassPrefix$ArrSeq.UncheckedList))
+    {
+      try
+      {
+        Object parent=UncheckedSubListparent.get(obj);
+        if(parent!=null)
+        {
+           Assertions.assertEquals(expectedParentSize,UncheckedSubListsize.getInt(parent));
+           obj=parent;
+        }
+        obj=UncheckedSubListroot.get(obj);
+      }
+      catch(Exception e)
+      {
+        throw new RuntimeException(e);
+      }
+    }
+    return ($ClassPrefix$ArrSeq.UncheckedList)obj;
+  }
+  
+  private static $ClassPrefix$ArrSeq.CheckedList assertCheckedSubListIntegrity(int expectedModCount,int expectedParentSize,Object obj)
+  {
+    if(!(obj instanceof $ClassPrefix$ArrSeq.CheckedList))
+    {
+      try
+      {
+        Assertions.assertEquals(expectedModCount,CheckedSubListmodCount.getInt(obj));
+        Object parent=CheckedSubListparent.get(obj);
+        if(parent!=null)
+        {
+           Assertions.assertEquals(expectedModCount,CheckedSubListmodCount.getInt(parent));
+           Assertions.assertEquals(expectedParentSize,CheckedSubListsize.getInt(parent));
+           obj=parent;
+        }
+        obj=CheckedSubListroot.get(obj);
+      }
+      catch(Exception e)
+      {
+        throw new RuntimeException(e);
+      }
+    }
+    $ClassPrefix$ArrSeq.CheckedList root=($ClassPrefix$ArrSeq.CheckedList)obj;
+    Assertions.assertEquals(expectedModCount,root.modCount);
+    return root;
+  }
+  
+  
+  #MACRO TestImpl<ArrSeq,Stack,Unchecked>()
+  #MACRO TestImpl<ArrSeq,Stack,Checked>()
+  #MACRO TestImpl<ArrSeq,List,Unchecked>()
+  #MACRO TestImpl<ArrSeq,List,Checked>()
+  #MACRO TestImpl<ArrSeq,SubList,Unchecked>()
+  #MACRO TestImpl<ArrSeq,SubList,Checked>()
+  
+  
+  
+  
+
+  static Stream<Arguments> subListAllocationArgumentProvider()
+  {
+    Arguments[] args=new Arguments[16];
+    args[0]=Arguments.of(0,0,0,0);
+    args[1]=Arguments.of(0,0,0,5);
+    args[2]=Arguments.of(0,0,5,0);
+    args[3]=Arguments.of(0,0,5,5);
+    args[4]=Arguments.of(0,5,0,0);
+    args[5]=Arguments.of(0,5,0,5);
+    args[6]=Arguments.of(0,5,5,0);
+    args[7]=Arguments.of(0,5,5,5);
+    args[8]=Arguments.of(5,0,0,0);
+    args[9]=Arguments.of(5,0,0,5);
+    args[10]=Arguments.of(5,0,5,0);
+    args[11]=Arguments.of(5,0,5,5);
+    args[12]=Arguments.of(5,5,0,0);
+    args[13]=Arguments.of(5,5,0,5);
+    args[14]=Arguments.of(5,5,5,0);
+    args[15]=Arguments.of(5,5,5,5);
+    return Stream.of(args);
+  }
+
+#IF OfRef
+  static void verifyNullification($ArrayType$[] arr,int newBound,int oldBound)
+  {
+    while(newBound<oldBound)
+    {
+      Assertions.assertNull(arr[--oldBound]);
+    }
+  }
+#ENDIF
 }
+
+
+#MACRODEF TestImplHelper(PREDICATETYPE)
+#IFSWITCH STRUCT==List,Stack
+@Test
+public void testROOTSTRUCTCHECKEDremoveIfPREDICATETYPE()
+{
+  Random rand=new Random(0);
+  #IF OfBoolean
+  for(int seqSize=0;seqSize<=10;++seqSize)
+  {
+     for(int period=1,inc=Math.max(1,seqSize/10);period<=seqSize;period+=inc)
+     {
+       testROOTSTRUCTCHECKEDremoveIfPREDICATETYPEHelper(buildROOTSTRUCTCHECKED(seqSize,true,period),new $ClassPrefix$MonitoredPredicate.RemoveAll(),null);
+       testROOTSTRUCTCHECKEDremoveIfPREDICATETYPEHelper(buildROOTSTRUCTCHECKED(seqSize,false,period),new $ClassPrefix$MonitoredPredicate.RemoveAll(),null);
+       testROOTSTRUCTCHECKEDremoveIfPREDICATETYPEHelper(buildROOTSTRUCTCHECKED(seqSize,true,period),new $ClassPrefix$MonitoredPredicate.RemoveNone(),null);
+       testROOTSTRUCTCHECKEDremoveIfPREDICATETYPEHelper(buildROOTSTRUCTCHECKED(seqSize,false,period),new $ClassPrefix$MonitoredPredicate.RemoveNone(),null);
+       testROOTSTRUCTCHECKEDremoveIfPREDICATETYPEHelper(buildROOTSTRUCTCHECKED(seqSize,true,period),new $ClassPrefix$MonitoredPredicate.NonThrowing(rand,0.5),null);
+       testROOTSTRUCTCHECKEDremoveIfPREDICATETYPEHelper(buildROOTSTRUCTCHECKED(seqSize,false,period),new $ClassPrefix$MonitoredPredicate.NonThrowing(rand,0.5),null);
+    #IFSWITCH CHECKED==Checked
+       {
+         var seq=buildROOTSTRUCTCHECKED(seqSize,true,period);
+         testROOTSTRUCTCHECKEDremoveIfPREDICATETYPEHelper(seq,new $ClassPrefix$MonitoredPredicate.Throwing(rand,seq.contains(true)?seq.contains(false)?2:1:seq.contains(false)?1:0),seqSize==0?null:IndexOutOfBoundsException.class);
+       }
+       {
+         var seq=buildROOTSTRUCTCHECKED(seqSize,false,period);
+         testROOTSTRUCTCHECKEDremoveIfPREDICATETYPEHelper(seq,new $ClassPrefix$MonitoredPredicate.Throwing(rand,seq.contains(true)?seq.contains(false)?2:1:seq.contains(false)?1:0),seqSize==0?null:IndexOutOfBoundsException.class);
+       }
+       {
+         var seq=buildROOTSTRUCTCHECKED(seqSize,true,period);
+         testROOTSTRUCTCHECKEDremoveIfPREDICATETYPEHelper(seq,new $ClassPrefix$MonitoredPredicate.Modding(rand,seq.contains(true)?seq.contains(false)?2:1:seq.contains(false)?1:0,seq),seqSize==0?null:ConcurrentModificationException.class);
+       }
+       {
+         var seq=buildROOTSTRUCTCHECKED(seqSize,false,period);
+         testROOTSTRUCTCHECKEDremoveIfPREDICATETYPEHelper(seq,new $ClassPrefix$MonitoredPredicate.Modding(rand,seq.contains(true)?seq.contains(false)?2:1:seq.contains(false)?1:0,seq),seqSize==0?null:ConcurrentModificationException.class);
+       }
+       {
+         var seq=buildROOTSTRUCTCHECKED(seqSize,true,period);
+         testROOTSTRUCTCHECKEDremoveIfPREDICATETYPEHelper(seq,new $ClassPrefix$MonitoredPredicate.ModdingAndThrowing(rand,seq.contains(true)?seq.contains(false)?2:1:seq.contains(false)?1:0,seq),seqSize==0?null:ConcurrentModificationException.class);
+       }
+       {
+         var seq=buildROOTSTRUCTCHECKED(seqSize,false,period);
+         testROOTSTRUCTCHECKEDremoveIfPREDICATETYPEHelper(seq,new $ClassPrefix$MonitoredPredicate.ModdingAndThrowing(rand,seq.contains(true)?seq.contains(false)?2:1:seq.contains(false)?1:0,seq),seqSize==0?null:ConcurrentModificationException.class);
+       }
+    #ENDIF
+    }
+  }
+  #ELSE
+  outer:for(int seqSize=0;seqSize<=100;seqSize+=10)
+  {
+    for(int i=0;i<100;++i)
+    {
+      testROOTSTRUCTCHECKEDremoveIfPREDICATETYPEHelper(buildROOTSTRUCTCHECKED(seqSize),new $ClassPrefix$MonitoredPredicate.RemoveAll(),seqSize,null);          
+      testROOTSTRUCTCHECKEDremoveIfPREDICATETYPEHelper(buildROOTSTRUCTCHECKED(seqSize),new $ClassPrefix$MonitoredPredicate.RemoveNone(),0,null);
+      testROOTSTRUCTCHECKEDremoveIfPREDICATETYPEHelper(buildROOTSTRUCTCHECKED(seqSize),new $ClassPrefix$MonitoredPredicate.NonThrowing(rand,0.01),-1,null);
+      testROOTSTRUCTCHECKEDremoveIfPREDICATETYPEHelper(buildROOTSTRUCTCHECKED(seqSize),new $ClassPrefix$MonitoredPredicate.NonThrowing(rand,0.05),-1,null);
+      testROOTSTRUCTCHECKEDremoveIfPREDICATETYPEHelper(buildROOTSTRUCTCHECKED(seqSize),new $ClassPrefix$MonitoredPredicate.NonThrowing(rand,0.10),-1,null);
+      testROOTSTRUCTCHECKEDremoveIfPREDICATETYPEHelper(buildROOTSTRUCTCHECKED(seqSize),new $ClassPrefix$MonitoredPredicate.NonThrowing(rand,0.25),-1,null);
+      testROOTSTRUCTCHECKEDremoveIfPREDICATETYPEHelper(buildROOTSTRUCTCHECKED(seqSize),new $ClassPrefix$MonitoredPredicate.NonThrowing(rand,0.50),-1,null);
+      testROOTSTRUCTCHECKEDremoveIfPREDICATETYPEHelper(buildROOTSTRUCTCHECKED(seqSize),new $ClassPrefix$MonitoredPredicate.NonThrowing(rand,0.75),-1,null);
+      testROOTSTRUCTCHECKEDremoveIfPREDICATETYPEHelper(buildROOTSTRUCTCHECKED(seqSize),new $ClassPrefix$MonitoredPredicate.NonThrowing(rand,0.90),-1,null);
+      testROOTSTRUCTCHECKEDremoveIfPREDICATETYPEHelper(buildROOTSTRUCTCHECKED(seqSize),new $ClassPrefix$MonitoredPredicate.NonThrowing(rand,0.95),-1,null);
+      testROOTSTRUCTCHECKEDremoveIfPREDICATETYPEHelper(buildROOTSTRUCTCHECKED(seqSize),new $ClassPrefix$MonitoredPredicate.NonThrowing(rand,0.99),-1,null);
+    #IFSWITCH CHECKED==Checked
+      testROOTSTRUCTCHECKEDremoveIfPREDICATETYPEHelper(buildROOTSTRUCTCHECKED(seqSize),new $ClassPrefix$MonitoredPredicate.Throwing(rand,seqSize),0,seqSize==0?null:IndexOutOfBoundsException.class);
+      {
+        var seq=buildROOTSTRUCTCHECKED(seqSize);
+        testROOTSTRUCTCHECKEDremoveIfPREDICATETYPEHelper(seq,new $ClassPrefix$MonitoredPredicate.Modding(rand,seqSize,seq),0,seqSize==0?null:ConcurrentModificationException.class);
+      }
+      {
+        var seq=buildROOTSTRUCTCHECKED(seqSize);
+        testROOTSTRUCTCHECKEDremoveIfPREDICATETYPEHelper(seq,new $ClassPrefix$MonitoredPredicate.ModdingAndThrowing(rand,seqSize,seq),0,seqSize==0?null:ConcurrentModificationException.class);
+      }
+    #ENDIF
+      if(seqSize==0)
+      {
+        continue outer;
+      }
+    }
+  }
+  #ENDIF
+}
+#ELSE
+@ParameterizedTest(name="$ClassPrefix$ROOT.CHECKEDSTRUCT rootPreAlloc={0},parentPreAlloc={1},parentPostAlloc={2},rootPostAlloc={3}")
+@MethodSource("subListAllocationArgumentProvider")
+public void testROOTSTRUCTCHECKEDremoveIfPREDICATETYPE(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc)
+{
+  Random rand=new Random(0);
+  #IF OfBoolean
+  for(int seqSize=0;seqSize<=10;++seqSize)
+  {
+     for(int period=1,inc=Math.max(1,seqSize/10);period<=seqSize;period+=inc)
+     {
+       testROOTSTRUCTCHECKEDremoveIfPREDICATETYPEHelper(true,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,buildROOTSTRUCTCHECKED(seqSize,true,period,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc),new $ClassPrefix$MonitoredPredicate.RemoveAll(),null);
+       testROOTSTRUCTCHECKEDremoveIfPREDICATETYPEHelper(false,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,buildROOTSTRUCTCHECKED(seqSize,false,period,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc),new $ClassPrefix$MonitoredPredicate.RemoveAll(),null);
+       testROOTSTRUCTCHECKEDremoveIfPREDICATETYPEHelper(true,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,buildROOTSTRUCTCHECKED(seqSize,true,period,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc),new $ClassPrefix$MonitoredPredicate.RemoveNone(),null);
+       testROOTSTRUCTCHECKEDremoveIfPREDICATETYPEHelper(false,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,buildROOTSTRUCTCHECKED(seqSize,false,period,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc),new $ClassPrefix$MonitoredPredicate.RemoveNone(),null);
+       testROOTSTRUCTCHECKEDremoveIfPREDICATETYPEHelper(true,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,buildROOTSTRUCTCHECKED(seqSize,true,period,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc),new $ClassPrefix$MonitoredPredicate.NonThrowing(rand,0.5),null);
+       testROOTSTRUCTCHECKEDremoveIfPREDICATETYPEHelper(false,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,buildROOTSTRUCTCHECKED(seqSize,false,period,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc),new $ClassPrefix$MonitoredPredicate.NonThrowing(rand,0.5),null);
+    #IFSWITCH CHECKED==Checked
+       {
+         var seq=buildROOTSTRUCTCHECKED(seqSize,true,period,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc);
+         testROOTSTRUCTCHECKEDremoveIfPREDICATETYPEHelper(true,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,seq,new $ClassPrefix$MonitoredPredicate.Throwing(rand,seq.contains(true)?seq.contains(false)?2:1:seq.contains(false)?1:0),seqSize==0?null:IndexOutOfBoundsException.class);
+       }
+       {
+         var seq=buildROOTSTRUCTCHECKED(seqSize,false,period,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc);
+         testROOTSTRUCTCHECKEDremoveIfPREDICATETYPEHelper(false,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,seq,new $ClassPrefix$MonitoredPredicate.Throwing(rand,seq.contains(true)?seq.contains(false)?2:1:seq.contains(false)?1:0),seqSize==0?null:IndexOutOfBoundsException.class);
+       }
+       
+       {
+         var seq=buildROOTSTRUCTCHECKED(seqSize,true,period,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc);
+         testROOTSTRUCTCHECKEDremoveIfPREDICATETYPEHelper(true,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,seq,new $ClassPrefix$MonitoredPredicate.Modding(rand,seq.contains(true)?seq.contains(false)?2:1:seq.contains(false)?1:0,seq),seqSize==0?null:ConcurrentModificationException.class);
+       }
+       {
+         var seq=buildROOTSTRUCTCHECKED(seqSize,false,period,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc);
+         testROOTSTRUCTCHECKEDremoveIfPREDICATETYPEHelper(false,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,seq,new $ClassPrefix$MonitoredPredicate.Modding(rand,seq.contains(true)?seq.contains(false)?2:1:seq.contains(false)?1:0,seq),seqSize==0?null:ConcurrentModificationException.class);
+       }
+       {
+         var seq=buildROOTSTRUCTCHECKED(seqSize,true,period,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc);
+         testROOTSTRUCTCHECKEDremoveIfPREDICATETYPEHelper(true,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,seq,new $ClassPrefix$MonitoredPredicate.ModdingAndThrowing(rand,seq.contains(true)?seq.contains(false)?2:1:seq.contains(false)?1:0,seq),seqSize==0?null:ConcurrentModificationException.class);
+       }
+       {
+         var seq=buildROOTSTRUCTCHECKED(seqSize,false,period,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc);
+         testROOTSTRUCTCHECKEDremoveIfPREDICATETYPEHelper(false,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,seq,new $ClassPrefix$MonitoredPredicate.ModdingAndThrowing(rand,seq.contains(true)?seq.contains(false)?2:1:seq.contains(false)?1:0,seq),seqSize==0?null:ConcurrentModificationException.class);
+       }
+       
+       
+       {
+         var seq=buildROOTSTRUCTCHECKED(seqSize,true,period,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc);
+         testROOTSTRUCTCHECKEDremoveIfPREDICATETYPEHelper(true,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,seq,new $ClassPrefix$MonitoredPredicate.Modding(rand,seq.contains(true)?seq.contains(false)?2:1:seq.contains(false)?1:0,getParent(seq)),seqSize==0?null:ConcurrentModificationException.class);
+       }
+       {
+         var seq=buildROOTSTRUCTCHECKED(seqSize,false,period,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc);
+         testROOTSTRUCTCHECKEDremoveIfPREDICATETYPEHelper(false,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,seq,new $ClassPrefix$MonitoredPredicate.Modding(rand,seq.contains(true)?seq.contains(false)?2:1:seq.contains(false)?1:0,getParent(seq)),seqSize==0?null:ConcurrentModificationException.class);
+       }
+       {
+         var seq=buildROOTSTRUCTCHECKED(seqSize,true,period,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc);
+         testROOTSTRUCTCHECKEDremoveIfPREDICATETYPEHelper(true,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,seq,new $ClassPrefix$MonitoredPredicate.ModdingAndThrowing(rand,seq.contains(true)?seq.contains(false)?2:1:seq.contains(false)?1:0,getParent(seq)),seqSize==0?null:ConcurrentModificationException.class);
+       }
+       {
+         var seq=buildROOTSTRUCTCHECKED(seqSize,false,period,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc);
+         testROOTSTRUCTCHECKEDremoveIfPREDICATETYPEHelper(false,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,seq,new $ClassPrefix$MonitoredPredicate.ModdingAndThrowing(rand,seq.contains(true)?seq.contains(false)?2:1:seq.contains(false)?1:0,getParent(seq)),seqSize==0?null:ConcurrentModificationException.class);
+       }
+       
+       
+       {
+         var seq=buildROOTSTRUCTCHECKED(seqSize,true,period,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc);
+         testROOTSTRUCTCHECKEDremoveIfPREDICATETYPEHelper(true,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,seq,new $ClassPrefix$MonitoredPredicate.Modding(rand,seq.contains(true)?seq.contains(false)?2:1:seq.contains(false)?1:0,getRoot(seq)),seqSize==0?null:ConcurrentModificationException.class);
+       }
+       {
+         var seq=buildROOTSTRUCTCHECKED(seqSize,false,period,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc);
+         testROOTSTRUCTCHECKEDremoveIfPREDICATETYPEHelper(false,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,seq,new $ClassPrefix$MonitoredPredicate.Modding(rand,seq.contains(true)?seq.contains(false)?2:1:seq.contains(false)?1:0,getRoot(seq)),seqSize==0?null:ConcurrentModificationException.class);
+       }
+       {
+         var seq=buildROOTSTRUCTCHECKED(seqSize,true,period,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc);
+         testROOTSTRUCTCHECKEDremoveIfPREDICATETYPEHelper(true,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,seq,new $ClassPrefix$MonitoredPredicate.ModdingAndThrowing(rand,seq.contains(true)?seq.contains(false)?2:1:seq.contains(false)?1:0,getRoot(seq)),seqSize==0?null:ConcurrentModificationException.class);
+       }
+       {
+         var seq=buildROOTSTRUCTCHECKED(seqSize,false,period,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc);
+         testROOTSTRUCTCHECKEDremoveIfPREDICATETYPEHelper(false,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,seq,new $ClassPrefix$MonitoredPredicate.ModdingAndThrowing(rand,seq.contains(true)?seq.contains(false)?2:1:seq.contains(false)?1:0,getRoot(seq)),seqSize==0?null:ConcurrentModificationException.class);
+       }
+       
+       
+    #ENDIF
+    }
+  }
+  #ELSE
+  outer:for(int seqSize=0;seqSize<=100;seqSize+=10)
+  {
+    for(int i=0;i<100;++i)
+    {
+      testROOTSTRUCTCHECKEDremoveIfPREDICATETYPEHelper(rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,buildROOTSTRUCTCHECKED(seqSize,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc),new $ClassPrefix$MonitoredPredicate.RemoveAll(),seqSize,null);          
+      testROOTSTRUCTCHECKEDremoveIfPREDICATETYPEHelper(rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,buildROOTSTRUCTCHECKED(seqSize,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc),new $ClassPrefix$MonitoredPredicate.RemoveNone(),0,null);
+      testROOTSTRUCTCHECKEDremoveIfPREDICATETYPEHelper(rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,buildROOTSTRUCTCHECKED(seqSize,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc),new $ClassPrefix$MonitoredPredicate.NonThrowing(rand,0.01),-1,null);
+      testROOTSTRUCTCHECKEDremoveIfPREDICATETYPEHelper(rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,buildROOTSTRUCTCHECKED(seqSize,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc),new $ClassPrefix$MonitoredPredicate.NonThrowing(rand,0.05),-1,null);
+      testROOTSTRUCTCHECKEDremoveIfPREDICATETYPEHelper(rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,buildROOTSTRUCTCHECKED(seqSize,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc),new $ClassPrefix$MonitoredPredicate.NonThrowing(rand,0.10),-1,null);
+      testROOTSTRUCTCHECKEDremoveIfPREDICATETYPEHelper(rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,buildROOTSTRUCTCHECKED(seqSize,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc),new $ClassPrefix$MonitoredPredicate.NonThrowing(rand,0.25),-1,null);
+      testROOTSTRUCTCHECKEDremoveIfPREDICATETYPEHelper(rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,buildROOTSTRUCTCHECKED(seqSize,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc),new $ClassPrefix$MonitoredPredicate.NonThrowing(rand,0.50),-1,null);
+      testROOTSTRUCTCHECKEDremoveIfPREDICATETYPEHelper(rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,buildROOTSTRUCTCHECKED(seqSize,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc),new $ClassPrefix$MonitoredPredicate.NonThrowing(rand,0.75),-1,null);
+      testROOTSTRUCTCHECKEDremoveIfPREDICATETYPEHelper(rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,buildROOTSTRUCTCHECKED(seqSize,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc),new $ClassPrefix$MonitoredPredicate.NonThrowing(rand,0.90),-1,null);
+      testROOTSTRUCTCHECKEDremoveIfPREDICATETYPEHelper(rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,buildROOTSTRUCTCHECKED(seqSize,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc),new $ClassPrefix$MonitoredPredicate.NonThrowing(rand,0.95),-1,null);
+      testROOTSTRUCTCHECKEDremoveIfPREDICATETYPEHelper(rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,buildROOTSTRUCTCHECKED(seqSize,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc),new $ClassPrefix$MonitoredPredicate.NonThrowing(rand,0.99),-1,null);
+    #IFSWITCH CHECKED==Checked
+      testROOTSTRUCTCHECKEDremoveIfPREDICATETYPEHelper(rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,buildROOTSTRUCTCHECKED(seqSize,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc),new $ClassPrefix$MonitoredPredicate.Throwing(rand,seqSize),0,seqSize==0?null:IndexOutOfBoundsException.class);
+      {
+        var seq=buildROOTSTRUCTCHECKED(seqSize,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc);
+        testROOTSTRUCTCHECKEDremoveIfPREDICATETYPEHelper(rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,seq,new $ClassPrefix$MonitoredPredicate.Modding(rand,seqSize,seq),0,seqSize==0?null:ConcurrentModificationException.class);
+      }
+      {
+        var seq=buildROOTSTRUCTCHECKED(seqSize,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc);
+        testROOTSTRUCTCHECKEDremoveIfPREDICATETYPEHelper(rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,seq,new $ClassPrefix$MonitoredPredicate.ModdingAndThrowing(rand,seqSize,seq),0,seqSize==0?null:ConcurrentModificationException.class);
+      }
+      
+      {
+        var seq=buildROOTSTRUCTCHECKED(seqSize,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc);
+        testROOTSTRUCTCHECKEDremoveIfPREDICATETYPEHelper(rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,seq,new $ClassPrefix$MonitoredPredicate.Modding(rand,seqSize,getParent(seq)),0,seqSize==0?null:ConcurrentModificationException.class);
+      }
+      {
+        var seq=buildROOTSTRUCTCHECKED(seqSize,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc);
+        testROOTSTRUCTCHECKEDremoveIfPREDICATETYPEHelper(rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,seq,new $ClassPrefix$MonitoredPredicate.ModdingAndThrowing(rand,seqSize,getParent(seq)),0,seqSize==0?null:ConcurrentModificationException.class);
+      }
+      
+      {
+        var seq=buildROOTSTRUCTCHECKED(seqSize,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc);
+        testROOTSTRUCTCHECKEDremoveIfPREDICATETYPEHelper(rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,seq,new $ClassPrefix$MonitoredPredicate.Modding(rand,seqSize,getRoot(seq)),0,seqSize==0?null:ConcurrentModificationException.class);
+      }
+      {
+        var seq=buildROOTSTRUCTCHECKED(seqSize,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc);
+        testROOTSTRUCTCHECKEDremoveIfPREDICATETYPEHelper(rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,seq,new $ClassPrefix$MonitoredPredicate.ModdingAndThrowing(rand,seqSize,getRoot(seq)),0,seqSize==0?null:ConcurrentModificationException.class);
+      }
+    #ENDIF
+      if(seqSize==0)
+      {
+        continue outer;
+      }
+    }
+  }
+  #ENDIF
+}
+#ENDIF
+
+
+
+
+  #IFNOTSWITCH STRUCT==Stack,List,SubList
+ERROR unknown struct STRUCT in macro TestImpl<ROOT,STRUCT,CHECKED>()
+  #ENDIF
+  #IFNOTSWITCH ROOT==ArrSeq
+ERROR unknown root ROOT in macro TestImpl<ROOT,STRUCT,CHECKED>()
+  #ENDIF
+  #IFNOTSWITCH CHECKED==Checked,Unchecked
+ERROR unknown checked CHECKED in macro TestImpl<ROOT,STRUCT,CHECKED>()
+  #ENDIF
+#IF OfBoolean
+  #IFSWITCH STRUCT==Stack,List
+private static void testROOTSTRUCTCHECKEDremoveIfPREDICATETYPEHelper($ClassPrefix$ROOT.CHECKEDSTRUCT seq,$ClassPrefix$MonitoredPredicate pred,Class<? extends Throwable> expectedException)
+{
+  var clone=($ClassPrefix$ROOT.CHECKEDSTRUCT)seq.clone();
+  if(expectedException==null)
+  {
+    int seqSize=seq.size();
+    int trueCount=0;
+    for(var v:clone)
+    {
+      if(v)
+      {
+        ++trueCount;
+      }
+    }
+    var result=seq.removeIf((PREDICATETYPE)pred);
+    Assertions.assertEquals(!pred.removedVals.isEmpty(),result);
+    #IFSWITCH CHECKED==Checked
+    Assertions.assertEquals(result?1:0,seq.modCount);
+    #ENDIF
+    boolean removedValsContainsTrue=pred.removedVals.contains(true);
+    boolean removedValsContainsFalse=pred.removedVals.contains(false);
+    Assertions.assertEquals(removedValsContainsTrue?removedValsContainsFalse?0:seqSize-trueCount:removedValsContainsFalse?trueCount:seqSize,seq.size());
+    if(removedValsContainsTrue)
+    {
+      Assertions.assertFalse(seq.contains(true));
+    }
+    if(removedValsContainsFalse)
+    {
+      Assertions.assertFalse(seq.contains(false));
+    }
+  }
+  else
+  {
+    Assertions.assertThrows(expectedException,()->seq.removeIf((PREDICATETYPE)pred));
+    if(ConcurrentModificationException.class.equals(expectedException))
+    {
+      Assertions.assertEquals(seq.size(),clone.size());
+      for(var val:clone)
+      {
+        Assertions.assertTrue(seq.contains(val));
+      }
+      return;
+    }
+    var cloneItr=clone.iterator();
+    var seqItr=seq.iterator();
+    for(;;)
+    {
+      if(!cloneItr.hasNext())
+      {
+        Assertions.assertFalse(seqItr.hasNext());
+        return;
+      }
+      var v=cloneItr.next$TypeNameModifier$();
+      if(expectedException==null && pred.removedVals.contains(v))
+      {
+        continue;
+      }
+      Assertions.assertTrue(seqItr.hasNext());
+    #IF OfRef
+      Assertions.assertSame(seqItr.next$TypeNameModifier$(),v);
+    #ELSE
+      Assertions.assertEquals(seqItr.next$TypeNameModifier$(),v);
+    #ENDIF
+    }
+  }
+}
+  #ELSE
+private static void testROOTSTRUCTCHECKEDremoveIfPREDICATETYPEHelper(boolean initVal,int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc,OmniList.Of$ClassPrefix$ seq,$ClassPrefix$MonitoredPredicate pred,Class<? extends Throwable> expectedException)
+{
+  var clone=($ClassPrefix$ROOT.CHECKEDList)seq.clone();
+  int expectedSize;
+  $ClassPrefix$ROOT.CHECKEDList root;
+  if(expectedException==null)
+  {
+    int seqSize=seq.size();
+    int trueCount=0;
+    for(var v:clone)
+    {
+      if(v)
+      {
+        ++trueCount;
+      }
+    }
+    var result=seq.removeIf((PREDICATETYPE)pred);
+    Assertions.assertEquals(!pred.removedVals.isEmpty(),result);
+    boolean removedValsContainsTrue=pred.removedVals.contains(true);
+    boolean removedValsContainsFalse=pred.removedVals.contains(false);
+    expectedSize=removedValsContainsTrue?removedValsContainsFalse?0:seqSize-trueCount:removedValsContainsFalse?trueCount:seqSize;
+    Assertions.assertEquals(expectedSize,seq.size());
+    if(removedValsContainsTrue)
+    {
+      Assertions.assertFalse(seq.contains(true));
+    }
+    if(removedValsContainsFalse)
+    {
+      Assertions.assertFalse(seq.contains(false));
+    }
+    root=assertCHECKEDSubListIntegrity(result?1:0,parentPreAlloc+parentPostAlloc+expectedSize,seq);
+  }
+  else
+  {
+    Assertions.assertThrows(expectedException,()->seq.removeIf((PREDICATETYPE)pred));
+    if(ConcurrentModificationException.class.equals(expectedException))
+    {
+      return;
+    }
+    var cloneItr=clone.iterator();
+    var seqItr=seq.iterator();
+    for(;;)
+    {
+      if(!cloneItr.hasNext())
+      {
+        Assertions.assertFalse(seqItr.hasNext());
+        break;
+      }
+      var v=cloneItr.next$TypeNameModifier$();
+      if(expectedException==null && pred.removedVals.contains(v))
+      {
+        continue;
+      }
+      Assertions.assertTrue(seqItr.hasNext());
+    #IF OfRef
+      Assertions.assertSame(seqItr.next$TypeNameModifier$(),v);
+    #ELSE
+      Assertions.assertEquals(seqItr.next$TypeNameModifier$(),v);
+    #ENDIF
+    }
+    expectedSize=seq.size();
+    root=assertCHECKEDSubListIntegrity(0,parentPreAlloc+parentPostAlloc+expectedSize,seq);
+  }
+  Assertions.assertEquals(parentPreAlloc+parentPostAlloc+expectedSize+rootPreAlloc+rootPostAlloc,root.size);
+  for(int i=0,bound=rootPreAlloc+parentPreAlloc;i<bound;++i)
+  {
+    Assertions.assertEquals(!initVal,root.arr[i]);
+  }
+  for(int i=rootPreAlloc+parentPreAlloc+expectedSize,bound=parentPreAlloc+parentPostAlloc+expectedSize+rootPreAlloc+rootPostAlloc;i<bound;++i)
+  {
+    Assertions.assertEquals(!initVal,root.arr[i]);
+  }
+}
+  #ENDIF
+#ELSE
+  #IFSWITCH STRUCT==Stack,List
+private static void testROOTSTRUCTCHECKEDremoveIfPREDICATETYPEHelper($ClassPrefix$ROOT.CHECKEDSTRUCT seq,$ClassPrefix$MonitoredPredicate pred,int numExpectedToBeRemoved,Class<? extends Throwable> expectedException)
+{
+  var clone=($ClassPrefix$ROOT.CHECKEDSTRUCT)seq.clone();
+  int expectedSize;
+  if(expectedException==null)
+  {
+    int seqSize=seq.size();
+    if(numExpectedToBeRemoved<0)
+    {
+      var result=seq.removeIf((PREDICATETYPE)pred);
+      int numRemoved=pred.removedVals.size();
+      Assertions.assertEquals(numRemoved!=0,result);
+      expectedSize=seqSize-numRemoved;
+    }
+    else if(numExpectedToBeRemoved==0)
+    {
+      Assertions.assertFalse(seq.removeIf((PREDICATETYPE)pred));
+      Assertions.assertTrue(pred.removedVals.isEmpty());
+      expectedSize=seqSize;
+    }
+    else
+    {
+      Assertions.assertTrue(seq.removeIf((PREDICATETYPE)pred));
+      expectedSize=seqSize-numExpectedToBeRemoved;
+    }
+    Assertions.assertEquals(expectedSize,seq.size());
+    #IF OfRef
+    verifyNullification(seq.arr,seq.size,seq.size+(seqSize-expectedSize));
+    #ENDIF
+  }
+  else
+  {
+    Assertions.assertThrows(expectedException,()->seq.removeIf((PREDICATETYPE)pred));
+    if(ConcurrentModificationException.class.equals(expectedException))
+    {
+      Assertions.assertEquals(seq.size(),clone.size());
+      for(var val:clone)
+      {
+        Assertions.assertTrue(seq.contains(val));
+      }
+      return;
+    }
+
+  }
+  var cloneItr=clone.iterator();
+  var seqItr=seq.iterator();
+      
+  for(;;)
+  {
+    if(!cloneItr.hasNext())
+    {
+      Assertions.assertFalse(seqItr.hasNext());
+      return;
+    }
+    var v=cloneItr.next$TypeNameModifier$();
+    if(expectedException==null && pred.removedVals.contains(v))
+    {
+      continue;
+    }
+    Assertions.assertTrue(seqItr.hasNext());
+  #IF OfRef
+    Assertions.assertSame(seqItr.next$TypeNameModifier$(),v);
+  #ELSE
+    Assertions.assertEquals(seqItr.next$TypeNameModifier$(),v);
+  #ENDIF
+  }
+
+  
+  
+  
+}
+  #ELSE
+private static void testROOTSTRUCTCHECKEDremoveIfPREDICATETYPEHelper(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc,OmniList.Of$ClassPrefix$ seq,$ClassPrefix$MonitoredPredicate pred,int numExpectedToBeRemoved,Class<? extends Throwable> expectedException)
+{
+  var clone=($ClassPrefix$ROOT.CHECKEDList)seq.clone();
+  int expectedSize;
+  $ClassPrefix$ROOT.CHECKEDList root;
+  int seqSize=seq.size();
+  if(expectedException==null)
+  {
+    
+    if(numExpectedToBeRemoved<0)
+    {
+      var result=seq.removeIf((PREDICATETYPE)pred);
+      int numRemoved=pred.removedVals.size();
+      Assertions.assertEquals(numRemoved!=0,result);
+      expectedSize=seqSize-numRemoved;
+      root=assertCHECKEDSubListIntegrity(numRemoved==0?0:1,parentPreAlloc+parentPostAlloc+expectedSize,seq);
+    }
+    else if(numExpectedToBeRemoved==0)
+    {
+      Assertions.assertFalse(seq.removeIf((PREDICATETYPE)pred));
+      Assertions.assertTrue(pred.removedVals.isEmpty());
+      expectedSize=seqSize;
+      root=assertCHECKEDSubListIntegrity(0,parentPreAlloc+parentPostAlloc+expectedSize,seq);
+    }
+    else
+    {
+      Assertions.assertTrue(seq.removeIf((PREDICATETYPE)pred));
+      expectedSize=seqSize-numExpectedToBeRemoved;
+      root=assertCHECKEDSubListIntegrity(1,parentPreAlloc+parentPostAlloc+expectedSize,seq);
+      
+    }
+    Assertions.assertEquals(expectedSize,seq.size());
+    #IF OfRef
+    verifyNullification(root.arr,root.size,root.size+(seqSize-expectedSize));
+    #ENDIF
+  }
+  else
+  {
+    Assertions.assertThrows(expectedException,()->seq.removeIf((PREDICATETYPE)pred));
+    if(ConcurrentModificationException.class.equals(expectedException))
+    {
+      return;
+    }
+    expectedSize=seq.size();
+    root=assertCHECKEDSubListIntegrity(0,parentPreAlloc+parentPostAlloc+expectedSize,seq);
+  }
+  var cloneItr=clone.iterator();
+  var seqItr=seq.iterator();
+      
+  for(;;)
+  {
+    if(!cloneItr.hasNext())
+    {
+      Assertions.assertFalse(seqItr.hasNext());
+      break;
+    }
+    var v=cloneItr.next$TypeNameModifier$();
+    if(expectedException==null && pred.removedVals.contains(v))
+    {
+      continue;
+    }
+    Assertions.assertTrue(seqItr.hasNext());
+  #IF OfRef
+    Assertions.assertSame(seqItr.next$TypeNameModifier$(),v);
+  #ELSE
+    Assertions.assertEquals(seqItr.next$TypeNameModifier$(),v);
+  #ENDIF
+  }
+  int dstOffset=0;
+  for(int i=0;i<rootPreAlloc;++i,++dstOffset)
+  {
+    Assertions.assertEquals(root.arr[dstOffset],TypeConversionUtil.convertTo$ArrayType$(i-rootPreAlloc-parentPreAlloc));
+  }
+  for(int i=0;i<parentPreAlloc;++i,++dstOffset)
+  {
+    Assertions.assertEquals(root.arr[dstOffset],TypeConversionUtil.convertTo$ArrayType$(i-parentPreAlloc));
+  }
+  dstOffset+=expectedSize;
+  for(int i=0;i<parentPostAlloc;++i,++dstOffset)
+  {
+    Assertions.assertEquals(root.arr[dstOffset],TypeConversionUtil.convertTo$ArrayType$(seqSize+i));
+  }
+  for(int i=0;i<rootPostAlloc;++i,++dstOffset)
+  {
+    Assertions.assertEquals(root.arr[dstOffset],TypeConversionUtil.convertTo$ArrayType$(seqSize+parentPostAlloc+i));
+  }
+  
+}
+  #ENDIF
+#ENDIF
+#ENDDEF
+
+#MACRODEF TestImpl<ROOT,STRUCT,CHECKED>()
+#IF OfBoolean
+  #IFSWITCH STRUCT==List,Stack
+static $ClassPrefix$ROOT.CHECKEDSTRUCT buildROOTSTRUCTCHECKED(int seqSize,boolean initVal,int period)
+{
+  $ArrayType$[] arr;
+  if(seqSize==0)
+  {
+    arr=OmniArray.Of$ClassPrefix$.DEFAULT_ARR;
+  }
+  else
+  {
+    arr=new $ArrayType$[seqSize];
+    for(int i=0;i<seqSize;)
+    {
+      arr[i]=initVal;
+      if(++i==seqSize)
+      {
+        break;
+      }
+      if(i%period==0)
+      {
+        initVal=!initVal;
+      }
+    }
+  }
+  return new $ClassPrefix$ROOT.CHECKEDSTRUCT(seqSize,arr);
+}
+  #ELSE
+static OmniList.Of$ClassPrefix$ buildROOTSTRUCTCHECKED(int seqSize,boolean initVal,int period,int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc)
+{
+  $ArrayType$[] arr;
+  int rootSize=rootPreAlloc+parentPreAlloc+seqSize+parentPostAlloc+rootPostAlloc;
+  if(rootSize==0)
+  {
+    arr=OmniArray.Of$ClassPrefix$.DEFAULT_ARR;
+  }
+  else
+  {
+    arr=new $ArrayType$[rootSize];
+    for(int i=0;i<rootPreAlloc+parentPreAlloc;++i)
+    {
+      arr[i]=!initVal;
+    }
+    for(int i=rootPreAlloc+parentPreAlloc+seqSize;i<rootSize;++i)
+    {
+      arr[i]=!initVal;
+    }
+    for(int i=rootPreAlloc+parentPreAlloc;;)
+    {
+      arr[i]=initVal;
+      if(++i==rootPreAlloc+parentPreAlloc+seqSize)
+      {
+        break;
+      }
+      if(i%period==0)
+      {
+        initVal=!initVal;
+      }
+    }
+    
+    
+  }
+  return new $ClassPrefix$ROOT.CheckedList(rootSize,arr).subList(rootPreAlloc,parentPreAlloc+seqSize+parentPostAlloc).subList(parentPreAlloc,parentPreAlloc+seqSize);
+}
+  #ENDIF
+#ELSE
+  #IFSWITCH STRUCT==List,Stack
+static $ClassPrefix$ROOT.CHECKEDSTRUCT buildROOTSTRUCTCHECKED(int seqSize)
+{
+  $ArrayType$[] arr;
+  if(seqSize==0)
+  {
+    arr=OmniArray.Of$ClassPrefix$.DEFAULT_ARR;
+  }
+  else
+  {
+    arr=new $ArrayType$[seqSize];
+    for(int i=0;i<seqSize;++i)
+    {
+      arr[i]=TypeConversionUtil.convertTo$ArrayType$(i);
+    }
+  }
+  return new $ClassPrefix$ROOT.CHECKEDSTRUCT(seqSize,arr);
+}
+  #ELSE
+static OmniList.Of$ClassPrefix$ buildROOTSTRUCTCHECKED(int seqSize,int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc)
+{
+  $ArrayType$[] arr;
+  int rootSize=rootPreAlloc+parentPreAlloc+seqSize+parentPostAlloc+rootPostAlloc;
+  if(rootSize==0)
+  {
+    arr=OmniArray.Of$ClassPrefix$.DEFAULT_ARR;
+  }
+  else
+  {
+    arr=new $ArrayType$[rootSize];
+    int dstOffset=0;
+    for(int i=0;i<rootPreAlloc;++i,++dstOffset)
+    {
+      arr[dstOffset]=TypeConversionUtil.convertTo$ArrayType$(i-rootPreAlloc-parentPreAlloc);
+    }
+    for(int i=0;i<parentPreAlloc;++i,++dstOffset)
+    {
+      arr[dstOffset]=TypeConversionUtil.convertTo$ArrayType$(i-parentPreAlloc);
+    }
+    for(int i=0;i<seqSize;++i,++dstOffset)
+    {
+      arr[dstOffset]=TypeConversionUtil.convertTo$ArrayType$(i);
+    }
+    for(int i=0;i<parentPostAlloc;++i,++dstOffset)
+    {
+      arr[dstOffset]=TypeConversionUtil.convertTo$ArrayType$(seqSize+i);
+    }
+    for(int i=0;i<rootPostAlloc;++i,++dstOffset)
+    {
+      arr[dstOffset]=TypeConversionUtil.convertTo$ArrayType$(seqSize+parentPostAlloc+i);
+    }
+  }
+  return new $ClassPrefix$ROOT.CheckedList(rootSize,arr).subList(rootPreAlloc,parentPreAlloc+seqSize+parentPostAlloc).subList(parentPreAlloc,parentPreAlloc+seqSize);
+  
+}
+  #ENDIF
+#ENDIF
+
+
+#MACRO TestImplHelper($TypeNameModifier$Predicate)
+#IFNOT OfRef
+#MACRO TestImplHelper(Predicate)
+#ENDIF
+#ENDDEF
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 #MACRODEF ConstructRawSeq(length)
 var arr=new $ArrayType$[length];
@@ -435,7 +1295,8 @@ var seq=new STRUCTNAME(length,arr);
 #ENDDEF
 
 
-#MACRODEF ArrSeqImpl<STRUCTNAME,INTERFACE>()
+#MACRODEF ArrSeqImpl2<STRUCTNAME,INTERFACE>()
+/*
 @Test
 public void testEmptyRemoveIfArrSeqSTRUCTNAME()
 {
@@ -637,7 +1498,6 @@ public void testRemoveIfSTRUCTNAME()
 
 
 #IFSWITCH STRUCTNAME==CheckedList,CheckedStack,CheckedSubList
-/*
 @Test
 public void testRemoveIfModCheckArrSeqSTRUCTNAME()
 {

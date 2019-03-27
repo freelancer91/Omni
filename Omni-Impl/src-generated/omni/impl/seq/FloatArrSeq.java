@@ -3480,6 +3480,7 @@ public abstract class FloatArrSeq implements OmniCollection.OfFloat
         bits==Float.floatToRawIntBits(arr[index])
         )
         {
+          ++this.modCount;
           OmniArray.OfFloat.removeIndexAndPullDown(arr,index,--size);
           this.size=size;
           return true;
@@ -3501,6 +3502,7 @@ public abstract class FloatArrSeq implements OmniCollection.OfFloat
         Float.isNaN(arr[index])
         )
         {
+          ++this.modCount;
           OmniArray.OfFloat.removeIndexAndPullDown(arr,index,--size);
           this.size=size;
           return true;
@@ -3522,6 +3524,7 @@ public abstract class FloatArrSeq implements OmniCollection.OfFloat
         arr[index]==0
         )
         {
+          ++this.modCount;
           OmniArray.OfFloat.removeIndexAndPullDown(arr,index,--size);
           this.size=size;
           return true;

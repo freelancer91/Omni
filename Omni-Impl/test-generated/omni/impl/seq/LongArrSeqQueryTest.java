@@ -5,7 +5,7 @@ import omni.impl.seq.LongArrSeq.UncheckedList;
 import omni.impl.seq.LongArrSeq.CheckedList;
 import omni.impl.seq.LongArrSeq.UncheckedStack;
 import omni.impl.seq.LongArrSeq.CheckedStack;
-import omni.api.QueryTestUtil;
+import omni.impl.QueryTestUtil;
 public class LongArrSeqQueryTest
 {
   //TODO place sanity checks for checked sequence modification behavior

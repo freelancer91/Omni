@@ -2895,6 +2895,7 @@ public abstract class IntArrSeq implements OmniCollection.OfInt
         val==arr[index]
         )
         {
+          ++this.modCount;
           OmniArray.OfInt.removeIndexAndPullDown(arr,index,--size);
           this.size=size;
           return true;

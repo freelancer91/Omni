@@ -322,7 +322,7 @@ public class OmniArrayTest
   public void testAscendingOmniStringBuilderToStringboolean()
   {
     boolean[] arr=new boolean[10];
-    booleanArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
+    booleanTestDataBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
     byte[] buffer=new byte[]{(byte)'['};
     ToStringUtil.OmniStringBuilderByte builder=new ToStringUtil.OmniStringBuilderByte(1,buffer);
     OmniArray.OfBoolean.ascendingToString(arr,0,arr.length-1,builder);
@@ -335,7 +335,7 @@ public class OmniArrayTest
   public void testDescendingOmniStringBuilderToStringboolean()
   {
     boolean[] arr=new boolean[10];
-    booleanArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
+    booleanTestDataBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
     byte[] buffer=new byte[]{(byte)'['};
     ToStringUtil.OmniStringBuilderByte builder=new ToStringUtil.OmniStringBuilderByte(1,buffer);
     OmniArray.OfBoolean.descendingToString(arr,0,arr.length-1,builder);
@@ -349,7 +349,7 @@ public class OmniArrayTest
   public void testAscendingFixedBufferToStringboolean()
   {
     boolean[] arr=new boolean[10];
-    booleanArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
+    booleanTestDataBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
     byte[] buffer=new byte[22*arr.length];
     buffer[0]=(byte)'[';
     int bufferOffset=OmniArray.OfBoolean.ascendingToString(arr,0,arr.length-1,buffer,1);
@@ -362,7 +362,7 @@ public class OmniArrayTest
   public void testDescendingFixedBufferToStringboolean()
   {
     boolean[] arr=new boolean[10];
-    booleanArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
+    booleanTestDataBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
     byte[] buffer=new byte[22*arr.length];
     buffer[0]=(byte)'[';
     int bufferOffset=OmniArray.OfBoolean.descendingToString(arr,0,arr.length-1,buffer,1);
@@ -376,7 +376,7 @@ public class OmniArrayTest
   public void testAscendingOmniStringBuilderToStringbyte()
   {
     byte[] arr=new byte[10];
-    byteArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
+    byteTestDataBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
     byte[] buffer=new byte[]{(byte)'['};
     ToStringUtil.OmniStringBuilderByte builder=new ToStringUtil.OmniStringBuilderByte(1,buffer);
     OmniArray.OfByte.ascendingToString(arr,0,arr.length-1,builder);
@@ -389,7 +389,7 @@ public class OmniArrayTest
   public void testDescendingOmniStringBuilderToStringbyte()
   {
     byte[] arr=new byte[10];
-    byteArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
+    byteTestDataBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
     byte[] buffer=new byte[]{(byte)'['};
     ToStringUtil.OmniStringBuilderByte builder=new ToStringUtil.OmniStringBuilderByte(1,buffer);
     OmniArray.OfByte.descendingToString(arr,0,arr.length-1,builder);
@@ -403,7 +403,7 @@ public class OmniArrayTest
   public void testAscendingFixedBufferToStringbyte()
   {
     byte[] arr=new byte[10];
-    byteArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
+    byteTestDataBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
     byte[] buffer=new byte[22*arr.length];
     buffer[0]=(byte)'[';
     int bufferOffset=OmniArray.OfByte.ascendingToString(arr,0,arr.length-1,buffer,1);
@@ -416,7 +416,7 @@ public class OmniArrayTest
   public void testDescendingFixedBufferToStringbyte()
   {
     byte[] arr=new byte[10];
-    byteArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
+    byteTestDataBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
     byte[] buffer=new byte[22*arr.length];
     buffer[0]=(byte)'[';
     int bufferOffset=OmniArray.OfByte.descendingToString(arr,0,arr.length-1,buffer,1);
@@ -430,7 +430,7 @@ public class OmniArrayTest
   public void testAscendingFixedBufferToStringchar()
   {
     char[] arr=new char[10];
-    charArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
+    charTestDataBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
     char[] buffer=new char[arr.length*3];
     buffer[0]='[';
     buffer[buffer.length-1]=']';
@@ -443,7 +443,7 @@ public class OmniArrayTest
   public void testDescendingFixedBufferToStringchar()
   {
     char[] arr=new char[10];
-    charArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
+    charTestDataBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
     char[] buffer=new char[arr.length*3];
     buffer[0]='[';
     buffer[buffer.length-1]=']';
@@ -457,7 +457,7 @@ public class OmniArrayTest
   public void testAscendingOmniStringBuilderToStringshort()
   {
     short[] arr=new short[10];
-    shortArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
+    shortTestDataBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
     byte[] buffer=new byte[]{(byte)'['};
     ToStringUtil.OmniStringBuilderByte builder=new ToStringUtil.OmniStringBuilderByte(1,buffer);
     OmniArray.OfShort.ascendingToString(arr,0,arr.length-1,builder);
@@ -470,7 +470,7 @@ public class OmniArrayTest
   public void testDescendingOmniStringBuilderToStringshort()
   {
     short[] arr=new short[10];
-    shortArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
+    shortTestDataBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
     byte[] buffer=new byte[]{(byte)'['};
     ToStringUtil.OmniStringBuilderByte builder=new ToStringUtil.OmniStringBuilderByte(1,buffer);
     OmniArray.OfShort.descendingToString(arr,0,arr.length-1,builder);
@@ -484,7 +484,7 @@ public class OmniArrayTest
   public void testAscendingFixedBufferToStringshort()
   {
     short[] arr=new short[10];
-    shortArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
+    shortTestDataBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
     byte[] buffer=new byte[22*arr.length];
     buffer[0]=(byte)'[';
     int bufferOffset=OmniArray.OfShort.ascendingToString(arr,0,arr.length-1,buffer,1);
@@ -497,7 +497,7 @@ public class OmniArrayTest
   public void testDescendingFixedBufferToStringshort()
   {
     short[] arr=new short[10];
-    shortArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
+    shortTestDataBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
     byte[] buffer=new byte[22*arr.length];
     buffer[0]=(byte)'[';
     int bufferOffset=OmniArray.OfShort.descendingToString(arr,0,arr.length-1,buffer,1);
@@ -511,7 +511,7 @@ public class OmniArrayTest
   public void testAscendingOmniStringBuilderToStringint()
   {
     int[] arr=new int[10];
-    intArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
+    intTestDataBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
     byte[] buffer=new byte[]{(byte)'['};
     ToStringUtil.OmniStringBuilderByte builder=new ToStringUtil.OmniStringBuilderByte(1,buffer);
     OmniArray.OfInt.ascendingToString(arr,0,arr.length-1,builder);
@@ -524,7 +524,7 @@ public class OmniArrayTest
   public void testDescendingOmniStringBuilderToStringint()
   {
     int[] arr=new int[10];
-    intArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
+    intTestDataBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
     byte[] buffer=new byte[]{(byte)'['};
     ToStringUtil.OmniStringBuilderByte builder=new ToStringUtil.OmniStringBuilderByte(1,buffer);
     OmniArray.OfInt.descendingToString(arr,0,arr.length-1,builder);
@@ -538,7 +538,7 @@ public class OmniArrayTest
   public void testAscendingFixedBufferToStringint()
   {
     int[] arr=new int[10];
-    intArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
+    intTestDataBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
     byte[] buffer=new byte[22*arr.length];
     buffer[0]=(byte)'[';
     int bufferOffset=OmniArray.OfInt.ascendingToString(arr,0,arr.length-1,buffer,1);
@@ -551,7 +551,7 @@ public class OmniArrayTest
   public void testDescendingFixedBufferToStringint()
   {
     int[] arr=new int[10];
-    intArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
+    intTestDataBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
     byte[] buffer=new byte[22*arr.length];
     buffer[0]=(byte)'[';
     int bufferOffset=OmniArray.OfInt.descendingToString(arr,0,arr.length-1,buffer,1);
@@ -565,7 +565,7 @@ public class OmniArrayTest
   public void testAscendingOmniStringBuilderToStringlong()
   {
     long[] arr=new long[10];
-    longArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
+    longTestDataBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
     byte[] buffer=new byte[]{(byte)'['};
     ToStringUtil.OmniStringBuilderByte builder=new ToStringUtil.OmniStringBuilderByte(1,buffer);
     OmniArray.OfLong.ascendingToString(arr,0,arr.length-1,builder);
@@ -578,7 +578,7 @@ public class OmniArrayTest
   public void testDescendingOmniStringBuilderToStringlong()
   {
     long[] arr=new long[10];
-    longArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
+    longTestDataBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
     byte[] buffer=new byte[]{(byte)'['};
     ToStringUtil.OmniStringBuilderByte builder=new ToStringUtil.OmniStringBuilderByte(1,buffer);
     OmniArray.OfLong.descendingToString(arr,0,arr.length-1,builder);
@@ -592,7 +592,7 @@ public class OmniArrayTest
   public void testAscendingFixedBufferToStringlong()
   {
     long[] arr=new long[10];
-    longArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
+    longTestDataBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
     byte[] buffer=new byte[22*arr.length];
     buffer[0]=(byte)'[';
     int bufferOffset=OmniArray.OfLong.ascendingToString(arr,0,arr.length-1,buffer,1);
@@ -605,7 +605,7 @@ public class OmniArrayTest
   public void testDescendingFixedBufferToStringlong()
   {
     long[] arr=new long[10];
-    longArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
+    longTestDataBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
     byte[] buffer=new byte[22*arr.length];
     buffer[0]=(byte)'[';
     int bufferOffset=OmniArray.OfLong.descendingToString(arr,0,arr.length-1,buffer,1);
@@ -619,7 +619,7 @@ public class OmniArrayTest
   public void testAscendingOmniStringBuilderToStringfloat()
   {
     float[] arr=new float[10];
-    floatArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
+    floatTestDataBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
     byte[] buffer=new byte[]{(byte)'['};
     ToStringUtil.OmniStringBuilderByte builder=new ToStringUtil.OmniStringBuilderByte(1,buffer);
     OmniArray.OfFloat.ascendingToString(arr,0,arr.length-1,builder);
@@ -632,7 +632,7 @@ public class OmniArrayTest
   public void testDescendingOmniStringBuilderToStringfloat()
   {
     float[] arr=new float[10];
-    floatArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
+    floatTestDataBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
     byte[] buffer=new byte[]{(byte)'['};
     ToStringUtil.OmniStringBuilderByte builder=new ToStringUtil.OmniStringBuilderByte(1,buffer);
     OmniArray.OfFloat.descendingToString(arr,0,arr.length-1,builder);
@@ -646,7 +646,7 @@ public class OmniArrayTest
   public void testAscendingFixedBufferToStringfloat()
   {
     float[] arr=new float[10];
-    floatArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
+    floatTestDataBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
     byte[] buffer=new byte[22*arr.length];
     buffer[0]=(byte)'[';
     int bufferOffset=OmniArray.OfFloat.ascendingToString(arr,0,arr.length-1,buffer,1);
@@ -659,7 +659,7 @@ public class OmniArrayTest
   public void testDescendingFixedBufferToStringfloat()
   {
     float[] arr=new float[10];
-    floatArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
+    floatTestDataBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
     byte[] buffer=new byte[22*arr.length];
     buffer[0]=(byte)'[';
     int bufferOffset=OmniArray.OfFloat.descendingToString(arr,0,arr.length-1,buffer,1);
@@ -673,7 +673,7 @@ public class OmniArrayTest
   public void testAscendingStringBuilderToStringdouble()
   {
     double[] arr=new double[10];
-    doubleArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
+    doubleTestDataBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
     StringBuilder builder=new StringBuilder("[");
     OmniArray.OfDouble.ascendingToString(arr,0,arr.length-1,builder);
     builder.append(']');
@@ -685,7 +685,7 @@ public class OmniArrayTest
   public void testDescendingStringBuilderToStringdouble()
   {
     double[] arr=new double[10];
-    doubleArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
+    doubleTestDataBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
     StringBuilder builder=new StringBuilder("[");
     OmniArray.OfDouble.descendingToString(arr,0,arr.length-1,builder);
     builder.append(']');
@@ -698,7 +698,7 @@ public class OmniArrayTest
   public void testAscendingStringBuilderToStringInteger()
   {
     Integer[] arr=new Integer[10];
-    IntegerArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
+    IntegerTestDataBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
     StringBuilder builder=new StringBuilder("[");
     OmniArray.OfRef.ascendingToString(arr,0,arr.length-1,builder);
     builder.append(']');
@@ -710,7 +710,7 @@ public class OmniArrayTest
   public void testDescendingStringBuilderToStringInteger()
   {
     Integer[] arr=new Integer[10];
-    IntegerArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
+    IntegerTestDataBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
     StringBuilder builder=new StringBuilder("[");
     OmniArray.OfRef.descendingToString(arr,0,arr.length-1,builder);
     builder.append(']');
@@ -723,7 +723,7 @@ public class OmniArrayTest
   public void testRemoveRangeAndPullDownboolean()
   {
     boolean[] arr=new boolean[1000];
-    booleanArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
+    booleanTestDataBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
     boolean[] copy=new boolean[arr.length];
     ArrCopy.uncheckedCopy(arr,0,copy,0,arr.length);
     int index=arr.length/2;
@@ -736,7 +736,7 @@ public class OmniArrayTest
   public void testRemoveRangeAndPullDownbyte()
   {
     byte[] arr=new byte[1000];
-    byteArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
+    byteTestDataBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
     byte[] copy=new byte[arr.length];
     ArrCopy.uncheckedCopy(arr,0,copy,0,arr.length);
     int index=arr.length/2;
@@ -749,7 +749,7 @@ public class OmniArrayTest
   public void testRemoveRangeAndPullDownchar()
   {
     char[] arr=new char[1000];
-    charArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
+    charTestDataBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
     char[] copy=new char[arr.length];
     ArrCopy.uncheckedCopy(arr,0,copy,0,arr.length);
     int index=arr.length/2;
@@ -762,7 +762,7 @@ public class OmniArrayTest
   public void testRemoveRangeAndPullDownshort()
   {
     short[] arr=new short[1000];
-    shortArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
+    shortTestDataBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
     short[] copy=new short[arr.length];
     ArrCopy.uncheckedCopy(arr,0,copy,0,arr.length);
     int index=arr.length/2;
@@ -775,7 +775,7 @@ public class OmniArrayTest
   public void testRemoveRangeAndPullDownint()
   {
     int[] arr=new int[1000];
-    intArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
+    intTestDataBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
     int[] copy=new int[arr.length];
     ArrCopy.uncheckedCopy(arr,0,copy,0,arr.length);
     int index=arr.length/2;
@@ -788,7 +788,7 @@ public class OmniArrayTest
   public void testRemoveRangeAndPullDownlong()
   {
     long[] arr=new long[1000];
-    longArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
+    longTestDataBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
     long[] copy=new long[arr.length];
     ArrCopy.uncheckedCopy(arr,0,copy,0,arr.length);
     int index=arr.length/2;
@@ -801,7 +801,7 @@ public class OmniArrayTest
   public void testRemoveRangeAndPullDownfloat()
   {
     float[] arr=new float[1000];
-    floatArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
+    floatTestDataBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
     float[] copy=new float[arr.length];
     ArrCopy.uncheckedCopy(arr,0,copy,0,arr.length);
     int index=arr.length/2;
@@ -814,7 +814,7 @@ public class OmniArrayTest
   public void testRemoveRangeAndPullDowndouble()
   {
     double[] arr=new double[1000];
-    doubleArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
+    doubleTestDataBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
     double[] copy=new double[arr.length];
     ArrCopy.uncheckedCopy(arr,0,copy,0,arr.length);
     int index=arr.length/2;
@@ -827,7 +827,7 @@ public class OmniArrayTest
   public void testRemoveRangeAndPullDownInteger()
   {
     Integer[] arr=new Integer[1000];
-    IntegerArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
+    IntegerTestDataBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
     Integer[] copy=new Integer[arr.length];
     ArrCopy.uncheckedCopy(arr,0,copy,0,arr.length);
     int index=arr.length/2;
@@ -844,7 +844,7 @@ public class OmniArrayTest
   public void testRemoveIndexAndPullDownboolean()
   {
     boolean[] arr=new boolean[1000];
-    booleanArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
+    booleanTestDataBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
     boolean[] copy=new boolean[arr.length];
     ArrCopy.uncheckedCopy(arr,0,copy,0,arr.length);
     int index=arr.length/2;
@@ -856,7 +856,7 @@ public class OmniArrayTest
   public void testRemoveIndexAndPullDownbyte()
   {
     byte[] arr=new byte[1000];
-    byteArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
+    byteTestDataBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
     byte[] copy=new byte[arr.length];
     ArrCopy.uncheckedCopy(arr,0,copy,0,arr.length);
     int index=arr.length/2;
@@ -868,7 +868,7 @@ public class OmniArrayTest
   public void testRemoveIndexAndPullDownchar()
   {
     char[] arr=new char[1000];
-    charArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
+    charTestDataBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
     char[] copy=new char[arr.length];
     ArrCopy.uncheckedCopy(arr,0,copy,0,arr.length);
     int index=arr.length/2;
@@ -880,7 +880,7 @@ public class OmniArrayTest
   public void testRemoveIndexAndPullDownshort()
   {
     short[] arr=new short[1000];
-    shortArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
+    shortTestDataBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
     short[] copy=new short[arr.length];
     ArrCopy.uncheckedCopy(arr,0,copy,0,arr.length);
     int index=arr.length/2;
@@ -892,7 +892,7 @@ public class OmniArrayTest
   public void testRemoveIndexAndPullDownint()
   {
     int[] arr=new int[1000];
-    intArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
+    intTestDataBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
     int[] copy=new int[arr.length];
     ArrCopy.uncheckedCopy(arr,0,copy,0,arr.length);
     int index=arr.length/2;
@@ -904,7 +904,7 @@ public class OmniArrayTest
   public void testRemoveIndexAndPullDownlong()
   {
     long[] arr=new long[1000];
-    longArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
+    longTestDataBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
     long[] copy=new long[arr.length];
     ArrCopy.uncheckedCopy(arr,0,copy,0,arr.length);
     int index=arr.length/2;
@@ -916,7 +916,7 @@ public class OmniArrayTest
   public void testRemoveIndexAndPullDownfloat()
   {
     float[] arr=new float[1000];
-    floatArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
+    floatTestDataBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
     float[] copy=new float[arr.length];
     ArrCopy.uncheckedCopy(arr,0,copy,0,arr.length);
     int index=arr.length/2;
@@ -928,7 +928,7 @@ public class OmniArrayTest
   public void testRemoveIndexAndPullDowndouble()
   {
     double[] arr=new double[1000];
-    doubleArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
+    doubleTestDataBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
     double[] copy=new double[arr.length];
     ArrCopy.uncheckedCopy(arr,0,copy,0,arr.length);
     int index=arr.length/2;
@@ -940,7 +940,7 @@ public class OmniArrayTest
   public void testRemoveIndexAndPullDownInteger()
   {
     Integer[] arr=new Integer[1000];
-    IntegerArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
+    IntegerTestDataBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
     Integer[] copy=new Integer[arr.length];
     ArrCopy.uncheckedCopy(arr,0,copy,0,arr.length);
     int index=arr.length/2;
@@ -953,7 +953,7 @@ public class OmniArrayTest
   public void testAscendingSeqHashCodeboolean()
   {
     boolean[] arr=new boolean[1000];
-    booleanArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
+    booleanTestDataBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
     int hash=OmniArray.OfBoolean.ascendingSeqHashCode(arr,0,arr.length-1);
     int expectedHash=1;
     for(int i=0;i<arr.length;++i)
@@ -976,7 +976,7 @@ public class OmniArrayTest
   public void testDescendingSeqHashCodeboolean()
   {
     boolean[] arr=new boolean[1000];
-    booleanArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
+    booleanTestDataBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
     int hash=OmniArray.OfBoolean.descendingSeqHashCode(arr,0,arr.length-1);
     int expectedHash=1;
     for(int i=arr.length-1;i>=0;--i)
@@ -998,7 +998,7 @@ public class OmniArrayTest
   public void testAscendingSeqHashCodebyte()
   {
     byte[] arr=new byte[1000];
-    byteArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
+    byteTestDataBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
     int hash=OmniArray.OfByte.ascendingSeqHashCode(arr,0,arr.length-1);
     int expectedHash=1;
     for(int i=0;i<arr.length;++i)
@@ -1013,7 +1013,7 @@ public class OmniArrayTest
   public void testDescendingSeqHashCodebyte()
   {
     byte[] arr=new byte[1000];
-    byteArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
+    byteTestDataBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
     int hash=OmniArray.OfByte.descendingSeqHashCode(arr,0,arr.length-1);
     int expectedHash=1;
     for(int i=arr.length-1;i>=0;--i)
@@ -1027,7 +1027,7 @@ public class OmniArrayTest
   public void testAscendingSeqHashCodechar()
   {
     char[] arr=new char[1000];
-    charArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
+    charTestDataBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
     int hash=OmniArray.OfChar.ascendingSeqHashCode(arr,0,arr.length-1);
     int expectedHash=1;
     for(int i=0;i<arr.length;++i)
@@ -1042,7 +1042,7 @@ public class OmniArrayTest
   public void testDescendingSeqHashCodechar()
   {
     char[] arr=new char[1000];
-    charArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
+    charTestDataBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
     int hash=OmniArray.OfChar.descendingSeqHashCode(arr,0,arr.length-1);
     int expectedHash=1;
     for(int i=arr.length-1;i>=0;--i)
@@ -1056,7 +1056,7 @@ public class OmniArrayTest
   public void testAscendingSeqHashCodeshort()
   {
     short[] arr=new short[1000];
-    shortArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
+    shortTestDataBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
     int hash=OmniArray.OfShort.ascendingSeqHashCode(arr,0,arr.length-1);
     int expectedHash=1;
     for(int i=0;i<arr.length;++i)
@@ -1071,7 +1071,7 @@ public class OmniArrayTest
   public void testDescendingSeqHashCodeshort()
   {
     short[] arr=new short[1000];
-    shortArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
+    shortTestDataBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
     int hash=OmniArray.OfShort.descendingSeqHashCode(arr,0,arr.length-1);
     int expectedHash=1;
     for(int i=arr.length-1;i>=0;--i)
@@ -1085,7 +1085,7 @@ public class OmniArrayTest
   public void testAscendingSeqHashCodeint()
   {
     int[] arr=new int[1000];
-    intArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
+    intTestDataBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
     int hash=OmniArray.OfInt.ascendingSeqHashCode(arr,0,arr.length-1);
     int expectedHash=1;
     for(int i=0;i<arr.length;++i)
@@ -1100,7 +1100,7 @@ public class OmniArrayTest
   public void testDescendingSeqHashCodeint()
   {
     int[] arr=new int[1000];
-    intArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
+    intTestDataBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
     int hash=OmniArray.OfInt.descendingSeqHashCode(arr,0,arr.length-1);
     int expectedHash=1;
     for(int i=arr.length-1;i>=0;--i)
@@ -1114,7 +1114,7 @@ public class OmniArrayTest
   public void testAscendingSeqHashCodelong()
   {
     long[] arr=new long[1000];
-    longArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
+    longTestDataBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
     int hash=OmniArray.OfLong.ascendingSeqHashCode(arr,0,arr.length-1);
     int expectedHash=1;
     for(int i=0;i<arr.length;++i)
@@ -1129,7 +1129,7 @@ public class OmniArrayTest
   public void testDescendingSeqHashCodelong()
   {
     long[] arr=new long[1000];
-    longArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
+    longTestDataBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
     int hash=OmniArray.OfLong.descendingSeqHashCode(arr,0,arr.length-1);
     int expectedHash=1;
     for(int i=arr.length-1;i>=0;--i)
@@ -1143,7 +1143,7 @@ public class OmniArrayTest
   public void testAscendingSeqHashCodefloat()
   {
     float[] arr=new float[1000];
-    floatArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
+    floatTestDataBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
     int hash=OmniArray.OfFloat.ascendingSeqHashCode(arr,0,arr.length-1);
     int expectedHash=1;
     for(int i=0;i<arr.length;++i)
@@ -1158,7 +1158,7 @@ public class OmniArrayTest
   public void testDescendingSeqHashCodefloat()
   {
     float[] arr=new float[1000];
-    floatArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
+    floatTestDataBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
     int hash=OmniArray.OfFloat.descendingSeqHashCode(arr,0,arr.length-1);
     int expectedHash=1;
     for(int i=arr.length-1;i>=0;--i)
@@ -1172,7 +1172,7 @@ public class OmniArrayTest
   public void testAscendingSeqHashCodedouble()
   {
     double[] arr=new double[1000];
-    doubleArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
+    doubleTestDataBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
     int hash=OmniArray.OfDouble.ascendingSeqHashCode(arr,0,arr.length-1);
     int expectedHash=1;
     for(int i=0;i<arr.length;++i)
@@ -1187,7 +1187,7 @@ public class OmniArrayTest
   public void testDescendingSeqHashCodedouble()
   {
     double[] arr=new double[1000];
-    doubleArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
+    doubleTestDataBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
     int hash=OmniArray.OfDouble.descendingSeqHashCode(arr,0,arr.length-1);
     int expectedHash=1;
     for(int i=arr.length-1;i>=0;--i)
@@ -1201,7 +1201,7 @@ public class OmniArrayTest
   public void testAscendingSeqHashCodeInteger()
   {
     Integer[] arr=new Integer[1000];
-    IntegerArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
+    IntegerTestDataBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
     int hash=OmniArray.OfRef.ascendingSeqHashCode(arr,0,arr.length-1);
     int expectedHash=1;
     for(int i=0;i<arr.length;++i)
@@ -1216,7 +1216,7 @@ public class OmniArrayTest
   public void testDescendingSeqHashCodeInteger()
   {
     Integer[] arr=new Integer[1000];
-    IntegerArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
+    IntegerTestDataBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
     int hash=OmniArray.OfRef.descendingSeqHashCode(arr,0,arr.length-1);
     int expectedHash=1;
     for(int i=arr.length-1;i>=0;--i)
@@ -1230,7 +1230,7 @@ public class OmniArrayTest
   public void testascendingForEachboolean()
   {
     boolean[] arr=new boolean[1000];
-    booleanArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
+    booleanTestDataBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
     boolean[] copy=new boolean[arr.length];
     var forwardCopier=new BooleanConsumer()
     {
@@ -1247,7 +1247,7 @@ public class OmniArrayTest
   public void testdescendingForEachboolean()
   {
     boolean[] arr=new boolean[1000];
-    booleanArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
+    booleanTestDataBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
     boolean[] copy=new boolean[arr.length];
     var reverseCopier=new BooleanConsumer()
     {
@@ -1264,7 +1264,7 @@ public class OmniArrayTest
   public void testascendingForEachbyte()
   {
     byte[] arr=new byte[1000];
-    byteArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
+    byteTestDataBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
     byte[] copy=new byte[arr.length];
     var forwardCopier=new ByteConsumer()
     {
@@ -1281,7 +1281,7 @@ public class OmniArrayTest
   public void testdescendingForEachbyte()
   {
     byte[] arr=new byte[1000];
-    byteArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
+    byteTestDataBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
     byte[] copy=new byte[arr.length];
     var reverseCopier=new ByteConsumer()
     {
@@ -1298,7 +1298,7 @@ public class OmniArrayTest
   public void testascendingForEachchar()
   {
     char[] arr=new char[1000];
-    charArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
+    charTestDataBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
     char[] copy=new char[arr.length];
     var forwardCopier=new CharConsumer()
     {
@@ -1315,7 +1315,7 @@ public class OmniArrayTest
   public void testdescendingForEachchar()
   {
     char[] arr=new char[1000];
-    charArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
+    charTestDataBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
     char[] copy=new char[arr.length];
     var reverseCopier=new CharConsumer()
     {
@@ -1332,7 +1332,7 @@ public class OmniArrayTest
   public void testascendingForEachshort()
   {
     short[] arr=new short[1000];
-    shortArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
+    shortTestDataBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
     short[] copy=new short[arr.length];
     var forwardCopier=new ShortConsumer()
     {
@@ -1349,7 +1349,7 @@ public class OmniArrayTest
   public void testdescendingForEachshort()
   {
     short[] arr=new short[1000];
-    shortArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
+    shortTestDataBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
     short[] copy=new short[arr.length];
     var reverseCopier=new ShortConsumer()
     {
@@ -1366,7 +1366,7 @@ public class OmniArrayTest
   public void testascendingForEachint()
   {
     int[] arr=new int[1000];
-    intArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
+    intTestDataBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
     int[] copy=new int[arr.length];
     var forwardCopier=new IntConsumer()
     {
@@ -1383,7 +1383,7 @@ public class OmniArrayTest
   public void testdescendingForEachint()
   {
     int[] arr=new int[1000];
-    intArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
+    intTestDataBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
     int[] copy=new int[arr.length];
     var reverseCopier=new IntConsumer()
     {
@@ -1400,7 +1400,7 @@ public class OmniArrayTest
   public void testascendingForEachlong()
   {
     long[] arr=new long[1000];
-    longArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
+    longTestDataBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
     long[] copy=new long[arr.length];
     var forwardCopier=new LongConsumer()
     {
@@ -1417,7 +1417,7 @@ public class OmniArrayTest
   public void testdescendingForEachlong()
   {
     long[] arr=new long[1000];
-    longArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
+    longTestDataBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
     long[] copy=new long[arr.length];
     var reverseCopier=new LongConsumer()
     {
@@ -1434,7 +1434,7 @@ public class OmniArrayTest
   public void testascendingForEachfloat()
   {
     float[] arr=new float[1000];
-    floatArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
+    floatTestDataBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
     float[] copy=new float[arr.length];
     var forwardCopier=new FloatConsumer()
     {
@@ -1451,7 +1451,7 @@ public class OmniArrayTest
   public void testdescendingForEachfloat()
   {
     float[] arr=new float[1000];
-    floatArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
+    floatTestDataBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
     float[] copy=new float[arr.length];
     var reverseCopier=new FloatConsumer()
     {
@@ -1468,7 +1468,7 @@ public class OmniArrayTest
   public void testascendingForEachdouble()
   {
     double[] arr=new double[1000];
-    doubleArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
+    doubleTestDataBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
     double[] copy=new double[arr.length];
     var forwardCopier=new DoubleConsumer()
     {
@@ -1485,7 +1485,7 @@ public class OmniArrayTest
   public void testdescendingForEachdouble()
   {
     double[] arr=new double[1000];
-    doubleArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
+    doubleTestDataBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
     double[] copy=new double[arr.length];
     var reverseCopier=new DoubleConsumer()
     {
@@ -1502,7 +1502,7 @@ public class OmniArrayTest
   public void testascendingForEachInteger()
   {
     Integer[] arr=new Integer[1000];
-    IntegerArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
+    IntegerTestDataBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
     Integer[] copy=new Integer[arr.length];
     var forwardCopier=new Consumer<Integer>()
     {
@@ -1519,7 +1519,7 @@ public class OmniArrayTest
   public void testdescendingForEachInteger()
   {
     Integer[] arr=new Integer[1000];
-    IntegerArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
+    IntegerTestDataBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
     Integer[] copy=new Integer[arr.length];
     var reverseCopier=new Consumer<Integer>()
     {
@@ -1536,7 +1536,7 @@ public class OmniArrayTest
   public void testUncheckedReplaceAllboolean()
   {
     boolean[] arr=new boolean[1000];
-    booleanArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
+    booleanTestDataBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
     boolean[] copy=new boolean[arr.length];
     ArrCopy.uncheckedCopy(arr,0,copy,0,arr.length);
     BooleanPredicate manipulator=val->
@@ -1553,7 +1553,7 @@ public class OmniArrayTest
   public void testUncheckedReplaceAllbyte()
   {
     byte[] arr=new byte[1000];
-    byteArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
+    byteTestDataBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
     byte[] copy=new byte[arr.length];
     ArrCopy.uncheckedCopy(arr,0,copy,0,arr.length);
     ByteUnaryOperator manipulator=val->
@@ -1570,7 +1570,7 @@ public class OmniArrayTest
   public void testUncheckedReplaceAllchar()
   {
     char[] arr=new char[1000];
-    charArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
+    charTestDataBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
     char[] copy=new char[arr.length];
     ArrCopy.uncheckedCopy(arr,0,copy,0,arr.length);
     CharUnaryOperator manipulator=val->
@@ -1587,7 +1587,7 @@ public class OmniArrayTest
   public void testUncheckedReplaceAllshort()
   {
     short[] arr=new short[1000];
-    shortArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
+    shortTestDataBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
     short[] copy=new short[arr.length];
     ArrCopy.uncheckedCopy(arr,0,copy,0,arr.length);
     ShortUnaryOperator manipulator=val->
@@ -1604,7 +1604,7 @@ public class OmniArrayTest
   public void testUncheckedReplaceAllint()
   {
     int[] arr=new int[1000];
-    intArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
+    intTestDataBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
     int[] copy=new int[arr.length];
     ArrCopy.uncheckedCopy(arr,0,copy,0,arr.length);
     IntUnaryOperator manipulator=val->
@@ -1621,7 +1621,7 @@ public class OmniArrayTest
   public void testUncheckedReplaceAlllong()
   {
     long[] arr=new long[1000];
-    longArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
+    longTestDataBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
     long[] copy=new long[arr.length];
     ArrCopy.uncheckedCopy(arr,0,copy,0,arr.length);
     LongUnaryOperator manipulator=val->
@@ -1638,7 +1638,7 @@ public class OmniArrayTest
   public void testUncheckedReplaceAllfloat()
   {
     float[] arr=new float[1000];
-    floatArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
+    floatTestDataBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
     float[] copy=new float[arr.length];
     ArrCopy.uncheckedCopy(arr,0,copy,0,arr.length);
     FloatUnaryOperator manipulator=val->
@@ -1655,7 +1655,7 @@ public class OmniArrayTest
   public void testUncheckedReplaceAlldouble()
   {
     double[] arr=new double[1000];
-    doubleArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
+    doubleTestDataBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
     double[] copy=new double[arr.length];
     ArrCopy.uncheckedCopy(arr,0,copy,0,arr.length);
     DoubleUnaryOperator manipulator=val->
@@ -1672,7 +1672,7 @@ public class OmniArrayTest
   public void testUncheckedReplaceAllInteger()
   {
     Integer[] arr=new Integer[1000];
-    IntegerArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
+    IntegerTestDataBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
     Integer[] copy=new Integer[arr.length];
     ArrCopy.uncheckedCopy(arr,0,copy,0,arr.length);
     UnaryOperator<Integer> manipulator=val->
@@ -1691,7 +1691,7 @@ public class OmniArrayTest
     {
       Random rand=new Random(0);
       boolean[] arr;
-      booleanArrayBuilder.Randomized.buildUnchecked(arr=new boolean[100],0,arr.length,rand,0);
+      booleanTestDataBuilder.Randomized.buildUnchecked(arr=new boolean[100],0,arr.length,rand,0);
       boolean[] copy=new boolean[arr.length];
       ArrCopy.uncheckedCopy(arr,0,copy,0,arr.length);
       OmniArray.OfBoolean.reverseRange(arr,0,arr.length-1);
@@ -1702,7 +1702,7 @@ public class OmniArrayTest
     {
       Random rand=new Random(0);
       byte[] arr;
-      byteArrayBuilder.Randomized.buildUnchecked(arr=new byte[100],0,arr.length,rand,0);
+      byteTestDataBuilder.Randomized.buildUnchecked(arr=new byte[100],0,arr.length,rand,0);
       byte[] copy=new byte[arr.length];
       ArrCopy.uncheckedCopy(arr,0,copy,0,arr.length);
       OmniArray.OfByte.reverseRange(arr,0,arr.length-1);
@@ -1713,7 +1713,7 @@ public class OmniArrayTest
     {
       Random rand=new Random(0);
       char[] arr;
-      charArrayBuilder.Randomized.buildUnchecked(arr=new char[100],0,arr.length,rand,0);
+      charTestDataBuilder.Randomized.buildUnchecked(arr=new char[100],0,arr.length,rand,0);
       char[] copy=new char[arr.length];
       ArrCopy.uncheckedCopy(arr,0,copy,0,arr.length);
       OmniArray.OfChar.reverseRange(arr,0,arr.length-1);
@@ -1724,7 +1724,7 @@ public class OmniArrayTest
     {
       Random rand=new Random(0);
       short[] arr;
-      shortArrayBuilder.Randomized.buildUnchecked(arr=new short[100],0,arr.length,rand,0);
+      shortTestDataBuilder.Randomized.buildUnchecked(arr=new short[100],0,arr.length,rand,0);
       short[] copy=new short[arr.length];
       ArrCopy.uncheckedCopy(arr,0,copy,0,arr.length);
       OmniArray.OfShort.reverseRange(arr,0,arr.length-1);
@@ -1735,7 +1735,7 @@ public class OmniArrayTest
     {
       Random rand=new Random(0);
       int[] arr;
-      intArrayBuilder.Randomized.buildUnchecked(arr=new int[100],0,arr.length,rand,0);
+      intTestDataBuilder.Randomized.buildUnchecked(arr=new int[100],0,arr.length,rand,0);
       int[] copy=new int[arr.length];
       ArrCopy.uncheckedCopy(arr,0,copy,0,arr.length);
       OmniArray.OfInt.reverseRange(arr,0,arr.length-1);
@@ -1746,7 +1746,7 @@ public class OmniArrayTest
     {
       Random rand=new Random(0);
       long[] arr;
-      longArrayBuilder.Randomized.buildUnchecked(arr=new long[100],0,arr.length,rand,0);
+      longTestDataBuilder.Randomized.buildUnchecked(arr=new long[100],0,arr.length,rand,0);
       long[] copy=new long[arr.length];
       ArrCopy.uncheckedCopy(arr,0,copy,0,arr.length);
       OmniArray.OfLong.reverseRange(arr,0,arr.length-1);
@@ -1757,7 +1757,7 @@ public class OmniArrayTest
     {
       Random rand=new Random(0);
       float[] arr;
-      floatArrayBuilder.Randomized.buildUnchecked(arr=new float[100],0,arr.length,rand,0);
+      floatTestDataBuilder.Randomized.buildUnchecked(arr=new float[100],0,arr.length,rand,0);
       float[] copy=new float[arr.length];
       ArrCopy.uncheckedCopy(arr,0,copy,0,arr.length);
       OmniArray.OfFloat.reverseRange(arr,0,arr.length-1);
@@ -1768,7 +1768,7 @@ public class OmniArrayTest
     {
       Random rand=new Random(0);
       double[] arr;
-      doubleArrayBuilder.Randomized.buildUnchecked(arr=new double[100],0,arr.length,rand,0);
+      doubleTestDataBuilder.Randomized.buildUnchecked(arr=new double[100],0,arr.length,rand,0);
       double[] copy=new double[arr.length];
       ArrCopy.uncheckedCopy(arr,0,copy,0,arr.length);
       OmniArray.OfDouble.reverseRange(arr,0,arr.length-1);
@@ -1779,7 +1779,7 @@ public class OmniArrayTest
     {
       Random rand=new Random(0);
       String[] arr;
-      StringArrayBuilder.Randomized.buildUnchecked(arr=new String[100],0,arr.length,rand,0);
+      StringTestDataBuilder.Randomized.buildUnchecked(arr=new String[100],0,arr.length,rand,0);
       String[] copy=new String[arr.length];
       ArrCopy.uncheckedCopy(arr,0,copy,0,arr.length);
       OmniArray.OfRef.reverseRange(arr,0,arr.length-1);
@@ -1822,11 +1822,11 @@ public class OmniArrayTest
       boolean[] arr=new boolean[1000];
       if(willContain)
       {
-        booleanArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,rand,rand.nextInt());
+        booleanTestDataBuilder.Randomized.buildUnchecked(arr,0,arr.length,rand,rand.nextInt());
         int index=RandomUtil.randomIntBetween(0,arr.length-1,rand);
         boolean v=arr[index];
         Assertions.assertTrue(OmniArray.OfBoolean.uncheckedcontains(arr,0,arr.length-1,v));
-        booleanArrayBuilder.AllEquals.buildUnchecked(arr,0,arr.length,rand,0);
+        booleanTestDataBuilder.AllEquals.buildUnchecked(arr,0,arr.length,rand,0);
         v=arr[index];
         arr[index]=!v;
         Assertions.assertEquals(index,OmniArray.OfBoolean.uncheckedindexOf(arr,arr.length,!v));
@@ -1837,7 +1837,7 @@ public class OmniArrayTest
       }
       else
       {
-        booleanArrayBuilder.AllEquals.buildUnchecked(arr,0,arr.length,rand,rand.nextInt());
+        booleanTestDataBuilder.AllEquals.buildUnchecked(arr,0,arr.length,rand,rand.nextInt());
         boolean v=arr[0];
         Assertions.assertFalse(OmniArray.OfBoolean.uncheckedcontains(arr,0,arr.length-1,!v));
         Assertions.assertEquals(-1,OmniArray.OfBoolean.uncheckedindexOf(arr,arr.length,!v));
@@ -1855,7 +1855,7 @@ public class OmniArrayTest
     for(int i=0;i<100;++i)
     {
       boolean willContain=rand.nextBoolean();
-      var arr=byteArrayBuilder.buildRandomArray(1000,1,100,rand);
+      var arr=byteTestDataBuilder.buildRandomArray(1000,1,100,rand);
       if(willContain)
       {
         int index=RandomUtil.randomIntBetween(0,arr.length-1,rand);
@@ -1887,7 +1887,7 @@ public class OmniArrayTest
     for(int i=0;i<100;++i)
     {
       boolean willContain=rand.nextBoolean();
-      var arr=charArrayBuilder.buildRandomArray(1000,1,100,rand);
+      var arr=charTestDataBuilder.buildRandomArray(1000,1,100,rand);
       if(willContain)
       {
         int index=RandomUtil.randomIntBetween(0,arr.length-1,rand);
@@ -1919,7 +1919,7 @@ public class OmniArrayTest
     for(int i=0;i<100;++i)
     {
       boolean willContain=rand.nextBoolean();
-      var arr=shortArrayBuilder.buildRandomArray(1000,1,100,rand);
+      var arr=shortTestDataBuilder.buildRandomArray(1000,1,100,rand);
       if(willContain)
       {
         int index=RandomUtil.randomIntBetween(0,arr.length-1,rand);
@@ -1951,7 +1951,7 @@ public class OmniArrayTest
     for(int i=0;i<100;++i)
     {
       boolean willContain=rand.nextBoolean();
-      var arr=intArrayBuilder.buildRandomArray(1000,1,100,rand);
+      var arr=intTestDataBuilder.buildRandomArray(1000,1,100,rand);
       if(willContain)
       {
         int index=RandomUtil.randomIntBetween(0,arr.length-1,rand);
@@ -1983,7 +1983,7 @@ public class OmniArrayTest
     for(int i=0;i<100;++i)
     {
       boolean willContain=rand.nextBoolean();
-      var arr=longArrayBuilder.buildRandomArray(1000,1,100,rand);
+      var arr=longTestDataBuilder.buildRandomArray(1000,1,100,rand);
       if(willContain)
       {
         int index=RandomUtil.randomIntBetween(0,arr.length-1,rand);
@@ -2015,7 +2015,7 @@ public class OmniArrayTest
     for(int i=0;i<100;++i)
     {
       boolean willContain=rand.nextBoolean();
-      var arr=floatArrayBuilder.buildRandomArray(1000,1,100,rand);
+      var arr=floatTestDataBuilder.buildRandomArray(1000,1,100,rand);
       switch(RandomUtil.randomIntBetween(0,2,rand))
       {
         case 0:
@@ -2106,7 +2106,7 @@ public class OmniArrayTest
     for(int i=0;i<100;++i)
     {
       boolean willContain=rand.nextBoolean();
-      var arr=doubleArrayBuilder.buildRandomArray(1000,1,100,rand);
+      var arr=doubleTestDataBuilder.buildRandomArray(1000,1,100,rand);
       switch(RandomUtil.randomIntBetween(0,2,rand))
       {
         case 0:
@@ -2197,7 +2197,7 @@ public class OmniArrayTest
     for(int i=0;i<100;++i)
     {
       boolean willContain=rand.nextBoolean();
-      var arr=IntegerArrayBuilder.buildRandomArray(1000,1,100,rand);
+      var arr=IntegerTestDataBuilder.buildRandomArray(1000,1,100,rand);
       switch(RandomUtil.randomIntBetween(0,2,rand))
       {
         case 0:

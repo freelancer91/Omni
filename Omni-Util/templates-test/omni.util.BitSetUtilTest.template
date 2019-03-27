@@ -44,13 +44,13 @@ public void testMarkSurvivorsBitSetARRTYPE()
   var filter=ARRTYPEPredicates.MarkGreaterThan.getPred(rand,128);
   for(int i=0;i<100;++i)
   {
-    ARRTYPE[] arr=ARRTYPEArrayBuilder.buildRandomArray(5000,0,256,rand);
+    ARRTYPE[] arr=ARRTYPETestDataBuilder.buildRandomArray(5000,0,256,rand);
 #ELSE
   var filter=ARRTYPEPredicates.MarkGreaterThan.getPred(rand,0);
   for(int i=0;i<100;++i)
   {
 
-    ARRTYPE[] arr=ARRTYPEArrayBuilder.buildRandomArray(5000,Byte.MIN_VALUE,Byte.MAX_VALUE,rand);
+    ARRTYPE[] arr=ARRTYPETestDataBuilder.buildRandomArray(5000,Byte.MIN_VALUE,Byte.MAX_VALUE,rand);
 #ENDIF
     long[] bitSet=BitSetUtil.getBitSet(arr.length);
 
@@ -93,13 +93,13 @@ public void testMarkSurvivorsRetWordARRTYPE()
   var filter=ARRTYPEPredicates.MarkGreaterThan.getPred(rand,128);
   for(int i=0;i<100;++i)
   {
-    ARRTYPE[] arr=ARRTYPEArrayBuilder.buildRandomArray(64,0,256,rand);
+    ARRTYPE[] arr=ARRTYPETestDataBuilder.buildRandomArray(64,0,256,rand);
 #ELSE
   var filter=ARRTYPEPredicates.MarkGreaterThan.getPred(rand,0);
   for(int i=0;i<100;++i)
   {
 
-    ARRTYPE[] arr=ARRTYPEArrayBuilder.buildRandomArray(64,Byte.MIN_VALUE,Byte.MAX_VALUE,rand);
+    ARRTYPE[] arr=ARRTYPETestDataBuilder.buildRandomArray(64,Byte.MIN_VALUE,Byte.MAX_VALUE,rand);
 #ENDIF
     long word=BitSetUtil.markSurvivors(arr,0,arr.length,filter);
     int numExpectedSurvivors=Long.bitCount(word);

@@ -3173,6 +3173,7 @@ public abstract class ByteArrSeq implements OmniCollection.OfByte
         val==arr[index]
         )
         {
+          ++this.modCount;
           OmniArray.OfByte.removeIndexAndPullDown(arr,index,--size);
           this.size=size;
           return true;

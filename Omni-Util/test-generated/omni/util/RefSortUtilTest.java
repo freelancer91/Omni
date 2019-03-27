@@ -40,10 +40,10 @@ public class RefSortUtilTest
   {
     final long randSeed;
     final int m;
-    final IntegerArrayBuilder builder;
+    final IntegerTestDataBuilder builder;
     final Integer[] customArr;
     final int[] stockArr;
-    private TestData(long randSeed,int m,IntegerArrayBuilder builder,int arrLength,Random rand)
+    private TestData(long randSeed,int m,IntegerTestDataBuilder builder,int arrLength,Random rand)
     {
       this.randSeed=randSeed;
       this.m=m;
@@ -79,7 +79,7 @@ public class RefSortUtilTest
     {
       return "TestData{builder="+builder+"; arrayType=Object; arrLength="+customArr.length+"; m="+m+"; randSeed="+randSeed+"}";
     }
-    private static void initializeTestData(IntegerArrayBuilder builder,long randSeed,int arrLength,ArrayList<TestData> testDatas)
+    private static void initializeTestData(IntegerTestDataBuilder builder,long randSeed,int arrLength,ArrayList<TestData> testDatas)
     {
       Random rand=new Random(randSeed);
       for(int m=builder.getMLo(),mHi=builder.getMHi(arrLength),numReps=builder.getNumSortReps(arrLength);m<=mHi;m=builder.incrementM(m))
@@ -267,7 +267,7 @@ public class RefSortUtilTest
     }
     lengthStream.forEach(arrLength->
     {
-      if(IntegerArrayBuilder.AllEquals.isRandomized())
+      if(IntegerTestDataBuilder.AllEquals.isRandomized())
       {
         var randStream=Arrays.stream(randSeeds);
         if(PARALLEL)
@@ -276,12 +276,12 @@ public class RefSortUtilTest
         }
         randStream.forEach(randSeed->
         {
-          TestData.initializeTestData(IntegerArrayBuilder.AllEquals,randSeed,arrLength,TEST_DATA);
+          TestData.initializeTestData(IntegerTestDataBuilder.AllEquals,randSeed,arrLength,TEST_DATA);
         });
       }
       else
       {
-        TestData.initializeTestData(IntegerArrayBuilder.AllEquals,0,arrLength,TEST_DATA);
+        TestData.initializeTestData(IntegerTestDataBuilder.AllEquals,0,arrLength,TEST_DATA);
       }
     });
     System.out.println("Initialized "+TEST_DATA.size()+" arrays");
@@ -535,7 +535,7 @@ public class RefSortUtilTest
     }
     lengthStream.forEach(arrLength->
     {
-      if(IntegerArrayBuilder.MergeAscending.isRandomized())
+      if(IntegerTestDataBuilder.MergeAscending.isRandomized())
       {
         var randStream=Arrays.stream(randSeeds);
         if(PARALLEL)
@@ -544,12 +544,12 @@ public class RefSortUtilTest
         }
         randStream.forEach(randSeed->
         {
-          TestData.initializeTestData(IntegerArrayBuilder.MergeAscending,randSeed,arrLength,TEST_DATA);
+          TestData.initializeTestData(IntegerTestDataBuilder.MergeAscending,randSeed,arrLength,TEST_DATA);
         });
       }
       else
       {
-        TestData.initializeTestData(IntegerArrayBuilder.MergeAscending,0,arrLength,TEST_DATA);
+        TestData.initializeTestData(IntegerTestDataBuilder.MergeAscending,0,arrLength,TEST_DATA);
       }
     });
     System.out.println("Initialized "+TEST_DATA.size()+" arrays");
@@ -805,7 +805,7 @@ public class RefSortUtilTest
     }
     lengthStream.forEach(arrLength->
     {
-      if(IntegerArrayBuilder.MergeDescending.isRandomized())
+      if(IntegerTestDataBuilder.MergeDescending.isRandomized())
       {
         var randStream=Arrays.stream(randSeeds);
         if(PARALLEL)
@@ -814,12 +814,12 @@ public class RefSortUtilTest
         }
         randStream.forEach(randSeed->
         {
-          TestData.initializeTestData(IntegerArrayBuilder.MergeDescending,randSeed,arrLength,TEST_DATA);
+          TestData.initializeTestData(IntegerTestDataBuilder.MergeDescending,randSeed,arrLength,TEST_DATA);
         });
       }
       else
       {
-        TestData.initializeTestData(IntegerArrayBuilder.MergeDescending,0,arrLength,TEST_DATA);
+        TestData.initializeTestData(IntegerTestDataBuilder.MergeDescending,0,arrLength,TEST_DATA);
       }
     });
     System.out.println("Initialized "+TEST_DATA.size()+" arrays");
@@ -1075,7 +1075,7 @@ public class RefSortUtilTest
     }
     lengthStream.forEach(arrLength->
     {
-      if(IntegerArrayBuilder.SortedRepeated.isRandomized())
+      if(IntegerTestDataBuilder.SortedRepeated.isRandomized())
       {
         var randStream=Arrays.stream(randSeeds);
         if(PARALLEL)
@@ -1084,12 +1084,12 @@ public class RefSortUtilTest
         }
         randStream.forEach(randSeed->
         {
-          TestData.initializeTestData(IntegerArrayBuilder.SortedRepeated,randSeed,arrLength,TEST_DATA);
+          TestData.initializeTestData(IntegerTestDataBuilder.SortedRepeated,randSeed,arrLength,TEST_DATA);
         });
       }
       else
       {
-        TestData.initializeTestData(IntegerArrayBuilder.SortedRepeated,0,arrLength,TEST_DATA);
+        TestData.initializeTestData(IntegerTestDataBuilder.SortedRepeated,0,arrLength,TEST_DATA);
       }
     });
     System.out.println("Initialized "+TEST_DATA.size()+" arrays");
@@ -1345,7 +1345,7 @@ public class RefSortUtilTest
     }
     lengthStream.forEach(arrLength->
     {
-      if(IntegerArrayBuilder.SortedOrganPipes.isRandomized())
+      if(IntegerTestDataBuilder.SortedOrganPipes.isRandomized())
       {
         var randStream=Arrays.stream(randSeeds);
         if(PARALLEL)
@@ -1354,12 +1354,12 @@ public class RefSortUtilTest
         }
         randStream.forEach(randSeed->
         {
-          TestData.initializeTestData(IntegerArrayBuilder.SortedOrganPipes,randSeed,arrLength,TEST_DATA);
+          TestData.initializeTestData(IntegerTestDataBuilder.SortedOrganPipes,randSeed,arrLength,TEST_DATA);
         });
       }
       else
       {
-        TestData.initializeTestData(IntegerArrayBuilder.SortedOrganPipes,0,arrLength,TEST_DATA);
+        TestData.initializeTestData(IntegerTestDataBuilder.SortedOrganPipes,0,arrLength,TEST_DATA);
       }
     });
     System.out.println("Initialized "+TEST_DATA.size()+" arrays");
@@ -1615,7 +1615,7 @@ public class RefSortUtilTest
     }
     lengthStream.forEach(arrLength->
     {
-      if(IntegerArrayBuilder.Ascending.isRandomized())
+      if(IntegerTestDataBuilder.Ascending.isRandomized())
       {
         var randStream=Arrays.stream(randSeeds);
         if(PARALLEL)
@@ -1624,12 +1624,12 @@ public class RefSortUtilTest
         }
         randStream.forEach(randSeed->
         {
-          TestData.initializeTestData(IntegerArrayBuilder.Ascending,randSeed,arrLength,TEST_DATA);
+          TestData.initializeTestData(IntegerTestDataBuilder.Ascending,randSeed,arrLength,TEST_DATA);
         });
       }
       else
       {
-        TestData.initializeTestData(IntegerArrayBuilder.Ascending,0,arrLength,TEST_DATA);
+        TestData.initializeTestData(IntegerTestDataBuilder.Ascending,0,arrLength,TEST_DATA);
       }
     });
     System.out.println("Initialized "+TEST_DATA.size()+" arrays");
@@ -1884,7 +1884,7 @@ public class RefSortUtilTest
     }
     lengthStream.forEach(arrLength->
     {
-      if(IntegerArrayBuilder.Descending.isRandomized())
+      if(IntegerTestDataBuilder.Descending.isRandomized())
       {
         var randStream=Arrays.stream(randSeeds);
         if(PARALLEL)
@@ -1893,12 +1893,12 @@ public class RefSortUtilTest
         }
         randStream.forEach(randSeed->
         {
-          TestData.initializeTestData(IntegerArrayBuilder.Descending,randSeed,arrLength,TEST_DATA);
+          TestData.initializeTestData(IntegerTestDataBuilder.Descending,randSeed,arrLength,TEST_DATA);
         });
       }
       else
       {
-        TestData.initializeTestData(IntegerArrayBuilder.Descending,0,arrLength,TEST_DATA);
+        TestData.initializeTestData(IntegerTestDataBuilder.Descending,0,arrLength,TEST_DATA);
       }
     });
     System.out.println("Initialized "+TEST_DATA.size()+" arrays");
@@ -2153,7 +2153,7 @@ public class RefSortUtilTest
     }
     lengthStream.forEach(arrLength->
     {
-      if(IntegerArrayBuilder.Saw.isRandomized())
+      if(IntegerTestDataBuilder.Saw.isRandomized())
       {
         var randStream=Arrays.stream(randSeeds);
         if(PARALLEL)
@@ -2162,12 +2162,12 @@ public class RefSortUtilTest
         }
         randStream.forEach(randSeed->
         {
-          TestData.initializeTestData(IntegerArrayBuilder.Saw,randSeed,arrLength,TEST_DATA);
+          TestData.initializeTestData(IntegerTestDataBuilder.Saw,randSeed,arrLength,TEST_DATA);
         });
       }
       else
       {
-        TestData.initializeTestData(IntegerArrayBuilder.Saw,0,arrLength,TEST_DATA);
+        TestData.initializeTestData(IntegerTestDataBuilder.Saw,0,arrLength,TEST_DATA);
       }
     });
     System.out.println("Initialized "+TEST_DATA.size()+" arrays");
@@ -2423,7 +2423,7 @@ public class RefSortUtilTest
     }
     lengthStream.forEach(arrLength->
     {
-      if(IntegerArrayBuilder.Repeated.isRandomized())
+      if(IntegerTestDataBuilder.Repeated.isRandomized())
       {
         var randStream=Arrays.stream(randSeeds);
         if(PARALLEL)
@@ -2432,12 +2432,12 @@ public class RefSortUtilTest
         }
         randStream.forEach(randSeed->
         {
-          TestData.initializeTestData(IntegerArrayBuilder.Repeated,randSeed,arrLength,TEST_DATA);
+          TestData.initializeTestData(IntegerTestDataBuilder.Repeated,randSeed,arrLength,TEST_DATA);
         });
       }
       else
       {
-        TestData.initializeTestData(IntegerArrayBuilder.Repeated,0,arrLength,TEST_DATA);
+        TestData.initializeTestData(IntegerTestDataBuilder.Repeated,0,arrLength,TEST_DATA);
       }
     });
     System.out.println("Initialized "+TEST_DATA.size()+" arrays");
@@ -2693,7 +2693,7 @@ public class RefSortUtilTest
     }
     lengthStream.forEach(arrLength->
     {
-      if(IntegerArrayBuilder.OrganPipes.isRandomized())
+      if(IntegerTestDataBuilder.OrganPipes.isRandomized())
       {
         var randStream=Arrays.stream(randSeeds);
         if(PARALLEL)
@@ -2702,12 +2702,12 @@ public class RefSortUtilTest
         }
         randStream.forEach(randSeed->
         {
-          TestData.initializeTestData(IntegerArrayBuilder.OrganPipes,randSeed,arrLength,TEST_DATA);
+          TestData.initializeTestData(IntegerTestDataBuilder.OrganPipes,randSeed,arrLength,TEST_DATA);
         });
       }
       else
       {
-        TestData.initializeTestData(IntegerArrayBuilder.OrganPipes,0,arrLength,TEST_DATA);
+        TestData.initializeTestData(IntegerTestDataBuilder.OrganPipes,0,arrLength,TEST_DATA);
       }
     });
     System.out.println("Initialized "+TEST_DATA.size()+" arrays");
@@ -2963,7 +2963,7 @@ public class RefSortUtilTest
     }
     lengthStream.forEach(arrLength->
     {
-      if(IntegerArrayBuilder.Stagger.isRandomized())
+      if(IntegerTestDataBuilder.Stagger.isRandomized())
       {
         var randStream=Arrays.stream(randSeeds);
         if(PARALLEL)
@@ -2972,12 +2972,12 @@ public class RefSortUtilTest
         }
         randStream.forEach(randSeed->
         {
-          TestData.initializeTestData(IntegerArrayBuilder.Stagger,randSeed,arrLength,TEST_DATA);
+          TestData.initializeTestData(IntegerTestDataBuilder.Stagger,randSeed,arrLength,TEST_DATA);
         });
       }
       else
       {
-        TestData.initializeTestData(IntegerArrayBuilder.Stagger,0,arrLength,TEST_DATA);
+        TestData.initializeTestData(IntegerTestDataBuilder.Stagger,0,arrLength,TEST_DATA);
       }
     });
     System.out.println("Initialized "+TEST_DATA.size()+" arrays");
@@ -3233,7 +3233,7 @@ public class RefSortUtilTest
     }
     lengthStream.forEach(arrLength->
     {
-      if(IntegerArrayBuilder.Plateau.isRandomized())
+      if(IntegerTestDataBuilder.Plateau.isRandomized())
       {
         var randStream=Arrays.stream(randSeeds);
         if(PARALLEL)
@@ -3242,12 +3242,12 @@ public class RefSortUtilTest
         }
         randStream.forEach(randSeed->
         {
-          TestData.initializeTestData(IntegerArrayBuilder.Plateau,randSeed,arrLength,TEST_DATA);
+          TestData.initializeTestData(IntegerTestDataBuilder.Plateau,randSeed,arrLength,TEST_DATA);
         });
       }
       else
       {
-        TestData.initializeTestData(IntegerArrayBuilder.Plateau,0,arrLength,TEST_DATA);
+        TestData.initializeTestData(IntegerTestDataBuilder.Plateau,0,arrLength,TEST_DATA);
       }
     });
     System.out.println("Initialized "+TEST_DATA.size()+" arrays");
@@ -3503,7 +3503,7 @@ public class RefSortUtilTest
     }
     lengthStream.forEach(arrLength->
     {
-      if(IntegerArrayBuilder.Shuffle.isRandomized())
+      if(IntegerTestDataBuilder.Shuffle.isRandomized())
       {
         var randStream=Arrays.stream(randSeeds);
         if(PARALLEL)
@@ -3512,12 +3512,12 @@ public class RefSortUtilTest
         }
         randStream.forEach(randSeed->
         {
-          TestData.initializeTestData(IntegerArrayBuilder.Shuffle,randSeed,arrLength,TEST_DATA);
+          TestData.initializeTestData(IntegerTestDataBuilder.Shuffle,randSeed,arrLength,TEST_DATA);
         });
       }
       else
       {
-        TestData.initializeTestData(IntegerArrayBuilder.Shuffle,0,arrLength,TEST_DATA);
+        TestData.initializeTestData(IntegerTestDataBuilder.Shuffle,0,arrLength,TEST_DATA);
       }
     });
     System.out.println("Initialized "+TEST_DATA.size()+" arrays");
@@ -3773,7 +3773,7 @@ public class RefSortUtilTest
     }
     lengthStream.forEach(arrLength->
     {
-      if(IntegerArrayBuilder.Randomized.isRandomized())
+      if(IntegerTestDataBuilder.Randomized.isRandomized())
       {
         var randStream=Arrays.stream(randSeeds);
         if(PARALLEL)
@@ -3782,12 +3782,12 @@ public class RefSortUtilTest
         }
         randStream.forEach(randSeed->
         {
-          TestData.initializeTestData(IntegerArrayBuilder.Randomized,randSeed,arrLength,TEST_DATA);
+          TestData.initializeTestData(IntegerTestDataBuilder.Randomized,randSeed,arrLength,TEST_DATA);
         });
       }
       else
       {
-        TestData.initializeTestData(IntegerArrayBuilder.Randomized,0,arrLength,TEST_DATA);
+        TestData.initializeTestData(IntegerTestDataBuilder.Randomized,0,arrLength,TEST_DATA);
       }
     });
     System.out.println("Initialized "+TEST_DATA.size()+" arrays");
@@ -4043,7 +4043,7 @@ public class RefSortUtilTest
     }
     lengthStream.forEach(arrLength->
     {
-      if(IntegerArrayBuilder.Duplicated.isRandomized())
+      if(IntegerTestDataBuilder.Duplicated.isRandomized())
       {
         var randStream=Arrays.stream(randSeeds);
         if(PARALLEL)
@@ -4052,12 +4052,12 @@ public class RefSortUtilTest
         }
         randStream.forEach(randSeed->
         {
-          TestData.initializeTestData(IntegerArrayBuilder.Duplicated,randSeed,arrLength,TEST_DATA);
+          TestData.initializeTestData(IntegerTestDataBuilder.Duplicated,randSeed,arrLength,TEST_DATA);
         });
       }
       else
       {
-        TestData.initializeTestData(IntegerArrayBuilder.Duplicated,0,arrLength,TEST_DATA);
+        TestData.initializeTestData(IntegerTestDataBuilder.Duplicated,0,arrLength,TEST_DATA);
       }
     });
     System.out.println("Initialized "+TEST_DATA.size()+" arrays");

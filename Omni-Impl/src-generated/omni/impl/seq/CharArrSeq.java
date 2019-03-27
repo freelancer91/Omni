@@ -3131,6 +3131,7 @@ public abstract class CharArrSeq implements OmniCollection.OfChar
         val==arr[index]
         )
         {
+          ++this.modCount;
           OmniArray.OfChar.removeIndexAndPullDown(arr,index,--size);
           this.size=size;
           return true;

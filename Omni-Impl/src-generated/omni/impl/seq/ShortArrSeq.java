@@ -3152,6 +3152,7 @@ public abstract class ShortArrSeq implements OmniCollection.OfShort
         val==arr[index]
         )
         {
+          ++this.modCount;
           OmniArray.OfShort.removeIndexAndPullDown(arr,index,--size);
           this.size=size;
           return true;

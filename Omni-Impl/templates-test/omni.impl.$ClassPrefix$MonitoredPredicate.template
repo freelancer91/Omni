@@ -1,0 +1,133 @@
+#TYPEDEF OfBoolean
+#TYPEDEF OfByte
+#TYPEDEF OfChar
+#TYPEDEF OfShort
+#TYPEDEF OfInt
+#TYPEDEF OfLong
+#TYPEDEF OfFloat
+#TYPEDEF OfDouble
+#TYPEDEF OfRef
+package omni.impl;
+import java.util.function.Predicate;
+#IF OfInt,OfLong,OfDouble
+import java.util.function.$TypeNameModifier$Predicate;
+#ELSEIFNOT OfRef
+import omni.function.$TypeNameModifier$Predicate;
+#ENDIF
+import java.util.Random;
+import java.util.HashSet;
+import omni.api.OmniCollection;
+public abstract class $ClassPrefix$MonitoredPredicate$<E>$ implements $TypeNameModifier$Predicate$<E>$
+#IFNOT OfRef
+  ,Predicate<$BoxedType$>
+#ENDIF
+{
+
+  public final HashSet<$BoxedType$> removedVals=new HashSet<>();
+  public int callCounter;
+  abstract boolean testImpl($exposedType$ val);
+  @Override public $ClassPrefix$MonitoredPredicate$<E>$ negate(){
+    //not worth implementing but must declare
+    return null;
+  }
+  @Override public boolean test($exposedType$ val)
+  {
+    ++callCounter;
+    if(removedVals.contains(val))
+    {
+      return true;
+    }
+    if(testImpl(val))
+    {
+      removedVals.add(val);
+      return true;
+    }
+    return false;
+  }
+#IFNOT OfRef
+  @Override public boolean test($BoxedType$ val)
+  {
+    return test(($ArrayType$)val);
+  }
+#ENDIF
+
+  public static class RemoveAll$<E>$ extends $ClassPrefix$MonitoredPredicate$<E>$
+  {
+    @Override boolean testImpl($exposedType$ val){
+      return true;
+    }
+  }
+  public static class RemoveNone$<E>$ extends $ClassPrefix$MonitoredPredicate$<E>$
+  {
+    @Override boolean testImpl($exposedType$ val){
+      return false;
+    }
+  }
+  public static class NonThrowing$<E>$ extends $ClassPrefix$MonitoredPredicate$<E>$
+  {
+    final Random rand;
+    final double threshold;
+    public NonThrowing(Random rand,double threshold){
+      this.rand=rand;
+      this.threshold=threshold;
+    }
+    @Override boolean testImpl($exposedType$ val){
+      return rand.nextDouble()>=threshold;
+    }
+  }
+  public static class Throwing$<E>$ extends NonThrowing$<E>$
+  {
+    final int numExpectedCalls;
+    public Throwing(Random rand,int numExpectedCalls){
+      super(rand,.5);
+      this.numExpectedCalls=numExpectedCalls;
+    }
+    @Override boolean testImpl($exposedType$ val){
+      if(callCounter>rand.nextInt(numExpectedCalls))
+      {
+        throw new IndexOutOfBoundsException();
+      }
+      return super.testImpl(val);
+    }
+  }
+  public static class Modding$<E>$ extends Throwing$<E>$
+  {
+    final OmniCollection.Of$ClassPrefix$$<E>$ col;
+    public Modding(Random rand,int numExpectedCalls,OmniCollection.Of$ClassPrefix$$<E>$ col){
+      super(rand,numExpectedCalls);
+      this.col=col;
+    }
+    @Override boolean testImpl($exposedType$ val){
+      if(callCounter>rand.nextInt(numExpectedCalls))
+      {
+#IF OfRef
+        col.remove(val);
+#ELSE
+        col.removeVal(val);
+#ENDIF
+        col.add(val);
+      }
+      return rand.nextBoolean();
+    }
+  }
+  public static class ModdingAndThrowing$<E>$ extends Modding$<E>$
+  {
+    public ModdingAndThrowing(Random rand,int numExpectedCalls,OmniCollection.Of$ClassPrefix$$<E>$ col){
+      super(rand,numExpectedCalls,col);
+    }
+    @Override boolean testImpl($exposedType$ val){
+      if(callCounter>rand.nextInt(numExpectedCalls))
+      {
+#IF OfRef
+        col.remove(val);
+#ELSE
+        col.removeVal(val);
+#ENDIF
+        col.add(val);
+        throw new IndexOutOfBoundsException();
+      }
+      return rand.nextBoolean();
+    }
+  }
+}
+  

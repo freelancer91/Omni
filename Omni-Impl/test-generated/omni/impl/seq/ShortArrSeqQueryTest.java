@@ -5,7 +5,7 @@ import omni.impl.seq.ShortArrSeq.UncheckedList;
 import omni.impl.seq.ShortArrSeq.CheckedList;
 import omni.impl.seq.ShortArrSeq.UncheckedStack;
 import omni.impl.seq.ShortArrSeq.CheckedStack;
-import omni.api.QueryTestUtil;
+import omni.impl.QueryTestUtil;
 public class ShortArrSeqQueryTest
 {
   //TODO place sanity checks for checked sequence modification behavior

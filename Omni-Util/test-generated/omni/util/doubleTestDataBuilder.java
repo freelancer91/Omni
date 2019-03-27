@@ -1,7 +1,7 @@
 package omni.util;
 import java.util.Collection;
 import java.util.Random;
-public enum shortArrayBuilder
+public enum doubleTestDataBuilder
 {
   Randomized
   {
@@ -13,10 +13,6 @@ public enum shortArrayBuilder
     @Override
     public int getNumSortReps(int arrLength)
     {
-      if(arrLength<=3201 && arrLength>=287)
-      {
-        return 40;
-      }  
       return 10;
     }
     @Override
@@ -25,22 +21,22 @@ public enum shortArrayBuilder
       return true;
     }
     @Override
-    public void buildUnchecked(short[] arr,int offset,int length,Random rand,int m)
+    public void buildUnchecked(double[] arr,int offset,int length,Random rand,int m)
     {
       length+=offset;
       do
       {
-        arr[offset]=RandomUtil.getRandomshort(rand);
+        arr[offset]=RandomUtil.getRandomdouble(rand);
       }
       while(++offset!=length);
     }
     @Override
-    public void buildUnchecked(Short[] arr,int offset,int length,Random rand,int m)
+    public void buildUnchecked(Double[] arr,int offset,int length,Random rand,int m)
     {
       length+=offset;
       do
       {
-        arr[offset]=RandomUtil.getRandomShort(rand);
+        arr[offset]=RandomUtil.getRandomDouble(rand);
       }
       while(++offset!=length);
     }
@@ -58,14 +54,14 @@ public enum shortArrayBuilder
       return m<<1;
     }
     @Override
-    public void buildUnchecked(short[] arr,int offset,int length,Random rand,int m)
+    public void buildUnchecked(double[] arr,int offset,int length,Random rand,int m)
     {
-      for(int i=0;i<length;arr[(i++)+offset]=TypeConversionUtil.convertToshort(m+i)){}
+      for(int i=0;i<length;arr[(i++)+offset]=TypeConversionUtil.convertTodouble(m+i)){}
     }
     @Override
-    public void buildUnchecked(Short[] arr,int offset,int length,Random rand,int m)
+    public void buildUnchecked(Double[] arr,int offset,int length,Random rand,int m)
     {
-      for(int i=0;i<length;arr[(i++)+offset]=TypeConversionUtil.convertToShort(m+i)){}
+      for(int i=0;i<length;arr[(i++)+offset]=TypeConversionUtil.convertToDouble(m+i)){}
     }
   }
   ,
@@ -81,14 +77,14 @@ public enum shortArrayBuilder
       return m<<1;
     }
     @Override
-    public void buildUnchecked(short[] arr,int offset,int length,Random rand,int m)
+    public void buildUnchecked(double[] arr,int offset,int length,Random rand,int m)
     {
-      for(int i=0;i<length;arr[(i++)+offset]=TypeConversionUtil.convertToshort(length-m-i)){}
+      for(int i=0;i<length;arr[(i++)+offset]=TypeConversionUtil.convertTodouble(length-m-i)){}
     }
     @Override
-    public void buildUnchecked(Short[] arr,int offset,int length,Random rand,int m)
+    public void buildUnchecked(Double[] arr,int offset,int length,Random rand,int m)
     {
-      for(int i=0;i<length;arr[(i++)+offset]=TypeConversionUtil.convertToShort(length-m-i)){}
+      for(int i=0;i<length;arr[(i++)+offset]=TypeConversionUtil.convertToDouble(length-m-i)){}
     }
   }
   ,
@@ -105,9 +101,9 @@ public enum shortArrayBuilder
       return 0;
     }
     @Override
-    public void buildUnchecked(short[] arr,int offset,int length,Random rand,int m)
+    public void buildUnchecked(double[] arr,int offset,int length,Random rand,int m)
     {
-      short val=TypeConversionUtil.convertToshort(m);
+      double val=TypeConversionUtil.convertTodouble(m);
       length+=offset;
       do
       {
@@ -116,9 +112,9 @@ public enum shortArrayBuilder
       while(++offset!=length);
     }
     @Override
-    public void buildUnchecked(Short[] arr,int offset,int length,Random rand,int m)
+    public void buildUnchecked(Double[] arr,int offset,int length,Random rand,int m)
     {
-      Short val=TypeConversionUtil.convertToShort(m);
+      Double val=TypeConversionUtil.convertToDouble(m);
       length+=offset;
       do
       {
@@ -141,31 +137,31 @@ public enum shortArrayBuilder
       return 69;
     }
     @Override
-    public void buildUnchecked(short[] arr,int offset,int length,Random rand,int m)
+    public void buildUnchecked(double[] arr,int offset,int length,Random rand,int m)
     {
       int v=0;
       for(int i=0, k=0,period=length/m;k<m;++k)
       {
         v=0;
-        for(int p=0;p<period;arr[(i++)+offset]=TypeConversionUtil.convertToshort(++v),++p){}
+        for(int p=0;p<period;arr[(i++)+offset]=TypeConversionUtil.convertTodouble(++v),++p){}
       }
-      for(int j=1;j<length-1;arr[j++]=TypeConversionUtil.convertToshort(++v)){}
+      for(int j=1;j<length-1;arr[j++]=TypeConversionUtil.convertTodouble(++v)){}
     }
     @Override
-    public void buildUnchecked(Short[] arr,int offset,int length,Random rand,int m)
+    public void buildUnchecked(Double[] arr,int offset,int length,Random rand,int m)
     {
       int v=0;
       for(int i=0, k=0,period=length/m;k<m;++k)
       {
         v=0;
-        for(int p=0;p<period;arr[(i++)+offset]=TypeConversionUtil.convertToShort(++v),++p){}
+        for(int p=0;p<period;arr[(i++)+offset]=TypeConversionUtil.convertToDouble(++v),++p){}
       }
-      for(int j=1;j<length-1;arr[j++]=TypeConversionUtil.convertToShort(++v)){}
+      for(int j=1;j<length-1;arr[j++]=TypeConversionUtil.convertToDouble(++v)){}
       for(int i=offset,bound=offset+length;i<bound;++i)
       {
         if(arr[i]==null)
         {
-          arr[i]=TypeConversionUtil.convertToShort(0);
+          arr[i]=TypeConversionUtil.convertToDouble(0);
         }
       }
     }
@@ -184,31 +180,31 @@ public enum shortArrayBuilder
       return 69;
     }
     @Override
-    public void buildUnchecked(short[] arr,int offset,int length,Random rand,int m)
+    public void buildUnchecked(double[] arr,int offset,int length,Random rand,int m)
     {
       int v=0;
       for(int i=0, k=0,period=length/m;k<m;++k)
       {
         v=0;
-        for(int p=0;p<period;arr[(i++)+offset]=TypeConversionUtil.convertToshort(--v),++p){}
+        for(int p=0;p<period;arr[(i++)+offset]=TypeConversionUtil.convertTodouble(--v),++p){}
       }
-      for(int j=1;j<length-1;arr[j++]=TypeConversionUtil.convertToshort(--v)){}
+      for(int j=1;j<length-1;arr[j++]=TypeConversionUtil.convertTodouble(--v)){}
     }
     @Override
-    public void buildUnchecked(Short[] arr,int offset,int length,Random rand,int m)
+    public void buildUnchecked(Double[] arr,int offset,int length,Random rand,int m)
     {
       int v=0;
       for(int i=0, k=0,period=length/m;k<m;++k)
       {
         v=0;
-        for(int p=0;p<period;arr[(i++)+offset]=TypeConversionUtil.convertToShort(--v),++p){}
+        for(int p=0;p<period;arr[(i++)+offset]=TypeConversionUtil.convertToDouble(--v),++p){}
       }
-      for(int j=1;j<length-1;arr[j++]=TypeConversionUtil.convertToShort(--v)){}
+      for(int j=1;j<length-1;arr[j++]=TypeConversionUtil.convertToDouble(--v)){}
       for(int i=offset,bound=offset+length;i<bound;++i)
       {
         if(arr[i]==null)
         {
-          arr[i]=TypeConversionUtil.convertToShort(0);
+          arr[i]=TypeConversionUtil.convertToDouble(0);
         }
       }
     }
@@ -226,11 +222,11 @@ public enum shortArrayBuilder
       return m<<1;
     }
     @Override
-    public void buildUnchecked(short[] arr,int offset,int length,Random rand,int m)
+    public void buildUnchecked(double[] arr,int offset,int length,Random rand,int m)
     {
       for(int incCount=1,decCount=length,i=0,period=m--;;period+=m)
       {
-        for(int k=0;++k<=period;arr[(i++)+offset]=TypeConversionUtil.convertToshort(incCount++))
+        for(int k=0;++k<=period;arr[(i++)+offset]=TypeConversionUtil.convertTodouble(incCount++))
         {
           if(i>=length)
           {
@@ -238,7 +234,7 @@ public enum shortArrayBuilder
           }
         }
         period+=m;
-        for(int k=0;++k<=period;arr[(i++)+offset]=TypeConversionUtil.convertToshort(decCount--))
+        for(int k=0;++k<=period;arr[(i++)+offset]=TypeConversionUtil.convertTodouble(decCount--))
         {
           if(i>=length)
           {
@@ -248,11 +244,11 @@ public enum shortArrayBuilder
       }
     }
     @Override
-    public void buildUnchecked(Short[] arr,int offset,int length,Random rand,int m)
+    public void buildUnchecked(Double[] arr,int offset,int length,Random rand,int m)
     {
       for(int incCount=1,decCount=length,i=0,period=m--;;period+=m)
       {
-        for(int k=0;++k<=period;arr[(i++)+offset]=TypeConversionUtil.convertToShort(incCount++))
+        for(int k=0;++k<=period;arr[(i++)+offset]=TypeConversionUtil.convertToDouble(incCount++))
         {
           if(i>=length)
           {
@@ -260,7 +256,7 @@ public enum shortArrayBuilder
           }
         }
         period+=m;
-        for(int k=0;++k<=period;arr[(i++)+offset]=TypeConversionUtil.convertToShort(decCount--))
+        for(int k=0;++k<=period;arr[(i++)+offset]=TypeConversionUtil.convertToDouble(decCount--))
         {
           if(i>=length)
           {
@@ -279,11 +275,11 @@ public enum shortArrayBuilder
       return Math.min(arrLength,7);
     }
     @Override
-    public void buildUnchecked(short[] arr,int offset,int length,Random rand,int m)
+    public void buildUnchecked(double[] arr,int offset,int length,Random rand,int m)
     {
       for(int period=length/m,i=0,k=0;;++k)
       {
-        for(int t=0;++t<=period;arr[(i++)+offset]=TypeConversionUtil.convertToshort(k))
+        for(int t=0;++t<=period;arr[(i++)+offset]=TypeConversionUtil.convertTodouble(k))
         {
           if(i>=length)
           {
@@ -297,11 +293,11 @@ public enum shortArrayBuilder
       }
     }
     @Override
-    public void buildUnchecked(Short[] arr,int offset,int length,Random rand,int m)
+    public void buildUnchecked(Double[] arr,int offset,int length,Random rand,int m)
     {
       for(int period=length/m,i=0,k=0;;++k)
       {
-        for(int t=0;++t<=period;arr[(i++)+offset]=TypeConversionUtil.convertToShort(k))
+        for(int t=0;++t<=period;arr[(i++)+offset]=TypeConversionUtil.convertToDouble(k))
         {
           if(i>=length)
           {
@@ -328,22 +324,22 @@ public enum shortArrayBuilder
       return m<<1;
     }
     @Override
-    public void buildUnchecked(short[] arr,int offset,int length,Random rand,int m)
+    public void buildUnchecked(double[] arr,int offset,int length,Random rand,int m)
     {
       int i=0;
       do
       {
-        arr[i+offset]=TypeConversionUtil.convertToshort(i%m);
+        arr[i+offset]=TypeConversionUtil.convertTodouble(i%m);
       }
       while(++i!=length);
     }
     @Override
-    public void buildUnchecked(Short[] arr,int offset,int length,Random rand,int m)
+    public void buildUnchecked(Double[] arr,int offset,int length,Random rand,int m)
     {
       int i=0;
       do
       {
-        arr[i+offset]=TypeConversionUtil.convertToShort(i%m);
+        arr[i+offset]=TypeConversionUtil.convertToDouble(i%m);
       }
       while(++i!=length);
     }
@@ -356,15 +352,6 @@ public enum shortArrayBuilder
     {
       return (arrLength<<1)-1;
     }
-    @Override
-    public int getNumSortReps(int arrLength)
-    {
-      if(arrLength<=3201 && arrLength>=287)
-      {
-        return 40;
-      }
-      return 1;
-    }
     public int incrementM(int m)
     {
       return m<<1;
@@ -375,22 +362,22 @@ public enum shortArrayBuilder
       return true;
     }
     @Override
-    public void buildUnchecked(short[] arr,int offset,int length,Random rand,int m)
+    public void buildUnchecked(double[] arr,int offset,int length,Random rand,int m)
     {
       int i=0;
       do
       {
-        arr[i+offset]=TypeConversionUtil.convertToshort(rand.nextInt(m));
+        arr[i+offset]=TypeConversionUtil.convertTodouble(rand.nextInt(m));
       }
       while(++i!=length);
     }
     @Override
-    public void buildUnchecked(Short[] arr,int offset,int length,Random rand,int m)
+    public void buildUnchecked(Double[] arr,int offset,int length,Random rand,int m)
     {
       int i=0;
       do
       {
-        arr[i+offset]=TypeConversionUtil.convertToShort(rand.nextInt(m));
+        arr[i+offset]=TypeConversionUtil.convertToDouble(rand.nextInt(m));
       }
       while(++i!=length);
     }
@@ -404,11 +391,11 @@ public enum shortArrayBuilder
       return Math.min(arrLength,7);
     }
     @Override
-    public void buildUnchecked(short[] arr,int offset,int length,Random rand,int m)
+    public void buildUnchecked(double[] arr,int offset,int length,Random rand,int m)
     {
       for(int i=0;;)
       {
-        for(int t=0;++t<=m;arr[(i++)+offset]=TypeConversionUtil.convertToshort(m))
+        for(int t=0;++t<=m;arr[(i++)+offset]=TypeConversionUtil.convertTodouble(m))
         {
           if(i>=length)
           {
@@ -418,11 +405,11 @@ public enum shortArrayBuilder
       }
     }
     @Override
-    public void buildUnchecked(Short[] arr,int offset,int length,Random rand,int m)
+    public void buildUnchecked(Double[] arr,int offset,int length,Random rand,int m)
     {
       for(int i=0;;)
       {
-        for(int t=0;++t<=m;arr[(i++)+offset]=TypeConversionUtil.convertToShort(m))
+        for(int t=0;++t<=m;arr[(i++)+offset]=TypeConversionUtil.convertToDouble(m))
         {
           if(i>=length)
           {
@@ -445,23 +432,23 @@ public enum shortArrayBuilder
       return m<<1;
     }
     @Override
-    public void buildUnchecked(short[] arr,int offset,int length,Random rand,int m)
+    public void buildUnchecked(double[] arr,int offset,int length,Random rand,int m)
     {
       int i=0;
-      for(int middle=length/(m+1);i<middle;arr[i+offset]=TypeConversionUtil.convertToshort(i++)){}
+      for(int middle=length/(m+1);i<middle;arr[i+offset]=TypeConversionUtil.convertTodouble(i++)){}
       while(i<length)
       {
-        arr[i+offset]=TypeConversionUtil.convertToshort(length-(i++)-1);
+        arr[i+offset]=TypeConversionUtil.convertTodouble(length-(i++)-1);
       }
     }
     @Override
-    public void buildUnchecked(Short[] arr,int offset,int length,Random rand,int m)
+    public void buildUnchecked(Double[] arr,int offset,int length,Random rand,int m)
     {
       int i=0;
-      for(int middle=length/(m+1);i<middle;arr[i+offset]=TypeConversionUtil.convertToShort(i++)){}
+      for(int middle=length/(m+1);i<middle;arr[i+offset]=TypeConversionUtil.convertToDouble(i++)){}
       while(i<length)
       {
-        arr[i+offset]=TypeConversionUtil.convertToShort(length-(i++)-1);
+        arr[i+offset]=TypeConversionUtil.convertToDouble(length-(i++)-1);
       }
     }
   }
@@ -478,22 +465,22 @@ public enum shortArrayBuilder
       return m<<1;
     }
     @Override
-    public void buildUnchecked(short[] arr,int offset,int length,Random rand,int m)
+    public void buildUnchecked(double[] arr,int offset,int length,Random rand,int m)
     {
       int i=0;
       do
       {
-        arr[i+offset]=TypeConversionUtil.convertToshort((i*m+i)%length);
+        arr[i+offset]=TypeConversionUtil.convertTodouble((i*m+i)%length);
       }
       while(++i!=length);
     }
     @Override
-    public void buildUnchecked(Short[] arr,int offset,int length,Random rand,int m)
+    public void buildUnchecked(Double[] arr,int offset,int length,Random rand,int m)
     {
       int i=0;
       do
       {
-        arr[i+offset]=TypeConversionUtil.convertToShort((i*m+i)%length);
+        arr[i+offset]=TypeConversionUtil.convertToDouble((i*m+i)%length);
       }
       while(++i!=length);
     }
@@ -511,22 +498,22 @@ public enum shortArrayBuilder
       return m<<1;
     }
     @Override
-    public void buildUnchecked(short[] arr,int offset,int length,Random rand,int m)
+    public void buildUnchecked(double[] arr,int offset,int length,Random rand,int m)
     {
       int i=0;
       do
       {
-        arr[offset+i]=TypeConversionUtil.convertToshort(Math.min(i,m));
+        arr[offset+i]=TypeConversionUtil.convertTodouble(Math.min(i,m));
       }
       while(++i!=length);
     }
     @Override
-    public void buildUnchecked(Short[] arr,int offset,int length,Random rand,int m)
+    public void buildUnchecked(Double[] arr,int offset,int length,Random rand,int m)
     {
       int i=0;
       do
       {
-        arr[offset+i]=TypeConversionUtil.convertToShort(Math.min(i,m));
+        arr[offset+i]=TypeConversionUtil.convertToDouble(Math.min(i,m));
       }
       while(++i!=length);
     }
@@ -542,10 +529,6 @@ public enum shortArrayBuilder
     @Override
     public int getNumSortReps(int arrLength)
     {
-      if(arrLength<=3201 && arrLength>=287)
-      {
-        return 40;
-      }  
       return 10;
     }
     @Override
@@ -554,26 +537,89 @@ public enum shortArrayBuilder
       return true;
     }
     @Override
-    public void buildUnchecked(short[] arr,int offset,int length,Random rand,int m)
+    public void buildUnchecked(double[] arr,int offset,int length,Random rand,int m)
     {
       int x=0,y=0;
       int bound=offset+length;
       do
       {
-        arr[offset]=TypeConversionUtil.convertToshort(rand.nextBoolean()?(x+2):(y+2));
+        arr[offset]=TypeConversionUtil.convertTodouble(rand.nextBoolean()?(x+2):(y+2));
       }
       while(++offset!=bound);
     }
     @Override
-    public void buildUnchecked(Short[] arr,int offset,int length,Random rand,int m)
+    public void buildUnchecked(Double[] arr,int offset,int length,Random rand,int m)
     {
       int x=0,y=0;
       int bound=offset+length;
       do
       {
-        arr[offset]=TypeConversionUtil.convertToShort(rand.nextBoolean()?(x+2):(y+2));
+        arr[offset]=TypeConversionUtil.convertToDouble(rand.nextBoolean()?(x+2):(y+2));
       }
       while(++offset!=bound);
+    }
+  }
+  ,
+  WithNaNsAndZeros
+  {
+    @Override
+    public int getNumRemoveIfReps(int arrLength)
+    {
+      return 10;
+    }
+    @Override
+    public int getNumSortReps(int arrLength)
+    {
+      return 20;
+    }
+    @Override
+    public boolean isRandomized()
+    {
+      return true;
+    }
+    @Override
+    public void buildUnchecked(double[] arr,int offset,int length,Random rand,int m)
+    {
+      for(int i=0;i<length;++i)
+      {
+        switch(rand.nextInt(4))
+        {
+        case 0:
+          arr[i+offset]=(double)0.0;
+          break;
+        case 1:
+          arr[i+offset]=(double)-0.0;
+          break;
+        case 2:
+          arr[i+offset]=Double.NaN;
+          break;
+        default:
+          arr[i+offset]=RandomUtil.getRandomdouble(rand);
+        }
+      }
+    }
+    //Ignore deprecation because we need would like to be able to use identity equality on the newly created boxed types
+    @SuppressWarnings("deprecation")
+    @Override
+    public void buildUnchecked(Double[] arr,int offset,int length,Random rand,int m)
+    {
+      for(int i=0;i<length;++i)
+      {
+        switch(rand.nextInt(4))
+        {
+        case 0:
+          arr[i+offset]=new Double((double)0.0);
+          break;
+        case 1:
+          arr[i+offset]=new Double((double)-0.0);
+          break;
+        case 2:
+          arr[i+offset]=new Double(Double.NaN);
+          break;
+        default:
+          arr[i+offset]=RandomUtil.getRandomDouble(rand);
+        }
+      }
     }
   }
   ;
@@ -602,8 +648,8 @@ public enum shortArrayBuilder
     //most sub-types are not randomized, so make that the default
     return false;
   }
-  public abstract void buildUnchecked(short[] arr,int offset,int length,Random rand,int m);
-  public void build(short[] arr,Random rand,int m)
+  public abstract void buildUnchecked(double[] arr,int offset,int length,Random rand,int m);
+  public void build(double[] arr,Random rand,int m)
   {
     if(arr==null)
     {
@@ -615,7 +661,7 @@ public enum shortArrayBuilder
       buildUnchecked(arr,0,length,rand,m);
     }
   }  
-  public void build(short[] arr,int offset,int length,Random rand,int m)
+  public void build(double[] arr,int offset,int length,Random rand,int m)
   {
     if(arr==null)
     {
@@ -630,8 +676,8 @@ public enum shortArrayBuilder
       buildUnchecked(arr,offset,length,rand,m);
     }
   }
-  public abstract void buildUnchecked(Short[] arr,int offset,int length,Random rand,int m);
-  public void build(Short[] arr,Random rand,int m)
+  public abstract void buildUnchecked(Double[] arr,int offset,int length,Random rand,int m);
+  public void build(Double[] arr,Random rand,int m)
   {
     if(arr==null)
     {
@@ -643,7 +689,7 @@ public enum shortArrayBuilder
       buildUnchecked(arr,0,length,rand,m);
     }
   }  
-  public void build(Short[] arr,int offset,int length,Random rand,int m)
+  public void build(Double[] arr,int offset,int length,Random rand,int m)
   {
     if(arr==null)
     {
@@ -661,16 +707,16 @@ public enum shortArrayBuilder
   @Override
   public String toString()
   {
-    return "shortArrayBuilder."+this.name();
+    return "doubleTestDataBuilder."+this.name();
   }
-  public void addArrays(long randSeed,int arrLength,Collection<short[]> arrays)
+  public void addArrays(long randSeed,int arrLength,Collection<double[]> arrays)
   {
     Random rand=new Random(randSeed);
     for(int m=getMLo(),mHi=getMHi(arrLength),numReps=getNumSortReps(arrLength);m<=mHi;m=incrementM(m))
     {
       for(int i=0;i<numReps;++i)
       {
-        short[] arr=new short[arrLength];
+        double[] arr=new double[arrLength];
         if(arrLength!=0)
         {
           buildUnchecked(arr,0,arrLength,rand,m);
@@ -682,12 +728,12 @@ public enum shortArrayBuilder
       }
     }
   }
-  static short[] buildRandomArray(int arrLength,int minIncl,int maxIncl,Random rand)
+  static double[] buildRandomArray(int arrLength,int minIncl,int maxIncl,Random rand)
   {
-    short[] arr=new short[arrLength];
+    double[] arr=new double[arrLength];
     for(int i=0;i<arrLength;++i)
     {
-      arr[i]=TypeConversionUtil.convertToshort(RandomUtil.randomIntBetween(minIncl,maxIncl,rand));
+      arr[i]=TypeConversionUtil.convertTodouble(RandomUtil.randomIntBetween(minIncl,maxIncl,rand));
     }
     return arr;
   }

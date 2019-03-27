@@ -5,7 +5,7 @@ import omni.impl.seq.ByteArrSeq.UncheckedList;
 import omni.impl.seq.ByteArrSeq.CheckedList;
 import omni.impl.seq.ByteArrSeq.UncheckedStack;
 import omni.impl.seq.ByteArrSeq.CheckedStack;
-import omni.api.QueryTestUtil;
+import omni.impl.QueryTestUtil;
 public class ByteArrSeqQueryTest
 {
   //TODO place sanity checks for checked sequence modification behavior

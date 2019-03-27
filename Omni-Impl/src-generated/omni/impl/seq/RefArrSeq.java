@@ -3976,6 +3976,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>
         arr[index]==null
         )
         {
+          ++this.modCount;
           OmniArray.OfRef.removeIndexAndPullDown(arr,index,--size);
           this.size=size;
           return true;
@@ -3998,6 +3999,7 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>
         pred.test(arr[index])
         )
         {
+          ++this.modCount;
           OmniArray.OfRef.removeIndexAndPullDown(arr,index,--size);
           this.size=size;
           return true;

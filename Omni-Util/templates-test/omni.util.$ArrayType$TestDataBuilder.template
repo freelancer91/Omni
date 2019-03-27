@@ -15,44 +15,45 @@ import java.util.Random;
 import java.util.function.$TypeNameModifier$Supplier;
 #ENDIF
 
-public enum $ArrayType$ArrayBuilder
+public enum $ArrayType$TestDataBuilder
 {
   
 
 
-  #MACRO ArrayBuilderValue<Randomized>()
+
+  #MACRO TestDataBuilderValue<Randomized>()
   ,
-  #MACRO ArrayBuilderValue<Ascending>()
+  #MACRO TestDataBuilderValue<Ascending>()
   ,
-  #MACRO ArrayBuilderValue<Descending>()
+  #MACRO TestDataBuilderValue<Descending>()
   ,
-  #MACRO ArrayBuilderValue<AllEquals>()
+  #MACRO TestDataBuilderValue<AllEquals>()
 #IFNOT OfBoolean
   ,
-  #MACRO ArrayBuilderValue<MergeAscending>()
+  #MACRO TestDataBuilderValue<MergeAscending>()
   ,
-  #MACRO ArrayBuilderValue<MergeDescending>()
+  #MACRO TestDataBuilderValue<MergeDescending>()
   ,
-  #MACRO ArrayBuilderValue<Saw>()
+  #MACRO TestDataBuilderValue<Saw>()
   ,
-  #MACRO ArrayBuilderValue<SortedRepeated>()
+  #MACRO TestDataBuilderValue<SortedRepeated>()
   ,
-  #MACRO ArrayBuilderValue<Repeated>()
+  #MACRO TestDataBuilderValue<Repeated>()
   ,
-  #MACRO ArrayBuilderValue<Duplicated>()
+  #MACRO TestDataBuilderValue<Duplicated>()
   ,
-  #MACRO ArrayBuilderValue<SortedOrganPipes>()
+  #MACRO TestDataBuilderValue<SortedOrganPipes>()
   ,
-  #MACRO ArrayBuilderValue<OrganPipes>()
+  #MACRO TestDataBuilderValue<OrganPipes>()
   ,
-  #MACRO ArrayBuilderValue<Stagger>()
+  #MACRO TestDataBuilderValue<Stagger>()
   ,
-  #MACRO ArrayBuilderValue<Plateau>()
+  #MACRO TestDataBuilderValue<Plateau>()
   ,
-  #MACRO ArrayBuilderValue<Shuffle>()
+  #MACRO TestDataBuilderValue<Shuffle>()
   #IF OfFloat,OfDouble
   ,
-  #MACRO ArrayBuilderValue<WithNaNsAndZeros>()
+  #MACRO TestDataBuilderValue<WithNaNsAndZeros>()
   #ENDIF
 #ENDIF
   ;
@@ -145,7 +146,7 @@ public enum $ArrayType$ArrayBuilder
   @Override
   public String toString()
   {
-    return "$ArrayType$ArrayBuilder."+this.name();
+    return "$ArrayType$TestDataBuilder."+this.name();
   }
   public void addArrays(long randSeed,int arrLength,Collection<$ArrayType$[]> arrays)
   {
@@ -178,7 +179,7 @@ public enum $ArrayType$ArrayBuilder
   }
 }
 
-#MACRODEF ArrayBuilderValue<VALUENAME>()
+#MACRODEF TestDataBuilderValue<VALUENAME>()
 VALUENAME
 {
 #IFSWITCH VALUENAME==AllEquals

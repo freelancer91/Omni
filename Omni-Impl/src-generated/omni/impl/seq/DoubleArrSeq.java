@@ -3184,6 +3184,7 @@ public abstract class DoubleArrSeq implements OmniCollection.OfDouble
         bits==Double.doubleToRawLongBits(arr[index])
         )
         {
+          ++this.modCount;
           OmniArray.OfDouble.removeIndexAndPullDown(arr,index,--size);
           this.size=size;
           return true;
@@ -3205,6 +3206,7 @@ public abstract class DoubleArrSeq implements OmniCollection.OfDouble
         Double.isNaN(arr[index])
         )
         {
+          ++this.modCount;
           OmniArray.OfDouble.removeIndexAndPullDown(arr,index,--size);
           this.size=size;
           return true;
@@ -3226,6 +3228,7 @@ public abstract class DoubleArrSeq implements OmniCollection.OfDouble
         arr[index]==0
         )
         {
+          ++this.modCount;
           OmniArray.OfDouble.removeIndexAndPullDown(arr,index,--size);
           this.size=size;
           return true;

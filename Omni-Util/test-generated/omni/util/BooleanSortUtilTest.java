@@ -39,10 +39,10 @@ public class BooleanSortUtilTest
   {
     final long randSeed;
     final int m;
-    final booleanArrayBuilder builder;
+    final booleanTestDataBuilder builder;
     final boolean[] customArr;
     final Boolean[] stockArr;
-    private TestData(long randSeed,int m,booleanArrayBuilder builder,int arrLength,Random rand)
+    private TestData(long randSeed,int m,booleanTestDataBuilder builder,int arrLength,Random rand)
     {
       this.randSeed=randSeed;
       this.m=m;
@@ -78,7 +78,7 @@ public class BooleanSortUtilTest
     {
       return "TestData{builder="+builder+"; arrayType=boolean; arrLength="+customArr.length+"; m="+m+"; randSeed="+randSeed+"}";
     }
-    private static void initializeTestData(booleanArrayBuilder builder,long randSeed,int arrLength,ArrayList<TestData> testDatas)
+    private static void initializeTestData(booleanTestDataBuilder builder,long randSeed,int arrLength,ArrayList<TestData> testDatas)
     {
       Random rand=new Random(randSeed);
       for(int m=builder.getMLo(),mHi=builder.getMHi(arrLength),numReps=builder.getNumSortReps(arrLength);m<=mHi;m=builder.incrementM(m))
@@ -106,7 +106,7 @@ public class BooleanSortUtilTest
     }
     lengthStream.forEach(arrLength->
     {
-      if(booleanArrayBuilder.AllEquals.isRandomized())
+      if(booleanTestDataBuilder.AllEquals.isRandomized())
       {
         var randStream=Arrays.stream(randSeeds);
         if(PARALLEL)
@@ -115,12 +115,12 @@ public class BooleanSortUtilTest
         }
         randStream.forEach(randSeed->
         {
-          TestData.initializeTestData(booleanArrayBuilder.AllEquals,randSeed,arrLength,TEST_DATA);
+          TestData.initializeTestData(booleanTestDataBuilder.AllEquals,randSeed,arrLength,TEST_DATA);
         });
       }
       else
       {
-        TestData.initializeTestData(booleanArrayBuilder.AllEquals,0,arrLength,TEST_DATA);
+        TestData.initializeTestData(booleanTestDataBuilder.AllEquals,0,arrLength,TEST_DATA);
       }
     });
     System.out.println("Initialized "+TEST_DATA.size()+" arrays");
@@ -270,7 +270,7 @@ public class BooleanSortUtilTest
     }
     lengthStream.forEach(arrLength->
     {
-      if(booleanArrayBuilder.Ascending.isRandomized())
+      if(booleanTestDataBuilder.Ascending.isRandomized())
       {
         var randStream=Arrays.stream(randSeeds);
         if(PARALLEL)
@@ -279,12 +279,12 @@ public class BooleanSortUtilTest
         }
         randStream.forEach(randSeed->
         {
-          TestData.initializeTestData(booleanArrayBuilder.Ascending,randSeed,arrLength,TEST_DATA);
+          TestData.initializeTestData(booleanTestDataBuilder.Ascending,randSeed,arrLength,TEST_DATA);
         });
       }
       else
       {
-        TestData.initializeTestData(booleanArrayBuilder.Ascending,0,arrLength,TEST_DATA);
+        TestData.initializeTestData(booleanTestDataBuilder.Ascending,0,arrLength,TEST_DATA);
       }
     });
     System.out.println("Initialized "+TEST_DATA.size()+" arrays");
@@ -435,7 +435,7 @@ public class BooleanSortUtilTest
     }
     lengthStream.forEach(arrLength->
     {
-      if(booleanArrayBuilder.Descending.isRandomized())
+      if(booleanTestDataBuilder.Descending.isRandomized())
       {
         var randStream=Arrays.stream(randSeeds);
         if(PARALLEL)
@@ -444,12 +444,12 @@ public class BooleanSortUtilTest
         }
         randStream.forEach(randSeed->
         {
-          TestData.initializeTestData(booleanArrayBuilder.Descending,randSeed,arrLength,TEST_DATA);
+          TestData.initializeTestData(booleanTestDataBuilder.Descending,randSeed,arrLength,TEST_DATA);
         });
       }
       else
       {
-        TestData.initializeTestData(booleanArrayBuilder.Descending,0,arrLength,TEST_DATA);
+        TestData.initializeTestData(booleanTestDataBuilder.Descending,0,arrLength,TEST_DATA);
       }
     });
     System.out.println("Initialized "+TEST_DATA.size()+" arrays");
@@ -600,7 +600,7 @@ public class BooleanSortUtilTest
     }
     lengthStream.forEach(arrLength->
     {
-      if(booleanArrayBuilder.Randomized.isRandomized())
+      if(booleanTestDataBuilder.Randomized.isRandomized())
       {
         var randStream=Arrays.stream(randSeeds);
         if(PARALLEL)
@@ -609,12 +609,12 @@ public class BooleanSortUtilTest
         }
         randStream.forEach(randSeed->
         {
-          TestData.initializeTestData(booleanArrayBuilder.Randomized,randSeed,arrLength,TEST_DATA);
+          TestData.initializeTestData(booleanTestDataBuilder.Randomized,randSeed,arrLength,TEST_DATA);
         });
       }
       else
       {
-        TestData.initializeTestData(booleanArrayBuilder.Randomized,0,arrLength,TEST_DATA);
+        TestData.initializeTestData(booleanTestDataBuilder.Randomized,0,arrLength,TEST_DATA);
       }
     });
     System.out.println("Initialized "+TEST_DATA.size()+" arrays");

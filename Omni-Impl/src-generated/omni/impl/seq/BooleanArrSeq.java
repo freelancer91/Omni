@@ -3451,6 +3451,7 @@ public abstract class BooleanArrSeq implements OmniCollection.OfBoolean
         val==arr[index]
         )
         {
+          ++this.modCount;
           OmniArray.OfBoolean.removeIndexAndPullDown(arr,index,--size);
           this.size=size;
           return true;

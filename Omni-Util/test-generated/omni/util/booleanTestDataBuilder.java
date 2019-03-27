@@ -2,7 +2,7 @@ package omni.util;
 import java.util.Collection;
 import java.util.Random;
 import java.util.function.BooleanSupplier;
-public enum booleanArrayBuilder
+public enum booleanTestDataBuilder
 {
   Randomized
   {
@@ -263,7 +263,7 @@ public enum booleanArrayBuilder
   @Override
   public String toString()
   {
-    return "booleanArrayBuilder."+this.name();
+    return "booleanTestDataBuilder."+this.name();
   }
   public void addArrays(long randSeed,int arrLength,Collection<boolean[]> arrays)
   {

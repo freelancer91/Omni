@@ -176,7 +176,7 @@ public abstract interface OmniCollection
           ());
     }
   }
-  public abstract interface OfBoolean extends OfPrimitive
+  public abstract interface OfBoolean extends OfPrimitive,Iterable<Boolean>
   {
     public abstract boolean add(boolean val);
     public abstract boolean add(Boolean val);
@@ -226,7 +226,7 @@ public abstract interface OmniCollection
       return removeVal((int)val);
     }
   }
-  public abstract interface OfByte extends OfPrimitive
+  public abstract interface OfByte extends OfPrimitive,Iterable<Byte>
   {
     public abstract boolean add(boolean val);
     public abstract boolean add(Byte val);
@@ -259,7 +259,7 @@ public abstract interface OmniCollection
       return add(val.booleanValue());
     }
   }
-  public abstract interface OfChar extends OfPrimitive
+  public abstract interface OfChar extends OfPrimitive,Iterable<Character>
   {
     public abstract boolean add(boolean val);
     public abstract boolean add(Character val);
@@ -281,7 +281,7 @@ public abstract interface OmniCollection
       return add(val.booleanValue());
     }
   }
-  public abstract interface OfShort extends OfPrimitive
+  public abstract interface OfShort extends OfPrimitive,Iterable<Short>
   {
     public abstract boolean add(boolean val);
     public abstract boolean add(Short val);
@@ -311,7 +311,7 @@ public abstract interface OmniCollection
       return add(val.booleanValue());
     }
   }
-  public abstract interface OfInt extends OfPrimitive
+  public abstract interface OfInt extends OfPrimitive,Iterable<Integer>
   {
     public abstract boolean add(boolean val);
     public abstract boolean add(Integer val);
@@ -366,7 +366,7 @@ public abstract interface OmniCollection
       return add(val.booleanValue());
     }
   }
-  public abstract interface OfLong extends OfPrimitive
+  public abstract interface OfLong extends OfPrimitive,Iterable<Long>
   {
     public abstract boolean add(boolean val);
     public abstract boolean add(Long val);
@@ -425,7 +425,7 @@ public abstract interface OmniCollection
       return add(val.booleanValue());
     }
   }
-  public abstract interface OfFloat extends OfPrimitive
+  public abstract interface OfFloat extends OfPrimitive,Iterable<Float>
   {
     public abstract boolean add(boolean val);
     public abstract boolean add(Float val);
@@ -472,7 +472,7 @@ public abstract interface OmniCollection
       return add(val.booleanValue());
     }
   }
-  public abstract interface OfDouble extends OfPrimitive
+  public abstract interface OfDouble extends OfPrimitive,Iterable<Double>
   {
     public abstract boolean add(boolean val);
     public abstract boolean add(Double val);
@@ -523,7 +523,7 @@ public abstract interface OmniCollection
       return add(val.booleanValue());
     }
   }
-  public abstract interface OfRef<E> extends OmniCollection
+  public abstract interface OfRef<E> extends OmniCollection,Iterable<E>
   {
     public abstract boolean add(E val);
     public abstract void forEach(Consumer<? super E> action);

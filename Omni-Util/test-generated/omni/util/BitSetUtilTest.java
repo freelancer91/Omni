@@ -24,7 +24,7 @@ public class BitSetUtilTest{
       var filter=bytePredicates.MarkGreaterThan.getPred(rand,0);
       for(int i=0;i<100;++i)
       {
-        byte[] arr=byteArrayBuilder.buildRandomArray(5000,Byte.MIN_VALUE,Byte.MAX_VALUE,rand);
+        byte[] arr=byteTestDataBuilder.buildRandomArray(5000,Byte.MIN_VALUE,Byte.MAX_VALUE,rand);
         long[] bitSet=BitSetUtil.getBitSet(arr.length);
         int numExpectedSurvivors=BitSetUtil.markSurvivors(arr,0,arr.length,filter,bitSet);
         byte[] copy=new byte[arr.length];
@@ -53,7 +53,7 @@ public class BitSetUtilTest{
       var filter=bytePredicates.MarkGreaterThan.getPred(rand,0);
       for(int i=0;i<100;++i)
       {
-        byte[] arr=byteArrayBuilder.buildRandomArray(64,Byte.MIN_VALUE,Byte.MAX_VALUE,rand);
+        byte[] arr=byteTestDataBuilder.buildRandomArray(64,Byte.MIN_VALUE,Byte.MAX_VALUE,rand);
         long word=BitSetUtil.markSurvivors(arr,0,arr.length,filter);
         int numExpectedSurvivors=Long.bitCount(word);
         byte[] copy=new byte[arr.length];
@@ -81,7 +81,7 @@ public class BitSetUtilTest{
       var filter=charPredicates.MarkGreaterThan.getPred(rand,128);
       for(int i=0;i<100;++i)
       {
-        char[] arr=charArrayBuilder.buildRandomArray(5000,0,256,rand);
+        char[] arr=charTestDataBuilder.buildRandomArray(5000,0,256,rand);
         long[] bitSet=BitSetUtil.getBitSet(arr.length);
         int numExpectedSurvivors=BitSetUtil.markSurvivors(arr,0,arr.length,filter,bitSet);
         char[] copy=new char[arr.length];
@@ -110,7 +110,7 @@ public class BitSetUtilTest{
       var filter=charPredicates.MarkGreaterThan.getPred(rand,128);
       for(int i=0;i<100;++i)
       {
-        char[] arr=charArrayBuilder.buildRandomArray(64,0,256,rand);
+        char[] arr=charTestDataBuilder.buildRandomArray(64,0,256,rand);
         long word=BitSetUtil.markSurvivors(arr,0,arr.length,filter);
         int numExpectedSurvivors=Long.bitCount(word);
         char[] copy=new char[arr.length];
@@ -138,7 +138,7 @@ public class BitSetUtilTest{
       var filter=shortPredicates.MarkGreaterThan.getPred(rand,0);
       for(int i=0;i<100;++i)
       {
-        short[] arr=shortArrayBuilder.buildRandomArray(5000,Byte.MIN_VALUE,Byte.MAX_VALUE,rand);
+        short[] arr=shortTestDataBuilder.buildRandomArray(5000,Byte.MIN_VALUE,Byte.MAX_VALUE,rand);
         long[] bitSet=BitSetUtil.getBitSet(arr.length);
         int numExpectedSurvivors=BitSetUtil.markSurvivors(arr,0,arr.length,filter,bitSet);
         short[] copy=new short[arr.length];
@@ -167,7 +167,7 @@ public class BitSetUtilTest{
       var filter=shortPredicates.MarkGreaterThan.getPred(rand,0);
       for(int i=0;i<100;++i)
       {
-        short[] arr=shortArrayBuilder.buildRandomArray(64,Byte.MIN_VALUE,Byte.MAX_VALUE,rand);
+        short[] arr=shortTestDataBuilder.buildRandomArray(64,Byte.MIN_VALUE,Byte.MAX_VALUE,rand);
         long word=BitSetUtil.markSurvivors(arr,0,arr.length,filter);
         int numExpectedSurvivors=Long.bitCount(word);
         short[] copy=new short[arr.length];
@@ -195,7 +195,7 @@ public class BitSetUtilTest{
       var filter=intPredicates.MarkGreaterThan.getPred(rand,0);
       for(int i=0;i<100;++i)
       {
-        int[] arr=intArrayBuilder.buildRandomArray(5000,Byte.MIN_VALUE,Byte.MAX_VALUE,rand);
+        int[] arr=intTestDataBuilder.buildRandomArray(5000,Byte.MIN_VALUE,Byte.MAX_VALUE,rand);
         long[] bitSet=BitSetUtil.getBitSet(arr.length);
         int numExpectedSurvivors=BitSetUtil.markSurvivors(arr,0,arr.length,filter,bitSet);
         int[] copy=new int[arr.length];
@@ -224,7 +224,7 @@ public class BitSetUtilTest{
       var filter=intPredicates.MarkGreaterThan.getPred(rand,0);
       for(int i=0;i<100;++i)
       {
-        int[] arr=intArrayBuilder.buildRandomArray(64,Byte.MIN_VALUE,Byte.MAX_VALUE,rand);
+        int[] arr=intTestDataBuilder.buildRandomArray(64,Byte.MIN_VALUE,Byte.MAX_VALUE,rand);
         long word=BitSetUtil.markSurvivors(arr,0,arr.length,filter);
         int numExpectedSurvivors=Long.bitCount(word);
         int[] copy=new int[arr.length];
@@ -252,7 +252,7 @@ public class BitSetUtilTest{
       var filter=longPredicates.MarkGreaterThan.getPred(rand,0);
       for(int i=0;i<100;++i)
       {
-        long[] arr=longArrayBuilder.buildRandomArray(5000,Byte.MIN_VALUE,Byte.MAX_VALUE,rand);
+        long[] arr=longTestDataBuilder.buildRandomArray(5000,Byte.MIN_VALUE,Byte.MAX_VALUE,rand);
         long[] bitSet=BitSetUtil.getBitSet(arr.length);
         int numExpectedSurvivors=BitSetUtil.markSurvivors(arr,0,arr.length,filter,bitSet);
         long[] copy=new long[arr.length];
@@ -281,7 +281,7 @@ public class BitSetUtilTest{
       var filter=longPredicates.MarkGreaterThan.getPred(rand,0);
       for(int i=0;i<100;++i)
       {
-        long[] arr=longArrayBuilder.buildRandomArray(64,Byte.MIN_VALUE,Byte.MAX_VALUE,rand);
+        long[] arr=longTestDataBuilder.buildRandomArray(64,Byte.MIN_VALUE,Byte.MAX_VALUE,rand);
         long word=BitSetUtil.markSurvivors(arr,0,arr.length,filter);
         int numExpectedSurvivors=Long.bitCount(word);
         long[] copy=new long[arr.length];
@@ -309,7 +309,7 @@ public class BitSetUtilTest{
       var filter=floatPredicates.MarkGreaterThan.getPred(rand,0);
       for(int i=0;i<100;++i)
       {
-        float[] arr=floatArrayBuilder.buildRandomArray(5000,Byte.MIN_VALUE,Byte.MAX_VALUE,rand);
+        float[] arr=floatTestDataBuilder.buildRandomArray(5000,Byte.MIN_VALUE,Byte.MAX_VALUE,rand);
         long[] bitSet=BitSetUtil.getBitSet(arr.length);
         int numExpectedSurvivors=BitSetUtil.markSurvivors(arr,0,arr.length,filter,bitSet);
         float[] copy=new float[arr.length];
@@ -338,7 +338,7 @@ public class BitSetUtilTest{
       var filter=floatPredicates.MarkGreaterThan.getPred(rand,0);
       for(int i=0;i<100;++i)
       {
-        float[] arr=floatArrayBuilder.buildRandomArray(64,Byte.MIN_VALUE,Byte.MAX_VALUE,rand);
+        float[] arr=floatTestDataBuilder.buildRandomArray(64,Byte.MIN_VALUE,Byte.MAX_VALUE,rand);
         long word=BitSetUtil.markSurvivors(arr,0,arr.length,filter);
         int numExpectedSurvivors=Long.bitCount(word);
         float[] copy=new float[arr.length];
@@ -366,7 +366,7 @@ public class BitSetUtilTest{
       var filter=doublePredicates.MarkGreaterThan.getPred(rand,0);
       for(int i=0;i<100;++i)
       {
-        double[] arr=doubleArrayBuilder.buildRandomArray(5000,Byte.MIN_VALUE,Byte.MAX_VALUE,rand);
+        double[] arr=doubleTestDataBuilder.buildRandomArray(5000,Byte.MIN_VALUE,Byte.MAX_VALUE,rand);
         long[] bitSet=BitSetUtil.getBitSet(arr.length);
         int numExpectedSurvivors=BitSetUtil.markSurvivors(arr,0,arr.length,filter,bitSet);
         double[] copy=new double[arr.length];
@@ -395,7 +395,7 @@ public class BitSetUtilTest{
       var filter=doublePredicates.MarkGreaterThan.getPred(rand,0);
       for(int i=0;i<100;++i)
       {
-        double[] arr=doubleArrayBuilder.buildRandomArray(64,Byte.MIN_VALUE,Byte.MAX_VALUE,rand);
+        double[] arr=doubleTestDataBuilder.buildRandomArray(64,Byte.MIN_VALUE,Byte.MAX_VALUE,rand);
         long word=BitSetUtil.markSurvivors(arr,0,arr.length,filter);
         int numExpectedSurvivors=Long.bitCount(word);
         double[] copy=new double[arr.length];
@@ -423,7 +423,7 @@ public class BitSetUtilTest{
       var filter=IntegerPredicates.MarkGreaterThan.getPred(rand,0);
       for(int i=0;i<100;++i)
       {
-        Integer[] arr=IntegerArrayBuilder.buildRandomArray(5000,Byte.MIN_VALUE,Byte.MAX_VALUE,rand);
+        Integer[] arr=IntegerTestDataBuilder.buildRandomArray(5000,Byte.MIN_VALUE,Byte.MAX_VALUE,rand);
         long[] bitSet=BitSetUtil.getBitSet(arr.length);
         int numExpectedSurvivors=BitSetUtil.markSurvivors(arr,0,arr.length,filter,bitSet);
         Integer[] copy=new Integer[arr.length];
@@ -452,7 +452,7 @@ public class BitSetUtilTest{
       var filter=IntegerPredicates.MarkGreaterThan.getPred(rand,0);
       for(int i=0;i<100;++i)
       {
-        Integer[] arr=IntegerArrayBuilder.buildRandomArray(64,Byte.MIN_VALUE,Byte.MAX_VALUE,rand);
+        Integer[] arr=IntegerTestDataBuilder.buildRandomArray(64,Byte.MIN_VALUE,Byte.MAX_VALUE,rand);
         long word=BitSetUtil.markSurvivors(arr,0,arr.length,filter);
         int numExpectedSurvivors=Long.bitCount(word);
         Integer[] copy=new Integer[arr.length];

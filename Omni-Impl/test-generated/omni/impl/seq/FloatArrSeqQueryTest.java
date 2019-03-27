@@ -5,7 +5,7 @@ import omni.impl.seq.FloatArrSeq.UncheckedList;
 import omni.impl.seq.FloatArrSeq.CheckedList;
 import omni.impl.seq.FloatArrSeq.UncheckedStack;
 import omni.impl.seq.FloatArrSeq.CheckedStack;
-import omni.api.QueryTestUtil;
+import omni.impl.QueryTestUtil;
 public class FloatArrSeqQueryTest
 {
   //TODO place sanity checks for checked sequence modification behavior

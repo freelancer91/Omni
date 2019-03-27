@@ -242,7 +242,7 @@ private static class CLASSPREFIXIndexPredicate implements PREDICATETYPE
 public void testAscendingStringBuilderToStringARRTYPE()
 {
   ARRTYPE[] arr=new ARRTYPE[10];
-  ARRTYPEArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
+  ARRTYPETestDataBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
   StringBuilder builder=new StringBuilder("[");
   OmniArray.OfCLASSPREFIX.ascendingToString(arr,0,arr.length-1,builder);
   builder.append(']');
@@ -254,7 +254,7 @@ public void testAscendingStringBuilderToStringARRTYPE()
 public void testDescendingStringBuilderToStringARRTYPE()
 {
   ARRTYPE[] arr=new ARRTYPE[10];
-  ARRTYPEArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
+  ARRTYPETestDataBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
   StringBuilder builder=new StringBuilder("[");
   OmniArray.OfCLASSPREFIX.descendingToString(arr,0,arr.length-1,builder);
   builder.append(']');
@@ -268,7 +268,7 @@ public void testDescendingStringBuilderToStringARRTYPE()
 public void testAscendingFixedBufferToStringARRTYPE()
 {
   ARRTYPE[] arr=new ARRTYPE[10];
-  ARRTYPEArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
+  ARRTYPETestDataBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
   char[] buffer=new char[arr.length*3];
   buffer[0]='[';
   buffer[buffer.length-1]=']';
@@ -281,7 +281,7 @@ public void testAscendingFixedBufferToStringARRTYPE()
 public void testDescendingFixedBufferToStringARRTYPE()
 {
   ARRTYPE[] arr=new ARRTYPE[10];
-  ARRTYPEArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
+  ARRTYPETestDataBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
   char[] buffer=new char[arr.length*3];
   buffer[0]='[';
   buffer[buffer.length-1]=']';
@@ -296,7 +296,7 @@ public void testDescendingFixedBufferToStringARRTYPE()
 public void testAscendingOmniStringBuilderToStringARRTYPE()
 {
   ARRTYPE[] arr=new ARRTYPE[10];
-  ARRTYPEArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
+  ARRTYPETestDataBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
   byte[] buffer=new byte[]{(byte)'['};
   ToStringUtil.OmniStringBuilderByte builder=new ToStringUtil.OmniStringBuilderByte(1,buffer);
   OmniArray.OfCLASSPREFIX.ascendingToString(arr,0,arr.length-1,builder);
@@ -309,7 +309,7 @@ public void testAscendingOmniStringBuilderToStringARRTYPE()
 public void testDescendingOmniStringBuilderToStringARRTYPE()
 {
   ARRTYPE[] arr=new ARRTYPE[10];
-  ARRTYPEArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
+  ARRTYPETestDataBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
   byte[] buffer=new byte[]{(byte)'['};
   ToStringUtil.OmniStringBuilderByte builder=new ToStringUtil.OmniStringBuilderByte(1,buffer);
   OmniArray.OfCLASSPREFIX.descendingToString(arr,0,arr.length-1,builder);
@@ -323,7 +323,7 @@ public void testDescendingOmniStringBuilderToStringARRTYPE()
 public void testAscendingFixedBufferToStringARRTYPE()
 {
   ARRTYPE[] arr=new ARRTYPE[10];
-  ARRTYPEArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
+  ARRTYPETestDataBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
   byte[] buffer=new byte[22*arr.length];
   buffer[0]=(byte)'[';
   int bufferOffset=OmniArray.OfCLASSPREFIX.ascendingToString(arr,0,arr.length-1,buffer,1);
@@ -336,7 +336,7 @@ public void testAscendingFixedBufferToStringARRTYPE()
 public void testDescendingFixedBufferToStringARRTYPE()
 {
   ARRTYPE[] arr=new ARRTYPE[10];
-  ARRTYPEArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
+  ARRTYPETestDataBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
   byte[] buffer=new byte[22*arr.length];
   buffer[0]=(byte)'[';
   int bufferOffset=OmniArray.OfCLASSPREFIX.descendingToString(arr,0,arr.length-1,buffer,1);
@@ -363,7 +363,7 @@ public void testDescendingFixedBufferToStringARRTYPE()
 public void testRemoveRangeAndPullDownARRTYPE()
 {
   ARRTYPE[] arr=new ARRTYPE[1000];
-  ARRTYPEArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
+  ARRTYPETestDataBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
   ARRTYPE[] copy=new ARRTYPE[arr.length];
   ArrCopy.uncheckedCopy(arr,0,copy,0,arr.length);
   int index=arr.length/2;
@@ -394,7 +394,7 @@ public void testRemoveRangeAndPullDownARRTYPE()
 public void testRemoveIndexAndPullDownARRTYPE()
 {
   ARRTYPE[] arr=new ARRTYPE[1000];
-  ARRTYPEArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
+  ARRTYPETestDataBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
   ARRTYPE[] copy=new ARRTYPE[arr.length];
   ArrCopy.uncheckedCopy(arr,0,copy,0,arr.length);
   int index=arr.length/2;
@@ -422,7 +422,7 @@ public void testRemoveIndexAndPullDownARRTYPE()
 public void testAscendingSeqHashCodeARRTYPE()
 {
   ARRTYPE[] arr=new ARRTYPE[1000];
-  ARRTYPEArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
+  ARRTYPETestDataBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
   int hash=OmniArray.OfCLASSPREFIX.ascendingSeqHashCode(arr,0,arr.length-1);
   int expectedHash=1;
   for(int i=0;i<arr.length;++i)
@@ -454,7 +454,7 @@ public void testAscendingSeqHashCodeARRTYPE()
 public void testDescendingSeqHashCodeARRTYPE()
 {
   ARRTYPE[] arr=new ARRTYPE[1000];
-  ARRTYPEArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
+  ARRTYPETestDataBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
   int hash=OmniArray.OfCLASSPREFIX.descendingSeqHashCode(arr,0,arr.length-1);
   int expectedHash=1;
   for(int i=arr.length-1;i>=0;--i)
@@ -496,7 +496,7 @@ public void testDescendingSeqHashCodeARRTYPE()
 public void testascendingForEachARRTYPE()
 {
   ARRTYPE[] arr=new ARRTYPE[1000];
-  ARRTYPEArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
+  ARRTYPETestDataBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
   ARRTYPE[] copy=new ARRTYPE[arr.length];
   
   var forwardCopier=new CONSUMER()
@@ -518,7 +518,7 @@ public void testascendingForEachARRTYPE()
 public void testdescendingForEachARRTYPE()
 {
   ARRTYPE[] arr=new ARRTYPE[1000];
-  ARRTYPEArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
+  ARRTYPETestDataBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
   ARRTYPE[] copy=new ARRTYPE[arr.length];
   
   var reverseCopier=new CONSUMER()
@@ -551,7 +551,7 @@ public void testdescendingForEachARRTYPE()
 public void testUncheckedReplaceAllARRTYPE()
 {
   ARRTYPE[] arr=new ARRTYPE[1000];
-  ARRTYPEArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
+  ARRTYPETestDataBuilder.Randomized.buildUnchecked(arr,0,arr.length,new Random(),0);
   ARRTYPE[] copy=new ARRTYPE[arr.length];
   ArrCopy.uncheckedCopy(arr,0,copy,0,arr.length);
   
@@ -593,7 +593,7 @@ public void testReverseRangeARRTYPE()
 {
   Random rand=new Random(0);
   ARRTYPE[] arr;
-  ARRTYPEArrayBuilder.Randomized.buildUnchecked(arr=new ARRTYPE[100],0,arr.length,rand,0);
+  ARRTYPETestDataBuilder.Randomized.buildUnchecked(arr=new ARRTYPE[100],0,arr.length,rand,0);
   ARRTYPE[] copy=new ARRTYPE[arr.length];
   ArrCopy.uncheckedCopy(arr,0,copy,0,arr.length);
   OmniArray.OfCLASSPREFIX.reverseRange(arr,0,arr.length-1);
@@ -656,11 +656,11 @@ public void testUncheckedQueryARRTYPE()
     ARRTYPE[] arr=new ARRTYPE[1000];
     if(willContain)
     {
-      ARRTYPEArrayBuilder.Randomized.buildUnchecked(arr,0,arr.length,rand,rand.nextInt());
+      ARRTYPETestDataBuilder.Randomized.buildUnchecked(arr,0,arr.length,rand,rand.nextInt());
       int index=RandomUtil.randomIntBetween(0,arr.length-1,rand);
       ARRTYPE v=arr[index];
       Assertions.assertTrue(OmniArray.OfCLASSPREFIX.uncheckedcontains(arr,0,arr.length-1,v));
-      ARRTYPEArrayBuilder.AllEquals.buildUnchecked(arr,0,arr.length,rand,0);
+      ARRTYPETestDataBuilder.AllEquals.buildUnchecked(arr,0,arr.length,rand,0);
       v=arr[index];
       arr[index]=!v;
       Assertions.assertEquals(index,OmniArray.OfCLASSPREFIX.uncheckedindexOf(arr,arr.length,!v));
@@ -671,7 +671,7 @@ public void testUncheckedQueryARRTYPE()
     }
     else
     {
-      ARRTYPEArrayBuilder.AllEquals.buildUnchecked(arr,0,arr.length,rand,rand.nextInt());
+      ARRTYPETestDataBuilder.AllEquals.buildUnchecked(arr,0,arr.length,rand,rand.nextInt());
       ARRTYPE v=arr[0];
       Assertions.assertFalse(OmniArray.OfCLASSPREFIX.uncheckedcontains(arr,0,arr.length-1,!v));
       Assertions.assertEquals(-1,OmniArray.OfCLASSPREFIX.uncheckedindexOf(arr,arr.length,!v));
@@ -682,7 +682,7 @@ public void testUncheckedQueryARRTYPE()
       
     }
 #ELSEIFSWITCH ARRTYPE==byte,char,short,int,long
-    var arr=ARRTYPEArrayBuilder.buildRandomArray(1000,1,100,rand);
+    var arr=ARRTYPETestDataBuilder.buildRandomArray(1000,1,100,rand);
     if(willContain)
     {
       int index=RandomUtil.randomIntBetween(0,arr.length-1,rand);
@@ -708,7 +708,7 @@ public void testUncheckedQueryARRTYPE()
       Assertions.assertEquals(-1,OmniArray.OfCLASSPREFIX.uncheckedsearch(arr,arr.length,v));
     }
 #ELSE
-    var arr=ARRTYPEArrayBuilder.buildRandomArray(1000,1,100,rand);
+    var arr=ARRTYPETestDataBuilder.buildRandomArray(1000,1,100,rand);
     switch(RandomUtil.randomIntBetween(0,2,rand))
     {
       case 0:

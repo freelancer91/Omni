@@ -110,10 +110,10 @@ private static class TestData
 {
   final long randSeed;
   final int m;
-  final CUSTOMARRTYPEArrayBuilder builder;
+  final CUSTOMARRTYPETestDataBuilder builder;
   final CUSTOMARRTYPE[] customArr;
   final STOCKARRTYPE[] stockArr;
-  private TestData(long randSeed,int m,CUSTOMARRTYPEArrayBuilder builder,int arrLength,Random rand)
+  private TestData(long randSeed,int m,CUSTOMARRTYPETestDataBuilder builder,int arrLength,Random rand)
   {
     this.randSeed=randSeed;
     this.m=m;
@@ -155,7 +155,7 @@ private static class TestData
   {
     return "TestData{builder="+builder+"; arrayType=$ArrayType$; arrLength="+customArr.length+"; m="+m+"; randSeed="+randSeed+"}";
   }
-  private static void initializeTestData(CUSTOMARRTYPEArrayBuilder builder,long randSeed,int arrLength,ArrayList<TestData> testDatas)
+  private static void initializeTestData(CUSTOMARRTYPETestDataBuilder builder,long randSeed,int arrLength,ArrayList<TestData> testDatas)
   {
     Random rand=new Random(randSeed);
     for(int m=builder.getMLo(),mHi=builder.getMHi(arrLength),numReps=builder.getNumSortReps(arrLength);m<=mHi;m=builder.incrementM(m))
@@ -227,7 +227,7 @@ private static class TestData
 #ENDIF
 #ENDDEF
 
-#MACRODEF BasicTestSuite<ARRAYBUILDER,SUITEORDER>()
+#MACRODEF BasicTestSuite<TESTDATABUILDER,SUITEORDER>()
 @Test
 #IF OfBoolean
 @Order(6*SUITEORDER+1)
@@ -236,13 +236,13 @@ private static class TestData
 #ELSE
 @Order(8*SUITEORDER+1)
 #ENDIF
-public void initializeArraysForARRAYBUILDER()
+public void initializeArraysForTESTDATABUILDER()
 {
 #IFNOTSWITCH SUITEORDER==0
   stopTimer();
   TEST_DATA.clear();
 #ENDIF
-  System.out.println("Initializing arrays for arrType=$ArrayType$; builder=ARRAYBUILDER");
+  System.out.println("Initializing arrays for arrType=$ArrayType$; builder=TESTDATABUILDER");
   var lengthStream=Arrays.stream(lengths);
   if(PARALLEL)
   {
@@ -250,7 +250,7 @@ public void initializeArraysForARRAYBUILDER()
   }
   lengthStream.forEach(arrLength->
   {
-    if(CUSTOMARRTYPEArrayBuilder.ARRAYBUILDER.isRandomized())
+    if(CUSTOMARRTYPETestDataBuilder.TESTDATABUILDER.isRandomized())
     {
       var randStream=Arrays.stream(randSeeds);
       if(PARALLEL)
@@ -259,18 +259,18 @@ public void initializeArraysForARRAYBUILDER()
       }
       randStream.forEach(randSeed->
       {
-        TestData.initializeTestData(CUSTOMARRTYPEArrayBuilder.ARRAYBUILDER,randSeed,arrLength,TEST_DATA);
+        TestData.initializeTestData(CUSTOMARRTYPETestDataBuilder.TESTDATABUILDER,randSeed,arrLength,TEST_DATA);
       });
     }
     else
     {
-      TestData.initializeTestData(CUSTOMARRTYPEArrayBuilder.ARRAYBUILDER,0,arrLength,TEST_DATA);
+      TestData.initializeTestData(CUSTOMARRTYPETestDataBuilder.TESTDATABUILDER,0,arrLength,TEST_DATA);
     }
   });
   System.out.println("Initialized "+TEST_DATA.size()+" arrays");
   TIMER=System.currentTimeMillis();
 }
-#IFSWITCH ARRAYBUILDER==Ascending
+#IFSWITCH TESTDATABUILDER==Ascending
   #IF OfBoolean
 #MACRO TestMethod<6*SUITEORDER+2,UnsortedComparator,Stable,NoStockAction,DontCopyCustom>()
 #MACRO TestMethod<6*SUITEORDER+3,AscendingComparator,Stable,NoStockAction,DontCopyCustom>()
@@ -300,7 +300,7 @@ public void initializeArraysForARRAYBUILDER()
 #MACRO TestMethod<8*SUITEORDER+7,DescendingComparator,Unstable,NoStockAction,CopyCustom>()
 #MACRO TestMethod<8*SUITEORDER+8,Descending,Stable,NoStockAction,DontCopyCustom>()
   #ENDIF
-#ELSEIFSWITCH ARRAYBUILDER==Descending
+#ELSEIFSWITCH TESTDATABUILDER==Descending
   #IF OfBoolean
 #MACRO TestMethod<6*SUITEORDER+2,UnsortedComparator,Stable,NoStockAction,DontCopyCustom>()
 #MACRO TestMethod<6*SUITEORDER+3,DescendingComparator,Stable,NoStockAction,DontCopyCustom>()
@@ -330,7 +330,7 @@ public void initializeArraysForARRAYBUILDER()
 #MACRO TestMethod<8*SUITEORDER+7,AscendingComparator,Unstable,NoStockAction,CopyCustom>()
 #MACRO TestMethod<8*SUITEORDER+8,Ascending,Stable,NoStockAction,DontCopyCustom>()
   #ENDIF
-#ELSEIFSWITCH ARRAYBUILDER==AllEquals
+#ELSEIFSWITCH TESTDATABUILDER==AllEquals
   #IF OfBoolean
 #MACRO TestMethod<6*SUITEORDER+2,UnsortedComparator,Stable,NoStockAction,DontCopyCustom>()
 #MACRO TestMethod<6*SUITEORDER+3,DescendingComparator,Stable,NoStockAction,DontCopyCustom>()
@@ -389,9 +389,9 @@ public void initializeArraysForARRAYBUILDER()
 @Test
 @Order(METHODORDER)
 #IFSWITCH STABLE==Stable
-public void testUncheckedStableCOMPARATORTYPESortWithARRAYBUILDERArray()
+public void testUncheckedStableCOMPARATORTYPESortWithTESTDATABUILDERArray()
 #ELSEIFSWITCH STABLE==Unstable
-public void testUncheckedUnstableCOMPARATORTYPESortWithARRAYBUILDERArray()
+public void testUncheckedUnstableCOMPARATORTYPESortWithTESTDATABUILDERArray()
 #ELSE
 ERROR unknown stable flag STABLE
 #ENDIF
@@ -603,7 +603,7 @@ public void testIsStableCOMPARATORTYPESort()
   }
 #ELSE
   $ArrayType$[] customArr=new $ArrayType$[4000];
-  $ArrayType$ArrayBuilder.Randomized.buildUnchecked(customArr,0,customArr.length,rand,0);
+  $ArrayType$TestDataBuilder.Randomized.buildUnchecked(customArr,0,customArr.length,rand,0);
   $ArrayType$[] copy=new $ArrayType$[customArr.length];
   ArrCopy.uncheckedCopy(customArr,0,copy,0,customArr.length);
   #IFSWITCH COMPARATORTYPE==UnstableComparator

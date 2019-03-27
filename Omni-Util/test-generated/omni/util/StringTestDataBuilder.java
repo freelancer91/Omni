@@ -1,7 +1,7 @@
 package omni.util;
 import java.util.Collection;
 import java.util.Random;
-public enum StringArrayBuilder
+public enum StringTestDataBuilder
 {
   Randomized
   {
@@ -448,7 +448,7 @@ public enum StringArrayBuilder
   @Override
   public String toString()
   {
-    return "StringArrayBuilder."+this.name();
+    return "StringTestDataBuilder."+this.name();
   }
   public void addArrays(long randSeed,int arrLength,Collection<String[]> arrays)
   {

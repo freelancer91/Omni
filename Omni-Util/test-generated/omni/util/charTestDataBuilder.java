@@ -1,7 +1,7 @@
 package omni.util;
 import java.util.Collection;
 import java.util.Random;
-public enum floatArrayBuilder
+public enum charTestDataBuilder
 {
   Randomized
   {
@@ -13,6 +13,10 @@ public enum floatArrayBuilder
     @Override
     public int getNumSortReps(int arrLength)
     {
+      if(arrLength<=3201 && arrLength>=287)
+      {
+        return 40;
+      }  
       return 10;
     }
     @Override
@@ -21,22 +25,22 @@ public enum floatArrayBuilder
       return true;
     }
     @Override
-    public void buildUnchecked(float[] arr,int offset,int length,Random rand,int m)
+    public void buildUnchecked(char[] arr,int offset,int length,Random rand,int m)
     {
       length+=offset;
       do
       {
-        arr[offset]=RandomUtil.getRandomfloat(rand);
+        arr[offset]=RandomUtil.getRandomchar(rand);
       }
       while(++offset!=length);
     }
     @Override
-    public void buildUnchecked(Float[] arr,int offset,int length,Random rand,int m)
+    public void buildUnchecked(Character[] arr,int offset,int length,Random rand,int m)
     {
       length+=offset;
       do
       {
-        arr[offset]=RandomUtil.getRandomFloat(rand);
+        arr[offset]=RandomUtil.getRandomCharacter(rand);
       }
       while(++offset!=length);
     }
@@ -54,14 +58,14 @@ public enum floatArrayBuilder
       return m<<1;
     }
     @Override
-    public void buildUnchecked(float[] arr,int offset,int length,Random rand,int m)
+    public void buildUnchecked(char[] arr,int offset,int length,Random rand,int m)
     {
-      for(int i=0;i<length;arr[(i++)+offset]=TypeConversionUtil.convertTofloat(m+i)){}
+      for(int i=0;i<length;arr[(i++)+offset]=TypeConversionUtil.convertTochar(m+i)){}
     }
     @Override
-    public void buildUnchecked(Float[] arr,int offset,int length,Random rand,int m)
+    public void buildUnchecked(Character[] arr,int offset,int length,Random rand,int m)
     {
-      for(int i=0;i<length;arr[(i++)+offset]=TypeConversionUtil.convertToFloat(m+i)){}
+      for(int i=0;i<length;arr[(i++)+offset]=TypeConversionUtil.convertToCharacter(m+i)){}
     }
   }
   ,
@@ -77,14 +81,14 @@ public enum floatArrayBuilder
       return m<<1;
     }
     @Override
-    public void buildUnchecked(float[] arr,int offset,int length,Random rand,int m)
+    public void buildUnchecked(char[] arr,int offset,int length,Random rand,int m)
     {
-      for(int i=0;i<length;arr[(i++)+offset]=TypeConversionUtil.convertTofloat(length-m-i)){}
+      for(int i=0;i<length;arr[(i++)+offset]=TypeConversionUtil.convertTochar(length-m-i)){}
     }
     @Override
-    public void buildUnchecked(Float[] arr,int offset,int length,Random rand,int m)
+    public void buildUnchecked(Character[] arr,int offset,int length,Random rand,int m)
     {
-      for(int i=0;i<length;arr[(i++)+offset]=TypeConversionUtil.convertToFloat(length-m-i)){}
+      for(int i=0;i<length;arr[(i++)+offset]=TypeConversionUtil.convertToCharacter(length-m-i)){}
     }
   }
   ,
@@ -101,9 +105,9 @@ public enum floatArrayBuilder
       return 0;
     }
     @Override
-    public void buildUnchecked(float[] arr,int offset,int length,Random rand,int m)
+    public void buildUnchecked(char[] arr,int offset,int length,Random rand,int m)
     {
-      float val=TypeConversionUtil.convertTofloat(m);
+      char val=TypeConversionUtil.convertTochar(m);
       length+=offset;
       do
       {
@@ -112,9 +116,9 @@ public enum floatArrayBuilder
       while(++offset!=length);
     }
     @Override
-    public void buildUnchecked(Float[] arr,int offset,int length,Random rand,int m)
+    public void buildUnchecked(Character[] arr,int offset,int length,Random rand,int m)
     {
-      Float val=TypeConversionUtil.convertToFloat(m);
+      Character val=TypeConversionUtil.convertToCharacter(m);
       length+=offset;
       do
       {
@@ -137,31 +141,31 @@ public enum floatArrayBuilder
       return 69;
     }
     @Override
-    public void buildUnchecked(float[] arr,int offset,int length,Random rand,int m)
+    public void buildUnchecked(char[] arr,int offset,int length,Random rand,int m)
     {
       int v=0;
       for(int i=0, k=0,period=length/m;k<m;++k)
       {
         v=0;
-        for(int p=0;p<period;arr[(i++)+offset]=TypeConversionUtil.convertTofloat(++v),++p){}
+        for(int p=0;p<period;arr[(i++)+offset]=TypeConversionUtil.convertTochar(++v),++p){}
       }
-      for(int j=1;j<length-1;arr[j++]=TypeConversionUtil.convertTofloat(++v)){}
+      for(int j=1;j<length-1;arr[j++]=TypeConversionUtil.convertTochar(++v)){}
     }
     @Override
-    public void buildUnchecked(Float[] arr,int offset,int length,Random rand,int m)
+    public void buildUnchecked(Character[] arr,int offset,int length,Random rand,int m)
     {
       int v=0;
       for(int i=0, k=0,period=length/m;k<m;++k)
       {
         v=0;
-        for(int p=0;p<period;arr[(i++)+offset]=TypeConversionUtil.convertToFloat(++v),++p){}
+        for(int p=0;p<period;arr[(i++)+offset]=TypeConversionUtil.convertToCharacter(++v),++p){}
       }
-      for(int j=1;j<length-1;arr[j++]=TypeConversionUtil.convertToFloat(++v)){}
+      for(int j=1;j<length-1;arr[j++]=TypeConversionUtil.convertToCharacter(++v)){}
       for(int i=offset,bound=offset+length;i<bound;++i)
       {
         if(arr[i]==null)
         {
-          arr[i]=TypeConversionUtil.convertToFloat(0);
+          arr[i]=TypeConversionUtil.convertToCharacter(0);
         }
       }
     }
@@ -180,31 +184,31 @@ public enum floatArrayBuilder
       return 69;
     }
     @Override
-    public void buildUnchecked(float[] arr,int offset,int length,Random rand,int m)
+    public void buildUnchecked(char[] arr,int offset,int length,Random rand,int m)
     {
       int v=0;
       for(int i=0, k=0,period=length/m;k<m;++k)
       {
         v=0;
-        for(int p=0;p<period;arr[(i++)+offset]=TypeConversionUtil.convertTofloat(--v),++p){}
+        for(int p=0;p<period;arr[(i++)+offset]=TypeConversionUtil.convertTochar(--v),++p){}
       }
-      for(int j=1;j<length-1;arr[j++]=TypeConversionUtil.convertTofloat(--v)){}
+      for(int j=1;j<length-1;arr[j++]=TypeConversionUtil.convertTochar(--v)){}
     }
     @Override
-    public void buildUnchecked(Float[] arr,int offset,int length,Random rand,int m)
+    public void buildUnchecked(Character[] arr,int offset,int length,Random rand,int m)
     {
       int v=0;
       for(int i=0, k=0,period=length/m;k<m;++k)
       {
         v=0;
-        for(int p=0;p<period;arr[(i++)+offset]=TypeConversionUtil.convertToFloat(--v),++p){}
+        for(int p=0;p<period;arr[(i++)+offset]=TypeConversionUtil.convertToCharacter(--v),++p){}
       }
-      for(int j=1;j<length-1;arr[j++]=TypeConversionUtil.convertToFloat(--v)){}
+      for(int j=1;j<length-1;arr[j++]=TypeConversionUtil.convertToCharacter(--v)){}
       for(int i=offset,bound=offset+length;i<bound;++i)
       {
         if(arr[i]==null)
         {
-          arr[i]=TypeConversionUtil.convertToFloat(0);
+          arr[i]=TypeConversionUtil.convertToCharacter(0);
         }
       }
     }
@@ -222,11 +226,11 @@ public enum floatArrayBuilder
       return m<<1;
     }
     @Override
-    public void buildUnchecked(float[] arr,int offset,int length,Random rand,int m)
+    public void buildUnchecked(char[] arr,int offset,int length,Random rand,int m)
     {
       for(int incCount=1,decCount=length,i=0,period=m--;;period+=m)
       {
-        for(int k=0;++k<=period;arr[(i++)+offset]=TypeConversionUtil.convertTofloat(incCount++))
+        for(int k=0;++k<=period;arr[(i++)+offset]=TypeConversionUtil.convertTochar(incCount++))
         {
           if(i>=length)
           {
@@ -234,7 +238,7 @@ public enum floatArrayBuilder
           }
         }
         period+=m;
-        for(int k=0;++k<=period;arr[(i++)+offset]=TypeConversionUtil.convertTofloat(decCount--))
+        for(int k=0;++k<=period;arr[(i++)+offset]=TypeConversionUtil.convertTochar(decCount--))
         {
           if(i>=length)
           {
@@ -244,11 +248,11 @@ public enum floatArrayBuilder
       }
     }
     @Override
-    public void buildUnchecked(Float[] arr,int offset,int length,Random rand,int m)
+    public void buildUnchecked(Character[] arr,int offset,int length,Random rand,int m)
     {
       for(int incCount=1,decCount=length,i=0,period=m--;;period+=m)
       {
-        for(int k=0;++k<=period;arr[(i++)+offset]=TypeConversionUtil.convertToFloat(incCount++))
+        for(int k=0;++k<=period;arr[(i++)+offset]=TypeConversionUtil.convertToCharacter(incCount++))
         {
           if(i>=length)
           {
@@ -256,7 +260,7 @@ public enum floatArrayBuilder
           }
         }
         period+=m;
-        for(int k=0;++k<=period;arr[(i++)+offset]=TypeConversionUtil.convertToFloat(decCount--))
+        for(int k=0;++k<=period;arr[(i++)+offset]=TypeConversionUtil.convertToCharacter(decCount--))
         {
           if(i>=length)
           {
@@ -275,11 +279,11 @@ public enum floatArrayBuilder
       return Math.min(arrLength,7);
     }
     @Override
-    public void buildUnchecked(float[] arr,int offset,int length,Random rand,int m)
+    public void buildUnchecked(char[] arr,int offset,int length,Random rand,int m)
     {
       for(int period=length/m,i=0,k=0;;++k)
       {
-        for(int t=0;++t<=period;arr[(i++)+offset]=TypeConversionUtil.convertTofloat(k))
+        for(int t=0;++t<=period;arr[(i++)+offset]=TypeConversionUtil.convertTochar(k))
         {
           if(i>=length)
           {
@@ -293,11 +297,11 @@ public enum floatArrayBuilder
       }
     }
     @Override
-    public void buildUnchecked(Float[] arr,int offset,int length,Random rand,int m)
+    public void buildUnchecked(Character[] arr,int offset,int length,Random rand,int m)
     {
       for(int period=length/m,i=0,k=0;;++k)
       {
-        for(int t=0;++t<=period;arr[(i++)+offset]=TypeConversionUtil.convertToFloat(k))
+        for(int t=0;++t<=period;arr[(i++)+offset]=TypeConversionUtil.convertToCharacter(k))
         {
           if(i>=length)
           {
@@ -324,22 +328,22 @@ public enum floatArrayBuilder
       return m<<1;
     }
     @Override
-    public void buildUnchecked(float[] arr,int offset,int length,Random rand,int m)
+    public void buildUnchecked(char[] arr,int offset,int length,Random rand,int m)
     {
       int i=0;
       do
       {
-        arr[i+offset]=TypeConversionUtil.convertTofloat(i%m);
+        arr[i+offset]=TypeConversionUtil.convertTochar(i%m);
       }
       while(++i!=length);
     }
     @Override
-    public void buildUnchecked(Float[] arr,int offset,int length,Random rand,int m)
+    public void buildUnchecked(Character[] arr,int offset,int length,Random rand,int m)
     {
       int i=0;
       do
       {
-        arr[i+offset]=TypeConversionUtil.convertToFloat(i%m);
+        arr[i+offset]=TypeConversionUtil.convertToCharacter(i%m);
       }
       while(++i!=length);
     }
@@ -352,6 +356,15 @@ public enum floatArrayBuilder
     {
       return (arrLength<<1)-1;
     }
+    @Override
+    public int getNumSortReps(int arrLength)
+    {
+      if(arrLength<=3201 && arrLength>=287)
+      {
+        return 40;
+      }
+      return 1;
+    }
     public int incrementM(int m)
     {
       return m<<1;
@@ -362,22 +375,22 @@ public enum floatArrayBuilder
       return true;
     }
     @Override
-    public void buildUnchecked(float[] arr,int offset,int length,Random rand,int m)
+    public void buildUnchecked(char[] arr,int offset,int length,Random rand,int m)
     {
       int i=0;
       do
       {
-        arr[i+offset]=TypeConversionUtil.convertTofloat(rand.nextInt(m));
+        arr[i+offset]=TypeConversionUtil.convertTochar(rand.nextInt(m));
       }
       while(++i!=length);
     }
     @Override
-    public void buildUnchecked(Float[] arr,int offset,int length,Random rand,int m)
+    public void buildUnchecked(Character[] arr,int offset,int length,Random rand,int m)
     {
       int i=0;
       do
       {
-        arr[i+offset]=TypeConversionUtil.convertToFloat(rand.nextInt(m));
+        arr[i+offset]=TypeConversionUtil.convertToCharacter(rand.nextInt(m));
       }
       while(++i!=length);
     }
@@ -391,11 +404,11 @@ public enum floatArrayBuilder
       return Math.min(arrLength,7);
     }
     @Override
-    public void buildUnchecked(float[] arr,int offset,int length,Random rand,int m)
+    public void buildUnchecked(char[] arr,int offset,int length,Random rand,int m)
     {
       for(int i=0;;)
       {
-        for(int t=0;++t<=m;arr[(i++)+offset]=TypeConversionUtil.convertTofloat(m))
+        for(int t=0;++t<=m;arr[(i++)+offset]=TypeConversionUtil.convertTochar(m))
         {
           if(i>=length)
           {
@@ -405,11 +418,11 @@ public enum floatArrayBuilder
       }
     }
     @Override
-    public void buildUnchecked(Float[] arr,int offset,int length,Random rand,int m)
+    public void buildUnchecked(Character[] arr,int offset,int length,Random rand,int m)
     {
       for(int i=0;;)
       {
-        for(int t=0;++t<=m;arr[(i++)+offset]=TypeConversionUtil.convertToFloat(m))
+        for(int t=0;++t<=m;arr[(i++)+offset]=TypeConversionUtil.convertToCharacter(m))
         {
           if(i>=length)
           {
@@ -432,23 +445,23 @@ public enum floatArrayBuilder
       return m<<1;
     }
     @Override
-    public void buildUnchecked(float[] arr,int offset,int length,Random rand,int m)
+    public void buildUnchecked(char[] arr,int offset,int length,Random rand,int m)
     {
       int i=0;
-      for(int middle=length/(m+1);i<middle;arr[i+offset]=TypeConversionUtil.convertTofloat(i++)){}
+      for(int middle=length/(m+1);i<middle;arr[i+offset]=TypeConversionUtil.convertTochar(i++)){}
       while(i<length)
       {
-        arr[i+offset]=TypeConversionUtil.convertTofloat(length-(i++)-1);
+        arr[i+offset]=TypeConversionUtil.convertTochar(length-(i++)-1);
       }
     }
     @Override
-    public void buildUnchecked(Float[] arr,int offset,int length,Random rand,int m)
+    public void buildUnchecked(Character[] arr,int offset,int length,Random rand,int m)
     {
       int i=0;
-      for(int middle=length/(m+1);i<middle;arr[i+offset]=TypeConversionUtil.convertToFloat(i++)){}
+      for(int middle=length/(m+1);i<middle;arr[i+offset]=TypeConversionUtil.convertToCharacter(i++)){}
       while(i<length)
       {
-        arr[i+offset]=TypeConversionUtil.convertToFloat(length-(i++)-1);
+        arr[i+offset]=TypeConversionUtil.convertToCharacter(length-(i++)-1);
       }
     }
   }
@@ -465,22 +478,22 @@ public enum floatArrayBuilder
       return m<<1;
     }
     @Override
-    public void buildUnchecked(float[] arr,int offset,int length,Random rand,int m)
+    public void buildUnchecked(char[] arr,int offset,int length,Random rand,int m)
     {
       int i=0;
       do
       {
-        arr[i+offset]=TypeConversionUtil.convertTofloat((i*m+i)%length);
+        arr[i+offset]=TypeConversionUtil.convertTochar((i*m+i)%length);
       }
       while(++i!=length);
     }
     @Override
-    public void buildUnchecked(Float[] arr,int offset,int length,Random rand,int m)
+    public void buildUnchecked(Character[] arr,int offset,int length,Random rand,int m)
     {
       int i=0;
       do
       {
-        arr[i+offset]=TypeConversionUtil.convertToFloat((i*m+i)%length);
+        arr[i+offset]=TypeConversionUtil.convertToCharacter((i*m+i)%length);
       }
       while(++i!=length);
     }
@@ -498,22 +511,22 @@ public enum floatArrayBuilder
       return m<<1;
     }
     @Override
-    public void buildUnchecked(float[] arr,int offset,int length,Random rand,int m)
+    public void buildUnchecked(char[] arr,int offset,int length,Random rand,int m)
     {
       int i=0;
       do
       {
-        arr[offset+i]=TypeConversionUtil.convertTofloat(Math.min(i,m));
+        arr[offset+i]=TypeConversionUtil.convertTochar(Math.min(i,m));
       }
       while(++i!=length);
     }
     @Override
-    public void buildUnchecked(Float[] arr,int offset,int length,Random rand,int m)
+    public void buildUnchecked(Character[] arr,int offset,int length,Random rand,int m)
     {
       int i=0;
       do
       {
-        arr[offset+i]=TypeConversionUtil.convertToFloat(Math.min(i,m));
+        arr[offset+i]=TypeConversionUtil.convertToCharacter(Math.min(i,m));
       }
       while(++i!=length);
     }
@@ -529,6 +542,10 @@ public enum floatArrayBuilder
     @Override
     public int getNumSortReps(int arrLength)
     {
+      if(arrLength<=3201 && arrLength>=287)
+      {
+        return 40;
+      }  
       return 10;
     }
     @Override
@@ -537,89 +554,26 @@ public enum floatArrayBuilder
       return true;
     }
     @Override
-    public void buildUnchecked(float[] arr,int offset,int length,Random rand,int m)
+    public void buildUnchecked(char[] arr,int offset,int length,Random rand,int m)
     {
       int x=0,y=0;
       int bound=offset+length;
       do
       {
-        arr[offset]=TypeConversionUtil.convertTofloat(rand.nextBoolean()?(x+2):(y+2));
+        arr[offset]=TypeConversionUtil.convertTochar(rand.nextBoolean()?(x+2):(y+2));
       }
       while(++offset!=bound);
     }
     @Override
-    public void buildUnchecked(Float[] arr,int offset,int length,Random rand,int m)
+    public void buildUnchecked(Character[] arr,int offset,int length,Random rand,int m)
     {
       int x=0,y=0;
       int bound=offset+length;
       do
       {
-        arr[offset]=TypeConversionUtil.convertToFloat(rand.nextBoolean()?(x+2):(y+2));
+        arr[offset]=TypeConversionUtil.convertToCharacter(rand.nextBoolean()?(x+2):(y+2));
       }
       while(++offset!=bound);
-    }
-  }
-  ,
-  WithNaNsAndZeros
-  {
-    @Override
-    public int getNumRemoveIfReps(int arrLength)
-    {
-      return 10;
-    }
-    @Override
-    public int getNumSortReps(int arrLength)
-    {
-      return 20;
-    }
-    @Override
-    public boolean isRandomized()
-    {
-      return true;
-    }
-    @Override
-    public void buildUnchecked(float[] arr,int offset,int length,Random rand,int m)
-    {
-      for(int i=0;i<length;++i)
-      {
-        switch(rand.nextInt(4))
-        {
-        case 0:
-          arr[i+offset]=(float)0.0;
-          break;
-        case 1:
-          arr[i+offset]=(float)-0.0;
-          break;
-        case 2:
-          arr[i+offset]=Float.NaN;
-          break;
-        default:
-          arr[i+offset]=RandomUtil.getRandomfloat(rand);
-        }
-      }
-    }
-    //Ignore deprecation because we need would like to be able to use identity equality on the newly created boxed types
-    @SuppressWarnings("deprecation")
-    @Override
-    public void buildUnchecked(Float[] arr,int offset,int length,Random rand,int m)
-    {
-      for(int i=0;i<length;++i)
-      {
-        switch(rand.nextInt(4))
-        {
-        case 0:
-          arr[i+offset]=new Float((float)0.0);
-          break;
-        case 1:
-          arr[i+offset]=new Float((float)-0.0);
-          break;
-        case 2:
-          arr[i+offset]=new Float(Float.NaN);
-          break;
-        default:
-          arr[i+offset]=RandomUtil.getRandomFloat(rand);
-        }
-      }
     }
   }
   ;
@@ -648,8 +602,8 @@ public enum floatArrayBuilder
     //most sub-types are not randomized, so make that the default
     return false;
   }
-  public abstract void buildUnchecked(float[] arr,int offset,int length,Random rand,int m);
-  public void build(float[] arr,Random rand,int m)
+  public abstract void buildUnchecked(char[] arr,int offset,int length,Random rand,int m);
+  public void build(char[] arr,Random rand,int m)
   {
     if(arr==null)
     {
@@ -661,7 +615,7 @@ public enum floatArrayBuilder
       buildUnchecked(arr,0,length,rand,m);
     }
   }  
-  public void build(float[] arr,int offset,int length,Random rand,int m)
+  public void build(char[] arr,int offset,int length,Random rand,int m)
   {
     if(arr==null)
     {
@@ -676,8 +630,8 @@ public enum floatArrayBuilder
       buildUnchecked(arr,offset,length,rand,m);
     }
   }
-  public abstract void buildUnchecked(Float[] arr,int offset,int length,Random rand,int m);
-  public void build(Float[] arr,Random rand,int m)
+  public abstract void buildUnchecked(Character[] arr,int offset,int length,Random rand,int m);
+  public void build(Character[] arr,Random rand,int m)
   {
     if(arr==null)
     {
@@ -689,7 +643,7 @@ public enum floatArrayBuilder
       buildUnchecked(arr,0,length,rand,m);
     }
   }  
-  public void build(Float[] arr,int offset,int length,Random rand,int m)
+  public void build(Character[] arr,int offset,int length,Random rand,int m)
   {
     if(arr==null)
     {
@@ -707,16 +661,16 @@ public enum floatArrayBuilder
   @Override
   public String toString()
   {
-    return "floatArrayBuilder."+this.name();
+    return "charTestDataBuilder."+this.name();
   }
-  public void addArrays(long randSeed,int arrLength,Collection<float[]> arrays)
+  public void addArrays(long randSeed,int arrLength,Collection<char[]> arrays)
   {
     Random rand=new Random(randSeed);
     for(int m=getMLo(),mHi=getMHi(arrLength),numReps=getNumSortReps(arrLength);m<=mHi;m=incrementM(m))
     {
       for(int i=0;i<numReps;++i)
       {
-        float[] arr=new float[arrLength];
+        char[] arr=new char[arrLength];
         if(arrLength!=0)
         {
           buildUnchecked(arr,0,arrLength,rand,m);
@@ -728,12 +682,12 @@ public enum floatArrayBuilder
       }
     }
   }
-  static float[] buildRandomArray(int arrLength,int minIncl,int maxIncl,Random rand)
+  static char[] buildRandomArray(int arrLength,int minIncl,int maxIncl,Random rand)
   {
-    float[] arr=new float[arrLength];
+    char[] arr=new char[arrLength];
     for(int i=0;i<arrLength;++i)
     {
-      arr[i]=TypeConversionUtil.convertTofloat(RandomUtil.randomIntBetween(minIncl,maxIncl,rand));
+      arr[i]=TypeConversionUtil.convertTochar(RandomUtil.randomIntBetween(minIncl,maxIncl,rand));
     }
     return arr;
   }
