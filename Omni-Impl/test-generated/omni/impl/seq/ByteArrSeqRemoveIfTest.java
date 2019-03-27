@@ -18,7 +18,6 @@ import omni.api.OmniList;
 @SuppressWarnings({"rawtypes","unchecked"}) 
 public class ByteArrSeqRemoveIfTest
 {
-//TODO place sanity checks for checked sequence modification behavior
   private static final Field CheckedSubListmodCount;
   private static final Field CheckedSubListparent;
   private static final Field CheckedSubListroot;
@@ -26,10 +25,10 @@ public class ByteArrSeqRemoveIfTest
   private static final Field UncheckedSubListparent;
   private static final Field UncheckedSubListroot;
   private static final Field UncheckedSubListsize;
-  static
-  {
-    try
-    {
+  static{
+    try{
+      //You must add the following switch to the VM arguments
+      //--add-opens java.base/java.lang.reflect=omni.impl
       Field modifiersField=Field.class.getDeclaredField("modifiers");
       modifiersField.setAccessible(true);
       {
@@ -49,73 +48,51 @@ public class ByteArrSeqRemoveIfTest
         modifiersField.setInt(UncheckedSubListroot,UncheckedSubListroot.getModifiers()&~Modifier.FINAL);
         (UncheckedSubListsize=clazz.getDeclaredField("size")).setAccessible(true);
       }
-    }
-    catch(Exception e)
-    {
+    }catch(Exception e){
       throw new ExceptionInInitializerError(e);
     }
   }
-  private static ByteArrSeq.CheckedList getRoot(Object seq)
-  {
-    try
-    {
+  private static ByteArrSeq.CheckedList getRoot(Object seq){
+    try{
       return (ByteArrSeq.CheckedList)CheckedSubListroot.get(seq);
-    }
-    catch(Exception e)
-    {
+    }catch(Exception e){
       throw new RuntimeException(e);
     }
   }
-  private static OmniList.OfByte getParent(Object seq)
-  {
-    try
-    {
+  private static OmniList.OfByte getParent(Object seq){
+    try{
       return (OmniList.OfByte)CheckedSubListparent.get(seq);
-    }
-    catch(Exception e)
-    {
+    }catch(Exception e){
       throw new RuntimeException(e);
     }
   }
-  private static ByteArrSeq.UncheckedList assertUncheckedSubListIntegrity(int expectedModCount,int expectedParentSize,Object obj)
-  {
-    if(!(obj instanceof ByteArrSeq.UncheckedList))
-    {
-      try
-      {
+  private static ByteArrSeq.UncheckedList assertUncheckedSubListIntegrity(int expectedModCount,int expectedParentSize,Object obj){
+    if(!(obj instanceof ByteArrSeq.UncheckedList)){
+      try{
         Object parent=UncheckedSubListparent.get(obj);
-        if(parent!=null)
-        {
+        if(parent!=null){
            Assertions.assertEquals(expectedParentSize,UncheckedSubListsize.getInt(parent));
            obj=parent;
         }
         obj=UncheckedSubListroot.get(obj);
-      }
-      catch(Exception e)
-      {
+      }catch(Exception e){
         throw new RuntimeException(e);
       }
     }
     return (ByteArrSeq.UncheckedList)obj;
   }
-  private static ByteArrSeq.CheckedList assertCheckedSubListIntegrity(int expectedModCount,int expectedParentSize,Object obj)
-  {
-    if(!(obj instanceof ByteArrSeq.CheckedList))
-    {
-      try
-      {
+  private static ByteArrSeq.CheckedList assertCheckedSubListIntegrity(int expectedModCount,int expectedParentSize,Object obj){
+    if(!(obj instanceof ByteArrSeq.CheckedList)){
+      try{
         Assertions.assertEquals(expectedModCount,CheckedSubListmodCount.getInt(obj));
         Object parent=CheckedSubListparent.get(obj);
-        if(parent!=null)
-        {
+        if(parent!=null){
            Assertions.assertEquals(expectedModCount,CheckedSubListmodCount.getInt(parent));
            Assertions.assertEquals(expectedParentSize,CheckedSubListsize.getInt(parent));
            obj=parent;
         }
         obj=CheckedSubListroot.get(obj);
-      }
-      catch(Exception e)
-      {
+      }catch(Exception e){
         throw new RuntimeException(e);
       }
     }
@@ -141,13 +118,10 @@ public class ByteArrSeqRemoveIfTest
     return new ByteArrSeq.UncheckedStack(seqSize,arr);
   }
   @Test
-  public void testArrSeqStackUncheckedremoveIfBytePredicate()
-  {
+  public void testArrSeqStackUncheckedremoveIfBytePredicate(){
     Random rand=new Random(0);
-    outer:for(int seqSize=0;seqSize<=100;seqSize+=10)
-    {
-      for(int i=0;i<100;++i)
-      {
+    outer:for(int seqSize=0;seqSize<=100;seqSize+=10){
+      for(int i=0;i<100;++i){
         testArrSeqStackUncheckedremoveIfBytePredicateHelper(buildArrSeqStackUnchecked(seqSize),new ByteMonitoredPredicate.RemoveAll(),seqSize,null);          
         testArrSeqStackUncheckedremoveIfBytePredicateHelper(buildArrSeqStackUnchecked(seqSize),new ByteMonitoredPredicate.RemoveNone(),0,null);
         testArrSeqStackUncheckedremoveIfBytePredicateHelper(buildArrSeqStackUnchecked(seqSize),new ByteMonitoredPredicate.NonThrowing(rand,0.01),-1,null);
@@ -159,15 +133,13 @@ public class ByteArrSeqRemoveIfTest
         testArrSeqStackUncheckedremoveIfBytePredicateHelper(buildArrSeqStackUnchecked(seqSize),new ByteMonitoredPredicate.NonThrowing(rand,0.90),-1,null);
         testArrSeqStackUncheckedremoveIfBytePredicateHelper(buildArrSeqStackUnchecked(seqSize),new ByteMonitoredPredicate.NonThrowing(rand,0.95),-1,null);
         testArrSeqStackUncheckedremoveIfBytePredicateHelper(buildArrSeqStackUnchecked(seqSize),new ByteMonitoredPredicate.NonThrowing(rand,0.99),-1,null);
-        if(seqSize==0)
-        {
+        if(seqSize==0){
           continue outer;
         }
       }
     }
   }
-  private static void testArrSeqStackUncheckedremoveIfBytePredicateHelper(ByteArrSeq.UncheckedStack seq,ByteMonitoredPredicate pred,int numExpectedToBeRemoved,Class<? extends Throwable> expectedException)
-  {
+  private static void testArrSeqStackUncheckedremoveIfBytePredicateHelper(ByteArrSeq.UncheckedStack seq,ByteMonitoredPredicate pred,int numExpectedToBeRemoved,Class<? extends Throwable> expectedException){
     var clone=(ByteArrSeq.UncheckedStack)seq.clone();
     int expectedSize;
     if(expectedException==null)
@@ -225,13 +197,10 @@ public class ByteArrSeqRemoveIfTest
     }
   }
   @Test
-  public void testArrSeqStackUncheckedremoveIfPredicate()
-  {
+  public void testArrSeqStackUncheckedremoveIfPredicate(){
     Random rand=new Random(0);
-    outer:for(int seqSize=0;seqSize<=100;seqSize+=10)
-    {
-      for(int i=0;i<100;++i)
-      {
+    outer:for(int seqSize=0;seqSize<=100;seqSize+=10){
+      for(int i=0;i<100;++i){
         testArrSeqStackUncheckedremoveIfPredicateHelper(buildArrSeqStackUnchecked(seqSize),new ByteMonitoredPredicate.RemoveAll(),seqSize,null);          
         testArrSeqStackUncheckedremoveIfPredicateHelper(buildArrSeqStackUnchecked(seqSize),new ByteMonitoredPredicate.RemoveNone(),0,null);
         testArrSeqStackUncheckedremoveIfPredicateHelper(buildArrSeqStackUnchecked(seqSize),new ByteMonitoredPredicate.NonThrowing(rand,0.01),-1,null);
@@ -243,15 +212,13 @@ public class ByteArrSeqRemoveIfTest
         testArrSeqStackUncheckedremoveIfPredicateHelper(buildArrSeqStackUnchecked(seqSize),new ByteMonitoredPredicate.NonThrowing(rand,0.90),-1,null);
         testArrSeqStackUncheckedremoveIfPredicateHelper(buildArrSeqStackUnchecked(seqSize),new ByteMonitoredPredicate.NonThrowing(rand,0.95),-1,null);
         testArrSeqStackUncheckedremoveIfPredicateHelper(buildArrSeqStackUnchecked(seqSize),new ByteMonitoredPredicate.NonThrowing(rand,0.99),-1,null);
-        if(seqSize==0)
-        {
+        if(seqSize==0){
           continue outer;
         }
       }
     }
   }
-  private static void testArrSeqStackUncheckedremoveIfPredicateHelper(ByteArrSeq.UncheckedStack seq,ByteMonitoredPredicate pred,int numExpectedToBeRemoved,Class<? extends Throwable> expectedException)
-  {
+  private static void testArrSeqStackUncheckedremoveIfPredicateHelper(ByteArrSeq.UncheckedStack seq,ByteMonitoredPredicate pred,int numExpectedToBeRemoved,Class<? extends Throwable> expectedException){
     var clone=(ByteArrSeq.UncheckedStack)seq.clone();
     int expectedSize;
     if(expectedException==null)
@@ -326,13 +293,10 @@ public class ByteArrSeqRemoveIfTest
     return new ByteArrSeq.CheckedStack(seqSize,arr);
   }
   @Test
-  public void testArrSeqStackCheckedremoveIfBytePredicate()
-  {
+  public void testArrSeqStackCheckedremoveIfBytePredicate(){
     Random rand=new Random(0);
-    outer:for(int seqSize=0;seqSize<=100;seqSize+=10)
-    {
-      for(int i=0;i<100;++i)
-      {
+    outer:for(int seqSize=0;seqSize<=100;seqSize+=10){
+      for(int i=0;i<100;++i){
         testArrSeqStackCheckedremoveIfBytePredicateHelper(buildArrSeqStackChecked(seqSize),new ByteMonitoredPredicate.RemoveAll(),seqSize,null);          
         testArrSeqStackCheckedremoveIfBytePredicateHelper(buildArrSeqStackChecked(seqSize),new ByteMonitoredPredicate.RemoveNone(),0,null);
         testArrSeqStackCheckedremoveIfBytePredicateHelper(buildArrSeqStackChecked(seqSize),new ByteMonitoredPredicate.NonThrowing(rand,0.01),-1,null);
@@ -353,15 +317,13 @@ public class ByteArrSeqRemoveIfTest
           var seq=buildArrSeqStackChecked(seqSize);
           testArrSeqStackCheckedremoveIfBytePredicateHelper(seq,new ByteMonitoredPredicate.ModdingAndThrowing(rand,seqSize,seq),0,seqSize==0?null:ConcurrentModificationException.class);
         }
-        if(seqSize==0)
-        {
+        if(seqSize==0){
           continue outer;
         }
       }
     }
   }
-  private static void testArrSeqStackCheckedremoveIfBytePredicateHelper(ByteArrSeq.CheckedStack seq,ByteMonitoredPredicate pred,int numExpectedToBeRemoved,Class<? extends Throwable> expectedException)
-  {
+  private static void testArrSeqStackCheckedremoveIfBytePredicateHelper(ByteArrSeq.CheckedStack seq,ByteMonitoredPredicate pred,int numExpectedToBeRemoved,Class<? extends Throwable> expectedException){
     var clone=(ByteArrSeq.CheckedStack)seq.clone();
     int expectedSize;
     if(expectedException==null)
@@ -419,13 +381,10 @@ public class ByteArrSeqRemoveIfTest
     }
   }
   @Test
-  public void testArrSeqStackCheckedremoveIfPredicate()
-  {
+  public void testArrSeqStackCheckedremoveIfPredicate(){
     Random rand=new Random(0);
-    outer:for(int seqSize=0;seqSize<=100;seqSize+=10)
-    {
-      for(int i=0;i<100;++i)
-      {
+    outer:for(int seqSize=0;seqSize<=100;seqSize+=10){
+      for(int i=0;i<100;++i){
         testArrSeqStackCheckedremoveIfPredicateHelper(buildArrSeqStackChecked(seqSize),new ByteMonitoredPredicate.RemoveAll(),seqSize,null);          
         testArrSeqStackCheckedremoveIfPredicateHelper(buildArrSeqStackChecked(seqSize),new ByteMonitoredPredicate.RemoveNone(),0,null);
         testArrSeqStackCheckedremoveIfPredicateHelper(buildArrSeqStackChecked(seqSize),new ByteMonitoredPredicate.NonThrowing(rand,0.01),-1,null);
@@ -446,15 +405,13 @@ public class ByteArrSeqRemoveIfTest
           var seq=buildArrSeqStackChecked(seqSize);
           testArrSeqStackCheckedremoveIfPredicateHelper(seq,new ByteMonitoredPredicate.ModdingAndThrowing(rand,seqSize,seq),0,seqSize==0?null:ConcurrentModificationException.class);
         }
-        if(seqSize==0)
-        {
+        if(seqSize==0){
           continue outer;
         }
       }
     }
   }
-  private static void testArrSeqStackCheckedremoveIfPredicateHelper(ByteArrSeq.CheckedStack seq,ByteMonitoredPredicate pred,int numExpectedToBeRemoved,Class<? extends Throwable> expectedException)
-  {
+  private static void testArrSeqStackCheckedremoveIfPredicateHelper(ByteArrSeq.CheckedStack seq,ByteMonitoredPredicate pred,int numExpectedToBeRemoved,Class<? extends Throwable> expectedException){
     var clone=(ByteArrSeq.CheckedStack)seq.clone();
     int expectedSize;
     if(expectedException==null)
@@ -529,13 +486,10 @@ public class ByteArrSeqRemoveIfTest
     return new ByteArrSeq.UncheckedList(seqSize,arr);
   }
   @Test
-  public void testArrSeqListUncheckedremoveIfBytePredicate()
-  {
+  public void testArrSeqListUncheckedremoveIfBytePredicate(){
     Random rand=new Random(0);
-    outer:for(int seqSize=0;seqSize<=100;seqSize+=10)
-    {
-      for(int i=0;i<100;++i)
-      {
+    outer:for(int seqSize=0;seqSize<=100;seqSize+=10){
+      for(int i=0;i<100;++i){
         testArrSeqListUncheckedremoveIfBytePredicateHelper(buildArrSeqListUnchecked(seqSize),new ByteMonitoredPredicate.RemoveAll(),seqSize,null);          
         testArrSeqListUncheckedremoveIfBytePredicateHelper(buildArrSeqListUnchecked(seqSize),new ByteMonitoredPredicate.RemoveNone(),0,null);
         testArrSeqListUncheckedremoveIfBytePredicateHelper(buildArrSeqListUnchecked(seqSize),new ByteMonitoredPredicate.NonThrowing(rand,0.01),-1,null);
@@ -547,15 +501,13 @@ public class ByteArrSeqRemoveIfTest
         testArrSeqListUncheckedremoveIfBytePredicateHelper(buildArrSeqListUnchecked(seqSize),new ByteMonitoredPredicate.NonThrowing(rand,0.90),-1,null);
         testArrSeqListUncheckedremoveIfBytePredicateHelper(buildArrSeqListUnchecked(seqSize),new ByteMonitoredPredicate.NonThrowing(rand,0.95),-1,null);
         testArrSeqListUncheckedremoveIfBytePredicateHelper(buildArrSeqListUnchecked(seqSize),new ByteMonitoredPredicate.NonThrowing(rand,0.99),-1,null);
-        if(seqSize==0)
-        {
+        if(seqSize==0){
           continue outer;
         }
       }
     }
   }
-  private static void testArrSeqListUncheckedremoveIfBytePredicateHelper(ByteArrSeq.UncheckedList seq,ByteMonitoredPredicate pred,int numExpectedToBeRemoved,Class<? extends Throwable> expectedException)
-  {
+  private static void testArrSeqListUncheckedremoveIfBytePredicateHelper(ByteArrSeq.UncheckedList seq,ByteMonitoredPredicate pred,int numExpectedToBeRemoved,Class<? extends Throwable> expectedException){
     var clone=(ByteArrSeq.UncheckedList)seq.clone();
     int expectedSize;
     if(expectedException==null)
@@ -613,13 +565,10 @@ public class ByteArrSeqRemoveIfTest
     }
   }
   @Test
-  public void testArrSeqListUncheckedremoveIfPredicate()
-  {
+  public void testArrSeqListUncheckedremoveIfPredicate(){
     Random rand=new Random(0);
-    outer:for(int seqSize=0;seqSize<=100;seqSize+=10)
-    {
-      for(int i=0;i<100;++i)
-      {
+    outer:for(int seqSize=0;seqSize<=100;seqSize+=10){
+      for(int i=0;i<100;++i){
         testArrSeqListUncheckedremoveIfPredicateHelper(buildArrSeqListUnchecked(seqSize),new ByteMonitoredPredicate.RemoveAll(),seqSize,null);          
         testArrSeqListUncheckedremoveIfPredicateHelper(buildArrSeqListUnchecked(seqSize),new ByteMonitoredPredicate.RemoveNone(),0,null);
         testArrSeqListUncheckedremoveIfPredicateHelper(buildArrSeqListUnchecked(seqSize),new ByteMonitoredPredicate.NonThrowing(rand,0.01),-1,null);
@@ -631,15 +580,13 @@ public class ByteArrSeqRemoveIfTest
         testArrSeqListUncheckedremoveIfPredicateHelper(buildArrSeqListUnchecked(seqSize),new ByteMonitoredPredicate.NonThrowing(rand,0.90),-1,null);
         testArrSeqListUncheckedremoveIfPredicateHelper(buildArrSeqListUnchecked(seqSize),new ByteMonitoredPredicate.NonThrowing(rand,0.95),-1,null);
         testArrSeqListUncheckedremoveIfPredicateHelper(buildArrSeqListUnchecked(seqSize),new ByteMonitoredPredicate.NonThrowing(rand,0.99),-1,null);
-        if(seqSize==0)
-        {
+        if(seqSize==0){
           continue outer;
         }
       }
     }
   }
-  private static void testArrSeqListUncheckedremoveIfPredicateHelper(ByteArrSeq.UncheckedList seq,ByteMonitoredPredicate pred,int numExpectedToBeRemoved,Class<? extends Throwable> expectedException)
-  {
+  private static void testArrSeqListUncheckedremoveIfPredicateHelper(ByteArrSeq.UncheckedList seq,ByteMonitoredPredicate pred,int numExpectedToBeRemoved,Class<? extends Throwable> expectedException){
     var clone=(ByteArrSeq.UncheckedList)seq.clone();
     int expectedSize;
     if(expectedException==null)
@@ -714,13 +661,10 @@ public class ByteArrSeqRemoveIfTest
     return new ByteArrSeq.CheckedList(seqSize,arr);
   }
   @Test
-  public void testArrSeqListCheckedremoveIfBytePredicate()
-  {
+  public void testArrSeqListCheckedremoveIfBytePredicate(){
     Random rand=new Random(0);
-    outer:for(int seqSize=0;seqSize<=100;seqSize+=10)
-    {
-      for(int i=0;i<100;++i)
-      {
+    outer:for(int seqSize=0;seqSize<=100;seqSize+=10){
+      for(int i=0;i<100;++i){
         testArrSeqListCheckedremoveIfBytePredicateHelper(buildArrSeqListChecked(seqSize),new ByteMonitoredPredicate.RemoveAll(),seqSize,null);          
         testArrSeqListCheckedremoveIfBytePredicateHelper(buildArrSeqListChecked(seqSize),new ByteMonitoredPredicate.RemoveNone(),0,null);
         testArrSeqListCheckedremoveIfBytePredicateHelper(buildArrSeqListChecked(seqSize),new ByteMonitoredPredicate.NonThrowing(rand,0.01),-1,null);
@@ -741,15 +685,13 @@ public class ByteArrSeqRemoveIfTest
           var seq=buildArrSeqListChecked(seqSize);
           testArrSeqListCheckedremoveIfBytePredicateHelper(seq,new ByteMonitoredPredicate.ModdingAndThrowing(rand,seqSize,seq),0,seqSize==0?null:ConcurrentModificationException.class);
         }
-        if(seqSize==0)
-        {
+        if(seqSize==0){
           continue outer;
         }
       }
     }
   }
-  private static void testArrSeqListCheckedremoveIfBytePredicateHelper(ByteArrSeq.CheckedList seq,ByteMonitoredPredicate pred,int numExpectedToBeRemoved,Class<? extends Throwable> expectedException)
-  {
+  private static void testArrSeqListCheckedremoveIfBytePredicateHelper(ByteArrSeq.CheckedList seq,ByteMonitoredPredicate pred,int numExpectedToBeRemoved,Class<? extends Throwable> expectedException){
     var clone=(ByteArrSeq.CheckedList)seq.clone();
     int expectedSize;
     if(expectedException==null)
@@ -807,13 +749,10 @@ public class ByteArrSeqRemoveIfTest
     }
   }
   @Test
-  public void testArrSeqListCheckedremoveIfPredicate()
-  {
+  public void testArrSeqListCheckedremoveIfPredicate(){
     Random rand=new Random(0);
-    outer:for(int seqSize=0;seqSize<=100;seqSize+=10)
-    {
-      for(int i=0;i<100;++i)
-      {
+    outer:for(int seqSize=0;seqSize<=100;seqSize+=10){
+      for(int i=0;i<100;++i){
         testArrSeqListCheckedremoveIfPredicateHelper(buildArrSeqListChecked(seqSize),new ByteMonitoredPredicate.RemoveAll(),seqSize,null);          
         testArrSeqListCheckedremoveIfPredicateHelper(buildArrSeqListChecked(seqSize),new ByteMonitoredPredicate.RemoveNone(),0,null);
         testArrSeqListCheckedremoveIfPredicateHelper(buildArrSeqListChecked(seqSize),new ByteMonitoredPredicate.NonThrowing(rand,0.01),-1,null);
@@ -834,15 +773,13 @@ public class ByteArrSeqRemoveIfTest
           var seq=buildArrSeqListChecked(seqSize);
           testArrSeqListCheckedremoveIfPredicateHelper(seq,new ByteMonitoredPredicate.ModdingAndThrowing(rand,seqSize,seq),0,seqSize==0?null:ConcurrentModificationException.class);
         }
-        if(seqSize==0)
-        {
+        if(seqSize==0){
           continue outer;
         }
       }
     }
   }
-  private static void testArrSeqListCheckedremoveIfPredicateHelper(ByteArrSeq.CheckedList seq,ByteMonitoredPredicate pred,int numExpectedToBeRemoved,Class<? extends Throwable> expectedException)
-  {
+  private static void testArrSeqListCheckedremoveIfPredicateHelper(ByteArrSeq.CheckedList seq,ByteMonitoredPredicate pred,int numExpectedToBeRemoved,Class<? extends Throwable> expectedException){
     var clone=(ByteArrSeq.CheckedList)seq.clone();
     int expectedSize;
     if(expectedException==null)
@@ -932,17 +869,14 @@ public class ByteArrSeqRemoveIfTest
         arr[dstOffset]=TypeConversionUtil.convertTobyte(seqSize+parentPostAlloc+i);
       }
     }
-    return new ByteArrSeq.CheckedList(rootSize,arr).subList(rootPreAlloc,parentPreAlloc+seqSize+parentPostAlloc).subList(parentPreAlloc,parentPreAlloc+seqSize);
+    return new ByteArrSeq.UncheckedList(rootSize,arr).subList(rootPreAlloc,rootPreAlloc+parentPreAlloc+seqSize+parentPostAlloc).subList(parentPreAlloc,parentPreAlloc+seqSize);
   }
   @ParameterizedTest(name="ByteArrSeq.UncheckedSubList rootPreAlloc={0},parentPreAlloc={1},parentPostAlloc={2},rootPostAlloc={3}")
   @MethodSource("subListAllocationArgumentProvider")
-  public void testArrSeqSubListUncheckedremoveIfBytePredicate(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc)
-  {
+  public void testArrSeqSubListUncheckedremoveIfBytePredicate(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
     Random rand=new Random(0);
-    outer:for(int seqSize=0;seqSize<=100;seqSize+=10)
-    {
-      for(int i=0;i<100;++i)
-      {
+    outer:for(int seqSize=0;seqSize<=100;seqSize+=10){
+      for(int i=0;i<100;++i){
         testArrSeqSubListUncheckedremoveIfBytePredicateHelper(rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,buildArrSeqSubListUnchecked(seqSize,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc),new ByteMonitoredPredicate.RemoveAll(),seqSize,null);          
         testArrSeqSubListUncheckedremoveIfBytePredicateHelper(rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,buildArrSeqSubListUnchecked(seqSize,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc),new ByteMonitoredPredicate.RemoveNone(),0,null);
         testArrSeqSubListUncheckedremoveIfBytePredicateHelper(rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,buildArrSeqSubListUnchecked(seqSize,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc),new ByteMonitoredPredicate.NonThrowing(rand,0.01),-1,null);
@@ -954,8 +888,7 @@ public class ByteArrSeqRemoveIfTest
         testArrSeqSubListUncheckedremoveIfBytePredicateHelper(rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,buildArrSeqSubListUnchecked(seqSize,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc),new ByteMonitoredPredicate.NonThrowing(rand,0.90),-1,null);
         testArrSeqSubListUncheckedremoveIfBytePredicateHelper(rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,buildArrSeqSubListUnchecked(seqSize,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc),new ByteMonitoredPredicate.NonThrowing(rand,0.95),-1,null);
         testArrSeqSubListUncheckedremoveIfBytePredicateHelper(rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,buildArrSeqSubListUnchecked(seqSize,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc),new ByteMonitoredPredicate.NonThrowing(rand,0.99),-1,null);
-        if(seqSize==0)
-        {
+        if(seqSize==0){
           continue outer;
         }
       }
@@ -1040,13 +973,10 @@ public class ByteArrSeqRemoveIfTest
   }
   @ParameterizedTest(name="ByteArrSeq.UncheckedSubList rootPreAlloc={0},parentPreAlloc={1},parentPostAlloc={2},rootPostAlloc={3}")
   @MethodSource("subListAllocationArgumentProvider")
-  public void testArrSeqSubListUncheckedremoveIfPredicate(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc)
-  {
+  public void testArrSeqSubListUncheckedremoveIfPredicate(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
     Random rand=new Random(0);
-    outer:for(int seqSize=0;seqSize<=100;seqSize+=10)
-    {
-      for(int i=0;i<100;++i)
-      {
+    outer:for(int seqSize=0;seqSize<=100;seqSize+=10){
+      for(int i=0;i<100;++i){
         testArrSeqSubListUncheckedremoveIfPredicateHelper(rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,buildArrSeqSubListUnchecked(seqSize,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc),new ByteMonitoredPredicate.RemoveAll(),seqSize,null);          
         testArrSeqSubListUncheckedremoveIfPredicateHelper(rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,buildArrSeqSubListUnchecked(seqSize,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc),new ByteMonitoredPredicate.RemoveNone(),0,null);
         testArrSeqSubListUncheckedremoveIfPredicateHelper(rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,buildArrSeqSubListUnchecked(seqSize,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc),new ByteMonitoredPredicate.NonThrowing(rand,0.01),-1,null);
@@ -1058,8 +988,7 @@ public class ByteArrSeqRemoveIfTest
         testArrSeqSubListUncheckedremoveIfPredicateHelper(rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,buildArrSeqSubListUnchecked(seqSize,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc),new ByteMonitoredPredicate.NonThrowing(rand,0.90),-1,null);
         testArrSeqSubListUncheckedremoveIfPredicateHelper(rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,buildArrSeqSubListUnchecked(seqSize,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc),new ByteMonitoredPredicate.NonThrowing(rand,0.95),-1,null);
         testArrSeqSubListUncheckedremoveIfPredicateHelper(rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,buildArrSeqSubListUnchecked(seqSize,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc),new ByteMonitoredPredicate.NonThrowing(rand,0.99),-1,null);
-        if(seqSize==0)
-        {
+        if(seqSize==0){
           continue outer;
         }
       }
@@ -1175,17 +1104,14 @@ public class ByteArrSeqRemoveIfTest
         arr[dstOffset]=TypeConversionUtil.convertTobyte(seqSize+parentPostAlloc+i);
       }
     }
-    return new ByteArrSeq.CheckedList(rootSize,arr).subList(rootPreAlloc,parentPreAlloc+seqSize+parentPostAlloc).subList(parentPreAlloc,parentPreAlloc+seqSize);
+    return new ByteArrSeq.CheckedList(rootSize,arr).subList(rootPreAlloc,rootPreAlloc+parentPreAlloc+seqSize+parentPostAlloc).subList(parentPreAlloc,parentPreAlloc+seqSize);
   }
   @ParameterizedTest(name="ByteArrSeq.CheckedSubList rootPreAlloc={0},parentPreAlloc={1},parentPostAlloc={2},rootPostAlloc={3}")
   @MethodSource("subListAllocationArgumentProvider")
-  public void testArrSeqSubListCheckedremoveIfBytePredicate(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc)
-  {
+  public void testArrSeqSubListCheckedremoveIfBytePredicate(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
     Random rand=new Random(0);
-    outer:for(int seqSize=0;seqSize<=100;seqSize+=10)
-    {
-      for(int i=0;i<100;++i)
-      {
+    outer:for(int seqSize=0;seqSize<=100;seqSize+=10){
+      for(int i=0;i<100;++i){
         testArrSeqSubListCheckedremoveIfBytePredicateHelper(rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,buildArrSeqSubListChecked(seqSize,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc),new ByteMonitoredPredicate.RemoveAll(),seqSize,null);          
         testArrSeqSubListCheckedremoveIfBytePredicateHelper(rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,buildArrSeqSubListChecked(seqSize,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc),new ByteMonitoredPredicate.RemoveNone(),0,null);
         testArrSeqSubListCheckedremoveIfBytePredicateHelper(rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,buildArrSeqSubListChecked(seqSize,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc),new ByteMonitoredPredicate.NonThrowing(rand,0.01),-1,null);
@@ -1222,8 +1148,7 @@ public class ByteArrSeqRemoveIfTest
           var seq=buildArrSeqSubListChecked(seqSize,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc);
           testArrSeqSubListCheckedremoveIfBytePredicateHelper(rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,seq,new ByteMonitoredPredicate.ModdingAndThrowing(rand,seqSize,getRoot(seq)),0,seqSize==0?null:ConcurrentModificationException.class);
         }
-        if(seqSize==0)
-        {
+        if(seqSize==0){
           continue outer;
         }
       }
@@ -1308,13 +1233,10 @@ public class ByteArrSeqRemoveIfTest
   }
   @ParameterizedTest(name="ByteArrSeq.CheckedSubList rootPreAlloc={0},parentPreAlloc={1},parentPostAlloc={2},rootPostAlloc={3}")
   @MethodSource("subListAllocationArgumentProvider")
-  public void testArrSeqSubListCheckedremoveIfPredicate(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc)
-  {
+  public void testArrSeqSubListCheckedremoveIfPredicate(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
     Random rand=new Random(0);
-    outer:for(int seqSize=0;seqSize<=100;seqSize+=10)
-    {
-      for(int i=0;i<100;++i)
-      {
+    outer:for(int seqSize=0;seqSize<=100;seqSize+=10){
+      for(int i=0;i<100;++i){
         testArrSeqSubListCheckedremoveIfPredicateHelper(rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,buildArrSeqSubListChecked(seqSize,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc),new ByteMonitoredPredicate.RemoveAll(),seqSize,null);          
         testArrSeqSubListCheckedremoveIfPredicateHelper(rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,buildArrSeqSubListChecked(seqSize,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc),new ByteMonitoredPredicate.RemoveNone(),0,null);
         testArrSeqSubListCheckedremoveIfPredicateHelper(rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,buildArrSeqSubListChecked(seqSize,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc),new ByteMonitoredPredicate.NonThrowing(rand,0.01),-1,null);
@@ -1351,8 +1273,7 @@ public class ByteArrSeqRemoveIfTest
           var seq=buildArrSeqSubListChecked(seqSize,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc);
           testArrSeqSubListCheckedremoveIfPredicateHelper(rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,seq,new ByteMonitoredPredicate.ModdingAndThrowing(rand,seqSize,getRoot(seq)),0,seqSize==0?null:ConcurrentModificationException.class);
         }
-        if(seqSize==0)
-        {
+        if(seqSize==0){
           continue outer;
         }
       }
@@ -1435,8 +1356,7 @@ public class ByteArrSeqRemoveIfTest
       Assertions.assertEquals(root.arr[dstOffset],TypeConversionUtil.convertTobyte(seqSize+parentPostAlloc+i));
     }
   }
-  static Stream<Arguments> subListAllocationArgumentProvider()
-  {
+  static Stream<Arguments> subListAllocationArgumentProvider(){
     Arguments[] args=new Arguments[16];
     args[0]=Arguments.of(0,0,0,0);
     args[1]=Arguments.of(0,0,0,5);

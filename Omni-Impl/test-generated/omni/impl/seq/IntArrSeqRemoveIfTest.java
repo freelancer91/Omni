@@ -18,7 +18,6 @@ import omni.api.OmniList;
 @SuppressWarnings({"rawtypes","unchecked"}) 
 public class IntArrSeqRemoveIfTest
 {
-//TODO place sanity checks for checked sequence modification behavior
   private static final Field CheckedSubListmodCount;
   private static final Field CheckedSubListparent;
   private static final Field CheckedSubListroot;
@@ -26,10 +25,10 @@ public class IntArrSeqRemoveIfTest
   private static final Field UncheckedSubListparent;
   private static final Field UncheckedSubListroot;
   private static final Field UncheckedSubListsize;
-  static
-  {
-    try
-    {
+  static{
+    try{
+      //You must add the following switch to the VM arguments
+      //--add-opens java.base/java.lang.reflect=omni.impl
       Field modifiersField=Field.class.getDeclaredField("modifiers");
       modifiersField.setAccessible(true);
       {
@@ -49,73 +48,51 @@ public class IntArrSeqRemoveIfTest
         modifiersField.setInt(UncheckedSubListroot,UncheckedSubListroot.getModifiers()&~Modifier.FINAL);
         (UncheckedSubListsize=clazz.getDeclaredField("size")).setAccessible(true);
       }
-    }
-    catch(Exception e)
-    {
+    }catch(Exception e){
       throw new ExceptionInInitializerError(e);
     }
   }
-  private static IntArrSeq.CheckedList getRoot(Object seq)
-  {
-    try
-    {
+  private static IntArrSeq.CheckedList getRoot(Object seq){
+    try{
       return (IntArrSeq.CheckedList)CheckedSubListroot.get(seq);
-    }
-    catch(Exception e)
-    {
+    }catch(Exception e){
       throw new RuntimeException(e);
     }
   }
-  private static OmniList.OfInt getParent(Object seq)
-  {
-    try
-    {
+  private static OmniList.OfInt getParent(Object seq){
+    try{
       return (OmniList.OfInt)CheckedSubListparent.get(seq);
-    }
-    catch(Exception e)
-    {
+    }catch(Exception e){
       throw new RuntimeException(e);
     }
   }
-  private static IntArrSeq.UncheckedList assertUncheckedSubListIntegrity(int expectedModCount,int expectedParentSize,Object obj)
-  {
-    if(!(obj instanceof IntArrSeq.UncheckedList))
-    {
-      try
-      {
+  private static IntArrSeq.UncheckedList assertUncheckedSubListIntegrity(int expectedModCount,int expectedParentSize,Object obj){
+    if(!(obj instanceof IntArrSeq.UncheckedList)){
+      try{
         Object parent=UncheckedSubListparent.get(obj);
-        if(parent!=null)
-        {
+        if(parent!=null){
            Assertions.assertEquals(expectedParentSize,UncheckedSubListsize.getInt(parent));
            obj=parent;
         }
         obj=UncheckedSubListroot.get(obj);
-      }
-      catch(Exception e)
-      {
+      }catch(Exception e){
         throw new RuntimeException(e);
       }
     }
     return (IntArrSeq.UncheckedList)obj;
   }
-  private static IntArrSeq.CheckedList assertCheckedSubListIntegrity(int expectedModCount,int expectedParentSize,Object obj)
-  {
-    if(!(obj instanceof IntArrSeq.CheckedList))
-    {
-      try
-      {
+  private static IntArrSeq.CheckedList assertCheckedSubListIntegrity(int expectedModCount,int expectedParentSize,Object obj){
+    if(!(obj instanceof IntArrSeq.CheckedList)){
+      try{
         Assertions.assertEquals(expectedModCount,CheckedSubListmodCount.getInt(obj));
         Object parent=CheckedSubListparent.get(obj);
-        if(parent!=null)
-        {
+        if(parent!=null){
            Assertions.assertEquals(expectedModCount,CheckedSubListmodCount.getInt(parent));
            Assertions.assertEquals(expectedParentSize,CheckedSubListsize.getInt(parent));
            obj=parent;
         }
         obj=CheckedSubListroot.get(obj);
-      }
-      catch(Exception e)
-      {
+      }catch(Exception e){
         throw new RuntimeException(e);
       }
     }
@@ -141,13 +118,10 @@ public class IntArrSeqRemoveIfTest
     return new IntArrSeq.UncheckedStack(seqSize,arr);
   }
   @Test
-  public void testArrSeqStackUncheckedremoveIfIntPredicate()
-  {
+  public void testArrSeqStackUncheckedremoveIfIntPredicate(){
     Random rand=new Random(0);
-    outer:for(int seqSize=0;seqSize<=100;seqSize+=10)
-    {
-      for(int i=0;i<100;++i)
-      {
+    outer:for(int seqSize=0;seqSize<=100;seqSize+=10){
+      for(int i=0;i<100;++i){
         testArrSeqStackUncheckedremoveIfIntPredicateHelper(buildArrSeqStackUnchecked(seqSize),new IntMonitoredPredicate.RemoveAll(),seqSize,null);          
         testArrSeqStackUncheckedremoveIfIntPredicateHelper(buildArrSeqStackUnchecked(seqSize),new IntMonitoredPredicate.RemoveNone(),0,null);
         testArrSeqStackUncheckedremoveIfIntPredicateHelper(buildArrSeqStackUnchecked(seqSize),new IntMonitoredPredicate.NonThrowing(rand,0.01),-1,null);
@@ -159,15 +133,13 @@ public class IntArrSeqRemoveIfTest
         testArrSeqStackUncheckedremoveIfIntPredicateHelper(buildArrSeqStackUnchecked(seqSize),new IntMonitoredPredicate.NonThrowing(rand,0.90),-1,null);
         testArrSeqStackUncheckedremoveIfIntPredicateHelper(buildArrSeqStackUnchecked(seqSize),new IntMonitoredPredicate.NonThrowing(rand,0.95),-1,null);
         testArrSeqStackUncheckedremoveIfIntPredicateHelper(buildArrSeqStackUnchecked(seqSize),new IntMonitoredPredicate.NonThrowing(rand,0.99),-1,null);
-        if(seqSize==0)
-        {
+        if(seqSize==0){
           continue outer;
         }
       }
     }
   }
-  private static void testArrSeqStackUncheckedremoveIfIntPredicateHelper(IntArrSeq.UncheckedStack seq,IntMonitoredPredicate pred,int numExpectedToBeRemoved,Class<? extends Throwable> expectedException)
-  {
+  private static void testArrSeqStackUncheckedremoveIfIntPredicateHelper(IntArrSeq.UncheckedStack seq,IntMonitoredPredicate pred,int numExpectedToBeRemoved,Class<? extends Throwable> expectedException){
     var clone=(IntArrSeq.UncheckedStack)seq.clone();
     int expectedSize;
     if(expectedException==null)
@@ -225,13 +197,10 @@ public class IntArrSeqRemoveIfTest
     }
   }
   @Test
-  public void testArrSeqStackUncheckedremoveIfPredicate()
-  {
+  public void testArrSeqStackUncheckedremoveIfPredicate(){
     Random rand=new Random(0);
-    outer:for(int seqSize=0;seqSize<=100;seqSize+=10)
-    {
-      for(int i=0;i<100;++i)
-      {
+    outer:for(int seqSize=0;seqSize<=100;seqSize+=10){
+      for(int i=0;i<100;++i){
         testArrSeqStackUncheckedremoveIfPredicateHelper(buildArrSeqStackUnchecked(seqSize),new IntMonitoredPredicate.RemoveAll(),seqSize,null);          
         testArrSeqStackUncheckedremoveIfPredicateHelper(buildArrSeqStackUnchecked(seqSize),new IntMonitoredPredicate.RemoveNone(),0,null);
         testArrSeqStackUncheckedremoveIfPredicateHelper(buildArrSeqStackUnchecked(seqSize),new IntMonitoredPredicate.NonThrowing(rand,0.01),-1,null);
@@ -243,15 +212,13 @@ public class IntArrSeqRemoveIfTest
         testArrSeqStackUncheckedremoveIfPredicateHelper(buildArrSeqStackUnchecked(seqSize),new IntMonitoredPredicate.NonThrowing(rand,0.90),-1,null);
         testArrSeqStackUncheckedremoveIfPredicateHelper(buildArrSeqStackUnchecked(seqSize),new IntMonitoredPredicate.NonThrowing(rand,0.95),-1,null);
         testArrSeqStackUncheckedremoveIfPredicateHelper(buildArrSeqStackUnchecked(seqSize),new IntMonitoredPredicate.NonThrowing(rand,0.99),-1,null);
-        if(seqSize==0)
-        {
+        if(seqSize==0){
           continue outer;
         }
       }
     }
   }
-  private static void testArrSeqStackUncheckedremoveIfPredicateHelper(IntArrSeq.UncheckedStack seq,IntMonitoredPredicate pred,int numExpectedToBeRemoved,Class<? extends Throwable> expectedException)
-  {
+  private static void testArrSeqStackUncheckedremoveIfPredicateHelper(IntArrSeq.UncheckedStack seq,IntMonitoredPredicate pred,int numExpectedToBeRemoved,Class<? extends Throwable> expectedException){
     var clone=(IntArrSeq.UncheckedStack)seq.clone();
     int expectedSize;
     if(expectedException==null)
@@ -326,13 +293,10 @@ public class IntArrSeqRemoveIfTest
     return new IntArrSeq.CheckedStack(seqSize,arr);
   }
   @Test
-  public void testArrSeqStackCheckedremoveIfIntPredicate()
-  {
+  public void testArrSeqStackCheckedremoveIfIntPredicate(){
     Random rand=new Random(0);
-    outer:for(int seqSize=0;seqSize<=100;seqSize+=10)
-    {
-      for(int i=0;i<100;++i)
-      {
+    outer:for(int seqSize=0;seqSize<=100;seqSize+=10){
+      for(int i=0;i<100;++i){
         testArrSeqStackCheckedremoveIfIntPredicateHelper(buildArrSeqStackChecked(seqSize),new IntMonitoredPredicate.RemoveAll(),seqSize,null);          
         testArrSeqStackCheckedremoveIfIntPredicateHelper(buildArrSeqStackChecked(seqSize),new IntMonitoredPredicate.RemoveNone(),0,null);
         testArrSeqStackCheckedremoveIfIntPredicateHelper(buildArrSeqStackChecked(seqSize),new IntMonitoredPredicate.NonThrowing(rand,0.01),-1,null);
@@ -353,15 +317,13 @@ public class IntArrSeqRemoveIfTest
           var seq=buildArrSeqStackChecked(seqSize);
           testArrSeqStackCheckedremoveIfIntPredicateHelper(seq,new IntMonitoredPredicate.ModdingAndThrowing(rand,seqSize,seq),0,seqSize==0?null:ConcurrentModificationException.class);
         }
-        if(seqSize==0)
-        {
+        if(seqSize==0){
           continue outer;
         }
       }
     }
   }
-  private static void testArrSeqStackCheckedremoveIfIntPredicateHelper(IntArrSeq.CheckedStack seq,IntMonitoredPredicate pred,int numExpectedToBeRemoved,Class<? extends Throwable> expectedException)
-  {
+  private static void testArrSeqStackCheckedremoveIfIntPredicateHelper(IntArrSeq.CheckedStack seq,IntMonitoredPredicate pred,int numExpectedToBeRemoved,Class<? extends Throwable> expectedException){
     var clone=(IntArrSeq.CheckedStack)seq.clone();
     int expectedSize;
     if(expectedException==null)
@@ -419,13 +381,10 @@ public class IntArrSeqRemoveIfTest
     }
   }
   @Test
-  public void testArrSeqStackCheckedremoveIfPredicate()
-  {
+  public void testArrSeqStackCheckedremoveIfPredicate(){
     Random rand=new Random(0);
-    outer:for(int seqSize=0;seqSize<=100;seqSize+=10)
-    {
-      for(int i=0;i<100;++i)
-      {
+    outer:for(int seqSize=0;seqSize<=100;seqSize+=10){
+      for(int i=0;i<100;++i){
         testArrSeqStackCheckedremoveIfPredicateHelper(buildArrSeqStackChecked(seqSize),new IntMonitoredPredicate.RemoveAll(),seqSize,null);          
         testArrSeqStackCheckedremoveIfPredicateHelper(buildArrSeqStackChecked(seqSize),new IntMonitoredPredicate.RemoveNone(),0,null);
         testArrSeqStackCheckedremoveIfPredicateHelper(buildArrSeqStackChecked(seqSize),new IntMonitoredPredicate.NonThrowing(rand,0.01),-1,null);
@@ -446,15 +405,13 @@ public class IntArrSeqRemoveIfTest
           var seq=buildArrSeqStackChecked(seqSize);
           testArrSeqStackCheckedremoveIfPredicateHelper(seq,new IntMonitoredPredicate.ModdingAndThrowing(rand,seqSize,seq),0,seqSize==0?null:ConcurrentModificationException.class);
         }
-        if(seqSize==0)
-        {
+        if(seqSize==0){
           continue outer;
         }
       }
     }
   }
-  private static void testArrSeqStackCheckedremoveIfPredicateHelper(IntArrSeq.CheckedStack seq,IntMonitoredPredicate pred,int numExpectedToBeRemoved,Class<? extends Throwable> expectedException)
-  {
+  private static void testArrSeqStackCheckedremoveIfPredicateHelper(IntArrSeq.CheckedStack seq,IntMonitoredPredicate pred,int numExpectedToBeRemoved,Class<? extends Throwable> expectedException){
     var clone=(IntArrSeq.CheckedStack)seq.clone();
     int expectedSize;
     if(expectedException==null)
@@ -529,13 +486,10 @@ public class IntArrSeqRemoveIfTest
     return new IntArrSeq.UncheckedList(seqSize,arr);
   }
   @Test
-  public void testArrSeqListUncheckedremoveIfIntPredicate()
-  {
+  public void testArrSeqListUncheckedremoveIfIntPredicate(){
     Random rand=new Random(0);
-    outer:for(int seqSize=0;seqSize<=100;seqSize+=10)
-    {
-      for(int i=0;i<100;++i)
-      {
+    outer:for(int seqSize=0;seqSize<=100;seqSize+=10){
+      for(int i=0;i<100;++i){
         testArrSeqListUncheckedremoveIfIntPredicateHelper(buildArrSeqListUnchecked(seqSize),new IntMonitoredPredicate.RemoveAll(),seqSize,null);          
         testArrSeqListUncheckedremoveIfIntPredicateHelper(buildArrSeqListUnchecked(seqSize),new IntMonitoredPredicate.RemoveNone(),0,null);
         testArrSeqListUncheckedremoveIfIntPredicateHelper(buildArrSeqListUnchecked(seqSize),new IntMonitoredPredicate.NonThrowing(rand,0.01),-1,null);
@@ -547,15 +501,13 @@ public class IntArrSeqRemoveIfTest
         testArrSeqListUncheckedremoveIfIntPredicateHelper(buildArrSeqListUnchecked(seqSize),new IntMonitoredPredicate.NonThrowing(rand,0.90),-1,null);
         testArrSeqListUncheckedremoveIfIntPredicateHelper(buildArrSeqListUnchecked(seqSize),new IntMonitoredPredicate.NonThrowing(rand,0.95),-1,null);
         testArrSeqListUncheckedremoveIfIntPredicateHelper(buildArrSeqListUnchecked(seqSize),new IntMonitoredPredicate.NonThrowing(rand,0.99),-1,null);
-        if(seqSize==0)
-        {
+        if(seqSize==0){
           continue outer;
         }
       }
     }
   }
-  private static void testArrSeqListUncheckedremoveIfIntPredicateHelper(IntArrSeq.UncheckedList seq,IntMonitoredPredicate pred,int numExpectedToBeRemoved,Class<? extends Throwable> expectedException)
-  {
+  private static void testArrSeqListUncheckedremoveIfIntPredicateHelper(IntArrSeq.UncheckedList seq,IntMonitoredPredicate pred,int numExpectedToBeRemoved,Class<? extends Throwable> expectedException){
     var clone=(IntArrSeq.UncheckedList)seq.clone();
     int expectedSize;
     if(expectedException==null)
@@ -613,13 +565,10 @@ public class IntArrSeqRemoveIfTest
     }
   }
   @Test
-  public void testArrSeqListUncheckedremoveIfPredicate()
-  {
+  public void testArrSeqListUncheckedremoveIfPredicate(){
     Random rand=new Random(0);
-    outer:for(int seqSize=0;seqSize<=100;seqSize+=10)
-    {
-      for(int i=0;i<100;++i)
-      {
+    outer:for(int seqSize=0;seqSize<=100;seqSize+=10){
+      for(int i=0;i<100;++i){
         testArrSeqListUncheckedremoveIfPredicateHelper(buildArrSeqListUnchecked(seqSize),new IntMonitoredPredicate.RemoveAll(),seqSize,null);          
         testArrSeqListUncheckedremoveIfPredicateHelper(buildArrSeqListUnchecked(seqSize),new IntMonitoredPredicate.RemoveNone(),0,null);
         testArrSeqListUncheckedremoveIfPredicateHelper(buildArrSeqListUnchecked(seqSize),new IntMonitoredPredicate.NonThrowing(rand,0.01),-1,null);
@@ -631,15 +580,13 @@ public class IntArrSeqRemoveIfTest
         testArrSeqListUncheckedremoveIfPredicateHelper(buildArrSeqListUnchecked(seqSize),new IntMonitoredPredicate.NonThrowing(rand,0.90),-1,null);
         testArrSeqListUncheckedremoveIfPredicateHelper(buildArrSeqListUnchecked(seqSize),new IntMonitoredPredicate.NonThrowing(rand,0.95),-1,null);
         testArrSeqListUncheckedremoveIfPredicateHelper(buildArrSeqListUnchecked(seqSize),new IntMonitoredPredicate.NonThrowing(rand,0.99),-1,null);
-        if(seqSize==0)
-        {
+        if(seqSize==0){
           continue outer;
         }
       }
     }
   }
-  private static void testArrSeqListUncheckedremoveIfPredicateHelper(IntArrSeq.UncheckedList seq,IntMonitoredPredicate pred,int numExpectedToBeRemoved,Class<? extends Throwable> expectedException)
-  {
+  private static void testArrSeqListUncheckedremoveIfPredicateHelper(IntArrSeq.UncheckedList seq,IntMonitoredPredicate pred,int numExpectedToBeRemoved,Class<? extends Throwable> expectedException){
     var clone=(IntArrSeq.UncheckedList)seq.clone();
     int expectedSize;
     if(expectedException==null)
@@ -714,13 +661,10 @@ public class IntArrSeqRemoveIfTest
     return new IntArrSeq.CheckedList(seqSize,arr);
   }
   @Test
-  public void testArrSeqListCheckedremoveIfIntPredicate()
-  {
+  public void testArrSeqListCheckedremoveIfIntPredicate(){
     Random rand=new Random(0);
-    outer:for(int seqSize=0;seqSize<=100;seqSize+=10)
-    {
-      for(int i=0;i<100;++i)
-      {
+    outer:for(int seqSize=0;seqSize<=100;seqSize+=10){
+      for(int i=0;i<100;++i){
         testArrSeqListCheckedremoveIfIntPredicateHelper(buildArrSeqListChecked(seqSize),new IntMonitoredPredicate.RemoveAll(),seqSize,null);          
         testArrSeqListCheckedremoveIfIntPredicateHelper(buildArrSeqListChecked(seqSize),new IntMonitoredPredicate.RemoveNone(),0,null);
         testArrSeqListCheckedremoveIfIntPredicateHelper(buildArrSeqListChecked(seqSize),new IntMonitoredPredicate.NonThrowing(rand,0.01),-1,null);
@@ -741,15 +685,13 @@ public class IntArrSeqRemoveIfTest
           var seq=buildArrSeqListChecked(seqSize);
           testArrSeqListCheckedremoveIfIntPredicateHelper(seq,new IntMonitoredPredicate.ModdingAndThrowing(rand,seqSize,seq),0,seqSize==0?null:ConcurrentModificationException.class);
         }
-        if(seqSize==0)
-        {
+        if(seqSize==0){
           continue outer;
         }
       }
     }
   }
-  private static void testArrSeqListCheckedremoveIfIntPredicateHelper(IntArrSeq.CheckedList seq,IntMonitoredPredicate pred,int numExpectedToBeRemoved,Class<? extends Throwable> expectedException)
-  {
+  private static void testArrSeqListCheckedremoveIfIntPredicateHelper(IntArrSeq.CheckedList seq,IntMonitoredPredicate pred,int numExpectedToBeRemoved,Class<? extends Throwable> expectedException){
     var clone=(IntArrSeq.CheckedList)seq.clone();
     int expectedSize;
     if(expectedException==null)
@@ -807,13 +749,10 @@ public class IntArrSeqRemoveIfTest
     }
   }
   @Test
-  public void testArrSeqListCheckedremoveIfPredicate()
-  {
+  public void testArrSeqListCheckedremoveIfPredicate(){
     Random rand=new Random(0);
-    outer:for(int seqSize=0;seqSize<=100;seqSize+=10)
-    {
-      for(int i=0;i<100;++i)
-      {
+    outer:for(int seqSize=0;seqSize<=100;seqSize+=10){
+      for(int i=0;i<100;++i){
         testArrSeqListCheckedremoveIfPredicateHelper(buildArrSeqListChecked(seqSize),new IntMonitoredPredicate.RemoveAll(),seqSize,null);          
         testArrSeqListCheckedremoveIfPredicateHelper(buildArrSeqListChecked(seqSize),new IntMonitoredPredicate.RemoveNone(),0,null);
         testArrSeqListCheckedremoveIfPredicateHelper(buildArrSeqListChecked(seqSize),new IntMonitoredPredicate.NonThrowing(rand,0.01),-1,null);
@@ -834,15 +773,13 @@ public class IntArrSeqRemoveIfTest
           var seq=buildArrSeqListChecked(seqSize);
           testArrSeqListCheckedremoveIfPredicateHelper(seq,new IntMonitoredPredicate.ModdingAndThrowing(rand,seqSize,seq),0,seqSize==0?null:ConcurrentModificationException.class);
         }
-        if(seqSize==0)
-        {
+        if(seqSize==0){
           continue outer;
         }
       }
     }
   }
-  private static void testArrSeqListCheckedremoveIfPredicateHelper(IntArrSeq.CheckedList seq,IntMonitoredPredicate pred,int numExpectedToBeRemoved,Class<? extends Throwable> expectedException)
-  {
+  private static void testArrSeqListCheckedremoveIfPredicateHelper(IntArrSeq.CheckedList seq,IntMonitoredPredicate pred,int numExpectedToBeRemoved,Class<? extends Throwable> expectedException){
     var clone=(IntArrSeq.CheckedList)seq.clone();
     int expectedSize;
     if(expectedException==null)
@@ -932,17 +869,14 @@ public class IntArrSeqRemoveIfTest
         arr[dstOffset]=TypeConversionUtil.convertToint(seqSize+parentPostAlloc+i);
       }
     }
-    return new IntArrSeq.CheckedList(rootSize,arr).subList(rootPreAlloc,parentPreAlloc+seqSize+parentPostAlloc).subList(parentPreAlloc,parentPreAlloc+seqSize);
+    return new IntArrSeq.UncheckedList(rootSize,arr).subList(rootPreAlloc,rootPreAlloc+parentPreAlloc+seqSize+parentPostAlloc).subList(parentPreAlloc,parentPreAlloc+seqSize);
   }
   @ParameterizedTest(name="IntArrSeq.UncheckedSubList rootPreAlloc={0},parentPreAlloc={1},parentPostAlloc={2},rootPostAlloc={3}")
   @MethodSource("subListAllocationArgumentProvider")
-  public void testArrSeqSubListUncheckedremoveIfIntPredicate(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc)
-  {
+  public void testArrSeqSubListUncheckedremoveIfIntPredicate(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
     Random rand=new Random(0);
-    outer:for(int seqSize=0;seqSize<=100;seqSize+=10)
-    {
-      for(int i=0;i<100;++i)
-      {
+    outer:for(int seqSize=0;seqSize<=100;seqSize+=10){
+      for(int i=0;i<100;++i){
         testArrSeqSubListUncheckedremoveIfIntPredicateHelper(rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,buildArrSeqSubListUnchecked(seqSize,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc),new IntMonitoredPredicate.RemoveAll(),seqSize,null);          
         testArrSeqSubListUncheckedremoveIfIntPredicateHelper(rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,buildArrSeqSubListUnchecked(seqSize,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc),new IntMonitoredPredicate.RemoveNone(),0,null);
         testArrSeqSubListUncheckedremoveIfIntPredicateHelper(rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,buildArrSeqSubListUnchecked(seqSize,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc),new IntMonitoredPredicate.NonThrowing(rand,0.01),-1,null);
@@ -954,8 +888,7 @@ public class IntArrSeqRemoveIfTest
         testArrSeqSubListUncheckedremoveIfIntPredicateHelper(rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,buildArrSeqSubListUnchecked(seqSize,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc),new IntMonitoredPredicate.NonThrowing(rand,0.90),-1,null);
         testArrSeqSubListUncheckedremoveIfIntPredicateHelper(rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,buildArrSeqSubListUnchecked(seqSize,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc),new IntMonitoredPredicate.NonThrowing(rand,0.95),-1,null);
         testArrSeqSubListUncheckedremoveIfIntPredicateHelper(rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,buildArrSeqSubListUnchecked(seqSize,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc),new IntMonitoredPredicate.NonThrowing(rand,0.99),-1,null);
-        if(seqSize==0)
-        {
+        if(seqSize==0){
           continue outer;
         }
       }
@@ -1040,13 +973,10 @@ public class IntArrSeqRemoveIfTest
   }
   @ParameterizedTest(name="IntArrSeq.UncheckedSubList rootPreAlloc={0},parentPreAlloc={1},parentPostAlloc={2},rootPostAlloc={3}")
   @MethodSource("subListAllocationArgumentProvider")
-  public void testArrSeqSubListUncheckedremoveIfPredicate(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc)
-  {
+  public void testArrSeqSubListUncheckedremoveIfPredicate(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
     Random rand=new Random(0);
-    outer:for(int seqSize=0;seqSize<=100;seqSize+=10)
-    {
-      for(int i=0;i<100;++i)
-      {
+    outer:for(int seqSize=0;seqSize<=100;seqSize+=10){
+      for(int i=0;i<100;++i){
         testArrSeqSubListUncheckedremoveIfPredicateHelper(rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,buildArrSeqSubListUnchecked(seqSize,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc),new IntMonitoredPredicate.RemoveAll(),seqSize,null);          
         testArrSeqSubListUncheckedremoveIfPredicateHelper(rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,buildArrSeqSubListUnchecked(seqSize,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc),new IntMonitoredPredicate.RemoveNone(),0,null);
         testArrSeqSubListUncheckedremoveIfPredicateHelper(rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,buildArrSeqSubListUnchecked(seqSize,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc),new IntMonitoredPredicate.NonThrowing(rand,0.01),-1,null);
@@ -1058,8 +988,7 @@ public class IntArrSeqRemoveIfTest
         testArrSeqSubListUncheckedremoveIfPredicateHelper(rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,buildArrSeqSubListUnchecked(seqSize,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc),new IntMonitoredPredicate.NonThrowing(rand,0.90),-1,null);
         testArrSeqSubListUncheckedremoveIfPredicateHelper(rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,buildArrSeqSubListUnchecked(seqSize,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc),new IntMonitoredPredicate.NonThrowing(rand,0.95),-1,null);
         testArrSeqSubListUncheckedremoveIfPredicateHelper(rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,buildArrSeqSubListUnchecked(seqSize,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc),new IntMonitoredPredicate.NonThrowing(rand,0.99),-1,null);
-        if(seqSize==0)
-        {
+        if(seqSize==0){
           continue outer;
         }
       }
@@ -1175,17 +1104,14 @@ public class IntArrSeqRemoveIfTest
         arr[dstOffset]=TypeConversionUtil.convertToint(seqSize+parentPostAlloc+i);
       }
     }
-    return new IntArrSeq.CheckedList(rootSize,arr).subList(rootPreAlloc,parentPreAlloc+seqSize+parentPostAlloc).subList(parentPreAlloc,parentPreAlloc+seqSize);
+    return new IntArrSeq.CheckedList(rootSize,arr).subList(rootPreAlloc,rootPreAlloc+parentPreAlloc+seqSize+parentPostAlloc).subList(parentPreAlloc,parentPreAlloc+seqSize);
   }
   @ParameterizedTest(name="IntArrSeq.CheckedSubList rootPreAlloc={0},parentPreAlloc={1},parentPostAlloc={2},rootPostAlloc={3}")
   @MethodSource("subListAllocationArgumentProvider")
-  public void testArrSeqSubListCheckedremoveIfIntPredicate(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc)
-  {
+  public void testArrSeqSubListCheckedremoveIfIntPredicate(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
     Random rand=new Random(0);
-    outer:for(int seqSize=0;seqSize<=100;seqSize+=10)
-    {
-      for(int i=0;i<100;++i)
-      {
+    outer:for(int seqSize=0;seqSize<=100;seqSize+=10){
+      for(int i=0;i<100;++i){
         testArrSeqSubListCheckedremoveIfIntPredicateHelper(rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,buildArrSeqSubListChecked(seqSize,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc),new IntMonitoredPredicate.RemoveAll(),seqSize,null);          
         testArrSeqSubListCheckedremoveIfIntPredicateHelper(rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,buildArrSeqSubListChecked(seqSize,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc),new IntMonitoredPredicate.RemoveNone(),0,null);
         testArrSeqSubListCheckedremoveIfIntPredicateHelper(rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,buildArrSeqSubListChecked(seqSize,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc),new IntMonitoredPredicate.NonThrowing(rand,0.01),-1,null);
@@ -1222,8 +1148,7 @@ public class IntArrSeqRemoveIfTest
           var seq=buildArrSeqSubListChecked(seqSize,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc);
           testArrSeqSubListCheckedremoveIfIntPredicateHelper(rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,seq,new IntMonitoredPredicate.ModdingAndThrowing(rand,seqSize,getRoot(seq)),0,seqSize==0?null:ConcurrentModificationException.class);
         }
-        if(seqSize==0)
-        {
+        if(seqSize==0){
           continue outer;
         }
       }
@@ -1308,13 +1233,10 @@ public class IntArrSeqRemoveIfTest
   }
   @ParameterizedTest(name="IntArrSeq.CheckedSubList rootPreAlloc={0},parentPreAlloc={1},parentPostAlloc={2},rootPostAlloc={3}")
   @MethodSource("subListAllocationArgumentProvider")
-  public void testArrSeqSubListCheckedremoveIfPredicate(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc)
-  {
+  public void testArrSeqSubListCheckedremoveIfPredicate(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
     Random rand=new Random(0);
-    outer:for(int seqSize=0;seqSize<=100;seqSize+=10)
-    {
-      for(int i=0;i<100;++i)
-      {
+    outer:for(int seqSize=0;seqSize<=100;seqSize+=10){
+      for(int i=0;i<100;++i){
         testArrSeqSubListCheckedremoveIfPredicateHelper(rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,buildArrSeqSubListChecked(seqSize,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc),new IntMonitoredPredicate.RemoveAll(),seqSize,null);          
         testArrSeqSubListCheckedremoveIfPredicateHelper(rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,buildArrSeqSubListChecked(seqSize,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc),new IntMonitoredPredicate.RemoveNone(),0,null);
         testArrSeqSubListCheckedremoveIfPredicateHelper(rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,buildArrSeqSubListChecked(seqSize,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc),new IntMonitoredPredicate.NonThrowing(rand,0.01),-1,null);
@@ -1351,8 +1273,7 @@ public class IntArrSeqRemoveIfTest
           var seq=buildArrSeqSubListChecked(seqSize,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc);
           testArrSeqSubListCheckedremoveIfPredicateHelper(rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,seq,new IntMonitoredPredicate.ModdingAndThrowing(rand,seqSize,getRoot(seq)),0,seqSize==0?null:ConcurrentModificationException.class);
         }
-        if(seqSize==0)
-        {
+        if(seqSize==0){
           continue outer;
         }
       }
@@ -1435,8 +1356,7 @@ public class IntArrSeqRemoveIfTest
       Assertions.assertEquals(root.arr[dstOffset],TypeConversionUtil.convertToint(seqSize+parentPostAlloc+i));
     }
   }
-  static Stream<Arguments> subListAllocationArgumentProvider()
-  {
+  static Stream<Arguments> subListAllocationArgumentProvider(){
     Arguments[] args=new Arguments[16];
     args[0]=Arguments.of(0,0,0,0);
     args[1]=Arguments.of(0,0,0,5);

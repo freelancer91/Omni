@@ -8,10 +8,6 @@
 #TYPEDEF OfDouble
 #TYPEDEF OfRef
 package omni.impl.seq;
-//import omni.impl.seq.$ClassPrefix$ArrSeq.UncheckedList;
-//import omni.impl.seq.$ClassPrefix$ArrSeq.CheckedList;
-//import omni.impl.seq.$ClassPrefix$ArrSeq.UncheckedStack;
-//import omni.impl.seq.$ClassPrefix$ArrSeq.CheckedStack;
 import omni.util.TypeConversionUtil;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

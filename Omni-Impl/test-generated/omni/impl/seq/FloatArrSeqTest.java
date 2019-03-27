@@ -1,8 +1,4 @@
 package omni.impl.seq;
-//import omni.impl.seq.FloatArrSeq.UncheckedList;
-//import omni.impl.seq.FloatArrSeq.CheckedList;
-//import omni.impl.seq.FloatArrSeq.UncheckedStack;
-//import omni.impl.seq.FloatArrSeq.CheckedStack;
 import omni.util.TypeConversionUtil;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

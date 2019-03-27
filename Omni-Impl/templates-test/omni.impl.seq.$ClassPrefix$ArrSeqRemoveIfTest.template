@@ -33,25 +33,19 @@ import omni.api.OmniList;
 @SuppressWarnings({"rawtypes","unchecked"}) 
 public class $ClassPrefix$ArrSeqRemoveIfTest
 {
-//TODO place sanity checks for checked sequence modification behavior
-  
   private static final Field CheckedSubListmodCount;
   private static final Field CheckedSubListparent;
   private static final Field CheckedSubListroot;
   private static final Field CheckedSubListsize;
-  
   private static final Field UncheckedSubListparent;
   private static final Field UncheckedSubListroot;
   private static final Field UncheckedSubListsize;
-  
-  static
-  {
-    try
-    {
+  static{
+    try{
+      //You must add the following switch to the VM arguments
+      //--add-opens java.base/java.lang.reflect=omni.impl
       Field modifiersField=Field.class.getDeclaredField("modifiers");
       modifiersField.setAccessible(true);
-      
-    
       {
         Class<?> clazz=new $ClassPrefix$ArrSeq.CheckedList().subList(0,0).getClass();
         (CheckedSubListmodCount=clazz.getDeclaredField("modCount")).setAccessible(true);
@@ -69,76 +63,51 @@ public class $ClassPrefix$ArrSeqRemoveIfTest
         modifiersField.setInt(UncheckedSubListroot,UncheckedSubListroot.getModifiers()&~Modifier.FINAL);
         (UncheckedSubListsize=clazz.getDeclaredField("size")).setAccessible(true);
       }
-    }
-    catch(Exception e)
-    {
+    }catch(Exception e){
       throw new ExceptionInInitializerError(e);
     }
   }
-  
-  private static $ClassPrefix$ArrSeq.CheckedList getRoot(Object seq)
-  {
-    try
-    {
+  private static $ClassPrefix$ArrSeq.CheckedList getRoot(Object seq){
+    try{
       return ($ClassPrefix$ArrSeq.CheckedList)CheckedSubListroot.get(seq);
-    }
-    catch(Exception e)
-    {
+    }catch(Exception e){
       throw new RuntimeException(e);
     }
   }
-  private static OmniList.Of$ClassPrefix$ getParent(Object seq)
-  {
-    try
-    {
+  private static OmniList.Of$ClassPrefix$ getParent(Object seq){
+    try{
       return (OmniList.Of$ClassPrefix$)CheckedSubListparent.get(seq);
-    }
-    catch(Exception e)
-    {
+    }catch(Exception e){
       throw new RuntimeException(e);
     }
   }
-  
-  private static $ClassPrefix$ArrSeq.UncheckedList assertUncheckedSubListIntegrity(int expectedModCount,int expectedParentSize,Object obj)
-  {
-    if(!(obj instanceof $ClassPrefix$ArrSeq.UncheckedList))
-    {
-      try
-      {
+  private static $ClassPrefix$ArrSeq.UncheckedList assertUncheckedSubListIntegrity(int expectedModCount,int expectedParentSize,Object obj){
+    if(!(obj instanceof $ClassPrefix$ArrSeq.UncheckedList)){
+      try{
         Object parent=UncheckedSubListparent.get(obj);
-        if(parent!=null)
-        {
+        if(parent!=null){
            Assertions.assertEquals(expectedParentSize,UncheckedSubListsize.getInt(parent));
            obj=parent;
         }
         obj=UncheckedSubListroot.get(obj);
-      }
-      catch(Exception e)
-      {
+      }catch(Exception e){
         throw new RuntimeException(e);
       }
     }
     return ($ClassPrefix$ArrSeq.UncheckedList)obj;
   }
-  
-  private static $ClassPrefix$ArrSeq.CheckedList assertCheckedSubListIntegrity(int expectedModCount,int expectedParentSize,Object obj)
-  {
-    if(!(obj instanceof $ClassPrefix$ArrSeq.CheckedList))
-    {
-      try
-      {
+  private static $ClassPrefix$ArrSeq.CheckedList assertCheckedSubListIntegrity(int expectedModCount,int expectedParentSize,Object obj){
+    if(!(obj instanceof $ClassPrefix$ArrSeq.CheckedList)){
+      try{
         Assertions.assertEquals(expectedModCount,CheckedSubListmodCount.getInt(obj));
         Object parent=CheckedSubListparent.get(obj);
-        if(parent!=null)
-        {
+        if(parent!=null){
            Assertions.assertEquals(expectedModCount,CheckedSubListmodCount.getInt(parent));
            Assertions.assertEquals(expectedParentSize,CheckedSubListsize.getInt(parent));
            obj=parent;
         }
         obj=CheckedSubListroot.get(obj);
-      }
-      catch(Exception e)
-      {
+      }catch(Exception e){
         throw new RuntimeException(e);
       }
     }
@@ -146,21 +115,13 @@ public class $ClassPrefix$ArrSeqRemoveIfTest
     Assertions.assertEquals(expectedModCount,root.modCount);
     return root;
   }
-  
-  
   #MACRO TestImpl<ArrSeq,Stack,Unchecked>()
   #MACRO TestImpl<ArrSeq,Stack,Checked>()
   #MACRO TestImpl<ArrSeq,List,Unchecked>()
   #MACRO TestImpl<ArrSeq,List,Checked>()
   #MACRO TestImpl<ArrSeq,SubList,Unchecked>()
   #MACRO TestImpl<ArrSeq,SubList,Checked>()
-  
-  
-  
-  
-
-  static Stream<Arguments> subListAllocationArgumentProvider()
-  {
+  static Stream<Arguments> subListAllocationArgumentProvider(){
     Arguments[] args=new Arguments[16];
     args[0]=Arguments.of(0,0,0,0);
     args[1]=Arguments.of(0,0,0,5);
@@ -180,30 +141,22 @@ public class $ClassPrefix$ArrSeqRemoveIfTest
     args[15]=Arguments.of(5,5,5,5);
     return Stream.of(args);
   }
-
 #IF OfRef
-  static void verifyNullification($ArrayType$[] arr,int newBound,int oldBound)
-  {
-    while(newBound<oldBound)
-    {
+  static void verifyNullification($ArrayType$[] arr,int newBound,int oldBound){
+    while(newBound<oldBound){
       Assertions.assertNull(arr[--oldBound]);
     }
   }
 #ENDIF
 }
-
-
 #MACRODEF TestImplHelper(PREDICATETYPE)
 #IFSWITCH STRUCT==List,Stack
 @Test
-public void testROOTSTRUCTCHECKEDremoveIfPREDICATETYPE()
-{
+public void testROOTSTRUCTCHECKEDremoveIfPREDICATETYPE(){
   Random rand=new Random(0);
   #IF OfBoolean
-  for(int seqSize=0;seqSize<=10;++seqSize)
-  {
-     for(int period=1,inc=Math.max(1,seqSize/10);period<=seqSize;period+=inc)
-     {
+  for(int seqSize=0;seqSize<=10;++seqSize){
+     for(int period=1,inc=Math.max(1,seqSize/10);;period+=inc){
        testROOTSTRUCTCHECKEDremoveIfPREDICATETYPEHelper(buildROOTSTRUCTCHECKED(seqSize,true,period),new $ClassPrefix$MonitoredPredicate.RemoveAll(),null);
        testROOTSTRUCTCHECKEDremoveIfPREDICATETYPEHelper(buildROOTSTRUCTCHECKED(seqSize,false,period),new $ClassPrefix$MonitoredPredicate.RemoveAll(),null);
        testROOTSTRUCTCHECKEDremoveIfPREDICATETYPEHelper(buildROOTSTRUCTCHECKED(seqSize,true,period),new $ClassPrefix$MonitoredPredicate.RemoveNone(),null);
@@ -236,13 +189,15 @@ public void testROOTSTRUCTCHECKEDremoveIfPREDICATETYPE()
          testROOTSTRUCTCHECKEDremoveIfPREDICATETYPEHelper(seq,new $ClassPrefix$MonitoredPredicate.ModdingAndThrowing(rand,seq.contains(true)?seq.contains(false)?2:1:seq.contains(false)?1:0,seq),seqSize==0?null:ConcurrentModificationException.class);
        }
     #ENDIF
+      if(period>seqSize)
+      {
+        break;
+      }
     }
   }
   #ELSE
-  outer:for(int seqSize=0;seqSize<=100;seqSize+=10)
-  {
-    for(int i=0;i<100;++i)
-    {
+  outer:for(int seqSize=0;seqSize<=100;seqSize+=10){
+    for(int i=0;i<100;++i){
       testROOTSTRUCTCHECKEDremoveIfPREDICATETYPEHelper(buildROOTSTRUCTCHECKED(seqSize),new $ClassPrefix$MonitoredPredicate.RemoveAll(),seqSize,null);          
       testROOTSTRUCTCHECKEDremoveIfPREDICATETYPEHelper(buildROOTSTRUCTCHECKED(seqSize),new $ClassPrefix$MonitoredPredicate.RemoveNone(),0,null);
       testROOTSTRUCTCHECKEDremoveIfPREDICATETYPEHelper(buildROOTSTRUCTCHECKED(seqSize),new $ClassPrefix$MonitoredPredicate.NonThrowing(rand,0.01),-1,null);
@@ -265,8 +220,7 @@ public void testROOTSTRUCTCHECKEDremoveIfPREDICATETYPE()
         testROOTSTRUCTCHECKEDremoveIfPREDICATETYPEHelper(seq,new $ClassPrefix$MonitoredPredicate.ModdingAndThrowing(rand,seqSize,seq),0,seqSize==0?null:ConcurrentModificationException.class);
       }
     #ENDIF
-      if(seqSize==0)
-      {
+      if(seqSize==0){
         continue outer;
       }
     }
@@ -276,14 +230,11 @@ public void testROOTSTRUCTCHECKEDremoveIfPREDICATETYPE()
 #ELSE
 @ParameterizedTest(name="$ClassPrefix$ROOT.CHECKEDSTRUCT rootPreAlloc={0},parentPreAlloc={1},parentPostAlloc={2},rootPostAlloc={3}")
 @MethodSource("subListAllocationArgumentProvider")
-public void testROOTSTRUCTCHECKEDremoveIfPREDICATETYPE(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc)
-{
+public void testROOTSTRUCTCHECKEDremoveIfPREDICATETYPE(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
   Random rand=new Random(0);
   #IF OfBoolean
-  for(int seqSize=0;seqSize<=10;++seqSize)
-  {
-     for(int period=1,inc=Math.max(1,seqSize/10);period<=seqSize;period+=inc)
-     {
+  for(int seqSize=0;seqSize<=10;++seqSize){
+     for(int period=1,inc=Math.max(1,seqSize/10);;period+=inc){
        testROOTSTRUCTCHECKEDremoveIfPREDICATETYPEHelper(true,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,buildROOTSTRUCTCHECKED(seqSize,true,period,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc),new $ClassPrefix$MonitoredPredicate.RemoveAll(),null);
        testROOTSTRUCTCHECKEDremoveIfPREDICATETYPEHelper(false,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,buildROOTSTRUCTCHECKED(seqSize,false,period,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc),new $ClassPrefix$MonitoredPredicate.RemoveAll(),null);
        testROOTSTRUCTCHECKEDremoveIfPREDICATETYPEHelper(true,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,buildROOTSTRUCTCHECKED(seqSize,true,period,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc),new $ClassPrefix$MonitoredPredicate.RemoveNone(),null);
@@ -316,8 +267,6 @@ public void testROOTSTRUCTCHECKEDremoveIfPREDICATETYPE(int rootPreAlloc,int pare
          var seq=buildROOTSTRUCTCHECKED(seqSize,false,period,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc);
          testROOTSTRUCTCHECKEDremoveIfPREDICATETYPEHelper(false,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,seq,new $ClassPrefix$MonitoredPredicate.ModdingAndThrowing(rand,seq.contains(true)?seq.contains(false)?2:1:seq.contains(false)?1:0,seq),seqSize==0?null:ConcurrentModificationException.class);
        }
-       
-       
        {
          var seq=buildROOTSTRUCTCHECKED(seqSize,true,period,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc);
          testROOTSTRUCTCHECKEDremoveIfPREDICATETYPEHelper(true,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,seq,new $ClassPrefix$MonitoredPredicate.Modding(rand,seq.contains(true)?seq.contains(false)?2:1:seq.contains(false)?1:0,getParent(seq)),seqSize==0?null:ConcurrentModificationException.class);
@@ -334,8 +283,6 @@ public void testROOTSTRUCTCHECKEDremoveIfPREDICATETYPE(int rootPreAlloc,int pare
          var seq=buildROOTSTRUCTCHECKED(seqSize,false,period,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc);
          testROOTSTRUCTCHECKEDremoveIfPREDICATETYPEHelper(false,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,seq,new $ClassPrefix$MonitoredPredicate.ModdingAndThrowing(rand,seq.contains(true)?seq.contains(false)?2:1:seq.contains(false)?1:0,getParent(seq)),seqSize==0?null:ConcurrentModificationException.class);
        }
-       
-       
        {
          var seq=buildROOTSTRUCTCHECKED(seqSize,true,period,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc);
          testROOTSTRUCTCHECKEDremoveIfPREDICATETYPEHelper(true,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,seq,new $ClassPrefix$MonitoredPredicate.Modding(rand,seq.contains(true)?seq.contains(false)?2:1:seq.contains(false)?1:0,getRoot(seq)),seqSize==0?null:ConcurrentModificationException.class);
@@ -352,16 +299,16 @@ public void testROOTSTRUCTCHECKEDremoveIfPREDICATETYPE(int rootPreAlloc,int pare
          var seq=buildROOTSTRUCTCHECKED(seqSize,false,period,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc);
          testROOTSTRUCTCHECKEDremoveIfPREDICATETYPEHelper(false,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,seq,new $ClassPrefix$MonitoredPredicate.ModdingAndThrowing(rand,seq.contains(true)?seq.contains(false)?2:1:seq.contains(false)?1:0,getRoot(seq)),seqSize==0?null:ConcurrentModificationException.class);
        }
-       
-       
     #ENDIF
+      if(period>seqSize)
+      {
+        break;
+      }
     }
   }
   #ELSE
-  outer:for(int seqSize=0;seqSize<=100;seqSize+=10)
-  {
-    for(int i=0;i<100;++i)
-    {
+  outer:for(int seqSize=0;seqSize<=100;seqSize+=10){
+    for(int i=0;i<100;++i){
       testROOTSTRUCTCHECKEDremoveIfPREDICATETYPEHelper(rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,buildROOTSTRUCTCHECKED(seqSize,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc),new $ClassPrefix$MonitoredPredicate.RemoveAll(),seqSize,null);          
       testROOTSTRUCTCHECKEDremoveIfPREDICATETYPEHelper(rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,buildROOTSTRUCTCHECKED(seqSize,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc),new $ClassPrefix$MonitoredPredicate.RemoveNone(),0,null);
       testROOTSTRUCTCHECKEDremoveIfPREDICATETYPEHelper(rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,buildROOTSTRUCTCHECKED(seqSize,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc),new $ClassPrefix$MonitoredPredicate.NonThrowing(rand,0.01),-1,null);
@@ -383,7 +330,6 @@ public void testROOTSTRUCTCHECKEDremoveIfPREDICATETYPE(int rootPreAlloc,int pare
         var seq=buildROOTSTRUCTCHECKED(seqSize,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc);
         testROOTSTRUCTCHECKEDremoveIfPREDICATETYPEHelper(rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,seq,new $ClassPrefix$MonitoredPredicate.ModdingAndThrowing(rand,seqSize,seq),0,seqSize==0?null:ConcurrentModificationException.class);
       }
-      
       {
         var seq=buildROOTSTRUCTCHECKED(seqSize,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc);
         testROOTSTRUCTCHECKEDremoveIfPREDICATETYPEHelper(rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,seq,new $ClassPrefix$MonitoredPredicate.Modding(rand,seqSize,getParent(seq)),0,seqSize==0?null:ConcurrentModificationException.class);
@@ -392,7 +338,6 @@ public void testROOTSTRUCTCHECKEDremoveIfPREDICATETYPE(int rootPreAlloc,int pare
         var seq=buildROOTSTRUCTCHECKED(seqSize,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc);
         testROOTSTRUCTCHECKEDremoveIfPREDICATETYPEHelper(rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,seq,new $ClassPrefix$MonitoredPredicate.ModdingAndThrowing(rand,seqSize,getParent(seq)),0,seqSize==0?null:ConcurrentModificationException.class);
       }
-      
       {
         var seq=buildROOTSTRUCTCHECKED(seqSize,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc);
         testROOTSTRUCTCHECKEDremoveIfPREDICATETYPEHelper(rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,seq,new $ClassPrefix$MonitoredPredicate.Modding(rand,seqSize,getRoot(seq)),0,seqSize==0?null:ConcurrentModificationException.class);
@@ -402,8 +347,7 @@ public void testROOTSTRUCTCHECKEDremoveIfPREDICATETYPE(int rootPreAlloc,int pare
         testROOTSTRUCTCHECKEDremoveIfPREDICATETYPEHelper(rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,seq,new $ClassPrefix$MonitoredPredicate.ModdingAndThrowing(rand,seqSize,getRoot(seq)),0,seqSize==0?null:ConcurrentModificationException.class);
       }
     #ENDIF
-      if(seqSize==0)
-      {
+      if(seqSize==0){
         continue outer;
       }
     }
@@ -411,10 +355,6 @@ public void testROOTSTRUCTCHECKEDremoveIfPREDICATETYPE(int rootPreAlloc,int pare
   #ENDIF
 }
 #ENDIF
-
-
-
-
   #IFNOTSWITCH STRUCT==Stack,List,SubList
 ERROR unknown struct STRUCT in macro TestImpl<ROOT,STRUCT,CHECKED>()
   #ENDIF
@@ -426,17 +366,13 @@ ERROR unknown checked CHECKED in macro TestImpl<ROOT,STRUCT,CHECKED>()
   #ENDIF
 #IF OfBoolean
   #IFSWITCH STRUCT==Stack,List
-private static void testROOTSTRUCTCHECKEDremoveIfPREDICATETYPEHelper($ClassPrefix$ROOT.CHECKEDSTRUCT seq,$ClassPrefix$MonitoredPredicate pred,Class<? extends Throwable> expectedException)
-{
+private static void testROOTSTRUCTCHECKEDremoveIfPREDICATETYPEHelper($ClassPrefix$ROOT.CHECKEDSTRUCT seq,$ClassPrefix$MonitoredPredicate pred,Class<? extends Throwable> expectedException){
   var clone=($ClassPrefix$ROOT.CHECKEDSTRUCT)seq.clone();
-  if(expectedException==null)
-  {
+  if(expectedException==null){
     int seqSize=seq.size();
     int trueCount=0;
-    for(var v:clone)
-    {
-      if(v)
-      {
+    for(var v:clone){
+      if(v){
         ++trueCount;
       }
     }
@@ -448,39 +384,30 @@ private static void testROOTSTRUCTCHECKEDremoveIfPREDICATETYPEHelper($ClassPrefi
     boolean removedValsContainsTrue=pred.removedVals.contains(true);
     boolean removedValsContainsFalse=pred.removedVals.contains(false);
     Assertions.assertEquals(removedValsContainsTrue?removedValsContainsFalse?0:seqSize-trueCount:removedValsContainsFalse?trueCount:seqSize,seq.size());
-    if(removedValsContainsTrue)
-    {
+    if(removedValsContainsTrue){
       Assertions.assertFalse(seq.contains(true));
     }
-    if(removedValsContainsFalse)
-    {
+    if(removedValsContainsFalse){
       Assertions.assertFalse(seq.contains(false));
     }
-  }
-  else
-  {
+  }else{
     Assertions.assertThrows(expectedException,()->seq.removeIf((PREDICATETYPE)pred));
-    if(ConcurrentModificationException.class.equals(expectedException))
-    {
+    if(ConcurrentModificationException.class.equals(expectedException)){
       Assertions.assertEquals(seq.size(),clone.size());
-      for(var val:clone)
-      {
+      for(var val:clone){
         Assertions.assertTrue(seq.contains(val));
       }
       return;
     }
     var cloneItr=clone.iterator();
     var seqItr=seq.iterator();
-    for(;;)
-    {
-      if(!cloneItr.hasNext())
-      {
+    for(;;){
+      if(!cloneItr.hasNext()){
         Assertions.assertFalse(seqItr.hasNext());
         return;
       }
       var v=cloneItr.next$TypeNameModifier$();
-      if(expectedException==null && pred.removedVals.contains(v))
-      {
+      if(expectedException==null && pred.removedVals.contains(v)){
         continue;
       }
       Assertions.assertTrue(seqItr.hasNext());
@@ -493,19 +420,15 @@ private static void testROOTSTRUCTCHECKEDremoveIfPREDICATETYPEHelper($ClassPrefi
   }
 }
   #ELSE
-private static void testROOTSTRUCTCHECKEDremoveIfPREDICATETYPEHelper(boolean initVal,int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc,OmniList.Of$ClassPrefix$ seq,$ClassPrefix$MonitoredPredicate pred,Class<? extends Throwable> expectedException)
-{
+private static void testROOTSTRUCTCHECKEDremoveIfPREDICATETYPEHelper(boolean initVal,int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc,OmniList.Of$ClassPrefix$ seq,$ClassPrefix$MonitoredPredicate pred,Class<? extends Throwable> expectedException){
   var clone=($ClassPrefix$ROOT.CHECKEDList)seq.clone();
   int expectedSize;
   $ClassPrefix$ROOT.CHECKEDList root;
-  if(expectedException==null)
-  {
+  if(expectedException==null){
     int seqSize=seq.size();
     int trueCount=0;
-    for(var v:clone)
-    {
-      if(v)
-      {
+    for(var v:clone){
+      if(v){
         ++trueCount;
       }
     }
@@ -515,35 +438,27 @@ private static void testROOTSTRUCTCHECKEDremoveIfPREDICATETYPEHelper(boolean ini
     boolean removedValsContainsFalse=pred.removedVals.contains(false);
     expectedSize=removedValsContainsTrue?removedValsContainsFalse?0:seqSize-trueCount:removedValsContainsFalse?trueCount:seqSize;
     Assertions.assertEquals(expectedSize,seq.size());
-    if(removedValsContainsTrue)
-    {
+    if(removedValsContainsTrue){
       Assertions.assertFalse(seq.contains(true));
     }
-    if(removedValsContainsFalse)
-    {
+    if(removedValsContainsFalse){
       Assertions.assertFalse(seq.contains(false));
     }
     root=assertCHECKEDSubListIntegrity(result?1:0,parentPreAlloc+parentPostAlloc+expectedSize,seq);
-  }
-  else
-  {
+  }else{
     Assertions.assertThrows(expectedException,()->seq.removeIf((PREDICATETYPE)pred));
-    if(ConcurrentModificationException.class.equals(expectedException))
-    {
+    if(ConcurrentModificationException.class.equals(expectedException)){
       return;
     }
     var cloneItr=clone.iterator();
     var seqItr=seq.iterator();
-    for(;;)
-    {
-      if(!cloneItr.hasNext())
-      {
+    for(;;){
+      if(!cloneItr.hasNext()){
         Assertions.assertFalse(seqItr.hasNext());
         break;
       }
       var v=cloneItr.next$TypeNameModifier$();
-      if(expectedException==null && pred.removedVals.contains(v))
-      {
+      if(expectedException==null && pred.removedVals.contains(v)){
         continue;
       }
       Assertions.assertTrue(seqItr.hasNext());
@@ -557,20 +472,17 @@ private static void testROOTSTRUCTCHECKEDremoveIfPREDICATETYPEHelper(boolean ini
     root=assertCHECKEDSubListIntegrity(0,parentPreAlloc+parentPostAlloc+expectedSize,seq);
   }
   Assertions.assertEquals(parentPreAlloc+parentPostAlloc+expectedSize+rootPreAlloc+rootPostAlloc,root.size);
-  for(int i=0,bound=rootPreAlloc+parentPreAlloc;i<bound;++i)
-  {
+  for(int i=0,bound=rootPreAlloc+parentPreAlloc;i<bound;++i){
     Assertions.assertEquals(!initVal,root.arr[i]);
   }
-  for(int i=rootPreAlloc+parentPreAlloc+expectedSize,bound=parentPreAlloc+parentPostAlloc+expectedSize+rootPreAlloc+rootPostAlloc;i<bound;++i)
-  {
+  for(int i=rootPreAlloc+parentPreAlloc+expectedSize,bound=parentPreAlloc+parentPostAlloc+expectedSize+rootPreAlloc+rootPostAlloc;i<bound;++i){
     Assertions.assertEquals(!initVal,root.arr[i]);
   }
 }
   #ENDIF
 #ELSE
   #IFSWITCH STRUCT==Stack,List
-private static void testROOTSTRUCTCHECKEDremoveIfPREDICATETYPEHelper($ClassPrefix$ROOT.CHECKEDSTRUCT seq,$ClassPrefix$MonitoredPredicate pred,int numExpectedToBeRemoved,Class<? extends Throwable> expectedException)
-{
+private static void testROOTSTRUCTCHECKEDremoveIfPREDICATETYPEHelper($ClassPrefix$ROOT.CHECKEDSTRUCT seq,$ClassPrefix$MonitoredPredicate pred,int numExpectedToBeRemoved,Class<? extends Throwable> expectedException){
   var clone=($ClassPrefix$ROOT.CHECKEDSTRUCT)seq.clone();
   int expectedSize;
   if(expectedException==null)
@@ -749,11 +661,7 @@ static $ClassPrefix$ROOT.CHECKEDSTRUCT buildROOTSTRUCTCHECKED(int seqSize,boolea
     for(int i=0;i<seqSize;)
     {
       arr[i]=initVal;
-      if(++i==seqSize)
-      {
-        break;
-      }
-      if(i%period==0)
+      if((++i)%period==0)
       {
         initVal=!initVal;
       }
@@ -781,22 +689,16 @@ static OmniList.Of$ClassPrefix$ buildROOTSTRUCTCHECKED(int seqSize,boolean initV
     {
       arr[i]=!initVal;
     }
-    for(int i=rootPreAlloc+parentPreAlloc;;)
+    for(int i=rootPreAlloc+parentPreAlloc;i<rootPreAlloc+parentPreAlloc+seqSize;)
     {
       arr[i]=initVal;
-      if(++i==rootPreAlloc+parentPreAlloc+seqSize)
-      {
-        break;
-      }
-      if(i%period==0)
+      if((++i)%period==0)
       {
         initVal=!initVal;
       }
     }
-    
-    
   }
-  return new $ClassPrefix$ROOT.CheckedList(rootSize,arr).subList(rootPreAlloc,parentPreAlloc+seqSize+parentPostAlloc).subList(parentPreAlloc,parentPreAlloc+seqSize);
+  return new $ClassPrefix$ROOT.CHECKEDList(rootSize,arr).subList(rootPreAlloc,rootPreAlloc+parentPreAlloc+seqSize+parentPostAlloc).subList(parentPreAlloc,parentPreAlloc+seqSize);
 }
   #ENDIF
 #ELSE
@@ -852,7 +754,7 @@ static OmniList.Of$ClassPrefix$ buildROOTSTRUCTCHECKED(int seqSize,int rootPreAl
       arr[dstOffset]=TypeConversionUtil.convertTo$ArrayType$(seqSize+parentPostAlloc+i);
     }
   }
-  return new $ClassPrefix$ROOT.CheckedList(rootSize,arr).subList(rootPreAlloc,parentPreAlloc+seqSize+parentPostAlloc).subList(parentPreAlloc,parentPreAlloc+seqSize);
+  return new $ClassPrefix$ROOT.CHECKEDList(rootSize,arr).subList(rootPreAlloc,rootPreAlloc+parentPreAlloc+seqSize+parentPostAlloc).subList(parentPreAlloc,parentPreAlloc+seqSize);
   
 }
   #ENDIF
@@ -863,731 +765,4 @@ static OmniList.Of$ClassPrefix$ buildROOTSTRUCTCHECKED(int seqSize,int rootPreAl
 #IFNOT OfRef
 #MACRO TestImplHelper(Predicate)
 #ENDIF
-#ENDDEF
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#MACRODEF ConstructRawSeq(length)
-var arr=new $ArrayType$[length];
-#IFSWITCH STRUCTNAME==UncheckedSubList
-var root=new UncheckedList(length,arr);
-var subList=root.subList(0,length);
-var seq=subList.subList(0,length);
-#ELSEIFSWITCH STRUCTNAME==CheckedSubList
-var root=new CheckedList(length,arr);
-var subList=root.subList(0,length);
-var seq=subList.subList(0,length);
-#ELSE
-var seq=new STRUCTNAME(length,arr);
-#ENDIF
-#ENDDEF
-#MACRODEF RemoveAllTestImpl<PREDICATETYPE,ConcurrentModificationBehavior>(length)
-{
-  #MACRO ConstructRawSeq(length)
-#IFSWITCH ConcurrentModificationBehavior==throwConcurrent
-  PREDICATETYPE pred=val->true;
-  Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf(CheckedCollectionTest.getModifyingPred(pred,()->
-  {
-  #IFSWITCH STRUCTNAME==CheckedStack
-    var tmp=seq.pop$TypeNameModifier$();
-    seq.push(tmp);
-  #ELSE
-    var tmp=seq.$removeAtIndexMethod$(seq.size()-1);
-    seq.add(tmp);
-  #ENDIF
-  })));
-#ELSEIFSWITCH ConcurrentModificationBehavior==throwRunTimeNoMod
-  Assertions.assertThrows(IndexOutOfBoundsException.class,()->
-  {
-    seq.removeIf((PREDICATETYPE)(v)->
-    {
-      throw new IndexOutOfBoundsException();
-    });
-  });
-#ELSEIFSWITCH ConcurrentModificationBehavior==throwRunTimeMod
-  Assertions.assertThrows(ConcurrentModificationException.class,()->
-  {
-    seq.removeIf((PREDICATETYPE)(v)->
-    {
-  #IFSWITCH STRUCTNAME==CheckedStack
-      var tmp=seq.pop$TypeNameModifier$();
-      seq.push(tmp);
-  #ELSE
-      var tmp=seq.get$TypeNameModifier$(seq.size()-1);
-      seq.add(tmp);
-  #ENDIF
-      throw new IndexOutOfBoundsException();
-    });
-  });
-#ELSE
-  PREDICATETYPE pred=val->true;
-  Assertions.assertTrue(seq.removeIf(pred));
-  Assertions.assertTrue(seq.isEmpty());
-  #IFSWITCH STRUCTNAME==CheckedList,CheckedStack
-  Assertions.assertTrue(seq.modCount!=0);
-  #ELSEIFSWITCH STRUCTNAME==CheckedSubList
-  Assertions.assertTrue(root.modCount!=0);
-  #ENDIF
-#ENDIF
-}
-#ENDDEF
-#MACRODEF RetainSecondImpl<PREDICATETYPE,ConcurrentModificationBehavior>(length)
-{
-  PREDICATETYPE pred=(val)->
-  {
-#IF OfRef
-    return !EqualityUtil.isEqual(val,TypeConversionUtil.convertToInteger(1));
-#ELSE
-    return !EqualityUtil.isEqual(val,TypeConversionUtil.convertTo$ArrayType$(1));
-#ENDIF
-   
-  };
-  #MACRO ConstructRawSeq(length)
-  for(int i=0;i<length;++i)
-  {
-  #IF OfRef
-    arr[i]=TypeConversionUtil.convertToInteger(i);
-  #ELSE
-    arr[i]=TypeConversionUtil.convertTo$ArrayType$(i);
-  #ENDIF
-  }
-#IFSWITCH ConcurrentModificationBehavior==throwConcurrent
-  Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf(CheckedCollectionTest.getModifyingPred(pred,()->
-  {
-  #IFSWITCH STRUCTNAME==CheckedStack
-    var tmp=seq.pop$TypeNameModifier$();
-    seq.push(tmp);
-  #ELSE
-    var tmp=seq.$removeAtIndexMethod$(seq.size()-1);
-    seq.add(tmp);
-  #ENDIF
-  })));
-
-#ELSE
-  Assertions.assertTrue(seq.removeIf(pred));
-  Assertions.assertEquals(seq.size(),1);
-  #IF OfRef
-  Assertions.assertEquals(arr[0],TypeConversionUtil.convertToInteger(1));
-  #ELSE
-  Assertions.assertEquals(arr[0],TypeConversionUtil.convertTo$ArrayType$(1));
-  #ENDIF
-  #IFSWITCH STRUCTNAME==CheckedList,CheckedStack
-  Assertions.assertTrue(seq.modCount!=0);
-  #ELSEIFSWITCH STRUCTNAME==CheckedSubList
-  Assertions.assertTrue(root.modCount!=0);
-  #ENDIF
-#ENDIF
-} 
-#ENDDEF
-
-#MACRODEF RetainSecondAndLastImpl<PREDICATETYPE,ConcurrentModificationBehavior>(length)
-{
-  PREDICATETYPE pred=(val)->
-  {
-#IF OfRef
-    return !EqualityUtil.isEqual(val,TypeConversionUtil.convertToInteger(1)) && !EqualityUtil.isEqual(val,TypeConversionUtil.convertToInteger(length-1));
-#ELSE
-    return !EqualityUtil.isEqual(val,TypeConversionUtil.convertTo$ArrayType$(1)) && !EqualityUtil.isEqual(val,TypeConversionUtil.convertTo$ArrayType$(length-1));
-#ENDIF
-   
-  };
-  #MACRO ConstructRawSeq(length)
-  for(int i=0;i<length;++i)
-  {
-  #IF OfRef
-    arr[i]=TypeConversionUtil.convertToInteger(i);
-  #ELSE
-    arr[i]=TypeConversionUtil.convertTo$ArrayType$(i);
-  #ENDIF
-  }
-#IFSWITCH ConcurrentModificationBehavior==throwConcurrent
-  Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf(CheckedCollectionTest.getModifyingPred(pred,()->
-  {
-  #IFSWITCH STRUCTNAME==CheckedStack
-    var tmp=seq.pop$TypeNameModifier$();
-    seq.push(tmp);
-  #ELSE
-    var tmp=seq.$removeAtIndexMethod$(seq.size()-1);
-    seq.add(tmp);
-  #ENDIF
-  })));
-
-#ELSE
-  Assertions.assertTrue(seq.removeIf(pred));
-  Assertions.assertEquals(seq.size(),2);
-  #IF OfRef
-  Assertions.assertEquals(arr[0],TypeConversionUtil.convertToInteger(1));
-  Assertions.assertEquals(arr[1],TypeConversionUtil.convertToInteger(length-1));
-  #ELSE
-  Assertions.assertEquals(arr[0],TypeConversionUtil.convertTo$ArrayType$(1));
-  Assertions.assertEquals(arr[1],TypeConversionUtil.convertTo$ArrayType$(length-1));
-  #ENDIF
-  #IFSWITCH STRUCTNAME==CheckedList,CheckedStack
-  Assertions.assertTrue(seq.modCount!=0);
-  #ELSEIFSWITCH STRUCTNAME==CheckedSubList
-  Assertions.assertTrue(root.modCount!=0);
-  #ENDIF
-#ENDIF
-} 
-#ENDDEF
-
-#MACRODEF RemoveFirstAndThirdImpl<PREDICATETYPE,ConcurrentModificationBehavior>(length)
-{
-  PREDICATETYPE pred=(val)->
-  {
-#IF OfRef
-    return (EqualityUtil.isEqual(val,TypeConversionUtil.convertToInteger(0))
-      ||
-       EqualityUtil.isEqual(val,TypeConversionUtil.convertToInteger(2)));
-#ELSE
-    return (EqualityUtil.isEqual(val,TypeConversionUtil.convertTo$ArrayType$(0))
-      ||
-       EqualityUtil.isEqual(val,TypeConversionUtil.convertTo$ArrayType$(2)));
-#ENDIF
-   
-  };
-  #MACRO ConstructRawSeq(length)
-  for(int i=0;i<length;++i)
-  {
-  #IF OfRef
-    arr[i]=TypeConversionUtil.convertToInteger(i);
-  #ELSE
-    arr[i]=TypeConversionUtil.convertTo$ArrayType$(i);
-  #ENDIF
-  }
-#IFSWITCH ConcurrentModificationBehavior==throwConcurrent
-  Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf(CheckedCollectionTest.getModifyingPred(pred,()->
-  {
-  #IFSWITCH STRUCTNAME==CheckedStack
-    var tmp=seq.pop$TypeNameModifier$();
-    seq.push(tmp);
-  #ELSE
-    var tmp=seq.$removeAtIndexMethod$(seq.size()-1);
-    seq.add(tmp);
-  #ENDIF
-  })));
-
-#ELSE
-  Assertions.assertTrue(seq.removeIf(pred));
-  Assertions.assertEquals(seq.size(),length-2);
-  
-  for(int i=0,valIndex=0;i<length-2;++i,++valIndex)
-  {
-    if(i==0 || i==1)
-    {
-      ++valIndex;
-    }
-  #IF OfRef
-    Assertions.assertEquals(arr[i],TypeConversionUtil.convertToInteger(valIndex));
-  #ELSE
-    Assertions.assertEquals(arr[i],TypeConversionUtil.convertTo$ArrayType$(valIndex));
-  #ENDIF
-    
-  }
-  #IFSWITCH STRUCTNAME==CheckedList,CheckedStack
-  Assertions.assertTrue(seq.modCount!=0);
-  #ELSEIFSWITCH STRUCTNAME==CheckedSubList
-  Assertions.assertTrue(root.modCount!=0);
-  #ENDIF
-#ENDIF
-} 
-#ENDDEF
-
-#MACRODEF RemoveFirstImpl<PREDICATETYPE,ConcurrentModificationBehavior>(length)
-{
-  PREDICATETYPE pred=(val)->
-  {
-#IF OfRef
-    return EqualityUtil.isEqual(val,TypeConversionUtil.convertToInteger(0));
-#ELSE
-    return EqualityUtil.isEqual(val,TypeConversionUtil.convertTo$ArrayType$(0));
-#ENDIF
-   
-  };
-  #MACRO ConstructRawSeq(length)
-  for(int i=0;i<length;++i)
-  {
-  #IF OfRef
-    arr[i]=TypeConversionUtil.convertToInteger(i);
-  #ELSE
-    arr[i]=TypeConversionUtil.convertTo$ArrayType$(i);
-  #ENDIF
-  }
-#IFSWITCH ConcurrentModificationBehavior==throwConcurrent
-  Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf(CheckedCollectionTest.getModifyingPred(pred,()->
-  {
-  #IFSWITCH STRUCTNAME==CheckedStack
-    var tmp=seq.pop$TypeNameModifier$();
-    seq.push(tmp);
-  #ELSE
-    var tmp=seq.$removeAtIndexMethod$(seq.size()-1);
-    seq.add(tmp);
-  #ENDIF
-  })));
-
-#ELSE
-  Assertions.assertTrue(seq.removeIf(pred));
-  Assertions.assertEquals(seq.size(),length-1);
-  
-  for(int i=0,valIndex=1;i<length-1;++i,++valIndex)
-  {
-  #IF OfRef
-    Assertions.assertEquals(arr[i],TypeConversionUtil.convertToInteger(valIndex));
-  #ELSE
-    Assertions.assertEquals(arr[i],TypeConversionUtil.convertTo$ArrayType$(valIndex));
-  #ENDIF
-    
-  }
-  #IFSWITCH STRUCTNAME==CheckedList,CheckedStack
-  Assertions.assertTrue(seq.modCount!=0);
-  #ELSEIFSWITCH STRUCTNAME==CheckedSubList
-  Assertions.assertTrue(root.modCount!=0);
-  #ENDIF
-#ENDIF
-} 
-#ENDDEF
-
-
-#MACRODEF RemoveFirstAndSecondToLastImpl<PREDICATETYPE,ConcurrentModificationBehavior>(length)
-{
-  PREDICATETYPE pred=(val)->
-  {
-#IF OfRef
-    return EqualityUtil.isEqual(val,TypeConversionUtil.convertToInteger(0)) || EqualityUtil.isEqual(val,TypeConversionUtil.convertToInteger(length-2));
-#ELSE
-    return EqualityUtil.isEqual(val,TypeConversionUtil.convertTo$ArrayType$(0)) || EqualityUtil.isEqual(val,TypeConversionUtil.convertTo$ArrayType$(length-2));
-#ENDIF
-   
-  };
-  #MACRO ConstructRawSeq(length)
-  for(int i=0;i<length;++i)
-  {
-  #IF OfRef
-    arr[i]=TypeConversionUtil.convertToInteger(i);
-  #ELSE
-    arr[i]=TypeConversionUtil.convertTo$ArrayType$(i);
-  #ENDIF
-  }
-#IFSWITCH ConcurrentModificationBehavior==throwConcurrent
-  Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf(CheckedCollectionTest.getModifyingPred(pred,()->
-  {
-  #IFSWITCH STRUCTNAME==CheckedStack
-    var tmp=seq.pop$TypeNameModifier$();
-    seq.push(tmp);
-  #ELSE
-    var tmp=seq.$removeAtIndexMethod$(seq.size()-1);
-    seq.add(tmp);
-  #ENDIF
-  })));
-
-#ELSE
-  Assertions.assertTrue(seq.removeIf(pred));
-  Assertions.assertEquals(seq.size(),length-2);
-  
-  for(int i=0,valIndex=1;i<length-3;++i,++valIndex)
-  {
-  #IF OfRef
-    Assertions.assertEquals(arr[i],TypeConversionUtil.convertToInteger(valIndex));
-  #ELSE
-    Assertions.assertEquals(arr[i],TypeConversionUtil.convertTo$ArrayType$(valIndex));
-  #ENDIF
-    
-  }
-  #IF OfRef
-  Assertions.assertEquals(arr[length-3],TypeConversionUtil.convertToInteger(length-1));
-  #ELSE
-  Assertions.assertEquals(arr[length-3],TypeConversionUtil.convertTo$ArrayType$(length-1));
-  #ENDIF
-  #IFSWITCH STRUCTNAME==CheckedList,CheckedStack
-  Assertions.assertTrue(seq.modCount!=0);
-  #ELSEIFSWITCH STRUCTNAME==CheckedSubList
-  Assertions.assertTrue(root.modCount!=0);
-  #ENDIF
-#ENDIF
-} 
-#ENDDEF
-
-#MACRODEF RemoveNoneTestImpl<PREDICATETYPE,ConcurrentModificationBehavior>(length)
-{
-  
-  #MACRO ConstructRawSeq(length)
-#IFSWITCH ConcurrentModificationBehavior==throwConcurrent
-  PREDICATETYPE pred=val->false;
-  Assertions.assertThrows(ConcurrentModificationException.class,()->seq.removeIf(CheckedCollectionTest.getModifyingPred(pred,()->
-  {
-  #IFSWITCH STRUCTNAME==CheckedStack
-    var tmp=seq.pop$TypeNameModifier$();
-    seq.push(tmp);
-  #ELSE
-    var tmp=seq.$removeAtIndexMethod$(seq.size()-1);
-    seq.add(tmp);
-  #ENDIF
-  })));
-#ELSEIFSWITCH ConcurrentModificationBehavior==throwRunTimeNoMod
-  Assertions.assertThrows(IndexOutOfBoundsException.class,()->
-  {
-    seq.removeIf((PREDICATETYPE)(v)->
-    {
-      throw new IndexOutOfBoundsException();
-    });
-  });
-#ELSEIFSWITCH ConcurrentModificationBehavior==throwRunTimeMod
-  Assertions.assertThrows(ConcurrentModificationException.class,()->
-  {
-    seq.removeIf((PREDICATETYPE)(v)->
-    {
-  #IFSWITCH STRUCTNAME==CheckedStack
-      var tmp=seq.pop$TypeNameModifier$();
-      seq.push(tmp);
-  #ELSE
-      var tmp=seq.$removeAtIndexMethod$(seq.size()-1);
-      seq.add(tmp);
-  #ENDIF
-      throw new IndexOutOfBoundsException();
-    });
-  });
-#ELSE
-  PREDICATETYPE pred=val->false;
-  Assertions.assertFalse(seq.removeIf(pred));
-  Assertions.assertEquals(seq.size(),length);
-  #IFSWITCH STRUCTNAME==CheckedList,CheckedStack
-  Assertions.assertEquals(0,seq.modCount);
-  #ELSEIFSWITCH STRUCTNAME==CheckedSubList
-  Assertions.assertEquals(0,root.modCount);
-  #ENDIF
-#ENDIF
-}
-#ENDDEF
-
-
-#MACRODEF ArrSeqImpl2<STRUCTNAME,INTERFACE>()
-/*
-@Test
-public void testEmptyRemoveIfArrSeqSTRUCTNAME()
-{
-#IF OfRef
-  $TypeNameModifier$Predicate filter=IntegerPredicates.MarkAll.getPred(null,0);
-#ELSE
-  $TypeNameModifier$Predicate filter=$ArrayType$Predicates.MarkAll.getPred(null,0);
-#ENDIF
-#IFSWITCH STRUCTNAME==UncheckedSubList
-  var root=new UncheckedList();
-  var seq=root.subList(0,0);
-#ELSEIFSWITCH STRUCTNAME==CheckedSubList
-  var root=new CheckedList();
-  var seq=root.subList(0,0);
-#ELSE
-  var seq=new STRUCTNAME();
-#ENDIF
-  Assertions.assertFalse(seq.removeIf(filter));
-#IFNOT OfRef
-  Assertions.assertFalse(seq.removeIf((Predicate<$BoxedType$>)filter::test));
-#ENDIF
-}
-
-
-
-
-
-@Test
-public void testRemoveIfSTRUCTNAME()
-{
-  #IF OfRef
-    #MACRO RemoveNoneTestImpl<$TypeNameModifier$Predicate<? super Integer>,false>(100)
-  #ELSE
-    #MACRO RemoveNoneTestImpl<$TypeNameModifier$Predicate,false>(100)
-    #MACRO RemoveNoneTestImpl<Predicate<? super $BoxedType$>,false>(100)
-  #ENDIF
-  #IFSWITCH STRUCTNAME==CheckedSubList,CheckedList,CheckedStack
-    #IF OfRef
-    #MACRO RemoveNoneTestImpl<$TypeNameModifier$Predicate<? super Integer>,throwConcurrent>(100)
-    #ELSE
-    #MACRO RemoveNoneTestImpl<$TypeNameModifier$Predicate,throwConcurrent>(100)
-    #MACRO RemoveNoneTestImpl<Predicate<? super $BoxedType$>,throwConcurrent>(100)
-    #ENDIF
-    #IF OfRef
-    #MACRO RemoveNoneTestImpl<$TypeNameModifier$Predicate<? super Integer>,throwRunTimeNoMod>(100)
-    #ELSE
-    #MACRO RemoveNoneTestImpl<$TypeNameModifier$Predicate,throwRunTimeNoMod>(100)
-    #MACRO RemoveNoneTestImpl<Predicate<? super $BoxedType$>,throwRunTimeNoMod>(100)
-    #ENDIF
-    #IF OfRef
-    #MACRO RemoveNoneTestImpl<$TypeNameModifier$Predicate<? super Integer>,throwRunTimeMod>(100)
-    #ELSE
-    #MACRO RemoveNoneTestImpl<$TypeNameModifier$Predicate,throwRunTimeMod>(100)
-    #MACRO RemoveNoneTestImpl<Predicate<? super $BoxedType$>,throwRunTimeMod>(100)
-    #ENDIF
-  #ENDIF
-  
-  
-  #IF OfRef
-    #MACRO RemoveAllTestImpl<$TypeNameModifier$Predicate<? super Integer>,false>(100)
-  #ELSE
-    #MACRO RemoveAllTestImpl<$TypeNameModifier$Predicate,false>(100)
-    #MACRO RemoveAllTestImpl<Predicate<? super $BoxedType$>,false>(100)
-  #ENDIF
-  #IFSWITCH STRUCTNAME==CheckedSubList,CheckedList,CheckedStack
-    #IF OfRef
-    #MACRO RemoveAllTestImpl<$TypeNameModifier$Predicate<? super Integer>,throwConcurrent>(100)
-    #ELSE
-    #MACRO RemoveAllTestImpl<$TypeNameModifier$Predicate,throwConcurrent>(100)
-    #MACRO RemoveAllTestImpl<Predicate<? super $BoxedType$>,throwConcurrent>(100)
-    #ENDIF
-    #IF OfRef
-    #MACRO RemoveAllTestImpl<$TypeNameModifier$Predicate<? super Integer>,throwRunTimeNoMod>(100)
-    #ELSE
-    #MACRO RemoveAllTestImpl<$TypeNameModifier$Predicate,throwRunTimeNoMod>(100)
-    #MACRO RemoveAllTestImpl<Predicate<? super $BoxedType$>,throwRunTimeNoMod>(100)
-    #ENDIF
-    #IF OfRef
-    #MACRO RemoveAllTestImpl<$TypeNameModifier$Predicate<? super Integer>,throwRunTimeMod>(100)
-    #ELSE
-    #MACRO RemoveAllTestImpl<$TypeNameModifier$Predicate,throwRunTimeMod>(100)
-    #MACRO RemoveAllTestImpl<Predicate<? super $BoxedType$>,throwRunTimeMod>(100)
-    #ENDIF
-  #ENDIF
-  #IF OfRef
-    #MACRO RemoveFirstAndThirdImpl<$TypeNameModifier$Predicate<? super Integer>,false>(100)
-  #ELSE
-    #MACRO RemoveFirstAndThirdImpl<$TypeNameModifier$Predicate,false>(100)
-    #MACRO RemoveFirstAndThirdImpl<Predicate<? super $BoxedType$>,false>(100)
-  #ENDIF
-  #IFSWITCH STRUCTNAME==CheckedSubList,CheckedList,CheckedStack
-    #IF OfRef
-    #MACRO RemoveFirstAndThirdImpl<$TypeNameModifier$Predicate<? super Integer>,throwConcurrent>(100)
-    #ELSE
-    #MACRO RemoveFirstAndThirdImpl<$TypeNameModifier$Predicate,throwConcurrent>(100)
-    #MACRO RemoveFirstAndThirdImpl<Predicate<? super $BoxedType$>,throwConcurrent>(100)
-    #ENDIF
-  #ENDIF
-  #IF OfRef
-    #MACRO RetainSecondImpl<$TypeNameModifier$Predicate<? super Integer>,false>(100)
-  #ELSE
-    #MACRO RetainSecondImpl<$TypeNameModifier$Predicate,false>(100)
-    #MACRO RetainSecondImpl<Predicate<? super $BoxedType$>,false>(100)
-  #ENDIF
-  #IFSWITCH STRUCTNAME==CheckedSubList,CheckedList,CheckedStack
-    #IF OfRef
-    #MACRO RetainSecondImpl<$TypeNameModifier$Predicate<? super Integer>,throwConcurrent>(100)
-    #ELSE
-    #MACRO RetainSecondImpl<$TypeNameModifier$Predicate,throwConcurrent>(100)
-    #MACRO RetainSecondImpl<Predicate<? super $BoxedType$>,throwConcurrent>(100)
-    #ENDIF
-  #ENDIF
-  #IF OfRef
-    #MACRO RetainSecondAndLastImpl<$TypeNameModifier$Predicate<? super Integer>,false>(100)
-  #ELSE
-    #MACRO RetainSecondAndLastImpl<$TypeNameModifier$Predicate,false>(100)
-    #MACRO RetainSecondAndLastImpl<Predicate<? super $BoxedType$>,false>(100)
-  #ENDIF
-  #IFSWITCH STRUCTNAME==CheckedSubList,CheckedList,CheckedStack
-    #IF OfRef
-    #MACRO RetainSecondAndLastImpl<$TypeNameModifier$Predicate<? super Integer>,throwConcurrent>(100)
-    #ELSE
-    #MACRO RetainSecondAndLastImpl<$TypeNameModifier$Predicate,throwConcurrent>(100)
-    #MACRO RetainSecondAndLastImpl<Predicate<? super $BoxedType$>,throwConcurrent>(100)
-    #ENDIF
-  #ENDIF
-  #IF OfRef
-    #MACRO RetainSecondAndLastImpl<$TypeNameModifier$Predicate<? super Integer>,false>(3)
-  #ELSE
-    #MACRO RetainSecondAndLastImpl<$TypeNameModifier$Predicate,false>(3)
-    #MACRO RetainSecondAndLastImpl<Predicate<? super $BoxedType$>,false>(3)
-  #ENDIF
-  #IFSWITCH STRUCTNAME==CheckedSubList,CheckedList,CheckedStack
-    #IF OfRef
-    #MACRO RetainSecondAndLastImpl<$TypeNameModifier$Predicate<? super Integer>,throwConcurrent>(3)
-    #ELSE
-    #MACRO RetainSecondAndLastImpl<$TypeNameModifier$Predicate,throwConcurrent>(3)
-    #MACRO RetainSecondAndLastImpl<Predicate<? super $BoxedType$>,throwConcurrent>(3)
-    #ENDIF
-  #ENDIF
-  #IF OfRef
-    #MACRO RetainSecondAndLastImpl<$TypeNameModifier$Predicate<? super Integer>,false>(50)
-  #ELSE
-    #MACRO RetainSecondAndLastImpl<$TypeNameModifier$Predicate,false>(50)
-    #MACRO RetainSecondAndLastImpl<Predicate<? super $BoxedType$>,false>(50)
-  #ENDIF
-  #IFSWITCH STRUCTNAME==CheckedSubList,CheckedList,CheckedStack
-    #IF OfRef
-    #MACRO RetainSecondAndLastImpl<$TypeNameModifier$Predicate<? super Integer>,throwConcurrent>(50)
-    #ELSE
-    #MACRO RetainSecondAndLastImpl<$TypeNameModifier$Predicate,throwConcurrent>(50)
-    #MACRO RetainSecondAndLastImpl<Predicate<? super $BoxedType$>,throwConcurrent>(50)
-    #ENDIF
-  #ENDIF
-  #IF OfRef
-    #MACRO RemoveFirstImpl<$TypeNameModifier$Predicate<? super Integer>,false>(100)
-  #ELSE
-    #MACRO RemoveFirstImpl<$TypeNameModifier$Predicate,false>(100)
-    #MACRO RemoveFirstImpl<Predicate<? super $BoxedType$>,false>(100)
-  #ENDIF
-  #IFSWITCH STRUCTNAME==CheckedSubList,CheckedList,CheckedStack
-    #IF OfRef
-    #MACRO RemoveFirstImpl<$TypeNameModifier$Predicate<? super Integer>,throwConcurrent>(100)
-    #ELSE
-    #MACRO RemoveFirstImpl<$TypeNameModifier$Predicate,throwConcurrent>(100)
-    #MACRO RemoveFirstImpl<Predicate<? super $BoxedType$>,throwConcurrent>(100)
-    #ENDIF
-  #ENDIF
-  #IF OfRef
-    #MACRO RemoveFirstImpl<$TypeNameModifier$Predicate<? super Integer>,false>(50)
-  #ELSE
-    #MACRO RemoveFirstImpl<$TypeNameModifier$Predicate,false>(50)
-    #MACRO RemoveFirstImpl<Predicate<? super $BoxedType$>,false>(50)
-  #ENDIF
-  #IFSWITCH STRUCTNAME==CheckedSubList,CheckedList,CheckedStack
-    #IF OfRef
-    #MACRO RemoveFirstImpl<$TypeNameModifier$Predicate<? super Integer>,throwConcurrent>(50)
-    #ELSE
-    #MACRO RemoveFirstImpl<$TypeNameModifier$Predicate,throwConcurrent>(50)
-    #MACRO RemoveFirstImpl<Predicate<? super $BoxedType$>,throwConcurrent>(50)
-    #ENDIF
-  #ENDIF
-  #IF OfRef
-    #MACRO RemoveFirstAndSecondToLastImpl<$TypeNameModifier$Predicate<? super Integer>,false>(50)
-  #ELSE
-    #MACRO RemoveFirstAndSecondToLastImpl<$TypeNameModifier$Predicate,false>(50)
-    #MACRO RemoveFirstAndSecondToLastImpl<Predicate<? super $BoxedType$>,false>(50)
-  #ENDIF
-  #IFSWITCH STRUCTNAME==CheckedSubList,CheckedList,CheckedStack
-    #IF OfRef
-    #MACRO RemoveFirstAndSecondToLastImpl<$TypeNameModifier$Predicate<? super Integer>,throwConcurrent>(50)
-    #ELSE
-    #MACRO RemoveFirstAndSecondToLastImpl<$TypeNameModifier$Predicate,throwConcurrent>(50)
-    #MACRO RemoveFirstAndSecondToLastImpl<Predicate<? super $BoxedType$>,throwConcurrent>(50)
-    #ENDIF
-  #ENDIF
-}
-
-
-
-#IFSWITCH STRUCTNAME==CheckedList,CheckedStack,CheckedSubList
-@Test
-public void testRemoveIfModCheckArrSeqSTRUCTNAME()
-{
-  #IFSWITCH STRUCTNAME==UncheckedSubList
-  var root=new UncheckedList();
-  var seq=root.subList(0,0);
-  #ELSEIFSWITCH STRUCTNAME==CheckedSubList
-  var root=new CheckedList();
-  var seq=root.subList(0,0);
-  #ELSE
-  var seq=new STRUCTNAME();
-  #ENDIF
-  for(int i=0;i<1000;++i)
-  {
-  #IF OfRef
-    var val=TypeConversionUtil.convertToInteger(i);
-  #ELSE
-    var val=TypeConversionUtil.convertTo$exposedType$(i);
-  #ENDIF
-    seq.add(val);
-  }
-  Random rand=new Random(0);
-#IF OfRef
-  for(var predicateGenerator:IntegerPredicates.values())
-#ELSE
-  for(var predicateGenerator:$ArrayType$Predicates.values())
-#ENDIF
-  {
-    for(int m=predicateGenerator.getMLo(),mHi=predicateGenerator.getMHi(),repsBound=predicateGenerator.getNumReps();m<=mHi;m=predicateGenerator.incrementM(m))
-    {
-      for(int reps=0;reps<repsBound;++reps)
-      {
-        {
-          var seqClone=(INTERFACE.Of$ClassPrefix$)seq.clone();
-          var pred=CheckedCollectionTest.getModifyingPred(predicateGenerator.getPred(rand,m),()->
-          {
-            if(!seqClone.isEmpty())
-            {
-  #IFSWITCH INTERFACE==OmniList
-              seqClone.remove(0);
-  #ELSEIFSWITCH INTERFACE==OmniStack
-              seqClone.pop();
-  #ELSE         
-              ERROR unknown interface INTERFACE
-  #ENDIF
-            }
-          });
-          Assertions.assertThrows(ConcurrentModificationException.class,()->seqClone.removeIf(pred));
-        }
-        {
-          var seqClone=(INTERFACE.Of$ClassPrefix$)seq.clone();
-          var pred=CheckedCollectionTest.getModifyingPred(predicateGenerator.getPred(rand,m),()->
-          {
-            seqClone.add($defaultVal$);
-          });
-          Assertions.assertThrows(ConcurrentModificationException.class,()->seqClone.removeIf(pred));
-        }
-  #IFNOT OfRef
-        {
-          var seqClone=(INTERFACE.Of$ClassPrefix$)seq.clone();
-          var pred=CheckedCollectionTest.getModifyingPred(predicateGenerator.getPred(rand,m),()->
-          {
-            if(!seqClone.isEmpty())
-            {
-    #IFSWITCH INTERFACE==OmniList
-              seqClone.remove(0);
-    #ELSEIFSWITCH INTERFACE==OmniStack
-              seqClone.pop();
-    #ELSE         
-              ERROR unknown interface INTERFACE
-    #ENDIF
-            }
-          });
-          
-          Assertions.assertThrows(ConcurrentModificationException.class,()->seqClone.removeIf((Predicate<$BoxedType$>)pred::test));
-        }
-        {
-          var seqClone=(INTERFACE.Of$ClassPrefix$)seq.clone();
-          var pred=CheckedCollectionTest.getModifyingPred(predicateGenerator.getPred(rand,m),()->
-          {
-            seqClone.add($defaultVal$);
-          });
-          Assertions.assertThrows(ConcurrentModificationException.class,()->seqClone.removeIf((Predicate<$BoxedType$>)pred::test));
-        }
-  #ENDIF
-      }
-    }
-  }
-}
-*/
-#ENDIF
-
 #ENDDEF

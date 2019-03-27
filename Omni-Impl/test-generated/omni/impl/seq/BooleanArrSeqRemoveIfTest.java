@@ -17,7 +17,6 @@ import omni.api.OmniList;
 @SuppressWarnings({"rawtypes","unchecked"}) 
 public class BooleanArrSeqRemoveIfTest
 {
-//TODO place sanity checks for checked sequence modification behavior
   private static final Field CheckedSubListmodCount;
   private static final Field CheckedSubListparent;
   private static final Field CheckedSubListroot;
@@ -25,10 +24,10 @@ public class BooleanArrSeqRemoveIfTest
   private static final Field UncheckedSubListparent;
   private static final Field UncheckedSubListroot;
   private static final Field UncheckedSubListsize;
-  static
-  {
-    try
-    {
+  static{
+    try{
+      //You must add the following switch to the VM arguments
+      //--add-opens java.base/java.lang.reflect=omni.impl
       Field modifiersField=Field.class.getDeclaredField("modifiers");
       modifiersField.setAccessible(true);
       {
@@ -48,73 +47,51 @@ public class BooleanArrSeqRemoveIfTest
         modifiersField.setInt(UncheckedSubListroot,UncheckedSubListroot.getModifiers()&~Modifier.FINAL);
         (UncheckedSubListsize=clazz.getDeclaredField("size")).setAccessible(true);
       }
-    }
-    catch(Exception e)
-    {
+    }catch(Exception e){
       throw new ExceptionInInitializerError(e);
     }
   }
-  private static BooleanArrSeq.CheckedList getRoot(Object seq)
-  {
-    try
-    {
+  private static BooleanArrSeq.CheckedList getRoot(Object seq){
+    try{
       return (BooleanArrSeq.CheckedList)CheckedSubListroot.get(seq);
-    }
-    catch(Exception e)
-    {
+    }catch(Exception e){
       throw new RuntimeException(e);
     }
   }
-  private static OmniList.OfBoolean getParent(Object seq)
-  {
-    try
-    {
+  private static OmniList.OfBoolean getParent(Object seq){
+    try{
       return (OmniList.OfBoolean)CheckedSubListparent.get(seq);
-    }
-    catch(Exception e)
-    {
+    }catch(Exception e){
       throw new RuntimeException(e);
     }
   }
-  private static BooleanArrSeq.UncheckedList assertUncheckedSubListIntegrity(int expectedModCount,int expectedParentSize,Object obj)
-  {
-    if(!(obj instanceof BooleanArrSeq.UncheckedList))
-    {
-      try
-      {
+  private static BooleanArrSeq.UncheckedList assertUncheckedSubListIntegrity(int expectedModCount,int expectedParentSize,Object obj){
+    if(!(obj instanceof BooleanArrSeq.UncheckedList)){
+      try{
         Object parent=UncheckedSubListparent.get(obj);
-        if(parent!=null)
-        {
+        if(parent!=null){
            Assertions.assertEquals(expectedParentSize,UncheckedSubListsize.getInt(parent));
            obj=parent;
         }
         obj=UncheckedSubListroot.get(obj);
-      }
-      catch(Exception e)
-      {
+      }catch(Exception e){
         throw new RuntimeException(e);
       }
     }
     return (BooleanArrSeq.UncheckedList)obj;
   }
-  private static BooleanArrSeq.CheckedList assertCheckedSubListIntegrity(int expectedModCount,int expectedParentSize,Object obj)
-  {
-    if(!(obj instanceof BooleanArrSeq.CheckedList))
-    {
-      try
-      {
+  private static BooleanArrSeq.CheckedList assertCheckedSubListIntegrity(int expectedModCount,int expectedParentSize,Object obj){
+    if(!(obj instanceof BooleanArrSeq.CheckedList)){
+      try{
         Assertions.assertEquals(expectedModCount,CheckedSubListmodCount.getInt(obj));
         Object parent=CheckedSubListparent.get(obj);
-        if(parent!=null)
-        {
+        if(parent!=null){
            Assertions.assertEquals(expectedModCount,CheckedSubListmodCount.getInt(parent));
            Assertions.assertEquals(expectedParentSize,CheckedSubListsize.getInt(parent));
            obj=parent;
         }
         obj=CheckedSubListroot.get(obj);
-      }
-      catch(Exception e)
-      {
+      }catch(Exception e){
         throw new RuntimeException(e);
       }
     }
@@ -135,11 +112,7 @@ public class BooleanArrSeqRemoveIfTest
       for(int i=0;i<seqSize;)
       {
         arr[i]=initVal;
-        if(++i==seqSize)
-        {
-          break;
-        }
-        if(i%period==0)
+        if((++i)%period==0)
         {
           initVal=!initVal;
         }
@@ -148,33 +121,30 @@ public class BooleanArrSeqRemoveIfTest
     return new BooleanArrSeq.UncheckedStack(seqSize,arr);
   }
   @Test
-  public void testArrSeqStackUncheckedremoveIfBooleanPredicate()
-  {
+  public void testArrSeqStackUncheckedremoveIfBooleanPredicate(){
     Random rand=new Random(0);
-    for(int seqSize=0;seqSize<=10;++seqSize)
-    {
-       for(int period=1,inc=Math.max(1,seqSize/10);period<=seqSize;period+=inc)
-       {
+    for(int seqSize=0;seqSize<=10;++seqSize){
+       for(int period=1,inc=Math.max(1,seqSize/10);;period+=inc){
          testArrSeqStackUncheckedremoveIfBooleanPredicateHelper(buildArrSeqStackUnchecked(seqSize,true,period),new BooleanMonitoredPredicate.RemoveAll(),null);
          testArrSeqStackUncheckedremoveIfBooleanPredicateHelper(buildArrSeqStackUnchecked(seqSize,false,period),new BooleanMonitoredPredicate.RemoveAll(),null);
          testArrSeqStackUncheckedremoveIfBooleanPredicateHelper(buildArrSeqStackUnchecked(seqSize,true,period),new BooleanMonitoredPredicate.RemoveNone(),null);
          testArrSeqStackUncheckedremoveIfBooleanPredicateHelper(buildArrSeqStackUnchecked(seqSize,false,period),new BooleanMonitoredPredicate.RemoveNone(),null);
          testArrSeqStackUncheckedremoveIfBooleanPredicateHelper(buildArrSeqStackUnchecked(seqSize,true,period),new BooleanMonitoredPredicate.NonThrowing(rand,0.5),null);
          testArrSeqStackUncheckedremoveIfBooleanPredicateHelper(buildArrSeqStackUnchecked(seqSize,false,period),new BooleanMonitoredPredicate.NonThrowing(rand,0.5),null);
+        if(period>seqSize)
+        {
+          break;
+        }
       }
     }
   }
-  private static void testArrSeqStackUncheckedremoveIfBooleanPredicateHelper(BooleanArrSeq.UncheckedStack seq,BooleanMonitoredPredicate pred,Class<? extends Throwable> expectedException)
-  {
+  private static void testArrSeqStackUncheckedremoveIfBooleanPredicateHelper(BooleanArrSeq.UncheckedStack seq,BooleanMonitoredPredicate pred,Class<? extends Throwable> expectedException){
     var clone=(BooleanArrSeq.UncheckedStack)seq.clone();
-    if(expectedException==null)
-    {
+    if(expectedException==null){
       int seqSize=seq.size();
       int trueCount=0;
-      for(var v:clone)
-      {
-        if(v)
-        {
+      for(var v:clone){
+        if(v){
           ++trueCount;
         }
       }
@@ -183,39 +153,30 @@ public class BooleanArrSeqRemoveIfTest
       boolean removedValsContainsTrue=pred.removedVals.contains(true);
       boolean removedValsContainsFalse=pred.removedVals.contains(false);
       Assertions.assertEquals(removedValsContainsTrue?removedValsContainsFalse?0:seqSize-trueCount:removedValsContainsFalse?trueCount:seqSize,seq.size());
-      if(removedValsContainsTrue)
-      {
+      if(removedValsContainsTrue){
         Assertions.assertFalse(seq.contains(true));
       }
-      if(removedValsContainsFalse)
-      {
+      if(removedValsContainsFalse){
         Assertions.assertFalse(seq.contains(false));
       }
-    }
-    else
-    {
+    }else{
       Assertions.assertThrows(expectedException,()->seq.removeIf((BooleanPredicate)pred));
-      if(ConcurrentModificationException.class.equals(expectedException))
-      {
+      if(ConcurrentModificationException.class.equals(expectedException)){
         Assertions.assertEquals(seq.size(),clone.size());
-        for(var val:clone)
-        {
+        for(var val:clone){
           Assertions.assertTrue(seq.contains(val));
         }
         return;
       }
       var cloneItr=clone.iterator();
       var seqItr=seq.iterator();
-      for(;;)
-      {
-        if(!cloneItr.hasNext())
-        {
+      for(;;){
+        if(!cloneItr.hasNext()){
           Assertions.assertFalse(seqItr.hasNext());
           return;
         }
         var v=cloneItr.nextBoolean();
-        if(expectedException==null && pred.removedVals.contains(v))
-        {
+        if(expectedException==null && pred.removedVals.contains(v)){
           continue;
         }
         Assertions.assertTrue(seqItr.hasNext());
@@ -224,33 +185,30 @@ public class BooleanArrSeqRemoveIfTest
     }
   }
   @Test
-  public void testArrSeqStackUncheckedremoveIfPredicate()
-  {
+  public void testArrSeqStackUncheckedremoveIfPredicate(){
     Random rand=new Random(0);
-    for(int seqSize=0;seqSize<=10;++seqSize)
-    {
-       for(int period=1,inc=Math.max(1,seqSize/10);period<=seqSize;period+=inc)
-       {
+    for(int seqSize=0;seqSize<=10;++seqSize){
+       for(int period=1,inc=Math.max(1,seqSize/10);;period+=inc){
          testArrSeqStackUncheckedremoveIfPredicateHelper(buildArrSeqStackUnchecked(seqSize,true,period),new BooleanMonitoredPredicate.RemoveAll(),null);
          testArrSeqStackUncheckedremoveIfPredicateHelper(buildArrSeqStackUnchecked(seqSize,false,period),new BooleanMonitoredPredicate.RemoveAll(),null);
          testArrSeqStackUncheckedremoveIfPredicateHelper(buildArrSeqStackUnchecked(seqSize,true,period),new BooleanMonitoredPredicate.RemoveNone(),null);
          testArrSeqStackUncheckedremoveIfPredicateHelper(buildArrSeqStackUnchecked(seqSize,false,period),new BooleanMonitoredPredicate.RemoveNone(),null);
          testArrSeqStackUncheckedremoveIfPredicateHelper(buildArrSeqStackUnchecked(seqSize,true,period),new BooleanMonitoredPredicate.NonThrowing(rand,0.5),null);
          testArrSeqStackUncheckedremoveIfPredicateHelper(buildArrSeqStackUnchecked(seqSize,false,period),new BooleanMonitoredPredicate.NonThrowing(rand,0.5),null);
+        if(period>seqSize)
+        {
+          break;
+        }
       }
     }
   }
-  private static void testArrSeqStackUncheckedremoveIfPredicateHelper(BooleanArrSeq.UncheckedStack seq,BooleanMonitoredPredicate pred,Class<? extends Throwable> expectedException)
-  {
+  private static void testArrSeqStackUncheckedremoveIfPredicateHelper(BooleanArrSeq.UncheckedStack seq,BooleanMonitoredPredicate pred,Class<? extends Throwable> expectedException){
     var clone=(BooleanArrSeq.UncheckedStack)seq.clone();
-    if(expectedException==null)
-    {
+    if(expectedException==null){
       int seqSize=seq.size();
       int trueCount=0;
-      for(var v:clone)
-      {
-        if(v)
-        {
+      for(var v:clone){
+        if(v){
           ++trueCount;
         }
       }
@@ -259,39 +217,30 @@ public class BooleanArrSeqRemoveIfTest
       boolean removedValsContainsTrue=pred.removedVals.contains(true);
       boolean removedValsContainsFalse=pred.removedVals.contains(false);
       Assertions.assertEquals(removedValsContainsTrue?removedValsContainsFalse?0:seqSize-trueCount:removedValsContainsFalse?trueCount:seqSize,seq.size());
-      if(removedValsContainsTrue)
-      {
+      if(removedValsContainsTrue){
         Assertions.assertFalse(seq.contains(true));
       }
-      if(removedValsContainsFalse)
-      {
+      if(removedValsContainsFalse){
         Assertions.assertFalse(seq.contains(false));
       }
-    }
-    else
-    {
+    }else{
       Assertions.assertThrows(expectedException,()->seq.removeIf((Predicate)pred));
-      if(ConcurrentModificationException.class.equals(expectedException))
-      {
+      if(ConcurrentModificationException.class.equals(expectedException)){
         Assertions.assertEquals(seq.size(),clone.size());
-        for(var val:clone)
-        {
+        for(var val:clone){
           Assertions.assertTrue(seq.contains(val));
         }
         return;
       }
       var cloneItr=clone.iterator();
       var seqItr=seq.iterator();
-      for(;;)
-      {
-        if(!cloneItr.hasNext())
-        {
+      for(;;){
+        if(!cloneItr.hasNext()){
           Assertions.assertFalse(seqItr.hasNext());
           return;
         }
         var v=cloneItr.nextBoolean();
-        if(expectedException==null && pred.removedVals.contains(v))
-        {
+        if(expectedException==null && pred.removedVals.contains(v)){
           continue;
         }
         Assertions.assertTrue(seqItr.hasNext());
@@ -312,11 +261,7 @@ public class BooleanArrSeqRemoveIfTest
       for(int i=0;i<seqSize;)
       {
         arr[i]=initVal;
-        if(++i==seqSize)
-        {
-          break;
-        }
-        if(i%period==0)
+        if((++i)%period==0)
         {
           initVal=!initVal;
         }
@@ -325,13 +270,10 @@ public class BooleanArrSeqRemoveIfTest
     return new BooleanArrSeq.CheckedStack(seqSize,arr);
   }
   @Test
-  public void testArrSeqStackCheckedremoveIfBooleanPredicate()
-  {
+  public void testArrSeqStackCheckedremoveIfBooleanPredicate(){
     Random rand=new Random(0);
-    for(int seqSize=0;seqSize<=10;++seqSize)
-    {
-       for(int period=1,inc=Math.max(1,seqSize/10);period<=seqSize;period+=inc)
-       {
+    for(int seqSize=0;seqSize<=10;++seqSize){
+       for(int period=1,inc=Math.max(1,seqSize/10);;period+=inc){
          testArrSeqStackCheckedremoveIfBooleanPredicateHelper(buildArrSeqStackChecked(seqSize,true,period),new BooleanMonitoredPredicate.RemoveAll(),null);
          testArrSeqStackCheckedremoveIfBooleanPredicateHelper(buildArrSeqStackChecked(seqSize,false,period),new BooleanMonitoredPredicate.RemoveAll(),null);
          testArrSeqStackCheckedremoveIfBooleanPredicateHelper(buildArrSeqStackChecked(seqSize,true,period),new BooleanMonitoredPredicate.RemoveNone(),null);
@@ -362,20 +304,20 @@ public class BooleanArrSeqRemoveIfTest
            var seq=buildArrSeqStackChecked(seqSize,false,period);
            testArrSeqStackCheckedremoveIfBooleanPredicateHelper(seq,new BooleanMonitoredPredicate.ModdingAndThrowing(rand,seq.contains(true)?seq.contains(false)?2:1:seq.contains(false)?1:0,seq),seqSize==0?null:ConcurrentModificationException.class);
          }
+        if(period>seqSize)
+        {
+          break;
+        }
       }
     }
   }
-  private static void testArrSeqStackCheckedremoveIfBooleanPredicateHelper(BooleanArrSeq.CheckedStack seq,BooleanMonitoredPredicate pred,Class<? extends Throwable> expectedException)
-  {
+  private static void testArrSeqStackCheckedremoveIfBooleanPredicateHelper(BooleanArrSeq.CheckedStack seq,BooleanMonitoredPredicate pred,Class<? extends Throwable> expectedException){
     var clone=(BooleanArrSeq.CheckedStack)seq.clone();
-    if(expectedException==null)
-    {
+    if(expectedException==null){
       int seqSize=seq.size();
       int trueCount=0;
-      for(var v:clone)
-      {
-        if(v)
-        {
+      for(var v:clone){
+        if(v){
           ++trueCount;
         }
       }
@@ -385,39 +327,30 @@ public class BooleanArrSeqRemoveIfTest
       boolean removedValsContainsTrue=pred.removedVals.contains(true);
       boolean removedValsContainsFalse=pred.removedVals.contains(false);
       Assertions.assertEquals(removedValsContainsTrue?removedValsContainsFalse?0:seqSize-trueCount:removedValsContainsFalse?trueCount:seqSize,seq.size());
-      if(removedValsContainsTrue)
-      {
+      if(removedValsContainsTrue){
         Assertions.assertFalse(seq.contains(true));
       }
-      if(removedValsContainsFalse)
-      {
+      if(removedValsContainsFalse){
         Assertions.assertFalse(seq.contains(false));
       }
-    }
-    else
-    {
+    }else{
       Assertions.assertThrows(expectedException,()->seq.removeIf((BooleanPredicate)pred));
-      if(ConcurrentModificationException.class.equals(expectedException))
-      {
+      if(ConcurrentModificationException.class.equals(expectedException)){
         Assertions.assertEquals(seq.size(),clone.size());
-        for(var val:clone)
-        {
+        for(var val:clone){
           Assertions.assertTrue(seq.contains(val));
         }
         return;
       }
       var cloneItr=clone.iterator();
       var seqItr=seq.iterator();
-      for(;;)
-      {
-        if(!cloneItr.hasNext())
-        {
+      for(;;){
+        if(!cloneItr.hasNext()){
           Assertions.assertFalse(seqItr.hasNext());
           return;
         }
         var v=cloneItr.nextBoolean();
-        if(expectedException==null && pred.removedVals.contains(v))
-        {
+        if(expectedException==null && pred.removedVals.contains(v)){
           continue;
         }
         Assertions.assertTrue(seqItr.hasNext());
@@ -426,13 +359,10 @@ public class BooleanArrSeqRemoveIfTest
     }
   }
   @Test
-  public void testArrSeqStackCheckedremoveIfPredicate()
-  {
+  public void testArrSeqStackCheckedremoveIfPredicate(){
     Random rand=new Random(0);
-    for(int seqSize=0;seqSize<=10;++seqSize)
-    {
-       for(int period=1,inc=Math.max(1,seqSize/10);period<=seqSize;period+=inc)
-       {
+    for(int seqSize=0;seqSize<=10;++seqSize){
+       for(int period=1,inc=Math.max(1,seqSize/10);;period+=inc){
          testArrSeqStackCheckedremoveIfPredicateHelper(buildArrSeqStackChecked(seqSize,true,period),new BooleanMonitoredPredicate.RemoveAll(),null);
          testArrSeqStackCheckedremoveIfPredicateHelper(buildArrSeqStackChecked(seqSize,false,period),new BooleanMonitoredPredicate.RemoveAll(),null);
          testArrSeqStackCheckedremoveIfPredicateHelper(buildArrSeqStackChecked(seqSize,true,period),new BooleanMonitoredPredicate.RemoveNone(),null);
@@ -463,20 +393,20 @@ public class BooleanArrSeqRemoveIfTest
            var seq=buildArrSeqStackChecked(seqSize,false,period);
            testArrSeqStackCheckedremoveIfPredicateHelper(seq,new BooleanMonitoredPredicate.ModdingAndThrowing(rand,seq.contains(true)?seq.contains(false)?2:1:seq.contains(false)?1:0,seq),seqSize==0?null:ConcurrentModificationException.class);
          }
+        if(period>seqSize)
+        {
+          break;
+        }
       }
     }
   }
-  private static void testArrSeqStackCheckedremoveIfPredicateHelper(BooleanArrSeq.CheckedStack seq,BooleanMonitoredPredicate pred,Class<? extends Throwable> expectedException)
-  {
+  private static void testArrSeqStackCheckedremoveIfPredicateHelper(BooleanArrSeq.CheckedStack seq,BooleanMonitoredPredicate pred,Class<? extends Throwable> expectedException){
     var clone=(BooleanArrSeq.CheckedStack)seq.clone();
-    if(expectedException==null)
-    {
+    if(expectedException==null){
       int seqSize=seq.size();
       int trueCount=0;
-      for(var v:clone)
-      {
-        if(v)
-        {
+      for(var v:clone){
+        if(v){
           ++trueCount;
         }
       }
@@ -486,39 +416,30 @@ public class BooleanArrSeqRemoveIfTest
       boolean removedValsContainsTrue=pred.removedVals.contains(true);
       boolean removedValsContainsFalse=pred.removedVals.contains(false);
       Assertions.assertEquals(removedValsContainsTrue?removedValsContainsFalse?0:seqSize-trueCount:removedValsContainsFalse?trueCount:seqSize,seq.size());
-      if(removedValsContainsTrue)
-      {
+      if(removedValsContainsTrue){
         Assertions.assertFalse(seq.contains(true));
       }
-      if(removedValsContainsFalse)
-      {
+      if(removedValsContainsFalse){
         Assertions.assertFalse(seq.contains(false));
       }
-    }
-    else
-    {
+    }else{
       Assertions.assertThrows(expectedException,()->seq.removeIf((Predicate)pred));
-      if(ConcurrentModificationException.class.equals(expectedException))
-      {
+      if(ConcurrentModificationException.class.equals(expectedException)){
         Assertions.assertEquals(seq.size(),clone.size());
-        for(var val:clone)
-        {
+        for(var val:clone){
           Assertions.assertTrue(seq.contains(val));
         }
         return;
       }
       var cloneItr=clone.iterator();
       var seqItr=seq.iterator();
-      for(;;)
-      {
-        if(!cloneItr.hasNext())
-        {
+      for(;;){
+        if(!cloneItr.hasNext()){
           Assertions.assertFalse(seqItr.hasNext());
           return;
         }
         var v=cloneItr.nextBoolean();
-        if(expectedException==null && pred.removedVals.contains(v))
-        {
+        if(expectedException==null && pred.removedVals.contains(v)){
           continue;
         }
         Assertions.assertTrue(seqItr.hasNext());
@@ -539,11 +460,7 @@ public class BooleanArrSeqRemoveIfTest
       for(int i=0;i<seqSize;)
       {
         arr[i]=initVal;
-        if(++i==seqSize)
-        {
-          break;
-        }
-        if(i%period==0)
+        if((++i)%period==0)
         {
           initVal=!initVal;
         }
@@ -552,33 +469,30 @@ public class BooleanArrSeqRemoveIfTest
     return new BooleanArrSeq.UncheckedList(seqSize,arr);
   }
   @Test
-  public void testArrSeqListUncheckedremoveIfBooleanPredicate()
-  {
+  public void testArrSeqListUncheckedremoveIfBooleanPredicate(){
     Random rand=new Random(0);
-    for(int seqSize=0;seqSize<=10;++seqSize)
-    {
-       for(int period=1,inc=Math.max(1,seqSize/10);period<=seqSize;period+=inc)
-       {
+    for(int seqSize=0;seqSize<=10;++seqSize){
+       for(int period=1,inc=Math.max(1,seqSize/10);;period+=inc){
          testArrSeqListUncheckedremoveIfBooleanPredicateHelper(buildArrSeqListUnchecked(seqSize,true,period),new BooleanMonitoredPredicate.RemoveAll(),null);
          testArrSeqListUncheckedremoveIfBooleanPredicateHelper(buildArrSeqListUnchecked(seqSize,false,period),new BooleanMonitoredPredicate.RemoveAll(),null);
          testArrSeqListUncheckedremoveIfBooleanPredicateHelper(buildArrSeqListUnchecked(seqSize,true,period),new BooleanMonitoredPredicate.RemoveNone(),null);
          testArrSeqListUncheckedremoveIfBooleanPredicateHelper(buildArrSeqListUnchecked(seqSize,false,period),new BooleanMonitoredPredicate.RemoveNone(),null);
          testArrSeqListUncheckedremoveIfBooleanPredicateHelper(buildArrSeqListUnchecked(seqSize,true,period),new BooleanMonitoredPredicate.NonThrowing(rand,0.5),null);
          testArrSeqListUncheckedremoveIfBooleanPredicateHelper(buildArrSeqListUnchecked(seqSize,false,period),new BooleanMonitoredPredicate.NonThrowing(rand,0.5),null);
+        if(period>seqSize)
+        {
+          break;
+        }
       }
     }
   }
-  private static void testArrSeqListUncheckedremoveIfBooleanPredicateHelper(BooleanArrSeq.UncheckedList seq,BooleanMonitoredPredicate pred,Class<? extends Throwable> expectedException)
-  {
+  private static void testArrSeqListUncheckedremoveIfBooleanPredicateHelper(BooleanArrSeq.UncheckedList seq,BooleanMonitoredPredicate pred,Class<? extends Throwable> expectedException){
     var clone=(BooleanArrSeq.UncheckedList)seq.clone();
-    if(expectedException==null)
-    {
+    if(expectedException==null){
       int seqSize=seq.size();
       int trueCount=0;
-      for(var v:clone)
-      {
-        if(v)
-        {
+      for(var v:clone){
+        if(v){
           ++trueCount;
         }
       }
@@ -587,39 +501,30 @@ public class BooleanArrSeqRemoveIfTest
       boolean removedValsContainsTrue=pred.removedVals.contains(true);
       boolean removedValsContainsFalse=pred.removedVals.contains(false);
       Assertions.assertEquals(removedValsContainsTrue?removedValsContainsFalse?0:seqSize-trueCount:removedValsContainsFalse?trueCount:seqSize,seq.size());
-      if(removedValsContainsTrue)
-      {
+      if(removedValsContainsTrue){
         Assertions.assertFalse(seq.contains(true));
       }
-      if(removedValsContainsFalse)
-      {
+      if(removedValsContainsFalse){
         Assertions.assertFalse(seq.contains(false));
       }
-    }
-    else
-    {
+    }else{
       Assertions.assertThrows(expectedException,()->seq.removeIf((BooleanPredicate)pred));
-      if(ConcurrentModificationException.class.equals(expectedException))
-      {
+      if(ConcurrentModificationException.class.equals(expectedException)){
         Assertions.assertEquals(seq.size(),clone.size());
-        for(var val:clone)
-        {
+        for(var val:clone){
           Assertions.assertTrue(seq.contains(val));
         }
         return;
       }
       var cloneItr=clone.iterator();
       var seqItr=seq.iterator();
-      for(;;)
-      {
-        if(!cloneItr.hasNext())
-        {
+      for(;;){
+        if(!cloneItr.hasNext()){
           Assertions.assertFalse(seqItr.hasNext());
           return;
         }
         var v=cloneItr.nextBoolean();
-        if(expectedException==null && pred.removedVals.contains(v))
-        {
+        if(expectedException==null && pred.removedVals.contains(v)){
           continue;
         }
         Assertions.assertTrue(seqItr.hasNext());
@@ -628,33 +533,30 @@ public class BooleanArrSeqRemoveIfTest
     }
   }
   @Test
-  public void testArrSeqListUncheckedremoveIfPredicate()
-  {
+  public void testArrSeqListUncheckedremoveIfPredicate(){
     Random rand=new Random(0);
-    for(int seqSize=0;seqSize<=10;++seqSize)
-    {
-       for(int period=1,inc=Math.max(1,seqSize/10);period<=seqSize;period+=inc)
-       {
+    for(int seqSize=0;seqSize<=10;++seqSize){
+       for(int period=1,inc=Math.max(1,seqSize/10);;period+=inc){
          testArrSeqListUncheckedremoveIfPredicateHelper(buildArrSeqListUnchecked(seqSize,true,period),new BooleanMonitoredPredicate.RemoveAll(),null);
          testArrSeqListUncheckedremoveIfPredicateHelper(buildArrSeqListUnchecked(seqSize,false,period),new BooleanMonitoredPredicate.RemoveAll(),null);
          testArrSeqListUncheckedremoveIfPredicateHelper(buildArrSeqListUnchecked(seqSize,true,period),new BooleanMonitoredPredicate.RemoveNone(),null);
          testArrSeqListUncheckedremoveIfPredicateHelper(buildArrSeqListUnchecked(seqSize,false,period),new BooleanMonitoredPredicate.RemoveNone(),null);
          testArrSeqListUncheckedremoveIfPredicateHelper(buildArrSeqListUnchecked(seqSize,true,period),new BooleanMonitoredPredicate.NonThrowing(rand,0.5),null);
          testArrSeqListUncheckedremoveIfPredicateHelper(buildArrSeqListUnchecked(seqSize,false,period),new BooleanMonitoredPredicate.NonThrowing(rand,0.5),null);
+        if(period>seqSize)
+        {
+          break;
+        }
       }
     }
   }
-  private static void testArrSeqListUncheckedremoveIfPredicateHelper(BooleanArrSeq.UncheckedList seq,BooleanMonitoredPredicate pred,Class<? extends Throwable> expectedException)
-  {
+  private static void testArrSeqListUncheckedremoveIfPredicateHelper(BooleanArrSeq.UncheckedList seq,BooleanMonitoredPredicate pred,Class<? extends Throwable> expectedException){
     var clone=(BooleanArrSeq.UncheckedList)seq.clone();
-    if(expectedException==null)
-    {
+    if(expectedException==null){
       int seqSize=seq.size();
       int trueCount=0;
-      for(var v:clone)
-      {
-        if(v)
-        {
+      for(var v:clone){
+        if(v){
           ++trueCount;
         }
       }
@@ -663,39 +565,30 @@ public class BooleanArrSeqRemoveIfTest
       boolean removedValsContainsTrue=pred.removedVals.contains(true);
       boolean removedValsContainsFalse=pred.removedVals.contains(false);
       Assertions.assertEquals(removedValsContainsTrue?removedValsContainsFalse?0:seqSize-trueCount:removedValsContainsFalse?trueCount:seqSize,seq.size());
-      if(removedValsContainsTrue)
-      {
+      if(removedValsContainsTrue){
         Assertions.assertFalse(seq.contains(true));
       }
-      if(removedValsContainsFalse)
-      {
+      if(removedValsContainsFalse){
         Assertions.assertFalse(seq.contains(false));
       }
-    }
-    else
-    {
+    }else{
       Assertions.assertThrows(expectedException,()->seq.removeIf((Predicate)pred));
-      if(ConcurrentModificationException.class.equals(expectedException))
-      {
+      if(ConcurrentModificationException.class.equals(expectedException)){
         Assertions.assertEquals(seq.size(),clone.size());
-        for(var val:clone)
-        {
+        for(var val:clone){
           Assertions.assertTrue(seq.contains(val));
         }
         return;
       }
       var cloneItr=clone.iterator();
       var seqItr=seq.iterator();
-      for(;;)
-      {
-        if(!cloneItr.hasNext())
-        {
+      for(;;){
+        if(!cloneItr.hasNext()){
           Assertions.assertFalse(seqItr.hasNext());
           return;
         }
         var v=cloneItr.nextBoolean();
-        if(expectedException==null && pred.removedVals.contains(v))
-        {
+        if(expectedException==null && pred.removedVals.contains(v)){
           continue;
         }
         Assertions.assertTrue(seqItr.hasNext());
@@ -716,11 +609,7 @@ public class BooleanArrSeqRemoveIfTest
       for(int i=0;i<seqSize;)
       {
         arr[i]=initVal;
-        if(++i==seqSize)
-        {
-          break;
-        }
-        if(i%period==0)
+        if((++i)%period==0)
         {
           initVal=!initVal;
         }
@@ -729,13 +618,10 @@ public class BooleanArrSeqRemoveIfTest
     return new BooleanArrSeq.CheckedList(seqSize,arr);
   }
   @Test
-  public void testArrSeqListCheckedremoveIfBooleanPredicate()
-  {
+  public void testArrSeqListCheckedremoveIfBooleanPredicate(){
     Random rand=new Random(0);
-    for(int seqSize=0;seqSize<=10;++seqSize)
-    {
-       for(int period=1,inc=Math.max(1,seqSize/10);period<=seqSize;period+=inc)
-       {
+    for(int seqSize=0;seqSize<=10;++seqSize){
+       for(int period=1,inc=Math.max(1,seqSize/10);;period+=inc){
          testArrSeqListCheckedremoveIfBooleanPredicateHelper(buildArrSeqListChecked(seqSize,true,period),new BooleanMonitoredPredicate.RemoveAll(),null);
          testArrSeqListCheckedremoveIfBooleanPredicateHelper(buildArrSeqListChecked(seqSize,false,period),new BooleanMonitoredPredicate.RemoveAll(),null);
          testArrSeqListCheckedremoveIfBooleanPredicateHelper(buildArrSeqListChecked(seqSize,true,period),new BooleanMonitoredPredicate.RemoveNone(),null);
@@ -766,20 +652,20 @@ public class BooleanArrSeqRemoveIfTest
            var seq=buildArrSeqListChecked(seqSize,false,period);
            testArrSeqListCheckedremoveIfBooleanPredicateHelper(seq,new BooleanMonitoredPredicate.ModdingAndThrowing(rand,seq.contains(true)?seq.contains(false)?2:1:seq.contains(false)?1:0,seq),seqSize==0?null:ConcurrentModificationException.class);
          }
+        if(period>seqSize)
+        {
+          break;
+        }
       }
     }
   }
-  private static void testArrSeqListCheckedremoveIfBooleanPredicateHelper(BooleanArrSeq.CheckedList seq,BooleanMonitoredPredicate pred,Class<? extends Throwable> expectedException)
-  {
+  private static void testArrSeqListCheckedremoveIfBooleanPredicateHelper(BooleanArrSeq.CheckedList seq,BooleanMonitoredPredicate pred,Class<? extends Throwable> expectedException){
     var clone=(BooleanArrSeq.CheckedList)seq.clone();
-    if(expectedException==null)
-    {
+    if(expectedException==null){
       int seqSize=seq.size();
       int trueCount=0;
-      for(var v:clone)
-      {
-        if(v)
-        {
+      for(var v:clone){
+        if(v){
           ++trueCount;
         }
       }
@@ -789,39 +675,30 @@ public class BooleanArrSeqRemoveIfTest
       boolean removedValsContainsTrue=pred.removedVals.contains(true);
       boolean removedValsContainsFalse=pred.removedVals.contains(false);
       Assertions.assertEquals(removedValsContainsTrue?removedValsContainsFalse?0:seqSize-trueCount:removedValsContainsFalse?trueCount:seqSize,seq.size());
-      if(removedValsContainsTrue)
-      {
+      if(removedValsContainsTrue){
         Assertions.assertFalse(seq.contains(true));
       }
-      if(removedValsContainsFalse)
-      {
+      if(removedValsContainsFalse){
         Assertions.assertFalse(seq.contains(false));
       }
-    }
-    else
-    {
+    }else{
       Assertions.assertThrows(expectedException,()->seq.removeIf((BooleanPredicate)pred));
-      if(ConcurrentModificationException.class.equals(expectedException))
-      {
+      if(ConcurrentModificationException.class.equals(expectedException)){
         Assertions.assertEquals(seq.size(),clone.size());
-        for(var val:clone)
-        {
+        for(var val:clone){
           Assertions.assertTrue(seq.contains(val));
         }
         return;
       }
       var cloneItr=clone.iterator();
       var seqItr=seq.iterator();
-      for(;;)
-      {
-        if(!cloneItr.hasNext())
-        {
+      for(;;){
+        if(!cloneItr.hasNext()){
           Assertions.assertFalse(seqItr.hasNext());
           return;
         }
         var v=cloneItr.nextBoolean();
-        if(expectedException==null && pred.removedVals.contains(v))
-        {
+        if(expectedException==null && pred.removedVals.contains(v)){
           continue;
         }
         Assertions.assertTrue(seqItr.hasNext());
@@ -830,13 +707,10 @@ public class BooleanArrSeqRemoveIfTest
     }
   }
   @Test
-  public void testArrSeqListCheckedremoveIfPredicate()
-  {
+  public void testArrSeqListCheckedremoveIfPredicate(){
     Random rand=new Random(0);
-    for(int seqSize=0;seqSize<=10;++seqSize)
-    {
-       for(int period=1,inc=Math.max(1,seqSize/10);period<=seqSize;period+=inc)
-       {
+    for(int seqSize=0;seqSize<=10;++seqSize){
+       for(int period=1,inc=Math.max(1,seqSize/10);;period+=inc){
          testArrSeqListCheckedremoveIfPredicateHelper(buildArrSeqListChecked(seqSize,true,period),new BooleanMonitoredPredicate.RemoveAll(),null);
          testArrSeqListCheckedremoveIfPredicateHelper(buildArrSeqListChecked(seqSize,false,period),new BooleanMonitoredPredicate.RemoveAll(),null);
          testArrSeqListCheckedremoveIfPredicateHelper(buildArrSeqListChecked(seqSize,true,period),new BooleanMonitoredPredicate.RemoveNone(),null);
@@ -867,20 +741,20 @@ public class BooleanArrSeqRemoveIfTest
            var seq=buildArrSeqListChecked(seqSize,false,period);
            testArrSeqListCheckedremoveIfPredicateHelper(seq,new BooleanMonitoredPredicate.ModdingAndThrowing(rand,seq.contains(true)?seq.contains(false)?2:1:seq.contains(false)?1:0,seq),seqSize==0?null:ConcurrentModificationException.class);
          }
+        if(period>seqSize)
+        {
+          break;
+        }
       }
     }
   }
-  private static void testArrSeqListCheckedremoveIfPredicateHelper(BooleanArrSeq.CheckedList seq,BooleanMonitoredPredicate pred,Class<? extends Throwable> expectedException)
-  {
+  private static void testArrSeqListCheckedremoveIfPredicateHelper(BooleanArrSeq.CheckedList seq,BooleanMonitoredPredicate pred,Class<? extends Throwable> expectedException){
     var clone=(BooleanArrSeq.CheckedList)seq.clone();
-    if(expectedException==null)
-    {
+    if(expectedException==null){
       int seqSize=seq.size();
       int trueCount=0;
-      for(var v:clone)
-      {
-        if(v)
-        {
+      for(var v:clone){
+        if(v){
           ++trueCount;
         }
       }
@@ -890,39 +764,30 @@ public class BooleanArrSeqRemoveIfTest
       boolean removedValsContainsTrue=pred.removedVals.contains(true);
       boolean removedValsContainsFalse=pred.removedVals.contains(false);
       Assertions.assertEquals(removedValsContainsTrue?removedValsContainsFalse?0:seqSize-trueCount:removedValsContainsFalse?trueCount:seqSize,seq.size());
-      if(removedValsContainsTrue)
-      {
+      if(removedValsContainsTrue){
         Assertions.assertFalse(seq.contains(true));
       }
-      if(removedValsContainsFalse)
-      {
+      if(removedValsContainsFalse){
         Assertions.assertFalse(seq.contains(false));
       }
-    }
-    else
-    {
+    }else{
       Assertions.assertThrows(expectedException,()->seq.removeIf((Predicate)pred));
-      if(ConcurrentModificationException.class.equals(expectedException))
-      {
+      if(ConcurrentModificationException.class.equals(expectedException)){
         Assertions.assertEquals(seq.size(),clone.size());
-        for(var val:clone)
-        {
+        for(var val:clone){
           Assertions.assertTrue(seq.contains(val));
         }
         return;
       }
       var cloneItr=clone.iterator();
       var seqItr=seq.iterator();
-      for(;;)
-      {
-        if(!cloneItr.hasNext())
-        {
+      for(;;){
+        if(!cloneItr.hasNext()){
           Assertions.assertFalse(seqItr.hasNext());
           return;
         }
         var v=cloneItr.nextBoolean();
-        if(expectedException==null && pred.removedVals.contains(v))
-        {
+        if(expectedException==null && pred.removedVals.contains(v)){
           continue;
         }
         Assertions.assertTrue(seqItr.hasNext());
@@ -949,52 +814,45 @@ public class BooleanArrSeqRemoveIfTest
       {
         arr[i]=!initVal;
       }
-      for(int i=rootPreAlloc+parentPreAlloc;;)
+      for(int i=rootPreAlloc+parentPreAlloc;i<rootPreAlloc+parentPreAlloc+seqSize;)
       {
         arr[i]=initVal;
-        if(++i==rootPreAlloc+parentPreAlloc+seqSize)
-        {
-          break;
-        }
-        if(i%period==0)
+        if((++i)%period==0)
         {
           initVal=!initVal;
         }
       }
     }
-    return new BooleanArrSeq.CheckedList(rootSize,arr).subList(rootPreAlloc,parentPreAlloc+seqSize+parentPostAlloc).subList(parentPreAlloc,parentPreAlloc+seqSize);
+    return new BooleanArrSeq.UncheckedList(rootSize,arr).subList(rootPreAlloc,rootPreAlloc+parentPreAlloc+seqSize+parentPostAlloc).subList(parentPreAlloc,parentPreAlloc+seqSize);
   }
   @ParameterizedTest(name="BooleanArrSeq.UncheckedSubList rootPreAlloc={0},parentPreAlloc={1},parentPostAlloc={2},rootPostAlloc={3}")
   @MethodSource("subListAllocationArgumentProvider")
-  public void testArrSeqSubListUncheckedremoveIfBooleanPredicate(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc)
-  {
+  public void testArrSeqSubListUncheckedremoveIfBooleanPredicate(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
     Random rand=new Random(0);
-    for(int seqSize=0;seqSize<=10;++seqSize)
-    {
-       for(int period=1,inc=Math.max(1,seqSize/10);period<=seqSize;period+=inc)
-       {
+    for(int seqSize=0;seqSize<=10;++seqSize){
+       for(int period=1,inc=Math.max(1,seqSize/10);;period+=inc){
          testArrSeqSubListUncheckedremoveIfBooleanPredicateHelper(true,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,buildArrSeqSubListUnchecked(seqSize,true,period,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc),new BooleanMonitoredPredicate.RemoveAll(),null);
          testArrSeqSubListUncheckedremoveIfBooleanPredicateHelper(false,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,buildArrSeqSubListUnchecked(seqSize,false,period,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc),new BooleanMonitoredPredicate.RemoveAll(),null);
          testArrSeqSubListUncheckedremoveIfBooleanPredicateHelper(true,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,buildArrSeqSubListUnchecked(seqSize,true,period,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc),new BooleanMonitoredPredicate.RemoveNone(),null);
          testArrSeqSubListUncheckedremoveIfBooleanPredicateHelper(false,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,buildArrSeqSubListUnchecked(seqSize,false,period,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc),new BooleanMonitoredPredicate.RemoveNone(),null);
          testArrSeqSubListUncheckedremoveIfBooleanPredicateHelper(true,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,buildArrSeqSubListUnchecked(seqSize,true,period,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc),new BooleanMonitoredPredicate.NonThrowing(rand,0.5),null);
          testArrSeqSubListUncheckedremoveIfBooleanPredicateHelper(false,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,buildArrSeqSubListUnchecked(seqSize,false,period,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc),new BooleanMonitoredPredicate.NonThrowing(rand,0.5),null);
+        if(period>seqSize)
+        {
+          break;
+        }
       }
     }
   }
-  private static void testArrSeqSubListUncheckedremoveIfBooleanPredicateHelper(boolean initVal,int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc,OmniList.OfBoolean seq,BooleanMonitoredPredicate pred,Class<? extends Throwable> expectedException)
-  {
+  private static void testArrSeqSubListUncheckedremoveIfBooleanPredicateHelper(boolean initVal,int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc,OmniList.OfBoolean seq,BooleanMonitoredPredicate pred,Class<? extends Throwable> expectedException){
     var clone=(BooleanArrSeq.UncheckedList)seq.clone();
     int expectedSize;
     BooleanArrSeq.UncheckedList root;
-    if(expectedException==null)
-    {
+    if(expectedException==null){
       int seqSize=seq.size();
       int trueCount=0;
-      for(var v:clone)
-      {
-        if(v)
-        {
+      for(var v:clone){
+        if(v){
           ++trueCount;
         }
       }
@@ -1004,35 +862,27 @@ public class BooleanArrSeqRemoveIfTest
       boolean removedValsContainsFalse=pred.removedVals.contains(false);
       expectedSize=removedValsContainsTrue?removedValsContainsFalse?0:seqSize-trueCount:removedValsContainsFalse?trueCount:seqSize;
       Assertions.assertEquals(expectedSize,seq.size());
-      if(removedValsContainsTrue)
-      {
+      if(removedValsContainsTrue){
         Assertions.assertFalse(seq.contains(true));
       }
-      if(removedValsContainsFalse)
-      {
+      if(removedValsContainsFalse){
         Assertions.assertFalse(seq.contains(false));
       }
       root=assertUncheckedSubListIntegrity(result?1:0,parentPreAlloc+parentPostAlloc+expectedSize,seq);
-    }
-    else
-    {
+    }else{
       Assertions.assertThrows(expectedException,()->seq.removeIf((BooleanPredicate)pred));
-      if(ConcurrentModificationException.class.equals(expectedException))
-      {
+      if(ConcurrentModificationException.class.equals(expectedException)){
         return;
       }
       var cloneItr=clone.iterator();
       var seqItr=seq.iterator();
-      for(;;)
-      {
-        if(!cloneItr.hasNext())
-        {
+      for(;;){
+        if(!cloneItr.hasNext()){
           Assertions.assertFalse(seqItr.hasNext());
           break;
         }
         var v=cloneItr.nextBoolean();
-        if(expectedException==null && pred.removedVals.contains(v))
-        {
+        if(expectedException==null && pred.removedVals.contains(v)){
           continue;
         }
         Assertions.assertTrue(seqItr.hasNext());
@@ -1042,46 +892,41 @@ public class BooleanArrSeqRemoveIfTest
       root=assertUncheckedSubListIntegrity(0,parentPreAlloc+parentPostAlloc+expectedSize,seq);
     }
     Assertions.assertEquals(parentPreAlloc+parentPostAlloc+expectedSize+rootPreAlloc+rootPostAlloc,root.size);
-    for(int i=0,bound=rootPreAlloc+parentPreAlloc;i<bound;++i)
-    {
+    for(int i=0,bound=rootPreAlloc+parentPreAlloc;i<bound;++i){
       Assertions.assertEquals(!initVal,root.arr[i]);
     }
-    for(int i=rootPreAlloc+parentPreAlloc+expectedSize,bound=parentPreAlloc+parentPostAlloc+expectedSize+rootPreAlloc+rootPostAlloc;i<bound;++i)
-    {
+    for(int i=rootPreAlloc+parentPreAlloc+expectedSize,bound=parentPreAlloc+parentPostAlloc+expectedSize+rootPreAlloc+rootPostAlloc;i<bound;++i){
       Assertions.assertEquals(!initVal,root.arr[i]);
     }
   }
   @ParameterizedTest(name="BooleanArrSeq.UncheckedSubList rootPreAlloc={0},parentPreAlloc={1},parentPostAlloc={2},rootPostAlloc={3}")
   @MethodSource("subListAllocationArgumentProvider")
-  public void testArrSeqSubListUncheckedremoveIfPredicate(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc)
-  {
+  public void testArrSeqSubListUncheckedremoveIfPredicate(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
     Random rand=new Random(0);
-    for(int seqSize=0;seqSize<=10;++seqSize)
-    {
-       for(int period=1,inc=Math.max(1,seqSize/10);period<=seqSize;period+=inc)
-       {
+    for(int seqSize=0;seqSize<=10;++seqSize){
+       for(int period=1,inc=Math.max(1,seqSize/10);;period+=inc){
          testArrSeqSubListUncheckedremoveIfPredicateHelper(true,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,buildArrSeqSubListUnchecked(seqSize,true,period,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc),new BooleanMonitoredPredicate.RemoveAll(),null);
          testArrSeqSubListUncheckedremoveIfPredicateHelper(false,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,buildArrSeqSubListUnchecked(seqSize,false,period,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc),new BooleanMonitoredPredicate.RemoveAll(),null);
          testArrSeqSubListUncheckedremoveIfPredicateHelper(true,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,buildArrSeqSubListUnchecked(seqSize,true,period,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc),new BooleanMonitoredPredicate.RemoveNone(),null);
          testArrSeqSubListUncheckedremoveIfPredicateHelper(false,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,buildArrSeqSubListUnchecked(seqSize,false,period,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc),new BooleanMonitoredPredicate.RemoveNone(),null);
          testArrSeqSubListUncheckedremoveIfPredicateHelper(true,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,buildArrSeqSubListUnchecked(seqSize,true,period,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc),new BooleanMonitoredPredicate.NonThrowing(rand,0.5),null);
          testArrSeqSubListUncheckedremoveIfPredicateHelper(false,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,buildArrSeqSubListUnchecked(seqSize,false,period,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc),new BooleanMonitoredPredicate.NonThrowing(rand,0.5),null);
+        if(period>seqSize)
+        {
+          break;
+        }
       }
     }
   }
-  private static void testArrSeqSubListUncheckedremoveIfPredicateHelper(boolean initVal,int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc,OmniList.OfBoolean seq,BooleanMonitoredPredicate pred,Class<? extends Throwable> expectedException)
-  {
+  private static void testArrSeqSubListUncheckedremoveIfPredicateHelper(boolean initVal,int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc,OmniList.OfBoolean seq,BooleanMonitoredPredicate pred,Class<? extends Throwable> expectedException){
     var clone=(BooleanArrSeq.UncheckedList)seq.clone();
     int expectedSize;
     BooleanArrSeq.UncheckedList root;
-    if(expectedException==null)
-    {
+    if(expectedException==null){
       int seqSize=seq.size();
       int trueCount=0;
-      for(var v:clone)
-      {
-        if(v)
-        {
+      for(var v:clone){
+        if(v){
           ++trueCount;
         }
       }
@@ -1091,35 +936,27 @@ public class BooleanArrSeqRemoveIfTest
       boolean removedValsContainsFalse=pred.removedVals.contains(false);
       expectedSize=removedValsContainsTrue?removedValsContainsFalse?0:seqSize-trueCount:removedValsContainsFalse?trueCount:seqSize;
       Assertions.assertEquals(expectedSize,seq.size());
-      if(removedValsContainsTrue)
-      {
+      if(removedValsContainsTrue){
         Assertions.assertFalse(seq.contains(true));
       }
-      if(removedValsContainsFalse)
-      {
+      if(removedValsContainsFalse){
         Assertions.assertFalse(seq.contains(false));
       }
       root=assertUncheckedSubListIntegrity(result?1:0,parentPreAlloc+parentPostAlloc+expectedSize,seq);
-    }
-    else
-    {
+    }else{
       Assertions.assertThrows(expectedException,()->seq.removeIf((Predicate)pred));
-      if(ConcurrentModificationException.class.equals(expectedException))
-      {
+      if(ConcurrentModificationException.class.equals(expectedException)){
         return;
       }
       var cloneItr=clone.iterator();
       var seqItr=seq.iterator();
-      for(;;)
-      {
-        if(!cloneItr.hasNext())
-        {
+      for(;;){
+        if(!cloneItr.hasNext()){
           Assertions.assertFalse(seqItr.hasNext());
           break;
         }
         var v=cloneItr.nextBoolean();
-        if(expectedException==null && pred.removedVals.contains(v))
-        {
+        if(expectedException==null && pred.removedVals.contains(v)){
           continue;
         }
         Assertions.assertTrue(seqItr.hasNext());
@@ -1129,12 +966,10 @@ public class BooleanArrSeqRemoveIfTest
       root=assertUncheckedSubListIntegrity(0,parentPreAlloc+parentPostAlloc+expectedSize,seq);
     }
     Assertions.assertEquals(parentPreAlloc+parentPostAlloc+expectedSize+rootPreAlloc+rootPostAlloc,root.size);
-    for(int i=0,bound=rootPreAlloc+parentPreAlloc;i<bound;++i)
-    {
+    for(int i=0,bound=rootPreAlloc+parentPreAlloc;i<bound;++i){
       Assertions.assertEquals(!initVal,root.arr[i]);
     }
-    for(int i=rootPreAlloc+parentPreAlloc+expectedSize,bound=parentPreAlloc+parentPostAlloc+expectedSize+rootPreAlloc+rootPostAlloc;i<bound;++i)
-    {
+    for(int i=rootPreAlloc+parentPreAlloc+expectedSize,bound=parentPreAlloc+parentPostAlloc+expectedSize+rootPreAlloc+rootPostAlloc;i<bound;++i){
       Assertions.assertEquals(!initVal,root.arr[i]);
     }
   }
@@ -1157,30 +992,23 @@ public class BooleanArrSeqRemoveIfTest
       {
         arr[i]=!initVal;
       }
-      for(int i=rootPreAlloc+parentPreAlloc;;)
+      for(int i=rootPreAlloc+parentPreAlloc;i<rootPreAlloc+parentPreAlloc+seqSize;)
       {
         arr[i]=initVal;
-        if(++i==rootPreAlloc+parentPreAlloc+seqSize)
-        {
-          break;
-        }
-        if(i%period==0)
+        if((++i)%period==0)
         {
           initVal=!initVal;
         }
       }
     }
-    return new BooleanArrSeq.CheckedList(rootSize,arr).subList(rootPreAlloc,parentPreAlloc+seqSize+parentPostAlloc).subList(parentPreAlloc,parentPreAlloc+seqSize);
+    return new BooleanArrSeq.CheckedList(rootSize,arr).subList(rootPreAlloc,rootPreAlloc+parentPreAlloc+seqSize+parentPostAlloc).subList(parentPreAlloc,parentPreAlloc+seqSize);
   }
   @ParameterizedTest(name="BooleanArrSeq.CheckedSubList rootPreAlloc={0},parentPreAlloc={1},parentPostAlloc={2},rootPostAlloc={3}")
   @MethodSource("subListAllocationArgumentProvider")
-  public void testArrSeqSubListCheckedremoveIfBooleanPredicate(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc)
-  {
+  public void testArrSeqSubListCheckedremoveIfBooleanPredicate(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
     Random rand=new Random(0);
-    for(int seqSize=0;seqSize<=10;++seqSize)
-    {
-       for(int period=1,inc=Math.max(1,seqSize/10);period<=seqSize;period+=inc)
-       {
+    for(int seqSize=0;seqSize<=10;++seqSize){
+       for(int period=1,inc=Math.max(1,seqSize/10);;period+=inc){
          testArrSeqSubListCheckedremoveIfBooleanPredicateHelper(true,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,buildArrSeqSubListChecked(seqSize,true,period,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc),new BooleanMonitoredPredicate.RemoveAll(),null);
          testArrSeqSubListCheckedremoveIfBooleanPredicateHelper(false,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,buildArrSeqSubListChecked(seqSize,false,period,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc),new BooleanMonitoredPredicate.RemoveAll(),null);
          testArrSeqSubListCheckedremoveIfBooleanPredicateHelper(true,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,buildArrSeqSubListChecked(seqSize,true,period,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc),new BooleanMonitoredPredicate.RemoveNone(),null);
@@ -1243,22 +1071,22 @@ public class BooleanArrSeqRemoveIfTest
            var seq=buildArrSeqSubListChecked(seqSize,false,period,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc);
            testArrSeqSubListCheckedremoveIfBooleanPredicateHelper(false,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,seq,new BooleanMonitoredPredicate.ModdingAndThrowing(rand,seq.contains(true)?seq.contains(false)?2:1:seq.contains(false)?1:0,getRoot(seq)),seqSize==0?null:ConcurrentModificationException.class);
          }
+        if(period>seqSize)
+        {
+          break;
+        }
       }
     }
   }
-  private static void testArrSeqSubListCheckedremoveIfBooleanPredicateHelper(boolean initVal,int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc,OmniList.OfBoolean seq,BooleanMonitoredPredicate pred,Class<? extends Throwable> expectedException)
-  {
+  private static void testArrSeqSubListCheckedremoveIfBooleanPredicateHelper(boolean initVal,int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc,OmniList.OfBoolean seq,BooleanMonitoredPredicate pred,Class<? extends Throwable> expectedException){
     var clone=(BooleanArrSeq.CheckedList)seq.clone();
     int expectedSize;
     BooleanArrSeq.CheckedList root;
-    if(expectedException==null)
-    {
+    if(expectedException==null){
       int seqSize=seq.size();
       int trueCount=0;
-      for(var v:clone)
-      {
-        if(v)
-        {
+      for(var v:clone){
+        if(v){
           ++trueCount;
         }
       }
@@ -1268,35 +1096,27 @@ public class BooleanArrSeqRemoveIfTest
       boolean removedValsContainsFalse=pred.removedVals.contains(false);
       expectedSize=removedValsContainsTrue?removedValsContainsFalse?0:seqSize-trueCount:removedValsContainsFalse?trueCount:seqSize;
       Assertions.assertEquals(expectedSize,seq.size());
-      if(removedValsContainsTrue)
-      {
+      if(removedValsContainsTrue){
         Assertions.assertFalse(seq.contains(true));
       }
-      if(removedValsContainsFalse)
-      {
+      if(removedValsContainsFalse){
         Assertions.assertFalse(seq.contains(false));
       }
       root=assertCheckedSubListIntegrity(result?1:0,parentPreAlloc+parentPostAlloc+expectedSize,seq);
-    }
-    else
-    {
+    }else{
       Assertions.assertThrows(expectedException,()->seq.removeIf((BooleanPredicate)pred));
-      if(ConcurrentModificationException.class.equals(expectedException))
-      {
+      if(ConcurrentModificationException.class.equals(expectedException)){
         return;
       }
       var cloneItr=clone.iterator();
       var seqItr=seq.iterator();
-      for(;;)
-      {
-        if(!cloneItr.hasNext())
-        {
+      for(;;){
+        if(!cloneItr.hasNext()){
           Assertions.assertFalse(seqItr.hasNext());
           break;
         }
         var v=cloneItr.nextBoolean();
-        if(expectedException==null && pred.removedVals.contains(v))
-        {
+        if(expectedException==null && pred.removedVals.contains(v)){
           continue;
         }
         Assertions.assertTrue(seqItr.hasNext());
@@ -1306,24 +1126,19 @@ public class BooleanArrSeqRemoveIfTest
       root=assertCheckedSubListIntegrity(0,parentPreAlloc+parentPostAlloc+expectedSize,seq);
     }
     Assertions.assertEquals(parentPreAlloc+parentPostAlloc+expectedSize+rootPreAlloc+rootPostAlloc,root.size);
-    for(int i=0,bound=rootPreAlloc+parentPreAlloc;i<bound;++i)
-    {
+    for(int i=0,bound=rootPreAlloc+parentPreAlloc;i<bound;++i){
       Assertions.assertEquals(!initVal,root.arr[i]);
     }
-    for(int i=rootPreAlloc+parentPreAlloc+expectedSize,bound=parentPreAlloc+parentPostAlloc+expectedSize+rootPreAlloc+rootPostAlloc;i<bound;++i)
-    {
+    for(int i=rootPreAlloc+parentPreAlloc+expectedSize,bound=parentPreAlloc+parentPostAlloc+expectedSize+rootPreAlloc+rootPostAlloc;i<bound;++i){
       Assertions.assertEquals(!initVal,root.arr[i]);
     }
   }
   @ParameterizedTest(name="BooleanArrSeq.CheckedSubList rootPreAlloc={0},parentPreAlloc={1},parentPostAlloc={2},rootPostAlloc={3}")
   @MethodSource("subListAllocationArgumentProvider")
-  public void testArrSeqSubListCheckedremoveIfPredicate(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc)
-  {
+  public void testArrSeqSubListCheckedremoveIfPredicate(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
     Random rand=new Random(0);
-    for(int seqSize=0;seqSize<=10;++seqSize)
-    {
-       for(int period=1,inc=Math.max(1,seqSize/10);period<=seqSize;period+=inc)
-       {
+    for(int seqSize=0;seqSize<=10;++seqSize){
+       for(int period=1,inc=Math.max(1,seqSize/10);;period+=inc){
          testArrSeqSubListCheckedremoveIfPredicateHelper(true,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,buildArrSeqSubListChecked(seqSize,true,period,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc),new BooleanMonitoredPredicate.RemoveAll(),null);
          testArrSeqSubListCheckedremoveIfPredicateHelper(false,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,buildArrSeqSubListChecked(seqSize,false,period,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc),new BooleanMonitoredPredicate.RemoveAll(),null);
          testArrSeqSubListCheckedremoveIfPredicateHelper(true,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,buildArrSeqSubListChecked(seqSize,true,period,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc),new BooleanMonitoredPredicate.RemoveNone(),null);
@@ -1386,22 +1201,22 @@ public class BooleanArrSeqRemoveIfTest
            var seq=buildArrSeqSubListChecked(seqSize,false,period,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc);
            testArrSeqSubListCheckedremoveIfPredicateHelper(false,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,seq,new BooleanMonitoredPredicate.ModdingAndThrowing(rand,seq.contains(true)?seq.contains(false)?2:1:seq.contains(false)?1:0,getRoot(seq)),seqSize==0?null:ConcurrentModificationException.class);
          }
+        if(period>seqSize)
+        {
+          break;
+        }
       }
     }
   }
-  private static void testArrSeqSubListCheckedremoveIfPredicateHelper(boolean initVal,int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc,OmniList.OfBoolean seq,BooleanMonitoredPredicate pred,Class<? extends Throwable> expectedException)
-  {
+  private static void testArrSeqSubListCheckedremoveIfPredicateHelper(boolean initVal,int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc,OmniList.OfBoolean seq,BooleanMonitoredPredicate pred,Class<? extends Throwable> expectedException){
     var clone=(BooleanArrSeq.CheckedList)seq.clone();
     int expectedSize;
     BooleanArrSeq.CheckedList root;
-    if(expectedException==null)
-    {
+    if(expectedException==null){
       int seqSize=seq.size();
       int trueCount=0;
-      for(var v:clone)
-      {
-        if(v)
-        {
+      for(var v:clone){
+        if(v){
           ++trueCount;
         }
       }
@@ -1411,35 +1226,27 @@ public class BooleanArrSeqRemoveIfTest
       boolean removedValsContainsFalse=pred.removedVals.contains(false);
       expectedSize=removedValsContainsTrue?removedValsContainsFalse?0:seqSize-trueCount:removedValsContainsFalse?trueCount:seqSize;
       Assertions.assertEquals(expectedSize,seq.size());
-      if(removedValsContainsTrue)
-      {
+      if(removedValsContainsTrue){
         Assertions.assertFalse(seq.contains(true));
       }
-      if(removedValsContainsFalse)
-      {
+      if(removedValsContainsFalse){
         Assertions.assertFalse(seq.contains(false));
       }
       root=assertCheckedSubListIntegrity(result?1:0,parentPreAlloc+parentPostAlloc+expectedSize,seq);
-    }
-    else
-    {
+    }else{
       Assertions.assertThrows(expectedException,()->seq.removeIf((Predicate)pred));
-      if(ConcurrentModificationException.class.equals(expectedException))
-      {
+      if(ConcurrentModificationException.class.equals(expectedException)){
         return;
       }
       var cloneItr=clone.iterator();
       var seqItr=seq.iterator();
-      for(;;)
-      {
-        if(!cloneItr.hasNext())
-        {
+      for(;;){
+        if(!cloneItr.hasNext()){
           Assertions.assertFalse(seqItr.hasNext());
           break;
         }
         var v=cloneItr.nextBoolean();
-        if(expectedException==null && pred.removedVals.contains(v))
-        {
+        if(expectedException==null && pred.removedVals.contains(v)){
           continue;
         }
         Assertions.assertTrue(seqItr.hasNext());
@@ -1449,17 +1256,14 @@ public class BooleanArrSeqRemoveIfTest
       root=assertCheckedSubListIntegrity(0,parentPreAlloc+parentPostAlloc+expectedSize,seq);
     }
     Assertions.assertEquals(parentPreAlloc+parentPostAlloc+expectedSize+rootPreAlloc+rootPostAlloc,root.size);
-    for(int i=0,bound=rootPreAlloc+parentPreAlloc;i<bound;++i)
-    {
+    for(int i=0,bound=rootPreAlloc+parentPreAlloc;i<bound;++i){
       Assertions.assertEquals(!initVal,root.arr[i]);
     }
-    for(int i=rootPreAlloc+parentPreAlloc+expectedSize,bound=parentPreAlloc+parentPostAlloc+expectedSize+rootPreAlloc+rootPostAlloc;i<bound;++i)
-    {
+    for(int i=rootPreAlloc+parentPreAlloc+expectedSize,bound=parentPreAlloc+parentPostAlloc+expectedSize+rootPreAlloc+rootPostAlloc;i<bound;++i){
       Assertions.assertEquals(!initVal,root.arr[i]);
     }
   }
-  static Stream<Arguments> subListAllocationArgumentProvider()
-  {
+  static Stream<Arguments> subListAllocationArgumentProvider(){
     Arguments[] args=new Arguments[16];
     args[0]=Arguments.of(0,0,0,0);
     args[1]=Arguments.of(0,0,0,5);
