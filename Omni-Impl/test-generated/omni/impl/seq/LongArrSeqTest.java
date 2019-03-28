@@ -4,4533 +4,18469 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import java.util.function.IntFunction;
 import java.util.function.Consumer;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
+import org.junit.jupiter.params.provider.Arguments;
+import java.util.stream.Stream;
+//IF OfInt,OfLong,OfDouble
 import java.util.function.LongConsumer;
+//ENDIF
 import java.util.ConcurrentModificationException;
 import omni.util.OmniArray;
+import omni.api.OmniList;
+import omni.api.OmniStack;
 @SuppressWarnings({"rawtypes","unchecked"}) 
 public class LongArrSeqTest{
-  @Test
-  public void testUncheckedStackconstructor_void_initialCapacityDEFAULT(){
-    var seq=new LongArrSeq.UncheckedStack();
-    Assertions.assertEquals(0,seq.size);
-    Assertions.assertSame(OmniArray.OfLong.DEFAULT_ARR,seq.arr);
-  }
-  @Test
-  public void testUncheckedStackconstructor_intlong_initialCapacityNULL(){
-    var seq=new LongArrSeq.UncheckedStack(0,null);
-    Assertions.assertEquals(0,seq.size);
-    Assertions.assertNull(seq.arr);
-  }
-  @Test
-  public void testUncheckedStackconstructor_int_initialCapacity50(){
-    var seq=new LongArrSeq.UncheckedStack(50);
-    Assertions.assertEquals(0,seq.size);
-    switch(50){
-    case 0:
-      Assertions.assertNull(seq.arr);
-      break;
-    case OmniArray.DEFAULT_ARR_SEQ_CAP:
-      Assertions.assertSame(OmniArray.OfLong.DEFAULT_ARR,seq.arr);
-      break;
-    default:
-      Assertions.assertNotNull(seq.arr);
-      Assertions.assertEquals(50,seq.arr.length);
-    }
-  }
-  @Test
-  public void testUncheckedStackconstructor_int_initialCapacity0(){
-    var seq=new LongArrSeq.UncheckedStack(0);
-    Assertions.assertEquals(0,seq.size);
-    switch(0){
-    case 0:
-      Assertions.assertNull(seq.arr);
-      break;
-    case OmniArray.DEFAULT_ARR_SEQ_CAP:
-      Assertions.assertSame(OmniArray.OfLong.DEFAULT_ARR,seq.arr);
-      break;
-    default:
-      Assertions.assertNotNull(seq.arr);
-      Assertions.assertEquals(0,seq.arr.length);
-    }
-  }
-  @Test
-  public void testUncheckedStackconstructor_int_initialCapacity10(){
-    var seq=new LongArrSeq.UncheckedStack(10);
-    Assertions.assertEquals(0,seq.size);
-    switch(10){
-    case 0:
-      Assertions.assertNull(seq.arr);
-      break;
-    case OmniArray.DEFAULT_ARR_SEQ_CAP:
-      Assertions.assertSame(OmniArray.OfLong.DEFAULT_ARR,seq.arr);
-      break;
-    default:
-      Assertions.assertNotNull(seq.arr);
-      Assertions.assertEquals(10,seq.arr.length);
-    }
-  }
-  @Test
-  public void testUncheckedStackClone_initialCapacityDEFAULT_seqIsEmpty()
-  {
-    var seq=new LongArrSeq.UncheckedStack();
-    var clone=(LongArrSeq.UncheckedStack)seq.clone();
-    Assertions.assertEquals(0,clone.size());
-    Assertions.assertEquals(0,seq.size());
-    Assertions.assertSame(clone.arr,OmniArray.OfLong.DEFAULT_ARR);
-  }
-  @Test
-  public void testUncheckedStackClone_initialCapacityDEFAULT_seqIsNotEmpty()
-  {
-    var seq=new LongArrSeq.UncheckedStack();
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTolong(i)));
-    }
-    var clone=(LongArrSeq.UncheckedStack)seq.clone();
-    Assertions.assertEquals(100,clone.size());
-    Assertions.assertEquals(100,seq.size());
-    Assertions.assertNotSame(seq.arr,clone.arr);
-    for(int i=0;i<100;++i)
+  private static void verifyAscendingSpanlong(long[] arr,int offset,int bound,int loVal)
     {
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),clone.arr[i]);
+      for(int i=offset;i<bound;++i,++loVal)
+      {
+        Assertions.assertEquals(TypeConversionUtil.convertTolong(loVal),arr[i]);
+      }
     }
-  }
-  @Test
-  public void testUncheckedStackClone_initialCapacityNULL_seqIsEmpty()
-  {
-    var seq=new LongArrSeq.UncheckedStack(0,null);
-    var clone=(LongArrSeq.UncheckedStack)seq.clone();
-    Assertions.assertEquals(0,clone.size());
-    Assertions.assertEquals(0,seq.size());
-    Assertions.assertSame(clone.arr,OmniArray.OfLong.DEFAULT_ARR);
-  }
-  @Test
-  public void testUncheckedStackClone_initialCapacityNULL_seqIsNotEmpty()
-  {
-    var seq=new LongArrSeq.UncheckedStack(0,null);
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTolong(i)));
-    }
-    var clone=(LongArrSeq.UncheckedStack)seq.clone();
-    Assertions.assertEquals(100,clone.size());
-    Assertions.assertEquals(100,seq.size());
-    Assertions.assertNotSame(seq.arr,clone.arr);
-    for(int i=0;i<100;++i)
+//IF OfBoolean,OfRef
+  private static void verifyAscendingSpanlongboolean(long[] arr,int offset,int bound,int loVal)
     {
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),clone.arr[i]);
+      for(int i=offset;i<bound;++i,++loVal)
+      {
+        Assertions.assertEquals(TypeConversionUtil.convertTolongboolean(loVal),arr[i]);
+      }
     }
-  }
+//ENDIF
+//IF STRUCT==Stack,List
   @Test
-  public void testUncheckedStackClone_initialCapacity50_seqIsEmpty()
+  public void testUncheckedListConstructor_happyPath()
   {
-    var seq=new LongArrSeq.UncheckedStack(50);
-    var clone=(LongArrSeq.UncheckedStack)seq.clone();
-    Assertions.assertEquals(0,clone.size());
-    Assertions.assertEquals(0,seq.size());
-    Assertions.assertSame(clone.arr,OmniArray.OfLong.DEFAULT_ARR);
-  }
-  @Test
-  public void testUncheckedStackClone_initialCapacity50_seqIsNotEmpty()
-  {
-    var seq=new LongArrSeq.UncheckedStack(50);
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTolong(i)));
-    }
-    var clone=(LongArrSeq.UncheckedStack)seq.clone();
-    Assertions.assertEquals(100,clone.size());
-    Assertions.assertEquals(100,seq.size());
-    Assertions.assertNotSame(seq.arr,clone.arr);
-    for(int i=0;i<100;++i)
-    {
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),clone.arr[i]);
-    }
-  }
-  @Test
-  public void testUncheckedStackClone_initialCapacity0_seqIsEmpty()
-  {
-    var seq=new LongArrSeq.UncheckedStack(0);
-    var clone=(LongArrSeq.UncheckedStack)seq.clone();
-    Assertions.assertEquals(0,clone.size());
-    Assertions.assertEquals(0,seq.size());
-    Assertions.assertSame(clone.arr,OmniArray.OfLong.DEFAULT_ARR);
-  }
-  @Test
-  public void testUncheckedStackClone_initialCapacity0_seqIsNotEmpty()
-  {
-    var seq=new LongArrSeq.UncheckedStack(0);
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTolong(i)));
-    }
-    var clone=(LongArrSeq.UncheckedStack)seq.clone();
-    Assertions.assertEquals(100,clone.size());
-    Assertions.assertEquals(100,seq.size());
-    Assertions.assertNotSame(seq.arr,clone.arr);
-    for(int i=0;i<100;++i)
-    {
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),clone.arr[i]);
-    }
-  }
-  @Test
-  public void testUncheckedStackClone_initialCapacity10_seqIsEmpty()
-  {
-    var seq=new LongArrSeq.UncheckedStack(10);
-    var clone=(LongArrSeq.UncheckedStack)seq.clone();
-    Assertions.assertEquals(0,clone.size());
-    Assertions.assertEquals(0,seq.size());
-    Assertions.assertSame(clone.arr,OmniArray.OfLong.DEFAULT_ARR);
-  }
-  @Test
-  public void testUncheckedStackClone_initialCapacity10_seqIsNotEmpty()
-  {
-    var seq=new LongArrSeq.UncheckedStack(10);
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTolong(i)));
-    }
-    var clone=(LongArrSeq.UncheckedStack)seq.clone();
-    Assertions.assertEquals(100,clone.size());
-    Assertions.assertEquals(100,seq.size());
-    Assertions.assertNotSame(seq.arr,clone.arr);
-    for(int i=0;i<100;++i)
-    {
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),clone.arr[i]);
-    }
-  }
-  @Test
-  public void testUncheckedStacktoArray_ObjectArray_zeroLengthArrayAndSequenceIsEmpty(){
-    var seq=new LongArrSeq.UncheckedStack();
-    Long[] paramArr=new Long[0];
-    var result=seq.toArray(paramArr);
-    Assertions.assertEquals(0,seq.size());
-    Assertions.assertEquals(0,result.length);
-    Assertions.assertNotSame(seq.arr,result);
-    Assertions.assertSame(paramArr,result);
-  }
-  @Test
-  public void testUncheckedStacktoArray_ObjectArray_zeroLengthArrayAndSequenceNotEmpty(){
-    var seq=new LongArrSeq.UncheckedStack();
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTolong(i)));
-    }
-    Long[] paramArr=new Long[0];
-    var result=seq.toArray(paramArr);
-    Assertions.assertEquals(100,seq.size());
-    Assertions.assertEquals(100,result.length);
-    Assertions.assertNotSame(seq.arr,result);
-    Assertions.assertNotSame(paramArr,result);
-    var itr=seq.iterator();
-    for(int i=0;i<100;++i){
-      Assertions.assertEquals(itr.next(),result[i]);
-    }
-  }
-  @Test
-  public void testUncheckedStacktoArray_ObjectArray_nonzeroLengthArrayAndSequenceIsEmpty(){
-    var seq=new LongArrSeq.UncheckedStack();
-    Long[] paramArr=new Long[5];
-    for(int i=0;i<paramArr.length;++i){
-      paramArr[i]=TypeConversionUtil.convertTolong(paramArr.length);
-    }
-    var result=seq.toArray(paramArr);
-    Assertions.assertEquals(0,seq.size());
-    Assertions.assertEquals(5,result.length);
-    Assertions.assertNotSame(seq.arr,result);
-    Assertions.assertSame(paramArr,result);
-    Assertions.assertNull(result[0]);
-    for(int i=1;i<result.length;++i){
-      Assertions.assertEquals((Object)TypeConversionUtil.convertTolong(paramArr.length),result[i]);
-    }
-  }
-  @Test
-  public void testUncheckedStacktoArray_ObjectArray_overSizedArray(){
-    var seq=new LongArrSeq.UncheckedStack();
-    Long[] paramArr=new Long[10];
-    for(int i=0;i<paramArr.length;++i){
-      paramArr[i]=TypeConversionUtil.convertTolong(paramArr.length);
-    }
-    for(int i=0;i<5;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTolong(i)));
-    }
-    var result=seq.toArray(paramArr);
-    Assertions.assertEquals(5,seq.size());
-    Assertions.assertEquals(10,result.length);
-    Assertions.assertNotSame(seq.arr,result);
-    Assertions.assertSame(paramArr,result);
-    var itr=seq.iterator();
-    for(int i=0;i<5;++i){
-      Assertions.assertEquals(itr.next(),result[i]);
-    }
-    Assertions.assertNull(result[5]);
-    for(int i=6;i<result.length;++i){
-      Assertions.assertEquals((Object)TypeConversionUtil.convertTolong(paramArr.length),result[i]);
-    }
-  }
-  @Test
-  public void testUncheckedStacktoArray_ObjectArray_undersizedArray(){
-    var seq=new LongArrSeq.UncheckedStack();
-    Long[] paramArr=new Long[5];
-    for(int i=0;i<paramArr.length;++i){
-      paramArr[i]=TypeConversionUtil.convertTolong(10);
-    }
-    for(int i=0;i<10;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTolong(i)));
-    }
-    var result=seq.toArray(paramArr);
-    Assertions.assertEquals(10,seq.size());
-    Assertions.assertEquals(10,result.length);
-    Assertions.assertNotSame(seq.arr,result);
-    Assertions.assertNotSame(paramArr,result);
-    var itr=seq.iterator();
-    for(int i=0;i<10;++i){
-      Assertions.assertEquals(itr.next(),result[i]);
-    }
-  }
-  @Test
-  public void testUncheckedStacktoArray_ObjectArray_exactSizeArray(){
-    var seq=new LongArrSeq.UncheckedStack();
-    Long[] paramArr=new Long[5];
-    for(int i=0;i<paramArr.length;++i){
-      paramArr[i]=TypeConversionUtil.convertTolong(5);
-    }
-    for(int i=0;i<5;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTolong(i)));
-    }
-    var result=seq.toArray(paramArr);
-    Assertions.assertEquals(5,seq.size());
-    Assertions.assertEquals(5,result.length);
-    Assertions.assertNotSame(seq.arr,result);
-    Assertions.assertSame(paramArr,result);
-    var itr=seq.iterator();
-    for(int i=0;i<5;++i){
-      Assertions.assertEquals(itr.next(),result[i]);
-    }
-  }
-  @Test
-  public void testUncheckedStacktoArray_IntFunction_seqIsEmpty_nonMod(){
-    var seq=new LongArrSeq.UncheckedStack();
-    IntFunction<Long[]> arrConstructor=Long[]::new;
-    var result=seq.toArray(arrConstructor);
-    Assertions.assertEquals(0,seq.size());
-    Assertions.assertNotSame(seq.arr,result);
-    Assertions.assertEquals(0,result.length);
-  }
-  @Test
-  public void testUncheckedStacktoArray_IntFunction_seqIsNotEmpty_nonMod(){
-    var seq=new LongArrSeq.UncheckedStack();
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTolong(i)));
-    }
-    IntFunction<Long[]> arrConstructor=Long[]::new;
-    var result=seq.toArray(arrConstructor);
-    Assertions.assertEquals(100,seq.size());
-    Assertions.assertNotSame(seq.arr,result);
-    Assertions.assertEquals(100,result.length);
-    var itr=seq.iterator();
-    for(int i=0;i<100;++i){
-      Assertions.assertEquals(itr.next(),result[i]);
-    }
-  }
-  @Test
-  public void testUncheckedStackclear_void_seqIsEmpty(){
-    var seq=new LongArrSeq.UncheckedStack();
-    seq.clear();
-    Assertions.assertTrue(seq.isEmpty());
-  }
-  @Test
-  public void testUncheckedStackclear_void_seqIsNotEmpty(){
-    var seq=new LongArrSeq.UncheckedStack();
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTolong(i)));
-    }
-    seq.clear();
-    Assertions.assertTrue(seq.isEmpty());
-    for(int i=0;i<100;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),seq.arr[i]);
-    }
-  }
-  @Test
-  public void testUncheckedStackisEmpty_void_seqIsEmpty(){
-    var seq=new LongArrSeq.UncheckedStack();
-    Assertions.assertTrue(seq.isEmpty());
-  }
-  @Test
-  public void testUncheckedStackisEmpty_void_seqIsNotEmpty(){
-    var seq=new LongArrSeq.UncheckedStack();
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTolong(i)));
-    }
-    Assertions.assertFalse(seq.isEmpty());
-  }
-  @Test
-  public void testUncheckedStackisEmpty_void_seqIsBeingCleared(){
-    var seq=new LongArrSeq.UncheckedStack();
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTolong(i)));
-    }
-    var itr=seq.iterator();
-    for(int i=100;--i>=0;){
-      Assertions.assertFalse(seq.isEmpty());
-      itr.nextLong();
-      itr.remove();
-    }
-    Assertions.assertTrue(seq.isEmpty());
-  }
-  @Test
-  public void testUncheckedStacksize_void_seqIsEmpty(){
-    var seq=new LongArrSeq.UncheckedStack();
-    Assertions.assertEquals(0,seq.size);
-    Assertions.assertEquals(seq.size,seq.size());
-  }
-  @Test
-  public void testUncheckedStacksize_void_seqIsNotEmpty(){
-    var seq=new LongArrSeq.UncheckedStack();
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTolong(i)));
-    }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertEquals(seq.size,seq.size());
-  }
-  @Test
-  public void testUncheckedStacksize_void_seqIsBeingCleared(){
-    var seq=new LongArrSeq.UncheckedStack();
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTolong(i)));
-    }
-    var itr=seq.iterator();
-    for(int i=100;--i>=0;){
-      itr.nextLong();
-      itr.remove();
-      Assertions.assertEquals(i,seq.size());
-    }
-  }
-  @Test
-  public void testUncheckedStackforEach_Consumer_SeqIsEmpty_NoMod(){
-    var seq=new LongArrSeq.UncheckedStack();
-    var consumer=new LongMonitoredConsumer();
-    seq.forEach((Consumer)consumer);
-    Assertions.assertEquals(0,seq.size());
-    Assertions.assertTrue(consumer.isEmpty());
-  }
-  @Test
-  public void testUncheckedStackforEach_Consumer_SeqIsNotEmpty_NoMod(){
-    var seq=new LongArrSeq.UncheckedStack();
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTolong(i)));
-    }
-    var consumer=new LongMonitoredConsumer();
-    seq.forEach((Consumer)consumer);
-    Assertions.assertEquals(100,seq.size());
-    Assertions.assertEquals(100,consumer.size());
-    var seqIterator=seq.iterator();
-    var consumerIterator=consumer.iterator();
-    for(int i=0;i<100;++i)
-    {
-      Assertions.assertEquals(consumerIterator.next(),seqIterator.next());
-    }
-  }
-  @Test
-  public void testUncheckedStackforEach_LongConsumer_SeqIsEmpty_NoMod(){
-    var seq=new LongArrSeq.UncheckedStack();
-    var consumer=new LongMonitoredConsumer();
-    seq.forEach((LongConsumer)consumer);
-    Assertions.assertEquals(0,seq.size());
-    Assertions.assertTrue(consumer.isEmpty());
-  }
-  @Test
-  public void testUncheckedStackforEach_LongConsumer_SeqIsNotEmpty_NoMod(){
-    var seq=new LongArrSeq.UncheckedStack();
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTolong(i)));
-    }
-    var consumer=new LongMonitoredConsumer();
-    seq.forEach((LongConsumer)consumer);
-    Assertions.assertEquals(100,seq.size());
-    Assertions.assertEquals(100,consumer.size());
-    var seqIterator=seq.iterator();
-    var consumerIterator=consumer.iterator();
-    for(int i=0;i<100;++i)
-    {
-      Assertions.assertEquals(consumerIterator.next(),seqIterator.next());
-    }
-  }
-  @Test
-  public void testUncheckedStackadd_long_initialCapacityDEFAULT(){
-    var seq=new LongArrSeq.UncheckedStack();
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTolong(i)));
-    }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),seq.arr[i]);
-    }
-  }
-  @Test
-  public void testUncheckedStackadd_long_initialCapacityNULL(){
-    var seq=new LongArrSeq.UncheckedStack(0,null);
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTolong(i)));
-    }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),seq.arr[i]);
-    }
-  }
-  @Test
-  public void testUncheckedStackadd_long_initialCapacity50(){
-    var seq=new LongArrSeq.UncheckedStack(50);
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTolong(i)));
-    }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),seq.arr[i]);
-    }
-  }
-  @Test
-  public void testUncheckedStackadd_Long_initialCapacityDEFAULT(){
-    var seq=new LongArrSeq.UncheckedStack();
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToLong(i)));
-    }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),seq.arr[i]);
-    }
-  }
-  @Test
-  public void testUncheckedStackadd_Long_initialCapacityNULL(){
-    var seq=new LongArrSeq.UncheckedStack(0,null);
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToLong(i)));
-    }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),seq.arr[i]);
-    }
-  }
-  @Test
-  public void testUncheckedStackadd_Long_initialCapacity50(){
-    var seq=new LongArrSeq.UncheckedStack(50);
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToLong(i)));
-    }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),seq.arr[i]);
-    }
-  }
-  @Test
-  public void testUncheckedStackadd_boolean_initialCapacityDEFAULT(){
-    var seq=new LongArrSeq.UncheckedStack();
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
-    }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolongboolean(i),seq.arr[i]);
-    }
-  }
-  @Test
-  public void testUncheckedStackadd_boolean_initialCapacityNULL(){
-    var seq=new LongArrSeq.UncheckedStack(0,null);
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
-    }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolongboolean(i),seq.arr[i]);
-    }
-  }
-  @Test
-  public void testUncheckedStackadd_boolean_initialCapacity50(){
-    var seq=new LongArrSeq.UncheckedStack(50);
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
-    }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolongboolean(i),seq.arr[i]);
-    }
-  }
-  @Test
-  public void testUncheckedStackadd_Boolean_initialCapacityDEFAULT(){
-    var seq=new LongArrSeq.UncheckedStack();
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToBoolean(i)));
-    }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolongboolean(i),seq.arr[i]);
-    }
-  }
-  @Test
-  public void testUncheckedStackadd_Boolean_initialCapacityNULL(){
-    var seq=new LongArrSeq.UncheckedStack(0,null);
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToBoolean(i)));
-    }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolongboolean(i),seq.arr[i]);
-    }
-  }
-  @Test
-  public void testUncheckedStackadd_Boolean_initialCapacity50(){
-    var seq=new LongArrSeq.UncheckedStack(50);
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToBoolean(i)));
-    }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolongboolean(i),seq.arr[i]);
-    }
-  }
-  @Test
-  public void testUncheckedStackadd_byte_initialCapacityDEFAULT(){
-    var seq=new LongArrSeq.UncheckedStack();
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTobyte(i)));
-    }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),seq.arr[i]);
-    }
-  }
-  @Test
-  public void testUncheckedStackadd_byte_initialCapacityNULL(){
-    var seq=new LongArrSeq.UncheckedStack(0,null);
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTobyte(i)));
-    }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),seq.arr[i]);
-    }
-  }
-  @Test
-  public void testUncheckedStackadd_byte_initialCapacity50(){
-    var seq=new LongArrSeq.UncheckedStack(50);
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTobyte(i)));
-    }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),seq.arr[i]);
-    }
-  }
-  @Test
-  public void testUncheckedStackadd_Byte_initialCapacityDEFAULT(){
-    var seq=new LongArrSeq.UncheckedStack();
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToByte(i)));
-    }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),seq.arr[i]);
-    }
-  }
-  @Test
-  public void testUncheckedStackadd_Byte_initialCapacityNULL(){
-    var seq=new LongArrSeq.UncheckedStack(0,null);
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToByte(i)));
-    }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),seq.arr[i]);
-    }
-  }
-  @Test
-  public void testUncheckedStackadd_Byte_initialCapacity50(){
-    var seq=new LongArrSeq.UncheckedStack(50);
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToByte(i)));
-    }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),seq.arr[i]);
-    }
-  }
-  @Test
-  public void testUncheckedStackadd_char_initialCapacityDEFAULT(){
-    var seq=new LongArrSeq.UncheckedStack();
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTochar(i)));
-    }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),seq.arr[i]);
-    }
-  }
-  @Test
-  public void testUncheckedStackadd_char_initialCapacityNULL(){
-    var seq=new LongArrSeq.UncheckedStack(0,null);
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTochar(i)));
-    }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),seq.arr[i]);
-    }
-  }
-  @Test
-  public void testUncheckedStackadd_char_initialCapacity50(){
-    var seq=new LongArrSeq.UncheckedStack(50);
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTochar(i)));
-    }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),seq.arr[i]);
-    }
-  }
-  @Test
-  public void testUncheckedStackadd_Character_initialCapacityDEFAULT(){
-    var seq=new LongArrSeq.UncheckedStack();
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToCharacter(i)));
-    }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),seq.arr[i]);
-    }
-  }
-  @Test
-  public void testUncheckedStackadd_Character_initialCapacityNULL(){
-    var seq=new LongArrSeq.UncheckedStack(0,null);
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToCharacter(i)));
-    }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),seq.arr[i]);
-    }
-  }
-  @Test
-  public void testUncheckedStackadd_Character_initialCapacity50(){
-    var seq=new LongArrSeq.UncheckedStack(50);
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToCharacter(i)));
-    }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),seq.arr[i]);
-    }
-  }
-  @Test
-  public void testUncheckedStackadd_short_initialCapacityDEFAULT(){
-    var seq=new LongArrSeq.UncheckedStack();
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToshort(i)));
-    }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),seq.arr[i]);
-    }
-  }
-  @Test
-  public void testUncheckedStackadd_short_initialCapacityNULL(){
-    var seq=new LongArrSeq.UncheckedStack(0,null);
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToshort(i)));
-    }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),seq.arr[i]);
-    }
-  }
-  @Test
-  public void testUncheckedStackadd_short_initialCapacity50(){
-    var seq=new LongArrSeq.UncheckedStack(50);
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToshort(i)));
-    }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),seq.arr[i]);
-    }
-  }
-  @Test
-  public void testUncheckedStackadd_Short_initialCapacityDEFAULT(){
-    var seq=new LongArrSeq.UncheckedStack();
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToShort(i)));
-    }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),seq.arr[i]);
-    }
-  }
-  @Test
-  public void testUncheckedStackadd_Short_initialCapacityNULL(){
-    var seq=new LongArrSeq.UncheckedStack(0,null);
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToShort(i)));
-    }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),seq.arr[i]);
-    }
-  }
-  @Test
-  public void testUncheckedStackadd_Short_initialCapacity50(){
-    var seq=new LongArrSeq.UncheckedStack(50);
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToShort(i)));
-    }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),seq.arr[i]);
-    }
-  }
-  @Test
-  public void testUncheckedStackadd_int_initialCapacityDEFAULT(){
-    var seq=new LongArrSeq.UncheckedStack();
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToint(i)));
-    }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),seq.arr[i]);
-    }
-  }
-  @Test
-  public void testUncheckedStackadd_int_initialCapacityNULL(){
-    var seq=new LongArrSeq.UncheckedStack(0,null);
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToint(i)));
-    }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),seq.arr[i]);
-    }
-  }
-  @Test
-  public void testUncheckedStackadd_int_initialCapacity50(){
-    var seq=new LongArrSeq.UncheckedStack(50);
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToint(i)));
-    }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),seq.arr[i]);
-    }
-  }
-  @Test
-  public void testUncheckedStackadd_Integer_initialCapacityDEFAULT(){
-    var seq=new LongArrSeq.UncheckedStack();
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToInteger(i)));
-    }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),seq.arr[i]);
-    }
-  }
-  @Test
-  public void testUncheckedStackadd_Integer_initialCapacityNULL(){
-    var seq=new LongArrSeq.UncheckedStack(0,null);
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToInteger(i)));
-    }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),seq.arr[i]);
-    }
-  }
-  @Test
-  public void testUncheckedStackadd_Integer_initialCapacity50(){
-    var seq=new LongArrSeq.UncheckedStack(50);
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToInteger(i)));
-    }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),seq.arr[i]);
-    }
-  }
-  @Test
-  public void testUncheckedStacktoLongArray_void_seqIsEmpty(){
-    var seq=new LongArrSeq.UncheckedStack();
-    Assertions.assertSame(OmniArray.OfLong.DEFAULT_ARR,seq.toLongArray());
-    Assertions.assertEquals(0,seq.size());
-  }
-  @Test
-  public void testUncheckedStacktoLongArray_void_seqIsNotEmpty(){
-    var seq=new LongArrSeq.UncheckedStack();
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTolong(i)));
-    }
-    var result=seq.toLongArray();
-    Assertions.assertEquals(100,seq.size());
-    Assertions.assertEquals(100,result.length);
-    var itr=seq.iterator();
-    for(int i=0;i<100;++i){
-      Assertions.assertEquals(itr.nextLong(),result[i]);
-    }
-    Assertions.assertNotSame(seq.arr,result);
-  }
-  @Test
-  public void testUncheckedStacktoArray_void_seqIsEmpty(){
-    var seq=new LongArrSeq.UncheckedStack();
-    Assertions.assertSame(OmniArray.OfLong.DEFAULT_BOXED_ARR,seq.toArray());
-    Assertions.assertEquals(0,seq.size());
-  }
-  @Test
-  public void testUncheckedStacktoArray_void_seqIsNotEmpty(){
-    var seq=new LongArrSeq.UncheckedStack();
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTolong(i)));
-    }
-    var result=seq.toArray();
-    Assertions.assertEquals(100,seq.size());
-    Assertions.assertEquals(100,result.length);
-    var itr=seq.iterator();
-    for(int i=0;i<100;++i){
-      Assertions.assertEquals(itr.next(),result[i]);
-    }
-    Assertions.assertNotSame(seq.arr,result);
-  }
-  @Test
-  public void testUncheckedStacktoDoubleArray_void_seqIsEmpty(){
-    var seq=new LongArrSeq.UncheckedStack();
-    Assertions.assertSame(OmniArray.OfDouble.DEFAULT_ARR,seq.toDoubleArray());
-    Assertions.assertEquals(0,seq.size());
-  }
-  @Test
-  public void testUncheckedStacktoDoubleArray_void_seqIsNotEmpty(){
-    var seq=new LongArrSeq.UncheckedStack();
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTolong(i)));
-    }
-    var result=seq.toDoubleArray();
-    Assertions.assertEquals(100,seq.size());
-    Assertions.assertEquals(100,result.length);
-    var itr=seq.iterator();
-    for(int i=0;i<100;++i){
-      Assertions.assertEquals(itr.nextDouble(),result[i]);
-    }
-    Assertions.assertNotSame(seq.arr,result);
-  }
-  @Test
-  public void testUncheckedStacktoFloatArray_void_seqIsEmpty(){
-    var seq=new LongArrSeq.UncheckedStack();
-    Assertions.assertSame(OmniArray.OfFloat.DEFAULT_ARR,seq.toFloatArray());
-    Assertions.assertEquals(0,seq.size());
-  }
-  @Test
-  public void testUncheckedStacktoFloatArray_void_seqIsNotEmpty(){
-    var seq=new LongArrSeq.UncheckedStack();
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTolong(i)));
-    }
-    var result=seq.toFloatArray();
-    Assertions.assertEquals(100,seq.size());
-    Assertions.assertEquals(100,result.length);
-    var itr=seq.iterator();
-    for(int i=0;i<100;++i){
-      Assertions.assertEquals(itr.nextFloat(),result[i]);
-    }
-    Assertions.assertNotSame(seq.arr,result);
-  }
-  @Test
-  public void testUncheckedListconstructor_void_initialCapacityDEFAULT(){
     var seq=new LongArrSeq.UncheckedList();
     Assertions.assertEquals(0,seq.size);
     Assertions.assertSame(OmniArray.OfLong.DEFAULT_ARR,seq.arr);
+    assertStructuralIntegrity(seq,0,0,seq,0,0,seq,0,0);
   }
   @Test
-  public void testUncheckedListconstructor_intlong_initialCapacityNULL(){
-    var seq=new LongArrSeq.UncheckedList(0,null);
-    Assertions.assertEquals(0,seq.size);
-    Assertions.assertNull(seq.arr);
+  public void testUncheckedListConstructor_int_longarray_happyPath()
+  {
+    int size=5;
+    long[] arr=new long[10];
+    var seq=new LongArrSeq.UncheckedList(size,arr);
+    Assertions.assertEquals(size,seq.size);
+    Assertions.assertSame(arr,seq.arr);
+    assertStructuralIntegrity(seq,0,0,seq,0,0,seq,0,0);
   }
-  @Test
-  public void testUncheckedListconstructor_int_initialCapacity50(){
-    var seq=new LongArrSeq.UncheckedList(50);
+  @ParameterizedTest
+  @ValueSource(ints={0,5,OmniArray.DEFAULT_ARR_SEQ_CAP,15})
+  public void testUncheckedListConstructor_int_happyPath(int capacity)
+  {
+    var seq=new LongArrSeq.UncheckedList(capacity);
     Assertions.assertEquals(0,seq.size);
-    switch(50){
-    case 0:
+    switch(capacity)
+    {
+      case 0:
       Assertions.assertNull(seq.arr);
       break;
-    case OmniArray.DEFAULT_ARR_SEQ_CAP:
+      case OmniArray.DEFAULT_ARR_SEQ_CAP:
       Assertions.assertSame(OmniArray.OfLong.DEFAULT_ARR,seq.arr);
       break;
-    default:
-      Assertions.assertNotNull(seq.arr);
-      Assertions.assertEquals(50,seq.arr.length);
+      default:
+      Assertions.assertEquals(capacity,seq.arr.length);
+    }
+    assertStructuralIntegrity(seq,0,0,seq,0,0,seq,0,0);
+  }
+//ENDIF
+//IF STRUCT==List,SubList
+  @ParameterizedTest
+  //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testUncheckedListListItradd_long_happyPathInsertBegin(int initialCapacity){
+  //ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.UncheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    var seqItr=seq.listIterator();
+    for(int i=0;i<100;++i)
+    {
+      seqItr.add(TypeConversionUtil.convertTolong(i));
+      assertIteratorStateIntegrity(seqItr,preAllocSpan+1,-1,i+1,parent,root);
+      seqItr.previousLong();
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=100,bound=i+100;i<bound;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(--val),root.arr[i]);
+    }
+    verifyAscendingSpanlong(root.arr,i,rootSize+100,100);
+  }
+  @ParameterizedTest
+  //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testUncheckedListListItradd_long_happyPathInsertEnd(int initialCapacity){
+  //ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.UncheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    var seqItr=seq.listIterator();
+    for(int i=0;i<100;++i)
+    {
+      seqItr.add(TypeConversionUtil.convertTolong(i));
+      assertIteratorStateIntegrity(seqItr,preAllocSpan+i+1,-1,i+1,parent,root);
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,rootSize+100,-preAllocSpan);
+  }
+  @ParameterizedTest
+  //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testUncheckedListListItradd_long_happyPathInsertMidPoint(int initialCapacity){
+  //ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.UncheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    var seqItr=seq.listIterator();
+    for(int i=0;i<100;++i)
+    {
+      seqItr.add(TypeConversionUtil.convertTolong(i));
+      assertIteratorStateIntegrity(seqItr,((rootSize+i)/2)+1,-1,i+1,parent,root);
+      if((i&1)==0)
+      {
+        seqItr.previousLong();
+      }
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=1,bound=i+50;i<bound;++i,val+=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+    for(int val=98,bound=i+50;i<bound;++i,val-=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+    verifyAscendingSpanlong(root.arr,i,rootSize+100,i);
+  }
+  @ParameterizedTest
+  //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testUncheckedListadd_int_long_happyPathInsertBegin(int initialCapacity){
+  //ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.UncheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      seq.add(0,TypeConversionUtil.convertTolong(i));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=100,bound=i+100;i<bound;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(--val),root.arr[i]);
+    }
+    verifyAscendingSpanlong(root.arr,i,rootSize+100,100);
+  }
+  @ParameterizedTest
+  //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testUncheckedListadd_int_long_happyPathInsertEnd(int initialCapacity){
+  //ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.UncheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size(),TypeConversionUtil.convertTolong(i));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,rootSize+100,-preAllocSpan);
+  }
+  @ParameterizedTest
+  //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testUncheckedListadd_int_long_happyPathInsertMidPoint(int initialCapacity){
+  //ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.UncheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size()/2,TypeConversionUtil.convertTolong(i));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=1,bound=i+50;i<bound;++i,val+=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+    for(int val=98,bound=i+50;i<bound;++i,val-=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+    verifyAscendingSpanlong(root.arr,i,rootSize+100,i);
+  }
+//ENDIF
+  @ParameterizedTest
+//IF STRUCT==Stack,List
+  @ValueSource(ints={0,5,10,15})
+  public void testUncheckedListadd_long_happyPath(int initialCapacity){
+//ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.UncheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTolong(i)));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    for(int i=0,val=-preAllocSpan;i<100;++i,++val)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
     }
   }
+//IF OfRef
+//IF STRUCT==List,SubList
+  @ParameterizedTest
+  //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testUncheckedListListItradd_Long_happyPathInsertBegin(int initialCapacity){
+  //ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.UncheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    var seqItr=seq.listIterator();
+    for(int i=0;i<100;++i)
+    {
+      seqItr.add(TypeConversionUtil.convertToLong(i));
+      assertIteratorStateIntegrity(seqItr,preAllocSpan+1,-1,i+1,parent,root);
+      seqItr.previousLong();
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=100,bound=i+100;i<bound;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(--val),root.arr[i]);
+    }
+    verifyAscendingSpanlong(root.arr,i,rootSize+100,100);
+  }
+  @ParameterizedTest
+  //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testUncheckedListListItradd_Long_happyPathInsertEnd(int initialCapacity){
+  //ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.UncheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    var seqItr=seq.listIterator();
+    for(int i=0;i<100;++i)
+    {
+      seqItr.add(TypeConversionUtil.convertToLong(i));
+      assertIteratorStateIntegrity(seqItr,preAllocSpan+i+1,-1,i+1,parent,root);
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,rootSize+100,-preAllocSpan);
+  }
+  @ParameterizedTest
+  //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testUncheckedListListItradd_Long_happyPathInsertMidPoint(int initialCapacity){
+  //ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.UncheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    var seqItr=seq.listIterator();
+    for(int i=0;i<100;++i)
+    {
+      seqItr.add(TypeConversionUtil.convertToLong(i));
+      assertIteratorStateIntegrity(seqItr,((rootSize+i)/2)+1,-1,i+1,parent,root);
+      if((i&1)==0)
+      {
+        seqItr.previousLong();
+      }
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=1,bound=i+50;i<bound;++i,val+=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+    for(int val=98,bound=i+50;i<bound;++i,val-=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+    verifyAscendingSpanlong(root.arr,i,rootSize+100,i);
+  }
+  @ParameterizedTest
+  //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testUncheckedListadd_int_Long_happyPathInsertBegin(int initialCapacity){
+  //ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.UncheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      seq.add(0,TypeConversionUtil.convertToLong(i));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=100,bound=i+100;i<bound;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(--val),root.arr[i]);
+    }
+    verifyAscendingSpanlong(root.arr,i,rootSize+100,100);
+  }
+  @ParameterizedTest
+  //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testUncheckedListadd_int_Long_happyPathInsertEnd(int initialCapacity){
+  //ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.UncheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size(),TypeConversionUtil.convertToLong(i));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,rootSize+100,-preAllocSpan);
+  }
+  @ParameterizedTest
+  //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testUncheckedListadd_int_Long_happyPathInsertMidPoint(int initialCapacity){
+  //ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.UncheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size()/2,TypeConversionUtil.convertToLong(i));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=1,bound=i+50;i<bound;++i,val+=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+    for(int val=98,bound=i+50;i<bound;++i,val-=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+    verifyAscendingSpanlong(root.arr,i,rootSize+100,i);
+  }
+//ENDIF
+  @ParameterizedTest
+//IF STRUCT==Stack,List
+  @ValueSource(ints={0,5,10,15})
+  public void testUncheckedListadd_Long_happyPath(int initialCapacity){
+//ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.UncheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToLong(i)));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    for(int i=0,val=-preAllocSpan;i<100;++i,++val)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+  }
+  //IF OfBoolean
+//IF STRUCT==List,SubList
+  @ParameterizedTest
+  //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testUncheckedListListItradd_boolean_happyPathInsertBegin(int initialCapacity){
+  //ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.UncheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    var seqItr=seq.listIterator();
+    for(int i=0;i<100;++i)
+    {
+      seqItr.add(TypeConversionUtil.convertToboolean(i));
+      assertIteratorStateIntegrity(seqItr,preAllocSpan+1,-1,i+1,parent,root);
+      seqItr.previousLong();
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlongboolean(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=100,bound=i+100;i<bound;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolongboolean(--val),root.arr[i]);
+    }
+    verifyAscendingSpanlongboolean(root.arr,i,rootSize+100,100);
+  }
+  @ParameterizedTest
+  //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testUncheckedListListItradd_boolean_happyPathInsertEnd(int initialCapacity){
+  //ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.UncheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    var seqItr=seq.listIterator();
+    for(int i=0;i<100;++i)
+    {
+      seqItr.add(TypeConversionUtil.convertToboolean(i));
+      assertIteratorStateIntegrity(seqItr,preAllocSpan+i+1,-1,i+1,parent,root);
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlongboolean(root.arr,0,rootSize+100,-preAllocSpan);
+  }
+  @ParameterizedTest
+  //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testUncheckedListListItradd_boolean_happyPathInsertMidPoint(int initialCapacity){
+  //ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.UncheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    var seqItr=seq.listIterator();
+    for(int i=0;i<100;++i)
+    {
+      seqItr.add(TypeConversionUtil.convertToboolean(i));
+      assertIteratorStateIntegrity(seqItr,((rootSize+i)/2)+1,-1,i+1,parent,root);
+      if((i&1)==0)
+      {
+        seqItr.previousLong();
+      }
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlongboolean(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=1,bound=i+50;i<bound;++i,val+=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolongboolean(val),root.arr[i]);
+    }
+    for(int val=98,bound=i+50;i<bound;++i,val-=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolongboolean(val),root.arr[i]);
+    }
+    verifyAscendingSpanlongboolean(root.arr,i,rootSize+100,i);
+  }
+  @ParameterizedTest
+  //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testUncheckedListadd_int_boolean_happyPathInsertBegin(int initialCapacity){
+  //ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.UncheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      seq.add(0,TypeConversionUtil.convertToboolean(i));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlongboolean(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=100,bound=i+100;i<bound;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolongboolean(--val),root.arr[i]);
+    }
+    verifyAscendingSpanlongboolean(root.arr,i,rootSize+100,100);
+  }
+  @ParameterizedTest
+  //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testUncheckedListadd_int_boolean_happyPathInsertEnd(int initialCapacity){
+  //ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.UncheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size(),TypeConversionUtil.convertToboolean(i));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlongboolean(root.arr,0,rootSize+100,-preAllocSpan);
+  }
+  @ParameterizedTest
+  //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testUncheckedListadd_int_boolean_happyPathInsertMidPoint(int initialCapacity){
+  //ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.UncheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size()/2,TypeConversionUtil.convertToboolean(i));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlongboolean(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=1,bound=i+50;i<bound;++i,val+=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolongboolean(val),root.arr[i]);
+    }
+    for(int val=98,bound=i+50;i<bound;++i,val-=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolongboolean(val),root.arr[i]);
+    }
+    verifyAscendingSpanlongboolean(root.arr,i,rootSize+100,i);
+  }
+//ENDIF
+  @ParameterizedTest
+//IF STRUCT==Stack,List
+  @ValueSource(ints={0,5,10,15})
+  public void testUncheckedListadd_boolean_happyPath(int initialCapacity){
+//ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.UncheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    for(int i=0,val=-preAllocSpan;i<100;++i,++val)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolongboolean(val),root.arr[i]);
+    }
+  }
+//IF STRUCT==List,SubList
+  @ParameterizedTest
+  //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testUncheckedListListItradd_Boolean_happyPathInsertBegin(int initialCapacity){
+  //ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.UncheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    var seqItr=seq.listIterator();
+    for(int i=0;i<100;++i)
+    {
+      seqItr.add(TypeConversionUtil.convertToBoolean(i));
+      assertIteratorStateIntegrity(seqItr,preAllocSpan+1,-1,i+1,parent,root);
+      seqItr.previousLong();
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlongboolean(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=100,bound=i+100;i<bound;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolongboolean(--val),root.arr[i]);
+    }
+    verifyAscendingSpanlongboolean(root.arr,i,rootSize+100,100);
+  }
+  @ParameterizedTest
+  //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testUncheckedListListItradd_Boolean_happyPathInsertEnd(int initialCapacity){
+  //ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.UncheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    var seqItr=seq.listIterator();
+    for(int i=0;i<100;++i)
+    {
+      seqItr.add(TypeConversionUtil.convertToBoolean(i));
+      assertIteratorStateIntegrity(seqItr,preAllocSpan+i+1,-1,i+1,parent,root);
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlongboolean(root.arr,0,rootSize+100,-preAllocSpan);
+  }
+  @ParameterizedTest
+  //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testUncheckedListListItradd_Boolean_happyPathInsertMidPoint(int initialCapacity){
+  //ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.UncheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    var seqItr=seq.listIterator();
+    for(int i=0;i<100;++i)
+    {
+      seqItr.add(TypeConversionUtil.convertToBoolean(i));
+      assertIteratorStateIntegrity(seqItr,((rootSize+i)/2)+1,-1,i+1,parent,root);
+      if((i&1)==0)
+      {
+        seqItr.previousLong();
+      }
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlongboolean(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=1,bound=i+50;i<bound;++i,val+=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolongboolean(val),root.arr[i]);
+    }
+    for(int val=98,bound=i+50;i<bound;++i,val-=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolongboolean(val),root.arr[i]);
+    }
+    verifyAscendingSpanlongboolean(root.arr,i,rootSize+100,i);
+  }
+  @ParameterizedTest
+  //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testUncheckedListadd_int_Boolean_happyPathInsertBegin(int initialCapacity){
+  //ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.UncheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      seq.add(0,TypeConversionUtil.convertToBoolean(i));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlongboolean(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=100,bound=i+100;i<bound;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolongboolean(--val),root.arr[i]);
+    }
+    verifyAscendingSpanlongboolean(root.arr,i,rootSize+100,100);
+  }
+  @ParameterizedTest
+  //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testUncheckedListadd_int_Boolean_happyPathInsertEnd(int initialCapacity){
+  //ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.UncheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size(),TypeConversionUtil.convertToBoolean(i));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlongboolean(root.arr,0,rootSize+100,-preAllocSpan);
+  }
+  @ParameterizedTest
+  //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testUncheckedListadd_int_Boolean_happyPathInsertMidPoint(int initialCapacity){
+  //ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.UncheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size()/2,TypeConversionUtil.convertToBoolean(i));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlongboolean(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=1,bound=i+50;i<bound;++i,val+=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolongboolean(val),root.arr[i]);
+    }
+    for(int val=98,bound=i+50;i<bound;++i,val-=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolongboolean(val),root.arr[i]);
+    }
+    verifyAscendingSpanlongboolean(root.arr,i,rootSize+100,i);
+  }
+//ENDIF
+  @ParameterizedTest
+//IF STRUCT==Stack,List
+  @ValueSource(ints={0,5,10,15})
+  public void testUncheckedListadd_Boolean_happyPath(int initialCapacity){
+//ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.UncheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToBoolean(i)));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    for(int i=0,val=-preAllocSpan;i<100;++i,++val)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolongboolean(val),root.arr[i]);
+    }
+  }
+    //IF OfByte,OfChar
+//IF STRUCT==List,SubList
+  @ParameterizedTest
+  //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testUncheckedListListItradd_byte_happyPathInsertBegin(int initialCapacity){
+  //ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.UncheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    var seqItr=seq.listIterator();
+    for(int i=0;i<100;++i)
+    {
+      seqItr.add(TypeConversionUtil.convertTobyte(i));
+      assertIteratorStateIntegrity(seqItr,preAllocSpan+1,-1,i+1,parent,root);
+      seqItr.previousLong();
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=100,bound=i+100;i<bound;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(--val),root.arr[i]);
+    }
+    verifyAscendingSpanlong(root.arr,i,rootSize+100,100);
+  }
+  @ParameterizedTest
+  //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testUncheckedListListItradd_byte_happyPathInsertEnd(int initialCapacity){
+  //ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.UncheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    var seqItr=seq.listIterator();
+    for(int i=0;i<100;++i)
+    {
+      seqItr.add(TypeConversionUtil.convertTobyte(i));
+      assertIteratorStateIntegrity(seqItr,preAllocSpan+i+1,-1,i+1,parent,root);
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,rootSize+100,-preAllocSpan);
+  }
+  @ParameterizedTest
+  //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testUncheckedListListItradd_byte_happyPathInsertMidPoint(int initialCapacity){
+  //ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.UncheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    var seqItr=seq.listIterator();
+    for(int i=0;i<100;++i)
+    {
+      seqItr.add(TypeConversionUtil.convertTobyte(i));
+      assertIteratorStateIntegrity(seqItr,((rootSize+i)/2)+1,-1,i+1,parent,root);
+      if((i&1)==0)
+      {
+        seqItr.previousLong();
+      }
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=1,bound=i+50;i<bound;++i,val+=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+    for(int val=98,bound=i+50;i<bound;++i,val-=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+    verifyAscendingSpanlong(root.arr,i,rootSize+100,i);
+  }
+  @ParameterizedTest
+  //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testUncheckedListadd_int_byte_happyPathInsertBegin(int initialCapacity){
+  //ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.UncheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      seq.add(0,TypeConversionUtil.convertTobyte(i));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=100,bound=i+100;i<bound;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(--val),root.arr[i]);
+    }
+    verifyAscendingSpanlong(root.arr,i,rootSize+100,100);
+  }
+  @ParameterizedTest
+  //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testUncheckedListadd_int_byte_happyPathInsertEnd(int initialCapacity){
+  //ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.UncheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size(),TypeConversionUtil.convertTobyte(i));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,rootSize+100,-preAllocSpan);
+  }
+  @ParameterizedTest
+  //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testUncheckedListadd_int_byte_happyPathInsertMidPoint(int initialCapacity){
+  //ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.UncheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size()/2,TypeConversionUtil.convertTobyte(i));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=1,bound=i+50;i<bound;++i,val+=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+    for(int val=98,bound=i+50;i<bound;++i,val-=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+    verifyAscendingSpanlong(root.arr,i,rootSize+100,i);
+  }
+//ENDIF
+  @ParameterizedTest
+//IF STRUCT==Stack,List
+  @ValueSource(ints={0,5,10,15})
+  public void testUncheckedListadd_byte_happyPath(int initialCapacity){
+//ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.UncheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTobyte(i)));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    for(int i=0,val=-preAllocSpan;i<100;++i,++val)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+  }
+//IF STRUCT==List,SubList
+  @ParameterizedTest
+  //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testUncheckedListListItradd_Byte_happyPathInsertBegin(int initialCapacity){
+  //ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.UncheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    var seqItr=seq.listIterator();
+    for(int i=0;i<100;++i)
+    {
+      seqItr.add(TypeConversionUtil.convertToByte(i));
+      assertIteratorStateIntegrity(seqItr,preAllocSpan+1,-1,i+1,parent,root);
+      seqItr.previousLong();
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=100,bound=i+100;i<bound;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(--val),root.arr[i]);
+    }
+    verifyAscendingSpanlong(root.arr,i,rootSize+100,100);
+  }
+  @ParameterizedTest
+  //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testUncheckedListListItradd_Byte_happyPathInsertEnd(int initialCapacity){
+  //ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.UncheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    var seqItr=seq.listIterator();
+    for(int i=0;i<100;++i)
+    {
+      seqItr.add(TypeConversionUtil.convertToByte(i));
+      assertIteratorStateIntegrity(seqItr,preAllocSpan+i+1,-1,i+1,parent,root);
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,rootSize+100,-preAllocSpan);
+  }
+  @ParameterizedTest
+  //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testUncheckedListListItradd_Byte_happyPathInsertMidPoint(int initialCapacity){
+  //ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.UncheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    var seqItr=seq.listIterator();
+    for(int i=0;i<100;++i)
+    {
+      seqItr.add(TypeConversionUtil.convertToByte(i));
+      assertIteratorStateIntegrity(seqItr,((rootSize+i)/2)+1,-1,i+1,parent,root);
+      if((i&1)==0)
+      {
+        seqItr.previousLong();
+      }
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=1,bound=i+50;i<bound;++i,val+=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+    for(int val=98,bound=i+50;i<bound;++i,val-=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+    verifyAscendingSpanlong(root.arr,i,rootSize+100,i);
+  }
+  @ParameterizedTest
+  //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testUncheckedListadd_int_Byte_happyPathInsertBegin(int initialCapacity){
+  //ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.UncheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      seq.add(0,TypeConversionUtil.convertToByte(i));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=100,bound=i+100;i<bound;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(--val),root.arr[i]);
+    }
+    verifyAscendingSpanlong(root.arr,i,rootSize+100,100);
+  }
+  @ParameterizedTest
+  //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testUncheckedListadd_int_Byte_happyPathInsertEnd(int initialCapacity){
+  //ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.UncheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size(),TypeConversionUtil.convertToByte(i));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,rootSize+100,-preAllocSpan);
+  }
+  @ParameterizedTest
+  //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testUncheckedListadd_int_Byte_happyPathInsertMidPoint(int initialCapacity){
+  //ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.UncheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size()/2,TypeConversionUtil.convertToByte(i));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=1,bound=i+50;i<bound;++i,val+=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+    for(int val=98,bound=i+50;i<bound;++i,val-=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+    verifyAscendingSpanlong(root.arr,i,rootSize+100,i);
+  }
+//ENDIF
+  @ParameterizedTest
+//IF STRUCT==Stack,List
+  @ValueSource(ints={0,5,10,15})
+  public void testUncheckedListadd_Byte_happyPath(int initialCapacity){
+//ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.UncheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToByte(i)));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    for(int i=0,val=-preAllocSpan;i<100;++i,++val)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+  }
+      //IF OfShort
+//IF STRUCT==List,SubList
+  @ParameterizedTest
+  //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testUncheckedListListItradd_short_happyPathInsertBegin(int initialCapacity){
+  //ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.UncheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    var seqItr=seq.listIterator();
+    for(int i=0;i<100;++i)
+    {
+      seqItr.add(TypeConversionUtil.convertToshort(i));
+      assertIteratorStateIntegrity(seqItr,preAllocSpan+1,-1,i+1,parent,root);
+      seqItr.previousLong();
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=100,bound=i+100;i<bound;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(--val),root.arr[i]);
+    }
+    verifyAscendingSpanlong(root.arr,i,rootSize+100,100);
+  }
+  @ParameterizedTest
+  //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testUncheckedListListItradd_short_happyPathInsertEnd(int initialCapacity){
+  //ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.UncheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    var seqItr=seq.listIterator();
+    for(int i=0;i<100;++i)
+    {
+      seqItr.add(TypeConversionUtil.convertToshort(i));
+      assertIteratorStateIntegrity(seqItr,preAllocSpan+i+1,-1,i+1,parent,root);
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,rootSize+100,-preAllocSpan);
+  }
+  @ParameterizedTest
+  //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testUncheckedListListItradd_short_happyPathInsertMidPoint(int initialCapacity){
+  //ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.UncheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    var seqItr=seq.listIterator();
+    for(int i=0;i<100;++i)
+    {
+      seqItr.add(TypeConversionUtil.convertToshort(i));
+      assertIteratorStateIntegrity(seqItr,((rootSize+i)/2)+1,-1,i+1,parent,root);
+      if((i&1)==0)
+      {
+        seqItr.previousLong();
+      }
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=1,bound=i+50;i<bound;++i,val+=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+    for(int val=98,bound=i+50;i<bound;++i,val-=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+    verifyAscendingSpanlong(root.arr,i,rootSize+100,i);
+  }
+  @ParameterizedTest
+  //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testUncheckedListadd_int_short_happyPathInsertBegin(int initialCapacity){
+  //ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.UncheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      seq.add(0,TypeConversionUtil.convertToshort(i));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=100,bound=i+100;i<bound;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(--val),root.arr[i]);
+    }
+    verifyAscendingSpanlong(root.arr,i,rootSize+100,100);
+  }
+  @ParameterizedTest
+  //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testUncheckedListadd_int_short_happyPathInsertEnd(int initialCapacity){
+  //ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.UncheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size(),TypeConversionUtil.convertToshort(i));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,rootSize+100,-preAllocSpan);
+  }
+  @ParameterizedTest
+  //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testUncheckedListadd_int_short_happyPathInsertMidPoint(int initialCapacity){
+  //ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.UncheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size()/2,TypeConversionUtil.convertToshort(i));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=1,bound=i+50;i<bound;++i,val+=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+    for(int val=98,bound=i+50;i<bound;++i,val-=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+    verifyAscendingSpanlong(root.arr,i,rootSize+100,i);
+  }
+//ENDIF
+  @ParameterizedTest
+//IF STRUCT==Stack,List
+  @ValueSource(ints={0,5,10,15})
+  public void testUncheckedListadd_short_happyPath(int initialCapacity){
+//ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.UncheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToshort(i)));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    for(int i=0,val=-preAllocSpan;i<100;++i,++val)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+  }
+//IF STRUCT==List,SubList
+  @ParameterizedTest
+  //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testUncheckedListListItradd_Short_happyPathInsertBegin(int initialCapacity){
+  //ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.UncheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    var seqItr=seq.listIterator();
+    for(int i=0;i<100;++i)
+    {
+      seqItr.add(TypeConversionUtil.convertToShort(i));
+      assertIteratorStateIntegrity(seqItr,preAllocSpan+1,-1,i+1,parent,root);
+      seqItr.previousLong();
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=100,bound=i+100;i<bound;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(--val),root.arr[i]);
+    }
+    verifyAscendingSpanlong(root.arr,i,rootSize+100,100);
+  }
+  @ParameterizedTest
+  //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testUncheckedListListItradd_Short_happyPathInsertEnd(int initialCapacity){
+  //ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.UncheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    var seqItr=seq.listIterator();
+    for(int i=0;i<100;++i)
+    {
+      seqItr.add(TypeConversionUtil.convertToShort(i));
+      assertIteratorStateIntegrity(seqItr,preAllocSpan+i+1,-1,i+1,parent,root);
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,rootSize+100,-preAllocSpan);
+  }
+  @ParameterizedTest
+  //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testUncheckedListListItradd_Short_happyPathInsertMidPoint(int initialCapacity){
+  //ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.UncheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    var seqItr=seq.listIterator();
+    for(int i=0;i<100;++i)
+    {
+      seqItr.add(TypeConversionUtil.convertToShort(i));
+      assertIteratorStateIntegrity(seqItr,((rootSize+i)/2)+1,-1,i+1,parent,root);
+      if((i&1)==0)
+      {
+        seqItr.previousLong();
+      }
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=1,bound=i+50;i<bound;++i,val+=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+    for(int val=98,bound=i+50;i<bound;++i,val-=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+    verifyAscendingSpanlong(root.arr,i,rootSize+100,i);
+  }
+  @ParameterizedTest
+  //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testUncheckedListadd_int_Short_happyPathInsertBegin(int initialCapacity){
+  //ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.UncheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      seq.add(0,TypeConversionUtil.convertToShort(i));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=100,bound=i+100;i<bound;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(--val),root.arr[i]);
+    }
+    verifyAscendingSpanlong(root.arr,i,rootSize+100,100);
+  }
+  @ParameterizedTest
+  //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testUncheckedListadd_int_Short_happyPathInsertEnd(int initialCapacity){
+  //ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.UncheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size(),TypeConversionUtil.convertToShort(i));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,rootSize+100,-preAllocSpan);
+  }
+  @ParameterizedTest
+  //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testUncheckedListadd_int_Short_happyPathInsertMidPoint(int initialCapacity){
+  //ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.UncheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size()/2,TypeConversionUtil.convertToShort(i));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=1,bound=i+50;i<bound;++i,val+=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+    for(int val=98,bound=i+50;i<bound;++i,val-=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+    verifyAscendingSpanlong(root.arr,i,rootSize+100,i);
+  }
+//ENDIF
+  @ParameterizedTest
+//IF STRUCT==Stack,List
+  @ValueSource(ints={0,5,10,15})
+  public void testUncheckedListadd_Short_happyPath(int initialCapacity){
+//ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.UncheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToShort(i)));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    for(int i=0,val=-preAllocSpan;i<100;++i,++val)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+  }
+        //IF OfInt
+//IF STRUCT==List,SubList
+  @ParameterizedTest
+  //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testUncheckedListListItradd_int_happyPathInsertBegin(int initialCapacity){
+  //ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.UncheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    var seqItr=seq.listIterator();
+    for(int i=0;i<100;++i)
+    {
+      seqItr.add(TypeConversionUtil.convertToint(i));
+      assertIteratorStateIntegrity(seqItr,preAllocSpan+1,-1,i+1,parent,root);
+      seqItr.previousLong();
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=100,bound=i+100;i<bound;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(--val),root.arr[i]);
+    }
+    verifyAscendingSpanlong(root.arr,i,rootSize+100,100);
+  }
+  @ParameterizedTest
+  //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testUncheckedListListItradd_int_happyPathInsertEnd(int initialCapacity){
+  //ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.UncheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    var seqItr=seq.listIterator();
+    for(int i=0;i<100;++i)
+    {
+      seqItr.add(TypeConversionUtil.convertToint(i));
+      assertIteratorStateIntegrity(seqItr,preAllocSpan+i+1,-1,i+1,parent,root);
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,rootSize+100,-preAllocSpan);
+  }
+  @ParameterizedTest
+  //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testUncheckedListListItradd_int_happyPathInsertMidPoint(int initialCapacity){
+  //ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.UncheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    var seqItr=seq.listIterator();
+    for(int i=0;i<100;++i)
+    {
+      seqItr.add(TypeConversionUtil.convertToint(i));
+      assertIteratorStateIntegrity(seqItr,((rootSize+i)/2)+1,-1,i+1,parent,root);
+      if((i&1)==0)
+      {
+        seqItr.previousLong();
+      }
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=1,bound=i+50;i<bound;++i,val+=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+    for(int val=98,bound=i+50;i<bound;++i,val-=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+    verifyAscendingSpanlong(root.arr,i,rootSize+100,i);
+  }
+  @ParameterizedTest
+  //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testUncheckedListadd_int_int_happyPathInsertBegin(int initialCapacity){
+  //ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.UncheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      seq.add(0,TypeConversionUtil.convertToint(i));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=100,bound=i+100;i<bound;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(--val),root.arr[i]);
+    }
+    verifyAscendingSpanlong(root.arr,i,rootSize+100,100);
+  }
+  @ParameterizedTest
+  //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testUncheckedListadd_int_int_happyPathInsertEnd(int initialCapacity){
+  //ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.UncheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size(),TypeConversionUtil.convertToint(i));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,rootSize+100,-preAllocSpan);
+  }
+  @ParameterizedTest
+  //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testUncheckedListadd_int_int_happyPathInsertMidPoint(int initialCapacity){
+  //ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.UncheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size()/2,TypeConversionUtil.convertToint(i));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=1,bound=i+50;i<bound;++i,val+=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+    for(int val=98,bound=i+50;i<bound;++i,val-=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+    verifyAscendingSpanlong(root.arr,i,rootSize+100,i);
+  }
+//ENDIF
+  @ParameterizedTest
+//IF STRUCT==Stack,List
+  @ValueSource(ints={0,5,10,15})
+  public void testUncheckedListadd_int_happyPath(int initialCapacity){
+//ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.UncheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToint(i)));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    for(int i=0,val=-preAllocSpan;i<100;++i,++val)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+  }
+//IF STRUCT==List,SubList
+  @ParameterizedTest
+  //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testUncheckedListListItradd_Integer_happyPathInsertBegin(int initialCapacity){
+  //ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.UncheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    var seqItr=seq.listIterator();
+    for(int i=0;i<100;++i)
+    {
+      seqItr.add(TypeConversionUtil.convertToInteger(i));
+      assertIteratorStateIntegrity(seqItr,preAllocSpan+1,-1,i+1,parent,root);
+      seqItr.previousLong();
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=100,bound=i+100;i<bound;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(--val),root.arr[i]);
+    }
+    verifyAscendingSpanlong(root.arr,i,rootSize+100,100);
+  }
+  @ParameterizedTest
+  //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testUncheckedListListItradd_Integer_happyPathInsertEnd(int initialCapacity){
+  //ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.UncheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    var seqItr=seq.listIterator();
+    for(int i=0;i<100;++i)
+    {
+      seqItr.add(TypeConversionUtil.convertToInteger(i));
+      assertIteratorStateIntegrity(seqItr,preAllocSpan+i+1,-1,i+1,parent,root);
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,rootSize+100,-preAllocSpan);
+  }
+  @ParameterizedTest
+  //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testUncheckedListListItradd_Integer_happyPathInsertMidPoint(int initialCapacity){
+  //ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.UncheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    var seqItr=seq.listIterator();
+    for(int i=0;i<100;++i)
+    {
+      seqItr.add(TypeConversionUtil.convertToInteger(i));
+      assertIteratorStateIntegrity(seqItr,((rootSize+i)/2)+1,-1,i+1,parent,root);
+      if((i&1)==0)
+      {
+        seqItr.previousLong();
+      }
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=1,bound=i+50;i<bound;++i,val+=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+    for(int val=98,bound=i+50;i<bound;++i,val-=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+    verifyAscendingSpanlong(root.arr,i,rootSize+100,i);
+  }
+  @ParameterizedTest
+  //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testUncheckedListadd_int_Integer_happyPathInsertBegin(int initialCapacity){
+  //ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.UncheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      seq.add(0,TypeConversionUtil.convertToInteger(i));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=100,bound=i+100;i<bound;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(--val),root.arr[i]);
+    }
+    verifyAscendingSpanlong(root.arr,i,rootSize+100,100);
+  }
+  @ParameterizedTest
+  //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testUncheckedListadd_int_Integer_happyPathInsertEnd(int initialCapacity){
+  //ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.UncheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size(),TypeConversionUtil.convertToInteger(i));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,rootSize+100,-preAllocSpan);
+  }
+  @ParameterizedTest
+  //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testUncheckedListadd_int_Integer_happyPathInsertMidPoint(int initialCapacity){
+  //ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.UncheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size()/2,TypeConversionUtil.convertToInteger(i));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=1,bound=i+50;i<bound;++i,val+=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+    for(int val=98,bound=i+50;i<bound;++i,val-=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+    verifyAscendingSpanlong(root.arr,i,rootSize+100,i);
+  }
+//ENDIF
+  @ParameterizedTest
+//IF STRUCT==Stack,List
+  @ValueSource(ints={0,5,10,15})
+  public void testUncheckedListadd_Integer_happyPath(int initialCapacity){
+//ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.UncheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToInteger(i)));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    for(int i=0,val=-preAllocSpan;i<100;++i,++val)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+  }
+        //ENDIF
+      //ENDIF
+    //ENDIF
+  //ENDIF
+//ENDIF
+//IF STRUCT==Stack,List
   @Test
-  public void testUncheckedListconstructor_int_initialCapacity0(){
-    var seq=new LongArrSeq.UncheckedList(0);
+  public void testUncheckedStackConstructor_happyPath()
+  {
+    var seq=new LongArrSeq.UncheckedStack();
     Assertions.assertEquals(0,seq.size);
-    switch(0){
-    case 0:
+    Assertions.assertSame(OmniArray.OfLong.DEFAULT_ARR,seq.arr);
+    assertStructuralIntegrity(seq,0,0,seq,0,0,seq,0,0);
+  }
+  @Test
+  public void testUncheckedStackConstructor_int_longarray_happyPath()
+  {
+    int size=5;
+    long[] arr=new long[10];
+    var seq=new LongArrSeq.UncheckedStack(size,arr);
+    Assertions.assertEquals(size,seq.size);
+    Assertions.assertSame(arr,seq.arr);
+    assertStructuralIntegrity(seq,0,0,seq,0,0,seq,0,0);
+  }
+  @ParameterizedTest
+  @ValueSource(ints={0,5,OmniArray.DEFAULT_ARR_SEQ_CAP,15})
+  public void testUncheckedStackConstructor_int_happyPath(int capacity)
+  {
+    var seq=new LongArrSeq.UncheckedStack(capacity);
+    Assertions.assertEquals(0,seq.size);
+    switch(capacity)
+    {
+      case 0:
       Assertions.assertNull(seq.arr);
       break;
-    case OmniArray.DEFAULT_ARR_SEQ_CAP:
+      case OmniArray.DEFAULT_ARR_SEQ_CAP:
       Assertions.assertSame(OmniArray.OfLong.DEFAULT_ARR,seq.arr);
       break;
-    default:
-      Assertions.assertNotNull(seq.arr);
-      Assertions.assertEquals(0,seq.arr.length);
+      default:
+      Assertions.assertEquals(capacity,seq.arr.length);
+    }
+    assertStructuralIntegrity(seq,0,0,seq,0,0,seq,0,0);
+  }
+//ENDIF
+//IF STRUCT==Stack
+  @ParameterizedTest
+  @ValueSource(ints={0,5,10,15})
+  public void testUncheckedStackpush_long_happyPath(int initialCapacity){
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.UncheckedStack(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTolong(i)));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    for(int i=0,val=-preAllocSpan;i<100;++i,++val)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
     }
   }
+//ENDIF
+  @ParameterizedTest
+//IF STRUCT==Stack,List
+  @ValueSource(ints={0,5,10,15})
+  public void testUncheckedStackadd_long_happyPath(int initialCapacity){
+//ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.UncheckedStack(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTolong(i)));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    for(int i=0,val=-preAllocSpan;i<100;++i,++val)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+  }
+//IF OfRef
+//IF STRUCT==Stack
+  @ParameterizedTest
+  @ValueSource(ints={0,5,10,15})
+  public void testUncheckedStackpush_Long_happyPath(int initialCapacity){
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.UncheckedStack(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToLong(i)));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    for(int i=0,val=-preAllocSpan;i<100;++i,++val)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+  }
+//ENDIF
+  @ParameterizedTest
+//IF STRUCT==Stack,List
+  @ValueSource(ints={0,5,10,15})
+  public void testUncheckedStackadd_Long_happyPath(int initialCapacity){
+//ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.UncheckedStack(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToLong(i)));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    for(int i=0,val=-preAllocSpan;i<100;++i,++val)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+  }
+  //IF OfBoolean
+//IF STRUCT==Stack
+  @ParameterizedTest
+  @ValueSource(ints={0,5,10,15})
+  public void testUncheckedStackpush_boolean_happyPath(int initialCapacity){
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.UncheckedStack(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    for(int i=0,val=-preAllocSpan;i<100;++i,++val)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolongboolean(val),root.arr[i]);
+    }
+  }
+//ENDIF
+  @ParameterizedTest
+//IF STRUCT==Stack,List
+  @ValueSource(ints={0,5,10,15})
+  public void testUncheckedStackadd_boolean_happyPath(int initialCapacity){
+//ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.UncheckedStack(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    for(int i=0,val=-preAllocSpan;i<100;++i,++val)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolongboolean(val),root.arr[i]);
+    }
+  }
+//IF STRUCT==Stack
+  @ParameterizedTest
+  @ValueSource(ints={0,5,10,15})
+  public void testUncheckedStackpush_Boolean_happyPath(int initialCapacity){
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.UncheckedStack(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToBoolean(i)));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    for(int i=0,val=-preAllocSpan;i<100;++i,++val)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolongboolean(val),root.arr[i]);
+    }
+  }
+//ENDIF
+  @ParameterizedTest
+//IF STRUCT==Stack,List
+  @ValueSource(ints={0,5,10,15})
+  public void testUncheckedStackadd_Boolean_happyPath(int initialCapacity){
+//ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.UncheckedStack(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToBoolean(i)));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    for(int i=0,val=-preAllocSpan;i<100;++i,++val)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolongboolean(val),root.arr[i]);
+    }
+  }
+    //IF OfByte,OfChar
+//IF STRUCT==Stack
+  @ParameterizedTest
+  @ValueSource(ints={0,5,10,15})
+  public void testUncheckedStackpush_byte_happyPath(int initialCapacity){
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.UncheckedStack(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTobyte(i)));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    for(int i=0,val=-preAllocSpan;i<100;++i,++val)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+  }
+//ENDIF
+  @ParameterizedTest
+//IF STRUCT==Stack,List
+  @ValueSource(ints={0,5,10,15})
+  public void testUncheckedStackadd_byte_happyPath(int initialCapacity){
+//ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.UncheckedStack(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTobyte(i)));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    for(int i=0,val=-preAllocSpan;i<100;++i,++val)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+  }
+//IF STRUCT==Stack
+  @ParameterizedTest
+  @ValueSource(ints={0,5,10,15})
+  public void testUncheckedStackpush_Byte_happyPath(int initialCapacity){
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.UncheckedStack(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToByte(i)));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    for(int i=0,val=-preAllocSpan;i<100;++i,++val)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+  }
+//ENDIF
+  @ParameterizedTest
+//IF STRUCT==Stack,List
+  @ValueSource(ints={0,5,10,15})
+  public void testUncheckedStackadd_Byte_happyPath(int initialCapacity){
+//ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.UncheckedStack(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToByte(i)));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    for(int i=0,val=-preAllocSpan;i<100;++i,++val)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+  }
+      //IF OfShort
+//IF STRUCT==Stack
+  @ParameterizedTest
+  @ValueSource(ints={0,5,10,15})
+  public void testUncheckedStackpush_short_happyPath(int initialCapacity){
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.UncheckedStack(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToshort(i)));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    for(int i=0,val=-preAllocSpan;i<100;++i,++val)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+  }
+//ENDIF
+  @ParameterizedTest
+//IF STRUCT==Stack,List
+  @ValueSource(ints={0,5,10,15})
+  public void testUncheckedStackadd_short_happyPath(int initialCapacity){
+//ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.UncheckedStack(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToshort(i)));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    for(int i=0,val=-preAllocSpan;i<100;++i,++val)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+  }
+//IF STRUCT==Stack
+  @ParameterizedTest
+  @ValueSource(ints={0,5,10,15})
+  public void testUncheckedStackpush_Short_happyPath(int initialCapacity){
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.UncheckedStack(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToShort(i)));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    for(int i=0,val=-preAllocSpan;i<100;++i,++val)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+  }
+//ENDIF
+  @ParameterizedTest
+//IF STRUCT==Stack,List
+  @ValueSource(ints={0,5,10,15})
+  public void testUncheckedStackadd_Short_happyPath(int initialCapacity){
+//ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.UncheckedStack(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToShort(i)));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    for(int i=0,val=-preAllocSpan;i<100;++i,++val)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+  }
+        //IF OfInt
+//IF STRUCT==Stack
+  @ParameterizedTest
+  @ValueSource(ints={0,5,10,15})
+  public void testUncheckedStackpush_int_happyPath(int initialCapacity){
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.UncheckedStack(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToint(i)));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    for(int i=0,val=-preAllocSpan;i<100;++i,++val)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+  }
+//ENDIF
+  @ParameterizedTest
+//IF STRUCT==Stack,List
+  @ValueSource(ints={0,5,10,15})
+  public void testUncheckedStackadd_int_happyPath(int initialCapacity){
+//ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.UncheckedStack(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToint(i)));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    for(int i=0,val=-preAllocSpan;i<100;++i,++val)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+  }
+//IF STRUCT==Stack
+  @ParameterizedTest
+  @ValueSource(ints={0,5,10,15})
+  public void testUncheckedStackpush_Integer_happyPath(int initialCapacity){
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.UncheckedStack(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToInteger(i)));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    for(int i=0,val=-preAllocSpan;i<100;++i,++val)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+  }
+//ENDIF
+  @ParameterizedTest
+//IF STRUCT==Stack,List
+  @ValueSource(ints={0,5,10,15})
+  public void testUncheckedStackadd_Integer_happyPath(int initialCapacity){
+//ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.UncheckedStack(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToInteger(i)));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    for(int i=0,val=-preAllocSpan;i<100;++i,++val)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+  }
+        //ENDIF
+      //ENDIF
+    //ENDIF
+  //ENDIF
+//ENDIF
+//IF STRUCT==List,SubList
+  @ParameterizedTest
+  //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testUncheckedSubListListItradd_long_happyPathInsertBegin(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+  //ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.UncheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.UncheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.UncheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    var seqItr=seq.listIterator();
+    for(int i=0;i<100;++i)
+    {
+      seqItr.add(TypeConversionUtil.convertTolong(i));
+      assertIteratorStateIntegrity(seqItr,preAllocSpan+1,-1,i+1,parent,root);
+      seqItr.previousLong();
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=100,bound=i+100;i<bound;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(--val),root.arr[i]);
+    }
+    verifyAscendingSpanlong(root.arr,i,rootSize+100,100);
+  }
+  @ParameterizedTest
+  //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testUncheckedSubListListItradd_long_happyPathInsertEnd(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+  //ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.UncheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.UncheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.UncheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    var seqItr=seq.listIterator();
+    for(int i=0;i<100;++i)
+    {
+      seqItr.add(TypeConversionUtil.convertTolong(i));
+      assertIteratorStateIntegrity(seqItr,preAllocSpan+i+1,-1,i+1,parent,root);
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,rootSize+100,-preAllocSpan);
+  }
+  @ParameterizedTest
+  //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testUncheckedSubListListItradd_long_happyPathInsertMidPoint(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+  //ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.UncheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.UncheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.UncheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    var seqItr=seq.listIterator();
+    for(int i=0;i<100;++i)
+    {
+      seqItr.add(TypeConversionUtil.convertTolong(i));
+      assertIteratorStateIntegrity(seqItr,((rootSize+i)/2)+1,-1,i+1,parent,root);
+      if((i&1)==0)
+      {
+        seqItr.previousLong();
+      }
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=1,bound=i+50;i<bound;++i,val+=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+    for(int val=98,bound=i+50;i<bound;++i,val-=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+    verifyAscendingSpanlong(root.arr,i,rootSize+100,i);
+  }
+  @ParameterizedTest
+  //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testUncheckedSubListadd_int_long_happyPathInsertBegin(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+  //ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.UncheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.UncheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.UncheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      seq.add(0,TypeConversionUtil.convertTolong(i));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=100,bound=i+100;i<bound;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(--val),root.arr[i]);
+    }
+    verifyAscendingSpanlong(root.arr,i,rootSize+100,100);
+  }
+  @ParameterizedTest
+  //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testUncheckedSubListadd_int_long_happyPathInsertEnd(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+  //ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.UncheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.UncheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.UncheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size(),TypeConversionUtil.convertTolong(i));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,rootSize+100,-preAllocSpan);
+  }
+  @ParameterizedTest
+  //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testUncheckedSubListadd_int_long_happyPathInsertMidPoint(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+  //ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.UncheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.UncheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.UncheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size()/2,TypeConversionUtil.convertTolong(i));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=1,bound=i+50;i<bound;++i,val+=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+    for(int val=98,bound=i+50;i<bound;++i,val-=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+    verifyAscendingSpanlong(root.arr,i,rootSize+100,i);
+  }
+//ENDIF
+  @ParameterizedTest
+//IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testUncheckedSubListadd_long_happyPath(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+//ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.UncheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.UncheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.UncheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTolong(i)));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    for(int i=0,val=-preAllocSpan;i<100;++i,++val)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+  }
+//IF OfRef
+//IF STRUCT==List,SubList
+  @ParameterizedTest
+  //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testUncheckedSubListListItradd_Long_happyPathInsertBegin(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+  //ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.UncheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.UncheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.UncheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    var seqItr=seq.listIterator();
+    for(int i=0;i<100;++i)
+    {
+      seqItr.add(TypeConversionUtil.convertToLong(i));
+      assertIteratorStateIntegrity(seqItr,preAllocSpan+1,-1,i+1,parent,root);
+      seqItr.previousLong();
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=100,bound=i+100;i<bound;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(--val),root.arr[i]);
+    }
+    verifyAscendingSpanlong(root.arr,i,rootSize+100,100);
+  }
+  @ParameterizedTest
+  //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testUncheckedSubListListItradd_Long_happyPathInsertEnd(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+  //ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.UncheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.UncheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.UncheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    var seqItr=seq.listIterator();
+    for(int i=0;i<100;++i)
+    {
+      seqItr.add(TypeConversionUtil.convertToLong(i));
+      assertIteratorStateIntegrity(seqItr,preAllocSpan+i+1,-1,i+1,parent,root);
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,rootSize+100,-preAllocSpan);
+  }
+  @ParameterizedTest
+  //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testUncheckedSubListListItradd_Long_happyPathInsertMidPoint(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+  //ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.UncheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.UncheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.UncheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    var seqItr=seq.listIterator();
+    for(int i=0;i<100;++i)
+    {
+      seqItr.add(TypeConversionUtil.convertToLong(i));
+      assertIteratorStateIntegrity(seqItr,((rootSize+i)/2)+1,-1,i+1,parent,root);
+      if((i&1)==0)
+      {
+        seqItr.previousLong();
+      }
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=1,bound=i+50;i<bound;++i,val+=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+    for(int val=98,bound=i+50;i<bound;++i,val-=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+    verifyAscendingSpanlong(root.arr,i,rootSize+100,i);
+  }
+  @ParameterizedTest
+  //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testUncheckedSubListadd_int_Long_happyPathInsertBegin(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+  //ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.UncheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.UncheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.UncheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      seq.add(0,TypeConversionUtil.convertToLong(i));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=100,bound=i+100;i<bound;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(--val),root.arr[i]);
+    }
+    verifyAscendingSpanlong(root.arr,i,rootSize+100,100);
+  }
+  @ParameterizedTest
+  //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testUncheckedSubListadd_int_Long_happyPathInsertEnd(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+  //ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.UncheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.UncheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.UncheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size(),TypeConversionUtil.convertToLong(i));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,rootSize+100,-preAllocSpan);
+  }
+  @ParameterizedTest
+  //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testUncheckedSubListadd_int_Long_happyPathInsertMidPoint(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+  //ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.UncheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.UncheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.UncheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size()/2,TypeConversionUtil.convertToLong(i));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=1,bound=i+50;i<bound;++i,val+=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+    for(int val=98,bound=i+50;i<bound;++i,val-=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+    verifyAscendingSpanlong(root.arr,i,rootSize+100,i);
+  }
+//ENDIF
+  @ParameterizedTest
+//IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testUncheckedSubListadd_Long_happyPath(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+//ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.UncheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.UncheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.UncheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToLong(i)));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    for(int i=0,val=-preAllocSpan;i<100;++i,++val)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+  }
+  //IF OfBoolean
+//IF STRUCT==List,SubList
+  @ParameterizedTest
+  //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testUncheckedSubListListItradd_boolean_happyPathInsertBegin(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+  //ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.UncheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.UncheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.UncheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    var seqItr=seq.listIterator();
+    for(int i=0;i<100;++i)
+    {
+      seqItr.add(TypeConversionUtil.convertToboolean(i));
+      assertIteratorStateIntegrity(seqItr,preAllocSpan+1,-1,i+1,parent,root);
+      seqItr.previousLong();
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlongboolean(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=100,bound=i+100;i<bound;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolongboolean(--val),root.arr[i]);
+    }
+    verifyAscendingSpanlongboolean(root.arr,i,rootSize+100,100);
+  }
+  @ParameterizedTest
+  //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testUncheckedSubListListItradd_boolean_happyPathInsertEnd(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+  //ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.UncheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.UncheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.UncheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    var seqItr=seq.listIterator();
+    for(int i=0;i<100;++i)
+    {
+      seqItr.add(TypeConversionUtil.convertToboolean(i));
+      assertIteratorStateIntegrity(seqItr,preAllocSpan+i+1,-1,i+1,parent,root);
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlongboolean(root.arr,0,rootSize+100,-preAllocSpan);
+  }
+  @ParameterizedTest
+  //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testUncheckedSubListListItradd_boolean_happyPathInsertMidPoint(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+  //ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.UncheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.UncheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.UncheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    var seqItr=seq.listIterator();
+    for(int i=0;i<100;++i)
+    {
+      seqItr.add(TypeConversionUtil.convertToboolean(i));
+      assertIteratorStateIntegrity(seqItr,((rootSize+i)/2)+1,-1,i+1,parent,root);
+      if((i&1)==0)
+      {
+        seqItr.previousLong();
+      }
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlongboolean(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=1,bound=i+50;i<bound;++i,val+=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolongboolean(val),root.arr[i]);
+    }
+    for(int val=98,bound=i+50;i<bound;++i,val-=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolongboolean(val),root.arr[i]);
+    }
+    verifyAscendingSpanlongboolean(root.arr,i,rootSize+100,i);
+  }
+  @ParameterizedTest
+  //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testUncheckedSubListadd_int_boolean_happyPathInsertBegin(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+  //ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.UncheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.UncheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.UncheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      seq.add(0,TypeConversionUtil.convertToboolean(i));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlongboolean(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=100,bound=i+100;i<bound;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolongboolean(--val),root.arr[i]);
+    }
+    verifyAscendingSpanlongboolean(root.arr,i,rootSize+100,100);
+  }
+  @ParameterizedTest
+  //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testUncheckedSubListadd_int_boolean_happyPathInsertEnd(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+  //ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.UncheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.UncheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.UncheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size(),TypeConversionUtil.convertToboolean(i));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlongboolean(root.arr,0,rootSize+100,-preAllocSpan);
+  }
+  @ParameterizedTest
+  //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testUncheckedSubListadd_int_boolean_happyPathInsertMidPoint(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+  //ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.UncheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.UncheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.UncheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size()/2,TypeConversionUtil.convertToboolean(i));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlongboolean(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=1,bound=i+50;i<bound;++i,val+=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolongboolean(val),root.arr[i]);
+    }
+    for(int val=98,bound=i+50;i<bound;++i,val-=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolongboolean(val),root.arr[i]);
+    }
+    verifyAscendingSpanlongboolean(root.arr,i,rootSize+100,i);
+  }
+//ENDIF
+  @ParameterizedTest
+//IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testUncheckedSubListadd_boolean_happyPath(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+//ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.UncheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.UncheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.UncheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    for(int i=0,val=-preAllocSpan;i<100;++i,++val)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolongboolean(val),root.arr[i]);
+    }
+  }
+//IF STRUCT==List,SubList
+  @ParameterizedTest
+  //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testUncheckedSubListListItradd_Boolean_happyPathInsertBegin(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+  //ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.UncheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.UncheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.UncheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    var seqItr=seq.listIterator();
+    for(int i=0;i<100;++i)
+    {
+      seqItr.add(TypeConversionUtil.convertToBoolean(i));
+      assertIteratorStateIntegrity(seqItr,preAllocSpan+1,-1,i+1,parent,root);
+      seqItr.previousLong();
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlongboolean(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=100,bound=i+100;i<bound;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolongboolean(--val),root.arr[i]);
+    }
+    verifyAscendingSpanlongboolean(root.arr,i,rootSize+100,100);
+  }
+  @ParameterizedTest
+  //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testUncheckedSubListListItradd_Boolean_happyPathInsertEnd(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+  //ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.UncheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.UncheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.UncheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    var seqItr=seq.listIterator();
+    for(int i=0;i<100;++i)
+    {
+      seqItr.add(TypeConversionUtil.convertToBoolean(i));
+      assertIteratorStateIntegrity(seqItr,preAllocSpan+i+1,-1,i+1,parent,root);
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlongboolean(root.arr,0,rootSize+100,-preAllocSpan);
+  }
+  @ParameterizedTest
+  //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testUncheckedSubListListItradd_Boolean_happyPathInsertMidPoint(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+  //ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.UncheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.UncheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.UncheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    var seqItr=seq.listIterator();
+    for(int i=0;i<100;++i)
+    {
+      seqItr.add(TypeConversionUtil.convertToBoolean(i));
+      assertIteratorStateIntegrity(seqItr,((rootSize+i)/2)+1,-1,i+1,parent,root);
+      if((i&1)==0)
+      {
+        seqItr.previousLong();
+      }
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlongboolean(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=1,bound=i+50;i<bound;++i,val+=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolongboolean(val),root.arr[i]);
+    }
+    for(int val=98,bound=i+50;i<bound;++i,val-=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolongboolean(val),root.arr[i]);
+    }
+    verifyAscendingSpanlongboolean(root.arr,i,rootSize+100,i);
+  }
+  @ParameterizedTest
+  //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testUncheckedSubListadd_int_Boolean_happyPathInsertBegin(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+  //ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.UncheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.UncheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.UncheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      seq.add(0,TypeConversionUtil.convertToBoolean(i));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlongboolean(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=100,bound=i+100;i<bound;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolongboolean(--val),root.arr[i]);
+    }
+    verifyAscendingSpanlongboolean(root.arr,i,rootSize+100,100);
+  }
+  @ParameterizedTest
+  //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testUncheckedSubListadd_int_Boolean_happyPathInsertEnd(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+  //ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.UncheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.UncheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.UncheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size(),TypeConversionUtil.convertToBoolean(i));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlongboolean(root.arr,0,rootSize+100,-preAllocSpan);
+  }
+  @ParameterizedTest
+  //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testUncheckedSubListadd_int_Boolean_happyPathInsertMidPoint(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+  //ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.UncheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.UncheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.UncheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size()/2,TypeConversionUtil.convertToBoolean(i));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlongboolean(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=1,bound=i+50;i<bound;++i,val+=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolongboolean(val),root.arr[i]);
+    }
+    for(int val=98,bound=i+50;i<bound;++i,val-=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolongboolean(val),root.arr[i]);
+    }
+    verifyAscendingSpanlongboolean(root.arr,i,rootSize+100,i);
+  }
+//ENDIF
+  @ParameterizedTest
+//IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testUncheckedSubListadd_Boolean_happyPath(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+//ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.UncheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.UncheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.UncheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToBoolean(i)));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    for(int i=0,val=-preAllocSpan;i<100;++i,++val)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolongboolean(val),root.arr[i]);
+    }
+  }
+    //IF OfByte,OfChar
+//IF STRUCT==List,SubList
+  @ParameterizedTest
+  //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testUncheckedSubListListItradd_byte_happyPathInsertBegin(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+  //ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.UncheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.UncheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.UncheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    var seqItr=seq.listIterator();
+    for(int i=0;i<100;++i)
+    {
+      seqItr.add(TypeConversionUtil.convertTobyte(i));
+      assertIteratorStateIntegrity(seqItr,preAllocSpan+1,-1,i+1,parent,root);
+      seqItr.previousLong();
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=100,bound=i+100;i<bound;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(--val),root.arr[i]);
+    }
+    verifyAscendingSpanlong(root.arr,i,rootSize+100,100);
+  }
+  @ParameterizedTest
+  //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testUncheckedSubListListItradd_byte_happyPathInsertEnd(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+  //ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.UncheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.UncheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.UncheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    var seqItr=seq.listIterator();
+    for(int i=0;i<100;++i)
+    {
+      seqItr.add(TypeConversionUtil.convertTobyte(i));
+      assertIteratorStateIntegrity(seqItr,preAllocSpan+i+1,-1,i+1,parent,root);
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,rootSize+100,-preAllocSpan);
+  }
+  @ParameterizedTest
+  //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testUncheckedSubListListItradd_byte_happyPathInsertMidPoint(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+  //ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.UncheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.UncheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.UncheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    var seqItr=seq.listIterator();
+    for(int i=0;i<100;++i)
+    {
+      seqItr.add(TypeConversionUtil.convertTobyte(i));
+      assertIteratorStateIntegrity(seqItr,((rootSize+i)/2)+1,-1,i+1,parent,root);
+      if((i&1)==0)
+      {
+        seqItr.previousLong();
+      }
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=1,bound=i+50;i<bound;++i,val+=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+    for(int val=98,bound=i+50;i<bound;++i,val-=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+    verifyAscendingSpanlong(root.arr,i,rootSize+100,i);
+  }
+  @ParameterizedTest
+  //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testUncheckedSubListadd_int_byte_happyPathInsertBegin(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+  //ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.UncheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.UncheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.UncheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      seq.add(0,TypeConversionUtil.convertTobyte(i));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=100,bound=i+100;i<bound;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(--val),root.arr[i]);
+    }
+    verifyAscendingSpanlong(root.arr,i,rootSize+100,100);
+  }
+  @ParameterizedTest
+  //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testUncheckedSubListadd_int_byte_happyPathInsertEnd(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+  //ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.UncheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.UncheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.UncheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size(),TypeConversionUtil.convertTobyte(i));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,rootSize+100,-preAllocSpan);
+  }
+  @ParameterizedTest
+  //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testUncheckedSubListadd_int_byte_happyPathInsertMidPoint(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+  //ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.UncheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.UncheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.UncheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size()/2,TypeConversionUtil.convertTobyte(i));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=1,bound=i+50;i<bound;++i,val+=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+    for(int val=98,bound=i+50;i<bound;++i,val-=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+    verifyAscendingSpanlong(root.arr,i,rootSize+100,i);
+  }
+//ENDIF
+  @ParameterizedTest
+//IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testUncheckedSubListadd_byte_happyPath(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+//ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.UncheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.UncheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.UncheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTobyte(i)));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    for(int i=0,val=-preAllocSpan;i<100;++i,++val)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+  }
+//IF STRUCT==List,SubList
+  @ParameterizedTest
+  //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testUncheckedSubListListItradd_Byte_happyPathInsertBegin(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+  //ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.UncheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.UncheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.UncheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    var seqItr=seq.listIterator();
+    for(int i=0;i<100;++i)
+    {
+      seqItr.add(TypeConversionUtil.convertToByte(i));
+      assertIteratorStateIntegrity(seqItr,preAllocSpan+1,-1,i+1,parent,root);
+      seqItr.previousLong();
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=100,bound=i+100;i<bound;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(--val),root.arr[i]);
+    }
+    verifyAscendingSpanlong(root.arr,i,rootSize+100,100);
+  }
+  @ParameterizedTest
+  //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testUncheckedSubListListItradd_Byte_happyPathInsertEnd(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+  //ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.UncheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.UncheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.UncheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    var seqItr=seq.listIterator();
+    for(int i=0;i<100;++i)
+    {
+      seqItr.add(TypeConversionUtil.convertToByte(i));
+      assertIteratorStateIntegrity(seqItr,preAllocSpan+i+1,-1,i+1,parent,root);
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,rootSize+100,-preAllocSpan);
+  }
+  @ParameterizedTest
+  //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testUncheckedSubListListItradd_Byte_happyPathInsertMidPoint(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+  //ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.UncheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.UncheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.UncheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    var seqItr=seq.listIterator();
+    for(int i=0;i<100;++i)
+    {
+      seqItr.add(TypeConversionUtil.convertToByte(i));
+      assertIteratorStateIntegrity(seqItr,((rootSize+i)/2)+1,-1,i+1,parent,root);
+      if((i&1)==0)
+      {
+        seqItr.previousLong();
+      }
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=1,bound=i+50;i<bound;++i,val+=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+    for(int val=98,bound=i+50;i<bound;++i,val-=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+    verifyAscendingSpanlong(root.arr,i,rootSize+100,i);
+  }
+  @ParameterizedTest
+  //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testUncheckedSubListadd_int_Byte_happyPathInsertBegin(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+  //ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.UncheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.UncheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.UncheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      seq.add(0,TypeConversionUtil.convertToByte(i));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=100,bound=i+100;i<bound;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(--val),root.arr[i]);
+    }
+    verifyAscendingSpanlong(root.arr,i,rootSize+100,100);
+  }
+  @ParameterizedTest
+  //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testUncheckedSubListadd_int_Byte_happyPathInsertEnd(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+  //ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.UncheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.UncheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.UncheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size(),TypeConversionUtil.convertToByte(i));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,rootSize+100,-preAllocSpan);
+  }
+  @ParameterizedTest
+  //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testUncheckedSubListadd_int_Byte_happyPathInsertMidPoint(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+  //ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.UncheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.UncheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.UncheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size()/2,TypeConversionUtil.convertToByte(i));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=1,bound=i+50;i<bound;++i,val+=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+    for(int val=98,bound=i+50;i<bound;++i,val-=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+    verifyAscendingSpanlong(root.arr,i,rootSize+100,i);
+  }
+//ENDIF
+  @ParameterizedTest
+//IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testUncheckedSubListadd_Byte_happyPath(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+//ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.UncheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.UncheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.UncheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToByte(i)));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    for(int i=0,val=-preAllocSpan;i<100;++i,++val)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+  }
+      //IF OfShort
+//IF STRUCT==List,SubList
+  @ParameterizedTest
+  //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testUncheckedSubListListItradd_short_happyPathInsertBegin(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+  //ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.UncheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.UncheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.UncheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    var seqItr=seq.listIterator();
+    for(int i=0;i<100;++i)
+    {
+      seqItr.add(TypeConversionUtil.convertToshort(i));
+      assertIteratorStateIntegrity(seqItr,preAllocSpan+1,-1,i+1,parent,root);
+      seqItr.previousLong();
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=100,bound=i+100;i<bound;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(--val),root.arr[i]);
+    }
+    verifyAscendingSpanlong(root.arr,i,rootSize+100,100);
+  }
+  @ParameterizedTest
+  //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testUncheckedSubListListItradd_short_happyPathInsertEnd(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+  //ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.UncheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.UncheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.UncheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    var seqItr=seq.listIterator();
+    for(int i=0;i<100;++i)
+    {
+      seqItr.add(TypeConversionUtil.convertToshort(i));
+      assertIteratorStateIntegrity(seqItr,preAllocSpan+i+1,-1,i+1,parent,root);
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,rootSize+100,-preAllocSpan);
+  }
+  @ParameterizedTest
+  //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testUncheckedSubListListItradd_short_happyPathInsertMidPoint(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+  //ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.UncheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.UncheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.UncheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    var seqItr=seq.listIterator();
+    for(int i=0;i<100;++i)
+    {
+      seqItr.add(TypeConversionUtil.convertToshort(i));
+      assertIteratorStateIntegrity(seqItr,((rootSize+i)/2)+1,-1,i+1,parent,root);
+      if((i&1)==0)
+      {
+        seqItr.previousLong();
+      }
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=1,bound=i+50;i<bound;++i,val+=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+    for(int val=98,bound=i+50;i<bound;++i,val-=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+    verifyAscendingSpanlong(root.arr,i,rootSize+100,i);
+  }
+  @ParameterizedTest
+  //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testUncheckedSubListadd_int_short_happyPathInsertBegin(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+  //ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.UncheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.UncheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.UncheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      seq.add(0,TypeConversionUtil.convertToshort(i));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=100,bound=i+100;i<bound;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(--val),root.arr[i]);
+    }
+    verifyAscendingSpanlong(root.arr,i,rootSize+100,100);
+  }
+  @ParameterizedTest
+  //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testUncheckedSubListadd_int_short_happyPathInsertEnd(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+  //ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.UncheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.UncheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.UncheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size(),TypeConversionUtil.convertToshort(i));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,rootSize+100,-preAllocSpan);
+  }
+  @ParameterizedTest
+  //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testUncheckedSubListadd_int_short_happyPathInsertMidPoint(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+  //ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.UncheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.UncheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.UncheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size()/2,TypeConversionUtil.convertToshort(i));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=1,bound=i+50;i<bound;++i,val+=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+    for(int val=98,bound=i+50;i<bound;++i,val-=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+    verifyAscendingSpanlong(root.arr,i,rootSize+100,i);
+  }
+//ENDIF
+  @ParameterizedTest
+//IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testUncheckedSubListadd_short_happyPath(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+//ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.UncheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.UncheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.UncheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToshort(i)));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    for(int i=0,val=-preAllocSpan;i<100;++i,++val)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+  }
+//IF STRUCT==List,SubList
+  @ParameterizedTest
+  //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testUncheckedSubListListItradd_Short_happyPathInsertBegin(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+  //ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.UncheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.UncheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.UncheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    var seqItr=seq.listIterator();
+    for(int i=0;i<100;++i)
+    {
+      seqItr.add(TypeConversionUtil.convertToShort(i));
+      assertIteratorStateIntegrity(seqItr,preAllocSpan+1,-1,i+1,parent,root);
+      seqItr.previousLong();
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=100,bound=i+100;i<bound;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(--val),root.arr[i]);
+    }
+    verifyAscendingSpanlong(root.arr,i,rootSize+100,100);
+  }
+  @ParameterizedTest
+  //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testUncheckedSubListListItradd_Short_happyPathInsertEnd(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+  //ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.UncheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.UncheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.UncheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    var seqItr=seq.listIterator();
+    for(int i=0;i<100;++i)
+    {
+      seqItr.add(TypeConversionUtil.convertToShort(i));
+      assertIteratorStateIntegrity(seqItr,preAllocSpan+i+1,-1,i+1,parent,root);
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,rootSize+100,-preAllocSpan);
+  }
+  @ParameterizedTest
+  //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testUncheckedSubListListItradd_Short_happyPathInsertMidPoint(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+  //ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.UncheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.UncheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.UncheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    var seqItr=seq.listIterator();
+    for(int i=0;i<100;++i)
+    {
+      seqItr.add(TypeConversionUtil.convertToShort(i));
+      assertIteratorStateIntegrity(seqItr,((rootSize+i)/2)+1,-1,i+1,parent,root);
+      if((i&1)==0)
+      {
+        seqItr.previousLong();
+      }
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=1,bound=i+50;i<bound;++i,val+=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+    for(int val=98,bound=i+50;i<bound;++i,val-=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+    verifyAscendingSpanlong(root.arr,i,rootSize+100,i);
+  }
+  @ParameterizedTest
+  //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testUncheckedSubListadd_int_Short_happyPathInsertBegin(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+  //ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.UncheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.UncheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.UncheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      seq.add(0,TypeConversionUtil.convertToShort(i));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=100,bound=i+100;i<bound;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(--val),root.arr[i]);
+    }
+    verifyAscendingSpanlong(root.arr,i,rootSize+100,100);
+  }
+  @ParameterizedTest
+  //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testUncheckedSubListadd_int_Short_happyPathInsertEnd(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+  //ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.UncheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.UncheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.UncheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size(),TypeConversionUtil.convertToShort(i));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,rootSize+100,-preAllocSpan);
+  }
+  @ParameterizedTest
+  //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testUncheckedSubListadd_int_Short_happyPathInsertMidPoint(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+  //ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.UncheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.UncheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.UncheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size()/2,TypeConversionUtil.convertToShort(i));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=1,bound=i+50;i<bound;++i,val+=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+    for(int val=98,bound=i+50;i<bound;++i,val-=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+    verifyAscendingSpanlong(root.arr,i,rootSize+100,i);
+  }
+//ENDIF
+  @ParameterizedTest
+//IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testUncheckedSubListadd_Short_happyPath(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+//ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.UncheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.UncheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.UncheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToShort(i)));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    for(int i=0,val=-preAllocSpan;i<100;++i,++val)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+  }
+        //IF OfInt
+//IF STRUCT==List,SubList
+  @ParameterizedTest
+  //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testUncheckedSubListListItradd_int_happyPathInsertBegin(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+  //ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.UncheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.UncheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.UncheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    var seqItr=seq.listIterator();
+    for(int i=0;i<100;++i)
+    {
+      seqItr.add(TypeConversionUtil.convertToint(i));
+      assertIteratorStateIntegrity(seqItr,preAllocSpan+1,-1,i+1,parent,root);
+      seqItr.previousLong();
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=100,bound=i+100;i<bound;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(--val),root.arr[i]);
+    }
+    verifyAscendingSpanlong(root.arr,i,rootSize+100,100);
+  }
+  @ParameterizedTest
+  //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testUncheckedSubListListItradd_int_happyPathInsertEnd(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+  //ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.UncheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.UncheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.UncheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    var seqItr=seq.listIterator();
+    for(int i=0;i<100;++i)
+    {
+      seqItr.add(TypeConversionUtil.convertToint(i));
+      assertIteratorStateIntegrity(seqItr,preAllocSpan+i+1,-1,i+1,parent,root);
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,rootSize+100,-preAllocSpan);
+  }
+  @ParameterizedTest
+  //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testUncheckedSubListListItradd_int_happyPathInsertMidPoint(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+  //ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.UncheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.UncheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.UncheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    var seqItr=seq.listIterator();
+    for(int i=0;i<100;++i)
+    {
+      seqItr.add(TypeConversionUtil.convertToint(i));
+      assertIteratorStateIntegrity(seqItr,((rootSize+i)/2)+1,-1,i+1,parent,root);
+      if((i&1)==0)
+      {
+        seqItr.previousLong();
+      }
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=1,bound=i+50;i<bound;++i,val+=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+    for(int val=98,bound=i+50;i<bound;++i,val-=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+    verifyAscendingSpanlong(root.arr,i,rootSize+100,i);
+  }
+  @ParameterizedTest
+  //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testUncheckedSubListadd_int_int_happyPathInsertBegin(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+  //ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.UncheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.UncheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.UncheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      seq.add(0,TypeConversionUtil.convertToint(i));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=100,bound=i+100;i<bound;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(--val),root.arr[i]);
+    }
+    verifyAscendingSpanlong(root.arr,i,rootSize+100,100);
+  }
+  @ParameterizedTest
+  //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testUncheckedSubListadd_int_int_happyPathInsertEnd(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+  //ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.UncheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.UncheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.UncheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size(),TypeConversionUtil.convertToint(i));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,rootSize+100,-preAllocSpan);
+  }
+  @ParameterizedTest
+  //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testUncheckedSubListadd_int_int_happyPathInsertMidPoint(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+  //ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.UncheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.UncheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.UncheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size()/2,TypeConversionUtil.convertToint(i));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=1,bound=i+50;i<bound;++i,val+=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+    for(int val=98,bound=i+50;i<bound;++i,val-=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+    verifyAscendingSpanlong(root.arr,i,rootSize+100,i);
+  }
+//ENDIF
+  @ParameterizedTest
+//IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testUncheckedSubListadd_int_happyPath(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+//ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.UncheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.UncheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.UncheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToint(i)));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    for(int i=0,val=-preAllocSpan;i<100;++i,++val)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+  }
+//IF STRUCT==List,SubList
+  @ParameterizedTest
+  //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testUncheckedSubListListItradd_Integer_happyPathInsertBegin(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+  //ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.UncheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.UncheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.UncheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    var seqItr=seq.listIterator();
+    for(int i=0;i<100;++i)
+    {
+      seqItr.add(TypeConversionUtil.convertToInteger(i));
+      assertIteratorStateIntegrity(seqItr,preAllocSpan+1,-1,i+1,parent,root);
+      seqItr.previousLong();
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=100,bound=i+100;i<bound;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(--val),root.arr[i]);
+    }
+    verifyAscendingSpanlong(root.arr,i,rootSize+100,100);
+  }
+  @ParameterizedTest
+  //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testUncheckedSubListListItradd_Integer_happyPathInsertEnd(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+  //ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.UncheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.UncheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.UncheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    var seqItr=seq.listIterator();
+    for(int i=0;i<100;++i)
+    {
+      seqItr.add(TypeConversionUtil.convertToInteger(i));
+      assertIteratorStateIntegrity(seqItr,preAllocSpan+i+1,-1,i+1,parent,root);
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,rootSize+100,-preAllocSpan);
+  }
+  @ParameterizedTest
+  //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testUncheckedSubListListItradd_Integer_happyPathInsertMidPoint(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+  //ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.UncheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.UncheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.UncheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    var seqItr=seq.listIterator();
+    for(int i=0;i<100;++i)
+    {
+      seqItr.add(TypeConversionUtil.convertToInteger(i));
+      assertIteratorStateIntegrity(seqItr,((rootSize+i)/2)+1,-1,i+1,parent,root);
+      if((i&1)==0)
+      {
+        seqItr.previousLong();
+      }
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=1,bound=i+50;i<bound;++i,val+=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+    for(int val=98,bound=i+50;i<bound;++i,val-=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+    verifyAscendingSpanlong(root.arr,i,rootSize+100,i);
+  }
+  @ParameterizedTest
+  //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testUncheckedSubListadd_int_Integer_happyPathInsertBegin(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+  //ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.UncheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.UncheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.UncheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      seq.add(0,TypeConversionUtil.convertToInteger(i));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=100,bound=i+100;i<bound;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(--val),root.arr[i]);
+    }
+    verifyAscendingSpanlong(root.arr,i,rootSize+100,100);
+  }
+  @ParameterizedTest
+  //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testUncheckedSubListadd_int_Integer_happyPathInsertEnd(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+  //ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.UncheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.UncheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.UncheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size(),TypeConversionUtil.convertToInteger(i));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,rootSize+100,-preAllocSpan);
+  }
+  @ParameterizedTest
+  //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testUncheckedSubListadd_int_Integer_happyPathInsertMidPoint(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+  //ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.UncheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.UncheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.UncheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size()/2,TypeConversionUtil.convertToInteger(i));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=1,bound=i+50;i<bound;++i,val+=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+    for(int val=98,bound=i+50;i<bound;++i,val-=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+    verifyAscendingSpanlong(root.arr,i,rootSize+100,i);
+  }
+//ENDIF
+  @ParameterizedTest
+//IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testUncheckedSubListadd_Integer_happyPath(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+//ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.UncheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.UncheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.UncheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToInteger(i)));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    for(int i=0,val=-preAllocSpan;i<100;++i,++val)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+  }
+        //ENDIF
+      //ENDIF
+    //ENDIF
+  //ENDIF
+//ENDIF
+//IF STRUCT==Stack,List
   @Test
-  public void testUncheckedListconstructor_int_initialCapacity10(){
-    var seq=new LongArrSeq.UncheckedList(10);
+  public void testCheckedListConstructor_happyPath()
+  {
+    var seq=new LongArrSeq.CheckedList();
     Assertions.assertEquals(0,seq.size);
-    switch(10){
-    case 0:
+    Assertions.assertSame(OmniArray.OfLong.DEFAULT_ARR,seq.arr);
+    assertStructuralIntegrity(seq,0,0,seq,0,0,seq,0,0);
+  }
+  @Test
+  public void testCheckedListConstructor_int_longarray_happyPath()
+  {
+    int size=5;
+    long[] arr=new long[10];
+    var seq=new LongArrSeq.CheckedList(size,arr);
+    Assertions.assertEquals(size,seq.size);
+    Assertions.assertSame(arr,seq.arr);
+    assertStructuralIntegrity(seq,0,0,seq,0,0,seq,0,0);
+  }
+  @ParameterizedTest
+  @ValueSource(ints={0,5,OmniArray.DEFAULT_ARR_SEQ_CAP,15})
+  public void testCheckedListConstructor_int_happyPath(int capacity)
+  {
+    var seq=new LongArrSeq.CheckedList(capacity);
+    Assertions.assertEquals(0,seq.size);
+    switch(capacity)
+    {
+      case 0:
       Assertions.assertNull(seq.arr);
       break;
-    case OmniArray.DEFAULT_ARR_SEQ_CAP:
+      case OmniArray.DEFAULT_ARR_SEQ_CAP:
       Assertions.assertSame(OmniArray.OfLong.DEFAULT_ARR,seq.arr);
       break;
-    default:
-      Assertions.assertNotNull(seq.arr);
-      Assertions.assertEquals(10,seq.arr.length);
+      default:
+      Assertions.assertEquals(capacity,seq.arr.length);
     }
+    assertStructuralIntegrity(seq,0,0,seq,0,0,seq,0,0);
   }
-  @Test
-  public void testUncheckedListClone_initialCapacityDEFAULT_seqIsEmpty()
-  {
-    var seq=new LongArrSeq.UncheckedList();
-    var clone=(LongArrSeq.UncheckedList)seq.clone();
-    Assertions.assertEquals(0,clone.size());
-    Assertions.assertEquals(0,seq.size());
-    Assertions.assertSame(clone.arr,OmniArray.OfLong.DEFAULT_ARR);
-  }
-  @Test
-  public void testUncheckedListClone_initialCapacityDEFAULT_seqIsNotEmpty()
-  {
-    var seq=new LongArrSeq.UncheckedList();
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTolong(i)));
-    }
-    var clone=(LongArrSeq.UncheckedList)seq.clone();
-    Assertions.assertEquals(100,clone.size());
-    Assertions.assertEquals(100,seq.size());
-    Assertions.assertNotSame(seq.arr,clone.arr);
+//ENDIF
+//IF STRUCT==List,SubList
+  @ParameterizedTest
+  //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testCheckedListListItradd_long_happyPathInsertBegin(int initialCapacity){
+  //ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.CheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    var seqItr=seq.listIterator();
     for(int i=0;i<100;++i)
     {
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),clone.arr[i]);
+      seqItr.add(TypeConversionUtil.convertTolong(i));
+      assertIteratorStateIntegrity(seqItr,preAllocSpan+1,-1,i+1,parent,root);
+      seqItr.previousLong();
     }
-  }
-  @Test
-  public void testUncheckedListClone_initialCapacityNULL_seqIsEmpty()
-  {
-    var seq=new LongArrSeq.UncheckedList(0,null);
-    var clone=(LongArrSeq.UncheckedList)seq.clone();
-    Assertions.assertEquals(0,clone.size());
-    Assertions.assertEquals(0,seq.size());
-    Assertions.assertSame(clone.arr,OmniArray.OfLong.DEFAULT_ARR);
-  }
-  @Test
-  public void testUncheckedListClone_initialCapacityNULL_seqIsNotEmpty()
-  {
-    var seq=new LongArrSeq.UncheckedList(0,null);
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTolong(i)));
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=100,bound=i+100;i<bound;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(--val),root.arr[i]);
     }
-    var clone=(LongArrSeq.UncheckedList)seq.clone();
-    Assertions.assertEquals(100,clone.size());
-    Assertions.assertEquals(100,seq.size());
-    Assertions.assertNotSame(seq.arr,clone.arr);
+    verifyAscendingSpanlong(root.arr,i,rootSize+100,100);
+  }
+  @ParameterizedTest
+  //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testCheckedListListItradd_long_happyPathInsertEnd(int initialCapacity){
+  //ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.CheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    var seqItr=seq.listIterator();
     for(int i=0;i<100;++i)
     {
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),clone.arr[i]);
+      seqItr.add(TypeConversionUtil.convertTolong(i));
+      assertIteratorStateIntegrity(seqItr,preAllocSpan+i+1,-1,i+1,parent,root);
     }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,rootSize+100,-preAllocSpan);
   }
-  @Test
-  public void testUncheckedListClone_initialCapacity50_seqIsEmpty()
-  {
-    var seq=new LongArrSeq.UncheckedList(50);
-    var clone=(LongArrSeq.UncheckedList)seq.clone();
-    Assertions.assertEquals(0,clone.size());
-    Assertions.assertEquals(0,seq.size());
-    Assertions.assertSame(clone.arr,OmniArray.OfLong.DEFAULT_ARR);
-  }
-  @Test
-  public void testUncheckedListClone_initialCapacity50_seqIsNotEmpty()
-  {
-    var seq=new LongArrSeq.UncheckedList(50);
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTolong(i)));
-    }
-    var clone=(LongArrSeq.UncheckedList)seq.clone();
-    Assertions.assertEquals(100,clone.size());
-    Assertions.assertEquals(100,seq.size());
-    Assertions.assertNotSame(seq.arr,clone.arr);
+  @ParameterizedTest
+  //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testCheckedListListItradd_long_happyPathInsertMidPoint(int initialCapacity){
+  //ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.CheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    var seqItr=seq.listIterator();
     for(int i=0;i<100;++i)
     {
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),clone.arr[i]);
+      seqItr.add(TypeConversionUtil.convertTolong(i));
+      assertIteratorStateIntegrity(seqItr,((rootSize+i)/2)+1,-1,i+1,parent,root);
+      if((i&1)==0)
+      {
+        seqItr.previousLong();
+      }
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=1,bound=i+50;i<bound;++i,val+=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+    for(int val=98,bound=i+50;i<bound;++i,val-=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+    verifyAscendingSpanlong(root.arr,i,rootSize+100,i);
+  }
+  //IF CHECKED==Checked
+  @ParameterizedTest
+    //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testCheckedListListItradd_long_throwCME(int initialCapacity){
+    //ENDIF
+    {
+      //try on an empty sublist
+//IF 
+      int rootPreAlloc=0;
+      int parentPreAlloc=0;
+      int parentPostAlloc=0;
+      int rootPostAlloc=0;
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      var seq=new LongArrSeq.CheckedList(initialCapacity);
+      var parent=seq;
+      var root=seq;
+//ENDIF
+      var itr=seq.listIterator();
+      //illegally modify the root
+      root.add(preAllocSpan,TypeConversionUtil.convertTolong(0));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->itr.add(TypeConversionUtil.convertTolong(0)));
+      assertIteratorStateIntegrity(itr,preAllocSpan,-1,0,parent,root);
+      assertStructuralIntegrity(seq,0,0,parent,parentSize,0,root,rootSize+1,1);
+      verifyAscendingSpanlong(root.arr,0,preAllocSpan+1,-preAllocSpan);
+      verifyAscendingSpanlong(root.arr,preAllocSpan+1,rootSize+1,100);
+    }
+    {
+      //try on an empty sublist
+//IF 
+      int rootPreAlloc=0;
+      int parentPreAlloc=0;
+      int parentPostAlloc=0;
+      int rootPostAlloc=0;
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      var seq=new LongArrSeq.CheckedList(initialCapacity);
+      var parent=seq;
+      var root=seq;
+//ENDIF
+      var itr=seq.listIterator();
+      //illegally modify the parent
+      parent.add(parentPreAlloc,TypeConversionUtil.convertTolong(0));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->itr.add(TypeConversionUtil.convertTolong(0)));
+      assertIteratorStateIntegrity(itr,preAllocSpan,-1,0,parent,root);
+      assertStructuralIntegrity(seq,0,0,parent,parentSize+1,1,root,rootSize+1,1);
+      verifyAscendingSpanlong(root.arr,0,preAllocSpan+1,-preAllocSpan);
+      verifyAscendingSpanlong(root.arr,preAllocSpan+1,rootSize+1,100);
+    }
+    {
+      //try on an empty sublist
+//IF 
+      int rootPreAlloc=0;
+      int parentPreAlloc=0;
+      int parentPostAlloc=0;
+      int rootPostAlloc=0;
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      var seq=new LongArrSeq.CheckedList(initialCapacity);
+      var parent=seq;
+      var root=seq;
+//ENDIF
+      var itr=seq.listIterator();
+      //illegally modify the sequence
+      seq.add(0,TypeConversionUtil.convertTolong(0));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->itr.add(TypeConversionUtil.convertTolong(0)));
+      assertIteratorStateIntegrity(itr,preAllocSpan,-1,0,parent,root);
+      assertStructuralIntegrity(seq,1,1,parent,parentSize+1,1,root,rootSize+1,1);
+      verifyAscendingSpanlong(root.arr,0,preAllocSpan+1,-preAllocSpan);
+      verifyAscendingSpanlong(root.arr,preAllocSpan+1,rootSize+1,100);
+    }
+    {
+      //try on an non-empty sublist, inserting at the end
+//IF 
+      int rootPreAlloc=0;
+      int parentPreAlloc=0;
+      int parentPostAlloc=0;
+      int rootPostAlloc=0;
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      var seq=new LongArrSeq.CheckedList(initialCapacity);
+      var parent=seq;
+      var root=seq;
+//ENDIF
+      var itr=seq.listIterator();
+      for(int i=0;i<100;++i)
+      {
+        itr.add(TypeConversionUtil.convertTolong(i));
+      }
+      //illegally modify the root
+      root.add(TypeConversionUtil.convertTolong(rootSize+100));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->itr.add(TypeConversionUtil.convertTolong(0)));
+      assertIteratorStateIntegrity(itr,preAllocSpan+100,-1,100,parent,root);
+      assertStructuralIntegrity(seq,100,100,parent,parentSize+100,100,root,rootSize+101,101);
+      verifyAscendingSpanlong(root.arr,0,rootSize+101,-preAllocSpan);
+    }
+    {
+      //try on an non-empty sublist, inserting at the end
+//IF 
+      int rootPreAlloc=0;
+      int parentPreAlloc=0;
+      int parentPostAlloc=0;
+      int rootPostAlloc=0;
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      var seq=new LongArrSeq.CheckedList(initialCapacity);
+      var parent=seq;
+      var root=seq;
+//ENDIF
+      var itr=seq.listIterator();
+      for(int i=0;i<100;++i)
+      {
+        itr.add(TypeConversionUtil.convertTolong(i));
+      }
+      //illegally modify the parent
+      parent.add(parentPreAlloc+50,TypeConversionUtil.convertTolong(50));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->itr.add(TypeConversionUtil.convertTolong(0)));
+      assertIteratorStateIntegrity(itr,preAllocSpan+100,-1,100,parent,root);
+      assertStructuralIntegrity(seq,100,100,parent,parentSize+101,101,root,rootSize+101,101);
+      verifyAscendingSpanlong(root.arr,0,preAllocSpan+51,-preAllocSpan);
+      verifyAscendingSpanlong(root.arr,preAllocSpan+51,rootSize+101,50);
+    }
+    {
+      //try on an non-empty sublist, inserting at the end
+//IF 
+      int rootPreAlloc=0;
+      int parentPreAlloc=0;
+      int parentPostAlloc=0;
+      int rootPostAlloc=0;
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      var seq=new LongArrSeq.CheckedList(initialCapacity);
+      var parent=seq;
+      var root=seq;
+//ENDIF
+      var itr=seq.listIterator();
+      for(int i=0;i<100;++i)
+      {
+        itr.add(TypeConversionUtil.convertTolong(i));
+      }
+      //illegally modify the seq
+      seq.add(50,TypeConversionUtil.convertTolong(50));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->itr.add(TypeConversionUtil.convertTolong(0)));
+      assertIteratorStateIntegrity(itr,preAllocSpan+100,-1,100,parent,root);
+      assertStructuralIntegrity(seq,101,101,parent,parentSize+101,101,root,rootSize+101,101);
+      verifyAscendingSpanlong(root.arr,0,preAllocSpan+51,-preAllocSpan);
+      verifyAscendingSpanlong(root.arr,preAllocSpan+51,rootSize+101,50);
     }
   }
-  @Test
-  public void testUncheckedListClone_initialCapacity0_seqIsEmpty()
-  {
-    var seq=new LongArrSeq.UncheckedList(0);
-    var clone=(LongArrSeq.UncheckedList)seq.clone();
-    Assertions.assertEquals(0,clone.size());
-    Assertions.assertEquals(0,seq.size());
-    Assertions.assertSame(clone.arr,OmniArray.OfLong.DEFAULT_ARR);
-  }
-  @Test
-  public void testUncheckedListClone_initialCapacity0_seqIsNotEmpty()
-  {
-    var seq=new LongArrSeq.UncheckedList(0);
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTolong(i)));
-    }
-    var clone=(LongArrSeq.UncheckedList)seq.clone();
-    Assertions.assertEquals(100,clone.size());
-    Assertions.assertEquals(100,seq.size());
-    Assertions.assertNotSame(seq.arr,clone.arr);
+  //ENDIF
+  @ParameterizedTest
+  //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testCheckedListadd_int_long_happyPathInsertBegin(int initialCapacity){
+  //ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.CheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
     for(int i=0;i<100;++i)
     {
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),clone.arr[i]);
+      seq.add(0,TypeConversionUtil.convertTolong(i));
     }
-  }
-  @Test
-  public void testUncheckedListClone_initialCapacity10_seqIsEmpty()
-  {
-    var seq=new LongArrSeq.UncheckedList(10);
-    var clone=(LongArrSeq.UncheckedList)seq.clone();
-    Assertions.assertEquals(0,clone.size());
-    Assertions.assertEquals(0,seq.size());
-    Assertions.assertSame(clone.arr,OmniArray.OfLong.DEFAULT_ARR);
-  }
-  @Test
-  public void testUncheckedListClone_initialCapacity10_seqIsNotEmpty()
-  {
-    var seq=new LongArrSeq.UncheckedList(10);
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTolong(i)));
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=100,bound=i+100;i<bound;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(--val),root.arr[i]);
     }
-    var clone=(LongArrSeq.UncheckedList)seq.clone();
-    Assertions.assertEquals(100,clone.size());
-    Assertions.assertEquals(100,seq.size());
-    Assertions.assertNotSame(seq.arr,clone.arr);
+    verifyAscendingSpanlong(root.arr,i,rootSize+100,100);
+  }
+  @ParameterizedTest
+  //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testCheckedListadd_int_long_happyPathInsertEnd(int initialCapacity){
+  //ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.CheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
     for(int i=0;i<100;++i)
     {
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),clone.arr[i]);
+      seq.add(seq.size(),TypeConversionUtil.convertTolong(i));
     }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,rootSize+100,-preAllocSpan);
   }
-  @Test
-  public void testUncheckedListtoArray_ObjectArray_zeroLengthArrayAndSequenceIsEmpty(){
-    var seq=new LongArrSeq.UncheckedList();
-    Long[] paramArr=new Long[0];
-    var result=seq.toArray(paramArr);
-    Assertions.assertEquals(0,seq.size());
-    Assertions.assertEquals(0,result.length);
-    Assertions.assertNotSame(seq.arr,result);
-    Assertions.assertSame(paramArr,result);
-  }
-  @Test
-  public void testUncheckedListtoArray_ObjectArray_zeroLengthArrayAndSequenceNotEmpty(){
-    var seq=new LongArrSeq.UncheckedList();
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTolong(i)));
-    }
-    Long[] paramArr=new Long[0];
-    var result=seq.toArray(paramArr);
-    Assertions.assertEquals(100,seq.size());
-    Assertions.assertEquals(100,result.length);
-    Assertions.assertNotSame(seq.arr,result);
-    Assertions.assertNotSame(paramArr,result);
-    var itr=seq.iterator();
-    for(int i=0;i<100;++i){
-      Assertions.assertEquals(itr.next(),result[i]);
-    }
-  }
-  @Test
-  public void testUncheckedListtoArray_ObjectArray_nonzeroLengthArrayAndSequenceIsEmpty(){
-    var seq=new LongArrSeq.UncheckedList();
-    Long[] paramArr=new Long[5];
-    for(int i=0;i<paramArr.length;++i){
-      paramArr[i]=TypeConversionUtil.convertTolong(paramArr.length);
-    }
-    var result=seq.toArray(paramArr);
-    Assertions.assertEquals(0,seq.size());
-    Assertions.assertEquals(5,result.length);
-    Assertions.assertNotSame(seq.arr,result);
-    Assertions.assertSame(paramArr,result);
-    Assertions.assertNull(result[0]);
-    for(int i=1;i<result.length;++i){
-      Assertions.assertEquals((Object)TypeConversionUtil.convertTolong(paramArr.length),result[i]);
-    }
-  }
-  @Test
-  public void testUncheckedListtoArray_ObjectArray_overSizedArray(){
-    var seq=new LongArrSeq.UncheckedList();
-    Long[] paramArr=new Long[10];
-    for(int i=0;i<paramArr.length;++i){
-      paramArr[i]=TypeConversionUtil.convertTolong(paramArr.length);
-    }
-    for(int i=0;i<5;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTolong(i)));
-    }
-    var result=seq.toArray(paramArr);
-    Assertions.assertEquals(5,seq.size());
-    Assertions.assertEquals(10,result.length);
-    Assertions.assertNotSame(seq.arr,result);
-    Assertions.assertSame(paramArr,result);
-    var itr=seq.iterator();
-    for(int i=0;i<5;++i){
-      Assertions.assertEquals(itr.next(),result[i]);
-    }
-    Assertions.assertNull(result[5]);
-    for(int i=6;i<result.length;++i){
-      Assertions.assertEquals((Object)TypeConversionUtil.convertTolong(paramArr.length),result[i]);
-    }
-  }
-  @Test
-  public void testUncheckedListtoArray_ObjectArray_undersizedArray(){
-    var seq=new LongArrSeq.UncheckedList();
-    Long[] paramArr=new Long[5];
-    for(int i=0;i<paramArr.length;++i){
-      paramArr[i]=TypeConversionUtil.convertTolong(10);
-    }
-    for(int i=0;i<10;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTolong(i)));
-    }
-    var result=seq.toArray(paramArr);
-    Assertions.assertEquals(10,seq.size());
-    Assertions.assertEquals(10,result.length);
-    Assertions.assertNotSame(seq.arr,result);
-    Assertions.assertNotSame(paramArr,result);
-    var itr=seq.iterator();
-    for(int i=0;i<10;++i){
-      Assertions.assertEquals(itr.next(),result[i]);
-    }
-  }
-  @Test
-  public void testUncheckedListtoArray_ObjectArray_exactSizeArray(){
-    var seq=new LongArrSeq.UncheckedList();
-    Long[] paramArr=new Long[5];
-    for(int i=0;i<paramArr.length;++i){
-      paramArr[i]=TypeConversionUtil.convertTolong(5);
-    }
-    for(int i=0;i<5;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTolong(i)));
-    }
-    var result=seq.toArray(paramArr);
-    Assertions.assertEquals(5,seq.size());
-    Assertions.assertEquals(5,result.length);
-    Assertions.assertNotSame(seq.arr,result);
-    Assertions.assertSame(paramArr,result);
-    var itr=seq.iterator();
-    for(int i=0;i<5;++i){
-      Assertions.assertEquals(itr.next(),result[i]);
-    }
-  }
-  @Test
-  public void testUncheckedListtoArray_IntFunction_seqIsEmpty_nonMod(){
-    var seq=new LongArrSeq.UncheckedList();
-    IntFunction<Long[]> arrConstructor=Long[]::new;
-    var result=seq.toArray(arrConstructor);
-    Assertions.assertEquals(0,seq.size());
-    Assertions.assertNotSame(seq.arr,result);
-    Assertions.assertEquals(0,result.length);
-  }
-  @Test
-  public void testUncheckedListtoArray_IntFunction_seqIsNotEmpty_nonMod(){
-    var seq=new LongArrSeq.UncheckedList();
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTolong(i)));
-    }
-    IntFunction<Long[]> arrConstructor=Long[]::new;
-    var result=seq.toArray(arrConstructor);
-    Assertions.assertEquals(100,seq.size());
-    Assertions.assertNotSame(seq.arr,result);
-    Assertions.assertEquals(100,result.length);
-    var itr=seq.iterator();
-    for(int i=0;i<100;++i){
-      Assertions.assertEquals(itr.next(),result[i]);
-    }
-  }
-  @Test
-  public void testUncheckedListclear_void_seqIsEmpty(){
-    var seq=new LongArrSeq.UncheckedList();
-    seq.clear();
-    Assertions.assertTrue(seq.isEmpty());
-  }
-  @Test
-  public void testUncheckedListclear_void_seqIsNotEmpty(){
-    var seq=new LongArrSeq.UncheckedList();
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTolong(i)));
-    }
-    seq.clear();
-    Assertions.assertTrue(seq.isEmpty());
-    for(int i=0;i<100;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),seq.arr[i]);
-    }
-  }
-  @Test
-  public void testUncheckedListisEmpty_void_seqIsEmpty(){
-    var seq=new LongArrSeq.UncheckedList();
-    Assertions.assertTrue(seq.isEmpty());
-  }
-  @Test
-  public void testUncheckedListisEmpty_void_seqIsNotEmpty(){
-    var seq=new LongArrSeq.UncheckedList();
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTolong(i)));
-    }
-    Assertions.assertFalse(seq.isEmpty());
-  }
-  @Test
-  public void testUncheckedListisEmpty_void_seqIsBeingCleared(){
-    var seq=new LongArrSeq.UncheckedList();
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTolong(i)));
-    }
-    var itr=seq.iterator();
-    for(int i=100;--i>=0;){
-      Assertions.assertFalse(seq.isEmpty());
-      itr.nextLong();
-      itr.remove();
-    }
-    Assertions.assertTrue(seq.isEmpty());
-  }
-  @Test
-  public void testUncheckedListsize_void_seqIsEmpty(){
-    var seq=new LongArrSeq.UncheckedList();
-    Assertions.assertEquals(0,seq.size);
-    Assertions.assertEquals(seq.size,seq.size());
-  }
-  @Test
-  public void testUncheckedListsize_void_seqIsNotEmpty(){
-    var seq=new LongArrSeq.UncheckedList();
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTolong(i)));
-    }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertEquals(seq.size,seq.size());
-  }
-  @Test
-  public void testUncheckedListsize_void_seqIsBeingCleared(){
-    var seq=new LongArrSeq.UncheckedList();
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTolong(i)));
-    }
-    var itr=seq.iterator();
-    for(int i=100;--i>=0;){
-      itr.nextLong();
-      itr.remove();
-      Assertions.assertEquals(i,seq.size());
-    }
-  }
-  @Test
-  public void testUncheckedListforEach_Consumer_SeqIsEmpty_NoMod(){
-    var seq=new LongArrSeq.UncheckedList();
-    var consumer=new LongMonitoredConsumer();
-    seq.forEach((Consumer)consumer);
-    Assertions.assertEquals(0,seq.size());
-    Assertions.assertTrue(consumer.isEmpty());
-  }
-  @Test
-  public void testUncheckedListforEach_Consumer_SeqIsNotEmpty_NoMod(){
-    var seq=new LongArrSeq.UncheckedList();
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTolong(i)));
-    }
-    var consumer=new LongMonitoredConsumer();
-    seq.forEach((Consumer)consumer);
-    Assertions.assertEquals(100,seq.size());
-    Assertions.assertEquals(100,consumer.size());
-    var seqIterator=seq.iterator();
-    var consumerIterator=consumer.iterator();
+  @ParameterizedTest
+  //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testCheckedListadd_int_long_happyPathInsertMidPoint(int initialCapacity){
+  //ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.CheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
     for(int i=0;i<100;++i)
     {
-      Assertions.assertEquals(consumerIterator.next(),seqIterator.next());
+      seq.add(seq.size()/2,TypeConversionUtil.convertTolong(i));
     }
-  }
-  @Test
-  public void testUncheckedListforEach_LongConsumer_SeqIsEmpty_NoMod(){
-    var seq=new LongArrSeq.UncheckedList();
-    var consumer=new LongMonitoredConsumer();
-    seq.forEach((LongConsumer)consumer);
-    Assertions.assertEquals(0,seq.size());
-    Assertions.assertTrue(consumer.isEmpty());
-  }
-  @Test
-  public void testUncheckedListforEach_LongConsumer_SeqIsNotEmpty_NoMod(){
-    var seq=new LongArrSeq.UncheckedList();
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTolong(i)));
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=1,bound=i+50;i<bound;++i,val+=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
     }
-    var consumer=new LongMonitoredConsumer();
-    seq.forEach((LongConsumer)consumer);
-    Assertions.assertEquals(100,seq.size());
-    Assertions.assertEquals(100,consumer.size());
-    var seqIterator=seq.iterator();
-    var consumerIterator=consumer.iterator();
+    for(int val=98,bound=i+50;i<bound;++i,val-=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+    verifyAscendingSpanlong(root.arr,i,rootSize+100,i);
+  }
+  //IF CHECKED==Checked
+  @ParameterizedTest
+    //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testCheckedListadd_int_long_throwIOBE(int initialCapacity){
+    //ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.CheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
     for(int i=0;i<100;++i)
     {
-      Assertions.assertEquals(consumerIterator.next(),seqIterator.next());
+      //too low
+      Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(-1,TypeConversionUtil.convertTolong(0)));
+      //too hi
+      final int finalIndex=i;
+      Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(finalIndex+1,TypeConversionUtil.convertTolong(0)));
+      seq.add(TypeConversionUtil.convertTolong(i));
     }
+    //when the method throws, verify that no changes occurred
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,rootSize+100,-preAllocSpan);
   }
-  @Test
-  public void testUncheckedListadd_long_initialCapacityDEFAULT(){
-    var seq=new LongArrSeq.UncheckedList();
-    for(int i=0;i<100;++i){
+  //ENDIF
+//ENDIF
+  @ParameterizedTest
+//IF STRUCT==Stack,List
+  @ValueSource(ints={0,5,10,15})
+  public void testCheckedListadd_long_happyPath(int initialCapacity){
+//ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.CheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertTolong(i)));
     }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),seq.arr[i]);
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    for(int i=0,val=-preAllocSpan;i<100;++i,++val)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
     }
   }
-  @Test
-  public void testUncheckedListadd_long_initialCapacityNULL(){
-    var seq=new LongArrSeq.UncheckedList(0,null);
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTolong(i)));
+//IF OfRef
+//IF STRUCT==List,SubList
+  @ParameterizedTest
+  //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testCheckedListListItradd_Long_happyPathInsertBegin(int initialCapacity){
+  //ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.CheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    var seqItr=seq.listIterator();
+    for(int i=0;i<100;++i)
+    {
+      seqItr.add(TypeConversionUtil.convertToLong(i));
+      assertIteratorStateIntegrity(seqItr,preAllocSpan+1,-1,i+1,parent,root);
+      seqItr.previousLong();
     }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),seq.arr[i]);
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=100,bound=i+100;i<bound;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(--val),root.arr[i]);
+    }
+    verifyAscendingSpanlong(root.arr,i,rootSize+100,100);
+  }
+  @ParameterizedTest
+  //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testCheckedListListItradd_Long_happyPathInsertEnd(int initialCapacity){
+  //ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.CheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    var seqItr=seq.listIterator();
+    for(int i=0;i<100;++i)
+    {
+      seqItr.add(TypeConversionUtil.convertToLong(i));
+      assertIteratorStateIntegrity(seqItr,preAllocSpan+i+1,-1,i+1,parent,root);
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,rootSize+100,-preAllocSpan);
+  }
+  @ParameterizedTest
+  //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testCheckedListListItradd_Long_happyPathInsertMidPoint(int initialCapacity){
+  //ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.CheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    var seqItr=seq.listIterator();
+    for(int i=0;i<100;++i)
+    {
+      seqItr.add(TypeConversionUtil.convertToLong(i));
+      assertIteratorStateIntegrity(seqItr,((rootSize+i)/2)+1,-1,i+1,parent,root);
+      if((i&1)==0)
+      {
+        seqItr.previousLong();
+      }
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=1,bound=i+50;i<bound;++i,val+=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+    for(int val=98,bound=i+50;i<bound;++i,val-=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+    verifyAscendingSpanlong(root.arr,i,rootSize+100,i);
+  }
+  //IF CHECKED==Checked
+  @ParameterizedTest
+    //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testCheckedListListItradd_Long_throwCME(int initialCapacity){
+    //ENDIF
+    {
+      //try on an empty sublist
+//IF 
+      int rootPreAlloc=0;
+      int parentPreAlloc=0;
+      int parentPostAlloc=0;
+      int rootPostAlloc=0;
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      var seq=new LongArrSeq.CheckedList(initialCapacity);
+      var parent=seq;
+      var root=seq;
+//ENDIF
+      var itr=seq.listIterator();
+      //illegally modify the root
+      root.add(preAllocSpan,TypeConversionUtil.convertToLong(0));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->itr.add(TypeConversionUtil.convertToLong(0)));
+      assertIteratorStateIntegrity(itr,preAllocSpan,-1,0,parent,root);
+      assertStructuralIntegrity(seq,0,0,parent,parentSize,0,root,rootSize+1,1);
+      verifyAscendingSpanlong(root.arr,0,preAllocSpan+1,-preAllocSpan);
+      verifyAscendingSpanlong(root.arr,preAllocSpan+1,rootSize+1,100);
+    }
+    {
+      //try on an empty sublist
+//IF 
+      int rootPreAlloc=0;
+      int parentPreAlloc=0;
+      int parentPostAlloc=0;
+      int rootPostAlloc=0;
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      var seq=new LongArrSeq.CheckedList(initialCapacity);
+      var parent=seq;
+      var root=seq;
+//ENDIF
+      var itr=seq.listIterator();
+      //illegally modify the parent
+      parent.add(parentPreAlloc,TypeConversionUtil.convertToLong(0));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->itr.add(TypeConversionUtil.convertToLong(0)));
+      assertIteratorStateIntegrity(itr,preAllocSpan,-1,0,parent,root);
+      assertStructuralIntegrity(seq,0,0,parent,parentSize+1,1,root,rootSize+1,1);
+      verifyAscendingSpanlong(root.arr,0,preAllocSpan+1,-preAllocSpan);
+      verifyAscendingSpanlong(root.arr,preAllocSpan+1,rootSize+1,100);
+    }
+    {
+      //try on an empty sublist
+//IF 
+      int rootPreAlloc=0;
+      int parentPreAlloc=0;
+      int parentPostAlloc=0;
+      int rootPostAlloc=0;
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      var seq=new LongArrSeq.CheckedList(initialCapacity);
+      var parent=seq;
+      var root=seq;
+//ENDIF
+      var itr=seq.listIterator();
+      //illegally modify the sequence
+      seq.add(0,TypeConversionUtil.convertToLong(0));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->itr.add(TypeConversionUtil.convertToLong(0)));
+      assertIteratorStateIntegrity(itr,preAllocSpan,-1,0,parent,root);
+      assertStructuralIntegrity(seq,1,1,parent,parentSize+1,1,root,rootSize+1,1);
+      verifyAscendingSpanlong(root.arr,0,preAllocSpan+1,-preAllocSpan);
+      verifyAscendingSpanlong(root.arr,preAllocSpan+1,rootSize+1,100);
+    }
+    {
+      //try on an non-empty sublist, inserting at the end
+//IF 
+      int rootPreAlloc=0;
+      int parentPreAlloc=0;
+      int parentPostAlloc=0;
+      int rootPostAlloc=0;
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      var seq=new LongArrSeq.CheckedList(initialCapacity);
+      var parent=seq;
+      var root=seq;
+//ENDIF
+      var itr=seq.listIterator();
+      for(int i=0;i<100;++i)
+      {
+        itr.add(TypeConversionUtil.convertToLong(i));
+      }
+      //illegally modify the root
+      root.add(TypeConversionUtil.convertToLong(rootSize+100));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->itr.add(TypeConversionUtil.convertToLong(0)));
+      assertIteratorStateIntegrity(itr,preAllocSpan+100,-1,100,parent,root);
+      assertStructuralIntegrity(seq,100,100,parent,parentSize+100,100,root,rootSize+101,101);
+      verifyAscendingSpanlong(root.arr,0,rootSize+101,-preAllocSpan);
+    }
+    {
+      //try on an non-empty sublist, inserting at the end
+//IF 
+      int rootPreAlloc=0;
+      int parentPreAlloc=0;
+      int parentPostAlloc=0;
+      int rootPostAlloc=0;
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      var seq=new LongArrSeq.CheckedList(initialCapacity);
+      var parent=seq;
+      var root=seq;
+//ENDIF
+      var itr=seq.listIterator();
+      for(int i=0;i<100;++i)
+      {
+        itr.add(TypeConversionUtil.convertToLong(i));
+      }
+      //illegally modify the parent
+      parent.add(parentPreAlloc+50,TypeConversionUtil.convertToLong(50));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->itr.add(TypeConversionUtil.convertToLong(0)));
+      assertIteratorStateIntegrity(itr,preAllocSpan+100,-1,100,parent,root);
+      assertStructuralIntegrity(seq,100,100,parent,parentSize+101,101,root,rootSize+101,101);
+      verifyAscendingSpanlong(root.arr,0,preAllocSpan+51,-preAllocSpan);
+      verifyAscendingSpanlong(root.arr,preAllocSpan+51,rootSize+101,50);
+    }
+    {
+      //try on an non-empty sublist, inserting at the end
+//IF 
+      int rootPreAlloc=0;
+      int parentPreAlloc=0;
+      int parentPostAlloc=0;
+      int rootPostAlloc=0;
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      var seq=new LongArrSeq.CheckedList(initialCapacity);
+      var parent=seq;
+      var root=seq;
+//ENDIF
+      var itr=seq.listIterator();
+      for(int i=0;i<100;++i)
+      {
+        itr.add(TypeConversionUtil.convertToLong(i));
+      }
+      //illegally modify the seq
+      seq.add(50,TypeConversionUtil.convertToLong(50));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->itr.add(TypeConversionUtil.convertToLong(0)));
+      assertIteratorStateIntegrity(itr,preAllocSpan+100,-1,100,parent,root);
+      assertStructuralIntegrity(seq,101,101,parent,parentSize+101,101,root,rootSize+101,101);
+      verifyAscendingSpanlong(root.arr,0,preAllocSpan+51,-preAllocSpan);
+      verifyAscendingSpanlong(root.arr,preAllocSpan+51,rootSize+101,50);
     }
   }
-  @Test
-  public void testUncheckedListadd_long_initialCapacity50(){
-    var seq=new LongArrSeq.UncheckedList(50);
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTolong(i)));
+  //ENDIF
+  @ParameterizedTest
+  //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testCheckedListadd_int_Long_happyPathInsertBegin(int initialCapacity){
+  //ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.CheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      seq.add(0,TypeConversionUtil.convertToLong(i));
     }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),seq.arr[i]);
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=100,bound=i+100;i<bound;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(--val),root.arr[i]);
     }
+    verifyAscendingSpanlong(root.arr,i,rootSize+100,100);
   }
-  @Test
-  public void testUncheckedListadd_Long_initialCapacityDEFAULT(){
-    var seq=new LongArrSeq.UncheckedList();
-    for(int i=0;i<100;++i){
+  @ParameterizedTest
+  //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testCheckedListadd_int_Long_happyPathInsertEnd(int initialCapacity){
+  //ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.CheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size(),TypeConversionUtil.convertToLong(i));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,rootSize+100,-preAllocSpan);
+  }
+  @ParameterizedTest
+  //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testCheckedListadd_int_Long_happyPathInsertMidPoint(int initialCapacity){
+  //ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.CheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size()/2,TypeConversionUtil.convertToLong(i));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=1,bound=i+50;i<bound;++i,val+=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+    for(int val=98,bound=i+50;i<bound;++i,val-=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+    verifyAscendingSpanlong(root.arr,i,rootSize+100,i);
+  }
+  //IF CHECKED==Checked
+  @ParameterizedTest
+    //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testCheckedListadd_int_Long_throwIOBE(int initialCapacity){
+    //ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.CheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      //too low
+      Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(-1,TypeConversionUtil.convertToLong(0)));
+      //too hi
+      final int finalIndex=i;
+      Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(finalIndex+1,TypeConversionUtil.convertToLong(0)));
+      seq.add(TypeConversionUtil.convertToLong(i));
+    }
+    //when the method throws, verify that no changes occurred
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,rootSize+100,-preAllocSpan);
+  }
+  //ENDIF
+//ENDIF
+  @ParameterizedTest
+//IF STRUCT==Stack,List
+  @ValueSource(ints={0,5,10,15})
+  public void testCheckedListadd_Long_happyPath(int initialCapacity){
+//ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.CheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToLong(i)));
     }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),seq.arr[i]);
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    for(int i=0,val=-preAllocSpan;i<100;++i,++val)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
     }
   }
-  @Test
-  public void testUncheckedListadd_Long_initialCapacityNULL(){
-    var seq=new LongArrSeq.UncheckedList(0,null);
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToLong(i)));
+  //IF OfBoolean
+//IF STRUCT==List,SubList
+  @ParameterizedTest
+  //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testCheckedListListItradd_boolean_happyPathInsertBegin(int initialCapacity){
+  //ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.CheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    var seqItr=seq.listIterator();
+    for(int i=0;i<100;++i)
+    {
+      seqItr.add(TypeConversionUtil.convertToboolean(i));
+      assertIteratorStateIntegrity(seqItr,preAllocSpan+1,-1,i+1,parent,root);
+      seqItr.previousLong();
     }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),seq.arr[i]);
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlongboolean(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=100,bound=i+100;i<bound;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolongboolean(--val),root.arr[i]);
+    }
+    verifyAscendingSpanlongboolean(root.arr,i,rootSize+100,100);
+  }
+  @ParameterizedTest
+  //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testCheckedListListItradd_boolean_happyPathInsertEnd(int initialCapacity){
+  //ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.CheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    var seqItr=seq.listIterator();
+    for(int i=0;i<100;++i)
+    {
+      seqItr.add(TypeConversionUtil.convertToboolean(i));
+      assertIteratorStateIntegrity(seqItr,preAllocSpan+i+1,-1,i+1,parent,root);
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlongboolean(root.arr,0,rootSize+100,-preAllocSpan);
+  }
+  @ParameterizedTest
+  //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testCheckedListListItradd_boolean_happyPathInsertMidPoint(int initialCapacity){
+  //ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.CheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    var seqItr=seq.listIterator();
+    for(int i=0;i<100;++i)
+    {
+      seqItr.add(TypeConversionUtil.convertToboolean(i));
+      assertIteratorStateIntegrity(seqItr,((rootSize+i)/2)+1,-1,i+1,parent,root);
+      if((i&1)==0)
+      {
+        seqItr.previousLong();
+      }
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlongboolean(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=1,bound=i+50;i<bound;++i,val+=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolongboolean(val),root.arr[i]);
+    }
+    for(int val=98,bound=i+50;i<bound;++i,val-=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolongboolean(val),root.arr[i]);
+    }
+    verifyAscendingSpanlongboolean(root.arr,i,rootSize+100,i);
+  }
+  //IF CHECKED==Checked
+  @ParameterizedTest
+    //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testCheckedListListItradd_boolean_throwCME(int initialCapacity){
+    //ENDIF
+    {
+      //try on an empty sublist
+//IF 
+      int rootPreAlloc=0;
+      int parentPreAlloc=0;
+      int parentPostAlloc=0;
+      int rootPostAlloc=0;
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      var seq=new LongArrSeq.CheckedList(initialCapacity);
+      var parent=seq;
+      var root=seq;
+//ENDIF
+      var itr=seq.listIterator();
+      //illegally modify the root
+      root.add(preAllocSpan,TypeConversionUtil.convertToboolean(0));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->itr.add(TypeConversionUtil.convertToboolean(0)));
+      assertIteratorStateIntegrity(itr,preAllocSpan,-1,0,parent,root);
+      assertStructuralIntegrity(seq,0,0,parent,parentSize,0,root,rootSize+1,1);
+      verifyAscendingSpanlongboolean(root.arr,0,preAllocSpan+1,-preAllocSpan);
+      verifyAscendingSpanlongboolean(root.arr,preAllocSpan+1,rootSize+1,100);
+    }
+    {
+      //try on an empty sublist
+//IF 
+      int rootPreAlloc=0;
+      int parentPreAlloc=0;
+      int parentPostAlloc=0;
+      int rootPostAlloc=0;
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      var seq=new LongArrSeq.CheckedList(initialCapacity);
+      var parent=seq;
+      var root=seq;
+//ENDIF
+      var itr=seq.listIterator();
+      //illegally modify the parent
+      parent.add(parentPreAlloc,TypeConversionUtil.convertToboolean(0));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->itr.add(TypeConversionUtil.convertToboolean(0)));
+      assertIteratorStateIntegrity(itr,preAllocSpan,-1,0,parent,root);
+      assertStructuralIntegrity(seq,0,0,parent,parentSize+1,1,root,rootSize+1,1);
+      verifyAscendingSpanlongboolean(root.arr,0,preAllocSpan+1,-preAllocSpan);
+      verifyAscendingSpanlongboolean(root.arr,preAllocSpan+1,rootSize+1,100);
+    }
+    {
+      //try on an empty sublist
+//IF 
+      int rootPreAlloc=0;
+      int parentPreAlloc=0;
+      int parentPostAlloc=0;
+      int rootPostAlloc=0;
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      var seq=new LongArrSeq.CheckedList(initialCapacity);
+      var parent=seq;
+      var root=seq;
+//ENDIF
+      var itr=seq.listIterator();
+      //illegally modify the sequence
+      seq.add(0,TypeConversionUtil.convertToboolean(0));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->itr.add(TypeConversionUtil.convertToboolean(0)));
+      assertIteratorStateIntegrity(itr,preAllocSpan,-1,0,parent,root);
+      assertStructuralIntegrity(seq,1,1,parent,parentSize+1,1,root,rootSize+1,1);
+      verifyAscendingSpanlongboolean(root.arr,0,preAllocSpan+1,-preAllocSpan);
+      verifyAscendingSpanlongboolean(root.arr,preAllocSpan+1,rootSize+1,100);
+    }
+    {
+      //try on an non-empty sublist, inserting at the end
+//IF 
+      int rootPreAlloc=0;
+      int parentPreAlloc=0;
+      int parentPostAlloc=0;
+      int rootPostAlloc=0;
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      var seq=new LongArrSeq.CheckedList(initialCapacity);
+      var parent=seq;
+      var root=seq;
+//ENDIF
+      var itr=seq.listIterator();
+      for(int i=0;i<100;++i)
+      {
+        itr.add(TypeConversionUtil.convertToboolean(i));
+      }
+      //illegally modify the root
+      root.add(TypeConversionUtil.convertToboolean(rootSize+100));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->itr.add(TypeConversionUtil.convertToboolean(0)));
+      assertIteratorStateIntegrity(itr,preAllocSpan+100,-1,100,parent,root);
+      assertStructuralIntegrity(seq,100,100,parent,parentSize+100,100,root,rootSize+101,101);
+      verifyAscendingSpanlongboolean(root.arr,0,rootSize+101,-preAllocSpan);
+    }
+    {
+      //try on an non-empty sublist, inserting at the end
+//IF 
+      int rootPreAlloc=0;
+      int parentPreAlloc=0;
+      int parentPostAlloc=0;
+      int rootPostAlloc=0;
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      var seq=new LongArrSeq.CheckedList(initialCapacity);
+      var parent=seq;
+      var root=seq;
+//ENDIF
+      var itr=seq.listIterator();
+      for(int i=0;i<100;++i)
+      {
+        itr.add(TypeConversionUtil.convertToboolean(i));
+      }
+      //illegally modify the parent
+      parent.add(parentPreAlloc+50,TypeConversionUtil.convertToboolean(50));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->itr.add(TypeConversionUtil.convertToboolean(0)));
+      assertIteratorStateIntegrity(itr,preAllocSpan+100,-1,100,parent,root);
+      assertStructuralIntegrity(seq,100,100,parent,parentSize+101,101,root,rootSize+101,101);
+      verifyAscendingSpanlongboolean(root.arr,0,preAllocSpan+51,-preAllocSpan);
+      verifyAscendingSpanlongboolean(root.arr,preAllocSpan+51,rootSize+101,50);
+    }
+    {
+      //try on an non-empty sublist, inserting at the end
+//IF 
+      int rootPreAlloc=0;
+      int parentPreAlloc=0;
+      int parentPostAlloc=0;
+      int rootPostAlloc=0;
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      var seq=new LongArrSeq.CheckedList(initialCapacity);
+      var parent=seq;
+      var root=seq;
+//ENDIF
+      var itr=seq.listIterator();
+      for(int i=0;i<100;++i)
+      {
+        itr.add(TypeConversionUtil.convertToboolean(i));
+      }
+      //illegally modify the seq
+      seq.add(50,TypeConversionUtil.convertToboolean(50));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->itr.add(TypeConversionUtil.convertToboolean(0)));
+      assertIteratorStateIntegrity(itr,preAllocSpan+100,-1,100,parent,root);
+      assertStructuralIntegrity(seq,101,101,parent,parentSize+101,101,root,rootSize+101,101);
+      verifyAscendingSpanlongboolean(root.arr,0,preAllocSpan+51,-preAllocSpan);
+      verifyAscendingSpanlongboolean(root.arr,preAllocSpan+51,rootSize+101,50);
     }
   }
-  @Test
-  public void testUncheckedListadd_Long_initialCapacity50(){
-    var seq=new LongArrSeq.UncheckedList(50);
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToLong(i)));
+  //ENDIF
+  @ParameterizedTest
+  //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testCheckedListadd_int_boolean_happyPathInsertBegin(int initialCapacity){
+  //ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.CheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      seq.add(0,TypeConversionUtil.convertToboolean(i));
     }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),seq.arr[i]);
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlongboolean(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=100,bound=i+100;i<bound;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolongboolean(--val),root.arr[i]);
     }
+    verifyAscendingSpanlongboolean(root.arr,i,rootSize+100,100);
   }
-  @Test
-  public void testUncheckedListadd_boolean_initialCapacityDEFAULT(){
-    var seq=new LongArrSeq.UncheckedList();
-    for(int i=0;i<100;++i){
+  @ParameterizedTest
+  //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testCheckedListadd_int_boolean_happyPathInsertEnd(int initialCapacity){
+  //ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.CheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size(),TypeConversionUtil.convertToboolean(i));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlongboolean(root.arr,0,rootSize+100,-preAllocSpan);
+  }
+  @ParameterizedTest
+  //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testCheckedListadd_int_boolean_happyPathInsertMidPoint(int initialCapacity){
+  //ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.CheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size()/2,TypeConversionUtil.convertToboolean(i));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlongboolean(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=1,bound=i+50;i<bound;++i,val+=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolongboolean(val),root.arr[i]);
+    }
+    for(int val=98,bound=i+50;i<bound;++i,val-=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolongboolean(val),root.arr[i]);
+    }
+    verifyAscendingSpanlongboolean(root.arr,i,rootSize+100,i);
+  }
+  //IF CHECKED==Checked
+  @ParameterizedTest
+    //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testCheckedListadd_int_boolean_throwIOBE(int initialCapacity){
+    //ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.CheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      //too low
+      Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(-1,TypeConversionUtil.convertToboolean(0)));
+      //too hi
+      final int finalIndex=i;
+      Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(finalIndex+1,TypeConversionUtil.convertToboolean(0)));
+      seq.add(TypeConversionUtil.convertToboolean(i));
+    }
+    //when the method throws, verify that no changes occurred
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlongboolean(root.arr,0,rootSize+100,-preAllocSpan);
+  }
+  //ENDIF
+//ENDIF
+  @ParameterizedTest
+//IF STRUCT==Stack,List
+  @ValueSource(ints={0,5,10,15})
+  public void testCheckedListadd_boolean_happyPath(int initialCapacity){
+//ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.CheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
     }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolongboolean(i),seq.arr[i]);
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    for(int i=0,val=-preAllocSpan;i<100;++i,++val)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolongboolean(val),root.arr[i]);
     }
   }
-  @Test
-  public void testUncheckedListadd_boolean_initialCapacityNULL(){
-    var seq=new LongArrSeq.UncheckedList(0,null);
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
+//IF STRUCT==List,SubList
+  @ParameterizedTest
+  //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testCheckedListListItradd_Boolean_happyPathInsertBegin(int initialCapacity){
+  //ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.CheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    var seqItr=seq.listIterator();
+    for(int i=0;i<100;++i)
+    {
+      seqItr.add(TypeConversionUtil.convertToBoolean(i));
+      assertIteratorStateIntegrity(seqItr,preAllocSpan+1,-1,i+1,parent,root);
+      seqItr.previousLong();
     }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolongboolean(i),seq.arr[i]);
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlongboolean(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=100,bound=i+100;i<bound;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolongboolean(--val),root.arr[i]);
+    }
+    verifyAscendingSpanlongboolean(root.arr,i,rootSize+100,100);
+  }
+  @ParameterizedTest
+  //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testCheckedListListItradd_Boolean_happyPathInsertEnd(int initialCapacity){
+  //ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.CheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    var seqItr=seq.listIterator();
+    for(int i=0;i<100;++i)
+    {
+      seqItr.add(TypeConversionUtil.convertToBoolean(i));
+      assertIteratorStateIntegrity(seqItr,preAllocSpan+i+1,-1,i+1,parent,root);
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlongboolean(root.arr,0,rootSize+100,-preAllocSpan);
+  }
+  @ParameterizedTest
+  //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testCheckedListListItradd_Boolean_happyPathInsertMidPoint(int initialCapacity){
+  //ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.CheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    var seqItr=seq.listIterator();
+    for(int i=0;i<100;++i)
+    {
+      seqItr.add(TypeConversionUtil.convertToBoolean(i));
+      assertIteratorStateIntegrity(seqItr,((rootSize+i)/2)+1,-1,i+1,parent,root);
+      if((i&1)==0)
+      {
+        seqItr.previousLong();
+      }
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlongboolean(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=1,bound=i+50;i<bound;++i,val+=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolongboolean(val),root.arr[i]);
+    }
+    for(int val=98,bound=i+50;i<bound;++i,val-=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolongboolean(val),root.arr[i]);
+    }
+    verifyAscendingSpanlongboolean(root.arr,i,rootSize+100,i);
+  }
+  //IF CHECKED==Checked
+  @ParameterizedTest
+    //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testCheckedListListItradd_Boolean_throwCME(int initialCapacity){
+    //ENDIF
+    {
+      //try on an empty sublist
+//IF 
+      int rootPreAlloc=0;
+      int parentPreAlloc=0;
+      int parentPostAlloc=0;
+      int rootPostAlloc=0;
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      var seq=new LongArrSeq.CheckedList(initialCapacity);
+      var parent=seq;
+      var root=seq;
+//ENDIF
+      var itr=seq.listIterator();
+      //illegally modify the root
+      root.add(preAllocSpan,TypeConversionUtil.convertToBoolean(0));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->itr.add(TypeConversionUtil.convertToBoolean(0)));
+      assertIteratorStateIntegrity(itr,preAllocSpan,-1,0,parent,root);
+      assertStructuralIntegrity(seq,0,0,parent,parentSize,0,root,rootSize+1,1);
+      verifyAscendingSpanlongboolean(root.arr,0,preAllocSpan+1,-preAllocSpan);
+      verifyAscendingSpanlongboolean(root.arr,preAllocSpan+1,rootSize+1,100);
+    }
+    {
+      //try on an empty sublist
+//IF 
+      int rootPreAlloc=0;
+      int parentPreAlloc=0;
+      int parentPostAlloc=0;
+      int rootPostAlloc=0;
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      var seq=new LongArrSeq.CheckedList(initialCapacity);
+      var parent=seq;
+      var root=seq;
+//ENDIF
+      var itr=seq.listIterator();
+      //illegally modify the parent
+      parent.add(parentPreAlloc,TypeConversionUtil.convertToBoolean(0));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->itr.add(TypeConversionUtil.convertToBoolean(0)));
+      assertIteratorStateIntegrity(itr,preAllocSpan,-1,0,parent,root);
+      assertStructuralIntegrity(seq,0,0,parent,parentSize+1,1,root,rootSize+1,1);
+      verifyAscendingSpanlongboolean(root.arr,0,preAllocSpan+1,-preAllocSpan);
+      verifyAscendingSpanlongboolean(root.arr,preAllocSpan+1,rootSize+1,100);
+    }
+    {
+      //try on an empty sublist
+//IF 
+      int rootPreAlloc=0;
+      int parentPreAlloc=0;
+      int parentPostAlloc=0;
+      int rootPostAlloc=0;
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      var seq=new LongArrSeq.CheckedList(initialCapacity);
+      var parent=seq;
+      var root=seq;
+//ENDIF
+      var itr=seq.listIterator();
+      //illegally modify the sequence
+      seq.add(0,TypeConversionUtil.convertToBoolean(0));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->itr.add(TypeConversionUtil.convertToBoolean(0)));
+      assertIteratorStateIntegrity(itr,preAllocSpan,-1,0,parent,root);
+      assertStructuralIntegrity(seq,1,1,parent,parentSize+1,1,root,rootSize+1,1);
+      verifyAscendingSpanlongboolean(root.arr,0,preAllocSpan+1,-preAllocSpan);
+      verifyAscendingSpanlongboolean(root.arr,preAllocSpan+1,rootSize+1,100);
+    }
+    {
+      //try on an non-empty sublist, inserting at the end
+//IF 
+      int rootPreAlloc=0;
+      int parentPreAlloc=0;
+      int parentPostAlloc=0;
+      int rootPostAlloc=0;
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      var seq=new LongArrSeq.CheckedList(initialCapacity);
+      var parent=seq;
+      var root=seq;
+//ENDIF
+      var itr=seq.listIterator();
+      for(int i=0;i<100;++i)
+      {
+        itr.add(TypeConversionUtil.convertToBoolean(i));
+      }
+      //illegally modify the root
+      root.add(TypeConversionUtil.convertToBoolean(rootSize+100));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->itr.add(TypeConversionUtil.convertToBoolean(0)));
+      assertIteratorStateIntegrity(itr,preAllocSpan+100,-1,100,parent,root);
+      assertStructuralIntegrity(seq,100,100,parent,parentSize+100,100,root,rootSize+101,101);
+      verifyAscendingSpanlongboolean(root.arr,0,rootSize+101,-preAllocSpan);
+    }
+    {
+      //try on an non-empty sublist, inserting at the end
+//IF 
+      int rootPreAlloc=0;
+      int parentPreAlloc=0;
+      int parentPostAlloc=0;
+      int rootPostAlloc=0;
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      var seq=new LongArrSeq.CheckedList(initialCapacity);
+      var parent=seq;
+      var root=seq;
+//ENDIF
+      var itr=seq.listIterator();
+      for(int i=0;i<100;++i)
+      {
+        itr.add(TypeConversionUtil.convertToBoolean(i));
+      }
+      //illegally modify the parent
+      parent.add(parentPreAlloc+50,TypeConversionUtil.convertToBoolean(50));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->itr.add(TypeConversionUtil.convertToBoolean(0)));
+      assertIteratorStateIntegrity(itr,preAllocSpan+100,-1,100,parent,root);
+      assertStructuralIntegrity(seq,100,100,parent,parentSize+101,101,root,rootSize+101,101);
+      verifyAscendingSpanlongboolean(root.arr,0,preAllocSpan+51,-preAllocSpan);
+      verifyAscendingSpanlongboolean(root.arr,preAllocSpan+51,rootSize+101,50);
+    }
+    {
+      //try on an non-empty sublist, inserting at the end
+//IF 
+      int rootPreAlloc=0;
+      int parentPreAlloc=0;
+      int parentPostAlloc=0;
+      int rootPostAlloc=0;
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      var seq=new LongArrSeq.CheckedList(initialCapacity);
+      var parent=seq;
+      var root=seq;
+//ENDIF
+      var itr=seq.listIterator();
+      for(int i=0;i<100;++i)
+      {
+        itr.add(TypeConversionUtil.convertToBoolean(i));
+      }
+      //illegally modify the seq
+      seq.add(50,TypeConversionUtil.convertToBoolean(50));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->itr.add(TypeConversionUtil.convertToBoolean(0)));
+      assertIteratorStateIntegrity(itr,preAllocSpan+100,-1,100,parent,root);
+      assertStructuralIntegrity(seq,101,101,parent,parentSize+101,101,root,rootSize+101,101);
+      verifyAscendingSpanlongboolean(root.arr,0,preAllocSpan+51,-preAllocSpan);
+      verifyAscendingSpanlongboolean(root.arr,preAllocSpan+51,rootSize+101,50);
     }
   }
-  @Test
-  public void testUncheckedListadd_boolean_initialCapacity50(){
-    var seq=new LongArrSeq.UncheckedList(50);
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
+  //ENDIF
+  @ParameterizedTest
+  //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testCheckedListadd_int_Boolean_happyPathInsertBegin(int initialCapacity){
+  //ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.CheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      seq.add(0,TypeConversionUtil.convertToBoolean(i));
     }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolongboolean(i),seq.arr[i]);
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlongboolean(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=100,bound=i+100;i<bound;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolongboolean(--val),root.arr[i]);
     }
+    verifyAscendingSpanlongboolean(root.arr,i,rootSize+100,100);
   }
-  @Test
-  public void testUncheckedListadd_Boolean_initialCapacityDEFAULT(){
-    var seq=new LongArrSeq.UncheckedList();
-    for(int i=0;i<100;++i){
+  @ParameterizedTest
+  //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testCheckedListadd_int_Boolean_happyPathInsertEnd(int initialCapacity){
+  //ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.CheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size(),TypeConversionUtil.convertToBoolean(i));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlongboolean(root.arr,0,rootSize+100,-preAllocSpan);
+  }
+  @ParameterizedTest
+  //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testCheckedListadd_int_Boolean_happyPathInsertMidPoint(int initialCapacity){
+  //ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.CheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size()/2,TypeConversionUtil.convertToBoolean(i));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlongboolean(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=1,bound=i+50;i<bound;++i,val+=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolongboolean(val),root.arr[i]);
+    }
+    for(int val=98,bound=i+50;i<bound;++i,val-=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolongboolean(val),root.arr[i]);
+    }
+    verifyAscendingSpanlongboolean(root.arr,i,rootSize+100,i);
+  }
+  //IF CHECKED==Checked
+  @ParameterizedTest
+    //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testCheckedListadd_int_Boolean_throwIOBE(int initialCapacity){
+    //ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.CheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      //too low
+      Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(-1,TypeConversionUtil.convertToBoolean(0)));
+      //too hi
+      final int finalIndex=i;
+      Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(finalIndex+1,TypeConversionUtil.convertToBoolean(0)));
+      seq.add(TypeConversionUtil.convertToBoolean(i));
+    }
+    //when the method throws, verify that no changes occurred
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlongboolean(root.arr,0,rootSize+100,-preAllocSpan);
+  }
+  //ENDIF
+//ENDIF
+  @ParameterizedTest
+//IF STRUCT==Stack,List
+  @ValueSource(ints={0,5,10,15})
+  public void testCheckedListadd_Boolean_happyPath(int initialCapacity){
+//ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.CheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToBoolean(i)));
     }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolongboolean(i),seq.arr[i]);
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    for(int i=0,val=-preAllocSpan;i<100;++i,++val)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolongboolean(val),root.arr[i]);
     }
   }
-  @Test
-  public void testUncheckedListadd_Boolean_initialCapacityNULL(){
-    var seq=new LongArrSeq.UncheckedList(0,null);
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToBoolean(i)));
+    //IF OfByte,OfChar
+//IF STRUCT==List,SubList
+  @ParameterizedTest
+  //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testCheckedListListItradd_byte_happyPathInsertBegin(int initialCapacity){
+  //ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.CheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    var seqItr=seq.listIterator();
+    for(int i=0;i<100;++i)
+    {
+      seqItr.add(TypeConversionUtil.convertTobyte(i));
+      assertIteratorStateIntegrity(seqItr,preAllocSpan+1,-1,i+1,parent,root);
+      seqItr.previousLong();
     }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolongboolean(i),seq.arr[i]);
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=100,bound=i+100;i<bound;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(--val),root.arr[i]);
+    }
+    verifyAscendingSpanlong(root.arr,i,rootSize+100,100);
+  }
+  @ParameterizedTest
+  //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testCheckedListListItradd_byte_happyPathInsertEnd(int initialCapacity){
+  //ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.CheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    var seqItr=seq.listIterator();
+    for(int i=0;i<100;++i)
+    {
+      seqItr.add(TypeConversionUtil.convertTobyte(i));
+      assertIteratorStateIntegrity(seqItr,preAllocSpan+i+1,-1,i+1,parent,root);
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,rootSize+100,-preAllocSpan);
+  }
+  @ParameterizedTest
+  //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testCheckedListListItradd_byte_happyPathInsertMidPoint(int initialCapacity){
+  //ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.CheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    var seqItr=seq.listIterator();
+    for(int i=0;i<100;++i)
+    {
+      seqItr.add(TypeConversionUtil.convertTobyte(i));
+      assertIteratorStateIntegrity(seqItr,((rootSize+i)/2)+1,-1,i+1,parent,root);
+      if((i&1)==0)
+      {
+        seqItr.previousLong();
+      }
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=1,bound=i+50;i<bound;++i,val+=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+    for(int val=98,bound=i+50;i<bound;++i,val-=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+    verifyAscendingSpanlong(root.arr,i,rootSize+100,i);
+  }
+  //IF CHECKED==Checked
+  @ParameterizedTest
+    //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testCheckedListListItradd_byte_throwCME(int initialCapacity){
+    //ENDIF
+    {
+      //try on an empty sublist
+//IF 
+      int rootPreAlloc=0;
+      int parentPreAlloc=0;
+      int parentPostAlloc=0;
+      int rootPostAlloc=0;
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      var seq=new LongArrSeq.CheckedList(initialCapacity);
+      var parent=seq;
+      var root=seq;
+//ENDIF
+      var itr=seq.listIterator();
+      //illegally modify the root
+      root.add(preAllocSpan,TypeConversionUtil.convertTobyte(0));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->itr.add(TypeConversionUtil.convertTobyte(0)));
+      assertIteratorStateIntegrity(itr,preAllocSpan,-1,0,parent,root);
+      assertStructuralIntegrity(seq,0,0,parent,parentSize,0,root,rootSize+1,1);
+      verifyAscendingSpanlong(root.arr,0,preAllocSpan+1,-preAllocSpan);
+      verifyAscendingSpanlong(root.arr,preAllocSpan+1,rootSize+1,100);
+    }
+    {
+      //try on an empty sublist
+//IF 
+      int rootPreAlloc=0;
+      int parentPreAlloc=0;
+      int parentPostAlloc=0;
+      int rootPostAlloc=0;
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      var seq=new LongArrSeq.CheckedList(initialCapacity);
+      var parent=seq;
+      var root=seq;
+//ENDIF
+      var itr=seq.listIterator();
+      //illegally modify the parent
+      parent.add(parentPreAlloc,TypeConversionUtil.convertTobyte(0));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->itr.add(TypeConversionUtil.convertTobyte(0)));
+      assertIteratorStateIntegrity(itr,preAllocSpan,-1,0,parent,root);
+      assertStructuralIntegrity(seq,0,0,parent,parentSize+1,1,root,rootSize+1,1);
+      verifyAscendingSpanlong(root.arr,0,preAllocSpan+1,-preAllocSpan);
+      verifyAscendingSpanlong(root.arr,preAllocSpan+1,rootSize+1,100);
+    }
+    {
+      //try on an empty sublist
+//IF 
+      int rootPreAlloc=0;
+      int parentPreAlloc=0;
+      int parentPostAlloc=0;
+      int rootPostAlloc=0;
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      var seq=new LongArrSeq.CheckedList(initialCapacity);
+      var parent=seq;
+      var root=seq;
+//ENDIF
+      var itr=seq.listIterator();
+      //illegally modify the sequence
+      seq.add(0,TypeConversionUtil.convertTobyte(0));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->itr.add(TypeConversionUtil.convertTobyte(0)));
+      assertIteratorStateIntegrity(itr,preAllocSpan,-1,0,parent,root);
+      assertStructuralIntegrity(seq,1,1,parent,parentSize+1,1,root,rootSize+1,1);
+      verifyAscendingSpanlong(root.arr,0,preAllocSpan+1,-preAllocSpan);
+      verifyAscendingSpanlong(root.arr,preAllocSpan+1,rootSize+1,100);
+    }
+    {
+      //try on an non-empty sublist, inserting at the end
+//IF 
+      int rootPreAlloc=0;
+      int parentPreAlloc=0;
+      int parentPostAlloc=0;
+      int rootPostAlloc=0;
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      var seq=new LongArrSeq.CheckedList(initialCapacity);
+      var parent=seq;
+      var root=seq;
+//ENDIF
+      var itr=seq.listIterator();
+      for(int i=0;i<100;++i)
+      {
+        itr.add(TypeConversionUtil.convertTobyte(i));
+      }
+      //illegally modify the root
+      root.add(TypeConversionUtil.convertTobyte(rootSize+100));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->itr.add(TypeConversionUtil.convertTobyte(0)));
+      assertIteratorStateIntegrity(itr,preAllocSpan+100,-1,100,parent,root);
+      assertStructuralIntegrity(seq,100,100,parent,parentSize+100,100,root,rootSize+101,101);
+      verifyAscendingSpanlong(root.arr,0,rootSize+101,-preAllocSpan);
+    }
+    {
+      //try on an non-empty sublist, inserting at the end
+//IF 
+      int rootPreAlloc=0;
+      int parentPreAlloc=0;
+      int parentPostAlloc=0;
+      int rootPostAlloc=0;
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      var seq=new LongArrSeq.CheckedList(initialCapacity);
+      var parent=seq;
+      var root=seq;
+//ENDIF
+      var itr=seq.listIterator();
+      for(int i=0;i<100;++i)
+      {
+        itr.add(TypeConversionUtil.convertTobyte(i));
+      }
+      //illegally modify the parent
+      parent.add(parentPreAlloc+50,TypeConversionUtil.convertTobyte(50));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->itr.add(TypeConversionUtil.convertTobyte(0)));
+      assertIteratorStateIntegrity(itr,preAllocSpan+100,-1,100,parent,root);
+      assertStructuralIntegrity(seq,100,100,parent,parentSize+101,101,root,rootSize+101,101);
+      verifyAscendingSpanlong(root.arr,0,preAllocSpan+51,-preAllocSpan);
+      verifyAscendingSpanlong(root.arr,preAllocSpan+51,rootSize+101,50);
+    }
+    {
+      //try on an non-empty sublist, inserting at the end
+//IF 
+      int rootPreAlloc=0;
+      int parentPreAlloc=0;
+      int parentPostAlloc=0;
+      int rootPostAlloc=0;
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      var seq=new LongArrSeq.CheckedList(initialCapacity);
+      var parent=seq;
+      var root=seq;
+//ENDIF
+      var itr=seq.listIterator();
+      for(int i=0;i<100;++i)
+      {
+        itr.add(TypeConversionUtil.convertTobyte(i));
+      }
+      //illegally modify the seq
+      seq.add(50,TypeConversionUtil.convertTobyte(50));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->itr.add(TypeConversionUtil.convertTobyte(0)));
+      assertIteratorStateIntegrity(itr,preAllocSpan+100,-1,100,parent,root);
+      assertStructuralIntegrity(seq,101,101,parent,parentSize+101,101,root,rootSize+101,101);
+      verifyAscendingSpanlong(root.arr,0,preAllocSpan+51,-preAllocSpan);
+      verifyAscendingSpanlong(root.arr,preAllocSpan+51,rootSize+101,50);
     }
   }
-  @Test
-  public void testUncheckedListadd_Boolean_initialCapacity50(){
-    var seq=new LongArrSeq.UncheckedList(50);
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToBoolean(i)));
+  //ENDIF
+  @ParameterizedTest
+  //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testCheckedListadd_int_byte_happyPathInsertBegin(int initialCapacity){
+  //ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.CheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      seq.add(0,TypeConversionUtil.convertTobyte(i));
     }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolongboolean(i),seq.arr[i]);
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=100,bound=i+100;i<bound;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(--val),root.arr[i]);
     }
+    verifyAscendingSpanlong(root.arr,i,rootSize+100,100);
   }
-  @Test
-  public void testUncheckedListadd_byte_initialCapacityDEFAULT(){
-    var seq=new LongArrSeq.UncheckedList();
-    for(int i=0;i<100;++i){
+  @ParameterizedTest
+  //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testCheckedListadd_int_byte_happyPathInsertEnd(int initialCapacity){
+  //ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.CheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size(),TypeConversionUtil.convertTobyte(i));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,rootSize+100,-preAllocSpan);
+  }
+  @ParameterizedTest
+  //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testCheckedListadd_int_byte_happyPathInsertMidPoint(int initialCapacity){
+  //ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.CheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size()/2,TypeConversionUtil.convertTobyte(i));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=1,bound=i+50;i<bound;++i,val+=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+    for(int val=98,bound=i+50;i<bound;++i,val-=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+    verifyAscendingSpanlong(root.arr,i,rootSize+100,i);
+  }
+  //IF CHECKED==Checked
+  @ParameterizedTest
+    //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testCheckedListadd_int_byte_throwIOBE(int initialCapacity){
+    //ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.CheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      //too low
+      Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(-1,TypeConversionUtil.convertTobyte(0)));
+      //too hi
+      final int finalIndex=i;
+      Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(finalIndex+1,TypeConversionUtil.convertTobyte(0)));
+      seq.add(TypeConversionUtil.convertTobyte(i));
+    }
+    //when the method throws, verify that no changes occurred
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,rootSize+100,-preAllocSpan);
+  }
+  //ENDIF
+//ENDIF
+  @ParameterizedTest
+//IF STRUCT==Stack,List
+  @ValueSource(ints={0,5,10,15})
+  public void testCheckedListadd_byte_happyPath(int initialCapacity){
+//ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.CheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertTobyte(i)));
     }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),seq.arr[i]);
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    for(int i=0,val=-preAllocSpan;i<100;++i,++val)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
     }
   }
-  @Test
-  public void testUncheckedListadd_byte_initialCapacityNULL(){
-    var seq=new LongArrSeq.UncheckedList(0,null);
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTobyte(i)));
+//IF STRUCT==List,SubList
+  @ParameterizedTest
+  //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testCheckedListListItradd_Byte_happyPathInsertBegin(int initialCapacity){
+  //ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.CheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    var seqItr=seq.listIterator();
+    for(int i=0;i<100;++i)
+    {
+      seqItr.add(TypeConversionUtil.convertToByte(i));
+      assertIteratorStateIntegrity(seqItr,preAllocSpan+1,-1,i+1,parent,root);
+      seqItr.previousLong();
     }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),seq.arr[i]);
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=100,bound=i+100;i<bound;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(--val),root.arr[i]);
+    }
+    verifyAscendingSpanlong(root.arr,i,rootSize+100,100);
+  }
+  @ParameterizedTest
+  //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testCheckedListListItradd_Byte_happyPathInsertEnd(int initialCapacity){
+  //ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.CheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    var seqItr=seq.listIterator();
+    for(int i=0;i<100;++i)
+    {
+      seqItr.add(TypeConversionUtil.convertToByte(i));
+      assertIteratorStateIntegrity(seqItr,preAllocSpan+i+1,-1,i+1,parent,root);
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,rootSize+100,-preAllocSpan);
+  }
+  @ParameterizedTest
+  //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testCheckedListListItradd_Byte_happyPathInsertMidPoint(int initialCapacity){
+  //ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.CheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    var seqItr=seq.listIterator();
+    for(int i=0;i<100;++i)
+    {
+      seqItr.add(TypeConversionUtil.convertToByte(i));
+      assertIteratorStateIntegrity(seqItr,((rootSize+i)/2)+1,-1,i+1,parent,root);
+      if((i&1)==0)
+      {
+        seqItr.previousLong();
+      }
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=1,bound=i+50;i<bound;++i,val+=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+    for(int val=98,bound=i+50;i<bound;++i,val-=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+    verifyAscendingSpanlong(root.arr,i,rootSize+100,i);
+  }
+  //IF CHECKED==Checked
+  @ParameterizedTest
+    //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testCheckedListListItradd_Byte_throwCME(int initialCapacity){
+    //ENDIF
+    {
+      //try on an empty sublist
+//IF 
+      int rootPreAlloc=0;
+      int parentPreAlloc=0;
+      int parentPostAlloc=0;
+      int rootPostAlloc=0;
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      var seq=new LongArrSeq.CheckedList(initialCapacity);
+      var parent=seq;
+      var root=seq;
+//ENDIF
+      var itr=seq.listIterator();
+      //illegally modify the root
+      root.add(preAllocSpan,TypeConversionUtil.convertToByte(0));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->itr.add(TypeConversionUtil.convertToByte(0)));
+      assertIteratorStateIntegrity(itr,preAllocSpan,-1,0,parent,root);
+      assertStructuralIntegrity(seq,0,0,parent,parentSize,0,root,rootSize+1,1);
+      verifyAscendingSpanlong(root.arr,0,preAllocSpan+1,-preAllocSpan);
+      verifyAscendingSpanlong(root.arr,preAllocSpan+1,rootSize+1,100);
+    }
+    {
+      //try on an empty sublist
+//IF 
+      int rootPreAlloc=0;
+      int parentPreAlloc=0;
+      int parentPostAlloc=0;
+      int rootPostAlloc=0;
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      var seq=new LongArrSeq.CheckedList(initialCapacity);
+      var parent=seq;
+      var root=seq;
+//ENDIF
+      var itr=seq.listIterator();
+      //illegally modify the parent
+      parent.add(parentPreAlloc,TypeConversionUtil.convertToByte(0));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->itr.add(TypeConversionUtil.convertToByte(0)));
+      assertIteratorStateIntegrity(itr,preAllocSpan,-1,0,parent,root);
+      assertStructuralIntegrity(seq,0,0,parent,parentSize+1,1,root,rootSize+1,1);
+      verifyAscendingSpanlong(root.arr,0,preAllocSpan+1,-preAllocSpan);
+      verifyAscendingSpanlong(root.arr,preAllocSpan+1,rootSize+1,100);
+    }
+    {
+      //try on an empty sublist
+//IF 
+      int rootPreAlloc=0;
+      int parentPreAlloc=0;
+      int parentPostAlloc=0;
+      int rootPostAlloc=0;
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      var seq=new LongArrSeq.CheckedList(initialCapacity);
+      var parent=seq;
+      var root=seq;
+//ENDIF
+      var itr=seq.listIterator();
+      //illegally modify the sequence
+      seq.add(0,TypeConversionUtil.convertToByte(0));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->itr.add(TypeConversionUtil.convertToByte(0)));
+      assertIteratorStateIntegrity(itr,preAllocSpan,-1,0,parent,root);
+      assertStructuralIntegrity(seq,1,1,parent,parentSize+1,1,root,rootSize+1,1);
+      verifyAscendingSpanlong(root.arr,0,preAllocSpan+1,-preAllocSpan);
+      verifyAscendingSpanlong(root.arr,preAllocSpan+1,rootSize+1,100);
+    }
+    {
+      //try on an non-empty sublist, inserting at the end
+//IF 
+      int rootPreAlloc=0;
+      int parentPreAlloc=0;
+      int parentPostAlloc=0;
+      int rootPostAlloc=0;
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      var seq=new LongArrSeq.CheckedList(initialCapacity);
+      var parent=seq;
+      var root=seq;
+//ENDIF
+      var itr=seq.listIterator();
+      for(int i=0;i<100;++i)
+      {
+        itr.add(TypeConversionUtil.convertToByte(i));
+      }
+      //illegally modify the root
+      root.add(TypeConversionUtil.convertToByte(rootSize+100));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->itr.add(TypeConversionUtil.convertToByte(0)));
+      assertIteratorStateIntegrity(itr,preAllocSpan+100,-1,100,parent,root);
+      assertStructuralIntegrity(seq,100,100,parent,parentSize+100,100,root,rootSize+101,101);
+      verifyAscendingSpanlong(root.arr,0,rootSize+101,-preAllocSpan);
+    }
+    {
+      //try on an non-empty sublist, inserting at the end
+//IF 
+      int rootPreAlloc=0;
+      int parentPreAlloc=0;
+      int parentPostAlloc=0;
+      int rootPostAlloc=0;
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      var seq=new LongArrSeq.CheckedList(initialCapacity);
+      var parent=seq;
+      var root=seq;
+//ENDIF
+      var itr=seq.listIterator();
+      for(int i=0;i<100;++i)
+      {
+        itr.add(TypeConversionUtil.convertToByte(i));
+      }
+      //illegally modify the parent
+      parent.add(parentPreAlloc+50,TypeConversionUtil.convertToByte(50));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->itr.add(TypeConversionUtil.convertToByte(0)));
+      assertIteratorStateIntegrity(itr,preAllocSpan+100,-1,100,parent,root);
+      assertStructuralIntegrity(seq,100,100,parent,parentSize+101,101,root,rootSize+101,101);
+      verifyAscendingSpanlong(root.arr,0,preAllocSpan+51,-preAllocSpan);
+      verifyAscendingSpanlong(root.arr,preAllocSpan+51,rootSize+101,50);
+    }
+    {
+      //try on an non-empty sublist, inserting at the end
+//IF 
+      int rootPreAlloc=0;
+      int parentPreAlloc=0;
+      int parentPostAlloc=0;
+      int rootPostAlloc=0;
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      var seq=new LongArrSeq.CheckedList(initialCapacity);
+      var parent=seq;
+      var root=seq;
+//ENDIF
+      var itr=seq.listIterator();
+      for(int i=0;i<100;++i)
+      {
+        itr.add(TypeConversionUtil.convertToByte(i));
+      }
+      //illegally modify the seq
+      seq.add(50,TypeConversionUtil.convertToByte(50));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->itr.add(TypeConversionUtil.convertToByte(0)));
+      assertIteratorStateIntegrity(itr,preAllocSpan+100,-1,100,parent,root);
+      assertStructuralIntegrity(seq,101,101,parent,parentSize+101,101,root,rootSize+101,101);
+      verifyAscendingSpanlong(root.arr,0,preAllocSpan+51,-preAllocSpan);
+      verifyAscendingSpanlong(root.arr,preAllocSpan+51,rootSize+101,50);
     }
   }
-  @Test
-  public void testUncheckedListadd_byte_initialCapacity50(){
-    var seq=new LongArrSeq.UncheckedList(50);
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTobyte(i)));
+  //ENDIF
+  @ParameterizedTest
+  //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testCheckedListadd_int_Byte_happyPathInsertBegin(int initialCapacity){
+  //ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.CheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      seq.add(0,TypeConversionUtil.convertToByte(i));
     }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),seq.arr[i]);
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=100,bound=i+100;i<bound;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(--val),root.arr[i]);
     }
+    verifyAscendingSpanlong(root.arr,i,rootSize+100,100);
   }
-  @Test
-  public void testUncheckedListadd_Byte_initialCapacityDEFAULT(){
-    var seq=new LongArrSeq.UncheckedList();
-    for(int i=0;i<100;++i){
+  @ParameterizedTest
+  //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testCheckedListadd_int_Byte_happyPathInsertEnd(int initialCapacity){
+  //ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.CheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size(),TypeConversionUtil.convertToByte(i));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,rootSize+100,-preAllocSpan);
+  }
+  @ParameterizedTest
+  //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testCheckedListadd_int_Byte_happyPathInsertMidPoint(int initialCapacity){
+  //ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.CheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size()/2,TypeConversionUtil.convertToByte(i));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=1,bound=i+50;i<bound;++i,val+=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+    for(int val=98,bound=i+50;i<bound;++i,val-=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+    verifyAscendingSpanlong(root.arr,i,rootSize+100,i);
+  }
+  //IF CHECKED==Checked
+  @ParameterizedTest
+    //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testCheckedListadd_int_Byte_throwIOBE(int initialCapacity){
+    //ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.CheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      //too low
+      Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(-1,TypeConversionUtil.convertToByte(0)));
+      //too hi
+      final int finalIndex=i;
+      Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(finalIndex+1,TypeConversionUtil.convertToByte(0)));
+      seq.add(TypeConversionUtil.convertToByte(i));
+    }
+    //when the method throws, verify that no changes occurred
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,rootSize+100,-preAllocSpan);
+  }
+  //ENDIF
+//ENDIF
+  @ParameterizedTest
+//IF STRUCT==Stack,List
+  @ValueSource(ints={0,5,10,15})
+  public void testCheckedListadd_Byte_happyPath(int initialCapacity){
+//ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.CheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToByte(i)));
     }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),seq.arr[i]);
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    for(int i=0,val=-preAllocSpan;i<100;++i,++val)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
     }
   }
-  @Test
-  public void testUncheckedListadd_Byte_initialCapacityNULL(){
-    var seq=new LongArrSeq.UncheckedList(0,null);
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToByte(i)));
+      //IF OfShort
+//IF STRUCT==List,SubList
+  @ParameterizedTest
+  //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testCheckedListListItradd_short_happyPathInsertBegin(int initialCapacity){
+  //ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.CheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    var seqItr=seq.listIterator();
+    for(int i=0;i<100;++i)
+    {
+      seqItr.add(TypeConversionUtil.convertToshort(i));
+      assertIteratorStateIntegrity(seqItr,preAllocSpan+1,-1,i+1,parent,root);
+      seqItr.previousLong();
     }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),seq.arr[i]);
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=100,bound=i+100;i<bound;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(--val),root.arr[i]);
+    }
+    verifyAscendingSpanlong(root.arr,i,rootSize+100,100);
+  }
+  @ParameterizedTest
+  //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testCheckedListListItradd_short_happyPathInsertEnd(int initialCapacity){
+  //ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.CheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    var seqItr=seq.listIterator();
+    for(int i=0;i<100;++i)
+    {
+      seqItr.add(TypeConversionUtil.convertToshort(i));
+      assertIteratorStateIntegrity(seqItr,preAllocSpan+i+1,-1,i+1,parent,root);
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,rootSize+100,-preAllocSpan);
+  }
+  @ParameterizedTest
+  //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testCheckedListListItradd_short_happyPathInsertMidPoint(int initialCapacity){
+  //ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.CheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    var seqItr=seq.listIterator();
+    for(int i=0;i<100;++i)
+    {
+      seqItr.add(TypeConversionUtil.convertToshort(i));
+      assertIteratorStateIntegrity(seqItr,((rootSize+i)/2)+1,-1,i+1,parent,root);
+      if((i&1)==0)
+      {
+        seqItr.previousLong();
+      }
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=1,bound=i+50;i<bound;++i,val+=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+    for(int val=98,bound=i+50;i<bound;++i,val-=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+    verifyAscendingSpanlong(root.arr,i,rootSize+100,i);
+  }
+  //IF CHECKED==Checked
+  @ParameterizedTest
+    //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testCheckedListListItradd_short_throwCME(int initialCapacity){
+    //ENDIF
+    {
+      //try on an empty sublist
+//IF 
+      int rootPreAlloc=0;
+      int parentPreAlloc=0;
+      int parentPostAlloc=0;
+      int rootPostAlloc=0;
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      var seq=new LongArrSeq.CheckedList(initialCapacity);
+      var parent=seq;
+      var root=seq;
+//ENDIF
+      var itr=seq.listIterator();
+      //illegally modify the root
+      root.add(preAllocSpan,TypeConversionUtil.convertToshort(0));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->itr.add(TypeConversionUtil.convertToshort(0)));
+      assertIteratorStateIntegrity(itr,preAllocSpan,-1,0,parent,root);
+      assertStructuralIntegrity(seq,0,0,parent,parentSize,0,root,rootSize+1,1);
+      verifyAscendingSpanlong(root.arr,0,preAllocSpan+1,-preAllocSpan);
+      verifyAscendingSpanlong(root.arr,preAllocSpan+1,rootSize+1,100);
+    }
+    {
+      //try on an empty sublist
+//IF 
+      int rootPreAlloc=0;
+      int parentPreAlloc=0;
+      int parentPostAlloc=0;
+      int rootPostAlloc=0;
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      var seq=new LongArrSeq.CheckedList(initialCapacity);
+      var parent=seq;
+      var root=seq;
+//ENDIF
+      var itr=seq.listIterator();
+      //illegally modify the parent
+      parent.add(parentPreAlloc,TypeConversionUtil.convertToshort(0));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->itr.add(TypeConversionUtil.convertToshort(0)));
+      assertIteratorStateIntegrity(itr,preAllocSpan,-1,0,parent,root);
+      assertStructuralIntegrity(seq,0,0,parent,parentSize+1,1,root,rootSize+1,1);
+      verifyAscendingSpanlong(root.arr,0,preAllocSpan+1,-preAllocSpan);
+      verifyAscendingSpanlong(root.arr,preAllocSpan+1,rootSize+1,100);
+    }
+    {
+      //try on an empty sublist
+//IF 
+      int rootPreAlloc=0;
+      int parentPreAlloc=0;
+      int parentPostAlloc=0;
+      int rootPostAlloc=0;
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      var seq=new LongArrSeq.CheckedList(initialCapacity);
+      var parent=seq;
+      var root=seq;
+//ENDIF
+      var itr=seq.listIterator();
+      //illegally modify the sequence
+      seq.add(0,TypeConversionUtil.convertToshort(0));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->itr.add(TypeConversionUtil.convertToshort(0)));
+      assertIteratorStateIntegrity(itr,preAllocSpan,-1,0,parent,root);
+      assertStructuralIntegrity(seq,1,1,parent,parentSize+1,1,root,rootSize+1,1);
+      verifyAscendingSpanlong(root.arr,0,preAllocSpan+1,-preAllocSpan);
+      verifyAscendingSpanlong(root.arr,preAllocSpan+1,rootSize+1,100);
+    }
+    {
+      //try on an non-empty sublist, inserting at the end
+//IF 
+      int rootPreAlloc=0;
+      int parentPreAlloc=0;
+      int parentPostAlloc=0;
+      int rootPostAlloc=0;
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      var seq=new LongArrSeq.CheckedList(initialCapacity);
+      var parent=seq;
+      var root=seq;
+//ENDIF
+      var itr=seq.listIterator();
+      for(int i=0;i<100;++i)
+      {
+        itr.add(TypeConversionUtil.convertToshort(i));
+      }
+      //illegally modify the root
+      root.add(TypeConversionUtil.convertToshort(rootSize+100));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->itr.add(TypeConversionUtil.convertToshort(0)));
+      assertIteratorStateIntegrity(itr,preAllocSpan+100,-1,100,parent,root);
+      assertStructuralIntegrity(seq,100,100,parent,parentSize+100,100,root,rootSize+101,101);
+      verifyAscendingSpanlong(root.arr,0,rootSize+101,-preAllocSpan);
+    }
+    {
+      //try on an non-empty sublist, inserting at the end
+//IF 
+      int rootPreAlloc=0;
+      int parentPreAlloc=0;
+      int parentPostAlloc=0;
+      int rootPostAlloc=0;
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      var seq=new LongArrSeq.CheckedList(initialCapacity);
+      var parent=seq;
+      var root=seq;
+//ENDIF
+      var itr=seq.listIterator();
+      for(int i=0;i<100;++i)
+      {
+        itr.add(TypeConversionUtil.convertToshort(i));
+      }
+      //illegally modify the parent
+      parent.add(parentPreAlloc+50,TypeConversionUtil.convertToshort(50));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->itr.add(TypeConversionUtil.convertToshort(0)));
+      assertIteratorStateIntegrity(itr,preAllocSpan+100,-1,100,parent,root);
+      assertStructuralIntegrity(seq,100,100,parent,parentSize+101,101,root,rootSize+101,101);
+      verifyAscendingSpanlong(root.arr,0,preAllocSpan+51,-preAllocSpan);
+      verifyAscendingSpanlong(root.arr,preAllocSpan+51,rootSize+101,50);
+    }
+    {
+      //try on an non-empty sublist, inserting at the end
+//IF 
+      int rootPreAlloc=0;
+      int parentPreAlloc=0;
+      int parentPostAlloc=0;
+      int rootPostAlloc=0;
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      var seq=new LongArrSeq.CheckedList(initialCapacity);
+      var parent=seq;
+      var root=seq;
+//ENDIF
+      var itr=seq.listIterator();
+      for(int i=0;i<100;++i)
+      {
+        itr.add(TypeConversionUtil.convertToshort(i));
+      }
+      //illegally modify the seq
+      seq.add(50,TypeConversionUtil.convertToshort(50));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->itr.add(TypeConversionUtil.convertToshort(0)));
+      assertIteratorStateIntegrity(itr,preAllocSpan+100,-1,100,parent,root);
+      assertStructuralIntegrity(seq,101,101,parent,parentSize+101,101,root,rootSize+101,101);
+      verifyAscendingSpanlong(root.arr,0,preAllocSpan+51,-preAllocSpan);
+      verifyAscendingSpanlong(root.arr,preAllocSpan+51,rootSize+101,50);
     }
   }
-  @Test
-  public void testUncheckedListadd_Byte_initialCapacity50(){
-    var seq=new LongArrSeq.UncheckedList(50);
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToByte(i)));
+  //ENDIF
+  @ParameterizedTest
+  //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testCheckedListadd_int_short_happyPathInsertBegin(int initialCapacity){
+  //ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.CheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      seq.add(0,TypeConversionUtil.convertToshort(i));
     }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),seq.arr[i]);
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=100,bound=i+100;i<bound;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(--val),root.arr[i]);
     }
+    verifyAscendingSpanlong(root.arr,i,rootSize+100,100);
   }
-  @Test
-  public void testUncheckedListadd_char_initialCapacityDEFAULT(){
-    var seq=new LongArrSeq.UncheckedList();
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTochar(i)));
+  @ParameterizedTest
+  //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testCheckedListadd_int_short_happyPathInsertEnd(int initialCapacity){
+  //ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.CheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size(),TypeConversionUtil.convertToshort(i));
     }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),seq.arr[i]);
-    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,rootSize+100,-preAllocSpan);
   }
-  @Test
-  public void testUncheckedListadd_char_initialCapacityNULL(){
-    var seq=new LongArrSeq.UncheckedList(0,null);
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTochar(i)));
+  @ParameterizedTest
+  //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testCheckedListadd_int_short_happyPathInsertMidPoint(int initialCapacity){
+  //ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.CheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size()/2,TypeConversionUtil.convertToshort(i));
     }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),seq.arr[i]);
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=1,bound=i+50;i<bound;++i,val+=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
     }
+    for(int val=98,bound=i+50;i<bound;++i,val-=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+    verifyAscendingSpanlong(root.arr,i,rootSize+100,i);
   }
-  @Test
-  public void testUncheckedListadd_char_initialCapacity50(){
-    var seq=new LongArrSeq.UncheckedList(50);
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTochar(i)));
+  //IF CHECKED==Checked
+  @ParameterizedTest
+    //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testCheckedListadd_int_short_throwIOBE(int initialCapacity){
+    //ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.CheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      //too low
+      Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(-1,TypeConversionUtil.convertToshort(0)));
+      //too hi
+      final int finalIndex=i;
+      Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(finalIndex+1,TypeConversionUtil.convertToshort(0)));
+      seq.add(TypeConversionUtil.convertToshort(i));
     }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),seq.arr[i]);
-    }
+    //when the method throws, verify that no changes occurred
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,rootSize+100,-preAllocSpan);
   }
-  @Test
-  public void testUncheckedListadd_Character_initialCapacityDEFAULT(){
-    var seq=new LongArrSeq.UncheckedList();
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToCharacter(i)));
-    }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),seq.arr[i]);
-    }
-  }
-  @Test
-  public void testUncheckedListadd_Character_initialCapacityNULL(){
-    var seq=new LongArrSeq.UncheckedList(0,null);
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToCharacter(i)));
-    }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),seq.arr[i]);
-    }
-  }
-  @Test
-  public void testUncheckedListadd_Character_initialCapacity50(){
-    var seq=new LongArrSeq.UncheckedList(50);
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToCharacter(i)));
-    }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),seq.arr[i]);
-    }
-  }
-  @Test
-  public void testUncheckedListadd_short_initialCapacityDEFAULT(){
-    var seq=new LongArrSeq.UncheckedList();
-    for(int i=0;i<100;++i){
+  //ENDIF
+//ENDIF
+  @ParameterizedTest
+//IF STRUCT==Stack,List
+  @ValueSource(ints={0,5,10,15})
+  public void testCheckedListadd_short_happyPath(int initialCapacity){
+//ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.CheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToshort(i)));
     }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),seq.arr[i]);
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    for(int i=0,val=-preAllocSpan;i<100;++i,++val)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
     }
   }
-  @Test
-  public void testUncheckedListadd_short_initialCapacityNULL(){
-    var seq=new LongArrSeq.UncheckedList(0,null);
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToshort(i)));
+//IF STRUCT==List,SubList
+  @ParameterizedTest
+  //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testCheckedListListItradd_Short_happyPathInsertBegin(int initialCapacity){
+  //ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.CheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    var seqItr=seq.listIterator();
+    for(int i=0;i<100;++i)
+    {
+      seqItr.add(TypeConversionUtil.convertToShort(i));
+      assertIteratorStateIntegrity(seqItr,preAllocSpan+1,-1,i+1,parent,root);
+      seqItr.previousLong();
     }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),seq.arr[i]);
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=100,bound=i+100;i<bound;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(--val),root.arr[i]);
+    }
+    verifyAscendingSpanlong(root.arr,i,rootSize+100,100);
+  }
+  @ParameterizedTest
+  //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testCheckedListListItradd_Short_happyPathInsertEnd(int initialCapacity){
+  //ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.CheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    var seqItr=seq.listIterator();
+    for(int i=0;i<100;++i)
+    {
+      seqItr.add(TypeConversionUtil.convertToShort(i));
+      assertIteratorStateIntegrity(seqItr,preAllocSpan+i+1,-1,i+1,parent,root);
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,rootSize+100,-preAllocSpan);
+  }
+  @ParameterizedTest
+  //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testCheckedListListItradd_Short_happyPathInsertMidPoint(int initialCapacity){
+  //ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.CheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    var seqItr=seq.listIterator();
+    for(int i=0;i<100;++i)
+    {
+      seqItr.add(TypeConversionUtil.convertToShort(i));
+      assertIteratorStateIntegrity(seqItr,((rootSize+i)/2)+1,-1,i+1,parent,root);
+      if((i&1)==0)
+      {
+        seqItr.previousLong();
+      }
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=1,bound=i+50;i<bound;++i,val+=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+    for(int val=98,bound=i+50;i<bound;++i,val-=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+    verifyAscendingSpanlong(root.arr,i,rootSize+100,i);
+  }
+  //IF CHECKED==Checked
+  @ParameterizedTest
+    //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testCheckedListListItradd_Short_throwCME(int initialCapacity){
+    //ENDIF
+    {
+      //try on an empty sublist
+//IF 
+      int rootPreAlloc=0;
+      int parentPreAlloc=0;
+      int parentPostAlloc=0;
+      int rootPostAlloc=0;
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      var seq=new LongArrSeq.CheckedList(initialCapacity);
+      var parent=seq;
+      var root=seq;
+//ENDIF
+      var itr=seq.listIterator();
+      //illegally modify the root
+      root.add(preAllocSpan,TypeConversionUtil.convertToShort(0));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->itr.add(TypeConversionUtil.convertToShort(0)));
+      assertIteratorStateIntegrity(itr,preAllocSpan,-1,0,parent,root);
+      assertStructuralIntegrity(seq,0,0,parent,parentSize,0,root,rootSize+1,1);
+      verifyAscendingSpanlong(root.arr,0,preAllocSpan+1,-preAllocSpan);
+      verifyAscendingSpanlong(root.arr,preAllocSpan+1,rootSize+1,100);
+    }
+    {
+      //try on an empty sublist
+//IF 
+      int rootPreAlloc=0;
+      int parentPreAlloc=0;
+      int parentPostAlloc=0;
+      int rootPostAlloc=0;
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      var seq=new LongArrSeq.CheckedList(initialCapacity);
+      var parent=seq;
+      var root=seq;
+//ENDIF
+      var itr=seq.listIterator();
+      //illegally modify the parent
+      parent.add(parentPreAlloc,TypeConversionUtil.convertToShort(0));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->itr.add(TypeConversionUtil.convertToShort(0)));
+      assertIteratorStateIntegrity(itr,preAllocSpan,-1,0,parent,root);
+      assertStructuralIntegrity(seq,0,0,parent,parentSize+1,1,root,rootSize+1,1);
+      verifyAscendingSpanlong(root.arr,0,preAllocSpan+1,-preAllocSpan);
+      verifyAscendingSpanlong(root.arr,preAllocSpan+1,rootSize+1,100);
+    }
+    {
+      //try on an empty sublist
+//IF 
+      int rootPreAlloc=0;
+      int parentPreAlloc=0;
+      int parentPostAlloc=0;
+      int rootPostAlloc=0;
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      var seq=new LongArrSeq.CheckedList(initialCapacity);
+      var parent=seq;
+      var root=seq;
+//ENDIF
+      var itr=seq.listIterator();
+      //illegally modify the sequence
+      seq.add(0,TypeConversionUtil.convertToShort(0));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->itr.add(TypeConversionUtil.convertToShort(0)));
+      assertIteratorStateIntegrity(itr,preAllocSpan,-1,0,parent,root);
+      assertStructuralIntegrity(seq,1,1,parent,parentSize+1,1,root,rootSize+1,1);
+      verifyAscendingSpanlong(root.arr,0,preAllocSpan+1,-preAllocSpan);
+      verifyAscendingSpanlong(root.arr,preAllocSpan+1,rootSize+1,100);
+    }
+    {
+      //try on an non-empty sublist, inserting at the end
+//IF 
+      int rootPreAlloc=0;
+      int parentPreAlloc=0;
+      int parentPostAlloc=0;
+      int rootPostAlloc=0;
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      var seq=new LongArrSeq.CheckedList(initialCapacity);
+      var parent=seq;
+      var root=seq;
+//ENDIF
+      var itr=seq.listIterator();
+      for(int i=0;i<100;++i)
+      {
+        itr.add(TypeConversionUtil.convertToShort(i));
+      }
+      //illegally modify the root
+      root.add(TypeConversionUtil.convertToShort(rootSize+100));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->itr.add(TypeConversionUtil.convertToShort(0)));
+      assertIteratorStateIntegrity(itr,preAllocSpan+100,-1,100,parent,root);
+      assertStructuralIntegrity(seq,100,100,parent,parentSize+100,100,root,rootSize+101,101);
+      verifyAscendingSpanlong(root.arr,0,rootSize+101,-preAllocSpan);
+    }
+    {
+      //try on an non-empty sublist, inserting at the end
+//IF 
+      int rootPreAlloc=0;
+      int parentPreAlloc=0;
+      int parentPostAlloc=0;
+      int rootPostAlloc=0;
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      var seq=new LongArrSeq.CheckedList(initialCapacity);
+      var parent=seq;
+      var root=seq;
+//ENDIF
+      var itr=seq.listIterator();
+      for(int i=0;i<100;++i)
+      {
+        itr.add(TypeConversionUtil.convertToShort(i));
+      }
+      //illegally modify the parent
+      parent.add(parentPreAlloc+50,TypeConversionUtil.convertToShort(50));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->itr.add(TypeConversionUtil.convertToShort(0)));
+      assertIteratorStateIntegrity(itr,preAllocSpan+100,-1,100,parent,root);
+      assertStructuralIntegrity(seq,100,100,parent,parentSize+101,101,root,rootSize+101,101);
+      verifyAscendingSpanlong(root.arr,0,preAllocSpan+51,-preAllocSpan);
+      verifyAscendingSpanlong(root.arr,preAllocSpan+51,rootSize+101,50);
+    }
+    {
+      //try on an non-empty sublist, inserting at the end
+//IF 
+      int rootPreAlloc=0;
+      int parentPreAlloc=0;
+      int parentPostAlloc=0;
+      int rootPostAlloc=0;
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      var seq=new LongArrSeq.CheckedList(initialCapacity);
+      var parent=seq;
+      var root=seq;
+//ENDIF
+      var itr=seq.listIterator();
+      for(int i=0;i<100;++i)
+      {
+        itr.add(TypeConversionUtil.convertToShort(i));
+      }
+      //illegally modify the seq
+      seq.add(50,TypeConversionUtil.convertToShort(50));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->itr.add(TypeConversionUtil.convertToShort(0)));
+      assertIteratorStateIntegrity(itr,preAllocSpan+100,-1,100,parent,root);
+      assertStructuralIntegrity(seq,101,101,parent,parentSize+101,101,root,rootSize+101,101);
+      verifyAscendingSpanlong(root.arr,0,preAllocSpan+51,-preAllocSpan);
+      verifyAscendingSpanlong(root.arr,preAllocSpan+51,rootSize+101,50);
     }
   }
-  @Test
-  public void testUncheckedListadd_short_initialCapacity50(){
-    var seq=new LongArrSeq.UncheckedList(50);
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToshort(i)));
+  //ENDIF
+  @ParameterizedTest
+  //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testCheckedListadd_int_Short_happyPathInsertBegin(int initialCapacity){
+  //ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.CheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      seq.add(0,TypeConversionUtil.convertToShort(i));
     }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),seq.arr[i]);
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=100,bound=i+100;i<bound;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(--val),root.arr[i]);
     }
+    verifyAscendingSpanlong(root.arr,i,rootSize+100,100);
   }
-  @Test
-  public void testUncheckedListadd_Short_initialCapacityDEFAULT(){
-    var seq=new LongArrSeq.UncheckedList();
-    for(int i=0;i<100;++i){
+  @ParameterizedTest
+  //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testCheckedListadd_int_Short_happyPathInsertEnd(int initialCapacity){
+  //ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.CheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size(),TypeConversionUtil.convertToShort(i));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,rootSize+100,-preAllocSpan);
+  }
+  @ParameterizedTest
+  //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testCheckedListadd_int_Short_happyPathInsertMidPoint(int initialCapacity){
+  //ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.CheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size()/2,TypeConversionUtil.convertToShort(i));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=1,bound=i+50;i<bound;++i,val+=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+    for(int val=98,bound=i+50;i<bound;++i,val-=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+    verifyAscendingSpanlong(root.arr,i,rootSize+100,i);
+  }
+  //IF CHECKED==Checked
+  @ParameterizedTest
+    //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testCheckedListadd_int_Short_throwIOBE(int initialCapacity){
+    //ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.CheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      //too low
+      Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(-1,TypeConversionUtil.convertToShort(0)));
+      //too hi
+      final int finalIndex=i;
+      Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(finalIndex+1,TypeConversionUtil.convertToShort(0)));
+      seq.add(TypeConversionUtil.convertToShort(i));
+    }
+    //when the method throws, verify that no changes occurred
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,rootSize+100,-preAllocSpan);
+  }
+  //ENDIF
+//ENDIF
+  @ParameterizedTest
+//IF STRUCT==Stack,List
+  @ValueSource(ints={0,5,10,15})
+  public void testCheckedListadd_Short_happyPath(int initialCapacity){
+//ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.CheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToShort(i)));
     }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),seq.arr[i]);
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    for(int i=0,val=-preAllocSpan;i<100;++i,++val)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
     }
   }
-  @Test
-  public void testUncheckedListadd_Short_initialCapacityNULL(){
-    var seq=new LongArrSeq.UncheckedList(0,null);
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToShort(i)));
+        //IF OfInt
+//IF STRUCT==List,SubList
+  @ParameterizedTest
+  //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testCheckedListListItradd_int_happyPathInsertBegin(int initialCapacity){
+  //ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.CheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    var seqItr=seq.listIterator();
+    for(int i=0;i<100;++i)
+    {
+      seqItr.add(TypeConversionUtil.convertToint(i));
+      assertIteratorStateIntegrity(seqItr,preAllocSpan+1,-1,i+1,parent,root);
+      seqItr.previousLong();
     }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),seq.arr[i]);
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=100,bound=i+100;i<bound;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(--val),root.arr[i]);
+    }
+    verifyAscendingSpanlong(root.arr,i,rootSize+100,100);
+  }
+  @ParameterizedTest
+  //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testCheckedListListItradd_int_happyPathInsertEnd(int initialCapacity){
+  //ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.CheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    var seqItr=seq.listIterator();
+    for(int i=0;i<100;++i)
+    {
+      seqItr.add(TypeConversionUtil.convertToint(i));
+      assertIteratorStateIntegrity(seqItr,preAllocSpan+i+1,-1,i+1,parent,root);
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,rootSize+100,-preAllocSpan);
+  }
+  @ParameterizedTest
+  //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testCheckedListListItradd_int_happyPathInsertMidPoint(int initialCapacity){
+  //ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.CheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    var seqItr=seq.listIterator();
+    for(int i=0;i<100;++i)
+    {
+      seqItr.add(TypeConversionUtil.convertToint(i));
+      assertIteratorStateIntegrity(seqItr,((rootSize+i)/2)+1,-1,i+1,parent,root);
+      if((i&1)==0)
+      {
+        seqItr.previousLong();
+      }
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=1,bound=i+50;i<bound;++i,val+=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+    for(int val=98,bound=i+50;i<bound;++i,val-=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+    verifyAscendingSpanlong(root.arr,i,rootSize+100,i);
+  }
+  //IF CHECKED==Checked
+  @ParameterizedTest
+    //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testCheckedListListItradd_int_throwCME(int initialCapacity){
+    //ENDIF
+    {
+      //try on an empty sublist
+//IF 
+      int rootPreAlloc=0;
+      int parentPreAlloc=0;
+      int parentPostAlloc=0;
+      int rootPostAlloc=0;
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      var seq=new LongArrSeq.CheckedList(initialCapacity);
+      var parent=seq;
+      var root=seq;
+//ENDIF
+      var itr=seq.listIterator();
+      //illegally modify the root
+      root.add(preAllocSpan,TypeConversionUtil.convertToint(0));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->itr.add(TypeConversionUtil.convertToint(0)));
+      assertIteratorStateIntegrity(itr,preAllocSpan,-1,0,parent,root);
+      assertStructuralIntegrity(seq,0,0,parent,parentSize,0,root,rootSize+1,1);
+      verifyAscendingSpanlong(root.arr,0,preAllocSpan+1,-preAllocSpan);
+      verifyAscendingSpanlong(root.arr,preAllocSpan+1,rootSize+1,100);
+    }
+    {
+      //try on an empty sublist
+//IF 
+      int rootPreAlloc=0;
+      int parentPreAlloc=0;
+      int parentPostAlloc=0;
+      int rootPostAlloc=0;
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      var seq=new LongArrSeq.CheckedList(initialCapacity);
+      var parent=seq;
+      var root=seq;
+//ENDIF
+      var itr=seq.listIterator();
+      //illegally modify the parent
+      parent.add(parentPreAlloc,TypeConversionUtil.convertToint(0));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->itr.add(TypeConversionUtil.convertToint(0)));
+      assertIteratorStateIntegrity(itr,preAllocSpan,-1,0,parent,root);
+      assertStructuralIntegrity(seq,0,0,parent,parentSize+1,1,root,rootSize+1,1);
+      verifyAscendingSpanlong(root.arr,0,preAllocSpan+1,-preAllocSpan);
+      verifyAscendingSpanlong(root.arr,preAllocSpan+1,rootSize+1,100);
+    }
+    {
+      //try on an empty sublist
+//IF 
+      int rootPreAlloc=0;
+      int parentPreAlloc=0;
+      int parentPostAlloc=0;
+      int rootPostAlloc=0;
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      var seq=new LongArrSeq.CheckedList(initialCapacity);
+      var parent=seq;
+      var root=seq;
+//ENDIF
+      var itr=seq.listIterator();
+      //illegally modify the sequence
+      seq.add(0,TypeConversionUtil.convertToint(0));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->itr.add(TypeConversionUtil.convertToint(0)));
+      assertIteratorStateIntegrity(itr,preAllocSpan,-1,0,parent,root);
+      assertStructuralIntegrity(seq,1,1,parent,parentSize+1,1,root,rootSize+1,1);
+      verifyAscendingSpanlong(root.arr,0,preAllocSpan+1,-preAllocSpan);
+      verifyAscendingSpanlong(root.arr,preAllocSpan+1,rootSize+1,100);
+    }
+    {
+      //try on an non-empty sublist, inserting at the end
+//IF 
+      int rootPreAlloc=0;
+      int parentPreAlloc=0;
+      int parentPostAlloc=0;
+      int rootPostAlloc=0;
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      var seq=new LongArrSeq.CheckedList(initialCapacity);
+      var parent=seq;
+      var root=seq;
+//ENDIF
+      var itr=seq.listIterator();
+      for(int i=0;i<100;++i)
+      {
+        itr.add(TypeConversionUtil.convertToint(i));
+      }
+      //illegally modify the root
+      root.add(TypeConversionUtil.convertToint(rootSize+100));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->itr.add(TypeConversionUtil.convertToint(0)));
+      assertIteratorStateIntegrity(itr,preAllocSpan+100,-1,100,parent,root);
+      assertStructuralIntegrity(seq,100,100,parent,parentSize+100,100,root,rootSize+101,101);
+      verifyAscendingSpanlong(root.arr,0,rootSize+101,-preAllocSpan);
+    }
+    {
+      //try on an non-empty sublist, inserting at the end
+//IF 
+      int rootPreAlloc=0;
+      int parentPreAlloc=0;
+      int parentPostAlloc=0;
+      int rootPostAlloc=0;
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      var seq=new LongArrSeq.CheckedList(initialCapacity);
+      var parent=seq;
+      var root=seq;
+//ENDIF
+      var itr=seq.listIterator();
+      for(int i=0;i<100;++i)
+      {
+        itr.add(TypeConversionUtil.convertToint(i));
+      }
+      //illegally modify the parent
+      parent.add(parentPreAlloc+50,TypeConversionUtil.convertToint(50));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->itr.add(TypeConversionUtil.convertToint(0)));
+      assertIteratorStateIntegrity(itr,preAllocSpan+100,-1,100,parent,root);
+      assertStructuralIntegrity(seq,100,100,parent,parentSize+101,101,root,rootSize+101,101);
+      verifyAscendingSpanlong(root.arr,0,preAllocSpan+51,-preAllocSpan);
+      verifyAscendingSpanlong(root.arr,preAllocSpan+51,rootSize+101,50);
+    }
+    {
+      //try on an non-empty sublist, inserting at the end
+//IF 
+      int rootPreAlloc=0;
+      int parentPreAlloc=0;
+      int parentPostAlloc=0;
+      int rootPostAlloc=0;
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      var seq=new LongArrSeq.CheckedList(initialCapacity);
+      var parent=seq;
+      var root=seq;
+//ENDIF
+      var itr=seq.listIterator();
+      for(int i=0;i<100;++i)
+      {
+        itr.add(TypeConversionUtil.convertToint(i));
+      }
+      //illegally modify the seq
+      seq.add(50,TypeConversionUtil.convertToint(50));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->itr.add(TypeConversionUtil.convertToint(0)));
+      assertIteratorStateIntegrity(itr,preAllocSpan+100,-1,100,parent,root);
+      assertStructuralIntegrity(seq,101,101,parent,parentSize+101,101,root,rootSize+101,101);
+      verifyAscendingSpanlong(root.arr,0,preAllocSpan+51,-preAllocSpan);
+      verifyAscendingSpanlong(root.arr,preAllocSpan+51,rootSize+101,50);
     }
   }
-  @Test
-  public void testUncheckedListadd_Short_initialCapacity50(){
-    var seq=new LongArrSeq.UncheckedList(50);
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToShort(i)));
+  //ENDIF
+  @ParameterizedTest
+  //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testCheckedListadd_int_int_happyPathInsertBegin(int initialCapacity){
+  //ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.CheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      seq.add(0,TypeConversionUtil.convertToint(i));
     }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),seq.arr[i]);
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=100,bound=i+100;i<bound;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(--val),root.arr[i]);
     }
+    verifyAscendingSpanlong(root.arr,i,rootSize+100,100);
   }
-  @Test
-  public void testUncheckedListadd_int_initialCapacityDEFAULT(){
-    var seq=new LongArrSeq.UncheckedList();
-    for(int i=0;i<100;++i){
+  @ParameterizedTest
+  //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testCheckedListadd_int_int_happyPathInsertEnd(int initialCapacity){
+  //ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.CheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size(),TypeConversionUtil.convertToint(i));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,rootSize+100,-preAllocSpan);
+  }
+  @ParameterizedTest
+  //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testCheckedListadd_int_int_happyPathInsertMidPoint(int initialCapacity){
+  //ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.CheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size()/2,TypeConversionUtil.convertToint(i));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=1,bound=i+50;i<bound;++i,val+=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+    for(int val=98,bound=i+50;i<bound;++i,val-=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+    verifyAscendingSpanlong(root.arr,i,rootSize+100,i);
+  }
+  //IF CHECKED==Checked
+  @ParameterizedTest
+    //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testCheckedListadd_int_int_throwIOBE(int initialCapacity){
+    //ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.CheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      //too low
+      Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(-1,TypeConversionUtil.convertToint(0)));
+      //too hi
+      final int finalIndex=i;
+      Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(finalIndex+1,TypeConversionUtil.convertToint(0)));
+      seq.add(TypeConversionUtil.convertToint(i));
+    }
+    //when the method throws, verify that no changes occurred
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,rootSize+100,-preAllocSpan);
+  }
+  //ENDIF
+//ENDIF
+  @ParameterizedTest
+//IF STRUCT==Stack,List
+  @ValueSource(ints={0,5,10,15})
+  public void testCheckedListadd_int_happyPath(int initialCapacity){
+//ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.CheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToint(i)));
     }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),seq.arr[i]);
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    for(int i=0,val=-preAllocSpan;i<100;++i,++val)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
     }
   }
-  @Test
-  public void testUncheckedListadd_int_initialCapacityNULL(){
-    var seq=new LongArrSeq.UncheckedList(0,null);
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToint(i)));
+//IF STRUCT==List,SubList
+  @ParameterizedTest
+  //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testCheckedListListItradd_Integer_happyPathInsertBegin(int initialCapacity){
+  //ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.CheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    var seqItr=seq.listIterator();
+    for(int i=0;i<100;++i)
+    {
+      seqItr.add(TypeConversionUtil.convertToInteger(i));
+      assertIteratorStateIntegrity(seqItr,preAllocSpan+1,-1,i+1,parent,root);
+      seqItr.previousLong();
     }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),seq.arr[i]);
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=100,bound=i+100;i<bound;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(--val),root.arr[i]);
+    }
+    verifyAscendingSpanlong(root.arr,i,rootSize+100,100);
+  }
+  @ParameterizedTest
+  //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testCheckedListListItradd_Integer_happyPathInsertEnd(int initialCapacity){
+  //ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.CheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    var seqItr=seq.listIterator();
+    for(int i=0;i<100;++i)
+    {
+      seqItr.add(TypeConversionUtil.convertToInteger(i));
+      assertIteratorStateIntegrity(seqItr,preAllocSpan+i+1,-1,i+1,parent,root);
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,rootSize+100,-preAllocSpan);
+  }
+  @ParameterizedTest
+  //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testCheckedListListItradd_Integer_happyPathInsertMidPoint(int initialCapacity){
+  //ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.CheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    var seqItr=seq.listIterator();
+    for(int i=0;i<100;++i)
+    {
+      seqItr.add(TypeConversionUtil.convertToInteger(i));
+      assertIteratorStateIntegrity(seqItr,((rootSize+i)/2)+1,-1,i+1,parent,root);
+      if((i&1)==0)
+      {
+        seqItr.previousLong();
+      }
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=1,bound=i+50;i<bound;++i,val+=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+    for(int val=98,bound=i+50;i<bound;++i,val-=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+    verifyAscendingSpanlong(root.arr,i,rootSize+100,i);
+  }
+  //IF CHECKED==Checked
+  @ParameterizedTest
+    //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testCheckedListListItradd_Integer_throwCME(int initialCapacity){
+    //ENDIF
+    {
+      //try on an empty sublist
+//IF 
+      int rootPreAlloc=0;
+      int parentPreAlloc=0;
+      int parentPostAlloc=0;
+      int rootPostAlloc=0;
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      var seq=new LongArrSeq.CheckedList(initialCapacity);
+      var parent=seq;
+      var root=seq;
+//ENDIF
+      var itr=seq.listIterator();
+      //illegally modify the root
+      root.add(preAllocSpan,TypeConversionUtil.convertToInteger(0));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->itr.add(TypeConversionUtil.convertToInteger(0)));
+      assertIteratorStateIntegrity(itr,preAllocSpan,-1,0,parent,root);
+      assertStructuralIntegrity(seq,0,0,parent,parentSize,0,root,rootSize+1,1);
+      verifyAscendingSpanlong(root.arr,0,preAllocSpan+1,-preAllocSpan);
+      verifyAscendingSpanlong(root.arr,preAllocSpan+1,rootSize+1,100);
+    }
+    {
+      //try on an empty sublist
+//IF 
+      int rootPreAlloc=0;
+      int parentPreAlloc=0;
+      int parentPostAlloc=0;
+      int rootPostAlloc=0;
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      var seq=new LongArrSeq.CheckedList(initialCapacity);
+      var parent=seq;
+      var root=seq;
+//ENDIF
+      var itr=seq.listIterator();
+      //illegally modify the parent
+      parent.add(parentPreAlloc,TypeConversionUtil.convertToInteger(0));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->itr.add(TypeConversionUtil.convertToInteger(0)));
+      assertIteratorStateIntegrity(itr,preAllocSpan,-1,0,parent,root);
+      assertStructuralIntegrity(seq,0,0,parent,parentSize+1,1,root,rootSize+1,1);
+      verifyAscendingSpanlong(root.arr,0,preAllocSpan+1,-preAllocSpan);
+      verifyAscendingSpanlong(root.arr,preAllocSpan+1,rootSize+1,100);
+    }
+    {
+      //try on an empty sublist
+//IF 
+      int rootPreAlloc=0;
+      int parentPreAlloc=0;
+      int parentPostAlloc=0;
+      int rootPostAlloc=0;
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      var seq=new LongArrSeq.CheckedList(initialCapacity);
+      var parent=seq;
+      var root=seq;
+//ENDIF
+      var itr=seq.listIterator();
+      //illegally modify the sequence
+      seq.add(0,TypeConversionUtil.convertToInteger(0));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->itr.add(TypeConversionUtil.convertToInteger(0)));
+      assertIteratorStateIntegrity(itr,preAllocSpan,-1,0,parent,root);
+      assertStructuralIntegrity(seq,1,1,parent,parentSize+1,1,root,rootSize+1,1);
+      verifyAscendingSpanlong(root.arr,0,preAllocSpan+1,-preAllocSpan);
+      verifyAscendingSpanlong(root.arr,preAllocSpan+1,rootSize+1,100);
+    }
+    {
+      //try on an non-empty sublist, inserting at the end
+//IF 
+      int rootPreAlloc=0;
+      int parentPreAlloc=0;
+      int parentPostAlloc=0;
+      int rootPostAlloc=0;
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      var seq=new LongArrSeq.CheckedList(initialCapacity);
+      var parent=seq;
+      var root=seq;
+//ENDIF
+      var itr=seq.listIterator();
+      for(int i=0;i<100;++i)
+      {
+        itr.add(TypeConversionUtil.convertToInteger(i));
+      }
+      //illegally modify the root
+      root.add(TypeConversionUtil.convertToInteger(rootSize+100));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->itr.add(TypeConversionUtil.convertToInteger(0)));
+      assertIteratorStateIntegrity(itr,preAllocSpan+100,-1,100,parent,root);
+      assertStructuralIntegrity(seq,100,100,parent,parentSize+100,100,root,rootSize+101,101);
+      verifyAscendingSpanlong(root.arr,0,rootSize+101,-preAllocSpan);
+    }
+    {
+      //try on an non-empty sublist, inserting at the end
+//IF 
+      int rootPreAlloc=0;
+      int parentPreAlloc=0;
+      int parentPostAlloc=0;
+      int rootPostAlloc=0;
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      var seq=new LongArrSeq.CheckedList(initialCapacity);
+      var parent=seq;
+      var root=seq;
+//ENDIF
+      var itr=seq.listIterator();
+      for(int i=0;i<100;++i)
+      {
+        itr.add(TypeConversionUtil.convertToInteger(i));
+      }
+      //illegally modify the parent
+      parent.add(parentPreAlloc+50,TypeConversionUtil.convertToInteger(50));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->itr.add(TypeConversionUtil.convertToInteger(0)));
+      assertIteratorStateIntegrity(itr,preAllocSpan+100,-1,100,parent,root);
+      assertStructuralIntegrity(seq,100,100,parent,parentSize+101,101,root,rootSize+101,101);
+      verifyAscendingSpanlong(root.arr,0,preAllocSpan+51,-preAllocSpan);
+      verifyAscendingSpanlong(root.arr,preAllocSpan+51,rootSize+101,50);
+    }
+    {
+      //try on an non-empty sublist, inserting at the end
+//IF 
+      int rootPreAlloc=0;
+      int parentPreAlloc=0;
+      int parentPostAlloc=0;
+      int rootPostAlloc=0;
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      var seq=new LongArrSeq.CheckedList(initialCapacity);
+      var parent=seq;
+      var root=seq;
+//ENDIF
+      var itr=seq.listIterator();
+      for(int i=0;i<100;++i)
+      {
+        itr.add(TypeConversionUtil.convertToInteger(i));
+      }
+      //illegally modify the seq
+      seq.add(50,TypeConversionUtil.convertToInteger(50));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->itr.add(TypeConversionUtil.convertToInteger(0)));
+      assertIteratorStateIntegrity(itr,preAllocSpan+100,-1,100,parent,root);
+      assertStructuralIntegrity(seq,101,101,parent,parentSize+101,101,root,rootSize+101,101);
+      verifyAscendingSpanlong(root.arr,0,preAllocSpan+51,-preAllocSpan);
+      verifyAscendingSpanlong(root.arr,preAllocSpan+51,rootSize+101,50);
     }
   }
-  @Test
-  public void testUncheckedListadd_int_initialCapacity50(){
-    var seq=new LongArrSeq.UncheckedList(50);
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToint(i)));
+  //ENDIF
+  @ParameterizedTest
+  //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testCheckedListadd_int_Integer_happyPathInsertBegin(int initialCapacity){
+  //ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.CheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      seq.add(0,TypeConversionUtil.convertToInteger(i));
     }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),seq.arr[i]);
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=100,bound=i+100;i<bound;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(--val),root.arr[i]);
     }
+    verifyAscendingSpanlong(root.arr,i,rootSize+100,100);
   }
-  @Test
-  public void testUncheckedListadd_Integer_initialCapacityDEFAULT(){
-    var seq=new LongArrSeq.UncheckedList();
-    for(int i=0;i<100;++i){
+  @ParameterizedTest
+  //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testCheckedListadd_int_Integer_happyPathInsertEnd(int initialCapacity){
+  //ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.CheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size(),TypeConversionUtil.convertToInteger(i));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,rootSize+100,-preAllocSpan);
+  }
+  @ParameterizedTest
+  //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testCheckedListadd_int_Integer_happyPathInsertMidPoint(int initialCapacity){
+  //ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.CheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size()/2,TypeConversionUtil.convertToInteger(i));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=1,bound=i+50;i<bound;++i,val+=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+    for(int val=98,bound=i+50;i<bound;++i,val-=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+    verifyAscendingSpanlong(root.arr,i,rootSize+100,i);
+  }
+  //IF CHECKED==Checked
+  @ParameterizedTest
+    //IF STRUCT==List
+  @ValueSource(ints={0,5,10,15})
+  public void testCheckedListadd_int_Integer_throwIOBE(int initialCapacity){
+    //ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.CheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      //too low
+      Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(-1,TypeConversionUtil.convertToInteger(0)));
+      //too hi
+      final int finalIndex=i;
+      Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(finalIndex+1,TypeConversionUtil.convertToInteger(0)));
+      seq.add(TypeConversionUtil.convertToInteger(i));
+    }
+    //when the method throws, verify that no changes occurred
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,rootSize+100,-preAllocSpan);
+  }
+  //ENDIF
+//ENDIF
+  @ParameterizedTest
+//IF STRUCT==Stack,List
+  @ValueSource(ints={0,5,10,15})
+  public void testCheckedListadd_Integer_happyPath(int initialCapacity){
+//ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.CheckedList(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToInteger(i)));
     }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),seq.arr[i]);
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    for(int i=0,val=-preAllocSpan;i<100;++i,++val)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
     }
   }
+        //ENDIF
+      //ENDIF
+    //ENDIF
+  //ENDIF
+//ENDIF
+//IF STRUCT==Stack,List
   @Test
-  public void testUncheckedListadd_Integer_initialCapacityNULL(){
-    var seq=new LongArrSeq.UncheckedList(0,null);
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToInteger(i)));
-    }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),seq.arr[i]);
-    }
-  }
-  @Test
-  public void testUncheckedListadd_Integer_initialCapacity50(){
-    var seq=new LongArrSeq.UncheckedList(50);
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToInteger(i)));
-    }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),seq.arr[i]);
-    }
-  }
-  @Test
-  public void testUncheckedListtoLongArray_void_seqIsEmpty(){
-    var seq=new LongArrSeq.UncheckedList();
-    Assertions.assertSame(OmniArray.OfLong.DEFAULT_ARR,seq.toLongArray());
-    Assertions.assertEquals(0,seq.size());
-  }
-  @Test
-  public void testUncheckedListtoLongArray_void_seqIsNotEmpty(){
-    var seq=new LongArrSeq.UncheckedList();
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTolong(i)));
-    }
-    var result=seq.toLongArray();
-    Assertions.assertEquals(100,seq.size());
-    Assertions.assertEquals(100,result.length);
-    var itr=seq.iterator();
-    for(int i=0;i<100;++i){
-      Assertions.assertEquals(itr.nextLong(),result[i]);
-    }
-    Assertions.assertNotSame(seq.arr,result);
-  }
-  @Test
-  public void testUncheckedListtoArray_void_seqIsEmpty(){
-    var seq=new LongArrSeq.UncheckedList();
-    Assertions.assertSame(OmniArray.OfLong.DEFAULT_BOXED_ARR,seq.toArray());
-    Assertions.assertEquals(0,seq.size());
-  }
-  @Test
-  public void testUncheckedListtoArray_void_seqIsNotEmpty(){
-    var seq=new LongArrSeq.UncheckedList();
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTolong(i)));
-    }
-    var result=seq.toArray();
-    Assertions.assertEquals(100,seq.size());
-    Assertions.assertEquals(100,result.length);
-    var itr=seq.iterator();
-    for(int i=0;i<100;++i){
-      Assertions.assertEquals(itr.next(),result[i]);
-    }
-    Assertions.assertNotSame(seq.arr,result);
-  }
-  @Test
-  public void testUncheckedListtoDoubleArray_void_seqIsEmpty(){
-    var seq=new LongArrSeq.UncheckedList();
-    Assertions.assertSame(OmniArray.OfDouble.DEFAULT_ARR,seq.toDoubleArray());
-    Assertions.assertEquals(0,seq.size());
-  }
-  @Test
-  public void testUncheckedListtoDoubleArray_void_seqIsNotEmpty(){
-    var seq=new LongArrSeq.UncheckedList();
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTolong(i)));
-    }
-    var result=seq.toDoubleArray();
-    Assertions.assertEquals(100,seq.size());
-    Assertions.assertEquals(100,result.length);
-    var itr=seq.iterator();
-    for(int i=0;i<100;++i){
-      Assertions.assertEquals(itr.nextDouble(),result[i]);
-    }
-    Assertions.assertNotSame(seq.arr,result);
-  }
-  @Test
-  public void testUncheckedListtoFloatArray_void_seqIsEmpty(){
-    var seq=new LongArrSeq.UncheckedList();
-    Assertions.assertSame(OmniArray.OfFloat.DEFAULT_ARR,seq.toFloatArray());
-    Assertions.assertEquals(0,seq.size());
-  }
-  @Test
-  public void testUncheckedListtoFloatArray_void_seqIsNotEmpty(){
-    var seq=new LongArrSeq.UncheckedList();
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTolong(i)));
-    }
-    var result=seq.toFloatArray();
-    Assertions.assertEquals(100,seq.size());
-    Assertions.assertEquals(100,result.length);
-    var itr=seq.iterator();
-    for(int i=0;i<100;++i){
-      Assertions.assertEquals(itr.nextFloat(),result[i]);
-    }
-    Assertions.assertNotSame(seq.arr,result);
-  }
-  @Test
-  public void testCheckedStackconstructor_void_initialCapacityDEFAULT(){
+  public void testCheckedStackConstructor_happyPath()
+  {
     var seq=new LongArrSeq.CheckedStack();
     Assertions.assertEquals(0,seq.size);
     Assertions.assertSame(OmniArray.OfLong.DEFAULT_ARR,seq.arr);
-    Assertions.assertEquals(0,seq.modCount);
+    assertStructuralIntegrity(seq,0,0,seq,0,0,seq,0,0);
   }
   @Test
-  public void testCheckedStackconstructor_intlong_initialCapacityNULL(){
-    var seq=new LongArrSeq.CheckedStack(0,null);
-    Assertions.assertEquals(0,seq.size);
-    Assertions.assertNull(seq.arr);
-    Assertions.assertEquals(0,seq.modCount);
+  public void testCheckedStackConstructor_int_longarray_happyPath()
+  {
+    int size=5;
+    long[] arr=new long[10];
+    var seq=new LongArrSeq.CheckedStack(size,arr);
+    Assertions.assertEquals(size,seq.size);
+    Assertions.assertSame(arr,seq.arr);
+    assertStructuralIntegrity(seq,0,0,seq,0,0,seq,0,0);
   }
-  @Test
-  public void testCheckedStackconstructor_int_initialCapacity50(){
-    var seq=new LongArrSeq.CheckedStack(50);
+  @ParameterizedTest
+  @ValueSource(ints={0,5,OmniArray.DEFAULT_ARR_SEQ_CAP,15})
+  public void testCheckedStackConstructor_int_happyPath(int capacity)
+  {
+    var seq=new LongArrSeq.CheckedStack(capacity);
     Assertions.assertEquals(0,seq.size);
-    switch(50){
-    case 0:
+    switch(capacity)
+    {
+      case 0:
       Assertions.assertNull(seq.arr);
       break;
-    case OmniArray.DEFAULT_ARR_SEQ_CAP:
+      case OmniArray.DEFAULT_ARR_SEQ_CAP:
       Assertions.assertSame(OmniArray.OfLong.DEFAULT_ARR,seq.arr);
       break;
-    default:
-      Assertions.assertNotNull(seq.arr);
-      Assertions.assertEquals(50,seq.arr.length);
+      default:
+      Assertions.assertEquals(capacity,seq.arr.length);
     }
-    Assertions.assertEquals(0,seq.modCount);
+    assertStructuralIntegrity(seq,0,0,seq,0,0,seq,0,0);
   }
-  @Test
-  public void testCheckedStackconstructor_int_initialCapacity0(){
-    var seq=new LongArrSeq.CheckedStack(0);
-    Assertions.assertEquals(0,seq.size);
-    switch(0){
-    case 0:
-      Assertions.assertNull(seq.arr);
-      break;
-    case OmniArray.DEFAULT_ARR_SEQ_CAP:
-      Assertions.assertSame(OmniArray.OfLong.DEFAULT_ARR,seq.arr);
-      break;
-    default:
-      Assertions.assertNotNull(seq.arr);
-      Assertions.assertEquals(0,seq.arr.length);
-    }
-    Assertions.assertEquals(0,seq.modCount);
-  }
-  @Test
-  public void testCheckedStackconstructor_int_initialCapacity10(){
-    var seq=new LongArrSeq.CheckedStack(10);
-    Assertions.assertEquals(0,seq.size);
-    switch(10){
-    case 0:
-      Assertions.assertNull(seq.arr);
-      break;
-    case OmniArray.DEFAULT_ARR_SEQ_CAP:
-      Assertions.assertSame(OmniArray.OfLong.DEFAULT_ARR,seq.arr);
-      break;
-    default:
-      Assertions.assertNotNull(seq.arr);
-      Assertions.assertEquals(10,seq.arr.length);
-    }
-    Assertions.assertEquals(0,seq.modCount);
-  }
-  @Test
-  public void testCheckedStackClone_initialCapacityDEFAULT_seqIsEmpty()
-  {
-    var seq=new LongArrSeq.CheckedStack();
-    var clone=(LongArrSeq.CheckedStack)seq.clone();
-    Assertions.assertEquals(0,clone.size());
-    Assertions.assertEquals(0,seq.size());
-    Assertions.assertSame(clone.arr,OmniArray.OfLong.DEFAULT_ARR);
-    Assertions.assertEquals(0,clone.modCount);
-    Assertions.assertEquals(0,seq.modCount);
-  }
-  @Test
-  public void testCheckedStackClone_initialCapacityDEFAULT_seqIsNotEmpty()
-  {
-    var seq=new LongArrSeq.CheckedStack();
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTolong(i)));
-    }
-    var clone=(LongArrSeq.CheckedStack)seq.clone();
-    Assertions.assertEquals(100,clone.size());
-    Assertions.assertEquals(100,seq.size());
-    Assertions.assertNotSame(seq.arr,clone.arr);
+//ENDIF
+//IF STRUCT==Stack
+  @ParameterizedTest
+  @ValueSource(ints={0,5,10,15})
+  public void testCheckedStackpush_long_happyPath(int initialCapacity){
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.CheckedStack(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
     for(int i=0;i<100;++i)
     {
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),clone.arr[i]);
-    }
-    Assertions.assertEquals(0,clone.modCount);
-    Assertions.assertEquals(100,seq.modCount);
-  }
-  @Test
-  public void testCheckedStackClone_initialCapacityNULL_seqIsEmpty()
-  {
-    var seq=new LongArrSeq.CheckedStack(0,null);
-    var clone=(LongArrSeq.CheckedStack)seq.clone();
-    Assertions.assertEquals(0,clone.size());
-    Assertions.assertEquals(0,seq.size());
-    Assertions.assertSame(clone.arr,OmniArray.OfLong.DEFAULT_ARR);
-    Assertions.assertEquals(0,clone.modCount);
-    Assertions.assertEquals(0,seq.modCount);
-  }
-  @Test
-  public void testCheckedStackClone_initialCapacityNULL_seqIsNotEmpty()
-  {
-    var seq=new LongArrSeq.CheckedStack(0,null);
-    for(int i=0;i<100;++i){
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertTolong(i)));
     }
-    var clone=(LongArrSeq.CheckedStack)seq.clone();
-    Assertions.assertEquals(100,clone.size());
-    Assertions.assertEquals(100,seq.size());
-    Assertions.assertNotSame(seq.arr,clone.arr);
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    for(int i=0,val=-preAllocSpan;i<100;++i,++val)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+  }
+//ENDIF
+  @ParameterizedTest
+//IF STRUCT==Stack,List
+  @ValueSource(ints={0,5,10,15})
+  public void testCheckedStackadd_long_happyPath(int initialCapacity){
+//ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.CheckedStack(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
     for(int i=0;i<100;++i)
     {
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),clone.arr[i]);
-    }
-    Assertions.assertEquals(0,clone.modCount);
-    Assertions.assertEquals(100,seq.modCount);
-  }
-  @Test
-  public void testCheckedStackClone_initialCapacity50_seqIsEmpty()
-  {
-    var seq=new LongArrSeq.CheckedStack(50);
-    var clone=(LongArrSeq.CheckedStack)seq.clone();
-    Assertions.assertEquals(0,clone.size());
-    Assertions.assertEquals(0,seq.size());
-    Assertions.assertSame(clone.arr,OmniArray.OfLong.DEFAULT_ARR);
-    Assertions.assertEquals(0,clone.modCount);
-    Assertions.assertEquals(0,seq.modCount);
-  }
-  @Test
-  public void testCheckedStackClone_initialCapacity50_seqIsNotEmpty()
-  {
-    var seq=new LongArrSeq.CheckedStack(50);
-    for(int i=0;i<100;++i){
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertTolong(i)));
     }
-    var clone=(LongArrSeq.CheckedStack)seq.clone();
-    Assertions.assertEquals(100,clone.size());
-    Assertions.assertEquals(100,seq.size());
-    Assertions.assertNotSame(seq.arr,clone.arr);
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    for(int i=0,val=-preAllocSpan;i<100;++i,++val)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+  }
+//IF OfRef
+//IF STRUCT==Stack
+  @ParameterizedTest
+  @ValueSource(ints={0,5,10,15})
+  public void testCheckedStackpush_Long_happyPath(int initialCapacity){
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.CheckedStack(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
     for(int i=0;i<100;++i)
     {
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),clone.arr[i]);
-    }
-    Assertions.assertEquals(0,clone.modCount);
-    Assertions.assertEquals(100,seq.modCount);
-  }
-  @Test
-  public void testCheckedStackClone_initialCapacity0_seqIsEmpty()
-  {
-    var seq=new LongArrSeq.CheckedStack(0);
-    var clone=(LongArrSeq.CheckedStack)seq.clone();
-    Assertions.assertEquals(0,clone.size());
-    Assertions.assertEquals(0,seq.size());
-    Assertions.assertSame(clone.arr,OmniArray.OfLong.DEFAULT_ARR);
-    Assertions.assertEquals(0,clone.modCount);
-    Assertions.assertEquals(0,seq.modCount);
-  }
-  @Test
-  public void testCheckedStackClone_initialCapacity0_seqIsNotEmpty()
-  {
-    var seq=new LongArrSeq.CheckedStack(0);
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTolong(i)));
-    }
-    var clone=(LongArrSeq.CheckedStack)seq.clone();
-    Assertions.assertEquals(100,clone.size());
-    Assertions.assertEquals(100,seq.size());
-    Assertions.assertNotSame(seq.arr,clone.arr);
-    for(int i=0;i<100;++i)
-    {
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),clone.arr[i]);
-    }
-    Assertions.assertEquals(0,clone.modCount);
-    Assertions.assertEquals(100,seq.modCount);
-  }
-  @Test
-  public void testCheckedStackClone_initialCapacity10_seqIsEmpty()
-  {
-    var seq=new LongArrSeq.CheckedStack(10);
-    var clone=(LongArrSeq.CheckedStack)seq.clone();
-    Assertions.assertEquals(0,clone.size());
-    Assertions.assertEquals(0,seq.size());
-    Assertions.assertSame(clone.arr,OmniArray.OfLong.DEFAULT_ARR);
-    Assertions.assertEquals(0,clone.modCount);
-    Assertions.assertEquals(0,seq.modCount);
-  }
-  @Test
-  public void testCheckedStackClone_initialCapacity10_seqIsNotEmpty()
-  {
-    var seq=new LongArrSeq.CheckedStack(10);
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTolong(i)));
-    }
-    var clone=(LongArrSeq.CheckedStack)seq.clone();
-    Assertions.assertEquals(100,clone.size());
-    Assertions.assertEquals(100,seq.size());
-    Assertions.assertNotSame(seq.arr,clone.arr);
-    for(int i=0;i<100;++i)
-    {
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),clone.arr[i]);
-    }
-    Assertions.assertEquals(0,clone.modCount);
-    Assertions.assertEquals(100,seq.modCount);
-  }
-  @Test
-  public void testCheckedStacktoArray_ObjectArray_zeroLengthArrayAndSequenceIsEmpty(){
-    var seq=new LongArrSeq.CheckedStack();
-    Long[] paramArr=new Long[0];
-    var result=seq.toArray(paramArr);
-    Assertions.assertEquals(0,seq.size());
-    Assertions.assertEquals(0,seq.modCount);
-    Assertions.assertEquals(0,result.length);
-    Assertions.assertNotSame(seq.arr,result);
-    Assertions.assertSame(paramArr,result);
-  }
-  @Test
-  public void testCheckedStacktoArray_ObjectArray_zeroLengthArrayAndSequenceNotEmpty(){
-    var seq=new LongArrSeq.CheckedStack();
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTolong(i)));
-    }
-    Long[] paramArr=new Long[0];
-    var result=seq.toArray(paramArr);
-    Assertions.assertEquals(100,seq.size());
-    Assertions.assertEquals(100,seq.modCount);
-    Assertions.assertEquals(100,result.length);
-    Assertions.assertNotSame(seq.arr,result);
-    Assertions.assertNotSame(paramArr,result);
-    var itr=seq.iterator();
-    for(int i=0;i<100;++i){
-      Assertions.assertEquals(itr.next(),result[i]);
-    }
-  }
-  @Test
-  public void testCheckedStacktoArray_ObjectArray_nonzeroLengthArrayAndSequenceIsEmpty(){
-    var seq=new LongArrSeq.CheckedStack();
-    Long[] paramArr=new Long[5];
-    for(int i=0;i<paramArr.length;++i){
-      paramArr[i]=TypeConversionUtil.convertTolong(paramArr.length);
-    }
-    var result=seq.toArray(paramArr);
-    Assertions.assertEquals(0,seq.size());
-    Assertions.assertEquals(0,seq.modCount);
-    Assertions.assertEquals(5,result.length);
-    Assertions.assertNotSame(seq.arr,result);
-    Assertions.assertSame(paramArr,result);
-    Assertions.assertNull(result[0]);
-    for(int i=1;i<result.length;++i){
-      Assertions.assertEquals((Object)TypeConversionUtil.convertTolong(paramArr.length),result[i]);
-    }
-  }
-  @Test
-  public void testCheckedStacktoArray_ObjectArray_overSizedArray(){
-    var seq=new LongArrSeq.CheckedStack();
-    Long[] paramArr=new Long[10];
-    for(int i=0;i<paramArr.length;++i){
-      paramArr[i]=TypeConversionUtil.convertTolong(paramArr.length);
-    }
-    for(int i=0;i<5;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTolong(i)));
-    }
-    var result=seq.toArray(paramArr);
-    Assertions.assertEquals(5,seq.size());
-    Assertions.assertEquals(5,seq.modCount);
-    Assertions.assertEquals(10,result.length);
-    Assertions.assertNotSame(seq.arr,result);
-    Assertions.assertSame(paramArr,result);
-    var itr=seq.iterator();
-    for(int i=0;i<5;++i){
-      Assertions.assertEquals(itr.next(),result[i]);
-    }
-    Assertions.assertNull(result[5]);
-    for(int i=6;i<result.length;++i){
-      Assertions.assertEquals((Object)TypeConversionUtil.convertTolong(paramArr.length),result[i]);
-    }
-  }
-  @Test
-  public void testCheckedStacktoArray_ObjectArray_undersizedArray(){
-    var seq=new LongArrSeq.CheckedStack();
-    Long[] paramArr=new Long[5];
-    for(int i=0;i<paramArr.length;++i){
-      paramArr[i]=TypeConversionUtil.convertTolong(10);
-    }
-    for(int i=0;i<10;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTolong(i)));
-    }
-    var result=seq.toArray(paramArr);
-    Assertions.assertEquals(10,seq.size());
-    Assertions.assertEquals(10,seq.modCount);
-    Assertions.assertEquals(10,result.length);
-    Assertions.assertNotSame(seq.arr,result);
-    Assertions.assertNotSame(paramArr,result);
-    var itr=seq.iterator();
-    for(int i=0;i<10;++i){
-      Assertions.assertEquals(itr.next(),result[i]);
-    }
-  }
-  @Test
-  public void testCheckedStacktoArray_ObjectArray_exactSizeArray(){
-    var seq=new LongArrSeq.CheckedStack();
-    Long[] paramArr=new Long[5];
-    for(int i=0;i<paramArr.length;++i){
-      paramArr[i]=TypeConversionUtil.convertTolong(5);
-    }
-    for(int i=0;i<5;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTolong(i)));
-    }
-    var result=seq.toArray(paramArr);
-    Assertions.assertEquals(5,seq.size());
-    Assertions.assertEquals(5,seq.modCount);
-    Assertions.assertEquals(5,result.length);
-    Assertions.assertNotSame(seq.arr,result);
-    Assertions.assertSame(paramArr,result);
-    var itr=seq.iterator();
-    for(int i=0;i<5;++i){
-      Assertions.assertEquals(itr.next(),result[i]);
-    }
-  }
-  @Test
-  public void testCheckedStacktoArray_IntFunction_seqIsEmpty_nonMod(){
-    var seq=new LongArrSeq.CheckedStack();
-    IntFunction<Long[]> arrConstructor=Long[]::new;
-    var result=seq.toArray(arrConstructor);
-    Assertions.assertEquals(0,seq.size());
-    Assertions.assertNotSame(seq.arr,result);
-    Assertions.assertEquals(0,seq.modCount);
-    Assertions.assertEquals(0,result.length);
-  }
-  @Test
-  public void testCheckedStacktoArray_IntFunction_seqIsNotEmpty_nonMod(){
-    var seq=new LongArrSeq.CheckedStack();
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTolong(i)));
-    }
-    IntFunction<Long[]> arrConstructor=Long[]::new;
-    var result=seq.toArray(arrConstructor);
-    Assertions.assertEquals(100,seq.size());
-    Assertions.assertNotSame(seq.arr,result);
-    Assertions.assertEquals(100,seq.modCount);
-    Assertions.assertEquals(100,result.length);
-    var itr=seq.iterator();
-    for(int i=0;i<100;++i){
-      Assertions.assertEquals(itr.next(),result[i]);
-    }
-  }
-  @Test
-  public void testCheckedStacktoArray_IntFunction_seqIsEmpty_moddingArrayConstructor(){
-    var seq=new LongArrSeq.CheckedStack();
-    IntFunction<Long[]> arrConstructor=(int arrSize)->{
-      seq.add(TypeConversionUtil.convertTolong(arrSize));
-      return new Long[arrSize];
-    };
-    Assertions.assertThrows(ConcurrentModificationException.class,()->seq.toArray(arrConstructor));
-    Assertions.assertEquals(1,seq.size());
-    Assertions.assertEquals(TypeConversionUtil.convertTolong(0),seq.arr[0]);
-    Assertions.assertEquals(1,seq.modCount);
-  }
-  @Test
-  public void testCheckedStacktoArray_IntFunction_seqIsNotEmpty_moddingArrayConstructor(){
-    var seq=new LongArrSeq.CheckedStack();
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTolong(i)));
-    }
-    IntFunction<Long[]> arrConstructor=(int arrSize)->{
-      seq.add(TypeConversionUtil.convertTolong(arrSize));
-      return new Long[arrSize];
-    };
-    Assertions.assertThrows(ConcurrentModificationException.class,()->seq.toArray(arrConstructor));
-    Assertions.assertEquals(101,seq.size());
-    Assertions.assertEquals(TypeConversionUtil.convertTolong(100),seq.arr[100]);
-    Assertions.assertEquals(101,seq.modCount);
-  }
-  @Test
-  public void testCheckedStacktoArray_IntFunction_seqIsEmpty_throwingArrayConstructor(){
-    var seq=new LongArrSeq.CheckedStack();
-    IntFunction<Long[]> arrConstructor=(int arrSize)->{
-      throw new IndexOutOfBoundsException();
-    };
-    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.toArray(arrConstructor));
-    Assertions.assertEquals(0,seq.size());
-    Assertions.assertEquals(0,seq.modCount);
-  }
-  @Test
-  public void testCheckedStacktoArray_IntFunction_seqIsNotEmpty_throwingArrayConstructor(){
-    var seq=new LongArrSeq.CheckedStack();
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTolong(i)));
-    }
-    IntFunction<Long[]> arrConstructor=(int arrSize)->{
-      throw new IndexOutOfBoundsException();
-    };
-    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.toArray(arrConstructor));
-    Assertions.assertEquals(100,seq.size());
-    Assertions.assertEquals(100,seq.modCount);
-  }
-  @Test
-  public void testCheckedStacktoArray_IntFunction_seqIsEmpty_throwingAndModdingArrConstructor(){
-    var seq=new LongArrSeq.CheckedStack();
-    IntFunction<Long[]> arrConstructor=(int arrSize)->{
-      seq.add(TypeConversionUtil.convertTolong(arrSize));
-      throw new IndexOutOfBoundsException();
-    };
-    Assertions.assertThrows(ConcurrentModificationException.class,()->seq.toArray(arrConstructor));
-    Assertions.assertEquals(1,seq.size());
-    Assertions.assertEquals(TypeConversionUtil.convertTolong(0),seq.arr[0]);
-    Assertions.assertEquals(1,seq.modCount);
-  }
-  @Test
-  public void testCheckedStacktoArray_IntFunction_seqIsNotEmpty_throwingAndModdingArrConstructor(){
-    var seq=new LongArrSeq.CheckedStack();
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTolong(i)));
-    }
-    IntFunction<Long[]> arrConstructor=(int arrSize)->{
-      seq.add(TypeConversionUtil.convertTolong(arrSize));
-      throw new IndexOutOfBoundsException();
-    };
-    Assertions.assertThrows(ConcurrentModificationException.class,()->seq.toArray(arrConstructor));
-    Assertions.assertEquals(101,seq.size());
-    Assertions.assertEquals(TypeConversionUtil.convertTolong(100),seq.arr[100]);
-    Assertions.assertEquals(101,seq.modCount);
-  }
-  @Test
-  public void testCheckedStackclear_void_seqIsEmpty(){
-    var seq=new LongArrSeq.CheckedStack();
-    seq.clear();
-    Assertions.assertTrue(seq.isEmpty());
-    Assertions.assertEquals(0,seq.modCount);
-  }
-  @Test
-  public void testCheckedStackclear_void_seqIsNotEmpty(){
-    var seq=new LongArrSeq.CheckedStack();
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTolong(i)));
-    }
-    seq.clear();
-    Assertions.assertTrue(seq.isEmpty());
-    for(int i=0;i<100;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),seq.arr[i]);
-    }
-    Assertions.assertEquals(101,seq.modCount);
-  }
-  @Test
-  public void testCheckedStackisEmpty_void_seqIsEmpty(){
-    var seq=new LongArrSeq.CheckedStack();
-    Assertions.assertTrue(seq.isEmpty());
-    Assertions.assertEquals(0,seq.modCount);
-  }
-  @Test
-  public void testCheckedStackisEmpty_void_seqIsNotEmpty(){
-    var seq=new LongArrSeq.CheckedStack();
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTolong(i)));
-    }
-    Assertions.assertFalse(seq.isEmpty());
-    Assertions.assertEquals(100,seq.modCount);
-  }
-  @Test
-  public void testCheckedStackisEmpty_void_seqIsBeingCleared(){
-    var seq=new LongArrSeq.CheckedStack();
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTolong(i)));
-    }
-    var itr=seq.iterator();
-    for(int i=100;--i>=0;){
-      Assertions.assertFalse(seq.isEmpty());
-      itr.nextLong();
-      itr.remove();
-      Assertions.assertEquals(100+(100-i),seq.modCount);
-    }
-    Assertions.assertTrue(seq.isEmpty());
-  }
-  @Test
-  public void testCheckedStacksize_void_seqIsEmpty(){
-    var seq=new LongArrSeq.CheckedStack();
-    Assertions.assertEquals(0,seq.size);
-    Assertions.assertEquals(seq.size,seq.size());
-    Assertions.assertEquals(0,seq.modCount);
-  }
-  @Test
-  public void testCheckedStacksize_void_seqIsNotEmpty(){
-    var seq=new LongArrSeq.CheckedStack();
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTolong(i)));
-    }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertEquals(seq.size,seq.size());
-    Assertions.assertEquals(100,seq.modCount);
-  }
-  @Test
-  public void testCheckedStacksize_void_seqIsBeingCleared(){
-    var seq=new LongArrSeq.CheckedStack();
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTolong(i)));
-    }
-    var itr=seq.iterator();
-    for(int i=100;--i>=0;){
-      itr.nextLong();
-      itr.remove();
-      Assertions.assertEquals(i,seq.size());
-      Assertions.assertEquals(100+(100-i),seq.modCount);
-    }
-  }
-  @Test
-  public void testCheckedStackforEach_Consumer_SeqIsEmpty_NoMod(){
-    var seq=new LongArrSeq.CheckedStack();
-    var consumer=new LongMonitoredConsumer();
-    seq.forEach((Consumer)consumer);
-    Assertions.assertEquals(0,seq.size());
-    Assertions.assertEquals(0,seq.modCount);
-    Assertions.assertTrue(consumer.isEmpty());
-  }
-  @Test
-  public void testCheckedStackforEach_Consumer_SeqIsNotEmpty_NoMod(){
-    var seq=new LongArrSeq.CheckedStack();
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTolong(i)));
-    }
-    var consumer=new LongMonitoredConsumer();
-    seq.forEach((Consumer)consumer);
-    Assertions.assertEquals(100,seq.size());
-    Assertions.assertEquals(100,seq.modCount);
-    Assertions.assertEquals(100,consumer.size());
-    var seqIterator=seq.iterator();
-    var consumerIterator=consumer.iterator();
-    for(int i=0;i<100;++i)
-    {
-      Assertions.assertEquals(consumerIterator.next(),seqIterator.next());
-    }
-  }
-  @Test
-  public void testCheckedStackforEach_Consumer_SeqIsEmpty_ModdingConsumer(){
-    var seq=new LongArrSeq.CheckedStack();
-    var consumer=new LongMonitoredConsumer.ModifyingArrSeqCheckedStackConsumer(seq);
-    seq.forEach((Consumer)consumer);
-    Assertions.assertEquals(0,seq.size());
-    Assertions.assertEquals(0,seq.modCount);
-    Assertions.assertTrue(consumer.isEmpty());
-  }
-  @Test
-  public void testCheckedStackforEach_Consumer_SeqIsNotEmpty_ModdingConsumer(){
-    var seq=new LongArrSeq.CheckedStack();
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTolong(i)));
-    }
-    var consumer=new LongMonitoredConsumer.ModifyingArrSeqCheckedStackConsumer(seq);
-    Assertions.assertThrows(ConcurrentModificationException.class,()->seq.forEach((Consumer)consumer));
-    Assertions.assertEquals(100,seq.size());
-    Assertions.assertEquals(300,seq.modCount);
-    Assertions.assertEquals(100,consumer.size());
-    var seqIterator=seq.iterator();
-    var consumerIterator=consumer.iterator();
-    for(int i=0;i<100;++i){
-      Assertions.assertEquals(consumerIterator.next(),seqIterator.next());
-    }
-  }
-  @Test
-  public void testCheckedStackforEach_Consumer_SeqIsEmpty_ThrowingConsumer(){
-    var seq=new LongArrSeq.CheckedStack();
-    var consumer=new LongMonitoredConsumer.Throwing();
-    seq.forEach((Consumer)consumer);
-    Assertions.assertEquals(0,seq.size());
-    Assertions.assertEquals(0,seq.modCount);
-    Assertions.assertTrue(consumer.isEmpty());
-  }
-  @Test
-  public void testCheckedStackforEach_Consumer_SeqIsNotEmpty_ThrowingConsumer(){
-    var seq=new LongArrSeq.CheckedStack();
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTolong(i)));
-    }
-    var consumer=new LongMonitoredConsumer.Throwing();
-    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.forEach((Consumer)consumer));
-    Assertions.assertEquals(100,seq.size());
-    Assertions.assertEquals(100,seq.modCount);
-    Assertions.assertEquals(1,consumer.size());
-    var seqIterator=seq.iterator();
-    var consumerIterator=consumer.iterator();
-    for(int i=0;i<1;++i){
-      Assertions.assertEquals(consumerIterator.next(),seqIterator.next());
-    }
-  }
-  @Test
-  public void testCheckedStackforEach_Consumer_SeqIsEmpty_ThrowingAndModdingConsumer(){
-    var seq=new LongArrSeq.CheckedStack();
-    var consumer=new LongMonitoredConsumer.ModifyingArrSeqCheckedStackAndThrowingConsumer(seq);
-    seq.forEach((Consumer)consumer);
-    Assertions.assertEquals(0,seq.size());
-    Assertions.assertEquals(0,seq.modCount);
-    Assertions.assertTrue(consumer.isEmpty());
-  }
-  @Test
-  public void testCheckedStackforEach_Consumer_SeqIsNotEmpty_ThrowingAndModdingConsumer(){
-    var seq=new LongArrSeq.CheckedStack();
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTolong(i)));
-    }
-    var consumer=new LongMonitoredConsumer.ModifyingArrSeqCheckedStackAndThrowingConsumer(seq);
-    Assertions.assertThrows(ConcurrentModificationException.class,()->seq.forEach((Consumer)consumer));
-    Assertions.assertEquals(100,seq.size());
-    Assertions.assertEquals(102,seq.modCount);
-    Assertions.assertEquals(1,consumer.size());
-  }
-  @Test
-  public void testCheckedStackforEach_LongConsumer_SeqIsEmpty_NoMod(){
-    var seq=new LongArrSeq.CheckedStack();
-    var consumer=new LongMonitoredConsumer();
-    seq.forEach((LongConsumer)consumer);
-    Assertions.assertEquals(0,seq.size());
-    Assertions.assertEquals(0,seq.modCount);
-    Assertions.assertTrue(consumer.isEmpty());
-  }
-  @Test
-  public void testCheckedStackforEach_LongConsumer_SeqIsNotEmpty_NoMod(){
-    var seq=new LongArrSeq.CheckedStack();
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTolong(i)));
-    }
-    var consumer=new LongMonitoredConsumer();
-    seq.forEach((LongConsumer)consumer);
-    Assertions.assertEquals(100,seq.size());
-    Assertions.assertEquals(100,seq.modCount);
-    Assertions.assertEquals(100,consumer.size());
-    var seqIterator=seq.iterator();
-    var consumerIterator=consumer.iterator();
-    for(int i=0;i<100;++i)
-    {
-      Assertions.assertEquals(consumerIterator.next(),seqIterator.next());
-    }
-  }
-  @Test
-  public void testCheckedStackforEach_LongConsumer_SeqIsEmpty_ModdingConsumer(){
-    var seq=new LongArrSeq.CheckedStack();
-    var consumer=new LongMonitoredConsumer.ModifyingArrSeqCheckedStackConsumer(seq);
-    seq.forEach((LongConsumer)consumer);
-    Assertions.assertEquals(0,seq.size());
-    Assertions.assertEquals(0,seq.modCount);
-    Assertions.assertTrue(consumer.isEmpty());
-  }
-  @Test
-  public void testCheckedStackforEach_LongConsumer_SeqIsNotEmpty_ModdingConsumer(){
-    var seq=new LongArrSeq.CheckedStack();
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTolong(i)));
-    }
-    var consumer=new LongMonitoredConsumer.ModifyingArrSeqCheckedStackConsumer(seq);
-    Assertions.assertThrows(ConcurrentModificationException.class,()->seq.forEach((LongConsumer)consumer));
-    Assertions.assertEquals(100,seq.size());
-    Assertions.assertEquals(300,seq.modCount);
-    Assertions.assertEquals(100,consumer.size());
-    var seqIterator=seq.iterator();
-    var consumerIterator=consumer.iterator();
-    for(int i=0;i<100;++i){
-      Assertions.assertEquals(consumerIterator.next(),seqIterator.next());
-    }
-  }
-  @Test
-  public void testCheckedStackforEach_LongConsumer_SeqIsEmpty_ThrowingConsumer(){
-    var seq=new LongArrSeq.CheckedStack();
-    var consumer=new LongMonitoredConsumer.Throwing();
-    seq.forEach((LongConsumer)consumer);
-    Assertions.assertEquals(0,seq.size());
-    Assertions.assertEquals(0,seq.modCount);
-    Assertions.assertTrue(consumer.isEmpty());
-  }
-  @Test
-  public void testCheckedStackforEach_LongConsumer_SeqIsNotEmpty_ThrowingConsumer(){
-    var seq=new LongArrSeq.CheckedStack();
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTolong(i)));
-    }
-    var consumer=new LongMonitoredConsumer.Throwing();
-    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.forEach((LongConsumer)consumer));
-    Assertions.assertEquals(100,seq.size());
-    Assertions.assertEquals(100,seq.modCount);
-    Assertions.assertEquals(1,consumer.size());
-    var seqIterator=seq.iterator();
-    var consumerIterator=consumer.iterator();
-    for(int i=0;i<1;++i){
-      Assertions.assertEquals(consumerIterator.next(),seqIterator.next());
-    }
-  }
-  @Test
-  public void testCheckedStackforEach_LongConsumer_SeqIsEmpty_ThrowingAndModdingConsumer(){
-    var seq=new LongArrSeq.CheckedStack();
-    var consumer=new LongMonitoredConsumer.ModifyingArrSeqCheckedStackAndThrowingConsumer(seq);
-    seq.forEach((LongConsumer)consumer);
-    Assertions.assertEquals(0,seq.size());
-    Assertions.assertEquals(0,seq.modCount);
-    Assertions.assertTrue(consumer.isEmpty());
-  }
-  @Test
-  public void testCheckedStackforEach_LongConsumer_SeqIsNotEmpty_ThrowingAndModdingConsumer(){
-    var seq=new LongArrSeq.CheckedStack();
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTolong(i)));
-    }
-    var consumer=new LongMonitoredConsumer.ModifyingArrSeqCheckedStackAndThrowingConsumer(seq);
-    Assertions.assertThrows(ConcurrentModificationException.class,()->seq.forEach((LongConsumer)consumer));
-    Assertions.assertEquals(100,seq.size());
-    Assertions.assertEquals(102,seq.modCount);
-    Assertions.assertEquals(1,consumer.size());
-  }
-  @Test
-  public void testCheckedStackadd_long_initialCapacityDEFAULT(){
-    var seq=new LongArrSeq.CheckedStack();
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTolong(i)));
-    }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),seq.arr[i]);
-    }
-  }
-  @Test
-  public void testCheckedStackadd_long_initialCapacityNULL(){
-    var seq=new LongArrSeq.CheckedStack(0,null);
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTolong(i)));
-    }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),seq.arr[i]);
-    }
-  }
-  @Test
-  public void testCheckedStackadd_long_initialCapacity50(){
-    var seq=new LongArrSeq.CheckedStack(50);
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTolong(i)));
-    }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),seq.arr[i]);
-    }
-  }
-  @Test
-  public void testCheckedStackadd_Long_initialCapacityDEFAULT(){
-    var seq=new LongArrSeq.CheckedStack();
-    for(int i=0;i<100;++i){
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToLong(i)));
     }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),seq.arr[i]);
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    for(int i=0,val=-preAllocSpan;i<100;++i,++val)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
     }
   }
-  @Test
-  public void testCheckedStackadd_Long_initialCapacityNULL(){
-    var seq=new LongArrSeq.CheckedStack(0,null);
-    for(int i=0;i<100;++i){
+//ENDIF
+  @ParameterizedTest
+//IF STRUCT==Stack,List
+  @ValueSource(ints={0,5,10,15})
+  public void testCheckedStackadd_Long_happyPath(int initialCapacity){
+//ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.CheckedStack(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToLong(i)));
     }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),seq.arr[i]);
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    for(int i=0,val=-preAllocSpan;i<100;++i,++val)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
     }
   }
-  @Test
-  public void testCheckedStackadd_Long_initialCapacity50(){
-    var seq=new LongArrSeq.CheckedStack(50);
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToLong(i)));
-    }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),seq.arr[i]);
-    }
-  }
-  @Test
-  public void testCheckedStackadd_boolean_initialCapacityDEFAULT(){
-    var seq=new LongArrSeq.CheckedStack();
-    for(int i=0;i<100;++i){
+  //IF OfBoolean
+//IF STRUCT==Stack
+  @ParameterizedTest
+  @ValueSource(ints={0,5,10,15})
+  public void testCheckedStackpush_boolean_happyPath(int initialCapacity){
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.CheckedStack(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
     }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolongboolean(i),seq.arr[i]);
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    for(int i=0,val=-preAllocSpan;i<100;++i,++val)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolongboolean(val),root.arr[i]);
     }
   }
-  @Test
-  public void testCheckedStackadd_boolean_initialCapacityNULL(){
-    var seq=new LongArrSeq.CheckedStack(0,null);
-    for(int i=0;i<100;++i){
+//ENDIF
+  @ParameterizedTest
+//IF STRUCT==Stack,List
+  @ValueSource(ints={0,5,10,15})
+  public void testCheckedStackadd_boolean_happyPath(int initialCapacity){
+//ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.CheckedStack(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
     }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolongboolean(i),seq.arr[i]);
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    for(int i=0,val=-preAllocSpan;i<100;++i,++val)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolongboolean(val),root.arr[i]);
     }
   }
-  @Test
-  public void testCheckedStackadd_boolean_initialCapacity50(){
-    var seq=new LongArrSeq.CheckedStack(50);
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
-    }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolongboolean(i),seq.arr[i]);
-    }
-  }
-  @Test
-  public void testCheckedStackadd_Boolean_initialCapacityDEFAULT(){
-    var seq=new LongArrSeq.CheckedStack();
-    for(int i=0;i<100;++i){
+//IF STRUCT==Stack
+  @ParameterizedTest
+  @ValueSource(ints={0,5,10,15})
+  public void testCheckedStackpush_Boolean_happyPath(int initialCapacity){
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.CheckedStack(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToBoolean(i)));
     }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolongboolean(i),seq.arr[i]);
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    for(int i=0,val=-preAllocSpan;i<100;++i,++val)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolongboolean(val),root.arr[i]);
     }
   }
-  @Test
-  public void testCheckedStackadd_Boolean_initialCapacityNULL(){
-    var seq=new LongArrSeq.CheckedStack(0,null);
-    for(int i=0;i<100;++i){
+//ENDIF
+  @ParameterizedTest
+//IF STRUCT==Stack,List
+  @ValueSource(ints={0,5,10,15})
+  public void testCheckedStackadd_Boolean_happyPath(int initialCapacity){
+//ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.CheckedStack(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToBoolean(i)));
     }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolongboolean(i),seq.arr[i]);
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    for(int i=0,val=-preAllocSpan;i<100;++i,++val)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolongboolean(val),root.arr[i]);
     }
   }
-  @Test
-  public void testCheckedStackadd_Boolean_initialCapacity50(){
-    var seq=new LongArrSeq.CheckedStack(50);
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToBoolean(i)));
-    }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolongboolean(i),seq.arr[i]);
-    }
-  }
-  @Test
-  public void testCheckedStackadd_byte_initialCapacityDEFAULT(){
-    var seq=new LongArrSeq.CheckedStack();
-    for(int i=0;i<100;++i){
+    //IF OfByte,OfChar
+//IF STRUCT==Stack
+  @ParameterizedTest
+  @ValueSource(ints={0,5,10,15})
+  public void testCheckedStackpush_byte_happyPath(int initialCapacity){
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.CheckedStack(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertTobyte(i)));
     }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),seq.arr[i]);
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    for(int i=0,val=-preAllocSpan;i<100;++i,++val)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
     }
   }
-  @Test
-  public void testCheckedStackadd_byte_initialCapacityNULL(){
-    var seq=new LongArrSeq.CheckedStack(0,null);
-    for(int i=0;i<100;++i){
+//ENDIF
+  @ParameterizedTest
+//IF STRUCT==Stack,List
+  @ValueSource(ints={0,5,10,15})
+  public void testCheckedStackadd_byte_happyPath(int initialCapacity){
+//ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.CheckedStack(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertTobyte(i)));
     }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),seq.arr[i]);
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    for(int i=0,val=-preAllocSpan;i<100;++i,++val)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
     }
   }
-  @Test
-  public void testCheckedStackadd_byte_initialCapacity50(){
-    var seq=new LongArrSeq.CheckedStack(50);
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTobyte(i)));
-    }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),seq.arr[i]);
-    }
-  }
-  @Test
-  public void testCheckedStackadd_Byte_initialCapacityDEFAULT(){
-    var seq=new LongArrSeq.CheckedStack();
-    for(int i=0;i<100;++i){
+//IF STRUCT==Stack
+  @ParameterizedTest
+  @ValueSource(ints={0,5,10,15})
+  public void testCheckedStackpush_Byte_happyPath(int initialCapacity){
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.CheckedStack(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToByte(i)));
     }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),seq.arr[i]);
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    for(int i=0,val=-preAllocSpan;i<100;++i,++val)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
     }
   }
-  @Test
-  public void testCheckedStackadd_Byte_initialCapacityNULL(){
-    var seq=new LongArrSeq.CheckedStack(0,null);
-    for(int i=0;i<100;++i){
+//ENDIF
+  @ParameterizedTest
+//IF STRUCT==Stack,List
+  @ValueSource(ints={0,5,10,15})
+  public void testCheckedStackadd_Byte_happyPath(int initialCapacity){
+//ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.CheckedStack(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToByte(i)));
     }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),seq.arr[i]);
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    for(int i=0,val=-preAllocSpan;i<100;++i,++val)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
     }
   }
-  @Test
-  public void testCheckedStackadd_Byte_initialCapacity50(){
-    var seq=new LongArrSeq.CheckedStack(50);
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToByte(i)));
-    }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),seq.arr[i]);
-    }
-  }
-  @Test
-  public void testCheckedStackadd_char_initialCapacityDEFAULT(){
-    var seq=new LongArrSeq.CheckedStack();
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTochar(i)));
-    }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),seq.arr[i]);
-    }
-  }
-  @Test
-  public void testCheckedStackadd_char_initialCapacityNULL(){
-    var seq=new LongArrSeq.CheckedStack(0,null);
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTochar(i)));
-    }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),seq.arr[i]);
-    }
-  }
-  @Test
-  public void testCheckedStackadd_char_initialCapacity50(){
-    var seq=new LongArrSeq.CheckedStack(50);
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTochar(i)));
-    }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),seq.arr[i]);
-    }
-  }
-  @Test
-  public void testCheckedStackadd_Character_initialCapacityDEFAULT(){
-    var seq=new LongArrSeq.CheckedStack();
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToCharacter(i)));
-    }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),seq.arr[i]);
-    }
-  }
-  @Test
-  public void testCheckedStackadd_Character_initialCapacityNULL(){
-    var seq=new LongArrSeq.CheckedStack(0,null);
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToCharacter(i)));
-    }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),seq.arr[i]);
-    }
-  }
-  @Test
-  public void testCheckedStackadd_Character_initialCapacity50(){
-    var seq=new LongArrSeq.CheckedStack(50);
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToCharacter(i)));
-    }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),seq.arr[i]);
-    }
-  }
-  @Test
-  public void testCheckedStackadd_short_initialCapacityDEFAULT(){
-    var seq=new LongArrSeq.CheckedStack();
-    for(int i=0;i<100;++i){
+      //IF OfShort
+//IF STRUCT==Stack
+  @ParameterizedTest
+  @ValueSource(ints={0,5,10,15})
+  public void testCheckedStackpush_short_happyPath(int initialCapacity){
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.CheckedStack(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToshort(i)));
     }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),seq.arr[i]);
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    for(int i=0,val=-preAllocSpan;i<100;++i,++val)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
     }
   }
-  @Test
-  public void testCheckedStackadd_short_initialCapacityNULL(){
-    var seq=new LongArrSeq.CheckedStack(0,null);
-    for(int i=0;i<100;++i){
+//ENDIF
+  @ParameterizedTest
+//IF STRUCT==Stack,List
+  @ValueSource(ints={0,5,10,15})
+  public void testCheckedStackadd_short_happyPath(int initialCapacity){
+//ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.CheckedStack(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToshort(i)));
     }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),seq.arr[i]);
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    for(int i=0,val=-preAllocSpan;i<100;++i,++val)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
     }
   }
-  @Test
-  public void testCheckedStackadd_short_initialCapacity50(){
-    var seq=new LongArrSeq.CheckedStack(50);
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToshort(i)));
-    }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),seq.arr[i]);
-    }
-  }
-  @Test
-  public void testCheckedStackadd_Short_initialCapacityDEFAULT(){
-    var seq=new LongArrSeq.CheckedStack();
-    for(int i=0;i<100;++i){
+//IF STRUCT==Stack
+  @ParameterizedTest
+  @ValueSource(ints={0,5,10,15})
+  public void testCheckedStackpush_Short_happyPath(int initialCapacity){
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.CheckedStack(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToShort(i)));
     }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),seq.arr[i]);
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    for(int i=0,val=-preAllocSpan;i<100;++i,++val)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
     }
   }
-  @Test
-  public void testCheckedStackadd_Short_initialCapacityNULL(){
-    var seq=new LongArrSeq.CheckedStack(0,null);
-    for(int i=0;i<100;++i){
+//ENDIF
+  @ParameterizedTest
+//IF STRUCT==Stack,List
+  @ValueSource(ints={0,5,10,15})
+  public void testCheckedStackadd_Short_happyPath(int initialCapacity){
+//ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.CheckedStack(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToShort(i)));
     }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),seq.arr[i]);
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    for(int i=0,val=-preAllocSpan;i<100;++i,++val)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
     }
   }
-  @Test
-  public void testCheckedStackadd_Short_initialCapacity50(){
-    var seq=new LongArrSeq.CheckedStack(50);
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToShort(i)));
-    }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),seq.arr[i]);
-    }
-  }
-  @Test
-  public void testCheckedStackadd_int_initialCapacityDEFAULT(){
-    var seq=new LongArrSeq.CheckedStack();
-    for(int i=0;i<100;++i){
+        //IF OfInt
+//IF STRUCT==Stack
+  @ParameterizedTest
+  @ValueSource(ints={0,5,10,15})
+  public void testCheckedStackpush_int_happyPath(int initialCapacity){
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.CheckedStack(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToint(i)));
     }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),seq.arr[i]);
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    for(int i=0,val=-preAllocSpan;i<100;++i,++val)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
     }
   }
-  @Test
-  public void testCheckedStackadd_int_initialCapacityNULL(){
-    var seq=new LongArrSeq.CheckedStack(0,null);
-    for(int i=0;i<100;++i){
+//ENDIF
+  @ParameterizedTest
+//IF STRUCT==Stack,List
+  @ValueSource(ints={0,5,10,15})
+  public void testCheckedStackadd_int_happyPath(int initialCapacity){
+//ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.CheckedStack(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToint(i)));
     }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),seq.arr[i]);
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    for(int i=0,val=-preAllocSpan;i<100;++i,++val)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
     }
   }
-  @Test
-  public void testCheckedStackadd_int_initialCapacity50(){
-    var seq=new LongArrSeq.CheckedStack(50);
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToint(i)));
-    }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),seq.arr[i]);
-    }
-  }
-  @Test
-  public void testCheckedStackadd_Integer_initialCapacityDEFAULT(){
-    var seq=new LongArrSeq.CheckedStack();
-    for(int i=0;i<100;++i){
+//IF STRUCT==Stack
+  @ParameterizedTest
+  @ValueSource(ints={0,5,10,15})
+  public void testCheckedStackpush_Integer_happyPath(int initialCapacity){
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.CheckedStack(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToInteger(i)));
     }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),seq.arr[i]);
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    for(int i=0,val=-preAllocSpan;i<100;++i,++val)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
     }
   }
-  @Test
-  public void testCheckedStackadd_Integer_initialCapacityNULL(){
-    var seq=new LongArrSeq.CheckedStack(0,null);
-    for(int i=0;i<100;++i){
+//ENDIF
+  @ParameterizedTest
+//IF STRUCT==Stack,List
+  @ValueSource(ints={0,5,10,15})
+  public void testCheckedStackadd_Integer_happyPath(int initialCapacity){
+//ENDIF
+//IF 
+    int rootPreAlloc=0;
+    int parentPreAlloc=0;
+    int parentPostAlloc=0;
+    int rootPostAlloc=0;
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    var seq=new LongArrSeq.CheckedStack(initialCapacity);
+    var parent=seq;
+    var root=seq;
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
       Assertions.assertTrue(seq.add(TypeConversionUtil.convertToInteger(i)));
     }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),seq.arr[i]);
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    for(int i=0,val=-preAllocSpan;i<100;++i,++val)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
     }
   }
-  @Test
-  public void testCheckedStackadd_Integer_initialCapacity50(){
-    var seq=new LongArrSeq.CheckedStack(50);
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToInteger(i)));
+        //ENDIF
+      //ENDIF
+    //ENDIF
+  //ENDIF
+//ENDIF
+//IF STRUCT==List,SubList
+  @ParameterizedTest
+  //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testCheckedSubListListItradd_long_happyPathInsertBegin(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+  //ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.CheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.CheckedList();
     }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),seq.arr[i]);
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.CheckedList(rootSize,arr);
     }
-  }
-  @Test
-  public void testCheckedStacktoLongArray_void_seqIsEmpty(){
-    var seq=new LongArrSeq.CheckedStack();
-    Assertions.assertSame(OmniArray.OfLong.DEFAULT_ARR,seq.toLongArray());
-    Assertions.assertEquals(0,seq.size());
-    Assertions.assertEquals(0,seq.modCount);
-  }
-  @Test
-  public void testCheckedStacktoLongArray_void_seqIsNotEmpty(){
-    var seq=new LongArrSeq.CheckedStack();
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTolong(i)));
-    }
-    var result=seq.toLongArray();
-    Assertions.assertEquals(100,seq.size());
-    Assertions.assertEquals(100,seq.modCount);
-    Assertions.assertEquals(100,result.length);
-    var itr=seq.iterator();
-    for(int i=0;i<100;++i){
-      Assertions.assertEquals(itr.nextLong(),result[i]);
-    }
-    Assertions.assertNotSame(seq.arr,result);
-  }
-  @Test
-  public void testCheckedStacktoArray_void_seqIsEmpty(){
-    var seq=new LongArrSeq.CheckedStack();
-    Assertions.assertSame(OmniArray.OfLong.DEFAULT_BOXED_ARR,seq.toArray());
-    Assertions.assertEquals(0,seq.size());
-    Assertions.assertEquals(0,seq.modCount);
-  }
-  @Test
-  public void testCheckedStacktoArray_void_seqIsNotEmpty(){
-    var seq=new LongArrSeq.CheckedStack();
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTolong(i)));
-    }
-    var result=seq.toArray();
-    Assertions.assertEquals(100,seq.size());
-    Assertions.assertEquals(100,seq.modCount);
-    Assertions.assertEquals(100,result.length);
-    var itr=seq.iterator();
-    for(int i=0;i<100;++i){
-      Assertions.assertEquals(itr.next(),result[i]);
-    }
-    Assertions.assertNotSame(seq.arr,result);
-  }
-  @Test
-  public void testCheckedStacktoDoubleArray_void_seqIsEmpty(){
-    var seq=new LongArrSeq.CheckedStack();
-    Assertions.assertSame(OmniArray.OfDouble.DEFAULT_ARR,seq.toDoubleArray());
-    Assertions.assertEquals(0,seq.size());
-    Assertions.assertEquals(0,seq.modCount);
-  }
-  @Test
-  public void testCheckedStacktoDoubleArray_void_seqIsNotEmpty(){
-    var seq=new LongArrSeq.CheckedStack();
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTolong(i)));
-    }
-    var result=seq.toDoubleArray();
-    Assertions.assertEquals(100,seq.size());
-    Assertions.assertEquals(100,seq.modCount);
-    Assertions.assertEquals(100,result.length);
-    var itr=seq.iterator();
-    for(int i=0;i<100;++i){
-      Assertions.assertEquals(itr.nextDouble(),result[i]);
-    }
-    Assertions.assertNotSame(seq.arr,result);
-  }
-  @Test
-  public void testCheckedStacktoFloatArray_void_seqIsEmpty(){
-    var seq=new LongArrSeq.CheckedStack();
-    Assertions.assertSame(OmniArray.OfFloat.DEFAULT_ARR,seq.toFloatArray());
-    Assertions.assertEquals(0,seq.size());
-    Assertions.assertEquals(0,seq.modCount);
-  }
-  @Test
-  public void testCheckedStacktoFloatArray_void_seqIsNotEmpty(){
-    var seq=new LongArrSeq.CheckedStack();
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTolong(i)));
-    }
-    var result=seq.toFloatArray();
-    Assertions.assertEquals(100,seq.size());
-    Assertions.assertEquals(100,seq.modCount);
-    Assertions.assertEquals(100,result.length);
-    var itr=seq.iterator();
-    for(int i=0;i<100;++i){
-      Assertions.assertEquals(itr.nextFloat(),result[i]);
-    }
-    Assertions.assertNotSame(seq.arr,result);
-  }
-  @Test
-  public void testCheckedListconstructor_void_initialCapacityDEFAULT(){
-    var seq=new LongArrSeq.CheckedList();
-    Assertions.assertEquals(0,seq.size);
-    Assertions.assertSame(OmniArray.OfLong.DEFAULT_ARR,seq.arr);
-    Assertions.assertEquals(0,seq.modCount);
-  }
-  @Test
-  public void testCheckedListconstructor_intlong_initialCapacityNULL(){
-    var seq=new LongArrSeq.CheckedList(0,null);
-    Assertions.assertEquals(0,seq.size);
-    Assertions.assertNull(seq.arr);
-    Assertions.assertEquals(0,seq.modCount);
-  }
-  @Test
-  public void testCheckedListconstructor_int_initialCapacity50(){
-    var seq=new LongArrSeq.CheckedList(50);
-    Assertions.assertEquals(0,seq.size);
-    switch(50){
-    case 0:
-      Assertions.assertNull(seq.arr);
-      break;
-    case OmniArray.DEFAULT_ARR_SEQ_CAP:
-      Assertions.assertSame(OmniArray.OfLong.DEFAULT_ARR,seq.arr);
-      break;
-    default:
-      Assertions.assertNotNull(seq.arr);
-      Assertions.assertEquals(50,seq.arr.length);
-    }
-    Assertions.assertEquals(0,seq.modCount);
-  }
-  @Test
-  public void testCheckedListconstructor_int_initialCapacity0(){
-    var seq=new LongArrSeq.CheckedList(0);
-    Assertions.assertEquals(0,seq.size);
-    switch(0){
-    case 0:
-      Assertions.assertNull(seq.arr);
-      break;
-    case OmniArray.DEFAULT_ARR_SEQ_CAP:
-      Assertions.assertSame(OmniArray.OfLong.DEFAULT_ARR,seq.arr);
-      break;
-    default:
-      Assertions.assertNotNull(seq.arr);
-      Assertions.assertEquals(0,seq.arr.length);
-    }
-    Assertions.assertEquals(0,seq.modCount);
-  }
-  @Test
-  public void testCheckedListconstructor_int_initialCapacity10(){
-    var seq=new LongArrSeq.CheckedList(10);
-    Assertions.assertEquals(0,seq.size);
-    switch(10){
-    case 0:
-      Assertions.assertNull(seq.arr);
-      break;
-    case OmniArray.DEFAULT_ARR_SEQ_CAP:
-      Assertions.assertSame(OmniArray.OfLong.DEFAULT_ARR,seq.arr);
-      break;
-    default:
-      Assertions.assertNotNull(seq.arr);
-      Assertions.assertEquals(10,seq.arr.length);
-    }
-    Assertions.assertEquals(0,seq.modCount);
-  }
-  @Test
-  public void testCheckedListClone_initialCapacityDEFAULT_seqIsEmpty()
-  {
-    var seq=new LongArrSeq.CheckedList();
-    var clone=(LongArrSeq.CheckedList)seq.clone();
-    Assertions.assertEquals(0,clone.size());
-    Assertions.assertEquals(0,seq.size());
-    Assertions.assertSame(clone.arr,OmniArray.OfLong.DEFAULT_ARR);
-    Assertions.assertEquals(0,clone.modCount);
-    Assertions.assertEquals(0,seq.modCount);
-  }
-  @Test
-  public void testCheckedListClone_initialCapacityDEFAULT_seqIsNotEmpty()
-  {
-    var seq=new LongArrSeq.CheckedList();
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTolong(i)));
-    }
-    var clone=(LongArrSeq.CheckedList)seq.clone();
-    Assertions.assertEquals(100,clone.size());
-    Assertions.assertEquals(100,seq.size());
-    Assertions.assertNotSame(seq.arr,clone.arr);
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    var seqItr=seq.listIterator();
     for(int i=0;i<100;++i)
     {
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),clone.arr[i]);
+      seqItr.add(TypeConversionUtil.convertTolong(i));
+      assertIteratorStateIntegrity(seqItr,preAllocSpan+1,-1,i+1,parent,root);
+      seqItr.previousLong();
     }
-    Assertions.assertEquals(0,clone.modCount);
-    Assertions.assertEquals(100,seq.modCount);
-  }
-  @Test
-  public void testCheckedListClone_initialCapacityNULL_seqIsEmpty()
-  {
-    var seq=new LongArrSeq.CheckedList(0,null);
-    var clone=(LongArrSeq.CheckedList)seq.clone();
-    Assertions.assertEquals(0,clone.size());
-    Assertions.assertEquals(0,seq.size());
-    Assertions.assertSame(clone.arr,OmniArray.OfLong.DEFAULT_ARR);
-    Assertions.assertEquals(0,clone.modCount);
-    Assertions.assertEquals(0,seq.modCount);
-  }
-  @Test
-  public void testCheckedListClone_initialCapacityNULL_seqIsNotEmpty()
-  {
-    var seq=new LongArrSeq.CheckedList(0,null);
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTolong(i)));
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=100,bound=i+100;i<bound;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(--val),root.arr[i]);
     }
-    var clone=(LongArrSeq.CheckedList)seq.clone();
-    Assertions.assertEquals(100,clone.size());
-    Assertions.assertEquals(100,seq.size());
-    Assertions.assertNotSame(seq.arr,clone.arr);
+    verifyAscendingSpanlong(root.arr,i,rootSize+100,100);
+  }
+  @ParameterizedTest
+  //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testCheckedSubListListItradd_long_happyPathInsertEnd(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+  //ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.CheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.CheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.CheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    var seqItr=seq.listIterator();
     for(int i=0;i<100;++i)
     {
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),clone.arr[i]);
+      seqItr.add(TypeConversionUtil.convertTolong(i));
+      assertIteratorStateIntegrity(seqItr,preAllocSpan+i+1,-1,i+1,parent,root);
     }
-    Assertions.assertEquals(0,clone.modCount);
-    Assertions.assertEquals(100,seq.modCount);
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,rootSize+100,-preAllocSpan);
   }
-  @Test
-  public void testCheckedListClone_initialCapacity50_seqIsEmpty()
-  {
-    var seq=new LongArrSeq.CheckedList(50);
-    var clone=(LongArrSeq.CheckedList)seq.clone();
-    Assertions.assertEquals(0,clone.size());
-    Assertions.assertEquals(0,seq.size());
-    Assertions.assertSame(clone.arr,OmniArray.OfLong.DEFAULT_ARR);
-    Assertions.assertEquals(0,clone.modCount);
-    Assertions.assertEquals(0,seq.modCount);
-  }
-  @Test
-  public void testCheckedListClone_initialCapacity50_seqIsNotEmpty()
-  {
-    var seq=new LongArrSeq.CheckedList(50);
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTolong(i)));
+  @ParameterizedTest
+  //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testCheckedSubListListItradd_long_happyPathInsertMidPoint(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+  //ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.CheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.CheckedList();
     }
-    var clone=(LongArrSeq.CheckedList)seq.clone();
-    Assertions.assertEquals(100,clone.size());
-    Assertions.assertEquals(100,seq.size());
-    Assertions.assertNotSame(seq.arr,clone.arr);
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.CheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    var seqItr=seq.listIterator();
     for(int i=0;i<100;++i)
     {
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),clone.arr[i]);
+      seqItr.add(TypeConversionUtil.convertTolong(i));
+      assertIteratorStateIntegrity(seqItr,((rootSize+i)/2)+1,-1,i+1,parent,root);
+      if((i&1)==0)
+      {
+        seqItr.previousLong();
+      }
     }
-    Assertions.assertEquals(0,clone.modCount);
-    Assertions.assertEquals(100,seq.modCount);
-  }
-  @Test
-  public void testCheckedListClone_initialCapacity0_seqIsEmpty()
-  {
-    var seq=new LongArrSeq.CheckedList(0);
-    var clone=(LongArrSeq.CheckedList)seq.clone();
-    Assertions.assertEquals(0,clone.size());
-    Assertions.assertEquals(0,seq.size());
-    Assertions.assertSame(clone.arr,OmniArray.OfLong.DEFAULT_ARR);
-    Assertions.assertEquals(0,clone.modCount);
-    Assertions.assertEquals(0,seq.modCount);
-  }
-  @Test
-  public void testCheckedListClone_initialCapacity0_seqIsNotEmpty()
-  {
-    var seq=new LongArrSeq.CheckedList(0);
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTolong(i)));
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=1,bound=i+50;i<bound;++i,val+=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
     }
-    var clone=(LongArrSeq.CheckedList)seq.clone();
-    Assertions.assertEquals(100,clone.size());
-    Assertions.assertEquals(100,seq.size());
-    Assertions.assertNotSame(seq.arr,clone.arr);
+    for(int val=98,bound=i+50;i<bound;++i,val-=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+    verifyAscendingSpanlong(root.arr,i,rootSize+100,i);
+  }
+  //IF CHECKED==Checked
+  @ParameterizedTest
+    //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testCheckedSubListListItradd_long_throwCME(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+    //ENDIF
+    {
+      //try on an empty sublist
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      var itr=seq.listIterator();
+      //illegally modify the root
+      root.add(preAllocSpan,TypeConversionUtil.convertTolong(0));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->itr.add(TypeConversionUtil.convertTolong(0)));
+      assertIteratorStateIntegrity(itr,preAllocSpan,-1,0,parent,root);
+      assertStructuralIntegrity(seq,0,0,parent,parentSize,0,root,rootSize+1,1);
+      verifyAscendingSpanlong(root.arr,0,preAllocSpan+1,-preAllocSpan);
+      verifyAscendingSpanlong(root.arr,preAllocSpan+1,rootSize+1,100);
+    }
+    {
+      //try on an empty sublist
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      var itr=seq.listIterator();
+      //illegally modify the parent
+      parent.add(parentPreAlloc,TypeConversionUtil.convertTolong(0));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->itr.add(TypeConversionUtil.convertTolong(0)));
+      assertIteratorStateIntegrity(itr,preAllocSpan,-1,0,parent,root);
+      assertStructuralIntegrity(seq,0,0,parent,parentSize+1,1,root,rootSize+1,1);
+      verifyAscendingSpanlong(root.arr,0,preAllocSpan+1,-preAllocSpan);
+      verifyAscendingSpanlong(root.arr,preAllocSpan+1,rootSize+1,100);
+    }
+    {
+      //try on an empty sublist
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      var itr=seq.listIterator();
+      //illegally modify the sequence
+      seq.add(0,TypeConversionUtil.convertTolong(0));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->itr.add(TypeConversionUtil.convertTolong(0)));
+      assertIteratorStateIntegrity(itr,preAllocSpan,-1,0,parent,root);
+      assertStructuralIntegrity(seq,1,1,parent,parentSize+1,1,root,rootSize+1,1);
+      verifyAscendingSpanlong(root.arr,0,preAllocSpan+1,-preAllocSpan);
+      verifyAscendingSpanlong(root.arr,preAllocSpan+1,rootSize+1,100);
+    }
+    {
+      //try on an non-empty sublist, inserting at the end
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      var itr=seq.listIterator();
+      for(int i=0;i<100;++i)
+      {
+        itr.add(TypeConversionUtil.convertTolong(i));
+      }
+      //illegally modify the root
+      root.add(TypeConversionUtil.convertTolong(rootSize+100));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->itr.add(TypeConversionUtil.convertTolong(0)));
+      assertIteratorStateIntegrity(itr,preAllocSpan+100,-1,100,parent,root);
+      assertStructuralIntegrity(seq,100,100,parent,parentSize+100,100,root,rootSize+101,101);
+      verifyAscendingSpanlong(root.arr,0,rootSize+101,-preAllocSpan);
+    }
+    {
+      //try on an non-empty sublist, inserting at the end
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      var itr=seq.listIterator();
+      for(int i=0;i<100;++i)
+      {
+        itr.add(TypeConversionUtil.convertTolong(i));
+      }
+      //illegally modify the parent
+      parent.add(parentPreAlloc+50,TypeConversionUtil.convertTolong(50));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->itr.add(TypeConversionUtil.convertTolong(0)));
+      assertIteratorStateIntegrity(itr,preAllocSpan+100,-1,100,parent,root);
+      assertStructuralIntegrity(seq,100,100,parent,parentSize+101,101,root,rootSize+101,101);
+      verifyAscendingSpanlong(root.arr,0,preAllocSpan+51,-preAllocSpan);
+      verifyAscendingSpanlong(root.arr,preAllocSpan+51,rootSize+101,50);
+    }
+    {
+      //try on an non-empty sublist, inserting at the end
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      var itr=seq.listIterator();
+      for(int i=0;i<100;++i)
+      {
+        itr.add(TypeConversionUtil.convertTolong(i));
+      }
+      //illegally modify the seq
+      seq.add(50,TypeConversionUtil.convertTolong(50));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->itr.add(TypeConversionUtil.convertTolong(0)));
+      assertIteratorStateIntegrity(itr,preAllocSpan+100,-1,100,parent,root);
+      assertStructuralIntegrity(seq,101,101,parent,parentSize+101,101,root,rootSize+101,101);
+      verifyAscendingSpanlong(root.arr,0,preAllocSpan+51,-preAllocSpan);
+      verifyAscendingSpanlong(root.arr,preAllocSpan+51,rootSize+101,50);
+    }
+  }
+  //ENDIF
+  @ParameterizedTest
+  //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testCheckedSubListadd_int_long_happyPathInsertBegin(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+  //ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.CheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.CheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.CheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
     for(int i=0;i<100;++i)
     {
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),clone.arr[i]);
+      seq.add(0,TypeConversionUtil.convertTolong(i));
     }
-    Assertions.assertEquals(0,clone.modCount);
-    Assertions.assertEquals(100,seq.modCount);
-  }
-  @Test
-  public void testCheckedListClone_initialCapacity10_seqIsEmpty()
-  {
-    var seq=new LongArrSeq.CheckedList(10);
-    var clone=(LongArrSeq.CheckedList)seq.clone();
-    Assertions.assertEquals(0,clone.size());
-    Assertions.assertEquals(0,seq.size());
-    Assertions.assertSame(clone.arr,OmniArray.OfLong.DEFAULT_ARR);
-    Assertions.assertEquals(0,clone.modCount);
-    Assertions.assertEquals(0,seq.modCount);
-  }
-  @Test
-  public void testCheckedListClone_initialCapacity10_seqIsNotEmpty()
-  {
-    var seq=new LongArrSeq.CheckedList(10);
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTolong(i)));
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=100,bound=i+100;i<bound;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(--val),root.arr[i]);
     }
-    var clone=(LongArrSeq.CheckedList)seq.clone();
-    Assertions.assertEquals(100,clone.size());
-    Assertions.assertEquals(100,seq.size());
-    Assertions.assertNotSame(seq.arr,clone.arr);
+    verifyAscendingSpanlong(root.arr,i,rootSize+100,100);
+  }
+  @ParameterizedTest
+  //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testCheckedSubListadd_int_long_happyPathInsertEnd(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+  //ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.CheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.CheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.CheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
     for(int i=0;i<100;++i)
     {
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),clone.arr[i]);
+      seq.add(seq.size(),TypeConversionUtil.convertTolong(i));
     }
-    Assertions.assertEquals(0,clone.modCount);
-    Assertions.assertEquals(100,seq.modCount);
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,rootSize+100,-preAllocSpan);
   }
-  @Test
-  public void testCheckedListtoArray_ObjectArray_zeroLengthArrayAndSequenceIsEmpty(){
-    var seq=new LongArrSeq.CheckedList();
-    Long[] paramArr=new Long[0];
-    var result=seq.toArray(paramArr);
-    Assertions.assertEquals(0,seq.size());
-    Assertions.assertEquals(0,seq.modCount);
-    Assertions.assertEquals(0,result.length);
-    Assertions.assertNotSame(seq.arr,result);
-    Assertions.assertSame(paramArr,result);
-  }
-  @Test
-  public void testCheckedListtoArray_ObjectArray_zeroLengthArrayAndSequenceNotEmpty(){
-    var seq=new LongArrSeq.CheckedList();
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTolong(i)));
+  @ParameterizedTest
+  //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testCheckedSubListadd_int_long_happyPathInsertMidPoint(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+  //ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.CheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.CheckedList();
     }
-    Long[] paramArr=new Long[0];
-    var result=seq.toArray(paramArr);
-    Assertions.assertEquals(100,seq.size());
-    Assertions.assertEquals(100,seq.modCount);
-    Assertions.assertEquals(100,result.length);
-    Assertions.assertNotSame(seq.arr,result);
-    Assertions.assertNotSame(paramArr,result);
-    var itr=seq.iterator();
-    for(int i=0;i<100;++i){
-      Assertions.assertEquals(itr.next(),result[i]);
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.CheckedList(rootSize,arr);
     }
-  }
-  @Test
-  public void testCheckedListtoArray_ObjectArray_nonzeroLengthArrayAndSequenceIsEmpty(){
-    var seq=new LongArrSeq.CheckedList();
-    Long[] paramArr=new Long[5];
-    for(int i=0;i<paramArr.length;++i){
-      paramArr[i]=TypeConversionUtil.convertTolong(paramArr.length);
-    }
-    var result=seq.toArray(paramArr);
-    Assertions.assertEquals(0,seq.size());
-    Assertions.assertEquals(0,seq.modCount);
-    Assertions.assertEquals(5,result.length);
-    Assertions.assertNotSame(seq.arr,result);
-    Assertions.assertSame(paramArr,result);
-    Assertions.assertNull(result[0]);
-    for(int i=1;i<result.length;++i){
-      Assertions.assertEquals((Object)TypeConversionUtil.convertTolong(paramArr.length),result[i]);
-    }
-  }
-  @Test
-  public void testCheckedListtoArray_ObjectArray_overSizedArray(){
-    var seq=new LongArrSeq.CheckedList();
-    Long[] paramArr=new Long[10];
-    for(int i=0;i<paramArr.length;++i){
-      paramArr[i]=TypeConversionUtil.convertTolong(paramArr.length);
-    }
-    for(int i=0;i<5;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTolong(i)));
-    }
-    var result=seq.toArray(paramArr);
-    Assertions.assertEquals(5,seq.size());
-    Assertions.assertEquals(5,seq.modCount);
-    Assertions.assertEquals(10,result.length);
-    Assertions.assertNotSame(seq.arr,result);
-    Assertions.assertSame(paramArr,result);
-    var itr=seq.iterator();
-    for(int i=0;i<5;++i){
-      Assertions.assertEquals(itr.next(),result[i]);
-    }
-    Assertions.assertNull(result[5]);
-    for(int i=6;i<result.length;++i){
-      Assertions.assertEquals((Object)TypeConversionUtil.convertTolong(paramArr.length),result[i]);
-    }
-  }
-  @Test
-  public void testCheckedListtoArray_ObjectArray_undersizedArray(){
-    var seq=new LongArrSeq.CheckedList();
-    Long[] paramArr=new Long[5];
-    for(int i=0;i<paramArr.length;++i){
-      paramArr[i]=TypeConversionUtil.convertTolong(10);
-    }
-    for(int i=0;i<10;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTolong(i)));
-    }
-    var result=seq.toArray(paramArr);
-    Assertions.assertEquals(10,seq.size());
-    Assertions.assertEquals(10,seq.modCount);
-    Assertions.assertEquals(10,result.length);
-    Assertions.assertNotSame(seq.arr,result);
-    Assertions.assertNotSame(paramArr,result);
-    var itr=seq.iterator();
-    for(int i=0;i<10;++i){
-      Assertions.assertEquals(itr.next(),result[i]);
-    }
-  }
-  @Test
-  public void testCheckedListtoArray_ObjectArray_exactSizeArray(){
-    var seq=new LongArrSeq.CheckedList();
-    Long[] paramArr=new Long[5];
-    for(int i=0;i<paramArr.length;++i){
-      paramArr[i]=TypeConversionUtil.convertTolong(5);
-    }
-    for(int i=0;i<5;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTolong(i)));
-    }
-    var result=seq.toArray(paramArr);
-    Assertions.assertEquals(5,seq.size());
-    Assertions.assertEquals(5,seq.modCount);
-    Assertions.assertEquals(5,result.length);
-    Assertions.assertNotSame(seq.arr,result);
-    Assertions.assertSame(paramArr,result);
-    var itr=seq.iterator();
-    for(int i=0;i<5;++i){
-      Assertions.assertEquals(itr.next(),result[i]);
-    }
-  }
-  @Test
-  public void testCheckedListtoArray_IntFunction_seqIsEmpty_nonMod(){
-    var seq=new LongArrSeq.CheckedList();
-    IntFunction<Long[]> arrConstructor=Long[]::new;
-    var result=seq.toArray(arrConstructor);
-    Assertions.assertEquals(0,seq.size());
-    Assertions.assertNotSame(seq.arr,result);
-    Assertions.assertEquals(0,seq.modCount);
-    Assertions.assertEquals(0,result.length);
-  }
-  @Test
-  public void testCheckedListtoArray_IntFunction_seqIsNotEmpty_nonMod(){
-    var seq=new LongArrSeq.CheckedList();
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTolong(i)));
-    }
-    IntFunction<Long[]> arrConstructor=Long[]::new;
-    var result=seq.toArray(arrConstructor);
-    Assertions.assertEquals(100,seq.size());
-    Assertions.assertNotSame(seq.arr,result);
-    Assertions.assertEquals(100,seq.modCount);
-    Assertions.assertEquals(100,result.length);
-    var itr=seq.iterator();
-    for(int i=0;i<100;++i){
-      Assertions.assertEquals(itr.next(),result[i]);
-    }
-  }
-  @Test
-  public void testCheckedListtoArray_IntFunction_seqIsEmpty_moddingArrayConstructor(){
-    var seq=new LongArrSeq.CheckedList();
-    IntFunction<Long[]> arrConstructor=(int arrSize)->{
-      seq.add(TypeConversionUtil.convertTolong(arrSize));
-      return new Long[arrSize];
-    };
-    Assertions.assertThrows(ConcurrentModificationException.class,()->seq.toArray(arrConstructor));
-    Assertions.assertEquals(1,seq.size());
-    Assertions.assertEquals(TypeConversionUtil.convertTolong(0),seq.arr[0]);
-    Assertions.assertEquals(1,seq.modCount);
-  }
-  @Test
-  public void testCheckedListtoArray_IntFunction_seqIsNotEmpty_moddingArrayConstructor(){
-    var seq=new LongArrSeq.CheckedList();
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTolong(i)));
-    }
-    IntFunction<Long[]> arrConstructor=(int arrSize)->{
-      seq.add(TypeConversionUtil.convertTolong(arrSize));
-      return new Long[arrSize];
-    };
-    Assertions.assertThrows(ConcurrentModificationException.class,()->seq.toArray(arrConstructor));
-    Assertions.assertEquals(101,seq.size());
-    Assertions.assertEquals(TypeConversionUtil.convertTolong(100),seq.arr[100]);
-    Assertions.assertEquals(101,seq.modCount);
-  }
-  @Test
-  public void testCheckedListtoArray_IntFunction_seqIsEmpty_throwingArrayConstructor(){
-    var seq=new LongArrSeq.CheckedList();
-    IntFunction<Long[]> arrConstructor=(int arrSize)->{
-      throw new IndexOutOfBoundsException();
-    };
-    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.toArray(arrConstructor));
-    Assertions.assertEquals(0,seq.size());
-    Assertions.assertEquals(0,seq.modCount);
-  }
-  @Test
-  public void testCheckedListtoArray_IntFunction_seqIsNotEmpty_throwingArrayConstructor(){
-    var seq=new LongArrSeq.CheckedList();
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTolong(i)));
-    }
-    IntFunction<Long[]> arrConstructor=(int arrSize)->{
-      throw new IndexOutOfBoundsException();
-    };
-    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.toArray(arrConstructor));
-    Assertions.assertEquals(100,seq.size());
-    Assertions.assertEquals(100,seq.modCount);
-  }
-  @Test
-  public void testCheckedListtoArray_IntFunction_seqIsEmpty_throwingAndModdingArrConstructor(){
-    var seq=new LongArrSeq.CheckedList();
-    IntFunction<Long[]> arrConstructor=(int arrSize)->{
-      seq.add(TypeConversionUtil.convertTolong(arrSize));
-      throw new IndexOutOfBoundsException();
-    };
-    Assertions.assertThrows(ConcurrentModificationException.class,()->seq.toArray(arrConstructor));
-    Assertions.assertEquals(1,seq.size());
-    Assertions.assertEquals(TypeConversionUtil.convertTolong(0),seq.arr[0]);
-    Assertions.assertEquals(1,seq.modCount);
-  }
-  @Test
-  public void testCheckedListtoArray_IntFunction_seqIsNotEmpty_throwingAndModdingArrConstructor(){
-    var seq=new LongArrSeq.CheckedList();
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTolong(i)));
-    }
-    IntFunction<Long[]> arrConstructor=(int arrSize)->{
-      seq.add(TypeConversionUtil.convertTolong(arrSize));
-      throw new IndexOutOfBoundsException();
-    };
-    Assertions.assertThrows(ConcurrentModificationException.class,()->seq.toArray(arrConstructor));
-    Assertions.assertEquals(101,seq.size());
-    Assertions.assertEquals(TypeConversionUtil.convertTolong(100),seq.arr[100]);
-    Assertions.assertEquals(101,seq.modCount);
-  }
-  @Test
-  public void testCheckedListclear_void_seqIsEmpty(){
-    var seq=new LongArrSeq.CheckedList();
-    seq.clear();
-    Assertions.assertTrue(seq.isEmpty());
-    Assertions.assertEquals(0,seq.modCount);
-  }
-  @Test
-  public void testCheckedListclear_void_seqIsNotEmpty(){
-    var seq=new LongArrSeq.CheckedList();
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTolong(i)));
-    }
-    seq.clear();
-    Assertions.assertTrue(seq.isEmpty());
-    for(int i=0;i<100;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),seq.arr[i]);
-    }
-    Assertions.assertEquals(101,seq.modCount);
-  }
-  @Test
-  public void testCheckedListisEmpty_void_seqIsEmpty(){
-    var seq=new LongArrSeq.CheckedList();
-    Assertions.assertTrue(seq.isEmpty());
-    Assertions.assertEquals(0,seq.modCount);
-  }
-  @Test
-  public void testCheckedListisEmpty_void_seqIsNotEmpty(){
-    var seq=new LongArrSeq.CheckedList();
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTolong(i)));
-    }
-    Assertions.assertFalse(seq.isEmpty());
-    Assertions.assertEquals(100,seq.modCount);
-  }
-  @Test
-  public void testCheckedListisEmpty_void_seqIsBeingCleared(){
-    var seq=new LongArrSeq.CheckedList();
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTolong(i)));
-    }
-    var itr=seq.iterator();
-    for(int i=100;--i>=0;){
-      Assertions.assertFalse(seq.isEmpty());
-      itr.nextLong();
-      itr.remove();
-      Assertions.assertEquals(100+(100-i),seq.modCount);
-    }
-    Assertions.assertTrue(seq.isEmpty());
-  }
-  @Test
-  public void testCheckedListsize_void_seqIsEmpty(){
-    var seq=new LongArrSeq.CheckedList();
-    Assertions.assertEquals(0,seq.size);
-    Assertions.assertEquals(seq.size,seq.size());
-    Assertions.assertEquals(0,seq.modCount);
-  }
-  @Test
-  public void testCheckedListsize_void_seqIsNotEmpty(){
-    var seq=new LongArrSeq.CheckedList();
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTolong(i)));
-    }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertEquals(seq.size,seq.size());
-    Assertions.assertEquals(100,seq.modCount);
-  }
-  @Test
-  public void testCheckedListsize_void_seqIsBeingCleared(){
-    var seq=new LongArrSeq.CheckedList();
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTolong(i)));
-    }
-    var itr=seq.iterator();
-    for(int i=100;--i>=0;){
-      itr.nextLong();
-      itr.remove();
-      Assertions.assertEquals(i,seq.size());
-      Assertions.assertEquals(100+(100-i),seq.modCount);
-    }
-  }
-  @Test
-  public void testCheckedListforEach_Consumer_SeqIsEmpty_NoMod(){
-    var seq=new LongArrSeq.CheckedList();
-    var consumer=new LongMonitoredConsumer();
-    seq.forEach((Consumer)consumer);
-    Assertions.assertEquals(0,seq.size());
-    Assertions.assertEquals(0,seq.modCount);
-    Assertions.assertTrue(consumer.isEmpty());
-  }
-  @Test
-  public void testCheckedListforEach_Consumer_SeqIsNotEmpty_NoMod(){
-    var seq=new LongArrSeq.CheckedList();
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTolong(i)));
-    }
-    var consumer=new LongMonitoredConsumer();
-    seq.forEach((Consumer)consumer);
-    Assertions.assertEquals(100,seq.size());
-    Assertions.assertEquals(100,seq.modCount);
-    Assertions.assertEquals(100,consumer.size());
-    var seqIterator=seq.iterator();
-    var consumerIterator=consumer.iterator();
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
     for(int i=0;i<100;++i)
     {
-      Assertions.assertEquals(consumerIterator.next(),seqIterator.next());
+      seq.add(seq.size()/2,TypeConversionUtil.convertTolong(i));
     }
-  }
-  @Test
-  public void testCheckedListforEach_Consumer_SeqIsEmpty_ModdingConsumer(){
-    var seq=new LongArrSeq.CheckedList();
-    var consumer=new LongMonitoredConsumer.ModifyingArrSeqCheckedListConsumer(seq);
-    seq.forEach((Consumer)consumer);
-    Assertions.assertEquals(0,seq.size());
-    Assertions.assertEquals(0,seq.modCount);
-    Assertions.assertTrue(consumer.isEmpty());
-  }
-  @Test
-  public void testCheckedListforEach_Consumer_SeqIsNotEmpty_ModdingConsumer(){
-    var seq=new LongArrSeq.CheckedList();
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTolong(i)));
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=1,bound=i+50;i<bound;++i,val+=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
     }
-    var consumer=new LongMonitoredConsumer.ModifyingArrSeqCheckedListConsumer(seq);
-    Assertions.assertThrows(ConcurrentModificationException.class,()->seq.forEach((Consumer)consumer));
-    Assertions.assertEquals(100,seq.size());
-    Assertions.assertEquals(300,seq.modCount);
-    Assertions.assertEquals(100,consumer.size());
-    var seqIterator=seq.iterator();
-    var consumerIterator=consumer.iterator();
-    for(int i=0;i<100;++i){
-      Assertions.assertEquals(consumerIterator.next(),seqIterator.next());
+    for(int val=98,bound=i+50;i<bound;++i,val-=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
     }
+    verifyAscendingSpanlong(root.arr,i,rootSize+100,i);
   }
-  @Test
-  public void testCheckedListforEach_Consumer_SeqIsEmpty_ThrowingConsumer(){
-    var seq=new LongArrSeq.CheckedList();
-    var consumer=new LongMonitoredConsumer.Throwing();
-    seq.forEach((Consumer)consumer);
-    Assertions.assertEquals(0,seq.size());
-    Assertions.assertEquals(0,seq.modCount);
-    Assertions.assertTrue(consumer.isEmpty());
-  }
-  @Test
-  public void testCheckedListforEach_Consumer_SeqIsNotEmpty_ThrowingConsumer(){
-    var seq=new LongArrSeq.CheckedList();
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTolong(i)));
+  //IF CHECKED==Checked
+  @ParameterizedTest
+    //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testCheckedSubListadd_int_long_throwIOBE(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+    //ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.CheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.CheckedList();
     }
-    var consumer=new LongMonitoredConsumer.Throwing();
-    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.forEach((Consumer)consumer));
-    Assertions.assertEquals(100,seq.size());
-    Assertions.assertEquals(100,seq.modCount);
-    Assertions.assertEquals(1,consumer.size());
-    var seqIterator=seq.iterator();
-    var consumerIterator=consumer.iterator();
-    for(int i=0;i<1;++i){
-      Assertions.assertEquals(consumerIterator.next(),seqIterator.next());
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.CheckedList(rootSize,arr);
     }
-  }
-  @Test
-  public void testCheckedListforEach_Consumer_SeqIsEmpty_ThrowingAndModdingConsumer(){
-    var seq=new LongArrSeq.CheckedList();
-    var consumer=new LongMonitoredConsumer.ModifyingArrSeqCheckedListAndThrowingConsumer(seq);
-    seq.forEach((Consumer)consumer);
-    Assertions.assertEquals(0,seq.size());
-    Assertions.assertEquals(0,seq.modCount);
-    Assertions.assertTrue(consumer.isEmpty());
-  }
-  @Test
-  public void testCheckedListforEach_Consumer_SeqIsNotEmpty_ThrowingAndModdingConsumer(){
-    var seq=new LongArrSeq.CheckedList();
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTolong(i)));
-    }
-    var consumer=new LongMonitoredConsumer.ModifyingArrSeqCheckedListAndThrowingConsumer(seq);
-    Assertions.assertThrows(ConcurrentModificationException.class,()->seq.forEach((Consumer)consumer));
-    Assertions.assertEquals(100,seq.size());
-    Assertions.assertEquals(102,seq.modCount);
-    Assertions.assertEquals(1,consumer.size());
-  }
-  @Test
-  public void testCheckedListforEach_LongConsumer_SeqIsEmpty_NoMod(){
-    var seq=new LongArrSeq.CheckedList();
-    var consumer=new LongMonitoredConsumer();
-    seq.forEach((LongConsumer)consumer);
-    Assertions.assertEquals(0,seq.size());
-    Assertions.assertEquals(0,seq.modCount);
-    Assertions.assertTrue(consumer.isEmpty());
-  }
-  @Test
-  public void testCheckedListforEach_LongConsumer_SeqIsNotEmpty_NoMod(){
-    var seq=new LongArrSeq.CheckedList();
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTolong(i)));
-    }
-    var consumer=new LongMonitoredConsumer();
-    seq.forEach((LongConsumer)consumer);
-    Assertions.assertEquals(100,seq.size());
-    Assertions.assertEquals(100,seq.modCount);
-    Assertions.assertEquals(100,consumer.size());
-    var seqIterator=seq.iterator();
-    var consumerIterator=consumer.iterator();
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
     for(int i=0;i<100;++i)
     {
-      Assertions.assertEquals(consumerIterator.next(),seqIterator.next());
-    }
-  }
-  @Test
-  public void testCheckedListforEach_LongConsumer_SeqIsEmpty_ModdingConsumer(){
-    var seq=new LongArrSeq.CheckedList();
-    var consumer=new LongMonitoredConsumer.ModifyingArrSeqCheckedListConsumer(seq);
-    seq.forEach((LongConsumer)consumer);
-    Assertions.assertEquals(0,seq.size());
-    Assertions.assertEquals(0,seq.modCount);
-    Assertions.assertTrue(consumer.isEmpty());
-  }
-  @Test
-  public void testCheckedListforEach_LongConsumer_SeqIsNotEmpty_ModdingConsumer(){
-    var seq=new LongArrSeq.CheckedList();
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTolong(i)));
-    }
-    var consumer=new LongMonitoredConsumer.ModifyingArrSeqCheckedListConsumer(seq);
-    Assertions.assertThrows(ConcurrentModificationException.class,()->seq.forEach((LongConsumer)consumer));
-    Assertions.assertEquals(100,seq.size());
-    Assertions.assertEquals(300,seq.modCount);
-    Assertions.assertEquals(100,consumer.size());
-    var seqIterator=seq.iterator();
-    var consumerIterator=consumer.iterator();
-    for(int i=0;i<100;++i){
-      Assertions.assertEquals(consumerIterator.next(),seqIterator.next());
-    }
-  }
-  @Test
-  public void testCheckedListforEach_LongConsumer_SeqIsEmpty_ThrowingConsumer(){
-    var seq=new LongArrSeq.CheckedList();
-    var consumer=new LongMonitoredConsumer.Throwing();
-    seq.forEach((LongConsumer)consumer);
-    Assertions.assertEquals(0,seq.size());
-    Assertions.assertEquals(0,seq.modCount);
-    Assertions.assertTrue(consumer.isEmpty());
-  }
-  @Test
-  public void testCheckedListforEach_LongConsumer_SeqIsNotEmpty_ThrowingConsumer(){
-    var seq=new LongArrSeq.CheckedList();
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTolong(i)));
-    }
-    var consumer=new LongMonitoredConsumer.Throwing();
-    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.forEach((LongConsumer)consumer));
-    Assertions.assertEquals(100,seq.size());
-    Assertions.assertEquals(100,seq.modCount);
-    Assertions.assertEquals(1,consumer.size());
-    var seqIterator=seq.iterator();
-    var consumerIterator=consumer.iterator();
-    for(int i=0;i<1;++i){
-      Assertions.assertEquals(consumerIterator.next(),seqIterator.next());
-    }
-  }
-  @Test
-  public void testCheckedListforEach_LongConsumer_SeqIsEmpty_ThrowingAndModdingConsumer(){
-    var seq=new LongArrSeq.CheckedList();
-    var consumer=new LongMonitoredConsumer.ModifyingArrSeqCheckedListAndThrowingConsumer(seq);
-    seq.forEach((LongConsumer)consumer);
-    Assertions.assertEquals(0,seq.size());
-    Assertions.assertEquals(0,seq.modCount);
-    Assertions.assertTrue(consumer.isEmpty());
-  }
-  @Test
-  public void testCheckedListforEach_LongConsumer_SeqIsNotEmpty_ThrowingAndModdingConsumer(){
-    var seq=new LongArrSeq.CheckedList();
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTolong(i)));
-    }
-    var consumer=new LongMonitoredConsumer.ModifyingArrSeqCheckedListAndThrowingConsumer(seq);
-    Assertions.assertThrows(ConcurrentModificationException.class,()->seq.forEach((LongConsumer)consumer));
-    Assertions.assertEquals(100,seq.size());
-    Assertions.assertEquals(102,seq.modCount);
-    Assertions.assertEquals(1,consumer.size());
-  }
-  @Test
-  public void testCheckedListadd_long_initialCapacityDEFAULT(){
-    var seq=new LongArrSeq.CheckedList();
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTolong(i)));
-    }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),seq.arr[i]);
-    }
-  }
-  @Test
-  public void testCheckedListadd_long_initialCapacityNULL(){
-    var seq=new LongArrSeq.CheckedList(0,null);
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTolong(i)));
-    }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),seq.arr[i]);
-    }
-  }
-  @Test
-  public void testCheckedListadd_long_initialCapacity50(){
-    var seq=new LongArrSeq.CheckedList(50);
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTolong(i)));
-    }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),seq.arr[i]);
-    }
-  }
-  @Test
-  public void testCheckedListadd_Long_initialCapacityDEFAULT(){
-    var seq=new LongArrSeq.CheckedList();
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToLong(i)));
-    }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),seq.arr[i]);
-    }
-  }
-  @Test
-  public void testCheckedListadd_Long_initialCapacityNULL(){
-    var seq=new LongArrSeq.CheckedList(0,null);
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToLong(i)));
-    }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),seq.arr[i]);
-    }
-  }
-  @Test
-  public void testCheckedListadd_Long_initialCapacity50(){
-    var seq=new LongArrSeq.CheckedList(50);
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToLong(i)));
-    }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),seq.arr[i]);
-    }
-  }
-  @Test
-  public void testCheckedListadd_boolean_initialCapacityDEFAULT(){
-    var seq=new LongArrSeq.CheckedList();
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
-    }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolongboolean(i),seq.arr[i]);
-    }
-  }
-  @Test
-  public void testCheckedListadd_boolean_initialCapacityNULL(){
-    var seq=new LongArrSeq.CheckedList(0,null);
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
-    }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolongboolean(i),seq.arr[i]);
-    }
-  }
-  @Test
-  public void testCheckedListadd_boolean_initialCapacity50(){
-    var seq=new LongArrSeq.CheckedList(50);
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
-    }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolongboolean(i),seq.arr[i]);
-    }
-  }
-  @Test
-  public void testCheckedListadd_Boolean_initialCapacityDEFAULT(){
-    var seq=new LongArrSeq.CheckedList();
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToBoolean(i)));
-    }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolongboolean(i),seq.arr[i]);
-    }
-  }
-  @Test
-  public void testCheckedListadd_Boolean_initialCapacityNULL(){
-    var seq=new LongArrSeq.CheckedList(0,null);
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToBoolean(i)));
-    }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolongboolean(i),seq.arr[i]);
-    }
-  }
-  @Test
-  public void testCheckedListadd_Boolean_initialCapacity50(){
-    var seq=new LongArrSeq.CheckedList(50);
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToBoolean(i)));
-    }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolongboolean(i),seq.arr[i]);
-    }
-  }
-  @Test
-  public void testCheckedListadd_byte_initialCapacityDEFAULT(){
-    var seq=new LongArrSeq.CheckedList();
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTobyte(i)));
-    }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),seq.arr[i]);
-    }
-  }
-  @Test
-  public void testCheckedListadd_byte_initialCapacityNULL(){
-    var seq=new LongArrSeq.CheckedList(0,null);
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTobyte(i)));
-    }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),seq.arr[i]);
-    }
-  }
-  @Test
-  public void testCheckedListadd_byte_initialCapacity50(){
-    var seq=new LongArrSeq.CheckedList(50);
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTobyte(i)));
-    }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),seq.arr[i]);
-    }
-  }
-  @Test
-  public void testCheckedListadd_Byte_initialCapacityDEFAULT(){
-    var seq=new LongArrSeq.CheckedList();
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToByte(i)));
-    }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),seq.arr[i]);
-    }
-  }
-  @Test
-  public void testCheckedListadd_Byte_initialCapacityNULL(){
-    var seq=new LongArrSeq.CheckedList(0,null);
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToByte(i)));
-    }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),seq.arr[i]);
-    }
-  }
-  @Test
-  public void testCheckedListadd_Byte_initialCapacity50(){
-    var seq=new LongArrSeq.CheckedList(50);
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToByte(i)));
-    }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),seq.arr[i]);
-    }
-  }
-  @Test
-  public void testCheckedListadd_char_initialCapacityDEFAULT(){
-    var seq=new LongArrSeq.CheckedList();
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTochar(i)));
-    }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),seq.arr[i]);
-    }
-  }
-  @Test
-  public void testCheckedListadd_char_initialCapacityNULL(){
-    var seq=new LongArrSeq.CheckedList(0,null);
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTochar(i)));
-    }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),seq.arr[i]);
-    }
-  }
-  @Test
-  public void testCheckedListadd_char_initialCapacity50(){
-    var seq=new LongArrSeq.CheckedList(50);
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTochar(i)));
-    }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),seq.arr[i]);
-    }
-  }
-  @Test
-  public void testCheckedListadd_Character_initialCapacityDEFAULT(){
-    var seq=new LongArrSeq.CheckedList();
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToCharacter(i)));
-    }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),seq.arr[i]);
-    }
-  }
-  @Test
-  public void testCheckedListadd_Character_initialCapacityNULL(){
-    var seq=new LongArrSeq.CheckedList(0,null);
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToCharacter(i)));
-    }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),seq.arr[i]);
-    }
-  }
-  @Test
-  public void testCheckedListadd_Character_initialCapacity50(){
-    var seq=new LongArrSeq.CheckedList(50);
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToCharacter(i)));
-    }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),seq.arr[i]);
-    }
-  }
-  @Test
-  public void testCheckedListadd_short_initialCapacityDEFAULT(){
-    var seq=new LongArrSeq.CheckedList();
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToshort(i)));
-    }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),seq.arr[i]);
-    }
-  }
-  @Test
-  public void testCheckedListadd_short_initialCapacityNULL(){
-    var seq=new LongArrSeq.CheckedList(0,null);
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToshort(i)));
-    }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),seq.arr[i]);
-    }
-  }
-  @Test
-  public void testCheckedListadd_short_initialCapacity50(){
-    var seq=new LongArrSeq.CheckedList(50);
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToshort(i)));
-    }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),seq.arr[i]);
-    }
-  }
-  @Test
-  public void testCheckedListadd_Short_initialCapacityDEFAULT(){
-    var seq=new LongArrSeq.CheckedList();
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToShort(i)));
-    }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),seq.arr[i]);
-    }
-  }
-  @Test
-  public void testCheckedListadd_Short_initialCapacityNULL(){
-    var seq=new LongArrSeq.CheckedList(0,null);
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToShort(i)));
-    }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),seq.arr[i]);
-    }
-  }
-  @Test
-  public void testCheckedListadd_Short_initialCapacity50(){
-    var seq=new LongArrSeq.CheckedList(50);
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToShort(i)));
-    }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),seq.arr[i]);
-    }
-  }
-  @Test
-  public void testCheckedListadd_int_initialCapacityDEFAULT(){
-    var seq=new LongArrSeq.CheckedList();
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToint(i)));
-    }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),seq.arr[i]);
-    }
-  }
-  @Test
-  public void testCheckedListadd_int_initialCapacityNULL(){
-    var seq=new LongArrSeq.CheckedList(0,null);
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToint(i)));
-    }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),seq.arr[i]);
-    }
-  }
-  @Test
-  public void testCheckedListadd_int_initialCapacity50(){
-    var seq=new LongArrSeq.CheckedList(50);
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToint(i)));
-    }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),seq.arr[i]);
-    }
-  }
-  @Test
-  public void testCheckedListadd_Integer_initialCapacityDEFAULT(){
-    var seq=new LongArrSeq.CheckedList();
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToInteger(i)));
-    }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),seq.arr[i]);
-    }
-  }
-  @Test
-  public void testCheckedListadd_Integer_initialCapacityNULL(){
-    var seq=new LongArrSeq.CheckedList(0,null);
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToInteger(i)));
-    }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),seq.arr[i]);
-    }
-  }
-  @Test
-  public void testCheckedListadd_Integer_initialCapacity50(){
-    var seq=new LongArrSeq.CheckedList(50);
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToInteger(i)));
-    }
-    Assertions.assertEquals(100,seq.size);
-    Assertions.assertNotNull(seq.arr);
-    Assertions.assertEquals(100,seq.modCount);
-    for(int i=0;i<seq.size;++i){
-      Assertions.assertEquals(TypeConversionUtil.convertTolong(i),seq.arr[i]);
-    }
-  }
-  @Test
-  public void testCheckedListtoLongArray_void_seqIsEmpty(){
-    var seq=new LongArrSeq.CheckedList();
-    Assertions.assertSame(OmniArray.OfLong.DEFAULT_ARR,seq.toLongArray());
-    Assertions.assertEquals(0,seq.size());
-    Assertions.assertEquals(0,seq.modCount);
-  }
-  @Test
-  public void testCheckedListtoLongArray_void_seqIsNotEmpty(){
-    var seq=new LongArrSeq.CheckedList();
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTolong(i)));
-    }
-    var result=seq.toLongArray();
-    Assertions.assertEquals(100,seq.size());
-    Assertions.assertEquals(100,seq.modCount);
-    Assertions.assertEquals(100,result.length);
-    var itr=seq.iterator();
-    for(int i=0;i<100;++i){
-      Assertions.assertEquals(itr.nextLong(),result[i]);
-    }
-    Assertions.assertNotSame(seq.arr,result);
-  }
-  @Test
-  public void testCheckedListtoArray_void_seqIsEmpty(){
-    var seq=new LongArrSeq.CheckedList();
-    Assertions.assertSame(OmniArray.OfLong.DEFAULT_BOXED_ARR,seq.toArray());
-    Assertions.assertEquals(0,seq.size());
-    Assertions.assertEquals(0,seq.modCount);
-  }
-  @Test
-  public void testCheckedListtoArray_void_seqIsNotEmpty(){
-    var seq=new LongArrSeq.CheckedList();
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTolong(i)));
-    }
-    var result=seq.toArray();
-    Assertions.assertEquals(100,seq.size());
-    Assertions.assertEquals(100,seq.modCount);
-    Assertions.assertEquals(100,result.length);
-    var itr=seq.iterator();
-    for(int i=0;i<100;++i){
-      Assertions.assertEquals(itr.next(),result[i]);
-    }
-    Assertions.assertNotSame(seq.arr,result);
-  }
-  @Test
-  public void testCheckedListtoDoubleArray_void_seqIsEmpty(){
-    var seq=new LongArrSeq.CheckedList();
-    Assertions.assertSame(OmniArray.OfDouble.DEFAULT_ARR,seq.toDoubleArray());
-    Assertions.assertEquals(0,seq.size());
-    Assertions.assertEquals(0,seq.modCount);
-  }
-  @Test
-  public void testCheckedListtoDoubleArray_void_seqIsNotEmpty(){
-    var seq=new LongArrSeq.CheckedList();
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTolong(i)));
-    }
-    var result=seq.toDoubleArray();
-    Assertions.assertEquals(100,seq.size());
-    Assertions.assertEquals(100,seq.modCount);
-    Assertions.assertEquals(100,result.length);
-    var itr=seq.iterator();
-    for(int i=0;i<100;++i){
-      Assertions.assertEquals(itr.nextDouble(),result[i]);
-    }
-    Assertions.assertNotSame(seq.arr,result);
-  }
-  @Test
-  public void testCheckedListtoFloatArray_void_seqIsEmpty(){
-    var seq=new LongArrSeq.CheckedList();
-    Assertions.assertSame(OmniArray.OfFloat.DEFAULT_ARR,seq.toFloatArray());
-    Assertions.assertEquals(0,seq.size());
-    Assertions.assertEquals(0,seq.modCount);
-  }
-  @Test
-  public void testCheckedListtoFloatArray_void_seqIsNotEmpty(){
-    var seq=new LongArrSeq.CheckedList();
-    for(int i=0;i<100;++i){
-      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTolong(i)));
-    }
-    var result=seq.toFloatArray();
-    Assertions.assertEquals(100,seq.size());
-    Assertions.assertEquals(100,seq.modCount);
-    Assertions.assertEquals(100,result.length);
-    var itr=seq.iterator();
-    for(int i=0;i<100;++i){
-      Assertions.assertEquals(itr.nextFloat(),result[i]);
-    }
-    Assertions.assertNotSame(seq.arr,result);
-  }
-  @Test
-  public void testCheckedSubListsize(){
-    var root=new LongArrSeq.CheckedList();
-    var parent=root.subList(0,0);
-    var seq=parent.subList(0,0);
-    Assertions.assertEquals(0,seq.size());
-    for(int i=0;i<100;++i)
-    {
+      //too low
+      Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(-1,TypeConversionUtil.convertTolong(0)));
+      //too hi
+      final int finalIndex=i;
+      Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(finalIndex+1,TypeConversionUtil.convertTolong(0)));
       seq.add(TypeConversionUtil.convertTolong(i));
-      Assertions.assertEquals(i+1,seq.size());
     }
-    parent.add(TypeConversionUtil.convertTolong(0));
-    Assertions.assertThrows(ConcurrentModificationException.class,seq::size);
-    root.add(TypeConversionUtil.convertTolong(0));
-    Assertions.assertThrows(ConcurrentModificationException.class,parent::size);
+    //when the method throws, verify that no changes occurred
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,rootSize+100,-preAllocSpan);
   }
-  @Test
-  public void testCheckedSubListisEmpty(){
-    var root=new LongArrSeq.CheckedList();
-    var parent=root.subList(0,0);
-    var seq=parent.subList(0,0);
-    Assertions.assertTrue(seq.isEmpty());
-    for(int i=0;i<100;++i)
+    //IF STRUCT==SubList
+  @ParameterizedTest
+  @MethodSource("getSubListConstructionArgs")
+  public void testCheckedSubListadd_long_throwCME(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
     {
-      seq.add(TypeConversionUtil.convertTolong(i));
-      Assertions.assertFalse(seq.isEmpty());
+      //try on an empty sublist
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      //illegally modify the root
+      root.add(preAllocSpan,TypeConversionUtil.convertTolong(0));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(TypeConversionUtil.convertTolong(0)));
+      //attempt the same tests on the parent
+      Assertions.assertThrows(ConcurrentModificationException.class,()->parent.add(TypeConversionUtil.convertTolong(0)));
+      assertStructuralIntegrity(seq,0,0,parent,parentSize,0,root,rootSize+1,1);
+      verifyAscendingSpanlong(root.arr,0,preAllocSpan+1,-preAllocSpan);
+      verifyAscendingSpanlong(root.arr,preAllocSpan+1,rootSize+1,100);
     }
-    var seqItr=seq.iterator();
-    for(int i=0;i<100;++i)
     {
-      Assertions.assertFalse(seq.isEmpty());
-      seqItr.next();
-      seqItr.remove();
+      //try on an empty sublist
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      //illegally modify the parent
+      parent.add(parentPreAlloc,TypeConversionUtil.convertTolong(0));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(TypeConversionUtil.convertTolong(0)));
+      assertStructuralIntegrity(seq,0,0,parent,parentSize+1,1,root,rootSize+1,1);
+      verifyAscendingSpanlong(root.arr,0,preAllocSpan+1,-preAllocSpan);
+      verifyAscendingSpanlong(root.arr,preAllocSpan+1,rootSize+1,100);
     }
-    Assertions.assertTrue(seq.isEmpty());
-    parent.add(TypeConversionUtil.convertTolong(0));
-    Assertions.assertThrows(ConcurrentModificationException.class,seq::isEmpty);
-    root.add(TypeConversionUtil.convertTolong(0));
-    Assertions.assertThrows(ConcurrentModificationException.class,parent::isEmpty);
+    {
+      //try on an non-empty sublist
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      for(int i=0;i<100;++i)
+      {
+        seq.add(TypeConversionUtil.convertTolong(i));
+      }
+      //illegally modify the root
+      root.add(TypeConversionUtil.convertTolong(rootSize+100));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(TypeConversionUtil.convertTolong(0)));
+      //attempt the same tests on the parent
+      Assertions.assertThrows(ConcurrentModificationException.class,()->parent.add(TypeConversionUtil.convertTolong(0)));
+      assertStructuralIntegrity(seq,100,100,parent,parentSize+100,100,root,rootSize+101,101);
+      verifyAscendingSpanlong(root.arr,0,rootSize+101,-preAllocSpan);
+    }
+    {
+      //try on an non-empty sublist
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      for(int i=0;i<100;++i)
+      {
+        seq.add(TypeConversionUtil.convertTolong(i));
+      }
+      //illegally modify the parent
+      parent.add(parentPreAlloc+50,TypeConversionUtil.convertTolong(50));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(TypeConversionUtil.convertTolong(0)));
+      assertStructuralIntegrity(seq,100,100,parent,parentSize+101,101,root,rootSize+101,101);
+      verifyAscendingSpanlong(root.arr,0,preAllocSpan+51,-preAllocSpan);
+      verifyAscendingSpanlong(root.arr,preAllocSpan+51,rootSize+101,50);
+    }
   }
-  @Test
-  public void testUncheckedSubListsize(){
-    var root=new LongArrSeq.UncheckedList();
-    var parent=root.subList(0,0);
-    var seq=parent.subList(0,0);
-    Assertions.assertEquals(0,seq.size());
-    for(int i=0;i<100;++i)
+  @ParameterizedTest
+  @MethodSource("getSubListConstructionArgs")
+  public void testCheckedSubListadd_int_long_throwCME(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
     {
-      seq.add(TypeConversionUtil.convertTolong(i));
-      Assertions.assertEquals(i+1,seq.size());
+      //try on an empty sublist
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      //illegally modify the root
+      root.add(preAllocSpan,TypeConversionUtil.convertTolong(0));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(0,TypeConversionUtil.convertTolong(0)));
+      //an insertion out of bounds should also throw a CME
+      //too low
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(-1,TypeConversionUtil.convertTolong(0)));
+      //too hi
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(1,TypeConversionUtil.convertTolong(0)));
+      //attempt the same tests on the parent
+      Assertions.assertThrows(ConcurrentModificationException.class,()->parent.add(0,TypeConversionUtil.convertTolong(0)));
+      Assertions.assertThrows(ConcurrentModificationException.class,()->parent.add(-1,TypeConversionUtil.convertTolong(0)));
+      Assertions.assertThrows(ConcurrentModificationException.class,()->parent.add(parentSize+1,TypeConversionUtil.convertTolong(0)));
+      assertStructuralIntegrity(seq,0,0,parent,parentSize,0,root,rootSize+1,1);
+      verifyAscendingSpanlong(root.arr,0,preAllocSpan+1,-preAllocSpan);
+      verifyAscendingSpanlong(root.arr,preAllocSpan+1,rootSize+1,100);
+    }
+    {
+      //try on an empty sublist
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      //illegally modify the parent
+      parent.add(parentPreAlloc,TypeConversionUtil.convertTolong(0));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(0,TypeConversionUtil.convertTolong(0)));
+      //an insertion out of bounds should also throw a CME
+      //too low
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(-1,TypeConversionUtil.convertTolong(0)));
+      //too hi
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(1,TypeConversionUtil.convertTolong(0)));
+      assertStructuralIntegrity(seq,0,0,parent,parentSize+1,1,root,rootSize+1,1);
+      verifyAscendingSpanlong(root.arr,0,preAllocSpan+1,-preAllocSpan);
+      verifyAscendingSpanlong(root.arr,preAllocSpan+1,rootSize+1,100);
+    }
+    {
+      //try on an non-empty sublist
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      for(int i=0;i<100;++i)
+      {
+        seq.add(TypeConversionUtil.convertTolong(i));
+      }
+      //illegally modify the root
+      root.add(TypeConversionUtil.convertTolong(rootSize+100));
+      //attempt an insertion at the beginning
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(0,TypeConversionUtil.convertTolong(0)));
+      //attempt an insertion at the midpoint
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(50,TypeConversionUtil.convertTolong(0)));
+      //attempt an insertion at the end
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(100,TypeConversionUtil.convertTolong(0)));
+      //an insertion out of bounds should also throw a CME
+      //too low
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(-1,TypeConversionUtil.convertTolong(0)));
+      //too hi
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(101,TypeConversionUtil.convertTolong(0)));
+      //attempt the same tests on the parent
+      Assertions.assertThrows(ConcurrentModificationException.class,()->parent.add(0,TypeConversionUtil.convertTolong(0)));
+      Assertions.assertThrows(ConcurrentModificationException.class,()->parent.add(parentPreAlloc+50,TypeConversionUtil.convertTolong(0)));
+      Assertions.assertThrows(ConcurrentModificationException.class,()->parent.add(parentSize+100,TypeConversionUtil.convertTolong(0)));
+      Assertions.assertThrows(ConcurrentModificationException.class,()->parent.add(-1,TypeConversionUtil.convertTolong(0)));
+      Assertions.assertThrows(ConcurrentModificationException.class,()->parent.add(parentSize+101,TypeConversionUtil.convertTolong(0)));
+      assertStructuralIntegrity(seq,100,100,parent,parentSize+100,100,root,rootSize+101,101);
+      verifyAscendingSpanlong(root.arr,0,rootSize+101,-preAllocSpan);
+    }
+    {
+      //try on an non-empty sublist
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      for(int i=0;i<100;++i)
+      {
+        seq.add(TypeConversionUtil.convertTolong(i));
+      }
+      //illegally modify the parent
+      parent.add(parentPreAlloc+50,TypeConversionUtil.convertTolong(50));
+      //attempt an insertion at the beginning
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(0,TypeConversionUtil.convertTolong(0)));
+      //attempt an insertion at the midpoint
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(50,TypeConversionUtil.convertTolong(0)));
+      //attempt an insertion at the end
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(100,TypeConversionUtil.convertTolong(0)));
+      //an insertion out of bounds should also throw a CME
+      //too low
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(-1,TypeConversionUtil.convertTolong(0)));
+      //too hi
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(101,TypeConversionUtil.convertTolong(0)));
+      assertStructuralIntegrity(seq,100,100,parent,parentSize+101,101,root,rootSize+101,101);
+      verifyAscendingSpanlong(root.arr,0,preAllocSpan+51,-preAllocSpan);
+      verifyAscendingSpanlong(root.arr,preAllocSpan+51,rootSize+101,50);
     }
   }
-  @Test
-  public void testUncheckedSubListisEmpty(){
-    var root=new LongArrSeq.UncheckedList();
-    var parent=root.subList(0,0);
-    var seq=parent.subList(0,0);
-    Assertions.assertTrue(seq.isEmpty());
+    //ENDIF
+  //ENDIF
+//ENDIF
+  @ParameterizedTest
+//IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testCheckedSubListadd_long_happyPath(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+//ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.CheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.CheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.CheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
     for(int i=0;i<100;++i)
     {
-      seq.add(TypeConversionUtil.convertTolong(i));
-      Assertions.assertFalse(seq.isEmpty());
+      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTolong(i)));
     }
-    var seqItr=seq.iterator();
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    for(int i=0,val=-preAllocSpan;i<100;++i,++val)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+  }
+//IF OfRef
+//IF STRUCT==List,SubList
+  @ParameterizedTest
+  //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testCheckedSubListListItradd_Long_happyPathInsertBegin(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+  //ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.CheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.CheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.CheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    var seqItr=seq.listIterator();
     for(int i=0;i<100;++i)
     {
-      Assertions.assertFalse(seq.isEmpty());
-      seqItr.next();
-      seqItr.remove();
+      seqItr.add(TypeConversionUtil.convertToLong(i));
+      assertIteratorStateIntegrity(seqItr,preAllocSpan+1,-1,i+1,parent,root);
+      seqItr.previousLong();
     }
-    Assertions.assertTrue(seq.isEmpty());
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=100,bound=i+100;i<bound;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(--val),root.arr[i]);
+    }
+    verifyAscendingSpanlong(root.arr,i,rootSize+100,100);
+  }
+  @ParameterizedTest
+  //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testCheckedSubListListItradd_Long_happyPathInsertEnd(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+  //ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.CheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.CheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.CheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    var seqItr=seq.listIterator();
+    for(int i=0;i<100;++i)
+    {
+      seqItr.add(TypeConversionUtil.convertToLong(i));
+      assertIteratorStateIntegrity(seqItr,preAllocSpan+i+1,-1,i+1,parent,root);
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,rootSize+100,-preAllocSpan);
+  }
+  @ParameterizedTest
+  //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testCheckedSubListListItradd_Long_happyPathInsertMidPoint(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+  //ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.CheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.CheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.CheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    var seqItr=seq.listIterator();
+    for(int i=0;i<100;++i)
+    {
+      seqItr.add(TypeConversionUtil.convertToLong(i));
+      assertIteratorStateIntegrity(seqItr,((rootSize+i)/2)+1,-1,i+1,parent,root);
+      if((i&1)==0)
+      {
+        seqItr.previousLong();
+      }
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=1,bound=i+50;i<bound;++i,val+=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+    for(int val=98,bound=i+50;i<bound;++i,val-=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+    verifyAscendingSpanlong(root.arr,i,rootSize+100,i);
+  }
+  //IF CHECKED==Checked
+  @ParameterizedTest
+    //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testCheckedSubListListItradd_Long_throwCME(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+    //ENDIF
+    {
+      //try on an empty sublist
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      var itr=seq.listIterator();
+      //illegally modify the root
+      root.add(preAllocSpan,TypeConversionUtil.convertToLong(0));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->itr.add(TypeConversionUtil.convertToLong(0)));
+      assertIteratorStateIntegrity(itr,preAllocSpan,-1,0,parent,root);
+      assertStructuralIntegrity(seq,0,0,parent,parentSize,0,root,rootSize+1,1);
+      verifyAscendingSpanlong(root.arr,0,preAllocSpan+1,-preAllocSpan);
+      verifyAscendingSpanlong(root.arr,preAllocSpan+1,rootSize+1,100);
+    }
+    {
+      //try on an empty sublist
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      var itr=seq.listIterator();
+      //illegally modify the parent
+      parent.add(parentPreAlloc,TypeConversionUtil.convertToLong(0));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->itr.add(TypeConversionUtil.convertToLong(0)));
+      assertIteratorStateIntegrity(itr,preAllocSpan,-1,0,parent,root);
+      assertStructuralIntegrity(seq,0,0,parent,parentSize+1,1,root,rootSize+1,1);
+      verifyAscendingSpanlong(root.arr,0,preAllocSpan+1,-preAllocSpan);
+      verifyAscendingSpanlong(root.arr,preAllocSpan+1,rootSize+1,100);
+    }
+    {
+      //try on an empty sublist
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      var itr=seq.listIterator();
+      //illegally modify the sequence
+      seq.add(0,TypeConversionUtil.convertToLong(0));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->itr.add(TypeConversionUtil.convertToLong(0)));
+      assertIteratorStateIntegrity(itr,preAllocSpan,-1,0,parent,root);
+      assertStructuralIntegrity(seq,1,1,parent,parentSize+1,1,root,rootSize+1,1);
+      verifyAscendingSpanlong(root.arr,0,preAllocSpan+1,-preAllocSpan);
+      verifyAscendingSpanlong(root.arr,preAllocSpan+1,rootSize+1,100);
+    }
+    {
+      //try on an non-empty sublist, inserting at the end
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      var itr=seq.listIterator();
+      for(int i=0;i<100;++i)
+      {
+        itr.add(TypeConversionUtil.convertToLong(i));
+      }
+      //illegally modify the root
+      root.add(TypeConversionUtil.convertToLong(rootSize+100));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->itr.add(TypeConversionUtil.convertToLong(0)));
+      assertIteratorStateIntegrity(itr,preAllocSpan+100,-1,100,parent,root);
+      assertStructuralIntegrity(seq,100,100,parent,parentSize+100,100,root,rootSize+101,101);
+      verifyAscendingSpanlong(root.arr,0,rootSize+101,-preAllocSpan);
+    }
+    {
+      //try on an non-empty sublist, inserting at the end
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      var itr=seq.listIterator();
+      for(int i=0;i<100;++i)
+      {
+        itr.add(TypeConversionUtil.convertToLong(i));
+      }
+      //illegally modify the parent
+      parent.add(parentPreAlloc+50,TypeConversionUtil.convertToLong(50));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->itr.add(TypeConversionUtil.convertToLong(0)));
+      assertIteratorStateIntegrity(itr,preAllocSpan+100,-1,100,parent,root);
+      assertStructuralIntegrity(seq,100,100,parent,parentSize+101,101,root,rootSize+101,101);
+      verifyAscendingSpanlong(root.arr,0,preAllocSpan+51,-preAllocSpan);
+      verifyAscendingSpanlong(root.arr,preAllocSpan+51,rootSize+101,50);
+    }
+    {
+      //try on an non-empty sublist, inserting at the end
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      var itr=seq.listIterator();
+      for(int i=0;i<100;++i)
+      {
+        itr.add(TypeConversionUtil.convertToLong(i));
+      }
+      //illegally modify the seq
+      seq.add(50,TypeConversionUtil.convertToLong(50));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->itr.add(TypeConversionUtil.convertToLong(0)));
+      assertIteratorStateIntegrity(itr,preAllocSpan+100,-1,100,parent,root);
+      assertStructuralIntegrity(seq,101,101,parent,parentSize+101,101,root,rootSize+101,101);
+      verifyAscendingSpanlong(root.arr,0,preAllocSpan+51,-preAllocSpan);
+      verifyAscendingSpanlong(root.arr,preAllocSpan+51,rootSize+101,50);
+    }
+  }
+  //ENDIF
+  @ParameterizedTest
+  //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testCheckedSubListadd_int_Long_happyPathInsertBegin(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+  //ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.CheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.CheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.CheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      seq.add(0,TypeConversionUtil.convertToLong(i));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=100,bound=i+100;i<bound;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(--val),root.arr[i]);
+    }
+    verifyAscendingSpanlong(root.arr,i,rootSize+100,100);
+  }
+  @ParameterizedTest
+  //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testCheckedSubListadd_int_Long_happyPathInsertEnd(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+  //ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.CheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.CheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.CheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size(),TypeConversionUtil.convertToLong(i));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,rootSize+100,-preAllocSpan);
+  }
+  @ParameterizedTest
+  //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testCheckedSubListadd_int_Long_happyPathInsertMidPoint(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+  //ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.CheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.CheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.CheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size()/2,TypeConversionUtil.convertToLong(i));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=1,bound=i+50;i<bound;++i,val+=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+    for(int val=98,bound=i+50;i<bound;++i,val-=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+    verifyAscendingSpanlong(root.arr,i,rootSize+100,i);
+  }
+  //IF CHECKED==Checked
+  @ParameterizedTest
+    //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testCheckedSubListadd_int_Long_throwIOBE(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+    //ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.CheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.CheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.CheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      //too low
+      Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(-1,TypeConversionUtil.convertToLong(0)));
+      //too hi
+      final int finalIndex=i;
+      Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(finalIndex+1,TypeConversionUtil.convertToLong(0)));
+      seq.add(TypeConversionUtil.convertToLong(i));
+    }
+    //when the method throws, verify that no changes occurred
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,rootSize+100,-preAllocSpan);
+  }
+    //IF STRUCT==SubList
+  @ParameterizedTest
+  @MethodSource("getSubListConstructionArgs")
+  public void testCheckedSubListadd_Long_throwCME(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+    {
+      //try on an empty sublist
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      //illegally modify the root
+      root.add(preAllocSpan,TypeConversionUtil.convertToLong(0));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(TypeConversionUtil.convertToLong(0)));
+      //attempt the same tests on the parent
+      Assertions.assertThrows(ConcurrentModificationException.class,()->parent.add(TypeConversionUtil.convertToLong(0)));
+      assertStructuralIntegrity(seq,0,0,parent,parentSize,0,root,rootSize+1,1);
+      verifyAscendingSpanlong(root.arr,0,preAllocSpan+1,-preAllocSpan);
+      verifyAscendingSpanlong(root.arr,preAllocSpan+1,rootSize+1,100);
+    }
+    {
+      //try on an empty sublist
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      //illegally modify the parent
+      parent.add(parentPreAlloc,TypeConversionUtil.convertToLong(0));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(TypeConversionUtil.convertToLong(0)));
+      assertStructuralIntegrity(seq,0,0,parent,parentSize+1,1,root,rootSize+1,1);
+      verifyAscendingSpanlong(root.arr,0,preAllocSpan+1,-preAllocSpan);
+      verifyAscendingSpanlong(root.arr,preAllocSpan+1,rootSize+1,100);
+    }
+    {
+      //try on an non-empty sublist
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      for(int i=0;i<100;++i)
+      {
+        seq.add(TypeConversionUtil.convertToLong(i));
+      }
+      //illegally modify the root
+      root.add(TypeConversionUtil.convertToLong(rootSize+100));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(TypeConversionUtil.convertToLong(0)));
+      //attempt the same tests on the parent
+      Assertions.assertThrows(ConcurrentModificationException.class,()->parent.add(TypeConversionUtil.convertToLong(0)));
+      assertStructuralIntegrity(seq,100,100,parent,parentSize+100,100,root,rootSize+101,101);
+      verifyAscendingSpanlong(root.arr,0,rootSize+101,-preAllocSpan);
+    }
+    {
+      //try on an non-empty sublist
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      for(int i=0;i<100;++i)
+      {
+        seq.add(TypeConversionUtil.convertToLong(i));
+      }
+      //illegally modify the parent
+      parent.add(parentPreAlloc+50,TypeConversionUtil.convertToLong(50));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(TypeConversionUtil.convertToLong(0)));
+      assertStructuralIntegrity(seq,100,100,parent,parentSize+101,101,root,rootSize+101,101);
+      verifyAscendingSpanlong(root.arr,0,preAllocSpan+51,-preAllocSpan);
+      verifyAscendingSpanlong(root.arr,preAllocSpan+51,rootSize+101,50);
+    }
+  }
+  @ParameterizedTest
+  @MethodSource("getSubListConstructionArgs")
+  public void testCheckedSubListadd_int_Long_throwCME(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+    {
+      //try on an empty sublist
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      //illegally modify the root
+      root.add(preAllocSpan,TypeConversionUtil.convertToLong(0));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(0,TypeConversionUtil.convertToLong(0)));
+      //an insertion out of bounds should also throw a CME
+      //too low
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(-1,TypeConversionUtil.convertToLong(0)));
+      //too hi
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(1,TypeConversionUtil.convertToLong(0)));
+      //attempt the same tests on the parent
+      Assertions.assertThrows(ConcurrentModificationException.class,()->parent.add(0,TypeConversionUtil.convertToLong(0)));
+      Assertions.assertThrows(ConcurrentModificationException.class,()->parent.add(-1,TypeConversionUtil.convertToLong(0)));
+      Assertions.assertThrows(ConcurrentModificationException.class,()->parent.add(parentSize+1,TypeConversionUtil.convertToLong(0)));
+      assertStructuralIntegrity(seq,0,0,parent,parentSize,0,root,rootSize+1,1);
+      verifyAscendingSpanlong(root.arr,0,preAllocSpan+1,-preAllocSpan);
+      verifyAscendingSpanlong(root.arr,preAllocSpan+1,rootSize+1,100);
+    }
+    {
+      //try on an empty sublist
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      //illegally modify the parent
+      parent.add(parentPreAlloc,TypeConversionUtil.convertToLong(0));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(0,TypeConversionUtil.convertToLong(0)));
+      //an insertion out of bounds should also throw a CME
+      //too low
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(-1,TypeConversionUtil.convertToLong(0)));
+      //too hi
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(1,TypeConversionUtil.convertToLong(0)));
+      assertStructuralIntegrity(seq,0,0,parent,parentSize+1,1,root,rootSize+1,1);
+      verifyAscendingSpanlong(root.arr,0,preAllocSpan+1,-preAllocSpan);
+      verifyAscendingSpanlong(root.arr,preAllocSpan+1,rootSize+1,100);
+    }
+    {
+      //try on an non-empty sublist
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      for(int i=0;i<100;++i)
+      {
+        seq.add(TypeConversionUtil.convertToLong(i));
+      }
+      //illegally modify the root
+      root.add(TypeConversionUtil.convertToLong(rootSize+100));
+      //attempt an insertion at the beginning
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(0,TypeConversionUtil.convertToLong(0)));
+      //attempt an insertion at the midpoint
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(50,TypeConversionUtil.convertToLong(0)));
+      //attempt an insertion at the end
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(100,TypeConversionUtil.convertToLong(0)));
+      //an insertion out of bounds should also throw a CME
+      //too low
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(-1,TypeConversionUtil.convertToLong(0)));
+      //too hi
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(101,TypeConversionUtil.convertToLong(0)));
+      //attempt the same tests on the parent
+      Assertions.assertThrows(ConcurrentModificationException.class,()->parent.add(0,TypeConversionUtil.convertToLong(0)));
+      Assertions.assertThrows(ConcurrentModificationException.class,()->parent.add(parentPreAlloc+50,TypeConversionUtil.convertToLong(0)));
+      Assertions.assertThrows(ConcurrentModificationException.class,()->parent.add(parentSize+100,TypeConversionUtil.convertToLong(0)));
+      Assertions.assertThrows(ConcurrentModificationException.class,()->parent.add(-1,TypeConversionUtil.convertToLong(0)));
+      Assertions.assertThrows(ConcurrentModificationException.class,()->parent.add(parentSize+101,TypeConversionUtil.convertToLong(0)));
+      assertStructuralIntegrity(seq,100,100,parent,parentSize+100,100,root,rootSize+101,101);
+      verifyAscendingSpanlong(root.arr,0,rootSize+101,-preAllocSpan);
+    }
+    {
+      //try on an non-empty sublist
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      for(int i=0;i<100;++i)
+      {
+        seq.add(TypeConversionUtil.convertToLong(i));
+      }
+      //illegally modify the parent
+      parent.add(parentPreAlloc+50,TypeConversionUtil.convertToLong(50));
+      //attempt an insertion at the beginning
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(0,TypeConversionUtil.convertToLong(0)));
+      //attempt an insertion at the midpoint
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(50,TypeConversionUtil.convertToLong(0)));
+      //attempt an insertion at the end
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(100,TypeConversionUtil.convertToLong(0)));
+      //an insertion out of bounds should also throw a CME
+      //too low
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(-1,TypeConversionUtil.convertToLong(0)));
+      //too hi
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(101,TypeConversionUtil.convertToLong(0)));
+      assertStructuralIntegrity(seq,100,100,parent,parentSize+101,101,root,rootSize+101,101);
+      verifyAscendingSpanlong(root.arr,0,preAllocSpan+51,-preAllocSpan);
+      verifyAscendingSpanlong(root.arr,preAllocSpan+51,rootSize+101,50);
+    }
+  }
+    //ENDIF
+  //ENDIF
+//ENDIF
+  @ParameterizedTest
+//IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testCheckedSubListadd_Long_happyPath(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+//ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.CheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.CheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.CheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToLong(i)));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    for(int i=0,val=-preAllocSpan;i<100;++i,++val)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+  }
+  //IF OfBoolean
+//IF STRUCT==List,SubList
+  @ParameterizedTest
+  //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testCheckedSubListListItradd_boolean_happyPathInsertBegin(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+  //ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.CheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.CheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.CheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    var seqItr=seq.listIterator();
+    for(int i=0;i<100;++i)
+    {
+      seqItr.add(TypeConversionUtil.convertToboolean(i));
+      assertIteratorStateIntegrity(seqItr,preAllocSpan+1,-1,i+1,parent,root);
+      seqItr.previousLong();
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlongboolean(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=100,bound=i+100;i<bound;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolongboolean(--val),root.arr[i]);
+    }
+    verifyAscendingSpanlongboolean(root.arr,i,rootSize+100,100);
+  }
+  @ParameterizedTest
+  //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testCheckedSubListListItradd_boolean_happyPathInsertEnd(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+  //ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.CheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.CheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.CheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    var seqItr=seq.listIterator();
+    for(int i=0;i<100;++i)
+    {
+      seqItr.add(TypeConversionUtil.convertToboolean(i));
+      assertIteratorStateIntegrity(seqItr,preAllocSpan+i+1,-1,i+1,parent,root);
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlongboolean(root.arr,0,rootSize+100,-preAllocSpan);
+  }
+  @ParameterizedTest
+  //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testCheckedSubListListItradd_boolean_happyPathInsertMidPoint(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+  //ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.CheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.CheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.CheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    var seqItr=seq.listIterator();
+    for(int i=0;i<100;++i)
+    {
+      seqItr.add(TypeConversionUtil.convertToboolean(i));
+      assertIteratorStateIntegrity(seqItr,((rootSize+i)/2)+1,-1,i+1,parent,root);
+      if((i&1)==0)
+      {
+        seqItr.previousLong();
+      }
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlongboolean(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=1,bound=i+50;i<bound;++i,val+=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolongboolean(val),root.arr[i]);
+    }
+    for(int val=98,bound=i+50;i<bound;++i,val-=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolongboolean(val),root.arr[i]);
+    }
+    verifyAscendingSpanlongboolean(root.arr,i,rootSize+100,i);
+  }
+  //IF CHECKED==Checked
+  @ParameterizedTest
+    //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testCheckedSubListListItradd_boolean_throwCME(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+    //ENDIF
+    {
+      //try on an empty sublist
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      var itr=seq.listIterator();
+      //illegally modify the root
+      root.add(preAllocSpan,TypeConversionUtil.convertToboolean(0));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->itr.add(TypeConversionUtil.convertToboolean(0)));
+      assertIteratorStateIntegrity(itr,preAllocSpan,-1,0,parent,root);
+      assertStructuralIntegrity(seq,0,0,parent,parentSize,0,root,rootSize+1,1);
+      verifyAscendingSpanlongboolean(root.arr,0,preAllocSpan+1,-preAllocSpan);
+      verifyAscendingSpanlongboolean(root.arr,preAllocSpan+1,rootSize+1,100);
+    }
+    {
+      //try on an empty sublist
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      var itr=seq.listIterator();
+      //illegally modify the parent
+      parent.add(parentPreAlloc,TypeConversionUtil.convertToboolean(0));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->itr.add(TypeConversionUtil.convertToboolean(0)));
+      assertIteratorStateIntegrity(itr,preAllocSpan,-1,0,parent,root);
+      assertStructuralIntegrity(seq,0,0,parent,parentSize+1,1,root,rootSize+1,1);
+      verifyAscendingSpanlongboolean(root.arr,0,preAllocSpan+1,-preAllocSpan);
+      verifyAscendingSpanlongboolean(root.arr,preAllocSpan+1,rootSize+1,100);
+    }
+    {
+      //try on an empty sublist
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      var itr=seq.listIterator();
+      //illegally modify the sequence
+      seq.add(0,TypeConversionUtil.convertToboolean(0));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->itr.add(TypeConversionUtil.convertToboolean(0)));
+      assertIteratorStateIntegrity(itr,preAllocSpan,-1,0,parent,root);
+      assertStructuralIntegrity(seq,1,1,parent,parentSize+1,1,root,rootSize+1,1);
+      verifyAscendingSpanlongboolean(root.arr,0,preAllocSpan+1,-preAllocSpan);
+      verifyAscendingSpanlongboolean(root.arr,preAllocSpan+1,rootSize+1,100);
+    }
+    {
+      //try on an non-empty sublist, inserting at the end
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      var itr=seq.listIterator();
+      for(int i=0;i<100;++i)
+      {
+        itr.add(TypeConversionUtil.convertToboolean(i));
+      }
+      //illegally modify the root
+      root.add(TypeConversionUtil.convertToboolean(rootSize+100));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->itr.add(TypeConversionUtil.convertToboolean(0)));
+      assertIteratorStateIntegrity(itr,preAllocSpan+100,-1,100,parent,root);
+      assertStructuralIntegrity(seq,100,100,parent,parentSize+100,100,root,rootSize+101,101);
+      verifyAscendingSpanlongboolean(root.arr,0,rootSize+101,-preAllocSpan);
+    }
+    {
+      //try on an non-empty sublist, inserting at the end
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      var itr=seq.listIterator();
+      for(int i=0;i<100;++i)
+      {
+        itr.add(TypeConversionUtil.convertToboolean(i));
+      }
+      //illegally modify the parent
+      parent.add(parentPreAlloc+50,TypeConversionUtil.convertToboolean(50));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->itr.add(TypeConversionUtil.convertToboolean(0)));
+      assertIteratorStateIntegrity(itr,preAllocSpan+100,-1,100,parent,root);
+      assertStructuralIntegrity(seq,100,100,parent,parentSize+101,101,root,rootSize+101,101);
+      verifyAscendingSpanlongboolean(root.arr,0,preAllocSpan+51,-preAllocSpan);
+      verifyAscendingSpanlongboolean(root.arr,preAllocSpan+51,rootSize+101,50);
+    }
+    {
+      //try on an non-empty sublist, inserting at the end
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      var itr=seq.listIterator();
+      for(int i=0;i<100;++i)
+      {
+        itr.add(TypeConversionUtil.convertToboolean(i));
+      }
+      //illegally modify the seq
+      seq.add(50,TypeConversionUtil.convertToboolean(50));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->itr.add(TypeConversionUtil.convertToboolean(0)));
+      assertIteratorStateIntegrity(itr,preAllocSpan+100,-1,100,parent,root);
+      assertStructuralIntegrity(seq,101,101,parent,parentSize+101,101,root,rootSize+101,101);
+      verifyAscendingSpanlongboolean(root.arr,0,preAllocSpan+51,-preAllocSpan);
+      verifyAscendingSpanlongboolean(root.arr,preAllocSpan+51,rootSize+101,50);
+    }
+  }
+  //ENDIF
+  @ParameterizedTest
+  //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testCheckedSubListadd_int_boolean_happyPathInsertBegin(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+  //ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.CheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.CheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.CheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      seq.add(0,TypeConversionUtil.convertToboolean(i));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlongboolean(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=100,bound=i+100;i<bound;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolongboolean(--val),root.arr[i]);
+    }
+    verifyAscendingSpanlongboolean(root.arr,i,rootSize+100,100);
+  }
+  @ParameterizedTest
+  //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testCheckedSubListadd_int_boolean_happyPathInsertEnd(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+  //ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.CheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.CheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.CheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size(),TypeConversionUtil.convertToboolean(i));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlongboolean(root.arr,0,rootSize+100,-preAllocSpan);
+  }
+  @ParameterizedTest
+  //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testCheckedSubListadd_int_boolean_happyPathInsertMidPoint(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+  //ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.CheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.CheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.CheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size()/2,TypeConversionUtil.convertToboolean(i));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlongboolean(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=1,bound=i+50;i<bound;++i,val+=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolongboolean(val),root.arr[i]);
+    }
+    for(int val=98,bound=i+50;i<bound;++i,val-=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolongboolean(val),root.arr[i]);
+    }
+    verifyAscendingSpanlongboolean(root.arr,i,rootSize+100,i);
+  }
+  //IF CHECKED==Checked
+  @ParameterizedTest
+    //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testCheckedSubListadd_int_boolean_throwIOBE(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+    //ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.CheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.CheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.CheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      //too low
+      Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(-1,TypeConversionUtil.convertToboolean(0)));
+      //too hi
+      final int finalIndex=i;
+      Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(finalIndex+1,TypeConversionUtil.convertToboolean(0)));
+      seq.add(TypeConversionUtil.convertToboolean(i));
+    }
+    //when the method throws, verify that no changes occurred
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlongboolean(root.arr,0,rootSize+100,-preAllocSpan);
+  }
+    //IF STRUCT==SubList
+  @ParameterizedTest
+  @MethodSource("getSubListConstructionArgs")
+  public void testCheckedSubListadd_boolean_throwCME(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+    {
+      //try on an empty sublist
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      //illegally modify the root
+      root.add(preAllocSpan,TypeConversionUtil.convertToboolean(0));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(TypeConversionUtil.convertToboolean(0)));
+      //attempt the same tests on the parent
+      Assertions.assertThrows(ConcurrentModificationException.class,()->parent.add(TypeConversionUtil.convertToboolean(0)));
+      assertStructuralIntegrity(seq,0,0,parent,parentSize,0,root,rootSize+1,1);
+      verifyAscendingSpanlongboolean(root.arr,0,preAllocSpan+1,-preAllocSpan);
+      verifyAscendingSpanlongboolean(root.arr,preAllocSpan+1,rootSize+1,100);
+    }
+    {
+      //try on an empty sublist
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      //illegally modify the parent
+      parent.add(parentPreAlloc,TypeConversionUtil.convertToboolean(0));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(TypeConversionUtil.convertToboolean(0)));
+      assertStructuralIntegrity(seq,0,0,parent,parentSize+1,1,root,rootSize+1,1);
+      verifyAscendingSpanlongboolean(root.arr,0,preAllocSpan+1,-preAllocSpan);
+      verifyAscendingSpanlongboolean(root.arr,preAllocSpan+1,rootSize+1,100);
+    }
+    {
+      //try on an non-empty sublist
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      for(int i=0;i<100;++i)
+      {
+        seq.add(TypeConversionUtil.convertToboolean(i));
+      }
+      //illegally modify the root
+      root.add(TypeConversionUtil.convertToboolean(rootSize+100));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(TypeConversionUtil.convertToboolean(0)));
+      //attempt the same tests on the parent
+      Assertions.assertThrows(ConcurrentModificationException.class,()->parent.add(TypeConversionUtil.convertToboolean(0)));
+      assertStructuralIntegrity(seq,100,100,parent,parentSize+100,100,root,rootSize+101,101);
+      verifyAscendingSpanlongboolean(root.arr,0,rootSize+101,-preAllocSpan);
+    }
+    {
+      //try on an non-empty sublist
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      for(int i=0;i<100;++i)
+      {
+        seq.add(TypeConversionUtil.convertToboolean(i));
+      }
+      //illegally modify the parent
+      parent.add(parentPreAlloc+50,TypeConversionUtil.convertToboolean(50));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(TypeConversionUtil.convertToboolean(0)));
+      assertStructuralIntegrity(seq,100,100,parent,parentSize+101,101,root,rootSize+101,101);
+      verifyAscendingSpanlongboolean(root.arr,0,preAllocSpan+51,-preAllocSpan);
+      verifyAscendingSpanlongboolean(root.arr,preAllocSpan+51,rootSize+101,50);
+    }
+  }
+  @ParameterizedTest
+  @MethodSource("getSubListConstructionArgs")
+  public void testCheckedSubListadd_int_boolean_throwCME(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+    {
+      //try on an empty sublist
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      //illegally modify the root
+      root.add(preAllocSpan,TypeConversionUtil.convertToboolean(0));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(0,TypeConversionUtil.convertToboolean(0)));
+      //an insertion out of bounds should also throw a CME
+      //too low
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(-1,TypeConversionUtil.convertToboolean(0)));
+      //too hi
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(1,TypeConversionUtil.convertToboolean(0)));
+      //attempt the same tests on the parent
+      Assertions.assertThrows(ConcurrentModificationException.class,()->parent.add(0,TypeConversionUtil.convertToboolean(0)));
+      Assertions.assertThrows(ConcurrentModificationException.class,()->parent.add(-1,TypeConversionUtil.convertToboolean(0)));
+      Assertions.assertThrows(ConcurrentModificationException.class,()->parent.add(parentSize+1,TypeConversionUtil.convertToboolean(0)));
+      assertStructuralIntegrity(seq,0,0,parent,parentSize,0,root,rootSize+1,1);
+      verifyAscendingSpanlongboolean(root.arr,0,preAllocSpan+1,-preAllocSpan);
+      verifyAscendingSpanlongboolean(root.arr,preAllocSpan+1,rootSize+1,100);
+    }
+    {
+      //try on an empty sublist
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      //illegally modify the parent
+      parent.add(parentPreAlloc,TypeConversionUtil.convertToboolean(0));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(0,TypeConversionUtil.convertToboolean(0)));
+      //an insertion out of bounds should also throw a CME
+      //too low
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(-1,TypeConversionUtil.convertToboolean(0)));
+      //too hi
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(1,TypeConversionUtil.convertToboolean(0)));
+      assertStructuralIntegrity(seq,0,0,parent,parentSize+1,1,root,rootSize+1,1);
+      verifyAscendingSpanlongboolean(root.arr,0,preAllocSpan+1,-preAllocSpan);
+      verifyAscendingSpanlongboolean(root.arr,preAllocSpan+1,rootSize+1,100);
+    }
+    {
+      //try on an non-empty sublist
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      for(int i=0;i<100;++i)
+      {
+        seq.add(TypeConversionUtil.convertToboolean(i));
+      }
+      //illegally modify the root
+      root.add(TypeConversionUtil.convertToboolean(rootSize+100));
+      //attempt an insertion at the beginning
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(0,TypeConversionUtil.convertToboolean(0)));
+      //attempt an insertion at the midpoint
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(50,TypeConversionUtil.convertToboolean(0)));
+      //attempt an insertion at the end
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(100,TypeConversionUtil.convertToboolean(0)));
+      //an insertion out of bounds should also throw a CME
+      //too low
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(-1,TypeConversionUtil.convertToboolean(0)));
+      //too hi
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(101,TypeConversionUtil.convertToboolean(0)));
+      //attempt the same tests on the parent
+      Assertions.assertThrows(ConcurrentModificationException.class,()->parent.add(0,TypeConversionUtil.convertToboolean(0)));
+      Assertions.assertThrows(ConcurrentModificationException.class,()->parent.add(parentPreAlloc+50,TypeConversionUtil.convertToboolean(0)));
+      Assertions.assertThrows(ConcurrentModificationException.class,()->parent.add(parentSize+100,TypeConversionUtil.convertToboolean(0)));
+      Assertions.assertThrows(ConcurrentModificationException.class,()->parent.add(-1,TypeConversionUtil.convertToboolean(0)));
+      Assertions.assertThrows(ConcurrentModificationException.class,()->parent.add(parentSize+101,TypeConversionUtil.convertToboolean(0)));
+      assertStructuralIntegrity(seq,100,100,parent,parentSize+100,100,root,rootSize+101,101);
+      verifyAscendingSpanlongboolean(root.arr,0,rootSize+101,-preAllocSpan);
+    }
+    {
+      //try on an non-empty sublist
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      for(int i=0;i<100;++i)
+      {
+        seq.add(TypeConversionUtil.convertToboolean(i));
+      }
+      //illegally modify the parent
+      parent.add(parentPreAlloc+50,TypeConversionUtil.convertToboolean(50));
+      //attempt an insertion at the beginning
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(0,TypeConversionUtil.convertToboolean(0)));
+      //attempt an insertion at the midpoint
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(50,TypeConversionUtil.convertToboolean(0)));
+      //attempt an insertion at the end
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(100,TypeConversionUtil.convertToboolean(0)));
+      //an insertion out of bounds should also throw a CME
+      //too low
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(-1,TypeConversionUtil.convertToboolean(0)));
+      //too hi
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(101,TypeConversionUtil.convertToboolean(0)));
+      assertStructuralIntegrity(seq,100,100,parent,parentSize+101,101,root,rootSize+101,101);
+      verifyAscendingSpanlongboolean(root.arr,0,preAllocSpan+51,-preAllocSpan);
+      verifyAscendingSpanlongboolean(root.arr,preAllocSpan+51,rootSize+101,50);
+    }
+  }
+    //ENDIF
+  //ENDIF
+//ENDIF
+  @ParameterizedTest
+//IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testCheckedSubListadd_boolean_happyPath(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+//ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.CheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.CheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.CheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToboolean(i)));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    for(int i=0,val=-preAllocSpan;i<100;++i,++val)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolongboolean(val),root.arr[i]);
+    }
+  }
+//IF STRUCT==List,SubList
+  @ParameterizedTest
+  //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testCheckedSubListListItradd_Boolean_happyPathInsertBegin(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+  //ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.CheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.CheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.CheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    var seqItr=seq.listIterator();
+    for(int i=0;i<100;++i)
+    {
+      seqItr.add(TypeConversionUtil.convertToBoolean(i));
+      assertIteratorStateIntegrity(seqItr,preAllocSpan+1,-1,i+1,parent,root);
+      seqItr.previousLong();
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlongboolean(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=100,bound=i+100;i<bound;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolongboolean(--val),root.arr[i]);
+    }
+    verifyAscendingSpanlongboolean(root.arr,i,rootSize+100,100);
+  }
+  @ParameterizedTest
+  //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testCheckedSubListListItradd_Boolean_happyPathInsertEnd(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+  //ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.CheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.CheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.CheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    var seqItr=seq.listIterator();
+    for(int i=0;i<100;++i)
+    {
+      seqItr.add(TypeConversionUtil.convertToBoolean(i));
+      assertIteratorStateIntegrity(seqItr,preAllocSpan+i+1,-1,i+1,parent,root);
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlongboolean(root.arr,0,rootSize+100,-preAllocSpan);
+  }
+  @ParameterizedTest
+  //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testCheckedSubListListItradd_Boolean_happyPathInsertMidPoint(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+  //ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.CheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.CheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.CheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    var seqItr=seq.listIterator();
+    for(int i=0;i<100;++i)
+    {
+      seqItr.add(TypeConversionUtil.convertToBoolean(i));
+      assertIteratorStateIntegrity(seqItr,((rootSize+i)/2)+1,-1,i+1,parent,root);
+      if((i&1)==0)
+      {
+        seqItr.previousLong();
+      }
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlongboolean(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=1,bound=i+50;i<bound;++i,val+=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolongboolean(val),root.arr[i]);
+    }
+    for(int val=98,bound=i+50;i<bound;++i,val-=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolongboolean(val),root.arr[i]);
+    }
+    verifyAscendingSpanlongboolean(root.arr,i,rootSize+100,i);
+  }
+  //IF CHECKED==Checked
+  @ParameterizedTest
+    //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testCheckedSubListListItradd_Boolean_throwCME(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+    //ENDIF
+    {
+      //try on an empty sublist
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      var itr=seq.listIterator();
+      //illegally modify the root
+      root.add(preAllocSpan,TypeConversionUtil.convertToBoolean(0));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->itr.add(TypeConversionUtil.convertToBoolean(0)));
+      assertIteratorStateIntegrity(itr,preAllocSpan,-1,0,parent,root);
+      assertStructuralIntegrity(seq,0,0,parent,parentSize,0,root,rootSize+1,1);
+      verifyAscendingSpanlongboolean(root.arr,0,preAllocSpan+1,-preAllocSpan);
+      verifyAscendingSpanlongboolean(root.arr,preAllocSpan+1,rootSize+1,100);
+    }
+    {
+      //try on an empty sublist
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      var itr=seq.listIterator();
+      //illegally modify the parent
+      parent.add(parentPreAlloc,TypeConversionUtil.convertToBoolean(0));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->itr.add(TypeConversionUtil.convertToBoolean(0)));
+      assertIteratorStateIntegrity(itr,preAllocSpan,-1,0,parent,root);
+      assertStructuralIntegrity(seq,0,0,parent,parentSize+1,1,root,rootSize+1,1);
+      verifyAscendingSpanlongboolean(root.arr,0,preAllocSpan+1,-preAllocSpan);
+      verifyAscendingSpanlongboolean(root.arr,preAllocSpan+1,rootSize+1,100);
+    }
+    {
+      //try on an empty sublist
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      var itr=seq.listIterator();
+      //illegally modify the sequence
+      seq.add(0,TypeConversionUtil.convertToBoolean(0));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->itr.add(TypeConversionUtil.convertToBoolean(0)));
+      assertIteratorStateIntegrity(itr,preAllocSpan,-1,0,parent,root);
+      assertStructuralIntegrity(seq,1,1,parent,parentSize+1,1,root,rootSize+1,1);
+      verifyAscendingSpanlongboolean(root.arr,0,preAllocSpan+1,-preAllocSpan);
+      verifyAscendingSpanlongboolean(root.arr,preAllocSpan+1,rootSize+1,100);
+    }
+    {
+      //try on an non-empty sublist, inserting at the end
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      var itr=seq.listIterator();
+      for(int i=0;i<100;++i)
+      {
+        itr.add(TypeConversionUtil.convertToBoolean(i));
+      }
+      //illegally modify the root
+      root.add(TypeConversionUtil.convertToBoolean(rootSize+100));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->itr.add(TypeConversionUtil.convertToBoolean(0)));
+      assertIteratorStateIntegrity(itr,preAllocSpan+100,-1,100,parent,root);
+      assertStructuralIntegrity(seq,100,100,parent,parentSize+100,100,root,rootSize+101,101);
+      verifyAscendingSpanlongboolean(root.arr,0,rootSize+101,-preAllocSpan);
+    }
+    {
+      //try on an non-empty sublist, inserting at the end
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      var itr=seq.listIterator();
+      for(int i=0;i<100;++i)
+      {
+        itr.add(TypeConversionUtil.convertToBoolean(i));
+      }
+      //illegally modify the parent
+      parent.add(parentPreAlloc+50,TypeConversionUtil.convertToBoolean(50));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->itr.add(TypeConversionUtil.convertToBoolean(0)));
+      assertIteratorStateIntegrity(itr,preAllocSpan+100,-1,100,parent,root);
+      assertStructuralIntegrity(seq,100,100,parent,parentSize+101,101,root,rootSize+101,101);
+      verifyAscendingSpanlongboolean(root.arr,0,preAllocSpan+51,-preAllocSpan);
+      verifyAscendingSpanlongboolean(root.arr,preAllocSpan+51,rootSize+101,50);
+    }
+    {
+      //try on an non-empty sublist, inserting at the end
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      var itr=seq.listIterator();
+      for(int i=0;i<100;++i)
+      {
+        itr.add(TypeConversionUtil.convertToBoolean(i));
+      }
+      //illegally modify the seq
+      seq.add(50,TypeConversionUtil.convertToBoolean(50));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->itr.add(TypeConversionUtil.convertToBoolean(0)));
+      assertIteratorStateIntegrity(itr,preAllocSpan+100,-1,100,parent,root);
+      assertStructuralIntegrity(seq,101,101,parent,parentSize+101,101,root,rootSize+101,101);
+      verifyAscendingSpanlongboolean(root.arr,0,preAllocSpan+51,-preAllocSpan);
+      verifyAscendingSpanlongboolean(root.arr,preAllocSpan+51,rootSize+101,50);
+    }
+  }
+  //ENDIF
+  @ParameterizedTest
+  //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testCheckedSubListadd_int_Boolean_happyPathInsertBegin(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+  //ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.CheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.CheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.CheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      seq.add(0,TypeConversionUtil.convertToBoolean(i));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlongboolean(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=100,bound=i+100;i<bound;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolongboolean(--val),root.arr[i]);
+    }
+    verifyAscendingSpanlongboolean(root.arr,i,rootSize+100,100);
+  }
+  @ParameterizedTest
+  //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testCheckedSubListadd_int_Boolean_happyPathInsertEnd(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+  //ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.CheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.CheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.CheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size(),TypeConversionUtil.convertToBoolean(i));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlongboolean(root.arr,0,rootSize+100,-preAllocSpan);
+  }
+  @ParameterizedTest
+  //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testCheckedSubListadd_int_Boolean_happyPathInsertMidPoint(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+  //ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.CheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.CheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.CheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size()/2,TypeConversionUtil.convertToBoolean(i));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlongboolean(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=1,bound=i+50;i<bound;++i,val+=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolongboolean(val),root.arr[i]);
+    }
+    for(int val=98,bound=i+50;i<bound;++i,val-=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolongboolean(val),root.arr[i]);
+    }
+    verifyAscendingSpanlongboolean(root.arr,i,rootSize+100,i);
+  }
+  //IF CHECKED==Checked
+  @ParameterizedTest
+    //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testCheckedSubListadd_int_Boolean_throwIOBE(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+    //ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.CheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.CheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.CheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      //too low
+      Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(-1,TypeConversionUtil.convertToBoolean(0)));
+      //too hi
+      final int finalIndex=i;
+      Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(finalIndex+1,TypeConversionUtil.convertToBoolean(0)));
+      seq.add(TypeConversionUtil.convertToBoolean(i));
+    }
+    //when the method throws, verify that no changes occurred
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlongboolean(root.arr,0,rootSize+100,-preAllocSpan);
+  }
+    //IF STRUCT==SubList
+  @ParameterizedTest
+  @MethodSource("getSubListConstructionArgs")
+  public void testCheckedSubListadd_Boolean_throwCME(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+    {
+      //try on an empty sublist
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      //illegally modify the root
+      root.add(preAllocSpan,TypeConversionUtil.convertToBoolean(0));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(TypeConversionUtil.convertToBoolean(0)));
+      //attempt the same tests on the parent
+      Assertions.assertThrows(ConcurrentModificationException.class,()->parent.add(TypeConversionUtil.convertToBoolean(0)));
+      assertStructuralIntegrity(seq,0,0,parent,parentSize,0,root,rootSize+1,1);
+      verifyAscendingSpanlongboolean(root.arr,0,preAllocSpan+1,-preAllocSpan);
+      verifyAscendingSpanlongboolean(root.arr,preAllocSpan+1,rootSize+1,100);
+    }
+    {
+      //try on an empty sublist
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      //illegally modify the parent
+      parent.add(parentPreAlloc,TypeConversionUtil.convertToBoolean(0));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(TypeConversionUtil.convertToBoolean(0)));
+      assertStructuralIntegrity(seq,0,0,parent,parentSize+1,1,root,rootSize+1,1);
+      verifyAscendingSpanlongboolean(root.arr,0,preAllocSpan+1,-preAllocSpan);
+      verifyAscendingSpanlongboolean(root.arr,preAllocSpan+1,rootSize+1,100);
+    }
+    {
+      //try on an non-empty sublist
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      for(int i=0;i<100;++i)
+      {
+        seq.add(TypeConversionUtil.convertToBoolean(i));
+      }
+      //illegally modify the root
+      root.add(TypeConversionUtil.convertToBoolean(rootSize+100));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(TypeConversionUtil.convertToBoolean(0)));
+      //attempt the same tests on the parent
+      Assertions.assertThrows(ConcurrentModificationException.class,()->parent.add(TypeConversionUtil.convertToBoolean(0)));
+      assertStructuralIntegrity(seq,100,100,parent,parentSize+100,100,root,rootSize+101,101);
+      verifyAscendingSpanlongboolean(root.arr,0,rootSize+101,-preAllocSpan);
+    }
+    {
+      //try on an non-empty sublist
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      for(int i=0;i<100;++i)
+      {
+        seq.add(TypeConversionUtil.convertToBoolean(i));
+      }
+      //illegally modify the parent
+      parent.add(parentPreAlloc+50,TypeConversionUtil.convertToBoolean(50));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(TypeConversionUtil.convertToBoolean(0)));
+      assertStructuralIntegrity(seq,100,100,parent,parentSize+101,101,root,rootSize+101,101);
+      verifyAscendingSpanlongboolean(root.arr,0,preAllocSpan+51,-preAllocSpan);
+      verifyAscendingSpanlongboolean(root.arr,preAllocSpan+51,rootSize+101,50);
+    }
+  }
+  @ParameterizedTest
+  @MethodSource("getSubListConstructionArgs")
+  public void testCheckedSubListadd_int_Boolean_throwCME(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+    {
+      //try on an empty sublist
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      //illegally modify the root
+      root.add(preAllocSpan,TypeConversionUtil.convertToBoolean(0));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(0,TypeConversionUtil.convertToBoolean(0)));
+      //an insertion out of bounds should also throw a CME
+      //too low
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(-1,TypeConversionUtil.convertToBoolean(0)));
+      //too hi
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(1,TypeConversionUtil.convertToBoolean(0)));
+      //attempt the same tests on the parent
+      Assertions.assertThrows(ConcurrentModificationException.class,()->parent.add(0,TypeConversionUtil.convertToBoolean(0)));
+      Assertions.assertThrows(ConcurrentModificationException.class,()->parent.add(-1,TypeConversionUtil.convertToBoolean(0)));
+      Assertions.assertThrows(ConcurrentModificationException.class,()->parent.add(parentSize+1,TypeConversionUtil.convertToBoolean(0)));
+      assertStructuralIntegrity(seq,0,0,parent,parentSize,0,root,rootSize+1,1);
+      verifyAscendingSpanlongboolean(root.arr,0,preAllocSpan+1,-preAllocSpan);
+      verifyAscendingSpanlongboolean(root.arr,preAllocSpan+1,rootSize+1,100);
+    }
+    {
+      //try on an empty sublist
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      //illegally modify the parent
+      parent.add(parentPreAlloc,TypeConversionUtil.convertToBoolean(0));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(0,TypeConversionUtil.convertToBoolean(0)));
+      //an insertion out of bounds should also throw a CME
+      //too low
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(-1,TypeConversionUtil.convertToBoolean(0)));
+      //too hi
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(1,TypeConversionUtil.convertToBoolean(0)));
+      assertStructuralIntegrity(seq,0,0,parent,parentSize+1,1,root,rootSize+1,1);
+      verifyAscendingSpanlongboolean(root.arr,0,preAllocSpan+1,-preAllocSpan);
+      verifyAscendingSpanlongboolean(root.arr,preAllocSpan+1,rootSize+1,100);
+    }
+    {
+      //try on an non-empty sublist
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      for(int i=0;i<100;++i)
+      {
+        seq.add(TypeConversionUtil.convertToBoolean(i));
+      }
+      //illegally modify the root
+      root.add(TypeConversionUtil.convertToBoolean(rootSize+100));
+      //attempt an insertion at the beginning
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(0,TypeConversionUtil.convertToBoolean(0)));
+      //attempt an insertion at the midpoint
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(50,TypeConversionUtil.convertToBoolean(0)));
+      //attempt an insertion at the end
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(100,TypeConversionUtil.convertToBoolean(0)));
+      //an insertion out of bounds should also throw a CME
+      //too low
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(-1,TypeConversionUtil.convertToBoolean(0)));
+      //too hi
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(101,TypeConversionUtil.convertToBoolean(0)));
+      //attempt the same tests on the parent
+      Assertions.assertThrows(ConcurrentModificationException.class,()->parent.add(0,TypeConversionUtil.convertToBoolean(0)));
+      Assertions.assertThrows(ConcurrentModificationException.class,()->parent.add(parentPreAlloc+50,TypeConversionUtil.convertToBoolean(0)));
+      Assertions.assertThrows(ConcurrentModificationException.class,()->parent.add(parentSize+100,TypeConversionUtil.convertToBoolean(0)));
+      Assertions.assertThrows(ConcurrentModificationException.class,()->parent.add(-1,TypeConversionUtil.convertToBoolean(0)));
+      Assertions.assertThrows(ConcurrentModificationException.class,()->parent.add(parentSize+101,TypeConversionUtil.convertToBoolean(0)));
+      assertStructuralIntegrity(seq,100,100,parent,parentSize+100,100,root,rootSize+101,101);
+      verifyAscendingSpanlongboolean(root.arr,0,rootSize+101,-preAllocSpan);
+    }
+    {
+      //try on an non-empty sublist
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      for(int i=0;i<100;++i)
+      {
+        seq.add(TypeConversionUtil.convertToBoolean(i));
+      }
+      //illegally modify the parent
+      parent.add(parentPreAlloc+50,TypeConversionUtil.convertToBoolean(50));
+      //attempt an insertion at the beginning
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(0,TypeConversionUtil.convertToBoolean(0)));
+      //attempt an insertion at the midpoint
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(50,TypeConversionUtil.convertToBoolean(0)));
+      //attempt an insertion at the end
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(100,TypeConversionUtil.convertToBoolean(0)));
+      //an insertion out of bounds should also throw a CME
+      //too low
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(-1,TypeConversionUtil.convertToBoolean(0)));
+      //too hi
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(101,TypeConversionUtil.convertToBoolean(0)));
+      assertStructuralIntegrity(seq,100,100,parent,parentSize+101,101,root,rootSize+101,101);
+      verifyAscendingSpanlongboolean(root.arr,0,preAllocSpan+51,-preAllocSpan);
+      verifyAscendingSpanlongboolean(root.arr,preAllocSpan+51,rootSize+101,50);
+    }
+  }
+    //ENDIF
+  //ENDIF
+//ENDIF
+  @ParameterizedTest
+//IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testCheckedSubListadd_Boolean_happyPath(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+//ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.CheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.CheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.CheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToBoolean(i)));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    for(int i=0,val=-preAllocSpan;i<100;++i,++val)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolongboolean(val),root.arr[i]);
+    }
+  }
+    //IF OfByte,OfChar
+//IF STRUCT==List,SubList
+  @ParameterizedTest
+  //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testCheckedSubListListItradd_byte_happyPathInsertBegin(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+  //ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.CheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.CheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.CheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    var seqItr=seq.listIterator();
+    for(int i=0;i<100;++i)
+    {
+      seqItr.add(TypeConversionUtil.convertTobyte(i));
+      assertIteratorStateIntegrity(seqItr,preAllocSpan+1,-1,i+1,parent,root);
+      seqItr.previousLong();
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=100,bound=i+100;i<bound;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(--val),root.arr[i]);
+    }
+    verifyAscendingSpanlong(root.arr,i,rootSize+100,100);
+  }
+  @ParameterizedTest
+  //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testCheckedSubListListItradd_byte_happyPathInsertEnd(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+  //ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.CheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.CheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.CheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    var seqItr=seq.listIterator();
+    for(int i=0;i<100;++i)
+    {
+      seqItr.add(TypeConversionUtil.convertTobyte(i));
+      assertIteratorStateIntegrity(seqItr,preAllocSpan+i+1,-1,i+1,parent,root);
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,rootSize+100,-preAllocSpan);
+  }
+  @ParameterizedTest
+  //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testCheckedSubListListItradd_byte_happyPathInsertMidPoint(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+  //ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.CheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.CheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.CheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    var seqItr=seq.listIterator();
+    for(int i=0;i<100;++i)
+    {
+      seqItr.add(TypeConversionUtil.convertTobyte(i));
+      assertIteratorStateIntegrity(seqItr,((rootSize+i)/2)+1,-1,i+1,parent,root);
+      if((i&1)==0)
+      {
+        seqItr.previousLong();
+      }
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=1,bound=i+50;i<bound;++i,val+=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+    for(int val=98,bound=i+50;i<bound;++i,val-=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+    verifyAscendingSpanlong(root.arr,i,rootSize+100,i);
+  }
+  //IF CHECKED==Checked
+  @ParameterizedTest
+    //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testCheckedSubListListItradd_byte_throwCME(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+    //ENDIF
+    {
+      //try on an empty sublist
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      var itr=seq.listIterator();
+      //illegally modify the root
+      root.add(preAllocSpan,TypeConversionUtil.convertTobyte(0));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->itr.add(TypeConversionUtil.convertTobyte(0)));
+      assertIteratorStateIntegrity(itr,preAllocSpan,-1,0,parent,root);
+      assertStructuralIntegrity(seq,0,0,parent,parentSize,0,root,rootSize+1,1);
+      verifyAscendingSpanlong(root.arr,0,preAllocSpan+1,-preAllocSpan);
+      verifyAscendingSpanlong(root.arr,preAllocSpan+1,rootSize+1,100);
+    }
+    {
+      //try on an empty sublist
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      var itr=seq.listIterator();
+      //illegally modify the parent
+      parent.add(parentPreAlloc,TypeConversionUtil.convertTobyte(0));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->itr.add(TypeConversionUtil.convertTobyte(0)));
+      assertIteratorStateIntegrity(itr,preAllocSpan,-1,0,parent,root);
+      assertStructuralIntegrity(seq,0,0,parent,parentSize+1,1,root,rootSize+1,1);
+      verifyAscendingSpanlong(root.arr,0,preAllocSpan+1,-preAllocSpan);
+      verifyAscendingSpanlong(root.arr,preAllocSpan+1,rootSize+1,100);
+    }
+    {
+      //try on an empty sublist
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      var itr=seq.listIterator();
+      //illegally modify the sequence
+      seq.add(0,TypeConversionUtil.convertTobyte(0));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->itr.add(TypeConversionUtil.convertTobyte(0)));
+      assertIteratorStateIntegrity(itr,preAllocSpan,-1,0,parent,root);
+      assertStructuralIntegrity(seq,1,1,parent,parentSize+1,1,root,rootSize+1,1);
+      verifyAscendingSpanlong(root.arr,0,preAllocSpan+1,-preAllocSpan);
+      verifyAscendingSpanlong(root.arr,preAllocSpan+1,rootSize+1,100);
+    }
+    {
+      //try on an non-empty sublist, inserting at the end
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      var itr=seq.listIterator();
+      for(int i=0;i<100;++i)
+      {
+        itr.add(TypeConversionUtil.convertTobyte(i));
+      }
+      //illegally modify the root
+      root.add(TypeConversionUtil.convertTobyte(rootSize+100));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->itr.add(TypeConversionUtil.convertTobyte(0)));
+      assertIteratorStateIntegrity(itr,preAllocSpan+100,-1,100,parent,root);
+      assertStructuralIntegrity(seq,100,100,parent,parentSize+100,100,root,rootSize+101,101);
+      verifyAscendingSpanlong(root.arr,0,rootSize+101,-preAllocSpan);
+    }
+    {
+      //try on an non-empty sublist, inserting at the end
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      var itr=seq.listIterator();
+      for(int i=0;i<100;++i)
+      {
+        itr.add(TypeConversionUtil.convertTobyte(i));
+      }
+      //illegally modify the parent
+      parent.add(parentPreAlloc+50,TypeConversionUtil.convertTobyte(50));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->itr.add(TypeConversionUtil.convertTobyte(0)));
+      assertIteratorStateIntegrity(itr,preAllocSpan+100,-1,100,parent,root);
+      assertStructuralIntegrity(seq,100,100,parent,parentSize+101,101,root,rootSize+101,101);
+      verifyAscendingSpanlong(root.arr,0,preAllocSpan+51,-preAllocSpan);
+      verifyAscendingSpanlong(root.arr,preAllocSpan+51,rootSize+101,50);
+    }
+    {
+      //try on an non-empty sublist, inserting at the end
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      var itr=seq.listIterator();
+      for(int i=0;i<100;++i)
+      {
+        itr.add(TypeConversionUtil.convertTobyte(i));
+      }
+      //illegally modify the seq
+      seq.add(50,TypeConversionUtil.convertTobyte(50));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->itr.add(TypeConversionUtil.convertTobyte(0)));
+      assertIteratorStateIntegrity(itr,preAllocSpan+100,-1,100,parent,root);
+      assertStructuralIntegrity(seq,101,101,parent,parentSize+101,101,root,rootSize+101,101);
+      verifyAscendingSpanlong(root.arr,0,preAllocSpan+51,-preAllocSpan);
+      verifyAscendingSpanlong(root.arr,preAllocSpan+51,rootSize+101,50);
+    }
+  }
+  //ENDIF
+  @ParameterizedTest
+  //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testCheckedSubListadd_int_byte_happyPathInsertBegin(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+  //ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.CheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.CheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.CheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      seq.add(0,TypeConversionUtil.convertTobyte(i));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=100,bound=i+100;i<bound;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(--val),root.arr[i]);
+    }
+    verifyAscendingSpanlong(root.arr,i,rootSize+100,100);
+  }
+  @ParameterizedTest
+  //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testCheckedSubListadd_int_byte_happyPathInsertEnd(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+  //ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.CheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.CheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.CheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size(),TypeConversionUtil.convertTobyte(i));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,rootSize+100,-preAllocSpan);
+  }
+  @ParameterizedTest
+  //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testCheckedSubListadd_int_byte_happyPathInsertMidPoint(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+  //ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.CheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.CheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.CheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size()/2,TypeConversionUtil.convertTobyte(i));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=1,bound=i+50;i<bound;++i,val+=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+    for(int val=98,bound=i+50;i<bound;++i,val-=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+    verifyAscendingSpanlong(root.arr,i,rootSize+100,i);
+  }
+  //IF CHECKED==Checked
+  @ParameterizedTest
+    //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testCheckedSubListadd_int_byte_throwIOBE(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+    //ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.CheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.CheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.CheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      //too low
+      Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(-1,TypeConversionUtil.convertTobyte(0)));
+      //too hi
+      final int finalIndex=i;
+      Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(finalIndex+1,TypeConversionUtil.convertTobyte(0)));
+      seq.add(TypeConversionUtil.convertTobyte(i));
+    }
+    //when the method throws, verify that no changes occurred
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,rootSize+100,-preAllocSpan);
+  }
+    //IF STRUCT==SubList
+  @ParameterizedTest
+  @MethodSource("getSubListConstructionArgs")
+  public void testCheckedSubListadd_byte_throwCME(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+    {
+      //try on an empty sublist
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      //illegally modify the root
+      root.add(preAllocSpan,TypeConversionUtil.convertTobyte(0));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(TypeConversionUtil.convertTobyte(0)));
+      //attempt the same tests on the parent
+      Assertions.assertThrows(ConcurrentModificationException.class,()->parent.add(TypeConversionUtil.convertTobyte(0)));
+      assertStructuralIntegrity(seq,0,0,parent,parentSize,0,root,rootSize+1,1);
+      verifyAscendingSpanlong(root.arr,0,preAllocSpan+1,-preAllocSpan);
+      verifyAscendingSpanlong(root.arr,preAllocSpan+1,rootSize+1,100);
+    }
+    {
+      //try on an empty sublist
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      //illegally modify the parent
+      parent.add(parentPreAlloc,TypeConversionUtil.convertTobyte(0));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(TypeConversionUtil.convertTobyte(0)));
+      assertStructuralIntegrity(seq,0,0,parent,parentSize+1,1,root,rootSize+1,1);
+      verifyAscendingSpanlong(root.arr,0,preAllocSpan+1,-preAllocSpan);
+      verifyAscendingSpanlong(root.arr,preAllocSpan+1,rootSize+1,100);
+    }
+    {
+      //try on an non-empty sublist
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      for(int i=0;i<100;++i)
+      {
+        seq.add(TypeConversionUtil.convertTobyte(i));
+      }
+      //illegally modify the root
+      root.add(TypeConversionUtil.convertTobyte(rootSize+100));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(TypeConversionUtil.convertTobyte(0)));
+      //attempt the same tests on the parent
+      Assertions.assertThrows(ConcurrentModificationException.class,()->parent.add(TypeConversionUtil.convertTobyte(0)));
+      assertStructuralIntegrity(seq,100,100,parent,parentSize+100,100,root,rootSize+101,101);
+      verifyAscendingSpanlong(root.arr,0,rootSize+101,-preAllocSpan);
+    }
+    {
+      //try on an non-empty sublist
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      for(int i=0;i<100;++i)
+      {
+        seq.add(TypeConversionUtil.convertTobyte(i));
+      }
+      //illegally modify the parent
+      parent.add(parentPreAlloc+50,TypeConversionUtil.convertTobyte(50));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(TypeConversionUtil.convertTobyte(0)));
+      assertStructuralIntegrity(seq,100,100,parent,parentSize+101,101,root,rootSize+101,101);
+      verifyAscendingSpanlong(root.arr,0,preAllocSpan+51,-preAllocSpan);
+      verifyAscendingSpanlong(root.arr,preAllocSpan+51,rootSize+101,50);
+    }
+  }
+  @ParameterizedTest
+  @MethodSource("getSubListConstructionArgs")
+  public void testCheckedSubListadd_int_byte_throwCME(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+    {
+      //try on an empty sublist
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      //illegally modify the root
+      root.add(preAllocSpan,TypeConversionUtil.convertTobyte(0));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(0,TypeConversionUtil.convertTobyte(0)));
+      //an insertion out of bounds should also throw a CME
+      //too low
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(-1,TypeConversionUtil.convertTobyte(0)));
+      //too hi
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(1,TypeConversionUtil.convertTobyte(0)));
+      //attempt the same tests on the parent
+      Assertions.assertThrows(ConcurrentModificationException.class,()->parent.add(0,TypeConversionUtil.convertTobyte(0)));
+      Assertions.assertThrows(ConcurrentModificationException.class,()->parent.add(-1,TypeConversionUtil.convertTobyte(0)));
+      Assertions.assertThrows(ConcurrentModificationException.class,()->parent.add(parentSize+1,TypeConversionUtil.convertTobyte(0)));
+      assertStructuralIntegrity(seq,0,0,parent,parentSize,0,root,rootSize+1,1);
+      verifyAscendingSpanlong(root.arr,0,preAllocSpan+1,-preAllocSpan);
+      verifyAscendingSpanlong(root.arr,preAllocSpan+1,rootSize+1,100);
+    }
+    {
+      //try on an empty sublist
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      //illegally modify the parent
+      parent.add(parentPreAlloc,TypeConversionUtil.convertTobyte(0));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(0,TypeConversionUtil.convertTobyte(0)));
+      //an insertion out of bounds should also throw a CME
+      //too low
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(-1,TypeConversionUtil.convertTobyte(0)));
+      //too hi
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(1,TypeConversionUtil.convertTobyte(0)));
+      assertStructuralIntegrity(seq,0,0,parent,parentSize+1,1,root,rootSize+1,1);
+      verifyAscendingSpanlong(root.arr,0,preAllocSpan+1,-preAllocSpan);
+      verifyAscendingSpanlong(root.arr,preAllocSpan+1,rootSize+1,100);
+    }
+    {
+      //try on an non-empty sublist
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      for(int i=0;i<100;++i)
+      {
+        seq.add(TypeConversionUtil.convertTobyte(i));
+      }
+      //illegally modify the root
+      root.add(TypeConversionUtil.convertTobyte(rootSize+100));
+      //attempt an insertion at the beginning
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(0,TypeConversionUtil.convertTobyte(0)));
+      //attempt an insertion at the midpoint
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(50,TypeConversionUtil.convertTobyte(0)));
+      //attempt an insertion at the end
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(100,TypeConversionUtil.convertTobyte(0)));
+      //an insertion out of bounds should also throw a CME
+      //too low
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(-1,TypeConversionUtil.convertTobyte(0)));
+      //too hi
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(101,TypeConversionUtil.convertTobyte(0)));
+      //attempt the same tests on the parent
+      Assertions.assertThrows(ConcurrentModificationException.class,()->parent.add(0,TypeConversionUtil.convertTobyte(0)));
+      Assertions.assertThrows(ConcurrentModificationException.class,()->parent.add(parentPreAlloc+50,TypeConversionUtil.convertTobyte(0)));
+      Assertions.assertThrows(ConcurrentModificationException.class,()->parent.add(parentSize+100,TypeConversionUtil.convertTobyte(0)));
+      Assertions.assertThrows(ConcurrentModificationException.class,()->parent.add(-1,TypeConversionUtil.convertTobyte(0)));
+      Assertions.assertThrows(ConcurrentModificationException.class,()->parent.add(parentSize+101,TypeConversionUtil.convertTobyte(0)));
+      assertStructuralIntegrity(seq,100,100,parent,parentSize+100,100,root,rootSize+101,101);
+      verifyAscendingSpanlong(root.arr,0,rootSize+101,-preAllocSpan);
+    }
+    {
+      //try on an non-empty sublist
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      for(int i=0;i<100;++i)
+      {
+        seq.add(TypeConversionUtil.convertTobyte(i));
+      }
+      //illegally modify the parent
+      parent.add(parentPreAlloc+50,TypeConversionUtil.convertTobyte(50));
+      //attempt an insertion at the beginning
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(0,TypeConversionUtil.convertTobyte(0)));
+      //attempt an insertion at the midpoint
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(50,TypeConversionUtil.convertTobyte(0)));
+      //attempt an insertion at the end
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(100,TypeConversionUtil.convertTobyte(0)));
+      //an insertion out of bounds should also throw a CME
+      //too low
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(-1,TypeConversionUtil.convertTobyte(0)));
+      //too hi
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(101,TypeConversionUtil.convertTobyte(0)));
+      assertStructuralIntegrity(seq,100,100,parent,parentSize+101,101,root,rootSize+101,101);
+      verifyAscendingSpanlong(root.arr,0,preAllocSpan+51,-preAllocSpan);
+      verifyAscendingSpanlong(root.arr,preAllocSpan+51,rootSize+101,50);
+    }
+  }
+    //ENDIF
+  //ENDIF
+//ENDIF
+  @ParameterizedTest
+//IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testCheckedSubListadd_byte_happyPath(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+//ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.CheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.CheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.CheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertTrue(seq.add(TypeConversionUtil.convertTobyte(i)));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    for(int i=0,val=-preAllocSpan;i<100;++i,++val)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+  }
+//IF STRUCT==List,SubList
+  @ParameterizedTest
+  //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testCheckedSubListListItradd_Byte_happyPathInsertBegin(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+  //ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.CheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.CheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.CheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    var seqItr=seq.listIterator();
+    for(int i=0;i<100;++i)
+    {
+      seqItr.add(TypeConversionUtil.convertToByte(i));
+      assertIteratorStateIntegrity(seqItr,preAllocSpan+1,-1,i+1,parent,root);
+      seqItr.previousLong();
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=100,bound=i+100;i<bound;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(--val),root.arr[i]);
+    }
+    verifyAscendingSpanlong(root.arr,i,rootSize+100,100);
+  }
+  @ParameterizedTest
+  //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testCheckedSubListListItradd_Byte_happyPathInsertEnd(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+  //ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.CheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.CheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.CheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    var seqItr=seq.listIterator();
+    for(int i=0;i<100;++i)
+    {
+      seqItr.add(TypeConversionUtil.convertToByte(i));
+      assertIteratorStateIntegrity(seqItr,preAllocSpan+i+1,-1,i+1,parent,root);
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,rootSize+100,-preAllocSpan);
+  }
+  @ParameterizedTest
+  //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testCheckedSubListListItradd_Byte_happyPathInsertMidPoint(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+  //ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.CheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.CheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.CheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    var seqItr=seq.listIterator();
+    for(int i=0;i<100;++i)
+    {
+      seqItr.add(TypeConversionUtil.convertToByte(i));
+      assertIteratorStateIntegrity(seqItr,((rootSize+i)/2)+1,-1,i+1,parent,root);
+      if((i&1)==0)
+      {
+        seqItr.previousLong();
+      }
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=1,bound=i+50;i<bound;++i,val+=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+    for(int val=98,bound=i+50;i<bound;++i,val-=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+    verifyAscendingSpanlong(root.arr,i,rootSize+100,i);
+  }
+  //IF CHECKED==Checked
+  @ParameterizedTest
+    //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testCheckedSubListListItradd_Byte_throwCME(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+    //ENDIF
+    {
+      //try on an empty sublist
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      var itr=seq.listIterator();
+      //illegally modify the root
+      root.add(preAllocSpan,TypeConversionUtil.convertToByte(0));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->itr.add(TypeConversionUtil.convertToByte(0)));
+      assertIteratorStateIntegrity(itr,preAllocSpan,-1,0,parent,root);
+      assertStructuralIntegrity(seq,0,0,parent,parentSize,0,root,rootSize+1,1);
+      verifyAscendingSpanlong(root.arr,0,preAllocSpan+1,-preAllocSpan);
+      verifyAscendingSpanlong(root.arr,preAllocSpan+1,rootSize+1,100);
+    }
+    {
+      //try on an empty sublist
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      var itr=seq.listIterator();
+      //illegally modify the parent
+      parent.add(parentPreAlloc,TypeConversionUtil.convertToByte(0));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->itr.add(TypeConversionUtil.convertToByte(0)));
+      assertIteratorStateIntegrity(itr,preAllocSpan,-1,0,parent,root);
+      assertStructuralIntegrity(seq,0,0,parent,parentSize+1,1,root,rootSize+1,1);
+      verifyAscendingSpanlong(root.arr,0,preAllocSpan+1,-preAllocSpan);
+      verifyAscendingSpanlong(root.arr,preAllocSpan+1,rootSize+1,100);
+    }
+    {
+      //try on an empty sublist
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      var itr=seq.listIterator();
+      //illegally modify the sequence
+      seq.add(0,TypeConversionUtil.convertToByte(0));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->itr.add(TypeConversionUtil.convertToByte(0)));
+      assertIteratorStateIntegrity(itr,preAllocSpan,-1,0,parent,root);
+      assertStructuralIntegrity(seq,1,1,parent,parentSize+1,1,root,rootSize+1,1);
+      verifyAscendingSpanlong(root.arr,0,preAllocSpan+1,-preAllocSpan);
+      verifyAscendingSpanlong(root.arr,preAllocSpan+1,rootSize+1,100);
+    }
+    {
+      //try on an non-empty sublist, inserting at the end
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      var itr=seq.listIterator();
+      for(int i=0;i<100;++i)
+      {
+        itr.add(TypeConversionUtil.convertToByte(i));
+      }
+      //illegally modify the root
+      root.add(TypeConversionUtil.convertToByte(rootSize+100));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->itr.add(TypeConversionUtil.convertToByte(0)));
+      assertIteratorStateIntegrity(itr,preAllocSpan+100,-1,100,parent,root);
+      assertStructuralIntegrity(seq,100,100,parent,parentSize+100,100,root,rootSize+101,101);
+      verifyAscendingSpanlong(root.arr,0,rootSize+101,-preAllocSpan);
+    }
+    {
+      //try on an non-empty sublist, inserting at the end
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      var itr=seq.listIterator();
+      for(int i=0;i<100;++i)
+      {
+        itr.add(TypeConversionUtil.convertToByte(i));
+      }
+      //illegally modify the parent
+      parent.add(parentPreAlloc+50,TypeConversionUtil.convertToByte(50));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->itr.add(TypeConversionUtil.convertToByte(0)));
+      assertIteratorStateIntegrity(itr,preAllocSpan+100,-1,100,parent,root);
+      assertStructuralIntegrity(seq,100,100,parent,parentSize+101,101,root,rootSize+101,101);
+      verifyAscendingSpanlong(root.arr,0,preAllocSpan+51,-preAllocSpan);
+      verifyAscendingSpanlong(root.arr,preAllocSpan+51,rootSize+101,50);
+    }
+    {
+      //try on an non-empty sublist, inserting at the end
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      var itr=seq.listIterator();
+      for(int i=0;i<100;++i)
+      {
+        itr.add(TypeConversionUtil.convertToByte(i));
+      }
+      //illegally modify the seq
+      seq.add(50,TypeConversionUtil.convertToByte(50));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->itr.add(TypeConversionUtil.convertToByte(0)));
+      assertIteratorStateIntegrity(itr,preAllocSpan+100,-1,100,parent,root);
+      assertStructuralIntegrity(seq,101,101,parent,parentSize+101,101,root,rootSize+101,101);
+      verifyAscendingSpanlong(root.arr,0,preAllocSpan+51,-preAllocSpan);
+      verifyAscendingSpanlong(root.arr,preAllocSpan+51,rootSize+101,50);
+    }
+  }
+  //ENDIF
+  @ParameterizedTest
+  //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testCheckedSubListadd_int_Byte_happyPathInsertBegin(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+  //ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.CheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.CheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.CheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      seq.add(0,TypeConversionUtil.convertToByte(i));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=100,bound=i+100;i<bound;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(--val),root.arr[i]);
+    }
+    verifyAscendingSpanlong(root.arr,i,rootSize+100,100);
+  }
+  @ParameterizedTest
+  //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testCheckedSubListadd_int_Byte_happyPathInsertEnd(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+  //ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.CheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.CheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.CheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size(),TypeConversionUtil.convertToByte(i));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,rootSize+100,-preAllocSpan);
+  }
+  @ParameterizedTest
+  //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testCheckedSubListadd_int_Byte_happyPathInsertMidPoint(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+  //ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.CheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.CheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.CheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size()/2,TypeConversionUtil.convertToByte(i));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=1,bound=i+50;i<bound;++i,val+=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+    for(int val=98,bound=i+50;i<bound;++i,val-=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+    verifyAscendingSpanlong(root.arr,i,rootSize+100,i);
+  }
+  //IF CHECKED==Checked
+  @ParameterizedTest
+    //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testCheckedSubListadd_int_Byte_throwIOBE(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+    //ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.CheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.CheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.CheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      //too low
+      Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(-1,TypeConversionUtil.convertToByte(0)));
+      //too hi
+      final int finalIndex=i;
+      Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(finalIndex+1,TypeConversionUtil.convertToByte(0)));
+      seq.add(TypeConversionUtil.convertToByte(i));
+    }
+    //when the method throws, verify that no changes occurred
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,rootSize+100,-preAllocSpan);
+  }
+    //IF STRUCT==SubList
+  @ParameterizedTest
+  @MethodSource("getSubListConstructionArgs")
+  public void testCheckedSubListadd_Byte_throwCME(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+    {
+      //try on an empty sublist
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      //illegally modify the root
+      root.add(preAllocSpan,TypeConversionUtil.convertToByte(0));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(TypeConversionUtil.convertToByte(0)));
+      //attempt the same tests on the parent
+      Assertions.assertThrows(ConcurrentModificationException.class,()->parent.add(TypeConversionUtil.convertToByte(0)));
+      assertStructuralIntegrity(seq,0,0,parent,parentSize,0,root,rootSize+1,1);
+      verifyAscendingSpanlong(root.arr,0,preAllocSpan+1,-preAllocSpan);
+      verifyAscendingSpanlong(root.arr,preAllocSpan+1,rootSize+1,100);
+    }
+    {
+      //try on an empty sublist
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      //illegally modify the parent
+      parent.add(parentPreAlloc,TypeConversionUtil.convertToByte(0));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(TypeConversionUtil.convertToByte(0)));
+      assertStructuralIntegrity(seq,0,0,parent,parentSize+1,1,root,rootSize+1,1);
+      verifyAscendingSpanlong(root.arr,0,preAllocSpan+1,-preAllocSpan);
+      verifyAscendingSpanlong(root.arr,preAllocSpan+1,rootSize+1,100);
+    }
+    {
+      //try on an non-empty sublist
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      for(int i=0;i<100;++i)
+      {
+        seq.add(TypeConversionUtil.convertToByte(i));
+      }
+      //illegally modify the root
+      root.add(TypeConversionUtil.convertToByte(rootSize+100));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(TypeConversionUtil.convertToByte(0)));
+      //attempt the same tests on the parent
+      Assertions.assertThrows(ConcurrentModificationException.class,()->parent.add(TypeConversionUtil.convertToByte(0)));
+      assertStructuralIntegrity(seq,100,100,parent,parentSize+100,100,root,rootSize+101,101);
+      verifyAscendingSpanlong(root.arr,0,rootSize+101,-preAllocSpan);
+    }
+    {
+      //try on an non-empty sublist
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      for(int i=0;i<100;++i)
+      {
+        seq.add(TypeConversionUtil.convertToByte(i));
+      }
+      //illegally modify the parent
+      parent.add(parentPreAlloc+50,TypeConversionUtil.convertToByte(50));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(TypeConversionUtil.convertToByte(0)));
+      assertStructuralIntegrity(seq,100,100,parent,parentSize+101,101,root,rootSize+101,101);
+      verifyAscendingSpanlong(root.arr,0,preAllocSpan+51,-preAllocSpan);
+      verifyAscendingSpanlong(root.arr,preAllocSpan+51,rootSize+101,50);
+    }
+  }
+  @ParameterizedTest
+  @MethodSource("getSubListConstructionArgs")
+  public void testCheckedSubListadd_int_Byte_throwCME(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+    {
+      //try on an empty sublist
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      //illegally modify the root
+      root.add(preAllocSpan,TypeConversionUtil.convertToByte(0));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(0,TypeConversionUtil.convertToByte(0)));
+      //an insertion out of bounds should also throw a CME
+      //too low
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(-1,TypeConversionUtil.convertToByte(0)));
+      //too hi
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(1,TypeConversionUtil.convertToByte(0)));
+      //attempt the same tests on the parent
+      Assertions.assertThrows(ConcurrentModificationException.class,()->parent.add(0,TypeConversionUtil.convertToByte(0)));
+      Assertions.assertThrows(ConcurrentModificationException.class,()->parent.add(-1,TypeConversionUtil.convertToByte(0)));
+      Assertions.assertThrows(ConcurrentModificationException.class,()->parent.add(parentSize+1,TypeConversionUtil.convertToByte(0)));
+      assertStructuralIntegrity(seq,0,0,parent,parentSize,0,root,rootSize+1,1);
+      verifyAscendingSpanlong(root.arr,0,preAllocSpan+1,-preAllocSpan);
+      verifyAscendingSpanlong(root.arr,preAllocSpan+1,rootSize+1,100);
+    }
+    {
+      //try on an empty sublist
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      //illegally modify the parent
+      parent.add(parentPreAlloc,TypeConversionUtil.convertToByte(0));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(0,TypeConversionUtil.convertToByte(0)));
+      //an insertion out of bounds should also throw a CME
+      //too low
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(-1,TypeConversionUtil.convertToByte(0)));
+      //too hi
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(1,TypeConversionUtil.convertToByte(0)));
+      assertStructuralIntegrity(seq,0,0,parent,parentSize+1,1,root,rootSize+1,1);
+      verifyAscendingSpanlong(root.arr,0,preAllocSpan+1,-preAllocSpan);
+      verifyAscendingSpanlong(root.arr,preAllocSpan+1,rootSize+1,100);
+    }
+    {
+      //try on an non-empty sublist
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      for(int i=0;i<100;++i)
+      {
+        seq.add(TypeConversionUtil.convertToByte(i));
+      }
+      //illegally modify the root
+      root.add(TypeConversionUtil.convertToByte(rootSize+100));
+      //attempt an insertion at the beginning
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(0,TypeConversionUtil.convertToByte(0)));
+      //attempt an insertion at the midpoint
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(50,TypeConversionUtil.convertToByte(0)));
+      //attempt an insertion at the end
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(100,TypeConversionUtil.convertToByte(0)));
+      //an insertion out of bounds should also throw a CME
+      //too low
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(-1,TypeConversionUtil.convertToByte(0)));
+      //too hi
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(101,TypeConversionUtil.convertToByte(0)));
+      //attempt the same tests on the parent
+      Assertions.assertThrows(ConcurrentModificationException.class,()->parent.add(0,TypeConversionUtil.convertToByte(0)));
+      Assertions.assertThrows(ConcurrentModificationException.class,()->parent.add(parentPreAlloc+50,TypeConversionUtil.convertToByte(0)));
+      Assertions.assertThrows(ConcurrentModificationException.class,()->parent.add(parentSize+100,TypeConversionUtil.convertToByte(0)));
+      Assertions.assertThrows(ConcurrentModificationException.class,()->parent.add(-1,TypeConversionUtil.convertToByte(0)));
+      Assertions.assertThrows(ConcurrentModificationException.class,()->parent.add(parentSize+101,TypeConversionUtil.convertToByte(0)));
+      assertStructuralIntegrity(seq,100,100,parent,parentSize+100,100,root,rootSize+101,101);
+      verifyAscendingSpanlong(root.arr,0,rootSize+101,-preAllocSpan);
+    }
+    {
+      //try on an non-empty sublist
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      for(int i=0;i<100;++i)
+      {
+        seq.add(TypeConversionUtil.convertToByte(i));
+      }
+      //illegally modify the parent
+      parent.add(parentPreAlloc+50,TypeConversionUtil.convertToByte(50));
+      //attempt an insertion at the beginning
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(0,TypeConversionUtil.convertToByte(0)));
+      //attempt an insertion at the midpoint
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(50,TypeConversionUtil.convertToByte(0)));
+      //attempt an insertion at the end
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(100,TypeConversionUtil.convertToByte(0)));
+      //an insertion out of bounds should also throw a CME
+      //too low
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(-1,TypeConversionUtil.convertToByte(0)));
+      //too hi
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(101,TypeConversionUtil.convertToByte(0)));
+      assertStructuralIntegrity(seq,100,100,parent,parentSize+101,101,root,rootSize+101,101);
+      verifyAscendingSpanlong(root.arr,0,preAllocSpan+51,-preAllocSpan);
+      verifyAscendingSpanlong(root.arr,preAllocSpan+51,rootSize+101,50);
+    }
+  }
+    //ENDIF
+  //ENDIF
+//ENDIF
+  @ParameterizedTest
+//IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testCheckedSubListadd_Byte_happyPath(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+//ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.CheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.CheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.CheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToByte(i)));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    for(int i=0,val=-preAllocSpan;i<100;++i,++val)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+  }
+      //IF OfShort
+//IF STRUCT==List,SubList
+  @ParameterizedTest
+  //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testCheckedSubListListItradd_short_happyPathInsertBegin(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+  //ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.CheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.CheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.CheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    var seqItr=seq.listIterator();
+    for(int i=0;i<100;++i)
+    {
+      seqItr.add(TypeConversionUtil.convertToshort(i));
+      assertIteratorStateIntegrity(seqItr,preAllocSpan+1,-1,i+1,parent,root);
+      seqItr.previousLong();
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=100,bound=i+100;i<bound;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(--val),root.arr[i]);
+    }
+    verifyAscendingSpanlong(root.arr,i,rootSize+100,100);
+  }
+  @ParameterizedTest
+  //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testCheckedSubListListItradd_short_happyPathInsertEnd(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+  //ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.CheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.CheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.CheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    var seqItr=seq.listIterator();
+    for(int i=0;i<100;++i)
+    {
+      seqItr.add(TypeConversionUtil.convertToshort(i));
+      assertIteratorStateIntegrity(seqItr,preAllocSpan+i+1,-1,i+1,parent,root);
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,rootSize+100,-preAllocSpan);
+  }
+  @ParameterizedTest
+  //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testCheckedSubListListItradd_short_happyPathInsertMidPoint(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+  //ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.CheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.CheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.CheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    var seqItr=seq.listIterator();
+    for(int i=0;i<100;++i)
+    {
+      seqItr.add(TypeConversionUtil.convertToshort(i));
+      assertIteratorStateIntegrity(seqItr,((rootSize+i)/2)+1,-1,i+1,parent,root);
+      if((i&1)==0)
+      {
+        seqItr.previousLong();
+      }
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=1,bound=i+50;i<bound;++i,val+=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+    for(int val=98,bound=i+50;i<bound;++i,val-=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+    verifyAscendingSpanlong(root.arr,i,rootSize+100,i);
+  }
+  //IF CHECKED==Checked
+  @ParameterizedTest
+    //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testCheckedSubListListItradd_short_throwCME(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+    //ENDIF
+    {
+      //try on an empty sublist
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      var itr=seq.listIterator();
+      //illegally modify the root
+      root.add(preAllocSpan,TypeConversionUtil.convertToshort(0));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->itr.add(TypeConversionUtil.convertToshort(0)));
+      assertIteratorStateIntegrity(itr,preAllocSpan,-1,0,parent,root);
+      assertStructuralIntegrity(seq,0,0,parent,parentSize,0,root,rootSize+1,1);
+      verifyAscendingSpanlong(root.arr,0,preAllocSpan+1,-preAllocSpan);
+      verifyAscendingSpanlong(root.arr,preAllocSpan+1,rootSize+1,100);
+    }
+    {
+      //try on an empty sublist
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      var itr=seq.listIterator();
+      //illegally modify the parent
+      parent.add(parentPreAlloc,TypeConversionUtil.convertToshort(0));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->itr.add(TypeConversionUtil.convertToshort(0)));
+      assertIteratorStateIntegrity(itr,preAllocSpan,-1,0,parent,root);
+      assertStructuralIntegrity(seq,0,0,parent,parentSize+1,1,root,rootSize+1,1);
+      verifyAscendingSpanlong(root.arr,0,preAllocSpan+1,-preAllocSpan);
+      verifyAscendingSpanlong(root.arr,preAllocSpan+1,rootSize+1,100);
+    }
+    {
+      //try on an empty sublist
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      var itr=seq.listIterator();
+      //illegally modify the sequence
+      seq.add(0,TypeConversionUtil.convertToshort(0));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->itr.add(TypeConversionUtil.convertToshort(0)));
+      assertIteratorStateIntegrity(itr,preAllocSpan,-1,0,parent,root);
+      assertStructuralIntegrity(seq,1,1,parent,parentSize+1,1,root,rootSize+1,1);
+      verifyAscendingSpanlong(root.arr,0,preAllocSpan+1,-preAllocSpan);
+      verifyAscendingSpanlong(root.arr,preAllocSpan+1,rootSize+1,100);
+    }
+    {
+      //try on an non-empty sublist, inserting at the end
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      var itr=seq.listIterator();
+      for(int i=0;i<100;++i)
+      {
+        itr.add(TypeConversionUtil.convertToshort(i));
+      }
+      //illegally modify the root
+      root.add(TypeConversionUtil.convertToshort(rootSize+100));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->itr.add(TypeConversionUtil.convertToshort(0)));
+      assertIteratorStateIntegrity(itr,preAllocSpan+100,-1,100,parent,root);
+      assertStructuralIntegrity(seq,100,100,parent,parentSize+100,100,root,rootSize+101,101);
+      verifyAscendingSpanlong(root.arr,0,rootSize+101,-preAllocSpan);
+    }
+    {
+      //try on an non-empty sublist, inserting at the end
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      var itr=seq.listIterator();
+      for(int i=0;i<100;++i)
+      {
+        itr.add(TypeConversionUtil.convertToshort(i));
+      }
+      //illegally modify the parent
+      parent.add(parentPreAlloc+50,TypeConversionUtil.convertToshort(50));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->itr.add(TypeConversionUtil.convertToshort(0)));
+      assertIteratorStateIntegrity(itr,preAllocSpan+100,-1,100,parent,root);
+      assertStructuralIntegrity(seq,100,100,parent,parentSize+101,101,root,rootSize+101,101);
+      verifyAscendingSpanlong(root.arr,0,preAllocSpan+51,-preAllocSpan);
+      verifyAscendingSpanlong(root.arr,preAllocSpan+51,rootSize+101,50);
+    }
+    {
+      //try on an non-empty sublist, inserting at the end
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      var itr=seq.listIterator();
+      for(int i=0;i<100;++i)
+      {
+        itr.add(TypeConversionUtil.convertToshort(i));
+      }
+      //illegally modify the seq
+      seq.add(50,TypeConversionUtil.convertToshort(50));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->itr.add(TypeConversionUtil.convertToshort(0)));
+      assertIteratorStateIntegrity(itr,preAllocSpan+100,-1,100,parent,root);
+      assertStructuralIntegrity(seq,101,101,parent,parentSize+101,101,root,rootSize+101,101);
+      verifyAscendingSpanlong(root.arr,0,preAllocSpan+51,-preAllocSpan);
+      verifyAscendingSpanlong(root.arr,preAllocSpan+51,rootSize+101,50);
+    }
+  }
+  //ENDIF
+  @ParameterizedTest
+  //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testCheckedSubListadd_int_short_happyPathInsertBegin(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+  //ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.CheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.CheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.CheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      seq.add(0,TypeConversionUtil.convertToshort(i));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=100,bound=i+100;i<bound;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(--val),root.arr[i]);
+    }
+    verifyAscendingSpanlong(root.arr,i,rootSize+100,100);
+  }
+  @ParameterizedTest
+  //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testCheckedSubListadd_int_short_happyPathInsertEnd(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+  //ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.CheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.CheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.CheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size(),TypeConversionUtil.convertToshort(i));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,rootSize+100,-preAllocSpan);
+  }
+  @ParameterizedTest
+  //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testCheckedSubListadd_int_short_happyPathInsertMidPoint(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+  //ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.CheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.CheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.CheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size()/2,TypeConversionUtil.convertToshort(i));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=1,bound=i+50;i<bound;++i,val+=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+    for(int val=98,bound=i+50;i<bound;++i,val-=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+    verifyAscendingSpanlong(root.arr,i,rootSize+100,i);
+  }
+  //IF CHECKED==Checked
+  @ParameterizedTest
+    //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testCheckedSubListadd_int_short_throwIOBE(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+    //ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.CheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.CheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.CheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      //too low
+      Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(-1,TypeConversionUtil.convertToshort(0)));
+      //too hi
+      final int finalIndex=i;
+      Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(finalIndex+1,TypeConversionUtil.convertToshort(0)));
+      seq.add(TypeConversionUtil.convertToshort(i));
+    }
+    //when the method throws, verify that no changes occurred
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,rootSize+100,-preAllocSpan);
+  }
+    //IF STRUCT==SubList
+  @ParameterizedTest
+  @MethodSource("getSubListConstructionArgs")
+  public void testCheckedSubListadd_short_throwCME(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+    {
+      //try on an empty sublist
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      //illegally modify the root
+      root.add(preAllocSpan,TypeConversionUtil.convertToshort(0));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(TypeConversionUtil.convertToshort(0)));
+      //attempt the same tests on the parent
+      Assertions.assertThrows(ConcurrentModificationException.class,()->parent.add(TypeConversionUtil.convertToshort(0)));
+      assertStructuralIntegrity(seq,0,0,parent,parentSize,0,root,rootSize+1,1);
+      verifyAscendingSpanlong(root.arr,0,preAllocSpan+1,-preAllocSpan);
+      verifyAscendingSpanlong(root.arr,preAllocSpan+1,rootSize+1,100);
+    }
+    {
+      //try on an empty sublist
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      //illegally modify the parent
+      parent.add(parentPreAlloc,TypeConversionUtil.convertToshort(0));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(TypeConversionUtil.convertToshort(0)));
+      assertStructuralIntegrity(seq,0,0,parent,parentSize+1,1,root,rootSize+1,1);
+      verifyAscendingSpanlong(root.arr,0,preAllocSpan+1,-preAllocSpan);
+      verifyAscendingSpanlong(root.arr,preAllocSpan+1,rootSize+1,100);
+    }
+    {
+      //try on an non-empty sublist
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      for(int i=0;i<100;++i)
+      {
+        seq.add(TypeConversionUtil.convertToshort(i));
+      }
+      //illegally modify the root
+      root.add(TypeConversionUtil.convertToshort(rootSize+100));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(TypeConversionUtil.convertToshort(0)));
+      //attempt the same tests on the parent
+      Assertions.assertThrows(ConcurrentModificationException.class,()->parent.add(TypeConversionUtil.convertToshort(0)));
+      assertStructuralIntegrity(seq,100,100,parent,parentSize+100,100,root,rootSize+101,101);
+      verifyAscendingSpanlong(root.arr,0,rootSize+101,-preAllocSpan);
+    }
+    {
+      //try on an non-empty sublist
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      for(int i=0;i<100;++i)
+      {
+        seq.add(TypeConversionUtil.convertToshort(i));
+      }
+      //illegally modify the parent
+      parent.add(parentPreAlloc+50,TypeConversionUtil.convertToshort(50));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(TypeConversionUtil.convertToshort(0)));
+      assertStructuralIntegrity(seq,100,100,parent,parentSize+101,101,root,rootSize+101,101);
+      verifyAscendingSpanlong(root.arr,0,preAllocSpan+51,-preAllocSpan);
+      verifyAscendingSpanlong(root.arr,preAllocSpan+51,rootSize+101,50);
+    }
+  }
+  @ParameterizedTest
+  @MethodSource("getSubListConstructionArgs")
+  public void testCheckedSubListadd_int_short_throwCME(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+    {
+      //try on an empty sublist
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      //illegally modify the root
+      root.add(preAllocSpan,TypeConversionUtil.convertToshort(0));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(0,TypeConversionUtil.convertToshort(0)));
+      //an insertion out of bounds should also throw a CME
+      //too low
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(-1,TypeConversionUtil.convertToshort(0)));
+      //too hi
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(1,TypeConversionUtil.convertToshort(0)));
+      //attempt the same tests on the parent
+      Assertions.assertThrows(ConcurrentModificationException.class,()->parent.add(0,TypeConversionUtil.convertToshort(0)));
+      Assertions.assertThrows(ConcurrentModificationException.class,()->parent.add(-1,TypeConversionUtil.convertToshort(0)));
+      Assertions.assertThrows(ConcurrentModificationException.class,()->parent.add(parentSize+1,TypeConversionUtil.convertToshort(0)));
+      assertStructuralIntegrity(seq,0,0,parent,parentSize,0,root,rootSize+1,1);
+      verifyAscendingSpanlong(root.arr,0,preAllocSpan+1,-preAllocSpan);
+      verifyAscendingSpanlong(root.arr,preAllocSpan+1,rootSize+1,100);
+    }
+    {
+      //try on an empty sublist
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      //illegally modify the parent
+      parent.add(parentPreAlloc,TypeConversionUtil.convertToshort(0));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(0,TypeConversionUtil.convertToshort(0)));
+      //an insertion out of bounds should also throw a CME
+      //too low
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(-1,TypeConversionUtil.convertToshort(0)));
+      //too hi
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(1,TypeConversionUtil.convertToshort(0)));
+      assertStructuralIntegrity(seq,0,0,parent,parentSize+1,1,root,rootSize+1,1);
+      verifyAscendingSpanlong(root.arr,0,preAllocSpan+1,-preAllocSpan);
+      verifyAscendingSpanlong(root.arr,preAllocSpan+1,rootSize+1,100);
+    }
+    {
+      //try on an non-empty sublist
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      for(int i=0;i<100;++i)
+      {
+        seq.add(TypeConversionUtil.convertToshort(i));
+      }
+      //illegally modify the root
+      root.add(TypeConversionUtil.convertToshort(rootSize+100));
+      //attempt an insertion at the beginning
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(0,TypeConversionUtil.convertToshort(0)));
+      //attempt an insertion at the midpoint
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(50,TypeConversionUtil.convertToshort(0)));
+      //attempt an insertion at the end
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(100,TypeConversionUtil.convertToshort(0)));
+      //an insertion out of bounds should also throw a CME
+      //too low
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(-1,TypeConversionUtil.convertToshort(0)));
+      //too hi
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(101,TypeConversionUtil.convertToshort(0)));
+      //attempt the same tests on the parent
+      Assertions.assertThrows(ConcurrentModificationException.class,()->parent.add(0,TypeConversionUtil.convertToshort(0)));
+      Assertions.assertThrows(ConcurrentModificationException.class,()->parent.add(parentPreAlloc+50,TypeConversionUtil.convertToshort(0)));
+      Assertions.assertThrows(ConcurrentModificationException.class,()->parent.add(parentSize+100,TypeConversionUtil.convertToshort(0)));
+      Assertions.assertThrows(ConcurrentModificationException.class,()->parent.add(-1,TypeConversionUtil.convertToshort(0)));
+      Assertions.assertThrows(ConcurrentModificationException.class,()->parent.add(parentSize+101,TypeConversionUtil.convertToshort(0)));
+      assertStructuralIntegrity(seq,100,100,parent,parentSize+100,100,root,rootSize+101,101);
+      verifyAscendingSpanlong(root.arr,0,rootSize+101,-preAllocSpan);
+    }
+    {
+      //try on an non-empty sublist
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      for(int i=0;i<100;++i)
+      {
+        seq.add(TypeConversionUtil.convertToshort(i));
+      }
+      //illegally modify the parent
+      parent.add(parentPreAlloc+50,TypeConversionUtil.convertToshort(50));
+      //attempt an insertion at the beginning
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(0,TypeConversionUtil.convertToshort(0)));
+      //attempt an insertion at the midpoint
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(50,TypeConversionUtil.convertToshort(0)));
+      //attempt an insertion at the end
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(100,TypeConversionUtil.convertToshort(0)));
+      //an insertion out of bounds should also throw a CME
+      //too low
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(-1,TypeConversionUtil.convertToshort(0)));
+      //too hi
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(101,TypeConversionUtil.convertToshort(0)));
+      assertStructuralIntegrity(seq,100,100,parent,parentSize+101,101,root,rootSize+101,101);
+      verifyAscendingSpanlong(root.arr,0,preAllocSpan+51,-preAllocSpan);
+      verifyAscendingSpanlong(root.arr,preAllocSpan+51,rootSize+101,50);
+    }
+  }
+    //ENDIF
+  //ENDIF
+//ENDIF
+  @ParameterizedTest
+//IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testCheckedSubListadd_short_happyPath(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+//ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.CheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.CheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.CheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToshort(i)));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    for(int i=0,val=-preAllocSpan;i<100;++i,++val)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+  }
+//IF STRUCT==List,SubList
+  @ParameterizedTest
+  //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testCheckedSubListListItradd_Short_happyPathInsertBegin(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+  //ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.CheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.CheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.CheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    var seqItr=seq.listIterator();
+    for(int i=0;i<100;++i)
+    {
+      seqItr.add(TypeConversionUtil.convertToShort(i));
+      assertIteratorStateIntegrity(seqItr,preAllocSpan+1,-1,i+1,parent,root);
+      seqItr.previousLong();
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=100,bound=i+100;i<bound;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(--val),root.arr[i]);
+    }
+    verifyAscendingSpanlong(root.arr,i,rootSize+100,100);
+  }
+  @ParameterizedTest
+  //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testCheckedSubListListItradd_Short_happyPathInsertEnd(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+  //ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.CheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.CheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.CheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    var seqItr=seq.listIterator();
+    for(int i=0;i<100;++i)
+    {
+      seqItr.add(TypeConversionUtil.convertToShort(i));
+      assertIteratorStateIntegrity(seqItr,preAllocSpan+i+1,-1,i+1,parent,root);
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,rootSize+100,-preAllocSpan);
+  }
+  @ParameterizedTest
+  //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testCheckedSubListListItradd_Short_happyPathInsertMidPoint(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+  //ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.CheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.CheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.CheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    var seqItr=seq.listIterator();
+    for(int i=0;i<100;++i)
+    {
+      seqItr.add(TypeConversionUtil.convertToShort(i));
+      assertIteratorStateIntegrity(seqItr,((rootSize+i)/2)+1,-1,i+1,parent,root);
+      if((i&1)==0)
+      {
+        seqItr.previousLong();
+      }
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=1,bound=i+50;i<bound;++i,val+=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+    for(int val=98,bound=i+50;i<bound;++i,val-=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+    verifyAscendingSpanlong(root.arr,i,rootSize+100,i);
+  }
+  //IF CHECKED==Checked
+  @ParameterizedTest
+    //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testCheckedSubListListItradd_Short_throwCME(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+    //ENDIF
+    {
+      //try on an empty sublist
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      var itr=seq.listIterator();
+      //illegally modify the root
+      root.add(preAllocSpan,TypeConversionUtil.convertToShort(0));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->itr.add(TypeConversionUtil.convertToShort(0)));
+      assertIteratorStateIntegrity(itr,preAllocSpan,-1,0,parent,root);
+      assertStructuralIntegrity(seq,0,0,parent,parentSize,0,root,rootSize+1,1);
+      verifyAscendingSpanlong(root.arr,0,preAllocSpan+1,-preAllocSpan);
+      verifyAscendingSpanlong(root.arr,preAllocSpan+1,rootSize+1,100);
+    }
+    {
+      //try on an empty sublist
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      var itr=seq.listIterator();
+      //illegally modify the parent
+      parent.add(parentPreAlloc,TypeConversionUtil.convertToShort(0));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->itr.add(TypeConversionUtil.convertToShort(0)));
+      assertIteratorStateIntegrity(itr,preAllocSpan,-1,0,parent,root);
+      assertStructuralIntegrity(seq,0,0,parent,parentSize+1,1,root,rootSize+1,1);
+      verifyAscendingSpanlong(root.arr,0,preAllocSpan+1,-preAllocSpan);
+      verifyAscendingSpanlong(root.arr,preAllocSpan+1,rootSize+1,100);
+    }
+    {
+      //try on an empty sublist
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      var itr=seq.listIterator();
+      //illegally modify the sequence
+      seq.add(0,TypeConversionUtil.convertToShort(0));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->itr.add(TypeConversionUtil.convertToShort(0)));
+      assertIteratorStateIntegrity(itr,preAllocSpan,-1,0,parent,root);
+      assertStructuralIntegrity(seq,1,1,parent,parentSize+1,1,root,rootSize+1,1);
+      verifyAscendingSpanlong(root.arr,0,preAllocSpan+1,-preAllocSpan);
+      verifyAscendingSpanlong(root.arr,preAllocSpan+1,rootSize+1,100);
+    }
+    {
+      //try on an non-empty sublist, inserting at the end
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      var itr=seq.listIterator();
+      for(int i=0;i<100;++i)
+      {
+        itr.add(TypeConversionUtil.convertToShort(i));
+      }
+      //illegally modify the root
+      root.add(TypeConversionUtil.convertToShort(rootSize+100));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->itr.add(TypeConversionUtil.convertToShort(0)));
+      assertIteratorStateIntegrity(itr,preAllocSpan+100,-1,100,parent,root);
+      assertStructuralIntegrity(seq,100,100,parent,parentSize+100,100,root,rootSize+101,101);
+      verifyAscendingSpanlong(root.arr,0,rootSize+101,-preAllocSpan);
+    }
+    {
+      //try on an non-empty sublist, inserting at the end
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      var itr=seq.listIterator();
+      for(int i=0;i<100;++i)
+      {
+        itr.add(TypeConversionUtil.convertToShort(i));
+      }
+      //illegally modify the parent
+      parent.add(parentPreAlloc+50,TypeConversionUtil.convertToShort(50));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->itr.add(TypeConversionUtil.convertToShort(0)));
+      assertIteratorStateIntegrity(itr,preAllocSpan+100,-1,100,parent,root);
+      assertStructuralIntegrity(seq,100,100,parent,parentSize+101,101,root,rootSize+101,101);
+      verifyAscendingSpanlong(root.arr,0,preAllocSpan+51,-preAllocSpan);
+      verifyAscendingSpanlong(root.arr,preAllocSpan+51,rootSize+101,50);
+    }
+    {
+      //try on an non-empty sublist, inserting at the end
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      var itr=seq.listIterator();
+      for(int i=0;i<100;++i)
+      {
+        itr.add(TypeConversionUtil.convertToShort(i));
+      }
+      //illegally modify the seq
+      seq.add(50,TypeConversionUtil.convertToShort(50));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->itr.add(TypeConversionUtil.convertToShort(0)));
+      assertIteratorStateIntegrity(itr,preAllocSpan+100,-1,100,parent,root);
+      assertStructuralIntegrity(seq,101,101,parent,parentSize+101,101,root,rootSize+101,101);
+      verifyAscendingSpanlong(root.arr,0,preAllocSpan+51,-preAllocSpan);
+      verifyAscendingSpanlong(root.arr,preAllocSpan+51,rootSize+101,50);
+    }
+  }
+  //ENDIF
+  @ParameterizedTest
+  //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testCheckedSubListadd_int_Short_happyPathInsertBegin(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+  //ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.CheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.CheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.CheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      seq.add(0,TypeConversionUtil.convertToShort(i));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=100,bound=i+100;i<bound;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(--val),root.arr[i]);
+    }
+    verifyAscendingSpanlong(root.arr,i,rootSize+100,100);
+  }
+  @ParameterizedTest
+  //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testCheckedSubListadd_int_Short_happyPathInsertEnd(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+  //ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.CheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.CheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.CheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size(),TypeConversionUtil.convertToShort(i));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,rootSize+100,-preAllocSpan);
+  }
+  @ParameterizedTest
+  //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testCheckedSubListadd_int_Short_happyPathInsertMidPoint(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+  //ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.CheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.CheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.CheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size()/2,TypeConversionUtil.convertToShort(i));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=1,bound=i+50;i<bound;++i,val+=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+    for(int val=98,bound=i+50;i<bound;++i,val-=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+    verifyAscendingSpanlong(root.arr,i,rootSize+100,i);
+  }
+  //IF CHECKED==Checked
+  @ParameterizedTest
+    //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testCheckedSubListadd_int_Short_throwIOBE(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+    //ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.CheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.CheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.CheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      //too low
+      Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(-1,TypeConversionUtil.convertToShort(0)));
+      //too hi
+      final int finalIndex=i;
+      Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(finalIndex+1,TypeConversionUtil.convertToShort(0)));
+      seq.add(TypeConversionUtil.convertToShort(i));
+    }
+    //when the method throws, verify that no changes occurred
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,rootSize+100,-preAllocSpan);
+  }
+    //IF STRUCT==SubList
+  @ParameterizedTest
+  @MethodSource("getSubListConstructionArgs")
+  public void testCheckedSubListadd_Short_throwCME(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+    {
+      //try on an empty sublist
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      //illegally modify the root
+      root.add(preAllocSpan,TypeConversionUtil.convertToShort(0));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(TypeConversionUtil.convertToShort(0)));
+      //attempt the same tests on the parent
+      Assertions.assertThrows(ConcurrentModificationException.class,()->parent.add(TypeConversionUtil.convertToShort(0)));
+      assertStructuralIntegrity(seq,0,0,parent,parentSize,0,root,rootSize+1,1);
+      verifyAscendingSpanlong(root.arr,0,preAllocSpan+1,-preAllocSpan);
+      verifyAscendingSpanlong(root.arr,preAllocSpan+1,rootSize+1,100);
+    }
+    {
+      //try on an empty sublist
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      //illegally modify the parent
+      parent.add(parentPreAlloc,TypeConversionUtil.convertToShort(0));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(TypeConversionUtil.convertToShort(0)));
+      assertStructuralIntegrity(seq,0,0,parent,parentSize+1,1,root,rootSize+1,1);
+      verifyAscendingSpanlong(root.arr,0,preAllocSpan+1,-preAllocSpan);
+      verifyAscendingSpanlong(root.arr,preAllocSpan+1,rootSize+1,100);
+    }
+    {
+      //try on an non-empty sublist
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      for(int i=0;i<100;++i)
+      {
+        seq.add(TypeConversionUtil.convertToShort(i));
+      }
+      //illegally modify the root
+      root.add(TypeConversionUtil.convertToShort(rootSize+100));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(TypeConversionUtil.convertToShort(0)));
+      //attempt the same tests on the parent
+      Assertions.assertThrows(ConcurrentModificationException.class,()->parent.add(TypeConversionUtil.convertToShort(0)));
+      assertStructuralIntegrity(seq,100,100,parent,parentSize+100,100,root,rootSize+101,101);
+      verifyAscendingSpanlong(root.arr,0,rootSize+101,-preAllocSpan);
+    }
+    {
+      //try on an non-empty sublist
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      for(int i=0;i<100;++i)
+      {
+        seq.add(TypeConversionUtil.convertToShort(i));
+      }
+      //illegally modify the parent
+      parent.add(parentPreAlloc+50,TypeConversionUtil.convertToShort(50));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(TypeConversionUtil.convertToShort(0)));
+      assertStructuralIntegrity(seq,100,100,parent,parentSize+101,101,root,rootSize+101,101);
+      verifyAscendingSpanlong(root.arr,0,preAllocSpan+51,-preAllocSpan);
+      verifyAscendingSpanlong(root.arr,preAllocSpan+51,rootSize+101,50);
+    }
+  }
+  @ParameterizedTest
+  @MethodSource("getSubListConstructionArgs")
+  public void testCheckedSubListadd_int_Short_throwCME(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+    {
+      //try on an empty sublist
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      //illegally modify the root
+      root.add(preAllocSpan,TypeConversionUtil.convertToShort(0));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(0,TypeConversionUtil.convertToShort(0)));
+      //an insertion out of bounds should also throw a CME
+      //too low
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(-1,TypeConversionUtil.convertToShort(0)));
+      //too hi
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(1,TypeConversionUtil.convertToShort(0)));
+      //attempt the same tests on the parent
+      Assertions.assertThrows(ConcurrentModificationException.class,()->parent.add(0,TypeConversionUtil.convertToShort(0)));
+      Assertions.assertThrows(ConcurrentModificationException.class,()->parent.add(-1,TypeConversionUtil.convertToShort(0)));
+      Assertions.assertThrows(ConcurrentModificationException.class,()->parent.add(parentSize+1,TypeConversionUtil.convertToShort(0)));
+      assertStructuralIntegrity(seq,0,0,parent,parentSize,0,root,rootSize+1,1);
+      verifyAscendingSpanlong(root.arr,0,preAllocSpan+1,-preAllocSpan);
+      verifyAscendingSpanlong(root.arr,preAllocSpan+1,rootSize+1,100);
+    }
+    {
+      //try on an empty sublist
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      //illegally modify the parent
+      parent.add(parentPreAlloc,TypeConversionUtil.convertToShort(0));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(0,TypeConversionUtil.convertToShort(0)));
+      //an insertion out of bounds should also throw a CME
+      //too low
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(-1,TypeConversionUtil.convertToShort(0)));
+      //too hi
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(1,TypeConversionUtil.convertToShort(0)));
+      assertStructuralIntegrity(seq,0,0,parent,parentSize+1,1,root,rootSize+1,1);
+      verifyAscendingSpanlong(root.arr,0,preAllocSpan+1,-preAllocSpan);
+      verifyAscendingSpanlong(root.arr,preAllocSpan+1,rootSize+1,100);
+    }
+    {
+      //try on an non-empty sublist
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      for(int i=0;i<100;++i)
+      {
+        seq.add(TypeConversionUtil.convertToShort(i));
+      }
+      //illegally modify the root
+      root.add(TypeConversionUtil.convertToShort(rootSize+100));
+      //attempt an insertion at the beginning
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(0,TypeConversionUtil.convertToShort(0)));
+      //attempt an insertion at the midpoint
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(50,TypeConversionUtil.convertToShort(0)));
+      //attempt an insertion at the end
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(100,TypeConversionUtil.convertToShort(0)));
+      //an insertion out of bounds should also throw a CME
+      //too low
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(-1,TypeConversionUtil.convertToShort(0)));
+      //too hi
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(101,TypeConversionUtil.convertToShort(0)));
+      //attempt the same tests on the parent
+      Assertions.assertThrows(ConcurrentModificationException.class,()->parent.add(0,TypeConversionUtil.convertToShort(0)));
+      Assertions.assertThrows(ConcurrentModificationException.class,()->parent.add(parentPreAlloc+50,TypeConversionUtil.convertToShort(0)));
+      Assertions.assertThrows(ConcurrentModificationException.class,()->parent.add(parentSize+100,TypeConversionUtil.convertToShort(0)));
+      Assertions.assertThrows(ConcurrentModificationException.class,()->parent.add(-1,TypeConversionUtil.convertToShort(0)));
+      Assertions.assertThrows(ConcurrentModificationException.class,()->parent.add(parentSize+101,TypeConversionUtil.convertToShort(0)));
+      assertStructuralIntegrity(seq,100,100,parent,parentSize+100,100,root,rootSize+101,101);
+      verifyAscendingSpanlong(root.arr,0,rootSize+101,-preAllocSpan);
+    }
+    {
+      //try on an non-empty sublist
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      for(int i=0;i<100;++i)
+      {
+        seq.add(TypeConversionUtil.convertToShort(i));
+      }
+      //illegally modify the parent
+      parent.add(parentPreAlloc+50,TypeConversionUtil.convertToShort(50));
+      //attempt an insertion at the beginning
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(0,TypeConversionUtil.convertToShort(0)));
+      //attempt an insertion at the midpoint
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(50,TypeConversionUtil.convertToShort(0)));
+      //attempt an insertion at the end
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(100,TypeConversionUtil.convertToShort(0)));
+      //an insertion out of bounds should also throw a CME
+      //too low
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(-1,TypeConversionUtil.convertToShort(0)));
+      //too hi
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(101,TypeConversionUtil.convertToShort(0)));
+      assertStructuralIntegrity(seq,100,100,parent,parentSize+101,101,root,rootSize+101,101);
+      verifyAscendingSpanlong(root.arr,0,preAllocSpan+51,-preAllocSpan);
+      verifyAscendingSpanlong(root.arr,preAllocSpan+51,rootSize+101,50);
+    }
+  }
+    //ENDIF
+  //ENDIF
+//ENDIF
+  @ParameterizedTest
+//IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testCheckedSubListadd_Short_happyPath(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+//ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.CheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.CheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.CheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToShort(i)));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    for(int i=0,val=-preAllocSpan;i<100;++i,++val)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+  }
+        //IF OfInt
+//IF STRUCT==List,SubList
+  @ParameterizedTest
+  //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testCheckedSubListListItradd_int_happyPathInsertBegin(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+  //ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.CheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.CheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.CheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    var seqItr=seq.listIterator();
+    for(int i=0;i<100;++i)
+    {
+      seqItr.add(TypeConversionUtil.convertToint(i));
+      assertIteratorStateIntegrity(seqItr,preAllocSpan+1,-1,i+1,parent,root);
+      seqItr.previousLong();
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=100,bound=i+100;i<bound;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(--val),root.arr[i]);
+    }
+    verifyAscendingSpanlong(root.arr,i,rootSize+100,100);
+  }
+  @ParameterizedTest
+  //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testCheckedSubListListItradd_int_happyPathInsertEnd(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+  //ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.CheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.CheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.CheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    var seqItr=seq.listIterator();
+    for(int i=0;i<100;++i)
+    {
+      seqItr.add(TypeConversionUtil.convertToint(i));
+      assertIteratorStateIntegrity(seqItr,preAllocSpan+i+1,-1,i+1,parent,root);
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,rootSize+100,-preAllocSpan);
+  }
+  @ParameterizedTest
+  //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testCheckedSubListListItradd_int_happyPathInsertMidPoint(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+  //ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.CheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.CheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.CheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    var seqItr=seq.listIterator();
+    for(int i=0;i<100;++i)
+    {
+      seqItr.add(TypeConversionUtil.convertToint(i));
+      assertIteratorStateIntegrity(seqItr,((rootSize+i)/2)+1,-1,i+1,parent,root);
+      if((i&1)==0)
+      {
+        seqItr.previousLong();
+      }
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=1,bound=i+50;i<bound;++i,val+=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+    for(int val=98,bound=i+50;i<bound;++i,val-=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+    verifyAscendingSpanlong(root.arr,i,rootSize+100,i);
+  }
+  //IF CHECKED==Checked
+  @ParameterizedTest
+    //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testCheckedSubListListItradd_int_throwCME(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+    //ENDIF
+    {
+      //try on an empty sublist
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      var itr=seq.listIterator();
+      //illegally modify the root
+      root.add(preAllocSpan,TypeConversionUtil.convertToint(0));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->itr.add(TypeConversionUtil.convertToint(0)));
+      assertIteratorStateIntegrity(itr,preAllocSpan,-1,0,parent,root);
+      assertStructuralIntegrity(seq,0,0,parent,parentSize,0,root,rootSize+1,1);
+      verifyAscendingSpanlong(root.arr,0,preAllocSpan+1,-preAllocSpan);
+      verifyAscendingSpanlong(root.arr,preAllocSpan+1,rootSize+1,100);
+    }
+    {
+      //try on an empty sublist
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      var itr=seq.listIterator();
+      //illegally modify the parent
+      parent.add(parentPreAlloc,TypeConversionUtil.convertToint(0));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->itr.add(TypeConversionUtil.convertToint(0)));
+      assertIteratorStateIntegrity(itr,preAllocSpan,-1,0,parent,root);
+      assertStructuralIntegrity(seq,0,0,parent,parentSize+1,1,root,rootSize+1,1);
+      verifyAscendingSpanlong(root.arr,0,preAllocSpan+1,-preAllocSpan);
+      verifyAscendingSpanlong(root.arr,preAllocSpan+1,rootSize+1,100);
+    }
+    {
+      //try on an empty sublist
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      var itr=seq.listIterator();
+      //illegally modify the sequence
+      seq.add(0,TypeConversionUtil.convertToint(0));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->itr.add(TypeConversionUtil.convertToint(0)));
+      assertIteratorStateIntegrity(itr,preAllocSpan,-1,0,parent,root);
+      assertStructuralIntegrity(seq,1,1,parent,parentSize+1,1,root,rootSize+1,1);
+      verifyAscendingSpanlong(root.arr,0,preAllocSpan+1,-preAllocSpan);
+      verifyAscendingSpanlong(root.arr,preAllocSpan+1,rootSize+1,100);
+    }
+    {
+      //try on an non-empty sublist, inserting at the end
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      var itr=seq.listIterator();
+      for(int i=0;i<100;++i)
+      {
+        itr.add(TypeConversionUtil.convertToint(i));
+      }
+      //illegally modify the root
+      root.add(TypeConversionUtil.convertToint(rootSize+100));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->itr.add(TypeConversionUtil.convertToint(0)));
+      assertIteratorStateIntegrity(itr,preAllocSpan+100,-1,100,parent,root);
+      assertStructuralIntegrity(seq,100,100,parent,parentSize+100,100,root,rootSize+101,101);
+      verifyAscendingSpanlong(root.arr,0,rootSize+101,-preAllocSpan);
+    }
+    {
+      //try on an non-empty sublist, inserting at the end
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      var itr=seq.listIterator();
+      for(int i=0;i<100;++i)
+      {
+        itr.add(TypeConversionUtil.convertToint(i));
+      }
+      //illegally modify the parent
+      parent.add(parentPreAlloc+50,TypeConversionUtil.convertToint(50));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->itr.add(TypeConversionUtil.convertToint(0)));
+      assertIteratorStateIntegrity(itr,preAllocSpan+100,-1,100,parent,root);
+      assertStructuralIntegrity(seq,100,100,parent,parentSize+101,101,root,rootSize+101,101);
+      verifyAscendingSpanlong(root.arr,0,preAllocSpan+51,-preAllocSpan);
+      verifyAscendingSpanlong(root.arr,preAllocSpan+51,rootSize+101,50);
+    }
+    {
+      //try on an non-empty sublist, inserting at the end
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      var itr=seq.listIterator();
+      for(int i=0;i<100;++i)
+      {
+        itr.add(TypeConversionUtil.convertToint(i));
+      }
+      //illegally modify the seq
+      seq.add(50,TypeConversionUtil.convertToint(50));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->itr.add(TypeConversionUtil.convertToint(0)));
+      assertIteratorStateIntegrity(itr,preAllocSpan+100,-1,100,parent,root);
+      assertStructuralIntegrity(seq,101,101,parent,parentSize+101,101,root,rootSize+101,101);
+      verifyAscendingSpanlong(root.arr,0,preAllocSpan+51,-preAllocSpan);
+      verifyAscendingSpanlong(root.arr,preAllocSpan+51,rootSize+101,50);
+    }
+  }
+  //ENDIF
+  @ParameterizedTest
+  //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testCheckedSubListadd_int_int_happyPathInsertBegin(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+  //ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.CheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.CheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.CheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      seq.add(0,TypeConversionUtil.convertToint(i));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=100,bound=i+100;i<bound;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(--val),root.arr[i]);
+    }
+    verifyAscendingSpanlong(root.arr,i,rootSize+100,100);
+  }
+  @ParameterizedTest
+  //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testCheckedSubListadd_int_int_happyPathInsertEnd(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+  //ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.CheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.CheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.CheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size(),TypeConversionUtil.convertToint(i));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,rootSize+100,-preAllocSpan);
+  }
+  @ParameterizedTest
+  //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testCheckedSubListadd_int_int_happyPathInsertMidPoint(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+  //ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.CheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.CheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.CheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size()/2,TypeConversionUtil.convertToint(i));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=1,bound=i+50;i<bound;++i,val+=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+    for(int val=98,bound=i+50;i<bound;++i,val-=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+    verifyAscendingSpanlong(root.arr,i,rootSize+100,i);
+  }
+  //IF CHECKED==Checked
+  @ParameterizedTest
+    //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testCheckedSubListadd_int_int_throwIOBE(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+    //ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.CheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.CheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.CheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      //too low
+      Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(-1,TypeConversionUtil.convertToint(0)));
+      //too hi
+      final int finalIndex=i;
+      Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(finalIndex+1,TypeConversionUtil.convertToint(0)));
+      seq.add(TypeConversionUtil.convertToint(i));
+    }
+    //when the method throws, verify that no changes occurred
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,rootSize+100,-preAllocSpan);
+  }
+    //IF STRUCT==SubList
+  @ParameterizedTest
+  @MethodSource("getSubListConstructionArgs")
+  public void testCheckedSubListadd_int_throwCME(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+    {
+      //try on an empty sublist
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      //illegally modify the root
+      root.add(preAllocSpan,TypeConversionUtil.convertToint(0));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(TypeConversionUtil.convertToint(0)));
+      //attempt the same tests on the parent
+      Assertions.assertThrows(ConcurrentModificationException.class,()->parent.add(TypeConversionUtil.convertToint(0)));
+      assertStructuralIntegrity(seq,0,0,parent,parentSize,0,root,rootSize+1,1);
+      verifyAscendingSpanlong(root.arr,0,preAllocSpan+1,-preAllocSpan);
+      verifyAscendingSpanlong(root.arr,preAllocSpan+1,rootSize+1,100);
+    }
+    {
+      //try on an empty sublist
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      //illegally modify the parent
+      parent.add(parentPreAlloc,TypeConversionUtil.convertToint(0));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(TypeConversionUtil.convertToint(0)));
+      assertStructuralIntegrity(seq,0,0,parent,parentSize+1,1,root,rootSize+1,1);
+      verifyAscendingSpanlong(root.arr,0,preAllocSpan+1,-preAllocSpan);
+      verifyAscendingSpanlong(root.arr,preAllocSpan+1,rootSize+1,100);
+    }
+    {
+      //try on an non-empty sublist
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      for(int i=0;i<100;++i)
+      {
+        seq.add(TypeConversionUtil.convertToint(i));
+      }
+      //illegally modify the root
+      root.add(TypeConversionUtil.convertToint(rootSize+100));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(TypeConversionUtil.convertToint(0)));
+      //attempt the same tests on the parent
+      Assertions.assertThrows(ConcurrentModificationException.class,()->parent.add(TypeConversionUtil.convertToint(0)));
+      assertStructuralIntegrity(seq,100,100,parent,parentSize+100,100,root,rootSize+101,101);
+      verifyAscendingSpanlong(root.arr,0,rootSize+101,-preAllocSpan);
+    }
+    {
+      //try on an non-empty sublist
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      for(int i=0;i<100;++i)
+      {
+        seq.add(TypeConversionUtil.convertToint(i));
+      }
+      //illegally modify the parent
+      parent.add(parentPreAlloc+50,TypeConversionUtil.convertToint(50));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(TypeConversionUtil.convertToint(0)));
+      assertStructuralIntegrity(seq,100,100,parent,parentSize+101,101,root,rootSize+101,101);
+      verifyAscendingSpanlong(root.arr,0,preAllocSpan+51,-preAllocSpan);
+      verifyAscendingSpanlong(root.arr,preAllocSpan+51,rootSize+101,50);
+    }
+  }
+  @ParameterizedTest
+  @MethodSource("getSubListConstructionArgs")
+  public void testCheckedSubListadd_int_int_throwCME(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+    {
+      //try on an empty sublist
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      //illegally modify the root
+      root.add(preAllocSpan,TypeConversionUtil.convertToint(0));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(0,TypeConversionUtil.convertToint(0)));
+      //an insertion out of bounds should also throw a CME
+      //too low
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(-1,TypeConversionUtil.convertToint(0)));
+      //too hi
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(1,TypeConversionUtil.convertToint(0)));
+      //attempt the same tests on the parent
+      Assertions.assertThrows(ConcurrentModificationException.class,()->parent.add(0,TypeConversionUtil.convertToint(0)));
+      Assertions.assertThrows(ConcurrentModificationException.class,()->parent.add(-1,TypeConversionUtil.convertToint(0)));
+      Assertions.assertThrows(ConcurrentModificationException.class,()->parent.add(parentSize+1,TypeConversionUtil.convertToint(0)));
+      assertStructuralIntegrity(seq,0,0,parent,parentSize,0,root,rootSize+1,1);
+      verifyAscendingSpanlong(root.arr,0,preAllocSpan+1,-preAllocSpan);
+      verifyAscendingSpanlong(root.arr,preAllocSpan+1,rootSize+1,100);
+    }
+    {
+      //try on an empty sublist
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      //illegally modify the parent
+      parent.add(parentPreAlloc,TypeConversionUtil.convertToint(0));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(0,TypeConversionUtil.convertToint(0)));
+      //an insertion out of bounds should also throw a CME
+      //too low
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(-1,TypeConversionUtil.convertToint(0)));
+      //too hi
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(1,TypeConversionUtil.convertToint(0)));
+      assertStructuralIntegrity(seq,0,0,parent,parentSize+1,1,root,rootSize+1,1);
+      verifyAscendingSpanlong(root.arr,0,preAllocSpan+1,-preAllocSpan);
+      verifyAscendingSpanlong(root.arr,preAllocSpan+1,rootSize+1,100);
+    }
+    {
+      //try on an non-empty sublist
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      for(int i=0;i<100;++i)
+      {
+        seq.add(TypeConversionUtil.convertToint(i));
+      }
+      //illegally modify the root
+      root.add(TypeConversionUtil.convertToint(rootSize+100));
+      //attempt an insertion at the beginning
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(0,TypeConversionUtil.convertToint(0)));
+      //attempt an insertion at the midpoint
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(50,TypeConversionUtil.convertToint(0)));
+      //attempt an insertion at the end
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(100,TypeConversionUtil.convertToint(0)));
+      //an insertion out of bounds should also throw a CME
+      //too low
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(-1,TypeConversionUtil.convertToint(0)));
+      //too hi
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(101,TypeConversionUtil.convertToint(0)));
+      //attempt the same tests on the parent
+      Assertions.assertThrows(ConcurrentModificationException.class,()->parent.add(0,TypeConversionUtil.convertToint(0)));
+      Assertions.assertThrows(ConcurrentModificationException.class,()->parent.add(parentPreAlloc+50,TypeConversionUtil.convertToint(0)));
+      Assertions.assertThrows(ConcurrentModificationException.class,()->parent.add(parentSize+100,TypeConversionUtil.convertToint(0)));
+      Assertions.assertThrows(ConcurrentModificationException.class,()->parent.add(-1,TypeConversionUtil.convertToint(0)));
+      Assertions.assertThrows(ConcurrentModificationException.class,()->parent.add(parentSize+101,TypeConversionUtil.convertToint(0)));
+      assertStructuralIntegrity(seq,100,100,parent,parentSize+100,100,root,rootSize+101,101);
+      verifyAscendingSpanlong(root.arr,0,rootSize+101,-preAllocSpan);
+    }
+    {
+      //try on an non-empty sublist
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      for(int i=0;i<100;++i)
+      {
+        seq.add(TypeConversionUtil.convertToint(i));
+      }
+      //illegally modify the parent
+      parent.add(parentPreAlloc+50,TypeConversionUtil.convertToint(50));
+      //attempt an insertion at the beginning
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(0,TypeConversionUtil.convertToint(0)));
+      //attempt an insertion at the midpoint
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(50,TypeConversionUtil.convertToint(0)));
+      //attempt an insertion at the end
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(100,TypeConversionUtil.convertToint(0)));
+      //an insertion out of bounds should also throw a CME
+      //too low
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(-1,TypeConversionUtil.convertToint(0)));
+      //too hi
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(101,TypeConversionUtil.convertToint(0)));
+      assertStructuralIntegrity(seq,100,100,parent,parentSize+101,101,root,rootSize+101,101);
+      verifyAscendingSpanlong(root.arr,0,preAllocSpan+51,-preAllocSpan);
+      verifyAscendingSpanlong(root.arr,preAllocSpan+51,rootSize+101,50);
+    }
+  }
+    //ENDIF
+  //ENDIF
+//ENDIF
+  @ParameterizedTest
+//IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testCheckedSubListadd_int_happyPath(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+//ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.CheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.CheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.CheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToint(i)));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    for(int i=0,val=-preAllocSpan;i<100;++i,++val)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+  }
+//IF STRUCT==List,SubList
+  @ParameterizedTest
+  //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testCheckedSubListListItradd_Integer_happyPathInsertBegin(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+  //ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.CheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.CheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.CheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    var seqItr=seq.listIterator();
+    for(int i=0;i<100;++i)
+    {
+      seqItr.add(TypeConversionUtil.convertToInteger(i));
+      assertIteratorStateIntegrity(seqItr,preAllocSpan+1,-1,i+1,parent,root);
+      seqItr.previousLong();
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=100,bound=i+100;i<bound;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(--val),root.arr[i]);
+    }
+    verifyAscendingSpanlong(root.arr,i,rootSize+100,100);
+  }
+  @ParameterizedTest
+  //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testCheckedSubListListItradd_Integer_happyPathInsertEnd(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+  //ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.CheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.CheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.CheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    var seqItr=seq.listIterator();
+    for(int i=0;i<100;++i)
+    {
+      seqItr.add(TypeConversionUtil.convertToInteger(i));
+      assertIteratorStateIntegrity(seqItr,preAllocSpan+i+1,-1,i+1,parent,root);
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,rootSize+100,-preAllocSpan);
+  }
+  @ParameterizedTest
+  //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testCheckedSubListListItradd_Integer_happyPathInsertMidPoint(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+  //ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.CheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.CheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.CheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    var seqItr=seq.listIterator();
+    for(int i=0;i<100;++i)
+    {
+      seqItr.add(TypeConversionUtil.convertToInteger(i));
+      assertIteratorStateIntegrity(seqItr,((rootSize+i)/2)+1,-1,i+1,parent,root);
+      if((i&1)==0)
+      {
+        seqItr.previousLong();
+      }
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=1,bound=i+50;i<bound;++i,val+=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+    for(int val=98,bound=i+50;i<bound;++i,val-=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+    verifyAscendingSpanlong(root.arr,i,rootSize+100,i);
+  }
+  //IF CHECKED==Checked
+  @ParameterizedTest
+    //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testCheckedSubListListItradd_Integer_throwCME(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+    //ENDIF
+    {
+      //try on an empty sublist
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      var itr=seq.listIterator();
+      //illegally modify the root
+      root.add(preAllocSpan,TypeConversionUtil.convertToInteger(0));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->itr.add(TypeConversionUtil.convertToInteger(0)));
+      assertIteratorStateIntegrity(itr,preAllocSpan,-1,0,parent,root);
+      assertStructuralIntegrity(seq,0,0,parent,parentSize,0,root,rootSize+1,1);
+      verifyAscendingSpanlong(root.arr,0,preAllocSpan+1,-preAllocSpan);
+      verifyAscendingSpanlong(root.arr,preAllocSpan+1,rootSize+1,100);
+    }
+    {
+      //try on an empty sublist
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      var itr=seq.listIterator();
+      //illegally modify the parent
+      parent.add(parentPreAlloc,TypeConversionUtil.convertToInteger(0));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->itr.add(TypeConversionUtil.convertToInteger(0)));
+      assertIteratorStateIntegrity(itr,preAllocSpan,-1,0,parent,root);
+      assertStructuralIntegrity(seq,0,0,parent,parentSize+1,1,root,rootSize+1,1);
+      verifyAscendingSpanlong(root.arr,0,preAllocSpan+1,-preAllocSpan);
+      verifyAscendingSpanlong(root.arr,preAllocSpan+1,rootSize+1,100);
+    }
+    {
+      //try on an empty sublist
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      var itr=seq.listIterator();
+      //illegally modify the sequence
+      seq.add(0,TypeConversionUtil.convertToInteger(0));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->itr.add(TypeConversionUtil.convertToInteger(0)));
+      assertIteratorStateIntegrity(itr,preAllocSpan,-1,0,parent,root);
+      assertStructuralIntegrity(seq,1,1,parent,parentSize+1,1,root,rootSize+1,1);
+      verifyAscendingSpanlong(root.arr,0,preAllocSpan+1,-preAllocSpan);
+      verifyAscendingSpanlong(root.arr,preAllocSpan+1,rootSize+1,100);
+    }
+    {
+      //try on an non-empty sublist, inserting at the end
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      var itr=seq.listIterator();
+      for(int i=0;i<100;++i)
+      {
+        itr.add(TypeConversionUtil.convertToInteger(i));
+      }
+      //illegally modify the root
+      root.add(TypeConversionUtil.convertToInteger(rootSize+100));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->itr.add(TypeConversionUtil.convertToInteger(0)));
+      assertIteratorStateIntegrity(itr,preAllocSpan+100,-1,100,parent,root);
+      assertStructuralIntegrity(seq,100,100,parent,parentSize+100,100,root,rootSize+101,101);
+      verifyAscendingSpanlong(root.arr,0,rootSize+101,-preAllocSpan);
+    }
+    {
+      //try on an non-empty sublist, inserting at the end
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      var itr=seq.listIterator();
+      for(int i=0;i<100;++i)
+      {
+        itr.add(TypeConversionUtil.convertToInteger(i));
+      }
+      //illegally modify the parent
+      parent.add(parentPreAlloc+50,TypeConversionUtil.convertToInteger(50));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->itr.add(TypeConversionUtil.convertToInteger(0)));
+      assertIteratorStateIntegrity(itr,preAllocSpan+100,-1,100,parent,root);
+      assertStructuralIntegrity(seq,100,100,parent,parentSize+101,101,root,rootSize+101,101);
+      verifyAscendingSpanlong(root.arr,0,preAllocSpan+51,-preAllocSpan);
+      verifyAscendingSpanlong(root.arr,preAllocSpan+51,rootSize+101,50);
+    }
+    {
+      //try on an non-empty sublist, inserting at the end
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      var itr=seq.listIterator();
+      for(int i=0;i<100;++i)
+      {
+        itr.add(TypeConversionUtil.convertToInteger(i));
+      }
+      //illegally modify the seq
+      seq.add(50,TypeConversionUtil.convertToInteger(50));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->itr.add(TypeConversionUtil.convertToInteger(0)));
+      assertIteratorStateIntegrity(itr,preAllocSpan+100,-1,100,parent,root);
+      assertStructuralIntegrity(seq,101,101,parent,parentSize+101,101,root,rootSize+101,101);
+      verifyAscendingSpanlong(root.arr,0,preAllocSpan+51,-preAllocSpan);
+      verifyAscendingSpanlong(root.arr,preAllocSpan+51,rootSize+101,50);
+    }
+  }
+  //ENDIF
+  @ParameterizedTest
+  //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testCheckedSubListadd_int_Integer_happyPathInsertBegin(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+  //ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.CheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.CheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.CheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      seq.add(0,TypeConversionUtil.convertToInteger(i));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=100,bound=i+100;i<bound;++i)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(--val),root.arr[i]);
+    }
+    verifyAscendingSpanlong(root.arr,i,rootSize+100,100);
+  }
+  @ParameterizedTest
+  //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testCheckedSubListadd_int_Integer_happyPathInsertEnd(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+  //ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.CheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.CheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.CheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size(),TypeConversionUtil.convertToInteger(i));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,rootSize+100,-preAllocSpan);
+  }
+  @ParameterizedTest
+  //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testCheckedSubListadd_int_Integer_happyPathInsertMidPoint(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+  //ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.CheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.CheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.CheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      seq.add(seq.size()/2,TypeConversionUtil.convertToInteger(i));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,preAllocSpan,-preAllocSpan);
+    int i=preAllocSpan;
+    for(int val=1,bound=i+50;i<bound;++i,val+=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+    for(int val=98,bound=i+50;i<bound;++i,val-=2)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+    verifyAscendingSpanlong(root.arr,i,rootSize+100,i);
+  }
+  //IF CHECKED==Checked
+  @ParameterizedTest
+    //IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testCheckedSubListadd_int_Integer_throwIOBE(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+    //ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.CheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.CheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.CheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      //too low
+      Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(-1,TypeConversionUtil.convertToInteger(0)));
+      //too hi
+      final int finalIndex=i;
+      Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(finalIndex+1,TypeConversionUtil.convertToInteger(0)));
+      seq.add(TypeConversionUtil.convertToInteger(i));
+    }
+    //when the method throws, verify that no changes occurred
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    verifyAscendingSpanlong(root.arr,0,rootSize+100,-preAllocSpan);
+  }
+    //IF STRUCT==SubList
+  @ParameterizedTest
+  @MethodSource("getSubListConstructionArgs")
+  public void testCheckedSubListadd_Integer_throwCME(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+    {
+      //try on an empty sublist
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      //illegally modify the root
+      root.add(preAllocSpan,TypeConversionUtil.convertToInteger(0));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(TypeConversionUtil.convertToInteger(0)));
+      //attempt the same tests on the parent
+      Assertions.assertThrows(ConcurrentModificationException.class,()->parent.add(TypeConversionUtil.convertToInteger(0)));
+      assertStructuralIntegrity(seq,0,0,parent,parentSize,0,root,rootSize+1,1);
+      verifyAscendingSpanlong(root.arr,0,preAllocSpan+1,-preAllocSpan);
+      verifyAscendingSpanlong(root.arr,preAllocSpan+1,rootSize+1,100);
+    }
+    {
+      //try on an empty sublist
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      //illegally modify the parent
+      parent.add(parentPreAlloc,TypeConversionUtil.convertToInteger(0));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(TypeConversionUtil.convertToInteger(0)));
+      assertStructuralIntegrity(seq,0,0,parent,parentSize+1,1,root,rootSize+1,1);
+      verifyAscendingSpanlong(root.arr,0,preAllocSpan+1,-preAllocSpan);
+      verifyAscendingSpanlong(root.arr,preAllocSpan+1,rootSize+1,100);
+    }
+    {
+      //try on an non-empty sublist
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      for(int i=0;i<100;++i)
+      {
+        seq.add(TypeConversionUtil.convertToInteger(i));
+      }
+      //illegally modify the root
+      root.add(TypeConversionUtil.convertToInteger(rootSize+100));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(TypeConversionUtil.convertToInteger(0)));
+      //attempt the same tests on the parent
+      Assertions.assertThrows(ConcurrentModificationException.class,()->parent.add(TypeConversionUtil.convertToInteger(0)));
+      assertStructuralIntegrity(seq,100,100,parent,parentSize+100,100,root,rootSize+101,101);
+      verifyAscendingSpanlong(root.arr,0,rootSize+101,-preAllocSpan);
+    }
+    {
+      //try on an non-empty sublist
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      for(int i=0;i<100;++i)
+      {
+        seq.add(TypeConversionUtil.convertToInteger(i));
+      }
+      //illegally modify the parent
+      parent.add(parentPreAlloc+50,TypeConversionUtil.convertToInteger(50));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(TypeConversionUtil.convertToInteger(0)));
+      assertStructuralIntegrity(seq,100,100,parent,parentSize+101,101,root,rootSize+101,101);
+      verifyAscendingSpanlong(root.arr,0,preAllocSpan+51,-preAllocSpan);
+      verifyAscendingSpanlong(root.arr,preAllocSpan+51,rootSize+101,50);
+    }
+  }
+  @ParameterizedTest
+  @MethodSource("getSubListConstructionArgs")
+  public void testCheckedSubListadd_int_Integer_throwCME(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+    {
+      //try on an empty sublist
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      //illegally modify the root
+      root.add(preAllocSpan,TypeConversionUtil.convertToInteger(0));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(0,TypeConversionUtil.convertToInteger(0)));
+      //an insertion out of bounds should also throw a CME
+      //too low
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(-1,TypeConversionUtil.convertToInteger(0)));
+      //too hi
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(1,TypeConversionUtil.convertToInteger(0)));
+      //attempt the same tests on the parent
+      Assertions.assertThrows(ConcurrentModificationException.class,()->parent.add(0,TypeConversionUtil.convertToInteger(0)));
+      Assertions.assertThrows(ConcurrentModificationException.class,()->parent.add(-1,TypeConversionUtil.convertToInteger(0)));
+      Assertions.assertThrows(ConcurrentModificationException.class,()->parent.add(parentSize+1,TypeConversionUtil.convertToInteger(0)));
+      assertStructuralIntegrity(seq,0,0,parent,parentSize,0,root,rootSize+1,1);
+      verifyAscendingSpanlong(root.arr,0,preAllocSpan+1,-preAllocSpan);
+      verifyAscendingSpanlong(root.arr,preAllocSpan+1,rootSize+1,100);
+    }
+    {
+      //try on an empty sublist
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      //illegally modify the parent
+      parent.add(parentPreAlloc,TypeConversionUtil.convertToInteger(0));
+      //attempt an insertion
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(0,TypeConversionUtil.convertToInteger(0)));
+      //an insertion out of bounds should also throw a CME
+      //too low
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(-1,TypeConversionUtil.convertToInteger(0)));
+      //too hi
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(1,TypeConversionUtil.convertToInteger(0)));
+      assertStructuralIntegrity(seq,0,0,parent,parentSize+1,1,root,rootSize+1,1);
+      verifyAscendingSpanlong(root.arr,0,preAllocSpan+1,-preAllocSpan);
+      verifyAscendingSpanlong(root.arr,preAllocSpan+1,rootSize+1,100);
+    }
+    {
+      //try on an non-empty sublist
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      for(int i=0;i<100;++i)
+      {
+        seq.add(TypeConversionUtil.convertToInteger(i));
+      }
+      //illegally modify the root
+      root.add(TypeConversionUtil.convertToInteger(rootSize+100));
+      //attempt an insertion at the beginning
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(0,TypeConversionUtil.convertToInteger(0)));
+      //attempt an insertion at the midpoint
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(50,TypeConversionUtil.convertToInteger(0)));
+      //attempt an insertion at the end
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(100,TypeConversionUtil.convertToInteger(0)));
+      //an insertion out of bounds should also throw a CME
+      //too low
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(-1,TypeConversionUtil.convertToInteger(0)));
+      //too hi
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(101,TypeConversionUtil.convertToInteger(0)));
+      //attempt the same tests on the parent
+      Assertions.assertThrows(ConcurrentModificationException.class,()->parent.add(0,TypeConversionUtil.convertToInteger(0)));
+      Assertions.assertThrows(ConcurrentModificationException.class,()->parent.add(parentPreAlloc+50,TypeConversionUtil.convertToInteger(0)));
+      Assertions.assertThrows(ConcurrentModificationException.class,()->parent.add(parentSize+100,TypeConversionUtil.convertToInteger(0)));
+      Assertions.assertThrows(ConcurrentModificationException.class,()->parent.add(-1,TypeConversionUtil.convertToInteger(0)));
+      Assertions.assertThrows(ConcurrentModificationException.class,()->parent.add(parentSize+101,TypeConversionUtil.convertToInteger(0)));
+      assertStructuralIntegrity(seq,100,100,parent,parentSize+100,100,root,rootSize+101,101);
+      verifyAscendingSpanlong(root.arr,0,rootSize+101,-preAllocSpan);
+    }
+    {
+      //try on an non-empty sublist
+//IF STRUCT==SubList
+      int parentSize=parentPreAlloc+parentPostAlloc;
+      int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+      int preAllocSpan=rootPreAlloc+parentPreAlloc;
+      LongArrSeq.CheckedList root;
+      if(rootSize==0)
+      {
+        root=new LongArrSeq.CheckedList();
+      }
+      else
+      {
+        long[] arr=new long[rootSize];
+        initAscendingArray(arr,0,-preAllocSpan,0);
+        initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+        root=new LongArrSeq.CheckedList(rootSize,arr);
+      }
+      var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+      var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+      for(int i=0;i<100;++i)
+      {
+        seq.add(TypeConversionUtil.convertToInteger(i));
+      }
+      //illegally modify the parent
+      parent.add(parentPreAlloc+50,TypeConversionUtil.convertToInteger(50));
+      //attempt an insertion at the beginning
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(0,TypeConversionUtil.convertToInteger(0)));
+      //attempt an insertion at the midpoint
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(50,TypeConversionUtil.convertToInteger(0)));
+      //attempt an insertion at the end
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(100,TypeConversionUtil.convertToInteger(0)));
+      //an insertion out of bounds should also throw a CME
+      //too low
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(-1,TypeConversionUtil.convertToInteger(0)));
+      //too hi
+      Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(101,TypeConversionUtil.convertToInteger(0)));
+      assertStructuralIntegrity(seq,100,100,parent,parentSize+101,101,root,rootSize+101,101);
+      verifyAscendingSpanlong(root.arr,0,preAllocSpan+51,-preAllocSpan);
+      verifyAscendingSpanlong(root.arr,preAllocSpan+51,rootSize+101,50);
+    }
+  }
+    //ENDIF
+  //ENDIF
+//ENDIF
+  @ParameterizedTest
+//IF 
+  @MethodSource("getSubListConstructionArgs")
+  public void testCheckedSubListadd_Integer_happyPath(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+//ENDIF
+//IF STRUCT==SubList
+    int parentSize=parentPreAlloc+parentPostAlloc;
+    int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+    int preAllocSpan=rootPreAlloc+parentPreAlloc;
+    LongArrSeq.CheckedList root;
+    if(rootSize==0)
+    {
+      root=new LongArrSeq.CheckedList();
+    }
+    else
+    {
+      long[] arr=new long[rootSize];
+      initAscendingArray(arr,0,-preAllocSpan,0);
+      initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+      root=new LongArrSeq.CheckedList(rootSize,arr);
+    }
+    var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+    var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+//ENDIF
+    for(int i=0;i<100;++i)
+    {
+      Assertions.assertTrue(seq.add(TypeConversionUtil.convertToInteger(i)));
+    }
+    assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+    for(int i=0,val=-preAllocSpan;i<100;++i,++val)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertTolong(val),root.arr[i]);
+    }
+  }
+        //ENDIF
+      //ENDIF
+    //ENDIF
+  //ENDIF
+//ENDIF
+  private static final Arguments[] SUB_LIST_CONSTRUCTION_ARGS;
+  static
+  {
+    Arguments[] args=new Arguments[16];
+    int dstOffset=0;
+    for(int rootPreAlloc=0;rootPreAlloc<=5;rootPreAlloc+=5)
+    {
+      for(int rootPostAlloc=0;rootPostAlloc<=5;rootPostAlloc+=5)
+      {
+        for(int parentPreAlloc=0;parentPreAlloc<=5;parentPreAlloc+=5)
+        {
+          for(int parentPostAlloc=0;parentPostAlloc<=5;parentPostAlloc+=5,++dstOffset)
+          {
+            args[dstOffset]=Arguments.of(rootPreAlloc,rootPostAlloc,parentPreAlloc,parentPostAlloc);
+          }
+        }
+      }
+    }
+    SUB_LIST_CONSTRUCTION_ARGS=args;
+  }
+  private static Stream<Arguments> getSubListConstructionArgs()
+  {
+    return Stream.of(SUB_LIST_CONSTRUCTION_ARGS);
+  }
+  private static void initAscendingArray(long[] arr,int offset,int lo,int hi)
+  {
+    int bound=offset+(hi-lo);
+    for(int i=offset;i<bound;++i,++lo)
+    {
+      arr[i]=TypeConversionUtil.convertTolong(lo);
+    }
+  }
+  private static void assertIteratorStateIntegrity(Object itr,int expectedCursor,int expectedLastRet,int expectedItrModCount,Object expectedParent,Object expectedRoot)
+  {
+    int actualCursor;
+    Object actualParent;
+    if(expectedParent==expectedRoot)
+    {
+      if(expectedRoot instanceof OmniStack.OfLong)
+      {
+        if(expectedRoot instanceof LongArrSeq.CheckedStack)
+        {
+          actualCursor=FieldAccessor.LongArrSeq.CheckedStack.Itr.cursor(itr);
+          actualParent=FieldAccessor.LongArrSeq.CheckedStack.Itr.parent(itr);
+          Assertions.assertEquals(expectedItrModCount,FieldAccessor.LongArrSeq.CheckedStack.Itr.modCount(itr));
+          Assertions.assertEquals(expectedLastRet,FieldAccessor.LongArrSeq.CheckedStack.Itr.lastRet(itr));
+        }
+        else
+        {
+          actualCursor=FieldAccessor.LongArrSeq.UncheckedStack.Itr.cursor(itr);
+          actualParent=FieldAccessor.LongArrSeq.UncheckedStack.Itr.parent(itr);
+        }
+      }
+      else
+      {
+        if(expectedRoot instanceof LongArrSeq.CheckedList)
+        {
+          actualCursor=FieldAccessor.LongArrSeq.CheckedList.Itr.cursor(itr);
+          actualParent=FieldAccessor.LongArrSeq.CheckedList.Itr.parent(itr);
+          Assertions.assertEquals(expectedItrModCount,FieldAccessor.LongArrSeq.CheckedList.Itr.modCount(itr));
+          Assertions.assertEquals(expectedLastRet,FieldAccessor.LongArrSeq.CheckedList.Itr.lastRet(itr));
+        }
+        else
+        {
+          actualCursor=FieldAccessor.LongArrSeq.UncheckedList.Itr.cursor(itr);
+          actualParent=FieldAccessor.LongArrSeq.UncheckedList.Itr.parent(itr);
+          //skip the lastRet check since the unchecked iterator does not guarantee its state
+          //if(itr instanceof OmniListIterator.OfLong)
+          //{
+          //  Assertions.assertEquals(expectedLastRet,FieldAccessor.LongArrSeq.UncheckedList.ListItr.lastRet(itr));
+          //}
+        }
+      }
+    }
+    else
+    {
+      if(expectedRoot instanceof LongArrSeq.CheckedList)
+      {
+        actualCursor=FieldAccessor.LongArrSeq.CheckedSubList.Itr.cursor(itr);
+        actualParent=FieldAccessor.LongArrSeq.CheckedSubList.Itr.parent(itr);
+        Assertions.assertEquals(expectedItrModCount,FieldAccessor.LongArrSeq.CheckedSubList.Itr.modCount(itr));
+        Assertions.assertEquals(expectedLastRet,FieldAccessor.LongArrSeq.CheckedSubList.Itr.lastRet(itr));
+      }
+      else
+      {
+        actualCursor=FieldAccessor.LongArrSeq.UncheckedSubList.Itr.cursor(itr);
+        actualParent=FieldAccessor.LongArrSeq.UncheckedSubList.Itr.parent(itr);
+        //skip the lastRet check since the unchecked iterator does not guarantee its state
+        //if(itr instanceof OmniListIterator.OfLong)
+        //{
+        //  Assertions.assertEquals(expectedLastRet,FieldAccessor.LongArrSeq.UncheckedSubList.ListItr.lastRet(itr));
+        //}
+      }
+    }
+    Assertions.assertEquals(expectedCursor,actualCursor);
+    Assertions.assertSame(expectedParent,actualParent);
+  }
+  private static LongArrSeq assertStructuralIntegrity(Object seq,int expectedSeqSize,int expectedSeqModCount,Object expectedParent,int expectedParentSize,int expectedParentModCount,LongArrSeq expectedRoot,int expectedRootSize,int expectedRootModCount)
+  {
+    if(seq==expectedRoot)
+    {
+      if(seq instanceof LongArrSeq.CheckedList)
+      {
+        Assertions.assertEquals(expectedSeqModCount,FieldAccessor.LongArrSeq.CheckedList.modCount(seq));
+      }
+      else if(seq instanceof LongArrSeq.CheckedStack)
+      {
+        Assertions.assertEquals(expectedSeqModCount,FieldAccessor.LongArrSeq.CheckedStack.modCount(seq));
+      }
+    }
+    else
+    {
+      OmniList.OfLong actualSeqParent;
+      Object actualSeqRoot;
+      OmniList.OfLong actualParentParent;
+      Object actualParentRoot;
+      int actualParentSize;
+      int actualSeqSize;
+      if(expectedRoot instanceof LongArrSeq.CheckedList)
+      {
+        actualSeqParent=FieldAccessor.LongArrSeq.CheckedSubList.parent(seq);
+        actualSeqRoot=FieldAccessor.LongArrSeq.CheckedSubList.root(seq);
+        actualParentParent=FieldAccessor.LongArrSeq.CheckedSubList.parent(expectedParent);
+        actualParentRoot=FieldAccessor.LongArrSeq.CheckedSubList.root(expectedParent);
+        actualSeqSize=FieldAccessor.LongArrSeq.CheckedSubList.size(seq);
+        actualParentSize=FieldAccessor.LongArrSeq.CheckedSubList.size(expectedParent);
+        Assertions.assertEquals(expectedSeqModCount,FieldAccessor.LongArrSeq.CheckedSubList.modCount(seq));
+        Assertions.assertEquals(expectedParentModCount,FieldAccessor.LongArrSeq.CheckedSubList.modCount(expectedParent));
+        Assertions.assertEquals(expectedRootModCount,FieldAccessor.LongArrSeq.CheckedList.modCount(expectedRoot));
+      }
+      else
+      {
+        actualSeqParent=FieldAccessor.LongArrSeq.UncheckedSubList.parent(seq);
+        actualSeqRoot=FieldAccessor.LongArrSeq.UncheckedSubList.root(seq);
+        actualParentParent=FieldAccessor.LongArrSeq.UncheckedSubList.parent(expectedParent);
+        actualParentRoot=FieldAccessor.LongArrSeq.UncheckedSubList.root(expectedParent);
+        actualSeqSize=FieldAccessor.LongArrSeq.UncheckedSubList.size(seq);
+        actualParentSize=FieldAccessor.LongArrSeq.UncheckedSubList.size(expectedParent);
+      }
+      Assertions.assertSame(expectedRoot,actualSeqRoot);
+      Assertions.assertSame(expectedRoot,actualParentRoot);
+      Assertions.assertSame(expectedParent,actualSeqParent);
+      Assertions.assertNull(actualParentParent);
+      Assertions.assertEquals(expectedSeqSize,actualSeqSize);
+      Assertions.assertEquals(expectedParentSize,actualParentSize);
+    }
+    Assertions.assertEquals(expectedRootSize,FieldAccessor.LongArrSeq.size(expectedRoot));
+    return expectedRoot;
   }
 }

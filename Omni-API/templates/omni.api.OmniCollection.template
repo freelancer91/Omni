@@ -22,7 +22,7 @@ import omni.function.ShortConsumer;
 import omni.function.ShortPredicate;
 //TODO integration into Java Collection library
 public abstract interface OmniCollection
-{
+{  
   public abstract void clear();
   #MACRO ContainsMethodDecl<Object>()
   #MACRO PrimitiveMethods(ContainsMethodDecl)

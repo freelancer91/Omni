@@ -13,6 +13,11 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import java.util.function.IntFunction;
 import java.util.function.Consumer;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
+import org.junit.jupiter.params.provider.Arguments;
+import java.util.stream.Stream;
 #IF OfInt,OfLong,OfDouble
 import java.util.function.$TypeNameModifier$Consumer;
 #ELSEIFNOT OfRef
@@ -20,21 +25,794 @@ import omni.function.$TypeNameModifier$Consumer;
 #ENDIF
 import java.util.ConcurrentModificationException;
 import omni.util.OmniArray;
+import omni.api.OmniList;
+import omni.api.OmniStack;
 @SuppressWarnings({"rawtypes","unchecked"}) 
 public class $ClassPrefix$ArrSeqTest{
 
-
  
-
-
-  #MACRO StructImpl<UncheckedStack>()
-  #MACRO StructImpl<UncheckedList>()
-  #MACRO StructImpl<CheckedStack>()
-  #MACRO StructImpl<CheckedList>()
   
  
-  #MACRO SubListImpl<Checked>()
-  #MACRO SubListImpl<Unchecked>()
+
+#IF OfRef
+  private static void verifyRangeIsNull($ArrayType$[] arr,int offset,int bound)
+  {
+    for(int i=offset;i<bound;++i)
+    {
+      Assertions.assertNull(arr[i]);
+    }
+  }
+#ENDIF
+
+  #MACRO VerifyAscending($ArrayType$)
+#IFNOT OfBoolean,OfRef
+  #MACRO VerifyAscending($ArrayType$boolean)
+#ENDIF
+#MACRODEF VerifyAscending(OUTPUTTYPE)
+private static void verifyAscendingSpanOUTPUTTYPE($ArrayType$[] arr,int offset,int bound,int loVal)
+  {
+    for(int i=offset;i<bound;++i,++loVal)
+    {
+      Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPE(loVal),arr[i]);
+    }
+  }
+
+#ENDDEF
+
+  
+
+
+
+  #MACRO TestImpl<Unchecked,List>()
+  #MACRO TestImpl<Unchecked,Stack>()
+  #MACRO TestImpl<Unchecked,SubList>()
+  #MACRO TestImpl<Checked,List>()
+  #MACRO TestImpl<Checked,Stack>()
+  #MACRO TestImpl<Checked,SubList>()
+
+
+  private static final Arguments[] SUB_LIST_CONSTRUCTION_ARGS;
+  static
+  {
+    Arguments[] args=new Arguments[16];
+    int dstOffset=0;
+    for(int rootPreAlloc=0;rootPreAlloc<=5;rootPreAlloc+=5)
+    {
+      for(int rootPostAlloc=0;rootPostAlloc<=5;rootPostAlloc+=5)
+      {
+        for(int parentPreAlloc=0;parentPreAlloc<=5;parentPreAlloc+=5)
+        {
+          for(int parentPostAlloc=0;parentPostAlloc<=5;parentPostAlloc+=5,++dstOffset)
+          {
+            args[dstOffset]=Arguments.of(rootPreAlloc,rootPostAlloc,parentPreAlloc,parentPostAlloc);
+          }
+        }
+      }
+    }
+
+    SUB_LIST_CONSTRUCTION_ARGS=args;
+  }
+
+  private static Stream<Arguments> getSubListConstructionArgs()
+  {
+    return Stream.of(SUB_LIST_CONSTRUCTION_ARGS);
+  }
+  
+  private static void initAscendingArray($ArrayType$[] arr,int offset,int lo,int hi)
+  {
+    int bound=offset+(hi-lo);
+    for(int i=offset;i<bound;++i,++lo)
+    {
+      arr[i]=TypeConversionUtil.convertTo$ArrayType$(lo);
+    }
+  }
+
+  
+  private static void assertIteratorStateIntegrity(Object itr,int expectedCursor,int expectedLastRet,int expectedItrModCount,Object expectedParent,Object expectedRoot)
+  {
+    int actualCursor;
+    Object actualParent;
+    if(expectedParent==expectedRoot)
+    {
+      if(expectedRoot instanceof OmniStack.Of$ClassPrefix$)
+      {
+        if(expectedRoot instanceof $ClassPrefix$ArrSeq.CheckedStack)
+        {
+          actualCursor=FieldAccessor.$ClassPrefix$ArrSeq.CheckedStack.Itr.cursor(itr);
+          actualParent=FieldAccessor.$ClassPrefix$ArrSeq.CheckedStack.Itr.parent(itr);
+          Assertions.assertEquals(expectedItrModCount,FieldAccessor.$ClassPrefix$ArrSeq.CheckedStack.Itr.modCount(itr));
+          Assertions.assertEquals(expectedLastRet,FieldAccessor.$ClassPrefix$ArrSeq.CheckedStack.Itr.lastRet(itr));
+        }
+        else
+        {
+          actualCursor=FieldAccessor.$ClassPrefix$ArrSeq.UncheckedStack.Itr.cursor(itr);
+          actualParent=FieldAccessor.$ClassPrefix$ArrSeq.UncheckedStack.Itr.parent(itr);
+        }
+      }
+      else
+      {
+        if(expectedRoot instanceof $ClassPrefix$ArrSeq.CheckedList)
+        {
+          actualCursor=FieldAccessor.$ClassPrefix$ArrSeq.CheckedList.Itr.cursor(itr);
+          actualParent=FieldAccessor.$ClassPrefix$ArrSeq.CheckedList.Itr.parent(itr);
+          Assertions.assertEquals(expectedItrModCount,FieldAccessor.$ClassPrefix$ArrSeq.CheckedList.Itr.modCount(itr));
+          Assertions.assertEquals(expectedLastRet,FieldAccessor.$ClassPrefix$ArrSeq.CheckedList.Itr.lastRet(itr));
+        }
+        else
+        {
+          actualCursor=FieldAccessor.$ClassPrefix$ArrSeq.UncheckedList.Itr.cursor(itr);
+          actualParent=FieldAccessor.$ClassPrefix$ArrSeq.UncheckedList.Itr.parent(itr);
+          //skip the lastRet check since the unchecked iterator does not guarantee its state
+          //if(itr instanceof OmniListIterator.Of$ClassPrefix$)
+          //{
+          //  Assertions.assertEquals(expectedLastRet,FieldAccessor.$ClassPrefix$ArrSeq.UncheckedList.ListItr.lastRet(itr));
+          //}
+        }
+      }
+    }
+    else
+    {
+      if(expectedRoot instanceof $ClassPrefix$ArrSeq.CheckedList)
+      {
+        actualCursor=FieldAccessor.$ClassPrefix$ArrSeq.CheckedSubList.Itr.cursor(itr);
+        actualParent=FieldAccessor.$ClassPrefix$ArrSeq.CheckedSubList.Itr.parent(itr);
+        Assertions.assertEquals(expectedItrModCount,FieldAccessor.$ClassPrefix$ArrSeq.CheckedSubList.Itr.modCount(itr));
+        Assertions.assertEquals(expectedLastRet,FieldAccessor.$ClassPrefix$ArrSeq.CheckedSubList.Itr.lastRet(itr));
+      }
+      else
+      {
+        actualCursor=FieldAccessor.$ClassPrefix$ArrSeq.UncheckedSubList.Itr.cursor(itr);
+        actualParent=FieldAccessor.$ClassPrefix$ArrSeq.UncheckedSubList.Itr.parent(itr);
+        //skip the lastRet check since the unchecked iterator does not guarantee its state
+        //if(itr instanceof OmniListIterator.Of$ClassPrefix$)
+        //{
+        //  Assertions.assertEquals(expectedLastRet,FieldAccessor.$ClassPrefix$ArrSeq.UncheckedSubList.ListItr.lastRet(itr));
+        //}
+      }
+    }
+    Assertions.assertEquals(expectedCursor,actualCursor);
+    Assertions.assertSame(expectedParent,actualParent);
+  }
+  
+  private static $ClassPrefix$ArrSeq assertStructuralIntegrity(Object seq,int expectedSeqSize,int expectedSeqModCount,Object expectedParent,int expectedParentSize,int expectedParentModCount,$ClassPrefix$ArrSeq expectedRoot,int expectedRootSize,int expectedRootModCount)
+  {
+    if(seq==expectedRoot)
+    {
+      if(seq instanceof $ClassPrefix$ArrSeq.CheckedList)
+      {
+        Assertions.assertEquals(expectedSeqModCount,FieldAccessor.$ClassPrefix$ArrSeq.CheckedList.modCount(seq));
+      }
+      else if(seq instanceof $ClassPrefix$ArrSeq.CheckedStack)
+      {
+        Assertions.assertEquals(expectedSeqModCount,FieldAccessor.$ClassPrefix$ArrSeq.CheckedStack.modCount(seq));
+      }
+    }
+    else
+    {
+      OmniList.Of$ClassPrefix$ actualSeqParent;
+      Object actualSeqRoot;
+      OmniList.Of$ClassPrefix$ actualParentParent;
+      Object actualParentRoot;
+      int actualParentSize;
+      int actualSeqSize;
+      if(expectedRoot instanceof $ClassPrefix$ArrSeq.CheckedList)
+      {
+        actualSeqParent=FieldAccessor.$ClassPrefix$ArrSeq.CheckedSubList.parent(seq);
+        actualSeqRoot=FieldAccessor.$ClassPrefix$ArrSeq.CheckedSubList.root(seq);
+        actualParentParent=FieldAccessor.$ClassPrefix$ArrSeq.CheckedSubList.parent(expectedParent);
+        actualParentRoot=FieldAccessor.$ClassPrefix$ArrSeq.CheckedSubList.root(expectedParent);
+        actualSeqSize=FieldAccessor.$ClassPrefix$ArrSeq.CheckedSubList.size(seq);
+        actualParentSize=FieldAccessor.$ClassPrefix$ArrSeq.CheckedSubList.size(expectedParent);
+        Assertions.assertEquals(expectedSeqModCount,FieldAccessor.$ClassPrefix$ArrSeq.CheckedSubList.modCount(seq));
+        Assertions.assertEquals(expectedParentModCount,FieldAccessor.$ClassPrefix$ArrSeq.CheckedSubList.modCount(expectedParent));
+        Assertions.assertEquals(expectedRootModCount,FieldAccessor.$ClassPrefix$ArrSeq.CheckedList.modCount(expectedRoot));
+      }
+      else
+      {
+        actualSeqParent=FieldAccessor.$ClassPrefix$ArrSeq.UncheckedSubList.parent(seq);
+        actualSeqRoot=FieldAccessor.$ClassPrefix$ArrSeq.UncheckedSubList.root(seq);
+        actualParentParent=FieldAccessor.$ClassPrefix$ArrSeq.UncheckedSubList.parent(expectedParent);
+        actualParentRoot=FieldAccessor.$ClassPrefix$ArrSeq.UncheckedSubList.root(expectedParent);
+        actualSeqSize=FieldAccessor.$ClassPrefix$ArrSeq.UncheckedSubList.size(seq);
+        actualParentSize=FieldAccessor.$ClassPrefix$ArrSeq.UncheckedSubList.size(expectedParent);
+      }
+      Assertions.assertSame(expectedRoot,actualSeqRoot);
+      Assertions.assertSame(expectedRoot,actualParentRoot);
+      Assertions.assertSame(expectedParent,actualSeqParent);
+      Assertions.assertNull(actualParentParent);
+      Assertions.assertEquals(expectedSeqSize,actualSeqSize);
+      Assertions.assertEquals(expectedParentSize,actualParentSize);
+    }
+    Assertions.assertEquals(expectedRootSize,FieldAccessor.$ClassPrefix$ArrSeq.size(expectedRoot));
+    return expectedRoot;
+  }
+
+
+
+#MACRODEF TestImpl<CHECKED,STRUCT>()
+
+
+
+
+#IFSWITCH STRUCT==Stack,List
+@Test
+public void testCHECKEDSTRUCTConstructor_happyPath()
+{
+  var seq=new $ClassPrefix$ArrSeq.CHECKEDSTRUCT();
+  Assertions.assertEquals(0,seq.size);
+  Assertions.assertSame(OmniArray.Of$ClassPrefix$.DEFAULT_ARR,seq.arr);
+  assertStructuralIntegrity(seq,0,0,seq,0,0,seq,0,0);
+}
+@Test
+public void testCHECKEDSTRUCTConstructor_int_$ArrayType$array_happyPath()
+{
+  int size=5;
+  $ArrayType$[] arr=new $ArrayType$[10];
+  var seq=new $ClassPrefix$ArrSeq.CHECKEDSTRUCT(size,arr);
+  Assertions.assertEquals(size,seq.size);
+  Assertions.assertSame(arr,seq.arr);
+  assertStructuralIntegrity(seq,0,0,seq,0,0,seq,0,0);
+}
+@ParameterizedTest
+@ValueSource(ints={0,5,OmniArray.DEFAULT_ARR_SEQ_CAP,15})
+public void testCHECKEDSTRUCTConstructor_int_happyPath(int capacity)
+{
+  var seq=new $ClassPrefix$ArrSeq.CHECKEDSTRUCT(capacity);
+  Assertions.assertEquals(0,seq.size);
+  switch(capacity)
+  {
+    case 0:
+    Assertions.assertNull(seq.arr);
+    break;
+    case OmniArray.DEFAULT_ARR_SEQ_CAP:
+    Assertions.assertSame(OmniArray.Of$ClassPrefix$.DEFAULT_ARR,seq.arr);
+    break;
+    default:
+    Assertions.assertEquals(capacity,seq.arr.length);
+  #IF OfRef
+    verifyRangeIsNull(seq.arr,0,capacity);
+  #ENDIF
+  }
+  assertStructuralIntegrity(seq,0,0,seq,0,0,seq,0,0);
+}
+#ENDIF
+
+#MACRO TestInputMethods($ArrayType$,$ArrayType$)
+#IFNOT OfRef
+#MACRO TestInputMethods($BoxedType$,$ArrayType$)
+  #IFNOT OfBoolean
+#MACRO TestInputMethods(boolean,$ArrayType$boolean)
+#MACRO TestInputMethods(Boolean,$ArrayType$boolean)
+    #IFNOT OfByte,OfChar
+#MACRO TestInputMethods(byte,$ArrayType$)
+#MACRO TestInputMethods(Byte,$ArrayType$)
+      #IFNOT OfShort
+#MACRO TestInputMethods(short,$ArrayType$)
+#MACRO TestInputMethods(Short,$ArrayType$)
+        #IFNOT OfInt
+#MACRO TestInputMethods(int,$ArrayType$)
+#MACRO TestInputMethods(Integer,$ArrayType$)
+          #IFNOT OfLong
+#MACRO TestInputMethods(long,$ArrayType$)
+#MACRO TestInputMethods(Long,$ArrayType$)
+            #IFNOT OfFloat
+#MACRO TestInputMethods(float,$ArrayType$)
+#MACRO TestInputMethods(Float,$ArrayType$)
+            #ENDIF
+          #ENDIF
+        #ENDIF
+      #ENDIF
+    #ENDIF
+  #ENDIF
+#ENDIF
+
+
+#ENDDEF
+
+
+
+
+#MACRODEF TestInputMethods(INPUTTYPE,OUTPUTTYPE)
+
+
+
+#IFSWITCH STRUCT==List,SubList
+@ParameterizedTest
+  #IFSWITCH STRUCT==List
+@ValueSource(ints={0,5,10,15})
+public void testCHECKEDSTRUCTListItradd_INPUTTYPE_happyPathInsertBegin(int initialCapacity){
+  #ELSE
+@MethodSource("getSubListConstructionArgs")
+public void testCHECKEDSTRUCTListItradd_INPUTTYPE_happyPathInsertBegin(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+  #ENDIF
+  #MACRO InitializeForInputTest()
+  var seqItr=seq.listIterator();
+  for(int i=0;i<100;++i)
+  {
+    seqItr.add(TypeConversionUtil.convertToINPUTTYPE(i));
+    assertIteratorStateIntegrity(seqItr,preAllocSpan+1,-1,i+1,parent,root);
+    seqItr.previous$TypeNameModifier$();
+  }
+  assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+  verifyAscendingSpanOUTPUTTYPE(root.arr,0,preAllocSpan,-preAllocSpan);
+  int i=preAllocSpan;
+  for(int val=100,bound=i+100;i<bound;++i)
+  {
+    Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPE(--val),root.arr[i]);
+  }
+  verifyAscendingSpanOUTPUTTYPE(root.arr,i,rootSize+100,100);
+}
+
+@ParameterizedTest
+  #IFSWITCH STRUCT==List
+@ValueSource(ints={0,5,10,15})
+public void testCHECKEDSTRUCTListItradd_INPUTTYPE_happyPathInsertEnd(int initialCapacity){
+  #ELSE
+@MethodSource("getSubListConstructionArgs")
+public void testCHECKEDSTRUCTListItradd_INPUTTYPE_happyPathInsertEnd(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+  #ENDIF
+  #MACRO InitializeForInputTest()
+  var seqItr=seq.listIterator();
+  for(int i=0;i<100;++i)
+  {
+    seqItr.add(TypeConversionUtil.convertToINPUTTYPE(i));
+    assertIteratorStateIntegrity(seqItr,preAllocSpan+i+1,-1,i+1,parent,root);
+  }
+  assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+  verifyAscendingSpanOUTPUTTYPE(root.arr,0,rootSize+100,-preAllocSpan);
+}
+@ParameterizedTest
+  #IFSWITCH STRUCT==List
+@ValueSource(ints={0,5,10,15})
+public void testCHECKEDSTRUCTListItradd_INPUTTYPE_happyPathInsertMidPoint(int initialCapacity){
+  #ELSE
+@MethodSource("getSubListConstructionArgs")
+public void testCHECKEDSTRUCTListItradd_INPUTTYPE_happyPathInsertMidPoint(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+  #ENDIF
+  #MACRO InitializeForInputTest()
+  var seqItr=seq.listIterator();
+  for(int i=0;i<100;++i)
+  {
+    seqItr.add(TypeConversionUtil.convertToINPUTTYPE(i));
+    assertIteratorStateIntegrity(seqItr,((rootSize+i)/2)+1,-1,i+1,parent,root);
+    if((i&1)==0)
+    {
+      seqItr.previous$TypeNameModifier$();
+    }
+  }
+  assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+  verifyAscendingSpanOUTPUTTYPE(root.arr,0,preAllocSpan,-preAllocSpan);
+  int i=preAllocSpan;
+  for(int val=1,bound=i+50;i<bound;++i,val+=2)
+  {
+    Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPE(val),root.arr[i]);
+  }
+  for(int val=98,bound=i+50;i<bound;++i,val-=2)
+  {
+    Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPE(val),root.arr[i]);
+  }
+  verifyAscendingSpanOUTPUTTYPE(root.arr,i,rootSize+100,i);
+}
+  #IFSWITCH CHECKED==Checked
+@ParameterizedTest
+    #IFSWITCH STRUCT==List
+@ValueSource(ints={0,5,10,15})
+public void testCHECKEDSTRUCTListItradd_INPUTTYPE_throwCME(int initialCapacity){
+    #ELSE
+@MethodSource("getSubListConstructionArgs")
+public void testCHECKEDSTRUCTListItradd_INPUTTYPE_throwCME(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+    #ENDIF
+  {
+    //try on an empty sublist
+    #MACRO InitializeForInputTest()
+    var itr=seq.listIterator();
+    //illegally modify the root
+    root.add(preAllocSpan,TypeConversionUtil.convertToINPUTTYPE(0));
+    //attempt an insertion
+    Assertions.assertThrows(ConcurrentModificationException.class,()->itr.add(TypeConversionUtil.convertToINPUTTYPE(0)));
+    assertIteratorStateIntegrity(itr,preAllocSpan,-1,0,parent,root);
+    assertStructuralIntegrity(seq,0,0,parent,parentSize,0,root,rootSize+1,1);
+    verifyAscendingSpanOUTPUTTYPE(root.arr,0,preAllocSpan+1,-preAllocSpan);
+    verifyAscendingSpanOUTPUTTYPE(root.arr,preAllocSpan+1,rootSize+1,100);
+  }
+  {
+    //try on an empty sublist
+    #MACRO InitializeForInputTest()
+    var itr=seq.listIterator();
+    //illegally modify the parent
+    parent.add(parentPreAlloc,TypeConversionUtil.convertToINPUTTYPE(0));
+    //attempt an insertion
+    Assertions.assertThrows(ConcurrentModificationException.class,()->itr.add(TypeConversionUtil.convertToINPUTTYPE(0)));
+    assertIteratorStateIntegrity(itr,preAllocSpan,-1,0,parent,root);
+    assertStructuralIntegrity(seq,0,0,parent,parentSize+1,1,root,rootSize+1,1);
+    verifyAscendingSpanOUTPUTTYPE(root.arr,0,preAllocSpan+1,-preAllocSpan);
+    verifyAscendingSpanOUTPUTTYPE(root.arr,preAllocSpan+1,rootSize+1,100);
+  }
+  {
+    //try on an empty sublist
+    #MACRO InitializeForInputTest()
+    var itr=seq.listIterator();
+    //illegally modify the sequence
+    seq.add(0,TypeConversionUtil.convertToINPUTTYPE(0));
+    //attempt an insertion
+    Assertions.assertThrows(ConcurrentModificationException.class,()->itr.add(TypeConversionUtil.convertToINPUTTYPE(0)));
+    assertIteratorStateIntegrity(itr,preAllocSpan,-1,0,parent,root);
+    assertStructuralIntegrity(seq,1,1,parent,parentSize+1,1,root,rootSize+1,1);
+    verifyAscendingSpanOUTPUTTYPE(root.arr,0,preAllocSpan+1,-preAllocSpan);
+    verifyAscendingSpanOUTPUTTYPE(root.arr,preAllocSpan+1,rootSize+1,100);
+  }
+  {
+    //try on an non-empty sublist, inserting at the end
+    #MACRO InitializeForInputTest()
+    var itr=seq.listIterator();
+    for(int i=0;i<100;++i)
+    {
+      itr.add(TypeConversionUtil.convertToINPUTTYPE(i));
+    }
+    //illegally modify the root
+    root.add(TypeConversionUtil.convertToINPUTTYPE(rootSize+100));
+    //attempt an insertion
+    Assertions.assertThrows(ConcurrentModificationException.class,()->itr.add(TypeConversionUtil.convertToINPUTTYPE(0)));
+    assertIteratorStateIntegrity(itr,preAllocSpan+100,-1,100,parent,root);
+    assertStructuralIntegrity(seq,100,100,parent,parentSize+100,100,root,rootSize+101,101);
+    verifyAscendingSpanOUTPUTTYPE(root.arr,0,rootSize+101,-preAllocSpan);
+  }
+  {
+    //try on an non-empty sublist, inserting at the end
+    #MACRO InitializeForInputTest()
+    var itr=seq.listIterator();
+    for(int i=0;i<100;++i)
+    {
+      itr.add(TypeConversionUtil.convertToINPUTTYPE(i));
+    }
+    //illegally modify the parent
+    parent.add(parentPreAlloc+50,TypeConversionUtil.convertToINPUTTYPE(50));
+    //attempt an insertion
+    Assertions.assertThrows(ConcurrentModificationException.class,()->itr.add(TypeConversionUtil.convertToINPUTTYPE(0)));
+    assertIteratorStateIntegrity(itr,preAllocSpan+100,-1,100,parent,root);
+    assertStructuralIntegrity(seq,100,100,parent,parentSize+101,101,root,rootSize+101,101);
+    verifyAscendingSpanOUTPUTTYPE(root.arr,0,preAllocSpan+51,-preAllocSpan);
+    verifyAscendingSpanOUTPUTTYPE(root.arr,preAllocSpan+51,rootSize+101,50);
+  }
+  {
+    //try on an non-empty sublist, inserting at the end
+    #MACRO InitializeForInputTest()
+    var itr=seq.listIterator();
+    for(int i=0;i<100;++i)
+    {
+      itr.add(TypeConversionUtil.convertToINPUTTYPE(i));
+    }
+    //illegally modify the seq
+    seq.add(50,TypeConversionUtil.convertToINPUTTYPE(50));
+    //attempt an insertion
+    Assertions.assertThrows(ConcurrentModificationException.class,()->itr.add(TypeConversionUtil.convertToINPUTTYPE(0)));
+    assertIteratorStateIntegrity(itr,preAllocSpan+100,-1,100,parent,root);
+    assertStructuralIntegrity(seq,101,101,parent,parentSize+101,101,root,rootSize+101,101);
+    verifyAscendingSpanOUTPUTTYPE(root.arr,0,preAllocSpan+51,-preAllocSpan);
+    verifyAscendingSpanOUTPUTTYPE(root.arr,preAllocSpan+51,rootSize+101,50);
+  }
+}
+  #ENDIF
+@ParameterizedTest
+  #IFSWITCH STRUCT==List
+@ValueSource(ints={0,5,10,15})
+public void testCHECKEDSTRUCTadd_int_INPUTTYPE_happyPathInsertBegin(int initialCapacity){
+  #ELSE
+@MethodSource("getSubListConstructionArgs")
+public void testCHECKEDSTRUCTadd_int_INPUTTYPE_happyPathInsertBegin(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+  #ENDIF
+  #MACRO InitializeForInputTest()
+  for(int i=0;i<100;++i)
+  {
+    seq.add(0,TypeConversionUtil.convertToINPUTTYPE(i));
+  }
+  assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+  verifyAscendingSpanOUTPUTTYPE(root.arr,0,preAllocSpan,-preAllocSpan);
+  int i=preAllocSpan;
+  for(int val=100,bound=i+100;i<bound;++i)
+  {
+    Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPE(--val),root.arr[i]);
+  }
+  verifyAscendingSpanOUTPUTTYPE(root.arr,i,rootSize+100,100);
+}
+@ParameterizedTest
+  #IFSWITCH STRUCT==List
+@ValueSource(ints={0,5,10,15})
+public void testCHECKEDSTRUCTadd_int_INPUTTYPE_happyPathInsertEnd(int initialCapacity){
+  #ELSE
+@MethodSource("getSubListConstructionArgs")
+public void testCHECKEDSTRUCTadd_int_INPUTTYPE_happyPathInsertEnd(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+  #ENDIF
+  #MACRO InitializeForInputTest()
+  for(int i=0;i<100;++i)
+  {
+    seq.add(seq.size(),TypeConversionUtil.convertToINPUTTYPE(i));
+  }
+  assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+  verifyAscendingSpanOUTPUTTYPE(root.arr,0,rootSize+100,-preAllocSpan);
+}
+@ParameterizedTest
+  #IFSWITCH STRUCT==List
+@ValueSource(ints={0,5,10,15})
+public void testCHECKEDSTRUCTadd_int_INPUTTYPE_happyPathInsertMidPoint(int initialCapacity){
+  #ELSE
+@MethodSource("getSubListConstructionArgs")
+public void testCHECKEDSTRUCTadd_int_INPUTTYPE_happyPathInsertMidPoint(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+  #ENDIF
+  #MACRO InitializeForInputTest()
+  for(int i=0;i<100;++i)
+  {
+    seq.add(seq.size()/2,TypeConversionUtil.convertToINPUTTYPE(i));
+  }
+  assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+  verifyAscendingSpanOUTPUTTYPE(root.arr,0,preAllocSpan,-preAllocSpan);
+  int i=preAllocSpan;
+  for(int val=1,bound=i+50;i<bound;++i,val+=2)
+  {
+    Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPE(val),root.arr[i]);
+  }
+  for(int val=98,bound=i+50;i<bound;++i,val-=2)
+  {
+    Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPE(val),root.arr[i]);
+  }
+  verifyAscendingSpanOUTPUTTYPE(root.arr,i,rootSize+100,i);
+}
+
+  #IFSWITCH CHECKED==Checked
+@ParameterizedTest
+    #IFSWITCH STRUCT==List
+@ValueSource(ints={0,5,10,15})
+public void testCHECKEDSTRUCTadd_int_INPUTTYPE_throwIOBE(int initialCapacity){
+    #ELSE
+@MethodSource("getSubListConstructionArgs")
+public void testCHECKEDSTRUCTadd_int_INPUTTYPE_throwIOBE(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+    #ENDIF
+  #MACRO InitializeForInputTest()
+  for(int i=0;i<100;++i)
+  {
+    //too low
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(-1,TypeConversionUtil.convertToINPUTTYPE(0)));
+    //too hi
+    final int finalIndex=i;
+    Assertions.assertThrows(IndexOutOfBoundsException.class,()->seq.add(finalIndex+1,TypeConversionUtil.convertToINPUTTYPE(0)));
+    seq.add(TypeConversionUtil.convertToINPUTTYPE(i));
+  }
+  //when the method throws, verify that no changes occurred
+  assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+  verifyAscendingSpanOUTPUTTYPE(root.arr,0,rootSize+100,-preAllocSpan);
+}
+    #IFSWITCH STRUCT==SubList
+@ParameterizedTest
+@MethodSource("getSubListConstructionArgs")
+public void testCHECKEDSTRUCTadd_INPUTTYPE_throwCME(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+  {
+    //try on an empty sublist
+    #MACRO InitializeForInputTest()
+    //illegally modify the root
+    root.add(preAllocSpan,TypeConversionUtil.convertToINPUTTYPE(0));
+    //attempt an insertion
+    Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(TypeConversionUtil.convertToINPUTTYPE(0)));
+    //attempt the same tests on the parent
+    Assertions.assertThrows(ConcurrentModificationException.class,()->parent.add(TypeConversionUtil.convertToINPUTTYPE(0)));
+    assertStructuralIntegrity(seq,0,0,parent,parentSize,0,root,rootSize+1,1);
+    verifyAscendingSpanOUTPUTTYPE(root.arr,0,preAllocSpan+1,-preAllocSpan);
+    verifyAscendingSpanOUTPUTTYPE(root.arr,preAllocSpan+1,rootSize+1,100);
+  }
+  {
+    //try on an empty sublist
+    #MACRO InitializeForInputTest()
+    //illegally modify the parent
+    parent.add(parentPreAlloc,TypeConversionUtil.convertToINPUTTYPE(0));
+    //attempt an insertion
+    Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(TypeConversionUtil.convertToINPUTTYPE(0)));
+    assertStructuralIntegrity(seq,0,0,parent,parentSize+1,1,root,rootSize+1,1);
+    verifyAscendingSpanOUTPUTTYPE(root.arr,0,preAllocSpan+1,-preAllocSpan);
+    verifyAscendingSpanOUTPUTTYPE(root.arr,preAllocSpan+1,rootSize+1,100);
+  }
+  {
+    //try on an non-empty sublist
+    #MACRO InitializeForInputTest()
+    for(int i=0;i<100;++i)
+    {
+      seq.add(TypeConversionUtil.convertToINPUTTYPE(i));
+    }
+    //illegally modify the root
+    root.add(TypeConversionUtil.convertToINPUTTYPE(rootSize+100));
+    //attempt an insertion
+    Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(TypeConversionUtil.convertToINPUTTYPE(0)));
+    //attempt the same tests on the parent
+    Assertions.assertThrows(ConcurrentModificationException.class,()->parent.add(TypeConversionUtil.convertToINPUTTYPE(0)));
+    assertStructuralIntegrity(seq,100,100,parent,parentSize+100,100,root,rootSize+101,101);
+    verifyAscendingSpanOUTPUTTYPE(root.arr,0,rootSize+101,-preAllocSpan);
+  }
+  {
+    //try on an non-empty sublist
+    #MACRO InitializeForInputTest()
+    for(int i=0;i<100;++i)
+    {
+      seq.add(TypeConversionUtil.convertToINPUTTYPE(i));
+    }
+    //illegally modify the parent
+    parent.add(parentPreAlloc+50,TypeConversionUtil.convertToINPUTTYPE(50));
+    //attempt an insertion
+    Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(TypeConversionUtil.convertToINPUTTYPE(0)));
+    assertStructuralIntegrity(seq,100,100,parent,parentSize+101,101,root,rootSize+101,101);
+    verifyAscendingSpanOUTPUTTYPE(root.arr,0,preAllocSpan+51,-preAllocSpan);
+    verifyAscendingSpanOUTPUTTYPE(root.arr,preAllocSpan+51,rootSize+101,50);
+  }
+}
+@ParameterizedTest
+@MethodSource("getSubListConstructionArgs")
+public void testCHECKEDSTRUCTadd_int_INPUTTYPE_throwCME(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+  {
+    //try on an empty sublist
+    #MACRO InitializeForInputTest()
+    //illegally modify the root
+    root.add(preAllocSpan,TypeConversionUtil.convertToINPUTTYPE(0));
+    //attempt an insertion
+    Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(0,TypeConversionUtil.convertToINPUTTYPE(0)));
+    //an insertion out of bounds should also throw a CME
+    //too low
+    Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(-1,TypeConversionUtil.convertToINPUTTYPE(0)));
+    //too hi
+    Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(1,TypeConversionUtil.convertToINPUTTYPE(0)));
+    //attempt the same tests on the parent
+    Assertions.assertThrows(ConcurrentModificationException.class,()->parent.add(0,TypeConversionUtil.convertToINPUTTYPE(0)));
+    Assertions.assertThrows(ConcurrentModificationException.class,()->parent.add(-1,TypeConversionUtil.convertToINPUTTYPE(0)));
+    Assertions.assertThrows(ConcurrentModificationException.class,()->parent.add(parentSize+1,TypeConversionUtil.convertToINPUTTYPE(0)));
+    assertStructuralIntegrity(seq,0,0,parent,parentSize,0,root,rootSize+1,1);
+    verifyAscendingSpanOUTPUTTYPE(root.arr,0,preAllocSpan+1,-preAllocSpan);
+    verifyAscendingSpanOUTPUTTYPE(root.arr,preAllocSpan+1,rootSize+1,100);
+  }
+  {
+    //try on an empty sublist
+    #MACRO InitializeForInputTest()
+    //illegally modify the parent
+    parent.add(parentPreAlloc,TypeConversionUtil.convertToINPUTTYPE(0));
+    //attempt an insertion
+    Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(0,TypeConversionUtil.convertToINPUTTYPE(0)));
+    //an insertion out of bounds should also throw a CME
+    //too low
+    Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(-1,TypeConversionUtil.convertToINPUTTYPE(0)));
+    //too hi
+    Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(1,TypeConversionUtil.convertToINPUTTYPE(0)));
+    assertStructuralIntegrity(seq,0,0,parent,parentSize+1,1,root,rootSize+1,1);
+    verifyAscendingSpanOUTPUTTYPE(root.arr,0,preAllocSpan+1,-preAllocSpan);
+    verifyAscendingSpanOUTPUTTYPE(root.arr,preAllocSpan+1,rootSize+1,100);
+  }
+  {
+    //try on an non-empty sublist
+    #MACRO InitializeForInputTest()
+    for(int i=0;i<100;++i)
+    {
+      seq.add(TypeConversionUtil.convertToINPUTTYPE(i));
+    }
+    //illegally modify the root
+    root.add(TypeConversionUtil.convertToINPUTTYPE(rootSize+100));
+    //attempt an insertion at the beginning
+    Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(0,TypeConversionUtil.convertToINPUTTYPE(0)));
+    //attempt an insertion at the midpoint
+    Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(50,TypeConversionUtil.convertToINPUTTYPE(0)));
+    //attempt an insertion at the end
+    Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(100,TypeConversionUtil.convertToINPUTTYPE(0)));
+    //an insertion out of bounds should also throw a CME
+    //too low
+    Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(-1,TypeConversionUtil.convertToINPUTTYPE(0)));
+    //too hi
+    Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(101,TypeConversionUtil.convertToINPUTTYPE(0)));
+    //attempt the same tests on the parent
+    Assertions.assertThrows(ConcurrentModificationException.class,()->parent.add(0,TypeConversionUtil.convertToINPUTTYPE(0)));
+    Assertions.assertThrows(ConcurrentModificationException.class,()->parent.add(parentPreAlloc+50,TypeConversionUtil.convertToINPUTTYPE(0)));
+    Assertions.assertThrows(ConcurrentModificationException.class,()->parent.add(parentSize+100,TypeConversionUtil.convertToINPUTTYPE(0)));
+    Assertions.assertThrows(ConcurrentModificationException.class,()->parent.add(-1,TypeConversionUtil.convertToINPUTTYPE(0)));
+    Assertions.assertThrows(ConcurrentModificationException.class,()->parent.add(parentSize+101,TypeConversionUtil.convertToINPUTTYPE(0)));
+    assertStructuralIntegrity(seq,100,100,parent,parentSize+100,100,root,rootSize+101,101);
+    verifyAscendingSpanOUTPUTTYPE(root.arr,0,rootSize+101,-preAllocSpan);
+  }
+  {
+    //try on an non-empty sublist
+    #MACRO InitializeForInputTest()
+    for(int i=0;i<100;++i)
+    {
+      seq.add(TypeConversionUtil.convertToINPUTTYPE(i));
+    }
+    //illegally modify the parent
+    parent.add(parentPreAlloc+50,TypeConversionUtil.convertToINPUTTYPE(50));
+    //attempt an insertion at the beginning
+    Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(0,TypeConversionUtil.convertToINPUTTYPE(0)));
+    //attempt an insertion at the midpoint
+    Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(50,TypeConversionUtil.convertToINPUTTYPE(0)));
+    //attempt an insertion at the end
+    Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(100,TypeConversionUtil.convertToINPUTTYPE(0)));
+    //an insertion out of bounds should also throw a CME
+    //too low
+    Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(-1,TypeConversionUtil.convertToINPUTTYPE(0)));
+    //too hi
+    Assertions.assertThrows(ConcurrentModificationException.class,()->seq.add(101,TypeConversionUtil.convertToINPUTTYPE(0)));
+    assertStructuralIntegrity(seq,100,100,parent,parentSize+101,101,root,rootSize+101,101);
+    verifyAscendingSpanOUTPUTTYPE(root.arr,0,preAllocSpan+51,-preAllocSpan);
+    verifyAscendingSpanOUTPUTTYPE(root.arr,preAllocSpan+51,rootSize+101,50);
+  }
+}
+    #ENDIF
+  #ENDIF
+#ENDIF
+
+#IFSWITCH STRUCT==Stack
+@ParameterizedTest
+@ValueSource(ints={0,5,10,15})
+public void testCHECKEDSTRUCTpush_INPUTTYPE_happyPath(int initialCapacity){
+  #MACRO InitializeForInputTest()
+  for(int i=0;i<100;++i)
+  {
+    Assertions.assertTrue(seq.add(TypeConversionUtil.convertToINPUTTYPE(i)));
+  }
+  assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+  for(int i=0,val=-preAllocSpan;i<100;++i,++val)
+  {
+    Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPE(val),root.arr[i]);
+  }
+}
+#ENDIF
+
+@ParameterizedTest
+#IFSWITCH STRUCT==Stack,List
+@ValueSource(ints={0,5,10,15})
+public void testCHECKEDSTRUCTadd_INPUTTYPE_happyPath(int initialCapacity){
+#ELSE
+@MethodSource("getSubListConstructionArgs")
+public void testCHECKEDSTRUCTadd_INPUTTYPE_happyPath(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc){
+#ENDIF
+  #MACRO InitializeForInputTest()
+  for(int i=0;i<100;++i)
+  {
+    Assertions.assertTrue(seq.add(TypeConversionUtil.convertToINPUTTYPE(i)));
+  }
+  assertStructuralIntegrity(seq,100,100,parent,100+parentSize,100,root,100+rootSize,100);
+  for(int i=0,val=-preAllocSpan;i<100;++i,++val)
+  {
+    Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPE(val),root.arr[i]);
+  }
+}
+#ENDDEF
+
+#MACRODEF InitializeForInputTest()
+#IFSWITCH STRUCT==SubList
+int parentSize=parentPreAlloc+parentPostAlloc;
+int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+int preAllocSpan=rootPreAlloc+parentPreAlloc;
+$ClassPrefix$ArrSeq.CHECKEDList root;
+if(rootSize==0)
+{
+  root=new $ClassPrefix$ArrSeq.CHECKEDList();
+}
+else
+{
+  $ArrayType$[] arr=new $ArrayType$[rootSize];
+  initAscendingArray(arr,0,-preAllocSpan,0);
+  initAscendingArray(arr,preAllocSpan,100,100+parentPostAlloc+rootPostAlloc);
+  root=new $ClassPrefix$ArrSeq.CHECKEDList(rootSize,arr);
+}
+var parent=root.subList(rootPreAlloc,preAllocSpan+parentPostAlloc);
+var seq=parent.subList(parentPreAlloc,parentPreAlloc);
+#ELSE
+int rootPreAlloc=0;
+int parentPreAlloc=0;
+int parentPostAlloc=0;
+int rootPostAlloc=0;
+int parentSize=parentPreAlloc+parentPostAlloc;
+int rootSize=rootPreAlloc+parentSize+rootPostAlloc;
+int preAllocSpan=rootPreAlloc+parentPreAlloc;
+var seq=new $ClassPrefix$ArrSeq.CHECKEDSTRUCT(initialCapacity);
+var parent=seq;
+var root=seq;
+#ENDIF
+#ENDDEF
+
+
+
+
+
 
 
 
@@ -830,21 +1608,7 @@ public void testSTRUCTNAMEtoOUTPUTMODIFIERArray_void_seqIsNotEmpty(){
   Assertions.assertNotSame(seq.arr,result);
 }
 #ENDDEF
-#MACRODEF TestInputMethods<INITIALCAPACITY>(INPUTTYPE,OUTPUTTYPE)
-@Test
-public void testSTRUCTNAMEadd_INPUTTYPE_initialCapacityINITIALCAPACITY(){
-  #MACRO ConstructionRoutine()
-  #MACRO AddAscending(100,INPUTTYPE)
-  Assertions.assertEquals(100,seq.size);
-  Assertions.assertNotNull(seq.arr);
-  #IFSWITCH STRUCTNAME==CheckedList,CheckedStack
-  Assertions.assertEquals(100,seq.modCount);
-  #ENDIF
-  for(int i=0;i<seq.size;++i){
-    Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPE(i),seq.arr[i]);
-  }
-}
-#ENDDEF
+
 #MACRODEF ConstructionRoutine()
 #IFSWITCH INITIALCAPACITY==DEFAULT
 var seq=new $ClassPrefix$ArrSeq.STRUCTNAME();
@@ -859,3 +1623,29 @@ for(int i=0;i<NUM_TO_ADD;++i){
   Assertions.assertTrue(seq.add(TypeConversionUtil.convertToINPUTTYPE(i)));
 }
 #ENDDEF
+
+#MACRODEF VerifyIntegrity()
+#IFSWITCH STRUCT==Stack,List
+private static void verifyIntegrity($ClassPrefix$ArrSeq.CHECKEDSTRUCT seq,int expectedModCount,int expected
+#ELSE
+#ENDIF
+#ENDDEF
+
+#MACRODEF TestContains<INPUTTYPE>()
+@ParameterizedTest
+@MethoSource("getCHECKEDSTRUCTcontainsINPUTTYPETestArgs")
+#IFSWITCH STRUCTNAME==Stack,List
+public void testCHECKEDSTRUCTcontains($ClassPrefix$ArrSeq.CHECKEDSTRUCT seq,INPUTTYPE input,boolean expectedReturn,Class<? extends Throwable> expectedException)
+{
+  if(expectedException==null)
+  {
+    #IFSWITCH  
+  }
+  else
+  {
+  }
+}
+#ELSE
+#ENDIF
+#ENDDEF
+

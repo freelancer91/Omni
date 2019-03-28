@@ -66,7 +66,7 @@ public class CodeGeneratorMain{
                             if(!fqtMatcher.matches()){
                                 System.err.println("The fully-qualified-type \""+fqt+"\" is not valid");
                             }else{
-                                final TemplateProcessor2 processor=new TemplateProcessor2(file);
+                                final TemplateProcessor processor=new TemplateProcessor(file);
                                 final Map<TypeDefinition,List<String>> sources=processor.sources;
                                 final Map<TypeDefinition,Integer> typeDefs=processor.typeDefs;
                                 typeDefs.keySet().parallelStream().forEach(typeDef->{

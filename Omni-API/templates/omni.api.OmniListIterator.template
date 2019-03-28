@@ -20,21 +20,101 @@ public abstract interface OmniListIterator<E> extends OmniIterator<E>,ListIterat
   #MACRO PrimitiveSubInterface<float,Float,Float>()
   #MACRO PrimitiveSubInterface<double,Double,Double>()
   
+#MACRODEF InputMethods(INPUTTYPE,CAST)
+public default void add(INPUTTYPE val)
+{
+  add(CAST(val));
+}
+public default void set(INPUTTYPE val)
+{
+  set(CAST(val));
+}
+#ENDDEF
+  
 #MACRODEF PrimitiveSubInterface<ARRTYPE,CLASSPREFIX,BOXEDTYPE>()
 public abstract interface OfCLASSPREFIX extends OmniListIterator<BOXEDTYPE>,OmniIterator.OfCLASSPREFIX
 {
+
+
   public abstract void add(ARRTYPE val);
+  public abstract void set(ARRTYPE val);
+
+#IFNOTSWITCH CLASSPREFIX==Ref
   @Override
   public default void add(BOXEDTYPE val)
   {
-    add(val.ARRTYPEValue());
+    add((ARRTYPE)(val));
   }
-  public abstract void set(ARRTYPE val);
   @Override
   public default void set(BOXEDTYPE val)
   {
-    set(val.ARRTYPEValue());
+    set((ARRTYPE)(val));
   }
+#ENDIF
+  
+  
+#IFSWITCH CLASSPREFIX==Byte
+  #MACRO InputMethods(boolean,TypeUtil.castToByte)
+  #MACRO InputMethods(Boolean,TypeUtil.castToByte)
+#ELSEIFSWITCH CLASSPREFIX==Char
+  #MACRO InputMethods(boolean,TypeUtil.castToChar)
+  #MACRO InputMethods(Boolean,TypeUtil.castToChar)
+#ELSEIFSWITCH CLASSPREFIX==Short
+  #MACRO InputMethods(boolean,(short)TypeUtil.castToByte)
+  #MACRO InputMethods(Boolean,(short)TypeUtil.castToByte)
+  #MACRO InputMethods(byte,(short))
+  #MACRO InputMethods(Byte,(short)(byte))
+#ELSEIFSWITCH CLASSPREFIX==Int
+  #MACRO InputMethods(boolean,(int)TypeUtil.castToByte)
+  #MACRO InputMethods(Boolean,(int)TypeUtil.castToByte)
+  #MACRO InputMethods(byte,(int))
+  #MACRO InputMethods(Byte,(int)(byte))
+  #MACRO InputMethods(char,(int))
+  #MACRO InputMethods(Character,(int)(char))
+  #MACRO InputMethods(short,(int))
+  #MACRO InputMethods(Short,(int)(short))
+#ELSEIFSWITCH CLASSPREFIX==Long
+  #MACRO InputMethods(boolean,TypeUtil.castToLong)
+  #MACRO InputMethods(Boolean,TypeUtil.castToLong)
+  #MACRO InputMethods(byte,(long))
+  #MACRO InputMethods(Byte,(long)(byte))
+  #MACRO InputMethods(char,(long))
+  #MACRO InputMethods(Character,(long)(char))
+  #MACRO InputMethods(short,(long))
+  #MACRO InputMethods(Short,(long)(short))
+  #MACRO InputMethods(int,(long))
+  #MACRO InputMethods(Integer,(long)(int))
+#ELSEIFSWITCH CLASSPREFIX==Float
+  #MACRO InputMethods(boolean,TypeUtil.castToFloat)
+  #MACRO InputMethods(Boolean,TypeUtil.castToFloat)
+  #MACRO InputMethods(byte,(float))
+  #MACRO InputMethods(Byte,(float)(byte))
+  #MACRO InputMethods(char,(float))
+  #MACRO InputMethods(Character,(float)(char))
+  #MACRO InputMethods(short,(float))
+  #MACRO InputMethods(Short,(float)(short))
+  #MACRO InputMethods(int,(float))
+  #MACRO InputMethods(Integer,(float)(int))
+  #MACRO InputMethods(long,(float))
+  #MACRO InputMethods(Long,(float)(long))
+#ELSEIFSWITCH CLASSPREFIX==Double
+  #MACRO InputMethods(boolean,TypeUtil.castToDouble)
+  #MACRO InputMethods(Boolean,TypeUtil.castToDouble)
+  #MACRO InputMethods(byte,(double))
+  #MACRO InputMethods(Byte,(double)(byte))
+  #MACRO InputMethods(char,(double))
+  #MACRO InputMethods(Character,(double)(char))
+  #MACRO InputMethods(short,(double))
+  #MACRO InputMethods(Short,(double)(short))
+  #MACRO InputMethods(int,(double))
+  #MACRO InputMethods(Integer,(double)(int))
+  #MACRO InputMethods(long,(double))
+  #MACRO InputMethods(Long,(double)(long))
+  #MACRO InputMethods(float,(double))
+  #MACRO InputMethods(Float,(double)(float))
+#ENDIF
+  
+ 
   public abstract ARRTYPE previousCLASSPREFIX();
   @Override
   public default BOXEDTYPE next()

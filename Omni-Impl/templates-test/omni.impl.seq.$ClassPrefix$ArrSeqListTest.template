@@ -8,13 +8,12 @@
 #TYPEDEF OfDouble
 #TYPEDEF OfRef
 package omni.impl.seq;
-import java.util.ArrayList;
-import omni.impl.seq.$ClassPrefix$ArrSeq.UncheckedList;
-import omni.impl.seq.$ClassPrefix$ArrSeq.CheckedList;
 import omni.util.TypeConversionUtil;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-@SuppressWarnings({"rawtypes","unchecked"}) 
+#IF OfRef
+@SuppressWarnings({"rawtypes","unchecked"})
+#ENDIF
 public class $ClassPrefix$ArrSeqListTest
 {
 
@@ -125,11 +124,11 @@ public class $ClassPrefix$ArrSeqListTest
 
 #MACRODEF ConstructionRoutine()
 #IFSWITCH INITIALCAPACITY==DEFAULT
-STRUCTNAME seq=new STRUCTNAME();
+var seq=new $ClassPrefix$ArrSeq.STRUCTNAME();
 #ELSEIFSWITCH INITIALCAPACITY==NULL
-STRUCTNAME seq=new STRUCTNAME(0,null);
+var seq=new $ClassPrefix$ArrSeq.STRUCTNAME(0,null);
 #ELSE
-STRUCTNAME seq=new STRUCTNAME(INITIALCAPACITY);
+var seq=new $ClassPrefix$ArrSeq.STRUCTNAME(INITIALCAPACITY);
 #ENDIF
 #ENDDEF
 
@@ -310,25 +309,12 @@ public void testSTRUCTNAMEREMOVEMETHOD_seqIsNotEmpty_removeAtMidPoint()
 {
   #MACRO ConstructionRoutine()
   #MACRO InsertEndAscending(100,$ArrayType$)
-#IFNOT OfRef
-  ArrayList arrayList=new ArrayList();
-  for(int i=0;i<100;++i)
-  {
-    arrayList.add(TypeConversionUtil.convertToOUTPUTTYPE(i));
-  }
-#ENDIF
   for(int i=0;i<100;++i)
   {
     int removeIndex=seq.size()/2;
+    Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPE(((i&1)==0?i:0)+removeIndex),seq.REMOVEMETHOD(removeIndex));
 #IF OfRef
-    Assertions.assertSame(seq.arr[removeIndex],seq.REMOVEMETHOD(removeIndex));
     Assertions.assertNull(seq.arr[seq.size()]);
-#ELSE
-    Assertions.assertEquals(arrayList.remove(removeIndex),(Object)seq.REMOVEMETHOD(removeIndex));
-#ENDIF
-    Assertions.assertEquals(100-i-1,seq.size());
-#IFSWITCH STRUCTNAME==CheckedList
-    Assertions.assertEquals(100+i+1,seq.modCount);
 #ENDIF
   }
 }
@@ -418,18 +404,14 @@ public void testSTRUCTNAMEadd_intINPUTTYPE_initialCapacityINITIALCAPACITY_Insert
   #IFSWITCH STRUCTNAME==CheckedList
   Assertions.assertEquals(100,seq.modCount);
   #ENDIF
-  ArrayList arrayList=new ArrayList();
-  for(int i=0;i<seqSize;++i)
+  for(int i=0,val=1;i<50;++i,val+=2)
   {
-    arrayList.add(arrayList.size()/2,TypeConversionUtil.convertToOUTPUTTYPE(i));
+    Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPE(val),seq.arr[i]);
   }
-  System.out.println("BEGIN testSTRUCTNAMEadd_intINPUTTYPE_initialCapacityINITIALCAPACITY_InsertMidPoint");
-  for(int i=0;i<seqSize;++i)
+  for(int i=50,val=98;i<100;++i,val-=2)
   {
-    System.out.println(arrayList.get(i));
-    Assertions.assertEquals(arrayList.get(i),(Object)seq.arr[i]);
+    Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPE(val),seq.arr[i]);
   }
-  System.out.println("END testSTRUCTNAMEadd_intINPUTTYPE_initialCapacityINITIALCAPACITY_InsertMidPoint");
 }
 #IFSWITCH STRUCTNAME==CheckedList
 @Test
