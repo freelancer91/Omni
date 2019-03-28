@@ -175,22 +175,23 @@ public class CheckedCollectionTest{
             throw CheckedCollection.checkModCount(1,2,new Error());
         });
     }
+    private static class ModCountCheckerTester{
+      int modCount;
+      ModCountCheckerTester(int modCount){
+          this.modCount=modCount;
+      }
+      public CheckedCollection.AbstractModCountChecker getModCountChecker(int expected){
+          return new CheckedCollection.AbstractModCountChecker(expected){
+              @Override
+              protected int getActualModCount(){
+                  return modCount;
+              }
+          };
+      }
+  }
     @Test
     public void testAbstractModCountChecker(){
-        class ModCountCheckerTester{
-            int modCount;
-            ModCountCheckerTester(int modCount){
-                this.modCount=modCount;
-            }
-            public CheckedCollection.AbstractModCountChecker getModCountChecker(int expected){
-                return new CheckedCollection.AbstractModCountChecker(expected){
-                    @Override
-                    protected int getActualModCount(){
-                        return modCount;
-                    }
-                };
-            }
-        }
+        
         ModCountCheckerTester testClass=new ModCountCheckerTester(1);
         CheckedCollection.AbstractModCountChecker modCountChecker=testClass.getModCountChecker(testClass.modCount);
         Assertions.assertDoesNotThrow(modCountChecker::checkModCount);
