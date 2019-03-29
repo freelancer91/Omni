@@ -18,58 +18,26 @@ import omni.api.OmniCollection;
 import omni.api.OmniListIterator;
 @SuppressWarnings({"rawtypes","unchecked"}) 
 public class BooleanArrSeqTest{
-  private static enum StructType{
-    STACK,
-    LIST,
-    SUBLIST;
-  }
+  private static enum StructType{STACK,LIST,SUBLIST;}
   private static enum InputTestArgType{
      ARRAY_TYPE{
-       void callListItrAdd(OmniListIterator.OfBoolean itr,int valToConvert){
-         itr.add(TypeConversionUtil.convertToboolean(valToConvert));
-       }
-       void callListItrSet(OmniListIterator.OfBoolean itr,int valToConvert){
-         itr.set(TypeConversionUtil.convertToboolean(valToConvert));
-       }
-       void callListPut(OmniCollection.OfBoolean seq,int index,int valToConvert){
-         ((OmniList.OfBoolean)seq).put(index,TypeConversionUtil.convertToboolean(valToConvert));
-       }
-       void callListAdd(OmniCollection.OfBoolean seq,int index,int valToConvert){
-         ((OmniList.OfBoolean)seq).add(index,TypeConversionUtil.convertToboolean(valToConvert));
-       }
-       void callStackPush(OmniCollection.OfBoolean seq,int valToConvert){
-         ((OmniStack.OfBoolean)seq).push(TypeConversionUtil.convertToboolean(valToConvert));
-       }
-       boolean callCollectionAdd(OmniCollection.OfBoolean seq,int valToConvert){
-         return seq.add(TypeConversionUtil.convertToboolean(valToConvert));
-       }
-       void verifyIndex(int expectedValToConvert,boolean actualVal){
-         Assertions.assertEquals(TypeConversionUtil.convertToboolean(expectedValToConvert),actualVal);
-       }
+       void callListItrAdd(OmniListIterator.OfBoolean itr,int valToConvert){itr.add(TypeConversionUtil.convertToboolean(valToConvert));}
+       void callListItrSet(OmniListIterator.OfBoolean itr,int valToConvert){itr.set(TypeConversionUtil.convertToboolean(valToConvert));}
+       void callListPut(OmniCollection.OfBoolean seq,int index,int valToConvert){((OmniList.OfBoolean)seq).put(index,TypeConversionUtil.convertToboolean(valToConvert));}
+       void callListAdd(OmniCollection.OfBoolean seq,int index,int valToConvert){((OmniList.OfBoolean)seq).add(index,TypeConversionUtil.convertToboolean(valToConvert));}
+       void callStackPush(OmniCollection.OfBoolean seq,int valToConvert){((OmniStack.OfBoolean)seq).push(TypeConversionUtil.convertToboolean(valToConvert));}
+       boolean callCollectionAdd(OmniCollection.OfBoolean seq,int valToConvert){return seq.add(TypeConversionUtil.convertToboolean(valToConvert));}
+       void verifyIndex(int expectedValToConvert,boolean actualVal){Assertions.assertEquals(TypeConversionUtil.convertToboolean(expectedValToConvert),actualVal);}
      }
     ,
     BOXED_TYPE{
-      void callListItrAdd(OmniListIterator.OfBoolean itr,int valToConvert){
-        itr.add(TypeConversionUtil.convertToBoolean(valToConvert));
-      }
-      void callListItrSet(OmniListIterator.OfBoolean itr,int valToConvert){
-        itr.set(TypeConversionUtil.convertToBoolean(valToConvert));
-      }
-      void callListPut(OmniCollection.OfBoolean seq,int index,int valToConvert){
-        ((OmniList.OfBoolean)seq).put(index,TypeConversionUtil.convertToBoolean(valToConvert));
-      }
-      void callListAdd(OmniCollection.OfBoolean seq,int index,int valToConvert){
-        ((OmniList.OfBoolean)seq).add(index,TypeConversionUtil.convertToBoolean(valToConvert));
-      }
-      void callStackPush(OmniCollection.OfBoolean seq,int valToConvert){
-        ((OmniStack.OfBoolean)seq).push(TypeConversionUtil.convertToBoolean(valToConvert));
-      }
-      boolean callCollectionAdd(OmniCollection.OfBoolean seq,int valToConvert){
-        return seq.add(TypeConversionUtil.convertToBoolean(valToConvert));
-      }
-      void verifyIndex(int expectedValToConvert,boolean actualVal){
-        Assertions.assertEquals(TypeConversionUtil.convertToboolean(expectedValToConvert),actualVal);
-      }
+      void callListItrAdd(OmniListIterator.OfBoolean itr,int valToConvert){itr.add(TypeConversionUtil.convertToBoolean(valToConvert));}
+      void callListItrSet(OmniListIterator.OfBoolean itr,int valToConvert){itr.set(TypeConversionUtil.convertToBoolean(valToConvert));}
+      void callListPut(OmniCollection.OfBoolean seq,int index,int valToConvert){((OmniList.OfBoolean)seq).put(index,TypeConversionUtil.convertToBoolean(valToConvert));}
+      void callListAdd(OmniCollection.OfBoolean seq,int index,int valToConvert){((OmniList.OfBoolean)seq).add(index,TypeConversionUtil.convertToBoolean(valToConvert));}
+      void callStackPush(OmniCollection.OfBoolean seq,int valToConvert){((OmniStack.OfBoolean)seq).push(TypeConversionUtil.convertToBoolean(valToConvert));}
+      boolean callCollectionAdd(OmniCollection.OfBoolean seq,int valToConvert){return seq.add(TypeConversionUtil.convertToBoolean(valToConvert));}
+      void verifyIndex(int expectedValToConvert,boolean actualVal){Assertions.assertEquals(TypeConversionUtil.convertToboolean(expectedValToConvert),actualVal);}
     }
     ;
     abstract void callListItrAdd(OmniListIterator.OfBoolean itr,int valToConvert);
@@ -78,42 +46,27 @@ public class BooleanArrSeqTest{
     abstract void callListAdd(OmniCollection.OfBoolean seq,int index,int valToConvert);
     abstract void callStackPush(OmniCollection.OfBoolean seq,int valToConvert);
     abstract boolean callCollectionAdd(OmniCollection.OfBoolean seq,int valToConvert);
-    private int verifyAscending(ConstructionArguments constructionArgs,int offset,int length,int loVal){
-      return verifyAscending(constructionArgs.root.arr,offset,length,loVal);
-    }
-    private int verifyDescending(ConstructionArguments constructionArgs,int offset,int length,int loVal){
-      return verifyDescending(constructionArgs.root.arr,offset,length,loVal);
-    }
-    private int verifyMidPointInsertion(ConstructionArguments constructionArgs,int offset,int length,int loVal){
-      return verifyMidPointInsertion(constructionArgs.root.arr,offset,length,loVal);
-    }
-    private int verifyIndex(ConstructionArguments constructionArgs,int index,int expectedValToConvert)
-    {
+    private int verifyAscending(ConstructionArguments constructionArgs,int offset,int length,int loVal){return verifyAscending(constructionArgs.root.arr,offset,length,loVal);}
+    private int verifyDescending(ConstructionArguments constructionArgs,int offset,int length,int loVal){return verifyDescending(constructionArgs.root.arr,offset,length,loVal);}
+    private int verifyMidPointInsertion(ConstructionArguments constructionArgs,int offset,int length,int loVal){return verifyMidPointInsertion(constructionArgs.root.arr,offset,length,loVal);}
+    private int verifyIndex(ConstructionArguments constructionArgs,int index,int expectedValToConvert){
       verifyIndex(expectedValToConvert,constructionArgs.root.arr[index]);
       return index+1; 
     }
     private int verifyAscending(boolean[] arr,int offset,int length,int loVal){
       int bound=offset+length;
-      for(int i=offset;i<bound;++i,++loVal){
-        verifyIndex(loVal,arr[i]);
-      }
+      for(int i=offset;i<bound;++i,++loVal){verifyIndex(loVal,arr[i]);}
       return bound;
     }
     private int verifyDescending(boolean[] arr,int offset,int length,int loVal){
       int bound=offset+length;
-      for(int i=bound;--i>=offset;++loVal){
-        verifyIndex(loVal,arr[i]);
-      }
+      for(int i=bound;--i>=offset;++loVal){verifyIndex(loVal,arr[i]);}
       return bound;
     }
     private int verifyMidPointInsertion(boolean[] arr,int offset,int length,int loVal){
       int i;
-      for(int v=loVal+1,b=(i=offset)+length/2;i<b;++i,v+=2){
-        verifyIndex(v,arr[i]);
-      }
-      for(int v=loVal+length-2,b=i+length/2;i<b;++i,v-=2){
-        verifyIndex(v,arr[i]);
-      }
+      for(int v=loVal+1,b=(i=offset)+length/2;i<b;++i,v+=2){verifyIndex(v,arr[i]);}
+      for(int v=loVal+length-2,b=i+length/2;i<b;++i,v-=2){verifyIndex(v,arr[i]);}
       return offset+length;
     }
     abstract void verifyIndex(int expectedValToConvert,boolean actualVal);
@@ -190,9 +143,7 @@ public class BooleanArrSeqTest{
       }
       return builder.append('}').toString();
     }
-    private OmniListIterator.OfBoolean constructSeqListIterator(){
-      return ((OmniList.OfBoolean)seq).listIterator();
-    }
+    private OmniListIterator.OfBoolean constructSeqListIterator(){return ((OmniList.OfBoolean)seq).listIterator();}
     private void verifyIteratorState(Object itr,int expectedCursor,int expectedLastRet,int expectedModCount){
       int actualCursor;
       Object actualParent;
@@ -233,27 +184,15 @@ public class BooleanArrSeqTest{
       Assertions.assertEquals(expectedCursor+preAlloc,actualCursor);
       Assertions.assertSame(seq,actualParent);
     }
-    private void verifyStructuralIntegrity(int expectedSize,int expectedModCount){
-       verifyStructuralIntegrity(expectedSize,expectedModCount,expectedSize,expectedModCount,expectedSize,expectedModCount);
-    }
-    private void verifyStructuralIntegrity(int expectedSeqSize,int expectedSeqModCount,int expectedParentAndRootSize,int expectedParentAndRootModCount){
-       verifyStructuralIntegrity(expectedSeqSize,expectedSeqModCount,expectedParentAndRootSize,expectedParentAndRootModCount,expectedParentAndRootSize,expectedParentAndRootModCount);
-    }
-    private void verifyStructuralIntegrity(int expectedSeqSize,int expectedModCount,int expectedParentSize,int expectedParentModCount,int expectedRootSize,int expectedRootModCount)
-    {
-      switch(structType)
-      {
+    private void verifyStructuralIntegrity(int expectedSize,int expectedModCount){verifyStructuralIntegrity(expectedSize,expectedModCount,expectedSize,expectedModCount,expectedSize,expectedModCount);}
+    private void verifyStructuralIntegrity(int expectedSeqSize,int expectedSeqModCount,int expectedParentAndRootSize,int expectedParentAndRootModCount){verifyStructuralIntegrity(expectedSeqSize,expectedSeqModCount,expectedParentAndRootSize,expectedParentAndRootModCount,expectedParentAndRootSize,expectedParentAndRootModCount);}
+    private void verifyStructuralIntegrity(int expectedSeqSize,int expectedModCount,int expectedParentSize,int expectedParentModCount,int expectedRootSize,int expectedRootModCount){
+      switch(structType){
         case STACK:
-          if(checked)
-          {
-            Assertions.assertEquals(expectedRootModCount,FieldAccessor.BooleanArrSeq.CheckedStack.modCount(root));
-          }
+          if(checked){Assertions.assertEquals(expectedRootModCount,FieldAccessor.BooleanArrSeq.CheckedStack.modCount(root));}
           break;
         case LIST:
-          if(checked)
-          {
-             Assertions.assertEquals(expectedRootModCount,FieldAccessor.BooleanArrSeq.CheckedList.modCount(root));
-          }
+          if(checked){Assertions.assertEquals(expectedRootModCount,FieldAccessor.BooleanArrSeq.CheckedList.modCount(root));}
           break;
         default:
           OmniList.OfBoolean actualSeqParent;
@@ -292,25 +231,18 @@ public class BooleanArrSeqTest{
   }
   private static void initAscendingArray(boolean[] arr,int offset,int lo,int hi){
     int bound=offset+(hi-lo);
-    for(int i=offset;i<bound;++i,++lo){
-      arr[i]=TypeConversionUtil.convertToboolean(lo);
-    }
+    for(int i=offset;i<bound;++i,++lo){arr[i]=TypeConversionUtil.convertToboolean(lo);}
   }
-  private static final Arguments[] NON_SUBLIST_TYPES=new Arguments[]
-  {
+  private static final Arguments[] NON_SUBLIST_TYPES=new Arguments[]{
     Arguments.of(false,StructType.LIST),
     Arguments.of(true,StructType.LIST),
     Arguments.of(false,StructType.STACK),
     Arguments.of(true,StructType.STACK)
   };
-  static Stream<Arguments> getArgsForNonSubListTypes()
-  {
-    return Stream.of(NON_SUBLIST_TYPES);
-  }
+  static Stream<Arguments> getArgsForNonSubListTypes(){return Stream.of(NON_SUBLIST_TYPES);}
   @ParameterizedTest
   @MethodSource("getArgsForNonSubListTypes")
-  public void testConstructor_happyPath(boolean checked,StructType structType)
-  {
+  public void testConstructor_happyPath(boolean checked,StructType structType){
     BooleanArrSeq seq;
     if(checked){
       Assertions.assertEquals(0,structType==StructType.LIST?FieldAccessor.BooleanArrSeq.CheckedList.modCount(seq=new BooleanArrSeq.CheckedList()):FieldAccessor.BooleanArrSeq.CheckedStack.modCount(seq=new BooleanArrSeq.CheckedStack()));
@@ -321,8 +253,7 @@ public class BooleanArrSeqTest{
   }
   @ParameterizedTest
   @MethodSource("getArgsForNonSubListTypes")
-  public void testConstructor_int_booleanarr_happyPath(boolean checked,StructType structType)
-  {
+  public void testConstructor_int_booleanarr_happyPath(boolean checked,StructType structType){
     int size=5;
     boolean[] arr=new boolean[10];
     BooleanArrSeq seq;
@@ -334,11 +265,9 @@ public class BooleanArrSeqTest{
     Assertions.assertEquals(size,seq.size);
     Assertions.assertSame(arr,seq.arr);
   }
-  static Stream<Arguments> getArgsFortestConstructor_int_happyPath()
-  {
+  static Stream<Arguments> getArgsFortestConstructor_int_happyPath(){
     Stream.Builder<Arguments> builder=Stream.builder();
-    for(int initialCapacity=0;initialCapacity<=15;initialCapacity+=5)
-    {
+    for(int initialCapacity=0;initialCapacity<=15;initialCapacity+=5){
       builder.add(Arguments.of(initialCapacity,false,StructType.LIST));
       builder.add(Arguments.of(initialCapacity,true,StructType.LIST));
       builder.add(Arguments.of(initialCapacity,false,StructType.STACK));
@@ -348,8 +277,7 @@ public class BooleanArrSeqTest{
   }
   @ParameterizedTest
   @MethodSource("getArgsFortestConstructor_int_happyPath")
-  public void testConstructor_int_happyPath(int initialCapacity,boolean checked,StructType structType)
-  {
+  public void testConstructor_int_happyPath(int initialCapacity,boolean checked,StructType structType){
     BooleanArrSeq seq;
     if(checked){
       Assertions.assertEquals(0,structType==StructType.LIST?FieldAccessor.BooleanArrSeq.CheckedList.modCount(seq=new BooleanArrSeq.CheckedList(initialCapacity)):FieldAccessor.BooleanArrSeq.CheckedStack.modCount(seq=new BooleanArrSeq.CheckedStack(initialCapacity)));
@@ -357,8 +285,7 @@ public class BooleanArrSeqTest{
       seq=structType==StructType.LIST?new BooleanArrSeq.UncheckedList(initialCapacity):new BooleanArrSeq.UncheckedStack(initialCapacity);
     }
     Assertions.assertEquals(0,seq.size);
-    switch(initialCapacity)
-    {
+    switch(initialCapacity){
       case 0:
         Assertions.assertNull(seq.arr);
         break;
@@ -369,24 +296,17 @@ public class BooleanArrSeqTest{
         Assertions.assertEquals(initialCapacity,seq.arr.length);
     }
   }
-  static Stream<Arguments> getListInputMethodArgs()
-  {
+  static Stream<Arguments> getListInputMethodArgs(){
     Stream.Builder<Arguments> builder=Stream.builder();
-    for(InputTestArgType inputTestArgType:InputTestArgType.values())
-    {
-      for(int initialCapacity=0;initialCapacity<=15;initialCapacity+=5)
-      {
+    for(InputTestArgType inputTestArgType:InputTestArgType.values()){
+      for(int initialCapacity=0;initialCapacity<=15;initialCapacity+=5){
         builder.add(Arguments.of(inputTestArgType,new ConstructionArguments(initialCapacity,false,StructType.LIST)));
         builder.add(Arguments.of(inputTestArgType,new ConstructionArguments(initialCapacity,true,StructType.LIST)));
       }
-      for(int rootPreAlloc=0;rootPreAlloc<=5;rootPreAlloc+=5)
-      {
-        for(int rootPostAlloc=0;rootPostAlloc<=5;rootPostAlloc+=5)
-        {
-          for(int parentPreAlloc=0;parentPreAlloc<=5;parentPreAlloc+=5)
-          {
-            for(int parentPostAlloc=0;parentPostAlloc<=5;parentPostAlloc+=5)
-            {
+      for(int rootPreAlloc=0;rootPreAlloc<=5;rootPreAlloc+=5){
+        for(int rootPostAlloc=0;rootPostAlloc<=5;rootPostAlloc+=5){
+          for(int parentPreAlloc=0;parentPreAlloc<=5;parentPreAlloc+=5){
+            for(int parentPostAlloc=0;parentPostAlloc<=5;parentPostAlloc+=5){
               builder.add(Arguments.of(inputTestArgType,new ConstructionArguments(rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,true)));
               builder.add(Arguments.of(inputTestArgType,new ConstructionArguments(rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,false)));
             }
@@ -396,26 +316,19 @@ public class BooleanArrSeqTest{
     }
     return builder.build();
   }
-  static Stream<Arguments> getCollectionInputMethodArgs()
-  {
+  static Stream<Arguments> getCollectionInputMethodArgs(){
     Stream.Builder<Arguments> builder=Stream.builder();
-    for(InputTestArgType inputTestArgType:InputTestArgType.values())
-    {
-      for(int initialCapacity=0;initialCapacity<=15;initialCapacity+=5)
-      {
+    for(InputTestArgType inputTestArgType:InputTestArgType.values()){
+      for(int initialCapacity=0;initialCapacity<=15;initialCapacity+=5){
         builder.add(Arguments.of(inputTestArgType,new ConstructionArguments(initialCapacity,false,StructType.STACK)));
         builder.add(Arguments.of(inputTestArgType,new ConstructionArguments(initialCapacity,true,StructType.STACK)));
         builder.add(Arguments.of(inputTestArgType,new ConstructionArguments(initialCapacity,false,StructType.LIST)));
         builder.add(Arguments.of(inputTestArgType,new ConstructionArguments(initialCapacity,true,StructType.LIST)));
       }
-      for(int rootPreAlloc=0;rootPreAlloc<=5;rootPreAlloc+=5)
-      {
-        for(int rootPostAlloc=0;rootPostAlloc<=5;rootPostAlloc+=5)
-        {
-          for(int parentPreAlloc=0;parentPreAlloc<=5;parentPreAlloc+=5)
-          {
-            for(int parentPostAlloc=0;parentPostAlloc<=5;parentPostAlloc+=5)
-            {
+      for(int rootPreAlloc=0;rootPreAlloc<=5;rootPreAlloc+=5){
+        for(int rootPostAlloc=0;rootPostAlloc<=5;rootPostAlloc+=5){
+          for(int parentPreAlloc=0;parentPreAlloc<=5;parentPreAlloc+=5){
+            for(int parentPostAlloc=0;parentPostAlloc<=5;parentPostAlloc+=5){
               builder.add(Arguments.of(inputTestArgType,new ConstructionArguments(rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,true)));
               builder.add(Arguments.of(inputTestArgType,new ConstructionArguments(rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,false)));
             }
@@ -425,13 +338,10 @@ public class BooleanArrSeqTest{
     }
     return builder.build();
   }
-  static Stream<Arguments> getStackInputMethodArgs()
-  {
+  static Stream<Arguments> getStackInputMethodArgs(){
     Stream.Builder<Arguments> builder=Stream.builder();
-    for(InputTestArgType inputTestArgType:InputTestArgType.values())
-    {
-      for(int initialCapacity=0;initialCapacity<=15;initialCapacity+=5)
-      {
+    for(InputTestArgType inputTestArgType:InputTestArgType.values()){
+      for(int initialCapacity=0;initialCapacity<=15;initialCapacity+=5){
         builder.add(Arguments.of(inputTestArgType,new ConstructionArguments(initialCapacity,false,StructType.STACK)));
         builder.add(Arguments.of(inputTestArgType,new ConstructionArguments(initialCapacity,true,StructType.STACK)));
       }
@@ -440,11 +350,9 @@ public class BooleanArrSeqTest{
   }
   @ParameterizedTest
   @MethodSource("getListInputMethodArgs")
-  public void testListItradd_val_happyPathInsertBegin(InputTestArgType inputArgType,ConstructionArguments constructionArgs)
-  {
+  public void testListItradd_val_happyPathInsertBegin(InputTestArgType inputArgType,ConstructionArguments constructionArgs){
     var seqItr=constructionArgs.constructSeqListIterator();
-    for(int i=0;i<100;++i)
-    {
+    for(int i=0;i<100;++i){
       inputArgType.callListItrAdd(seqItr,i);
       constructionArgs.verifyIteratorState(seqItr,1,-1,i+1);
       seqItr.previousBoolean();
@@ -458,12 +366,8 @@ public class BooleanArrSeqTest{
   }
   @ParameterizedTest
   @MethodSource("getListInputMethodArgs")
-  public void testadd_int_val_happyPathInsertBegin(InputTestArgType inputArgType,ConstructionArguments constructionArgs)
-  {
-    for(int i=0;i<100;++i)
-    {
-      inputArgType.callListAdd(constructionArgs.seq,0,i);
-    }
+  public void testadd_int_val_happyPathInsertBegin(InputTestArgType inputArgType,ConstructionArguments constructionArgs){
+    for(int i=0;i<100;++i){inputArgType.callListAdd(constructionArgs.seq,0,i);}
     constructionArgs.verifyStructuralIntegrity(100,100);
     InputTestArgType.ARRAY_TYPE.verifyAscending(constructionArgs,
       inputArgType.verifyDescending(constructionArgs,
@@ -473,11 +377,9 @@ public class BooleanArrSeqTest{
   }
   @ParameterizedTest
   @MethodSource("getListInputMethodArgs")
-  public void testListItradd_val_happyPathInsertEnd(InputTestArgType inputArgType,ConstructionArguments constructionArgs)
-  {
+  public void testListItradd_val_happyPathInsertEnd(InputTestArgType inputArgType,ConstructionArguments constructionArgs){
     var seqItr=constructionArgs.constructSeqListIterator();
-    for(int i=0;i<100;++i)
-    {
+    for(int i=0;i<100;++i){
       inputArgType.callListItrAdd(seqItr,i);
       constructionArgs.verifyIteratorState(seqItr,i+1,-1,i+1);
     }
@@ -490,12 +392,8 @@ public class BooleanArrSeqTest{
   }
   @ParameterizedTest
   @MethodSource("getListInputMethodArgs")
-  public void testadd_int_val_happyPathInsertEnd(InputTestArgType inputArgType,ConstructionArguments constructionArgs)
-  {
-    for(int i=0;i<100;++i)
-    {
-      inputArgType.callListAdd(constructionArgs.seq,constructionArgs.seq.size(),i);
-    }
+  public void testadd_int_val_happyPathInsertEnd(InputTestArgType inputArgType,ConstructionArguments constructionArgs){
+    for(int i=0;i<100;++i){inputArgType.callListAdd(constructionArgs.seq,constructionArgs.seq.size(),i);}
     constructionArgs.verifyStructuralIntegrity(100,100);
     InputTestArgType.ARRAY_TYPE.verifyAscending(constructionArgs,
       inputArgType.verifyAscending(constructionArgs,
@@ -505,17 +403,12 @@ public class BooleanArrSeqTest{
   }
   @ParameterizedTest
   @MethodSource("getListInputMethodArgs")
-  public void testListItradd_val_happyPathInsertMidPoint(InputTestArgType inputArgType,ConstructionArguments constructionArgs)
-  {
+  public void testListItradd_val_happyPathInsertMidPoint(InputTestArgType inputArgType,ConstructionArguments constructionArgs){
     var seqItr=constructionArgs.constructSeqListIterator();
-    for(int i=0;i<100;++i)
-    {
+    for(int i=0;i<100;++i){
       inputArgType.callListItrAdd(seqItr,i);
       constructionArgs.verifyIteratorState(seqItr,(i/2)+1,-1,i+1);
-      if((i&1)==0)
-      {
-        seqItr.previousBoolean();
-      }
+      if((i&1)==0){seqItr.previousBoolean();}
     }
     constructionArgs.verifyStructuralIntegrity(100,100);
     InputTestArgType.ARRAY_TYPE.verifyAscending(constructionArgs,
@@ -526,12 +419,8 @@ public class BooleanArrSeqTest{
   }
   @ParameterizedTest
   @MethodSource("getListInputMethodArgs")
-  public void testadd_int_val_happyPathInsertMidPoint(InputTestArgType inputArgType,ConstructionArguments constructionArgs)
-  {
-    for(int i=0;i<100;++i)
-    {
-      inputArgType.callListAdd(constructionArgs.seq,constructionArgs.seq.size()/2,i);
-    }
+  public void testadd_int_val_happyPathInsertMidPoint(InputTestArgType inputArgType,ConstructionArguments constructionArgs){
+    for(int i=0;i<100;++i){inputArgType.callListAdd(constructionArgs.seq,constructionArgs.seq.size()/2,i);}
     constructionArgs.verifyStructuralIntegrity(100,100);
     InputTestArgType.ARRAY_TYPE.verifyAscending(constructionArgs,
       inputArgType.verifyMidPointInsertion(constructionArgs,
@@ -541,15 +430,10 @@ public class BooleanArrSeqTest{
   }
   @ParameterizedTest
   @MethodSource("getListInputMethodArgs")
-  public void testListItrset_val_happyPath(InputTestArgType inputArgType,ConstructionArguments constructionArgs)
-  {
-    for(int i=100;--i>=0;)
-    {
-      constructionArgs.seq.add(TypeConversionUtil.convertToboolean(i));
-    }
+  public void testListItrset_val_happyPath(InputTestArgType inputArgType,ConstructionArguments constructionArgs){
+    for(int i=100;--i>=0;){constructionArgs.seq.add(TypeConversionUtil.convertToboolean(i));}
     var seqItr=constructionArgs.constructSeqListIterator();
-    for(int i=0;i<100;++i)
-    {
+    for(int i=0;i<100;++i){
       seqItr.nextBoolean();
       inputArgType.callListItrSet(seqItr,i);
       constructionArgs.verifyIteratorState(seqItr,i+1,i,100);
@@ -559,8 +443,7 @@ public class BooleanArrSeqTest{
         InputTestArgType.ARRAY_TYPE.verifyAscending(constructionArgs,0,constructionArgs.preAlloc,-constructionArgs.preAlloc)
       ,100,0)
     ,constructionArgs.postAlloc,100);
-    for(int i=0;i<100;++i)
-    {
+    for(int i=0;i<100;++i){
       seqItr.previousBoolean();
       inputArgType.callListItrSet(seqItr,i);
       constructionArgs.verifyIteratorState(seqItr,100-i-1,100-i-1,100);
@@ -574,16 +457,9 @@ public class BooleanArrSeqTest{
   }
   @ParameterizedTest
   @MethodSource("getListInputMethodArgs")
-  public void testput_int_val_happyPath(InputTestArgType inputArgType,ConstructionArguments constructionArgs)
-  {
-    for(int i=0;i<100;++i)
-    {
-      constructionArgs.seq.add(TypeConversionUtil.convertToboolean(i));
-    }
-    for(int i=0;i<100;++i)
-    {
-      inputArgType.callListPut(constructionArgs.seq,100-i-1,i);
-    }
+  public void testput_int_val_happyPath(InputTestArgType inputArgType,ConstructionArguments constructionArgs){
+    for(int i=0;i<100;++i){constructionArgs.seq.add(TypeConversionUtil.convertToboolean(i));}
+    for(int i=0;i<100;++i){inputArgType.callListPut(constructionArgs.seq,100-i-1,i);}
     constructionArgs.verifyStructuralIntegrity(100,100);
     InputTestArgType.ARRAY_TYPE.verifyAscending(constructionArgs,
       inputArgType.verifyDescending(constructionArgs,
@@ -593,12 +469,8 @@ public class BooleanArrSeqTest{
   }
   @ParameterizedTest
   @MethodSource("getStackInputMethodArgs")
-  public void testpush_val_happyPath(InputTestArgType inputArgType,ConstructionArguments constructionArgs)
-  {
-    for(int i=0;i<100;++i)
-    {
-      inputArgType.callStackPush(constructionArgs.seq,i);
-    }
+  public void testpush_val_happyPath(InputTestArgType inputArgType,ConstructionArguments constructionArgs){
+    for(int i=0;i<100;++i){inputArgType.callStackPush(constructionArgs.seq,i);}
     constructionArgs.verifyStructuralIntegrity(100,100);
     InputTestArgType.ARRAY_TYPE.verifyAscending(constructionArgs,
       inputArgType.verifyAscending(constructionArgs,
@@ -608,12 +480,8 @@ public class BooleanArrSeqTest{
   }
   @ParameterizedTest
   @MethodSource("getCollectionInputMethodArgs")
-  public void testadd_val_happyPath(InputTestArgType inputArgType,ConstructionArguments constructionArgs)
-  {
-    for(int i=0;i<100;++i)
-    {
-      Assertions.assertTrue(inputArgType.callCollectionAdd(constructionArgs.seq,i));
-    }
+  public void testadd_val_happyPath(InputTestArgType inputArgType,ConstructionArguments constructionArgs){
+    for(int i=0;i<100;++i){Assertions.assertTrue(inputArgType.callCollectionAdd(constructionArgs.seq,i));}
     constructionArgs.verifyStructuralIntegrity(100,100);
     InputTestArgType.ARRAY_TYPE.verifyAscending(constructionArgs,
       inputArgType.verifyAscending(constructionArgs,
@@ -621,25 +489,14 @@ public class BooleanArrSeqTest{
       ,100,0)
     ,constructionArgs.postAlloc,100);
   }
-  static Stream<Arguments> getCheckedListInputMethodArgs()
-  {
+  static Stream<Arguments> getCheckedListInputMethodArgs(){
     Stream.Builder<Arguments> builder=Stream.builder();
-    for(InputTestArgType inputTestArgType:InputTestArgType.values())
-    {
-      for(int initialCapacity=0;initialCapacity<=15;initialCapacity+=5)
-      {
-        builder.add(Arguments.of(inputTestArgType,new ConstructionArguments(initialCapacity,true,StructType.LIST)));
-      }
-      for(int rootPreAlloc=0;rootPreAlloc<=5;rootPreAlloc+=5)
-      {
-        for(int rootPostAlloc=0;rootPostAlloc<=5;rootPostAlloc+=5)
-        {
-          for(int parentPreAlloc=0;parentPreAlloc<=5;parentPreAlloc+=5)
-          {
-            for(int parentPostAlloc=0;parentPostAlloc<=5;parentPostAlloc+=5)
-            {
-              builder.add(Arguments.of(inputTestArgType,new ConstructionArguments(rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,true)));
-            }
+    for(InputTestArgType inputTestArgType:InputTestArgType.values()){
+      for(int initialCapacity=0;initialCapacity<=15;initialCapacity+=5){builder.add(Arguments.of(inputTestArgType,new ConstructionArguments(initialCapacity,true,StructType.LIST)));}
+      for(int rootPreAlloc=0;rootPreAlloc<=5;rootPreAlloc+=5){
+        for(int rootPostAlloc=0;rootPostAlloc<=5;rootPostAlloc+=5){
+          for(int parentPreAlloc=0;parentPreAlloc<=5;parentPreAlloc+=5){
+            for(int parentPostAlloc=0;parentPostAlloc<=5;parentPostAlloc+=5){builder.add(Arguments.of(inputTestArgType,new ConstructionArguments(rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,true)));}
           }
         }
       }
@@ -648,10 +505,8 @@ public class BooleanArrSeqTest{
   }
   @ParameterizedTest
   @MethodSource("getCheckedListInputMethodArgs")
-  public void testput_int_val_throwIOBE(InputTestArgType inputArgType,ConstructionArguments constructionArgs)
-  {
-    for(int i=0;i<100;++i)
-    {
+  public void testput_int_val_throwIOBE(InputTestArgType inputArgType,ConstructionArguments constructionArgs){
+    for(int i=0;i<100;++i){
       //too low
       Assertions.assertThrows(IndexOutOfBoundsException.class,()->inputArgType.callListPut(constructionArgs.seq,-1,0));
       //too high
@@ -665,10 +520,8 @@ public class BooleanArrSeqTest{
   }
   @ParameterizedTest
   @MethodSource("getCheckedListInputMethodArgs")
-  public void testadd_int_val_throwIOBE(InputTestArgType inputArgType,ConstructionArguments constructionArgs)
-  {
-    for(int i=0;i<100;++i)
-    {
+  public void testadd_int_val_throwIOBE(InputTestArgType inputArgType,ConstructionArguments constructionArgs){
+    for(int i=0;i<100;++i){
       //too low
       Assertions.assertThrows(IndexOutOfBoundsException.class,()->inputArgType.callListAdd(constructionArgs.seq,-1,0));
       //too high
@@ -682,8 +535,7 @@ public class BooleanArrSeqTest{
   }
   @ParameterizedTest
   @MethodSource("getCheckedListInputMethodArgs")
-  public void testListItrAadd_val_emptyListModRootthrowCME(InputTestArgType inputArgType,ConstructionArguments constructionArgs)
-  {
+  public void testListItrAadd_val_emptyListModRootthrowCME(InputTestArgType inputArgType,ConstructionArguments constructionArgs){
     var seqItr=constructionArgs.constructSeqListIterator();
     //illegally modify the root;
     constructionArgs.root.add(TypeConversionUtil.convertToboolean(0));
@@ -699,8 +551,7 @@ public class BooleanArrSeqTest{
   }
   @ParameterizedTest
   @MethodSource("getCheckedListInputMethodArgs")
-  public void testListItradd_val_emptyListModParentthrowCME(InputTestArgType inputArgType,ConstructionArguments constructionArgs)
-  {
+  public void testListItradd_val_emptyListModParentthrowCME(InputTestArgType inputArgType,ConstructionArguments constructionArgs){
     var seqItr=constructionArgs.constructSeqListIterator();
     //illegally modify the parent;
     constructionArgs.parent.add(TypeConversionUtil.convertToboolean(0));
@@ -718,8 +569,7 @@ public class BooleanArrSeqTest{
   }
   @ParameterizedTest
   @MethodSource("getCheckedListInputMethodArgs")
-  public void testListItradd_val_emptyListModSequencethrowCME(InputTestArgType inputArgType,ConstructionArguments constructionArgs)
-  {
+  public void testListItradd_val_emptyListModSequencethrowCME(InputTestArgType inputArgType,ConstructionArguments constructionArgs){
     var seqItr=constructionArgs.constructSeqListIterator();
     //illegally modify the sequence;
     constructionArgs.seq.add(TypeConversionUtil.convertToboolean(0));
@@ -735,13 +585,9 @@ public class BooleanArrSeqTest{
   }
   @ParameterizedTest
   @MethodSource("getCheckedListInputMethodArgs")
-  public void testListItradd_val_nonEmptyListModRootthrowCME(InputTestArgType inputArgType,ConstructionArguments constructionArgs)
-  {
+  public void testListItradd_val_nonEmptyListModRootthrowCME(InputTestArgType inputArgType,ConstructionArguments constructionArgs){
     var seqItr=constructionArgs.constructSeqListIterator();
-    for(int i=0;i<100;++i)
-    {
-      seqItr.add(TypeConversionUtil.convertToboolean(i));
-    }
+    for(int i=0;i<100;++i){seqItr.add(TypeConversionUtil.convertToboolean(i));}
     //illegally modify the root;
     constructionArgs.root.add(TypeConversionUtil.convertToboolean(0));
     //attempt an insertion
@@ -754,13 +600,9 @@ public class BooleanArrSeqTest{
   }
   @ParameterizedTest
   @MethodSource("getCheckedListInputMethodArgs")
-  public void testListItradd_val_nonEmptyListModParentthrowCME(InputTestArgType inputArgType,ConstructionArguments constructionArgs)
-  {
+  public void testListItradd_val_nonEmptyListModParentthrowCME(InputTestArgType inputArgType,ConstructionArguments constructionArgs){
     var seqItr=constructionArgs.constructSeqListIterator();
-    for(int i=0;i<100;++i)
-    {
-      seqItr.add(TypeConversionUtil.convertToboolean(i));
-    }
+    for(int i=0;i<100;++i){seqItr.add(TypeConversionUtil.convertToboolean(i));}
     //illegally modify the parent;
     constructionArgs.parent.add(TypeConversionUtil.convertToboolean(0));
     //attempt an insertion
@@ -775,13 +617,9 @@ public class BooleanArrSeqTest{
   }
   @ParameterizedTest
   @MethodSource("getCheckedListInputMethodArgs")
-  public void testListItradd_val_nonEmptyListModSequencethrowCME(InputTestArgType inputArgType,ConstructionArguments constructionArgs)
-  {
+  public void testListItradd_val_nonEmptyListModSequencethrowCME(InputTestArgType inputArgType,ConstructionArguments constructionArgs){
     var seqItr=constructionArgs.constructSeqListIterator();
-    for(int i=0;i<100;++i)
-    {
-      seqItr.add(TypeConversionUtil.convertToboolean(i));
-    }
+    for(int i=0;i<100;++i){seqItr.add(TypeConversionUtil.convertToboolean(i));}
     //illegally modify the sequence;
     constructionArgs.seq.add(TypeConversionUtil.convertToboolean(0));
     //attempt an insertion
@@ -796,8 +634,7 @@ public class BooleanArrSeqTest{
   }
   @ParameterizedTest
   @MethodSource("getCheckedListInputMethodArgs")
-  public void testListItrAset_val_emptyListModRootthrowCME(InputTestArgType inputArgType,ConstructionArguments constructionArgs)
-  {
+  public void testListItrAset_val_emptyListModRootthrowCME(InputTestArgType inputArgType,ConstructionArguments constructionArgs){
     var seqItr=constructionArgs.constructSeqListIterator();
     seqItr.add(TypeConversionUtil.convertToboolean(0));
     seqItr.previousBoolean();
@@ -817,8 +654,7 @@ public class BooleanArrSeqTest{
   }
   @ParameterizedTest
   @MethodSource("getCheckedListInputMethodArgs")
-  public void testListItrset_val_emptyListModParentthrowCME(InputTestArgType inputArgType,ConstructionArguments constructionArgs)
-  {
+  public void testListItrset_val_emptyListModParentthrowCME(InputTestArgType inputArgType,ConstructionArguments constructionArgs){
     var seqItr=constructionArgs.constructSeqListIterator();
     seqItr.add(TypeConversionUtil.convertToboolean(0));
     seqItr.previousBoolean();
@@ -840,8 +676,7 @@ public class BooleanArrSeqTest{
   }
   @ParameterizedTest
   @MethodSource("getCheckedListInputMethodArgs")
-  public void testListItrset_val_emptyListModSequencethrowCME(InputTestArgType inputArgType,ConstructionArguments constructionArgs)
-  {
+  public void testListItrset_val_emptyListModSequencethrowCME(InputTestArgType inputArgType,ConstructionArguments constructionArgs){
     var seqItr=constructionArgs.constructSeqListIterator();
     seqItr.add(TypeConversionUtil.convertToboolean(0));
     seqItr.previousBoolean();
@@ -861,13 +696,9 @@ public class BooleanArrSeqTest{
   }
   @ParameterizedTest
   @MethodSource("getCheckedListInputMethodArgs")
-  public void testListItrset_val_nonEmptyListModRootthrowCME(InputTestArgType inputArgType,ConstructionArguments constructionArgs)
-  {
+  public void testListItrset_val_nonEmptyListModRootthrowCME(InputTestArgType inputArgType,ConstructionArguments constructionArgs){
     var seqItr=constructionArgs.constructSeqListIterator();
-    for(int i=0;i<100;++i)
-    {
-      seqItr.add(TypeConversionUtil.convertToboolean(i));
-    }
+    for(int i=0;i<100;++i){seqItr.add(TypeConversionUtil.convertToboolean(i));}
     seqItr.add(TypeConversionUtil.convertToboolean(0));
     seqItr.previousBoolean();
     //illegally modify the root;
@@ -886,13 +717,9 @@ public class BooleanArrSeqTest{
   }
   @ParameterizedTest
   @MethodSource("getCheckedListInputMethodArgs")
-  public void testListItrset_val_nonEmptyListModParentthrowCME(InputTestArgType inputArgType,ConstructionArguments constructionArgs)
-  {
+  public void testListItrset_val_nonEmptyListModParentthrowCME(InputTestArgType inputArgType,ConstructionArguments constructionArgs){
     var seqItr=constructionArgs.constructSeqListIterator();
-    for(int i=0;i<100;++i)
-    {
-      seqItr.add(TypeConversionUtil.convertToboolean(i));
-    }
+    for(int i=0;i<100;++i){seqItr.add(TypeConversionUtil.convertToboolean(i));}
     seqItr.add(TypeConversionUtil.convertToboolean(0));
     seqItr.previousBoolean();
     //illegally modify the parent;
@@ -913,13 +740,9 @@ public class BooleanArrSeqTest{
   }
   @ParameterizedTest
   @MethodSource("getCheckedListInputMethodArgs")
-  public void testListItrset_val_nonEmptyListModSequencethrowCME(InputTestArgType inputArgType,ConstructionArguments constructionArgs)
-  {
+  public void testListItrset_val_nonEmptyListModSequencethrowCME(InputTestArgType inputArgType,ConstructionArguments constructionArgs){
     var seqItr=constructionArgs.constructSeqListIterator();
-    for(int i=0;i<100;++i)
-    {
-      seqItr.add(TypeConversionUtil.convertToboolean(i));
-    }
+    for(int i=0;i<100;++i){seqItr.add(TypeConversionUtil.convertToboolean(i));}
     seqItr.add(TypeConversionUtil.convertToboolean(0));
     seqItr.previousBoolean();
     //illegally modify the sequence;
@@ -936,6 +759,314 @@ public class BooleanArrSeqTest{
       ,0)
     ,constructionArgs.postAlloc,100);
   }
-  //TODO checked sublist CME add/put methods
-  //TODO checked list iterator ISE add methods
+  static Stream<Arguments> getCheckedSubListInputMethodArgs(){
+    Stream.Builder<Arguments> builder=Stream.builder();
+    for(InputTestArgType inputTestArgType:InputTestArgType.values()){
+      for(int rootPreAlloc=0;rootPreAlloc<=5;rootPreAlloc+=5){
+        for(int rootPostAlloc=0;rootPostAlloc<=5;rootPostAlloc+=5){
+          for(int parentPreAlloc=0;parentPreAlloc<=5;parentPreAlloc+=5){
+            for(int parentPostAlloc=0;parentPostAlloc<=5;parentPostAlloc+=5){builder.add(Arguments.of(inputTestArgType,new ConstructionArguments(rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,true)));}
+          }
+        }
+      }
+    }
+    return builder.build();
+  }
+  @ParameterizedTest
+  @MethodSource("getCheckedSubListInputMethodArgs")
+  public void testSubListadd_val_emptyListModRootthrowCME(InputTestArgType inputArgType,ConstructionArguments constructionArgs){
+    //illegally modify the root
+    constructionArgs.root.add(TypeConversionUtil.convertToboolean(0));
+    //attempt an insertion
+    Assertions.assertThrows(ConcurrentModificationException.class,()->inputArgType.callCollectionAdd(constructionArgs.seq,0));
+    constructionArgs.verifyStructuralIntegrity(0,0,0,0,1,1);
+    InputTestArgType.ARRAY_TYPE.verifyIndex(constructionArgs,
+      InputTestArgType.ARRAY_TYPE.verifyAscending(constructionArgs,
+        InputTestArgType.ARRAY_TYPE.verifyAscending(constructionArgs,0,constructionArgs.preAlloc,-constructionArgs.preAlloc)
+      ,constructionArgs.postAlloc,100)
+    ,0);
+  }
+  @ParameterizedTest
+  @MethodSource("getCheckedSubListInputMethodArgs")
+  public void testSubListadd_val_emptyListModParentthrowCME(InputTestArgType inputArgType,ConstructionArguments constructionArgs){
+    //illegally modify the root
+    constructionArgs.parent.add(TypeConversionUtil.convertToboolean(0));
+    //attempt an insertion
+    Assertions.assertThrows(ConcurrentModificationException.class,()->inputArgType.callCollectionAdd(constructionArgs.seq,0));
+    constructionArgs.verifyStructuralIntegrity(0,0,1,1);
+    InputTestArgType.ARRAY_TYPE.verifyAscending(constructionArgs,
+      InputTestArgType.ARRAY_TYPE.verifyIndex(constructionArgs,
+        InputTestArgType.ARRAY_TYPE.verifyAscending(constructionArgs,
+          InputTestArgType.ARRAY_TYPE.verifyAscending(constructionArgs,0,constructionArgs.preAlloc,-constructionArgs.preAlloc)
+        ,constructionArgs.parentPostAlloc,100)
+      ,0)
+    ,constructionArgs.rootPostAlloc,constructionArgs.parentPostAlloc+100);
+  }
+  @ParameterizedTest
+  @MethodSource("getCheckedSubListInputMethodArgs")
+  public void testSubListadd_val_nonEmptyListModRootthrowCME(InputTestArgType inputArgType,ConstructionArguments constructionArgs){
+    for(int i=0;i<100;++i){
+      constructionArgs.seq.add(TypeConversionUtil.convertToboolean(i));
+    }
+    //illegally modify the root
+    constructionArgs.root.add(TypeConversionUtil.convertToboolean(0));
+    //attempt an insertion
+    Assertions.assertThrows(ConcurrentModificationException.class,()->inputArgType.callCollectionAdd(constructionArgs.seq,0));
+    constructionArgs.verifyStructuralIntegrity(100,100,100,100,101,101);
+    InputTestArgType.ARRAY_TYPE.verifyIndex(constructionArgs,
+      InputTestArgType.ARRAY_TYPE.verifyAscending(constructionArgs,0,constructionArgs.rootSize+100,-constructionArgs.preAlloc)
+    ,0);
+  }
+  @ParameterizedTest
+  @MethodSource("getCheckedSubListInputMethodArgs")
+  public void testSubListadd_val_nonEmptyListModParentthrowCME(InputTestArgType inputArgType,ConstructionArguments constructionArgs){
+    for(int i=0;i<100;++i){
+      constructionArgs.seq.add(TypeConversionUtil.convertToboolean(i));
+    }
+    //illegally modify the parent
+    constructionArgs.parent.add(TypeConversionUtil.convertToboolean(0));
+    //attempt an insertion
+    Assertions.assertThrows(ConcurrentModificationException.class,()->inputArgType.callCollectionAdd(constructionArgs.seq,0));
+    constructionArgs.verifyStructuralIntegrity(100,100,101,101);
+    InputTestArgType.ARRAY_TYPE.verifyAscending(constructionArgs,
+      InputTestArgType.ARRAY_TYPE.verifyIndex(constructionArgs,
+        InputTestArgType.ARRAY_TYPE.verifyAscending(constructionArgs,0,constructionArgs.preAlloc+100+constructionArgs.parentPostAlloc,-constructionArgs.preAlloc)
+      ,0)
+    ,constructionArgs.rootPostAlloc,100+constructionArgs.parentPostAlloc);
+  }
+  @ParameterizedTest
+  @MethodSource("getCheckedSubListInputMethodArgs")
+  public void testSubListadd_int_val_emptyListModRootthrowCME(InputTestArgType inputArgType,ConstructionArguments constructionArgs){
+    //illegally modify the root
+    constructionArgs.root.add(TypeConversionUtil.convertToboolean(0));
+    //attempt an insertion
+    Assertions.assertThrows(ConcurrentModificationException.class,()->inputArgType.callListAdd(constructionArgs.seq,0,0));
+    constructionArgs.verifyStructuralIntegrity(0,0,0,0,1,1);
+    InputTestArgType.ARRAY_TYPE.verifyIndex(constructionArgs,
+      InputTestArgType.ARRAY_TYPE.verifyAscending(constructionArgs,
+        InputTestArgType.ARRAY_TYPE.verifyAscending(constructionArgs,0,constructionArgs.preAlloc,-constructionArgs.preAlloc)
+      ,constructionArgs.postAlloc,100)
+    ,0);
+  }
+  @ParameterizedTest
+  @MethodSource("getCheckedSubListInputMethodArgs")
+  public void testSubListadd_int_val_emptyListModParentthrowCME(InputTestArgType inputArgType,ConstructionArguments constructionArgs){
+    //illegally modify the root
+    constructionArgs.parent.add(TypeConversionUtil.convertToboolean(0));
+    //attempt an insertion
+    Assertions.assertThrows(ConcurrentModificationException.class,()->inputArgType.callListAdd(constructionArgs.seq,0,0));
+    constructionArgs.verifyStructuralIntegrity(0,0,1,1);
+    InputTestArgType.ARRAY_TYPE.verifyAscending(constructionArgs,
+      InputTestArgType.ARRAY_TYPE.verifyIndex(constructionArgs,
+        InputTestArgType.ARRAY_TYPE.verifyAscending(constructionArgs,
+          InputTestArgType.ARRAY_TYPE.verifyAscending(constructionArgs,0,constructionArgs.preAlloc,-constructionArgs.preAlloc)
+        ,constructionArgs.parentPostAlloc,100)
+      ,0)
+    ,constructionArgs.rootPostAlloc,constructionArgs.parentPostAlloc+100);
+  }
+  @ParameterizedTest
+  @MethodSource("getCheckedSubListInputMethodArgs")
+  public void testSubListadd_int_val_nonEmptyListModRootthrowCME(InputTestArgType inputArgType,ConstructionArguments constructionArgs){
+    for(int i=0;i<100;++i){
+      constructionArgs.seq.add(TypeConversionUtil.convertToboolean(i));
+    }
+    //illegally modify the root
+    constructionArgs.root.add(TypeConversionUtil.convertToboolean(0));
+    //attempt an insertion
+    Assertions.assertThrows(ConcurrentModificationException.class,()->inputArgType.callListAdd(constructionArgs.seq,100,0));
+    constructionArgs.verifyStructuralIntegrity(100,100,100,100,101,101);
+    InputTestArgType.ARRAY_TYPE.verifyIndex(constructionArgs,
+      InputTestArgType.ARRAY_TYPE.verifyAscending(constructionArgs,0,constructionArgs.rootSize+100,-constructionArgs.preAlloc)
+    ,0);
+  }
+  @ParameterizedTest
+  @MethodSource("getCheckedSubListInputMethodArgs")
+  public void testSubListadd_int_val_nonEmptyListModParentthrowCME(InputTestArgType inputArgType,ConstructionArguments constructionArgs){
+    for(int i=0;i<100;++i){
+      constructionArgs.seq.add(TypeConversionUtil.convertToboolean(i));
+    }
+    //illegally modify the parent
+    constructionArgs.parent.add(TypeConversionUtil.convertToboolean(0));
+    //attempt an insertion
+    Assertions.assertThrows(ConcurrentModificationException.class,()->inputArgType.callListAdd(constructionArgs.seq,100,0));
+    constructionArgs.verifyStructuralIntegrity(100,100,101,101);
+    InputTestArgType.ARRAY_TYPE.verifyAscending(constructionArgs,
+      InputTestArgType.ARRAY_TYPE.verifyIndex(constructionArgs,
+        InputTestArgType.ARRAY_TYPE.verifyAscending(constructionArgs,0,constructionArgs.preAlloc+100+constructionArgs.parentPostAlloc,-constructionArgs.preAlloc)
+      ,0)
+    ,constructionArgs.rootPostAlloc,100+constructionArgs.parentPostAlloc);
+  }
+  @ParameterizedTest
+  @MethodSource("getCheckedSubListInputMethodArgs")
+  public void testSubListput_int_val_nonEmptyListModRootthrowCME(InputTestArgType inputArgType,ConstructionArguments constructionArgs){
+    for(int i=0;i<100;++i){
+      constructionArgs.seq.add(TypeConversionUtil.convertToboolean(i));
+    }
+    //illegally modify the root
+    constructionArgs.root.add(TypeConversionUtil.convertToboolean(0));
+    //attempt a put
+    Assertions.assertThrows(ConcurrentModificationException.class,()->inputArgType.callListPut(constructionArgs.seq,99,0));
+    constructionArgs.verifyStructuralIntegrity(100,100,100,100,101,101);
+    InputTestArgType.ARRAY_TYPE.verifyIndex(constructionArgs,
+      InputTestArgType.ARRAY_TYPE.verifyAscending(constructionArgs,0,constructionArgs.rootSize+100,-constructionArgs.preAlloc)
+    ,0);
+  }
+  @ParameterizedTest
+  @MethodSource("getCheckedSubListInputMethodArgs")
+  public void testSubListput_int_val_nonEmptyListModParentthrowCME(InputTestArgType inputArgType,ConstructionArguments constructionArgs){
+    for(int i=0;i<100;++i){
+      constructionArgs.seq.add(TypeConversionUtil.convertToboolean(i));
+    }
+    //illegally modify the parent
+    constructionArgs.parent.add(TypeConversionUtil.convertToboolean(0));
+    //attempt a put
+    Assertions.assertThrows(ConcurrentModificationException.class,()->inputArgType.callListPut(constructionArgs.seq,99,0));
+    constructionArgs.verifyStructuralIntegrity(100,100,101,101);
+    InputTestArgType.ARRAY_TYPE.verifyAscending(constructionArgs,
+      InputTestArgType.ARRAY_TYPE.verifyIndex(constructionArgs,
+        InputTestArgType.ARRAY_TYPE.verifyAscending(constructionArgs,0,constructionArgs.preAlloc+100+constructionArgs.parentPostAlloc,-constructionArgs.preAlloc)
+      ,0)
+    ,constructionArgs.rootPostAlloc,100+constructionArgs.parentPostAlloc);
+  }
+  @ParameterizedTest
+  @MethodSource("getCheckedSubListInputMethodArgs")
+  public void testSubListadd_int_val_emptyListModRootthrowCMEsupercedesIOBE(InputTestArgType inputArgType,ConstructionArguments constructionArgs){
+    //illegally modify the root
+    constructionArgs.root.add(TypeConversionUtil.convertToboolean(0));
+    //attempt an insertion too low
+    Assertions.assertThrows(ConcurrentModificationException.class,()->inputArgType.callListAdd(constructionArgs.seq,-1,0));
+    //attempt an insertion too high
+    Assertions.assertThrows(ConcurrentModificationException.class,()->inputArgType.callListAdd(constructionArgs.seq,1,0));
+    constructionArgs.verifyStructuralIntegrity(0,0,0,0,1,1);
+    InputTestArgType.ARRAY_TYPE.verifyIndex(constructionArgs,
+      InputTestArgType.ARRAY_TYPE.verifyAscending(constructionArgs,
+        InputTestArgType.ARRAY_TYPE.verifyAscending(constructionArgs,0,constructionArgs.preAlloc,-constructionArgs.preAlloc)
+      ,constructionArgs.postAlloc,100)
+    ,0);
+  }
+  @ParameterizedTest
+  @MethodSource("getCheckedSubListInputMethodArgs")
+  public void testSubListadd_int_val_emptyListModParentthrowCMEsupercedesIOBE(InputTestArgType inputArgType,ConstructionArguments constructionArgs){
+    //illegally modify the root
+    constructionArgs.parent.add(TypeConversionUtil.convertToboolean(0));
+    //attempt an insertion too low
+    Assertions.assertThrows(ConcurrentModificationException.class,()->inputArgType.callListAdd(constructionArgs.seq,-1,0));
+    //attempt an insertion too high
+    Assertions.assertThrows(ConcurrentModificationException.class,()->inputArgType.callListAdd(constructionArgs.seq,1,0));
+    constructionArgs.verifyStructuralIntegrity(0,0,1,1);
+    InputTestArgType.ARRAY_TYPE.verifyAscending(constructionArgs,
+      InputTestArgType.ARRAY_TYPE.verifyIndex(constructionArgs,
+        InputTestArgType.ARRAY_TYPE.verifyAscending(constructionArgs,
+          InputTestArgType.ARRAY_TYPE.verifyAscending(constructionArgs,0,constructionArgs.preAlloc,-constructionArgs.preAlloc)
+        ,constructionArgs.parentPostAlloc,100)
+      ,0)
+    ,constructionArgs.rootPostAlloc,constructionArgs.parentPostAlloc+100);
+  }
+  @ParameterizedTest
+  @MethodSource("getCheckedSubListInputMethodArgs")
+  public void testSubListadd_int_val_nonEmptyListModRootthrowCMEsupercedesIOBE(InputTestArgType inputArgType,ConstructionArguments constructionArgs){
+    for(int i=0;i<100;++i){
+      constructionArgs.seq.add(TypeConversionUtil.convertToboolean(i));
+    }
+    //illegally modify the root
+    constructionArgs.root.add(TypeConversionUtil.convertToboolean(0));
+    //attempt an insertion too low
+    Assertions.assertThrows(ConcurrentModificationException.class,()->inputArgType.callListAdd(constructionArgs.seq,-1,0));
+    //attempt an insertion too high
+    Assertions.assertThrows(ConcurrentModificationException.class,()->inputArgType.callListAdd(constructionArgs.seq,101,0));
+    constructionArgs.verifyStructuralIntegrity(100,100,100,100,101,101);
+    InputTestArgType.ARRAY_TYPE.verifyIndex(constructionArgs,
+      InputTestArgType.ARRAY_TYPE.verifyAscending(constructionArgs,0,constructionArgs.rootSize+100,-constructionArgs.preAlloc)
+    ,0);
+  }
+  @ParameterizedTest
+  @MethodSource("getCheckedSubListInputMethodArgs")
+  public void testSubListadd_int_val_nonEmptyListModParentthrowCMEsupercedesIOBE(InputTestArgType inputArgType,ConstructionArguments constructionArgs){
+    for(int i=0;i<100;++i){
+      constructionArgs.seq.add(TypeConversionUtil.convertToboolean(i));
+    }
+    //illegally modify the parent
+    constructionArgs.parent.add(TypeConversionUtil.convertToboolean(0));
+    //attempt an insertion too low
+    Assertions.assertThrows(ConcurrentModificationException.class,()->inputArgType.callListAdd(constructionArgs.seq,-1,0));
+    //attempt an insertion too high
+    Assertions.assertThrows(ConcurrentModificationException.class,()->inputArgType.callListAdd(constructionArgs.seq,101,0));
+    constructionArgs.verifyStructuralIntegrity(100,100,101,101);
+    InputTestArgType.ARRAY_TYPE.verifyAscending(constructionArgs,
+      InputTestArgType.ARRAY_TYPE.verifyIndex(constructionArgs,
+        InputTestArgType.ARRAY_TYPE.verifyAscending(constructionArgs,0,constructionArgs.preAlloc+100+constructionArgs.parentPostAlloc,-constructionArgs.preAlloc)
+      ,0)
+    ,constructionArgs.rootPostAlloc,100+constructionArgs.parentPostAlloc);
+  }
+  @ParameterizedTest
+  @MethodSource("getCheckedSubListInputMethodArgs")
+  public void testSubListput_int_val_emptyListModRootthrowCMEsupercedesIOBE(InputTestArgType inputArgType,ConstructionArguments constructionArgs){
+    //illegally modify the root
+    constructionArgs.root.add(TypeConversionUtil.convertToboolean(0));
+    //attempt a put too low
+    Assertions.assertThrows(ConcurrentModificationException.class,()->inputArgType.callListPut(constructionArgs.seq,-1,0));
+    //attempt a put too high
+    Assertions.assertThrows(ConcurrentModificationException.class,()->inputArgType.callListPut(constructionArgs.seq,0,0));
+    constructionArgs.verifyStructuralIntegrity(0,0,0,0,1,1);
+    InputTestArgType.ARRAY_TYPE.verifyIndex(constructionArgs,
+      InputTestArgType.ARRAY_TYPE.verifyAscending(constructionArgs,
+        InputTestArgType.ARRAY_TYPE.verifyAscending(constructionArgs,0,constructionArgs.preAlloc,-constructionArgs.preAlloc)
+      ,constructionArgs.postAlloc,100)
+    ,0);
+  }
+  @ParameterizedTest
+  @MethodSource("getCheckedSubListInputMethodArgs")
+  public void testSubListput_int_val_emptyListModParentthrowCMEsupercedesIOBE(InputTestArgType inputArgType,ConstructionArguments constructionArgs){
+    //illegally modify the parent
+    constructionArgs.parent.add(TypeConversionUtil.convertToboolean(0));
+    //attempt a put too low
+    Assertions.assertThrows(ConcurrentModificationException.class,()->inputArgType.callListPut(constructionArgs.seq,-1,0));
+    //attempt a put too high
+    Assertions.assertThrows(ConcurrentModificationException.class,()->inputArgType.callListPut(constructionArgs.seq,0,0));
+    constructionArgs.verifyStructuralIntegrity(0,0,1,1);
+    InputTestArgType.ARRAY_TYPE.verifyAscending(constructionArgs,
+      InputTestArgType.ARRAY_TYPE.verifyIndex(constructionArgs,
+        InputTestArgType.ARRAY_TYPE.verifyAscending(constructionArgs,
+          InputTestArgType.ARRAY_TYPE.verifyAscending(constructionArgs,0,constructionArgs.preAlloc,-constructionArgs.preAlloc)
+        ,constructionArgs.parentPostAlloc,100)
+      ,0)
+    ,constructionArgs.rootPostAlloc,constructionArgs.parentPostAlloc+100);
+  }
+  @ParameterizedTest
+  @MethodSource("getCheckedSubListInputMethodArgs")
+  public void testSubListput_int_val_nonEmptyListModRootthrowCMEsupercedesIOBE(InputTestArgType inputArgType,ConstructionArguments constructionArgs){
+    for(int i=0;i<100;++i){
+      constructionArgs.seq.add(TypeConversionUtil.convertToboolean(i));
+    }
+    //illegally modify the root
+    constructionArgs.root.add(TypeConversionUtil.convertToboolean(0));
+    //attempt a put too low
+    Assertions.assertThrows(ConcurrentModificationException.class,()->inputArgType.callListPut(constructionArgs.seq,-1,0));
+    //attempt a put too high
+    Assertions.assertThrows(ConcurrentModificationException.class,()->inputArgType.callListPut(constructionArgs.seq,100,0));
+    constructionArgs.verifyStructuralIntegrity(100,100,100,100,101,101);
+    InputTestArgType.ARRAY_TYPE.verifyIndex(constructionArgs,
+      InputTestArgType.ARRAY_TYPE.verifyAscending(constructionArgs,0,constructionArgs.rootSize+100,-constructionArgs.preAlloc)
+    ,0);
+  }
+  @ParameterizedTest
+  @MethodSource("getCheckedSubListInputMethodArgs")
+  public void testSubListput_int_val_nonEmptyListModParentthrowCMEsupercedesIOBE(InputTestArgType inputArgType,ConstructionArguments constructionArgs){
+    for(int i=0;i<100;++i){
+      constructionArgs.seq.add(TypeConversionUtil.convertToboolean(i));
+    }
+    //illegally modify the parent
+    constructionArgs.parent.add(TypeConversionUtil.convertToboolean(0));
+    //attempt a put too low
+    Assertions.assertThrows(ConcurrentModificationException.class,()->inputArgType.callListPut(constructionArgs.seq,-1,0));
+    //attempt a put too high
+    Assertions.assertThrows(ConcurrentModificationException.class,()->inputArgType.callListPut(constructionArgs.seq,100,0));
+    constructionArgs.verifyStructuralIntegrity(100,100,101,101);
+    InputTestArgType.ARRAY_TYPE.verifyAscending(constructionArgs,
+      InputTestArgType.ARRAY_TYPE.verifyIndex(constructionArgs,
+        InputTestArgType.ARRAY_TYPE.verifyAscending(constructionArgs,0,constructionArgs.preAlloc+100+constructionArgs.parentPostAlloc,-constructionArgs.preAlloc)
+      ,0)
+    ,constructionArgs.rootPostAlloc,100+constructionArgs.parentPostAlloc);
+  }
+  //TODO checked list/sublist iterator ISE add methods
 }

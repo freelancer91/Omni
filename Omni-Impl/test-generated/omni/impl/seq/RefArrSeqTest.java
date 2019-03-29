@@ -18,38 +18,18 @@ import omni.api.OmniListIterator;
 @SuppressWarnings({"rawtypes","unchecked"}) 
 public class RefArrSeqTest{
   private static void verifyRangeIsNull(Object[] arr,int offset,int bound){
-    for(int i=offset;i<bound;++i){
-      Assertions.assertNull(arr[i]);
-    }
+    for(int i=offset;i<bound;++i){Assertions.assertNull(arr[i]);}
   }
-  private static enum StructType{
-    STACK,
-    LIST,
-    SUBLIST;
-  }
+  private static enum StructType{STACK,LIST,SUBLIST;}
   private static enum InputTestArgType{
      ARRAY_TYPE{
-       void callListItrAdd(OmniListIterator.OfRef itr,int valToConvert){
-         itr.add(TypeConversionUtil.convertToObject(valToConvert));
-       }
-       void callListItrSet(OmniListIterator.OfRef itr,int valToConvert){
-         itr.set(TypeConversionUtil.convertToObject(valToConvert));
-       }
-       void callListPut(OmniCollection.OfRef seq,int index,int valToConvert){
-         ((OmniList.OfRef)seq).put(index,TypeConversionUtil.convertToObject(valToConvert));
-       }
-       void callListAdd(OmniCollection.OfRef seq,int index,int valToConvert){
-         ((OmniList.OfRef)seq).add(index,TypeConversionUtil.convertToObject(valToConvert));
-       }
-       void callStackPush(OmniCollection.OfRef seq,int valToConvert){
-         ((OmniStack.OfRef)seq).push(TypeConversionUtil.convertToObject(valToConvert));
-       }
-       boolean callCollectionAdd(OmniCollection.OfRef seq,int valToConvert){
-         return seq.add(TypeConversionUtil.convertToObject(valToConvert));
-       }
-       void verifyIndex(int expectedValToConvert,Object actualVal){
-         Assertions.assertEquals(TypeConversionUtil.convertToObject(expectedValToConvert),actualVal);
-       }
+       void callListItrAdd(OmniListIterator.OfRef itr,int valToConvert){itr.add(TypeConversionUtil.convertToObject(valToConvert));}
+       void callListItrSet(OmniListIterator.OfRef itr,int valToConvert){itr.set(TypeConversionUtil.convertToObject(valToConvert));}
+       void callListPut(OmniCollection.OfRef seq,int index,int valToConvert){((OmniList.OfRef)seq).put(index,TypeConversionUtil.convertToObject(valToConvert));}
+       void callListAdd(OmniCollection.OfRef seq,int index,int valToConvert){((OmniList.OfRef)seq).add(index,TypeConversionUtil.convertToObject(valToConvert));}
+       void callStackPush(OmniCollection.OfRef seq,int valToConvert){((OmniStack.OfRef)seq).push(TypeConversionUtil.convertToObject(valToConvert));}
+       boolean callCollectionAdd(OmniCollection.OfRef seq,int valToConvert){return seq.add(TypeConversionUtil.convertToObject(valToConvert));}
+       void verifyIndex(int expectedValToConvert,Object actualVal){Assertions.assertEquals(TypeConversionUtil.convertToObject(expectedValToConvert),actualVal);}
      }
     ;
     abstract void callListItrAdd(OmniListIterator.OfRef itr,int valToConvert);
@@ -58,42 +38,27 @@ public class RefArrSeqTest{
     abstract void callListAdd(OmniCollection.OfRef seq,int index,int valToConvert);
     abstract void callStackPush(OmniCollection.OfRef seq,int valToConvert);
     abstract boolean callCollectionAdd(OmniCollection.OfRef seq,int valToConvert);
-    private int verifyAscending(ConstructionArguments constructionArgs,int offset,int length,int loVal){
-      return verifyAscending(constructionArgs.root.arr,offset,length,loVal);
-    }
-    private int verifyDescending(ConstructionArguments constructionArgs,int offset,int length,int loVal){
-      return verifyDescending(constructionArgs.root.arr,offset,length,loVal);
-    }
-    private int verifyMidPointInsertion(ConstructionArguments constructionArgs,int offset,int length,int loVal){
-      return verifyMidPointInsertion(constructionArgs.root.arr,offset,length,loVal);
-    }
-    private int verifyIndex(ConstructionArguments constructionArgs,int index,int expectedValToConvert)
-    {
+    private int verifyAscending(ConstructionArguments constructionArgs,int offset,int length,int loVal){return verifyAscending(constructionArgs.root.arr,offset,length,loVal);}
+    private int verifyDescending(ConstructionArguments constructionArgs,int offset,int length,int loVal){return verifyDescending(constructionArgs.root.arr,offset,length,loVal);}
+    private int verifyMidPointInsertion(ConstructionArguments constructionArgs,int offset,int length,int loVal){return verifyMidPointInsertion(constructionArgs.root.arr,offset,length,loVal);}
+    private int verifyIndex(ConstructionArguments constructionArgs,int index,int expectedValToConvert){
       verifyIndex(expectedValToConvert,constructionArgs.root.arr[index]);
       return index+1; 
     }
     private int verifyAscending(Object[] arr,int offset,int length,int loVal){
       int bound=offset+length;
-      for(int i=offset;i<bound;++i,++loVal){
-        verifyIndex(loVal,arr[i]);
-      }
+      for(int i=offset;i<bound;++i,++loVal){verifyIndex(loVal,arr[i]);}
       return bound;
     }
     private int verifyDescending(Object[] arr,int offset,int length,int loVal){
       int bound=offset+length;
-      for(int i=bound;--i>=offset;++loVal){
-        verifyIndex(loVal,arr[i]);
-      }
+      for(int i=bound;--i>=offset;++loVal){verifyIndex(loVal,arr[i]);}
       return bound;
     }
     private int verifyMidPointInsertion(Object[] arr,int offset,int length,int loVal){
       int i;
-      for(int v=loVal+1,b=(i=offset)+length/2;i<b;++i,v+=2){
-        verifyIndex(v,arr[i]);
-      }
-      for(int v=loVal+length-2,b=i+length/2;i<b;++i,v-=2){
-        verifyIndex(v,arr[i]);
-      }
+      for(int v=loVal+1,b=(i=offset)+length/2;i<b;++i,v+=2){verifyIndex(v,arr[i]);}
+      for(int v=loVal+length-2,b=i+length/2;i<b;++i,v-=2){verifyIndex(v,arr[i]);}
       return offset+length;
     }
     abstract void verifyIndex(int expectedValToConvert,Object actualVal);
@@ -170,9 +135,7 @@ public class RefArrSeqTest{
       }
       return builder.append('}').toString();
     }
-    private OmniListIterator.OfRef constructSeqListIterator(){
-      return ((OmniList.OfRef)seq).listIterator();
-    }
+    private OmniListIterator.OfRef constructSeqListIterator(){return ((OmniList.OfRef)seq).listIterator();}
     private void verifyIteratorState(Object itr,int expectedCursor,int expectedLastRet,int expectedModCount){
       int actualCursor;
       Object actualParent;
@@ -213,27 +176,15 @@ public class RefArrSeqTest{
       Assertions.assertEquals(expectedCursor+preAlloc,actualCursor);
       Assertions.assertSame(seq,actualParent);
     }
-    private void verifyStructuralIntegrity(int expectedSize,int expectedModCount){
-       verifyStructuralIntegrity(expectedSize,expectedModCount,expectedSize,expectedModCount,expectedSize,expectedModCount);
-    }
-    private void verifyStructuralIntegrity(int expectedSeqSize,int expectedSeqModCount,int expectedParentAndRootSize,int expectedParentAndRootModCount){
-       verifyStructuralIntegrity(expectedSeqSize,expectedSeqModCount,expectedParentAndRootSize,expectedParentAndRootModCount,expectedParentAndRootSize,expectedParentAndRootModCount);
-    }
-    private void verifyStructuralIntegrity(int expectedSeqSize,int expectedModCount,int expectedParentSize,int expectedParentModCount,int expectedRootSize,int expectedRootModCount)
-    {
-      switch(structType)
-      {
+    private void verifyStructuralIntegrity(int expectedSize,int expectedModCount){verifyStructuralIntegrity(expectedSize,expectedModCount,expectedSize,expectedModCount,expectedSize,expectedModCount);}
+    private void verifyStructuralIntegrity(int expectedSeqSize,int expectedSeqModCount,int expectedParentAndRootSize,int expectedParentAndRootModCount){verifyStructuralIntegrity(expectedSeqSize,expectedSeqModCount,expectedParentAndRootSize,expectedParentAndRootModCount,expectedParentAndRootSize,expectedParentAndRootModCount);}
+    private void verifyStructuralIntegrity(int expectedSeqSize,int expectedModCount,int expectedParentSize,int expectedParentModCount,int expectedRootSize,int expectedRootModCount){
+      switch(structType){
         case STACK:
-          if(checked)
-          {
-            Assertions.assertEquals(expectedRootModCount,FieldAccessor.RefArrSeq.CheckedStack.modCount(root));
-          }
+          if(checked){Assertions.assertEquals(expectedRootModCount,FieldAccessor.RefArrSeq.CheckedStack.modCount(root));}
           break;
         case LIST:
-          if(checked)
-          {
-             Assertions.assertEquals(expectedRootModCount,FieldAccessor.RefArrSeq.CheckedList.modCount(root));
-          }
+          if(checked){Assertions.assertEquals(expectedRootModCount,FieldAccessor.RefArrSeq.CheckedList.modCount(root));}
           break;
         default:
           OmniList.OfRef actualSeqParent;
@@ -272,25 +223,18 @@ public class RefArrSeqTest{
   }
   private static void initAscendingArray(Object[] arr,int offset,int lo,int hi){
     int bound=offset+(hi-lo);
-    for(int i=offset;i<bound;++i,++lo){
-      arr[i]=TypeConversionUtil.convertToObject(lo);
-    }
+    for(int i=offset;i<bound;++i,++lo){arr[i]=TypeConversionUtil.convertToObject(lo);}
   }
-  private static final Arguments[] NON_SUBLIST_TYPES=new Arguments[]
-  {
+  private static final Arguments[] NON_SUBLIST_TYPES=new Arguments[]{
     Arguments.of(false,StructType.LIST),
     Arguments.of(true,StructType.LIST),
     Arguments.of(false,StructType.STACK),
     Arguments.of(true,StructType.STACK)
   };
-  static Stream<Arguments> getArgsForNonSubListTypes()
-  {
-    return Stream.of(NON_SUBLIST_TYPES);
-  }
+  static Stream<Arguments> getArgsForNonSubListTypes(){return Stream.of(NON_SUBLIST_TYPES);}
   @ParameterizedTest
   @MethodSource("getArgsForNonSubListTypes")
-  public void testConstructor_happyPath(boolean checked,StructType structType)
-  {
+  public void testConstructor_happyPath(boolean checked,StructType structType){
     RefArrSeq seq;
     if(checked){
       Assertions.assertEquals(0,structType==StructType.LIST?FieldAccessor.RefArrSeq.CheckedList.modCount(seq=new RefArrSeq.CheckedList()):FieldAccessor.RefArrSeq.CheckedStack.modCount(seq=new RefArrSeq.CheckedStack()));
@@ -301,8 +245,7 @@ public class RefArrSeqTest{
   }
   @ParameterizedTest
   @MethodSource("getArgsForNonSubListTypes")
-  public void testConstructor_int_Objectarr_happyPath(boolean checked,StructType structType)
-  {
+  public void testConstructor_int_Objectarr_happyPath(boolean checked,StructType structType){
     int size=5;
     Object[] arr=new Object[10];
     RefArrSeq seq;
@@ -314,11 +257,9 @@ public class RefArrSeqTest{
     Assertions.assertEquals(size,seq.size);
     Assertions.assertSame(arr,seq.arr);
   }
-  static Stream<Arguments> getArgsFortestConstructor_int_happyPath()
-  {
+  static Stream<Arguments> getArgsFortestConstructor_int_happyPath(){
     Stream.Builder<Arguments> builder=Stream.builder();
-    for(int initialCapacity=0;initialCapacity<=15;initialCapacity+=5)
-    {
+    for(int initialCapacity=0;initialCapacity<=15;initialCapacity+=5){
       builder.add(Arguments.of(initialCapacity,false,StructType.LIST));
       builder.add(Arguments.of(initialCapacity,true,StructType.LIST));
       builder.add(Arguments.of(initialCapacity,false,StructType.STACK));
@@ -328,8 +269,7 @@ public class RefArrSeqTest{
   }
   @ParameterizedTest
   @MethodSource("getArgsFortestConstructor_int_happyPath")
-  public void testConstructor_int_happyPath(int initialCapacity,boolean checked,StructType structType)
-  {
+  public void testConstructor_int_happyPath(int initialCapacity,boolean checked,StructType structType){
     RefArrSeq seq;
     if(checked){
       Assertions.assertEquals(0,structType==StructType.LIST?FieldAccessor.RefArrSeq.CheckedList.modCount(seq=new RefArrSeq.CheckedList(initialCapacity)):FieldAccessor.RefArrSeq.CheckedStack.modCount(seq=new RefArrSeq.CheckedStack(initialCapacity)));
@@ -337,8 +277,7 @@ public class RefArrSeqTest{
       seq=structType==StructType.LIST?new RefArrSeq.UncheckedList(initialCapacity):new RefArrSeq.UncheckedStack(initialCapacity);
     }
     Assertions.assertEquals(0,seq.size);
-    switch(initialCapacity)
-    {
+    switch(initialCapacity){
       case 0:
         Assertions.assertNull(seq.arr);
         break;
@@ -350,24 +289,17 @@ public class RefArrSeqTest{
         verifyRangeIsNull(seq.arr,0,initialCapacity);
     }
   }
-  static Stream<Arguments> getListInputMethodArgs()
-  {
+  static Stream<Arguments> getListInputMethodArgs(){
     Stream.Builder<Arguments> builder=Stream.builder();
-    for(InputTestArgType inputTestArgType:InputTestArgType.values())
-    {
-      for(int initialCapacity=0;initialCapacity<=15;initialCapacity+=5)
-      {
+    for(InputTestArgType inputTestArgType:InputTestArgType.values()){
+      for(int initialCapacity=0;initialCapacity<=15;initialCapacity+=5){
         builder.add(Arguments.of(inputTestArgType,new ConstructionArguments(initialCapacity,false,StructType.LIST)));
         builder.add(Arguments.of(inputTestArgType,new ConstructionArguments(initialCapacity,true,StructType.LIST)));
       }
-      for(int rootPreAlloc=0;rootPreAlloc<=5;rootPreAlloc+=5)
-      {
-        for(int rootPostAlloc=0;rootPostAlloc<=5;rootPostAlloc+=5)
-        {
-          for(int parentPreAlloc=0;parentPreAlloc<=5;parentPreAlloc+=5)
-          {
-            for(int parentPostAlloc=0;parentPostAlloc<=5;parentPostAlloc+=5)
-            {
+      for(int rootPreAlloc=0;rootPreAlloc<=5;rootPreAlloc+=5){
+        for(int rootPostAlloc=0;rootPostAlloc<=5;rootPostAlloc+=5){
+          for(int parentPreAlloc=0;parentPreAlloc<=5;parentPreAlloc+=5){
+            for(int parentPostAlloc=0;parentPostAlloc<=5;parentPostAlloc+=5){
               builder.add(Arguments.of(inputTestArgType,new ConstructionArguments(rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,true)));
               builder.add(Arguments.of(inputTestArgType,new ConstructionArguments(rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,false)));
             }
@@ -377,26 +309,19 @@ public class RefArrSeqTest{
     }
     return builder.build();
   }
-  static Stream<Arguments> getCollectionInputMethodArgs()
-  {
+  static Stream<Arguments> getCollectionInputMethodArgs(){
     Stream.Builder<Arguments> builder=Stream.builder();
-    for(InputTestArgType inputTestArgType:InputTestArgType.values())
-    {
-      for(int initialCapacity=0;initialCapacity<=15;initialCapacity+=5)
-      {
+    for(InputTestArgType inputTestArgType:InputTestArgType.values()){
+      for(int initialCapacity=0;initialCapacity<=15;initialCapacity+=5){
         builder.add(Arguments.of(inputTestArgType,new ConstructionArguments(initialCapacity,false,StructType.STACK)));
         builder.add(Arguments.of(inputTestArgType,new ConstructionArguments(initialCapacity,true,StructType.STACK)));
         builder.add(Arguments.of(inputTestArgType,new ConstructionArguments(initialCapacity,false,StructType.LIST)));
         builder.add(Arguments.of(inputTestArgType,new ConstructionArguments(initialCapacity,true,StructType.LIST)));
       }
-      for(int rootPreAlloc=0;rootPreAlloc<=5;rootPreAlloc+=5)
-      {
-        for(int rootPostAlloc=0;rootPostAlloc<=5;rootPostAlloc+=5)
-        {
-          for(int parentPreAlloc=0;parentPreAlloc<=5;parentPreAlloc+=5)
-          {
-            for(int parentPostAlloc=0;parentPostAlloc<=5;parentPostAlloc+=5)
-            {
+      for(int rootPreAlloc=0;rootPreAlloc<=5;rootPreAlloc+=5){
+        for(int rootPostAlloc=0;rootPostAlloc<=5;rootPostAlloc+=5){
+          for(int parentPreAlloc=0;parentPreAlloc<=5;parentPreAlloc+=5){
+            for(int parentPostAlloc=0;parentPostAlloc<=5;parentPostAlloc+=5){
               builder.add(Arguments.of(inputTestArgType,new ConstructionArguments(rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,true)));
               builder.add(Arguments.of(inputTestArgType,new ConstructionArguments(rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,false)));
             }
@@ -406,13 +331,10 @@ public class RefArrSeqTest{
     }
     return builder.build();
   }
-  static Stream<Arguments> getStackInputMethodArgs()
-  {
+  static Stream<Arguments> getStackInputMethodArgs(){
     Stream.Builder<Arguments> builder=Stream.builder();
-    for(InputTestArgType inputTestArgType:InputTestArgType.values())
-    {
-      for(int initialCapacity=0;initialCapacity<=15;initialCapacity+=5)
-      {
+    for(InputTestArgType inputTestArgType:InputTestArgType.values()){
+      for(int initialCapacity=0;initialCapacity<=15;initialCapacity+=5){
         builder.add(Arguments.of(inputTestArgType,new ConstructionArguments(initialCapacity,false,StructType.STACK)));
         builder.add(Arguments.of(inputTestArgType,new ConstructionArguments(initialCapacity,true,StructType.STACK)));
       }
@@ -421,11 +343,9 @@ public class RefArrSeqTest{
   }
   @ParameterizedTest
   @MethodSource("getListInputMethodArgs")
-  public void testListItradd_val_happyPathInsertBegin(InputTestArgType inputArgType,ConstructionArguments constructionArgs)
-  {
+  public void testListItradd_val_happyPathInsertBegin(InputTestArgType inputArgType,ConstructionArguments constructionArgs){
     var seqItr=constructionArgs.constructSeqListIterator();
-    for(int i=0;i<100;++i)
-    {
+    for(int i=0;i<100;++i){
       inputArgType.callListItrAdd(seqItr,i);
       constructionArgs.verifyIteratorState(seqItr,1,-1,i+1);
       seqItr.previous();
@@ -439,12 +359,8 @@ public class RefArrSeqTest{
   }
   @ParameterizedTest
   @MethodSource("getListInputMethodArgs")
-  public void testadd_int_val_happyPathInsertBegin(InputTestArgType inputArgType,ConstructionArguments constructionArgs)
-  {
-    for(int i=0;i<100;++i)
-    {
-      inputArgType.callListAdd(constructionArgs.seq,0,i);
-    }
+  public void testadd_int_val_happyPathInsertBegin(InputTestArgType inputArgType,ConstructionArguments constructionArgs){
+    for(int i=0;i<100;++i){inputArgType.callListAdd(constructionArgs.seq,0,i);}
     constructionArgs.verifyStructuralIntegrity(100,100);
     InputTestArgType.ARRAY_TYPE.verifyAscending(constructionArgs,
       inputArgType.verifyDescending(constructionArgs,
@@ -454,11 +370,9 @@ public class RefArrSeqTest{
   }
   @ParameterizedTest
   @MethodSource("getListInputMethodArgs")
-  public void testListItradd_val_happyPathInsertEnd(InputTestArgType inputArgType,ConstructionArguments constructionArgs)
-  {
+  public void testListItradd_val_happyPathInsertEnd(InputTestArgType inputArgType,ConstructionArguments constructionArgs){
     var seqItr=constructionArgs.constructSeqListIterator();
-    for(int i=0;i<100;++i)
-    {
+    for(int i=0;i<100;++i){
       inputArgType.callListItrAdd(seqItr,i);
       constructionArgs.verifyIteratorState(seqItr,i+1,-1,i+1);
     }
@@ -471,12 +385,8 @@ public class RefArrSeqTest{
   }
   @ParameterizedTest
   @MethodSource("getListInputMethodArgs")
-  public void testadd_int_val_happyPathInsertEnd(InputTestArgType inputArgType,ConstructionArguments constructionArgs)
-  {
-    for(int i=0;i<100;++i)
-    {
-      inputArgType.callListAdd(constructionArgs.seq,constructionArgs.seq.size(),i);
-    }
+  public void testadd_int_val_happyPathInsertEnd(InputTestArgType inputArgType,ConstructionArguments constructionArgs){
+    for(int i=0;i<100;++i){inputArgType.callListAdd(constructionArgs.seq,constructionArgs.seq.size(),i);}
     constructionArgs.verifyStructuralIntegrity(100,100);
     InputTestArgType.ARRAY_TYPE.verifyAscending(constructionArgs,
       inputArgType.verifyAscending(constructionArgs,
@@ -486,17 +396,12 @@ public class RefArrSeqTest{
   }
   @ParameterizedTest
   @MethodSource("getListInputMethodArgs")
-  public void testListItradd_val_happyPathInsertMidPoint(InputTestArgType inputArgType,ConstructionArguments constructionArgs)
-  {
+  public void testListItradd_val_happyPathInsertMidPoint(InputTestArgType inputArgType,ConstructionArguments constructionArgs){
     var seqItr=constructionArgs.constructSeqListIterator();
-    for(int i=0;i<100;++i)
-    {
+    for(int i=0;i<100;++i){
       inputArgType.callListItrAdd(seqItr,i);
       constructionArgs.verifyIteratorState(seqItr,(i/2)+1,-1,i+1);
-      if((i&1)==0)
-      {
-        seqItr.previous();
-      }
+      if((i&1)==0){seqItr.previous();}
     }
     constructionArgs.verifyStructuralIntegrity(100,100);
     InputTestArgType.ARRAY_TYPE.verifyAscending(constructionArgs,
@@ -507,12 +412,8 @@ public class RefArrSeqTest{
   }
   @ParameterizedTest
   @MethodSource("getListInputMethodArgs")
-  public void testadd_int_val_happyPathInsertMidPoint(InputTestArgType inputArgType,ConstructionArguments constructionArgs)
-  {
-    for(int i=0;i<100;++i)
-    {
-      inputArgType.callListAdd(constructionArgs.seq,constructionArgs.seq.size()/2,i);
-    }
+  public void testadd_int_val_happyPathInsertMidPoint(InputTestArgType inputArgType,ConstructionArguments constructionArgs){
+    for(int i=0;i<100;++i){inputArgType.callListAdd(constructionArgs.seq,constructionArgs.seq.size()/2,i);}
     constructionArgs.verifyStructuralIntegrity(100,100);
     InputTestArgType.ARRAY_TYPE.verifyAscending(constructionArgs,
       inputArgType.verifyMidPointInsertion(constructionArgs,
@@ -522,15 +423,10 @@ public class RefArrSeqTest{
   }
   @ParameterizedTest
   @MethodSource("getListInputMethodArgs")
-  public void testListItrset_val_happyPath(InputTestArgType inputArgType,ConstructionArguments constructionArgs)
-  {
-    for(int i=100;--i>=0;)
-    {
-      constructionArgs.seq.add(TypeConversionUtil.convertToObject(i));
-    }
+  public void testListItrset_val_happyPath(InputTestArgType inputArgType,ConstructionArguments constructionArgs){
+    for(int i=100;--i>=0;){constructionArgs.seq.add(TypeConversionUtil.convertToObject(i));}
     var seqItr=constructionArgs.constructSeqListIterator();
-    for(int i=0;i<100;++i)
-    {
+    for(int i=0;i<100;++i){
       seqItr.next();
       inputArgType.callListItrSet(seqItr,i);
       constructionArgs.verifyIteratorState(seqItr,i+1,i,100);
@@ -540,8 +436,7 @@ public class RefArrSeqTest{
         InputTestArgType.ARRAY_TYPE.verifyAscending(constructionArgs,0,constructionArgs.preAlloc,-constructionArgs.preAlloc)
       ,100,0)
     ,constructionArgs.postAlloc,100);
-    for(int i=0;i<100;++i)
-    {
+    for(int i=0;i<100;++i){
       seqItr.previous();
       inputArgType.callListItrSet(seqItr,i);
       constructionArgs.verifyIteratorState(seqItr,100-i-1,100-i-1,100);
@@ -555,16 +450,9 @@ public class RefArrSeqTest{
   }
   @ParameterizedTest
   @MethodSource("getListInputMethodArgs")
-  public void testput_int_val_happyPath(InputTestArgType inputArgType,ConstructionArguments constructionArgs)
-  {
-    for(int i=0;i<100;++i)
-    {
-      constructionArgs.seq.add(TypeConversionUtil.convertToObject(i));
-    }
-    for(int i=0;i<100;++i)
-    {
-      inputArgType.callListPut(constructionArgs.seq,100-i-1,i);
-    }
+  public void testput_int_val_happyPath(InputTestArgType inputArgType,ConstructionArguments constructionArgs){
+    for(int i=0;i<100;++i){constructionArgs.seq.add(TypeConversionUtil.convertToObject(i));}
+    for(int i=0;i<100;++i){inputArgType.callListPut(constructionArgs.seq,100-i-1,i);}
     constructionArgs.verifyStructuralIntegrity(100,100);
     InputTestArgType.ARRAY_TYPE.verifyAscending(constructionArgs,
       inputArgType.verifyDescending(constructionArgs,
@@ -574,12 +462,8 @@ public class RefArrSeqTest{
   }
   @ParameterizedTest
   @MethodSource("getStackInputMethodArgs")
-  public void testpush_val_happyPath(InputTestArgType inputArgType,ConstructionArguments constructionArgs)
-  {
-    for(int i=0;i<100;++i)
-    {
-      inputArgType.callStackPush(constructionArgs.seq,i);
-    }
+  public void testpush_val_happyPath(InputTestArgType inputArgType,ConstructionArguments constructionArgs){
+    for(int i=0;i<100;++i){inputArgType.callStackPush(constructionArgs.seq,i);}
     constructionArgs.verifyStructuralIntegrity(100,100);
     InputTestArgType.ARRAY_TYPE.verifyAscending(constructionArgs,
       inputArgType.verifyAscending(constructionArgs,
@@ -589,12 +473,8 @@ public class RefArrSeqTest{
   }
   @ParameterizedTest
   @MethodSource("getCollectionInputMethodArgs")
-  public void testadd_val_happyPath(InputTestArgType inputArgType,ConstructionArguments constructionArgs)
-  {
-    for(int i=0;i<100;++i)
-    {
-      Assertions.assertTrue(inputArgType.callCollectionAdd(constructionArgs.seq,i));
-    }
+  public void testadd_val_happyPath(InputTestArgType inputArgType,ConstructionArguments constructionArgs){
+    for(int i=0;i<100;++i){Assertions.assertTrue(inputArgType.callCollectionAdd(constructionArgs.seq,i));}
     constructionArgs.verifyStructuralIntegrity(100,100);
     InputTestArgType.ARRAY_TYPE.verifyAscending(constructionArgs,
       inputArgType.verifyAscending(constructionArgs,
@@ -602,25 +482,14 @@ public class RefArrSeqTest{
       ,100,0)
     ,constructionArgs.postAlloc,100);
   }
-  static Stream<Arguments> getCheckedListInputMethodArgs()
-  {
+  static Stream<Arguments> getCheckedListInputMethodArgs(){
     Stream.Builder<Arguments> builder=Stream.builder();
-    for(InputTestArgType inputTestArgType:InputTestArgType.values())
-    {
-      for(int initialCapacity=0;initialCapacity<=15;initialCapacity+=5)
-      {
-        builder.add(Arguments.of(inputTestArgType,new ConstructionArguments(initialCapacity,true,StructType.LIST)));
-      }
-      for(int rootPreAlloc=0;rootPreAlloc<=5;rootPreAlloc+=5)
-      {
-        for(int rootPostAlloc=0;rootPostAlloc<=5;rootPostAlloc+=5)
-        {
-          for(int parentPreAlloc=0;parentPreAlloc<=5;parentPreAlloc+=5)
-          {
-            for(int parentPostAlloc=0;parentPostAlloc<=5;parentPostAlloc+=5)
-            {
-              builder.add(Arguments.of(inputTestArgType,new ConstructionArguments(rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,true)));
-            }
+    for(InputTestArgType inputTestArgType:InputTestArgType.values()){
+      for(int initialCapacity=0;initialCapacity<=15;initialCapacity+=5){builder.add(Arguments.of(inputTestArgType,new ConstructionArguments(initialCapacity,true,StructType.LIST)));}
+      for(int rootPreAlloc=0;rootPreAlloc<=5;rootPreAlloc+=5){
+        for(int rootPostAlloc=0;rootPostAlloc<=5;rootPostAlloc+=5){
+          for(int parentPreAlloc=0;parentPreAlloc<=5;parentPreAlloc+=5){
+            for(int parentPostAlloc=0;parentPostAlloc<=5;parentPostAlloc+=5){builder.add(Arguments.of(inputTestArgType,new ConstructionArguments(rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,true)));}
           }
         }
       }
@@ -629,10 +498,8 @@ public class RefArrSeqTest{
   }
   @ParameterizedTest
   @MethodSource("getCheckedListInputMethodArgs")
-  public void testput_int_val_throwIOBE(InputTestArgType inputArgType,ConstructionArguments constructionArgs)
-  {
-    for(int i=0;i<100;++i)
-    {
+  public void testput_int_val_throwIOBE(InputTestArgType inputArgType,ConstructionArguments constructionArgs){
+    for(int i=0;i<100;++i){
       //too low
       Assertions.assertThrows(IndexOutOfBoundsException.class,()->inputArgType.callListPut(constructionArgs.seq,-1,0));
       //too high
@@ -646,10 +513,8 @@ public class RefArrSeqTest{
   }
   @ParameterizedTest
   @MethodSource("getCheckedListInputMethodArgs")
-  public void testadd_int_val_throwIOBE(InputTestArgType inputArgType,ConstructionArguments constructionArgs)
-  {
-    for(int i=0;i<100;++i)
-    {
+  public void testadd_int_val_throwIOBE(InputTestArgType inputArgType,ConstructionArguments constructionArgs){
+    for(int i=0;i<100;++i){
       //too low
       Assertions.assertThrows(IndexOutOfBoundsException.class,()->inputArgType.callListAdd(constructionArgs.seq,-1,0));
       //too high
@@ -663,8 +528,7 @@ public class RefArrSeqTest{
   }
   @ParameterizedTest
   @MethodSource("getCheckedListInputMethodArgs")
-  public void testListItrAadd_val_emptyListModRootthrowCME(InputTestArgType inputArgType,ConstructionArguments constructionArgs)
-  {
+  public void testListItrAadd_val_emptyListModRootthrowCME(InputTestArgType inputArgType,ConstructionArguments constructionArgs){
     var seqItr=constructionArgs.constructSeqListIterator();
     //illegally modify the root;
     constructionArgs.root.add(TypeConversionUtil.convertToObject(0));
@@ -680,8 +544,7 @@ public class RefArrSeqTest{
   }
   @ParameterizedTest
   @MethodSource("getCheckedListInputMethodArgs")
-  public void testListItradd_val_emptyListModParentthrowCME(InputTestArgType inputArgType,ConstructionArguments constructionArgs)
-  {
+  public void testListItradd_val_emptyListModParentthrowCME(InputTestArgType inputArgType,ConstructionArguments constructionArgs){
     var seqItr=constructionArgs.constructSeqListIterator();
     //illegally modify the parent;
     constructionArgs.parent.add(TypeConversionUtil.convertToObject(0));
@@ -699,8 +562,7 @@ public class RefArrSeqTest{
   }
   @ParameterizedTest
   @MethodSource("getCheckedListInputMethodArgs")
-  public void testListItradd_val_emptyListModSequencethrowCME(InputTestArgType inputArgType,ConstructionArguments constructionArgs)
-  {
+  public void testListItradd_val_emptyListModSequencethrowCME(InputTestArgType inputArgType,ConstructionArguments constructionArgs){
     var seqItr=constructionArgs.constructSeqListIterator();
     //illegally modify the sequence;
     constructionArgs.seq.add(TypeConversionUtil.convertToObject(0));
@@ -716,13 +578,9 @@ public class RefArrSeqTest{
   }
   @ParameterizedTest
   @MethodSource("getCheckedListInputMethodArgs")
-  public void testListItradd_val_nonEmptyListModRootthrowCME(InputTestArgType inputArgType,ConstructionArguments constructionArgs)
-  {
+  public void testListItradd_val_nonEmptyListModRootthrowCME(InputTestArgType inputArgType,ConstructionArguments constructionArgs){
     var seqItr=constructionArgs.constructSeqListIterator();
-    for(int i=0;i<100;++i)
-    {
-      seqItr.add(TypeConversionUtil.convertToObject(i));
-    }
+    for(int i=0;i<100;++i){seqItr.add(TypeConversionUtil.convertToObject(i));}
     //illegally modify the root;
     constructionArgs.root.add(TypeConversionUtil.convertToObject(0));
     //attempt an insertion
@@ -735,13 +593,9 @@ public class RefArrSeqTest{
   }
   @ParameterizedTest
   @MethodSource("getCheckedListInputMethodArgs")
-  public void testListItradd_val_nonEmptyListModParentthrowCME(InputTestArgType inputArgType,ConstructionArguments constructionArgs)
-  {
+  public void testListItradd_val_nonEmptyListModParentthrowCME(InputTestArgType inputArgType,ConstructionArguments constructionArgs){
     var seqItr=constructionArgs.constructSeqListIterator();
-    for(int i=0;i<100;++i)
-    {
-      seqItr.add(TypeConversionUtil.convertToObject(i));
-    }
+    for(int i=0;i<100;++i){seqItr.add(TypeConversionUtil.convertToObject(i));}
     //illegally modify the parent;
     constructionArgs.parent.add(TypeConversionUtil.convertToObject(0));
     //attempt an insertion
@@ -756,13 +610,9 @@ public class RefArrSeqTest{
   }
   @ParameterizedTest
   @MethodSource("getCheckedListInputMethodArgs")
-  public void testListItradd_val_nonEmptyListModSequencethrowCME(InputTestArgType inputArgType,ConstructionArguments constructionArgs)
-  {
+  public void testListItradd_val_nonEmptyListModSequencethrowCME(InputTestArgType inputArgType,ConstructionArguments constructionArgs){
     var seqItr=constructionArgs.constructSeqListIterator();
-    for(int i=0;i<100;++i)
-    {
-      seqItr.add(TypeConversionUtil.convertToObject(i));
-    }
+    for(int i=0;i<100;++i){seqItr.add(TypeConversionUtil.convertToObject(i));}
     //illegally modify the sequence;
     constructionArgs.seq.add(TypeConversionUtil.convertToObject(0));
     //attempt an insertion
@@ -777,8 +627,7 @@ public class RefArrSeqTest{
   }
   @ParameterizedTest
   @MethodSource("getCheckedListInputMethodArgs")
-  public void testListItrAset_val_emptyListModRootthrowCME(InputTestArgType inputArgType,ConstructionArguments constructionArgs)
-  {
+  public void testListItrAset_val_emptyListModRootthrowCME(InputTestArgType inputArgType,ConstructionArguments constructionArgs){
     var seqItr=constructionArgs.constructSeqListIterator();
     seqItr.add(TypeConversionUtil.convertToObject(0));
     seqItr.previous();
@@ -798,8 +647,7 @@ public class RefArrSeqTest{
   }
   @ParameterizedTest
   @MethodSource("getCheckedListInputMethodArgs")
-  public void testListItrset_val_emptyListModParentthrowCME(InputTestArgType inputArgType,ConstructionArguments constructionArgs)
-  {
+  public void testListItrset_val_emptyListModParentthrowCME(InputTestArgType inputArgType,ConstructionArguments constructionArgs){
     var seqItr=constructionArgs.constructSeqListIterator();
     seqItr.add(TypeConversionUtil.convertToObject(0));
     seqItr.previous();
@@ -821,8 +669,7 @@ public class RefArrSeqTest{
   }
   @ParameterizedTest
   @MethodSource("getCheckedListInputMethodArgs")
-  public void testListItrset_val_emptyListModSequencethrowCME(InputTestArgType inputArgType,ConstructionArguments constructionArgs)
-  {
+  public void testListItrset_val_emptyListModSequencethrowCME(InputTestArgType inputArgType,ConstructionArguments constructionArgs){
     var seqItr=constructionArgs.constructSeqListIterator();
     seqItr.add(TypeConversionUtil.convertToObject(0));
     seqItr.previous();
@@ -842,13 +689,9 @@ public class RefArrSeqTest{
   }
   @ParameterizedTest
   @MethodSource("getCheckedListInputMethodArgs")
-  public void testListItrset_val_nonEmptyListModRootthrowCME(InputTestArgType inputArgType,ConstructionArguments constructionArgs)
-  {
+  public void testListItrset_val_nonEmptyListModRootthrowCME(InputTestArgType inputArgType,ConstructionArguments constructionArgs){
     var seqItr=constructionArgs.constructSeqListIterator();
-    for(int i=0;i<100;++i)
-    {
-      seqItr.add(TypeConversionUtil.convertToObject(i));
-    }
+    for(int i=0;i<100;++i){seqItr.add(TypeConversionUtil.convertToObject(i));}
     seqItr.add(TypeConversionUtil.convertToObject(0));
     seqItr.previous();
     //illegally modify the root;
@@ -867,13 +710,9 @@ public class RefArrSeqTest{
   }
   @ParameterizedTest
   @MethodSource("getCheckedListInputMethodArgs")
-  public void testListItrset_val_nonEmptyListModParentthrowCME(InputTestArgType inputArgType,ConstructionArguments constructionArgs)
-  {
+  public void testListItrset_val_nonEmptyListModParentthrowCME(InputTestArgType inputArgType,ConstructionArguments constructionArgs){
     var seqItr=constructionArgs.constructSeqListIterator();
-    for(int i=0;i<100;++i)
-    {
-      seqItr.add(TypeConversionUtil.convertToObject(i));
-    }
+    for(int i=0;i<100;++i){seqItr.add(TypeConversionUtil.convertToObject(i));}
     seqItr.add(TypeConversionUtil.convertToObject(0));
     seqItr.previous();
     //illegally modify the parent;
@@ -894,13 +733,9 @@ public class RefArrSeqTest{
   }
   @ParameterizedTest
   @MethodSource("getCheckedListInputMethodArgs")
-  public void testListItrset_val_nonEmptyListModSequencethrowCME(InputTestArgType inputArgType,ConstructionArguments constructionArgs)
-  {
+  public void testListItrset_val_nonEmptyListModSequencethrowCME(InputTestArgType inputArgType,ConstructionArguments constructionArgs){
     var seqItr=constructionArgs.constructSeqListIterator();
-    for(int i=0;i<100;++i)
-    {
-      seqItr.add(TypeConversionUtil.convertToObject(i));
-    }
+    for(int i=0;i<100;++i){seqItr.add(TypeConversionUtil.convertToObject(i));}
     seqItr.add(TypeConversionUtil.convertToObject(0));
     seqItr.previous();
     //illegally modify the sequence;
@@ -917,6 +752,314 @@ public class RefArrSeqTest{
       ,0)
     ,constructionArgs.postAlloc,100);
   }
-  //TODO checked sublist CME add/put methods
-  //TODO checked list iterator ISE add methods
+  static Stream<Arguments> getCheckedSubListInputMethodArgs(){
+    Stream.Builder<Arguments> builder=Stream.builder();
+    for(InputTestArgType inputTestArgType:InputTestArgType.values()){
+      for(int rootPreAlloc=0;rootPreAlloc<=5;rootPreAlloc+=5){
+        for(int rootPostAlloc=0;rootPostAlloc<=5;rootPostAlloc+=5){
+          for(int parentPreAlloc=0;parentPreAlloc<=5;parentPreAlloc+=5){
+            for(int parentPostAlloc=0;parentPostAlloc<=5;parentPostAlloc+=5){builder.add(Arguments.of(inputTestArgType,new ConstructionArguments(rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,true)));}
+          }
+        }
+      }
+    }
+    return builder.build();
+  }
+  @ParameterizedTest
+  @MethodSource("getCheckedSubListInputMethodArgs")
+  public void testSubListadd_val_emptyListModRootthrowCME(InputTestArgType inputArgType,ConstructionArguments constructionArgs){
+    //illegally modify the root
+    constructionArgs.root.add(TypeConversionUtil.convertToObject(0));
+    //attempt an insertion
+    Assertions.assertThrows(ConcurrentModificationException.class,()->inputArgType.callCollectionAdd(constructionArgs.seq,0));
+    constructionArgs.verifyStructuralIntegrity(0,0,0,0,1,1);
+    InputTestArgType.ARRAY_TYPE.verifyIndex(constructionArgs,
+      InputTestArgType.ARRAY_TYPE.verifyAscending(constructionArgs,
+        InputTestArgType.ARRAY_TYPE.verifyAscending(constructionArgs,0,constructionArgs.preAlloc,-constructionArgs.preAlloc)
+      ,constructionArgs.postAlloc,100)
+    ,0);
+  }
+  @ParameterizedTest
+  @MethodSource("getCheckedSubListInputMethodArgs")
+  public void testSubListadd_val_emptyListModParentthrowCME(InputTestArgType inputArgType,ConstructionArguments constructionArgs){
+    //illegally modify the root
+    constructionArgs.parent.add(TypeConversionUtil.convertToObject(0));
+    //attempt an insertion
+    Assertions.assertThrows(ConcurrentModificationException.class,()->inputArgType.callCollectionAdd(constructionArgs.seq,0));
+    constructionArgs.verifyStructuralIntegrity(0,0,1,1);
+    InputTestArgType.ARRAY_TYPE.verifyAscending(constructionArgs,
+      InputTestArgType.ARRAY_TYPE.verifyIndex(constructionArgs,
+        InputTestArgType.ARRAY_TYPE.verifyAscending(constructionArgs,
+          InputTestArgType.ARRAY_TYPE.verifyAscending(constructionArgs,0,constructionArgs.preAlloc,-constructionArgs.preAlloc)
+        ,constructionArgs.parentPostAlloc,100)
+      ,0)
+    ,constructionArgs.rootPostAlloc,constructionArgs.parentPostAlloc+100);
+  }
+  @ParameterizedTest
+  @MethodSource("getCheckedSubListInputMethodArgs")
+  public void testSubListadd_val_nonEmptyListModRootthrowCME(InputTestArgType inputArgType,ConstructionArguments constructionArgs){
+    for(int i=0;i<100;++i){
+      constructionArgs.seq.add(TypeConversionUtil.convertToObject(i));
+    }
+    //illegally modify the root
+    constructionArgs.root.add(TypeConversionUtil.convertToObject(0));
+    //attempt an insertion
+    Assertions.assertThrows(ConcurrentModificationException.class,()->inputArgType.callCollectionAdd(constructionArgs.seq,0));
+    constructionArgs.verifyStructuralIntegrity(100,100,100,100,101,101);
+    InputTestArgType.ARRAY_TYPE.verifyIndex(constructionArgs,
+      InputTestArgType.ARRAY_TYPE.verifyAscending(constructionArgs,0,constructionArgs.rootSize+100,-constructionArgs.preAlloc)
+    ,0);
+  }
+  @ParameterizedTest
+  @MethodSource("getCheckedSubListInputMethodArgs")
+  public void testSubListadd_val_nonEmptyListModParentthrowCME(InputTestArgType inputArgType,ConstructionArguments constructionArgs){
+    for(int i=0;i<100;++i){
+      constructionArgs.seq.add(TypeConversionUtil.convertToObject(i));
+    }
+    //illegally modify the parent
+    constructionArgs.parent.add(TypeConversionUtil.convertToObject(0));
+    //attempt an insertion
+    Assertions.assertThrows(ConcurrentModificationException.class,()->inputArgType.callCollectionAdd(constructionArgs.seq,0));
+    constructionArgs.verifyStructuralIntegrity(100,100,101,101);
+    InputTestArgType.ARRAY_TYPE.verifyAscending(constructionArgs,
+      InputTestArgType.ARRAY_TYPE.verifyIndex(constructionArgs,
+        InputTestArgType.ARRAY_TYPE.verifyAscending(constructionArgs,0,constructionArgs.preAlloc+100+constructionArgs.parentPostAlloc,-constructionArgs.preAlloc)
+      ,0)
+    ,constructionArgs.rootPostAlloc,100+constructionArgs.parentPostAlloc);
+  }
+  @ParameterizedTest
+  @MethodSource("getCheckedSubListInputMethodArgs")
+  public void testSubListadd_int_val_emptyListModRootthrowCME(InputTestArgType inputArgType,ConstructionArguments constructionArgs){
+    //illegally modify the root
+    constructionArgs.root.add(TypeConversionUtil.convertToObject(0));
+    //attempt an insertion
+    Assertions.assertThrows(ConcurrentModificationException.class,()->inputArgType.callListAdd(constructionArgs.seq,0,0));
+    constructionArgs.verifyStructuralIntegrity(0,0,0,0,1,1);
+    InputTestArgType.ARRAY_TYPE.verifyIndex(constructionArgs,
+      InputTestArgType.ARRAY_TYPE.verifyAscending(constructionArgs,
+        InputTestArgType.ARRAY_TYPE.verifyAscending(constructionArgs,0,constructionArgs.preAlloc,-constructionArgs.preAlloc)
+      ,constructionArgs.postAlloc,100)
+    ,0);
+  }
+  @ParameterizedTest
+  @MethodSource("getCheckedSubListInputMethodArgs")
+  public void testSubListadd_int_val_emptyListModParentthrowCME(InputTestArgType inputArgType,ConstructionArguments constructionArgs){
+    //illegally modify the root
+    constructionArgs.parent.add(TypeConversionUtil.convertToObject(0));
+    //attempt an insertion
+    Assertions.assertThrows(ConcurrentModificationException.class,()->inputArgType.callListAdd(constructionArgs.seq,0,0));
+    constructionArgs.verifyStructuralIntegrity(0,0,1,1);
+    InputTestArgType.ARRAY_TYPE.verifyAscending(constructionArgs,
+      InputTestArgType.ARRAY_TYPE.verifyIndex(constructionArgs,
+        InputTestArgType.ARRAY_TYPE.verifyAscending(constructionArgs,
+          InputTestArgType.ARRAY_TYPE.verifyAscending(constructionArgs,0,constructionArgs.preAlloc,-constructionArgs.preAlloc)
+        ,constructionArgs.parentPostAlloc,100)
+      ,0)
+    ,constructionArgs.rootPostAlloc,constructionArgs.parentPostAlloc+100);
+  }
+  @ParameterizedTest
+  @MethodSource("getCheckedSubListInputMethodArgs")
+  public void testSubListadd_int_val_nonEmptyListModRootthrowCME(InputTestArgType inputArgType,ConstructionArguments constructionArgs){
+    for(int i=0;i<100;++i){
+      constructionArgs.seq.add(TypeConversionUtil.convertToObject(i));
+    }
+    //illegally modify the root
+    constructionArgs.root.add(TypeConversionUtil.convertToObject(0));
+    //attempt an insertion
+    Assertions.assertThrows(ConcurrentModificationException.class,()->inputArgType.callListAdd(constructionArgs.seq,100,0));
+    constructionArgs.verifyStructuralIntegrity(100,100,100,100,101,101);
+    InputTestArgType.ARRAY_TYPE.verifyIndex(constructionArgs,
+      InputTestArgType.ARRAY_TYPE.verifyAscending(constructionArgs,0,constructionArgs.rootSize+100,-constructionArgs.preAlloc)
+    ,0);
+  }
+  @ParameterizedTest
+  @MethodSource("getCheckedSubListInputMethodArgs")
+  public void testSubListadd_int_val_nonEmptyListModParentthrowCME(InputTestArgType inputArgType,ConstructionArguments constructionArgs){
+    for(int i=0;i<100;++i){
+      constructionArgs.seq.add(TypeConversionUtil.convertToObject(i));
+    }
+    //illegally modify the parent
+    constructionArgs.parent.add(TypeConversionUtil.convertToObject(0));
+    //attempt an insertion
+    Assertions.assertThrows(ConcurrentModificationException.class,()->inputArgType.callListAdd(constructionArgs.seq,100,0));
+    constructionArgs.verifyStructuralIntegrity(100,100,101,101);
+    InputTestArgType.ARRAY_TYPE.verifyAscending(constructionArgs,
+      InputTestArgType.ARRAY_TYPE.verifyIndex(constructionArgs,
+        InputTestArgType.ARRAY_TYPE.verifyAscending(constructionArgs,0,constructionArgs.preAlloc+100+constructionArgs.parentPostAlloc,-constructionArgs.preAlloc)
+      ,0)
+    ,constructionArgs.rootPostAlloc,100+constructionArgs.parentPostAlloc);
+  }
+  @ParameterizedTest
+  @MethodSource("getCheckedSubListInputMethodArgs")
+  public void testSubListput_int_val_nonEmptyListModRootthrowCME(InputTestArgType inputArgType,ConstructionArguments constructionArgs){
+    for(int i=0;i<100;++i){
+      constructionArgs.seq.add(TypeConversionUtil.convertToObject(i));
+    }
+    //illegally modify the root
+    constructionArgs.root.add(TypeConversionUtil.convertToObject(0));
+    //attempt a put
+    Assertions.assertThrows(ConcurrentModificationException.class,()->inputArgType.callListPut(constructionArgs.seq,99,0));
+    constructionArgs.verifyStructuralIntegrity(100,100,100,100,101,101);
+    InputTestArgType.ARRAY_TYPE.verifyIndex(constructionArgs,
+      InputTestArgType.ARRAY_TYPE.verifyAscending(constructionArgs,0,constructionArgs.rootSize+100,-constructionArgs.preAlloc)
+    ,0);
+  }
+  @ParameterizedTest
+  @MethodSource("getCheckedSubListInputMethodArgs")
+  public void testSubListput_int_val_nonEmptyListModParentthrowCME(InputTestArgType inputArgType,ConstructionArguments constructionArgs){
+    for(int i=0;i<100;++i){
+      constructionArgs.seq.add(TypeConversionUtil.convertToObject(i));
+    }
+    //illegally modify the parent
+    constructionArgs.parent.add(TypeConversionUtil.convertToObject(0));
+    //attempt a put
+    Assertions.assertThrows(ConcurrentModificationException.class,()->inputArgType.callListPut(constructionArgs.seq,99,0));
+    constructionArgs.verifyStructuralIntegrity(100,100,101,101);
+    InputTestArgType.ARRAY_TYPE.verifyAscending(constructionArgs,
+      InputTestArgType.ARRAY_TYPE.verifyIndex(constructionArgs,
+        InputTestArgType.ARRAY_TYPE.verifyAscending(constructionArgs,0,constructionArgs.preAlloc+100+constructionArgs.parentPostAlloc,-constructionArgs.preAlloc)
+      ,0)
+    ,constructionArgs.rootPostAlloc,100+constructionArgs.parentPostAlloc);
+  }
+  @ParameterizedTest
+  @MethodSource("getCheckedSubListInputMethodArgs")
+  public void testSubListadd_int_val_emptyListModRootthrowCMEsupercedesIOBE(InputTestArgType inputArgType,ConstructionArguments constructionArgs){
+    //illegally modify the root
+    constructionArgs.root.add(TypeConversionUtil.convertToObject(0));
+    //attempt an insertion too low
+    Assertions.assertThrows(ConcurrentModificationException.class,()->inputArgType.callListAdd(constructionArgs.seq,-1,0));
+    //attempt an insertion too high
+    Assertions.assertThrows(ConcurrentModificationException.class,()->inputArgType.callListAdd(constructionArgs.seq,1,0));
+    constructionArgs.verifyStructuralIntegrity(0,0,0,0,1,1);
+    InputTestArgType.ARRAY_TYPE.verifyIndex(constructionArgs,
+      InputTestArgType.ARRAY_TYPE.verifyAscending(constructionArgs,
+        InputTestArgType.ARRAY_TYPE.verifyAscending(constructionArgs,0,constructionArgs.preAlloc,-constructionArgs.preAlloc)
+      ,constructionArgs.postAlloc,100)
+    ,0);
+  }
+  @ParameterizedTest
+  @MethodSource("getCheckedSubListInputMethodArgs")
+  public void testSubListadd_int_val_emptyListModParentthrowCMEsupercedesIOBE(InputTestArgType inputArgType,ConstructionArguments constructionArgs){
+    //illegally modify the root
+    constructionArgs.parent.add(TypeConversionUtil.convertToObject(0));
+    //attempt an insertion too low
+    Assertions.assertThrows(ConcurrentModificationException.class,()->inputArgType.callListAdd(constructionArgs.seq,-1,0));
+    //attempt an insertion too high
+    Assertions.assertThrows(ConcurrentModificationException.class,()->inputArgType.callListAdd(constructionArgs.seq,1,0));
+    constructionArgs.verifyStructuralIntegrity(0,0,1,1);
+    InputTestArgType.ARRAY_TYPE.verifyAscending(constructionArgs,
+      InputTestArgType.ARRAY_TYPE.verifyIndex(constructionArgs,
+        InputTestArgType.ARRAY_TYPE.verifyAscending(constructionArgs,
+          InputTestArgType.ARRAY_TYPE.verifyAscending(constructionArgs,0,constructionArgs.preAlloc,-constructionArgs.preAlloc)
+        ,constructionArgs.parentPostAlloc,100)
+      ,0)
+    ,constructionArgs.rootPostAlloc,constructionArgs.parentPostAlloc+100);
+  }
+  @ParameterizedTest
+  @MethodSource("getCheckedSubListInputMethodArgs")
+  public void testSubListadd_int_val_nonEmptyListModRootthrowCMEsupercedesIOBE(InputTestArgType inputArgType,ConstructionArguments constructionArgs){
+    for(int i=0;i<100;++i){
+      constructionArgs.seq.add(TypeConversionUtil.convertToObject(i));
+    }
+    //illegally modify the root
+    constructionArgs.root.add(TypeConversionUtil.convertToObject(0));
+    //attempt an insertion too low
+    Assertions.assertThrows(ConcurrentModificationException.class,()->inputArgType.callListAdd(constructionArgs.seq,-1,0));
+    //attempt an insertion too high
+    Assertions.assertThrows(ConcurrentModificationException.class,()->inputArgType.callListAdd(constructionArgs.seq,101,0));
+    constructionArgs.verifyStructuralIntegrity(100,100,100,100,101,101);
+    InputTestArgType.ARRAY_TYPE.verifyIndex(constructionArgs,
+      InputTestArgType.ARRAY_TYPE.verifyAscending(constructionArgs,0,constructionArgs.rootSize+100,-constructionArgs.preAlloc)
+    ,0);
+  }
+  @ParameterizedTest
+  @MethodSource("getCheckedSubListInputMethodArgs")
+  public void testSubListadd_int_val_nonEmptyListModParentthrowCMEsupercedesIOBE(InputTestArgType inputArgType,ConstructionArguments constructionArgs){
+    for(int i=0;i<100;++i){
+      constructionArgs.seq.add(TypeConversionUtil.convertToObject(i));
+    }
+    //illegally modify the parent
+    constructionArgs.parent.add(TypeConversionUtil.convertToObject(0));
+    //attempt an insertion too low
+    Assertions.assertThrows(ConcurrentModificationException.class,()->inputArgType.callListAdd(constructionArgs.seq,-1,0));
+    //attempt an insertion too high
+    Assertions.assertThrows(ConcurrentModificationException.class,()->inputArgType.callListAdd(constructionArgs.seq,101,0));
+    constructionArgs.verifyStructuralIntegrity(100,100,101,101);
+    InputTestArgType.ARRAY_TYPE.verifyAscending(constructionArgs,
+      InputTestArgType.ARRAY_TYPE.verifyIndex(constructionArgs,
+        InputTestArgType.ARRAY_TYPE.verifyAscending(constructionArgs,0,constructionArgs.preAlloc+100+constructionArgs.parentPostAlloc,-constructionArgs.preAlloc)
+      ,0)
+    ,constructionArgs.rootPostAlloc,100+constructionArgs.parentPostAlloc);
+  }
+  @ParameterizedTest
+  @MethodSource("getCheckedSubListInputMethodArgs")
+  public void testSubListput_int_val_emptyListModRootthrowCMEsupercedesIOBE(InputTestArgType inputArgType,ConstructionArguments constructionArgs){
+    //illegally modify the root
+    constructionArgs.root.add(TypeConversionUtil.convertToObject(0));
+    //attempt a put too low
+    Assertions.assertThrows(ConcurrentModificationException.class,()->inputArgType.callListPut(constructionArgs.seq,-1,0));
+    //attempt a put too high
+    Assertions.assertThrows(ConcurrentModificationException.class,()->inputArgType.callListPut(constructionArgs.seq,0,0));
+    constructionArgs.verifyStructuralIntegrity(0,0,0,0,1,1);
+    InputTestArgType.ARRAY_TYPE.verifyIndex(constructionArgs,
+      InputTestArgType.ARRAY_TYPE.verifyAscending(constructionArgs,
+        InputTestArgType.ARRAY_TYPE.verifyAscending(constructionArgs,0,constructionArgs.preAlloc,-constructionArgs.preAlloc)
+      ,constructionArgs.postAlloc,100)
+    ,0);
+  }
+  @ParameterizedTest
+  @MethodSource("getCheckedSubListInputMethodArgs")
+  public void testSubListput_int_val_emptyListModParentthrowCMEsupercedesIOBE(InputTestArgType inputArgType,ConstructionArguments constructionArgs){
+    //illegally modify the parent
+    constructionArgs.parent.add(TypeConversionUtil.convertToObject(0));
+    //attempt a put too low
+    Assertions.assertThrows(ConcurrentModificationException.class,()->inputArgType.callListPut(constructionArgs.seq,-1,0));
+    //attempt a put too high
+    Assertions.assertThrows(ConcurrentModificationException.class,()->inputArgType.callListPut(constructionArgs.seq,0,0));
+    constructionArgs.verifyStructuralIntegrity(0,0,1,1);
+    InputTestArgType.ARRAY_TYPE.verifyAscending(constructionArgs,
+      InputTestArgType.ARRAY_TYPE.verifyIndex(constructionArgs,
+        InputTestArgType.ARRAY_TYPE.verifyAscending(constructionArgs,
+          InputTestArgType.ARRAY_TYPE.verifyAscending(constructionArgs,0,constructionArgs.preAlloc,-constructionArgs.preAlloc)
+        ,constructionArgs.parentPostAlloc,100)
+      ,0)
+    ,constructionArgs.rootPostAlloc,constructionArgs.parentPostAlloc+100);
+  }
+  @ParameterizedTest
+  @MethodSource("getCheckedSubListInputMethodArgs")
+  public void testSubListput_int_val_nonEmptyListModRootthrowCMEsupercedesIOBE(InputTestArgType inputArgType,ConstructionArguments constructionArgs){
+    for(int i=0;i<100;++i){
+      constructionArgs.seq.add(TypeConversionUtil.convertToObject(i));
+    }
+    //illegally modify the root
+    constructionArgs.root.add(TypeConversionUtil.convertToObject(0));
+    //attempt a put too low
+    Assertions.assertThrows(ConcurrentModificationException.class,()->inputArgType.callListPut(constructionArgs.seq,-1,0));
+    //attempt a put too high
+    Assertions.assertThrows(ConcurrentModificationException.class,()->inputArgType.callListPut(constructionArgs.seq,100,0));
+    constructionArgs.verifyStructuralIntegrity(100,100,100,100,101,101);
+    InputTestArgType.ARRAY_TYPE.verifyIndex(constructionArgs,
+      InputTestArgType.ARRAY_TYPE.verifyAscending(constructionArgs,0,constructionArgs.rootSize+100,-constructionArgs.preAlloc)
+    ,0);
+  }
+  @ParameterizedTest
+  @MethodSource("getCheckedSubListInputMethodArgs")
+  public void testSubListput_int_val_nonEmptyListModParentthrowCMEsupercedesIOBE(InputTestArgType inputArgType,ConstructionArguments constructionArgs){
+    for(int i=0;i<100;++i){
+      constructionArgs.seq.add(TypeConversionUtil.convertToObject(i));
+    }
+    //illegally modify the parent
+    constructionArgs.parent.add(TypeConversionUtil.convertToObject(0));
+    //attempt a put too low
+    Assertions.assertThrows(ConcurrentModificationException.class,()->inputArgType.callListPut(constructionArgs.seq,-1,0));
+    //attempt a put too high
+    Assertions.assertThrows(ConcurrentModificationException.class,()->inputArgType.callListPut(constructionArgs.seq,100,0));
+    constructionArgs.verifyStructuralIntegrity(100,100,101,101);
+    InputTestArgType.ARRAY_TYPE.verifyAscending(constructionArgs,
+      InputTestArgType.ARRAY_TYPE.verifyIndex(constructionArgs,
+        InputTestArgType.ARRAY_TYPE.verifyAscending(constructionArgs,0,constructionArgs.preAlloc+100+constructionArgs.parentPostAlloc,-constructionArgs.preAlloc)
+      ,0)
+    ,constructionArgs.rootPostAlloc,100+constructionArgs.parentPostAlloc);
+  }
+  //TODO checked list/sublist iterator ISE add methods
 }
