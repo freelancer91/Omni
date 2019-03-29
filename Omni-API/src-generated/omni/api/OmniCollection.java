@@ -63,153 +63,123 @@ public abstract interface OmniCollection
   public abstract <T> T[] toArray(T[] dst);
   public abstract interface OfPrimitive extends OmniCollection
   {
+    public abstract boolean add(boolean val);
     @Override
     public default boolean contains(Boolean val)
     {
       return val!=null && contains(val.
-  //IF INPUTTYPE==Boolean
         booleanValue
-  //ENDIF
           ());
     }
     @Override
     public default boolean contains(Byte val)
     {
       return val!=null && contains(val.
-  //IF INPUTTYPE==Byte
         byteValue
-  //ENDIF
           ());
     }
     @Override
     public default boolean contains(Character val)
     {
       return val!=null && contains(val.
-  //IF INPUTTYPE==Character
         charValue
-  //ENDIF
           ());
     }
     @Override
     public default boolean contains(Short val)
     {
       return val!=null && contains(val.
-  //IF INPUTTYPE==Short
         shortValue
-  //ENDIF
           ());
     }
     @Override
     public default boolean contains(Integer val)
     {
       return val!=null && contains(val.
-  //IF INPUTTYPE==Integer
         intValue
-  //ENDIF
           ());
     }
     @Override
     public default boolean contains(Long val)
     {
       return val!=null && contains(val.
-  //IF INPUTTYPE==Long
         longValue
-  //ENDIF
           ());
     }
     @Override
     public default boolean contains(Float val)
     {
       return val!=null && contains(val.
-  //IF INPUTTYPE==Float
         floatValue
-  //ENDIF
           ());
     }
     @Override
     public default boolean contains(Double val)
     {
       return val!=null && contains(val.
-  //IF INPUTTYPE==Double
         doubleValue
-  //ENDIF
           ());
     }
     @Override
     public default boolean removeVal(Boolean val)
     {
       return val!=null && removeVal(val.
-  //IF INPUTTYPE==Boolean
         booleanValue
-  //ENDIF
           ());
     }
     @Override
     public default boolean removeVal(Byte val)
     {
       return val!=null && removeVal(val.
-  //IF INPUTTYPE==Byte
         byteValue
-  //ENDIF
           ());
     }
     @Override
     public default boolean removeVal(Character val)
     {
       return val!=null && removeVal(val.
-  //IF INPUTTYPE==Character
         charValue
-  //ENDIF
           ());
     }
     @Override
     public default boolean removeVal(Short val)
     {
       return val!=null && removeVal(val.
-  //IF INPUTTYPE==Short
         shortValue
-  //ENDIF
           ());
     }
     @Override
     public default boolean removeVal(Integer val)
     {
       return val!=null && removeVal(val.
-  //IF INPUTTYPE==Integer
         intValue
-  //ENDIF
           ());
     }
     @Override
     public default boolean removeVal(Long val)
     {
       return val!=null && removeVal(val.
-  //IF INPUTTYPE==Long
         longValue
-  //ENDIF
           ());
     }
     @Override
     public default boolean removeVal(Float val)
     {
       return val!=null && removeVal(val.
-  //IF INPUTTYPE==Float
         floatValue
-  //ENDIF
           ());
     }
     @Override
     public default boolean removeVal(Double val)
     {
       return val!=null && removeVal(val.
-  //IF INPUTTYPE==Double
         doubleValue
-  //ENDIF
           ());
     }
   }
   public abstract interface OfBoolean extends OfPrimitive,Iterable<Boolean>
   {
+    @Override
     public abstract boolean add(boolean val);
     public abstract boolean add(Boolean val);
     public abstract void forEach(BooleanConsumer action);
@@ -220,26 +190,13 @@ public abstract interface OmniCollection
     @Override
     public abstract Boolean[] toArray();
     public abstract boolean[] toBooleanArray();
-  //IF ARRTYPE==double
     public abstract double[] toDoubleArray();
-    //IF ARRTYPE==float
     public abstract float[] toFloatArray();
-      //IF ARRTYPE==long
     public abstract long[] toLongArray();
-        //IF ARRTYPE==int
     public abstract int[] toIntArray();
-          //IF ARRTYPE==short,char
     public abstract short[] toShortArray();
-            //IF ARRTYPE==byte
     public abstract byte[] toByteArray();
     public abstract char[] toCharArray();
-            //ENDIF
-          //ENDIF
-        //ENDIF
-      //ENDIF
-    //ENDIF
-  //ENDIF
-  //IF ARRTYPE==boolean,byte,int,long
     @Override
     public default boolean contains(short val)
     {
@@ -250,7 +207,6 @@ public abstract interface OmniCollection
     {
       return removeVal((int)val);
     }
-    //IF ARRTYPE==boolean
     @Override
     public default boolean contains(byte val)
     {
@@ -271,11 +227,10 @@ public abstract interface OmniCollection
     {
       return removeVal((int)val);
     }
-    //ENDIF
-  //ENDIF
   }
   public abstract interface OfByte extends OfPrimitive,Iterable<Byte>
   {
+    @Override
     public abstract boolean add(boolean val);
     public abstract boolean add(Byte val);
     public abstract void forEach(ByteConsumer action);
@@ -286,22 +241,11 @@ public abstract interface OmniCollection
     @Override
     public abstract Byte[] toArray();
     public abstract byte[] toByteArray();
-  //IF ARRTYPE==double
     public abstract double[] toDoubleArray();
-    //IF ARRTYPE==float
     public abstract float[] toFloatArray();
-      //IF ARRTYPE==long
     public abstract long[] toLongArray();
-        //IF ARRTYPE==int
     public abstract int[] toIntArray();
-          //IF ARRTYPE==short,char
     public abstract short[] toShortArray();
-          //ENDIF
-        //ENDIF
-      //ENDIF
-    //ENDIF
-  //ENDIF
-  //IF ARRTYPE==boolean,byte,int,long
     @Override
     public default boolean contains(short val)
     {
@@ -312,17 +256,15 @@ public abstract interface OmniCollection
     {
       return removeVal((int)val);
     }
-  //ENDIF
-  //IF ARRTYPE==boolean
     public abstract boolean add(byte val);
     public default boolean add(Boolean val)
     {
       return add(val.booleanValue());
     }
-  //ENDIF
   }
   public abstract interface OfChar extends OfPrimitive,Iterable<Character>
   {
+    @Override
     public abstract boolean add(boolean val);
     public abstract boolean add(Character val);
     public abstract void forEach(CharConsumer action);
@@ -333,28 +275,19 @@ public abstract interface OmniCollection
     @Override
     public abstract Character[] toArray();
     public abstract char[] toCharArray();
-  //IF ARRTYPE==double
     public abstract double[] toDoubleArray();
-    //IF ARRTYPE==float
     public abstract float[] toFloatArray();
-      //IF ARRTYPE==long
     public abstract long[] toLongArray();
-        //IF ARRTYPE==int
     public abstract int[] toIntArray();
-        //ENDIF
-      //ENDIF
-    //ENDIF
-  //ENDIF
-  //IF ARRTYPE==boolean
     public abstract boolean add(char val);
     public default boolean add(Boolean val)
     {
       return add(val.booleanValue());
     }
-  //ENDIF
   }
   public abstract interface OfShort extends OfPrimitive,Iterable<Short>
   {
+    @Override
     public abstract boolean add(boolean val);
     public abstract boolean add(Short val);
     public abstract void forEach(ShortConsumer action);
@@ -365,19 +298,10 @@ public abstract interface OmniCollection
     @Override
     public abstract Short[] toArray();
     public abstract short[] toShortArray();
-  //IF ARRTYPE==double
     public abstract double[] toDoubleArray();
-    //IF ARRTYPE==float
     public abstract float[] toFloatArray();
-      //IF ARRTYPE==long
     public abstract long[] toLongArray();
-        //IF ARRTYPE==int
     public abstract int[] toIntArray();
-        //ENDIF
-      //ENDIF
-    //ENDIF
-  //ENDIF
-  //IF ARRTYPE==short,int
     public default boolean add(byte val)
     {
       return add((short)val);
@@ -386,17 +310,15 @@ public abstract interface OmniCollection
     {
       return add((short)val.byteValue());
     }
-  //ENDIF
-  //IF ARRTYPE==boolean
     public abstract boolean add(short val);
     public default boolean add(Boolean val)
     {
       return add(val.booleanValue());
     }
-  //ENDIF
   }
   public abstract interface OfInt extends OfPrimitive,Iterable<Integer>
   {
+    @Override
     public abstract boolean add(boolean val);
     public abstract boolean add(Integer val);
     public abstract void forEach(IntConsumer action);
@@ -407,16 +329,9 @@ public abstract interface OmniCollection
     @Override
     public abstract Integer[] toArray();
     public abstract int[] toIntArray();
-  //IF ARRTYPE==double
     public abstract double[] toDoubleArray();
-    //IF ARRTYPE==float
     public abstract float[] toFloatArray();
-      //IF ARRTYPE==long
     public abstract long[] toLongArray();
-      //ENDIF
-    //ENDIF
-  //ENDIF
-  //IF ARRTYPE==boolean,byte,int,long
     @Override
     public default boolean contains(short val)
     {
@@ -427,8 +342,6 @@ public abstract interface OmniCollection
     {
       return removeVal((int)val);
     }
-  //ENDIF
-  //IF ARRTYPE==short,int
     public default boolean add(byte val)
     {
       return add((int)val);
@@ -437,8 +350,6 @@ public abstract interface OmniCollection
     {
       return add((int)val.byteValue());
     }
-  //ENDIF
-  //IF ARRTYPE==int,long
     public default boolean add(char val)
     {
       return add((int)val);
@@ -455,17 +366,15 @@ public abstract interface OmniCollection
     {
       return add((int)val.shortValue());
     }
-  //ENDIF
-  //IF ARRTYPE==boolean
     public abstract boolean add(int val);
     public default boolean add(Boolean val)
     {
       return add(val.booleanValue());
     }
-  //ENDIF
   }
   public abstract interface OfLong extends OfPrimitive,Iterable<Long>
   {
+    @Override
     public abstract boolean add(boolean val);
     public abstract boolean add(Long val);
     public abstract void forEach(LongConsumer action);
@@ -476,13 +385,8 @@ public abstract interface OmniCollection
     @Override
     public abstract Long[] toArray();
     public abstract long[] toLongArray();
-  //IF ARRTYPE==double
     public abstract double[] toDoubleArray();
-    //IF ARRTYPE==float
     public abstract float[] toFloatArray();
-    //ENDIF
-  //ENDIF
-  //IF ARRTYPE==boolean,byte,int,long
     @Override
     public default boolean contains(short val)
     {
@@ -493,8 +397,6 @@ public abstract interface OmniCollection
     {
       return removeVal((int)val);
     }
-  //ENDIF
-  //IF ARRTYPE==int,long
     public default boolean add(char val)
     {
       return add((int)val);
@@ -511,8 +413,6 @@ public abstract interface OmniCollection
     {
       return add((int)val.shortValue());
     }
-  //ENDIF
-  //IF ARRTYPE==long
     public default boolean add(byte val)
     {
       return add((int)val);
@@ -521,24 +421,20 @@ public abstract interface OmniCollection
     {
       return add((int)val.byteValue());
     }
-  //ENDIF
-  //IF ARRTYPE==long,float,double
     public abstract boolean add(int val);
     public default boolean add(Integer val)
     {
       return add(val.intValue());
     }
-  //ENDIF
-  //IF ARRTYPE==boolean
     public abstract boolean add(long val);
     public default boolean add(Boolean val)
     {
       return add(val.booleanValue());
     }
-  //ENDIF
   }
   public abstract interface OfFloat extends OfPrimitive,Iterable<Float>
   {
+    @Override
     public abstract boolean add(boolean val);
     public abstract boolean add(Float val);
     public abstract void forEach(FloatConsumer action);
@@ -549,10 +445,7 @@ public abstract interface OmniCollection
     @Override
     public abstract Float[] toArray();
     public abstract float[] toFloatArray();
-  //IF ARRTYPE==double
     public abstract double[] toDoubleArray();
-  //ENDIF
-  //IF ARRTYPE==float,double
     public default boolean add(byte val)
     {
       return add((short)val);
@@ -576,24 +469,20 @@ public abstract interface OmniCollection
     {
       return add(val.shortValue());
     }
-  //ENDIF
-  //IF ARRTYPE==long,float,double
     public abstract boolean add(int val);
     public default boolean add(Integer val)
     {
       return add(val.intValue());
     }
-  //ENDIF
-  //IF ARRTYPE==boolean
     public abstract boolean add(float val);
     public default boolean add(Boolean val)
     {
       return add(val.booleanValue());
     }
-  //ENDIF
   }
   public abstract interface OfDouble extends OfPrimitive,Iterable<Double>
   {
+    @Override
     public abstract boolean add(boolean val);
     public abstract boolean add(Double val);
     public abstract void forEach(DoubleConsumer action);
@@ -604,14 +493,11 @@ public abstract interface OmniCollection
     @Override
     public abstract Double[] toArray();
     public abstract double[] toDoubleArray();
-  //IF ARRTYPE==double
     public abstract boolean add(float val);
     public default boolean add(Float val)
     {
       return add(val.floatValue());
     }
-  //ENDIF
-  //IF ARRTYPE==float,double
     public default boolean add(byte val)
     {
       return add((short)val);
@@ -635,21 +521,16 @@ public abstract interface OmniCollection
     {
       return add(val.shortValue());
     }
-  //ENDIF
-  //IF ARRTYPE==long,float,double
     public abstract boolean add(int val);
     public default boolean add(Integer val)
     {
       return add(val.intValue());
     }
-  //ENDIF
-  //IF ARRTYPE==boolean
     public abstract boolean add(double val);
     public default boolean add(Boolean val)
     {
       return add(val.booleanValue());
     }
-  //ENDIF
   }
   public abstract interface OfRef<E> extends OmniCollection,Iterable<E>
   {

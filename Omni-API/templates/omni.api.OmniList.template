@@ -33,6 +33,7 @@ public abstract interface OmniList extends OmniCollection,Cloneable
   
   public abstract interface OfPrimitive extends OmniList,OmniCollection.OfPrimitive
   {
+     public abstract void add(int index,boolean val);
      #MACRO BoxedMethods(IndexOfMethodDefault)
      #MACRO BoxedMethods(LastIndexOfMethodDefault)
   }
@@ -51,7 +52,9 @@ public abstract interface OfCLASSPREFIX extends OfPrimitive,OmniCollection.OfCLA
 {
   public abstract BOXEDTYPE get(int index);
   public abstract ARRTYPE getCLASSPREFIX(int index);
-  public abstract void add(int index,ARRTYPE val);
+#IFSWITCH ARRTYPE==boolean
+  @Override public abstract void add(int index,boolean val);
+#ENDIF
   public abstract void add(int index,BOXEDTYPE val);
   public abstract OmniListIterator.OfCLASSPREFIX listIterator();
   public abstract OmniListIterator.OfCLASSPREFIX listIterator(int index);
@@ -65,6 +68,7 @@ public abstract interface OfCLASSPREFIX extends OfPrimitive,OmniCollection.OfCLA
   #IFSWITCH ARRTYPE==boolean
   public abstract void replaceAll(CLASSPREFIXPredicate operator);
   #ELSE
+  public abstract void add(int index,ARRTYPE val);
   public abstract void replaceAll(CLASSPREFIXUnaryOperator operator);
   #ENDIF
   public abstract void replaceAll(UnaryOperator<BOXEDTYPE> operator);

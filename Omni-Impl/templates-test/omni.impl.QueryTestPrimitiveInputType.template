@@ -1,0 +1,228 @@
+#TYPEDEF OfGeneric
+package omni.impl;
+
+import omni.api.OmniCollection;
+import omni.api.OmniList;
+import omni.api.OmniStack;
+import omni.util.TypeUtil;
+import java.lang.reflect.Method;
+import java.lang.reflect.InvocationTargetException;
+public enum QueryTestPrimitiveInputType{
+  #MACRO QueryTestPrimitiveInputTypeImpl<false,Boolean,boolean>(false,true)
+  #MACRO QueryTestPrimitiveInputTypeImpl<true,Boolean,boolean>(true,false)
+  #MACRO QueryTestPrimitiveInputTypeImpl<0,Byte,byte>(0,true)
+  #MACRO QueryTestPrimitiveInputTypeImpl<pos1,Byte,byte>(1,false)
+  #MACRO QueryTestPrimitiveInputTypeImpl<pos2,Byte,byte>(2,false)
+  #MACRO QueryTestPrimitiveInputTypeImpl<neg1,Byte,byte>(-1,false)
+  #MACRO QueryTestPrimitiveInputTypeImpl<0,Character,char>(0,true)
+  #MACRO QueryTestPrimitiveInputTypeImpl<pos1,Character,char>(1,false)
+  #MACRO QueryTestPrimitiveInputTypeImpl<pos2,Character,char>(2,false)
+  #MACRO QueryTestPrimitiveInputTypeImpl<MAX_BYTE_PLUS1,Character,char>(((char)Byte.MAX_VALUE)+1,false)
+  #MACRO QueryTestPrimitiveInputTypeImpl<MAX_SHORT_PLUS1,Character,char>(((char)Short.MAX_VALUE)+1,false)
+  #MACRO QueryTestPrimitiveInputTypeImpl<0,Short,short>(0,true)
+  #MACRO QueryTestPrimitiveInputTypeImpl<pos1,Short,short>(1,false)
+  #MACRO QueryTestPrimitiveInputTypeImpl<pos2,Short,short>(2,false)
+  #MACRO QueryTestPrimitiveInputTypeImpl<neg1,Short,short>(-1,false)
+  #MACRO QueryTestPrimitiveInputTypeImpl<MAX_BYTE_PLUS1,Short,short>(((short)Byte.MAX_VALUE)+1,false)
+  #MACRO QueryTestPrimitiveInputTypeImpl<MIN_BYTE_MINUS1,Short,short>(((short)Byte.MIN_VALUE)-1,false)
+  #MACRO QueryTestPrimitiveInputTypeImpl<0,Integer,int>(0,true)
+  #MACRO QueryTestPrimitiveInputTypeImpl<pos1,Integer,int>(1,false)
+  #MACRO QueryTestPrimitiveInputTypeImpl<pos2,Integer,int>(2,false)
+  #MACRO QueryTestPrimitiveInputTypeImpl<neg1,Integer,int>(-1,false)
+  #MACRO QueryTestPrimitiveInputTypeImpl<MAX_BYTE_PLUS1,Integer,int>(((int)Byte.MAX_VALUE)+1,false)
+  #MACRO QueryTestPrimitiveInputTypeImpl<MIN_BYTE_MINUS1,Integer,int>(((int)Byte.MIN_VALUE)-1,false)
+  #MACRO QueryTestPrimitiveInputTypeImpl<MAX_SHORT_PLUS1,Integer,int>(((int)Short.MAX_VALUE)+1,false)
+  #MACRO QueryTestPrimitiveInputTypeImpl<MIN_SHORT_MINUS1,Integer,int>(((int)Short.MIN_VALUE)-1,false)
+  #MACRO QueryTestPrimitiveInputTypeImpl<MAX_CHAR_PLUS1,Integer,int>(((int)Character.MAX_VALUE)+1,false)
+  #MACRO QueryTestPrimitiveInputTypeImpl<MAX_SAFE_INT_PLUS1,Integer,int>(TypeUtil.MAX_SAFE_INT+1,false)
+  #MACRO QueryTestPrimitiveInputTypeImpl<MIN_SAFE_INT_MINUS1,Integer,int>(TypeUtil.MIN_SAFE_INT-1,false)
+  #MACRO QueryTestPrimitiveInputTypeImpl<0,Long,long>(0,true)
+  #MACRO QueryTestPrimitiveInputTypeImpl<pos1,Long,long>(1,false)
+  #MACRO QueryTestPrimitiveInputTypeImpl<pos2,Long,long>(2,false)
+  #MACRO QueryTestPrimitiveInputTypeImpl<neg1,Long,long>(-1,false)
+  #MACRO QueryTestPrimitiveInputTypeImpl<MAX_BYTE_PLUS1,Long,long>(((long)Byte.MAX_VALUE)+1,false)
+  #MACRO QueryTestPrimitiveInputTypeImpl<MIN_BYTE_MINUS1,Long,long>(((long)Byte.MIN_VALUE)-1,false)
+  #MACRO QueryTestPrimitiveInputTypeImpl<MAX_SHORT_PLUS1,Long,long>(((long)Short.MAX_VALUE)+1,false)
+  #MACRO QueryTestPrimitiveInputTypeImpl<MIN_SHORT_MINUS1,Long,long>(((long)Short.MIN_VALUE)-1,false)
+  #MACRO QueryTestPrimitiveInputTypeImpl<MAX_CHAR_PLUS1,Long,long>(((long)Character.MAX_VALUE)+1,false)
+  #MACRO QueryTestPrimitiveInputTypeImpl<MAX_SAFE_INT_PLUS1,Long,long>(((long)TypeUtil.MAX_SAFE_INT)+1,false)
+  #MACRO QueryTestPrimitiveInputTypeImpl<MIN_SAFE_INT_MINUS1,Long,long>(((long)TypeUtil.MIN_SAFE_INT)-1,false)
+  #MACRO QueryTestPrimitiveInputTypeImpl<MAX_INT_PLUS1,Long,long>(((long)Integer.MAX_VALUE)+1,false)
+  #MACRO QueryTestPrimitiveInputTypeImpl<MIN_INT_MINUS1,Long,long>(((long)Integer.MIN_VALUE)-1,false)
+  #MACRO QueryTestPrimitiveInputTypeImpl<MAX_SAFE_LONG_PLUS1,Long,long>(((long)TypeUtil.MAX_SAFE_LONG)+1,false)
+  #MACRO QueryTestPrimitiveInputTypeImpl<MIN_SAFE_LONG_MINUS1,Long,long>(((long)TypeUtil.MIN_SAFE_LONG)-1,false)
+  #MACRO QueryTestPrimitiveInputTypeImpl<pos0,Float,float>(0.0F,true)
+  #MACRO QueryTestPrimitiveInputTypeImpl<neg0,Float,float>(-0.0F,true)
+  #MACRO QueryTestPrimitiveInputTypeImpl<pos1,Float,float>(1,false)
+  #MACRO QueryTestPrimitiveInputTypeImpl<pos2,Float,float>(2,false)
+  #MACRO QueryTestPrimitiveInputTypeImpl<neg1,Float,float>(-1,false)
+  #MACRO QueryTestPrimitiveInputTypeImpl<MAX_BYTE_PLUS1,Float,float>(((float)Byte.MAX_VALUE)+1,false)
+  #MACRO QueryTestPrimitiveInputTypeImpl<MIN_BYTE_MINUS1,Float,float>(((float)Byte.MIN_VALUE)-1,false)
+  #MACRO QueryTestPrimitiveInputTypeImpl<MAX_SHORT_PLUS1,Float,float>(((float)Short.MAX_VALUE)+1,false)
+  #MACRO QueryTestPrimitiveInputTypeImpl<MIN_SHORT_MINUS1,Float,float>(((float)Short.MIN_VALUE)-1,false)
+  #MACRO QueryTestPrimitiveInputTypeImpl<MAX_CHAR_PLUS1,Float,float>(((float)Character.MAX_VALUE)+1,false)
+  #MACRO QueryTestPrimitiveInputTypeImpl<MAX_INT_PLUS1,Float,float>(((float)Integer.MAX_VALUE)+1,false)
+  #MACRO QueryTestPrimitiveInputTypeImpl<MIN_INT_MINUS1,Float,float>(((float)Integer.MIN_VALUE)-1,false)
+  #MACRO QueryTestPrimitiveInputTypeImpl<MAX_LONG_PLUS1,Float,float>(((float)Long.MAX_VALUE)+1,false)
+  #MACRO QueryTestPrimitiveInputTypeImpl<MIN_LONG_MINUS1,Float,float>(((float)Long.MIN_VALUE)-1,false)
+  #MACRO QueryTestPrimitiveInputTypeImpl<MIN_FLOAT_VALUE,Float,float>(Float.MIN_VALUE,false)
+  #MACRO QueryTestPrimitiveInputTypeImpl<MAX_FLOAT_VALUE,Float,float>(Float.MAX_VALUE,false)
+  #MACRO QueryTestPrimitiveInputTypeImpl<NaN,Float,float>(Float.NaN,false)
+  #MACRO QueryTestPrimitiveInputTypeImpl<pos0,Double,double>(0.0D,true)
+  #MACRO QueryTestPrimitiveInputTypeImpl<neg0,Double,double>(-0.0D,true)
+  #MACRO QueryTestPrimitiveInputTypeImpl<pos1,Double,double>(1,false)
+  #MACRO QueryTestPrimitiveInputTypeImpl<pos2,Double,double>(2,false)
+  #MACRO QueryTestPrimitiveInputTypeImpl<neg1,Double,double>(-1,false)
+  #MACRO QueryTestPrimitiveInputTypeImpl<MAX_BYTE_PLUS1,Double,double>(((double)Byte.MAX_VALUE)+1,false)
+  #MACRO QueryTestPrimitiveInputTypeImpl<MIN_BYTE_MINUS1,Double,double>(((double)Byte.MIN_VALUE)-1,false)
+  #MACRO QueryTestPrimitiveInputTypeImpl<MAX_SHORT_PLUS1,Double,double>(((double)Short.MAX_VALUE)+1,false)
+  #MACRO QueryTestPrimitiveInputTypeImpl<MIN_SHORT_MINUS1,Double,double>(((double)Short.MIN_VALUE)-1,false)
+  #MACRO QueryTestPrimitiveInputTypeImpl<MAX_CHAR_PLUS1,Double,double>(((double)Character.MAX_VALUE)+1,false)
+  #MACRO QueryTestPrimitiveInputTypeImpl<MAX_SAFE_INT_PLUS1,Double,double>(((double)TypeUtil.MAX_SAFE_INT)+1,false)
+  #MACRO QueryTestPrimitiveInputTypeImpl<MIN_SAFE_INT_MINUS1,Double,double>(((double)TypeUtil.MIN_SAFE_INT)-1,false)
+  #MACRO QueryTestPrimitiveInputTypeImpl<MAX_INT_PLUS1,Double,double>(((double)Integer.MAX_VALUE)+1,false)
+  #MACRO QueryTestPrimitiveInputTypeImpl<MIN_INT_MINUS1,Double,double>(((double)Integer.MIN_VALUE)-1,false)
+  #MACRO QueryTestPrimitiveInputTypeImpl<MAX_LONG_PLUS1,Double,double>(((double)Long.MAX_VALUE)+1,false)
+  #MACRO QueryTestPrimitiveInputTypeImpl<MIN_LONG_MINUS1,Double,double>(((double)Long.MIN_VALUE)-1,false)
+  #MACRO QueryTestPrimitiveInputTypeImpl<MIN_FLOAT_VALUE,Double,double>(Float.MIN_VALUE,false)
+  #MACRO QueryTestPrimitiveInputTypeImpl<MAX_FLOAT_VALUE,Double,double>(Float.MAX_VALUE,false)
+  #MACRO QueryTestPrimitiveInputTypeImpl<MIN_DOUBLE_VALUE,Double,double>(Double.MIN_VALUE,false)
+  #MACRO QueryTestPrimitiveInputTypeImpl<MAX_DOUBLE_VALUE,Double,double>(Double.MAX_VALUE,false)
+  #MACRO QueryTestPrimitiveInputTypeImpl<NaN,Double,double>(Double.NaN,false)
+  
+  ;
+  public final Class<?> primitiveClass;
+  public final Class<?> boxedClass;
+  private QueryTestPrimitiveInputType(Class<?> primitiveClass,Class<?> boxedClass){
+    this.primitiveClass=primitiveClass;
+    this.boxedClass=boxedClass;
+  }
+  public abstract boolean invokecontains(OmniCollection col);
+  public abstract boolean invokeremoveVal(OmniCollection col);
+  public abstract int invokeindexOf(OmniCollection col);
+  public abstract int invokelastIndexOf(OmniCollection col);
+  public abstract int invokesearch(OmniCollection col);
+  public abstract boolean invokeBoxedcontains(OmniCollection col);
+  public abstract boolean invokeBoxedremoveVal(OmniCollection col);
+  public abstract int invokeBoxedindexOf(OmniCollection col);
+  public abstract int invokeBoxedlastIndexOf(OmniCollection col);
+  public abstract int invokeBoxedsearch(OmniCollection col);
+  public abstract boolean invokeObjectcontains(OmniCollection col);
+  public abstract boolean invokeObjectremoveVal(OmniCollection col);
+  public abstract int invokeObjectindexOf(OmniCollection col);
+  public abstract int invokeObjectlastIndexOf(OmniCollection col);
+  public abstract int invokeObjectsearch(OmniCollection col);
+  public abstract boolean attemptAdd(OmniCollection col);
+  public abstract boolean attemptInsertionInList(int index,OmniCollection col);
+  public abstract boolean addNotEqualsVal(OmniCollection col);
+  public abstract void insertNotEqualsValInList(int index,OmniCollection col);
+
+}
+
+#MACRODEF QueryTestPrimitiveInputTypeImpl<VALUE_NAME,BOXED_TYPE,PRIMITIVE_TYPE>(PRIMITIVE_VAL,NOT_EQUALS_VAL)
+BOXED_TYPEVALUE_NAME(PRIMITIVE_TYPE.class,BOXED_TYPE.class){
+  @Override public boolean invokecontains(OmniCollection col){return col.contains((PRIMITIVE_TYPE)(PRIMITIVE_VAL));}
+  @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((PRIMITIVE_TYPE)(PRIMITIVE_VAL));}
+  @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((PRIMITIVE_TYPE)(PRIMITIVE_VAL));}
+  @Override public int invokelastIndexOf(OmniCollection col){return ((OmniList)col).lastIndexOf((PRIMITIVE_TYPE)(PRIMITIVE_VAL));}
+  @Override public int invokesearch(OmniCollection col){return ((OmniStack)col).search((PRIMITIVE_TYPE)(PRIMITIVE_VAL));}
+  @Override public boolean invokeBoxedcontains(OmniCollection col){return col.contains((BOXED_TYPE)(PRIMITIVE_TYPE)(PRIMITIVE_VAL));}
+  @Override public boolean invokeBoxedremoveVal(OmniCollection col){return col.removeVal((BOXED_TYPE)(PRIMITIVE_TYPE)(PRIMITIVE_VAL));}
+  @Override public int invokeBoxedindexOf(OmniCollection col){return ((OmniList)col).indexOf((BOXED_TYPE)(PRIMITIVE_TYPE)(PRIMITIVE_VAL));}
+  @Override public int invokeBoxedlastIndexOf(OmniCollection col){return ((OmniList)col).lastIndexOf((BOXED_TYPE)(PRIMITIVE_TYPE)(PRIMITIVE_VAL));}
+  @Override public int invokeBoxedsearch(OmniCollection col){return ((OmniStack)col).search((BOXED_TYPE)(PRIMITIVE_TYPE)(PRIMITIVE_VAL));}
+  @Override public boolean invokeObjectcontains(OmniCollection col){return col.contains((Object)(PRIMITIVE_TYPE)(PRIMITIVE_VAL));}
+  @Override public boolean invokeObjectremoveVal(OmniCollection col){return col.remove((Object)(PRIMITIVE_TYPE)(PRIMITIVE_VAL));}
+  @Override public int invokeObjectindexOf(OmniCollection col){return ((OmniList)col).indexOf((Object)(PRIMITIVE_TYPE)(PRIMITIVE_VAL));}
+  @Override public int invokeObjectlastIndexOf(OmniCollection col){return ((OmniList)col).lastIndexOf((Object)(PRIMITIVE_TYPE)(PRIMITIVE_VAL));}
+  @Override public int invokeObjectsearch(OmniCollection col){return ((OmniStack)col).search((Object)(PRIMITIVE_TYPE)(PRIMITIVE_VAL));}
+
+  public boolean addNotEqualsVal(OmniCollection col)
+  {
+    return ((OmniCollection.OfPrimitive)col).add((boolean)NOT_EQUALS_VAL);
+  }
+  public void insertNotEqualsValInList(int index,OmniCollection col)
+  {
+    ((OmniList.OfPrimitive)col).add(index,(boolean)NOT_EQUALS_VAL);
+  }
+
+  public boolean attemptAdd(OmniCollection col)
+  {
+    //TODO switch pattern matching would be very handy here
+    Class<?> clazz=col.getClass();
+    Method method;
+    try
+    {
+      //attempt to call with the primitive type
+      method=clazz.getDeclaredMethod("add",primitiveClass);
+    }
+    catch(NoSuchMethodException e)
+    {
+      try
+      {
+        //if that fails, call with the boxed type
+        method=clazz.getDeclaredMethod("add",boxedClass);
+      }
+      catch(NoSuchMethodException e1)
+      {
+        try
+        {
+          //if all else fails, call with the object class
+          method=clazz.getDeclaredMethod("add",Object.class);
+        }
+        catch(NoSuchMethodException e2)
+        {
+          return false;
+        }
+      }
+    }
+    try
+    {
+      return (boolean)method.invoke(col,PRIMITIVE_VAL); 
+    }
+    catch(IllegalAccessException|InvocationTargetException e)
+    {
+      throw new RuntimeException(e);
+    }
+  }
+
+  public boolean attemptInsertionInList(int index,OmniCollection col)
+  {
+    //TODO switch pattern matching would be very handy here
+    OmniList list=(OmniList)col; //throw if not correct type
+    Class<?> clazz=list.getClass();
+    Method method;
+    try
+    {
+      method=clazz.getDeclaredMethod("add",int.class,primitiveClass);
+    }
+    catch(NoSuchMethodException e)
+    {
+      try
+      {
+        method=clazz.getDeclaredMethod("add",int.class,boxedClass);
+      }
+      catch(NoSuchMethodException e1)
+      {
+        try
+        {
+          method=clazz.getDeclaredMethod("add",int.class,Object.class);
+        }
+        catch(NoSuchMethodException e2)
+        {
+          return false;
+        }
+      }
+    }
+    try
+    {
+      method.invoke(list,index,PRIMITIVE_VAL); 
+    }
+    catch(IllegalAccessException|InvocationTargetException e)
+    {
+      throw new RuntimeException(e);
+    }
+    return true;
+  }
+},
+#ENDDEF

@@ -59,6 +59,7 @@ public abstract interface OmniList extends OmniCollection,Cloneable
   public Object clone();
   public abstract interface OfPrimitive extends OmniList,OmniCollection.OfPrimitive
   {
+     public abstract void add(int index,boolean val);
      @Override
      public default int indexOf(Boolean val)
      {
@@ -240,7 +241,7 @@ public abstract interface OmniList extends OmniCollection,Cloneable
     {
       public abstract Boolean get(int index);
       public abstract boolean getBoolean(int index);
-      public abstract void add(int index,boolean val);
+      @Override public abstract void add(int index,boolean val);
       public abstract void add(int index,Boolean val);
       public abstract OmniListIterator.OfBoolean listIterator();
       public abstract OmniListIterator.OfBoolean listIterator(int index);
@@ -329,7 +330,6 @@ public abstract interface OmniList extends OmniCollection,Cloneable
     {
       public abstract Byte get(int index);
       public abstract byte getByte(int index);
-      public abstract void add(int index,byte val);
       public abstract void add(int index,Byte val);
       public abstract OmniListIterator.OfByte listIterator();
       public abstract OmniListIterator.OfByte listIterator(int index);
@@ -340,6 +340,7 @@ public abstract interface OmniList extends OmniCollection,Cloneable
       }
       public abstract Byte remove(int index);
       public abstract byte removeByteAt(int index);
+      public abstract void add(int index,byte val);
       public abstract void replaceAll(ByteUnaryOperator operator);
       public abstract void replaceAll(UnaryOperator<Byte> operator);
       public abstract byte set(int index,byte val);
@@ -425,7 +426,6 @@ public abstract interface OmniList extends OmniCollection,Cloneable
     {
       public abstract Character get(int index);
       public abstract char getChar(int index);
-      public abstract void add(int index,char val);
       public abstract void add(int index,Character val);
       public abstract OmniListIterator.OfChar listIterator();
       public abstract OmniListIterator.OfChar listIterator(int index);
@@ -436,6 +436,7 @@ public abstract interface OmniList extends OmniCollection,Cloneable
       }
       public abstract Character remove(int index);
       public abstract char removeCharAt(int index);
+      public abstract void add(int index,char val);
       public abstract void replaceAll(CharUnaryOperator operator);
       public abstract void replaceAll(UnaryOperator<Character> operator);
       public abstract char set(int index,char val);
@@ -513,7 +514,6 @@ public abstract interface OmniList extends OmniCollection,Cloneable
     {
       public abstract Short get(int index);
       public abstract short getShort(int index);
-      public abstract void add(int index,short val);
       public abstract void add(int index,Short val);
       public abstract OmniListIterator.OfShort listIterator();
       public abstract OmniListIterator.OfShort listIterator(int index);
@@ -524,6 +524,7 @@ public abstract interface OmniList extends OmniCollection,Cloneable
       }
       public abstract Short remove(int index);
       public abstract short removeShortAt(int index);
+      public abstract void add(int index,short val);
       public abstract void replaceAll(ShortUnaryOperator operator);
       public abstract void replaceAll(UnaryOperator<Short> operator);
       public abstract short set(int index,short val);
@@ -617,7 +618,6 @@ public abstract interface OmniList extends OmniCollection,Cloneable
     {
       public abstract Integer get(int index);
       public abstract int getInt(int index);
-      public abstract void add(int index,int val);
       public abstract void add(int index,Integer val);
       public abstract OmniListIterator.OfInt listIterator();
       public abstract OmniListIterator.OfInt listIterator(int index);
@@ -628,6 +628,7 @@ public abstract interface OmniList extends OmniCollection,Cloneable
       }
       public abstract Integer remove(int index);
       public abstract int removeIntAt(int index);
+      public abstract void add(int index,int val);
       public abstract void replaceAll(IntUnaryOperator operator);
       public abstract void replaceAll(UnaryOperator<Integer> operator);
       public abstract int set(int index,int val);
@@ -745,7 +746,6 @@ public abstract interface OmniList extends OmniCollection,Cloneable
     {
       public abstract Long get(int index);
       public abstract long getLong(int index);
-      public abstract void add(int index,long val);
       public abstract void add(int index,Long val);
       public abstract OmniListIterator.OfLong listIterator();
       public abstract OmniListIterator.OfLong listIterator(int index);
@@ -756,6 +756,7 @@ public abstract interface OmniList extends OmniCollection,Cloneable
       }
       public abstract Long remove(int index);
       public abstract long removeLongAt(int index);
+      public abstract void add(int index,long val);
       public abstract void replaceAll(LongUnaryOperator operator);
       public abstract void replaceAll(UnaryOperator<Long> operator);
       public abstract long set(int index,long val);
@@ -881,7 +882,6 @@ public abstract interface OmniList extends OmniCollection,Cloneable
     {
       public abstract Float get(int index);
       public abstract float getFloat(int index);
-      public abstract void add(int index,float val);
       public abstract void add(int index,Float val);
       public abstract OmniListIterator.OfFloat listIterator();
       public abstract OmniListIterator.OfFloat listIterator(int index);
@@ -892,6 +892,7 @@ public abstract interface OmniList extends OmniCollection,Cloneable
       }
       public abstract Float remove(int index);
       public abstract float removeFloatAt(int index);
+      public abstract void add(int index,float val);
       public abstract void replaceAll(FloatUnaryOperator operator);
       public abstract void replaceAll(UnaryOperator<Float> operator);
       public abstract float set(int index,float val);
@@ -1009,7 +1010,6 @@ public abstract interface OmniList extends OmniCollection,Cloneable
     {
       public abstract Double get(int index);
       public abstract double getDouble(int index);
-      public abstract void add(int index,double val);
       public abstract void add(int index,Double val);
       public abstract OmniListIterator.OfDouble listIterator();
       public abstract OmniListIterator.OfDouble listIterator(int index);
@@ -1020,6 +1020,7 @@ public abstract interface OmniList extends OmniCollection,Cloneable
       }
       public abstract Double remove(int index);
       public abstract double removeDoubleAt(int index);
+      public abstract void add(int index,double val);
       public abstract void replaceAll(DoubleUnaryOperator operator);
       public abstract void replaceAll(UnaryOperator<Double> operator);
       public abstract double set(int index,double val);

@@ -37,6 +37,7 @@ public abstract interface OmniCollection
   public abstract <T> T[] toArray(T[] dst);
   public abstract interface OfPrimitive extends OmniCollection
   {
+    public abstract boolean add(boolean val);
     #MACRO BoxedMethods(ContainsMethodDefault)
     #MACRO BoxedMethods(RemoveValMethodDefault)
   }
@@ -52,6 +53,7 @@ public abstract interface OmniCollection
 #MACRODEF PrimitiveSubInterface<ARRTYPE,CLASSPREFIX,BOXEDTYPE>()
 public abstract interface OfCLASSPREFIX extends OfPrimitive,Iterable<BOXEDTYPE>
 {
+  @Override
   public abstract boolean add(boolean val);
   public abstract boolean add(BOXEDTYPE val);
   public abstract void forEach(CLASSPREFIXConsumer action);

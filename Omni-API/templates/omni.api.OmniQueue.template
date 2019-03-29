@@ -13,8 +13,13 @@ public abstract interface OmniQueue extends OmniCollection
   #MACRO PrimitiveSubInterface<float,Float,Float>()
   #MACRO PrimitiveSubInterface<double,Double,Double>()
   
+  public abstract interface OfPrimitive extends OmniQueue,OmniCollection.OfPrimitive
+  {
+    public abstract boolean offer(boolean val);
+  }
+  
 #MACRODEF PrimitiveSubInterface<ARRTYPE,CLASSPREFIX,BOXEDTYPE>()
-public abstract interface OfCLASSPREFIX extends OmniCollection,OmniQueue,OmniCollection.OfPrimitive,OmniCollection.OfCLASSPREFIX,PeekAndPollIfc<BOXEDTYPE>,PeekAndPollIfc.CLASSPREFIXInput
+public abstract interface OfCLASSPREFIX extends OfPrimitive,OmniCollection,OmniQueue,OmniCollection.OfPrimitive,OmniCollection.OfCLASSPREFIX,PeekAndPollIfc<BOXEDTYPE>,PeekAndPollIfc.CLASSPREFIXInput
 #IFNOTSWITCH ARRTYPE==double
 ,PeekAndPollIfc.DoubleInput
   #IFNOTSWITCH ARRTYPE==float
@@ -98,9 +103,13 @@ public abstract interface OfCLASSPREFIX extends OmniCollection,OmniQueue,OmniCol
     #ENDIF
   #ENDIF
 #ENDIF
+#IFSWITCH ARRTYPE==boolean
+  @Override
+#ENDIF
   public abstract boolean offer(ARRTYPE val);
   public abstract boolean offer(BOXEDTYPE val);
 #IFNOTSWITCH ARRTYPE==boolean
+  @Override
   public default boolean offer(boolean val)
   {
     return offer((ARRTYPE)TypeUtil.

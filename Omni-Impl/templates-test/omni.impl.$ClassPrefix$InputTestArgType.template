@@ -1,0 +1,85 @@
+#TYPEDEF OfBoolean
+#TYPEDEF OfByte
+#TYPEDEF OfChar
+#TYPEDEF OfShort
+#TYPEDEF OfInt
+#TYPEDEF OfLong
+#TYPEDEF OfFloat
+#TYPEDEF OfDouble
+#TYPEDEF OfRef
+package omni.impl;
+import omni.util.TypeConversionUtil;
+import omni.api.OmniCollection;
+import omni.api.OmniList;
+import omni.api.OmniStack;
+import omni.api.OmniListIterator;
+import org.junit.jupiter.api.Assertions;
+#IF OfRef
+@SuppressWarnings({"rawtypes","unchecked"}) 
+#ENDIF
+public enum $ClassPrefix$InputTestArgType{
+  #MACRO InputTestArgTypeImpl<ARRAY_TYPE,$ArrayType$,$ArrayType$>()
+#IFNOT OfRef
+  ,
+  #MACRO InputTestArgTypeImpl<BOXED_TYPE,$BoxedType$,$ArrayType$>()
+  #IFNOT OfBoolean
+  ,
+  #MACRO InputTestArgTypeImpl<PRIMITIVE_BOOLEAN,boolean,$ArrayType$boolean>()
+  ,
+  #MACRO InputTestArgTypeImpl<BOXED_BOOLEAN,Boolean,$ArrayType$boolean>()
+    #IFNOT OfByte,OfChar
+  ,
+  #MACRO InputTestArgTypeImpl<PRIMITIVE_BYTE,byte,$ArrayType$>()
+  ,
+  #MACRO InputTestArgTypeImpl<BOXED_BYTE,Byte,$ArrayType$>()
+      #IFNOT OfShort
+  ,
+  #MACRO InputTestArgTypeImpl<PRIMTIVE_SHORT,short,$ArrayType$>()
+  ,
+  #MACRO InputTestArgTypeImpl<BOXED_SHORT,Short,$ArrayType$>()
+  ,
+  #MACRO InputTestArgTypeImpl<PRIMITIVE_CHAR,char,$ArrayType$>()
+  ,
+  #MACRO InputTestArgTypeImpl<BOXED_CHAR,Character,$ArrayType$>()
+        #IFNOT OfInt
+  ,
+  #MACRO InputTestArgTypeImpl<PRIMITIVE_INT,int,$ArrayType$>()
+  ,
+  #MACRO InputTestArgTypeImpl<BOXED_INT,Integer,$ArrayType$>()
+          #IFNOT OfLong
+  ,
+  #MACRO InputTestArgTypeImpl<PRIMITIVE_LONG,long,$ArrayType$>()
+  ,
+  #MACRO InputTestArgTypeImpl<BOXED_LONG,Long,$ArrayType$>()
+            #IFNOT OfFloat
+  ,
+  #MACRO InputTestArgTypeImpl<PRIMITIVE_FLOAT,float,$ArrayType$>()
+  ,
+  #MACRO InputTestArgTypeImpl<BOXED_FLOAT,Float,$ArrayType$>()
+            #ENDIF
+          #ENDIF
+        #ENDIF
+      #ENDIF
+    #ENDIF
+  #ENDIF
+#ENDIF
+  ;
+#MACRODEF InputTestArgTypeImpl<VALUE_NAME,INPUTTYPE,OUTPUTTYPE>()
+VALUE_NAME{
+  public void callListItrAdd(OmniListIterator.Of$ClassPrefix$ itr,int valToConvert){itr.add(TypeConversionUtil.convertToINPUTTYPE(valToConvert));}
+  public void callListItrSet(OmniListIterator.Of$ClassPrefix$ itr,int valToConvert){itr.set(TypeConversionUtil.convertToINPUTTYPE(valToConvert));}
+  public void callListPut(OmniCollection.Of$ClassPrefix$ seq,int index,int valToConvert){((OmniList.Of$ClassPrefix$)seq).put(index,TypeConversionUtil.convertToINPUTTYPE(valToConvert));}
+  public void callListAdd(OmniCollection.Of$ClassPrefix$ seq,int index,int valToConvert){((OmniList.Of$ClassPrefix$)seq).add(index,TypeConversionUtil.convertToINPUTTYPE(valToConvert));}
+  public void callStackPush(OmniCollection.Of$ClassPrefix$ seq,int valToConvert){((OmniStack.Of$ClassPrefix$)seq).push(TypeConversionUtil.convertToINPUTTYPE(valToConvert));}
+  public boolean callCollectionAdd(OmniCollection.Of$ClassPrefix$ seq,int valToConvert){return seq.add(TypeConversionUtil.convertToINPUTTYPE(valToConvert));}
+  public void verifyVal(int expectedValToConvert,$ArrayType$ actualVal){Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPE(expectedValToConvert),actualVal);}
+}
+#ENDDEF
+    public abstract void callListItrAdd(OmniListIterator.Of$ClassPrefix$ itr,int valToConvert);
+    public abstract void callListItrSet(OmniListIterator.Of$ClassPrefix$ itr,int valToConvert);
+    public abstract void callListPut(OmniCollection.Of$ClassPrefix$ seq,int index,int valToConvert);
+    public abstract void callListAdd(OmniCollection.Of$ClassPrefix$ seq,int index,int valToConvert);
+    public abstract void callStackPush(OmniCollection.Of$ClassPrefix$ seq,int valToConvert);
+    public abstract boolean callCollectionAdd(OmniCollection.Of$ClassPrefix$ seq,int valToConvert);
+    public abstract void verifyVal(int expectedValToConvert,$ArrayType$ actualVal);
+}

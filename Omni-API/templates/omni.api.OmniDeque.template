@@ -19,6 +19,10 @@ public interface OmniDeque extends OmniCollection,OmniQueue,OmniStack
   #MACRO BoxedMethods(RemoveLastOccurrenceDecl)
   public abstract interface OfPrimitive extends OmniCollection,OmniCollection.OfPrimitive,OmniStack,OmniQueue,OmniStack.OfPrimitive,OmniDeque
   {
+    public abstract void addFirst(boolean val);
+    public abstract void addLast(boolean val);
+    public abstract boolean offerFirst(boolean val);
+    public abstract boolean offerLast(boolean val);
     #MACRO RemoveOccurrenceBoxed<Boolean,boolean>()
     #MACRO RemoveOccurrenceBoxed<Byte,byte>()
     #MACRO RemoveOccurrenceBoxed<Character,char>()
@@ -70,10 +74,12 @@ public abstract interface OfCLASSPREFIX extends OmniCollection,OmniCollection.Of
   #ENDIF
 #ENDIF
 {
+#IFNOT OfBoolean
   public default void addFirst(ARRTYPE val)
   {
     push(val);
   }
+#ENDIF
   public abstract void addFirst(BOXEDTYPE val);
   public abstract void addLast(ARRTYPE val);
   public abstract void addLast(BOXEDTYPE val);

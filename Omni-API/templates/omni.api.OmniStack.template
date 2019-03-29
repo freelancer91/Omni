@@ -9,6 +9,7 @@ public abstract interface OmniStack extends OmniCollection
     #MACRO BoxedMethods(SearchMethodDecl)
     public abstract interface OfPrimitive extends OmniCollection,OmniStack,OmniCollection.OfPrimitive
     {
+      public abstract void push(boolean val);
       #MACRO BoxedMethods(SearchMethodDefault)
     }
     #MACRO PrimitiveSubInterface<boolean,Boolean,Boolean>()
@@ -88,9 +89,13 @@ public abstract interface OfCLASSPREFIX extends OmniCollection,OmniStack,OmniCol
     #ENDIF
   #ENDIF
 #ENDIF
+#IFSWITCH ARRTYPE==boolean
+  @Override
+#ENDIF
   public abstract void push(ARRTYPE val);
   public abstract void push(BOXEDTYPE val);
 #IFNOTSWITCH ARRTYPE==boolean
+  @Override
   public default void push(boolean val)
   {
     push((ARRTYPE)TypeUtil.

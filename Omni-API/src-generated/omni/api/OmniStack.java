@@ -22,6 +22,7 @@ public abstract interface OmniStack extends OmniCollection
     public abstract int search(Double val);
     public abstract interface OfPrimitive extends OmniCollection,OmniStack,OmniCollection.OfPrimitive
     {
+      public abstract void push(boolean val);
       @Override
       public default int search(Boolean val)
       {
@@ -150,6 +151,7 @@ public abstract interface OmniStack extends OmniCollection
       {
         return TypeUtil.castToDouble(popBoolean());
       }
+      @Override
       public abstract void push(boolean val);
       public abstract void push(Boolean val);
       @Override
@@ -199,6 +201,7 @@ public abstract interface OmniStack extends OmniCollection
       }
       public abstract void push(byte val);
       public abstract void push(Byte val);
+      @Override
       public default void push(boolean val)
       {
         push((byte)TypeUtil.
@@ -243,6 +246,7 @@ public abstract interface OmniStack extends OmniCollection
       }
       public abstract void push(char val);
       public abstract void push(Character val);
+      @Override
       public default void push(boolean val)
       {
         push((char)TypeUtil.
@@ -287,6 +291,7 @@ public abstract interface OmniStack extends OmniCollection
       }
       public abstract void push(short val);
       public abstract void push(Short val);
+      @Override
       public default void push(boolean val)
       {
         push((short)TypeUtil.
@@ -334,6 +339,7 @@ public abstract interface OmniStack extends OmniCollection
       }
       public abstract void push(int val);
       public abstract void push(Integer val);
+      @Override
       public default void push(boolean val)
       {
         push((int)TypeUtil.
@@ -394,6 +400,7 @@ public abstract interface OmniStack extends OmniCollection
       }
       public abstract void push(long val);
       public abstract void push(Long val);
+      @Override
       public default void push(boolean val)
       {
         push((long)TypeUtil.
@@ -457,6 +464,7 @@ public abstract interface OmniStack extends OmniCollection
       }
       public abstract void push(float val);
       public abstract void push(Float val);
+      @Override
       public default void push(boolean val)
       {
         push((float)TypeUtil.
@@ -513,6 +521,7 @@ public abstract interface OmniStack extends OmniCollection
       public abstract double popDouble();
       public abstract void push(double val);
       public abstract void push(Double val);
+      @Override
       public default void push(boolean val)
       {
         push((double)TypeUtil.
