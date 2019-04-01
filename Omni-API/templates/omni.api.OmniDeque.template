@@ -74,7 +74,7 @@ public abstract interface OfCLASSPREFIX extends OmniCollection,OmniCollection.Of
   #ENDIF
 #ENDIF
 {
-#IFNOT OfBoolean
+#IFNOTSWITCH ARRTYPE==boolean
   public default void addFirst(ARRTYPE val)
   {
     push(val);

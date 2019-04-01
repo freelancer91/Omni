@@ -6,7 +6,7 @@ import omni.util.TypeUtil;
 import java.lang.reflect.Method;
 import java.lang.reflect.InvocationTargetException;
 public enum QueryTestPrimitiveInputType{
-  Booleanfalse(boolean.class,Boolean.class){
+  Booleanfalse(boolean.class,Boolean.class,true){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((boolean)(false));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((boolean)(false));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((boolean)(false));}
@@ -22,93 +22,16 @@ public enum QueryTestPrimitiveInputType{
     @Override public int invokeObjectindexOf(OmniCollection col){return ((OmniList)col).indexOf((Object)(boolean)(false));}
     @Override public int invokeObjectlastIndexOf(OmniCollection col){return ((OmniList)col).lastIndexOf((Object)(boolean)(false));}
     @Override public int invokeObjectsearch(OmniCollection col){return ((OmniStack)col).search((Object)(boolean)(false));}
-    public boolean addNotEqualsVal(OmniCollection col)
-    {
+    public boolean addNotEqualsVal(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(boolean)true);}
       return ((OmniCollection.OfPrimitive)col).add((boolean)true);
     }
-    public void insertNotEqualsValInList(int index,OmniCollection col)
-    {
-      ((OmniList.OfPrimitive)col).add(index,(boolean)true);
-    }
-    public boolean attemptAdd(OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      Class<?> clazz=col.getClass();
-      Method method;
-      try
-      {
-        //attempt to call with the primitive type
-        method=clazz.getDeclaredMethod("add",primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          //if that fails, call with the boxed type
-          method=clazz.getDeclaredMethod("add",boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            //if all else fails, call with the object class
-            method=clazz.getDeclaredMethod("add",Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        return (boolean)method.invoke(col,false); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-    }
-    public boolean attemptInsertionInList(int index,OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      OmniList list=(OmniList)col; //throw if not correct type
-      Class<?> clazz=list.getClass();
-      Method method;
-      try
-      {
-        method=clazz.getDeclaredMethod("add",int.class,primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          method=clazz.getDeclaredMethod("add",int.class,boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            method=clazz.getDeclaredMethod("add",int.class,Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        method.invoke(list,index,false); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-      return true;
+    public boolean attemptAdd(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(boolean)(false));}
+      return ((OmniCollection.OfPrimitive)col).add((boolean)(false));
     }
   },
-  Booleantrue(boolean.class,Boolean.class){
+  Booleantrue(boolean.class,Boolean.class,false){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((boolean)(true));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((boolean)(true));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((boolean)(true));}
@@ -124,93 +47,16 @@ public enum QueryTestPrimitiveInputType{
     @Override public int invokeObjectindexOf(OmniCollection col){return ((OmniList)col).indexOf((Object)(boolean)(true));}
     @Override public int invokeObjectlastIndexOf(OmniCollection col){return ((OmniList)col).lastIndexOf((Object)(boolean)(true));}
     @Override public int invokeObjectsearch(OmniCollection col){return ((OmniStack)col).search((Object)(boolean)(true));}
-    public boolean addNotEqualsVal(OmniCollection col)
-    {
+    public boolean addNotEqualsVal(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(boolean)false);}
       return ((OmniCollection.OfPrimitive)col).add((boolean)false);
     }
-    public void insertNotEqualsValInList(int index,OmniCollection col)
-    {
-      ((OmniList.OfPrimitive)col).add(index,(boolean)false);
-    }
-    public boolean attemptAdd(OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      Class<?> clazz=col.getClass();
-      Method method;
-      try
-      {
-        //attempt to call with the primitive type
-        method=clazz.getDeclaredMethod("add",primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          //if that fails, call with the boxed type
-          method=clazz.getDeclaredMethod("add",boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            //if all else fails, call with the object class
-            method=clazz.getDeclaredMethod("add",Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        return (boolean)method.invoke(col,true); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-    }
-    public boolean attemptInsertionInList(int index,OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      OmniList list=(OmniList)col; //throw if not correct type
-      Class<?> clazz=list.getClass();
-      Method method;
-      try
-      {
-        method=clazz.getDeclaredMethod("add",int.class,primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          method=clazz.getDeclaredMethod("add",int.class,boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            method=clazz.getDeclaredMethod("add",int.class,Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        method.invoke(list,index,true); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-      return true;
+    public boolean attemptAdd(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(boolean)(true));}
+      return ((OmniCollection.OfPrimitive)col).add((boolean)(true));
     }
   },
-  Byte0(byte.class,Byte.class){
+  Byte0(byte.class,Byte.class,true){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((byte)(0));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((byte)(0));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((byte)(0));}
@@ -226,93 +72,23 @@ public enum QueryTestPrimitiveInputType{
     @Override public int invokeObjectindexOf(OmniCollection col){return ((OmniList)col).indexOf((Object)(byte)(0));}
     @Override public int invokeObjectlastIndexOf(OmniCollection col){return ((OmniList)col).lastIndexOf((Object)(byte)(0));}
     @Override public int invokeObjectsearch(OmniCollection col){return ((OmniStack)col).search((Object)(byte)(0));}
-    public boolean addNotEqualsVal(OmniCollection col)
-    {
+    public boolean addNotEqualsVal(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(boolean)true);}
       return ((OmniCollection.OfPrimitive)col).add((boolean)true);
     }
-    public void insertNotEqualsValInList(int index,OmniCollection col)
-    {
-      ((OmniList.OfPrimitive)col).add(index,(boolean)true);
-    }
-    public boolean attemptAdd(OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      Class<?> clazz=col.getClass();
-      Method method;
-      try
-      {
-        //attempt to call with the primitive type
-        method=clazz.getDeclaredMethod("add",primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          //if that fails, call with the boxed type
-          method=clazz.getDeclaredMethod("add",boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            //if all else fails, call with the object class
-            method=clazz.getDeclaredMethod("add",Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        return (boolean)method.invoke(col,0); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-    }
-    public boolean attemptInsertionInList(int index,OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      OmniList list=(OmniList)col; //throw if not correct type
-      Class<?> clazz=list.getClass();
-      Method method;
-      try
-      {
-        method=clazz.getDeclaredMethod("add",int.class,primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          method=clazz.getDeclaredMethod("add",int.class,boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            method=clazz.getDeclaredMethod("add",int.class,Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        method.invoke(list,index,0); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-      return true;
+    public boolean attemptAdd(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(byte)(0));}
+      if(col instanceof OmniCollection.OfDouble){return ((OmniCollection.OfDouble)col).add((double)(0));}
+      if(col instanceof OmniCollection.OfFloat){return ((OmniCollection.OfFloat)col).add((float)(0));}
+      if(col instanceof OmniCollection.OfLong){return ((OmniCollection.OfLong)col).add((long)(0));}
+      if(col instanceof OmniCollection.OfInt){return ((OmniCollection.OfInt)col).add((int)(0));}
+      if(col instanceof OmniCollection.OfShort){return ((OmniCollection.OfShort)col).add((short)(0));}
+      if(col instanceof OmniCollection.OfChar){return ((OmniCollection.OfChar)col).add((char)(0));}
+      if(col instanceof OmniCollection.OfByte){return ((OmniCollection.OfByte)col).add((byte)(0));}
+      return ((OmniCollection.OfPrimitive)col).add((boolean)((0)==1));
     }
   },
-  Bytepos1(byte.class,Byte.class){
+  Bytepos1(byte.class,Byte.class,false){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((byte)(1));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((byte)(1));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((byte)(1));}
@@ -328,93 +104,23 @@ public enum QueryTestPrimitiveInputType{
     @Override public int invokeObjectindexOf(OmniCollection col){return ((OmniList)col).indexOf((Object)(byte)(1));}
     @Override public int invokeObjectlastIndexOf(OmniCollection col){return ((OmniList)col).lastIndexOf((Object)(byte)(1));}
     @Override public int invokeObjectsearch(OmniCollection col){return ((OmniStack)col).search((Object)(byte)(1));}
-    public boolean addNotEqualsVal(OmniCollection col)
-    {
+    public boolean addNotEqualsVal(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(boolean)false);}
       return ((OmniCollection.OfPrimitive)col).add((boolean)false);
     }
-    public void insertNotEqualsValInList(int index,OmniCollection col)
-    {
-      ((OmniList.OfPrimitive)col).add(index,(boolean)false);
-    }
-    public boolean attemptAdd(OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      Class<?> clazz=col.getClass();
-      Method method;
-      try
-      {
-        //attempt to call with the primitive type
-        method=clazz.getDeclaredMethod("add",primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          //if that fails, call with the boxed type
-          method=clazz.getDeclaredMethod("add",boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            //if all else fails, call with the object class
-            method=clazz.getDeclaredMethod("add",Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        return (boolean)method.invoke(col,1); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-    }
-    public boolean attemptInsertionInList(int index,OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      OmniList list=(OmniList)col; //throw if not correct type
-      Class<?> clazz=list.getClass();
-      Method method;
-      try
-      {
-        method=clazz.getDeclaredMethod("add",int.class,primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          method=clazz.getDeclaredMethod("add",int.class,boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            method=clazz.getDeclaredMethod("add",int.class,Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        method.invoke(list,index,1); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-      return true;
+    public boolean attemptAdd(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(byte)(1));}
+      if(col instanceof OmniCollection.OfDouble){return ((OmniCollection.OfDouble)col).add((double)(1));}
+      if(col instanceof OmniCollection.OfFloat){return ((OmniCollection.OfFloat)col).add((float)(1));}
+      if(col instanceof OmniCollection.OfLong){return ((OmniCollection.OfLong)col).add((long)(1));}
+      if(col instanceof OmniCollection.OfInt){return ((OmniCollection.OfInt)col).add((int)(1));}
+      if(col instanceof OmniCollection.OfShort){return ((OmniCollection.OfShort)col).add((short)(1));}
+      if(col instanceof OmniCollection.OfChar){return ((OmniCollection.OfChar)col).add((char)(1));}
+      if(col instanceof OmniCollection.OfByte){return ((OmniCollection.OfByte)col).add((byte)(1));}
+      return ((OmniCollection.OfPrimitive)col).add((boolean)((1)==1));
     }
   },
-  Bytepos2(byte.class,Byte.class){
+  Bytepos2(byte.class,Byte.class,false){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((byte)(2));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((byte)(2));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((byte)(2));}
@@ -430,93 +136,23 @@ public enum QueryTestPrimitiveInputType{
     @Override public int invokeObjectindexOf(OmniCollection col){return ((OmniList)col).indexOf((Object)(byte)(2));}
     @Override public int invokeObjectlastIndexOf(OmniCollection col){return ((OmniList)col).lastIndexOf((Object)(byte)(2));}
     @Override public int invokeObjectsearch(OmniCollection col){return ((OmniStack)col).search((Object)(byte)(2));}
-    public boolean addNotEqualsVal(OmniCollection col)
-    {
+    public boolean addNotEqualsVal(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(boolean)false);}
       return ((OmniCollection.OfPrimitive)col).add((boolean)false);
     }
-    public void insertNotEqualsValInList(int index,OmniCollection col)
-    {
-      ((OmniList.OfPrimitive)col).add(index,(boolean)false);
-    }
-    public boolean attemptAdd(OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      Class<?> clazz=col.getClass();
-      Method method;
-      try
-      {
-        //attempt to call with the primitive type
-        method=clazz.getDeclaredMethod("add",primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          //if that fails, call with the boxed type
-          method=clazz.getDeclaredMethod("add",boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            //if all else fails, call with the object class
-            method=clazz.getDeclaredMethod("add",Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        return (boolean)method.invoke(col,2); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-    }
-    public boolean attemptInsertionInList(int index,OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      OmniList list=(OmniList)col; //throw if not correct type
-      Class<?> clazz=list.getClass();
-      Method method;
-      try
-      {
-        method=clazz.getDeclaredMethod("add",int.class,primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          method=clazz.getDeclaredMethod("add",int.class,boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            method=clazz.getDeclaredMethod("add",int.class,Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        method.invoke(list,index,2); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-      return true;
+    public boolean attemptAdd(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(byte)(2));}
+      if(col instanceof OmniCollection.OfDouble){return ((OmniCollection.OfDouble)col).add((double)(2));}
+      if(col instanceof OmniCollection.OfFloat){return ((OmniCollection.OfFloat)col).add((float)(2));}
+      if(col instanceof OmniCollection.OfLong){return ((OmniCollection.OfLong)col).add((long)(2));}
+      if(col instanceof OmniCollection.OfInt){return ((OmniCollection.OfInt)col).add((int)(2));}
+      if(col instanceof OmniCollection.OfShort){return ((OmniCollection.OfShort)col).add((short)(2));}
+      if(col instanceof OmniCollection.OfChar){return ((OmniCollection.OfChar)col).add((char)(2));}
+      if(col instanceof OmniCollection.OfByte){return ((OmniCollection.OfByte)col).add((byte)(2));}
+      return ((OmniCollection.OfPrimitive)col).add((boolean)((2)==1));
     }
   },
-  Byteneg1(byte.class,Byte.class){
+  Byteneg1(byte.class,Byte.class,false){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((byte)(-1));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((byte)(-1));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((byte)(-1));}
@@ -532,93 +168,23 @@ public enum QueryTestPrimitiveInputType{
     @Override public int invokeObjectindexOf(OmniCollection col){return ((OmniList)col).indexOf((Object)(byte)(-1));}
     @Override public int invokeObjectlastIndexOf(OmniCollection col){return ((OmniList)col).lastIndexOf((Object)(byte)(-1));}
     @Override public int invokeObjectsearch(OmniCollection col){return ((OmniStack)col).search((Object)(byte)(-1));}
-    public boolean addNotEqualsVal(OmniCollection col)
-    {
+    public boolean addNotEqualsVal(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(boolean)false);}
       return ((OmniCollection.OfPrimitive)col).add((boolean)false);
     }
-    public void insertNotEqualsValInList(int index,OmniCollection col)
-    {
-      ((OmniList.OfPrimitive)col).add(index,(boolean)false);
-    }
-    public boolean attemptAdd(OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      Class<?> clazz=col.getClass();
-      Method method;
-      try
-      {
-        //attempt to call with the primitive type
-        method=clazz.getDeclaredMethod("add",primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          //if that fails, call with the boxed type
-          method=clazz.getDeclaredMethod("add",boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            //if all else fails, call with the object class
-            method=clazz.getDeclaredMethod("add",Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        return (boolean)method.invoke(col,-1); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-    }
-    public boolean attemptInsertionInList(int index,OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      OmniList list=(OmniList)col; //throw if not correct type
-      Class<?> clazz=list.getClass();
-      Method method;
-      try
-      {
-        method=clazz.getDeclaredMethod("add",int.class,primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          method=clazz.getDeclaredMethod("add",int.class,boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            method=clazz.getDeclaredMethod("add",int.class,Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        method.invoke(list,index,-1); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-      return true;
+    public boolean attemptAdd(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(byte)(-1));}
+      if(col instanceof OmniCollection.OfDouble){return ((OmniCollection.OfDouble)col).add((double)(-1));}
+      if(col instanceof OmniCollection.OfFloat){return ((OmniCollection.OfFloat)col).add((float)(-1));}
+      if(col instanceof OmniCollection.OfLong){return ((OmniCollection.OfLong)col).add((long)(-1));}
+      if(col instanceof OmniCollection.OfInt){return ((OmniCollection.OfInt)col).add((int)(-1));}
+      if(col instanceof OmniCollection.OfShort){return ((OmniCollection.OfShort)col).add((short)(-1));}
+      if(col instanceof OmniCollection.OfChar){return ((OmniCollection.OfChar)col).add((char)(-1));}
+      if(col instanceof OmniCollection.OfByte){return ((OmniCollection.OfByte)col).add((byte)(-1));}
+      return ((OmniCollection.OfPrimitive)col).add((boolean)((-1)==1));
     }
   },
-  Character0(char.class,Character.class){
+  Character0(char.class,Character.class,true){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((char)(0));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((char)(0));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((char)(0));}
@@ -634,93 +200,23 @@ public enum QueryTestPrimitiveInputType{
     @Override public int invokeObjectindexOf(OmniCollection col){return ((OmniList)col).indexOf((Object)(char)(0));}
     @Override public int invokeObjectlastIndexOf(OmniCollection col){return ((OmniList)col).lastIndexOf((Object)(char)(0));}
     @Override public int invokeObjectsearch(OmniCollection col){return ((OmniStack)col).search((Object)(char)(0));}
-    public boolean addNotEqualsVal(OmniCollection col)
-    {
+    public boolean addNotEqualsVal(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(boolean)true);}
       return ((OmniCollection.OfPrimitive)col).add((boolean)true);
     }
-    public void insertNotEqualsValInList(int index,OmniCollection col)
-    {
-      ((OmniList.OfPrimitive)col).add(index,(boolean)true);
-    }
-    public boolean attemptAdd(OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      Class<?> clazz=col.getClass();
-      Method method;
-      try
-      {
-        //attempt to call with the primitive type
-        method=clazz.getDeclaredMethod("add",primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          //if that fails, call with the boxed type
-          method=clazz.getDeclaredMethod("add",boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            //if all else fails, call with the object class
-            method=clazz.getDeclaredMethod("add",Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        return (boolean)method.invoke(col,0); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-    }
-    public boolean attemptInsertionInList(int index,OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      OmniList list=(OmniList)col; //throw if not correct type
-      Class<?> clazz=list.getClass();
-      Method method;
-      try
-      {
-        method=clazz.getDeclaredMethod("add",int.class,primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          method=clazz.getDeclaredMethod("add",int.class,boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            method=clazz.getDeclaredMethod("add",int.class,Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        method.invoke(list,index,0); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-      return true;
+    public boolean attemptAdd(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(char)(0));}
+      if(col instanceof OmniCollection.OfDouble){return ((OmniCollection.OfDouble)col).add((double)(0));}
+      if(col instanceof OmniCollection.OfFloat){return ((OmniCollection.OfFloat)col).add((float)(0));}
+      if(col instanceof OmniCollection.OfLong){return ((OmniCollection.OfLong)col).add((long)(0));}
+      if(col instanceof OmniCollection.OfInt){return ((OmniCollection.OfInt)col).add((int)(0));}
+      if(col instanceof OmniCollection.OfShort){return ((OmniCollection.OfShort)col).add((short)(0));}
+      if(col instanceof OmniCollection.OfChar){return ((OmniCollection.OfChar)col).add((char)(0));}
+      if(col instanceof OmniCollection.OfByte){return ((OmniCollection.OfByte)col).add((byte)(0));}
+      return ((OmniCollection.OfPrimitive)col).add((boolean)((0)==1));
     }
   },
-  Characterpos1(char.class,Character.class){
+  Characterpos1(char.class,Character.class,false){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((char)(1));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((char)(1));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((char)(1));}
@@ -736,93 +232,23 @@ public enum QueryTestPrimitiveInputType{
     @Override public int invokeObjectindexOf(OmniCollection col){return ((OmniList)col).indexOf((Object)(char)(1));}
     @Override public int invokeObjectlastIndexOf(OmniCollection col){return ((OmniList)col).lastIndexOf((Object)(char)(1));}
     @Override public int invokeObjectsearch(OmniCollection col){return ((OmniStack)col).search((Object)(char)(1));}
-    public boolean addNotEqualsVal(OmniCollection col)
-    {
+    public boolean addNotEqualsVal(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(boolean)false);}
       return ((OmniCollection.OfPrimitive)col).add((boolean)false);
     }
-    public void insertNotEqualsValInList(int index,OmniCollection col)
-    {
-      ((OmniList.OfPrimitive)col).add(index,(boolean)false);
-    }
-    public boolean attemptAdd(OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      Class<?> clazz=col.getClass();
-      Method method;
-      try
-      {
-        //attempt to call with the primitive type
-        method=clazz.getDeclaredMethod("add",primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          //if that fails, call with the boxed type
-          method=clazz.getDeclaredMethod("add",boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            //if all else fails, call with the object class
-            method=clazz.getDeclaredMethod("add",Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        return (boolean)method.invoke(col,1); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-    }
-    public boolean attemptInsertionInList(int index,OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      OmniList list=(OmniList)col; //throw if not correct type
-      Class<?> clazz=list.getClass();
-      Method method;
-      try
-      {
-        method=clazz.getDeclaredMethod("add",int.class,primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          method=clazz.getDeclaredMethod("add",int.class,boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            method=clazz.getDeclaredMethod("add",int.class,Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        method.invoke(list,index,1); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-      return true;
+    public boolean attemptAdd(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(char)(1));}
+      if(col instanceof OmniCollection.OfDouble){return ((OmniCollection.OfDouble)col).add((double)(1));}
+      if(col instanceof OmniCollection.OfFloat){return ((OmniCollection.OfFloat)col).add((float)(1));}
+      if(col instanceof OmniCollection.OfLong){return ((OmniCollection.OfLong)col).add((long)(1));}
+      if(col instanceof OmniCollection.OfInt){return ((OmniCollection.OfInt)col).add((int)(1));}
+      if(col instanceof OmniCollection.OfShort){return ((OmniCollection.OfShort)col).add((short)(1));}
+      if(col instanceof OmniCollection.OfChar){return ((OmniCollection.OfChar)col).add((char)(1));}
+      if(col instanceof OmniCollection.OfByte){return ((OmniCollection.OfByte)col).add((byte)(1));}
+      return ((OmniCollection.OfPrimitive)col).add((boolean)((1)==1));
     }
   },
-  Characterpos2(char.class,Character.class){
+  Characterpos2(char.class,Character.class,false){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((char)(2));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((char)(2));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((char)(2));}
@@ -838,93 +264,23 @@ public enum QueryTestPrimitiveInputType{
     @Override public int invokeObjectindexOf(OmniCollection col){return ((OmniList)col).indexOf((Object)(char)(2));}
     @Override public int invokeObjectlastIndexOf(OmniCollection col){return ((OmniList)col).lastIndexOf((Object)(char)(2));}
     @Override public int invokeObjectsearch(OmniCollection col){return ((OmniStack)col).search((Object)(char)(2));}
-    public boolean addNotEqualsVal(OmniCollection col)
-    {
+    public boolean addNotEqualsVal(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(boolean)false);}
       return ((OmniCollection.OfPrimitive)col).add((boolean)false);
     }
-    public void insertNotEqualsValInList(int index,OmniCollection col)
-    {
-      ((OmniList.OfPrimitive)col).add(index,(boolean)false);
-    }
-    public boolean attemptAdd(OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      Class<?> clazz=col.getClass();
-      Method method;
-      try
-      {
-        //attempt to call with the primitive type
-        method=clazz.getDeclaredMethod("add",primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          //if that fails, call with the boxed type
-          method=clazz.getDeclaredMethod("add",boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            //if all else fails, call with the object class
-            method=clazz.getDeclaredMethod("add",Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        return (boolean)method.invoke(col,2); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-    }
-    public boolean attemptInsertionInList(int index,OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      OmniList list=(OmniList)col; //throw if not correct type
-      Class<?> clazz=list.getClass();
-      Method method;
-      try
-      {
-        method=clazz.getDeclaredMethod("add",int.class,primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          method=clazz.getDeclaredMethod("add",int.class,boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            method=clazz.getDeclaredMethod("add",int.class,Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        method.invoke(list,index,2); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-      return true;
+    public boolean attemptAdd(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(char)(2));}
+      if(col instanceof OmniCollection.OfDouble){return ((OmniCollection.OfDouble)col).add((double)(2));}
+      if(col instanceof OmniCollection.OfFloat){return ((OmniCollection.OfFloat)col).add((float)(2));}
+      if(col instanceof OmniCollection.OfLong){return ((OmniCollection.OfLong)col).add((long)(2));}
+      if(col instanceof OmniCollection.OfInt){return ((OmniCollection.OfInt)col).add((int)(2));}
+      if(col instanceof OmniCollection.OfShort){return ((OmniCollection.OfShort)col).add((short)(2));}
+      if(col instanceof OmniCollection.OfChar){return ((OmniCollection.OfChar)col).add((char)(2));}
+      if(col instanceof OmniCollection.OfByte){return ((OmniCollection.OfByte)col).add((byte)(2));}
+      return ((OmniCollection.OfPrimitive)col).add((boolean)((2)==1));
     }
   },
-  CharacterMAX_BYTE_PLUS1(char.class,Character.class){
+  CharacterMAX_BYTE_PLUS1(char.class,Character.class,false){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((char)(((char)Byte.MAX_VALUE)+1));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((char)(((char)Byte.MAX_VALUE)+1));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((char)(((char)Byte.MAX_VALUE)+1));}
@@ -940,93 +296,23 @@ public enum QueryTestPrimitiveInputType{
     @Override public int invokeObjectindexOf(OmniCollection col){return ((OmniList)col).indexOf((Object)(char)(((char)Byte.MAX_VALUE)+1));}
     @Override public int invokeObjectlastIndexOf(OmniCollection col){return ((OmniList)col).lastIndexOf((Object)(char)(((char)Byte.MAX_VALUE)+1));}
     @Override public int invokeObjectsearch(OmniCollection col){return ((OmniStack)col).search((Object)(char)(((char)Byte.MAX_VALUE)+1));}
-    public boolean addNotEqualsVal(OmniCollection col)
-    {
+    public boolean addNotEqualsVal(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(boolean)false);}
       return ((OmniCollection.OfPrimitive)col).add((boolean)false);
     }
-    public void insertNotEqualsValInList(int index,OmniCollection col)
-    {
-      ((OmniList.OfPrimitive)col).add(index,(boolean)false);
-    }
-    public boolean attemptAdd(OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      Class<?> clazz=col.getClass();
-      Method method;
-      try
-      {
-        //attempt to call with the primitive type
-        method=clazz.getDeclaredMethod("add",primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          //if that fails, call with the boxed type
-          method=clazz.getDeclaredMethod("add",boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            //if all else fails, call with the object class
-            method=clazz.getDeclaredMethod("add",Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        return (boolean)method.invoke(col,((char)Byte.MAX_VALUE)+1); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-    }
-    public boolean attemptInsertionInList(int index,OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      OmniList list=(OmniList)col; //throw if not correct type
-      Class<?> clazz=list.getClass();
-      Method method;
-      try
-      {
-        method=clazz.getDeclaredMethod("add",int.class,primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          method=clazz.getDeclaredMethod("add",int.class,boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            method=clazz.getDeclaredMethod("add",int.class,Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        method.invoke(list,index,((char)Byte.MAX_VALUE)+1); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-      return true;
+    public boolean attemptAdd(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(char)(((char)Byte.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfDouble){return ((OmniCollection.OfDouble)col).add((double)(((char)Byte.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfFloat){return ((OmniCollection.OfFloat)col).add((float)(((char)Byte.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfLong){return ((OmniCollection.OfLong)col).add((long)(((char)Byte.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfInt){return ((OmniCollection.OfInt)col).add((int)(((char)Byte.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfShort){return ((OmniCollection.OfShort)col).add((short)(((char)Byte.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfChar){return ((OmniCollection.OfChar)col).add((char)(((char)Byte.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfByte){return ((OmniCollection.OfByte)col).add((byte)(((char)Byte.MAX_VALUE)+1));}
+      return ((OmniCollection.OfPrimitive)col).add((boolean)((((char)Byte.MAX_VALUE)+1)==1));
     }
   },
-  CharacterMAX_SHORT_PLUS1(char.class,Character.class){
+  CharacterMAX_SHORT_PLUS1(char.class,Character.class,false){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((char)(((char)Short.MAX_VALUE)+1));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((char)(((char)Short.MAX_VALUE)+1));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((char)(((char)Short.MAX_VALUE)+1));}
@@ -1042,93 +328,23 @@ public enum QueryTestPrimitiveInputType{
     @Override public int invokeObjectindexOf(OmniCollection col){return ((OmniList)col).indexOf((Object)(char)(((char)Short.MAX_VALUE)+1));}
     @Override public int invokeObjectlastIndexOf(OmniCollection col){return ((OmniList)col).lastIndexOf((Object)(char)(((char)Short.MAX_VALUE)+1));}
     @Override public int invokeObjectsearch(OmniCollection col){return ((OmniStack)col).search((Object)(char)(((char)Short.MAX_VALUE)+1));}
-    public boolean addNotEqualsVal(OmniCollection col)
-    {
+    public boolean addNotEqualsVal(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(boolean)false);}
       return ((OmniCollection.OfPrimitive)col).add((boolean)false);
     }
-    public void insertNotEqualsValInList(int index,OmniCollection col)
-    {
-      ((OmniList.OfPrimitive)col).add(index,(boolean)false);
-    }
-    public boolean attemptAdd(OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      Class<?> clazz=col.getClass();
-      Method method;
-      try
-      {
-        //attempt to call with the primitive type
-        method=clazz.getDeclaredMethod("add",primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          //if that fails, call with the boxed type
-          method=clazz.getDeclaredMethod("add",boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            //if all else fails, call with the object class
-            method=clazz.getDeclaredMethod("add",Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        return (boolean)method.invoke(col,((char)Short.MAX_VALUE)+1); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-    }
-    public boolean attemptInsertionInList(int index,OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      OmniList list=(OmniList)col; //throw if not correct type
-      Class<?> clazz=list.getClass();
-      Method method;
-      try
-      {
-        method=clazz.getDeclaredMethod("add",int.class,primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          method=clazz.getDeclaredMethod("add",int.class,boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            method=clazz.getDeclaredMethod("add",int.class,Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        method.invoke(list,index,((char)Short.MAX_VALUE)+1); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-      return true;
+    public boolean attemptAdd(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(char)(((char)Short.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfDouble){return ((OmniCollection.OfDouble)col).add((double)(((char)Short.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfFloat){return ((OmniCollection.OfFloat)col).add((float)(((char)Short.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfLong){return ((OmniCollection.OfLong)col).add((long)(((char)Short.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfInt){return ((OmniCollection.OfInt)col).add((int)(((char)Short.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfShort){return ((OmniCollection.OfShort)col).add((short)(((char)Short.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfChar){return ((OmniCollection.OfChar)col).add((char)(((char)Short.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfByte){return ((OmniCollection.OfByte)col).add((byte)(((char)Short.MAX_VALUE)+1));}
+      return ((OmniCollection.OfPrimitive)col).add((boolean)((((char)Short.MAX_VALUE)+1)==1));
     }
   },
-  Short0(short.class,Short.class){
+  Short0(short.class,Short.class,true){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((short)(0));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((short)(0));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((short)(0));}
@@ -1144,93 +360,23 @@ public enum QueryTestPrimitiveInputType{
     @Override public int invokeObjectindexOf(OmniCollection col){return ((OmniList)col).indexOf((Object)(short)(0));}
     @Override public int invokeObjectlastIndexOf(OmniCollection col){return ((OmniList)col).lastIndexOf((Object)(short)(0));}
     @Override public int invokeObjectsearch(OmniCollection col){return ((OmniStack)col).search((Object)(short)(0));}
-    public boolean addNotEqualsVal(OmniCollection col)
-    {
+    public boolean addNotEqualsVal(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(boolean)true);}
       return ((OmniCollection.OfPrimitive)col).add((boolean)true);
     }
-    public void insertNotEqualsValInList(int index,OmniCollection col)
-    {
-      ((OmniList.OfPrimitive)col).add(index,(boolean)true);
-    }
-    public boolean attemptAdd(OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      Class<?> clazz=col.getClass();
-      Method method;
-      try
-      {
-        //attempt to call with the primitive type
-        method=clazz.getDeclaredMethod("add",primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          //if that fails, call with the boxed type
-          method=clazz.getDeclaredMethod("add",boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            //if all else fails, call with the object class
-            method=clazz.getDeclaredMethod("add",Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        return (boolean)method.invoke(col,0); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-    }
-    public boolean attemptInsertionInList(int index,OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      OmniList list=(OmniList)col; //throw if not correct type
-      Class<?> clazz=list.getClass();
-      Method method;
-      try
-      {
-        method=clazz.getDeclaredMethod("add",int.class,primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          method=clazz.getDeclaredMethod("add",int.class,boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            method=clazz.getDeclaredMethod("add",int.class,Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        method.invoke(list,index,0); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-      return true;
+    public boolean attemptAdd(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(short)(0));}
+      if(col instanceof OmniCollection.OfDouble){return ((OmniCollection.OfDouble)col).add((double)(0));}
+      if(col instanceof OmniCollection.OfFloat){return ((OmniCollection.OfFloat)col).add((float)(0));}
+      if(col instanceof OmniCollection.OfLong){return ((OmniCollection.OfLong)col).add((long)(0));}
+      if(col instanceof OmniCollection.OfInt){return ((OmniCollection.OfInt)col).add((int)(0));}
+      if(col instanceof OmniCollection.OfShort){return ((OmniCollection.OfShort)col).add((short)(0));}
+      if(col instanceof OmniCollection.OfChar){return ((OmniCollection.OfChar)col).add((char)(0));}
+      if(col instanceof OmniCollection.OfByte){return ((OmniCollection.OfByte)col).add((byte)(0));}
+      return ((OmniCollection.OfPrimitive)col).add((boolean)((0)==1));
     }
   },
-  Shortpos1(short.class,Short.class){
+  Shortpos1(short.class,Short.class,false){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((short)(1));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((short)(1));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((short)(1));}
@@ -1246,93 +392,23 @@ public enum QueryTestPrimitiveInputType{
     @Override public int invokeObjectindexOf(OmniCollection col){return ((OmniList)col).indexOf((Object)(short)(1));}
     @Override public int invokeObjectlastIndexOf(OmniCollection col){return ((OmniList)col).lastIndexOf((Object)(short)(1));}
     @Override public int invokeObjectsearch(OmniCollection col){return ((OmniStack)col).search((Object)(short)(1));}
-    public boolean addNotEqualsVal(OmniCollection col)
-    {
+    public boolean addNotEqualsVal(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(boolean)false);}
       return ((OmniCollection.OfPrimitive)col).add((boolean)false);
     }
-    public void insertNotEqualsValInList(int index,OmniCollection col)
-    {
-      ((OmniList.OfPrimitive)col).add(index,(boolean)false);
-    }
-    public boolean attemptAdd(OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      Class<?> clazz=col.getClass();
-      Method method;
-      try
-      {
-        //attempt to call with the primitive type
-        method=clazz.getDeclaredMethod("add",primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          //if that fails, call with the boxed type
-          method=clazz.getDeclaredMethod("add",boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            //if all else fails, call with the object class
-            method=clazz.getDeclaredMethod("add",Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        return (boolean)method.invoke(col,1); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-    }
-    public boolean attemptInsertionInList(int index,OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      OmniList list=(OmniList)col; //throw if not correct type
-      Class<?> clazz=list.getClass();
-      Method method;
-      try
-      {
-        method=clazz.getDeclaredMethod("add",int.class,primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          method=clazz.getDeclaredMethod("add",int.class,boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            method=clazz.getDeclaredMethod("add",int.class,Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        method.invoke(list,index,1); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-      return true;
+    public boolean attemptAdd(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(short)(1));}
+      if(col instanceof OmniCollection.OfDouble){return ((OmniCollection.OfDouble)col).add((double)(1));}
+      if(col instanceof OmniCollection.OfFloat){return ((OmniCollection.OfFloat)col).add((float)(1));}
+      if(col instanceof OmniCollection.OfLong){return ((OmniCollection.OfLong)col).add((long)(1));}
+      if(col instanceof OmniCollection.OfInt){return ((OmniCollection.OfInt)col).add((int)(1));}
+      if(col instanceof OmniCollection.OfShort){return ((OmniCollection.OfShort)col).add((short)(1));}
+      if(col instanceof OmniCollection.OfChar){return ((OmniCollection.OfChar)col).add((char)(1));}
+      if(col instanceof OmniCollection.OfByte){return ((OmniCollection.OfByte)col).add((byte)(1));}
+      return ((OmniCollection.OfPrimitive)col).add((boolean)((1)==1));
     }
   },
-  Shortpos2(short.class,Short.class){
+  Shortpos2(short.class,Short.class,false){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((short)(2));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((short)(2));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((short)(2));}
@@ -1348,93 +424,23 @@ public enum QueryTestPrimitiveInputType{
     @Override public int invokeObjectindexOf(OmniCollection col){return ((OmniList)col).indexOf((Object)(short)(2));}
     @Override public int invokeObjectlastIndexOf(OmniCollection col){return ((OmniList)col).lastIndexOf((Object)(short)(2));}
     @Override public int invokeObjectsearch(OmniCollection col){return ((OmniStack)col).search((Object)(short)(2));}
-    public boolean addNotEqualsVal(OmniCollection col)
-    {
+    public boolean addNotEqualsVal(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(boolean)false);}
       return ((OmniCollection.OfPrimitive)col).add((boolean)false);
     }
-    public void insertNotEqualsValInList(int index,OmniCollection col)
-    {
-      ((OmniList.OfPrimitive)col).add(index,(boolean)false);
-    }
-    public boolean attemptAdd(OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      Class<?> clazz=col.getClass();
-      Method method;
-      try
-      {
-        //attempt to call with the primitive type
-        method=clazz.getDeclaredMethod("add",primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          //if that fails, call with the boxed type
-          method=clazz.getDeclaredMethod("add",boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            //if all else fails, call with the object class
-            method=clazz.getDeclaredMethod("add",Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        return (boolean)method.invoke(col,2); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-    }
-    public boolean attemptInsertionInList(int index,OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      OmniList list=(OmniList)col; //throw if not correct type
-      Class<?> clazz=list.getClass();
-      Method method;
-      try
-      {
-        method=clazz.getDeclaredMethod("add",int.class,primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          method=clazz.getDeclaredMethod("add",int.class,boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            method=clazz.getDeclaredMethod("add",int.class,Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        method.invoke(list,index,2); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-      return true;
+    public boolean attemptAdd(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(short)(2));}
+      if(col instanceof OmniCollection.OfDouble){return ((OmniCollection.OfDouble)col).add((double)(2));}
+      if(col instanceof OmniCollection.OfFloat){return ((OmniCollection.OfFloat)col).add((float)(2));}
+      if(col instanceof OmniCollection.OfLong){return ((OmniCollection.OfLong)col).add((long)(2));}
+      if(col instanceof OmniCollection.OfInt){return ((OmniCollection.OfInt)col).add((int)(2));}
+      if(col instanceof OmniCollection.OfShort){return ((OmniCollection.OfShort)col).add((short)(2));}
+      if(col instanceof OmniCollection.OfChar){return ((OmniCollection.OfChar)col).add((char)(2));}
+      if(col instanceof OmniCollection.OfByte){return ((OmniCollection.OfByte)col).add((byte)(2));}
+      return ((OmniCollection.OfPrimitive)col).add((boolean)((2)==1));
     }
   },
-  Shortneg1(short.class,Short.class){
+  Shortneg1(short.class,Short.class,false){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((short)(-1));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((short)(-1));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((short)(-1));}
@@ -1450,93 +456,23 @@ public enum QueryTestPrimitiveInputType{
     @Override public int invokeObjectindexOf(OmniCollection col){return ((OmniList)col).indexOf((Object)(short)(-1));}
     @Override public int invokeObjectlastIndexOf(OmniCollection col){return ((OmniList)col).lastIndexOf((Object)(short)(-1));}
     @Override public int invokeObjectsearch(OmniCollection col){return ((OmniStack)col).search((Object)(short)(-1));}
-    public boolean addNotEqualsVal(OmniCollection col)
-    {
+    public boolean addNotEqualsVal(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(boolean)false);}
       return ((OmniCollection.OfPrimitive)col).add((boolean)false);
     }
-    public void insertNotEqualsValInList(int index,OmniCollection col)
-    {
-      ((OmniList.OfPrimitive)col).add(index,(boolean)false);
-    }
-    public boolean attemptAdd(OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      Class<?> clazz=col.getClass();
-      Method method;
-      try
-      {
-        //attempt to call with the primitive type
-        method=clazz.getDeclaredMethod("add",primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          //if that fails, call with the boxed type
-          method=clazz.getDeclaredMethod("add",boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            //if all else fails, call with the object class
-            method=clazz.getDeclaredMethod("add",Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        return (boolean)method.invoke(col,-1); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-    }
-    public boolean attemptInsertionInList(int index,OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      OmniList list=(OmniList)col; //throw if not correct type
-      Class<?> clazz=list.getClass();
-      Method method;
-      try
-      {
-        method=clazz.getDeclaredMethod("add",int.class,primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          method=clazz.getDeclaredMethod("add",int.class,boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            method=clazz.getDeclaredMethod("add",int.class,Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        method.invoke(list,index,-1); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-      return true;
+    public boolean attemptAdd(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(short)(-1));}
+      if(col instanceof OmniCollection.OfDouble){return ((OmniCollection.OfDouble)col).add((double)(-1));}
+      if(col instanceof OmniCollection.OfFloat){return ((OmniCollection.OfFloat)col).add((float)(-1));}
+      if(col instanceof OmniCollection.OfLong){return ((OmniCollection.OfLong)col).add((long)(-1));}
+      if(col instanceof OmniCollection.OfInt){return ((OmniCollection.OfInt)col).add((int)(-1));}
+      if(col instanceof OmniCollection.OfShort){return ((OmniCollection.OfShort)col).add((short)(-1));}
+      if(col instanceof OmniCollection.OfChar){return ((OmniCollection.OfChar)col).add((char)(-1));}
+      if(col instanceof OmniCollection.OfByte){return ((OmniCollection.OfByte)col).add((byte)(-1));}
+      return ((OmniCollection.OfPrimitive)col).add((boolean)((-1)==1));
     }
   },
-  ShortMAX_BYTE_PLUS1(short.class,Short.class){
+  ShortMAX_BYTE_PLUS1(short.class,Short.class,false){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((short)(((short)Byte.MAX_VALUE)+1));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((short)(((short)Byte.MAX_VALUE)+1));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((short)(((short)Byte.MAX_VALUE)+1));}
@@ -1552,93 +488,23 @@ public enum QueryTestPrimitiveInputType{
     @Override public int invokeObjectindexOf(OmniCollection col){return ((OmniList)col).indexOf((Object)(short)(((short)Byte.MAX_VALUE)+1));}
     @Override public int invokeObjectlastIndexOf(OmniCollection col){return ((OmniList)col).lastIndexOf((Object)(short)(((short)Byte.MAX_VALUE)+1));}
     @Override public int invokeObjectsearch(OmniCollection col){return ((OmniStack)col).search((Object)(short)(((short)Byte.MAX_VALUE)+1));}
-    public boolean addNotEqualsVal(OmniCollection col)
-    {
+    public boolean addNotEqualsVal(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(boolean)false);}
       return ((OmniCollection.OfPrimitive)col).add((boolean)false);
     }
-    public void insertNotEqualsValInList(int index,OmniCollection col)
-    {
-      ((OmniList.OfPrimitive)col).add(index,(boolean)false);
-    }
-    public boolean attemptAdd(OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      Class<?> clazz=col.getClass();
-      Method method;
-      try
-      {
-        //attempt to call with the primitive type
-        method=clazz.getDeclaredMethod("add",primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          //if that fails, call with the boxed type
-          method=clazz.getDeclaredMethod("add",boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            //if all else fails, call with the object class
-            method=clazz.getDeclaredMethod("add",Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        return (boolean)method.invoke(col,((short)Byte.MAX_VALUE)+1); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-    }
-    public boolean attemptInsertionInList(int index,OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      OmniList list=(OmniList)col; //throw if not correct type
-      Class<?> clazz=list.getClass();
-      Method method;
-      try
-      {
-        method=clazz.getDeclaredMethod("add",int.class,primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          method=clazz.getDeclaredMethod("add",int.class,boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            method=clazz.getDeclaredMethod("add",int.class,Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        method.invoke(list,index,((short)Byte.MAX_VALUE)+1); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-      return true;
+    public boolean attemptAdd(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(short)(((short)Byte.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfDouble){return ((OmniCollection.OfDouble)col).add((double)(((short)Byte.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfFloat){return ((OmniCollection.OfFloat)col).add((float)(((short)Byte.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfLong){return ((OmniCollection.OfLong)col).add((long)(((short)Byte.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfInt){return ((OmniCollection.OfInt)col).add((int)(((short)Byte.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfShort){return ((OmniCollection.OfShort)col).add((short)(((short)Byte.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfChar){return ((OmniCollection.OfChar)col).add((char)(((short)Byte.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfByte){return ((OmniCollection.OfByte)col).add((byte)(((short)Byte.MAX_VALUE)+1));}
+      return ((OmniCollection.OfPrimitive)col).add((boolean)((((short)Byte.MAX_VALUE)+1)==1));
     }
   },
-  ShortMIN_BYTE_MINUS1(short.class,Short.class){
+  ShortMIN_BYTE_MINUS1(short.class,Short.class,false){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((short)(((short)Byte.MIN_VALUE)-1));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((short)(((short)Byte.MIN_VALUE)-1));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((short)(((short)Byte.MIN_VALUE)-1));}
@@ -1654,93 +520,23 @@ public enum QueryTestPrimitiveInputType{
     @Override public int invokeObjectindexOf(OmniCollection col){return ((OmniList)col).indexOf((Object)(short)(((short)Byte.MIN_VALUE)-1));}
     @Override public int invokeObjectlastIndexOf(OmniCollection col){return ((OmniList)col).lastIndexOf((Object)(short)(((short)Byte.MIN_VALUE)-1));}
     @Override public int invokeObjectsearch(OmniCollection col){return ((OmniStack)col).search((Object)(short)(((short)Byte.MIN_VALUE)-1));}
-    public boolean addNotEqualsVal(OmniCollection col)
-    {
+    public boolean addNotEqualsVal(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(boolean)false);}
       return ((OmniCollection.OfPrimitive)col).add((boolean)false);
     }
-    public void insertNotEqualsValInList(int index,OmniCollection col)
-    {
-      ((OmniList.OfPrimitive)col).add(index,(boolean)false);
-    }
-    public boolean attemptAdd(OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      Class<?> clazz=col.getClass();
-      Method method;
-      try
-      {
-        //attempt to call with the primitive type
-        method=clazz.getDeclaredMethod("add",primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          //if that fails, call with the boxed type
-          method=clazz.getDeclaredMethod("add",boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            //if all else fails, call with the object class
-            method=clazz.getDeclaredMethod("add",Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        return (boolean)method.invoke(col,((short)Byte.MIN_VALUE)-1); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-    }
-    public boolean attemptInsertionInList(int index,OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      OmniList list=(OmniList)col; //throw if not correct type
-      Class<?> clazz=list.getClass();
-      Method method;
-      try
-      {
-        method=clazz.getDeclaredMethod("add",int.class,primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          method=clazz.getDeclaredMethod("add",int.class,boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            method=clazz.getDeclaredMethod("add",int.class,Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        method.invoke(list,index,((short)Byte.MIN_VALUE)-1); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-      return true;
+    public boolean attemptAdd(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(short)(((short)Byte.MIN_VALUE)-1));}
+      if(col instanceof OmniCollection.OfDouble){return ((OmniCollection.OfDouble)col).add((double)(((short)Byte.MIN_VALUE)-1));}
+      if(col instanceof OmniCollection.OfFloat){return ((OmniCollection.OfFloat)col).add((float)(((short)Byte.MIN_VALUE)-1));}
+      if(col instanceof OmniCollection.OfLong){return ((OmniCollection.OfLong)col).add((long)(((short)Byte.MIN_VALUE)-1));}
+      if(col instanceof OmniCollection.OfInt){return ((OmniCollection.OfInt)col).add((int)(((short)Byte.MIN_VALUE)-1));}
+      if(col instanceof OmniCollection.OfShort){return ((OmniCollection.OfShort)col).add((short)(((short)Byte.MIN_VALUE)-1));}
+      if(col instanceof OmniCollection.OfChar){return ((OmniCollection.OfChar)col).add((char)(((short)Byte.MIN_VALUE)-1));}
+      if(col instanceof OmniCollection.OfByte){return ((OmniCollection.OfByte)col).add((byte)(((short)Byte.MIN_VALUE)-1));}
+      return ((OmniCollection.OfPrimitive)col).add((boolean)((((short)Byte.MIN_VALUE)-1)==1));
     }
   },
-  Integer0(int.class,Integer.class){
+  Integer0(int.class,Integer.class,true){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((int)(0));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((int)(0));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((int)(0));}
@@ -1756,93 +552,23 @@ public enum QueryTestPrimitiveInputType{
     @Override public int invokeObjectindexOf(OmniCollection col){return ((OmniList)col).indexOf((Object)(int)(0));}
     @Override public int invokeObjectlastIndexOf(OmniCollection col){return ((OmniList)col).lastIndexOf((Object)(int)(0));}
     @Override public int invokeObjectsearch(OmniCollection col){return ((OmniStack)col).search((Object)(int)(0));}
-    public boolean addNotEqualsVal(OmniCollection col)
-    {
+    public boolean addNotEqualsVal(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(boolean)true);}
       return ((OmniCollection.OfPrimitive)col).add((boolean)true);
     }
-    public void insertNotEqualsValInList(int index,OmniCollection col)
-    {
-      ((OmniList.OfPrimitive)col).add(index,(boolean)true);
-    }
-    public boolean attemptAdd(OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      Class<?> clazz=col.getClass();
-      Method method;
-      try
-      {
-        //attempt to call with the primitive type
-        method=clazz.getDeclaredMethod("add",primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          //if that fails, call with the boxed type
-          method=clazz.getDeclaredMethod("add",boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            //if all else fails, call with the object class
-            method=clazz.getDeclaredMethod("add",Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        return (boolean)method.invoke(col,0); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-    }
-    public boolean attemptInsertionInList(int index,OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      OmniList list=(OmniList)col; //throw if not correct type
-      Class<?> clazz=list.getClass();
-      Method method;
-      try
-      {
-        method=clazz.getDeclaredMethod("add",int.class,primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          method=clazz.getDeclaredMethod("add",int.class,boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            method=clazz.getDeclaredMethod("add",int.class,Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        method.invoke(list,index,0); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-      return true;
+    public boolean attemptAdd(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(int)(0));}
+      if(col instanceof OmniCollection.OfDouble){return ((OmniCollection.OfDouble)col).add((double)(0));}
+      if(col instanceof OmniCollection.OfFloat){return ((OmniCollection.OfFloat)col).add((float)(0));}
+      if(col instanceof OmniCollection.OfLong){return ((OmniCollection.OfLong)col).add((long)(0));}
+      if(col instanceof OmniCollection.OfInt){return ((OmniCollection.OfInt)col).add((int)(0));}
+      if(col instanceof OmniCollection.OfShort){return ((OmniCollection.OfShort)col).add((short)(0));}
+      if(col instanceof OmniCollection.OfChar){return ((OmniCollection.OfChar)col).add((char)(0));}
+      if(col instanceof OmniCollection.OfByte){return ((OmniCollection.OfByte)col).add((byte)(0));}
+      return ((OmniCollection.OfPrimitive)col).add((boolean)((0)==1));
     }
   },
-  Integerpos1(int.class,Integer.class){
+  Integerpos1(int.class,Integer.class,false){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((int)(1));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((int)(1));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((int)(1));}
@@ -1858,93 +584,23 @@ public enum QueryTestPrimitiveInputType{
     @Override public int invokeObjectindexOf(OmniCollection col){return ((OmniList)col).indexOf((Object)(int)(1));}
     @Override public int invokeObjectlastIndexOf(OmniCollection col){return ((OmniList)col).lastIndexOf((Object)(int)(1));}
     @Override public int invokeObjectsearch(OmniCollection col){return ((OmniStack)col).search((Object)(int)(1));}
-    public boolean addNotEqualsVal(OmniCollection col)
-    {
+    public boolean addNotEqualsVal(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(boolean)false);}
       return ((OmniCollection.OfPrimitive)col).add((boolean)false);
     }
-    public void insertNotEqualsValInList(int index,OmniCollection col)
-    {
-      ((OmniList.OfPrimitive)col).add(index,(boolean)false);
-    }
-    public boolean attemptAdd(OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      Class<?> clazz=col.getClass();
-      Method method;
-      try
-      {
-        //attempt to call with the primitive type
-        method=clazz.getDeclaredMethod("add",primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          //if that fails, call with the boxed type
-          method=clazz.getDeclaredMethod("add",boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            //if all else fails, call with the object class
-            method=clazz.getDeclaredMethod("add",Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        return (boolean)method.invoke(col,1); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-    }
-    public boolean attemptInsertionInList(int index,OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      OmniList list=(OmniList)col; //throw if not correct type
-      Class<?> clazz=list.getClass();
-      Method method;
-      try
-      {
-        method=clazz.getDeclaredMethod("add",int.class,primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          method=clazz.getDeclaredMethod("add",int.class,boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            method=clazz.getDeclaredMethod("add",int.class,Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        method.invoke(list,index,1); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-      return true;
+    public boolean attemptAdd(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(int)(1));}
+      if(col instanceof OmniCollection.OfDouble){return ((OmniCollection.OfDouble)col).add((double)(1));}
+      if(col instanceof OmniCollection.OfFloat){return ((OmniCollection.OfFloat)col).add((float)(1));}
+      if(col instanceof OmniCollection.OfLong){return ((OmniCollection.OfLong)col).add((long)(1));}
+      if(col instanceof OmniCollection.OfInt){return ((OmniCollection.OfInt)col).add((int)(1));}
+      if(col instanceof OmniCollection.OfShort){return ((OmniCollection.OfShort)col).add((short)(1));}
+      if(col instanceof OmniCollection.OfChar){return ((OmniCollection.OfChar)col).add((char)(1));}
+      if(col instanceof OmniCollection.OfByte){return ((OmniCollection.OfByte)col).add((byte)(1));}
+      return ((OmniCollection.OfPrimitive)col).add((boolean)((1)==1));
     }
   },
-  Integerpos2(int.class,Integer.class){
+  Integerpos2(int.class,Integer.class,false){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((int)(2));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((int)(2));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((int)(2));}
@@ -1960,93 +616,23 @@ public enum QueryTestPrimitiveInputType{
     @Override public int invokeObjectindexOf(OmniCollection col){return ((OmniList)col).indexOf((Object)(int)(2));}
     @Override public int invokeObjectlastIndexOf(OmniCollection col){return ((OmniList)col).lastIndexOf((Object)(int)(2));}
     @Override public int invokeObjectsearch(OmniCollection col){return ((OmniStack)col).search((Object)(int)(2));}
-    public boolean addNotEqualsVal(OmniCollection col)
-    {
+    public boolean addNotEqualsVal(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(boolean)false);}
       return ((OmniCollection.OfPrimitive)col).add((boolean)false);
     }
-    public void insertNotEqualsValInList(int index,OmniCollection col)
-    {
-      ((OmniList.OfPrimitive)col).add(index,(boolean)false);
-    }
-    public boolean attemptAdd(OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      Class<?> clazz=col.getClass();
-      Method method;
-      try
-      {
-        //attempt to call with the primitive type
-        method=clazz.getDeclaredMethod("add",primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          //if that fails, call with the boxed type
-          method=clazz.getDeclaredMethod("add",boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            //if all else fails, call with the object class
-            method=clazz.getDeclaredMethod("add",Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        return (boolean)method.invoke(col,2); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-    }
-    public boolean attemptInsertionInList(int index,OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      OmniList list=(OmniList)col; //throw if not correct type
-      Class<?> clazz=list.getClass();
-      Method method;
-      try
-      {
-        method=clazz.getDeclaredMethod("add",int.class,primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          method=clazz.getDeclaredMethod("add",int.class,boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            method=clazz.getDeclaredMethod("add",int.class,Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        method.invoke(list,index,2); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-      return true;
+    public boolean attemptAdd(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(int)(2));}
+      if(col instanceof OmniCollection.OfDouble){return ((OmniCollection.OfDouble)col).add((double)(2));}
+      if(col instanceof OmniCollection.OfFloat){return ((OmniCollection.OfFloat)col).add((float)(2));}
+      if(col instanceof OmniCollection.OfLong){return ((OmniCollection.OfLong)col).add((long)(2));}
+      if(col instanceof OmniCollection.OfInt){return ((OmniCollection.OfInt)col).add((int)(2));}
+      if(col instanceof OmniCollection.OfShort){return ((OmniCollection.OfShort)col).add((short)(2));}
+      if(col instanceof OmniCollection.OfChar){return ((OmniCollection.OfChar)col).add((char)(2));}
+      if(col instanceof OmniCollection.OfByte){return ((OmniCollection.OfByte)col).add((byte)(2));}
+      return ((OmniCollection.OfPrimitive)col).add((boolean)((2)==1));
     }
   },
-  Integerneg1(int.class,Integer.class){
+  Integerneg1(int.class,Integer.class,false){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((int)(-1));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((int)(-1));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((int)(-1));}
@@ -2062,93 +648,23 @@ public enum QueryTestPrimitiveInputType{
     @Override public int invokeObjectindexOf(OmniCollection col){return ((OmniList)col).indexOf((Object)(int)(-1));}
     @Override public int invokeObjectlastIndexOf(OmniCollection col){return ((OmniList)col).lastIndexOf((Object)(int)(-1));}
     @Override public int invokeObjectsearch(OmniCollection col){return ((OmniStack)col).search((Object)(int)(-1));}
-    public boolean addNotEqualsVal(OmniCollection col)
-    {
+    public boolean addNotEqualsVal(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(boolean)false);}
       return ((OmniCollection.OfPrimitive)col).add((boolean)false);
     }
-    public void insertNotEqualsValInList(int index,OmniCollection col)
-    {
-      ((OmniList.OfPrimitive)col).add(index,(boolean)false);
-    }
-    public boolean attemptAdd(OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      Class<?> clazz=col.getClass();
-      Method method;
-      try
-      {
-        //attempt to call with the primitive type
-        method=clazz.getDeclaredMethod("add",primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          //if that fails, call with the boxed type
-          method=clazz.getDeclaredMethod("add",boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            //if all else fails, call with the object class
-            method=clazz.getDeclaredMethod("add",Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        return (boolean)method.invoke(col,-1); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-    }
-    public boolean attemptInsertionInList(int index,OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      OmniList list=(OmniList)col; //throw if not correct type
-      Class<?> clazz=list.getClass();
-      Method method;
-      try
-      {
-        method=clazz.getDeclaredMethod("add",int.class,primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          method=clazz.getDeclaredMethod("add",int.class,boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            method=clazz.getDeclaredMethod("add",int.class,Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        method.invoke(list,index,-1); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-      return true;
+    public boolean attemptAdd(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(int)(-1));}
+      if(col instanceof OmniCollection.OfDouble){return ((OmniCollection.OfDouble)col).add((double)(-1));}
+      if(col instanceof OmniCollection.OfFloat){return ((OmniCollection.OfFloat)col).add((float)(-1));}
+      if(col instanceof OmniCollection.OfLong){return ((OmniCollection.OfLong)col).add((long)(-1));}
+      if(col instanceof OmniCollection.OfInt){return ((OmniCollection.OfInt)col).add((int)(-1));}
+      if(col instanceof OmniCollection.OfShort){return ((OmniCollection.OfShort)col).add((short)(-1));}
+      if(col instanceof OmniCollection.OfChar){return ((OmniCollection.OfChar)col).add((char)(-1));}
+      if(col instanceof OmniCollection.OfByte){return ((OmniCollection.OfByte)col).add((byte)(-1));}
+      return ((OmniCollection.OfPrimitive)col).add((boolean)((-1)==1));
     }
   },
-  IntegerMAX_BYTE_PLUS1(int.class,Integer.class){
+  IntegerMAX_BYTE_PLUS1(int.class,Integer.class,false){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((int)(((int)Byte.MAX_VALUE)+1));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((int)(((int)Byte.MAX_VALUE)+1));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((int)(((int)Byte.MAX_VALUE)+1));}
@@ -2164,93 +680,23 @@ public enum QueryTestPrimitiveInputType{
     @Override public int invokeObjectindexOf(OmniCollection col){return ((OmniList)col).indexOf((Object)(int)(((int)Byte.MAX_VALUE)+1));}
     @Override public int invokeObjectlastIndexOf(OmniCollection col){return ((OmniList)col).lastIndexOf((Object)(int)(((int)Byte.MAX_VALUE)+1));}
     @Override public int invokeObjectsearch(OmniCollection col){return ((OmniStack)col).search((Object)(int)(((int)Byte.MAX_VALUE)+1));}
-    public boolean addNotEqualsVal(OmniCollection col)
-    {
+    public boolean addNotEqualsVal(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(boolean)false);}
       return ((OmniCollection.OfPrimitive)col).add((boolean)false);
     }
-    public void insertNotEqualsValInList(int index,OmniCollection col)
-    {
-      ((OmniList.OfPrimitive)col).add(index,(boolean)false);
-    }
-    public boolean attemptAdd(OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      Class<?> clazz=col.getClass();
-      Method method;
-      try
-      {
-        //attempt to call with the primitive type
-        method=clazz.getDeclaredMethod("add",primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          //if that fails, call with the boxed type
-          method=clazz.getDeclaredMethod("add",boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            //if all else fails, call with the object class
-            method=clazz.getDeclaredMethod("add",Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        return (boolean)method.invoke(col,((int)Byte.MAX_VALUE)+1); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-    }
-    public boolean attemptInsertionInList(int index,OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      OmniList list=(OmniList)col; //throw if not correct type
-      Class<?> clazz=list.getClass();
-      Method method;
-      try
-      {
-        method=clazz.getDeclaredMethod("add",int.class,primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          method=clazz.getDeclaredMethod("add",int.class,boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            method=clazz.getDeclaredMethod("add",int.class,Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        method.invoke(list,index,((int)Byte.MAX_VALUE)+1); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-      return true;
+    public boolean attemptAdd(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(int)(((int)Byte.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfDouble){return ((OmniCollection.OfDouble)col).add((double)(((int)Byte.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfFloat){return ((OmniCollection.OfFloat)col).add((float)(((int)Byte.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfLong){return ((OmniCollection.OfLong)col).add((long)(((int)Byte.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfInt){return ((OmniCollection.OfInt)col).add((int)(((int)Byte.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfShort){return ((OmniCollection.OfShort)col).add((short)(((int)Byte.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfChar){return ((OmniCollection.OfChar)col).add((char)(((int)Byte.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfByte){return ((OmniCollection.OfByte)col).add((byte)(((int)Byte.MAX_VALUE)+1));}
+      return ((OmniCollection.OfPrimitive)col).add((boolean)((((int)Byte.MAX_VALUE)+1)==1));
     }
   },
-  IntegerMIN_BYTE_MINUS1(int.class,Integer.class){
+  IntegerMIN_BYTE_MINUS1(int.class,Integer.class,false){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((int)(((int)Byte.MIN_VALUE)-1));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((int)(((int)Byte.MIN_VALUE)-1));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((int)(((int)Byte.MIN_VALUE)-1));}
@@ -2266,93 +712,23 @@ public enum QueryTestPrimitiveInputType{
     @Override public int invokeObjectindexOf(OmniCollection col){return ((OmniList)col).indexOf((Object)(int)(((int)Byte.MIN_VALUE)-1));}
     @Override public int invokeObjectlastIndexOf(OmniCollection col){return ((OmniList)col).lastIndexOf((Object)(int)(((int)Byte.MIN_VALUE)-1));}
     @Override public int invokeObjectsearch(OmniCollection col){return ((OmniStack)col).search((Object)(int)(((int)Byte.MIN_VALUE)-1));}
-    public boolean addNotEqualsVal(OmniCollection col)
-    {
+    public boolean addNotEqualsVal(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(boolean)false);}
       return ((OmniCollection.OfPrimitive)col).add((boolean)false);
     }
-    public void insertNotEqualsValInList(int index,OmniCollection col)
-    {
-      ((OmniList.OfPrimitive)col).add(index,(boolean)false);
-    }
-    public boolean attemptAdd(OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      Class<?> clazz=col.getClass();
-      Method method;
-      try
-      {
-        //attempt to call with the primitive type
-        method=clazz.getDeclaredMethod("add",primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          //if that fails, call with the boxed type
-          method=clazz.getDeclaredMethod("add",boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            //if all else fails, call with the object class
-            method=clazz.getDeclaredMethod("add",Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        return (boolean)method.invoke(col,((int)Byte.MIN_VALUE)-1); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-    }
-    public boolean attemptInsertionInList(int index,OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      OmniList list=(OmniList)col; //throw if not correct type
-      Class<?> clazz=list.getClass();
-      Method method;
-      try
-      {
-        method=clazz.getDeclaredMethod("add",int.class,primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          method=clazz.getDeclaredMethod("add",int.class,boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            method=clazz.getDeclaredMethod("add",int.class,Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        method.invoke(list,index,((int)Byte.MIN_VALUE)-1); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-      return true;
+    public boolean attemptAdd(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(int)(((int)Byte.MIN_VALUE)-1));}
+      if(col instanceof OmniCollection.OfDouble){return ((OmniCollection.OfDouble)col).add((double)(((int)Byte.MIN_VALUE)-1));}
+      if(col instanceof OmniCollection.OfFloat){return ((OmniCollection.OfFloat)col).add((float)(((int)Byte.MIN_VALUE)-1));}
+      if(col instanceof OmniCollection.OfLong){return ((OmniCollection.OfLong)col).add((long)(((int)Byte.MIN_VALUE)-1));}
+      if(col instanceof OmniCollection.OfInt){return ((OmniCollection.OfInt)col).add((int)(((int)Byte.MIN_VALUE)-1));}
+      if(col instanceof OmniCollection.OfShort){return ((OmniCollection.OfShort)col).add((short)(((int)Byte.MIN_VALUE)-1));}
+      if(col instanceof OmniCollection.OfChar){return ((OmniCollection.OfChar)col).add((char)(((int)Byte.MIN_VALUE)-1));}
+      if(col instanceof OmniCollection.OfByte){return ((OmniCollection.OfByte)col).add((byte)(((int)Byte.MIN_VALUE)-1));}
+      return ((OmniCollection.OfPrimitive)col).add((boolean)((((int)Byte.MIN_VALUE)-1)==1));
     }
   },
-  IntegerMAX_SHORT_PLUS1(int.class,Integer.class){
+  IntegerMAX_SHORT_PLUS1(int.class,Integer.class,false){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((int)(((int)Short.MAX_VALUE)+1));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((int)(((int)Short.MAX_VALUE)+1));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((int)(((int)Short.MAX_VALUE)+1));}
@@ -2368,93 +744,23 @@ public enum QueryTestPrimitiveInputType{
     @Override public int invokeObjectindexOf(OmniCollection col){return ((OmniList)col).indexOf((Object)(int)(((int)Short.MAX_VALUE)+1));}
     @Override public int invokeObjectlastIndexOf(OmniCollection col){return ((OmniList)col).lastIndexOf((Object)(int)(((int)Short.MAX_VALUE)+1));}
     @Override public int invokeObjectsearch(OmniCollection col){return ((OmniStack)col).search((Object)(int)(((int)Short.MAX_VALUE)+1));}
-    public boolean addNotEqualsVal(OmniCollection col)
-    {
+    public boolean addNotEqualsVal(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(boolean)false);}
       return ((OmniCollection.OfPrimitive)col).add((boolean)false);
     }
-    public void insertNotEqualsValInList(int index,OmniCollection col)
-    {
-      ((OmniList.OfPrimitive)col).add(index,(boolean)false);
-    }
-    public boolean attemptAdd(OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      Class<?> clazz=col.getClass();
-      Method method;
-      try
-      {
-        //attempt to call with the primitive type
-        method=clazz.getDeclaredMethod("add",primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          //if that fails, call with the boxed type
-          method=clazz.getDeclaredMethod("add",boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            //if all else fails, call with the object class
-            method=clazz.getDeclaredMethod("add",Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        return (boolean)method.invoke(col,((int)Short.MAX_VALUE)+1); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-    }
-    public boolean attemptInsertionInList(int index,OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      OmniList list=(OmniList)col; //throw if not correct type
-      Class<?> clazz=list.getClass();
-      Method method;
-      try
-      {
-        method=clazz.getDeclaredMethod("add",int.class,primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          method=clazz.getDeclaredMethod("add",int.class,boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            method=clazz.getDeclaredMethod("add",int.class,Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        method.invoke(list,index,((int)Short.MAX_VALUE)+1); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-      return true;
+    public boolean attemptAdd(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(int)(((int)Short.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfDouble){return ((OmniCollection.OfDouble)col).add((double)(((int)Short.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfFloat){return ((OmniCollection.OfFloat)col).add((float)(((int)Short.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfLong){return ((OmniCollection.OfLong)col).add((long)(((int)Short.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfInt){return ((OmniCollection.OfInt)col).add((int)(((int)Short.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfShort){return ((OmniCollection.OfShort)col).add((short)(((int)Short.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfChar){return ((OmniCollection.OfChar)col).add((char)(((int)Short.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfByte){return ((OmniCollection.OfByte)col).add((byte)(((int)Short.MAX_VALUE)+1));}
+      return ((OmniCollection.OfPrimitive)col).add((boolean)((((int)Short.MAX_VALUE)+1)==1));
     }
   },
-  IntegerMIN_SHORT_MINUS1(int.class,Integer.class){
+  IntegerMIN_SHORT_MINUS1(int.class,Integer.class,false){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((int)(((int)Short.MIN_VALUE)-1));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((int)(((int)Short.MIN_VALUE)-1));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((int)(((int)Short.MIN_VALUE)-1));}
@@ -2470,93 +776,23 @@ public enum QueryTestPrimitiveInputType{
     @Override public int invokeObjectindexOf(OmniCollection col){return ((OmniList)col).indexOf((Object)(int)(((int)Short.MIN_VALUE)-1));}
     @Override public int invokeObjectlastIndexOf(OmniCollection col){return ((OmniList)col).lastIndexOf((Object)(int)(((int)Short.MIN_VALUE)-1));}
     @Override public int invokeObjectsearch(OmniCollection col){return ((OmniStack)col).search((Object)(int)(((int)Short.MIN_VALUE)-1));}
-    public boolean addNotEqualsVal(OmniCollection col)
-    {
+    public boolean addNotEqualsVal(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(boolean)false);}
       return ((OmniCollection.OfPrimitive)col).add((boolean)false);
     }
-    public void insertNotEqualsValInList(int index,OmniCollection col)
-    {
-      ((OmniList.OfPrimitive)col).add(index,(boolean)false);
-    }
-    public boolean attemptAdd(OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      Class<?> clazz=col.getClass();
-      Method method;
-      try
-      {
-        //attempt to call with the primitive type
-        method=clazz.getDeclaredMethod("add",primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          //if that fails, call with the boxed type
-          method=clazz.getDeclaredMethod("add",boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            //if all else fails, call with the object class
-            method=clazz.getDeclaredMethod("add",Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        return (boolean)method.invoke(col,((int)Short.MIN_VALUE)-1); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-    }
-    public boolean attemptInsertionInList(int index,OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      OmniList list=(OmniList)col; //throw if not correct type
-      Class<?> clazz=list.getClass();
-      Method method;
-      try
-      {
-        method=clazz.getDeclaredMethod("add",int.class,primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          method=clazz.getDeclaredMethod("add",int.class,boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            method=clazz.getDeclaredMethod("add",int.class,Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        method.invoke(list,index,((int)Short.MIN_VALUE)-1); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-      return true;
+    public boolean attemptAdd(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(int)(((int)Short.MIN_VALUE)-1));}
+      if(col instanceof OmniCollection.OfDouble){return ((OmniCollection.OfDouble)col).add((double)(((int)Short.MIN_VALUE)-1));}
+      if(col instanceof OmniCollection.OfFloat){return ((OmniCollection.OfFloat)col).add((float)(((int)Short.MIN_VALUE)-1));}
+      if(col instanceof OmniCollection.OfLong){return ((OmniCollection.OfLong)col).add((long)(((int)Short.MIN_VALUE)-1));}
+      if(col instanceof OmniCollection.OfInt){return ((OmniCollection.OfInt)col).add((int)(((int)Short.MIN_VALUE)-1));}
+      if(col instanceof OmniCollection.OfShort){return ((OmniCollection.OfShort)col).add((short)(((int)Short.MIN_VALUE)-1));}
+      if(col instanceof OmniCollection.OfChar){return ((OmniCollection.OfChar)col).add((char)(((int)Short.MIN_VALUE)-1));}
+      if(col instanceof OmniCollection.OfByte){return ((OmniCollection.OfByte)col).add((byte)(((int)Short.MIN_VALUE)-1));}
+      return ((OmniCollection.OfPrimitive)col).add((boolean)((((int)Short.MIN_VALUE)-1)==1));
     }
   },
-  IntegerMAX_CHAR_PLUS1(int.class,Integer.class){
+  IntegerMAX_CHAR_PLUS1(int.class,Integer.class,false){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((int)(((int)Character.MAX_VALUE)+1));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((int)(((int)Character.MAX_VALUE)+1));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((int)(((int)Character.MAX_VALUE)+1));}
@@ -2572,93 +808,23 @@ public enum QueryTestPrimitiveInputType{
     @Override public int invokeObjectindexOf(OmniCollection col){return ((OmniList)col).indexOf((Object)(int)(((int)Character.MAX_VALUE)+1));}
     @Override public int invokeObjectlastIndexOf(OmniCollection col){return ((OmniList)col).lastIndexOf((Object)(int)(((int)Character.MAX_VALUE)+1));}
     @Override public int invokeObjectsearch(OmniCollection col){return ((OmniStack)col).search((Object)(int)(((int)Character.MAX_VALUE)+1));}
-    public boolean addNotEqualsVal(OmniCollection col)
-    {
+    public boolean addNotEqualsVal(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(boolean)false);}
       return ((OmniCollection.OfPrimitive)col).add((boolean)false);
     }
-    public void insertNotEqualsValInList(int index,OmniCollection col)
-    {
-      ((OmniList.OfPrimitive)col).add(index,(boolean)false);
-    }
-    public boolean attemptAdd(OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      Class<?> clazz=col.getClass();
-      Method method;
-      try
-      {
-        //attempt to call with the primitive type
-        method=clazz.getDeclaredMethod("add",primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          //if that fails, call with the boxed type
-          method=clazz.getDeclaredMethod("add",boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            //if all else fails, call with the object class
-            method=clazz.getDeclaredMethod("add",Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        return (boolean)method.invoke(col,((int)Character.MAX_VALUE)+1); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-    }
-    public boolean attemptInsertionInList(int index,OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      OmniList list=(OmniList)col; //throw if not correct type
-      Class<?> clazz=list.getClass();
-      Method method;
-      try
-      {
-        method=clazz.getDeclaredMethod("add",int.class,primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          method=clazz.getDeclaredMethod("add",int.class,boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            method=clazz.getDeclaredMethod("add",int.class,Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        method.invoke(list,index,((int)Character.MAX_VALUE)+1); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-      return true;
+    public boolean attemptAdd(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(int)(((int)Character.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfDouble){return ((OmniCollection.OfDouble)col).add((double)(((int)Character.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfFloat){return ((OmniCollection.OfFloat)col).add((float)(((int)Character.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfLong){return ((OmniCollection.OfLong)col).add((long)(((int)Character.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfInt){return ((OmniCollection.OfInt)col).add((int)(((int)Character.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfShort){return ((OmniCollection.OfShort)col).add((short)(((int)Character.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfChar){return ((OmniCollection.OfChar)col).add((char)(((int)Character.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfByte){return ((OmniCollection.OfByte)col).add((byte)(((int)Character.MAX_VALUE)+1));}
+      return ((OmniCollection.OfPrimitive)col).add((boolean)((((int)Character.MAX_VALUE)+1)==1));
     }
   },
-  IntegerMAX_SAFE_INT_PLUS1(int.class,Integer.class){
+  IntegerMAX_SAFE_INT_PLUS1(int.class,Integer.class,false){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((int)(TypeUtil.MAX_SAFE_INT+1));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((int)(TypeUtil.MAX_SAFE_INT+1));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((int)(TypeUtil.MAX_SAFE_INT+1));}
@@ -2674,93 +840,23 @@ public enum QueryTestPrimitiveInputType{
     @Override public int invokeObjectindexOf(OmniCollection col){return ((OmniList)col).indexOf((Object)(int)(TypeUtil.MAX_SAFE_INT+1));}
     @Override public int invokeObjectlastIndexOf(OmniCollection col){return ((OmniList)col).lastIndexOf((Object)(int)(TypeUtil.MAX_SAFE_INT+1));}
     @Override public int invokeObjectsearch(OmniCollection col){return ((OmniStack)col).search((Object)(int)(TypeUtil.MAX_SAFE_INT+1));}
-    public boolean addNotEqualsVal(OmniCollection col)
-    {
+    public boolean addNotEqualsVal(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(boolean)false);}
       return ((OmniCollection.OfPrimitive)col).add((boolean)false);
     }
-    public void insertNotEqualsValInList(int index,OmniCollection col)
-    {
-      ((OmniList.OfPrimitive)col).add(index,(boolean)false);
-    }
-    public boolean attemptAdd(OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      Class<?> clazz=col.getClass();
-      Method method;
-      try
-      {
-        //attempt to call with the primitive type
-        method=clazz.getDeclaredMethod("add",primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          //if that fails, call with the boxed type
-          method=clazz.getDeclaredMethod("add",boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            //if all else fails, call with the object class
-            method=clazz.getDeclaredMethod("add",Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        return (boolean)method.invoke(col,TypeUtil.MAX_SAFE_INT+1); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-    }
-    public boolean attemptInsertionInList(int index,OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      OmniList list=(OmniList)col; //throw if not correct type
-      Class<?> clazz=list.getClass();
-      Method method;
-      try
-      {
-        method=clazz.getDeclaredMethod("add",int.class,primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          method=clazz.getDeclaredMethod("add",int.class,boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            method=clazz.getDeclaredMethod("add",int.class,Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        method.invoke(list,index,TypeUtil.MAX_SAFE_INT+1); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-      return true;
+    public boolean attemptAdd(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(int)(TypeUtil.MAX_SAFE_INT+1));}
+      if(col instanceof OmniCollection.OfDouble){return ((OmniCollection.OfDouble)col).add((double)(TypeUtil.MAX_SAFE_INT+1));}
+      if(col instanceof OmniCollection.OfFloat){return ((OmniCollection.OfFloat)col).add((float)(TypeUtil.MAX_SAFE_INT+1));}
+      if(col instanceof OmniCollection.OfLong){return ((OmniCollection.OfLong)col).add((long)(TypeUtil.MAX_SAFE_INT+1));}
+      if(col instanceof OmniCollection.OfInt){return ((OmniCollection.OfInt)col).add((int)(TypeUtil.MAX_SAFE_INT+1));}
+      if(col instanceof OmniCollection.OfShort){return ((OmniCollection.OfShort)col).add((short)(TypeUtil.MAX_SAFE_INT+1));}
+      if(col instanceof OmniCollection.OfChar){return ((OmniCollection.OfChar)col).add((char)(TypeUtil.MAX_SAFE_INT+1));}
+      if(col instanceof OmniCollection.OfByte){return ((OmniCollection.OfByte)col).add((byte)(TypeUtil.MAX_SAFE_INT+1));}
+      return ((OmniCollection.OfPrimitive)col).add((boolean)((TypeUtil.MAX_SAFE_INT+1)==1));
     }
   },
-  IntegerMIN_SAFE_INT_MINUS1(int.class,Integer.class){
+  IntegerMIN_SAFE_INT_MINUS1(int.class,Integer.class,false){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((int)(TypeUtil.MIN_SAFE_INT-1));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((int)(TypeUtil.MIN_SAFE_INT-1));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((int)(TypeUtil.MIN_SAFE_INT-1));}
@@ -2776,93 +872,23 @@ public enum QueryTestPrimitiveInputType{
     @Override public int invokeObjectindexOf(OmniCollection col){return ((OmniList)col).indexOf((Object)(int)(TypeUtil.MIN_SAFE_INT-1));}
     @Override public int invokeObjectlastIndexOf(OmniCollection col){return ((OmniList)col).lastIndexOf((Object)(int)(TypeUtil.MIN_SAFE_INT-1));}
     @Override public int invokeObjectsearch(OmniCollection col){return ((OmniStack)col).search((Object)(int)(TypeUtil.MIN_SAFE_INT-1));}
-    public boolean addNotEqualsVal(OmniCollection col)
-    {
+    public boolean addNotEqualsVal(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(boolean)false);}
       return ((OmniCollection.OfPrimitive)col).add((boolean)false);
     }
-    public void insertNotEqualsValInList(int index,OmniCollection col)
-    {
-      ((OmniList.OfPrimitive)col).add(index,(boolean)false);
-    }
-    public boolean attemptAdd(OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      Class<?> clazz=col.getClass();
-      Method method;
-      try
-      {
-        //attempt to call with the primitive type
-        method=clazz.getDeclaredMethod("add",primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          //if that fails, call with the boxed type
-          method=clazz.getDeclaredMethod("add",boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            //if all else fails, call with the object class
-            method=clazz.getDeclaredMethod("add",Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        return (boolean)method.invoke(col,TypeUtil.MIN_SAFE_INT-1); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-    }
-    public boolean attemptInsertionInList(int index,OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      OmniList list=(OmniList)col; //throw if not correct type
-      Class<?> clazz=list.getClass();
-      Method method;
-      try
-      {
-        method=clazz.getDeclaredMethod("add",int.class,primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          method=clazz.getDeclaredMethod("add",int.class,boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            method=clazz.getDeclaredMethod("add",int.class,Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        method.invoke(list,index,TypeUtil.MIN_SAFE_INT-1); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-      return true;
+    public boolean attemptAdd(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(int)(TypeUtil.MIN_SAFE_INT-1));}
+      if(col instanceof OmniCollection.OfDouble){return ((OmniCollection.OfDouble)col).add((double)(TypeUtil.MIN_SAFE_INT-1));}
+      if(col instanceof OmniCollection.OfFloat){return ((OmniCollection.OfFloat)col).add((float)(TypeUtil.MIN_SAFE_INT-1));}
+      if(col instanceof OmniCollection.OfLong){return ((OmniCollection.OfLong)col).add((long)(TypeUtil.MIN_SAFE_INT-1));}
+      if(col instanceof OmniCollection.OfInt){return ((OmniCollection.OfInt)col).add((int)(TypeUtil.MIN_SAFE_INT-1));}
+      if(col instanceof OmniCollection.OfShort){return ((OmniCollection.OfShort)col).add((short)(TypeUtil.MIN_SAFE_INT-1));}
+      if(col instanceof OmniCollection.OfChar){return ((OmniCollection.OfChar)col).add((char)(TypeUtil.MIN_SAFE_INT-1));}
+      if(col instanceof OmniCollection.OfByte){return ((OmniCollection.OfByte)col).add((byte)(TypeUtil.MIN_SAFE_INT-1));}
+      return ((OmniCollection.OfPrimitive)col).add((boolean)((TypeUtil.MIN_SAFE_INT-1)==1));
     }
   },
-  Long0(long.class,Long.class){
+  Long0(long.class,Long.class,true){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((long)(0));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((long)(0));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((long)(0));}
@@ -2878,93 +904,23 @@ public enum QueryTestPrimitiveInputType{
     @Override public int invokeObjectindexOf(OmniCollection col){return ((OmniList)col).indexOf((Object)(long)(0));}
     @Override public int invokeObjectlastIndexOf(OmniCollection col){return ((OmniList)col).lastIndexOf((Object)(long)(0));}
     @Override public int invokeObjectsearch(OmniCollection col){return ((OmniStack)col).search((Object)(long)(0));}
-    public boolean addNotEqualsVal(OmniCollection col)
-    {
+    public boolean addNotEqualsVal(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(boolean)true);}
       return ((OmniCollection.OfPrimitive)col).add((boolean)true);
     }
-    public void insertNotEqualsValInList(int index,OmniCollection col)
-    {
-      ((OmniList.OfPrimitive)col).add(index,(boolean)true);
-    }
-    public boolean attemptAdd(OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      Class<?> clazz=col.getClass();
-      Method method;
-      try
-      {
-        //attempt to call with the primitive type
-        method=clazz.getDeclaredMethod("add",primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          //if that fails, call with the boxed type
-          method=clazz.getDeclaredMethod("add",boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            //if all else fails, call with the object class
-            method=clazz.getDeclaredMethod("add",Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        return (boolean)method.invoke(col,0); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-    }
-    public boolean attemptInsertionInList(int index,OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      OmniList list=(OmniList)col; //throw if not correct type
-      Class<?> clazz=list.getClass();
-      Method method;
-      try
-      {
-        method=clazz.getDeclaredMethod("add",int.class,primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          method=clazz.getDeclaredMethod("add",int.class,boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            method=clazz.getDeclaredMethod("add",int.class,Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        method.invoke(list,index,0); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-      return true;
+    public boolean attemptAdd(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(long)(0));}
+      if(col instanceof OmniCollection.OfDouble){return ((OmniCollection.OfDouble)col).add((double)(0));}
+      if(col instanceof OmniCollection.OfFloat){return ((OmniCollection.OfFloat)col).add((float)(0));}
+      if(col instanceof OmniCollection.OfLong){return ((OmniCollection.OfLong)col).add((long)(0));}
+      if(col instanceof OmniCollection.OfInt){return ((OmniCollection.OfInt)col).add((int)(0));}
+      if(col instanceof OmniCollection.OfShort){return ((OmniCollection.OfShort)col).add((short)(0));}
+      if(col instanceof OmniCollection.OfChar){return ((OmniCollection.OfChar)col).add((char)(0));}
+      if(col instanceof OmniCollection.OfByte){return ((OmniCollection.OfByte)col).add((byte)(0));}
+      return ((OmniCollection.OfPrimitive)col).add((boolean)((0)==1));
     }
   },
-  Longpos1(long.class,Long.class){
+  Longpos1(long.class,Long.class,false){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((long)(1));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((long)(1));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((long)(1));}
@@ -2980,93 +936,23 @@ public enum QueryTestPrimitiveInputType{
     @Override public int invokeObjectindexOf(OmniCollection col){return ((OmniList)col).indexOf((Object)(long)(1));}
     @Override public int invokeObjectlastIndexOf(OmniCollection col){return ((OmniList)col).lastIndexOf((Object)(long)(1));}
     @Override public int invokeObjectsearch(OmniCollection col){return ((OmniStack)col).search((Object)(long)(1));}
-    public boolean addNotEqualsVal(OmniCollection col)
-    {
+    public boolean addNotEqualsVal(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(boolean)false);}
       return ((OmniCollection.OfPrimitive)col).add((boolean)false);
     }
-    public void insertNotEqualsValInList(int index,OmniCollection col)
-    {
-      ((OmniList.OfPrimitive)col).add(index,(boolean)false);
-    }
-    public boolean attemptAdd(OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      Class<?> clazz=col.getClass();
-      Method method;
-      try
-      {
-        //attempt to call with the primitive type
-        method=clazz.getDeclaredMethod("add",primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          //if that fails, call with the boxed type
-          method=clazz.getDeclaredMethod("add",boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            //if all else fails, call with the object class
-            method=clazz.getDeclaredMethod("add",Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        return (boolean)method.invoke(col,1); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-    }
-    public boolean attemptInsertionInList(int index,OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      OmniList list=(OmniList)col; //throw if not correct type
-      Class<?> clazz=list.getClass();
-      Method method;
-      try
-      {
-        method=clazz.getDeclaredMethod("add",int.class,primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          method=clazz.getDeclaredMethod("add",int.class,boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            method=clazz.getDeclaredMethod("add",int.class,Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        method.invoke(list,index,1); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-      return true;
+    public boolean attemptAdd(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(long)(1));}
+      if(col instanceof OmniCollection.OfDouble){return ((OmniCollection.OfDouble)col).add((double)(1));}
+      if(col instanceof OmniCollection.OfFloat){return ((OmniCollection.OfFloat)col).add((float)(1));}
+      if(col instanceof OmniCollection.OfLong){return ((OmniCollection.OfLong)col).add((long)(1));}
+      if(col instanceof OmniCollection.OfInt){return ((OmniCollection.OfInt)col).add((int)(1));}
+      if(col instanceof OmniCollection.OfShort){return ((OmniCollection.OfShort)col).add((short)(1));}
+      if(col instanceof OmniCollection.OfChar){return ((OmniCollection.OfChar)col).add((char)(1));}
+      if(col instanceof OmniCollection.OfByte){return ((OmniCollection.OfByte)col).add((byte)(1));}
+      return ((OmniCollection.OfPrimitive)col).add((boolean)((1)==1));
     }
   },
-  Longpos2(long.class,Long.class){
+  Longpos2(long.class,Long.class,false){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((long)(2));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((long)(2));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((long)(2));}
@@ -3082,93 +968,23 @@ public enum QueryTestPrimitiveInputType{
     @Override public int invokeObjectindexOf(OmniCollection col){return ((OmniList)col).indexOf((Object)(long)(2));}
     @Override public int invokeObjectlastIndexOf(OmniCollection col){return ((OmniList)col).lastIndexOf((Object)(long)(2));}
     @Override public int invokeObjectsearch(OmniCollection col){return ((OmniStack)col).search((Object)(long)(2));}
-    public boolean addNotEqualsVal(OmniCollection col)
-    {
+    public boolean addNotEqualsVal(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(boolean)false);}
       return ((OmniCollection.OfPrimitive)col).add((boolean)false);
     }
-    public void insertNotEqualsValInList(int index,OmniCollection col)
-    {
-      ((OmniList.OfPrimitive)col).add(index,(boolean)false);
-    }
-    public boolean attemptAdd(OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      Class<?> clazz=col.getClass();
-      Method method;
-      try
-      {
-        //attempt to call with the primitive type
-        method=clazz.getDeclaredMethod("add",primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          //if that fails, call with the boxed type
-          method=clazz.getDeclaredMethod("add",boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            //if all else fails, call with the object class
-            method=clazz.getDeclaredMethod("add",Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        return (boolean)method.invoke(col,2); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-    }
-    public boolean attemptInsertionInList(int index,OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      OmniList list=(OmniList)col; //throw if not correct type
-      Class<?> clazz=list.getClass();
-      Method method;
-      try
-      {
-        method=clazz.getDeclaredMethod("add",int.class,primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          method=clazz.getDeclaredMethod("add",int.class,boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            method=clazz.getDeclaredMethod("add",int.class,Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        method.invoke(list,index,2); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-      return true;
+    public boolean attemptAdd(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(long)(2));}
+      if(col instanceof OmniCollection.OfDouble){return ((OmniCollection.OfDouble)col).add((double)(2));}
+      if(col instanceof OmniCollection.OfFloat){return ((OmniCollection.OfFloat)col).add((float)(2));}
+      if(col instanceof OmniCollection.OfLong){return ((OmniCollection.OfLong)col).add((long)(2));}
+      if(col instanceof OmniCollection.OfInt){return ((OmniCollection.OfInt)col).add((int)(2));}
+      if(col instanceof OmniCollection.OfShort){return ((OmniCollection.OfShort)col).add((short)(2));}
+      if(col instanceof OmniCollection.OfChar){return ((OmniCollection.OfChar)col).add((char)(2));}
+      if(col instanceof OmniCollection.OfByte){return ((OmniCollection.OfByte)col).add((byte)(2));}
+      return ((OmniCollection.OfPrimitive)col).add((boolean)((2)==1));
     }
   },
-  Longneg1(long.class,Long.class){
+  Longneg1(long.class,Long.class,false){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((long)(-1));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((long)(-1));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((long)(-1));}
@@ -3184,93 +1000,23 @@ public enum QueryTestPrimitiveInputType{
     @Override public int invokeObjectindexOf(OmniCollection col){return ((OmniList)col).indexOf((Object)(long)(-1));}
     @Override public int invokeObjectlastIndexOf(OmniCollection col){return ((OmniList)col).lastIndexOf((Object)(long)(-1));}
     @Override public int invokeObjectsearch(OmniCollection col){return ((OmniStack)col).search((Object)(long)(-1));}
-    public boolean addNotEqualsVal(OmniCollection col)
-    {
+    public boolean addNotEqualsVal(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(boolean)false);}
       return ((OmniCollection.OfPrimitive)col).add((boolean)false);
     }
-    public void insertNotEqualsValInList(int index,OmniCollection col)
-    {
-      ((OmniList.OfPrimitive)col).add(index,(boolean)false);
-    }
-    public boolean attemptAdd(OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      Class<?> clazz=col.getClass();
-      Method method;
-      try
-      {
-        //attempt to call with the primitive type
-        method=clazz.getDeclaredMethod("add",primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          //if that fails, call with the boxed type
-          method=clazz.getDeclaredMethod("add",boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            //if all else fails, call with the object class
-            method=clazz.getDeclaredMethod("add",Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        return (boolean)method.invoke(col,-1); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-    }
-    public boolean attemptInsertionInList(int index,OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      OmniList list=(OmniList)col; //throw if not correct type
-      Class<?> clazz=list.getClass();
-      Method method;
-      try
-      {
-        method=clazz.getDeclaredMethod("add",int.class,primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          method=clazz.getDeclaredMethod("add",int.class,boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            method=clazz.getDeclaredMethod("add",int.class,Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        method.invoke(list,index,-1); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-      return true;
+    public boolean attemptAdd(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(long)(-1));}
+      if(col instanceof OmniCollection.OfDouble){return ((OmniCollection.OfDouble)col).add((double)(-1));}
+      if(col instanceof OmniCollection.OfFloat){return ((OmniCollection.OfFloat)col).add((float)(-1));}
+      if(col instanceof OmniCollection.OfLong){return ((OmniCollection.OfLong)col).add((long)(-1));}
+      if(col instanceof OmniCollection.OfInt){return ((OmniCollection.OfInt)col).add((int)(-1));}
+      if(col instanceof OmniCollection.OfShort){return ((OmniCollection.OfShort)col).add((short)(-1));}
+      if(col instanceof OmniCollection.OfChar){return ((OmniCollection.OfChar)col).add((char)(-1));}
+      if(col instanceof OmniCollection.OfByte){return ((OmniCollection.OfByte)col).add((byte)(-1));}
+      return ((OmniCollection.OfPrimitive)col).add((boolean)((-1)==1));
     }
   },
-  LongMAX_BYTE_PLUS1(long.class,Long.class){
+  LongMAX_BYTE_PLUS1(long.class,Long.class,false){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((long)(((long)Byte.MAX_VALUE)+1));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((long)(((long)Byte.MAX_VALUE)+1));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((long)(((long)Byte.MAX_VALUE)+1));}
@@ -3286,93 +1032,23 @@ public enum QueryTestPrimitiveInputType{
     @Override public int invokeObjectindexOf(OmniCollection col){return ((OmniList)col).indexOf((Object)(long)(((long)Byte.MAX_VALUE)+1));}
     @Override public int invokeObjectlastIndexOf(OmniCollection col){return ((OmniList)col).lastIndexOf((Object)(long)(((long)Byte.MAX_VALUE)+1));}
     @Override public int invokeObjectsearch(OmniCollection col){return ((OmniStack)col).search((Object)(long)(((long)Byte.MAX_VALUE)+1));}
-    public boolean addNotEqualsVal(OmniCollection col)
-    {
+    public boolean addNotEqualsVal(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(boolean)false);}
       return ((OmniCollection.OfPrimitive)col).add((boolean)false);
     }
-    public void insertNotEqualsValInList(int index,OmniCollection col)
-    {
-      ((OmniList.OfPrimitive)col).add(index,(boolean)false);
-    }
-    public boolean attemptAdd(OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      Class<?> clazz=col.getClass();
-      Method method;
-      try
-      {
-        //attempt to call with the primitive type
-        method=clazz.getDeclaredMethod("add",primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          //if that fails, call with the boxed type
-          method=clazz.getDeclaredMethod("add",boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            //if all else fails, call with the object class
-            method=clazz.getDeclaredMethod("add",Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        return (boolean)method.invoke(col,((long)Byte.MAX_VALUE)+1); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-    }
-    public boolean attemptInsertionInList(int index,OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      OmniList list=(OmniList)col; //throw if not correct type
-      Class<?> clazz=list.getClass();
-      Method method;
-      try
-      {
-        method=clazz.getDeclaredMethod("add",int.class,primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          method=clazz.getDeclaredMethod("add",int.class,boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            method=clazz.getDeclaredMethod("add",int.class,Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        method.invoke(list,index,((long)Byte.MAX_VALUE)+1); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-      return true;
+    public boolean attemptAdd(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(long)(((long)Byte.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfDouble){return ((OmniCollection.OfDouble)col).add((double)(((long)Byte.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfFloat){return ((OmniCollection.OfFloat)col).add((float)(((long)Byte.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfLong){return ((OmniCollection.OfLong)col).add((long)(((long)Byte.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfInt){return ((OmniCollection.OfInt)col).add((int)(((long)Byte.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfShort){return ((OmniCollection.OfShort)col).add((short)(((long)Byte.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfChar){return ((OmniCollection.OfChar)col).add((char)(((long)Byte.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfByte){return ((OmniCollection.OfByte)col).add((byte)(((long)Byte.MAX_VALUE)+1));}
+      return ((OmniCollection.OfPrimitive)col).add((boolean)((((long)Byte.MAX_VALUE)+1)==1));
     }
   },
-  LongMIN_BYTE_MINUS1(long.class,Long.class){
+  LongMIN_BYTE_MINUS1(long.class,Long.class,false){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((long)(((long)Byte.MIN_VALUE)-1));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((long)(((long)Byte.MIN_VALUE)-1));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((long)(((long)Byte.MIN_VALUE)-1));}
@@ -3388,93 +1064,23 @@ public enum QueryTestPrimitiveInputType{
     @Override public int invokeObjectindexOf(OmniCollection col){return ((OmniList)col).indexOf((Object)(long)(((long)Byte.MIN_VALUE)-1));}
     @Override public int invokeObjectlastIndexOf(OmniCollection col){return ((OmniList)col).lastIndexOf((Object)(long)(((long)Byte.MIN_VALUE)-1));}
     @Override public int invokeObjectsearch(OmniCollection col){return ((OmniStack)col).search((Object)(long)(((long)Byte.MIN_VALUE)-1));}
-    public boolean addNotEqualsVal(OmniCollection col)
-    {
+    public boolean addNotEqualsVal(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(boolean)false);}
       return ((OmniCollection.OfPrimitive)col).add((boolean)false);
     }
-    public void insertNotEqualsValInList(int index,OmniCollection col)
-    {
-      ((OmniList.OfPrimitive)col).add(index,(boolean)false);
-    }
-    public boolean attemptAdd(OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      Class<?> clazz=col.getClass();
-      Method method;
-      try
-      {
-        //attempt to call with the primitive type
-        method=clazz.getDeclaredMethod("add",primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          //if that fails, call with the boxed type
-          method=clazz.getDeclaredMethod("add",boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            //if all else fails, call with the object class
-            method=clazz.getDeclaredMethod("add",Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        return (boolean)method.invoke(col,((long)Byte.MIN_VALUE)-1); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-    }
-    public boolean attemptInsertionInList(int index,OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      OmniList list=(OmniList)col; //throw if not correct type
-      Class<?> clazz=list.getClass();
-      Method method;
-      try
-      {
-        method=clazz.getDeclaredMethod("add",int.class,primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          method=clazz.getDeclaredMethod("add",int.class,boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            method=clazz.getDeclaredMethod("add",int.class,Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        method.invoke(list,index,((long)Byte.MIN_VALUE)-1); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-      return true;
+    public boolean attemptAdd(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(long)(((long)Byte.MIN_VALUE)-1));}
+      if(col instanceof OmniCollection.OfDouble){return ((OmniCollection.OfDouble)col).add((double)(((long)Byte.MIN_VALUE)-1));}
+      if(col instanceof OmniCollection.OfFloat){return ((OmniCollection.OfFloat)col).add((float)(((long)Byte.MIN_VALUE)-1));}
+      if(col instanceof OmniCollection.OfLong){return ((OmniCollection.OfLong)col).add((long)(((long)Byte.MIN_VALUE)-1));}
+      if(col instanceof OmniCollection.OfInt){return ((OmniCollection.OfInt)col).add((int)(((long)Byte.MIN_VALUE)-1));}
+      if(col instanceof OmniCollection.OfShort){return ((OmniCollection.OfShort)col).add((short)(((long)Byte.MIN_VALUE)-1));}
+      if(col instanceof OmniCollection.OfChar){return ((OmniCollection.OfChar)col).add((char)(((long)Byte.MIN_VALUE)-1));}
+      if(col instanceof OmniCollection.OfByte){return ((OmniCollection.OfByte)col).add((byte)(((long)Byte.MIN_VALUE)-1));}
+      return ((OmniCollection.OfPrimitive)col).add((boolean)((((long)Byte.MIN_VALUE)-1)==1));
     }
   },
-  LongMAX_SHORT_PLUS1(long.class,Long.class){
+  LongMAX_SHORT_PLUS1(long.class,Long.class,false){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((long)(((long)Short.MAX_VALUE)+1));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((long)(((long)Short.MAX_VALUE)+1));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((long)(((long)Short.MAX_VALUE)+1));}
@@ -3490,93 +1096,23 @@ public enum QueryTestPrimitiveInputType{
     @Override public int invokeObjectindexOf(OmniCollection col){return ((OmniList)col).indexOf((Object)(long)(((long)Short.MAX_VALUE)+1));}
     @Override public int invokeObjectlastIndexOf(OmniCollection col){return ((OmniList)col).lastIndexOf((Object)(long)(((long)Short.MAX_VALUE)+1));}
     @Override public int invokeObjectsearch(OmniCollection col){return ((OmniStack)col).search((Object)(long)(((long)Short.MAX_VALUE)+1));}
-    public boolean addNotEqualsVal(OmniCollection col)
-    {
+    public boolean addNotEqualsVal(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(boolean)false);}
       return ((OmniCollection.OfPrimitive)col).add((boolean)false);
     }
-    public void insertNotEqualsValInList(int index,OmniCollection col)
-    {
-      ((OmniList.OfPrimitive)col).add(index,(boolean)false);
-    }
-    public boolean attemptAdd(OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      Class<?> clazz=col.getClass();
-      Method method;
-      try
-      {
-        //attempt to call with the primitive type
-        method=clazz.getDeclaredMethod("add",primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          //if that fails, call with the boxed type
-          method=clazz.getDeclaredMethod("add",boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            //if all else fails, call with the object class
-            method=clazz.getDeclaredMethod("add",Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        return (boolean)method.invoke(col,((long)Short.MAX_VALUE)+1); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-    }
-    public boolean attemptInsertionInList(int index,OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      OmniList list=(OmniList)col; //throw if not correct type
-      Class<?> clazz=list.getClass();
-      Method method;
-      try
-      {
-        method=clazz.getDeclaredMethod("add",int.class,primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          method=clazz.getDeclaredMethod("add",int.class,boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            method=clazz.getDeclaredMethod("add",int.class,Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        method.invoke(list,index,((long)Short.MAX_VALUE)+1); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-      return true;
+    public boolean attemptAdd(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(long)(((long)Short.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfDouble){return ((OmniCollection.OfDouble)col).add((double)(((long)Short.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfFloat){return ((OmniCollection.OfFloat)col).add((float)(((long)Short.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfLong){return ((OmniCollection.OfLong)col).add((long)(((long)Short.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfInt){return ((OmniCollection.OfInt)col).add((int)(((long)Short.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfShort){return ((OmniCollection.OfShort)col).add((short)(((long)Short.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfChar){return ((OmniCollection.OfChar)col).add((char)(((long)Short.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfByte){return ((OmniCollection.OfByte)col).add((byte)(((long)Short.MAX_VALUE)+1));}
+      return ((OmniCollection.OfPrimitive)col).add((boolean)((((long)Short.MAX_VALUE)+1)==1));
     }
   },
-  LongMIN_SHORT_MINUS1(long.class,Long.class){
+  LongMIN_SHORT_MINUS1(long.class,Long.class,false){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((long)(((long)Short.MIN_VALUE)-1));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((long)(((long)Short.MIN_VALUE)-1));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((long)(((long)Short.MIN_VALUE)-1));}
@@ -3592,93 +1128,23 @@ public enum QueryTestPrimitiveInputType{
     @Override public int invokeObjectindexOf(OmniCollection col){return ((OmniList)col).indexOf((Object)(long)(((long)Short.MIN_VALUE)-1));}
     @Override public int invokeObjectlastIndexOf(OmniCollection col){return ((OmniList)col).lastIndexOf((Object)(long)(((long)Short.MIN_VALUE)-1));}
     @Override public int invokeObjectsearch(OmniCollection col){return ((OmniStack)col).search((Object)(long)(((long)Short.MIN_VALUE)-1));}
-    public boolean addNotEqualsVal(OmniCollection col)
-    {
+    public boolean addNotEqualsVal(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(boolean)false);}
       return ((OmniCollection.OfPrimitive)col).add((boolean)false);
     }
-    public void insertNotEqualsValInList(int index,OmniCollection col)
-    {
-      ((OmniList.OfPrimitive)col).add(index,(boolean)false);
-    }
-    public boolean attemptAdd(OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      Class<?> clazz=col.getClass();
-      Method method;
-      try
-      {
-        //attempt to call with the primitive type
-        method=clazz.getDeclaredMethod("add",primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          //if that fails, call with the boxed type
-          method=clazz.getDeclaredMethod("add",boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            //if all else fails, call with the object class
-            method=clazz.getDeclaredMethod("add",Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        return (boolean)method.invoke(col,((long)Short.MIN_VALUE)-1); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-    }
-    public boolean attemptInsertionInList(int index,OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      OmniList list=(OmniList)col; //throw if not correct type
-      Class<?> clazz=list.getClass();
-      Method method;
-      try
-      {
-        method=clazz.getDeclaredMethod("add",int.class,primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          method=clazz.getDeclaredMethod("add",int.class,boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            method=clazz.getDeclaredMethod("add",int.class,Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        method.invoke(list,index,((long)Short.MIN_VALUE)-1); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-      return true;
+    public boolean attemptAdd(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(long)(((long)Short.MIN_VALUE)-1));}
+      if(col instanceof OmniCollection.OfDouble){return ((OmniCollection.OfDouble)col).add((double)(((long)Short.MIN_VALUE)-1));}
+      if(col instanceof OmniCollection.OfFloat){return ((OmniCollection.OfFloat)col).add((float)(((long)Short.MIN_VALUE)-1));}
+      if(col instanceof OmniCollection.OfLong){return ((OmniCollection.OfLong)col).add((long)(((long)Short.MIN_VALUE)-1));}
+      if(col instanceof OmniCollection.OfInt){return ((OmniCollection.OfInt)col).add((int)(((long)Short.MIN_VALUE)-1));}
+      if(col instanceof OmniCollection.OfShort){return ((OmniCollection.OfShort)col).add((short)(((long)Short.MIN_VALUE)-1));}
+      if(col instanceof OmniCollection.OfChar){return ((OmniCollection.OfChar)col).add((char)(((long)Short.MIN_VALUE)-1));}
+      if(col instanceof OmniCollection.OfByte){return ((OmniCollection.OfByte)col).add((byte)(((long)Short.MIN_VALUE)-1));}
+      return ((OmniCollection.OfPrimitive)col).add((boolean)((((long)Short.MIN_VALUE)-1)==1));
     }
   },
-  LongMAX_CHAR_PLUS1(long.class,Long.class){
+  LongMAX_CHAR_PLUS1(long.class,Long.class,false){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((long)(((long)Character.MAX_VALUE)+1));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((long)(((long)Character.MAX_VALUE)+1));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((long)(((long)Character.MAX_VALUE)+1));}
@@ -3694,93 +1160,23 @@ public enum QueryTestPrimitiveInputType{
     @Override public int invokeObjectindexOf(OmniCollection col){return ((OmniList)col).indexOf((Object)(long)(((long)Character.MAX_VALUE)+1));}
     @Override public int invokeObjectlastIndexOf(OmniCollection col){return ((OmniList)col).lastIndexOf((Object)(long)(((long)Character.MAX_VALUE)+1));}
     @Override public int invokeObjectsearch(OmniCollection col){return ((OmniStack)col).search((Object)(long)(((long)Character.MAX_VALUE)+1));}
-    public boolean addNotEqualsVal(OmniCollection col)
-    {
+    public boolean addNotEqualsVal(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(boolean)false);}
       return ((OmniCollection.OfPrimitive)col).add((boolean)false);
     }
-    public void insertNotEqualsValInList(int index,OmniCollection col)
-    {
-      ((OmniList.OfPrimitive)col).add(index,(boolean)false);
-    }
-    public boolean attemptAdd(OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      Class<?> clazz=col.getClass();
-      Method method;
-      try
-      {
-        //attempt to call with the primitive type
-        method=clazz.getDeclaredMethod("add",primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          //if that fails, call with the boxed type
-          method=clazz.getDeclaredMethod("add",boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            //if all else fails, call with the object class
-            method=clazz.getDeclaredMethod("add",Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        return (boolean)method.invoke(col,((long)Character.MAX_VALUE)+1); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-    }
-    public boolean attemptInsertionInList(int index,OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      OmniList list=(OmniList)col; //throw if not correct type
-      Class<?> clazz=list.getClass();
-      Method method;
-      try
-      {
-        method=clazz.getDeclaredMethod("add",int.class,primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          method=clazz.getDeclaredMethod("add",int.class,boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            method=clazz.getDeclaredMethod("add",int.class,Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        method.invoke(list,index,((long)Character.MAX_VALUE)+1); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-      return true;
+    public boolean attemptAdd(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(long)(((long)Character.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfDouble){return ((OmniCollection.OfDouble)col).add((double)(((long)Character.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfFloat){return ((OmniCollection.OfFloat)col).add((float)(((long)Character.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfLong){return ((OmniCollection.OfLong)col).add((long)(((long)Character.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfInt){return ((OmniCollection.OfInt)col).add((int)(((long)Character.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfShort){return ((OmniCollection.OfShort)col).add((short)(((long)Character.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfChar){return ((OmniCollection.OfChar)col).add((char)(((long)Character.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfByte){return ((OmniCollection.OfByte)col).add((byte)(((long)Character.MAX_VALUE)+1));}
+      return ((OmniCollection.OfPrimitive)col).add((boolean)((((long)Character.MAX_VALUE)+1)==1));
     }
   },
-  LongMAX_SAFE_INT_PLUS1(long.class,Long.class){
+  LongMAX_SAFE_INT_PLUS1(long.class,Long.class,false){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((long)(((long)TypeUtil.MAX_SAFE_INT)+1));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((long)(((long)TypeUtil.MAX_SAFE_INT)+1));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((long)(((long)TypeUtil.MAX_SAFE_INT)+1));}
@@ -3796,93 +1192,23 @@ public enum QueryTestPrimitiveInputType{
     @Override public int invokeObjectindexOf(OmniCollection col){return ((OmniList)col).indexOf((Object)(long)(((long)TypeUtil.MAX_SAFE_INT)+1));}
     @Override public int invokeObjectlastIndexOf(OmniCollection col){return ((OmniList)col).lastIndexOf((Object)(long)(((long)TypeUtil.MAX_SAFE_INT)+1));}
     @Override public int invokeObjectsearch(OmniCollection col){return ((OmniStack)col).search((Object)(long)(((long)TypeUtil.MAX_SAFE_INT)+1));}
-    public boolean addNotEqualsVal(OmniCollection col)
-    {
+    public boolean addNotEqualsVal(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(boolean)false);}
       return ((OmniCollection.OfPrimitive)col).add((boolean)false);
     }
-    public void insertNotEqualsValInList(int index,OmniCollection col)
-    {
-      ((OmniList.OfPrimitive)col).add(index,(boolean)false);
-    }
-    public boolean attemptAdd(OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      Class<?> clazz=col.getClass();
-      Method method;
-      try
-      {
-        //attempt to call with the primitive type
-        method=clazz.getDeclaredMethod("add",primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          //if that fails, call with the boxed type
-          method=clazz.getDeclaredMethod("add",boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            //if all else fails, call with the object class
-            method=clazz.getDeclaredMethod("add",Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        return (boolean)method.invoke(col,((long)TypeUtil.MAX_SAFE_INT)+1); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-    }
-    public boolean attemptInsertionInList(int index,OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      OmniList list=(OmniList)col; //throw if not correct type
-      Class<?> clazz=list.getClass();
-      Method method;
-      try
-      {
-        method=clazz.getDeclaredMethod("add",int.class,primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          method=clazz.getDeclaredMethod("add",int.class,boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            method=clazz.getDeclaredMethod("add",int.class,Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        method.invoke(list,index,((long)TypeUtil.MAX_SAFE_INT)+1); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-      return true;
+    public boolean attemptAdd(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(long)(((long)TypeUtil.MAX_SAFE_INT)+1));}
+      if(col instanceof OmniCollection.OfDouble){return ((OmniCollection.OfDouble)col).add((double)(((long)TypeUtil.MAX_SAFE_INT)+1));}
+      if(col instanceof OmniCollection.OfFloat){return ((OmniCollection.OfFloat)col).add((float)(((long)TypeUtil.MAX_SAFE_INT)+1));}
+      if(col instanceof OmniCollection.OfLong){return ((OmniCollection.OfLong)col).add((long)(((long)TypeUtil.MAX_SAFE_INT)+1));}
+      if(col instanceof OmniCollection.OfInt){return ((OmniCollection.OfInt)col).add((int)(((long)TypeUtil.MAX_SAFE_INT)+1));}
+      if(col instanceof OmniCollection.OfShort){return ((OmniCollection.OfShort)col).add((short)(((long)TypeUtil.MAX_SAFE_INT)+1));}
+      if(col instanceof OmniCollection.OfChar){return ((OmniCollection.OfChar)col).add((char)(((long)TypeUtil.MAX_SAFE_INT)+1));}
+      if(col instanceof OmniCollection.OfByte){return ((OmniCollection.OfByte)col).add((byte)(((long)TypeUtil.MAX_SAFE_INT)+1));}
+      return ((OmniCollection.OfPrimitive)col).add((boolean)((((long)TypeUtil.MAX_SAFE_INT)+1)==1));
     }
   },
-  LongMIN_SAFE_INT_MINUS1(long.class,Long.class){
+  LongMIN_SAFE_INT_MINUS1(long.class,Long.class,false){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((long)(((long)TypeUtil.MIN_SAFE_INT)-1));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((long)(((long)TypeUtil.MIN_SAFE_INT)-1));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((long)(((long)TypeUtil.MIN_SAFE_INT)-1));}
@@ -3898,93 +1224,23 @@ public enum QueryTestPrimitiveInputType{
     @Override public int invokeObjectindexOf(OmniCollection col){return ((OmniList)col).indexOf((Object)(long)(((long)TypeUtil.MIN_SAFE_INT)-1));}
     @Override public int invokeObjectlastIndexOf(OmniCollection col){return ((OmniList)col).lastIndexOf((Object)(long)(((long)TypeUtil.MIN_SAFE_INT)-1));}
     @Override public int invokeObjectsearch(OmniCollection col){return ((OmniStack)col).search((Object)(long)(((long)TypeUtil.MIN_SAFE_INT)-1));}
-    public boolean addNotEqualsVal(OmniCollection col)
-    {
+    public boolean addNotEqualsVal(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(boolean)false);}
       return ((OmniCollection.OfPrimitive)col).add((boolean)false);
     }
-    public void insertNotEqualsValInList(int index,OmniCollection col)
-    {
-      ((OmniList.OfPrimitive)col).add(index,(boolean)false);
-    }
-    public boolean attemptAdd(OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      Class<?> clazz=col.getClass();
-      Method method;
-      try
-      {
-        //attempt to call with the primitive type
-        method=clazz.getDeclaredMethod("add",primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          //if that fails, call with the boxed type
-          method=clazz.getDeclaredMethod("add",boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            //if all else fails, call with the object class
-            method=clazz.getDeclaredMethod("add",Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        return (boolean)method.invoke(col,((long)TypeUtil.MIN_SAFE_INT)-1); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-    }
-    public boolean attemptInsertionInList(int index,OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      OmniList list=(OmniList)col; //throw if not correct type
-      Class<?> clazz=list.getClass();
-      Method method;
-      try
-      {
-        method=clazz.getDeclaredMethod("add",int.class,primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          method=clazz.getDeclaredMethod("add",int.class,boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            method=clazz.getDeclaredMethod("add",int.class,Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        method.invoke(list,index,((long)TypeUtil.MIN_SAFE_INT)-1); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-      return true;
+    public boolean attemptAdd(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(long)(((long)TypeUtil.MIN_SAFE_INT)-1));}
+      if(col instanceof OmniCollection.OfDouble){return ((OmniCollection.OfDouble)col).add((double)(((long)TypeUtil.MIN_SAFE_INT)-1));}
+      if(col instanceof OmniCollection.OfFloat){return ((OmniCollection.OfFloat)col).add((float)(((long)TypeUtil.MIN_SAFE_INT)-1));}
+      if(col instanceof OmniCollection.OfLong){return ((OmniCollection.OfLong)col).add((long)(((long)TypeUtil.MIN_SAFE_INT)-1));}
+      if(col instanceof OmniCollection.OfInt){return ((OmniCollection.OfInt)col).add((int)(((long)TypeUtil.MIN_SAFE_INT)-1));}
+      if(col instanceof OmniCollection.OfShort){return ((OmniCollection.OfShort)col).add((short)(((long)TypeUtil.MIN_SAFE_INT)-1));}
+      if(col instanceof OmniCollection.OfChar){return ((OmniCollection.OfChar)col).add((char)(((long)TypeUtil.MIN_SAFE_INT)-1));}
+      if(col instanceof OmniCollection.OfByte){return ((OmniCollection.OfByte)col).add((byte)(((long)TypeUtil.MIN_SAFE_INT)-1));}
+      return ((OmniCollection.OfPrimitive)col).add((boolean)((((long)TypeUtil.MIN_SAFE_INT)-1)==1));
     }
   },
-  LongMAX_INT_PLUS1(long.class,Long.class){
+  LongMAX_INT_PLUS1(long.class,Long.class,false){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((long)(((long)Integer.MAX_VALUE)+1));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((long)(((long)Integer.MAX_VALUE)+1));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((long)(((long)Integer.MAX_VALUE)+1));}
@@ -4000,93 +1256,23 @@ public enum QueryTestPrimitiveInputType{
     @Override public int invokeObjectindexOf(OmniCollection col){return ((OmniList)col).indexOf((Object)(long)(((long)Integer.MAX_VALUE)+1));}
     @Override public int invokeObjectlastIndexOf(OmniCollection col){return ((OmniList)col).lastIndexOf((Object)(long)(((long)Integer.MAX_VALUE)+1));}
     @Override public int invokeObjectsearch(OmniCollection col){return ((OmniStack)col).search((Object)(long)(((long)Integer.MAX_VALUE)+1));}
-    public boolean addNotEqualsVal(OmniCollection col)
-    {
+    public boolean addNotEqualsVal(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(boolean)false);}
       return ((OmniCollection.OfPrimitive)col).add((boolean)false);
     }
-    public void insertNotEqualsValInList(int index,OmniCollection col)
-    {
-      ((OmniList.OfPrimitive)col).add(index,(boolean)false);
-    }
-    public boolean attemptAdd(OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      Class<?> clazz=col.getClass();
-      Method method;
-      try
-      {
-        //attempt to call with the primitive type
-        method=clazz.getDeclaredMethod("add",primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          //if that fails, call with the boxed type
-          method=clazz.getDeclaredMethod("add",boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            //if all else fails, call with the object class
-            method=clazz.getDeclaredMethod("add",Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        return (boolean)method.invoke(col,((long)Integer.MAX_VALUE)+1); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-    }
-    public boolean attemptInsertionInList(int index,OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      OmniList list=(OmniList)col; //throw if not correct type
-      Class<?> clazz=list.getClass();
-      Method method;
-      try
-      {
-        method=clazz.getDeclaredMethod("add",int.class,primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          method=clazz.getDeclaredMethod("add",int.class,boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            method=clazz.getDeclaredMethod("add",int.class,Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        method.invoke(list,index,((long)Integer.MAX_VALUE)+1); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-      return true;
+    public boolean attemptAdd(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(long)(((long)Integer.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfDouble){return ((OmniCollection.OfDouble)col).add((double)(((long)Integer.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfFloat){return ((OmniCollection.OfFloat)col).add((float)(((long)Integer.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfLong){return ((OmniCollection.OfLong)col).add((long)(((long)Integer.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfInt){return ((OmniCollection.OfInt)col).add((int)(((long)Integer.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfShort){return ((OmniCollection.OfShort)col).add((short)(((long)Integer.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfChar){return ((OmniCollection.OfChar)col).add((char)(((long)Integer.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfByte){return ((OmniCollection.OfByte)col).add((byte)(((long)Integer.MAX_VALUE)+1));}
+      return ((OmniCollection.OfPrimitive)col).add((boolean)((((long)Integer.MAX_VALUE)+1)==1));
     }
   },
-  LongMIN_INT_MINUS1(long.class,Long.class){
+  LongMIN_INT_MINUS1(long.class,Long.class,false){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((long)(((long)Integer.MIN_VALUE)-1));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((long)(((long)Integer.MIN_VALUE)-1));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((long)(((long)Integer.MIN_VALUE)-1));}
@@ -4102,93 +1288,23 @@ public enum QueryTestPrimitiveInputType{
     @Override public int invokeObjectindexOf(OmniCollection col){return ((OmniList)col).indexOf((Object)(long)(((long)Integer.MIN_VALUE)-1));}
     @Override public int invokeObjectlastIndexOf(OmniCollection col){return ((OmniList)col).lastIndexOf((Object)(long)(((long)Integer.MIN_VALUE)-1));}
     @Override public int invokeObjectsearch(OmniCollection col){return ((OmniStack)col).search((Object)(long)(((long)Integer.MIN_VALUE)-1));}
-    public boolean addNotEqualsVal(OmniCollection col)
-    {
+    public boolean addNotEqualsVal(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(boolean)false);}
       return ((OmniCollection.OfPrimitive)col).add((boolean)false);
     }
-    public void insertNotEqualsValInList(int index,OmniCollection col)
-    {
-      ((OmniList.OfPrimitive)col).add(index,(boolean)false);
-    }
-    public boolean attemptAdd(OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      Class<?> clazz=col.getClass();
-      Method method;
-      try
-      {
-        //attempt to call with the primitive type
-        method=clazz.getDeclaredMethod("add",primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          //if that fails, call with the boxed type
-          method=clazz.getDeclaredMethod("add",boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            //if all else fails, call with the object class
-            method=clazz.getDeclaredMethod("add",Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        return (boolean)method.invoke(col,((long)Integer.MIN_VALUE)-1); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-    }
-    public boolean attemptInsertionInList(int index,OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      OmniList list=(OmniList)col; //throw if not correct type
-      Class<?> clazz=list.getClass();
-      Method method;
-      try
-      {
-        method=clazz.getDeclaredMethod("add",int.class,primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          method=clazz.getDeclaredMethod("add",int.class,boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            method=clazz.getDeclaredMethod("add",int.class,Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        method.invoke(list,index,((long)Integer.MIN_VALUE)-1); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-      return true;
+    public boolean attemptAdd(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(long)(((long)Integer.MIN_VALUE)-1));}
+      if(col instanceof OmniCollection.OfDouble){return ((OmniCollection.OfDouble)col).add((double)(((long)Integer.MIN_VALUE)-1));}
+      if(col instanceof OmniCollection.OfFloat){return ((OmniCollection.OfFloat)col).add((float)(((long)Integer.MIN_VALUE)-1));}
+      if(col instanceof OmniCollection.OfLong){return ((OmniCollection.OfLong)col).add((long)(((long)Integer.MIN_VALUE)-1));}
+      if(col instanceof OmniCollection.OfInt){return ((OmniCollection.OfInt)col).add((int)(((long)Integer.MIN_VALUE)-1));}
+      if(col instanceof OmniCollection.OfShort){return ((OmniCollection.OfShort)col).add((short)(((long)Integer.MIN_VALUE)-1));}
+      if(col instanceof OmniCollection.OfChar){return ((OmniCollection.OfChar)col).add((char)(((long)Integer.MIN_VALUE)-1));}
+      if(col instanceof OmniCollection.OfByte){return ((OmniCollection.OfByte)col).add((byte)(((long)Integer.MIN_VALUE)-1));}
+      return ((OmniCollection.OfPrimitive)col).add((boolean)((((long)Integer.MIN_VALUE)-1)==1));
     }
   },
-  LongMAX_SAFE_LONG_PLUS1(long.class,Long.class){
+  LongMAX_SAFE_LONG_PLUS1(long.class,Long.class,false){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((long)(((long)TypeUtil.MAX_SAFE_LONG)+1));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((long)(((long)TypeUtil.MAX_SAFE_LONG)+1));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((long)(((long)TypeUtil.MAX_SAFE_LONG)+1));}
@@ -4204,93 +1320,23 @@ public enum QueryTestPrimitiveInputType{
     @Override public int invokeObjectindexOf(OmniCollection col){return ((OmniList)col).indexOf((Object)(long)(((long)TypeUtil.MAX_SAFE_LONG)+1));}
     @Override public int invokeObjectlastIndexOf(OmniCollection col){return ((OmniList)col).lastIndexOf((Object)(long)(((long)TypeUtil.MAX_SAFE_LONG)+1));}
     @Override public int invokeObjectsearch(OmniCollection col){return ((OmniStack)col).search((Object)(long)(((long)TypeUtil.MAX_SAFE_LONG)+1));}
-    public boolean addNotEqualsVal(OmniCollection col)
-    {
+    public boolean addNotEqualsVal(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(boolean)false);}
       return ((OmniCollection.OfPrimitive)col).add((boolean)false);
     }
-    public void insertNotEqualsValInList(int index,OmniCollection col)
-    {
-      ((OmniList.OfPrimitive)col).add(index,(boolean)false);
-    }
-    public boolean attemptAdd(OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      Class<?> clazz=col.getClass();
-      Method method;
-      try
-      {
-        //attempt to call with the primitive type
-        method=clazz.getDeclaredMethod("add",primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          //if that fails, call with the boxed type
-          method=clazz.getDeclaredMethod("add",boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            //if all else fails, call with the object class
-            method=clazz.getDeclaredMethod("add",Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        return (boolean)method.invoke(col,((long)TypeUtil.MAX_SAFE_LONG)+1); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-    }
-    public boolean attemptInsertionInList(int index,OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      OmniList list=(OmniList)col; //throw if not correct type
-      Class<?> clazz=list.getClass();
-      Method method;
-      try
-      {
-        method=clazz.getDeclaredMethod("add",int.class,primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          method=clazz.getDeclaredMethod("add",int.class,boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            method=clazz.getDeclaredMethod("add",int.class,Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        method.invoke(list,index,((long)TypeUtil.MAX_SAFE_LONG)+1); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-      return true;
+    public boolean attemptAdd(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(long)(((long)TypeUtil.MAX_SAFE_LONG)+1));}
+      if(col instanceof OmniCollection.OfDouble){return ((OmniCollection.OfDouble)col).add((double)(((long)TypeUtil.MAX_SAFE_LONG)+1));}
+      if(col instanceof OmniCollection.OfFloat){return ((OmniCollection.OfFloat)col).add((float)(((long)TypeUtil.MAX_SAFE_LONG)+1));}
+      if(col instanceof OmniCollection.OfLong){return ((OmniCollection.OfLong)col).add((long)(((long)TypeUtil.MAX_SAFE_LONG)+1));}
+      if(col instanceof OmniCollection.OfInt){return ((OmniCollection.OfInt)col).add((int)(((long)TypeUtil.MAX_SAFE_LONG)+1));}
+      if(col instanceof OmniCollection.OfShort){return ((OmniCollection.OfShort)col).add((short)(((long)TypeUtil.MAX_SAFE_LONG)+1));}
+      if(col instanceof OmniCollection.OfChar){return ((OmniCollection.OfChar)col).add((char)(((long)TypeUtil.MAX_SAFE_LONG)+1));}
+      if(col instanceof OmniCollection.OfByte){return ((OmniCollection.OfByte)col).add((byte)(((long)TypeUtil.MAX_SAFE_LONG)+1));}
+      return ((OmniCollection.OfPrimitive)col).add((boolean)((((long)TypeUtil.MAX_SAFE_LONG)+1)==1));
     }
   },
-  LongMIN_SAFE_LONG_MINUS1(long.class,Long.class){
+  LongMIN_SAFE_LONG_MINUS1(long.class,Long.class,false){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((long)(((long)TypeUtil.MIN_SAFE_LONG)-1));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((long)(((long)TypeUtil.MIN_SAFE_LONG)-1));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((long)(((long)TypeUtil.MIN_SAFE_LONG)-1));}
@@ -4306,93 +1352,23 @@ public enum QueryTestPrimitiveInputType{
     @Override public int invokeObjectindexOf(OmniCollection col){return ((OmniList)col).indexOf((Object)(long)(((long)TypeUtil.MIN_SAFE_LONG)-1));}
     @Override public int invokeObjectlastIndexOf(OmniCollection col){return ((OmniList)col).lastIndexOf((Object)(long)(((long)TypeUtil.MIN_SAFE_LONG)-1));}
     @Override public int invokeObjectsearch(OmniCollection col){return ((OmniStack)col).search((Object)(long)(((long)TypeUtil.MIN_SAFE_LONG)-1));}
-    public boolean addNotEqualsVal(OmniCollection col)
-    {
+    public boolean addNotEqualsVal(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(boolean)false);}
       return ((OmniCollection.OfPrimitive)col).add((boolean)false);
     }
-    public void insertNotEqualsValInList(int index,OmniCollection col)
-    {
-      ((OmniList.OfPrimitive)col).add(index,(boolean)false);
-    }
-    public boolean attemptAdd(OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      Class<?> clazz=col.getClass();
-      Method method;
-      try
-      {
-        //attempt to call with the primitive type
-        method=clazz.getDeclaredMethod("add",primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          //if that fails, call with the boxed type
-          method=clazz.getDeclaredMethod("add",boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            //if all else fails, call with the object class
-            method=clazz.getDeclaredMethod("add",Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        return (boolean)method.invoke(col,((long)TypeUtil.MIN_SAFE_LONG)-1); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-    }
-    public boolean attemptInsertionInList(int index,OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      OmniList list=(OmniList)col; //throw if not correct type
-      Class<?> clazz=list.getClass();
-      Method method;
-      try
-      {
-        method=clazz.getDeclaredMethod("add",int.class,primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          method=clazz.getDeclaredMethod("add",int.class,boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            method=clazz.getDeclaredMethod("add",int.class,Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        method.invoke(list,index,((long)TypeUtil.MIN_SAFE_LONG)-1); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-      return true;
+    public boolean attemptAdd(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(long)(((long)TypeUtil.MIN_SAFE_LONG)-1));}
+      if(col instanceof OmniCollection.OfDouble){return ((OmniCollection.OfDouble)col).add((double)(((long)TypeUtil.MIN_SAFE_LONG)-1));}
+      if(col instanceof OmniCollection.OfFloat){return ((OmniCollection.OfFloat)col).add((float)(((long)TypeUtil.MIN_SAFE_LONG)-1));}
+      if(col instanceof OmniCollection.OfLong){return ((OmniCollection.OfLong)col).add((long)(((long)TypeUtil.MIN_SAFE_LONG)-1));}
+      if(col instanceof OmniCollection.OfInt){return ((OmniCollection.OfInt)col).add((int)(((long)TypeUtil.MIN_SAFE_LONG)-1));}
+      if(col instanceof OmniCollection.OfShort){return ((OmniCollection.OfShort)col).add((short)(((long)TypeUtil.MIN_SAFE_LONG)-1));}
+      if(col instanceof OmniCollection.OfChar){return ((OmniCollection.OfChar)col).add((char)(((long)TypeUtil.MIN_SAFE_LONG)-1));}
+      if(col instanceof OmniCollection.OfByte){return ((OmniCollection.OfByte)col).add((byte)(((long)TypeUtil.MIN_SAFE_LONG)-1));}
+      return ((OmniCollection.OfPrimitive)col).add((boolean)((((long)TypeUtil.MIN_SAFE_LONG)-1)==1));
     }
   },
-  Floatpos0(float.class,Float.class){
+  Floatpos0(float.class,Float.class,true){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((float)(0.0F));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((float)(0.0F));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((float)(0.0F));}
@@ -4408,93 +1384,23 @@ public enum QueryTestPrimitiveInputType{
     @Override public int invokeObjectindexOf(OmniCollection col){return ((OmniList)col).indexOf((Object)(float)(0.0F));}
     @Override public int invokeObjectlastIndexOf(OmniCollection col){return ((OmniList)col).lastIndexOf((Object)(float)(0.0F));}
     @Override public int invokeObjectsearch(OmniCollection col){return ((OmniStack)col).search((Object)(float)(0.0F));}
-    public boolean addNotEqualsVal(OmniCollection col)
-    {
+    public boolean addNotEqualsVal(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(boolean)true);}
       return ((OmniCollection.OfPrimitive)col).add((boolean)true);
     }
-    public void insertNotEqualsValInList(int index,OmniCollection col)
-    {
-      ((OmniList.OfPrimitive)col).add(index,(boolean)true);
-    }
-    public boolean attemptAdd(OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      Class<?> clazz=col.getClass();
-      Method method;
-      try
-      {
-        //attempt to call with the primitive type
-        method=clazz.getDeclaredMethod("add",primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          //if that fails, call with the boxed type
-          method=clazz.getDeclaredMethod("add",boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            //if all else fails, call with the object class
-            method=clazz.getDeclaredMethod("add",Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        return (boolean)method.invoke(col,0.0F); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-    }
-    public boolean attemptInsertionInList(int index,OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      OmniList list=(OmniList)col; //throw if not correct type
-      Class<?> clazz=list.getClass();
-      Method method;
-      try
-      {
-        method=clazz.getDeclaredMethod("add",int.class,primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          method=clazz.getDeclaredMethod("add",int.class,boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            method=clazz.getDeclaredMethod("add",int.class,Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        method.invoke(list,index,0.0F); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-      return true;
+    public boolean attemptAdd(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(float)(0.0F));}
+      if(col instanceof OmniCollection.OfDouble){return ((OmniCollection.OfDouble)col).add((double)(0.0F));}
+      if(col instanceof OmniCollection.OfFloat){return ((OmniCollection.OfFloat)col).add((float)(0.0F));}
+      if(col instanceof OmniCollection.OfLong){return ((OmniCollection.OfLong)col).add((long)(0.0F));}
+      if(col instanceof OmniCollection.OfInt){return ((OmniCollection.OfInt)col).add((int)(0.0F));}
+      if(col instanceof OmniCollection.OfShort){return ((OmniCollection.OfShort)col).add((short)(0.0F));}
+      if(col instanceof OmniCollection.OfChar){return ((OmniCollection.OfChar)col).add((char)(0.0F));}
+      if(col instanceof OmniCollection.OfByte){return ((OmniCollection.OfByte)col).add((byte)(0.0F));}
+      return ((OmniCollection.OfPrimitive)col).add((boolean)((0.0F)==1));
     }
   },
-  Floatneg0(float.class,Float.class){
+  Floatneg0(float.class,Float.class,true){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((float)(-0.0F));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((float)(-0.0F));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((float)(-0.0F));}
@@ -4510,93 +1416,23 @@ public enum QueryTestPrimitiveInputType{
     @Override public int invokeObjectindexOf(OmniCollection col){return ((OmniList)col).indexOf((Object)(float)(-0.0F));}
     @Override public int invokeObjectlastIndexOf(OmniCollection col){return ((OmniList)col).lastIndexOf((Object)(float)(-0.0F));}
     @Override public int invokeObjectsearch(OmniCollection col){return ((OmniStack)col).search((Object)(float)(-0.0F));}
-    public boolean addNotEqualsVal(OmniCollection col)
-    {
+    public boolean addNotEqualsVal(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(boolean)true);}
       return ((OmniCollection.OfPrimitive)col).add((boolean)true);
     }
-    public void insertNotEqualsValInList(int index,OmniCollection col)
-    {
-      ((OmniList.OfPrimitive)col).add(index,(boolean)true);
-    }
-    public boolean attemptAdd(OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      Class<?> clazz=col.getClass();
-      Method method;
-      try
-      {
-        //attempt to call with the primitive type
-        method=clazz.getDeclaredMethod("add",primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          //if that fails, call with the boxed type
-          method=clazz.getDeclaredMethod("add",boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            //if all else fails, call with the object class
-            method=clazz.getDeclaredMethod("add",Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        return (boolean)method.invoke(col,-0.0F); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-    }
-    public boolean attemptInsertionInList(int index,OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      OmniList list=(OmniList)col; //throw if not correct type
-      Class<?> clazz=list.getClass();
-      Method method;
-      try
-      {
-        method=clazz.getDeclaredMethod("add",int.class,primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          method=clazz.getDeclaredMethod("add",int.class,boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            method=clazz.getDeclaredMethod("add",int.class,Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        method.invoke(list,index,-0.0F); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-      return true;
+    public boolean attemptAdd(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(float)(-0.0F));}
+      if(col instanceof OmniCollection.OfDouble){return ((OmniCollection.OfDouble)col).add((double)(-0.0F));}
+      if(col instanceof OmniCollection.OfFloat){return ((OmniCollection.OfFloat)col).add((float)(-0.0F));}
+      if(col instanceof OmniCollection.OfLong){return ((OmniCollection.OfLong)col).add((long)(-0.0F));}
+      if(col instanceof OmniCollection.OfInt){return ((OmniCollection.OfInt)col).add((int)(-0.0F));}
+      if(col instanceof OmniCollection.OfShort){return ((OmniCollection.OfShort)col).add((short)(-0.0F));}
+      if(col instanceof OmniCollection.OfChar){return ((OmniCollection.OfChar)col).add((char)(-0.0F));}
+      if(col instanceof OmniCollection.OfByte){return ((OmniCollection.OfByte)col).add((byte)(-0.0F));}
+      return ((OmniCollection.OfPrimitive)col).add((boolean)((-0.0F)==1));
     }
   },
-  Floatpos1(float.class,Float.class){
+  Floatpos1(float.class,Float.class,false){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((float)(1));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((float)(1));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((float)(1));}
@@ -4612,93 +1448,23 @@ public enum QueryTestPrimitiveInputType{
     @Override public int invokeObjectindexOf(OmniCollection col){return ((OmniList)col).indexOf((Object)(float)(1));}
     @Override public int invokeObjectlastIndexOf(OmniCollection col){return ((OmniList)col).lastIndexOf((Object)(float)(1));}
     @Override public int invokeObjectsearch(OmniCollection col){return ((OmniStack)col).search((Object)(float)(1));}
-    public boolean addNotEqualsVal(OmniCollection col)
-    {
+    public boolean addNotEqualsVal(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(boolean)false);}
       return ((OmniCollection.OfPrimitive)col).add((boolean)false);
     }
-    public void insertNotEqualsValInList(int index,OmniCollection col)
-    {
-      ((OmniList.OfPrimitive)col).add(index,(boolean)false);
-    }
-    public boolean attemptAdd(OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      Class<?> clazz=col.getClass();
-      Method method;
-      try
-      {
-        //attempt to call with the primitive type
-        method=clazz.getDeclaredMethod("add",primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          //if that fails, call with the boxed type
-          method=clazz.getDeclaredMethod("add",boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            //if all else fails, call with the object class
-            method=clazz.getDeclaredMethod("add",Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        return (boolean)method.invoke(col,1); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-    }
-    public boolean attemptInsertionInList(int index,OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      OmniList list=(OmniList)col; //throw if not correct type
-      Class<?> clazz=list.getClass();
-      Method method;
-      try
-      {
-        method=clazz.getDeclaredMethod("add",int.class,primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          method=clazz.getDeclaredMethod("add",int.class,boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            method=clazz.getDeclaredMethod("add",int.class,Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        method.invoke(list,index,1); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-      return true;
+    public boolean attemptAdd(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(float)(1));}
+      if(col instanceof OmniCollection.OfDouble){return ((OmniCollection.OfDouble)col).add((double)(1));}
+      if(col instanceof OmniCollection.OfFloat){return ((OmniCollection.OfFloat)col).add((float)(1));}
+      if(col instanceof OmniCollection.OfLong){return ((OmniCollection.OfLong)col).add((long)(1));}
+      if(col instanceof OmniCollection.OfInt){return ((OmniCollection.OfInt)col).add((int)(1));}
+      if(col instanceof OmniCollection.OfShort){return ((OmniCollection.OfShort)col).add((short)(1));}
+      if(col instanceof OmniCollection.OfChar){return ((OmniCollection.OfChar)col).add((char)(1));}
+      if(col instanceof OmniCollection.OfByte){return ((OmniCollection.OfByte)col).add((byte)(1));}
+      return ((OmniCollection.OfPrimitive)col).add((boolean)((1)==1));
     }
   },
-  Floatpos2(float.class,Float.class){
+  Floatpos2(float.class,Float.class,false){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((float)(2));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((float)(2));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((float)(2));}
@@ -4714,93 +1480,23 @@ public enum QueryTestPrimitiveInputType{
     @Override public int invokeObjectindexOf(OmniCollection col){return ((OmniList)col).indexOf((Object)(float)(2));}
     @Override public int invokeObjectlastIndexOf(OmniCollection col){return ((OmniList)col).lastIndexOf((Object)(float)(2));}
     @Override public int invokeObjectsearch(OmniCollection col){return ((OmniStack)col).search((Object)(float)(2));}
-    public boolean addNotEqualsVal(OmniCollection col)
-    {
+    public boolean addNotEqualsVal(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(boolean)false);}
       return ((OmniCollection.OfPrimitive)col).add((boolean)false);
     }
-    public void insertNotEqualsValInList(int index,OmniCollection col)
-    {
-      ((OmniList.OfPrimitive)col).add(index,(boolean)false);
-    }
-    public boolean attemptAdd(OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      Class<?> clazz=col.getClass();
-      Method method;
-      try
-      {
-        //attempt to call with the primitive type
-        method=clazz.getDeclaredMethod("add",primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          //if that fails, call with the boxed type
-          method=clazz.getDeclaredMethod("add",boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            //if all else fails, call with the object class
-            method=clazz.getDeclaredMethod("add",Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        return (boolean)method.invoke(col,2); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-    }
-    public boolean attemptInsertionInList(int index,OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      OmniList list=(OmniList)col; //throw if not correct type
-      Class<?> clazz=list.getClass();
-      Method method;
-      try
-      {
-        method=clazz.getDeclaredMethod("add",int.class,primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          method=clazz.getDeclaredMethod("add",int.class,boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            method=clazz.getDeclaredMethod("add",int.class,Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        method.invoke(list,index,2); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-      return true;
+    public boolean attemptAdd(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(float)(2));}
+      if(col instanceof OmniCollection.OfDouble){return ((OmniCollection.OfDouble)col).add((double)(2));}
+      if(col instanceof OmniCollection.OfFloat){return ((OmniCollection.OfFloat)col).add((float)(2));}
+      if(col instanceof OmniCollection.OfLong){return ((OmniCollection.OfLong)col).add((long)(2));}
+      if(col instanceof OmniCollection.OfInt){return ((OmniCollection.OfInt)col).add((int)(2));}
+      if(col instanceof OmniCollection.OfShort){return ((OmniCollection.OfShort)col).add((short)(2));}
+      if(col instanceof OmniCollection.OfChar){return ((OmniCollection.OfChar)col).add((char)(2));}
+      if(col instanceof OmniCollection.OfByte){return ((OmniCollection.OfByte)col).add((byte)(2));}
+      return ((OmniCollection.OfPrimitive)col).add((boolean)((2)==1));
     }
   },
-  Floatneg1(float.class,Float.class){
+  Floatneg1(float.class,Float.class,false){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((float)(-1));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((float)(-1));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((float)(-1));}
@@ -4816,93 +1512,23 @@ public enum QueryTestPrimitiveInputType{
     @Override public int invokeObjectindexOf(OmniCollection col){return ((OmniList)col).indexOf((Object)(float)(-1));}
     @Override public int invokeObjectlastIndexOf(OmniCollection col){return ((OmniList)col).lastIndexOf((Object)(float)(-1));}
     @Override public int invokeObjectsearch(OmniCollection col){return ((OmniStack)col).search((Object)(float)(-1));}
-    public boolean addNotEqualsVal(OmniCollection col)
-    {
+    public boolean addNotEqualsVal(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(boolean)false);}
       return ((OmniCollection.OfPrimitive)col).add((boolean)false);
     }
-    public void insertNotEqualsValInList(int index,OmniCollection col)
-    {
-      ((OmniList.OfPrimitive)col).add(index,(boolean)false);
-    }
-    public boolean attemptAdd(OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      Class<?> clazz=col.getClass();
-      Method method;
-      try
-      {
-        //attempt to call with the primitive type
-        method=clazz.getDeclaredMethod("add",primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          //if that fails, call with the boxed type
-          method=clazz.getDeclaredMethod("add",boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            //if all else fails, call with the object class
-            method=clazz.getDeclaredMethod("add",Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        return (boolean)method.invoke(col,-1); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-    }
-    public boolean attemptInsertionInList(int index,OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      OmniList list=(OmniList)col; //throw if not correct type
-      Class<?> clazz=list.getClass();
-      Method method;
-      try
-      {
-        method=clazz.getDeclaredMethod("add",int.class,primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          method=clazz.getDeclaredMethod("add",int.class,boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            method=clazz.getDeclaredMethod("add",int.class,Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        method.invoke(list,index,-1); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-      return true;
+    public boolean attemptAdd(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(float)(-1));}
+      if(col instanceof OmniCollection.OfDouble){return ((OmniCollection.OfDouble)col).add((double)(-1));}
+      if(col instanceof OmniCollection.OfFloat){return ((OmniCollection.OfFloat)col).add((float)(-1));}
+      if(col instanceof OmniCollection.OfLong){return ((OmniCollection.OfLong)col).add((long)(-1));}
+      if(col instanceof OmniCollection.OfInt){return ((OmniCollection.OfInt)col).add((int)(-1));}
+      if(col instanceof OmniCollection.OfShort){return ((OmniCollection.OfShort)col).add((short)(-1));}
+      if(col instanceof OmniCollection.OfChar){return ((OmniCollection.OfChar)col).add((char)(-1));}
+      if(col instanceof OmniCollection.OfByte){return ((OmniCollection.OfByte)col).add((byte)(-1));}
+      return ((OmniCollection.OfPrimitive)col).add((boolean)((-1)==1));
     }
   },
-  FloatMAX_BYTE_PLUS1(float.class,Float.class){
+  FloatMAX_BYTE_PLUS1(float.class,Float.class,false){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((float)(((float)Byte.MAX_VALUE)+1));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((float)(((float)Byte.MAX_VALUE)+1));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((float)(((float)Byte.MAX_VALUE)+1));}
@@ -4918,93 +1544,23 @@ public enum QueryTestPrimitiveInputType{
     @Override public int invokeObjectindexOf(OmniCollection col){return ((OmniList)col).indexOf((Object)(float)(((float)Byte.MAX_VALUE)+1));}
     @Override public int invokeObjectlastIndexOf(OmniCollection col){return ((OmniList)col).lastIndexOf((Object)(float)(((float)Byte.MAX_VALUE)+1));}
     @Override public int invokeObjectsearch(OmniCollection col){return ((OmniStack)col).search((Object)(float)(((float)Byte.MAX_VALUE)+1));}
-    public boolean addNotEqualsVal(OmniCollection col)
-    {
+    public boolean addNotEqualsVal(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(boolean)false);}
       return ((OmniCollection.OfPrimitive)col).add((boolean)false);
     }
-    public void insertNotEqualsValInList(int index,OmniCollection col)
-    {
-      ((OmniList.OfPrimitive)col).add(index,(boolean)false);
-    }
-    public boolean attemptAdd(OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      Class<?> clazz=col.getClass();
-      Method method;
-      try
-      {
-        //attempt to call with the primitive type
-        method=clazz.getDeclaredMethod("add",primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          //if that fails, call with the boxed type
-          method=clazz.getDeclaredMethod("add",boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            //if all else fails, call with the object class
-            method=clazz.getDeclaredMethod("add",Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        return (boolean)method.invoke(col,((float)Byte.MAX_VALUE)+1); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-    }
-    public boolean attemptInsertionInList(int index,OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      OmniList list=(OmniList)col; //throw if not correct type
-      Class<?> clazz=list.getClass();
-      Method method;
-      try
-      {
-        method=clazz.getDeclaredMethod("add",int.class,primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          method=clazz.getDeclaredMethod("add",int.class,boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            method=clazz.getDeclaredMethod("add",int.class,Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        method.invoke(list,index,((float)Byte.MAX_VALUE)+1); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-      return true;
+    public boolean attemptAdd(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(float)(((float)Byte.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfDouble){return ((OmniCollection.OfDouble)col).add((double)(((float)Byte.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfFloat){return ((OmniCollection.OfFloat)col).add((float)(((float)Byte.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfLong){return ((OmniCollection.OfLong)col).add((long)(((float)Byte.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfInt){return ((OmniCollection.OfInt)col).add((int)(((float)Byte.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfShort){return ((OmniCollection.OfShort)col).add((short)(((float)Byte.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfChar){return ((OmniCollection.OfChar)col).add((char)(((float)Byte.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfByte){return ((OmniCollection.OfByte)col).add((byte)(((float)Byte.MAX_VALUE)+1));}
+      return ((OmniCollection.OfPrimitive)col).add((boolean)((((float)Byte.MAX_VALUE)+1)==1));
     }
   },
-  FloatMIN_BYTE_MINUS1(float.class,Float.class){
+  FloatMIN_BYTE_MINUS1(float.class,Float.class,false){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((float)(((float)Byte.MIN_VALUE)-1));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((float)(((float)Byte.MIN_VALUE)-1));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((float)(((float)Byte.MIN_VALUE)-1));}
@@ -5020,93 +1576,23 @@ public enum QueryTestPrimitiveInputType{
     @Override public int invokeObjectindexOf(OmniCollection col){return ((OmniList)col).indexOf((Object)(float)(((float)Byte.MIN_VALUE)-1));}
     @Override public int invokeObjectlastIndexOf(OmniCollection col){return ((OmniList)col).lastIndexOf((Object)(float)(((float)Byte.MIN_VALUE)-1));}
     @Override public int invokeObjectsearch(OmniCollection col){return ((OmniStack)col).search((Object)(float)(((float)Byte.MIN_VALUE)-1));}
-    public boolean addNotEqualsVal(OmniCollection col)
-    {
+    public boolean addNotEqualsVal(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(boolean)false);}
       return ((OmniCollection.OfPrimitive)col).add((boolean)false);
     }
-    public void insertNotEqualsValInList(int index,OmniCollection col)
-    {
-      ((OmniList.OfPrimitive)col).add(index,(boolean)false);
-    }
-    public boolean attemptAdd(OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      Class<?> clazz=col.getClass();
-      Method method;
-      try
-      {
-        //attempt to call with the primitive type
-        method=clazz.getDeclaredMethod("add",primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          //if that fails, call with the boxed type
-          method=clazz.getDeclaredMethod("add",boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            //if all else fails, call with the object class
-            method=clazz.getDeclaredMethod("add",Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        return (boolean)method.invoke(col,((float)Byte.MIN_VALUE)-1); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-    }
-    public boolean attemptInsertionInList(int index,OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      OmniList list=(OmniList)col; //throw if not correct type
-      Class<?> clazz=list.getClass();
-      Method method;
-      try
-      {
-        method=clazz.getDeclaredMethod("add",int.class,primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          method=clazz.getDeclaredMethod("add",int.class,boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            method=clazz.getDeclaredMethod("add",int.class,Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        method.invoke(list,index,((float)Byte.MIN_VALUE)-1); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-      return true;
+    public boolean attemptAdd(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(float)(((float)Byte.MIN_VALUE)-1));}
+      if(col instanceof OmniCollection.OfDouble){return ((OmniCollection.OfDouble)col).add((double)(((float)Byte.MIN_VALUE)-1));}
+      if(col instanceof OmniCollection.OfFloat){return ((OmniCollection.OfFloat)col).add((float)(((float)Byte.MIN_VALUE)-1));}
+      if(col instanceof OmniCollection.OfLong){return ((OmniCollection.OfLong)col).add((long)(((float)Byte.MIN_VALUE)-1));}
+      if(col instanceof OmniCollection.OfInt){return ((OmniCollection.OfInt)col).add((int)(((float)Byte.MIN_VALUE)-1));}
+      if(col instanceof OmniCollection.OfShort){return ((OmniCollection.OfShort)col).add((short)(((float)Byte.MIN_VALUE)-1));}
+      if(col instanceof OmniCollection.OfChar){return ((OmniCollection.OfChar)col).add((char)(((float)Byte.MIN_VALUE)-1));}
+      if(col instanceof OmniCollection.OfByte){return ((OmniCollection.OfByte)col).add((byte)(((float)Byte.MIN_VALUE)-1));}
+      return ((OmniCollection.OfPrimitive)col).add((boolean)((((float)Byte.MIN_VALUE)-1)==1));
     }
   },
-  FloatMAX_SHORT_PLUS1(float.class,Float.class){
+  FloatMAX_SHORT_PLUS1(float.class,Float.class,false){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((float)(((float)Short.MAX_VALUE)+1));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((float)(((float)Short.MAX_VALUE)+1));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((float)(((float)Short.MAX_VALUE)+1));}
@@ -5122,93 +1608,23 @@ public enum QueryTestPrimitiveInputType{
     @Override public int invokeObjectindexOf(OmniCollection col){return ((OmniList)col).indexOf((Object)(float)(((float)Short.MAX_VALUE)+1));}
     @Override public int invokeObjectlastIndexOf(OmniCollection col){return ((OmniList)col).lastIndexOf((Object)(float)(((float)Short.MAX_VALUE)+1));}
     @Override public int invokeObjectsearch(OmniCollection col){return ((OmniStack)col).search((Object)(float)(((float)Short.MAX_VALUE)+1));}
-    public boolean addNotEqualsVal(OmniCollection col)
-    {
+    public boolean addNotEqualsVal(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(boolean)false);}
       return ((OmniCollection.OfPrimitive)col).add((boolean)false);
     }
-    public void insertNotEqualsValInList(int index,OmniCollection col)
-    {
-      ((OmniList.OfPrimitive)col).add(index,(boolean)false);
-    }
-    public boolean attemptAdd(OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      Class<?> clazz=col.getClass();
-      Method method;
-      try
-      {
-        //attempt to call with the primitive type
-        method=clazz.getDeclaredMethod("add",primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          //if that fails, call with the boxed type
-          method=clazz.getDeclaredMethod("add",boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            //if all else fails, call with the object class
-            method=clazz.getDeclaredMethod("add",Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        return (boolean)method.invoke(col,((float)Short.MAX_VALUE)+1); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-    }
-    public boolean attemptInsertionInList(int index,OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      OmniList list=(OmniList)col; //throw if not correct type
-      Class<?> clazz=list.getClass();
-      Method method;
-      try
-      {
-        method=clazz.getDeclaredMethod("add",int.class,primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          method=clazz.getDeclaredMethod("add",int.class,boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            method=clazz.getDeclaredMethod("add",int.class,Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        method.invoke(list,index,((float)Short.MAX_VALUE)+1); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-      return true;
+    public boolean attemptAdd(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(float)(((float)Short.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfDouble){return ((OmniCollection.OfDouble)col).add((double)(((float)Short.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfFloat){return ((OmniCollection.OfFloat)col).add((float)(((float)Short.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfLong){return ((OmniCollection.OfLong)col).add((long)(((float)Short.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfInt){return ((OmniCollection.OfInt)col).add((int)(((float)Short.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfShort){return ((OmniCollection.OfShort)col).add((short)(((float)Short.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfChar){return ((OmniCollection.OfChar)col).add((char)(((float)Short.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfByte){return ((OmniCollection.OfByte)col).add((byte)(((float)Short.MAX_VALUE)+1));}
+      return ((OmniCollection.OfPrimitive)col).add((boolean)((((float)Short.MAX_VALUE)+1)==1));
     }
   },
-  FloatMIN_SHORT_MINUS1(float.class,Float.class){
+  FloatMIN_SHORT_MINUS1(float.class,Float.class,false){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((float)(((float)Short.MIN_VALUE)-1));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((float)(((float)Short.MIN_VALUE)-1));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((float)(((float)Short.MIN_VALUE)-1));}
@@ -5224,93 +1640,23 @@ public enum QueryTestPrimitiveInputType{
     @Override public int invokeObjectindexOf(OmniCollection col){return ((OmniList)col).indexOf((Object)(float)(((float)Short.MIN_VALUE)-1));}
     @Override public int invokeObjectlastIndexOf(OmniCollection col){return ((OmniList)col).lastIndexOf((Object)(float)(((float)Short.MIN_VALUE)-1));}
     @Override public int invokeObjectsearch(OmniCollection col){return ((OmniStack)col).search((Object)(float)(((float)Short.MIN_VALUE)-1));}
-    public boolean addNotEqualsVal(OmniCollection col)
-    {
+    public boolean addNotEqualsVal(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(boolean)false);}
       return ((OmniCollection.OfPrimitive)col).add((boolean)false);
     }
-    public void insertNotEqualsValInList(int index,OmniCollection col)
-    {
-      ((OmniList.OfPrimitive)col).add(index,(boolean)false);
-    }
-    public boolean attemptAdd(OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      Class<?> clazz=col.getClass();
-      Method method;
-      try
-      {
-        //attempt to call with the primitive type
-        method=clazz.getDeclaredMethod("add",primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          //if that fails, call with the boxed type
-          method=clazz.getDeclaredMethod("add",boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            //if all else fails, call with the object class
-            method=clazz.getDeclaredMethod("add",Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        return (boolean)method.invoke(col,((float)Short.MIN_VALUE)-1); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-    }
-    public boolean attemptInsertionInList(int index,OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      OmniList list=(OmniList)col; //throw if not correct type
-      Class<?> clazz=list.getClass();
-      Method method;
-      try
-      {
-        method=clazz.getDeclaredMethod("add",int.class,primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          method=clazz.getDeclaredMethod("add",int.class,boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            method=clazz.getDeclaredMethod("add",int.class,Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        method.invoke(list,index,((float)Short.MIN_VALUE)-1); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-      return true;
+    public boolean attemptAdd(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(float)(((float)Short.MIN_VALUE)-1));}
+      if(col instanceof OmniCollection.OfDouble){return ((OmniCollection.OfDouble)col).add((double)(((float)Short.MIN_VALUE)-1));}
+      if(col instanceof OmniCollection.OfFloat){return ((OmniCollection.OfFloat)col).add((float)(((float)Short.MIN_VALUE)-1));}
+      if(col instanceof OmniCollection.OfLong){return ((OmniCollection.OfLong)col).add((long)(((float)Short.MIN_VALUE)-1));}
+      if(col instanceof OmniCollection.OfInt){return ((OmniCollection.OfInt)col).add((int)(((float)Short.MIN_VALUE)-1));}
+      if(col instanceof OmniCollection.OfShort){return ((OmniCollection.OfShort)col).add((short)(((float)Short.MIN_VALUE)-1));}
+      if(col instanceof OmniCollection.OfChar){return ((OmniCollection.OfChar)col).add((char)(((float)Short.MIN_VALUE)-1));}
+      if(col instanceof OmniCollection.OfByte){return ((OmniCollection.OfByte)col).add((byte)(((float)Short.MIN_VALUE)-1));}
+      return ((OmniCollection.OfPrimitive)col).add((boolean)((((float)Short.MIN_VALUE)-1)==1));
     }
   },
-  FloatMAX_CHAR_PLUS1(float.class,Float.class){
+  FloatMAX_CHAR_PLUS1(float.class,Float.class,false){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((float)(((float)Character.MAX_VALUE)+1));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((float)(((float)Character.MAX_VALUE)+1));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((float)(((float)Character.MAX_VALUE)+1));}
@@ -5326,93 +1672,23 @@ public enum QueryTestPrimitiveInputType{
     @Override public int invokeObjectindexOf(OmniCollection col){return ((OmniList)col).indexOf((Object)(float)(((float)Character.MAX_VALUE)+1));}
     @Override public int invokeObjectlastIndexOf(OmniCollection col){return ((OmniList)col).lastIndexOf((Object)(float)(((float)Character.MAX_VALUE)+1));}
     @Override public int invokeObjectsearch(OmniCollection col){return ((OmniStack)col).search((Object)(float)(((float)Character.MAX_VALUE)+1));}
-    public boolean addNotEqualsVal(OmniCollection col)
-    {
+    public boolean addNotEqualsVal(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(boolean)false);}
       return ((OmniCollection.OfPrimitive)col).add((boolean)false);
     }
-    public void insertNotEqualsValInList(int index,OmniCollection col)
-    {
-      ((OmniList.OfPrimitive)col).add(index,(boolean)false);
-    }
-    public boolean attemptAdd(OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      Class<?> clazz=col.getClass();
-      Method method;
-      try
-      {
-        //attempt to call with the primitive type
-        method=clazz.getDeclaredMethod("add",primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          //if that fails, call with the boxed type
-          method=clazz.getDeclaredMethod("add",boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            //if all else fails, call with the object class
-            method=clazz.getDeclaredMethod("add",Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        return (boolean)method.invoke(col,((float)Character.MAX_VALUE)+1); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-    }
-    public boolean attemptInsertionInList(int index,OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      OmniList list=(OmniList)col; //throw if not correct type
-      Class<?> clazz=list.getClass();
-      Method method;
-      try
-      {
-        method=clazz.getDeclaredMethod("add",int.class,primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          method=clazz.getDeclaredMethod("add",int.class,boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            method=clazz.getDeclaredMethod("add",int.class,Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        method.invoke(list,index,((float)Character.MAX_VALUE)+1); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-      return true;
+    public boolean attemptAdd(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(float)(((float)Character.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfDouble){return ((OmniCollection.OfDouble)col).add((double)(((float)Character.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfFloat){return ((OmniCollection.OfFloat)col).add((float)(((float)Character.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfLong){return ((OmniCollection.OfLong)col).add((long)(((float)Character.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfInt){return ((OmniCollection.OfInt)col).add((int)(((float)Character.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfShort){return ((OmniCollection.OfShort)col).add((short)(((float)Character.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfChar){return ((OmniCollection.OfChar)col).add((char)(((float)Character.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfByte){return ((OmniCollection.OfByte)col).add((byte)(((float)Character.MAX_VALUE)+1));}
+      return ((OmniCollection.OfPrimitive)col).add((boolean)((((float)Character.MAX_VALUE)+1)==1));
     }
   },
-  FloatMAX_INT_PLUS1(float.class,Float.class){
+  FloatMAX_INT_PLUS1(float.class,Float.class,false){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((float)(((float)Integer.MAX_VALUE)+1));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((float)(((float)Integer.MAX_VALUE)+1));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((float)(((float)Integer.MAX_VALUE)+1));}
@@ -5428,93 +1704,23 @@ public enum QueryTestPrimitiveInputType{
     @Override public int invokeObjectindexOf(OmniCollection col){return ((OmniList)col).indexOf((Object)(float)(((float)Integer.MAX_VALUE)+1));}
     @Override public int invokeObjectlastIndexOf(OmniCollection col){return ((OmniList)col).lastIndexOf((Object)(float)(((float)Integer.MAX_VALUE)+1));}
     @Override public int invokeObjectsearch(OmniCollection col){return ((OmniStack)col).search((Object)(float)(((float)Integer.MAX_VALUE)+1));}
-    public boolean addNotEqualsVal(OmniCollection col)
-    {
+    public boolean addNotEqualsVal(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(boolean)false);}
       return ((OmniCollection.OfPrimitive)col).add((boolean)false);
     }
-    public void insertNotEqualsValInList(int index,OmniCollection col)
-    {
-      ((OmniList.OfPrimitive)col).add(index,(boolean)false);
-    }
-    public boolean attemptAdd(OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      Class<?> clazz=col.getClass();
-      Method method;
-      try
-      {
-        //attempt to call with the primitive type
-        method=clazz.getDeclaredMethod("add",primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          //if that fails, call with the boxed type
-          method=clazz.getDeclaredMethod("add",boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            //if all else fails, call with the object class
-            method=clazz.getDeclaredMethod("add",Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        return (boolean)method.invoke(col,((float)Integer.MAX_VALUE)+1); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-    }
-    public boolean attemptInsertionInList(int index,OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      OmniList list=(OmniList)col; //throw if not correct type
-      Class<?> clazz=list.getClass();
-      Method method;
-      try
-      {
-        method=clazz.getDeclaredMethod("add",int.class,primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          method=clazz.getDeclaredMethod("add",int.class,boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            method=clazz.getDeclaredMethod("add",int.class,Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        method.invoke(list,index,((float)Integer.MAX_VALUE)+1); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-      return true;
+    public boolean attemptAdd(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(float)(((float)Integer.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfDouble){return ((OmniCollection.OfDouble)col).add((double)(((float)Integer.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfFloat){return ((OmniCollection.OfFloat)col).add((float)(((float)Integer.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfLong){return ((OmniCollection.OfLong)col).add((long)(((float)Integer.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfInt){return ((OmniCollection.OfInt)col).add((int)(((float)Integer.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfShort){return ((OmniCollection.OfShort)col).add((short)(((float)Integer.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfChar){return ((OmniCollection.OfChar)col).add((char)(((float)Integer.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfByte){return ((OmniCollection.OfByte)col).add((byte)(((float)Integer.MAX_VALUE)+1));}
+      return ((OmniCollection.OfPrimitive)col).add((boolean)((((float)Integer.MAX_VALUE)+1)==1));
     }
   },
-  FloatMIN_INT_MINUS1(float.class,Float.class){
+  FloatMIN_INT_MINUS1(float.class,Float.class,false){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((float)(((float)Integer.MIN_VALUE)-1));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((float)(((float)Integer.MIN_VALUE)-1));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((float)(((float)Integer.MIN_VALUE)-1));}
@@ -5530,93 +1736,23 @@ public enum QueryTestPrimitiveInputType{
     @Override public int invokeObjectindexOf(OmniCollection col){return ((OmniList)col).indexOf((Object)(float)(((float)Integer.MIN_VALUE)-1));}
     @Override public int invokeObjectlastIndexOf(OmniCollection col){return ((OmniList)col).lastIndexOf((Object)(float)(((float)Integer.MIN_VALUE)-1));}
     @Override public int invokeObjectsearch(OmniCollection col){return ((OmniStack)col).search((Object)(float)(((float)Integer.MIN_VALUE)-1));}
-    public boolean addNotEqualsVal(OmniCollection col)
-    {
+    public boolean addNotEqualsVal(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(boolean)false);}
       return ((OmniCollection.OfPrimitive)col).add((boolean)false);
     }
-    public void insertNotEqualsValInList(int index,OmniCollection col)
-    {
-      ((OmniList.OfPrimitive)col).add(index,(boolean)false);
-    }
-    public boolean attemptAdd(OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      Class<?> clazz=col.getClass();
-      Method method;
-      try
-      {
-        //attempt to call with the primitive type
-        method=clazz.getDeclaredMethod("add",primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          //if that fails, call with the boxed type
-          method=clazz.getDeclaredMethod("add",boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            //if all else fails, call with the object class
-            method=clazz.getDeclaredMethod("add",Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        return (boolean)method.invoke(col,((float)Integer.MIN_VALUE)-1); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-    }
-    public boolean attemptInsertionInList(int index,OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      OmniList list=(OmniList)col; //throw if not correct type
-      Class<?> clazz=list.getClass();
-      Method method;
-      try
-      {
-        method=clazz.getDeclaredMethod("add",int.class,primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          method=clazz.getDeclaredMethod("add",int.class,boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            method=clazz.getDeclaredMethod("add",int.class,Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        method.invoke(list,index,((float)Integer.MIN_VALUE)-1); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-      return true;
+    public boolean attemptAdd(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(float)(((float)Integer.MIN_VALUE)-1));}
+      if(col instanceof OmniCollection.OfDouble){return ((OmniCollection.OfDouble)col).add((double)(((float)Integer.MIN_VALUE)-1));}
+      if(col instanceof OmniCollection.OfFloat){return ((OmniCollection.OfFloat)col).add((float)(((float)Integer.MIN_VALUE)-1));}
+      if(col instanceof OmniCollection.OfLong){return ((OmniCollection.OfLong)col).add((long)(((float)Integer.MIN_VALUE)-1));}
+      if(col instanceof OmniCollection.OfInt){return ((OmniCollection.OfInt)col).add((int)(((float)Integer.MIN_VALUE)-1));}
+      if(col instanceof OmniCollection.OfShort){return ((OmniCollection.OfShort)col).add((short)(((float)Integer.MIN_VALUE)-1));}
+      if(col instanceof OmniCollection.OfChar){return ((OmniCollection.OfChar)col).add((char)(((float)Integer.MIN_VALUE)-1));}
+      if(col instanceof OmniCollection.OfByte){return ((OmniCollection.OfByte)col).add((byte)(((float)Integer.MIN_VALUE)-1));}
+      return ((OmniCollection.OfPrimitive)col).add((boolean)((((float)Integer.MIN_VALUE)-1)==1));
     }
   },
-  FloatMAX_LONG_PLUS1(float.class,Float.class){
+  FloatMAX_LONG_PLUS1(float.class,Float.class,false){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((float)(((float)Long.MAX_VALUE)+1));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((float)(((float)Long.MAX_VALUE)+1));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((float)(((float)Long.MAX_VALUE)+1));}
@@ -5632,93 +1768,23 @@ public enum QueryTestPrimitiveInputType{
     @Override public int invokeObjectindexOf(OmniCollection col){return ((OmniList)col).indexOf((Object)(float)(((float)Long.MAX_VALUE)+1));}
     @Override public int invokeObjectlastIndexOf(OmniCollection col){return ((OmniList)col).lastIndexOf((Object)(float)(((float)Long.MAX_VALUE)+1));}
     @Override public int invokeObjectsearch(OmniCollection col){return ((OmniStack)col).search((Object)(float)(((float)Long.MAX_VALUE)+1));}
-    public boolean addNotEqualsVal(OmniCollection col)
-    {
+    public boolean addNotEqualsVal(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(boolean)false);}
       return ((OmniCollection.OfPrimitive)col).add((boolean)false);
     }
-    public void insertNotEqualsValInList(int index,OmniCollection col)
-    {
-      ((OmniList.OfPrimitive)col).add(index,(boolean)false);
-    }
-    public boolean attemptAdd(OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      Class<?> clazz=col.getClass();
-      Method method;
-      try
-      {
-        //attempt to call with the primitive type
-        method=clazz.getDeclaredMethod("add",primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          //if that fails, call with the boxed type
-          method=clazz.getDeclaredMethod("add",boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            //if all else fails, call with the object class
-            method=clazz.getDeclaredMethod("add",Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        return (boolean)method.invoke(col,((float)Long.MAX_VALUE)+1); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-    }
-    public boolean attemptInsertionInList(int index,OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      OmniList list=(OmniList)col; //throw if not correct type
-      Class<?> clazz=list.getClass();
-      Method method;
-      try
-      {
-        method=clazz.getDeclaredMethod("add",int.class,primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          method=clazz.getDeclaredMethod("add",int.class,boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            method=clazz.getDeclaredMethod("add",int.class,Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        method.invoke(list,index,((float)Long.MAX_VALUE)+1); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-      return true;
+    public boolean attemptAdd(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(float)(((float)Long.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfDouble){return ((OmniCollection.OfDouble)col).add((double)(((float)Long.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfFloat){return ((OmniCollection.OfFloat)col).add((float)(((float)Long.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfLong){return ((OmniCollection.OfLong)col).add((long)(((float)Long.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfInt){return ((OmniCollection.OfInt)col).add((int)(((float)Long.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfShort){return ((OmniCollection.OfShort)col).add((short)(((float)Long.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfChar){return ((OmniCollection.OfChar)col).add((char)(((float)Long.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfByte){return ((OmniCollection.OfByte)col).add((byte)(((float)Long.MAX_VALUE)+1));}
+      return ((OmniCollection.OfPrimitive)col).add((boolean)((((float)Long.MAX_VALUE)+1)==1));
     }
   },
-  FloatMIN_LONG_MINUS1(float.class,Float.class){
+  FloatMIN_LONG_MINUS1(float.class,Float.class,false){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((float)(((float)Long.MIN_VALUE)-1));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((float)(((float)Long.MIN_VALUE)-1));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((float)(((float)Long.MIN_VALUE)-1));}
@@ -5734,93 +1800,23 @@ public enum QueryTestPrimitiveInputType{
     @Override public int invokeObjectindexOf(OmniCollection col){return ((OmniList)col).indexOf((Object)(float)(((float)Long.MIN_VALUE)-1));}
     @Override public int invokeObjectlastIndexOf(OmniCollection col){return ((OmniList)col).lastIndexOf((Object)(float)(((float)Long.MIN_VALUE)-1));}
     @Override public int invokeObjectsearch(OmniCollection col){return ((OmniStack)col).search((Object)(float)(((float)Long.MIN_VALUE)-1));}
-    public boolean addNotEqualsVal(OmniCollection col)
-    {
+    public boolean addNotEqualsVal(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(boolean)false);}
       return ((OmniCollection.OfPrimitive)col).add((boolean)false);
     }
-    public void insertNotEqualsValInList(int index,OmniCollection col)
-    {
-      ((OmniList.OfPrimitive)col).add(index,(boolean)false);
-    }
-    public boolean attemptAdd(OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      Class<?> clazz=col.getClass();
-      Method method;
-      try
-      {
-        //attempt to call with the primitive type
-        method=clazz.getDeclaredMethod("add",primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          //if that fails, call with the boxed type
-          method=clazz.getDeclaredMethod("add",boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            //if all else fails, call with the object class
-            method=clazz.getDeclaredMethod("add",Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        return (boolean)method.invoke(col,((float)Long.MIN_VALUE)-1); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-    }
-    public boolean attemptInsertionInList(int index,OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      OmniList list=(OmniList)col; //throw if not correct type
-      Class<?> clazz=list.getClass();
-      Method method;
-      try
-      {
-        method=clazz.getDeclaredMethod("add",int.class,primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          method=clazz.getDeclaredMethod("add",int.class,boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            method=clazz.getDeclaredMethod("add",int.class,Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        method.invoke(list,index,((float)Long.MIN_VALUE)-1); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-      return true;
+    public boolean attemptAdd(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(float)(((float)Long.MIN_VALUE)-1));}
+      if(col instanceof OmniCollection.OfDouble){return ((OmniCollection.OfDouble)col).add((double)(((float)Long.MIN_VALUE)-1));}
+      if(col instanceof OmniCollection.OfFloat){return ((OmniCollection.OfFloat)col).add((float)(((float)Long.MIN_VALUE)-1));}
+      if(col instanceof OmniCollection.OfLong){return ((OmniCollection.OfLong)col).add((long)(((float)Long.MIN_VALUE)-1));}
+      if(col instanceof OmniCollection.OfInt){return ((OmniCollection.OfInt)col).add((int)(((float)Long.MIN_VALUE)-1));}
+      if(col instanceof OmniCollection.OfShort){return ((OmniCollection.OfShort)col).add((short)(((float)Long.MIN_VALUE)-1));}
+      if(col instanceof OmniCollection.OfChar){return ((OmniCollection.OfChar)col).add((char)(((float)Long.MIN_VALUE)-1));}
+      if(col instanceof OmniCollection.OfByte){return ((OmniCollection.OfByte)col).add((byte)(((float)Long.MIN_VALUE)-1));}
+      return ((OmniCollection.OfPrimitive)col).add((boolean)((((float)Long.MIN_VALUE)-1)==1));
     }
   },
-  FloatMIN_FLOAT_VALUE(float.class,Float.class){
+  FloatMIN_FLOAT_VALUE(float.class,Float.class,false){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((float)(Float.MIN_VALUE));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((float)(Float.MIN_VALUE));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((float)(Float.MIN_VALUE));}
@@ -5836,93 +1832,23 @@ public enum QueryTestPrimitiveInputType{
     @Override public int invokeObjectindexOf(OmniCollection col){return ((OmniList)col).indexOf((Object)(float)(Float.MIN_VALUE));}
     @Override public int invokeObjectlastIndexOf(OmniCollection col){return ((OmniList)col).lastIndexOf((Object)(float)(Float.MIN_VALUE));}
     @Override public int invokeObjectsearch(OmniCollection col){return ((OmniStack)col).search((Object)(float)(Float.MIN_VALUE));}
-    public boolean addNotEqualsVal(OmniCollection col)
-    {
+    public boolean addNotEqualsVal(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(boolean)false);}
       return ((OmniCollection.OfPrimitive)col).add((boolean)false);
     }
-    public void insertNotEqualsValInList(int index,OmniCollection col)
-    {
-      ((OmniList.OfPrimitive)col).add(index,(boolean)false);
-    }
-    public boolean attemptAdd(OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      Class<?> clazz=col.getClass();
-      Method method;
-      try
-      {
-        //attempt to call with the primitive type
-        method=clazz.getDeclaredMethod("add",primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          //if that fails, call with the boxed type
-          method=clazz.getDeclaredMethod("add",boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            //if all else fails, call with the object class
-            method=clazz.getDeclaredMethod("add",Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        return (boolean)method.invoke(col,Float.MIN_VALUE); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-    }
-    public boolean attemptInsertionInList(int index,OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      OmniList list=(OmniList)col; //throw if not correct type
-      Class<?> clazz=list.getClass();
-      Method method;
-      try
-      {
-        method=clazz.getDeclaredMethod("add",int.class,primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          method=clazz.getDeclaredMethod("add",int.class,boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            method=clazz.getDeclaredMethod("add",int.class,Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        method.invoke(list,index,Float.MIN_VALUE); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-      return true;
+    public boolean attemptAdd(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(float)(Float.MIN_VALUE));}
+      if(col instanceof OmniCollection.OfDouble){return ((OmniCollection.OfDouble)col).add((double)(Float.MIN_VALUE));}
+      if(col instanceof OmniCollection.OfFloat){return ((OmniCollection.OfFloat)col).add((float)(Float.MIN_VALUE));}
+      if(col instanceof OmniCollection.OfLong){return ((OmniCollection.OfLong)col).add((long)(Float.MIN_VALUE));}
+      if(col instanceof OmniCollection.OfInt){return ((OmniCollection.OfInt)col).add((int)(Float.MIN_VALUE));}
+      if(col instanceof OmniCollection.OfShort){return ((OmniCollection.OfShort)col).add((short)(Float.MIN_VALUE));}
+      if(col instanceof OmniCollection.OfChar){return ((OmniCollection.OfChar)col).add((char)(Float.MIN_VALUE));}
+      if(col instanceof OmniCollection.OfByte){return ((OmniCollection.OfByte)col).add((byte)(Float.MIN_VALUE));}
+      return ((OmniCollection.OfPrimitive)col).add((boolean)((Float.MIN_VALUE)==1));
     }
   },
-  FloatMAX_FLOAT_VALUE(float.class,Float.class){
+  FloatMAX_FLOAT_VALUE(float.class,Float.class,false){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((float)(Float.MAX_VALUE));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((float)(Float.MAX_VALUE));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((float)(Float.MAX_VALUE));}
@@ -5938,93 +1864,23 @@ public enum QueryTestPrimitiveInputType{
     @Override public int invokeObjectindexOf(OmniCollection col){return ((OmniList)col).indexOf((Object)(float)(Float.MAX_VALUE));}
     @Override public int invokeObjectlastIndexOf(OmniCollection col){return ((OmniList)col).lastIndexOf((Object)(float)(Float.MAX_VALUE));}
     @Override public int invokeObjectsearch(OmniCollection col){return ((OmniStack)col).search((Object)(float)(Float.MAX_VALUE));}
-    public boolean addNotEqualsVal(OmniCollection col)
-    {
+    public boolean addNotEqualsVal(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(boolean)false);}
       return ((OmniCollection.OfPrimitive)col).add((boolean)false);
     }
-    public void insertNotEqualsValInList(int index,OmniCollection col)
-    {
-      ((OmniList.OfPrimitive)col).add(index,(boolean)false);
-    }
-    public boolean attemptAdd(OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      Class<?> clazz=col.getClass();
-      Method method;
-      try
-      {
-        //attempt to call with the primitive type
-        method=clazz.getDeclaredMethod("add",primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          //if that fails, call with the boxed type
-          method=clazz.getDeclaredMethod("add",boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            //if all else fails, call with the object class
-            method=clazz.getDeclaredMethod("add",Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        return (boolean)method.invoke(col,Float.MAX_VALUE); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-    }
-    public boolean attemptInsertionInList(int index,OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      OmniList list=(OmniList)col; //throw if not correct type
-      Class<?> clazz=list.getClass();
-      Method method;
-      try
-      {
-        method=clazz.getDeclaredMethod("add",int.class,primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          method=clazz.getDeclaredMethod("add",int.class,boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            method=clazz.getDeclaredMethod("add",int.class,Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        method.invoke(list,index,Float.MAX_VALUE); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-      return true;
+    public boolean attemptAdd(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(float)(Float.MAX_VALUE));}
+      if(col instanceof OmniCollection.OfDouble){return ((OmniCollection.OfDouble)col).add((double)(Float.MAX_VALUE));}
+      if(col instanceof OmniCollection.OfFloat){return ((OmniCollection.OfFloat)col).add((float)(Float.MAX_VALUE));}
+      if(col instanceof OmniCollection.OfLong){return ((OmniCollection.OfLong)col).add((long)(Float.MAX_VALUE));}
+      if(col instanceof OmniCollection.OfInt){return ((OmniCollection.OfInt)col).add((int)(Float.MAX_VALUE));}
+      if(col instanceof OmniCollection.OfShort){return ((OmniCollection.OfShort)col).add((short)(Float.MAX_VALUE));}
+      if(col instanceof OmniCollection.OfChar){return ((OmniCollection.OfChar)col).add((char)(Float.MAX_VALUE));}
+      if(col instanceof OmniCollection.OfByte){return ((OmniCollection.OfByte)col).add((byte)(Float.MAX_VALUE));}
+      return ((OmniCollection.OfPrimitive)col).add((boolean)((Float.MAX_VALUE)==1));
     }
   },
-  FloatNaN(float.class,Float.class){
+  FloatNaN(float.class,Float.class,false){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((float)(Float.NaN));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((float)(Float.NaN));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((float)(Float.NaN));}
@@ -6040,93 +1896,23 @@ public enum QueryTestPrimitiveInputType{
     @Override public int invokeObjectindexOf(OmniCollection col){return ((OmniList)col).indexOf((Object)(float)(Float.NaN));}
     @Override public int invokeObjectlastIndexOf(OmniCollection col){return ((OmniList)col).lastIndexOf((Object)(float)(Float.NaN));}
     @Override public int invokeObjectsearch(OmniCollection col){return ((OmniStack)col).search((Object)(float)(Float.NaN));}
-    public boolean addNotEqualsVal(OmniCollection col)
-    {
+    public boolean addNotEqualsVal(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(boolean)false);}
       return ((OmniCollection.OfPrimitive)col).add((boolean)false);
     }
-    public void insertNotEqualsValInList(int index,OmniCollection col)
-    {
-      ((OmniList.OfPrimitive)col).add(index,(boolean)false);
-    }
-    public boolean attemptAdd(OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      Class<?> clazz=col.getClass();
-      Method method;
-      try
-      {
-        //attempt to call with the primitive type
-        method=clazz.getDeclaredMethod("add",primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          //if that fails, call with the boxed type
-          method=clazz.getDeclaredMethod("add",boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            //if all else fails, call with the object class
-            method=clazz.getDeclaredMethod("add",Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        return (boolean)method.invoke(col,Float.NaN); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-    }
-    public boolean attemptInsertionInList(int index,OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      OmniList list=(OmniList)col; //throw if not correct type
-      Class<?> clazz=list.getClass();
-      Method method;
-      try
-      {
-        method=clazz.getDeclaredMethod("add",int.class,primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          method=clazz.getDeclaredMethod("add",int.class,boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            method=clazz.getDeclaredMethod("add",int.class,Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        method.invoke(list,index,Float.NaN); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-      return true;
+    public boolean attemptAdd(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(float)(Float.NaN));}
+      if(col instanceof OmniCollection.OfDouble){return ((OmniCollection.OfDouble)col).add((double)(Float.NaN));}
+      if(col instanceof OmniCollection.OfFloat){return ((OmniCollection.OfFloat)col).add((float)(Float.NaN));}
+      if(col instanceof OmniCollection.OfLong){return ((OmniCollection.OfLong)col).add((long)(Float.NaN));}
+      if(col instanceof OmniCollection.OfInt){return ((OmniCollection.OfInt)col).add((int)(Float.NaN));}
+      if(col instanceof OmniCollection.OfShort){return ((OmniCollection.OfShort)col).add((short)(Float.NaN));}
+      if(col instanceof OmniCollection.OfChar){return ((OmniCollection.OfChar)col).add((char)(Float.NaN));}
+      if(col instanceof OmniCollection.OfByte){return ((OmniCollection.OfByte)col).add((byte)(Float.NaN));}
+      return ((OmniCollection.OfPrimitive)col).add((boolean)((Float.NaN)==1));
     }
   },
-  Doublepos0(double.class,Double.class){
+  Doublepos0(double.class,Double.class,true){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((double)(0.0D));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((double)(0.0D));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((double)(0.0D));}
@@ -6142,93 +1928,23 @@ public enum QueryTestPrimitiveInputType{
     @Override public int invokeObjectindexOf(OmniCollection col){return ((OmniList)col).indexOf((Object)(double)(0.0D));}
     @Override public int invokeObjectlastIndexOf(OmniCollection col){return ((OmniList)col).lastIndexOf((Object)(double)(0.0D));}
     @Override public int invokeObjectsearch(OmniCollection col){return ((OmniStack)col).search((Object)(double)(0.0D));}
-    public boolean addNotEqualsVal(OmniCollection col)
-    {
+    public boolean addNotEqualsVal(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(boolean)true);}
       return ((OmniCollection.OfPrimitive)col).add((boolean)true);
     }
-    public void insertNotEqualsValInList(int index,OmniCollection col)
-    {
-      ((OmniList.OfPrimitive)col).add(index,(boolean)true);
-    }
-    public boolean attemptAdd(OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      Class<?> clazz=col.getClass();
-      Method method;
-      try
-      {
-        //attempt to call with the primitive type
-        method=clazz.getDeclaredMethod("add",primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          //if that fails, call with the boxed type
-          method=clazz.getDeclaredMethod("add",boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            //if all else fails, call with the object class
-            method=clazz.getDeclaredMethod("add",Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        return (boolean)method.invoke(col,0.0D); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-    }
-    public boolean attemptInsertionInList(int index,OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      OmniList list=(OmniList)col; //throw if not correct type
-      Class<?> clazz=list.getClass();
-      Method method;
-      try
-      {
-        method=clazz.getDeclaredMethod("add",int.class,primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          method=clazz.getDeclaredMethod("add",int.class,boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            method=clazz.getDeclaredMethod("add",int.class,Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        method.invoke(list,index,0.0D); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-      return true;
+    public boolean attemptAdd(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(double)(0.0D));}
+      if(col instanceof OmniCollection.OfDouble){return ((OmniCollection.OfDouble)col).add((double)(0.0D));}
+      if(col instanceof OmniCollection.OfFloat){return ((OmniCollection.OfFloat)col).add((float)(0.0D));}
+      if(col instanceof OmniCollection.OfLong){return ((OmniCollection.OfLong)col).add((long)(0.0D));}
+      if(col instanceof OmniCollection.OfInt){return ((OmniCollection.OfInt)col).add((int)(0.0D));}
+      if(col instanceof OmniCollection.OfShort){return ((OmniCollection.OfShort)col).add((short)(0.0D));}
+      if(col instanceof OmniCollection.OfChar){return ((OmniCollection.OfChar)col).add((char)(0.0D));}
+      if(col instanceof OmniCollection.OfByte){return ((OmniCollection.OfByte)col).add((byte)(0.0D));}
+      return ((OmniCollection.OfPrimitive)col).add((boolean)((0.0D)==1));
     }
   },
-  Doubleneg0(double.class,Double.class){
+  Doubleneg0(double.class,Double.class,true){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((double)(-0.0D));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((double)(-0.0D));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((double)(-0.0D));}
@@ -6244,93 +1960,23 @@ public enum QueryTestPrimitiveInputType{
     @Override public int invokeObjectindexOf(OmniCollection col){return ((OmniList)col).indexOf((Object)(double)(-0.0D));}
     @Override public int invokeObjectlastIndexOf(OmniCollection col){return ((OmniList)col).lastIndexOf((Object)(double)(-0.0D));}
     @Override public int invokeObjectsearch(OmniCollection col){return ((OmniStack)col).search((Object)(double)(-0.0D));}
-    public boolean addNotEqualsVal(OmniCollection col)
-    {
+    public boolean addNotEqualsVal(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(boolean)true);}
       return ((OmniCollection.OfPrimitive)col).add((boolean)true);
     }
-    public void insertNotEqualsValInList(int index,OmniCollection col)
-    {
-      ((OmniList.OfPrimitive)col).add(index,(boolean)true);
-    }
-    public boolean attemptAdd(OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      Class<?> clazz=col.getClass();
-      Method method;
-      try
-      {
-        //attempt to call with the primitive type
-        method=clazz.getDeclaredMethod("add",primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          //if that fails, call with the boxed type
-          method=clazz.getDeclaredMethod("add",boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            //if all else fails, call with the object class
-            method=clazz.getDeclaredMethod("add",Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        return (boolean)method.invoke(col,-0.0D); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-    }
-    public boolean attemptInsertionInList(int index,OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      OmniList list=(OmniList)col; //throw if not correct type
-      Class<?> clazz=list.getClass();
-      Method method;
-      try
-      {
-        method=clazz.getDeclaredMethod("add",int.class,primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          method=clazz.getDeclaredMethod("add",int.class,boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            method=clazz.getDeclaredMethod("add",int.class,Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        method.invoke(list,index,-0.0D); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-      return true;
+    public boolean attemptAdd(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(double)(-0.0D));}
+      if(col instanceof OmniCollection.OfDouble){return ((OmniCollection.OfDouble)col).add((double)(-0.0D));}
+      if(col instanceof OmniCollection.OfFloat){return ((OmniCollection.OfFloat)col).add((float)(-0.0D));}
+      if(col instanceof OmniCollection.OfLong){return ((OmniCollection.OfLong)col).add((long)(-0.0D));}
+      if(col instanceof OmniCollection.OfInt){return ((OmniCollection.OfInt)col).add((int)(-0.0D));}
+      if(col instanceof OmniCollection.OfShort){return ((OmniCollection.OfShort)col).add((short)(-0.0D));}
+      if(col instanceof OmniCollection.OfChar){return ((OmniCollection.OfChar)col).add((char)(-0.0D));}
+      if(col instanceof OmniCollection.OfByte){return ((OmniCollection.OfByte)col).add((byte)(-0.0D));}
+      return ((OmniCollection.OfPrimitive)col).add((boolean)((-0.0D)==1));
     }
   },
-  Doublepos1(double.class,Double.class){
+  Doublepos1(double.class,Double.class,false){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((double)(1));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((double)(1));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((double)(1));}
@@ -6346,93 +1992,23 @@ public enum QueryTestPrimitiveInputType{
     @Override public int invokeObjectindexOf(OmniCollection col){return ((OmniList)col).indexOf((Object)(double)(1));}
     @Override public int invokeObjectlastIndexOf(OmniCollection col){return ((OmniList)col).lastIndexOf((Object)(double)(1));}
     @Override public int invokeObjectsearch(OmniCollection col){return ((OmniStack)col).search((Object)(double)(1));}
-    public boolean addNotEqualsVal(OmniCollection col)
-    {
+    public boolean addNotEqualsVal(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(boolean)false);}
       return ((OmniCollection.OfPrimitive)col).add((boolean)false);
     }
-    public void insertNotEqualsValInList(int index,OmniCollection col)
-    {
-      ((OmniList.OfPrimitive)col).add(index,(boolean)false);
-    }
-    public boolean attemptAdd(OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      Class<?> clazz=col.getClass();
-      Method method;
-      try
-      {
-        //attempt to call with the primitive type
-        method=clazz.getDeclaredMethod("add",primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          //if that fails, call with the boxed type
-          method=clazz.getDeclaredMethod("add",boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            //if all else fails, call with the object class
-            method=clazz.getDeclaredMethod("add",Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        return (boolean)method.invoke(col,1); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-    }
-    public boolean attemptInsertionInList(int index,OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      OmniList list=(OmniList)col; //throw if not correct type
-      Class<?> clazz=list.getClass();
-      Method method;
-      try
-      {
-        method=clazz.getDeclaredMethod("add",int.class,primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          method=clazz.getDeclaredMethod("add",int.class,boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            method=clazz.getDeclaredMethod("add",int.class,Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        method.invoke(list,index,1); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-      return true;
+    public boolean attemptAdd(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(double)(1));}
+      if(col instanceof OmniCollection.OfDouble){return ((OmniCollection.OfDouble)col).add((double)(1));}
+      if(col instanceof OmniCollection.OfFloat){return ((OmniCollection.OfFloat)col).add((float)(1));}
+      if(col instanceof OmniCollection.OfLong){return ((OmniCollection.OfLong)col).add((long)(1));}
+      if(col instanceof OmniCollection.OfInt){return ((OmniCollection.OfInt)col).add((int)(1));}
+      if(col instanceof OmniCollection.OfShort){return ((OmniCollection.OfShort)col).add((short)(1));}
+      if(col instanceof OmniCollection.OfChar){return ((OmniCollection.OfChar)col).add((char)(1));}
+      if(col instanceof OmniCollection.OfByte){return ((OmniCollection.OfByte)col).add((byte)(1));}
+      return ((OmniCollection.OfPrimitive)col).add((boolean)((1)==1));
     }
   },
-  Doublepos2(double.class,Double.class){
+  Doublepos2(double.class,Double.class,false){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((double)(2));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((double)(2));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((double)(2));}
@@ -6448,93 +2024,23 @@ public enum QueryTestPrimitiveInputType{
     @Override public int invokeObjectindexOf(OmniCollection col){return ((OmniList)col).indexOf((Object)(double)(2));}
     @Override public int invokeObjectlastIndexOf(OmniCollection col){return ((OmniList)col).lastIndexOf((Object)(double)(2));}
     @Override public int invokeObjectsearch(OmniCollection col){return ((OmniStack)col).search((Object)(double)(2));}
-    public boolean addNotEqualsVal(OmniCollection col)
-    {
+    public boolean addNotEqualsVal(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(boolean)false);}
       return ((OmniCollection.OfPrimitive)col).add((boolean)false);
     }
-    public void insertNotEqualsValInList(int index,OmniCollection col)
-    {
-      ((OmniList.OfPrimitive)col).add(index,(boolean)false);
-    }
-    public boolean attemptAdd(OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      Class<?> clazz=col.getClass();
-      Method method;
-      try
-      {
-        //attempt to call with the primitive type
-        method=clazz.getDeclaredMethod("add",primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          //if that fails, call with the boxed type
-          method=clazz.getDeclaredMethod("add",boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            //if all else fails, call with the object class
-            method=clazz.getDeclaredMethod("add",Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        return (boolean)method.invoke(col,2); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-    }
-    public boolean attemptInsertionInList(int index,OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      OmniList list=(OmniList)col; //throw if not correct type
-      Class<?> clazz=list.getClass();
-      Method method;
-      try
-      {
-        method=clazz.getDeclaredMethod("add",int.class,primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          method=clazz.getDeclaredMethod("add",int.class,boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            method=clazz.getDeclaredMethod("add",int.class,Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        method.invoke(list,index,2); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-      return true;
+    public boolean attemptAdd(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(double)(2));}
+      if(col instanceof OmniCollection.OfDouble){return ((OmniCollection.OfDouble)col).add((double)(2));}
+      if(col instanceof OmniCollection.OfFloat){return ((OmniCollection.OfFloat)col).add((float)(2));}
+      if(col instanceof OmniCollection.OfLong){return ((OmniCollection.OfLong)col).add((long)(2));}
+      if(col instanceof OmniCollection.OfInt){return ((OmniCollection.OfInt)col).add((int)(2));}
+      if(col instanceof OmniCollection.OfShort){return ((OmniCollection.OfShort)col).add((short)(2));}
+      if(col instanceof OmniCollection.OfChar){return ((OmniCollection.OfChar)col).add((char)(2));}
+      if(col instanceof OmniCollection.OfByte){return ((OmniCollection.OfByte)col).add((byte)(2));}
+      return ((OmniCollection.OfPrimitive)col).add((boolean)((2)==1));
     }
   },
-  Doubleneg1(double.class,Double.class){
+  Doubleneg1(double.class,Double.class,false){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((double)(-1));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((double)(-1));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((double)(-1));}
@@ -6550,93 +2056,23 @@ public enum QueryTestPrimitiveInputType{
     @Override public int invokeObjectindexOf(OmniCollection col){return ((OmniList)col).indexOf((Object)(double)(-1));}
     @Override public int invokeObjectlastIndexOf(OmniCollection col){return ((OmniList)col).lastIndexOf((Object)(double)(-1));}
     @Override public int invokeObjectsearch(OmniCollection col){return ((OmniStack)col).search((Object)(double)(-1));}
-    public boolean addNotEqualsVal(OmniCollection col)
-    {
+    public boolean addNotEqualsVal(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(boolean)false);}
       return ((OmniCollection.OfPrimitive)col).add((boolean)false);
     }
-    public void insertNotEqualsValInList(int index,OmniCollection col)
-    {
-      ((OmniList.OfPrimitive)col).add(index,(boolean)false);
-    }
-    public boolean attemptAdd(OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      Class<?> clazz=col.getClass();
-      Method method;
-      try
-      {
-        //attempt to call with the primitive type
-        method=clazz.getDeclaredMethod("add",primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          //if that fails, call with the boxed type
-          method=clazz.getDeclaredMethod("add",boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            //if all else fails, call with the object class
-            method=clazz.getDeclaredMethod("add",Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        return (boolean)method.invoke(col,-1); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-    }
-    public boolean attemptInsertionInList(int index,OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      OmniList list=(OmniList)col; //throw if not correct type
-      Class<?> clazz=list.getClass();
-      Method method;
-      try
-      {
-        method=clazz.getDeclaredMethod("add",int.class,primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          method=clazz.getDeclaredMethod("add",int.class,boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            method=clazz.getDeclaredMethod("add",int.class,Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        method.invoke(list,index,-1); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-      return true;
+    public boolean attemptAdd(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(double)(-1));}
+      if(col instanceof OmniCollection.OfDouble){return ((OmniCollection.OfDouble)col).add((double)(-1));}
+      if(col instanceof OmniCollection.OfFloat){return ((OmniCollection.OfFloat)col).add((float)(-1));}
+      if(col instanceof OmniCollection.OfLong){return ((OmniCollection.OfLong)col).add((long)(-1));}
+      if(col instanceof OmniCollection.OfInt){return ((OmniCollection.OfInt)col).add((int)(-1));}
+      if(col instanceof OmniCollection.OfShort){return ((OmniCollection.OfShort)col).add((short)(-1));}
+      if(col instanceof OmniCollection.OfChar){return ((OmniCollection.OfChar)col).add((char)(-1));}
+      if(col instanceof OmniCollection.OfByte){return ((OmniCollection.OfByte)col).add((byte)(-1));}
+      return ((OmniCollection.OfPrimitive)col).add((boolean)((-1)==1));
     }
   },
-  DoubleMAX_BYTE_PLUS1(double.class,Double.class){
+  DoubleMAX_BYTE_PLUS1(double.class,Double.class,false){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((double)(((double)Byte.MAX_VALUE)+1));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((double)(((double)Byte.MAX_VALUE)+1));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((double)(((double)Byte.MAX_VALUE)+1));}
@@ -6652,93 +2088,23 @@ public enum QueryTestPrimitiveInputType{
     @Override public int invokeObjectindexOf(OmniCollection col){return ((OmniList)col).indexOf((Object)(double)(((double)Byte.MAX_VALUE)+1));}
     @Override public int invokeObjectlastIndexOf(OmniCollection col){return ((OmniList)col).lastIndexOf((Object)(double)(((double)Byte.MAX_VALUE)+1));}
     @Override public int invokeObjectsearch(OmniCollection col){return ((OmniStack)col).search((Object)(double)(((double)Byte.MAX_VALUE)+1));}
-    public boolean addNotEqualsVal(OmniCollection col)
-    {
+    public boolean addNotEqualsVal(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(boolean)false);}
       return ((OmniCollection.OfPrimitive)col).add((boolean)false);
     }
-    public void insertNotEqualsValInList(int index,OmniCollection col)
-    {
-      ((OmniList.OfPrimitive)col).add(index,(boolean)false);
-    }
-    public boolean attemptAdd(OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      Class<?> clazz=col.getClass();
-      Method method;
-      try
-      {
-        //attempt to call with the primitive type
-        method=clazz.getDeclaredMethod("add",primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          //if that fails, call with the boxed type
-          method=clazz.getDeclaredMethod("add",boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            //if all else fails, call with the object class
-            method=clazz.getDeclaredMethod("add",Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        return (boolean)method.invoke(col,((double)Byte.MAX_VALUE)+1); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-    }
-    public boolean attemptInsertionInList(int index,OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      OmniList list=(OmniList)col; //throw if not correct type
-      Class<?> clazz=list.getClass();
-      Method method;
-      try
-      {
-        method=clazz.getDeclaredMethod("add",int.class,primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          method=clazz.getDeclaredMethod("add",int.class,boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            method=clazz.getDeclaredMethod("add",int.class,Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        method.invoke(list,index,((double)Byte.MAX_VALUE)+1); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-      return true;
+    public boolean attemptAdd(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(double)(((double)Byte.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfDouble){return ((OmniCollection.OfDouble)col).add((double)(((double)Byte.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfFloat){return ((OmniCollection.OfFloat)col).add((float)(((double)Byte.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfLong){return ((OmniCollection.OfLong)col).add((long)(((double)Byte.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfInt){return ((OmniCollection.OfInt)col).add((int)(((double)Byte.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfShort){return ((OmniCollection.OfShort)col).add((short)(((double)Byte.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfChar){return ((OmniCollection.OfChar)col).add((char)(((double)Byte.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfByte){return ((OmniCollection.OfByte)col).add((byte)(((double)Byte.MAX_VALUE)+1));}
+      return ((OmniCollection.OfPrimitive)col).add((boolean)((((double)Byte.MAX_VALUE)+1)==1));
     }
   },
-  DoubleMIN_BYTE_MINUS1(double.class,Double.class){
+  DoubleMIN_BYTE_MINUS1(double.class,Double.class,false){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((double)(((double)Byte.MIN_VALUE)-1));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((double)(((double)Byte.MIN_VALUE)-1));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((double)(((double)Byte.MIN_VALUE)-1));}
@@ -6754,93 +2120,23 @@ public enum QueryTestPrimitiveInputType{
     @Override public int invokeObjectindexOf(OmniCollection col){return ((OmniList)col).indexOf((Object)(double)(((double)Byte.MIN_VALUE)-1));}
     @Override public int invokeObjectlastIndexOf(OmniCollection col){return ((OmniList)col).lastIndexOf((Object)(double)(((double)Byte.MIN_VALUE)-1));}
     @Override public int invokeObjectsearch(OmniCollection col){return ((OmniStack)col).search((Object)(double)(((double)Byte.MIN_VALUE)-1));}
-    public boolean addNotEqualsVal(OmniCollection col)
-    {
+    public boolean addNotEqualsVal(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(boolean)false);}
       return ((OmniCollection.OfPrimitive)col).add((boolean)false);
     }
-    public void insertNotEqualsValInList(int index,OmniCollection col)
-    {
-      ((OmniList.OfPrimitive)col).add(index,(boolean)false);
-    }
-    public boolean attemptAdd(OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      Class<?> clazz=col.getClass();
-      Method method;
-      try
-      {
-        //attempt to call with the primitive type
-        method=clazz.getDeclaredMethod("add",primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          //if that fails, call with the boxed type
-          method=clazz.getDeclaredMethod("add",boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            //if all else fails, call with the object class
-            method=clazz.getDeclaredMethod("add",Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        return (boolean)method.invoke(col,((double)Byte.MIN_VALUE)-1); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-    }
-    public boolean attemptInsertionInList(int index,OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      OmniList list=(OmniList)col; //throw if not correct type
-      Class<?> clazz=list.getClass();
-      Method method;
-      try
-      {
-        method=clazz.getDeclaredMethod("add",int.class,primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          method=clazz.getDeclaredMethod("add",int.class,boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            method=clazz.getDeclaredMethod("add",int.class,Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        method.invoke(list,index,((double)Byte.MIN_VALUE)-1); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-      return true;
+    public boolean attemptAdd(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(double)(((double)Byte.MIN_VALUE)-1));}
+      if(col instanceof OmniCollection.OfDouble){return ((OmniCollection.OfDouble)col).add((double)(((double)Byte.MIN_VALUE)-1));}
+      if(col instanceof OmniCollection.OfFloat){return ((OmniCollection.OfFloat)col).add((float)(((double)Byte.MIN_VALUE)-1));}
+      if(col instanceof OmniCollection.OfLong){return ((OmniCollection.OfLong)col).add((long)(((double)Byte.MIN_VALUE)-1));}
+      if(col instanceof OmniCollection.OfInt){return ((OmniCollection.OfInt)col).add((int)(((double)Byte.MIN_VALUE)-1));}
+      if(col instanceof OmniCollection.OfShort){return ((OmniCollection.OfShort)col).add((short)(((double)Byte.MIN_VALUE)-1));}
+      if(col instanceof OmniCollection.OfChar){return ((OmniCollection.OfChar)col).add((char)(((double)Byte.MIN_VALUE)-1));}
+      if(col instanceof OmniCollection.OfByte){return ((OmniCollection.OfByte)col).add((byte)(((double)Byte.MIN_VALUE)-1));}
+      return ((OmniCollection.OfPrimitive)col).add((boolean)((((double)Byte.MIN_VALUE)-1)==1));
     }
   },
-  DoubleMAX_SHORT_PLUS1(double.class,Double.class){
+  DoubleMAX_SHORT_PLUS1(double.class,Double.class,false){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((double)(((double)Short.MAX_VALUE)+1));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((double)(((double)Short.MAX_VALUE)+1));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((double)(((double)Short.MAX_VALUE)+1));}
@@ -6856,93 +2152,23 @@ public enum QueryTestPrimitiveInputType{
     @Override public int invokeObjectindexOf(OmniCollection col){return ((OmniList)col).indexOf((Object)(double)(((double)Short.MAX_VALUE)+1));}
     @Override public int invokeObjectlastIndexOf(OmniCollection col){return ((OmniList)col).lastIndexOf((Object)(double)(((double)Short.MAX_VALUE)+1));}
     @Override public int invokeObjectsearch(OmniCollection col){return ((OmniStack)col).search((Object)(double)(((double)Short.MAX_VALUE)+1));}
-    public boolean addNotEqualsVal(OmniCollection col)
-    {
+    public boolean addNotEqualsVal(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(boolean)false);}
       return ((OmniCollection.OfPrimitive)col).add((boolean)false);
     }
-    public void insertNotEqualsValInList(int index,OmniCollection col)
-    {
-      ((OmniList.OfPrimitive)col).add(index,(boolean)false);
-    }
-    public boolean attemptAdd(OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      Class<?> clazz=col.getClass();
-      Method method;
-      try
-      {
-        //attempt to call with the primitive type
-        method=clazz.getDeclaredMethod("add",primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          //if that fails, call with the boxed type
-          method=clazz.getDeclaredMethod("add",boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            //if all else fails, call with the object class
-            method=clazz.getDeclaredMethod("add",Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        return (boolean)method.invoke(col,((double)Short.MAX_VALUE)+1); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-    }
-    public boolean attemptInsertionInList(int index,OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      OmniList list=(OmniList)col; //throw if not correct type
-      Class<?> clazz=list.getClass();
-      Method method;
-      try
-      {
-        method=clazz.getDeclaredMethod("add",int.class,primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          method=clazz.getDeclaredMethod("add",int.class,boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            method=clazz.getDeclaredMethod("add",int.class,Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        method.invoke(list,index,((double)Short.MAX_VALUE)+1); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-      return true;
+    public boolean attemptAdd(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(double)(((double)Short.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfDouble){return ((OmniCollection.OfDouble)col).add((double)(((double)Short.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfFloat){return ((OmniCollection.OfFloat)col).add((float)(((double)Short.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfLong){return ((OmniCollection.OfLong)col).add((long)(((double)Short.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfInt){return ((OmniCollection.OfInt)col).add((int)(((double)Short.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfShort){return ((OmniCollection.OfShort)col).add((short)(((double)Short.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfChar){return ((OmniCollection.OfChar)col).add((char)(((double)Short.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfByte){return ((OmniCollection.OfByte)col).add((byte)(((double)Short.MAX_VALUE)+1));}
+      return ((OmniCollection.OfPrimitive)col).add((boolean)((((double)Short.MAX_VALUE)+1)==1));
     }
   },
-  DoubleMIN_SHORT_MINUS1(double.class,Double.class){
+  DoubleMIN_SHORT_MINUS1(double.class,Double.class,false){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((double)(((double)Short.MIN_VALUE)-1));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((double)(((double)Short.MIN_VALUE)-1));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((double)(((double)Short.MIN_VALUE)-1));}
@@ -6958,93 +2184,23 @@ public enum QueryTestPrimitiveInputType{
     @Override public int invokeObjectindexOf(OmniCollection col){return ((OmniList)col).indexOf((Object)(double)(((double)Short.MIN_VALUE)-1));}
     @Override public int invokeObjectlastIndexOf(OmniCollection col){return ((OmniList)col).lastIndexOf((Object)(double)(((double)Short.MIN_VALUE)-1));}
     @Override public int invokeObjectsearch(OmniCollection col){return ((OmniStack)col).search((Object)(double)(((double)Short.MIN_VALUE)-1));}
-    public boolean addNotEqualsVal(OmniCollection col)
-    {
+    public boolean addNotEqualsVal(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(boolean)false);}
       return ((OmniCollection.OfPrimitive)col).add((boolean)false);
     }
-    public void insertNotEqualsValInList(int index,OmniCollection col)
-    {
-      ((OmniList.OfPrimitive)col).add(index,(boolean)false);
-    }
-    public boolean attemptAdd(OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      Class<?> clazz=col.getClass();
-      Method method;
-      try
-      {
-        //attempt to call with the primitive type
-        method=clazz.getDeclaredMethod("add",primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          //if that fails, call with the boxed type
-          method=clazz.getDeclaredMethod("add",boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            //if all else fails, call with the object class
-            method=clazz.getDeclaredMethod("add",Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        return (boolean)method.invoke(col,((double)Short.MIN_VALUE)-1); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-    }
-    public boolean attemptInsertionInList(int index,OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      OmniList list=(OmniList)col; //throw if not correct type
-      Class<?> clazz=list.getClass();
-      Method method;
-      try
-      {
-        method=clazz.getDeclaredMethod("add",int.class,primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          method=clazz.getDeclaredMethod("add",int.class,boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            method=clazz.getDeclaredMethod("add",int.class,Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        method.invoke(list,index,((double)Short.MIN_VALUE)-1); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-      return true;
+    public boolean attemptAdd(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(double)(((double)Short.MIN_VALUE)-1));}
+      if(col instanceof OmniCollection.OfDouble){return ((OmniCollection.OfDouble)col).add((double)(((double)Short.MIN_VALUE)-1));}
+      if(col instanceof OmniCollection.OfFloat){return ((OmniCollection.OfFloat)col).add((float)(((double)Short.MIN_VALUE)-1));}
+      if(col instanceof OmniCollection.OfLong){return ((OmniCollection.OfLong)col).add((long)(((double)Short.MIN_VALUE)-1));}
+      if(col instanceof OmniCollection.OfInt){return ((OmniCollection.OfInt)col).add((int)(((double)Short.MIN_VALUE)-1));}
+      if(col instanceof OmniCollection.OfShort){return ((OmniCollection.OfShort)col).add((short)(((double)Short.MIN_VALUE)-1));}
+      if(col instanceof OmniCollection.OfChar){return ((OmniCollection.OfChar)col).add((char)(((double)Short.MIN_VALUE)-1));}
+      if(col instanceof OmniCollection.OfByte){return ((OmniCollection.OfByte)col).add((byte)(((double)Short.MIN_VALUE)-1));}
+      return ((OmniCollection.OfPrimitive)col).add((boolean)((((double)Short.MIN_VALUE)-1)==1));
     }
   },
-  DoubleMAX_CHAR_PLUS1(double.class,Double.class){
+  DoubleMAX_CHAR_PLUS1(double.class,Double.class,false){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((double)(((double)Character.MAX_VALUE)+1));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((double)(((double)Character.MAX_VALUE)+1));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((double)(((double)Character.MAX_VALUE)+1));}
@@ -7060,93 +2216,23 @@ public enum QueryTestPrimitiveInputType{
     @Override public int invokeObjectindexOf(OmniCollection col){return ((OmniList)col).indexOf((Object)(double)(((double)Character.MAX_VALUE)+1));}
     @Override public int invokeObjectlastIndexOf(OmniCollection col){return ((OmniList)col).lastIndexOf((Object)(double)(((double)Character.MAX_VALUE)+1));}
     @Override public int invokeObjectsearch(OmniCollection col){return ((OmniStack)col).search((Object)(double)(((double)Character.MAX_VALUE)+1));}
-    public boolean addNotEqualsVal(OmniCollection col)
-    {
+    public boolean addNotEqualsVal(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(boolean)false);}
       return ((OmniCollection.OfPrimitive)col).add((boolean)false);
     }
-    public void insertNotEqualsValInList(int index,OmniCollection col)
-    {
-      ((OmniList.OfPrimitive)col).add(index,(boolean)false);
-    }
-    public boolean attemptAdd(OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      Class<?> clazz=col.getClass();
-      Method method;
-      try
-      {
-        //attempt to call with the primitive type
-        method=clazz.getDeclaredMethod("add",primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          //if that fails, call with the boxed type
-          method=clazz.getDeclaredMethod("add",boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            //if all else fails, call with the object class
-            method=clazz.getDeclaredMethod("add",Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        return (boolean)method.invoke(col,((double)Character.MAX_VALUE)+1); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-    }
-    public boolean attemptInsertionInList(int index,OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      OmniList list=(OmniList)col; //throw if not correct type
-      Class<?> clazz=list.getClass();
-      Method method;
-      try
-      {
-        method=clazz.getDeclaredMethod("add",int.class,primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          method=clazz.getDeclaredMethod("add",int.class,boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            method=clazz.getDeclaredMethod("add",int.class,Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        method.invoke(list,index,((double)Character.MAX_VALUE)+1); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-      return true;
+    public boolean attemptAdd(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(double)(((double)Character.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfDouble){return ((OmniCollection.OfDouble)col).add((double)(((double)Character.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfFloat){return ((OmniCollection.OfFloat)col).add((float)(((double)Character.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfLong){return ((OmniCollection.OfLong)col).add((long)(((double)Character.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfInt){return ((OmniCollection.OfInt)col).add((int)(((double)Character.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfShort){return ((OmniCollection.OfShort)col).add((short)(((double)Character.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfChar){return ((OmniCollection.OfChar)col).add((char)(((double)Character.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfByte){return ((OmniCollection.OfByte)col).add((byte)(((double)Character.MAX_VALUE)+1));}
+      return ((OmniCollection.OfPrimitive)col).add((boolean)((((double)Character.MAX_VALUE)+1)==1));
     }
   },
-  DoubleMAX_SAFE_INT_PLUS1(double.class,Double.class){
+  DoubleMAX_SAFE_INT_PLUS1(double.class,Double.class,false){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((double)(((double)TypeUtil.MAX_SAFE_INT)+1));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((double)(((double)TypeUtil.MAX_SAFE_INT)+1));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((double)(((double)TypeUtil.MAX_SAFE_INT)+1));}
@@ -7162,93 +2248,23 @@ public enum QueryTestPrimitiveInputType{
     @Override public int invokeObjectindexOf(OmniCollection col){return ((OmniList)col).indexOf((Object)(double)(((double)TypeUtil.MAX_SAFE_INT)+1));}
     @Override public int invokeObjectlastIndexOf(OmniCollection col){return ((OmniList)col).lastIndexOf((Object)(double)(((double)TypeUtil.MAX_SAFE_INT)+1));}
     @Override public int invokeObjectsearch(OmniCollection col){return ((OmniStack)col).search((Object)(double)(((double)TypeUtil.MAX_SAFE_INT)+1));}
-    public boolean addNotEqualsVal(OmniCollection col)
-    {
+    public boolean addNotEqualsVal(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(boolean)false);}
       return ((OmniCollection.OfPrimitive)col).add((boolean)false);
     }
-    public void insertNotEqualsValInList(int index,OmniCollection col)
-    {
-      ((OmniList.OfPrimitive)col).add(index,(boolean)false);
-    }
-    public boolean attemptAdd(OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      Class<?> clazz=col.getClass();
-      Method method;
-      try
-      {
-        //attempt to call with the primitive type
-        method=clazz.getDeclaredMethod("add",primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          //if that fails, call with the boxed type
-          method=clazz.getDeclaredMethod("add",boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            //if all else fails, call with the object class
-            method=clazz.getDeclaredMethod("add",Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        return (boolean)method.invoke(col,((double)TypeUtil.MAX_SAFE_INT)+1); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-    }
-    public boolean attemptInsertionInList(int index,OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      OmniList list=(OmniList)col; //throw if not correct type
-      Class<?> clazz=list.getClass();
-      Method method;
-      try
-      {
-        method=clazz.getDeclaredMethod("add",int.class,primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          method=clazz.getDeclaredMethod("add",int.class,boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            method=clazz.getDeclaredMethod("add",int.class,Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        method.invoke(list,index,((double)TypeUtil.MAX_SAFE_INT)+1); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-      return true;
+    public boolean attemptAdd(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(double)(((double)TypeUtil.MAX_SAFE_INT)+1));}
+      if(col instanceof OmniCollection.OfDouble){return ((OmniCollection.OfDouble)col).add((double)(((double)TypeUtil.MAX_SAFE_INT)+1));}
+      if(col instanceof OmniCollection.OfFloat){return ((OmniCollection.OfFloat)col).add((float)(((double)TypeUtil.MAX_SAFE_INT)+1));}
+      if(col instanceof OmniCollection.OfLong){return ((OmniCollection.OfLong)col).add((long)(((double)TypeUtil.MAX_SAFE_INT)+1));}
+      if(col instanceof OmniCollection.OfInt){return ((OmniCollection.OfInt)col).add((int)(((double)TypeUtil.MAX_SAFE_INT)+1));}
+      if(col instanceof OmniCollection.OfShort){return ((OmniCollection.OfShort)col).add((short)(((double)TypeUtil.MAX_SAFE_INT)+1));}
+      if(col instanceof OmniCollection.OfChar){return ((OmniCollection.OfChar)col).add((char)(((double)TypeUtil.MAX_SAFE_INT)+1));}
+      if(col instanceof OmniCollection.OfByte){return ((OmniCollection.OfByte)col).add((byte)(((double)TypeUtil.MAX_SAFE_INT)+1));}
+      return ((OmniCollection.OfPrimitive)col).add((boolean)((((double)TypeUtil.MAX_SAFE_INT)+1)==1));
     }
   },
-  DoubleMIN_SAFE_INT_MINUS1(double.class,Double.class){
+  DoubleMIN_SAFE_INT_MINUS1(double.class,Double.class,false){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((double)(((double)TypeUtil.MIN_SAFE_INT)-1));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((double)(((double)TypeUtil.MIN_SAFE_INT)-1));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((double)(((double)TypeUtil.MIN_SAFE_INT)-1));}
@@ -7264,93 +2280,23 @@ public enum QueryTestPrimitiveInputType{
     @Override public int invokeObjectindexOf(OmniCollection col){return ((OmniList)col).indexOf((Object)(double)(((double)TypeUtil.MIN_SAFE_INT)-1));}
     @Override public int invokeObjectlastIndexOf(OmniCollection col){return ((OmniList)col).lastIndexOf((Object)(double)(((double)TypeUtil.MIN_SAFE_INT)-1));}
     @Override public int invokeObjectsearch(OmniCollection col){return ((OmniStack)col).search((Object)(double)(((double)TypeUtil.MIN_SAFE_INT)-1));}
-    public boolean addNotEqualsVal(OmniCollection col)
-    {
+    public boolean addNotEqualsVal(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(boolean)false);}
       return ((OmniCollection.OfPrimitive)col).add((boolean)false);
     }
-    public void insertNotEqualsValInList(int index,OmniCollection col)
-    {
-      ((OmniList.OfPrimitive)col).add(index,(boolean)false);
-    }
-    public boolean attemptAdd(OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      Class<?> clazz=col.getClass();
-      Method method;
-      try
-      {
-        //attempt to call with the primitive type
-        method=clazz.getDeclaredMethod("add",primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          //if that fails, call with the boxed type
-          method=clazz.getDeclaredMethod("add",boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            //if all else fails, call with the object class
-            method=clazz.getDeclaredMethod("add",Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        return (boolean)method.invoke(col,((double)TypeUtil.MIN_SAFE_INT)-1); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-    }
-    public boolean attemptInsertionInList(int index,OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      OmniList list=(OmniList)col; //throw if not correct type
-      Class<?> clazz=list.getClass();
-      Method method;
-      try
-      {
-        method=clazz.getDeclaredMethod("add",int.class,primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          method=clazz.getDeclaredMethod("add",int.class,boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            method=clazz.getDeclaredMethod("add",int.class,Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        method.invoke(list,index,((double)TypeUtil.MIN_SAFE_INT)-1); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-      return true;
+    public boolean attemptAdd(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(double)(((double)TypeUtil.MIN_SAFE_INT)-1));}
+      if(col instanceof OmniCollection.OfDouble){return ((OmniCollection.OfDouble)col).add((double)(((double)TypeUtil.MIN_SAFE_INT)-1));}
+      if(col instanceof OmniCollection.OfFloat){return ((OmniCollection.OfFloat)col).add((float)(((double)TypeUtil.MIN_SAFE_INT)-1));}
+      if(col instanceof OmniCollection.OfLong){return ((OmniCollection.OfLong)col).add((long)(((double)TypeUtil.MIN_SAFE_INT)-1));}
+      if(col instanceof OmniCollection.OfInt){return ((OmniCollection.OfInt)col).add((int)(((double)TypeUtil.MIN_SAFE_INT)-1));}
+      if(col instanceof OmniCollection.OfShort){return ((OmniCollection.OfShort)col).add((short)(((double)TypeUtil.MIN_SAFE_INT)-1));}
+      if(col instanceof OmniCollection.OfChar){return ((OmniCollection.OfChar)col).add((char)(((double)TypeUtil.MIN_SAFE_INT)-1));}
+      if(col instanceof OmniCollection.OfByte){return ((OmniCollection.OfByte)col).add((byte)(((double)TypeUtil.MIN_SAFE_INT)-1));}
+      return ((OmniCollection.OfPrimitive)col).add((boolean)((((double)TypeUtil.MIN_SAFE_INT)-1)==1));
     }
   },
-  DoubleMAX_INT_PLUS1(double.class,Double.class){
+  DoubleMAX_INT_PLUS1(double.class,Double.class,false){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((double)(((double)Integer.MAX_VALUE)+1));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((double)(((double)Integer.MAX_VALUE)+1));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((double)(((double)Integer.MAX_VALUE)+1));}
@@ -7366,93 +2312,23 @@ public enum QueryTestPrimitiveInputType{
     @Override public int invokeObjectindexOf(OmniCollection col){return ((OmniList)col).indexOf((Object)(double)(((double)Integer.MAX_VALUE)+1));}
     @Override public int invokeObjectlastIndexOf(OmniCollection col){return ((OmniList)col).lastIndexOf((Object)(double)(((double)Integer.MAX_VALUE)+1));}
     @Override public int invokeObjectsearch(OmniCollection col){return ((OmniStack)col).search((Object)(double)(((double)Integer.MAX_VALUE)+1));}
-    public boolean addNotEqualsVal(OmniCollection col)
-    {
+    public boolean addNotEqualsVal(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(boolean)false);}
       return ((OmniCollection.OfPrimitive)col).add((boolean)false);
     }
-    public void insertNotEqualsValInList(int index,OmniCollection col)
-    {
-      ((OmniList.OfPrimitive)col).add(index,(boolean)false);
-    }
-    public boolean attemptAdd(OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      Class<?> clazz=col.getClass();
-      Method method;
-      try
-      {
-        //attempt to call with the primitive type
-        method=clazz.getDeclaredMethod("add",primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          //if that fails, call with the boxed type
-          method=clazz.getDeclaredMethod("add",boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            //if all else fails, call with the object class
-            method=clazz.getDeclaredMethod("add",Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        return (boolean)method.invoke(col,((double)Integer.MAX_VALUE)+1); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-    }
-    public boolean attemptInsertionInList(int index,OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      OmniList list=(OmniList)col; //throw if not correct type
-      Class<?> clazz=list.getClass();
-      Method method;
-      try
-      {
-        method=clazz.getDeclaredMethod("add",int.class,primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          method=clazz.getDeclaredMethod("add",int.class,boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            method=clazz.getDeclaredMethod("add",int.class,Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        method.invoke(list,index,((double)Integer.MAX_VALUE)+1); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-      return true;
+    public boolean attemptAdd(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(double)(((double)Integer.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfDouble){return ((OmniCollection.OfDouble)col).add((double)(((double)Integer.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfFloat){return ((OmniCollection.OfFloat)col).add((float)(((double)Integer.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfLong){return ((OmniCollection.OfLong)col).add((long)(((double)Integer.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfInt){return ((OmniCollection.OfInt)col).add((int)(((double)Integer.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfShort){return ((OmniCollection.OfShort)col).add((short)(((double)Integer.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfChar){return ((OmniCollection.OfChar)col).add((char)(((double)Integer.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfByte){return ((OmniCollection.OfByte)col).add((byte)(((double)Integer.MAX_VALUE)+1));}
+      return ((OmniCollection.OfPrimitive)col).add((boolean)((((double)Integer.MAX_VALUE)+1)==1));
     }
   },
-  DoubleMIN_INT_MINUS1(double.class,Double.class){
+  DoubleMIN_INT_MINUS1(double.class,Double.class,false){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((double)(((double)Integer.MIN_VALUE)-1));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((double)(((double)Integer.MIN_VALUE)-1));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((double)(((double)Integer.MIN_VALUE)-1));}
@@ -7468,93 +2344,23 @@ public enum QueryTestPrimitiveInputType{
     @Override public int invokeObjectindexOf(OmniCollection col){return ((OmniList)col).indexOf((Object)(double)(((double)Integer.MIN_VALUE)-1));}
     @Override public int invokeObjectlastIndexOf(OmniCollection col){return ((OmniList)col).lastIndexOf((Object)(double)(((double)Integer.MIN_VALUE)-1));}
     @Override public int invokeObjectsearch(OmniCollection col){return ((OmniStack)col).search((Object)(double)(((double)Integer.MIN_VALUE)-1));}
-    public boolean addNotEqualsVal(OmniCollection col)
-    {
+    public boolean addNotEqualsVal(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(boolean)false);}
       return ((OmniCollection.OfPrimitive)col).add((boolean)false);
     }
-    public void insertNotEqualsValInList(int index,OmniCollection col)
-    {
-      ((OmniList.OfPrimitive)col).add(index,(boolean)false);
-    }
-    public boolean attemptAdd(OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      Class<?> clazz=col.getClass();
-      Method method;
-      try
-      {
-        //attempt to call with the primitive type
-        method=clazz.getDeclaredMethod("add",primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          //if that fails, call with the boxed type
-          method=clazz.getDeclaredMethod("add",boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            //if all else fails, call with the object class
-            method=clazz.getDeclaredMethod("add",Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        return (boolean)method.invoke(col,((double)Integer.MIN_VALUE)-1); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-    }
-    public boolean attemptInsertionInList(int index,OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      OmniList list=(OmniList)col; //throw if not correct type
-      Class<?> clazz=list.getClass();
-      Method method;
-      try
-      {
-        method=clazz.getDeclaredMethod("add",int.class,primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          method=clazz.getDeclaredMethod("add",int.class,boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            method=clazz.getDeclaredMethod("add",int.class,Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        method.invoke(list,index,((double)Integer.MIN_VALUE)-1); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-      return true;
+    public boolean attemptAdd(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(double)(((double)Integer.MIN_VALUE)-1));}
+      if(col instanceof OmniCollection.OfDouble){return ((OmniCollection.OfDouble)col).add((double)(((double)Integer.MIN_VALUE)-1));}
+      if(col instanceof OmniCollection.OfFloat){return ((OmniCollection.OfFloat)col).add((float)(((double)Integer.MIN_VALUE)-1));}
+      if(col instanceof OmniCollection.OfLong){return ((OmniCollection.OfLong)col).add((long)(((double)Integer.MIN_VALUE)-1));}
+      if(col instanceof OmniCollection.OfInt){return ((OmniCollection.OfInt)col).add((int)(((double)Integer.MIN_VALUE)-1));}
+      if(col instanceof OmniCollection.OfShort){return ((OmniCollection.OfShort)col).add((short)(((double)Integer.MIN_VALUE)-1));}
+      if(col instanceof OmniCollection.OfChar){return ((OmniCollection.OfChar)col).add((char)(((double)Integer.MIN_VALUE)-1));}
+      if(col instanceof OmniCollection.OfByte){return ((OmniCollection.OfByte)col).add((byte)(((double)Integer.MIN_VALUE)-1));}
+      return ((OmniCollection.OfPrimitive)col).add((boolean)((((double)Integer.MIN_VALUE)-1)==1));
     }
   },
-  DoubleMAX_LONG_PLUS1(double.class,Double.class){
+  DoubleMAX_LONG_PLUS1(double.class,Double.class,false){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((double)(((double)Long.MAX_VALUE)+1));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((double)(((double)Long.MAX_VALUE)+1));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((double)(((double)Long.MAX_VALUE)+1));}
@@ -7570,93 +2376,23 @@ public enum QueryTestPrimitiveInputType{
     @Override public int invokeObjectindexOf(OmniCollection col){return ((OmniList)col).indexOf((Object)(double)(((double)Long.MAX_VALUE)+1));}
     @Override public int invokeObjectlastIndexOf(OmniCollection col){return ((OmniList)col).lastIndexOf((Object)(double)(((double)Long.MAX_VALUE)+1));}
     @Override public int invokeObjectsearch(OmniCollection col){return ((OmniStack)col).search((Object)(double)(((double)Long.MAX_VALUE)+1));}
-    public boolean addNotEqualsVal(OmniCollection col)
-    {
+    public boolean addNotEqualsVal(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(boolean)false);}
       return ((OmniCollection.OfPrimitive)col).add((boolean)false);
     }
-    public void insertNotEqualsValInList(int index,OmniCollection col)
-    {
-      ((OmniList.OfPrimitive)col).add(index,(boolean)false);
-    }
-    public boolean attemptAdd(OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      Class<?> clazz=col.getClass();
-      Method method;
-      try
-      {
-        //attempt to call with the primitive type
-        method=clazz.getDeclaredMethod("add",primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          //if that fails, call with the boxed type
-          method=clazz.getDeclaredMethod("add",boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            //if all else fails, call with the object class
-            method=clazz.getDeclaredMethod("add",Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        return (boolean)method.invoke(col,((double)Long.MAX_VALUE)+1); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-    }
-    public boolean attemptInsertionInList(int index,OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      OmniList list=(OmniList)col; //throw if not correct type
-      Class<?> clazz=list.getClass();
-      Method method;
-      try
-      {
-        method=clazz.getDeclaredMethod("add",int.class,primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          method=clazz.getDeclaredMethod("add",int.class,boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            method=clazz.getDeclaredMethod("add",int.class,Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        method.invoke(list,index,((double)Long.MAX_VALUE)+1); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-      return true;
+    public boolean attemptAdd(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(double)(((double)Long.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfDouble){return ((OmniCollection.OfDouble)col).add((double)(((double)Long.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfFloat){return ((OmniCollection.OfFloat)col).add((float)(((double)Long.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfLong){return ((OmniCollection.OfLong)col).add((long)(((double)Long.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfInt){return ((OmniCollection.OfInt)col).add((int)(((double)Long.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfShort){return ((OmniCollection.OfShort)col).add((short)(((double)Long.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfChar){return ((OmniCollection.OfChar)col).add((char)(((double)Long.MAX_VALUE)+1));}
+      if(col instanceof OmniCollection.OfByte){return ((OmniCollection.OfByte)col).add((byte)(((double)Long.MAX_VALUE)+1));}
+      return ((OmniCollection.OfPrimitive)col).add((boolean)((((double)Long.MAX_VALUE)+1)==1));
     }
   },
-  DoubleMIN_LONG_MINUS1(double.class,Double.class){
+  DoubleMIN_LONG_MINUS1(double.class,Double.class,false){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((double)(((double)Long.MIN_VALUE)-1));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((double)(((double)Long.MIN_VALUE)-1));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((double)(((double)Long.MIN_VALUE)-1));}
@@ -7672,93 +2408,23 @@ public enum QueryTestPrimitiveInputType{
     @Override public int invokeObjectindexOf(OmniCollection col){return ((OmniList)col).indexOf((Object)(double)(((double)Long.MIN_VALUE)-1));}
     @Override public int invokeObjectlastIndexOf(OmniCollection col){return ((OmniList)col).lastIndexOf((Object)(double)(((double)Long.MIN_VALUE)-1));}
     @Override public int invokeObjectsearch(OmniCollection col){return ((OmniStack)col).search((Object)(double)(((double)Long.MIN_VALUE)-1));}
-    public boolean addNotEqualsVal(OmniCollection col)
-    {
+    public boolean addNotEqualsVal(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(boolean)false);}
       return ((OmniCollection.OfPrimitive)col).add((boolean)false);
     }
-    public void insertNotEqualsValInList(int index,OmniCollection col)
-    {
-      ((OmniList.OfPrimitive)col).add(index,(boolean)false);
-    }
-    public boolean attemptAdd(OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      Class<?> clazz=col.getClass();
-      Method method;
-      try
-      {
-        //attempt to call with the primitive type
-        method=clazz.getDeclaredMethod("add",primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          //if that fails, call with the boxed type
-          method=clazz.getDeclaredMethod("add",boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            //if all else fails, call with the object class
-            method=clazz.getDeclaredMethod("add",Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        return (boolean)method.invoke(col,((double)Long.MIN_VALUE)-1); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-    }
-    public boolean attemptInsertionInList(int index,OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      OmniList list=(OmniList)col; //throw if not correct type
-      Class<?> clazz=list.getClass();
-      Method method;
-      try
-      {
-        method=clazz.getDeclaredMethod("add",int.class,primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          method=clazz.getDeclaredMethod("add",int.class,boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            method=clazz.getDeclaredMethod("add",int.class,Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        method.invoke(list,index,((double)Long.MIN_VALUE)-1); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-      return true;
+    public boolean attemptAdd(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(double)(((double)Long.MIN_VALUE)-1));}
+      if(col instanceof OmniCollection.OfDouble){return ((OmniCollection.OfDouble)col).add((double)(((double)Long.MIN_VALUE)-1));}
+      if(col instanceof OmniCollection.OfFloat){return ((OmniCollection.OfFloat)col).add((float)(((double)Long.MIN_VALUE)-1));}
+      if(col instanceof OmniCollection.OfLong){return ((OmniCollection.OfLong)col).add((long)(((double)Long.MIN_VALUE)-1));}
+      if(col instanceof OmniCollection.OfInt){return ((OmniCollection.OfInt)col).add((int)(((double)Long.MIN_VALUE)-1));}
+      if(col instanceof OmniCollection.OfShort){return ((OmniCollection.OfShort)col).add((short)(((double)Long.MIN_VALUE)-1));}
+      if(col instanceof OmniCollection.OfChar){return ((OmniCollection.OfChar)col).add((char)(((double)Long.MIN_VALUE)-1));}
+      if(col instanceof OmniCollection.OfByte){return ((OmniCollection.OfByte)col).add((byte)(((double)Long.MIN_VALUE)-1));}
+      return ((OmniCollection.OfPrimitive)col).add((boolean)((((double)Long.MIN_VALUE)-1)==1));
     }
   },
-  DoubleMIN_FLOAT_VALUE(double.class,Double.class){
+  DoubleMIN_FLOAT_VALUE(double.class,Double.class,false){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((double)(Float.MIN_VALUE));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((double)(Float.MIN_VALUE));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((double)(Float.MIN_VALUE));}
@@ -7774,93 +2440,23 @@ public enum QueryTestPrimitiveInputType{
     @Override public int invokeObjectindexOf(OmniCollection col){return ((OmniList)col).indexOf((Object)(double)(Float.MIN_VALUE));}
     @Override public int invokeObjectlastIndexOf(OmniCollection col){return ((OmniList)col).lastIndexOf((Object)(double)(Float.MIN_VALUE));}
     @Override public int invokeObjectsearch(OmniCollection col){return ((OmniStack)col).search((Object)(double)(Float.MIN_VALUE));}
-    public boolean addNotEqualsVal(OmniCollection col)
-    {
+    public boolean addNotEqualsVal(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(boolean)false);}
       return ((OmniCollection.OfPrimitive)col).add((boolean)false);
     }
-    public void insertNotEqualsValInList(int index,OmniCollection col)
-    {
-      ((OmniList.OfPrimitive)col).add(index,(boolean)false);
-    }
-    public boolean attemptAdd(OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      Class<?> clazz=col.getClass();
-      Method method;
-      try
-      {
-        //attempt to call with the primitive type
-        method=clazz.getDeclaredMethod("add",primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          //if that fails, call with the boxed type
-          method=clazz.getDeclaredMethod("add",boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            //if all else fails, call with the object class
-            method=clazz.getDeclaredMethod("add",Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        return (boolean)method.invoke(col,Float.MIN_VALUE); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-    }
-    public boolean attemptInsertionInList(int index,OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      OmniList list=(OmniList)col; //throw if not correct type
-      Class<?> clazz=list.getClass();
-      Method method;
-      try
-      {
-        method=clazz.getDeclaredMethod("add",int.class,primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          method=clazz.getDeclaredMethod("add",int.class,boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            method=clazz.getDeclaredMethod("add",int.class,Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        method.invoke(list,index,Float.MIN_VALUE); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-      return true;
+    public boolean attemptAdd(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(double)(Float.MIN_VALUE));}
+      if(col instanceof OmniCollection.OfDouble){return ((OmniCollection.OfDouble)col).add((double)(Float.MIN_VALUE));}
+      if(col instanceof OmniCollection.OfFloat){return ((OmniCollection.OfFloat)col).add((float)(Float.MIN_VALUE));}
+      if(col instanceof OmniCollection.OfLong){return ((OmniCollection.OfLong)col).add((long)(Float.MIN_VALUE));}
+      if(col instanceof OmniCollection.OfInt){return ((OmniCollection.OfInt)col).add((int)(Float.MIN_VALUE));}
+      if(col instanceof OmniCollection.OfShort){return ((OmniCollection.OfShort)col).add((short)(Float.MIN_VALUE));}
+      if(col instanceof OmniCollection.OfChar){return ((OmniCollection.OfChar)col).add((char)(Float.MIN_VALUE));}
+      if(col instanceof OmniCollection.OfByte){return ((OmniCollection.OfByte)col).add((byte)(Float.MIN_VALUE));}
+      return ((OmniCollection.OfPrimitive)col).add((boolean)((Float.MIN_VALUE)==1));
     }
   },
-  DoubleMAX_FLOAT_VALUE(double.class,Double.class){
+  DoubleMAX_FLOAT_VALUE(double.class,Double.class,false){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((double)(Float.MAX_VALUE));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((double)(Float.MAX_VALUE));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((double)(Float.MAX_VALUE));}
@@ -7876,93 +2472,23 @@ public enum QueryTestPrimitiveInputType{
     @Override public int invokeObjectindexOf(OmniCollection col){return ((OmniList)col).indexOf((Object)(double)(Float.MAX_VALUE));}
     @Override public int invokeObjectlastIndexOf(OmniCollection col){return ((OmniList)col).lastIndexOf((Object)(double)(Float.MAX_VALUE));}
     @Override public int invokeObjectsearch(OmniCollection col){return ((OmniStack)col).search((Object)(double)(Float.MAX_VALUE));}
-    public boolean addNotEqualsVal(OmniCollection col)
-    {
+    public boolean addNotEqualsVal(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(boolean)false);}
       return ((OmniCollection.OfPrimitive)col).add((boolean)false);
     }
-    public void insertNotEqualsValInList(int index,OmniCollection col)
-    {
-      ((OmniList.OfPrimitive)col).add(index,(boolean)false);
-    }
-    public boolean attemptAdd(OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      Class<?> clazz=col.getClass();
-      Method method;
-      try
-      {
-        //attempt to call with the primitive type
-        method=clazz.getDeclaredMethod("add",primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          //if that fails, call with the boxed type
-          method=clazz.getDeclaredMethod("add",boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            //if all else fails, call with the object class
-            method=clazz.getDeclaredMethod("add",Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        return (boolean)method.invoke(col,Float.MAX_VALUE); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-    }
-    public boolean attemptInsertionInList(int index,OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      OmniList list=(OmniList)col; //throw if not correct type
-      Class<?> clazz=list.getClass();
-      Method method;
-      try
-      {
-        method=clazz.getDeclaredMethod("add",int.class,primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          method=clazz.getDeclaredMethod("add",int.class,boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            method=clazz.getDeclaredMethod("add",int.class,Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        method.invoke(list,index,Float.MAX_VALUE); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-      return true;
+    public boolean attemptAdd(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(double)(Float.MAX_VALUE));}
+      if(col instanceof OmniCollection.OfDouble){return ((OmniCollection.OfDouble)col).add((double)(Float.MAX_VALUE));}
+      if(col instanceof OmniCollection.OfFloat){return ((OmniCollection.OfFloat)col).add((float)(Float.MAX_VALUE));}
+      if(col instanceof OmniCollection.OfLong){return ((OmniCollection.OfLong)col).add((long)(Float.MAX_VALUE));}
+      if(col instanceof OmniCollection.OfInt){return ((OmniCollection.OfInt)col).add((int)(Float.MAX_VALUE));}
+      if(col instanceof OmniCollection.OfShort){return ((OmniCollection.OfShort)col).add((short)(Float.MAX_VALUE));}
+      if(col instanceof OmniCollection.OfChar){return ((OmniCollection.OfChar)col).add((char)(Float.MAX_VALUE));}
+      if(col instanceof OmniCollection.OfByte){return ((OmniCollection.OfByte)col).add((byte)(Float.MAX_VALUE));}
+      return ((OmniCollection.OfPrimitive)col).add((boolean)((Float.MAX_VALUE)==1));
     }
   },
-  DoubleMIN_DOUBLE_VALUE(double.class,Double.class){
+  DoubleMIN_DOUBLE_VALUE(double.class,Double.class,false){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((double)(Double.MIN_VALUE));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((double)(Double.MIN_VALUE));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((double)(Double.MIN_VALUE));}
@@ -7978,93 +2504,23 @@ public enum QueryTestPrimitiveInputType{
     @Override public int invokeObjectindexOf(OmniCollection col){return ((OmniList)col).indexOf((Object)(double)(Double.MIN_VALUE));}
     @Override public int invokeObjectlastIndexOf(OmniCollection col){return ((OmniList)col).lastIndexOf((Object)(double)(Double.MIN_VALUE));}
     @Override public int invokeObjectsearch(OmniCollection col){return ((OmniStack)col).search((Object)(double)(Double.MIN_VALUE));}
-    public boolean addNotEqualsVal(OmniCollection col)
-    {
+    public boolean addNotEqualsVal(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(boolean)false);}
       return ((OmniCollection.OfPrimitive)col).add((boolean)false);
     }
-    public void insertNotEqualsValInList(int index,OmniCollection col)
-    {
-      ((OmniList.OfPrimitive)col).add(index,(boolean)false);
-    }
-    public boolean attemptAdd(OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      Class<?> clazz=col.getClass();
-      Method method;
-      try
-      {
-        //attempt to call with the primitive type
-        method=clazz.getDeclaredMethod("add",primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          //if that fails, call with the boxed type
-          method=clazz.getDeclaredMethod("add",boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            //if all else fails, call with the object class
-            method=clazz.getDeclaredMethod("add",Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        return (boolean)method.invoke(col,Double.MIN_VALUE); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-    }
-    public boolean attemptInsertionInList(int index,OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      OmniList list=(OmniList)col; //throw if not correct type
-      Class<?> clazz=list.getClass();
-      Method method;
-      try
-      {
-        method=clazz.getDeclaredMethod("add",int.class,primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          method=clazz.getDeclaredMethod("add",int.class,boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            method=clazz.getDeclaredMethod("add",int.class,Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        method.invoke(list,index,Double.MIN_VALUE); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-      return true;
+    public boolean attemptAdd(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(double)(Double.MIN_VALUE));}
+      if(col instanceof OmniCollection.OfDouble){return ((OmniCollection.OfDouble)col).add((double)(Double.MIN_VALUE));}
+      if(col instanceof OmniCollection.OfFloat){return ((OmniCollection.OfFloat)col).add((float)(Double.MIN_VALUE));}
+      if(col instanceof OmniCollection.OfLong){return ((OmniCollection.OfLong)col).add((long)(Double.MIN_VALUE));}
+      if(col instanceof OmniCollection.OfInt){return ((OmniCollection.OfInt)col).add((int)(Double.MIN_VALUE));}
+      if(col instanceof OmniCollection.OfShort){return ((OmniCollection.OfShort)col).add((short)(Double.MIN_VALUE));}
+      if(col instanceof OmniCollection.OfChar){return ((OmniCollection.OfChar)col).add((char)(Double.MIN_VALUE));}
+      if(col instanceof OmniCollection.OfByte){return ((OmniCollection.OfByte)col).add((byte)(Double.MIN_VALUE));}
+      return ((OmniCollection.OfPrimitive)col).add((boolean)((Double.MIN_VALUE)==1));
     }
   },
-  DoubleMAX_DOUBLE_VALUE(double.class,Double.class){
+  DoubleMAX_DOUBLE_VALUE(double.class,Double.class,false){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((double)(Double.MAX_VALUE));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((double)(Double.MAX_VALUE));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((double)(Double.MAX_VALUE));}
@@ -8080,93 +2536,23 @@ public enum QueryTestPrimitiveInputType{
     @Override public int invokeObjectindexOf(OmniCollection col){return ((OmniList)col).indexOf((Object)(double)(Double.MAX_VALUE));}
     @Override public int invokeObjectlastIndexOf(OmniCollection col){return ((OmniList)col).lastIndexOf((Object)(double)(Double.MAX_VALUE));}
     @Override public int invokeObjectsearch(OmniCollection col){return ((OmniStack)col).search((Object)(double)(Double.MAX_VALUE));}
-    public boolean addNotEqualsVal(OmniCollection col)
-    {
+    public boolean addNotEqualsVal(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(boolean)false);}
       return ((OmniCollection.OfPrimitive)col).add((boolean)false);
     }
-    public void insertNotEqualsValInList(int index,OmniCollection col)
-    {
-      ((OmniList.OfPrimitive)col).add(index,(boolean)false);
-    }
-    public boolean attemptAdd(OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      Class<?> clazz=col.getClass();
-      Method method;
-      try
-      {
-        //attempt to call with the primitive type
-        method=clazz.getDeclaredMethod("add",primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          //if that fails, call with the boxed type
-          method=clazz.getDeclaredMethod("add",boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            //if all else fails, call with the object class
-            method=clazz.getDeclaredMethod("add",Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        return (boolean)method.invoke(col,Double.MAX_VALUE); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-    }
-    public boolean attemptInsertionInList(int index,OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      OmniList list=(OmniList)col; //throw if not correct type
-      Class<?> clazz=list.getClass();
-      Method method;
-      try
-      {
-        method=clazz.getDeclaredMethod("add",int.class,primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          method=clazz.getDeclaredMethod("add",int.class,boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            method=clazz.getDeclaredMethod("add",int.class,Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        method.invoke(list,index,Double.MAX_VALUE); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-      return true;
+    public boolean attemptAdd(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(double)(Double.MAX_VALUE));}
+      if(col instanceof OmniCollection.OfDouble){return ((OmniCollection.OfDouble)col).add((double)(Double.MAX_VALUE));}
+      if(col instanceof OmniCollection.OfFloat){return ((OmniCollection.OfFloat)col).add((float)(Double.MAX_VALUE));}
+      if(col instanceof OmniCollection.OfLong){return ((OmniCollection.OfLong)col).add((long)(Double.MAX_VALUE));}
+      if(col instanceof OmniCollection.OfInt){return ((OmniCollection.OfInt)col).add((int)(Double.MAX_VALUE));}
+      if(col instanceof OmniCollection.OfShort){return ((OmniCollection.OfShort)col).add((short)(Double.MAX_VALUE));}
+      if(col instanceof OmniCollection.OfChar){return ((OmniCollection.OfChar)col).add((char)(Double.MAX_VALUE));}
+      if(col instanceof OmniCollection.OfByte){return ((OmniCollection.OfByte)col).add((byte)(Double.MAX_VALUE));}
+      return ((OmniCollection.OfPrimitive)col).add((boolean)((Double.MAX_VALUE)==1));
     }
   },
-  DoubleNaN(double.class,Double.class){
+  DoubleNaN(double.class,Double.class,false){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((double)(Double.NaN));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((double)(Double.NaN));}
     @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((double)(Double.NaN));}
@@ -8182,98 +2568,30 @@ public enum QueryTestPrimitiveInputType{
     @Override public int invokeObjectindexOf(OmniCollection col){return ((OmniList)col).indexOf((Object)(double)(Double.NaN));}
     @Override public int invokeObjectlastIndexOf(OmniCollection col){return ((OmniList)col).lastIndexOf((Object)(double)(Double.NaN));}
     @Override public int invokeObjectsearch(OmniCollection col){return ((OmniStack)col).search((Object)(double)(Double.NaN));}
-    public boolean addNotEqualsVal(OmniCollection col)
-    {
+    public boolean addNotEqualsVal(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(boolean)false);}
       return ((OmniCollection.OfPrimitive)col).add((boolean)false);
     }
-    public void insertNotEqualsValInList(int index,OmniCollection col)
-    {
-      ((OmniList.OfPrimitive)col).add(index,(boolean)false);
-    }
-    public boolean attemptAdd(OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      Class<?> clazz=col.getClass();
-      Method method;
-      try
-      {
-        //attempt to call with the primitive type
-        method=clazz.getDeclaredMethod("add",primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          //if that fails, call with the boxed type
-          method=clazz.getDeclaredMethod("add",boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            //if all else fails, call with the object class
-            method=clazz.getDeclaredMethod("add",Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        return (boolean)method.invoke(col,Double.NaN); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-    }
-    public boolean attemptInsertionInList(int index,OmniCollection col)
-    {
-      //TODO switch pattern matching would be very handy here
-      OmniList list=(OmniList)col; //throw if not correct type
-      Class<?> clazz=list.getClass();
-      Method method;
-      try
-      {
-        method=clazz.getDeclaredMethod("add",int.class,primitiveClass);
-      }
-      catch(NoSuchMethodException e)
-      {
-        try
-        {
-          method=clazz.getDeclaredMethod("add",int.class,boxedClass);
-        }
-        catch(NoSuchMethodException e1)
-        {
-          try
-          {
-            method=clazz.getDeclaredMethod("add",int.class,Object.class);
-          }
-          catch(NoSuchMethodException e2)
-          {
-            return false;
-          }
-        }
-      }
-      try
-      {
-        method.invoke(list,index,Double.NaN); 
-      }
-      catch(IllegalAccessException|InvocationTargetException e)
-      {
-        throw new RuntimeException(e);
-      }
-      return true;
+    public boolean attemptAdd(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(double)(Double.NaN));}
+      if(col instanceof OmniCollection.OfDouble){return ((OmniCollection.OfDouble)col).add((double)(Double.NaN));}
+      if(col instanceof OmniCollection.OfFloat){return ((OmniCollection.OfFloat)col).add((float)(Double.NaN));}
+      if(col instanceof OmniCollection.OfLong){return ((OmniCollection.OfLong)col).add((long)(Double.NaN));}
+      if(col instanceof OmniCollection.OfInt){return ((OmniCollection.OfInt)col).add((int)(Double.NaN));}
+      if(col instanceof OmniCollection.OfShort){return ((OmniCollection.OfShort)col).add((short)(Double.NaN));}
+      if(col instanceof OmniCollection.OfChar){return ((OmniCollection.OfChar)col).add((char)(Double.NaN));}
+      if(col instanceof OmniCollection.OfByte){return ((OmniCollection.OfByte)col).add((byte)(Double.NaN));}
+      return ((OmniCollection.OfPrimitive)col).add((boolean)((Double.NaN)==1));
     }
   },
   ;
   public final Class<?> primitiveClass;
   public final Class<?> boxedClass;
-  private QueryTestPrimitiveInputType(Class<?> primitiveClass,Class<?> boxedClass){
+  private boolean notEqualsVal;
+  private QueryTestPrimitiveInputType(Class<?> primitiveClass,Class<?> boxedClass,boolean notEqualsVal){
     this.primitiveClass=primitiveClass;
     this.boxedClass=boxedClass;
+    this.notEqualsVal=notEqualsVal;
   }
   public abstract boolean invokecontains(OmniCollection col);
   public abstract boolean invokeremoveVal(OmniCollection col);
@@ -8291,7 +2609,5 @@ public enum QueryTestPrimitiveInputType{
   public abstract int invokeObjectlastIndexOf(OmniCollection col);
   public abstract int invokeObjectsearch(OmniCollection col);
   public abstract boolean attemptAdd(OmniCollection col);
-  public abstract boolean attemptInsertionInList(int index,OmniCollection col);
   public abstract boolean addNotEqualsVal(OmniCollection col);
-  public abstract void insertNotEqualsValInList(int index,OmniCollection col);
 }

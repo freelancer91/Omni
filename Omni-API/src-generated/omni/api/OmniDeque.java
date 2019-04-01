@@ -54,6 +54,10 @@ public interface OmniDeque extends OmniCollection,OmniQueue,OmniStack
   public abstract boolean removeLastOccurrence(Double val);
   public abstract interface OfPrimitive extends OmniCollection,OmniCollection.OfPrimitive,OmniStack,OmniQueue,OmniStack.OfPrimitive,OmniDeque
   {
+    public abstract void addFirst(boolean val);
+    public abstract void addLast(boolean val);
+    public abstract boolean offerFirst(boolean val);
+    public abstract boolean offerLast(boolean val);
     @Override
     public default boolean removeFirstOccurrence(Boolean val)
     {
@@ -144,10 +148,6 @@ public interface OmniDeque extends OmniCollection,OmniQueue,OmniStack
   ,PeekAndPollIfc.ByteInput
   ,PeekAndPollIfc.CharInput
   {
-    public default void addFirst(boolean val)
-    {
-      push(val);
-    }
     public abstract void addFirst(Boolean val);
     public abstract void addLast(boolean val);
     public abstract void addLast(Boolean val);

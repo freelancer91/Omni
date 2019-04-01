@@ -9,6 +9,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.Arguments;
 import java.util.stream.Stream;
 import omni.impl.QueryTestPrimitiveInputType;
+import omni.impl.QueryTestScenario;
 import java.util.function.DoubleConsumer;
 import java.util.ConcurrentModificationException;
 import omni.util.OmniArray;
@@ -38,6 +39,54 @@ public class DoubleArrSeqTest{
     final OmniCollection.OfDouble seq;
     final OmniCollection.OfDouble parent;
     final DoubleArrSeq root;
+    ConstructionArguments(StructType structType){
+      initialCapacity=OmniArray.DEFAULT_ARR_SEQ_CAP;
+      this.structType=structType;
+      double[] arr;
+      switch(structType){
+        case CHECKEDSUBLIST:
+        case UNCHECKEDSUBLIST:
+          rootPreAlloc=5;
+          parentPreAlloc=5;
+          parentPostAlloc=5;
+          rootPostAlloc=5;
+          arr=new double[rootPreAlloc+rootPostAlloc+parentPreAlloc+parentPostAlloc];
+          initAscendingArray(arr,0,-(rootPreAlloc+parentPreAlloc),0);
+          initAscendingArray(arr,rootPreAlloc+parentPreAlloc,100,100+rootPostAlloc+parentPostAlloc);
+          break;
+        default:
+          rootPreAlloc=0;
+          parentPreAlloc=0;
+          parentPostAlloc=0;
+          rootPostAlloc=0;
+          arr=OmniArray.OfDouble.DEFAULT_ARR;
+      }
+      switch(structType){
+        case CHECKEDLIST:
+        case CHECKEDSUBLIST:
+          this.root=new DoubleArrSeq.CheckedList(rootPreAlloc+rootPostAlloc+parentPreAlloc+parentPostAlloc,arr);
+          break;
+        case UNCHECKEDLIST:
+        case UNCHECKEDSUBLIST:
+          this.root=new DoubleArrSeq.UncheckedList(rootPreAlloc+rootPostAlloc+parentPreAlloc+parentPostAlloc,arr);
+          break;
+        case CHECKEDSTACK:
+          this.root=new DoubleArrSeq.CheckedStack();
+          break;
+        default:
+          this.root=new DoubleArrSeq.UncheckedStack();
+      }
+      switch(structType){
+        case CHECKEDSUBLIST:
+        case UNCHECKEDSUBLIST:
+          this.parent=((OmniList.OfDouble)root).subList(rootPreAlloc,rootPreAlloc+parentPreAlloc+parentPostAlloc);
+          this.seq=((OmniList.OfDouble)parent).subList(parentPreAlloc,parentPreAlloc);
+          break;
+        default:
+          this.parent=root;
+          this.seq=root;
+      }
+    }
     ConstructionArguments(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc,StructType structType){
       this.initialCapacity=OmniArray.DEFAULT_ARR_SEQ_CAP;
       this.rootPreAlloc=rootPreAlloc;
@@ -218,6 +267,107 @@ public class DoubleArrSeqTest{
       return offset+length;
     }
   }
+  static class InputTestMonitor{
+    int expectedItrModCount=0;
+    int expectedSeqModCount=0;
+    int expectedParentModCount=0;
+    int expectedRootModCount=0;
+    int expectedSeqSize=0;
+    int expectedParentSize=0;
+    int expectedRootSize=0;
+    int expectedCursor=0;
+    int expectedLastRet=-1;
+    public void seqItrAdd(OmniListIterator.OfDouble seqItr,DoubleInputTestArgType inputArgType,int valToAdd){
+      inputArgType.callListItrAdd(seqItr,valToAdd);
+      ++expectedItrModCount;
+      ++expectedSeqModCount;
+      ++expectedParentModCount;
+      ++expectedRootModCount;
+      ++expectedSeqSize;
+      ++expectedParentSize;
+      ++expectedRootSize;
+      ++expectedCursor;
+      expectedLastRet=-1;
+    }
+    public void seqItrPrevious(OmniListIterator.OfDouble seqItr){
+      seqItr.previousDouble();
+      expectedLastRet=--expectedCursor; 
+    }
+    public void seqItrNext(OmniListIterator.OfDouble seqItr){
+      seqItr.nextDouble();
+      expectedLastRet=expectedCursor++;
+    }
+    public void seqItrRemove(OmniListIterator.OfDouble seqItr){
+      seqItr.remove();
+      expectedCursor=expectedLastRet;
+      expectedLastRet=-1;
+      ++expectedItrModCount;
+      ++expectedSeqModCount;
+      ++expectedParentModCount;
+      ++expectedRootModCount;
+      --expectedSeqSize;
+      --expectedParentSize;
+      --expectedRootSize;
+    }
+    public void rootMod(ConstructionArguments constructionArgs,DoubleInputTestArgType inputArgType){
+      ++expectedRootSize;
+      ++expectedRootModCount;
+      inputArgType.callCollectionAdd(constructionArgs.root,0);
+    }
+    public void parentMod(ConstructionArguments constructionArgs,DoubleInputTestArgType inputArgType){
+      ++expectedRootSize;
+      ++expectedRootModCount;
+      ++expectedParentSize;
+      ++expectedParentModCount;
+      inputArgType.callCollectionAdd(constructionArgs.parent,0);
+    }
+    public void seqMod(ConstructionArguments constructionArgs,DoubleInputTestArgType inputArgType){
+      ++expectedRootSize;
+      ++expectedRootModCount;
+      ++expectedParentSize;
+      ++expectedParentModCount;
+      ++expectedSeqSize;
+      ++expectedSeqModCount;
+      inputArgType.callCollectionAdd(constructionArgs.seq,0);
+    }
+    public void collectionAdd(ConstructionArguments constructionArgs,DoubleInputTestArgType inputArgType,int val){
+      ++expectedRootSize;
+      ++expectedRootModCount;
+      ++expectedParentSize;
+      ++expectedParentModCount;
+      ++expectedSeqSize;
+      ++expectedSeqModCount;
+      inputArgType.callCollectionAdd(constructionArgs.seq,val);
+    }
+    public void listAdd(ConstructionArguments constructionArgs,DoubleInputTestArgType inputArgType,int index,int val){
+      ++expectedRootSize;
+      ++expectedRootModCount;
+      ++expectedParentSize;
+      ++expectedParentModCount;
+      ++expectedSeqSize;
+      ++expectedSeqModCount;
+      inputArgType.callListAdd(constructionArgs.seq,index,val);
+    }
+    public void illegalMod(ConstructionArguments constructionArgs,DoubleInputTestArgType inputArgType,CMEScenario modScenario){
+      switch(modScenario){
+        case ModRoot:
+          rootMod(constructionArgs,inputArgType);
+          break;
+        case ModParent:
+          parentMod(constructionArgs,inputArgType);
+          break;
+        case ModSeq:
+          seqMod(constructionArgs,inputArgType);
+        default:
+      }
+    }
+    public void verifyItrState(OmniListIterator.OfDouble seqItr,ConstructionArguments constructionArgs){
+      constructionArgs.verifyIteratorState(seqItr,expectedCursor,expectedLastRet,expectedItrModCount);
+    }
+    public void verifyStructuralIntegrity(ConstructionArguments constructionArgs){
+      constructionArgs.verifyStructuralIntegrity(expectedSeqSize,expectedSeqModCount,expectedParentSize,expectedParentModCount,expectedRootSize,expectedRootModCount);
+    }
+  }
   private static void initAscendingArray(double[] arr,int offset,int lo,int hi){
     int bound=offset+(hi-lo);
     for(int i=offset;i<bound;++i,++lo){arr[i]=TypeConversionUtil.convertTodouble(lo);}
@@ -228,6 +378,44 @@ public class DoubleArrSeqTest{
     Arguments.of(StructType.CHECKEDSTACK),
     Arguments.of(StructType.UNCHECKEDSTACK)
   };
+  static enum CMEScenario{
+    NoMod,
+    ModSeq,
+    ModParent,
+    ModRoot;
+  }
+  static Stream<Arguments> getListAddIntValArgs(){
+    Stream.Builder<Arguments> builder=Stream.builder();
+    for(DoubleInputTestArgType inputTestArgType:DoubleInputTestArgType.values()){
+      for(ListAddIntValTestScenario testScenario: ListAddIntValTestScenario.values()){
+        for(int initialCapacity=0;initialCapacity<=15;initialCapacity+=5){
+          if(testScenario.expectedException==null){builder.add(Arguments.of(testScenario,inputTestArgType,new ConstructionArguments(initialCapacity,StructType.UNCHECKEDLIST)));}
+          if(testScenario.expectedException!=ConcurrentModificationException.class){builder.add(Arguments.of(testScenario,inputTestArgType,new ConstructionArguments(initialCapacity,StructType.CHECKEDLIST)));}
+        }
+        for(int rootPreAlloc=0;rootPreAlloc<=5;rootPreAlloc+=5){
+          for(int rootPostAlloc=0;rootPostAlloc<=5;rootPostAlloc+=5){
+            for(int parentPreAlloc=0;parentPreAlloc<=5;parentPreAlloc+=5){
+              for(int parentPostAlloc=0;parentPostAlloc<=5;parentPostAlloc+=5){
+                builder.add(Arguments.of(testScenario,inputTestArgType,new ConstructionArguments(rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,StructType.CHECKEDSUBLIST)));
+                if(testScenario.expectedException==null){builder.add(Arguments.of(testScenario,inputTestArgType,new ConstructionArguments(rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,StructType.UNCHECKEDSUBLIST)));}
+              }
+            }
+          }
+        }
+      }
+    }
+    return builder.build();
+  }
+  static Stream<Arguments> getStackPushArgs(){
+    Stream.Builder<Arguments> builder=Stream.builder();
+    for(DoubleInputTestArgType inputTestArgType:DoubleInputTestArgType.values()){
+      for(int initialCapacity=0;initialCapacity<=15;initialCapacity+=5){
+        builder.add(Arguments.of(inputTestArgType,new ConstructionArguments(initialCapacity,StructType.CHECKEDSTACK)));
+        builder.add(Arguments.of(inputTestArgType,new ConstructionArguments(initialCapacity,StructType.UNCHECKEDSTACK)));
+      }
+    }
+    return builder.build();
+  }
   static Stream<Arguments> getArgsForNonSubListTypes(){return Stream.of(NON_SUBLIST_TYPES);}
   @ParameterizedTest
   @MethodSource("getArgsForNonSubListTypes")
@@ -242,7 +430,7 @@ public class DoubleArrSeqTest{
   }
   @ParameterizedTest
   @MethodSource("getArgsForNonSubListTypes")
-  public void testConstructor_int_doublearr_happyPath(boolean checked,StructType structType){
+  public void testConstructor_int_doublearr_happyPath(StructType structType){
     int size=5;
     double[] arr=new double[10];
     DoubleArrSeq seq;
@@ -285,19 +473,40 @@ public class DoubleArrSeqTest{
         Assertions.assertEquals(initialCapacity,seq.arr.length);
     }
   }
-  static Stream<Arguments> getListInputMethodArgs(){
+  static enum ListItrAddTestScenario{
+    HappyPathInsertBegin(false,CMEScenario.NoMod,null),
+    HappyPathInsertEnd(false,CMEScenario.NoMod,null),
+    HappyPathInsertMidPoint(false,CMEScenario.NoMod,null),
+    EmptyModRootThrowCME(false,CMEScenario.ModRoot,ConcurrentModificationException.class),
+    EmptyModParentThrowCME(false,CMEScenario.ModParent,ConcurrentModificationException.class),
+    EmptyModSeqThrowCME(false,CMEScenario.ModSeq,ConcurrentModificationException.class),
+    NonEmptyModRootThrowCME(true,CMEScenario.ModRoot,ConcurrentModificationException.class),
+    NonEmptyModParentThrowCME(true,CMEScenario.ModParent,ConcurrentModificationException.class),
+    NonEmptyModSeqThrowCME(true,CMEScenario.ModSeq,ConcurrentModificationException.class);
+    final boolean nonEmpty;
+    final CMEScenario modScenario;
+    final Class<? extends Throwable> expectedException;
+    ListItrAddTestScenario(boolean nonEmpty,CMEScenario modScenario,Class<? extends Throwable> expectedException){
+      this.expectedException=expectedException;
+      this.nonEmpty=nonEmpty;
+      this.modScenario=modScenario;
+    }
+  }
+  static Stream<Arguments> getListItrAddArgs(){
     Stream.Builder<Arguments> builder=Stream.builder();
     for(DoubleInputTestArgType inputTestArgType:DoubleInputTestArgType.values()){
-      for(int initialCapacity=0;initialCapacity<=15;initialCapacity+=5){
-        builder.add(Arguments.of(inputTestArgType,new ConstructionArguments(initialCapacity,StructType.UNCHECKEDLIST)));
-        builder.add(Arguments.of(inputTestArgType,new ConstructionArguments(initialCapacity,StructType.CHECKEDLIST)));
-      }
-      for(int rootPreAlloc=0;rootPreAlloc<=5;rootPreAlloc+=5){
-        for(int rootPostAlloc=0;rootPostAlloc<=5;rootPostAlloc+=5){
-          for(int parentPreAlloc=0;parentPreAlloc<=5;parentPreAlloc+=5){
-            for(int parentPostAlloc=0;parentPostAlloc<=5;parentPostAlloc+=5){
-              builder.add(Arguments.of(inputTestArgType,new ConstructionArguments(rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,StructType.CHECKEDSUBLIST)));
-              builder.add(Arguments.of(inputTestArgType,new ConstructionArguments(rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,StructType.UNCHECKEDSUBLIST)));
+      for(ListItrAddTestScenario testScenario:ListItrAddTestScenario.values()){
+        for(int initialCapacity=0;initialCapacity<=15;initialCapacity+=5){
+          if(testScenario.expectedException==null){builder.add(Arguments.of(testScenario,inputTestArgType,new ConstructionArguments(initialCapacity,StructType.UNCHECKEDLIST)));}
+          builder.add(Arguments.of(testScenario,inputTestArgType,new ConstructionArguments(initialCapacity,StructType.CHECKEDLIST)));
+        }
+        for(int rootPreAlloc=0;rootPreAlloc<=5;rootPreAlloc+=5){
+          for(int rootPostAlloc=0;rootPostAlloc<=5;rootPostAlloc+=5){
+            for(int parentPreAlloc=0;parentPreAlloc<=5;parentPreAlloc+=5){
+              for(int parentPostAlloc=0;parentPostAlloc<=5;parentPostAlloc+=5){
+                builder.add(Arguments.of(testScenario,inputTestArgType,new ConstructionArguments(rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,StructType.CHECKEDSUBLIST)));
+                if(testScenario.expectedException==null){builder.add(Arguments.of(testScenario,inputTestArgType,new ConstructionArguments(rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,StructType.UNCHECKEDSUBLIST)));}
+              }
             }
           }
         }
@@ -305,21 +514,113 @@ public class DoubleArrSeqTest{
     }
     return builder.build();
   }
-  static Stream<Arguments> getCollectionInputMethodArgs(){
+  @ParameterizedTest
+  @MethodSource("getListItrAddArgs")
+  public void testListItrAdd(ListItrAddTestScenario testScenario,DoubleInputTestArgType inputArgType,ConstructionArguments constructionArgs){
+    var seqItr=constructionArgs.constructSeqListIterator();
+    var testMonitor=new InputTestMonitor();
+    if(testScenario.nonEmpty){
+      for(int i=0;i<100;++i){
+        testMonitor.seqItrAdd(seqItr,inputArgType,i);
+      }
+    }
+    var expectedException=testScenario.expectedException;
+    if(expectedException==null){
+      for(int i=0;i<100;++i){
+        testMonitor.seqItrAdd(seqItr,inputArgType,i);
+        testMonitor.verifyItrState(seqItr,constructionArgs);
+        switch(testScenario){
+          case HappyPathInsertBegin:
+            testMonitor.seqItrPrevious(seqItr);
+            break;
+          case HappyPathInsertMidPoint:
+            if((i&1)==0){testMonitor.seqItrPrevious(seqItr);}
+            break;
+          default:
+        }
+      }
+    }else{
+      testMonitor.illegalMod(constructionArgs,inputArgType,testScenario.modScenario);
+      Assertions.assertThrows(expectedException,()->inputArgType.callListItrAdd(seqItr,0));
+    }
+    testMonitor.verifyItrState(seqItr,constructionArgs);
+    testMonitor.verifyStructuralIntegrity(constructionArgs);
+    int offset=constructionArgs.verifyPreAlloc();
+    switch(testScenario){
+      case HappyPathInsertBegin:
+        offset=constructionArgs.verifyDescending(offset,inputArgType,100);
+        break;
+      case HappyPathInsertMidPoint:
+        offset=constructionArgs.verifyMidPointInsertion(offset,inputArgType,100);
+        break;
+      case HappyPathInsertEnd:
+        offset=constructionArgs.verifyAscending(offset,inputArgType,100);
+        break;
+      default:
+        if(testScenario.nonEmpty){offset=constructionArgs.verifyAscending(offset,inputArgType,100);}
+    }
+    if(testScenario.modScenario==CMEScenario.ModSeq){offset=constructionArgs.verifyIndex(offset,inputArgType,0);}
+    offset=constructionArgs.verifyParentPostAlloc(offset);
+    if(testScenario.modScenario==CMEScenario.ModParent){offset=constructionArgs.verifyIndex(offset,inputArgType,0);}
+    offset=constructionArgs.verifyRootPostAlloc(offset);
+    if(testScenario.modScenario==CMEScenario.ModRoot){constructionArgs.verifyIndex(offset,inputArgType,0);}
+  }
+  static enum ListItrSetTestScenario{
+    HappyPath(true,CMEScenario.NoMod,null),
+    EmptyModRootThrowCME(false,CMEScenario.ModRoot,ConcurrentModificationException.class),
+    EmptyModParentThrowCME(false,CMEScenario.ModParent,ConcurrentModificationException.class),
+    EmptyModSeqThrowCME(false,CMEScenario.ModSeq,ConcurrentModificationException.class),
+    NonEmptyModRootThrowCME(true,CMEScenario.ModRoot,ConcurrentModificationException.class),
+    NonEmptyModParentThrowCME(true,CMEScenario.ModParent,ConcurrentModificationException.class),
+    NonEmptyModSeqThrowCME(true,CMEScenario.ModSeq,ConcurrentModificationException.class),
+    EmptyThrowISE(false,CMEScenario.NoMod,IllegalStateException.class),
+    EmptyPostAddThrowISE(false,CMEScenario.NoMod,IllegalStateException.class),
+    EmptyPostRemoveThrowISE(false,CMEScenario.NoMod,IllegalStateException.class),
+    EmptyThrowISEModRootCME(false,CMEScenario.ModRoot,IllegalStateException.class),
+    EmptyThrowISEModParentCME(false,CMEScenario.ModParent,IllegalStateException.class),
+    EmptyThrowISEModSeqCME(false,CMEScenario.ModSeq,IllegalStateException.class),
+    EmptyPostAddThrowISESupercedesModRootCME(false,CMEScenario.ModRoot,IllegalStateException.class),
+    EmptyPostAddThrowISESupercedesModParentCME(false,CMEScenario.ModParent,IllegalStateException.class),
+    EmptyPostAddThrowISESupercedesModSeqCME(false,CMEScenario.ModSeq,IllegalStateException.class),
+    EmptyPostRemoveThrowISESupercedesModRootCME(false,CMEScenario.ModRoot,IllegalStateException.class),
+    EmptyPostRemoveThrowISESupercedesModParentCME(false,CMEScenario.ModParent,IllegalStateException.class),
+    EmptyPostRemoveThrowISESupercedesModSeqCME(false,CMEScenario.ModSeq,IllegalStateException.class),
+    NonEmptyThrowISE(true,CMEScenario.NoMod,IllegalStateException.class),
+    NonEmptyPostAddThrowISE(true,CMEScenario.NoMod,IllegalStateException.class),
+    NonEmptyPostRemoveThrowISE(true,CMEScenario.NoMod,IllegalStateException.class),
+    NonEmptyThrowISEModRootCME(true,CMEScenario.ModRoot,IllegalStateException.class),
+    NonEmptyThrowISEModParentCME(true,CMEScenario.ModParent,IllegalStateException.class),
+    NonEmptyThrowISEModSeqCME(true,CMEScenario.ModSeq,IllegalStateException.class),
+    NonEmptyPostAddThrowISESupercedesModRootCME(true,CMEScenario.ModRoot,IllegalStateException.class),
+    NonEmptyPostAddThrowISESupercedesModParentCME(true,CMEScenario.ModParent,IllegalStateException.class),
+    NonEmptyPostAddThrowISESupercedesModSeqCME(true,CMEScenario.ModSeq,IllegalStateException.class),
+    NonEmptyPostRemoveThrowISESupercedesModRootCME(true,CMEScenario.ModRoot,IllegalStateException.class),
+    NonEmptyPostRemoveThrowISESupercedesModParentCME(true,CMEScenario.ModParent,IllegalStateException.class),
+    NonEmptyPostRemoveThrowISESupercedesModSeqCME(true,CMEScenario.ModSeq,IllegalStateException.class);
+    final boolean nonEmpty;
+    final CMEScenario modScenario;
+    final Class<? extends Throwable> expectedException;
+    ListItrSetTestScenario(boolean nonEmpty,CMEScenario modScenario,Class<? extends Throwable> expectedException){
+      this.expectedException=expectedException;
+      this.nonEmpty=nonEmpty;
+      this.modScenario=modScenario;
+    }
+  }
+  static Stream<Arguments> getListItrSetArgs(){
     Stream.Builder<Arguments> builder=Stream.builder();
     for(DoubleInputTestArgType inputTestArgType:DoubleInputTestArgType.values()){
-      for(int initialCapacity=0;initialCapacity<=15;initialCapacity+=5){
-        builder.add(Arguments.of(inputTestArgType,new ConstructionArguments(initialCapacity,StructType.CHECKEDSTACK)));
-        builder.add(Arguments.of(inputTestArgType,new ConstructionArguments(initialCapacity,StructType.UNCHECKEDSTACK)));
-        builder.add(Arguments.of(inputTestArgType,new ConstructionArguments(initialCapacity,StructType.CHECKEDLIST)));
-        builder.add(Arguments.of(inputTestArgType,new ConstructionArguments(initialCapacity,StructType.UNCHECKEDLIST)));
-      }
-      for(int rootPreAlloc=0;rootPreAlloc<=5;rootPreAlloc+=5){
-        for(int rootPostAlloc=0;rootPostAlloc<=5;rootPostAlloc+=5){
-          for(int parentPreAlloc=0;parentPreAlloc<=5;parentPreAlloc+=5){
-            for(int parentPostAlloc=0;parentPostAlloc<=5;parentPostAlloc+=5){
-              builder.add(Arguments.of(inputTestArgType,new ConstructionArguments(rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,StructType.CHECKEDSUBLIST)));
-              builder.add(Arguments.of(inputTestArgType,new ConstructionArguments(rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,StructType.UNCHECKEDSUBLIST)));
+      for(ListItrSetTestScenario testScenario: ListItrSetTestScenario.values()){
+        for(int initialCapacity=0;initialCapacity<=15;initialCapacity+=5){
+          if(testScenario.expectedException==null){builder.add(Arguments.of(testScenario,inputTestArgType,new ConstructionArguments(initialCapacity,StructType.UNCHECKEDLIST)));}
+          builder.add(Arguments.of(testScenario,inputTestArgType,new ConstructionArguments(initialCapacity,StructType.CHECKEDLIST)));
+        }
+        for(int rootPreAlloc=0;rootPreAlloc<=5;rootPreAlloc+=5){
+          for(int rootPostAlloc=0;rootPostAlloc<=5;rootPostAlloc+=5){
+            for(int parentPreAlloc=0;parentPreAlloc<=5;parentPreAlloc+=5){
+              for(int parentPostAlloc=0;parentPostAlloc<=5;parentPostAlloc+=5){
+                builder.add(Arguments.of(testScenario,inputTestArgType,new ConstructionArguments(rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,StructType.CHECKEDSUBLIST)));
+                if(testScenario.expectedException==null){builder.add(Arguments.of(testScenario,inputTestArgType,new ConstructionArguments(rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,StructType.UNCHECKEDSUBLIST)));}
+              }
             }
           }
         }
@@ -327,129 +628,340 @@ public class DoubleArrSeqTest{
     }
     return builder.build();
   }
-  static Stream<Arguments> getStackInputMethodArgs(){
+  @ParameterizedTest
+  @MethodSource("getListItrSetArgs")
+  public void testListItrSet(ListItrSetTestScenario testScenario,DoubleInputTestArgType inputArgType,ConstructionArguments constructionArgs){
+    var seqItr=constructionArgs.constructSeqListIterator();
+    var testMonitor=new InputTestMonitor();
+    if(testScenario.nonEmpty){for(int i=0;i<100;++i){testMonitor.seqItrAdd(seqItr,inputArgType,i);}}
+    var expectedException=testScenario.expectedException;
+    if(expectedException==null){
+      for(int i=0;i<100;++i){
+        testMonitor.seqItrPrevious(seqItr);
+        inputArgType.callListItrSet(seqItr,i);
+        testMonitor.verifyItrState(seqItr,constructionArgs);
+      }
+      int offset=constructionArgs.verifyPreAlloc();
+      offset=constructionArgs.verifyDescending(offset,inputArgType,testMonitor.expectedRootSize);
+      offset=constructionArgs.verifyParentPostAlloc(offset);
+      constructionArgs.verifyRootPostAlloc(offset);
+      for(int i=0;i<100;++i){
+        testMonitor.seqItrNext(seqItr);
+        inputArgType.callListItrSet(seqItr,i);
+        testMonitor.verifyItrState(seqItr,constructionArgs);
+      }
+    }else{
+      if(expectedException==ConcurrentModificationException.class)
+      {
+        testMonitor.seqItrAdd(seqItr,inputArgType,0);
+        testMonitor.seqItrPrevious(seqItr);
+      }else{
+        switch(testScenario){
+        case EmptyPostAddThrowISE:
+        case EmptyPostAddThrowISESupercedesModRootCME:
+        case EmptyPostAddThrowISESupercedesModParentCME:
+        case EmptyPostAddThrowISESupercedesModSeqCME:
+        case NonEmptyPostAddThrowISE:
+        case NonEmptyPostAddThrowISESupercedesModRootCME:
+        case NonEmptyPostAddThrowISESupercedesModParentCME:
+        case NonEmptyPostAddThrowISESupercedesModSeqCME:
+          testMonitor.seqItrAdd(seqItr,inputArgType,0);
+          break;
+        case EmptyPostRemoveThrowISE:
+        case EmptyPostRemoveThrowISESupercedesModRootCME:
+        case EmptyPostRemoveThrowISESupercedesModParentCME:
+        case EmptyPostRemoveThrowISESupercedesModSeqCME:
+        case NonEmptyPostRemoveThrowISE:
+        case NonEmptyPostRemoveThrowISESupercedesModRootCME:
+        case NonEmptyPostRemoveThrowISESupercedesModParentCME:
+        case NonEmptyPostRemoveThrowISESupercedesModSeqCME:
+          testMonitor.seqItrAdd(seqItr,inputArgType,0);
+          testMonitor.seqItrPrevious(seqItr);
+          testMonitor.seqItrRemove(seqItr);
+        default:
+        }
+      }
+      testMonitor.illegalMod(constructionArgs,inputArgType,testScenario.modScenario);
+      Assertions.assertThrows(expectedException,()->inputArgType.callListItrSet(seqItr,1));
+    }
+    testMonitor.verifyItrState(seqItr,constructionArgs);
+    testMonitor.verifyStructuralIntegrity(constructionArgs);
+    int offset=constructionArgs.verifyPreAlloc();
+    if(testScenario.nonEmpty){offset=constructionArgs.verifyAscending(offset,inputArgType,100);}
+    switch(testScenario){
+      case EmptyModRootThrowCME:
+      case EmptyModParentThrowCME:
+      case EmptyModSeqThrowCME:
+      case NonEmptyModRootThrowCME:
+      case NonEmptyModParentThrowCME:
+      case NonEmptyModSeqThrowCME:
+      case EmptyPostAddThrowISE:
+      case EmptyPostAddThrowISESupercedesModRootCME:
+      case EmptyPostAddThrowISESupercedesModParentCME:
+      case EmptyPostAddThrowISESupercedesModSeqCME:
+      case NonEmptyPostAddThrowISE:
+      case NonEmptyPostAddThrowISESupercedesModRootCME:
+      case NonEmptyPostAddThrowISESupercedesModParentCME:
+      case NonEmptyPostAddThrowISESupercedesModSeqCME:
+        offset=constructionArgs.verifyIndex(offset,inputArgType,0);
+      default:
+    }
+    if(testScenario.modScenario==CMEScenario.ModSeq){offset=constructionArgs.verifyIndex(offset,inputArgType,0);}
+    offset=constructionArgs.verifyParentPostAlloc(offset);
+    if(testScenario.modScenario==CMEScenario.ModParent){offset=constructionArgs.verifyIndex(offset,inputArgType,0);}
+    offset=constructionArgs.verifyRootPostAlloc(offset);
+    if(testScenario.modScenario==CMEScenario.ModRoot){constructionArgs.verifyIndex(offset,inputArgType,0);}
+  }
+  static enum ListAddIntValTestScenario{
+    HappyPathInsertBegin(false,CMEScenario.NoMod,null),
+    HappyPathInsertEnd(false,CMEScenario.NoMod,null),
+    HappyPathInsertMidPoint(false,CMEScenario.NoMod,null),
+    ThrowIOBE(false,CMEScenario.NoMod,IndexOutOfBoundsException.class),
+    EmptyModRootThrowCME(false,CMEScenario.ModRoot,ConcurrentModificationException.class),
+    EmptyModParentThrowCME(false,CMEScenario.ModParent,ConcurrentModificationException.class),
+    NonEmptyModRootThrowCME(true,CMEScenario.ModRoot,ConcurrentModificationException.class),
+    NonEmptyModParentThrowCME(true,CMEScenario.ModParent,ConcurrentModificationException.class),
+    EmptyModRootThrowCMESupercedesIOBE(false,CMEScenario.ModRoot,ConcurrentModificationException.class),
+    NonEmptyModRootThrowCMESupercedesIOBE(true,CMEScenario.ModRoot,ConcurrentModificationException.class),
+    EmptyModParentThrowCMESupercedesIOBE(false,CMEScenario.ModParent,ConcurrentModificationException.class),
+    NonEmptyModParentThrowCMESupercedesIOBE(true,CMEScenario.ModParent,ConcurrentModificationException.class);
+    final boolean nonEmpty;
+    final CMEScenario modScenario;
+    final Class<? extends Throwable> expectedException;
+    ListAddIntValTestScenario(boolean nonEmpty,CMEScenario modScenario,Class<? extends Throwable> expectedException){
+      this.expectedException=expectedException;
+      this.nonEmpty=nonEmpty;
+      this.modScenario=modScenario;
+    }
+  }
+  @ParameterizedTest
+  @MethodSource("getListAddIntValArgs")
+  public void testListadd_int_val(ListAddIntValTestScenario testScenario,DoubleInputTestArgType inputArgType,ConstructionArguments constructionArgs){
+    var testMonitor=new InputTestMonitor();
+    if(testScenario.nonEmpty){for(int i=0;i<100;++i){testMonitor.collectionAdd(constructionArgs,inputArgType,i);}}
+    var expectedException=testScenario.expectedException;
+    if(expectedException==ConcurrentModificationException.class){
+      testMonitor.illegalMod(constructionArgs,inputArgType,testScenario.modScenario);
+      switch(testScenario){
+        case EmptyModRootThrowCMESupercedesIOBE:
+        case NonEmptyModRootThrowCMESupercedesIOBE:
+        case EmptyModParentThrowCMESupercedesIOBE:
+        case NonEmptyModParentThrowCMESupercedesIOBE:
+          //attempt an insertion too low
+          Assertions.assertThrows(expectedException,()->inputArgType.callListAdd(constructionArgs.seq,-1,0));
+          //attempt an insertion too high
+          Assertions.assertThrows(expectedException,()->inputArgType.callListAdd(constructionArgs.seq,testMonitor.expectedSeqSize+1,0));
+          break;
+        default:
+          Assertions.assertThrows(expectedException,()->inputArgType.callListAdd(constructionArgs.seq,testMonitor.expectedSeqSize,0));
+      }
+    }else{
+      switch(testScenario){
+        case HappyPathInsertBegin:
+          for(int i=0;i<100;++i){testMonitor.listAdd(constructionArgs,inputArgType,0,i);}
+          break;
+        case HappyPathInsertEnd:
+          for(int i=0;i<100;++i){testMonitor.listAdd(constructionArgs,inputArgType,testMonitor.expectedSeqSize,i);}
+          break;
+        case HappyPathInsertMidPoint:
+          for(int i=0;i<100;++i){testMonitor.listAdd(constructionArgs,inputArgType,testMonitor.expectedSeqSize/2,i);}
+          break;
+        case ThrowIOBE:
+          for(int i=0;i<100;++i){
+            //too low
+            Assertions.assertThrows(expectedException,()->inputArgType.callListAdd(constructionArgs.seq,-1,0));
+            //too high
+            Assertions.assertThrows(expectedException,()->inputArgType.callListAdd(constructionArgs.seq,testMonitor.expectedSeqSize+1,0));
+            testMonitor.collectionAdd(constructionArgs,inputArgType,i);
+          }
+        default:
+      }
+    }
+    testMonitor.verifyStructuralIntegrity(constructionArgs);
+    int offset=constructionArgs.verifyPreAlloc();
+    switch(testScenario){
+      case HappyPathInsertBegin:
+        offset=constructionArgs.verifyDescending(offset,inputArgType,100);
+        break;
+      case HappyPathInsertMidPoint:
+        offset=constructionArgs.verifyMidPointInsertion(offset,inputArgType,100);
+        break;
+      default:
+        if(!testScenario.nonEmpty){break;}
+      case HappyPathInsertEnd:
+      case ThrowIOBE:
+        offset=constructionArgs.verifyAscending(offset,inputArgType,100);
+        break;
+    }
+    offset=constructionArgs.verifyParentPostAlloc(offset);
+    if(testScenario.modScenario==CMEScenario.ModParent){offset=constructionArgs.verifyIndex(offset,inputArgType,0);}
+    offset=constructionArgs.verifyRootPostAlloc(offset);
+    if(testScenario.modScenario==CMEScenario.ModRoot){constructionArgs.verifyIndex(offset,inputArgType,0);}
+  }
+  static enum ListPutIntValTestScenario{
+    HappyPath(true,CMEScenario.NoMod,null),
+    ThrowIOBE(false,CMEScenario.NoMod,IndexOutOfBoundsException.class),
+    NonEmptyListModRootThrowCME(true,CMEScenario.ModRoot,ConcurrentModificationException.class),
+    NonEmptyListModParentThrowCME(true,CMEScenario.ModParent,ConcurrentModificationException.class),
+    EmptyListModRootThrowCMESupercedesIOBE(false,CMEScenario.ModRoot,ConcurrentModificationException.class),
+    EmptyListModParentThrowCMESupercedesIOBE(false,CMEScenario.ModParent,ConcurrentModificationException.class),
+    NonEmptyListModRootThrowCMESupercedesIOBE(true,CMEScenario.ModRoot,ConcurrentModificationException.class),
+    NonEmptyListModParentThrowCMESupercedesIOBE(true,CMEScenario.ModParent,ConcurrentModificationException.class);
+    final boolean nonEmpty;
+    final CMEScenario modScenario;
+    final Class<? extends Throwable> expectedException;
+    ListPutIntValTestScenario(boolean nonEmpty,CMEScenario modScenario,Class<? extends Throwable> expectedException){
+      this.expectedException=expectedException;
+      this.nonEmpty=nonEmpty;
+      this.modScenario=modScenario;
+    }
+  }
+  static Stream<Arguments> getListPutIntValArgs(){
     Stream.Builder<Arguments> builder=Stream.builder();
     for(DoubleInputTestArgType inputTestArgType:DoubleInputTestArgType.values()){
-      for(int initialCapacity=0;initialCapacity<=15;initialCapacity+=5){
-        builder.add(Arguments.of(inputTestArgType,new ConstructionArguments(initialCapacity,StructType.CHECKEDSTACK)));
-        builder.add(Arguments.of(inputTestArgType,new ConstructionArguments(initialCapacity,StructType.UNCHECKEDSTACK)));
+      for(ListPutIntValTestScenario testScenario: ListPutIntValTestScenario.values()){
+        for(int initialCapacity=0;initialCapacity<=15;initialCapacity+=5){
+          if(testScenario.expectedException==null){builder.add(Arguments.of(testScenario,inputTestArgType,new ConstructionArguments(initialCapacity,StructType.UNCHECKEDLIST)));}
+          if(testScenario.expectedException!=ConcurrentModificationException.class){builder.add(Arguments.of(testScenario,inputTestArgType,new ConstructionArguments(initialCapacity,StructType.CHECKEDLIST)));}
+        }
+        for(int rootPreAlloc=0;rootPreAlloc<=5;rootPreAlloc+=5){
+          for(int rootPostAlloc=0;rootPostAlloc<=5;rootPostAlloc+=5){
+            for(int parentPreAlloc=0;parentPreAlloc<=5;parentPreAlloc+=5){
+              for(int parentPostAlloc=0;parentPostAlloc<=5;parentPostAlloc+=5){
+                builder.add(Arguments.of(testScenario,inputTestArgType,new ConstructionArguments(rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,StructType.CHECKEDSUBLIST)));
+                if(testScenario.expectedException==null){builder.add(Arguments.of(testScenario,inputTestArgType,new ConstructionArguments(rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,StructType.UNCHECKEDSUBLIST)));}
+              }
+            }
+          }
+        }
       }
     }
     return builder.build();
+  }
+  @ParameterizedTest
+  @MethodSource("getListPutIntValArgs")
+  public void testListput_int_val(ListPutIntValTestScenario testScenario,DoubleInputTestArgType inputArgType,ConstructionArguments constructionArgs){
+    var testMonitor=new InputTestMonitor();
+    if(testScenario.nonEmpty){for(int i=0;i<100;++i){testMonitor.collectionAdd(constructionArgs,inputArgType,i);}}
+    var expectedException=testScenario.expectedException;
+    if(expectedException==null){
+      for(int i=0;i<100;++i){inputArgType.callListPut(constructionArgs.seq,100-i-1,i);}
+    }else if(expectedException==IndexOutOfBoundsException.class){
+      for(int i=0;i<100;++i){
+        //attempt a put too low
+        Assertions.assertThrows(expectedException,()->inputArgType.callListPut(constructionArgs.seq,-1,0));
+        //attempt a put too high
+        Assertions.assertThrows(expectedException,()->inputArgType.callListPut(constructionArgs.seq,testMonitor.expectedSeqSize,0));
+        testMonitor.collectionAdd(constructionArgs,inputArgType,i);
+      }
+    }else{
+      testMonitor.illegalMod(constructionArgs,inputArgType,testScenario.modScenario);
+      switch(testScenario){
+        case NonEmptyListModRootThrowCME:
+        case NonEmptyListModParentThrowCME:
+          Assertions.assertThrows(expectedException,()->inputArgType.callListPut(constructionArgs.seq,0,0));
+          break;
+        case EmptyListModRootThrowCMESupercedesIOBE:
+        case EmptyListModParentThrowCMESupercedesIOBE:
+        case NonEmptyListModRootThrowCMESupercedesIOBE:
+        case NonEmptyListModParentThrowCMESupercedesIOBE:
+          //attempt a put too low
+          Assertions.assertThrows(expectedException,()->inputArgType.callListPut(constructionArgs.seq,-1,0));
+          //attempt a put too high
+          Assertions.assertThrows(expectedException,()->inputArgType.callListPut(constructionArgs.seq,testMonitor.expectedSeqSize,0));
+        default:
+      }
+    }
+    testMonitor.verifyStructuralIntegrity(constructionArgs);
+    int offset=constructionArgs.verifyPreAlloc();
+    switch(testScenario){
+      case HappyPath:
+        offset=constructionArgs.verifyDescending(offset,inputArgType,100);
+        break;
+      default:
+        if(!testScenario.nonEmpty){break;}
+      case ThrowIOBE:
+        offset=constructionArgs.verifyAscending(offset,inputArgType,100);
+    }
+    offset=constructionArgs.verifyParentPostAlloc(offset);
+    if(testScenario.modScenario==CMEScenario.ModParent){offset=constructionArgs.verifyIndex(offset,inputArgType,0);}
+    offset=constructionArgs.verifyRootPostAlloc(offset);
+    if(testScenario.modScenario==CMEScenario.ModRoot){constructionArgs.verifyIndex(offset,inputArgType,0);}
   }
   //TODO develop the parameterization of some of these tests to improve code dryness
-  @ParameterizedTest
-  @MethodSource("getListInputMethodArgs")
-  public void testListItradd_val_happyPathInsertBegin(DoubleInputTestArgType inputArgType,ConstructionArguments constructionArgs){
-    var seqItr=constructionArgs.constructSeqListIterator();
-    for(int i=0;i<100;++i){
-      inputArgType.callListItrAdd(seqItr,i);
-      constructionArgs.verifyIteratorState(seqItr,1,-1,i+1);
-      seqItr.previousDouble();
+  static enum CollectionAddValTestScenario
+  {
+    HappyPath(false,CMEScenario.NoMod,null),
+    EmptyListModRootThrowCME(false,CMEScenario.ModRoot,ConcurrentModificationException.class),
+    EmptyListModParentThrowCME(false,CMEScenario.ModParent,ConcurrentModificationException.class),
+    NonEmptyListModRootThrowCME(true,CMEScenario.ModRoot,ConcurrentModificationException.class),
+    NonEmptyListModParentThrowCME(true,CMEScenario.ModParent,ConcurrentModificationException.class);
+    final boolean nonEmpty;
+    final CMEScenario modScenario;
+    final Class<? extends Throwable> expectedException;
+    CollectionAddValTestScenario(boolean nonEmpty,CMEScenario modScenario,Class<? extends Throwable> expectedException){
+      this.expectedException=expectedException;
+      this.nonEmpty=nonEmpty;
+      this.modScenario=modScenario;
     }
-    constructionArgs.verifyStructuralIntegrity(100,100);
-    int offset=constructionArgs.verifyPreAlloc();
-    offset=constructionArgs.verifyDescending(offset,inputArgType,100);
-    offset=constructionArgs.verifyParentPostAlloc(offset);
-    constructionArgs.verifyRootPostAlloc(offset);
   }
-  @ParameterizedTest
-  @MethodSource("getListInputMethodArgs")
-  public void testadd_int_val_happyPathInsertBegin(DoubleInputTestArgType inputArgType,ConstructionArguments constructionArgs){
-    for(int i=0;i<100;++i){inputArgType.callListAdd(constructionArgs.seq,0,i);}
-    constructionArgs.verifyStructuralIntegrity(100,100);
-    int offset=constructionArgs.verifyPreAlloc();
-    offset=constructionArgs.verifyDescending(offset,inputArgType,100);
-    offset=constructionArgs.verifyParentPostAlloc(offset);
-    constructionArgs.verifyRootPostAlloc(offset);
-  }
-  @ParameterizedTest
-  @MethodSource("getListInputMethodArgs")
-  public void testListItradd_val_happyPathInsertEnd(DoubleInputTestArgType inputArgType,ConstructionArguments constructionArgs){
-    var seqItr=constructionArgs.constructSeqListIterator();
-    for(int i=0;i<100;++i){
-      inputArgType.callListItrAdd(seqItr,i);
-      constructionArgs.verifyIteratorState(seqItr,i+1,-1,i+1);
+  static Stream<Arguments> getCollectionAddValArgs(){
+    Stream.Builder<Arguments> builder=Stream.builder();
+    for(DoubleInputTestArgType inputTestArgType:DoubleInputTestArgType.values()){
+      for(CollectionAddValTestScenario testScenario: CollectionAddValTestScenario.values()){
+        for(int initialCapacity=0;initialCapacity<=15;initialCapacity+=5){
+          if(testScenario.expectedException==null){
+            builder.add(Arguments.of(testScenario,inputTestArgType,new ConstructionArguments(initialCapacity,StructType.UNCHECKEDLIST)));
+            builder.add(Arguments.of(testScenario,inputTestArgType,new ConstructionArguments(initialCapacity,StructType.CHECKEDLIST)));
+            builder.add(Arguments.of(testScenario,inputTestArgType,new ConstructionArguments(initialCapacity,StructType.UNCHECKEDSTACK)));
+            builder.add(Arguments.of(testScenario,inputTestArgType,new ConstructionArguments(initialCapacity,StructType.CHECKEDSTACK)));
+          }
+        }
+        for(int rootPreAlloc=0;rootPreAlloc<=5;rootPreAlloc+=5){
+          for(int rootPostAlloc=0;rootPostAlloc<=5;rootPostAlloc+=5){
+            for(int parentPreAlloc=0;parentPreAlloc<=5;parentPreAlloc+=5){
+              for(int parentPostAlloc=0;parentPostAlloc<=5;parentPostAlloc+=5){
+                builder.add(Arguments.of(testScenario,inputTestArgType,new ConstructionArguments(rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,StructType.CHECKEDSUBLIST)));
+                if(testScenario.expectedException==null){builder.add(Arguments.of(testScenario,inputTestArgType,new ConstructionArguments(rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,StructType.UNCHECKEDSUBLIST)));}
+              }
+            }
+          }
+        }
+      }
     }
-    constructionArgs.verifyStructuralIntegrity(100,100);
-    int offset=constructionArgs.verifyPreAlloc();
-    offset=constructionArgs.verifyAscending(offset,inputArgType,100);
-    offset=constructionArgs.verifyParentPostAlloc(offset);
-    constructionArgs.verifyRootPostAlloc(offset);
+    return builder.build();
   }
   @ParameterizedTest
-  @MethodSource("getListInputMethodArgs")
-  public void testadd_int_val_happyPathInsertEnd(DoubleInputTestArgType inputArgType,ConstructionArguments constructionArgs){
-    for(int i=0;i<100;++i){inputArgType.callListAdd(constructionArgs.seq,constructionArgs.seq.size(),i);}
-    constructionArgs.verifyStructuralIntegrity(100,100);
-    int offset=constructionArgs.verifyPreAlloc();
-    offset=constructionArgs.verifyAscending(offset,inputArgType,100);
-    offset=constructionArgs.verifyParentPostAlloc(offset);
-    constructionArgs.verifyRootPostAlloc(offset);
-  }
-  @ParameterizedTest
-  @MethodSource("getListInputMethodArgs")
-  public void testListItradd_val_happyPathInsertMidPoint(DoubleInputTestArgType inputArgType,ConstructionArguments constructionArgs){
-    var seqItr=constructionArgs.constructSeqListIterator();
-    for(int i=0;i<100;++i){
-      inputArgType.callListItrAdd(seqItr,i);
-      constructionArgs.verifyIteratorState(seqItr,(i/2)+1,-1,i+1);
-      if((i&1)==0){seqItr.previousDouble();}
-    }
-    constructionArgs.verifyStructuralIntegrity(100,100);
-    int offset=constructionArgs.verifyPreAlloc();
-    offset=constructionArgs.verifyMidPointInsertion(offset,inputArgType,100);
-    offset=constructionArgs.verifyParentPostAlloc(offset);
-    constructionArgs.verifyRootPostAlloc(offset);
-  }
-  @ParameterizedTest
-  @MethodSource("getListInputMethodArgs")
-  public void testadd_int_val_happyPathInsertMidPoint(DoubleInputTestArgType inputArgType,ConstructionArguments constructionArgs){
-    for(int i=0;i<100;++i){inputArgType.callListAdd(constructionArgs.seq,constructionArgs.seq.size()/2,i);}
-    constructionArgs.verifyStructuralIntegrity(100,100);
-    int offset=constructionArgs.verifyPreAlloc();
-    offset=constructionArgs.verifyMidPointInsertion(offset,inputArgType,100);
-    offset=constructionArgs.verifyParentPostAlloc(offset);
-    constructionArgs.verifyRootPostAlloc(offset);
-  }
-  @ParameterizedTest
-  @MethodSource("getListInputMethodArgs")
-  public void testListItrset_val_happyPath(DoubleInputTestArgType inputArgType,ConstructionArguments constructionArgs){
-    for(int i=100;--i>=0;){constructionArgs.seq.add(TypeConversionUtil.convertTodouble(i));}
-    var seqItr=constructionArgs.constructSeqListIterator();
-    for(int i=0;i<100;++i){
-      seqItr.nextDouble();
-      inputArgType.callListItrSet(seqItr,i);
-      constructionArgs.verifyIteratorState(seqItr,i+1,i,100);
+  @MethodSource("getCollectionAddValArgs")
+  public void testCollectionadd_val(CollectionAddValTestScenario testScenario,DoubleInputTestArgType inputArgType,ConstructionArguments constructionArgs){
+    var testMonitor=new InputTestMonitor();
+    if(testScenario.nonEmpty){for(int i=0;i<100;++i){testMonitor.collectionAdd(constructionArgs,inputArgType,i);}}
+    var expectedException=testScenario.expectedException;
+    if(expectedException==null){
+      for(int i=0;i<100;++i){
+        testMonitor.collectionAdd(constructionArgs,inputArgType,i);
+        testMonitor.verifyStructuralIntegrity(constructionArgs);
+      }
+    }else{
+      testMonitor.illegalMod(constructionArgs,inputArgType,testScenario.modScenario);
+      Assertions.assertThrows(expectedException,()->inputArgType.callCollectionAdd(constructionArgs.seq,0));
+      testMonitor.verifyStructuralIntegrity(constructionArgs);
     }
     int offset=constructionArgs.verifyPreAlloc();
-    offset=constructionArgs.verifyAscending(offset,inputArgType,100);
-    offset=constructionArgs.verifyParentPostAlloc(offset);
-    constructionArgs.verifyRootPostAlloc(offset);
-    for(int i=0;i<100;++i){
-      seqItr.previousDouble();
-      inputArgType.callListItrSet(seqItr,i);
-      constructionArgs.verifyIteratorState(seqItr,100-i-1,100-i-1,100);
+    switch(testScenario){
+      default:
+        if(!testScenario.nonEmpty){break;}
+      case HappyPath:
+        offset=constructionArgs.verifyAscending(offset,inputArgType,100);
+        break;
     }
-    constructionArgs.verifyStructuralIntegrity(100,100);
-    offset=constructionArgs.verifyPreAlloc();
-    offset=constructionArgs.verifyDescending(offset,inputArgType,100);
     offset=constructionArgs.verifyParentPostAlloc(offset);
-    constructionArgs.verifyRootPostAlloc(offset);
+    if(testScenario.modScenario==CMEScenario.ModParent){offset=constructionArgs.verifyIndex(offset,inputArgType,0);}
+    offset=constructionArgs.verifyRootPostAlloc(offset);
+    if(testScenario.modScenario==CMEScenario.ModRoot){constructionArgs.verifyIndex(offset,inputArgType,0);}
   }
   @ParameterizedTest
-  @MethodSource("getListInputMethodArgs")
-  public void testput_int_val_happyPath(DoubleInputTestArgType inputArgType,ConstructionArguments constructionArgs){
-    for(int i=0;i<100;++i){constructionArgs.seq.add(TypeConversionUtil.convertTodouble(i));}
-    for(int i=0;i<100;++i){inputArgType.callListPut(constructionArgs.seq,100-i-1,i);}
-    constructionArgs.verifyStructuralIntegrity(100,100);
-    int offset=constructionArgs.verifyPreAlloc();
-    offset=constructionArgs.verifyDescending(offset,inputArgType,100);
-    offset=constructionArgs.verifyParentPostAlloc(offset);
-    constructionArgs.verifyRootPostAlloc(offset);
-  }
-  @ParameterizedTest
-  @MethodSource("getStackInputMethodArgs")
+  @MethodSource("getStackPushArgs")
   public void testpush_val_happyPath(DoubleInputTestArgType inputArgType,ConstructionArguments constructionArgs){
     for(int i=0;i<100;++i){inputArgType.callStackPush(constructionArgs.seq,i);}
     constructionArgs.verifyStructuralIntegrity(100,100);
@@ -458,952 +970,12 @@ public class DoubleArrSeqTest{
     offset=constructionArgs.verifyParentPostAlloc(offset);
     constructionArgs.verifyRootPostAlloc(offset);
   }
-  @ParameterizedTest
-  @MethodSource("getCollectionInputMethodArgs")
-  public void testadd_val_happyPath(DoubleInputTestArgType inputArgType,ConstructionArguments constructionArgs){
-    for(int i=0;i<100;++i){Assertions.assertTrue(inputArgType.callCollectionAdd(constructionArgs.seq,i));}
-    constructionArgs.verifyStructuralIntegrity(100,100);
-    int offset=constructionArgs.verifyPreAlloc();
-    offset=constructionArgs.verifyAscending(offset,inputArgType,100);
-    offset=constructionArgs.verifyParentPostAlloc(offset);
-    constructionArgs.verifyRootPostAlloc(offset);
-  }
-  static Stream<Arguments> getCheckedListInputMethodArgs(){
-    Stream.Builder<Arguments> builder=Stream.builder();
-    for(DoubleInputTestArgType inputTestArgType:DoubleInputTestArgType.values()){
-      for(int initialCapacity=0;initialCapacity<=15;initialCapacity+=5){builder.add(Arguments.of(inputTestArgType,new ConstructionArguments(initialCapacity,StructType.CHECKEDLIST)));}
-      for(int rootPreAlloc=0;rootPreAlloc<=5;rootPreAlloc+=5){
-        for(int rootPostAlloc=0;rootPostAlloc<=5;rootPostAlloc+=5){
-          for(int parentPreAlloc=0;parentPreAlloc<=5;parentPreAlloc+=5){
-            for(int parentPostAlloc=0;parentPostAlloc<=5;parentPostAlloc+=5){builder.add(Arguments.of(inputTestArgType,new ConstructionArguments(rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,StructType.CHECKEDSUBLIST)));}
-          }
-        }
-      }
-    }
-    return builder.build();
-  }
-  @ParameterizedTest
-  @MethodSource("getCheckedListInputMethodArgs")
-  public void testput_int_val_throwIOBE(DoubleInputTestArgType inputArgType,ConstructionArguments constructionArgs){
-    for(int i=0;i<100;++i){
-      //too low
-      Assertions.assertThrows(IndexOutOfBoundsException.class,()->inputArgType.callListPut(constructionArgs.seq,-1,0));
-      //too high
-      final int finalIndex=i;
-      Assertions.assertThrows(IndexOutOfBoundsException.class,()->inputArgType.callListPut(constructionArgs.seq,finalIndex,0));
-      constructionArgs.seq.add(TypeConversionUtil.convertTodouble(i));
-    }
-    //when method throws, verify no changes occurred
-    constructionArgs.verifyStructuralIntegrity(100,100);
-    int offset=constructionArgs.verifyPreAlloc();
-    offset=constructionArgs.verifyAscending(offset,DoubleInputTestArgType.ARRAY_TYPE,100);
-    offset=constructionArgs.verifyParentPostAlloc(offset);
-    constructionArgs.verifyRootPostAlloc(offset);
-  }
-  @ParameterizedTest
-  @MethodSource("getCheckedListInputMethodArgs")
-  public void testadd_int_val_throwIOBE(DoubleInputTestArgType inputArgType,ConstructionArguments constructionArgs){
-    for(int i=0;i<100;++i){
-      //too low
-      Assertions.assertThrows(IndexOutOfBoundsException.class,()->inputArgType.callListAdd(constructionArgs.seq,-1,0));
-      //too high
-      final int finalIndex=i;
-      Assertions.assertThrows(IndexOutOfBoundsException.class,()->inputArgType.callListAdd(constructionArgs.seq,finalIndex+1,0));
-      constructionArgs.seq.add(TypeConversionUtil.convertTodouble(i));
-    }
-    //when method throws, verify no changes occurred
-    constructionArgs.verifyStructuralIntegrity(100,100);
-    int offset=constructionArgs.verifyPreAlloc();
-    offset=constructionArgs.verifyAscending(offset,DoubleInputTestArgType.ARRAY_TYPE,100);
-    offset=constructionArgs.verifyParentPostAlloc(offset);
-    constructionArgs.verifyRootPostAlloc(offset);
-  }
-  @ParameterizedTest
-  @MethodSource("getCheckedListInputMethodArgs")
-  public void testListItrAadd_val_emptyListModRootthrowCME(DoubleInputTestArgType inputArgType,ConstructionArguments constructionArgs){
-    var seqItr=constructionArgs.constructSeqListIterator();
-    //illegally modify the root;
-    constructionArgs.root.add(TypeConversionUtil.convertTodouble(0));
-    //attempt an insertion
-    Assertions.assertThrows(ConcurrentModificationException.class,()->inputArgType.callListItrAdd(seqItr,0));
-    constructionArgs.verifyIteratorState(seqItr,0,-1,0);
-    constructionArgs.verifyStructuralIntegrity(0,0,0,0,1,1);
-    int offset=constructionArgs.verifyPreAlloc();
-    offset=constructionArgs.verifyParentPostAlloc(offset);
-    offset=constructionArgs.verifyRootPostAlloc(offset);
-    constructionArgs.verifyIndex(offset,DoubleInputTestArgType.ARRAY_TYPE,0);
-  }
-  @ParameterizedTest
-  @MethodSource("getCheckedListInputMethodArgs")
-  public void testListItradd_val_emptyListModParentthrowCME(DoubleInputTestArgType inputArgType,ConstructionArguments constructionArgs){
-    var seqItr=constructionArgs.constructSeqListIterator();
-    //illegally modify the parent;
-    constructionArgs.parent.add(TypeConversionUtil.convertTodouble(0));
-    //attempt an insertion
-    Assertions.assertThrows(ConcurrentModificationException.class,()->inputArgType.callListItrAdd(seqItr,0));
-    constructionArgs.verifyIteratorState(seqItr,0,-1,0);
-    constructionArgs.verifyStructuralIntegrity(0,0,1,1);
-    int offset=constructionArgs.verifyPreAlloc();
-    offset=constructionArgs.verifyParentPostAlloc(offset);
-    offset=constructionArgs.verifyIndex(offset,DoubleInputTestArgType.ARRAY_TYPE,0);
-    constructionArgs.verifyRootPostAlloc(offset);
-  }
-  @ParameterizedTest
-  @MethodSource("getCheckedListInputMethodArgs")
-  public void testListItradd_val_emptyListModSequencethrowCME(DoubleInputTestArgType inputArgType,ConstructionArguments constructionArgs){
-    var seqItr=constructionArgs.constructSeqListIterator();
-    //illegally modify the sequence;
-    constructionArgs.seq.add(TypeConversionUtil.convertTodouble(0));
-    //attempt an insertion
-    Assertions.assertThrows(ConcurrentModificationException.class,()->inputArgType.callListItrAdd(seqItr,0));
-    constructionArgs.verifyIteratorState(seqItr,0,-1,0);
-    constructionArgs.verifyStructuralIntegrity(1,1);
-    int offset=constructionArgs.verifyPreAlloc();
-    offset=constructionArgs.verifyIndex(offset,DoubleInputTestArgType.ARRAY_TYPE,0);
-    offset=constructionArgs.verifyParentPostAlloc(offset);
-    constructionArgs.verifyRootPostAlloc(offset);
-  }
-  @ParameterizedTest
-  @MethodSource("getCheckedListInputMethodArgs")
-  public void testListItradd_val_nonEmptyListModRootthrowCME(DoubleInputTestArgType inputArgType,ConstructionArguments constructionArgs){
-    var seqItr=constructionArgs.constructSeqListIterator();
-    for(int i=0;i<100;++i){seqItr.add(TypeConversionUtil.convertTodouble(i));}
-    //illegally modify the root;
-    constructionArgs.root.add(TypeConversionUtil.convertTodouble(0));
-    //attempt an insertion
-    Assertions.assertThrows(ConcurrentModificationException.class,()->inputArgType.callListItrAdd(seqItr,0));
-    constructionArgs.verifyIteratorState(seqItr,100,-1,100);
-    constructionArgs.verifyStructuralIntegrity(100,100,100,100,101,101);
-    int offset=constructionArgs.verifyPreAlloc();
-    offset=constructionArgs.verifyAscending(offset,DoubleInputTestArgType.ARRAY_TYPE,100);
-    offset=constructionArgs.verifyParentPostAlloc(offset);
-    offset=constructionArgs.verifyRootPostAlloc(offset);
-    constructionArgs.verifyIndex(offset,DoubleInputTestArgType.ARRAY_TYPE,0);
-  }
-  @ParameterizedTest
-  @MethodSource("getCheckedListInputMethodArgs")
-  public void testListItradd_val_nonEmptyListModParentthrowCME(DoubleInputTestArgType inputArgType,ConstructionArguments constructionArgs){
-    var seqItr=constructionArgs.constructSeqListIterator();
-    for(int i=0;i<100;++i){seqItr.add(TypeConversionUtil.convertTodouble(i));}
-    //illegally modify the parent;
-    constructionArgs.parent.add(TypeConversionUtil.convertTodouble(0));
-    //attempt an insertion
-    Assertions.assertThrows(ConcurrentModificationException.class,()->inputArgType.callListItrAdd(seqItr,0));
-    constructionArgs.verifyIteratorState(seqItr,100,-1,100);
-    constructionArgs.verifyStructuralIntegrity(100,100,101,101);
-    int offset=constructionArgs.verifyPreAlloc();
-    offset=constructionArgs.verifyAscending(offset,DoubleInputTestArgType.ARRAY_TYPE,100);
-    offset=constructionArgs.verifyParentPostAlloc(offset);
-    offset=constructionArgs.verifyIndex(offset,DoubleInputTestArgType.ARRAY_TYPE,0);
-    constructionArgs.verifyRootPostAlloc(offset);
-  }
-  @ParameterizedTest
-  @MethodSource("getCheckedListInputMethodArgs")
-  public void testListItradd_val_nonEmptyListModSequencethrowCME(DoubleInputTestArgType inputArgType,ConstructionArguments constructionArgs){
-    var seqItr=constructionArgs.constructSeqListIterator();
-    for(int i=0;i<100;++i){seqItr.add(TypeConversionUtil.convertTodouble(i));}
-    //illegally modify the sequence;
-    constructionArgs.seq.add(TypeConversionUtil.convertTodouble(0));
-    //attempt an insertion
-    Assertions.assertThrows(ConcurrentModificationException.class,()->inputArgType.callListItrAdd(seqItr,0));
-    constructionArgs.verifyIteratorState(seqItr,100,-1,100);
-    constructionArgs.verifyStructuralIntegrity(101,101);
-    int offset=constructionArgs.verifyPreAlloc();
-    offset=constructionArgs.verifyAscending(offset,DoubleInputTestArgType.ARRAY_TYPE,100);
-    offset=constructionArgs.verifyIndex(offset,DoubleInputTestArgType.ARRAY_TYPE,0);
-    offset=constructionArgs.verifyParentPostAlloc(offset);
-    constructionArgs.verifyRootPostAlloc(offset);
-  }
-  @ParameterizedTest
-  @MethodSource("getCheckedListInputMethodArgs")
-  public void testListItrAset_val_emptyListModRootthrowCME(DoubleInputTestArgType inputArgType,ConstructionArguments constructionArgs){
-    var seqItr=constructionArgs.constructSeqListIterator();
-    seqItr.add(TypeConversionUtil.convertTodouble(0));
-    seqItr.previousDouble();
-    //illegally modify the root;
-    constructionArgs.root.add(TypeConversionUtil.convertTodouble(0));
-    //attempt to set
-    Assertions.assertThrows(ConcurrentModificationException.class,()->inputArgType.callListItrSet(seqItr,1));
-    constructionArgs.verifyIteratorState(seqItr,0,0,1);
-    constructionArgs.verifyStructuralIntegrity(1,1,1,1,2,2);
-    int offset=constructionArgs.verifyPreAlloc();
-    offset=constructionArgs.verifyIndex(offset,DoubleInputTestArgType.ARRAY_TYPE,0);
-    offset=constructionArgs.verifyParentPostAlloc(offset);
-    offset=constructionArgs.verifyRootPostAlloc(offset);
-    constructionArgs.verifyIndex(offset,DoubleInputTestArgType.ARRAY_TYPE,0);
-  }
-  @ParameterizedTest
-  @MethodSource("getCheckedListInputMethodArgs")
-  public void testListItrset_val_emptyListModParentthrowCME(DoubleInputTestArgType inputArgType,ConstructionArguments constructionArgs){
-    var seqItr=constructionArgs.constructSeqListIterator();
-    seqItr.add(TypeConversionUtil.convertTodouble(0));
-    seqItr.previousDouble();
-    //illegally modify the parent;
-    constructionArgs.parent.add(TypeConversionUtil.convertTodouble(0));
-    //attempt to set
-    Assertions.assertThrows(ConcurrentModificationException.class,()->inputArgType.callListItrSet(seqItr,0));
-    constructionArgs.verifyIteratorState(seqItr,0,0,1);
-    constructionArgs.verifyStructuralIntegrity(1,1,2,2);
-    int offset=constructionArgs.verifyPreAlloc();
-    offset=constructionArgs.verifyIndex(offset,DoubleInputTestArgType.ARRAY_TYPE,0);
-    offset=constructionArgs.verifyParentPostAlloc(offset);
-    offset=constructionArgs.verifyIndex(offset,DoubleInputTestArgType.ARRAY_TYPE,0);
-    constructionArgs.verifyRootPostAlloc(offset);
-  }
-  @ParameterizedTest
-  @MethodSource("getCheckedListInputMethodArgs")
-  public void testListItrset_val_emptyListModSequencethrowCME(DoubleInputTestArgType inputArgType,ConstructionArguments constructionArgs){
-    var seqItr=constructionArgs.constructSeqListIterator();
-    seqItr.add(TypeConversionUtil.convertTodouble(0));
-    seqItr.previousDouble();
-    //illegally modify the sequence;
-    constructionArgs.seq.add(TypeConversionUtil.convertTodouble(0));
-    //attempt to set
-    Assertions.assertThrows(ConcurrentModificationException.class,()->inputArgType.callListItrSet(seqItr,0));
-    constructionArgs.verifyIteratorState(seqItr,0,0,1);
-    constructionArgs.verifyStructuralIntegrity(2,2);
-    int offset=constructionArgs.verifyPreAlloc();
-    offset=constructionArgs.verifyIndex(offset,DoubleInputTestArgType.ARRAY_TYPE,0);
-    offset=constructionArgs.verifyIndex(offset,DoubleInputTestArgType.ARRAY_TYPE,0);
-    offset=constructionArgs.verifyParentPostAlloc(offset);
-    constructionArgs.verifyRootPostAlloc(offset);
-  }
-  @ParameterizedTest
-  @MethodSource("getCheckedListInputMethodArgs")
-  public void testListItrset_val_nonEmptyListModRootthrowCME(DoubleInputTestArgType inputArgType,ConstructionArguments constructionArgs){
-    var seqItr=constructionArgs.constructSeqListIterator();
-    for(int i=0;i<100;++i){seqItr.add(TypeConversionUtil.convertTodouble(i));}
-    seqItr.add(TypeConversionUtil.convertTodouble(0));
-    seqItr.previousDouble();
-    //illegally modify the root;
-    constructionArgs.root.add(TypeConversionUtil.convertTodouble(0));
-    //attempt to set
-    Assertions.assertThrows(ConcurrentModificationException.class,()->inputArgType.callListItrSet(seqItr,1));
-    constructionArgs.verifyIteratorState(seqItr,100,100,101);
-    constructionArgs.verifyStructuralIntegrity(101,101,101,101,102,102);
-    int offset=constructionArgs.verifyPreAlloc();
-    offset=constructionArgs.verifyAscending(offset,DoubleInputTestArgType.ARRAY_TYPE,100);
-    offset=constructionArgs.verifyIndex(offset,DoubleInputTestArgType.ARRAY_TYPE,0);
-    offset=constructionArgs.verifyParentPostAlloc(offset);
-    offset=constructionArgs.verifyRootPostAlloc(offset);
-    constructionArgs.verifyIndex(offset,DoubleInputTestArgType.ARRAY_TYPE,0);
-  }
-  @ParameterizedTest
-  @MethodSource("getCheckedListInputMethodArgs")
-  public void testListItrset_val_nonEmptyListModParentthrowCME(DoubleInputTestArgType inputArgType,ConstructionArguments constructionArgs){
-    var seqItr=constructionArgs.constructSeqListIterator();
-    for(int i=0;i<100;++i){seqItr.add(TypeConversionUtil.convertTodouble(i));}
-    seqItr.add(TypeConversionUtil.convertTodouble(0));
-    seqItr.previousDouble();
-    //illegally modify the parent;
-    constructionArgs.parent.add(TypeConversionUtil.convertTodouble(0));
-    //attempt to set
-    Assertions.assertThrows(ConcurrentModificationException.class,()->inputArgType.callListItrSet(seqItr,1));
-    constructionArgs.verifyIteratorState(seqItr,100,100,101);
-    constructionArgs.verifyStructuralIntegrity(101,101,102,102);
-    int offset=constructionArgs.verifyPreAlloc();
-    offset=constructionArgs.verifyAscending(offset,DoubleInputTestArgType.ARRAY_TYPE,100);
-    offset=constructionArgs.verifyIndex(offset,DoubleInputTestArgType.ARRAY_TYPE,0);
-    offset=constructionArgs.verifyParentPostAlloc(offset);
-    offset=constructionArgs.verifyIndex(offset,DoubleInputTestArgType.ARRAY_TYPE,0);
-    constructionArgs.verifyRootPostAlloc(offset);
-  }
-  @ParameterizedTest
-  @MethodSource("getCheckedListInputMethodArgs")
-  public void testListItrset_val_nonEmptyListModSequencethrowCME(DoubleInputTestArgType inputArgType,ConstructionArguments constructionArgs){
-    var seqItr=constructionArgs.constructSeqListIterator();
-    for(int i=0;i<100;++i){seqItr.add(TypeConversionUtil.convertTodouble(i));}
-    seqItr.add(TypeConversionUtil.convertTodouble(0));
-    seqItr.previousDouble();
-    //illegally modify the sequence;
-    constructionArgs.seq.add(TypeConversionUtil.convertTodouble(0));
-    //attempt to set
-    Assertions.assertThrows(ConcurrentModificationException.class,()->inputArgType.callListItrSet(seqItr,1));
-    constructionArgs.verifyIteratorState(seqItr,100,100,101);
-    constructionArgs.verifyStructuralIntegrity(102,102);
-    int offset=constructionArgs.verifyPreAlloc();
-    offset=constructionArgs.verifyAscending(offset,DoubleInputTestArgType.ARRAY_TYPE,100);
-    offset=constructionArgs.verifyIndex(offset,DoubleInputTestArgType.ARRAY_TYPE,0);
-    offset=constructionArgs.verifyIndex(offset,DoubleInputTestArgType.ARRAY_TYPE,0);
-    offset=constructionArgs.verifyParentPostAlloc(offset);
-    constructionArgs.verifyRootPostAlloc(offset);
-  }
-  @ParameterizedTest
-  @MethodSource("getCheckedListInputMethodArgs")
-  public void testListItrset_val_emptyListthrowISE(DoubleInputTestArgType inputArgType,ConstructionArguments constructionArgs){
-    var seqItr=constructionArgs.constructSeqListIterator();
-    Assertions.assertThrows(IllegalStateException.class,()->inputArgType.callListItrSet(seqItr,1));
-    constructionArgs.verifyIteratorState(seqItr,0,-1,0);
-    constructionArgs.verifyStructuralIntegrity(0,0);
-    int offset=constructionArgs.verifyPreAlloc();
-    offset=constructionArgs.verifyParentPostAlloc(offset);
-    constructionArgs.verifyRootPostAlloc(offset);
-  }
-  @ParameterizedTest
-  @MethodSource("getCheckedListInputMethodArgs")
-  public void testListItrset_val_emptyListpostaddthrowISE(DoubleInputTestArgType inputArgType,ConstructionArguments constructionArgs){
-    var seqItr=constructionArgs.constructSeqListIterator();
-    seqItr.add(TypeConversionUtil.convertTodouble(0));
-    Assertions.assertThrows(IllegalStateException.class,()->inputArgType.callListItrSet(seqItr,1));
-    constructionArgs.verifyIteratorState(seqItr,1,-1,1);
-    constructionArgs.verifyStructuralIntegrity(1,1);
-    int offset=constructionArgs.verifyPreAlloc();
-    offset=constructionArgs.verifyIndex(offset,DoubleInputTestArgType.ARRAY_TYPE,0);
-    offset=constructionArgs.verifyParentPostAlloc(offset);
-    constructionArgs.verifyRootPostAlloc(offset);
-  }
-  @MethodSource("getCheckedListInputMethodArgs")
-  public void testListItrset_val_emptyListpostremovethrowISE(DoubleInputTestArgType inputArgType,ConstructionArguments constructionArgs){
-    var seqItr=constructionArgs.constructSeqListIterator();
-    seqItr.add(TypeConversionUtil.convertTodouble(0));
-    seqItr.previousDouble();
-    seqItr.remove();
-    Assertions.assertThrows(IllegalStateException.class,()->inputArgType.callListItrSet(seqItr,1));
-    constructionArgs.verifyIteratorState(seqItr,0,-1,2);
-    constructionArgs.verifyStructuralIntegrity(0,2);
-    int offset=constructionArgs.verifyPreAlloc();
-    offset=constructionArgs.verifyParentPostAlloc(offset);
-    constructionArgs.verifyRootPostAlloc(offset);
-  }
-  @ParameterizedTest
-  @MethodSource("getCheckedListInputMethodArgs")
-  public void testListItrset_val_emptyListthrowISEsupercedesModRootCME(DoubleInputTestArgType inputArgType,ConstructionArguments constructionArgs){
-    var seqItr=constructionArgs.constructSeqListIterator();
-    //illegally modify the root
-    constructionArgs.root.add(TypeConversionUtil.convertTodouble(0));
-    Assertions.assertThrows(IllegalStateException.class,()->inputArgType.callListItrSet(seqItr,1));
-    constructionArgs.verifyIteratorState(seqItr,0,-1,0);
-    constructionArgs.verifyStructuralIntegrity(0,0,0,0,1,1);
-    int offset=constructionArgs.verifyPreAlloc();
-    offset=constructionArgs.verifyParentPostAlloc(offset);
-    offset=constructionArgs.verifyRootPostAlloc(offset);
-    constructionArgs.verifyIndex(offset,DoubleInputTestArgType.ARRAY_TYPE,0);
-  }
-  @ParameterizedTest
-  @MethodSource("getCheckedListInputMethodArgs")
-  public void testListItrset_val_emptyListthrowISEsupercedesModParentCME(DoubleInputTestArgType inputArgType,ConstructionArguments constructionArgs){
-    var seqItr=constructionArgs.constructSeqListIterator();
-    //illegally modify the parent
-    constructionArgs.parent.add(TypeConversionUtil.convertTodouble(0));
-    Assertions.assertThrows(IllegalStateException.class,()->inputArgType.callListItrSet(seqItr,1));
-    constructionArgs.verifyIteratorState(seqItr,0,-1,0);
-    constructionArgs.verifyStructuralIntegrity(0,0,1,1);
-    int offset=constructionArgs.verifyPreAlloc();
-    offset=constructionArgs.verifyParentPostAlloc(offset);
-    offset=constructionArgs.verifyIndex(offset,DoubleInputTestArgType.ARRAY_TYPE,0);
-    constructionArgs.verifyRootPostAlloc(offset);
-  }
-  @ParameterizedTest
-  @MethodSource("getCheckedListInputMethodArgs")
-  public void testListItrset_val_emptyListthrowISEsupercedesModSequenceCME(DoubleInputTestArgType inputArgType,ConstructionArguments constructionArgs){
-    var seqItr=constructionArgs.constructSeqListIterator();
-    //illegally modify the sequence
-    constructionArgs.seq.add(TypeConversionUtil.convertTodouble(0));
-    Assertions.assertThrows(IllegalStateException.class,()->inputArgType.callListItrSet(seqItr,1));
-    constructionArgs.verifyIteratorState(seqItr,0,-1,0);
-    constructionArgs.verifyStructuralIntegrity(1,1);
-    int offset=constructionArgs.verifyPreAlloc();
-    offset=constructionArgs.verifyIndex(offset,DoubleInputTestArgType.ARRAY_TYPE,0);
-    offset=constructionArgs.verifyParentPostAlloc(offset);
-    constructionArgs.verifyRootPostAlloc(offset);
-  }
-  @ParameterizedTest
-  @MethodSource("getCheckedListInputMethodArgs")
-  public void testListItrset_val_emptyListpostaddthrowISEsupercedesModRootCME(DoubleInputTestArgType inputArgType,ConstructionArguments constructionArgs){
-    var seqItr=constructionArgs.constructSeqListIterator();
-    seqItr.add(TypeConversionUtil.convertTodouble(0));
-    //illegally modify the root
-    constructionArgs.root.add(TypeConversionUtil.convertTodouble(0));
-    Assertions.assertThrows(IllegalStateException.class,()->inputArgType.callListItrSet(seqItr,1));
-    constructionArgs.verifyIteratorState(seqItr,1,-1,1);
-    constructionArgs.verifyStructuralIntegrity(1,1,1,1,2,2);
-    int offset=constructionArgs.verifyPreAlloc();
-    offset=constructionArgs.verifyIndex(offset,DoubleInputTestArgType.ARRAY_TYPE,0);
-    offset=constructionArgs.verifyParentPostAlloc(offset);
-    offset=constructionArgs.verifyRootPostAlloc(offset);
-    constructionArgs.verifyIndex(offset,DoubleInputTestArgType.ARRAY_TYPE,0);
-  }
-  @ParameterizedTest
-  @MethodSource("getCheckedListInputMethodArgs")
-  public void testListItrset_val_emptyListpostaddthrowISEsupercedesModParentCME(DoubleInputTestArgType inputArgType,ConstructionArguments constructionArgs){
-    var seqItr=constructionArgs.constructSeqListIterator();
-    seqItr.add(TypeConversionUtil.convertTodouble(0));
-    //illegally modify the parent
-    constructionArgs.parent.add(TypeConversionUtil.convertTodouble(0));
-    Assertions.assertThrows(IllegalStateException.class,()->inputArgType.callListItrSet(seqItr,1));
-    constructionArgs.verifyIteratorState(seqItr,1,-1,1);
-    constructionArgs.verifyStructuralIntegrity(1,1,2,2);
-    int offset=constructionArgs.verifyPreAlloc();
-    offset=constructionArgs.verifyIndex(offset,DoubleInputTestArgType.ARRAY_TYPE,0);
-    offset=constructionArgs.verifyParentPostAlloc(offset);
-    offset=constructionArgs.verifyIndex(offset,DoubleInputTestArgType.ARRAY_TYPE,0);
-    constructionArgs.verifyRootPostAlloc(offset);
-  }
-  @ParameterizedTest
-  @MethodSource("getCheckedListInputMethodArgs")
-  public void testListItrset_val_emptyListpostaddthrowISEsupercedesModSequenceCME(DoubleInputTestArgType inputArgType,ConstructionArguments constructionArgs){
-    var seqItr=constructionArgs.constructSeqListIterator();
-    seqItr.add(TypeConversionUtil.convertTodouble(0));
-    //illegally modify the sequence
-    constructionArgs.seq.add(TypeConversionUtil.convertTodouble(0));
-    Assertions.assertThrows(IllegalStateException.class,()->inputArgType.callListItrSet(seqItr,1));
-    constructionArgs.verifyIteratorState(seqItr,1,-1,1);
-    constructionArgs.verifyStructuralIntegrity(2,2);
-    int offset=constructionArgs.verifyPreAlloc();
-    offset=constructionArgs.verifyIndex(offset,DoubleInputTestArgType.ARRAY_TYPE,0);
-    offset=constructionArgs.verifyIndex(offset,DoubleInputTestArgType.ARRAY_TYPE,0);
-    offset=constructionArgs.verifyParentPostAlloc(offset);
-    constructionArgs.verifyRootPostAlloc(offset);
-  }
-  @ParameterizedTest
-  @MethodSource("getCheckedListInputMethodArgs")
-  public void testListItrset_val_emptyListpostremovethrowISEsupercedesModRootCME(DoubleInputTestArgType inputArgType,ConstructionArguments constructionArgs){
-    var seqItr=constructionArgs.constructSeqListIterator();
-    seqItr.add(TypeConversionUtil.convertTodouble(0));
-    seqItr.previousDouble();
-    seqItr.remove();
-    //illegally modify the root
-    constructionArgs.root.add(TypeConversionUtil.convertTodouble(0));
-    Assertions.assertThrows(IllegalStateException.class,()->inputArgType.callListItrSet(seqItr,1));
-    constructionArgs.verifyIteratorState(seqItr,0,-1,2);
-    constructionArgs.verifyStructuralIntegrity(0,2,0,2,1,3);
-    int offset=constructionArgs.verifyPreAlloc();
-    offset=constructionArgs.verifyParentPostAlloc(offset);
-    offset=constructionArgs.verifyRootPostAlloc(offset);
-    constructionArgs.verifyIndex(offset,DoubleInputTestArgType.ARRAY_TYPE,0);
-  }
-  @ParameterizedTest
-  @MethodSource("getCheckedListInputMethodArgs")
-  public void testListItrset_val_emptyListpostremovethrowISEsupercedesModParentCME(DoubleInputTestArgType inputArgType,ConstructionArguments constructionArgs){
-    var seqItr=constructionArgs.constructSeqListIterator();
-    seqItr.add(TypeConversionUtil.convertTodouble(0));
-    seqItr.previousDouble();
-    seqItr.remove();
-    //illegally modify the parent
-    constructionArgs.parent.add(TypeConversionUtil.convertTodouble(0));
-    Assertions.assertThrows(IllegalStateException.class,()->inputArgType.callListItrSet(seqItr,1));
-    constructionArgs.verifyIteratorState(seqItr,0,-1,2);
-    constructionArgs.verifyStructuralIntegrity(0,2,1,3);
-    int offset=constructionArgs.verifyPreAlloc();
-    offset=constructionArgs.verifyParentPostAlloc(offset);
-    offset=constructionArgs.verifyIndex(offset,DoubleInputTestArgType.ARRAY_TYPE,0);
-    constructionArgs.verifyRootPostAlloc(offset);
-  }
-  @ParameterizedTest
-  @MethodSource("getCheckedListInputMethodArgs")
-  public void testListItrset_val_emptyListpostremovethrowISEsupercedesModSequenceCME(DoubleInputTestArgType inputArgType,ConstructionArguments constructionArgs){
-    var seqItr=constructionArgs.constructSeqListIterator();
-    seqItr.add(TypeConversionUtil.convertTodouble(0));
-    seqItr.previousDouble();
-    seqItr.remove();
-    //illegally modify the sequence
-    constructionArgs.seq.add(TypeConversionUtil.convertTodouble(0));
-    Assertions.assertThrows(IllegalStateException.class,()->inputArgType.callListItrSet(seqItr,1));
-    constructionArgs.verifyIteratorState(seqItr,0,-1,2);
-    constructionArgs.verifyStructuralIntegrity(1,3);
-    int offset=constructionArgs.verifyPreAlloc();
-    offset=constructionArgs.verifyIndex(offset,DoubleInputTestArgType.ARRAY_TYPE,0);
-    offset=constructionArgs.verifyParentPostAlloc(offset);
-    constructionArgs.verifyRootPostAlloc(offset);
-  }
-  @ParameterizedTest
-  @MethodSource("getCheckedListInputMethodArgs")
-  public void testListItrset_val_nonEmptyListthrowISE(DoubleInputTestArgType inputArgType,ConstructionArguments constructionArgs){
-    var seqItr=constructionArgs.constructSeqListIterator();
-    for(int i=0;i<100;++i){seqItr.add(TypeConversionUtil.convertTodouble(i));}
-    Assertions.assertThrows(IllegalStateException.class,()->inputArgType.callListItrSet(seqItr,1));
-    constructionArgs.verifyIteratorState(seqItr,100,-1,100);
-    constructionArgs.verifyStructuralIntegrity(100,100);
-    int offset=constructionArgs.verifyPreAlloc();
-    offset=constructionArgs.verifyAscending(offset,DoubleInputTestArgType.ARRAY_TYPE,100);
-    offset=constructionArgs.verifyParentPostAlloc(offset);
-    constructionArgs.verifyRootPostAlloc(offset);
-  }
-  @ParameterizedTest
-  @MethodSource("getCheckedListInputMethodArgs")
-  public void testListItrset_val_nonEmptyListpostaddthrowISE(DoubleInputTestArgType inputArgType,ConstructionArguments constructionArgs){
-    var seqItr=constructionArgs.constructSeqListIterator();
-    for(int i=0;i<100;++i){seqItr.add(TypeConversionUtil.convertTodouble(i));}
-    seqItr.add(TypeConversionUtil.convertTodouble(0));
-    Assertions.assertThrows(IllegalStateException.class,()->inputArgType.callListItrSet(seqItr,1));
-    constructionArgs.verifyIteratorState(seqItr,101,-1,101);
-    constructionArgs.verifyStructuralIntegrity(101,101);
-    int offset=constructionArgs.verifyPreAlloc();
-    offset=constructionArgs.verifyAscending(offset,DoubleInputTestArgType.ARRAY_TYPE,100);
-    offset=constructionArgs.verifyIndex(offset,DoubleInputTestArgType.ARRAY_TYPE,0);
-    offset=constructionArgs.verifyParentPostAlloc(offset);
-    constructionArgs.verifyRootPostAlloc(offset);
-  }
-  @MethodSource("getCheckedListInputMethodArgs")
-  public void testListItrset_val_nonEmptyListpostremovethrowISE(DoubleInputTestArgType inputArgType,ConstructionArguments constructionArgs){
-    var seqItr=constructionArgs.constructSeqListIterator();
-    for(int i=0;i<100;++i){seqItr.add(TypeConversionUtil.convertTodouble(i));}
-    seqItr.add(TypeConversionUtil.convertTodouble(0));
-    seqItr.previousDouble();
-    seqItr.remove();
-    Assertions.assertThrows(IllegalStateException.class,()->inputArgType.callListItrSet(seqItr,1));
-    constructionArgs.verifyIteratorState(seqItr,100,-1,102);
-    constructionArgs.verifyStructuralIntegrity(100,102);
-    int offset=constructionArgs.verifyPreAlloc();
-    offset=constructionArgs.verifyAscending(offset,DoubleInputTestArgType.ARRAY_TYPE,100);
-    offset=constructionArgs.verifyParentPostAlloc(offset);
-    constructionArgs.verifyRootPostAlloc(offset);
-  }
-  @ParameterizedTest
-  @MethodSource("getCheckedListInputMethodArgs")
-  public void testListItrset_val_nonEmptyListthrowISEsupercedesModRootCME(DoubleInputTestArgType inputArgType,ConstructionArguments constructionArgs){
-    var seqItr=constructionArgs.constructSeqListIterator();
-    for(int i=0;i<100;++i){seqItr.add(TypeConversionUtil.convertTodouble(i));}
-    //illegally modify the root
-    constructionArgs.root.add(TypeConversionUtil.convertTodouble(0));
-    Assertions.assertThrows(IllegalStateException.class,()->inputArgType.callListItrSet(seqItr,1));
-    constructionArgs.verifyIteratorState(seqItr,100,-1,100);
-    constructionArgs.verifyStructuralIntegrity(100,100,100,100,101,101);
-    int offset=constructionArgs.verifyPreAlloc();
-    offset=constructionArgs.verifyAscending(offset,DoubleInputTestArgType.ARRAY_TYPE,100);
-    offset=constructionArgs.verifyParentPostAlloc(offset);
-    offset=constructionArgs.verifyRootPostAlloc(offset);
-    constructionArgs.verifyIndex(offset,DoubleInputTestArgType.ARRAY_TYPE,0);
-  }
-  @ParameterizedTest
-  @MethodSource("getCheckedListInputMethodArgs")
-  public void testListItrset_val_nonEmptyListthrowISEsupercedesModParentCME(DoubleInputTestArgType inputArgType,ConstructionArguments constructionArgs){
-    var seqItr=constructionArgs.constructSeqListIterator();
-    for(int i=0;i<100;++i){seqItr.add(TypeConversionUtil.convertTodouble(i));}
-    //illegally modify the parent
-    constructionArgs.parent.add(TypeConversionUtil.convertTodouble(0));
-    Assertions.assertThrows(IllegalStateException.class,()->inputArgType.callListItrSet(seqItr,1));
-    constructionArgs.verifyIteratorState(seqItr,100,-1,100);
-    constructionArgs.verifyStructuralIntegrity(100,100,101,101);
-    int offset=constructionArgs.verifyPreAlloc();
-    offset=constructionArgs.verifyAscending(offset,DoubleInputTestArgType.ARRAY_TYPE,100);
-    offset=constructionArgs.verifyParentPostAlloc(offset);
-    offset=constructionArgs.verifyIndex(offset,DoubleInputTestArgType.ARRAY_TYPE,0);
-    constructionArgs.verifyRootPostAlloc(offset);
-  }
-  @ParameterizedTest
-  @MethodSource("getCheckedListInputMethodArgs")
-  public void testListItrset_val_nonEmptyListthrowISEsupercedesModSequenceCME(DoubleInputTestArgType inputArgType,ConstructionArguments constructionArgs){
-    var seqItr=constructionArgs.constructSeqListIterator();
-    for(int i=0;i<100;++i){seqItr.add(TypeConversionUtil.convertTodouble(i));}
-    //illegally modify the sequence
-    constructionArgs.seq.add(TypeConversionUtil.convertTodouble(0));
-    Assertions.assertThrows(IllegalStateException.class,()->inputArgType.callListItrSet(seqItr,1));
-    constructionArgs.verifyIteratorState(seqItr,100,-1,100);
-    constructionArgs.verifyStructuralIntegrity(101,101);
-    int offset=constructionArgs.verifyPreAlloc();
-    offset=constructionArgs.verifyAscending(offset,DoubleInputTestArgType.ARRAY_TYPE,100);
-    offset=constructionArgs.verifyIndex(offset,DoubleInputTestArgType.ARRAY_TYPE,0);
-    offset=constructionArgs.verifyParentPostAlloc(offset);
-    constructionArgs.verifyRootPostAlloc(offset);
-  }
-  @ParameterizedTest
-  @MethodSource("getCheckedListInputMethodArgs")
-  public void testListItrset_val_nonEmptyListpostaddthrowISEsupercedesModRootCME(DoubleInputTestArgType inputArgType,ConstructionArguments constructionArgs){
-    var seqItr=constructionArgs.constructSeqListIterator();
-    for(int i=0;i<100;++i){seqItr.add(TypeConversionUtil.convertTodouble(i));}
-    seqItr.add(TypeConversionUtil.convertTodouble(0));
-    //illegally modify the root
-    constructionArgs.root.add(TypeConversionUtil.convertTodouble(0));
-    Assertions.assertThrows(IllegalStateException.class,()->inputArgType.callListItrSet(seqItr,1));
-    constructionArgs.verifyIteratorState(seqItr,101,-1,101);
-    constructionArgs.verifyStructuralIntegrity(101,101,101,101,102,102);
-    int offset=constructionArgs.verifyPreAlloc();
-    offset=constructionArgs.verifyAscending(offset,DoubleInputTestArgType.ARRAY_TYPE,100);
-    offset=constructionArgs.verifyIndex(offset,DoubleInputTestArgType.ARRAY_TYPE,0);
-    offset=constructionArgs.verifyParentPostAlloc(offset);
-    offset=constructionArgs.verifyRootPostAlloc(offset);
-    constructionArgs.verifyIndex(offset,DoubleInputTestArgType.ARRAY_TYPE,0);
-  }
-  @ParameterizedTest
-  @MethodSource("getCheckedListInputMethodArgs")
-  public void testListItrset_val_nonEmptyListpostaddthrowISEsupercedesModParentCME(DoubleInputTestArgType inputArgType,ConstructionArguments constructionArgs){
-    var seqItr=constructionArgs.constructSeqListIterator();
-    for(int i=0;i<100;++i){seqItr.add(TypeConversionUtil.convertTodouble(i));}
-    seqItr.add(TypeConversionUtil.convertTodouble(0));
-    //illegally modify the parent
-    constructionArgs.parent.add(TypeConversionUtil.convertTodouble(0));
-    Assertions.assertThrows(IllegalStateException.class,()->inputArgType.callListItrSet(seqItr,1));
-    constructionArgs.verifyIteratorState(seqItr,101,-1,101);
-    constructionArgs.verifyStructuralIntegrity(101,101,102,102);
-    int offset=constructionArgs.verifyPreAlloc();
-    offset=constructionArgs.verifyAscending(offset,DoubleInputTestArgType.ARRAY_TYPE,100);
-    offset=constructionArgs.verifyIndex(offset,DoubleInputTestArgType.ARRAY_TYPE,0);
-    offset=constructionArgs.verifyParentPostAlloc(offset);
-    offset=constructionArgs.verifyIndex(offset,DoubleInputTestArgType.ARRAY_TYPE,0);
-    constructionArgs.verifyRootPostAlloc(offset);
-  }
-  @ParameterizedTest
-  @MethodSource("getCheckedListInputMethodArgs")
-  public void testListItrset_val_nonEmptyListpostaddthrowISEsupercedesModSequenceCME(DoubleInputTestArgType inputArgType,ConstructionArguments constructionArgs){
-    var seqItr=constructionArgs.constructSeqListIterator();
-    for(int i=0;i<100;++i){seqItr.add(TypeConversionUtil.convertTodouble(i));}
-    seqItr.add(TypeConversionUtil.convertTodouble(0));
-    //illegally modify the sequence
-    constructionArgs.seq.add(TypeConversionUtil.convertTodouble(0));
-    Assertions.assertThrows(IllegalStateException.class,()->inputArgType.callListItrSet(seqItr,1));
-    constructionArgs.verifyIteratorState(seqItr,101,-1,101);
-    constructionArgs.verifyStructuralIntegrity(102,102);
-    int offset=constructionArgs.verifyPreAlloc();
-    offset=constructionArgs.verifyAscending(offset,DoubleInputTestArgType.ARRAY_TYPE,100);
-    offset=constructionArgs.verifyIndex(offset,DoubleInputTestArgType.ARRAY_TYPE,0);
-    offset=constructionArgs.verifyIndex(offset,DoubleInputTestArgType.ARRAY_TYPE,0);
-    offset=constructionArgs.verifyParentPostAlloc(offset);
-    constructionArgs.verifyRootPostAlloc(offset);
-  }
-  @ParameterizedTest
-  @MethodSource("getCheckedListInputMethodArgs")
-  public void testListItrset_val_nonEmptyListpostremovethrowISEsupercedesModRootCME(DoubleInputTestArgType inputArgType,ConstructionArguments constructionArgs){
-    var seqItr=constructionArgs.constructSeqListIterator();
-    for(int i=0;i<100;++i){seqItr.add(TypeConversionUtil.convertTodouble(i));}
-    seqItr.add(TypeConversionUtil.convertTodouble(0));
-    seqItr.previousDouble();
-    seqItr.remove();
-    //illegally modify the root
-    constructionArgs.root.add(TypeConversionUtil.convertTodouble(0));
-    Assertions.assertThrows(IllegalStateException.class,()->inputArgType.callListItrSet(seqItr,1));
-    constructionArgs.verifyIteratorState(seqItr,100,-1,102);
-    constructionArgs.verifyStructuralIntegrity(100,102,100,102,101,103);
-    int offset=constructionArgs.verifyPreAlloc();
-    offset=constructionArgs.verifyAscending(offset,DoubleInputTestArgType.ARRAY_TYPE,100);
-    offset=constructionArgs.verifyParentPostAlloc(offset);
-    offset=constructionArgs.verifyRootPostAlloc(offset);
-    constructionArgs.verifyIndex(offset,DoubleInputTestArgType.ARRAY_TYPE,0);
-  }
-  @ParameterizedTest
-  @MethodSource("getCheckedListInputMethodArgs")
-  public void testListItrset_val_nonEmptyListpostremovethrowISEsupercedesModParentCME(DoubleInputTestArgType inputArgType,ConstructionArguments constructionArgs){
-    var seqItr=constructionArgs.constructSeqListIterator();
-    for(int i=0;i<100;++i){seqItr.add(TypeConversionUtil.convertTodouble(i));}
-    seqItr.add(TypeConversionUtil.convertTodouble(0));
-    seqItr.previousDouble();
-    seqItr.remove();
-    //illegally modify the parent
-    constructionArgs.parent.add(TypeConversionUtil.convertTodouble(0));
-    Assertions.assertThrows(IllegalStateException.class,()->inputArgType.callListItrSet(seqItr,1));
-    constructionArgs.verifyIteratorState(seqItr,100,-1,102);
-    constructionArgs.verifyStructuralIntegrity(100,102,101,103);
-    int offset=constructionArgs.verifyPreAlloc();
-    offset=constructionArgs.verifyAscending(offset,DoubleInputTestArgType.ARRAY_TYPE,100);
-    offset=constructionArgs.verifyParentPostAlloc(offset);
-    offset=constructionArgs.verifyIndex(offset,DoubleInputTestArgType.ARRAY_TYPE,0);
-    constructionArgs.verifyRootPostAlloc(offset);
-  }
-  @ParameterizedTest
-  @MethodSource("getCheckedListInputMethodArgs")
-  public void testListItrset_val_nonEmptyListpostremovethrowISEsupercedesModSequenceCME(DoubleInputTestArgType inputArgType,ConstructionArguments constructionArgs){
-    var seqItr=constructionArgs.constructSeqListIterator();
-    for(int i=0;i<100;++i){seqItr.add(TypeConversionUtil.convertTodouble(i));}
-    seqItr.add(TypeConversionUtil.convertTodouble(0));
-    seqItr.previousDouble();
-    seqItr.remove();
-    //illegally modify the sequence
-    constructionArgs.seq.add(TypeConversionUtil.convertTodouble(0));
-    Assertions.assertThrows(IllegalStateException.class,()->inputArgType.callListItrSet(seqItr,1));
-    constructionArgs.verifyIteratorState(seqItr,100,-1,102);
-    constructionArgs.verifyStructuralIntegrity(101,103);
-    int offset=constructionArgs.verifyPreAlloc();
-    offset=constructionArgs.verifyAscending(offset,DoubleInputTestArgType.ARRAY_TYPE,100);
-    offset=constructionArgs.verifyIndex(offset,DoubleInputTestArgType.ARRAY_TYPE,0);
-    offset=constructionArgs.verifyParentPostAlloc(offset);
-    constructionArgs.verifyRootPostAlloc(offset);
-  }
-  static Stream<Arguments> getCheckedSubListInputMethodArgs(){
-    Stream.Builder<Arguments> builder=Stream.builder();
-    for(DoubleInputTestArgType inputTestArgType:DoubleInputTestArgType.values()){
-      for(int rootPreAlloc=0;rootPreAlloc<=5;rootPreAlloc+=5){
-        for(int rootPostAlloc=0;rootPostAlloc<=5;rootPostAlloc+=5){
-          for(int parentPreAlloc=0;parentPreAlloc<=5;parentPreAlloc+=5){
-            for(int parentPostAlloc=0;parentPostAlloc<=5;parentPostAlloc+=5){builder.add(Arguments.of(inputTestArgType,new ConstructionArguments(rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,StructType.CHECKEDSUBLIST)));}
-          }
-        }
-      }
-    }
-    return builder.build();
-  }
-  @ParameterizedTest
-  @MethodSource("getCheckedSubListInputMethodArgs")
-  public void testSubListadd_val_emptyListModRootthrowCME(DoubleInputTestArgType inputArgType,ConstructionArguments constructionArgs){
-    //illegally modify the root
-    constructionArgs.root.add(TypeConversionUtil.convertTodouble(0));
-    //attempt an insertion
-    Assertions.assertThrows(ConcurrentModificationException.class,()->inputArgType.callCollectionAdd(constructionArgs.seq,0));
-    constructionArgs.verifyStructuralIntegrity(0,0,0,0,1,1);
-    int offset=constructionArgs.verifyPreAlloc();
-    offset=constructionArgs.verifyParentPostAlloc(offset);
-    offset=constructionArgs.verifyRootPostAlloc(offset);
-    constructionArgs.verifyIndex(offset,DoubleInputTestArgType.ARRAY_TYPE,0);
-  }
-  @ParameterizedTest
-  @MethodSource("getCheckedSubListInputMethodArgs")
-  public void testSubListadd_val_emptyListModParentthrowCME(DoubleInputTestArgType inputArgType,ConstructionArguments constructionArgs){
-    //illegally modify the root
-    constructionArgs.parent.add(TypeConversionUtil.convertTodouble(0));
-    //attempt an insertion
-    Assertions.assertThrows(ConcurrentModificationException.class,()->inputArgType.callCollectionAdd(constructionArgs.seq,0));
-    constructionArgs.verifyStructuralIntegrity(0,0,1,1);
-    int offset=constructionArgs.verifyPreAlloc();
-    offset=constructionArgs.verifyParentPostAlloc(offset);
-    offset=constructionArgs.verifyIndex(offset,DoubleInputTestArgType.ARRAY_TYPE,0);
-    constructionArgs.verifyRootPostAlloc(offset);
-  }
-  @ParameterizedTest
-  @MethodSource("getCheckedSubListInputMethodArgs")
-  public void testSubListadd_val_nonEmptyListModRootthrowCME(DoubleInputTestArgType inputArgType,ConstructionArguments constructionArgs){
-    for(int i=0;i<100;++i){constructionArgs.seq.add(TypeConversionUtil.convertTodouble(i));}
-    //illegally modify the root
-    constructionArgs.root.add(TypeConversionUtil.convertTodouble(0));
-    //attempt an insertion
-    Assertions.assertThrows(ConcurrentModificationException.class,()->inputArgType.callCollectionAdd(constructionArgs.seq,0));
-    constructionArgs.verifyStructuralIntegrity(100,100,100,100,101,101);
-    int offset=constructionArgs.verifyPreAlloc();
-    offset=constructionArgs.verifyAscending(offset,DoubleInputTestArgType.ARRAY_TYPE,100);
-    offset=constructionArgs.verifyParentPostAlloc(offset);
-    offset=constructionArgs.verifyRootPostAlloc(offset);
-    constructionArgs.verifyIndex(offset,DoubleInputTestArgType.ARRAY_TYPE,0);
-  }
-  @ParameterizedTest
-  @MethodSource("getCheckedSubListInputMethodArgs")
-  public void testSubListadd_val_nonEmptyListModParentthrowCME(DoubleInputTestArgType inputArgType,ConstructionArguments constructionArgs){
-    for(int i=0;i<100;++i){constructionArgs.seq.add(TypeConversionUtil.convertTodouble(i));}
-    //illegally modify the parent
-    constructionArgs.parent.add(TypeConversionUtil.convertTodouble(0));
-    //attempt an insertion
-    Assertions.assertThrows(ConcurrentModificationException.class,()->inputArgType.callCollectionAdd(constructionArgs.seq,0));
-    constructionArgs.verifyStructuralIntegrity(100,100,101,101);
-    int offset=constructionArgs.verifyPreAlloc();
-    offset=constructionArgs.verifyAscending(offset,DoubleInputTestArgType.ARRAY_TYPE,100);
-    offset=constructionArgs.verifyParentPostAlloc(offset);
-    offset=constructionArgs.verifyIndex(offset,DoubleInputTestArgType.ARRAY_TYPE,0);
-    constructionArgs.verifyRootPostAlloc(offset);
-  }
-  @ParameterizedTest
-  @MethodSource("getCheckedSubListInputMethodArgs")
-  public void testSubListadd_int_val_emptyListModRootthrowCME(DoubleInputTestArgType inputArgType,ConstructionArguments constructionArgs){
-    //illegally modify the root
-    constructionArgs.root.add(TypeConversionUtil.convertTodouble(0));
-    //attempt an insertion
-    Assertions.assertThrows(ConcurrentModificationException.class,()->inputArgType.callListAdd(constructionArgs.seq,0,0));
-    constructionArgs.verifyStructuralIntegrity(0,0,0,0,1,1);
-    int offset=constructionArgs.verifyPreAlloc();
-    offset=constructionArgs.verifyParentPostAlloc(offset);
-    offset=constructionArgs.verifyRootPostAlloc(offset);
-    constructionArgs.verifyIndex(offset,DoubleInputTestArgType.ARRAY_TYPE,0);
-  }
-  @ParameterizedTest
-  @MethodSource("getCheckedSubListInputMethodArgs")
-  public void testSubListadd_int_val_emptyListModParentthrowCME(DoubleInputTestArgType inputArgType,ConstructionArguments constructionArgs){
-    //illegally modify the root
-    constructionArgs.parent.add(TypeConversionUtil.convertTodouble(0));
-    //attempt an insertion
-    Assertions.assertThrows(ConcurrentModificationException.class,()->inputArgType.callListAdd(constructionArgs.seq,0,0));
-    constructionArgs.verifyStructuralIntegrity(0,0,1,1);
-    int offset=constructionArgs.verifyPreAlloc();
-    offset=constructionArgs.verifyParentPostAlloc(offset);
-    offset=constructionArgs.verifyIndex(offset,DoubleInputTestArgType.ARRAY_TYPE,0);
-    constructionArgs.verifyRootPostAlloc(offset);
-  }
-  @ParameterizedTest
-  @MethodSource("getCheckedSubListInputMethodArgs")
-  public void testSubListadd_int_val_nonEmptyListModRootthrowCME(DoubleInputTestArgType inputArgType,ConstructionArguments constructionArgs){
-    for(int i=0;i<100;++i){constructionArgs.seq.add(TypeConversionUtil.convertTodouble(i));}
-    //illegally modify the root
-    constructionArgs.root.add(TypeConversionUtil.convertTodouble(0));
-    //attempt an insertion
-    Assertions.assertThrows(ConcurrentModificationException.class,()->inputArgType.callListAdd(constructionArgs.seq,100,0));
-    constructionArgs.verifyStructuralIntegrity(100,100,100,100,101,101);
-    int offset=constructionArgs.verifyPreAlloc();
-    offset=constructionArgs.verifyAscending(offset,DoubleInputTestArgType.ARRAY_TYPE,100);
-    offset=constructionArgs.verifyParentPostAlloc(offset);
-    offset=constructionArgs.verifyRootPostAlloc(offset);
-    constructionArgs.verifyIndex(offset,DoubleInputTestArgType.ARRAY_TYPE,0);
-  }
-  @ParameterizedTest
-  @MethodSource("getCheckedSubListInputMethodArgs")
-  public void testSubListadd_int_val_nonEmptyListModParentthrowCME(DoubleInputTestArgType inputArgType,ConstructionArguments constructionArgs){
-    for(int i=0;i<100;++i){constructionArgs.seq.add(TypeConversionUtil.convertTodouble(i));}
-    //illegally modify the parent
-    constructionArgs.parent.add(TypeConversionUtil.convertTodouble(0));
-    //attempt an insertion
-    Assertions.assertThrows(ConcurrentModificationException.class,()->inputArgType.callListAdd(constructionArgs.seq,100,0));
-    constructionArgs.verifyStructuralIntegrity(100,100,101,101);
-    int offset=constructionArgs.verifyPreAlloc();
-    offset=constructionArgs.verifyAscending(offset,DoubleInputTestArgType.ARRAY_TYPE,100);
-    offset=constructionArgs.verifyParentPostAlloc(offset);
-    offset=constructionArgs.verifyIndex(offset,DoubleInputTestArgType.ARRAY_TYPE,0);
-    constructionArgs.verifyRootPostAlloc(offset);
-  }
-  @ParameterizedTest
-  @MethodSource("getCheckedSubListInputMethodArgs")
-  public void testSubListput_int_val_nonEmptyListModRootthrowCME(DoubleInputTestArgType inputArgType,ConstructionArguments constructionArgs){
-    for(int i=0;i<100;++i){constructionArgs.seq.add(TypeConversionUtil.convertTodouble(i));}
-    //illegally modify the root
-    constructionArgs.root.add(TypeConversionUtil.convertTodouble(0));
-    //attempt a put
-    Assertions.assertThrows(ConcurrentModificationException.class,()->inputArgType.callListPut(constructionArgs.seq,99,0));
-    constructionArgs.verifyStructuralIntegrity(100,100,100,100,101,101);
-    int offset=constructionArgs.verifyPreAlloc();
-    offset=constructionArgs.verifyAscending(offset,DoubleInputTestArgType.ARRAY_TYPE,100);
-    offset=constructionArgs.verifyParentPostAlloc(offset);
-    offset=constructionArgs.verifyRootPostAlloc(offset);
-    constructionArgs.verifyIndex(offset,DoubleInputTestArgType.ARRAY_TYPE,0);
-  }
-  @ParameterizedTest
-  @MethodSource("getCheckedSubListInputMethodArgs")
-  public void testSubListput_int_val_nonEmptyListModParentthrowCME(DoubleInputTestArgType inputArgType,ConstructionArguments constructionArgs){
-    for(int i=0;i<100;++i){constructionArgs.seq.add(TypeConversionUtil.convertTodouble(i));}
-    //illegally modify the parent
-    constructionArgs.parent.add(TypeConversionUtil.convertTodouble(0));
-    //attempt a put
-    Assertions.assertThrows(ConcurrentModificationException.class,()->inputArgType.callListPut(constructionArgs.seq,99,0));
-    constructionArgs.verifyStructuralIntegrity(100,100,101,101);
-    int offset=constructionArgs.verifyPreAlloc();
-    offset=constructionArgs.verifyAscending(offset,DoubleInputTestArgType.ARRAY_TYPE,100);
-    offset=constructionArgs.verifyParentPostAlloc(offset);
-    offset=constructionArgs.verifyIndex(offset,DoubleInputTestArgType.ARRAY_TYPE,0);
-    constructionArgs.verifyRootPostAlloc(offset);
-  }
-  @ParameterizedTest
-  @MethodSource("getCheckedSubListInputMethodArgs")
-  public void testSubListadd_int_val_emptyListModRootthrowCMEsupercedesIOBE(DoubleInputTestArgType inputArgType,ConstructionArguments constructionArgs){
-    //illegally modify the root
-    constructionArgs.root.add(TypeConversionUtil.convertTodouble(0));
-    //attempt an insertion too low
-    Assertions.assertThrows(ConcurrentModificationException.class,()->inputArgType.callListAdd(constructionArgs.seq,-1,0));
-    //attempt an insertion too high
-    Assertions.assertThrows(ConcurrentModificationException.class,()->inputArgType.callListAdd(constructionArgs.seq,1,0));
-    constructionArgs.verifyStructuralIntegrity(0,0,0,0,1,1);
-    int offset=constructionArgs.verifyPreAlloc();
-    offset=constructionArgs.verifyParentPostAlloc(offset);
-    offset=constructionArgs.verifyRootPostAlloc(offset);
-    constructionArgs.verifyIndex(offset,DoubleInputTestArgType.ARRAY_TYPE,0);
-  }
-  @ParameterizedTest
-  @MethodSource("getCheckedSubListInputMethodArgs")
-  public void testSubListadd_int_val_emptyListModParentthrowCMEsupercedesIOBE(DoubleInputTestArgType inputArgType,ConstructionArguments constructionArgs){
-    //illegally modify the root
-    constructionArgs.parent.add(TypeConversionUtil.convertTodouble(0));
-    //attempt an insertion too low
-    Assertions.assertThrows(ConcurrentModificationException.class,()->inputArgType.callListAdd(constructionArgs.seq,-1,0));
-    //attempt an insertion too high
-    Assertions.assertThrows(ConcurrentModificationException.class,()->inputArgType.callListAdd(constructionArgs.seq,1,0));
-    constructionArgs.verifyStructuralIntegrity(0,0,1,1);
-    int offset=constructionArgs.verifyPreAlloc();
-    offset=constructionArgs.verifyParentPostAlloc(offset);
-    offset=constructionArgs.verifyIndex(offset,DoubleInputTestArgType.ARRAY_TYPE,0);
-    constructionArgs.verifyRootPostAlloc(offset);
-  }
-  @ParameterizedTest
-  @MethodSource("getCheckedSubListInputMethodArgs")
-  public void testSubListadd_int_val_nonEmptyListModRootthrowCMEsupercedesIOBE(DoubleInputTestArgType inputArgType,ConstructionArguments constructionArgs){
-    for(int i=0;i<100;++i){constructionArgs.seq.add(TypeConversionUtil.convertTodouble(i));}
-    //illegally modify the root
-    constructionArgs.root.add(TypeConversionUtil.convertTodouble(0));
-    //attempt an insertion too low
-    Assertions.assertThrows(ConcurrentModificationException.class,()->inputArgType.callListAdd(constructionArgs.seq,-1,0));
-    //attempt an insertion too high
-    Assertions.assertThrows(ConcurrentModificationException.class,()->inputArgType.callListAdd(constructionArgs.seq,101,0));
-    constructionArgs.verifyStructuralIntegrity(100,100,100,100,101,101);
-    int offset=constructionArgs.verifyPreAlloc();
-    offset=constructionArgs.verifyAscending(offset,DoubleInputTestArgType.ARRAY_TYPE,100);
-    offset=constructionArgs.verifyParentPostAlloc(offset);
-    offset=constructionArgs.verifyRootPostAlloc(offset);
-    constructionArgs.verifyIndex(offset,DoubleInputTestArgType.ARRAY_TYPE,0);
-  }
-  @ParameterizedTest
-  @MethodSource("getCheckedSubListInputMethodArgs")
-  public void testSubListadd_int_val_nonEmptyListModParentthrowCMEsupercedesIOBE(DoubleInputTestArgType inputArgType,ConstructionArguments constructionArgs){
-    for(int i=0;i<100;++i){constructionArgs.seq.add(TypeConversionUtil.convertTodouble(i));}
-    //illegally modify the parent
-    constructionArgs.parent.add(TypeConversionUtil.convertTodouble(0));
-    //attempt an insertion too low
-    Assertions.assertThrows(ConcurrentModificationException.class,()->inputArgType.callListAdd(constructionArgs.seq,-1,0));
-    //attempt an insertion too high
-    Assertions.assertThrows(ConcurrentModificationException.class,()->inputArgType.callListAdd(constructionArgs.seq,101,0));
-    constructionArgs.verifyStructuralIntegrity(100,100,101,101);
-    int offset=constructionArgs.verifyPreAlloc();
-    offset=constructionArgs.verifyAscending(offset,DoubleInputTestArgType.ARRAY_TYPE,100);
-    offset=constructionArgs.verifyParentPostAlloc(offset);
-    offset=constructionArgs.verifyIndex(offset,DoubleInputTestArgType.ARRAY_TYPE,0);
-    constructionArgs.verifyRootPostAlloc(offset);
-  }
-  @ParameterizedTest
-  @MethodSource("getCheckedSubListInputMethodArgs")
-  public void testSubListput_int_val_emptyListModRootthrowCMEsupercedesIOBE(DoubleInputTestArgType inputArgType,ConstructionArguments constructionArgs){
-    //illegally modify the root
-    constructionArgs.root.add(TypeConversionUtil.convertTodouble(0));
-    //attempt a put too low
-    Assertions.assertThrows(ConcurrentModificationException.class,()->inputArgType.callListPut(constructionArgs.seq,-1,0));
-    //attempt a put too high
-    Assertions.assertThrows(ConcurrentModificationException.class,()->inputArgType.callListPut(constructionArgs.seq,0,0));
-    constructionArgs.verifyStructuralIntegrity(0,0,0,0,1,1);
-    int offset=constructionArgs.verifyPreAlloc();
-    offset=constructionArgs.verifyParentPostAlloc(offset);
-    offset=constructionArgs.verifyRootPostAlloc(offset);
-    constructionArgs.verifyIndex(offset,DoubleInputTestArgType.ARRAY_TYPE,0);
-  }
-  @ParameterizedTest
-  @MethodSource("getCheckedSubListInputMethodArgs")
-  public void testSubListput_int_val_emptyListModParentthrowCMEsupercedesIOBE(DoubleInputTestArgType inputArgType,ConstructionArguments constructionArgs){
-    //illegally modify the parent
-    constructionArgs.parent.add(TypeConversionUtil.convertTodouble(0));
-    //attempt a put too low
-    Assertions.assertThrows(ConcurrentModificationException.class,()->inputArgType.callListPut(constructionArgs.seq,-1,0));
-    //attempt a put too high
-    Assertions.assertThrows(ConcurrentModificationException.class,()->inputArgType.callListPut(constructionArgs.seq,0,0));
-    constructionArgs.verifyStructuralIntegrity(0,0,1,1);
-    int offset=constructionArgs.verifyPreAlloc();
-    offset=constructionArgs.verifyParentPostAlloc(offset);
-    offset=constructionArgs.verifyIndex(offset,DoubleInputTestArgType.ARRAY_TYPE,0);
-    constructionArgs.verifyRootPostAlloc(offset);
-  }
-  @ParameterizedTest
-  @MethodSource("getCheckedSubListInputMethodArgs")
-  public void testSubListput_int_val_nonEmptyListModRootthrowCMEsupercedesIOBE(DoubleInputTestArgType inputArgType,ConstructionArguments constructionArgs){
-    for(int i=0;i<100;++i){constructionArgs.seq.add(TypeConversionUtil.convertTodouble(i));}
-    //illegally modify the root
-    constructionArgs.root.add(TypeConversionUtil.convertTodouble(0));
-    //attempt a put too low
-    Assertions.assertThrows(ConcurrentModificationException.class,()->inputArgType.callListPut(constructionArgs.seq,-1,0));
-    //attempt a put too high
-    Assertions.assertThrows(ConcurrentModificationException.class,()->inputArgType.callListPut(constructionArgs.seq,100,0));
-    constructionArgs.verifyStructuralIntegrity(100,100,100,100,101,101);
-    int offset=constructionArgs.verifyPreAlloc();
-    offset=constructionArgs.verifyAscending(offset,DoubleInputTestArgType.ARRAY_TYPE,100);
-    offset=constructionArgs.verifyParentPostAlloc(offset);
-    offset=constructionArgs.verifyRootPostAlloc(offset);
-    constructionArgs.verifyIndex(offset,DoubleInputTestArgType.ARRAY_TYPE,0);
-  }
-  @ParameterizedTest
-  @MethodSource("getCheckedSubListInputMethodArgs")
-  public void testSubListput_int_val_nonEmptyListModParentthrowCMEsupercedesIOBE(DoubleInputTestArgType inputArgType,ConstructionArguments constructionArgs){
-    for(int i=0;i<100;++i){constructionArgs.seq.add(TypeConversionUtil.convertTodouble(i));}
-    //illegally modify the parent
-    constructionArgs.parent.add(TypeConversionUtil.convertTodouble(0));
-    //attempt a put too low
-    Assertions.assertThrows(ConcurrentModificationException.class,()->inputArgType.callListPut(constructionArgs.seq,-1,0));
-    //attempt a put too high
-    Assertions.assertThrows(ConcurrentModificationException.class,()->inputArgType.callListPut(constructionArgs.seq,100,0));
-    constructionArgs.verifyStructuralIntegrity(100,100,101,101);
-    int offset=constructionArgs.verifyPreAlloc();
-    offset=constructionArgs.verifyAscending(offset,DoubleInputTestArgType.ARRAY_TYPE,100);
-    offset=constructionArgs.verifyParentPostAlloc(offset);
-    offset=constructionArgs.verifyIndex(offset,DoubleInputTestArgType.ARRAY_TYPE,0);
-    constructionArgs.verifyRootPostAlloc(offset);
-  }
-  static enum QueryTestScenario{
-    EMPTY,
-    CONTAINSBEGINNING,
-    CONTAINSMIDDLE,
-    CONTAINSEND,
-    DOESNOTCONTAINS;
-  }
-  static Stream<Arguments> getPrimitiveQueryArguments(){
+  static Stream<Arguments> getPrimitiveQueryCollectionArguments(){
     Stream.Builder<Arguments> builder=Stream.builder();
     for(StructType structType:StructType.values()){
       for(QueryTestPrimitiveInputType argType:QueryTestPrimitiveInputType.values()){
         builder.add(Arguments.of(QueryTestScenario.EMPTY,argType,structType));
-        builder.add(Arguments.of(QueryTestScenario.DOESNOTCONTAINS,argType,structType));
+        builder.add(Arguments.of(QueryTestScenario.DOESNOTCONTAIN,argType,structType));
         switch(argType){
           case Booleanfalse:
           case Byte0:
@@ -1450,8 +1022,9 @@ public class DoubleArrSeqTest{
           case FloatMIN_SHORT_MINUS1:
           case DoubleMIN_SHORT_MINUS1:
           //negative values beyond the range of int
-          case LongMIN_INT_MINUS1:
           case FloatMIN_INT_MINUS1:
+          //negative values beyond the range of int and beyond the precision of float
+          case LongMIN_INT_MINUS1:
           case DoubleMIN_INT_MINUS1:
           //negative values beyond MIN_SAFE_INT that are beyond the precision of float
           case IntegerMIN_SAFE_INT_MINUS1:
@@ -1510,5 +1083,306 @@ public class DoubleArrSeqTest{
       }
     }
     return builder.build();
+  }
+  @ParameterizedTest
+  @MethodSource("getPrimitiveQueryCollectionArguments")
+  public void testremoveVal_ObjectprimitiveVal(QueryTestScenario testScenario,QueryTestPrimitiveInputType inputArgType,StructType structType)
+  {
+    ConstructionArguments constructionArgs=new ConstructionArguments(structType);
+    switch(testScenario){
+      case CONTAINSBEGINNING:
+        Assertions.assertTrue(inputArgType.attemptAdd(constructionArgs.seq));
+        for(int i=1;i<100;++i)
+        {
+          inputArgType.addNotEqualsVal(constructionArgs.seq);
+        }
+        switch(structType){
+          case UNCHECKEDLIST:
+          case CHECKEDLIST:
+          case UNCHECKEDSUBLIST:
+          case CHECKEDSUBLIST:
+            Assertions.assertEquals(0,inputArgType.invokeindexOf(constructionArgs.seq));
+            break;
+          default:
+            Assertions.assertEquals(100,inputArgType.invokesearch(constructionArgs.seq));
+        }
+        break;
+      case CONTAINSMIDDLE:
+        for(int i=0;i<49;++i)
+        {
+          inputArgType.addNotEqualsVal(constructionArgs.seq);
+        }
+        Assertions.assertTrue(inputArgType.attemptAdd(constructionArgs.seq));
+        for(int i=50;i<100;++i)
+        {
+          inputArgType.addNotEqualsVal(constructionArgs.seq);
+        }
+        switch(structType){
+          case UNCHECKEDLIST:
+          case CHECKEDLIST:
+          case UNCHECKEDSUBLIST:
+          case CHECKEDSUBLIST:
+            Assertions.assertEquals(49,inputArgType.invokeindexOf(constructionArgs.seq));
+            break;
+          default:
+            Assertions.assertEquals(51,inputArgType.invokesearch(constructionArgs.seq));
+        }
+        break;
+      case CONTAINSEND:
+        for(int i=0;i<99;++i)
+        {
+          inputArgType.addNotEqualsVal(constructionArgs.seq);
+        }
+        Assertions.assertTrue(inputArgType.attemptAdd(constructionArgs.seq));
+        switch(structType){
+          case UNCHECKEDLIST:
+          case CHECKEDLIST:
+          case UNCHECKEDSUBLIST:
+          case CHECKEDSUBLIST:
+            Assertions.assertEquals(99,inputArgType.invokeindexOf(constructionArgs.seq));
+            break;
+          default:
+            Assertions.assertEquals(1,inputArgType.invokesearch(constructionArgs.seq));
+        }
+        break;
+      case DOESNOTCONTAIN:
+        for(int i=0;i<100;++i)
+        {
+          inputArgType.addNotEqualsVal(constructionArgs.seq);
+        }
+      default:
+        Assertions.assertFalse(inputArgType.invokecontains(constructionArgs.seq));
+        break;
+    }
+    boolean removedVal=false;
+     switch(testScenario){
+      default:
+        Assertions.assertEquals(removedVal=double.class.equals(inputArgType.primitiveClass),inputArgType.invokeObjectremoveVal(constructionArgs.seq));
+      case EMPTY:
+      case DOESNOTCONTAIN:
+        Assertions.assertFalse(inputArgType.invokeObjectremoveVal(constructionArgs.seq));
+    }
+    switch(testScenario){
+      case DOESNOTCONTAIN:
+        Assertions.assertFalse(inputArgType.invokeObjectcontains(constructionArgs.seq));
+        constructionArgs.verifyStructuralIntegrity(100,100);
+        int offset=constructionArgs.verifyPreAlloc();
+        offset=constructionArgs.verifyParentPostAlloc(offset+100);
+        offset=constructionArgs.verifyRootPostAlloc(offset);
+        break;
+      case EMPTY:
+        Assertions.assertFalse(inputArgType.invokeObjectcontains(constructionArgs.seq));
+        constructionArgs.verifyStructuralIntegrity(0,0);
+        offset=constructionArgs.verifyPreAlloc();
+        offset=constructionArgs.verifyParentPostAlloc(offset);
+        offset=constructionArgs.verifyRootPostAlloc(offset);
+        break;
+      default:
+        Assertions.assertFalse(inputArgType.invokeObjectcontains(constructionArgs.seq));
+        constructionArgs.verifyStructuralIntegrity(removedVal?99:100,removedVal?101:100);
+        offset=constructionArgs.verifyPreAlloc();
+        offset=constructionArgs.verifyParentPostAlloc(offset+(removedVal?99:100));
+        offset=constructionArgs.verifyRootPostAlloc(offset);
+    }
+  }
+  @ParameterizedTest
+  @MethodSource("getPrimitiveQueryCollectionArguments")
+  public void testremoveVal_BoxedprimitiveVal(QueryTestScenario testScenario,QueryTestPrimitiveInputType inputArgType,StructType structType)
+  {
+    ConstructionArguments constructionArgs=new ConstructionArguments(structType);
+    switch(testScenario){
+      case CONTAINSBEGINNING:
+        Assertions.assertTrue(inputArgType.attemptAdd(constructionArgs.seq));
+        for(int i=1;i<100;++i)
+        {
+          inputArgType.addNotEqualsVal(constructionArgs.seq);
+        }
+        switch(structType){
+          case UNCHECKEDLIST:
+          case CHECKEDLIST:
+          case UNCHECKEDSUBLIST:
+          case CHECKEDSUBLIST:
+            Assertions.assertEquals(0,inputArgType.invokeindexOf(constructionArgs.seq));
+            break;
+          default:
+            Assertions.assertEquals(100,inputArgType.invokesearch(constructionArgs.seq));
+        }
+        break;
+      case CONTAINSMIDDLE:
+        for(int i=0;i<49;++i)
+        {
+          inputArgType.addNotEqualsVal(constructionArgs.seq);
+        }
+        Assertions.assertTrue(inputArgType.attemptAdd(constructionArgs.seq));
+        for(int i=50;i<100;++i)
+        {
+          inputArgType.addNotEqualsVal(constructionArgs.seq);
+        }
+        switch(structType){
+          case UNCHECKEDLIST:
+          case CHECKEDLIST:
+          case UNCHECKEDSUBLIST:
+          case CHECKEDSUBLIST:
+            Assertions.assertEquals(49,inputArgType.invokeindexOf(constructionArgs.seq));
+            break;
+          default:
+            Assertions.assertEquals(51,inputArgType.invokesearch(constructionArgs.seq));
+        }
+        break;
+      case CONTAINSEND:
+        for(int i=0;i<99;++i)
+        {
+          inputArgType.addNotEqualsVal(constructionArgs.seq);
+        }
+        Assertions.assertTrue(inputArgType.attemptAdd(constructionArgs.seq));
+        switch(structType){
+          case UNCHECKEDLIST:
+          case CHECKEDLIST:
+          case UNCHECKEDSUBLIST:
+          case CHECKEDSUBLIST:
+            Assertions.assertEquals(99,inputArgType.invokeindexOf(constructionArgs.seq));
+            break;
+          default:
+            Assertions.assertEquals(1,inputArgType.invokesearch(constructionArgs.seq));
+        }
+        break;
+      case DOESNOTCONTAIN:
+        for(int i=0;i<100;++i)
+        {
+          inputArgType.addNotEqualsVal(constructionArgs.seq);
+        }
+      default:
+        Assertions.assertFalse(inputArgType.invokecontains(constructionArgs.seq));
+        break;
+    }
+     switch(testScenario){
+      default:
+        Assertions.assertTrue(inputArgType.invokeBoxedremoveVal(constructionArgs.seq));
+      case EMPTY:
+      case DOESNOTCONTAIN:
+        Assertions.assertFalse(inputArgType.invokeBoxedremoveVal(constructionArgs.seq));
+    }
+    switch(testScenario){
+      case DOESNOTCONTAIN:
+        Assertions.assertFalse(inputArgType.invokeBoxedcontains(constructionArgs.seq));
+        constructionArgs.verifyStructuralIntegrity(100,100);
+        int offset=constructionArgs.verifyPreAlloc();
+        offset=constructionArgs.verifyParentPostAlloc(offset+100);
+        offset=constructionArgs.verifyRootPostAlloc(offset);
+        break;
+      case EMPTY:
+        Assertions.assertFalse(inputArgType.invokeBoxedcontains(constructionArgs.seq));
+        constructionArgs.verifyStructuralIntegrity(0,0);
+        offset=constructionArgs.verifyPreAlloc();
+        offset=constructionArgs.verifyParentPostAlloc(offset);
+        offset=constructionArgs.verifyRootPostAlloc(offset);
+        break;
+      default:
+        Assertions.assertFalse(inputArgType.invokeBoxedcontains(constructionArgs.seq));
+        constructionArgs.verifyStructuralIntegrity(99,101);
+        offset=constructionArgs.verifyPreAlloc();
+        offset=constructionArgs.verifyParentPostAlloc(offset+99);
+        offset=constructionArgs.verifyRootPostAlloc(offset);
+    }
+  }
+  @ParameterizedTest
+  @MethodSource("getPrimitiveQueryCollectionArguments")
+  public void testremoveVal_primitiveVal(QueryTestScenario testScenario,QueryTestPrimitiveInputType inputArgType,StructType structType)
+  {
+    ConstructionArguments constructionArgs=new ConstructionArguments(structType);
+    switch(testScenario){
+      case CONTAINSBEGINNING:
+        Assertions.assertTrue(inputArgType.attemptAdd(constructionArgs.seq));
+        for(int i=1;i<100;++i)
+        {
+          inputArgType.addNotEqualsVal(constructionArgs.seq);
+        }
+        switch(structType){
+          case UNCHECKEDLIST:
+          case CHECKEDLIST:
+          case UNCHECKEDSUBLIST:
+          case CHECKEDSUBLIST:
+            Assertions.assertEquals(0,inputArgType.invokeindexOf(constructionArgs.seq));
+            break;
+          default:
+            Assertions.assertEquals(100,inputArgType.invokesearch(constructionArgs.seq));
+        }
+        break;
+      case CONTAINSMIDDLE:
+        for(int i=0;i<49;++i)
+        {
+          inputArgType.addNotEqualsVal(constructionArgs.seq);
+        }
+        Assertions.assertTrue(inputArgType.attemptAdd(constructionArgs.seq));
+        for(int i=50;i<100;++i)
+        {
+          inputArgType.addNotEqualsVal(constructionArgs.seq);
+        }
+        switch(structType){
+          case UNCHECKEDLIST:
+          case CHECKEDLIST:
+          case UNCHECKEDSUBLIST:
+          case CHECKEDSUBLIST:
+            Assertions.assertEquals(49,inputArgType.invokeindexOf(constructionArgs.seq));
+            break;
+          default:
+            Assertions.assertEquals(51,inputArgType.invokesearch(constructionArgs.seq));
+        }
+        break;
+      case CONTAINSEND:
+        for(int i=0;i<99;++i)
+        {
+          inputArgType.addNotEqualsVal(constructionArgs.seq);
+        }
+        Assertions.assertTrue(inputArgType.attemptAdd(constructionArgs.seq));
+        switch(structType){
+          case UNCHECKEDLIST:
+          case CHECKEDLIST:
+          case UNCHECKEDSUBLIST:
+          case CHECKEDSUBLIST:
+            Assertions.assertEquals(99,inputArgType.invokeindexOf(constructionArgs.seq));
+            break;
+          default:
+            Assertions.assertEquals(1,inputArgType.invokesearch(constructionArgs.seq));
+        }
+        break;
+      case DOESNOTCONTAIN:
+        for(int i=0;i<100;++i)
+        {
+          inputArgType.addNotEqualsVal(constructionArgs.seq);
+        }
+      default:
+        Assertions.assertFalse(inputArgType.invokecontains(constructionArgs.seq));
+        break;
+    }
+    switch(testScenario){
+      default:
+        Assertions.assertTrue(inputArgType.invokeremoveVal(constructionArgs.seq));
+      case EMPTY:
+      case DOESNOTCONTAIN:
+        Assertions.assertFalse(inputArgType.invokeremoveVal(constructionArgs.seq));
+    }
+    switch(testScenario){
+      case DOESNOTCONTAIN:
+        Assertions.assertFalse(inputArgType.invokecontains(constructionArgs.seq));
+        constructionArgs.verifyStructuralIntegrity(100,100);
+        int offset=constructionArgs.verifyPreAlloc();
+        offset=constructionArgs.verifyParentPostAlloc(offset+100);
+        offset=constructionArgs.verifyRootPostAlloc(offset);
+        break;
+      case EMPTY:
+        Assertions.assertFalse(inputArgType.invokecontains(constructionArgs.seq));
+        constructionArgs.verifyStructuralIntegrity(0,0);
+        offset=constructionArgs.verifyPreAlloc();
+        offset=constructionArgs.verifyParentPostAlloc(offset);
+        offset=constructionArgs.verifyRootPostAlloc(offset);
+        break;
+      default:
+        Assertions.assertFalse(inputArgType.invokecontains(constructionArgs.seq));
+        constructionArgs.verifyStructuralIntegrity(99,101);
+        offset=constructionArgs.verifyPreAlloc();
+        offset=constructionArgs.verifyParentPostAlloc(offset+99);
+        offset=constructionArgs.verifyRootPostAlloc(offset);
+    }
   }
 }
