@@ -1244,47 +1244,11 @@ public class $ClassPrefix$ArrSeqTest{
     return expectThrow;
   }
 #IF OfRef
-  private static class ModdingObjectData
-  {
-    final ConstructionArguments constructionArgs;
-    final ModdingObject moddingObject;
-    
-    ModdingObjectData(ConstructionArguments constructionArgs,ModdingObject moddingObject)
-    {
-      this.constructionArgs=constructionArgs;
-      this.moddingObject=moddingObject;
-    }
-  }
-  static class ModdingObject
-  {
-    OmniCollection.OfRef modThis;
-    int numCalls=0;
-    ModdingObject(OmniCollection modThis)
-    {
-      this.modThis=(OmniCollection.OfRef)modThis;
-    }
-    public boolean equals(Object obj)
-    {
-      ++numCalls;
-      modThis.add(TypeConversionUtil.convertTo$ArrayType$(0));
-      return super.equals(obj);
-    }
-    public int hashCode()
-    {
-      ++numCalls;
-      modThis.add(TypeConversionUtil.convertTo$ArrayType$(0));
-      return super.hashCode();
-    }
-    public String toString()
-    {
-      ++numCalls;
-      modThis.add(TypeConversionUtil.convertTo$ArrayType$(0));
-      return super.toString();
-    }
-  }
+ 
   private static ModdingObjectData initializeSeqForModdingObjectQuery(QueryTestScenario testScenario,StructType structType,CMEScenario objModScenario){
     ConstructionArguments constructionArgs=new ConstructionArguments(structType);
-    ModdingObject moddingObject;
+    //TODO
+    ModCheckTestObject moddingObject;
     switch(objModScenario)
     {
       case ModSeq:
