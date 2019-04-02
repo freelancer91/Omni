@@ -13,7 +13,6 @@ public abstract interface OmniListIterator<E> extends OmniIterator<E>,ListIterat
   {
     public abstract void add(boolean val);
     public abstract void set(boolean val);
-//IF CLASSPREFIX==Ref
     @Override
     public default void add(Boolean val)
     {
@@ -24,7 +23,6 @@ public abstract interface OmniListIterator<E> extends OmniIterator<E>,ListIterat
     {
       set((boolean)(val));
     }
-//ENDIF
     public abstract boolean previousBoolean();
     @Override
     public default Boolean next()
@@ -36,7 +34,6 @@ public abstract interface OmniListIterator<E> extends OmniIterator<E>,ListIterat
     {
       return previousBoolean();
     }
-//IF ARRTYPE==boolean
     public default byte previousByte(){
       return TypeUtil.castToByte(previousBoolean());
     }
@@ -58,13 +55,11 @@ public abstract interface OmniListIterator<E> extends OmniIterator<E>,ListIterat
     public default short prevousShort(){
       return TypeUtil.castToByte(previousBoolean());
     }
-//ENDIF
   }
   public abstract interface OfByte extends OmniListIterator<Byte>,OmniIterator.OfByte
   {
     public abstract void add(byte val);
     public abstract void set(byte val);
-//IF CLASSPREFIX==Ref
     @Override
     public default void add(Byte val)
     {
@@ -75,8 +70,6 @@ public abstract interface OmniListIterator<E> extends OmniIterator<E>,ListIterat
     {
       set((byte)(val));
     }
-//ENDIF
-//IF CLASSPREFIX==Byte
     public default void add(boolean val)
     {
       add(TypeUtil.castToByte(val));
@@ -93,7 +86,6 @@ public abstract interface OmniListIterator<E> extends OmniIterator<E>,ListIterat
     {
       set(TypeUtil.castToByte(val));
     }
-//ENDIF
     public abstract byte previousByte();
     @Override
     public default Byte next()
@@ -105,42 +97,31 @@ public abstract interface OmniListIterator<E> extends OmniIterator<E>,ListIterat
     {
       return previousByte();
     }
-//IF ARRTYPE==double
     public default double previousDouble()
     {
       return previousByte();
     }
-  //IF ARRTYPE==float
     public default float previousFloat()
     {
       return previousByte();
     }
-    //IF ARRTYPE==long
     public default long previousLong()
     {
       return previousByte();
     }
-      //IF ARRTYPE==int
     public default int previousInt()
     {
       return previousByte();
     }
-        //IF ARRTYPE==char,short
     public default short previousShort()
     {
       return previousByte();
     }
-        //ENDIF
-      //ENDIF
-    //ENDIF
-  //ENDIF
-//ENDIF
   }
   public abstract interface OfChar extends OmniListIterator<Character>,OmniIterator.OfChar
   {
     public abstract void add(char val);
     public abstract void set(char val);
-//IF CLASSPREFIX==Ref
     @Override
     public default void add(Character val)
     {
@@ -151,8 +132,6 @@ public abstract interface OmniListIterator<E> extends OmniIterator<E>,ListIterat
     {
       set((char)(val));
     }
-//ENDIF
-//IF CLASSPREFIX==Char
     public default void add(boolean val)
     {
       add(TypeUtil.castToChar(val));
@@ -169,7 +148,6 @@ public abstract interface OmniListIterator<E> extends OmniIterator<E>,ListIterat
     {
       set(TypeUtil.castToChar(val));
     }
-//ENDIF
     public abstract char previousChar();
     @Override
     public default Character next()
@@ -181,36 +159,27 @@ public abstract interface OmniListIterator<E> extends OmniIterator<E>,ListIterat
     {
       return previousChar();
     }
-//IF ARRTYPE==double
     public default double previousDouble()
     {
       return previousChar();
     }
-  //IF ARRTYPE==float
     public default float previousFloat()
     {
       return previousChar();
     }
-    //IF ARRTYPE==long
     public default long previousLong()
     {
       return previousChar();
     }
-      //IF ARRTYPE==int
     public default int previousInt()
     {
       return previousChar();
     }
-      //ENDIF
-    //ENDIF
-  //ENDIF
-//ENDIF
   }
   public abstract interface OfShort extends OmniListIterator<Short>,OmniIterator.OfShort
   {
     public abstract void add(short val);
     public abstract void set(short val);
-//IF CLASSPREFIX==Ref
     @Override
     public default void add(Short val)
     {
@@ -221,8 +190,6 @@ public abstract interface OmniListIterator<E> extends OmniIterator<E>,ListIterat
     {
       set((short)(val));
     }
-//ENDIF
-//IF CLASSPREFIX==Short
     public default void add(boolean val)
     {
       add((short)TypeUtil.castToByte(val));
@@ -255,7 +222,6 @@ public abstract interface OmniListIterator<E> extends OmniIterator<E>,ListIterat
     {
       set((short)(byte)(val));
     }
-//ENDIF
     public abstract short previousShort();
     @Override
     public default Short next()
@@ -267,36 +233,27 @@ public abstract interface OmniListIterator<E> extends OmniIterator<E>,ListIterat
     {
       return previousShort();
     }
-//IF ARRTYPE==double
     public default double previousDouble()
     {
       return previousShort();
     }
-  //IF ARRTYPE==float
     public default float previousFloat()
     {
       return previousShort();
     }
-    //IF ARRTYPE==long
     public default long previousLong()
     {
       return previousShort();
     }
-      //IF ARRTYPE==int
     public default int previousInt()
     {
       return previousShort();
     }
-      //ENDIF
-    //ENDIF
-  //ENDIF
-//ENDIF
   }
   public abstract interface OfInt extends OmniListIterator<Integer>,OmniIterator.OfInt
   {
     public abstract void add(int val);
     public abstract void set(int val);
-//IF CLASSPREFIX==Ref
     @Override
     public default void add(Integer val)
     {
@@ -307,8 +264,6 @@ public abstract interface OmniListIterator<E> extends OmniIterator<E>,ListIterat
     {
       set((int)(val));
     }
-//ENDIF
-//IF CLASSPREFIX==Int
     public default void add(boolean val)
     {
       add((int)TypeUtil.castToByte(val));
@@ -373,7 +328,6 @@ public abstract interface OmniListIterator<E> extends OmniIterator<E>,ListIterat
     {
       set((int)(short)(val));
     }
-//ENDIF
     public abstract int previousInt();
     @Override
     public default Integer next()
@@ -385,30 +339,23 @@ public abstract interface OmniListIterator<E> extends OmniIterator<E>,ListIterat
     {
       return previousInt();
     }
-//IF ARRTYPE==double
     public default double previousDouble()
     {
       return previousInt();
     }
-  //IF ARRTYPE==float
     public default float previousFloat()
     {
       return previousInt();
     }
-    //IF ARRTYPE==long
     public default long previousLong()
     {
       return previousInt();
     }
-    //ENDIF
-  //ENDIF
-//ENDIF
   }
   public abstract interface OfLong extends OmniListIterator<Long>,OmniIterator.OfLong
   {
     public abstract void add(long val);
     public abstract void set(long val);
-//IF CLASSPREFIX==Ref
     @Override
     public default void add(Long val)
     {
@@ -419,8 +366,6 @@ public abstract interface OmniListIterator<E> extends OmniIterator<E>,ListIterat
     {
       set((long)(val));
     }
-//ENDIF
-//IF CLASSPREFIX==Long
     public default void add(boolean val)
     {
       add(TypeUtil.castToLong(val));
@@ -501,7 +446,6 @@ public abstract interface OmniListIterator<E> extends OmniIterator<E>,ListIterat
     {
       set((long)(int)(val));
     }
-//ENDIF
     public abstract long previousLong();
     @Override
     public default Long next()
@@ -513,24 +457,19 @@ public abstract interface OmniListIterator<E> extends OmniIterator<E>,ListIterat
     {
       return previousLong();
     }
-//IF ARRTYPE==double
     public default double previousDouble()
     {
       return previousLong();
     }
-  //IF ARRTYPE==float
     public default float previousFloat()
     {
       return previousLong();
     }
-  //ENDIF
-//ENDIF
   }
   public abstract interface OfFloat extends OmniListIterator<Float>,OmniIterator.OfFloat
   {
     public abstract void add(float val);
     public abstract void set(float val);
-//IF CLASSPREFIX==Ref
     @Override
     public default void add(Float val)
     {
@@ -541,8 +480,6 @@ public abstract interface OmniListIterator<E> extends OmniIterator<E>,ListIterat
     {
       set((float)(val));
     }
-//ENDIF
-//IF CLASSPREFIX==Float
     public default void add(boolean val)
     {
       add(TypeUtil.castToFloat(val));
@@ -639,7 +576,6 @@ public abstract interface OmniListIterator<E> extends OmniIterator<E>,ListIterat
     {
       set((float)(long)(val));
     }
-//ENDIF
     public abstract float previousFloat();
     @Override
     public default Float next()
@@ -651,18 +587,15 @@ public abstract interface OmniListIterator<E> extends OmniIterator<E>,ListIterat
     {
       return previousFloat();
     }
-//IF ARRTYPE==double
     public default double previousDouble()
     {
       return previousFloat();
     }
-//ENDIF
   }
   public abstract interface OfDouble extends OmniListIterator<Double>,OmniIterator.OfDouble
   {
     public abstract void add(double val);
     public abstract void set(double val);
-//IF CLASSPREFIX==Ref
     @Override
     public default void add(Double val)
     {
@@ -673,8 +606,6 @@ public abstract interface OmniListIterator<E> extends OmniIterator<E>,ListIterat
     {
       set((double)(val));
     }
-//ENDIF
-//IF CLASSPREFIX==Double
     public default void add(boolean val)
     {
       add(TypeUtil.castToDouble(val));
@@ -787,7 +718,6 @@ public abstract interface OmniListIterator<E> extends OmniIterator<E>,ListIterat
     {
       set((double)(float)(val));
     }
-//ENDIF
     public abstract double previousDouble();
     @Override
     public default Double next()

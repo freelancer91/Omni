@@ -17,7 +17,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.Arguments;
 import java.util.stream.Stream;
-import omni.impl.QueryTestPrimitiveInputType;
+import omni.impl.QueryTestInputType;
 import omni.impl.QueryTestScenario;
 #IF OfInt,OfLong,OfDouble
 import java.util.function.$TypeNameModifier$Consumer;
@@ -995,570 +995,1172 @@ public class $ClassPrefix$ArrSeqTest{
     offset=constructionArgs.verifyParentPostAlloc(offset);
     constructionArgs.verifyRootPostAlloc(offset);
   }
-
-
-  static Stream<Arguments> getPrimitiveQueryCollectionArguments(){
-    Stream.Builder<Arguments> builder=Stream.builder();
-    for(StructType structType:StructType.values()){
-      for(QueryTestPrimitiveInputType argType:QueryTestPrimitiveInputType.values()){
-        builder.add(Arguments.of(QueryTestScenario.EMPTY,argType,structType));
-        builder.add(Arguments.of(QueryTestScenario.DOESNOTCONTAIN,argType,structType));
-        switch(argType){
-          case Booleanfalse:
-          case Byte0:
-          case Character0:
-          case Short0:
-          case Integer0:
-          case Long0:
-          case Floatpos0:
-          case Floatneg0:
-          case Doublepos0:
-          case Doubleneg0:
-          case Booleantrue:
-          case Bytepos1:
-          case Characterpos1:
-          case Shortpos1:
-          case Integerpos1:
-          case Longpos1:
-          case Floatpos1:
-          case Doublepos1:
+  static enum QueryCast{
+    AsIs,
+    ToBoxed,
+    ToObject;
+  }
+  static void buildQueryArguments(Stream.Builder<Arguments> builder,StructType structType){
+    for(QueryTestInputType argType:QueryTestInputType.values()){
+        for(QueryCast queryCast:QueryCast.values()){
+          if(structType==StructType.CHECKEDSUBLIST){
+            for(CMEScenario modScenario:CMEScenario.values()){
+              builder.add(Arguments.of(modScenario,queryCast,QueryTestScenario.EMPTY,argType,structType));
+              builder.add(Arguments.of(modScenario,queryCast,QueryTestScenario.DOESNOTCONTAIN,argType,structType));
+            }
+          }else{
+            builder.add(Arguments.of(CMEScenario.NoMod,queryCast,QueryTestScenario.EMPTY,argType,structType));
+            builder.add(Arguments.of(CMEScenario.NoMod,queryCast,QueryTestScenario.DOESNOTCONTAIN,argType,structType));
+          }
+          switch(argType){
+#IF OfRef
+            case Booleannull:
+            case Bytenull:
+            case Characternull:
+            case Shortnull:
+            case Integernull:
+            case Longnull:
+            case Floatnull:
+            case Doublenull:
+            case Objectnull:
+#ENDIF
+            case Booleanfalse:
+            case Byte0:
+            case Character0:
+            case Short0:
+            case Integer0:
+            case Long0:
+            case Floatpos0:
+            case Floatneg0:
+            case Doublepos0:
+            case Doubleneg0:
+            case Booleantrue:
+            case Bytepos1:
+            case Characterpos1:
+            case Shortpos1:
+            case Integerpos1:
+            case Longpos1:
+            case Floatpos1:
+            case Doublepos1:
 #IFNOT OfBoolean
-          //values beyond the range of boolean
-          case Bytepos2:
-          case Characterpos2:
-          case Shortpos2:
-          case Integerpos2:
-          case Longpos2:
-          case Floatpos2:
-          case Doublepos2:
+            //values beyond the range of boolean
+            case Bytepos2:
+            case Characterpos2:
+            case Shortpos2:
+            case Integerpos2:
+            case Longpos2:
+            case Floatpos2:
+            case Doublepos2:
   #IFNOT OfChar
-          //negative values beyond the range of char
-          case Byteneg1:
-          case Shortneg1:
-          case Integerneg1:
-          case Longneg1:
-          case Floatneg1:
-          case Doubleneg1:
+            //negative values beyond the range of char
+            case Byteneg1:
+            case Shortneg1:
+            case Integerneg1:
+            case Longneg1:
+            case Floatneg1:
+            case Doubleneg1:
     #IFNOT OfByte
-          //negative values beyond the range of byte
-          case ShortMIN_BYTE_MINUS1:
-          case IntegerMIN_BYTE_MINUS1:
-          case LongMIN_BYTE_MINUS1:
-          case FloatMIN_BYTE_MINUS1:
-          case DoubleMIN_BYTE_MINUS1:
+            //negative values beyond the range of byte
+            case ShortMIN_BYTE_MINUS1:
+            case IntegerMIN_BYTE_MINUS1:
+            case LongMIN_BYTE_MINUS1:
+            case FloatMIN_BYTE_MINUS1:
+            case DoubleMIN_BYTE_MINUS1:
       #IFNOT OfShort
-          //negative values beyond the range of short
-          case IntegerMIN_SHORT_MINUS1:
-          case LongMIN_SHORT_MINUS1:
-          case FloatMIN_SHORT_MINUS1:
-          case DoubleMIN_SHORT_MINUS1:
+            //negative values beyond the range of short
+            case IntegerMIN_SHORT_MINUS1:
+            case LongMIN_SHORT_MINUS1:
+            case FloatMIN_SHORT_MINUS1:
+            case DoubleMIN_SHORT_MINUS1:
         #IFNOT OfInt
-          //negative values beyond the range of int
-          case FloatMIN_INT_MINUS1:
+            //negative values beyond the range of int
+            case FloatMIN_INT_MINUS1:
           #IFNOT OfFloat
-          //negative values beyond the range of int and beyond the precision of float
-          case LongMIN_INT_MINUS1:
-          case DoubleMIN_INT_MINUS1:
+            //negative values beyond the range of int and beyond the precision of float
+            case LongMIN_INT_MINUS1:
+            case DoubleMIN_INT_MINUS1:
           #ENDIF
         #ENDIF
         #IFNOT OfFloat
-          //negative values beyond MIN_SAFE_INT that are beyond the precision of float
-          case IntegerMIN_SAFE_INT_MINUS1:
-          case LongMIN_SAFE_INT_MINUS1:
-          case DoubleMIN_SAFE_INT_MINUS1:
+            //negative values beyond MIN_SAFE_INT that are beyond the precision of float
+            case IntegerMIN_SAFE_INT_MINUS1:
+            case LongMIN_SAFE_INT_MINUS1:
+            case DoubleMIN_SAFE_INT_MINUS1:
           #IFNOT OfInt,OfDouble
-          //negative values beyond the range of int that are beyond the precision of float and double
-          case LongMIN_SAFE_LONG_MINUS1:
+            //negative values beyond the range of int that are beyond the precision of float and double
+            case LongMIN_SAFE_LONG_MINUS1:
           #ENDIF
         #ENDIF
       #ENDIF
     #ENDIF
   #ENDIF
   #IFNOT OfByte
-          //positive values out of the range of byte
-          case CharacterMAX_BYTE_PLUS1:
-          case ShortMAX_BYTE_PLUS1:
-          case IntegerMAX_BYTE_PLUS1:
-          case LongMAX_BYTE_PLUS1:
-          case FloatMAX_BYTE_PLUS1:
-          case DoubleMAX_BYTE_PLUS1:
+            //positive values out of the range of byte
+            case CharacterMAX_BYTE_PLUS1:
+            case ShortMAX_BYTE_PLUS1:
+            case IntegerMAX_BYTE_PLUS1:
+            case LongMAX_BYTE_PLUS1:
+            case FloatMAX_BYTE_PLUS1:
+            case DoubleMAX_BYTE_PLUS1:
     #IFNOT OfShort
-          //positive values out of the range of short
-          case CharacterMAX_SHORT_PLUS1:
-          case IntegerMAX_SHORT_PLUS1:
-          case LongMAX_SHORT_PLUS1:
-          case FloatMAX_SHORT_PLUS1:
-          case DoubleMAX_SHORT_PLUS1:
+            //positive values out of the range of short
+            case CharacterMAX_SHORT_PLUS1:
+            case IntegerMAX_SHORT_PLUS1:
+            case LongMAX_SHORT_PLUS1:
+            case FloatMAX_SHORT_PLUS1:
+            case DoubleMAX_SHORT_PLUS1:
       #IFNOT OfChar
-          //positive values out of the range of char
-          case IntegerMAX_CHAR_PLUS1:
-          case LongMAX_CHAR_PLUS1:
-          case FloatMAX_CHAR_PLUS1:
-          case DoubleMAX_CHAR_PLUS1:
+            //positive values out of the range of char
+            case IntegerMAX_CHAR_PLUS1:
+            case LongMAX_CHAR_PLUS1:
+            case FloatMAX_CHAR_PLUS1:
+            case DoubleMAX_CHAR_PLUS1:
         #IFNOT OfInt
-          //positive values out of the range of int
-          case LongMAX_INT_PLUS1:
-          case FloatMAX_INT_PLUS1:
-          case DoubleMAX_INT_PLUS1:
+            //positive values out of the range of int
+            case LongMAX_INT_PLUS1:
+            case FloatMAX_INT_PLUS1:
+            case DoubleMAX_INT_PLUS1:
         #ENDIF
         #IFNOT OfFloat
-          //positive values beyond MAX_SAFE_INT that are beyond the precision of float
-          case IntegerMAX_SAFE_INT_PLUS1:
-          case LongMAX_SAFE_INT_PLUS1:
-          case DoubleMAX_SAFE_INT_PLUS1:
+            //positive values beyond MAX_SAFE_INT that are beyond the precision of float
+            case IntegerMAX_SAFE_INT_PLUS1:
+            case LongMAX_SAFE_INT_PLUS1:
+            case DoubleMAX_SAFE_INT_PLUS1:
           #IFNOT OfInt,OfDouble
-          //positive values beyond the range of int that are beyond the precision of float and double
-          case LongMAX_SAFE_LONG_PLUS1:
+            //positive values beyond the range of int that are beyond the precision of float and double
+            case LongMAX_SAFE_LONG_PLUS1:
           #ENDIF
         #ENDIF
         #IFNOT OfInt,OfLong
-          //floating-point values beyond the range any integral type
-          case FloatMAX_LONG_PLUS1:
-          case FloatMIN_LONG_MINUS1:
-          case FloatMAX_FLOAT_VALUE:
-          case DoubleMAX_FLOAT_VALUE:
-          //fractional floating point values that cannot be matched with any integral type
-          case FloatMIN_FLOAT_VALUE:
-          case DoubleMIN_FLOAT_VALUE:
-          //NaN values that can only be matches with NaN
-          case FloatNaN:
-          case DoubleNaN:
+            //floating-point values beyond the range any integral type
+            case FloatMAX_LONG_PLUS1:
+            case FloatMIN_LONG_MINUS1:
+            case FloatMAX_FLOAT_VALUE:
+            case DoubleMAX_FLOAT_VALUE:
+            //fractional floating point values that cannot be matched with any integral type
+            case FloatMIN_FLOAT_VALUE:
+            case DoubleMIN_FLOAT_VALUE:
+            //NaN values that can only be matches with NaN
+            case FloatNaN:
+            case DoubleNaN:
           #IFNOT OfFloat
-          //double-precision floating-point values beyond the range of any integral type and beyond the precision of float
-          case DoubleMAX_LONG_PLUS1:
-          case DoubleMIN_LONG_MINUS1:
-          case DoubleMAX_DOUBLE_VALUE:
-          //fractional floating point values that cannot be matched with any integral type and which are beyond the precision of float
-          case DoubleMIN_DOUBLE_VALUE:
+            //double-precision floating-point values beyond the range of any integral type and beyond the precision of float
+            case DoubleMAX_LONG_PLUS1:
+            case DoubleMIN_LONG_MINUS1:
+            case DoubleMAX_DOUBLE_VALUE:
+            //fractional floating point values that cannot be matched with any integral type and which are beyond the precision of float
+            case DoubleMIN_DOUBLE_VALUE:
           #ENDIF
         #ENDIF
       #ENDIF
     #ENDIF
   #ENDIF  
 #ENDIF
-            //these input values cannot potentially return true
-            builder.add(Arguments.of(QueryTestScenario.CONTAINSBEGINNING,argType,structType));
-            builder.add(Arguments.of(QueryTestScenario.CONTAINSMIDDLE,argType,structType));
-            builder.add(Arguments.of(QueryTestScenario.CONTAINSEND,argType,structType));
-          default:
-            //all other enumerated values MUST return false because they are either out of range or are too precise
+              //these input values cannot potentially return true
+              if(structType==StructType.CHECKEDSUBLIST){
+                for(CMEScenario modScenario:CMEScenario.values()){
+                  builder.add(Arguments.of(modScenario,queryCast,QueryTestScenario.CONTAINSBEGINNING,argType,structType));
+                  builder.add(Arguments.of(modScenario,queryCast,QueryTestScenario.CONTAINSMIDDLE,argType,structType));
+                  builder.add(Arguments.of(modScenario,queryCast,QueryTestScenario.CONTAINSEND,argType,structType));
+                }
+              }else{
+                builder.add(Arguments.of(CMEScenario.NoMod,queryCast,QueryTestScenario.CONTAINSBEGINNING,argType,structType));
+                builder.add(Arguments.of(CMEScenario.NoMod,queryCast,QueryTestScenario.CONTAINSMIDDLE,argType,structType));
+                builder.add(Arguments.of(CMEScenario.NoMod,queryCast,QueryTestScenario.CONTAINSEND,argType,structType));
+              }
+            default:
+              //all other enumerated values MUST return false because they are either out of range or are too precise
+          }
         }
       }
+  }
+  static Stream<Arguments> getQueryStackArguments(){
+    Stream.Builder<Arguments> builder=Stream.builder();
+    for(StructType structType:StructType.values()){
+      switch(structType){
+        default:
+          continue;
+        case CHECKEDSTACK:
+        case UNCHECKEDSTACK:
+      }
+      buildQueryArguments(builder,structType);
     }
     return builder.build();
   }
-
+  static Stream<Arguments> getQueryListArguments(){
+    Stream.Builder<Arguments> builder=Stream.builder();
+    for(StructType structType:StructType.values()){
+      switch(structType){
+        case CHECKEDSTACK:
+        case UNCHECKEDSTACK:
+          continue;
+        default:
+      }
+      buildQueryArguments(builder,structType);
+    }
+    return builder.build();
+  }
+  static Stream<Arguments> getQueryCollectionArguments(){
+    Stream.Builder<Arguments> builder=Stream.builder();
+    for(StructType structType:StructType.values()){
+      buildQueryArguments(builder,structType);
+    }
+    return builder.build();
+  } 
+  private static boolean illegallyModForQuery(QueryCast queryCast,CMEScenario modScenario,QueryTestInputType inputArgType,QueryTestScenario testScenario,ConstructionArguments constructionArgs){
+    boolean expectThrow=false;
+    switch(modScenario){
+      case ModParent:
+      case ModRoot:
+        #IF OfRef
+          expectThrow=true;
+        #ELSE
+          switch(inputArgType){
+            default:
+              expectThrow=true;
+              break;
+            case Booleannull:
+            case Bytenull:
+            case Characternull:
+            case Shortnull:
+            case Integernull:
+            case Longnull:
+            case Floatnull:
+            case Doublenull:
+              expectThrow=(queryCast==QueryCast.ToObject);
+          }
+        #ENDIF
+      default:
+    }
+    switch(modScenario){
+      case ModParent:
+        $ClassPrefix$InputTestArgType.ARRAY_TYPE.callCollectionAdd(constructionArgs.parent,0);
+        break;
+      case ModRoot:
+        $ClassPrefix$InputTestArgType.ARRAY_TYPE.callCollectionAdd(constructionArgs.root,0);
+        break;
+      default:
+    }
+    return expectThrow;
+  }
+#IF OfRef
+  private static class ModdingObjectData
+  {
+    final ConstructionArguments constructionArgs;
+    final ModdingObject moddingObject;
+    
+    ModdingObjectData(ConstructionArguments constructionArgs,ModdingObject moddingObject)
+    {
+      this.constructionArgs=constructionArgs;
+      this.moddingObject=moddingObject;
+    }
+  }
+  static class ModdingObject
+  {
+    OmniCollection.OfRef modThis;
+    int numCalls=0;
+    ModdingObject(OmniCollection modThis)
+    {
+      this.modThis=(OmniCollection.OfRef)modThis;
+    }
+    public boolean equals(Object obj)
+    {
+      ++numCalls;
+      modThis.add(TypeConversionUtil.convertTo$ArrayType$(0));
+      return super.equals(obj);
+    }
+    public int hashCode()
+    {
+      ++numCalls;
+      modThis.add(TypeConversionUtil.convertTo$ArrayType$(0));
+      return super.hashCode();
+    }
+    public String toString()
+    {
+      ++numCalls;
+      modThis.add(TypeConversionUtil.convertTo$ArrayType$(0));
+      return super.toString();
+    }
+  }
+  private static ModdingObjectData initializeSeqForModdingObjectQuery(QueryTestScenario testScenario,StructType structType,CMEScenario objModScenario){
+    ConstructionArguments constructionArgs=new ConstructionArguments(structType);
+    ModdingObject moddingObject;
+    switch(objModScenario)
+    {
+      case ModSeq:
+        moddingObject=new ModdingObject(constructionArgs.seq);
+        break;
+      case ModParent:
+        moddingObject=new ModdingObject(constructionArgs.parent);
+        break;
+      default:
+        moddingObject=new ModdingObject(constructionArgs.root);
+    }
+    switch(testScenario){
+      case CONTAINSBEGINNING:
+        Assertions.assertTrue(((OmniCollection.OfRef)constructionArgs.seq).add(moddingObject));
+        for(int i=1;i<100;++i){
+          ((OmniCollection.OfRef)constructionArgs.seq).add(Boolean.FALSE);
+        }
+        break;
+      case CONTAINSMIDDLE:
+        for(int i=0;i<49;++i){
+          ((OmniCollection.OfRef)constructionArgs.seq).add(Boolean.FALSE);
+        }
+        Assertions.assertTrue(((OmniCollection.OfRef)constructionArgs.seq).add(moddingObject));
+        for(int i=50;i<100;++i){
+          ((OmniCollection.OfRef)constructionArgs.seq).add(Boolean.FALSE);
+        }
+        break;
+      case CONTAINSEND:
+        for(int i=0;i<99;++i){
+          ((OmniCollection.OfRef)constructionArgs.seq).add(Boolean.FALSE);
+        }
+        Assertions.assertTrue(((OmniCollection.OfRef)constructionArgs.seq).add(moddingObject));
+        break;
+      case DOESNOTCONTAIN:
+        for(int i=0;i<100;++i){
+          ((OmniCollection.OfRef)constructionArgs.seq).add(Boolean.FALSE);
+        }
+      default:
+        break;
+    }
+    return new ModdingObjectData(constructionArgs,moddingObject);
+  }
+  private static boolean illegallyModForQuery(CMEScenario modScenario,ConstructionArguments constructionArgs){
+    boolean expectThrow=false;
+    switch(modScenario){
+      case ModParent:
+      case ModRoot:
+          expectThrow=true;
+      default:
+    }
+    switch(modScenario){
+      case ModParent:
+        $ClassPrefix$InputTestArgType.ARRAY_TYPE.callCollectionAdd(constructionArgs.parent,0);
+        break;
+      case ModRoot:
+        $ClassPrefix$InputTestArgType.ARRAY_TYPE.callCollectionAdd(constructionArgs.root,0);
+        break;
+      default:
+    }
+    return expectThrow;
+  }
+#ENDIF
   
-  static enum BoxedType{
-    BooleanType,
-    ByteType,
-    CharType,
-    ShortType,
-    IntType,
-    LongType,
-    FloatType,
-    DoubleType,
-    ObjectType;
+  private static ConstructionArguments initializeSeqForQuery(QueryTestScenario testScenario,QueryTestInputType inputArgType,StructType structType){
+    ConstructionArguments constructionArgs=new ConstructionArguments(structType);
+    switch(testScenario){
+      case CONTAINSBEGINNING:
+        Assertions.assertTrue(inputArgType.attemptAdd(constructionArgs.seq));
+        for(int i=1;i<100;++i){
+          inputArgType.addNotEqualsVal(constructionArgs.seq);
+        }
+        break;
+      case CONTAINSMIDDLE:
+        for(int i=0;i<49;++i){
+          inputArgType.addNotEqualsVal(constructionArgs.seq);
+        }
+        Assertions.assertTrue(inputArgType.attemptAdd(constructionArgs.seq));
+        for(int i=50;i<100;++i){
+          inputArgType.addNotEqualsVal(constructionArgs.seq);
+        }
+        break;
+      case CONTAINSEND:
+        for(int i=0;i<99;++i){
+          inputArgType.addNotEqualsVal(constructionArgs.seq);
+        }
+        Assertions.assertTrue(inputArgType.attemptAdd(constructionArgs.seq));
+        break;
+      case DOESNOTCONTAIN:
+        for(int i=0;i<100;++i){
+          inputArgType.addNotEqualsVal(constructionArgs.seq);
+        }
+      default:
+        break;
+    }
+    return constructionArgs;
+  }
+  private static void verifyQueryDidNotModify(CMEScenario modScenario,ConstructionArguments constructionArgs,QueryTestScenario testScenario){
+    int offset=constructionArgs.verifyPreAlloc();
+    if(testScenario==QueryTestScenario.EMPTY){
+      switch(modScenario){
+        case ModParent:
+          constructionArgs.verifyStructuralIntegrity(0,0,1,1);
+          offset=constructionArgs.verifyParentPostAlloc(offset);
+          offset=constructionArgs.verifyIndex(offset,$ClassPrefix$InputTestArgType.ARRAY_TYPE,0);
+          constructionArgs.verifyRootPostAlloc(offset);
+          break;
+        case ModRoot:
+          constructionArgs.verifyStructuralIntegrity(0,0,0,0,1,1);
+          offset=constructionArgs.verifyParentPostAlloc(offset);
+          offset=constructionArgs.verifyRootPostAlloc(offset);
+          constructionArgs.verifyIndex(offset,$ClassPrefix$InputTestArgType.ARRAY_TYPE,0);
+          break;
+        default:
+          constructionArgs.verifyStructuralIntegrity(0,0);
+          offset=constructionArgs.verifyParentPostAlloc(offset);
+          constructionArgs.verifyRootPostAlloc(offset);
+      }
+    }else{
+      switch(modScenario){
+        case ModParent:
+          constructionArgs.verifyStructuralIntegrity(100,100,101,101);
+          offset=constructionArgs.verifyParentPostAlloc(offset+100);
+          offset=constructionArgs.verifyIndex(offset,$ClassPrefix$InputTestArgType.ARRAY_TYPE,0);
+          constructionArgs.verifyRootPostAlloc(offset);
+          break;
+        case ModRoot:
+          constructionArgs.verifyStructuralIntegrity(100,100,100,100,101,101);
+          offset=constructionArgs.verifyParentPostAlloc(offset+100);
+          offset=constructionArgs.verifyRootPostAlloc(offset);
+          constructionArgs.verifyIndex(offset,$ClassPrefix$InputTestArgType.ARRAY_TYPE,0);
+          break;
+        default:
+          constructionArgs.verifyStructuralIntegrity(100,100);
+          offset=constructionArgs.verifyParentPostAlloc(offset+100);
+          constructionArgs.verifyRootPostAlloc(offset);
+      }
+    }
+  }
+#IF OfRef
+  //TODO build throwing and modding+throwing removeVal(Object) querying tests
+  private static void buildModdingNonNullQueryArgs(Stream.Builder<Arguments> builder,StructType structType)
+  {
+    for(QueryTestScenario testScenario:QueryTestScenario.values())
+    {
+      if(structType==StructType.CHECKEDSUBLIST)
+      {
+        builder.add(Arguments.of(CMEScenario.ModRoot,CMEScenario.ModRoot,testScenario,structType));
+        builder.add(Arguments.of(CMEScenario.ModRoot,CMEScenario.ModParent,testScenario,structType));
+        builder.add(Arguments.of(CMEScenario.ModRoot,CMEScenario.NoMod,testScenario,structType));
+        builder.add(Arguments.of(CMEScenario.ModParent,CMEScenario.ModRoot,testScenario,structType));
+        builder.add(Arguments.of(CMEScenario.ModParent,CMEScenario.ModParent,testScenario,structType));
+        builder.add(Arguments.of(CMEScenario.ModParent,CMEScenario.NoMod,testScenario,structType));
+        builder.add(Arguments.of(CMEScenario.ModSeq,CMEScenario.ModRoot,testScenario,structType));
+        builder.add(Arguments.of(CMEScenario.ModSeq,CMEScenario.ModParent,testScenario,structType));
+      }
+      builder.add(Arguments.of(CMEScenario.ModSeq,CMEScenario.NoMod,testScenario,structType));
+    }
   }
 
-  static Stream<Arguments> getNullQueryCollectionArguments(){
-    Stream.Builder<Arguments> bulder=Stream.builder();
-    for(StructType structType:StructType.values()){
-      for(BoxedType boxedType:BoxedType.values()){
-        builder.add(Arguments.of(boxedType,structType,QueryTestScenario.EMPTY));
-        builder.add(Arguments.of(boxedType,structType,QueryTestScenario.DOESNOTCONTAIN));
-#IF OfRef
-        builder.add(Arguments.of(boxedType,structType,QueryTestScenario.CONTAINSBEGINNING));
-        builder.add(Arguments.of(boxedType,structType,QueryTestScenario.CONTAINSMIDDLE));
-        builder.add(Arguments.of(boxedType.structType,QueryTestScenario.CONTAINSEND));
-#ENDIF
+  static Stream<Arguments> getModdingNonNullObjectQueryCollectionArgs(){
+    Stream.Builder<Arguments> builder=Stream.builder();
+    buildModdingNonNullQueryArgs(builder,StructType.CHECKEDLIST);
+    buildModdingNonNullQueryArgs(builder,StructType.CHECKEDSUBLIST);
+    buildModdingNonNullQueryArgs(builder,StructType.CHECKEDSTACK);
+    return builder.build();
+  }
+  
+  static Stream<Arguments> getModdingNonNullObjectQueryStackArgs(){
+    Stream.Builder<Arguments> builder=Stream.builder();
+    buildModdingNonNullQueryArgs(builder,StructType.CHECKEDSTACK);
+    return builder.build();
+  }
+  static Stream<Arguments> getModdingNonNullObjectQueryListArgs(){
+    Stream.Builder<Arguments> builder=Stream.builder();
+    buildModdingNonNullQueryArgs(builder,StructType.CHECKEDLIST);
+    buildModdingNonNullQueryArgs(builder,StructType.CHECKEDSUBLIST);
+    return builder.build();
+  }
+  
+  
+  @ParameterizedTest
+  @MethodSource("getModdingNonNullObjectQueryStackArgs")
+  public void testsearch_ModdingNonNullObject(CMEScenario objModScenario,CMEScenario preModScenario,QueryTestScenario testScenario,StructType structType)
+  {
+    ModdingObjectData moddingObjectData=initializeSeqForModdingObjectQuery(testScenario,structType,objModScenario);
+    ModdingObject moddingObject=moddingObjectData.moddingObject;
+    ConstructionArguments constructionArgs=moddingObjectData.constructionArgs;
+    if(testScenario==QueryTestScenario.EMPTY)
+    {
+      Assertions.assertEquals(-1,((OmniStack)constructionArgs.seq).search(moddingObject));
+      constructionArgs.verifyStructuralIntegrity(0,0);
+    }
+    else
+    {
+      Assertions.assertThrows(ConcurrentModificationException.class,()->((OmniStack)constructionArgs.seq).search(moddingObject));
+      int numCalls=moddingObject.numCalls;
+      int offset=100;
+      for(int i=0;i<numCalls;++i)
+      {
+        offset=constructionArgs.verifyIndex(offset,$ClassPrefix$InputTestArgType.ARRAY_TYPE,0);
+      }
+      constructionArgs.verifyStructuralIntegrity(100+numCalls,100+numCalls,100+numCalls,100+numCalls,100+numCalls,100+numCalls); 
+    }
+  }
+  
+  @ParameterizedTest
+  @MethodSource("getModdingNonNullObjectQueryListArgs")
+  public void testlastIndexOf_ModdingNonNullObject(CMEScenario objModScenario,CMEScenario preModScenario,QueryTestScenario testScenario,StructType structType)
+  {
+    ModdingObjectData moddingObjectData=initializeSeqForModdingObjectQuery(testScenario,structType,objModScenario);
+    ModdingObject moddingObject=moddingObjectData.moddingObject;
+    ConstructionArguments constructionArgs=moddingObjectData.constructionArgs;
+    boolean expectThrow=illegallyModForQuery(preModScenario,constructionArgs);
+    if(!expectThrow && testScenario==QueryTestScenario.EMPTY)
+    {
+      Assertions.assertEquals(-1,((OmniList)constructionArgs.seq).lastIndexOf(moddingObject));
+      constructionArgs.verifyStructuralIntegrity(0,0);
+      int offset=constructionArgs.verifyPreAlloc();
+      offset=constructionArgs.verifyParentPostAlloc(offset);
+      constructionArgs.verifyRootPostAlloc(offset);
+    }
+    else
+    {
+      Assertions.assertThrows(ConcurrentModificationException.class,()->((OmniList)constructionArgs.seq).lastIndexOf(moddingObject));
+      int numCalls=moddingObject.numCalls;
+      int numAdded=testScenario==QueryTestScenario.EMPTY?0:100;
+      int offset=constructionArgs.verifyPreAlloc();
+      offset+=numAdded;
+      switch(objModScenario)
+      {
+        case ModRoot:
+          switch(preModScenario)
+          {
+            case ModRoot:
+            constructionArgs.verifyStructuralIntegrity(numAdded,numAdded,numAdded,numAdded,numAdded+numCalls+1,numAdded+numCalls+1);
+            offset=constructionArgs.verifyParentPostAlloc(offset);
+            offset=constructionArgs.verifyRootPostAlloc(offset);
+            offset=constructionArgs.verifyIndex(offset,$ClassPrefix$InputTestArgType.ARRAY_TYPE,0);
+            break;
+            case ModParent:
+            constructionArgs.verifyStructuralIntegrity(numAdded,numAdded,numAdded+1,numAdded+1,numAdded+numCalls+1,numAdded+numCalls+1);
+            offset=constructionArgs.verifyParentPostAlloc(offset);
+            offset=constructionArgs.verifyIndex(offset,$ClassPrefix$InputTestArgType.ARRAY_TYPE,0);
+            offset=constructionArgs.verifyRootPostAlloc(offset);
+            break;
+            default:
+            constructionArgs.verifyStructuralIntegrity(numAdded,numAdded,numAdded,numAdded,numAdded+numCalls,numAdded+numCalls);
+            offset=constructionArgs.verifyParentPostAlloc(offset);
+            offset=constructionArgs.verifyRootPostAlloc(offset);
+          }
+          for(int i=0;i<numCalls;++i)
+          {
+            offset=constructionArgs.verifyIndex(offset,$ClassPrefix$InputTestArgType.ARRAY_TYPE,0);
+          }
+          break;
+        case ModParent:
+          switch(preModScenario)
+          {
+            case ModRoot:
+            constructionArgs.verifyStructuralIntegrity(numAdded,numAdded,numAdded,numAdded,numAdded+1,numAdded+1);
+            offset=constructionArgs.verifyParentPostAlloc(offset);
+            offset=constructionArgs.verifyRootPostAlloc(offset);
+            offset=constructionArgs.verifyIndex(offset,$ClassPrefix$InputTestArgType.ARRAY_TYPE,0);
+            break;
+            case ModParent:
+            constructionArgs.verifyStructuralIntegrity(numAdded,numAdded,numAdded+numCalls+1,numAdded+numCalls+1,numAdded+numCalls+1,numAdded+numCalls+1);
+            offset=constructionArgs.verifyParentPostAlloc(offset);
+            for(int i=0;i<numCalls;++i)
+            {
+              offset=constructionArgs.verifyIndex(offset,$ClassPrefix$InputTestArgType.ARRAY_TYPE,0);
+            }
+            offset=constructionArgs.verifyIndex(offset,$ClassPrefix$InputTestArgType.ARRAY_TYPE,0);
+            offset=constructionArgs.verifyRootPostAlloc(offset);
+            break;
+            default:
+            constructionArgs.verifyStructuralIntegrity(numAdded,numAdded,numAdded+numCalls,numAdded+numCalls,numAdded+numCalls,numAdded+numCalls);
+            offset=constructionArgs.verifyParentPostAlloc(offset);
+            for(int i=0;i<numCalls;++i)
+            {
+              offset=constructionArgs.verifyIndex(offset,$ClassPrefix$InputTestArgType.ARRAY_TYPE,0);
+            }
+            offset=constructionArgs.verifyRootPostAlloc(offset);
+          }
+          break;
+        default:
+          switch(preModScenario)
+          {
+            case ModRoot:
+              constructionArgs.verifyStructuralIntegrity(numAdded,numAdded,numAdded,numAdded,numAdded+1,numAdded+1);
+              offset=constructionArgs.verifyParentPostAlloc(offset);
+              offset=constructionArgs.verifyRootPostAlloc(offset);
+              offset=constructionArgs.verifyIndex(offset,$ClassPrefix$InputTestArgType.ARRAY_TYPE,0);
+              break;
+            case ModParent:
+              constructionArgs.verifyStructuralIntegrity(numAdded,numAdded,numAdded+1,numAdded+1,numAdded+1,numAdded+1);
+              offset=constructionArgs.verifyParentPostAlloc(offset);
+              offset=constructionArgs.verifyIndex(offset,$ClassPrefix$InputTestArgType.ARRAY_TYPE,0);
+              offset=constructionArgs.verifyRootPostAlloc(offset);
+              break;
+            default:
+              for(int i=0;i<numCalls;++i)
+              {
+                offset=constructionArgs.verifyIndex(offset,$ClassPrefix$InputTestArgType.ARRAY_TYPE,0);
+              }
+              constructionArgs.verifyStructuralIntegrity(numAdded+numCalls,numAdded+numCalls,numAdded+numCalls,numAdded+numCalls,numAdded+numCalls,numAdded+numCalls); 
+              offset=constructionArgs.verifyParentPostAlloc(offset);
+              offset=constructionArgs.verifyRootPostAlloc(offset);
+          }
       }
     }
   }
   @ParameterizedTest
-  @MethodSource("getNullQueryCollectionArguments")
-  public void testremoveVal_null( boxedType,StructType structType,QueryTestScenario testScenario){
-    ConstructionArguments constructionArgs=new ConstructionArguments(structType);
-    switch(testScenario){
-      case CONTAINSBEGINNING:
-        Assertions.assertTrue(((OmniCollection.OfRef)constructionArgs.seq).add(null));
-        for(int i=1;i<100;++i){
-          ((OmniCollection.OfRef)constructionArgs.seq).add(Boolean.FALSE);
-        }
-        switch(structType){
-          case UNCHECKEDLIST:
-          case CHECKEDLIST:
-          case UNCHECKEDSUBLIST:
-          case CHECKEDSUBLIST:
-            Assertions.assertEquals(0,((OmniList)onstructionArgs.seq).indexOf(null));
+  @MethodSource("getModdingNonNullObjectQueryListArgs")
+  public void testindexOf_ModdingNonNullObject(CMEScenario objModScenario,CMEScenario preModScenario,QueryTestScenario testScenario,StructType structType)
+  {
+    ModdingObjectData moddingObjectData=initializeSeqForModdingObjectQuery(testScenario,structType,objModScenario);
+    ModdingObject moddingObject=moddingObjectData.moddingObject;
+    ConstructionArguments constructionArgs=moddingObjectData.constructionArgs;
+    boolean expectThrow=illegallyModForQuery(preModScenario,constructionArgs);
+    if(!expectThrow && testScenario==QueryTestScenario.EMPTY)
+    {
+      Assertions.assertEquals(-1,((OmniList)constructionArgs.seq).indexOf(moddingObject));
+      constructionArgs.verifyStructuralIntegrity(0,0);
+      int offset=constructionArgs.verifyPreAlloc();
+      offset=constructionArgs.verifyParentPostAlloc(offset);
+      constructionArgs.verifyRootPostAlloc(offset);
+    }
+    else
+    {
+      Assertions.assertThrows(ConcurrentModificationException.class,()->((OmniList)constructionArgs.seq).indexOf(moddingObject));
+      int numCalls=moddingObject.numCalls;
+      int numAdded=testScenario==QueryTestScenario.EMPTY?0:100;
+      int offset=constructionArgs.verifyPreAlloc();
+      offset+=numAdded;
+      switch(objModScenario)
+      {
+        case ModRoot:
+          switch(preModScenario)
+          {
+            case ModRoot:
+            constructionArgs.verifyStructuralIntegrity(numAdded,numAdded,numAdded,numAdded,numAdded+numCalls+1,numAdded+numCalls+1);
+            offset=constructionArgs.verifyParentPostAlloc(offset);
+            offset=constructionArgs.verifyRootPostAlloc(offset);
+            offset=constructionArgs.verifyIndex(offset,$ClassPrefix$InputTestArgType.ARRAY_TYPE,0);
             break;
-          default:
-            Assertions.assertEquals(100,((OmniList)onstructionArgs.seq).search(null));
-        }
-        break;
-      case CONTAINSMIDDLE:
-        for(int i=0;i<49;++i)
-        {
-          ((OmniCollection.OfRef)constructionArgs.seq).add(Boolean.FALSE);
-        }
-        Assertions.assertTrue(((OmniCollection.OfRef)constructionArgs.seq).add(null));
-        for(int i=50;i<100;++i)
-        {
-          ((OmniCollection.OfRef)constructionArgs.seq).add(Boolean.FALSE);
-        }
-        switch(structType){
-          case UNCHECKEDLIST:
-          case CHECKEDLIST:
-          case UNCHECKEDSUBLIST:
-          case CHECKEDSUBLIST:
-            Assertions.assertEquals(49,((OmniList)onstructionArgs.seq).indexOf(null));
+            case ModParent:
+            constructionArgs.verifyStructuralIntegrity(numAdded,numAdded,numAdded+1,numAdded+1,numAdded+numCalls+1,numAdded+numCalls+1);
+            offset=constructionArgs.verifyParentPostAlloc(offset);
+            offset=constructionArgs.verifyIndex(offset,$ClassPrefix$InputTestArgType.ARRAY_TYPE,0);
+            offset=constructionArgs.verifyRootPostAlloc(offset);
             break;
-          default:
-            Assertions.assertEquals(51,((OmniList)onstructionArgs.seq).search(null));
-        }
-        break;
-      case CONTAINSEND:
-        for(int i=0;i<99;++i)
-        {
-          ((OmniCollection.OfRef)constructionArgs.seq).add(Boolean.FALSE);
-        }
-        Assertions.assertTrue(((OmniCollection.OfRef)constructionArgs.seq).add(null));
-        switch(structType){
-          case UNCHECKEDLIST:
-          case CHECKEDLIST:
-          case UNCHECKEDSUBLIST:
-          case CHECKEDSUBLIST:
-            Assertions.assertEquals(99,((OmniList)onstructionArgs.seq).indexOf(null));
+            default:
+            constructionArgs.verifyStructuralIntegrity(numAdded,numAdded,numAdded,numAdded,numAdded+numCalls,numAdded+numCalls);
+            offset=constructionArgs.verifyParentPostAlloc(offset);
+            offset=constructionArgs.verifyRootPostAlloc(offset);
+          }
+          for(int i=0;i<numCalls;++i)
+          {
+            offset=constructionArgs.verifyIndex(offset,$ClassPrefix$InputTestArgType.ARRAY_TYPE,0);
+          }
+          break;
+        case ModParent:
+          switch(preModScenario)
+          {
+            case ModRoot:
+            constructionArgs.verifyStructuralIntegrity(numAdded,numAdded,numAdded,numAdded,numAdded+1,numAdded+1);
+            offset=constructionArgs.verifyParentPostAlloc(offset);
+            offset=constructionArgs.verifyRootPostAlloc(offset);
+            offset=constructionArgs.verifyIndex(offset,$ClassPrefix$InputTestArgType.ARRAY_TYPE,0);
             break;
-          default:
-           Assertions.assertEquals(1,((OmniList)onstructionArgs.seq).indexOf(null));
-        }
-        break;
-      case DOESNOTCONTAIN:
-        for(int i=0;i<100;++i)
-        {
-          ((OmniCollection.OfRef)constructionArgs.seq).add(Boolean.FALSE);
-        }
-      default:
-        Assertions.assertFalse(constructionArgs.seq.contains(null));
-        break;
+            case ModParent:
+            constructionArgs.verifyStructuralIntegrity(numAdded,numAdded,numAdded+numCalls+1,numAdded+numCalls+1,numAdded+numCalls+1,numAdded+numCalls+1);
+            offset=constructionArgs.verifyParentPostAlloc(offset);
+            for(int i=0;i<numCalls;++i)
+            {
+              offset=constructionArgs.verifyIndex(offset,$ClassPrefix$InputTestArgType.ARRAY_TYPE,0);
+            }
+            offset=constructionArgs.verifyIndex(offset,$ClassPrefix$InputTestArgType.ARRAY_TYPE,0);
+            offset=constructionArgs.verifyRootPostAlloc(offset);
+            break;
+            default:
+            constructionArgs.verifyStructuralIntegrity(numAdded,numAdded,numAdded+numCalls,numAdded+numCalls,numAdded+numCalls,numAdded+numCalls);
+            offset=constructionArgs.verifyParentPostAlloc(offset);
+            for(int i=0;i<numCalls;++i)
+            {
+              offset=constructionArgs.verifyIndex(offset,$ClassPrefix$InputTestArgType.ARRAY_TYPE,0);
+            }
+            offset=constructionArgs.verifyRootPostAlloc(offset);
+          }
+          break;
+        default:
+          switch(preModScenario)
+          {
+            case ModRoot:
+              constructionArgs.verifyStructuralIntegrity(numAdded,numAdded,numAdded,numAdded,numAdded+1,numAdded+1);
+              offset=constructionArgs.verifyParentPostAlloc(offset);
+              offset=constructionArgs.verifyRootPostAlloc(offset);
+              offset=constructionArgs.verifyIndex(offset,$ClassPrefix$InputTestArgType.ARRAY_TYPE,0);
+              break;
+            case ModParent:
+              constructionArgs.verifyStructuralIntegrity(numAdded,numAdded,numAdded+1,numAdded+1,numAdded+1,numAdded+1);
+              offset=constructionArgs.verifyParentPostAlloc(offset);
+              offset=constructionArgs.verifyIndex(offset,$ClassPrefix$InputTestArgType.ARRAY_TYPE,0);
+              offset=constructionArgs.verifyRootPostAlloc(offset);
+              break;
+            default:
+              for(int i=0;i<numCalls;++i)
+              {
+                offset=constructionArgs.verifyIndex(offset,$ClassPrefix$InputTestArgType.ARRAY_TYPE,0);
+              }
+              constructionArgs.verifyStructuralIntegrity(numAdded+numCalls,numAdded+numCalls,numAdded+numCalls,numAdded+numCalls,numAdded+numCalls,numAdded+numCalls); 
+              offset=constructionArgs.verifyParentPostAlloc(offset);
+              offset=constructionArgs.verifyRootPostAlloc(offset);
+          }
+      }
+    }
+  }
+  
+  
+  @ParameterizedTest
+  @MethodSource("getModdingNonNullObjectQueryCollectionArgs")
+  public void testcontains_ModdingNonNullObject(CMEScenario objModScenario,CMEScenario preModScenario,QueryTestScenario testScenario,StructType structType)
+  {
+    ModdingObjectData moddingObjectData=initializeSeqForModdingObjectQuery(testScenario,structType,objModScenario);
+    ModdingObject moddingObject=moddingObjectData.moddingObject;
+    ConstructionArguments constructionArgs=moddingObjectData.constructionArgs;
+    boolean expectThrow=illegallyModForQuery(preModScenario,constructionArgs);
+    if(!expectThrow && testScenario==QueryTestScenario.EMPTY)
+    {
+      Assertions.assertFalse(constructionArgs.seq.contains(moddingObject));
+      constructionArgs.verifyStructuralIntegrity(0,0);
+      int offset=constructionArgs.verifyPreAlloc();
+      offset=constructionArgs.verifyParentPostAlloc(offset);
+      constructionArgs.verifyRootPostAlloc(offset);
+    }
+    else
+    {
+      Assertions.assertThrows(ConcurrentModificationException.class,()->constructionArgs.seq.contains(moddingObject));
+      int numCalls=moddingObject.numCalls;
+      int numAdded=testScenario==QueryTestScenario.EMPTY?0:100;
+      int offset=constructionArgs.verifyPreAlloc();
+      offset+=numAdded;
+      switch(objModScenario)
+      {
+        case ModRoot:
+          switch(preModScenario)
+          {
+            case ModRoot:
+            constructionArgs.verifyStructuralIntegrity(numAdded,numAdded,numAdded,numAdded,numAdded+numCalls+1,numAdded+numCalls+1);
+            offset=constructionArgs.verifyParentPostAlloc(offset);
+            offset=constructionArgs.verifyRootPostAlloc(offset);
+            offset=constructionArgs.verifyIndex(offset,$ClassPrefix$InputTestArgType.ARRAY_TYPE,0);
+            break;
+            case ModParent:
+            constructionArgs.verifyStructuralIntegrity(numAdded,numAdded,numAdded+1,numAdded+1,numAdded+numCalls+1,numAdded+numCalls+1);
+            offset=constructionArgs.verifyParentPostAlloc(offset);
+            offset=constructionArgs.verifyIndex(offset,$ClassPrefix$InputTestArgType.ARRAY_TYPE,0);
+            offset=constructionArgs.verifyRootPostAlloc(offset);
+            break;
+            default:
+            constructionArgs.verifyStructuralIntegrity(numAdded,numAdded,numAdded,numAdded,numAdded+numCalls,numAdded+numCalls);
+            offset=constructionArgs.verifyParentPostAlloc(offset);
+            offset=constructionArgs.verifyRootPostAlloc(offset);
+          }
+          for(int i=0;i<numCalls;++i)
+          {
+            offset=constructionArgs.verifyIndex(offset,$ClassPrefix$InputTestArgType.ARRAY_TYPE,0);
+          }
+          break;
+        case ModParent:
+          switch(preModScenario)
+          {
+            case ModRoot:
+            constructionArgs.verifyStructuralIntegrity(numAdded,numAdded,numAdded,numAdded,numAdded+1,numAdded+1);
+            offset=constructionArgs.verifyParentPostAlloc(offset);
+            offset=constructionArgs.verifyRootPostAlloc(offset);
+            offset=constructionArgs.verifyIndex(offset,$ClassPrefix$InputTestArgType.ARRAY_TYPE,0);
+            break;
+            case ModParent:
+            constructionArgs.verifyStructuralIntegrity(numAdded,numAdded,numAdded+numCalls+1,numAdded+numCalls+1,numAdded+numCalls+1,numAdded+numCalls+1);
+            offset=constructionArgs.verifyParentPostAlloc(offset);
+            for(int i=0;i<numCalls;++i)
+            {
+              offset=constructionArgs.verifyIndex(offset,$ClassPrefix$InputTestArgType.ARRAY_TYPE,0);
+            }
+            offset=constructionArgs.verifyIndex(offset,$ClassPrefix$InputTestArgType.ARRAY_TYPE,0);
+            offset=constructionArgs.verifyRootPostAlloc(offset);
+            break;
+            default:
+            constructionArgs.verifyStructuralIntegrity(numAdded,numAdded,numAdded+numCalls,numAdded+numCalls,numAdded+numCalls,numAdded+numCalls);
+            offset=constructionArgs.verifyParentPostAlloc(offset);
+            for(int i=0;i<numCalls;++i)
+            {
+              offset=constructionArgs.verifyIndex(offset,$ClassPrefix$InputTestArgType.ARRAY_TYPE,0);
+            }
+            offset=constructionArgs.verifyRootPostAlloc(offset);
+          }
+          break;
+        default:
+          switch(preModScenario)
+          {
+            case ModRoot:
+              constructionArgs.verifyStructuralIntegrity(numAdded,numAdded,numAdded,numAdded,numAdded+1,numAdded+1);
+              offset=constructionArgs.verifyParentPostAlloc(offset);
+              offset=constructionArgs.verifyRootPostAlloc(offset);
+              offset=constructionArgs.verifyIndex(offset,$ClassPrefix$InputTestArgType.ARRAY_TYPE,0);
+              break;
+            case ModParent:
+              constructionArgs.verifyStructuralIntegrity(numAdded,numAdded,numAdded+1,numAdded+1,numAdded+1,numAdded+1);
+              offset=constructionArgs.verifyParentPostAlloc(offset);
+              offset=constructionArgs.verifyIndex(offset,$ClassPrefix$InputTestArgType.ARRAY_TYPE,0);
+              offset=constructionArgs.verifyRootPostAlloc(offset);
+              break;
+            default:
+              for(int i=0;i<numCalls;++i)
+              {
+                offset=constructionArgs.verifyIndex(offset,$ClassPrefix$InputTestArgType.ARRAY_TYPE,0);
+              }
+              constructionArgs.verifyStructuralIntegrity(numAdded+numCalls,numAdded+numCalls,numAdded+numCalls,numAdded+numCalls,numAdded+numCalls,numAdded+numCalls); 
+              offset=constructionArgs.verifyParentPostAlloc(offset);
+              offset=constructionArgs.verifyRootPostAlloc(offset);
+          }
+      }
     }
   }
   @ParameterizedTest
-  @MethodSource("getPrimitiveQueryCollectionArguments")
-  public void testremoveVal_ObjectprimitiveVal(QueryTestScenario testScenario,QueryTestPrimitiveInputType inputArgType,StructType structType)
+  @MethodSource("getModdingNonNullObjectQueryCollectionArgs")
+  public void testremoveVal_ModdingNonNullObject(CMEScenario objModScenario,CMEScenario preModScenario,QueryTestScenario testScenario,StructType structType)
   {
-    ConstructionArguments constructionArgs=new ConstructionArguments(structType);
+    ModdingObjectData moddingObjectData=initializeSeqForModdingObjectQuery(testScenario,structType,objModScenario);
+    ModdingObject moddingObject=moddingObjectData.moddingObject;
+    ConstructionArguments constructionArgs=moddingObjectData.constructionArgs;
+    boolean expectThrow=illegallyModForQuery(preModScenario,constructionArgs);
+    if(!expectThrow && testScenario==QueryTestScenario.EMPTY)
+    {
+      Assertions.assertFalse(constructionArgs.seq.remove(moddingObject));
+      constructionArgs.verifyStructuralIntegrity(0,0);
+      int offset=constructionArgs.verifyPreAlloc();
+      offset=constructionArgs.verifyParentPostAlloc(offset);
+      constructionArgs.verifyRootPostAlloc(offset);
+    }
+    else
+    {
+      Assertions.assertThrows(ConcurrentModificationException.class,()->constructionArgs.seq.remove(moddingObject));
+      int numCalls=moddingObject.numCalls;
+      int numAdded=testScenario==QueryTestScenario.EMPTY?0:100;
+      int offset=constructionArgs.verifyPreAlloc();
+      offset+=numAdded;
+      switch(objModScenario)
+      {
+        case ModRoot:
+          switch(preModScenario)
+          {
+            case ModRoot:
+            constructionArgs.verifyStructuralIntegrity(numAdded,numAdded,numAdded,numAdded,numAdded+numCalls+1,numAdded+numCalls+1);
+            offset=constructionArgs.verifyParentPostAlloc(offset);
+            offset=constructionArgs.verifyRootPostAlloc(offset);
+            offset=constructionArgs.verifyIndex(offset,$ClassPrefix$InputTestArgType.ARRAY_TYPE,0);
+            break;
+            case ModParent:
+            constructionArgs.verifyStructuralIntegrity(numAdded,numAdded,numAdded+1,numAdded+1,numAdded+numCalls+1,numAdded+numCalls+1);
+            offset=constructionArgs.verifyParentPostAlloc(offset);
+            offset=constructionArgs.verifyIndex(offset,$ClassPrefix$InputTestArgType.ARRAY_TYPE,0);
+            offset=constructionArgs.verifyRootPostAlloc(offset);
+            break;
+            default:
+            constructionArgs.verifyStructuralIntegrity(numAdded,numAdded,numAdded,numAdded,numAdded+numCalls,numAdded+numCalls);
+            offset=constructionArgs.verifyParentPostAlloc(offset);
+            offset=constructionArgs.verifyRootPostAlloc(offset);
+          }
+          for(int i=0;i<numCalls;++i)
+          {
+            offset=constructionArgs.verifyIndex(offset,$ClassPrefix$InputTestArgType.ARRAY_TYPE,0);
+          }
+          break;
+        case ModParent:
+          switch(preModScenario)
+          {
+            case ModRoot:
+            constructionArgs.verifyStructuralIntegrity(numAdded,numAdded,numAdded,numAdded,numAdded+1,numAdded+1);
+            offset=constructionArgs.verifyParentPostAlloc(offset);
+            offset=constructionArgs.verifyRootPostAlloc(offset);
+            offset=constructionArgs.verifyIndex(offset,$ClassPrefix$InputTestArgType.ARRAY_TYPE,0);
+            break;
+            case ModParent:
+            constructionArgs.verifyStructuralIntegrity(numAdded,numAdded,numAdded+numCalls+1,numAdded+numCalls+1,numAdded+numCalls+1,numAdded+numCalls+1);
+            offset=constructionArgs.verifyParentPostAlloc(offset);
+            for(int i=0;i<numCalls;++i)
+            {
+              offset=constructionArgs.verifyIndex(offset,$ClassPrefix$InputTestArgType.ARRAY_TYPE,0);
+            }
+            offset=constructionArgs.verifyIndex(offset,$ClassPrefix$InputTestArgType.ARRAY_TYPE,0);
+            offset=constructionArgs.verifyRootPostAlloc(offset);
+            break;
+            default:
+            constructionArgs.verifyStructuralIntegrity(numAdded,numAdded,numAdded+numCalls,numAdded+numCalls,numAdded+numCalls,numAdded+numCalls);
+            offset=constructionArgs.verifyParentPostAlloc(offset);
+            for(int i=0;i<numCalls;++i)
+            {
+              offset=constructionArgs.verifyIndex(offset,$ClassPrefix$InputTestArgType.ARRAY_TYPE,0);
+            }
+            offset=constructionArgs.verifyRootPostAlloc(offset);
+          }
+          break;
+        default:
+          switch(preModScenario)
+          {
+            case ModRoot:
+              constructionArgs.verifyStructuralIntegrity(numAdded,numAdded,numAdded,numAdded,numAdded+1,numAdded+1);
+              offset=constructionArgs.verifyParentPostAlloc(offset);
+              offset=constructionArgs.verifyRootPostAlloc(offset);
+              offset=constructionArgs.verifyIndex(offset,$ClassPrefix$InputTestArgType.ARRAY_TYPE,0);
+              break;
+            case ModParent:
+              constructionArgs.verifyStructuralIntegrity(numAdded,numAdded,numAdded+1,numAdded+1,numAdded+1,numAdded+1);
+              offset=constructionArgs.verifyParentPostAlloc(offset);
+              offset=constructionArgs.verifyIndex(offset,$ClassPrefix$InputTestArgType.ARRAY_TYPE,0);
+              offset=constructionArgs.verifyRootPostAlloc(offset);
+              break;
+            default:
+              for(int i=0;i<numCalls;++i)
+              {
+                offset=constructionArgs.verifyIndex(offset,$ClassPrefix$InputTestArgType.ARRAY_TYPE,0);
+              }
+              constructionArgs.verifyStructuralIntegrity(numAdded+numCalls,numAdded+numCalls,numAdded+numCalls,numAdded+numCalls,numAdded+numCalls,numAdded+numCalls); 
+              offset=constructionArgs.verifyParentPostAlloc(offset);
+              offset=constructionArgs.verifyRootPostAlloc(offset);
+          }
+      }
+    }
+  }
+#ENDIF
+  
+
+  @ParameterizedTest
+  @MethodSource("getQueryListArguments")
+  public void testindexOf_val(CMEScenario modScenario,QueryCast queryCast,QueryTestScenario testScenario,QueryTestInputType inputArgType,StructType structType){
+    ConstructionArguments constructionArgs=initializeSeqForQuery(testScenario,inputArgType,structType);
+    boolean expectThrow=illegallyModForQuery(queryCast,modScenario,inputArgType,testScenario,constructionArgs);
+    int expectedRet;
     switch(testScenario){
       case CONTAINSBEGINNING:
-        Assertions.assertTrue(inputArgType.attemptAdd(constructionArgs.seq));
-        for(int i=1;i<100;++i)
-        {
-          inputArgType.addNotEqualsVal(constructionArgs.seq);
-        }
-        switch(structType){
-          case UNCHECKEDLIST:
-          case CHECKEDLIST:
-          case UNCHECKEDSUBLIST:
-          case CHECKEDSUBLIST:
-            Assertions.assertEquals(0,inputArgType.invokeindexOf(constructionArgs.seq));
-            break;
-          default:
-            Assertions.assertEquals(100,inputArgType.invokesearch(constructionArgs.seq));
-        }
+        expectedRet=0;
         break;
       case CONTAINSMIDDLE:
-        for(int i=0;i<49;++i)
-        {
-          inputArgType.addNotEqualsVal(constructionArgs.seq);
-        }
-        Assertions.assertTrue(inputArgType.attemptAdd(constructionArgs.seq));
-        for(int i=50;i<100;++i)
-        {
-          inputArgType.addNotEqualsVal(constructionArgs.seq);
-        }
-        switch(structType){
-          case UNCHECKEDLIST:
-          case CHECKEDLIST:
-          case UNCHECKEDSUBLIST:
-          case CHECKEDSUBLIST:
-            Assertions.assertEquals(49,inputArgType.invokeindexOf(constructionArgs.seq));
-            break;
-          default:
-            Assertions.assertEquals(51,inputArgType.invokesearch(constructionArgs.seq));
-        }
+        expectedRet=49;
         break;
       case CONTAINSEND:
-        for(int i=0;i<99;++i)
-        {
-          inputArgType.addNotEqualsVal(constructionArgs.seq);
-        }
-        Assertions.assertTrue(inputArgType.attemptAdd(constructionArgs.seq));
-        switch(structType){
-          case UNCHECKEDLIST:
-          case CHECKEDLIST:
-          case UNCHECKEDSUBLIST:
-          case CHECKEDSUBLIST:
-            Assertions.assertEquals(99,inputArgType.invokeindexOf(constructionArgs.seq));
-            break;
-          default:
-            Assertions.assertEquals(1,inputArgType.invokesearch(constructionArgs.seq));
-        }
-        break;
-      case DOESNOTCONTAIN:
-        for(int i=0;i<100;++i)
-        {
-          inputArgType.addNotEqualsVal(constructionArgs.seq);
-        }
-      default:
-        Assertions.assertFalse(inputArgType.invokecontains(constructionArgs.seq));
-        break;
-    }
-    boolean removedVal=false;
-     switch(testScenario){
-      default:
-      #IF OfRef
-        Assertions.assertTrue(inputArgType.invokeObjectremoveVal(constructionArgs.seq));
-        removedVal=true;
-      #ELSE
-        Assertions.assertEquals(removedVal=$ArrayType$.class.equals(inputArgType.primitiveClass),inputArgType.invokeObjectremoveVal(constructionArgs.seq));
-      #ENDIF
-      case EMPTY:
-      case DOESNOTCONTAIN:
-        Assertions.assertFalse(inputArgType.invokeObjectremoveVal(constructionArgs.seq));
-    }
-    switch(testScenario){
-      case DOESNOTCONTAIN:
-        Assertions.assertFalse(inputArgType.invokeObjectcontains(constructionArgs.seq));
-        constructionArgs.verifyStructuralIntegrity(100,100);
-        int offset=constructionArgs.verifyPreAlloc();
-        offset=constructionArgs.verifyParentPostAlloc(offset+100);
-        offset=constructionArgs.verifyRootPostAlloc(offset);
-        break;
-      case EMPTY:
-        Assertions.assertFalse(inputArgType.invokeObjectcontains(constructionArgs.seq));
-        constructionArgs.verifyStructuralIntegrity(0,0);
-        offset=constructionArgs.verifyPreAlloc();
-        offset=constructionArgs.verifyParentPostAlloc(offset);
-        offset=constructionArgs.verifyRootPostAlloc(offset);
+        expectedRet=99;
         break;
       default:
-        Assertions.assertFalse(inputArgType.invokeObjectcontains(constructionArgs.seq));
-        constructionArgs.verifyStructuralIntegrity(removedVal?99:100,removedVal?101:100);
-        offset=constructionArgs.verifyPreAlloc();
-        offset=constructionArgs.verifyParentPostAlloc(offset+(removedVal?99:100));
-        offset=constructionArgs.verifyRootPostAlloc(offset);
-#IF OfRef
-        Assertions.assertEquals(removedVal,constructionArgs.root.arr[offset]==null);
-#ENDIF
+        expectedRet=-1;
     }
+    switch(queryCast){
+      case ToBoxed:
+        if(expectThrow){
+          Assertions.assertThrows(ConcurrentModificationException.class,()->inputArgType.invokeBoxedindexOf(constructionArgs.seq));
+        }else{
+          Assertions.assertEquals(expectedRet,inputArgType.invokeBoxedindexOf(constructionArgs.seq));
+        }
+        break;
+      case ToObject:
+        if(expectThrow){
+          Assertions.assertThrows(ConcurrentModificationException.class,()->inputArgType.invokeObjectindexOf(constructionArgs.seq));
+        }else{
+          Assertions.assertEquals(expectedRet,inputArgType.invokeObjectindexOf(constructionArgs.seq));
+        }
+        break;
+      default:
+        if(expectThrow){
+          Assertions.assertThrows(ConcurrentModificationException.class,()->inputArgType.invokeindexOf(constructionArgs.seq));
+        }else{
+          Assertions.assertEquals(expectedRet,inputArgType.invokeindexOf(constructionArgs.seq));
+        }
+    }
+    verifyQueryDidNotModify(modScenario,constructionArgs,testScenario);
   }
   @ParameterizedTest
-  @MethodSource("getPrimitiveQueryCollectionArguments")
-  public void testremoveVal_BoxedprimitiveVal(QueryTestScenario testScenario,QueryTestPrimitiveInputType inputArgType,StructType structType)
-  {
-    ConstructionArguments constructionArgs=new ConstructionArguments(structType);
+  @MethodSource("getQueryListArguments")
+  public void testlastIndexOf_val(CMEScenario modScenario,QueryCast queryCast,QueryTestScenario testScenario,QueryTestInputType inputArgType,StructType structType){
+    ConstructionArguments constructionArgs=initializeSeqForQuery(testScenario,inputArgType,structType);
+    boolean expectThrow=illegallyModForQuery(queryCast,modScenario,inputArgType,testScenario,constructionArgs);
+    int expectedRet;
     switch(testScenario){
       case CONTAINSBEGINNING:
-        Assertions.assertTrue(inputArgType.attemptAdd(constructionArgs.seq));
-        for(int i=1;i<100;++i)
-        {
-          inputArgType.addNotEqualsVal(constructionArgs.seq);
-        }
-        switch(structType){
-          case UNCHECKEDLIST:
-          case CHECKEDLIST:
-          case UNCHECKEDSUBLIST:
-          case CHECKEDSUBLIST:
-            Assertions.assertEquals(0,inputArgType.invokeindexOf(constructionArgs.seq));
-            break;
-          default:
-            Assertions.assertEquals(100,inputArgType.invokesearch(constructionArgs.seq));
-        }
+        expectedRet=0;
         break;
       case CONTAINSMIDDLE:
-        for(int i=0;i<49;++i)
-        {
-          inputArgType.addNotEqualsVal(constructionArgs.seq);
-        }
-        Assertions.assertTrue(inputArgType.attemptAdd(constructionArgs.seq));
-        for(int i=50;i<100;++i)
-        {
-          inputArgType.addNotEqualsVal(constructionArgs.seq);
-        }
-        switch(structType){
-          case UNCHECKEDLIST:
-          case CHECKEDLIST:
-          case UNCHECKEDSUBLIST:
-          case CHECKEDSUBLIST:
-            Assertions.assertEquals(49,inputArgType.invokeindexOf(constructionArgs.seq));
-            break;
-          default:
-            Assertions.assertEquals(51,inputArgType.invokesearch(constructionArgs.seq));
-        }
+        expectedRet=49;
         break;
       case CONTAINSEND:
-        for(int i=0;i<99;++i)
-        {
-          inputArgType.addNotEqualsVal(constructionArgs.seq);
-        }
-        Assertions.assertTrue(inputArgType.attemptAdd(constructionArgs.seq));
-        switch(structType){
-          case UNCHECKEDLIST:
-          case CHECKEDLIST:
-          case UNCHECKEDSUBLIST:
-          case CHECKEDSUBLIST:
-            Assertions.assertEquals(99,inputArgType.invokeindexOf(constructionArgs.seq));
-            break;
-          default:
-            Assertions.assertEquals(1,inputArgType.invokesearch(constructionArgs.seq));
-        }
-        break;
-      case DOESNOTCONTAIN:
-        for(int i=0;i<100;++i)
-        {
-          inputArgType.addNotEqualsVal(constructionArgs.seq);
-        }
-      default:
-        Assertions.assertFalse(inputArgType.invokecontains(constructionArgs.seq));
-        break;
-    }
-     switch(testScenario){
-      default:
-        Assertions.assertTrue(inputArgType.invokeBoxedremoveVal(constructionArgs.seq));
-      case EMPTY:
-      case DOESNOTCONTAIN:
-        Assertions.assertFalse(inputArgType.invokeBoxedremoveVal(constructionArgs.seq));
-    }
-    switch(testScenario){
-      case DOESNOTCONTAIN:
-        Assertions.assertFalse(inputArgType.invokeBoxedcontains(constructionArgs.seq));
-        constructionArgs.verifyStructuralIntegrity(100,100);
-        int offset=constructionArgs.verifyPreAlloc();
-        offset=constructionArgs.verifyParentPostAlloc(offset+100);
-        offset=constructionArgs.verifyRootPostAlloc(offset);
-        break;
-      case EMPTY:
-        Assertions.assertFalse(inputArgType.invokeBoxedcontains(constructionArgs.seq));
-        constructionArgs.verifyStructuralIntegrity(0,0);
-        offset=constructionArgs.verifyPreAlloc();
-        offset=constructionArgs.verifyParentPostAlloc(offset);
-        offset=constructionArgs.verifyRootPostAlloc(offset);
+        expectedRet=99;
         break;
       default:
-        Assertions.assertFalse(inputArgType.invokeBoxedcontains(constructionArgs.seq));
-        constructionArgs.verifyStructuralIntegrity(99,101);
-        offset=constructionArgs.verifyPreAlloc();
-        offset=constructionArgs.verifyParentPostAlloc(offset+99);
-        offset=constructionArgs.verifyRootPostAlloc(offset);
-#IF OfRef
-        Assertions.assertNull(constructionArgs.root.arr[offset]);
-#ENDIF
+        expectedRet=-1;
     }
+    switch(queryCast){
+      case ToBoxed:
+        if(expectThrow){
+          Assertions.assertThrows(ConcurrentModificationException.class,()->inputArgType.invokeBoxedlastIndexOf(constructionArgs.seq));
+        }else{
+          Assertions.assertEquals(expectedRet,inputArgType.invokeBoxedlastIndexOf(constructionArgs.seq));
+        }
+        break;
+      case ToObject:
+        if(expectThrow){
+          Assertions.assertThrows(ConcurrentModificationException.class,()->inputArgType.invokeObjectlastIndexOf(constructionArgs.seq));
+        }else{
+          Assertions.assertEquals(expectedRet,inputArgType.invokeObjectlastIndexOf(constructionArgs.seq));
+        }
+        break;
+      default:
+        if(expectThrow){
+          Assertions.assertThrows(ConcurrentModificationException.class,()->inputArgType.invokelastIndexOf(constructionArgs.seq));
+        }else{
+          Assertions.assertEquals(expectedRet,inputArgType.invokelastIndexOf(constructionArgs.seq));
+        }
+    }
+    verifyQueryDidNotModify(modScenario,constructionArgs,testScenario);
   }
   @ParameterizedTest
-  @MethodSource("getPrimitiveQueryCollectionArguments")
-  public void testremoveVal_primitiveVal(QueryTestScenario testScenario,QueryTestPrimitiveInputType inputArgType,StructType structType)
-  {
-    ConstructionArguments constructionArgs=new ConstructionArguments(structType);
+  @MethodSource("getQueryStackArguments")
+  public void testsearch_val(CMEScenario modScenario,QueryCast queryCast,QueryTestScenario testScenario,QueryTestInputType inputArgType,StructType structType){
+    ConstructionArguments constructionArgs=initializeSeqForQuery(testScenario,inputArgType,structType);
+    int expectedRet;
     switch(testScenario){
       case CONTAINSBEGINNING:
-        Assertions.assertTrue(inputArgType.attemptAdd(constructionArgs.seq));
-        for(int i=1;i<100;++i)
-        {
-          inputArgType.addNotEqualsVal(constructionArgs.seq);
-        }
-        switch(structType){
-          case UNCHECKEDLIST:
-          case CHECKEDLIST:
-          case UNCHECKEDSUBLIST:
-          case CHECKEDSUBLIST:
-            Assertions.assertEquals(0,inputArgType.invokeindexOf(constructionArgs.seq));
-            break;
-          default:
-            Assertions.assertEquals(100,inputArgType.invokesearch(constructionArgs.seq));
-        }
+        expectedRet=100;
         break;
       case CONTAINSMIDDLE:
-        for(int i=0;i<49;++i)
-        {
-          inputArgType.addNotEqualsVal(constructionArgs.seq);
-        }
-        Assertions.assertTrue(inputArgType.attemptAdd(constructionArgs.seq));
-        for(int i=50;i<100;++i)
-        {
-          inputArgType.addNotEqualsVal(constructionArgs.seq);
-        }
-        switch(structType){
-          case UNCHECKEDLIST:
-          case CHECKEDLIST:
-          case UNCHECKEDSUBLIST:
-          case CHECKEDSUBLIST:
-            Assertions.assertEquals(49,inputArgType.invokeindexOf(constructionArgs.seq));
-            break;
-          default:
-            Assertions.assertEquals(51,inputArgType.invokesearch(constructionArgs.seq));
-        }
+        expectedRet=51;
         break;
       case CONTAINSEND:
-        for(int i=0;i<99;++i)
-        {
-          inputArgType.addNotEqualsVal(constructionArgs.seq);
-        }
-        Assertions.assertTrue(inputArgType.attemptAdd(constructionArgs.seq));
-        switch(structType){
-          case UNCHECKEDLIST:
-          case CHECKEDLIST:
-          case UNCHECKEDSUBLIST:
-          case CHECKEDSUBLIST:
-            Assertions.assertEquals(99,inputArgType.invokeindexOf(constructionArgs.seq));
-            break;
-          default:
-            Assertions.assertEquals(1,inputArgType.invokesearch(constructionArgs.seq));
-        }
+        expectedRet=1;
         break;
-      case DOESNOTCONTAIN:
-        for(int i=0;i<100;++i)
-        {
-          inputArgType.addNotEqualsVal(constructionArgs.seq);
-        }
       default:
-        Assertions.assertFalse(inputArgType.invokecontains(constructionArgs.seq));
-        break;
+        expectedRet=-1;
     }
+    switch(queryCast){
+    case ToBoxed:
+      Assertions.assertEquals(expectedRet,inputArgType.invokeBoxedsearch(constructionArgs.seq));
+      break;
+    case ToObject:
+      Assertions.assertEquals(expectedRet,inputArgType.invokeObjectsearch(constructionArgs.seq));
+      break;
+    default:
+      Assertions.assertEquals(expectedRet,inputArgType.invokesearch(constructionArgs.seq));
+    }
+    verifyQueryDidNotModify(modScenario,constructionArgs,testScenario);
+  }
+  @ParameterizedTest
+  @MethodSource("getQueryCollectionArguments")
+  public void testcontains_val(CMEScenario modScenario,QueryCast queryCast,QueryTestScenario testScenario,QueryTestInputType inputArgType,StructType structType){
+    ConstructionArguments constructionArgs=initializeSeqForQuery(testScenario,inputArgType,structType);
+    boolean expectThrow=illegallyModForQuery(queryCast,modScenario,inputArgType,testScenario,constructionArgs);
+    boolean expectedRet;
     switch(testScenario){
+      case CONTAINSBEGINNING:
+      case CONTAINSMIDDLE:
+      case CONTAINSEND:
+        expectedRet=true;
+        break;
       default:
-        Assertions.assertTrue(inputArgType.invokeremoveVal(constructionArgs.seq));
-      case EMPTY:
-      case DOESNOTCONTAIN:
-        Assertions.assertFalse(inputArgType.invokeremoveVal(constructionArgs.seq));
+        expectedRet=false;
     }
-    switch(testScenario){
-      case DOESNOTCONTAIN:
-        Assertions.assertFalse(inputArgType.invokecontains(constructionArgs.seq));
-        constructionArgs.verifyStructuralIntegrity(100,100);
-        int offset=constructionArgs.verifyPreAlloc();
-        offset=constructionArgs.verifyParentPostAlloc(offset+100);
-        offset=constructionArgs.verifyRootPostAlloc(offset);
+    switch(queryCast){
+      case ToBoxed:
+        if(expectThrow){
+          Assertions.assertThrows(ConcurrentModificationException.class,()->inputArgType.invokeBoxedcontains(constructionArgs.seq));
+        }else{
+          Assertions.assertEquals(expectedRet,inputArgType.invokeBoxedcontains(constructionArgs.seq));
+        }
         break;
-      case EMPTY:
-        Assertions.assertFalse(inputArgType.invokecontains(constructionArgs.seq));
-        constructionArgs.verifyStructuralIntegrity(0,0);
-        offset=constructionArgs.verifyPreAlloc();
+      case ToObject:
+        if(expectThrow){
+          Assertions.assertThrows(ConcurrentModificationException.class,()->inputArgType.invokeObjectcontains(constructionArgs.seq));
+        }else{
+          Assertions.assertEquals(expectedRet,inputArgType.invokeObjectcontains(constructionArgs.seq));
+        }
+        break;
+      default:
+        if(expectThrow){
+          Assertions.assertThrows(ConcurrentModificationException.class,()->inputArgType.invokecontains(constructionArgs.seq));
+        }else{
+          Assertions.assertEquals(expectedRet,inputArgType.invokecontains(constructionArgs.seq));
+        }
+    }
+    verifyQueryDidNotModify(modScenario,constructionArgs,testScenario);
+  }
+  @ParameterizedTest
+  @MethodSource("getQueryCollectionArguments")
+  public void testremoveVal_val(CMEScenario modScenario,QueryCast queryCast,QueryTestScenario testScenario,QueryTestInputType inputArgType,StructType structType){
+    ConstructionArguments constructionArgs=initializeSeqForQuery(testScenario,inputArgType,structType);
+    boolean expectThrow=illegallyModForQuery(queryCast,modScenario,inputArgType,testScenario,constructionArgs);
+    boolean expectedRet;
+    switch(testScenario){
+      case CONTAINSBEGINNING:
+      case CONTAINSMIDDLE:
+      case CONTAINSEND:
+        expectedRet=true;
+        break;
+      default:
+        expectedRet=false;
+    }
+    switch(queryCast){
+      case ToBoxed:
+        if(expectThrow){
+          Assertions.assertThrows(ConcurrentModificationException.class,()->inputArgType.invokeBoxedremoveVal(constructionArgs.seq));
+        }else{
+          Assertions.assertEquals(expectedRet,inputArgType.invokeBoxedremoveVal(constructionArgs.seq));
+          Assertions.assertFalse(inputArgType.invokeBoxedcontains(constructionArgs.seq));
+        }
+        break;
+      case ToObject:
+       if(expectThrow){
+          Assertions.assertThrows(ConcurrentModificationException.class,()->inputArgType.invokeObjectremoveVal(constructionArgs.seq));
+        }else{
+          Assertions.assertEquals(expectedRet,inputArgType.invokeObjectremoveVal(constructionArgs.seq));
+          Assertions.assertFalse(inputArgType.invokeObjectcontains(constructionArgs.seq));
+        }
+        break;
+      default:
+        if(expectThrow){
+          Assertions.assertThrows(ConcurrentModificationException.class,()->inputArgType.invokeremoveVal(constructionArgs.seq));
+        }else{
+          Assertions.assertEquals(expectedRet,inputArgType.invokeremoveVal(constructionArgs.seq));
+          Assertions.assertFalse(inputArgType.invokecontains(constructionArgs.seq));
+        }
+    }
+    int offset=constructionArgs.verifyPreAlloc();
+    switch(modScenario){
+      case ModParent:
+        if(testScenario==QueryTestScenario.EMPTY){
+          constructionArgs.verifyStructuralIntegrity(0,0,1,1);
+        }else{
+          constructionArgs.verifyStructuralIntegrity(100,100,101,101);
+          offset+=100;
+        }
+        offset=constructionArgs.verifyParentPostAlloc(offset);
+        offset=constructionArgs.verifyIndex(offset,$ClassPrefix$InputTestArgType.ARRAY_TYPE,0);
+        constructionArgs.verifyRootPostAlloc(offset);
+        break;
+      case ModRoot:
+        if(testScenario==QueryTestScenario.EMPTY){
+          constructionArgs.verifyStructuralIntegrity(0,0,0,0,1,1);
+        }else{
+          constructionArgs.verifyStructuralIntegrity(100,100,100,100,101,101);
+          offset+=100;
+        }
         offset=constructionArgs.verifyParentPostAlloc(offset);
         offset=constructionArgs.verifyRootPostAlloc(offset);
+        constructionArgs.verifyIndex(offset,$ClassPrefix$InputTestArgType.ARRAY_TYPE,0);
         break;
       default:
-        Assertions.assertFalse(inputArgType.invokecontains(constructionArgs.seq));
-        constructionArgs.verifyStructuralIntegrity(99,101);
-        offset=constructionArgs.verifyPreAlloc();
-        offset=constructionArgs.verifyParentPostAlloc(offset+99);
-        offset=constructionArgs.verifyRootPostAlloc(offset);
+        switch(testScenario){
+          case DOESNOTCONTAIN:
+            constructionArgs.verifyStructuralIntegrity(100,100);
+            offset=constructionArgs.verifyParentPostAlloc(offset+100);
+            constructionArgs.verifyRootPostAlloc(offset);
+            break;
+          case EMPTY:
+            constructionArgs.verifyStructuralIntegrity(0,0);
+            offset=constructionArgs.verifyParentPostAlloc(offset);
+            constructionArgs.verifyRootPostAlloc(offset);
+            break;
+          default:
+            constructionArgs.verifyStructuralIntegrity(99,101);
+            offset=constructionArgs.verifyParentPostAlloc(offset+99);
+            offset=constructionArgs.verifyRootPostAlloc(offset);
 #IF OfRef
-        Assertions.assertNull(constructionArgs.root.arr[offset]);
+            Assertions.assertTrue(constructionArgs.root.arr[offset]==null);
 #ENDIF
+        }
     }
   }
+  
 
 #MACRODEF SubListImpl<CHECKED>()
 @Test

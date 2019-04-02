@@ -169,12 +169,51 @@ public abstract class IntArrSeq implements OmniCollection.OfInt
   public boolean contains(Object val)
   {
     final int size;
-    if((size=this.size)!=0)
-    {
-      if(val instanceof Integer)
-      {
-        return OmniArray.OfInt.uncheckedcontains(this.arr,0,size-1,(int)(val));
+    if((size=this.size)!=0){
+     //TODO a pattern-matching switch statement would be great here
+      returnFalse:for(;;){
+        final int i;
+        if(val instanceof Integer||val instanceof Byte||val instanceof Short){
+          i=((Number)val).intValue();
+        }else if(val instanceof Long){
+          final long l;
+          if((l=(long)val)!=(i=(int)l)){
+            break returnFalse;
+          }
+        }else if(val instanceof Float){
+          final float f;
+          if((double)(f=(float)val)!=(double)(i=(int)f)){
+            break returnFalse;
+          }
+        }else if(val instanceof Double){
+          final double d;
+          if((d=(double)val)!=(i=(int)d)){
+            break returnFalse;
+          }
+        }else if(val instanceof Character){
+          i=(char)val;
+        }else if(val instanceof Boolean){
+          i=TypeUtil.castToByte((boolean)val);
+        }else{
+          break returnFalse;
+        }
+        return OmniArray.OfInt.uncheckedcontains(this.arr,0,size-1,i);
       }
+  //#ELSE
+  //    if(val instanceof Integer)
+  //    {
+  //  #IF OfDouble,OfFloat
+  //      final int v;
+  //      if((v=(int)val)==v)
+  //      {
+  //        #MACRO ReturnUncheckedQueryBits($convertToBits$(v))
+  //      }
+  //      #MACRO ReturnUncheckedQueryNaN()
+  //  #ELSE
+  //      #MACRO ReturnUncheckedQuery((int)(val))
+  //  #ENDIF
+  //    }
+  //#ENDIF
     }
     return false;
   }
@@ -270,12 +309,51 @@ public abstract class IntArrSeq implements OmniCollection.OfInt
   public boolean remove(Object val)
   {
     final int size;
-    if((size=this.size)!=0)
-    {
-      if(val instanceof Integer)
-      {
-        return this.uncheckedremoveVal(size,(int)(val));
+    if((size=this.size)!=0){
+     //TODO a pattern-matching switch statement would be great here
+      returnFalse:for(;;){
+        final int i;
+        if(val instanceof Integer||val instanceof Byte||val instanceof Short){
+          i=((Number)val).intValue();
+        }else if(val instanceof Long){
+          final long l;
+          if((l=(long)val)!=(i=(int)l)){
+            break returnFalse;
+          }
+        }else if(val instanceof Float){
+          final float f;
+          if((double)(f=(float)val)!=(double)(i=(int)f)){
+            break returnFalse;
+          }
+        }else if(val instanceof Double){
+          final double d;
+          if((d=(double)val)!=(i=(int)d)){
+            break returnFalse;
+          }
+        }else if(val instanceof Character){
+          i=(char)val;
+        }else if(val instanceof Boolean){
+          i=TypeUtil.castToByte((boolean)val);
+        }else{
+          break returnFalse;
+        }
+        return this.uncheckedremoveVal(size,i);
       }
+  //#ELSE
+  //    if(val instanceof Integer)
+  //    {
+  //  #IF OfDouble,OfFloat
+  //      final int v;
+  //      if((v=(int)val)==v)
+  //      {
+  //        #MACRO ReturnUncheckedQueryBits($convertToBits$(v))
+  //      }
+  //      #MACRO ReturnUncheckedQueryNaN()
+  //  #ELSE
+  //      #MACRO ReturnUncheckedQuery((int)(val))
+  //  #ENDIF
+  //    }
+  //#ENDIF
     }
     return false;
   }
@@ -723,12 +801,51 @@ public abstract class IntArrSeq implements OmniCollection.OfInt
     public int search(Object val)
     {
       final int size;
-      if((size=this.size)!=0)
-      {
-        if(val instanceof Integer)
-        {
-          return OmniArray.OfInt.uncheckedsearch(this.arr,size,(int)(val));
+      if((size=this.size)!=0){
+       //TODO a pattern-matching switch statement would be great here
+        returnFalse:for(;;){
+          final int i;
+          if(val instanceof Integer||val instanceof Byte||val instanceof Short){
+            i=((Number)val).intValue();
+          }else if(val instanceof Long){
+            final long l;
+            if((l=(long)val)!=(i=(int)l)){
+              break returnFalse;
+            }
+          }else if(val instanceof Float){
+            final float f;
+            if((double)(f=(float)val)!=(double)(i=(int)f)){
+              break returnFalse;
+            }
+          }else if(val instanceof Double){
+            final double d;
+            if((d=(double)val)!=(i=(int)d)){
+              break returnFalse;
+            }
+          }else if(val instanceof Character){
+            i=(char)val;
+          }else if(val instanceof Boolean){
+            i=TypeUtil.castToByte((boolean)val);
+          }else{
+            break returnFalse;
+          }
+          return OmniArray.OfInt.uncheckedsearch(this.arr,size,i);
         }
+    //#ELSE
+    //    if(val instanceof Integer)
+    //    {
+    //  #IF OfDouble,OfFloat
+    //      final int v;
+    //      if((v=(int)val)==v)
+    //      {
+    //        #MACRO ReturnUncheckedQueryBits($convertToBits$(v))
+    //      }
+    //      #MACRO ReturnUncheckedQueryNaN()
+    //  #ELSE
+    //      #MACRO ReturnUncheckedQuery((int)(val))
+    //  #ENDIF
+    //    }
+    //#ENDIF
       }
       return -1;
     }
@@ -1093,12 +1210,51 @@ public abstract class IntArrSeq implements OmniCollection.OfInt
     public int indexOf(Object val)
     {
       final int size;
-      if((size=this.size)!=0)
-      {
-        if(val instanceof Integer)
-        {
-          return OmniArray.OfInt.uncheckedindexOf(this.arr,size,(int)(val));
+      if((size=this.size)!=0){
+       //TODO a pattern-matching switch statement would be great here
+        returnFalse:for(;;){
+          final int i;
+          if(val instanceof Integer||val instanceof Byte||val instanceof Short){
+            i=((Number)val).intValue();
+          }else if(val instanceof Long){
+            final long l;
+            if((l=(long)val)!=(i=(int)l)){
+              break returnFalse;
+            }
+          }else if(val instanceof Float){
+            final float f;
+            if((double)(f=(float)val)!=(double)(i=(int)f)){
+              break returnFalse;
+            }
+          }else if(val instanceof Double){
+            final double d;
+            if((d=(double)val)!=(i=(int)d)){
+              break returnFalse;
+            }
+          }else if(val instanceof Character){
+            i=(char)val;
+          }else if(val instanceof Boolean){
+            i=TypeUtil.castToByte((boolean)val);
+          }else{
+            break returnFalse;
+          }
+          return OmniArray.OfInt.uncheckedindexOf(this.arr,size,i);
         }
+    //#ELSE
+    //    if(val instanceof Integer)
+    //    {
+    //  #IF OfDouble,OfFloat
+    //      final int v;
+    //      if((v=(int)val)==v)
+    //      {
+    //        #MACRO ReturnUncheckedQueryBits($convertToBits$(v))
+    //      }
+    //      #MACRO ReturnUncheckedQueryNaN()
+    //  #ELSE
+    //      #MACRO ReturnUncheckedQuery((int)(val))
+    //  #ENDIF
+    //    }
+    //#ENDIF
       }
       return -1;
     }
@@ -1170,12 +1326,51 @@ public abstract class IntArrSeq implements OmniCollection.OfInt
     public int lastIndexOf(Object val)
     {
       final int size;
-      if((size=this.size)!=0)
-      {
-        if(val instanceof Integer)
-        {
-          return OmniArray.OfInt.uncheckedlastIndexOf(this.arr,size,(int)(val));
+      if((size=this.size)!=0){
+       //TODO a pattern-matching switch statement would be great here
+        returnFalse:for(;;){
+          final int i;
+          if(val instanceof Integer||val instanceof Byte||val instanceof Short){
+            i=((Number)val).intValue();
+          }else if(val instanceof Long){
+            final long l;
+            if((l=(long)val)!=(i=(int)l)){
+              break returnFalse;
+            }
+          }else if(val instanceof Float){
+            final float f;
+            if((double)(f=(float)val)!=(double)(i=(int)f)){
+              break returnFalse;
+            }
+          }else if(val instanceof Double){
+            final double d;
+            if((d=(double)val)!=(i=(int)d)){
+              break returnFalse;
+            }
+          }else if(val instanceof Character){
+            i=(char)val;
+          }else if(val instanceof Boolean){
+            i=TypeUtil.castToByte((boolean)val);
+          }else{
+            break returnFalse;
+          }
+          return OmniArray.OfInt.uncheckedlastIndexOf(this.arr,size,i);
         }
+    //#ELSE
+    //    if(val instanceof Integer)
+    //    {
+    //  #IF OfDouble,OfFloat
+    //      final int v;
+    //      if((v=(int)val)==v)
+    //      {
+    //        #MACRO ReturnUncheckedQueryBits($convertToBits$(v))
+    //      }
+    //      #MACRO ReturnUncheckedQueryNaN()
+    //  #ELSE
+    //      #MACRO ReturnUncheckedQuery((int)(val))
+    //  #ENDIF
+    //    }
+    //#ENDIF
       }
       return -1;
     }
@@ -1724,13 +1919,52 @@ public abstract class IntArrSeq implements OmniCollection.OfInt
     public boolean contains(Object val)
     {
       final int size;
-      if((size=this.size)!=0)
-      {
-        if(val instanceof Integer)
-        {
+      if((size=this.size)!=0){
+       //TODO a pattern-matching switch statement would be great here
+        returnFalse:for(;;){
+          final int i;
+          if(val instanceof Integer||val instanceof Byte||val instanceof Short){
+            i=((Number)val).intValue();
+          }else if(val instanceof Long){
+            final long l;
+            if((l=(long)val)!=(i=(int)l)){
+              break returnFalse;
+            }
+          }else if(val instanceof Float){
+            final float f;
+            if((double)(f=(float)val)!=(double)(i=(int)f)){
+              break returnFalse;
+            }
+          }else if(val instanceof Double){
+            final double d;
+            if((d=(double)val)!=(i=(int)d)){
+              break returnFalse;
+            }
+          }else if(val instanceof Character){
+            i=(char)val;
+          }else if(val instanceof Boolean){
+            i=TypeUtil.castToByte((boolean)val);
+          }else{
+            break returnFalse;
+          }
           final int rootOffset;
-          return OmniArray.OfInt.uncheckedcontains(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,(int)(val));
+          return OmniArray.OfInt.uncheckedcontains(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,i);
         }
+    //#ELSE
+    //    if(val instanceof Integer)
+    //    {
+    //  #IF OfDouble,OfFloat
+    //      final int v;
+    //      if((v=(int)val)==v)
+    //      {
+    //        #MACRO ReturnUncheckedQueryBits($convertToBits$(v))
+    //      }
+    //      #MACRO ReturnUncheckedQueryNaN()
+    //  #ELSE
+    //      #MACRO ReturnUncheckedQuery((int)(val))
+    //  #ENDIF
+    //    }
+    //#ENDIF
       }
       return false;
     }
@@ -1828,12 +2062,51 @@ public abstract class IntArrSeq implements OmniCollection.OfInt
     public boolean remove(Object val)
     {
       final int size;
-      if((size=this.size)!=0)
-      {
-        if(val instanceof Integer)
-        {
-          return this.uncheckedremoveVal(size,(int)(val));
+      if((size=this.size)!=0){
+       //TODO a pattern-matching switch statement would be great here
+        returnFalse:for(;;){
+          final int i;
+          if(val instanceof Integer||val instanceof Byte||val instanceof Short){
+            i=((Number)val).intValue();
+          }else if(val instanceof Long){
+            final long l;
+            if((l=(long)val)!=(i=(int)l)){
+              break returnFalse;
+            }
+          }else if(val instanceof Float){
+            final float f;
+            if((double)(f=(float)val)!=(double)(i=(int)f)){
+              break returnFalse;
+            }
+          }else if(val instanceof Double){
+            final double d;
+            if((d=(double)val)!=(i=(int)d)){
+              break returnFalse;
+            }
+          }else if(val instanceof Character){
+            i=(char)val;
+          }else if(val instanceof Boolean){
+            i=TypeUtil.castToByte((boolean)val);
+          }else{
+            break returnFalse;
+          }
+          return this.uncheckedremoveVal(size,i);
         }
+    //#ELSE
+    //    if(val instanceof Integer)
+    //    {
+    //  #IF OfDouble,OfFloat
+    //      final int v;
+    //      if((v=(int)val)==v)
+    //      {
+    //        #MACRO ReturnUncheckedQueryBits($convertToBits$(v))
+    //      }
+    //      #MACRO ReturnUncheckedQueryNaN()
+    //  #ELSE
+    //      #MACRO ReturnUncheckedQuery((int)(val))
+    //  #ENDIF
+    //    }
+    //#ENDIF
       }
       return false;
     }
@@ -1929,12 +2202,51 @@ public abstract class IntArrSeq implements OmniCollection.OfInt
     public int indexOf(Object val)
     {
       final int size;
-      if((size=this.size)!=0)
-      {
-        if(val instanceof Integer)
-        {
-          return OmniArray.OfInt.uncheckedindexOf(root.arr,this.rootOffset,size,(int)(val));
+      if((size=this.size)!=0){
+       //TODO a pattern-matching switch statement would be great here
+        returnFalse:for(;;){
+          final int i;
+          if(val instanceof Integer||val instanceof Byte||val instanceof Short){
+            i=((Number)val).intValue();
+          }else if(val instanceof Long){
+            final long l;
+            if((l=(long)val)!=(i=(int)l)){
+              break returnFalse;
+            }
+          }else if(val instanceof Float){
+            final float f;
+            if((double)(f=(float)val)!=(double)(i=(int)f)){
+              break returnFalse;
+            }
+          }else if(val instanceof Double){
+            final double d;
+            if((d=(double)val)!=(i=(int)d)){
+              break returnFalse;
+            }
+          }else if(val instanceof Character){
+            i=(char)val;
+          }else if(val instanceof Boolean){
+            i=TypeUtil.castToByte((boolean)val);
+          }else{
+            break returnFalse;
+          }
+          return OmniArray.OfInt.uncheckedindexOf(root.arr,this.rootOffset,size,i);
         }
+    //#ELSE
+    //    if(val instanceof Integer)
+    //    {
+    //  #IF OfDouble,OfFloat
+    //      final int v;
+    //      if((v=(int)val)==v)
+    //      {
+    //        #MACRO ReturnUncheckedQueryBits($convertToBits$(v))
+    //      }
+    //      #MACRO ReturnUncheckedQueryNaN()
+    //  #ELSE
+    //      #MACRO ReturnUncheckedQuery((int)(val))
+    //  #ENDIF
+    //    }
+    //#ENDIF
       }
       return -1;
     }
@@ -2006,12 +2318,51 @@ public abstract class IntArrSeq implements OmniCollection.OfInt
     public int lastIndexOf(Object val)
     {
       final int size;
-      if((size=this.size)!=0)
-      {
-        if(val instanceof Integer)
-        {
-          return OmniArray.OfInt.uncheckedlastIndexOf(root.arr,this.rootOffset,size,(int)(val));
+      if((size=this.size)!=0){
+       //TODO a pattern-matching switch statement would be great here
+        returnFalse:for(;;){
+          final int i;
+          if(val instanceof Integer||val instanceof Byte||val instanceof Short){
+            i=((Number)val).intValue();
+          }else if(val instanceof Long){
+            final long l;
+            if((l=(long)val)!=(i=(int)l)){
+              break returnFalse;
+            }
+          }else if(val instanceof Float){
+            final float f;
+            if((double)(f=(float)val)!=(double)(i=(int)f)){
+              break returnFalse;
+            }
+          }else if(val instanceof Double){
+            final double d;
+            if((d=(double)val)!=(i=(int)d)){
+              break returnFalse;
+            }
+          }else if(val instanceof Character){
+            i=(char)val;
+          }else if(val instanceof Boolean){
+            i=TypeUtil.castToByte((boolean)val);
+          }else{
+            break returnFalse;
+          }
+          return OmniArray.OfInt.uncheckedlastIndexOf(root.arr,this.rootOffset,size,i);
         }
+    //#ELSE
+    //    if(val instanceof Integer)
+    //    {
+    //  #IF OfDouble,OfFloat
+    //      final int v;
+    //      if((v=(int)val)==v)
+    //      {
+    //        #MACRO ReturnUncheckedQueryBits($convertToBits$(v))
+    //      }
+    //      #MACRO ReturnUncheckedQueryNaN()
+    //  #ELSE
+    //      #MACRO ReturnUncheckedQuery((int)(val))
+    //  #ENDIF
+    //    }
+    //#ENDIF
       }
       return -1;
     }
@@ -3586,19 +3937,58 @@ public abstract class IntArrSeq implements OmniCollection.OfInt
     public boolean contains(Object val)
     {
       final int size;
-      if((size=this.size)!=0)
-      {
-        if(val instanceof Integer)
-        {
+      if((size=this.size)!=0){
+       //TODO a pattern-matching switch statement would be great here
+        returnFalse:for(;;){
+          final int i;
+          if(val instanceof Integer||val instanceof Byte||val instanceof Short){
+            i=((Number)val).intValue();
+          }else if(val instanceof Long){
+            final long l;
+            if((l=(long)val)!=(i=(int)l)){
+              break returnFalse;
+            }
+          }else if(val instanceof Float){
+            final float f;
+            if((double)(f=(float)val)!=(double)(i=(int)f)){
+              break returnFalse;
+            }
+          }else if(val instanceof Double){
+            final double d;
+            if((d=(double)val)!=(i=(int)d)){
+              break returnFalse;
+            }
+          }else if(val instanceof Character){
+            i=(char)val;
+          }else if(val instanceof Boolean){
+            i=TypeUtil.castToByte((boolean)val);
+          }else{
+            break returnFalse;
+          }
           final int modCount=this.modCount;
           final var root=this.root;
           try{
             final int rootOffset;
-            return OmniArray.OfInt.uncheckedcontains(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,(int)(val));
+            return OmniArray.OfInt.uncheckedcontains(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,i);
           }finally{
             CheckedCollection.checkModCount(modCount,root.modCount);
           }
         }
+    //#ELSE
+    //    if(val instanceof Integer)
+    //    {
+    //  #IF OfDouble,OfFloat
+    //      final int v;
+    //      if((v=(int)val)==v)
+    //      {
+    //        #MACRO ReturnUncheckedQueryBits($convertToBits$(v))
+    //      }
+    //      #MACRO ReturnUncheckedQueryNaN()
+    //  #ELSE
+    //      #MACRO ReturnUncheckedQuery((int)(val))
+    //  #ENDIF
+    //    }
+    //#ENDIF
       }
       CheckedCollection.checkModCount(modCount,root.modCount);
       return false;
@@ -3716,12 +4106,51 @@ public abstract class IntArrSeq implements OmniCollection.OfInt
     public boolean remove(Object val)
     {
       final int size;
-      if((size=this.size)!=0)
-      {
-        if(val instanceof Integer)
-        {
-          return this.uncheckedremoveVal(size,(int)(val));
+      if((size=this.size)!=0){
+       //TODO a pattern-matching switch statement would be great here
+        returnFalse:for(;;){
+          final int i;
+          if(val instanceof Integer||val instanceof Byte||val instanceof Short){
+            i=((Number)val).intValue();
+          }else if(val instanceof Long){
+            final long l;
+            if((l=(long)val)!=(i=(int)l)){
+              break returnFalse;
+            }
+          }else if(val instanceof Float){
+            final float f;
+            if((double)(f=(float)val)!=(double)(i=(int)f)){
+              break returnFalse;
+            }
+          }else if(val instanceof Double){
+            final double d;
+            if((d=(double)val)!=(i=(int)d)){
+              break returnFalse;
+            }
+          }else if(val instanceof Character){
+            i=(char)val;
+          }else if(val instanceof Boolean){
+            i=TypeUtil.castToByte((boolean)val);
+          }else{
+            break returnFalse;
+          }
+          return this.uncheckedremoveVal(size,i);
         }
+    //#ELSE
+    //    if(val instanceof Integer)
+    //    {
+    //  #IF OfDouble,OfFloat
+    //      final int v;
+    //      if((v=(int)val)==v)
+    //      {
+    //        #MACRO ReturnUncheckedQueryBits($convertToBits$(v))
+    //      }
+    //      #MACRO ReturnUncheckedQueryNaN()
+    //  #ELSE
+    //      #MACRO ReturnUncheckedQuery((int)(val))
+    //  #ENDIF
+    //    }
+    //#ENDIF
       }
       CheckedCollection.checkModCount(modCount,root.modCount);
       return false;
@@ -3855,18 +4284,57 @@ public abstract class IntArrSeq implements OmniCollection.OfInt
     public int indexOf(Object val)
     {
       final int size;
-      if((size=this.size)!=0)
-      {
-        if(val instanceof Integer)
-        {
+      if((size=this.size)!=0){
+       //TODO a pattern-matching switch statement would be great here
+        returnFalse:for(;;){
+          final int i;
+          if(val instanceof Integer||val instanceof Byte||val instanceof Short){
+            i=((Number)val).intValue();
+          }else if(val instanceof Long){
+            final long l;
+            if((l=(long)val)!=(i=(int)l)){
+              break returnFalse;
+            }
+          }else if(val instanceof Float){
+            final float f;
+            if((double)(f=(float)val)!=(double)(i=(int)f)){
+              break returnFalse;
+            }
+          }else if(val instanceof Double){
+            final double d;
+            if((d=(double)val)!=(i=(int)d)){
+              break returnFalse;
+            }
+          }else if(val instanceof Character){
+            i=(char)val;
+          }else if(val instanceof Boolean){
+            i=TypeUtil.castToByte((boolean)val);
+          }else{
+            break returnFalse;
+          }
           final int modCount=this.modCount;
           final var root=this.root;
           try{
-            return OmniArray.OfInt.uncheckedindexOf(root.arr,this.rootOffset,size,(int)(val));
+            return OmniArray.OfInt.uncheckedindexOf(root.arr,this.rootOffset,size,i);
           }finally{
             CheckedCollection.checkModCount(modCount,root.modCount);
           }
         }
+    //#ELSE
+    //    if(val instanceof Integer)
+    //    {
+    //  #IF OfDouble,OfFloat
+    //      final int v;
+    //      if((v=(int)val)==v)
+    //      {
+    //        #MACRO ReturnUncheckedQueryBits($convertToBits$(v))
+    //      }
+    //      #MACRO ReturnUncheckedQueryNaN()
+    //  #ELSE
+    //      #MACRO ReturnUncheckedQuery((int)(val))
+    //  #ENDIF
+    //    }
+    //#ENDIF
       }
       CheckedCollection.checkModCount(modCount,root.modCount);
       return -1;
@@ -3974,18 +4442,57 @@ public abstract class IntArrSeq implements OmniCollection.OfInt
     public int lastIndexOf(Object val)
     {
       final int size;
-      if((size=this.size)!=0)
-      {
-        if(val instanceof Integer)
-        {
+      if((size=this.size)!=0){
+       //TODO a pattern-matching switch statement would be great here
+        returnFalse:for(;;){
+          final int i;
+          if(val instanceof Integer||val instanceof Byte||val instanceof Short){
+            i=((Number)val).intValue();
+          }else if(val instanceof Long){
+            final long l;
+            if((l=(long)val)!=(i=(int)l)){
+              break returnFalse;
+            }
+          }else if(val instanceof Float){
+            final float f;
+            if((double)(f=(float)val)!=(double)(i=(int)f)){
+              break returnFalse;
+            }
+          }else if(val instanceof Double){
+            final double d;
+            if((d=(double)val)!=(i=(int)d)){
+              break returnFalse;
+            }
+          }else if(val instanceof Character){
+            i=(char)val;
+          }else if(val instanceof Boolean){
+            i=TypeUtil.castToByte((boolean)val);
+          }else{
+            break returnFalse;
+          }
           final int modCount=this.modCount;
           final var root=this.root;
           try{
-            return OmniArray.OfInt.uncheckedlastIndexOf(root.arr,this.rootOffset,size,(int)(val));
+            return OmniArray.OfInt.uncheckedlastIndexOf(root.arr,this.rootOffset,size,i);
           }finally{
             CheckedCollection.checkModCount(modCount,root.modCount);
           }
         }
+    //#ELSE
+    //    if(val instanceof Integer)
+    //    {
+    //  #IF OfDouble,OfFloat
+    //      final int v;
+    //      if((v=(int)val)==v)
+    //      {
+    //        #MACRO ReturnUncheckedQueryBits($convertToBits$(v))
+    //      }
+    //      #MACRO ReturnUncheckedQueryNaN()
+    //  #ELSE
+    //      #MACRO ReturnUncheckedQuery((int)(val))
+    //  #ENDIF
+    //    }
+    //#ENDIF
       }
       CheckedCollection.checkModCount(modCount,root.modCount);
       return -1;

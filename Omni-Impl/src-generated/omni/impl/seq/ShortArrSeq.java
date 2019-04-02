@@ -170,12 +170,57 @@ public abstract class ShortArrSeq implements OmniCollection.OfShort
   public boolean contains(Object val)
   {
     final int size;
-    if((size=this.size)!=0)
-    {
-      if(val instanceof Short)
-      {
-        return OmniArray.OfShort.uncheckedcontains(this.arr,0,size-1,(short)(val));
+    if((size=this.size)!=0){
+     //TODO a pattern-matching switch statement would be great here
+      returnFalse:for(;;){
+        final int i;
+        if(val instanceof Short||val instanceof Byte){
+          i=((Number)val).shortValue();
+        }else if(val instanceof Integer){
+          if((i=(int)val)!=(short)i){
+            break returnFalse;
+          }
+        }else if(val instanceof Long){
+          final long l;
+          if((l=(long)val)!=(i=(short)l)){
+            break returnFalse;
+          }
+        }else if(val instanceof Float){
+          final float f;
+          if((f=(float)val)!=(i=(short)f)){
+            break returnFalse;
+          }
+        }else if(val instanceof Double){
+          final double d;
+          if((d=(double)val)!=(i=(short)d)){
+            break returnFalse;
+          }
+        }else if(val instanceof Character){
+          if((i=(char)val)>Short.MAX_VALUE){
+            break returnFalse;
+          }
+        }else if(val instanceof Boolean){
+          i=TypeUtil.castToByte((boolean)val);
+        }else{
+          break returnFalse;
+        }
+        return OmniArray.OfShort.uncheckedcontains(this.arr,0,size-1,i);
       }
+  //#ELSE
+  //    if(val instanceof Short)
+  //    {
+  //  #IF OfDouble,OfFloat
+  //      final short v;
+  //      if((v=(short)val)==v)
+  //      {
+  //        #MACRO ReturnUncheckedQueryBits($convertToBits$(v))
+  //      }
+  //      #MACRO ReturnUncheckedQueryNaN()
+  //  #ELSE
+  //      #MACRO ReturnUncheckedQuery((short)(val))
+  //  #ENDIF
+  //    }
+  //#ENDIF
     }
     return false;
   }
@@ -285,12 +330,57 @@ public abstract class ShortArrSeq implements OmniCollection.OfShort
   public boolean remove(Object val)
   {
     final int size;
-    if((size=this.size)!=0)
-    {
-      if(val instanceof Short)
-      {
-        return this.uncheckedremoveVal(size,(short)(val));
+    if((size=this.size)!=0){
+     //TODO a pattern-matching switch statement would be great here
+      returnFalse:for(;;){
+        final int i;
+        if(val instanceof Short||val instanceof Byte){
+          i=((Number)val).shortValue();
+        }else if(val instanceof Integer){
+          if((i=(int)val)!=(short)i){
+            break returnFalse;
+          }
+        }else if(val instanceof Long){
+          final long l;
+          if((l=(long)val)!=(i=(short)l)){
+            break returnFalse;
+          }
+        }else if(val instanceof Float){
+          final float f;
+          if((f=(float)val)!=(i=(short)f)){
+            break returnFalse;
+          }
+        }else if(val instanceof Double){
+          final double d;
+          if((d=(double)val)!=(i=(short)d)){
+            break returnFalse;
+          }
+        }else if(val instanceof Character){
+          if((i=(char)val)>Short.MAX_VALUE){
+            break returnFalse;
+          }
+        }else if(val instanceof Boolean){
+          i=TypeUtil.castToByte((boolean)val);
+        }else{
+          break returnFalse;
+        }
+        return this.uncheckedremoveVal(size,i);
       }
+  //#ELSE
+  //    if(val instanceof Short)
+  //    {
+  //  #IF OfDouble,OfFloat
+  //      final short v;
+  //      if((v=(short)val)==v)
+  //      {
+  //        #MACRO ReturnUncheckedQueryBits($convertToBits$(v))
+  //      }
+  //      #MACRO ReturnUncheckedQueryNaN()
+  //  #ELSE
+  //      #MACRO ReturnUncheckedQuery((short)(val))
+  //  #ENDIF
+  //    }
+  //#ENDIF
     }
     return false;
   }
@@ -765,12 +855,57 @@ public abstract class ShortArrSeq implements OmniCollection.OfShort
     public int search(Object val)
     {
       final int size;
-      if((size=this.size)!=0)
-      {
-        if(val instanceof Short)
-        {
-          return OmniArray.OfShort.uncheckedsearch(this.arr,size,(short)(val));
+      if((size=this.size)!=0){
+       //TODO a pattern-matching switch statement would be great here
+        returnFalse:for(;;){
+          final int i;
+          if(val instanceof Short||val instanceof Byte){
+            i=((Number)val).shortValue();
+          }else if(val instanceof Integer){
+            if((i=(int)val)!=(short)i){
+              break returnFalse;
+            }
+          }else if(val instanceof Long){
+            final long l;
+            if((l=(long)val)!=(i=(short)l)){
+              break returnFalse;
+            }
+          }else if(val instanceof Float){
+            final float f;
+            if((f=(float)val)!=(i=(short)f)){
+              break returnFalse;
+            }
+          }else if(val instanceof Double){
+            final double d;
+            if((d=(double)val)!=(i=(short)d)){
+              break returnFalse;
+            }
+          }else if(val instanceof Character){
+            if((i=(char)val)>Short.MAX_VALUE){
+              break returnFalse;
+            }
+          }else if(val instanceof Boolean){
+            i=TypeUtil.castToByte((boolean)val);
+          }else{
+            break returnFalse;
+          }
+          return OmniArray.OfShort.uncheckedsearch(this.arr,size,i);
         }
+    //#ELSE
+    //    if(val instanceof Short)
+    //    {
+    //  #IF OfDouble,OfFloat
+    //      final short v;
+    //      if((v=(short)val)==v)
+    //      {
+    //        #MACRO ReturnUncheckedQueryBits($convertToBits$(v))
+    //      }
+    //      #MACRO ReturnUncheckedQueryNaN()
+    //  #ELSE
+    //      #MACRO ReturnUncheckedQuery((short)(val))
+    //  #ENDIF
+    //    }
+    //#ENDIF
       }
       return -1;
     }
@@ -1188,12 +1323,57 @@ public abstract class ShortArrSeq implements OmniCollection.OfShort
     public int indexOf(Object val)
     {
       final int size;
-      if((size=this.size)!=0)
-      {
-        if(val instanceof Short)
-        {
-          return OmniArray.OfShort.uncheckedindexOf(this.arr,size,(short)(val));
+      if((size=this.size)!=0){
+       //TODO a pattern-matching switch statement would be great here
+        returnFalse:for(;;){
+          final int i;
+          if(val instanceof Short||val instanceof Byte){
+            i=((Number)val).shortValue();
+          }else if(val instanceof Integer){
+            if((i=(int)val)!=(short)i){
+              break returnFalse;
+            }
+          }else if(val instanceof Long){
+            final long l;
+            if((l=(long)val)!=(i=(short)l)){
+              break returnFalse;
+            }
+          }else if(val instanceof Float){
+            final float f;
+            if((f=(float)val)!=(i=(short)f)){
+              break returnFalse;
+            }
+          }else if(val instanceof Double){
+            final double d;
+            if((d=(double)val)!=(i=(short)d)){
+              break returnFalse;
+            }
+          }else if(val instanceof Character){
+            if((i=(char)val)>Short.MAX_VALUE){
+              break returnFalse;
+            }
+          }else if(val instanceof Boolean){
+            i=TypeUtil.castToByte((boolean)val);
+          }else{
+            break returnFalse;
+          }
+          return OmniArray.OfShort.uncheckedindexOf(this.arr,size,i);
         }
+    //#ELSE
+    //    if(val instanceof Short)
+    //    {
+    //  #IF OfDouble,OfFloat
+    //      final short v;
+    //      if((v=(short)val)==v)
+    //      {
+    //        #MACRO ReturnUncheckedQueryBits($convertToBits$(v))
+    //      }
+    //      #MACRO ReturnUncheckedQueryNaN()
+    //  #ELSE
+    //      #MACRO ReturnUncheckedQuery((short)(val))
+    //  #ENDIF
+    //    }
+    //#ENDIF
       }
       return -1;
     }
@@ -1291,12 +1471,57 @@ public abstract class ShortArrSeq implements OmniCollection.OfShort
     public int lastIndexOf(Object val)
     {
       final int size;
-      if((size=this.size)!=0)
-      {
-        if(val instanceof Short)
-        {
-          return OmniArray.OfShort.uncheckedlastIndexOf(this.arr,size,(short)(val));
+      if((size=this.size)!=0){
+       //TODO a pattern-matching switch statement would be great here
+        returnFalse:for(;;){
+          final int i;
+          if(val instanceof Short||val instanceof Byte){
+            i=((Number)val).shortValue();
+          }else if(val instanceof Integer){
+            if((i=(int)val)!=(short)i){
+              break returnFalse;
+            }
+          }else if(val instanceof Long){
+            final long l;
+            if((l=(long)val)!=(i=(short)l)){
+              break returnFalse;
+            }
+          }else if(val instanceof Float){
+            final float f;
+            if((f=(float)val)!=(i=(short)f)){
+              break returnFalse;
+            }
+          }else if(val instanceof Double){
+            final double d;
+            if((d=(double)val)!=(i=(short)d)){
+              break returnFalse;
+            }
+          }else if(val instanceof Character){
+            if((i=(char)val)>Short.MAX_VALUE){
+              break returnFalse;
+            }
+          }else if(val instanceof Boolean){
+            i=TypeUtil.castToByte((boolean)val);
+          }else{
+            break returnFalse;
+          }
+          return OmniArray.OfShort.uncheckedlastIndexOf(this.arr,size,i);
         }
+    //#ELSE
+    //    if(val instanceof Short)
+    //    {
+    //  #IF OfDouble,OfFloat
+    //      final short v;
+    //      if((v=(short)val)==v)
+    //      {
+    //        #MACRO ReturnUncheckedQueryBits($convertToBits$(v))
+    //      }
+    //      #MACRO ReturnUncheckedQueryNaN()
+    //  #ELSE
+    //      #MACRO ReturnUncheckedQuery((short)(val))
+    //  #ENDIF
+    //    }
+    //#ENDIF
       }
       return -1;
     }
@@ -1876,13 +2101,58 @@ public abstract class ShortArrSeq implements OmniCollection.OfShort
     public boolean contains(Object val)
     {
       final int size;
-      if((size=this.size)!=0)
-      {
-        if(val instanceof Short)
-        {
+      if((size=this.size)!=0){
+       //TODO a pattern-matching switch statement would be great here
+        returnFalse:for(;;){
+          final int i;
+          if(val instanceof Short||val instanceof Byte){
+            i=((Number)val).shortValue();
+          }else if(val instanceof Integer){
+            if((i=(int)val)!=(short)i){
+              break returnFalse;
+            }
+          }else if(val instanceof Long){
+            final long l;
+            if((l=(long)val)!=(i=(short)l)){
+              break returnFalse;
+            }
+          }else if(val instanceof Float){
+            final float f;
+            if((f=(float)val)!=(i=(short)f)){
+              break returnFalse;
+            }
+          }else if(val instanceof Double){
+            final double d;
+            if((d=(double)val)!=(i=(short)d)){
+              break returnFalse;
+            }
+          }else if(val instanceof Character){
+            if((i=(char)val)>Short.MAX_VALUE){
+              break returnFalse;
+            }
+          }else if(val instanceof Boolean){
+            i=TypeUtil.castToByte((boolean)val);
+          }else{
+            break returnFalse;
+          }
           final int rootOffset;
-          return OmniArray.OfShort.uncheckedcontains(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,(short)(val));
+          return OmniArray.OfShort.uncheckedcontains(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,i);
         }
+    //#ELSE
+    //    if(val instanceof Short)
+    //    {
+    //  #IF OfDouble,OfFloat
+    //      final short v;
+    //      if((v=(short)val)==v)
+    //      {
+    //        #MACRO ReturnUncheckedQueryBits($convertToBits$(v))
+    //      }
+    //      #MACRO ReturnUncheckedQueryNaN()
+    //  #ELSE
+    //      #MACRO ReturnUncheckedQuery((short)(val))
+    //  #ENDIF
+    //    }
+    //#ENDIF
       }
       return false;
     }
@@ -1995,12 +2265,57 @@ public abstract class ShortArrSeq implements OmniCollection.OfShort
     public boolean remove(Object val)
     {
       final int size;
-      if((size=this.size)!=0)
-      {
-        if(val instanceof Short)
-        {
-          return this.uncheckedremoveVal(size,(short)(val));
+      if((size=this.size)!=0){
+       //TODO a pattern-matching switch statement would be great here
+        returnFalse:for(;;){
+          final int i;
+          if(val instanceof Short||val instanceof Byte){
+            i=((Number)val).shortValue();
+          }else if(val instanceof Integer){
+            if((i=(int)val)!=(short)i){
+              break returnFalse;
+            }
+          }else if(val instanceof Long){
+            final long l;
+            if((l=(long)val)!=(i=(short)l)){
+              break returnFalse;
+            }
+          }else if(val instanceof Float){
+            final float f;
+            if((f=(float)val)!=(i=(short)f)){
+              break returnFalse;
+            }
+          }else if(val instanceof Double){
+            final double d;
+            if((d=(double)val)!=(i=(short)d)){
+              break returnFalse;
+            }
+          }else if(val instanceof Character){
+            if((i=(char)val)>Short.MAX_VALUE){
+              break returnFalse;
+            }
+          }else if(val instanceof Boolean){
+            i=TypeUtil.castToByte((boolean)val);
+          }else{
+            break returnFalse;
+          }
+          return this.uncheckedremoveVal(size,i);
         }
+    //#ELSE
+    //    if(val instanceof Short)
+    //    {
+    //  #IF OfDouble,OfFloat
+    //      final short v;
+    //      if((v=(short)val)==v)
+    //      {
+    //        #MACRO ReturnUncheckedQueryBits($convertToBits$(v))
+    //      }
+    //      #MACRO ReturnUncheckedQueryNaN()
+    //  #ELSE
+    //      #MACRO ReturnUncheckedQuery((short)(val))
+    //  #ENDIF
+    //    }
+    //#ENDIF
       }
       return false;
     }
@@ -2110,12 +2425,57 @@ public abstract class ShortArrSeq implements OmniCollection.OfShort
     public int indexOf(Object val)
     {
       final int size;
-      if((size=this.size)!=0)
-      {
-        if(val instanceof Short)
-        {
-          return OmniArray.OfShort.uncheckedindexOf(root.arr,this.rootOffset,size,(short)(val));
+      if((size=this.size)!=0){
+       //TODO a pattern-matching switch statement would be great here
+        returnFalse:for(;;){
+          final int i;
+          if(val instanceof Short||val instanceof Byte){
+            i=((Number)val).shortValue();
+          }else if(val instanceof Integer){
+            if((i=(int)val)!=(short)i){
+              break returnFalse;
+            }
+          }else if(val instanceof Long){
+            final long l;
+            if((l=(long)val)!=(i=(short)l)){
+              break returnFalse;
+            }
+          }else if(val instanceof Float){
+            final float f;
+            if((f=(float)val)!=(i=(short)f)){
+              break returnFalse;
+            }
+          }else if(val instanceof Double){
+            final double d;
+            if((d=(double)val)!=(i=(short)d)){
+              break returnFalse;
+            }
+          }else if(val instanceof Character){
+            if((i=(char)val)>Short.MAX_VALUE){
+              break returnFalse;
+            }
+          }else if(val instanceof Boolean){
+            i=TypeUtil.castToByte((boolean)val);
+          }else{
+            break returnFalse;
+          }
+          return OmniArray.OfShort.uncheckedindexOf(root.arr,this.rootOffset,size,i);
         }
+    //#ELSE
+    //    if(val instanceof Short)
+    //    {
+    //  #IF OfDouble,OfFloat
+    //      final short v;
+    //      if((v=(short)val)==v)
+    //      {
+    //        #MACRO ReturnUncheckedQueryBits($convertToBits$(v))
+    //      }
+    //      #MACRO ReturnUncheckedQueryNaN()
+    //  #ELSE
+    //      #MACRO ReturnUncheckedQuery((short)(val))
+    //  #ENDIF
+    //    }
+    //#ENDIF
       }
       return -1;
     }
@@ -2213,12 +2573,57 @@ public abstract class ShortArrSeq implements OmniCollection.OfShort
     public int lastIndexOf(Object val)
     {
       final int size;
-      if((size=this.size)!=0)
-      {
-        if(val instanceof Short)
-        {
-          return OmniArray.OfShort.uncheckedlastIndexOf(root.arr,this.rootOffset,size,(short)(val));
+      if((size=this.size)!=0){
+       //TODO a pattern-matching switch statement would be great here
+        returnFalse:for(;;){
+          final int i;
+          if(val instanceof Short||val instanceof Byte){
+            i=((Number)val).shortValue();
+          }else if(val instanceof Integer){
+            if((i=(int)val)!=(short)i){
+              break returnFalse;
+            }
+          }else if(val instanceof Long){
+            final long l;
+            if((l=(long)val)!=(i=(short)l)){
+              break returnFalse;
+            }
+          }else if(val instanceof Float){
+            final float f;
+            if((f=(float)val)!=(i=(short)f)){
+              break returnFalse;
+            }
+          }else if(val instanceof Double){
+            final double d;
+            if((d=(double)val)!=(i=(short)d)){
+              break returnFalse;
+            }
+          }else if(val instanceof Character){
+            if((i=(char)val)>Short.MAX_VALUE){
+              break returnFalse;
+            }
+          }else if(val instanceof Boolean){
+            i=TypeUtil.castToByte((boolean)val);
+          }else{
+            break returnFalse;
+          }
+          return OmniArray.OfShort.uncheckedlastIndexOf(root.arr,this.rootOffset,size,i);
         }
+    //#ELSE
+    //    if(val instanceof Short)
+    //    {
+    //  #IF OfDouble,OfFloat
+    //      final short v;
+    //      if((v=(short)val)==v)
+    //      {
+    //        #MACRO ReturnUncheckedQueryBits($convertToBits$(v))
+    //      }
+    //      #MACRO ReturnUncheckedQueryNaN()
+    //  #ELSE
+    //      #MACRO ReturnUncheckedQuery((short)(val))
+    //  #ENDIF
+    //    }
+    //#ENDIF
       }
       return -1;
     }
@@ -3844,19 +4249,64 @@ public abstract class ShortArrSeq implements OmniCollection.OfShort
     public boolean contains(Object val)
     {
       final int size;
-      if((size=this.size)!=0)
-      {
-        if(val instanceof Short)
-        {
+      if((size=this.size)!=0){
+       //TODO a pattern-matching switch statement would be great here
+        returnFalse:for(;;){
+          final int i;
+          if(val instanceof Short||val instanceof Byte){
+            i=((Number)val).shortValue();
+          }else if(val instanceof Integer){
+            if((i=(int)val)!=(short)i){
+              break returnFalse;
+            }
+          }else if(val instanceof Long){
+            final long l;
+            if((l=(long)val)!=(i=(short)l)){
+              break returnFalse;
+            }
+          }else if(val instanceof Float){
+            final float f;
+            if((f=(float)val)!=(i=(short)f)){
+              break returnFalse;
+            }
+          }else if(val instanceof Double){
+            final double d;
+            if((d=(double)val)!=(i=(short)d)){
+              break returnFalse;
+            }
+          }else if(val instanceof Character){
+            if((i=(char)val)>Short.MAX_VALUE){
+              break returnFalse;
+            }
+          }else if(val instanceof Boolean){
+            i=TypeUtil.castToByte((boolean)val);
+          }else{
+            break returnFalse;
+          }
           final int modCount=this.modCount;
           final var root=this.root;
           try{
             final int rootOffset;
-            return OmniArray.OfShort.uncheckedcontains(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,(short)(val));
+            return OmniArray.OfShort.uncheckedcontains(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,i);
           }finally{
             CheckedCollection.checkModCount(modCount,root.modCount);
           }
         }
+    //#ELSE
+    //    if(val instanceof Short)
+    //    {
+    //  #IF OfDouble,OfFloat
+    //      final short v;
+    //      if((v=(short)val)==v)
+    //      {
+    //        #MACRO ReturnUncheckedQueryBits($convertToBits$(v))
+    //      }
+    //      #MACRO ReturnUncheckedQueryNaN()
+    //  #ELSE
+    //      #MACRO ReturnUncheckedQuery((short)(val))
+    //  #ENDIF
+    //    }
+    //#ENDIF
       }
       CheckedCollection.checkModCount(modCount,root.modCount);
       return false;
@@ -3996,12 +4446,57 @@ public abstract class ShortArrSeq implements OmniCollection.OfShort
     public boolean remove(Object val)
     {
       final int size;
-      if((size=this.size)!=0)
-      {
-        if(val instanceof Short)
-        {
-          return this.uncheckedremoveVal(size,(short)(val));
+      if((size=this.size)!=0){
+       //TODO a pattern-matching switch statement would be great here
+        returnFalse:for(;;){
+          final int i;
+          if(val instanceof Short||val instanceof Byte){
+            i=((Number)val).shortValue();
+          }else if(val instanceof Integer){
+            if((i=(int)val)!=(short)i){
+              break returnFalse;
+            }
+          }else if(val instanceof Long){
+            final long l;
+            if((l=(long)val)!=(i=(short)l)){
+              break returnFalse;
+            }
+          }else if(val instanceof Float){
+            final float f;
+            if((f=(float)val)!=(i=(short)f)){
+              break returnFalse;
+            }
+          }else if(val instanceof Double){
+            final double d;
+            if((d=(double)val)!=(i=(short)d)){
+              break returnFalse;
+            }
+          }else if(val instanceof Character){
+            if((i=(char)val)>Short.MAX_VALUE){
+              break returnFalse;
+            }
+          }else if(val instanceof Boolean){
+            i=TypeUtil.castToByte((boolean)val);
+          }else{
+            break returnFalse;
+          }
+          return this.uncheckedremoveVal(size,i);
         }
+    //#ELSE
+    //    if(val instanceof Short)
+    //    {
+    //  #IF OfDouble,OfFloat
+    //      final short v;
+    //      if((v=(short)val)==v)
+    //      {
+    //        #MACRO ReturnUncheckedQueryBits($convertToBits$(v))
+    //      }
+    //      #MACRO ReturnUncheckedQueryNaN()
+    //  #ELSE
+    //      #MACRO ReturnUncheckedQuery((short)(val))
+    //  #ENDIF
+    //    }
+    //#ENDIF
       }
       CheckedCollection.checkModCount(modCount,root.modCount);
       return false;
@@ -4150,18 +4645,63 @@ public abstract class ShortArrSeq implements OmniCollection.OfShort
     public int indexOf(Object val)
     {
       final int size;
-      if((size=this.size)!=0)
-      {
-        if(val instanceof Short)
-        {
+      if((size=this.size)!=0){
+       //TODO a pattern-matching switch statement would be great here
+        returnFalse:for(;;){
+          final int i;
+          if(val instanceof Short||val instanceof Byte){
+            i=((Number)val).shortValue();
+          }else if(val instanceof Integer){
+            if((i=(int)val)!=(short)i){
+              break returnFalse;
+            }
+          }else if(val instanceof Long){
+            final long l;
+            if((l=(long)val)!=(i=(short)l)){
+              break returnFalse;
+            }
+          }else if(val instanceof Float){
+            final float f;
+            if((f=(float)val)!=(i=(short)f)){
+              break returnFalse;
+            }
+          }else if(val instanceof Double){
+            final double d;
+            if((d=(double)val)!=(i=(short)d)){
+              break returnFalse;
+            }
+          }else if(val instanceof Character){
+            if((i=(char)val)>Short.MAX_VALUE){
+              break returnFalse;
+            }
+          }else if(val instanceof Boolean){
+            i=TypeUtil.castToByte((boolean)val);
+          }else{
+            break returnFalse;
+          }
           final int modCount=this.modCount;
           final var root=this.root;
           try{
-            return OmniArray.OfShort.uncheckedindexOf(root.arr,this.rootOffset,size,(short)(val));
+            return OmniArray.OfShort.uncheckedindexOf(root.arr,this.rootOffset,size,i);
           }finally{
             CheckedCollection.checkModCount(modCount,root.modCount);
           }
         }
+    //#ELSE
+    //    if(val instanceof Short)
+    //    {
+    //  #IF OfDouble,OfFloat
+    //      final short v;
+    //      if((v=(short)val)==v)
+    //      {
+    //        #MACRO ReturnUncheckedQueryBits($convertToBits$(v))
+    //      }
+    //      #MACRO ReturnUncheckedQueryNaN()
+    //  #ELSE
+    //      #MACRO ReturnUncheckedQuery((short)(val))
+    //  #ENDIF
+    //    }
+    //#ENDIF
       }
       CheckedCollection.checkModCount(modCount,root.modCount);
       return -1;
@@ -4309,18 +4849,63 @@ public abstract class ShortArrSeq implements OmniCollection.OfShort
     public int lastIndexOf(Object val)
     {
       final int size;
-      if((size=this.size)!=0)
-      {
-        if(val instanceof Short)
-        {
+      if((size=this.size)!=0){
+       //TODO a pattern-matching switch statement would be great here
+        returnFalse:for(;;){
+          final int i;
+          if(val instanceof Short||val instanceof Byte){
+            i=((Number)val).shortValue();
+          }else if(val instanceof Integer){
+            if((i=(int)val)!=(short)i){
+              break returnFalse;
+            }
+          }else if(val instanceof Long){
+            final long l;
+            if((l=(long)val)!=(i=(short)l)){
+              break returnFalse;
+            }
+          }else if(val instanceof Float){
+            final float f;
+            if((f=(float)val)!=(i=(short)f)){
+              break returnFalse;
+            }
+          }else if(val instanceof Double){
+            final double d;
+            if((d=(double)val)!=(i=(short)d)){
+              break returnFalse;
+            }
+          }else if(val instanceof Character){
+            if((i=(char)val)>Short.MAX_VALUE){
+              break returnFalse;
+            }
+          }else if(val instanceof Boolean){
+            i=TypeUtil.castToByte((boolean)val);
+          }else{
+            break returnFalse;
+          }
           final int modCount=this.modCount;
           final var root=this.root;
           try{
-            return OmniArray.OfShort.uncheckedlastIndexOf(root.arr,this.rootOffset,size,(short)(val));
+            return OmniArray.OfShort.uncheckedlastIndexOf(root.arr,this.rootOffset,size,i);
           }finally{
             CheckedCollection.checkModCount(modCount,root.modCount);
           }
         }
+    //#ELSE
+    //    if(val instanceof Short)
+    //    {
+    //  #IF OfDouble,OfFloat
+    //      final short v;
+    //      if((v=(short)val)==v)
+    //      {
+    //        #MACRO ReturnUncheckedQueryBits($convertToBits$(v))
+    //      }
+    //      #MACRO ReturnUncheckedQueryNaN()
+    //  #ELSE
+    //      #MACRO ReturnUncheckedQuery((short)(val))
+    //  #ENDIF
+    //    }
+    //#ENDIF
       }
       CheckedCollection.checkModCount(modCount,root.modCount);
       return -1;

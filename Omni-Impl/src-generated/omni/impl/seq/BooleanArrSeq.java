@@ -216,12 +216,81 @@ public abstract class BooleanArrSeq implements OmniCollection.OfBoolean
   public boolean contains(Object val)
   {
     final int size;
-    if((size=this.size)!=0)
-    {
-      if(val instanceof Boolean)
-      {
-        return OmniArray.OfBoolean.uncheckedcontains(this.arr,0,size-1,(boolean)(val));
+    if((size=this.size)!=0){
+     //TODO a pattern-matching switch statement would be great here
+      returnFalse:for(;;){
+        final boolean b;
+        if(val instanceof Boolean){
+          b=(boolean)val;
+        }else if(val instanceof Integer||val instanceof Byte||val instanceof Short){
+          switch(((Number)val).intValue()){
+            default:
+              break returnFalse;
+            case 0:
+              b=false;
+              break;
+            case 1:
+              b=true;
+          }
+        }else if(val instanceof Float){
+          switch(Float.floatToRawIntBits((float)val)){
+            default:
+              break returnFalse;
+            case 0:
+            case Integer.MIN_VALUE:
+              b=false;
+              break;
+            case TypeUtil.FLT_TRUE_BITS:
+              b=true;
+          }
+        }else if(val instanceof Double){
+          final long bits;
+          if((bits=Double.doubleToRawLongBits((double)val))==0L || bits==Long.MIN_VALUE){
+            b=false;
+          }else if(bits==TypeUtil.DBL_TRUE_BITS){
+            b=true;
+          }else{
+            break returnFalse;
+          }
+        }else if(val instanceof Long){
+          final long v;
+          if((v=(long)val)==0L){
+            b=false;
+          }else if(v==1L){
+            b=true;
+          }else{
+           break returnFalse;
+          }
+        }else if(val instanceof Character){
+          switch(((Character)val).charValue()){
+            default:
+              break returnFalse;
+            case 0:
+              b=false;
+              break;
+            case 1:
+              b=true;
+          }
+        }else{
+          break returnFalse;
+        }
+        return OmniArray.OfBoolean.uncheckedcontains(this.arr,0,size-1,b);
       }
+  //#ELSE
+  //    if(val instanceof Boolean)
+  //    {
+  //  #IF OfDouble,OfFloat
+  //      final boolean v;
+  //      if((v=(boolean)val)==v)
+  //      {
+  //        #MACRO ReturnUncheckedQueryBits($convertToBits$(v))
+  //      }
+  //      #MACRO ReturnUncheckedQueryNaN()
+  //  #ELSE
+  //      #MACRO ReturnUncheckedQuery((boolean)(val))
+  //  #ENDIF
+  //    }
+  //#ENDIF
     }
     return false;
   }
@@ -342,12 +411,81 @@ public abstract class BooleanArrSeq implements OmniCollection.OfBoolean
   public boolean remove(Object val)
   {
     final int size;
-    if((size=this.size)!=0)
-    {
-      if(val instanceof Boolean)
-      {
-        return this.uncheckedremoveVal(size,(boolean)(val));
+    if((size=this.size)!=0){
+     //TODO a pattern-matching switch statement would be great here
+      returnFalse:for(;;){
+        final boolean b;
+        if(val instanceof Boolean){
+          b=(boolean)val;
+        }else if(val instanceof Integer||val instanceof Byte||val instanceof Short){
+          switch(((Number)val).intValue()){
+            default:
+              break returnFalse;
+            case 0:
+              b=false;
+              break;
+            case 1:
+              b=true;
+          }
+        }else if(val instanceof Float){
+          switch(Float.floatToRawIntBits((float)val)){
+            default:
+              break returnFalse;
+            case 0:
+            case Integer.MIN_VALUE:
+              b=false;
+              break;
+            case TypeUtil.FLT_TRUE_BITS:
+              b=true;
+          }
+        }else if(val instanceof Double){
+          final long bits;
+          if((bits=Double.doubleToRawLongBits((double)val))==0L || bits==Long.MIN_VALUE){
+            b=false;
+          }else if(bits==TypeUtil.DBL_TRUE_BITS){
+            b=true;
+          }else{
+            break returnFalse;
+          }
+        }else if(val instanceof Long){
+          final long v;
+          if((v=(long)val)==0L){
+            b=false;
+          }else if(v==1L){
+            b=true;
+          }else{
+           break returnFalse;
+          }
+        }else if(val instanceof Character){
+          switch(((Character)val).charValue()){
+            default:
+              break returnFalse;
+            case 0:
+              b=false;
+              break;
+            case 1:
+              b=true;
+          }
+        }else{
+          break returnFalse;
+        }
+        return this.uncheckedremoveVal(size,b);
       }
+  //#ELSE
+  //    if(val instanceof Boolean)
+  //    {
+  //  #IF OfDouble,OfFloat
+  //      final boolean v;
+  //      if((v=(boolean)val)==v)
+  //      {
+  //        #MACRO ReturnUncheckedQueryBits($convertToBits$(v))
+  //      }
+  //      #MACRO ReturnUncheckedQueryNaN()
+  //  #ELSE
+  //      #MACRO ReturnUncheckedQuery((boolean)(val))
+  //  #ENDIF
+  //    }
+  //#ENDIF
     }
     return false;
   }
@@ -840,12 +978,81 @@ public abstract class BooleanArrSeq implements OmniCollection.OfBoolean
     public int search(Object val)
     {
       final int size;
-      if((size=this.size)!=0)
-      {
-        if(val instanceof Boolean)
-        {
-          return OmniArray.OfBoolean.uncheckedsearch(this.arr,size,(boolean)(val));
+      if((size=this.size)!=0){
+       //TODO a pattern-matching switch statement would be great here
+        returnFalse:for(;;){
+          final boolean b;
+          if(val instanceof Boolean){
+            b=(boolean)val;
+          }else if(val instanceof Integer||val instanceof Byte||val instanceof Short){
+            switch(((Number)val).intValue()){
+              default:
+                break returnFalse;
+              case 0:
+                b=false;
+                break;
+              case 1:
+                b=true;
+            }
+          }else if(val instanceof Float){
+            switch(Float.floatToRawIntBits((float)val)){
+              default:
+                break returnFalse;
+              case 0:
+              case Integer.MIN_VALUE:
+                b=false;
+                break;
+              case TypeUtil.FLT_TRUE_BITS:
+                b=true;
+            }
+          }else if(val instanceof Double){
+            final long bits;
+            if((bits=Double.doubleToRawLongBits((double)val))==0L || bits==Long.MIN_VALUE){
+              b=false;
+            }else if(bits==TypeUtil.DBL_TRUE_BITS){
+              b=true;
+            }else{
+              break returnFalse;
+            }
+          }else if(val instanceof Long){
+            final long v;
+            if((v=(long)val)==0L){
+              b=false;
+            }else if(v==1L){
+              b=true;
+            }else{
+             break returnFalse;
+            }
+          }else if(val instanceof Character){
+            switch(((Character)val).charValue()){
+              default:
+                break returnFalse;
+              case 0:
+                b=false;
+                break;
+              case 1:
+                b=true;
+            }
+          }else{
+            break returnFalse;
+          }
+          return OmniArray.OfBoolean.uncheckedsearch(this.arr,size,b);
         }
+    //#ELSE
+    //    if(val instanceof Boolean)
+    //    {
+    //  #IF OfDouble,OfFloat
+    //      final boolean v;
+    //      if((v=(boolean)val)==v)
+    //      {
+    //        #MACRO ReturnUncheckedQueryBits($convertToBits$(v))
+    //      }
+    //      #MACRO ReturnUncheckedQueryNaN()
+    //  #ELSE
+    //      #MACRO ReturnUncheckedQuery((boolean)(val))
+    //  #ENDIF
+    //    }
+    //#ENDIF
       }
       return -1;
     }
@@ -1367,12 +1574,81 @@ public abstract class BooleanArrSeq implements OmniCollection.OfBoolean
     public int indexOf(Object val)
     {
       final int size;
-      if((size=this.size)!=0)
-      {
-        if(val instanceof Boolean)
-        {
-          return OmniArray.OfBoolean.uncheckedindexOf(this.arr,size,(boolean)(val));
+      if((size=this.size)!=0){
+       //TODO a pattern-matching switch statement would be great here
+        returnFalse:for(;;){
+          final boolean b;
+          if(val instanceof Boolean){
+            b=(boolean)val;
+          }else if(val instanceof Integer||val instanceof Byte||val instanceof Short){
+            switch(((Number)val).intValue()){
+              default:
+                break returnFalse;
+              case 0:
+                b=false;
+                break;
+              case 1:
+                b=true;
+            }
+          }else if(val instanceof Float){
+            switch(Float.floatToRawIntBits((float)val)){
+              default:
+                break returnFalse;
+              case 0:
+              case Integer.MIN_VALUE:
+                b=false;
+                break;
+              case TypeUtil.FLT_TRUE_BITS:
+                b=true;
+            }
+          }else if(val instanceof Double){
+            final long bits;
+            if((bits=Double.doubleToRawLongBits((double)val))==0L || bits==Long.MIN_VALUE){
+              b=false;
+            }else if(bits==TypeUtil.DBL_TRUE_BITS){
+              b=true;
+            }else{
+              break returnFalse;
+            }
+          }else if(val instanceof Long){
+            final long v;
+            if((v=(long)val)==0L){
+              b=false;
+            }else if(v==1L){
+              b=true;
+            }else{
+             break returnFalse;
+            }
+          }else if(val instanceof Character){
+            switch(((Character)val).charValue()){
+              default:
+                break returnFalse;
+              case 0:
+                b=false;
+                break;
+              case 1:
+                b=true;
+            }
+          }else{
+            break returnFalse;
+          }
+          return OmniArray.OfBoolean.uncheckedindexOf(this.arr,size,b);
         }
+    //#ELSE
+    //    if(val instanceof Boolean)
+    //    {
+    //  #IF OfDouble,OfFloat
+    //      final boolean v;
+    //      if((v=(boolean)val)==v)
+    //      {
+    //        #MACRO ReturnUncheckedQueryBits($convertToBits$(v))
+    //      }
+    //      #MACRO ReturnUncheckedQueryNaN()
+    //  #ELSE
+    //      #MACRO ReturnUncheckedQuery((boolean)(val))
+    //  #ENDIF
+    //    }
+    //#ENDIF
       }
       return -1;
     }
@@ -1493,12 +1769,81 @@ public abstract class BooleanArrSeq implements OmniCollection.OfBoolean
     public int lastIndexOf(Object val)
     {
       final int size;
-      if((size=this.size)!=0)
-      {
-        if(val instanceof Boolean)
-        {
-          return OmniArray.OfBoolean.uncheckedlastIndexOf(this.arr,size,(boolean)(val));
+      if((size=this.size)!=0){
+       //TODO a pattern-matching switch statement would be great here
+        returnFalse:for(;;){
+          final boolean b;
+          if(val instanceof Boolean){
+            b=(boolean)val;
+          }else if(val instanceof Integer||val instanceof Byte||val instanceof Short){
+            switch(((Number)val).intValue()){
+              default:
+                break returnFalse;
+              case 0:
+                b=false;
+                break;
+              case 1:
+                b=true;
+            }
+          }else if(val instanceof Float){
+            switch(Float.floatToRawIntBits((float)val)){
+              default:
+                break returnFalse;
+              case 0:
+              case Integer.MIN_VALUE:
+                b=false;
+                break;
+              case TypeUtil.FLT_TRUE_BITS:
+                b=true;
+            }
+          }else if(val instanceof Double){
+            final long bits;
+            if((bits=Double.doubleToRawLongBits((double)val))==0L || bits==Long.MIN_VALUE){
+              b=false;
+            }else if(bits==TypeUtil.DBL_TRUE_BITS){
+              b=true;
+            }else{
+              break returnFalse;
+            }
+          }else if(val instanceof Long){
+            final long v;
+            if((v=(long)val)==0L){
+              b=false;
+            }else if(v==1L){
+              b=true;
+            }else{
+             break returnFalse;
+            }
+          }else if(val instanceof Character){
+            switch(((Character)val).charValue()){
+              default:
+                break returnFalse;
+              case 0:
+                b=false;
+                break;
+              case 1:
+                b=true;
+            }
+          }else{
+            break returnFalse;
+          }
+          return OmniArray.OfBoolean.uncheckedlastIndexOf(this.arr,size,b);
         }
+    //#ELSE
+    //    if(val instanceof Boolean)
+    //    {
+    //  #IF OfDouble,OfFloat
+    //      final boolean v;
+    //      if((v=(boolean)val)==v)
+    //      {
+    //        #MACRO ReturnUncheckedQueryBits($convertToBits$(v))
+    //      }
+    //      #MACRO ReturnUncheckedQueryNaN()
+    //  #ELSE
+    //      #MACRO ReturnUncheckedQuery((boolean)(val))
+    //  #ENDIF
+    //    }
+    //#ENDIF
       }
       return -1;
     }
@@ -2100,13 +2445,82 @@ public abstract class BooleanArrSeq implements OmniCollection.OfBoolean
     public boolean contains(Object val)
     {
       final int size;
-      if((size=this.size)!=0)
-      {
-        if(val instanceof Boolean)
-        {
+      if((size=this.size)!=0){
+       //TODO a pattern-matching switch statement would be great here
+        returnFalse:for(;;){
+          final boolean b;
+          if(val instanceof Boolean){
+            b=(boolean)val;
+          }else if(val instanceof Integer||val instanceof Byte||val instanceof Short){
+            switch(((Number)val).intValue()){
+              default:
+                break returnFalse;
+              case 0:
+                b=false;
+                break;
+              case 1:
+                b=true;
+            }
+          }else if(val instanceof Float){
+            switch(Float.floatToRawIntBits((float)val)){
+              default:
+                break returnFalse;
+              case 0:
+              case Integer.MIN_VALUE:
+                b=false;
+                break;
+              case TypeUtil.FLT_TRUE_BITS:
+                b=true;
+            }
+          }else if(val instanceof Double){
+            final long bits;
+            if((bits=Double.doubleToRawLongBits((double)val))==0L || bits==Long.MIN_VALUE){
+              b=false;
+            }else if(bits==TypeUtil.DBL_TRUE_BITS){
+              b=true;
+            }else{
+              break returnFalse;
+            }
+          }else if(val instanceof Long){
+            final long v;
+            if((v=(long)val)==0L){
+              b=false;
+            }else if(v==1L){
+              b=true;
+            }else{
+             break returnFalse;
+            }
+          }else if(val instanceof Character){
+            switch(((Character)val).charValue()){
+              default:
+                break returnFalse;
+              case 0:
+                b=false;
+                break;
+              case 1:
+                b=true;
+            }
+          }else{
+            break returnFalse;
+          }
           final int rootOffset;
-          return OmniArray.OfBoolean.uncheckedcontains(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,(boolean)(val));
+          return OmniArray.OfBoolean.uncheckedcontains(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,b);
         }
+    //#ELSE
+    //    if(val instanceof Boolean)
+    //    {
+    //  #IF OfDouble,OfFloat
+    //      final boolean v;
+    //      if((v=(boolean)val)==v)
+    //      {
+    //        #MACRO ReturnUncheckedQueryBits($convertToBits$(v))
+    //      }
+    //      #MACRO ReturnUncheckedQueryNaN()
+    //  #ELSE
+    //      #MACRO ReturnUncheckedQuery((boolean)(val))
+    //  #ENDIF
+    //    }
+    //#ENDIF
       }
       return false;
     }
@@ -2227,12 +2641,81 @@ public abstract class BooleanArrSeq implements OmniCollection.OfBoolean
     public boolean remove(Object val)
     {
       final int size;
-      if((size=this.size)!=0)
-      {
-        if(val instanceof Boolean)
-        {
-          return this.uncheckedremoveVal(size,(boolean)(val));
+      if((size=this.size)!=0){
+       //TODO a pattern-matching switch statement would be great here
+        returnFalse:for(;;){
+          final boolean b;
+          if(val instanceof Boolean){
+            b=(boolean)val;
+          }else if(val instanceof Integer||val instanceof Byte||val instanceof Short){
+            switch(((Number)val).intValue()){
+              default:
+                break returnFalse;
+              case 0:
+                b=false;
+                break;
+              case 1:
+                b=true;
+            }
+          }else if(val instanceof Float){
+            switch(Float.floatToRawIntBits((float)val)){
+              default:
+                break returnFalse;
+              case 0:
+              case Integer.MIN_VALUE:
+                b=false;
+                break;
+              case TypeUtil.FLT_TRUE_BITS:
+                b=true;
+            }
+          }else if(val instanceof Double){
+            final long bits;
+            if((bits=Double.doubleToRawLongBits((double)val))==0L || bits==Long.MIN_VALUE){
+              b=false;
+            }else if(bits==TypeUtil.DBL_TRUE_BITS){
+              b=true;
+            }else{
+              break returnFalse;
+            }
+          }else if(val instanceof Long){
+            final long v;
+            if((v=(long)val)==0L){
+              b=false;
+            }else if(v==1L){
+              b=true;
+            }else{
+             break returnFalse;
+            }
+          }else if(val instanceof Character){
+            switch(((Character)val).charValue()){
+              default:
+                break returnFalse;
+              case 0:
+                b=false;
+                break;
+              case 1:
+                b=true;
+            }
+          }else{
+            break returnFalse;
+          }
+          return this.uncheckedremoveVal(size,b);
         }
+    //#ELSE
+    //    if(val instanceof Boolean)
+    //    {
+    //  #IF OfDouble,OfFloat
+    //      final boolean v;
+    //      if((v=(boolean)val)==v)
+    //      {
+    //        #MACRO ReturnUncheckedQueryBits($convertToBits$(v))
+    //      }
+    //      #MACRO ReturnUncheckedQueryNaN()
+    //  #ELSE
+    //      #MACRO ReturnUncheckedQuery((boolean)(val))
+    //  #ENDIF
+    //    }
+    //#ENDIF
       }
       return false;
     }
@@ -2353,12 +2836,81 @@ public abstract class BooleanArrSeq implements OmniCollection.OfBoolean
     public int indexOf(Object val)
     {
       final int size;
-      if((size=this.size)!=0)
-      {
-        if(val instanceof Boolean)
-        {
-          return OmniArray.OfBoolean.uncheckedindexOf(root.arr,this.rootOffset,size,(boolean)(val));
+      if((size=this.size)!=0){
+       //TODO a pattern-matching switch statement would be great here
+        returnFalse:for(;;){
+          final boolean b;
+          if(val instanceof Boolean){
+            b=(boolean)val;
+          }else if(val instanceof Integer||val instanceof Byte||val instanceof Short){
+            switch(((Number)val).intValue()){
+              default:
+                break returnFalse;
+              case 0:
+                b=false;
+                break;
+              case 1:
+                b=true;
+            }
+          }else if(val instanceof Float){
+            switch(Float.floatToRawIntBits((float)val)){
+              default:
+                break returnFalse;
+              case 0:
+              case Integer.MIN_VALUE:
+                b=false;
+                break;
+              case TypeUtil.FLT_TRUE_BITS:
+                b=true;
+            }
+          }else if(val instanceof Double){
+            final long bits;
+            if((bits=Double.doubleToRawLongBits((double)val))==0L || bits==Long.MIN_VALUE){
+              b=false;
+            }else if(bits==TypeUtil.DBL_TRUE_BITS){
+              b=true;
+            }else{
+              break returnFalse;
+            }
+          }else if(val instanceof Long){
+            final long v;
+            if((v=(long)val)==0L){
+              b=false;
+            }else if(v==1L){
+              b=true;
+            }else{
+             break returnFalse;
+            }
+          }else if(val instanceof Character){
+            switch(((Character)val).charValue()){
+              default:
+                break returnFalse;
+              case 0:
+                b=false;
+                break;
+              case 1:
+                b=true;
+            }
+          }else{
+            break returnFalse;
+          }
+          return OmniArray.OfBoolean.uncheckedindexOf(root.arr,this.rootOffset,size,b);
         }
+    //#ELSE
+    //    if(val instanceof Boolean)
+    //    {
+    //  #IF OfDouble,OfFloat
+    //      final boolean v;
+    //      if((v=(boolean)val)==v)
+    //      {
+    //        #MACRO ReturnUncheckedQueryBits($convertToBits$(v))
+    //      }
+    //      #MACRO ReturnUncheckedQueryNaN()
+    //  #ELSE
+    //      #MACRO ReturnUncheckedQuery((boolean)(val))
+    //  #ENDIF
+    //    }
+    //#ENDIF
       }
       return -1;
     }
@@ -2479,12 +3031,81 @@ public abstract class BooleanArrSeq implements OmniCollection.OfBoolean
     public int lastIndexOf(Object val)
     {
       final int size;
-      if((size=this.size)!=0)
-      {
-        if(val instanceof Boolean)
-        {
-          return OmniArray.OfBoolean.uncheckedlastIndexOf(root.arr,this.rootOffset,size,(boolean)(val));
+      if((size=this.size)!=0){
+       //TODO a pattern-matching switch statement would be great here
+        returnFalse:for(;;){
+          final boolean b;
+          if(val instanceof Boolean){
+            b=(boolean)val;
+          }else if(val instanceof Integer||val instanceof Byte||val instanceof Short){
+            switch(((Number)val).intValue()){
+              default:
+                break returnFalse;
+              case 0:
+                b=false;
+                break;
+              case 1:
+                b=true;
+            }
+          }else if(val instanceof Float){
+            switch(Float.floatToRawIntBits((float)val)){
+              default:
+                break returnFalse;
+              case 0:
+              case Integer.MIN_VALUE:
+                b=false;
+                break;
+              case TypeUtil.FLT_TRUE_BITS:
+                b=true;
+            }
+          }else if(val instanceof Double){
+            final long bits;
+            if((bits=Double.doubleToRawLongBits((double)val))==0L || bits==Long.MIN_VALUE){
+              b=false;
+            }else if(bits==TypeUtil.DBL_TRUE_BITS){
+              b=true;
+            }else{
+              break returnFalse;
+            }
+          }else if(val instanceof Long){
+            final long v;
+            if((v=(long)val)==0L){
+              b=false;
+            }else if(v==1L){
+              b=true;
+            }else{
+             break returnFalse;
+            }
+          }else if(val instanceof Character){
+            switch(((Character)val).charValue()){
+              default:
+                break returnFalse;
+              case 0:
+                b=false;
+                break;
+              case 1:
+                b=true;
+            }
+          }else{
+            break returnFalse;
+          }
+          return OmniArray.OfBoolean.uncheckedlastIndexOf(root.arr,this.rootOffset,size,b);
         }
+    //#ELSE
+    //    if(val instanceof Boolean)
+    //    {
+    //  #IF OfDouble,OfFloat
+    //      final boolean v;
+    //      if((v=(boolean)val)==v)
+    //      {
+    //        #MACRO ReturnUncheckedQueryBits($convertToBits$(v))
+    //      }
+    //      #MACRO ReturnUncheckedQueryNaN()
+    //  #ELSE
+    //      #MACRO ReturnUncheckedQuery((boolean)(val))
+    //  #ENDIF
+    //    }
+    //#ENDIF
       }
       return -1;
     }
@@ -4160,19 +4781,88 @@ public abstract class BooleanArrSeq implements OmniCollection.OfBoolean
     public boolean contains(Object val)
     {
       final int size;
-      if((size=this.size)!=0)
-      {
-        if(val instanceof Boolean)
-        {
+      if((size=this.size)!=0){
+       //TODO a pattern-matching switch statement would be great here
+        returnFalse:for(;;){
+          final boolean b;
+          if(val instanceof Boolean){
+            b=(boolean)val;
+          }else if(val instanceof Integer||val instanceof Byte||val instanceof Short){
+            switch(((Number)val).intValue()){
+              default:
+                break returnFalse;
+              case 0:
+                b=false;
+                break;
+              case 1:
+                b=true;
+            }
+          }else if(val instanceof Float){
+            switch(Float.floatToRawIntBits((float)val)){
+              default:
+                break returnFalse;
+              case 0:
+              case Integer.MIN_VALUE:
+                b=false;
+                break;
+              case TypeUtil.FLT_TRUE_BITS:
+                b=true;
+            }
+          }else if(val instanceof Double){
+            final long bits;
+            if((bits=Double.doubleToRawLongBits((double)val))==0L || bits==Long.MIN_VALUE){
+              b=false;
+            }else if(bits==TypeUtil.DBL_TRUE_BITS){
+              b=true;
+            }else{
+              break returnFalse;
+            }
+          }else if(val instanceof Long){
+            final long v;
+            if((v=(long)val)==0L){
+              b=false;
+            }else if(v==1L){
+              b=true;
+            }else{
+             break returnFalse;
+            }
+          }else if(val instanceof Character){
+            switch(((Character)val).charValue()){
+              default:
+                break returnFalse;
+              case 0:
+                b=false;
+                break;
+              case 1:
+                b=true;
+            }
+          }else{
+            break returnFalse;
+          }
           final int modCount=this.modCount;
           final var root=this.root;
           try{
             final int rootOffset;
-            return OmniArray.OfBoolean.uncheckedcontains(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,(boolean)(val));
+            return OmniArray.OfBoolean.uncheckedcontains(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,b);
           }finally{
             CheckedCollection.checkModCount(modCount,root.modCount);
           }
         }
+    //#ELSE
+    //    if(val instanceof Boolean)
+    //    {
+    //  #IF OfDouble,OfFloat
+    //      final boolean v;
+    //      if((v=(boolean)val)==v)
+    //      {
+    //        #MACRO ReturnUncheckedQueryBits($convertToBits$(v))
+    //      }
+    //      #MACRO ReturnUncheckedQueryNaN()
+    //  #ELSE
+    //      #MACRO ReturnUncheckedQuery((boolean)(val))
+    //  #ENDIF
+    //    }
+    //#ENDIF
       }
       CheckedCollection.checkModCount(modCount,root.modCount);
       return false;
@@ -4299,12 +4989,81 @@ public abstract class BooleanArrSeq implements OmniCollection.OfBoolean
     public boolean remove(Object val)
     {
       final int size;
-      if((size=this.size)!=0)
-      {
-        if(val instanceof Boolean)
-        {
-          return this.uncheckedremoveVal(size,(boolean)(val));
+      if((size=this.size)!=0){
+       //TODO a pattern-matching switch statement would be great here
+        returnFalse:for(;;){
+          final boolean b;
+          if(val instanceof Boolean){
+            b=(boolean)val;
+          }else if(val instanceof Integer||val instanceof Byte||val instanceof Short){
+            switch(((Number)val).intValue()){
+              default:
+                break returnFalse;
+              case 0:
+                b=false;
+                break;
+              case 1:
+                b=true;
+            }
+          }else if(val instanceof Float){
+            switch(Float.floatToRawIntBits((float)val)){
+              default:
+                break returnFalse;
+              case 0:
+              case Integer.MIN_VALUE:
+                b=false;
+                break;
+              case TypeUtil.FLT_TRUE_BITS:
+                b=true;
+            }
+          }else if(val instanceof Double){
+            final long bits;
+            if((bits=Double.doubleToRawLongBits((double)val))==0L || bits==Long.MIN_VALUE){
+              b=false;
+            }else if(bits==TypeUtil.DBL_TRUE_BITS){
+              b=true;
+            }else{
+              break returnFalse;
+            }
+          }else if(val instanceof Long){
+            final long v;
+            if((v=(long)val)==0L){
+              b=false;
+            }else if(v==1L){
+              b=true;
+            }else{
+             break returnFalse;
+            }
+          }else if(val instanceof Character){
+            switch(((Character)val).charValue()){
+              default:
+                break returnFalse;
+              case 0:
+                b=false;
+                break;
+              case 1:
+                b=true;
+            }
+          }else{
+            break returnFalse;
+          }
+          return this.uncheckedremoveVal(size,b);
         }
+    //#ELSE
+    //    if(val instanceof Boolean)
+    //    {
+    //  #IF OfDouble,OfFloat
+    //      final boolean v;
+    //      if((v=(boolean)val)==v)
+    //      {
+    //        #MACRO ReturnUncheckedQueryBits($convertToBits$(v))
+    //      }
+    //      #MACRO ReturnUncheckedQueryNaN()
+    //  #ELSE
+    //      #MACRO ReturnUncheckedQuery((boolean)(val))
+    //  #ENDIF
+    //    }
+    //#ENDIF
       }
       CheckedCollection.checkModCount(modCount,root.modCount);
       return false;
@@ -4461,18 +5220,87 @@ public abstract class BooleanArrSeq implements OmniCollection.OfBoolean
     public int indexOf(Object val)
     {
       final int size;
-      if((size=this.size)!=0)
-      {
-        if(val instanceof Boolean)
-        {
+      if((size=this.size)!=0){
+       //TODO a pattern-matching switch statement would be great here
+        returnFalse:for(;;){
+          final boolean b;
+          if(val instanceof Boolean){
+            b=(boolean)val;
+          }else if(val instanceof Integer||val instanceof Byte||val instanceof Short){
+            switch(((Number)val).intValue()){
+              default:
+                break returnFalse;
+              case 0:
+                b=false;
+                break;
+              case 1:
+                b=true;
+            }
+          }else if(val instanceof Float){
+            switch(Float.floatToRawIntBits((float)val)){
+              default:
+                break returnFalse;
+              case 0:
+              case Integer.MIN_VALUE:
+                b=false;
+                break;
+              case TypeUtil.FLT_TRUE_BITS:
+                b=true;
+            }
+          }else if(val instanceof Double){
+            final long bits;
+            if((bits=Double.doubleToRawLongBits((double)val))==0L || bits==Long.MIN_VALUE){
+              b=false;
+            }else if(bits==TypeUtil.DBL_TRUE_BITS){
+              b=true;
+            }else{
+              break returnFalse;
+            }
+          }else if(val instanceof Long){
+            final long v;
+            if((v=(long)val)==0L){
+              b=false;
+            }else if(v==1L){
+              b=true;
+            }else{
+             break returnFalse;
+            }
+          }else if(val instanceof Character){
+            switch(((Character)val).charValue()){
+              default:
+                break returnFalse;
+              case 0:
+                b=false;
+                break;
+              case 1:
+                b=true;
+            }
+          }else{
+            break returnFalse;
+          }
           final int modCount=this.modCount;
           final var root=this.root;
           try{
-            return OmniArray.OfBoolean.uncheckedindexOf(root.arr,this.rootOffset,size,(boolean)(val));
+            return OmniArray.OfBoolean.uncheckedindexOf(root.arr,this.rootOffset,size,b);
           }finally{
             CheckedCollection.checkModCount(modCount,root.modCount);
           }
         }
+    //#ELSE
+    //    if(val instanceof Boolean)
+    //    {
+    //  #IF OfDouble,OfFloat
+    //      final boolean v;
+    //      if((v=(boolean)val)==v)
+    //      {
+    //        #MACRO ReturnUncheckedQueryBits($convertToBits$(v))
+    //      }
+    //      #MACRO ReturnUncheckedQueryNaN()
+    //  #ELSE
+    //      #MACRO ReturnUncheckedQuery((boolean)(val))
+    //  #ENDIF
+    //    }
+    //#ENDIF
       }
       CheckedCollection.checkModCount(modCount,root.modCount);
       return -1;
@@ -4629,18 +5457,87 @@ public abstract class BooleanArrSeq implements OmniCollection.OfBoolean
     public int lastIndexOf(Object val)
     {
       final int size;
-      if((size=this.size)!=0)
-      {
-        if(val instanceof Boolean)
-        {
+      if((size=this.size)!=0){
+       //TODO a pattern-matching switch statement would be great here
+        returnFalse:for(;;){
+          final boolean b;
+          if(val instanceof Boolean){
+            b=(boolean)val;
+          }else if(val instanceof Integer||val instanceof Byte||val instanceof Short){
+            switch(((Number)val).intValue()){
+              default:
+                break returnFalse;
+              case 0:
+                b=false;
+                break;
+              case 1:
+                b=true;
+            }
+          }else if(val instanceof Float){
+            switch(Float.floatToRawIntBits((float)val)){
+              default:
+                break returnFalse;
+              case 0:
+              case Integer.MIN_VALUE:
+                b=false;
+                break;
+              case TypeUtil.FLT_TRUE_BITS:
+                b=true;
+            }
+          }else if(val instanceof Double){
+            final long bits;
+            if((bits=Double.doubleToRawLongBits((double)val))==0L || bits==Long.MIN_VALUE){
+              b=false;
+            }else if(bits==TypeUtil.DBL_TRUE_BITS){
+              b=true;
+            }else{
+              break returnFalse;
+            }
+          }else if(val instanceof Long){
+            final long v;
+            if((v=(long)val)==0L){
+              b=false;
+            }else if(v==1L){
+              b=true;
+            }else{
+             break returnFalse;
+            }
+          }else if(val instanceof Character){
+            switch(((Character)val).charValue()){
+              default:
+                break returnFalse;
+              case 0:
+                b=false;
+                break;
+              case 1:
+                b=true;
+            }
+          }else{
+            break returnFalse;
+          }
           final int modCount=this.modCount;
           final var root=this.root;
           try{
-            return OmniArray.OfBoolean.uncheckedlastIndexOf(root.arr,this.rootOffset,size,(boolean)(val));
+            return OmniArray.OfBoolean.uncheckedlastIndexOf(root.arr,this.rootOffset,size,b);
           }finally{
             CheckedCollection.checkModCount(modCount,root.modCount);
           }
         }
+    //#ELSE
+    //    if(val instanceof Boolean)
+    //    {
+    //  #IF OfDouble,OfFloat
+    //      final boolean v;
+    //      if((v=(boolean)val)==v)
+    //      {
+    //        #MACRO ReturnUncheckedQueryBits($convertToBits$(v))
+    //      }
+    //      #MACRO ReturnUncheckedQueryNaN()
+    //  #ELSE
+    //      #MACRO ReturnUncheckedQuery((boolean)(val))
+    //  #ENDIF
+    //    }
+    //#ENDIF
       }
       CheckedCollection.checkModCount(modCount,root.modCount);
       return -1;

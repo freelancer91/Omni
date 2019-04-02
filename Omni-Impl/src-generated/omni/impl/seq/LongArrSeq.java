@@ -165,12 +165,46 @@ public abstract class LongArrSeq implements OmniCollection.OfLong
   public boolean contains(Object val)
   {
     final int size;
-    if((size=this.size)!=0)
-    {
-      if(val instanceof Long)
-      {
-        return OmniArray.OfLong.uncheckedcontains(this.arr,0,size-1,(long)(val));
+    if((size=this.size)!=0){
+     //TODO a pattern-matching switch statement would be great here
+      returnFalse:for(;;){
+        final long l;
+        if(val instanceof Long||val instanceof Integer||val instanceof Byte||val instanceof Short){
+          l=((Number)val).longValue();
+        }else if(val instanceof Float){
+          final float f;
+          if(!TypeUtil.floatEquals(f=(float)val,l=(long)f)){
+            break returnFalse;
+          }
+        }else if(val instanceof Double){
+          final double d;
+          if(!TypeUtil.doubleEquals(d=(double)val,l=(long)d)){
+            break returnFalse;
+          }
+        }else if(val instanceof Character){
+          l=(char)val;
+        }else if(val instanceof Boolean){
+          l=TypeUtil.castToLong((boolean)val);
+        }else{
+          break returnFalse;
+        }
+        return OmniArray.OfLong.uncheckedcontains(this.arr,0,size-1,l);
       }
+  //#ELSE
+  //    if(val instanceof Long)
+  //    {
+  //  #IF OfDouble,OfFloat
+  //      final long v;
+  //      if((v=(long)val)==v)
+  //      {
+  //        #MACRO ReturnUncheckedQueryBits($convertToBits$(v))
+  //      }
+  //      #MACRO ReturnUncheckedQueryNaN()
+  //  #ELSE
+  //      #MACRO ReturnUncheckedQuery((long)(val))
+  //  #ENDIF
+  //    }
+  //#ENDIF
     }
     return false;
   }
@@ -262,12 +296,46 @@ public abstract class LongArrSeq implements OmniCollection.OfLong
   public boolean remove(Object val)
   {
     final int size;
-    if((size=this.size)!=0)
-    {
-      if(val instanceof Long)
-      {
-        return this.uncheckedremoveVal(size,(long)(val));
+    if((size=this.size)!=0){
+     //TODO a pattern-matching switch statement would be great here
+      returnFalse:for(;;){
+        final long l;
+        if(val instanceof Long||val instanceof Integer||val instanceof Byte||val instanceof Short){
+          l=((Number)val).longValue();
+        }else if(val instanceof Float){
+          final float f;
+          if(!TypeUtil.floatEquals(f=(float)val,l=(long)f)){
+            break returnFalse;
+          }
+        }else if(val instanceof Double){
+          final double d;
+          if(!TypeUtil.doubleEquals(d=(double)val,l=(long)d)){
+            break returnFalse;
+          }
+        }else if(val instanceof Character){
+          l=(char)val;
+        }else if(val instanceof Boolean){
+          l=TypeUtil.castToLong((boolean)val);
+        }else{
+          break returnFalse;
+        }
+        return this.uncheckedremoveVal(size,l);
       }
+  //#ELSE
+  //    if(val instanceof Long)
+  //    {
+  //  #IF OfDouble,OfFloat
+  //      final long v;
+  //      if((v=(long)val)==v)
+  //      {
+  //        #MACRO ReturnUncheckedQueryBits($convertToBits$(v))
+  //      }
+  //      #MACRO ReturnUncheckedQueryNaN()
+  //  #ELSE
+  //      #MACRO ReturnUncheckedQuery((long)(val))
+  //  #ENDIF
+  //    }
+  //#ENDIF
     }
     return false;
   }
@@ -704,12 +772,46 @@ public abstract class LongArrSeq implements OmniCollection.OfLong
     public int search(Object val)
     {
       final int size;
-      if((size=this.size)!=0)
-      {
-        if(val instanceof Long)
-        {
-          return OmniArray.OfLong.uncheckedsearch(this.arr,size,(long)(val));
+      if((size=this.size)!=0){
+       //TODO a pattern-matching switch statement would be great here
+        returnFalse:for(;;){
+          final long l;
+          if(val instanceof Long||val instanceof Integer||val instanceof Byte||val instanceof Short){
+            l=((Number)val).longValue();
+          }else if(val instanceof Float){
+            final float f;
+            if(!TypeUtil.floatEquals(f=(float)val,l=(long)f)){
+              break returnFalse;
+            }
+          }else if(val instanceof Double){
+            final double d;
+            if(!TypeUtil.doubleEquals(d=(double)val,l=(long)d)){
+              break returnFalse;
+            }
+          }else if(val instanceof Character){
+            l=(char)val;
+          }else if(val instanceof Boolean){
+            l=TypeUtil.castToLong((boolean)val);
+          }else{
+            break returnFalse;
+          }
+          return OmniArray.OfLong.uncheckedsearch(this.arr,size,l);
         }
+    //#ELSE
+    //    if(val instanceof Long)
+    //    {
+    //  #IF OfDouble,OfFloat
+    //      final long v;
+    //      if((v=(long)val)==v)
+    //      {
+    //        #MACRO ReturnUncheckedQueryBits($convertToBits$(v))
+    //      }
+    //      #MACRO ReturnUncheckedQueryNaN()
+    //  #ELSE
+    //      #MACRO ReturnUncheckedQuery((long)(val))
+    //  #ENDIF
+    //    }
+    //#ENDIF
       }
       return -1;
     }
@@ -1043,12 +1145,46 @@ public abstract class LongArrSeq implements OmniCollection.OfLong
     public int indexOf(Object val)
     {
       final int size;
-      if((size=this.size)!=0)
-      {
-        if(val instanceof Long)
-        {
-          return OmniArray.OfLong.uncheckedindexOf(this.arr,size,(long)(val));
+      if((size=this.size)!=0){
+       //TODO a pattern-matching switch statement would be great here
+        returnFalse:for(;;){
+          final long l;
+          if(val instanceof Long||val instanceof Integer||val instanceof Byte||val instanceof Short){
+            l=((Number)val).longValue();
+          }else if(val instanceof Float){
+            final float f;
+            if(!TypeUtil.floatEquals(f=(float)val,l=(long)f)){
+              break returnFalse;
+            }
+          }else if(val instanceof Double){
+            final double d;
+            if(!TypeUtil.doubleEquals(d=(double)val,l=(long)d)){
+              break returnFalse;
+            }
+          }else if(val instanceof Character){
+            l=(char)val;
+          }else if(val instanceof Boolean){
+            l=TypeUtil.castToLong((boolean)val);
+          }else{
+            break returnFalse;
+          }
+          return OmniArray.OfLong.uncheckedindexOf(this.arr,size,l);
         }
+    //#ELSE
+    //    if(val instanceof Long)
+    //    {
+    //  #IF OfDouble,OfFloat
+    //      final long v;
+    //      if((v=(long)val)==v)
+    //      {
+    //        #MACRO ReturnUncheckedQueryBits($convertToBits$(v))
+    //      }
+    //      #MACRO ReturnUncheckedQueryNaN()
+    //  #ELSE
+    //      #MACRO ReturnUncheckedQuery((long)(val))
+    //  #ENDIF
+    //    }
+    //#ENDIF
       }
       return -1;
     }
@@ -1116,12 +1252,46 @@ public abstract class LongArrSeq implements OmniCollection.OfLong
     public int lastIndexOf(Object val)
     {
       final int size;
-      if((size=this.size)!=0)
-      {
-        if(val instanceof Long)
-        {
-          return OmniArray.OfLong.uncheckedlastIndexOf(this.arr,size,(long)(val));
+      if((size=this.size)!=0){
+       //TODO a pattern-matching switch statement would be great here
+        returnFalse:for(;;){
+          final long l;
+          if(val instanceof Long||val instanceof Integer||val instanceof Byte||val instanceof Short){
+            l=((Number)val).longValue();
+          }else if(val instanceof Float){
+            final float f;
+            if(!TypeUtil.floatEquals(f=(float)val,l=(long)f)){
+              break returnFalse;
+            }
+          }else if(val instanceof Double){
+            final double d;
+            if(!TypeUtil.doubleEquals(d=(double)val,l=(long)d)){
+              break returnFalse;
+            }
+          }else if(val instanceof Character){
+            l=(char)val;
+          }else if(val instanceof Boolean){
+            l=TypeUtil.castToLong((boolean)val);
+          }else{
+            break returnFalse;
+          }
+          return OmniArray.OfLong.uncheckedlastIndexOf(this.arr,size,l);
         }
+    //#ELSE
+    //    if(val instanceof Long)
+    //    {
+    //  #IF OfDouble,OfFloat
+    //      final long v;
+    //      if((v=(long)val)==v)
+    //      {
+    //        #MACRO ReturnUncheckedQueryBits($convertToBits$(v))
+    //      }
+    //      #MACRO ReturnUncheckedQueryNaN()
+    //  #ELSE
+    //      #MACRO ReturnUncheckedQuery((long)(val))
+    //  #ENDIF
+    //    }
+    //#ENDIF
       }
       return -1;
     }
@@ -1661,13 +1831,47 @@ public abstract class LongArrSeq implements OmniCollection.OfLong
     public boolean contains(Object val)
     {
       final int size;
-      if((size=this.size)!=0)
-      {
-        if(val instanceof Long)
-        {
+      if((size=this.size)!=0){
+       //TODO a pattern-matching switch statement would be great here
+        returnFalse:for(;;){
+          final long l;
+          if(val instanceof Long||val instanceof Integer||val instanceof Byte||val instanceof Short){
+            l=((Number)val).longValue();
+          }else if(val instanceof Float){
+            final float f;
+            if(!TypeUtil.floatEquals(f=(float)val,l=(long)f)){
+              break returnFalse;
+            }
+          }else if(val instanceof Double){
+            final double d;
+            if(!TypeUtil.doubleEquals(d=(double)val,l=(long)d)){
+              break returnFalse;
+            }
+          }else if(val instanceof Character){
+            l=(char)val;
+          }else if(val instanceof Boolean){
+            l=TypeUtil.castToLong((boolean)val);
+          }else{
+            break returnFalse;
+          }
           final int rootOffset;
-          return OmniArray.OfLong.uncheckedcontains(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,(long)(val));
+          return OmniArray.OfLong.uncheckedcontains(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,l);
         }
+    //#ELSE
+    //    if(val instanceof Long)
+    //    {
+    //  #IF OfDouble,OfFloat
+    //      final long v;
+    //      if((v=(long)val)==v)
+    //      {
+    //        #MACRO ReturnUncheckedQueryBits($convertToBits$(v))
+    //      }
+    //      #MACRO ReturnUncheckedQueryNaN()
+    //  #ELSE
+    //      #MACRO ReturnUncheckedQuery((long)(val))
+    //  #ENDIF
+    //    }
+    //#ENDIF
       }
       return false;
     }
@@ -1761,12 +1965,46 @@ public abstract class LongArrSeq implements OmniCollection.OfLong
     public boolean remove(Object val)
     {
       final int size;
-      if((size=this.size)!=0)
-      {
-        if(val instanceof Long)
-        {
-          return this.uncheckedremoveVal(size,(long)(val));
+      if((size=this.size)!=0){
+       //TODO a pattern-matching switch statement would be great here
+        returnFalse:for(;;){
+          final long l;
+          if(val instanceof Long||val instanceof Integer||val instanceof Byte||val instanceof Short){
+            l=((Number)val).longValue();
+          }else if(val instanceof Float){
+            final float f;
+            if(!TypeUtil.floatEquals(f=(float)val,l=(long)f)){
+              break returnFalse;
+            }
+          }else if(val instanceof Double){
+            final double d;
+            if(!TypeUtil.doubleEquals(d=(double)val,l=(long)d)){
+              break returnFalse;
+            }
+          }else if(val instanceof Character){
+            l=(char)val;
+          }else if(val instanceof Boolean){
+            l=TypeUtil.castToLong((boolean)val);
+          }else{
+            break returnFalse;
+          }
+          return this.uncheckedremoveVal(size,l);
         }
+    //#ELSE
+    //    if(val instanceof Long)
+    //    {
+    //  #IF OfDouble,OfFloat
+    //      final long v;
+    //      if((v=(long)val)==v)
+    //      {
+    //        #MACRO ReturnUncheckedQueryBits($convertToBits$(v))
+    //      }
+    //      #MACRO ReturnUncheckedQueryNaN()
+    //  #ELSE
+    //      #MACRO ReturnUncheckedQuery((long)(val))
+    //  #ENDIF
+    //    }
+    //#ENDIF
       }
       return false;
     }
@@ -1858,12 +2096,46 @@ public abstract class LongArrSeq implements OmniCollection.OfLong
     public int indexOf(Object val)
     {
       final int size;
-      if((size=this.size)!=0)
-      {
-        if(val instanceof Long)
-        {
-          return OmniArray.OfLong.uncheckedindexOf(root.arr,this.rootOffset,size,(long)(val));
+      if((size=this.size)!=0){
+       //TODO a pattern-matching switch statement would be great here
+        returnFalse:for(;;){
+          final long l;
+          if(val instanceof Long||val instanceof Integer||val instanceof Byte||val instanceof Short){
+            l=((Number)val).longValue();
+          }else if(val instanceof Float){
+            final float f;
+            if(!TypeUtil.floatEquals(f=(float)val,l=(long)f)){
+              break returnFalse;
+            }
+          }else if(val instanceof Double){
+            final double d;
+            if(!TypeUtil.doubleEquals(d=(double)val,l=(long)d)){
+              break returnFalse;
+            }
+          }else if(val instanceof Character){
+            l=(char)val;
+          }else if(val instanceof Boolean){
+            l=TypeUtil.castToLong((boolean)val);
+          }else{
+            break returnFalse;
+          }
+          return OmniArray.OfLong.uncheckedindexOf(root.arr,this.rootOffset,size,l);
         }
+    //#ELSE
+    //    if(val instanceof Long)
+    //    {
+    //  #IF OfDouble,OfFloat
+    //      final long v;
+    //      if((v=(long)val)==v)
+    //      {
+    //        #MACRO ReturnUncheckedQueryBits($convertToBits$(v))
+    //      }
+    //      #MACRO ReturnUncheckedQueryNaN()
+    //  #ELSE
+    //      #MACRO ReturnUncheckedQuery((long)(val))
+    //  #ENDIF
+    //    }
+    //#ENDIF
       }
       return -1;
     }
@@ -1931,12 +2203,46 @@ public abstract class LongArrSeq implements OmniCollection.OfLong
     public int lastIndexOf(Object val)
     {
       final int size;
-      if((size=this.size)!=0)
-      {
-        if(val instanceof Long)
-        {
-          return OmniArray.OfLong.uncheckedlastIndexOf(root.arr,this.rootOffset,size,(long)(val));
+      if((size=this.size)!=0){
+       //TODO a pattern-matching switch statement would be great here
+        returnFalse:for(;;){
+          final long l;
+          if(val instanceof Long||val instanceof Integer||val instanceof Byte||val instanceof Short){
+            l=((Number)val).longValue();
+          }else if(val instanceof Float){
+            final float f;
+            if(!TypeUtil.floatEquals(f=(float)val,l=(long)f)){
+              break returnFalse;
+            }
+          }else if(val instanceof Double){
+            final double d;
+            if(!TypeUtil.doubleEquals(d=(double)val,l=(long)d)){
+              break returnFalse;
+            }
+          }else if(val instanceof Character){
+            l=(char)val;
+          }else if(val instanceof Boolean){
+            l=TypeUtil.castToLong((boolean)val);
+          }else{
+            break returnFalse;
+          }
+          return OmniArray.OfLong.uncheckedlastIndexOf(root.arr,this.rootOffset,size,l);
         }
+    //#ELSE
+    //    if(val instanceof Long)
+    //    {
+    //  #IF OfDouble,OfFloat
+    //      final long v;
+    //      if((v=(long)val)==v)
+    //      {
+    //        #MACRO ReturnUncheckedQueryBits($convertToBits$(v))
+    //      }
+    //      #MACRO ReturnUncheckedQueryNaN()
+    //  #ELSE
+    //      #MACRO ReturnUncheckedQuery((long)(val))
+    //  #ENDIF
+    //    }
+    //#ENDIF
       }
       return -1;
     }
@@ -3482,19 +3788,53 @@ public abstract class LongArrSeq implements OmniCollection.OfLong
     public boolean contains(Object val)
     {
       final int size;
-      if((size=this.size)!=0)
-      {
-        if(val instanceof Long)
-        {
+      if((size=this.size)!=0){
+       //TODO a pattern-matching switch statement would be great here
+        returnFalse:for(;;){
+          final long l;
+          if(val instanceof Long||val instanceof Integer||val instanceof Byte||val instanceof Short){
+            l=((Number)val).longValue();
+          }else if(val instanceof Float){
+            final float f;
+            if(!TypeUtil.floatEquals(f=(float)val,l=(long)f)){
+              break returnFalse;
+            }
+          }else if(val instanceof Double){
+            final double d;
+            if(!TypeUtil.doubleEquals(d=(double)val,l=(long)d)){
+              break returnFalse;
+            }
+          }else if(val instanceof Character){
+            l=(char)val;
+          }else if(val instanceof Boolean){
+            l=TypeUtil.castToLong((boolean)val);
+          }else{
+            break returnFalse;
+          }
           final int modCount=this.modCount;
           final var root=this.root;
           try{
             final int rootOffset;
-            return OmniArray.OfLong.uncheckedcontains(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,(long)(val));
+            return OmniArray.OfLong.uncheckedcontains(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,l);
           }finally{
             CheckedCollection.checkModCount(modCount,root.modCount);
           }
         }
+    //#ELSE
+    //    if(val instanceof Long)
+    //    {
+    //  #IF OfDouble,OfFloat
+    //      final long v;
+    //      if((v=(long)val)==v)
+    //      {
+    //        #MACRO ReturnUncheckedQueryBits($convertToBits$(v))
+    //      }
+    //      #MACRO ReturnUncheckedQueryNaN()
+    //  #ELSE
+    //      #MACRO ReturnUncheckedQuery((long)(val))
+    //  #ENDIF
+    //    }
+    //#ENDIF
       }
       CheckedCollection.checkModCount(modCount,root.modCount);
       return false;
@@ -3608,12 +3948,46 @@ public abstract class LongArrSeq implements OmniCollection.OfLong
     public boolean remove(Object val)
     {
       final int size;
-      if((size=this.size)!=0)
-      {
-        if(val instanceof Long)
-        {
-          return this.uncheckedremoveVal(size,(long)(val));
+      if((size=this.size)!=0){
+       //TODO a pattern-matching switch statement would be great here
+        returnFalse:for(;;){
+          final long l;
+          if(val instanceof Long||val instanceof Integer||val instanceof Byte||val instanceof Short){
+            l=((Number)val).longValue();
+          }else if(val instanceof Float){
+            final float f;
+            if(!TypeUtil.floatEquals(f=(float)val,l=(long)f)){
+              break returnFalse;
+            }
+          }else if(val instanceof Double){
+            final double d;
+            if(!TypeUtil.doubleEquals(d=(double)val,l=(long)d)){
+              break returnFalse;
+            }
+          }else if(val instanceof Character){
+            l=(char)val;
+          }else if(val instanceof Boolean){
+            l=TypeUtil.castToLong((boolean)val);
+          }else{
+            break returnFalse;
+          }
+          return this.uncheckedremoveVal(size,l);
         }
+    //#ELSE
+    //    if(val instanceof Long)
+    //    {
+    //  #IF OfDouble,OfFloat
+    //      final long v;
+    //      if((v=(long)val)==v)
+    //      {
+    //        #MACRO ReturnUncheckedQueryBits($convertToBits$(v))
+    //      }
+    //      #MACRO ReturnUncheckedQueryNaN()
+    //  #ELSE
+    //      #MACRO ReturnUncheckedQuery((long)(val))
+    //  #ENDIF
+    //    }
+    //#ENDIF
       }
       CheckedCollection.checkModCount(modCount,root.modCount);
       return false;
@@ -3743,18 +4117,52 @@ public abstract class LongArrSeq implements OmniCollection.OfLong
     public int indexOf(Object val)
     {
       final int size;
-      if((size=this.size)!=0)
-      {
-        if(val instanceof Long)
-        {
+      if((size=this.size)!=0){
+       //TODO a pattern-matching switch statement would be great here
+        returnFalse:for(;;){
+          final long l;
+          if(val instanceof Long||val instanceof Integer||val instanceof Byte||val instanceof Short){
+            l=((Number)val).longValue();
+          }else if(val instanceof Float){
+            final float f;
+            if(!TypeUtil.floatEquals(f=(float)val,l=(long)f)){
+              break returnFalse;
+            }
+          }else if(val instanceof Double){
+            final double d;
+            if(!TypeUtil.doubleEquals(d=(double)val,l=(long)d)){
+              break returnFalse;
+            }
+          }else if(val instanceof Character){
+            l=(char)val;
+          }else if(val instanceof Boolean){
+            l=TypeUtil.castToLong((boolean)val);
+          }else{
+            break returnFalse;
+          }
           final int modCount=this.modCount;
           final var root=this.root;
           try{
-            return OmniArray.OfLong.uncheckedindexOf(root.arr,this.rootOffset,size,(long)(val));
+            return OmniArray.OfLong.uncheckedindexOf(root.arr,this.rootOffset,size,l);
           }finally{
             CheckedCollection.checkModCount(modCount,root.modCount);
           }
         }
+    //#ELSE
+    //    if(val instanceof Long)
+    //    {
+    //  #IF OfDouble,OfFloat
+    //      final long v;
+    //      if((v=(long)val)==v)
+    //      {
+    //        #MACRO ReturnUncheckedQueryBits($convertToBits$(v))
+    //      }
+    //      #MACRO ReturnUncheckedQueryNaN()
+    //  #ELSE
+    //      #MACRO ReturnUncheckedQuery((long)(val))
+    //  #ENDIF
+    //    }
+    //#ENDIF
       }
       CheckedCollection.checkModCount(modCount,root.modCount);
       return -1;
@@ -3858,18 +4266,52 @@ public abstract class LongArrSeq implements OmniCollection.OfLong
     public int lastIndexOf(Object val)
     {
       final int size;
-      if((size=this.size)!=0)
-      {
-        if(val instanceof Long)
-        {
+      if((size=this.size)!=0){
+       //TODO a pattern-matching switch statement would be great here
+        returnFalse:for(;;){
+          final long l;
+          if(val instanceof Long||val instanceof Integer||val instanceof Byte||val instanceof Short){
+            l=((Number)val).longValue();
+          }else if(val instanceof Float){
+            final float f;
+            if(!TypeUtil.floatEquals(f=(float)val,l=(long)f)){
+              break returnFalse;
+            }
+          }else if(val instanceof Double){
+            final double d;
+            if(!TypeUtil.doubleEquals(d=(double)val,l=(long)d)){
+              break returnFalse;
+            }
+          }else if(val instanceof Character){
+            l=(char)val;
+          }else if(val instanceof Boolean){
+            l=TypeUtil.castToLong((boolean)val);
+          }else{
+            break returnFalse;
+          }
           final int modCount=this.modCount;
           final var root=this.root;
           try{
-            return OmniArray.OfLong.uncheckedlastIndexOf(root.arr,this.rootOffset,size,(long)(val));
+            return OmniArray.OfLong.uncheckedlastIndexOf(root.arr,this.rootOffset,size,l);
           }finally{
             CheckedCollection.checkModCount(modCount,root.modCount);
           }
         }
+    //#ELSE
+    //    if(val instanceof Long)
+    //    {
+    //  #IF OfDouble,OfFloat
+    //      final long v;
+    //      if((v=(long)val)==v)
+    //      {
+    //        #MACRO ReturnUncheckedQueryBits($convertToBits$(v))
+    //      }
+    //      #MACRO ReturnUncheckedQueryNaN()
+    //  #ELSE
+    //      #MACRO ReturnUncheckedQuery((long)(val))
+    //  #ENDIF
+    //    }
+    //#ENDIF
       }
       CheckedCollection.checkModCount(modCount,root.modCount);
       return -1;

@@ -160,12 +160,57 @@ public abstract class CharArrSeq implements OmniCollection.OfChar
   public boolean contains(Object val)
   {
     final int size;
-    if((size=this.size)!=0)
-    {
-      if(val instanceof Character)
-      {
-        return OmniArray.OfChar.uncheckedcontains(this.arr,0,size-1,(char)(val));
+    if((size=this.size)!=0){
+     //TODO a pattern-matching switch statement would be great here
+      returnFalse:for(;;){
+        final int i;
+        if(val instanceof Character){
+          i=(char)val;
+        }else if(val instanceof Integer){
+          if((i=(int)val)!=(char)i){
+            break returnFalse;
+          }
+        }else if(val instanceof Byte||val instanceof Short){
+          if((i=((Number)val).shortValue())<0){
+            break returnFalse;
+          }
+        }else if(val instanceof Long){
+          final long l;
+          if((l=(long)val)!=(i=(char)l)){
+            break returnFalse;
+          }
+        }else if(val instanceof Float){
+          final float f;
+          if((f=(float)val)!=(i=(char)f)){
+            break returnFalse;
+          }
+        }else if(val instanceof Double){
+          final double d;
+          if((d=(double)val)!=(i=(char)d)){
+            break returnFalse;
+          }
+        }else if(val instanceof Boolean){
+          i=TypeUtil.castToByte((boolean)val);
+        }else{
+          break returnFalse;
+        }
+        return OmniArray.OfChar.uncheckedcontains(this.arr,0,size-1,i);
       }
+  //#ELSE
+  //    if(val instanceof Character)
+  //    {
+  //  #IF OfDouble,OfFloat
+  //      final char v;
+  //      if((v=(char)val)==v)
+  //      {
+  //        #MACRO ReturnUncheckedQueryBits($convertToBits$(v))
+  //      }
+  //      #MACRO ReturnUncheckedQueryNaN()
+  //  #ELSE
+  //      #MACRO ReturnUncheckedQuery((char)(val))
+  //  #ENDIF
+  //    }
+  //#ENDIF
     }
     return false;
   }
@@ -276,12 +321,57 @@ public abstract class CharArrSeq implements OmniCollection.OfChar
   public boolean remove(Object val)
   {
     final int size;
-    if((size=this.size)!=0)
-    {
-      if(val instanceof Character)
-      {
-        return this.uncheckedremoveVal(size,(char)(val));
+    if((size=this.size)!=0){
+     //TODO a pattern-matching switch statement would be great here
+      returnFalse:for(;;){
+        final int i;
+        if(val instanceof Character){
+          i=(char)val;
+        }else if(val instanceof Integer){
+          if((i=(int)val)!=(char)i){
+            break returnFalse;
+          }
+        }else if(val instanceof Byte||val instanceof Short){
+          if((i=((Number)val).shortValue())<0){
+            break returnFalse;
+          }
+        }else if(val instanceof Long){
+          final long l;
+          if((l=(long)val)!=(i=(char)l)){
+            break returnFalse;
+          }
+        }else if(val instanceof Float){
+          final float f;
+          if((f=(float)val)!=(i=(char)f)){
+            break returnFalse;
+          }
+        }else if(val instanceof Double){
+          final double d;
+          if((d=(double)val)!=(i=(char)d)){
+            break returnFalse;
+          }
+        }else if(val instanceof Boolean){
+          i=TypeUtil.castToByte((boolean)val);
+        }else{
+          break returnFalse;
+        }
+        return this.uncheckedremoveVal(size,i);
       }
+  //#ELSE
+  //    if(val instanceof Character)
+  //    {
+  //  #IF OfDouble,OfFloat
+  //      final char v;
+  //      if((v=(char)val)==v)
+  //      {
+  //        #MACRO ReturnUncheckedQueryBits($convertToBits$(v))
+  //      }
+  //      #MACRO ReturnUncheckedQueryNaN()
+  //  #ELSE
+  //      #MACRO ReturnUncheckedQuery((char)(val))
+  //  #ENDIF
+  //    }
+  //#ENDIF
     }
     return false;
   }
@@ -753,12 +843,57 @@ public abstract class CharArrSeq implements OmniCollection.OfChar
     public int search(Object val)
     {
       final int size;
-      if((size=this.size)!=0)
-      {
-        if(val instanceof Character)
-        {
-          return OmniArray.OfChar.uncheckedsearch(this.arr,size,(char)(val));
+      if((size=this.size)!=0){
+       //TODO a pattern-matching switch statement would be great here
+        returnFalse:for(;;){
+          final int i;
+          if(val instanceof Character){
+            i=(char)val;
+          }else if(val instanceof Integer){
+            if((i=(int)val)!=(char)i){
+              break returnFalse;
+            }
+          }else if(val instanceof Byte||val instanceof Short){
+            if((i=((Number)val).shortValue())<0){
+              break returnFalse;
+            }
+          }else if(val instanceof Long){
+            final long l;
+            if((l=(long)val)!=(i=(char)l)){
+              break returnFalse;
+            }
+          }else if(val instanceof Float){
+            final float f;
+            if((f=(float)val)!=(i=(char)f)){
+              break returnFalse;
+            }
+          }else if(val instanceof Double){
+            final double d;
+            if((d=(double)val)!=(i=(char)d)){
+              break returnFalse;
+            }
+          }else if(val instanceof Boolean){
+            i=TypeUtil.castToByte((boolean)val);
+          }else{
+            break returnFalse;
+          }
+          return OmniArray.OfChar.uncheckedsearch(this.arr,size,i);
         }
+    //#ELSE
+    //    if(val instanceof Character)
+    //    {
+    //  #IF OfDouble,OfFloat
+    //      final char v;
+    //      if((v=(char)val)==v)
+    //      {
+    //        #MACRO ReturnUncheckedQueryBits($convertToBits$(v))
+    //      }
+    //      #MACRO ReturnUncheckedQueryNaN()
+    //  #ELSE
+    //      #MACRO ReturnUncheckedQuery((char)(val))
+    //  #ENDIF
+    //    }
+    //#ENDIF
       }
       return -1;
     }
@@ -1172,12 +1307,57 @@ public abstract class CharArrSeq implements OmniCollection.OfChar
     public int indexOf(Object val)
     {
       final int size;
-      if((size=this.size)!=0)
-      {
-        if(val instanceof Character)
-        {
-          return OmniArray.OfChar.uncheckedindexOf(this.arr,size,(char)(val));
+      if((size=this.size)!=0){
+       //TODO a pattern-matching switch statement would be great here
+        returnFalse:for(;;){
+          final int i;
+          if(val instanceof Character){
+            i=(char)val;
+          }else if(val instanceof Integer){
+            if((i=(int)val)!=(char)i){
+              break returnFalse;
+            }
+          }else if(val instanceof Byte||val instanceof Short){
+            if((i=((Number)val).shortValue())<0){
+              break returnFalse;
+            }
+          }else if(val instanceof Long){
+            final long l;
+            if((l=(long)val)!=(i=(char)l)){
+              break returnFalse;
+            }
+          }else if(val instanceof Float){
+            final float f;
+            if((f=(float)val)!=(i=(char)f)){
+              break returnFalse;
+            }
+          }else if(val instanceof Double){
+            final double d;
+            if((d=(double)val)!=(i=(char)d)){
+              break returnFalse;
+            }
+          }else if(val instanceof Boolean){
+            i=TypeUtil.castToByte((boolean)val);
+          }else{
+            break returnFalse;
+          }
+          return OmniArray.OfChar.uncheckedindexOf(this.arr,size,i);
         }
+    //#ELSE
+    //    if(val instanceof Character)
+    //    {
+    //  #IF OfDouble,OfFloat
+    //      final char v;
+    //      if((v=(char)val)==v)
+    //      {
+    //        #MACRO ReturnUncheckedQueryBits($convertToBits$(v))
+    //      }
+    //      #MACRO ReturnUncheckedQueryNaN()
+    //  #ELSE
+    //      #MACRO ReturnUncheckedQuery((char)(val))
+    //  #ENDIF
+    //    }
+    //#ENDIF
       }
       return -1;
     }
@@ -1275,12 +1455,57 @@ public abstract class CharArrSeq implements OmniCollection.OfChar
     public int lastIndexOf(Object val)
     {
       final int size;
-      if((size=this.size)!=0)
-      {
-        if(val instanceof Character)
-        {
-          return OmniArray.OfChar.uncheckedlastIndexOf(this.arr,size,(char)(val));
+      if((size=this.size)!=0){
+       //TODO a pattern-matching switch statement would be great here
+        returnFalse:for(;;){
+          final int i;
+          if(val instanceof Character){
+            i=(char)val;
+          }else if(val instanceof Integer){
+            if((i=(int)val)!=(char)i){
+              break returnFalse;
+            }
+          }else if(val instanceof Byte||val instanceof Short){
+            if((i=((Number)val).shortValue())<0){
+              break returnFalse;
+            }
+          }else if(val instanceof Long){
+            final long l;
+            if((l=(long)val)!=(i=(char)l)){
+              break returnFalse;
+            }
+          }else if(val instanceof Float){
+            final float f;
+            if((f=(float)val)!=(i=(char)f)){
+              break returnFalse;
+            }
+          }else if(val instanceof Double){
+            final double d;
+            if((d=(double)val)!=(i=(char)d)){
+              break returnFalse;
+            }
+          }else if(val instanceof Boolean){
+            i=TypeUtil.castToByte((boolean)val);
+          }else{
+            break returnFalse;
+          }
+          return OmniArray.OfChar.uncheckedlastIndexOf(this.arr,size,i);
         }
+    //#ELSE
+    //    if(val instanceof Character)
+    //    {
+    //  #IF OfDouble,OfFloat
+    //      final char v;
+    //      if((v=(char)val)==v)
+    //      {
+    //        #MACRO ReturnUncheckedQueryBits($convertToBits$(v))
+    //      }
+    //      #MACRO ReturnUncheckedQueryNaN()
+    //  #ELSE
+    //      #MACRO ReturnUncheckedQuery((char)(val))
+    //  #ENDIF
+    //    }
+    //#ENDIF
       }
       return -1;
     }
@@ -1853,13 +2078,58 @@ public abstract class CharArrSeq implements OmniCollection.OfChar
     public boolean contains(Object val)
     {
       final int size;
-      if((size=this.size)!=0)
-      {
-        if(val instanceof Character)
-        {
+      if((size=this.size)!=0){
+       //TODO a pattern-matching switch statement would be great here
+        returnFalse:for(;;){
+          final int i;
+          if(val instanceof Character){
+            i=(char)val;
+          }else if(val instanceof Integer){
+            if((i=(int)val)!=(char)i){
+              break returnFalse;
+            }
+          }else if(val instanceof Byte||val instanceof Short){
+            if((i=((Number)val).shortValue())<0){
+              break returnFalse;
+            }
+          }else if(val instanceof Long){
+            final long l;
+            if((l=(long)val)!=(i=(char)l)){
+              break returnFalse;
+            }
+          }else if(val instanceof Float){
+            final float f;
+            if((f=(float)val)!=(i=(char)f)){
+              break returnFalse;
+            }
+          }else if(val instanceof Double){
+            final double d;
+            if((d=(double)val)!=(i=(char)d)){
+              break returnFalse;
+            }
+          }else if(val instanceof Boolean){
+            i=TypeUtil.castToByte((boolean)val);
+          }else{
+            break returnFalse;
+          }
           final int rootOffset;
-          return OmniArray.OfChar.uncheckedcontains(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,(char)(val));
+          return OmniArray.OfChar.uncheckedcontains(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,i);
         }
+    //#ELSE
+    //    if(val instanceof Character)
+    //    {
+    //  #IF OfDouble,OfFloat
+    //      final char v;
+    //      if((v=(char)val)==v)
+    //      {
+    //        #MACRO ReturnUncheckedQueryBits($convertToBits$(v))
+    //      }
+    //      #MACRO ReturnUncheckedQueryNaN()
+    //  #ELSE
+    //      #MACRO ReturnUncheckedQuery((char)(val))
+    //  #ENDIF
+    //    }
+    //#ENDIF
       }
       return false;
     }
@@ -1973,12 +2243,57 @@ public abstract class CharArrSeq implements OmniCollection.OfChar
     public boolean remove(Object val)
     {
       final int size;
-      if((size=this.size)!=0)
-      {
-        if(val instanceof Character)
-        {
-          return this.uncheckedremoveVal(size,(char)(val));
+      if((size=this.size)!=0){
+       //TODO a pattern-matching switch statement would be great here
+        returnFalse:for(;;){
+          final int i;
+          if(val instanceof Character){
+            i=(char)val;
+          }else if(val instanceof Integer){
+            if((i=(int)val)!=(char)i){
+              break returnFalse;
+            }
+          }else if(val instanceof Byte||val instanceof Short){
+            if((i=((Number)val).shortValue())<0){
+              break returnFalse;
+            }
+          }else if(val instanceof Long){
+            final long l;
+            if((l=(long)val)!=(i=(char)l)){
+              break returnFalse;
+            }
+          }else if(val instanceof Float){
+            final float f;
+            if((f=(float)val)!=(i=(char)f)){
+              break returnFalse;
+            }
+          }else if(val instanceof Double){
+            final double d;
+            if((d=(double)val)!=(i=(char)d)){
+              break returnFalse;
+            }
+          }else if(val instanceof Boolean){
+            i=TypeUtil.castToByte((boolean)val);
+          }else{
+            break returnFalse;
+          }
+          return this.uncheckedremoveVal(size,i);
         }
+    //#ELSE
+    //    if(val instanceof Character)
+    //    {
+    //  #IF OfDouble,OfFloat
+    //      final char v;
+    //      if((v=(char)val)==v)
+    //      {
+    //        #MACRO ReturnUncheckedQueryBits($convertToBits$(v))
+    //      }
+    //      #MACRO ReturnUncheckedQueryNaN()
+    //  #ELSE
+    //      #MACRO ReturnUncheckedQuery((char)(val))
+    //  #ENDIF
+    //    }
+    //#ENDIF
       }
       return false;
     }
@@ -2089,12 +2404,57 @@ public abstract class CharArrSeq implements OmniCollection.OfChar
     public int indexOf(Object val)
     {
       final int size;
-      if((size=this.size)!=0)
-      {
-        if(val instanceof Character)
-        {
-          return OmniArray.OfChar.uncheckedindexOf(root.arr,this.rootOffset,size,(char)(val));
+      if((size=this.size)!=0){
+       //TODO a pattern-matching switch statement would be great here
+        returnFalse:for(;;){
+          final int i;
+          if(val instanceof Character){
+            i=(char)val;
+          }else if(val instanceof Integer){
+            if((i=(int)val)!=(char)i){
+              break returnFalse;
+            }
+          }else if(val instanceof Byte||val instanceof Short){
+            if((i=((Number)val).shortValue())<0){
+              break returnFalse;
+            }
+          }else if(val instanceof Long){
+            final long l;
+            if((l=(long)val)!=(i=(char)l)){
+              break returnFalse;
+            }
+          }else if(val instanceof Float){
+            final float f;
+            if((f=(float)val)!=(i=(char)f)){
+              break returnFalse;
+            }
+          }else if(val instanceof Double){
+            final double d;
+            if((d=(double)val)!=(i=(char)d)){
+              break returnFalse;
+            }
+          }else if(val instanceof Boolean){
+            i=TypeUtil.castToByte((boolean)val);
+          }else{
+            break returnFalse;
+          }
+          return OmniArray.OfChar.uncheckedindexOf(root.arr,this.rootOffset,size,i);
         }
+    //#ELSE
+    //    if(val instanceof Character)
+    //    {
+    //  #IF OfDouble,OfFloat
+    //      final char v;
+    //      if((v=(char)val)==v)
+    //      {
+    //        #MACRO ReturnUncheckedQueryBits($convertToBits$(v))
+    //      }
+    //      #MACRO ReturnUncheckedQueryNaN()
+    //  #ELSE
+    //      #MACRO ReturnUncheckedQuery((char)(val))
+    //  #ENDIF
+    //    }
+    //#ENDIF
       }
       return -1;
     }
@@ -2192,12 +2552,57 @@ public abstract class CharArrSeq implements OmniCollection.OfChar
     public int lastIndexOf(Object val)
     {
       final int size;
-      if((size=this.size)!=0)
-      {
-        if(val instanceof Character)
-        {
-          return OmniArray.OfChar.uncheckedlastIndexOf(root.arr,this.rootOffset,size,(char)(val));
+      if((size=this.size)!=0){
+       //TODO a pattern-matching switch statement would be great here
+        returnFalse:for(;;){
+          final int i;
+          if(val instanceof Character){
+            i=(char)val;
+          }else if(val instanceof Integer){
+            if((i=(int)val)!=(char)i){
+              break returnFalse;
+            }
+          }else if(val instanceof Byte||val instanceof Short){
+            if((i=((Number)val).shortValue())<0){
+              break returnFalse;
+            }
+          }else if(val instanceof Long){
+            final long l;
+            if((l=(long)val)!=(i=(char)l)){
+              break returnFalse;
+            }
+          }else if(val instanceof Float){
+            final float f;
+            if((f=(float)val)!=(i=(char)f)){
+              break returnFalse;
+            }
+          }else if(val instanceof Double){
+            final double d;
+            if((d=(double)val)!=(i=(char)d)){
+              break returnFalse;
+            }
+          }else if(val instanceof Boolean){
+            i=TypeUtil.castToByte((boolean)val);
+          }else{
+            break returnFalse;
+          }
+          return OmniArray.OfChar.uncheckedlastIndexOf(root.arr,this.rootOffset,size,i);
         }
+    //#ELSE
+    //    if(val instanceof Character)
+    //    {
+    //  #IF OfDouble,OfFloat
+    //      final char v;
+    //      if((v=(char)val)==v)
+    //      {
+    //        #MACRO ReturnUncheckedQueryBits($convertToBits$(v))
+    //      }
+    //      #MACRO ReturnUncheckedQueryNaN()
+    //  #ELSE
+    //      #MACRO ReturnUncheckedQuery((char)(val))
+    //  #ENDIF
+    //    }
+    //#ENDIF
       }
       return -1;
     }
@@ -3816,19 +4221,64 @@ public abstract class CharArrSeq implements OmniCollection.OfChar
     public boolean contains(Object val)
     {
       final int size;
-      if((size=this.size)!=0)
-      {
-        if(val instanceof Character)
-        {
+      if((size=this.size)!=0){
+       //TODO a pattern-matching switch statement would be great here
+        returnFalse:for(;;){
+          final int i;
+          if(val instanceof Character){
+            i=(char)val;
+          }else if(val instanceof Integer){
+            if((i=(int)val)!=(char)i){
+              break returnFalse;
+            }
+          }else if(val instanceof Byte||val instanceof Short){
+            if((i=((Number)val).shortValue())<0){
+              break returnFalse;
+            }
+          }else if(val instanceof Long){
+            final long l;
+            if((l=(long)val)!=(i=(char)l)){
+              break returnFalse;
+            }
+          }else if(val instanceof Float){
+            final float f;
+            if((f=(float)val)!=(i=(char)f)){
+              break returnFalse;
+            }
+          }else if(val instanceof Double){
+            final double d;
+            if((d=(double)val)!=(i=(char)d)){
+              break returnFalse;
+            }
+          }else if(val instanceof Boolean){
+            i=TypeUtil.castToByte((boolean)val);
+          }else{
+            break returnFalse;
+          }
           final int modCount=this.modCount;
           final var root=this.root;
           try{
             final int rootOffset;
-            return OmniArray.OfChar.uncheckedcontains(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,(char)(val));
+            return OmniArray.OfChar.uncheckedcontains(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,i);
           }finally{
             CheckedCollection.checkModCount(modCount,root.modCount);
           }
         }
+    //#ELSE
+    //    if(val instanceof Character)
+    //    {
+    //  #IF OfDouble,OfFloat
+    //      final char v;
+    //      if((v=(char)val)==v)
+    //      {
+    //        #MACRO ReturnUncheckedQueryBits($convertToBits$(v))
+    //      }
+    //      #MACRO ReturnUncheckedQueryNaN()
+    //  #ELSE
+    //      #MACRO ReturnUncheckedQuery((char)(val))
+    //  #ENDIF
+    //    }
+    //#ENDIF
       }
       CheckedCollection.checkModCount(modCount,root.modCount);
       return false;
@@ -3969,12 +4419,57 @@ public abstract class CharArrSeq implements OmniCollection.OfChar
     public boolean remove(Object val)
     {
       final int size;
-      if((size=this.size)!=0)
-      {
-        if(val instanceof Character)
-        {
-          return this.uncheckedremoveVal(size,(char)(val));
+      if((size=this.size)!=0){
+       //TODO a pattern-matching switch statement would be great here
+        returnFalse:for(;;){
+          final int i;
+          if(val instanceof Character){
+            i=(char)val;
+          }else if(val instanceof Integer){
+            if((i=(int)val)!=(char)i){
+              break returnFalse;
+            }
+          }else if(val instanceof Byte||val instanceof Short){
+            if((i=((Number)val).shortValue())<0){
+              break returnFalse;
+            }
+          }else if(val instanceof Long){
+            final long l;
+            if((l=(long)val)!=(i=(char)l)){
+              break returnFalse;
+            }
+          }else if(val instanceof Float){
+            final float f;
+            if((f=(float)val)!=(i=(char)f)){
+              break returnFalse;
+            }
+          }else if(val instanceof Double){
+            final double d;
+            if((d=(double)val)!=(i=(char)d)){
+              break returnFalse;
+            }
+          }else if(val instanceof Boolean){
+            i=TypeUtil.castToByte((boolean)val);
+          }else{
+            break returnFalse;
+          }
+          return this.uncheckedremoveVal(size,i);
         }
+    //#ELSE
+    //    if(val instanceof Character)
+    //    {
+    //  #IF OfDouble,OfFloat
+    //      final char v;
+    //      if((v=(char)val)==v)
+    //      {
+    //        #MACRO ReturnUncheckedQueryBits($convertToBits$(v))
+    //      }
+    //      #MACRO ReturnUncheckedQueryNaN()
+    //  #ELSE
+    //      #MACRO ReturnUncheckedQuery((char)(val))
+    //  #ENDIF
+    //    }
+    //#ENDIF
       }
       CheckedCollection.checkModCount(modCount,root.modCount);
       return false;
@@ -4124,18 +4619,63 @@ public abstract class CharArrSeq implements OmniCollection.OfChar
     public int indexOf(Object val)
     {
       final int size;
-      if((size=this.size)!=0)
-      {
-        if(val instanceof Character)
-        {
+      if((size=this.size)!=0){
+       //TODO a pattern-matching switch statement would be great here
+        returnFalse:for(;;){
+          final int i;
+          if(val instanceof Character){
+            i=(char)val;
+          }else if(val instanceof Integer){
+            if((i=(int)val)!=(char)i){
+              break returnFalse;
+            }
+          }else if(val instanceof Byte||val instanceof Short){
+            if((i=((Number)val).shortValue())<0){
+              break returnFalse;
+            }
+          }else if(val instanceof Long){
+            final long l;
+            if((l=(long)val)!=(i=(char)l)){
+              break returnFalse;
+            }
+          }else if(val instanceof Float){
+            final float f;
+            if((f=(float)val)!=(i=(char)f)){
+              break returnFalse;
+            }
+          }else if(val instanceof Double){
+            final double d;
+            if((d=(double)val)!=(i=(char)d)){
+              break returnFalse;
+            }
+          }else if(val instanceof Boolean){
+            i=TypeUtil.castToByte((boolean)val);
+          }else{
+            break returnFalse;
+          }
           final int modCount=this.modCount;
           final var root=this.root;
           try{
-            return OmniArray.OfChar.uncheckedindexOf(root.arr,this.rootOffset,size,(char)(val));
+            return OmniArray.OfChar.uncheckedindexOf(root.arr,this.rootOffset,size,i);
           }finally{
             CheckedCollection.checkModCount(modCount,root.modCount);
           }
         }
+    //#ELSE
+    //    if(val instanceof Character)
+    //    {
+    //  #IF OfDouble,OfFloat
+    //      final char v;
+    //      if((v=(char)val)==v)
+    //      {
+    //        #MACRO ReturnUncheckedQueryBits($convertToBits$(v))
+    //      }
+    //      #MACRO ReturnUncheckedQueryNaN()
+    //  #ELSE
+    //      #MACRO ReturnUncheckedQuery((char)(val))
+    //  #ENDIF
+    //    }
+    //#ENDIF
       }
       CheckedCollection.checkModCount(modCount,root.modCount);
       return -1;
@@ -4283,18 +4823,63 @@ public abstract class CharArrSeq implements OmniCollection.OfChar
     public int lastIndexOf(Object val)
     {
       final int size;
-      if((size=this.size)!=0)
-      {
-        if(val instanceof Character)
-        {
+      if((size=this.size)!=0){
+       //TODO a pattern-matching switch statement would be great here
+        returnFalse:for(;;){
+          final int i;
+          if(val instanceof Character){
+            i=(char)val;
+          }else if(val instanceof Integer){
+            if((i=(int)val)!=(char)i){
+              break returnFalse;
+            }
+          }else if(val instanceof Byte||val instanceof Short){
+            if((i=((Number)val).shortValue())<0){
+              break returnFalse;
+            }
+          }else if(val instanceof Long){
+            final long l;
+            if((l=(long)val)!=(i=(char)l)){
+              break returnFalse;
+            }
+          }else if(val instanceof Float){
+            final float f;
+            if((f=(float)val)!=(i=(char)f)){
+              break returnFalse;
+            }
+          }else if(val instanceof Double){
+            final double d;
+            if((d=(double)val)!=(i=(char)d)){
+              break returnFalse;
+            }
+          }else if(val instanceof Boolean){
+            i=TypeUtil.castToByte((boolean)val);
+          }else{
+            break returnFalse;
+          }
           final int modCount=this.modCount;
           final var root=this.root;
           try{
-            return OmniArray.OfChar.uncheckedlastIndexOf(root.arr,this.rootOffset,size,(char)(val));
+            return OmniArray.OfChar.uncheckedlastIndexOf(root.arr,this.rootOffset,size,i);
           }finally{
             CheckedCollection.checkModCount(modCount,root.modCount);
           }
         }
+    //#ELSE
+    //    if(val instanceof Character)
+    //    {
+    //  #IF OfDouble,OfFloat
+    //      final char v;
+    //      if((v=(char)val)==v)
+    //      {
+    //        #MACRO ReturnUncheckedQueryBits($convertToBits$(v))
+    //      }
+    //      #MACRO ReturnUncheckedQueryNaN()
+    //  #ELSE
+    //      #MACRO ReturnUncheckedQuery((char)(val))
+    //  #ENDIF
+    //    }
+    //#ENDIF
       }
       CheckedCollection.checkModCount(modCount,root.modCount);
       return -1;

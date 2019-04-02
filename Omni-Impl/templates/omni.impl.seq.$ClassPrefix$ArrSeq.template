@@ -923,8 +923,6 @@ public void unstableDIRECTIONSort()
   final int size;
   if((size=this.size)>1){
     #IFSWITCH STRUCTNAME==CheckedList
-    
-    
       #IF OfRef
     final int modCount=this.modCount;
     try
@@ -2218,29 +2216,340 @@ ERROR QueryShort<STRUCTNAME,METHODNAME>() is not allowed for $ClassPrefix$
 #MACRO QuerySignature<Object>()
 {
   final int size;
-  if((size=this.size)!=0)
-  {
+  if((size=this.size)!=0){
 #IF OfRef
-    if(val!=null)
-    {
+    if(val!=null){
       #MACRO ReturnUncheckedQueryNonNull(val)
     }
     #MACRO ReturnUncheckedQueryNull()
 #ELSE
-    if(val instanceof $BoxedType$)
-    {
-  #IF OfDouble,OfFloat
-      final $ArrayType$ v;
-      if((v=($ArrayType$)val)==v)
-      {
-        #MACRO ReturnUncheckedQueryBits($convertToBits$(v))
+   //TODO a pattern-matching switch statement would be great here
+    returnFalse:for(;;){
+  #IF OfBoolean
+      final boolean b;
+      if(val instanceof Boolean){
+        b=(boolean)val;
+      }else if(val instanceof Integer||val instanceof Byte||val instanceof Short){
+        switch(((Number)val).intValue()){
+          default:
+            break returnFalse;
+          case 0:
+            b=false;
+            break;
+          case 1:
+            b=true;
+        }
+      }else if(val instanceof Float){
+        switch(Float.floatToRawIntBits((float)val)){
+          default:
+            break returnFalse;
+          case 0:
+          case Integer.MIN_VALUE:
+            b=false;
+            break;
+          case TypeUtil.FLT_TRUE_BITS:
+            b=true;
+        }
+      }else if(val instanceof Double){
+        final long bits;
+        if((bits=Double.doubleToRawLongBits((double)val))==0L || bits==Long.MIN_VALUE){
+          b=false;
+        }else if(bits==TypeUtil.DBL_TRUE_BITS){
+          b=true;
+        }else{
+          break returnFalse;
+        }
+      }else if(val instanceof Long){
+        final long v;
+        if((v=(long)val)==0L){
+          b=false;
+        }else if(v==1L){
+          b=true;
+        }else{
+         break returnFalse;
+        }
+      }else if(val instanceof Character){
+        switch(((Character)val).charValue()){
+          default:
+            break returnFalse;
+          case 0:
+            b=false;
+            break;
+          case 1:
+            b=true;
+        }
+      }else{
+        break returnFalse;
       }
-      #MACRO ReturnUncheckedQueryNaN()
+      #MACRO ReturnUncheckedQuery(b)
+  #ELSEIF OfByte
+      final int i;
+      if(val instanceof Byte){
+        i=(byte)val;
+      }else if(val instanceof Integer||val instanceof Short){
+        if((i=((Number)val).intValue())!=(byte)i){
+          break returnFalse;
+        }
+      }else if(val instanceof Long){
+        final long l;
+        if((l=(long)val)!=(i=(byte)l)){
+          break returnFalse;
+        }
+      }else if(val instanceof Float){
+        final float f;
+        if((f=(float)val)!=(i=(byte)f)){
+          break returnFalse;
+        }
+      }else if(val instanceof Double){
+        final double d;
+        if((d=(double)val)!=(i=(byte)d)){
+          break returnFalse;
+        }
+      }else if(val instanceof Character){
+        if((i=(char)val)>Byte.MAX_VALUE){
+          break returnFalse;
+        }
+      }else if(val instanceof Boolean){
+        i=TypeUtil.castToByte((boolean)val);
+      }else{
+        break returnFalse;
+      }
+      #MACRO ReturnUncheckedQuery(i);
+  #ELSEIF OfChar
+      final int i;
+      if(val instanceof Character){
+        i=(char)val;
+      }else if(val instanceof Integer){
+        if((i=(int)val)!=(char)i){
+          break returnFalse;
+        }
+      }else if(val instanceof Byte||val instanceof Short){
+        if((i=((Number)val).shortValue())<0){
+          break returnFalse;
+        }
+      }else if(val instanceof Long){
+        final long l;
+        if((l=(long)val)!=(i=(char)l)){
+          break returnFalse;
+        }
+      }else if(val instanceof Float){
+        final float f;
+        if((f=(float)val)!=(i=(char)f)){
+          break returnFalse;
+        }
+      }else if(val instanceof Double){
+        final double d;
+        if((d=(double)val)!=(i=(char)d)){
+          break returnFalse;
+        }
+      }else if(val instanceof Boolean){
+        i=TypeUtil.castToByte((boolean)val);
+      }else{
+        break returnFalse;
+      }
+      #MACRO ReturnUncheckedQuery(i);
+  #ELSEIF OfShort
+      final int i;
+      if(val instanceof Short||val instanceof Byte){
+        i=((Number)val).shortValue();
+      }else if(val instanceof Integer){
+        if((i=(int)val)!=(short)i){
+          break returnFalse;
+        }
+      }else if(val instanceof Long){
+        final long l;
+        if((l=(long)val)!=(i=(short)l)){
+          break returnFalse;
+        }
+      }else if(val instanceof Float){
+        final float f;
+        if((f=(float)val)!=(i=(short)f)){
+          break returnFalse;
+        }
+      }else if(val instanceof Double){
+        final double d;
+        if((d=(double)val)!=(i=(short)d)){
+          break returnFalse;
+        }
+      }else if(val instanceof Character){
+        if((i=(char)val)>Short.MAX_VALUE){
+          break returnFalse;
+        }
+      }else if(val instanceof Boolean){
+        i=TypeUtil.castToByte((boolean)val);
+      }else{
+        break returnFalse;
+      }
+      #MACRO ReturnUncheckedQuery(i);
+  #ELSEIF OfInt
+      final int i;
+      if(val instanceof Integer||val instanceof Byte||val instanceof Short){
+        i=((Number)val).intValue();
+      }else if(val instanceof Long){
+        final long l;
+        if((l=(long)val)!=(i=(int)l)){
+          break returnFalse;
+        }
+      }else if(val instanceof Float){
+        final float f;
+        if((double)(f=(float)val)!=(double)(i=(int)f)){
+          break returnFalse;
+        }
+      }else if(val instanceof Double){
+        final double d;
+        if((d=(double)val)!=(i=(int)d)){
+          break returnFalse;
+        }
+      }else if(val instanceof Character){
+        i=(char)val;
+      }else if(val instanceof Boolean){
+        i=TypeUtil.castToByte((boolean)val);
+      }else{
+        break returnFalse;
+      }
+      #MACRO ReturnUncheckedQuery(i);
+  #ELSEIF OfLong
+      final long l;
+      if(val instanceof Long||val instanceof Integer||val instanceof Byte||val instanceof Short){
+        l=((Number)val).longValue();
+      }else if(val instanceof Float){
+        final float f;
+        if(!TypeUtil.floatEquals(f=(float)val,l=(long)f)){
+          break returnFalse;
+        }
+      }else if(val instanceof Double){
+        final double d;
+        if(!TypeUtil.doubleEquals(d=(double)val,l=(long)d)){
+          break returnFalse;
+        }
+      }else if(val instanceof Character){
+        l=(char)val;
+      }else if(val instanceof Boolean){
+        l=TypeUtil.castToLong((boolean)val);
+      }else{
+        break returnFalse;
+      }
+      #MACRO ReturnUncheckedQuery(l);
+  #ELSEIF OfFloat
+      if(val instanceof Float){
+        final float f;
+        if((f=(float)val)==f){
+           #MACRO ReturnUncheckedQueryBits($convertToBits$(f))
+        }
+        #MACRO ReturnUncheckedQueryNaN()
+      }else if(val instanceof Double){
+        final double d;
+        final float f;
+        if((d=(double)val)==(f=(float)d)){
+          #MACRO ReturnUncheckedQueryBits($convertToBits$(f))
+        }else if(f!=f){
+          #MACRO ReturnUncheckedQueryNaN()
+        }else{
+          break returnFalse;
+        }
+      }else if(val instanceof Integer){
+        final int i;
+        if((i=(int)val)!=0){
+          if(!TypeUtil.checkCastToFloat(i)){
+            break returnFalse;
+          }
+          #MACRO ReturnUncheckedQueryBits($convertToBits$(i))
+        }
+        #MACRO ReturnUncheckedQuery0()
+      }else if(val instanceof Long){
+        final long l;
+        if((l=(long)val)!=0){
+          if(!TypeUtil.checkCastToFloat(l)){
+            break returnFalse;
+          }
+          #MACRO ReturnUncheckedQueryBits($convertToBits$(l))
+        }
+        #MACRO ReturnUncheckedQuery0()
+      }else if(val instanceof Short||val instanceof Byte){
+        final int i;
+        if((i=((Number)val).shortValue())!=0){
+ 
+          #MACRO ReturnUncheckedQueryBits($convertToBits$(i))
+        }
+        #MACRO ReturnUncheckedQuery0()
+      }else if(val instanceof Character){
+        final int i;
+        if((i=(char)val)!=0){
+ 
+          #MACRO ReturnUncheckedQueryBits($convertToBits$(i))
+        }
+        #MACRO ReturnUncheckedQuery0()
+      }else if(val instanceof Boolean){
+        if((boolean)val){
+          #MACRO ReturnUncheckedQueryBits($TRUE_BITS$)
+        }
+        #MACRO ReturnUncheckedQuery0()
+      }else{
+        break returnFalse;
+      }
   #ELSE
-      #MACRO ReturnUncheckedQuery($queryCastRef$(val))
+      if(val instanceof Double){
+        final double d;
+        if((d=(double)val)==d){
+           #MACRO ReturnUncheckedQueryBits($convertToBits$(d))
+        }
+        #MACRO ReturnUncheckedQueryNaN()
+      }else if(val instanceof Float){
+        final float f;
+        if((f=(float)val)==f){
+           #MACRO ReturnUncheckedQueryBits($convertToBits$(f))
+        }
+        #MACRO ReturnUncheckedQueryNaN()
+      }else if(val instanceof Integer|| val instanceof Short||val instanceof Byte){
+        final int i;
+        if((i=((Number)val).intValue())!=0){
+ 
+          #MACRO ReturnUncheckedQueryBits($convertToBits$(i))
+        }
+        #MACRO ReturnUncheckedQuery0()
+      }else if(val instanceof Long){
+        final long l;
+        if((l=(long)val)!=0){
+          if(!TypeUtil.checkCastToDouble(l)){
+            break returnFalse;
+          }
+          #MACRO ReturnUncheckedQueryBits($convertToBits$(l))
+        }
+        #MACRO ReturnUncheckedQuery0()
+      }else if(val instanceof Character){
+        final int i;
+        if((i=(char)val)!=0){
+ 
+          #MACRO ReturnUncheckedQueryBits($convertToBits$(i))
+        }
+        #MACRO ReturnUncheckedQuery0()
+      }else if(val instanceof Boolean){
+        if((boolean)val){
+          #MACRO ReturnUncheckedQueryBits($TRUE_BITS$)
+        }
+        #MACRO ReturnUncheckedQuery0()
+      }else{
+        break returnFalse;
+      }
   #ENDIF
     }
 #ENDIF
+
+//#ELSE
+//    if(val instanceof $BoxedType$)
+//    {
+//  #IF OfDouble,OfFloat
+//      final $ArrayType$ v;
+//      if((v=($ArrayType$)val)==v)
+//      {
+//        #MACRO ReturnUncheckedQueryBits($convertToBits$(v))
+//      }
+//      #MACRO ReturnUncheckedQueryNaN()
+//  #ELSE
+//      #MACRO ReturnUncheckedQuery($queryCastRef$(val))
+//  #ENDIF
+//    }
+//#ENDIF
   }
   #MACRO CheckedSubListNegativeReturnCheckModCount()
   #MACRO QueryReturnNegative()

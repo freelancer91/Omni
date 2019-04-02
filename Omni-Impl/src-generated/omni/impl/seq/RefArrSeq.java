@@ -145,13 +145,26 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>
   public boolean contains(Object val)
   {
     final int size;
-    if((size=this.size)!=0)
-    {
-      if(val!=null)
-      {
+    if((size=this.size)!=0){
+      if(val!=null){
         return OmniArray.OfRef.uncheckedcontainsNonNull(this.arr,0,size-1,val);
       }
       return OmniArray.OfRef.uncheckedcontainsNull(this.arr,0,size-1);
+  //#ELSE
+  //    if(val instanceof E)
+  //    {
+  //  #IF OfDouble,OfFloat
+  //      final Object v;
+  //      if((v=(Object)val)==v)
+  //      {
+  //        #MACRO ReturnUncheckedQueryBits($convertToBits$(v))
+  //      }
+  //      #MACRO ReturnUncheckedQueryNaN()
+  //  #ELSE
+  //      #MACRO ReturnUncheckedQuery(OmniPred.OfRef.getEqualsPred(val))
+  //  #ENDIF
+  //    }
+  //#ENDIF
     }
     return false;
   }
@@ -359,13 +372,26 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>
   public boolean remove(Object val)
   {
     final int size;
-    if((size=this.size)!=0)
-    {
-      if(val!=null)
-      {
+    if((size=this.size)!=0){
+      if(val!=null){
         return this.uncheckedremoveValNonNull(size,val);
       }
       return this.uncheckedremoveValNull(size);
+  //#ELSE
+  //    if(val instanceof E)
+  //    {
+  //  #IF OfDouble,OfFloat
+  //      final Object v;
+  //      if((v=(Object)val)==v)
+  //      {
+  //        #MACRO ReturnUncheckedQueryBits($convertToBits$(v))
+  //      }
+  //      #MACRO ReturnUncheckedQueryNaN()
+  //  #ELSE
+  //      #MACRO ReturnUncheckedQuery(OmniPred.OfRef.getEqualsPred(val))
+  //  #ENDIF
+  //    }
+  //#ENDIF
     }
     return false;
   }
@@ -850,13 +876,26 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>
     public int search(Object val)
     {
       final int size;
-      if((size=this.size)!=0)
-      {
-        if(val!=null)
-        {
+      if((size=this.size)!=0){
+        if(val!=null){
           return OmniArray.OfRef.uncheckedsearchNonNull(this.arr,size,val);
         }
         return OmniArray.OfRef.uncheckedsearchNull(this.arr,size);
+    //#ELSE
+    //    if(val instanceof E)
+    //    {
+    //  #IF OfDouble,OfFloat
+    //      final Object v;
+    //      if((v=(Object)val)==v)
+    //      {
+    //        #MACRO ReturnUncheckedQueryBits($convertToBits$(v))
+    //      }
+    //      #MACRO ReturnUncheckedQueryNaN()
+    //  #ELSE
+    //      #MACRO ReturnUncheckedQuery(OmniPred.OfRef.getEqualsPred(val))
+    //  #ENDIF
+    //    }
+    //#ENDIF
       }
       return -1;
     }
@@ -1271,13 +1310,26 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>
     public int indexOf(Object val)
     {
       final int size;
-      if((size=this.size)!=0)
-      {
-        if(val!=null)
-        {
+      if((size=this.size)!=0){
+        if(val!=null){
           return OmniArray.OfRef.uncheckedindexOfNonNull(this.arr,size,val);
         }
         return OmniArray.OfRef.uncheckedindexOfNull(this.arr,size);
+    //#ELSE
+    //    if(val instanceof E)
+    //    {
+    //  #IF OfDouble,OfFloat
+    //      final Object v;
+    //      if((v=(Object)val)==v)
+    //      {
+    //        #MACRO ReturnUncheckedQueryBits($convertToBits$(v))
+    //      }
+    //      #MACRO ReturnUncheckedQueryNaN()
+    //  #ELSE
+    //      #MACRO ReturnUncheckedQuery(OmniPred.OfRef.getEqualsPred(val))
+    //  #ENDIF
+    //    }
+    //#ENDIF
       }
       return -1;
     }
@@ -1485,13 +1537,26 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>
     public int lastIndexOf(Object val)
     {
       final int size;
-      if((size=this.size)!=0)
-      {
-        if(val!=null)
-        {
+      if((size=this.size)!=0){
+        if(val!=null){
           return OmniArray.OfRef.uncheckedlastIndexOfNonNull(this.arr,size,val);
         }
         return OmniArray.OfRef.uncheckedlastIndexOfNull(this.arr,size);
+    //#ELSE
+    //    if(val instanceof E)
+    //    {
+    //  #IF OfDouble,OfFloat
+    //      final Object v;
+    //      if((v=(Object)val)==v)
+    //      {
+    //        #MACRO ReturnUncheckedQueryBits($convertToBits$(v))
+    //      }
+    //      #MACRO ReturnUncheckedQueryNaN()
+    //  #ELSE
+    //      #MACRO ReturnUncheckedQuery(OmniPred.OfRef.getEqualsPred(val))
+    //  #ENDIF
+    //    }
+    //#ENDIF
       }
       return -1;
     }
@@ -2162,15 +2227,28 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>
     public boolean contains(Object val)
     {
       final int size;
-      if((size=this.size)!=0)
-      {
-        if(val!=null)
-        {
+      if((size=this.size)!=0){
+        if(val!=null){
           final int rootOffset;
           return OmniArray.OfRef.uncheckedcontainsNonNull(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,val);
         }
         final int rootOffset;
         return OmniArray.OfRef.uncheckedcontainsNull(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
+    //#ELSE
+    //    if(val instanceof E)
+    //    {
+    //  #IF OfDouble,OfFloat
+    //      final Object v;
+    //      if((v=(Object)val)==v)
+    //      {
+    //        #MACRO ReturnUncheckedQueryBits($convertToBits$(v))
+    //      }
+    //      #MACRO ReturnUncheckedQueryNaN()
+    //  #ELSE
+    //      #MACRO ReturnUncheckedQuery(OmniPred.OfRef.getEqualsPred(val))
+    //  #ENDIF
+    //    }
+    //#ENDIF
       }
       return false;
     }
@@ -2397,13 +2475,26 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>
     public boolean remove(Object val)
     {
       final int size;
-      if((size=this.size)!=0)
-      {
-        if(val!=null)
-        {
+      if((size=this.size)!=0){
+        if(val!=null){
           return this.uncheckedremoveValNonNull(size,val);
         }
         return this.uncheckedremoveValNull(size);
+    //#ELSE
+    //    if(val instanceof E)
+    //    {
+    //  #IF OfDouble,OfFloat
+    //      final Object v;
+    //      if((v=(Object)val)==v)
+    //      {
+    //        #MACRO ReturnUncheckedQueryBits($convertToBits$(v))
+    //      }
+    //      #MACRO ReturnUncheckedQueryNaN()
+    //  #ELSE
+    //      #MACRO ReturnUncheckedQuery(OmniPred.OfRef.getEqualsPred(val))
+    //  #ENDIF
+    //    }
+    //#ENDIF
       }
       return false;
     }
@@ -2611,13 +2702,26 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>
     public int indexOf(Object val)
     {
       final int size;
-      if((size=this.size)!=0)
-      {
-        if(val!=null)
-        {
+      if((size=this.size)!=0){
+        if(val!=null){
           return OmniArray.OfRef.uncheckedindexOfNonNull(root.arr,this.rootOffset,size,val);
         }
         return OmniArray.OfRef.uncheckedindexOfNull(root.arr,this.rootOffset,size);
+    //#ELSE
+    //    if(val instanceof E)
+    //    {
+    //  #IF OfDouble,OfFloat
+    //      final Object v;
+    //      if((v=(Object)val)==v)
+    //      {
+    //        #MACRO ReturnUncheckedQueryBits($convertToBits$(v))
+    //      }
+    //      #MACRO ReturnUncheckedQueryNaN()
+    //  #ELSE
+    //      #MACRO ReturnUncheckedQuery(OmniPred.OfRef.getEqualsPred(val))
+    //  #ENDIF
+    //    }
+    //#ENDIF
       }
       return -1;
     }
@@ -2825,13 +2929,26 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>
     public int lastIndexOf(Object val)
     {
       final int size;
-      if((size=this.size)!=0)
-      {
-        if(val!=null)
-        {
+      if((size=this.size)!=0){
+        if(val!=null){
           return OmniArray.OfRef.uncheckedlastIndexOfNonNull(root.arr,this.rootOffset,size,val);
         }
         return OmniArray.OfRef.uncheckedlastIndexOfNull(root.arr,this.rootOffset,size);
+    //#ELSE
+    //    if(val instanceof E)
+    //    {
+    //  #IF OfDouble,OfFloat
+    //      final Object v;
+    //      if((v=(Object)val)==v)
+    //      {
+    //        #MACRO ReturnUncheckedQueryBits($convertToBits$(v))
+    //      }
+    //      #MACRO ReturnUncheckedQueryNaN()
+    //  #ELSE
+    //      #MACRO ReturnUncheckedQuery(OmniPred.OfRef.getEqualsPred(val))
+    //  #ENDIF
+    //    }
+    //#ENDIF
       }
       return -1;
     }
@@ -3504,10 +3621,8 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>
     public boolean contains(Object val)
     {
       final int size;
-      if((size=this.size)!=0)
-      {
-        if(val!=null)
-        {
+      if((size=this.size)!=0){
+        if(val!=null){
           final int modCount=this.modCount;
           try{
             return OmniArray.OfRef.uncheckedcontainsNonNull(this.arr,0,size-1,val);
@@ -3516,6 +3631,21 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>
           }
         }
         return OmniArray.OfRef.uncheckedcontainsNull(this.arr,0,size-1);
+    //#ELSE
+    //    if(val instanceof E)
+    //    {
+    //  #IF OfDouble,OfFloat
+    //      final Object v;
+    //      if((v=(Object)val)==v)
+    //      {
+    //        #MACRO ReturnUncheckedQueryBits($convertToBits$(v))
+    //      }
+    //      #MACRO ReturnUncheckedQueryNaN()
+    //  #ELSE
+    //      #MACRO ReturnUncheckedQuery(OmniPred.OfRef.getEqualsPred(val))
+    //  #ENDIF
+    //    }
+    //#ENDIF
       }
       return false;
     }
@@ -3523,10 +3653,8 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>
     public int search(Object val)
     {
       final int size;
-      if((size=this.size)!=0)
-      {
-        if(val!=null)
-        {
+      if((size=this.size)!=0){
+        if(val!=null){
           final int modCount=this.modCount;
           try{
             return OmniArray.OfRef.uncheckedsearchNonNull(this.arr,size,val);
@@ -3535,6 +3663,21 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>
           }
         }
         return OmniArray.OfRef.uncheckedsearchNull(this.arr,size);  
+    //#ELSE
+    //    if(val instanceof E)
+    //    {
+    //  #IF OfDouble,OfFloat
+    //      final Object v;
+    //      if((v=(Object)val)==v)
+    //      {
+    //        #MACRO ReturnUncheckedQueryBits($convertToBits$(v))
+    //      }
+    //      #MACRO ReturnUncheckedQueryNaN()
+    //  #ELSE
+    //      #MACRO ReturnUncheckedQuery(OmniPred.OfRef.getEqualsPred(val))
+    //  #ENDIF
+    //    }
+    //#ENDIF
       }
       return -1;
     }
@@ -3879,10 +4022,8 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>
     public boolean contains(Object val)
     {
       final int size;
-      if((size=this.size)!=0)
-      {
-        if(val!=null)
-        {
+      if((size=this.size)!=0){
+        if(val!=null){
           final int modCount=this.modCount;
           try{
             return OmniArray.OfRef.uncheckedcontainsNonNull(this.arr,0,size-1,val);
@@ -3891,6 +4032,21 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>
           }
         }
         return OmniArray.OfRef.uncheckedcontainsNull(this.arr,0,size-1);
+    //#ELSE
+    //    if(val instanceof E)
+    //    {
+    //  #IF OfDouble,OfFloat
+    //      final Object v;
+    //      if((v=(Object)val)==v)
+    //      {
+    //        #MACRO ReturnUncheckedQueryBits($convertToBits$(v))
+    //      }
+    //      #MACRO ReturnUncheckedQueryNaN()
+    //  #ELSE
+    //      #MACRO ReturnUncheckedQuery(OmniPred.OfRef.getEqualsPred(val))
+    //  #ENDIF
+    //    }
+    //#ENDIF
       }
       return false;
     }
@@ -3898,10 +4054,8 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>
     public int indexOf(Object val)
     {
       final int size;
-      if((size=this.size)!=0)
-      {
-        if(val!=null)
-        {
+      if((size=this.size)!=0){
+        if(val!=null){
           final int modCount=this.modCount;
           try{
             return OmniArray.OfRef.uncheckedindexOfNonNull(this.arr,size,val);
@@ -3910,6 +4064,21 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>
           }
         }
         return OmniArray.OfRef.uncheckedindexOfNull(this.arr,size);  
+    //#ELSE
+    //    if(val instanceof E)
+    //    {
+    //  #IF OfDouble,OfFloat
+    //      final Object v;
+    //      if((v=(Object)val)==v)
+    //      {
+    //        #MACRO ReturnUncheckedQueryBits($convertToBits$(v))
+    //      }
+    //      #MACRO ReturnUncheckedQueryNaN()
+    //  #ELSE
+    //      #MACRO ReturnUncheckedQuery(OmniPred.OfRef.getEqualsPred(val))
+    //  #ENDIF
+    //    }
+    //#ENDIF
       }
       return -1;
     }
@@ -3917,10 +4086,8 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>
     public int lastIndexOf(Object val)
     {
       final int size;
-      if((size=this.size)!=0)
-      {
-        if(val!=null)
-        {
+      if((size=this.size)!=0){
+        if(val!=null){
           final int modCount=this.modCount;
           try{
             return OmniArray.OfRef.uncheckedlastIndexOfNonNull(this.arr,size,val);
@@ -3929,6 +4096,21 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>
           }
         }
         return OmniArray.OfRef.uncheckedlastIndexOfNull(this.arr,size);  
+    //#ELSE
+    //    if(val instanceof E)
+    //    {
+    //  #IF OfDouble,OfFloat
+    //      final Object v;
+    //      if((v=(Object)val)==v)
+    //      {
+    //        #MACRO ReturnUncheckedQueryBits($convertToBits$(v))
+    //      }
+    //      #MACRO ReturnUncheckedQueryNaN()
+    //  #ELSE
+    //      #MACRO ReturnUncheckedQuery(OmniPred.OfRef.getEqualsPred(val))
+    //  #ENDIF
+    //    }
+    //#ENDIF
       }
       return -1;
     }
@@ -4678,10 +4860,8 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>
     public boolean contains(Object val)
     {
       final int size;
-      if((size=this.size)!=0)
-      {
-        if(val!=null)
-        {
+      if((size=this.size)!=0){
+        if(val!=null){
           final int modCount=this.modCount;
           final var root=this.root;
           try{
@@ -4699,6 +4879,21 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>
         }finally{
           CheckedCollection.checkModCount(modCount,root.modCount);
         }
+    //#ELSE
+    //    if(val instanceof E)
+    //    {
+    //  #IF OfDouble,OfFloat
+    //      final Object v;
+    //      if((v=(Object)val)==v)
+    //      {
+    //        #MACRO ReturnUncheckedQueryBits($convertToBits$(v))
+    //      }
+    //      #MACRO ReturnUncheckedQueryNaN()
+    //  #ELSE
+    //      #MACRO ReturnUncheckedQuery(OmniPred.OfRef.getEqualsPred(val))
+    //  #ENDIF
+    //    }
+    //#ENDIF
       }
       CheckedCollection.checkModCount(modCount,root.modCount);
       return false;
@@ -5056,13 +5251,26 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>
     public boolean remove(Object val)
     {
       final int size;
-      if((size=this.size)!=0)
-      {
-        if(val!=null)
-        {
+      if((size=this.size)!=0){
+        if(val!=null){
           return this.uncheckedremoveValNonNull(size,val);
         }
         return this.uncheckedremoveValNull(size);
+    //#ELSE
+    //    if(val instanceof E)
+    //    {
+    //  #IF OfDouble,OfFloat
+    //      final Object v;
+    //      if((v=(Object)val)==v)
+    //      {
+    //        #MACRO ReturnUncheckedQueryBits($convertToBits$(v))
+    //      }
+    //      #MACRO ReturnUncheckedQueryNaN()
+    //  #ELSE
+    //      #MACRO ReturnUncheckedQuery(OmniPred.OfRef.getEqualsPred(val))
+    //  #ENDIF
+    //    }
+    //#ENDIF
       }
       CheckedCollection.checkModCount(modCount,root.modCount);
       return false;
@@ -5317,10 +5525,8 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>
     public int indexOf(Object val)
     {
       final int size;
-      if((size=this.size)!=0)
-      {
-        if(val!=null)
-        {
+      if((size=this.size)!=0){
+        if(val!=null){
           final int modCount=this.modCount;
           final var root=this.root;
           try{
@@ -5336,6 +5542,21 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>
         }finally{
           CheckedCollection.checkModCount(modCount,root.modCount);
         }
+    //#ELSE
+    //    if(val instanceof E)
+    //    {
+    //  #IF OfDouble,OfFloat
+    //      final Object v;
+    //      if((v=(Object)val)==v)
+    //      {
+    //        #MACRO ReturnUncheckedQueryBits($convertToBits$(v))
+    //      }
+    //      #MACRO ReturnUncheckedQueryNaN()
+    //  #ELSE
+    //      #MACRO ReturnUncheckedQuery(OmniPred.OfRef.getEqualsPred(val))
+    //  #ENDIF
+    //    }
+    //#ENDIF
       }
       CheckedCollection.checkModCount(modCount,root.modCount);
       return -1;
@@ -5704,10 +5925,8 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>
     public int lastIndexOf(Object val)
     {
       final int size;
-      if((size=this.size)!=0)
-      {
-        if(val!=null)
-        {
+      if((size=this.size)!=0){
+        if(val!=null){
           final int modCount=this.modCount;
           final var root=this.root;
           try{
@@ -5723,6 +5942,21 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>
         }finally{
           CheckedCollection.checkModCount(modCount,root.modCount);
         }
+    //#ELSE
+    //    if(val instanceof E)
+    //    {
+    //  #IF OfDouble,OfFloat
+    //      final Object v;
+    //      if((v=(Object)val)==v)
+    //      {
+    //        #MACRO ReturnUncheckedQueryBits($convertToBits$(v))
+    //      }
+    //      #MACRO ReturnUncheckedQueryNaN()
+    //  #ELSE
+    //      #MACRO ReturnUncheckedQuery(OmniPred.OfRef.getEqualsPred(val))
+    //  #ENDIF
+    //    }
+    //#ENDIF
       }
       CheckedCollection.checkModCount(modCount,root.modCount);
       return -1;

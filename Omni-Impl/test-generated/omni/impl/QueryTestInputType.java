@@ -5,7 +5,232 @@ import omni.api.OmniStack;
 import omni.util.TypeUtil;
 import java.lang.reflect.Method;
 import java.lang.reflect.InvocationTargetException;
-public enum QueryTestPrimitiveInputType{
+public enum QueryTestInputType{
+  Booleannull(Boolean.class,Boolean.class,false){
+    @Override public boolean invokecontains(OmniCollection col){return col.contains((Boolean)(null));}
+    @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((Boolean)(null));}
+    @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((Boolean)(null));}
+    @Override public int invokelastIndexOf(OmniCollection col){return ((OmniList)col).lastIndexOf((Boolean)(null));}
+    @Override public int invokesearch(OmniCollection col){return ((OmniStack)col).search((Boolean)(null));}
+    @Override public boolean invokeBoxedcontains(OmniCollection col){return col.contains((Boolean)(Boolean)(null));}
+    @Override public boolean invokeBoxedremoveVal(OmniCollection col){return col.removeVal((Boolean)(Boolean)(null));}
+    @Override public int invokeBoxedindexOf(OmniCollection col){return ((OmniList)col).indexOf((Boolean)(Boolean)(null));}
+    @Override public int invokeBoxedlastIndexOf(OmniCollection col){return ((OmniList)col).lastIndexOf((Boolean)(Boolean)(null));}
+    @Override public int invokeBoxedsearch(OmniCollection col){return ((OmniStack)col).search((Boolean)(Boolean)(null));}
+    @Override public boolean invokeObjectcontains(OmniCollection col){return col.contains((Object)(Boolean)(null));}
+    @Override public boolean invokeObjectremoveVal(OmniCollection col){return col.remove((Object)(Boolean)(null));}
+    @Override public int invokeObjectindexOf(OmniCollection col){return ((OmniList)col).indexOf((Object)(Boolean)(null));}
+    @Override public int invokeObjectlastIndexOf(OmniCollection col){return ((OmniList)col).lastIndexOf((Object)(Boolean)(null));}
+    @Override public int invokeObjectsearch(OmniCollection col){return ((OmniStack)col).search((Object)(Boolean)(null));}
+    public boolean addNotEqualsVal(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(boolean)false);}
+      return ((OmniCollection.OfPrimitive)col).add((boolean)false);
+    }
+    public boolean attemptAdd(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(null));}
+      return false;
+    }
+  },
+  Bytenull(Byte.class,Byte.class,false){
+    @Override public boolean invokecontains(OmniCollection col){return col.contains((Byte)(null));}
+    @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((Byte)(null));}
+    @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((Byte)(null));}
+    @Override public int invokelastIndexOf(OmniCollection col){return ((OmniList)col).lastIndexOf((Byte)(null));}
+    @Override public int invokesearch(OmniCollection col){return ((OmniStack)col).search((Byte)(null));}
+    @Override public boolean invokeBoxedcontains(OmniCollection col){return col.contains((Byte)(Byte)(null));}
+    @Override public boolean invokeBoxedremoveVal(OmniCollection col){return col.removeVal((Byte)(Byte)(null));}
+    @Override public int invokeBoxedindexOf(OmniCollection col){return ((OmniList)col).indexOf((Byte)(Byte)(null));}
+    @Override public int invokeBoxedlastIndexOf(OmniCollection col){return ((OmniList)col).lastIndexOf((Byte)(Byte)(null));}
+    @Override public int invokeBoxedsearch(OmniCollection col){return ((OmniStack)col).search((Byte)(Byte)(null));}
+    @Override public boolean invokeObjectcontains(OmniCollection col){return col.contains((Object)(Byte)(null));}
+    @Override public boolean invokeObjectremoveVal(OmniCollection col){return col.remove((Object)(Byte)(null));}
+    @Override public int invokeObjectindexOf(OmniCollection col){return ((OmniList)col).indexOf((Object)(Byte)(null));}
+    @Override public int invokeObjectlastIndexOf(OmniCollection col){return ((OmniList)col).lastIndexOf((Object)(Byte)(null));}
+    @Override public int invokeObjectsearch(OmniCollection col){return ((OmniStack)col).search((Object)(Byte)(null));}
+    public boolean addNotEqualsVal(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(boolean)false);}
+      return ((OmniCollection.OfPrimitive)col).add((boolean)false);
+    }
+    public boolean attemptAdd(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(null));}
+      return false;
+    }
+  },
+  Characternull(Character.class,Character.class,false){
+    @Override public boolean invokecontains(OmniCollection col){return col.contains((Character)(null));}
+    @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((Character)(null));}
+    @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((Character)(null));}
+    @Override public int invokelastIndexOf(OmniCollection col){return ((OmniList)col).lastIndexOf((Character)(null));}
+    @Override public int invokesearch(OmniCollection col){return ((OmniStack)col).search((Character)(null));}
+    @Override public boolean invokeBoxedcontains(OmniCollection col){return col.contains((Character)(Character)(null));}
+    @Override public boolean invokeBoxedremoveVal(OmniCollection col){return col.removeVal((Character)(Character)(null));}
+    @Override public int invokeBoxedindexOf(OmniCollection col){return ((OmniList)col).indexOf((Character)(Character)(null));}
+    @Override public int invokeBoxedlastIndexOf(OmniCollection col){return ((OmniList)col).lastIndexOf((Character)(Character)(null));}
+    @Override public int invokeBoxedsearch(OmniCollection col){return ((OmniStack)col).search((Character)(Character)(null));}
+    @Override public boolean invokeObjectcontains(OmniCollection col){return col.contains((Object)(Character)(null));}
+    @Override public boolean invokeObjectremoveVal(OmniCollection col){return col.remove((Object)(Character)(null));}
+    @Override public int invokeObjectindexOf(OmniCollection col){return ((OmniList)col).indexOf((Object)(Character)(null));}
+    @Override public int invokeObjectlastIndexOf(OmniCollection col){return ((OmniList)col).lastIndexOf((Object)(Character)(null));}
+    @Override public int invokeObjectsearch(OmniCollection col){return ((OmniStack)col).search((Object)(Character)(null));}
+    public boolean addNotEqualsVal(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(boolean)false);}
+      return ((OmniCollection.OfPrimitive)col).add((boolean)false);
+    }
+    public boolean attemptAdd(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(null));}
+      return false;
+    }
+  },
+  Shortnull(Short.class,Short.class,false){
+    @Override public boolean invokecontains(OmniCollection col){return col.contains((Short)(null));}
+    @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((Short)(null));}
+    @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((Short)(null));}
+    @Override public int invokelastIndexOf(OmniCollection col){return ((OmniList)col).lastIndexOf((Short)(null));}
+    @Override public int invokesearch(OmniCollection col){return ((OmniStack)col).search((Short)(null));}
+    @Override public boolean invokeBoxedcontains(OmniCollection col){return col.contains((Short)(Short)(null));}
+    @Override public boolean invokeBoxedremoveVal(OmniCollection col){return col.removeVal((Short)(Short)(null));}
+    @Override public int invokeBoxedindexOf(OmniCollection col){return ((OmniList)col).indexOf((Short)(Short)(null));}
+    @Override public int invokeBoxedlastIndexOf(OmniCollection col){return ((OmniList)col).lastIndexOf((Short)(Short)(null));}
+    @Override public int invokeBoxedsearch(OmniCollection col){return ((OmniStack)col).search((Short)(Short)(null));}
+    @Override public boolean invokeObjectcontains(OmniCollection col){return col.contains((Object)(Short)(null));}
+    @Override public boolean invokeObjectremoveVal(OmniCollection col){return col.remove((Object)(Short)(null));}
+    @Override public int invokeObjectindexOf(OmniCollection col){return ((OmniList)col).indexOf((Object)(Short)(null));}
+    @Override public int invokeObjectlastIndexOf(OmniCollection col){return ((OmniList)col).lastIndexOf((Object)(Short)(null));}
+    @Override public int invokeObjectsearch(OmniCollection col){return ((OmniStack)col).search((Object)(Short)(null));}
+    public boolean addNotEqualsVal(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(boolean)false);}
+      return ((OmniCollection.OfPrimitive)col).add((boolean)false);
+    }
+    public boolean attemptAdd(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(null));}
+      return false;
+    }
+  },
+  Integernull(Integer.class,Integer.class,false){
+    @Override public boolean invokecontains(OmniCollection col){return col.contains((Integer)(null));}
+    @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((Integer)(null));}
+    @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((Integer)(null));}
+    @Override public int invokelastIndexOf(OmniCollection col){return ((OmniList)col).lastIndexOf((Integer)(null));}
+    @Override public int invokesearch(OmniCollection col){return ((OmniStack)col).search((Integer)(null));}
+    @Override public boolean invokeBoxedcontains(OmniCollection col){return col.contains((Integer)(Integer)(null));}
+    @Override public boolean invokeBoxedremoveVal(OmniCollection col){return col.removeVal((Integer)(Integer)(null));}
+    @Override public int invokeBoxedindexOf(OmniCollection col){return ((OmniList)col).indexOf((Integer)(Integer)(null));}
+    @Override public int invokeBoxedlastIndexOf(OmniCollection col){return ((OmniList)col).lastIndexOf((Integer)(Integer)(null));}
+    @Override public int invokeBoxedsearch(OmniCollection col){return ((OmniStack)col).search((Integer)(Integer)(null));}
+    @Override public boolean invokeObjectcontains(OmniCollection col){return col.contains((Object)(Integer)(null));}
+    @Override public boolean invokeObjectremoveVal(OmniCollection col){return col.remove((Object)(Integer)(null));}
+    @Override public int invokeObjectindexOf(OmniCollection col){return ((OmniList)col).indexOf((Object)(Integer)(null));}
+    @Override public int invokeObjectlastIndexOf(OmniCollection col){return ((OmniList)col).lastIndexOf((Object)(Integer)(null));}
+    @Override public int invokeObjectsearch(OmniCollection col){return ((OmniStack)col).search((Object)(Integer)(null));}
+    public boolean addNotEqualsVal(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(boolean)false);}
+      return ((OmniCollection.OfPrimitive)col).add((boolean)false);
+    }
+    public boolean attemptAdd(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(null));}
+      return false;
+    }
+  },
+  Longnull(Long.class,Long.class,false){
+    @Override public boolean invokecontains(OmniCollection col){return col.contains((Long)(null));}
+    @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((Long)(null));}
+    @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((Long)(null));}
+    @Override public int invokelastIndexOf(OmniCollection col){return ((OmniList)col).lastIndexOf((Long)(null));}
+    @Override public int invokesearch(OmniCollection col){return ((OmniStack)col).search((Long)(null));}
+    @Override public boolean invokeBoxedcontains(OmniCollection col){return col.contains((Long)(Long)(null));}
+    @Override public boolean invokeBoxedremoveVal(OmniCollection col){return col.removeVal((Long)(Long)(null));}
+    @Override public int invokeBoxedindexOf(OmniCollection col){return ((OmniList)col).indexOf((Long)(Long)(null));}
+    @Override public int invokeBoxedlastIndexOf(OmniCollection col){return ((OmniList)col).lastIndexOf((Long)(Long)(null));}
+    @Override public int invokeBoxedsearch(OmniCollection col){return ((OmniStack)col).search((Long)(Long)(null));}
+    @Override public boolean invokeObjectcontains(OmniCollection col){return col.contains((Object)(Long)(null));}
+    @Override public boolean invokeObjectremoveVal(OmniCollection col){return col.remove((Object)(Long)(null));}
+    @Override public int invokeObjectindexOf(OmniCollection col){return ((OmniList)col).indexOf((Object)(Long)(null));}
+    @Override public int invokeObjectlastIndexOf(OmniCollection col){return ((OmniList)col).lastIndexOf((Object)(Long)(null));}
+    @Override public int invokeObjectsearch(OmniCollection col){return ((OmniStack)col).search((Object)(Long)(null));}
+    public boolean addNotEqualsVal(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(boolean)false);}
+      return ((OmniCollection.OfPrimitive)col).add((boolean)false);
+    }
+    public boolean attemptAdd(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(null));}
+      return false;
+    }
+  },
+  Floatnull(Float.class,Float.class,false){
+    @Override public boolean invokecontains(OmniCollection col){return col.contains((Float)(null));}
+    @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((Float)(null));}
+    @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((Float)(null));}
+    @Override public int invokelastIndexOf(OmniCollection col){return ((OmniList)col).lastIndexOf((Float)(null));}
+    @Override public int invokesearch(OmniCollection col){return ((OmniStack)col).search((Float)(null));}
+    @Override public boolean invokeBoxedcontains(OmniCollection col){return col.contains((Float)(Float)(null));}
+    @Override public boolean invokeBoxedremoveVal(OmniCollection col){return col.removeVal((Float)(Float)(null));}
+    @Override public int invokeBoxedindexOf(OmniCollection col){return ((OmniList)col).indexOf((Float)(Float)(null));}
+    @Override public int invokeBoxedlastIndexOf(OmniCollection col){return ((OmniList)col).lastIndexOf((Float)(Float)(null));}
+    @Override public int invokeBoxedsearch(OmniCollection col){return ((OmniStack)col).search((Float)(Float)(null));}
+    @Override public boolean invokeObjectcontains(OmniCollection col){return col.contains((Object)(Float)(null));}
+    @Override public boolean invokeObjectremoveVal(OmniCollection col){return col.remove((Object)(Float)(null));}
+    @Override public int invokeObjectindexOf(OmniCollection col){return ((OmniList)col).indexOf((Object)(Float)(null));}
+    @Override public int invokeObjectlastIndexOf(OmniCollection col){return ((OmniList)col).lastIndexOf((Object)(Float)(null));}
+    @Override public int invokeObjectsearch(OmniCollection col){return ((OmniStack)col).search((Object)(Float)(null));}
+    public boolean addNotEqualsVal(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(boolean)false);}
+      return ((OmniCollection.OfPrimitive)col).add((boolean)false);
+    }
+    public boolean attemptAdd(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(null));}
+      return false;
+    }
+  },
+  Doublenull(Double.class,Double.class,false){
+    @Override public boolean invokecontains(OmniCollection col){return col.contains((Double)(null));}
+    @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((Double)(null));}
+    @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((Double)(null));}
+    @Override public int invokelastIndexOf(OmniCollection col){return ((OmniList)col).lastIndexOf((Double)(null));}
+    @Override public int invokesearch(OmniCollection col){return ((OmniStack)col).search((Double)(null));}
+    @Override public boolean invokeBoxedcontains(OmniCollection col){return col.contains((Double)(Double)(null));}
+    @Override public boolean invokeBoxedremoveVal(OmniCollection col){return col.removeVal((Double)(Double)(null));}
+    @Override public int invokeBoxedindexOf(OmniCollection col){return ((OmniList)col).indexOf((Double)(Double)(null));}
+    @Override public int invokeBoxedlastIndexOf(OmniCollection col){return ((OmniList)col).lastIndexOf((Double)(Double)(null));}
+    @Override public int invokeBoxedsearch(OmniCollection col){return ((OmniStack)col).search((Double)(Double)(null));}
+    @Override public boolean invokeObjectcontains(OmniCollection col){return col.contains((Object)(Double)(null));}
+    @Override public boolean invokeObjectremoveVal(OmniCollection col){return col.remove((Object)(Double)(null));}
+    @Override public int invokeObjectindexOf(OmniCollection col){return ((OmniList)col).indexOf((Object)(Double)(null));}
+    @Override public int invokeObjectlastIndexOf(OmniCollection col){return ((OmniList)col).lastIndexOf((Object)(Double)(null));}
+    @Override public int invokeObjectsearch(OmniCollection col){return ((OmniStack)col).search((Object)(Double)(null));}
+    public boolean addNotEqualsVal(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(boolean)false);}
+      return ((OmniCollection.OfPrimitive)col).add((boolean)false);
+    }
+    public boolean attemptAdd(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(null));}
+      return false;
+    }
+  },
+  Objectnull(Object.class,Object.class,false){
+    @Override public boolean invokecontains(OmniCollection col){return col.contains((Object)(null));}
+    @Override public boolean invokeremoveVal(OmniCollection col){return col.remove((Object)(null));}
+    @Override public int invokeindexOf(OmniCollection col){return ((OmniList)col).indexOf((Object)(null));}
+    @Override public int invokelastIndexOf(OmniCollection col){return ((OmniList)col).lastIndexOf((Object)(null));}
+    @Override public int invokesearch(OmniCollection col){return ((OmniStack)col).search((Object)(null));}
+    @Override public boolean invokeBoxedcontains(OmniCollection col){return col.contains((Object)(Object)(null));}
+    @Override public boolean invokeBoxedremoveVal(OmniCollection col){return col.remove((Object)(Object)(null));}
+    @Override public int invokeBoxedindexOf(OmniCollection col){return ((OmniList)col).indexOf((Object)(Object)(null));}
+    @Override public int invokeBoxedlastIndexOf(OmniCollection col){return ((OmniList)col).lastIndexOf((Object)(Object)(null));}
+    @Override public int invokeBoxedsearch(OmniCollection col){return ((OmniStack)col).search((Object)(Object)(null));}
+    @Override public boolean invokeObjectcontains(OmniCollection col){return col.contains((Object)(Object)(null));}
+    @Override public boolean invokeObjectremoveVal(OmniCollection col){return col.remove((Object)(Object)(null));}
+    @Override public int invokeObjectindexOf(OmniCollection col){return ((OmniList)col).indexOf((Object)(Object)(null));}
+    @Override public int invokeObjectlastIndexOf(OmniCollection col){return ((OmniList)col).lastIndexOf((Object)(Object)(null));}
+    @Override public int invokeObjectsearch(OmniCollection col){return ((OmniStack)col).search((Object)(Object)(null));}
+    public boolean addNotEqualsVal(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(boolean)false);}
+      return ((OmniCollection.OfPrimitive)col).add((boolean)false);
+    }
+    public boolean attemptAdd(OmniCollection col){
+      if(col instanceof OmniCollection.OfRef){return ((OmniCollection.OfRef)col).add((Object)(null));}
+      return false;
+    }
+  },
   Booleanfalse(boolean.class,Boolean.class,true){
     @Override public boolean invokecontains(OmniCollection col){return col.contains((boolean)(false));}
     @Override public boolean invokeremoveVal(OmniCollection col){return col.removeVal((boolean)(false));}
@@ -2588,7 +2813,7 @@ public enum QueryTestPrimitiveInputType{
   public final Class<?> primitiveClass;
   public final Class<?> boxedClass;
   private boolean notEqualsVal;
-  private QueryTestPrimitiveInputType(Class<?> primitiveClass,Class<?> boxedClass,boolean notEqualsVal){
+  private QueryTestInputType(Class<?> primitiveClass,Class<?> boxedClass,boolean notEqualsVal){
     this.primitiveClass=primitiveClass;
     this.boxedClass=boxedClass;
     this.notEqualsVal=notEqualsVal;
