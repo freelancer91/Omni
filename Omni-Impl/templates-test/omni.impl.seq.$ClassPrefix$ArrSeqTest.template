@@ -1253,8 +1253,6 @@ public class $ClassPrefix$ArrSeqTest{
     }
     return expectThrow;
   }
-
-  
   private static ConstructionArguments initializeSeqForQuery(QueryTestScenario testScenario,QueryTestInputType inputArgType,StructType structType){
     ConstructionArguments constructionArgs=new ConstructionArguments(structType);
     switch(testScenario){
@@ -1348,9 +1346,7 @@ public class $ClassPrefix$ArrSeqTest{
       this.constructionArgs=constructionArgs;
     }
   }
-  
 #IF OfRef
-  
   private static ModCheckTestData initializeSeqForModCheckQueryTest(QueryTestScenario testScenario,StructType structType,ObjModScenario objModScenario){
     ConstructionArguments constructionArgs=new ConstructionArguments(structType);
     ModCheckTestObject modCheckTestObject;
@@ -2583,7 +2579,6 @@ public class $ClassPrefix$ArrSeqTest{
         Assertions.assertEquals(itr.next(),outputArray[i]);
         #ENDIF
       }
-      
     }else{
       Assertions.assertThrows(expectedException,()->constructionArgs.seq.toArray(monitoredArrConstructor));
     }
@@ -2617,7 +2612,6 @@ public class $ClassPrefix$ArrSeqTest{
           constructionArgs.verifyStructuralIntegrity(seqSize,seqSize,seqSize+1,seqSize+1);
           offset=constructionArgs.verifyIndex(offset,$ClassPrefix$InputTestArgType.ARRAY_TYPE,0);
       }
-      
     }
     if(preModScenario==CMEScenario.ModParent){
       offset=constructionArgs.verifyIndex(offset,$ClassPrefix$InputTestArgType.ARRAY_TYPE,0);
@@ -2641,7 +2635,90 @@ public class $ClassPrefix$ArrSeqTest{
     }
     Assertions.assertEquals(1,monitoredArrConstructor.numCalls);
   }
+  static enum ItrForEachModScenario
+  {
+    ModItr,
+    ModItrThrow,
+    ModSeq,
+    ModSeqThrow
+    ModParent,
+    ModParentThrow,
+    ModRoot,
+    ModRootThrow,
+    Throw,
+    NoMod;
+  }
   
+  static enum FunctionCallType
+  {
+#IFNOT OfRef
+    BoxedType,
+#ENDIF
+    AsIs;
+  }
+  static enum ItrType
+  {
+    ListItr,
+    Itr;
+  }
+  
+  static Stream<Arguments> getItrForEachArguments()
+  {
+    Stream.Builder<Arguments> builder=Stream.builder();
+    for(var structType:StructType.values())
+    {
+      for(var itrType:ItrType.values())
+      {
+        if(itrType==ItrType.ListItr && (structType==StructType.CHECKEDSTACK || structType==StructType.UNCHECKEDSTACK))
+        {
+          continue;
+        }
+        for(var preModScenario:CMEScenario.values())
+        {
+          if((!structType.checked && preModScenario!=CMEScenario.NoMod) || (structType!=StructType.CHECKEDSUBLIST && (preModScenario==CMEScenario.ModParent||preModScenario==CMEScenario.ModRoot)))
+          {
+            continue;
+          }
+          for(var itrModScenario:ItrForEachModScenario.values())
+          {
+            if((!structType.checked && itrModScenario!=ItrForEachModScenario.NoMod) || (structType!=StructType.CHECKEDSUBLIST && (itrModScenario==ItrForEachModScenario.ModRoot || itrModScenario==ItrForEachModScenario.ModParent || itrModScenario==ItrForEachModScenario.ModRootThrow || itrModScenario==ItrForEachModScenario.ModParentThrow)))
+            {
+              continue;
+            }
+            for(var functionCallType:FunctionCallType.values())
+            {
+              for(int seqSize=0;seqSize<=5;seqSize+=5)
+              {
+                builder.add(Arguments.of(structType,seqSize,preModScenario,itrModScenario,itrType,functionCallType));
+              }
+            }
+          }
+        }
+      }
+    }
+    return builder.build().parallel();
+  }
+  @ParameterizedTest
+  @MethodSource("getItrForEachArguments")
+  public void testItrforEachRemaining(StructType structType,int seqSize,CMEScenario preModScenario,ItrForEachModScenario itrForEachModScenario,ItrType itrType,FunctionCallType functionCallType)
+  {
+    ConstructionArgs constructionArgs=ConstructionArguments(structType);
+    for(int i=0;i<seqSize;++i){
+      $ClassPrefix$InputTestArgType.ARRAY_TYPE.callCollectionAdd(constructionArgs.seq,i);
+    }
+    OmniIterator.Of$ClassPrefix$ itr;
+    if(itrType==ItrType.ListItr)
+    {
+      itr=((OmniList.Of$ClassPrefix)constructionArgs.seq).listIterator();
+    }
+    else
+    {
+      itr=constructionArgs.seq.iterator();
+    }
+    switch(preModScenario)
+    {
+    }
+  }
   
   
 
