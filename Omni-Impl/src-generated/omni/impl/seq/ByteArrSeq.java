@@ -23,7 +23,7 @@ import omni.function.ByteConsumer;
 import omni.util.ToStringUtil;
 import omni.util.BitSetUtil;
 import omni.impl.AbstractByteItr;
-public abstract class ByteArrSeq implements OmniCollection.OfByte
+public abstract class ByteArrSeq implements OmniCollection.OfByte,Cloneable
 {
   transient int size;
   transient byte[] arr;
@@ -51,6 +51,8 @@ public abstract class ByteArrSeq implements OmniCollection.OfByte
     this.size=size;
     this.arr=arr;
   }
+  @Override
+  public abstract Object clone();
   @Override
   public int size()
   {

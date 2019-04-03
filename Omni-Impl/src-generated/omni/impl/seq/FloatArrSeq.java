@@ -23,7 +23,7 @@ import omni.function.FloatConsumer;
 import omni.util.ToStringUtil;
 import omni.util.BitSetUtil;
 import omni.impl.AbstractFloatItr;
-public abstract class FloatArrSeq implements OmniCollection.OfFloat
+public abstract class FloatArrSeq implements OmniCollection.OfFloat,Cloneable
 {
   transient int size;
   transient float[] arr;
@@ -51,6 +51,8 @@ public abstract class FloatArrSeq implements OmniCollection.OfFloat
     this.size=size;
     this.arr=arr;
   }
+  @Override
+  public abstract Object clone();
   @Override
   public int size()
   {

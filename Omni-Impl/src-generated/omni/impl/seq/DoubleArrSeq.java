@@ -22,7 +22,7 @@ import java.util.function.DoublePredicate;
 import java.util.function.DoubleConsumer;
 import omni.util.BitSetUtil;
 import omni.impl.AbstractDoubleItr;
-public abstract class DoubleArrSeq implements OmniCollection.OfDouble
+public abstract class DoubleArrSeq implements OmniCollection.OfDouble,Cloneable
 {
   transient int size;
   transient double[] arr;
@@ -50,6 +50,8 @@ public abstract class DoubleArrSeq implements OmniCollection.OfDouble
     this.size=size;
     this.arr=arr;
   }
+  @Override
+  public abstract Object clone();
   @Override
   public int size()
   {

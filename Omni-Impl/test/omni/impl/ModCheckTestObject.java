@@ -2,60 +2,69 @@ package omni.impl;
 
 import omni.api.OmniCollection;
 import omni.util.TypeConversionUtil;
-@SuppressWarnings({"rawtypes","unchecked"}) 
+@SuppressWarnings({"rawtypes","unchecked"})
 public class ModCheckTestObject{
-  int callCount;
-  public boolean equals(Object val) {
-    ++callCount;
-    throw new IndexOutOfBoundsException();
-  }
-  public int hashCode(Object val) {
-    ++callCount;
-    throw new IndexOutOfBoundsException();
-  }
-  public String toString() {
-    ++callCount;
-    throw new IndexOutOfBoundsException();
-  }
-  static class Modding extends ModCheckTestObject{
-    OmniCollection.OfRef col;
-    Modding(OmniCollection.OfRef<?> col){
-      this.col=col;
-    }
+    public int numCalls;
+    @Override
     public boolean equals(Object val) {
-      ++callCount;
-      col.add(TypeConversionUtil.convertToObject(0));
-      return super.equals(val);
+        ++numCalls;
+        throw new IndexOutOfBoundsException();
     }
-    public int hashCode(Object val) {
-      ++callCount;
-      col.add(TypeConversionUtil.convertToObject(0));
-      return super.hashCode();
+    @Override
+    public int hashCode(){
+        ++numCalls;
+        throw new IndexOutOfBoundsException();
     }
+    @Override
     public String toString() {
-      ++callCount;
-      col.add(TypeConversionUtil.convertToObject(0));
-      return super.toString();
+        ++numCalls;
+        throw new IndexOutOfBoundsException();
     }
-  }
-  static class ModdingAndThrowing extends Modding{
-    ModdingAndThrowing(OmniCollection.OfRef<?> col){
-      super(col);
+    public static class Modding extends ModCheckTestObject{
+        public final OmniCollection.OfRef col;
+        public Modding(OmniCollection.OfRef<?> col){
+            this.col=col;
+        }
+        @Override
+        public boolean equals(Object val) {
+            ++numCalls;
+            col.add(TypeConversionUtil.convertToObject(0));
+            return val == this;
+        }
+        @Override
+        public int hashCode(){
+            ++numCalls;
+            col.add(TypeConversionUtil.convertToObject(0));
+            return System.identityHashCode(this);
+        }
+        @Override
+        public String toString() {
+            ++numCalls;
+            col.add(TypeConversionUtil.convertToObject(0));
+            return getClass().getName() + "@" + Integer.toHexString(System.identityHashCode(this));
+        }
     }
-    public boolean equals(Object val) {
-      ++callCount;
-      col.add(TypeConversionUtil.convertToObject(0));
-      throw new IndexOutOfBoundsException();
+    public static class ModdingAndThrowing extends Modding{
+        public ModdingAndThrowing(OmniCollection.OfRef<?> col){
+            super(col);
+        }
+        @Override
+        public boolean equals(Object val) {
+            ++numCalls;
+            col.add(TypeConversionUtil.convertToObject(0));
+            throw new IndexOutOfBoundsException();
+        }
+        @Override
+        public int hashCode(){
+            ++numCalls;
+            col.add(TypeConversionUtil.convertToObject(0));
+            throw new IndexOutOfBoundsException();
+        }
+        @Override
+        public String toString() {
+            ++numCalls;
+            col.add(TypeConversionUtil.convertToObject(0));
+            throw new IndexOutOfBoundsException();
+        }
     }
-    public int hashCode(Object val) {
-      ++callCount;
-      col.add(TypeConversionUtil.convertToObject(0));
-      throw new IndexOutOfBoundsException();
-    }
-    public String toString() {
-      ++callCount;
-      col.add(TypeConversionUtil.convertToObject(0));
-      throw new IndexOutOfBoundsException();
-    }
-  }
 }

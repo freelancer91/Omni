@@ -23,7 +23,7 @@ import java.util.function.IntConsumer;
 import omni.util.ToStringUtil;
 import omni.util.BitSetUtil;
 import omni.impl.AbstractIntItr;
-public abstract class IntArrSeq implements OmniCollection.OfInt
+public abstract class IntArrSeq implements OmniCollection.OfInt,Cloneable
 {
   transient int size;
   transient int[] arr;
@@ -51,6 +51,8 @@ public abstract class IntArrSeq implements OmniCollection.OfInt
     this.size=size;
     this.arr=arr;
   }
+  @Override
+  public abstract Object clone();
   @Override
   public int size()
   {

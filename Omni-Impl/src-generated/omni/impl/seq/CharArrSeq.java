@@ -22,7 +22,7 @@ import omni.function.CharPredicate;
 import omni.function.CharConsumer;
 import omni.util.BitSetUtil;
 import omni.impl.AbstractCharItr;
-public abstract class CharArrSeq implements OmniCollection.OfChar
+public abstract class CharArrSeq implements OmniCollection.OfChar,Cloneable
 {
   transient int size;
   transient char[] arr;
@@ -50,6 +50,8 @@ public abstract class CharArrSeq implements OmniCollection.OfChar
     this.size=size;
     this.arr=arr;
   }
+  @Override
+  public abstract Object clone();
   @Override
   public int size()
   {

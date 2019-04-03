@@ -22,6 +22,7 @@ public abstract class $ClassPrefix$MonitoredPredicate$<E>$ implements $TypeNameM
   ,Predicate<$BoxedType$>
 #ENDIF
 {
+  
 
   public final HashSet<$BoxedType$> removedVals=new HashSet<>();
   public int callCounter;

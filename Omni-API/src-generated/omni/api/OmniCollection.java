@@ -19,7 +19,7 @@ import omni.function.FloatPredicate;
 import omni.function.ShortConsumer;
 import omni.function.ShortPredicate;
 //TODO integration into Java Collection library
-public abstract interface OmniCollection
+public abstract interface OmniCollection extends Cloneable
 {  
   public abstract void clear();
   public abstract boolean contains(Object val);
@@ -61,6 +61,7 @@ public abstract interface OmniCollection
   public abstract Object[] toArray();
   public abstract <T> T[] toArray(IntFunction<T[]> arrConstructor);
   public abstract <T> T[] toArray(T[] dst);
+  public abstract Object clone();
   public abstract interface OfPrimitive extends OmniCollection
   {
     public abstract boolean add(boolean val);

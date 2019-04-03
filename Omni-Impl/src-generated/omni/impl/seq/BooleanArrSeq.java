@@ -21,7 +21,7 @@ import omni.function.BooleanPredicate;
 import omni.function.BooleanConsumer;
 import omni.util.ToStringUtil;
 import omni.impl.AbstractBooleanItr;
-public abstract class BooleanArrSeq implements OmniCollection.OfBoolean
+public abstract class BooleanArrSeq implements OmniCollection.OfBoolean,Cloneable
 {
   transient int size;
   transient boolean[] arr;
@@ -49,6 +49,8 @@ public abstract class BooleanArrSeq implements OmniCollection.OfBoolean
     this.size=size;
     this.arr=arr;
   }
+  @Override
+  public abstract Object clone();
   @Override
   public int size()
   {

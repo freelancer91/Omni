@@ -56,7 +56,7 @@ import omni.impl.Abstract$TypeNameModifier$Itr;
 #IF OfRef
 import omni.util.OmniPred;
 #ENDIF
-public abstract class $ClassPrefix$ArrSeq$<E>$ implements OmniCollection.Of$ClassPrefix$$<E>$
+public abstract class $ClassPrefix$ArrSeq$<E>$ implements OmniCollection.Of$ClassPrefix$$<E>$,Cloneable
 {
   transient int size;
   transient $ArrayType$[] arr;
@@ -84,7 +84,8 @@ public abstract class $ClassPrefix$ArrSeq$<E>$ implements OmniCollection.Of$Clas
     this.size=size;
     this.arr=arr;
   }
-  
+  @Override
+  public abstract Object clone();
   @Override
   public int size()
   {

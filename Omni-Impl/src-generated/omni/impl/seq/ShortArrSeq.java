@@ -23,7 +23,7 @@ import omni.function.ShortConsumer;
 import omni.util.ToStringUtil;
 import omni.util.BitSetUtil;
 import omni.impl.AbstractShortItr;
-public abstract class ShortArrSeq implements OmniCollection.OfShort
+public abstract class ShortArrSeq implements OmniCollection.OfShort,Cloneable
 {
   transient int size;
   transient short[] arr;
@@ -51,6 +51,8 @@ public abstract class ShortArrSeq implements OmniCollection.OfShort
     this.size=size;
     this.arr=arr;
   }
+  @Override
+  public abstract Object clone();
   @Override
   public int size()
   {

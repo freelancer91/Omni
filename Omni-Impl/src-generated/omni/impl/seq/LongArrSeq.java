@@ -23,7 +23,7 @@ import java.util.function.LongConsumer;
 import omni.util.ToStringUtil;
 import omni.util.BitSetUtil;
 import omni.impl.AbstractLongItr;
-public abstract class LongArrSeq implements OmniCollection.OfLong
+public abstract class LongArrSeq implements OmniCollection.OfLong,Cloneable
 {
   transient int size;
   transient long[] arr;
@@ -51,6 +51,8 @@ public abstract class LongArrSeq implements OmniCollection.OfLong
     this.size=size;
     this.arr=arr;
   }
+  @Override
+  public abstract Object clone();
   @Override
   public int size()
   {

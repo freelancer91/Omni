@@ -18,7 +18,7 @@ import omni.function.LongComparator;
 import omni.function.ShortComparator;
 import omni.function.ShortUnaryOperator;
 import omni.util.TypeUtil;
-public abstract interface OmniList extends OmniCollection,Cloneable
+public abstract interface OmniList extends OmniCollection
 {
   public abstract int indexOf(Object val);
   public abstract int indexOf(boolean val);
@@ -56,7 +56,6 @@ public abstract interface OmniList extends OmniCollection,Cloneable
   public abstract int lastIndexOf(Double val);
   public abstract void stableAscendingSort();
   public abstract void stableDescendingSort();
-  public Object clone();
   public abstract interface OfPrimitive extends OmniList,OmniCollection.OfPrimitive
   {
      public abstract void add(int index,boolean val);

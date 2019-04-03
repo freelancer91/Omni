@@ -17,7 +17,7 @@ import java.util.function.UnaryOperator;
 import java.util.ConcurrentModificationException;
 import omni.util.BitSetUtil;
 import omni.util.OmniPred;
-public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>
+public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>,Cloneable
 {
   transient int size;
   transient Object[] arr;
@@ -45,6 +45,8 @@ public abstract class RefArrSeq<E> implements OmniCollection.OfRef<E>
     this.size=size;
     this.arr=arr;
   }
+  @Override
+  public abstract Object clone();
   @Override
   public int size()
   {
