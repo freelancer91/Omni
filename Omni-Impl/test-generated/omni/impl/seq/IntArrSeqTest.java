@@ -19,9 +19,12 @@ import omni.api.OmniList;
 import omni.api.OmniStack;
 import omni.api.OmniCollection;
 import omni.api.OmniListIterator;
+import omni.api.OmniIterator;
 import omni.impl.MonitoredArrayConstructor;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
+//TODO replace this with a custom collection
+import java.util.ArrayList;
 @SuppressWarnings({"rawtypes","unchecked"})
 @Execution(ExecutionMode.CONCURRENT)
 public class IntArrSeqTest{
@@ -35,6 +38,7 @@ public class IntArrSeqTest{
     boolean checked;
     StructType(boolean checked){this.checked=checked;}
   }
+  /*
   private static class ConstructionArguments{
     final int initialCapacity;
     final int rootPreAlloc;
@@ -275,6 +279,7 @@ public class IntArrSeqTest{
       return offset+length;
     }
   }
+  */
   static class InputTestMonitor{
     int expectedItrModCount=0;
     int expectedSeqModCount=0;
@@ -1497,6 +1502,9 @@ public class IntArrSeqTest{
   }
   static void illegallyMod(CMEScenario modScenario,ConstructionArguments constructionArgs){
     switch(modScenario){
+      case ModSeq:
+        IntInputTestArgType.ARRAY_TYPE.callCollectionAdd(constructionArgs.seq,0);
+        break;
       case ModParent:
         IntInputTestArgType.ARRAY_TYPE.callCollectionAdd(constructionArgs.parent,0);
         break;
@@ -2046,5 +2054,489 @@ public class IntArrSeqTest{
       constructionArgs.verifyIndex(offset,IntInputTestArgType.ARRAY_TYPE,0);
     }
     Assertions.assertEquals(1,monitoredArrConstructor.numCalls);
+  }
+  static enum FunctionCallType
+  {
+    BoxedType,
+    AsIs;
+  }
+  static enum ItrType
+  {
+    ListItr,
+    Itr;
+  }
+  static enum ItrForEachModScenario
+  {
+    ModItr,
+    ModItrThrow,
+    ModSeq,
+    ModSeqThrow,
+    ModParent,
+    ModParentThrow,
+    ModRoot,
+    ModRootThrow,
+    Throw,
+    NoMod;
+  }
+  static Stream<Arguments> getItrForEachArguments()
+  {
+    Stream.Builder<Arguments> builder=Stream.builder();
+    for(var structType:StructType.values())
+    {
+      for(var itrType:ItrType.values())
+      {
+        if(itrType==ItrType.ListItr && (structType==StructType.CHECKEDSTACK || structType==StructType.UNCHECKEDSTACK))
+        {
+          continue;
+        }
+        for(var preModScenario:CMEScenario.values())
+        {
+          if((!structType.checked && preModScenario!=CMEScenario.NoMod) || (structType!=StructType.CHECKEDSUBLIST && (preModScenario==CMEScenario.ModParent||preModScenario==CMEScenario.ModRoot)))
+          {
+            continue;
+          }
+          for(var itrModScenario:ItrForEachModScenario.values())
+          {
+            if((!structType.checked && itrModScenario!=ItrForEachModScenario.NoMod) || (structType!=StructType.CHECKEDSUBLIST && (itrModScenario==ItrForEachModScenario.ModRoot || itrModScenario==ItrForEachModScenario.ModParent || itrModScenario==ItrForEachModScenario.ModRootThrow || itrModScenario==ItrForEachModScenario.ModParentThrow)))
+            {
+              continue;
+            }
+            for(var functionCallType:FunctionCallType.values())
+            {
+              for(int seqSize=0;seqSize<=5;seqSize+=5)
+              {
+                builder.add(Arguments.of(structType,seqSize,preModScenario,itrModScenario,itrType,functionCallType));
+              }
+            }
+          }
+        }
+      }
+    }
+    return builder.build().parallel();
+  }
+  @ParameterizedTest
+  @MethodSource("getItrForEachArguments")
+  public void testItrforEachRemaining(StructType structType,int seqSize,CMEScenario preModScenario,ItrForEachModScenario itrForEachModScenario,ItrType itrType,FunctionCallType functionCallType)
+  {
+    ConstructionArguments constructionArgs=new ConstructionArguments(structType);
+    for(int i=0;i<seqSize;++i){
+      IntInputTestArgType.ARRAY_TYPE.callCollectionAdd(constructionArgs.seq,i);
+    }
+    OmniIterator.OfInt itr;
+    if(itrType==ItrType.ListItr)
+    {
+      itr=((OmniList.OfInt)constructionArgs.seq).listIterator();
+    }
+    else
+    {
+      itr=constructionArgs.seq.iterator();
+    }
+    illegallyMod(preModScenario,constructionArgs);
+    ArrayList consumerMonitor=new ArrayList();
+    final IntConsumer consumer;
+    Class<? extends Throwable> expectedException;
+    switch(itrForEachModScenario)
+    {
+      case ModItr:
+        consumer=(v)->
+        {
+          itr.nextInt();
+          itr.remove();
+          consumerMonitor.add(v);
+        };
+        expectedException=seqSize==0?null:ConcurrentModificationException.class;
+        break;
+      case ModItrThrow:
+        consumer=(v)->
+        {
+          itr.nextInt();
+          itr.remove();
+          consumerMonitor.add(v);
+          throw new IndexOutOfBoundsException();
+        };
+        expectedException=seqSize==0?null:ConcurrentModificationException.class;
+        break;
+      case ModSeq:
+        consumer=(v)->
+        {
+          constructionArgs.seq.remove(v);
+          consumerMonitor.add(v);
+        };
+        expectedException=seqSize==0?null:ConcurrentModificationException.class;
+        break;
+      case ModSeqThrow:
+        consumer=(v)->
+        {
+          constructionArgs.seq.remove(v);
+          consumerMonitor.add(v);
+          throw new IndexOutOfBoundsException();
+        };
+        expectedException=seqSize==0?null:ConcurrentModificationException.class;
+        break;
+      case ModParent:
+        consumer=(v)->
+        {
+          constructionArgs.parent.remove(v);
+          consumerMonitor.add(v);
+        };
+        expectedException=seqSize==0?null:ConcurrentModificationException.class;
+        break;
+      case ModParentThrow:
+        consumer=(v)->
+        {
+          constructionArgs.parent.remove(v);
+          consumerMonitor.add(v);
+          throw new IndexOutOfBoundsException();
+        };
+        expectedException=seqSize==0?null:ConcurrentModificationException.class;
+        break;
+      case ModRoot:
+        consumer=(v)->
+        {
+          constructionArgs.root.remove(v);
+          consumerMonitor.add(v);
+        };
+        expectedException=seqSize==0?null:ConcurrentModificationException.class;
+        break;
+      case ModRootThrow:
+        consumer=(v)->
+        {
+          constructionArgs.root.remove(v);
+          consumerMonitor.add(v);
+          throw new IndexOutOfBoundsException();
+        };
+        expectedException=seqSize==0?null:ConcurrentModificationException.class;
+        break;
+      case Throw:
+        consumer=(v)->
+        {
+          consumerMonitor.add(v);
+          throw new IndexOutOfBoundsException();
+        };
+        expectedException=seqSize==0?null:IndexOutOfBoundsException.class;
+        break;
+      default:
+        consumer=(v)->
+        {
+          consumerMonitor.add(v);
+        };
+        expectedException=null;
+    }
+    if(expectedException==null)
+    {
+      if(functionCallType==FunctionCallType.AsIs)
+      {
+        itr.forEachRemaining(consumer);
+      }
+      else
+      {
+        itr.forEachRemaining((Consumer<? super Integer>)consumer::accept);
+      }
+    }
+    else
+    {
+      if(functionCallType==FunctionCallType.AsIs)
+      {
+        Assertions.assertThrows(expectedException,()->itr.forEachRemaining(consumer));
+      }
+      else
+      {
+        Assertions.assertThrows(expectedException,()->itr.forEachRemaining((Consumer<? super Integer>)consumer::accept));
+      }
+    }
+    verifyIteratorState(constructionArgs,itr,seqSize,preModScenario,itrForEachModScenario);
+    verifyStructuralIntegrity(seqSize,constructionArgs,preModScenario,itrForEachModScenario);
+    verifyConsumerMonitor(consumerMonitor,seqSize,constructionArgs,preModScenario,itrForEachModScenario); 
+  }
+  private static void verifyIteratorState(ConstructionArguments constructionArgs,Object iterator,int seqSize,CMEScenario preModScenario,ItrForEachModScenario itrForEachModScenario)
+  {
+    switch(itrForEachModScenario)
+    {
+      case ModItr:
+        switch(preModScenario)
+        {
+          case ModSeq:
+            switch(constructionArgs.structType)
+            {
+              case CHECKEDSTACK:
+              case UNCHECKEDSTACK:
+              default:
+            }
+          case ModParent:
+          case ModRoot:
+          default:
+        }
+        break;
+      case ModItrThrow:
+        switch(preModScenario)
+        {
+          case ModSeq:
+          case ModParent:
+          case ModRoot:
+          default:
+        }
+        break;
+      case ModSeq:
+        switch(preModScenario)
+        {
+          case ModSeq:
+          case ModParent:
+          case ModRoot:
+          default:
+        }
+        break;
+      case ModSeqThrow:
+        switch(preModScenario)
+        {
+          case ModSeq:
+          case ModParent:
+          case ModRoot:
+          default:
+        }
+        break;
+      case ModParent:
+        switch(preModScenario)
+        {
+          case ModSeq:
+          case ModParent:
+          case ModRoot:
+          default:
+        }
+        break;
+      case ModParentThrow:
+        switch(preModScenario)
+        {
+          case ModSeq:
+          case ModParent:
+          case ModRoot:
+          default:
+        }
+        break;
+      case ModRoot:
+        switch(preModScenario)
+        {
+          case ModSeq:
+          case ModParent:
+          case ModRoot:
+          default:
+        }
+        break;
+      case ModRootThrow:
+        switch(preModScenario)
+        {
+          case ModSeq:
+          case ModParent:
+          case ModRoot:
+          default:
+        }
+        break;
+      case Throw:
+        switch(preModScenario)
+        {
+          case ModSeq:
+          case ModParent:
+          case ModRoot:
+          default:
+        }
+        break;
+      default:
+        switch(preModScenario)
+        {
+          case ModSeq:
+          case ModParent:
+          case ModRoot:
+          default:
+        }
+    }
+  }
+  private static void verifyStructuralIntegrity(int seqSize,ConstructionArguments constructionArgs,CMEScenario preModScenario,ItrForEachModScenario itrForEachModScenario)
+  {
+    switch(itrForEachModScenario)
+    {
+      case ModItr:
+        switch(preModScenario)
+        {
+          case ModSeq:
+          case ModParent:
+          case ModRoot:
+          default:
+        }
+        break;
+      case ModItrThrow:
+        switch(preModScenario)
+        {
+          case ModSeq:
+          case ModParent:
+          case ModRoot:
+          default:
+        }
+        break;
+      case ModSeq:
+        switch(preModScenario)
+        {
+          case ModSeq:
+          case ModParent:
+          case ModRoot:
+          default:
+        }
+        break;
+      case ModSeqThrow:
+        switch(preModScenario)
+        {
+          case ModSeq:
+          case ModParent:
+          case ModRoot:
+          default:
+        }
+        break;
+      case ModParent:
+        switch(preModScenario)
+        {
+          case ModSeq:
+          case ModParent:
+          case ModRoot:
+          default:
+        }
+        break;
+      case ModParentThrow:
+        switch(preModScenario)
+        {
+          case ModSeq:
+          case ModParent:
+          case ModRoot:
+          default:
+        }
+        break;
+      case ModRoot:
+        switch(preModScenario)
+        {
+          case ModSeq:
+          case ModParent:
+          case ModRoot:
+          default:
+        }
+        break;
+      case ModRootThrow:
+        switch(preModScenario)
+        {
+          case ModSeq:
+          case ModParent:
+          case ModRoot:
+          default:
+        }
+        break;
+      case Throw:
+        switch(preModScenario)
+        {
+          case ModSeq:
+          case ModParent:
+          case ModRoot:
+          default:
+        }
+        break;
+      default:
+        switch(preModScenario)
+        {
+          case ModSeq:
+          case ModParent:
+          case ModRoot:
+          default:
+        }
+    }
+  }
+  private static void verifyConsumerMonitor(ArrayList consumerMonitor,int seqSize,ConstructionArguments constructionArgs,CMEScenario preModScenario,ItrForEachModScenario itrForEachModScenario)
+  {
+    switch(itrForEachModScenario)
+    {
+      case ModItr:
+        switch(preModScenario)
+        {
+          case ModSeq:
+          case ModParent:
+          case ModRoot:
+          default:
+        }
+        break;
+      case ModItrThrow:
+        switch(preModScenario)
+        {
+          case ModSeq:
+          case ModParent:
+          case ModRoot:
+          default:
+        }
+        break;
+      case ModSeq:
+        switch(preModScenario)
+        {
+          case ModSeq:
+          case ModParent:
+          case ModRoot:
+          default:
+        }
+        break;
+      case ModSeqThrow:
+        switch(preModScenario)
+        {
+          case ModSeq:
+          case ModParent:
+          case ModRoot:
+          default:
+        }
+        break;
+      case ModParent:
+        switch(preModScenario)
+        {
+          case ModSeq:
+          case ModParent:
+          case ModRoot:
+          default:
+        }
+        break;
+      case ModParentThrow:
+        switch(preModScenario)
+        {
+          case ModSeq:
+          case ModParent:
+          case ModRoot:
+          default:
+        }
+        break;
+      case ModRoot:
+        switch(preModScenario)
+        {
+          case ModSeq:
+          case ModParent:
+          case ModRoot:
+          default:
+        }
+        break;
+      case ModRootThrow:
+        switch(preModScenario)
+        {
+          case ModSeq:
+          case ModParent:
+          case ModRoot:
+          default:
+        }
+        break;
+      case Throw:
+        switch(preModScenario)
+        {
+          case ModSeq:
+          case ModParent:
+          case ModRoot:
+          default:
+        }
+        break;
+      default:
+        switch(preModScenario)
+        {
+          case ModSeq:
+          case ModParent:
+          case ModRoot:
+          default:
+        }
+    }
   }
 }

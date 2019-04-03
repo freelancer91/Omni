@@ -1,0 +1,728 @@
+#TYPEDEF OfBoolean
+#TYPEDEF OfByte
+#TYPEDEF OfChar
+#TYPEDEF OfShort
+#TYPEDEF OfInt
+#TYPEDEF OfLong
+#TYPEDEF OfFloat
+#TYPEDEF OfDouble
+#TYPEDEF OfRef
+package omni.impl.seq;
+import omni.util.TypeConversionUtil;
+import omni.util.OmniArray;
+import omni.api.OmniCollection;
+import omni.api.OmniList;
+import org.junit.jupiter.api.Assertions;
+import omni.impl.$ClassPrefix$InputTestArgType;
+import omni.impl.FunctionCallType;
+import omni.api.OmniIterator;
+import omni.api.OmniListIterator;
+class $ClassPrefix$SeqMonitor
+{
+  static enum StructType
+  {
+    ARRSEQ;
+  }
+  static enum CheckedType
+  {
+    CHECKED,
+    UNCHECKED;
+  }
+  static enum NestedType
+  {
+    LIST,
+    STACK,
+    SUBLIST;
+  }
+  static enum PreModScenario
+  {
+    ModSeq,
+    ModParent,
+    ModRoot,
+    NoMod;
+  }
+  static enum FunctionExceptionScenario
+  {
+    ModItr,
+    ModItrThrow,
+    ModSeq,
+    ModSeqThrow,
+    ModParent,
+    ModParentThrow,
+    ModRoot,
+    ModRootThrow,
+    Throw,
+    NoMod;
+  }
+
+  final StructType structType;
+  final NestedType nestedType;
+  final CheckedType checkedType;
+  final int initialCapacity;
+  final int rootPreAlloc;
+  final int parentPreAlloc;
+  final int parentPostAlloc;
+  final int rootPostAlloc;
+  final OmniCollection.Of$ClassPrefix$ root;
+  final OmniCollection.Of$ClassPrefix$ parent;
+  final OmniCollection.Of$ClassPrefix$ seq;
+  
+  PreModScenario activePreModScenario;
+  int expectedRootSize;
+  int expectedParentSize;
+  int expectedSeqSize;
+  int expectedRootModCount;
+  int expectedParentModCount;
+  int expectedSeqModCount;
+  
+ 
+  
+  $ClassPrefix$SeqMonitor(final StructType structType, final NestedType nestedType,final CheckedType checkedType)
+  {
+    this.structType=structType;
+    this.nestedType=nestedType;
+    this.checkedType=checkedType;
+    this.initialCapacity=OmniArray.DEFAULT_ARR_SEQ_CAP;
+    switch(structType)
+    {
+      case ARRSEQ:
+        if(nestedType==NestedType.SUBLIST)
+        {
+          this.rootPreAlloc=5;
+          this.parentPreAlloc=5;
+          this.parentPostAlloc=5;
+          this.rootPostAlloc=5;
+          $ArrayType$[] arr=new $ArrayType$[20];
+          int i=0,v=Integer.MIN_VALUE;
+          for(;i<5;++i,++v)
+          {
+            arr[i]=TypeConversionUtil.convertTo$ArrayType$(v);
+          }
+          for(;i<10;++i,++v)
+          {
+            arr[i]=TypeConversionUtil.convertTo$ArrayType$(v);
+          }
+          v=Integer.MAX_VALUE-10;
+          for(;i<15;++i,++v)
+          {
+            arr[i]=TypeConversionUtil.convertTo$ArrayType$(v);
+          }
+          for(;i<20;++i,++v)
+          {
+            arr[i]=TypeConversionUtil.convertTo$ArrayType$(v);
+          }
+          if(checkedType==CheckedType.CHECKED)
+          {
+            this.root=new $ClassPrefix$ArrSeq.CheckedList(20,arr);
+          }
+          else
+          {
+            this.root=new $ClassPrefix$ArrSeq.UncheckedList(20,arr);
+          }
+          this.parent=((OmniList.Of$ClassPrefix$)root).subList(5,15);
+          this.seq=((OmniList.Of$ClassPrefix$)parent).subList(5,5);
+        }
+        else
+        {
+          this.rootPreAlloc=0;
+          this.parentPreAlloc=0;
+          this.parentPostAlloc=0;
+          this.rootPostAlloc=0;
+          switch(nestedType)
+          {
+            case STACK:
+              if(checkedType==CheckedType.CHECKED)
+              {
+                this.root=new $ClassPrefix$ArrSeq.CheckedStack();
+              }
+              else
+              {
+                this.root=new $ClassPrefix$ArrSeq.UncheckedStack();
+              }
+              break;
+            case LIST:
+              if(checkedType==CheckedType.CHECKED)
+              {
+                this.root=new $ClassPrefix$ArrSeq.CheckedList();
+              }
+              else
+              {
+                this.root=new $ClassPrefix$ArrSeq.UncheckedList();
+              }
+              break;
+            default:
+              throw new Error("Unknown nestedType "+nestedType);
+          }
+          this.parent=root;
+          this.seq=root;
+        }
+        break;
+      default:
+        throw new Error("Unknown structType "+structType);
+    }
+  }
+  
+  
+  $ClassPrefix$SeqMonitor(final StructType structType, final NestedType nestedType,final CheckedType checkedType,final int initialCapacity)
+  {
+    this(structType,nestedType,checkedType,initialCapacity,0,0,0,0);
+  }
+  
+  $ClassPrefix$SeqMonitor(final StructType structType, final CheckedType checkedType,final int rootPreAlloc,final int parentPreAlloc,final int parentPostAlloc,final int rootPostAlloc)
+  {
+    this(structType,NestedType.SUBLIST,checkedType,OmniArray.DEFAULT_ARR_SEQ_CAP,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc);
+  }
+
+  $ClassPrefix$SeqMonitor(final StructType structType, final NestedType nestedType,final CheckedType checkedType,final int initialCapacity,final int rootPreAlloc,final int parentPreAlloc,final int parentPostAlloc,final int rootPostAlloc)
+  {
+    this.structType=structType;
+    this.nestedType=nestedType;
+    this.checkedType=checkedType;
+    this.initialCapacity=initialCapacity;
+    this.rootPreAlloc=rootPreAlloc;
+    this.parentPreAlloc=parentPreAlloc;
+    this.parentPostAlloc=parentPostAlloc;
+    this.rootPostAlloc=rootPostAlloc;
+    switch(structType)
+    {
+      case ARRSEQ:
+        int rootSize=rootPreAlloc+parentPreAlloc+parentPostAlloc+rootPostAlloc;
+        $ArrayType$[] arr;
+        if(rootSize==0)
+        {
+          switch(initialCapacity)
+          {
+            case 0:
+              arr=null;
+              break;
+            case OmniArray.DEFAULT_ARR_SEQ_CAP:
+              arr=OmniArray.Of$ClassPrefix$.DEFAULT_ARR;
+              break;
+            default:
+              arr=new $ArrayType$[initialCapacity];
+          }
+        }
+        else
+        {
+          arr=new $ArrayType$[Math.max(initialCapacity,rootSize)];
+        }
+        int i=0,v=Integer.MIN_VALUE;
+        for(int bound=i+rootPreAlloc;i<bound;++i,++v)
+        {
+          arr[i]=TypeConversionUtil.convertTo$ArrayType$(v);
+        }
+        for(int bound=i+parentPreAlloc;i<bound;++i,++v)
+        {
+          arr[i]=TypeConversionUtil.convertTo$ArrayType$(v);
+        }
+        v=Integer.MAX_VALUE-rootPostAlloc-parentPostAlloc;
+        for(int bound=i+parentPostAlloc;i<bound;++i,++v)
+        {
+          arr[i]=TypeConversionUtil.convertTo$ArrayType$(v);
+        }
+        for(int bound=i+rootPostAlloc;i<bound;++i,++v)
+        {
+          arr[i]=TypeConversionUtil.convertTo$ArrayType$(v);
+        }
+        if(nestedType==NestedType.STACK)
+        {
+          if(checkedType==CheckedType.CHECKED)
+          {
+            this.root=new $ClassPrefix$ArrSeq.CheckedStack(rootSize,arr);
+          }
+          else
+          {
+            this.root=new $ClassPrefix$ArrSeq.UncheckedStack(rootSize,arr);
+          }
+        }
+        else
+        {
+          if(checkedType==CheckedType.CHECKED)
+          {
+            this.root=new $ClassPrefix$ArrSeq.CheckedList(rootSize,arr);
+          }
+          else
+          {
+            this.root=new $ClassPrefix$ArrSeq.UncheckedList(rootSize,arr);
+          }
+        }
+        break;
+      default:
+        throw new Error("Unknown structType "+structType);
+    }
+    switch(nestedType)
+    {
+      case SUBLIST:
+        this.parent=((OmniList.Of$ClassPrefix$)root).subList(rootPreAlloc,rootPreAlloc+parentPreAlloc+parentPostAlloc);
+        this.seq=((OmniList.Of$ClassPrefix$)parent).subList(parentPreAlloc,parentPreAlloc);
+        break;
+      case LIST:
+      case STACK:
+        this.parent=root;
+        this.seq=root;
+        break;
+      default:
+        throw new Error("Unknown nestedType "+nestedType);
+    }
+  }
+  public static abstract class SeqMonitorItr
+  {
+    public abstract void verifyIndexAndIterate($ClassPrefix$InputTestArgType inputArgType,int val);
+    public abstract SeqMonitorItr getPositiveOffset(int i);
+    public abstract boolean equals(Object val);
+    
+    private static class OfArrSeq extends SeqMonitorItr
+    {
+      $ArrayType$[] arr;
+      int offset;
+      private OfArrSeq(int offset,$ArrayType$[] arr)
+      {
+        this.arr=arr;
+      }
+      
+      public void verifyIndexAndIterate($ClassPrefix$InputTestArgType inputArgType,int val)
+      {
+        inputArgType.verifyVal(val,arr[offset++]);
+      }
+      public SeqMonitorItr getPositiveOffset(int i){
+        if(i<0)
+        {
+          throw new Error("offset cannot be negative: "+i);
+        }
+        return new OfArrSeq(i+offset,arr);
+      }
+      public boolean equals(Object val){
+        final OfArrSeq that;
+        return val==this || (val instanceof OfArrSeq && (that=(OfArrSeq)val).arr==this.arr && that.offset==this.offset);
+      }
+    }
+    
+  }
+  
+  private class UncheckedArrSeqItrMonitor extends $ClassPrefix$ItrMonitor
+  {
+    private UncheckedArrSeqItrMonitor(OmniIterator.Of$ClassPrefix$ itr,int expectedCursor)
+    {
+      super(itr,expectedCursor);
+    }
+    @Override
+    public void verifyIteratorState()
+    {
+      int actualCursor;
+      Object actualParent;
+      switch(nestedType)
+      {
+        case LIST:
+          actualCursor=FieldAccessor.$ClassPrefix$ArrSeq.UncheckedList.Itr.cursor(itr);
+          actualParent=FieldAccessor.$ClassPrefix$ArrSeq.UncheckedList.Itr.parent(itr);
+          break;
+        case STACK:
+          actualCursor=FieldAccessor.$ClassPrefix$ArrSeq.UncheckedStack.Itr.cursor(itr);
+          actualParent=FieldAccessor.$ClassPrefix$ArrSeq.UncheckedStack.Itr.parent(itr);
+          break;
+        case SUBLIST:
+          actualCursor=FieldAccessor.$ClassPrefix$ArrSeq.UncheckedSubList.Itr.cursor(itr);
+          actualParent=FieldAccessor.$ClassPrefix$ArrSeq.UncheckedSubList.Itr.parent(itr);
+          break;
+        default:
+          throw new Error("Unknown nestedType "+nestedType);
+      }
+      Assertions.assertEquals(expectedCursor+(rootPreAlloc+parentPreAlloc),actualCursor);
+      Assertions.assertSame(seq,actualParent);
+    }
+    
+    @Override
+    public void add(int v,$ClassPrefix$InputTestArgType inputArgType)
+    {
+      inputArgType.callListSet((OmniListIterator.Of$ClassPrefix$)itr,v);
+      ++expectedCursor;
+      ++expectedRootModCount;
+      ++expectedParentModCount;
+      ++expectedSeqModCount;
+      ++expectedRootSize;
+      ++expectedParentSize;
+      ++expectedSeqSize;
+      expectedLastRet=-1;
+    }
+    @Override
+    public void iterateForward()
+    {
+      itr.next$TypeNameModifier$();
+      if(nestedType==NestedType.STACK)
+      {
+        expectedLastRet=--expectedCursor;
+      }
+      else
+      {
+        expectedLastRet=expectedCursor++;
+      }
+    }
+    
+    @Override
+    public void remove()
+    {
+      itr.remove();
+      --expectedRootSize;
+      ++expectedRootModCount;
+      --expectedParentSize;
+      ++expectedParentModCount;
+      --expectedSeqSize;
+      ++expectedSeqModCount;
+      expectedCursor=expectedLastRet;
+      expectedLastRet=-1;
+    }
+  }
+  
+  private class CheckedArrSeqItrMonitor extends UncheckedArrSeqItrMonitor
+  {
+    int expectedItrModCount;
+    private CheckedArrSeqItrMonitor(OmniIterator.Of$ClassPrefix$ itr,int expectedCursor)
+    {
+      super(itr,expectedCursor);
+      this.itrModCount=expectedRootModCount;
+    }
+    @Override
+    public void verifyIteratorState()
+    {
+      int actualCursor;
+      Object actualParent;
+      switch(nestedType)
+      {
+        case LIST:
+          actualCursor=FieldAccessor.$ClassPrefix$ArrSeq.CheckedList.Itr.cursor(itr);
+          actualParent=FieldAccessor.$ClassPrefix$ArrSeq.CheckedList.Itr.parent(itr);
+          Assertions.assertEquals(expectedItrModCount,FieldAccessor.$ClassPrefix$ArrSeq.CheckedList.Itr.modCount(itr));
+          Assertions.assertEquals(expectedLastRet<0?expectedLastRet:expectedLastRet+(rootPreAlloc+parentPreAlloc),FieldAccessor.$ClassPrefix$ArrSeq.CheckedList.Itr.lastRet(itr));
+          break;
+        case STACK:
+          actualCursor=FieldAccessor.$ClassPrefix$ArrSeq.CheckedStack.Itr.cursor(itr);
+          actualParent=FieldAccessor.$ClassPrefix$ArrSeq.CheckedStack.Itr.parent(itr);
+          Assertions.assertEquals(expectedItrModCount,FieldAccessor.$ClassPrefix$ArrSeq.CheckedStack.Itr.modCount(itr));
+          Assertions.assertEquals(expectedLastRet<0?expectedLastRet:expectedLastRet+(rootPreAlloc+parentPreAlloc),FieldAccessor.$ClassPrefix$ArrSeq.CheckedStack.Itr.lastRet(itr));
+          break;
+        case SUBLIST:
+          actualCursor=FieldAccessor.$ClassPrefix$ArrSeq.CheckedSubList.Itr.cursor(itr);
+          actualParent=FieldAccessor.$ClassPrefix$ArrSeq.CheckedSubList.Itr.parent(itr);
+          Assertions.assertEquals(expectedItrModCount,FieldAccessor.$ClassPrefix$ArrSeq.CheckedSubList.Itr.modCount(itr));
+          Assertions.assertEquals(expectedLastRet<0?expectedLastRet:expectedLastRet+(rootPreAlloc+parentPreAlloc),FieldAccessor.$ClassPrefix$ArrSeq.CheckedSubList.Itr.lastRet(itr));
+          break;
+        default:
+          throw new Error("Unknown nestedType "+nestedType);
+      }
+      Assertions.assertEquals(expectedCursor+(rootPreAlloc+parentPreAlloc),actualCursor);
+      Assertions.assertSame(seq,actualParent);
+    }
+    @Override
+    public void add(int v,$ClassPrefix$InputTestArgType inputArgType)
+    {
+      super.add(v,inputArgType);
+      ++expectedItrModCount;
+    }
+    @Override
+    public void remove()
+    {
+      super.remove();
+      ++expectedItrModCount;
+    }
+  }
+  
+  
+ 
+  
+  
+  public $ClassPrefix$ItrMonitor getItrMonitor()
+  {
+    var iterator=seq.iterator();
+    
+    switch(structType)
+    {
+      case ARRSEQ:
+        int expectedCursor=nestedType==NestedType.STACK?(($ClassPrefix$ArrSeq)root).size:0
+        if(checkedType==CheckedType.CHECKED)
+        {
+          return new CheckedArrSeqItrMonitor(itr,expectedCursor);
+        }
+        return new UncheckedArrSeqItrMonitor(itr,expectedCursor);
+      default:
+        throw new Error("Unknown structType "+structType);
+    }
+  }
+  public $ClassPrefix$ItrMonitor getListItrMonitor()
+  {
+    var iterator=((OmniList.Of$ClassPrefix$)seq).listIterator();
+    
+    switch(structType)
+    {
+      case ARRSEQ:
+        if(checkedType==CheckedType.CHECKED)
+        {
+          return new CheckedArrSeqItrMonitor(itr,0);
+        }
+        return new UncheckedArrSeqItrMonitor(itr,0);
+      default:
+        throw new Error("Unknown structType "+structType);
+    }
+  }
+  
+  public $ClassPrefix$ItrMonitor getListItrMonitor(int index)
+  {
+    var iterator=seq.listIterator(index);
+    
+    switch(structType)
+    {
+      case ARRSEQ:
+        if(checkedType==CheckedType.CHECKED)
+        {
+          return new CheckedArrSeqItrMonitor(itr,index);
+        }
+        return new UncheckedArrSeqItrMonitor(itr,index);
+      default:
+        throw new Error("Unknown structType "+structType);
+    }
+  }
+  
+  
+  public SeqMonitorItr verifyPreAlloc()
+  {
+    switch(structType)
+    {
+      case ARRSEQ:
+      {
+        var arr=(($ClassPrefix$ArrSeq)root).arr;
+        int offset=0;
+        for(int bound=offset+rootPreAlloc,v=Integer.MIN_VALUE;offset<bound;++offset,++v)
+        {
+          $ClassPrefix$InputTestArgType.ARRAY_TYPE.verifyVal(v,arr[offset]);
+        }
+        return new SeqMonitorItr.OfArrSeq(offset,arr);
+      }
+      default:
+        throw new Error("Unknown structType "+structType);
+    }
+  }
+  public SeqMonitorItr verifyAscending(SeqMonitorItr monitorItr,$ClassPrefix$InputTestArgType inputArgType,int length)
+  {
+    for(int i=0,v=0;i<length;++i,++v)
+    {
+      monitorItr.verifyIndexAndIterate(inputArgType,v);
+    }
+    return monitorItr;
+  }
+  public SeqMonitorItr verifyDescending(SeqMonitorItr monitorItr,$ClassPrefix$InputTestArgType inputArgType,int length)
+  {
+    for(int i=0,v=length;i<length;++i)
+    {
+      monitorItr.verifyIndexAndIterate(inputArgType,--v);
+    }
+    return monitorItr;
+  }
+  public SeqMonitorItr verifyMidPointInsertion(SeqMonitorItr monitorItr,$ClassPrefix$InputTestArgType inputArgType,final int length)
+  {
+    int halfLength=length/2;
+    int i=0;
+    for(int v=1;i<halfLength;++i,v+=2)
+    {
+      monitorItr.verifyIndexAndIterate(inputArgType,v);
+    }
+    halfLength=length-halfLength;
+    for(int v=length-2;i<halfLength;++i,v-=2)
+    {
+      monitorItr.verifyIndexAndIterate(inputArgType,v);
+    }
+    return monitorItr;
+  }
+  public SeqMonitorItr verifyParentPostAlloc(SeqMonitorItr monitorItr)
+  {
+    for(int i=0,v=Integer.MAX_VALUE-rootPostAlloc-parentPostAlloc;i<parentPostAlloc;++i,++v){
+      monitorItr.verifyIndexAndIterate($ClassPrefix$InputTestArgType.ARRAY_TYPE,v);
+    }
+    return monitorItr;
+  }
+  public SeqMonitorItr verifyRootPostAlloc(SeqMonitorItr monitorItr)
+  {
+    for(int i=0,v=Integer.MAX_VALUE-rootPostAlloc;i<rootPostAlloc;++i,++v){
+      monitorItr.verifyIndexAndIterate($ClassPrefix$InputTestArgType.ARRAY_TYPE,v);
+    }
+    return monitorItr;
+  }
+  public SeqMonitorItr verifyIllegalAdd(SeqMonitorItr monitorItr)
+  {
+    monitorItr.verifyIndexAndIterate($ClassPrefix$InputTestArgType.ARRAY_TYPE,0);
+    return monitorItr;
+  }
+  
+  public void illegalAdd(PreModScenario preModScenario)
+  {
+    if(activePreModScenario!=null)
+    {
+      throw new Error("Cannot modify sequence with "+preModScenario+" because it has already been modified with "+activePreModScenario);
+    }
+    switch(preModScenario){
+      case ModSeq:
+        $ClassPrefix$InputTestArgType.ARRAY_TYPE.callCollectionAdd(seq,0);
+        ++expectedRootModCount;
+        ++expectedRootSize;
+        ++expectedParentModCount;
+        ++expectedParentSize;
+        ++expectedSeqModCount;
+        ++expectedSeqSize;
+        activePreModScenario=preModScenario;
+        break;
+      case ModParent:
+        $ClassPrefix$InputTestArgType.ARRAY_TYPE.callCollectionAdd(parent,0);
+        ++expectedRootModCount;
+        ++expectedRootSize;
+        ++expectedParentModCount;
+        ++expectedParentSize;
+        activePreModScenario=preModScenario;
+        break;
+      case ModRoot:
+        $ClassPrefix$InputTestArgType.ARRAY_TYPE.callCollectionAdd(root,0);
+        ++expectedRootModCount;
+        ++expectedRootSize;
+        activePreModScenario=preModScenario;
+        break;
+      case NoMod:
+        break;
+      default:
+        throw new Error("Unknown preModScenario "+preModScenario);
+    }
+  }
+  public void add(int index,int val,$ClassPrefix$InputTestArgType inputArgType)
+  {
+    inputArgType.callListAdd(seq,index,val);
+    ++expectedRootSize;
+    ++expectedParentSize;
+    ++expectedSeqSize;
+    ++expectedRootModCount;
+    ++expectedParentModCount;
+    ++expectedSeqModCount;
+  }
+  public void add(int index,int val)
+  {
+    add(index,val,$ClassPrefix$InputTestArgType.ARRAY_TYPE);
+  }
+  public boolean add(int val,$ClassPrefix$InputTestArgType inputArgType)
+  {
+    boolean ret=inputArgType.callCollectionAdd(seq,val);
+    if(ret)
+    {
+      ++expectedRootSize;
+      ++expectedParentSize;
+      ++expectedSeqSize;
+      ++expectedRootModCount;
+      ++expectedParentModCount;
+      ++expectedSeqModCount;
+    }
+    return ret;
+  }
+  public boolean add(int val)
+  {
+    return add(val,$ClassPrefix$InputTestArgType.ARRAY_TYPE);
+  }
+  public void push(int val,$ClassPrefix$InputTestArgType inputArgType)
+  {
+    inputArgType.callStackPush(seq,val);
+    ++expectedRootSize;
+    ++expectedParentSize;
+    ++expectedSeqSize;
+    ++expectedRootModCount;
+    ++expectedParentModCount;
+    ++expectedSeqModCount;
+  }
+  public void push(int val)
+  {
+    push(val,$ClassPrefix$InputTestArgType.ARRAY_TYPE);
+  }
+  public String toString()
+  {
+    StringBuilder builder=new StringBuilder();
+    switch(structType)
+    {
+      case ARRSEQ:
+        builder.append("$ClassPrefix$ArrSeq.").append(checkedType==CheckedType.CHECKED?"Checked":"Unchecked");
+        switch(nestedType)
+        {
+          case STACK:
+            builder.append("Stack{").append(initialCapacity);
+            break;
+          case LIST:
+            builder.append("List{").append(initialCapacity);
+            break;
+          case SUBLIST:
+            builder.append("SubList{").append(rootPreAlloc).append(',').append(parentPreAlloc).append(',').append(parentPostAlloc).append(',').append(rootPostAlloc);
+            break;
+          default:
+            throw new Error("Unknown nestedType "+nestedType);
+        }
+        break;
+      default:
+        throw new Error("Unknown structType "+structType);
+    }
+    return builder.append('}').toString();
+  }
+  public void verifyStructuralIntegrity()
+  {
+    switch(structType)
+    {
+      case ARRSEQ:
+        switch(nestedType)
+        {
+          case STACK:
+            if(checkedType==CheckedType.CHECKED)
+            {
+              Assertions.assertEquals(expectedRootModCount,FieldAccessor.$ClassPrefix$ArrSeq.CheckedStack.modCount(root));
+            }
+            
+            break;
+          case LIST:
+            if(checkedType==CheckedType.CHECKED)
+            {
+              Assertions.assertEquals(expectedRootModCount,FieldAccessor.$ClassPrefix$ArrSeq.CheckedList.modCount(root));
+            }
+          case SUBLIST:
+            OmniList.Of$ClassPrefix$ actualSeqParent;
+            $ClassPrefix$ArrSeq actualSeqRoot;
+            int actualSeqSize;
+            OmniList.Of$ClassPrefix$ actualParentParent;
+            $ClassPrefix$ArrSeq  actualParentRoot;
+            int actualParentSize;
+            if(checkedType==CheckedType.CHECKED)
+            {
+              actualSeqParent=(OmniList.Of$ClassPrefix$)FieldAccessor.$ClassPrefix$ArrSeq.CheckedSubList.parent(seq);
+              actualSeqRoot=($ClassPrefix$ArrSeq)FieldAccessor.$ClassPrefix$ArrSeq.CheckedSubList.root(seq);
+              actualSeqSize=FieldAccessor.$ClassPrefix$ArrSeq.CheckedSubList.size(seq);
+              actualParentParent=(OmniList.Of$ClassPrefix$)FieldAccessor.$ClassPrefix$ArrSeq.CheckedSubList.parent(parent);
+              actualParentRoot=($ClassPrefix$ArrSeq)FieldAccessor.$ClassPrefix$ArrSeq.CheckedSubList.root(parent);
+              actualParentSize=FieldAccessor.$ClassPrefix$ArrSeq.CheckedSubList.size(parent);
+              Assertions.assertEquals(expectedSeqModCount,FieldAccessor.$ClassPrefix$ArrSeq.CheckedSubList.modCount(seq));
+              Assertions.assertEquals(expectedParentModCount,FieldAccessor.$ClassPrefix$ArrSeq.CheckedSubList.modCount(parent));
+              Assertions.assertEquals(expectedRootModCount,FieldAccessor.$ClassPrefix$ArrSeq.CheckedList.modCount(root));
+            }
+            else
+            {
+              actualSeqParent=(OmniList.Of$ClassPrefix$)FieldAccessor.$ClassPrefix$ArrSeq.UncheckedSubList.parent(seq);
+              actualSeqRoot=($ClassPrefix$ArrSeq)FieldAccessor.$ClassPrefix$ArrSeq.UncheckedSubList.root(seq);
+              actualSeqSize=FieldAccessor.$ClassPrefix$ArrSeq.UncheckedSubList.size(seq);
+              actualParentParent=(OmniList.Of$ClassPrefix$)FieldAccessor.$ClassPrefix$ArrSeq.UncheckedSubList.parent(parent);
+              actualParentRoot=($ClassPrefix$ArrSeq)FieldAccessor.$ClassPrefix$ArrSeq.UncheckedSubList.root(parent);
+              actualParentSize=FieldAccessor.$ClassPrefix$ArrSeq.UncheckedSubList.size(parent);
+            }
+            Assertions.assertSame(root,actualSeqRoot);
+            Assertions.assertSame(root,actualParentRoot);
+            Assertions.assertSame(parent,actualSeqParent);
+            Assertions.assertNull(actualParentParent);
+            Assertions.assertEquals(expectedSeqSize,actualSeqSize);
+            Assertions.assertEquals(expectedParentSize+parentPreAlloc+parentPostAlloc,actualParentSize);
+            break;
+          default:
+            throw new Error("Unknown structType "+structType);
+        }
+        Assertions.assertEquals(expectedRootSize+parentPreAlloc+parentPostAlloc+rootPreAlloc+rootPostAlloc,FieldAccessor.$ClassPrefix$ArrSeq.size(root));
+        break;
+      default:
+        throw new Error("Unknown structType "+structType);
+    }
+  }
+  
+}
