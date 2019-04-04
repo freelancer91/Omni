@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Assertions;
 import java.util.function.IntFunction;
 import java.util.function.Consumer;
 import omni.impl.$ClassPrefix$InputTestArgType;
+import omni.impl.$ClassPrefix$OutputTestArgType;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.Arguments;
@@ -37,11 +38,14 @@ import omni.impl.MonitoredArrayConstructor;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
 
-import omni.impl.seq.$ClassPrefixSeqMonitor.NestedType;
-import omni.impl.seq.$ClassPrefixSeqMonitor.StructType;
-import omni.impl.seq.$ClassPrefixSeqMonitor.CheckedType;
-import omni.impl.seq.$ClassPrefixSeqMonitor.PreModScenario;
-import omni.impl.seq.$ClassPrefixSeqMonitor.FunctionExceptionScenario;
+import omni.impl.seq.$ClassPrefix$SeqMonitor.NestedType;
+import omni.impl.seq.$ClassPrefix$SeqMonitor.StructType;
+import omni.impl.seq.$ClassPrefix$SeqMonitor.CheckedType;
+import omni.impl.seq.$ClassPrefix$SeqMonitor.PreModScenario;
+import omni.impl.seq.$ClassPrefix$SeqMonitor.SequenceLocation;
+import omni.impl.seq.$ClassPrefix$SeqMonitor.FunctionExceptionScenario;
+import omni.impl.seq.$ClassPrefix$SeqMonitor.SequenceContentsScenario;
+import omni.impl.seq.$ClassPrefix$SeqMonitor.ListItrSetExceptionScenario;
 
 //TODO replace this with a custom collection
 import java.util.ArrayList;
@@ -49,12 +53,6 @@ import java.util.ArrayList;
 @Execution(ExecutionMode.CONCURRENT)
 public class $ClassPrefix$ArrSeqTest{
     /*
-#IF OfRef
-  private static void verifyRangeIsNull($ArrayType$[] arr,int offset,int bound){
-    for(int i=offset;i<bound;++i){Assertions.assertNull(arr[i]);}
-  }
-#ENDIF
-
   private static enum StructType{
     CHECKEDSTACK(true),
     CHECKEDLIST(true),
@@ -71,7 +69,6 @@ public class $ClassPrefix$ArrSeqTest{
     Arguments.of(StructType.CHECKEDSTACK),
     Arguments.of(StructType.UNCHECKEDSTACK)
   };
-
   private static class ConstructionArguments{
     final int initialCapacity;
     final int rootPreAlloc;
@@ -495,19 +492,14 @@ public class $ClassPrefix$ArrSeqTest{
     return builder.build().parallel();
   }
   */
-  static Stream<Arguments> getArgsForConstructor_int()
-  {
+  static Stream<Arguments> getArgsForConstructor_int(){
     Stream.Builder<Arguments> builder=Stream.builder();
-    for(var nestedType:NestedType.values())
-    {
-      if(nestedType==NestedType.SUBLIST)
-      {
+    for(var nestedType:NestedType.values()){
+      if(nestedType==NestedType.SUBLIST){
         continue;
       }
-      for(var checkedType:CheckedType.values())
-      {
-        for(int initialCapacity=0;initialCapacity<=15;initialCapacity+=5)
-        {
+      for(var checkedType:CheckedType.values()){
+        for(int initialCapacity=0;initialCapacity<=15;initialCapacity+=5){
           builder.add(Arguments.of(nestedType,checkedType,initialCapacity));
         }
       }
@@ -515,41 +507,13 @@ public class $ClassPrefix$ArrSeqTest{
     return builder.build().parallel();
   }
   @ParameterizedTest
-  public void testConstructor_int(NestedType nestedType,CheckedType checkedType,int initialCapacity)
-  {
-    if(nestedType==NestedType.LIST)
-    {
-      if(checkedType==CheckedType.CHECKED)
-      {
-        var seq=new $ClassPrefix$ArrSeq.CheckedList(initialCapacity);
-      }
-      else
-      {
-        var seq=new $ClassPrefix$ArrSeq.UncheckedList(initialCapacity);
-      }
-    }
-    else
-    {
-      if(checkedType==CheckedType.CHECKED)
-      {
-        var seq=new $ClassPrefix$ArrSeq.CheckedStack(initialCapacity);
-      }
-      else
-      {
-        var seq=new $ClassPrefix$ArrSeq.UncheckedStack(initialCapacity);
-      }
-    }
-  }
-  
-  
-  @ParameterizedTest
-  @MethodSource("getArgsFortestConstructor_int_happyPath")
-  public void testConstructor_int_happyPath(int initialCapacity,StructType structType){
+  @MethodSource("getArgsForConstructor_int")
+  public void testConstructor_int(NestedType nestedType,CheckedType checkedType,int initialCapacity){
     $ClassPrefix$ArrSeq seq;
-    if(structType.checked){
-      Assertions.assertEquals(0,structType==StructType.CHECKEDLIST?FieldAccessor.$ClassPrefix$ArrSeq.CheckedList.modCount(seq=new $ClassPrefix$ArrSeq.CheckedList(initialCapacity)):FieldAccessor.$ClassPrefix$ArrSeq.CheckedStack.modCount(seq=new $ClassPrefix$ArrSeq.CheckedStack(initialCapacity)));
+    if(checkedType.checked){
+      Assertions.assertEquals(0,nestedType==NestedType.LIST?FieldAccessor.$ClassPrefix$ArrSeq.CheckedList.modCount(seq=new $ClassPrefix$ArrSeq.CheckedList(initialCapacity)):FieldAccessor.$ClassPrefix$ArrSeq.CheckedStack.modCount(seq=new $ClassPrefix$ArrSeq.CheckedStack(initialCapacity)));
     }else{
-      seq=structType==StructType.UNCHECKEDLIST?new $ClassPrefix$ArrSeq.UncheckedList(initialCapacity):new $ClassPrefix$ArrSeq.UncheckedStack(initialCapacity);
+      seq=nestedType==NestedType.LIST?new $ClassPrefix$ArrSeq.UncheckedList(initialCapacity):new $ClassPrefix$ArrSeq.UncheckedStack(initialCapacity);
     }
     Assertions.assertEquals(0,seq.size);
     switch(initialCapacity){
@@ -562,43 +526,31 @@ public class $ClassPrefix$ArrSeqTest{
       default:
         Assertions.assertEquals(initialCapacity,seq.arr.length);
 #IF OfRef
-        verifyRangeIsNull(seq.arr,0,initialCapacity);
+        $ClassPrefix$SeqMonitor.verifyRangeIsNull(seq.arr,0,initialCapacity);
 #ENDIF
-    }
-  }
-  static enum ListItrAddTestScenario{
-    HappyPathInsertBegin(false,CMEScenario.NoMod,null),
-    HappyPathInsertEnd(false,CMEScenario.NoMod,null),
-    HappyPathInsertMidPoint(false,CMEScenario.NoMod,null),
-    EmptyModRootThrowCME(false,CMEScenario.ModRoot,ConcurrentModificationException.class),
-    EmptyModParentThrowCME(false,CMEScenario.ModParent,ConcurrentModificationException.class),
-    EmptyModSeqThrowCME(false,CMEScenario.ModSeq,ConcurrentModificationException.class),
-    NonEmptyModRootThrowCME(true,CMEScenario.ModRoot,ConcurrentModificationException.class),
-    NonEmptyModParentThrowCME(true,CMEScenario.ModParent,ConcurrentModificationException.class),
-    NonEmptyModSeqThrowCME(true,CMEScenario.ModSeq,ConcurrentModificationException.class);
-    final boolean nonEmpty;
-    final CMEScenario modScenario;
-    final Class<? extends Throwable> expectedException;
-    ListItrAddTestScenario(boolean nonEmpty,CMEScenario modScenario,Class<? extends Throwable> expectedException){
-      this.expectedException=expectedException;
-      this.nonEmpty=nonEmpty;
-      this.modScenario=modScenario;
     }
   }
   static Stream<Arguments> getListItrAddArgs(){
     Stream.Builder<Arguments> builder=Stream.builder();
-    for($ClassPrefix$InputTestArgType inputTestArgType:$ClassPrefix$InputTestArgType.values()){
-      for(ListItrAddTestScenario testScenario:ListItrAddTestScenario.values()){
-        for(int initialCapacity=0;initialCapacity<=15;initialCapacity+=5){
-          if(testScenario.expectedException==null){builder.add(Arguments.of(testScenario,inputTestArgType,new ConstructionArguments(initialCapacity,StructType.UNCHECKEDLIST)));}
-          builder.add(Arguments.of(testScenario,inputTestArgType,new ConstructionArguments(initialCapacity,StructType.CHECKEDLIST)));
+    for(var checkedType:CheckedType.values()){
+      for(var preModScenario:PreModScenario.values()){
+        if(!checkedType.checked && preModScenario.expectedException!=null){
+          continue;
         }
-        for(int rootPreAlloc=0;rootPreAlloc<=5;rootPreAlloc+=5){
-          for(int rootPostAlloc=0;rootPostAlloc<=5;rootPostAlloc+=5){
-            for(int parentPreAlloc=0;parentPreAlloc<=5;parentPreAlloc+=5){
-              for(int parentPostAlloc=0;parentPostAlloc<=5;parentPostAlloc+=5){
-                builder.add(Arguments.of(testScenario,inputTestArgType,new ConstructionArguments(rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,StructType.CHECKEDSUBLIST)));
-                if(testScenario.expectedException==null){builder.add(Arguments.of(testScenario,inputTestArgType,new ConstructionArguments(rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,StructType.UNCHECKEDSUBLIST)));}
+        for(var seqContentsScenario:SequenceContentsScenario.values()){
+          for(var seqLocation:SequenceLocation.values()){
+            for(var inputArgType:$ClassPrefix$InputTestArgType.values()){
+              for(int initialCapacity=0;initialCapacity<=15;initialCapacity+=5){
+                  builder.add(Arguments.of(new $ClassPrefix$SeqMonitor(StructType.ARRSEQ,NestedType.LIST,checkedType,initialCapacity),preModScenario,seqContentsScenario,seqLocation,inputArgType));
+              }
+              for(int rootPreAlloc=0;rootPreAlloc<=5;rootPreAlloc+=5){
+                for(int parentPreAlloc=0;parentPreAlloc<=5;parentPreAlloc+=5){
+                  for(int parentPostAlloc=0;parentPostAlloc<=5;parentPostAlloc+=5){
+                    for(int rootPostAlloc=0;rootPostAlloc<=5;rootPostAlloc+=5){
+                      builder.add(Arguments.of(new $ClassPrefix$SeqMonitor(StructType.ARRSEQ,NestedType.SUBLIST,checkedType,OmniArray.DEFAULT_ARR_SEQ_CAP,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc),preModScenario,seqContentsScenario,seqLocation,inputArgType));
+                    }
+                  }
+                }
               }
             }
           }
@@ -609,113 +561,99 @@ public class $ClassPrefix$ArrSeqTest{
   }
   @ParameterizedTest
   @MethodSource("getListItrAddArgs")
-  public void testListItrAdd(ListItrAddTestScenario testScenario,$ClassPrefix$InputTestArgType inputArgType,ConstructionArguments constructionArgs){
-    var seqItr=constructionArgs.constructSeqListIterator();
-    var testMonitor=new InputTestMonitor();
-    if(testScenario.nonEmpty){
-      for(int i=0;i<100;++i){
-        testMonitor.seqItrAdd(seqItr,inputArgType,i);
-      }
+  public void testListItradd_val($ClassPrefix$SeqMonitor seqMonitor,PreModScenario preModScenario,SequenceContentsScenario seqContentsScenario,SequenceLocation seqLocationScenario,$ClassPrefix$InputTestArgType inputArgType){
+    int numToAdd=seqContentsScenario.nonEmpty?100:0;
+    for(int i=0;i<numToAdd;++i){
+      seqMonitor.add(i);
     }
-    var expectedException=testScenario.expectedException;
-    if(expectedException==null){
-      for(int i=0;i<100;++i){
-        testMonitor.seqItrAdd(seqItr,inputArgType,i);
-        testMonitor.verifyItrState(seqItr,constructionArgs);
-        switch(testScenario){
-          case HappyPathInsertBegin:
-            testMonitor.seqItrPrevious(seqItr);
-            break;
-          case HappyPathInsertMidPoint:
-            if((i&1)==0){testMonitor.seqItrPrevious(seqItr);}
-            break;
-          default:
-        }
-      }
-    }else{
-      testMonitor.illegalMod(constructionArgs,inputArgType,testScenario.modScenario);
-      Assertions.assertThrows(expectedException,()->inputArgType.callListItrAdd(seqItr,0));
-    }
-    testMonitor.verifyItrState(seqItr,constructionArgs);
-    testMonitor.verifyStructuralIntegrity(constructionArgs);
-    int offset=constructionArgs.verifyPreAlloc();
-    switch(testScenario){
-      case HappyPathInsertBegin:
-        offset=constructionArgs.verifyDescending(offset,inputArgType,100);
+    $ClassPrefix$ItrMonitor itrMonitor;
+    switch(seqLocationScenario){
+      case BEGINNING:
+        itrMonitor=seqMonitor.getListItrMonitor();
         break;
-      case HappyPathInsertMidPoint:
-        offset=constructionArgs.verifyMidPointInsertion(offset,inputArgType,100);
+      case MIDDLE:
+        itrMonitor=seqMonitor.getListItrMonitor(numToAdd/2);
         break;
-      case HappyPathInsertEnd:
-        offset=constructionArgs.verifyAscending(offset,inputArgType,100);
+      case END:
+        itrMonitor=seqMonitor.getListItrMonitor(numToAdd);
         break;
       default:
-        if(testScenario.nonEmpty){offset=constructionArgs.verifyAscending(offset,inputArgType,100);}
+        throw new Error("Unknown sequence locatio scenario "+seqLocationScenario);
     }
-    if(testScenario.modScenario==CMEScenario.ModSeq){offset=constructionArgs.verifyIndex(offset,inputArgType,0);}
-    offset=constructionArgs.verifyParentPostAlloc(offset);
-    if(testScenario.modScenario==CMEScenario.ModParent){offset=constructionArgs.verifyIndex(offset,inputArgType,0);}
-    offset=constructionArgs.verifyRootPostAlloc(offset);
-    if(testScenario.modScenario==CMEScenario.ModRoot){constructionArgs.verifyIndex(offset,inputArgType,0);}
-  }
-  static enum ListItrSetTestScenario{
-    HappyPath(true,CMEScenario.NoMod,null),
-    EmptyModRootThrowCME(false,CMEScenario.ModRoot,ConcurrentModificationException.class),
-    EmptyModParentThrowCME(false,CMEScenario.ModParent,ConcurrentModificationException.class),
-    EmptyModSeqThrowCME(false,CMEScenario.ModSeq,ConcurrentModificationException.class),
-    NonEmptyModRootThrowCME(true,CMEScenario.ModRoot,ConcurrentModificationException.class),
-    NonEmptyModParentThrowCME(true,CMEScenario.ModParent,ConcurrentModificationException.class),
-    NonEmptyModSeqThrowCME(true,CMEScenario.ModSeq,ConcurrentModificationException.class),
-    EmptyThrowISE(false,CMEScenario.NoMod,IllegalStateException.class),
-    EmptyPostAddThrowISE(false,CMEScenario.NoMod,IllegalStateException.class),
-    EmptyPostRemoveThrowISE(false,CMEScenario.NoMod,IllegalStateException.class),
-    EmptyThrowISEModRootCME(false,CMEScenario.ModRoot,IllegalStateException.class),
-    EmptyThrowISEModParentCME(false,CMEScenario.ModParent,IllegalStateException.class),
-    EmptyThrowISEModSeqCME(false,CMEScenario.ModSeq,IllegalStateException.class),
-    EmptyPostAddThrowISESupercedesModRootCME(false,CMEScenario.ModRoot,IllegalStateException.class),
-    EmptyPostAddThrowISESupercedesModParentCME(false,CMEScenario.ModParent,IllegalStateException.class),
-    EmptyPostAddThrowISESupercedesModSeqCME(false,CMEScenario.ModSeq,IllegalStateException.class),
-    EmptyPostRemoveThrowISESupercedesModRootCME(false,CMEScenario.ModRoot,IllegalStateException.class),
-    EmptyPostRemoveThrowISESupercedesModParentCME(false,CMEScenario.ModParent,IllegalStateException.class),
-    EmptyPostRemoveThrowISESupercedesModSeqCME(false,CMEScenario.ModSeq,IllegalStateException.class),
-    NonEmptyThrowISE(true,CMEScenario.NoMod,IllegalStateException.class),
-    NonEmptyPostAddThrowISE(true,CMEScenario.NoMod,IllegalStateException.class),
-    NonEmptyPostRemoveThrowISE(true,CMEScenario.NoMod,IllegalStateException.class),
-    NonEmptyThrowISEModRootCME(true,CMEScenario.ModRoot,IllegalStateException.class),
-    NonEmptyThrowISEModParentCME(true,CMEScenario.ModParent,IllegalStateException.class),
-    NonEmptyThrowISEModSeqCME(true,CMEScenario.ModSeq,IllegalStateException.class),
-    NonEmptyPostAddThrowISESupercedesModRootCME(true,CMEScenario.ModRoot,IllegalStateException.class),
-    NonEmptyPostAddThrowISESupercedesModParentCME(true,CMEScenario.ModParent,IllegalStateException.class),
-    NonEmptyPostAddThrowISESupercedesModSeqCME(true,CMEScenario.ModSeq,IllegalStateException.class),
-    NonEmptyPostRemoveThrowISESupercedesModRootCME(true,CMEScenario.ModRoot,IllegalStateException.class),
-    NonEmptyPostRemoveThrowISESupercedesModParentCME(true,CMEScenario.ModParent,IllegalStateException.class),
-    NonEmptyPostRemoveThrowISESupercedesModSeqCME(true,CMEScenario.ModSeq,IllegalStateException.class);
-    final boolean nonEmpty;
-    final CMEScenario modScenario;
-    final Class<? extends Throwable> expectedException;
-    ListItrSetTestScenario(boolean nonEmpty,CMEScenario modScenario,Class<? extends Throwable> expectedException){
-      this.expectedException=expectedException;
-      this.nonEmpty=nonEmpty;
-      this.modScenario=modScenario;
+    seqMonitor.illegalAdd(preModScenario);
+    if(preModScenario.expectedException==null){
+      switch(seqLocationScenario){
+        case BEGINNING:
+          for(int i=0;i<100;++i){
+            itrMonitor.add(i,inputArgType);
+            itrMonitor.verifyIteratorState();
+            itrMonitor.iterateReverse();
+            seqMonitor.verifyStructuralIntegrity();
+          }
+          break;
+        case MIDDLE:
+          for(int i=0;i<100;++i){
+            itrMonitor.add(i,inputArgType);
+            itrMonitor.verifyIteratorState();
+            if((i&1)!=0){
+              itrMonitor.iterateReverse();
+            }
+            seqMonitor.verifyStructuralIntegrity();
+          }
+          break;
+        case END:
+          for(int i=0;i<100;++i){
+            itrMonitor.add(i,inputArgType);
+            itrMonitor.verifyIteratorState();
+            seqMonitor.verifyStructuralIntegrity();
+          }
+          break;
+        default:
+          throw new Error("Unknown sequence locatio scenario "+seqLocationScenario);
+      }
+      var i=seqMonitor.verifyPreAlloc();
+      switch(seqLocationScenario){
+        case BEGINNING:
+          i=seqMonitor.verifyDescending(i,inputArgType,100);
+          i=seqMonitor.verifyAscending(i,numToAdd);
+          break;
+        case MIDDLE:
+          i=seqMonitor.verifyAscending(i,numToAdd/2);
+          i=seqMonitor.verifyMidPointInsertion(i,inputArgType,100);
+          i=seqMonitor.verifyAscending(numToAdd/2,i,numToAdd-(numToAdd/2));
+          break;
+        case END:
+          i=seqMonitor.verifyAscending(i,numToAdd);
+          i=seqMonitor.verifyAscending(i,inputArgType,100);
+          break;
+        default:
+          throw new Error("Unknown sequence location scenario "+seqLocationScenario);
+      }
+      i=seqMonitor.verifyParentPostAlloc(i);
+      seqMonitor.verifyRootPostAlloc(i);
+    }else{
+      Assertions.assertThrows(preModScenario.expectedException,()->itrMonitor.add(0,inputArgType));
+      itrMonitor.verifyIteratorState();
+      seqMonitor.verifyStructuralIntegrity();
+      var i=seqMonitor.verifyPreAlloc();
+      i=seqMonitor.verifyAscending(i,numToAdd);
+      if(preModScenario==PreModScenario.ModSeq){i=seqMonitor.verifyIllegalAdd(i);}
+      i=seqMonitor.verifyParentPostAlloc(i);
+      if(preModScenario==PreModScenario.ModParent){i=seqMonitor.verifyIllegalAdd(i);}
+      i=seqMonitor.verifyRootPostAlloc(i);
+      if(preModScenario==PreModScenario.ModRoot){i=seqMonitor.verifyIllegalAdd(i);}
     }
   }
   static Stream<Arguments> getListItrSetArgs(){
     Stream.Builder<Arguments> builder=Stream.builder();
-    for($ClassPrefix$InputTestArgType inputTestArgType:$ClassPrefix$InputTestArgType.values()){
-      for(ListItrSetTestScenario testScenario: ListItrSetTestScenario.values()){
-        for(int initialCapacity=0;initialCapacity<=15;initialCapacity+=5){
-          if(testScenario.expectedException==null){builder.add(Arguments.of(testScenario,inputTestArgType,new ConstructionArguments(initialCapacity,StructType.UNCHECKEDLIST)));}
-          builder.add(Arguments.of(testScenario,inputTestArgType,new ConstructionArguments(initialCapacity,StructType.CHECKEDLIST)));
+    for(var checkedType:CheckedType.values()){
+      for(var listItrSetExceptionScenario:ListItrSetExceptionScenario.values()){
+        if(!checkedType.checked && listItrSetExceptionScenario.expectedException!=null){
+          continue;
         }
-        for(int rootPreAlloc=0;rootPreAlloc<=5;rootPreAlloc+=5){
-          for(int rootPostAlloc=0;rootPostAlloc<=5;rootPostAlloc+=5){
-            for(int parentPreAlloc=0;parentPreAlloc<=5;parentPreAlloc+=5){
-              for(int parentPostAlloc=0;parentPostAlloc<=5;parentPostAlloc+=5){
-                builder.add(Arguments.of(testScenario,inputTestArgType,new ConstructionArguments(rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,StructType.CHECKEDSUBLIST)));
-                if(testScenario.expectedException==null){builder.add(Arguments.of(testScenario,inputTestArgType,new ConstructionArguments(rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,StructType.UNCHECKEDSUBLIST)));}
-              }
-            }
-          }
+        for(var inputArgType:$ClassPrefix$InputTestArgType.values()){
+          builder.add(Arguments.of(new $ClassPrefix$SeqMonitor(StructType.ARRSEQ,NestedType.LIST,checkedType),listItrSetExceptionScenario,inputArgType));
+          builder.add(Arguments.of(new $ClassPrefix$SeqMonitor(StructType.ARRSEQ,NestedType.SUBLIST,checkedType),listItrSetExceptionScenario,inputArgType));
         }
       }
     }
@@ -723,88 +661,85 @@ public class $ClassPrefix$ArrSeqTest{
   }
   @ParameterizedTest
   @MethodSource("getListItrSetArgs")
-  public void testListItrSet(ListItrSetTestScenario testScenario,$ClassPrefix$InputTestArgType inputArgType,ConstructionArguments constructionArgs){
-    var seqItr=constructionArgs.constructSeqListIterator();
-    var testMonitor=new InputTestMonitor();
-    if(testScenario.nonEmpty){for(int i=0;i<100;++i){testMonitor.seqItrAdd(seqItr,inputArgType,i);}}
-    var expectedException=testScenario.expectedException;
-    if(expectedException==null){
-      for(int i=0;i<100;++i){
-        testMonitor.seqItrPrevious(seqItr);
-        inputArgType.callListItrSet(seqItr,i);
-        testMonitor.verifyItrState(seqItr,constructionArgs);
-      }
-      int offset=constructionArgs.verifyPreAlloc();
-      offset=constructionArgs.verifyDescending(offset,inputArgType,testMonitor.expectedRootSize);
-      offset=constructionArgs.verifyParentPostAlloc(offset);
-      constructionArgs.verifyRootPostAlloc(offset);
-      for(int i=0;i<100;++i){
-        testMonitor.seqItrNext(seqItr);
-        inputArgType.callListItrSet(seqItr,i);
-        testMonitor.verifyItrState(seqItr,constructionArgs);
-      }
-    }else{
-      if(expectedException==ConcurrentModificationException.class)
-      {
-        testMonitor.seqItrAdd(seqItr,inputArgType,0);
-        testMonitor.seqItrPrevious(seqItr);
-      }else{
-        switch(testScenario){
-        case EmptyPostAddThrowISE:
-        case EmptyPostAddThrowISESupercedesModRootCME:
-        case EmptyPostAddThrowISESupercedesModParentCME:
-        case EmptyPostAddThrowISESupercedesModSeqCME:
-        case NonEmptyPostAddThrowISE:
-        case NonEmptyPostAddThrowISESupercedesModRootCME:
-        case NonEmptyPostAddThrowISESupercedesModParentCME:
-        case NonEmptyPostAddThrowISESupercedesModSeqCME:
-          testMonitor.seqItrAdd(seqItr,inputArgType,0);
-          break;
-        case EmptyPostRemoveThrowISE:
-        case EmptyPostRemoveThrowISESupercedesModRootCME:
-        case EmptyPostRemoveThrowISESupercedesModParentCME:
-        case EmptyPostRemoveThrowISESupercedesModSeqCME:
-        case NonEmptyPostRemoveThrowISE:
-        case NonEmptyPostRemoveThrowISESupercedesModRootCME:
-        case NonEmptyPostRemoveThrowISESupercedesModParentCME:
-        case NonEmptyPostRemoveThrowISESupercedesModSeqCME:
-          testMonitor.seqItrAdd(seqItr,inputArgType,0);
-          testMonitor.seqItrPrevious(seqItr);
-          testMonitor.seqItrRemove(seqItr);
-        default:
-        }
-      }
-      testMonitor.illegalMod(constructionArgs,inputArgType,testScenario.modScenario);
-      Assertions.assertThrows(expectedException,()->inputArgType.callListItrSet(seqItr,1));
+  public void testListItrset_val($ClassPrefix$SeqMonitor seqMonitor,ListItrSetExceptionScenario listItrSetExceptionScenario,$ClassPrefix$InputTestArgType inputArgType){
+    int numToAdd=100;
+    for(int i=0;i<numToAdd;++i){
+      seqMonitor.add(i);
     }
-    testMonitor.verifyItrState(seqItr,constructionArgs);
-    testMonitor.verifyStructuralIntegrity(constructionArgs);
-    int offset=constructionArgs.verifyPreAlloc();
-    if(testScenario.nonEmpty){offset=constructionArgs.verifyAscending(offset,inputArgType,100);}
-    switch(testScenario){
-      case EmptyModRootThrowCME:
-      case EmptyModParentThrowCME:
-      case EmptyModSeqThrowCME:
-      case NonEmptyModRootThrowCME:
-      case NonEmptyModParentThrowCME:
-      case NonEmptyModSeqThrowCME:
-      case EmptyPostAddThrowISE:
-      case EmptyPostAddThrowISESupercedesModRootCME:
-      case EmptyPostAddThrowISESupercedesModParentCME:
-      case EmptyPostAddThrowISESupercedesModSeqCME:
-      case NonEmptyPostAddThrowISE:
-      case NonEmptyPostAddThrowISESupercedesModRootCME:
-      case NonEmptyPostAddThrowISESupercedesModParentCME:
-      case NonEmptyPostAddThrowISESupercedesModSeqCME:
-        offset=constructionArgs.verifyIndex(offset,inputArgType,0);
+    $ClassPrefix$ItrMonitor itrMonitor=seqMonitor.getListItrMonitor();
+    switch(listItrSetExceptionScenario){
+      case PostAddThrowISE:
+      case PostAddThrowISESupercedesModRootCME:
+      case PostAddThrowISESupercedesModParentCME:
+      case PostAddThrowISESupercedesModSeqCME:
+        itrMonitor.add(0);
+        break;
+      case PostRemoveThrowISE:
+      case PostRemoveThrowISESupercedesModRootCME:
+      case PostRemoveThrowISESupercedesModParentCME:
+      case PostRemoveThrowISESupercedesModSeqCME:
+        itrMonitor.iterateForward();
+        itrMonitor.remove();
+        break;
       default:
+        itrMonitor.iterateForward();
+      case ThrowISE:
+      case ThrowISESupercedesModRootCME:
+      case ThrowISESupercedesModParentCME:
+      case ThrowISESupercedesModSeqCME:
     }
-    if(testScenario.modScenario==CMEScenario.ModSeq){offset=constructionArgs.verifyIndex(offset,inputArgType,0);}
-    offset=constructionArgs.verifyParentPostAlloc(offset);
-    if(testScenario.modScenario==CMEScenario.ModParent){offset=constructionArgs.verifyIndex(offset,inputArgType,0);}
-    offset=constructionArgs.verifyRootPostAlloc(offset);
-    if(testScenario.modScenario==CMEScenario.ModRoot){constructionArgs.verifyIndex(offset,inputArgType,0);}
+    seqMonitor.illegalAdd(listItrSetExceptionScenario.preModScenario);
+    $ClassPrefix$SeqMonitor.SeqMonitorItr i;
+    if(listItrSetExceptionScenario.expectedException==null){
+      for(int j=0;j<numToAdd;++j){
+        itrMonitor.set(numToAdd-j-1,inputArgType);
+        itrMonitor.verifyIteratorState();
+        seqMonitor.verifyStructuralIntegrity();
+        if(!itrMonitor.hasNext()){
+          break;
+        }
+        itrMonitor.iterateForward();
+      }
+      i=seqMonitor.verifyPreAlloc();
+      i=seqMonitor.verifyDescending(i,inputArgType,numToAdd);
+      i=seqMonitor.verifyParentPostAlloc(i);
+      seqMonitor.verifyRootPostAlloc(i);
+      for(int j=0;j<numToAdd;++j){
+        itrMonitor.iterateReverse();
+        itrMonitor.set(numToAdd-j-1,inputArgType);
+        itrMonitor.verifyIteratorState();
+        seqMonitor.verifyStructuralIntegrity();
+      }
+      i=seqMonitor.verifyPreAlloc();
+      i=seqMonitor.verifyAscending(i,inputArgType,numToAdd);
+    }else{
+      Assertions.assertThrows(listItrSetExceptionScenario.expectedException,()->itrMonitor.set(0));
+      itrMonitor.verifyIteratorState();
+      seqMonitor.verifyStructuralIntegrity();
+      i=seqMonitor.verifyPreAlloc();
+      switch(listItrSetExceptionScenario){
+        case PostRemoveThrowISE:
+        case PostRemoveThrowISESupercedesModRootCME:
+        case PostRemoveThrowISESupercedesModParentCME:
+        case PostRemoveThrowISESupercedesModSeqCME:
+          i=seqMonitor.verifyAscending(1,i,numToAdd-1);
+          break;
+        case PostAddThrowISE:
+        case PostAddThrowISESupercedesModRootCME:
+        case PostAddThrowISESupercedesModParentCME:
+        case PostAddThrowISESupercedesModSeqCME:
+          i=seqMonitor.verifyIllegalAdd(i);
+        default:
+          i=seqMonitor.verifyAscending(i,numToAdd);
+      }
+    }
+    if(listItrSetExceptionScenario.preModScenario==PreModScenario.ModSeq){i=seqMonitor.verifyIllegalAdd(i);}
+    i=seqMonitor.verifyParentPostAlloc(i);
+    if(listItrSetExceptionScenario.preModScenario==PreModScenario.ModParent){i=seqMonitor.verifyIllegalAdd(i);}
+    i=seqMonitor.verifyRootPostAlloc(i);
+    if(listItrSetExceptionScenario.preModScenario==PreModScenario.ModRoot){seqMonitor.verifyIllegalAdd(i);}
   }
+  /*
   static enum ListAddIntValTestScenario{
     HappyPathInsertBegin(false,CMEScenario.NoMod,null),
     HappyPathInsertEnd(false,CMEScenario.NoMod,null),
@@ -3198,11 +3133,13 @@ public class $ClassPrefix$ArrSeqTest{
         }
     }
   }
-  
+  */
   
   
 
 
+
+}
 #MACRODEF StructImpl<STRUCTNAME>()
 
 #MACRO TestForEachMethods<DEFAULT>(,)
@@ -3235,8 +3172,6 @@ public class $ClassPrefix$ArrSeqTest{
   #ENDIF
 #ENDIF
 #ENDDEF
-}
-
 #MACRODEF TestForEachMethods<INITIALCAPACITY>(OUTPUTMODIFIER,dummy)
 @Test
 public void testSTRUCTNAMEforEach_OUTPUTMODIFIERConsumer_SeqIsEmpty_NoMod(){

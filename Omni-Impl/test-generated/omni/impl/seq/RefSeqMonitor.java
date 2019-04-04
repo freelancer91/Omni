@@ -5,41 +5,111 @@ import omni.api.OmniCollection;
 import omni.api.OmniList;
 import org.junit.jupiter.api.Assertions;
 import omni.impl.RefInputTestArgType;
-class RefSeqMonitor
-{
-  static enum StructType
-  {
+import omni.impl.FunctionCallType;
+import omni.api.OmniIterator;
+import omni.api.OmniListIterator;
+import java.util.ConcurrentModificationException;
+class RefSeqMonitor{
+  static final int DEFAULT_PRE_AND_POST_ALLOC=5;
+  static void verifyRangeIsNull(Object[] arr,int offset,int bound){
+    for(int i=offset;i<bound;++i){Assertions.assertNull(arr[i]);}
+  }
+  static enum StructType{
     ARRSEQ;
   }
-  static enum NestedType
-  {
+  static enum SequenceLocation{
+    BEGINNING,
+    MIDDLE,
+    END;
+  }
+  static enum SequenceContentsScenario{
+    EMPTY(false),
+    NONEMPTY(true);
+    final boolean nonEmpty;
+    SequenceContentsScenario(boolean nonEmpty){
+      this.nonEmpty=nonEmpty;
+    }
+  }
+  static enum CheckedType{
+    CHECKED(true),
+    UNCHECKED(false);
+    final boolean checked;
+    CheckedType(boolean checked){
+      this.checked=checked;
+    }
+  }
+  static enum NestedType{
     LIST,
     STACK,
-    SUBLIST;
+    SUBLIST,
   }
-  static enum PreModScenario
-  {
-    ModSeq,
-    ModParent,
-    ModRoot,
-    NoMod;
+  static enum PreModScenario{
+    ModSeq(ConcurrentModificationException.class),
+    ModParent(ConcurrentModificationException.class),
+    ModRoot(ConcurrentModificationException.class),
+    NoMod(null);
+    final Class<? extends Throwable> expectedException;
+    PreModScenario(Class<? extends Throwable> expectedException){
+      this.expectedException=expectedException;
+    }
   }
-  static enum FunctionExceptionScenario
-  {
-    ModItr,
-    ModItrThrow,
-    ModSeq,
-    ModSeqThrow,
-    ModParent,
-    ModParentThrow,
-    ModRoot,
-    ModRootThrow,
-    Throw,
-    NoMod;
+  static enum ListItrSetExceptionScenario{
+    HappyPath(null,PreModScenario.NoMod),
+    ModSeq(ConcurrentModificationException.class,PreModScenario.ModSeq),
+    ModParent(ConcurrentModificationException.class,PreModScenario.ModParent),
+    ModRoot(ConcurrentModificationException.class,PreModScenario.ModRoot),
+    ThrowISE(IllegalStateException.class,PreModScenario.NoMod),
+    PostAddThrowISE(IllegalStateException.class,PreModScenario.NoMod),
+    PostRemoveThrowISE(IllegalStateException.class,PreModScenario.NoMod),
+    ThrowISESupercedesModRootCME(IllegalStateException.class,PreModScenario.ModRoot),
+    ThrowISESupercedesModParentCME(IllegalStateException.class,PreModScenario.ModParent),
+    ThrowISESupercedesModSeqCME(IllegalStateException.class,PreModScenario.ModSeq),
+    PostAddThrowISESupercedesModRootCME(IllegalStateException.class,PreModScenario.ModRoot),
+    PostAddThrowISESupercedesModParentCME(IllegalStateException.class,PreModScenario.ModParent),
+    PostAddThrowISESupercedesModSeqCME(IllegalStateException.class,PreModScenario.ModSeq),
+    PostRemoveThrowISESupercedesModRootCME(IllegalStateException.class,PreModScenario.ModRoot),
+    PostRemoveThrowISESupercedesModParentCME(IllegalStateException.class,PreModScenario.ModParent),
+    PostRemoveThrowISESupercedesModSeqCME(IllegalStateException.class,PreModScenario.ModSeq);
+    final Class<? extends Throwable> expectedException;
+    final PreModScenario preModScenario;
+    ListItrSetExceptionScenario(Class<? extends Throwable> expectedException,PreModScenario preModScenario){
+      this.expectedException=expectedException;
+      this.preModScenario=preModScenario;
+    }
+  }
+  static enum FunctionExceptionScenario{
+    ModItr(ConcurrentModificationException.class),
+    ModItrThrow(ConcurrentModificationException.class),
+    ModSeq(ConcurrentModificationException.class),
+    ModSeqThrow(ConcurrentModificationException.class),
+    ModParent(ConcurrentModificationException.class),
+    ModParentThrow(ConcurrentModificationException.class),
+    ModRoot(ConcurrentModificationException.class),
+    ModRootThrow(ConcurrentModificationException.class),
+    Throw(IndexOutOfBoundsException.class),
+    NoMod(null);
+    final Class<? extends Throwable> expectedException;
+    FunctionExceptionScenario(Class<? extends Throwable> expectedException){
+      this.expectedException=expectedException;
+    }
+  }
+  private static void initArray(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc,Object[] arr){
+    for(int i=0,v=Integer.MIN_VALUE,bound=rootPreAlloc;i<bound;++i,++v){
+      arr[i]=TypeConversionUtil.convertToObject(v);
+    }
+    for(int i=rootPreAlloc,v=Integer.MIN_VALUE+rootPreAlloc,bound=i+parentPreAlloc;i<bound;++i,++v){
+      arr[i]=TypeConversionUtil.convertToObject(v);
+    }
+    for(int i=rootPreAlloc+parentPreAlloc,v=Integer.MAX_VALUE-rootPostAlloc-parentPostAlloc,bound=i+parentPostAlloc;i<bound;++i,++v){
+      arr[i]=TypeConversionUtil.convertToObject(v);
+    }
+    for(int i=rootPreAlloc+parentPreAlloc+parentPostAlloc,v=Integer.MAX_VALUE-rootPostAlloc,bound=i+rootPostAlloc;i<bound;++i,++v){
+      arr[i]=TypeConversionUtil.convertToObject(v);
+    }
   }
   final StructType structType;
   final NestedType nestedType;
-  final boolean checked;
+  final CheckedType checkedType;
   final int initialCapacity;
   final int rootPreAlloc;
   final int parentPreAlloc;
@@ -55,81 +125,43 @@ class RefSeqMonitor
   int expectedRootModCount;
   int expectedParentModCount;
   int expectedSeqModCount;
-  RefSeqMonitor(final StructType structType, final NestedType nestedType,final boolean checked)
-  {
+  RefSeqMonitor(final StructType structType, final NestedType nestedType,final CheckedType checkedType){
     this.structType=structType;
     this.nestedType=nestedType;
-    this.checked=checked;
+    this.checkedType=checkedType;
     this.initialCapacity=OmniArray.DEFAULT_ARR_SEQ_CAP;
-    switch(structType)
-    {
+    switch(structType){
       case ARRSEQ:
-        if(nestedType==NestedType.SUBLIST)
-        {
-          this.rootPreAlloc=5;
-          this.parentPreAlloc=5;
-          this.parentPostAlloc=5;
-          this.rootPostAlloc=5;
-          Object[] arr=new Object[20];
-          int i=0,v=Integer.MIN_VALUE;
-          for(;i<5;++i,++v)
-          {
-            arr[i]=TypeConversionUtil.convertToObject(v);
-          }
-          for(;i<10;++i,++v)
-          {
-            arr[i]=TypeConversionUtil.convertToObject(v);
-          }
-          v=Integer.MAX_VALUE-10;
-          for(;i<15;++i,++v)
-          {
-            arr[i]=TypeConversionUtil.convertToObject(v);
-          }
-          for(;i<20;++i,++v)
-          {
-            arr[i]=TypeConversionUtil.convertToObject(v);
-          }
-          if(checked)
-          {
-            this.root=new RefArrSeq.CheckedList(20,arr);
-          }
-          else
-          {
-            this.root=new RefArrSeq.UncheckedList(20,arr);
-          }
-          this.parent=((OmniList.OfRef)root).subList(5,15);
-          this.seq=((OmniList.OfRef)parent).subList(5,5);
-        }
-        else
-        {
+        if(nestedType==NestedType.SUBLIST){
+          this.rootPreAlloc=DEFAULT_PRE_AND_POST_ALLOC;
+          this.parentPreAlloc=DEFAULT_PRE_AND_POST_ALLOC;
+          this.parentPostAlloc=DEFAULT_PRE_AND_POST_ALLOC;
+          this.rootPostAlloc=DEFAULT_PRE_AND_POST_ALLOC;
+          int rootSize;
+          Object[] arr=new Object[rootSize=rootPreAlloc+parentPreAlloc+parentPostAlloc+rootPostAlloc];
+          initArray(rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,arr);
+          this.root=checkedType.checked
+            ?new RefArrSeq.CheckedList(rootSize,arr)
+            :new RefArrSeq.UncheckedList(rootSize,arr);
+          this.parent=((OmniList.OfRef)root).subList(rootPreAlloc,rootSize-rootPostAlloc);
+          this.seq=((OmniList.OfRef)parent).subList(parentPreAlloc,parentPreAlloc);
+        }else{
           this.rootPreAlloc=0;
           this.parentPreAlloc=0;
           this.parentPostAlloc=0;
           this.rootPostAlloc=0;
-          switch(nestedType)
-          {
-            case STACK:
-              if(checked)
-              {
-                this.root=new RefArrSeq.CheckedStack();
-              }
-              else
-              {
-                this.root=new RefArrSeq.UncheckedStack();
-              }
-              break;
-            case LIST:
-              if(checked)
-              {
-                this.root=new RefArrSeq.CheckedList();
-              }
-              else
-              {
-                this.root=new RefArrSeq.UncheckedList();
-              }
-              break;
+          switch(nestedType){
             default:
               throw new Error("Unknown nestedType "+nestedType);
+            case STACK:
+              this.root=checkedType.checked
+                ?new RefArrSeq.CheckedStack()
+                :new RefArrSeq.UncheckedStack();
+              break;
+            case LIST:
+              this.root=checkedType.checked
+                ?new RefArrSeq.CheckedList()
+                :new RefArrSeq.UncheckedList();
           }
           this.parent=root;
           this.seq=root;
@@ -139,25 +171,27 @@ class RefSeqMonitor
         throw new Error("Unknown structType "+structType);
     }
   }
-  RefSeqMonitor(final StructType structType, final NestedType nestedType,final boolean checked,final int initialCapacity,final int rootPreAlloc,final int parentPreAlloc,final int parentPostAlloc,final int rootPostAlloc)
-  {
+  RefSeqMonitor(final StructType structType, final NestedType nestedType,final CheckedType checkedType,final int initialCapacity){
+    this(structType,nestedType,checkedType,initialCapacity,0,0,0,0);
+  }
+  RefSeqMonitor(final StructType structType, final CheckedType checkedType,final int rootPreAlloc,final int parentPreAlloc,final int parentPostAlloc,final int rootPostAlloc){
+    this(structType,NestedType.SUBLIST,checkedType,OmniArray.DEFAULT_ARR_SEQ_CAP,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc);
+  }
+  RefSeqMonitor(final StructType structType, final NestedType nestedType,final CheckedType checkedType,final int initialCapacity,final int rootPreAlloc,final int parentPreAlloc,final int parentPostAlloc,final int rootPostAlloc){
     this.structType=structType;
     this.nestedType=nestedType;
-    this.checked=checked;
+    this.checkedType=checkedType;
     this.initialCapacity=initialCapacity;
     this.rootPreAlloc=rootPreAlloc;
     this.parentPreAlloc=parentPreAlloc;
     this.parentPostAlloc=parentPostAlloc;
     this.rootPostAlloc=rootPostAlloc;
-    switch(structType)
-    {
+    switch(structType){
       case ARRSEQ:
         int rootSize=rootPreAlloc+parentPreAlloc+parentPostAlloc+rootPostAlloc;
         Object[] arr;
-        if(rootSize==0)
-        {
-          switch(initialCapacity)
-          {
+        if(rootSize==0){
+          switch(initialCapacity){
             case 0:
               arr=null;
               break;
@@ -167,57 +201,22 @@ class RefSeqMonitor
             default:
               arr=new Object[initialCapacity];
           }
-        }
-        else
-        {
+        }else{
           arr=new Object[Math.max(initialCapacity,rootSize)];
         }
-        int i=0,v=Integer.MIN_VALUE;
-        for(int bound=i+rootPreAlloc;i<bound;++i,++v)
-        {
-          arr[i]=TypeConversionUtil.convertToObject(v);
-        }
-        for(int bound=i+parentPreAlloc;i<bound;++i,++v)
-        {
-          arr[i]=TypeConversionUtil.convertToObject(v);
-        }
-        v=Integer.MAX_VALUE-rootPostAlloc-parentPostAlloc;
-        for(int bound=i+parentPostAlloc;i<bound;++i,++v)
-        {
-          arr[i]=TypeConversionUtil.convertToObject(v);
-        }
-        for(int bound=i+rootPostAlloc;i<bound;++i,++v)
-        {
-          arr[i]=TypeConversionUtil.convertToObject(v);
-        }
-        if(nestedType==NestedType.STACK)
-        {
-          if(checked)
-          {
-            this.root=new RefArrSeq.CheckedStack(rootSize,arr);
-          }
-          else
-          {
-            this.root=new RefArrSeq.UncheckedStack(rootSize,arr);
-          }
-        }
-        else
-        {
-          if(checked)
-          {
-            this.root=new RefArrSeq.CheckedList(rootSize,arr);
-          }
-          else
-          {
-            this.root=new RefArrSeq.UncheckedList(rootSize,arr);
-          }
-        }
+        initArray(rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,arr);
+        this.root=nestedType==NestedType.STACK
+          ?checkedType.checked
+            ?new RefArrSeq.CheckedStack(rootSize,arr)
+            :new RefArrSeq.UncheckedStack(rootSize,arr)
+          :checkedType.checked
+            ?new RefArrSeq.CheckedList(rootSize,arr)
+            :new RefArrSeq.UncheckedList(rootSize,arr);
         break;
       default:
         throw new Error("Unknown structType "+structType);
     }
-    switch(nestedType)
-    {
+    switch(nestedType){
       case SUBLIST:
         this.parent=((OmniList.OfRef)root).subList(rootPreAlloc,rootPreAlloc+parentPreAlloc+parentPostAlloc);
         this.seq=((OmniList.OfRef)parent).subList(parentPreAlloc,parentPreAlloc);
@@ -231,26 +230,22 @@ class RefSeqMonitor
         throw new Error("Unknown nestedType "+nestedType);
     }
   }
-  public static abstract class SeqMonitorItr
-  {
+  public static abstract class SeqMonitorItr{
     public abstract void verifyIndexAndIterate(RefInputTestArgType inputArgType,int val);
     public abstract SeqMonitorItr getPositiveOffset(int i);
     public abstract boolean equals(Object val);
-    private static class OfArrSeq extends SeqMonitorItr
-    {
-      Object[] arr;
+    private static class OfArrSeq extends SeqMonitorItr{
+      final Object[] arr;
       int offset;
-      private OfArrSeq(int offset,Object[] arr)
-      {
+      private OfArrSeq(int offset,Object[] arr){
         this.arr=arr;
+        this.offset=offset;
       }
-      public void verifyIndexAndIterate(RefInputTestArgType inputArgType,int val)
-      {
+      public void verifyIndexAndIterate(RefInputTestArgType inputArgType,int val){
         inputArgType.verifyVal(val,arr[offset++]);
       }
       public SeqMonitorItr getPositiveOffset(int i){
-        if(i<0)
-        {
+        if(i<0){
           throw new Error("offset cannot be negative: "+i);
         }
         return new OfArrSeq(i+offset,arr);
@@ -261,16 +256,144 @@ class RefSeqMonitor
       }
     }
   }
-  public SeqMonitorItr verifyPreAlloc()
-  {
-    switch(structType)
-    {
+  private class UncheckedArrSeqItrMonitor extends RefItrMonitor{
+    private UncheckedArrSeqItrMonitor(OmniIterator.OfRef itr,int expectedCursor){
+      super(itr,expectedCursor);
+    }
+    @Override public void verifyIteratorState(){
+      int actualCursor;
+      Object actualParent;
+      switch(nestedType){
+        case LIST:
+          actualCursor=FieldAccessor.RefArrSeq.UncheckedList.Itr.cursor(itr);
+          actualParent=FieldAccessor.RefArrSeq.UncheckedList.Itr.parent(itr);
+          break;
+        case STACK:
+          actualCursor=FieldAccessor.RefArrSeq.UncheckedStack.Itr.cursor(itr);
+          actualParent=FieldAccessor.RefArrSeq.UncheckedStack.Itr.parent(itr);
+          break;
+        case SUBLIST:
+          actualCursor=FieldAccessor.RefArrSeq.UncheckedSubList.Itr.cursor(itr);
+          actualParent=FieldAccessor.RefArrSeq.UncheckedSubList.Itr.parent(itr);
+          break;
+        default:
+          throw new Error("Unknown nestedType "+nestedType);
+      }
+      Assertions.assertEquals(expectedCursor+(rootPreAlloc+parentPreAlloc),actualCursor);
+      Assertions.assertSame(seq,actualParent);
+    }
+    @Override public void add(int v,RefInputTestArgType inputArgType){
+      inputArgType.callListItrAdd((OmniListIterator.OfRef)itr,v);
+      ++expectedCursor;
+      ++expectedRootModCount;
+      ++expectedParentModCount;
+      ++expectedSeqModCount;
+      ++expectedRootSize;
+      ++expectedParentSize;
+      ++expectedSeqSize;
+      expectedLastRet=-1;
+    }
+    @Override public void iterateForward(){
+      itr.next();
+      expectedLastRet=nestedType==NestedType.STACK
+        ?--expectedCursor
+        :expectedCursor++;
+    }
+    @Override public void remove(){
+      itr.remove();
+      --expectedRootSize;
+      ++expectedRootModCount;
+      --expectedParentSize;
+      ++expectedParentModCount;
+      --expectedSeqSize;
+      ++expectedSeqModCount;
+      expectedCursor=expectedLastRet;
+      expectedLastRet=-1;
+    }
+  }
+  private class CheckedArrSeqItrMonitor extends UncheckedArrSeqItrMonitor{
+    int expectedItrModCount;
+    private CheckedArrSeqItrMonitor(OmniIterator.OfRef itr,int expectedCursor){
+      super(itr,expectedCursor);
+      this.expectedItrModCount=expectedRootModCount;
+    }
+    @Override public void verifyIteratorState(){
+      int actualCursor;
+      Object actualParent;
+      switch(nestedType){
+        case LIST:
+          actualCursor=FieldAccessor.RefArrSeq.CheckedList.Itr.cursor(itr);
+          actualParent=FieldAccessor.RefArrSeq.CheckedList.Itr.parent(itr);
+          Assertions.assertEquals(expectedItrModCount,FieldAccessor.RefArrSeq.CheckedList.Itr.modCount(itr));
+          Assertions.assertEquals(expectedLastRet<0?expectedLastRet:expectedLastRet+(rootPreAlloc+parentPreAlloc),FieldAccessor.RefArrSeq.CheckedList.Itr.lastRet(itr));
+          break;
+        case STACK:
+          actualCursor=FieldAccessor.RefArrSeq.CheckedStack.Itr.cursor(itr);
+          actualParent=FieldAccessor.RefArrSeq.CheckedStack.Itr.parent(itr);
+          Assertions.assertEquals(expectedItrModCount,FieldAccessor.RefArrSeq.CheckedStack.Itr.modCount(itr));
+          Assertions.assertEquals(expectedLastRet<0?expectedLastRet:expectedLastRet+(rootPreAlloc+parentPreAlloc),FieldAccessor.RefArrSeq.CheckedStack.Itr.lastRet(itr));
+          break;
+        case SUBLIST:
+          actualCursor=FieldAccessor.RefArrSeq.CheckedSubList.Itr.cursor(itr);
+          actualParent=FieldAccessor.RefArrSeq.CheckedSubList.Itr.parent(itr);
+          Assertions.assertEquals(expectedItrModCount,FieldAccessor.RefArrSeq.CheckedSubList.Itr.modCount(itr));
+          Assertions.assertEquals(expectedLastRet<0?expectedLastRet:expectedLastRet+(rootPreAlloc+parentPreAlloc),FieldAccessor.RefArrSeq.CheckedSubList.Itr.lastRet(itr));
+          break;
+        default:
+          throw new Error("Unknown nestedType "+nestedType);
+      }
+      Assertions.assertEquals(expectedCursor+(rootPreAlloc+parentPreAlloc),actualCursor);
+      Assertions.assertSame(seq,actualParent);
+    }
+    @Override public void add(int v,RefInputTestArgType inputArgType){
+      super.add(v,inputArgType);
+      ++expectedItrModCount;
+    }
+    @Override public void remove(){
+      super.remove();
+      ++expectedItrModCount;
+    }
+  }
+  public RefItrMonitor getItrMonitor(){
+    var itr=seq.iterator();
+    switch(structType){
       case ARRSEQ:
-      {
+        int expectedCursor=nestedType==NestedType.STACK?((RefArrSeq)root).size:0;
+        return checkedType.checked
+          ?new CheckedArrSeqItrMonitor(itr,expectedCursor)
+          :new UncheckedArrSeqItrMonitor(itr,expectedCursor);
+      default:
+        throw new Error("Unknown structType "+structType);
+    }
+  }
+  public RefItrMonitor getListItrMonitor(){
+    var itr=((OmniList.OfRef)seq).listIterator();
+    switch(structType){
+      case ARRSEQ:
+        return checkedType.checked
+          ?new CheckedArrSeqItrMonitor(itr,0)
+          :new UncheckedArrSeqItrMonitor(itr,0);
+      default:
+        throw new Error("Unknown structType "+structType);
+    }
+  }
+  public RefItrMonitor getListItrMonitor(int index){
+    var itr=((OmniList.OfRef)seq).listIterator(index);
+    switch(structType){
+      case ARRSEQ:
+        return checkedType.checked
+          ?new CheckedArrSeqItrMonitor(itr,index)
+          :new UncheckedArrSeqItrMonitor(itr,index);
+      default:
+        throw new Error("Unknown structType "+structType);
+    }
+  }
+  public SeqMonitorItr verifyPreAlloc(){
+    switch(structType){
+      case ARRSEQ:{
         var arr=((RefArrSeq)root).arr;
         int offset=0;
-        for(int bound=offset+rootPreAlloc,v=Integer.MIN_VALUE;offset<bound;++offset,++v)
-        {
+        for(int bound=offset+rootPreAlloc+parentPreAlloc,v=Integer.MIN_VALUE;offset<bound;++offset,++v){
           RefInputTestArgType.ARRAY_TYPE.verifyVal(v,arr[offset]);
         }
         return new SeqMonitorItr.OfArrSeq(offset,arr);
@@ -279,60 +402,61 @@ class RefSeqMonitor
         throw new Error("Unknown structType "+structType);
     }
   }
-  public SeqMonitorItr verifyAscending(SeqMonitorItr monitorItr,RefInputTestArgType inputArgType,int length)
-  {
-    for(int i=0,v=0;i<length;++i,++v)
-    {
+  public SeqMonitorItr verifyAscending(SeqMonitorItr monitorItr,int length){
+    return verifyAscending(0,monitorItr,RefInputTestArgType.ARRAY_TYPE,length);
+  }
+  public SeqMonitorItr verifyAscending(int v,SeqMonitorItr monitorItr,int length){
+    return verifyAscending(v,monitorItr,RefInputTestArgType.ARRAY_TYPE,length);
+  }
+  public SeqMonitorItr verifyAscending(SeqMonitorItr monitorItr,RefInputTestArgType inputArgType,int length){
+    return verifyAscending(0,monitorItr,inputArgType,length);
+  }
+  public SeqMonitorItr verifyAscending(int v,SeqMonitorItr monitorItr,RefInputTestArgType inputArgType,int length){
+    for(int i=0;i<length;++i,++v){
       monitorItr.verifyIndexAndIterate(inputArgType,v);
     }
     return monitorItr;
   }
-  public SeqMonitorItr verifyDescending(SeqMonitorItr monitorItr,RefInputTestArgType inputArgType,int length)
-  {
-    for(int i=0,v=length;i<length;++i)
-    {
+  public SeqMonitorItr verifyDescending(SeqMonitorItr monitorItr,int length){
+     return verifyDescending(monitorItr,RefInputTestArgType.ARRAY_TYPE,length);
+  }
+  public SeqMonitorItr verifyDescending(SeqMonitorItr monitorItr,RefInputTestArgType inputArgType,int length){
+    for(int i=0,v=length;i<length;++i){
       monitorItr.verifyIndexAndIterate(inputArgType,--v);
     }
     return monitorItr;
   }
-  public SeqMonitorItr verifyMidPointInsertion(SeqMonitorItr monitorItr,RefInputTestArgType inputArgType,final int length)
-  {
-    int halfLength=length/2;
+  public SeqMonitorItr verifyMidPointInsertion(SeqMonitorItr monitorItr,int length){
+     return verifyMidPointInsertion(monitorItr,RefInputTestArgType.ARRAY_TYPE,length);
+  }
+  public SeqMonitorItr verifyMidPointInsertion(SeqMonitorItr monitorItr,RefInputTestArgType inputArgType,final int length){
     int i=0;
-    for(int v=1;i<halfLength;++i,v+=2)
-    {
+    for(int v=0,halfLength=length/2;i<halfLength;++i,v+=2){
       monitorItr.verifyIndexAndIterate(inputArgType,v);
     }
-    halfLength=length-halfLength;
-    for(int v=length-2;i<halfLength;++i,v-=2)
-    {
+    for(int v=length-1;i<length;++i,v-=2){
       monitorItr.verifyIndexAndIterate(inputArgType,v);
     }
     return monitorItr;
   }
-  public SeqMonitorItr verifyParentPostAlloc(SeqMonitorItr monitorItr)
-  {
+  public SeqMonitorItr verifyParentPostAlloc(SeqMonitorItr monitorItr){
     for(int i=0,v=Integer.MAX_VALUE-rootPostAlloc-parentPostAlloc;i<parentPostAlloc;++i,++v){
       monitorItr.verifyIndexAndIterate(RefInputTestArgType.ARRAY_TYPE,v);
     }
     return monitorItr;
   }
-  public SeqMonitorItr verifyRootPostAlloc(SeqMonitorItr monitorItr)
-  {
+  public SeqMonitorItr verifyRootPostAlloc(SeqMonitorItr monitorItr){
     for(int i=0,v=Integer.MAX_VALUE-rootPostAlloc;i<rootPostAlloc;++i,++v){
       monitorItr.verifyIndexAndIterate(RefInputTestArgType.ARRAY_TYPE,v);
     }
     return monitorItr;
   }
-  public SeqMonitorItr verifyIllegalAdd(SeqMonitorItr monitorItr)
-  {
+  public SeqMonitorItr verifyIllegalAdd(SeqMonitorItr monitorItr){
     monitorItr.verifyIndexAndIterate(RefInputTestArgType.ARRAY_TYPE,0);
     return monitorItr;
   }
-  public void illegalAdd(PreModScenario preModScenario)
-  {
-    if(activePreModScenario!=null)
-    {
+  public void illegalAdd(PreModScenario preModScenario){
+    if(activePreModScenario!=null){
       throw new Error("Cannot modify sequence with "+preModScenario+" because it has already been modified with "+activePreModScenario);
     }
     switch(preModScenario){
@@ -366,8 +490,7 @@ class RefSeqMonitor
         throw new Error("Unknown preModScenario "+preModScenario);
     }
   }
-  public void add(int index,int val,RefInputTestArgType inputArgType)
-  {
+  public void add(int index,int val,RefInputTestArgType inputArgType){
     inputArgType.callListAdd(seq,index,val);
     ++expectedRootSize;
     ++expectedParentSize;
@@ -376,15 +499,12 @@ class RefSeqMonitor
     ++expectedParentModCount;
     ++expectedSeqModCount;
   }
-  public void add(int index,int val)
-  {
+  public void add(int index,int val){
     add(index,val,RefInputTestArgType.ARRAY_TYPE);
   }
-  public boolean add(int val,RefInputTestArgType inputArgType)
-  {
+  public boolean add(int val,RefInputTestArgType inputArgType){
     boolean ret=inputArgType.callCollectionAdd(seq,val);
-    if(ret)
-    {
+    if(ret){
       ++expectedRootSize;
       ++expectedParentSize;
       ++expectedSeqSize;
@@ -394,12 +514,10 @@ class RefSeqMonitor
     }
     return ret;
   }
-  public boolean add(int val)
-  {
+  public boolean add(int val){
     return add(val,RefInputTestArgType.ARRAY_TYPE);
   }
-  public void push(int val,RefInputTestArgType inputArgType)
-  {
+  public void push(int val,RefInputTestArgType inputArgType){
     inputArgType.callStackPush(seq,val);
     ++expectedRootSize;
     ++expectedParentSize;
@@ -408,19 +526,15 @@ class RefSeqMonitor
     ++expectedParentModCount;
     ++expectedSeqModCount;
   }
-  public void push(int val)
-  {
+  public void push(int val){
     push(val,RefInputTestArgType.ARRAY_TYPE);
   }
-  public String toString()
-  {
+  public String toString(){
     StringBuilder builder=new StringBuilder();
-    switch(structType)
-    {
+    switch(structType){
       case ARRSEQ:
-        builder.append("RefArrSeq.").append(checked?"Checked":"Unchecked");
-        switch(nestedType)
-        {
+        builder.append("RefArrSeq.").append(checkedType.checked?"Checked":"Unchecked");
+        switch(nestedType){
           case STACK:
             builder.append("Stack{").append(initialCapacity);
             break;
@@ -439,24 +553,20 @@ class RefSeqMonitor
     }
     return builder.append('}').toString();
   }
-  public void verifyStructuralIntegrity()
-  {
-    switch(structType)
-    {
+  public void verifyStructuralIntegrity(){
+    switch(structType){
       case ARRSEQ:
-        switch(nestedType)
-        {
+        switch(nestedType){
           case STACK:
-            if(checked)
-            {
+            if(checkedType.checked){
               Assertions.assertEquals(expectedRootModCount,FieldAccessor.RefArrSeq.CheckedStack.modCount(root));
             }
             break;
           case LIST:
-            if(checked)
-            {
+            if(checkedType.checked){
               Assertions.assertEquals(expectedRootModCount,FieldAccessor.RefArrSeq.CheckedList.modCount(root));
             }
+            break;
           case SUBLIST:
             OmniList.OfRef actualSeqParent;
             RefArrSeq actualSeqRoot;
@@ -464,8 +574,7 @@ class RefSeqMonitor
             OmniList.OfRef actualParentParent;
             RefArrSeq  actualParentRoot;
             int actualParentSize;
-            if(checked)
-            {
+            if(checkedType.checked){
               actualSeqParent=(OmniList.OfRef)FieldAccessor.RefArrSeq.CheckedSubList.parent(seq);
               actualSeqRoot=(RefArrSeq)FieldAccessor.RefArrSeq.CheckedSubList.root(seq);
               actualSeqSize=FieldAccessor.RefArrSeq.CheckedSubList.size(seq);
@@ -475,9 +584,7 @@ class RefSeqMonitor
               Assertions.assertEquals(expectedSeqModCount,FieldAccessor.RefArrSeq.CheckedSubList.modCount(seq));
               Assertions.assertEquals(expectedParentModCount,FieldAccessor.RefArrSeq.CheckedSubList.modCount(parent));
               Assertions.assertEquals(expectedRootModCount,FieldAccessor.RefArrSeq.CheckedList.modCount(root));
-            }
-            else
-            {
+            }else{
               actualSeqParent=(OmniList.OfRef)FieldAccessor.RefArrSeq.UncheckedSubList.parent(seq);
               actualSeqRoot=(RefArrSeq)FieldAccessor.RefArrSeq.UncheckedSubList.root(seq);
               actualSeqSize=FieldAccessor.RefArrSeq.UncheckedSubList.size(seq);

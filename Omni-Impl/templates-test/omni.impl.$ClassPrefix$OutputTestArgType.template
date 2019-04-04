@@ -1,0 +1,66 @@
+#TYPEDEF OfBoolean
+#TYPEDEF OfByte
+#TYPEDEF OfChar
+#TYPEDEF OfShort
+#TYPEDEF OfInt
+#TYPEDEF OfLong
+#TYPEDEF OfFloat
+#TYPEDEF OfDouble
+#TYPEDEF OfRef
+package omni.impl;
+import omni.util.TypeConversionUtil;
+import omni.api.OmniCollection;
+import omni.api.OmniList;
+import omni.api.OmniStack;
+import omni.api.OmniListIterator;
+import org.junit.jupiter.api.Assertions;
+#IF OfRef
+@SuppressWarnings({"rawtypes","unchecked"}) 
+#ENDIF
+public enum $ClassPrefix$InputTestArgType{
+  #MACRO OutputTestArgTypeImpl<ARRAY_TYPE>($ArrayType$,$TypeNameModifier$,$defaultVal$,OmniArray.Of$ClassPrefix$.DEFAULT_ARR)
+#IFNOT OfRef
+  ,
+  #MACRO OutputTestArgTypeImpl<BOXED_TYPE>($BoxedType$,,null,OmniArray.Of$ClassPrefix$.DEFAULT_BOXED_ARR)
+  #IFNOT OfDouble
+  ,
+  #MACRO OutputTestArgTypeImpl<DOUBLE>(double,Double,Double.NaN,OmniArray.OfDouble.DEFAULT_ARR)
+    #IFNOT OfFloat
+  ,
+  #MACRO OutputTestArgTypeImpl<FLOAT>(float,Float,Float.NaN,OmniArray.OfFloat.DEFAULT_ARR)
+      #IFNOT OfLong
+  ,
+  #MACRO OutputTestArgTypeImpl<LONG>(long,Long,Long.MIN_VALUE,OmniArray.OfLong.DEFAULT_ARR)
+        #IFNOT OfInt
+  ,
+  #MACRO OutputTestArgTypeImpl<INT>(int,Int,Integer.MIN_VALUE,OmniArray.OfInt.DEFAULT_ARR)
+          #IFNOT OfShort,OfChar
+  ,
+  #MACRO OutputTestArgTypeImpl<SHORT>(short,Short,Short.MIN_VALUE,OmniArray.OfShort.DEFAULT_ARR)
+            #IFNOT OfByte
+  ,
+  #MACRO OutputTestArgTypeImpl<BYTE>(byte,Byte,Byte.MIN_VALUE,OmniArray.OfByte.DEFAULT_ARR)
+  ,
+  #MACRO OutputTestArgTypeImpl<CHAR>(char,Char,Character.MIN_VALUE,OmniArray.OfChar.DEFAULT_ARR)
+            #ENDIF
+          #ENDIF
+        #ENDIF
+      #ENDIF
+    #ENDIF
+  #ENDIF
+#ENDIF
+  ;
+#MACRODEF OutputTestArgTypeImpl<VALUE_NAME,OUTPUTTYPE>(OUTPUTTYPE,TYPENAMEMODIFIER,DEFAULT_VAL,DEFAULTARR)
+VALUE_NAME{
+  @Override public void verifyItrPrevious(OmniIterator.Of$ClassPrefix$ itr,int valToConvert){
+    Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPE(valToConvert),((OmniListIterator.Of$ClassPrefix)itr).previousTYPENAMEMODIFIER());
+  }
+  @Override public void verifyItrNext(OmniIterator.Of$ClassPrefix$ itr,int valToConvert){
+    Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPE(valToConvert),itr.nextTYPENAMEMODIFIER());
+  }
+}
+#ENDDEF
+  public abstract void verifyItrPrevious(OmniIterator.Of$ClassPrefix$ itr,int valToConvert);
+  public abstract void verifyItrNext(OmniIterator.Of$ClassPrefix$ itr,int valToConvert);
+  //TODO other method tests
+}

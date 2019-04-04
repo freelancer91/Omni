@@ -23,11 +23,20 @@ import omni.api.OmniIterator;
 import omni.impl.MonitoredArrayConstructor;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
+import omni.impl.seq.ByteSeqMonitor.NestedType;
+import omni.impl.seq.ByteSeqMonitor.StructType;
+import omni.impl.seq.ByteSeqMonitor.CheckedType;
+import omni.impl.seq.ByteSeqMonitor.PreModScenario;
+import omni.impl.seq.ByteSeqMonitor.SequenceLocation;
+import omni.impl.seq.ByteSeqMonitor.FunctionExceptionScenario;
+import omni.impl.seq.ByteSeqMonitor.SequenceContentsScenario;
+import omni.impl.seq.ByteSeqMonitor.ListItrSetExceptionScenario;
 //TODO replace this with a custom collection
 import java.util.ArrayList;
 @SuppressWarnings({"rawtypes","unchecked"})
 @Execution(ExecutionMode.CONCURRENT)
 public class ByteArrSeqTest{
+    /*
   private static enum StructType{
     CHECKEDSTACK(true),
     CHECKEDLIST(true),
@@ -38,7 +47,12 @@ public class ByteArrSeqTest{
     boolean checked;
     StructType(boolean checked){this.checked=checked;}
   }
-  /*
+  private static final Arguments[] NON_SUBLIST_TYPES=new Arguments[]{
+    Arguments.of(StructType.CHECKEDLIST),
+    Arguments.of(StructType.UNCHECKEDLIST),
+    Arguments.of(StructType.CHECKEDSTACK),
+    Arguments.of(StructType.UNCHECKEDSTACK)
+  };
   private static class ConstructionArguments{
     final int initialCapacity;
     final int rootPreAlloc;
@@ -279,7 +293,6 @@ public class ByteArrSeqTest{
       return offset+length;
     }
   }
-  */
   static class InputTestMonitor{
     int expectedItrModCount=0;
     int expectedSeqModCount=0;
@@ -385,12 +398,6 @@ public class ByteArrSeqTest{
     int bound=offset+(hi-lo);
     for(int i=offset;i<bound;++i,++lo){arr[i]=TypeConversionUtil.convertTobyte(lo);}
   }
-  private static final Arguments[] NON_SUBLIST_TYPES=new Arguments[]{
-    Arguments.of(StructType.CHECKEDLIST),
-    Arguments.of(StructType.UNCHECKEDLIST),
-    Arguments.of(StructType.CHECKEDSTACK),
-    Arguments.of(StructType.UNCHECKEDSTACK)
-  };
   static enum CMEScenario{
     NoMod,
     ModSeq,
@@ -465,14 +472,29 @@ public class ByteArrSeqTest{
     }
     return builder.build().parallel();
   }
+  */
+  static Stream<Arguments> getArgsForConstructor_int(){
+    Stream.Builder<Arguments> builder=Stream.builder();
+    for(var nestedType:NestedType.values()){
+      if(nestedType==NestedType.SUBLIST){
+        continue;
+      }
+      for(var checkedType:CheckedType.values()){
+        for(int initialCapacity=0;initialCapacity<=15;initialCapacity+=5){
+          builder.add(Arguments.of(nestedType,checkedType,initialCapacity));
+        }
+      }
+    }
+    return builder.build().parallel();
+  }
   @ParameterizedTest
-  @MethodSource("getArgsFortestConstructor_int_happyPath")
-  public void testConstructor_int_happyPath(int initialCapacity,StructType structType){
+  @MethodSource("getArgsForConstructor_int")
+  public void testConstructor_int(NestedType nestedType,CheckedType checkedType,int initialCapacity){
     ByteArrSeq seq;
-    if(structType.checked){
-      Assertions.assertEquals(0,structType==StructType.CHECKEDLIST?FieldAccessor.ByteArrSeq.CheckedList.modCount(seq=new ByteArrSeq.CheckedList(initialCapacity)):FieldAccessor.ByteArrSeq.CheckedStack.modCount(seq=new ByteArrSeq.CheckedStack(initialCapacity)));
+    if(checkedType.checked){
+      Assertions.assertEquals(0,nestedType==NestedType.LIST?FieldAccessor.ByteArrSeq.CheckedList.modCount(seq=new ByteArrSeq.CheckedList(initialCapacity)):FieldAccessor.ByteArrSeq.CheckedStack.modCount(seq=new ByteArrSeq.CheckedStack(initialCapacity)));
     }else{
-      seq=structType==StructType.UNCHECKEDLIST?new ByteArrSeq.UncheckedList(initialCapacity):new ByteArrSeq.UncheckedStack(initialCapacity);
+      seq=nestedType==NestedType.LIST?new ByteArrSeq.UncheckedList(initialCapacity):new ByteArrSeq.UncheckedStack(initialCapacity);
     }
     Assertions.assertEquals(0,seq.size);
     switch(initialCapacity){
@@ -486,39 +508,27 @@ public class ByteArrSeqTest{
         Assertions.assertEquals(initialCapacity,seq.arr.length);
     }
   }
-  static enum ListItrAddTestScenario{
-    HappyPathInsertBegin(false,CMEScenario.NoMod,null),
-    HappyPathInsertEnd(false,CMEScenario.NoMod,null),
-    HappyPathInsertMidPoint(false,CMEScenario.NoMod,null),
-    EmptyModRootThrowCME(false,CMEScenario.ModRoot,ConcurrentModificationException.class),
-    EmptyModParentThrowCME(false,CMEScenario.ModParent,ConcurrentModificationException.class),
-    EmptyModSeqThrowCME(false,CMEScenario.ModSeq,ConcurrentModificationException.class),
-    NonEmptyModRootThrowCME(true,CMEScenario.ModRoot,ConcurrentModificationException.class),
-    NonEmptyModParentThrowCME(true,CMEScenario.ModParent,ConcurrentModificationException.class),
-    NonEmptyModSeqThrowCME(true,CMEScenario.ModSeq,ConcurrentModificationException.class);
-    final boolean nonEmpty;
-    final CMEScenario modScenario;
-    final Class<? extends Throwable> expectedException;
-    ListItrAddTestScenario(boolean nonEmpty,CMEScenario modScenario,Class<? extends Throwable> expectedException){
-      this.expectedException=expectedException;
-      this.nonEmpty=nonEmpty;
-      this.modScenario=modScenario;
-    }
-  }
   static Stream<Arguments> getListItrAddArgs(){
     Stream.Builder<Arguments> builder=Stream.builder();
-    for(ByteInputTestArgType inputTestArgType:ByteInputTestArgType.values()){
-      for(ListItrAddTestScenario testScenario:ListItrAddTestScenario.values()){
-        for(int initialCapacity=0;initialCapacity<=15;initialCapacity+=5){
-          if(testScenario.expectedException==null){builder.add(Arguments.of(testScenario,inputTestArgType,new ConstructionArguments(initialCapacity,StructType.UNCHECKEDLIST)));}
-          builder.add(Arguments.of(testScenario,inputTestArgType,new ConstructionArguments(initialCapacity,StructType.CHECKEDLIST)));
+    for(var checkedType:CheckedType.values()){
+      for(var preModScenario:PreModScenario.values()){
+        if(!checkedType.checked && preModScenario.expectedException!=null){
+          continue;
         }
-        for(int rootPreAlloc=0;rootPreAlloc<=5;rootPreAlloc+=5){
-          for(int rootPostAlloc=0;rootPostAlloc<=5;rootPostAlloc+=5){
-            for(int parentPreAlloc=0;parentPreAlloc<=5;parentPreAlloc+=5){
-              for(int parentPostAlloc=0;parentPostAlloc<=5;parentPostAlloc+=5){
-                builder.add(Arguments.of(testScenario,inputTestArgType,new ConstructionArguments(rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,StructType.CHECKEDSUBLIST)));
-                if(testScenario.expectedException==null){builder.add(Arguments.of(testScenario,inputTestArgType,new ConstructionArguments(rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,StructType.UNCHECKEDSUBLIST)));}
+        for(var seqContentsScenario:SequenceContentsScenario.values()){
+          for(var seqLocation:SequenceLocation.values()){
+            for(var inputArgType:ByteInputTestArgType.values()){
+              for(int initialCapacity=0;initialCapacity<=15;initialCapacity+=5){
+                  builder.add(Arguments.of(new ByteSeqMonitor(StructType.ARRSEQ,NestedType.LIST,checkedType,initialCapacity),preModScenario,seqContentsScenario,seqLocation,inputArgType));
+              }
+              for(int rootPreAlloc=0;rootPreAlloc<=5;rootPreAlloc+=5){
+                for(int parentPreAlloc=0;parentPreAlloc<=5;parentPreAlloc+=5){
+                  for(int parentPostAlloc=0;parentPostAlloc<=5;parentPostAlloc+=5){
+                    for(int rootPostAlloc=0;rootPostAlloc<=5;rootPostAlloc+=5){
+                      builder.add(Arguments.of(new ByteSeqMonitor(StructType.ARRSEQ,NestedType.SUBLIST,checkedType,OmniArray.DEFAULT_ARR_SEQ_CAP,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc),preModScenario,seqContentsScenario,seqLocation,inputArgType));
+                    }
+                  }
+                }
               }
             }
           }
@@ -529,55 +539,185 @@ public class ByteArrSeqTest{
   }
   @ParameterizedTest
   @MethodSource("getListItrAddArgs")
-  public void testListItrAdd(ListItrAddTestScenario testScenario,ByteInputTestArgType inputArgType,ConstructionArguments constructionArgs){
-    var seqItr=constructionArgs.constructSeqListIterator();
-    var testMonitor=new InputTestMonitor();
-    if(testScenario.nonEmpty){
-      for(int i=0;i<100;++i){
-        testMonitor.seqItrAdd(seqItr,inputArgType,i);
-      }
+  public void testListItradd_val(ByteSeqMonitor seqMonitor,PreModScenario preModScenario,SequenceContentsScenario seqContentsScenario,SequenceLocation seqLocationScenario,ByteInputTestArgType inputArgType){
+    int numToAdd=seqContentsScenario.nonEmpty?100:0;
+    for(int i=0;i<numToAdd;++i){
+      seqMonitor.add(i);
     }
-    var expectedException=testScenario.expectedException;
-    if(expectedException==null){
-      for(int i=0;i<100;++i){
-        testMonitor.seqItrAdd(seqItr,inputArgType,i);
-        testMonitor.verifyItrState(seqItr,constructionArgs);
-        switch(testScenario){
-          case HappyPathInsertBegin:
-            testMonitor.seqItrPrevious(seqItr);
-            break;
-          case HappyPathInsertMidPoint:
-            if((i&1)==0){testMonitor.seqItrPrevious(seqItr);}
-            break;
-          default:
-        }
-      }
-    }else{
-      testMonitor.illegalMod(constructionArgs,inputArgType,testScenario.modScenario);
-      Assertions.assertThrows(expectedException,()->inputArgType.callListItrAdd(seqItr,0));
-    }
-    testMonitor.verifyItrState(seqItr,constructionArgs);
-    testMonitor.verifyStructuralIntegrity(constructionArgs);
-    int offset=constructionArgs.verifyPreAlloc();
-    switch(testScenario){
-      case HappyPathInsertBegin:
-        offset=constructionArgs.verifyDescending(offset,inputArgType,100);
+    ByteItrMonitor itrMonitor;
+    switch(seqLocationScenario){
+      case BEGINNING:
+        itrMonitor=seqMonitor.getListItrMonitor();
         break;
-      case HappyPathInsertMidPoint:
-        offset=constructionArgs.verifyMidPointInsertion(offset,inputArgType,100);
+      case MIDDLE:
+        itrMonitor=seqMonitor.getListItrMonitor(numToAdd/2);
         break;
-      case HappyPathInsertEnd:
-        offset=constructionArgs.verifyAscending(offset,inputArgType,100);
+      case END:
+        itrMonitor=seqMonitor.getListItrMonitor(numToAdd);
         break;
       default:
-        if(testScenario.nonEmpty){offset=constructionArgs.verifyAscending(offset,inputArgType,100);}
+        throw new Error("Unknown sequence locatio scenario "+seqLocationScenario);
     }
-    if(testScenario.modScenario==CMEScenario.ModSeq){offset=constructionArgs.verifyIndex(offset,inputArgType,0);}
-    offset=constructionArgs.verifyParentPostAlloc(offset);
-    if(testScenario.modScenario==CMEScenario.ModParent){offset=constructionArgs.verifyIndex(offset,inputArgType,0);}
-    offset=constructionArgs.verifyRootPostAlloc(offset);
-    if(testScenario.modScenario==CMEScenario.ModRoot){constructionArgs.verifyIndex(offset,inputArgType,0);}
+    seqMonitor.illegalAdd(preModScenario);
+    if(preModScenario.expectedException==null){
+      switch(seqLocationScenario){
+        case BEGINNING:
+          for(int i=0;i<100;++i){
+            itrMonitor.add(i,inputArgType);
+            itrMonitor.verifyIteratorState();
+            itrMonitor.iterateReverse();
+            seqMonitor.verifyStructuralIntegrity();
+          }
+          break;
+        case MIDDLE:
+          for(int i=0;i<100;++i){
+            itrMonitor.add(i,inputArgType);
+            itrMonitor.verifyIteratorState();
+            if((i&1)!=0){
+              itrMonitor.iterateReverse();
+            }
+            seqMonitor.verifyStructuralIntegrity();
+          }
+          break;
+        case END:
+          for(int i=0;i<100;++i){
+            itrMonitor.add(i,inputArgType);
+            itrMonitor.verifyIteratorState();
+            seqMonitor.verifyStructuralIntegrity();
+          }
+          break;
+        default:
+          throw new Error("Unknown sequence locatio scenario "+seqLocationScenario);
+      }
+      var i=seqMonitor.verifyPreAlloc();
+      switch(seqLocationScenario){
+        case BEGINNING:
+          i=seqMonitor.verifyDescending(i,inputArgType,100);
+          i=seqMonitor.verifyAscending(i,numToAdd);
+          break;
+        case MIDDLE:
+          i=seqMonitor.verifyAscending(i,numToAdd/2);
+          i=seqMonitor.verifyMidPointInsertion(i,inputArgType,100);
+          i=seqMonitor.verifyAscending(numToAdd/2,i,numToAdd-(numToAdd/2));
+          break;
+        case END:
+          i=seqMonitor.verifyAscending(i,numToAdd);
+          i=seqMonitor.verifyAscending(i,inputArgType,100);
+          break;
+        default:
+          throw new Error("Unknown sequence location scenario "+seqLocationScenario);
+      }
+      i=seqMonitor.verifyParentPostAlloc(i);
+      seqMonitor.verifyRootPostAlloc(i);
+    }else{
+      Assertions.assertThrows(preModScenario.expectedException,()->itrMonitor.add(0,inputArgType));
+      itrMonitor.verifyIteratorState();
+      seqMonitor.verifyStructuralIntegrity();
+      var i=seqMonitor.verifyPreAlloc();
+      i=seqMonitor.verifyAscending(i,numToAdd);
+      if(preModScenario==PreModScenario.ModSeq){i=seqMonitor.verifyIllegalAdd(i);}
+      i=seqMonitor.verifyParentPostAlloc(i);
+      if(preModScenario==PreModScenario.ModParent){i=seqMonitor.verifyIllegalAdd(i);}
+      i=seqMonitor.verifyRootPostAlloc(i);
+      if(preModScenario==PreModScenario.ModRoot){i=seqMonitor.verifyIllegalAdd(i);}
+    }
   }
+  static Stream<Arguments> getListItrSetArgs(){
+    Stream.Builder<Arguments> builder=Stream.builder();
+    for(var checkedType:CheckedType.values()){
+      for(var listItrSetExceptionScenario:ListItrSetExceptionScenario.values()){
+        if(!checkedType.checked && listItrSetExceptionScenario.expectedException!=null){
+          continue;
+        }
+        for(var inputArgType:ByteInputTestArgType.values()){
+          builder.add(Arguments.of(new ByteSeqMonitor(StructType.ARRSEQ,NestedType.LIST,checkedType),listItrSetExceptionScenario,inputArgType));
+          builder.add(Arguments.of(new ByteSeqMonitor(StructType.ARRSEQ,NestedType.SUBLIST,checkedType),listItrSetExceptionScenario,inputArgType));
+        }
+      }
+    }
+    return builder.build().parallel();
+  }
+  @ParameterizedTest
+  @MethodSource("getListItrSetArgs")
+  public void testListItrset_val(ByteSeqMonitor seqMonitor,ListItrSetExceptionScenario listItrSetExceptionScenario,ByteInputTestArgType inputArgType){
+    int numToAdd=100;
+    for(int i=0;i<numToAdd;++i){
+      seqMonitor.add(i);
+    }
+    ByteItrMonitor itrMonitor=seqMonitor.getListItrMonitor();
+    switch(listItrSetExceptionScenario){
+      case PostAddThrowISE:
+      case PostAddThrowISESupercedesModRootCME:
+      case PostAddThrowISESupercedesModParentCME:
+      case PostAddThrowISESupercedesModSeqCME:
+        itrMonitor.add(0);
+        break;
+      case PostRemoveThrowISE:
+      case PostRemoveThrowISESupercedesModRootCME:
+      case PostRemoveThrowISESupercedesModParentCME:
+      case PostRemoveThrowISESupercedesModSeqCME:
+        itrMonitor.iterateForward();
+        itrMonitor.remove();
+        break;
+      default:
+        itrMonitor.iterateForward();
+      case ThrowISE:
+      case ThrowISESupercedesModRootCME:
+      case ThrowISESupercedesModParentCME:
+      case ThrowISESupercedesModSeqCME:
+    }
+    seqMonitor.illegalAdd(listItrSetExceptionScenario.preModScenario);
+    ByteSeqMonitor.SeqMonitorItr i;
+    if(listItrSetExceptionScenario.expectedException==null){
+      for(int j=0;j<numToAdd;++j){
+        itrMonitor.set(numToAdd-j-1,inputArgType);
+        itrMonitor.verifyIteratorState();
+        seqMonitor.verifyStructuralIntegrity();
+        if(!itrMonitor.hasNext()){
+          break;
+        }
+        itrMonitor.iterateForward();
+      }
+      i=seqMonitor.verifyPreAlloc();
+      i=seqMonitor.verifyDescending(i,inputArgType,numToAdd);
+      i=seqMonitor.verifyParentPostAlloc(i);
+      seqMonitor.verifyRootPostAlloc(i);
+      for(int j=0;j<numToAdd;++j){
+        itrMonitor.iterateReverse();
+        itrMonitor.set(numToAdd-j-1,inputArgType);
+        itrMonitor.verifyIteratorState();
+        seqMonitor.verifyStructuralIntegrity();
+      }
+      i=seqMonitor.verifyPreAlloc();
+      i=seqMonitor.verifyAscending(i,inputArgType,numToAdd);
+    }else{
+      Assertions.assertThrows(listItrSetExceptionScenario.expectedException,()->itrMonitor.set(0));
+      itrMonitor.verifyIteratorState();
+      seqMonitor.verifyStructuralIntegrity();
+      i=seqMonitor.verifyPreAlloc();
+      switch(listItrSetExceptionScenario){
+        case PostRemoveThrowISE:
+        case PostRemoveThrowISESupercedesModRootCME:
+        case PostRemoveThrowISESupercedesModParentCME:
+        case PostRemoveThrowISESupercedesModSeqCME:
+          i=seqMonitor.verifyAscending(1,i,numToAdd-1);
+          break;
+        case PostAddThrowISE:
+        case PostAddThrowISESupercedesModRootCME:
+        case PostAddThrowISESupercedesModParentCME:
+        case PostAddThrowISESupercedesModSeqCME:
+          i=seqMonitor.verifyIllegalAdd(i);
+        default:
+          i=seqMonitor.verifyAscending(i,numToAdd);
+      }
+    }
+    if(listItrSetExceptionScenario.preModScenario==PreModScenario.ModSeq){i=seqMonitor.verifyIllegalAdd(i);}
+    i=seqMonitor.verifyParentPostAlloc(i);
+    if(listItrSetExceptionScenario.preModScenario==PreModScenario.ModParent){i=seqMonitor.verifyIllegalAdd(i);}
+    i=seqMonitor.verifyRootPostAlloc(i);
+    if(listItrSetExceptionScenario.preModScenario==PreModScenario.ModRoot){seqMonitor.verifyIllegalAdd(i);}
+  }
+  /*
   static enum ListItrSetTestScenario{
     HappyPath(true,CMEScenario.NoMod,null),
     EmptyModRootThrowCME(false,CMEScenario.ModRoot,ConcurrentModificationException.class),
@@ -2502,4 +2642,5 @@ public class ByteArrSeqTest{
         }
     }
   }
+  */
 }

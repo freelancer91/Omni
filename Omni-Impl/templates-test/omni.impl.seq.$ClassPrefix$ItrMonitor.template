@@ -8,6 +8,8 @@
 #TYPEDEF OfDouble
 #TYPEDEF OfRef
 package omni.impl.seq;
+import omni.api.OmniIterator;
+import omni.api.OmniListIterator;
 import org.junit.jupiter.api.Assertions;
 import omni.impl.$ClassPrefix$InputTestArgType;
 import omni.impl.FunctionCallType;
@@ -40,7 +42,7 @@ abstract class $ClassPrefix$ItrMonitor
   
   public abstract void verifyIteratorState();
   public void set(int v,$ClassPrefix$InputTestArgType inputArgType){
-     inputArgType.callListSet((OmniListIterator.Of$ClassPrefix$)itr,v);
+     inputArgType.callListItrSet((OmniListIterator.Of$ClassPrefix$)itr,v);
   }
   public void set(int v)
   {
