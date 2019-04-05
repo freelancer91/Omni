@@ -51,6 +51,10 @@ class CharSeqMonitor{
       this.forwardIteration=forwardIteration;
     }
   }
+  static enum ItrType{
+    Itr,
+    ListItr;
+  }
   static enum PreModScenario{
     ModSeq(ConcurrentModificationException.class,false,true),
     ModParent(ConcurrentModificationException.class,true,false),
@@ -65,164 +69,63 @@ class CharSeqMonitor{
       this.appliesToRootItr=appliesToRootItr;
     }
   }
-  private static void initArray(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc,char[] arr){
-    for(int i=0,v=Integer.MIN_VALUE,bound=rootPreAlloc;i<bound;++i,++v){
-      arr[i]=TypeConversionUtil.convertTochar(v);
-    }
-    for(int i=rootPreAlloc,v=Integer.MIN_VALUE+rootPreAlloc,bound=i+parentPreAlloc;i<bound;++i,++v){
-      arr[i]=TypeConversionUtil.convertTochar(v);
-    }
-    for(int i=rootPreAlloc+parentPreAlloc,v=Integer.MAX_VALUE-rootPostAlloc-parentPostAlloc,bound=i+parentPostAlloc;i<bound;++i,++v){
-      arr[i]=TypeConversionUtil.convertTochar(v);
-    }
-    for(int i=rootPreAlloc+parentPreAlloc+parentPostAlloc,v=Integer.MAX_VALUE-rootPostAlloc,bound=i+rootPostAlloc;i<bound;++i,++v){
-      arr[i]=TypeConversionUtil.convertTochar(v);
-    }
-  }
-  final StructType structType;
-  final NestedType nestedType;
-  final CheckedType checkedType;
-  final int initialCapacity;
-  final int rootPreAlloc;
-  final int parentPreAlloc;
-  final int parentPostAlloc;
-  final int rootPostAlloc;
-  final OmniCollection.OfChar root;
-  final OmniCollection.OfChar parent;
-  final OmniCollection.OfChar seq;
-  int expectedRootSize;
-  int expectedParentSize;
-  int expectedSeqSize;
-  int expectedRootModCount;
-  int expectedParentModCount;
-  int expectedSeqModCount;
-  CharSeqMonitor(final StructType structType, final NestedType nestedType,final CheckedType checkedType){
-    this.structType=structType;
-    this.nestedType=nestedType;
-    this.checkedType=checkedType;
-    this.initialCapacity=OmniArray.DEFAULT_ARR_SEQ_CAP;
-    switch(structType){
-      case ARRSEQ:
-        if(nestedType==NestedType.SUBLIST){
-          this.rootPreAlloc=DEFAULT_PRE_AND_POST_ALLOC;
-          this.parentPreAlloc=DEFAULT_PRE_AND_POST_ALLOC;
-          this.parentPostAlloc=DEFAULT_PRE_AND_POST_ALLOC;
-          this.rootPostAlloc=DEFAULT_PRE_AND_POST_ALLOC;
-          int rootSize;
-          char[] arr=new char[rootSize=rootPreAlloc+parentPreAlloc+parentPostAlloc+rootPostAlloc];
-          initArray(rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,arr);
-          this.root=checkedType.checked
-            ?new CharArrSeq.CheckedList(rootSize,arr)
-            :new CharArrSeq.UncheckedList(rootSize,arr);
-          this.parent=((OmniList.OfChar)root).subList(rootPreAlloc,rootSize-rootPostAlloc);
-          this.seq=((OmniList.OfChar)parent).subList(parentPreAlloc,parentPreAlloc);
-        }else{
-          this.rootPreAlloc=0;
-          this.parentPreAlloc=0;
-          this.parentPostAlloc=0;
-          this.rootPostAlloc=0;
-          switch(nestedType){
-            default:
-              throw new Error("Unknown nestedType "+nestedType);
-            case STACK:
-              this.root=checkedType.checked
-                ?new CharArrSeq.CheckedStack()
-                :new CharArrSeq.UncheckedStack();
-              break;
-            case LIST:
-              this.root=checkedType.checked
-                ?new CharArrSeq.CheckedList()
-                :new CharArrSeq.UncheckedList();
-          }
-          this.parent=root;
-          this.seq=root;
-        }
-        break;
-      default:
-        throw new Error("Unknown structType "+structType);
+  static enum ListItrSetScenario{
+    HappyPath(null,PreModScenario.NoMod),
+    ModSeq(ConcurrentModificationException.class,PreModScenario.ModSeq),
+    ModParent(ConcurrentModificationException.class,PreModScenario.ModParent),
+    ModRoot(ConcurrentModificationException.class,PreModScenario.ModRoot),
+    ThrowISE(IllegalStateException.class,PreModScenario.NoMod),
+    PostAddThrowISE(IllegalStateException.class,PreModScenario.NoMod),
+    PostRemoveThrowISE(IllegalStateException.class,PreModScenario.NoMod),
+    ThrowISESupercedesModRootCME(IllegalStateException.class,PreModScenario.ModRoot),
+    ThrowISESupercedesModParentCME(IllegalStateException.class,PreModScenario.ModParent),
+    ThrowISESupercedesModSeqCME(IllegalStateException.class,PreModScenario.ModSeq),
+    PostAddThrowISESupercedesModRootCME(IllegalStateException.class,PreModScenario.ModRoot),
+    PostAddThrowISESupercedesModParentCME(IllegalStateException.class,PreModScenario.ModParent),
+    PostAddThrowISESupercedesModSeqCME(IllegalStateException.class,PreModScenario.ModSeq),
+    PostRemoveThrowISESupercedesModRootCME(IllegalStateException.class,PreModScenario.ModRoot),
+    PostRemoveThrowISESupercedesModParentCME(IllegalStateException.class,PreModScenario.ModParent),
+    PostRemoveThrowISESupercedesModSeqCME(IllegalStateException.class,PreModScenario.ModSeq);
+    final Class<? extends Throwable> expectedException;
+    final PreModScenario preModScenario;
+    ListItrSetScenario(Class<? extends Throwable> expectedException,PreModScenario preModScenario){
+      this.expectedException=expectedException;
+      this.preModScenario=preModScenario;
     }
   }
-  CharSeqMonitor(final StructType structType, final NestedType nestedType,final CheckedType checkedType,final int initialCapacity){
-    this(structType,nestedType,checkedType,initialCapacity,0,0,0,0);
-  }
-  CharSeqMonitor(final StructType structType, final CheckedType checkedType,final int rootPreAlloc,final int parentPreAlloc,final int parentPostAlloc,final int rootPostAlloc){
-    this(structType,NestedType.SUBLIST,checkedType,OmniArray.DEFAULT_ARR_SEQ_CAP,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc);
-  }
-  CharSeqMonitor(final StructType structType, final NestedType nestedType,final CheckedType checkedType,final int initialCapacity,final int rootPreAlloc,final int parentPreAlloc,final int parentPostAlloc,final int rootPostAlloc){
-    this.structType=structType;
-    this.nestedType=nestedType;
-    this.checkedType=checkedType;
-    this.initialCapacity=initialCapacity;
-    this.rootPreAlloc=rootPreAlloc;
-    this.parentPreAlloc=parentPreAlloc;
-    this.parentPostAlloc=parentPostAlloc;
-    this.rootPostAlloc=rootPostAlloc;
-    switch(structType){
-      case ARRSEQ:
-        int rootSize=rootPreAlloc+parentPreAlloc+parentPostAlloc+rootPostAlloc;
-        char[] arr;
-        if(rootSize==0){
-          switch(initialCapacity){
-            case 0:
-              arr=null;
-              break;
-            case OmniArray.DEFAULT_ARR_SEQ_CAP:
-              arr=OmniArray.OfChar.DEFAULT_ARR;
-              break;
-            default:
-              arr=new char[initialCapacity];
-          }
-        }else{
-          arr=new char[Math.max(initialCapacity,rootSize)];
-        }
-        initArray(rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,arr);
-        this.root=nestedType==NestedType.STACK
-          ?checkedType.checked
-            ?new CharArrSeq.CheckedStack(rootSize,arr)
-            :new CharArrSeq.UncheckedStack(rootSize,arr)
-          :checkedType.checked
-            ?new CharArrSeq.CheckedList(rootSize,arr)
-            :new CharArrSeq.UncheckedList(rootSize,arr);
-        break;
-      default:
-        throw new Error("Unknown structType "+structType);
-    }
-    switch(nestedType){
-      case SUBLIST:
-        this.parent=((OmniList.OfChar)root).subList(rootPreAlloc,rootPreAlloc+parentPreAlloc+parentPostAlloc);
-        this.seq=((OmniList.OfChar)parent).subList(parentPreAlloc,parentPreAlloc);
-        break;
-      case LIST:
-      case STACK:
-        this.parent=root;
-        this.seq=root;
-        break;
-      default:
-        throw new Error("Unknown nestedType "+nestedType);
+  static enum ItrRemoveScenario{
+    PostNext(null,false,true),
+    PostPrevious(null,false,false),
+    PostInit(IllegalStateException.class,true,true),
+    PostAdd(IllegalStateException.class,true,false),
+    PostRemove(IllegalStateException.class,false,true);
+    final Class<? extends Throwable> expectedException;
+    final boolean validWithEmptySeq;
+    final boolean validWithForwardItr;
+    ItrRemoveScenario(Class<? extends Throwable> expectedException,boolean validWithEmptySeq,boolean validWithForwardItr){
+      this.expectedException=expectedException;
+      this.validWithEmptySeq=validWithEmptySeq;
+      this.validWithForwardItr=validWithForwardItr;
     }
   }
-  static class MonitoredConsumer implements CharConsumer
-    ,Consumer
-  {
-    ArrayList encounteredValues=new ArrayList();
-    public void accept(char val)
-    {
-      encounteredValues.add(val);
-    }
-    public void accept(Object val)
-    {
-      accept((char)val);
-    }
-  }
-  public static class ThrowingMonitoredConsumer extends MonitoredConsumer{
-    public void accept(char val)
-    {
-      super.accept(val);
-      throw new IndexOutOfBoundsException();
+  static enum IterationScenario{
+    NoMod(NoSuchElementException.class,PreModScenario.NoMod,false),
+    ModSeq(ConcurrentModificationException.class,PreModScenario.ModSeq,false),
+    ModParent(ConcurrentModificationException.class,PreModScenario.ModParent,false),
+    ModRoot(ConcurrentModificationException.class,PreModScenario.ModRoot,false),
+    ModSeqSupercedesThrowNSEE(ConcurrentModificationException.class,PreModScenario.ModSeq,true),
+    ModParentSupercedesThrowNSEE(ConcurrentModificationException.class,PreModScenario.ModParent,true),
+    ModRootSupercedesThrowNSEE(ConcurrentModificationException.class,PreModScenario.ModRoot,true);
+    final Class<? extends Throwable> expectedException;
+    final PreModScenario preModScenario;
+    final boolean validWithEmptySeq;
+    IterationScenario(Class<? extends Throwable> expectedException,PreModScenario preModScenario,boolean validWithEmptySeq){
+      this.expectedException=expectedException;
+      this.preModScenario=preModScenario;
+      this.validWithEmptySeq=validWithEmptySeq;
     }
   }
-  static enum MonitoredConsumerGen
-  {
+  static enum MonitoredConsumerGen{
     NoThrow(null,true,true,true){
       @Override MonitoredConsumer getMonitoredConsumer(CharSeqMonitor seqMonitor){
         return new MonitoredConsumer();
@@ -393,69 +296,160 @@ class CharSeqMonitor{
       throw new UnsupportedOperationException();
     }
   }
-  static enum ItrType
+  private static void initArray(int rootPreAlloc,int parentPreAlloc,int parentPostAlloc,int rootPostAlloc,char[] arr){
+    for(int i=0,v=Integer.MIN_VALUE,bound=rootPreAlloc;i<bound;++i,++v){
+      arr[i]=TypeConversionUtil.convertTochar(v);
+    }
+    for(int i=rootPreAlloc,v=Integer.MIN_VALUE+rootPreAlloc,bound=i+parentPreAlloc;i<bound;++i,++v){
+      arr[i]=TypeConversionUtil.convertTochar(v);
+    }
+    for(int i=rootPreAlloc+parentPreAlloc,v=Integer.MAX_VALUE-rootPostAlloc-parentPostAlloc,bound=i+parentPostAlloc;i<bound;++i,++v){
+      arr[i]=TypeConversionUtil.convertTochar(v);
+    }
+    for(int i=rootPreAlloc+parentPreAlloc+parentPostAlloc,v=Integer.MAX_VALUE-rootPostAlloc,bound=i+rootPostAlloc;i<bound;++i,++v){
+      arr[i]=TypeConversionUtil.convertTochar(v);
+    }
+  }
+  final StructType structType;
+  final NestedType nestedType;
+  final CheckedType checkedType;
+  final int initialCapacity;
+  final int rootPreAlloc;
+  final int parentPreAlloc;
+  final int parentPostAlloc;
+  final int rootPostAlloc;
+  final OmniCollection.OfChar root;
+  final OmniCollection.OfChar parent;
+  final OmniCollection.OfChar seq;
+  int expectedRootSize;
+  int expectedParentSize;
+  int expectedSeqSize;
+  int expectedRootModCount;
+  int expectedParentModCount;
+  int expectedSeqModCount;
+  CharSeqMonitor(final StructType structType, final NestedType nestedType,final CheckedType checkedType){
+    this.structType=structType;
+    this.nestedType=nestedType;
+    this.checkedType=checkedType;
+    this.initialCapacity=OmniArray.DEFAULT_ARR_SEQ_CAP;
+    switch(structType){
+      case ARRSEQ:
+        if(nestedType==NestedType.SUBLIST){
+          this.rootPreAlloc=DEFAULT_PRE_AND_POST_ALLOC;
+          this.parentPreAlloc=DEFAULT_PRE_AND_POST_ALLOC;
+          this.parentPostAlloc=DEFAULT_PRE_AND_POST_ALLOC;
+          this.rootPostAlloc=DEFAULT_PRE_AND_POST_ALLOC;
+          int rootSize;
+          char[] arr=new char[rootSize=rootPreAlloc+parentPreAlloc+parentPostAlloc+rootPostAlloc];
+          initArray(rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,arr);
+          this.root=checkedType.checked
+            ?new CharArrSeq.CheckedList(rootSize,arr)
+            :new CharArrSeq.UncheckedList(rootSize,arr);
+          this.parent=((OmniList.OfChar)root).subList(rootPreAlloc,rootSize-rootPostAlloc);
+          this.seq=((OmniList.OfChar)parent).subList(parentPreAlloc,parentPreAlloc);
+        }else{
+          this.rootPreAlloc=0;
+          this.parentPreAlloc=0;
+          this.parentPostAlloc=0;
+          this.rootPostAlloc=0;
+          switch(nestedType){
+            default:
+              throw new Error("Unknown nestedType "+nestedType);
+            case STACK:
+              this.root=checkedType.checked
+                ?new CharArrSeq.CheckedStack()
+                :new CharArrSeq.UncheckedStack();
+              break;
+            case LIST:
+              this.root=checkedType.checked
+                ?new CharArrSeq.CheckedList()
+                :new CharArrSeq.UncheckedList();
+          }
+          this.parent=root;
+          this.seq=root;
+        }
+        break;
+      default:
+        throw new Error("Unknown structType "+structType);
+    }
+  }
+  CharSeqMonitor(final StructType structType, final NestedType nestedType,final CheckedType checkedType,final int initialCapacity){
+    this(structType,nestedType,checkedType,initialCapacity,0,0,0,0);
+  }
+  CharSeqMonitor(final StructType structType, final CheckedType checkedType,final int rootPreAlloc,final int parentPreAlloc,final int parentPostAlloc,final int rootPostAlloc){
+    this(structType,NestedType.SUBLIST,checkedType,OmniArray.DEFAULT_ARR_SEQ_CAP,rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc);
+  }
+  CharSeqMonitor(final StructType structType, final NestedType nestedType,final CheckedType checkedType,final int initialCapacity,final int rootPreAlloc,final int parentPreAlloc,final int parentPostAlloc,final int rootPostAlloc){
+    this.structType=structType;
+    this.nestedType=nestedType;
+    this.checkedType=checkedType;
+    this.initialCapacity=initialCapacity;
+    this.rootPreAlloc=rootPreAlloc;
+    this.parentPreAlloc=parentPreAlloc;
+    this.parentPostAlloc=parentPostAlloc;
+    this.rootPostAlloc=rootPostAlloc;
+    switch(structType){
+      case ARRSEQ:
+        int rootSize=rootPreAlloc+parentPreAlloc+parentPostAlloc+rootPostAlloc;
+        char[] arr;
+        if(rootSize==0){
+          switch(initialCapacity){
+            case 0:
+              arr=null;
+              break;
+            case OmniArray.DEFAULT_ARR_SEQ_CAP:
+              arr=OmniArray.OfChar.DEFAULT_ARR;
+              break;
+            default:
+              arr=new char[initialCapacity];
+          }
+        }else{
+          arr=new char[Math.max(initialCapacity,rootSize)];
+        }
+        initArray(rootPreAlloc,parentPreAlloc,parentPostAlloc,rootPostAlloc,arr);
+        this.root=nestedType==NestedType.STACK
+          ?checkedType.checked
+            ?new CharArrSeq.CheckedStack(rootSize,arr)
+            :new CharArrSeq.UncheckedStack(rootSize,arr)
+          :checkedType.checked
+            ?new CharArrSeq.CheckedList(rootSize,arr)
+            :new CharArrSeq.UncheckedList(rootSize,arr);
+        break;
+      default:
+        throw new Error("Unknown structType "+structType);
+    }
+    switch(nestedType){
+      case SUBLIST:
+        this.parent=((OmniList.OfChar)root).subList(rootPreAlloc,rootPreAlloc+parentPreAlloc+parentPostAlloc);
+        this.seq=((OmniList.OfChar)parent).subList(parentPreAlloc,parentPreAlloc);
+        break;
+      case LIST:
+      case STACK:
+        this.parent=root;
+        this.seq=root;
+        break;
+      default:
+        throw new Error("Unknown nestedType "+nestedType);
+    }
+  }
+  static class MonitoredConsumer implements CharConsumer
+    ,Consumer
   {
-    Itr,
-    ListItr;
-  }
-  static enum ListItrSetScenario{
-    HappyPath(null,PreModScenario.NoMod),
-    ModSeq(ConcurrentModificationException.class,PreModScenario.ModSeq),
-    ModParent(ConcurrentModificationException.class,PreModScenario.ModParent),
-    ModRoot(ConcurrentModificationException.class,PreModScenario.ModRoot),
-    ThrowISE(IllegalStateException.class,PreModScenario.NoMod),
-    PostAddThrowISE(IllegalStateException.class,PreModScenario.NoMod),
-    PostRemoveThrowISE(IllegalStateException.class,PreModScenario.NoMod),
-    ThrowISESupercedesModRootCME(IllegalStateException.class,PreModScenario.ModRoot),
-    ThrowISESupercedesModParentCME(IllegalStateException.class,PreModScenario.ModParent),
-    ThrowISESupercedesModSeqCME(IllegalStateException.class,PreModScenario.ModSeq),
-    PostAddThrowISESupercedesModRootCME(IllegalStateException.class,PreModScenario.ModRoot),
-    PostAddThrowISESupercedesModParentCME(IllegalStateException.class,PreModScenario.ModParent),
-    PostAddThrowISESupercedesModSeqCME(IllegalStateException.class,PreModScenario.ModSeq),
-    PostRemoveThrowISESupercedesModRootCME(IllegalStateException.class,PreModScenario.ModRoot),
-    PostRemoveThrowISESupercedesModParentCME(IllegalStateException.class,PreModScenario.ModParent),
-    PostRemoveThrowISESupercedesModSeqCME(IllegalStateException.class,PreModScenario.ModSeq);
-    final Class<? extends Throwable> expectedException;
-    final PreModScenario preModScenario;
-    ListItrSetScenario(Class<? extends Throwable> expectedException,PreModScenario preModScenario){
-      this.expectedException=expectedException;
-      this.preModScenario=preModScenario;
+    ArrayList encounteredValues=new ArrayList();
+    public void accept(char val){
+      encounteredValues.add(val);
+    }
+    public void accept(Object val){
+      accept((char)val);
     }
   }
-  static enum ItrRemoveScenario{
-    PostNext(null,false,true),
-    PostPrevious(null,false,false),
-    PostInit(IllegalStateException.class,true,true),
-    PostAdd(IllegalStateException.class,true,false),
-    PostRemove(IllegalStateException.class,false,true);
-    final Class<? extends Throwable> expectedException;
-    final boolean validWithEmptySeq;
-    final boolean validWithForwardItr;
-    ItrRemoveScenario(Class<? extends Throwable> expectedException,boolean validWithEmptySeq,boolean validWithForwardItr){
-      this.expectedException=expectedException;
-      this.validWithEmptySeq=validWithEmptySeq;
-      this.validWithForwardItr=validWithForwardItr;
+  public static class ThrowingMonitoredConsumer extends MonitoredConsumer{
+    public void accept(char val){
+      super.accept(val);
+      throw new IndexOutOfBoundsException();
     }
   }
-  static enum IterationScenario{
-    NoMod(NoSuchElementException.class,PreModScenario.NoMod,false),
-    ModSeq(ConcurrentModificationException.class,PreModScenario.ModSeq,false),
-    ModParent(ConcurrentModificationException.class,PreModScenario.ModParent,false),
-    ModRoot(ConcurrentModificationException.class,PreModScenario.ModRoot,false),
-    ModSeqSupercedesThrowNSEE(ConcurrentModificationException.class,PreModScenario.ModSeq,true),
-    ModParentSupercedesThrowNSEE(ConcurrentModificationException.class,PreModScenario.ModParent,true),
-    ModRootSupercedesThrowNSEE(ConcurrentModificationException.class,PreModScenario.ModRoot,true);
-    final Class<? extends Throwable> expectedException;
-    final PreModScenario preModScenario;
-    final boolean validWithEmptySeq;
-    IterationScenario(Class<? extends Throwable> expectedException,PreModScenario preModScenario,boolean validWithEmptySeq){
-      this.expectedException=expectedException;
-      this.preModScenario=preModScenario;
-      this.validWithEmptySeq=validWithEmptySeq;
-    }
-  }
-  abstract class ItrMonitor
-  {
+  abstract class ItrMonitor{
     final OmniIterator.OfChar itr;
     int expectedCursor;
     int expectedLastRet;
@@ -472,9 +466,7 @@ class CharSeqMonitor{
           expectedCursor=expectedBound;
           expectedLastRet=expectedCursor-1;
         }
-      }
-      else
-      {
+      }else{
         if(expectedCursor>expectedBound){
           expectedCursor=expectedBound;
           expectedLastRet=expectedCursor;
@@ -486,8 +478,7 @@ class CharSeqMonitor{
       this.expectedCursor=expectedCursor;
       this.expectedLastRet=-1;
     }
-    public void iterateReverse()
-    {
+    public void iterateReverse(){
       ((OmniListIterator.OfChar)itr).previousChar();
       expectedLastRet=--expectedCursor;
     }
@@ -502,15 +493,13 @@ class CharSeqMonitor{
     public void set(int v,CharInputTestArgType inputArgType){
        inputArgType.callListItrSet((OmniListIterator.OfChar)itr,v);
     }
-    public void set(int v)
-    {
+    public void set(int v){
       set(v,CharInputTestArgType.ARRAY_TYPE);
     }
     public void add(int v,CharInputTestArgType inputArgType){
       throw new UnsupportedOperationException();
     }
-    public void add(int v)
-    {
+    public void add(int v){
       add(v,CharInputTestArgType.ARRAY_TYPE);
     }
     public abstract void iterateForward();
@@ -969,5 +958,13 @@ class CharSeqMonitor{
   }
   public boolean isEmpty(){
     return seq.isEmpty();
+  }
+  public void forEach(MonitoredConsumer action,FunctionCallType functionCallType){
+    if(functionCallType==FunctionCallType.Boxed){
+      seq.forEach((Consumer)action);
+    }else
+    {
+      seq.forEach((CharConsumer)action);
+    }
   }
 }

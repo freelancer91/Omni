@@ -2216,6 +2216,7 @@ ERROR QueryShort<STRUCTNAME,METHODNAME>() is not allowed for $ClassPrefix$
 #MACRODEF QueryObject()
 #MACRO QuerySignature<Object>()
 {
+  //TODO refactor this to reduce the calls to check mod count
   final int size;
   if((size=this.size)!=0){
 #IF OfRef
@@ -2733,20 +2734,16 @@ ERROR unknown method METHODNAME for ReturnUncheckedQueryNull<METHODNAME,STRUCTNA
   #IFSWITCH METHODNAME==removeVal
 return this.uncheckedMETHODNAMENull(size);
   #ELSE
-final int modCount=this.modCount;
-final var root=this.root;
-try{
+final CheckedList$<E>$ root;
+CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
     #IFSWITCH METHODNAME==contains
-  final int rootOffset;
-  return OmniArray.Of$ClassPrefix$.uncheckedMETHODNAMENull(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
+final int rootOffset;
+return OmniArray.Of$ClassPrefix$.uncheckedMETHODNAMENull(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
     #ELSEIFSWITCH METHODNAME==indexOf,lastIndexOf,
-  return OmniArray.Of$ClassPrefix$.uncheckedMETHODNAMENull(root.arr,this.rootOffset,size);
+return OmniArray.Of$ClassPrefix$.uncheckedMETHODNAMENull(root.arr,this.rootOffset,size);
     #ELSE
 ERROR unknown method METHODNAME for ReturnUncheckedQueryNull<METHODNAME,STRUCTNAME>()
     #ENDIF
-}finally{
-  CheckedCollection.checkModCount(modCount,root.modCount);
-}
   #ENDIF
 #ELSE
 ERROR unknown struct STRUCTNAME for ReturnUncheckedQueryNull<METHODNAME,STRUCTNAME>()
@@ -2792,25 +2789,22 @@ ERROR unknown method METHODNAME for ReturnUncheckedQueryNaN<METHODNAME,STRUCTNAM
   #IFSWITCH METHODNAME==removeVal
 return this.uncheckedMETHODNAMENaN(size);
   #ELSE
-final int modCount=this.modCount;
-final var root=this.root;
-try{
+final CheckedList$<E>$ root;
+CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
     #IFSWITCH METHODNAME==contains
-  final int rootOffset;
-  return OmniArray.Of$ClassPrefix$.uncheckedMETHODNAMENaN(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
+final int rootOffset;
+return OmniArray.Of$ClassPrefix$.uncheckedMETHODNAMENaN(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
     #ELSEIFSWITCH METHODNAME==indexOf,lastIndexOf,
-  return OmniArray.Of$ClassPrefix$.uncheckedMETHODNAMENaN(root.arr,this.rootOffset,size);
+return OmniArray.Of$ClassPrefix$.uncheckedMETHODNAMENaN(root.arr,this.rootOffset,size);
     #ELSE
 ERROR unknown method METHODNAME for ReturnUncheckedQueryNaN<METHODNAME,STRUCTNAME>()
     #ENDIF
-}finally{
-  CheckedCollection.checkModCount(modCount,root.modCount);
-}
   #ENDIF
 #ELSE
 ERROR unknown struct STRUCTNAME for ReturnUncheckedQueryNaN<METHODNAME,STRUCTNAME>()
 #ENDIF
 #ENDDEF
+
 #MACRODEF ReturnUncheckedQuery0()
 #IFNOT OfDouble,OfFloat
 ERROR ReturnUncheckedQuery0<METHODNAME,STRUCTNAME>() is only valid for OfFloat and OfDouble
@@ -2850,25 +2844,22 @@ ERROR unknown method METHODNAME for ReturnUncheckedQuery0<METHODNAME,STRUCTNAME>
   #IFSWITCH METHODNAME==removeVal
 return this.uncheckedMETHODNAME0(size);
   #ELSE
-final int modCount=this.modCount;
-final var root=this.root;
-try{
+final CheckedList$<E>$ root;
+CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
     #IFSWITCH METHODNAME==contains
-  final int rootOffset;
-  return OmniArray.Of$ClassPrefix$.uncheckedMETHODNAME0(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
+final int rootOffset;
+return OmniArray.Of$ClassPrefix$.uncheckedMETHODNAME0(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
     #ELSEIFSWITCH METHODNAME==indexOf,lastIndexOf,
-  return OmniArray.Of$ClassPrefix$.uncheckedMETHODNAME0(root.arr,this.rootOffset,size);
+return OmniArray.Of$ClassPrefix$.uncheckedMETHODNAME0(root.arr,this.rootOffset,size);
     #ELSE
 ERROR unknown method METHODNAME for ReturnUncheckedQuery0<METHODNAME,STRUCTNAME>()
     #ENDIF
-}finally{
-  CheckedCollection.checkModCount(modCount,root.modCount);
-}
   #ENDIF
 #ELSE
 ERROR unknown struct STRUCTNAME for ReturnUncheckedQuery0<METHODNAME,STRUCTNAME>()
 #ENDIF
 #ENDDEF
+
 #MACRODEF ReturnUncheckedQueryBits(VAL)
 #IFNOT OfDouble,OfFloat
 ERROR ReturnUncheckedQueryBits<METHODNAME,STRUCTNAME>(VAL) is only valid for OfFloat and OfDouble
@@ -2908,28 +2899,25 @@ ERROR unknown method METHODNAME for ReturnUncheckedQueryBits<METHODNAME,STRUCTNA
   #IFSWITCH METHODNAME==removeVal
 return this.uncheckedMETHODNAMEBits(size,VAL);
   #ELSE
-final int modCount=this.modCount;
-final var root=this.root;
-try{
+final CheckedList$<E>$ root;
+CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
     #IFSWITCH METHODNAME==contains
-  final int rootOffset;
-  return OmniArray.Of$ClassPrefix$.uncheckedMETHODNAMEBits(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,VAL);
+final int rootOffset;
+return OmniArray.Of$ClassPrefix$.uncheckedMETHODNAMEBits(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,VAL);
     #ELSEIFSWITCH METHODNAME==indexOf,lastIndexOf,
-  return OmniArray.Of$ClassPrefix$.uncheckedMETHODNAMEBits(root.arr,this.rootOffset,size,VAL);
+return OmniArray.Of$ClassPrefix$.uncheckedMETHODNAMEBits(root.arr,this.rootOffset,size,VAL);
     #ELSE
 ERROR unknown method METHODNAME for ReturnUncheckedQueryBits<METHODNAME,STRUCTNAME>(VAL)
     #ENDIF
-}finally{
-  CheckedCollection.checkModCount(modCount,root.modCount);
-}
   #ENDIF
 #ELSE
 ERROR unknown struct STRUCTNAME for ReturnUncheckedQueryBits<METHODNAME,STRUCTNAME>(VAL)
 #ENDIF
 #ENDDEF
+
 #MACRODEF ReturnUncheckedQuery(VAL)
 #IF OfDouble,OfFloat
-ERROR ReturnUncheckedQuery0<METHODNAME,STRUCTNAME>() is not valid for OfFloat and OfDouble
+ERROR ReturnUncheckedQuery<METHODNAME,STRUCTNAME>(VAL) is not valid for OfFloat and OfDouble
 #ENDIF
 #IFSWITCH STRUCTNAME==Root
   #IFSWITCH METHODNAME==contains

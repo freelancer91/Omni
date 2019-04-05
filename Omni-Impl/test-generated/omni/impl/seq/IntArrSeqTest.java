@@ -8,6 +8,7 @@ import omni.impl.IntOutputTestArgType;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.api.Test;
 import java.util.stream.Stream;
 import java.util.Objects;
 import omni.impl.QueryTestInputType;
@@ -1296,6 +1297,179 @@ public class IntArrSeqTest{
             verifyItr.verifyPostAlloc(preModScenario);
             verifyItr.verifyIllegalAdd();
             numExpectedIteratedValues=1;
+            break;
+          default:
+            throw new Error("Unknown monitored consumer gen "+monitoredConsumerGen);
+      }
+    }
+    Assertions.assertEquals(numExpectedIteratedValues,monitoredConsumer.encounteredValues.size());
+    var arr=((IntArrSeq)seqMonitor.root).arr;
+    if(seqMonitor.nestedType.forwardIteration){
+      int i=seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc;
+      for(var encounteredValue:monitoredConsumer.encounteredValues){
+        Assertions.assertEquals(encounteredValue,(Object)arr[i++]);
+      }
+    }else{
+      int i=seqMonitor.rootPreAlloc+seqMonitor.parentPreAlloc+numToAdd;
+      for(var encounteredValue:monitoredConsumer.encounteredValues){
+        Assertions.assertEquals(encounteredValue,(Object)arr[--i]);
+      }
+    }
+  }
+  static Stream<Arguments> getforEach_ConsumerArgs(){
+    Stream.Builder<Arguments> builder=Stream.builder();
+    for(var checkedType:CheckedType.values()){
+      for(var nestedType:NestedType.values()){
+        for(var preModScenario:PreModScenario.values()){
+          if(preModScenario==PreModScenario.ModSeq||(preModScenario.expectedException!=null&&(nestedType.rootType||!checkedType.checked))){
+            continue;
+          }
+          for(var monitoredConsumerGen:MonitoredConsumerGen.values()){
+            if((!checkedType.checked && monitoredConsumerGen.expectedException!=null)||(nestedType.rootType && !monitoredConsumerGen.appliesToRoot) ||(!nestedType.rootType && !monitoredConsumerGen.appliesToSubList)){
+              continue;
+            }
+            for(var seqContentsScenario:SequenceContentsScenario.values()){
+              builder.add(Arguments.of(new IntSeqMonitor(StructType.ARRSEQ,nestedType,checkedType),preModScenario,monitoredConsumerGen,seqContentsScenario,FunctionCallType.Unboxed));
+              builder.add(Arguments.of(new IntSeqMonitor(StructType.ARRSEQ,nestedType,checkedType),preModScenario,monitoredConsumerGen,seqContentsScenario,FunctionCallType.Boxed));
+            }
+          }  
+        }
+      }
+    }
+    return builder.build().parallel();
+  }
+  @ParameterizedTest
+  @MethodSource("getforEach_ConsumerArgs")
+  public void testforEach_ConsumerArgs(IntSeqMonitor seqMonitor,PreModScenario preModScenario,MonitoredConsumerGen monitoredConsumerGen,SequenceContentsScenario seqContentsScenario,FunctionCallType functionCallType){
+    int numToAdd=seqContentsScenario.nonEmpty?100:0;
+    for(int i=0;i<numToAdd;++i){
+      seqMonitor.add(i);
+    }
+    seqMonitor.illegalAdd(preModScenario);
+    var monitoredConsumer=monitoredConsumerGen.getMonitoredConsumer(seqMonitor);
+    int numExpectedIteratedValues;
+    if(preModScenario.expectedException==null){
+      if(monitoredConsumerGen.expectedException==null || !seqContentsScenario.nonEmpty){
+        seqMonitor.forEach(monitoredConsumer,functionCallType);
+        seqMonitor.verifyStructuralIntegrity();
+        seqMonitor.verifyPreAlloc().verifyAscending(numToAdd).verifyPostAlloc(preModScenario);
+        numExpectedIteratedValues=numToAdd;
+      }else{
+        Assertions.assertThrows(monitoredConsumerGen.expectedException,()->seqMonitor.forEach(monitoredConsumer,functionCallType));
+        seqMonitor.verifyStructuralIntegrity();
+        var verifyItr=seqMonitor.verifyPreAlloc().verifyAscending(numToAdd);
+        switch(monitoredConsumerGen){
+          case Throw:
+            numExpectedIteratedValues=1;
+            verifyItr.verifyPostAlloc();
+            break;
+          case ModSeq:
+            numExpectedIteratedValues=numToAdd;
+            for(int i=0;i<numToAdd;++i){
+              verifyItr.verifyIllegalAdd();
+            }
+            verifyItr.verifyPostAlloc();
+            break;
+          case ModParent:
+            numExpectedIteratedValues=numToAdd;
+            verifyItr.verifyParentPostAlloc();
+            for(int i=0;i<numToAdd;++i){
+              verifyItr.verifyIllegalAdd();
+            }
+            verifyItr.verifyRootPostAlloc();
+            break;
+          case ModRoot:
+            numExpectedIteratedValues=numToAdd;
+            verifyItr.verifyPostAlloc();
+            for(int i=0;i<numToAdd;++i){
+              verifyItr.verifyIllegalAdd();
+            }
+            break;
+          case ThrowModSeq:
+            numExpectedIteratedValues=1;
+            verifyItr.verifyPostAlloc(PreModScenario.ModSeq);
+            break;
+          case ThrowModParent:
+            numExpectedIteratedValues=1;
+            verifyItr.verifyPostAlloc(PreModScenario.ModParent);
+            break;
+          case ThrowModRoot:
+            numExpectedIteratedValues=1;
+            verifyItr.verifyPostAlloc(PreModScenario.ModRoot);
+            break;
+          default:
+            throw new Error("Unknown monitored consumer gen "+monitoredConsumerGen);
+        }
+      }
+    }else{
+      Assertions.assertThrows(preModScenario.expectedException,()->seqMonitor.forEach(monitoredConsumer,functionCallType));
+      seqMonitor.verifyStructuralIntegrity();
+      var verifyItr=seqMonitor.verifyPreAlloc().verifyAscending(numToAdd);
+      switch(monitoredConsumerGen){
+          case NoThrow:
+            numExpectedIteratedValues=numToAdd;
+            verifyItr.verifyPostAlloc(preModScenario);
+            break;
+          case Throw:
+            numExpectedIteratedValues=numToAdd==0?0:1;
+            verifyItr.verifyPostAlloc(preModScenario);
+            break;
+          case ModSeq:
+            numExpectedIteratedValues=numToAdd==0?0:1;
+            verifyItr.verifyPostAlloc(preModScenario);
+            break;
+          case ModParent:
+            switch(preModScenario){
+              case ModRoot:
+                numExpectedIteratedValues=numToAdd==0?0:1;
+                verifyItr.verifyPostAlloc(preModScenario);
+                break;
+              case ModParent:
+                numExpectedIteratedValues=numToAdd;
+                verifyItr.verifyParentPostAlloc();
+                for(int i=0;i<numExpectedIteratedValues+1;++i){
+                  verifyItr.verifyIllegalAdd();
+                }
+                verifyItr.verifyRootPostAlloc();
+                break;
+              default:
+                throw new Error("Unknown preModScenario "+preModScenario);
+            }
+            break;
+          case ModRoot:
+            numExpectedIteratedValues=numToAdd;
+            verifyItr.verifyPostAlloc(preModScenario);
+            for(int i=0;i<numExpectedIteratedValues;++i){
+              verifyItr.verifyIllegalAdd();
+            }
+            break;
+          case ThrowModSeq:
+            verifyItr.verifyPostAlloc(preModScenario);
+            numExpectedIteratedValues=numToAdd==0?0:1;
+            break;
+          case ThrowModParent:
+            numExpectedIteratedValues=numToAdd==0?0:1;
+            switch(preModScenario){
+              case ModParent:
+                verifyItr.verifyParentPostAlloc();
+                for(int i=0;i<numExpectedIteratedValues;++i){
+                  verifyItr.verifyIllegalAdd();
+                }
+                verifyItr.verifyIllegalAdd().verifyRootPostAlloc();
+                break;
+              case ModRoot:
+                verifyItr.verifyPostAlloc(preModScenario);
+                break;
+              default:
+                throw new Error("Unknown preModScenario "+preModScenario);
+            }
+            break;
+          case ThrowModRoot:
+            numExpectedIteratedValues=numToAdd==0?0:1;
+            verifyItr.verifyPostAlloc(preModScenario);
+            for(int i=0;i<numExpectedIteratedValues;++i){
+              verifyItr.verifyIllegalAdd();
+            }
             break;
           default:
             throw new Error("Unknown monitored consumer gen "+monitoredConsumerGen);

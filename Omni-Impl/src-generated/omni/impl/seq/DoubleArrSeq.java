@@ -177,6 +177,7 @@ public abstract class DoubleArrSeq implements OmniCollection.OfDouble,Cloneable
   @Override
   public boolean contains(Object val)
   {
+    //TODO refactor this to reduce the calls to check mod count
     final int size;
     if((size=this.size)!=0){
      //TODO a pattern-matching switch statement would be great here
@@ -375,6 +376,7 @@ public abstract class DoubleArrSeq implements OmniCollection.OfDouble,Cloneable
   @Override
   public boolean remove(Object val)
   {
+    //TODO refactor this to reduce the calls to check mod count
     final int size;
     if((size=this.size)!=0){
      //TODO a pattern-matching switch statement would be great here
@@ -915,6 +917,7 @@ public abstract class DoubleArrSeq implements OmniCollection.OfDouble,Cloneable
     @Override
     public int search(Object val)
     {
+      //TODO refactor this to reduce the calls to check mod count
       final int size;
       if((size=this.size)!=0){
        //TODO a pattern-matching switch statement would be great here
@@ -1311,6 +1314,7 @@ public abstract class DoubleArrSeq implements OmniCollection.OfDouble,Cloneable
     @Override
     public int indexOf(Object val)
     {
+      //TODO refactor this to reduce the calls to check mod count
       final int size;
       if((size=this.size)!=0){
        //TODO a pattern-matching switch statement would be great here
@@ -1461,6 +1465,7 @@ public abstract class DoubleArrSeq implements OmniCollection.OfDouble,Cloneable
     @Override
     public int lastIndexOf(Object val)
     {
+      //TODO refactor this to reduce the calls to check mod count
       final int size;
       if((size=this.size)!=0){
        //TODO a pattern-matching switch statement would be great here
@@ -2111,6 +2116,7 @@ public abstract class DoubleArrSeq implements OmniCollection.OfDouble,Cloneable
     @Override
     public boolean contains(Object val)
     {
+      //TODO refactor this to reduce the calls to check mod count
       final int size;
       if((size=this.size)!=0){
        //TODO a pattern-matching switch statement would be great here
@@ -2327,6 +2333,7 @@ public abstract class DoubleArrSeq implements OmniCollection.OfDouble,Cloneable
     @Override
     public boolean remove(Object val)
     {
+      //TODO refactor this to reduce the calls to check mod count
       final int size;
       if((size=this.size)!=0){
        //TODO a pattern-matching switch statement would be great here
@@ -2525,6 +2532,7 @@ public abstract class DoubleArrSeq implements OmniCollection.OfDouble,Cloneable
     @Override
     public int indexOf(Object val)
     {
+      //TODO refactor this to reduce the calls to check mod count
       final int size;
       if((size=this.size)!=0){
        //TODO a pattern-matching switch statement would be great here
@@ -2675,6 +2683,7 @@ public abstract class DoubleArrSeq implements OmniCollection.OfDouble,Cloneable
     @Override
     public int lastIndexOf(Object val)
     {
+      //TODO refactor this to reduce the calls to check mod count
       final int size;
       if((size=this.size)!=0){
        //TODO a pattern-matching switch statement would be great here
@@ -4251,23 +4260,15 @@ public abstract class DoubleArrSeq implements OmniCollection.OfDouble,Cloneable
       {
         if(val)
         {
-          final int modCount=this.modCount;
-          final var root=this.root;
-          try{
-            final int rootOffset;
-            return OmniArray.OfDouble.uncheckedcontainsBits(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,TypeUtil.DBL_TRUE_BITS);
-          }finally{
-            CheckedCollection.checkModCount(modCount,root.modCount);
-          }
-        }
-        final int modCount=this.modCount;
-        final var root=this.root;
-        try{
+          final CheckedList root;
+          CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
           final int rootOffset;
-          return OmniArray.OfDouble.uncheckedcontains0(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
-        }finally{
-          CheckedCollection.checkModCount(modCount,root.modCount);
+          return OmniArray.OfDouble.uncheckedcontainsBits(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,TypeUtil.DBL_TRUE_BITS);
         }
+        final CheckedList root;
+        CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+        final int rootOffset;
+        return OmniArray.OfDouble.uncheckedcontains0(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
       }
       CheckedCollection.checkModCount(modCount,root.modCount);
       return false;
@@ -4282,26 +4283,18 @@ public abstract class DoubleArrSeq implements OmniCollection.OfDouble,Cloneable
           if(val!=0)
           {
             {
-              final int modCount=this.modCount;
-              final var root=this.root;
-              try{
-                final int rootOffset;
-                return OmniArray.OfDouble.uncheckedcontainsBits(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,Double.doubleToRawLongBits(val));
-              }finally{
-                CheckedCollection.checkModCount(modCount,root.modCount);
-              }
+              final CheckedList root;
+              CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+              final int rootOffset;
+              return OmniArray.OfDouble.uncheckedcontainsBits(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,Double.doubleToRawLongBits(val));
             }
           }
           else
           {
-            final int modCount=this.modCount;
-            final var root=this.root;
-            try{
-              final int rootOffset;
-              return OmniArray.OfDouble.uncheckedcontains0(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
-            }finally{
-              CheckedCollection.checkModCount(modCount,root.modCount);
-            }
+            final CheckedList root;
+            CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+            final int rootOffset;
+            return OmniArray.OfDouble.uncheckedcontains0(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
           }
         }
       }
@@ -4318,26 +4311,18 @@ public abstract class DoubleArrSeq implements OmniCollection.OfDouble,Cloneable
         {
           if(TypeUtil.checkCastToDouble(val))
           {
-            final int modCount=this.modCount;
-            final var root=this.root;
-            try{
-              final int rootOffset;
-              return OmniArray.OfDouble.uncheckedcontainsBits(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,Double.doubleToRawLongBits(val));
-            }finally{
-              CheckedCollection.checkModCount(modCount,root.modCount);
-            }
+            final CheckedList root;
+            CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+            final int rootOffset;
+            return OmniArray.OfDouble.uncheckedcontainsBits(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,Double.doubleToRawLongBits(val));
           }
         }
         else
         {
-          final int modCount=this.modCount;
-          final var root=this.root;
-          try{
-            final int rootOffset;
-            return OmniArray.OfDouble.uncheckedcontains0(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
-          }finally{
-            CheckedCollection.checkModCount(modCount,root.modCount);
-          }
+          final CheckedList root;
+          CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+          final int rootOffset;
+          return OmniArray.OfDouble.uncheckedcontains0(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
         }
       }
       CheckedCollection.checkModCount(modCount,root.modCount);
@@ -4351,23 +4336,15 @@ public abstract class DoubleArrSeq implements OmniCollection.OfDouble,Cloneable
       {
         if(val==val)
         {
-          final int modCount=this.modCount;
-          final var root=this.root;
-          try{
-            final int rootOffset;
-            return OmniArray.OfDouble.uncheckedcontainsBits(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,Double.doubleToRawLongBits(val));
-          }finally{
-            CheckedCollection.checkModCount(modCount,root.modCount);
-          }
-        }
-        final int modCount=this.modCount;
-        final var root=this.root;
-        try{
+          final CheckedList root;
+          CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
           final int rootOffset;
-          return OmniArray.OfDouble.uncheckedcontainsNaN(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
-        }finally{
-          CheckedCollection.checkModCount(modCount,root.modCount);
+          return OmniArray.OfDouble.uncheckedcontainsBits(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,Double.doubleToRawLongBits(val));
         }
+        final CheckedList root;
+        CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+        final int rootOffset;
+        return OmniArray.OfDouble.uncheckedcontainsNaN(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
       }
       CheckedCollection.checkModCount(modCount,root.modCount);
       return false;
@@ -4380,23 +4357,15 @@ public abstract class DoubleArrSeq implements OmniCollection.OfDouble,Cloneable
       {
         if(val==val)
         {
-          final int modCount=this.modCount;
-          final var root=this.root;
-          try{
-            final int rootOffset;
-            return OmniArray.OfDouble.uncheckedcontainsBits(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,Double.doubleToRawLongBits(val));
-          }finally{
-            CheckedCollection.checkModCount(modCount,root.modCount);
-          }
-        }
-        final int modCount=this.modCount;
-        final var root=this.root;
-        try{
+          final CheckedList root;
+          CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
           final int rootOffset;
-          return OmniArray.OfDouble.uncheckedcontainsNaN(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
-        }finally{
-          CheckedCollection.checkModCount(modCount,root.modCount);
+          return OmniArray.OfDouble.uncheckedcontainsBits(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,Double.doubleToRawLongBits(val));
         }
+        final CheckedList root;
+        CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+        final int rootOffset;
+        return OmniArray.OfDouble.uncheckedcontainsNaN(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
       }
       CheckedCollection.checkModCount(modCount,root.modCount);
       return false;
@@ -4404,6 +4373,7 @@ public abstract class DoubleArrSeq implements OmniCollection.OfDouble,Cloneable
     @Override
     public boolean contains(Object val)
     {
+      //TODO refactor this to reduce the calls to check mod count
       final int size;
       if((size=this.size)!=0){
        //TODO a pattern-matching switch statement would be great here
@@ -4411,125 +4381,77 @@ public abstract class DoubleArrSeq implements OmniCollection.OfDouble,Cloneable
           if(val instanceof Double){
             final double d;
             if((d=(double)val)==d){
-               final int modCount=this.modCount;
-               final var root=this.root;
-               try{
-                 final int rootOffset;
-                 return OmniArray.OfDouble.uncheckedcontainsBits(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,Double.doubleToRawLongBits(d));
-               }finally{
-                 CheckedCollection.checkModCount(modCount,root.modCount);
-               }
+               final CheckedList root;
+               CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+               final int rootOffset;
+               return OmniArray.OfDouble.uncheckedcontainsBits(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,Double.doubleToRawLongBits(d));
             }
-            final int modCount=this.modCount;
-            final var root=this.root;
-            try{
-              final int rootOffset;
-              return OmniArray.OfDouble.uncheckedcontainsNaN(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
-            }finally{
-              CheckedCollection.checkModCount(modCount,root.modCount);
-            }
+            final CheckedList root;
+            CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+            final int rootOffset;
+            return OmniArray.OfDouble.uncheckedcontainsNaN(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
           }else if(val instanceof Float){
             final float f;
             if((f=(float)val)==f){
-               final int modCount=this.modCount;
-               final var root=this.root;
-               try{
-                 final int rootOffset;
-                 return OmniArray.OfDouble.uncheckedcontainsBits(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,Double.doubleToRawLongBits(f));
-               }finally{
-                 CheckedCollection.checkModCount(modCount,root.modCount);
-               }
+               final CheckedList root;
+               CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+               final int rootOffset;
+               return OmniArray.OfDouble.uncheckedcontainsBits(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,Double.doubleToRawLongBits(f));
             }
-            final int modCount=this.modCount;
-            final var root=this.root;
-            try{
-              final int rootOffset;
-              return OmniArray.OfDouble.uncheckedcontainsNaN(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
-            }finally{
-              CheckedCollection.checkModCount(modCount,root.modCount);
-            }
+            final CheckedList root;
+            CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+            final int rootOffset;
+            return OmniArray.OfDouble.uncheckedcontainsNaN(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
           }else if(val instanceof Integer|| val instanceof Short||val instanceof Byte){
             final int i;
             if((i=((Number)val).intValue())!=0){
-              final int modCount=this.modCount;
-              final var root=this.root;
-              try{
-                final int rootOffset;
-                return OmniArray.OfDouble.uncheckedcontainsBits(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,Double.doubleToRawLongBits(i));
-              }finally{
-                CheckedCollection.checkModCount(modCount,root.modCount);
-              }
-            }
-            final int modCount=this.modCount;
-            final var root=this.root;
-            try{
+              final CheckedList root;
+              CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
               final int rootOffset;
-              return OmniArray.OfDouble.uncheckedcontains0(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
-            }finally{
-              CheckedCollection.checkModCount(modCount,root.modCount);
+              return OmniArray.OfDouble.uncheckedcontainsBits(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,Double.doubleToRawLongBits(i));
             }
+            final CheckedList root;
+            CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+            final int rootOffset;
+            return OmniArray.OfDouble.uncheckedcontains0(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
           }else if(val instanceof Long){
             final long l;
             if((l=(long)val)!=0){
               if(!TypeUtil.checkCastToDouble(l)){
                 break returnFalse;
               }
-              final int modCount=this.modCount;
-              final var root=this.root;
-              try{
-                final int rootOffset;
-                return OmniArray.OfDouble.uncheckedcontainsBits(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,Double.doubleToRawLongBits(l));
-              }finally{
-                CheckedCollection.checkModCount(modCount,root.modCount);
-              }
-            }
-            final int modCount=this.modCount;
-            final var root=this.root;
-            try{
+              final CheckedList root;
+              CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
               final int rootOffset;
-              return OmniArray.OfDouble.uncheckedcontains0(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
-            }finally{
-              CheckedCollection.checkModCount(modCount,root.modCount);
+              return OmniArray.OfDouble.uncheckedcontainsBits(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,Double.doubleToRawLongBits(l));
             }
+            final CheckedList root;
+            CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+            final int rootOffset;
+            return OmniArray.OfDouble.uncheckedcontains0(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
           }else if(val instanceof Character){
             final int i;
             if((i=(char)val)!=0){
-              final int modCount=this.modCount;
-              final var root=this.root;
-              try{
-                final int rootOffset;
-                return OmniArray.OfDouble.uncheckedcontainsBits(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,Double.doubleToRawLongBits(i));
-              }finally{
-                CheckedCollection.checkModCount(modCount,root.modCount);
-              }
-            }
-            final int modCount=this.modCount;
-            final var root=this.root;
-            try{
+              final CheckedList root;
+              CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
               final int rootOffset;
-              return OmniArray.OfDouble.uncheckedcontains0(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
-            }finally{
-              CheckedCollection.checkModCount(modCount,root.modCount);
+              return OmniArray.OfDouble.uncheckedcontainsBits(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,Double.doubleToRawLongBits(i));
             }
+            final CheckedList root;
+            CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+            final int rootOffset;
+            return OmniArray.OfDouble.uncheckedcontains0(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
           }else if(val instanceof Boolean){
             if((boolean)val){
-              final int modCount=this.modCount;
-              final var root=this.root;
-              try{
-                final int rootOffset;
-                return OmniArray.OfDouble.uncheckedcontainsBits(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,TypeUtil.DBL_TRUE_BITS);
-              }finally{
-                CheckedCollection.checkModCount(modCount,root.modCount);
-              }
-            }
-            final int modCount=this.modCount;
-            final var root=this.root;
-            try{
+              final CheckedList root;
+              CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
               final int rootOffset;
-              return OmniArray.OfDouble.uncheckedcontains0(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
-            }finally{
-              CheckedCollection.checkModCount(modCount,root.modCount);
+              return OmniArray.OfDouble.uncheckedcontainsBits(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,TypeUtil.DBL_TRUE_BITS);
             }
+            final CheckedList root;
+            CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+            final int rootOffset;
+            return OmniArray.OfDouble.uncheckedcontains0(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
           }else{
             break returnFalse;
           }
@@ -4562,23 +4484,15 @@ public abstract class DoubleArrSeq implements OmniCollection.OfDouble,Cloneable
         {
           if(val!=0)
           {
-            final int modCount=this.modCount;
-            final var root=this.root;
-            try{
-              final int rootOffset;
-              return OmniArray.OfDouble.uncheckedcontainsBits(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,Double.doubleToRawLongBits(val));
-            }finally{
-              CheckedCollection.checkModCount(modCount,root.modCount);
-            }
-          }
-          final int modCount=this.modCount;
-          final var root=this.root;
-          try{
+            final CheckedList root;
+            CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
             final int rootOffset;
-            return OmniArray.OfDouble.uncheckedcontains0(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
-          }finally{
-            CheckedCollection.checkModCount(modCount,root.modCount);
+            return OmniArray.OfDouble.uncheckedcontainsBits(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,Double.doubleToRawLongBits(val));
           }
+          final CheckedList root;
+          CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+          final int rootOffset;
+          return OmniArray.OfDouble.uncheckedcontains0(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
         }
       }
       CheckedCollection.checkModCount(modCount,root.modCount);
@@ -4593,23 +4507,15 @@ public abstract class DoubleArrSeq implements OmniCollection.OfDouble,Cloneable
         {
           if(val!=0)
           {
-            final int modCount=this.modCount;
-            final var root=this.root;
-            try{
-              final int rootOffset;
-              return OmniArray.OfDouble.uncheckedcontainsBits(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,Double.doubleToRawLongBits(val));
-            }finally{
-              CheckedCollection.checkModCount(modCount,root.modCount);
-            }
-          }
-          final int modCount=this.modCount;
-          final var root=this.root;
-          try{
+            final CheckedList root;
+            CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
             final int rootOffset;
-            return OmniArray.OfDouble.uncheckedcontains0(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
-          }finally{
-            CheckedCollection.checkModCount(modCount,root.modCount);
+            return OmniArray.OfDouble.uncheckedcontainsBits(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,Double.doubleToRawLongBits(val));
           }
+          final CheckedList root;
+          CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+          final int rootOffset;
+          return OmniArray.OfDouble.uncheckedcontains0(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
         }
       }
       CheckedCollection.checkModCount(modCount,root.modCount);
@@ -4624,23 +4530,15 @@ public abstract class DoubleArrSeq implements OmniCollection.OfDouble,Cloneable
         {
           if(val!=0)
           {
-            final int modCount=this.modCount;
-            final var root=this.root;
-            try{
-              final int rootOffset;
-              return OmniArray.OfDouble.uncheckedcontainsBits(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,Double.doubleToRawLongBits(val));
-            }finally{
-              CheckedCollection.checkModCount(modCount,root.modCount);
-            }
-          }
-          final int modCount=this.modCount;
-          final var root=this.root;
-          try{
+            final CheckedList root;
+            CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
             final int rootOffset;
-            return OmniArray.OfDouble.uncheckedcontains0(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
-          }finally{
-            CheckedCollection.checkModCount(modCount,root.modCount);
+            return OmniArray.OfDouble.uncheckedcontainsBits(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,Double.doubleToRawLongBits(val));
           }
+          final CheckedList root;
+          CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+          final int rootOffset;
+          return OmniArray.OfDouble.uncheckedcontains0(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
         }
       }
       CheckedCollection.checkModCount(modCount,root.modCount);
@@ -4737,6 +4635,7 @@ public abstract class DoubleArrSeq implements OmniCollection.OfDouble,Cloneable
     @Override
     public boolean remove(Object val)
     {
+      //TODO refactor this to reduce the calls to check mod count
       final int size;
       if((size=this.size)!=0){
        //TODO a pattern-matching switch statement would be great here
@@ -4861,21 +4760,13 @@ public abstract class DoubleArrSeq implements OmniCollection.OfDouble,Cloneable
       {
         if(val)
         {
-          final int modCount=this.modCount;
-          final var root=this.root;
-          try{
-            return OmniArray.OfDouble.uncheckedindexOfBits(root.arr,this.rootOffset,size,TypeUtil.DBL_TRUE_BITS);
-          }finally{
-            CheckedCollection.checkModCount(modCount,root.modCount);
-          }
+          final CheckedList root;
+          CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+          return OmniArray.OfDouble.uncheckedindexOfBits(root.arr,this.rootOffset,size,TypeUtil.DBL_TRUE_BITS);
         }
-        final int modCount=this.modCount;
-        final var root=this.root;
-        try{
-          return OmniArray.OfDouble.uncheckedindexOf0(root.arr,this.rootOffset,size);
-        }finally{
-          CheckedCollection.checkModCount(modCount,root.modCount);
-        }
+        final CheckedList root;
+        CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+        return OmniArray.OfDouble.uncheckedindexOf0(root.arr,this.rootOffset,size);
       }
       CheckedCollection.checkModCount(modCount,root.modCount);
       return -1;
@@ -4890,24 +4781,16 @@ public abstract class DoubleArrSeq implements OmniCollection.OfDouble,Cloneable
           if(val!=0)
           {
             {
-              final int modCount=this.modCount;
-              final var root=this.root;
-              try{
-                return OmniArray.OfDouble.uncheckedindexOfBits(root.arr,this.rootOffset,size,Double.doubleToRawLongBits(val));
-              }finally{
-                CheckedCollection.checkModCount(modCount,root.modCount);
-              }
+              final CheckedList root;
+              CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+              return OmniArray.OfDouble.uncheckedindexOfBits(root.arr,this.rootOffset,size,Double.doubleToRawLongBits(val));
             }
           }
           else
           {
-            final int modCount=this.modCount;
-            final var root=this.root;
-            try{
-              return OmniArray.OfDouble.uncheckedindexOf0(root.arr,this.rootOffset,size);
-            }finally{
-              CheckedCollection.checkModCount(modCount,root.modCount);
-            }
+            final CheckedList root;
+            CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+            return OmniArray.OfDouble.uncheckedindexOf0(root.arr,this.rootOffset,size);
           }
         }
       }
@@ -4924,24 +4807,16 @@ public abstract class DoubleArrSeq implements OmniCollection.OfDouble,Cloneable
         {
           if(TypeUtil.checkCastToDouble(val))
           {
-            final int modCount=this.modCount;
-            final var root=this.root;
-            try{
-              return OmniArray.OfDouble.uncheckedindexOfBits(root.arr,this.rootOffset,size,Double.doubleToRawLongBits(val));
-            }finally{
-              CheckedCollection.checkModCount(modCount,root.modCount);
-            }
+            final CheckedList root;
+            CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+            return OmniArray.OfDouble.uncheckedindexOfBits(root.arr,this.rootOffset,size,Double.doubleToRawLongBits(val));
           }
         }
         else
         {
-          final int modCount=this.modCount;
-          final var root=this.root;
-          try{
-            return OmniArray.OfDouble.uncheckedindexOf0(root.arr,this.rootOffset,size);
-          }finally{
-            CheckedCollection.checkModCount(modCount,root.modCount);
-          }
+          final CheckedList root;
+          CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+          return OmniArray.OfDouble.uncheckedindexOf0(root.arr,this.rootOffset,size);
         }
       }
       CheckedCollection.checkModCount(modCount,root.modCount);
@@ -4955,21 +4830,13 @@ public abstract class DoubleArrSeq implements OmniCollection.OfDouble,Cloneable
       {
         if(val==val)
         {
-          final int modCount=this.modCount;
-          final var root=this.root;
-          try{
-            return OmniArray.OfDouble.uncheckedindexOfBits(root.arr,this.rootOffset,size,Double.doubleToRawLongBits(val));
-          }finally{
-            CheckedCollection.checkModCount(modCount,root.modCount);
-          }
+          final CheckedList root;
+          CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+          return OmniArray.OfDouble.uncheckedindexOfBits(root.arr,this.rootOffset,size,Double.doubleToRawLongBits(val));
         }
-        final int modCount=this.modCount;
-        final var root=this.root;
-        try{
-          return OmniArray.OfDouble.uncheckedindexOfNaN(root.arr,this.rootOffset,size);
-        }finally{
-          CheckedCollection.checkModCount(modCount,root.modCount);
-        }
+        final CheckedList root;
+        CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+        return OmniArray.OfDouble.uncheckedindexOfNaN(root.arr,this.rootOffset,size);
       }
       CheckedCollection.checkModCount(modCount,root.modCount);
       return -1;
@@ -4982,21 +4849,13 @@ public abstract class DoubleArrSeq implements OmniCollection.OfDouble,Cloneable
       {
         if(val==val)
         {
-          final int modCount=this.modCount;
-          final var root=this.root;
-          try{
-            return OmniArray.OfDouble.uncheckedindexOfBits(root.arr,this.rootOffset,size,Double.doubleToRawLongBits(val));
-          }finally{
-            CheckedCollection.checkModCount(modCount,root.modCount);
-          }
+          final CheckedList root;
+          CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+          return OmniArray.OfDouble.uncheckedindexOfBits(root.arr,this.rootOffset,size,Double.doubleToRawLongBits(val));
         }
-        final int modCount=this.modCount;
-        final var root=this.root;
-        try{
-          return OmniArray.OfDouble.uncheckedindexOfNaN(root.arr,this.rootOffset,size);
-        }finally{
-          CheckedCollection.checkModCount(modCount,root.modCount);
-        }
+        final CheckedList root;
+        CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+        return OmniArray.OfDouble.uncheckedindexOfNaN(root.arr,this.rootOffset,size);
       }
       CheckedCollection.checkModCount(modCount,root.modCount);
       return -1;
@@ -5004,6 +4863,7 @@ public abstract class DoubleArrSeq implements OmniCollection.OfDouble,Cloneable
     @Override
     public int indexOf(Object val)
     {
+      //TODO refactor this to reduce the calls to check mod count
       final int size;
       if((size=this.size)!=0){
        //TODO a pattern-matching switch statement would be great here
@@ -5011,113 +4871,65 @@ public abstract class DoubleArrSeq implements OmniCollection.OfDouble,Cloneable
           if(val instanceof Double){
             final double d;
             if((d=(double)val)==d){
-               final int modCount=this.modCount;
-               final var root=this.root;
-               try{
-                 return OmniArray.OfDouble.uncheckedindexOfBits(root.arr,this.rootOffset,size,Double.doubleToRawLongBits(d));
-               }finally{
-                 CheckedCollection.checkModCount(modCount,root.modCount);
-               }
+               final CheckedList root;
+               CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+               return OmniArray.OfDouble.uncheckedindexOfBits(root.arr,this.rootOffset,size,Double.doubleToRawLongBits(d));
             }
-            final int modCount=this.modCount;
-            final var root=this.root;
-            try{
-              return OmniArray.OfDouble.uncheckedindexOfNaN(root.arr,this.rootOffset,size);
-            }finally{
-              CheckedCollection.checkModCount(modCount,root.modCount);
-            }
+            final CheckedList root;
+            CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+            return OmniArray.OfDouble.uncheckedindexOfNaN(root.arr,this.rootOffset,size);
           }else if(val instanceof Float){
             final float f;
             if((f=(float)val)==f){
-               final int modCount=this.modCount;
-               final var root=this.root;
-               try{
-                 return OmniArray.OfDouble.uncheckedindexOfBits(root.arr,this.rootOffset,size,Double.doubleToRawLongBits(f));
-               }finally{
-                 CheckedCollection.checkModCount(modCount,root.modCount);
-               }
+               final CheckedList root;
+               CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+               return OmniArray.OfDouble.uncheckedindexOfBits(root.arr,this.rootOffset,size,Double.doubleToRawLongBits(f));
             }
-            final int modCount=this.modCount;
-            final var root=this.root;
-            try{
-              return OmniArray.OfDouble.uncheckedindexOfNaN(root.arr,this.rootOffset,size);
-            }finally{
-              CheckedCollection.checkModCount(modCount,root.modCount);
-            }
+            final CheckedList root;
+            CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+            return OmniArray.OfDouble.uncheckedindexOfNaN(root.arr,this.rootOffset,size);
           }else if(val instanceof Integer|| val instanceof Short||val instanceof Byte){
             final int i;
             if((i=((Number)val).intValue())!=0){
-              final int modCount=this.modCount;
-              final var root=this.root;
-              try{
-                return OmniArray.OfDouble.uncheckedindexOfBits(root.arr,this.rootOffset,size,Double.doubleToRawLongBits(i));
-              }finally{
-                CheckedCollection.checkModCount(modCount,root.modCount);
-              }
+              final CheckedList root;
+              CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+              return OmniArray.OfDouble.uncheckedindexOfBits(root.arr,this.rootOffset,size,Double.doubleToRawLongBits(i));
             }
-            final int modCount=this.modCount;
-            final var root=this.root;
-            try{
-              return OmniArray.OfDouble.uncheckedindexOf0(root.arr,this.rootOffset,size);
-            }finally{
-              CheckedCollection.checkModCount(modCount,root.modCount);
-            }
+            final CheckedList root;
+            CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+            return OmniArray.OfDouble.uncheckedindexOf0(root.arr,this.rootOffset,size);
           }else if(val instanceof Long){
             final long l;
             if((l=(long)val)!=0){
               if(!TypeUtil.checkCastToDouble(l)){
                 break returnFalse;
               }
-              final int modCount=this.modCount;
-              final var root=this.root;
-              try{
-                return OmniArray.OfDouble.uncheckedindexOfBits(root.arr,this.rootOffset,size,Double.doubleToRawLongBits(l));
-              }finally{
-                CheckedCollection.checkModCount(modCount,root.modCount);
-              }
+              final CheckedList root;
+              CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+              return OmniArray.OfDouble.uncheckedindexOfBits(root.arr,this.rootOffset,size,Double.doubleToRawLongBits(l));
             }
-            final int modCount=this.modCount;
-            final var root=this.root;
-            try{
-              return OmniArray.OfDouble.uncheckedindexOf0(root.arr,this.rootOffset,size);
-            }finally{
-              CheckedCollection.checkModCount(modCount,root.modCount);
-            }
+            final CheckedList root;
+            CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+            return OmniArray.OfDouble.uncheckedindexOf0(root.arr,this.rootOffset,size);
           }else if(val instanceof Character){
             final int i;
             if((i=(char)val)!=0){
-              final int modCount=this.modCount;
-              final var root=this.root;
-              try{
-                return OmniArray.OfDouble.uncheckedindexOfBits(root.arr,this.rootOffset,size,Double.doubleToRawLongBits(i));
-              }finally{
-                CheckedCollection.checkModCount(modCount,root.modCount);
-              }
+              final CheckedList root;
+              CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+              return OmniArray.OfDouble.uncheckedindexOfBits(root.arr,this.rootOffset,size,Double.doubleToRawLongBits(i));
             }
-            final int modCount=this.modCount;
-            final var root=this.root;
-            try{
-              return OmniArray.OfDouble.uncheckedindexOf0(root.arr,this.rootOffset,size);
-            }finally{
-              CheckedCollection.checkModCount(modCount,root.modCount);
-            }
+            final CheckedList root;
+            CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+            return OmniArray.OfDouble.uncheckedindexOf0(root.arr,this.rootOffset,size);
           }else if(val instanceof Boolean){
             if((boolean)val){
-              final int modCount=this.modCount;
-              final var root=this.root;
-              try{
-                return OmniArray.OfDouble.uncheckedindexOfBits(root.arr,this.rootOffset,size,TypeUtil.DBL_TRUE_BITS);
-              }finally{
-                CheckedCollection.checkModCount(modCount,root.modCount);
-              }
+              final CheckedList root;
+              CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+              return OmniArray.OfDouble.uncheckedindexOfBits(root.arr,this.rootOffset,size,TypeUtil.DBL_TRUE_BITS);
             }
-            final int modCount=this.modCount;
-            final var root=this.root;
-            try{
-              return OmniArray.OfDouble.uncheckedindexOf0(root.arr,this.rootOffset,size);
-            }finally{
-              CheckedCollection.checkModCount(modCount,root.modCount);
-            }
+            final CheckedList root;
+            CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+            return OmniArray.OfDouble.uncheckedindexOf0(root.arr,this.rootOffset,size);
           }else{
             break returnFalse;
           }
@@ -5149,21 +4961,13 @@ public abstract class DoubleArrSeq implements OmniCollection.OfDouble,Cloneable
       {
         if(val)
         {
-          final int modCount=this.modCount;
-          final var root=this.root;
-          try{
-            return OmniArray.OfDouble.uncheckedlastIndexOfBits(root.arr,this.rootOffset,size,TypeUtil.DBL_TRUE_BITS);
-          }finally{
-            CheckedCollection.checkModCount(modCount,root.modCount);
-          }
+          final CheckedList root;
+          CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+          return OmniArray.OfDouble.uncheckedlastIndexOfBits(root.arr,this.rootOffset,size,TypeUtil.DBL_TRUE_BITS);
         }
-        final int modCount=this.modCount;
-        final var root=this.root;
-        try{
-          return OmniArray.OfDouble.uncheckedlastIndexOf0(root.arr,this.rootOffset,size);
-        }finally{
-          CheckedCollection.checkModCount(modCount,root.modCount);
-        }
+        final CheckedList root;
+        CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+        return OmniArray.OfDouble.uncheckedlastIndexOf0(root.arr,this.rootOffset,size);
       }
       CheckedCollection.checkModCount(modCount,root.modCount);
       return -1;
@@ -5178,24 +4982,16 @@ public abstract class DoubleArrSeq implements OmniCollection.OfDouble,Cloneable
           if(val!=0)
           {
             {
-              final int modCount=this.modCount;
-              final var root=this.root;
-              try{
-                return OmniArray.OfDouble.uncheckedlastIndexOfBits(root.arr,this.rootOffset,size,Double.doubleToRawLongBits(val));
-              }finally{
-                CheckedCollection.checkModCount(modCount,root.modCount);
-              }
+              final CheckedList root;
+              CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+              return OmniArray.OfDouble.uncheckedlastIndexOfBits(root.arr,this.rootOffset,size,Double.doubleToRawLongBits(val));
             }
           }
           else
           {
-            final int modCount=this.modCount;
-            final var root=this.root;
-            try{
-              return OmniArray.OfDouble.uncheckedlastIndexOf0(root.arr,this.rootOffset,size);
-            }finally{
-              CheckedCollection.checkModCount(modCount,root.modCount);
-            }
+            final CheckedList root;
+            CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+            return OmniArray.OfDouble.uncheckedlastIndexOf0(root.arr,this.rootOffset,size);
           }
         }
       }
@@ -5212,24 +5008,16 @@ public abstract class DoubleArrSeq implements OmniCollection.OfDouble,Cloneable
         {
           if(TypeUtil.checkCastToDouble(val))
           {
-            final int modCount=this.modCount;
-            final var root=this.root;
-            try{
-              return OmniArray.OfDouble.uncheckedlastIndexOfBits(root.arr,this.rootOffset,size,Double.doubleToRawLongBits(val));
-            }finally{
-              CheckedCollection.checkModCount(modCount,root.modCount);
-            }
+            final CheckedList root;
+            CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+            return OmniArray.OfDouble.uncheckedlastIndexOfBits(root.arr,this.rootOffset,size,Double.doubleToRawLongBits(val));
           }
         }
         else
         {
-          final int modCount=this.modCount;
-          final var root=this.root;
-          try{
-            return OmniArray.OfDouble.uncheckedlastIndexOf0(root.arr,this.rootOffset,size);
-          }finally{
-            CheckedCollection.checkModCount(modCount,root.modCount);
-          }
+          final CheckedList root;
+          CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+          return OmniArray.OfDouble.uncheckedlastIndexOf0(root.arr,this.rootOffset,size);
         }
       }
       CheckedCollection.checkModCount(modCount,root.modCount);
@@ -5243,21 +5031,13 @@ public abstract class DoubleArrSeq implements OmniCollection.OfDouble,Cloneable
       {
         if(val==val)
         {
-          final int modCount=this.modCount;
-          final var root=this.root;
-          try{
-            return OmniArray.OfDouble.uncheckedlastIndexOfBits(root.arr,this.rootOffset,size,Double.doubleToRawLongBits(val));
-          }finally{
-            CheckedCollection.checkModCount(modCount,root.modCount);
-          }
+          final CheckedList root;
+          CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+          return OmniArray.OfDouble.uncheckedlastIndexOfBits(root.arr,this.rootOffset,size,Double.doubleToRawLongBits(val));
         }
-        final int modCount=this.modCount;
-        final var root=this.root;
-        try{
-          return OmniArray.OfDouble.uncheckedlastIndexOfNaN(root.arr,this.rootOffset,size);
-        }finally{
-          CheckedCollection.checkModCount(modCount,root.modCount);
-        }
+        final CheckedList root;
+        CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+        return OmniArray.OfDouble.uncheckedlastIndexOfNaN(root.arr,this.rootOffset,size);
       }
       CheckedCollection.checkModCount(modCount,root.modCount);
       return -1;
@@ -5270,21 +5050,13 @@ public abstract class DoubleArrSeq implements OmniCollection.OfDouble,Cloneable
       {
         if(val==val)
         {
-          final int modCount=this.modCount;
-          final var root=this.root;
-          try{
-            return OmniArray.OfDouble.uncheckedlastIndexOfBits(root.arr,this.rootOffset,size,Double.doubleToRawLongBits(val));
-          }finally{
-            CheckedCollection.checkModCount(modCount,root.modCount);
-          }
+          final CheckedList root;
+          CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+          return OmniArray.OfDouble.uncheckedlastIndexOfBits(root.arr,this.rootOffset,size,Double.doubleToRawLongBits(val));
         }
-        final int modCount=this.modCount;
-        final var root=this.root;
-        try{
-          return OmniArray.OfDouble.uncheckedlastIndexOfNaN(root.arr,this.rootOffset,size);
-        }finally{
-          CheckedCollection.checkModCount(modCount,root.modCount);
-        }
+        final CheckedList root;
+        CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+        return OmniArray.OfDouble.uncheckedlastIndexOfNaN(root.arr,this.rootOffset,size);
       }
       CheckedCollection.checkModCount(modCount,root.modCount);
       return -1;
@@ -5292,6 +5064,7 @@ public abstract class DoubleArrSeq implements OmniCollection.OfDouble,Cloneable
     @Override
     public int lastIndexOf(Object val)
     {
+      //TODO refactor this to reduce the calls to check mod count
       final int size;
       if((size=this.size)!=0){
        //TODO a pattern-matching switch statement would be great here
@@ -5299,113 +5072,65 @@ public abstract class DoubleArrSeq implements OmniCollection.OfDouble,Cloneable
           if(val instanceof Double){
             final double d;
             if((d=(double)val)==d){
-               final int modCount=this.modCount;
-               final var root=this.root;
-               try{
-                 return OmniArray.OfDouble.uncheckedlastIndexOfBits(root.arr,this.rootOffset,size,Double.doubleToRawLongBits(d));
-               }finally{
-                 CheckedCollection.checkModCount(modCount,root.modCount);
-               }
+               final CheckedList root;
+               CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+               return OmniArray.OfDouble.uncheckedlastIndexOfBits(root.arr,this.rootOffset,size,Double.doubleToRawLongBits(d));
             }
-            final int modCount=this.modCount;
-            final var root=this.root;
-            try{
-              return OmniArray.OfDouble.uncheckedlastIndexOfNaN(root.arr,this.rootOffset,size);
-            }finally{
-              CheckedCollection.checkModCount(modCount,root.modCount);
-            }
+            final CheckedList root;
+            CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+            return OmniArray.OfDouble.uncheckedlastIndexOfNaN(root.arr,this.rootOffset,size);
           }else if(val instanceof Float){
             final float f;
             if((f=(float)val)==f){
-               final int modCount=this.modCount;
-               final var root=this.root;
-               try{
-                 return OmniArray.OfDouble.uncheckedlastIndexOfBits(root.arr,this.rootOffset,size,Double.doubleToRawLongBits(f));
-               }finally{
-                 CheckedCollection.checkModCount(modCount,root.modCount);
-               }
+               final CheckedList root;
+               CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+               return OmniArray.OfDouble.uncheckedlastIndexOfBits(root.arr,this.rootOffset,size,Double.doubleToRawLongBits(f));
             }
-            final int modCount=this.modCount;
-            final var root=this.root;
-            try{
-              return OmniArray.OfDouble.uncheckedlastIndexOfNaN(root.arr,this.rootOffset,size);
-            }finally{
-              CheckedCollection.checkModCount(modCount,root.modCount);
-            }
+            final CheckedList root;
+            CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+            return OmniArray.OfDouble.uncheckedlastIndexOfNaN(root.arr,this.rootOffset,size);
           }else if(val instanceof Integer|| val instanceof Short||val instanceof Byte){
             final int i;
             if((i=((Number)val).intValue())!=0){
-              final int modCount=this.modCount;
-              final var root=this.root;
-              try{
-                return OmniArray.OfDouble.uncheckedlastIndexOfBits(root.arr,this.rootOffset,size,Double.doubleToRawLongBits(i));
-              }finally{
-                CheckedCollection.checkModCount(modCount,root.modCount);
-              }
+              final CheckedList root;
+              CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+              return OmniArray.OfDouble.uncheckedlastIndexOfBits(root.arr,this.rootOffset,size,Double.doubleToRawLongBits(i));
             }
-            final int modCount=this.modCount;
-            final var root=this.root;
-            try{
-              return OmniArray.OfDouble.uncheckedlastIndexOf0(root.arr,this.rootOffset,size);
-            }finally{
-              CheckedCollection.checkModCount(modCount,root.modCount);
-            }
+            final CheckedList root;
+            CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+            return OmniArray.OfDouble.uncheckedlastIndexOf0(root.arr,this.rootOffset,size);
           }else if(val instanceof Long){
             final long l;
             if((l=(long)val)!=0){
               if(!TypeUtil.checkCastToDouble(l)){
                 break returnFalse;
               }
-              final int modCount=this.modCount;
-              final var root=this.root;
-              try{
-                return OmniArray.OfDouble.uncheckedlastIndexOfBits(root.arr,this.rootOffset,size,Double.doubleToRawLongBits(l));
-              }finally{
-                CheckedCollection.checkModCount(modCount,root.modCount);
-              }
+              final CheckedList root;
+              CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+              return OmniArray.OfDouble.uncheckedlastIndexOfBits(root.arr,this.rootOffset,size,Double.doubleToRawLongBits(l));
             }
-            final int modCount=this.modCount;
-            final var root=this.root;
-            try{
-              return OmniArray.OfDouble.uncheckedlastIndexOf0(root.arr,this.rootOffset,size);
-            }finally{
-              CheckedCollection.checkModCount(modCount,root.modCount);
-            }
+            final CheckedList root;
+            CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+            return OmniArray.OfDouble.uncheckedlastIndexOf0(root.arr,this.rootOffset,size);
           }else if(val instanceof Character){
             final int i;
             if((i=(char)val)!=0){
-              final int modCount=this.modCount;
-              final var root=this.root;
-              try{
-                return OmniArray.OfDouble.uncheckedlastIndexOfBits(root.arr,this.rootOffset,size,Double.doubleToRawLongBits(i));
-              }finally{
-                CheckedCollection.checkModCount(modCount,root.modCount);
-              }
+              final CheckedList root;
+              CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+              return OmniArray.OfDouble.uncheckedlastIndexOfBits(root.arr,this.rootOffset,size,Double.doubleToRawLongBits(i));
             }
-            final int modCount=this.modCount;
-            final var root=this.root;
-            try{
-              return OmniArray.OfDouble.uncheckedlastIndexOf0(root.arr,this.rootOffset,size);
-            }finally{
-              CheckedCollection.checkModCount(modCount,root.modCount);
-            }
+            final CheckedList root;
+            CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+            return OmniArray.OfDouble.uncheckedlastIndexOf0(root.arr,this.rootOffset,size);
           }else if(val instanceof Boolean){
             if((boolean)val){
-              final int modCount=this.modCount;
-              final var root=this.root;
-              try{
-                return OmniArray.OfDouble.uncheckedlastIndexOfBits(root.arr,this.rootOffset,size,TypeUtil.DBL_TRUE_BITS);
-              }finally{
-                CheckedCollection.checkModCount(modCount,root.modCount);
-              }
+              final CheckedList root;
+              CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+              return OmniArray.OfDouble.uncheckedlastIndexOfBits(root.arr,this.rootOffset,size,TypeUtil.DBL_TRUE_BITS);
             }
-            final int modCount=this.modCount;
-            final var root=this.root;
-            try{
-              return OmniArray.OfDouble.uncheckedlastIndexOf0(root.arr,this.rootOffset,size);
-            }finally{
-              CheckedCollection.checkModCount(modCount,root.modCount);
-            }
+            final CheckedList root;
+            CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+            return OmniArray.OfDouble.uncheckedlastIndexOf0(root.arr,this.rootOffset,size);
           }else{
             break returnFalse;
           }

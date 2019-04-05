@@ -194,6 +194,7 @@ public abstract class FloatArrSeq implements OmniCollection.OfFloat,Cloneable
   @Override
   public boolean contains(Object val)
   {
+    //TODO refactor this to reduce the calls to check mod count
     final int size;
     if((size=this.size)!=0){
      //TODO a pattern-matching switch statement would be great here
@@ -410,6 +411,7 @@ public abstract class FloatArrSeq implements OmniCollection.OfFloat,Cloneable
   @Override
   public boolean remove(Object val)
   {
+    //TODO refactor this to reduce the calls to check mod count
     final int size;
     if((size=this.size)!=0){
      //TODO a pattern-matching switch statement would be great here
@@ -978,6 +980,7 @@ public abstract class FloatArrSeq implements OmniCollection.OfFloat,Cloneable
     @Override
     public int search(Object val)
     {
+      //TODO refactor this to reduce the calls to check mod count
       final int size;
       if((size=this.size)!=0){
        //TODO a pattern-matching switch statement would be great here
@@ -1454,6 +1457,7 @@ public abstract class FloatArrSeq implements OmniCollection.OfFloat,Cloneable
     @Override
     public int indexOf(Object val)
     {
+      //TODO refactor this to reduce the calls to check mod count
       final int size;
       if((size=this.size)!=0){
        //TODO a pattern-matching switch statement would be great here
@@ -1654,6 +1658,7 @@ public abstract class FloatArrSeq implements OmniCollection.OfFloat,Cloneable
     @Override
     public int lastIndexOf(Object val)
     {
+      //TODO refactor this to reduce the calls to check mod count
       final int size;
       if((size=this.size)!=0){
        //TODO a pattern-matching switch statement would be great here
@@ -2368,6 +2373,7 @@ public abstract class FloatArrSeq implements OmniCollection.OfFloat,Cloneable
     @Override
     public boolean contains(Object val)
     {
+      //TODO refactor this to reduce the calls to check mod count
       final int size;
       if((size=this.size)!=0){
        //TODO a pattern-matching switch statement would be great here
@@ -2604,6 +2610,7 @@ public abstract class FloatArrSeq implements OmniCollection.OfFloat,Cloneable
     @Override
     public boolean remove(Object val)
     {
+      //TODO refactor this to reduce the calls to check mod count
       final int size;
       if((size=this.size)!=0){
        //TODO a pattern-matching switch statement would be great here
@@ -2820,6 +2827,7 @@ public abstract class FloatArrSeq implements OmniCollection.OfFloat,Cloneable
     @Override
     public int indexOf(Object val)
     {
+      //TODO refactor this to reduce the calls to check mod count
       final int size;
       if((size=this.size)!=0){
        //TODO a pattern-matching switch statement would be great here
@@ -3020,6 +3028,7 @@ public abstract class FloatArrSeq implements OmniCollection.OfFloat,Cloneable
     @Override
     public int lastIndexOf(Object val)
     {
+      //TODO refactor this to reduce the calls to check mod count
       final int size;
       if((size=this.size)!=0){
        //TODO a pattern-matching switch statement would be great here
@@ -4675,23 +4684,15 @@ public abstract class FloatArrSeq implements OmniCollection.OfFloat,Cloneable
       {
         if(val)
         {
-          final int modCount=this.modCount;
-          final var root=this.root;
-          try{
-            final int rootOffset;
-            return OmniArray.OfFloat.uncheckedcontainsBits(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,TypeUtil.FLT_TRUE_BITS);
-          }finally{
-            CheckedCollection.checkModCount(modCount,root.modCount);
-          }
-        }
-        final int modCount=this.modCount;
-        final var root=this.root;
-        try{
+          final CheckedList root;
+          CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
           final int rootOffset;
-          return OmniArray.OfFloat.uncheckedcontains0(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
-        }finally{
-          CheckedCollection.checkModCount(modCount,root.modCount);
+          return OmniArray.OfFloat.uncheckedcontainsBits(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,TypeUtil.FLT_TRUE_BITS);
         }
+        final CheckedList root;
+        CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+        final int rootOffset;
+        return OmniArray.OfFloat.uncheckedcontains0(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
       }
       CheckedCollection.checkModCount(modCount,root.modCount);
       return false;
@@ -4707,26 +4708,18 @@ public abstract class FloatArrSeq implements OmniCollection.OfFloat,Cloneable
           {
             if(TypeUtil.checkCastToFloat(val))
             {
-              final int modCount=this.modCount;
-              final var root=this.root;
-              try{
-                final int rootOffset;
-                return OmniArray.OfFloat.uncheckedcontainsBits(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,Float.floatToRawIntBits(val));
-              }finally{
-                CheckedCollection.checkModCount(modCount,root.modCount);
-              }
+              final CheckedList root;
+              CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+              final int rootOffset;
+              return OmniArray.OfFloat.uncheckedcontainsBits(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,Float.floatToRawIntBits(val));
             }
           }
           else
           {
-            final int modCount=this.modCount;
-            final var root=this.root;
-            try{
-              final int rootOffset;
-              return OmniArray.OfFloat.uncheckedcontains0(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
-            }finally{
-              CheckedCollection.checkModCount(modCount,root.modCount);
-            }
+            final CheckedList root;
+            CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+            final int rootOffset;
+            return OmniArray.OfFloat.uncheckedcontains0(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
           }
         }
       }
@@ -4743,26 +4736,18 @@ public abstract class FloatArrSeq implements OmniCollection.OfFloat,Cloneable
         {
           if(TypeUtil.checkCastToFloat(val))
           {
-            final int modCount=this.modCount;
-            final var root=this.root;
-            try{
-              final int rootOffset;
-              return OmniArray.OfFloat.uncheckedcontainsBits(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,Float.floatToRawIntBits(val));
-            }finally{
-              CheckedCollection.checkModCount(modCount,root.modCount);
-            }
+            final CheckedList root;
+            CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+            final int rootOffset;
+            return OmniArray.OfFloat.uncheckedcontainsBits(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,Float.floatToRawIntBits(val));
           }
         }
         else
         {
-          final int modCount=this.modCount;
-          final var root=this.root;
-          try{
-            final int rootOffset;
-            return OmniArray.OfFloat.uncheckedcontains0(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
-          }finally{
-            CheckedCollection.checkModCount(modCount,root.modCount);
-          }
+          final CheckedList root;
+          CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+          final int rootOffset;
+          return OmniArray.OfFloat.uncheckedcontains0(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
         }
       }
       CheckedCollection.checkModCount(modCount,root.modCount);
@@ -4776,23 +4761,15 @@ public abstract class FloatArrSeq implements OmniCollection.OfFloat,Cloneable
       {
         if(val==val)
         {
-          final int modCount=this.modCount;
-          final var root=this.root;
-          try{
-            final int rootOffset;
-            return OmniArray.OfFloat.uncheckedcontainsBits(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,Float.floatToRawIntBits(val));
-          }finally{
-            CheckedCollection.checkModCount(modCount,root.modCount);
-          }
-        }
-        final int modCount=this.modCount;
-        final var root=this.root;
-        try{
+          final CheckedList root;
+          CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
           final int rootOffset;
-          return OmniArray.OfFloat.uncheckedcontainsNaN(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
-        }finally{
-          CheckedCollection.checkModCount(modCount,root.modCount);
+          return OmniArray.OfFloat.uncheckedcontainsBits(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,Float.floatToRawIntBits(val));
         }
+        final CheckedList root;
+        CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+        final int rootOffset;
+        return OmniArray.OfFloat.uncheckedcontainsNaN(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
       }
       CheckedCollection.checkModCount(modCount,root.modCount);
       return false;
@@ -4806,25 +4783,17 @@ public abstract class FloatArrSeq implements OmniCollection.OfFloat,Cloneable
         final float v;
         if(val==(v=(float)val))
         {
-          final int modCount=this.modCount;
-          final var root=this.root;
-          try{
-            final int rootOffset;
-            return OmniArray.OfFloat.uncheckedcontainsBits(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,Float.floatToRawIntBits(v));
-          }finally{
-            CheckedCollection.checkModCount(modCount,root.modCount);
-          }
+          final CheckedList root;
+          CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+          final int rootOffset;
+          return OmniArray.OfFloat.uncheckedcontainsBits(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,Float.floatToRawIntBits(v));
         }
         else if(v!=v)
         {
-          final int modCount=this.modCount;
-          final var root=this.root;
-          try{
-            final int rootOffset;
-            return OmniArray.OfFloat.uncheckedcontainsNaN(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
-          }finally{
-            CheckedCollection.checkModCount(modCount,root.modCount);
-          }
+          final CheckedList root;
+          CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+          final int rootOffset;
+          return OmniArray.OfFloat.uncheckedcontainsNaN(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
         }
       }
       CheckedCollection.checkModCount(modCount,root.modCount);
@@ -4833,6 +4802,7 @@ public abstract class FloatArrSeq implements OmniCollection.OfFloat,Cloneable
     @Override
     public boolean contains(Object val)
     {
+      //TODO refactor this to reduce the calls to check mod count
       final int size;
       if((size=this.size)!=0){
        //TODO a pattern-matching switch statement would be great here
@@ -4840,44 +4810,28 @@ public abstract class FloatArrSeq implements OmniCollection.OfFloat,Cloneable
           if(val instanceof Float){
             final float f;
             if((f=(float)val)==f){
-               final int modCount=this.modCount;
-               final var root=this.root;
-               try{
-                 final int rootOffset;
-                 return OmniArray.OfFloat.uncheckedcontainsBits(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,Float.floatToRawIntBits(f));
-               }finally{
-                 CheckedCollection.checkModCount(modCount,root.modCount);
-               }
+               final CheckedList root;
+               CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+               final int rootOffset;
+               return OmniArray.OfFloat.uncheckedcontainsBits(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,Float.floatToRawIntBits(f));
             }
-            final int modCount=this.modCount;
-            final var root=this.root;
-            try{
-              final int rootOffset;
-              return OmniArray.OfFloat.uncheckedcontainsNaN(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
-            }finally{
-              CheckedCollection.checkModCount(modCount,root.modCount);
-            }
+            final CheckedList root;
+            CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+            final int rootOffset;
+            return OmniArray.OfFloat.uncheckedcontainsNaN(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
           }else if(val instanceof Double){
             final double d;
             final float f;
             if((d=(double)val)==(f=(float)d)){
-              final int modCount=this.modCount;
-              final var root=this.root;
-              try{
-                final int rootOffset;
-                return OmniArray.OfFloat.uncheckedcontainsBits(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,Float.floatToRawIntBits(f));
-              }finally{
-                CheckedCollection.checkModCount(modCount,root.modCount);
-              }
+              final CheckedList root;
+              CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+              final int rootOffset;
+              return OmniArray.OfFloat.uncheckedcontainsBits(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,Float.floatToRawIntBits(f));
             }else if(f!=f){
-              final int modCount=this.modCount;
-              final var root=this.root;
-              try{
-                final int rootOffset;
-                return OmniArray.OfFloat.uncheckedcontainsNaN(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
-              }finally{
-                CheckedCollection.checkModCount(modCount,root.modCount);
-              }
+              final CheckedList root;
+              CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+              final int rootOffset;
+              return OmniArray.OfFloat.uncheckedcontainsNaN(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
             }else{
               break returnFalse;
             }
@@ -4887,105 +4841,65 @@ public abstract class FloatArrSeq implements OmniCollection.OfFloat,Cloneable
               if(!TypeUtil.checkCastToFloat(i)){
                 break returnFalse;
               }
-              final int modCount=this.modCount;
-              final var root=this.root;
-              try{
-                final int rootOffset;
-                return OmniArray.OfFloat.uncheckedcontainsBits(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,Float.floatToRawIntBits(i));
-              }finally{
-                CheckedCollection.checkModCount(modCount,root.modCount);
-              }
-            }
-            final int modCount=this.modCount;
-            final var root=this.root;
-            try{
+              final CheckedList root;
+              CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
               final int rootOffset;
-              return OmniArray.OfFloat.uncheckedcontains0(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
-            }finally{
-              CheckedCollection.checkModCount(modCount,root.modCount);
+              return OmniArray.OfFloat.uncheckedcontainsBits(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,Float.floatToRawIntBits(i));
             }
+            final CheckedList root;
+            CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+            final int rootOffset;
+            return OmniArray.OfFloat.uncheckedcontains0(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
           }else if(val instanceof Long){
             final long l;
             if((l=(long)val)!=0){
               if(!TypeUtil.checkCastToFloat(l)){
                 break returnFalse;
               }
-              final int modCount=this.modCount;
-              final var root=this.root;
-              try{
-                final int rootOffset;
-                return OmniArray.OfFloat.uncheckedcontainsBits(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,Float.floatToRawIntBits(l));
-              }finally{
-                CheckedCollection.checkModCount(modCount,root.modCount);
-              }
-            }
-            final int modCount=this.modCount;
-            final var root=this.root;
-            try{
+              final CheckedList root;
+              CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
               final int rootOffset;
-              return OmniArray.OfFloat.uncheckedcontains0(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
-            }finally{
-              CheckedCollection.checkModCount(modCount,root.modCount);
+              return OmniArray.OfFloat.uncheckedcontainsBits(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,Float.floatToRawIntBits(l));
             }
+            final CheckedList root;
+            CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+            final int rootOffset;
+            return OmniArray.OfFloat.uncheckedcontains0(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
           }else if(val instanceof Short||val instanceof Byte){
             final int i;
             if((i=((Number)val).shortValue())!=0){
-              final int modCount=this.modCount;
-              final var root=this.root;
-              try{
-                final int rootOffset;
-                return OmniArray.OfFloat.uncheckedcontainsBits(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,Float.floatToRawIntBits(i));
-              }finally{
-                CheckedCollection.checkModCount(modCount,root.modCount);
-              }
-            }
-            final int modCount=this.modCount;
-            final var root=this.root;
-            try{
+              final CheckedList root;
+              CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
               final int rootOffset;
-              return OmniArray.OfFloat.uncheckedcontains0(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
-            }finally{
-              CheckedCollection.checkModCount(modCount,root.modCount);
+              return OmniArray.OfFloat.uncheckedcontainsBits(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,Float.floatToRawIntBits(i));
             }
+            final CheckedList root;
+            CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+            final int rootOffset;
+            return OmniArray.OfFloat.uncheckedcontains0(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
           }else if(val instanceof Character){
             final int i;
             if((i=(char)val)!=0){
-              final int modCount=this.modCount;
-              final var root=this.root;
-              try{
-                final int rootOffset;
-                return OmniArray.OfFloat.uncheckedcontainsBits(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,Float.floatToRawIntBits(i));
-              }finally{
-                CheckedCollection.checkModCount(modCount,root.modCount);
-              }
-            }
-            final int modCount=this.modCount;
-            final var root=this.root;
-            try{
+              final CheckedList root;
+              CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
               final int rootOffset;
-              return OmniArray.OfFloat.uncheckedcontains0(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
-            }finally{
-              CheckedCollection.checkModCount(modCount,root.modCount);
+              return OmniArray.OfFloat.uncheckedcontainsBits(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,Float.floatToRawIntBits(i));
             }
+            final CheckedList root;
+            CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+            final int rootOffset;
+            return OmniArray.OfFloat.uncheckedcontains0(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
           }else if(val instanceof Boolean){
             if((boolean)val){
-              final int modCount=this.modCount;
-              final var root=this.root;
-              try{
-                final int rootOffset;
-                return OmniArray.OfFloat.uncheckedcontainsBits(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,TypeUtil.FLT_TRUE_BITS);
-              }finally{
-                CheckedCollection.checkModCount(modCount,root.modCount);
-              }
-            }
-            final int modCount=this.modCount;
-            final var root=this.root;
-            try{
+              final CheckedList root;
+              CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
               final int rootOffset;
-              return OmniArray.OfFloat.uncheckedcontains0(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
-            }finally{
-              CheckedCollection.checkModCount(modCount,root.modCount);
+              return OmniArray.OfFloat.uncheckedcontainsBits(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,TypeUtil.FLT_TRUE_BITS);
             }
+            final CheckedList root;
+            CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+            final int rootOffset;
+            return OmniArray.OfFloat.uncheckedcontains0(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
           }else{
             break returnFalse;
           }
@@ -5018,23 +4932,15 @@ public abstract class FloatArrSeq implements OmniCollection.OfFloat,Cloneable
         {
           if(val!=0)
           {
-            final int modCount=this.modCount;
-            final var root=this.root;
-            try{
-              final int rootOffset;
-              return OmniArray.OfFloat.uncheckedcontainsBits(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,Float.floatToRawIntBits(val));
-            }finally{
-              CheckedCollection.checkModCount(modCount,root.modCount);
-            }
-          }
-          final int modCount=this.modCount;
-          final var root=this.root;
-          try{
+            final CheckedList root;
+            CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
             final int rootOffset;
-            return OmniArray.OfFloat.uncheckedcontains0(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
-          }finally{
-            CheckedCollection.checkModCount(modCount,root.modCount);
+            return OmniArray.OfFloat.uncheckedcontainsBits(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,Float.floatToRawIntBits(val));
           }
+          final CheckedList root;
+          CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+          final int rootOffset;
+          return OmniArray.OfFloat.uncheckedcontains0(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
         }
       }
       CheckedCollection.checkModCount(modCount,root.modCount);
@@ -5049,23 +4955,15 @@ public abstract class FloatArrSeq implements OmniCollection.OfFloat,Cloneable
         {
           if(val!=0)
           {
-            final int modCount=this.modCount;
-            final var root=this.root;
-            try{
-              final int rootOffset;
-              return OmniArray.OfFloat.uncheckedcontainsBits(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,Float.floatToRawIntBits(val));
-            }finally{
-              CheckedCollection.checkModCount(modCount,root.modCount);
-            }
-          }
-          final int modCount=this.modCount;
-          final var root=this.root;
-          try{
+            final CheckedList root;
+            CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
             final int rootOffset;
-            return OmniArray.OfFloat.uncheckedcontains0(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
-          }finally{
-            CheckedCollection.checkModCount(modCount,root.modCount);
+            return OmniArray.OfFloat.uncheckedcontainsBits(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,Float.floatToRawIntBits(val));
           }
+          final CheckedList root;
+          CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+          final int rootOffset;
+          return OmniArray.OfFloat.uncheckedcontains0(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
         }
       }
       CheckedCollection.checkModCount(modCount,root.modCount);
@@ -5080,23 +4978,15 @@ public abstract class FloatArrSeq implements OmniCollection.OfFloat,Cloneable
         {
           if(val!=0)
           {
-            final int modCount=this.modCount;
-            final var root=this.root;
-            try{
-              final int rootOffset;
-              return OmniArray.OfFloat.uncheckedcontainsBits(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,Float.floatToRawIntBits(val));
-            }finally{
-              CheckedCollection.checkModCount(modCount,root.modCount);
-            }
-          }
-          final int modCount=this.modCount;
-          final var root=this.root;
-          try{
+            final CheckedList root;
+            CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
             final int rootOffset;
-            return OmniArray.OfFloat.uncheckedcontains0(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
-          }finally{
-            CheckedCollection.checkModCount(modCount,root.modCount);
+            return OmniArray.OfFloat.uncheckedcontainsBits(root.arr,rootOffset=this.rootOffset,rootOffset+size-1,Float.floatToRawIntBits(val));
           }
+          final CheckedList root;
+          CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+          final int rootOffset;
+          return OmniArray.OfFloat.uncheckedcontains0(root.arr,rootOffset=this.rootOffset,rootOffset+size-1);
         }
       }
       CheckedCollection.checkModCount(modCount,root.modCount);
@@ -5198,6 +5088,7 @@ public abstract class FloatArrSeq implements OmniCollection.OfFloat,Cloneable
     @Override
     public boolean remove(Object val)
     {
+      //TODO refactor this to reduce the calls to check mod count
       final int size;
       if((size=this.size)!=0){
        //TODO a pattern-matching switch statement would be great here
@@ -5335,21 +5226,13 @@ public abstract class FloatArrSeq implements OmniCollection.OfFloat,Cloneable
       {
         if(val)
         {
-          final int modCount=this.modCount;
-          final var root=this.root;
-          try{
-            return OmniArray.OfFloat.uncheckedindexOfBits(root.arr,this.rootOffset,size,TypeUtil.FLT_TRUE_BITS);
-          }finally{
-            CheckedCollection.checkModCount(modCount,root.modCount);
-          }
+          final CheckedList root;
+          CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+          return OmniArray.OfFloat.uncheckedindexOfBits(root.arr,this.rootOffset,size,TypeUtil.FLT_TRUE_BITS);
         }
-        final int modCount=this.modCount;
-        final var root=this.root;
-        try{
-          return OmniArray.OfFloat.uncheckedindexOf0(root.arr,this.rootOffset,size);
-        }finally{
-          CheckedCollection.checkModCount(modCount,root.modCount);
-        }
+        final CheckedList root;
+        CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+        return OmniArray.OfFloat.uncheckedindexOf0(root.arr,this.rootOffset,size);
       }
       CheckedCollection.checkModCount(modCount,root.modCount);
       return -1;
@@ -5365,24 +5248,16 @@ public abstract class FloatArrSeq implements OmniCollection.OfFloat,Cloneable
           {
             if(TypeUtil.checkCastToFloat(val))
             {
-              final int modCount=this.modCount;
-              final var root=this.root;
-              try{
-                return OmniArray.OfFloat.uncheckedindexOfBits(root.arr,this.rootOffset,size,Float.floatToRawIntBits(val));
-              }finally{
-                CheckedCollection.checkModCount(modCount,root.modCount);
-              }
+              final CheckedList root;
+              CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+              return OmniArray.OfFloat.uncheckedindexOfBits(root.arr,this.rootOffset,size,Float.floatToRawIntBits(val));
             }
           }
           else
           {
-            final int modCount=this.modCount;
-            final var root=this.root;
-            try{
-              return OmniArray.OfFloat.uncheckedindexOf0(root.arr,this.rootOffset,size);
-            }finally{
-              CheckedCollection.checkModCount(modCount,root.modCount);
-            }
+            final CheckedList root;
+            CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+            return OmniArray.OfFloat.uncheckedindexOf0(root.arr,this.rootOffset,size);
           }
         }
       }
@@ -5399,24 +5274,16 @@ public abstract class FloatArrSeq implements OmniCollection.OfFloat,Cloneable
         {
           if(TypeUtil.checkCastToFloat(val))
           {
-            final int modCount=this.modCount;
-            final var root=this.root;
-            try{
-              return OmniArray.OfFloat.uncheckedindexOfBits(root.arr,this.rootOffset,size,Float.floatToRawIntBits(val));
-            }finally{
-              CheckedCollection.checkModCount(modCount,root.modCount);
-            }
+            final CheckedList root;
+            CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+            return OmniArray.OfFloat.uncheckedindexOfBits(root.arr,this.rootOffset,size,Float.floatToRawIntBits(val));
           }
         }
         else
         {
-          final int modCount=this.modCount;
-          final var root=this.root;
-          try{
-            return OmniArray.OfFloat.uncheckedindexOf0(root.arr,this.rootOffset,size);
-          }finally{
-            CheckedCollection.checkModCount(modCount,root.modCount);
-          }
+          final CheckedList root;
+          CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+          return OmniArray.OfFloat.uncheckedindexOf0(root.arr,this.rootOffset,size);
         }
       }
       CheckedCollection.checkModCount(modCount,root.modCount);
@@ -5430,21 +5297,13 @@ public abstract class FloatArrSeq implements OmniCollection.OfFloat,Cloneable
       {
         if(val==val)
         {
-          final int modCount=this.modCount;
-          final var root=this.root;
-          try{
-            return OmniArray.OfFloat.uncheckedindexOfBits(root.arr,this.rootOffset,size,Float.floatToRawIntBits(val));
-          }finally{
-            CheckedCollection.checkModCount(modCount,root.modCount);
-          }
+          final CheckedList root;
+          CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+          return OmniArray.OfFloat.uncheckedindexOfBits(root.arr,this.rootOffset,size,Float.floatToRawIntBits(val));
         }
-        final int modCount=this.modCount;
-        final var root=this.root;
-        try{
-          return OmniArray.OfFloat.uncheckedindexOfNaN(root.arr,this.rootOffset,size);
-        }finally{
-          CheckedCollection.checkModCount(modCount,root.modCount);
-        }
+        final CheckedList root;
+        CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+        return OmniArray.OfFloat.uncheckedindexOfNaN(root.arr,this.rootOffset,size);
       }
       CheckedCollection.checkModCount(modCount,root.modCount);
       return -1;
@@ -5458,23 +5317,15 @@ public abstract class FloatArrSeq implements OmniCollection.OfFloat,Cloneable
         final float v;
         if(val==(v=(float)val))
         {
-          final int modCount=this.modCount;
-          final var root=this.root;
-          try{
-            return OmniArray.OfFloat.uncheckedindexOfBits(root.arr,this.rootOffset,size,Float.floatToRawIntBits(v));
-          }finally{
-            CheckedCollection.checkModCount(modCount,root.modCount);
-          }
+          final CheckedList root;
+          CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+          return OmniArray.OfFloat.uncheckedindexOfBits(root.arr,this.rootOffset,size,Float.floatToRawIntBits(v));
         }
         else if(v!=v)
         {
-          final int modCount=this.modCount;
-          final var root=this.root;
-          try{
-            return OmniArray.OfFloat.uncheckedindexOfNaN(root.arr,this.rootOffset,size);
-          }finally{
-            CheckedCollection.checkModCount(modCount,root.modCount);
-          }
+          final CheckedList root;
+          CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+          return OmniArray.OfFloat.uncheckedindexOfNaN(root.arr,this.rootOffset,size);
         }
       }
       CheckedCollection.checkModCount(modCount,root.modCount);
@@ -5483,6 +5334,7 @@ public abstract class FloatArrSeq implements OmniCollection.OfFloat,Cloneable
     @Override
     public int indexOf(Object val)
     {
+      //TODO refactor this to reduce the calls to check mod count
       final int size;
       if((size=this.size)!=0){
        //TODO a pattern-matching switch statement would be great here
@@ -5490,40 +5342,24 @@ public abstract class FloatArrSeq implements OmniCollection.OfFloat,Cloneable
           if(val instanceof Float){
             final float f;
             if((f=(float)val)==f){
-               final int modCount=this.modCount;
-               final var root=this.root;
-               try{
-                 return OmniArray.OfFloat.uncheckedindexOfBits(root.arr,this.rootOffset,size,Float.floatToRawIntBits(f));
-               }finally{
-                 CheckedCollection.checkModCount(modCount,root.modCount);
-               }
+               final CheckedList root;
+               CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+               return OmniArray.OfFloat.uncheckedindexOfBits(root.arr,this.rootOffset,size,Float.floatToRawIntBits(f));
             }
-            final int modCount=this.modCount;
-            final var root=this.root;
-            try{
-              return OmniArray.OfFloat.uncheckedindexOfNaN(root.arr,this.rootOffset,size);
-            }finally{
-              CheckedCollection.checkModCount(modCount,root.modCount);
-            }
+            final CheckedList root;
+            CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+            return OmniArray.OfFloat.uncheckedindexOfNaN(root.arr,this.rootOffset,size);
           }else if(val instanceof Double){
             final double d;
             final float f;
             if((d=(double)val)==(f=(float)d)){
-              final int modCount=this.modCount;
-              final var root=this.root;
-              try{
-                return OmniArray.OfFloat.uncheckedindexOfBits(root.arr,this.rootOffset,size,Float.floatToRawIntBits(f));
-              }finally{
-                CheckedCollection.checkModCount(modCount,root.modCount);
-              }
+              final CheckedList root;
+              CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+              return OmniArray.OfFloat.uncheckedindexOfBits(root.arr,this.rootOffset,size,Float.floatToRawIntBits(f));
             }else if(f!=f){
-              final int modCount=this.modCount;
-              final var root=this.root;
-              try{
-                return OmniArray.OfFloat.uncheckedindexOfNaN(root.arr,this.rootOffset,size);
-              }finally{
-                CheckedCollection.checkModCount(modCount,root.modCount);
-              }
+              final CheckedList root;
+              CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+              return OmniArray.OfFloat.uncheckedindexOfNaN(root.arr,this.rootOffset,size);
             }else{
               break returnFalse;
             }
@@ -5533,95 +5369,55 @@ public abstract class FloatArrSeq implements OmniCollection.OfFloat,Cloneable
               if(!TypeUtil.checkCastToFloat(i)){
                 break returnFalse;
               }
-              final int modCount=this.modCount;
-              final var root=this.root;
-              try{
-                return OmniArray.OfFloat.uncheckedindexOfBits(root.arr,this.rootOffset,size,Float.floatToRawIntBits(i));
-              }finally{
-                CheckedCollection.checkModCount(modCount,root.modCount);
-              }
+              final CheckedList root;
+              CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+              return OmniArray.OfFloat.uncheckedindexOfBits(root.arr,this.rootOffset,size,Float.floatToRawIntBits(i));
             }
-            final int modCount=this.modCount;
-            final var root=this.root;
-            try{
-              return OmniArray.OfFloat.uncheckedindexOf0(root.arr,this.rootOffset,size);
-            }finally{
-              CheckedCollection.checkModCount(modCount,root.modCount);
-            }
+            final CheckedList root;
+            CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+            return OmniArray.OfFloat.uncheckedindexOf0(root.arr,this.rootOffset,size);
           }else if(val instanceof Long){
             final long l;
             if((l=(long)val)!=0){
               if(!TypeUtil.checkCastToFloat(l)){
                 break returnFalse;
               }
-              final int modCount=this.modCount;
-              final var root=this.root;
-              try{
-                return OmniArray.OfFloat.uncheckedindexOfBits(root.arr,this.rootOffset,size,Float.floatToRawIntBits(l));
-              }finally{
-                CheckedCollection.checkModCount(modCount,root.modCount);
-              }
+              final CheckedList root;
+              CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+              return OmniArray.OfFloat.uncheckedindexOfBits(root.arr,this.rootOffset,size,Float.floatToRawIntBits(l));
             }
-            final int modCount=this.modCount;
-            final var root=this.root;
-            try{
-              return OmniArray.OfFloat.uncheckedindexOf0(root.arr,this.rootOffset,size);
-            }finally{
-              CheckedCollection.checkModCount(modCount,root.modCount);
-            }
+            final CheckedList root;
+            CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+            return OmniArray.OfFloat.uncheckedindexOf0(root.arr,this.rootOffset,size);
           }else if(val instanceof Short||val instanceof Byte){
             final int i;
             if((i=((Number)val).shortValue())!=0){
-              final int modCount=this.modCount;
-              final var root=this.root;
-              try{
-                return OmniArray.OfFloat.uncheckedindexOfBits(root.arr,this.rootOffset,size,Float.floatToRawIntBits(i));
-              }finally{
-                CheckedCollection.checkModCount(modCount,root.modCount);
-              }
+              final CheckedList root;
+              CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+              return OmniArray.OfFloat.uncheckedindexOfBits(root.arr,this.rootOffset,size,Float.floatToRawIntBits(i));
             }
-            final int modCount=this.modCount;
-            final var root=this.root;
-            try{
-              return OmniArray.OfFloat.uncheckedindexOf0(root.arr,this.rootOffset,size);
-            }finally{
-              CheckedCollection.checkModCount(modCount,root.modCount);
-            }
+            final CheckedList root;
+            CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+            return OmniArray.OfFloat.uncheckedindexOf0(root.arr,this.rootOffset,size);
           }else if(val instanceof Character){
             final int i;
             if((i=(char)val)!=0){
-              final int modCount=this.modCount;
-              final var root=this.root;
-              try{
-                return OmniArray.OfFloat.uncheckedindexOfBits(root.arr,this.rootOffset,size,Float.floatToRawIntBits(i));
-              }finally{
-                CheckedCollection.checkModCount(modCount,root.modCount);
-              }
+              final CheckedList root;
+              CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+              return OmniArray.OfFloat.uncheckedindexOfBits(root.arr,this.rootOffset,size,Float.floatToRawIntBits(i));
             }
-            final int modCount=this.modCount;
-            final var root=this.root;
-            try{
-              return OmniArray.OfFloat.uncheckedindexOf0(root.arr,this.rootOffset,size);
-            }finally{
-              CheckedCollection.checkModCount(modCount,root.modCount);
-            }
+            final CheckedList root;
+            CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+            return OmniArray.OfFloat.uncheckedindexOf0(root.arr,this.rootOffset,size);
           }else if(val instanceof Boolean){
             if((boolean)val){
-              final int modCount=this.modCount;
-              final var root=this.root;
-              try{
-                return OmniArray.OfFloat.uncheckedindexOfBits(root.arr,this.rootOffset,size,TypeUtil.FLT_TRUE_BITS);
-              }finally{
-                CheckedCollection.checkModCount(modCount,root.modCount);
-              }
+              final CheckedList root;
+              CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+              return OmniArray.OfFloat.uncheckedindexOfBits(root.arr,this.rootOffset,size,TypeUtil.FLT_TRUE_BITS);
             }
-            final int modCount=this.modCount;
-            final var root=this.root;
-            try{
-              return OmniArray.OfFloat.uncheckedindexOf0(root.arr,this.rootOffset,size);
-            }finally{
-              CheckedCollection.checkModCount(modCount,root.modCount);
-            }
+            final CheckedList root;
+            CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+            return OmniArray.OfFloat.uncheckedindexOf0(root.arr,this.rootOffset,size);
           }else{
             break returnFalse;
           }
@@ -5654,21 +5450,13 @@ public abstract class FloatArrSeq implements OmniCollection.OfFloat,Cloneable
         {
           if(val!=0)
           {
-            final int modCount=this.modCount;
-            final var root=this.root;
-            try{
-              return OmniArray.OfFloat.uncheckedindexOfBits(root.arr,this.rootOffset,size,Float.floatToRawIntBits(val));
-            }finally{
-              CheckedCollection.checkModCount(modCount,root.modCount);
-            }
+            final CheckedList root;
+            CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+            return OmniArray.OfFloat.uncheckedindexOfBits(root.arr,this.rootOffset,size,Float.floatToRawIntBits(val));
           }
-          final int modCount=this.modCount;
-          final var root=this.root;
-          try{
-            return OmniArray.OfFloat.uncheckedindexOf0(root.arr,this.rootOffset,size);
-          }finally{
-            CheckedCollection.checkModCount(modCount,root.modCount);
-          }
+          final CheckedList root;
+          CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+          return OmniArray.OfFloat.uncheckedindexOf0(root.arr,this.rootOffset,size);
         }
       }
       CheckedCollection.checkModCount(modCount,root.modCount);
@@ -5683,21 +5471,13 @@ public abstract class FloatArrSeq implements OmniCollection.OfFloat,Cloneable
         {
           if(val!=0)
           {
-            final int modCount=this.modCount;
-            final var root=this.root;
-            try{
-              return OmniArray.OfFloat.uncheckedindexOfBits(root.arr,this.rootOffset,size,Float.floatToRawIntBits(val));
-            }finally{
-              CheckedCollection.checkModCount(modCount,root.modCount);
-            }
+            final CheckedList root;
+            CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+            return OmniArray.OfFloat.uncheckedindexOfBits(root.arr,this.rootOffset,size,Float.floatToRawIntBits(val));
           }
-          final int modCount=this.modCount;
-          final var root=this.root;
-          try{
-            return OmniArray.OfFloat.uncheckedindexOf0(root.arr,this.rootOffset,size);
-          }finally{
-            CheckedCollection.checkModCount(modCount,root.modCount);
-          }
+          final CheckedList root;
+          CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+          return OmniArray.OfFloat.uncheckedindexOf0(root.arr,this.rootOffset,size);
         }
       }
       CheckedCollection.checkModCount(modCount,root.modCount);
@@ -5711,21 +5491,13 @@ public abstract class FloatArrSeq implements OmniCollection.OfFloat,Cloneable
       {
         if(val)
         {
-          final int modCount=this.modCount;
-          final var root=this.root;
-          try{
-            return OmniArray.OfFloat.uncheckedlastIndexOfBits(root.arr,this.rootOffset,size,TypeUtil.FLT_TRUE_BITS);
-          }finally{
-            CheckedCollection.checkModCount(modCount,root.modCount);
-          }
+          final CheckedList root;
+          CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+          return OmniArray.OfFloat.uncheckedlastIndexOfBits(root.arr,this.rootOffset,size,TypeUtil.FLT_TRUE_BITS);
         }
-        final int modCount=this.modCount;
-        final var root=this.root;
-        try{
-          return OmniArray.OfFloat.uncheckedlastIndexOf0(root.arr,this.rootOffset,size);
-        }finally{
-          CheckedCollection.checkModCount(modCount,root.modCount);
-        }
+        final CheckedList root;
+        CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+        return OmniArray.OfFloat.uncheckedlastIndexOf0(root.arr,this.rootOffset,size);
       }
       CheckedCollection.checkModCount(modCount,root.modCount);
       return -1;
@@ -5741,24 +5513,16 @@ public abstract class FloatArrSeq implements OmniCollection.OfFloat,Cloneable
           {
             if(TypeUtil.checkCastToFloat(val))
             {
-              final int modCount=this.modCount;
-              final var root=this.root;
-              try{
-                return OmniArray.OfFloat.uncheckedlastIndexOfBits(root.arr,this.rootOffset,size,Float.floatToRawIntBits(val));
-              }finally{
-                CheckedCollection.checkModCount(modCount,root.modCount);
-              }
+              final CheckedList root;
+              CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+              return OmniArray.OfFloat.uncheckedlastIndexOfBits(root.arr,this.rootOffset,size,Float.floatToRawIntBits(val));
             }
           }
           else
           {
-            final int modCount=this.modCount;
-            final var root=this.root;
-            try{
-              return OmniArray.OfFloat.uncheckedlastIndexOf0(root.arr,this.rootOffset,size);
-            }finally{
-              CheckedCollection.checkModCount(modCount,root.modCount);
-            }
+            final CheckedList root;
+            CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+            return OmniArray.OfFloat.uncheckedlastIndexOf0(root.arr,this.rootOffset,size);
           }
         }
       }
@@ -5775,24 +5539,16 @@ public abstract class FloatArrSeq implements OmniCollection.OfFloat,Cloneable
         {
           if(TypeUtil.checkCastToFloat(val))
           {
-            final int modCount=this.modCount;
-            final var root=this.root;
-            try{
-              return OmniArray.OfFloat.uncheckedlastIndexOfBits(root.arr,this.rootOffset,size,Float.floatToRawIntBits(val));
-            }finally{
-              CheckedCollection.checkModCount(modCount,root.modCount);
-            }
+            final CheckedList root;
+            CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+            return OmniArray.OfFloat.uncheckedlastIndexOfBits(root.arr,this.rootOffset,size,Float.floatToRawIntBits(val));
           }
         }
         else
         {
-          final int modCount=this.modCount;
-          final var root=this.root;
-          try{
-            return OmniArray.OfFloat.uncheckedlastIndexOf0(root.arr,this.rootOffset,size);
-          }finally{
-            CheckedCollection.checkModCount(modCount,root.modCount);
-          }
+          final CheckedList root;
+          CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+          return OmniArray.OfFloat.uncheckedlastIndexOf0(root.arr,this.rootOffset,size);
         }
       }
       CheckedCollection.checkModCount(modCount,root.modCount);
@@ -5806,21 +5562,13 @@ public abstract class FloatArrSeq implements OmniCollection.OfFloat,Cloneable
       {
         if(val==val)
         {
-          final int modCount=this.modCount;
-          final var root=this.root;
-          try{
-            return OmniArray.OfFloat.uncheckedlastIndexOfBits(root.arr,this.rootOffset,size,Float.floatToRawIntBits(val));
-          }finally{
-            CheckedCollection.checkModCount(modCount,root.modCount);
-          }
+          final CheckedList root;
+          CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+          return OmniArray.OfFloat.uncheckedlastIndexOfBits(root.arr,this.rootOffset,size,Float.floatToRawIntBits(val));
         }
-        final int modCount=this.modCount;
-        final var root=this.root;
-        try{
-          return OmniArray.OfFloat.uncheckedlastIndexOfNaN(root.arr,this.rootOffset,size);
-        }finally{
-          CheckedCollection.checkModCount(modCount,root.modCount);
-        }
+        final CheckedList root;
+        CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+        return OmniArray.OfFloat.uncheckedlastIndexOfNaN(root.arr,this.rootOffset,size);
       }
       CheckedCollection.checkModCount(modCount,root.modCount);
       return -1;
@@ -5834,23 +5582,15 @@ public abstract class FloatArrSeq implements OmniCollection.OfFloat,Cloneable
         final float v;
         if(val==(v=(float)val))
         {
-          final int modCount=this.modCount;
-          final var root=this.root;
-          try{
-            return OmniArray.OfFloat.uncheckedlastIndexOfBits(root.arr,this.rootOffset,size,Float.floatToRawIntBits(v));
-          }finally{
-            CheckedCollection.checkModCount(modCount,root.modCount);
-          }
+          final CheckedList root;
+          CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+          return OmniArray.OfFloat.uncheckedlastIndexOfBits(root.arr,this.rootOffset,size,Float.floatToRawIntBits(v));
         }
         else if(v!=v)
         {
-          final int modCount=this.modCount;
-          final var root=this.root;
-          try{
-            return OmniArray.OfFloat.uncheckedlastIndexOfNaN(root.arr,this.rootOffset,size);
-          }finally{
-            CheckedCollection.checkModCount(modCount,root.modCount);
-          }
+          final CheckedList root;
+          CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+          return OmniArray.OfFloat.uncheckedlastIndexOfNaN(root.arr,this.rootOffset,size);
         }
       }
       CheckedCollection.checkModCount(modCount,root.modCount);
@@ -5859,6 +5599,7 @@ public abstract class FloatArrSeq implements OmniCollection.OfFloat,Cloneable
     @Override
     public int lastIndexOf(Object val)
     {
+      //TODO refactor this to reduce the calls to check mod count
       final int size;
       if((size=this.size)!=0){
        //TODO a pattern-matching switch statement would be great here
@@ -5866,40 +5607,24 @@ public abstract class FloatArrSeq implements OmniCollection.OfFloat,Cloneable
           if(val instanceof Float){
             final float f;
             if((f=(float)val)==f){
-               final int modCount=this.modCount;
-               final var root=this.root;
-               try{
-                 return OmniArray.OfFloat.uncheckedlastIndexOfBits(root.arr,this.rootOffset,size,Float.floatToRawIntBits(f));
-               }finally{
-                 CheckedCollection.checkModCount(modCount,root.modCount);
-               }
+               final CheckedList root;
+               CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+               return OmniArray.OfFloat.uncheckedlastIndexOfBits(root.arr,this.rootOffset,size,Float.floatToRawIntBits(f));
             }
-            final int modCount=this.modCount;
-            final var root=this.root;
-            try{
-              return OmniArray.OfFloat.uncheckedlastIndexOfNaN(root.arr,this.rootOffset,size);
-            }finally{
-              CheckedCollection.checkModCount(modCount,root.modCount);
-            }
+            final CheckedList root;
+            CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+            return OmniArray.OfFloat.uncheckedlastIndexOfNaN(root.arr,this.rootOffset,size);
           }else if(val instanceof Double){
             final double d;
             final float f;
             if((d=(double)val)==(f=(float)d)){
-              final int modCount=this.modCount;
-              final var root=this.root;
-              try{
-                return OmniArray.OfFloat.uncheckedlastIndexOfBits(root.arr,this.rootOffset,size,Float.floatToRawIntBits(f));
-              }finally{
-                CheckedCollection.checkModCount(modCount,root.modCount);
-              }
+              final CheckedList root;
+              CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+              return OmniArray.OfFloat.uncheckedlastIndexOfBits(root.arr,this.rootOffset,size,Float.floatToRawIntBits(f));
             }else if(f!=f){
-              final int modCount=this.modCount;
-              final var root=this.root;
-              try{
-                return OmniArray.OfFloat.uncheckedlastIndexOfNaN(root.arr,this.rootOffset,size);
-              }finally{
-                CheckedCollection.checkModCount(modCount,root.modCount);
-              }
+              final CheckedList root;
+              CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+              return OmniArray.OfFloat.uncheckedlastIndexOfNaN(root.arr,this.rootOffset,size);
             }else{
               break returnFalse;
             }
@@ -5909,95 +5634,55 @@ public abstract class FloatArrSeq implements OmniCollection.OfFloat,Cloneable
               if(!TypeUtil.checkCastToFloat(i)){
                 break returnFalse;
               }
-              final int modCount=this.modCount;
-              final var root=this.root;
-              try{
-                return OmniArray.OfFloat.uncheckedlastIndexOfBits(root.arr,this.rootOffset,size,Float.floatToRawIntBits(i));
-              }finally{
-                CheckedCollection.checkModCount(modCount,root.modCount);
-              }
+              final CheckedList root;
+              CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+              return OmniArray.OfFloat.uncheckedlastIndexOfBits(root.arr,this.rootOffset,size,Float.floatToRawIntBits(i));
             }
-            final int modCount=this.modCount;
-            final var root=this.root;
-            try{
-              return OmniArray.OfFloat.uncheckedlastIndexOf0(root.arr,this.rootOffset,size);
-            }finally{
-              CheckedCollection.checkModCount(modCount,root.modCount);
-            }
+            final CheckedList root;
+            CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+            return OmniArray.OfFloat.uncheckedlastIndexOf0(root.arr,this.rootOffset,size);
           }else if(val instanceof Long){
             final long l;
             if((l=(long)val)!=0){
               if(!TypeUtil.checkCastToFloat(l)){
                 break returnFalse;
               }
-              final int modCount=this.modCount;
-              final var root=this.root;
-              try{
-                return OmniArray.OfFloat.uncheckedlastIndexOfBits(root.arr,this.rootOffset,size,Float.floatToRawIntBits(l));
-              }finally{
-                CheckedCollection.checkModCount(modCount,root.modCount);
-              }
+              final CheckedList root;
+              CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+              return OmniArray.OfFloat.uncheckedlastIndexOfBits(root.arr,this.rootOffset,size,Float.floatToRawIntBits(l));
             }
-            final int modCount=this.modCount;
-            final var root=this.root;
-            try{
-              return OmniArray.OfFloat.uncheckedlastIndexOf0(root.arr,this.rootOffset,size);
-            }finally{
-              CheckedCollection.checkModCount(modCount,root.modCount);
-            }
+            final CheckedList root;
+            CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+            return OmniArray.OfFloat.uncheckedlastIndexOf0(root.arr,this.rootOffset,size);
           }else if(val instanceof Short||val instanceof Byte){
             final int i;
             if((i=((Number)val).shortValue())!=0){
-              final int modCount=this.modCount;
-              final var root=this.root;
-              try{
-                return OmniArray.OfFloat.uncheckedlastIndexOfBits(root.arr,this.rootOffset,size,Float.floatToRawIntBits(i));
-              }finally{
-                CheckedCollection.checkModCount(modCount,root.modCount);
-              }
+              final CheckedList root;
+              CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+              return OmniArray.OfFloat.uncheckedlastIndexOfBits(root.arr,this.rootOffset,size,Float.floatToRawIntBits(i));
             }
-            final int modCount=this.modCount;
-            final var root=this.root;
-            try{
-              return OmniArray.OfFloat.uncheckedlastIndexOf0(root.arr,this.rootOffset,size);
-            }finally{
-              CheckedCollection.checkModCount(modCount,root.modCount);
-            }
+            final CheckedList root;
+            CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+            return OmniArray.OfFloat.uncheckedlastIndexOf0(root.arr,this.rootOffset,size);
           }else if(val instanceof Character){
             final int i;
             if((i=(char)val)!=0){
-              final int modCount=this.modCount;
-              final var root=this.root;
-              try{
-                return OmniArray.OfFloat.uncheckedlastIndexOfBits(root.arr,this.rootOffset,size,Float.floatToRawIntBits(i));
-              }finally{
-                CheckedCollection.checkModCount(modCount,root.modCount);
-              }
+              final CheckedList root;
+              CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+              return OmniArray.OfFloat.uncheckedlastIndexOfBits(root.arr,this.rootOffset,size,Float.floatToRawIntBits(i));
             }
-            final int modCount=this.modCount;
-            final var root=this.root;
-            try{
-              return OmniArray.OfFloat.uncheckedlastIndexOf0(root.arr,this.rootOffset,size);
-            }finally{
-              CheckedCollection.checkModCount(modCount,root.modCount);
-            }
+            final CheckedList root;
+            CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+            return OmniArray.OfFloat.uncheckedlastIndexOf0(root.arr,this.rootOffset,size);
           }else if(val instanceof Boolean){
             if((boolean)val){
-              final int modCount=this.modCount;
-              final var root=this.root;
-              try{
-                return OmniArray.OfFloat.uncheckedlastIndexOfBits(root.arr,this.rootOffset,size,TypeUtil.FLT_TRUE_BITS);
-              }finally{
-                CheckedCollection.checkModCount(modCount,root.modCount);
-              }
+              final CheckedList root;
+              CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+              return OmniArray.OfFloat.uncheckedlastIndexOfBits(root.arr,this.rootOffset,size,TypeUtil.FLT_TRUE_BITS);
             }
-            final int modCount=this.modCount;
-            final var root=this.root;
-            try{
-              return OmniArray.OfFloat.uncheckedlastIndexOf0(root.arr,this.rootOffset,size);
-            }finally{
-              CheckedCollection.checkModCount(modCount,root.modCount);
-            }
+            final CheckedList root;
+            CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+            return OmniArray.OfFloat.uncheckedlastIndexOf0(root.arr,this.rootOffset,size);
           }else{
             break returnFalse;
           }
@@ -6030,21 +5715,13 @@ public abstract class FloatArrSeq implements OmniCollection.OfFloat,Cloneable
         {
           if(val!=0)
           {
-            final int modCount=this.modCount;
-            final var root=this.root;
-            try{
-              return OmniArray.OfFloat.uncheckedlastIndexOfBits(root.arr,this.rootOffset,size,Float.floatToRawIntBits(val));
-            }finally{
-              CheckedCollection.checkModCount(modCount,root.modCount);
-            }
+            final CheckedList root;
+            CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+            return OmniArray.OfFloat.uncheckedlastIndexOfBits(root.arr,this.rootOffset,size,Float.floatToRawIntBits(val));
           }
-          final int modCount=this.modCount;
-          final var root=this.root;
-          try{
-            return OmniArray.OfFloat.uncheckedlastIndexOf0(root.arr,this.rootOffset,size);
-          }finally{
-            CheckedCollection.checkModCount(modCount,root.modCount);
-          }
+          final CheckedList root;
+          CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+          return OmniArray.OfFloat.uncheckedlastIndexOf0(root.arr,this.rootOffset,size);
         }
       }
       CheckedCollection.checkModCount(modCount,root.modCount);
@@ -6059,21 +5736,13 @@ public abstract class FloatArrSeq implements OmniCollection.OfFloat,Cloneable
         {
           if(val!=0)
           {
-            final int modCount=this.modCount;
-            final var root=this.root;
-            try{
-              return OmniArray.OfFloat.uncheckedlastIndexOfBits(root.arr,this.rootOffset,size,Float.floatToRawIntBits(val));
-            }finally{
-              CheckedCollection.checkModCount(modCount,root.modCount);
-            }
+            final CheckedList root;
+            CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+            return OmniArray.OfFloat.uncheckedlastIndexOfBits(root.arr,this.rootOffset,size,Float.floatToRawIntBits(val));
           }
-          final int modCount=this.modCount;
-          final var root=this.root;
-          try{
-            return OmniArray.OfFloat.uncheckedlastIndexOf0(root.arr,this.rootOffset,size);
-          }finally{
-            CheckedCollection.checkModCount(modCount,root.modCount);
-          }
+          final CheckedList root;
+          CheckedCollection.checkModCount(modCount,(root=this.root).modCount);
+          return OmniArray.OfFloat.uncheckedlastIndexOf0(root.arr,this.rootOffset,size);
         }
       }
       CheckedCollection.checkModCount(modCount,root.modCount);

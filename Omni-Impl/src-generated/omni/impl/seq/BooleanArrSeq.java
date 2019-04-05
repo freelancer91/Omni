@@ -217,6 +217,7 @@ public abstract class BooleanArrSeq implements OmniCollection.OfBoolean,Cloneabl
   @Override
   public boolean contains(Object val)
   {
+    //TODO refactor this to reduce the calls to check mod count
     final int size;
     if((size=this.size)!=0){
      //TODO a pattern-matching switch statement would be great here
@@ -412,6 +413,7 @@ public abstract class BooleanArrSeq implements OmniCollection.OfBoolean,Cloneabl
   @Override
   public boolean remove(Object val)
   {
+    //TODO refactor this to reduce the calls to check mod count
     final int size;
     if((size=this.size)!=0){
      //TODO a pattern-matching switch statement would be great here
@@ -979,6 +981,7 @@ public abstract class BooleanArrSeq implements OmniCollection.OfBoolean,Cloneabl
     @Override
     public int search(Object val)
     {
+      //TODO refactor this to reduce the calls to check mod count
       final int size;
       if((size=this.size)!=0){
        //TODO a pattern-matching switch statement would be great here
@@ -1570,6 +1573,7 @@ public abstract class BooleanArrSeq implements OmniCollection.OfBoolean,Cloneabl
     @Override
     public int indexOf(Object val)
     {
+      //TODO refactor this to reduce the calls to check mod count
       final int size;
       if((size=this.size)!=0){
        //TODO a pattern-matching switch statement would be great here
@@ -1765,6 +1769,7 @@ public abstract class BooleanArrSeq implements OmniCollection.OfBoolean,Cloneabl
     @Override
     public int lastIndexOf(Object val)
     {
+      //TODO refactor this to reduce the calls to check mod count
       final int size;
       if((size=this.size)!=0){
        //TODO a pattern-matching switch statement would be great here
@@ -2441,6 +2446,7 @@ public abstract class BooleanArrSeq implements OmniCollection.OfBoolean,Cloneabl
     @Override
     public boolean contains(Object val)
     {
+      //TODO refactor this to reduce the calls to check mod count
       final int size;
       if((size=this.size)!=0){
        //TODO a pattern-matching switch statement would be great here
@@ -2637,6 +2643,7 @@ public abstract class BooleanArrSeq implements OmniCollection.OfBoolean,Cloneabl
     @Override
     public boolean remove(Object val)
     {
+      //TODO refactor this to reduce the calls to check mod count
       final int size;
       if((size=this.size)!=0){
        //TODO a pattern-matching switch statement would be great here
@@ -2832,6 +2839,7 @@ public abstract class BooleanArrSeq implements OmniCollection.OfBoolean,Cloneabl
     @Override
     public int indexOf(Object val)
     {
+      //TODO refactor this to reduce the calls to check mod count
       final int size;
       if((size=this.size)!=0){
        //TODO a pattern-matching switch statement would be great here
@@ -3027,6 +3035,7 @@ public abstract class BooleanArrSeq implements OmniCollection.OfBoolean,Cloneabl
     @Override
     public int lastIndexOf(Object val)
     {
+      //TODO refactor this to reduce the calls to check mod count
       final int size;
       if((size=this.size)!=0){
        //TODO a pattern-matching switch statement would be great here
@@ -4770,6 +4779,7 @@ public abstract class BooleanArrSeq implements OmniCollection.OfBoolean,Cloneabl
     @Override
     public boolean contains(Object val)
     {
+      //TODO refactor this to reduce the calls to check mod count
       final int size;
       if((size=this.size)!=0){
        //TODO a pattern-matching switch statement would be great here
@@ -4978,6 +4988,7 @@ public abstract class BooleanArrSeq implements OmniCollection.OfBoolean,Cloneabl
     @Override
     public boolean remove(Object val)
     {
+      //TODO refactor this to reduce the calls to check mod count
       final int size;
       if((size=this.size)!=0){
        //TODO a pattern-matching switch statement would be great here
@@ -5209,6 +5220,7 @@ public abstract class BooleanArrSeq implements OmniCollection.OfBoolean,Cloneabl
     @Override
     public int indexOf(Object val)
     {
+      //TODO refactor this to reduce the calls to check mod count
       final int size;
       if((size=this.size)!=0){
        //TODO a pattern-matching switch statement would be great here
@@ -5446,6 +5458,7 @@ public abstract class BooleanArrSeq implements OmniCollection.OfBoolean,Cloneabl
     @Override
     public int lastIndexOf(Object val)
     {
+      //TODO refactor this to reduce the calls to check mod count
       final int size;
       if((size=this.size)!=0){
        //TODO a pattern-matching switch statement would be great here
