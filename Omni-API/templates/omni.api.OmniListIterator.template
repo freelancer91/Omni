@@ -145,7 +145,7 @@ public abstract interface OfCLASSPREFIX extends OmniListIterator<BOXEDTYPE>,Omni
   public default long previousLong(){
     return TypeUtil.castToLong(previousCLASSPREFIX());
   }
-  public default short prevousShort(){
+  public default short previousShort(){
     return TypeUtil.castToByte(previousCLASSPREFIX());
   }
 #ELSEIFNOTSWITCH ARRTYPE==double

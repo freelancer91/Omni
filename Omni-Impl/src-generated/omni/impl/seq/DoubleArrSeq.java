@@ -1060,11 +1060,6 @@ public abstract class DoubleArrSeq implements OmniCollection.OfDouble,Cloneable
         this.parent=parent;
         this.cursor=parent.size;
       }
-      private Itr(UncheckedStack parent,int cursor)
-      {
-        this.parent=parent;
-        this.cursor=cursor;
-      }
       @Override
       public boolean hasNext()
       {
@@ -3395,13 +3390,6 @@ public abstract class DoubleArrSeq implements OmniCollection.OfDouble,Cloneable
       {
         this.parent=parent;
         this.cursor=parent.size;
-        this.modCount=parent.modCount;
-        this.lastRet=-1;
-      }
-      private Itr(CheckedStack parent,int cursor)
-      {
-        this.parent=parent;
-        this.cursor=cursor;
         this.modCount=parent.modCount;
         this.lastRet=-1;
       }

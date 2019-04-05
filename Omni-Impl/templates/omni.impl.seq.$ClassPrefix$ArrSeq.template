@@ -3236,15 +3236,17 @@ private static class Itr$<E>$
     this.lastRet=-1;
 #ENDIF
   }
+#IFNOTSWITCH STRUCTNAME==UncheckedStack,CheckedStack
   private Itr(STRUCTNAME$<E>$ parent,int cursor)
   {
     this.parent=parent;
     this.cursor=cursor;
-#IFSWITCH STRUCTNAME==CheckedList,CheckedStack,CheckedSubList
+  #IFSWITCH STRUCTNAME==CheckedList,CheckedSubList
     this.modCount=parent.modCount;
     this.lastRet=-1;
-#ENDIF
+  #ENDIF
   }
+#ENDIF
   @Override
   public boolean hasNext()
   {

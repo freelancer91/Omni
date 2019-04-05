@@ -12,12 +12,13 @@ import omni.util.TypeConversionUtil;
 import omni.api.OmniCollection;
 import omni.api.OmniList;
 import omni.api.OmniStack;
+import omni.api.OmniIterator;
 import omni.api.OmniListIterator;
 import org.junit.jupiter.api.Assertions;
 #IF OfRef
 @SuppressWarnings({"rawtypes","unchecked"}) 
 #ENDIF
-public enum $ClassPrefix$InputTestArgType{
+public enum $ClassPrefix$OutputTestArgType{
   #MACRO OutputTestArgTypeImpl<ARRAY_TYPE>($ArrayType$,$TypeNameModifier$,$defaultVal$,OmniArray.Of$ClassPrefix$.DEFAULT_ARR)
 #IFNOT OfRef
   ,
@@ -50,13 +51,29 @@ public enum $ClassPrefix$InputTestArgType{
   #ENDIF
 #ENDIF
   ;
-#MACRODEF OutputTestArgTypeImpl<VALUE_NAME,OUTPUTTYPE>(OUTPUTTYPE,TYPENAMEMODIFIER,DEFAULT_VAL,DEFAULTARR)
+#MACRODEF OutputTestArgTypeImpl<VALUE_NAME>(OUTPUTTYPE,TYPENAMEMODIFIER,DEFAULT_VAL,DEFAULTARR)
 VALUE_NAME{
   @Override public void verifyItrPrevious(OmniIterator.Of$ClassPrefix$ itr,int valToConvert){
-    Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPE(valToConvert),((OmniListIterator.Of$ClassPrefix)itr).previousTYPENAMEMODIFIER());
+#IF OfBoolean
+  #IFSWITCH VALUE_NAME==ARRAY_TYPE,BOXED_TYPE
+    Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPE(valToConvert),((OmniListIterator.Of$ClassPrefix$)itr).previousTYPENAMEMODIFIER());
+  #ELSE
+    Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPEboolean(valToConvert),((OmniListIterator.Of$ClassPrefix$)itr).previousTYPENAMEMODIFIER());
+  #ENDIF
+#ELSE
+    Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPE(valToConvert),((OmniListIterator.Of$ClassPrefix$)itr).previousTYPENAMEMODIFIER());
+#ENDIF
   }
   @Override public void verifyItrNext(OmniIterator.Of$ClassPrefix$ itr,int valToConvert){
+#IF OfBoolean
+  #IFSWITCH VALUE_NAME==ARRAY_TYPE,BOXED_TYPE
     Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPE(valToConvert),itr.nextTYPENAMEMODIFIER());
+  #ELSE
+    Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPEboolean(valToConvert),itr.nextTYPENAMEMODIFIER());
+  #ENDIF
+#ELSE
+    Assertions.assertEquals(TypeConversionUtil.convertToOUTPUTTYPE(valToConvert),itr.nextTYPENAMEMODIFIER());
+#ENDIF
   }
 }
 #ENDDEF

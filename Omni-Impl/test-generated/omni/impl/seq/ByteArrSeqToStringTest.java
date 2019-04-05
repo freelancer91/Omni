@@ -69,7 +69,7 @@ public class ByteArrSeqToStringTest
     Assertions.assertEquals(expected,new ByteArrSeq.UncheckedStack().toString());
   }
   //TODO make this faster or place is switch to disable it as desired
-  @Test
+  //@Test
   public void testLargeArrSeqToString()
   {
     testArrSeqToString((OmniArray.MAX_ARR_SIZE/(MAX_TOSTRING_LENGTH+2))+1);

@@ -52,7 +52,7 @@ public abstract interface OmniListIterator<E> extends OmniIterator<E>,ListIterat
     public default long previousLong(){
       return TypeUtil.castToLong(previousBoolean());
     }
-    public default short prevousShort(){
+    public default short previousShort(){
       return TypeUtil.castToByte(previousBoolean());
     }
   }
